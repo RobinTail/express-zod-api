@@ -7,20 +7,16 @@ type ZodObject = z.ZodObject<z.ZodRawShape>;
 type RawHandlerImplementation<
   IN extends ZodObject,
   OUT extends ZodObject
-> = InnerTypeOfFunction<z.ZodTuple<[IN]>, OUT>;
+> = InnerTypeOfFunction<z.ZodTuple<[IN, typeof handlerOptions]>, OUT>;
 
+const handlerOptions = z.object({
+  path: z.string(),
+  urlParams: z.record(z.any()), // ParamsDictionary
+  query: z.record(z.any()), // ParsedQs
+  headers: z.record(z.any()), // IncomingHttpHeaders
+});
 
-const t = z.function(
-  z.tuple([
-    z.string(),
-    z.number()
-  ]),
-  z.null()
-).implement((m, f) => {
-  return null;
-})
-
-const createHandlerParams = (obj: ZodObject) => z.tuple([obj]);
+const createHandlerParams = (params: ZodObject) => z.tuple([params, handlerOptions]);
 export const createHandler = <
   IN extends ZodObject,
   OUT extends ZodObject,
@@ -64,7 +60,12 @@ export const tryHandler = ({req, res, handler}: {
   handler: Handler
 }) => {
   try {
-    const result = handler(req.body);
+    const result = handler(req.body, {
+      path: req.path,
+      urlParams: req.params,
+      query: req.query,
+      headers: req.headers,
+    });
     replySuccess(res, result);
   } catch (err) {
     replyError(res, err);
