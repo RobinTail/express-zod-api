@@ -1,6 +1,7 @@
 import * as z from 'zod';
 import {createHandler} from '../handler';
 import {logger} from '../logger';
+import * as createHttpError from 'http-errors';
 
 const params = z.object({
   id: z.number().int().nonnegative(),
@@ -18,6 +19,9 @@ export const getUserHandler = createHandler({
     const name = 'sample';
     if (id < 10) {
       return { status: returns.shape.status.enum.OK, name };
+    }
+    if (id > 100) {
+      throw createHttpError(404, 'User not found');
     }
     return { status: returns.shape.status.enum.Warning, name };
   }

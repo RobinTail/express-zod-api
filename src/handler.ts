@@ -2,6 +2,7 @@ import * as express from 'express';
 import * as z from 'zod';
 import {InnerTypeOfFunction} from 'zod/lib/cjs/types/function';
 import {ZodIssueCode} from 'zod/lib/cjs/ZodError';
+import {HttpError} from 'http-errors';
 
 type ZodObject = z.ZodObject<z.ZodRawShape>;
 type RawHandlerImplementation<
@@ -49,7 +50,7 @@ const replySuccess = (res: express.Response, result: ZodObject) => {
 }
 
 const replyError = (res: express.Response, err: Error) => {
-  res.status(500).type('json').send({
+  res.status(err instanceof HttpError ? err.statusCode : 500).type('json').send({
     error: createErrorMessage(err),
   });
 }
