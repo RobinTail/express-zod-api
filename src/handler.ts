@@ -50,7 +50,14 @@ const replySuccess = (res: express.Response, result: ZodObject) => {
 }
 
 const replyError = (res: express.Response, err: Error) => {
-  res.status(err instanceof HttpError ? err.statusCode : 500).type('json').send({
+  let code = 500;
+  if (err instanceof HttpError) {
+    code = err.statusCode;
+  }
+  if (err instanceof z.ZodError) {
+    code = 400;
+  }
+  res.status(code).type('json').send({
     error: createErrorMessage(err),
   });
 }
