@@ -7,8 +7,13 @@ const params = z.object({
   id: z.number().int().nonnegative(),
 });
 
+enum Status {
+  OK = "That's ok",
+  Warning = 'Some kind of warning'
+}
+
 const returns = z.object({
-  status: z.enum(['OK', 'Warning']),
+  status: z.nativeEnum(Status),
   name: z.string(),
   meta: z.string()
 });
@@ -31,7 +36,7 @@ export const getUserEndpoint = new EndpointsFactory().addMiddleware({
     const meta = `Your key is ${options.isValidKey ? 'valid' : 'invalid'}: ${key}`;
     if (id < 10) {
       return Promise.resolve({
-        status: returns.shape.status.enum.OK as z.infer<typeof returns.shape.status>,
+        status: Status.OK,
         name, meta
       });
     }
@@ -39,7 +44,7 @@ export const getUserEndpoint = new EndpointsFactory().addMiddleware({
       throw createHttpError(404, 'User not found');
     }
     return Promise.resolve({
-      status: returns.shape.status.enum.Warning as z.infer<typeof returns.shape.status>,
+      status: Status.Warning,
       name, meta
     });
   }
