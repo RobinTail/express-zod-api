@@ -1,5 +1,6 @@
 {
-  "name": "zod",
+  "name": "zod-api",
+  "description": "Sample ZOD API",
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
