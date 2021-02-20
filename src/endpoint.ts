@@ -1,5 +1,5 @@
 import * as z from 'zod';
-import {Unshape} from './helpers';
+import {JoinUnshaped, Unshape} from './helpers';
 import {logger} from './logger';
 import {Request, Response} from 'express';
 import {MiddlewareDefinition} from './middleware';
@@ -19,14 +19,14 @@ export class Endpoint<IN extends z.ZodRawShape, OUT extends z.ZodRawShape, mIN, 
   protected middlewares: MiddlewareDefinition<any, any, any>[] = [];
   protected inputSchema: z.ZodObject<IN>;
   protected outputSchema: z.ZodObject<OUT>;
-  protected handler: Handler<Unshape<IN> & Unshape<mIN>, Unshape<OUT>, OPT>
+  protected handler: Handler<JoinUnshaped<IN, mIN>, Unshape<OUT>, OPT>
   protected resultHandler: ResultHandler;
 
   constructor({middlewares, inputSchema, outputSchema, handler, resultHandler}: {
     middlewares: MiddlewareDefinition<any, any, any>[],
     inputSchema: z.ZodObject<IN>,
     outputSchema: z.ZodObject<OUT>,
-    handler: Handler<Unshape<IN> & Unshape<mIN>, Unshape<OUT>, OPT>
+    handler: Handler<JoinUnshaped<IN, mIN>, Unshape<OUT>, OPT>
     resultHandler: ResultHandler | null
   }) {
     super();
