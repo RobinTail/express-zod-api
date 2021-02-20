@@ -1,10 +1,10 @@
 import {Express} from 'express';
-import {Handler, tryHandler} from './handler';
+import {AbstractEndpoint} from './endpoint';
 import {logger} from './logger';
 import {v1Routing} from './v1';
 
 export interface Routing {
-  [PATH: string]: Handler | Routing;
+  [PATH: string]: AbstractEndpoint | Routing;
 }
 
 export const routing: Routing = {
@@ -15,10 +15,10 @@ export const initRouting = (app: Express, routing: Routing, parentPath?: string)
   Object.keys(routing).forEach((path) => {
     const fullPath = `${parentPath || ''}/${path}`;
     const handler = routing[path];
-    if (typeof handler === 'function') {
-      app.post(fullPath, (req, res) => {
+    if (handler instanceof AbstractEndpoint) {
+      app.post(fullPath, async (req, res) => {
         logger.info(`${req.method}: ${fullPath}`);
-        tryHandler({req, res, handler});
+        await handler.execute(req, res);
       });
     } else {
       initRouting(app, handler, fullPath);

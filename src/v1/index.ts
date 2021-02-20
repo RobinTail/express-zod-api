@@ -1,6 +1,6 @@
 import {Routing} from '../routing';
-import {getUserHandler} from './get-user';
+import {getUserEndpoint} from './get-user';
 
 export const v1Routing: Routing =  {
-  getUser: getUserHandler
+  getUser: getUserEndpoint
 }
