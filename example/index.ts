@@ -1,6 +1,6 @@
-import {ConfigType} from '../src/config-type';
-import {Routing} from '../src/routing';
-import {createServer} from '../src/server';
+import {ConfigType} from '../src';
+import {Routing} from '../src';
+import {createServer} from '../src';
 import {v1Routing} from './v1';
 
 export const config: ConfigType = {

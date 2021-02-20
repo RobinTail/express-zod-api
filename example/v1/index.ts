@@ -1,4 +1,4 @@
-import {Routing} from '../../src/routing';
+import {Routing} from '../../src';
 import {getUserEndpoint} from './get-user';
 import {setUserEndpoint} from './set-user';
 
