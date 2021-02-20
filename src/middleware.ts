@@ -17,3 +17,7 @@ export interface MiddlewareDefinition<IN extends z.ZodRawShape, OPT, OUT> {
   input: ObjectSchema<IN>;
   middleware: Middleware<Unshape<IN>, OPT, OUT>;
 }
+
+export const createMiddleware = <IN extends z.ZodRawShape, OPT, OUT>(
+  definition: MiddlewareDefinition<IN, OPT, OUT>
+) => definition;
