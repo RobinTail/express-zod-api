@@ -16,9 +16,11 @@ export const initRouting = (app: Express, routing: Routing, parentPath?: string)
     const fullPath = `${parentPath || ''}/${path}`;
     const handler = routing[path];
     if (handler instanceof AbstractEndpoint) {
-      app[handler.getMethod()](fullPath, async (req, res) => {
-        logger.info(`${req.method}: ${fullPath}`);
-        await handler.execute(req, res);
+      handler.getMethods().forEach((method) => {
+        app[method](fullPath, async (req, res) => {
+          logger.info(`${req.method}: ${fullPath}`);
+          await handler.execute(req, res);
+        });
       });
     } else {
       initRouting(app, handler, fullPath);

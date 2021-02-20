@@ -11,10 +11,10 @@ export type Handler<IN, OUT, OPT> = (params: {
 }) => Promise<OUT>;
 
 export abstract class AbstractEndpoint {
-  protected method: Method;
+  protected methods: Method[];
   public abstract execute(request: Request, response: Response): Promise<void>;
-  public getMethod() {
-    return this.method;
+  public getMethods() {
+    return this.methods;
   }
 }
 
@@ -28,8 +28,8 @@ export class Endpoint<IN extends z.ZodRawShape, OUT extends z.ZodRawShape, mIN, 
   protected handler: Handler<JoinUnshaped<IN, mIN>, Unshape<OUT>, OPT>
   protected resultHandler: ResultHandler;
 
-  constructor({method, middlewares, inputSchema, outputSchema, handler, resultHandler}: {
-    method: Method;
+  constructor({methods, middlewares, inputSchema, outputSchema, handler, resultHandler}: {
+    methods: Method[];
     middlewares: MiddlewareDefinition<any, any, any>[],
     inputSchema: z.ZodObject<IN>,
     outputSchema: z.ZodObject<OUT>,
@@ -37,7 +37,7 @@ export class Endpoint<IN extends z.ZodRawShape, OUT extends z.ZodRawShape, mIN, 
     resultHandler: ResultHandler | null
   }) {
     super();
-    this.method = method;
+    this.methods = methods;
     this.middlewares = middlewares;
     this.inputSchema = inputSchema;
     this.outputSchema = outputSchema;
@@ -46,8 +46,9 @@ export class Endpoint<IN extends z.ZodRawShape, OUT extends z.ZodRawShape, mIN, 
   }
 
   public async execute(request: Request, response: Response) {
+    const accessMethods = this.methods.map((method) => method.toUpperCase()).concat('OPTIONS').join(', ');
     response.set('Access-Control-Allow-Origin', '*');
-    response.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+    response.set('Access-Control-Allow-Methods', accessMethods);
     response.set('Access-Control-Allow-Headers', 'content-type');
 
     if (request.method === 'OPTIONS') {
@@ -65,7 +66,7 @@ export class Endpoint<IN extends z.ZodRawShape, OUT extends z.ZodRawShape, mIN, 
       if (request.method === 'GET') {
         initialInput = request.query
       }
-      if (request.method === 'DELETE') {
+      if (request.method === 'DELETE') { // _may_ have body
         initialInput = {...request.query, ...request.body};
       }
       let input = {...initialInput};

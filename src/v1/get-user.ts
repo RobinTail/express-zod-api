@@ -31,7 +31,7 @@ export const getUserEndpoint = new EndpointsFactory().addMiddleware({
     });
   }
 }).build({
-  method: 'get',
+  methods: ['get'],
   input: params,
   output: returns,
   handler: ({input: {id, key}, options}) => {

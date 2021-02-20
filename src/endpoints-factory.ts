@@ -31,14 +31,14 @@ export class EndpointsFactory<mIN, mOUT> {
     );
   }
 
-  public build<IN extends z.ZodRawShape, OUT extends z.ZodRawShape>({method, input, output, handler}: {
-    method: Method,
+  public build<IN extends z.ZodRawShape, OUT extends z.ZodRawShape>({methods, input, output, handler}: {
+    methods: Method[],
     input: z.ZodObject<IN>,
     output: z.ZodObject<OUT>,
     handler: Handler<JoinUnshaped<IN, mIN>, Unshape<OUT>, mOUT>
   }) {
     return new Endpoint<IN, OUT, mIN, mOUT>({
-      method, handler,
+      methods, handler,
       middlewares: this.middlewares,
       inputSchema: input,
       outputSchema: output,
