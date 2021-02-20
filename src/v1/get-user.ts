@@ -1,5 +1,5 @@
 import * as z from 'zod';
-import {EndpointBuilder} from '../endpoint';
+import {EndpointsFactory} from '../endpoints-factory';
 import {logger} from '../logger';
 import * as createHttpError from 'http-errors';
 
@@ -13,7 +13,7 @@ const returns = z.object({
   meta: z.string()
 });
 
-export const getUserEndpoint = new EndpointBuilder().addMiddleware({
+export const getUserEndpoint = new EndpointsFactory().addMiddleware({
   input: z.object({
     key: z.string().optional()
   }),
