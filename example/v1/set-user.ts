@@ -12,7 +12,7 @@ export const setUserEndpoint = keyAndTokenAuthenticatedEndpointsFactory.build({
   input: z.object({
     id: z.number().int().nonnegative(),
     name: z.string().nonempty()
-  }).nonstrict(), // to have key provided by middleware input
+  }),
   output: z.object({
     status: z.nativeEnum(Status),
   }),
