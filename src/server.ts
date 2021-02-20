@@ -25,7 +25,7 @@ export function createServer(config: ConfigType, routing: Routing) {
     }
   ]);
 
-  initRouting({app, routing, logger});
+  initRouting({app, routing, logger, config});
 
   app.use((request, response) => {
     defaultResultHandler({

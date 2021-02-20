@@ -6,6 +6,7 @@ import {v1Routing} from './v1';
 export const config: ConfigType = {
   server: {
     listen: 8090,
+    cors: true
   },
   logger: {
     level: 'debug',
