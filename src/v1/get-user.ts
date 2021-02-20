@@ -5,9 +5,9 @@ import * as createHttpError from 'http-errors';
 
 const params = z.object({
   // for POST method:
-  // id: z.number().int().nonnegative(),
+  id: z.number().int().nonnegative(),
   // for GET method:
-  id: z.string().transform((id) => parseInt(id, 10))
+  // id: z.string().transform((id) => parseInt(id, 10))
 });
 
 enum Status {
@@ -31,7 +31,7 @@ export const getUserEndpoint = new EndpointsFactory().addMiddleware({
     });
   }
 }).build({
-  methods: ['get'],
+  methods: ['post'],
   input: params,
   output: returns,
   handler: ({input: {id, key}, options}) => {
