@@ -5,23 +5,23 @@ import {Request, Response} from 'express';
 
 type Unshape<T extends z.ZodRawShape> = z.infer<z.ZodObject<T>>;
 
-interface MiddlewareParams<I, P> {
-  input: I;
-  options: P;
+interface MiddlewareParams<IN, OPT> {
+  input: IN;
+  options: OPT;
   request: Request;
   response: Response;
 }
 
-type Middleware<I, P, NP> = (params: MiddlewareParams<I, P>) => Promise<NP>;
+type Middleware<IN, OPT, OUT> = (params: MiddlewareParams<IN, OPT>) => Promise<OUT>;
 
-export type Handler<I, O, P> = (params: {
-  input: I,
-  options: P
-}) => Promise<O>;
+export type Handler<IN, OUT, OPT> = (params: {
+  input: IN,
+  options: OPT
+}) => Promise<OUT>;
 
-interface MiddlewareDefinition<I extends z.ZodRawShape, P, NP> {
-  input: z.ZodObject<I>;
-  middleware: Middleware<Unshape<I>, P, NP>;
+interface MiddlewareDefinition<IN extends z.ZodRawShape, OPT, OUT> {
+  input: z.ZodObject<IN>;
+  middleware: Middleware<Unshape<IN>, OPT, OUT>;
 }
 
 interface ResultHandlerParams {
@@ -87,18 +87,19 @@ export abstract class AbstractEndpoint {
   public abstract execute(request: Request, response: Response): Promise<void>;
 }
 
-class Endpoint<I extends z.ZodRawShape, O extends z.ZodRawShape, MI, MO> extends AbstractEndpoint {
+/** mIN, OPT - from Middlewares */
+class Endpoint<IN extends z.ZodRawShape, OUT extends z.ZodRawShape, mIN, OPT> extends AbstractEndpoint {
   protected middlewares: MiddlewareDefinition<any, any, any>[] = [];
-  protected inputSchema: z.ZodObject<I>;
-  protected outputSchema: z.ZodObject<O>;
-  protected handler: Handler<Unshape<I> & MI, Unshape<O>, MO>
+  protected inputSchema: z.ZodObject<IN>;
+  protected outputSchema: z.ZodObject<OUT>;
+  protected handler: Handler<Unshape<IN> & mIN, Unshape<OUT>, OPT>
   protected resultHandler: ResultHandler;
 
   constructor({middlewares, inputSchema, outputSchema, handler, resultHandler}: {
     middlewares: MiddlewareDefinition<any, any, any>[],
-    inputSchema: z.ZodObject<I>,
-    outputSchema: z.ZodObject<O>,
-    handler: Handler<Unshape<I> & MI, Unshape<O>, MO>
+    inputSchema: z.ZodObject<IN>,
+    outputSchema: z.ZodObject<OUT>,
+    handler: Handler<Unshape<IN> & mIN, Unshape<OUT>, OPT>
     resultHandler: ResultHandler | null
   }) {
     super();
@@ -157,7 +158,8 @@ class Endpoint<I extends z.ZodRawShape, O extends z.ZodRawShape, MI, MO> extends
   }
 }
 
-export class EndpointBuilder<MI, MO> {
+/** mIN, mOUT - accumulated from all middlewares */
+export class EndpointBuilder<mIN, mOUT> {
   protected middlewares: MiddlewareDefinition<any, any, any>[] = [];
   protected resultHandler: ResultHandler | null;
 
@@ -170,25 +172,25 @@ export class EndpointBuilder<MI, MO> {
   }
 
   public setResultHandler(resultHandler: ResultHandler) {
-    return new EndpointBuilder<MI, MO>(
+    return new EndpointBuilder<mIN, mOUT>(
       this.middlewares,
       resultHandler
     );
   }
 
-  public addMiddleware<I extends z.ZodRawShape, R>(definition: MiddlewareDefinition<I, MO, R>) {
-    return new EndpointBuilder<MI & I, MO & R>(
+  public addMiddleware<IN extends z.ZodRawShape, OUT>(definition: MiddlewareDefinition<IN, mOUT, OUT>) {
+    return new EndpointBuilder<mIN & IN, mOUT & OUT>(
       this.middlewares.concat(definition),
       this.resultHandler
     );
   }
 
-  public build<I extends z.ZodRawShape, O extends z.ZodRawShape>(params: {
-    input: z.ZodObject<I>,
-    output: z.ZodObject<O>,
-    handler: Handler<Unshape<I> & MI, Unshape<O>, MO>
+  public build<IN extends z.ZodRawShape, OUT extends z.ZodRawShape>(params: {
+    input: z.ZodObject<IN>,
+    output: z.ZodObject<OUT>,
+    handler: Handler<Unshape<IN> & mIN, Unshape<OUT>, mOUT>
   }) {
-    return new Endpoint<I, O, MI, MO>({
+    return new Endpoint<IN, OUT, mIN, mOUT>({
       middlewares: this.middlewares,
       inputSchema: params.input,
       outputSchema: params.output,
