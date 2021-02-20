@@ -5,6 +5,8 @@
     "sourceMap": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
+    "declaration": true,
+    "outDir": "./dist"
   },
   "exclude": [
     "node_modules"

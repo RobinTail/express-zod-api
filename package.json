@@ -2,11 +2,14 @@
   "name": "zod-api",
   "description": "Sample ZOD API",
   "version": "1.0.0",
-  "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "start": "ts-node src/server.ts"
+    "start": "ts-node src/server.ts",
+    "cleanup": "rm -rf ./dist",
+    "build": "yarn cleanup && tsc"
   },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "dependencies": {
     "@types/express": "^4.17.11",
     "@types/http-errors": "^1.8.0",
