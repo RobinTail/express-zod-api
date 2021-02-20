@@ -4,7 +4,10 @@ import {logger} from '../logger';
 import * as createHttpError from 'http-errors';
 
 const params = z.object({
-  id: z.number().int().nonnegative(),
+  // for POST method:
+  // id: z.number().int().nonnegative(),
+  // for GET method:
+  id: z.string().transform((id) => parseInt(id, 10))
 });
 
 enum Status {
@@ -28,11 +31,13 @@ export const getUserEndpoint = new EndpointsFactory().addMiddleware({
     });
   }
 }).build({
+  method: 'get',
   input: params,
   output: returns,
   handler: ({input: {id, key}, options}) => {
+    logger.debug('ID: ' + (typeof id));
     logger.debug('Options', options);
-    const name = 'sample';
+    const name = 'John Doe';
     const meta = `Your key is ${options.isValidKey ? 'valid' : 'invalid'}: ${key}`;
     if (id < 10) {
       return Promise.resolve({

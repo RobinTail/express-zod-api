@@ -11,8 +11,14 @@ export type Handler<IN, OUT, OPT> = (params: {
 }) => Promise<OUT>;
 
 export abstract class AbstractEndpoint {
+  protected method: Method;
   public abstract execute(request: Request, response: Response): Promise<void>;
+  public getMethod() {
+    return this.method;
+  }
 }
+
+export type Method = 'get' | 'post' | 'put' | 'delete' | 'patch';
 
 /** mIN, OPT - from Middlewares */
 export class Endpoint<IN extends z.ZodRawShape, OUT extends z.ZodRawShape, mIN, OPT> extends AbstractEndpoint {
@@ -22,7 +28,8 @@ export class Endpoint<IN extends z.ZodRawShape, OUT extends z.ZodRawShape, mIN, 
   protected handler: Handler<JoinUnshaped<IN, mIN>, Unshape<OUT>, OPT>
   protected resultHandler: ResultHandler;
 
-  constructor({middlewares, inputSchema, outputSchema, handler, resultHandler}: {
+  constructor({method, middlewares, inputSchema, outputSchema, handler, resultHandler}: {
+    method: Method;
     middlewares: MiddlewareDefinition<any, any, any>[],
     inputSchema: z.ZodObject<IN>,
     outputSchema: z.ZodObject<OUT>,
@@ -30,6 +37,7 @@ export class Endpoint<IN extends z.ZodRawShape, OUT extends z.ZodRawShape, mIN, 
     resultHandler: ResultHandler | null
   }) {
     super();
+    this.method = method;
     this.middlewares = middlewares;
     this.inputSchema = inputSchema;
     this.outputSchema = outputSchema;
@@ -39,7 +47,7 @@ export class Endpoint<IN extends z.ZodRawShape, OUT extends z.ZodRawShape, mIN, 
 
   public async execute(request: Request, response: Response) {
     response.set('Access-Control-Allow-Origin', '*');
-    response.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    response.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
     response.set('Access-Control-Allow-Headers', 'content-type');
 
     if (request.method === 'OPTIONS') {
@@ -51,13 +59,19 @@ export class Endpoint<IN extends z.ZodRawShape, OUT extends z.ZodRawShape, mIN, 
     let output;
     let initialInput: any = null;
     try {
-      if (request.method === 'POST') {
+      if (['POST', 'PUT', 'PATCH'].includes(request.method)) {
         initialInput = request.body;
+      }
+      if (request.method === 'GET') {
+        initialInput = request.query
+      }
+      if (request.method === 'DELETE') {
+        initialInput = {...request.query, ...request.body};
       }
       let input = {...initialInput};
       let options: any = {};
       for (let def of this.middlewares) {
-        def.input.parse(input);
+        input = {...input, ...def.input.parse(input)}; // middleware can transform the input types
         Object.assign(options, await def.middleware({
           input,
           options,
@@ -68,7 +82,7 @@ export class Endpoint<IN extends z.ZodRawShape, OUT extends z.ZodRawShape, mIN, 
           return;
         }
       }
-      this.inputSchema.parse(input);
+      input = this.inputSchema.parse(input); // final input types transformations for handler
       output = await this.handler({
         input,
         options,
