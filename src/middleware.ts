@@ -1,7 +1,7 @@
 import {Request, Response} from 'express';
 import {Logger} from 'winston';
 import * as z from 'zod';
-import {Unshape} from './helpers';
+import {ObjectSchema, Unshape} from './helpers';
 
 interface MiddlewareParams<IN, OPT> {
   input: IN;
@@ -14,6 +14,6 @@ interface MiddlewareParams<IN, OPT> {
 type Middleware<IN, OPT, OUT> = (params: MiddlewareParams<IN, OPT>) => Promise<OUT>;
 
 export interface MiddlewareDefinition<IN extends z.ZodRawShape, OPT, OUT> {
-  input: z.ZodObject<IN>;
+  input: ObjectSchema<IN>;
   middleware: Middleware<Unshape<IN>, OPT, OUT>;
 }

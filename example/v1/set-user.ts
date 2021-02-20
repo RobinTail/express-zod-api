@@ -12,12 +12,11 @@ export const setUserEndpoint = keyAndTokenAuthenticatedEndpointsFactory.build({
   input: z.object({
     id: z.number().int().nonnegative(),
     name: z.string().nonempty()
-  }),
+  }).nonstrict(), // to have key provided by middleware input
   output: z.object({
     status: z.nativeEnum(Status),
   }),
   handler: ({input: {id, name, key}, options: {token}, logger}) => {
-    // todo: need to fix KEY inherited property, need z.object.nonstrict and AnyZodObject in implementation
     logger.debug(`id, key and token: ${id}, ${key}, ${token}`);
     if (id < 10) {
       return Promise.resolve({

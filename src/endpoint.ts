@@ -1,6 +1,6 @@
 import {Logger} from 'winston';
 import * as z from 'zod';
-import {JoinUnshaped, Unshape} from './helpers';
+import {JoinUnshaped, ObjectSchema, Unshape} from './helpers';
 import {Request, Response} from 'express';
 import {MiddlewareDefinition} from './middleware';
 import {defaultResultHandler, ResultHandler} from './result-handler';
@@ -26,16 +26,16 @@ export type Method = 'get' | 'post' | 'put' | 'delete' | 'patch';
 /** mIN, OPT - from Middlewares */
 export class Endpoint<IN extends z.ZodRawShape, OUT extends z.ZodRawShape, mIN, OPT> extends AbstractEndpoint {
   protected middlewares: MiddlewareDefinition<any, any, any>[] = [];
-  protected inputSchema: z.ZodObject<IN>;
-  protected outputSchema: z.ZodObject<OUT>;
+  protected inputSchema: ObjectSchema<IN>;
+  protected outputSchema: ObjectSchema<OUT>;
   protected handler: Handler<JoinUnshaped<IN, mIN>, Unshape<OUT>, OPT>
   protected resultHandler: ResultHandler;
 
   constructor({methods, middlewares, inputSchema, outputSchema, handler, resultHandler}: {
     methods: Method[];
     middlewares: MiddlewareDefinition<any, any, any>[],
-    inputSchema: z.ZodObject<IN>,
-    outputSchema: z.ZodObject<OUT>,
+    inputSchema: ObjectSchema<IN>,
+    outputSchema: ObjectSchema<OUT>,
     handler: Handler<JoinUnshaped<IN, mIN>, Unshape<OUT>, OPT>
     resultHandler: ResultHandler | null
   }) {
