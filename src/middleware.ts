@@ -1,4 +1,5 @@
 import {Request, Response} from 'express';
+import {Logger} from 'winston';
 import * as z from 'zod';
 import {Unshape} from './helpers';
 
@@ -7,6 +8,7 @@ interface MiddlewareParams<IN, OPT> {
   options: OPT;
   request: Request;
   response: Response;
+  logger: Logger;
 }
 
 type Middleware<IN, OPT, OUT> = (params: MiddlewareParams<IN, OPT>) => Promise<OUT>;

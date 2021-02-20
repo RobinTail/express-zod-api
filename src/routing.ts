@@ -1,17 +1,17 @@
 import {Express} from 'express';
+import {Logger} from 'winston';
 import {AbstractEndpoint} from './endpoint';
-import {logger} from './logger';
-import {v1Routing} from './v1';
 
 export interface Routing {
   [PATH: string]: AbstractEndpoint | Routing;
 }
 
-export const routing: Routing = {
-  v1: v1Routing
-}
-
-export const initRouting = (app: Express, routing: Routing, parentPath?: string) => {
+export const initRouting = ({app, logger, routing, parentPath}: {
+  app: Express,
+  logger: Logger,
+  routing: Routing,
+  parentPath?: string
+}) => {
   Object.keys(routing).forEach((path) => {
     const fullPath = `${parentPath || ''}/${path}`;
     const handler = routing[path];
@@ -19,11 +19,15 @@ export const initRouting = (app: Express, routing: Routing, parentPath?: string)
       handler.getMethods().forEach((method) => {
         app[method](fullPath, async (req, res) => {
           logger.info(`${req.method}: ${fullPath}`);
-          await handler.execute(req, res);
+          await handler.execute(req, res, logger);
         });
       });
     } else {
-      initRouting(app, handler, fullPath);
+      initRouting({
+        app, logger,
+        routing: handler,
+        parentPath: fullPath
+      });
     }
   });
 }

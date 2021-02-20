@@ -1,6 +1,5 @@
 import * as z from 'zod';
-import {EndpointsFactory} from '../endpoints-factory';
-import {logger} from '../logger';
+import {EndpointsFactory} from '../../src/endpoints-factory';
 import * as createHttpError from 'http-errors';
 
 const params = z.object({
@@ -25,16 +24,17 @@ export const getUserEndpoint = new EndpointsFactory().addMiddleware({
   input: z.object({
     key: z.string().optional()
   }),
-  middleware: ({input}) => {
+  middleware: ({input: {key}, logger}) => {
+    logger.debug('Checking the key...');
     return Promise.resolve({
-      isValidKey: input.key === '123'
+      isValidKey: key === '123'
     });
   }
 }).build({
   methods: ['post'],
   input: params,
   output: returns,
-  handler: ({input: {id, key}, options}) => {
+  handler: ({input: {id, key}, options, logger}) => {
     logger.debug('ID: ' + (typeof id));
     logger.debug('Options', options);
     const name = 'John Doe';

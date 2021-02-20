@@ -1,7 +1,7 @@
 import {Request, Response} from 'express';
 import {HttpError} from 'http-errors';
+import {Logger} from 'winston';
 import * as z from 'zod';
-import {logger} from './logger';
 
 type ApiResponse<T> = {
   status: 'success',
@@ -19,11 +19,12 @@ interface ResultHandlerParams {
   output: any;
   request: Request;
   response: Response;
+  logger: Logger
 }
 
 export type ResultHandler = (params: ResultHandlerParams) => void | Promise<void>;
 
-export const defaultResultHandler = ({error, request, response, input, output}: ResultHandlerParams) => {
+export const defaultResultHandler = ({error, request, response, input, output, logger}: ResultHandlerParams) => {
   let resultJson: ApiResponse<any>;
   if (error) {
     let statusCode = 500;

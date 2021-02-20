@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "license": "MIT",
   "scripts": {
-    "start": "ts-node src/server.ts",
+    "start": "ts-node example/index.ts",
     "cleanup": "rm -rf ./dist",
     "build": "yarn cleanup && tsc"
   },
