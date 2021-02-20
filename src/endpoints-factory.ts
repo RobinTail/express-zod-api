@@ -34,7 +34,7 @@ export class EndpointsFactory<mIN, mOUT> {
   public build<IN extends z.ZodRawShape, OUT extends z.ZodRawShape>(params: {
     input: z.ZodObject<IN>,
     output: z.ZodObject<OUT>,
-    handler: Handler<Unshape<IN> & mIN, Unshape<OUT>, mOUT>
+    handler: Handler<Unshape<IN> & Unshape<mIN>, Unshape<OUT>, mOUT>
   }) {
     return new Endpoint<IN, OUT, mIN, mOUT>({
       middlewares: this.middlewares,
