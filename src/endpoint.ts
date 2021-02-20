@@ -3,6 +3,7 @@ import * as z from 'zod';
 import {logger} from './logger';
 import {Request, Response} from 'express';
 
+type Unshape<T extends z.ZodRawShape> = z.infer<z.ZodObject<T>>;
 
 interface MiddlewareParams<I, P> {
   input: I;
@@ -20,7 +21,7 @@ export type Handler<I, O, P> = (params: {
 
 interface MiddlewareDefinition<I extends z.ZodRawShape, P, NP> {
   input: z.ZodObject<I>;
-  middleware: Middleware<z.infer<z.ZodObject<I>>, P, NP>;
+  middleware: Middleware<Unshape<I>, P, NP>;
 }
 
 interface ResultHandlerParams {
@@ -90,20 +91,14 @@ class Endpoint<I extends z.ZodRawShape, O extends z.ZodRawShape, MI, MO> extends
   protected middlewares: MiddlewareDefinition<any, any, any>[] = [];
   protected inputSchema: z.ZodObject<I>;
   protected outputSchema: z.ZodObject<O>;
-  protected handler: Handler<z.infer<z.ZodObject<I>>, z.infer<z.ZodObject<O>>, MO>
+  protected handler: Handler<Unshape<I> & MI, Unshape<O>, MO>
   protected resultHandler: ResultHandler;
 
-  constructor({
-                middlewares,
-                inputSchema,
-                outputSchema,
-                handler,
-                resultHandler
-              }: {
+  constructor({middlewares, inputSchema, outputSchema, handler, resultHandler}: {
     middlewares: MiddlewareDefinition<any, any, any>[],
     inputSchema: z.ZodObject<I>,
     outputSchema: z.ZodObject<O>,
-    handler: Handler<z.infer<z.ZodObject<I>>, z.infer<z.ZodObject<O>>, MO>
+    handler: Handler<Unshape<I> & MI, Unshape<O>, MO>
     resultHandler: ResultHandler | null
   }) {
     super();
@@ -191,7 +186,7 @@ export class EndpointBuilder<MI, MO> {
   public build<I extends z.ZodRawShape, O extends z.ZodRawShape>(params: {
     input: z.ZodObject<I>,
     output: z.ZodObject<O>,
-    handler: Handler<z.infer<z.ZodObject<I>>, z.infer<z.ZodObject<O>>, MO>
+    handler: Handler<Unshape<I> & MI, Unshape<O>, MO>
   }) {
     return new Endpoint<I, O, MI, MO>({
       middlewares: this.middlewares,

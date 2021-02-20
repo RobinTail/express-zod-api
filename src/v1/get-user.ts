@@ -25,10 +25,10 @@ export const getUserEndpoint = new EndpointBuilder().addMiddleware({
 }).build({
   input: params,
   output: returns,
-  handler: ({input: {id}, options}) => {
+  handler: ({input: {id, key}, options}) => {
     logger.debug('Options', options);
     const name = 'sample';
-    const meta = `Your key is ${options.isValidKey ? 'valid' : 'invalid'}`;
+    const meta = `Your key is ${options.isValidKey ? 'valid' : 'invalid'}: ${key}`;
     if (id < 10) {
       return Promise.resolve({
         status: returns.shape.status.enum.OK as z.infer<typeof returns.shape.status>,
