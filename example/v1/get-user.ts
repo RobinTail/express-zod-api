@@ -1,48 +1,28 @@
 import * as z from 'zod';
-import {EndpointsFactory} from '../../src/endpoints-factory';
 import * as createHttpError from 'http-errors';
-
-const params = z.object({
-  // for POST method:
-  id: z.number().int().nonnegative(),
-  // for GET method:
-  // id: z.string().transform((id) => parseInt(id, 10))
-});
+import {endpointsFactory} from '../factories';
 
 enum Status {
   OK = "That's ok",
   Warning = 'Some kind of warning'
 }
 
-const returns = z.object({
-  status: z.nativeEnum(Status),
-  name: z.string(),
-  meta: z.string()
-});
-
-export const getUserEndpoint = new EndpointsFactory().addMiddleware({
+export const getUserEndpoint = endpointsFactory.build({
+  methods: ['get'],
   input: z.object({
-    key: z.string().optional()
+    id: z.string().transform((id) => parseInt(id, 10))
   }),
-  middleware: ({input: {key}, logger}) => {
-    logger.debug('Checking the key...');
-    return Promise.resolve({
-      isValidKey: key === '123'
-    });
-  }
-}).build({
-  methods: ['post'],
-  input: params,
-  output: returns,
-  handler: ({input: {id, key}, options, logger}) => {
-    logger.debug('ID: ' + (typeof id));
-    logger.debug('Options', options);
+  output: z.object({
+    status: z.nativeEnum(Status),
+    name: z.string(),
+  }),
+  handler: ({input: {id}, options, logger}) => {
+    logger.debug(`Requested id: ${id}`);
     const name = 'John Doe';
-    const meta = `Your key is ${options.isValidKey ? 'valid' : 'invalid'}: ${key}`;
     if (id < 10) {
       return Promise.resolve({
         status: Status.OK,
-        name, meta
+        name
       });
     }
     if (id > 100) {
@@ -50,7 +30,7 @@ export const getUserEndpoint = new EndpointsFactory().addMiddleware({
     }
     return Promise.resolve({
       status: Status.Warning,
-      name, meta
+      name
     });
   }
 })

@@ -74,8 +74,10 @@ export class Endpoint<IN extends z.ZodRawShape, OUT extends z.ZodRawShape, mIN, 
       }
       let input = {...initialInput};
       let options: any = {};
+      logger.debug('input before middle', input);
       for (let def of this.middlewares) {
         input = {...input, ...def.input.parse(input)}; // middleware can transform the input types
+        logger.debug('input after middle validation', input);
         Object.assign(options, await def.middleware({
           input, options, request,
           response, logger
@@ -84,6 +86,7 @@ export class Endpoint<IN extends z.ZodRawShape, OUT extends z.ZodRawShape, mIN, 
           return;
         }
       }
+      logger.debug('input after middle execution', input);
       input = this.inputSchema.parse(input); // final input types transformations for handler
       output = await this.handler({input, options, logger});
     } catch (e) {
