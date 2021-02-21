@@ -118,6 +118,7 @@ describe('initRouting()', () => {
     expect(nextMock).toBeCalledTimes(0);
     expect(handlerMock).toBeCalledTimes(1);
     expect(loggerMock.info).toBeCalledWith('POST: /v1/user/set');
+    expect(loggerMock.error).toBeCalledTimes(0);
     expect(handlerMock).toBeCalledWith({
       input: {
         test: 123,
@@ -131,6 +132,6 @@ describe('initRouting()', () => {
       data: {
         result: true
       }
-    })
+    });
   });
 });

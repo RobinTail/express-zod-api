@@ -7,7 +7,7 @@
     "start": "ts-node example/index.ts",
     "cleanup": "rm -rf ./dist",
     "build": "yarn cleanup && tsc",
-    "test": "yarn jest"
+    "test": "yarn jest --verbose"
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
