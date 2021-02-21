@@ -16,18 +16,18 @@ export const initRouting = ({app, logger, config, routing, parentPath}: {
 }) => {
   Object.keys(routing).forEach((path) => {
     const fullPath = `${parentPath || ''}/${path}`;
-    const handler = routing[path];
-    if (handler instanceof AbstractEndpoint) {
-      handler.getMethods().forEach((method) => {
+    const endpoint = routing[path];
+    if (endpoint instanceof AbstractEndpoint) {
+      endpoint.getMethods().forEach((method) => {
         app[method](fullPath, async (request, response) => {
           logger.info(`${request.method}: ${fullPath}`);
-          await handler.execute({request, response, logger, config});
+          await endpoint.execute({request, response, logger, config});
         });
       });
     } else {
       initRouting({
         app, logger, config,
-        routing: handler,
+        routing: endpoint,
         parentPath: fullPath
       });
     }
