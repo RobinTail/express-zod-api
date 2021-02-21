@@ -28,7 +28,16 @@
     "url": "https://github.com/RobinTail/express-zod-api"
   },
   "keywords": [
-    "typescript", "api", "zod", "express", "http", "server",
-    "validation", "schema", "endpoint", "handler", "json"
+    "typescript",
+    "api",
+    "zod",
+    "express",
+    "http",
+    "server",
+    "validation",
+    "schema",
+    "endpoint",
+    "handler",
+    "json"
   ]
 }
