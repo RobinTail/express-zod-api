@@ -1,5 +1,6 @@
 import {Logger} from 'winston';
 import * as z from 'zod';
+import {ConfigType} from './config-type';
 import {combineEndpointAndMiddlewareInputSchemas, JoinUnshaped, ObjectSchema, Unshape} from './helpers';
 import {Request, Response} from 'express';
 import {MiddlewareDefinition} from './middleware';
@@ -14,7 +15,12 @@ export type Handler<IN, OUT, OPT> = (params: {
 export abstract class AbstractEndpoint {
   protected methods: Method[];
 
-  public abstract execute(request: Request, response: Response, logger: Logger): Promise<void>;
+  public abstract execute(params: {
+    request: Request,
+    response: Response,
+    logger: Logger,
+    config: ConfigType
+  }): Promise<void>;
 
   public getMethods() {
     return this.methods;
@@ -48,11 +54,18 @@ export class Endpoint<IN extends z.ZodRawShape, OUT extends z.ZodRawShape, mIN, 
     this.resultHandler = resultHandler || defaultResultHandler;
   }
 
-  public async execute(request: Request, response: Response, logger: Logger) {
-    const accessMethods = this.methods.map((method) => method.toUpperCase()).concat('OPTIONS').join(', ');
-    response.set('Access-Control-Allow-Origin', '*');
-    response.set('Access-Control-Allow-Methods', accessMethods);
-    response.set('Access-Control-Allow-Headers', 'content-type');
+  public async execute({request, response, logger, config}: {
+    request: Request,
+    response: Response,
+    logger: Logger,
+    config: ConfigType
+  }) {
+    if (config.server.cors) {
+      const accessMethods = this.methods.map((method) => method.toUpperCase()).concat('OPTIONS').join(', ');
+      response.set('Access-Control-Allow-Origin', '*');
+      response.set('Access-Control-Allow-Methods', accessMethods);
+      response.set('Access-Control-Allow-Headers', 'content-type');
+    }
 
     if (request.method === 'OPTIONS') {
       response.end();
