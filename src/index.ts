@@ -5,7 +5,7 @@ export { ObjectSchema, Unshape } from './helpers';
 export { createLogger } from './logger';
 export { createMiddleware } from './middleware';
 export { ResultHandler } from './result-handler';
-export { Routing } from './routing';
+export { Routing, initRouting } from './routing';
 export { createServer } from './server';
 
 import * as z from 'zod';
