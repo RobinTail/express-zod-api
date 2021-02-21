@@ -3,7 +3,7 @@ import {Routing} from '../src';
 import {createServer} from '../src';
 import {v1Routing} from './v1';
 
-export const config: ConfigType = {
+const config: ConfigType = {
   server: {
     listen: 8090,
     cors: true
@@ -14,7 +14,7 @@ export const config: ConfigType = {
   }
 };
 
-export const routing: Routing = {
+const routing: Routing = {
   v1: v1Routing
 }
 
