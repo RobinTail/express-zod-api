@@ -54,6 +54,7 @@ export const defaultResultHandler = ({error, request, response, input, output, l
       }
     };
   } else {
+    response.status(200);
     resultJson = {
       status: 'success',
       data: output
