@@ -1,11 +1,7 @@
 {
-  "name": "zod-api",
+  "name": "express-zod-api",
   "version": "0.0.1",
-  "description": "Sample ZOD API",
-  "keywords": [
-    "api", "zod", "express", "http", "server",
-    "validation", "schema", "endpoint", "handler"
-  ],
+  "description": "Express ZOD API",
   "license": "MIT",
   "scripts": {
     "start": "ts-node example/index.ts",
@@ -26,5 +22,13 @@
     "@types/triple-beam": "^1.3.2",
     "ts-node": "^9.1.1",
     "typescript": "^4.1.5"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/RobinTail/express-zod-api"
+  },
+  "keywords": [
+    "typescript", "api", "zod", "express", "http", "server",
+    "validation", "schema", "endpoint", "handler", "json"
+  ]
 }
