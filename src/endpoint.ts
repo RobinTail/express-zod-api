@@ -35,7 +35,7 @@ export class Endpoint<IN extends z.ZodRawShape, OUT extends z.ZodRawShape, mIN, 
   protected inputSchema: ObjectSchema<IN & mIN>; // combined with middlewares input
   protected outputSchema: ObjectSchema<OUT>;
   protected handler: Handler<JoinUnshaped<IN, mIN>, Unshape<OUT>, OPT>
-  protected resultHandler: ResultHandler;
+  protected resultHandler: ResultHandler | null;
 
   constructor({methods, middlewares, inputSchema, outputSchema, handler, resultHandler}: {
     methods: Method[];
@@ -51,7 +51,7 @@ export class Endpoint<IN extends z.ZodRawShape, OUT extends z.ZodRawShape, mIN, 
     this.inputSchema = combineEndpointAndMiddlewareInputSchemas<IN, mIN>(inputSchema, middlewares);
     this.outputSchema = outputSchema;
     this.handler = handler;
-    this.resultHandler = resultHandler || defaultResultHandler;
+    this.resultHandler = resultHandler;
   }
 
   public async execute({request, response, logger, config}: {
@@ -102,8 +102,9 @@ export class Endpoint<IN extends z.ZodRawShape, OUT extends z.ZodRawShape, mIN, 
     } catch (e) {
       error = e;
     }
+    const resultHandler = this.resultHandler || config.server.resultHandler || defaultResultHandler;
     try {
-      await this.resultHandler({
+      await resultHandler({
         error, output, request, response, logger,
         input: initialInput
       });

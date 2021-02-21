@@ -8,7 +8,7 @@ import * as createHttpError from 'http-errors';
 export function createServer(config: ConfigType, routing: Routing) {
   const logger = createLogger(config);
   const app = express();
-  const resultHandler = config.server.errorsHandler || defaultResultHandler;
+  const resultHandler = config.server.resultHandler || defaultResultHandler;
 
   app.use([
     config.server.jsonParser || express.json(),

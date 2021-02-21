@@ -10,8 +10,8 @@ export interface ConfigType {
     cors: boolean;
     // custom JSON parser, default: express.json()
     jsonParser?: NextHandleFunction,
-    // custom handler for JSON parsing errors and unsupported requests
-    errorsHandler?: ResultHandler;
+    // custom handler for errors and output, default: defaultResultHandler()
+    resultHandler?: ResultHandler;
   },
   logger: {
     level: 'silent' | 'warn' | 'debug';
