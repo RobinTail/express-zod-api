@@ -11,7 +11,7 @@ export function createServer(config: ConfigType, routing: Routing) {
   const app = express();
 
   app.use([
-    express.json(),
+    config.server.jsonParser || express.json(),
     (error, request, response, next) => {
       if (error) {
         defaultResultHandler({
