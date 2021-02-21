@@ -1,7 +1,11 @@
 {
   "name": "zod-api",
-  "description": "Sample ZOD API",
   "version": "0.0.1",
+  "description": "Sample ZOD API",
+  "keywords": [
+    "api", "zod", "express", "http", "server",
+    "validation", "schema", "endpoint", "handler"
+  ],
   "license": "MIT",
   "scripts": {
     "start": "ts-node example/index.ts",
