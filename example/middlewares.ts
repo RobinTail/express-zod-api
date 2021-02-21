@@ -1,6 +1,4 @@
-import * as createHttpError from 'http-errors';
-import * as z from 'zod';
-import {createMiddleware, Method} from '../src';
+import {createMiddleware, Method, createHttpError, z} from '../src';
 
 export const authMiddleware = createMiddleware({
   input: z.object({

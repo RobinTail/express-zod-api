@@ -1,5 +1,4 @@
-import * as z from 'zod';
-import * as createHttpError from 'http-errors';
+import {z, createHttpError} from '../../src';
 import {keyAndTokenAuthenticatedEndpointsFactory} from '../factories';
 
 enum Status {
