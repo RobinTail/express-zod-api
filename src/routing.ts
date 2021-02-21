@@ -19,9 +19,9 @@ export const initRouting = ({app, logger, config, routing, parentPath}: {
     const handler = routing[path];
     if (handler instanceof AbstractEndpoint) {
       handler.getMethods().forEach((method) => {
-        app[method](fullPath, async (req, res) => {
-          logger.info(`${req.method}: ${fullPath}`);
-          await handler.execute(req, res, logger, config);
+        app[method](fullPath, async (request, response) => {
+          logger.info(`${request.method}: ${fullPath}`);
+          await handler.execute({request, response, logger, config});
         });
       });
     } else {

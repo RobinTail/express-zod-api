@@ -15,7 +15,12 @@ export type Handler<IN, OUT, OPT> = (params: {
 export abstract class AbstractEndpoint {
   protected methods: Method[];
 
-  public abstract execute(request: Request, response: Response, logger: Logger, config: ConfigType): Promise<void>;
+  public abstract execute(params: {
+    request: Request,
+    response: Response,
+    logger: Logger,
+    config: ConfigType
+  }): Promise<void>;
 
   public getMethods() {
     return this.methods;
@@ -49,7 +54,12 @@ export class Endpoint<IN extends z.ZodRawShape, OUT extends z.ZodRawShape, mIN, 
     this.resultHandler = resultHandler || defaultResultHandler;
   }
 
-  public async execute(request: Request, response: Response, logger: Logger, config: ConfigType) {
+  public async execute({request, response, logger, config}: {
+    request: Request,
+    response: Response,
+    logger: Logger,
+    config: ConfigType
+  }) {
     if (config.server.cors) {
       const accessMethods = this.methods.map((method) => method.toUpperCase()).concat('OPTIONS').join(', ');
       response.set('Access-Control-Allow-Origin', '*');
