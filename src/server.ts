@@ -7,14 +7,14 @@ import * as createHttpError from 'http-errors';
 
 export function createServer(config: ConfigType, routing: Routing) {
   const logger = createLogger(config);
-
   const app = express();
+  const resultHandler = config.server.errorsHandler || defaultResultHandler;
 
   app.use([
     config.server.jsonParser || express.json(),
     (error, request, response, next) => {
       if (error) {
-        defaultResultHandler({
+        resultHandler({
           error, request, response, logger,
           input: request.body,
           output: null
@@ -28,7 +28,7 @@ export function createServer(config: ConfigType, routing: Routing) {
   initRouting({app, routing, logger, config});
 
   app.use((request, response) => {
-    defaultResultHandler({
+    resultHandler({
       request, response, logger,
       error: createHttpError(404, `Can not ${request.method} ${request.path}`),
       input: null,

@@ -1,4 +1,5 @@
 import {NextHandleFunction} from 'connect';
+import {ResultHandler} from './result-handler';
 
 export interface ConfigType {
   server: {
@@ -8,7 +9,9 @@ export interface ConfigType {
     // https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
     cors: boolean;
     // custom JSON parser, default: express.json()
-    jsonParser?: NextHandleFunction
+    jsonParser?: NextHandleFunction,
+    // custom handler for JSON parsing errors and unsupported requests
+    errorsHandler?: ResultHandler;
   },
   logger: {
     level: 'silent' | 'warn' | 'debug';
