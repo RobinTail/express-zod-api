@@ -14,6 +14,12 @@ Start your API server with I/O schema validation and custom middlewares in minut
 coming soon
 ```
 
+# Tests
+
+```sh
+yarn test
+```
+
 # Usage
 
 Full example in `./example`. You can clone the repo and run `yarn start` to check it out in action.
