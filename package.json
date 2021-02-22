@@ -7,7 +7,9 @@
     "start": "ts-node example/index.ts",
     "cleanup": "rm -rf ./dist",
     "build": "yarn cleanup && tsc",
-    "lint": "yarn eslint ./src ./example"
+    "lint": "yarn eslint ./src ./example",
+    "precommit": "yarn lint",
+    "install_hooks": "husky install"
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -24,6 +26,7 @@
     "@typescript-eslint/eslint-plugin": "^4.15.1",
     "@typescript-eslint/parser": "^4.15.1",
     "eslint": "^7.20.0",
+    "husky": "^5.1.1",
     "ts-node": "^9.1.1",
     "typescript": "^4.1.5"
   },
