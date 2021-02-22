@@ -16,6 +16,6 @@ const config: ConfigType = {
 
 const routing: Routing = {
   v1: v1Routing
-}
+};
 
 createServer(config, routing);

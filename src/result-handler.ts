@@ -36,7 +36,7 @@ export const defaultResultHandler = ({error, request, response, input, output, l
     }
     if (statusCode === 500) {
       logger.error(
-        `Internal server error\n` +
+        'Internal server error\n' +
         `${error.stack}\n` +
         `URL: ${request.url}\n` +
         `Payload: ${JSON.stringify(input, null, 2)}`,
@@ -61,4 +61,4 @@ export const defaultResultHandler = ({error, request, response, input, output, l
     };
   }
   response.json(resultJson);
-}
+};

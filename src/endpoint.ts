@@ -80,14 +80,14 @@ export class Endpoint<IN extends z.ZodRawShape, OUT extends z.ZodRawShape, mIN, 
         initialInput = request.body;
       }
       if (request.method === 'GET') {
-        initialInput = request.query
+        initialInput = request.query;
       }
       if (request.method === 'DELETE') { // _may_ have body
         initialInput = {...request.query, ...request.body};
       }
       let input = {...initialInput};
-      let options: any = {};
-      for (let def of this.middlewares) {
+      const options: any = {};
+      for (const def of this.middlewares) {
         input = {...input, ...def.input.parse(input)}; // middleware can transform the input types
         Object.assign(options, await def.middleware({
           input, options, request,

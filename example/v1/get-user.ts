@@ -35,4 +35,4 @@ export const getUserEndpoint = endpointsFactory
         name
       });
     }
-  })
+  });

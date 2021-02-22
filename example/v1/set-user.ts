@@ -31,4 +31,4 @@ export const setUserEndpoint = keyAndTokenAuthenticatedEndpointsFactory.build({
       name
     });
   }
-})
+});
