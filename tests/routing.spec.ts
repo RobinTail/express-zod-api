@@ -5,24 +5,24 @@ import {EndpointsFactory, z, Routing, initRouting, ConfigType} from '../src';
 let appMock: any;
 let loggerMock: any;
 
-beforeEach(() => {
-  appMock = {
-    get: jest.fn(),
-    post: jest.fn(),
-    put: jest.fn(),
-    delete: jest.fn(),
-    patch: jest.fn()
-  };
-
-  loggerMock = {
-    info: jest.fn(),
-    warn: jest.fn(),
-    error: jest.fn(),
-    debug: jest.fn()
-  }
-});
-
 describe('initRouting()', () => {
+  beforeEach(() => {
+    appMock = {
+      get: jest.fn(),
+      post: jest.fn(),
+      put: jest.fn(),
+      delete: jest.fn(),
+      patch: jest.fn()
+    };
+
+    loggerMock = {
+      info: jest.fn(),
+      warn: jest.fn(),
+      error: jest.fn(),
+      debug: jest.fn()
+    };
+  });
+
   test('Should set right methods', () => {
     const handlerMock = jest.fn();
     const configMock = {};

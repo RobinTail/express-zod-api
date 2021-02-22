@@ -8,7 +8,7 @@
     "cleanup": "rm -rf ./dist",
     "build": "yarn cleanup && tsc",
     "test": "yarn jest --verbose",
-    "lint": "yarn eslint ./src ./example",
+    "lint": "yarn eslint ./src ./example ./tests",
     "precommit": "yarn lint && yarn test",
     "install_hooks": "husky install"
   },

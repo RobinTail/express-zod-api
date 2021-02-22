@@ -4,25 +4,24 @@ import {Request, Response} from 'express';
 
 let loggerMock: any;
 
-beforeEach(() => {
-  loggerMock = {
-    info: jest.fn(),
-    warn: jest.fn(),
-    error: jest.fn(),
-    debug: jest.fn()
-  }
-});
-
 describe('Endpoint', () => {
+  beforeEach(() => {
+    loggerMock = {
+      info: jest.fn(),
+      warn: jest.fn(),
+      error: jest.fn(),
+      debug: jest.fn()
+    };
+  });
+
   describe('.getMethods()', () => {
     test('Should return the correct set of methods', () => {
       const endpointMock = new Endpoint({
         methods: ['get', 'post', 'put', 'delete', 'patch'],
         inputSchema: z.object({}).nonstrict(),
         outputSchema: z.object({}).nonstrict(),
-        handler: async () => ({}),
-        resultHandler: () => {
-        },
+        handler: jest.fn(),
+        resultHandler: jest.fn(),
         middlewares: []
       });
       expect(endpointMock.getMethods()).toEqual(['get', 'post', 'put', 'delete', 'patch']);
