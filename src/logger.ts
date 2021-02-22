@@ -13,7 +13,7 @@ export function createLogger(config: ConfigType): winston.Logger {
     delete meta[MESSAGE];
     delete meta[SPLAT];
     return inspect(meta, false, 1, config.logger.color);
-  }
+  };
 
   const getOutputFormat = (isPretty?: boolean) => printf(
     ({timestamp, message, level, durationMs, ...meta}) =>
@@ -22,7 +22,7 @@ export function createLogger(config: ConfigType): winston.Logger {
       (Object.keys(meta).length === 0
         ? ''
         : ' ' + (isPretty ? prettyPrint(meta) : JSON.stringify(meta))),
-  )
+  );
 
   const formats: Format[] = [useTimestamp()];
 

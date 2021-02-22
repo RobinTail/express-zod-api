@@ -5,4 +5,4 @@ import {setUserEndpoint} from './set-user';
 export const v1Routing: Routing =  {
   getUser: getUserEndpoint,
   setUser: setUserEndpoint
-}
+};

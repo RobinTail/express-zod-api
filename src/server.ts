@@ -33,7 +33,7 @@ export function createServer(config: ConfigType, routing: Routing) {
       error: createHttpError(404, `Can not ${request.method} ${request.path}`),
       input: null,
       output: null
-    })
+    });
   });
 
   return app.listen(config.server.listen, () => {

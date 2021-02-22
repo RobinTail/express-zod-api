@@ -32,4 +32,4 @@ export const initRouting = ({app, logger, config, routing, parentPath}: {
       });
     }
   });
-}
+};
