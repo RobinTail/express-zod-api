@@ -39,8 +39,7 @@ export const defaultResultHandler = ({error, request, response, input, output, l
         'Internal server error\n' +
         `${error.stack}\n` +
         `URL: ${request.url}\n` +
-        `Payload: ${JSON.stringify(input, null, 2)}`,
-        '  '
+        `Payload: ${JSON.stringify(input, undefined, 2)}`,
       );
     }
     response.status(statusCode);
