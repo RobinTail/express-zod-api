@@ -35,23 +35,21 @@ export function createLogger(config: ConfigType): winston.Logger {
   }
 
   switch (config.logger.level) {
-    case 'silent':
-      consoleOutputOptions.silent = true;
-      formats.push(getOutputFormat());
-      break;
-    case 'warn':
-      consoleOutputOptions.level = 'warn';
-      formats.push(getOutputFormat());
-      break;
-    case 'debug': // all levels output
-    default:
+    case 'debug':
       consoleOutputOptions.level = 'debug';
       formats.push(getOutputFormat(true));
+      break;
+    case 'silent':
+    case 'warn':
+    default:
+      consoleOutputOptions.level = 'warn';
+      formats.push(getOutputFormat());
   }
 
   consoleOutputOptions.format = combine(...formats);
 
   return winston.createLogger({
+    silent: config.logger.level === 'silent',
     levels: winston.config.npm.levels,
     transports: [new winston.transports.Console(consoleOutputOptions)],
     exitOnError: false,

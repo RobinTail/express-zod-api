@@ -10,7 +10,13 @@ describe('Logger', () => {
         }
       };
       const logger = createLogger(configMock as ConfigType);
-      expect(logger).toMatchSnapshot();
+      expect(logger.silent).toBeTruthy();
+      expect(logger.isErrorEnabled()).toBeTruthy();
+      expect(logger.isWarnEnabled()).toBeTruthy();
+      expect(logger.isInfoEnabled()).toBeFalsy();
+      expect(logger.isVerboseEnabled()).toBeFalsy();
+      expect(logger.isDebugEnabled()).toBeFalsy();
+      expect(logger.isSillyEnabled()).toBeFalsy();
     });
 
     test('Should create warn logger', () => {
@@ -21,7 +27,12 @@ describe('Logger', () => {
         }
       };
       const logger = createLogger(configMock as ConfigType);
-      expect(logger).toMatchSnapshot();
+      expect(logger.isErrorEnabled()).toBeTruthy();
+      expect(logger.isWarnEnabled()).toBeTruthy();
+      expect(logger.isInfoEnabled()).toBeFalsy();
+      expect(logger.isVerboseEnabled()).toBeFalsy();
+      expect(logger.isDebugEnabled()).toBeFalsy();
+      expect(logger.isSillyEnabled()).toBeFalsy();
     });
 
     test('Should create debug logger', () => {
@@ -32,18 +43,12 @@ describe('Logger', () => {
         }
       };
       const logger = createLogger(configMock as ConfigType);
-      expect(logger).toMatchSnapshot();
+      expect(logger.isErrorEnabled()).toBeTruthy();
+      expect(logger.isWarnEnabled()).toBeTruthy();
+      expect(logger.isInfoEnabled()).toBeTruthy();
+      expect(logger.isVerboseEnabled()).toBeTruthy();
+      expect(logger.isDebugEnabled()).toBeTruthy();
+      expect(logger.isSillyEnabled()).toBeFalsy();
     });
-  });
-
-  test('Should create debug logger with colors', () => {
-    const configMock = {
-      logger: {
-        level: 'debug',
-        color: true
-      }
-    };
-    const logger = createLogger(configMock as ConfigType);
-    expect(logger).toMatchSnapshot();
   });
 });
