@@ -25,9 +25,6 @@ jobs:
       uses: actions/setup-node@v2
       with:
         node-version: ${{ matrix.node-version }}
-    - name: Installing dependencies
     - run: rm -rf node_modules && yarn install
-    - name: Testing
     - run: yarn precommit
-    - name: Building
     - run: yarn build
