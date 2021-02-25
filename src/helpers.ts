@@ -4,6 +4,7 @@ import {MiddlewareDefinition} from './middleware';
 export type ObjectSchema<T extends z.ZodRawShape> = z.ZodObject<T, 'passthrough' | 'strict' | 'strip'>;
 export type Unshape<T> = T extends z.ZodRawShape ? z.infer<ObjectSchema<T>> : T;
 export type JoinUnshaped<A, B> = Unshape<A> & Unshape<B>;
+export type FlatObject = Record<string, any>;
 
 export function combineEndpointAndMiddlewareInputSchemas<IN extends z.ZodRawShape, mIN>(
   input: ObjectSchema<IN>,

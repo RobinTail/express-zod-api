@@ -1,6 +1,6 @@
 import * as z from 'zod';
 import {Endpoint, Handler, Method} from './endpoint';
-import {JoinUnshaped, ObjectSchema, Unshape} from './helpers';
+import {FlatObject, JoinUnshaped, ObjectSchema, Unshape} from './helpers';
 import {MiddlewareDefinition} from './middleware';
 import {ResultHandler} from './result-handler';
 
@@ -24,7 +24,7 @@ export class EndpointsFactory<mIN, mOUT> {
     );
   }
 
-  public addMiddleware<IN extends z.ZodRawShape, OUT>(definition: MiddlewareDefinition<IN, mOUT, OUT>) {
+  public addMiddleware<IN extends z.ZodRawShape, OUT extends FlatObject>(definition: MiddlewareDefinition<IN, mOUT, OUT>) {
     return new EndpointsFactory<mIN & IN, mOUT & OUT>(
       this.middlewares.concat(definition),
       this.resultHandler
