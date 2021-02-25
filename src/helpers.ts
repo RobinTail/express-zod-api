@@ -2,6 +2,7 @@ import * as z from 'zod';
 import {AnyZodObject} from 'zod/lib/cjs/types/object';
 import {MiddlewareDefinition} from './middleware';
 
+export type FlatObject = Record<string, any>;
 export type ObjectSchema = AnyZodObject;
 
 export type Merge<A extends ObjectSchema, B extends ObjectSchema | any> = z.ZodObject<
@@ -10,7 +11,6 @@ export type Merge<A extends ObjectSchema, B extends ObjectSchema | any> = z.ZodO
   A['_unknownKeys'],
   A['_catchall']
 >;
-export type FlatObject = Record<string, any>;
 
 export function combineEndpointAndMiddlewareInputSchemas<IN extends ObjectSchema, mIN>(
   input: IN,
