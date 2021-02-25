@@ -15,20 +15,20 @@ export const setUserEndpoint = keyAndTokenAuthenticatedEndpointsFactory.build({
   output: z.object({
     status: z.nativeEnum(Status),
   }),
-  handler: ({input: {id, name, key}, options: {token}, logger}) => {
+  handler: async ({input: {id, name, key}, options: {token}, logger}) => {
     logger.debug(`id, key and token: ${id}, ${key}, ${token}`);
     if (id < 10) {
-      return Promise.resolve({
+      return {
         status: Status.Updated,
         name
-      });
+      };
     }
     if (id > 100) {
       throw createHttpError(404, 'User not found');
     }
-    return Promise.resolve({
+    return {
       status: Status.Delayed,
       name
-    });
+    };
   }
 });

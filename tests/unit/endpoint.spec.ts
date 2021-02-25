@@ -30,7 +30,7 @@ describe('Endpoint', () => {
 
   describe('.execute()', () => {
     test('Should call middlewares, handler and resultHandler with correct arguments', async () => {
-      const middlewareMock = jest.fn().mockImplementationOnce(({input}) => Promise.resolve({
+      const middlewareMock = jest.fn().mockImplementationOnce(async ({input}) => ({
         inc: input.n + 1
       }));
       const middlewareDefinitionMock = createMiddleware({
@@ -40,7 +40,7 @@ describe('Endpoint', () => {
         middleware: middlewareMock
       });
       const factory = new EndpointsFactory().addMiddleware(middlewareDefinitionMock);
-      const handlerMock = jest.fn().mockImplementationOnce(({input, options}) => Promise.resolve({
+      const handlerMock = jest.fn().mockImplementationOnce(async ({input, options}) => ({
         inc2: (options as { inc: number }).inc + 1,
         str: input.n.toFixed(2)
       }));

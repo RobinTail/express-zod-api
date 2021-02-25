@@ -13,7 +13,7 @@ describe('System', () => {
             input: z.object({
               key: z.string().refine((v) => v === '123', 'Invalid key')
             }),
-            middleware: () => Promise.resolve({
+            middleware: async () => ({
               user: {
                 id: 354
               }
@@ -21,7 +21,7 @@ describe('System', () => {
           })
           .addMiddleware({
             input: z.object({}).nonstrict(),
-            middleware: ({request, options: {user}}) => Promise.resolve({
+            middleware: async ({request, options: {user}}) => ({
               method: request.method.toLowerCase() as Method,
               permissions: user.id === 354 ? ['any'] : []
             })
@@ -34,7 +34,7 @@ describe('System', () => {
             output: z.object({
               anything: z.number()
             }),
-            handler: ({input: {key, something}, options: {user, permissions, method}}) => Promise.resolve({
+            handler: async ({input: {key, something}, options: {user, permissions, method}}) => ({
               anything: something === 'joke' ? 300 : 100500,
               doubleKey: key.repeat(2),
               userId: user.id,

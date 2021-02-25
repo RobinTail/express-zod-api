@@ -20,7 +20,7 @@ export const authMiddleware = createMiddleware({
 
 export const methodProviderMiddleware = createMiddleware({
   input: z.object({}).nonstrict(),
-  middleware: ({request}) => Promise.resolve({
+  middleware: async ({request}) => ({
     method: request.method.toLowerCase() as Method,
   })
 });
