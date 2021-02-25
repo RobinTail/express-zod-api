@@ -1,4 +1,5 @@
 import {Logger} from 'winston';
+import {ZodError} from 'zod';
 import * as z from 'zod';
 import {ConfigType} from './config-type';
 import {combineEndpointAndMiddlewareInputSchemas, JoinUnshaped, ObjectSchema, Unshape} from './helpers';
@@ -99,6 +100,27 @@ export class Endpoint<IN extends z.ZodRawShape, OUT extends z.ZodRawShape, mIN, 
       }
       input = this.inputSchema.parse(input); // final input types transformations for handler
       output = await this.handler({input, options, logger});
+      try {
+        output = this.outputSchema.parse(output);
+      } catch (e) {
+        if (e instanceof ZodError) {
+          // noinspection ExceptionCaughtLocallyJS
+          throw new ZodError([
+            {
+              message: 'Invalid format',
+              code: 'custom',
+              path: ['output'],
+            },
+            ...e.issues.map((issue) => ({
+              ...issue,
+              path: issue.path.length === 0 ? ['output'] : issue.path
+            }))
+          ]);
+        } else {
+          // noinspection ExceptionCaughtLocallyJS
+          throw e;
+        }
+      }
     } catch (e) {
       error = e;
     }

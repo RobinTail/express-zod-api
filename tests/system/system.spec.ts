@@ -35,8 +35,8 @@ describe('System', () => {
               anything: z.number()
             }),
             handler: ({input: {key, something}, options: {user, permissions, method}}) => Promise.resolve({
-              doubleKey: key.repeat(2),
               anything: something === 'joke' ? 300 : 100500,
+              doubleKey: key.repeat(2),
               userId: user.id,
               permissions,
               method
@@ -71,11 +71,11 @@ describe('System', () => {
       expect(json).toEqual({
         status: 'success',
         data: {
-          doubleKey: '123123',
           anything: 300,
-          userId: 354,
-          permissions: ['any'],
-          method: 'get'
+          // doubleKey: '123123',
+          // userId: 354,
+          // permissions: ['any'],
+          // method: 'get'
         }
       });
     });
