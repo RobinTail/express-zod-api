@@ -1,7 +1,7 @@
 export { ConfigType } from './config-type';
 export { AbstractEndpoint, Method } from './endpoint';
 export { EndpointsFactory } from './endpoints-factory';
-export { ObjectSchema, Unshape, FlatObject, JoinUnshaped } from './helpers';
+export { ObjectSchema, FlatObject, Merge } from './helpers';
 export { createLogger } from './logger';
 export { createMiddleware } from './middleware';
 export { ResultHandler } from './result-handler';
