@@ -1,6 +1,6 @@
 import * as http from 'http';
 import fetch from 'node-fetch';
-import {createServer, EndpointsFactory, z} from '../../src';
+import {createServer, EndpointsFactory, Method, z} from '../../src';
 
 describe('System', () => {
   let server: http.Server;
@@ -8,29 +8,40 @@ describe('System', () => {
   beforeAll(() => {
     const routing = {
       v1: {
-        test: new EndpointsFactory().addMiddleware({
-          input: z.object({
-            key: z.string().refine((v) => v === '123', 'Invalid key')
-          }),
-          middleware: () => Promise.resolve({
-            user: {
-              id: 354
-            }
+        test: new EndpointsFactory()
+          .addMiddleware({
+            input: z.object({
+              key: z.string().refine((v) => v === '123', 'Invalid key')
+            }),
+            middleware: () => Promise.resolve({
+              user: {
+                id: 354
+              }
+            })
           })
-        }).build({
-          methods: ['get', 'post'],
-          input: z.object({
-            something: z.string()
-          }),
-          output: z.object({
-            anything: z.number()
-          }),
-          handler: ({input: {key, something}, options: {user}}) => Promise.resolve({
-            doubleKey: key.repeat(2),
-            anything: something === 'joke' ? 300 : 100500,
-            userId: user.id
+          .addMiddleware({
+            input: z.object({}).nonstrict(),
+            middleware: ({request, options: {user}}) => Promise.resolve({
+              method: request.method.toLowerCase() as Method,
+              permissions: user.id === 354 ? ['any'] : []
+            })
           })
-        })
+          .build({
+            methods: ['get', 'post'],
+            input: z.object({
+              something: z.string()
+            }),
+            output: z.object({
+              anything: z.number()
+            }),
+            handler: ({input: {key, something}, options: {user, permissions, method}}) => Promise.resolve({
+              doubleKey: key.repeat(2),
+              anything: something === 'joke' ? 300 : 100500,
+              userId: user.id,
+              permissions,
+              method
+            })
+          })
       }
     };
     server = createServer({
@@ -62,7 +73,9 @@ describe('System', () => {
         data: {
           doubleKey: '123123',
           anything: 300,
-          userId: 354
+          userId: 354,
+          permissions: ['any'],
+          method: 'get'
         }
       });
     });
