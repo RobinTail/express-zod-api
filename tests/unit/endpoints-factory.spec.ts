@@ -1,6 +1,6 @@
-import {createMiddleware, EndpointsFactory, z} from '../src';
-import {Endpoint} from '../src/endpoint';
-import {defaultResultHandler} from '../src/result-handler';
+import {createMiddleware, EndpointsFactory, z} from '../../src';
+import {Endpoint} from '../../src/endpoint';
+import {defaultResultHandler} from '../../src/result-handler';
 
 describe('EndpointsFactory', () => {
   describe('.constructor()', () => {

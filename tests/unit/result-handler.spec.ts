@@ -1,7 +1,7 @@
 import {Request, Response} from 'express';
 import {ZodError} from 'zod';
-import {defaultResultHandler} from '../src/result-handler';
-import {createHttpError} from '../src';
+import {defaultResultHandler} from '../../src/result-handler';
+import {createHttpError} from '../../src';
 
 let loggerMock: any;
 let responseMock: any;

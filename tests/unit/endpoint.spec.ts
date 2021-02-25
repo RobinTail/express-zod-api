@@ -1,5 +1,5 @@
-import {z, EndpointsFactory, ConfigType, createMiddleware} from '../src';
-import {Endpoint} from '../src/endpoint';
+import {z, EndpointsFactory, ConfigType, createMiddleware} from '../../src';
+import {Endpoint} from '../../src/endpoint';
 import {Request, Response} from 'express';
 
 let loggerMock: any;

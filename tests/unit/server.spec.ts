@@ -14,7 +14,7 @@ const expressMock = jest.mock('express', () => {
   return returnFunction;
 });
 
-import {ConfigType, createServer, EndpointsFactory, z} from '../src';
+import {ConfigType, createServer, EndpointsFactory, z} from '../../src';
 
 describe('Server', () => {
   beforeEach(() => {
