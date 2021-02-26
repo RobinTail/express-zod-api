@@ -107,7 +107,7 @@ describe('App', () => {
     });
   });
 
-  describe('Negative',() => {
+  describe('Protocol', () => {
     test('Should fail on invalid method', async () => {
       const response = await fetch('http://127.0.0.1:8055/v1/test', {
         method: 'PUT',
@@ -161,6 +161,92 @@ describe('App', () => {
         status: 'error',
         error: {
           message: 'key: Required'
+        }
+      });
+    });
+  });
+
+  describe('Validation', () => {
+    test('Should fail on middleware input type mismatch', async () => {
+      const response = await fetch('http://127.0.0.1:8055/v1/test', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          key: 123,
+          something: 'joke'
+        })
+      });
+      expect(response.status).toBe(400);
+      const json = await response.json();
+      expect(json).toEqual({
+        status: 'error',
+        error: {
+          message: 'key: Expected string, received number'
+        }
+      });
+    });
+
+    test('Should fail on middleware refinement mismatch', async () => {
+      const response = await fetch('http://127.0.0.1:8055/v1/test', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          key: '456',
+          something: 'joke'
+        })
+      });
+      expect(response.status).toBe(400);
+      const json = await response.json();
+      expect(json).toEqual({
+        status: 'error',
+        error: {
+          message: 'key: Invalid key'
+        }
+      });
+    });
+
+    test('Should fail on handler input type mismatch', async () => {
+      const response = await fetch('http://127.0.0.1:8055/v1/test', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          key: '123',
+          something: 123
+        })
+      });
+      expect(response.status).toBe(400);
+      const json = await response.json();
+      expect(json).toEqual({
+        status: 'error',
+        error: {
+          message: 'something: Expected string, received number'
+        }
+      });
+    });
+
+    test('Should fail on handler output type mismatch', async () => {
+      const response = await fetch('http://127.0.0.1:8055/v1/test', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          key: '123',
+          something: 'gimme fail'
+        })
+      });
+      expect(response.status).toBe(400);
+      const json = await response.json();
+      expect(json).toEqual({
+        status: 'error',
+        error: {
+          message: 'output: Invalid format; anything: Value should be greater than 0'
         }
       });
     });
