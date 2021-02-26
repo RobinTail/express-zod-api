@@ -54,7 +54,7 @@ const config: ConfigType = {
 ## Create an endpoints factory
 
 ```typescript
-export const endpointsFactory = new EndpointsFactory();
+const endpointsFactory = new EndpointsFactory();
 ```
 
 You can also instantly add middlewares to it using `.addMiddleware()` method.
@@ -64,7 +64,7 @@ You can also instantly add middlewares to it using `.addMiddleware()` method.
 Note: `options` come from the output of middlewares.
 
 ```typescript
-export const getUserEndpoint = endpointsFactory
+const getUserEndpoint = endpointsFactory
   .build({
     methods: ['get'],
     input: z.object({
@@ -110,7 +110,7 @@ All middleware inputs are also available as the endpoint inputs.
 
 ```typescript
 // This one provides the method of the request
-export const methodProviderMiddleware = createMiddleware({
+const methodProviderMiddleware = createMiddleware({
   input: z.object({}).nonstrict(),
   middleware: async ({request}) => ({
     method: request.method.toLowerCase() as Method,
@@ -119,7 +119,7 @@ export const methodProviderMiddleware = createMiddleware({
 
 // This one performs the authentication 
 // using key from the input and token from headers
-export const authMiddleware = createMiddleware({
+const authMiddleware = createMiddleware({
   input: z.object({
     key: z.string().nonempty()
   }),
@@ -141,7 +141,7 @@ export const authMiddleware = createMiddleware({
 You can also implement the validation inside the input schema:
 
 ```typescript
-export const authMiddleware = createMiddleware({
+const authMiddleware = createMiddleware({
   input: z.object({
     key: z.string().nonempty()
       .refine((key) => key === '123', 'Invalid key')
