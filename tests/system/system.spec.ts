@@ -32,10 +32,10 @@ describe('System', () => {
               something: z.string()
             }),
             output: z.object({
-              anything: z.number()
-            }),
+              anything: z.number().positive()
+            }).passthrough(), // allow excessive keys
             handler: async ({input: {key, something}, options: {user, permissions, method}}) => ({
-              anything: something === 'joke' ? 300 : 100500,
+              anything: something === 'joke' ? 300 : -100500,
               doubleKey: key.repeat(2),
               userId: user.id,
               permissions,
@@ -72,10 +72,10 @@ describe('System', () => {
         status: 'success',
         data: {
           anything: 300,
-          // doubleKey: '123123',
-          // userId: 354,
-          // permissions: ['any'],
-          // method: 'get'
+          doubleKey: '123123',
+          userId: 354,
+          permissions: ['any'],
+          method: 'get'
         }
       });
     });
