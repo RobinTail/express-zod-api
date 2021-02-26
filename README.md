@@ -61,6 +61,8 @@ You can also instantly add middlewares to it using `.addMiddleware()` method.
 
 ## Create your first endpoint
 
+Note: `options` come from the output of middlewares.
+
 ```typescript
 export const getUserEndpoint = endpointsFactory
   .build({
@@ -71,16 +73,16 @@ export const getUserEndpoint = endpointsFactory
     output: z.object({
       name: z.string(),
     }),
-    handler: ({input: {id}, options, logger}) => {
+    handler: async ({input: {id}, options, logger}) => {
       logger.debug(`Requested id: ${id}`);
       logger.debug('Options:', options);
       const name = 'John Doe';
-      return Promise.resolve({ name: 'John Doe' });
+      return { name: 'John Doe' };
     }
   });
 ```
 
-You can also add the middleware using `.addMiddleware()` method before `.build()`.
+You can add middlewares by using `.addMiddleware()` method before `.build()`.
 All inputs and outputs are validated.
 
 ## Setup routing
@@ -110,29 +112,42 @@ All middleware inputs are also available as the endpoint inputs.
 // This one provides the method of the request
 export const methodProviderMiddleware = createMiddleware({
   input: z.object({}).nonstrict(),
-  middleware: ({request}) => Promise.resolve({
+  middleware: async ({request}) => ({
     method: request.method.toLowerCase() as Method,
   })
 });
 
-// This one performs the authentication using key from input and token from headers
+// This one performs the authentication 
+// using key from the input and token from headers
 export const authMiddleware = createMiddleware({
   input: z.object({
     key: z.string().nonempty()
   }),
-  middleware: ({input: {key}, request, logger}) => {
+  middleware: async ({input: {key}, request, logger}) => {
     logger.debug('Checking the key and token...');
-    return new Promise<{token: string}>((resolve, reject) => {
-      if (key !== '123') {
-        return reject(createHttpError(401, 'Invalid key'));
-      }
-      if (request.headers['token'] !== '456') {
-        return reject(createHttpError(401, 'Invalid token'));
-      }
-      resolve({token: request.headers['token']});
-    });
+    if (key !== '123') {
+      throw createHttpError(401, 'Invalid key');
+    }
+    if (request.headers['token'] !== '456') {
+      throw createHttpError(401, 'Invalid token');
+    }
+    return {token: request.headers['token']};
   }
 });
+```
+
+## Refinements
+
+You can also implement the validation inside the input schema:
+
+```typescript
+export const authMiddleware = createMiddleware({
+  input: z.object({
+    key: z.string().nonempty()
+      .refine((key) => key === '123', 'Invalid key')
+  }),
+  ...
+})
 ```
 
 ## Custom server

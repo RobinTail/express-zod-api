@@ -4,17 +4,15 @@ export const authMiddleware = createMiddleware({
   input: z.object({
     key: z.string().nonempty()
   }),
-  middleware: ({input: {key}, request, logger}) => {
+  middleware: async ({input: {key}, request, logger}) => {
     logger.debug('Checking the key and token...');
-    return new Promise<{token: string}>((resolve, reject) => {
-      if (key !== '123') {
-        return reject(createHttpError(401, 'Invalid key'));
-      }
-      if (request.headers['token'] !== '456') {
-        return reject(createHttpError(401, 'Invalid token'));
-      }
-      resolve({token: request.headers['token']});
-    });
+    if (key !== '123') {
+      throw createHttpError(401, 'Invalid key');
+    }
+    if (request.headers['token'] !== '456') {
+      throw createHttpError(401, 'Invalid token');
+    }
+    return {token: request.headers['token']};
   }
 });
 
