@@ -65,8 +65,9 @@ describe('System', () => {
       expect(server.listening).toBeTruthy();
     });
 
-    test('Should handle valid request', async () => {
+    test('Should handle valid GET request', async () => {
       const response = await fetch('http://127.0.0.1:8055/v1/test?key=123&something=joke');
+      expect(response.status).toBe(200);
       const json = await response.json();
       expect(json).toEqual({
         status: 'success',
@@ -76,6 +77,31 @@ describe('System', () => {
           userId: 354,
           permissions: ['any'],
           method: 'get'
+        }
+      });
+    });
+
+    test('Should handle valid POST request', async () => {
+      const response = await fetch('http://127.0.0.1:8055/v1/test', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          key: '123',
+          something: 'joke'
+        })
+      });
+      expect(response.status).toBe(200);
+      const json = await response.json();
+      expect(json).toEqual({
+        status: 'success',
+        data: {
+          anything: 300,
+          doubleKey: '123123',
+          userId: 354,
+          permissions: ['any'],
+          method: 'post'
         }
       });
     });
