@@ -1,19 +1,26 @@
 import * as z from 'zod';
+import {AnyZodObject} from 'zod/lib/cjs/types/object';
 import {MiddlewareDefinition} from './middleware';
 
-export type ObjectSchema<T extends z.ZodRawShape> = z.ZodObject<T, 'passthrough' | 'strict' | 'strip'>;
-export type Unshape<T> = T extends z.ZodRawShape ? z.infer<ObjectSchema<T>> : T;
-export type JoinUnshaped<A, B> = Unshape<A> & Unshape<B>;
+export type FlatObject = Record<string, any>;
+export type ObjectSchema = AnyZodObject;
 
-export function combineEndpointAndMiddlewareInputSchemas<IN extends z.ZodRawShape, mIN>(
-  input: ObjectSchema<IN>,
+export type Merge<A extends ObjectSchema, B extends ObjectSchema | any> = z.ZodObject<
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  A['_shape'] & (B extends ObjectSchema ? B['_shape'] : {}),
+  A['_unknownKeys'],
+  A['_catchall']
+>;
+
+export function combineEndpointAndMiddlewareInputSchemas<IN extends ObjectSchema, mIN>(
+  input: IN,
   middlewares: MiddlewareDefinition<any, any, any>[]
-): ObjectSchema<IN & mIN> {
+): Merge<IN, mIN> {
   if (middlewares.length === 0) {
-    return input as any as ObjectSchema<IN & mIN>;
+    return input as any as Merge<IN, mIN>;
   }
   return middlewares
     .map((middleware) => middleware.input)
-    .reduce((carry, schema) => carry.merge(schema))
-    .merge(input) as ObjectSchema<IN & mIN>;
+    .reduce((carry: ObjectSchema, schema) => carry.merge(schema))
+    .merge(input) as Merge<IN, mIN>;
 }

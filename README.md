@@ -14,13 +14,24 @@ Start your API server with I/O schema validation and custom middlewares in minut
 coming soon
 ```
 
+Add the following options to your `tsconfig.json` file in order to make it work as expected:
+
+```json
+{
+  "compilerOptions": {
+    "noImplicitAny": true,
+    "strictNullChecks": true
+  }
+}
+```
+
 # Tests
 
 ```sh
 yarn test
 ```
 
-# Usage
+# Basic usage
 
 Full example in `./example`. You can clone the repo and run `yarn start` to check it out in action.
 
@@ -40,7 +51,7 @@ const config: ConfigType = {
 };
 ```
 
-## Create endpoints factory
+## Create an endpoints factory
 
 ```typescript
 export const endpointsFactory = new EndpointsFactory();
@@ -69,7 +80,7 @@ export const getUserEndpoint = endpointsFactory
   });
 ```
 
-You can also add middleware using `.addMiddleware()` method befor `.build()`.
+You can also add the middleware using `.addMiddleware()` method before `.build()`.
 All inputs and outputs are validated.
 
 ## Setup routing
@@ -121,5 +132,51 @@ export const authMiddleware = createMiddleware({
       resolve({token: request.headers['token']});
     });
   }
+});
+```
+
+## Custom server
+
+You can instantiate your own express app and connect your endpoints the following way:
+
+```typescript
+const config: ConfigType = {...};
+const logger = createLogger(config);
+const routing = {...};
+
+initRouting({app, logger, config, routing});
+```
+
+# Known issues
+
+# Excessive of endpoint's output
+
+Unfortunately Typescript does not perform [excess proprety check](https://www.typescriptlang.org/docs/handbook/interfaces.html#excess-property-checks) for objects resolved in `Promise`, so there is no error during development of endpoint's output.
+
+```typescript
+endpointsFactory.build({
+  methods, input,
+  output: z.object({
+    anything: z.number()
+  }),
+  handler: async () => ({
+    anything: 123,
+    excessive: 'something' // no type error
+  })
+});
+```
+
+You can achieve this check by assigning the output schema to a constant and reusing it in additional definition of handler's return type:
+
+```typescript
+const output = z.object({
+  anything: z.number()
+});
+endpointsFactory.build({
+  methods, input, output,
+  handler: async (): Promise<z.infer<typeof handlerOutput>> => ({
+    anything: 123,
+    excessive: 'something' // error TS2322, ok!
+  })
 });
 ```

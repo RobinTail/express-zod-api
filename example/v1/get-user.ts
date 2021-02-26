@@ -18,21 +18,21 @@ export const getUserEndpoint = endpointsFactory
       status: z.nativeEnum(Status),
       name: z.string(),
     }),
-    handler: ({input: {id}, options: {method}, logger}) => {
+    handler: async ({input: {id}, options: {method}, logger}) => {
       logger.debug(`Requested id: ${id}, method ${method}`);
       const name = 'John Doe';
       if (id < 10) {
-        return Promise.resolve({
+        return {
           status: Status.OK,
           name
-        });
+        };
       }
       if (id > 100) {
         throw createHttpError(404, 'User not found');
       }
-      return Promise.resolve({
+      return {
         status: Status.Warning,
         name
-      });
+      };
     }
   });

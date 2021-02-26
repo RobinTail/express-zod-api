@@ -1,4 +1,4 @@
-import {ConfigType, createLogger} from '../src';
+import {ConfigType, createLogger} from '../../src';
 
 describe('Logger', () => {
   describe('createLogger()', () => {

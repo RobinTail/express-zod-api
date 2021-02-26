@@ -1,6 +1,6 @@
 import {ZodObject} from 'zod';
-import {combineEndpointAndMiddlewareInputSchemas} from '../src/helpers';
-import {createMiddleware, z} from '../src';
+import {combineEndpointAndMiddlewareInputSchemas} from '../../src/helpers';
+import {createMiddleware, z} from '../../src';
 
 describe('Helpers', () => {
   describe('combineEndpointAndMiddlewareInputSchemas()', () => {

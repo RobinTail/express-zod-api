@@ -1,7 +1,8 @@
 import {Logger} from 'winston';
+import {ZodError} from 'zod';
 import * as z from 'zod';
 import {ConfigType} from './config-type';
-import {combineEndpointAndMiddlewareInputSchemas, JoinUnshaped, ObjectSchema, Unshape} from './helpers';
+import {combineEndpointAndMiddlewareInputSchemas, Merge, ObjectSchema} from './helpers';
 import {Request, Response} from 'express';
 import {MiddlewareDefinition} from './middleware';
 import {defaultResultHandler, ResultHandler} from './result-handler';
@@ -30,19 +31,19 @@ export abstract class AbstractEndpoint {
 export type Method = 'get' | 'post' | 'put' | 'delete' | 'patch';
 
 /** mIN, OPT - from Middlewares */
-export class Endpoint<IN extends z.ZodRawShape, OUT extends z.ZodRawShape, mIN, OPT> extends AbstractEndpoint {
+export class Endpoint<IN extends ObjectSchema, OUT extends ObjectSchema, mIN, OPT> extends AbstractEndpoint {
   protected middlewares: MiddlewareDefinition<any, any, any>[] = [];
-  protected inputSchema: ObjectSchema<IN & mIN>; // combined with middlewares input
-  protected outputSchema: ObjectSchema<OUT>;
-  protected handler: Handler<JoinUnshaped<IN, mIN>, Unshape<OUT>, OPT>
+  protected inputSchema: Merge<IN, mIN>; // combined with middlewares input
+  protected outputSchema: OUT;
+  protected handler: Handler<z.infer<Merge<IN, mIN>>, z.infer<OUT>, OPT>
   protected resultHandler: ResultHandler | null;
 
   constructor({methods, middlewares, inputSchema, outputSchema, handler, resultHandler}: {
     methods: Method[];
     middlewares: MiddlewareDefinition<any, any, any>[],
-    inputSchema: ObjectSchema<IN>,
-    outputSchema: ObjectSchema<OUT>,
-    handler: Handler<JoinUnshaped<IN, mIN>, Unshape<OUT>, OPT>
+    inputSchema: IN,
+    outputSchema: OUT,
+    handler: Handler<z.infer<Merge<IN, mIN>>, z.infer<OUT>, OPT>
     resultHandler: ResultHandler | null
   }) {
     super();
@@ -99,6 +100,27 @@ export class Endpoint<IN extends z.ZodRawShape, OUT extends z.ZodRawShape, mIN, 
       }
       input = this.inputSchema.parse(input); // final input types transformations for handler
       output = await this.handler({input, options, logger});
+      try {
+        output = this.outputSchema.parse(output);
+      } catch (e) {
+        if (e instanceof ZodError) {
+          // noinspection ExceptionCaughtLocallyJS
+          throw new ZodError([
+            {
+              message: 'Invalid format',
+              code: 'custom',
+              path: ['output'],
+            },
+            ...e.issues.map((issue) => ({
+              ...issue,
+              path: issue.path.length === 0 ? ['output'] : issue.path
+            }))
+          ]);
+        } else {
+          // noinspection ExceptionCaughtLocallyJS
+          throw e;
+        }
+      }
     } catch (e) {
       error = e;
     }
