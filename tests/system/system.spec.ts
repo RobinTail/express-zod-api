@@ -105,5 +105,62 @@ describe('System', () => {
         }
       });
     });
+
+    test('Should handle invalid method', async () => {
+      const response = await fetch('http://127.0.0.1:8055/v1/test', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          key: '123',
+          something: 'joke'
+        })
+      });
+      expect(response.status).toBe(404);
+      const json = await response.json();
+      expect(json).toEqual({
+        status: 'error',
+        error: {
+          message: 'Can not PUT /v1/test'
+        }
+      });
+    });
+
+    test('Should handle malformed body', async () => {
+      const response = await fetch('http://127.0.0.1:8055/v1/test', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: '{"key": "123", "something'
+      });
+      expect(response.status).toBe(500);
+      const json = await response.json();
+      expect(json).toEqual({
+        status: 'error',
+        error: {
+          message: 'Unexpected end of JSON input'
+        }
+      });
+    });
+
+    test('Should fail when missing content type header', async () => {
+      const response = await fetch('http://127.0.0.1:8055/v1/test', {
+        method: 'POST',
+        body: JSON.stringify({
+          key: '123',
+          something: 'joke'
+        })
+      });
+      expect(response.status).toBe(400);
+      const json = await response.json();
+      expect(json).toEqual({
+        status: 'error',
+        error: {
+          message: 'key: Required'
+        }
+      });
+    });
   });
 });
