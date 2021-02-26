@@ -164,7 +164,7 @@ initRouting({app, logger, config, routing});
 
 # Known issues
 
-# Excessive of endpoint's output
+# Excess property check of endpoint output
 
 Unfortunately Typescript does not perform [excess proprety check](https://www.typescriptlang.org/docs/handbook/interfaces.html#excess-property-checks) for objects resolved in `Promise`, so there is no error during development of endpoint's output.
 
