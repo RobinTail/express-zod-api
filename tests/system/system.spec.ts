@@ -2,7 +2,7 @@ import * as http from 'http';
 import fetch from 'node-fetch';
 import {createServer, EndpointsFactory, Method, z} from '../../src';
 
-describe('System', () => {
+describe('App', () => {
   let server: http.Server;
 
   beforeAll(() => {
@@ -60,7 +60,7 @@ describe('System', () => {
     server.close(done);
   });
 
-  describe('App', () => {
+  describe('Positive', () => {
     test('Is listening', () => {
       expect(server.listening).toBeTruthy();
     });
@@ -105,8 +105,10 @@ describe('System', () => {
         }
       });
     });
+  });
 
-    test('Should handle invalid method', async () => {
+  describe('Negative',() => {
+    test('Should fail on invalid method', async () => {
       const response = await fetch('http://127.0.0.1:8055/v1/test', {
         method: 'PUT',
         headers: {
@@ -127,7 +129,7 @@ describe('System', () => {
       });
     });
 
-    test('Should handle malformed body', async () => {
+    test('Should fail on malformed body', async () => {
       const response = await fetch('http://127.0.0.1:8055/v1/test', {
         method: 'PUT',
         headers: {
