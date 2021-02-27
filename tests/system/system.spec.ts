@@ -56,8 +56,17 @@ describe('App', () => {
     }, routing);
   });
 
-  afterAll((done) => {
-    server.close(done);
+  afterAll(async () => {
+    server.close();
+    // this approach works better than .close() callback
+    await new Promise((resolve) => {
+      const timer = setInterval(() => {
+        if (!server.listening) {
+          clearInterval(timer);
+          resolve('OK');
+        }
+      }, 100);
+    });
   });
 
   describe('Positive', () => {
