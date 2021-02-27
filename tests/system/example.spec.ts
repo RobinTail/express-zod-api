@@ -9,7 +9,7 @@ describe('Example', () => {
   };
 
   beforeAll(() => {
-    example = spawn('yarn', ['start']);
+    example = spawn('ts-node', ['example/index.ts']);
     example.stdout.on('data', listener);
   });
 
@@ -24,11 +24,6 @@ describe('Example', () => {
         }
       }, 100);
     });
-    if (process.env.NODE_ENV === 'ci') {
-      await new Promise((resolve) => {
-        setTimeout(() => resolve, 1000);
-      });
-    }
   });
 
   describe('Positive', () => {

@@ -27,5 +27,5 @@ jobs:
         node-version: ${{ matrix.node-version }}
     - run: yarn install
     - run: yarn lint
-    - run: NODE_ENV=ci && yarn test
+    - run: yarn test
     - run: yarn build
