@@ -15,6 +15,9 @@ describe('Example', () => {
 
   afterAll(async () => {
     example.stdout.removeListener('data', listener);
+    example.stdout.removeAllListeners();
+    example.removeAllListeners();
+    example.disconnect();
     example.kill();
     await new Promise((resolve) => {
       const timer = setInterval(() => {
