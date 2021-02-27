@@ -10,7 +10,7 @@ describe('Example', () => {
   };
 
   beforeAll(() => {
-    example = spawn('yarn', ['start']);
+    example = spawn('yarn', ['start'], { detached: true });
     example.stdout.on('data', listener);
     example.on('exit', () => { exited = true; });
   });
