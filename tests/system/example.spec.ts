@@ -12,8 +12,16 @@ describe('Example', () => {
     });
   });
 
-  afterAll(() => {
+  afterAll(async () => {
     example.kill();
+    await new Promise((resolve) => {
+      const timer = setInterval(() => {
+        if (example.killed) {
+          clearInterval(timer);
+          resolve('OK');
+        }
+      }, 100);
+    });
   });
 
   describe('Positive', () => {
