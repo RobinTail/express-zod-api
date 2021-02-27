@@ -4,6 +4,7 @@ import {spawn, ChildProcessWithoutNullStreams} from 'child_process';
 describe('Example', () => {
   let example: ChildProcessWithoutNullStreams;
   let out = '';
+  let exited = false;
   const listener = (chunk: Buffer) => {
     out += chunk.toString();
   };
@@ -11,6 +12,7 @@ describe('Example', () => {
   beforeAll(() => {
     example = spawn('yarn', ['start']);
     example.stdout.on('data', listener);
+    example.on('exit', () => { exited = true; });
   });
 
   afterAll(async () => {
@@ -18,7 +20,7 @@ describe('Example', () => {
     example.kill();
     await new Promise((resolve) => {
       const timer = setInterval(() => {
-        if (example.killed) {
+        if (example.killed && exited) {
           clearInterval(timer);
           resolve('OK');
         }
