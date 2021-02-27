@@ -4,15 +4,17 @@ import {spawn, ChildProcessWithoutNullStreams} from 'child_process';
 describe('Example', () => {
   let example: ChildProcessWithoutNullStreams;
   let out = '';
+  const listener = (chunk: Buffer) => {
+    out += chunk.toString();
+  };
 
   beforeAll(() => {
     example = spawn('yarn', ['start']);
-    example.stdout.on('data', (chunk: Buffer) => {
-      out += chunk.toString();
-    });
+    example.stdout.on('data', listener);
   });
 
   afterAll(async () => {
+    example.stdout.removeListener('data', listener);
     example.kill();
     await new Promise((resolve) => {
       const timer = setInterval(() => {

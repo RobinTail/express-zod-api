@@ -9,7 +9,7 @@
     "build": "yarn cleanup && tsc",
     "test": "yarn test:unit && yarn test:system",
     "test:unit": "yarn jest --verbose ./tests/unit",
-    "test:system": "yarn jest --verbose ./tests/system --detectOpenHandles --forceExit",
+    "test:system": "yarn jest --verbose --detectOpenHandles --forceExit ./tests/system",
     "lint": "yarn eslint ./src ./example ./tests",
     "precommit": "yarn lint && yarn test",
     "install_hooks": "husky install"
