@@ -162,9 +162,23 @@ const routing = {...};
 initRouting({app, logger, config, routing});
 ```
 
+# Front-end awareness of endpoint types
+
+You can export only the types of your endpoints for your front-end:
+
+```typescript
+export type GetUserEndpoint = typeof getUserEndpoint;
+```
+
+Then use provided helpers to obtain their input and output types:
+```typescript
+type GetUserEndpointInput = EndpointInput<GetUserEndpoint>;
+type GetUserEndpointOutput = EndpointOutput<GetUserEndpoint>;
+```
+
 # Known issues
 
-# Excess property check of endpoint output
+## Excess property check of endpoint output
 
 Unfortunately Typescript does not perform [excess proprety check](https://www.typescriptlang.org/docs/handbook/interfaces.html#excess-property-checks) for objects resolved in `Promise`, so there is no error during development of endpoint's output.
 

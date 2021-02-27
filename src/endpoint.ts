@@ -30,6 +30,10 @@ export abstract class AbstractEndpoint {
 
 export type Method = 'get' | 'post' | 'put' | 'delete' | 'patch';
 
+export type EndpointInput<T> = T extends Endpoint<infer IN, any, infer mIN, any> ? z.input<Merge<IN, mIN>> : never;
+
+export type EndpointOutput<T> = T extends Endpoint<any, infer OUT, any, any> ? z.infer<OUT> : never;
+
 /** mIN, OPT - from Middlewares */
 export class Endpoint<IN extends ObjectSchema, OUT extends ObjectSchema, mIN, OPT> extends AbstractEndpoint {
   protected middlewares: MiddlewareDefinition<any, any, any>[] = [];
