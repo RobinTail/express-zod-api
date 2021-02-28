@@ -1,35 +1,38 @@
 import {Express} from 'express';
 import {Logger} from 'winston';
 import {ConfigType} from './config-type';
-import {AbstractEndpoint} from './endpoint';
+import {AbstractEndpoint, Method} from './endpoint';
 
 export interface Routing {
   [PATH: string]: AbstractEndpoint | Routing;
 }
 
-export const initRouting = ({app, logger, config, routing, parentPath}: {
+type RoutingCycleCallback = (endpoint: AbstractEndpoint, fullPath: string, method: Method) => void;
+
+const routingCycle = (routing: Routing, cb: RoutingCycleCallback, parentPath?: string) => {
+  Object.keys(routing).forEach((path) => {
+    const fullPath = `${parentPath || ''}/${path}`;
+    const element = routing[path];
+    if (element instanceof AbstractEndpoint) {
+      element.getMethods().forEach((method) => {
+        cb(element, fullPath, method);
+      });
+    } else {
+      routingCycle(element, cb, fullPath);
+    }
+  });
+};
+
+export const initRouting = ({app, logger, config, routing}: {
   app: Express,
   logger: Logger,
   config: ConfigType,
-  routing: Routing,
-  parentPath?: string
+  routing: Routing
 }) => {
-  Object.keys(routing).forEach((path) => {
-    const fullPath = `${parentPath || ''}/${path}`;
-    const endpoint = routing[path];
-    if (endpoint instanceof AbstractEndpoint) {
-      endpoint.getMethods().forEach((method) => {
-        app[method](fullPath, async (request, response) => {
-          logger.info(`${request.method}: ${fullPath}`);
-          await endpoint.execute({request, response, logger, config});
-        });
-      });
-    } else {
-      initRouting({
-        app, logger, config,
-        routing: endpoint,
-        parentPath: fullPath
-      });
-    }
+  routingCycle(routing, (endpoint, fullPath, method) => {
+    app[method](fullPath, async (request, response) => {
+      logger.info(`${request.method}: ${fullPath}`);
+      await endpoint.execute({request, response, logger, config});
+    });
   });
 };
