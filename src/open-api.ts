@@ -8,6 +8,7 @@ import {
 } from 'openapi3-ts';
 import {PathItemObject} from 'openapi3-ts/src/model/OpenApi';
 import {ZodTypeAny} from 'zod';
+import {ZodArrayDef} from 'zod/lib/cjs/types/array';
 import {AnyZodObject} from 'zod/lib/cjs/types/object';
 import {ZodTransformerDef} from 'zod/lib/cjs/types/transformer';
 import {Routing, routingCycle} from './routing';
@@ -31,7 +32,11 @@ const getOpenApiPropertyType = (value: ZodTypeAny): Partial<SchemaObject> => {
     case 'null':
       return {...otherProps, type: 'null'};
     case 'array':
-      return {...otherProps, type: 'array'};
+      return {
+        ...otherProps,
+        type: 'array',
+        items: getOpenApiPropertyType((value._def as ZodArrayDef).type)
+      };
     case 'object':
     case 'record':
       return {
