@@ -84,6 +84,7 @@ const getOpenApiPropertyType = (value: ZodTypeAny): Partial<SchemaObject> => {
 
 const objectCycle = (schema: AnyZodObject): Record<string, SchemaObject> => {
   return Object.keys(schema.shape).reduce((carry, key) => ({
+    ...carry,
     [key]: getOpenApiPropertyType(schema.shape[key])
   }), {} as Record<string, SchemaObject>);
 };
