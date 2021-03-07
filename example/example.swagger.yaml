@@ -1,0 +1,76 @@
+openapi: 3.0.0
+info:
+  title: ""
+  version: ""
+paths:
+  /v1/getUser:
+    get:
+      responses:
+        default:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                nullable: false
+                type: object
+                properties:
+                  name:
+                    nullable: false
+                    type: string
+                required:
+                  - status
+                  - name
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema:
+            nullable: false
+            type: string
+  /v1/setUser:
+    post:
+      responses:
+        default:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                nullable: false
+                type: object
+                properties:
+                  status:
+                    nullable: false
+                    type: string
+                    enum:
+                      - Success
+                      - I'll fix it later
+                required:
+                  - status
+      requestBody:
+        content:
+          application/json:
+            schema:
+              nullable: false
+              type: object
+              properties:
+                name:
+                  nullable: false
+                  type: string
+              required:
+                - key
+                - id
+                - name
+components:
+  schemas: {}
+  responses: {}
+  parameters: {}
+  examples: {}
+  requestBodies: {}
+  headers: {}
+  securitySchemes: {}
+  links: {}
+  callbacks: {}
+tags: []
+servers:
+  - url: ""
+

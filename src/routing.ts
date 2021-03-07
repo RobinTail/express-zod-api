@@ -9,7 +9,7 @@ export interface Routing {
 
 type RoutingCycleCallback = (endpoint: AbstractEndpoint, fullPath: string, method: Method) => void;
 
-const routingCycle = (routing: Routing, cb: RoutingCycleCallback, parentPath?: string) => {
+export const routingCycle = (routing: Routing, cb: RoutingCycleCallback, parentPath?: string) => {
   Object.keys(routing).forEach((path) => {
     const fullPath = `${parentPath || ''}/${path}`;
     const element = routing[path];
