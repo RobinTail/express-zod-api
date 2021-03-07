@@ -7,7 +7,7 @@ export type ObjectSchema = AnyZodObject;
 
 export type Merge<A extends ObjectSchema, B extends ObjectSchema | any> = z.ZodObject<
   // eslint-disable-next-line @typescript-eslint/ban-types
-  A['_shape'] & (B extends ObjectSchema ? B['_shape'] : {}),
+  A['shape'] & (B extends ObjectSchema ? B['shape'] : {}),
   A['_unknownKeys'],
   A['_catchall']
 >;
