@@ -12,6 +12,8 @@ import {ZodTransformerDef} from 'zod/lib/cjs/types/transformer';
 import {Routing, routingCycle} from './routing';
 import {lookup} from 'mime';
 
+const _usedRef: Record<string, true> = {};
+
 const getOpenApiPropertyType = (value: ZodTypeAny): Partial<SchemaObject> => {
   const otherProps: Partial<SchemaObject> = {
     nullable: value.isNullable(),
@@ -95,16 +97,18 @@ interface GenerationParams {
   successfulResponseDescription?: string
 }
 
-const usedRef: Record<string, true> = {};
-
 const createRef = (str: string): string => {
   const name = str.replace(/[^A-Za-z0-9\-._]/g, '');
   let n = 1;
-  while (usedRef[`${name}${n}`]) {
+  while (_usedRef[`${name}${n}`]) {
     n++;
   }
-  return `${name}${n}`;
+  const ref = `${name}${n}`;
+  _usedRef[ref] = true;
+  return ref;
 };
+
+const useRef = (ref: string) => ({$ref: `#/components/schemas/${ref}`});
 
 export const generateOpenApi = ({
   routing, title, version, serverUrl,
@@ -118,15 +122,19 @@ export const generateOpenApi = ({
     .addInfo({title, version})
     .addServer({url: serverUrl});
   routingCycle(routing, (endpoint, fullPath, method) => {
-    const response: MediaTypeObject = {
-      schema: getOpenApiPropertyType(endpoint.getOutputSchema())
-    };
+    const responseSchema = createRef('responseSchema');
+    builder.addSchema(responseSchema, {
+      ...getOpenApiPropertyType(endpoint.getOutputSchema()),
+      description: `${fullPath} ${method} response schema`
+    });
     const operation: OperationObject = {
       responses: {
         default: {
           description: successfulResponseDescription || 'Successful response',
           content: {
-            [mimeJson]: response
+            [mimeJson]: {
+              schema: useRef(responseSchema)
+            }
           }
         },
       }
@@ -147,7 +155,7 @@ export const generateOpenApi = ({
       operation.requestBody = {
         content: {
           [mimeJson]: {
-            schema: {$ref: `#/components/schemas/${bodySchema}`}
+            schema: useRef(bodySchema)
           }
         }
       };

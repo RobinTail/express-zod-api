@@ -11,15 +11,7 @@ paths:
           content:
             application/json:
               schema:
-                nullable: false
-                type: object
-                properties:
-                  name:
-                    nullable: false
-                    type: string
-                required:
-                  - status
-                  - name
+                $ref: "#/components/schemas/responseSchema1"
       parameters:
         - name: id
           in: query
@@ -35,17 +27,7 @@ paths:
           content:
             application/json:
               schema:
-                nullable: false
-                type: object
-                properties:
-                  status:
-                    nullable: false
-                    type: string
-                    enum:
-                      - Success
-                      - I'll fix it later
-                required:
-                  - status
+                $ref: "#/components/schemas/responseSchema2"
       requestBody:
         content:
           application/json:
@@ -53,6 +35,30 @@ paths:
               $ref: "#/components/schemas/requestBody1"
 components:
   schemas:
+    responseSchema1:
+      nullable: false
+      type: object
+      properties:
+        name:
+          nullable: false
+          type: string
+      required:
+        - status
+        - name
+      description: /v1/getUser get response schema
+    responseSchema2:
+      nullable: false
+      type: object
+      properties:
+        status:
+          nullable: false
+          type: string
+          enum:
+            - Success
+            - I'll fix it later
+      required:
+        - status
+      description: /v1/setUser post response schema
     requestBody1:
       nullable: false
       type: object
