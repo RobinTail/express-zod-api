@@ -1,0 +1,104 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Open API generator generateOpenApi() should generate the correct schema of example routing 1`] = `
+"openapi: 3.0.0
+info:
+  title: Example API
+  version: 1.2.3
+paths:
+  /v1/getUser:
+    get:
+      responses:
+        default:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: \\"#/components/schemas/responseSchema1\\"
+      parameters:
+        - $ref: \\"#/components/parameters/parameter1\\"
+  /v1/setUser:
+    post:
+      responses:
+        default:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: \\"#/components/schemas/responseSchema2\\"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: \\"#/components/schemas/requestBody1\\"
+components:
+  schemas:
+    responseSchema1:
+      nullable: false
+      type: object
+      properties:
+        status:
+          nullable: false
+          type: string
+          enum:
+            - That's ok
+            - Some kind of warning
+        name:
+          nullable: false
+          type: string
+      required:
+        - status
+        - name
+      description: /v1/getUser GET response schema
+    responseSchema2:
+      nullable: false
+      type: object
+      properties:
+        status:
+          nullable: false
+          type: string
+          enum:
+            - Success
+            - I'll fix it later
+      required:
+        - status
+      description: /v1/setUser POST response schema
+    requestBody1:
+      nullable: false
+      type: object
+      properties:
+        key:
+          nullable: false
+          type: string
+        id:
+          nullable: false
+          type: number
+        name:
+          nullable: false
+          type: string
+      required:
+        - key
+        - id
+        - name
+      description: /v1/setUser POST request body
+  responses: {}
+  parameters:
+    parameter1:
+      name: id
+      in: query
+      required: true
+      schema:
+        nullable: false
+        type: string
+        description: /v1/getUser GET parameter
+  examples: {}
+  requestBodies: {}
+  headers: {}
+  securitySchemes: {}
+  links: {}
+  callbacks: {}
+tags: []
+servers:
+  - url: http://example.com
+"
+`;
