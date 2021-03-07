@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
-  title: ""
-  version: ""
+  title: Example API
+  version: 0.1.0
 paths:
   /v1/getUser:
     get:
@@ -72,5 +72,5 @@ components:
   callbacks: {}
 tags: []
 servers:
-  - url: ""
+  - url: http://example.com
 

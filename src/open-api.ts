@@ -1,4 +1,5 @@
 import {
+  InfoObject,
   MediaTypeObject,
   OpenApiBuilder,
   OperationObject,
@@ -83,7 +84,14 @@ const objectCycle = (schema: AnyZodObject): Record<string, SchemaObject> => {
   }), {} as Record<string, SchemaObject>);
 };
 
-export const openApi = (routing: Routing): OpenApiBuilder => {
+interface GenerationParams {
+  title: string;
+  version: string;
+  serverUrl: string;
+  routing: Routing;
+}
+
+export const openApi = ({routing, title, version, serverUrl}: GenerationParams): OpenApiBuilder => {
   const paths: PathsObject = {};
   routingCycle(routing, (endpoint, fullPath, method) => {
     const body: MediaTypeObject = {
@@ -124,12 +132,11 @@ export const openApi = (routing: Routing): OpenApiBuilder => {
       [method]: operation
     };
   });
-  const builder = OpenApiBuilder.create().addVersion('3.0.0').addInfo({
-    title: '',
-    version: ''
-  }).addServer({
-    url: ''
-  });
+  const builder = OpenApiBuilder
+    .create()
+    .addVersion('3.0.0')
+    .addInfo({title, version})
+    .addServer({url: serverUrl});
   Object.keys(paths).forEach((path) => builder.addPath(path, paths[path]));
   return builder;
 };
