@@ -1,4 +1,4 @@
-# Express Zod API
+# Express Zod API ![CI](https://github.com/RobinTail/express-zod-api/actions/workflows/node.js.yml/badge.svg)
 
 Start your API server with I/O schema validation and custom middlewares in minutes.
 
