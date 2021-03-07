@@ -40,7 +40,7 @@ components:
       required:
         - status
         - name
-      description: /v1/getUser get response schema
+      description: /v1/getUser GET response schema
     responseSchema2:
       nullable: false
       type: object
@@ -53,7 +53,7 @@ components:
             - I'll fix it later
       required:
         - status
-      description: /v1/setUser post response schema
+      description: /v1/setUser POST response schema
     requestBody1:
       nullable: false
       type: object
@@ -65,7 +65,7 @@ components:
         - key
         - id
         - name
-      description: /v1/setUser post request body
+      description: /v1/setUser POST request body
   responses: {}
   parameters:
     parameter1:
@@ -75,6 +75,7 @@ components:
       schema:
         nullable: false
         type: string
+        description: /v1/getUser GET parameter
   examples: {}
   requestBodies: {}
   headers: {}

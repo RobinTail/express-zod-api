@@ -1,8 +1,6 @@
 import {
-  MediaTypeObject,
   OpenApiBuilder,
   OperationObject,
-  ParameterObject,
   SchemaObject
 } from 'openapi3-ts';
 import {ReferenceObject} from 'openapi3-ts/src/model/OpenApi';
@@ -132,7 +130,7 @@ export const generateOpenApi = ({
     const responseSchemaRef = createRef('responseSchema');
     builder.addSchema(responseSchemaRef.name, {
       ...getOpenApiPropertyType(endpoint.getOutputSchema()),
-      description: `${fullPath} ${method} response schema`
+      description: `${fullPath} ${method.toUpperCase()} response schema`
     });
     const operation: OperationObject = {
       responses: {
@@ -154,7 +152,10 @@ export const generateOpenApi = ({
           name,
           in: 'query',
           required: !endpoint.getInputSchema().shape[name].isOptional(),
-          schema: getOpenApiPropertyType(endpoint.getInputSchema().shape[name])
+          schema: {
+            ...getOpenApiPropertyType(endpoint.getInputSchema().shape[name]),
+            description: `${fullPath} ${method.toUpperCase()} parameter`
+          },
         });
         (operation.parameters as ReferenceObject[]).push(parameterRef.link);
       });
@@ -162,7 +163,7 @@ export const generateOpenApi = ({
       const bodySchemaRef = createRef('requestBody');
       builder.addSchema(bodySchemaRef.name, {
         ...getOpenApiPropertyType(endpoint.getInputSchema()),
-        description: `${fullPath} ${method} request body`
+        description: `${fullPath} ${method.toUpperCase()} request body`
       });
       operation.requestBody = {
         content: {
