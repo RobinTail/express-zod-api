@@ -50,18 +50,21 @@ paths:
         content:
           application/json:
             schema:
-              nullable: false
-              type: object
-              properties:
-                name:
-                  nullable: false
-                  type: string
-              required:
-                - key
-                - id
-                - name
+              $ref: "#/components/schemas/requestBody1"
 components:
-  schemas: {}
+  schemas:
+    requestBody1:
+      nullable: false
+      type: object
+      properties:
+        name:
+          nullable: false
+          type: string
+      required:
+        - key
+        - id
+        - name
+      description: /v1/setUser post request body
   responses: {}
   parameters: {}
   examples: {}

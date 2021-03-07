@@ -95,6 +95,17 @@ interface GenerationParams {
   successfulResponseDescription?: string
 }
 
+const usedRef: Record<string, true> = {};
+
+const createRef = (str: string): string => {
+  const name = str.replace(/[^A-Za-z0-9\-._]/g, '');
+  let n = 1;
+  while (usedRef[`${name}${n}`]) {
+    n++;
+  }
+  return `${name}${n}`;
+};
+
 export const generateOpenApi = ({
   routing, title, version, serverUrl,
   successfulResponseDescription
@@ -107,9 +118,6 @@ export const generateOpenApi = ({
     .addInfo({title, version})
     .addServer({url: serverUrl});
   routingCycle(routing, (endpoint, fullPath, method) => {
-    const body: MediaTypeObject = {
-      schema: getOpenApiPropertyType(endpoint.getInputSchema())
-    };
     const response: MediaTypeObject = {
       schema: getOpenApiPropertyType(endpoint.getOutputSchema())
     };
@@ -131,9 +139,16 @@ export const generateOpenApi = ({
         schema: getOpenApiPropertyType(endpoint.getInputSchema().shape[name])
       }));
     } else {
+      const bodySchema = createRef('requestBody');
+      builder.addSchema(bodySchema, {
+        ...getOpenApiPropertyType(endpoint.getInputSchema()),
+        description: `${fullPath} ${method} request body`
+      });
       operation.requestBody = {
         content: {
-          [mimeJson]: body
+          [mimeJson]: {
+            schema: {$ref: `#/components/schemas/${bodySchema}`}
+          }
         }
       };
     }
