@@ -2,3 +2,5 @@ src
 tsconfig.json
 example
 .husky
+jest.config.js
+tests
