@@ -1,5 +1,4 @@
 import {
-  InfoObject,
   MediaTypeObject,
   OpenApiBuilder,
   OperationObject,
@@ -12,6 +11,7 @@ import {ZodTypeAny} from 'zod';
 import {AnyZodObject} from 'zod/lib/cjs/types/object';
 import {ZodTransformerDef} from 'zod/lib/cjs/types/transformer';
 import {Routing, routingCycle} from './routing';
+import {lookup} from 'mime';
 
 const getOpenApiPropertyType = (value: ZodTypeAny): Partial<SchemaObject> => {
   const otherProps: Partial<SchemaObject> = {
@@ -89,9 +89,15 @@ interface GenerationParams {
   version: string;
   serverUrl: string;
   routing: Routing;
+  successfulResponseDescription?: string
 }
 
-export const openApi = ({routing, title, version, serverUrl}: GenerationParams): OpenApiBuilder => {
+export const openApi = ({
+  routing, title, version, serverUrl,
+  successfulResponseDescription
+}: GenerationParams): OpenApiBuilder => {
+  const openApiVersion = '3.0.0';
+  const mimeJson = lookup('.json');
   const paths: PathsObject = {};
   routingCycle(routing, (endpoint, fullPath, method) => {
     const body: MediaTypeObject = {
@@ -103,9 +109,9 @@ export const openApi = ({routing, title, version, serverUrl}: GenerationParams):
     const operation: OperationObject = {
       responses: {
         default: {
-          description: 'Successful response',
+          description: successfulResponseDescription || 'Successful response',
           content: {
-            'application/json': response
+            [mimeJson]: response
           }
         },
       }
@@ -120,7 +126,7 @@ export const openApi = ({routing, title, version, serverUrl}: GenerationParams):
     } else {
       operation.requestBody = {
         content: {
-          'application/json': body
+          [mimeJson]: body
         }
       };
     }
@@ -134,7 +140,7 @@ export const openApi = ({routing, title, version, serverUrl}: GenerationParams):
   });
   const builder = OpenApiBuilder
     .create()
-    .addVersion('3.0.0')
+    .addVersion(openApiVersion)
     .addInfo({title, version})
     .addServer({url: serverUrl});
   Object.keys(paths).forEach((path) => builder.addPath(path, paths[path]));
