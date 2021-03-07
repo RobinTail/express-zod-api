@@ -13,12 +13,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/responseSchema1"
       parameters:
-        - name: id
-          in: query
-          required: true
-          schema:
-            nullable: false
-            type: string
+        - $ref: "#/components/parameters/parameter1"
   /v1/setUser:
     post:
       responses:
@@ -72,7 +67,14 @@ components:
         - name
       description: /v1/setUser post request body
   responses: {}
-  parameters: {}
+  parameters:
+    parameter1:
+      name: id
+      in: query
+      required: true
+      schema:
+        nullable: false
+        type: string
   examples: {}
   requestBodies: {}
   headers: {}

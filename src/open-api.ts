@@ -5,6 +5,7 @@ import {
   ParameterObject,
   SchemaObject
 } from 'openapi3-ts';
+import {ReferenceObject} from 'openapi3-ts/src/model/OpenApi';
 import {ZodTypeAny} from 'zod';
 import {ZodArrayDef} from 'zod/lib/cjs/types/array';
 import {AnyZodObject} from 'zod/lib/cjs/types/object';
@@ -108,7 +109,7 @@ const createRef = (str: string): string => {
   return ref;
 };
 
-const useRef = (ref: string) => ({$ref: `#/components/schemas/${ref}`});
+const useRef = (ref: string, section = 'schemas') => ({$ref: `#/components/${section}/${ref}`});
 
 export const generateOpenApi = ({
   routing, title, version, serverUrl,
@@ -140,12 +141,17 @@ export const generateOpenApi = ({
       }
     };
     if (method === 'get') {
-      operation.parameters = Object.keys(endpoint.getInputSchema().shape).map((name): ParameterObject => ({
-        name,
-        in: 'query',
-        required: !endpoint.getInputSchema().shape[name].isOptional(),
-        schema: getOpenApiPropertyType(endpoint.getInputSchema().shape[name])
-      }));
+      operation.parameters = [];
+      Object.keys(endpoint.getInputSchema().shape).forEach((name) => {
+        const parameter = createRef('parameter');
+        builder.addParameter(parameter, {
+          name,
+          in: 'query',
+          required: !endpoint.getInputSchema().shape[name].isOptional(),
+          schema: getOpenApiPropertyType(endpoint.getInputSchema().shape[name])
+        });
+        (operation.parameters as ReferenceObject[]).push(useRef(parameter, 'parameters'));
+      });
     } else {
       const bodySchema = createRef('requestBody');
       builder.addSchema(bodySchema, {
