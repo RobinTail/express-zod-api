@@ -6,7 +6,6 @@ import {
   PathsObject,
   SchemaObject
 } from 'openapi3-ts';
-import {PathItemObject} from 'openapi3-ts/src/model/OpenApi';
 import {ZodTypeAny} from 'zod';
 import {ZodArrayDef} from 'zod/lib/cjs/types/array';
 import {AnyZodObject} from 'zod/lib/cjs/types/object';
@@ -135,11 +134,8 @@ export const generateOpenApi = ({
         }
       };
     }
-    if (!paths[fullPath]) {
-      paths[fullPath] = {} as PathItemObject;
-    }
     paths[fullPath] = {
-      ...paths[fullPath],
+      ...(paths?.[fullPath] || {}),
       [method]: operation
     };
   });
