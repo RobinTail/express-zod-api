@@ -3,7 +3,6 @@ import {
   OpenApiBuilder,
   OperationObject,
   ParameterObject,
-  PathsObject,
   SchemaObject
 } from 'openapi3-ts';
 import {ZodTypeAny} from 'zod';
@@ -102,7 +101,11 @@ export const generateOpenApi = ({
 }: GenerationParams): OpenApiBuilder => {
   const openApiVersion = '3.0.0';
   const mimeJson = lookup('.json');
-  const paths: PathsObject = {};
+  const builder = OpenApiBuilder
+    .create()
+    .addVersion(openApiVersion)
+    .addInfo({title, version})
+    .addServer({url: serverUrl});
   routingCycle(routing, (endpoint, fullPath, method) => {
     const body: MediaTypeObject = {
       schema: getOpenApiPropertyType(endpoint.getInputSchema())
@@ -134,16 +137,10 @@ export const generateOpenApi = ({
         }
       };
     }
-    paths[fullPath] = {
-      ...(paths?.[fullPath] || {}),
+    builder.addPath(fullPath, {
+      ...(builder.rootDoc.paths?.[fullPath] || {}),
       [method]: operation
-    };
+    });
   });
-  const builder = OpenApiBuilder
-    .create()
-    .addVersion(openApiVersion)
-    .addInfo({title, version})
-    .addServer({url: serverUrl});
-  Object.keys(paths).forEach((path) => builder.addPath(path, paths[path]));
   return builder;
 };
