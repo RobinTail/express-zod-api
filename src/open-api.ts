@@ -98,7 +98,12 @@ interface GenerationParams {
   successfulResponseDescription?: string
 }
 
-const createRef = (str: string): string => {
+interface Ref {
+  name: string;
+  link: {$ref: string};
+}
+
+const createRef = (str: string, section = 'schemas'): Ref => {
   const name = str.replace(/[^A-Za-z0-9\-._]/g, '');
   let n = 1;
   while (_usedRef[`${name}${n}`]) {
@@ -106,10 +111,11 @@ const createRef = (str: string): string => {
   }
   const ref = `${name}${n}`;
   _usedRef[ref] = true;
-  return ref;
+  return {
+    name: ref,
+    link: {$ref: `#/components/${section}/${ref}`}
+  };
 };
-
-const useRef = (ref: string, section = 'schemas') => ({$ref: `#/components/${section}/${ref}`});
 
 export const generateOpenApi = ({
   routing, title, version, serverUrl,
@@ -123,8 +129,8 @@ export const generateOpenApi = ({
     .addInfo({title, version})
     .addServer({url: serverUrl});
   routingCycle(routing, (endpoint, fullPath, method) => {
-    const responseSchema = createRef('responseSchema');
-    builder.addSchema(responseSchema, {
+    const responseSchemaRef = createRef('responseSchema');
+    builder.addSchema(responseSchemaRef.name, {
       ...getOpenApiPropertyType(endpoint.getOutputSchema()),
       description: `${fullPath} ${method} response schema`
     });
@@ -134,7 +140,7 @@ export const generateOpenApi = ({
           description: successfulResponseDescription || 'Successful response',
           content: {
             [mimeJson]: {
-              schema: useRef(responseSchema)
+              schema: responseSchemaRef.link
             }
           }
         },
@@ -143,25 +149,25 @@ export const generateOpenApi = ({
     if (method === 'get') {
       operation.parameters = [];
       Object.keys(endpoint.getInputSchema().shape).forEach((name) => {
-        const parameter = createRef('parameter');
-        builder.addParameter(parameter, {
+        const parameterRef = createRef('parameter', 'parameters');
+        builder.addParameter(parameterRef.name, {
           name,
           in: 'query',
           required: !endpoint.getInputSchema().shape[name].isOptional(),
           schema: getOpenApiPropertyType(endpoint.getInputSchema().shape[name])
         });
-        (operation.parameters as ReferenceObject[]).push(useRef(parameter, 'parameters'));
+        (operation.parameters as ReferenceObject[]).push(parameterRef.link);
       });
     } else {
-      const bodySchema = createRef('requestBody');
-      builder.addSchema(bodySchema, {
+      const bodySchemaRef = createRef('requestBody');
+      builder.addSchema(bodySchemaRef.name, {
         ...getOpenApiPropertyType(endpoint.getInputSchema()),
         description: `${fullPath} ${method} request body`
       });
       operation.requestBody = {
         content: {
           [mimeJson]: {
-            schema: useRef(bodySchema)
+            schema: bodySchemaRef.link
           }
         }
       };
