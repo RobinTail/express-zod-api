@@ -23,7 +23,7 @@ const getOpenApiPropertyType = (value: ZodTypeAny): Partial<SchemaObject> => {
     case 'number':
       return {...otherProps, type: 'number'};
     case 'bigint':
-      return {...otherProps, type: 'integer'};
+      return {...otherProps, type: 'integer', format: 'int64'};
     case 'boolean':
       return {...otherProps, type: 'boolean'};
     case 'date':
