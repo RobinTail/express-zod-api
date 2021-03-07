@@ -14,9 +14,10 @@ import {lookup} from 'mime';
 const _usedRef: Record<string, true> = {};
 
 const getOpenApiPropertyType = (value: ZodTypeAny): Partial<SchemaObject> => {
-  const otherProps: Partial<SchemaObject> = {
-    nullable: value.isNullable(),
-  };
+  const otherProps: Partial<SchemaObject> = {};
+  if (value.isNullable()) {
+    otherProps.nullable = true;
+  }
   switch (value._def.t) {
     case 'string':
       return {...otherProps, type: 'string'};
@@ -29,7 +30,9 @@ const getOpenApiPropertyType = (value: ZodTypeAny): Partial<SchemaObject> => {
     case 'date':
       return {...otherProps, type: 'string', format: 'date'};
     case 'null':
-      return {...otherProps, type: 'null'};
+      // null is not supported https://swagger.io/docs/specification/data-models/data-types/
+      // return {...otherProps, type: 'null'};
+      return {...otherProps, type: 'string', nullable: true, format: 'null'};
     case 'array':
       return {
         ...otherProps,

@@ -34,28 +34,23 @@ paths:
 components:
   schemas:
     responseSchema1:
-      nullable: false
       type: object
       properties:
         status:
-          nullable: false
           type: string
           enum:
             - That's ok
             - Some kind of warning
         name:
-          nullable: false
           type: string
       required:
         - status
         - name
       description: /v1/getUser GET response schema
     responseSchema2:
-      nullable: false
       type: object
       properties:
         status:
-          nullable: false
           type: string
           enum:
             - Success
@@ -64,17 +59,13 @@ components:
         - status
       description: /v1/setUser POST response schema
     requestBody1:
-      nullable: false
       type: object
       properties:
         key:
-          nullable: false
           type: string
         id:
-          nullable: false
           type: number
         name:
-          nullable: false
           type: string
       required:
         - key
@@ -88,7 +79,6 @@ components:
       in: query
       required: true
       schema:
-        nullable: false
         type: string
         description: /v1/getUser GET parameter
   examples: {}
