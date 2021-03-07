@@ -74,7 +74,7 @@ const getOpenApiPropertyType = (value: ZodTypeAny): Partial<SchemaObject> => {
     case 'optional':
     case 'nullable':
     default:
-      throw new Error(`${value._def.t} is unsupported as `);
+      throw new Error(`Zod type ${value._def.t} is unsupported`);
   }
 };
 
