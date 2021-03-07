@@ -1,6 +1,6 @@
 {
   "name": "express-zod-api",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Express ZOD API",
   "license": "MIT",
   "scripts": {
@@ -43,7 +43,7 @@
     "url": "https://github.com/RobinTail/express-zod-api.git"
   },
   "publishConfig": {
-    "registry":"https://npm.pkg.github.com"
+    "registry": "https://npm.pkg.github.com"
   },
   "keywords": [
     "typescript",
