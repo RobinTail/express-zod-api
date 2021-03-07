@@ -92,7 +92,7 @@ interface GenerationParams {
   successfulResponseDescription?: string
 }
 
-export const openApi = ({
+export const generateOpenApi = ({
   routing, title, version, serverUrl,
   successfulResponseDescription
 }: GenerationParams): OpenApiBuilder => {
