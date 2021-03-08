@@ -2,6 +2,23 @@
 
 Start your API server with I/O schema validation and custom middlewares in minutes.
 
+1. [Tech](#tech)
+2. [Installation](#installation)
+3. [Basic usage](#basic-usage)
+   1. [Set up config](#set-up-config)
+   2. [Create an endpoints factory](#create-an-endpoints-factory)
+   3. [Set up routing](#set-up-routing)
+   4. [Start your server](#start-your-server)
+4. [Advanced usage](#advanced-usage)
+   1. [Create a middleware](#create-a-middleware)
+   2. [Refinements](#refinements)
+   3. [Your custom server](#your-custom-server)
+5. [Disclosing API specifications](#disclosing-api-specifications)
+   1. [Reusing endpoint types on your frontend](#reusing-endpoint-types-on-your-frontend)
+   2. [Swagger / OpenAPI Specification](#swagger--openapi-specification)
+6. [Known issues](#known-issues)
+   1. [Excess property check of endpoint output](#excess-property-check-of-endpoint-output)
+
 # Tech
 
 - Typescript first
@@ -91,14 +108,14 @@ const routing: Routing = {
 ```
 This sets up getUserEndpoint to handle requests to the /v1/getUser path.  
 
-## Create your server
+## Start your server
 
 ```typescript
 createServer(config, routing);
 ```
 
 # Advanced usage
-## Create middleware
+## Create a middleware
 
 You can create middlewares separately using `createMiddleware()` function and connect them later.
 All outputs of connected middlewares are put in `options` argument of the endpoint handler.
@@ -146,7 +163,7 @@ const authMiddleware = createMiddleware({
 })
 ```
 
-## Custom server
+## Your custom server
 
 You can instantiate your own express app and connect your endpoints the following way:
 
@@ -158,7 +175,8 @@ const routing = {...};
 initRouting({app, logger, config, routing});
 ```
 
-## Front-end awareness of endpoint types
+# Disclosing API specifications
+## Reusing endpoint types on your frontend
 
 You can export only the types of your endpoints for your front-end:
 
