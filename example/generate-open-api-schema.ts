@@ -1,4 +1,4 @@
-import {generateOpenApi} from '../src/open-api';
+import {generateOpenApi} from '../src';
 import {routing} from './routing';
 import {version} from '../package.json';
 

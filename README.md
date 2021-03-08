@@ -4,9 +4,11 @@ Start your API server with I/O schema validation and custom middlewares in minut
 
 # Tech
 
-- Schema validation — Zod (latest).
+- Typescript first
+- Schema validation — Zod 3.x
 - Webserver — Express.js.
 - Logger — Winston.
+- Swagger - OpenAPI 3.x
 
 # Installation
 
@@ -25,19 +27,12 @@ Add the following options to your `tsconfig.json` file in order to make it work 
 }
 ```
 
-# Tests
-
-```sh
-yarn test
-```
-
 # Basic usage
 
 Full example in `./example`. You can clone the repo and run `yarn start` to check it out in action.
 
 ## Setup config
 
-See `./src/config-type.ts` for all available options.
 ```typescript
 const config: ConfigType = {
   server: {
@@ -50,6 +45,7 @@ const config: ConfigType = {
   }
 };
 ```
+See `./src/config-type.ts` for all available options.
 
 ## Create an endpoints factory
 
@@ -60,8 +56,6 @@ const endpointsFactory = new EndpointsFactory();
 You can also instantly add middlewares to it using `.addMiddleware()` method.
 
 ## Create your first endpoint
-
-Note: `options` come from the output of middlewares.
 
 ```typescript
 const getUserEndpoint = endpointsFactory
@@ -82,6 +76,7 @@ const getUserEndpoint = endpointsFactory
   });
 ```
 
+Note: `options` come from the output of middlewares.
 You can add middlewares by using `.addMiddleware()` method before `.build()`.
 All inputs and outputs are validated.
 
@@ -94,6 +89,7 @@ const routing: Routing = {
   }
 };
 ```
+This sets up getUserEndpoint to handle requests to the /v1/getUser path.  
 
 ## Create your server
 
@@ -162,7 +158,7 @@ const routing = {...};
 initRouting({app, logger, config, routing});
 ```
 
-# Front-end awareness of endpoint types
+## Front-end awareness of endpoint types
 
 You can export only the types of your endpoints for your front-end:
 
@@ -174,6 +170,19 @@ Then use provided helpers to obtain their input and output types:
 ```typescript
 type GetUserEndpointInput = EndpointInput<GetUserEndpoint>;
 type GetUserEndpointOutput = EndpointOutput<GetUserEndpoint>;
+```
+
+## Swagger / OpenAPI Specification
+
+You can generate the specification of your API the following way and write it to a `.yaml` file:
+
+```typescript
+const yamlString = generateOpenApi({
+  routing, 
+  version: '1.2.3',
+  title: 'Example API',
+  serverUrl: 'http://example.com'
+}).getSpecAsYaml();
 ```
 
 # Known issues
