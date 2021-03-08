@@ -31,7 +31,7 @@ Add the following options to your `tsconfig.json` file in order to make it work 
 
 Full example in `./example`. You can clone the repo and run `yarn start` to check it out in action.
 
-## Setup config
+## Set up config
 
 ```typescript
 const config: ConfigType = {
@@ -80,7 +80,7 @@ Note: `options` come from the output of middlewares.
 You can add middlewares by using `.addMiddleware()` method before `.build()`.
 All inputs and outputs are validated.
 
-## Setup routing
+## Set up routing
 
 ```typescript
 const routing: Routing = {
