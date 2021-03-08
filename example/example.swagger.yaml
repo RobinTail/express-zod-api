@@ -1,0 +1,90 @@
+openapi: 3.0.0
+info:
+  title: Example API
+  version: 0.2.0
+paths:
+  /v1/getUser:
+    get:
+      responses:
+        default:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseSchema1"
+      parameters:
+        - $ref: "#/components/parameters/parameter1"
+  /v1/setUser:
+    post:
+      responses:
+        default:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseSchema2"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/requestBody1"
+components:
+  schemas:
+    responseSchema1:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+            - That's ok
+            - Some kind of warning
+        name:
+          type: string
+      required:
+        - status
+        - name
+      description: /v1/getUser GET response schema
+    responseSchema2:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+            - Success
+            - I'll fix it later
+      required:
+        - status
+      description: /v1/setUser POST response schema
+    requestBody1:
+      type: object
+      properties:
+        key:
+          type: string
+        id:
+          type: number
+        name:
+          type: string
+      required:
+        - key
+        - id
+        - name
+      description: /v1/setUser POST request body
+  responses: {}
+  parameters:
+    parameter1:
+      name: id
+      in: query
+      required: true
+      schema:
+        type: string
+        description: /v1/getUser GET parameter
+  examples: {}
+  requestBodies: {}
+  headers: {}
+  securitySchemes: {}
+  links: {}
+  callbacks: {}
+tags: []
+servers:
+  - url: http://example.com
+

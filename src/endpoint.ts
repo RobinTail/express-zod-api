@@ -26,6 +26,9 @@ export abstract class AbstractEndpoint {
   public getMethods() {
     return this.methods;
   }
+
+  abstract getInputSchema(): ObjectSchema;
+  abstract getOutputSchema(): ObjectSchema;
 }
 
 export type Method = 'get' | 'post' | 'put' | 'delete' | 'patch';
@@ -57,6 +60,14 @@ export class Endpoint<IN extends ObjectSchema, OUT extends ObjectSchema, mIN, OP
     this.outputSchema = outputSchema;
     this.handler = handler;
     this.resultHandler = resultHandler;
+  }
+
+  public getInputSchema(): ObjectSchema {
+    return this.inputSchema;
+  }
+
+  public getOutputSchema(): ObjectSchema {
+    return this.outputSchema;
   }
 
   public async execute({request, response, logger, config}: {
