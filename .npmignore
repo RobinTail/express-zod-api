@@ -4,3 +4,6 @@ example
 .husky
 jest.config.js
 tests
+.idea
+yarn-error.log
+.github
