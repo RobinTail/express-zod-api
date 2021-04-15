@@ -93,9 +93,8 @@ export class Endpoint<IN extends ObjectSchema, OUT extends ObjectSchema, mIN, OP
             path: issue.path.length === 0 ? ['output'] : issue.path
           }))
         ]);
-      } else {
-        throw e;
       }
+      throw e;
     }
   }
 
@@ -164,7 +163,7 @@ export class Endpoint<IN extends ObjectSchema, OUT extends ObjectSchema, mIN, OP
     const initialInput = getInitialInput(request);
     try {
       const {input, options, isStreamClosed} = await this.runMiddlewares({
-        input: {...initialInput},
+        input: {...initialInput}, // preserve the initial
         request, response, logger
       });
       if (isStreamClosed) {
@@ -177,7 +176,8 @@ export class Endpoint<IN extends ObjectSchema, OUT extends ObjectSchema, mIN, OP
       error = e;
     }
     await this.handleResult({
-      initialInput, output, request, response, error, logger, config
+      initialInput, output, request,
+      response, error, logger, config
     });
   }
 }
