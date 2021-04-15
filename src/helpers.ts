@@ -1,3 +1,4 @@
+import {Request} from 'express';
 import * as z from 'zod';
 import {AnyZodObject} from 'zod/lib/cjs/types/object';
 import {MiddlewareDefinition} from './middleware';
@@ -23,4 +24,18 @@ export function combineEndpointAndMiddlewareInputSchemas<IN extends ObjectSchema
     .map((middleware) => middleware.input)
     .reduce((carry: ObjectSchema, schema) => carry.merge(schema))
     .merge(input) as Merge<IN, mIN>;
+}
+
+export function getInitialInput(request: Request): any {
+  switch (request.method) {
+    case 'POST':
+    case 'PUT':
+    case 'PATCH':
+      return request.body;
+    case 'GET':
+      return request.query;
+    case 'DELETE': // _may_ have body
+    default:
+      return {...request.query, ...request.body};
+  }
 }

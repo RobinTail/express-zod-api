@@ -2,7 +2,7 @@ import {Logger} from 'winston';
 import {ZodError} from 'zod';
 import * as z from 'zod';
 import {ConfigType} from './config-type';
-import {combineEndpointAndMiddlewareInputSchemas, Merge, ObjectSchema} from './helpers';
+import {combineEndpointAndMiddlewareInputSchemas, getInitialInput, Merge, ObjectSchema} from './helpers';
 import {Request, Response} from 'express';
 import {MiddlewareDefinition} from './middleware';
 import {defaultResultHandler, ResultHandler} from './result-handler';
@@ -70,75 +70,71 @@ export class Endpoint<IN extends ObjectSchema, OUT extends ObjectSchema, mIN, OP
     return this.outputSchema;
   }
 
-  public async execute({request, response, logger, config}: {
+  private setupCorsHeaders(response: Response) {
+    const accessMethods = this.methods.map((method) => method.toUpperCase()).concat('OPTIONS').join(', ');
+    response.set('Access-Control-Allow-Origin', '*');
+    response.set('Access-Control-Allow-Methods', accessMethods);
+    response.set('Access-Control-Allow-Headers', 'content-type');
+  }
+
+  private parseOutput(output: any) {
+    try {
+      return this.outputSchema.parse(output);
+    } catch (e) {
+      if (e instanceof ZodError) {
+        throw new ZodError([
+          {
+            message: 'Invalid format',
+            code: 'custom',
+            path: ['output'],
+          },
+          ...e.issues.map((issue) => ({
+            ...issue,
+            path: issue.path.length === 0 ? ['output'] : issue.path
+          }))
+        ]);
+      } else {
+        throw e;
+      }
+    }
+  }
+
+  private async runMiddlewares({input, request, response, logger}: {
+    input: any,
+    request: Request,
+    response: Response,
+    logger: Logger
+  }) {
+    const options: any = {};
+    for (const def of this.middlewares) {
+      input = {...input, ...def.input.parse(input)}; // middleware can transform the input types
+      Object.assign(options, await def.middleware({
+        input, options, request,
+        response, logger
+      }));
+      if (response.writableEnded) {
+        break;
+      }
+    }
+    return {input, options, isStreamClosed: response.writableEnded};
+  }
+
+  private async parseAndRunHandler({input, options, logger}: {input: any, options: any, logger: Logger}) {
+    return await this.handler({
+      input: this.inputSchema.parse(input), // final input types transformations for handler,
+      options, logger
+    });
+  }
+
+  private async handleResult({config, error, request, response, logger, initialInput, output}: {
+    config: ConfigType,
+    error: Error | null,
     request: Request,
     response: Response,
     logger: Logger,
-    config: ConfigType
+    initialInput: any,
+    output: any
   }) {
-    if (config.server.cors) {
-      const accessMethods = this.methods.map((method) => method.toUpperCase()).concat('OPTIONS').join(', ');
-      response.set('Access-Control-Allow-Origin', '*');
-      response.set('Access-Control-Allow-Methods', accessMethods);
-      response.set('Access-Control-Allow-Headers', 'content-type');
-    }
-
-    if (request.method === 'OPTIONS') {
-      response.end();
-      return;
-    }
-
-    let error;
-    let output;
-    let initialInput: any = null;
-    try {
-      if (['POST', 'PUT', 'PATCH'].includes(request.method)) {
-        initialInput = request.body;
-      }
-      if (request.method === 'GET') {
-        initialInput = request.query;
-      }
-      if (request.method === 'DELETE') { // _may_ have body
-        initialInput = {...request.query, ...request.body};
-      }
-      let input = {...initialInput};
-      const options: any = {};
-      for (const def of this.middlewares) {
-        input = {...input, ...def.input.parse(input)}; // middleware can transform the input types
-        Object.assign(options, await def.middleware({
-          input, options, request,
-          response, logger
-        }));
-        if (response.writableEnded) {
-          return;
-        }
-      }
-      input = this.inputSchema.parse(input); // final input types transformations for handler
-      output = await this.handler({input, options, logger});
-      try {
-        output = this.outputSchema.parse(output);
-      } catch (e) {
-        if (e instanceof ZodError) {
-          // noinspection ExceptionCaughtLocallyJS
-          throw new ZodError([
-            {
-              message: 'Invalid format',
-              code: 'custom',
-              path: ['output'],
-            },
-            ...e.issues.map((issue) => ({
-              ...issue,
-              path: issue.path.length === 0 ? ['output'] : issue.path
-            }))
-          ]);
-        } else {
-          // noinspection ExceptionCaughtLocallyJS
-          throw e;
-        }
-      }
-    } catch (e) {
-      error = e;
-    }
     const resultHandler = this.resultHandler || config.server.resultHandler || defaultResultHandler;
     try {
       await resultHandler({
@@ -149,6 +145,40 @@ export class Endpoint<IN extends ObjectSchema, OUT extends ObjectSchema, mIN, OP
       logger.error(`Result handler failure: ${e.message}.`);
       // throw e;
     }
+  }
+
+  public async execute({request, response, logger, config}: {
+    request: Request,
+    response: Response,
+    logger: Logger,
+    config: ConfigType
+  }) {
+    let output: any;
+    let error: Error | null = null;
+    if (config.server.cors) {
+      this.setupCorsHeaders(response);
+    }
+    if (request.method === 'OPTIONS') {
+      return response.end();
+    }
+    const initialInput = getInitialInput(request);
+    try {
+      const {input, options, isStreamClosed} = await this.runMiddlewares({
+        input: {...initialInput},
+        request, response, logger
+      });
+      if (isStreamClosed) {
+        return;
+      }
+      output = this.parseOutput(
+        await this.parseAndRunHandler({input, options, logger})
+      );
+    } catch (e) {
+      error = e;
+    }
+    await this.handleResult({
+      initialInput, output, request, response, error, logger, config
+    });
   }
 }
 
