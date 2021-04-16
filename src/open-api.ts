@@ -8,7 +8,7 @@ import {z} from 'zod';
 import {Routing, routingCycle} from './routing';
 import {lookup} from 'mime';
 
-const _usedRef: Record<string, true> = {};
+const _usedRef: Record<string, true> = {}; // @todo should be in class
 
 const getOpenApiPropertyType = (value: z.ZodTypeAny): Partial<SchemaObject> => {
   const otherProps: Partial<SchemaObject> = {};
@@ -34,7 +34,7 @@ const getOpenApiPropertyType = (value: z.ZodTypeAny): Partial<SchemaObject> => {
       return {
         ...otherProps,
         type: 'array',
-        items: getOpenApiPropertyType((value._def as z.ZodArrayDef).type) // @todo this needs a test
+        items: getOpenApiPropertyType((value._def as z.ZodArrayDef).type)
       };
     case value instanceof z.ZodObject:
     case value instanceof z.ZodRecord:
@@ -48,7 +48,7 @@ const getOpenApiPropertyType = (value: z.ZodTypeAny): Partial<SchemaObject> => {
     case value instanceof z.ZodLiteral:
       return {
         ...otherProps,
-        type: typeof value._def.value as 'string' | 'number' | 'boolean', // @todo this needs a test
+        type: typeof value._def.value as 'string' | 'number' | 'boolean',
         enum: [value._def.value]
       };
     case value instanceof z.ZodEnum:
@@ -62,7 +62,7 @@ const getOpenApiPropertyType = (value: z.ZodTypeAny): Partial<SchemaObject> => {
     case value instanceof z.ZodEffects:
       return {
         ...otherProps,
-        ...getOpenApiPropertyType((value._def as z.ZodEffectsDef).schema) // @todo this needs a test
+        ...getOpenApiPropertyType((value._def as z.ZodEffectsDef).schema)
       };
     case value instanceof z.ZodUndefined:
     case value instanceof z.ZodUnion:
