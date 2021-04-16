@@ -4,93 +4,86 @@ import {
   SchemaObject
 } from 'openapi3-ts';
 import {ReferenceObject} from 'openapi3-ts/src/model/OpenApi';
-import {
-  ZodAny, ZodArray, ZodBigInt, ZodBoolean, ZodDate, ZodEffects,
-  ZodEnum, ZodFunction, ZodIntersection, ZodLazy, ZodLiteral,
-  ZodMap, ZodNativeEnum, ZodNever, ZodNull, ZodNullable, ZodString,
-  ZodNumber, ZodObject, ZodOptional, ZodPromise, ZodRecord,
-  ZodTransformer, ZodTuple, ZodTypeAny, ZodUndefined, ZodUnion,
-  ZodUnknown, ZodVoid, ZodArrayDef, AnyZodObject, ZodEffectsDef
-} from 'zod';
+import {z} from 'zod';
 import {Routing, routingCycle} from './routing';
 import {lookup} from 'mime';
 
 const _usedRef: Record<string, true> = {};
 
-const getOpenApiPropertyType = (value: ZodTypeAny): Partial<SchemaObject> => {
+const getOpenApiPropertyType = (value: z.ZodTypeAny): Partial<SchemaObject> => {
   const otherProps: Partial<SchemaObject> = {};
   if (value.isNullable()) {
     otherProps.nullable = true;
   }
   switch (true) {
-    case value instanceof ZodString:
+    case value instanceof z.ZodString:
       return {...otherProps, type: 'string'};
-    case value instanceof ZodNumber:
+    case value instanceof z.ZodNumber:
       return {...otherProps, type: 'number'};
-    case value instanceof ZodBigInt:
+    case value instanceof z.ZodBigInt:
       return {...otherProps, type: 'integer', format: 'int64'};
-    case value instanceof ZodBoolean:
+    case value instanceof z.ZodBoolean:
       return {...otherProps, type: 'boolean'};
-    case value instanceof ZodDate:
+    case value instanceof z.ZodDate:
       return {...otherProps, type: 'string', format: 'date'};
-    case value instanceof ZodNull:
+    case value instanceof z.ZodNull:
       // null is not supported https://swagger.io/docs/specification/data-models/data-types/
       // return {...otherProps, type: 'null'};
       return {...otherProps, type: 'string', nullable: true, format: 'null'};
-    case value instanceof ZodArray:
+    case value instanceof z.ZodArray:
       return {
         ...otherProps,
         type: 'array',
-        items: getOpenApiPropertyType((value._def as ZodArrayDef).type)
+        items: getOpenApiPropertyType((value._def as z.ZodArrayDef).type) // @todo this needs a test
       };
-    case value instanceof ZodObject:
-    case value instanceof ZodRecord:
+    case value instanceof z.ZodObject:
+    case value instanceof z.ZodRecord:
       return {
         ...otherProps,
         type: 'object',
-        properties: objectCycle(value as AnyZodObject),
-        required: Object.keys((value as AnyZodObject).shape)
-          .filter((key) => !(value as AnyZodObject).shape[key].isOptional())
+        properties: objectCycle(value as z.AnyZodObject),
+        required: Object.keys((value as z.AnyZodObject).shape)
+          .filter((key) => !(value as z.AnyZodObject).shape[key].isOptional())
       };
-    case value instanceof ZodLiteral:
+    case value instanceof z.ZodLiteral:
       return {
         ...otherProps,
-        type: typeof value._def.value as 'string' | 'number' | 'boolean',
+        type: typeof value._def.value as 'string' | 'number' | 'boolean', // @todo this needs a test
         enum: [value._def.value]
       };
-    case value instanceof ZodEnum:
-    case value instanceof ZodNativeEnum:
+    case value instanceof z.ZodEnum:
+    case value instanceof z.ZodNativeEnum:
       return {
         ...otherProps,
         type: typeof Object.values(value._def.values)[0] as 'string' | 'number',
         enum: Object.values(value._def.values)
       };
-    case value instanceof ZodTransformer:
-    case value instanceof ZodEffects:
+    case value instanceof z.ZodTransformer:
+    case value instanceof z.ZodEffects:
       return {
         ...otherProps,
-        ...getOpenApiPropertyType((value._def as ZodEffectsDef).schema)
+        ...getOpenApiPropertyType((value._def as z.ZodEffectsDef).schema) // @todo this needs a test
       };
-    case value instanceof ZodUndefined:
-    case value instanceof ZodUnion:
-    case value instanceof ZodIntersection:
-    case value instanceof ZodTuple:
-    case value instanceof ZodMap:
-    case value instanceof ZodFunction:
-    case value instanceof ZodLazy:
-    case value instanceof ZodPromise:
-    case value instanceof ZodAny:
-    case value instanceof ZodUnknown:
-    case value instanceof ZodNever:
-    case value instanceof ZodVoid:
-    case value instanceof ZodOptional:
-    case value instanceof ZodNullable:
+    case value instanceof z.ZodUndefined:
+    case value instanceof z.ZodUnion:
+    case value instanceof z.ZodIntersection:
+    case value instanceof z.ZodTuple:
+    case value instanceof z.ZodMap:
+    case value instanceof z.ZodFunction:
+    case value instanceof z.ZodLazy:
+    case value instanceof z.ZodPromise:
+    case value instanceof z.ZodAny:
+    case value instanceof z.ZodUnknown:
+    case value instanceof z.ZodNever:
+    case value instanceof z.ZodVoid:
+    case value instanceof z.ZodOptional:
+    case value instanceof z.ZodNullable:
     default:
       throw new Error(`Zod type ${value.constructor.name} is unsupported`);
   }
 };
 
-const objectCycle = (schema: AnyZodObject): Record<string, SchemaObject> => {
+const objectCycle = (schema: z.AnyZodObject): Record<string, SchemaObject> => {
   return Object.keys(schema.shape).reduce((carry, key) => ({
     ...carry,
     [key]: getOpenApiPropertyType(schema.shape[key])

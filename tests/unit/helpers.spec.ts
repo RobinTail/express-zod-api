@@ -1,4 +1,3 @@
-import {ZodObject} from 'zod';
 import {combineEndpointAndMiddlewareInputSchemas, getInitialInput} from '../../src/helpers';
 import {createMiddleware, z} from '../../src';
 import {Request} from 'express';
@@ -30,7 +29,7 @@ describe('Helpers', () => {
         four: z.boolean()
       });
       const result = combineEndpointAndMiddlewareInputSchemas(endpointInput, middlewares);
-      expect(result).toBeInstanceOf(ZodObject);
+      expect(result).toBeInstanceOf(z.ZodObject);
       expect(result.shape).toMatchSnapshot();
     });
   });
