@@ -230,7 +230,7 @@ const output = z.object({
 });
 endpointsFactory.build({
   methods, input, output,
-  handler: async (): Promise<z.infer<typeof handlerOutput>> => ({
+  handler: async (): Promise<z.infer<typeof output>> => ({
     anything: 123,
     excessive: 'something' // error TS2322, ok!
   })
