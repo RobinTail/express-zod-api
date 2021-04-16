@@ -8,8 +8,6 @@ import {z} from 'zod';
 import {Routing, routingCycle} from './routing';
 import {lookup} from 'mime';
 
-const _usedRef: Record<string, true> = {}; // @todo should be in class
-
 const getOpenApiPropertyType = (value: z.ZodTypeAny): Partial<SchemaObject> => {
   const otherProps: Partial<SchemaObject> = {};
   if (value.isNullable()) {
@@ -103,82 +101,80 @@ interface Ref {
   link: {$ref: string};
 }
 
-const createRef = (str: string, section = 'schemas'): Ref => {
-  const name = str.replace(/[^A-Za-z0-9\-._]/g, '');
-  let n = 1;
-  while (_usedRef[`${name}${n}`]) {
-    n++;
-  }
-  const ref = `${name}${n}`;
-  _usedRef[ref] = true;
-  return {
-    name: ref,
-    link: {$ref: `#/components/${section}/${ref}`}
-  };
-};
+export class OpenAPI {
+  private _usedRef: Record<string, true> = {};
+  public builder: OpenApiBuilder; // @todo extend builder after switching to ES6 target
 
-export const generateOpenApi = ({
-  routing, title, version, serverUrl,
-  successfulResponseDescription
-}: GenerationParams): OpenApiBuilder => {
-  const openApiVersion = '3.0.0';
-  const mimeJson = lookup('.json');
-  const builder = OpenApiBuilder
-    .create()
-    .addVersion(openApiVersion)
-    .addInfo({title, version})
-    .addServer({url: serverUrl});
-  routingCycle(routing, (endpoint, fullPath, method) => {
-    const responseSchemaRef = createRef('responseSchema');
-    builder.addSchema(responseSchemaRef.name, {
-      ...getOpenApiPropertyType(endpoint.getOutputSchema()),
-      description: `${fullPath} ${method.toUpperCase()} response schema`
-    });
-    const operation: OperationObject = {
-      responses: {
-        default: {
-          description: successfulResponseDescription || 'Successful response',
-          content: {
-            [mimeJson]: {
-              schema: responseSchemaRef.link
-            }
-          }
-        },
-      }
+  private createRef(str: string, section = 'schemas'): Ref {
+    const name = str.replace(/[^A-Za-z0-9\-._]/g, '');
+    let n = 1;
+    while (this._usedRef[`${name}${n}`]) {
+      n++;
+    }
+    const ref = `${name}${n}`;
+    this._usedRef[ref] = true;
+    return {
+      name: ref,
+      link: {$ref: `#/components/${section}/${ref}`}
     };
-    if (method === 'get') {
-      operation.parameters = [];
-      Object.keys(endpoint.getInputSchema().shape).forEach((name) => {
-        const parameterRef = createRef('parameter', 'parameters');
-        builder.addParameter(parameterRef.name, {
-          name,
-          in: 'query',
-          required: !endpoint.getInputSchema().shape[name].isOptional(),
-          schema: {
-            ...getOpenApiPropertyType(endpoint.getInputSchema().shape[name]),
-            description: `${fullPath} ${method.toUpperCase()} parameter`
+  }
+
+  public constructor({routing, title, version, serverUrl, successfulResponseDescription}: GenerationParams) {
+    const mimeJson = lookup('.json');
+    this.builder = new OpenApiBuilder()
+      .addInfo({title, version})
+      .addServer({url: serverUrl});
+    routingCycle(routing, (endpoint, fullPath, method) => {
+      const responseSchemaRef = this.createRef('responseSchema');
+      this.builder.addSchema(responseSchemaRef.name, {
+        ...getOpenApiPropertyType(endpoint.getOutputSchema()),
+        description: `${fullPath} ${method.toUpperCase()} response schema`
+      });
+      const operation: OperationObject = {
+        responses: {
+          default: {
+            description: successfulResponseDescription || 'Successful response',
+            content: {
+              [mimeJson]: {
+                schema: responseSchemaRef.link
+              }
+            }
           },
-        });
-        (operation.parameters as ReferenceObject[]).push(parameterRef.link);
-      });
-    } else {
-      const bodySchemaRef = createRef('requestBody');
-      builder.addSchema(bodySchemaRef.name, {
-        ...getOpenApiPropertyType(endpoint.getInputSchema()),
-        description: `${fullPath} ${method.toUpperCase()} request body`
-      });
-      operation.requestBody = {
-        content: {
-          [mimeJson]: {
-            schema: bodySchemaRef.link
-          }
         }
       };
-    }
-    builder.addPath(fullPath, {
-      ...(builder.rootDoc.paths?.[fullPath] || {}),
-      [method]: operation
+      if (method === 'get') {
+        operation.parameters = [];
+        Object.keys(endpoint.getInputSchema().shape).forEach((name) => {
+          const parameterRef = this.createRef('parameter', 'parameters');
+          this.builder.addParameter(parameterRef.name, {
+            name,
+            in: 'query',
+            required: !endpoint.getInputSchema().shape[name].isOptional(),
+            schema: {
+              ...getOpenApiPropertyType(endpoint.getInputSchema().shape[name]),
+              description: `${fullPath} ${method.toUpperCase()} parameter`
+            },
+          });
+          (operation.parameters as ReferenceObject[]).push(parameterRef.link);
+        });
+      } else {
+        const bodySchemaRef = this.createRef('requestBody');
+        this.builder.addSchema(bodySchemaRef.name, {
+          ...getOpenApiPropertyType(endpoint.getInputSchema()),
+          description: `${fullPath} ${method.toUpperCase()} request body`
+        });
+        operation.requestBody = {
+          content: {
+            [mimeJson]: {
+              schema: bodySchemaRef.link
+            }
+          }
+        };
+      }
+      this.builder.addPath(fullPath, {
+        ...(this.builder.rootDoc.paths?.[fullPath] || {}),
+        [method]: operation
+      });
     });
-  });
-  return builder;
-};
+  }
+}

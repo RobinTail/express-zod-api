@@ -195,12 +195,12 @@ type GetUserEndpointOutput = EndpointOutput<GetUserEndpoint>;
 You can generate the specification of your API the following way and write it to a `.yaml` file:
 
 ```typescript
-const yamlString = generateOpenApi({
+const yamlString = new OpenAPI({
   routing, 
   version: '1.2.3',
   title: 'Example API',
   serverUrl: 'http://example.com'
-}).getSpecAsYaml();
+}).builder.getSpecAsYaml();
 ```
 
 # Known issues

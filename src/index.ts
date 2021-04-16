@@ -7,7 +7,7 @@ export { createMiddleware } from './middleware';
 export { ResultHandler } from './result-handler';
 export { Routing, initRouting } from './routing';
 export { createServer } from './server';
-export { generateOpenApi } from './open-api';
+export { OpenAPI } from './open-api';
 
 import { z } from 'zod';
 import * as createHttpError from 'http-errors';

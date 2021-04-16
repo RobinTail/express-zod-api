@@ -1,22 +1,22 @@
 import {routing} from '../../example/routing';
 import {endpointsFactory} from '../../example/factories';
-import {z, generateOpenApi} from '../../src';
+import {z, OpenAPI} from '../../src';
 
 describe('Open API generator', () => {
   describe('generateOpenApi()', () => {
     test('should generate the correct schema of example routing', () => {
-      const spec = generateOpenApi({
+      const spec = new OpenAPI({
         routing,
         version: '1.2.3',
         title: 'Example API',
         serverUrl: 'http://example.com'
-      }).getSpecAsYaml();
+      }).builder.getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
 
     test('should generate the correct schema for complex types', () => {
       const literalValue = 'something';
-      const spec = generateOpenApi({
+      const spec = new OpenAPI({
         routing: {
           v1: {
             getSomething: endpointsFactory.build({
@@ -39,7 +39,7 @@ describe('Open API generator', () => {
         version: '3.4.5',
         title: 'Testing Complex Types',
         serverUrl: 'http://example.com'
-      }).getSpecAsYaml();
+      }).builder.getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
   });

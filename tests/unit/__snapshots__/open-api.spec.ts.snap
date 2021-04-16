@@ -14,13 +14,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: \\"#/components/schemas/responseSchema3\\"
+                $ref: \\"#/components/schemas/responseSchema1\\"
       parameters:
+        - $ref: \\"#/components/parameters/parameter1\\"
         - $ref: \\"#/components/parameters/parameter2\\"
-        - $ref: \\"#/components/parameters/parameter3\\"
 components:
   schemas:
-    responseSchema3:
+    responseSchema1:
       type: object
       properties:
         literal:
@@ -35,7 +35,7 @@ components:
       description: /v1/getSomething GET response schema
   responses: {}
   parameters:
-    parameter2:
+    parameter1:
       name: array
       in: query
       required: true
@@ -44,7 +44,7 @@ components:
         items:
           type: number
         description: /v1/getSomething GET parameter
-    parameter3:
+    parameter2:
       name: transformer
       in: query
       required: true
