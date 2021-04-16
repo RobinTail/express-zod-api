@@ -6,7 +6,7 @@
   "scripts": {
     "start": "ts-node example/index.ts",
     "build": "yarn build:cleanup && yarn build:compile && yarn build:swagger",
-    "build:cleanup": "rm -rf ./dist && rm example/example.swagger.yaml",
+    "build:cleanup": "rm -rf ./dist && rm -f example/example.swagger.yaml",
     "build:compile": "tsc",
     "build:swagger": "ts-node example/generate-open-api-schema.ts > example/example.swagger.yaml",
     "test": "yarn test:unit && yarn test:system",
@@ -14,6 +14,7 @@
     "test:system": "yarn jest --verbose --detectOpenHandles --forceExit ./tests/system",
     "lint": "yarn eslint ./src ./example ./tests",
     "precommit": "yarn lint && yarn test",
+    "prepublishOnly": "yarn test && yarn build",
     "install_hooks": "husky install"
   },
   "main": "dist/index.js",
