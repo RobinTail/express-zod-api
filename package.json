@@ -15,6 +15,7 @@
     "lint": "yarn eslint ./src ./example ./tests",
     "precommit": "yarn lint && yarn test",
     "prepublishOnly": "yarn test && yarn build",
+    "postpublish": "git add example/example.swagger.yaml && git commit --amend --no-edit && git push && git push --tags",
     "install_hooks": "husky install"
   },
   "main": "dist/index.js",
