@@ -1,7 +1,7 @@
 import {Request, Response} from 'express';
 import {HttpError} from 'http-errors';
 import {Logger} from 'winston';
-import * as z from 'zod';
+import {z} from 'zod';
 
 type ApiResponse<T> = {
   status: 'success',

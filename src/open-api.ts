@@ -4,10 +4,14 @@ import {
   SchemaObject
 } from 'openapi3-ts';
 import {ReferenceObject} from 'openapi3-ts/src/model/OpenApi';
-import {ZodTypeAny} from 'zod';
-import {ZodArrayDef} from 'zod/lib/cjs/types/array';
-import {AnyZodObject} from 'zod/lib/cjs/types/object';
-import {ZodTransformerDef} from 'zod/lib/cjs/types/transformer';
+import {
+  ZodAny, ZodArray, ZodBigInt, ZodBoolean, ZodDate, ZodEffects,
+  ZodEnum, ZodFunction, ZodIntersection, ZodLazy, ZodLiteral,
+  ZodMap, ZodNativeEnum, ZodNever, ZodNull, ZodNullable, ZodString,
+  ZodNumber, ZodObject, ZodOptional, ZodPromise, ZodRecord,
+  ZodTransformer, ZodTuple, ZodTypeAny, ZodUndefined, ZodUnion,
+  ZodUnknown, ZodVoid, ZodArrayDef, AnyZodObject, ZodEffectsDef
+} from 'zod';
 import {Routing, routingCycle} from './routing';
 import {lookup} from 'mime';
 
@@ -18,29 +22,29 @@ const getOpenApiPropertyType = (value: ZodTypeAny): Partial<SchemaObject> => {
   if (value.isNullable()) {
     otherProps.nullable = true;
   }
-  switch (value._def.t) {
-    case 'string':
+  switch (true) {
+    case value instanceof ZodString:
       return {...otherProps, type: 'string'};
-    case 'number':
+    case value instanceof ZodNumber:
       return {...otherProps, type: 'number'};
-    case 'bigint':
+    case value instanceof ZodBigInt:
       return {...otherProps, type: 'integer', format: 'int64'};
-    case 'boolean':
+    case value instanceof ZodBoolean:
       return {...otherProps, type: 'boolean'};
-    case 'date':
+    case value instanceof ZodDate:
       return {...otherProps, type: 'string', format: 'date'};
-    case 'null':
+    case value instanceof ZodNull:
       // null is not supported https://swagger.io/docs/specification/data-models/data-types/
       // return {...otherProps, type: 'null'};
       return {...otherProps, type: 'string', nullable: true, format: 'null'};
-    case 'array':
+    case value instanceof ZodArray:
       return {
         ...otherProps,
         type: 'array',
         items: getOpenApiPropertyType((value._def as ZodArrayDef).type)
       };
-    case 'object':
-    case 'record':
+    case value instanceof ZodObject:
+    case value instanceof ZodRecord:
       return {
         ...otherProps,
         type: 'object',
@@ -48,40 +52,41 @@ const getOpenApiPropertyType = (value: ZodTypeAny): Partial<SchemaObject> => {
         required: Object.keys((value as AnyZodObject).shape)
           .filter((key) => !(value as AnyZodObject).shape[key].isOptional())
       };
-    case 'literal':
+    case value instanceof ZodLiteral:
       return {
         ...otherProps,
         type: typeof value._def.value as 'string' | 'number' | 'boolean',
         enum: [value._def.value]
       };
-    case 'enum':
-    case 'nativeEnum':
+    case value instanceof ZodEnum:
+    case value instanceof ZodNativeEnum:
       return {
         ...otherProps,
         type: typeof Object.values(value._def.values)[0] as 'string' | 'number',
         enum: Object.values(value._def.values)
       };
-    case 'transformer':
+    case value instanceof ZodTransformer:
+    case value instanceof ZodEffects:
       return {
         ...otherProps,
-        ...getOpenApiPropertyType((value._def as ZodTransformerDef).schema)
+        ...getOpenApiPropertyType((value._def as ZodEffectsDef).schema)
       };
-    case 'undefined':
-    case 'union':
-    case 'intersection':
-    case 'tuple':
-    case 'map':
-    case 'function':
-    case 'lazy':
-    case 'promise':
-    case 'any':
-    case 'unknown':
-    case 'never':
-    case 'void':
-    case 'optional':
-    case 'nullable':
+    case value instanceof ZodUndefined:
+    case value instanceof ZodUnion:
+    case value instanceof ZodIntersection:
+    case value instanceof ZodTuple:
+    case value instanceof ZodMap:
+    case value instanceof ZodFunction:
+    case value instanceof ZodLazy:
+    case value instanceof ZodPromise:
+    case value instanceof ZodAny:
+    case value instanceof ZodUnknown:
+    case value instanceof ZodNever:
+    case value instanceof ZodVoid:
+    case value instanceof ZodOptional:
+    case value instanceof ZodNullable:
     default:
-      throw new Error(`Zod type ${value._def.t} is unsupported`);
+      throw new Error(`Zod type ${value.constructor.name} is unsupported`);
   }
 };
 

@@ -1,4 +1,4 @@
-import * as z from 'zod';
+import {z} from 'zod';
 import {Endpoint, Handler, Method} from './endpoint';
 import {FlatObject, Merge, ObjectSchema} from './helpers';
 import {MiddlewareDefinition} from './middleware';

@@ -31,20 +31,7 @@ describe('Helpers', () => {
       });
       const result = combineEndpointAndMiddlewareInputSchemas(endpointInput, middlewares);
       expect(result).toBeInstanceOf(ZodObject);
-      expect(JSON.parse(JSON.stringify(result.shape))).toEqual({
-        four: {t: 'boolean'},
-        one: {t: 'string', validation: {}},
-        three: {t: 'null'},
-        two: {t: 'number'}
-      });
-      /*
-      expect(result.shape).toEqual({
-        one: z.string(),
-        two: z.number(),
-        three: z.null(),
-        four: z.boolean()
-      });
-      */
+      expect(result.shape).toMatchSnapshot();
     });
   });
   describe('getInitialInput()', () => {

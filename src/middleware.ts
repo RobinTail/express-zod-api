@@ -1,6 +1,6 @@
 import {Request, Response} from 'express';
 import {Logger} from 'winston';
-import * as z from 'zod';
+import {z} from 'zod';
 import {FlatObject, ObjectSchema} from './helpers';
 
 interface MiddlewareParams<IN, OPT> {

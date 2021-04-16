@@ -88,13 +88,8 @@ describe('EndpointsFactory', () => {
       expect(endpoint).toBeInstanceOf(Endpoint);
       expect(endpoint.getMethods()).toStrictEqual(['get']);
       expect(endpoint['middlewares']).toStrictEqual(middlewares);
-      expect(JSON.parse(JSON.stringify(endpoint['inputSchema'].shape))).toStrictEqual({
-        n: {t: 'number'},
-        s: {t: 'string', validation: {}}
-      });
-      expect(JSON.parse(JSON.stringify(endpoint['outputSchema'].shape))).toStrictEqual({
-        b: {t: 'boolean'}
-      });
+      expect(endpoint['inputSchema'].shape).toMatchSnapshot();
+      expect(endpoint['outputSchema'].shape).toMatchSnapshot();
       expect(endpoint['handler']).toStrictEqual(handlerMock);
       expect(endpoint['resultHandler']).toStrictEqual(resultHandlerMock);
     });

@@ -1,6 +1,5 @@
 import {Logger} from 'winston';
-import {ZodError} from 'zod';
-import * as z from 'zod';
+import {z, ZodError} from 'zod';
 import {ConfigType} from './config-type';
 import {combineEndpointAndMiddlewareInputSchemas, getInitialInput, Merge, ObjectSchema} from './helpers';
 import {Request, Response} from 'express';

@@ -1,6 +1,5 @@
 import {Request} from 'express';
-import * as z from 'zod';
-import {AnyZodObject} from 'zod/lib/cjs/types/object';
+import {z, AnyZodObject} from 'zod';
 import {MiddlewareDefinition} from './middleware';
 
 export type FlatObject = Record<string, any>;
