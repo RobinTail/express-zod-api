@@ -13,7 +13,7 @@
     "test:unit": "yarn jest --verbose ./tests/unit",
     "test:system": "yarn jest --verbose --detectOpenHandles --forceExit ./tests/system",
     "lint": "yarn eslint ./src ./example ./tests",
-    "precommit": "yarn lint && yarn test",
+    "precommit": "yarn lint && yarn test && yarn build:cleanup && yarn build:swagger && git add example/example.swagger.yaml",
     "prepublishOnly": "yarn test && yarn build",
     "postversion": "git push --tags",
     "install_hooks": "husky install"
