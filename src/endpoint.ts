@@ -1,6 +1,5 @@
 import {Logger} from 'winston';
-import {ZodError} from 'zod';
-import * as z from 'zod';
+import {z} from 'zod';
 import {ConfigType} from './config-type';
 import {combineEndpointAndMiddlewareInputSchemas, getInitialInput, Merge, ObjectSchema} from './helpers';
 import {Request, Response} from 'express';
@@ -81,8 +80,8 @@ export class Endpoint<IN extends ObjectSchema, OUT extends ObjectSchema, mIN, OP
     try {
       return this.outputSchema.parse(output);
     } catch (e) {
-      if (e instanceof ZodError) {
-        throw new ZodError([
+      if (e instanceof z.ZodError) {
+        throw new z.ZodError([
           {
             message: 'Invalid format',
             code: 'custom',

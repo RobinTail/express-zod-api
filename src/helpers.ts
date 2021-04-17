@@ -1,10 +1,9 @@
 import {Request} from 'express';
-import * as z from 'zod';
-import {AnyZodObject} from 'zod/lib/cjs/types/object';
+import {z} from 'zod';
 import {MiddlewareDefinition} from './middleware';
 
 export type FlatObject = Record<string, any>;
-export type ObjectSchema = AnyZodObject;
+export type ObjectSchema = z.AnyZodObject;
 
 export type Merge<A extends ObjectSchema, B extends ObjectSchema | any> = z.ZodObject<
   // eslint-disable-next-line @typescript-eslint/ban-types

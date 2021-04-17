@@ -1,4 +1,3 @@
-import {ZodObject} from 'zod';
 import {combineEndpointAndMiddlewareInputSchemas, getInitialInput} from '../../src/helpers';
 import {createMiddleware, z} from '../../src';
 import {Request} from 'express';
@@ -30,21 +29,8 @@ describe('Helpers', () => {
         four: z.boolean()
       });
       const result = combineEndpointAndMiddlewareInputSchemas(endpointInput, middlewares);
-      expect(result).toBeInstanceOf(ZodObject);
-      expect(JSON.parse(JSON.stringify(result.shape))).toEqual({
-        four: {t: 'boolean'},
-        one: {t: 'string', validation: {}},
-        three: {t: 'null'},
-        two: {t: 'number'}
-      });
-      /*
-      expect(result.shape).toEqual({
-        one: z.string(),
-        two: z.number(),
-        three: z.null(),
-        four: z.boolean()
-      });
-      */
+      expect(result).toBeInstanceOf(z.ZodObject);
+      expect(result.shape).toMatchSnapshot();
     });
   });
   describe('getInitialInput()', () => {

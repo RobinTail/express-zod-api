@@ -1,7 +1,6 @@
 import {Request, Response} from 'express';
-import {ZodError} from 'zod';
 import {defaultResultHandler} from '../../src/result-handler';
-import {createHttpError} from '../../src';
+import {z, createHttpError} from '../../src';
 
 let loggerMock: any;
 let responseMock: any;
@@ -52,7 +51,7 @@ describe('ResultHandler', () => {
         url: 'http://something/v1/anything'
       };
       defaultResultHandler({
-        error: new ZodError([{
+        error: new z.ZodError([{
           code: 'invalid_type',
           message: 'Expected string, got number',
           path: ['something'],

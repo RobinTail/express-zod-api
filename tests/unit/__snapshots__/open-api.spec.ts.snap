@@ -1,5 +1,68 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`Open API generator generateOpenApi() should generate the correct schema for complex types 1`] = `
+"openapi: 3.0.0
+info:
+  title: Testing Complex Types
+  version: 3.4.5
+paths:
+  /v1/getSomething:
+    get:
+      responses:
+        default:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: \\"#/components/schemas/responseSchema1\\"
+      parameters:
+        - $ref: \\"#/components/parameters/parameter1\\"
+        - $ref: \\"#/components/parameters/parameter2\\"
+components:
+  schemas:
+    responseSchema1:
+      type: object
+      properties:
+        literal:
+          type: string
+          enum:
+            - something
+        transformation:
+          type: number
+      required:
+        - literal
+        - transformation
+      description: /v1/getSomething GET response schema
+  responses: {}
+  parameters:
+    parameter1:
+      name: array
+      in: query
+      required: true
+      schema:
+        type: array
+        items:
+          type: number
+        description: /v1/getSomething GET parameter
+    parameter2:
+      name: transformer
+      in: query
+      required: true
+      schema:
+        type: string
+        description: /v1/getSomething GET parameter
+  examples: {}
+  requestBodies: {}
+  headers: {}
+  securitySchemes: {}
+  links: {}
+  callbacks: {}
+tags: []
+servers:
+  - url: http://example.com
+"
+`;
+
 exports[`Open API generator generateOpenApi() should generate the correct schema of example routing 1`] = `
 "openapi: 3.0.0
 info:
