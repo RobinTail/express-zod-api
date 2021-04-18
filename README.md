@@ -2,7 +2,7 @@
 
 Start your API server with I/O schema validation and custom middlewares in minutes.
 
-1. [Tech](#tech)
+1. [Tech](#technologies)
 2. [Installation](#installation)
 3. [Basic usage](#basic-usage)
    1. [Set up config](#set-up-config)
@@ -19,7 +19,7 @@ Start your API server with I/O schema validation and custom middlewares in minut
 6. [Known issues](#known-issues)
    1. [Excess property check of endpoint output](#excess-property-check-of-endpoint-output)
 
-# Tech
+# Technologies
 
 - Typescript first
 - Schema validation — Zod 3.x
@@ -53,6 +53,8 @@ Full example in `./example`. You can clone the repo and run `yarn start` to chec
 ## Set up config
 
 ```typescript
+import {ConfigType} from 'express-zod-api';
+
 const config: ConfigType = {
   server: {
     listen: 8090,
@@ -69,6 +71,8 @@ See `./src/config-type.ts` for all available options.
 ## Create an endpoints factory
 
 ```typescript
+import {EndpointsFactory} from 'express-zod-api';
+
 const endpointsFactory = new EndpointsFactory();
 ```
 
@@ -77,6 +81,8 @@ You can also instantly add middlewares to it using `.addMiddleware()` method.
 ## Create your first endpoint
 
 ```typescript
+import {z} from 'express-zod-api';
+
 const getUserEndpoint = endpointsFactory
   .build({
     methods: ['get'],
@@ -89,30 +95,33 @@ const getUserEndpoint = endpointsFactory
     handler: async ({input: {id}, options, logger}) => {
       logger.debug(`Requested id: ${id}`);
       logger.debug('Options:', options);
-      const name = 'John Doe';
       return { name: 'John Doe' };
     }
   });
 ```
 
 Note: `options` come from the output of middlewares.
-You can add middlewares by using `.addMiddleware()` method before `.build()`.
+You can add middlewares to the endpoint factory using `.addMiddleware()`.
 All inputs and outputs are validated.
 
 ## Set up routing
 
 ```typescript
+import {Routing} from 'express-zod-api';
+
 const routing: Routing = {
   v1: {
     getUser: getUserEndpoint
   }
 };
 ```
-This sets up getUserEndpoint to handle requests to the /v1/getUser path.  
+This implementation sets up `getUserEndpoint` to handle requests to the `/v1/getUser` path.  
 
 ## Start your server
 
 ```typescript
+import {createServer} from 'express-zod-api';
+
 createServer(config, routing);
 ```
 
@@ -124,6 +133,10 @@ All outputs of connected middlewares are put in `options` argument of the endpoi
 All middleware inputs are also available as the endpoint inputs.
 
 ```typescript
+import {
+  createMiddleware, z, Method, createHttpError
+} from 'express-zod-api';
+
 // This one provides the method of the request
 const methodProviderMiddleware = createMiddleware({
   input: z.object({}).nonstrict(),
@@ -156,6 +169,8 @@ const authMiddleware = createMiddleware({
 You can also implement the validation inside the input schema:
 
 ```typescript
+import {createMiddleware, z} from 'express-zod-api';
+
 const authMiddleware = createMiddleware({
   input: z.object({
     key: z.string().nonempty()
@@ -170,6 +185,8 @@ const authMiddleware = createMiddleware({
 You can instantiate your own express app and connect your endpoints the following way:
 
 ```typescript
+import {ConfigType, createLogger, initRouting} from 'express-zod-api';
+
 const config: ConfigType = {...};
 const logger = createLogger(config);
 const routing = {...};
@@ -188,6 +205,9 @@ export type GetUserEndpoint = typeof getUserEndpoint;
 
 Then use provided helpers to obtain their input and output types:
 ```typescript
+import {EndpointInput, EndpointOutput} from 'express-zod-api';
+import {GetUserEndpoint, GetUserEndpoint} from '../your/backend';
+
 type GetUserEndpointInput = EndpointInput<GetUserEndpoint>;
 type GetUserEndpointOutput = EndpointOutput<GetUserEndpoint>;
 ```
@@ -197,6 +217,8 @@ type GetUserEndpointOutput = EndpointOutput<GetUserEndpoint>;
 You can generate the specification of your API the following way and write it to a `.yaml` file:
 
 ```typescript
+import {OpenAPI} from 'express-zod-api';
+
 const yamlString = new OpenAPI({
   routing, 
   version: '1.2.3',
@@ -209,9 +231,11 @@ const yamlString = new OpenAPI({
 
 ## Excess property check of endpoint output
 
-Unfortunately Typescript does not perform [excess proprety check](https://www.typescriptlang.org/docs/handbook/interfaces.html#excess-property-checks) for objects resolved in `Promise`, so there is no error during development of endpoint's output.
+Unfortunately Typescript does not perform [excess property check](https://www.typescriptlang.org/docs/handbook/interfaces.html#excess-property-checks) for objects resolved in `Promise`, so there is no error during development of endpoint's output.
 
 ```typescript
+import {z} from 'express-zod-api';
+
 endpointsFactory.build({
   methods, input,
   output: z.object({
@@ -227,9 +251,12 @@ endpointsFactory.build({
 You can achieve this check by assigning the output schema to a constant and reusing it in additional definition of handler's return type:
 
 ```typescript
+import {z} from 'express-zod-api';
+
 const output = z.object({
   anything: z.number()
 });
+
 endpointsFactory.build({
   methods, input, output,
   handler: async (): Promise<z.infer<typeof output>> => ({
