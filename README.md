@@ -2,7 +2,7 @@
 
 Start your API server with I/O schema validation and custom middlewares in minutes.
 
-1. [Tech](#technologies)
+1. [Technologies](#technologies)
 2. [Installation](#installation)
 3. [Basic usage](#basic-usage)
    1. [Set up config](#set-up-config)
