@@ -30,7 +30,9 @@ Start your API server with I/O schema validation and custom middlewares in minut
 # Installation
 
 ```shell
-yarn install express-zod-api
+yarn add express-zod-api
+# or
+npm install express-zod-api
 ```
 
 Add the following options to your `tsconfig.json` file in order to make it work as expected:
