@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.4.0
+- Ability to specify your custom Winston logger in config
+- `createLogger()` now accepts `LoggerConfig` as an argument
+
+```typescript
+// before
+createLogger(config);
+// after
+createLogger(config.logger);
+```
+
 ## v0.3.1
 - Minor Readme file fixes and clarifications
 

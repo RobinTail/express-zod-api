@@ -180,6 +180,21 @@ const authMiddleware = createMiddleware({
 })
 ```
 
+## Your custom logger
+
+You can specify your custom Winston logger in config:
+
+```typescript
+import * as winston from 'winston';
+import {ConfigType, createServer} from 'express-zod-api';
+
+const config: ConfigType = {
+   logger: winston.createLogger(),
+   ...
+};
+createServer(config, routing);
+```
+
 ## Your custom server
 
 You can instantiate your own express app and connect your endpoints the following way:
@@ -188,7 +203,7 @@ You can instantiate your own express app and connect your endpoints the followin
 import {ConfigType, createLogger, initRouting} from 'express-zod-api';
 
 const config: ConfigType = {...};
-const logger = createLogger(config);
+const logger = createLogger(config.logger);
 const routing = {...};
 
 initRouting({app, logger, config, routing});
