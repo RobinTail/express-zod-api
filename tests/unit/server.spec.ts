@@ -2,7 +2,7 @@ let appMock: ReturnType<typeof newAppMock>;
 const expressJsonMock = jest.fn();
 const newAppMock = () => ({
   use: jest.fn(),
-  listen: jest.fn(),
+  listen: jest.fn((port, cb) => cb()),
   get: jest.fn(),
   post: jest.fn()
 });
@@ -68,8 +68,8 @@ describe('Server', () => {
       expect(appMock.listen.mock.calls[0][0]).toBe(8054);
     });
 
-    test('Should create server with custom JSON parser and result handler', () => {
-      const configMock: ConfigType = {
+    test('Should create server with custom JSON parser, logger and result handler', () => {
+      const configMock = {
         server: {
           listen: 8054,
           cors: true,
@@ -77,8 +77,7 @@ describe('Server', () => {
           resultHandler: jest.fn()
         },
         logger: {
-          level: 'warn',
-          color: false
+          info: jest.fn()
         }
       };
       const routingMock = {
@@ -95,7 +94,7 @@ describe('Server', () => {
           })
         }
       };
-      createServer(configMock, routingMock);
+      createServer(configMock as unknown as ConfigType, routingMock);
       expect(appMock).toBeTruthy();
       expect(appMock.use).toBeCalledTimes(2);
       expect(Array.isArray(appMock.use.mock.calls[0][0])).toBeTruthy();
@@ -104,6 +103,8 @@ describe('Server', () => {
       expect(configMock.server.resultHandler).toBeCalledTimes(0);
       appMock.use.mock.calls[1][0]({method: 'get', path: '/v1/test'});
       expect(configMock.server.resultHandler).toBeCalledTimes(1);
+      expect(configMock.logger.info).toBeCalledTimes(1);
+      expect(configMock.logger.info).toBeCalledWith('Listening 8054');
       expect(appMock.get).toBeCalledTimes(1);
       expect(appMock.get.mock.calls[0][0]).toBe('/v1/test');
       expect(appMock.post).toBeCalledTimes(1);
