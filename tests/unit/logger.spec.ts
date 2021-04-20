@@ -1,15 +1,13 @@
-import {ConfigType, createLogger} from '../../src';
+import {createLogger, LoggerConfig} from '../../src';
 
 describe('Logger', () => {
   describe('createLogger()', () => {
     test('Should create silent logger', () => {
-      const configMock = {
-        logger: {
-          level: 'silent',
-          color: false
-        }
+      const loggerConfig: LoggerConfig = {
+        level: 'silent',
+        color: false
       };
-      const logger = createLogger(configMock as ConfigType);
+      const logger = createLogger(loggerConfig);
       expect(logger.silent).toBeTruthy();
       expect(logger.isErrorEnabled()).toBeTruthy();
       expect(logger.isWarnEnabled()).toBeTruthy();
@@ -20,13 +18,11 @@ describe('Logger', () => {
     });
 
     test('Should create warn logger', () => {
-      const configMock = {
-        logger: {
-          level: 'warn',
-          color: false
-        }
+      const loggerConfig: LoggerConfig = {
+        level: 'warn',
+        color: false
       };
-      const logger = createLogger(configMock as ConfigType);
+      const logger = createLogger(loggerConfig);
       expect(logger.isErrorEnabled()).toBeTruthy();
       expect(logger.isWarnEnabled()).toBeTruthy();
       expect(logger.isInfoEnabled()).toBeFalsy();
@@ -36,13 +32,11 @@ describe('Logger', () => {
     });
 
     test('Should create debug logger', () => {
-      const configMock = {
-        logger: {
-          level: 'debug',
-          color: false
-        }
+      const loggerConfig: LoggerConfig = {
+        level: 'debug',
+        color: false
       };
-      const logger = createLogger(configMock as ConfigType);
+      const logger = createLogger(loggerConfig);
       expect(logger.isErrorEnabled()).toBeTruthy();
       expect(logger.isWarnEnabled()).toBeTruthy();
       expect(logger.isInfoEnabled()).toBeTruthy();

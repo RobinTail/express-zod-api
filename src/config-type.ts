@@ -1,5 +1,17 @@
 import {NextHandleFunction} from 'connect';
+import * as winston from 'winston';
 import {ResultHandler} from './result-handler';
+
+export const loggerLevels = {
+  silent: true,
+  warn: true,
+  debug: true,
+};
+
+export interface LoggerConfig {
+  level: keyof typeof loggerLevels;
+  color: boolean;
+}
 
 export interface ConfigType {
   server: {
@@ -13,8 +25,6 @@ export interface ConfigType {
     // custom handler for errors and output, default: defaultResultHandler()
     resultHandler?: ResultHandler;
   },
-  logger: {
-    level: 'silent' | 'warn' | 'debug';
-    color: boolean;
-  }
+  // logger configuration or your custom winston logger
+  logger: LoggerConfig | winston.Logger;
 }

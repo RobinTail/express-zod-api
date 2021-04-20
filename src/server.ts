@@ -1,12 +1,13 @@
 import * as express from 'express';
 import {ConfigType} from './config-type';
+import {isLoggerConfig} from './helpers';
 import {createLogger} from './logger';
 import {defaultResultHandler} from './result-handler';
 import {initRouting, Routing} from './routing';
 import * as createHttpError from 'http-errors';
 
 export function createServer(config: ConfigType, routing: Routing) {
-  const logger = createLogger(config);
+  const logger = isLoggerConfig(config.logger) ? createLogger(config.logger) : config.logger;
   const app = express();
   const resultHandler = config.server.resultHandler || defaultResultHandler;
 

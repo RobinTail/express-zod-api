@@ -1,4 +1,4 @@
-import {combineEndpointAndMiddlewareInputSchemas, getInitialInput} from '../../src/helpers';
+import {combineEndpointAndMiddlewareInputSchemas, getInitialInput, isLoggerConfig} from '../../src/helpers';
 import {createMiddleware, z} from '../../src';
 import {Request} from 'express';
 
@@ -33,6 +33,7 @@ describe('Helpers', () => {
       expect(result.shape).toMatchSnapshot();
     });
   });
+  
   describe('getInitialInput()', () => {
     test('should return body for POST, PUT and PATCH requests', () => {
       expect(getInitialInput({
@@ -63,6 +64,37 @@ describe('Helpers', () => {
         a: 'query',
         b: 'body'
       });
+    });
+  });
+
+  describe('isLoggerConfig()', () => {
+    test('Should identify the valid logger config', () => {
+      expect(isLoggerConfig({
+        level: 'debug',
+        color: true,
+      })).toBeTruthy();
+    });
+    test('Should reject the object with invalid properties', () => {
+      expect(isLoggerConfig({
+        level: 'something',
+        color: true,
+      })).toBeFalsy();
+      expect(isLoggerConfig({
+        level: 'debug',
+        color: null,
+      })).toBeFalsy();
+    });
+    test('Should reject the object with missing properties', () => {
+      expect(isLoggerConfig({
+        level: 'something',
+      })).toBeFalsy();
+      expect(isLoggerConfig({
+        color: null,
+      })).toBeFalsy();
+    });
+    test('Should reject non-objects', () => {
+      expect(isLoggerConfig([1,2,3])).toBeFalsy();
+      expect(isLoggerConfig('something')).toBeFalsy();
     });
   });
 });

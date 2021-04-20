@@ -3,16 +3,16 @@ import {Format} from 'logform';
 import {LEVEL, MESSAGE, SPLAT} from 'triple-beam';
 import * as winston from 'winston';
 import * as Transport from 'winston-transport';
-import {ConfigType} from './config-type';
+import {LoggerConfig} from './config-type';
 
 const {combine, colorize, timestamp: useTimestamp, printf} = winston.format;
 
-export function createLogger(config: ConfigType): winston.Logger {
+export function createLogger(loggerConfig: LoggerConfig): winston.Logger {
   const prettyPrint = (meta: any) => {
     delete meta[LEVEL];
     delete meta[MESSAGE];
     delete meta[SPLAT];
-    return inspect(meta, false, 1, config.logger.color);
+    return inspect(meta, false, 1, loggerConfig.color);
   };
 
   const getOutputFormat = (isPretty?: boolean) => printf(
@@ -30,11 +30,11 @@ export function createLogger(config: ConfigType): winston.Logger {
     handleExceptions: true,
   };
 
-  if (config.logger.color) {
+  if (loggerConfig.color) {
     formats.push(colorize());
   }
 
-  switch (config.logger.level) {
+  switch (loggerConfig.level) {
     case 'debug':
       consoleOutputOptions.level = 'debug';
       formats.push(getOutputFormat(true));
@@ -49,7 +49,7 @@ export function createLogger(config: ConfigType): winston.Logger {
   consoleOutputOptions.format = combine(...formats);
 
   return winston.createLogger({
-    silent: config.logger.level === 'silent',
+    silent: loggerConfig.level === 'silent',
     levels: winston.config.npm.levels,
     transports: [new winston.transports.Console(consoleOutputOptions)],
     exitOnError: false,
