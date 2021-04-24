@@ -81,6 +81,11 @@ You can also instantly add middlewares to it using `.addMiddleware()` method.
 
 ## Create your first endpoint
 
+The API always operates object schemas for input and output. 
+For GET method it provides `request.query` for middlewares and handler as `input` and all properties are `string`.
+The example below shows how to use transformations for incoming GET params.
+For POST, PUT and PATCH the `input` is `request.body` (the parsed JSON) so properties may have different types.
+
 ```typescript
 import {z} from 'express-zod-api';
 
@@ -94,14 +99,14 @@ const getUserEndpoint = endpointsFactory
       name: z.string(),
     }),
     handler: async ({input: {id}, options, logger}) => {
-      logger.debug(`Requested id: ${id}`);
+      logger.debug(`Requested id: ${id}`); // here id is a number
       logger.debug('Options:', options);
       return { name: 'John Doe' };
     }
   });
 ```
 
-Note: `options` come from the output of middlewares.
+Note: the handler's argument `options` comes from the output of middlewares, which can also supplement and transform the `input` argument.
 You can add middlewares to the endpoint factory using `.addMiddleware()`.
 All inputs and outputs are validated.
 
