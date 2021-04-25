@@ -4,6 +4,7 @@
 
 ### v0.4.1
 - Minor Readme file fixes and clarifications
+- Nice dataflow diagram
 
 ### v0.4.0
 - Ability to specify your custom Winston logger in config

@@ -3,21 +3,22 @@
 Start your API server with I/O schema validation and custom middlewares in minutes.
 
 1. [Technologies](#technologies)
-2. [Installation](#installation)
-3. [Basic usage](#basic-usage)
+2. [Concept](#concept)
+3. [Installation](#installation)
+4. [Basic usage](#basic-usage)
    1. [Set up config](#set-up-config)
    2. [Create an endpoints factory](#create-an-endpoints-factory)
    3. [Set up routing](#set-up-routing)
    4. [Start your server](#start-your-server)
-4. [Advanced usage](#advanced-usage)
+5. [Advanced usage](#advanced-usage)
    1. [Create a middleware](#create-a-middleware)
    2. [Refinements](#refinements)
    3. [Your custom logger](#your-custom-logger)
    4. [Your custom server](#your-custom-server)
-5. [Disclosing API specifications](#disclosing-api-specifications)
+6. [Disclosing API specifications](#disclosing-api-specifications)
    1. [Reusing endpoint types on your frontend](#reusing-endpoint-types-on-your-frontend)
    2. [Swagger / OpenAPI Specification](#swagger--openapi-specification)
-6. [Known issues](#known-issues)
+7. [Known issues](#known-issues)
    1. [Excess property check of endpoint output](#excess-property-check-of-endpoint-output)
 
 # Technologies
@@ -27,6 +28,18 @@ Start your API server with I/O schema validation and custom middlewares in minut
 - Webserver — Express.js.
 - Logger — Winston.
 - Swagger - OpenAPI 3.x
+
+# Concept
+
+The API always operates object schemas for input and output.
+For GET method it provides `request.query` for middlewares and handler as `input` and all properties are `string`.
+Input schema may also have transformations for incoming GET params *(see the example below)*.
+For POST, PUT and PATCH the `input` is `request.body` *(parsed JSON)* so properties may have different types.
+
+The handler's argument `options` comes from the `output` of the middlewares, which can also supplement and transform the `input` argument.
+All inputs and outputs are validated against their object schemas and `ResultHandler` handles the output or possible validation or thrown errors.
+
+![Dataflow](dataflow.svg)
 
 # Installation
 
@@ -49,7 +62,7 @@ Add the following options to your `tsconfig.json` file in order to make it work 
 
 # Basic usage
 
-Full example in `./example`. You can clone the repo and run `yarn start` to check it out in action.
+*See full example [here](https://github.com/RobinTail/express-zod-api/tree/master/example).*
 
 ## Set up config
 
@@ -67,7 +80,7 @@ const config: ConfigType = {
   }
 };
 ```
-See `./src/config-type.ts` for all available options.
+*See `config-type.d.ts` for all available options.*
 
 ## Create an endpoints factory
 
@@ -80,11 +93,6 @@ const endpointsFactory = new EndpointsFactory();
 You can also instantly add middlewares to it using `.addMiddleware()` method.
 
 ## Create your first endpoint
-
-The API always operates object schemas for input and output. 
-For GET method it provides `request.query` for middlewares and handler as `input` and all properties are `string`.
-The example below shows how to use transformations for incoming GET params.
-For POST, PUT and PATCH the `input` is `request.body` (the parsed JSON) so properties may have different types.
 
 ```typescript
 import {z} from 'express-zod-api';
@@ -106,9 +114,7 @@ const getUserEndpoint = endpointsFactory
   });
 ```
 
-Note: the handler's argument `options` comes from the output of middlewares, which can also supplement and transform the `input` argument.
-You can add middlewares to the endpoint factory using `.addMiddleware()`.
-All inputs and outputs are validated.
+You can add middlewares to the endpoint by using `.addMiddleware()` before `.build()`.
 
 ## Set up routing
 
