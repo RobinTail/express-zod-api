@@ -37,7 +37,7 @@ For GET method it provides `request.query` for middlewares and handler as `input
 Input schema may also have transformations for incoming GET params *(see the example [below](#create-your-first-endpoint))*.
 For POST, PUT and PATCH the `input` is `request.body` *(parsed JSON)* so properties may have different types.
 
-The handler's argument `options` comes from the `output` of the middlewares, which can also supplement and transform the `input` argument.
+The handler's argument `options` comes from the returns of the middlewares, which can also supplement and transform the `input` argument.
 All inputs and outputs are validated against their object schemas and `ResultHandler` handles the output or possible validation or thrown errors.
 
 ![Dataflow](dataflow.svg)
@@ -142,7 +142,7 @@ createServer(config, routing);
 ## Create a middleware
 
 You can create middlewares separately using `createMiddleware()` function and connect them later.
-All outputs of connected middlewares are put in `options` argument of the endpoint handler.
+All returns of the connected middlewares are put in `options` argument of the endpoint handler.
 All middleware inputs are also available as the endpoint inputs.
 
 ```typescript
