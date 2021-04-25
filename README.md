@@ -8,8 +8,9 @@ Start your API server with I/O schema validation and custom middlewares in minut
 4. [Basic usage](#basic-usage)
    1. [Set up config](#set-up-config)
    2. [Create an endpoints factory](#create-an-endpoints-factory)
-   3. [Set up routing](#set-up-routing)
-   4. [Start your server](#start-your-server)
+   3. [Create your first endpoint](#create-your-first-endpoint)   
+   4. [Set up routing](#set-up-routing)
+   5. [Start your server](#start-your-server)
 5. [Advanced usage](#advanced-usage)
    1. [Create a middleware](#create-a-middleware)
    2. [Refinements](#refinements)
@@ -23,17 +24,17 @@ Start your API server with I/O schema validation and custom middlewares in minut
 
 # Technologies
 
-- Typescript first
-- Schema validation — Zod 3.x
-- Webserver — Express.js.
-- Logger — Winston.
-- Swagger - OpenAPI 3.x
+- [Typescript](https://www.typescriptlang.org/) first
+- Schema validation — [Zod 3.x](https://github.com/colinhacks/zod).
+- Webserver — [Express.js](https://expressjs.com/).
+- Logger — [Winston](https://github.com/winstonjs/winston).
+- Swagger - [OpenAPI 3.x](https://github.com/metadevpro/openapi3-ts)
 
 # Concept
 
 The API always operates object schemas for input and output.
 For GET method it provides `request.query` for middlewares and handler as `input` and all properties are `string`.
-Input schema may also have transformations for incoming GET params *(see the example below)*.
+Input schema may also have transformations for incoming GET params *(see the example [below](#create-your-first-endpoint))*.
 For POST, PUT and PATCH the `input` is `request.body` *(parsed JSON)* so properties may have different types.
 
 The handler's argument `options` comes from the `output` of the middlewares, which can also supplement and transform the `input` argument.
