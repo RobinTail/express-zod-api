@@ -2,6 +2,9 @@
 
 ## Version 0
 
+### v0.4.2
+- Dataflow diagram improvement
+
 ### v0.4.1
 - Minor Readme file fixes and clarifications
 - Nice dataflow diagram
