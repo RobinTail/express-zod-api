@@ -1,8 +1,8 @@
 import {Logger} from 'winston';
 import {z} from 'zod';
-import {ConfigType} from './config-type';
+import {ConfigType, ServerConfig} from './config-type';
 import {combineEndpointAndMiddlewareInputSchemas, getInitialInput, Merge, ObjectSchema} from './helpers';
-import {Request, Response} from 'express';
+import {Request, Response, Express} from 'express';
 import {MiddlewareDefinition} from './middleware';
 import {defaultResultHandler, ResultHandler} from './result-handler';
 
@@ -19,7 +19,7 @@ export abstract class AbstractEndpoint {
     request: Request,
     response: Response,
     logger: Logger,
-    config: ConfigType
+    config: ConfigType<ServerConfig | Express>
   }): Promise<void>;
 
   public getMethods() {
@@ -125,7 +125,7 @@ export class Endpoint<IN extends ObjectSchema, OUT extends ObjectSchema, mIN, OP
   }
 
   private async handleResult({config, error, request, response, logger, initialInput, output}: {
-    config: ConfigType,
+    config: ConfigType<ServerConfig | Express>,
     error: Error | null,
     request: Request,
     response: Response,
@@ -133,7 +133,7 @@ export class Endpoint<IN extends ObjectSchema, OUT extends ObjectSchema, mIN, OP
     initialInput: any,
     output: any
   }) {
-    const resultHandler = this.resultHandler || config.server.resultHandler || defaultResultHandler;
+    const resultHandler = this.resultHandler || config.resultHandler || defaultResultHandler;
     try {
       await resultHandler({
         error, output, request, response, logger,
@@ -149,11 +149,11 @@ export class Endpoint<IN extends ObjectSchema, OUT extends ObjectSchema, mIN, OP
     request: Request,
     response: Response,
     logger: Logger,
-    config: ConfigType
+    config: ConfigType<ServerConfig | Express>
   }) {
     let output: any;
     let error: Error | null = null;
-    if (config.server.cors) {
+    if (config.cors) {
       this.setupCorsHeaders(response);
     }
     if (request.method === 'OPTIONS') {

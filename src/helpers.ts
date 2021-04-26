@@ -1,6 +1,6 @@
 import {Request} from 'express';
 import {z} from 'zod';
-import {LoggerConfig, loggerLevels} from './config-type';
+import {LoggerConfig, loggerLevels, ServerConfig} from './config-type';
 import {MiddlewareDefinition} from './middleware';
 
 export type FlatObject = Record<string, any>;
@@ -45,4 +45,11 @@ export function isLoggerConfig(logger: any): logger is LoggerConfig {
     'level' in logger && 'color' in logger &&
     Object.keys(loggerLevels).includes(logger.level) &&
     typeof logger.color === 'boolean';
+}
+
+export function isServerConfig(server: any): server is ServerConfig {
+  return typeof server === 'object' &&
+    'listen' in server &&
+    ['number', 'string'].includes(server.listen) &&
+    ('jsonParser' in server ? typeof server.jsonParser === 'function' : true);
 }

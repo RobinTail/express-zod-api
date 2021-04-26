@@ -14,7 +14,7 @@ const expressMock = jest.mock('express', () => {
   return returnFunction;
 });
 
-import {ConfigType, createServer, EndpointsFactory, z} from '../../src';
+import {ConfigType, createServer, EndpointsFactory, z, ServerConfig} from '../../src';
 
 describe('Server', () => {
   beforeEach(() => {
@@ -31,11 +31,11 @@ describe('Server', () => {
 
   describe('createServer()', () => {
     test('Should create server with minimal config', () => {
-      const configMock: ConfigType = {
+      const configMock: ConfigType<ServerConfig> = {
         server: {
           listen: 8054,
-          cors: true
         },
+        cors: true,
         logger: {
           level: 'warn',
           color: false
@@ -72,10 +72,10 @@ describe('Server', () => {
       const configMock = {
         server: {
           listen: 8054,
-          cors: true,
           jsonParser: jest.fn(),
-          resultHandler: jest.fn()
         },
+        cors: true,
+        resultHandler: jest.fn(),
         logger: {
           info: jest.fn()
         }
@@ -94,15 +94,15 @@ describe('Server', () => {
           })
         }
       };
-      createServer(configMock as unknown as ConfigType, routingMock);
+      createServer(configMock as unknown as ConfigType<ServerConfig>, routingMock);
       expect(appMock).toBeTruthy();
       expect(appMock.use).toBeCalledTimes(2);
       expect(Array.isArray(appMock.use.mock.calls[0][0])).toBeTruthy();
       expect(appMock.use.mock.calls[0][0][0]).toBe(configMock.server.jsonParser);
       expect(typeof appMock.use.mock.calls[1][0]).toBe('function');
-      expect(configMock.server.resultHandler).toBeCalledTimes(0);
+      expect(configMock.resultHandler).toBeCalledTimes(0);
       appMock.use.mock.calls[1][0]({method: 'get', path: '/v1/test'});
-      expect(configMock.server.resultHandler).toBeCalledTimes(1);
+      expect(configMock.resultHandler).toBeCalledTimes(1);
       expect(configMock.logger.info).toBeCalledTimes(1);
       expect(configMock.logger.info).toBeCalledWith('Listening 8054');
       expect(appMock.get).toBeCalledTimes(1);

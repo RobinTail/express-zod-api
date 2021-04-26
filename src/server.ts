@@ -1,15 +1,26 @@
 import * as express from 'express';
-import {ConfigType} from './config-type';
+import {Server} from 'http';
+import * as winston from 'winston';
+import {ConfigType, LoggerConfig, ServerConfig} from './config-type';
 import {isLoggerConfig} from './helpers';
 import {createLogger} from './logger';
 import {defaultResultHandler} from './result-handler';
 import {initRouting, Routing} from './routing';
 import * as createHttpError from 'http-errors';
 
-export function createServer(config: ConfigType, routing: Routing) {
-  const logger = isLoggerConfig(config.logger) ? createLogger(config.logger) : config.logger;
+function getLoggerFromConfig(logger: LoggerConfig | winston.Logger) {
+  return isLoggerConfig(logger) ? createLogger(logger) : logger;
+}
+
+export function attachToApp(config: ConfigType<express.Express>, routing: Routing): void {
+  const logger = getLoggerFromConfig(config.logger);
+  return initRouting({app: config.server, routing, logger, config});
+}
+
+export function createServer(config: ConfigType<ServerConfig>, routing: Routing): Server {
+  const logger = getLoggerFromConfig(config.logger);
   const app = express();
-  const resultHandler = config.server.resultHandler || defaultResultHandler;
+  const resultHandler = config.resultHandler || defaultResultHandler;
 
   app.use([
     config.server.jsonParser || express.json(),
