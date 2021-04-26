@@ -14,7 +14,7 @@ const expressMock = jest.mock('express', () => {
   return returnFunction;
 });
 
-import {ConfigType, createServer, EndpointsFactory, z, ServerConfig} from '../../src';
+import {ConfigType, createServer, EndpointsFactory, z} from '../../src';
 
 describe('Server', () => {
   beforeEach(() => {
@@ -31,7 +31,7 @@ describe('Server', () => {
 
   describe('createServer()', () => {
     test('Should create server with minimal config', () => {
-      const configMock: ConfigType<ServerConfig> = {
+      const configMock: ConfigType = {
         server: {
           listen: 8054,
         },
@@ -94,7 +94,7 @@ describe('Server', () => {
           })
         }
       };
-      createServer(configMock as unknown as ConfigType<ServerConfig>, routingMock);
+      createServer(configMock as unknown as ConfigType, routingMock);
       expect(appMock).toBeTruthy();
       expect(appMock.use).toBeCalledTimes(2);
       expect(Array.isArray(appMock.use.mock.calls[0][0])).toBeTruthy();

@@ -1,6 +1,6 @@
 import {Express, RequestHandler, Request, Response} from 'express';
 import {Logger} from 'winston';
-import {EndpointsFactory, z, Routing, ConfigType, ServerConfig} from '../../src';
+import {EndpointsFactory, z, Routing, ConfigType} from '../../src';
 import {initRouting} from '../../src/routing';
 
 let appMock: any;
@@ -58,7 +58,7 @@ describe('Routing', () => {
       initRouting({
         app: appMock as Express,
         logger: loggerMock as Logger,
-        config: configMock as ConfigType<ServerConfig>,
+        config: configMock as ConfigType,
         routing: routing
       });
       expect(appMock.get).toBeCalledTimes(2);
@@ -95,7 +95,7 @@ describe('Routing', () => {
       initRouting({
         app: appMock as Express,
         logger: loggerMock as Logger,
-        config: configMock as ConfigType<ServerConfig>,
+        config: configMock as ConfigType,
         routing: routing
       });
       expect(appMock.post).toBeCalledTimes(1);

@@ -1,6 +1,6 @@
 import {Express} from 'express';
 import {Logger} from 'winston';
-import {ConfigType, ServerConfig} from './config-type';
+import {ConfigType} from './config-type';
 import {AbstractEndpoint, Method} from './endpoint';
 
 export interface Routing {
@@ -26,7 +26,7 @@ export const routingCycle = (routing: Routing, cb: RoutingCycleCallback, parentP
 export const initRouting = ({app, logger, config, routing}: {
   app: Express,
   logger: Logger,
-  config: ConfigType<ServerConfig | Express>,
+  config: ConfigType,
   routing: Routing
 }) => {
   routingCycle(routing, (endpoint, fullPath, method) => {

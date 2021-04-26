@@ -1,8 +1,8 @@
-import {ConfigType, ServerConfig} from '../src';
+import {ConfigType} from '../src';
 import {createServer} from '../src';
 import {routing} from './routing';
 
-const config: ConfigType<ServerConfig> = {
+const config: ConfigType = {
   server: {
     listen: 8090,
   },

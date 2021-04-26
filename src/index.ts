@@ -1,4 +1,4 @@
-export { ConfigType, LoggerConfig, ServerConfig } from './config-type';
+export { ConfigType, LoggerConfig } from './config-type';
 export { AbstractEndpoint, Method, EndpointInput, EndpointOutput } from './endpoint';
 export { EndpointsFactory } from './endpoints-factory';
 export { ObjectSchema, FlatObject } from './helpers';

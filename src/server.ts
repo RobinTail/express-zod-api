@@ -1,24 +1,24 @@
 import * as express from 'express';
 import {Server} from 'http';
-import * as winston from 'winston';
-import {ConfigType, LoggerConfig, ServerConfig} from './config-type';
+import {ConfigType} from './config-type';
 import {isLoggerConfig} from './helpers';
 import {createLogger} from './logger';
 import {defaultResultHandler} from './result-handler';
 import {initRouting, Routing} from './routing';
 import * as createHttpError from 'http-errors';
 
-function getLoggerFromConfig(logger: LoggerConfig | winston.Logger) {
-  return isLoggerConfig(logger) ? createLogger(logger) : logger;
-}
+type ConfigWithServer = Exclude<ConfigType, 'app'>;
+type ConfigWithApp = Exclude<ConfigType, 'server'>;
 
-export function attachToApp(config: ConfigType<express.Express>, routing: Routing): void {
-  const logger = getLoggerFromConfig(config.logger);
-  return initRouting({app: config.server, routing, logger, config});
-}
+export function createServer(config: ConfigWithServer, routing: Routing): Server;
+export function createServer(config: ConfigWithApp, routing: Routing): void;
+export function createServer(config: ConfigType, routing: Routing): Server | void {
+  const logger = isLoggerConfig(config.logger) ? createLogger(config.logger) : config.logger;
 
-export function createServer(config: ConfigType<ServerConfig>, routing: Routing): Server {
-  const logger = getLoggerFromConfig(config.logger);
+  if ('app' in config) {
+    return initRouting({app: config.app, routing, logger, config});
+  }
+
   const app = express();
   const resultHandler = config.resultHandler || defaultResultHandler;
 
