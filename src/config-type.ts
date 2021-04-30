@@ -15,12 +15,11 @@ export interface LoggerConfig {
 }
 
 export type ConfigType = ({
-  // server configuration
-  server: {
+  server: { // server configuration
     // port or socket
     listen: number | string;
     // custom JSON parser, default: express.json()
-    jsonParser?: NextHandleFunction,
+    jsonParser?: NextHandleFunction;
   },
 } | { // or your custom express app
   app: Express
