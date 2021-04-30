@@ -7,8 +7,8 @@ import {defaultResultHandler} from './result-handler';
 import {initRouting, Routing} from './routing';
 import * as createHttpError from 'http-errors';
 
-type ConfigWithServer = Exclude<ConfigType, 'app'>;
-type ConfigWithApp = Exclude<ConfigType, 'server'>;
+type ConfigWithServer = Exclude<ConfigType, {app: any}>;
+type ConfigWithApp = Exclude<ConfigType, {server: any}>;
 
 export function createServer(config: ConfigWithServer, routing: Routing): Server;
 export function createServer(config: ConfigWithApp, routing: Routing): void;

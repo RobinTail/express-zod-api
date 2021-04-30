@@ -74,7 +74,7 @@ describe('Endpoint', () => {
       await endpoint.execute({
         request: requestMock as Request,
         response: responseMock as any as Response,
-        config: configMock as ConfigType,
+        config: configMock as unknown as ConfigType,
         logger: loggerMock
       });
       expect(middlewareMock).toBeCalledTimes(1);
