@@ -94,6 +94,8 @@ describe('Server', () => {
           })
         }
       };
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore forcing the type for the test
       createServer(configMock as unknown as ConfigType, routingMock);
       expect(appMock).toBeTruthy();
       expect(appMock.use).toBeCalledTimes(2);
