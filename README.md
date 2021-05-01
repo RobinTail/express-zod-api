@@ -212,7 +212,10 @@ createServer(config, routing);
 
 You can instantiate your own express app and connect your endpoints the following way.
 
-**Please note**: in this case `createServer()` returns `undefined` and you have to `app.listen()` and handle `404` errors yourself.
+**Please note**: in this case `createServer()` returns `undefined` and you have to:
+- parse `request.body` yourself;
+- call `app.listen()` yourself;
+- handle `404` errors yourself;
 
 ```typescript
 import * as express from 'express';
