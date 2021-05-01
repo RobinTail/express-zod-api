@@ -10,15 +10,13 @@ import * as createHttpError from 'http-errors';
 type ConfigWithServer = Exclude<ConfigType, {app: any}>;
 type ConfigWithApp = Exclude<ConfigType, {server: any}>;
 
-export function createServer(config: ConfigWithServer, routing: Routing): Server;
-export function createServer(config: ConfigWithApp, routing: Routing): void;
-export function createServer(config: ConfigType, routing: Routing): Server | void {
+export function attachRouting(config: ConfigWithApp, routing: Routing): void {
   const logger = isLoggerConfig(config.logger) ? createLogger(config.logger) : config.logger;
+  return initRouting({app: config.app, routing, logger, config});
+}
 
-  if ('app' in config) {
-    return initRouting({app: config.app, routing, logger, config});
-  }
-
+export function createServer(config: ConfigWithServer, routing: Routing): Server {
+  const logger = isLoggerConfig(config.logger) ? createLogger(config.logger) : config.logger;
   const app = express();
   const resultHandler = config.resultHandler || defaultResultHandler;
 

@@ -17,7 +17,7 @@ const expressMock = jest.mock('express', () => {
 });
 
 import * as express from 'express'; // mocked above
-import {ConfigType, createServer, EndpointsFactory, z} from '../../src';
+import {ConfigType, createServer, attachRouting, EndpointsFactory, z} from '../../src';
 
 describe('Server', () => {
   beforeEach(() => {
@@ -116,7 +116,9 @@ describe('Server', () => {
       expect(appMock.listen).toBeCalledTimes(1);
       expect(appMock.listen.mock.calls[0][0]).toBe(8054);
     });
+  });
 
+  describe('attachRouting()', () => {
     test('should attach routing to the custom express app', () => {
       const app = express();
       expect(appMock).toBeTruthy();
@@ -143,7 +145,7 @@ describe('Server', () => {
         }
       };
       // noinspection JSVoidFunctionReturnValueUsed
-      const result = createServer(configMock as unknown as ConfigType & {app: any}, routingMock);
+      const result = attachRouting(configMock as unknown as ConfigType & {app: any}, routingMock);
       expect(result).toBe(undefined);
       expect(appMock.use).toBeCalledTimes(0);
       expect(configMock.resultHandler).toBeCalledTimes(0);

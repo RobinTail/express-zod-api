@@ -6,7 +6,7 @@ export { createLogger } from './logger';
 export { createMiddleware } from './middleware';
 export { ResultHandler } from './result-handler';
 export { Routing } from './routing';
-export { createServer } from './server';
+export { createServer, attachRouting } from './server';
 export { OpenAPI } from './open-api';
 
 import { z } from 'zod';
