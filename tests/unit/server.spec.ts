@@ -4,7 +4,7 @@ let appMock: ReturnType<typeof newAppMock>;
 const expressJsonMock = jest.fn();
 const newAppMock = () => ({
   use: jest.fn(),
-  listen: jest.fn((port, cb) => {cb(); return new http.Server(); }),
+  listen: jest.fn((port, cb) => {cb && cb(); return new http.Server(); }),
   get: jest.fn(),
   post: jest.fn()
 });
@@ -153,6 +153,9 @@ describe('Server', () => {
       expect(appMock.get.mock.calls[0][0]).toBe('/v1/test');
       expect(appMock.post).toBeCalledTimes(1);
       expect(appMock.post.mock.calls[0][0]).toBe('/v1/test');
+      app.listen(8054);
+      expect(appMock.listen).toBeCalledTimes(1);
+      expect(appMock.listen.mock.calls[0][0]).toBe(8054);
     });
   });
 });
