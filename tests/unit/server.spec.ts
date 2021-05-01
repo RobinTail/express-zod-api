@@ -1,8 +1,10 @@
+import * as http from 'http';
+
 let appMock: ReturnType<typeof newAppMock>;
 const expressJsonMock = jest.fn();
 const newAppMock = () => ({
   use: jest.fn(),
-  listen: jest.fn((port, cb) => cb()),
+  listen: jest.fn((port, cb) => {cb(); return new http.Server(); }),
   get: jest.fn(),
   post: jest.fn()
 });
@@ -14,6 +16,7 @@ const expressMock = jest.mock('express', () => {
   return returnFunction;
 });
 
+import * as express from 'express'; // mocked above
 import {ConfigType, createServer, EndpointsFactory, z} from '../../src';
 
 describe('Server', () => {
@@ -94,9 +97,8 @@ describe('Server', () => {
           })
         }
       };
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore forcing the type for the test
-      createServer(configMock as unknown as ConfigType, routingMock);
+      const server = createServer(configMock as unknown as ConfigType & {server: any}, routingMock);
+      expect(server).toBeInstanceOf(http.Server);
       expect(appMock).toBeTruthy();
       expect(appMock.use).toBeCalledTimes(2);
       expect(Array.isArray(appMock.use.mock.calls[0][0])).toBeTruthy();
@@ -113,6 +115,44 @@ describe('Server', () => {
       expect(appMock.post.mock.calls[0][0]).toBe('/v1/test');
       expect(appMock.listen).toBeCalledTimes(1);
       expect(appMock.listen.mock.calls[0][0]).toBe(8054);
+    });
+
+    test('should attach routing to the custom express app', () => {
+      const app = express();
+      expect(appMock).toBeTruthy();
+      const configMock = {
+        app,
+        cors: true,
+        resultHandler: jest.fn(),
+        logger: {
+          info: jest.fn()
+        }
+      };
+      const routingMock = {
+        v1: {
+          test: new EndpointsFactory().build({
+            methods: ['get', 'post'],
+            input: z.object({
+              n: z.number()
+            }),
+            output: z.object({
+              b: z.boolean()
+            }),
+            handler: jest.fn()
+          })
+        }
+      };
+      // noinspection JSVoidFunctionReturnValueUsed
+      const result = createServer(configMock as unknown as ConfigType & {app: any}, routingMock);
+      expect(result).toBe(undefined);
+      expect(appMock.use).toBeCalledTimes(0);
+      expect(configMock.resultHandler).toBeCalledTimes(0);
+      expect(configMock.logger.info).toBeCalledTimes(0);
+      expect(appMock.listen).toBeCalledTimes(0);
+      expect(appMock.get).toBeCalledTimes(1);
+      expect(appMock.get.mock.calls[0][0]).toBe('/v1/test');
+      expect(appMock.post).toBeCalledTimes(1);
+      expect(appMock.post.mock.calls[0][0]).toBe('/v1/test');
     });
   });
 });
