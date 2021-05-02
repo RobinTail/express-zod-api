@@ -63,7 +63,83 @@ servers:
 "
 `;
 
-exports[`Open API generator generateOpenApi() should generate the correct schema nullable and optional types 1`] = `
+exports[`Open API generator generateOpenApi() should generate the correct schema for intersection type 1`] = `
+"openapi: 3.0.0
+info:
+  title: Testing Intersection and And types
+  version: 3.4.5
+paths:
+  /v1/getSomething:
+    post:
+      responses:
+        default:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: \\"#/components/schemas/responseSchema1\\"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: \\"#/components/schemas/requestBody1\\"
+components:
+  schemas:
+    responseSchema1:
+      type: object
+      properties:
+        and:
+          allOf:
+            - type: object
+              properties:
+                five:
+                  type: number
+              required:
+                - five
+            - type: object
+              properties:
+                six:
+                  type: string
+              required:
+                - six
+      required:
+        - and
+      description: /v1/getSomething POST response schema
+    requestBody1:
+      type: object
+      properties:
+        intersection:
+          allOf:
+            - type: object
+              properties:
+                one:
+                  type: string
+              required:
+                - one
+            - type: object
+              properties:
+                two:
+                  type: string
+              required:
+                - two
+      required:
+        - intersection
+      description: /v1/getSomething POST request body
+  responses: {}
+  parameters: {}
+  examples: {}
+  requestBodies: {}
+  headers: {}
+  securitySchemes: {}
+  links: {}
+  callbacks: {}
+tags: []
+servers:
+  - url: http://example.com
+"
+`;
+
+exports[`Open API generator generateOpenApi() should generate the correct schema for nullable and optional types 1`] = `
 "openapi: 3.0.0
 info:
   title: Testing Nullable and Optional Types
@@ -193,6 +269,78 @@ components:
       schema:
         type: string
         description: /v1/getUser GET parameter
+  examples: {}
+  requestBodies: {}
+  headers: {}
+  securitySchemes: {}
+  links: {}
+  callbacks: {}
+tags: []
+servers:
+  - url: http://example.com
+"
+`;
+
+exports[`Open API generator should generate the correct schema for union type 1`] = `
+"openapi: 3.0.0
+info:
+  title: Testing Union and Or Types
+  version: 3.4.5
+paths:
+  /v1/getSomething:
+    post:
+      responses:
+        default:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: \\"#/components/schemas/responseSchema1\\"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: \\"#/components/schemas/requestBody1\\"
+components:
+  schemas:
+    responseSchema1:
+      type: object
+      properties:
+        or:
+          oneOf:
+            - type: string
+            - type: number
+      required:
+        - or
+      description: /v1/getSomething POST response schema
+    requestBody1:
+      type: object
+      properties:
+        union:
+          oneOf:
+            - type: object
+              properties:
+                one:
+                  type: string
+                two:
+                  type: number
+              required:
+                - one
+                - two
+            - type: object
+              properties:
+                two:
+                  type: number
+                three:
+                  type: string
+              required:
+                - two
+                - three
+      required:
+        - union
+      description: /v1/getSomething POST request body
+  responses: {}
+  parameters: {}
   examples: {}
   requestBodies: {}
   headers: {}

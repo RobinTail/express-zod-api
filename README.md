@@ -25,7 +25,7 @@ Start your API server with I/O schema validation and custom middlewares in minut
 # Technologies
 
 - [Typescript](https://www.typescriptlang.org/) first
-- Schema validation — [Zod 3.x](https://github.com/colinhacks/zod).
+- Schema validation — [Zod 3.x](https://github.com/colinhacks/zod/tree/v3).
 - Webserver — [Express.js](https://expressjs.com/).
 - Logger — [Winston](https://github.com/winstonjs/winston).
 - Swagger - [OpenAPI 3.x](https://github.com/metadevpro/openapi3-ts)
