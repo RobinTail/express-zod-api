@@ -2,6 +2,9 @@
 
 ## Version 0
 
+### v0.6.0
+- OpenAPI / Swagger specification generator now supports `ZodNullable`, `ZodOptional`, `ZodUnion` and `ZodIntersection` properties. 
+
 ### v0.5.0
 - More convenient way to attach routing to your custom express app
 - `ConfigType` changes:
