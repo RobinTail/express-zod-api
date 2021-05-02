@@ -210,7 +210,7 @@ createServer(config, routing);
 
 ## Your custom server
 
-You can instantiate your own express app and connect your endpoints the following way. **Please note** that in this case you have to:
+You can instantiate your own express app and connect your endpoints the following way. **Please note** that in this case you probably need to:
 - parse `request.body` yourself;
 - call `app.listen()` yourself;
 - handle `404` errors yourself;

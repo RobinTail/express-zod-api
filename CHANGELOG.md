@@ -3,8 +3,8 @@
 ## Version 0
 
 ### v0.5.0
-- Ability to attach routing to your custom express app
-- `ConfigType` changes
+- More convenient way to attach routing to your custom express app
+- `ConfigType` changes:
 ```typescript
 // before
 export interface ConfigType {
@@ -16,6 +16,7 @@ export interface ConfigType {
   },
   logger: LoggerConfig | winston.Logger;
 }
+
 // after
 export type ConfigType = ({
   server: { // server configuration
