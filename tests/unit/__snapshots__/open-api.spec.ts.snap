@@ -70,7 +70,7 @@ info:
   version: 3.4.5
 paths:
   /v1/getSomething:
-    get:
+    post:
       responses:
         default:
           description: Successful response
@@ -78,8 +78,11 @@ paths:
             application/json:
               schema:
                 $ref: \\"#/components/schemas/responseSchema1\\"
-      parameters:
-        - $ref: \\"#/components/parameters/parameter1\\"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: \\"#/components/schemas/requestBody1\\"
 components:
   schemas:
     responseSchema1:
@@ -101,28 +104,29 @@ components:
                 - six
       required:
         - and
-      description: /v1/getSomething GET response schema
+      description: /v1/getSomething POST response schema
+    requestBody1:
+      type: object
+      properties:
+        intersection:
+          allOf:
+            - type: object
+              properties:
+                one:
+                  type: string
+              required:
+                - one
+            - type: object
+              properties:
+                two:
+                  type: string
+              required:
+                - two
+      required:
+        - intersection
+      description: /v1/getSomething POST request body
   responses: {}
-  parameters:
-    parameter1:
-      name: intersection
-      in: query
-      required: true
-      schema:
-        allOf:
-          - type: object
-            properties:
-              one:
-                type: string
-            required:
-              - one
-          - type: object
-            properties:
-              two:
-                type: string
-            required:
-              - two
-        description: /v1/getSomething GET parameter
+  parameters: {}
   examples: {}
   requestBodies: {}
   headers: {}
@@ -265,6 +269,78 @@ components:
       schema:
         type: string
         description: /v1/getUser GET parameter
+  examples: {}
+  requestBodies: {}
+  headers: {}
+  securitySchemes: {}
+  links: {}
+  callbacks: {}
+tags: []
+servers:
+  - url: http://example.com
+"
+`;
+
+exports[`Open API generator should generate the correct schema for union type 1`] = `
+"openapi: 3.0.0
+info:
+  title: Testing Union and Or Types
+  version: 3.4.5
+paths:
+  /v1/getSomething:
+    post:
+      responses:
+        default:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: \\"#/components/schemas/responseSchema1\\"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: \\"#/components/schemas/requestBody1\\"
+components:
+  schemas:
+    responseSchema1:
+      type: object
+      properties:
+        or:
+          oneOf:
+            - type: string
+            - type: number
+      required:
+        - or
+      description: /v1/getSomething POST response schema
+    requestBody1:
+      type: object
+      properties:
+        union:
+          oneOf:
+            - type: object
+              properties:
+                one:
+                  type: string
+                two:
+                  type: number
+              required:
+                - one
+                - two
+            - type: object
+              properties:
+                two:
+                  type: number
+                three:
+                  type: string
+              required:
+                - two
+                - three
+      required:
+        - union
+      description: /v1/getSomething POST request body
+  responses: {}
+  parameters: {}
   examples: {}
   requestBodies: {}
   headers: {}

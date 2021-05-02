@@ -76,6 +76,11 @@ const getOpenApiPropertyType = (value: z.ZodTypeAny): Partial<SchemaObject> => {
           getOpenApiPropertyType((value as z.ZodIntersection<z.ZodTypeAny, z.ZodTypeAny>)._def.right)
         ]
       };
+    case value instanceof z.ZodUnion:
+      return {
+        ...otherProps,
+        oneOf: (value as z.ZodUnion<[z.ZodTypeAny, ...z.ZodTypeAny[]]>)._def.options.map(getOpenApiPropertyType)
+      };
     case value instanceof z.ZodUndefined:
     case value instanceof z.ZodTuple:
     case value instanceof z.ZodMap:

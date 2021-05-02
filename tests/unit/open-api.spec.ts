@@ -73,7 +73,7 @@ describe('Open API generator', () => {
         routing: {
           v1: {
             getSomething: endpointsFactory.build({
-              methods: ['get'],
+              methods: ['post'],
               input: z.object({
                 intersection: z.intersection(
                   z.object({
@@ -106,5 +106,39 @@ describe('Open API generator', () => {
       }).builder.getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
+  });
+
+  test('should generate the correct schema for union type', () => {
+    const spec = new OpenAPI({
+      routing: {
+        v1: {
+          getSomething: endpointsFactory.build({
+            methods: ['post'],
+            input: z.object({
+              union: z.union([
+                z.object({
+                  one: z.string(),
+                  two: z.number()
+                }),
+                z.object({
+                  two: z.number(),
+                  three: z.string()
+                })
+              ]),
+            }),
+            output: z.object({
+              or: z.string().or(z.number()),
+            }),
+            handler: async () => ({
+              or: 554
+            })
+          })
+        }
+      },
+      version: '3.4.5',
+      title: 'Testing Union and Or Types',
+      serverUrl: 'http://example.com'
+    }).builder.getSpecAsYaml();
+    expect(spec).toMatchSnapshot();
   });
 });
