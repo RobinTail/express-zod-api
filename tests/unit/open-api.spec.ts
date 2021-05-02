@@ -43,7 +43,7 @@ describe('Open API generator', () => {
       expect(spec).toMatchSnapshot();
     });
 
-    test('should generate the correct schema nullable and optional types', () => {
+    test('should generate the correct schema for nullable and optional types', () => {
       const spec = new OpenAPI({
         routing: {
           v1: {
@@ -63,6 +63,45 @@ describe('Open API generator', () => {
         },
         version: '3.4.5',
         title: 'Testing Nullable and Optional Types',
+        serverUrl: 'http://example.com'
+      }).builder.getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
+    });
+
+    test('should generate the correct schema for intersection type', () => {
+      const spec = new OpenAPI({
+        routing: {
+          v1: {
+            getSomething: endpointsFactory.build({
+              methods: ['get'],
+              input: z.object({
+                intersection: z.intersection(
+                  z.object({
+                    one: z.string(),
+                  }),
+                  z.object({
+                    two: z.string(),
+                  })
+                ),
+              }),
+              output: z.object({
+                and: z.object({
+                  five: z.number(),
+                }).and(z.object({
+                  six: z.string()
+                })),
+              }),
+              handler: async () => ({
+                and: {
+                  five: 5,
+                  six: 'six'
+                }
+              })
+            })
+          }
+        },
+        version: '3.4.5',
+        title: 'Testing Intersection and And types',
         serverUrl: 'http://example.com'
       }).builder.getSpecAsYaml();
       expect(spec).toMatchSnapshot();

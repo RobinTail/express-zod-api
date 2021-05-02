@@ -63,7 +63,79 @@ servers:
 "
 `;
 
-exports[`Open API generator generateOpenApi() should generate the correct schema nullable and optional types 1`] = `
+exports[`Open API generator generateOpenApi() should generate the correct schema for intersection type 1`] = `
+"openapi: 3.0.0
+info:
+  title: Testing Intersection and And types
+  version: 3.4.5
+paths:
+  /v1/getSomething:
+    get:
+      responses:
+        default:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: \\"#/components/schemas/responseSchema1\\"
+      parameters:
+        - $ref: \\"#/components/parameters/parameter1\\"
+components:
+  schemas:
+    responseSchema1:
+      type: object
+      properties:
+        and:
+          allOf:
+            - type: object
+              properties:
+                five:
+                  type: number
+              required:
+                - five
+            - type: object
+              properties:
+                six:
+                  type: string
+              required:
+                - six
+      required:
+        - and
+      description: /v1/getSomething GET response schema
+  responses: {}
+  parameters:
+    parameter1:
+      name: intersection
+      in: query
+      required: true
+      schema:
+        allOf:
+          - type: object
+            properties:
+              one:
+                type: string
+            required:
+              - one
+          - type: object
+            properties:
+              two:
+                type: string
+            required:
+              - two
+        description: /v1/getSomething GET parameter
+  examples: {}
+  requestBodies: {}
+  headers: {}
+  securitySchemes: {}
+  links: {}
+  callbacks: {}
+tags: []
+servers:
+  - url: http://example.com
+"
+`;
+
+exports[`Open API generator generateOpenApi() should generate the correct schema for nullable and optional types 1`] = `
 "openapi: 3.0.0
 info:
   title: Testing Nullable and Optional Types
