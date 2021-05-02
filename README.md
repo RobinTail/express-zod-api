@@ -210,16 +210,21 @@ createServer(config, routing);
 
 ## Your custom server
 
-You can instantiate your own express app and connect your endpoints the following way:
+You can instantiate your own express app and connect your endpoints the following way. **Please note** that in this case you probably need to:
+- parse `request.body` yourself;
+- call `app.listen()` yourself;
+- handle `404` errors yourself;
 
 ```typescript
-import {ConfigType, createLogger, initRouting} from 'express-zod-api';
+import * as express from 'express';
+import {ConfigType, attachRouting} from 'express-zod-api';
 
-const config: ConfigType = {...};
-const logger = createLogger(config.logger);
+const app = express();
+const config: ConfigType = {app, ...};
 const routing = {...};
 
-initRouting({app, logger, config, routing});
+attachRouting(config, routing);
+app.listen();
 ```
 
 # Disclosing API specifications

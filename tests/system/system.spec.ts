@@ -47,8 +47,8 @@ describe('App', () => {
     server = createServer({
       server: {
         listen: 8055,
-        cors: true
       },
+      cors: true,
       logger: {
         level: 'silent',
         color: false

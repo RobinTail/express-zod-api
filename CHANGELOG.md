@@ -2,8 +2,35 @@
 
 ## Version 0
 
-### v0.4.2
-- Dataflow diagram improvement
+### v0.5.0
+- More convenient way to attach routing to your custom express app
+- `ConfigType` changes:
+```typescript
+// before
+export interface ConfigType {
+  server: {
+    listen: number | string;
+    cors: boolean;
+    jsonParser?: NextHandleFunction;
+    resultHandler?: ResultHandler;
+  },
+  logger: LoggerConfig | winston.Logger;
+}
+
+// after
+export type ConfigType = ({
+  server: { // server configuration
+    listen: number | string; // preserved
+    jsonParser?: NextHandleFunction; // preserved
+  },
+} | { // or your custom express app
+  app: Express
+}) & {
+  cors: boolean; // moved
+  resultHandler?: ResultHandler; // moved
+  logger: LoggerConfig | Logger;
+}
+```
 
 ### v0.4.1
 - Minor Readme file fixes and clarifications

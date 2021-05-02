@@ -133,7 +133,7 @@ export class Endpoint<IN extends ObjectSchema, OUT extends ObjectSchema, mIN, OP
     initialInput: any,
     output: any
   }) {
-    const resultHandler = this.resultHandler || config.server.resultHandler || defaultResultHandler;
+    const resultHandler = this.resultHandler || config.resultHandler || defaultResultHandler;
     try {
       await resultHandler({
         error, output, request, response, logger,
@@ -153,7 +153,7 @@ export class Endpoint<IN extends ObjectSchema, OUT extends ObjectSchema, mIN, OP
   }) {
     let output: any;
     let error: Error | null = null;
-    if (config.server.cors) {
+    if (config.cors) {
       this.setupCorsHeaders(response);
     }
     if (request.method === 'OPTIONS') {

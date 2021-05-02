@@ -5,8 +5,8 @@ export { ObjectSchema, FlatObject } from './helpers';
 export { createLogger } from './logger';
 export { createMiddleware } from './middleware';
 export { ResultHandler } from './result-handler';
-export { Routing, initRouting } from './routing';
-export { createServer } from './server';
+export { Routing } from './routing';
+export { createServer, attachRouting } from './server';
 export { OpenAPI } from './open-api';
 
 import { z } from 'zod';

@@ -1,4 +1,5 @@
 import * as express from 'express';
+import {Server} from 'http';
 import {ConfigType} from './config-type';
 import {isLoggerConfig} from './helpers';
 import {createLogger} from './logger';
@@ -6,10 +7,18 @@ import {defaultResultHandler} from './result-handler';
 import {initRouting, Routing} from './routing';
 import * as createHttpError from 'http-errors';
 
-export function createServer(config: ConfigType, routing: Routing) {
+type ConfigWithServer = Exclude<ConfigType, {app: any}>;
+type ConfigWithApp = Exclude<ConfigType, {server: any}>;
+
+export function attachRouting(config: ConfigWithApp, routing: Routing): void {
+  const logger = isLoggerConfig(config.logger) ? createLogger(config.logger) : config.logger;
+  return initRouting({app: config.app, routing, logger, config});
+}
+
+export function createServer(config: ConfigWithServer, routing: Routing): Server {
   const logger = isLoggerConfig(config.logger) ? createLogger(config.logger) : config.logger;
   const app = express();
-  const resultHandler = config.server.resultHandler || defaultResultHandler;
+  const resultHandler = config.resultHandler || defaultResultHandler;
 
   app.use([
     config.server.jsonParser || express.json(),

@@ -1,8 +1,10 @@
+import * as http from 'http';
+
 let appMock: ReturnType<typeof newAppMock>;
 const expressJsonMock = jest.fn();
 const newAppMock = () => ({
   use: jest.fn(),
-  listen: jest.fn((port, cb) => cb()),
+  listen: jest.fn((port, cb) => {cb && cb(); return new http.Server(); }),
   get: jest.fn(),
   post: jest.fn()
 });
@@ -14,7 +16,8 @@ const expressMock = jest.mock('express', () => {
   return returnFunction;
 });
 
-import {ConfigType, createServer, EndpointsFactory, z} from '../../src';
+import * as express from 'express'; // mocked above
+import {ConfigType, createServer, attachRouting, EndpointsFactory, z} from '../../src';
 
 describe('Server', () => {
   beforeEach(() => {
@@ -34,8 +37,8 @@ describe('Server', () => {
       const configMock: ConfigType = {
         server: {
           listen: 8054,
-          cors: true
         },
+        cors: true,
         logger: {
           level: 'warn',
           color: false
@@ -72,10 +75,10 @@ describe('Server', () => {
       const configMock = {
         server: {
           listen: 8054,
-          cors: true,
           jsonParser: jest.fn(),
-          resultHandler: jest.fn()
         },
+        cors: true,
+        resultHandler: jest.fn(),
         logger: {
           info: jest.fn()
         }
@@ -94,21 +97,65 @@ describe('Server', () => {
           })
         }
       };
-      createServer(configMock as unknown as ConfigType, routingMock);
+      const server = createServer(configMock as unknown as ConfigType & {server: any}, routingMock);
+      expect(server).toBeInstanceOf(http.Server);
       expect(appMock).toBeTruthy();
       expect(appMock.use).toBeCalledTimes(2);
       expect(Array.isArray(appMock.use.mock.calls[0][0])).toBeTruthy();
       expect(appMock.use.mock.calls[0][0][0]).toBe(configMock.server.jsonParser);
       expect(typeof appMock.use.mock.calls[1][0]).toBe('function');
-      expect(configMock.server.resultHandler).toBeCalledTimes(0);
+      expect(configMock.resultHandler).toBeCalledTimes(0);
       appMock.use.mock.calls[1][0]({method: 'get', path: '/v1/test'});
-      expect(configMock.server.resultHandler).toBeCalledTimes(1);
+      expect(configMock.resultHandler).toBeCalledTimes(1);
       expect(configMock.logger.info).toBeCalledTimes(1);
       expect(configMock.logger.info).toBeCalledWith('Listening 8054');
       expect(appMock.get).toBeCalledTimes(1);
       expect(appMock.get.mock.calls[0][0]).toBe('/v1/test');
       expect(appMock.post).toBeCalledTimes(1);
       expect(appMock.post.mock.calls[0][0]).toBe('/v1/test');
+      expect(appMock.listen).toBeCalledTimes(1);
+      expect(appMock.listen.mock.calls[0][0]).toBe(8054);
+    });
+  });
+
+  describe('attachRouting()', () => {
+    test('should attach routing to the custom express app', () => {
+      const app = express();
+      expect(appMock).toBeTruthy();
+      const configMock = {
+        app,
+        cors: true,
+        resultHandler: jest.fn(),
+        logger: {
+          info: jest.fn()
+        }
+      };
+      const routingMock = {
+        v1: {
+          test: new EndpointsFactory().build({
+            methods: ['get', 'post'],
+            input: z.object({
+              n: z.number()
+            }),
+            output: z.object({
+              b: z.boolean()
+            }),
+            handler: jest.fn()
+          })
+        }
+      };
+      // noinspection JSVoidFunctionReturnValueUsed
+      const result = attachRouting(configMock as unknown as ConfigType & {app: any}, routingMock);
+      expect(result).toBe(undefined);
+      expect(appMock.use).toBeCalledTimes(0);
+      expect(configMock.resultHandler).toBeCalledTimes(0);
+      expect(configMock.logger.info).toBeCalledTimes(0);
+      expect(appMock.listen).toBeCalledTimes(0);
+      expect(appMock.get).toBeCalledTimes(1);
+      expect(appMock.get.mock.calls[0][0]).toBe('/v1/test');
+      expect(appMock.post).toBeCalledTimes(1);
+      expect(appMock.post.mock.calls[0][0]).toBe('/v1/test');
+      app.listen(8054);
       expect(appMock.listen).toBeCalledTimes(1);
       expect(appMock.listen.mock.calls[0][0]).toBe(8054);
     });

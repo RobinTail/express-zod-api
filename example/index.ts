@@ -5,8 +5,8 @@ import {routing} from './routing';
 const config: ConfigType = {
   server: {
     listen: 8090,
-    cors: true
   },
+  cors: true,
   logger: {
     level: 'debug',
     color: true

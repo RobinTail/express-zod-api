@@ -1,6 +1,7 @@
 import {Express, RequestHandler, Request, Response} from 'express';
 import {Logger} from 'winston';
-import {EndpointsFactory, z, Routing, initRouting, ConfigType} from '../../src';
+import {EndpointsFactory, z, Routing, ConfigType} from '../../src';
+import {initRouting} from '../../src/routing';
 
 let appMock: any;
 let loggerMock: any;
@@ -73,11 +74,7 @@ describe('Routing', () => {
 
     test('Should execute endpoints with right arguments', async () => {
       const handlerMock = jest.fn().mockImplementationOnce(() => ({result: true}));
-      const configMock = {
-        server: {
-          cors: true
-        }
-      };
+      const configMock = { cors: true };
       const setEndpoint = new EndpointsFactory().build({
         methods: ['post'],
         input: z.object({
