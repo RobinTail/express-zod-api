@@ -42,5 +42,30 @@ describe('Open API generator', () => {
       }).builder.getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
+
+    test('should generate the correct schema nullable and optional types', () => {
+      const spec = new OpenAPI({
+        routing: {
+          v1: {
+            getSomething: endpointsFactory.build({
+              methods: ['get'],
+              input: z.object({
+                optional: z.string().optional(),
+              }),
+              output: z.object({
+                nullable: z.string().nullable(),
+              }),
+              handler: async () => ({
+                nullable: null,
+              })
+            })
+          }
+        },
+        version: '3.4.5',
+        title: 'Testing Nullable and Optional Types',
+        serverUrl: 'http://example.com'
+      }).builder.getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
+    });
   });
 });

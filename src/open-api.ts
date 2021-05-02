@@ -62,6 +62,12 @@ const getOpenApiPropertyType = (value: z.ZodTypeAny): Partial<SchemaObject> => {
         ...otherProps,
         ...getOpenApiPropertyType((value._def as z.ZodEffectsDef).schema)
       };
+    case value instanceof z.ZodOptional:
+    case value instanceof z.ZodNullable:
+      return {
+        ...otherProps,
+        ...getOpenApiPropertyType((value as z.ZodOptional<z.ZodTypeAny> | z.ZodNullable<z.ZodTypeAny>).unwrap())
+      };
     case value instanceof z.ZodUndefined:
     case value instanceof z.ZodUnion:
     case value instanceof z.ZodIntersection:
@@ -74,8 +80,6 @@ const getOpenApiPropertyType = (value: z.ZodTypeAny): Partial<SchemaObject> => {
     case value instanceof z.ZodUnknown:
     case value instanceof z.ZodNever:
     case value instanceof z.ZodVoid:
-    case value instanceof z.ZodOptional:
-    case value instanceof z.ZodNullable:
     default:
       throw new Error(`Zod type ${value.constructor.name} is unsupported`);
   }

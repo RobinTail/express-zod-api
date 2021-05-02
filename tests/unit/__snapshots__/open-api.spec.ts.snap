@@ -63,6 +63,55 @@ servers:
 "
 `;
 
+exports[`Open API generator generateOpenApi() should generate the correct schema nullable and optional types 1`] = `
+"openapi: 3.0.0
+info:
+  title: Testing Nullable and Optional Types
+  version: 3.4.5
+paths:
+  /v1/getSomething:
+    get:
+      responses:
+        default:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: \\"#/components/schemas/responseSchema1\\"
+      parameters:
+        - $ref: \\"#/components/parameters/parameter1\\"
+components:
+  schemas:
+    responseSchema1:
+      type: object
+      properties:
+        nullable:
+          nullable: true
+          type: string
+      required:
+        - nullable
+      description: /v1/getSomething GET response schema
+  responses: {}
+  parameters:
+    parameter1:
+      name: optional
+      in: query
+      required: false
+      schema:
+        type: string
+        description: /v1/getSomething GET parameter
+  examples: {}
+  requestBodies: {}
+  headers: {}
+  securitySchemes: {}
+  links: {}
+  callbacks: {}
+tags: []
+servers:
+  - url: http://example.com
+"
+`;
+
 exports[`Open API generator generateOpenApi() should generate the correct schema of example routing 1`] = `
 "openapi: 3.0.0
 info:
