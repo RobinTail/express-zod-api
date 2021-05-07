@@ -1,4 +1,9 @@
-import {combineEndpointAndMiddlewareInputSchemas, getInitialInput, isLoggerConfig} from '../../src/helpers';
+import {
+  combineEndpointAndMiddlewareInputSchemas,
+  extractObjectSchema,
+  getInitialInput,
+  isLoggerConfig
+} from '../../src/helpers';
 import {createMiddleware, z} from '../../src';
 import {Request} from 'express';
 
@@ -180,6 +185,36 @@ describe('Helpers', () => {
     test('Should reject non-objects', () => {
       expect(isLoggerConfig([1,2,3])).toBeFalsy();
       expect(isLoggerConfig('something')).toBeFalsy();
+    });
+  });
+
+  describe('extractObjectSchema()', () => {
+    test('should pass the object schema through', () => {
+      const subject = extractObjectSchema(z.object({
+        one: z.string()
+      }));
+      expect(subject).toBeInstanceOf(z.ZodObject);
+      expect(subject.shape).toMatchSnapshot();
+    });
+
+    test('should return object schema for the union of object schemas', () => {
+      const subject = extractObjectSchema(z.object({
+        one: z.string()
+      }).or(z.object({
+        two: z.number()
+      })));
+      expect(subject).toBeInstanceOf(z.ZodObject);
+      expect(subject.shape).toMatchSnapshot();
+    });
+
+    test('should return object schema for the intersection of object schemas', () => {
+      const subject = extractObjectSchema(z.object({
+        one: z.string()
+      }).and(z.object({
+        two: z.number()
+      })));
+      expect(subject).toBeInstanceOf(z.ZodObject);
+      expect(subject.shape).toMatchSnapshot();
     });
   });
 });
