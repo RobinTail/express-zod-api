@@ -90,6 +90,33 @@ describe('Helpers', () => {
       expect(result).toBeInstanceOf(z.ZodObject);
       expect(result.shape).toMatchSnapshot();
     });
+
+    test('Should merge mixed object schemas', () => {
+      const middlewares = [
+        createMiddleware({
+          input: z.object({
+            one: z.string()
+          }).and(z.object({
+            two: z.number()
+          })),
+          middleware: jest.fn()
+        }),
+        createMiddleware({
+          input: z.object({
+            three: z.null()
+          }).or(z.object({
+            four: z.boolean()
+          })),
+          middleware: jest.fn()
+        }),
+      ];
+      const endpointInput = z.object({
+        five: z.string()
+      });
+      const result = combineEndpointAndMiddlewareInputSchemas(endpointInput, middlewares);
+      expect(result).toBeInstanceOf(z.ZodObject);
+      expect(result.shape).toMatchSnapshot();
+    });
   });
   
   describe('getInitialInput()', () => {
