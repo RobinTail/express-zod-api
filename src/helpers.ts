@@ -7,14 +7,33 @@ export type FlatObject = Record<string, any>;
 type EmptyFlatObject = {[K in never]: never};
 
 type ObjectSchema = z.AnyZodObject;
-type ObjectUnionSchema = z.ZodUnion<[ObjectSchema, ...ObjectSchema[]]>;
-type ObjectIntersectionSchema = z.ZodIntersection<ObjectSchema, ObjectSchema>;
-export type IOSubject = ObjectSchema | ObjectUnionSchema | ObjectIntersectionSchema;
+type Extractable = 'shape' | '_unknownKeys' | '_catchall';
+type UnionSchema = z.ZodUnion<[ObjectSchema, ...ObjectSchema[]]>;
+type IntersectionSchema = z.ZodIntersection<ObjectSchema, ObjectSchema>;
 
-export function getObject(subject: IOSubject): ObjectSchema {
+export type IO = ObjectSchema | UnionSchema | IntersectionSchema;
+
+type ArrayElement<T extends readonly unknown[]> = T extends readonly (infer K)[] ? K : never;
+
+type UnionResult<T extends ObjectSchema[], F extends Extractable> = Partial<ArrayElement<T>[F]>;
+type IntersectionResult<T extends IntersectionSchema, F extends Extractable> =
+  T['_def']['left'][F] & T['_def']['right'][F];
+
+type IOExtract<T extends IO | any, F extends Extractable> =
+  T extends ObjectSchema ? T[F] :
+  T extends UnionSchema ? UnionResult<T['options'], F> :
+  T extends IntersectionSchema ? IntersectionResult<T, F> : EmptyFlatObject;
+
+export type Merge<A extends IO, B extends IO | any> = z.ZodObject<
+  IOExtract<A, 'shape'> & IOExtract<B, 'shape'>,
+  IOExtract<A, '_unknownKeys'>,
+  IOExtract<A, '_catchall'>
+>;
+
+export function extractObjectSchema(subject: IO): ObjectSchema {
   if (subject instanceof z.ZodUnion) {
-    return subject.options.reduce((acc, opt) =>
-      acc.partial().merge(opt.partial()));
+    return subject.options.reduce((acc, option) =>
+      acc.partial().merge(option.partial()));
   }
   if (subject instanceof z.ZodIntersection) {
     return subject._def.left.merge(subject._def.right);
@@ -22,34 +41,19 @@ export function getObject(subject: IOSubject): ObjectSchema {
   return subject;
 }
 
-type ToFetch = 'shape' | '_unknownKeys' | '_catchall';
-type ArrayElement<ArrayType extends readonly unknown[]> =
-  ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
-type UnionObjectSchemas<T extends ObjectSchema[], F extends ToFetch> = Partial<ArrayElement<T>[F]>;
-
-type FetchIO<T extends IOSubject | any, F extends ToFetch> =
-  T extends ObjectSchema ? T[F] :
-  T extends ObjectUnionSchema ? UnionObjectSchemas<T['options'], F> :
-  T extends ObjectIntersectionSchema ? T['_def']['left'][F] & T['_def']['right'][F] :
-    EmptyFlatObject;
-
-export type Merge<A extends IOSubject, B extends IOSubject | any> = z.ZodObject<
-  FetchIO<A, 'shape'> & FetchIO<B, 'shape'>,
-  FetchIO<A, '_unknownKeys'>,
-  FetchIO<A, '_catchall'>
->;
-
-export function combineEndpointAndMiddlewareInputSchemas<IN extends IOSubject, mIN>(
+export function combineEndpointAndMiddlewareInputSchemas<IN extends IO, mIN>(
   input: IN,
-  middlewares: MiddlewareDefinition<any, any, any>[]
+  middlewares: MiddlewareDefinition<IO, any, any>[]
 ): Merge<IN, mIN> {
   if (middlewares.length === 0) {
-    return input as any as Merge<IN, mIN>;
+    return extractObjectSchema(input) as Merge<IN, mIN>;
   }
-  const mSchema: IOSubject = middlewares
+  const mSchema = middlewares
     .map((middleware) => middleware.input)
-    .reduce((carry: IOSubject, schema: IOSubject) => getObject(carry).merge(getObject(schema)));
-  return getObject(mSchema).merge(getObject(input)) as Merge<IN, mIN>;
+    .reduce((carry, schema) =>
+      extractObjectSchema(carry).merge(extractObjectSchema(schema))
+    );
+  return extractObjectSchema(mSchema).merge(extractObjectSchema(input)) as Merge<IN, mIN>;
 }
 
 export function getInitialInput(request: Request): any {

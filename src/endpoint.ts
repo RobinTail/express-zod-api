@@ -1,7 +1,7 @@
 import {Logger} from 'winston';
 import {z} from 'zod';
 import {ConfigType} from './config-type';
-import {combineEndpointAndMiddlewareInputSchemas, getInitialInput, IOSubject, Merge} from './helpers';
+import {combineEndpointAndMiddlewareInputSchemas, getInitialInput, IO, Merge} from './helpers';
 import {Request, Response} from 'express';
 import {MiddlewareDefinition} from './middleware';
 import {defaultResultHandler, ResultHandler} from './result-handler';
@@ -26,8 +26,8 @@ export abstract class AbstractEndpoint {
     return this.methods;
   }
 
-  abstract getInputSchema(): IOSubject;
-  abstract getOutputSchema(): IOSubject;
+  abstract getInputSchema(): IO;
+  abstract getOutputSchema(): IO;
 }
 
 export type Method = 'get' | 'post' | 'put' | 'delete' | 'patch';
@@ -37,7 +37,7 @@ export type EndpointInput<T> = T extends Endpoint<infer IN, any, infer mIN, any>
 export type EndpointOutput<T> = T extends Endpoint<any, infer OUT, any, any> ? z.infer<OUT> : never;
 
 /** mIN, OPT - from Middlewares */
-export class Endpoint<IN extends IOSubject, OUT extends IOSubject, mIN, OPT> extends AbstractEndpoint {
+export class Endpoint<IN extends IO, OUT extends IO, mIN, OPT> extends AbstractEndpoint {
   protected middlewares: MiddlewareDefinition<any, any, any>[] = [];
   protected inputSchema: Merge<IN, mIN>; // combined with middlewares input
   protected outputSchema: OUT;
@@ -61,11 +61,11 @@ export class Endpoint<IN extends IOSubject, OUT extends IOSubject, mIN, OPT> ext
     this.resultHandler = resultHandler;
   }
 
-  public getInputSchema(): IOSubject {
+  public getInputSchema(): IO {
     return this.inputSchema;
   }
 
-  public getOutputSchema(): IOSubject {
+  public getOutputSchema(): IO {
     return this.outputSchema;
   }
 

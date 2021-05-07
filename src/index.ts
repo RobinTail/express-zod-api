@@ -1,7 +1,7 @@
 export { ConfigType, LoggerConfig } from './config-type';
 export { AbstractEndpoint, Method, EndpointInput, EndpointOutput } from './endpoint';
 export { EndpointsFactory } from './endpoints-factory';
-export { IOSubject, FlatObject } from './helpers';
+export { IO, FlatObject } from './helpers';
 export { createLogger } from './logger';
 export { createMiddleware } from './middleware';
 export { ResultHandler } from './result-handler';

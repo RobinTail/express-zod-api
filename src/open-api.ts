@@ -5,7 +5,7 @@ import {
 } from 'openapi3-ts';
 import {ReferenceObject} from 'openapi3-ts/src/model/OpenApi';
 import {z} from 'zod';
-import {getObject} from './helpers';
+import {extractObjectSchema} from './helpers';
 import {Routing, routingCycle} from './routing';
 import {lookup} from 'mime';
 
@@ -160,7 +160,7 @@ export class OpenAPI {
       };
       if (method === 'get') {
         operation.parameters = [];
-        const subject = getObject(endpoint.getInputSchema()).shape;
+        const subject = extractObjectSchema(endpoint.getInputSchema()).shape;
         Object.keys(subject).forEach((name) => {
           const parameterRef = this.createRef('parameter', 'parameters');
           this.builder.addParameter(parameterRef.name, {
