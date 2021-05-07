@@ -1,6 +1,6 @@
 import {z} from 'zod';
 import {Endpoint, Handler, Method} from './endpoint';
-import {FlatObject, Merge, ObjectSchema} from './helpers';
+import {FlatObject, IOSubject, Merge} from './helpers';
 import {MiddlewareDefinition} from './middleware';
 import {ResultHandler} from './result-handler';
 
@@ -24,14 +24,14 @@ export class EndpointsFactory<mIN, mOUT> {
     );
   }
 
-  public addMiddleware<IN extends ObjectSchema, OUT extends FlatObject>(definition: MiddlewareDefinition<IN, mOUT, OUT>) {
+  public addMiddleware<IN extends IOSubject, OUT extends FlatObject>(definition: MiddlewareDefinition<IN, mOUT, OUT>) {
     return new EndpointsFactory<Merge<IN, mIN>, mOUT & OUT>(
       this.middlewares.concat(definition),
       this.resultHandler
     );
   }
 
-  public build<IN extends ObjectSchema, OUT extends ObjectSchema>({methods, input, output, handler}: {
+  public build<IN extends IOSubject, OUT extends IOSubject>({methods, input, output, handler}: {
     methods: Method[],
     input: IN,
     output: OUT,
