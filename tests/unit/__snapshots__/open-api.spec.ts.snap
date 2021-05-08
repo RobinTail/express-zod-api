@@ -352,3 +352,58 @@ servers:
   - url: http://example.com
 "
 `;
+
+exports[`Open API generator should handle transformation schema in output 1`] = `
+"openapi: 3.0.0
+info:
+  title: Testing Transformation in response schema
+  version: 3.4.5
+paths:
+  /v1/getSomething:
+    post:
+      responses:
+        default:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: \\"#/components/schemas/responseSchema1\\"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: \\"#/components/schemas/requestBody1\\"
+components:
+  schemas:
+    responseSchema1:
+      type: object
+      properties:
+        transform:
+          type: number
+      required:
+        - transform
+      description: /v1/getSomething POST response schema
+    requestBody1:
+      type: object
+      properties:
+        one:
+          type: string
+        two:
+          type: number
+      required:
+        - one
+        - two
+      description: /v1/getSomething POST request body
+  responses: {}
+  parameters: {}
+  examples: {}
+  requestBodies: {}
+  headers: {}
+  securitySchemes: {}
+  links: {}
+  callbacks: {}
+tags: []
+servers:
+  - url: http://example.com
+"
+`;
