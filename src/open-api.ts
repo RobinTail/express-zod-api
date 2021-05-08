@@ -8,8 +8,8 @@ import {z} from 'zod';
 import {Routing, routingCycle} from './routing';
 import {lookup} from 'mime';
 
-const describeSchema = (value: z.ZodTypeAny, isResponse: boolean): Partial<SchemaObject> => {
-  const otherProps: Partial<SchemaObject> = {};
+const describeSchema = (value: z.ZodTypeAny, isResponse: boolean): SchemaObject => {
+  const otherProps: SchemaObject = {};
   if (value.isNullable()) {
     otherProps.nullable = true;
   }
