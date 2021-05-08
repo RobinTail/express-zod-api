@@ -15,7 +15,7 @@ type Middleware<IN, OPT, OUT> = (params: MiddlewareParams<IN, OPT>) => Promise<O
 
 export interface MiddlewareDefinition<IN extends ObjectSchema, OPT, OUT extends FlatObject> {
   input: IN;
-  middleware: Middleware<z.infer<IN>, OPT, OUT>;
+  middleware: Middleware<z.output<IN>, OPT, OUT>;
 }
 
 export const createMiddleware = <IN extends ObjectSchema, OPT, OUT extends FlatObject>(

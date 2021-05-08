@@ -35,7 +35,7 @@ export class EndpointsFactory<mIN, mOUT> {
     methods: Method[],
     input: IN,
     output: OUT,
-    handler: Handler<z.infer<Merge<IN, mIN>>, z.infer<OUT>, mOUT>
+    handler: Handler<z.output<Merge<IN, mIN>>, z.input<OUT>, mOUT>
   }) {
     return new Endpoint<IN, OUT, mIN, mOUT>({
       methods, handler,
