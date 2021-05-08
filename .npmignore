@@ -8,3 +8,5 @@ tests
 yarn-error.log
 .github
 dataflow.svg
+logo.svg
+.eslintrc.json
