@@ -1,5 +1,7 @@
 # Express Zod API ![CI](https://github.com/RobinTail/express-zod-api/actions/workflows/node.js.yml/badge.svg)
 
+![logo](logo.svg)
+
 Start your API server with I/O schema validation and custom middlewares in minutes.
 
 1. [Technologies](#technologies)
@@ -38,7 +40,7 @@ Input schema may also have transformations for incoming GET params *(see the exa
 For POST, PUT and PATCH the `input` is `request.body` *(parsed JSON)* so properties may have different types.
 
 The handler's argument `options` comes from the returns of the middlewares, which can also supplement and transform the `input` argument.
-All inputs and outputs are validated against their object schemas and `ResultHandler` handles the output or possible validation or thrown errors.
+All inputs and outputs are validated against their object schemas and `ResultHandler` handles the output or possible validation errors.
 
 ![Dataflow](dataflow.svg)
 

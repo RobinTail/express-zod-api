@@ -9,8 +9,8 @@ import {extractObjectSchema} from './helpers';
 import {Routing, routingCycle} from './routing';
 import {lookup} from 'mime';
 
-const getOpenApiPropertyType = (value: z.ZodTypeAny): Partial<SchemaObject> => {
-  const otherProps: Partial<SchemaObject> = {};
+const describeSchema = (value: z.ZodTypeAny, isResponse: boolean): SchemaObject => {
+  const otherProps: SchemaObject = {};
   if (value.isNullable()) {
     otherProps.nullable = true;
   }
@@ -33,14 +33,14 @@ const getOpenApiPropertyType = (value: z.ZodTypeAny): Partial<SchemaObject> => {
       return {
         ...otherProps,
         type: 'array',
-        items: getOpenApiPropertyType((value._def as z.ZodArrayDef).type)
+        items: describeSchema((value._def as z.ZodArrayDef).type, isResponse)
       };
     case value instanceof z.ZodObject:
     case value instanceof z.ZodRecord:
       return {
         ...otherProps,
         type: 'object',
-        properties: objectCycle(value as z.AnyZodObject),
+        properties: describeObject(value as z.AnyZodObject, isResponse),
         required: Object.keys((value as z.AnyZodObject).shape)
           .filter((key) => !(value as z.AnyZodObject).shape[key].isOptional())
       };
@@ -61,26 +61,27 @@ const getOpenApiPropertyType = (value: z.ZodTypeAny): Partial<SchemaObject> => {
     case value instanceof z.ZodEffects:
       return {
         ...otherProps,
-        ...getOpenApiPropertyType((value._def as z.ZodEffectsDef).schema)
+        ...describeTransformation(value, isResponse)
       };
     case value instanceof z.ZodOptional:
     case value instanceof z.ZodNullable:
       return {
         ...otherProps,
-        ...getOpenApiPropertyType((value as z.ZodOptional<z.ZodTypeAny> | z.ZodNullable<z.ZodTypeAny>).unwrap())
+        ...describeSchema((value as z.ZodOptional<z.ZodTypeAny> | z.ZodNullable<z.ZodTypeAny>).unwrap(), isResponse)
       };
     case value instanceof z.ZodIntersection:
       return {
         ...otherProps,
         allOf: [
-          getOpenApiPropertyType((value as z.ZodIntersection<z.ZodTypeAny, z.ZodTypeAny>)._def.left),
-          getOpenApiPropertyType((value as z.ZodIntersection<z.ZodTypeAny, z.ZodTypeAny>)._def.right)
+          describeSchema((value as z.ZodIntersection<z.ZodTypeAny, z.ZodTypeAny>)._def.left, isResponse),
+          describeSchema((value as z.ZodIntersection<z.ZodTypeAny, z.ZodTypeAny>)._def.right, isResponse)
         ]
       };
     case value instanceof z.ZodUnion:
       return {
         ...otherProps,
-        oneOf: (value as z.ZodUnion<[z.ZodTypeAny, ...z.ZodTypeAny[]]>)._def.options.map(getOpenApiPropertyType)
+        oneOf: (value as z.ZodUnion<[z.ZodTypeAny, ...z.ZodTypeAny[]]>)._def.options
+          .map((schema) => describeSchema(schema, isResponse))
       };
     case value instanceof z.ZodUndefined:
     case value instanceof z.ZodTuple:
@@ -97,11 +98,39 @@ const getOpenApiPropertyType = (value: z.ZodTypeAny): Partial<SchemaObject> => {
   }
 };
 
-const objectCycle = (schema: z.AnyZodObject): Record<string, SchemaObject> => {
+const describeObject = (schema: z.AnyZodObject, isResponse: boolean): Record<string, SchemaObject> => {
   return Object.keys(schema.shape).reduce((carry, key) => ({
     ...carry,
-    [key]: getOpenApiPropertyType(schema.shape[key])
+    [key]: describeSchema(schema.shape[key], isResponse)
   }), {} as Record<string, SchemaObject>);
+};
+
+const describeTransformation = (value: z.ZodTransformer<any> | z.ZodEffects<any>, isResponse: boolean) => {
+  const input = describeSchema(value._def.schema, isResponse);
+  let output = 'undefined';
+  if (isResponse && value._def.effects && value._def.effects.length > 0) {
+    const effect = value._def.effects.filter((ef) => ef.type === 'transform').slice(-1)[0];
+    if (effect && 'transform' in effect) {
+      try {
+        output = typeof effect.transform(
+          ['integer', 'number'].includes(`${input.type}`) ? 0 :
+            'string' === input.type ? '' :
+              'boolean' === input.type ? false :
+                'object' === input.type ? {} :
+                  'null' === input.type ? null :
+                    'array' === input.type ? [] : undefined
+        );
+      } catch (e) {/**/}
+    }
+  }
+  return {
+    ...input,
+    ...(
+      ['number', 'string', 'boolean', 'null'].includes(output) ? {
+        type: output as 'number' | 'string' | 'boolean' | 'null'
+      } : {}
+    )
+  };
 };
 
 interface GenerationParams {
@@ -143,7 +172,7 @@ export class OpenAPI {
     routingCycle(routing, (endpoint, fullPath, method) => {
       const responseSchemaRef = this.createRef('responseSchema');
       this.builder.addSchema(responseSchemaRef.name, {
-        ...getOpenApiPropertyType(endpoint.getOutputSchema()),
+        ...describeSchema(endpoint.getOutputSchema(), true),
         description: `${fullPath} ${method.toUpperCase()} response schema`
       });
       const operation: OperationObject = {
@@ -168,7 +197,7 @@ export class OpenAPI {
             in: 'query',
             required: !subject[name].isOptional(),
             schema: {
-              ...getOpenApiPropertyType(subject[name]),
+              ...describeSchema(subject[name], false),
               description: `${fullPath} ${method.toUpperCase()} parameter`
             },
           });
@@ -177,7 +206,7 @@ export class OpenAPI {
       } else {
         const bodySchemaRef = this.createRef('requestBody');
         this.builder.addSchema(bodySchemaRef.name, {
-          ...getOpenApiPropertyType(endpoint.getInputSchema()),
+          ...describeSchema(endpoint.getInputSchema(), false),
           description: `${fullPath} ${method.toUpperCase()} request body`
         });
         operation.requestBody = {

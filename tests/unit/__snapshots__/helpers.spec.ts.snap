@@ -11,6 +11,7 @@ Object {
     "isNullable": [Function],
     "isOptional": [Function],
     "nullable": [Function],
+    "nullish": [Function],
     "optional": [Function],
     "parse": [Function],
     "parseAsync": [Function],
@@ -42,6 +43,7 @@ Object {
     "min": [Function],
     "nonempty": [Function],
     "nullable": [Function],
+    "nullish": [Function],
     "optional": [Function],
     "parse": [Function],
     "parseAsync": [Function],
@@ -65,6 +67,7 @@ Object {
     "isNullable": [Function],
     "isOptional": [Function],
     "nullable": [Function],
+    "nullish": [Function],
     "optional": [Function],
     "parse": [Function],
     "parseAsync": [Function],
@@ -95,6 +98,7 @@ Object {
     "nonnegative": [Function],
     "nonpositive": [Function],
     "nullable": [Function],
+    "nullish": [Function],
     "optional": [Function],
     "parse": [Function],
     "parseAsync": [Function],
@@ -132,6 +136,7 @@ Object {
     "min": [Function],
     "nonempty": [Function],
     "nullable": [Function],
+    "nullish": [Function],
     "optional": [Function],
     "parse": [Function],
     "parseAsync": [Function],
@@ -155,6 +160,7 @@ Object {
     "isNullable": [Function],
     "isOptional": [Function],
     "nullable": [Function],
+    "nullish": [Function],
     "optional": [Function],
     "parse": [Function],
     "parseAsync": [Function],
@@ -186,6 +192,7 @@ Object {
     "min": [Function],
     "nonempty": [Function],
     "nullable": [Function],
+    "nullish": [Function],
     "optional": [Function],
     "parse": [Function],
     "parseAsync": [Function],
@@ -219,6 +226,7 @@ Object {
     "nonnegative": [Function],
     "nonpositive": [Function],
     "nullable": [Function],
+    "nullish": [Function],
     "optional": [Function],
     "parse": [Function],
     "parseAsync": [Function],
@@ -240,6 +248,7 @@ Object {
     "isNullable": [Function],
     "isOptional": [Function],
     "nullable": [Function],
+    "nullish": [Function],
     "optional": [Function],
     "parse": [Function],
     "parseAsync": [Function],
@@ -270,6 +279,7 @@ Object {
     "nonnegative": [Function],
     "nonpositive": [Function],
     "nullable": [Function],
+    "nullish": [Function],
     "optional": [Function],
     "parse": [Function],
     "parseAsync": [Function],
@@ -307,6 +317,7 @@ Object {
     "min": [Function],
     "nonempty": [Function],
     "nullable": [Function],
+    "nullish": [Function],
     "optional": [Function],
     "parse": [Function],
     "parseAsync": [Function],
@@ -323,7 +334,6 @@ Object {
   },
   "four": ZodOptional {
     "_def": Object {
-      "defaultValue": undefined,
       "innerType": ZodBoolean {
         "_def": Object {},
         "_parseInternalOptionalParams": [Function],
@@ -333,6 +343,7 @@ Object {
         "isNullable": [Function],
         "isOptional": [Function],
         "nullable": [Function],
+        "nullish": [Function],
         "optional": [Function],
         "parse": [Function],
         "parseAsync": [Function],
@@ -352,6 +363,7 @@ Object {
     "isNullable": [Function],
     "isOptional": [Function],
     "nullable": [Function],
+    "nullish": [Function],
     "optional": [Function],
     "parse": [Function],
     "parseAsync": [Function],
@@ -383,6 +395,7 @@ Object {
     "min": [Function],
     "nonempty": [Function],
     "nullable": [Function],
+    "nullish": [Function],
     "optional": [Function],
     "parse": [Function],
     "parseAsync": [Function],
@@ -399,7 +412,6 @@ Object {
   },
   "three": ZodOptional {
     "_def": Object {
-      "defaultValue": undefined,
       "innerType": ZodNull {
         "_def": Object {},
         "_parseInternalOptionalParams": [Function],
@@ -409,6 +421,7 @@ Object {
         "isNullable": [Function],
         "isOptional": [Function],
         "nullable": [Function],
+        "nullish": [Function],
         "optional": [Function],
         "parse": [Function],
         "parseAsync": [Function],
@@ -428,6 +441,7 @@ Object {
     "isNullable": [Function],
     "isOptional": [Function],
     "nullable": [Function],
+    "nullish": [Function],
     "optional": [Function],
     "parse": [Function],
     "parseAsync": [Function],
@@ -458,6 +472,7 @@ Object {
     "nonnegative": [Function],
     "nonpositive": [Function],
     "nullable": [Function],
+    "nullish": [Function],
     "optional": [Function],
     "parse": [Function],
     "parseAsync": [Function],
@@ -477,7 +492,6 @@ exports[`Helpers combineEndpointAndMiddlewareInputSchemas() Should merge union o
 Object {
   "five": ZodOptional {
     "_def": Object {
-      "defaultValue": undefined,
       "innerType": ZodString {
         "_def": Object {
           "isEmail": false,
@@ -498,6 +512,7 @@ Object {
         "min": [Function],
         "nonempty": [Function],
         "nullable": [Function],
+        "nullish": [Function],
         "optional": [Function],
         "parse": [Function],
         "parseAsync": [Function],
@@ -520,6 +535,7 @@ Object {
     "isNullable": [Function],
     "isOptional": [Function],
     "nullable": [Function],
+    "nullish": [Function],
     "optional": [Function],
     "parse": [Function],
     "parseAsync": [Function],
@@ -533,7 +549,6 @@ Object {
   },
   "four": ZodOptional {
     "_def": Object {
-      "defaultValue": undefined,
       "innerType": ZodBoolean {
         "_def": Object {},
         "_parseInternalOptionalParams": [Function],
@@ -543,6 +558,7 @@ Object {
         "isNullable": [Function],
         "isOptional": [Function],
         "nullable": [Function],
+        "nullish": [Function],
         "optional": [Function],
         "parse": [Function],
         "parseAsync": [Function],
@@ -562,6 +578,7 @@ Object {
     "isNullable": [Function],
     "isOptional": [Function],
     "nullable": [Function],
+    "nullish": [Function],
     "optional": [Function],
     "parse": [Function],
     "parseAsync": [Function],
@@ -575,7 +592,6 @@ Object {
   },
   "one": ZodOptional {
     "_def": Object {
-      "defaultValue": undefined,
       "innerType": ZodString {
         "_def": Object {
           "isEmail": false,
@@ -596,6 +612,7 @@ Object {
         "min": [Function],
         "nonempty": [Function],
         "nullable": [Function],
+        "nullish": [Function],
         "optional": [Function],
         "parse": [Function],
         "parseAsync": [Function],
@@ -618,6 +635,7 @@ Object {
     "isNullable": [Function],
     "isOptional": [Function],
     "nullable": [Function],
+    "nullish": [Function],
     "optional": [Function],
     "parse": [Function],
     "parseAsync": [Function],
@@ -631,7 +649,6 @@ Object {
   },
   "six": ZodOptional {
     "_def": Object {
-      "defaultValue": undefined,
       "innerType": ZodNumber {
         "_def": Object {
           "isInteger": false,
@@ -651,6 +668,7 @@ Object {
         "nonnegative": [Function],
         "nonpositive": [Function],
         "nullable": [Function],
+        "nullish": [Function],
         "optional": [Function],
         "parse": [Function],
         "parseAsync": [Function],
@@ -671,6 +689,7 @@ Object {
     "isNullable": [Function],
     "isOptional": [Function],
     "nullable": [Function],
+    "nullish": [Function],
     "optional": [Function],
     "parse": [Function],
     "parseAsync": [Function],
@@ -684,7 +703,6 @@ Object {
   },
   "three": ZodOptional {
     "_def": Object {
-      "defaultValue": undefined,
       "innerType": ZodNull {
         "_def": Object {},
         "_parseInternalOptionalParams": [Function],
@@ -694,6 +712,7 @@ Object {
         "isNullable": [Function],
         "isOptional": [Function],
         "nullable": [Function],
+        "nullish": [Function],
         "optional": [Function],
         "parse": [Function],
         "parseAsync": [Function],
@@ -713,6 +732,7 @@ Object {
     "isNullable": [Function],
     "isOptional": [Function],
     "nullable": [Function],
+    "nullish": [Function],
     "optional": [Function],
     "parse": [Function],
     "parseAsync": [Function],
@@ -726,7 +746,6 @@ Object {
   },
   "two": ZodOptional {
     "_def": Object {
-      "defaultValue": undefined,
       "innerType": ZodNumber {
         "_def": Object {
           "isInteger": false,
@@ -746,6 +765,7 @@ Object {
         "nonnegative": [Function],
         "nonpositive": [Function],
         "nullable": [Function],
+        "nullish": [Function],
         "optional": [Function],
         "parse": [Function],
         "parseAsync": [Function],
@@ -766,6 +786,7 @@ Object {
     "isNullable": [Function],
     "isOptional": [Function],
     "nullable": [Function],
+    "nullish": [Function],
     "optional": [Function],
     "parse": [Function],
     "parseAsync": [Function],
@@ -802,6 +823,7 @@ Object {
     "min": [Function],
     "nonempty": [Function],
     "nullable": [Function],
+    "nullish": [Function],
     "optional": [Function],
     "parse": [Function],
     "parseAsync": [Function],
@@ -841,6 +863,7 @@ Object {
     "min": [Function],
     "nonempty": [Function],
     "nullable": [Function],
+    "nullish": [Function],
     "optional": [Function],
     "parse": [Function],
     "parseAsync": [Function],
@@ -874,6 +897,7 @@ Object {
     "nonnegative": [Function],
     "nonpositive": [Function],
     "nullable": [Function],
+    "nullish": [Function],
     "optional": [Function],
     "parse": [Function],
     "parseAsync": [Function],
@@ -893,7 +917,6 @@ exports[`Helpers extractObjectSchema() should return object schema for the union
 Object {
   "one": ZodOptional {
     "_def": Object {
-      "defaultValue": undefined,
       "innerType": ZodString {
         "_def": Object {
           "isEmail": false,
@@ -914,6 +937,7 @@ Object {
         "min": [Function],
         "nonempty": [Function],
         "nullable": [Function],
+        "nullish": [Function],
         "optional": [Function],
         "parse": [Function],
         "parseAsync": [Function],
@@ -936,6 +960,7 @@ Object {
     "isNullable": [Function],
     "isOptional": [Function],
     "nullable": [Function],
+    "nullish": [Function],
     "optional": [Function],
     "parse": [Function],
     "parseAsync": [Function],
@@ -949,7 +974,6 @@ Object {
   },
   "two": ZodOptional {
     "_def": Object {
-      "defaultValue": undefined,
       "innerType": ZodNumber {
         "_def": Object {
           "isInteger": false,
@@ -969,6 +993,7 @@ Object {
         "nonnegative": [Function],
         "nonpositive": [Function],
         "nullable": [Function],
+        "nullish": [Function],
         "optional": [Function],
         "parse": [Function],
         "parseAsync": [Function],
@@ -989,6 +1014,7 @@ Object {
     "isNullable": [Function],
     "isOptional": [Function],
     "nullable": [Function],
+    "nullish": [Function],
     "optional": [Function],
     "parse": [Function],
     "parseAsync": [Function],
