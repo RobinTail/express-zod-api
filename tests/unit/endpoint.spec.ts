@@ -42,7 +42,8 @@ describe('Endpoint', () => {
       const factory = new EndpointsFactory().addMiddleware(middlewareDefinitionMock);
       const handlerMock = jest.fn().mockImplementationOnce(async ({input, options}) => ({
         inc2: (options as { inc: number }).inc + 1,
-        str: input.n.toFixed(2)
+        str: input.n.toFixed(2),
+        transform: 'test'
       }));
       const endpoint = factory.build({
         methods: ['post'],
@@ -51,7 +52,8 @@ describe('Endpoint', () => {
         }),
         output: z.object({
           inc2: z.number(),
-          str: z.string()
+          str: z.string(),
+          transform: z.string().transform((str) => str.length)
         }),
         handler: handlerMock
       });
@@ -105,7 +107,8 @@ describe('Endpoint', () => {
         status: 'success',
         data: {
           inc2: 455,
-          str: '453.00'
+          str: '453.00',
+          transform: 4
         }
       });
     });
