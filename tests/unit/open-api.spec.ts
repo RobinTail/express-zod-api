@@ -141,4 +141,30 @@ describe('Open API generator', () => {
     }).builder.getSpecAsYaml();
     expect(spec).toMatchSnapshot();
   });
+
+  test('should handle transformation schema in output', () => {
+    const spec = new OpenAPI({
+      routing: {
+        v1: {
+          getSomething: endpointsFactory.build({
+            methods: ['post'],
+            input: z.object({
+              one: z.string(),
+              two: z.number()
+            }),
+            output: z.object({
+              transform: z.string().transform((str) => str.length)
+            }),
+            handler: async () => ({
+              transform: 'test'
+            })
+          })
+        }
+      },
+      version: '3.4.5',
+      title: 'Testing Transformation in response schema',
+      serverUrl: 'http://example.com'
+    }).builder.getSpecAsYaml();
+    expect(spec).toMatchSnapshot();
+  });
 });

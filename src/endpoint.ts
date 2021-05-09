@@ -34,14 +34,14 @@ export type Method = 'get' | 'post' | 'put' | 'delete' | 'patch';
 
 export type EndpointInput<T> = T extends Endpoint<infer IN, any, infer mIN, any> ? z.input<Merge<IN, mIN>> : never;
 
-export type EndpointOutput<T> = T extends Endpoint<any, infer OUT, any, any> ? z.infer<OUT> : never;
+export type EndpointOutput<T> = T extends Endpoint<any, infer OUT, any, any> ? z.output<OUT> : never;
 
 /** mIN, OPT - from Middlewares */
 export class Endpoint<IN extends ObjectSchema, OUT extends ObjectSchema, mIN, OPT> extends AbstractEndpoint {
   protected middlewares: MiddlewareDefinition<any, any, any>[] = [];
   protected inputSchema: Merge<IN, mIN>; // combined with middlewares input
   protected outputSchema: OUT;
-  protected handler: Handler<z.infer<Merge<IN, mIN>>, z.infer<OUT>, OPT>
+  protected handler: Handler<z.output<Merge<IN, mIN>>, z.input<OUT>, OPT>
   protected resultHandler: ResultHandler | null;
 
   constructor({methods, middlewares, inputSchema, outputSchema, handler, resultHandler}: {
@@ -49,7 +49,7 @@ export class Endpoint<IN extends ObjectSchema, OUT extends ObjectSchema, mIN, OP
     middlewares: MiddlewareDefinition<any, any, any>[],
     inputSchema: IN,
     outputSchema: OUT,
-    handler: Handler<z.infer<Merge<IN, mIN>>, z.infer<OUT>, OPT>
+    handler: Handler<z.output<Merge<IN, mIN>>, z.input<OUT>, OPT>
     resultHandler: ResultHandler | null
   }) {
     super();
