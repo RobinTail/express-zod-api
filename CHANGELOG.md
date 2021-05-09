@@ -2,11 +2,13 @@
 
 ## Version 0
 
+### v0.6.1
+- Nothing special. Just new logo and the dataflow diagram update.
+
 ### v0.6.0
 - OpenAPI / Swagger specification generator now supports `ZodNullable`, `ZodOptional`, `ZodUnion` and `ZodIntersection` properties. 
 
 ### v0.5.0
-- More convenient way to attach routing to your custom express app
 - `ConfigType` changes:
 ```typescript
 // before
@@ -33,6 +35,14 @@ export type ConfigType = ({
   resultHandler?: ResultHandler; // moved
   logger: LoggerConfig | Logger;
 }
+```
+- More convenient way to attach routing to your custom express app
+```typescript
+// before
+initRouting({app, logger, config, routing});
+// after
+const config: ConfigType = {app, ...};
+attachRouting(config, routing);
 ```
 
 ### v0.4.1
