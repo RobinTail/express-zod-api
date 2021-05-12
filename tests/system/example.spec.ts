@@ -26,6 +26,10 @@ describe('Example', () => {
     });
   });
 
+  afterEach(() => {
+    out = '';
+  });
+
   describe('Positive', () => {
     test('Should listen', async () => {
       expect(await new Promise((resolve) => {
@@ -59,6 +63,8 @@ describe('Example', () => {
           status: "I'll fix it later"
         }
       });
+      expect(out).toMatch(/v1\/setUser/);
+      expect(out).toMatch(/50, 123, 456/);
     });
 
     test('Should handle valid GET request', async () => {
@@ -72,6 +78,8 @@ describe('Example', () => {
           name: 'John Doe'
         }
       });
+      expect(out).toMatch(/v1\/getUser/);
+      expect(out).toMatch(/50, method get/);
     });
   });
 
@@ -86,6 +94,7 @@ describe('Example', () => {
           message: 'id: Required'
         }
       });
+      console.log(out);
     });
 
     test('GET request should fail on specific value in handler implementation', async () => {
@@ -98,6 +107,7 @@ describe('Example', () => {
           message: 'User not found'
         }
       });
+      expect(out).toMatch(/101, method get/);
     });
 
     test('POST request should fail on auth middleware key check', async () => {
