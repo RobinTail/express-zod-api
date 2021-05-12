@@ -2,6 +2,37 @@
 
 ## Version 0
 
+### v0.7.0
+- Zod version is v3.0.0-beta.1
+- Ability to use z.ZodIntersection and z.ZodUnion as an I/O schema for handlers and middlewares.
+```typescript
+// example
+const middleware = createMiddleware({
+  input: z.object({
+    one: z.string()
+  }).or(z.object({
+    two: z.number()
+  })),
+  middleware: async ({input}) => ({
+    input // => type: { one: string } | { two: number }
+  })
+});
+```
+- Ability to use `z.transform()` in handler's output schema.
+```typescript
+// example
+const endpoint = factory.build({
+  methods: ['post'],
+  input: z.object({}).nonstrict(),
+  output: z.object({
+    value: z.string().transform((str) => str.length)
+  }),
+  handler: async ({input, options}) => ({
+    transform: 'test' // => in response: { transform: 4 }
+  })
+});
+```
+
 ### v0.6.1
 - Nothing special. Just new logo and the dataflow diagram update.
 

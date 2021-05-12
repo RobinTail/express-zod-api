@@ -1,7 +1,7 @@
 import {Logger} from 'winston';
 import {z} from 'zod';
 import {ConfigType} from './config-type';
-import {combineEndpointAndMiddlewareInputSchemas, getInitialInput, Merge, ObjectSchema} from './helpers';
+import {combineEndpointAndMiddlewareInputSchemas, getInitialInput, IOSchema, Merge} from './helpers';
 import {Request, Response} from 'express';
 import {MiddlewareDefinition} from './middleware';
 import {defaultResultHandler, ResultHandler} from './result-handler';
@@ -26,8 +26,8 @@ export abstract class AbstractEndpoint {
     return this.methods;
   }
 
-  abstract getInputSchema(): ObjectSchema;
-  abstract getOutputSchema(): ObjectSchema;
+  abstract getInputSchema(): IOSchema;
+  abstract getOutputSchema(): IOSchema;
 }
 
 export type Method = 'get' | 'post' | 'put' | 'delete' | 'patch';
@@ -37,7 +37,7 @@ export type EndpointInput<T> = T extends Endpoint<infer IN, any, infer mIN, any>
 export type EndpointOutput<T> = T extends Endpoint<any, infer OUT, any, any> ? z.output<OUT> : never;
 
 /** mIN, OPT - from Middlewares */
-export class Endpoint<IN extends ObjectSchema, OUT extends ObjectSchema, mIN, OPT> extends AbstractEndpoint {
+export class Endpoint<IN extends IOSchema, OUT extends IOSchema, mIN, OPT> extends AbstractEndpoint {
   protected middlewares: MiddlewareDefinition<any, any, any>[] = [];
   protected inputSchema: Merge<IN, mIN>; // combined with middlewares input
   protected outputSchema: OUT;
@@ -61,11 +61,11 @@ export class Endpoint<IN extends ObjectSchema, OUT extends ObjectSchema, mIN, OP
     this.resultHandler = resultHandler;
   }
 
-  public getInputSchema(): ObjectSchema {
+  public getInputSchema(): IOSchema {
     return this.inputSchema;
   }
 
-  public getOutputSchema(): ObjectSchema {
+  public getOutputSchema(): IOSchema {
     return this.outputSchema;
   }
 

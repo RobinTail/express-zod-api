@@ -1,10 +1,15 @@
-import {combineEndpointAndMiddlewareInputSchemas, getInitialInput, isLoggerConfig} from '../../src/helpers';
+import {
+  combineEndpointAndMiddlewareInputSchemas,
+  extractObjectSchema,
+  getInitialInput,
+  isLoggerConfig
+} from '../../src/helpers';
 import {createMiddleware, z} from '../../src';
 import {Request} from 'express';
 
 describe('Helpers', () => {
   describe('combineEndpointAndMiddlewareInputSchemas()', () => {
-    test('Should merge input schemas', () => {
+    test('Should merge input object schemas', () => {
       const middlewares = [
         createMiddleware({
           input: z.object({
@@ -27,6 +32,91 @@ describe('Helpers', () => {
       ];
       const endpointInput = z.object({
         four: z.boolean()
+      });
+      const result = combineEndpointAndMiddlewareInputSchemas(endpointInput, middlewares);
+      expect(result).toBeInstanceOf(z.ZodObject);
+      expect(result.shape).toMatchSnapshot();
+    });
+
+    test('Should merge union object schemas', () => {
+      const middlewares = [
+        createMiddleware({
+          input: z.object({
+            one: z.string()
+          }).or(z.object({
+            two: z.number()
+          })),
+          middleware: jest.fn()
+        }),
+        createMiddleware({
+          input: z.object({
+            three: z.null()
+          }).or(z.object({
+            four: z.boolean()
+          })),
+          middleware: jest.fn()
+        }),
+      ];
+      const endpointInput = z.object({
+        five: z.string()
+      }).or(z.object({
+        six: z.number()
+      }));
+      const result = combineEndpointAndMiddlewareInputSchemas(endpointInput, middlewares);
+      expect(result).toBeInstanceOf(z.ZodObject);
+      expect(result.shape).toMatchSnapshot();
+    });
+
+    test('Should merge intersection object schemas', () => {
+      const middlewares = [
+        createMiddleware({
+          input: z.object({
+            one: z.string()
+          }).and(z.object({
+            two: z.number()
+          })),
+          middleware: jest.fn()
+        }),
+        createMiddleware({
+          input: z.object({
+            three: z.null()
+          }).and(z.object({
+            four: z.boolean()
+          })),
+          middleware: jest.fn()
+        }),
+      ];
+      const endpointInput = z.object({
+        five: z.string()
+      }).and(z.object({
+        six: z.number()
+      }));
+      const result = combineEndpointAndMiddlewareInputSchemas(endpointInput, middlewares);
+      expect(result).toBeInstanceOf(z.ZodObject);
+      expect(result.shape).toMatchSnapshot();
+    });
+
+    test('Should merge mixed object schemas', () => {
+      const middlewares = [
+        createMiddleware({
+          input: z.object({
+            one: z.string()
+          }).and(z.object({
+            two: z.number()
+          })),
+          middleware: jest.fn()
+        }),
+        createMiddleware({
+          input: z.object({
+            three: z.null()
+          }).or(z.object({
+            four: z.boolean()
+          })),
+          middleware: jest.fn()
+        }),
+      ];
+      const endpointInput = z.object({
+        five: z.string()
       });
       const result = combineEndpointAndMiddlewareInputSchemas(endpointInput, middlewares);
       expect(result).toBeInstanceOf(z.ZodObject);
@@ -95,6 +185,36 @@ describe('Helpers', () => {
     test('Should reject non-objects', () => {
       expect(isLoggerConfig([1,2,3])).toBeFalsy();
       expect(isLoggerConfig('something')).toBeFalsy();
+    });
+  });
+
+  describe('extractObjectSchema()', () => {
+    test('should pass the object schema through', () => {
+      const subject = extractObjectSchema(z.object({
+        one: z.string()
+      }));
+      expect(subject).toBeInstanceOf(z.ZodObject);
+      expect(subject.shape).toMatchSnapshot();
+    });
+
+    test('should return object schema for the union of object schemas', () => {
+      const subject = extractObjectSchema(z.object({
+        one: z.string()
+      }).or(z.object({
+        two: z.number()
+      })));
+      expect(subject).toBeInstanceOf(z.ZodObject);
+      expect(subject.shape).toMatchSnapshot();
+    });
+
+    test('should return object schema for the intersection of object schemas', () => {
+      const subject = extractObjectSchema(z.object({
+        one: z.string()
+      }).and(z.object({
+        two: z.number()
+      })));
+      expect(subject).toBeInstanceOf(z.ZodObject);
+      expect(subject.shape).toMatchSnapshot();
     });
   });
 });
