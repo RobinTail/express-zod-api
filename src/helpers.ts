@@ -11,7 +11,7 @@ type Extractable = 'shape' | '_unknownKeys' | '_catchall';
 type UnionSchema = z.ZodUnion<[ObjectSchema, ...ObjectSchema[]]>;
 type IntersectionSchema = z.ZodIntersection<ObjectSchema, ObjectSchema>;
 
-export type IO = ObjectSchema | UnionSchema | IntersectionSchema;
+export type IOSchema = ObjectSchema | UnionSchema | IntersectionSchema;
 
 type ArrayElement<T extends readonly unknown[]> = T extends readonly (infer K)[] ? K : never;
 
@@ -19,18 +19,18 @@ type UnionResult<T extends ObjectSchema[], F extends Extractable> = Partial<Arra
 type IntersectionResult<T extends IntersectionSchema, F extends Extractable> =
   T['_def']['left'][F] & T['_def']['right'][F];
 
-type IOExtract<T extends IO | any, F extends Extractable> =
+type IOExtract<T extends IOSchema | any, F extends Extractable> =
   T extends ObjectSchema ? T[F] :
   T extends UnionSchema ? UnionResult<T['options'], F> :
   T extends IntersectionSchema ? IntersectionResult<T, F> : EmptyFlatObject;
 
-export type Merge<A extends IO, B extends IO | any> = z.ZodObject<
+export type Merge<A extends IOSchema, B extends IOSchema | any> = z.ZodObject<
   IOExtract<A, 'shape'> & IOExtract<B, 'shape'>,
   IOExtract<A, '_unknownKeys'>,
   IOExtract<A, '_catchall'>
 >;
 
-export function extractObjectSchema(subject: IO): ObjectSchema {
+export function extractObjectSchema(subject: IOSchema): ObjectSchema {
   if (subject instanceof z.ZodUnion) {
     return subject.options.reduce((acc, option) =>
       acc.partial().merge(option.partial()));
@@ -41,9 +41,9 @@ export function extractObjectSchema(subject: IO): ObjectSchema {
   return subject;
 }
 
-export function combineEndpointAndMiddlewareInputSchemas<IN extends IO, mIN>(
+export function combineEndpointAndMiddlewareInputSchemas<IN extends IOSchema, mIN>(
   input: IN,
-  middlewares: MiddlewareDefinition<IO, any, any>[]
+  middlewares: MiddlewareDefinition<IOSchema, any, any>[]
 ): Merge<IN, mIN> {
   if (middlewares.length === 0) {
     return extractObjectSchema(input) as Merge<IN, mIN>;
