@@ -7,25 +7,27 @@ import {ResultHandler} from './result-handler';
 /** mIN, mOUT - accumulated from all middlewares */
 export class EndpointsFactory<mIN, mOUT> {
   protected middlewares: MiddlewareDefinition<any, any, any>[] = [];
-  protected resultHandler: ResultHandler | null;
+  protected resultHandler: ResultHandler | null = null;
 
-  constructor(
-    middlewares: MiddlewareDefinition<any, any, any>[] = [],
-    resultHandler: ResultHandler | null = null
+  private static create<mIN, mOUT>(
+    middlewares: MiddlewareDefinition<any, any, any>[],
+    resultHandler: ResultHandler | null
   ) {
-    this.middlewares = middlewares;
-    this.resultHandler = resultHandler;
+    const factory = new EndpointsFactory<mIN, mOUT>();
+    factory.middlewares = middlewares;
+    factory.resultHandler = resultHandler;
+    return factory;
   }
 
   public setResultHandler(resultHandler: ResultHandler) {
-    return new EndpointsFactory<mIN, mOUT>(
+    return EndpointsFactory.create<mIN, mOUT>(
       this.middlewares,
       resultHandler
     );
   }
 
   public addMiddleware<IN extends IOSchema, OUT extends FlatObject>(definition: MiddlewareDefinition<IN, mOUT, OUT>) {
-    return new EndpointsFactory<Merge<IN, mIN>, mOUT & OUT>(
+    return EndpointsFactory.create<Merge<IN, mIN>, mOUT & OUT>(
       this.middlewares.concat(definition),
       this.resultHandler
     );

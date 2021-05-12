@@ -32,6 +32,7 @@ const endpoint = factory.build({
   })
 });
 ```
+- Supplying parameters to `EndpointsFactory::constructor()` is now prohibited. Please use `.addMiddleware()` and `.setResultHandler()` as the right way in order to achieve the correct input schema type in handlers.
 
 ### v0.6.1
 - Nothing special. Just new logo and the dataflow diagram update.
