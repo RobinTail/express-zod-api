@@ -24,6 +24,8 @@ Start your API server with I/O schema validation and custom middlewares in minut
 7. [Known issues](#known-issues)
    1. [Excess property check of endpoint output](#excess-property-check-of-endpoint-output)
 
+[Changelog](CHANGELOG.md)
+
 # Technologies
 
 - [Typescript](https://www.typescriptlang.org/) first
@@ -35,11 +37,12 @@ Start your API server with I/O schema validation and custom middlewares in minut
 # Concept
 
 The API always operates object schemas for input and output.
-For GET method it provides `request.query` for middlewares and handler as `input` and all properties are `string`.
-Input schema may also have transformations for incoming GET params *(see the example [below](#create-your-first-endpoint))*.
+For GET method it provides `request.query` for middlewares and handler as `input` and all properties are `string | string[]`.
+Input schema may also have transformations *(see the example [below](#create-your-first-endpoint))*.
 For POST, PUT and PATCH the `input` is `request.body` *(parsed JSON)* so properties may have different types.
+Starting with version 0.7.0, union and intersection of object schemas are also supported (`.or()`, `.and()`).
 
-The handler's argument `options` comes from the returns of the middlewares, which can also supplement and transform the `input` argument.
+The handler's argument `options` comes from the returns of the middlewares, which can also supplement, transform the `input` argument.
 All inputs and outputs are validated against their object schemas and `ResultHandler` handles the output or possible validation errors.
 
 ![Dataflow](dataflow.svg)
