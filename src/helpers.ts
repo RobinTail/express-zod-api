@@ -4,10 +4,10 @@ import {LoggerConfig, loggerLevels} from './config-type';
 import {MiddlewareDefinition} from './middleware';
 
 export type FlatObject = Record<string, any>;
-type EmptyFlatObject = {[K in never]: never};
+// type EmptyFlatObject = {[K in never]: never};
 
 type ObjectSchema = z.AnyZodObject;
-type Extractable = 'shape' | '_unknownKeys' | '_catchall';
+type Extractable = 'shape' | '_unknownKeys' | '_catchall' | '_output' | '_input';
 type UnionSchema = z.ZodUnion<[ObjectSchema, ...ObjectSchema[]]>;
 type IntersectionSchema = z.ZodIntersection<ObjectSchema, ObjectSchema>;
 
@@ -15,19 +15,21 @@ export type IOSchema = ObjectSchema | UnionSchema | IntersectionSchema;
 
 type ArrayElement<T extends readonly unknown[]> = T extends readonly (infer K)[] ? K : never;
 
-type UnionResult<T extends ObjectSchema[], F extends Extractable> = Partial<ArrayElement<T>[F]>;
+type UnionResult<T extends ObjectSchema[], F extends Extractable> = ArrayElement<T>[F];
 type IntersectionResult<T extends IntersectionSchema, F extends Extractable> =
   T['_def']['left'][F] & T['_def']['right'][F];
 
 type IOExtract<T extends IOSchema | any, F extends Extractable> =
   T extends ObjectSchema ? T[F] :
   T extends UnionSchema ? UnionResult<T['options'], F> :
-  T extends IntersectionSchema ? IntersectionResult<T, F> : EmptyFlatObject;
+  T extends IntersectionSchema ? IntersectionResult<T, F> : unknown; // : EmptyFlatObject
 
 export type Merge<A extends IOSchema, B extends IOSchema | any> = z.ZodObject<
   IOExtract<A, 'shape'> & IOExtract<B, 'shape'>,
   IOExtract<A, '_unknownKeys'>,
-  IOExtract<A, '_catchall'>
+  IOExtract<A, '_catchall'>,
+  IOExtract<A, '_output'> & IOExtract<B, '_output'>,
+  IOExtract<A, '_input'> & IOExtract<B, '_input'>
 >;
 
 export function extractObjectSchema(subject: IOSchema): ObjectSchema {

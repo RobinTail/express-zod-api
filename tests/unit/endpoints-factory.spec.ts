@@ -1,6 +1,7 @@
 import {createMiddleware, EndpointsFactory, z} from '../../src';
 import {Endpoint} from '../../src/endpoint';
 import {defaultResultHandler} from '../../src/result-handler';
+import {expectType} from 'tsd';
 
 describe('EndpointsFactory', () => {
   describe('.constructor()', () => {
@@ -12,23 +13,21 @@ describe('EndpointsFactory', () => {
     });
 
     test('Should create the factory with middleware and result handler', () => {
-      const middlewares = [
-        createMiddleware({
-          input: z.object({
-            n: z.number()
-          }),
-          middleware: jest.fn()
-        })
-      ];
-      const factory = new EndpointsFactory(middlewares, defaultResultHandler);
-      expect(factory['middlewares']).toStrictEqual(middlewares);
+      const middleware = createMiddleware({
+        input: z.object({
+          n: z.number()
+        }),
+        middleware: jest.fn()
+      });
+      const factory = new EndpointsFactory().addMiddleware(middleware).setResultHandler(defaultResultHandler);
+      expect(factory['middlewares']).toStrictEqual([middleware]);
       expect(factory['resultHandler']).toStrictEqual(defaultResultHandler);
     });
   });
 
   describe('.addMiddleware()', () => {
     test('Should create a new factory with a middleware and the same result handler', () => {
-      const factory = new EndpointsFactory([], defaultResultHandler);
+      const factory = new EndpointsFactory().setResultHandler(defaultResultHandler);
       const middleware = createMiddleware({
         input: z.object({
           n: z.number()
@@ -45,35 +44,31 @@ describe('EndpointsFactory', () => {
 
   describe('.setResultHandler()', () => {
     test('Should create a new factory with a result handler and the same middlewares', () => {
-      const middlewares = [
-        createMiddleware({
-          input: z.object({
-            n: z.number()
-          }),
-          middleware: jest.fn()
-        })
-      ];
-      const factory = new EndpointsFactory(middlewares);
+      const middleware = createMiddleware({
+        input: z.object({
+          n: z.number()
+        }),
+        middleware: jest.fn()
+      });
+      const factory = new EndpointsFactory().addMiddleware(middleware);
       const newFactory = factory.setResultHandler(defaultResultHandler);
-      expect(factory['middlewares']).toStrictEqual(middlewares);
-      expect(newFactory['middlewares']).toStrictEqual(middlewares);
+      expect(factory['middlewares']).toStrictEqual([middleware]);
+      expect(newFactory['middlewares']).toStrictEqual([middleware]);
       expect(factory['resultHandler']).toStrictEqual(null);
       expect(newFactory['resultHandler']).toStrictEqual(defaultResultHandler);
     });
   });
 
   describe('.build()', () => {
-    test('Should create an endpoint', () => {
-      const middlewares = [
-        createMiddleware({
-          input: z.object({
-            n: z.number()
-          }),
-          middleware: jest.fn()
-        })
-      ];
+    test('Should create an endpoint with simple middleware', () => {
+      const middleware = createMiddleware({
+        input: z.object({
+          n: z.number()
+        }),
+        middleware: jest.fn()
+      });
       const resultHandlerMock = jest.fn();
-      const factory = new EndpointsFactory(middlewares, resultHandlerMock);
+      const factory = new EndpointsFactory().addMiddleware(middleware).setResultHandler(resultHandlerMock);
       const handlerMock = jest.fn();
       const endpoint = factory.build({
         methods: ['get'],
@@ -87,11 +82,97 @@ describe('EndpointsFactory', () => {
       });
       expect(endpoint).toBeInstanceOf(Endpoint);
       expect(endpoint.getMethods()).toStrictEqual(['get']);
-      expect(endpoint['middlewares']).toStrictEqual(middlewares);
+      expect(endpoint['middlewares']).toStrictEqual([middleware]);
       expect(endpoint['inputSchema'].shape).toMatchSnapshot();
       expect(endpoint['outputSchema'].shape).toMatchSnapshot();
       expect(endpoint['handler']).toStrictEqual(handlerMock);
       expect(endpoint['resultHandler']).toStrictEqual(resultHandlerMock);
+      expectType<{
+        n: z.ZodNumber,
+        s: z.ZodString,
+      }>(endpoint['inputSchema'].shape);
+    });
+
+    test('Should create an endpoint with intersection middleware', () => {
+      const middleware = createMiddleware({
+        input: z.object({
+          n1: z.number()
+        }).and(z.object({
+          n2: z.number()
+        })),
+        middleware: jest.fn()
+      });
+      const resultHandlerMock = jest.fn();
+      const factory = new EndpointsFactory().addMiddleware(middleware).setResultHandler(resultHandlerMock);
+      const handlerMock = jest.fn();
+      const endpoint = factory.build({
+        methods: ['get'],
+        input: z.object({
+          s: z.string()
+        }),
+        output: z.object({
+          b: z.boolean()
+        }),
+        handler: handlerMock
+      });
+      expect(endpoint).toBeInstanceOf(Endpoint);
+      expect(endpoint.getMethods()).toStrictEqual(['get']);
+      expect(endpoint['middlewares']).toStrictEqual([middleware]);
+      expect(endpoint['inputSchema'].shape).toMatchSnapshot();
+      expect(endpoint['outputSchema'].shape).toMatchSnapshot();
+      expect(endpoint['handler']).toStrictEqual(handlerMock);
+      expect(endpoint['resultHandler']).toStrictEqual(resultHandlerMock);
+      expectType<{
+        n1: z.ZodNumber,
+        n2: z.ZodNumber,
+        s: z.ZodString,
+      }>(endpoint['inputSchema'].shape);
+    });
+
+    test('Should create an endpoint with union middleware',  () => {
+      const middleware = createMiddleware({
+        input: z.object({
+          n1: z.number()
+        }).or(z.object({
+          n2: z.number()
+        })),
+        middleware: jest.fn()
+      });
+      const resultHandlerMock = jest.fn();
+      const factory = new EndpointsFactory().addMiddleware(middleware).setResultHandler(resultHandlerMock);
+      const handlerMock = jest.fn().mockImplementation((params) => ({
+        input: params.input,
+        b: true,
+      }));
+      const endpoint = factory.build({
+        methods: ['get'],
+        input: z.object({
+          s: z.string()
+        }),
+        output: z.object({
+          b: z.boolean()
+        }),
+        handler: handlerMock
+      });
+      expect(endpoint).toBeInstanceOf(Endpoint);
+      expect(endpoint.getMethods()).toStrictEqual(['get']);
+      expect(endpoint['middlewares']).toStrictEqual([middleware]);
+      expect(endpoint['inputSchema'].shape).toMatchSnapshot();
+      expect(endpoint['outputSchema'].shape).toMatchSnapshot();
+      expect(endpoint['handler']).toStrictEqual(handlerMock);
+      expect(endpoint['resultHandler']).toStrictEqual(resultHandlerMock);
+      expectType<({
+        n1: z.ZodNumber,
+      } | {
+        n2: z.ZodNumber,
+      }) & {
+        s: z.ZodString,
+      }>(endpoint['inputSchema'].shape);
+      expectType<{
+        n1?: z.ZodNumber,
+        n2?: z.ZodNumber,
+        s: z.ZodString,
+      }>(endpoint['inputSchema'].shape);
     });
   });
 });
