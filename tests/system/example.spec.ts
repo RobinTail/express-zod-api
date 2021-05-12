@@ -94,7 +94,6 @@ describe('Example', () => {
           message: 'id: Required'
         }
       });
-      console.log(out);
     });
 
     test('GET request should fail on specific value in handler implementation', async () => {
