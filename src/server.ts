@@ -19,9 +19,9 @@ export function createServer(config: ConfigWithServer, routing: Routing): Server
   const logger = isLoggerConfig(config.logger) ? createLogger(config.logger) : config.logger;
   const app = express();
   const resultHandler = config.resultHandler || defaultResultHandler;
-  const jsonParserMiddleware = config.server.jsonParser || express.json();
+  const jsonParser = config.server.jsonParser || express.json();
 
-  const jsonFailureMiddleware: express.ErrorRequestHandler = (error, request, response, next) => {
+  const jsonFailureHandler: express.ErrorRequestHandler = (error, request, response, next) => {
     if (!error) { return next(); }
     return resultHandler({
       error, request, response, logger,
@@ -39,7 +39,7 @@ export function createServer(config: ConfigWithServer, routing: Routing): Server
     });
   };
 
-  app.use([ jsonParserMiddleware, jsonFailureMiddleware ]);
+  app.use([jsonParser, jsonFailureHandler]);
   initRouting({app, routing, logger, config});
   app.use(lastResortHandler);
 
