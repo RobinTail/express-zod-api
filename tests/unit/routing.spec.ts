@@ -106,10 +106,10 @@ describe('Routing', () => {
           test: 123
         }
       };
-      const responseMock = {
-        set: jest.fn(),
-        status: jest.fn(),
-        json: jest.fn()
+      const responseMock: Record<string, jest.Mock> = {
+        set: jest.fn().mockImplementation(() => responseMock),
+        status: jest.fn().mockImplementation(() => responseMock),
+        json: jest.fn().mockImplementation(() => responseMock)
       };
       const nextMock = jest.fn();
       await routeHandler(requestMock as Request, responseMock as any as Response, nextMock);

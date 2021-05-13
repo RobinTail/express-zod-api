@@ -63,10 +63,10 @@ describe('Endpoint', () => {
           n: 453
         }
       };
-      const responseMock = {
-        set: jest.fn(),
-        status: jest.fn(),
-        json: jest.fn()
+      const responseMock: Record<string, jest.Mock> = {
+        set: jest.fn().mockImplementation(() => responseMock),
+        status: jest.fn().mockImplementation(() => responseMock),
+        json: jest.fn().mockImplementation(() => responseMock)
       };
       const configMock = {
         server: {
