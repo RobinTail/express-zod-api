@@ -23,7 +23,7 @@ export function createServer(config: ConfigWithServer, routing: Routing): Server
 
   const jsonFailureHandler: express.ErrorRequestHandler = (error, request, response, next) => {
     if (!error) { return next(); }
-    return resultHandler({
+    resultHandler({
       error, request, response, logger,
       input: request.body,
       output: null
