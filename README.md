@@ -41,13 +41,13 @@ Starting with version 0.7.0, union and intersection of object schemas are also s
 
 The object being validated is the `request.query` for GET request, the `request.body` for PUT, PATCH and POST requests, or their merging for DELETE requests.
 
-Middlewares can handle validated inputs and the original `request`, for example, to perform the authentication.
-The returns of middlewares are combined into `options` parameter available to the next middlewares and the endpoint's handler.
+Middlewares can handle validated inputs and the original `request`, for example, to perform the authentication or provide the endpoint's handler with some request properties like the actual method.
+The returns of middlewares are combined into the `options` parameter available to the next middlewares and the endpoint's handler.
 
-The endpoint parameter `input` combines the validated inputs of all connected middlewares along with its own.
+The handler's parameter `input` combines the validated inputs of all connected middlewares along with the handler's one.
 The result that the handler returns goes to the `ResultHandler` which is responsible for transmission of the final response or possible error.
 
-All inputs and outputs are validated and there are also advanced powerful features for schema validation like transformations and refinements.
+All inputs and outputs are validated and there are also advanced powerful features like transformations and refinements.
 The diagram below can give you a better idea of the dataflow.
 
 ![Dataflow](dataflow.svg)

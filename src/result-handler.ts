@@ -1,7 +1,6 @@
 import {Request, Response} from 'express';
-import {HttpError} from 'http-errors';
 import {Logger} from 'winston';
-import {z} from 'zod';
+import {getStatusCodeFromError, getMessageFromError} from './helpers';
 
 type ApiResponse<T> = {
   status: 'success',
@@ -24,40 +23,24 @@ interface ResultHandlerParams {
 
 export type ResultHandler = (params: ResultHandlerParams) => void | Promise<void>;
 
-export const defaultResultHandler = ({error, request, response, input, output, logger}: ResultHandlerParams) => {
-  let resultJson: ApiResponse<any>;
-  if (error) {
-    let statusCode = 500;
-    if (error instanceof HttpError) {
-      statusCode = error.statusCode;
-    }
-    if (error instanceof z.ZodError) {
-      statusCode = 400;
-    }
-    if (statusCode === 500) {
-      logger.error(
-        'Internal server error\n' +
-        `${error.stack}\n` +
-        `URL: ${request.url}\n` +
-        `Payload: ${JSON.stringify(input, undefined, 2)}`,
-      );
-    }
-    response.status(statusCode);
-    resultJson = {
-      status: 'error',
-      error: {
-        message: error instanceof z.ZodError
-          ? error.issues.map(({path, message}) =>
-            `${path.join('/')}: ${message}`).join('; ')
-          : error.message,
-      }
-    };
-  } else {
-    response.status(200);
-    resultJson = {
-      status: 'success',
-      data: output
-    };
+export const defaultResultHandler: ResultHandler = ({error, request, response, input, output, logger}) => {
+  if (!error) {
+    const result: ApiResponse<typeof output> = { status: 'success', data: output };
+    response.status(200).json(result);
+    return;
   }
-  response.json(resultJson);
+  const statusCode = getStatusCodeFromError(error);
+  if (statusCode === 500) {
+    logger.error(
+      'Internal server error\n' +
+      `${error.stack}\n` +
+      `URL: ${request.url}\n` +
+      `Payload: ${JSON.stringify(input, undefined, 2)}`,
+    );
+  }
+  const result: ApiResponse<any> = {
+    status: 'error',
+    error: { message: getMessageFromError(error) }
+  };
+  response.status(statusCode).json(result);
 };

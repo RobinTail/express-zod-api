@@ -15,8 +15,9 @@ describe('ResultHandler', () => {
         debug: jest.fn()
       };
       responseMock = {
-        status: jest.fn(),
-        json: jest.fn()
+        set: jest.fn().mockImplementation(() => responseMock),
+        status: jest.fn().mockImplementation(() => responseMock),
+        json: jest.fn().mockImplementation(() => responseMock)
       };
     });
 

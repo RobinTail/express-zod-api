@@ -2,9 +2,11 @@ import {
   combineEndpointAndMiddlewareInputSchemas,
   extractObjectSchema,
   getInitialInput,
+  getMessageFromError,
+  getStatusCodeFromError,
   isLoggerConfig
 } from '../../src/helpers';
-import {createMiddleware, z} from '../../src';
+import {createMiddleware, z, createHttpError} from '../../src';
 import {Request} from 'express';
 
 describe('Helpers', () => {
@@ -215,6 +217,62 @@ describe('Helpers', () => {
       })));
       expect(subject).toBeInstanceOf(z.ZodObject);
       expect(subject.shape).toMatchSnapshot();
+    });
+  });
+
+  describe('getMessageFromError()', () => {
+    test('should compile a string from ZodError', () => {
+      const error = new z.ZodError([
+        {
+          code: 'invalid_type',
+          path: ['user', 'id'],
+          message: 'expected number, got string',
+          expected: 'number',
+          received: 'string'
+        },
+        {
+          code: 'invalid_type',
+          path: ['user', 'name'],
+          message: 'expected string, got number',
+          expected: 'string',
+          received: 'number'
+        }
+      ]);
+      expect(getMessageFromError(error)).toEqual(
+        'user/id: expected number, got string; user/name: expected string, got number'
+      );
+    });
+
+    test('should pass message from other error types', () => {
+      expect(getMessageFromError(createHttpError(502, 'something went wrong')))
+        .toEqual('something went wrong');
+      expect(getMessageFromError(new Error('something went wrong')))
+        .toEqual('something went wrong');
+    });
+  });
+
+  describe('getStatusCodeFromError()', () => {
+    test('should get status code from HttpError', () => {
+      expect(getStatusCodeFromError(createHttpError(403, 'Access denied')))
+        .toEqual(403);
+    });
+
+    test('should return 400 for ZodError', () => {
+      const error = new z.ZodError([
+        {
+          code: 'invalid_type',
+          path: ['user', 'id'],
+          message: 'expected number, got string',
+          expected: 'number',
+          received: 'string'
+        }
+      ]);
+      expect(getStatusCodeFromError(error)).toEqual(400);
+    });
+
+    test('should return 500 for other errors', () => {
+      expect(getStatusCodeFromError(new Error('something went wrong')))
+        .toEqual(500);
     });
   });
 });
