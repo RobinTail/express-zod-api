@@ -37,13 +37,18 @@ Start your API server with I/O schema validation and custom middlewares in minut
 # Concept
 
 The API always operates object schemas for input and output.
-For GET method it provides `request.query` for middlewares and handler as `input` and all properties are `string | string[]`.
-Input schema may also have transformations *(see the example [below](#create-your-first-endpoint))*.
-For POST, PUT and PATCH the `input` is `request.body` *(parsed JSON)* so properties may have different types.
 Starting with version 0.7.0, union and intersection of object schemas are also supported (`.or()`, `.and()`).
 
-The handler's argument `options` comes from the returns of the middlewares, which can also supplement, transform the `input` argument.
-All inputs and outputs are validated against their object schemas and `ResultHandler` handles the output or possible validation errors.
+The object being validated is the `request.query` for GET request, the `request.body` for PUT, PATCH and POST requests, or their merging for DELETE requests.
+
+Middlewares can handle validated inputs and the original `request`, for example, to perform the authentication.
+The returns of middlewares are combined into `options` parameter available to the next middlewares and the endpoint's handler.
+
+The endpoint parameter `input` combines the validated inputs of all connected middlewares along with its own.
+The result that the handler returns goes to the `ResultHandler` which is responsible for transmission of the final response or possible error.
+
+All inputs and outputs are validated and there are also advanced powerful features for schema validation like transformations and refinements.
+The diagram below can give you a better idea of the dataflow.
 
 ![Dataflow](dataflow.svg)
 
@@ -297,7 +302,7 @@ const output = z.object({
 
 endpointsFactory.build({
   methods, input, output,
-  handler: async (): Promise<z.infer<typeof output>> => ({
+  handler: async (): Promise<z.input<typeof output>> => ({
     anything: 123,
     excessive: 'something' // error TS2322, ok!
   })
