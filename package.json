@@ -1,6 +1,6 @@
 {
   "name": "express-zod-api",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "Express Zod API",
   "license": "MIT",
   "scripts": {
