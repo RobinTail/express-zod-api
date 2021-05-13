@@ -6,6 +6,7 @@
 - Readme file updates:
   - Concept description update.
   - Excess property check according to the new features of version 0.7.0.
+- Refactoring of `defaultResultHandler` and `ResultHandler` calls in `server.ts`.
 
 ### v0.7.0
 - Zod version is v3.0.0-beta.1
