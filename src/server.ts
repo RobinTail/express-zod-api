@@ -19,32 +19,29 @@ export function createServer(config: ConfigWithServer, routing: Routing): Server
   const logger = isLoggerConfig(config.logger) ? createLogger(config.logger) : config.logger;
   const app = express();
   const resultHandler = config.resultHandler || defaultResultHandler;
-
-  app.use([
-    config.server.jsonParser || express.json(),
-    (error, request, response, next) => {
-      if (error) {
-        resultHandler({
-          error, request, response, logger,
-          input: request.body,
-          output: null
-        });
-      } else {
-        next();
-      }
+  const jsonParserMiddleware = config.server.jsonParser || express.json();
+  const jsonFailureMiddleware: express.ErrorRequestHandler = (error, request, response, next) => {
+    if (error) {
+      return resultHandler({
+        error, request, response, logger,
+        input: request.body,
+        output: null
+      });
     }
-  ]);
-
-  initRouting({app, routing, logger, config});
-
-  app.use((request, response) => {
+    next();
+  };
+  const lastResortHandler: express.RequestHandler = (request, response) => {
     resultHandler({
       request, response, logger,
       error: createHttpError(404, `Can not ${request.method} ${request.path}`),
       input: null,
       output: null
     });
-  });
+  };
+
+  app.use([ jsonParserMiddleware, jsonFailureMiddleware ]);
+  initRouting({app, routing, logger, config});
+  app.use(lastResortHandler);
 
   return app.listen(config.server.listen, () => {
     logger.info(`Listening ${config.server.listen}`);
