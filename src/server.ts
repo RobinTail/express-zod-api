@@ -21,14 +21,12 @@ export function createServer(config: ConfigWithServer, routing: Routing): Server
   const resultHandler = config.resultHandler || defaultResultHandler;
   const jsonParserMiddleware = config.server.jsonParser || express.json();
   const jsonFailureMiddleware: express.ErrorRequestHandler = (error, request, response, next) => {
-    if (error) {
-      return resultHandler({
-        error, request, response, logger,
-        input: request.body,
-        output: null
-      });
-    }
-    next();
+    if (!error) { return next(); }
+    return resultHandler({
+      error, request, response, logger,
+      input: request.body,
+      output: null
+    });
   };
   const lastResortHandler: express.RequestHandler = (request, response) => {
     resultHandler({
