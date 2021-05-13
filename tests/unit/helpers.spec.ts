@@ -2,7 +2,8 @@ import {
   combineEndpointAndMiddlewareInputSchemas,
   extractObjectSchema,
   getInitialInput,
-  getMessageFromError, getStatusCodeFromError,
+  getMessageFromError,
+  getStatusCodeFromError,
   isLoggerConfig
 } from '../../src/helpers';
 import {createMiddleware, z, createHttpError} from '../../src';
