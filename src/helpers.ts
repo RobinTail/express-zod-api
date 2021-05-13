@@ -1,4 +1,5 @@
 import {Request} from 'express';
+import {HttpError} from 'http-errors';
 import {z} from 'zod';
 import {LoggerConfig, loggerLevels} from './config-type';
 import {MiddlewareDefinition} from './middleware';
@@ -77,4 +78,21 @@ export function isLoggerConfig(logger: any): logger is LoggerConfig {
     'level' in logger && 'color' in logger &&
     Object.keys(loggerLevels).includes(logger.level) &&
     typeof logger.color === 'boolean';
+}
+
+export function getMessageFromError(error: Error): string {
+  return error instanceof z.ZodError
+    ? error.issues.map(({path, message}) =>
+      `${path.join('/')}: ${message}`).join('; ')
+    : error.message;
+}
+
+export function getStatusCodeFromError(error: Error): number {
+  if (error instanceof HttpError) {
+    return error.statusCode;
+  }
+  if (error instanceof z.ZodError) {
+    return 400;
+  }
+  return 500;
 }
