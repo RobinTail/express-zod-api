@@ -48,6 +48,11 @@
     "type": "git",
     "url": "https://github.com/RobinTail/express-zod-api.git"
   },
+  "author": {
+    "name": "Anna Bocharova",
+    "url": "https://robintail.cz",
+    "email": "me@robintail.cz"
+  },
   "keywords": [
     "typescript",
     "api",
