@@ -224,21 +224,20 @@ Since parameters of GET requests come in the form of strings, there is often a n
 ```typescript
 import {z} from 'express-zod-api';
 
-const getUserEndpoint = endpointsFactory
-  .build({
-    methods: ['get'],
-    input: z.object({
-      id: z.string().transform((id) => parseInt(id, 10)),
-      ids: z.string().transform(
-        (ids) => ids.split(',').map((id) => parseInt(id, 10))
-      )
-    }),
-    output: z.object({...}),
-    handler: async ({input: {id, ids}, logger}) => {
-      logger.debug('id', id); // type: number
-      logger.debug('ids', ids); // type: number[]
-    }
-  });
+const getUserEndpoint = endpointsFactory.build({
+  methods: ['get'],
+  input: z.object({
+    id: z.string().transform((id) => parseInt(id, 10)),
+    ids: z.string().transform(
+      (ids) => ids.split(',').map((id) => parseInt(id, 10))
+    )
+  }),
+  output: z.object({...}),
+  handler: async ({input: {id, ids}, logger}) => {
+    logger.debug('id', id); // type: number
+    logger.debug('ids', ids); // type: number[]
+  }
+});
 ```
 
 ## ResultHandler
