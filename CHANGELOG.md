@@ -2,6 +2,12 @@
 
 ## Version 0
 
+### v0.7.2
+- Readme file updates:
+  - Transformations
+  - `ResultHandler`
+  - better examples
+
 ### v0.7.1
 - Readme file updates:
   - Concept description update.
