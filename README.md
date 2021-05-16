@@ -101,7 +101,7 @@ const config: ConfigType = {
   }
 };
 ```
-*See `config-type.d.ts` for all available options.*
+*See all available options [here](https://github.com/RobinTail/express-zod-api/blob/master/src/config-type.ts).*
 
 ## Create an endpoints factory
 
@@ -243,7 +243,7 @@ const getUserEndpoint = endpointsFactory
 
 ## ResultHandler
 
-`ResultHandler` is the type of function that is responsible for transmission of the final response or possible error.
+`ResultHandler` is the [type](https://github.com/RobinTail/express-zod-api/blob/master/src/result-handler.ts) of function that is responsible for transmission of the final response or possible error.
 The `defaultResultHandler` sets the HTTP status code and ensures the following type of the response:
 
 ```typescript
