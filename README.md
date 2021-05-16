@@ -1,6 +1,14 @@
-# Express Zod API ![CI](https://github.com/RobinTail/express-zod-api/actions/workflows/node.js.yml/badge.svg)
+# Express Zod API 
 
 ![logo](logo.svg)
+
+![CI](https://github.com/RobinTail/express-zod-api/actions/workflows/node.js.yml/badge.svg)
+![Swagger Validator](https://img.shields.io/swagger/valid/3.0?specUrl=https%3A%2F%2Fraw.githubusercontent.com%2FRobinTail%2Fexpress-zod-api%2Fmaster%2Fexample%2Fexample.swagger.yaml)
+![License](https://img.shields.io/npm/l/express-zod-api)
+
+![downloads](https://img.shields.io/npm/dw/express-zod-api)
+![npm release](https://img.shields.io/npm/v/express-zod-api?color=teal&label=latest)
+![GitHub Repo stars](https://img.shields.io/github/stars/RobinTail/express-zod-api)
 
 Start your API server with I/O schema validation and custom middlewares in minutes.
 
@@ -16,8 +24,10 @@ Start your API server with I/O schema validation and custom middlewares in minut
 5. [Advanced usage](#advanced-usage)
    1. [Create a middleware](#create-a-middleware)
    2. [Refinements](#refinements)
-   3. [Your custom logger](#your-custom-logger)
-   4. [Your custom server](#your-custom-server)
+   3. [Transformations](#transformations)
+   4. [ResultHandler](#resulthandler)   
+   5. [Your custom logger](#your-custom-logger)
+   6. [Your custom server](#your-custom-server)
 6. [Disclosing API specifications](#disclosing-api-specifications)
    1. [Reusing endpoint types on your frontend](#reusing-endpoint-types-on-your-frontend)
    2. [Swagger / OpenAPI Specification](#swagger--openapi-specification)
@@ -91,7 +101,7 @@ const config: ConfigType = {
   }
 };
 ```
-*See `config-type.d.ts` for all available options.*
+*See all available options [here](https://github.com/RobinTail/express-zod-api/blob/master/src/config-type.ts).*
 
 ## Create an endpoints factory
 
@@ -108,21 +118,21 @@ You can also instantly add middlewares to it using `.addMiddleware()` method.
 ```typescript
 import {z} from 'express-zod-api';
 
-const getUserEndpoint = endpointsFactory
-  .build({
-    methods: ['get'],
-    input: z.object({
-      id: z.string().transform((id) => parseInt(id, 10))
-    }),
-    output: z.object({
-      name: z.string(),
-    }),
-    handler: async ({input: {id}, options, logger}) => {
-      logger.debug(`Requested id: ${id}`); // here id is a number
-      logger.debug('Options:', options);
-      return { name: 'John Doe' };
-    }
-  });
+const setUserEndpoint = endpointsFactory.build({
+  methods: ['post'],
+  input: z.object({
+    id: z.number(),
+    name: z.string,
+  }),
+  output: z.object({
+    timestamp: z.number(),
+  }),
+  handler: async ({input: {id, name}, options, logger}) => {
+    logger.debug(`Requested id: ${id}`);
+    logger.debug('Options:', options); // provided by middlewares
+    return { timestamp: Date.now() };
+  }
+});
 ```
 
 You can add middlewares to the endpoint by using `.addMiddleware()` before `.build()`.
@@ -134,11 +144,11 @@ import {Routing} from 'express-zod-api';
 
 const routing: Routing = {
   v1: {
-    getUser: getUserEndpoint
+    setUser: setUserEndpoint
   }
 };
 ```
-This implementation sets up `getUserEndpoint` to handle requests to the `/v1/getUser` path.  
+This implementation sets up `setUserEndpoint` to handle requests to the `/v1/setUser` path.
 
 ## Start your server
 
@@ -152,15 +162,17 @@ createServer(config, routing);
 ## Create a middleware
 
 You can create middlewares separately using `createMiddleware()` function and connect them later.
-All returns of the connected middlewares are put in `options` argument of the endpoint handler.
-All middleware inputs are also available as the endpoint inputs.
+All returns of the connected middlewares are combined into the `options` argument of the endpoint's handler.
+The inputs of middlewares are combined with the inputs of the endpoint's handler.
 
 ```typescript
 import {
   createMiddleware, z, Method, createHttpError
 } from 'express-zod-api';
 
-// This one provides the method of the request
+// This one provides the method of the request to your 
+// endpoint. It's useful for the ones that handle 
+// multiple types of request (GET, POST, ...)
 const methodProviderMiddleware = createMiddleware({
   input: z.object({}).nonstrict(),
   middleware: async ({request}) => ({
@@ -168,28 +180,30 @@ const methodProviderMiddleware = createMiddleware({
   })
 });
 
-// This one performs the authentication 
-// using key from the input and token from headers
+// This one performs the authentication using a key from 
+// the input and a token from headers. It supplies the
+// endpoint with a user from a database.
 const authMiddleware = createMiddleware({
   input: z.object({
     key: z.string().nonempty()
   }),
   middleware: async ({input: {key}, request, logger}) => {
     logger.debug('Checking the key and token...');
-    if (key !== '123') {
+    const user = await db.Users.findOne({key});
+    if (!user) {
       throw createHttpError(401, 'Invalid key');
     }
-    if (request.headers['token'] !== '456') {
+    if (request.headers['token'] !== user.token) {
       throw createHttpError(401, 'Invalid token');
     }
-    return {token: request.headers['token']};
+    return { user };
   }
 });
 ```
 
 ## Refinements
 
-You can also implement the validation inside the input schema:
+You can implement additional validation inside the schema:
 
 ```typescript
 import {createMiddleware, z} from 'express-zod-api';
@@ -203,6 +217,65 @@ const authMiddleware = createMiddleware({
 })
 ```
 
+## Transformations
+
+Since parameters of GET requests come in the form of strings, there is often a need to transform them into numbers or arrays of numbers.
+
+```typescript
+import {z} from 'express-zod-api';
+
+const getUserEndpoint = endpointsFactory
+  .build({
+    methods: ['get'],
+    input: z.object({
+      id: z.string().transform((id) => parseInt(id, 10)),
+      ids: z.string().transform(
+        (ids) => ids.split(',').map((id) => parseInt(id, 10))
+      )
+    }),
+    output: z.object({...}),
+    handler: async ({input: {id, ids}, logger}) => {
+      logger.debug('id', id); // type: number
+      logger.debug('ids', ids); // type: number[]
+    }
+  });
+```
+
+## ResultHandler
+
+`ResultHandler` is the [type](https://github.com/RobinTail/express-zod-api/blob/master/src/result-handler.ts) of function that is responsible for transmission of the final response or possible error.
+The `defaultResultHandler` sets the HTTP status code and ensures the following type of the response:
+
+```typescript
+type ApiResponse<T> = {
+  status: 'success',
+  data: T
+} | {
+  status: 'error',
+  error: {
+    message: string;
+  }
+};
+```
+
+You have two options to customize the `ResultHandler`: globally or at the endpoint level:
+
+```typescript
+import {ConfigType, ResultHandler} from 'express-zod-api';
+
+const resultHandler: ResultHandler = 
+  ({error, input, output, request, response, logger}) => {};
+
+const config: ConfigType = { resultHandler, ... };
+
+// or
+import {EndpointsFactory} from 'express-zod-api';
+
+const endpointsFactory = new EndpointsFactory().setResultHandler(
+  ({error, input, output, request, response, logger}) => {}
+);
+```
+
 ## Your custom logger
 
 You can specify your custom Winston logger in config:
@@ -212,18 +285,15 @@ import * as winston from 'winston';
 import {ConfigType, createServer} from 'express-zod-api';
 
 const config: ConfigType = {
-   logger: winston.createLogger(),
-   ...
+  logger: winston.createLogger(),
+  ...
 };
 createServer(config, routing);
 ```
 
 ## Your custom server
 
-You can instantiate your own express app and connect your endpoints the following way. **Please note** that in this case you probably need to:
-- parse `request.body` yourself;
-- call `app.listen()` yourself;
-- handle `404` errors yourself;
+You can instantiate your own express app and connect your endpoints the following way.
 
 ```typescript
 import * as express from 'express';
@@ -237,22 +307,24 @@ attachRouting(config, routing);
 app.listen();
 ```
 
+**Please note** that in this case you probably need to: parse `request.body`, call `app.listen()` and handle `404` errors yourself;
+
 # Disclosing API specifications
 ## Reusing endpoint types on your frontend
 
 You can export only the types of your endpoints for your front-end:
 
 ```typescript
-export type GetUserEndpoint = typeof getUserEndpoint;
+export type MyEndpointType = typeof endpoint;
 ```
 
 Then use provided helpers to obtain their input and output types:
 ```typescript
 import {EndpointInput, EndpointOutput} from 'express-zod-api';
-import {GetUserEndpoint, GetUserEndpoint} from '../your/backend';
+import {MyEndpointType} from '../your/backend';
 
-type GetUserEndpointInput = EndpointInput<GetUserEndpoint>;
-type GetUserEndpointOutput = EndpointOutput<GetUserEndpoint>;
+type MyEndpointInput = EndpointInput<MyEndpointType>;
+type MyEndpointOutput = EndpointOutput<MyEndpointType>;
 ```
 
 ## Swagger / OpenAPI Specification

@@ -1,7 +1,7 @@
 {
   "name": "express-zod-api",
   "version": "0.7.1",
-  "description": "Express Zod API",
+  "description": "A Typescript library to help you get an API server up and running with I/O schema validation and custom middlewares in minutes.",
   "license": "MIT",
   "scripts": {
     "start": "ts-node example/index.ts",
@@ -47,6 +47,11 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/RobinTail/express-zod-api.git"
+  },
+  "author": {
+    "name": "Anna Bocharova",
+    "url": "https://robintail.cz",
+    "email": "me@robintail.cz"
   },
   "keywords": [
     "typescript",
