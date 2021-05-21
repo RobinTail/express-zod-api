@@ -1,5 +1,13 @@
 # Changelog
 
+## Version 1
+
+### v1.0.0
+
+- First version based on the stable Zod release.
+- Zod version is v3.0.2.
+- Other dependencies has been upgraded to the latest versions as well.
+
 ## Version 0
 
 ### v0.7.2
@@ -15,7 +23,7 @@
 - Refactoring of `defaultResultHandler` and `ResultHandler` calls in `server.ts`.
 
 ### v0.7.0
-- Zod version is v3.0.0-beta.1
+- Zod version is v3.0.0-beta.1.
 - Ability to use z.ZodIntersection and z.ZodUnion as an I/O schema for handlers and middlewares.
 ```typescript
 // example
@@ -80,7 +88,7 @@ export type ConfigType = ({
   logger: LoggerConfig | Logger;
 }
 ```
-- More convenient way to attach routing to your custom express app
+- More convenient way to attach routing to your custom express app:
 ```typescript
 // before
 initRouting({app, logger, config, routing});
@@ -90,12 +98,12 @@ attachRouting(config, routing);
 ```
 
 ### v0.4.1
-- Minor Readme file fixes and clarifications
-- Nice dataflow diagram
+- Minor Readme file fixes and clarifications.
+- Nice dataflow diagram.
 
 ### v0.4.0
-- Ability to specify your custom Winston logger in config
-- `createLogger()` now accepts `LoggerConfig` as an argument
+- Ability to specify your custom Winston logger in config.
+- `createLogger()` now accepts `LoggerConfig` as an argument:
 
 ```typescript
 // before
@@ -105,10 +113,10 @@ createLogger(config.logger);
 ```
 
 ### v0.3.1
-- Minor Readme file fixes and clarifications
+- Minor Readme file fixes and clarifications.
 
 ### v0.3.0
-- Zod version is v3.0.0-alpha33
+- Zod version is v3.0.0-alpha33.
 - The syntax for generating the Swagger/OpenAPI specification has changed:
 ```typescript
 // before
@@ -118,8 +126,8 @@ new OpenAPI().builder.getSpecAsYaml();
 ```
 
 ### v0.2.4
-- Refactoring of Endpoint::execute() method
+- Refactoring of Endpoint::execute() method.
 
 ### v0.2.3 & v0.2.2
-- First published release
-- Zod version is v3.0.0-alpha4
+- First published release.
+- Zod version is v3.0.0-alpha4.

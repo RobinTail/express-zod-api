@@ -61,7 +61,7 @@ const describeSchema = (value: z.ZodTypeAny, isResponse: boolean): SchemaObject 
     case value instanceof z.ZodEffects:
       return {
         ...otherProps,
-        ...describeTransformation(value, isResponse)
+        ...describeTransformation(value as z.ZodEffects<any> | z.ZodTransformer<any>, isResponse)
       };
     case value instanceof z.ZodOptional:
     case value instanceof z.ZodNullable:
