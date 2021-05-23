@@ -10,3 +10,4 @@ yarn-error.log
 dataflow.svg
 logo.svg
 .eslintrc.json
+generate-license.ts
