@@ -2,6 +2,10 @@
 
 ## Version 1
 
+### v1.1.0
+
+- Zod version is v3.1.0.
+
 ### v1.0.0
 
 - First version based on the stable Zod release.
