@@ -25,11 +25,7 @@ Object {
   },
   "one": ZodString {
     "_def": Object {
-      "isEmail": false,
-      "isURL": false,
-      "isUUID": false,
-      "maxLength": null,
-      "minLength": null,
+      "checks": Array [],
     },
     "_parseInternalOptionalParams": [Function],
     "_parseWithInvalidFallback": [Function],
@@ -81,9 +77,7 @@ Object {
   },
   "two": ZodNumber {
     "_def": Object {
-      "isInteger": false,
-      "maximum": null,
-      "minimum": null,
+      "checks": Array [],
     },
     "_parseInternalOptionalParams": [Function],
     "_parseWithInvalidFallback": [Function],
@@ -118,11 +112,7 @@ exports[`Helpers combineEndpointAndMiddlewareInputSchemas() Should merge interse
 Object {
   "five": ZodString {
     "_def": Object {
-      "isEmail": false,
-      "isURL": false,
-      "isUUID": false,
-      "maxLength": null,
-      "minLength": null,
+      "checks": Array [],
     },
     "_parseInternalOptionalParams": [Function],
     "_parseWithInvalidFallback": [Function],
@@ -174,11 +164,7 @@ Object {
   },
   "one": ZodString {
     "_def": Object {
-      "isEmail": false,
-      "isURL": false,
-      "isUUID": false,
-      "maxLength": null,
-      "minLength": null,
+      "checks": Array [],
     },
     "_parseInternalOptionalParams": [Function],
     "_parseWithInvalidFallback": [Function],
@@ -209,9 +195,7 @@ Object {
   },
   "six": ZodNumber {
     "_def": Object {
-      "isInteger": false,
-      "maximum": null,
-      "minimum": null,
+      "checks": Array [],
     },
     "_parseInternalOptionalParams": [Function],
     "_parseWithInvalidFallback": [Function],
@@ -262,9 +246,7 @@ Object {
   },
   "two": ZodNumber {
     "_def": Object {
-      "isInteger": false,
-      "maximum": null,
-      "minimum": null,
+      "checks": Array [],
     },
     "_parseInternalOptionalParams": [Function],
     "_parseWithInvalidFallback": [Function],
@@ -299,11 +281,7 @@ exports[`Helpers combineEndpointAndMiddlewareInputSchemas() Should merge mixed o
 Object {
   "five": ZodString {
     "_def": Object {
-      "isEmail": false,
-      "isURL": false,
-      "isUUID": false,
-      "maxLength": null,
-      "minLength": null,
+      "checks": Array [],
     },
     "_parseInternalOptionalParams": [Function],
     "_parseWithInvalidFallback": [Function],
@@ -377,11 +355,7 @@ Object {
   },
   "one": ZodString {
     "_def": Object {
-      "isEmail": false,
-      "isURL": false,
-      "isUUID": false,
-      "maxLength": null,
-      "minLength": null,
+      "checks": Array [],
     },
     "_parseInternalOptionalParams": [Function],
     "_parseWithInvalidFallback": [Function],
@@ -455,9 +429,7 @@ Object {
   },
   "two": ZodNumber {
     "_def": Object {
-      "isInteger": false,
-      "maximum": null,
-      "minimum": null,
+      "checks": Array [],
     },
     "_parseInternalOptionalParams": [Function],
     "_parseWithInvalidFallback": [Function],
@@ -494,11 +466,7 @@ Object {
     "_def": Object {
       "innerType": ZodString {
         "_def": Object {
-          "isEmail": false,
-          "isURL": false,
-          "isUUID": false,
-          "maxLength": null,
-          "minLength": null,
+          "checks": Array [],
         },
         "_parseInternalOptionalParams": [Function],
         "_parseWithInvalidFallback": [Function],
@@ -594,11 +562,7 @@ Object {
     "_def": Object {
       "innerType": ZodString {
         "_def": Object {
-          "isEmail": false,
-          "isURL": false,
-          "isUUID": false,
-          "maxLength": null,
-          "minLength": null,
+          "checks": Array [],
         },
         "_parseInternalOptionalParams": [Function],
         "_parseWithInvalidFallback": [Function],
@@ -651,9 +615,7 @@ Object {
     "_def": Object {
       "innerType": ZodNumber {
         "_def": Object {
-          "isInteger": false,
-          "maximum": null,
-          "minimum": null,
+          "checks": Array [],
         },
         "_parseInternalOptionalParams": [Function],
         "_parseWithInvalidFallback": [Function],
@@ -748,9 +710,7 @@ Object {
     "_def": Object {
       "innerType": ZodNumber {
         "_def": Object {
-          "isInteger": false,
-          "maximum": null,
-          "minimum": null,
+          "checks": Array [],
         },
         "_parseInternalOptionalParams": [Function],
         "_parseWithInvalidFallback": [Function],
@@ -805,11 +765,7 @@ exports[`Helpers extractObjectSchema() should pass the object schema through 1`]
 Object {
   "one": ZodString {
     "_def": Object {
-      "isEmail": false,
-      "isURL": false,
-      "isUUID": false,
-      "maxLength": null,
-      "minLength": null,
+      "checks": Array [],
     },
     "_parseInternalOptionalParams": [Function],
     "_parseWithInvalidFallback": [Function],
@@ -845,11 +801,7 @@ exports[`Helpers extractObjectSchema() should return object schema for the inter
 Object {
   "one": ZodString {
     "_def": Object {
-      "isEmail": false,
-      "isURL": false,
-      "isUUID": false,
-      "maxLength": null,
-      "minLength": null,
+      "checks": Array [],
     },
     "_parseInternalOptionalParams": [Function],
     "_parseWithInvalidFallback": [Function],
@@ -880,9 +832,7 @@ Object {
   },
   "two": ZodNumber {
     "_def": Object {
-      "isInteger": false,
-      "maximum": null,
-      "minimum": null,
+      "checks": Array [],
     },
     "_parseInternalOptionalParams": [Function],
     "_parseWithInvalidFallback": [Function],
@@ -919,11 +869,7 @@ Object {
     "_def": Object {
       "innerType": ZodString {
         "_def": Object {
-          "isEmail": false,
-          "isURL": false,
-          "isUUID": false,
-          "maxLength": null,
-          "minLength": null,
+          "checks": Array [],
         },
         "_parseInternalOptionalParams": [Function],
         "_parseWithInvalidFallback": [Function],
@@ -976,9 +922,7 @@ Object {
     "_def": Object {
       "innerType": ZodNumber {
         "_def": Object {
-          "isInteger": false,
-          "maximum": null,
-          "minimum": null,
+          "checks": Array [],
         },
         "_parseInternalOptionalParams": [Function],
         "_parseWithInvalidFallback": [Function],

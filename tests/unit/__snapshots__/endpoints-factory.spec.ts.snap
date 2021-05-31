@@ -4,9 +4,7 @@ exports[`EndpointsFactory .build() Should create an endpoint with intersection m
 Object {
   "n1": ZodNumber {
     "_def": Object {
-      "isInteger": false,
-      "maximum": null,
-      "minimum": null,
+      "checks": Array [],
     },
     "_parseInternalOptionalParams": [Function],
     "_parseWithInvalidFallback": [Function],
@@ -36,9 +34,7 @@ Object {
   },
   "n2": ZodNumber {
     "_def": Object {
-      "isInteger": false,
-      "maximum": null,
-      "minimum": null,
+      "checks": Array [],
     },
     "_parseInternalOptionalParams": [Function],
     "_parseWithInvalidFallback": [Function],
@@ -68,11 +64,7 @@ Object {
   },
   "s": ZodString {
     "_def": Object {
-      "isEmail": false,
-      "isURL": false,
-      "isUUID": false,
-      "maxLength": null,
-      "minLength": null,
+      "checks": Array [],
     },
     "_parseInternalOptionalParams": [Function],
     "_parseWithInvalidFallback": [Function],
@@ -134,9 +126,7 @@ exports[`EndpointsFactory .build() Should create an endpoint with simple middlew
 Object {
   "n": ZodNumber {
     "_def": Object {
-      "isInteger": false,
-      "maximum": null,
-      "minimum": null,
+      "checks": Array [],
     },
     "_parseInternalOptionalParams": [Function],
     "_parseWithInvalidFallback": [Function],
@@ -166,11 +156,7 @@ Object {
   },
   "s": ZodString {
     "_def": Object {
-      "isEmail": false,
-      "isURL": false,
-      "isUUID": false,
-      "maxLength": null,
-      "minLength": null,
+      "checks": Array [],
     },
     "_parseInternalOptionalParams": [Function],
     "_parseWithInvalidFallback": [Function],
@@ -234,9 +220,7 @@ Object {
     "_def": Object {
       "innerType": ZodNumber {
         "_def": Object {
-          "isInteger": false,
-          "maximum": null,
-          "minimum": null,
+          "checks": Array [],
         },
         "_parseInternalOptionalParams": [Function],
         "_parseWithInvalidFallback": [Function],
@@ -288,9 +272,7 @@ Object {
     "_def": Object {
       "innerType": ZodNumber {
         "_def": Object {
-          "isInteger": false,
-          "maximum": null,
-          "minimum": null,
+          "checks": Array [],
         },
         "_parseInternalOptionalParams": [Function],
         "_parseWithInvalidFallback": [Function],
@@ -340,11 +322,7 @@ Object {
   },
   "s": ZodString {
     "_def": Object {
-      "isEmail": false,
-      "isURL": false,
-      "isUUID": false,
-      "maxLength": null,
-      "minLength": null,
+      "checks": Array [],
     },
     "_parseInternalOptionalParams": [Function],
     "_parseWithInvalidFallback": [Function],
