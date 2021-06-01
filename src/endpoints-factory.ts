@@ -33,18 +33,19 @@ export class EndpointsFactory<mIN, mOUT> {
     );
   }
 
-  public build<IN extends IOSchema, OUT extends IOSchema>({methods, input, output, handler}: {
+  public build<IN extends IOSchema, OUT extends IOSchema>({methods, input, output, handler, description}: {
     methods: Method[],
     input: IN,
     output: OUT,
-    handler: Handler<z.output<Merge<IN, mIN>>, z.input<OUT>, mOUT>
+    handler: Handler<z.output<Merge<IN, mIN>>, z.input<OUT>, mOUT>,
+    description?: string
   }) {
     return new Endpoint<IN, OUT, mIN, mOUT>({
-      methods, handler,
+      methods, handler, description,
       middlewares: this.middlewares,
       inputSchema: input,
       outputSchema: output,
-      resultHandler: this.resultHandler
+      resultHandler: this.resultHandler,
     });
   }
 }
