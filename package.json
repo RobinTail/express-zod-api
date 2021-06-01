@@ -9,7 +9,7 @@
     "build:cleanup": "rm -rf ./dist && rm -f example/example.swagger.yaml && rm -f ./LICENSE",
     "build:compile": "tsc",
     "build:swagger": "ts-node example/generate-open-api-schema.ts > example/example.swagger.yaml",
-    "build:license": "ts-node generate-license.ts > ./LICENSE",
+    "build:license": "ts-node tools/generate-license.ts > ./LICENSE",
     "test": "yarn test:unit && yarn test:system",
     "test:unit": "yarn jest --verbose ./tests/unit",
     "test:system": "yarn jest --verbose --detectOpenHandles --forceExit ./tests/system",

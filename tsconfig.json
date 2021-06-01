@@ -9,10 +9,5 @@
     "outDir": "./dist",
     "resolveJsonModule": true
   },
-  "exclude": [
-    "node_modules",
-    "example",
-    "tests",
-    "generate-license.ts"
-  ]
+  "include": ["./src/*.ts"]
 }
