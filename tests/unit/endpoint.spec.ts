@@ -26,6 +26,18 @@ describe('Endpoint', () => {
       });
       expect(endpointMock.getMethods()).toEqual(['get', 'post', 'put', 'delete', 'patch']);
     });
+
+    test('Should return the array for a single method also', () => {
+      const endpointMock = new Endpoint({
+        method: 'patch',
+        inputSchema: z.object({}).nonstrict(),
+        outputSchema: z.object({}).nonstrict(),
+        handler: jest.fn(),
+        resultHandler: jest.fn(),
+        middlewares: []
+      });
+      expect(endpointMock.getMethods()).toEqual(['patch']);
+    });
   });
 
   describe('.execute()', () => {

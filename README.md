@@ -118,7 +118,7 @@ You can also instantly add middlewares to it using `.addMiddleware()` method.
 import {z} from 'express-zod-api';
 
 const setUserEndpoint = endpointsFactory.build({
-  methods: ['post'],
+  method: 'post',
   input: z.object({
     id: z.number(),
     name: z.string,
@@ -134,7 +134,8 @@ const setUserEndpoint = endpointsFactory.build({
 });
 ```
 
-You can add middlewares to the endpoint by using `.addMiddleware()` before `.build()`.
+The endpoint can also handle multiple types of requests, this feature is available by replacing `method` property to `methods` and assigning an array to it.
+You can also add middlewares to the endpoint by using `.addMiddleware()` before `.build()`.
 
 ## Set up routing
 
@@ -224,7 +225,7 @@ Since parameters of GET requests come in the form of strings, there is often a n
 import {z} from 'express-zod-api';
 
 const getUserEndpoint = endpointsFactory.build({
-  methods: ['get'],
+  method: 'get',
   input: z.object({
     id: z.string().transform((id) => parseInt(id, 10)),
     ids: z.string().transform(

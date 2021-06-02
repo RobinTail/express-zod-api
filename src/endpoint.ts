@@ -41,6 +41,19 @@ export type EndpointInput<T> = T extends Endpoint<infer IN, any, infer mIN, any>
 
 export type EndpointOutput<T> = T extends Endpoint<any, infer OUT, any, any> ? z.output<OUT> : never;
 
+type EndpointProps<IN extends IOSchema, OUT extends IOSchema, mIN, OPT> = {
+  middlewares: MiddlewareDefinition<any, any, any>[];
+  inputSchema: IN;
+  outputSchema: OUT;
+  handler: Handler<z.output<Merge<IN, mIN>>, z.input<OUT>, OPT>;
+  resultHandler: ResultHandler | null;
+  description?: string;
+} & ({
+  methods: Method[];
+} | {
+  method: Method;
+});
+
 /** mIN, OPT - from Middlewares */
 export class Endpoint<IN extends IOSchema, OUT extends IOSchema, mIN, OPT> extends AbstractEndpoint {
   protected middlewares: MiddlewareDefinition<any, any, any>[] = [];
@@ -49,17 +62,11 @@ export class Endpoint<IN extends IOSchema, OUT extends IOSchema, mIN, OPT> exten
   protected handler: Handler<z.output<Merge<IN, mIN>>, z.input<OUT>, OPT>
   protected resultHandler: ResultHandler | null;
 
-  constructor({methods, middlewares, inputSchema, outputSchema, handler, resultHandler, description}: {
-    methods: Method[];
-    middlewares: MiddlewareDefinition<any, any, any>[],
-    inputSchema: IN,
-    outputSchema: OUT,
-    handler: Handler<z.output<Merge<IN, mIN>>, z.input<OUT>, OPT>
-    resultHandler: ResultHandler | null,
-    description?: string
-  }) {
+  constructor({
+    middlewares, inputSchema, outputSchema, handler, resultHandler, description, ...rest
+  }: EndpointProps<IN, OUT, mIN, OPT>) {
     super();
-    this.methods = methods;
+    this.methods = 'methods' in rest ? rest.methods : [rest.method];
     this.middlewares = middlewares;
     this.inputSchema = combineEndpointAndMiddlewareInputSchemas<IN, mIN>(inputSchema, middlewares);
     this.outputSchema = outputSchema;

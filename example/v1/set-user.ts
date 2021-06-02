@@ -7,7 +7,7 @@ enum Status {
 }
 
 export const setUserEndpoint = keyAndTokenAuthenticatedEndpointsFactory.build({
-  methods: ['post'],
+  method: 'post',
   description: 'example user update endpoint',
   input: z.object({
     id: z.number().int().nonnegative(),
