@@ -1,6 +1,7 @@
 import {z} from 'zod';
-import {Endpoint, Handler, Method} from './endpoint';
+import {Endpoint, Handler} from './endpoint';
 import {FlatObject, IOSchema, Merge} from './helpers';
+import {MethodsDefinition} from './method';
 import {MiddlewareDefinition} from './middleware';
 import {ResultHandler} from './result-handler';
 
@@ -9,11 +10,7 @@ type BuildProps<IN extends IOSchema, OUT extends IOSchema, mIN, mOUT> = {
   output: OUT;
   handler: Handler<z.output<Merge<IN, mIN>>, z.input<OUT>, mOUT>;
   description?: string;
-} & ({
-  methods: Method[];
-} | {
-  method: Method;
-});
+} & MethodsDefinition;
 
 /** mIN, mOUT - accumulated from all middlewares */
 export class EndpointsFactory<mIN, mOUT> {

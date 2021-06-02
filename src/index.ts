@@ -1,5 +1,6 @@
 export { ConfigType, LoggerConfig } from './config-type';
-export { AbstractEndpoint, Method, EndpointInput, EndpointOutput } from './endpoint';
+export { AbstractEndpoint, EndpointInput, EndpointOutput } from './endpoint';
+export { Method } from './method';
 export { EndpointsFactory } from './endpoints-factory';
 export { IOSchema, FlatObject } from './helpers';
 export { createLogger } from './logger';

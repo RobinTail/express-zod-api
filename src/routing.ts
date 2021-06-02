@@ -1,7 +1,8 @@
 import {Express} from 'express';
 import {Logger} from 'winston';
 import {ConfigType} from './config-type';
-import {AbstractEndpoint, Method} from './endpoint';
+import {AbstractEndpoint} from './endpoint';
+import {Method} from './method';
 
 export interface Routing {
   [PATH: string]: AbstractEndpoint | Routing;

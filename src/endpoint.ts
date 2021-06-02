@@ -1,8 +1,9 @@
+import {Request, Response} from 'express';
 import {Logger} from 'winston';
 import {z} from 'zod';
 import {ConfigType} from './config-type';
 import {combineEndpointAndMiddlewareInputSchemas, getInitialInput, IOSchema, Merge} from './helpers';
-import {Request, Response} from 'express';
+import {Method, MethodsDefinition} from './method';
 import {MiddlewareDefinition} from './middleware';
 import {defaultResultHandler, ResultHandler} from './result-handler';
 
@@ -35,8 +36,6 @@ export abstract class AbstractEndpoint {
   abstract getOutputSchema(): IOSchema;
 }
 
-export type Method = 'get' | 'post' | 'put' | 'delete' | 'patch';
-
 export type EndpointInput<T> = T extends Endpoint<infer IN, any, infer mIN, any> ? z.input<Merge<IN, mIN>> : never;
 
 export type EndpointOutput<T> = T extends Endpoint<any, infer OUT, any, any> ? z.output<OUT> : never;
@@ -48,11 +47,7 @@ type EndpointProps<IN extends IOSchema, OUT extends IOSchema, mIN, OPT> = {
   handler: Handler<z.output<Merge<IN, mIN>>, z.input<OUT>, OPT>;
   resultHandler: ResultHandler | null;
   description?: string;
-} & ({
-  methods: Method[];
-} | {
-  method: Method;
-});
+} & MethodsDefinition;
 
 /** mIN, OPT - from Middlewares */
 export class Endpoint<IN extends IOSchema, OUT extends IOSchema, mIN, OPT> extends AbstractEndpoint {
