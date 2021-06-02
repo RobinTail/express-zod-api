@@ -2,6 +2,20 @@
 
 ## Version 1
 
+### v1.2.0
+
+- Ability to specify the endpoint description and [export it to the Swagger / OpenAPI specification](https://github.com/RobinTail/express-zod-api#swagger--openapi-specification).
+```typescript
+// example
+const endpoint = endpointsFactory.build({
+  methods: ['get'],
+  description: 'Here is an example description of the endpoint',
+  input: z.object({...}),
+  output: z.object({...}),
+  handler: async ({input, options, logger}) => {}
+});
+```
+
 ### v1.1.0
 
 - Zod version is v3.1.0.
