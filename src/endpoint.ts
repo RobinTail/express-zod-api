@@ -13,7 +13,8 @@ export type Handler<IN, OUT, OPT> = (params: {
 }) => Promise<OUT>;
 
 export abstract class AbstractEndpoint {
-  protected methods: Method[];
+  protected methods: Method[] = [];
+  protected description?: string;
 
   public abstract execute(params: {
     request: Request,
@@ -24,6 +25,10 @@ export abstract class AbstractEndpoint {
 
   public getMethods() {
     return this.methods;
+  }
+
+  public getDescription() {
+    return this.description;
   }
 
   abstract getInputSchema(): IOSchema;
@@ -44,13 +49,14 @@ export class Endpoint<IN extends IOSchema, OUT extends IOSchema, mIN, OPT> exten
   protected handler: Handler<z.output<Merge<IN, mIN>>, z.input<OUT>, OPT>
   protected resultHandler: ResultHandler | null;
 
-  constructor({methods, middlewares, inputSchema, outputSchema, handler, resultHandler}: {
+  constructor({methods, middlewares, inputSchema, outputSchema, handler, resultHandler, description}: {
     methods: Method[];
     middlewares: MiddlewareDefinition<any, any, any>[],
     inputSchema: IN,
     outputSchema: OUT,
     handler: Handler<z.output<Merge<IN, mIN>>, z.input<OUT>, OPT>
-    resultHandler: ResultHandler | null
+    resultHandler: ResultHandler | null,
+    description?: string
   }) {
     super();
     this.methods = methods;
@@ -59,6 +65,7 @@ export class Endpoint<IN extends IOSchema, OUT extends IOSchema, mIN, OPT> exten
     this.outputSchema = outputSchema;
     this.handler = handler;
     this.resultHandler = resultHandler;
+    this.description = description;
   }
 
   public getInputSchema(): IOSchema {

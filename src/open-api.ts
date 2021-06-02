@@ -187,6 +187,9 @@ export class OpenAPI {
           },
         }
       };
+      if (endpoint.getDescription()) {
+        operation.description = endpoint.getDescription();
+      }
       if (method === 'get') {
         operation.parameters = [];
         const subject = extractObjectSchema(endpoint.getInputSchema()).shape;
@@ -219,7 +222,7 @@ export class OpenAPI {
       }
       this.builder.addPath(fullPath, {
         ...(this.builder.rootDoc.paths?.[fullPath] || {}),
-        [method]: operation
+        [method]: operation,
       });
     });
   }

@@ -203,6 +203,7 @@ paths:
             application/json:
               schema:
                 $ref: \\"#/components/schemas/responseSchema1\\"
+      description: example user retrieval endpoint
       parameters:
         - $ref: \\"#/components/parameters/parameter1\\"
   /v1/setUser:
@@ -214,6 +215,7 @@ paths:
             application/json:
               schema:
                 $ref: \\"#/components/schemas/responseSchema2\\"
+      description: example user update endpoint
       requestBody:
         content:
           application/json:

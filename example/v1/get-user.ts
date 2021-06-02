@@ -11,6 +11,7 @@ export const getUserEndpoint = endpointsFactory
   .addMiddleware(methodProviderMiddleware)
   .build({
     methods: ['get'],
+    description: 'example user retrieval endpoint',
     input: z.object({
       id: z.string().transform((id) => parseInt(id, 10))
     }),

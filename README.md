@@ -46,8 +46,7 @@ Start your API server with I/O schema validation and custom middlewares in minut
 
 # Concept
 
-The API always operates object schemas for input and output.
-Starting with version 0.7.0, union and intersection of object schemas are also supported (`.or()`, `.and()`).
+The API always operates object schemas for input and output, including unions and intersections of object schemas (`.or()`, `.and()`).
 
 The object being validated is the `request.query` for GET request, the `request.body` for PUT, PATCH and POST requests, or their merging for DELETE requests.
 
