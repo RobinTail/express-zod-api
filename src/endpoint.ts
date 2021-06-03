@@ -13,8 +13,8 @@ export type Handler<IN, OUT, OPT> = (params: {
   logger: Logger
 }) => Promise<OUT>;
 
-export abstract class AbstractEndpoint {
-  protected methods: Method[] = [];
+export abstract class AbstractEndpoint<M extends Method> {
+  protected methods: M[] = [];
   protected description?: string;
 
   public abstract execute(params: {
@@ -36,21 +36,21 @@ export abstract class AbstractEndpoint {
   abstract getOutputSchema(): IOSchema;
 }
 
-export type EndpointInput<T> = T extends Endpoint<infer IN, any, infer mIN, any> ? z.input<Merge<IN, mIN>> : never;
+export type EndpointInput<T> = T extends Endpoint<infer IN, any, infer mIN, any, any> ? z.input<Merge<IN, mIN>> : never;
 
-export type EndpointOutput<T> = T extends Endpoint<any, infer OUT, any, any> ? z.output<OUT> : never;
+export type EndpointOutput<T> = T extends Endpoint<any, infer OUT, any, any, any> ? z.output<OUT> : never;
 
-type EndpointProps<IN extends IOSchema, OUT extends IOSchema, mIN, OPT> = {
+type EndpointProps<IN extends IOSchema, OUT extends IOSchema, mIN, OPT, M extends Method> = {
   middlewares: MiddlewareDefinition<any, any, any>[];
   inputSchema: IN;
   outputSchema: OUT;
   handler: Handler<z.output<Merge<IN, mIN>>, z.input<OUT>, OPT>;
   resultHandler: ResultHandler | null;
   description?: string;
-} & MethodsDefinition;
+} & MethodsDefinition<M>;
 
 /** mIN, OPT - from Middlewares */
-export class Endpoint<IN extends IOSchema, OUT extends IOSchema, mIN, OPT> extends AbstractEndpoint {
+export class Endpoint<IN extends IOSchema, OUT extends IOSchema, mIN, OPT, M extends Method> extends AbstractEndpoint<M> {
   protected middlewares: MiddlewareDefinition<any, any, any>[] = [];
   protected inputSchema: Merge<IN, mIN>; // combined with middlewares input
   protected outputSchema: OUT;
@@ -59,15 +59,19 @@ export class Endpoint<IN extends IOSchema, OUT extends IOSchema, mIN, OPT> exten
 
   constructor({
     middlewares, inputSchema, outputSchema, handler, resultHandler, description, ...rest
-  }: EndpointProps<IN, OUT, mIN, OPT>) {
+  }: EndpointProps<IN, OUT, mIN, OPT, M>) {
     super();
-    this.methods = 'methods' in rest ? rest.methods : [rest.method];
     this.middlewares = middlewares;
     this.inputSchema = combineEndpointAndMiddlewareInputSchemas<IN, mIN>(inputSchema, middlewares);
     this.outputSchema = outputSchema;
     this.handler = handler;
     this.resultHandler = resultHandler;
     this.description = description;
+    if ('methods' in rest) {
+      this.methods = rest.methods;
+    } else {
+      this.methods = [rest.method];
+    }
   }
 
   public getInputSchema(): IOSchema {
