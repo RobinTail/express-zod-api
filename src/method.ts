@@ -9,6 +9,8 @@ export type MethodsDefinition<M extends Method> = {
 };
 
 export class RouteMethods {
-  constructor(public readonly methods: Partial<{[K in Method]: Endpoint<any, any, any, any, K>}>) {
+  constructor(public readonly methods: Partial<{
+    [K in Method]: Endpoint<any, any, any, any, K>
+  }>) {
   }
 }
