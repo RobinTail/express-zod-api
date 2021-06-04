@@ -13,8 +13,7 @@ export type Handler<IN, OUT, OPT> = (params: {
   logger: Logger
 }) => Promise<OUT>;
 
-export abstract class AbstractEndpoint<M extends Method> {
-  protected methods: M[] = [];
+export abstract class AbstractEndpoint {
   protected description?: string;
 
   public abstract execute(params: {
@@ -24,14 +23,11 @@ export abstract class AbstractEndpoint<M extends Method> {
     config: ConfigType
   }): Promise<void>;
 
-  public getMethods() {
-    return this.methods;
-  }
-
   public getDescription() {
     return this.description;
   }
 
+  abstract getMethods(): Method[];
   abstract getInputSchema(): IOSchema;
   abstract getOutputSchema(): IOSchema;
 }
@@ -50,7 +46,8 @@ type EndpointProps<IN extends IOSchema, OUT extends IOSchema, mIN, OPT, M extend
 } & MethodsDefinition<M>;
 
 /** mIN, OPT - from Middlewares */
-export class Endpoint<IN extends IOSchema, OUT extends IOSchema, mIN, OPT, M extends Method> extends AbstractEndpoint<M> {
+export class Endpoint<IN extends IOSchema, OUT extends IOSchema, mIN, OPT, M extends Method> extends AbstractEndpoint {
+  protected methods: M[] = [];
   protected middlewares: MiddlewareDefinition<any, any, any>[] = [];
   protected inputSchema: Merge<IN, mIN>; // combined with middlewares input
   protected outputSchema: OUT;
@@ -74,11 +71,15 @@ export class Endpoint<IN extends IOSchema, OUT extends IOSchema, mIN, OPT, M ext
     }
   }
 
-  public getInputSchema(): IOSchema {
+  public getMethods(): M[] {
+    return this.methods;
+  }
+
+  public getInputSchema(): Merge<IN, mIN> {
     return this.inputSchema;
   }
 
-  public getOutputSchema(): IOSchema {
+  public getOutputSchema(): OUT {
     return this.outputSchema;
   }
 
