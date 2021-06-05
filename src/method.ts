@@ -1,4 +1,5 @@
 import {Endpoint} from './endpoint';
+import {RouteMethodsError} from './errors';
 
 export type Method = 'get' | 'post' | 'put' | 'delete' | 'patch';
 
@@ -7,8 +8,6 @@ export type MethodsDefinition<M extends Method> = {
 } | {
   method: M;
 };
-
-class RouteMethodsError extends Error {}
 
 export class RouteMethods {
   constructor(public readonly methods: {

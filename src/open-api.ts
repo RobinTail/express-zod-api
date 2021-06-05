@@ -5,6 +5,7 @@ import {
 } from 'openapi3-ts';
 import {ReferenceObject} from 'openapi3-ts/src/model/OpenApi';
 import {z} from 'zod';
+import {OpenAPIError} from './errors';
 import {extractObjectSchema} from './helpers';
 import {Routing, routingCycle} from './routing';
 import {lookup} from 'mime';
@@ -94,7 +95,7 @@ const describeSchema = (value: z.ZodTypeAny, isResponse: boolean): SchemaObject 
     case value instanceof z.ZodNever:
     case value instanceof z.ZodVoid:
     default:
-      throw new Error(`Zod type ${value.constructor.name} is unsupported`);
+      throw new OpenAPIError(`Zod type ${value.constructor.name} is unsupported`);
   }
 };
 

@@ -9,6 +9,7 @@ export { ResultHandler } from './result-handler';
 export { Routing } from './routing';
 export { createServer, attachRouting } from './server';
 export { OpenAPI } from './open-api';
+export { OpenAPIError, RouteMethodsError } from './errors';
 
 import { z } from 'zod';
 import * as createHttpError from 'http-errors';
