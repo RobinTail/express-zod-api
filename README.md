@@ -311,9 +311,11 @@ app.listen();
 
 ## Multiple schemas for a single route
 
-A route may have multiple Endpoints attached depending on different methods.
+Thanks to the `DependsOnMethod` class a route may have multiple Endpoints attached depending on different methods.
 It can also be the same Endpoint that handle multiple methods as well.
 ```typescript
+import {DependsOnMethod} from 'express-zod-api';
+
 // the route /v1/user has two Endpoints 
 // which handle a couple of methods each
 const routing: Routing = {
