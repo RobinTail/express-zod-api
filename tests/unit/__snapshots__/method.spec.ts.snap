@@ -1,0 +1,15 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Method RouteMethods should throw an error if the endpoint does not have the corresponding method 1`] = `
+"The endpoint assigned to the 'post' parameter must have at least this method in its specification.
+Example:
+
+new RouteMethods({
+  post: endpointsFactory.build({
+    methods: ['post', 'get', 'patch']
+    // or method: 'post'
+    ...
+  })
+});
+"
+`;

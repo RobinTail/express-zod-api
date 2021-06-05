@@ -19,7 +19,7 @@ export class RouteMethods {
         const endpointMethods = methods[key]?.getMethods() || [];
         if (!endpointMethods.includes(key)) {
           throw new RouteMethodsError(
-            `The endpoint assigned to the ${key} parameter must have at least this method in its specification.\n` +
+            `The endpoint assigned to the '${key}' parameter must have at least this method in its specification.\n` +
             'Example:\n\n' +
             'new RouteMethods({\n' +
             `  ${key}: endpointsFactory.build({\n` +
@@ -29,9 +29,9 @@ export class RouteMethods {
                 .join(', ')
               || '...'
             ) + ']\n' +
-            `    // or method: '${key}'` +
+            `    // or method: '${key}'\n` +
             '    ...\n' +
-            '    })\n' +
+            '  })\n' +
             '});\n'
           );
         }
