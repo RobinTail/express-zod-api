@@ -5,15 +5,20 @@
 ### v1.2.0
 
 - Ability to specify the endpoint description and [export it to the Swagger / OpenAPI specification](https://github.com/RobinTail/express-zod-api#swagger--openapi-specification).
-- Ability to supply either `methods` or `method` property to `.build()`. This is just a little syntactic simplification so as not to write an array every time.
 ```typescript
 // example
 const endpoint = endpointsFactory.build({
-  method: 'get', // or methods: ['get', 'post'],
   description: 'Here is an example description of the endpoint',
-  input: z.object({...}),
-  output: z.object({...}),
-  handler: async ({input, options, logger}) => {}
+  ...
+});
+
+```
+- Ability to specify either `methods` or `method` property to `.build()`. This is just a more convenient way for a single method case.
+```typescript
+// example
+const endpoint = endpointsFactory.build({
+  method: 'get', // same as methods:['get'] before
+  ...
 });
 ```
 
