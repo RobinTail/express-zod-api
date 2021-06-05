@@ -1,4 +1,4 @@
-import {RouteMethods, Routing} from '../../src';
+import {DependsOnMethod, Routing} from '../../src';
 import {getUserEndpoint} from './get-user';
 import {setUserEndpoint} from './set-user';
 
@@ -7,7 +7,7 @@ export const v1Routing: Routing = {
   getUser: getUserEndpoint,
 
   // syntax 2: methods are defined within the route
-  setUser: new RouteMethods({
+  setUser: new DependsOnMethod({
     post: setUserEndpoint // the Endpoint should have at least the same method specified in .build()
   })
 };

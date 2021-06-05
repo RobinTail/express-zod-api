@@ -1,15 +1,15 @@
-import {EndpointsFactory, RouteMethods, z} from '../../src';
+import {EndpointsFactory, DependsOnMethod, z} from '../../src';
 
 describe('Method', () => {
   describe('RouteMethods', () => {
     test('should accept empty object', () => {
-      const instance = new RouteMethods({});
-      expect(instance).toBeInstanceOf(RouteMethods);
+      const instance = new DependsOnMethod({});
+      expect(instance).toBeInstanceOf(DependsOnMethod);
       expect(instance.methods).toEqual({});
     });
 
     test('should accept an endpoint with a corresponding method', () => {
-      const instance = new RouteMethods({
+      const instance = new DependsOnMethod({
         post: new EndpointsFactory().build({
           method: 'post',
           input: z.object({}),
@@ -17,7 +17,7 @@ describe('Method', () => {
           handler: async () => ({})
         })
       });
-      expect(instance).toBeInstanceOf(RouteMethods);
+      expect(instance).toBeInstanceOf(DependsOnMethod);
       expect(instance.methods).toHaveProperty('post');
     });
 
@@ -28,11 +28,11 @@ describe('Method', () => {
         output: z.object({}),
         handler: async () => ({})
       });
-      const instance = new RouteMethods({
+      const instance = new DependsOnMethod({
         get: endpoint,
         post: endpoint
       });
-      expect(instance).toBeInstanceOf(RouteMethods);
+      expect(instance).toBeInstanceOf(DependsOnMethod);
       expect(instance.methods).toHaveProperty('get');
       expect(instance.methods).toHaveProperty('post');
     });
@@ -44,7 +44,7 @@ describe('Method', () => {
         output: z.object({}),
         handler: async () => ({})
       });
-      expect(() => new RouteMethods({
+      expect(() => new DependsOnMethod({
         get: endpoint,
         post: endpoint
       })).toThrowErrorMatchingSnapshot();

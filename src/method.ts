@@ -1,5 +1,5 @@
 import {Endpoint} from './endpoint';
-import {RouteMethodsError} from './errors';
+import {DependsOnMethodError} from './errors';
 
 export type Method = 'get' | 'post' | 'put' | 'delete' | 'patch';
 
@@ -9,7 +9,7 @@ export type MethodsDefinition<M extends Method> = {
   method: M;
 };
 
-export class RouteMethods {
+export class DependsOnMethod {
   constructor(public readonly methods: {
     [K in Method]?: Endpoint<any, any, any, any, K> | Endpoint<any, any, any, any, Method>;
   }) {
@@ -17,7 +17,7 @@ export class RouteMethods {
       if (key in methods) {
         const endpointMethods = methods[key]?.getMethods() || [];
         if (!endpointMethods.includes(key)) {
-          throw new RouteMethodsError(
+          throw new DependsOnMethodError(
             `The endpoint assigned to the '${key}' parameter must have at least this method in its specification.\n` +
             'This error should prevent mistakes during the development process.\n' +
             'Example:\n\n' +

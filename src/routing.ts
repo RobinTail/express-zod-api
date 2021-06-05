@@ -2,10 +2,10 @@ import {Express} from 'express';
 import {Logger} from 'winston';
 import {ConfigType} from './config-type';
 import {AbstractEndpoint} from './endpoint';
-import {Method, RouteMethods} from './method';
+import {Method, DependsOnMethod} from './method';
 
 export interface Routing {
-  [PATH: string]: Routing | RouteMethods | AbstractEndpoint;
+  [PATH: string]: Routing | DependsOnMethod | AbstractEndpoint;
 }
 
 type RoutingCycleCallback = (endpoint: AbstractEndpoint, fullPath: string, method: Method) => void;
@@ -18,7 +18,7 @@ export const routingCycle = (routing: Routing, cb: RoutingCycleCallback, parentP
       element.getMethods().forEach((method) => {
         cb(element, fullPath, method);
       });
-    } else if (element instanceof RouteMethods) {
+    } else if (element instanceof DependsOnMethod) {
       Object.entries<AbstractEndpoint>(element.methods).forEach(([method, endpoint]) => {
         cb(endpoint, fullPath, method as Method);
       });

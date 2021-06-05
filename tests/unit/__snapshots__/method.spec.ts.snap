@@ -5,7 +5,7 @@ exports[`Method RouteMethods should throw an error if the endpoint does not have
 This error should prevent mistakes during the development process.
 Example:
 
-new RouteMethods({
+new DependsOnMethod({
   post: endpointsFactory.build({
     methods: ['post', 'get', 'patch']
     // or method: 'post'
