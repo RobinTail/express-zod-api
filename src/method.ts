@@ -19,8 +19,9 @@ export class RouteMethods {
         if (!endpointMethods.includes(key)) {
           throw new RouteMethodsError(
             `The endpoint assigned to the '${key}' parameter must have at least this method in its specification.\n` +
+            'This error should prevent mistakes during the development process.\n' +
             'Example:\n\n' +
-            'new RouteMethods({\n' +
+            `new ${this.constructor.name}({\n` +
             `  ${key}: endpointsFactory.build({\n` +
             `    methods: ['${key}', ` + (
               (methods[key]?.getMethods() || [])
