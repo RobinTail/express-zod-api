@@ -21,7 +21,7 @@ const endpoint = endpointsFactory.build({
 });
 ```
 - Ability for a route to have multiple Endpoints attached depending on different methods.
-  It can also be the same Endpoint that handle different methods as well.
+  It can also be the same Endpoint that handle multiple  methods as well.
 ```typescript
 // example of different I/O schemas for /v1/user
 const routing: Routing = {

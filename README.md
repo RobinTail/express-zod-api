@@ -28,6 +28,7 @@ Start your API server with I/O schema validation and custom middlewares in minut
    4. [ResultHandler](#resulthandler)   
    5. [Your custom logger](#your-custom-logger)
    6. [Your custom server](#your-custom-server)
+   7. [Multiple schemas for a single route](#multiple-schemas-for-a-single-route)
 6. [Disclosing API specifications](#disclosing-api-specifications)
    1. [Reusing endpoint types on your frontend](#reusing-endpoint-types-on-your-frontend)
    2. [Swagger / OpenAPI Specification](#swagger--openapi-specification)
@@ -148,7 +149,7 @@ const routing: Routing = {
   }
 };
 ```
-This implementation sets up `setUserEndpoint` to handle requests to the `/v1/setUser` path.
+This implementation sets up `setUserEndpoint` to handle requests to the `/v1/setUser` route.
 
 ## Start your server
 
@@ -307,6 +308,25 @@ app.listen();
 ```
 
 **Please note** that in this case you probably need to: parse `request.body`, call `app.listen()` and handle `404` errors yourself;
+
+## Multiple schemas for a single route
+
+A route may have multiple Endpoints attached depending on different methods.
+It can also be the same Endpoint that handle multiple methods as well.
+```typescript
+// the route /v1/user has two Endpoints 
+// which handle a couple of methods each
+const routing: Routing = {
+  v1: {
+    user: new DependsOnMethod({
+      get: myEndpointForGetAndDelete,
+      delete: myEndpointForGetAndDelete,
+      post: myEndpointForPostAndPatch,
+      patch: myEndpointForPostAndPatch,
+    })
+  }
+};
+```
 
 # Disclosing API specifications
 ## Reusing endpoint types on your frontend
