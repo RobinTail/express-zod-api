@@ -11,7 +11,6 @@ const endpoint = endpointsFactory.build({
   description: 'Here is an example description of the endpoint',
   ...
 });
-
 ```
 - Ability to specify either `methods` or `method` property to `.build()`. This is just a more convenient way for a single method case.
 ```typescript
@@ -20,6 +19,21 @@ const endpoint = endpointsFactory.build({
   method: 'get', // same as methods:['get'] before
   ...
 });
+```
+- Ability for a route to have multiple Endpoints attached depending on different methods.
+  It can also be the same Endpoint that handle different methods as well.
+```typescript
+// example of different I/O schemas for /v1/user
+const routing: Routing = {
+  v1: {
+    user: new DependsOnMethod({
+      get: myEndpointForGetAndDelete,
+      delete: myEndpointForGetAndDelete,
+      post: myEndpointForPostAndPatch,
+      patch: myEndpointForPostAndPatch,
+    })
+  }
+};
 ```
 
 ### v1.1.0
