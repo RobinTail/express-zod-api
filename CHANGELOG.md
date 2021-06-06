@@ -8,12 +8,33 @@
 ```typescript
 // example
 const endpoint = endpointsFactory.build({
-  methods: ['get'],
   description: 'Here is an example description of the endpoint',
-  input: z.object({...}),
-  output: z.object({...}),
-  handler: async ({input, options, logger}) => {}
+  ...
 });
+```
+- Ability to specify either `methods` or `method` property to `.build()`. This is just a more convenient way for a single method case.
+```typescript
+// example
+const endpoint = endpointsFactory.build({
+  method: 'get', // same as methods:['get'] before
+  ...
+});
+```
+- Ability for a route to have multiple Endpoints attached depending on different methods.
+  It can also be the same Endpoint that handle multiple  methods as well.
+  This is a solution for the question raised in issue [#29](https://github.com/RobinTail/express-zod-api/issues/29).
+```typescript
+// example of different I/O schemas for /v1/user
+const routing: Routing = {
+  v1: {
+    user: new DependsOnMethod({
+      get: myEndpointForGetAndDelete,
+      delete: myEndpointForGetAndDelete,
+      post: myEndpointForPostAndPatch,
+      patch: myEndpointForPostAndPatch,
+    })
+  }
+};
 ```
 
 ### v1.1.0

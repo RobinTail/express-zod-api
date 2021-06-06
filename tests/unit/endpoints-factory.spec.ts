@@ -71,7 +71,7 @@ describe('EndpointsFactory', () => {
       const factory = new EndpointsFactory().addMiddleware(middleware).setResultHandler(resultHandlerMock);
       const handlerMock = jest.fn();
       const endpoint = factory.build({
-        methods: ['get'],
+        method: 'get',
         input: z.object({
           s: z.string()
         }),

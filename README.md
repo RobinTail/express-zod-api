@@ -28,6 +28,7 @@ Start your API server with I/O schema validation and custom middlewares in minut
    4. [ResultHandler](#resulthandler)   
    5. [Your custom logger](#your-custom-logger)
    6. [Your custom server](#your-custom-server)
+   7. [Multiple schemas for a single route](#multiple-schemas-for-a-single-route)
 6. [Disclosing API specifications](#disclosing-api-specifications)
    1. [Reusing endpoint types on your frontend](#reusing-endpoint-types-on-your-frontend)
    2. [Swagger / OpenAPI Specification](#swagger--openapi-specification)
@@ -118,7 +119,7 @@ You can also instantly add middlewares to it using `.addMiddleware()` method.
 import {z} from 'express-zod-api';
 
 const setUserEndpoint = endpointsFactory.build({
-  methods: ['post'],
+  method: 'post',
   input: z.object({
     id: z.number(),
     name: z.string,
@@ -134,7 +135,8 @@ const setUserEndpoint = endpointsFactory.build({
 });
 ```
 
-You can add middlewares to the endpoint by using `.addMiddleware()` before `.build()`.
+The endpoint can also handle multiple types of requests, this feature is available by using `methods` property that accepts an array.
+You can also add middlewares to the endpoint by using `.addMiddleware()` before `.build()`.
 
 ## Set up routing
 
@@ -147,7 +149,7 @@ const routing: Routing = {
   }
 };
 ```
-This implementation sets up `setUserEndpoint` to handle requests to the `/v1/setUser` path.
+This implementation sets up `setUserEndpoint` to handle requests to the `/v1/setUser` route.
 
 ## Start your server
 
@@ -224,7 +226,7 @@ Since parameters of GET requests come in the form of strings, there is often a n
 import {z} from 'express-zod-api';
 
 const getUserEndpoint = endpointsFactory.build({
-  methods: ['get'],
+  method: 'get',
   input: z.object({
     id: z.string().transform((id) => parseInt(id, 10)),
     ids: z.string().transform(
@@ -306,6 +308,27 @@ app.listen();
 ```
 
 **Please note** that in this case you probably need to: parse `request.body`, call `app.listen()` and handle `404` errors yourself;
+
+## Multiple schemas for a single route
+
+Thanks to the `DependsOnMethod` class a route may have multiple Endpoints attached depending on different methods.
+It can also be the same Endpoint that handle multiple methods as well.
+```typescript
+import {DependsOnMethod} from 'express-zod-api';
+
+// the route /v1/user has two Endpoints 
+// which handle a couple of methods each
+const routing: Routing = {
+  v1: {
+    user: new DependsOnMethod({
+      get: myEndpointForGetAndDelete,
+      delete: myEndpointForGetAndDelete,
+      post: myEndpointForPostAndPatch,
+      patch: myEndpointForPostAndPatch,
+    })
+  }
+};
+```
 
 # Disclosing API specifications
 ## Reusing endpoint types on your frontend
