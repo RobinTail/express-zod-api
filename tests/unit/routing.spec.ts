@@ -72,6 +72,54 @@ describe('Routing', () => {
       expect(appMock.post.mock.calls[1][0]).toBe('/v1/user/universal');
     });
 
+    test('Should accept DependsOnMethod', () => {
+      const handlerMock = jest.fn();
+      const configMock = {};
+      const getEndpoint = new EndpointsFactory().build({
+        methods: ['get'],
+        input: z.object({}).nonstrict(),
+        output: z.object({}).nonstrict(),
+        handler: handlerMock
+      });
+      const postEndpoint = new EndpointsFactory().build({
+        methods: ['post'],
+        input: z.object({}).nonstrict(),
+        output: z.object({}).nonstrict(),
+        handler: handlerMock
+      });
+      const putAndPatchEndpoint = new EndpointsFactory().build({
+        methods: ['put', 'patch'],
+        input: z.object({}).nonstrict(),
+        output: z.object({}).nonstrict(),
+        handler: handlerMock
+      });
+      const routing: Routing = {
+        v1: {
+          user: new DependsOnMethod({
+            get: getEndpoint,
+            post: postEndpoint,
+            put: putAndPatchEndpoint,
+            patch: putAndPatchEndpoint
+          })
+        }
+      };
+      initRouting({
+        app: appMock as Express,
+        logger: loggerMock as Logger,
+        config: configMock as ConfigType,
+        routing: routing
+      });
+      expect(appMock.get).toBeCalledTimes(1);
+      expect(appMock.post).toBeCalledTimes(1);
+      expect(appMock.put).toBeCalledTimes(1);
+      expect(appMock.patch).toBeCalledTimes(1);
+      expect(appMock.delete).toBeCalledTimes(0);
+      expect(appMock.get.mock.calls[0][0]).toBe('/v1/user');
+      expect(appMock.post.mock.calls[0][0]).toBe('/v1/user');
+      expect(appMock.put.mock.calls[0][0]).toBe('/v1/user');
+      expect(appMock.patch.mock.calls[0][0]).toBe('/v1/user');
+    });
+
     test('Should execute endpoints with right arguments', async () => {
       const handlerMock = jest.fn().mockImplementationOnce(() => ({result: true}));
       const configMock = { cors: true };
