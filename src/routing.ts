@@ -2,7 +2,7 @@ import {Express} from 'express';
 import {Logger} from 'winston';
 import {ConfigType} from './config-type';
 import {AbstractEndpoint, Endpoint} from './endpoint';
-import {DependsOnMethodError} from './errors';
+import {DependsOnMethodError, RoutingError} from './errors';
 import {Method} from './method';
 
 export class DependsOnMethod {
@@ -45,6 +45,12 @@ type RoutingCycleCallback = (endpoint: AbstractEndpoint, fullPath: string, metho
 export const routingCycle = (routing: Routing, cb: RoutingCycleCallback, parentPath?: string) => {
   Object.entries(routing).forEach(([path, element]) => {
     path = path.trim();
+    if (path.match(/\//)) {
+      throw new RoutingError(
+        'Routing elements should not contain \'/\' character.\n' + 
+        `The error caused by ${parentPath ? `'${parentPath}' route that has a '${path}'` : `'${path}'`} entry.`
+      );
+    }
     const fullPath = `${parentPath || ''}${path ? `/${path}` : ''}`;
     if (element instanceof AbstractEndpoint) {
       element.getMethods().forEach((method) => {

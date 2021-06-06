@@ -9,7 +9,7 @@ export { ResultHandler } from './result-handler';
 export { Routing, DependsOnMethod } from './routing';
 export { createServer, attachRouting } from './server';
 export { OpenAPI } from './open-api';
-export { OpenAPIError, DependsOnMethodError } from './errors';
+export { OpenAPIError, DependsOnMethodError, RoutingError } from './errors';
 
 import { z } from 'zod';
 import * as createHttpError from 'http-errors';

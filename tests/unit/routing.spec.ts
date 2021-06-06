@@ -176,6 +176,35 @@ describe('Routing', () => {
       expect(appMock.get.mock.calls[1][0]).toBe('/v1/user/:id/download');
     });
 
+    test('Should throw an error in case of slashes in route', () => {
+      const handlerMock = jest.fn();
+      const configMock = {};
+      const endpointMock = new EndpointsFactory().build({
+        methods: ['get'],
+        input: z.object({}).nonstrict(),
+        output: z.object({}).nonstrict(),
+        handler: handlerMock
+      });
+      expect(() => initRouting({
+        app: appMock as Express,
+        logger: loggerMock as Logger,
+        config: configMock as ConfigType,
+        routing: {
+          v1: {
+            'user/retrieve': endpointMock
+          }
+        }
+      })).toThrowErrorMatchingSnapshot();
+      expect(() => initRouting({
+        app: appMock as Express,
+        logger: loggerMock as Logger,
+        config: configMock as ConfigType,
+        routing: {
+          'v1/user/retrieve': endpointMock
+        }
+      })).toThrowErrorMatchingSnapshot();
+    });
+
     test('Should execute endpoints with right arguments', async () => {
       const handlerMock = jest.fn().mockImplementationOnce(() => ({result: true}));
       const configMock = { cors: true };
