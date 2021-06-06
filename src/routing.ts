@@ -43,9 +43,9 @@ export interface Routing {
 type RoutingCycleCallback = (endpoint: AbstractEndpoint, fullPath: string, method: Method) => void;
 
 export const routingCycle = (routing: Routing, cb: RoutingCycleCallback, parentPath?: string) => {
-  Object.keys(routing).forEach((path) => {
-    const fullPath = `${parentPath || ''}/${path}`;
-    const element = routing[path];
+  Object.entries(routing).forEach(([path, element]) => {
+    path = path.trim();
+    const fullPath = `${parentPath || ''}${path ? `/${path}` : ''}`;
     if (element instanceof AbstractEndpoint) {
       element.getMethods().forEach((method) => {
         cb(element, fullPath, method);

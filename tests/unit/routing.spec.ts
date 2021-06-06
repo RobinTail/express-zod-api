@@ -120,6 +120,62 @@ describe('Routing', () => {
       expect(appMock.patch.mock.calls[0][0]).toBe('/v1/user');
     });
 
+    test('Should accept parameters', () => {
+      const handlerMock = jest.fn();
+      const configMock = {};
+      const endpointMock = new EndpointsFactory().build({
+        methods: ['get'],
+        input: z.object({}).nonstrict(),
+        output: z.object({}).nonstrict(),
+        handler: handlerMock
+      });
+      const routing: Routing = {
+        v1: {
+          user: {
+            ':id': endpointMock
+          }
+        }
+      };
+      initRouting({
+        app: appMock as Express,
+        logger: loggerMock as Logger,
+        config: configMock as ConfigType,
+        routing: routing
+      });
+      expect(appMock.get).toBeCalledTimes(1);
+      expect(appMock.get.mock.calls[0][0]).toBe('/v1/user/:id');
+    });
+
+    test('Should handle empty paths and trim spaces', () => {
+      const handlerMock = jest.fn();
+      const configMock = {};
+      const endpointMock = new EndpointsFactory().build({
+        methods: ['get'],
+        input: z.object({}).nonstrict(),
+        output: z.object({}).nonstrict(),
+        handler: handlerMock
+      });
+      const routing: Routing = {
+        v1: {
+          user: {
+            ':id': {
+              '': endpointMock,
+              ' download ': endpointMock
+            }
+          }
+        }
+      };
+      initRouting({
+        app: appMock as Express,
+        logger: loggerMock as Logger,
+        config: configMock as ConfigType,
+        routing: routing
+      });
+      expect(appMock.get).toBeCalledTimes(2);
+      expect(appMock.get.mock.calls[0][0]).toBe('/v1/user/:id');
+      expect(appMock.get.mock.calls[1][0]).toBe('/v1/user/:id/download');
+    });
+
     test('Should execute endpoints with right arguments', async () => {
       const handlerMock = jest.fn().mockImplementationOnce(() => ({result: true}));
       const configMock = { cors: true };
