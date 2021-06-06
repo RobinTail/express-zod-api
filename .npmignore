@@ -2,7 +2,7 @@ src
 tsconfig.json
 example
 .husky
-jest.config.js
+jest.config.ts
 tests
 .idea
 yarn-error.log
