@@ -17,6 +17,9 @@ jobs:
         node-version: [10.x, 12.x, 14.x, 15.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
     steps:
+    - name: Get yarn cache dir
+      id: yarnCache
+      run: echo "::set-output name=dir::$(yarn cache dir)"
     - name: Checkout
       uses: actions/checkout@v2
     - name: Install Node.js ${{ matrix.node-version }}
@@ -26,9 +29,9 @@ jobs:
     - name: Cache node modules
       uses: actions/cache@v2
       env:
-        cache-name: cache-node-modules
+        cache-name: cache-yarn
       with:
-        path: ~/.npm
+        path: ${{ steps.yarnCache.outputs.dir }}
         key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ matrix.node-version }}-${{ hashFiles('**/yarn.lock') }}
     - name: Install dependencies
       run: yarn install
