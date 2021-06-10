@@ -2,6 +2,11 @@
 
 ## Version 1
 
+### v1.2.1
+
+- Additional handling of keys in `Routing` objects.
+- `createServer`, `attachRouting` and `new OpenAPI()` may throw an Error in case of using slashes in `Routing` keys.
+
 ### v1.2.0
 
 - Ability to specify the endpoint description and [export it to the Swagger / OpenAPI specification](https://github.com/RobinTail/express-zod-api#swagger--openapi-specification).
