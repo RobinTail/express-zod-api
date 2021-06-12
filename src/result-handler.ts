@@ -39,7 +39,7 @@ export const defaultResultHandler: ResultHandler = ({error, request, response, i
       }
     );
   }
-  const result: ApiResponse<any> = {
+  const result: ApiResponse<never> = {
     status: 'error',
     error: { message: getMessageFromError(error) }
   };
