@@ -32,10 +32,11 @@ export const defaultResultHandler: ResultHandler = ({error, request, response, i
   const statusCode = getStatusCodeFromError(error);
   if (statusCode === 500) {
     logger.error(
-      'Internal server error\n' +
-      `${error.stack}\n` +
-      `URL: ${request.url}\n` +
-      `Payload: ${JSON.stringify(input, undefined, 2)}`,
+      `Internal server error\n${error.stack}\n`,
+      {
+        url: request.url,
+        payload: input
+      }
     );
   }
   const result: ApiResponse<any> = {
