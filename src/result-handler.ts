@@ -2,9 +2,9 @@ import {Request, Response} from 'express';
 import {Logger} from 'winston';
 import {getStatusCodeFromError, getMessageFromError} from './helpers';
 
-type ApiResponse<T> = {
+type DefaultResponse<OUT> = {
   status: 'success',
-  data: T
+  data: OUT
 } | {
   status: 'error',
   error: {
@@ -25,7 +25,7 @@ export type ResultHandler = (params: ResultHandlerParams) => void | Promise<void
 
 export const defaultResultHandler: ResultHandler = ({error, request, response, input, output, logger}) => {
   if (!error) {
-    const result: ApiResponse<typeof output> = { status: 'success', data: output };
+    const result: DefaultResponse<typeof output> = { status: 'success', data: output };
     response.status(200).json(result);
     return;
   }
@@ -39,7 +39,7 @@ export const defaultResultHandler: ResultHandler = ({error, request, response, i
       }
     );
   }
-  const result: ApiResponse<never> = {
+  const result: DefaultResponse<never> = {
     status: 'error',
     error: { message: getMessageFromError(error) }
   };
