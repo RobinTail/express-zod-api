@@ -11,3 +11,4 @@ dataflow.svg
 logo.svg
 .eslintrc.json
 generate-license.ts
+coverage
