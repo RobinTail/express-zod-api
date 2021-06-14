@@ -6,6 +6,7 @@ const config: Config.InitialOptions = {
   verbose: true,
   forceExit: true,
   collectCoverage: true,
+  testTimeout: 10000,
 };
 
 export default config;
