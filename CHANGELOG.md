@@ -2,6 +2,11 @@
 
 ## Version 1
 
+### v1.3.0
+
+- Zod version is 3.2.0.
+- Minor changes to logging internal server errors.
+
 ### v1.2.1
 
 - Additional handling of keys in `Routing` objects.
