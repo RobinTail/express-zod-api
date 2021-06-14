@@ -247,9 +247,9 @@ const getUserEndpoint = endpointsFactory.build({
 The `defaultResultHandler` sets the HTTP status code and ensures the following type of the response:
 
 ```typescript
-type ApiResponse<T> = {
+type DefaultResponse<OUT> = {
   status: 'success',
-  data: T
+  data: OUT
 } | {
   status: 'error',
   error: {
