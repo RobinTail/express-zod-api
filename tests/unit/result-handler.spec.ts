@@ -36,7 +36,10 @@ describe('ResultHandler', () => {
       });
       expect(loggerMock.error).toBeCalledTimes(1);
       expect(loggerMock.error.mock.calls[0][0]).toMatch(/^Internal server error\nError: Some error/);
-      expect(loggerMock.error.mock.calls[0][0]).toMatch(/\nURL: http:\/\/something\/v1\/anything\n/);
+      expect(loggerMock.error.mock.calls[0][1]).toHaveProperty('url');
+      expect(loggerMock.error.mock.calls[0][1].url).toBe('http://something/v1/anything');
+      expect(loggerMock.error.mock.calls[0][1]).toHaveProperty('payload');
+      expect(loggerMock.error.mock.calls[0][1].payload).toEqual({ something: 453 });
       expect(responseMock.status).toBeCalledWith(500);
       expect(responseMock.json).toBeCalledWith({
         status: 'error',
