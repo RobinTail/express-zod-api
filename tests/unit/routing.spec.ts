@@ -14,7 +14,8 @@ describe('Routing', () => {
         post: jest.fn(),
         put: jest.fn(),
         delete: jest.fn(),
-        patch: jest.fn()
+        patch: jest.fn(),
+        options: jest.fn()
       };
 
       loggerMock = {
@@ -27,7 +28,9 @@ describe('Routing', () => {
 
     test('Should set right methods', () => {
       const handlerMock = jest.fn();
-      const configMock = {};
+      const configMock = {
+        cors: true
+      };
       const getEndpoint = new EndpointsFactory().build({
         methods: ['get'],
         input: z.object({}).nonstrict(),
@@ -66,15 +69,21 @@ describe('Routing', () => {
       expect(appMock.put).toBeCalledTimes(0);
       expect(appMock.delete).toBeCalledTimes(0);
       expect(appMock.patch).toBeCalledTimes(0);
+      expect(appMock.options).toBeCalledTimes(3);
       expect(appMock.get.mock.calls[0][0]).toBe('/v1/user/get');
       expect(appMock.get.mock.calls[1][0]).toBe('/v1/user/universal');
       expect(appMock.post.mock.calls[0][0]).toBe('/v1/user/set');
       expect(appMock.post.mock.calls[1][0]).toBe('/v1/user/universal');
+      expect(appMock.options.mock.calls[0][0]).toBe('/v1/user/get');
+      expect(appMock.options.mock.calls[1][0]).toBe('/v1/user/set');
+      expect(appMock.options.mock.calls[2][0]).toBe('/v1/user/universal');
     });
 
     test('Should accept DependsOnMethod', () => {
       const handlerMock = jest.fn();
-      const configMock = {};
+      const configMock = {
+        cors: true
+      };
       const getEndpoint = new EndpointsFactory().build({
         methods: ['get'],
         input: z.object({}).nonstrict(),
@@ -114,10 +123,12 @@ describe('Routing', () => {
       expect(appMock.put).toBeCalledTimes(1);
       expect(appMock.patch).toBeCalledTimes(1);
       expect(appMock.delete).toBeCalledTimes(0);
+      expect(appMock.options).toBeCalledTimes(1);
       expect(appMock.get.mock.calls[0][0]).toBe('/v1/user');
       expect(appMock.post.mock.calls[0][0]).toBe('/v1/user');
       expect(appMock.put.mock.calls[0][0]).toBe('/v1/user');
       expect(appMock.patch.mock.calls[0][0]).toBe('/v1/user');
+      expect(appMock.options.mock.calls[0][0]).toBe('/v1/user');
     });
 
     test('Should accept parameters', () => {

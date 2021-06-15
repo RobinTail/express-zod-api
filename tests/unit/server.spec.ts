@@ -6,7 +6,8 @@ const newAppMock = () => ({
   use: jest.fn(),
   listen: jest.fn((port, cb) => {cb && cb(); return new http.Server(); }),
   get: jest.fn(),
-  post: jest.fn()
+  post: jest.fn(),
+  options: jest.fn()
 });
 
 const expressMock = jest.mock('express', () => {
@@ -67,6 +68,8 @@ describe('Server', () => {
       expect(appMock.get.mock.calls[0][0]).toBe('/v1/test');
       expect(appMock.post).toBeCalledTimes(1);
       expect(appMock.post.mock.calls[0][0]).toBe('/v1/test');
+      expect(appMock.options).toBeCalledTimes(1);
+      expect(appMock.options.mock.calls[0][0]).toBe('/v1/test');
       expect(appMock.listen).toBeCalledTimes(1);
       expect(appMock.listen.mock.calls[0][0]).toBe(8054);
     });
@@ -113,6 +116,8 @@ describe('Server', () => {
       expect(appMock.get.mock.calls[0][0]).toBe('/v1/test');
       expect(appMock.post).toBeCalledTimes(1);
       expect(appMock.post.mock.calls[0][0]).toBe('/v1/test');
+      expect(appMock.options).toBeCalledTimes(1);
+      expect(appMock.options.mock.calls[0][0]).toBe('/v1/test');
       expect(appMock.listen).toBeCalledTimes(1);
       expect(appMock.listen.mock.calls[0][0]).toBe(8054);
     });
@@ -155,6 +160,8 @@ describe('Server', () => {
       expect(appMock.get.mock.calls[0][0]).toBe('/v1/test');
       expect(appMock.post).toBeCalledTimes(1);
       expect(appMock.post.mock.calls[0][0]).toBe('/v1/test');
+      expect(appMock.options).toBeCalledTimes(1);
+      expect(appMock.options.mock.calls[0][0]).toBe('/v1/test');
       app.listen(8054);
       expect(appMock.listen).toBeCalledTimes(1);
       expect(appMock.listen.mock.calls[0][0]).toBe(8054);

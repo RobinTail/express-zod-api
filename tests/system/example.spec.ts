@@ -42,6 +42,22 @@ describe('Example', () => {
       })).toBeTruthy();
     });
 
+    test('Should handle OPTIONS request', async () => {
+      const response = await fetch('http://localhost:8090/v1/setUser?test=123&id=50', {
+        method: 'OPTIONS',
+      });
+      expect(response.status).toBe(200);
+      const text = await response.text();
+      expect(text).toBe('');
+      expect(response.headers).toBeTruthy();
+      expect(response.headers.has('access-control-allow-origin')).toBeTruthy();
+      expect(response.headers.has('access-control-allow-methods')).toBeTruthy();
+      expect(response.headers.has('access-control-allow-headers')).toBeTruthy();
+      expect(response.headers.get('access-control-allow-origin')).toBe('*');
+      expect(response.headers.get('access-control-allow-methods')).toBe('POST, OPTIONS');
+      expect(response.headers.get('access-control-allow-headers')).toBe('content-type');
+    });
+
     test('Should handle valid POST request', async () => {
       const response = await fetch('http://localhost:8090/v1/setUser?test=123&id=50', {
         method: 'POST',
