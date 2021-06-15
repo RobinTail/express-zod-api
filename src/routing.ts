@@ -3,7 +3,7 @@ import {Logger} from 'winston';
 import {ConfigType} from './config-type';
 import {AbstractEndpoint, Endpoint} from './endpoint';
 import {DependsOnMethodError, RoutingError} from './errors';
-import {Method} from './method';
+import {CorsMethod, Method} from './method';
 
 export class DependsOnMethod {
   constructor(public readonly methods: {
@@ -40,9 +40,14 @@ export interface Routing {
   [PATH: string]: Routing | DependsOnMethod | AbstractEndpoint;
 }
 
-type RoutingCycleCallback = (endpoint: AbstractEndpoint, fullPath: string, method: Method) => void;
+export interface RoutingCycleParams {
+  routing: Routing;
+  cb: (endpoint: AbstractEndpoint, fullPath: string, method: CorsMethod) => void;
+  parentPath?: string;
+  cors?: boolean;
+}
 
-export const routingCycle = (routing: Routing, cb: RoutingCycleCallback, parentPath?: string) => {
+export const routingCycle = ({routing, cb, parentPath, cors}: RoutingCycleParams) => {
   Object.entries(routing).forEach(([path, element]) => {
     path = path.trim();
     if (path.match(/\//)) {
@@ -53,15 +58,27 @@ export const routingCycle = (routing: Routing, cb: RoutingCycleCallback, parentP
     }
     const fullPath = `${parentPath || ''}${path ? `/${path}` : ''}`;
     if (element instanceof AbstractEndpoint) {
-      element.getMethods().forEach((method) => {
+      const methods: CorsMethod[] = element.getMethods();
+      if (cors) {
+        methods.push('options');
+      }
+      methods.forEach((method) => {
         cb(element, fullPath, method);
       });
     } else if (element instanceof DependsOnMethod) {
       Object.entries<AbstractEndpoint>(element.methods).forEach(([method, endpoint]) => {
         cb(endpoint, fullPath, method as Method);
       });
+      if (cors && Object.keys(element.methods).length > 0) {
+        const firstEndpoint = Object.values(element.methods)[0] as AbstractEndpoint;
+        cb(firstEndpoint, fullPath, 'options');
+      }
     } else {
-      routingCycle(element, cb, fullPath);
+      routingCycle({
+        routing: element,
+        cb, cors,
+        parentPath: fullPath
+      });
     }
   });
 };
@@ -72,10 +89,14 @@ export const initRouting = ({app, logger, config, routing}: {
   config: ConfigType,
   routing: Routing
 }) => {
-  routingCycle(routing, (endpoint, fullPath, method) => {
-    app[method](fullPath, async (request, response) => {
-      logger.info(`${request.method}: ${fullPath}`);
-      await endpoint.execute({request, response, logger, config});
-    });
+  routingCycle({
+    routing,
+    cors: config.cors,
+    cb: (endpoint, fullPath, method) => {
+      app[method](fullPath, async (request, response) => {
+        logger.info(`${request.method}: ${fullPath}`);
+        await endpoint.execute({request, response, logger, config});
+      });
+    }
   });
 };

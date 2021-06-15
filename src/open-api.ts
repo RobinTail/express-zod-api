@@ -7,7 +7,7 @@ import {ReferenceObject} from 'openapi3-ts/src/model/OpenApi';
 import {z} from 'zod';
 import {OpenAPIError} from './errors';
 import {extractObjectSchema} from './helpers';
-import {Routing, routingCycle} from './routing';
+import {Routing, routingCycle, RoutingCycleParams} from './routing';
 import {lookup} from 'mime';
 
 const describeSchema = (value: z.ZodTypeAny, isResponse: boolean): SchemaObject => {
@@ -170,7 +170,7 @@ export class OpenAPI {
     this.builder = new OpenApiBuilder()
       .addInfo({title, version})
       .addServer({url: serverUrl});
-    routingCycle(routing, (endpoint, fullPath, method) => {
+    const cb: RoutingCycleParams['cb'] = (endpoint, fullPath, method) => {
       const responseSchemaRef = this.createRef('responseSchema');
       this.builder.addSchema(responseSchemaRef.name, {
         ...describeSchema(endpoint.getOutputSchema(), true),
@@ -225,6 +225,7 @@ export class OpenAPI {
         ...(this.builder.rootDoc.paths?.[fullPath] || {}),
         [method]: operation,
       });
-    });
+    };
+    routingCycle({routing, cb});
   }
 }
