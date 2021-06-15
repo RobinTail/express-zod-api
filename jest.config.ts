@@ -4,6 +4,9 @@ const config: Config.InitialOptions = {
   preset: 'ts-jest',
   testEnvironment: 'node',
   verbose: true,
+  forceExit: true,
+  collectCoverage: true,
+  testTimeout: 10000,
 };
 
 export default config;
