@@ -4,11 +4,12 @@
 
 ![CI](https://github.com/RobinTail/express-zod-api/actions/workflows/node.js.yml/badge.svg)
 ![Swagger Validator](https://img.shields.io/swagger/valid/3.0?specUrl=https%3A%2F%2Fraw.githubusercontent.com%2FRobinTail%2Fexpress-zod-api%2Fmaster%2Fexample%2Fexample.swagger.yaml)
-![License](https://img.shields.io/npm/l/express-zod-api)
+![Coverage](https://raw.githubusercontent.com/RobinTail/express-zod-api/master/coverage.svg)
 
 ![downloads](https://img.shields.io/npm/dw/express-zod-api)
 ![npm release](https://img.shields.io/npm/v/express-zod-api?color=teal&label=latest)
 ![GitHub Repo stars](https://img.shields.io/github/stars/RobinTail/express-zod-api)
+![License](https://img.shields.io/npm/l/express-zod-api)
 
 Start your API server with I/O schema validation and custom middlewares in minutes.
 
