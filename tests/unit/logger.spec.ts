@@ -1,6 +1,22 @@
 import {createLogger, LoggerConfig} from '../../src';
+import * as Transport from 'winston-transport';
+import {SPLAT} from 'triple-beam';
 
 describe('Logger', () => {
+  let log: any[] = [];
+
+  const createTransport = (level: string) => {
+    return new Transport({
+      level,
+      log: (info) => log.push(info),
+      logv: (info) => log.push(info)
+    });
+  };
+
+  beforeEach(() => {
+    log = [];
+  });
+
   describe('createLogger()', () => {
     test('Should create silent logger', () => {
       const loggerConfig: LoggerConfig = {
@@ -29,12 +45,19 @@ describe('Logger', () => {
       expect(logger.isVerboseEnabled()).toBeFalsy();
       expect(logger.isDebugEnabled()).toBeFalsy();
       expect(logger.isSillyEnabled()).toBeFalsy();
+      logger.add(createTransport(loggerConfig.level));
+      logger.warn('testing warn message', {withMeta: true});
+      expect(log).toHaveLength(1);
+      expect(log[0]).toHaveProperty('level');
+      expect(log[0]).toHaveProperty('message');
+      expect(log[0].message).toBe('testing warn message');
+      expect(log[0][SPLAT]).toEqual([{withMeta: true}]);
     });
 
     test('Should create debug logger', () => {
       const loggerConfig: LoggerConfig = {
         level: 'debug',
-        color: false
+        color: true
       };
       const logger = createLogger(loggerConfig);
       expect(logger.isErrorEnabled()).toBeTruthy();
@@ -43,6 +66,29 @@ describe('Logger', () => {
       expect(logger.isVerboseEnabled()).toBeTruthy();
       expect(logger.isDebugEnabled()).toBeTruthy();
       expect(logger.isSillyEnabled()).toBeFalsy();
+      logger.add(createTransport(loggerConfig.level));
+      logger.debug('testing debug message', {withColorful: 'output'});
+      expect(log).toHaveLength(1);
+      expect(log[0]).toHaveProperty('level');
+      expect(log[0]).toHaveProperty('message');
+      expect(log[0].message).toBe('testing debug message');
+      expect(log[0][SPLAT]).toEqual([{withColorful: 'output'}]);
+    });
+
+    test('Should manage profiling', async () => {
+      const loggerConfig: LoggerConfig = {
+        level: 'debug',
+        color: true
+      };
+      const logger = createLogger(loggerConfig);
+      logger.add(createTransport(loggerConfig.level));
+      logger.profile('long-test');
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      logger.profile('long-test');
+      expect(log).toHaveLength(1);
+      expect(log[0]).toHaveProperty('level');
+      expect(log[0]).toHaveProperty('message');
+      expect(log[0].message).toBe('long-test');
     });
   });
 });
