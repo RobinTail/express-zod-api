@@ -47,6 +47,8 @@ describe('Example', () => {
         method: 'OPTIONS',
       });
       expect(response.status).toBe(200);
+      const text = await response.text();
+      expect(text).toBe('');
       expect(response.headers).toBeTruthy();
       expect(response.headers.has('access-control-allow-origin')).toBeTruthy();
       expect(response.headers.has('access-control-allow-methods')).toBeTruthy();
