@@ -355,6 +355,68 @@ servers:
 "
 `;
 
+exports[`Open API generator should handle bigint, boolean, date and null 1`] = `
+"openapi: 3.0.0
+info:
+  title: Testing additional types
+  version: 3.4.5
+paths:
+  /v1/getSomething:
+    post:
+      responses:
+        default:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: \\"#/components/schemas/responseSchema1\\"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: \\"#/components/schemas/requestBody1\\"
+components:
+  schemas:
+    responseSchema1:
+      type: object
+      properties:
+        \\"null\\":
+          nullable: true
+          type: string
+          format: \\"null\\"
+      required:
+        - \\"null\\"
+      description: /v1/getSomething POST response schema
+    requestBody1:
+      type: object
+      properties:
+        bigint:
+          type: integer
+          format: int64
+        boolean:
+          type: boolean
+        date:
+          type: string
+          format: date
+      required:
+        - bigint
+        - boolean
+        - date
+      description: /v1/getSomething POST request body
+  responses: {}
+  parameters: {}
+  examples: {}
+  requestBodies: {}
+  headers: {}
+  securitySchemes: {}
+  links: {}
+  callbacks: {}
+tags: []
+servers:
+  - url: http://example.com
+"
+`;
+
 exports[`Open API generator should handle transformation schema in output 1`] = `
 "openapi: 3.0.0
 info:

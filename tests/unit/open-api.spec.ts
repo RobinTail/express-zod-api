@@ -167,4 +167,64 @@ describe('Open API generator', () => {
     }).builder.getSpecAsYaml();
     expect(spec).toMatchSnapshot();
   });
+
+  test('should handle bigint, boolean, date and null', () => {
+    const spec = new OpenAPI({
+      routing: {
+        v1: {
+          getSomething: endpointsFactory.build({
+            method: 'post',
+            input: z.object({
+              bigint: z.bigint(),
+              boolean: z.boolean(),
+              date: z.date()
+            }),
+            output: z.object({
+              null: z.null()
+            }),
+            handler: async () => ({
+              null: null
+            })
+          })
+        }
+      },
+      version: '3.4.5',
+      title: 'Testing additional types',
+      serverUrl: 'http://example.com'
+    }).builder.getSpecAsYaml();
+    expect(spec).toMatchSnapshot();
+  });
+
+  test('should throw on unsupported types', () => {
+    [
+      z.undefined(),
+      z.tuple([]),
+      z.map(z.any(), z.any()),
+      z.function(),
+      z.lazy(() => z.any()),
+      z.promise(z.any()),
+      z.any(),
+      z.unknown(),
+      z.never(),
+      z.void()
+    ].forEach((zodType) => {
+      expect(() => new OpenAPI({
+        routing: {
+          v1: {
+            getSomething: endpointsFactory.build({
+              method: 'post',
+              input: z.object({
+                property: zodType
+              }),
+              output: z.object({}),
+              handler: async () => ({})
+            })
+          }
+        },
+        version: '3.4.5',
+        title: 'Testing unsupported types',
+        serverUrl: 'http://example.com'
+      })).toThrowError(/Zod type Zod\w+ is unsupported/);
+    });
+  });
 });
