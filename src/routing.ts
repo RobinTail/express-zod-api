@@ -3,7 +3,7 @@ import {Logger} from 'winston';
 import {ConfigType} from './config-type';
 import {AbstractEndpoint, Endpoint} from './endpoint';
 import {DependsOnMethodError, RoutingError} from './errors';
-import {CorsMethod, Method} from './method';
+import {AuxMethod, Method} from './method';
 
 export class DependsOnMethod {
   constructor(public readonly methods: {
@@ -42,7 +42,7 @@ export interface Routing {
 
 export interface RoutingCycleParams {
   routing: Routing;
-  cb: (endpoint: AbstractEndpoint, fullPath: string, method: CorsMethod) => void;
+  cb: (endpoint: AbstractEndpoint, fullPath: string, method: Method | AuxMethod) => void;
   parentPath?: string;
   cors?: boolean;
 }
@@ -58,7 +58,7 @@ export const routingCycle = ({routing, cb, parentPath, cors}: RoutingCycleParams
     }
     const fullPath = `${parentPath || ''}${path ? `/${path}` : ''}`;
     if (element instanceof AbstractEndpoint) {
-      const methods: CorsMethod[] = element.getMethods();
+      const methods: (Method | AuxMethod)[] = element.getMethods();
       if (cors) {
         methods.push('options');
       }
