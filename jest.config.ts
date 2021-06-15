@@ -6,6 +6,7 @@ const config: Config.InitialOptions = {
   verbose: true,
   forceExit: true,
   collectCoverage: true,
+  coverageReporters: ['json-summary', 'text'],
   testTimeout: 10000,
 };
 
