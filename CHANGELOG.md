@@ -2,6 +2,14 @@
 
 ## Version 1
 
+### v1.3.1
+
+- Improving the coverage I found a bug and fixed it.
+  In some cases there was an issue with CORS requests: [preflight OPTIONS requests](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS#preflighted_requests).
+  Despite the enabled configuration option `cors: true` the OPTIONS requests have not been handled properly.
+  This was leading to the 404 error with a message "Can not OPTIONS <route>".
+  The issue has been fixed and covered by multiple tests.
+
 ### v1.3.0
 
 - Zod version is 3.2.0.
