@@ -21,7 +21,11 @@ describe('Endpoint', () => {
         inputSchema: z.object({}).nonstrict(),
         outputSchema: z.object({}).nonstrict(),
         handler: jest.fn(),
-        resultHandler: jest.fn(),
+        resultHandler: {
+          getPositiveResponse: jest.fn(),
+          getNegativeResponse: jest.fn(),
+          resultHandler: jest.fn()
+        },
         middlewares: []
       });
       expect(endpointMock.getMethods()).toEqual(['get', 'post', 'put', 'delete', 'patch']);
@@ -33,7 +37,11 @@ describe('Endpoint', () => {
         inputSchema: z.object({}).nonstrict(),
         outputSchema: z.object({}).nonstrict(),
         handler: jest.fn(),
-        resultHandler: jest.fn(),
+        resultHandler: {
+          getPositiveResponse: jest.fn(),
+          getNegativeResponse: jest.fn(),
+          resultHandler: jest.fn()
+        },
         middlewares: []
       });
       expect(endpointMock.getMethods()).toEqual(['patch']);
