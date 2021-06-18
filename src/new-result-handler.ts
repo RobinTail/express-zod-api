@@ -3,16 +3,16 @@ import {Logger} from 'winston';
 import {z} from 'zod';
 import {getMessageFromError, getStatusCodeFromError, IOSchema} from './helpers';
 
-interface ResultHandlerParams<T> {
+interface ResultHandlerParams<RES> {
   error: Error | null;
   input: any;
   output: any;
   request: Request;
-  response: Response<T>;
+  response: Response<RES>;
   logger: Logger
 }
 
-type ResultHandler<T> = (params: ResultHandlerParams<T>) => void | Promise<void>;
+type ResultHandler<RES> = (params: ResultHandlerParams<RES>) => void | Promise<void>;
 
 interface ResultHandlerDefinition<SUCCESS extends z.ZodTypeAny, ERROR extends z.ZodTypeAny> {
   getPositiveResponse: (output: IOSchema) => SUCCESS,
