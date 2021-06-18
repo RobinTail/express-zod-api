@@ -81,7 +81,9 @@ describe('Server', () => {
           jsonParser: jest.fn(),
         },
         cors: true,
-        resultHandler: jest.fn(),
+        resultHandler: {
+          resultHandler: jest.fn(),
+        },
         logger: {
           info: jest.fn()
         }
@@ -107,9 +109,9 @@ describe('Server', () => {
       expect(Array.isArray(appMock.use.mock.calls[0][0])).toBeTruthy();
       expect(appMock.use.mock.calls[0][0][0]).toBe(configMock.server.jsonParser);
       expect(typeof appMock.use.mock.calls[1][0]).toBe('function');
-      expect(configMock.resultHandler).toBeCalledTimes(0);
+      expect(configMock.resultHandler.resultHandler).toBeCalledTimes(0);
       appMock.use.mock.calls[1][0]({method: 'get', path: '/v1/test'});
-      expect(configMock.resultHandler).toBeCalledTimes(1);
+      expect(configMock.resultHandler.resultHandler).toBeCalledTimes(1);
       expect(configMock.logger.info).toBeCalledTimes(1);
       expect(configMock.logger.info).toBeCalledWith('Listening 8054');
       expect(appMock.get).toBeCalledTimes(1);

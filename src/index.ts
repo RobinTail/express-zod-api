@@ -5,7 +5,7 @@ export { EndpointsFactory } from './endpoints-factory';
 export { IOSchema, FlatObject } from './helpers';
 export { createLogger } from './logger';
 export { createMiddleware } from './middleware';
-export { ResultHandler } from './result-handler';
+export { createResultHandler } from './result-handler';
 export { Routing, DependsOnMethod } from './routing';
 export { createServer, attachRouting } from './server';
 export { OpenAPI } from './open-api';

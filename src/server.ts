@@ -18,12 +18,12 @@ export function attachRouting(config: ConfigWithApp, routing: Routing): void {
 export function createServer(config: ConfigWithServer, routing: Routing): Server {
   const logger = isLoggerConfig(config.logger) ? createLogger(config.logger) : config.logger;
   const app = express();
-  const resultHandler = config.resultHandler || defaultResultHandler;
+  const resultHandlerDefinition = config.resultHandler || defaultResultHandler;
   const jsonParser = config.server.jsonParser || express.json();
 
   const jsonFailureHandler: express.ErrorRequestHandler = (error, request, response, next) => {
     if (!error) { return next(); }
-    resultHandler({
+    resultHandlerDefinition.resultHandler({
       error, request, response, logger,
       input: request.body,
       output: null
@@ -31,7 +31,7 @@ export function createServer(config: ConfigWithServer, routing: Routing): Server
   };
 
   const lastResortHandler: express.RequestHandler = (request, response) => {
-    resultHandler({
+    resultHandlerDefinition.resultHandler({
       request, response, logger,
       error: createHttpError(404, `Can not ${request.method} ${request.path}`),
       input: null,

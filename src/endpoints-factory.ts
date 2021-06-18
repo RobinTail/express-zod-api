@@ -3,7 +3,7 @@ import {Endpoint, Handler} from './endpoint';
 import {FlatObject, IOSchema, Merge} from './helpers';
 import {Method, MethodsDefinition} from './method';
 import {MiddlewareDefinition} from './middleware';
-import {ResultHandler} from './result-handler';
+import {ResultHandlerDefinition} from './result-handler';
 
 type BuildProps<IN extends IOSchema, OUT extends IOSchema, mIN, mOUT, M extends Method> = {
   input: IN;
@@ -15,11 +15,11 @@ type BuildProps<IN extends IOSchema, OUT extends IOSchema, mIN, mOUT, M extends 
 /** mIN, mOUT - accumulated from all middlewares */
 export class EndpointsFactory<mIN, mOUT> {
   protected middlewares: MiddlewareDefinition<any, any, any>[] = [];
-  protected resultHandler: ResultHandler | null = null;
+  protected resultHandler: ResultHandlerDefinition<any, any> | null = null;
 
   private static create<mIN, mOUT>(
     middlewares: MiddlewareDefinition<any, any, any>[],
-    resultHandler: ResultHandler | null
+    resultHandler: ResultHandlerDefinition<any, any> | null
   ) {
     const factory = new EndpointsFactory<mIN, mOUT>();
     factory.middlewares = middlewares;
@@ -27,7 +27,7 @@ export class EndpointsFactory<mIN, mOUT> {
     return factory;
   }
 
-  public setResultHandler(resultHandler: ResultHandler) {
+  public setResultHandler(resultHandler: ResultHandlerDefinition<any, any>) {
     return EndpointsFactory.create<mIN, mOUT>(
       this.middlewares,
       resultHandler

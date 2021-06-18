@@ -5,7 +5,7 @@ import {ConfigType} from './config-type';
 import {combineEndpointAndMiddlewareInputSchemas, getInitialInput, IOSchema, Merge} from './helpers';
 import {Method, MethodsDefinition} from './method';
 import {MiddlewareDefinition} from './middleware';
-import {defaultResultHandler, ResultHandler} from './result-handler';
+import {defaultResultHandler, ResultHandlerDefinition} from './result-handler';
 
 export type Handler<IN, OUT, OPT> = (params: {
   input: IN,
@@ -41,7 +41,7 @@ type EndpointProps<IN extends IOSchema, OUT extends IOSchema, mIN, OPT, M extend
   inputSchema: IN;
   outputSchema: OUT;
   handler: Handler<z.output<Merge<IN, mIN>>, z.input<OUT>, OPT>;
-  resultHandler: ResultHandler | null;
+  resultHandler: ResultHandlerDefinition<any, any> | null;
   description?: string;
 } & MethodsDefinition<M>;
 
@@ -52,7 +52,7 @@ export class Endpoint<IN extends IOSchema, OUT extends IOSchema, mIN, OPT, M ext
   protected inputSchema: Merge<IN, mIN>; // combined with middlewares input
   protected outputSchema: OUT;
   protected handler: Handler<z.output<Merge<IN, mIN>>, z.input<OUT>, OPT>
-  protected resultHandler: ResultHandler | null;
+  protected resultHandler: ResultHandlerDefinition<any, any> | null;
 
   constructor({
     middlewares, inputSchema, outputSchema, handler, resultHandler, description, ...rest
@@ -147,9 +147,9 @@ export class Endpoint<IN extends IOSchema, OUT extends IOSchema, mIN, OPT, M ext
     initialInput: any,
     output: any
   }) {
-    const resultHandler = this.resultHandler || config.resultHandler || defaultResultHandler;
+    const definition = this.resultHandler || config.resultHandler || defaultResultHandler;
     try {
-      await resultHandler({
+      await definition.resultHandler({
         error, output, request, response, logger,
         input: initialInput
       });

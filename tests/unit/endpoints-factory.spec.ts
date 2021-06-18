@@ -1,6 +1,6 @@
 import {createMiddleware, EndpointsFactory, z} from '../../src';
 import {Endpoint} from '../../src/endpoint';
-import {defaultResultHandler} from '../../src/result-handler';
+import {defaultResultHandler, ResultHandlerDefinition} from '../../src/result-handler';
 import {expectType} from 'tsd';
 
 describe('EndpointsFactory', () => {
@@ -67,8 +67,10 @@ describe('EndpointsFactory', () => {
         }),
         middleware: jest.fn()
       });
-      const resultHandlerMock = jest.fn();
-      const factory = new EndpointsFactory().addMiddleware(middleware).setResultHandler(resultHandlerMock);
+      const resultHandlerMock = { resultHandler: jest.fn() };
+      const factory = new EndpointsFactory()
+        .addMiddleware(middleware)
+        .setResultHandler(resultHandlerMock as unknown as ResultHandlerDefinition<any, any>);
       const handlerMock = jest.fn();
       const endpoint = factory.build({
         method: 'get',
@@ -102,8 +104,10 @@ describe('EndpointsFactory', () => {
         })),
         middleware: jest.fn()
       });
-      const resultHandlerMock = jest.fn();
-      const factory = new EndpointsFactory().addMiddleware(middleware).setResultHandler(resultHandlerMock);
+      const resultHandlerMock = { resultHandler: jest.fn() };
+      const factory = new EndpointsFactory()
+        .addMiddleware(middleware)
+        .setResultHandler(resultHandlerMock as unknown as ResultHandlerDefinition<any, any>);
       const handlerMock = jest.fn();
       const endpoint = factory.build({
         methods: ['get'],
@@ -138,8 +142,10 @@ describe('EndpointsFactory', () => {
         })),
         middleware: jest.fn()
       });
-      const resultHandlerMock = jest.fn();
-      const factory = new EndpointsFactory().addMiddleware(middleware).setResultHandler(resultHandlerMock);
+      const resultHandlerMock = { resultHandler: jest.fn() };
+      const factory = new EndpointsFactory()
+        .addMiddleware(middleware)
+        .setResultHandler(resultHandlerMock as unknown as ResultHandlerDefinition<any, any>);
       const handlerMock = jest.fn().mockImplementation((params) => ({
         input: params.input,
         b: true,

@@ -26,7 +26,7 @@ describe('ResultHandler', () => {
         method: 'POST',
         url: 'http://something/v1/anything'
       };
-      defaultResultHandler({
+      defaultResultHandler.resultHandler({
         error: new Error('Some error'),
         input: { something: 453 },
         output: { anything: 118 },
@@ -54,7 +54,7 @@ describe('ResultHandler', () => {
         method: 'POST',
         url: 'http://something/v1/anything'
       };
-      defaultResultHandler({
+      defaultResultHandler.resultHandler({
         error: new z.ZodError([{
           code: 'invalid_type',
           message: 'Expected string, got number',
@@ -83,7 +83,7 @@ describe('ResultHandler', () => {
         method: 'POST',
         url: 'http://something/v1/anything'
       };
-      defaultResultHandler({
+      defaultResultHandler.resultHandler({
         error: createHttpError(404, 'Something not found'),
         input: { something: 453 },
         output: { anything: 118 },
@@ -106,7 +106,7 @@ describe('ResultHandler', () => {
         method: 'POST',
         url: 'http://something/v1/anything'
       };
-      defaultResultHandler({
+      defaultResultHandler.resultHandler({
         error: null,
         input: { something: 453 },
         output: { anything: 118 },
