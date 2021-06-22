@@ -16,27 +16,20 @@ type BuildProps<IN extends IOSchema, OUT extends IOSchema, mIN, mOUT, M extends 
 // type DefaultNegative = typeof defaultResultHandler extends ResultHandlerDefinition<any, infer dN> ? dN : never;
 
 /** mIN, mOUT - accumulated from all middlewares */
-export class EndpointsFactory<mIN, mOUT, POS, NEG> {
+export class EndpointsFactory<mIN, mOUT, POS extends z.ZodTypeAny, NEG extends z.ZodTypeAny> {
   protected middlewares: MiddlewareDefinition<any, any, any>[] = [];
-  protected resultHandler?: ResultHandlerDefinition<any, any>;
 
-  private static create<cmIN, cmOUT, cPOS, cNEG>(
-    middlewares: MiddlewareDefinition<any, any, any>[],
-    resultHandler?: ResultHandlerDefinition<any, any>
-  ) {
-    const factory = new EndpointsFactory<cmIN, cmOUT, cPOS, cNEG>();
-    factory.middlewares = middlewares;
-    factory.resultHandler = resultHandler;
-    return factory;
+  constructor(protected resultHandler: ResultHandlerDefinition<POS, NEG>) {
+    this.resultHandler = resultHandler;
   }
 
-  public setResultHandler<sPOS extends z.ZodTypeAny, sNEG extends z.ZodTypeAny>(
-    definition: ResultHandlerDefinition<sPOS, sNEG>
+  private static create<cmIN, cmOUT, cPOS extends z.ZodTypeAny, cNEG extends z.ZodTypeAny>(
+    middlewares: MiddlewareDefinition<any, any, any>[],
+    resultHandler: ResultHandlerDefinition<cPOS, cNEG>
   ) {
-    return EndpointsFactory.create<mIN, mOUT, sPOS, sNEG>(
-      this.middlewares,
-      definition
-    );
+    const factory = new EndpointsFactory<cmIN, cmOUT, cPOS, cNEG>(resultHandler);
+    factory.middlewares = middlewares;
+    return factory;
   }
 
   public addMiddleware<IN extends IOSchema, OUT extends FlatObject>(
@@ -51,9 +44,6 @@ export class EndpointsFactory<mIN, mOUT, POS, NEG> {
   public build<IN extends IOSchema, OUT extends IOSchema, M extends Method>({
     input, output, handler, description, ...rest
   }: BuildProps<IN, OUT, mIN, mOUT, M>) {
-    if (!this.resultHandler) {
-      throw new Error(`${description ? description + ': ' : ''}result handler is not set before calling .build()`);
-    }
     return new Endpoint<IN, OUT, mIN, mOUT, M, POS, NEG>({
       handler, description,
       middlewares: this.middlewares,

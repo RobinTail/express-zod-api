@@ -60,8 +60,7 @@ describe('Endpoint', () => {
         }),
         middleware: middlewareMock
       });
-      const factory = new EndpointsFactory()
-        .setResultHandler(defaultResultHandler)
+      const factory = new EndpointsFactory(defaultResultHandler)
         .addMiddleware(middlewareDefinitionMock);
       const handlerMock = jest.fn().mockImplementationOnce(async ({input, options}) => ({
         inc2: (options as { inc: number }).inc + 1,

@@ -48,8 +48,7 @@ describe('Server', () => {
       };
       const routingMock = {
         v1: {
-          test: new EndpointsFactory()
-            .setResultHandler(defaultResultHandler)
+          test: new EndpointsFactory(defaultResultHandler)
             .build({
               methods: ['get', 'post'],
               input: z.object({
@@ -93,8 +92,7 @@ describe('Server', () => {
       };
       const routingMock = {
         v1: {
-          test: new EndpointsFactory()
-            .setResultHandler(defaultResultHandler)
+          test: new EndpointsFactory(defaultResultHandler)
             .build({
               methods: ['get', 'post'],
               input: z.object({
@@ -146,8 +144,7 @@ describe('Server', () => {
       };
       const routingMock = {
         v1: {
-          test: new EndpointsFactory()
-            .setResultHandler(defaultResultHandler)
+          test: new EndpointsFactory(defaultResultHandler)
             .build({
               methods: ['get', 'post'],
               input: z.object({

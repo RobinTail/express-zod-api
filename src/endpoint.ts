@@ -47,33 +47,27 @@ export type EndpointResponse<T> = T extends Endpoint<any, any, any, any, any, an
 
 type EndpointProps<
   IN extends IOSchema, OUT extends IOSchema,
-  mIN, OPT, M extends Method, POS, NEG
+  mIN, OPT, M extends Method, POS extends z.ZodTypeAny, NEG extends z.ZodTypeAny
 > = {
   middlewares: MiddlewareDefinition<any, any, any>[];
   inputSchema: IN;
   outputSchema: OUT;
   handler: Handler<z.output<Merge<IN, mIN>>, z.input<OUT>, OPT>;
-  resultHandler: ResultHandlerDefinition<
-    POS extends z.ZodTypeAny ? POS : never,
-    NEG extends z.ZodTypeAny ? NEG : never
-  >;
+  resultHandler: ResultHandlerDefinition<POS, NEG>;
   description?: string;
 } & MethodsDefinition<M>;
 
 /** mIN, OPT - from Middlewares */
 export class Endpoint<
-  IN extends IOSchema, OUT extends IOSchema,
-  mIN, OPT, M extends Method, POS, NEG
+  IN extends IOSchema, OUT extends IOSchema, mIN, OPT,
+  M extends Method, POS extends z.ZodTypeAny, NEG extends z.ZodTypeAny
 > extends AbstractEndpoint {
   protected methods: M[] = [];
   protected middlewares: MiddlewareDefinition<any, any, any>[] = [];
   protected inputSchema: Merge<IN, mIN>; // combined with middlewares input
   protected outputSchema: OUT;
   protected handler: Handler<z.output<Merge<IN, mIN>>, z.input<OUT>, OPT>
-  protected resultHandler: ResultHandlerDefinition<
-    POS extends z.ZodTypeAny ? POS : never,
-    NEG extends z.ZodTypeAny ? NEG : never
-  >;
+  protected resultHandler: ResultHandlerDefinition<POS, NEG>;
 
   constructor({
     middlewares, inputSchema, outputSchema, handler, resultHandler, description, ...rest

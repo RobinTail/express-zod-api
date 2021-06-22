@@ -32,7 +32,7 @@ describe('Routing', () => {
       const configMock = {
         cors: true
       };
-      const factory = new EndpointsFactory().setResultHandler(defaultResultHandler);
+      const factory = new EndpointsFactory(defaultResultHandler);
       const getEndpoint = factory.build({
         methods: ['get'],
         input: z.object({}).nonstrict(),
@@ -86,7 +86,7 @@ describe('Routing', () => {
       const configMock = {
         cors: true
       };
-      const factory = new EndpointsFactory().setResultHandler(defaultResultHandler);
+      const factory = new EndpointsFactory(defaultResultHandler);
       const getEndpoint = factory.build({
         methods: ['get'],
         input: z.object({}).nonstrict(),
@@ -137,8 +137,7 @@ describe('Routing', () => {
     test('Should accept parameters', () => {
       const handlerMock = jest.fn();
       const configMock = {};
-      const endpointMock = new EndpointsFactory()
-        .setResultHandler(defaultResultHandler)
+      const endpointMock = new EndpointsFactory(defaultResultHandler)
         .build({
           methods: ['get'],
           input: z.object({}).nonstrict(),
@@ -165,8 +164,7 @@ describe('Routing', () => {
     test('Should handle empty paths and trim spaces', () => {
       const handlerMock = jest.fn();
       const configMock = {};
-      const endpointMock = new EndpointsFactory()
-        .setResultHandler(defaultResultHandler)
+      const endpointMock = new EndpointsFactory(defaultResultHandler)
         .build({
           methods: ['get'],
           input: z.object({}).nonstrict(),
@@ -197,8 +195,7 @@ describe('Routing', () => {
     test('Should throw an error in case of slashes in route', () => {
       const handlerMock = jest.fn();
       const configMock = {};
-      const endpointMock = new EndpointsFactory()
-        .setResultHandler(defaultResultHandler)
+      const endpointMock = new EndpointsFactory(defaultResultHandler)
         .build({
           methods: ['get'],
           input: z.object({}).nonstrict(),
@@ -228,8 +225,7 @@ describe('Routing', () => {
     test('Should execute endpoints with right arguments', async () => {
       const handlerMock = jest.fn().mockImplementationOnce(() => ({result: true}));
       const configMock = { cors: true };
-      const setEndpoint = new EndpointsFactory()
-        .setResultHandler(defaultResultHandler)
+      const setEndpoint = new EndpointsFactory(defaultResultHandler)
         .build({
           methods: ['post'],
           input: z.object({
@@ -298,8 +294,7 @@ describe('Routing', () => {
 
     test('should accept an endpoint with a corresponding method', () => {
       const instance = new DependsOnMethod({
-        post: new EndpointsFactory()
-          .setResultHandler(defaultResultHandler)
+        post: new EndpointsFactory(defaultResultHandler)
           .build({
             method: 'post',
             input: z.object({}),
@@ -312,8 +307,7 @@ describe('Routing', () => {
     });
 
     test('should accept an endpoint with additional methods', () => {
-      const endpoint = new EndpointsFactory()
-        .setResultHandler(defaultResultHandler)
+      const endpoint = new EndpointsFactory(defaultResultHandler)
         .build({
           methods: ['get', 'post'],
           input: z.object({}),
@@ -330,8 +324,7 @@ describe('Routing', () => {
     });
 
     test('should throw an error if the endpoint does not have the corresponding method', () => {
-      const endpoint = new EndpointsFactory()
-        .setResultHandler(defaultResultHandler)
+      const endpoint = new EndpointsFactory(defaultResultHandler)
         .build({
           methods: ['get', 'patch'],
           input: z.object({}),

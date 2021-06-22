@@ -9,8 +9,7 @@ describe('App', () => {
   beforeAll(() => {
     const routing = {
       v1: {
-        test: new EndpointsFactory()
-          .setResultHandler(defaultResultHandler)
+        test: new EndpointsFactory(defaultResultHandler)
           .addMiddleware({
             input: z.object({
               key: z.string().refine((v) => v === '123', 'Invalid key')
