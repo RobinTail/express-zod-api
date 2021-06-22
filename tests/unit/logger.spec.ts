@@ -1,5 +1,5 @@
 import {createLogger, LoggerConfig} from '../../src';
-import * as Transport from 'winston-transport';
+import Transport from 'winston-transport';
 import {SPLAT} from 'triple-beam';
 
 describe('Logger', () => {

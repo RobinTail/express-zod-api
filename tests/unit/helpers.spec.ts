@@ -8,6 +8,7 @@ import {
 } from '../../src/helpers';
 import {createMiddleware, z, createHttpError} from '../../src';
 import {Request} from 'express';
+import {MiddlewareDefinition} from '../../src/middleware';
 
 describe('Helpers', () => {
   describe('combineEndpointAndMiddlewareInputSchemas()', () => {
@@ -31,7 +32,7 @@ describe('Helpers', () => {
           }),
           middleware: jest.fn()
         }),
-      ];
+      ] as MiddlewareDefinition<any, any, any>[];
       const endpointInput = z.object({
         four: z.boolean()
       });
@@ -58,7 +59,7 @@ describe('Helpers', () => {
           })),
           middleware: jest.fn()
         }),
-      ];
+      ] as MiddlewareDefinition<any, any, any>[];
       const endpointInput = z.object({
         five: z.string()
       }).or(z.object({
@@ -87,7 +88,7 @@ describe('Helpers', () => {
           })),
           middleware: jest.fn()
         }),
-      ];
+      ] as MiddlewareDefinition<any, any, any>[];
       const endpointInput = z.object({
         five: z.string()
       }).and(z.object({
@@ -116,7 +117,7 @@ describe('Helpers', () => {
           })),
           middleware: jest.fn()
         }),
-      ];
+      ] as MiddlewareDefinition<any, any, any>[];
       const endpointInput = z.object({
         five: z.string()
       });

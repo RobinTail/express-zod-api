@@ -7,7 +7,7 @@
     "start": "ts-node example/index.ts",
     "build": "yarn build:cleanup && yarn build:compile && yarn build:swagger && yarn build:license",
     "build:cleanup": "rm -rf ./dist && rm -f example/example.swagger.yaml && rm -f ./LICENSE",
-    "build:compile": "tsc",
+    "build:compile": "tsc --build tsconfig.build.json",
     "build:swagger": "ts-node example/generate-open-api-schema.ts > example/example.swagger.yaml",
     "build:license": "ts-node tools/generate-license.ts > ./LICENSE",
     "test": "yarn test:jest && yarn test:badge",
@@ -29,6 +29,7 @@
     "zod": "^3.0.0-alpha.4"
   },
   "devDependencies": {
+    "@tsconfig/node10": "^1.0.8",
     "@types/express": "^4.17.11",
     "@types/http-errors": "^1.8.0",
     "@types/jest": "^26.0.20",
@@ -45,6 +46,9 @@
     "ts-node": "^9.1.1",
     "tsd": "^0.16.0",
     "typescript": "^4.1.5"
+  },
+  "engines": {
+    "node": ">=10.0.0"
   },
   "repository": {
     "type": "git",

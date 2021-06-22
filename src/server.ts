@@ -1,11 +1,11 @@
-import * as express from 'express';
+import express from 'express';
 import {Server} from 'http';
 import {ConfigType} from './config-type';
 import {isLoggerConfig} from './helpers';
 import {createLogger} from './logger';
 import {defaultResultHandler} from './result-handler';
 import {initRouting, Routing} from './routing';
-import * as createHttpError from 'http-errors';
+import createHttpError from 'http-errors';
 
 type ConfigWithServer = Exclude<ConfigType, {app: any}>;
 type ConfigWithApp = Exclude<ConfigType, {server: any}>;
