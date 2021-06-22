@@ -27,9 +27,9 @@ export type ConfigType = ({
   // enable cross-origin resource sharing
   // https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
   cors: boolean;
-  // custom handler for responding with an error or an output,
+  // custom ResultHandlerDefinition for common errors,
   // default: defaultResultHandler()
-  resultHandler?: ResultHandlerDefinition<any, any>;
+  errorHandler?: ResultHandlerDefinition<any, any>;
   // logger configuration or your custom winston logger
   logger: LoggerConfig | Logger;
 }

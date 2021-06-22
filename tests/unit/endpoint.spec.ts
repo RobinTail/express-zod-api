@@ -1,6 +1,7 @@
 import {z, EndpointsFactory, ConfigType, createMiddleware} from '../../src';
 import {Endpoint} from '../../src/endpoint';
 import {Request, Response} from 'express';
+import {defaultResultHandler} from '../../src/result-handler';
 
 let loggerMock: any;
 
@@ -59,7 +60,9 @@ describe('Endpoint', () => {
         }),
         middleware: middlewareMock
       });
-      const factory = new EndpointsFactory().addMiddleware(middlewareDefinitionMock);
+      const factory = new EndpointsFactory()
+        .setResultHandler(defaultResultHandler)
+        .addMiddleware(middlewareDefinitionMock);
       const handlerMock = jest.fn().mockImplementationOnce(async ({input, options}) => ({
         inc2: (options as { inc: number }).inc + 1,
         str: input.n.toFixed(2),

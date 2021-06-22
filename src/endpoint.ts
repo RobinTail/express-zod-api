@@ -5,7 +5,7 @@ import {ConfigType} from './config-type';
 import {combineEndpointAndMiddlewareInputSchemas, getInitialInput, IOSchema, Merge} from './helpers';
 import {Method, MethodsDefinition} from './method';
 import {MiddlewareDefinition} from './middleware';
-import {defaultResultHandler, ResultHandlerDefinition} from './result-handler';
+import {ResultHandlerDefinition} from './result-handler';
 
 export type Handler<IN, OUT, OPT> = (params: {
   input: IN,
@@ -30,33 +30,54 @@ export abstract class AbstractEndpoint {
   abstract getMethods(): Method[];
   abstract getInputSchema(): IOSchema;
   abstract getOutputSchema(): IOSchema;
+  abstract getPositiveResponseSchema(): z.ZodTypeAny;
+  abstract getNegativeResponseSchema(): z.ZodTypeAny;
 }
 
-export type EndpointInput<T> = T extends Endpoint<infer IN, any, infer mIN, any, any> ? z.input<Merge<IN, mIN>> : never;
+export type EndpointInput<T> = T extends Endpoint<infer IN, any, infer mIN, any, any, any, any>
+  ? z.input<Merge<IN, mIN>> : never;
 
-export type EndpointOutput<T> = T extends Endpoint<any, infer OUT, any, any, any> ? z.output<OUT> : never;
+export type EndpointOutput<T> = T extends Endpoint<any, infer OUT, any, any, any, any, any>
+  ? z.output<OUT> : never;
 
-type EndpointProps<IN extends IOSchema, OUT extends IOSchema, mIN, OPT, M extends Method> = {
+/*
+export type EndpointResponse<T> = T extends Endpoint<any, any, any, any, any, any, any> ?
+  z.output<ReturnType<T['getPositiveResponseSchema']>> | z.output<ReturnType<T['getNegativeResponseSchema']>> : never;
+*/
+
+type EndpointProps<
+  IN extends IOSchema, OUT extends IOSchema,
+  mIN, OPT, M extends Method, POS, NEG
+> = {
   middlewares: MiddlewareDefinition<any, any, any>[];
   inputSchema: IN;
   outputSchema: OUT;
   handler: Handler<z.output<Merge<IN, mIN>>, z.input<OUT>, OPT>;
-  resultHandler: ResultHandlerDefinition<any, any> | null;
+  resultHandler: ResultHandlerDefinition<
+    POS extends z.ZodTypeAny ? POS : never,
+    NEG extends z.ZodTypeAny ? NEG : never
+  >;
   description?: string;
 } & MethodsDefinition<M>;
 
 /** mIN, OPT - from Middlewares */
-export class Endpoint<IN extends IOSchema, OUT extends IOSchema, mIN, OPT, M extends Method> extends AbstractEndpoint {
+export class Endpoint<
+  IN extends IOSchema, OUT extends IOSchema,
+  mIN, OPT, M extends Method, POS, NEG
+> extends AbstractEndpoint {
   protected methods: M[] = [];
   protected middlewares: MiddlewareDefinition<any, any, any>[] = [];
   protected inputSchema: Merge<IN, mIN>; // combined with middlewares input
   protected outputSchema: OUT;
   protected handler: Handler<z.output<Merge<IN, mIN>>, z.input<OUT>, OPT>
-  protected resultHandler: ResultHandlerDefinition<any, any> | null;
+  protected resultHandler: ResultHandlerDefinition<
+    POS extends z.ZodTypeAny ? POS : never,
+    NEG extends z.ZodTypeAny ? NEG : never
+  >;
 
   constructor({
     middlewares, inputSchema, outputSchema, handler, resultHandler, description, ...rest
-  }: EndpointProps<IN, OUT, mIN, OPT, M>) {
+  }: EndpointProps<IN, OUT, mIN, OPT, M, POS, NEG>) {
     super();
     this.middlewares = middlewares;
     this.inputSchema = combineEndpointAndMiddlewareInputSchemas<IN, mIN>(inputSchema, middlewares);
@@ -81,6 +102,14 @@ export class Endpoint<IN extends IOSchema, OUT extends IOSchema, mIN, OPT, M ext
 
   public getOutputSchema(): OUT {
     return this.outputSchema;
+  }
+
+  public getPositiveResponseSchema() {
+    return this.resultHandler.getPositiveResponse(this.outputSchema);
+  }
+
+  public getNegativeResponseSchema() {
+    return this.resultHandler.getNegativeResponse();
   }
 
   private setupCorsHeaders(response: Response) {
@@ -138,8 +167,7 @@ export class Endpoint<IN extends IOSchema, OUT extends IOSchema, mIN, OPT, M ext
     });
   }
 
-  private async handleResult({config, error, request, response, logger, initialInput, output}: {
-    config: ConfigType,
+  private async handleResult({error, request, response, logger, initialInput, output}: {
     error: Error | null,
     request: Request,
     response: Response,
@@ -147,9 +175,8 @@ export class Endpoint<IN extends IOSchema, OUT extends IOSchema, mIN, OPT, M ext
     initialInput: any,
     output: any
   }) {
-    const definition = this.resultHandler || config.resultHandler || defaultResultHandler;
     try {
-      await definition.resultHandler({
+      await this.resultHandler.resultHandler({
         error, output, request, response, logger,
         input: initialInput
       });
@@ -190,7 +217,7 @@ export class Endpoint<IN extends IOSchema, OUT extends IOSchema, mIN, OPT, M ext
     }
     await this.handleResult({
       initialInput, output, request,
-      response, error, logger, config
+      response, error, logger
     });
   }
 }
