@@ -14,14 +14,14 @@ interface ResultHandlerParams<RES> {
 
 type ResultHandler<RES> = (params: ResultHandlerParams<RES>) => void | Promise<void>;
 
-export interface ResultHandlerDefinition<SUCCESS extends z.ZodTypeAny, ERROR extends z.ZodTypeAny> {
-  getPositiveResponse: (output: IOSchema) => SUCCESS,
-  getNegativeResponse: () => ERROR,
-  resultHandler: ResultHandler<z.output<SUCCESS> | z.output<ERROR>>;
+export interface ResultHandlerDefinition<POS extends z.ZodTypeAny, NEG extends z.ZodTypeAny> {
+  getPositiveResponse: (output: IOSchema) => POS,
+  getNegativeResponse: () => NEG,
+  resultHandler: ResultHandler<z.output<POS> | z.output<NEG>>;
 }
 
-export const createResultHandler = <SUCCESS extends z.ZodTypeAny, ERROR extends z.ZodTypeAny>(
-  definition: ResultHandlerDefinition<SUCCESS, ERROR>
+export const createResultHandler = <POS extends z.ZodTypeAny, NEG extends z.ZodTypeAny>(
+  definition: ResultHandlerDefinition<POS, NEG>
 ) => definition;
 
 export const defaultResultHandler = createResultHandler({

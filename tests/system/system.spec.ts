@@ -1,6 +1,7 @@
 import http from 'http';
 import fetch from 'node-fetch';
 import {createServer, EndpointsFactory, Method, z} from '../../src';
+import {defaultResultHandler} from '../../src/result-handler';
 
 describe('App', () => {
   let server: http.Server;
@@ -9,6 +10,7 @@ describe('App', () => {
     const routing = {
       v1: {
         test: new EndpointsFactory()
+          .setResultHandler(defaultResultHandler)
           .addMiddleware({
             input: z.object({
               key: z.string().refine((v) => v === '123', 'Invalid key')

@@ -37,3 +37,6 @@ export const getUserEndpoint = endpointsFactory
       };
     }
   });
+
+// type MMM = EndpointOutput<typeof getUserEndpoint>;
+// type EEE = EndpointResponse<typeof getUserEndpoint>;
