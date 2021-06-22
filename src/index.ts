@@ -12,6 +12,6 @@ export { OpenAPI } from './open-api';
 export { OpenAPIError, DependsOnMethodError, RoutingError } from './errors';
 
 import { z } from 'zod';
-import * as createHttpError from 'http-errors';
+import createHttpError from 'http-errors';
 
 export { createHttpError, z };

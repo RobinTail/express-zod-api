@@ -560,6 +560,11 @@
   dependencies:
     defer-to-connect "^1.0.1"
 
+"@tsconfig/node10@^1.0.8":
+  version "1.0.8"
+  resolved "https://registry.yarnpkg.com/@tsconfig/node10/-/node10-1.0.8.tgz#c1e4e80d6f964fbecb3359c43bd48b40f7cadad9"
+  integrity sha512-6XFfSQmMgq0CFLY1MslA/CPUfhIL919M1rMsa5lP2P097N2Wd1sSX0tx1u4olM16fLNhtHZpRhedZJphNJqmZg==
+
 "@tsd/typescript@^4.2.4":
   version "4.3.2"
   resolved "https://registry.yarnpkg.com/@tsd/typescript/-/typescript-4.3.2.tgz#c63c4ce7b68590e57d0473a03f48ee58501ef7cf"

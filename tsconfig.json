@@ -1,7 +1,6 @@
 {
+  "extends": "@tsconfig/node10/tsconfig.json",
   "compilerOptions": {
-    "module": "commonjs",
-    "target": "es5",
     "sourceMap": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
@@ -9,5 +8,4 @@
     "outDir": "./dist",
     "resolveJsonModule": true
   },
-  "include": ["./src/*.ts"]
 }

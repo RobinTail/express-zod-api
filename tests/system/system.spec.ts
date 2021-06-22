@@ -1,4 +1,4 @@
-import * as http from 'http';
+import http from 'http';
 import fetch from 'node-fetch';
 import {createServer, EndpointsFactory, Method, z} from '../../src';
 

@@ -1,4 +1,4 @@
-import * as http from 'http';
+import http from 'http';
 
 let appMock: ReturnType<typeof newAppMock>;
 const expressJsonMock = jest.fn();
@@ -17,7 +17,7 @@ const expressMock = jest.mock('express', () => {
   return returnFunction;
 });
 
-import * as express from 'express'; // mocked above
+import express from 'express'; // mocked above
 import {ConfigType, createServer, attachRouting, EndpointsFactory, z} from '../../src';
 
 describe('Server', () => {

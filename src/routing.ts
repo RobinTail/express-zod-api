@@ -9,7 +9,7 @@ export class DependsOnMethod {
   constructor(public readonly methods: {
     [K in Method]?: Endpoint<any, any, any, any, K> | Endpoint<any, any, any, any, Method>;
   }) {
-    Object.keys(methods).forEach((key: keyof typeof methods) => {
+    (Object.keys(methods) as (keyof typeof methods)[]).forEach((key) => {
       if (key in methods) {
         const endpointMethods = methods[key]?.getMethods() || [];
         if (!endpointMethods.includes(key)) {
