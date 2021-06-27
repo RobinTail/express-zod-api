@@ -1,7 +1,4 @@
-import {EndpointsFactory} from '../src';
-import {defaultResultHandler} from '../src/result-handler';
+import {defaultEndpointsFactory} from '../src';
 import {authMiddleware} from './middlewares';
 
-export const endpointsFactory = new EndpointsFactory(defaultResultHandler);
-
-export const keyAndTokenAuthenticatedEndpointsFactory = endpointsFactory.addMiddleware(authMiddleware);
+export const keyAndTokenAuthenticatedEndpointsFactory = defaultEndpointsFactory.addMiddleware(authMiddleware);

@@ -1,6 +1,5 @@
-import {z, createHttpError} from '../../src';
+import {z, createHttpError, defaultEndpointsFactory} from '../../src';
 import {EndpointResponse} from '../../src/endpoint';
-import {endpointsFactory} from '../factories';
 import {methodProviderMiddleware} from '../middlewares';
 
 enum Status {
@@ -8,7 +7,7 @@ enum Status {
   Warning = 'Some kind of warning'
 }
 
-export const getUserEndpoint = endpointsFactory
+export const getUserEndpoint = defaultEndpointsFactory
   .addMiddleware(methodProviderMiddleware)
   .build({
     method: 'get',

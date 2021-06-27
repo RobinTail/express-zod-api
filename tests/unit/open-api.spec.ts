@@ -1,6 +1,5 @@
 import {routing} from '../../example/routing';
-import {endpointsFactory} from '../../example/factories';
-import {z, OpenAPI} from '../../src';
+import {z, OpenAPI, defaultEndpointsFactory} from '../../src';
 
 describe('Open API generator', () => {
   describe('generateOpenApi()', () => {
@@ -19,7 +18,7 @@ describe('Open API generator', () => {
       const spec = new OpenAPI({
         routing: {
           v1: {
-            getSomething: endpointsFactory.build({
+            getSomething: defaultEndpointsFactory.build({
               methods: ['get'],
               input: z.object({
                 array: z.array(z.number().int().positive()),
@@ -47,7 +46,7 @@ describe('Open API generator', () => {
       const spec = new OpenAPI({
         routing: {
           v1: {
-            getSomething: endpointsFactory.build({
+            getSomething: defaultEndpointsFactory.build({
               methods: ['get'],
               input: z.object({
                 optional: z.string().optional(),
@@ -72,7 +71,7 @@ describe('Open API generator', () => {
       const spec = new OpenAPI({
         routing: {
           v1: {
-            getSomething: endpointsFactory.build({
+            getSomething: defaultEndpointsFactory.build({
               methods: ['post'],
               input: z.object({
                 intersection: z.intersection(
@@ -112,7 +111,7 @@ describe('Open API generator', () => {
     const spec = new OpenAPI({
       routing: {
         v1: {
-          getSomething: endpointsFactory.build({
+          getSomething: defaultEndpointsFactory.build({
             methods: ['post'],
             input: z.object({
               union: z.union([
@@ -146,7 +145,7 @@ describe('Open API generator', () => {
     const spec = new OpenAPI({
       routing: {
         v1: {
-          getSomething: endpointsFactory.build({
+          getSomething: defaultEndpointsFactory.build({
             methods: ['post'],
             input: z.object({
               one: z.string(),
@@ -172,7 +171,7 @@ describe('Open API generator', () => {
     const spec = new OpenAPI({
       routing: {
         v1: {
-          getSomething: endpointsFactory.build({
+          getSomething: defaultEndpointsFactory.build({
             method: 'post',
             input: z.object({
               bigint: z.bigint(),
@@ -211,7 +210,7 @@ describe('Open API generator', () => {
       expect(() => new OpenAPI({
         routing: {
           v1: {
-            getSomething: endpointsFactory.build({
+            getSomething: defaultEndpointsFactory.build({
               method: 'post',
               input: z.object({
                 property: zodType
