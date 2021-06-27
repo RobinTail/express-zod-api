@@ -142,7 +142,7 @@ interface GenerationParams {
   errorResponseDescription?: string;
 }
 
-const mimeJson = lookup('.json');
+const mimeJson = lookup('json');
 
 export class OpenAPI extends OpenApiBuilder {
   public constructor({
