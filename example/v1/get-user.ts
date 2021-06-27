@@ -1,4 +1,5 @@
 import {z, createHttpError} from '../../src';
+import {EndpointResponse} from '../../src/endpoint';
 import {endpointsFactory} from '../factories';
 import {methodProviderMiddleware} from '../middlewares';
 
@@ -38,5 +39,5 @@ export const getUserEndpoint = endpointsFactory
     }
   });
 
-// type MMM = EndpointOutput<typeof getUserEndpoint>;
-// type EEE = EndpointResponse<typeof getUserEndpoint>;
+// @todo remove
+type RRR3 = EndpointResponse<typeof getUserEndpoint>;

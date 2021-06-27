@@ -2,7 +2,14 @@ import {Request, Response} from 'express';
 import {Logger} from 'winston';
 import {z} from 'zod';
 import {ConfigType} from './config-type';
-import {combineEndpointAndMiddlewareInputSchemas, getInitialInput, IOSchema, Merge} from './helpers';
+import {
+  combineEndpointAndMiddlewareInputSchemas,
+  getInitialInput,
+  IOSchema,
+  Merge,
+  OutputMarker,
+  ReplaceMarkerInShape
+} from './helpers';
 import {Method, MethodsDefinition} from './method';
 import {MiddlewareDefinition} from './middleware';
 import {ResultHandlerDefinition} from './result-handler';
@@ -40,10 +47,18 @@ export type EndpointInput<T> = T extends Endpoint<infer IN, any, infer mIN, any,
 export type EndpointOutput<T> = T extends Endpoint<any, infer OUT, any, any, any, any, any>
   ? z.output<OUT> : never;
 
-/*
-export type EndpointResponse<T> = T extends Endpoint<any, any, any, any, any, any, any> ?
-  z.output<ReturnType<T['getPositiveResponseSchema']>> | z.output<ReturnType<T['getNegativeResponseSchema']>> : never;
-*/
+export type EndpointResponse<E extends AbstractEndpoint> = z.output<
+  ReturnType<E['getPositiveResponseSchema']> extends z.ZodObject<z.ZodRawShape> // in object response
+    ? z.ZodObject<
+      ReplaceMarkerInShape<
+        ReturnType<E['getPositiveResponseSchema']>['_shape'],
+        ReturnType<E['getOutputSchema']>
+      >
+    >
+    : ReturnType<E['getPositiveResponseSchema']> extends OutputMarker // "as is" response
+    ? ReturnType<E['getOutputSchema']>
+    : never
+>;
 
 type EndpointProps<
   IN extends IOSchema, OUT extends IOSchema,
@@ -99,7 +114,7 @@ export class Endpoint<
   }
 
   public getPositiveResponseSchema() {
-    return this.resultHandler.getPositiveResponse(z.lazy(() => this.outputSchema));
+    return this.resultHandler.getPositiveResponse(this.outputSchema);
   }
 
   public getNegativeResponseSchema() {
