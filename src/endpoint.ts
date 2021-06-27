@@ -99,7 +99,7 @@ export class Endpoint<
   }
 
   public getPositiveResponseSchema() {
-    return this.resultHandler.getPositiveResponse(this.outputSchema);
+    return this.resultHandler.getPositiveResponse(z.lazy(() => this.outputSchema));
   }
 
   public getNegativeResponseSchema() {

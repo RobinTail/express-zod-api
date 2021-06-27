@@ -15,7 +15,7 @@ interface ResultHandlerParams<RES> {
 type ResultHandler<RES> = (params: ResultHandlerParams<RES>) => void | Promise<void>;
 
 export interface ResultHandlerDefinition<POS extends z.ZodTypeAny, NEG extends z.ZodTypeAny> {
-  getPositiveResponse: (output: IOSchema) => POS,
+  getPositiveResponse: <OUT extends z.ZodLazy<IOSchema>>(output: OUT) => POS,
   getNegativeResponse: () => NEG,
   resultHandler: ResultHandler<z.output<POS> | z.output<NEG>>;
 }
@@ -25,9 +25,9 @@ export const createResultHandler = <POS extends z.ZodTypeAny, NEG extends z.ZodT
 ) => definition;
 
 export const defaultResultHandler = createResultHandler({
-  getPositiveResponse: (output: IOSchema) => z.object({
+  getPositiveResponse: <OUT extends z.ZodLazy<IOSchema>>(output: OUT) => z.object({
     status: z.literal('success'),
-    data: output,
+    data: output.schema,
   }),
   getNegativeResponse: () => z.object({
     status: z.literal('error'),
