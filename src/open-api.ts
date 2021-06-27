@@ -142,18 +142,16 @@ interface GenerationParams {
   errorResponseDescription?: string;
 }
 
-export class OpenAPI {
-  public builder: OpenApiBuilder; // @todo extend builder after switching to ES6 target
+const mimeJson = lookup('.json');
 
+export class OpenAPI extends OpenApiBuilder {
   public constructor({
     routing, title, version, serverUrl,
     successfulResponseDescription = 'Successful response',
     errorResponseDescription = 'Error response'
   }: GenerationParams) {
-    const mimeJson = lookup('.json');
-    this.builder = new OpenApiBuilder()
-      .addInfo({title, version})
-      .addServer({url: serverUrl});
+    super();
+    this.addInfo({title, version}).addServer({url: serverUrl});
     const cb: RoutingCycleParams['cb'] = (endpoint, fullPath, method) => {
       const operation: OperationObject = {
         responses: {
@@ -210,8 +208,8 @@ export class OpenAPI {
           }
         };
       }
-      this.builder.addPath(fullPath, {
-        ...(this.builder.rootDoc.paths?.[fullPath] || {}),
+      this.addPath(fullPath, {
+        ...(this.rootDoc.paths?.[fullPath] || {}),
         [method]: operation,
       });
     };

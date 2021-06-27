@@ -10,7 +10,7 @@ describe('Open API generator', () => {
         version: '1.2.3',
         title: 'Example API',
         serverUrl: 'http://example.com'
-      }).builder.getSpecAsYaml();
+      }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
 
@@ -39,7 +39,7 @@ describe('Open API generator', () => {
         version: '3.4.5',
         title: 'Testing Complex Types',
         serverUrl: 'http://example.com'
-      }).builder.getSpecAsYaml();
+      }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
 
@@ -64,7 +64,7 @@ describe('Open API generator', () => {
         version: '3.4.5',
         title: 'Testing Nullable and Optional Types',
         serverUrl: 'http://example.com'
-      }).builder.getSpecAsYaml();
+      }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
 
@@ -103,7 +103,7 @@ describe('Open API generator', () => {
         version: '3.4.5',
         title: 'Testing Intersection and And types',
         serverUrl: 'http://example.com'
-      }).builder.getSpecAsYaml();
+      }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
   });
@@ -138,7 +138,7 @@ describe('Open API generator', () => {
       version: '3.4.5',
       title: 'Testing Union and Or Types',
       serverUrl: 'http://example.com'
-    }).builder.getSpecAsYaml();
+    }).getSpecAsYaml();
     expect(spec).toMatchSnapshot();
   });
 
@@ -164,7 +164,7 @@ describe('Open API generator', () => {
       version: '3.4.5',
       title: 'Testing Transformation in response schema',
       serverUrl: 'http://example.com'
-    }).builder.getSpecAsYaml();
+    }).getSpecAsYaml();
     expect(spec).toMatchSnapshot();
   });
 
@@ -191,7 +191,7 @@ describe('Open API generator', () => {
       version: '3.4.5',
       title: 'Testing additional types',
       serverUrl: 'http://example.com'
-    }).builder.getSpecAsYaml();
+    }).getSpecAsYaml();
     expect(spec).toMatchSnapshot();
   });
 
