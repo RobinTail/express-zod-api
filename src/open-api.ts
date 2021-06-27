@@ -1,9 +1,8 @@
 import {
   OpenApiBuilder,
-  OperationObject,
+  OperationObject, ParameterObject,
   SchemaObject
 } from 'openapi3-ts';
-import {ReferenceObject} from 'openapi3-ts/src/model/OpenApi';
 import {z} from 'zod';
 import {OpenAPIError} from './errors';
 import {extractObjectSchema} from './helpers';
@@ -143,28 +142,8 @@ interface GenerationParams {
   errorResponseDescription?: string;
 }
 
-interface Ref {
-  name: string;
-  link: {$ref: string};
-}
-
 export class OpenAPI {
-  private _usedRef: Record<string, true> = {};
   public builder: OpenApiBuilder; // @todo extend builder after switching to ES6 target
-
-  private createRef(str: string, section = 'schemas'): Ref {
-    const name = str.replace(/[^A-Za-z0-9\-._]/g, '');
-    let n = 1;
-    while (this._usedRef[`${name}${n}`]) {
-      n++;
-    }
-    const ref = `${name}${n}`;
-    this._usedRef[ref] = true;
-    return {
-      name: ref,
-      link: {$ref: `#/components/${section}/${ref}`}
-    };
-  }
 
   public constructor({
     routing, title, version, serverUrl,
@@ -176,23 +155,16 @@ export class OpenAPI {
       .addInfo({title, version})
       .addServer({url: serverUrl});
     const cb: RoutingCycleParams['cb'] = (endpoint, fullPath, method) => {
-      const positiveResponseSchemaRef = this.createRef('positiveResponseSchema');
-      const negativeResponseSchemaRef = this.createRef('negativeResponseSchema');
-      this.builder.addSchema(positiveResponseSchemaRef.name, {
-        ...describeSchema(endpoint.getPositiveResponseSchema(), true),
-        description: `${method.toUpperCase()} ${fullPath} ${successfulResponseDescription}`
-      });
-      this.builder.addSchema(negativeResponseSchemaRef.name, {
-        ...describeSchema(endpoint.getNegativeResponseSchema(), true),
-        description: `${method.toUpperCase()} ${fullPath} ${errorResponseDescription}`
-      });
       const operation: OperationObject = {
         responses: {
           '200': {
             description: successfulResponseDescription,
             content: {
               [mimeJson]: {
-                schema: positiveResponseSchemaRef.link
+                schema: {
+                  ...describeSchema(endpoint.getPositiveResponseSchema(), true),
+                  description: `${method.toUpperCase()} ${fullPath} ${successfulResponseDescription}`
+                }
               }
             }
           },
@@ -200,7 +172,10 @@ export class OpenAPI {
             description: errorResponseDescription,
             content: {
               [mimeJson]: {
-                schema: negativeResponseSchemaRef.link
+                schema: {
+                  ...describeSchema(endpoint.getNegativeResponseSchema(), true),
+                  description: `${method.toUpperCase()} ${fullPath} ${errorResponseDescription}`
+                }
               }
             }
           }
@@ -213,28 +188,24 @@ export class OpenAPI {
         operation.parameters = [];
         const subject = extractObjectSchema(endpoint.getInputSchema()).shape;
         Object.keys(subject).forEach((name) => {
-          const parameterRef = this.createRef('parameter', 'parameters');
-          this.builder.addParameter(parameterRef.name, {
+          (operation.parameters as ParameterObject[]).push({
             name,
             in: 'query',
             required: !subject[name].isOptional(),
             schema: {
               ...describeSchema(subject[name], false),
-              description: `${fullPath} ${method.toUpperCase()} parameter`
+              description: `${method.toUpperCase()} ${fullPath} parameter`
             },
           });
-          (operation.parameters as ReferenceObject[]).push(parameterRef.link);
         });
       } else {
-        const bodySchemaRef = this.createRef('requestBody');
-        this.builder.addSchema(bodySchemaRef.name, {
-          ...describeSchema(endpoint.getInputSchema(), false),
-          description: `${fullPath} ${method.toUpperCase()} request body`
-        });
         operation.requestBody = {
           content: {
             [mimeJson]: {
-              schema: bodySchemaRef.link
+              schema: {
+                ...describeSchema(endpoint.getInputSchema(), false),
+                description: `${method.toUpperCase()} ${fullPath} request body`
+              }
             }
           }
         };

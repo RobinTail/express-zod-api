@@ -11,16 +11,59 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/positiveResponseSchema1"
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - success
+                  data:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+                        enum:
+                          - That's ok
+                          - Some kind of warning
+                      name:
+                        type: string
+                    required:
+                      - status
+                      - name
+                required:
+                  - status
+                  - data
+                description: GET /v1/getUser Successful response
         "400":
           description: Error response
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/negativeResponseSchema1"
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                required:
+                  - status
+                  - error
+                description: GET /v1/getUser Error response
       description: example user retrieval endpoint
       parameters:
-        - $ref: "#/components/parameters/parameter1"
+        - name: id
+          in: query
+          required: true
+          schema:
+            type: string
+            description: GET /v1/getUser parameter
   /v1/setUser:
     post:
       responses:
@@ -29,125 +72,70 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/positiveResponseSchema2"
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - success
+                  data:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+                        enum:
+                          - Success
+                          - I'll fix it later
+                    required:
+                      - status
+                required:
+                  - status
+                  - data
+                description: POST /v1/setUser Successful response
         "400":
           description: Error response
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/negativeResponseSchema2"
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                required:
+                  - status
+                  - error
+                description: POST /v1/setUser Error response
       description: example user update endpoint
       requestBody:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/requestBody1"
+              type: object
+              properties:
+                key:
+                  type: string
+                id:
+                  type: number
+                name:
+                  type: string
+              required:
+                - key
+                - id
+                - name
+              description: POST /v1/setUser request body
 components:
-  schemas:
-    positiveResponseSchema1:
-      type: object
-      properties:
-        status:
-          type: string
-          enum:
-            - success
-        data:
-          type: object
-          properties:
-            status:
-              type: string
-              enum:
-                - That's ok
-                - Some kind of warning
-            name:
-              type: string
-          required:
-            - status
-            - name
-      required:
-        - status
-        - data
-      description: GET /v1/getUser Successful response
-    negativeResponseSchema1:
-      type: object
-      properties:
-        status:
-          type: string
-          enum:
-            - error
-        error:
-          type: object
-          properties:
-            message:
-              type: string
-          required:
-            - message
-      required:
-        - status
-        - error
-      description: GET /v1/getUser Error response
-    positiveResponseSchema2:
-      type: object
-      properties:
-        status:
-          type: string
-          enum:
-            - success
-        data:
-          type: object
-          properties:
-            status:
-              type: string
-              enum:
-                - Success
-                - I'll fix it later
-          required:
-            - status
-      required:
-        - status
-        - data
-      description: POST /v1/setUser Successful response
-    negativeResponseSchema2:
-      type: object
-      properties:
-        status:
-          type: string
-          enum:
-            - error
-        error:
-          type: object
-          properties:
-            message:
-              type: string
-          required:
-            - message
-      required:
-        - status
-        - error
-      description: POST /v1/setUser Error response
-    requestBody1:
-      type: object
-      properties:
-        key:
-          type: string
-        id:
-          type: number
-        name:
-          type: string
-      required:
-        - key
-        - id
-        - name
-      description: /v1/setUser POST request body
+  schemas: {}
   responses: {}
-  parameters:
-    parameter1:
-      name: id
-      in: query
-      required: true
-      schema:
-        type: string
-        description: /v1/getUser GET parameter
+  parameters: {}
   examples: {}
   requestBodies: {}
   headers: {}
