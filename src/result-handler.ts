@@ -9,7 +9,7 @@ interface ResultHandlerParams<RES> {
   output: any;
   request: Request;
   response: Response<RES>;
-  logger: Logger
+  logger: Logger;
 }
 
 type ResultHandler<RES> = (params: ResultHandlerParams<RES>) => void | Promise<void>;
