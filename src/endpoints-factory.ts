@@ -3,7 +3,7 @@ import {Endpoint, Handler} from './endpoint';
 import {FlatObject, IOSchema, Merge} from './helpers';
 import {Method, MethodsDefinition} from './method';
 import {MiddlewareDefinition} from './middleware';
-import {ResultHandlerDefinition} from './result-handler';
+import {defaultResultHandler, ResultHandlerDefinition} from './result-handler';
 
 type BuildProps<IN extends IOSchema, OUT extends IOSchema, mIN, mOUT, M extends Method> = {
   input: IN;
@@ -11,9 +11,6 @@ type BuildProps<IN extends IOSchema, OUT extends IOSchema, mIN, mOUT, M extends 
   handler: Handler<z.output<Merge<IN, mIN>>, z.input<OUT>, mOUT>;
   description?: string;
 } & MethodsDefinition<M>;
-
-// type DefaultPositive = typeof defaultResultHandler extends ResultHandlerDefinition<infer dP, any> ? dP : never;
-// type DefaultNegative = typeof defaultResultHandler extends ResultHandlerDefinition<any, infer dN> ? dN : never;
 
 /** mIN, mOUT - accumulated from all middlewares */
 export class EndpointsFactory<mIN, mOUT, POS extends z.ZodTypeAny, NEG extends z.ZodTypeAny> {
@@ -54,3 +51,5 @@ export class EndpointsFactory<mIN, mOUT, POS extends z.ZodTypeAny, NEG extends z
     });
   }
 }
+
+export const defaultEndpointsFactory = new EndpointsFactory(defaultResultHandler);
