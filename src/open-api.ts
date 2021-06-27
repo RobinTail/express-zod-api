@@ -139,7 +139,8 @@ interface GenerationParams {
   version: string;
   serverUrl: string;
   routing: Routing;
-  successfulResponseDescription?: string
+  successfulResponseDescription?: string;
+  errorResponseDescription?: string;
 }
 
 interface Ref {
@@ -165,27 +166,44 @@ export class OpenAPI {
     };
   }
 
-  public constructor({routing, title, version, serverUrl, successfulResponseDescription}: GenerationParams) {
+  public constructor({
+    routing, title, version, serverUrl,
+    successfulResponseDescription = 'Successful response',
+    errorResponseDescription = 'Error response'
+  }: GenerationParams) {
     const mimeJson = lookup('.json');
     this.builder = new OpenApiBuilder()
       .addInfo({title, version})
       .addServer({url: serverUrl});
     const cb: RoutingCycleParams['cb'] = (endpoint, fullPath, method) => {
-      const responseSchemaRef = this.createRef('responseSchema');
-      this.builder.addSchema(responseSchemaRef.name, {
-        ...describeSchema(endpoint.getOutputSchema(), true),
-        description: `${fullPath} ${method.toUpperCase()} response schema`
+      const positiveResponseSchemaRef = this.createRef('positiveResponseSchema');
+      const negativeResponseSchemaRef = this.createRef('negativeResponseSchema');
+      this.builder.addSchema(positiveResponseSchemaRef.name, {
+        ...describeSchema(endpoint.getPositiveResponseSchema(), true),
+        description: `${method.toUpperCase()} ${fullPath} ${successfulResponseDescription}`
+      });
+      this.builder.addSchema(negativeResponseSchemaRef.name, {
+        ...describeSchema(endpoint.getNegativeResponseSchema(), true),
+        description: `${method.toUpperCase()} ${fullPath} ${errorResponseDescription}`
       });
       const operation: OperationObject = {
         responses: {
-          default: {
-            description: successfulResponseDescription || 'Successful response',
+          '200': {
+            description: successfulResponseDescription,
             content: {
               [mimeJson]: {
-                schema: responseSchemaRef.link
+                schema: positiveResponseSchemaRef.link
               }
             }
           },
+          '400': {
+            description: errorResponseDescription,
+            content: {
+              [mimeJson]: {
+                schema: negativeResponseSchemaRef.link
+              }
+            }
+          }
         }
       };
       if (endpoint.getDescription()) {

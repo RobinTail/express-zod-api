@@ -11,6 +11,7 @@
     "build:swagger": "ts-node example/generate-open-api-schema.ts > example/example.swagger.yaml",
     "build:license": "ts-node tools/generate-license.ts > ./LICENSE",
     "test": "yarn test:jest && yarn test:badge",
+    "test:u": "yarn test:jest -u",
     "test:jest": "yarn jest --detectOpenHandles ./tests/unit ./tests/system",
     "test:badge": "yarn make-coverage-badge --output-path ./coverage.svg",
     "lint": "yarn eslint ./src ./example ./tests",

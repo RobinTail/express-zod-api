@@ -9,30 +9,64 @@ paths:
   /v1/getSomething:
     get:
       responses:
-        default:
+        \\"200\\":
           description: Successful response
           content:
             application/json:
               schema:
-                $ref: \\"#/components/schemas/responseSchema1\\"
+                $ref: \\"#/components/schemas/positiveResponseSchema1\\"
+        \\"400\\":
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: \\"#/components/schemas/negativeResponseSchema1\\"
       parameters:
         - $ref: \\"#/components/parameters/parameter1\\"
         - $ref: \\"#/components/parameters/parameter2\\"
 components:
   schemas:
-    responseSchema1:
+    positiveResponseSchema1:
       type: object
       properties:
-        literal:
+        status:
           type: string
           enum:
-            - something
-        transformation:
-          type: number
+            - success
+        data:
+          type: object
+          properties:
+            literal:
+              type: string
+              enum:
+                - something
+            transformation:
+              type: number
+          required:
+            - literal
+            - transformation
       required:
-        - literal
-        - transformation
-      description: /v1/getSomething GET response schema
+        - status
+        - data
+      description: GET /v1/getSomething Successful response
+    negativeResponseSchema1:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+            - error
+        error:
+          type: object
+          properties:
+            message:
+              type: string
+          required:
+            - message
+      required:
+        - status
+        - error
+      description: GET /v1/getSomething Error response
   responses: {}
   parameters:
     parameter1:
@@ -72,12 +106,18 @@ paths:
   /v1/getSomething:
     post:
       responses:
-        default:
+        \\"200\\":
           description: Successful response
           content:
             application/json:
               schema:
-                $ref: \\"#/components/schemas/responseSchema1\\"
+                $ref: \\"#/components/schemas/positiveResponseSchema1\\"
+        \\"400\\":
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: \\"#/components/schemas/negativeResponseSchema1\\"
       requestBody:
         content:
           application/json:
@@ -85,26 +125,54 @@ paths:
               $ref: \\"#/components/schemas/requestBody1\\"
 components:
   schemas:
-    responseSchema1:
+    positiveResponseSchema1:
       type: object
       properties:
-        and:
-          allOf:
-            - type: object
-              properties:
-                five:
-                  type: number
-              required:
-                - five
-            - type: object
-              properties:
-                six:
-                  type: string
-              required:
-                - six
+        status:
+          type: string
+          enum:
+            - success
+        data:
+          type: object
+          properties:
+            and:
+              allOf:
+                - type: object
+                  properties:
+                    five:
+                      type: number
+                  required:
+                    - five
+                - type: object
+                  properties:
+                    six:
+                      type: string
+                  required:
+                    - six
+          required:
+            - and
       required:
-        - and
-      description: /v1/getSomething POST response schema
+        - status
+        - data
+      description: POST /v1/getSomething Successful response
+    negativeResponseSchema1:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+            - error
+        error:
+          type: object
+          properties:
+            message:
+              type: string
+          required:
+            - message
+      required:
+        - status
+        - error
+      description: POST /v1/getSomething Error response
     requestBody1:
       type: object
       properties:
@@ -148,25 +216,59 @@ paths:
   /v1/getSomething:
     get:
       responses:
-        default:
+        \\"200\\":
           description: Successful response
           content:
             application/json:
               schema:
-                $ref: \\"#/components/schemas/responseSchema1\\"
+                $ref: \\"#/components/schemas/positiveResponseSchema1\\"
+        \\"400\\":
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: \\"#/components/schemas/negativeResponseSchema1\\"
       parameters:
         - $ref: \\"#/components/parameters/parameter1\\"
 components:
   schemas:
-    responseSchema1:
+    positiveResponseSchema1:
       type: object
       properties:
-        nullable:
-          nullable: true
+        status:
           type: string
+          enum:
+            - success
+        data:
+          type: object
+          properties:
+            nullable:
+              nullable: true
+              type: string
+          required:
+            - nullable
       required:
-        - nullable
-      description: /v1/getSomething GET response schema
+        - status
+        - data
+      description: GET /v1/getSomething Successful response
+    negativeResponseSchema1:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+            - error
+        error:
+          type: object
+          properties:
+            message:
+              type: string
+          required:
+            - message
+      required:
+        - status
+        - error
+      description: GET /v1/getSomething Error response
   responses: {}
   parameters:
     parameter1:
@@ -197,24 +299,36 @@ paths:
   /v1/getUser:
     get:
       responses:
-        default:
+        \\"200\\":
           description: Successful response
           content:
             application/json:
               schema:
-                $ref: \\"#/components/schemas/responseSchema1\\"
+                $ref: \\"#/components/schemas/positiveResponseSchema1\\"
+        \\"400\\":
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: \\"#/components/schemas/negativeResponseSchema1\\"
       description: example user retrieval endpoint
       parameters:
         - $ref: \\"#/components/parameters/parameter1\\"
   /v1/setUser:
     post:
       responses:
-        default:
+        \\"200\\":
           description: Successful response
           content:
             application/json:
               schema:
-                $ref: \\"#/components/schemas/responseSchema2\\"
+                $ref: \\"#/components/schemas/positiveResponseSchema2\\"
+        \\"400\\":
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: \\"#/components/schemas/negativeResponseSchema2\\"
       description: example user update endpoint
       requestBody:
         content:
@@ -223,31 +337,87 @@ paths:
               $ref: \\"#/components/schemas/requestBody1\\"
 components:
   schemas:
-    responseSchema1:
+    positiveResponseSchema1:
       type: object
       properties:
         status:
           type: string
           enum:
-            - That's ok
-            - Some kind of warning
-        name:
-          type: string
+            - success
+        data:
+          type: object
+          properties:
+            status:
+              type: string
+              enum:
+                - That's ok
+                - Some kind of warning
+            name:
+              type: string
+          required:
+            - status
+            - name
       required:
         - status
-        - name
-      description: /v1/getUser GET response schema
-    responseSchema2:
+        - data
+      description: GET /v1/getUser Successful response
+    negativeResponseSchema1:
       type: object
       properties:
         status:
           type: string
           enum:
-            - Success
-            - I'll fix it later
+            - error
+        error:
+          type: object
+          properties:
+            message:
+              type: string
+          required:
+            - message
       required:
         - status
-      description: /v1/setUser POST response schema
+        - error
+      description: GET /v1/getUser Error response
+    positiveResponseSchema2:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+            - success
+        data:
+          type: object
+          properties:
+            status:
+              type: string
+              enum:
+                - Success
+                - I'll fix it later
+          required:
+            - status
+      required:
+        - status
+        - data
+      description: POST /v1/setUser Successful response
+    negativeResponseSchema2:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+            - error
+        error:
+          type: object
+          properties:
+            message:
+              type: string
+          required:
+            - message
+      required:
+        - status
+        - error
+      description: POST /v1/setUser Error response
     requestBody1:
       type: object
       properties:
@@ -292,12 +462,18 @@ paths:
   /v1/getSomething:
     post:
       responses:
-        default:
+        \\"200\\":
           description: Successful response
           content:
             application/json:
               schema:
-                $ref: \\"#/components/schemas/responseSchema1\\"
+                $ref: \\"#/components/schemas/positiveResponseSchema1\\"
+        \\"400\\":
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: \\"#/components/schemas/negativeResponseSchema1\\"
       requestBody:
         content:
           application/json:
@@ -305,16 +481,44 @@ paths:
               $ref: \\"#/components/schemas/requestBody1\\"
 components:
   schemas:
-    responseSchema1:
+    positiveResponseSchema1:
       type: object
       properties:
-        or:
-          oneOf:
-            - type: string
-            - type: number
+        status:
+          type: string
+          enum:
+            - success
+        data:
+          type: object
+          properties:
+            or:
+              oneOf:
+                - type: string
+                - type: number
+          required:
+            - or
       required:
-        - or
-      description: /v1/getSomething POST response schema
+        - status
+        - data
+      description: POST /v1/getSomething Successful response
+    negativeResponseSchema1:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+            - error
+        error:
+          type: object
+          properties:
+            message:
+              type: string
+          required:
+            - message
+      required:
+        - status
+        - error
+      description: POST /v1/getSomething Error response
     requestBody1:
       type: object
       properties:
@@ -364,12 +568,18 @@ paths:
   /v1/getSomething:
     post:
       responses:
-        default:
+        \\"200\\":
           description: Successful response
           content:
             application/json:
               schema:
-                $ref: \\"#/components/schemas/responseSchema1\\"
+                $ref: \\"#/components/schemas/positiveResponseSchema1\\"
+        \\"400\\":
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: \\"#/components/schemas/negativeResponseSchema1\\"
       requestBody:
         content:
           application/json:
@@ -377,16 +587,44 @@ paths:
               $ref: \\"#/components/schemas/requestBody1\\"
 components:
   schemas:
-    responseSchema1:
+    positiveResponseSchema1:
       type: object
       properties:
-        \\"null\\":
-          nullable: true
+        status:
           type: string
-          format: \\"null\\"
+          enum:
+            - success
+        data:
+          type: object
+          properties:
+            \\"null\\":
+              nullable: true
+              type: string
+              format: \\"null\\"
+          required:
+            - \\"null\\"
       required:
-        - \\"null\\"
-      description: /v1/getSomething POST response schema
+        - status
+        - data
+      description: POST /v1/getSomething Successful response
+    negativeResponseSchema1:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+            - error
+        error:
+          type: object
+          properties:
+            message:
+              type: string
+          required:
+            - message
+      required:
+        - status
+        - error
+      description: POST /v1/getSomething Error response
     requestBody1:
       type: object
       properties:
@@ -426,12 +664,18 @@ paths:
   /v1/getSomething:
     post:
       responses:
-        default:
+        \\"200\\":
           description: Successful response
           content:
             application/json:
               schema:
-                $ref: \\"#/components/schemas/responseSchema1\\"
+                $ref: \\"#/components/schemas/positiveResponseSchema1\\"
+        \\"400\\":
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: \\"#/components/schemas/negativeResponseSchema1\\"
       requestBody:
         content:
           application/json:
@@ -439,14 +683,42 @@ paths:
               $ref: \\"#/components/schemas/requestBody1\\"
 components:
   schemas:
-    responseSchema1:
+    positiveResponseSchema1:
       type: object
       properties:
-        transform:
-          type: number
+        status:
+          type: string
+          enum:
+            - success
+        data:
+          type: object
+          properties:
+            transform:
+              type: number
+          required:
+            - transform
       required:
-        - transform
-      description: /v1/getSomething POST response schema
+        - status
+        - data
+      description: POST /v1/getSomething Successful response
+    negativeResponseSchema1:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+            - error
+        error:
+          type: object
+          properties:
+            message:
+              type: string
+          required:
+            - message
+      required:
+        - status
+        - error
+      description: POST /v1/getSomething Error response
     requestBody1:
       type: object
       properties:

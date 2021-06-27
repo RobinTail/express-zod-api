@@ -6,24 +6,36 @@ paths:
   /v1/getUser:
     get:
       responses:
-        default:
+        "200":
           description: Successful response
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/responseSchema1"
+                $ref: "#/components/schemas/positiveResponseSchema1"
+        "400":
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/negativeResponseSchema1"
       description: example user retrieval endpoint
       parameters:
         - $ref: "#/components/parameters/parameter1"
   /v1/setUser:
     post:
       responses:
-        default:
+        "200":
           description: Successful response
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/responseSchema2"
+                $ref: "#/components/schemas/positiveResponseSchema2"
+        "400":
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/negativeResponseSchema2"
       description: example user update endpoint
       requestBody:
         content:
@@ -32,31 +44,87 @@ paths:
               $ref: "#/components/schemas/requestBody1"
 components:
   schemas:
-    responseSchema1:
+    positiveResponseSchema1:
       type: object
       properties:
         status:
           type: string
           enum:
-            - That's ok
-            - Some kind of warning
-        name:
-          type: string
+            - success
+        data:
+          type: object
+          properties:
+            status:
+              type: string
+              enum:
+                - That's ok
+                - Some kind of warning
+            name:
+              type: string
+          required:
+            - status
+            - name
       required:
         - status
-        - name
-      description: /v1/getUser GET response schema
-    responseSchema2:
+        - data
+      description: GET /v1/getUser Successful response
+    negativeResponseSchema1:
       type: object
       properties:
         status:
           type: string
           enum:
-            - Success
-            - I'll fix it later
+            - error
+        error:
+          type: object
+          properties:
+            message:
+              type: string
+          required:
+            - message
       required:
         - status
-      description: /v1/setUser POST response schema
+        - error
+      description: GET /v1/getUser Error response
+    positiveResponseSchema2:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+            - success
+        data:
+          type: object
+          properties:
+            status:
+              type: string
+              enum:
+                - Success
+                - I'll fix it later
+          required:
+            - status
+      required:
+        - status
+        - data
+      description: POST /v1/setUser Successful response
+    negativeResponseSchema2:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+            - error
+        error:
+          type: object
+          properties:
+            message:
+              type: string
+          required:
+            - message
+      required:
+        - status
+        - error
+      description: POST /v1/setUser Error response
     requestBody1:
       type: object
       properties:
