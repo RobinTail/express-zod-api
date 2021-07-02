@@ -61,8 +61,8 @@ export type EndpointResponse<E extends AbstractEndpoint> = z.output<
 > | z.output<ReturnType<E['getNegativeResponseSchema']>>;
 
 type EndpointProps<
-  IN extends IOSchema, OUT extends IOSchema,
-  mIN, OPT, M extends Method, POS extends z.ZodTypeAny, NEG extends z.ZodTypeAny
+  IN extends IOSchema, OUT extends IOSchema, mIN, OPT,
+  M extends Method, POS extends z.ZodTypeAny, NEG extends z.ZodTypeAny
 > = {
   middlewares: MiddlewareDefinition<any, any, any>[];
   inputSchema: IN;
