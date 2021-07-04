@@ -33,9 +33,8 @@ export type Merge<A extends IOSchema, B extends IOSchema | any> = z.ZodObject<
   IOExtract<A, '_input'> & IOExtract<B, '_input'>
 >;
 
-export interface OutputMarker extends z.ZodTypeAny {
-  _typeGuard: 'OutputMarker';
-}
+export type OutputMarker = IOSchema & {_typeGuard: 'OutputMarker'};
+export const markOutput = (output: IOSchema) => output as OutputMarker;
 
 export type ReplaceMarkerInShape<S extends z.ZodRawShape, OUT extends IOSchema> = {
   [K in keyof S]: S[K] extends OutputMarker

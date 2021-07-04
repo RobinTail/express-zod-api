@@ -1,7 +1,7 @@
 import {Request, Response} from 'express';
 import {Logger} from 'winston';
 import {z} from 'zod';
-import {getMessageFromError, getStatusCodeFromError, IOSchema, OutputMarker} from './helpers';
+import {getMessageFromError, getStatusCodeFromError, IOSchema, markOutput} from './helpers';
 
 interface ResultHandlerParams<RES> {
   error: Error | null;
@@ -27,7 +27,7 @@ export const createResultHandler = <POS extends z.ZodTypeAny, NEG extends z.ZodT
 export const defaultResultHandler = createResultHandler({
   getPositiveResponse: <OUT extends IOSchema>(output: OUT) => z.object({
     status: z.literal('success'),
-    data: output as OutputMarker,
+    data: markOutput(output)
   }),
   getNegativeResponse: () => z.object({
     status: z.literal('error'),

@@ -2,7 +2,7 @@ export { ConfigType, LoggerConfig } from './config-type';
 export { AbstractEndpoint, EndpointInput, EndpointOutput } from './endpoint';
 export { Method } from './method';
 export { EndpointsFactory, defaultEndpointsFactory } from './endpoints-factory';
-export { IOSchema, FlatObject, OutputMarker } from './helpers';
+export { IOSchema, FlatObject, markOutput } from './helpers';
 export { createLogger } from './logger';
 export { createMiddleware } from './middleware';
 export { createResultHandler, defaultResultHandler } from './result-handler';
