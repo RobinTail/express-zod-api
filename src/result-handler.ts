@@ -1,7 +1,14 @@
 import {Request, Response} from 'express';
 import {Logger} from 'winston';
 import {z} from 'zod';
-import {getMessageFromError, getStatusCodeFromError, IOSchema, markOutput} from './helpers';
+import {
+  ApiResponse,
+  createApiResponse,
+  getMessageFromError,
+  getStatusCodeFromError,
+  IOSchema,
+  markOutput
+} from './helpers';
 
 interface ResultHandlerParams<RES> {
   error: Error | null;
@@ -14,27 +21,27 @@ interface ResultHandlerParams<RES> {
 
 type ResultHandler<RES> = (params: ResultHandlerParams<RES>) => void | Promise<void>;
 
-export interface ResultHandlerDefinition<POS extends z.ZodTypeAny, NEG extends z.ZodTypeAny> {
+export interface ResultHandlerDefinition<POS extends ApiResponse, NEG extends ApiResponse> {
   getPositiveResponse: <OUT extends IOSchema>(output: OUT) => POS,
   getNegativeResponse: () => NEG,
-  resultHandler: ResultHandler<z.output<POS> | z.output<NEG>>;
+  resultHandler: ResultHandler<z.output<POS['schema']> | z.output<NEG['schema']>>;
 }
 
-export const createResultHandler = <POS extends z.ZodTypeAny, NEG extends z.ZodTypeAny>(
+export const createResultHandler = <POS extends ApiResponse, NEG extends ApiResponse>(
   definition: ResultHandlerDefinition<POS, NEG>
 ) => definition;
 
 export const defaultResultHandler = createResultHandler({
-  getPositiveResponse: <OUT extends IOSchema>(output: OUT) => z.object({
+  getPositiveResponse: <OUT extends IOSchema>(output: OUT) => createApiResponse(z.object({
     status: z.literal('success'),
     data: markOutput(output)
-  }),
-  getNegativeResponse: () => z.object({
+  })),
+  getNegativeResponse: () => createApiResponse(z.object({
     status: z.literal('error'),
     error: z.object({
       message: z.string()
     })
-  }),
+  })),
   resultHandler: ({error, input, output, request, response, logger}) => {
     if (!error) {
       response.status(200).json({

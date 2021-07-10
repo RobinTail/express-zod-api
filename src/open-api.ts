@@ -1,7 +1,9 @@
 import {
   OpenApiBuilder,
-  OperationObject, ParameterObject,
-  SchemaObject
+  OperationObject,
+  ParameterObject,
+  SchemaObject,
+  ContentObject
 } from 'openapi3-ts';
 import {z} from 'zod';
 import {OpenAPIError} from './errors';
@@ -157,25 +159,27 @@ export class OpenAPI extends OpenApiBuilder {
         responses: {
           '200': {
             description: successfulResponseDescription,
-            content: {
-              [mimeJson]: {
+            content: endpoint.getPositiveMimeTypes().reduce((carry, mimeType) => ({
+              ...carry,
+              [mimeType]: {
                 schema: {
                   ...describeSchema(endpoint.getPositiveResponseSchema(), true),
                   description: `${method.toUpperCase()} ${fullPath} ${successfulResponseDescription}`
                 }
               }
-            }
+            }), {} as ContentObject),
           },
           '400': {
             description: errorResponseDescription,
-            content: {
-              [mimeJson]: {
+            content: endpoint.getNegativeMimeTypes().reduce((carry, mimeType) => ({
+              ...carry,
+              [mimeType]: {
                 schema: {
                   ...describeSchema(endpoint.getNegativeResponseSchema(), true),
                   description: `${method.toUpperCase()} ${fullPath} ${errorResponseDescription}`
                 }
               }
-            }
+            }), {} as ContentObject),
           }
         }
       };

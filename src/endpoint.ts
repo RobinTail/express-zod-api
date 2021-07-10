@@ -3,6 +3,7 @@ import {Logger} from 'winston';
 import {z} from 'zod';
 import {ConfigType} from './config-type';
 import {
+  ApiResponse,
   combineEndpointAndMiddlewareInputSchemas,
   getInitialInput,
   IOSchema,
@@ -39,6 +40,8 @@ export abstract class AbstractEndpoint {
   abstract getOutputSchema(): IOSchema;
   abstract getPositiveResponseSchema(): z.ZodTypeAny;
   abstract getNegativeResponseSchema(): z.ZodTypeAny;
+  abstract getPositiveMimeTypes(): string[];
+  abstract getNegativeMimeTypes(): string[];
 }
 
 export type EndpointInput<T> = T extends Endpoint<infer IN, any, infer mIN, any, any, any, any>
@@ -62,7 +65,7 @@ export type EndpointResponse<E extends AbstractEndpoint> = z.output<
 
 type EndpointProps<
   IN extends IOSchema, OUT extends IOSchema, mIN, OPT,
-  M extends Method, POS extends z.ZodTypeAny, NEG extends z.ZodTypeAny
+  M extends Method, POS extends ApiResponse, NEG extends ApiResponse
 > = {
   middlewares: MiddlewareDefinition<any, any, any>[];
   inputSchema: IN;
@@ -75,7 +78,7 @@ type EndpointProps<
 /** mIN, OPT - from Middlewares */
 export class Endpoint<
   IN extends IOSchema, OUT extends IOSchema, mIN, OPT,
-  M extends Method, POS extends z.ZodTypeAny, NEG extends z.ZodTypeAny
+  M extends Method, POS extends ApiResponse, NEG extends ApiResponse
 > extends AbstractEndpoint {
   protected methods: M[] = [];
   protected middlewares: MiddlewareDefinition<any, any, any>[] = [];
@@ -113,12 +116,20 @@ export class Endpoint<
     return this.outputSchema;
   }
 
-  public getPositiveResponseSchema() {
-    return this.resultHandler.getPositiveResponse(this.outputSchema);
+  public getPositiveResponseSchema(): POS['schema'] {
+    return this.resultHandler.getPositiveResponse(this.outputSchema).schema;
   }
 
-  public getNegativeResponseSchema() {
-    return this.resultHandler.getNegativeResponse();
+  public getNegativeResponseSchema(): NEG['schema'] {
+    return this.resultHandler.getNegativeResponse().schema;
+  }
+
+  getNegativeMimeTypes() {
+    return this.resultHandler.getPositiveResponse(this.outputSchema).mimeTypes;
+  }
+
+  getPositiveMimeTypes() {
+    return this.resultHandler.getNegativeResponse().mimeTypes;
   }
 
   private setupCorsHeaders(response: Response) {
