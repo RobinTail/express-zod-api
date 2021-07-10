@@ -37,6 +37,3 @@ export const getUserEndpoint = defaultEndpointsFactory
       };
     }
   });
-
-// @todo remove
-type RRR3 = EndpointResponse<typeof getUserEndpoint>;
