@@ -1,5 +1,4 @@
 import {z, createHttpError, defaultEndpointsFactory} from '../../src';
-import {EndpointResponse} from '../../src/endpoint';
 import {methodProviderMiddleware} from '../middlewares';
 
 enum Status {

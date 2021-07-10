@@ -5,7 +5,6 @@ import {
   ConfigType,
   createMiddleware,
   defaultResultHandler,
-  markOutput,
   EndpointInput, EndpointOutput
 } from '../../src';
 import {Endpoint, EndpointResponse} from '../../src/endpoint';
