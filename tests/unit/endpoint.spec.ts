@@ -1,7 +1,15 @@
-import {z, EndpointsFactory, ConfigType, createMiddleware} from '../../src';
-import {Endpoint} from '../../src/endpoint';
+import {expectType} from 'tsd';
+import {
+  z,
+  EndpointsFactory,
+  ConfigType,
+  createMiddleware,
+  defaultResultHandler,
+  markOutput,
+  EndpointInput, EndpointOutput
+} from '../../src';
+import {Endpoint, EndpointResponse} from '../../src/endpoint';
 import {Request, Response} from 'express';
-import {defaultResultHandler} from '../../src/result-handler';
 
 let loggerMock: any;
 
@@ -131,6 +139,165 @@ describe('Endpoint', () => {
           inc2: 455,
           str: '453.00',
           transform: 4
+        }
+      });
+    });
+  });
+
+  describe('.getInputSchema()', () => {
+    test('should return input schema', () => {
+      const factory = new EndpointsFactory(defaultResultHandler);
+      const input = z.object({
+        something: z.number()
+      });
+      const endpoint = factory.build({
+        method: 'get',
+        input,
+        output: z.object({}),
+        handler: jest.fn()
+      });
+      expect(endpoint.getInputSchema()).toEqual(input);
+    });
+  });
+  
+  describe('.getOutputSchema()', () => {
+    test('should return output schema', () => {
+      const factory = new EndpointsFactory(defaultResultHandler);
+      const output = z.object({
+        something: z.number()
+      });
+      const endpoint = factory.build({
+        method: 'get',
+        input: z.object({}),
+        output,
+        handler: jest.fn()
+      });
+      expect(endpoint.getOutputSchema()).toEqual(output);
+    });
+  });
+  
+  describe('.getPositiveResponseSchema()', () => {
+    test('should return schema according to the result handler', () => {
+      const factory = new EndpointsFactory(defaultResultHandler);
+      const output = z.object({
+        something: z.number()
+      });
+      const endpoint = factory.build({
+        method: 'get',
+        input: z.object({}),
+        output,
+        handler: jest.fn()
+      });
+      expect(JSON.stringify(endpoint.getPositiveResponseSchema())).toBe(JSON.stringify(
+        z.object({
+          status: z.literal('success'),
+          data: output
+        }))
+      );
+    });
+  });
+
+  describe('.getNegativeResponseSchema()', () => {
+    test('should return the negative schema of the result handler', () => {
+      const factory = new EndpointsFactory(defaultResultHandler);
+      const output = z.object({
+        something: z.number()
+      });
+      const endpoint = factory.build({
+        method: 'get',
+        input: z.object({}),
+        output,
+        handler: jest.fn()
+      });
+      expect(JSON.stringify(endpoint.getNegativeResponseSchema())).toBe(JSON.stringify(
+        z.object({
+          status: z.literal('error'),
+          error: z.object({
+            message: z.string(),
+          })
+        }))
+      );
+    });
+  });
+
+  describe('.getPositiveMimeTypes()', () => {
+    test('should return an array according to the result handler', () => {
+      const factory = new EndpointsFactory(defaultResultHandler);
+      const endpoint = factory.build({
+        method: 'get',
+        input: z.object({}),
+        output: z.object({}),
+        handler: jest.fn()
+      });
+      expect(endpoint.getPositiveMimeTypes()).toEqual(['application/json']);
+    });
+  });
+
+  describe('.getNegativeMimeTypes()', () => {
+    test('should return an array according to the result handler', () => {
+      const factory = new EndpointsFactory(defaultResultHandler);
+      const endpoint = factory.build({
+        method: 'get',
+        input: z.object({}),
+        output: z.object({}),
+        handler: jest.fn()
+      });
+      expect(endpoint.getNegativeMimeTypes()).toEqual(['application/json']);
+    });
+  });
+
+  describe('EndpointInput<>', () => {
+    test('should be the type of input schema before transformations', () => {
+      const factory = new EndpointsFactory(defaultResultHandler);
+      const input = z.object({
+        something: z.number().transform((value) => `${value}`)
+      });
+      const endpoint = factory.build({
+        method: 'get',
+        input,
+        output: z.object({}),
+        handler: jest.fn()
+      });
+      expectType<EndpointInput<typeof endpoint>>(input._input);
+    });
+  });
+
+  describe('EndpointOutput<>', () => {
+    test('should be the type of output schema after transformations', () => {
+      const factory = new EndpointsFactory(defaultResultHandler);
+      const output = z.object({
+        something: z.number().transform((value) => `${value}`)
+      });
+      const endpoint = factory.build({
+        method: 'get',
+        input: z.object({}),
+        output,
+        handler: jest.fn()
+      });
+      expectType<EndpointOutput<typeof endpoint>>(output._output);
+    });
+  });
+
+  describe('EndpointResponse<>', () => {
+    test('should be the type declared in the result handler including positive and negative ones', () => {
+      const factory = new EndpointsFactory(defaultResultHandler);
+      const output = z.object({
+        something: z.number().transform((value) => `${value}`)
+      });
+      const endpoint = factory.build({
+        method: 'get',
+        input: z.object({}),
+        output,
+        handler: jest.fn()
+      });
+      expectType<EndpointResponse<typeof endpoint>>({
+        status: 'success',
+        data: output._output
+      });
+      expectType<EndpointResponse<typeof endpoint>>({
+        status: 'error',
+        error: {
+          message: 'some error'
         }
       });
     });
