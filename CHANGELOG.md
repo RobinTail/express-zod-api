@@ -1,5 +1,62 @@
 # Changelog
 
+## Version 2
+
+### v2.0.0-beta
+
+- **Warning**: There are breaking changes described below.
+  In general, if you used the `defaultResultHandler` before, then you won't have to change much of code.
+- **Motivation**. I really like the first version of the library for its simplicity and elegance, 
+  but there is one imperfection in it. The available methods and type helpers do not allow to disclose the complete 
+  response of the endpoint, including the specification of a successful and error response for which the 
+  `ResultHandler` is responsible. So I decided to fix it, although it made the implementation somewhat more 
+  complicated, but I found it important. However, it brought a number of benefits, which are also described below.
+- Core changes.
+  - Node version required: at least `10.0.0`.
+  - The library target now is `ES6`.
+- Changes to OpenAPI / Swagger specifications.
+  - Instead of `default` entry in `responses` there are positive and negative responses represented with HTTP 
+    status codes `200` and `400` accordingly.
+  - References are no longer used for schemas and parameters, so they are inline now.
+  - Response schemas are now complete according both to the `ResultHandlerDefinition` and the `Endpoint`.
+  - New options `errorResponseDescription`.
+  - New way of calling:
+```typescript
+// before
+new OpenAPI({...}).builder.getSpecAsYaml();
+// after
+new OpenAPI({...}).getSpecAsYaml();
+```
+- Changes to `EndpointsFactory`.
+  - Constructor now requires the `ResultHandlerDefinition` to be specified as an argument.
+  - The method `setResultHandler()` has been removed.
+  - New way of using the `EndpointsFactory` with a `defaultResultHandler`.
+```typescript
+// before
+export const endpointsFactoryBefore = new EndpointsFactory();
+// after
+export const endpointsFactoryAfter = new EndpointsFactory(defaultResultHandler);
+// which is the same as
+import {defaultEndpointsFactory} from 'express-zod-api';
+```
+- Changes to `ConfigType`.
+  - No more way to specify the default `ResultHandler` for endpoints — only the default result handler for errors.
+```typescript
+// before
+resultHandler: ResultHandler; // optional
+// after
+errorHandler: ResultHandlerDefinition<any, any>; // optional, default: defaultResultHandler
+```
+- Changes to `Endpoint`.
+  - New methods: `getPositiveResponseSchema()`, `getNegativeResponseSchema()` return the complete endpoint response 
+    defined in `ResultHandlerDefinition` including the output of the endpoint.
+  - New methods: `getPositiveMimeTypes()` and `getNegativeMimeTypes()` return the array of mime types.
+  - New type helping utility: `EndpointResponse<E extends AbstractEndpoint>` returns the complete type of endpoint 
+    response including both positive and negative cases.
+- Changes to the library exports.
+  - Removed `ResultHandler`.
+  - Added `defaultEndpointsFactory`, `defaultResultHandler`, `createResultHandler`, `markOutput`, `createApiResponse`.
+
 ## Version 1
 
 ### v1.3.1
