@@ -17,32 +17,32 @@
 import {EndpointOutput} from 'express-zod-api';
 
 const getUserEndpointV1 = endpointsFactory
-        .build({
-          method: 'get',
-          input: z.object({
-            id: z.string().transform((id) => parseInt(id, 10))
-          }),
-          output: z.object({
-            name: z.string(),
-          }),
-          handler: async () => ({...}),
-        });
+  .build({
+    method: 'get',
+    input: z.object({
+      id: z.string().transform((id) => parseInt(id, 10))
+    }),
+    output: z.object({
+      name: z.string(),
+    }),
+    handler: async () => ({...}),
+  });
 type GetUserEndpointOutput = EndpointOutput<typeof getUserEndpointV1>; // => { name: string }
 
 // and after (v2):
 import {defaultEndpointsFactory, EndpointResponse} from 'express-zod-api';
 
 const getUserEndpointV2 = defaultEndpointsFactory
-        .build({
-          method: 'get',
-          input: z.object({
-            id: z.string().transform((id) => parseInt(id, 10))
-          }),
-          output: z.object({
-            name: z.string(),
-          }),
-          handler: async () => ({...}),
-        });
+  .build({
+    method: 'get',
+    input: z.object({
+      id: z.string().transform((id) => parseInt(id, 10))
+    }),
+    output: z.object({
+      name: z.string(),
+    }),
+    handler: async () => ({...}),
+  });
 type GetUserEndpointResponse = EndpointResponse<typeof getUserEndpointV2>; // => the following type 
 //  {
 //    status: 'success';
