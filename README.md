@@ -71,13 +71,12 @@ yarn add express-zod-api
 npm install express-zod-api
 ```
 
-Add the following options to your `tsconfig.json` file in order to make it work as expected:
+Add the following option to your `tsconfig.json` file in order to make it work as expected:
 
 ```json
 {
   "compilerOptions": {
-    "noImplicitAny": true,
-    "strictNullChecks": true
+    "strict": true
   }
 }
 ```
@@ -107,9 +106,9 @@ const config: ConfigType = {
 ## Create an endpoints factory
 
 ```typescript
-import {EndpointsFactory} from 'express-zod-api';
-
-const endpointsFactory = new EndpointsFactory();
+import {defaultEndpointsFactory} from './endpoints-factory';
+// same as: new EndpointsFactory(defaultResultHandler)
+const endpointsFactory = defaultEndpointsFactory;
 ```
 
 You can also instantly add middlewares to it using `.addMiddleware()` method.
@@ -259,22 +258,35 @@ type DefaultResponse<OUT> = {
 };
 ```
 
-You have two options to customize the `ResultHandler`: globally or at the endpoint level:
+In order to customize the response you need to use `createResultHandler()` first wrapping the response schema in 
+`createApiResponse()` optionally specifying its mime types, and wrapping the endpoint output in `markOutput()`. 
+Positive schema is the schema of successful response. Negative schema is the one that describes the response in case 
+of error. Here is an example:
 
 ```typescript
-import {ConfigType, ResultHandler} from 'express-zod-api';
+import {createResultHandler, IOSchema, createApiResponse, markOutput} from 'express-zod-api';
 
-const resultHandler: ResultHandler = 
-  ({error, input, output, request, response, logger}) => {};
+const myResultHandler = createResultHandler({
+  getPositiveResponse: <OUT extends IOSchema>(output: OUT) => createApiResponse(
+    z.object({
+      ...,
+      someProperty: markOutput(output)
+    }), 
+    ['mime/type1', 'mime/type2'] // optional, default: application/json
+  ),
+  getNegativeResponse: () => createApiResponse(z.object({...})),
+  resultHandler: ({error, input, output, request, response, logger}) => {
+    // your implementation
+  }
+});
+```
 
-const config: ConfigType = { resultHandler, ... };
+Then you need to use it as an argument for `EndpointsFactory` creation:
 
-// or
+```typescript
 import {EndpointsFactory} from 'express-zod-api';
 
-const endpointsFactory = new EndpointsFactory().setResultHandler(
-  ({error, input, output, request, response, logger}) => {}
-);
+const endpointsFactory = new EndpointsFactory(myResultHandler);
 ```
 
 ## Your custom logger
@@ -340,13 +352,13 @@ You can export only the types of your endpoints for your front-end:
 export type MyEndpointType = typeof endpoint;
 ```
 
-Then use provided helpers to obtain their input and output types:
+Then use provided helpers to obtain their input and response types:
 ```typescript
-import {EndpointInput, EndpointOutput} from 'express-zod-api';
+import {EndpointInput, EndpointResponse} from 'express-zod-api';
 import {MyEndpointType} from '../your/backend';
 
 type MyEndpointInput = EndpointInput<MyEndpointType>;
-type MyEndpointOutput = EndpointOutput<MyEndpointType>;
+type MyEndpointResponse = EndpointResponse<MyEndpointType>; // unions positive and negative schemas
 ```
 
 ## Swagger / OpenAPI Specification
@@ -361,7 +373,7 @@ const yamlString = new OpenAPI({
   version: '1.2.3',
   title: 'Example API',
   serverUrl: 'http://example.com'
-}).builder.getSpecAsYaml();
+}).getSpecAsYaml();
 ```
 
 # Known issues
