@@ -16,34 +16,30 @@
 // Example. Before (v1):
 import {EndpointOutput} from 'express-zod-api';
 
-const getUserEndpointV1 = endpointsFactory
+const myEndpointV1 = endpointsFactory
   .build({
     method: 'get',
-    input: z.object({
-      id: z.string().transform((id) => parseInt(id, 10))
-    }),
+    input: z.object({...}),
     output: z.object({
       name: z.string(),
     }),
     handler: async () => ({...}),
   });
-type GetUserEndpointOutput = EndpointOutput<typeof getUserEndpointV1>; // => { name: string }
+type MyEndpointOutput = EndpointOutput<typeof myEndpointV1>; // => { name: string }
 
 // and after (v2):
 import {defaultEndpointsFactory, EndpointResponse} from 'express-zod-api';
 
-const getUserEndpointV2 = defaultEndpointsFactory
+const myEndpointV2 = defaultEndpointsFactory
   .build({
     method: 'get',
-    input: z.object({
-      id: z.string().transform((id) => parseInt(id, 10))
-    }),
+    input: z.object({...}),
     output: z.object({
       name: z.string(),
     }),
     handler: async () => ({...}),
   });
-type GetUserEndpointResponse = EndpointResponse<typeof getUserEndpointV2>; // => the following type 
+type MyEndpointResponse = EndpointResponse<typeof myEndpointV2>; // => the following type 
 //  {
 //    status: 'success';
 //    data: { name: string };
