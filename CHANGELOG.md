@@ -11,6 +11,47 @@
   response of the endpoint, including the specification of a successful and error response for which the 
   `ResultHandler` is responsible. So I decided to fix it, although it made the implementation somewhat more 
   complicated, but I found it important. However, it brought a number of benefits, which are also described below.
+
+```typescript
+// Example. Before (v1):
+import {EndpointOutput} from 'express-zod-api';
+
+const getUserEndpointV1 = endpointsFactory
+        .build({
+          method: 'get',
+          input: z.object({
+            id: z.string().transform((id) => parseInt(id, 10))
+          }),
+          output: z.object({
+            name: z.string(),
+          }),
+          handler: async () => ({...}),
+        });
+type GetUserEndpointOutput = EndpointOutput<typeof getUserEndpointV1>; // => { name: string }
+
+// and after (v2):
+import {defaultEndpointsFactory, EndpointResponse} from 'express-zod-api';
+
+const getUserEndpointV2 = defaultEndpointsFactory
+        .build({
+          method: 'get',
+          input: z.object({
+            id: z.string().transform((id) => parseInt(id, 10))
+          }),
+          output: z.object({
+            name: z.string(),
+          }),
+          handler: async () => ({...}),
+        });
+type GetUserEndpointResponse = EndpointResponse<typeof getUserEndpointV2>; // => the following type 
+//  {
+//    status: 'success';
+//    data: { name: string };
+//  } | {
+//    status: 'error',
+//    error: { message: string };
+//  }
+```
 - Core changes.
   - Node version required: at least `10.0.0`.
   - The library target now is `ES6`.
