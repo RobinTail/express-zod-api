@@ -36,7 +36,8 @@ Start your API server with I/O schema validation and custom middlewares in minut
 7. [Known issues](#known-issues)
    1. [Excess property check of endpoint output](#excess-property-check-of-endpoint-output)
 
-**Important notice**: v2 is currently beta. Please use stable v1 for production.
+**Important notice**: v2 is currently beta. Some methods and properties might be renamed or changed without backward 
+compatibility. Please use stable v1 for production.
 
 If you're upgrading from v1 please check out the information in [Changelog](CHANGELOG.md).  
 

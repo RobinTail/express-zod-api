@@ -2,6 +2,8 @@
 
 ## Version 2
 
+While v2 is beta some methods and properties might be renamed or changed without backward compatibility.
+
 ### v2.0.0-beta1
 
 - **Warning**: There are breaking changes described below.
