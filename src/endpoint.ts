@@ -35,13 +35,13 @@ export abstract class AbstractEndpoint {
     return this.description;
   }
 
-  abstract getMethods(): Method[];
-  abstract getInputSchema(): IOSchema;
-  abstract getOutputSchema(): IOSchema;
-  abstract getPositiveResponseSchema(): z.ZodTypeAny;
-  abstract getNegativeResponseSchema(): z.ZodTypeAny;
-  abstract getPositiveMimeTypes(): string[];
-  abstract getNegativeMimeTypes(): string[];
+  public abstract getMethods(): Method[];
+  public abstract getInputSchema(): IOSchema;
+  public abstract getOutputSchema(): IOSchema;
+  public abstract getPositiveResponseSchema(): z.ZodTypeAny;
+  public abstract getNegativeResponseSchema(): z.ZodTypeAny;
+  public abstract getPositiveMimeTypes(): string[];
+  public abstract getNegativeMimeTypes(): string[];
 }
 
 export type EndpointInput<T> = T extends Endpoint<infer IN, any, infer mIN, any, any, any, any>
@@ -124,11 +124,11 @@ export class Endpoint<
     return this.resultHandler.getNegativeResponse().schema;
   }
 
-  getNegativeMimeTypes() {
+  public getNegativeMimeTypes() {
     return this.resultHandler.getPositiveResponse(this.outputSchema).mimeTypes;
   }
 
-  getPositiveMimeTypes() {
+  public getPositiveMimeTypes() {
     return this.resultHandler.getNegativeResponse().mimeTypes;
   }
 
