@@ -258,13 +258,13 @@ type DefaultResponse<OUT> = {
 };
 ```
 
-In order to customize the response you need to use `createResultHandler()` first wrapping the response schema in 
-`createApiResponse()` optionally specifying its mime types, and wrapping the endpoint output in `markOutput()`. 
+In order to customize the response handler you need to use `createResultHandler()` first wrapping the response schema in 
+`createApiResponse()` optionally specifying its mime types, and wrapping the endpoint output schema in `markOutput()`. 
 Positive schema is the schema of successful response. Negative schema is the one that describes the response in case 
-of error. Here is an example:
+of error. Here is an example you can use as a template:
 
 ```typescript
-import {createResultHandler, IOSchema, createApiResponse, markOutput} from 'express-zod-api';
+import {createResultHandler, IOSchema, createApiResponse, markOutput, z} from 'express-zod-api';
 
 const myResultHandler = createResultHandler({
   getPositiveResponse: <OUT extends IOSchema>(output: OUT) => createApiResponse(
@@ -274,14 +274,16 @@ const myResultHandler = createResultHandler({
     }), 
     ['mime/type1', 'mime/type2'] // optional, default: application/json
   ),
-  getNegativeResponse: () => createApiResponse(z.object({...})),
+  getNegativeResponse: () => createApiResponse(z.object({
+     error: z.string()
+  })),
   resultHandler: ({error, input, output, request, response, logger}) => {
     // your implementation
   }
 });
 ```
 
-Then you need to use it as an argument for `EndpointsFactory` creation:
+Then you need to use it as an argument for `EndpointsFactory` instance creation:
 
 ```typescript
 import {EndpointsFactory} from 'express-zod-api';
