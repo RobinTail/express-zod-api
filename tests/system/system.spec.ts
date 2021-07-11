@@ -1,7 +1,6 @@
 import http from 'http';
 import fetch from 'node-fetch';
-import {createServer, EndpointsFactory, Method, z} from '../../src';
-import {defaultResultHandler} from '../../src/result-handler';
+import {createServer, EndpointsFactory, Method, z, defaultResultHandler} from '../../src';
 
 describe('App', () => {
   let server: http.Server;

@@ -5,9 +5,11 @@ import {
   ConfigType,
   createMiddleware,
   defaultResultHandler,
-  EndpointInput, EndpointOutput
+  EndpointInput,
+  EndpointOutput,
+  EndpointResponse
 } from '../../src';
-import {Endpoint, EndpointResponse} from '../../src/endpoint';
+import {Endpoint} from '../../src/endpoint';
 import {Request, Response} from 'express';
 
 let loggerMock: any;
@@ -32,7 +34,7 @@ describe('Endpoint', () => {
         resultHandler: {
           getPositiveResponse: jest.fn(),
           getNegativeResponse: jest.fn(),
-          resultHandler: jest.fn()
+          handler: jest.fn()
         },
         middlewares: []
       });
@@ -48,7 +50,7 @@ describe('Endpoint', () => {
         resultHandler: {
           getPositiveResponse: jest.fn(),
           getNegativeResponse: jest.fn(),
-          resultHandler: jest.fn()
+          handler: jest.fn()
         },
         middlewares: []
       });

@@ -1,6 +1,5 @@
 import {Request, Response} from 'express';
-import {defaultResultHandler} from '../../src/result-handler';
-import {z, createHttpError} from '../../src';
+import {z, createHttpError, defaultResultHandler} from '../../src';
 
 let loggerMock: any;
 let responseMock: any;
@@ -26,7 +25,7 @@ describe('ResultHandler', () => {
         method: 'POST',
         url: 'http://something/v1/anything'
       };
-      defaultResultHandler.resultHandler({
+      defaultResultHandler.handler({
         error: new Error('Some error'),
         input: { something: 453 },
         output: { anything: 118 },
@@ -54,7 +53,7 @@ describe('ResultHandler', () => {
         method: 'POST',
         url: 'http://something/v1/anything'
       };
-      defaultResultHandler.resultHandler({
+      defaultResultHandler.handler({
         error: new z.ZodError([{
           code: 'invalid_type',
           message: 'Expected string, got number',
@@ -83,7 +82,7 @@ describe('ResultHandler', () => {
         method: 'POST',
         url: 'http://something/v1/anything'
       };
-      defaultResultHandler.resultHandler({
+      defaultResultHandler.handler({
         error: createHttpError(404, 'Something not found'),
         input: { something: 453 },
         output: { anything: 118 },
@@ -106,7 +105,7 @@ describe('ResultHandler', () => {
         method: 'POST',
         url: 'http://something/v1/anything'
       };
-      defaultResultHandler.resultHandler({
+      defaultResultHandler.handler({
         error: null,
         input: { something: 453 },
         output: { anything: 118 },

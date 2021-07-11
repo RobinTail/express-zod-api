@@ -196,7 +196,7 @@ export class Endpoint<
     output: any
   }) {
     try {
-      await this.resultHandler.resultHandler({
+      await this.resultHandler.handler({
         error, output, request, response, logger,
         input: initialInput
       });

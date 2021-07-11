@@ -24,7 +24,7 @@ type ResultHandler<RES> = (params: ResultHandlerParams<RES>) => void | Promise<v
 export interface ResultHandlerDefinition<POS extends ApiResponse, NEG extends ApiResponse> {
   getPositiveResponse: <OUT extends IOSchema>(output: OUT) => POS,
   getNegativeResponse: () => NEG,
-  resultHandler: ResultHandler<z.output<POS['schema']> | z.output<NEG['schema']>>;
+  handler: ResultHandler<z.output<POS['schema']> | z.output<NEG['schema']>>;
 }
 
 export const createResultHandler = <POS extends ApiResponse, NEG extends ApiResponse>(
@@ -42,7 +42,7 @@ export const defaultResultHandler = createResultHandler({
       message: z.string()
     })
   })),
-  resultHandler: ({error, input, output, request, response, logger}) => {
+  handler: ({error, input, output, request, response, logger}) => {
     if (!error) {
       response.status(200).json({
         status: 'success' as const,

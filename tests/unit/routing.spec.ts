@@ -1,7 +1,6 @@
 import {Express, RequestHandler, Request, Response} from 'express';
 import {Logger} from 'winston';
-import {EndpointsFactory, z, Routing, ConfigType, DependsOnMethod} from '../../src';
-import {defaultResultHandler} from '../../src/result-handler';
+import {EndpointsFactory, z, Routing, ConfigType, DependsOnMethod, defaultResultHandler} from '../../src';
 import {initRouting} from '../../src/routing';
 
 let appMock: any;

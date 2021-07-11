@@ -103,7 +103,7 @@ const myResultHandlerV2 = createResultHandler({
     ['mime/type1', 'mime/type2'] // optional, default: application/json
   ),
   getNegativeResponse: () => createApiResponse(z.object({...})),
-  resultHandler: ({error, input, output, request, response, logger}) => {}
+  handler: ({error, input, output, request, response, logger}) => {}
 });
 ```
 

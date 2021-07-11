@@ -280,7 +280,7 @@ const myResultHandler = createResultHandler({
   getNegativeResponse: () => createApiResponse(z.object({
      error: z.string()
   })),
-  resultHandler: ({error, input, output, request, response, logger}) => {
+  handler: ({error, input, output, request, response, logger}) => {
     // your implementation
   }
 });

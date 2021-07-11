@@ -1,13 +1,14 @@
 import {expectType} from 'tsd';
 import {
-  combineEndpointAndMiddlewareInputSchemas, createApiResponse,
+  combineEndpointAndMiddlewareInputSchemas,
   extractObjectSchema,
   getInitialInput,
   getMessageFromError,
   getStatusCodeFromError,
-  isLoggerConfig, markOutput, OutputMarker
+  isLoggerConfig,
+  OutputMarker
 } from '../../src/helpers';
-import {createMiddleware, z, createHttpError} from '../../src';
+import {createMiddleware, z, createHttpError, markOutput, createApiResponse} from '../../src';
 import {Request} from 'express';
 import {MiddlewareDefinition} from '../../src/middleware';
 

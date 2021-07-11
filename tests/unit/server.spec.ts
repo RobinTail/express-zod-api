@@ -18,8 +18,7 @@ const expressMock = jest.mock('express', () => {
 });
 
 import express from 'express'; // mocked above
-import {ConfigType, createServer, attachRouting, EndpointsFactory, z} from '../../src';
-import {defaultResultHandler} from '../../src/result-handler';
+import {ConfigType, createServer, attachRouting, EndpointsFactory, z, defaultResultHandler} from '../../src';
 
 describe('Server', () => {
   beforeEach(() => {
@@ -84,7 +83,7 @@ describe('Server', () => {
         },
         cors: true,
         errorHandler: {
-          resultHandler: jest.fn(),
+          handler: jest.fn(),
         },
         logger: {
           info: jest.fn()
@@ -112,9 +111,9 @@ describe('Server', () => {
       expect(Array.isArray(appMock.use.mock.calls[0][0])).toBeTruthy();
       expect(appMock.use.mock.calls[0][0][0]).toBe(configMock.server.jsonParser);
       expect(typeof appMock.use.mock.calls[1][0]).toBe('function');
-      expect(configMock.errorHandler.resultHandler).toBeCalledTimes(0);
+      expect(configMock.errorHandler.handler).toBeCalledTimes(0);
       appMock.use.mock.calls[1][0]({method: 'get', path: '/v1/test'});
-      expect(configMock.errorHandler.resultHandler).toBeCalledTimes(1);
+      expect(configMock.errorHandler.handler).toBeCalledTimes(1);
       expect(configMock.logger.info).toBeCalledTimes(1);
       expect(configMock.logger.info).toBeCalledWith('Listening 8054');
       expect(appMock.get).toBeCalledTimes(1);
@@ -136,7 +135,7 @@ describe('Server', () => {
         app,
         cors: true,
         errorHandler: {
-          resultHandler: jest.fn(),
+          handler: jest.fn(),
         },
         logger: {
           info: jest.fn()
@@ -161,7 +160,7 @@ describe('Server', () => {
       const result = attachRouting(configMock as unknown as ConfigType & {app: any}, routingMock);
       expect(result).toBe(undefined);
       expect(appMock.use).toBeCalledTimes(0);
-      expect(configMock.errorHandler.resultHandler).toBeCalledTimes(0);
+      expect(configMock.errorHandler.handler).toBeCalledTimes(0);
       expect(configMock.logger.info).toBeCalledTimes(0);
       expect(appMock.listen).toBeCalledTimes(0);
       expect(appMock.get).toBeCalledTimes(1);

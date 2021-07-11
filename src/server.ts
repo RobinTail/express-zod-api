@@ -23,7 +23,7 @@ export function createServer(config: ConfigWithServer, routing: Routing): Server
 
   const jsonFailureHandler: express.ErrorRequestHandler = (error, request, response, next) => {
     if (!error) { return next(); }
-    errorHandlerDefinition.resultHandler({
+    errorHandlerDefinition.handler({
       error, request, response, logger,
       input: request.body,
       output: null
@@ -31,7 +31,7 @@ export function createServer(config: ConfigWithServer, routing: Routing): Server
   };
 
   const lastResortHandler: express.RequestHandler = (request, response) => {
-    errorHandlerDefinition.resultHandler({
+    errorHandlerDefinition.handler({
       request, response, logger,
       error: createHttpError(404, `Can not ${request.method} ${request.path}`),
       input: null,
