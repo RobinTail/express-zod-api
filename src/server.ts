@@ -1,11 +1,11 @@
-import * as express from 'express';
+import express from 'express';
 import {Server} from 'http';
 import {ConfigType} from './config-type';
 import {isLoggerConfig} from './helpers';
 import {createLogger} from './logger';
 import {defaultResultHandler} from './result-handler';
 import {initRouting, Routing} from './routing';
-import * as createHttpError from 'http-errors';
+import createHttpError from 'http-errors';
 
 type ConfigWithServer = Exclude<ConfigType, {app: any}>;
 type ConfigWithApp = Exclude<ConfigType, {server: any}>;
@@ -18,12 +18,12 @@ export function attachRouting(config: ConfigWithApp, routing: Routing): void {
 export function createServer(config: ConfigWithServer, routing: Routing): Server {
   const logger = isLoggerConfig(config.logger) ? createLogger(config.logger) : config.logger;
   const app = express();
-  const resultHandler = config.resultHandler || defaultResultHandler;
+  const errorHandler = config.errorHandler || defaultResultHandler;
   const jsonParser = config.server.jsonParser || express.json();
 
   const jsonFailureHandler: express.ErrorRequestHandler = (error, request, response, next) => {
     if (!error) { return next(); }
-    resultHandler({
+    errorHandler.handler({
       error, request, response, logger,
       input: request.body,
       output: null
@@ -31,7 +31,7 @@ export function createServer(config: ConfigWithServer, routing: Routing): Server
   };
 
   const lastResortHandler: express.RequestHandler = (request, response) => {
-    resultHandler({
+    errorHandler.handler({
       request, response, logger,
       error: createHttpError(404, `Can not ${request.method} ${request.path}`),
       input: null,

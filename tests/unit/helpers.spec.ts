@@ -1,13 +1,16 @@
+import {expectType} from 'tsd';
 import {
   combineEndpointAndMiddlewareInputSchemas,
   extractObjectSchema,
   getInitialInput,
   getMessageFromError,
   getStatusCodeFromError,
-  isLoggerConfig
+  isLoggerConfig,
+  OutputMarker
 } from '../../src/helpers';
-import {createMiddleware, z, createHttpError} from '../../src';
+import {createMiddleware, z, createHttpError, markOutput, createApiResponse} from '../../src';
 import {Request} from 'express';
+import {MiddlewareDefinition} from '../../src/middleware';
 
 describe('Helpers', () => {
   describe('combineEndpointAndMiddlewareInputSchemas()', () => {
@@ -31,7 +34,7 @@ describe('Helpers', () => {
           }),
           middleware: jest.fn()
         }),
-      ];
+      ] as MiddlewareDefinition<any, any, any>[];
       const endpointInput = z.object({
         four: z.boolean()
       });
@@ -58,7 +61,7 @@ describe('Helpers', () => {
           })),
           middleware: jest.fn()
         }),
-      ];
+      ] as MiddlewareDefinition<any, any, any>[];
       const endpointInput = z.object({
         five: z.string()
       }).or(z.object({
@@ -87,7 +90,7 @@ describe('Helpers', () => {
           })),
           middleware: jest.fn()
         }),
-      ];
+      ] as MiddlewareDefinition<any, any, any>[];
       const endpointInput = z.object({
         five: z.string()
       }).and(z.object({
@@ -116,7 +119,7 @@ describe('Helpers', () => {
           })),
           middleware: jest.fn()
         }),
-      ];
+      ] as MiddlewareDefinition<any, any, any>[];
       const endpointInput = z.object({
         five: z.string()
       });
@@ -273,6 +276,40 @@ describe('Helpers', () => {
     test('should return 500 for other errors', () => {
       expect(getStatusCodeFromError(new Error('something went wrong')))
         .toEqual(500);
+    });
+  });
+
+  describe('markOutput()', () => {
+    test('should change the type of schema', () => {
+      const output = z.object({});
+      expect(markOutput(output)).toEqual(output);
+      expectType<OutputMarker>(markOutput(output));
+    });
+  });
+
+  describe('createApiResponse()', () => {
+    test('should accept an array of mime types', () => {
+      const output = z.object({});
+      expect(createApiResponse(output, ['something', 'anything'])).toEqual({
+        schema: output,
+        mimeTypes: ['something', 'anything']
+      });
+    });
+
+    test('should accept a single mime type', () => {
+      const output = z.object({});
+      expect(createApiResponse(output, 'something')).toEqual({
+        schema: output,
+        mimeTypes: ['something']
+      });
+    });
+
+    test('should assume json mime type by default', () => {
+      const output = z.object({});
+      expect(createApiResponse(output, )).toEqual({
+        schema: output,
+        mimeTypes: ['application/json']
+      });
     });
   });
 });

@@ -1,7 +1,7 @@
 import {NextHandleFunction} from 'connect';
 import {Express} from 'express';
 import {Logger} from 'winston';
-import {ResultHandler} from './result-handler';
+import {ResultHandlerDefinition} from './result-handler';
 
 export const loggerLevels = {
   silent: true,
@@ -27,8 +27,9 @@ export type ConfigType = ({
   // enable cross-origin resource sharing
   // https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
   cors: boolean;
-  // custom handler for errors and output, default: defaultResultHandler()
-  resultHandler?: ResultHandler;
+  // custom ResultHandlerDefinition for common errors,
+  // default: defaultResultHandler()
+  errorHandler?: ResultHandlerDefinition<any, any>;
   // logger configuration or your custom winston logger
   logger: LoggerConfig | Logger;
 }

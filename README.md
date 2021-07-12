@@ -36,7 +36,10 @@ Start your API server with I/O schema validation and custom middlewares in minut
 7. [Known issues](#known-issues)
    1. [Excess property check of endpoint output](#excess-property-check-of-endpoint-output)
 
-[Changelog](CHANGELOG.md)
+**Important notice**: v2 is currently beta. Some methods and properties might be renamed or changed without backward 
+compatibility. Please use stable v1 for production.
+
+If you're upgrading from v1 please check out the information in [Changelog](CHANGELOG.md).  
 
 # Technologies
 
@@ -71,13 +74,12 @@ yarn add express-zod-api
 npm install express-zod-api
 ```
 
-Add the following options to your `tsconfig.json` file in order to make it work as expected:
+Add the following option to your `tsconfig.json` file in order to make it work as expected:
 
 ```json
 {
   "compilerOptions": {
-    "noImplicitAny": true,
-    "strictNullChecks": true
+    "strict": true
   }
 }
 ```
@@ -107,9 +109,9 @@ const config: ConfigType = {
 ## Create an endpoints factory
 
 ```typescript
-import {EndpointsFactory} from 'express-zod-api';
-
-const endpointsFactory = new EndpointsFactory();
+import {defaultEndpointsFactory} from './endpoints-factory';
+// same as: new EndpointsFactory(defaultResultHandler)
+const endpointsFactory = defaultEndpointsFactory;
 ```
 
 You can also instantly add middlewares to it using `.addMiddleware()` method.
@@ -244,8 +246,12 @@ const getUserEndpoint = endpointsFactory.build({
 
 ## ResultHandler
 
-`ResultHandler` is the [type](https://github.com/RobinTail/express-zod-api/blob/master/src/result-handler.ts) of function that is responsible for transmission of the final response or possible error.
-The `defaultResultHandler` sets the HTTP status code and ensures the following type of the response:
+`ResultHandler` is the [type](https://github.com/RobinTail/express-zod-api/blob/master/src/result-handler.ts) of 
+function that is responsible for transmission of the final response or possible error.
+`ResultHandlerDefinition` contains this handler and additional methods defining the schema of the positive and 
+negative responses as well as their MIME types for the further disclosing to consumers and documentation.
+Positive schema is the schema of successful response. Negative schema is the one that describes the response in case
+of error. The `defaultResultHandler` sets the HTTP status code and ensures the following type of the response:
 
 ```typescript
 type DefaultResponse<OUT> = {
@@ -259,22 +265,36 @@ type DefaultResponse<OUT> = {
 };
 ```
 
-You have two options to customize the `ResultHandler`: globally or at the endpoint level:
+In order to customize the result handler you need to use `createResultHandler()` first wrapping the response schema in 
+`createApiResponse()` optionally specifying its mime types, and wrapping the endpoint output schema in `markOutput()`. 
+Here is an example you can use as a template:
 
 ```typescript
-import {ConfigType, ResultHandler} from 'express-zod-api';
+import {createResultHandler, IOSchema, createApiResponse, markOutput, z} from 'express-zod-api';
 
-const resultHandler: ResultHandler = 
-  ({error, input, output, request, response, logger}) => {};
+const myResultHandler = createResultHandler({
+  getPositiveResponse: <OUT extends IOSchema>(output: OUT) => createApiResponse(
+    z.object({
+      ...,
+      someProperty: markOutput(output)
+    }), 
+    ['mime/type1', 'mime/type2'] // optional, default: application/json
+  ),
+  getNegativeResponse: () => createApiResponse(z.object({
+     error: z.string()
+  })),
+  handler: ({error, input, output, request, response, logger}) => {
+    // your implementation
+  }
+});
+```
 
-const config: ConfigType = { resultHandler, ... };
+Then you need to use it as an argument for `EndpointsFactory` instance creation:
 
-// or
+```typescript
 import {EndpointsFactory} from 'express-zod-api';
 
-const endpointsFactory = new EndpointsFactory().setResultHandler(
-  ({error, input, output, request, response, logger}) => {}
-);
+const endpointsFactory = new EndpointsFactory(myResultHandler);
 ```
 
 ## Your custom logger
@@ -313,7 +333,7 @@ app.listen();
 ## Multiple schemas for a single route
 
 Thanks to the `DependsOnMethod` class a route may have multiple Endpoints attached depending on different methods.
-It can also be the same Endpoint that handle multiple methods as well.
+It can also be the same Endpoint that handles multiple methods as well.
 ```typescript
 import {DependsOnMethod} from 'express-zod-api';
 
@@ -340,18 +360,19 @@ You can export only the types of your endpoints for your front-end:
 export type MyEndpointType = typeof endpoint;
 ```
 
-Then use provided helpers to obtain their input and output types:
+Then use provided helpers to obtain their input and response types:
 ```typescript
-import {EndpointInput, EndpointOutput} from 'express-zod-api';
+import {EndpointInput, EndpointResponse} from 'express-zod-api';
 import {MyEndpointType} from '../your/backend';
 
 type MyEndpointInput = EndpointInput<MyEndpointType>;
-type MyEndpointOutput = EndpointOutput<MyEndpointType>;
+type MyEndpointResponse = EndpointResponse<MyEndpointType>; // unions positive and negative schemas
 ```
 
 ## Swagger / OpenAPI Specification
 
-You can generate the specification of your API the following way and write it to a `.yaml` file:
+You can generate the specification of your API the following way and write it to a `.yaml` file, 
+that can be used as documentation:
 
 ```typescript
 import {OpenAPI} from 'express-zod-api';
@@ -361,7 +382,7 @@ const yamlString = new OpenAPI({
   version: '1.2.3',
   title: 'Example API',
   serverUrl: 'http://example.com'
-}).builder.getSpecAsYaml();
+}).getSpecAsYaml();
 ```
 
 # Known issues

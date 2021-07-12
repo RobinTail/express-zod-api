@@ -1,6 +1,5 @@
 import {routing} from '../../example/routing';
-import {endpointsFactory} from '../../example/factories';
-import {z, OpenAPI} from '../../src';
+import {z, OpenAPI, defaultEndpointsFactory} from '../../src';
 
 describe('Open API generator', () => {
   describe('generateOpenApi()', () => {
@@ -10,7 +9,7 @@ describe('Open API generator', () => {
         version: '1.2.3',
         title: 'Example API',
         serverUrl: 'http://example.com'
-      }).builder.getSpecAsYaml();
+      }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
 
@@ -19,7 +18,7 @@ describe('Open API generator', () => {
       const spec = new OpenAPI({
         routing: {
           v1: {
-            getSomething: endpointsFactory.build({
+            getSomething: defaultEndpointsFactory.build({
               methods: ['get'],
               input: z.object({
                 array: z.array(z.number().int().positive()),
@@ -39,7 +38,7 @@ describe('Open API generator', () => {
         version: '3.4.5',
         title: 'Testing Complex Types',
         serverUrl: 'http://example.com'
-      }).builder.getSpecAsYaml();
+      }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
 
@@ -47,7 +46,7 @@ describe('Open API generator', () => {
       const spec = new OpenAPI({
         routing: {
           v1: {
-            getSomething: endpointsFactory.build({
+            getSomething: defaultEndpointsFactory.build({
               methods: ['get'],
               input: z.object({
                 optional: z.string().optional(),
@@ -64,7 +63,7 @@ describe('Open API generator', () => {
         version: '3.4.5',
         title: 'Testing Nullable and Optional Types',
         serverUrl: 'http://example.com'
-      }).builder.getSpecAsYaml();
+      }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
 
@@ -72,7 +71,7 @@ describe('Open API generator', () => {
       const spec = new OpenAPI({
         routing: {
           v1: {
-            getSomething: endpointsFactory.build({
+            getSomething: defaultEndpointsFactory.build({
               methods: ['post'],
               input: z.object({
                 intersection: z.intersection(
@@ -103,7 +102,7 @@ describe('Open API generator', () => {
         version: '3.4.5',
         title: 'Testing Intersection and And types',
         serverUrl: 'http://example.com'
-      }).builder.getSpecAsYaml();
+      }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
   });
@@ -112,7 +111,7 @@ describe('Open API generator', () => {
     const spec = new OpenAPI({
       routing: {
         v1: {
-          getSomething: endpointsFactory.build({
+          getSomething: defaultEndpointsFactory.build({
             methods: ['post'],
             input: z.object({
               union: z.union([
@@ -138,7 +137,7 @@ describe('Open API generator', () => {
       version: '3.4.5',
       title: 'Testing Union and Or Types',
       serverUrl: 'http://example.com'
-    }).builder.getSpecAsYaml();
+    }).getSpecAsYaml();
     expect(spec).toMatchSnapshot();
   });
 
@@ -146,7 +145,7 @@ describe('Open API generator', () => {
     const spec = new OpenAPI({
       routing: {
         v1: {
-          getSomething: endpointsFactory.build({
+          getSomething: defaultEndpointsFactory.build({
             methods: ['post'],
             input: z.object({
               one: z.string(),
@@ -164,7 +163,7 @@ describe('Open API generator', () => {
       version: '3.4.5',
       title: 'Testing Transformation in response schema',
       serverUrl: 'http://example.com'
-    }).builder.getSpecAsYaml();
+    }).getSpecAsYaml();
     expect(spec).toMatchSnapshot();
   });
 
@@ -172,7 +171,7 @@ describe('Open API generator', () => {
     const spec = new OpenAPI({
       routing: {
         v1: {
-          getSomething: endpointsFactory.build({
+          getSomething: defaultEndpointsFactory.build({
             method: 'post',
             input: z.object({
               bigint: z.bigint(),
@@ -191,7 +190,7 @@ describe('Open API generator', () => {
       version: '3.4.5',
       title: 'Testing additional types',
       serverUrl: 'http://example.com'
-    }).builder.getSpecAsYaml();
+    }).getSpecAsYaml();
     expect(spec).toMatchSnapshot();
   });
 
@@ -211,7 +210,7 @@ describe('Open API generator', () => {
       expect(() => new OpenAPI({
         routing: {
           v1: {
-            getSomething: endpointsFactory.build({
+            getSomething: defaultEndpointsFactory.build({
               method: 'post',
               input: z.object({
                 property: zodType

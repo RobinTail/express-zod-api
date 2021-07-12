@@ -1,6 +1,6 @@
-import * as http from 'http';
+import http from 'http';
 import fetch from 'node-fetch';
-import {createServer, EndpointsFactory, Method, z} from '../../src';
+import {createServer, EndpointsFactory, Method, z, defaultResultHandler} from '../../src';
 
 describe('App', () => {
   let server: http.Server;
@@ -8,7 +8,7 @@ describe('App', () => {
   beforeAll(() => {
     const routing = {
       v1: {
-        test: new EndpointsFactory()
+        test: new EndpointsFactory(defaultResultHandler)
           .addMiddleware({
             input: z.object({
               key: z.string().refine((v) => v === '123', 'Invalid key')

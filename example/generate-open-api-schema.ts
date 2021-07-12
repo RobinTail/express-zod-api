@@ -6,4 +6,4 @@ console.log(new OpenAPI({
   routing, version,
   title: 'Example API',
   serverUrl: 'http://example.com'
-}).builder.getSpecAsYaml());
+}).getSpecAsYaml());

@@ -9,48 +9,74 @@ paths:
   /v1/getSomething:
     get:
       responses:
-        default:
+        \\"200\\":
           description: Successful response
           content:
             application/json:
               schema:
-                $ref: \\"#/components/schemas/responseSchema1\\"
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - success
+                  data:
+                    type: object
+                    properties:
+                      literal:
+                        type: string
+                        enum:
+                          - something
+                      transformation:
+                        type: number
+                    required:
+                      - literal
+                      - transformation
+                required:
+                  - status
+                  - data
+                description: GET /v1/getSomething Successful response
+        \\"400\\":
+          description: Error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                required:
+                  - status
+                  - error
+                description: GET /v1/getSomething Error response
       parameters:
-        - $ref: \\"#/components/parameters/parameter1\\"
-        - $ref: \\"#/components/parameters/parameter2\\"
+        - name: array
+          in: query
+          required: true
+          schema:
+            type: array
+            items:
+              type: number
+            description: GET /v1/getSomething parameter
+        - name: transformer
+          in: query
+          required: true
+          schema:
+            type: string
+            description: GET /v1/getSomething parameter
 components:
-  schemas:
-    responseSchema1:
-      type: object
-      properties:
-        literal:
-          type: string
-          enum:
-            - something
-        transformation:
-          type: number
-      required:
-        - literal
-        - transformation
-      description: /v1/getSomething GET response schema
+  schemas: {}
   responses: {}
-  parameters:
-    parameter1:
-      name: array
-      in: query
-      required: true
-      schema:
-        type: array
-        items:
-          type: number
-        description: /v1/getSomething GET parameter
-    parameter2:
-      name: transformer
-      in: query
-      required: true
-      schema:
-        type: string
-        description: /v1/getSomething GET parameter
+  parameters: {}
   examples: {}
   requestBodies: {}
   headers: {}
@@ -72,59 +98,87 @@ paths:
   /v1/getSomething:
     post:
       responses:
-        default:
+        \\"200\\":
           description: Successful response
           content:
             application/json:
               schema:
-                $ref: \\"#/components/schemas/responseSchema1\\"
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - success
+                  data:
+                    type: object
+                    properties:
+                      and:
+                        allOf:
+                          - type: object
+                            properties:
+                              five:
+                                type: number
+                            required:
+                              - five
+                          - type: object
+                            properties:
+                              six:
+                                type: string
+                            required:
+                              - six
+                    required:
+                      - and
+                required:
+                  - status
+                  - data
+                description: POST /v1/getSomething Successful response
+        \\"400\\":
+          description: Error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                required:
+                  - status
+                  - error
+                description: POST /v1/getSomething Error response
       requestBody:
         content:
           application/json:
             schema:
-              $ref: \\"#/components/schemas/requestBody1\\"
+              type: object
+              properties:
+                intersection:
+                  allOf:
+                    - type: object
+                      properties:
+                        one:
+                          type: string
+                      required:
+                        - one
+                    - type: object
+                      properties:
+                        two:
+                          type: string
+                      required:
+                        - two
+              required:
+                - intersection
+              description: POST /v1/getSomething request body
 components:
-  schemas:
-    responseSchema1:
-      type: object
-      properties:
-        and:
-          allOf:
-            - type: object
-              properties:
-                five:
-                  type: number
-              required:
-                - five
-            - type: object
-              properties:
-                six:
-                  type: string
-              required:
-                - six
-      required:
-        - and
-      description: /v1/getSomething POST response schema
-    requestBody1:
-      type: object
-      properties:
-        intersection:
-          allOf:
-            - type: object
-              properties:
-                one:
-                  type: string
-              required:
-                - one
-            - type: object
-              properties:
-                two:
-                  type: string
-              required:
-                - two
-      required:
-        - intersection
-      description: /v1/getSomething POST request body
+  schemas: {}
   responses: {}
   parameters: {}
   examples: {}
@@ -148,34 +202,62 @@ paths:
   /v1/getSomething:
     get:
       responses:
-        default:
+        \\"200\\":
           description: Successful response
           content:
             application/json:
               schema:
-                $ref: \\"#/components/schemas/responseSchema1\\"
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - success
+                  data:
+                    type: object
+                    properties:
+                      nullable:
+                        nullable: true
+                        type: string
+                    required:
+                      - nullable
+                required:
+                  - status
+                  - data
+                description: GET /v1/getSomething Successful response
+        \\"400\\":
+          description: Error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                required:
+                  - status
+                  - error
+                description: GET /v1/getSomething Error response
       parameters:
-        - $ref: \\"#/components/parameters/parameter1\\"
+        - name: optional
+          in: query
+          required: false
+          schema:
+            type: string
+            description: GET /v1/getSomething parameter
 components:
-  schemas:
-    responseSchema1:
-      type: object
-      properties:
-        nullable:
-          nullable: true
-          type: string
-      required:
-        - nullable
-      description: /v1/getSomething GET response schema
+  schemas: {}
   responses: {}
-  parameters:
-    parameter1:
-      name: optional
-      in: query
-      required: false
-      schema:
-        type: string
-        description: /v1/getSomething GET parameter
+  parameters: {}
   examples: {}
   requestBodies: {}
   headers: {}
@@ -197,80 +279,136 @@ paths:
   /v1/getUser:
     get:
       responses:
-        default:
+        \\"200\\":
           description: Successful response
           content:
             application/json:
               schema:
-                $ref: \\"#/components/schemas/responseSchema1\\"
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - success
+                  data:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+                        enum:
+                          - That's ok
+                          - Some kind of warning
+                      name:
+                        type: string
+                    required:
+                      - status
+                      - name
+                required:
+                  - status
+                  - data
+                description: GET /v1/getUser Successful response
+        \\"400\\":
+          description: Error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                required:
+                  - status
+                  - error
+                description: GET /v1/getUser Error response
       description: example user retrieval endpoint
       parameters:
-        - $ref: \\"#/components/parameters/parameter1\\"
+        - name: id
+          in: query
+          required: true
+          schema:
+            type: string
+            description: GET /v1/getUser parameter
   /v1/setUser:
     post:
       responses:
-        default:
+        \\"200\\":
           description: Successful response
           content:
             application/json:
               schema:
-                $ref: \\"#/components/schemas/responseSchema2\\"
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - success
+                  data:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+                        enum:
+                          - Success
+                          - I'll fix it later
+                    required:
+                      - status
+                required:
+                  - status
+                  - data
+                description: POST /v1/setUser Successful response
+        \\"400\\":
+          description: Error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                required:
+                  - status
+                  - error
+                description: POST /v1/setUser Error response
       description: example user update endpoint
       requestBody:
         content:
           application/json:
             schema:
-              $ref: \\"#/components/schemas/requestBody1\\"
+              type: object
+              properties:
+                key:
+                  type: string
+                id:
+                  type: number
+                name:
+                  type: string
+              required:
+                - key
+                - id
+                - name
+              description: POST /v1/setUser request body
 components:
-  schemas:
-    responseSchema1:
-      type: object
-      properties:
-        status:
-          type: string
-          enum:
-            - That's ok
-            - Some kind of warning
-        name:
-          type: string
-      required:
-        - status
-        - name
-      description: /v1/getUser GET response schema
-    responseSchema2:
-      type: object
-      properties:
-        status:
-          type: string
-          enum:
-            - Success
-            - I'll fix it later
-      required:
-        - status
-      description: /v1/setUser POST response schema
-    requestBody1:
-      type: object
-      properties:
-        key:
-          type: string
-        id:
-          type: number
-        name:
-          type: string
-      required:
-        - key
-        - id
-        - name
-      description: /v1/setUser POST request body
+  schemas: {}
   responses: {}
-  parameters:
-    parameter1:
-      name: id
-      in: query
-      required: true
-      schema:
-        type: string
-        description: /v1/getUser GET parameter
+  parameters: {}
   examples: {}
   requestBodies: {}
   headers: {}
@@ -292,55 +430,83 @@ paths:
   /v1/getSomething:
     post:
       responses:
-        default:
+        \\"200\\":
           description: Successful response
           content:
             application/json:
               schema:
-                $ref: \\"#/components/schemas/responseSchema1\\"
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - success
+                  data:
+                    type: object
+                    properties:
+                      or:
+                        oneOf:
+                          - type: string
+                          - type: number
+                    required:
+                      - or
+                required:
+                  - status
+                  - data
+                description: POST /v1/getSomething Successful response
+        \\"400\\":
+          description: Error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                required:
+                  - status
+                  - error
+                description: POST /v1/getSomething Error response
       requestBody:
         content:
           application/json:
             schema:
-              $ref: \\"#/components/schemas/requestBody1\\"
+              type: object
+              properties:
+                union:
+                  oneOf:
+                    - type: object
+                      properties:
+                        one:
+                          type: string
+                        two:
+                          type: number
+                      required:
+                        - one
+                        - two
+                    - type: object
+                      properties:
+                        two:
+                          type: number
+                        three:
+                          type: string
+                      required:
+                        - two
+                        - three
+              required:
+                - union
+              description: POST /v1/getSomething request body
 components:
-  schemas:
-    responseSchema1:
-      type: object
-      properties:
-        or:
-          oneOf:
-            - type: string
-            - type: number
-      required:
-        - or
-      description: /v1/getSomething POST response schema
-    requestBody1:
-      type: object
-      properties:
-        union:
-          oneOf:
-            - type: object
-              properties:
-                one:
-                  type: string
-                two:
-                  type: number
-              required:
-                - one
-                - two
-            - type: object
-              properties:
-                two:
-                  type: number
-                three:
-                  type: string
-              required:
-                - two
-                - three
-      required:
-        - union
-      description: /v1/getSomething POST request body
+  schemas: {}
   responses: {}
   parameters: {}
   examples: {}
@@ -364,45 +530,73 @@ paths:
   /v1/getSomething:
     post:
       responses:
-        default:
+        \\"200\\":
           description: Successful response
           content:
             application/json:
               schema:
-                $ref: \\"#/components/schemas/responseSchema1\\"
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - success
+                  data:
+                    type: object
+                    properties:
+                      \\"null\\":
+                        nullable: true
+                        type: string
+                        format: \\"null\\"
+                    required:
+                      - \\"null\\"
+                required:
+                  - status
+                  - data
+                description: POST /v1/getSomething Successful response
+        \\"400\\":
+          description: Error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                required:
+                  - status
+                  - error
+                description: POST /v1/getSomething Error response
       requestBody:
         content:
           application/json:
             schema:
-              $ref: \\"#/components/schemas/requestBody1\\"
+              type: object
+              properties:
+                bigint:
+                  type: integer
+                  format: int64
+                boolean:
+                  type: boolean
+                date:
+                  type: string
+                  format: date
+              required:
+                - bigint
+                - boolean
+                - date
+              description: POST /v1/getSomething request body
 components:
-  schemas:
-    responseSchema1:
-      type: object
-      properties:
-        \\"null\\":
-          nullable: true
-          type: string
-          format: \\"null\\"
-      required:
-        - \\"null\\"
-      description: /v1/getSomething POST response schema
-    requestBody1:
-      type: object
-      properties:
-        bigint:
-          type: integer
-          format: int64
-        boolean:
-          type: boolean
-        date:
-          type: string
-          format: date
-      required:
-        - bigint
-        - boolean
-        - date
-      description: /v1/getSomething POST request body
+  schemas: {}
   responses: {}
   parameters: {}
   examples: {}
@@ -426,38 +620,66 @@ paths:
   /v1/getSomething:
     post:
       responses:
-        default:
+        \\"200\\":
           description: Successful response
           content:
             application/json:
               schema:
-                $ref: \\"#/components/schemas/responseSchema1\\"
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - success
+                  data:
+                    type: object
+                    properties:
+                      transform:
+                        type: number
+                    required:
+                      - transform
+                required:
+                  - status
+                  - data
+                description: POST /v1/getSomething Successful response
+        \\"400\\":
+          description: Error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                required:
+                  - status
+                  - error
+                description: POST /v1/getSomething Error response
       requestBody:
         content:
           application/json:
             schema:
-              $ref: \\"#/components/schemas/requestBody1\\"
+              type: object
+              properties:
+                one:
+                  type: string
+                two:
+                  type: number
+              required:
+                - one
+                - two
+              description: POST /v1/getSomething request body
 components:
-  schemas:
-    responseSchema1:
-      type: object
-      properties:
-        transform:
-          type: number
-      required:
-        - transform
-      description: /v1/getSomething POST response schema
-    requestBody1:
-      type: object
-      properties:
-        one:
-          type: string
-        two:
-          type: number
-      required:
-        - one
-        - two
-      description: /v1/getSomething POST request body
+  schemas: {}
   responses: {}
   parameters: {}
   examples: {}

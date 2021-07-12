@@ -1,4 +1,4 @@
-import * as http from 'http';
+import http from 'http';
 
 let appMock: ReturnType<typeof newAppMock>;
 const expressJsonMock = jest.fn();
@@ -17,8 +17,8 @@ const expressMock = jest.mock('express', () => {
   return returnFunction;
 });
 
-import * as express from 'express'; // mocked above
-import {ConfigType, createServer, attachRouting, EndpointsFactory, z} from '../../src';
+import express from 'express'; // mocked above
+import {ConfigType, createServer, attachRouting, EndpointsFactory, z, defaultResultHandler} from '../../src';
 
 describe('Server', () => {
   beforeEach(() => {
@@ -47,16 +47,17 @@ describe('Server', () => {
       };
       const routingMock = {
         v1: {
-          test: new EndpointsFactory().build({
-            methods: ['get', 'post'],
-            input: z.object({
-              n: z.number()
-            }),
-            output: z.object({
-              b: z.boolean()
-            }),
-            handler: jest.fn()
-          })
+          test: new EndpointsFactory(defaultResultHandler)
+            .build({
+              methods: ['get', 'post'],
+              input: z.object({
+                n: z.number()
+              }),
+              output: z.object({
+                b: z.boolean()
+              }),
+              handler: jest.fn()
+            })
         }
       };
       createServer(configMock, routingMock);
@@ -74,30 +75,33 @@ describe('Server', () => {
       expect(appMock.listen.mock.calls[0][0]).toBe(8054);
     });
 
-    test('Should create server with custom JSON parser, logger and result handler', () => {
+    test('Should create server with custom JSON parser, logger and error handler', () => {
       const configMock = {
         server: {
           listen: 8054,
           jsonParser: jest.fn(),
         },
         cors: true,
-        resultHandler: jest.fn(),
+        errorHandler: {
+          handler: jest.fn(),
+        },
         logger: {
           info: jest.fn()
         }
       };
       const routingMock = {
         v1: {
-          test: new EndpointsFactory().build({
-            methods: ['get', 'post'],
-            input: z.object({
-              n: z.number()
-            }),
-            output: z.object({
-              b: z.boolean()
-            }),
-            handler: jest.fn()
-          })
+          test: new EndpointsFactory(defaultResultHandler)
+            .build({
+              methods: ['get', 'post'],
+              input: z.object({
+                n: z.number()
+              }),
+              output: z.object({
+                b: z.boolean()
+              }),
+              handler: jest.fn()
+            })
         }
       };
       const server = createServer(configMock as unknown as ConfigType & {server: any}, routingMock);
@@ -107,9 +111,9 @@ describe('Server', () => {
       expect(Array.isArray(appMock.use.mock.calls[0][0])).toBeTruthy();
       expect(appMock.use.mock.calls[0][0][0]).toBe(configMock.server.jsonParser);
       expect(typeof appMock.use.mock.calls[1][0]).toBe('function');
-      expect(configMock.resultHandler).toBeCalledTimes(0);
+      expect(configMock.errorHandler.handler).toBeCalledTimes(0);
       appMock.use.mock.calls[1][0]({method: 'get', path: '/v1/test'});
-      expect(configMock.resultHandler).toBeCalledTimes(1);
+      expect(configMock.errorHandler.handler).toBeCalledTimes(1);
       expect(configMock.logger.info).toBeCalledTimes(1);
       expect(configMock.logger.info).toBeCalledWith('Listening 8054');
       expect(appMock.get).toBeCalledTimes(1);
@@ -130,30 +134,33 @@ describe('Server', () => {
       const configMock = {
         app,
         cors: true,
-        resultHandler: jest.fn(),
+        errorHandler: {
+          handler: jest.fn(),
+        },
         logger: {
           info: jest.fn()
         }
       };
       const routingMock = {
         v1: {
-          test: new EndpointsFactory().build({
-            methods: ['get', 'post'],
-            input: z.object({
-              n: z.number()
-            }),
-            output: z.object({
-              b: z.boolean()
-            }),
-            handler: jest.fn()
-          })
+          test: new EndpointsFactory(defaultResultHandler)
+            .build({
+              methods: ['get', 'post'],
+              input: z.object({
+                n: z.number()
+              }),
+              output: z.object({
+                b: z.boolean()
+              }),
+              handler: jest.fn()
+            })
         }
       };
       // noinspection JSVoidFunctionReturnValueUsed
       const result = attachRouting(configMock as unknown as ConfigType & {app: any}, routingMock);
       expect(result).toBe(undefined);
       expect(appMock.use).toBeCalledTimes(0);
-      expect(configMock.resultHandler).toBeCalledTimes(0);
+      expect(configMock.errorHandler.handler).toBeCalledTimes(0);
       expect(configMock.logger.info).toBeCalledTimes(0);
       expect(appMock.listen).toBeCalledTimes(0);
       expect(appMock.get).toBeCalledTimes(1);

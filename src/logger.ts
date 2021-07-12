@@ -1,8 +1,8 @@
 import {inspect} from 'util';
 import {Format} from 'logform';
 import {LEVEL, MESSAGE, SPLAT} from 'triple-beam';
-import * as winston from 'winston';
-import * as Transport from 'winston-transport';
+import winston from 'winston';
+import Transport from 'winston-transport';
 import {LoggerConfig} from './config-type';
 
 const {combine, colorize, timestamp: useTimestamp, printf} = winston.format;

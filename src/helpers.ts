@@ -1,5 +1,6 @@
 import {Request} from 'express';
 import {HttpError} from 'http-errors';
+import {lookup} from 'mime';
 import {z} from 'zod';
 import {LoggerConfig, loggerLevels} from './config-type';
 import {MiddlewareDefinition} from './middleware';
@@ -32,6 +33,15 @@ export type Merge<A extends IOSchema, B extends IOSchema | any> = z.ZodObject<
   IOExtract<A, '_output'> & IOExtract<B, '_output'>,
   IOExtract<A, '_input'> & IOExtract<B, '_input'>
 >;
+
+export type OutputMarker = IOSchema & {_typeGuard: 'OutputMarker'};
+export const markOutput = (output: IOSchema) => output as OutputMarker;
+
+export type ReplaceMarkerInShape<S extends z.ZodRawShape, OUT extends IOSchema> = {
+  [K in keyof S]: S[K] extends OutputMarker
+    ? OUT
+    : S[K]
+}
 
 export function extractObjectSchema(subject: IOSchema): ObjectSchema {
   if (subject instanceof z.ZodUnion) {
@@ -96,3 +106,15 @@ export function getStatusCodeFromError(error: Error): number {
   }
   return 500;
 }
+
+export type ApiResponse<A = z.ZodTypeAny> = {
+  schema: A;
+  mimeTypes: string[];
+};
+
+export const createApiResponse = <S extends z.ZodTypeAny>(schema: S, mimeTypes: string | string[] = lookup('json')) => {
+  return {
+    schema,
+    mimeTypes: typeof mimeTypes === 'string' ? [mimeTypes] : mimeTypes,
+  } as ApiResponse<S>;
+};

@@ -7,9 +7,9 @@ import {AuxMethod, Method} from './method';
 
 export class DependsOnMethod {
   constructor(public readonly methods: {
-    [K in Method]?: Endpoint<any, any, any, any, K> | Endpoint<any, any, any, any, Method>;
+    [K in Method]?: Endpoint<any, any, any, any, K, any, any> | Endpoint<any, any, any, any, Method, any, any>;
   }) {
-    Object.keys(methods).forEach((key: keyof typeof methods) => {
+    (Object.keys(methods) as (keyof typeof methods)[]).forEach((key) => {
       if (key in methods) {
         const endpointMethods = methods[key]?.getMethods() || [];
         if (!endpointMethods.includes(key)) {

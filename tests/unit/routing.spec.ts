@@ -1,6 +1,6 @@
 import {Express, RequestHandler, Request, Response} from 'express';
 import {Logger} from 'winston';
-import {EndpointsFactory, z, Routing, ConfigType, DependsOnMethod} from '../../src';
+import {EndpointsFactory, z, Routing, ConfigType, DependsOnMethod, defaultResultHandler} from '../../src';
 import {initRouting} from '../../src/routing';
 
 let appMock: any;
@@ -31,19 +31,20 @@ describe('Routing', () => {
       const configMock = {
         cors: true
       };
-      const getEndpoint = new EndpointsFactory().build({
+      const factory = new EndpointsFactory(defaultResultHandler);
+      const getEndpoint = factory.build({
         methods: ['get'],
         input: z.object({}).nonstrict(),
         output: z.object({}).nonstrict(),
         handler: handlerMock
       });
-      const postEndpoint = new EndpointsFactory().build({
+      const postEndpoint = factory.build({
         methods: ['post'],
         input: z.object({}).nonstrict(),
         output: z.object({}).nonstrict(),
         handler: handlerMock
       });
-      const getAndPostEndpoint = new EndpointsFactory().build({
+      const getAndPostEndpoint = factory.build({
         methods: ['get', 'post'],
         input: z.object({}).nonstrict(),
         output: z.object({}).nonstrict(),
@@ -84,19 +85,20 @@ describe('Routing', () => {
       const configMock = {
         cors: true
       };
-      const getEndpoint = new EndpointsFactory().build({
+      const factory = new EndpointsFactory(defaultResultHandler);
+      const getEndpoint = factory.build({
         methods: ['get'],
         input: z.object({}).nonstrict(),
         output: z.object({}).nonstrict(),
         handler: handlerMock
       });
-      const postEndpoint = new EndpointsFactory().build({
+      const postEndpoint = factory.build({
         methods: ['post'],
         input: z.object({}).nonstrict(),
         output: z.object({}).nonstrict(),
         handler: handlerMock
       });
-      const putAndPatchEndpoint = new EndpointsFactory().build({
+      const putAndPatchEndpoint = factory.build({
         methods: ['put', 'patch'],
         input: z.object({}).nonstrict(),
         output: z.object({}).nonstrict(),
@@ -134,12 +136,13 @@ describe('Routing', () => {
     test('Should accept parameters', () => {
       const handlerMock = jest.fn();
       const configMock = {};
-      const endpointMock = new EndpointsFactory().build({
-        methods: ['get'],
-        input: z.object({}).nonstrict(),
-        output: z.object({}).nonstrict(),
-        handler: handlerMock
-      });
+      const endpointMock = new EndpointsFactory(defaultResultHandler)
+        .build({
+          methods: ['get'],
+          input: z.object({}).nonstrict(),
+          output: z.object({}).nonstrict(),
+          handler: handlerMock
+        });
       const routing: Routing = {
         v1: {
           user: {
@@ -160,12 +163,13 @@ describe('Routing', () => {
     test('Should handle empty paths and trim spaces', () => {
       const handlerMock = jest.fn();
       const configMock = {};
-      const endpointMock = new EndpointsFactory().build({
-        methods: ['get'],
-        input: z.object({}).nonstrict(),
-        output: z.object({}).nonstrict(),
-        handler: handlerMock
-      });
+      const endpointMock = new EndpointsFactory(defaultResultHandler)
+        .build({
+          methods: ['get'],
+          input: z.object({}).nonstrict(),
+          output: z.object({}).nonstrict(),
+          handler: handlerMock
+        });
       const routing: Routing = {
         v1: {
           user: {
@@ -190,12 +194,13 @@ describe('Routing', () => {
     test('Should throw an error in case of slashes in route', () => {
       const handlerMock = jest.fn();
       const configMock = {};
-      const endpointMock = new EndpointsFactory().build({
-        methods: ['get'],
-        input: z.object({}).nonstrict(),
-        output: z.object({}).nonstrict(),
-        handler: handlerMock
-      });
+      const endpointMock = new EndpointsFactory(defaultResultHandler)
+        .build({
+          methods: ['get'],
+          input: z.object({}).nonstrict(),
+          output: z.object({}).nonstrict(),
+          handler: handlerMock
+        });
       expect(() => initRouting({
         app: appMock as Express,
         logger: loggerMock as Logger,
@@ -219,16 +224,17 @@ describe('Routing', () => {
     test('Should execute endpoints with right arguments', async () => {
       const handlerMock = jest.fn().mockImplementationOnce(() => ({result: true}));
       const configMock = { cors: true };
-      const setEndpoint = new EndpointsFactory().build({
-        methods: ['post'],
-        input: z.object({
-          test: z.number()
-        }),
-        output: z.object({
-          result: z.boolean()
-        }),
-        handler: handlerMock
-      });
+      const setEndpoint = new EndpointsFactory(defaultResultHandler)
+        .build({
+          methods: ['post'],
+          input: z.object({
+            test: z.number()
+          }),
+          output: z.object({
+            result: z.boolean()
+          }),
+          handler: handlerMock
+        });
       const routing: Routing = {
         v1: {
           user: {
@@ -287,24 +293,26 @@ describe('Routing', () => {
 
     test('should accept an endpoint with a corresponding method', () => {
       const instance = new DependsOnMethod({
-        post: new EndpointsFactory().build({
-          method: 'post',
-          input: z.object({}),
-          output: z.object({}),
-          handler: async () => ({})
-        })
+        post: new EndpointsFactory(defaultResultHandler)
+          .build({
+            method: 'post',
+            input: z.object({}),
+            output: z.object({}),
+            handler: async () => ({})
+          })
       });
       expect(instance).toBeInstanceOf(DependsOnMethod);
       expect(instance.methods).toHaveProperty('post');
     });
 
     test('should accept an endpoint with additional methods', () => {
-      const endpoint = new EndpointsFactory().build({
-        methods: ['get', 'post'],
-        input: z.object({}),
-        output: z.object({}),
-        handler: async () => ({})
-      });
+      const endpoint = new EndpointsFactory(defaultResultHandler)
+        .build({
+          methods: ['get', 'post'],
+          input: z.object({}),
+          output: z.object({}),
+          handler: async () => ({})
+        });
       const instance = new DependsOnMethod({
         get: endpoint,
         post: endpoint
@@ -315,12 +323,13 @@ describe('Routing', () => {
     });
 
     test('should throw an error if the endpoint does not have the corresponding method', () => {
-      const endpoint = new EndpointsFactory().build({
-        methods: ['get', 'patch'],
-        input: z.object({}),
-        output: z.object({}),
-        handler: async () => ({})
-      });
+      const endpoint = new EndpointsFactory(defaultResultHandler)
+        .build({
+          methods: ['get', 'patch'],
+          input: z.object({}),
+          output: z.object({}),
+          handler: async () => ({})
+        });
       expect(() => new DependsOnMethod({
         get: endpoint,
         post: endpoint
