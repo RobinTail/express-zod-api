@@ -246,9 +246,12 @@ const getUserEndpoint = endpointsFactory.build({
 
 ## ResultHandler
 
-`ResultHandler` is the [type](https://github.com/RobinTail/express-zod-api/blob/master/src/result-handler.ts) of function that is responsible for transmission of the final response or possible error.
-`ResultHandlerDefinition` contains this handler and additional methods defining the schema of the positive and negative responses as well as their MIME types for the further disclosing to consumers and documentation.
-The `defaultResultHandler` sets the HTTP status code and ensures the following type of the response:
+`ResultHandler` is the [type](https://github.com/RobinTail/express-zod-api/blob/master/src/result-handler.ts) of 
+function that is responsible for transmission of the final response or possible error.
+`ResultHandlerDefinition` contains this handler and additional methods defining the schema of the positive and 
+negative responses as well as their MIME types for the further disclosing to consumers and documentation.
+Positive schema is the schema of successful response. Negative schema is the one that describes the response in case
+of error. The `defaultResultHandler` sets the HTTP status code and ensures the following type of the response:
 
 ```typescript
 type DefaultResponse<OUT> = {
@@ -262,10 +265,9 @@ type DefaultResponse<OUT> = {
 };
 ```
 
-In order to customize the response handler you need to use `createResultHandler()` first wrapping the response schema in 
+In order to customize the result handler you need to use `createResultHandler()` first wrapping the response schema in 
 `createApiResponse()` optionally specifying its mime types, and wrapping the endpoint output schema in `markOutput()`. 
-Positive schema is the schema of successful response. Negative schema is the one that describes the response in case 
-of error. Here is an example you can use as a template:
+Here is an example you can use as a template:
 
 ```typescript
 import {createResultHandler, IOSchema, createApiResponse, markOutput, z} from 'express-zod-api';

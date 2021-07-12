@@ -85,7 +85,7 @@ new OpenAPI({...}).getSpecAsYaml();
 - OpenAPI / Swagger specification no longer uses references for schemas and parameters, so they are inline now. 
   Instead of `default` entry in `responses` there are HTTP status codes `200` and `400` that represent positive 
   and negative responses accordingly. Response schemas are now complete as well.
-- For creating you own `ResultHandlerDefinition` please use `createResultHandler()`. It also requires 
+- For creating your own `ResultHandlerDefinition` please use `createResultHandler()`. It also requires 
   `createApiResponse()` to be used that takes a response schema and optional mime types as arguments.
   The endpoint output should be wrapped in `markOutput()`. So far this is the only way I have come up with to 
   facilitate type inference with essentially double nesting of generic types. Typescript does not yet support such 
