@@ -5,9 +5,8 @@ Object {
   "n1": ZodNumber {
     "_def": Object {
       "checks": Array [],
+      "typeName": "ZodNumber",
     },
-    "_parseInternalOptionalParams": [Function],
-    "_parseWithInvalidFallback": [Function],
     "array": [Function],
     "default": [Function],
     "int": [Function],
@@ -35,9 +34,8 @@ Object {
   "n2": ZodNumber {
     "_def": Object {
       "checks": Array [],
+      "typeName": "ZodNumber",
     },
-    "_parseInternalOptionalParams": [Function],
-    "_parseWithInvalidFallback": [Function],
     "array": [Function],
     "default": [Function],
     "int": [Function],
@@ -65,9 +63,8 @@ Object {
   "s": ZodString {
     "_def": Object {
       "checks": Array [],
+      "typeName": "ZodString",
     },
-    "_parseInternalOptionalParams": [Function],
-    "_parseWithInvalidFallback": [Function],
     "_regex": [Function],
     "array": [Function],
     "default": [Function],
@@ -99,9 +96,9 @@ Object {
 exports[`EndpointsFactory .build() Should create an endpoint with intersection middleware 2`] = `
 Object {
   "b": ZodBoolean {
-    "_def": Object {},
-    "_parseInternalOptionalParams": [Function],
-    "_parseWithInvalidFallback": [Function],
+    "_def": Object {
+      "typeName": "ZodBoolean",
+    },
     "array": [Function],
     "default": [Function],
     "isNullable": [Function],
@@ -127,9 +124,8 @@ Object {
   "n": ZodNumber {
     "_def": Object {
       "checks": Array [],
+      "typeName": "ZodNumber",
     },
-    "_parseInternalOptionalParams": [Function],
-    "_parseWithInvalidFallback": [Function],
     "array": [Function],
     "default": [Function],
     "int": [Function],
@@ -157,9 +153,8 @@ Object {
   "s": ZodString {
     "_def": Object {
       "checks": Array [],
+      "typeName": "ZodString",
     },
-    "_parseInternalOptionalParams": [Function],
-    "_parseWithInvalidFallback": [Function],
     "_regex": [Function],
     "array": [Function],
     "default": [Function],
@@ -191,9 +186,9 @@ Object {
 exports[`EndpointsFactory .build() Should create an endpoint with simple middleware 2`] = `
 Object {
   "b": ZodBoolean {
-    "_def": Object {},
-    "_parseInternalOptionalParams": [Function],
-    "_parseWithInvalidFallback": [Function],
+    "_def": Object {
+      "typeName": "ZodBoolean",
+    },
     "array": [Function],
     "default": [Function],
     "isNullable": [Function],
@@ -221,9 +216,8 @@ Object {
       "innerType": ZodNumber {
         "_def": Object {
           "checks": Array [],
+          "typeName": "ZodNumber",
         },
-        "_parseInternalOptionalParams": [Function],
-        "_parseWithInvalidFallback": [Function],
         "array": [Function],
         "default": [Function],
         "int": [Function],
@@ -248,9 +242,8 @@ Object {
         "superRefine": [Function],
         "transform": [Function],
       },
+      "typeName": "ZodOptional",
     },
-    "_parseInternalOptionalParams": [Function],
-    "_parseWithInvalidFallback": [Function],
     "array": [Function],
     "default": [Function],
     "isNullable": [Function],
@@ -273,9 +266,8 @@ Object {
       "innerType": ZodNumber {
         "_def": Object {
           "checks": Array [],
+          "typeName": "ZodNumber",
         },
-        "_parseInternalOptionalParams": [Function],
-        "_parseWithInvalidFallback": [Function],
         "array": [Function],
         "default": [Function],
         "int": [Function],
@@ -300,9 +292,8 @@ Object {
         "superRefine": [Function],
         "transform": [Function],
       },
+      "typeName": "ZodOptional",
     },
-    "_parseInternalOptionalParams": [Function],
-    "_parseWithInvalidFallback": [Function],
     "array": [Function],
     "default": [Function],
     "isNullable": [Function],
@@ -323,9 +314,8 @@ Object {
   "s": ZodString {
     "_def": Object {
       "checks": Array [],
+      "typeName": "ZodString",
     },
-    "_parseInternalOptionalParams": [Function],
-    "_parseWithInvalidFallback": [Function],
     "_regex": [Function],
     "array": [Function],
     "default": [Function],
@@ -357,9 +347,9 @@ Object {
 exports[`EndpointsFactory .build() Should create an endpoint with union middleware 2`] = `
 Object {
   "b": ZodBoolean {
-    "_def": Object {},
-    "_parseInternalOptionalParams": [Function],
-    "_parseWithInvalidFallback": [Function],
+    "_def": Object {
+      "typeName": "ZodBoolean",
+    },
     "array": [Function],
     "default": [Function],
     "isNullable": [Function],
