@@ -3,9 +3,9 @@
 exports[`Helpers combineEndpointAndMiddlewareInputSchemas() Should merge input object schemas 1`] = `
 Object {
   "four": ZodBoolean {
-    "_def": Object {},
-    "_parseInternalOptionalParams": [Function],
-    "_parseWithInvalidFallback": [Function],
+    "_def": Object {
+      "typeName": "ZodBoolean",
+    },
     "array": [Function],
     "default": [Function],
     "isNullable": [Function],
@@ -26,9 +26,8 @@ Object {
   "one": ZodString {
     "_def": Object {
       "checks": Array [],
+      "typeName": "ZodString",
     },
-    "_parseInternalOptionalParams": [Function],
-    "_parseWithInvalidFallback": [Function],
     "_regex": [Function],
     "array": [Function],
     "default": [Function],
@@ -55,9 +54,9 @@ Object {
     "uuid": [Function],
   },
   "three": ZodNull {
-    "_def": Object {},
-    "_parseInternalOptionalParams": [Function],
-    "_parseWithInvalidFallback": [Function],
+    "_def": Object {
+      "typeName": "ZodNull",
+    },
     "array": [Function],
     "default": [Function],
     "isNullable": [Function],
@@ -78,9 +77,8 @@ Object {
   "two": ZodNumber {
     "_def": Object {
       "checks": Array [],
+      "typeName": "ZodNumber",
     },
-    "_parseInternalOptionalParams": [Function],
-    "_parseWithInvalidFallback": [Function],
     "array": [Function],
     "default": [Function],
     "int": [Function],
@@ -113,9 +111,8 @@ Object {
   "five": ZodString {
     "_def": Object {
       "checks": Array [],
+      "typeName": "ZodString",
     },
-    "_parseInternalOptionalParams": [Function],
-    "_parseWithInvalidFallback": [Function],
     "_regex": [Function],
     "array": [Function],
     "default": [Function],
@@ -142,9 +139,9 @@ Object {
     "uuid": [Function],
   },
   "four": ZodBoolean {
-    "_def": Object {},
-    "_parseInternalOptionalParams": [Function],
-    "_parseWithInvalidFallback": [Function],
+    "_def": Object {
+      "typeName": "ZodBoolean",
+    },
     "array": [Function],
     "default": [Function],
     "isNullable": [Function],
@@ -165,9 +162,8 @@ Object {
   "one": ZodString {
     "_def": Object {
       "checks": Array [],
+      "typeName": "ZodString",
     },
-    "_parseInternalOptionalParams": [Function],
-    "_parseWithInvalidFallback": [Function],
     "_regex": [Function],
     "array": [Function],
     "default": [Function],
@@ -196,9 +192,8 @@ Object {
   "six": ZodNumber {
     "_def": Object {
       "checks": Array [],
+      "typeName": "ZodNumber",
     },
-    "_parseInternalOptionalParams": [Function],
-    "_parseWithInvalidFallback": [Function],
     "array": [Function],
     "default": [Function],
     "int": [Function],
@@ -224,9 +219,9 @@ Object {
     "transform": [Function],
   },
   "three": ZodNull {
-    "_def": Object {},
-    "_parseInternalOptionalParams": [Function],
-    "_parseWithInvalidFallback": [Function],
+    "_def": Object {
+      "typeName": "ZodNull",
+    },
     "array": [Function],
     "default": [Function],
     "isNullable": [Function],
@@ -247,9 +242,8 @@ Object {
   "two": ZodNumber {
     "_def": Object {
       "checks": Array [],
+      "typeName": "ZodNumber",
     },
-    "_parseInternalOptionalParams": [Function],
-    "_parseWithInvalidFallback": [Function],
     "array": [Function],
     "default": [Function],
     "int": [Function],
@@ -282,9 +276,8 @@ Object {
   "five": ZodString {
     "_def": Object {
       "checks": Array [],
+      "typeName": "ZodString",
     },
-    "_parseInternalOptionalParams": [Function],
-    "_parseWithInvalidFallback": [Function],
     "_regex": [Function],
     "array": [Function],
     "default": [Function],
@@ -313,9 +306,9 @@ Object {
   "four": ZodOptional {
     "_def": Object {
       "innerType": ZodBoolean {
-        "_def": Object {},
-        "_parseInternalOptionalParams": [Function],
-        "_parseWithInvalidFallback": [Function],
+        "_def": Object {
+          "typeName": "ZodBoolean",
+        },
         "array": [Function],
         "default": [Function],
         "isNullable": [Function],
@@ -333,9 +326,8 @@ Object {
         "superRefine": [Function],
         "transform": [Function],
       },
+      "typeName": "ZodOptional",
     },
-    "_parseInternalOptionalParams": [Function],
-    "_parseWithInvalidFallback": [Function],
     "array": [Function],
     "default": [Function],
     "isNullable": [Function],
@@ -356,9 +348,8 @@ Object {
   "one": ZodString {
     "_def": Object {
       "checks": Array [],
+      "typeName": "ZodString",
     },
-    "_parseInternalOptionalParams": [Function],
-    "_parseWithInvalidFallback": [Function],
     "_regex": [Function],
     "array": [Function],
     "default": [Function],
@@ -387,9 +378,9 @@ Object {
   "three": ZodOptional {
     "_def": Object {
       "innerType": ZodNull {
-        "_def": Object {},
-        "_parseInternalOptionalParams": [Function],
-        "_parseWithInvalidFallback": [Function],
+        "_def": Object {
+          "typeName": "ZodNull",
+        },
         "array": [Function],
         "default": [Function],
         "isNullable": [Function],
@@ -407,9 +398,8 @@ Object {
         "superRefine": [Function],
         "transform": [Function],
       },
+      "typeName": "ZodOptional",
     },
-    "_parseInternalOptionalParams": [Function],
-    "_parseWithInvalidFallback": [Function],
     "array": [Function],
     "default": [Function],
     "isNullable": [Function],
@@ -430,9 +420,8 @@ Object {
   "two": ZodNumber {
     "_def": Object {
       "checks": Array [],
+      "typeName": "ZodNumber",
     },
-    "_parseInternalOptionalParams": [Function],
-    "_parseWithInvalidFallback": [Function],
     "array": [Function],
     "default": [Function],
     "int": [Function],
@@ -467,9 +456,8 @@ Object {
       "innerType": ZodString {
         "_def": Object {
           "checks": Array [],
+          "typeName": "ZodString",
         },
-        "_parseInternalOptionalParams": [Function],
-        "_parseWithInvalidFallback": [Function],
         "_regex": [Function],
         "array": [Function],
         "default": [Function],
@@ -495,9 +483,8 @@ Object {
         "url": [Function],
         "uuid": [Function],
       },
+      "typeName": "ZodOptional",
     },
-    "_parseInternalOptionalParams": [Function],
-    "_parseWithInvalidFallback": [Function],
     "array": [Function],
     "default": [Function],
     "isNullable": [Function],
@@ -518,9 +505,9 @@ Object {
   "four": ZodOptional {
     "_def": Object {
       "innerType": ZodBoolean {
-        "_def": Object {},
-        "_parseInternalOptionalParams": [Function],
-        "_parseWithInvalidFallback": [Function],
+        "_def": Object {
+          "typeName": "ZodBoolean",
+        },
         "array": [Function],
         "default": [Function],
         "isNullable": [Function],
@@ -538,9 +525,8 @@ Object {
         "superRefine": [Function],
         "transform": [Function],
       },
+      "typeName": "ZodOptional",
     },
-    "_parseInternalOptionalParams": [Function],
-    "_parseWithInvalidFallback": [Function],
     "array": [Function],
     "default": [Function],
     "isNullable": [Function],
@@ -563,9 +549,8 @@ Object {
       "innerType": ZodString {
         "_def": Object {
           "checks": Array [],
+          "typeName": "ZodString",
         },
-        "_parseInternalOptionalParams": [Function],
-        "_parseWithInvalidFallback": [Function],
         "_regex": [Function],
         "array": [Function],
         "default": [Function],
@@ -591,9 +576,8 @@ Object {
         "url": [Function],
         "uuid": [Function],
       },
+      "typeName": "ZodOptional",
     },
-    "_parseInternalOptionalParams": [Function],
-    "_parseWithInvalidFallback": [Function],
     "array": [Function],
     "default": [Function],
     "isNullable": [Function],
@@ -616,9 +600,8 @@ Object {
       "innerType": ZodNumber {
         "_def": Object {
           "checks": Array [],
+          "typeName": "ZodNumber",
         },
-        "_parseInternalOptionalParams": [Function],
-        "_parseWithInvalidFallback": [Function],
         "array": [Function],
         "default": [Function],
         "int": [Function],
@@ -643,9 +626,8 @@ Object {
         "superRefine": [Function],
         "transform": [Function],
       },
+      "typeName": "ZodOptional",
     },
-    "_parseInternalOptionalParams": [Function],
-    "_parseWithInvalidFallback": [Function],
     "array": [Function],
     "default": [Function],
     "isNullable": [Function],
@@ -666,9 +648,9 @@ Object {
   "three": ZodOptional {
     "_def": Object {
       "innerType": ZodNull {
-        "_def": Object {},
-        "_parseInternalOptionalParams": [Function],
-        "_parseWithInvalidFallback": [Function],
+        "_def": Object {
+          "typeName": "ZodNull",
+        },
         "array": [Function],
         "default": [Function],
         "isNullable": [Function],
@@ -686,9 +668,8 @@ Object {
         "superRefine": [Function],
         "transform": [Function],
       },
+      "typeName": "ZodOptional",
     },
-    "_parseInternalOptionalParams": [Function],
-    "_parseWithInvalidFallback": [Function],
     "array": [Function],
     "default": [Function],
     "isNullable": [Function],
@@ -711,9 +692,8 @@ Object {
       "innerType": ZodNumber {
         "_def": Object {
           "checks": Array [],
+          "typeName": "ZodNumber",
         },
-        "_parseInternalOptionalParams": [Function],
-        "_parseWithInvalidFallback": [Function],
         "array": [Function],
         "default": [Function],
         "int": [Function],
@@ -738,9 +718,8 @@ Object {
         "superRefine": [Function],
         "transform": [Function],
       },
+      "typeName": "ZodOptional",
     },
-    "_parseInternalOptionalParams": [Function],
-    "_parseWithInvalidFallback": [Function],
     "array": [Function],
     "default": [Function],
     "isNullable": [Function],
@@ -766,9 +745,8 @@ Object {
   "one": ZodString {
     "_def": Object {
       "checks": Array [],
+      "typeName": "ZodString",
     },
-    "_parseInternalOptionalParams": [Function],
-    "_parseWithInvalidFallback": [Function],
     "_regex": [Function],
     "array": [Function],
     "default": [Function],
@@ -802,9 +780,8 @@ Object {
   "one": ZodString {
     "_def": Object {
       "checks": Array [],
+      "typeName": "ZodString",
     },
-    "_parseInternalOptionalParams": [Function],
-    "_parseWithInvalidFallback": [Function],
     "_regex": [Function],
     "array": [Function],
     "default": [Function],
@@ -833,9 +810,8 @@ Object {
   "two": ZodNumber {
     "_def": Object {
       "checks": Array [],
+      "typeName": "ZodNumber",
     },
-    "_parseInternalOptionalParams": [Function],
-    "_parseWithInvalidFallback": [Function],
     "array": [Function],
     "default": [Function],
     "int": [Function],
@@ -870,9 +846,8 @@ Object {
       "innerType": ZodString {
         "_def": Object {
           "checks": Array [],
+          "typeName": "ZodString",
         },
-        "_parseInternalOptionalParams": [Function],
-        "_parseWithInvalidFallback": [Function],
         "_regex": [Function],
         "array": [Function],
         "default": [Function],
@@ -898,9 +873,8 @@ Object {
         "url": [Function],
         "uuid": [Function],
       },
+      "typeName": "ZodOptional",
     },
-    "_parseInternalOptionalParams": [Function],
-    "_parseWithInvalidFallback": [Function],
     "array": [Function],
     "default": [Function],
     "isNullable": [Function],
@@ -923,9 +897,8 @@ Object {
       "innerType": ZodNumber {
         "_def": Object {
           "checks": Array [],
+          "typeName": "ZodNumber",
         },
-        "_parseInternalOptionalParams": [Function],
-        "_parseWithInvalidFallback": [Function],
         "array": [Function],
         "default": [Function],
         "int": [Function],
@@ -950,9 +923,8 @@ Object {
         "superRefine": [Function],
         "transform": [Function],
       },
+      "typeName": "ZodOptional",
     },
-    "_parseInternalOptionalParams": [Function],
-    "_parseWithInvalidFallback": [Function],
     "array": [Function],
     "default": [Function],
     "isNullable": [Function],
