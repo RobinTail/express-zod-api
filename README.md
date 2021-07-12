@@ -247,6 +247,7 @@ const getUserEndpoint = endpointsFactory.build({
 ## ResultHandler
 
 `ResultHandler` is the [type](https://github.com/RobinTail/express-zod-api/blob/master/src/result-handler.ts) of function that is responsible for transmission of the final response or possible error.
+`ResultHandlerDefinition` contains this handler and additional methods defining the schema of the positive and negative responses as well as their MIME types for the further disclosing to consumers and documentation.
 The `defaultResultHandler` sets the HTTP status code and ensures the following type of the response:
 
 ```typescript
@@ -368,7 +369,8 @@ type MyEndpointResponse = EndpointResponse<MyEndpointType>; // unions positive a
 
 ## Swagger / OpenAPI Specification
 
-You can generate the specification of your API the following way and write it to a `.yaml` file:
+You can generate the specification of your API the following way and write it to a `.yaml` file, 
+that can be used as documentation:
 
 ```typescript
 import {OpenAPI} from 'express-zod-api';
