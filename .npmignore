@@ -9,6 +9,7 @@ tests
 yarn-error.log
 .github
 dataflow.svg
+coverage.svg
 logo.svg
 .eslintrc.json
 generate-license.ts
