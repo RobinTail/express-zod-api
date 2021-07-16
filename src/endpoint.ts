@@ -60,7 +60,7 @@ export type EndpointResponse<E extends AbstractEndpoint> = z.output<
     >
     : ReturnType<E['getPositiveResponseSchema']> extends OutputMarker // "as is" response
     ? ReturnType<E['getOutputSchema']>
-    : never
+    : ReturnType<E['getPositiveResponseSchema']> // explicitly defined response
 > | z.output<ReturnType<E['getNegativeResponseSchema']>>;
 
 type EndpointProps<
