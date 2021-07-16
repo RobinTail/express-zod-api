@@ -26,10 +26,11 @@ Start your API server with I/O schema validation and custom middlewares in minut
    1. [Create a middleware](#create-a-middleware)
    2. [Refinements](#refinements)
    3. [Transformations](#transformations)
-   4. [ResultHandler](#resulthandler)   
-   5. [Your custom logger](#your-custom-logger)
-   6. [Your custom server](#your-custom-server)
-   7. [Multiple schemas for a single route](#multiple-schemas-for-a-single-route)
+   4. [ResultHandler](#resulthandler)
+   5. [Non-object response](#non-object-response)   
+   6. [Your custom logger](#your-custom-logger)
+   7. [Your custom server](#your-custom-server)
+   8. [Multiple schemas for a single route](#multiple-schemas-for-a-single-route)
 6. [Disclosing API specifications](#disclosing-api-specifications)
    1. [Reusing endpoint types on your frontend](#reusing-endpoint-types-on-your-frontend)
    2. [Swagger / OpenAPI Specification](#swagger--openapi-specification)
@@ -50,8 +51,8 @@ If you're upgrading from v1 please check out the information in [Changelog](CHAN
 - Swagger - [OpenAPI 3.x](https://github.com/metadevpro/openapi3-ts)
 
 # Concept
-
-The API always operates object schemas for input and output, including unions and intersections of object schemas (`.or()`, `.and()`).
+The API operates object schemas for input and output, including unions and intersections of object schemas
+(`.or()`, `.and()`), but in general the API can respond with any data type *(see [advanced example below](#non-object-response))*.
 
 The object being validated is the `request.query` for GET request, the `request.body` for PUT, PATCH and POST requests, or their merging for DELETE requests.
 
@@ -86,7 +87,7 @@ Add the following option to your `tsconfig.json` file in order to make it work a
 
 # Basic usage
 
-*See full example [here](https://github.com/RobinTail/express-zod-api/tree/master/example).*
+See the [full implementation example here](https://github.com/RobinTail/express-zod-api/tree/master/example).
 
 ## Set up config
 
@@ -296,6 +297,13 @@ import {EndpointsFactory} from 'express-zod-api';
 
 const endpointsFactory = new EndpointsFactory(myResultHandler);
 ```
+
+## Non-object response
+
+Starting from the version 2.0.0, `ResultHandler` also supports non-object response types, for example, sending an 
+image file including its MIME type in `Content-type` header.
+
+See the corresponding `EndpointsFactory` and `ResultHandler` [implementation example](https://github.com/RobinTail/express-zod-api/blob/master/example/factories.ts) and the [example implementation](https://github.com/RobinTail/express-zod-api/blob/master/example/v1/send-avatar.ts) of the corresponding `Endpoint`. 
 
 ## Your custom logger
 

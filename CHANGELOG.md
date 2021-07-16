@@ -7,7 +7,7 @@ While v2 is beta some methods and properties might be renamed or changed without
 ### v2.0.0-beta2
 
 - Zod version is 3.5.1.
-- Better examples.
+- Better examples including a custom `ResultHandler` and a file download.
 - Fixed a bug of incorrect `getPositiveMimeTypes()` and `getNegativeMimeTypes()` usage in Swagger docs generator. 
 
 ### v2.0.0-beta1
