@@ -20,15 +20,12 @@ paths:
                   data:
                     type: object
                     properties:
-                      status:
-                        type: string
-                        enum:
-                          - That's ok
-                          - Some kind of warning
+                      id:
+                        type: number
                       name:
                         type: string
                     required:
-                      - status
+                      - id
                       - name
                 required:
                   - status
@@ -81,13 +78,13 @@ paths:
                   data:
                     type: object
                     properties:
-                      status:
+                      name:
                         type: string
-                        enum:
-                          - Success
-                          - I'll fix it later
+                      timestamp:
+                        type: number
                     required:
-                      - status
+                      - name
+                      - timestamp
                 required:
                   - status
                   - data
