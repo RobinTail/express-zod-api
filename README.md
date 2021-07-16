@@ -125,7 +125,7 @@ const setUserEndpoint = endpointsFactory.build({
   method: 'post',
   input: z.object({
     id: z.number(),
-    name: z.string,
+    name: z.string(),
   }),
   output: z.object({
     timestamp: z.number(),
