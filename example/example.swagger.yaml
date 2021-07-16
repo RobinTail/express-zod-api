@@ -129,6 +129,30 @@ paths:
                 - id
                 - name
               description: POST /v1/setUser request body
+  /v1/avatar:
+    get:
+      responses:
+        "200":
+          description: Successful response
+          content:
+            image/svg+xml:
+              schema:
+                type: string
+                description: GET /v1/avatar Successful response
+        "400":
+          description: Error response
+          content:
+            text/plain:
+              schema:
+                type: string
+                description: GET /v1/avatar Error response
+      parameters:
+        - name: userId
+          in: query
+          required: true
+          schema:
+            type: string
+            description: GET /v1/avatar parameter
 components:
   schemas: {}
   responses: {}

@@ -124,11 +124,11 @@ export class Endpoint<
     return this.resultHandler.getNegativeResponse().schema;
   }
 
-  public getNegativeMimeTypes() {
+  public getPositiveMimeTypes() {
     return this.resultHandler.getPositiveResponse(this.outputSchema).mimeTypes;
   }
 
-  public getPositiveMimeTypes() {
+  public getNegativeMimeTypes() {
     return this.resultHandler.getNegativeResponse().mimeTypes;
   }
 
