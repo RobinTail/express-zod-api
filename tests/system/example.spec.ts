@@ -98,6 +98,14 @@ describe('Example', () => {
       expect(out).toMatch(/v1\/getUser/);
       expect(out).toMatch(/50, method get/);
     });
+
+    test('Should send an image with a correct header', async () => {
+      const response = await fetch('http://localhost:8090/v1/avatar?userId=123');
+      expect(response.status).toBe(200);
+      expect(response.headers.has('Content-type')).toBeTruthy();
+      expect(response.headers.get('Content-type')).toBe('image/svg+xml; charset=utf-8');
+      expect(await response.text()).toMatchSnapshot();
+    });
   });
 
   describe('Negative', () => {
