@@ -104,42 +104,42 @@ export class Endpoint<
     }
   }
 
-  public getMethods(): M[] {
+  public override getMethods(): M[] {
     return this.methods;
   }
 
-  public getInputSchema(): Merge<IN, mIN> {
+  public override getInputSchema(): Merge<IN, mIN> {
     return this.inputSchema;
   }
 
-  public getOutputSchema(): OUT {
+  public override getOutputSchema(): OUT {
     return this.outputSchema;
   }
 
-  public getPositiveResponseSchema(): POS['schema'] {
+  public override getPositiveResponseSchema(): POS['schema'] {
     return this.resultHandler.getPositiveResponse(this.outputSchema).schema;
   }
 
-  public getNegativeResponseSchema(): NEG['schema'] {
+  public override getNegativeResponseSchema(): NEG['schema'] {
     return this.resultHandler.getNegativeResponse().schema;
   }
 
-  public getPositiveMimeTypes() {
+  public override getPositiveMimeTypes() {
     return this.resultHandler.getPositiveResponse(this.outputSchema).mimeTypes;
   }
 
-  public getNegativeMimeTypes() {
+  public override getNegativeMimeTypes() {
     return this.resultHandler.getNegativeResponse().mimeTypes;
   }
 
-  private setupCorsHeaders(response: Response) {
+  #setupCorsHeaders(response: Response) {
     const accessMethods = this.methods.map((method) => method.toUpperCase()).concat('OPTIONS').join(', ');
     response.set('Access-Control-Allow-Origin', '*');
     response.set('Access-Control-Allow-Methods', accessMethods);
     response.set('Access-Control-Allow-Headers', 'content-type');
   }
 
-  private parseOutput(output: any) {
+  #parseOutput(output: any) {
     try {
       return this.outputSchema.parse(output);
     } catch (e) {
@@ -160,7 +160,7 @@ export class Endpoint<
     }
   }
 
-  private async runMiddlewares({input, request, response, logger}: {
+  async #runMiddlewares({input, request, response, logger}: {
     input: any,
     request: Request,
     response: Response,
@@ -180,14 +180,14 @@ export class Endpoint<
     return {input, options, isStreamClosed: response.writableEnded};
   }
 
-  private async parseAndRunHandler({input, options, logger}: {input: any, options: any, logger: Logger}) {
+  async #parseAndRunHandler({input, options, logger}: {input: any, options: any, logger: Logger}) {
     return await this.handler({
       input: this.inputSchema.parse(input), // final input types transformations for handler,
       options, logger
     });
   }
 
-  private async handleResult({error, request, response, logger, initialInput, output}: {
+  async #handleResult({error, request, response, logger, initialInput, output}: {
     error: Error | null,
     request: Request,
     response: Response,
@@ -206,7 +206,7 @@ export class Endpoint<
     }
   }
 
-  public async execute({request, response, logger, config}: {
+  public override async execute({request, response, logger, config}: {
     request: Request,
     response: Response,
     logger: Logger,
@@ -215,27 +215,27 @@ export class Endpoint<
     let output: any;
     let error: Error | null = null;
     if (config.cors) {
-      this.setupCorsHeaders(response);
+      this.#setupCorsHeaders(response);
     }
     if (request.method === 'OPTIONS') {
       return response.end();
     }
     const initialInput = getInitialInput(request);
     try {
-      const {input, options, isStreamClosed} = await this.runMiddlewares({
+      const {input, options, isStreamClosed} = await this.#runMiddlewares({
         input: {...initialInput}, // preserve the initial
         request, response, logger
       });
       if (isStreamClosed) {
         return;
       }
-      output = this.parseOutput(
-        await this.parseAndRunHandler({input, options, logger})
+      output = this.#parseOutput(
+        await this.#parseAndRunHandler({input, options, logger})
       );
     } catch (e) {
       error = e;
     }
-    await this.handleResult({
+    await this.#handleResult({
       initialInput, output, request,
       response, error, logger
     });

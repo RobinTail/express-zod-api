@@ -20,7 +20,7 @@ export class EndpointsFactory<mIN, mOUT, POS extends ApiResponse, NEG extends Ap
     this.resultHandler = resultHandler;
   }
 
-  private static create<cmIN, cmOUT, cPOS extends ApiResponse, cNEG extends ApiResponse>(
+  static #create<cmIN, cmOUT, cPOS extends ApiResponse, cNEG extends ApiResponse>(
     middlewares: MiddlewareDefinition<any, any, any>[],
     resultHandler: ResultHandlerDefinition<cPOS, cNEG>
   ) {
@@ -32,7 +32,7 @@ export class EndpointsFactory<mIN, mOUT, POS extends ApiResponse, NEG extends Ap
   public addMiddleware<IN extends IOSchema, OUT extends FlatObject>(
     definition: MiddlewareDefinition<IN, mOUT, OUT>
   ) {
-    return EndpointsFactory.create<Merge<IN, mIN>, mOUT & OUT, POS, NEG>(
+    return EndpointsFactory.#create<Merge<IN, mIN>, mOUT & OUT, POS, NEG>(
       this.middlewares.concat(definition),
       this.resultHandler
     );
