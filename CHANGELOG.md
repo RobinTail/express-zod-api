@@ -4,6 +4,11 @@
 
 While v2 is beta some methods and properties might be renamed or changed without backward compatibility.
 
+### v2.0.0-beta3
+
+- Some private methods have been made "really private" using the new typescript hashtag syntax.
+- Fixed `EndpointOutput<>` type helper for the non-object response type in the `ResultHandlerDefinition`.
+
 ### v2.0.0-beta2
 
 - Zod version is 3.5.1.
