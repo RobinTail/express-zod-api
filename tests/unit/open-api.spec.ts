@@ -194,6 +194,31 @@ describe('Open API generator', () => {
     expect(spec).toMatchSnapshot();
   });
 
+  test('should handle enum types', () => {
+    const spec = new OpenAPI({
+      routing: {
+        v1: {
+          getSomething: defaultEndpointsFactory.build({
+            method: 'post',
+            input: z.object({
+              regularEnum: z.enum(['ABC', 'DEF']),
+            }),
+            output: z.object({
+              nativeEnum: z.nativeEnum({FEG: 1, XYZ: 2})
+            }),
+            handler: async () => ({
+              nativeEnum: 1
+            })
+          })
+        }
+      },
+      version: '3.4.5',
+      title: 'Testing enums',
+      serverUrl: 'http://example.com'
+    }).getSpecAsYaml();
+    expect(spec).toMatchSnapshot();
+  });
+
   test('should throw on unsupported types', () => {
     [
       z.undefined(),
