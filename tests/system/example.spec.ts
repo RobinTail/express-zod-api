@@ -73,10 +73,11 @@ describe('Example', () => {
       });
       expect(response.status).toBe(200);
       const json = await response.json();
-      expect(json).toEqual({
+      expect(json).toMatchObject({
         status: 'success',
         data: {
-          status: "I'll fix it later"
+          name: 'John Doe',
+          timestamp: expect.any(Number)
         }
       });
       expect(out).toMatch(/v1\/setUser/);
@@ -90,7 +91,7 @@ describe('Example', () => {
       expect(json).toEqual({
         status: 'success',
         data: {
-          status: 'Some kind of warning',
+          id: 50,
           name: 'John Doe'
         }
       });

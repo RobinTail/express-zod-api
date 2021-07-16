@@ -1,11 +1,6 @@
 import {z, createHttpError, defaultEndpointsFactory} from '../../src';
 import {methodProviderMiddleware} from '../middlewares';
 
-enum Status {
-  OK = "That's ok",
-  Warning = 'Some kind of warning'
-}
-
 export const getUserEndpoint = defaultEndpointsFactory
   .addMiddleware(methodProviderMiddleware)
   .build({
@@ -15,24 +10,15 @@ export const getUserEndpoint = defaultEndpointsFactory
       id: z.string().transform((id) => parseInt(id, 10))
     }),
     output: z.object({
-      status: z.nativeEnum(Status),
+      id: z.number(),
       name: z.string(),
     }),
     handler: async ({input: {id}, options: {method}, logger}) => {
       logger.debug(`Requested id: ${id}, method ${method}`);
       const name = 'John Doe';
-      if (id < 10) {
-        return {
-          status: Status.OK,
-          name
-        };
-      }
       if (id > 100) {
         throw createHttpError(404, 'User not found');
       }
-      return {
-        status: Status.Warning,
-        name
-      };
+      return { id, name };
     }
   });
