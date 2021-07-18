@@ -309,10 +309,28 @@ const endpointsFactory = new EndpointsFactory(myResultHandler);
 Starting from the version 2.0.0, `ResultHandler` also supports non-object response types, for example, sending an 
 image file including its MIME type in `Content-type` header.
 
-See the corresponding `EndpointsFactory` and `ResultHandler` 
-[implementation example](https://github.com/RobinTail/express-zod-api/blob/master/example/factories.ts) and the 
-[example implementation](https://github.com/RobinTail/express-zod-api/blob/master/example/v1/send-avatar.ts) of the 
-corresponding `Endpoint`. 
+You can find two approaches to `EndpointsFactory` and `ResultHandler` implementation 
+[in this example](https://github.com/RobinTail/express-zod-api/blob/master/example/factories.ts). 
+One of them implements file streaming, in this case the endpoint just has to provide the filename:
+
+```typescript
+const fileStreamingEndpointsFactory = new EndpointsFactory(createResultHandler({
+  getPositiveResponse: () => createApiResponse(z.string(), 'image/*'),
+  getNegativeResponse: () => createApiResponse(z.string(), 'text/plain'),
+  handler: ({response, error, output}) => {
+    if (error) {
+      response.status(400).send(error.message);
+      return;
+    }
+    if ('filename' in output) {
+      fs.createReadStream(output.filename)
+        .pipe(response.type(output.filename));
+    } else {
+      response.status(400).send('Filename is missing');
+    }
+  }
+}));
+```
 
 ## Your custom logger
 
