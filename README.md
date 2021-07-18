@@ -1,6 +1,6 @@
 # Express Zod API 
 
-![logo](logo.svg)
+![logo](https://raw.githubusercontent.com/RobinTail/express-zod-api/master/logo.svg)
 
 ![CI](https://github.com/RobinTail/express-zod-api/actions/workflows/node.js.yml/badge.svg)
 ![Swagger Validator](https://img.shields.io/swagger/valid/3.0?specUrl=https%3A%2F%2Fraw.githubusercontent.com%2FRobinTail%2Fexpress-zod-api%2Fmaster%2Fexample%2Fexample.swagger.yaml)
@@ -36,6 +36,7 @@ Start your API server with I/O schema validation and custom middlewares in minut
    2. [Swagger / OpenAPI Specification](#swagger--openapi-specification)
 7. [Known issues](#known-issues)
    1. [Excess property check of endpoint output](#excess-property-check-of-endpoint-output)
+8. [Your input to my output](#your-input-to-my-output)
 
 **Important notice**: v2 is currently beta. Some methods and properties might be renamed or changed without backward 
 compatibility. Please use stable v1 for production.
@@ -52,20 +53,24 @@ If you're upgrading from v1 please check out the information in [Changelog](CHAN
 
 # Concept
 The API operates object schemas for input and output, including unions and intersections of object schemas
-(`.or()`, `.and()`), but in general the API can respond with any data type *(see [advanced example below](#non-object-response))*.
+(`.or()`, `.and()`), but in general the API can respond with any data type 
+*(see [advanced example below](#non-object-response))*.
 
-The object being validated is the `request.query` for GET request, the `request.body` for PUT, PATCH and POST requests, or their merging for DELETE requests.
+The object being validated is the `request.query` for GET request, the `request.body` for PUT, PATCH and POST requests, 
+or their merging for DELETE requests.
 
-Middlewares can handle validated inputs and the original `request`, for example, to perform the authentication or provide the endpoint's handler with some request properties like the actual method.
-The returns of middlewares are combined into the `options` parameter available to the next middlewares and the endpoint's handler.
+Middlewares can handle validated inputs and the original `request`, for example, to perform the authentication or 
+provide the endpoint's handler with some request properties like the actual method. The returns of middlewares are 
+combined into the `options` parameter available to the next middlewares and the endpoint's handler.
 
 The handler's parameter `input` combines the validated inputs of all connected middlewares along with the handler's one.
-The result that the handler returns goes to the `ResultHandler` which is responsible for transmission of the final response or possible error.
+The result that the handler returns goes to the `ResultHandler` which is responsible for transmission of the final 
+response or possible error.
 
 All inputs and outputs are validated and there are also advanced powerful features like transformations and refinements.
 The diagram below can give you a better idea of the dataflow.
 
-![Dataflow](dataflow.svg)
+![Dataflow](https://raw.githubusercontent.com/RobinTail/express-zod-api/master/dataflow.svg)
 
 # Installation
 
@@ -139,8 +144,8 @@ const setUserEndpoint = endpointsFactory.build({
 });
 ```
 
-The endpoint can also handle multiple types of requests, this feature is available by using `methods` property that accepts an array.
-You can also add middlewares to the endpoint by using `.addMiddleware()` before `.build()`.
+The endpoint can also handle multiple types of requests, this feature is available by using `methods` property that 
+accepts an array. You can also add middlewares to the endpoint by using `.addMiddleware()` before `.build()`.
 
 ## Set up routing
 
@@ -224,7 +229,8 @@ const authMiddleware = createMiddleware({
 
 ## Transformations
 
-Since parameters of GET requests come in the form of strings, there is often a need to transform them into numbers or arrays of numbers.
+Since parameters of GET requests come in the form of strings, there is often a need to transform them into numbers or 
+arrays of numbers.
 
 ```typescript
 import {z} from 'express-zod-api';
@@ -303,7 +309,10 @@ const endpointsFactory = new EndpointsFactory(myResultHandler);
 Starting from the version 2.0.0, `ResultHandler` also supports non-object response types, for example, sending an 
 image file including its MIME type in `Content-type` header.
 
-See the corresponding `EndpointsFactory` and `ResultHandler` [implementation example](https://github.com/RobinTail/express-zod-api/blob/master/example/factories.ts) and the [example implementation](https://github.com/RobinTail/express-zod-api/blob/master/example/v1/send-avatar.ts) of the corresponding `Endpoint`. 
+See the corresponding `EndpointsFactory` and `ResultHandler` 
+[implementation example](https://github.com/RobinTail/express-zod-api/blob/master/example/factories.ts) and the 
+[example implementation](https://github.com/RobinTail/express-zod-api/blob/master/example/v1/send-avatar.ts) of the 
+corresponding `Endpoint`. 
 
 ## Your custom logger
 
@@ -336,7 +345,8 @@ attachRouting(config, routing);
 app.listen();
 ```
 
-**Please note** that in this case you probably need to: parse `request.body`, call `app.listen()` and handle `404` errors yourself;
+**Please note** that in this case you probably need to: parse `request.body`, call `app.listen()` and handle `404` 
+errors yourself;
 
 ## Multiple schemas for a single route
 
@@ -397,7 +407,9 @@ const yamlString = new OpenAPI({
 
 ## Excess property check of endpoint output
 
-Unfortunately Typescript does not perform [excess property check](https://www.typescriptlang.org/docs/handbook/interfaces.html#excess-property-checks) for objects resolved in `Promise`, so there is no error during development of endpoint's output.
+Unfortunately Typescript does not perform 
+[excess property check](https://www.typescriptlang.org/docs/handbook/interfaces.html#excess-property-checks) for 
+objects resolved in `Promise`, so there is no error during development of endpoint's output.
 
 ```typescript
 import {z} from 'express-zod-api';
@@ -414,7 +426,8 @@ endpointsFactory.build({
 });
 ```
 
-You can achieve this check by assigning the output schema to a constant and reusing it in additional definition of handler's return type:
+You can achieve this check by assigning the output schema to a constant and reusing it in additional definition of 
+handler's return type:
 
 ```typescript
 import {z} from 'express-zod-api';
@@ -431,3 +444,14 @@ endpointsFactory.build({
   })
 });
 ```
+
+# Your input to my output
+
+Do you have a question or idea? 
+Your feedback is highly appreciated in [Discussions section](https://github.com/RobinTail/express-zod-api/discussions).
+
+Found a bug?
+Please let me know in [Issues section](https://github.com/RobinTail/express-zod-api/issues).
+
+Found a vulnerability or other security issue?
+Please refer to [Security policy](https://github.com/RobinTail/express-zod-api/blob/master/SECURITY.md).

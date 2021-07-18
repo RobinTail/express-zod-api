@@ -4,6 +4,17 @@
 
 While v2 is beta some methods and properties might be renamed or changed without backward compatibility.
 
+### v2.0.0-beta4
+
+- The code has not been changed from the previous version.
+- I've added the [Security policy](https://github.com/RobinTail/express-zod-api/blob/master/SECURITY.md).
+- The last thing that still confuses me is the naming of the `getPositiveResponse` and `getNegativeResponse` properties 
+  of `ResultHandlerDefinition`. The first of which has to be a method, since it depends on the output of the `Endpoint`,
+  and the second, although it shouldn't, I made it this way for consistency.
+- In any case, my idea for a stable release of the second version in a week has now been formed, but if you have any
+  feedback, suggestions, recommendations, complaints, please let me know. I've added a 
+  [section](https://github.com/RobinTail/express-zod-api#your-input-to-my-output) to the Readme file on how to do this.
+
 ### v2.0.0-beta3
 
 - Some private methods have been made "really private" using the new typescript hashtag syntax.
