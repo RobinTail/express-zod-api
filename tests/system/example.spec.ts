@@ -104,6 +104,7 @@ describe('Example', () => {
       expect(response.status).toBe(200);
       expect(response.headers.has('Content-type')).toBeTruthy();
       expect(response.headers.get('Content-type')).toBe('image/svg+xml; charset=utf-8');
+      expect(response.headers.has('Content-length')).toBeTruthy();
       expect(await response.text()).toMatchSnapshot();
     });
 
@@ -112,6 +113,8 @@ describe('Example', () => {
       expect(response.status).toBe(200);
       expect(response.headers.has('Content-type')).toBeTruthy();
       expect(response.headers.get('Content-type')).toBe('image/svg+xml');
+      expect(response.headers.has('Transfer-encoding')).toBeTruthy();
+      expect(response.headers.get('Transfer-encoding')).toBe('chunked');
       expect(await response.text()).toMatchSnapshot();
     });
   });
