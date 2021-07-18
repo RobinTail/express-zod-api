@@ -17,7 +17,7 @@ import {ZodFile} from './file-schema';
 
 const z = {
   ...originalZod,
-  file: () => ZodFile.create()
+  file: ZodFile.create
 };
 
 export { createHttpError, z };
