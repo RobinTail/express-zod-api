@@ -36,6 +36,7 @@ Start your API server with I/O schema validation and custom middlewares in minut
    2. [Swagger / OpenAPI Specification](#swagger--openapi-specification)
 7. [Known issues](#known-issues)
    1. [Excess property check of endpoint output](#excess-property-check-of-endpoint-output)
+8. [Your input to my output](#your-input-to-my-output)
 
 **Important notice**: v2 is currently beta. Some methods and properties might be renamed or changed without backward 
 compatibility. Please use stable v1 for production.
@@ -431,3 +432,14 @@ endpointsFactory.build({
   })
 });
 ```
+
+# Your input to my output
+
+Do you have a question or idea? 
+Your feedback is highly appreciated in [Discussions section](https://github.com/RobinTail/express-zod-api/discussions).
+
+Found a bug?
+Please let me know in [Issues section](https://github.com/RobinTail/express-zod-api/issues).
+
+Found a vulnerability or other security issue?
+Please refer to [this document](https://github.com/RobinTail/express-zod-api/blob/master/SECURITY.md).
