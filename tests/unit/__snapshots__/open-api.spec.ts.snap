@@ -432,7 +432,7 @@ paths:
         \\"200\\":
           description: Successful response
           content:
-            image/svg+xml:
+            image/*:
               schema:
                 type: string
                 description: GET /v1/stream Successful response

@@ -28,7 +28,7 @@ export const fileDownloadEndpointsFactory = new EndpointsFactory(createResultHan
 }));
 
 export const fileStreamingEndpointsFactory = new EndpointsFactory(createResultHandler({
-  getPositiveResponse: () => createApiResponse(z.string(), lookup('svg')),
+  getPositiveResponse: () => createApiResponse(z.string(), 'image/*'), // exact type based on the filename
   getNegativeResponse: () => createApiResponse(z.string(), lookup('txt')),
   handler: ({response, error, output}) => {
     if (error) {
@@ -37,7 +37,7 @@ export const fileStreamingEndpointsFactory = new EndpointsFactory(createResultHa
     }
     if ('filename' in output) {
       fs.createReadStream(output.filename)
-        .pipe(response.type('svg'));
+        .pipe(response.type(output.filename));
     } else {
       response.status(400).send('Filename is missing');
     }
