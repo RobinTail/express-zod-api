@@ -454,4 +454,4 @@ Found a bug?
 Please let me know in [Issues section](https://github.com/RobinTail/express-zod-api/issues).
 
 Found a vulnerability or other security issue?
-Please refer to [this document](https://github.com/RobinTail/express-zod-api/blob/master/SECURITY.md).
+Please refer to [Security policy](https://github.com/RobinTail/express-zod-api/blob/master/SECURITY.md).
