@@ -106,6 +106,14 @@ describe('Example', () => {
       expect(response.headers.get('Content-type')).toBe('image/svg+xml; charset=utf-8');
       expect(await response.text()).toMatchSnapshot();
     });
+
+    test('Should stream an image with a correct header', async () => {
+      const response = await fetch('http://localhost:8090/v1/stream?userId=123');
+      expect(response.status).toBe(200);
+      expect(response.headers.has('Content-type')).toBeTruthy();
+      expect(response.headers.get('Content-type')).toBe('image/svg+xml');
+      expect(await response.text()).toMatchSnapshot();
+    });
   });
 
   describe('Negative', () => {

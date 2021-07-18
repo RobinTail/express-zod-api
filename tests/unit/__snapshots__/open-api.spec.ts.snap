@@ -426,6 +426,30 @@ paths:
           schema:
             type: string
             description: GET /v1/avatar parameter
+  /v1/stream:
+    get:
+      responses:
+        \\"200\\":
+          description: Successful response
+          content:
+            image/svg+xml:
+              schema:
+                type: string
+                description: GET /v1/stream Successful response
+        \\"400\\":
+          description: Error response
+          content:
+            text/plain:
+              schema:
+                type: string
+                description: GET /v1/stream Error response
+      parameters:
+        - name: userId
+          in: query
+          required: true
+          schema:
+            type: string
+            description: GET /v1/stream parameter
 components:
   schemas: {}
   responses: {}
