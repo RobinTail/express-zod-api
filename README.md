@@ -384,7 +384,7 @@ import {EndpointInput, EndpointResponse} from 'express-zod-api';
 import {MyEndpointType} from '../your/backend';
 
 type MyEndpointInput = EndpointInput<MyEndpointType>;
-type MyEndpointResponse = EndpointResponse<MyEndpointType>; // unions positive and negative schemas
+type MyEndpointResponse = EndpointResponse<MyEndpointType>; // unites positive and negative schemas
 ```
 
 ## Swagger / OpenAPI Specification
