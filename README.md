@@ -1,6 +1,6 @@
 # Express Zod API 
 
-![logo](logo.svg)
+![logo](https://raw.githubusercontent.com/RobinTail/express-zod-api/master/logo.svg)
 
 ![CI](https://github.com/RobinTail/express-zod-api/actions/workflows/node.js.yml/badge.svg)
 ![Swagger Validator](https://img.shields.io/swagger/valid/3.0?specUrl=https%3A%2F%2Fraw.githubusercontent.com%2FRobinTail%2Fexpress-zod-api%2Fmaster%2Fexample%2Fexample.swagger.yaml)
@@ -65,7 +65,7 @@ The result that the handler returns goes to the `ResultHandler` which is respons
 All inputs and outputs are validated and there are also advanced powerful features like transformations and refinements.
 The diagram below can give you a better idea of the dataflow.
 
-![Dataflow](dataflow.svg)
+![Dataflow](https://raw.githubusercontent.com/RobinTail/express-zod-api/master/dataflow.svg)
 
 # Installation
 
