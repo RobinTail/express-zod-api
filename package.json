@@ -60,6 +60,9 @@
     "url": "https://robintail.cz",
     "email": "me@robintail.cz"
   },
+  "bugs": {
+    "url": "https://github.com/RobinTail/express-zod-api/issues"
+  },
   "keywords": [
     "typescript",
     "api",
