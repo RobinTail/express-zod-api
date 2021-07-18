@@ -7,6 +7,7 @@ import {
 } from 'openapi3-ts';
 import {z} from 'zod';
 import {OpenAPIError} from './errors';
+import {ZodFile} from './file-schema';
 import {extractObjectSchema} from './helpers';
 import {Routing, routingCycle, RoutingCycleParams} from './routing';
 import {lookup} from 'mime';
@@ -84,6 +85,13 @@ const describeSchema = (value: z.ZodTypeAny, isResponse: boolean): SchemaObject 
         ...otherProps,
         oneOf: (value as z.ZodUnion<[z.ZodTypeAny, ...z.ZodTypeAny[]]>)._def.options
           .map((schema) => describeSchema(schema, isResponse))
+      };
+    case value instanceof ZodFile:
+      return {
+        ...otherProps,
+        type: 'string',
+        format: (value as ZodFile).isBinary ? 'binary' :
+          (value as ZodFile).isBase64 ? 'byte' : 'file'
       };
     case value instanceof z.ZodUndefined:
     case value instanceof z.ZodTuple:

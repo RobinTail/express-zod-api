@@ -162,6 +162,7 @@ paths:
             image/*:
               schema:
                 type: string
+                format: binary
                 description: GET /v1/stream Successful response
         "400":
           description: Error response

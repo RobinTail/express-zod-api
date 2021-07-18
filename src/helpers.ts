@@ -15,7 +15,7 @@ type IntersectionSchema = z.ZodIntersection<ObjectSchema, ObjectSchema>;
 
 export type IOSchema = ObjectSchema | UnionSchema | IntersectionSchema;
 
-type ArrayElement<T extends readonly unknown[]> = T extends readonly (infer K)[] ? K : never;
+export type ArrayElement<T extends readonly unknown[]> = T extends readonly (infer K)[] ? K : never;
 
 type UnionResult<T extends ObjectSchema[], F extends Extractable> = ArrayElement<T>[F];
 type IntersectionResult<T extends IntersectionSchema, F extends Extractable> =
