@@ -1,6 +1,11 @@
+import jestConfig from '../jest.config';
+
 export const waitFor = async (cb: () => boolean) =>
   await new Promise((resolve, reject) => {
-    const timeout = setTimeout(reject, 5000);
+    const timeout = setTimeout(() => {
+      clearInterval(timer);
+      reject();
+    }, jestConfig.testTimeout);
     const timer = setInterval(() => {
       if (cb()) {
         clearInterval(timer);
