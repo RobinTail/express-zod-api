@@ -38,9 +38,6 @@ Start your API server with I/O schema validation and custom middlewares in minut
    1. [Excess property check of endpoint output](#excess-property-check-of-endpoint-output)
 8. [Your input to my output](#your-input-to-my-output)
 
-**Important notice**: v2 is currently beta. Some methods and properties might be renamed or changed without backward 
-compatibility. Please use stable v1 for production.
-
 If you're upgrading from v1 please check out the information in [Changelog](CHANGELOG.md).  
 
 # Technologies

@@ -1,6 +1,7 @@
 import {createLogger, LoggerConfig} from '../../src';
 import Transport from 'winston-transport';
 import {SPLAT} from 'triple-beam';
+import {delay} from '../helpers';
 
 describe('Logger', () => {
   let log: any[] = [];
@@ -83,7 +84,7 @@ describe('Logger', () => {
       const logger = createLogger(loggerConfig);
       logger.add(createTransport(loggerConfig.level));
       logger.profile('long-test');
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      await delay(500);
       logger.profile('long-test');
       expect(log).toHaveLength(1);
       expect(log[0]).toHaveProperty('level');
