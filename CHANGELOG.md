@@ -5,6 +5,7 @@
 ### v2.0.0
 
 - First stable release of the v2.
+- All dependencies are up to date.
 
 ### v2.0.0-beta4
 
