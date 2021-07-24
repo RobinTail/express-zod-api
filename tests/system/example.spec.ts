@@ -1,5 +1,6 @@
 import fetch from 'node-fetch';
 import {spawn, ChildProcessWithoutNullStreams} from 'child_process';
+import {waitFor} from '../helpers';
 
 describe('Example', () => {
   let example: ChildProcessWithoutNullStreams;
@@ -16,14 +17,7 @@ describe('Example', () => {
   afterAll(async () => {
     example.stdout.removeListener('data', listener);
     example.kill();
-    await new Promise((resolve) => {
-      const timer = setInterval(() => {
-        if (example.killed) {
-          clearInterval(timer);
-          resolve('OK');
-        }
-      }, 100);
-    });
+    await waitFor(() => example.killed);
   });
 
   afterEach(() => {
@@ -32,14 +26,8 @@ describe('Example', () => {
 
   describe('Positive', () => {
     test('Should listen', async () => {
-      expect(await new Promise((resolve) => {
-        const timer = setInterval(() => {
-          if (out.match(/Listening 8090/)) {
-            clearInterval(timer);
-            resolve('OK');
-          }
-        }, 100);
-      })).toBeTruthy();
+      await waitFor(() => /Listening 8090/.test(out));
+      expect(true).toBeTruthy();
     });
 
     test('Should handle OPTIONS request', async () => {
@@ -80,8 +68,9 @@ describe('Example', () => {
           timestamp: expect.any(Number)
         }
       });
-      expect(out).toMatch(/v1\/setUser/);
-      expect(out).toMatch(/50, 123, 456/);
+      await waitFor(() => /v1\/setUser/.test(out));
+      await waitFor(() => /50, 123, 456/.test(out));
+      expect(true).toBeTruthy();
     });
 
     test('Should handle valid GET request', async () => {
@@ -95,8 +84,9 @@ describe('Example', () => {
           name: 'John Doe'
         }
       });
-      expect(out).toMatch(/v1\/getUser/);
-      expect(out).toMatch(/50, method get/);
+      await waitFor(() => /v1\/getUser/.test(out));
+      await waitFor(() => /50, method get/.test(out));
+      expect(true).toBeTruthy();
     });
 
     test('Should send an image with a correct header', async () => {
@@ -142,7 +132,8 @@ describe('Example', () => {
           message: 'User not found'
         }
       });
-      expect(out).toMatch(/101, method get/);
+      await waitFor(() => /101, method get/.test(out));
+      expect(true).toBeTruthy();
     });
 
     test('POST request should fail on auth middleware key check', async () => {

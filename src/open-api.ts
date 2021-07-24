@@ -166,26 +166,20 @@ export class OpenAPI extends OpenApiBuilder {
       const operation: OperationObject = {
         responses: {
           '200': {
-            description: successfulResponseDescription,
+            description: `${method.toUpperCase()} ${fullPath} ${successfulResponseDescription}`,
             content: endpoint.getPositiveMimeTypes().reduce((carry, mimeType) => ({
               ...carry,
               [mimeType]: {
-                schema: {
-                  ...describeSchema(endpoint.getPositiveResponseSchema(), true),
-                  description: `${method.toUpperCase()} ${fullPath} ${successfulResponseDescription}`
-                }
+                schema: describeSchema(endpoint.getPositiveResponseSchema(), true)
               }
             }), {} as ContentObject),
           },
           '400': {
-            description: errorResponseDescription,
+            description: `${method.toUpperCase()} ${fullPath} ${errorResponseDescription}`,
             content: endpoint.getNegativeMimeTypes().reduce((carry, mimeType) => ({
               ...carry,
               [mimeType]: {
-                schema: {
-                  ...describeSchema(endpoint.getNegativeResponseSchema(), true),
-                  description: `${method.toUpperCase()} ${fullPath} ${errorResponseDescription}`
-                }
+                schema: describeSchema(endpoint.getNegativeResponseSchema(), true)
               }
             }), {} as ContentObject),
           }

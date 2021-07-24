@@ -1,6 +1,7 @@
 import http from 'http';
 import fetch from 'node-fetch';
 import {createServer, EndpointsFactory, Method, z, defaultResultHandler} from '../../src';
+import {waitFor} from '../helpers';
 
 describe('App', () => {
   let server: http.Server;
@@ -59,14 +60,7 @@ describe('App', () => {
   afterAll(async () => {
     server.close();
     // this approach works better than .close() callback
-    await new Promise((resolve) => {
-      const timer = setInterval(() => {
-        if (!server.listening) {
-          clearInterval(timer);
-          resolve('OK');
-        }
-      }, 100);
-    });
+    await waitFor(() => !server.listening);
   });
 
   describe('Positive', () => {

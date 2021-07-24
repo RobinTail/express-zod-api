@@ -10,7 +10,7 @@ paths:
     get:
       responses:
         \\"200\\":
-          description: Successful response
+          description: GET /v1/getSomething Successful response
           content:
             application/json:
               schema:
@@ -35,9 +35,8 @@ paths:
                 required:
                   - status
                   - data
-                description: GET /v1/getSomething Successful response
         \\"400\\":
-          description: Error response
+          description: GET /v1/getSomething Error response
           content:
             application/json:
               schema:
@@ -57,7 +56,6 @@ paths:
                 required:
                   - status
                   - error
-                description: GET /v1/getSomething Error response
       parameters:
         - name: array
           in: query
@@ -99,7 +97,7 @@ paths:
     post:
       responses:
         \\"200\\":
-          description: Successful response
+          description: POST /v1/getSomething Successful response
           content:
             application/json:
               schema:
@@ -131,9 +129,8 @@ paths:
                 required:
                   - status
                   - data
-                description: POST /v1/getSomething Successful response
         \\"400\\":
-          description: Error response
+          description: POST /v1/getSomething Error response
           content:
             application/json:
               schema:
@@ -153,7 +150,6 @@ paths:
                 required:
                   - status
                   - error
-                description: POST /v1/getSomething Error response
       requestBody:
         content:
           application/json:
@@ -203,7 +199,7 @@ paths:
     get:
       responses:
         \\"200\\":
-          description: Successful response
+          description: GET /v1/getSomething Successful response
           content:
             application/json:
               schema:
@@ -224,9 +220,8 @@ paths:
                 required:
                   - status
                   - data
-                description: GET /v1/getSomething Successful response
         \\"400\\":
-          description: Error response
+          description: GET /v1/getSomething Error response
           content:
             application/json:
               schema:
@@ -246,7 +241,6 @@ paths:
                 required:
                   - status
                   - error
-                description: GET /v1/getSomething Error response
       parameters:
         - name: optional
           in: query
@@ -280,7 +274,7 @@ paths:
     get:
       responses:
         \\"200\\":
-          description: Successful response
+          description: GET /v1/getUser Successful response
           content:
             application/json:
               schema:
@@ -303,9 +297,8 @@ paths:
                 required:
                   - status
                   - data
-                description: GET /v1/getUser Successful response
         \\"400\\":
-          description: Error response
+          description: GET /v1/getUser Error response
           content:
             application/json:
               schema:
@@ -325,7 +318,6 @@ paths:
                 required:
                   - status
                   - error
-                description: GET /v1/getUser Error response
       description: example user retrieval endpoint
       parameters:
         - name: id
@@ -338,7 +330,7 @@ paths:
     post:
       responses:
         \\"200\\":
-          description: Successful response
+          description: POST /v1/setUser Successful response
           content:
             application/json:
               schema:
@@ -361,9 +353,8 @@ paths:
                 required:
                   - status
                   - data
-                description: POST /v1/setUser Successful response
         \\"400\\":
-          description: Error response
+          description: POST /v1/setUser Error response
           content:
             application/json:
               schema:
@@ -383,7 +374,6 @@ paths:
                 required:
                   - status
                   - error
-                description: POST /v1/setUser Error response
       description: example user update endpoint
       requestBody:
         content:
@@ -406,19 +396,17 @@ paths:
     get:
       responses:
         \\"200\\":
-          description: Successful response
+          description: GET /v1/avatar Successful response
           content:
             image/svg+xml:
               schema:
                 type: string
-                description: GET /v1/avatar Successful response
         \\"400\\":
-          description: Error response
+          description: GET /v1/avatar Error response
           content:
             text/plain:
               schema:
                 type: string
-                description: GET /v1/avatar Error response
       parameters:
         - name: userId
           in: query
@@ -430,20 +418,18 @@ paths:
     get:
       responses:
         \\"200\\":
-          description: Successful response
+          description: GET /v1/stream Successful response
           content:
             image/*:
               schema:
                 type: string
                 format: binary
-                description: GET /v1/stream Successful response
         \\"400\\":
-          description: Error response
+          description: GET /v1/stream Error response
           content:
             text/plain:
               schema:
                 type: string
-                description: GET /v1/stream Error response
       parameters:
         - name: userId
           in: query
@@ -477,7 +463,7 @@ paths:
     post:
       responses:
         \\"200\\":
-          description: Successful response
+          description: POST /v1/getSomething Successful response
           content:
             application/json:
               schema:
@@ -499,9 +485,8 @@ paths:
                 required:
                   - status
                   - data
-                description: POST /v1/getSomething Successful response
         \\"400\\":
-          description: Error response
+          description: POST /v1/getSomething Error response
           content:
             application/json:
               schema:
@@ -521,7 +506,6 @@ paths:
                 required:
                   - status
                   - error
-                description: POST /v1/getSomething Error response
       requestBody:
         content:
           application/json:
@@ -577,7 +561,7 @@ paths:
     post:
       responses:
         \\"200\\":
-          description: Successful response
+          description: POST /v1/getSomething Successful response
           content:
             application/json:
               schema:
@@ -599,9 +583,8 @@ paths:
                 required:
                   - status
                   - data
-                description: POST /v1/getSomething Successful response
         \\"400\\":
-          description: Error response
+          description: POST /v1/getSomething Error response
           content:
             application/json:
               schema:
@@ -621,7 +604,6 @@ paths:
                 required:
                   - status
                   - error
-                description: POST /v1/getSomething Error response
       requestBody:
         content:
           application/json:
@@ -667,7 +649,7 @@ paths:
     post:
       responses:
         \\"200\\":
-          description: Successful response
+          description: POST /v1/getSomething Successful response
           content:
             application/json:
               schema:
@@ -690,9 +672,8 @@ paths:
                 required:
                   - status
                   - data
-                description: POST /v1/getSomething Successful response
         \\"400\\":
-          description: Error response
+          description: POST /v1/getSomething Error response
           content:
             application/json:
               schema:
@@ -712,7 +693,6 @@ paths:
                 required:
                   - status
                   - error
-                description: POST /v1/getSomething Error response
       requestBody:
         content:
           application/json:
@@ -753,7 +733,7 @@ paths:
     post:
       responses:
         \\"200\\":
-          description: Successful response
+          description: POST /v1/getSomething Successful response
           content:
             application/json:
               schema:
@@ -773,9 +753,8 @@ paths:
                 required:
                   - status
                   - data
-                description: POST /v1/getSomething Successful response
         \\"400\\":
-          description: Error response
+          description: POST /v1/getSomething Error response
           content:
             application/json:
               schema:
@@ -795,7 +774,6 @@ paths:
                 required:
                   - status
                   - error
-                description: POST /v1/getSomething Error response
       requestBody:
         content:
           application/json:

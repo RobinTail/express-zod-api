@@ -2,7 +2,11 @@
 
 ## Version 2
 
-While v2 is beta some methods and properties might be renamed or changed without backward compatibility.
+### v2.0.0
+
+- First stable release of the v2.
+- All dependencies are up to date.
+- Minor changes of response descriptions in OpenAPI / Swagger documentation generator.
 
 ### v2.0.0-beta4
 
