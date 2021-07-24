@@ -5,11 +5,17 @@ import {
   ZodParsedType,
   ZodType,
   INVALID,
-  OK
+  OK,
+  ZodString,
 } from 'zod';
-import {errorUtil} from 'zod/lib/helpers/errorUtil';
 
 const zodFileKind = 'ZodFile';
+
+// obtaining the private helper type from Zod
+type ErrMessage = Exclude<Parameters<typeof ZodString.prototype.email>[0], undefined>;
+
+// the copy of the private Zod errorUtil.errToObj
+const errToObj = (message: ErrMessage | undefined) => typeof message === 'string' ? {message} : message || {};
 
 declare type ZodFileCheck = {
   kind: 'binary';
@@ -57,21 +63,21 @@ export class ZodFile extends ZodType<string, ZodFileDef> {
     return invalid ? INVALID : OK(data);
   }
 
-  binary = (message?: errorUtil.ErrMessage) =>
+  binary = (message?: ErrMessage) =>
     new ZodFile({
       ...this._def,
       checks: [
         ...this._def.checks,
-        { kind: 'binary', ...errorUtil.errToObj(message) },
+        { kind: 'binary', ...errToObj(message) },
       ],
     });
 
-  base64 = (message?: errorUtil.ErrMessage) =>
+  base64 = (message?: ErrMessage) =>
     new ZodFile({
       ...this._def,
       checks: [
         ...this._def.checks,
-        { kind: 'base64', ...errorUtil.errToObj(message) },
+        { kind: 'base64', ...errToObj(message) },
       ],
     });
 
