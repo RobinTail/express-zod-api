@@ -1,3 +1,4 @@
+import {createRootContext} from 'zod';
 import {ZodFile} from '../../src/file-schema';
 
 describe('ZodFile', () => {
@@ -32,6 +33,24 @@ describe('ZodFile', () => {
       expect(schema._def.checks).toEqual([{
         kind: 'base64',
         message: 'test message'
+      }]);
+    });
+  });
+
+  describe('_parse()', () => {
+    test('should handle wrong parsed type', () => {
+      const context = createRootContext({});
+      const schema = ZodFile.create();
+      const result = schema._parse(context, 123, 'number');
+      expect(result).toEqual({
+        valid: false
+      });
+      expect(context.issues).toEqual([{
+        code: 'invalid_type',
+        expected: 'string',
+        message: 'Expected string, received number',
+        path: [],
+        received: 'number',
       }]);
     });
   });

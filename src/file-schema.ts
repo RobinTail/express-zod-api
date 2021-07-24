@@ -35,7 +35,7 @@ const base64Regex = /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3
 export class ZodFile extends ZodType<string, ZodFileDef> {
   _parse(
     ctx: ParseContext,
-    data: string,
+    data: any,
     parsedType: ZodParsedType
   ): ParseReturnType<string> {
     if (parsedType !== ZodParsedType.string) {
