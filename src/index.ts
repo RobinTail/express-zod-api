@@ -11,13 +11,7 @@ export { createServer, attachRouting } from './server';
 export { OpenAPI } from './open-api';
 export { OpenAPIError, DependsOnMethodError, RoutingError } from './errors';
 
-import { z as originalZod } from 'zod';
+import * as z from './extend-zod';
 import createHttpError from 'http-errors';
-import {ZodFile} from './file-schema';
-
-const z = {
-  ...originalZod,
-  file: ZodFile.create
-};
 
 export { createHttpError, z };
