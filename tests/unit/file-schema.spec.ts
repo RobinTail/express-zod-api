@@ -1,5 +1,6 @@
-import {createRootContext} from 'zod';
+import {createRootContext, getParsedType} from 'zod';
 import {ZodFile} from '../../src/file-schema';
+import fs from 'fs';
 
 describe('ZodFile', () => {
   describe('static::create()', () => {
@@ -52,6 +53,57 @@ describe('ZodFile', () => {
         path: [],
         received: 'number',
       }]);
+    });
+
+    test('should perform additional check for base64 file', () => {
+      const context = createRootContext({});
+      const schema = ZodFile.create().base64('this is not base64');
+      const result = schema._parse(context, '~~~~', 'string');
+      expect(result).toEqual({
+        valid: false
+      });
+      expect(context.issues).toEqual([{
+        code: 'custom',
+        message: 'this is not base64',
+        path: [],
+      }]);
+    });
+
+    test('should accept string', () => {
+      const context = createRootContext({});
+      const schema = ZodFile.create();
+      const result = schema._parse(context, 'some string', 'string');
+      expect(result).toEqual({
+        valid: true,
+        value: 'some string'
+      });
+      expect(context.issues).toEqual([]);
+    });
+
+    test('should accept binary read string', () => {
+      const context = createRootContext({});
+      const schema = ZodFile.create().binary();
+      const data = fs.readFileSync('logo.svg', 'binary');
+      const type = getParsedType(data);
+      const result = schema._parse(context, data, type);
+      expect(result).toEqual({
+        valid: true,
+        value: data
+      });
+      expect(context.issues).toEqual([]);
+    });
+
+    test('should accept base64 read string', () => {
+      const context = createRootContext({});
+      const schema = ZodFile.create().base64();
+      const data = fs.readFileSync('logo.svg', 'base64');
+      const type = getParsedType(data);
+      const result = schema._parse(context, data, type);
+      expect(result).toEqual({
+        valid: true,
+        value: data
+      });
+      expect(context.issues).toEqual([]);
     });
   });
 });
