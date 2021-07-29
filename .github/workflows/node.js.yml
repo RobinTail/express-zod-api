@@ -40,3 +40,33 @@ jobs:
         yarn lint
         yarn test
         yarn build
+  windows:
+    needs:
+      - build
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        node-version: [ 14.x ]
+    steps:
+      - name: Get yarn cache dir
+        id: yarnCache
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Install Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Cache node modules
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-yarn
+        with:
+          path: ${{ steps.yarnCache.outputs.dir }}
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ matrix.node-version }}-${{ hashFiles('**/yarn.lock') }}
+      - name: Install dependencies
+        run: yarn install
+      - name: Test
+        run: |
+          yarn lint
+          yarn test
