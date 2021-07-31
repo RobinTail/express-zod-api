@@ -6,7 +6,6 @@ import {LoggerConfig, loggerLevels} from './config-type';
 import {MiddlewareDefinition} from './middleware';
 
 export type FlatObject = Record<string, any>;
-// type EmptyFlatObject = {[K in never]: never};
 
 type ObjectSchema = z.AnyZodObject;
 type Extractable = 'shape' | '_unknownKeys' | '_catchall' | '_output' | '_input';

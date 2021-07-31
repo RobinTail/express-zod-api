@@ -30,7 +30,6 @@ const describeSchema = (value: z.ZodTypeAny, isResponse: boolean): SchemaObject 
       return {...otherProps, type: 'string', format: 'date'};
     case value instanceof z.ZodNull:
       // null is not supported https://swagger.io/docs/specification/data-models/data-types/
-      // return {...otherProps, type: 'null'};
       return {...otherProps, type: 'string', nullable: true, format: 'null'};
     case value instanceof z.ZodArray:
       return {
