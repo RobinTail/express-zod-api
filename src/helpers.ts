@@ -6,7 +6,6 @@ import {LoggerConfig, loggerLevels} from './config-type';
 import {MiddlewareDefinition} from './middleware';
 
 export type FlatObject = Record<string, any>;
-// type EmptyFlatObject = {[K in never]: never};
 
 type ObjectSchema = z.AnyZodObject;
 type Extractable = 'shape' | '_unknownKeys' | '_catchall' | '_output' | '_input';
@@ -24,7 +23,7 @@ type IntersectionResult<T extends IntersectionSchema, F extends Extractable> =
 type IOExtract<T extends IOSchema | any, F extends Extractable> =
   T extends ObjectSchema ? T[F] :
   T extends UnionSchema ? UnionResult<T['options'], F> :
-  T extends IntersectionSchema ? IntersectionResult<T, F> : unknown; // : EmptyFlatObject
+  T extends IntersectionSchema ? IntersectionResult<T, F> : unknown;
 
 export type Merge<A extends IOSchema, B extends IOSchema | any> = z.ZodObject<
   IOExtract<A, 'shape'> & IOExtract<B, 'shape'>,

@@ -2,6 +2,25 @@
 
 ## Version 2
 
+### v2.1.0
+
+- New response schema type `ZodFile` can be created using `z.file()`. It has two refinements: `.binary()` and 
+  `.base64()` which also reflected in the generated Swagger / OpenAPI documentation.
+  You can use it instead of `z.string()` with `createApiResponse()`:
+```typescript
+// before
+const fileStreamingEndpointsFactoryBefore = new EndpointsFactory(createResultHandler({
+  getPositiveResponse: () => createApiResponse(z.string(), 'image/*'),
+  ...
+}));
+
+// after
+const fileStreamingEndpointsFactoryAfter = new EndpointsFactory(createResultHandler({
+  getPositiveResponse: () => createApiResponse(z.file().binary(), 'image/*'),
+  ...
+}));
+```
+
 ### v2.0.0
 
 - First stable release of the v2.

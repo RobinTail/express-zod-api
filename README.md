@@ -308,11 +308,14 @@ image file including its MIME type in `Content-type` header.
 
 You can find two approaches to `EndpointsFactory` and `ResultHandler` implementation 
 [in this example](https://github.com/RobinTail/express-zod-api/blob/master/example/factories.ts). 
-One of them implements file streaming, in this case the endpoint just has to provide the filename:
+One of them implements file streaming, in this case the endpoint just has to provide the filename.
+The response schema generally may be just `z.string()`, but there is also a specific one: `z.file()` that also supports
+`.binary()` and `.base64()` refinements which are reflected in the 
+[generated documentation](#swagger--openapi-specification).
 
 ```typescript
 const fileStreamingEndpointsFactory = new EndpointsFactory(createResultHandler({
-  getPositiveResponse: () => createApiResponse(z.string(), 'image/*'),
+  getPositiveResponse: () => createApiResponse(z.file().binary(), 'image/*'),
   getNegativeResponse: () => createApiResponse(z.string(), 'text/plain'),
   handler: ({response, error, output}) => {
     if (error) {

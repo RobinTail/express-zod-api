@@ -156,6 +156,7 @@ paths:
             image/*:
               schema:
                 type: string
+                format: binary
         "400":
           description: GET /v1/stream Error response
           content:

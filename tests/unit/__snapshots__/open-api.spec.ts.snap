@@ -264,6 +264,104 @@ servers:
 "
 `;
 
+exports[`Open API generator generateOpenApi() should generate the correct schema for union type 1`] = `
+"openapi: 3.0.0
+info:
+  title: Testing Union and Or Types
+  version: 3.4.5
+paths:
+  /v1/getSomething:
+    post:
+      responses:
+        \\"200\\":
+          description: POST /v1/getSomething Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - success
+                  data:
+                    type: object
+                    properties:
+                      or:
+                        oneOf:
+                          - type: string
+                          - type: number
+                    required:
+                      - or
+                required:
+                  - status
+                  - data
+        \\"400\\":
+          description: POST /v1/getSomething Error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                required:
+                  - status
+                  - error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                union:
+                  oneOf:
+                    - type: object
+                      properties:
+                        one:
+                          type: string
+                        two:
+                          type: number
+                      required:
+                        - one
+                        - two
+                    - type: object
+                      properties:
+                        two:
+                          type: number
+                        three:
+                          type: string
+                      required:
+                        - two
+                        - three
+              required:
+                - union
+              description: POST /v1/getSomething request body
+components:
+  schemas: {}
+  responses: {}
+  parameters: {}
+  examples: {}
+  requestBodies: {}
+  headers: {}
+  securitySchemes: {}
+  links: {}
+  callbacks: {}
+tags: []
+servers:
+  - url: http://example.com
+"
+`;
+
 exports[`Open API generator generateOpenApi() should generate the correct schema of example routing 1`] = `
 "openapi: 3.0.0
 info:
@@ -423,6 +521,7 @@ paths:
             image/*:
               schema:
                 type: string
+                format: binary
         \\"400\\":
           description: GET /v1/stream Error response
           content:
@@ -452,105 +551,7 @@ servers:
 "
 `;
 
-exports[`Open API generator should generate the correct schema for union type 1`] = `
-"openapi: 3.0.0
-info:
-  title: Testing Union and Or Types
-  version: 3.4.5
-paths:
-  /v1/getSomething:
-    post:
-      responses:
-        \\"200\\":
-          description: POST /v1/getSomething Successful response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    enum:
-                      - success
-                  data:
-                    type: object
-                    properties:
-                      or:
-                        oneOf:
-                          - type: string
-                          - type: number
-                    required:
-                      - or
-                required:
-                  - status
-                  - data
-        \\"400\\":
-          description: POST /v1/getSomething Error response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    enum:
-                      - error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                required:
-                  - status
-                  - error
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                union:
-                  oneOf:
-                    - type: object
-                      properties:
-                        one:
-                          type: string
-                        two:
-                          type: number
-                      required:
-                        - one
-                        - two
-                    - type: object
-                      properties:
-                        two:
-                          type: number
-                        three:
-                          type: string
-                      required:
-                        - two
-                        - three
-              required:
-                - union
-              description: POST /v1/getSomething request body
-components:
-  schemas: {}
-  responses: {}
-  parameters: {}
-  examples: {}
-  requestBodies: {}
-  headers: {}
-  securitySchemes: {}
-  links: {}
-  callbacks: {}
-tags: []
-servers:
-  - url: http://example.com
-"
-`;
-
-exports[`Open API generator should handle bigint, boolean, date and null 1`] = `
+exports[`Open API generator generateOpenApi() should handle bigint, boolean, date and null 1`] = `
 "openapi: 3.0.0
 info:
   title: Testing additional types
@@ -638,7 +639,7 @@ servers:
 "
 `;
 
-exports[`Open API generator should handle enum types 1`] = `
+exports[`Open API generator generateOpenApi() should handle enum types 1`] = `
 "openapi: 3.0.0
 info:
   title: Testing enums
@@ -722,7 +723,7 @@ servers:
 "
 `;
 
-exports[`Open API generator should handle transformation schema in output 1`] = `
+exports[`Open API generator generateOpenApi() should handle transformation schema in output 1`] = `
 "openapi: 3.0.0
 info:
   title: Testing Transformation in response schema

@@ -28,7 +28,7 @@ export const fileDownloadEndpointsFactory = new EndpointsFactory(createResultHan
 }));
 
 export const fileStreamingEndpointsFactory = new EndpointsFactory(createResultHandler({
-  getPositiveResponse: () => createApiResponse(z.string(), 'image/*'),
+  getPositiveResponse: () => createApiResponse(z.file().binary(), 'image/*'),
   getNegativeResponse: () => createApiResponse(z.string(), lookup('txt')),
   handler: ({response, error, output}) => {
     if (error) {
