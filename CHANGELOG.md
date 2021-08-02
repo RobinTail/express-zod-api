@@ -4,6 +4,7 @@
 
 ### v2.1.0
 
+- Zod version is 3.7.1.
 - New response schema type `ZodFile` can be created using `z.file()`. It has two refinements: `.binary()` and 
   `.base64()` which also reflected in the generated Swagger / OpenAPI documentation.
   You can use it instead of `z.string()` with `createApiResponse()`:
@@ -20,6 +21,7 @@ const fileStreamingEndpointsFactoryAfter = new EndpointsFactory(createResultHand
   ...
 }));
 ```
+- Please do NOT use `z.file()` within the `Endpoint` input / output object schemas.
 
 ### v2.0.0
 

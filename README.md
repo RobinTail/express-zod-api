@@ -43,7 +43,7 @@ If you're upgrading from v1 please check out the information in [Changelog](CHAN
 # Technologies
 
 - [Typescript](https://www.typescriptlang.org/) first
-- Schema validation — [Zod 3.x](https://github.com/colinhacks/zod) *(stable)*.
+- Schema validation — [Zod 3.x](https://github.com/colinhacks/zod).
 - Webserver — [Express.js](https://expressjs.com/).
 - Logger — [Winston](https://github.com/winstonjs/winston).
 - Swagger - [OpenAPI 3.x](https://github.com/metadevpro/openapi3-ts)
