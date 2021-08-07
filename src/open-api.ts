@@ -37,8 +37,13 @@ const describeSchema = (value: z.ZodTypeAny, isResponse: boolean): SchemaObject 
         type: 'array',
         items: describeSchema((value._def as z.ZodArrayDef).type, isResponse)
       };
-    case value instanceof z.ZodObject:
     case value instanceof z.ZodRecord:
+      return {
+        ...otherProps,
+        type: 'object',
+        additionalProperties: describeSchema((value as z.ZodRecord)._def.valueType, isResponse)
+      };
+    case value instanceof z.ZodObject:
       return {
         ...otherProps,
         type: 'object',

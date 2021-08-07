@@ -723,6 +723,83 @@ servers:
 "
 `;
 
+exports[`Open API generator generateOpenApi() should handle record 1`] = `
+"openapi: 3.0.0
+info:
+  title: Testing record
+  version: 3.4.5
+paths:
+  /v1/getSomething:
+    post:
+      responses:
+        \\"200\\":
+          description: POST /v1/getSomething Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - success
+                  data:
+                    type: object
+                    properties:
+                      record:
+                        type: object
+                        additionalProperties:
+                          type: number
+                    required:
+                      - record
+                required:
+                  - status
+                  - data
+        \\"400\\":
+          description: POST /v1/getSomething Error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                required:
+                  - status
+                  - error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: {}
+              required: []
+              description: POST /v1/getSomething request body
+components:
+  schemas: {}
+  responses: {}
+  parameters: {}
+  examples: {}
+  requestBodies: {}
+  headers: {}
+  securitySchemes: {}
+  links: {}
+  callbacks: {}
+tags: []
+servers:
+  - url: http://example.com
+"
+`;
+
 exports[`Open API generator generateOpenApi() should handle transformation schema in output 1`] = `
 "openapi: 3.0.0
 info:

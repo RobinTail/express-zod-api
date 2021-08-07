@@ -193,6 +193,27 @@ describe('Open API generator', () => {
       expect(spec).toMatchSnapshot();
     });
 
+    test('should handle record', () => {
+      const spec = new OpenAPI({
+        routing: {
+          v1: {
+            getSomething: defaultEndpointsFactory.build({
+              method: 'post',
+              input: z.object({}),
+              output: z.object({
+                record: z.record(z.number()),
+              }),
+              handler: jest.fn()
+            })
+          }
+        },
+        version: '3.4.5',
+        title: 'Testing record',
+        serverUrl: 'http://example.com'
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
+    });
+
     test('should handle enum types', () => {
       const spec = new OpenAPI({
         routing: {
