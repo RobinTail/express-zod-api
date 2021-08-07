@@ -880,3 +880,78 @@ servers:
   - url: http://example.com
 "
 `;
+
+exports[`Open API generator generateOpenApi() should handle type any 1`] = `
+"openapi: 3.0.0
+info:
+  title: Testing type any
+  version: 3.4.5
+paths:
+  /v1/getSomething:
+    get:
+      responses:
+        \\"200\\":
+          description: GET /v1/getSomething Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - success
+                  data:
+                    type: object
+                    properties:
+                      any:
+                        nullable: true
+                        format: any
+                    required: []
+                required:
+                  - status
+                  - data
+        \\"400\\":
+          description: GET /v1/getSomething Error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                required:
+                  - status
+                  - error
+      parameters:
+        - name: any
+          in: query
+          required: false
+          schema:
+            nullable: true
+            format: any
+            description: GET /v1/getSomething parameter
+components:
+  schemas: {}
+  responses: {}
+  parameters: {}
+  examples: {}
+  requestBodies: {}
+  headers: {}
+  securitySchemes: {}
+  links: {}
+  callbacks: {}
+tags: []
+servers:
+  - url: http://example.com
+"
+`;

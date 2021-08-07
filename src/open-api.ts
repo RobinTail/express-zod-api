@@ -97,13 +97,17 @@ const describeSchema = (value: z.ZodTypeAny, isResponse: boolean): SchemaObject 
         format: (value as ZodFile).isBinary ? 'binary' :
           (value as ZodFile).isBase64 ? 'byte' : 'file'
       };
+    case value instanceof z.ZodAny:
+      return {
+        ...otherProps,
+        format: 'any'
+      };
     case value instanceof z.ZodUndefined:
     case value instanceof z.ZodTuple:
     case value instanceof z.ZodMap:
     case value instanceof z.ZodFunction:
     case value instanceof z.ZodLazy:
     case value instanceof z.ZodPromise:
-    case value instanceof z.ZodAny:
     case value instanceof z.ZodUnknown:
     case value instanceof z.ZodNever:
     case value instanceof z.ZodVoid:

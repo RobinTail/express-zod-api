@@ -214,6 +214,29 @@ describe('Open API generator', () => {
       expect(spec).toMatchSnapshot();
     });
 
+    test('should handle type any', () => {
+      const spec = new OpenAPI({
+        routing: {
+          v1: {
+            getSomething: defaultEndpointsFactory.build({
+              method: 'get',
+              input: z.object({
+                any: z.any()
+              }),
+              output: z.object({
+                any: z.any()
+              }),
+              handler: jest.fn()
+            })
+          }
+        },
+        version: '3.4.5',
+        title: 'Testing type any',
+        serverUrl: 'http://example.com'
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
+    });
+
     test('should handle enum types', () => {
       const spec = new OpenAPI({
         routing: {
@@ -247,7 +270,6 @@ describe('Open API generator', () => {
         z.function(),
         z.lazy(() => z.any()),
         z.promise(z.any()),
-        z.any(),
         z.unknown(),
         z.never(),
         z.void()
