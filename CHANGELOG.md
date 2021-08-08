@@ -20,19 +20,19 @@ ZodNumber: # z.number()
     type: number | integer # when z.number().int()
     format: double | int64 # when z.number().int()
     # MIN_VALUE or MIN_SAFE_INTEGER of Number or z.number().min(value)
-    minimum: 5e-324 | -9007199254740991
+    minimum: 5e-324 | -9007199254740991 | value
     # MAX_VALUE or MAX_SAFE_INTEGER of Number or z.number().max(value)
-    maximum: 1.7976931348623157e+308 | 9007199254740991
+    maximum: 1.7976931348623157e+308 | 9007199254740991 | value
     # Taking into account z.number().min(), .max(), .positive(), .nonnegative(), etc
-    exclusiveMinimum: boolean
-    exclusiveMaximum: boolean
+    exclusiveMinimum: true | false
+    exclusiveMaximum: true | false
 ZodString: # z.string()
   before:
     type: string
   after:
     type: string
-    minLength: number # optional, when z.string().min(value)
-    maxLength: number # optional, when z.string().max(value)
+    minLength: value # optional, when z.string().min(value)
+    maxLength: value # optional, when z.string().max(value)
     format: email | uuid | url # when z.string().email(), .uuid(), .url()
     pattern: /your regular expression/ # when z.string().regex(value)
 ```
