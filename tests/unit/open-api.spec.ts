@@ -21,7 +21,7 @@ describe('Open API generator', () => {
             getSomething: defaultEndpointsFactory.build({
               methods: ['get'],
               input: z.object({
-                array: z.array(z.number().int().positive()),
+                array: z.array(z.number().int().positive()).min(1).max(3),
                 transformer: z.string().transform((str) => str.length)
               }),
               output: z.object({

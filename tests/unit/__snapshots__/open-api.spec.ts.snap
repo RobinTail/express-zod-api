@@ -74,6 +74,8 @@ paths:
               exclusiveMinimum: true
               maximum: 9007199254740991
               exclusiveMaximum: false
+            minItems: 1
+            maxItems: 3
             description: GET /v1/getSomething parameter
         - name: transformer
           in: query
