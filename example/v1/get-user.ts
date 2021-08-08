@@ -10,7 +10,7 @@ export const getUserEndpoint = defaultEndpointsFactory
       id: z.string().transform((id) => parseInt(id, 10))
     }),
     output: z.object({
-      id: z.number(),
+      id: z.number().int().nonnegative(),
       name: z.string(),
     }),
     handler: async ({input: {id}, options: {method}, logger}) => {

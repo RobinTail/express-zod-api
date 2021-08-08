@@ -8,7 +8,7 @@ import {
 import {z} from 'zod';
 import {OpenAPIError} from './errors';
 import {ZodFile} from './file-schema';
-import {extractObjectSchema} from './helpers';
+import {ArrayElement, extractObjectSchema} from './helpers';
 import {Routing, routingCycle, RoutingCycleParams} from './routing';
 import {lookup} from 'mime';
 
@@ -20,10 +20,32 @@ const describeSchema = (value: z.ZodTypeAny, isResponse: boolean): SchemaObject 
   switch (true) {
     case value instanceof z.ZodString:
       return {...otherProps, type: 'string'};
-    case value instanceof z.ZodNumber:
-      return {...otherProps, type: 'number'};
+    case value instanceof z.ZodNumber: {
+      const isInt = (value as z.ZodNumber).isInt;
+      const minValue = (value as z.ZodNumber).minValue;
+      const minCheck = (value as z.ZodNumber)._def.checks.find(
+        ({kind}) => kind === 'min'
+      ) as Extract<ArrayElement<z.ZodNumberDef['checks']>, {kind: 'min'}> | undefined;
+      const isMinInclusive = minCheck ? minCheck.inclusive : true;
+      const maxValue = (value as z.ZodNumber).maxValue;
+      const maxCheck = (value as z.ZodNumber)._def.checks.find(
+        ({kind}) => kind === 'max'
+      ) as Extract<ArrayElement<z.ZodNumberDef['checks']>, {kind: 'max'}> | undefined;
+      const isMaxInclusive = maxCheck ? maxCheck.inclusive : true;
+      return {
+        ...otherProps,
+        type: isInt ? 'integer' : 'number',
+        format: isInt ? 'int64' : 'double',
+        minimum: minValue === null ?
+          (isInt ? Number.MIN_SAFE_INTEGER : Number.MIN_VALUE) : minValue,
+        exclusiveMinimum: !isMinInclusive,
+        maximum: maxValue === null ?
+          (isInt ? Number.MAX_SAFE_INTEGER : Number.MAX_VALUE) : maxValue,
+        exclusiveMaximum: !isMaxInclusive,
+      };
+    }
     case value instanceof z.ZodBigInt:
-      return {...otherProps, type: 'integer', format: 'int64'};
+      return {...otherProps, type: 'integer', format: 'bigint'};
     case value instanceof z.ZodBoolean:
       return {...otherProps, type: 'boolean'};
     case value instanceof z.ZodDate:

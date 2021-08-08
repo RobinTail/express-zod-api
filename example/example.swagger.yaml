@@ -21,7 +21,12 @@ paths:
                     type: object
                     properties:
                       id:
-                        type: number
+                        type: integer
+                        format: int64
+                        minimum: 0
+                        exclusiveMinimum: false
+                        maximum: 9007199254740991
+                        exclusiveMaximum: false
                       name:
                         type: string
                     required:
@@ -79,7 +84,12 @@ paths:
                       name:
                         type: string
                       timestamp:
-                        type: number
+                        type: integer
+                        format: int64
+                        minimum: 0
+                        exclusiveMinimum: false
+                        maximum: 9007199254740991
+                        exclusiveMaximum: false
                     required:
                       - name
                       - timestamp
@@ -117,7 +127,12 @@ paths:
                 key:
                   type: string
                 id:
-                  type: number
+                  type: integer
+                  format: int64
+                  minimum: 0
+                  exclusiveMinimum: false
+                  maximum: 9007199254740991
+                  exclusiveMaximum: false
                 name:
                   type: string
               required:

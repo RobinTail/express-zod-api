@@ -10,7 +10,7 @@ export const setUserEndpoint = keyAndTokenAuthenticatedEndpointsFactory.build({
   }),
   output: z.object({
     name: z.string(),
-    timestamp: z.number()
+    timestamp: z.number().int().nonnegative()
   }),
   handler: async ({input: {id, name, key}, options: {token}, logger}) => {
     logger.debug(`id, key and token: ${id}, ${key}, ${token}`);
