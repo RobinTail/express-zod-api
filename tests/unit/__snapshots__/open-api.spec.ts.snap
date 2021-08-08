@@ -77,6 +77,14 @@ paths:
             minItems: 1
             maxItems: 3
             description: GET /v1/getSomething parameter
+        - name: unlimited
+          in: query
+          required: true
+          schema:
+            type: array
+            items:
+              type: boolean
+            description: GET /v1/getSomething parameter
         - name: transformer
           in: query
           required: true
