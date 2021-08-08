@@ -299,6 +299,31 @@ describe('Open API generator', () => {
       expect(spec).toMatchSnapshot();
     });
 
+    test('should handle tuples', () => {
+      const spec = new OpenAPI({
+        routing: {
+          v1: {
+            getSomething: defaultEndpointsFactory.build({
+              method: 'post',
+              input: z.object({
+                ofOne: z.tuple([z.boolean()]),
+                ofStrings: z.tuple([z.string(), z.string().nullable()]),
+                complex: z.tuple([z.boolean(), z.string(), z.number().int().positive()])
+              }),
+              output: z.object({
+                empty: z.tuple([])
+              }),
+              handler: jest.fn()
+            })
+          }
+        },
+        version: '3.4.5',
+        title: 'Testing tuples',
+        serverUrl: 'http://example.com'
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
+    });
+
     test('should handle enum types', () => {
       const spec = new OpenAPI({
         routing: {
@@ -327,7 +352,6 @@ describe('Open API generator', () => {
     test('should throw on unsupported types', () => {
       [
         z.undefined(),
-        z.tuple([]),
         z.map(z.any(), z.any()),
         z.function(),
         z.lazy(() => z.any()),
