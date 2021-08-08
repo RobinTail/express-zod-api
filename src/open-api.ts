@@ -18,8 +18,31 @@ const describeSchema = (value: z.ZodTypeAny, isResponse: boolean): SchemaObject 
     otherProps.nullable = true;
   }
   switch (true) {
-    case value instanceof z.ZodString:
-      return {...otherProps, type: 'string'};
+    case value instanceof z.ZodString: {
+      const checks = (value as z.ZodString)._def.checks;
+      const isEmail = checks.find(({kind}) => kind === 'email') !== undefined;
+      const isUrl = checks.find(({kind}) => kind === 'url') !== undefined;
+      const isUUID = checks.find(({kind}) => kind === 'uuid') !== undefined;
+      const minLengthCheck = checks.find(
+        ({kind}) => kind === 'min'
+      ) as Extract<ArrayElement<z.ZodStringDef['checks']>, {kind: 'min'}> | undefined;
+      const maxLengthCheck = checks.find(
+        ({kind}) => kind === 'max'
+      ) as Extract<ArrayElement<z.ZodStringDef['checks']>, {kind: 'max'}> | undefined;
+      const regexCheck = checks.find(
+        ({kind}) => kind === 'regex'
+      ) as Extract<ArrayElement<z.ZodStringDef['checks']>, {kind: 'regex'}> | undefined;
+      return {
+        ...otherProps,
+        type: 'string',
+        ...(isEmail ? { format: 'email' } : {}),
+        ...(isUrl ? { format: 'url' } : {}),
+        ...(isUUID ? { format: 'uuid' } : {}),
+        ...(minLengthCheck ? { minLength: minLengthCheck.value } : {}),
+        ...(maxLengthCheck ? { maxLength: maxLengthCheck.value } : {}),
+        ...(regexCheck ? { pattern: `/${regexCheck.regex.source}/${regexCheck.regex.flags}` } : {}),
+      };
+    }
     case value instanceof z.ZodNumber: {
       const isInt = (value as z.ZodNumber).isInt;
       const minValue = (value as z.ZodNumber).minValue;

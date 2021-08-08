@@ -268,6 +268,37 @@ describe('Open API generator', () => {
       expect(spec).toMatchSnapshot();
     });
 
+    test('should handle different string types', () => {
+      const spec = new OpenAPI({
+        routing: {
+          v1: {
+            getSomething: defaultEndpointsFactory.build({
+              method: 'post',
+              input: z.object({
+                regular: z.string(),
+                min: z.string().min(1),
+                max: z.string().max(15),
+                range: z.string().min(2).max(3),
+                email: z.string().email(),
+                uuid: z.string().uuid(),
+                url: z.string().url(),
+                numeric: z.string().regex(/\d+/),
+                combined: z.string().nonempty().email().regex(/.*@example\.com/si).max(90)
+              }),
+              output: z.object({
+                nonempty: z.string().nonempty()
+              }),
+              handler: jest.fn()
+            })
+          }
+        },
+        version: '3.4.5',
+        title: 'Testing strings',
+        serverUrl: 'http://example.com'
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
+    });
+
     test('should handle enum types', () => {
       const spec = new OpenAPI({
         routing: {

@@ -63,6 +63,7 @@ paths:
           required: true
           schema:
             type: string
+            pattern: /\d+/
             description: GET /v1/getUser parameter
   /v1/setUser:
     post:
@@ -126,6 +127,7 @@ paths:
               properties:
                 key:
                   type: string
+                  minLength: 1
                 id:
                   type: integer
                   format: int64
@@ -135,6 +137,7 @@ paths:
                   exclusiveMaximum: false
                 name:
                   type: string
+                  minLength: 1
               required:
                 - key
                 - id
@@ -161,6 +164,7 @@ paths:
           required: true
           schema:
             type: string
+            pattern: /\d+/
             description: GET /v1/avatar parameter
   /v1/stream:
     get:
@@ -184,6 +188,7 @@ paths:
           required: true
           schema:
             type: string
+            pattern: /\d+/
             description: GET /v1/stream parameter
 components:
   schemas: {}
