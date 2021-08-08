@@ -2,6 +2,12 @@
 
 ## Version 2
 
+### v2.1.1
+
+- Fixed issue [#92](https://github.com/RobinTail/express-zod-api/issues/92): The error 
+  `Cannot convert undefined or null to object` in OpenAPI generator when using `z.record()` type has been fixed.
+- Supporting type `z.any()` in OpenAPI generator. 
+
 ### v2.1.0
 
 - Zod version is 3.7.1.
