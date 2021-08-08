@@ -18,55 +18,16 @@ const describeSchema = (value: z.ZodTypeAny, isResponse: boolean): SchemaObject 
     otherProps.nullable = true;
   }
   switch (true) {
-    case value instanceof z.ZodString: {
-      const checks = (value as z.ZodString)._def.checks;
-      const isEmail = checks.find(({kind}) => kind === 'email') !== undefined;
-      const isUrl = checks.find(({kind}) => kind === 'url') !== undefined;
-      const isUUID = checks.find(({kind}) => kind === 'uuid') !== undefined;
-      const minLengthCheck = checks.find(
-        ({kind}) => kind === 'min'
-      ) as Extract<ArrayElement<z.ZodStringDef['checks']>, {kind: 'min'}> | undefined;
-      const maxLengthCheck = checks.find(
-        ({kind}) => kind === 'max'
-      ) as Extract<ArrayElement<z.ZodStringDef['checks']>, {kind: 'max'}> | undefined;
-      const regexCheck = checks.find(
-        ({kind}) => kind === 'regex'
-      ) as Extract<ArrayElement<z.ZodStringDef['checks']>, {kind: 'regex'}> | undefined;
+    case value instanceof z.ZodString:
       return {
         ...otherProps,
-        type: 'string',
-        ...(isEmail ? { format: 'email' } : {}),
-        ...(isUrl ? { format: 'url' } : {}),
-        ...(isUUID ? { format: 'uuid' } : {}),
-        ...(minLengthCheck ? { minLength: minLengthCheck.value } : {}),
-        ...(maxLengthCheck ? { maxLength: maxLengthCheck.value } : {}),
-        ...(regexCheck ? { pattern: `/${regexCheck.regex.source}/${regexCheck.regex.flags}` } : {}),
+        ...describeString(value as z.ZodString),
       };
-    }
-    case value instanceof z.ZodNumber: {
-      const isInt = (value as z.ZodNumber).isInt;
-      const minValue = (value as z.ZodNumber).minValue;
-      const minCheck = (value as z.ZodNumber)._def.checks.find(
-        ({kind}) => kind === 'min'
-      ) as Extract<ArrayElement<z.ZodNumberDef['checks']>, {kind: 'min'}> | undefined;
-      const isMinInclusive = minCheck ? minCheck.inclusive : true;
-      const maxValue = (value as z.ZodNumber).maxValue;
-      const maxCheck = (value as z.ZodNumber)._def.checks.find(
-        ({kind}) => kind === 'max'
-      ) as Extract<ArrayElement<z.ZodNumberDef['checks']>, {kind: 'max'}> | undefined;
-      const isMaxInclusive = maxCheck ? maxCheck.inclusive : true;
+    case value instanceof z.ZodNumber:
       return {
         ...otherProps,
-        type: isInt ? 'integer' : 'number',
-        format: isInt ? 'int64' : 'double',
-        minimum: minValue === null ?
-          (isInt ? Number.MIN_SAFE_INTEGER : Number.MIN_VALUE) : minValue,
-        exclusiveMinimum: !isMinInclusive,
-        maximum: maxValue === null ?
-          (isInt ? Number.MAX_SAFE_INTEGER : Number.MAX_VALUE) : maxValue,
-        exclusiveMaximum: !isMaxInclusive,
+        ...describeNumber(value as z.ZodNumber)
       };
-    }
     case value instanceof z.ZodBigInt:
       return {...otherProps, type: 'integer', format: 'bigint'};
     case value instanceof z.ZodBoolean:
@@ -92,7 +53,7 @@ const describeSchema = (value: z.ZodTypeAny, isResponse: boolean): SchemaObject 
       return {
         ...otherProps,
         type: 'object',
-        properties: describeObject(value as z.AnyZodObject, isResponse),
+        properties: describeObjectProperties(value as z.AnyZodObject, isResponse),
         required: Object.keys((value as z.AnyZodObject).shape)
           .filter((key) => !(value as z.AnyZodObject).shape[key].isOptional())
       };
@@ -161,7 +122,53 @@ const describeSchema = (value: z.ZodTypeAny, isResponse: boolean): SchemaObject 
   }
 };
 
-const describeObject = (schema: z.AnyZodObject, isResponse: boolean): Record<string, SchemaObject> => {
+const describeString = (schema: z.ZodString): SchemaObject => {
+  const checks = schema._def.checks;
+  const isEmail = checks.find(({kind}) => kind === 'email') !== undefined;
+  const isUrl = checks.find(({kind}) => kind === 'url') !== undefined;
+  const isUUID = checks.find(({kind}) => kind === 'uuid') !== undefined;
+  const minLengthCheck = checks.find(
+    ({kind}) => kind === 'min'
+  ) as Extract<ArrayElement<z.ZodStringDef['checks']>, {kind: 'min'}> | undefined;
+  const maxLengthCheck = checks.find(
+    ({kind}) => kind === 'max'
+  ) as Extract<ArrayElement<z.ZodStringDef['checks']>, {kind: 'max'}> | undefined;
+  const regexCheck = checks.find(
+    ({kind}) => kind === 'regex'
+  ) as Extract<ArrayElement<z.ZodStringDef['checks']>, {kind: 'regex'}> | undefined;
+  return {
+    type: 'string' as const,
+    ...(isEmail ? { format: 'email' as const } : {}),
+    ...(isUrl ? { format: 'url' as const } : {}),
+    ...(isUUID ? { format: 'uuid' as const } : {}),
+    ...(minLengthCheck ? { minLength: minLengthCheck.value } : {}),
+    ...(maxLengthCheck ? { maxLength: maxLengthCheck.value } : {}),
+    ...(regexCheck ? { pattern: `/${regexCheck.regex.source}/${regexCheck.regex.flags}` } : {})
+  };
+};
+
+const describeNumber = (schema: z.ZodNumber): SchemaObject => {
+  const minCheck = schema._def.checks.find(
+    ({kind}) => kind === 'min'
+  ) as Extract<ArrayElement<z.ZodNumberDef['checks']>, {kind: 'min'}> | undefined;
+  const isMinInclusive = minCheck ? minCheck.inclusive : true;
+  const maxCheck = schema._def.checks.find(
+    ({kind}) => kind === 'max'
+  ) as Extract<ArrayElement<z.ZodNumberDef['checks']>, {kind: 'max'}> | undefined;
+  const isMaxInclusive = maxCheck ? maxCheck.inclusive : true;
+  return {
+    type: schema.isInt ? 'integer' as const : 'number' as const,
+    format: schema.isInt ? 'int64' as const : 'double' as const,
+    minimum: schema.minValue === null ?
+      (schema.isInt ? Number.MIN_SAFE_INTEGER : Number.MIN_VALUE) : schema.minValue,
+    exclusiveMinimum: !isMinInclusive,
+    maximum: schema.maxValue === null ?
+      (schema.isInt ? Number.MAX_SAFE_INTEGER : Number.MAX_VALUE) : schema.maxValue,
+    exclusiveMaximum: !isMaxInclusive
+  };
+};
+
+const describeObjectProperties = (schema: z.AnyZodObject, isResponse: boolean): Record<string, SchemaObject> => {
   return Object.keys(schema.shape).reduce((carry, key) => ({
     ...carry,
     [key]: describeSchema(schema.shape[key], isResponse)
