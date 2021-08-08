@@ -21,7 +21,12 @@ paths:
                     type: object
                     properties:
                       id:
-                        type: number
+                        type: integer
+                        format: int64
+                        minimum: 0
+                        exclusiveMinimum: false
+                        maximum: 9007199254740991
+                        exclusiveMaximum: false
                       name:
                         type: string
                     required:
@@ -58,6 +63,7 @@ paths:
           required: true
           schema:
             type: string
+            pattern: /\d+/
             description: GET /v1/getUser parameter
   /v1/setUser:
     post:
@@ -79,7 +85,12 @@ paths:
                       name:
                         type: string
                       timestamp:
-                        type: number
+                        type: integer
+                        format: int64
+                        minimum: 0
+                        exclusiveMinimum: false
+                        maximum: 9007199254740991
+                        exclusiveMaximum: false
                     required:
                       - name
                       - timestamp
@@ -116,10 +127,17 @@ paths:
               properties:
                 key:
                   type: string
+                  minLength: 1
                 id:
-                  type: number
+                  type: integer
+                  format: int64
+                  minimum: 0
+                  exclusiveMinimum: false
+                  maximum: 9007199254740991
+                  exclusiveMaximum: false
                 name:
                   type: string
+                  minLength: 1
               required:
                 - key
                 - id
@@ -146,6 +164,7 @@ paths:
           required: true
           schema:
             type: string
+            pattern: /\d+/
             description: GET /v1/avatar parameter
   /v1/stream:
     get:
@@ -169,6 +188,7 @@ paths:
           required: true
           schema:
             type: string
+            pattern: /\d+/
             description: GET /v1/stream parameter
 components:
   schemas: {}

@@ -29,6 +29,11 @@ paths:
                           - something
                       transformation:
                         type: number
+                        format: double
+                        minimum: 5e-324
+                        exclusiveMinimum: false
+                        maximum: 1.7976931348623157e+308
+                        exclusiveMaximum: false
                     required:
                       - literal
                       - transformation
@@ -63,7 +68,12 @@ paths:
           schema:
             type: array
             items:
-              type: number
+              type: integer
+              format: int64
+              minimum: 0
+              exclusiveMinimum: true
+              maximum: 9007199254740991
+              exclusiveMaximum: false
             description: GET /v1/getSomething parameter
         - name: transformer
           in: query
@@ -115,7 +125,12 @@ paths:
                           - type: object
                             properties:
                               five:
-                                type: number
+                                type: integer
+                                format: int64
+                                minimum: 0
+                                exclusiveMinimum: false
+                                maximum: 9007199254740991
+                                exclusiveMaximum: false
                             required:
                               - five
                           - type: object
@@ -290,7 +305,12 @@ paths:
                       or:
                         oneOf:
                           - type: string
-                          - type: number
+                          - type: integer
+                            format: int64
+                            minimum: 0
+                            exclusiveMinimum: true
+                            maximum: 9007199254740991
+                            exclusiveMaximum: false
                     required:
                       - or
                 required:
@@ -330,14 +350,24 @@ paths:
                         one:
                           type: string
                         two:
-                          type: number
+                          type: integer
+                          format: int64
+                          minimum: 0
+                          exclusiveMinimum: true
+                          maximum: 9007199254740991
+                          exclusiveMaximum: false
                       required:
                         - one
                         - two
                     - type: object
                       properties:
                         two:
-                          type: number
+                          type: integer
+                          format: int64
+                          minimum: -9007199254740991
+                          exclusiveMinimum: false
+                          maximum: 0
+                          exclusiveMaximum: true
                         three:
                           type: string
                       required:
@@ -386,7 +416,12 @@ paths:
                     type: object
                     properties:
                       id:
-                        type: number
+                        type: integer
+                        format: int64
+                        minimum: 0
+                        exclusiveMinimum: false
+                        maximum: 9007199254740991
+                        exclusiveMaximum: false
                       name:
                         type: string
                     required:
@@ -423,6 +458,7 @@ paths:
           required: true
           schema:
             type: string
+            pattern: /\\\\d+/
             description: GET /v1/getUser parameter
   /v1/setUser:
     post:
@@ -444,7 +480,12 @@ paths:
                       name:
                         type: string
                       timestamp:
-                        type: number
+                        type: integer
+                        format: int64
+                        minimum: 0
+                        exclusiveMinimum: false
+                        maximum: 9007199254740991
+                        exclusiveMaximum: false
                     required:
                       - name
                       - timestamp
@@ -481,10 +522,17 @@ paths:
               properties:
                 key:
                   type: string
+                  minLength: 1
                 id:
-                  type: number
+                  type: integer
+                  format: int64
+                  minimum: 0
+                  exclusiveMinimum: false
+                  maximum: 9007199254740991
+                  exclusiveMaximum: false
                 name:
                   type: string
+                  minLength: 1
               required:
                 - key
                 - id
@@ -511,6 +559,7 @@ paths:
           required: true
           schema:
             type: string
+            pattern: /\\\\d+/
             description: GET /v1/avatar parameter
   /v1/stream:
     get:
@@ -534,6 +583,7 @@ paths:
           required: true
           schema:
             type: string
+            pattern: /\\\\d+/
             description: GET /v1/stream parameter
 components:
   schemas: {}
@@ -612,7 +662,7 @@ paths:
               properties:
                 bigint:
                   type: integer
-                  format: int64
+                  format: bigint
                 boolean:
                   type: boolean
                 date:
@@ -622,6 +672,268 @@ paths:
                 - bigint
                 - boolean
                 - date
+              description: POST /v1/getSomething request body
+components:
+  schemas: {}
+  responses: {}
+  parameters: {}
+  examples: {}
+  requestBodies: {}
+  headers: {}
+  securitySchemes: {}
+  links: {}
+  callbacks: {}
+tags: []
+servers:
+  - url: http://example.com
+"
+`;
+
+exports[`Open API generator generateOpenApi() should handle different number types 1`] = `
+"openapi: 3.0.0
+info:
+  title: Testing numbers
+  version: 3.4.5
+paths:
+  /v1/getSomething:
+    post:
+      responses:
+        \\"200\\":
+          description: POST /v1/getSomething Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - success
+                  data:
+                    type: object
+                    properties:
+                      bigint:
+                        type: integer
+                        format: bigint
+                    required:
+                      - bigint
+                required:
+                  - status
+                  - data
+        \\"400\\":
+          description: POST /v1/getSomething Error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                required:
+                  - status
+                  - error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                double:
+                  type: number
+                  format: double
+                  minimum: 5e-324
+                  exclusiveMinimum: false
+                  maximum: 1.7976931348623157e+308
+                  exclusiveMaximum: false
+                doublePositive:
+                  type: number
+                  format: double
+                  minimum: 0
+                  exclusiveMinimum: true
+                  maximum: 1.7976931348623157e+308
+                  exclusiveMaximum: false
+                doubleNegative:
+                  type: number
+                  format: double
+                  minimum: 5e-324
+                  exclusiveMinimum: false
+                  maximum: 0
+                  exclusiveMaximum: true
+                doubleLimited:
+                  type: number
+                  format: double
+                  minimum: -0.5
+                  exclusiveMinimum: false
+                  maximum: 0.5
+                  exclusiveMaximum: false
+                int:
+                  type: integer
+                  format: int64
+                  minimum: -9007199254740991
+                  exclusiveMinimum: false
+                  maximum: 9007199254740991
+                  exclusiveMaximum: false
+                intPositive:
+                  type: integer
+                  format: int64
+                  minimum: 0
+                  exclusiveMinimum: true
+                  maximum: 9007199254740991
+                  exclusiveMaximum: false
+                intNegative:
+                  type: integer
+                  format: int64
+                  minimum: -9007199254740991
+                  exclusiveMinimum: false
+                  maximum: 0
+                  exclusiveMaximum: true
+                intLimited:
+                  type: integer
+                  format: int64
+                  minimum: -100
+                  exclusiveMinimum: false
+                  maximum: 100
+                  exclusiveMaximum: false
+                zero:
+                  type: integer
+                  format: int64
+                  minimum: 0
+                  exclusiveMinimum: false
+                  maximum: 0
+                  exclusiveMaximum: false
+              required:
+                - double
+                - doublePositive
+                - doubleNegative
+                - doubleLimited
+                - int
+                - intPositive
+                - intNegative
+                - intLimited
+              description: POST /v1/getSomething request body
+components:
+  schemas: {}
+  responses: {}
+  parameters: {}
+  examples: {}
+  requestBodies: {}
+  headers: {}
+  securitySchemes: {}
+  links: {}
+  callbacks: {}
+tags: []
+servers:
+  - url: http://example.com
+"
+`;
+
+exports[`Open API generator generateOpenApi() should handle different string types 1`] = `
+"openapi: 3.0.0
+info:
+  title: Testing strings
+  version: 3.4.5
+paths:
+  /v1/getSomething:
+    post:
+      responses:
+        \\"200\\":
+          description: POST /v1/getSomething Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - success
+                  data:
+                    type: object
+                    properties:
+                      nonempty:
+                        type: string
+                        minLength: 1
+                    required:
+                      - nonempty
+                required:
+                  - status
+                  - data
+        \\"400\\":
+          description: POST /v1/getSomething Error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                required:
+                  - status
+                  - error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                regular:
+                  type: string
+                min:
+                  type: string
+                  minLength: 1
+                max:
+                  type: string
+                  maxLength: 15
+                range:
+                  type: string
+                  minLength: 2
+                  maxLength: 3
+                email:
+                  type: string
+                  format: email
+                uuid:
+                  type: string
+                  format: uuid
+                url:
+                  type: string
+                  format: url
+                numeric:
+                  type: string
+                  pattern: /\\\\d+/
+                combined:
+                  type: string
+                  format: email
+                  minLength: 1
+                  maxLength: 90
+                  pattern: /.*@example\\\\.com/is
+              required:
+                - regular
+                - min
+                - max
+                - range
+                - email
+                - uuid
+                - url
+                - numeric
+                - combined
               description: POST /v1/getSomething request body
 components:
   schemas: {}
@@ -749,7 +1061,12 @@ paths:
                       record:
                         type: object
                         additionalProperties:
-                          type: number
+                          type: integer
+                          format: int64
+                          minimum: -9007199254740991
+                          exclusiveMinimum: false
+                          maximum: 9007199254740991
+                          exclusiveMaximum: false
                     required:
                       - record
                 required:
@@ -860,7 +1177,12 @@ paths:
                 one:
                   type: string
                 two:
-                  type: number
+                  type: integer
+                  format: int64
+                  minimum: 0
+                  exclusiveMinimum: true
+                  maximum: 9007199254740991
+                  exclusiveMaximum: false
               required:
                 - one
                 - two

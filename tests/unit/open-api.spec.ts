@@ -14,7 +14,7 @@ describe('Open API generator', () => {
     });
 
     test('should generate the correct schema for complex types', () => {
-      const literalValue = 'something';
+      const literalValue = 'something' as const;
       const spec = new OpenAPI({
         routing: {
           v1: {
@@ -29,7 +29,7 @@ describe('Open API generator', () => {
                 transformation: z.number(),
               }),
               handler: async ({input}) => ({
-                literal: literalValue as typeof literalValue,
+                literal: literalValue,
                 transformation: input.transformer,
               })
             })
@@ -85,7 +85,7 @@ describe('Open API generator', () => {
               }),
               output: z.object({
                 and: z.object({
-                  five: z.number(),
+                  five: z.number().int().gte(0),
                 }).and(z.object({
                   six: z.string()
                 })),
@@ -116,16 +116,16 @@ describe('Open API generator', () => {
                 union: z.union([
                   z.object({
                     one: z.string(),
-                    two: z.number()
+                    two: z.number().int().positive()
                   }),
                   z.object({
-                    two: z.number(),
+                    two: z.number().int().negative(),
                     three: z.string()
                   })
                 ]),
               }),
               output: z.object({
-                or: z.string().or(z.number()),
+                or: z.string().or(z.number().int().positive()),
               }),
               handler: async () => ({
                 or: 554
@@ -148,7 +148,7 @@ describe('Open API generator', () => {
               methods: ['post'],
               input: z.object({
                 one: z.string(),
-                two: z.number()
+                two: z.number().int().positive()
               }),
               output: z.object({
                 transform: z.string().transform((str) => str.length)
@@ -201,7 +201,7 @@ describe('Open API generator', () => {
               method: 'post',
               input: z.object({}),
               output: z.object({
-                record: z.record(z.number()),
+                record: z.record(z.number().int()),
               }),
               handler: jest.fn()
             })
@@ -232,6 +232,68 @@ describe('Open API generator', () => {
         },
         version: '3.4.5',
         title: 'Testing type any',
+        serverUrl: 'http://example.com'
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
+    });
+
+    test('should handle different number types', () => {
+      const spec = new OpenAPI({
+        routing: {
+          v1: {
+            getSomething: defaultEndpointsFactory.build({
+              method: 'post',
+              input: z.object({
+                double: z.number(),
+                doublePositive: z.number().positive(),
+                doubleNegative: z.number().negative(),
+                doubleLimited: z.number().min(-0.5).max(0.5),
+                int: z.number().int(),
+                intPositive: z.number().int().positive(),
+                intNegative: z.number().int().negative(),
+                intLimited: z.number().int().min(-100).max(100),
+                zero: z.number().int().nonnegative().nonpositive().optional(),
+              }),
+              output: z.object({
+                bigint: z.bigint()
+              }),
+              handler: jest.fn()
+            })
+          }
+        },
+        version: '3.4.5',
+        title: 'Testing numbers',
+        serverUrl: 'http://example.com'
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
+    });
+
+    test('should handle different string types', () => {
+      const spec = new OpenAPI({
+        routing: {
+          v1: {
+            getSomething: defaultEndpointsFactory.build({
+              method: 'post',
+              input: z.object({
+                regular: z.string(),
+                min: z.string().min(1),
+                max: z.string().max(15),
+                range: z.string().min(2).max(3),
+                email: z.string().email(),
+                uuid: z.string().uuid(),
+                url: z.string().url(),
+                numeric: z.string().regex(/\d+/),
+                combined: z.string().nonempty().email().regex(/.*@example\.com/si).max(90)
+              }),
+              output: z.object({
+                nonempty: z.string().nonempty()
+              }),
+              handler: jest.fn()
+            })
+          }
+        },
+        version: '3.4.5',
+        title: 'Testing strings',
         serverUrl: 'http://example.com'
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();

@@ -408,7 +408,7 @@ type MyEndpointResponse = EndpointResponse<MyEndpointType>; // unites positive a
 ## Swagger / OpenAPI Specification
 
 You can generate the specification of your API the following way and write it to a `.yaml` file, 
-that can be used as documentation:
+that can be used as the documentation:
 
 ```typescript
 import {OpenAPI} from 'express-zod-api';
@@ -420,6 +420,9 @@ const yamlString = new OpenAPI({
   serverUrl: 'http://example.com'
 }).getSpecAsYaml();
 ```
+
+*See the example of the generated documentation 
+[here](https://github.com/RobinTail/express-zod-api/blob/master/example/example.swagger.yaml)*
 
 # Known issues
 

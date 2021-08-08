@@ -7,10 +7,10 @@ export const getUserEndpoint = defaultEndpointsFactory
     method: 'get',
     description: 'example user retrieval endpoint',
     input: z.object({
-      id: z.string().transform((id) => parseInt(id, 10))
+      id: z.string().regex(/\d+/).transform((id) => parseInt(id, 10))
     }),
     output: z.object({
-      id: z.number(),
+      id: z.number().int().nonnegative(),
       name: z.string(),
     }),
     handler: async ({input: {id}, options: {method}, logger}) => {

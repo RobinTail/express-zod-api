@@ -5,7 +5,7 @@ import fs from 'fs';
 export const sendAvatar = fileDownloadEndpointsFactory.build({
   methods: ['get'],
   input: z.object({
-    userId: z.string().transform((str) => parseInt(str, 10))
+    userId: z.string().regex(/\d+/).transform((str) => parseInt(str, 10))
   }),
   output: z.object({
     data: z.string()

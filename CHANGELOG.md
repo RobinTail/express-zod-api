@@ -2,6 +2,45 @@
 
 ## Version 2
 
+### v2.2.0
+
+- Changes and improvements of the generated Swagger / OpenAPI documentation:
+```yaml
+ZodBigInt: # z.bigint()
+  before:
+    type: integer
+    format: int64
+  after:
+    type: integer
+    format: bigint
+ZodNumber: # z.number()
+  before:
+    type: number
+  after:
+    type: number | integer # when z.number().int()
+    format: double | int64 # when z.number().int()
+    # MIN_VALUE or MIN_SAFE_INTEGER of Number or z.number().min(value)
+    minimum: 5e-324 | -9007199254740991 | value
+    # MAX_VALUE or MAX_SAFE_INTEGER of Number or z.number().max(value)
+    maximum: 1.7976931348623157e+308 | 9007199254740991 | value
+    # Taking into account z.number().min(), .max(), .positive(), .nonnegative(), etc
+    exclusiveMinimum: true | false
+    exclusiveMaximum: true | false
+ZodString: # z.string()
+  before:
+    type: string
+  after:
+    type: string
+    minLength: value # optional, when z.string().min(value)
+    maxLength: value # optional, when z.string().max(value)
+    format: email | uuid | url # when z.string().email(), .uuid(), .url()
+    pattern: /your regular expression/ # when z.string().regex(value)
+```
+- Since `z.number().int()` is a 
+  [JS Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number) which is 
+  neither `int32` nor `int64` but rather `int53`, I made a decision to describe it as `int64` predefined `format` with
+  an indispensable minimum and maximum values.
+
 ### v2.1.1
 
 - Fixed issue [#92](https://github.com/RobinTail/express-zod-api/issues/92): The error 
