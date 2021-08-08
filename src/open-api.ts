@@ -43,23 +43,11 @@ const describeSchema = (value: z.ZodTypeAny, isResponse: boolean): SchemaObject 
         type: 'array',
         items: describeSchema((value._def as z.ZodArrayDef).type, isResponse)
       };
-    case value instanceof z.ZodTuple: { // @todo improve it when OpenAPI 3.1.0 will be released
-      const items = (value as z.ZodTuple).items;
-      const types = items.map((item) => describeSchema(item, isResponse));
+    case value instanceof z.ZodTuple:
       return {
         ...otherProps,
-        type: 'array',
-        minItems: items.length,
-        maxItems: items.length,
-        items: {
-          oneOf: types,
-          format: 'tuple',
-          ...(items.length === 0 ? {} : {
-            description: types.map((schema, index) => `${index}: ${schema.type}`).join(', ')
-          })
-        }
+        ...describeTuple(value as z.ZodTuple, isResponse)
       };
-    }
     case value instanceof z.ZodRecord:
       return {
         ...otherProps,
@@ -136,6 +124,23 @@ const describeSchema = (value: z.ZodTypeAny, isResponse: boolean): SchemaObject 
     default:
       throw new OpenAPIError(`Zod type ${value.constructor.name} is unsupported`);
   }
+};
+
+/** @todo improve it when OpenAPI 3.1.0 will be released */
+const describeTuple = (schema: z.ZodTuple, isResponse: boolean): SchemaObject => {
+  const types = schema.items.map((item) => describeSchema(item, isResponse));
+  return {
+    type: 'array',
+    minItems: types.length,
+    maxItems: types.length,
+    items: {
+      oneOf: types,
+      format: 'tuple',
+      ...(types.length === 0 ? {} : {
+        description: types.map((schema, index) => `${index}: ${schema.type}`).join(', ')
+      })
+    }
+  };
 };
 
 const describeString = (schema: z.ZodString): SchemaObject => {
