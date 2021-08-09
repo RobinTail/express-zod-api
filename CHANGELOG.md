@@ -2,6 +2,33 @@
 
 ## Version 2
 
+### v2.3.0
+
+- Changes and improvements of the generated Swagger / OpenAPI documentation:
+```yaml
+ZodArray: # z.array()
+  before:
+    type: array
+    items:
+      type: type # type of the array items 
+  after:
+    type: array
+    items:
+      type: type
+    minItems: value # optional, when z.array().min(value)
+    maxItems: value # optional, when z.array().max(value)
+ZodTuple: # z.tuple()
+  before:
+    error: unsupported
+  after:
+    type: array
+    items:
+      oneOf: [] # schemas of the tuple items
+    minItems: value # number of items in the tuple
+    maxItems: value # number of items in the tuple
+    description: '0: type, 1: type, ...'
+```
+
 ### v2.2.0
 
 - Changes and improvements of the generated Swagger / OpenAPI documentation:

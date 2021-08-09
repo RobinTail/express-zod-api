@@ -74,6 +74,16 @@ paths:
               exclusiveMinimum: true
               maximum: 9007199254740991
               exclusiveMaximum: false
+            minItems: 1
+            maxItems: 3
+            description: GET /v1/getSomething parameter
+        - name: unlimited
+          in: query
+          required: true
+          schema:
+            type: array
+            items:
+              type: boolean
             description: GET /v1/getSomething parameter
         - name: transformer
           in: query
@@ -1186,6 +1196,125 @@ paths:
               required:
                 - one
                 - two
+              description: POST /v1/getSomething request body
+components:
+  schemas: {}
+  responses: {}
+  parameters: {}
+  examples: {}
+  requestBodies: {}
+  headers: {}
+  securitySchemes: {}
+  links: {}
+  callbacks: {}
+tags: []
+servers:
+  - url: http://example.com
+"
+`;
+
+exports[`Open API generator generateOpenApi() should handle tuples 1`] = `
+"openapi: 3.0.0
+info:
+  title: Testing tuples
+  version: 3.4.5
+paths:
+  /v1/getSomething:
+    post:
+      responses:
+        \\"200\\":
+          description: POST /v1/getSomething Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - success
+                  data:
+                    type: object
+                    properties:
+                      empty:
+                        type: array
+                        minItems: 0
+                        maxItems: 0
+                        items:
+                          oneOf: []
+                          format: tuple
+                    required:
+                      - empty
+                required:
+                  - status
+                  - data
+        \\"400\\":
+          description: POST /v1/getSomething Error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                required:
+                  - status
+                  - error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ofOne:
+                  type: array
+                  minItems: 1
+                  maxItems: 1
+                  items:
+                    oneOf:
+                      - type: boolean
+                    format: tuple
+                    description: \\"0: boolean\\"
+                ofStrings:
+                  type: array
+                  minItems: 2
+                  maxItems: 2
+                  items:
+                    oneOf:
+                      - type: string
+                      - nullable: true
+                        type: string
+                    format: tuple
+                    description: \\"0: string, 1: string\\"
+                complex:
+                  type: array
+                  minItems: 3
+                  maxItems: 3
+                  items:
+                    oneOf:
+                      - type: boolean
+                      - type: string
+                      - type: integer
+                        format: int64
+                        minimum: 0
+                        exclusiveMinimum: true
+                        maximum: 9007199254740991
+                        exclusiveMaximum: false
+                    format: tuple
+                    description: \\"0: boolean, 1: string, 2: integer\\"
+              required:
+                - ofOne
+                - ofStrings
+                - complex
               description: POST /v1/getSomething request body
 components:
   schemas: {}
