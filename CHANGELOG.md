@@ -2,6 +2,28 @@
 
 ## Version 2
 
+### v2.3.0
+
+- Changes and improvements of the generated Swagger / OpenAPI documentation:
+```yaml
+ZodArray: # z.array()
+  before:
+    type: array
+  after:
+    type: array
+    minItems: value # optional, when z.array().min(value)
+    maxItems: value # options, when z.array().max(value)
+ZodTuple: # z.tuple()
+  before:
+    error: unsupported
+  after:
+    type: array
+    items:
+      oneOf: [] # schemas of the tuple items
+    minItems: value # number of items in the tuple
+    maxItems: value # number of items in the tuple
+```
+
 ### v2.2.0
 
 - Changes and improvements of the generated Swagger / OpenAPI documentation:
@@ -35,6 +57,12 @@ ZodString: # z.string()
     maxLength: value # optional, when z.string().max(value)
     format: email | uuid | url # when z.string().email(), .uuid(), .url()
     pattern: /your regular expression/ # when z.string().regex(value)
+ZodAny: # z.any()
+  before: 
+    error: unsupported
+  after:
+    format: any
+    nullable: true # optional, when z.any().nullable()
 ```
 - Since `z.number().int()` is a 
   [JS Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number) which is 
