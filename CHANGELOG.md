@@ -9,10 +9,14 @@
 ZodArray: # z.array()
   before:
     type: array
+    items:
+      type: type # type of the array items 
   after:
     type: array
+    items:
+      type: type
     minItems: value # optional, when z.array().min(value)
-    maxItems: value # options, when z.array().max(value)
+    maxItems: value # optional, when z.array().max(value)
 ZodTuple: # z.tuple()
   before:
     error: unsupported
@@ -22,6 +26,7 @@ ZodTuple: # z.tuple()
       oneOf: [] # schemas of the tuple items
     minItems: value # number of items in the tuple
     maxItems: value # number of items in the tuple
+    description: '0: type, 1: type, ...'
 ```
 
 ### v2.2.0
