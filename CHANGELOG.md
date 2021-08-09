@@ -62,12 +62,6 @@ ZodString: # z.string()
     maxLength: value # optional, when z.string().max(value)
     format: email | uuid | url # when z.string().email(), .uuid(), .url()
     pattern: /your regular expression/ # when z.string().regex(value)
-ZodAny: # z.any()
-  before: 
-    error: unsupported
-  after:
-    format: any
-    nullable: true # optional, when z.any().nullable()
 ```
 - Since `z.number().int()` is a 
   [JS Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number) which is 
