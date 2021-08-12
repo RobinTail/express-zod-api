@@ -18,7 +18,8 @@ const expressMock = jest.mock('express', () => {
 });
 
 import express from 'express'; // mocked above
-import {ConfigType, createServer, attachRouting, EndpointsFactory, z, defaultResultHandler} from '../../src';
+import {createServer, attachRouting, EndpointsFactory, z, defaultResultHandler} from '../../src';
+import {AppConfig, CommonConfig, ServerConfig} from '../../src/config-type';
 
 describe('Server', () => {
   beforeEach(() => {
@@ -35,7 +36,7 @@ describe('Server', () => {
 
   describe('createServer()', () => {
     test('Should create server with minimal config', () => {
-      const configMock: ConfigType = {
+      const configMock: ServerConfig & CommonConfig = {
         server: {
           listen: 8054,
         },
@@ -104,7 +105,7 @@ describe('Server', () => {
             })
         }
       };
-      const server = createServer(configMock as unknown as ConfigType & {server: any}, routingMock);
+      const server = createServer(configMock as unknown as ServerConfig & CommonConfig, routingMock);
       expect(server).toBeInstanceOf(http.Server);
       expect(appMock).toBeTruthy();
       expect(appMock.use).toBeCalledTimes(2);
@@ -157,7 +158,7 @@ describe('Server', () => {
         }
       };
       // noinspection JSVoidFunctionReturnValueUsed
-      const result = attachRouting(configMock as unknown as ConfigType & {app: any}, routingMock);
+      const result = attachRouting(configMock as unknown as AppConfig & CommonConfig, routingMock);
       expect(result).toBe(undefined);
       expect(appMock.use).toBeCalledTimes(0);
       expect(configMock.errorHandler.handler).toBeCalledTimes(0);

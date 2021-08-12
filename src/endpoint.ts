@@ -1,7 +1,7 @@
 import {Request, Response} from 'express';
 import {Logger} from 'winston';
 import {z} from 'zod';
-import {ConfigType} from './config-type';
+import {CommonConfig} from './config-type';
 import {
   ApiResponse,
   combineEndpointAndMiddlewareInputSchemas,
@@ -28,7 +28,7 @@ export abstract class AbstractEndpoint {
     request: Request,
     response: Response,
     logger: Logger,
-    config: ConfigType
+    config: CommonConfig
   }): Promise<void>;
 
   public getDescription() {
@@ -210,7 +210,7 @@ export class Endpoint<
     request: Request,
     response: Response,
     logger: Logger,
-    config: ConfigType
+    config: CommonConfig
   }) {
     let output: any;
     let error: Error | null = null;

@@ -1,6 +1,6 @@
 import {Express} from 'express';
 import {Logger} from 'winston';
-import {ConfigType} from './config-type';
+import {CommonConfig} from './config-type';
 import {AbstractEndpoint, Endpoint} from './endpoint';
 import {DependsOnMethodError, RoutingError} from './errors';
 import {AuxMethod, Method} from './method';
@@ -86,7 +86,7 @@ export const routingCycle = ({routing, cb, parentPath, cors}: RoutingCycleParams
 export const initRouting = ({app, logger, config, routing}: {
   app: Express,
   logger: Logger,
-  config: ConfigType,
+  config: CommonConfig,
   routing: Routing
 }) => {
   routingCycle({

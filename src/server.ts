@@ -1,21 +1,18 @@
 import express from 'express';
 import {Server} from 'http';
-import {ConfigType} from './config-type';
+import {AppConfig, CommonConfig, ServerConfig} from './config-type';
 import {isLoggerConfig} from './helpers';
 import {createLogger} from './logger';
 import {defaultResultHandler} from './result-handler';
 import {initRouting, Routing} from './routing';
 import createHttpError from 'http-errors';
 
-type ConfigWithServer = Exclude<ConfigType, {app: any}>;
-type ConfigWithApp = Exclude<ConfigType, {server: any}>;
-
-export function attachRouting(config: ConfigWithApp, routing: Routing): void {
+export function attachRouting(config: AppConfig & CommonConfig, routing: Routing): void {
   const logger = isLoggerConfig(config.logger) ? createLogger(config.logger) : config.logger;
   return initRouting({app: config.app, routing, logger, config});
 }
 
-export function createServer(config: ConfigWithServer, routing: Routing): Server {
+export function createServer(config: ServerConfig & CommonConfig, routing: Routing): Server {
   const logger = isLoggerConfig(config.logger) ? createLogger(config.logger) : config.logger;
   const app = express();
   const errorHandler = config.errorHandler || defaultResultHandler;

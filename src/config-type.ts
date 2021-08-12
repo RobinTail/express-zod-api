@@ -14,16 +14,20 @@ export interface LoggerConfig {
   color: boolean;
 }
 
-export type ConfigType = ({
-  server: { // server configuration
+export interface ServerConfig { // server configuration
+  server: {
     // port or socket
     listen: number | string;
     // custom JSON parser, default: express.json()
     jsonParser?: NextHandleFunction;
   },
-} | { // or your custom express app
+}
+
+export interface AppConfig { // or your custom express app
   app: Express
-}) & {
+}
+
+export interface CommonConfig {
   // enable cross-origin resource sharing
   // https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
   cors: boolean;
@@ -33,3 +37,11 @@ export type ConfigType = ({
   // logger configuration or your custom winston logger
   logger: LoggerConfig | Logger;
 }
+
+export const createConfig = <T extends (ServerConfig | AppConfig) & CommonConfig>(config: T): T => config;
+
+/**
+ * @deprecated
+ * @see createConfig()
+ * */
+export type ConfigType = (ServerConfig | AppConfig) & CommonConfig;
