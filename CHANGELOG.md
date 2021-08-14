@@ -5,7 +5,7 @@
 ### v2.3.1
 
 - Fixed a type mismatch issue when the configuration is declared in a separate file using the `ConfigType`.
-  - `ConfigType` is now deprecated.
+  - `ConfigType` is now deprecated *(will be removed in v3)*.
   - Please use helper function `createConfig()`.
   - This way it assigns the correct type for using configuration with `createServer()` and `attachRouting()`.
 ```typescript
