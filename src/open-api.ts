@@ -113,6 +113,10 @@ const describeSchema = (value: z.ZodTypeAny, isResponse: boolean): SchemaObject 
         format: 'any'
       };
     case value instanceof z.ZodUndefined:
+      return {
+        ...otherProps,
+        format: 'undefined',
+      };
     case value instanceof z.ZodMap:
     case value instanceof z.ZodFunction:
     case value instanceof z.ZodLazy:

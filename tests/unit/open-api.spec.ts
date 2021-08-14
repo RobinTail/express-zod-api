@@ -43,17 +43,21 @@ describe('Open API generator', () => {
       expect(spec).toMatchSnapshot();
     });
 
-    test('should generate the correct schema for nullable and optional types', () => {
+    test('should generate the correct schema for nullable, optional and undefined types', () => {
       const spec = new OpenAPI({
         routing: {
           v1: {
             getSomething: defaultEndpointsFactory.build({
               methods: ['get'],
               input: z.object({
+                nullable: z.string().nullable(),
                 optional: z.string().optional(),
+                undef: z.undefined(),
               }),
               output: z.object({
                 nullable: z.string().nullable(),
+                optional: z.string().optional(),
+                undef: z.undefined(),
               }),
               handler: async () => ({
                 nullable: null,
@@ -62,7 +66,7 @@ describe('Open API generator', () => {
           }
         },
         version: '3.4.5',
-        title: 'Testing Nullable and Optional Types',
+        title: 'Testing Nullable, Optional, Undefined Types',
         serverUrl: 'http://example.com'
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
@@ -352,7 +356,6 @@ describe('Open API generator', () => {
 
     test('should throw on unsupported types', () => {
       [
-        z.undefined(),
         z.map(z.any(), z.any()),
         z.function(),
         z.lazy(() => z.any()),

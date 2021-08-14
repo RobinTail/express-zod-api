@@ -214,10 +214,10 @@ servers:
 "
 `;
 
-exports[`Open API generator generateOpenApi() should generate the correct schema for nullable and optional types 1`] = `
+exports[`Open API generator generateOpenApi() should generate the correct schema for nullable, optional and undefined types 1`] = `
 "openapi: 3.0.0
 info:
-  title: Testing Nullable and Optional Types
+  title: Testing Nullable, Optional, Undefined Types
   version: 3.4.5
 paths:
   /v1/getSomething:
@@ -240,6 +240,10 @@ paths:
                       nullable:
                         nullable: true
                         type: string
+                      optional:
+                        type: string
+                      undef:
+                        format: undefined
                     required:
                       - nullable
                 required:
@@ -267,11 +271,24 @@ paths:
                   - status
                   - error
       parameters:
+        - name: nullable
+          in: query
+          required: true
+          schema:
+            nullable: true
+            type: string
+            description: GET /v1/getSomething parameter
         - name: optional
           in: query
           required: false
           schema:
             type: string
+            description: GET /v1/getSomething parameter
+        - name: undef
+          in: query
+          required: false
+          schema:
+            format: undefined
             description: GET /v1/getSomething parameter
 components:
   schemas: {}
