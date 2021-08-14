@@ -244,6 +244,14 @@ paths:
                         type: string
                       undef:
                         format: undefined
+                        not:
+                          anyOf:
+                            - type: string
+                            - type: integer
+                            - type: number
+                            - type: boolean
+                            - type: object
+                            - type: array
                     required:
                       - nullable
                 required:
@@ -289,6 +297,14 @@ paths:
           required: false
           schema:
             format: undefined
+            not:
+              anyOf:
+                - type: string
+                - type: integer
+                - type: number
+                - type: boolean
+                - type: object
+                - type: array
             description: GET /v1/getSomething parameter
 components:
   schemas: {}

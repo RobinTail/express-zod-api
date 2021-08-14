@@ -116,6 +116,16 @@ const describeSchema = (value: z.ZodTypeAny, isResponse: boolean): SchemaObject 
       return {
         ...otherProps,
         format: 'undefined',
+        not: {
+          anyOf: [
+            { type: 'string' },
+            { type: 'integer' },
+            { type: 'number' },
+            { type: 'boolean' },
+            { type: 'object' },
+            { type: 'array' }
+          ]
+        }
       };
     case value instanceof z.ZodMap:
     case value instanceof z.ZodFunction:
