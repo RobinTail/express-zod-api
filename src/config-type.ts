@@ -14,17 +14,15 @@ export interface LoggerConfig {
   color: boolean;
 }
 
-export interface ServerConfig { // server configuration
-  server: {
-    // port or socket
-    listen: number | string;
-    // custom JSON parser, default: express.json()
-    jsonParser?: NextHandleFunction;
+export interface ServerConfig {
+  server: { // server configuration
+    listen: number | string; // port or socket
+    jsonParser?: NextHandleFunction; // custom JSON parser, default: express.json()
   },
 }
 
-export interface AppConfig { // or your custom express app
-  app: Express
+export interface AppConfig {
+  app: Express // or your custom express app
 }
 
 export interface CommonConfig {
