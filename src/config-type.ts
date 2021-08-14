@@ -22,7 +22,7 @@ export interface ServerConfig {
 }
 
 export interface AppConfig {
-  app: Express // or your custom express app
+  app: Express; // or your custom express app
 }
 
 export interface CommonConfig {
