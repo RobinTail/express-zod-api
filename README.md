@@ -94,9 +94,9 @@ See the [full implementation example here](https://github.com/RobinTail/express-
 ## Set up config
 
 ```typescript
-import {ConfigType} from 'express-zod-api';
+import {createConfig} from 'express-zod-api';
 
-const config: ConfigType = {
+const config = createConfig({
   server: {
     listen: 8090,
   },
@@ -105,7 +105,7 @@ const config: ConfigType = {
     level: 'debug',
     color: true
   }
-};
+});
 ```
 *See all available options [here](https://github.com/RobinTail/express-zod-api/blob/master/src/config-type.ts).*
 
@@ -338,12 +338,12 @@ You can specify your custom Winston logger in config:
 
 ```typescript
 import * as winston from 'winston';
-import {ConfigType, createServer} from 'express-zod-api';
+import {createConfig, createServer} from 'express-zod-api';
 
-const config: ConfigType = {
+const config = createConfig({
   logger: winston.createLogger(),
   ...
-};
+});
 createServer(config, routing);
 ```
 
@@ -353,10 +353,10 @@ You can instantiate your own express app and connect your endpoints the followin
 
 ```typescript
 import * as express from 'express';
-import {ConfigType, attachRouting} from 'express-zod-api';
+import {createConfig, attachRouting} from 'express-zod-api';
 
 const app = express();
-const config: ConfigType = {app, ...};
+const config = createConfig({app, ...});
 const routing = {...};
 
 attachRouting(config, routing);
