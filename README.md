@@ -274,19 +274,24 @@ In order to customize the result handler you need to use `createResultHandler()`
 Here is an example you can use as a template:
 
 ```typescript
-import {createResultHandler, IOSchema, createApiResponse, markOutput, z} from 'express-zod-api';
+import {
+  createResultHandler, createApiResponse,
+  IOSchema, markOutput, z
+} from 'express-zod-api';
 
 const myResultHandler = createResultHandler({
-  getPositiveResponse: <OUT extends IOSchema>(output: OUT) => createApiResponse(
-    z.object({
-      ...,
-      someProperty: markOutput(output)
-    }), 
-    ['mime/type1', 'mime/type2'] // optional, default: application/json
+  getPositiveResponse: <OUT extends IOSchema>(output: OUT) => 
+    createApiResponse(
+      z.object({
+        ...,
+        someProperty: markOutput(output)
+      }),
+      // optional, default: application/json
+      ['mime/type1', 'mime/type2']
+    ),
+  getNegativeResponse: () => createApiResponse(
+    z.object({ error: z.string() })
   ),
-  getNegativeResponse: () => createApiResponse(z.object({
-     error: z.string()
-  })),
   handler: ({error, input, output, request, response, logger}) => {
     // your implementation
   }
@@ -314,22 +319,28 @@ The response schema generally may be just `z.string()`, but there is also a spec
 [generated documentation](#swagger--openapi-specification).
 
 ```typescript
-const fileStreamingEndpointsFactory = new EndpointsFactory(createResultHandler({
-  getPositiveResponse: () => createApiResponse(z.file().binary(), 'image/*'),
-  getNegativeResponse: () => createApiResponse(z.string(), 'text/plain'),
-  handler: ({response, error, output}) => {
-    if (error) {
-      response.status(400).send(error.message);
-      return;
+const fileStreamingEndpointsFactory = new EndpointsFactory(
+  createResultHandler({
+    getPositiveResponse: () => createApiResponse(
+      z.file().binary(), 'image/*'
+    ),
+    getNegativeResponse: () => createApiResponse(
+      z.string(), 'text/plain'
+    ),
+    handler: ({response, error, output}) => {
+      if (error) {
+        response.status(400).send(error.message);
+        return;
+      }
+      if ('filename' in output) {
+        fs.createReadStream(output.filename)
+          .pipe(response.type(output.filename));
+      } else {
+        response.status(400).send('Filename is missing');
+      }
     }
-    if ('filename' in output) {
-      fs.createReadStream(output.filename)
-        .pipe(response.type(output.filename));
-    } else {
-      response.status(400).send('Filename is missing');
-    }
-  }
-}));
+  })
+);
 ```
 
 ## Your custom logger
@@ -402,7 +413,8 @@ import {EndpointInput, EndpointResponse} from 'express-zod-api';
 import {MyEndpointType} from '../your/backend';
 
 type MyEndpointInput = EndpointInput<MyEndpointType>;
-type MyEndpointResponse = EndpointResponse<MyEndpointType>; // unites positive and negative schemas
+// unites the positive and the negative response schemas:
+type MyEndpointResponse = EndpointResponse<MyEndpointType>;
 ```
 
 ## Swagger / OpenAPI Specification
