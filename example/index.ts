@@ -1,8 +1,7 @@
-import {ConfigType} from '../src';
-import {createServer} from '../src';
+import {createConfig, createServer} from '../src';
 import {routing} from './routing';
 
-const config: ConfigType = {
+const config = createConfig({
   server: {
     listen: 8090,
   },
@@ -11,6 +10,6 @@ const config: ConfigType = {
     level: 'debug',
     color: true
   }
-};
+});
 
 createServer(config, routing);

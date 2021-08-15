@@ -1,6 +1,7 @@
 import {Express, RequestHandler, Request, Response} from 'express';
 import {Logger} from 'winston';
-import {EndpointsFactory, z, Routing, ConfigType, DependsOnMethod, defaultResultHandler} from '../../src';
+import {EndpointsFactory, z, Routing, DependsOnMethod, defaultResultHandler} from '../../src';
+import {CommonConfig} from '../../src/config-type';
 import {initRouting} from '../../src/routing';
 
 let appMock: any;
@@ -62,7 +63,7 @@ describe('Routing', () => {
       initRouting({
         app: appMock as Express,
         logger: loggerMock as Logger,
-        config: configMock as ConfigType,
+        config: configMock as CommonConfig,
         routing: routing
       });
       expect(appMock.get).toBeCalledTimes(2);
@@ -117,7 +118,7 @@ describe('Routing', () => {
       initRouting({
         app: appMock as Express,
         logger: loggerMock as Logger,
-        config: configMock as ConfigType,
+        config: configMock as CommonConfig,
         routing: routing
       });
       expect(appMock.get).toBeCalledTimes(1);
@@ -153,7 +154,7 @@ describe('Routing', () => {
       initRouting({
         app: appMock as Express,
         logger: loggerMock as Logger,
-        config: configMock as ConfigType,
+        config: configMock as CommonConfig,
         routing: routing
       });
       expect(appMock.get).toBeCalledTimes(1);
@@ -183,7 +184,7 @@ describe('Routing', () => {
       initRouting({
         app: appMock as Express,
         logger: loggerMock as Logger,
-        config: configMock as ConfigType,
+        config: configMock as CommonConfig,
         routing: routing
       });
       expect(appMock.get).toBeCalledTimes(2);
@@ -204,7 +205,7 @@ describe('Routing', () => {
       expect(() => initRouting({
         app: appMock as Express,
         logger: loggerMock as Logger,
-        config: configMock as ConfigType,
+        config: configMock as CommonConfig,
         routing: {
           v1: {
             'user/retrieve': endpointMock
@@ -214,7 +215,7 @@ describe('Routing', () => {
       expect(() => initRouting({
         app: appMock as Express,
         logger: loggerMock as Logger,
-        config: configMock as ConfigType,
+        config: configMock as CommonConfig,
         routing: {
           'v1/user/retrieve': endpointMock
         }
@@ -245,7 +246,7 @@ describe('Routing', () => {
       initRouting({
         app: appMock as Express,
         logger: loggerMock as Logger,
-        config: configMock as ConfigType,
+        config: configMock as CommonConfig,
         routing: routing
       });
       expect(appMock.post).toBeCalledTimes(1);

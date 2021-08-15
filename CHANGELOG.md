@@ -2,6 +2,37 @@
 
 ## Version 2
 
+### v2.3.1
+
+- Fixed a type mismatch issue when the configuration is declared in a separate file using the `ConfigType`.
+  - `ConfigType` is now deprecated *(will be removed in v3)*.
+  - Please use helper function `createConfig()`.
+  - This way it assigns the correct type for using configuration with `createServer()` and `attachRouting()`.
+```typescript
+// before
+const configBefore: ConfigType = {
+  server: {
+    listen: 8090,
+  },
+  cors: true,
+  logger: {
+    level: 'debug',
+    color: true
+  }
+};
+// after
+export const configAfter = createConfig({
+  server: {
+    listen: 8090,
+  },
+  cors: true,
+  logger: {
+    level: 'debug',
+    color: true
+  },
+});
+```
+
 ### v2.3.0
 
 - Changes and improvements of the generated Swagger / OpenAPI documentation:

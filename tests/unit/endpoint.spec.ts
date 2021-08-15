@@ -2,13 +2,13 @@ import {expectType} from 'tsd';
 import {
   z,
   EndpointsFactory,
-  ConfigType,
   createMiddleware,
   defaultResultHandler,
   EndpointInput,
   EndpointOutput,
   EndpointResponse
 } from '../../src';
+import {CommonConfig} from '../../src/config-type';
 import {Endpoint} from '../../src/endpoint';
 import {Request, Response} from 'express';
 
@@ -100,14 +100,12 @@ describe('Endpoint', () => {
         json: jest.fn().mockImplementation(() => responseMock)
       };
       const configMock = {
-        server: {
-          cors: true
-        }
+        cors: true
       };
       await endpoint.execute({
         request: requestMock as Request,
         response: responseMock as any as Response,
-        config: configMock as unknown as ConfigType,
+        config: configMock as CommonConfig,
         logger: loggerMock
       });
       expect(middlewareMock).toBeCalledTimes(1);

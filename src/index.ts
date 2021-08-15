@@ -1,4 +1,4 @@
-export { ConfigType, LoggerConfig } from './config-type';
+export { createConfig, LoggerConfig, ConfigType } from './config-type';
 export { AbstractEndpoint, EndpointInput, EndpointOutput, EndpointResponse } from './endpoint';
 export { Method } from './method';
 export { EndpointsFactory, defaultEndpointsFactory } from './endpoints-factory';
