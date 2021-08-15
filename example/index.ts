@@ -1,7 +1,7 @@
 import {createConfig, createServer} from '../src';
 import {routing} from './routing';
 
-export const config = createConfig({
+const config = createConfig({
   server: {
     listen: 8090,
   },
@@ -9,7 +9,7 @@ export const config = createConfig({
   logger: {
     level: 'debug',
     color: true
-  },
+  }
 });
 
 createServer(config, routing);
