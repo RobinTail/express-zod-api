@@ -1,7 +1,6 @@
 import {Request, Response} from 'express';
 import {Logger} from 'winston';
 import {z} from 'zod';
-import {ZodParsedType} from 'zod/lib/helpers/parseUtil';
 import {
   ApiResponse,
   createApiResponse,
@@ -68,7 +67,9 @@ export const defaultResultHandler = createResultHandler({
       status: 'error' as const,
       error: {
         message: getMessageFromError(error),
-        ...(error instanceof z.ZodError ? { fields: error.flatten().fieldErrors } : null)
+        ...(error instanceof z.ZodError
+          ? { fields: error.flatten().fieldErrors }
+          : null)
       }
     });
   }
