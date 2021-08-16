@@ -1,0 +1,92 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`App Protocol Should fail on invalid method 1`] = `
+Object {
+  "error": Object {
+    "message": "Can not PUT /v1/test",
+  },
+  "status": "error",
+}
+`;
+
+exports[`App Protocol Should fail on malformed body 1`] = `
+Object {
+  "error": Object {
+    "message": "Unexpected end of JSON input",
+  },
+  "status": "error",
+}
+`;
+
+exports[`App Protocol Should fail when missing content type header 1`] = `
+Object {
+  "error": Object {
+    "fields": Object {
+      "key": Array [
+        "Required",
+      ],
+    },
+    "message": "key: Required",
+  },
+  "status": "error",
+}
+`;
+
+exports[`App Validation Should fail on handler input type mismatch 1`] = `
+Object {
+  "error": Object {
+    "fields": Object {
+      "something": Array [
+        "Expected string, received number",
+      ],
+    },
+    "message": "something: Expected string, received number",
+  },
+  "status": "error",
+}
+`;
+
+exports[`App Validation Should fail on handler output type mismatch 1`] = `
+Object {
+  "error": Object {
+    "fields": Object {
+      "anything": Array [
+        "Value should be greater than 0",
+      ],
+      "output": Array [
+        "Invalid format",
+      ],
+    },
+    "message": "output: Invalid format; anything: Value should be greater than 0",
+  },
+  "status": "error",
+}
+`;
+
+exports[`App Validation Should fail on middleware input type mismatch 1`] = `
+Object {
+  "error": Object {
+    "fields": Object {
+      "key": Array [
+        "Expected string, received number",
+      ],
+    },
+    "message": "key: Expected string, received number",
+  },
+  "status": "error",
+}
+`;
+
+exports[`App Validation Should fail on middleware refinement mismatch 1`] = `
+Object {
+  "error": Object {
+    "fields": Object {
+      "key": Array [
+        "Invalid key",
+      ],
+    },
+    "message": "key: Invalid key",
+  },
+  "status": "error",
+}
+`;

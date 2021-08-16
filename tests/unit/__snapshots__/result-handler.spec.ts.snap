@@ -1,0 +1,17 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ResultHandler defaultResultHandler Should handle schema error 1`] = `
+Array [
+  Object {
+    "error": Object {
+      "fields": Object {
+        "something": Array [
+          "Expected string, got number",
+        ],
+      },
+      "message": "something: Expected string, got number",
+    },
+    "status": "error",
+  },
+]
+`;

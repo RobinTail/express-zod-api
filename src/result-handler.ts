@@ -41,8 +41,7 @@ export const defaultResultHandler = createResultHandler({
     status: z.literal('error'),
     error: z.object({
       message: z.string(),
-      formErrors: z.array(z.string()).optional(),
-      fieldErrors: z.record(z.array(
+      fields: z.record(z.array(
         z.string()
       )).optional(),
     })
@@ -69,7 +68,7 @@ export const defaultResultHandler = createResultHandler({
       status: 'error' as const,
       error: {
         message: getMessageFromError(error),
-        ...(error instanceof z.ZodError ? error.flatten() : null)
+        ...(error instanceof z.ZodError ? { fields: error.flatten().fieldErrors } : null)
       }
     });
   }

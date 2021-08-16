@@ -56,11 +56,7 @@ paths:
                     properties:
                       message:
                         type: string
-                      formErrors:
-                        type: array
-                        items:
-                          type: string
-                      fieldErrors:
+                      fields:
                         type: object
                         additionalProperties:
                           type: array
@@ -180,11 +176,7 @@ paths:
                     properties:
                       message:
                         type: string
-                      formErrors:
-                        type: array
-                        items:
-                          type: string
-                      fieldErrors:
+                      fields:
                         type: object
                         additionalProperties:
                           type: array
@@ -281,11 +273,7 @@ paths:
                     properties:
                       message:
                         type: string
-                      formErrors:
-                        type: array
-                        items:
-                          type: string
-                      fieldErrors:
+                      fields:
                         type: object
                         additionalProperties:
                           type: array
@@ -372,11 +360,7 @@ paths:
                     properties:
                       message:
                         type: string
-                      formErrors:
-                        type: array
-                        items:
-                          type: string
-                      fieldErrors:
+                      fields:
                         type: object
                         additionalProperties:
                           type: array
@@ -496,11 +480,7 @@ paths:
                     properties:
                       message:
                         type: string
-                      formErrors:
-                        type: array
-                        items:
-                          type: string
-                      fieldErrors:
+                      fields:
                         type: object
                         additionalProperties:
                           type: array
@@ -568,11 +548,7 @@ paths:
                     properties:
                       message:
                         type: string
-                      formErrors:
-                        type: array
-                        items:
-                          type: string
-                      fieldErrors:
+                      fields:
                         type: object
                         additionalProperties:
                           type: array
@@ -719,11 +695,7 @@ paths:
                     properties:
                       message:
                         type: string
-                      formErrors:
-                        type: array
-                        items:
-                          type: string
-                      fieldErrors:
+                      fields:
                         type: object
                         additionalProperties:
                           type: array
@@ -816,11 +788,7 @@ paths:
                     properties:
                       message:
                         type: string
-                      formErrors:
-                        type: array
-                        items:
-                          type: string
-                      fieldErrors:
+                      fields:
                         type: object
                         additionalProperties:
                           type: array
@@ -973,11 +941,7 @@ paths:
                     properties:
                       message:
                         type: string
-                      formErrors:
-                        type: array
-                        items:
-                          type: string
-                      fieldErrors:
+                      fields:
                         type: object
                         additionalProperties:
                           type: array
@@ -1100,11 +1064,7 @@ paths:
                     properties:
                       message:
                         type: string
-                      formErrors:
-                        type: array
-                        items:
-                          type: string
-                      fieldErrors:
+                      fields:
                         type: object
                         additionalProperties:
                           type: array
@@ -1198,11 +1158,7 @@ paths:
                     properties:
                       message:
                         type: string
-                      formErrors:
-                        type: array
-                        items:
-                          type: string
-                      fieldErrors:
+                      fields:
                         type: object
                         additionalProperties:
                           type: array
@@ -1283,11 +1239,7 @@ paths:
                     properties:
                       message:
                         type: string
-                      formErrors:
-                        type: array
-                        items:
-                          type: string
-                      fieldErrors:
+                      fields:
                         type: object
                         additionalProperties:
                           type: array
@@ -1384,11 +1336,7 @@ paths:
                     properties:
                       message:
                         type: string
-                      formErrors:
-                        type: array
-                        items:
-                          type: string
-                      fieldErrors:
+                      fields:
                         type: object
                         additionalProperties:
                           type: array
@@ -1508,11 +1456,7 @@ paths:
                     properties:
                       message:
                         type: string
-                      formErrors:
-                        type: array
-                        items:
-                          type: string
-                      fieldErrors:
+                      fields:
                         type: object
                         additionalProperties:
                           type: array

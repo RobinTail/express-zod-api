@@ -1,5 +1,33 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`Example Negative GET request should fail on missing input param 1`] = `
+Object {
+  "error": Object {
+    "fields": Object {
+      "id": Array [
+        "Required",
+      ],
+    },
+    "message": "id: Required",
+  },
+  "status": "error",
+}
+`;
+
+exports[`Example Negative POST request should fail on schema validation 1`] = `
+Object {
+  "error": Object {
+    "fields": Object {
+      "id": Array [
+        "Value should be greater than or equal to 0",
+      ],
+    },
+    "message": "id: Value should be greater than or equal to 0",
+  },
+  "status": "error",
+}
+`;
+
 exports[`Example Positive Should send an image with a correct header 1`] = `
 "<?xml version=\\"1.0\\" encoding=\\"UTF-8\\"?>
 <svg width=\\"345px\\" height=\\"230px\\" viewBox=\\"0 0 345 230\\" version=\\"1.1\\" xmlns=\\"http://www.w3.org/2000/svg\\" xmlns:xlink=\\"http://www.w3.org/1999/xlink\\" xmlns:sketch=\\"http://www.bohemiancoding.com/sketch/ns\\">

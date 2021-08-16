@@ -114,16 +114,7 @@ describe('Example', () => {
       const response = await fetch('http://localhost:8090/v1/getUser?test=123');
       expect(response.status).toBe(400);
       const json = await response.json();
-      expect(json).toEqual({
-        status: 'error',
-        error: {
-          message: 'id: Required',
-          fieldErrors:  {
-            id: [ 'Required' ],
-          },
-          formErrors: []
-        }
-      });
+      expect(json).toMatchSnapshot();
     });
 
     test('GET request should fail on specific value in handler implementation', async () => {
@@ -201,16 +192,7 @@ describe('Example', () => {
       });
       expect(response.status).toBe(400);
       const json = await response.json();
-      expect(json).toEqual({
-        status: 'error',
-        error: {
-          message: 'id: Value should be greater than or equal to 0',
-          fieldErrors: {
-            id: [ 'Value should be greater than or equal to 0' ],
-          },
-          formErrors: [],
-        }
-      });
+      expect(json).toMatchSnapshot();
     });
 
     test('POST request should fail on specific value in handler implementation', async () => {

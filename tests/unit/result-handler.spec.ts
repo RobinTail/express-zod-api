@@ -69,16 +69,7 @@ describe('ResultHandler', () => {
       });
       expect(loggerMock.error).toBeCalledTimes(0);
       expect(responseMock.status).toBeCalledWith(400);
-      expect(responseMock.json).toBeCalledWith({
-        status: 'error',
-        error: {
-          message: 'something: Expected string, got number',
-          fieldErrors: {
-            something: [ 'Expected string, got number' ],
-          },
-          formErrors: [],
-        }
-      });
+      expect(responseMock.json.mock.calls[0]).toMatchSnapshot();
     });
 
     test('Should handle HTTP error', () => {
