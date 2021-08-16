@@ -41,9 +41,9 @@ export const defaultResultHandler = createResultHandler({
     status: z.literal('error'),
     error: z.object({
       message: z.string(),
-      fields: z.record(z.array(
-        z.string()
-      )).optional(),
+      fields: z.record(
+        z.array(z.string())
+      ).optional(),
     })
   })),
   handler: ({error, input, output, request, response, logger}) => {
