@@ -51,6 +51,16 @@ paths:
                     properties:
                       message:
                         type: string
+                      formErrors:
+                        type: array
+                        items:
+                          type: string
+                      fieldErrors:
+                        type: object
+                        additionalProperties:
+                          type: array
+                          items:
+                            type: string
                     required:
                       - message
                 required:
@@ -113,6 +123,16 @@ paths:
                     properties:
                       message:
                         type: string
+                      formErrors:
+                        type: array
+                        items:
+                          type: string
+                      fieldErrors:
+                        type: object
+                        additionalProperties:
+                          type: array
+                          items:
+                            type: string
                     required:
                       - message
                 required:

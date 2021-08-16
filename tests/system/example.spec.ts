@@ -117,7 +117,11 @@ describe('Example', () => {
       expect(json).toEqual({
         status: 'error',
         error: {
-          message: 'id: Required'
+          message: 'id: Required',
+          fieldErrors:  {
+            id: [ 'Required' ],
+          },
+          formErrors: []
         }
       });
     });
@@ -200,7 +204,11 @@ describe('Example', () => {
       expect(json).toEqual({
         status: 'error',
         error: {
-          message: 'id: Value should be greater than or equal to 0'
+          message: 'id: Value should be greater than or equal to 0',
+          fieldErrors: {
+            id: [ 'Value should be greater than or equal to 0' ],
+          },
+          formErrors: [],
         }
       });
     });

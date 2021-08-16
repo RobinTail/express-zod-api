@@ -163,7 +163,11 @@ describe('App', () => {
       expect(json).toEqual({
         status: 'error',
         error: {
-          message: 'key: Required'
+          message: 'key: Required',
+          fieldErrors: {
+            key: [ 'Required' ],
+          },
+          formErrors: [],
         }
       });
     });
@@ -186,7 +190,11 @@ describe('App', () => {
       expect(json).toEqual({
         status: 'error',
         error: {
-          message: 'key: Expected string, received number'
+          message: 'key: Expected string, received number',
+          fieldErrors:  {
+            key: [ 'Expected string, received number' ],
+          },
+          formErrors:  [],
         }
       });
     });
@@ -207,7 +215,11 @@ describe('App', () => {
       expect(json).toEqual({
         status: 'error',
         error: {
-          message: 'key: Invalid key'
+          message: 'key: Invalid key',
+          fieldErrors: {
+            key: [ 'Invalid key' ],
+          },
+          formErrors: [],
         }
       });
     });
@@ -228,7 +240,11 @@ describe('App', () => {
       expect(json).toEqual({
         status: 'error',
         error: {
-          message: 'something: Expected string, received number'
+          message: 'something: Expected string, received number',
+          fieldErrors: {
+            something: [ 'Expected string, received number' ],
+          },
+          formErrors: [],
         }
       });
     });
@@ -249,7 +265,12 @@ describe('App', () => {
       expect(json).toEqual({
         status: 'error',
         error: {
-          message: 'output: Invalid format; anything: Value should be greater than 0'
+          message: 'output: Invalid format; anything: Value should be greater than 0',
+          fieldErrors: {
+            anything: [ 'Value should be greater than 0' ],
+            output: [ 'Invalid format' ],
+          },
+          formErrors: [],
         }
       });
     });

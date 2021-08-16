@@ -72,7 +72,11 @@ describe('ResultHandler', () => {
       expect(responseMock.json).toBeCalledWith({
         status: 'error',
         error: {
-          message: 'something: Expected string, got number'
+          message: 'something: Expected string, got number',
+          fieldErrors: {
+            something: [ 'Expected string, got number' ],
+          },
+          formErrors: [],
         }
       });
     });
