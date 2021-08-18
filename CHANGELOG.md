@@ -2,6 +2,11 @@
 
 ## Version 2
 
+### v2.3.2
+
+- Zod version is 3.7.2.
+- I've also updated it to `^3.7.2` in the `package.json` file in case of package manager issues.
+
 ### v2.3.1
 
 - Fixed a type mismatch issue when the configuration is declared in a separate file using the `ConfigType`.
