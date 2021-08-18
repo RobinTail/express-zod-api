@@ -384,6 +384,34 @@ describe('Open API generator', () => {
   });
 
   describe('Issue #98', () => {
+    test('Should describe non-empty array', () => {
+      // There is no such class as ZodNonEmptyArray in Zod v3.7.0+
+      // It existed though in Zod v3.6.x:
+      // @see https://github.com/colinhacks/zod/blob/v3.6.1/src/types.ts#L1204
+      const spec = new OpenAPI({
+        routing: {
+          v1: {
+            getSomething: defaultEndpointsFactory.build({
+              methods: ['get', 'post'],
+              input: z.object({
+                arr: z.array(z.string()).nonempty(),
+              }),
+              output: z.object({
+                arr: z.array(z.string()).nonempty()
+              }),
+              handler: async ({input}) => ({
+                arr: input.arr
+              })
+            })
+          }
+        },
+        version: '3.4.5',
+        title: 'Testing issue #98',
+        serverUrl: 'http://example.com'
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
+    });
+
     test('should union schemas', () => {
       const baseSchema = z.object({ id: z.string() });
       const subType1 = baseSchema.extend({ field1: z.string() });
