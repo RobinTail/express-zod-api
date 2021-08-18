@@ -1,5 +1,240 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`Open API generator Issue #98 Should describe non-empty array 1`] = `
+"openapi: 3.0.0
+info:
+  title: \\"Testing issue #98\\"
+  version: 3.4.5
+paths:
+  /v1/getSomething:
+    get:
+      responses:
+        \\"200\\":
+          description: GET /v1/getSomething Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - success
+                  data:
+                    type: object
+                    properties:
+                      arr:
+                        type: array
+                        items:
+                          type: string
+                        minItems: 1
+                    required:
+                      - arr
+                required:
+                  - status
+                  - data
+        \\"400\\":
+          description: GET /v1/getSomething Error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                required:
+                  - status
+                  - error
+      parameters:
+        - name: arr
+          in: query
+          required: true
+          schema:
+            type: array
+            items:
+              type: string
+            minItems: 1
+            description: GET /v1/getSomething parameter
+    post:
+      responses:
+        \\"200\\":
+          description: POST /v1/getSomething Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - success
+                  data:
+                    type: object
+                    properties:
+                      arr:
+                        type: array
+                        items:
+                          type: string
+                        minItems: 1
+                    required:
+                      - arr
+                required:
+                  - status
+                  - data
+        \\"400\\":
+          description: POST /v1/getSomething Error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                required:
+                  - status
+                  - error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                arr:
+                  type: array
+                  items:
+                    type: string
+                  minItems: 1
+              required:
+                - arr
+              description: POST /v1/getSomething request body
+components:
+  schemas: {}
+  responses: {}
+  parameters: {}
+  examples: {}
+  requestBodies: {}
+  headers: {}
+  securitySchemes: {}
+  links: {}
+  callbacks: {}
+tags: []
+servers:
+  - url: http://example.com
+"
+`;
+
+exports[`Open API generator Issue #98 should union schemas 1`] = `
+"openapi: 3.0.0
+info:
+  title: \\"Testing issue #98\\"
+  version: 3.4.5
+paths:
+  /v1/getSomething:
+    post:
+      responses:
+        \\"200\\":
+          description: POST /v1/getSomething Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - success
+                  data:
+                    oneOf:
+                      - type: object
+                        properties:
+                          id:
+                            type: string
+                          field1:
+                            type: string
+                        required:
+                          - id
+                          - field1
+                      - type: object
+                        properties:
+                          id:
+                            type: string
+                          field2:
+                            type: string
+                        required:
+                          - id
+                          - field2
+                required:
+                  - status
+                  - data
+        \\"400\\":
+          description: POST /v1/getSomething Error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                required:
+                  - status
+                  - error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                field1:
+                  type: string
+                field2:
+                  type: string
+              required: []
+              description: POST /v1/getSomething request body
+components:
+  schemas: {}
+  responses: {}
+  parameters: {}
+  examples: {}
+  requestBodies: {}
+  headers: {}
+  securitySchemes: {}
+  links: {}
+  callbacks: {}
+tags: []
+servers:
+  - url: http://example.com
+"
+`;
+
 exports[`Open API generator generateOpenApi() should generate the correct schema for complex types 1`] = `
 "openapi: 3.0.0
 info:

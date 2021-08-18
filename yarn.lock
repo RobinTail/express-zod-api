@@ -5359,7 +5359,7 @@ yn@3.1.1:
   resolved "https://registry.yarnpkg.com/yn/-/yn-3.1.1.tgz#1e87401a09d767c1d5eab26a6e4c185182d2eb50"
   integrity sha512-Ux4ygGWsu2c7isFWe8Yu1YluJmqVhxqK2cLXNQA5AcC3QfbGNpM7fu0Y8b/z16pXLnFxZYvWhd3fhBY9DLmC6Q==
 
-zod@^3.5.1:
+zod@^3.7.2:
   version "3.7.2"
   resolved "https://registry.yarnpkg.com/zod/-/zod-3.7.2.tgz#b02505f8314aa99c05ef8a7e55464680f9a515f6"
   integrity sha512-JhYYcj+TS/a0+3kqxnbmuXMVtA+QkJUPu91beQTo1Y3xA891pHeMPQgVOSu97FdzAd056Yp87lpEi8Xvmd3zhw==
