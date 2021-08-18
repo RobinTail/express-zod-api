@@ -1,5 +1,6 @@
 import {routing} from '../../example/routing';
 import {z, OpenAPI, defaultEndpointsFactory} from '../../src';
+import {expectType} from 'tsd';
 
 describe('Open API generator', () => {
   describe('generateOpenApi()', () => {
@@ -401,6 +402,45 @@ describe('Open API generator', () => {
               handler: async ({input}) => ({
                 arr: input.arr
               })
+            })
+          }
+        },
+        version: '3.4.5',
+        title: 'Testing issue #98',
+        serverUrl: 'http://example.com'
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
+    });
+
+    test('should union schemas', () => {
+      const baseSchema = z.object({ id: z.string() });
+      const subType1 = baseSchema.extend({ field1: z.string() });
+      const subType2 = baseSchema.extend({ field2: z.string() });
+      const unionSchema = z.union([subType1, subType2]);
+      type TestingType = z.infer<typeof unionSchema>;
+
+      expectType<TestingType>({id: 'string', field1: 'string'});
+      expectType<TestingType>({id: 'string', field2: 'string'});
+
+      const spec = new OpenAPI({
+        routing: {
+          v1: {
+            getSomething: defaultEndpointsFactory.build({
+              method: 'post',
+              input: unionSchema,
+              output: unionSchema,
+              handler: async ({input}) => {
+                if ('field1' in input) {
+                  return {
+                    id: `test, ${input.id}`,
+                    field1: input.field1
+                  };
+                }
+                return {
+                  id: 'other test',
+                  field2: input.field2
+                };
+              }
             })
           }
         },
