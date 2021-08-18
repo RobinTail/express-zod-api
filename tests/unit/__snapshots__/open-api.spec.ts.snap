@@ -49,6 +49,12 @@ paths:
                     properties:
                       message:
                         type: string
+                      fields:
+                        type: object
+                        additionalProperties:
+                          type: array
+                          items:
+                            type: string
                     required:
                       - message
                 required:
@@ -106,6 +112,12 @@ paths:
                     properties:
                       message:
                         type: string
+                      fields:
+                        type: object
+                        additionalProperties:
+                          type: array
+                          items:
+                            type: string
                     required:
                       - message
                 required:
@@ -200,6 +212,12 @@ paths:
                     properties:
                       message:
                         type: string
+                      fields:
+                        type: object
+                        additionalProperties:
+                          type: array
+                          items:
+                            type: string
                     required:
                       - message
                 required:
