@@ -1,4 +1,5 @@
 import jestConfig from '../jest.config';
+import {z} from '../src';
 
 export const waitFor = async (cb: () => boolean) =>
   await new Promise((resolve, reject) => {
@@ -16,3 +17,51 @@ export const waitFor = async (cb: () => boolean) =>
   });
 
 export const delay = async (ms: number) => await new Promise((resolve) => setTimeout(resolve, ms));
+
+export const serializeSchemaForTest = (schema: z.ZodTypeAny): Record<string, any> => {
+  const getDescription = () => {
+    if (schema instanceof z.ZodIntersection) {
+      return {
+        left: serializeSchemaForTest(schema._def.left),
+        right: serializeSchemaForTest(schema._def.right),
+      };
+    }
+    if (schema instanceof z.ZodUnion) {
+      return {
+        options: schema._def.options.map(serializeSchemaForTest)
+      };
+    }
+    if (schema instanceof z.ZodObject) {
+      return {
+        shape: Object.keys(schema.shape).reduce((carry, key) => ({
+          ...carry,
+          [key]: serializeSchemaForTest(schema.shape[key])
+        }), {})
+      };
+    }
+    if (schema instanceof z.ZodOptional || schema instanceof z.ZodNullable) {
+      return {
+        value: serializeSchemaForTest(schema.unwrap())
+      };
+    }
+    if (schema instanceof z.ZodEffects || schema instanceof z.ZodTransformer) {
+      return {
+        value: serializeSchemaForTest(schema._def.schema)
+      };
+    }
+    if (schema instanceof z.ZodRecord) {
+      return {
+        values: serializeSchemaForTest(schema._def.valueType)
+      };
+    }
+    if (schema instanceof z.ZodArray) {
+      return {
+        items: serializeSchemaForTest(schema._def.type)
+      };
+    }
+  };
+  return {
+    _type: schema._def.typeName,
+    ...getDescription()
+  };
+};

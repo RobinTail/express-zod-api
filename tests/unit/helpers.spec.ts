@@ -11,6 +11,7 @@ import {
 import {createMiddleware, z, createHttpError, markOutput, createApiResponse} from '../../src';
 import {Request} from 'express';
 import {MiddlewareDefinition} from '../../src/middleware';
+import {serializeSchemaForTest} from '../helpers';
 
 describe('Helpers', () => {
   describe('combineEndpointAndMiddlewareInputSchemas()', () => {
@@ -40,7 +41,7 @@ describe('Helpers', () => {
       });
       const result = combineEndpointAndMiddlewareInputSchemas(endpointInput, middlewares);
       expect(result).toBeInstanceOf(z.ZodObject);
-      expect(result.shape).toMatchSnapshot();
+      expect(serializeSchemaForTest(result)).toMatchSnapshot();
     });
 
     test('Should merge union object schemas', () => {
@@ -69,7 +70,7 @@ describe('Helpers', () => {
       }));
       const result = combineEndpointAndMiddlewareInputSchemas(endpointInput, middlewares);
       expect(result).toBeInstanceOf(z.ZodObject);
-      expect(result.shape).toMatchSnapshot();
+      expect(serializeSchemaForTest(result)).toMatchSnapshot();
     });
 
     test('Should merge intersection object schemas', () => {
@@ -98,7 +99,7 @@ describe('Helpers', () => {
       }));
       const result = combineEndpointAndMiddlewareInputSchemas(endpointInput, middlewares);
       expect(result).toBeInstanceOf(z.ZodObject);
-      expect(result.shape).toMatchSnapshot();
+      expect(serializeSchemaForTest(result)).toMatchSnapshot();
     });
 
     test('Should merge mixed object schemas', () => {
@@ -125,7 +126,7 @@ describe('Helpers', () => {
       });
       const result = combineEndpointAndMiddlewareInputSchemas(endpointInput, middlewares);
       expect(result).toBeInstanceOf(z.ZodObject);
-      expect(result.shape).toMatchSnapshot();
+      expect(serializeSchemaForTest(result)).toMatchSnapshot();
     });
   });
   
@@ -199,7 +200,7 @@ describe('Helpers', () => {
         one: z.string()
       }));
       expect(subject).toBeInstanceOf(z.ZodObject);
-      expect(subject.shape).toMatchSnapshot();
+      expect(serializeSchemaForTest(subject)).toMatchSnapshot();
     });
 
     test('should return object schema for the union of object schemas', () => {
@@ -209,7 +210,7 @@ describe('Helpers', () => {
         two: z.number()
       })));
       expect(subject).toBeInstanceOf(z.ZodObject);
-      expect(subject.shape).toMatchSnapshot();
+      expect(serializeSchemaForTest(subject)).toMatchSnapshot();
     });
 
     test('should return object schema for the intersection of object schemas', () => {
@@ -219,7 +220,7 @@ describe('Helpers', () => {
         two: z.number()
       })));
       expect(subject).toBeInstanceOf(z.ZodObject);
-      expect(subject.shape).toMatchSnapshot();
+      expect(serializeSchemaForTest(subject)).toMatchSnapshot();
     });
   });
 
