@@ -2,6 +2,10 @@
 
 ## Version 2
 
+### v2.3.3
+
+- Zod version is 3.7.3
+
 ### v2.3.2
 
 - Zod version is 3.7.2.
