@@ -181,7 +181,7 @@ import {
 // endpoint. It's useful for the ones that handle 
 // multiple types of request (GET, POST, ...)
 const methodProviderMiddleware = createMiddleware({
-  input: z.object({}).nonstrict(),
+  input: z.object({}),
   middleware: async ({request}) => ({
     method: request.method.toLowerCase() as Method,
   })

@@ -2,6 +2,11 @@
 
 ## Version 2
 
+### v2.3.3
+
+- Zod version is 3.7.3
+- Removed usage of the deprecated `ZodObject`'s method `.nonstrict()` in the example and Readme since it's not required.
+
 ### v2.3.2
 
 - Zod version is 3.7.2.
@@ -362,7 +367,7 @@ const middleware = createMiddleware({
 // example
 const endpoint = factory.build({
   methods: ['post'],
-  input: z.object({}).nonstrict(),
+  input: z.object({}),
   output: z.object({
     value: z.string().transform((str) => str.length)
   }),
