@@ -1,6 +1,7 @@
 import fetch from 'node-fetch';
 import {spawn, ChildProcessWithoutNullStreams} from 'child_process';
 import {waitFor} from '../helpers';
+import crypto from 'crypto';
 
 describe('Example', () => {
   let example: ChildProcessWithoutNullStreams;
@@ -95,7 +96,8 @@ describe('Example', () => {
       expect(response.headers.has('Content-type')).toBeTruthy();
       expect(response.headers.get('Content-type')).toBe('image/svg+xml; charset=utf-8');
       expect(response.headers.has('Content-length')).toBeTruthy();
-      expect(await response.text()).toMatchSnapshot();
+      const hash = crypto.createHash('sha1').update(await response.text()).digest('hex');
+      expect(hash).toMatchSnapshot();
     });
 
     test('Should stream an image with a correct header', async () => {
@@ -105,7 +107,8 @@ describe('Example', () => {
       expect(response.headers.get('Content-type')).toBe('image/svg+xml');
       expect(response.headers.has('Transfer-encoding')).toBeTruthy();
       expect(response.headers.get('Transfer-encoding')).toBe('chunked');
-      expect(await response.text()).toMatchSnapshot();
+      const hash = crypto.createHash('sha1').update(await response.text()).digest('hex');
+      expect(hash).toMatchSnapshot();
     });
   });
 
