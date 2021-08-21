@@ -21,7 +21,7 @@ describe('App', () => {
             })
           })
           .addMiddleware({
-            input: z.object({}).passthrough(),
+            input: z.object({}),
             middleware: async ({request, options: {user}}) => ({
               method: request.method.toLowerCase() as Method,
               permissions: user.id === 354 ? ['any'] : []

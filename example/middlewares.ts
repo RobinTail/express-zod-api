@@ -17,7 +17,7 @@ export const authMiddleware = createMiddleware({
 });
 
 export const methodProviderMiddleware = createMiddleware({
-  input: z.object({}).passthrough(),
+  input: z.object({}),
   middleware: async ({request}) => ({
     method: request.method.toLowerCase() as Method,
   })

@@ -4,7 +4,8 @@
 
 ### v2.3.3
 
-- Replaced the deprecated `ZodObject`'s method ~~.nonstrict()~~ with `.passthrough()` in the example, Readme and tests.
+- Replaced the deprecated `ZodObject`'s method ~~.nonstrict()~~ with `.passthrough()` in tests 
+  and removing it in the example and Readme since it's not required.
 
 ### v2.3.2
 
@@ -366,7 +367,7 @@ const middleware = createMiddleware({
 // example
 const endpoint = factory.build({
   methods: ['post'],
-  input: z.object({}).passthrough(),
+  input: z.object({}),
   output: z.object({
     value: z.string().transform((str) => str.length)
   }),
