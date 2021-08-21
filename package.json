@@ -64,16 +64,25 @@
     "url": "https://github.com/RobinTail/express-zod-api/issues"
   },
   "keywords": [
-    "typescript",
+    "nodejs",
     "api",
-    "zod",
-    "express",
     "http",
-    "server",
-    "validation",
+    "middleware",
+    "documentation",
+    "json",
+    "express",
+    "typescript",
     "schema",
-    "endpoint",
+    "server",
     "handler",
-    "json"
+    "swagger",
+    "documentation-tool",
+    "openapi",
+    "schema-validation",
+    "endpoint",
+    "openapi-specification",
+    "swagger-documentation",
+    "zod",
+    "validation"
   ]
 }
