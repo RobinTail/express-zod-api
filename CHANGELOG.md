@@ -2,6 +2,10 @@
 
 ## Version 2
 
+### v2.3.3
+
+- Replaced the deprecated `ZodObject`'s method ~~.nonstrict()~~ with `.passthrough()` in the example, Readme and tests.
+
 ### v2.3.2
 
 - Zod version is 3.7.2.
