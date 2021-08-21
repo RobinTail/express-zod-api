@@ -362,7 +362,7 @@ const middleware = createMiddleware({
 // example
 const endpoint = factory.build({
   methods: ['post'],
-  input: z.object({}).nonstrict(),
+  input: z.object({}).passthrough(),
   output: z.object({
     value: z.string().transform((str) => str.length)
   }),

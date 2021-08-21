@@ -35,20 +35,20 @@ describe('Routing', () => {
       const factory = new EndpointsFactory(defaultResultHandler);
       const getEndpoint = factory.build({
         methods: ['get'],
-        input: z.object({}).nonstrict(),
-        output: z.object({}).nonstrict(),
+        input: z.object({}).passthrough(),
+        output: z.object({}).passthrough(),
         handler: handlerMock
       });
       const postEndpoint = factory.build({
         methods: ['post'],
-        input: z.object({}).nonstrict(),
-        output: z.object({}).nonstrict(),
+        input: z.object({}).passthrough(),
+        output: z.object({}).passthrough(),
         handler: handlerMock
       });
       const getAndPostEndpoint = factory.build({
         methods: ['get', 'post'],
-        input: z.object({}).nonstrict(),
-        output: z.object({}).nonstrict(),
+        input: z.object({}).passthrough(),
+        output: z.object({}).passthrough(),
         handler: handlerMock
       });
       const routing: Routing = {
@@ -89,20 +89,20 @@ describe('Routing', () => {
       const factory = new EndpointsFactory(defaultResultHandler);
       const getEndpoint = factory.build({
         methods: ['get'],
-        input: z.object({}).nonstrict(),
-        output: z.object({}).nonstrict(),
+        input: z.object({}).passthrough(),
+        output: z.object({}).passthrough(),
         handler: handlerMock
       });
       const postEndpoint = factory.build({
         methods: ['post'],
-        input: z.object({}).nonstrict(),
-        output: z.object({}).nonstrict(),
+        input: z.object({}).passthrough(),
+        output: z.object({}).passthrough(),
         handler: handlerMock
       });
       const putAndPatchEndpoint = factory.build({
         methods: ['put', 'patch'],
-        input: z.object({}).nonstrict(),
-        output: z.object({}).nonstrict(),
+        input: z.object({}).passthrough(),
+        output: z.object({}).passthrough(),
         handler: handlerMock
       });
       const routing: Routing = {
@@ -140,8 +140,8 @@ describe('Routing', () => {
       const endpointMock = new EndpointsFactory(defaultResultHandler)
         .build({
           methods: ['get'],
-          input: z.object({}).nonstrict(),
-          output: z.object({}).nonstrict(),
+          input: z.object({}).passthrough(),
+          output: z.object({}).passthrough(),
           handler: handlerMock
         });
       const routing: Routing = {
@@ -167,8 +167,8 @@ describe('Routing', () => {
       const endpointMock = new EndpointsFactory(defaultResultHandler)
         .build({
           methods: ['get'],
-          input: z.object({}).nonstrict(),
-          output: z.object({}).nonstrict(),
+          input: z.object({}).passthrough(),
+          output: z.object({}).passthrough(),
           handler: handlerMock
         });
       const routing: Routing = {
@@ -198,8 +198,8 @@ describe('Routing', () => {
       const endpointMock = new EndpointsFactory(defaultResultHandler)
         .build({
           methods: ['get'],
-          input: z.object({}).nonstrict(),
-          output: z.object({}).nonstrict(),
+          input: z.object({}).passthrough(),
+          output: z.object({}).passthrough(),
           handler: handlerMock
         });
       expect(() => initRouting({

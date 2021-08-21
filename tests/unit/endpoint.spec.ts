@@ -28,8 +28,8 @@ describe('Endpoint', () => {
     test('Should return the correct set of methods', () => {
       const endpointMock = new Endpoint({
         methods: ['get', 'post', 'put', 'delete', 'patch'],
-        inputSchema: z.object({}).nonstrict(),
-        outputSchema: z.object({}).nonstrict(),
+        inputSchema: z.object({}).passthrough(),
+        outputSchema: z.object({}).passthrough(),
         handler: jest.fn(),
         resultHandler: {
           getPositiveResponse: jest.fn(),
@@ -44,8 +44,8 @@ describe('Endpoint', () => {
     test('Should return the array for a single method also', () => {
       const endpointMock = new Endpoint({
         method: 'patch',
-        inputSchema: z.object({}).nonstrict(),
-        outputSchema: z.object({}).nonstrict(),
+        inputSchema: z.object({}).passthrough(),
+        outputSchema: z.object({}).passthrough(),
         handler: jest.fn(),
         resultHandler: {
           getPositiveResponse: jest.fn(),
