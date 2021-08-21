@@ -4,7 +4,8 @@
 
 ### v2.3.3
 
-- Removed usage of deprecated `ZodObject`'s method `.nonstrict()` in the example and Readme since it's not required.
+- Zod version is 3.7.3
+- Removed usage of the deprecated `ZodObject`'s method `.nonstrict()` in the example and Readme since it's not required.
 
 ### v2.3.2
 
