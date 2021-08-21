@@ -5,7 +5,7 @@
 ### v2.3.3
 
 - Replaced the deprecated `ZodObject`'s method ~~.nonstrict()~~ with `.passthrough()` in tests 
-  and removing it in the example and Readme since it's not required.
+  and removed it in the example and Readme since it's not required.
 
 ### v2.3.2
 
