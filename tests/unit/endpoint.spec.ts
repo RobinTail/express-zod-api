@@ -259,6 +259,36 @@ describe('Endpoint', () => {
       });
       expectType<EndpointInput<typeof endpoint>>(input._input);
     });
+
+    test('should also include inputs of middlewares', () => {
+      const mInput = z.object({
+        key: z.string()
+      });
+      const factory = new EndpointsFactory(defaultResultHandler).addMiddleware({
+        input: mInput,
+        middleware: jest.fn()
+      });
+      const input = z.object({
+        something: z.number().transform((value) => `${value}`)
+      });
+      const mInput2 = z.object({
+        token: z.string()
+      });
+      const endpoint = factory.addMiddleware({
+        input: mInput2,
+        middleware: jest.fn()
+      }).build({
+        method: 'get',
+        input,
+        output: z.object({}),
+        handler: jest.fn()
+      });
+      expectType<EndpointInput<typeof endpoint>>({
+        ...input._input,
+        ...mInput._input,
+        ...mInput2._input
+      });
+    });
   });
 
   describe('EndpointOutput<>', () => {
