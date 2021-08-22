@@ -3,6 +3,7 @@ import {HttpError} from 'http-errors';
 import {lookup} from 'mime';
 import {z} from 'zod';
 import {LoggerConfig, loggerLevels} from './config-type';
+import {errorDescriptionSchema} from './errors';
 import {MiddlewareDefinition} from './middleware';
 
 export type FlatObject = Record<string, any>;
@@ -89,17 +90,7 @@ export function isLoggerConfig(logger: any): logger is LoggerConfig {
     typeof logger.color === 'boolean';
 }
 
-export const errorSchema = z.object({
-  message: z.string(),
-  fields: z.record(
-    z.array(z.object({
-      message: z.string(),
-      internalPath: z.array(z.string().or(z.number().int().nonnegative()))
-    }))
-  ).optional(),
-});
-
-export function describeError(error: Error): z.output<typeof errorSchema> {
+export function describeError(error: Error): z.output<typeof errorDescriptionSchema> {
   if (!(error instanceof z.ZodError)) {
     return { message: error.message }; 
   }
