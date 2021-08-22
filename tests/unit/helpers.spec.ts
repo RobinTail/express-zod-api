@@ -3,7 +3,7 @@ import {
   combineEndpointAndMiddlewareInputSchemas,
   extractObjectSchema,
   getInitialInput,
-  getMessageFromError,
+  describeError,
   getStatusCodeFromError,
   isLoggerConfig,
   OutputMarker
@@ -224,7 +224,7 @@ describe('Helpers', () => {
     });
   });
 
-  describe('getMessageFromError()', () => {
+  describe('describeError()', () => {
     test('should compile a string from ZodError', () => {
       const error = new z.ZodError([
         {
@@ -242,16 +242,16 @@ describe('Helpers', () => {
           received: 'number'
         }
       ]);
-      expect(getMessageFromError(error)).toEqual(
-        'user/id: expected number, got string; user/name: expected string, got number'
-      );
+      expect(describeError(error)).toMatchSnapshot();
     });
 
     test('should pass message from other error types', () => {
-      expect(getMessageFromError(createHttpError(502, 'something went wrong')))
-        .toEqual('something went wrong');
-      expect(getMessageFromError(new Error('something went wrong')))
-        .toEqual('something went wrong');
+      expect(describeError(
+        createHttpError(502, 'something went wrong'))
+      ).toMatchSnapshot();
+      expect(describeError(
+        new Error('something went wrong'))
+      ).toMatchSnapshot();
     });
   });
 

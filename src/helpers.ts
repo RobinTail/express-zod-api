@@ -89,11 +89,30 @@ export function isLoggerConfig(logger: any): logger is LoggerConfig {
     typeof logger.color === 'boolean';
 }
 
-export function getMessageFromError(error: Error): string {
-  return error instanceof z.ZodError
-    ? error.issues.map(({path, message}) =>
-      `${path.join('/')}: ${message}`).join('; ')
-    : error.message;
+export const errorSchema = z.object({
+  message: z.string(),
+  fields: z.record(
+    z.array(z.object({
+      message: z.string(),
+      internalPath: z.array(z.string().or(z.number().int().nonnegative()))
+    }))
+  ).optional(),
+});
+
+export function describeError(error: Error): z.output<typeof errorSchema> {
+  if (!(error instanceof z.ZodError)) {
+    return { message: error.message }; 
+  }
+  const errorMessage = error.issues.map(({path, message}) =>
+    `${path.join('/')}: ${message}`).join('; ');
+  const fields = error.flatten((issue) => ({
+    message: issue.message,
+    internalPath: issue.path.slice(1)}
+  )).fieldErrors;
+  return {
+    message: errorMessage,
+    fields
+  };
 }
 
 export function getStatusCodeFromError(error: Error): number {

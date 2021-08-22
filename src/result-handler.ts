@@ -4,7 +4,7 @@ import {z} from 'zod';
 import {
   ApiResponse,
   createApiResponse,
-  getMessageFromError,
+  describeError, errorSchema,
   getStatusCodeFromError,
   IOSchema,
   markOutput
@@ -38,15 +38,7 @@ export const defaultResultHandler = createResultHandler({
   })),
   getNegativeResponse: () => createApiResponse(z.object({
     status: z.literal('error'),
-    error: z.object({
-      message: z.string(),
-      fields: z.record(
-        z.array(z.object({
-          message: z.string(),
-          internalPath: z.array(z.string().or(z.number().int().nonnegative()))
-        }))
-      ).optional(),
-    })
+    error: errorSchema
   })),
   handler: ({error, input, output, request, response, logger}) => {
     if (!error) {
@@ -68,15 +60,7 @@ export const defaultResultHandler = createResultHandler({
     }
     response.status(statusCode).json({
       status: 'error' as const,
-      error: {
-        message: getMessageFromError(error),
-        ...(error instanceof z.ZodError
-          ? { fields: error.flatten((issue) => ({
-            message: issue.message, 
-            internalPath: issue.path.slice(1)})
-          ).fieldErrors }
-          : null)
-      }
+      error: describeError(error)
     });
   }
 });
