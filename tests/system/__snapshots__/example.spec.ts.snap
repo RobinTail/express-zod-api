@@ -5,7 +5,10 @@ Object {
   "error": Object {
     "fields": Object {
       "id": Array [
-        "Required",
+        Object {
+          "internalPath": Array [],
+          "message": "Required",
+        },
       ],
     },
     "message": "id: Required",
@@ -19,7 +22,10 @@ Object {
   "error": Object {
     "fields": Object {
       "id": Array [
-        "Value should be greater than or equal to 0",
+        Object {
+          "internalPath": Array [],
+          "message": "Value should be greater than or equal to 0",
+        },
       ],
     },
     "message": "id: Value should be greater than or equal to 0",

@@ -41,7 +41,10 @@ export const defaultResultHandler = createResultHandler({
     error: z.object({
       message: z.string(),
       fields: z.record(
-        z.array(z.string())
+        z.array(z.object({
+          message: z.string(),
+          internalPath: z.array(z.string().or(z.number().int().nonnegative()))
+        }))
       ).optional(),
     })
   })),
@@ -68,7 +71,10 @@ export const defaultResultHandler = createResultHandler({
       error: {
         message: getMessageFromError(error),
         ...(error instanceof z.ZodError
-          ? { fields: error.flatten().fieldErrors }
+          ? { fields: error.flatten((issue) => ({
+            message: issue.message, 
+            internalPath: issue.path.slice(1)})
+          ).fieldErrors }
           : null)
       }
     });

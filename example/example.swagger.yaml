@@ -56,7 +56,24 @@ paths:
                         additionalProperties:
                           type: array
                           items:
-                            type: string
+                            type: object
+                            properties:
+                              message:
+                                type: string
+                              internalPath:
+                                type: array
+                                items:
+                                  oneOf:
+                                    - type: string
+                                    - type: integer
+                                      format: int64
+                                      minimum: 0
+                                      exclusiveMinimum: false
+                                      maximum: 9007199254740991
+                                      exclusiveMaximum: false
+                            required:
+                              - message
+                              - internalPath
                     required:
                       - message
                 required:
@@ -124,7 +141,24 @@ paths:
                         additionalProperties:
                           type: array
                           items:
-                            type: string
+                            type: object
+                            properties:
+                              message:
+                                type: string
+                              internalPath:
+                                type: array
+                                items:
+                                  oneOf:
+                                    - type: string
+                                    - type: integer
+                                      format: int64
+                                      minimum: 0
+                                      exclusiveMinimum: false
+                                      maximum: 9007199254740991
+                                      exclusiveMaximum: false
+                            required:
+                              - message
+                              - internalPath
                     required:
                       - message
                 required:

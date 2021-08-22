@@ -6,7 +6,10 @@ Array [
     "error": Object {
       "fields": Object {
         "something": Array [
-          "Expected string, got number",
+          Object {
+            "internalPath": Array [],
+            "message": "Expected string, got number",
+          },
         ],
       },
       "message": "something: Expected string, got number",

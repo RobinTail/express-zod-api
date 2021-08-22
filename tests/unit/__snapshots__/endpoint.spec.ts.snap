@@ -14,7 +14,26 @@ Object {
             "values": Object {
               "_type": "ZodArray",
               "items": Object {
-                "_type": "ZodString",
+                "_type": "ZodObject",
+                "shape": Object {
+                  "internalPath": Object {
+                    "_type": "ZodArray",
+                    "items": Object {
+                      "_type": "ZodUnion",
+                      "options": Array [
+                        Object {
+                          "_type": "ZodString",
+                        },
+                        Object {
+                          "_type": "ZodNumber",
+                        },
+                      ],
+                    },
+                  },
+                  "message": Object {
+                    "_type": "ZodString",
+                  },
+                },
               },
             },
           },
