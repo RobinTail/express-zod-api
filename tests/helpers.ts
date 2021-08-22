@@ -59,6 +59,11 @@ export const serializeSchemaForTest = (schema: z.ZodTypeAny): Record<string, any
         items: serializeSchemaForTest(schema._def.type)
       };
     }
+    if (schema instanceof z.ZodLiteral) {
+      return {
+        value: schema._def.value
+      };
+    }
   };
   return {
     _type: schema._def.typeName,
