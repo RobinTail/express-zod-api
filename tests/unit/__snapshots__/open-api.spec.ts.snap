@@ -1157,6 +1157,9 @@ paths:
                 uuid:
                   type: string
                   format: uuid
+                cuid:
+                  type: string
+                  format: cuid
                 url:
                   type: string
                   format: url
@@ -1176,6 +1179,7 @@ paths:
                 - range
                 - email
                 - uuid
+                - cuid
                 - url
                 - numeric
                 - combined

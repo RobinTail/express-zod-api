@@ -283,6 +283,7 @@ describe('Open API generator', () => {
                 range: z.string().min(2).max(3),
                 email: z.string().email(),
                 uuid: z.string().uuid(),
+                cuid: z.string().cuid(),
                 url: z.string().url(),
                 numeric: z.string().regex(/\d+/),
                 combined: z.string().nonempty().email().regex(/.*@example\.com/si).max(90)

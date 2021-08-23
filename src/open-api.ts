@@ -154,6 +154,7 @@ const describeString = (schema: z.ZodString): SchemaObject => {
   const isEmail = checks.find(({kind}) => kind === 'email') !== undefined;
   const isUrl = checks.find(({kind}) => kind === 'url') !== undefined;
   const isUUID = checks.find(({kind}) => kind === 'uuid') !== undefined;
+  const isCUID = checks.find(({kind}) => kind === 'cuid') !== undefined;
   const minLengthCheck = checks.find(
     ({kind}) => kind === 'min'
   ) as Extract<ArrayElement<z.ZodStringDef['checks']>, {kind: 'min'}> | undefined;
@@ -165,9 +166,10 @@ const describeString = (schema: z.ZodString): SchemaObject => {
   ) as Extract<ArrayElement<z.ZodStringDef['checks']>, {kind: 'regex'}> | undefined;
   return {
     type: 'string' as const,
-    ...(isEmail ? { format: 'email' as const } : {}),
-    ...(isUrl ? { format: 'url' as const } : {}),
-    ...(isUUID ? { format: 'uuid' as const } : {}),
+    ...(isEmail ? { format: 'email' } : {}),
+    ...(isUrl ? { format: 'url' } : {}),
+    ...(isUUID ? { format: 'uuid' } : {}),
+    ...(isCUID ? { format: 'cuid' } : {}),
     ...(minLengthCheck ? { minLength: minLengthCheck.value } : {}),
     ...(maxLengthCheck ? { maxLength: maxLengthCheck.value } : {}),
     ...(regexCheck ? { pattern: `/${regexCheck.regex.source}/${regexCheck.regex.flags}` } : {})
