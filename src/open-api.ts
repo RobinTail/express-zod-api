@@ -225,8 +225,8 @@ const describeTransformation = (value: z.ZodTransformer<any> | z.ZodEffects<any>
   return {
     ...input,
     ...(
-      ['number', 'string', 'boolean', 'null'].includes(output) ? {
-        type: output as 'number' | 'string' | 'boolean' | 'null'
+      ['number', 'string', 'boolean'].includes(output) ? {
+        type: output as 'number' | 'string' | 'boolean'
       } : {}
     )
   };
