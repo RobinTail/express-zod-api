@@ -204,32 +204,50 @@ const describeObjectProperties = (schema: z.AnyZodObject, isResponse: boolean): 
   }), {} as Record<string, SchemaObject>);
 };
 
-const describeTransformation = (value: z.ZodTransformer<any> | z.ZodEffects<any>, isResponse: boolean) => {
-  const input = describeSchema(value._def.schema, isResponse);
-  let output = 'undefined';
-  if (isResponse && value._def.effects && value._def.effects.length > 0) {
-    const effect = value._def.effects.filter((ef) => ef.type === 'transform').slice(-1)[0];
+const getTransformationMod = (def: z.ZodEffectsDef): z.Mod<any> & { isPreprocess: boolean} | undefined => {
+  if ('effects' in def && def.effects && def.effects.length > 0) {
+    const effect = def.effects.filter((ef) => ef.type === 'transform').slice(-1)[0];
     if (effect && 'transform' in effect) {
-      try {
-        output = typeof effect.transform(
-          ['integer', 'number'].includes(`${input.type}`) ? 0 :
-            'string' === input.type ? '' :
-              'boolean' === input.type ? false :
-                'object' === input.type ? {} :
-                  'null' === input.type ? null :
-                    'array' === input.type ? [] : undefined
-        );
-      } catch (e) {/**/}
+      return { ...effect, isPreprocess: false };
     }
   }
-  return {
-    ...input,
-    ...(
-      ['number', 'string', 'boolean'].includes(output) ? {
-        type: output as 'number' | 'string' | 'boolean'
-      } : {}
-    )
-  };
+  if ('preprocess' in def && def.preprocess && def.preprocess.type === 'transform') {
+    return { ...def.preprocess, isPreprocess: true };
+  }
+};
+
+const describeTransformation = (value: z.ZodEffects<any>, isResponse: boolean): SchemaObject => {
+  const input = describeSchema(value._def.schema, isResponse);
+  const mod = getTransformationMod(value._def);
+  if (isResponse && mod && !mod.isPreprocess) {
+    let output = 'undefined';
+    try {
+      output = typeof mod.transform(
+        ['integer', 'number'].includes(`${input.type}`) ? 0 :
+          'string' === input.type ? '' :
+            'boolean' === input.type ? false :
+              'object' === input.type ? {} :
+                'null' === input.type ? null :
+                  'array' === input.type ? [] : undefined
+      );
+    } catch (e) {/**/}
+    return {
+      ...input,
+      ...(
+        ['number', 'string', 'boolean'].includes(output) ? {
+          type: output as 'number' | 'string' | 'boolean'
+        } : {}
+      ),
+    };
+  }
+  if (!isResponse && mod && mod.isPreprocess) {
+    const { type: inputType, ...rest } = input;
+    return {
+      ...rest,
+      format: `${rest.format || inputType} (preprocessed)`
+    };
+  }
+  return input;
 };
 
 interface GenerationParams {
