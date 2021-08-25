@@ -112,6 +112,12 @@ const describeSchema = (value: z.ZodTypeAny, isResponse: boolean): SchemaObject 
         ...otherProps,
         format: 'any'
       };
+    case value instanceof z.ZodDefault:
+      return {
+        ...otherProps,
+        ...describeSchema((value._def as z.ZodDefaultDef).innerType, isResponse),
+        default: (value._def as z.ZodDefaultDef).defaultValue()
+      };
     case value instanceof z.ZodUndefined:
     case value instanceof z.ZodMap:
     case value instanceof z.ZodFunction:
