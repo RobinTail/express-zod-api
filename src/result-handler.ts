@@ -62,9 +62,7 @@ export const defaultResultHandler = createResultHandler({
     }
     response.status(statusCode).json({
       status: 'error' as const,
-      error: {
-        message: getMessageFromError(error)
-      }
+      error: { message: getMessageFromError(error) }
     });
   }
 });
