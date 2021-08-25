@@ -52,6 +52,9 @@ describe('Open API generator', () => {
               methods: ['get'],
               input: z.object({
                 optional: z.string().optional(),
+                optDefault: z.string().optional().default('test'),
+                nullish: z.boolean().nullish(),
+                nuDefault: z.number().int().positive().nullish().default(123)
               }),
               output: z.object({
                 nullable: z.string().nullable(),

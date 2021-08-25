@@ -508,6 +508,33 @@ paths:
           schema:
             type: string
             description: GET /v1/getSomething parameter
+        - name: optDefault
+          in: query
+          required: false
+          schema:
+            type: string
+            default: test
+            description: GET /v1/getSomething parameter
+        - name: nullish
+          in: query
+          required: false
+          schema:
+            nullable: true
+            type: boolean
+            description: GET /v1/getSomething parameter
+        - name: nuDefault
+          in: query
+          required: false
+          schema:
+            nullable: true
+            type: integer
+            format: int64
+            minimum: 0
+            exclusiveMinimum: true
+            maximum: 9007199254740991
+            exclusiveMaximum: false
+            default: 123
+            description: GET /v1/getSomething parameter
 components:
   schemas: {}
   responses: {}
