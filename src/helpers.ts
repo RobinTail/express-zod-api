@@ -3,7 +3,6 @@ import {HttpError} from 'http-errors';
 import {lookup} from 'mime';
 import {z} from 'zod';
 import {LoggerConfig, loggerLevels} from './config-type';
-import {errorDescriptionSchema} from './errors';
 import {MiddlewareDefinition} from './middleware';
 
 export type FlatObject = Record<string, any>;
@@ -90,20 +89,12 @@ export function isLoggerConfig(logger: any): logger is LoggerConfig {
     typeof logger.color === 'boolean';
 }
 
-export function describeError(error: Error): z.output<typeof errorDescriptionSchema> {
+export function getMessageFromError(error: Error): string {
   if (!(error instanceof z.ZodError)) {
-    return { message: error.message }; 
+    return error.message;
   }
-  const errorMessage = error.issues.map(({path, message}) =>
+  return error.issues.map(({path, message}) =>
     `${path.join('/')}: ${message}`).join('; ');
-  const fields = error.flatten((issue) => ({
-    message: issue.message,
-    internalPath: issue.path.slice(1)}
-  )).fieldErrors;
-  return {
-    message: errorMessage,
-    fields
-  };
 }
 
 export function getStatusCodeFromError(error: Error): number {

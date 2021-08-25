@@ -3,7 +3,7 @@ import {
   combineEndpointAndMiddlewareInputSchemas,
   extractObjectSchema,
   getInitialInput,
-  describeError,
+  getMessageFromError,
   getStatusCodeFromError,
   isLoggerConfig,
   OutputMarker
@@ -242,14 +242,14 @@ describe('Helpers', () => {
           received: 'number'
         }
       ]);
-      expect(describeError(error)).toMatchSnapshot();
+      expect(getMessageFromError(error)).toMatchSnapshot();
     });
 
     test('should pass message from other error types', () => {
-      expect(describeError(
+      expect(getMessageFromError(
         createHttpError(502, 'something went wrong'))
       ).toMatchSnapshot();
-      expect(describeError(
+      expect(getMessageFromError(
         new Error('something went wrong'))
       ).toMatchSnapshot();
     });

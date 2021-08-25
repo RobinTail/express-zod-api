@@ -1,11 +1,10 @@
 import {Request, Response} from 'express';
 import {Logger} from 'winston';
 import {z} from 'zod';
-import {errorDescriptionSchema} from './errors';
 import {
   ApiResponse,
   createApiResponse,
-  describeError,
+  getMessageFromError,
   getStatusCodeFromError,
   IOSchema,
   markOutput
@@ -39,7 +38,9 @@ export const defaultResultHandler = createResultHandler({
   })),
   getNegativeResponse: () => createApiResponse(z.object({
     status: z.literal('error'),
-    error: errorDescriptionSchema
+    error: z.object({
+      message: z.string()
+    })
   })),
   handler: ({error, input, output, request, response, logger}) => {
     if (!error) {
@@ -61,7 +62,9 @@ export const defaultResultHandler = createResultHandler({
     }
     response.status(statusCode).json({
       status: 'error' as const,
-      error: describeError(error)
+      error: {
+        message: getMessageFromError(error)
+      }
     });
   }
 });

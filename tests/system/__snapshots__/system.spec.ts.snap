@@ -21,14 +21,6 @@ Object {
 exports[`App Protocol Should fail when missing content type header 1`] = `
 Object {
   "error": Object {
-    "fields": Object {
-      "key": Array [
-        Object {
-          "internalPath": Array [],
-          "message": "Required",
-        },
-      ],
-    },
     "message": "key: Required",
   },
   "status": "error",
@@ -38,14 +30,6 @@ Object {
 exports[`App Validation Should fail on handler input type mismatch 1`] = `
 Object {
   "error": Object {
-    "fields": Object {
-      "something": Array [
-        Object {
-          "internalPath": Array [],
-          "message": "Expected string, received number",
-        },
-      ],
-    },
     "message": "something: Expected string, received number",
   },
   "status": "error",
@@ -55,20 +39,6 @@ Object {
 exports[`App Validation Should fail on handler output type mismatch 1`] = `
 Object {
   "error": Object {
-    "fields": Object {
-      "anything": Array [
-        Object {
-          "internalPath": Array [],
-          "message": "Value should be greater than 0",
-        },
-      ],
-      "output": Array [
-        Object {
-          "internalPath": Array [],
-          "message": "Invalid format",
-        },
-      ],
-    },
     "message": "output: Invalid format; anything: Value should be greater than 0",
   },
   "status": "error",
@@ -78,14 +48,6 @@ Object {
 exports[`App Validation Should fail on middleware input type mismatch 1`] = `
 Object {
   "error": Object {
-    "fields": Object {
-      "key": Array [
-        Object {
-          "internalPath": Array [],
-          "message": "Expected string, received number",
-        },
-      ],
-    },
     "message": "key: Expected string, received number",
   },
   "status": "error",
@@ -95,14 +57,6 @@ Object {
 exports[`App Validation Should fail on middleware refinement mismatch 1`] = `
 Object {
   "error": Object {
-    "fields": Object {
-      "key": Array [
-        Object {
-          "internalPath": Array [],
-          "message": "Invalid key",
-        },
-      ],
-    },
     "message": "key: Invalid key",
   },
   "status": "error",

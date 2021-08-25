@@ -7,37 +7,6 @@ Object {
     "error": Object {
       "_type": "ZodObject",
       "shape": Object {
-        "fields": Object {
-          "_type": "ZodOptional",
-          "value": Object {
-            "_type": "ZodRecord",
-            "values": Object {
-              "_type": "ZodArray",
-              "items": Object {
-                "_type": "ZodObject",
-                "shape": Object {
-                  "internalPath": Object {
-                    "_type": "ZodArray",
-                    "items": Object {
-                      "_type": "ZodUnion",
-                      "options": Array [
-                        Object {
-                          "_type": "ZodString",
-                        },
-                        Object {
-                          "_type": "ZodNumber",
-                        },
-                      ],
-                    },
-                  },
-                  "message": Object {
-                    "_type": "ZodString",
-                  },
-                },
-              },
-            },
-          },
-        },
         "message": Object {
           "_type": "ZodString",
         },

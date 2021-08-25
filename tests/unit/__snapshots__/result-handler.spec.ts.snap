@@ -4,14 +4,6 @@ exports[`ResultHandler defaultResultHandler Should handle schema error 1`] = `
 Array [
   Object {
     "error": Object {
-      "fields": Object {
-        "something": Array [
-          Object {
-            "internalPath": Array [],
-            "message": "Expected string, got number",
-          },
-        ],
-      },
       "message": "something: Expected string, got number",
     },
     "status": "error",

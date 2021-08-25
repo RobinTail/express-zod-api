@@ -3,14 +3,6 @@
 exports[`Example Negative GET request should fail on missing input param 1`] = `
 Object {
   "error": Object {
-    "fields": Object {
-      "id": Array [
-        Object {
-          "internalPath": Array [],
-          "message": "Required",
-        },
-      ],
-    },
     "message": "id: Required",
   },
   "status": "error",
@@ -20,14 +12,6 @@ Object {
 exports[`Example Negative POST request should fail on schema validation 1`] = `
 Object {
   "error": Object {
-    "fields": Object {
-      "id": Array [
-        Object {
-          "internalPath": Array [],
-          "message": "Value should be greater than or equal to 0",
-        },
-      ],
-    },
     "message": "id: Value should be greater than or equal to 0",
   },
   "status": "error",
