@@ -286,6 +286,7 @@ describe('Open API generator', () => {
                 range: z.string().min(2).max(3),
                 email: z.string().email(),
                 uuid: z.string().uuid(),
+                cuid: z.string().cuid(),
                 url: z.string().url(),
                 numeric: z.string().regex(/\d+/),
                 combined: z.string().nonempty().email().regex(/.*@example\.com/si).max(90)
@@ -352,6 +353,35 @@ describe('Open API generator', () => {
         serverUrl: 'http://example.com'
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
+    });
+
+    test('should handle z.preprocess()', () => {
+      const string = z.preprocess((arg) => String(arg), z.string());
+      const number = z.preprocess((arg) => parseInt(String(arg), 16), z.number().int().nonnegative());
+      const boolean = z.preprocess((arg) => !!arg, z.boolean());
+      const spec = new OpenAPI({
+        routing: {
+          v1: {
+            getSomething: defaultEndpointsFactory.build({
+              method: 'get',
+              input: z.object({ string, number }),
+              output: z.object({ boolean }),
+              handler: async () => ({
+                boolean: [] as unknown as boolean // @todo check this out without type forcing in future Zod versions
+              })
+            })
+          }
+        },
+        version: '3.4.5',
+        title: 'Testing z.preprocess()',
+        serverUrl: 'http://example.com'
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
+      expect(string.parse(123)).toBe('123');
+      expect(number.parse('0xFF')).toBe(255);
+      expect(boolean.parse([])).toBe(true);
+      expect(boolean.parse('')).toBe(false);
+      expect(boolean.parse(null)).toBe(false);
     });
 
     test('should throw on unsupported types', () => {
