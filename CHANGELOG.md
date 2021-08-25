@@ -2,9 +2,17 @@
 
 ## Version 2
 
+### v2.4.0
+
+- Zod version is 3.8.1.
+- Supporting new string format: `cuid`.
+- Supporting new Zod schema `z.preprocess()`. 
+  Please avoid using it for Endpoint outputs.
+- Supporting default values of optional properties in OpenAPI/Swagger documentation.
+
 ### v2.3.3
 
-- Zod version is 3.7.3
+- Zod version is 3.7.3.
 - Removed usage of the deprecated `ZodObject`'s method `.nonstrict()` in the example and Readme since it's not required.
 
 ### v2.3.2

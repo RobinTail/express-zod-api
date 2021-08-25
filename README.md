@@ -409,8 +409,9 @@ export type MyEndpointType = typeof endpoint;
 
 Then use provided helpers to obtain their input and response types:
 ```typescript
-import {EndpointInput, EndpointResponse} from 'express-zod-api';
-import {MyEndpointType} from '../your/backend';
+import {EndpointInput, EndpointResponse} from 'express-zod-api'; 
+import type {MyEndpointType} from '../your/backend';
+//     ^---- please note the import syntax of the type only
 
 type MyEndpointInput = EndpointInput<MyEndpointType>;
 // unites the positive and the negative response schemas:

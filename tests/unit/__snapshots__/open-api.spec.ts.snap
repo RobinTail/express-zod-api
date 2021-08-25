@@ -646,6 +646,33 @@ paths:
           schema:
             type: string
             description: GET /v1/getSomething parameter
+        - name: optDefault
+          in: query
+          required: false
+          schema:
+            type: string
+            default: test
+            description: GET /v1/getSomething parameter
+        - name: nullish
+          in: query
+          required: false
+          schema:
+            nullable: true
+            type: boolean
+            description: GET /v1/getSomething parameter
+        - name: nuDefault
+          in: query
+          required: false
+          schema:
+            nullable: true
+            type: integer
+            format: int64
+            minimum: 0
+            exclusiveMinimum: true
+            maximum: 9007199254740991
+            exclusiveMaximum: false
+            default: 123
+            description: GET /v1/getSomething parameter
 components:
   schemas: {}
   responses: {}
@@ -1433,6 +1460,9 @@ paths:
                 uuid:
                   type: string
                   format: uuid
+                cuid:
+                  type: string
+                  format: cuid
                 url:
                   type: string
                   format: url
@@ -1452,6 +1482,7 @@ paths:
                 - range
                 - email
                 - uuid
+                - cuid
                 - url
                 - numeric
                 - combined
@@ -2016,6 +2047,114 @@ paths:
           schema:
             nullable: true
             format: any
+            description: GET /v1/getSomething parameter
+components:
+  schemas: {}
+  responses: {}
+  parameters: {}
+  examples: {}
+  requestBodies: {}
+  headers: {}
+  securitySchemes: {}
+  links: {}
+  callbacks: {}
+tags: []
+servers:
+  - url: http://example.com
+"
+`;
+
+exports[`Open API generator generateOpenApi() should handle z.preprocess() 1`] = `
+"openapi: 3.0.0
+info:
+  title: Testing z.preprocess()
+  version: 3.4.5
+paths:
+  /v1/getSomething:
+    get:
+      responses:
+        \\"200\\":
+          description: GET /v1/getSomething Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - success
+                  data:
+                    type: object
+                    properties:
+                      boolean:
+                        nullable: true
+                        type: boolean
+                    required: []
+                required:
+                  - status
+                  - data
+        \\"400\\":
+          description: GET /v1/getSomething Error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                      fields:
+                        type: object
+                        additionalProperties:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              message:
+                                type: string
+                              internalPath:
+                                type: array
+                                items:
+                                  oneOf:
+                                    - type: string
+                                    - type: integer
+                                      format: int64
+                                      minimum: 0
+                                      exclusiveMinimum: false
+                                      maximum: 9007199254740991
+                                      exclusiveMaximum: false
+                            required:
+                              - message
+                              - internalPath
+                    required:
+                      - message
+                required:
+                  - status
+                  - error
+      parameters:
+        - name: string
+          in: query
+          required: false
+          schema:
+            nullable: true
+            format: string (preprocessed)
+            description: GET /v1/getSomething parameter
+        - name: number
+          in: query
+          required: true
+          schema:
+            format: int64 (preprocessed)
+            minimum: 0
+            exclusiveMinimum: false
+            maximum: 9007199254740991
+            exclusiveMaximum: false
             description: GET /v1/getSomething parameter
 components:
   schemas: {}
