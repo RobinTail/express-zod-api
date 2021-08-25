@@ -224,7 +224,7 @@ describe('Helpers', () => {
     });
   });
 
-  describe('describeError()', () => {
+  describe('getMessageFromError()', () => {
     test('should compile a string from ZodError', () => {
       const error = new z.ZodError([
         {

@@ -119,12 +119,6 @@ Object {
 }
 `;
 
-exports[`Helpers describeError() should compile a string from ZodError 1`] = `"user/id: expected number, got string; user/name: expected string, got number"`;
-
-exports[`Helpers describeError() should pass message from other error types 1`] = `"something went wrong"`;
-
-exports[`Helpers describeError() should pass message from other error types 2`] = `"something went wrong"`;
-
 exports[`Helpers extractObjectSchema() should pass the object schema through 1`] = `
 Object {
   "_type": "ZodObject",
@@ -169,3 +163,9 @@ Object {
   },
 }
 `;
+
+exports[`Helpers getMessageFromError() should compile a string from ZodError 1`] = `"user/id: expected number, got string; user/name: expected string, got number"`;
+
+exports[`Helpers getMessageFromError() should pass message from other error types 1`] = `"something went wrong"`;
+
+exports[`Helpers getMessageFromError() should pass message from other error types 2`] = `"something went wrong"`;
