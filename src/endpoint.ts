@@ -201,7 +201,9 @@ export class Endpoint<
         input: initialInput
       });
     } catch (e) {
-      logger.error(`Result handler failure: ${e.message}.`);
+      if (e instanceof Error) {
+        logger.error(`Result handler failure: ${e.message}.`);
+      }
       // throw e;
     }
   }
@@ -233,7 +235,9 @@ export class Endpoint<
         await this.#parseAndRunHandler({input, options, logger})
       );
     } catch (e) {
-      error = e;
+      if (e instanceof Error) {
+        error = e;
+      }
     }
     await this.#handleResult({
       initialInput, output, request,
