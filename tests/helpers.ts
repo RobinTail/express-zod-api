@@ -19,54 +19,30 @@ export const waitFor = async (cb: () => boolean) =>
 export const delay = async (ms: number) => await new Promise((resolve) => setTimeout(resolve, ms));
 
 export const serializeSchemaForTest = (schema: z.ZodTypeAny): Record<string, any> => {
-  const getDescription = () => {
-    if (schema instanceof z.ZodIntersection) {
-      return {
+  return {
+    _type: schema._def.typeName,
+    ...(
+      schema instanceof z.ZodIntersection ? {
         left: serializeSchemaForTest(schema._def.left),
         right: serializeSchemaForTest(schema._def.right),
-      };
-    }
-    if (schema instanceof z.ZodUnion) {
-      return {
+      } : schema instanceof z.ZodUnion ? {
         options: schema._def.options.map(serializeSchemaForTest)
-      };
-    }
-    if (schema instanceof z.ZodObject) {
-      return {
+      } : schema instanceof z.ZodObject ? {
         shape: Object.keys(schema.shape).reduce((carry, key) => ({
           ...carry,
           [key]: serializeSchemaForTest(schema.shape[key])
         }), {})
-      };
-    }
-    if (schema instanceof z.ZodOptional || schema instanceof z.ZodNullable) {
-      return {
+      } : schema instanceof z.ZodOptional || schema instanceof z.ZodNullable ? {
         value: serializeSchemaForTest(schema.unwrap())
-      };
-    }
-    if (schema instanceof z.ZodEffects || schema instanceof z.ZodTransformer) {
-      return {
+      } : schema instanceof z.ZodEffects || schema instanceof z.ZodTransformer ? {
         value: serializeSchemaForTest(schema._def.schema)
-      };
-    }
-    if (schema instanceof z.ZodRecord) {
-      return {
+      } : schema instanceof z.ZodRecord ? {
         values: serializeSchemaForTest(schema._def.valueType)
-      };
-    }
-    if (schema instanceof z.ZodArray) {
-      return {
+      } : schema instanceof z.ZodArray ? {
         items: serializeSchemaForTest(schema._def.type)
-      };
-    }
-    if (schema instanceof z.ZodLiteral) {
-      return {
+      } : schema instanceof z.ZodLiteral ? {
         value: schema._def.value
-      };
-    }
-  };
-  return {
-    _type: schema._def.typeName,
-    ...getDescription()
+      } : {}
+    )
   };
 };
