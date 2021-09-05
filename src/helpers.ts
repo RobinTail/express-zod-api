@@ -90,10 +90,11 @@ export function isLoggerConfig(logger: any): logger is LoggerConfig {
 }
 
 export function getMessageFromError(error: Error): string {
-  return error instanceof z.ZodError
-    ? error.issues.map(({path, message}) =>
-      `${path.join('/')}: ${message}`).join('; ')
-    : error.message;
+  if (error instanceof z.ZodError) {
+    return error.issues.map(({path, message}) =>
+      `${path.join('/')}: ${message}`).join('; ');
+  }
+  return error.message;
 }
 
 export function getStatusCodeFromError(error: Error): number {

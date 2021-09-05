@@ -1,0 +1,41 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Endpoint .getNegativeResponseSchema() should return the negative schema of the result handler 1`] = `
+Object {
+  "_type": "ZodObject",
+  "shape": Object {
+    "error": Object {
+      "_type": "ZodObject",
+      "shape": Object {
+        "message": Object {
+          "_type": "ZodString",
+        },
+      },
+    },
+    "status": Object {
+      "_type": "ZodLiteral",
+      "value": "error",
+    },
+  },
+}
+`;
+
+exports[`Endpoint .getPositiveResponseSchema() should return schema according to the result handler 1`] = `
+Object {
+  "_type": "ZodObject",
+  "shape": Object {
+    "data": Object {
+      "_type": "ZodObject",
+      "shape": Object {
+        "something": Object {
+          "_type": "ZodNumber",
+        },
+      },
+    },
+    "status": Object {
+      "_type": "ZodLiteral",
+      "value": "success",
+    },
+  },
+}
+`;

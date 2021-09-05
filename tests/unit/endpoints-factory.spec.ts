@@ -2,6 +2,7 @@ import {createMiddleware, EndpointsFactory, z} from '../../src';
 import {Endpoint} from '../../src/endpoint';
 import {ResultHandlerDefinition} from '../../src/result-handler';
 import {expectType} from 'tsd';
+import {serializeSchemaForTest} from '../helpers';
 
 describe('EndpointsFactory', () => {
   describe('.constructor()', () => {
@@ -71,8 +72,8 @@ describe('EndpointsFactory', () => {
       expect(endpoint).toBeInstanceOf(Endpoint);
       expect(endpoint.getMethods()).toStrictEqual(['get']);
       expect(endpoint['middlewares']).toStrictEqual([middleware]);
-      expect(endpoint['inputSchema'].shape).toMatchSnapshot();
-      expect(endpoint['outputSchema'].shape).toMatchSnapshot();
+      expect(serializeSchemaForTest(endpoint['inputSchema'])).toMatchSnapshot();
+      expect(serializeSchemaForTest(endpoint['outputSchema'])).toMatchSnapshot();
       expect(endpoint['handler']).toStrictEqual(handlerMock);
       expect(endpoint['resultHandler']).toStrictEqual(resultHandlerMock);
       expectType<{
@@ -107,8 +108,8 @@ describe('EndpointsFactory', () => {
       expect(endpoint).toBeInstanceOf(Endpoint);
       expect(endpoint.getMethods()).toStrictEqual(['get']);
       expect(endpoint['middlewares']).toStrictEqual([middleware]);
-      expect(endpoint['inputSchema'].shape).toMatchSnapshot();
-      expect(endpoint['outputSchema'].shape).toMatchSnapshot();
+      expect(serializeSchemaForTest(endpoint['inputSchema'])).toMatchSnapshot();
+      expect(serializeSchemaForTest(endpoint['outputSchema'])).toMatchSnapshot();
       expect(endpoint['handler']).toStrictEqual(handlerMock);
       expect(endpoint['resultHandler']).toStrictEqual(resultHandlerMock);
       expectType<{
@@ -147,8 +148,8 @@ describe('EndpointsFactory', () => {
       expect(endpoint).toBeInstanceOf(Endpoint);
       expect(endpoint.getMethods()).toStrictEqual(['get']);
       expect(endpoint['middlewares']).toStrictEqual([middleware]);
-      expect(endpoint['inputSchema'].shape).toMatchSnapshot();
-      expect(endpoint['outputSchema'].shape).toMatchSnapshot();
+      expect(serializeSchemaForTest(endpoint['inputSchema'])).toMatchSnapshot();
+      expect(serializeSchemaForTest(endpoint['outputSchema'])).toMatchSnapshot();
       expect(endpoint['handler']).toStrictEqual(handlerMock);
       expect(endpoint['resultHandler']).toStrictEqual(resultHandlerMock);
       expectType<({
