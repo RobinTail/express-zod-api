@@ -11,6 +11,7 @@ import {
 import {CommonConfig} from '../../src/config-type';
 import {Endpoint} from '../../src/endpoint';
 import {Request, Response} from 'express';
+import {serializeSchemaForTest} from '../helpers';
 
 let loggerMock: any;
 
@@ -187,12 +188,7 @@ describe('Endpoint', () => {
         output,
         handler: jest.fn()
       });
-      expect(JSON.stringify(endpoint.getPositiveResponseSchema())).toBe(JSON.stringify(
-        z.object({
-          status: z.literal('success'),
-          data: output
-        }))
-      );
+      expect(serializeSchemaForTest(endpoint.getPositiveResponseSchema())).toMatchSnapshot();
     });
   });
 
@@ -208,14 +204,7 @@ describe('Endpoint', () => {
         output,
         handler: jest.fn()
       });
-      expect(JSON.stringify(endpoint.getNegativeResponseSchema())).toBe(JSON.stringify(
-        z.object({
-          status: z.literal('error'),
-          error: z.object({
-            message: z.string(),
-          })
-        }))
-      );
+      expect(serializeSchemaForTest(endpoint.getNegativeResponseSchema())).toMatchSnapshot();
     });
   });
 

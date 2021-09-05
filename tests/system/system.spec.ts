@@ -124,12 +124,7 @@ describe('App', () => {
       });
       expect(response.status).toBe(404);
       const json = await response.json();
-      expect(json).toEqual({
-        status: 'error',
-        error: {
-          message: 'Can not PUT /v1/test'
-        }
-      });
+      expect(json).toMatchSnapshot();
     });
 
     test('Should fail on malformed body', async () => {
@@ -142,12 +137,7 @@ describe('App', () => {
       });
       expect(response.status).toBe(500);
       const json = await response.json();
-      expect(json).toEqual({
-        status: 'error',
-        error: {
-          message: 'Unexpected end of JSON input'
-        }
-      });
+      expect(json).toMatchSnapshot();
     });
 
     test('Should fail when missing content type header', async () => {
@@ -160,12 +150,7 @@ describe('App', () => {
       });
       expect(response.status).toBe(400);
       const json = await response.json();
-      expect(json).toEqual({
-        status: 'error',
-        error: {
-          message: 'key: Required'
-        }
-      });
+      expect(json).toMatchSnapshot();
     });
   });
 
@@ -183,12 +168,7 @@ describe('App', () => {
       });
       expect(response.status).toBe(400);
       const json = await response.json();
-      expect(json).toEqual({
-        status: 'error',
-        error: {
-          message: 'key: Expected string, received number'
-        }
-      });
+      expect(json).toMatchSnapshot();
     });
 
     test('Should fail on middleware refinement mismatch', async () => {
@@ -204,12 +184,7 @@ describe('App', () => {
       });
       expect(response.status).toBe(400);
       const json = await response.json();
-      expect(json).toEqual({
-        status: 'error',
-        error: {
-          message: 'key: Invalid key'
-        }
-      });
+      expect(json).toMatchSnapshot();
     });
 
     test('Should fail on handler input type mismatch', async () => {
@@ -225,12 +200,7 @@ describe('App', () => {
       });
       expect(response.status).toBe(400);
       const json = await response.json();
-      expect(json).toEqual({
-        status: 'error',
-        error: {
-          message: 'something: Expected string, received number'
-        }
-      });
+      expect(json).toMatchSnapshot();
     });
 
     test('Should fail on handler output type mismatch', async () => {
@@ -246,12 +216,7 @@ describe('App', () => {
       });
       expect(response.status).toBe(400);
       const json = await response.json();
-      expect(json).toEqual({
-        status: 'error',
-        error: {
-          message: 'output: Invalid format; anything: Value should be greater than 0'
-        }
-      });
+      expect(json).toMatchSnapshot();
     });
   });
 });
