@@ -4,7 +4,7 @@
 
 ### v2.4.0
 
-- Zod version is 3.8.1.
+- Zod version is 3.8.2.
 - Supporting new string format: `cuid`.
 - Supporting new Zod schema `z.preprocess()`. 
   Please avoid using it for Endpoint outputs.
