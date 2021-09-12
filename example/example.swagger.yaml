@@ -223,10 +223,13 @@ paths:
                               exclusiveMaximum: false
                             mime:
                               type: string
+                            hash:
+                              type: string
                           required:
                             - name
                             - size
                             - mime
+                            - hash
                     required:
                       - files
                 required:

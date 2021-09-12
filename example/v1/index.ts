@@ -1,5 +1,5 @@
 import {DependsOnMethod, Routing} from '../../src';
-import {fileUploadEndpoint} from './fileUpload';
+import {fileUploadEndpoint} from './file-upload';
 import {getUserEndpoint} from './get-user';
 import {sendAvatarEndpoint} from './send-avatar';
 import {setUserEndpoint} from './set-user';
