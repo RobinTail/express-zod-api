@@ -57,6 +57,11 @@ const libs: Lib[] = [
     name: 'Winston',
     url: 'https://github.com/winstonjs/winston',
     module: 'winston'
+  },
+  {
+    name: 'Express-FileUpload',
+    url: 'https://github.com/richardgirges/express-fileupload',
+    module: 'express-fileupload'
   }
 ];
 
