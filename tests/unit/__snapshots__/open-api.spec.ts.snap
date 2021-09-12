@@ -857,6 +857,77 @@ paths:
             type: string
             pattern: /\\\\d+/
             description: GET /v1/stream parameter
+  /v1/upload:
+    post:
+      responses:
+        \\"200\\":
+          description: POST /v1/upload Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - success
+                  data:
+                    type: object
+                    properties:
+                      files:
+                        type: object
+                        additionalProperties:
+                          type: object
+                          properties:
+                            name:
+                              type: string
+                            size:
+                              type: integer
+                              format: int64
+                              minimum: 0
+                              exclusiveMinimum: false
+                              maximum: 9007199254740991
+                              exclusiveMaximum: false
+                            mime:
+                              type: string
+                          required:
+                            - name
+                            - size
+                            - mime
+                    required:
+                      - files
+                required:
+                  - status
+                  - data
+        \\"400\\":
+          description: POST /v1/upload Error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                required:
+                  - status
+                  - error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: {}
+              required: []
+              description: POST /v1/upload request body
 components:
   schemas: {}
   responses: {}

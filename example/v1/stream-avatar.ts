@@ -1,7 +1,7 @@
 import {z} from '../../src';
 import {fileStreamingEndpointsFactory} from '../factories';
 
-export const streamAvatar = fileStreamingEndpointsFactory.build({
+export const streamAvatarEndpoint = fileStreamingEndpointsFactory.build({
   methods: ['get'],
   input: z.object({
     userId: z.string().regex(/\d+/).transform((str) => parseInt(str, 10))
