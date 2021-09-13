@@ -10,7 +10,6 @@ import {OpenAPIError} from './errors';
 import {ZodFile} from './file-schema';
 import {ArrayElement, extractObjectSchema} from './helpers';
 import {Routing, routingCycle, RoutingCycleParams} from './routing';
-import {lookup} from 'mime';
 
 const describeSchema = (value: z.ZodTypeAny, isResponse: boolean): SchemaObject => {
   const otherProps: SchemaObject = {};
@@ -265,8 +264,6 @@ interface GenerationParams {
   errorResponseDescription?: string;
 }
 
-const mimeJson = lookup('json');
-
 export class OpenAPI extends OpenApiBuilder {
   public constructor({
     routing, title, version, serverUrl,
@@ -318,7 +315,7 @@ export class OpenAPI extends OpenApiBuilder {
       } else {
         operation.requestBody = {
           content: {
-            [mimeJson]: {
+            [endpoint.getInputMimeType()]: {
               schema: {
                 ...describeSchema(endpoint.getInputSchema(), false),
                 description: `${method.toUpperCase()} ${fullPath} request body`

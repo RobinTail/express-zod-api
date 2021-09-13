@@ -1,4 +1,5 @@
 import {Request, Response} from 'express';
+import {lookup} from 'mime';
 import {Logger} from 'winston';
 import {z} from 'zod';
 import {CommonConfig} from './config-type';
@@ -40,6 +41,7 @@ export abstract class AbstractEndpoint {
   public abstract getOutputSchema(): IOSchema;
   public abstract getPositiveResponseSchema(): z.ZodTypeAny;
   public abstract getNegativeResponseSchema(): z.ZodTypeAny;
+  public abstract getInputMimeType(): string;
   public abstract getPositiveMimeTypes(): string[];
   public abstract getNegativeMimeTypes(): string[];
 }
@@ -122,6 +124,10 @@ export class Endpoint<
 
   public override getNegativeResponseSchema(): NEG['schema'] {
     return this.resultHandler.getNegativeResponse().schema;
+  }
+
+  public override getInputMimeType() {
+    return lookup('json'); // @todo make it configurable
   }
 
   public override getPositiveMimeTypes() {
