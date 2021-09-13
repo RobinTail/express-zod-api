@@ -314,14 +314,15 @@ export class OpenAPI extends OpenApiBuilder {
         });
       } else {
         operation.requestBody = {
-          content: {
-            [endpoint.getInputMimeType()]: {
+          content: endpoint.getInputMimeTypes().reduce((carry, mimeType) => ({
+            ...carry,
+            [mimeType]: {
               schema: {
                 ...describeSchema(endpoint.getInputSchema(), false),
                 description: `${method.toUpperCase()} ${fullPath} request body`
               }
             }
-          }
+          }), {} as ContentObject)
         };
       }
       this.addPath(fullPath, {

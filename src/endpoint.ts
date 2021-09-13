@@ -41,7 +41,7 @@ export abstract class AbstractEndpoint {
   public abstract getOutputSchema(): IOSchema;
   public abstract getPositiveResponseSchema(): z.ZodTypeAny;
   public abstract getNegativeResponseSchema(): z.ZodTypeAny;
-  public abstract getInputMimeType(): string;
+  public abstract getInputMimeTypes(): string[];
   public abstract getPositiveMimeTypes(): string[];
   public abstract getNegativeMimeTypes(): string[];
 }
@@ -126,8 +126,8 @@ export class Endpoint<
     return this.resultHandler.getNegativeResponse().schema;
   }
 
-  public override getInputMimeType() {
-    return mimeJson; // @todo make it configurable
+  public override getInputMimeTypes() {
+    return [mimeJson]; // @todo make it configurable
   }
 
   public override getPositiveMimeTypes() {
