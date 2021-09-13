@@ -13,7 +13,6 @@ import {
 } from './helpers';
 import {Method, MethodsDefinition} from './method';
 import {MiddlewareDefinition} from './middleware';
-import {mimeJson} from './mime';
 import {ResultHandlerDefinition} from './result-handler';
 
 export type Handler<IN, OUT, OPT> = (params: {
@@ -71,6 +70,7 @@ type EndpointProps<
 > = {
   middlewares: MiddlewareDefinition<any, any, any>[];
   inputSchema: IN;
+  mimeTypes: string[];
   outputSchema: OUT;
   handler: Handler<z.output<Merge<IN, mIN>>, z.input<OUT>, OPT>;
   resultHandler: ResultHandlerDefinition<POS, NEG>;
@@ -85,16 +85,18 @@ export class Endpoint<
   protected methods: M[] = [];
   protected middlewares: MiddlewareDefinition<any, any, any>[] = [];
   protected inputSchema: Merge<IN, mIN>; // combined with middlewares input
+  protected mimeTypes: string[];
   protected outputSchema: OUT;
   protected handler: Handler<z.output<Merge<IN, mIN>>, z.input<OUT>, OPT>
   protected resultHandler: ResultHandlerDefinition<POS, NEG>;
 
   constructor({
-    middlewares, inputSchema, outputSchema, handler, resultHandler, description, ...rest
+    middlewares, inputSchema, outputSchema, handler, resultHandler, description, mimeTypes, ...rest
   }: EndpointProps<IN, OUT, mIN, OPT, M, POS, NEG>) {
     super();
     this.middlewares = middlewares;
     this.inputSchema = combineEndpointAndMiddlewareInputSchemas<IN, mIN>(inputSchema, middlewares);
+    this.mimeTypes = mimeTypes;
     this.outputSchema = outputSchema;
     this.handler = handler;
     this.resultHandler = resultHandler;
@@ -127,7 +129,7 @@ export class Endpoint<
   }
 
   public override getInputMimeTypes() {
-    return [mimeJson]; // @todo make it configurable
+    return this.mimeTypes;
   }
 
   public override getPositiveMimeTypes() {

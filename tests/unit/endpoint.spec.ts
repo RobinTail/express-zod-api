@@ -11,6 +11,7 @@ import {
 import {CommonConfig} from '../../src/config-type';
 import {Endpoint} from '../../src/endpoint';
 import {Request, Response} from 'express';
+import {mimeJson} from '../../src/mime';
 import {serializeSchemaForTest} from '../helpers';
 
 let loggerMock: any;
@@ -30,6 +31,7 @@ describe('Endpoint', () => {
       const endpointMock = new Endpoint({
         methods: ['get', 'post', 'put', 'delete', 'patch'],
         inputSchema: z.object({}),
+        mimeTypes: [mimeJson],
         outputSchema: z.object({}),
         handler: jest.fn(),
         resultHandler: {
@@ -46,6 +48,7 @@ describe('Endpoint', () => {
       const endpointMock = new Endpoint({
         method: 'patch',
         inputSchema: z.object({}),
+        mimeTypes: [mimeJson],
         outputSchema: z.object({}),
         handler: jest.fn(),
         resultHandler: {

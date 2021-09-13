@@ -4,6 +4,7 @@ import {Endpoint, Handler} from './endpoint';
 import {FlatObject, IOSchema, Merge} from './helpers';
 import {Method, MethodsDefinition} from './method';
 import {MiddlewareDefinition} from './middleware';
+import {mimeJson} from './mime';
 import {defaultResultHandler, ResultHandlerDefinition} from './result-handler';
 
 type BuildProps<IN extends IOSchema, OUT extends IOSchema, mIN, mOUT, M extends Method> = {
@@ -48,6 +49,7 @@ export class EndpointsFactory<mIN, mOUT, POS extends ApiResponse, NEG extends Ap
       inputSchema: input,
       outputSchema: output,
       resultHandler: this.resultHandler,
+      mimeTypes: [mimeJson], // @todo configurable
       ...rest
     });
   }
