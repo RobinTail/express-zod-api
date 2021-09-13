@@ -12,6 +12,7 @@ const fileDescriptionsSchema = z.record(z.object({
 // @todo content type of input (?)
 export const fileUploadEndpoint = fileUploadEndpointsFactory.build({
   method: 'post',
+  type: 'upload',
   input: z.object({}),
   output: z.object({
     files: fileDescriptionsSchema

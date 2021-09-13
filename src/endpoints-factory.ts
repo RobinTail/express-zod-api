@@ -4,7 +4,7 @@ import {Endpoint, Handler} from './endpoint';
 import {FlatObject, IOSchema, Merge} from './helpers';
 import {Method, MethodsDefinition} from './method';
 import {MiddlewareDefinition} from './middleware';
-import {mimeJson} from './mime';
+import {mimeJson, mimeUpload} from './mime';
 import {defaultResultHandler, ResultHandlerDefinition} from './result-handler';
 
 type BuildProps<IN extends IOSchema, OUT extends IOSchema, mIN, mOUT, M extends Method> = {
@@ -12,6 +12,7 @@ type BuildProps<IN extends IOSchema, OUT extends IOSchema, mIN, mOUT, M extends 
   output: OUT;
   handler: Handler<z.output<Merge<IN, mIN>>, z.input<OUT>, mOUT>;
   description?: string;
+  type?: 'json' | 'upload';
 } & MethodsDefinition<M>;
 
 /** mIN, mOUT - accumulated from all middlewares */
@@ -41,7 +42,7 @@ export class EndpointsFactory<mIN, mOUT, POS extends ApiResponse, NEG extends Ap
   }
 
   public build<IN extends IOSchema, OUT extends IOSchema, M extends Method>({
-    input, output, handler, description, ...rest
+    input, output, handler, description, type, ...rest
   }: BuildProps<IN, OUT, mIN, mOUT, M>) {
     return new Endpoint<IN, OUT, mIN, mOUT, M, POS, NEG>({
       handler, description,
@@ -49,7 +50,7 @@ export class EndpointsFactory<mIN, mOUT, POS extends ApiResponse, NEG extends Ap
       inputSchema: input,
       outputSchema: output,
       resultHandler: this.resultHandler,
-      mimeTypes: [mimeJson], // @todo configurable
+      mimeTypes: type === 'upload' ? [mimeUpload] : [mimeJson],
       ...rest
     });
   }
