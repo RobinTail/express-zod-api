@@ -1,5 +1,4 @@
 import {Request, Response} from 'express';
-import {lookup} from 'mime';
 import {Logger} from 'winston';
 import {z} from 'zod';
 import {ApiResponse} from './api-response';
@@ -14,6 +13,7 @@ import {
 } from './helpers';
 import {Method, MethodsDefinition} from './method';
 import {MiddlewareDefinition} from './middleware';
+import {mimeJson} from './mime';
 import {ResultHandlerDefinition} from './result-handler';
 
 export type Handler<IN, OUT, OPT> = (params: {
@@ -127,7 +127,7 @@ export class Endpoint<
   }
 
   public override getInputMimeType() {
-    return lookup('json'); // @todo make it configurable
+    return mimeJson; // @todo make it configurable
   }
 
   public override getPositiveMimeTypes() {
