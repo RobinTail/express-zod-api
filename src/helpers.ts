@@ -1,6 +1,5 @@
 import {Request} from 'express';
 import {HttpError} from 'http-errors';
-import {lookup} from 'mime';
 import {z} from 'zod';
 import {LoggerConfig, loggerLevels} from './config-type';
 import {MiddlewareDefinition} from './middleware';
@@ -107,14 +106,3 @@ export function getStatusCodeFromError(error: Error): number {
   return 500;
 }
 
-export type ApiResponse<A = z.ZodTypeAny> = {
-  schema: A;
-  mimeTypes: string[];
-};
-
-export const createApiResponse = <S extends z.ZodTypeAny>(schema: S, mimeTypes: string | string[] = lookup('json')) => {
-  return {
-    schema,
-    mimeTypes: typeof mimeTypes === 'string' ? [mimeTypes] : mimeTypes,
-  } as ApiResponse<S>;
-};

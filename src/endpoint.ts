@@ -2,9 +2,9 @@ import {Request, Response} from 'express';
 import {lookup} from 'mime';
 import {Logger} from 'winston';
 import {z} from 'zod';
+import {ApiResponse} from './api-response';
 import {CommonConfig} from './config-type';
 import {
-  ApiResponse,
   combineEndpointAndMiddlewareInputSchemas,
   getInitialInput,
   IOSchema,

@@ -8,7 +8,7 @@ import {
   isLoggerConfig,
   OutputMarker
 } from '../../src/helpers';
-import {createMiddleware, z, createHttpError, markOutput, createApiResponse} from '../../src';
+import {createMiddleware, z, createHttpError, markOutput} from '../../src';
 import {Request} from 'express';
 import {MiddlewareDefinition} from '../../src/middleware';
 import {serializeSchemaForTest} from '../helpers';
@@ -285,32 +285,6 @@ describe('Helpers', () => {
       const output = z.object({});
       expect(markOutput(output)).toEqual(output);
       expectType<OutputMarker>(markOutput(output));
-    });
-  });
-
-  describe('createApiResponse()', () => {
-    test('should accept an array of mime types', () => {
-      const output = z.object({});
-      expect(createApiResponse(output, ['something', 'anything'])).toEqual({
-        schema: output,
-        mimeTypes: ['something', 'anything']
-      });
-    });
-
-    test('should accept a single mime type', () => {
-      const output = z.object({});
-      expect(createApiResponse(output, 'something')).toEqual({
-        schema: output,
-        mimeTypes: ['something']
-      });
-    });
-
-    test('should assume json mime type by default', () => {
-      const output = z.object({});
-      expect(createApiResponse(output, )).toEqual({
-        schema: output,
-        mimeTypes: ['application/json']
-      });
     });
   });
 });

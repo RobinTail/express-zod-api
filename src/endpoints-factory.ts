@@ -1,6 +1,7 @@
 import {z} from 'zod';
+import {ApiResponse} from './api-response';
 import {Endpoint, Handler} from './endpoint';
-import {ApiResponse, FlatObject, IOSchema, Merge} from './helpers';
+import {FlatObject, IOSchema, Merge} from './helpers';
 import {Method, MethodsDefinition} from './method';
 import {MiddlewareDefinition} from './middleware';
 import {defaultResultHandler, ResultHandlerDefinition} from './result-handler';
