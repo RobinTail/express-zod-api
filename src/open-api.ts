@@ -166,7 +166,7 @@ export class OpenAPI {
   }
 
   public constructor({routing, title, version, serverUrl, successfulResponseDescription}: GenerationParams) {
-    const mimeJson = lookup('.json');
+    const mimeJson = lookup('json');
     this.builder = new OpenApiBuilder()
       .addInfo({title, version})
       .addServer({url: serverUrl});
