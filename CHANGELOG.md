@@ -2,6 +2,16 @@
 
 ## Version 1
 
+### v1.3.2
+
+- Updated the development package `path-parse` from 1.0.6 to 1.0.7.
+  An audit revealed a vulnerability, but this package is not included in the build.
+```
+info Reasons this module exists
+   - "jest#@jest#core#jest-resolve#resolve" depends on it
+   - Hoisted from "jest#@jest#core#jest-resolve#resolve#path-parse"
+```
+
 ### v1.3.1
 
 - Improving the coverage I found a bug and fixed it.
