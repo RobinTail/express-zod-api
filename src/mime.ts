@@ -1,6 +1,6 @@
-import {lookup} from 'mime';
+import {getType} from 'mime';
 
-export const mimeJson = lookup('json');
+export const mimeJson = getType('json') || 'application/json';
 export const mimeUpload = 'multipart/form-data';
 
 export type MimeParam = string | string[];

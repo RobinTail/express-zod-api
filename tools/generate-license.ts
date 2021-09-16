@@ -58,6 +58,10 @@ const libs: Lib[] = [
     url: 'https://github.com/winstonjs/winston',
     module: 'winston'
   },
+  {    name: 'Mime',
+    url: 'https://github.com/broofa/mime',
+    module: 'mime'
+  },
   {
     name: 'Express-FileUpload',
     url: 'https://github.com/richardgirges/express-fileupload',

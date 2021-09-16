@@ -105,4 +105,3 @@ export function getStatusCodeFromError(error: Error): number {
   }
   return 500;
 }
-
