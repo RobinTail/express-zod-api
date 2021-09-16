@@ -9,6 +9,12 @@
 - Supporting new Zod schema `z.preprocess()`. 
   Please avoid using it for Endpoint outputs.
 - Supporting default values of optional properties in OpenAPI/Swagger documentation.
+```typescript
+// example
+z.object({
+  name: z.string().optional().default('John Wick')
+});
+```
 
 ### v2.3.3
 
