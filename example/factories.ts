@@ -1,4 +1,4 @@
-import {lookup} from 'mime';
+import {getType} from 'mime';
 import {
   createApiResponse,
   createResultHandler,
@@ -12,8 +12,8 @@ import fs from 'fs';
 export const keyAndTokenAuthenticatedEndpointsFactory = defaultEndpointsFactory.addMiddleware(authMiddleware);
 
 export const fileDownloadEndpointsFactory = new EndpointsFactory(createResultHandler({
-  getPositiveResponse: () => createApiResponse(z.string(), lookup('svg')),
-  getNegativeResponse: () => createApiResponse(z.string(), lookup('txt')),
+  getPositiveResponse: () => createApiResponse(z.string(), getType('svg') || 'image/svg+xml'),
+  getNegativeResponse: () => createApiResponse(z.string(), getType('txt') || 'text/plain'),
   handler: ({response, error, output}) => {
     if (error) {
       response.status(400).send(error.message);
@@ -29,7 +29,7 @@ export const fileDownloadEndpointsFactory = new EndpointsFactory(createResultHan
 
 export const fileStreamingEndpointsFactory = new EndpointsFactory(createResultHandler({
   getPositiveResponse: () => createApiResponse(z.file().binary(), 'image/*'),
-  getNegativeResponse: () => createApiResponse(z.string(), lookup('txt')),
+  getNegativeResponse: () => createApiResponse(z.string(), getType('txt') || 'text/plain'),
   handler: ({response, error, output}) => {
     if (error) {
       response.status(400).send(error.message);

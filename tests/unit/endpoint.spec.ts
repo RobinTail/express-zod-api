@@ -142,6 +142,48 @@ describe('Endpoint', () => {
         }
       });
     });
+
+    test('Should throw on output parsing non-Zod error', async () => {
+      const factory = new EndpointsFactory(defaultResultHandler);
+      const endpoint = factory.build({
+        method: 'post',
+        input: z.object({}),
+        output: z.object({
+          test: z.number().transform(() => {
+            throw new Error('Something unexpected');
+          })
+        }),
+        handler: async () => ({
+          test: 123
+        })
+      });
+      const requestMock = {
+        method: 'GET',
+        body: {}
+      };
+      const responseMock: Record<string, jest.Mock> = {
+        set: jest.fn().mockImplementation(() => responseMock),
+        status: jest.fn().mockImplementation(() => responseMock),
+        json: jest.fn().mockImplementation(() => responseMock)
+      };
+      const configMock = {
+        cors: true
+      };
+      await endpoint.execute({
+        request: requestMock as Request,
+        response: responseMock as any as Response,
+        config: configMock as CommonConfig,
+        logger: loggerMock
+      });
+      expect(loggerMock.error).toBeCalledTimes(1);
+      expect(responseMock.status).toBeCalledWith(500);
+      expect(responseMock.json).toBeCalledWith({
+        status: 'error',
+        error: {
+          message: 'Something unexpected'
+        }
+      });
+    });
   });
 
   describe('.getInputSchema()', () => {

@@ -57,6 +57,11 @@ const libs: Lib[] = [
     name: 'Winston',
     url: 'https://github.com/winstonjs/winston',
     module: 'winston'
+  },
+  {
+    name: 'Mime',
+    url: 'https://github.com/broofa/mime',
+    module: 'mime'
   }
 ];
 
