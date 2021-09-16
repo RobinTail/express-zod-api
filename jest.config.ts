@@ -7,7 +7,7 @@ const config: Config.InitialOptions = {
   forceExit: true,
   collectCoverage: true,
   collectCoverageFrom: ['src/**'],
-  coverageReporters: ['json-summary', 'text', 'html-spa'],
+  coverageReporters: ['json-summary', 'text', 'html'],
   testTimeout: 10000,
 };
 
