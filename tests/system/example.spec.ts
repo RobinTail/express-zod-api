@@ -1,4 +1,3 @@
-import * as Buffer from 'buffer';
 import fetch from 'node-fetch';
 import {spawn, ChildProcessWithoutNullStreams} from 'child_process';
 import {mimeMultipart} from '../../src/mime';
