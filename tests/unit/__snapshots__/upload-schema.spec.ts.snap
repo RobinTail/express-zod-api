@@ -1,0 +1,31 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ZodUpload _parse() should accept UploadedFile 1`] = `
+Object {
+  "valid": true,
+  "value": Object {
+    "data": Object {
+      "data": Array [
+        115,
+        111,
+        109,
+        101,
+        116,
+        104,
+        105,
+        110,
+        103,
+      ],
+      "type": "Buffer",
+    },
+    "encoding": "utf-8",
+    "md5": "",
+    "mimetype": "image/jpeg",
+    "mv": [Function],
+    "name": "avatar.jpg",
+    "size": 100500,
+    "tempFilePath": "",
+    "truncated": false,
+  },
+}
+`;
