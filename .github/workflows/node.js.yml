@@ -40,3 +40,10 @@ jobs:
         yarn lint
         yarn test
         yarn build
+    - name: Upload to codecov
+      uses: codecov/codecov-action@v2
+      with:
+        name: node ${{ matrix.node-version }}
+        token: ${{ secrets.CODECOV_TOKEN }}
+        directory: coverage
+        verbose: true
