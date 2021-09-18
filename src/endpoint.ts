@@ -83,13 +83,13 @@ export class Endpoint<
   IN extends IOSchema, OUT extends IOSchema, mIN, OPT,
   M extends Method, POS extends ApiResponse, NEG extends ApiResponse
 > extends AbstractEndpoint {
-  protected methods: M[] = [];
-  protected middlewares: MiddlewareDefinition<any, any, any>[] = [];
-  protected inputSchema: Merge<IN, mIN>; // combined with middlewares input
-  protected mimeTypes: string[];
-  protected outputSchema: OUT;
-  protected handler: Handler<z.output<Merge<IN, mIN>>, z.input<OUT>, OPT>
-  protected resultHandler: ResultHandlerDefinition<POS, NEG>;
+  protected readonly methods: M[] = [];
+  protected readonly middlewares: MiddlewareDefinition<any, any, any>[] = [];
+  protected readonly inputSchema: Merge<IN, mIN>; // combined with middlewares input
+  protected readonly mimeTypes: string[];
+  protected readonly outputSchema: OUT;
+  protected readonly handler: Handler<z.output<Merge<IN, mIN>>, z.input<OUT>, OPT>
+  protected readonly resultHandler: ResultHandlerDefinition<POS, NEG>;
 
   constructor({
     middlewares, inputSchema, outputSchema, handler, resultHandler, description, mimeTypes, ...rest
