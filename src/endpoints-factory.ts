@@ -12,7 +12,7 @@ type BuildProps<IN extends IOSchema, OUT extends IOSchema, mIN, mOUT, M extends 
   output: OUT;
   handler: Handler<z.output<Merge<IN, mIN>>, z.input<OUT>, mOUT>;
   description?: string;
-  type?: 'json' | 'upload';
+  type?: 'json' | 'upload'; // @todo can we detect the usage of z.upload() within input?
 } & MethodsDefinition<M>;
 
 /** mIN, mOUT - accumulated from all middlewares */
