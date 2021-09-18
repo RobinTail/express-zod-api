@@ -375,6 +375,8 @@ const fileUploadEndpoint = defaultEndpointsFactory.build({
 });
 ```
 
+You can still send other data and specify additional `input` parameters, including arrays and objects.
+
 ## Your custom logger
 
 You can specify your custom Winston logger in config:
