@@ -70,7 +70,7 @@ export function combineEndpointAndMiddlewareInputSchemas<IN extends IOSchema, mI
 export function getInitialInput(request: Request, isWithFiles: boolean): any {
   switch (request.method) {
     case 'POST':
-      return isWithFiles ? {...request.body, ...request.files} : request.body; // @todo configurable?
+      return isWithFiles ? {...request.body, ...request.files} : request.body;
     case 'PUT':
     case 'PATCH':
       return request.body;
