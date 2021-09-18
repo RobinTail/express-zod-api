@@ -23,19 +23,13 @@ export type Handler<IN, OUT, OPT> = (params: {
 }) => Promise<OUT>;
 
 export abstract class AbstractEndpoint {
-  protected description?: string;
-
   public abstract execute(params: {
     request: Request,
     response: Response,
     logger: Logger,
     config: CommonConfig
   }): Promise<void>;
-
-  public getDescription() {
-    return this.description;
-  }
-
+  public abstract getDescription(): string | undefined;
   public abstract getMethods(): Method[];
   public abstract getInputSchema(): IOSchema;
   public abstract getOutputSchema(): IOSchema;
@@ -83,6 +77,7 @@ export class Endpoint<
   IN extends IOSchema, OUT extends IOSchema, mIN, OPT,
   M extends Method, POS extends ApiResponse, NEG extends ApiResponse
 > extends AbstractEndpoint {
+  protected readonly description?: string;
   protected readonly methods: M[] = [];
   protected readonly middlewares: MiddlewareDefinition<any, any, any>[] = [];
   protected readonly inputSchema: Merge<IN, mIN>; // combined with middlewares input
@@ -107,6 +102,10 @@ export class Endpoint<
     } else {
       this.methods = [rest.method];
     }
+  }
+
+  public override getDescription() {
+    return this.description;
   }
 
   public override getMethods(): M[] {
