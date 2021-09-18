@@ -26,7 +26,7 @@ const config = createConfig({
 ```
 - Creating the `Endpoint`:
 ```typescript
-export const fileUploadEndpoint = defaultEndpointsFactory.build({
+const fileUploadEndpoint = defaultEndpointsFactory.build({
   method: 'post',
   type: 'upload', // <- new option, required
   input: z.object({
