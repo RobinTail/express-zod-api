@@ -40,7 +40,8 @@ export const fileUploadEndpoint = defaultEndpointsFactory.build({
   }
 });
 ```
-- The file upload currently supports requests having POST method and `multipart/form-data` content type. 
+- The file upload currently supports requests having POST method and `multipart/form-data` content type.
+- You can send other data and specify additional `input` parameters, including arrays and objects.
 
 ### v2.4.0
 
