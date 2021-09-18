@@ -119,6 +119,11 @@ describe('Example', () => {
       const logo = readFileSync(filename, 'utf-8');
       const data = new FormData();
       data.append('avatar', logo, { filename });
+      data.append('str', 'test string value');
+      data.append('num', 123);
+      data.append('arr[0]', 456);
+      data.append('arr[1]', 789);
+      data.append('obj[some]', 'thing');
       const response = await fetch('http://localhost:8090/v1/upload', {
         method: 'POST',
         headers: {

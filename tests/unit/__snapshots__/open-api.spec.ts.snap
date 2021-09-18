@@ -887,11 +887,17 @@ paths:
                         type: string
                       hash:
                         type: string
+                      otherInputs:
+                        type: object
+                        additionalProperties:
+                          nullable: true
+                          format: any
                     required:
                       - name
                       - size
                       - mime
                       - hash
+                      - otherInputs
                 required:
                   - status
                   - data

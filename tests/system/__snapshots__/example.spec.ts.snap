@@ -28,6 +28,17 @@ Object {
     "hash": "f39beeff92379dc935586d726211c2620be6f879",
     "mime": "image/svg+xml",
     "name": "logo.svg",
+    "otherInputs": Object {
+      "arr": Array [
+        "456",
+        "789",
+      ],
+      "num": "123",
+      "obj": Object {
+        "some": "thing",
+      },
+      "str": "test string value",
+    },
     "size": 48687,
   },
   "status": "success",
