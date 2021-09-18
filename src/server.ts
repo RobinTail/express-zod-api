@@ -42,8 +42,8 @@ export function createServer(config: ServerConfig & CommonConfig, routing: Routi
     });
   };
 
-  type Parsers = (express.RequestHandler | express.ErrorRequestHandler)[];
-  app.use(([jsonParser] as Parsers).concat(multipartParser || []).concat(parserFailureHandler));
+  app.use(([jsonParser] as express.RequestHandler[]).concat(multipartParser || []));
+  app.use(parserFailureHandler);
   initRouting({app, routing, logger, config});
   app.use(lastResortHandler);
 
