@@ -45,5 +45,5 @@ jobs:
       with:
         name: node ${{ matrix.node-version }}
         token: ${{ secrets.CODECOV_TOKEN }}
-        directory: coverage
+        directory: ./coverage
         verbose: true
