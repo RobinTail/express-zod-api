@@ -232,8 +232,8 @@ export class Endpoint<
       return response.end();
     }
     const contentType = request.header('content-type') || '';
-    const isUpload = contentType.substr(0, mimeUpload.length).toLowerCase() === mimeUpload;
-    const initialInput = getInitialInput(request, isUpload);
+    const isMultipart = contentType.substr(0, mimeUpload.length).toLowerCase() === mimeUpload;
+    const initialInput = getInitialInput(request, isMultipart);
     try {
       const {input, options, isStreamClosed} = await this.#runMiddlewares({
         input: {...initialInput}, // preserve the initial
