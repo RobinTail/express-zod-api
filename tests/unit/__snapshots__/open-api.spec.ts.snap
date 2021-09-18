@@ -874,31 +874,24 @@ paths:
                   data:
                     type: object
                     properties:
-                      files:
-                        type: object
-                        additionalProperties:
-                          type: object
-                          properties:
-                            name:
-                              type: string
-                            size:
-                              type: integer
-                              format: int64
-                              minimum: 0
-                              exclusiveMinimum: false
-                              maximum: 9007199254740991
-                              exclusiveMaximum: false
-                            mime:
-                              type: string
-                            hash:
-                              type: string
-                          required:
-                            - name
-                            - size
-                            - mime
-                            - hash
+                      name:
+                        type: string
+                      size:
+                        type: integer
+                        format: int64
+                        minimum: 0
+                        exclusiveMinimum: false
+                        maximum: 9007199254740991
+                        exclusiveMaximum: false
+                      mime:
+                        type: string
+                      hash:
+                        type: string
                     required:
-                      - files
+                      - name
+                      - size
+                      - mime
+                      - hash
                 required:
                   - status
                   - data
@@ -928,7 +921,11 @@ paths:
           multipart/form-data:
             schema:
               type: object
-              properties: {}
+              properties:
+                avatar:
+                  nullable: true
+                  type: string
+                  format: binary
               required: []
               description: POST /v1/upload request body
 components:

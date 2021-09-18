@@ -1,36 +1,24 @@
-import { z } from '../../src';
-import {fileUploadEndpointsFactory} from '../factories';
+import {z, defaultEndpointsFactory} from '../../src';
 import crypto from 'crypto';
 
-const fileDescriptionsSchema = z.record(z.object({
-  name: z.string(),
-  size: z.number().int().nonnegative(),
-  mime: z.string(),
-  hash: z.string()
-}));
-
-export const fileUploadEndpoint = fileUploadEndpointsFactory.build({
+export const fileUploadEndpoint = defaultEndpointsFactory.build({
   method: 'post',
   type: 'upload',
-  input: z.object({}),
-  output: z.object({
-    files: fileDescriptionsSchema
+  input: z.object({
+    avatar: z.upload(),
   }),
-  handler: async ({options}) => {
-    const fileDescriptions = Object.entries(options.files)
-      .map(([key, file]) => ({
-        key,
-        file: Array.isArray(file) ? file[0] : file
-      }))
-      .reduce((carry, {key, file}) => ({
-        ...carry,
-        [key]: {
-          name: file.name,
-          size: file.size,
-          mime: file.mimetype,
-          hash: crypto.createHash('sha1').update(file.data).digest('hex')
-        }
-      }), {} as z.input<typeof fileDescriptionsSchema>);
-    return { files: fileDescriptions };
+  output: z.object({
+    name: z.string(),
+    size: z.number().int().nonnegative(),
+    mime: z.string(),
+    hash: z.string()
+  }),
+  handler: async ({input: {avatar}}) => {
+    return {
+      name: avatar.name,
+      size: avatar.size,
+      mime: avatar.mimetype,
+      hash: crypto.createHash('sha1').update(avatar.data).digest('hex')
+    };
   }
 });

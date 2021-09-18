@@ -119,7 +119,7 @@ describe('Example', () => {
       const filename = 'logo.svg';
       const logo = readFileSync(filename, 'utf-8');
       const data = new FormData();
-      data.append('logo', logo, { filename });
+      data.append('avatar', logo, { filename });
       const response = await fetch('http://localhost:8090/v1/upload', {
         method: 'POST',
         headers: {

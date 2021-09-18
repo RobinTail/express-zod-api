@@ -94,6 +94,7 @@ describe('Endpoint', () => {
       });
       const requestMock = {
         method: 'POST',
+        header: jest.fn(() => mimeJson),
         body: {
           n: 453
         }
@@ -107,8 +108,8 @@ describe('Endpoint', () => {
         cors: true
       };
       await endpoint.execute({
-        request: requestMock as Request,
-        response: responseMock as any as Response,
+        request: requestMock as unknown as Request,
+        response: responseMock as unknown as Response,
         config: configMock as CommonConfig,
         logger: loggerMock
       });
@@ -162,6 +163,7 @@ describe('Endpoint', () => {
       });
       const requestMock = {
         method: 'GET',
+        header: jest.fn(() => mimeJson),
         body: {}
       };
       const responseMock: Record<string, jest.Mock> = {
@@ -173,8 +175,8 @@ describe('Endpoint', () => {
         cors: true
       };
       await endpoint.execute({
-        request: requestMock as Request,
-        response: responseMock as any as Response,
+        request: requestMock as unknown as Request,
+        response: responseMock as unknown as Response,
         config: configMock as CommonConfig,
         logger: loggerMock
       });

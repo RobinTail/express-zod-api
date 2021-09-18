@@ -13,6 +13,7 @@ import {
 } from './helpers';
 import {Method, MethodsDefinition} from './method';
 import {MiddlewareDefinition} from './middleware';
+import {mimeUpload} from './mime';
 import {ResultHandlerDefinition} from './result-handler';
 
 export type Handler<IN, OUT, OPT> = (params: {
@@ -230,7 +231,9 @@ export class Endpoint<
     if (request.method === 'OPTIONS') {
       return response.end();
     }
-    const initialInput = getInitialInput(request);
+    const contentType = request.header('content-type') || '';
+    const isUpload = contentType.substr(0, mimeUpload.length).toLowerCase() === mimeUpload;
+    const initialInput = getInitialInput(request, isUpload);
     try {
       const {input, options, isStreamClosed} = await this.#runMiddlewares({
         input: {...initialInput}, // preserve the initial

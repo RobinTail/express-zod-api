@@ -6,11 +6,10 @@ import {
   EndpointsFactory,
   z
 } from '../src';
-import {authMiddleware, fileUploadMiddleware} from './middlewares';
+import {authMiddleware} from './middlewares';
 import fs from 'fs';
 
 export const keyAndTokenAuthenticatedEndpointsFactory = defaultEndpointsFactory.addMiddleware(authMiddleware);
-export const fileUploadEndpointsFactory = defaultEndpointsFactory.addMiddleware(fileUploadMiddleware);
 
 export const fileDownloadEndpointsFactory = new EndpointsFactory(createResultHandler({
   getPositiveResponse: () => createApiResponse(z.string(), getType('svg') || 'image/svg+xml'),

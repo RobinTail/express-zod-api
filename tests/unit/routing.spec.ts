@@ -2,6 +2,7 @@ import {Express, RequestHandler, Request, Response} from 'express';
 import {Logger} from 'winston';
 import {EndpointsFactory, z, Routing, DependsOnMethod, defaultResultHandler} from '../../src';
 import {CommonConfig} from '../../src/config-type';
+import {mimeJson} from '../../src/mime';
 import {initRouting} from '../../src/routing';
 
 let appMock: any;
@@ -253,6 +254,7 @@ describe('Routing', () => {
       const routeHandler = appMock.post.mock.calls[0][1] as RequestHandler;
       const requestMock = {
         method: 'POST',
+        header: jest.fn(() => mimeJson),
         body: {
           test: 123
         }
@@ -263,7 +265,7 @@ describe('Routing', () => {
         json: jest.fn().mockImplementation(() => responseMock)
       };
       const nextMock = jest.fn();
-      await routeHandler(requestMock as Request, responseMock as any as Response, nextMock);
+      await routeHandler(requestMock as unknown as Request, responseMock as unknown as Response, nextMock);
       expect(nextMock).toBeCalledTimes(0);
       expect(handlerMock).toBeCalledTimes(1);
       expect(loggerMock.info).toBeCalledWith('POST: /v1/user/set');

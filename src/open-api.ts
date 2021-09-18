@@ -10,6 +10,7 @@ import {OpenAPIError} from './errors';
 import {ZodFile} from './file-schema';
 import {ArrayElement, extractObjectSchema} from './helpers';
 import {Routing, routingCycle, RoutingCycleParams} from './routing';
+import {ZodUpload} from './upload-schema';
 
 const describeSchema = (value: z.ZodTypeAny, isResponse: boolean): SchemaObject => {
   const otherProps: SchemaObject = {};
@@ -105,6 +106,16 @@ const describeSchema = (value: z.ZodTypeAny, isResponse: boolean): SchemaObject 
         type: 'string',
         format: (value as ZodFile).isBinary ? 'binary' :
           (value as ZodFile).isBase64 ? 'byte' : 'file'
+      };
+    case value instanceof ZodUpload:
+      return (value as ZodUpload).isMultiple ? {
+        ...otherProps,
+        type: 'array',
+        items: { type: 'string', format: 'binary' }
+      } : {
+        ...otherProps,
+        type: 'string',
+        format: 'binary'
       };
     case value instanceof z.ZodAny:
       return {

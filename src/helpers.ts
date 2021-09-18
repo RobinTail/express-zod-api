@@ -67,9 +67,10 @@ export function combineEndpointAndMiddlewareInputSchemas<IN extends IOSchema, mI
   return extractObjectSchema(mSchema).merge(extractObjectSchema(input)) as Merge<IN, mIN>;
 }
 
-export function getInitialInput(request: Request): any {
+export function getInitialInput(request: Request, isWithFiles: boolean): any {
   switch (request.method) {
     case 'POST':
+      return isWithFiles ? {...request.body, ...request.files} : request.body; // @todo configurable?
     case 'PUT':
     case 'PATCH':
       return request.body;

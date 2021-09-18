@@ -25,14 +25,10 @@ exports[`Example Positive Should stream an image with a correct header 1`] = `"f
 exports[`Example Positive Should upload the file 1`] = `
 Object {
   "data": Object {
-    "files": Object {
-      "logo": Object {
-        "hash": "f39beeff92379dc935586d726211c2620be6f879",
-        "mime": "image/svg+xml",
-        "name": "logo.svg",
-        "size": 48687,
-      },
-    },
+    "hash": "f39beeff92379dc935586d726211c2620be6f879",
+    "mime": "image/svg+xml",
+    "name": "logo.svg",
+    "size": 48687,
   },
   "status": "success",
 }

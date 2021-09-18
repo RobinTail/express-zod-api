@@ -22,10 +22,3 @@ export const methodProviderMiddleware = createMiddleware({
     method: request.method.toLowerCase() as Method,
   })
 });
-
-export const fileUploadMiddleware = createMiddleware({
-  input: z.object({}),
-  middleware: async ({request}) => ({
-    files: request.files || {}
-  })
-});
