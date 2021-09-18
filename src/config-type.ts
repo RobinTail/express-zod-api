@@ -1,5 +1,6 @@
 import {NextHandleFunction} from 'connect';
 import {Express} from 'express';
+import fileUpload from 'express-fileupload';
 import {Logger} from 'winston';
 import {ResultHandlerDefinition} from './result-handler';
 
@@ -14,11 +15,17 @@ export interface LoggerConfig {
   color: boolean;
 }
 
+type UploadOptions = Pick<fileUpload.Options,
+  'createParentPath' | 'uriDecodeFileNames' | 'safeFileNames' | 'preserveExtension' |
+  'useTempFiles' | 'tempFileDir' | 'debug' | 'uploadTimeout'
+>;
+
 export interface ServerConfig {
   server: { // server configuration
     listen: number | string; // port or socket
     jsonParser?: NextHandleFunction; // custom JSON parser, default: express.json()
-  },
+    upload?: boolean | UploadOptions;
+  }
 }
 
 export interface AppConfig {

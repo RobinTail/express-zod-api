@@ -8,7 +8,7 @@ import {
   isLoggerConfig,
   OutputMarker
 } from '../../src/helpers';
-import {createMiddleware, z, createHttpError, markOutput, createApiResponse} from '../../src';
+import {createMiddleware, z, createHttpError, markOutput} from '../../src';
 import {Request} from 'express';
 import {MiddlewareDefinition} from '../../src/middleware';
 import {serializeSchemaForTest} from '../helpers';
@@ -135,30 +135,44 @@ describe('Helpers', () => {
       expect(getInitialInput({
         body: 'body',
         method: 'POST'
-      } as Request)).toEqual('body');
+      } as Request, false)).toEqual('body');
       expect(getInitialInput({
         body: 'body',
         method: 'PUT'
-      } as Request)).toEqual('body');
+      } as Request, false)).toEqual('body');
       expect(getInitialInput({
         body: 'body',
         method: 'PATCH'
-      } as Request)).toEqual('body');
+      } as Request, false)).toEqual('body');
     });
     test('should return query for GET requests', () => {
       expect(getInitialInput({
         query: 'query',
         method: 'GET'
-      } as unknown as Request)).toEqual('query');
+      } as unknown as Request, false)).toEqual('query');
     });
     test('should return both body and query for DELETE and unknown requests', () => {
       expect(getInitialInput({
         query: { a: 'query' },
         body: {b: 'body'},
         method: 'DELETE'
-      } as unknown as Request)).toEqual({
+      } as unknown as Request, false)).toEqual({
         a: 'query',
         b: 'body'
+      });
+    });
+    test('should return body and files on demand for POST', () => {
+      expect(getInitialInput({
+        body: {
+          param: 123
+        },
+        files: {
+          file: '456'
+        },
+        method: 'POST'
+      } as unknown as Request, true)).toEqual({
+        param: 123,
+        file: '456'
       });
     });
   });
@@ -285,32 +299,6 @@ describe('Helpers', () => {
       const output = z.object({});
       expect(markOutput(output)).toEqual(output);
       expectType<OutputMarker>(markOutput(output));
-    });
-  });
-
-  describe('createApiResponse()', () => {
-    test('should accept an array of mime types', () => {
-      const output = z.object({});
-      expect(createApiResponse(output, ['something', 'anything'])).toEqual({
-        schema: output,
-        mimeTypes: ['something', 'anything']
-      });
-    });
-
-    test('should accept a single mime type', () => {
-      const output = z.object({});
-      expect(createApiResponse(output, 'something')).toEqual({
-        schema: output,
-        mimeTypes: ['something']
-      });
-    });
-
-    test('should assume json mime type by default', () => {
-      const output = z.object({});
-      expect(createApiResponse(output, )).toEqual({
-        schema: output,
-        mimeTypes: ['application/json']
-      });
     });
   });
 });

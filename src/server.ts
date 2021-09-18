@@ -1,4 +1,5 @@
 import express from 'express';
+import fileUpload from 'express-fileupload';
 import {Server} from 'http';
 import {AppConfig, CommonConfig, ServerConfig} from './config-type';
 import {isLoggerConfig} from './helpers';
@@ -17,8 +18,13 @@ export function createServer(config: ServerConfig & CommonConfig, routing: Routi
   const app = express();
   const errorHandler = config.errorHandler || defaultResultHandler;
   const jsonParser = config.server.jsonParser || express.json();
+  const multipartParser = config.server.upload ? fileUpload({
+    ...(typeof config.server.upload === 'object' ? config.server.upload : {}),
+    abortOnLimit: false,
+    parseNested: true,
+  }) : undefined;
 
-  const jsonFailureHandler: express.ErrorRequestHandler = (error, request, response, next) => {
+  const parserFailureHandler: express.ErrorRequestHandler = (error, request, response, next) => {
     if (!error) { return next(); }
     errorHandler.handler({
       error, request, response, logger,
@@ -36,7 +42,8 @@ export function createServer(config: ServerConfig & CommonConfig, routing: Routi
     });
   };
 
-  app.use([jsonParser, jsonFailureHandler]);
+  app.use(([jsonParser] as express.RequestHandler[]).concat(multipartParser || []));
+  app.use(parserFailureHandler);
   initRouting({app, routing, logger, config});
   app.use(lastResortHandler);
 

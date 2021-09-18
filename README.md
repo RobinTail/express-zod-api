@@ -19,7 +19,7 @@ Start your API server with I/O schema validation and custom middlewares in minut
 4. [Basic usage](#basic-usage)
    1. [Set up config](#set-up-config)
    2. [Create an endpoints factory](#create-an-endpoints-factory)
-   3. [Create your first endpoint](#create-your-first-endpoint)   
+   3. [Create your first endpoint](#create-your-first-endpoint)
    4. [Set up routing](#set-up-routing)
    5. [Start your server](#start-your-server)
 5. [Advanced usage](#advanced-usage)
@@ -27,10 +27,11 @@ Start your API server with I/O schema validation and custom middlewares in minut
    2. [Refinements](#refinements)
    3. [Transformations](#transformations)
    4. [ResultHandler](#resulthandler)
-   5. [Non-object response](#non-object-response)   
-   6. [Your custom logger](#your-custom-logger)
-   7. [Your custom server](#your-custom-server)
-   8. [Multiple schemas for a single route](#multiple-schemas-for-a-single-route)
+   5. [Non-object response](#non-object-response) including file downloads
+   6. [File uploads](#file-uploads)
+   7. [Your custom logger](#your-custom-logger)
+   8. [Your custom server](#your-custom-server)
+   9. [Multiple schemas for a single route](#multiple-schemas-for-a-single-route)
 6. [Disclosing API specifications](#disclosing-api-specifications)
    1. [Reusing endpoint types on your frontend](#reusing-endpoint-types-on-your-frontend)
    2. [Swagger / OpenAPI Specification](#swagger--openapi-specification)
@@ -308,8 +309,8 @@ const endpointsFactory = new EndpointsFactory(myResultHandler);
 
 ## Non-object response
 
-Starting from the version 2.0.0, `ResultHandler` also supports non-object response types, for example, sending an 
-image file including its MIME type in `Content-type` header.
+`ResultHandler` also supports non-object response types, for example, sending an image file including its MIME type 
+in `Content-type` header.
 
 You can find two approaches to `EndpointsFactory` and `ResultHandler` implementation 
 [in this example](https://github.com/RobinTail/express-zod-api/blob/master/example/factories.ts). 
@@ -342,6 +343,39 @@ const fileStreamingEndpointsFactory = new EndpointsFactory(
   })
 );
 ```
+
+## File uploads
+
+Starting from the version 2.5.0 you can switch the `Endpoint` to handle requests with the `multipart/formdata` 
+content type instead of JSON. Together with a corresponding configuration option, this makes it possible to handle 
+file uploads. Here is a simplified example:
+
+```typescript
+import {createConfig, z, defaultEndpointsFactory} from 'express-zod-api';
+
+const config = createConfig({
+   server: {
+     upload: true, // <- required
+     ...
+   },
+});
+
+const fileUploadEndpoint = defaultEndpointsFactory.build({
+   method: 'post',
+   type: 'upload', // <- required
+   input: z.object({
+      avatar: z.upload()
+   }),
+   output: z.object({...}),
+   handler: async ({input: {avatar}}) => {
+      // avatar: {name, mv(), mimetype, encoding, data, truncated, size, ...}
+      // avatar.truncated is true on failure
+      return {...};
+   }
+});
+```
+
+You can still send other data and specify additional `input` parameters, including arrays and objects.
 
 ## Your custom logger
 

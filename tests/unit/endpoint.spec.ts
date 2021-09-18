@@ -11,6 +11,7 @@ import {
 import {CommonConfig} from '../../src/config-type';
 import {Endpoint} from '../../src/endpoint';
 import {Request, Response} from 'express';
+import {mimeJson} from '../../src/mime';
 import {serializeSchemaForTest} from '../helpers';
 
 let loggerMock: any;
@@ -30,6 +31,7 @@ describe('Endpoint', () => {
       const endpointMock = new Endpoint({
         methods: ['get', 'post', 'put', 'delete', 'patch'],
         inputSchema: z.object({}),
+        mimeTypes: [mimeJson],
         outputSchema: z.object({}),
         handler: jest.fn(),
         resultHandler: {
@@ -46,6 +48,7 @@ describe('Endpoint', () => {
       const endpointMock = new Endpoint({
         method: 'patch',
         inputSchema: z.object({}),
+        mimeTypes: [mimeJson],
         outputSchema: z.object({}),
         handler: jest.fn(),
         resultHandler: {
@@ -91,6 +94,7 @@ describe('Endpoint', () => {
       });
       const requestMock = {
         method: 'POST',
+        header: jest.fn(() => mimeJson),
         body: {
           n: 453
         }
@@ -104,8 +108,8 @@ describe('Endpoint', () => {
         cors: true
       };
       await endpoint.execute({
-        request: requestMock as Request,
-        response: responseMock as any as Response,
+        request: requestMock as unknown as Request,
+        response: responseMock as unknown as Response,
         config: configMock as CommonConfig,
         logger: loggerMock
       });
@@ -159,6 +163,7 @@ describe('Endpoint', () => {
       });
       const requestMock = {
         method: 'GET',
+        header: jest.fn(() => mimeJson),
         body: {}
       };
       const responseMock: Record<string, jest.Mock> = {
@@ -170,8 +175,8 @@ describe('Endpoint', () => {
         cors: true
       };
       await endpoint.execute({
-        request: requestMock as Request,
-        response: responseMock as any as Response,
+        request: requestMock as unknown as Request,
+        response: responseMock as unknown as Response,
         config: configMock as CommonConfig,
         logger: loggerMock
       });

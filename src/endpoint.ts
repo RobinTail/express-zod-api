@@ -1,9 +1,9 @@
 import {Request, Response} from 'express';
 import {Logger} from 'winston';
 import {z} from 'zod';
+import {ApiResponse} from './api-response';
 import {CommonConfig} from './config-type';
 import {
-  ApiResponse,
   combineEndpointAndMiddlewareInputSchemas,
   getInitialInput,
   IOSchema,
@@ -13,6 +13,7 @@ import {
 } from './helpers';
 import {Method, MethodsDefinition} from './method';
 import {MiddlewareDefinition} from './middleware';
+import {mimeMultipart} from './mime';
 import {ResultHandlerDefinition} from './result-handler';
 
 export type Handler<IN, OUT, OPT> = (params: {
@@ -40,6 +41,7 @@ export abstract class AbstractEndpoint {
   public abstract getOutputSchema(): IOSchema;
   public abstract getPositiveResponseSchema(): z.ZodTypeAny;
   public abstract getNegativeResponseSchema(): z.ZodTypeAny;
+  public abstract getInputMimeTypes(): string[];
   public abstract getPositiveMimeTypes(): string[];
   public abstract getNegativeMimeTypes(): string[];
 }
@@ -69,6 +71,7 @@ type EndpointProps<
 > = {
   middlewares: MiddlewareDefinition<any, any, any>[];
   inputSchema: IN;
+  mimeTypes: string[];
   outputSchema: OUT;
   handler: Handler<z.output<Merge<IN, mIN>>, z.input<OUT>, OPT>;
   resultHandler: ResultHandlerDefinition<POS, NEG>;
@@ -83,16 +86,18 @@ export class Endpoint<
   protected methods: M[] = [];
   protected middlewares: MiddlewareDefinition<any, any, any>[] = [];
   protected inputSchema: Merge<IN, mIN>; // combined with middlewares input
+  protected mimeTypes: string[];
   protected outputSchema: OUT;
   protected handler: Handler<z.output<Merge<IN, mIN>>, z.input<OUT>, OPT>
   protected resultHandler: ResultHandlerDefinition<POS, NEG>;
 
   constructor({
-    middlewares, inputSchema, outputSchema, handler, resultHandler, description, ...rest
+    middlewares, inputSchema, outputSchema, handler, resultHandler, description, mimeTypes, ...rest
   }: EndpointProps<IN, OUT, mIN, OPT, M, POS, NEG>) {
     super();
     this.middlewares = middlewares;
     this.inputSchema = combineEndpointAndMiddlewareInputSchemas<IN, mIN>(inputSchema, middlewares);
+    this.mimeTypes = mimeTypes;
     this.outputSchema = outputSchema;
     this.handler = handler;
     this.resultHandler = resultHandler;
@@ -122,6 +127,10 @@ export class Endpoint<
 
   public override getNegativeResponseSchema(): NEG['schema'] {
     return this.resultHandler.getNegativeResponse().schema;
+  }
+
+  public override getInputMimeTypes() {
+    return this.mimeTypes;
   }
 
   public override getPositiveMimeTypes() {
@@ -222,7 +231,9 @@ export class Endpoint<
     if (request.method === 'OPTIONS') {
       return response.end();
     }
-    const initialInput = getInitialInput(request);
+    const contentType = request.header('content-type') || '';
+    const isMultipart = contentType.substr(0, mimeMultipart.length).toLowerCase() === mimeMultipart;
+    const initialInput = getInitialInput(request, 'files' in request && isMultipart);
     try {
       const {input, options, isStreamClosed} = await this.#runMiddlewares({
         input: {...initialInput}, // preserve the initial

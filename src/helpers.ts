@@ -1,6 +1,5 @@
 import {Request} from 'express';
 import {HttpError} from 'http-errors';
-import {getType} from 'mime';
 import {z} from 'zod';
 import {LoggerConfig, loggerLevels} from './config-type';
 import {MiddlewareDefinition} from './middleware';
@@ -68,9 +67,10 @@ export function combineEndpointAndMiddlewareInputSchemas<IN extends IOSchema, mI
   return extractObjectSchema(mSchema).merge(extractObjectSchema(input)) as Merge<IN, mIN>;
 }
 
-export function getInitialInput(request: Request): any {
+export function getInitialInput(request: Request, isWithFiles: boolean): any {
   switch (request.method) {
     case 'POST':
+      return isWithFiles ? {...request.body, ...request.files} : request.body;
     case 'PUT':
     case 'PATCH':
       return request.body;
@@ -107,17 +107,8 @@ export function getStatusCodeFromError(error: Error): number {
   return 500;
 }
 
-export type ApiResponse<A = z.ZodTypeAny> = {
-  schema: A;
-  mimeTypes: string[];
-};
+// obtaining the private helper type from Zod
+export type ErrMessage = Exclude<Parameters<typeof z.ZodString.prototype.email>[0], undefined>;
 
-export const createApiResponse = <S extends z.ZodTypeAny>(
-  schema: S,
-  mimeTypes: string | string[] = getType('json') || 'application/json'
-) => {
-  return {
-    schema,
-    mimeTypes: typeof mimeTypes === 'string' ? [mimeTypes] : mimeTypes,
-  } as ApiResponse<S>;
-};
+// the copy of the private Zod errorUtil.errToObj
+export const errToObj = (message: ErrMessage | undefined) => typeof message === 'string' ? {message} : message || {};

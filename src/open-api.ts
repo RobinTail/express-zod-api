@@ -10,7 +10,7 @@ import {OpenAPIError} from './errors';
 import {ZodFile} from './file-schema';
 import {ArrayElement, extractObjectSchema} from './helpers';
 import {Routing, routingCycle, RoutingCycleParams} from './routing';
-import {getType} from 'mime';
+import {ZodUpload} from './upload-schema';
 
 const describeSchema = (value: z.ZodTypeAny, isResponse: boolean): SchemaObject => {
   const otherProps: SchemaObject = {};
@@ -106,6 +106,12 @@ const describeSchema = (value: z.ZodTypeAny, isResponse: boolean): SchemaObject 
         type: 'string',
         format: (value as ZodFile).isBinary ? 'binary' :
           (value as ZodFile).isBase64 ? 'byte' : 'file'
+      };
+    case value instanceof ZodUpload:
+      return {
+        ...otherProps,
+        type: 'string',
+        format: 'binary'
       };
     case value instanceof z.ZodAny:
       return {
@@ -265,8 +271,6 @@ interface GenerationParams {
   errorResponseDescription?: string;
 }
 
-const mimeJson = getType('json') || 'application/json';
-
 export class OpenAPI extends OpenApiBuilder {
   public constructor({
     routing, title, version, serverUrl,
@@ -317,14 +321,15 @@ export class OpenAPI extends OpenApiBuilder {
         });
       } else {
         operation.requestBody = {
-          content: {
-            [mimeJson]: {
+          content: endpoint.getInputMimeTypes().reduce((carry, mimeType) => ({
+            ...carry,
+            [mimeType]: {
               schema: {
                 ...describeSchema(endpoint.getInputSchema(), false),
                 description: `${method.toUpperCase()} ${fullPath} request body`
               }
             }
-          }
+          }), {} as ContentObject)
         };
       }
       this.addPath(fullPath, {

@@ -2,7 +2,7 @@ import { z } from '../../src';
 import {fileDownloadEndpointsFactory} from '../factories';
 import fs from 'fs';
 
-export const sendAvatar = fileDownloadEndpointsFactory.build({
+export const sendAvatarEndpoint = fileDownloadEndpointsFactory.build({
   methods: ['get'],
   input: z.object({
     userId: z.string().regex(/\d+/).transform((str) => parseInt(str, 10))

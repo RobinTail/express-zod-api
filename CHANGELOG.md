@@ -2,6 +2,47 @@
 
 ## Version 2
 
+### v2.5.0
+
+- New feature: file uploads!
+- The processing of files is provided by `express-fileupload` which is based on `busboy`.
+- Introducing the new schema: `z.upload()`.
+- New configuration option:
+```typescript
+const config = createConfig({
+  server: {
+    upload: true, 
+    // or selected express-fileupload's options:
+    // @see https://github.com/richardgirges/express-fileupload#available-options
+    upload: {
+      uploadTimeout: 60000,
+      useTempFiles: true,
+      safeFileNames: true,
+      preserveExtension: 4,
+      tempFileDir: '/var/tmp'
+    }
+  },
+});
+```
+- Creating the `Endpoint`:
+```typescript
+const fileUploadEndpoint = defaultEndpointsFactory.build({
+  method: 'post',
+  type: 'upload', // <- new option, required
+  input: z.object({
+    avatar: z.upload()
+  }),
+  output: z.object({...}),
+  handler: async ({input: {avatar}}) => {
+    // avatar: {name, mv(), mimetype, encoding, data, truncated, size, ...}
+    // avatar.truncated is true on failure
+    return {...};
+  }
+});
+```
+- The file upload currently supports requests having POST method and `multipart/form-data` content type.
+- You can send other data and specify additional `input` parameters, including arrays and objects.
+
 ### v2.4.0
 
 - Zod version is 3.8.2.

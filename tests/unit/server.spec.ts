@@ -63,7 +63,7 @@ describe('Server', () => {
       };
       createServer(configMock, routingMock);
       expect(appMock).toBeTruthy();
-      expect(appMock.use).toBeCalledTimes(2);
+      expect(appMock.use).toBeCalledTimes(3);
       expect(Array.isArray(appMock.use.mock.calls[0][0])).toBeTruthy();
       expect(appMock.use.mock.calls[0][0][0]).toBe(expressJsonMock);
       expect(appMock.get).toBeCalledTimes(1);
@@ -108,12 +108,12 @@ describe('Server', () => {
       const server = createServer(configMock as unknown as ServerConfig & CommonConfig, routingMock);
       expect(server).toBeInstanceOf(http.Server);
       expect(appMock).toBeTruthy();
-      expect(appMock.use).toBeCalledTimes(2);
+      expect(appMock.use).toBeCalledTimes(3);
       expect(Array.isArray(appMock.use.mock.calls[0][0])).toBeTruthy();
       expect(appMock.use.mock.calls[0][0][0]).toBe(configMock.server.jsonParser);
-      expect(typeof appMock.use.mock.calls[1][0]).toBe('function');
+      expect(typeof appMock.use.mock.calls[2][0]).toBe('function');
       expect(configMock.errorHandler.handler).toBeCalledTimes(0);
-      appMock.use.mock.calls[1][0]({method: 'get', path: '/v1/test'});
+      appMock.use.mock.calls[2][0]({method: 'get', path: '/v1/test'});
       expect(configMock.errorHandler.handler).toBeCalledTimes(1);
       expect(configMock.logger.info).toBeCalledTimes(1);
       expect(configMock.logger.info).toBeCalledWith('Listening 8054');
