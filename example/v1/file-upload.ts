@@ -5,7 +5,10 @@ export const fileUploadEndpoint = defaultEndpointsFactory.build({
   method: 'post',
   type: 'upload',
   input: z.object({
-    avatar: z.upload(),
+    avatar: z.upload().refine(
+      (file) => file.mimetype.match(/image\/.+/),
+      'Should be an image'
+    ),
   }).passthrough(),
   output: z.object({
     name: z.string(),
