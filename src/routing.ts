@@ -58,7 +58,7 @@ export const routingCycle = ({routing, cb, parentPath, cors}: RoutingCycleParams
     }
     const fullPath = `${parentPath || ''}${path ? `/${path}` : ''}`;
     if (element instanceof AbstractEndpoint) {
-      const methods: (Method | AuxMethod)[] = element.getMethods();
+      const methods: (Method | AuxMethod)[] = element.getMethods().slice();
       if (cors) {
         methods.push('options');
       }
