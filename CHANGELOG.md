@@ -11,8 +11,16 @@
 ```typescript
 const config = createConfig({
   server: {
-    upload: true, // or selected express-fileupload's options:
+    upload: true, 
+    // or selected express-fileupload's options:
     // @see https://github.com/richardgirges/express-fileupload#available-options
+    upload: {
+      uploadTimeout: 60000,
+      useTempFiles: true,
+      safeFileNames: true,
+      preserveExtension: 4,
+      tempFileDir: '/var/tmp'
+    }
   },
 });
 ```
