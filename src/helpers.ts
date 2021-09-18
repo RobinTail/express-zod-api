@@ -106,3 +106,9 @@ export function getStatusCodeFromError(error: Error): number {
   }
   return 500;
 }
+
+// obtaining the private helper type from Zod
+export type ErrMessage = Exclude<Parameters<typeof z.ZodString.prototype.email>[0], undefined>;
+
+// the copy of the private Zod errorUtil.errToObj
+export const errToObj = (message: ErrMessage | undefined) => typeof message === 'string' ? {message} : message || {};

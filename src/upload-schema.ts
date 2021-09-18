@@ -6,19 +6,11 @@ import {
   ZodParsedType,
   ZodType,
   INVALID,
-  OK, ZodString,
+  OK
 } from 'zod';
+import {ErrMessage, errToObj} from './helpers';
 
 const zodUploadKind = 'ZodUpload';
-
-// @todo move this to helpers, DNRY
-
-// obtaining the private helper type from Zod
-type ErrMessage = Exclude<Parameters<typeof ZodString.prototype.email>[0], undefined>;
-
-// the copy of the private Zod errorUtil.errToObj
-const errToObj = (message: ErrMessage | undefined) => typeof message === 'string' ? {message} : message || {};
-
 
 declare type ZodUploadCheck = {
   kind: 'single';
