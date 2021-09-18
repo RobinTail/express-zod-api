@@ -13,7 +13,7 @@ import {
 } from './helpers';
 import {Method, MethodsDefinition} from './method';
 import {MiddlewareDefinition} from './middleware';
-import {mimeUpload} from './mime';
+import {mimeMultipart} from './mime';
 import {ResultHandlerDefinition} from './result-handler';
 
 export type Handler<IN, OUT, OPT> = (params: {
@@ -232,7 +232,7 @@ export class Endpoint<
       return response.end();
     }
     const contentType = request.header('content-type') || '';
-    const isMultipart = contentType.substr(0, mimeUpload.length).toLowerCase() === mimeUpload;
+    const isMultipart = contentType.substr(0, mimeMultipart.length).toLowerCase() === mimeMultipart;
     const initialInput = getInitialInput(request, 'files' in request && isMultipart);
     try {
       const {input, options, isStreamClosed} = await this.#runMiddlewares({

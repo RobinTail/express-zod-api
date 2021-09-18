@@ -1,7 +1,7 @@
 import * as Buffer from 'buffer';
 import fetch from 'node-fetch';
 import {spawn, ChildProcessWithoutNullStreams} from 'child_process';
-import {mimeUpload} from '../../src/mime';
+import {mimeMultipart} from '../../src/mime';
 import {waitFor} from '../helpers';
 import crypto from 'crypto';
 import FormData from 'form-data';
@@ -123,7 +123,7 @@ describe('Example', () => {
       const response = await fetch('http://localhost:8090/v1/upload', {
         method: 'POST',
         headers: {
-          'Content-Type': `${mimeUpload}; boundary=${data.getBoundary()}`,
+          'Content-Type': `${mimeMultipart}; boundary=${data.getBoundary()}`,
         },
         body: data
       });
