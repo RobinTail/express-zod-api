@@ -18,7 +18,11 @@ export function createServer(config: ServerConfig & CommonConfig, routing: Routi
   const app = express();
   const errorHandler = config.errorHandler || defaultResultHandler;
   const jsonParser = config.server.jsonParser || express.json();
-  const multipartParser = fileUpload(); // @todo options
+  const multipartParser = config.server.upload ? fileUpload({
+    ...(typeof config.server.upload === 'object' ? config.server.upload : {}),
+    abortOnLimit: false,
+    parseNested: true,
+  }) : undefined;
 
   const parserFailureHandler: express.ErrorRequestHandler = (error, request, response, next) => {
     if (!error) { return next(); }
@@ -38,7 +42,8 @@ export function createServer(config: ServerConfig & CommonConfig, routing: Routi
     });
   };
 
-  app.use([jsonParser, multipartParser, parserFailureHandler]); // @todo multipart optional
+  type Parsers = (express.RequestHandler | express.ErrorRequestHandler)[];
+  app.use(([jsonParser] as Parsers).concat(multipartParser || []).concat(parserFailureHandler));
   initRouting({app, routing, logger, config});
   app.use(lastResortHandler);
 

@@ -4,6 +4,7 @@ import {routing} from './routing';
 const config = createConfig({
   server: {
     listen: 8090,
+    upload: true,
   },
   cors: true,
   logger: {
