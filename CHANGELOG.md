@@ -16,7 +16,7 @@ const config = createConfig({
   },
 });
 ```
-- Creating the endpoint:
+- Creating the `Endpoint`:
 ```typescript
 export const fileUploadEndpoint = defaultEndpointsFactory.build({
   method: 'post',
@@ -32,6 +32,7 @@ export const fileUploadEndpoint = defaultEndpointsFactory.build({
   }
 });
 ```
+- The file upload currently supports requests having POST method and `multipart/form-data` content type. 
 
 ### v2.4.0
 
