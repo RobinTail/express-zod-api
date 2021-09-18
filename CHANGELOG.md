@@ -42,6 +42,13 @@ const fileUploadEndpoint = defaultEndpointsFactory.build({
 ```
 - The file upload currently supports requests having POST method and `multipart/form-data` content type.
 - You can send other data and specify additional `input` parameters, including arrays and objects.
+- Fixed the OPTIONS duplication issue in response header when `cors` option is enabled:
+```http request
+# before
+Access-Control-Allow-Methods: POST, OPTIONS, OPTIONS
+# after
+Access-Control-Allow-Methods: POST, OPTIONS
+```
 
 ### v2.4.0
 
