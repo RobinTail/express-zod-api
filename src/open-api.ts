@@ -108,11 +108,7 @@ const describeSchema = (value: z.ZodTypeAny, isResponse: boolean): SchemaObject 
           (value as ZodFile).isBase64 ? 'byte' : 'file'
       };
     case value instanceof ZodUpload:
-      return (value as ZodUpload).isMultiple ? {
-        ...otherProps,
-        type: 'array',
-        items: { type: 'string', format: 'binary' }
-      } : {
+      return {
         ...otherProps,
         type: 'string',
         format: 'binary'

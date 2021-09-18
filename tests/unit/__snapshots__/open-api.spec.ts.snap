@@ -923,10 +923,10 @@ paths:
               type: object
               properties:
                 avatar:
-                  nullable: true
                   type: string
                   format: binary
-              required: []
+              required:
+                - avatar
               description: POST /v1/upload request body
 components:
   schemas: {}
