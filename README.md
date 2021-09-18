@@ -51,8 +51,8 @@ If you're upgrading from v1 please check out the information in [Changelog](CHAN
 
 # Concept
 The API operates object schemas for input and output, including unions and intersections of object schemas
-(`.or()`, `.and()`), but in general the API can respond with any data type 
-*(see [advanced example below](#non-object-response))*.
+(`.or()`, `.and()`), but in general the API can [respond with any data type](#non-object-response) and 
+accept [file uploads](#file-uploads).
 
 The object being validated is the `request.query` for GET request, the `request.body` for PUT, PATCH and POST requests, 
 or their merging for DELETE requests.
