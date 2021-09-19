@@ -1,4 +1,4 @@
-import express, {ErrorRequestHandler, RequestHandler} from 'express';
+import express, {ErrorRequestHandler, RequestHandler, json} from 'express';
 import fileUpload from 'express-fileupload';
 import {Server} from 'http';
 import {Logger} from 'winston';
@@ -40,14 +40,14 @@ export function createServer(config: ServerConfig & CommonConfig, routing: Routi
   const logger = isLoggerConfig(config.logger) ? createLogger(config.logger) : config.logger;
   const app = express();
   const errorHandler = config.errorHandler || defaultResultHandler;
-  const jsonParser = config.server.jsonParser || express.json();
+  const jsonParser = config.server.jsonParser || json();
   const multipartParser = config.server.upload ? fileUpload({
     ...(typeof config.server.upload === 'object' ? config.server.upload : {}),
     abortOnLimit: false,
     parseNested: true,
   }) : undefined;
 
-  app.use(([jsonParser] as express.RequestHandler[]).concat(multipartParser || []));
+  app.use(([jsonParser] as RequestHandler[]).concat(multipartParser || []));
   app.use(createParserFailureHandler(errorHandler, logger));
   initRouting({app, routing, logger, config});
   app.use(createLastResortHandler(errorHandler, logger));
