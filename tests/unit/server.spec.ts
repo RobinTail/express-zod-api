@@ -17,8 +17,8 @@ const expressMock = jest.mock('express', () => {
   return returnFunction;
 });
 
-import express, {Request, Response} from 'express';
-import {Logger} from 'winston'; // mocked above
+import express, {Request, Response} from 'express';  // express is mocked above
+import {Logger} from 'winston';
 import {createServer, attachRouting, EndpointsFactory, z, defaultResultHandler} from '../../src';
 import {AppConfig, CommonConfig, ServerConfig} from '../../src/config-type';
 import {mimeJson} from '../../src/mime';
