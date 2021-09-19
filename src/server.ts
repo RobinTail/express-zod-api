@@ -5,25 +5,24 @@ import {Logger} from 'winston';
 import {AppConfig, CommonConfig, ServerConfig} from './config-type';
 import {isLoggerConfig} from './helpers';
 import {createLogger} from './logger';
-import {defaultResultHandler, ResultHandlerDefinition} from './result-handler';
+import {defaultResultHandler} from './result-handler';
 import {initRouting, Routing} from './routing';
 import createHttpError from 'http-errors';
 
-type AnyResultHandler = ResultHandlerDefinition<any, any>;
+type AnyResultHandler = NonNullable<CommonConfig['errorHandler']>;
 
-const createParserFailureHandler = 
-  (errorHandler: AnyResultHandler, logger: Logger): ErrorRequestHandler =>
-    (error, request, response, next) => {
-      if (!error) { return next(); }
-      errorHandler.handler({
-        error, request, response, logger,
-        input: request.body,
-        output: null
-      });
-    };
+const createParserFailureHandler = (errorHandler: AnyResultHandler, logger: Logger): ErrorRequestHandler =>
+  (error, request, response, next) => {
+    if (!error) { return next(); }
+    errorHandler.handler({
+      error, request, response, logger,
+      input: request.body,
+      output: null
+    });
+  };
 
-const createLastResortHandler = 
-  (errorHandler: AnyResultHandler, logger: Logger): RequestHandler => (request, response) => {
+const createLastResortHandler = (errorHandler: AnyResultHandler, logger: Logger): RequestHandler => 
+  (request, response) => {
     errorHandler.handler({
       request, response, logger,
       error: createHttpError(404, `Can not ${request.method} ${request.path}`),
