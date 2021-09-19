@@ -1,12 +1,36 @@
-import express from 'express';
+import express, {ErrorRequestHandler, RequestHandler} from 'express';
 import fileUpload from 'express-fileupload';
 import {Server} from 'http';
+import {Logger} from 'winston';
 import {AppConfig, CommonConfig, ServerConfig} from './config-type';
 import {isLoggerConfig} from './helpers';
 import {createLogger} from './logger';
-import {defaultResultHandler} from './result-handler';
+import {defaultResultHandler, ResultHandlerDefinition} from './result-handler';
 import {initRouting, Routing} from './routing';
 import createHttpError from 'http-errors';
+
+type AnyResultHandler = ResultHandlerDefinition<any, any>;
+
+const createParserFailureHandler = 
+  (errorHandler: AnyResultHandler, logger: Logger): ErrorRequestHandler =>
+    (error, request, response, next) => {
+      if (!error) { return next(); }
+      errorHandler.handler({
+        error, request, response, logger,
+        input: request.body,
+        output: null
+      });
+    };
+
+const createLastResortHandler = 
+  (errorHandler: AnyResultHandler, logger: Logger): RequestHandler => (request, response) => {
+    errorHandler.handler({
+      request, response, logger,
+      error: createHttpError(404, `Can not ${request.method} ${request.path}`),
+      input: null,
+      output: null
+    });
+  };
 
 export function attachRouting(config: AppConfig & CommonConfig, routing: Routing): void {
   const logger = isLoggerConfig(config.logger) ? createLogger(config.logger) : config.logger;
@@ -24,28 +48,10 @@ export function createServer(config: ServerConfig & CommonConfig, routing: Routi
     parseNested: true,
   }) : undefined;
 
-  const parserFailureHandler: express.ErrorRequestHandler = (error, request, response, next) => {
-    if (!error) { return next(); }
-    errorHandler.handler({
-      error, request, response, logger,
-      input: request.body,
-      output: null
-    });
-  };
-
-  const lastResortHandler: express.RequestHandler = (request, response) => {
-    errorHandler.handler({
-      request, response, logger,
-      error: createHttpError(404, `Can not ${request.method} ${request.path}`),
-      input: null,
-      output: null
-    });
-  };
-
   app.use(([jsonParser] as express.RequestHandler[]).concat(multipartParser || []));
-  app.use(parserFailureHandler);
+  app.use(createParserFailureHandler(errorHandler, logger));
   initRouting({app, routing, logger, config});
-  app.use(lastResortHandler);
+  app.use(createLastResortHandler(errorHandler, logger));
 
   return app.listen(config.server.listen, () => {
     logger.info(`Listening ${config.server.listen}`);
