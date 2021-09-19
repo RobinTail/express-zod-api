@@ -21,7 +21,7 @@ export const createParserFailureHandler = (errorHandler: AnyResultHandler, logge
     });
   };
 
-export const createLastResortHandler = (errorHandler: AnyResultHandler, logger: Logger): RequestHandler =>
+export const createNotFoundHandler = (errorHandler: AnyResultHandler, logger: Logger): RequestHandler =>
   (request, response) => {
     errorHandler.handler({
       request, response, logger,
@@ -50,7 +50,7 @@ export function createServer(config: ServerConfig & CommonConfig, routing: Routi
   app.use(([jsonParser] as RequestHandler[]).concat(multipartParser || []));
   app.use(createParserFailureHandler(errorHandler, logger));
   initRouting({app, routing, logger, config});
-  app.use(createLastResortHandler(errorHandler, logger));
+  app.use(createNotFoundHandler(errorHandler, logger));
 
   return app.listen(config.server.listen, () => {
     logger.info(`Listening ${config.server.listen}`);

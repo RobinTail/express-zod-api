@@ -22,7 +22,7 @@ import {Logger} from 'winston';
 import {createServer, attachRouting, EndpointsFactory, z, defaultResultHandler} from '../../src';
 import {AppConfig, CommonConfig, ServerConfig} from '../../src/config-type';
 import {mimeJson} from '../../src/mime';
-import {createLastResortHandler, createParserFailureHandler} from '../../src/server';
+import {createNotFoundHandler, createParserFailureHandler} from '../../src/server';
 
 describe('Server', () => {
   beforeEach(() => {
@@ -143,7 +143,7 @@ describe('Server', () => {
     });
   });
 
-  describe('createLastResortHandler()', () => {
+  describe('createNotFoundHandler()', () => {
     test('the handler should call ResultHandler with 404 error', () => {
       const loggerMock = {
         info: jest.fn(),
@@ -155,7 +155,7 @@ describe('Server', () => {
         ...defaultResultHandler,
         handler: jest.fn()
       };
-      const handler = createLastResortHandler(resultHandler, loggerMock as unknown as Logger);
+      const handler = createNotFoundHandler(resultHandler, loggerMock as unknown as Logger);
       const next = jest.fn();
       const requestMock = {
         method: 'POST',
