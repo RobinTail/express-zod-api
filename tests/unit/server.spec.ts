@@ -176,6 +176,44 @@ describe('Server', () => {
       expect(resultHandler.handler).toHaveBeenCalledTimes(1);
       expect(resultHandler.handler.mock.calls[0]).toMatchSnapshot();
     });
+
+    test('should call Last Resort Handler in case of ResultHandler is faulty', () => {
+      const loggerMock = {
+        info: jest.fn(),
+        warn: jest.fn(),
+        error: jest.fn(),
+        debug: jest.fn()
+      };
+      const resultHandler = {
+        ...defaultResultHandler,
+        handler: jest.fn().mockImplementation(() => {
+          throw new Error('I am faulty');
+        })
+      };
+      const handler = createNotFoundHandler(resultHandler, loggerMock as unknown as Logger);
+      const next = jest.fn();
+      const requestMock = {
+        method: 'POST',
+        path: '/v1/test',
+        header: jest.fn(() => mimeJson),
+        body: {
+          n: 453
+        }
+      };
+      const responseMock: Record<string, jest.Mock> = {
+        end: jest.fn(),
+        set: jest.fn().mockImplementation(() => responseMock),
+        status: jest.fn().mockImplementation(() => responseMock),
+        json: jest.fn().mockImplementation(() => responseMock)
+      };
+      handler(requestMock as unknown as Request, responseMock as unknown as Response, next);
+      expect(next).toHaveBeenCalledTimes(0);
+      expect(resultHandler.handler).toHaveBeenCalledTimes(1);
+      expect(responseMock.status).toHaveBeenCalledTimes(1);
+      expect(responseMock.status.mock.calls[0][0]).toBe(500);
+      expect(responseMock.end).toHaveBeenCalledTimes(1);
+      expect(responseMock.end.mock.calls[0][0]).toBe('An error occurred while serving the result: I am faulty.');
+    });
   });
 
   describe('attachRouting()', () => {

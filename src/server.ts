@@ -5,7 +5,7 @@ import {Logger} from 'winston';
 import {AppConfig, CommonConfig, ServerConfig} from './config-type';
 import {isLoggerConfig} from './helpers';
 import {createLogger} from './logger';
-import {defaultResultHandler} from './result-handler';
+import {defaultResultHandler, lastResortHandler} from './result-handler';
 import {initRouting, Routing} from './routing';
 import createHttpError from 'http-errors';
 
@@ -23,12 +23,18 @@ export const createParserFailureHandler = (errorHandler: AnyResultHandler, logge
 
 export const createNotFoundHandler = (errorHandler: AnyResultHandler, logger: Logger): RequestHandler =>
   (request, response) => {
-    errorHandler.handler({
-      request, response, logger,
-      error: createHttpError(404, `Can not ${request.method} ${request.path}`),
-      input: null,
-      output: null
-    });
+    try {
+      errorHandler.handler({
+        request, response, logger,
+        error: createHttpError(404, `Can not ${request.method} ${request.path}`),
+        input: null,
+        output: null
+      });
+    } catch (e) {
+      if (e instanceof Error) {
+        lastResortHandler({error: e, response, logger});
+      }
+    }
   };
 
 export function attachRouting(config: AppConfig & CommonConfig, routing: Routing): void {

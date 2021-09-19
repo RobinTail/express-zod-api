@@ -65,3 +65,9 @@ export const defaultResultHandler = createResultHandler({
     });
   }
 });
+
+// @todo make a specific error for this
+export const lastResortHandler = ({error, logger, response}: {error: Error, logger: Logger, response: Response}) => {
+  logger.error(`Result handler failure: ${error.message}.`);
+  response.status(500).end(`An error occurred while serving the result: ${error.message}.`);
+};

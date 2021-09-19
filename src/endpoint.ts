@@ -14,7 +14,7 @@ import {
 import {Method, MethodsDefinition} from './method';
 import {MiddlewareDefinition} from './middleware';
 import {mimeMultipart} from './mime';
-import {ResultHandlerDefinition} from './result-handler';
+import {lastResortHandler, ResultHandlerDefinition} from './result-handler';
 
 export type Handler<IN, OUT, OPT> = (params: {
   input: IN,
@@ -214,8 +214,7 @@ export class Endpoint<
       });
     } catch (e) {
       if (e instanceof Error) {
-        logger.error(`Result handler failure: ${e.message}.`);
-        response.status(500).end(`An error occurred while serving the result: ${e.message}.`);
+        lastResortHandler({error: e, logger, response});
       }
     }
   }
