@@ -3,7 +3,7 @@
 exports[`Server createLastResortHandler() the handler should call ResultHandler with 404 error 1`] = `
 Array [
   Object {
-    "error": [NotFoundError: Can not POST undefined],
+    "error": [NotFoundError: Can not POST /v1/test],
     "input": null,
     "logger": Object {
       "debug": [MockFunction],
@@ -18,6 +18,7 @@ Array [
       },
       "header": [MockFunction],
       "method": "POST",
+      "path": "/v1/test",
     },
     "response": Object {
       "end": [MockFunction],

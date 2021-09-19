@@ -159,6 +159,7 @@ describe('Server', () => {
       const next = jest.fn();
       const requestMock = {
         method: 'POST',
+        path: '/v1/test',
         header: jest.fn(() => mimeJson),
         body: {
           n: 453
@@ -171,8 +172,6 @@ describe('Server', () => {
         json: jest.fn().mockImplementation(() => responseMock)
       };
       handler(requestMock as unknown as Request, responseMock as unknown as Response, next);
-      // @todo has to be called
-      // @see https://expressjs.com/en/guide/error-handling.html
       expect(next).toHaveBeenCalledTimes(0);
       expect(resultHandler.handler).toHaveBeenCalledTimes(1);
       expect(resultHandler.handler.mock.calls[0]).toMatchSnapshot();
