@@ -266,7 +266,7 @@ describe('Routing', () => {
       };
       const nextMock = jest.fn();
       await routeHandler(requestMock as unknown as Request, responseMock as unknown as Response, nextMock);
-      expect(nextMock).toBeCalledTimes(1);
+      expect(nextMock).toBeCalledTimes(0);
       expect(handlerMock).toBeCalledTimes(1);
       expect(loggerMock.info).toBeCalledWith('POST: /v1/user/set');
       expect(loggerMock.error).toBeCalledTimes(0);

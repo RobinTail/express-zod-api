@@ -30,19 +30,14 @@ export const fileDownloadEndpointsFactory = new EndpointsFactory(createResultHan
 export const fileStreamingEndpointsFactory = new EndpointsFactory(createResultHandler({
   getPositiveResponse: () => createApiResponse(z.file().binary(), 'image/*'),
   getNegativeResponse: () => createApiResponse(z.string(), getType('txt') || 'text/plain'),
-  handler: async ({response, error, output}) => {
+  handler: ({response, error, output}) => {
     if (error) {
       response.status(400).send(error.message);
       return;
     }
     if ('filename' in output) {
-      // @todo update readme and put in the changelog
-      await new Promise((resolve, reject) =>
-        fs.createReadStream(output.filename)
-          .pipe(response.type(output.filename))
-          .on('close', resolve)
-          .on('error', reject)
-      );
+      fs.createReadStream(output.filename)
+        .pipe(response.type(output.filename));
     } else {
       response.status(400).send('Filename is missing');
     }

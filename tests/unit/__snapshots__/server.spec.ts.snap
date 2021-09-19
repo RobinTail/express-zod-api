@@ -1,9 +1,9 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Server createLastResortHandler() the handler should call ResultHandler with a supplied error 1`] = `
+exports[`Server createLastResortHandler() the handler should call ResultHandler with 404 error 1`] = `
 Array [
   Object {
-    "error": [NotFoundError: Not found],
+    "error": [NotFoundError: Can not POST undefined],
     "input": null,
     "logger": Object {
       "debug": [MockFunction],

@@ -3,12 +3,10 @@ import {Logger} from 'winston';
 import {z} from 'zod';
 import {ApiResponse} from './api-response';
 import {CommonConfig} from './config-type';
-import {ResultHandlerError} from './errors';
 import {
   combineEndpointAndMiddlewareInputSchemas,
   getInitialInput,
   IOSchema,
-  isStreamClosed,
   Merge,
   OutputMarker,
   ReplaceMarkerInShape
@@ -177,20 +175,21 @@ export class Endpoint<
     logger: Logger
   }) {
     const options: any = {};
-    let isClosed = false;
+    let isStreamClosed = false;
     for (const def of this.middlewares) {
       input = {...input, ...def.input.parse(input)}; // middleware can transform the input types
       Object.assign(options, await def.middleware({
         input, options, request,
         response, logger
       }));
-      isClosed = isStreamClosed(response);
-      if (isClosed) {
+      isStreamClosed = ('writableEnded' in response && response.writableEnded) ||
+        ('finished' in response && response.finished); // Node v10 and below
+      if (isStreamClosed) {
         logger.warn(`The middleware ${def.middleware.name} has closed the stream. Accumulated options:`, options);
         break;
       }
     }
-    return {input, options, isStreamClosed: isClosed};
+    return {input, options, isStreamClosed};
   }
 
   async #parseAndRunHandler({input, options, logger}: {input: any, options: any, logger: Logger}) {
@@ -216,7 +215,7 @@ export class Endpoint<
     } catch (e) {
       if (e instanceof Error) {
         logger.error(`Result handler failure: ${e.message}.`);
-        throw new ResultHandlerError(e.message);
+        response.status(500).end(`An error occurred while serving the result: ${e.message}.`);
       }
     }
   }
