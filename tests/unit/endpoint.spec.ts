@@ -8,7 +8,9 @@ import {
   EndpointInput,
   EndpointOutput,
   EndpointResponse,
-  defaultEndpointsFactory
+  defaultEndpointsFactory,
+  createResultHandler,
+  createApiResponse
 } from '../../src';
 import {CommonConfig} from '../../src/config-type';
 import {Endpoint} from '../../src/endpoint';
@@ -148,7 +150,9 @@ describe('Endpoint', () => {
         }
       });
     });
+  });
 
+  describe('#parseOutput', () => {
     test('Should throw on output parsing non-Zod error', async () => {
       const factory = new EndpointsFactory(defaultResultHandler);
       const endpoint = factory.build({
@@ -191,7 +195,9 @@ describe('Endpoint', () => {
         }
       });
     });
+  });
 
+  describe('#runMiddlewares', () => {
     test('Should handle middleware closing the response stream', async () => {
       const middlewareMock = jest.fn().mockImplementationOnce(async ({input, response}) => {
         response.end('to hell with all that!');
@@ -243,6 +249,48 @@ describe('Endpoint', () => {
       expect(responseMock.json).toBeCalledTimes(0);
       expect(responseMock.statusCode).toBe(200);
       expect(responseMock.statusMessage).toBe('OK');
+    });
+  });
+
+  describe('#handleResult', () => {
+    test('Should handle errors within ResultHandler', async () => {
+      const factory = new EndpointsFactory(createResultHandler({
+        getPositiveResponse: () => createApiResponse(z.object({})),
+        getNegativeResponse: () => createApiResponse(z.object({})),
+        handler: () => {
+          throw new Error('Something unexpected happened');
+        }
+      }));
+      const endpoint = factory.build({
+        method: 'get',
+        input: z.object({}),
+        output: z.object({
+          test: z.string()
+        }),
+        handler: async () => ({test: 'OK'})
+      });
+      const requestMock = {
+        method: 'GET',
+        header: jest.fn(() => mimeJson),
+      };
+      const responseMock: Record<string, jest.Mock> = {
+        set: jest.fn().mockImplementation(() => responseMock),
+        status: jest.fn().mockImplementation(() => responseMock),
+        json: jest.fn().mockImplementation(() => responseMock)
+      };
+      const configMock = {
+        cors: true
+      };
+      await endpoint.execute({
+        request: requestMock as unknown as Request,
+        response: responseMock as unknown as Response,
+        config: configMock as CommonConfig,
+        logger: loggerMock
+      });
+      expect(loggerMock.error).toBeCalledTimes(1);
+      expect(loggerMock.error.mock.calls[0][0]).toBe('Result handler failure: Something unexpected happened.');
+      expect(responseMock.status).toBeCalledTimes(0);
+      expect(responseMock.json).toBeCalledTimes(0);
     });
   });
 
