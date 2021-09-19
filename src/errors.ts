@@ -8,11 +8,11 @@ export class OpenAPIError extends Error {
 }
 
 export class ResultHandlerError extends Error {
-  protected readonly originalError?: Error
+  protected readonly originalError?: Error;
 
-  constructor(message: string, originalError?: Error) {
+  constructor(message: string, originalError?: Error | null) {
     super(message);
-    this.originalError = originalError;
+    this.originalError = originalError || undefined;
   }
 
   public hasOriginalError() {

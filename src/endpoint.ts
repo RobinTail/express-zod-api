@@ -217,7 +217,7 @@ export class Endpoint<
       if (e instanceof Error) {
         lastResortHandler({
           logger, response,
-          error: new ResultHandlerError(e.message, error || undefined)
+          error: new ResultHandlerError(e.message, error)
         });
       }
     }
