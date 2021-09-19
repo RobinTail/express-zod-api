@@ -2,6 +2,12 @@
 
 ## Version 2
 
+### v2.5.1
+
+- Fixed a bug due to which the execution of the code could continue despite the possible closing of the response 
+  stream by one of the middlewares.
+  - Affected Node versions: below 12.9.0.
+
 ### v2.5.0
 
 - New feature: file uploads!

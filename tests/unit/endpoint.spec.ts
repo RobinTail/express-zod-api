@@ -1,3 +1,4 @@
+import http from 'http';
 import {expectType} from 'tsd';
 import {
   z,
@@ -6,7 +7,10 @@ import {
   defaultResultHandler,
   EndpointInput,
   EndpointOutput,
-  EndpointResponse
+  EndpointResponse,
+  defaultEndpointsFactory,
+  createResultHandler,
+  createApiResponse
 } from '../../src';
 import {CommonConfig} from '../../src/config-type';
 import {Endpoint} from '../../src/endpoint';
@@ -147,6 +151,46 @@ describe('Endpoint', () => {
       });
     });
 
+    test('should close the stream on OPTIONS request', async () => {
+      const handlerMock = jest.fn();
+      const endpoint = defaultEndpointsFactory.build({
+        method: 'get',
+        input: z.object({}),
+        output: z.object({}),
+        handler: handlerMock
+      });
+      const requestMock = {
+        method: 'OPTIONS',
+        header: jest.fn(() => mimeJson),
+      };
+      const responseMock: Record<string, jest.Mock> = {
+        end: jest.fn(),
+        set: jest.fn().mockImplementation(() => responseMock),
+        status: jest.fn().mockImplementation(() => responseMock),
+        json: jest.fn().mockImplementation(() => responseMock)
+      };
+      const configMock = {
+        cors: true
+      };
+      await endpoint.execute({
+        request: requestMock as unknown as Request,
+        response: responseMock as unknown as Response,
+        config: configMock as CommonConfig,
+        logger: loggerMock
+      });
+      expect(loggerMock.error).toBeCalledTimes(0);
+      expect(responseMock.status).toBeCalledTimes(0);
+      expect(responseMock.json).toBeCalledTimes(0);
+      expect(handlerMock).toBeCalledTimes(0);
+      expect(responseMock.set).toBeCalledTimes(3);
+      expect(responseMock.end).toBeCalledTimes(1);
+      expect(responseMock.set.mock.calls[0]).toEqual(['Access-Control-Allow-Origin', '*']);
+      expect(responseMock.set.mock.calls[1]).toEqual(['Access-Control-Allow-Methods', 'GET, OPTIONS']);
+      expect(responseMock.set.mock.calls[2]).toEqual(['Access-Control-Allow-Headers', 'content-type']);
+    });
+  });
+
+  describe('#parseOutput', () => {
     test('Should throw on output parsing non-Zod error', async () => {
       const factory = new EndpointsFactory(defaultResultHandler);
       const endpoint = factory.build({
@@ -188,6 +232,103 @@ describe('Endpoint', () => {
           message: 'Something unexpected'
         }
       });
+    });
+  });
+
+  describe('#runMiddlewares', () => {
+    test('Should handle middleware closing the response stream', async () => {
+      const middlewareMock = jest.fn().mockImplementationOnce(async ({input, response}) => {
+        response.end('to hell with all that!');
+        return { inc: input.n + 1 };
+      });
+      const middlewareDefinitionMock = createMiddleware({
+        input: z.object({
+          n: z.number()
+        }),
+        middleware: middlewareMock
+      });
+      const factory = defaultEndpointsFactory.addMiddleware(middlewareDefinitionMock);
+      const handlerMock = jest.fn();
+      const endpoint = factory.build({
+        method: 'post',
+        input: z.object({}),
+        output: z.object({}),
+        handler: handlerMock
+      });
+      const configMock = {
+        cors: true
+      };
+      const requestMock = {
+        method: 'POST',
+        header: jest.fn(() => mimeJson),
+        body: {
+          n: 453
+        }
+      };
+      const responseMock: any = new http.ServerResponse(requestMock as unknown as Request);
+      responseMock.set = jest.fn().mockImplementation(() => responseMock);
+      responseMock.status = jest.fn().mockImplementation(() => responseMock);
+      responseMock.json = jest.fn().mockImplementation(() => responseMock);
+      await endpoint.execute({
+        request: requestMock as unknown as Request,
+        response: responseMock as unknown as Response,
+        config: configMock as CommonConfig,
+        logger: loggerMock
+      });
+      expect(handlerMock).toHaveBeenCalledTimes(0);
+      expect(middlewareMock).toHaveBeenCalledTimes(1);
+      expect(loggerMock.error).toBeCalledTimes(0);
+      expect(loggerMock.warn).toBeCalledTimes(1);
+      expect(loggerMock.warn.mock.calls[0][0]).toBe(
+        'The middleware mockConstructor has closed the stream. Accumulated options:'
+      );
+      expect(loggerMock.warn.mock.calls[0][1]).toEqual({inc: 454});
+      expect(responseMock.status).toBeCalledTimes(0);
+      expect(responseMock.json).toBeCalledTimes(0);
+      expect(responseMock.statusCode).toBe(200);
+      expect(responseMock.statusMessage).toBe('OK');
+    });
+  });
+
+  describe('#handleResult', () => {
+    test('Should handle errors within ResultHandler', async () => {
+      const factory = new EndpointsFactory(createResultHandler({
+        getPositiveResponse: () => createApiResponse(z.object({})),
+        getNegativeResponse: () => createApiResponse(z.object({})),
+        handler: () => {
+          throw new Error('Something unexpected happened');
+        }
+      }));
+      const endpoint = factory.build({
+        method: 'get',
+        input: z.object({}),
+        output: z.object({
+          test: z.string()
+        }),
+        handler: async () => ({test: 'OK'})
+      });
+      const requestMock = {
+        method: 'GET',
+        header: jest.fn(() => mimeJson),
+      };
+      const responseMock: Record<string, jest.Mock> = {
+        set: jest.fn().mockImplementation(() => responseMock),
+        status: jest.fn().mockImplementation(() => responseMock),
+        json: jest.fn().mockImplementation(() => responseMock)
+      };
+      const configMock = {
+        cors: true
+      };
+      await endpoint.execute({
+        request: requestMock as unknown as Request,
+        response: responseMock as unknown as Response,
+        config: configMock as CommonConfig,
+        logger: loggerMock
+      });
+      expect(loggerMock.error).toBeCalledTimes(1);
+      expect(loggerMock.error.mock.calls[0][0]).toBe('Result handler failure: Something unexpected happened.');
+      expect(responseMock.status).toBeCalledTimes(0);
+      expect(responseMock.json).toBeCalledTimes(0);
     });
   });
 

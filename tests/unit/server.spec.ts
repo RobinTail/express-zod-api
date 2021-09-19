@@ -126,6 +126,37 @@ describe('Server', () => {
       expect(appMock.listen).toBeCalledTimes(1);
       expect(appMock.listen.mock.calls[0][0]).toBe(8054);
     });
+
+    test('parserFailureHandler should call next if there is no error', () => {
+      const configMock: ServerConfig & CommonConfig = {
+        server: {
+          listen: 8054,
+        },
+        cors: true,
+        logger: {
+          level: 'warn',
+          color: false
+        }
+      };
+      const routingMock = {
+        v1: {
+          test: new EndpointsFactory(defaultResultHandler)
+            .build({
+              method: 'get',
+              input: z.object({}),
+              output: z.object({}),
+              handler: jest.fn()
+            })
+        }
+      };
+      createServer(configMock, routingMock);
+      expect(appMock).toBeTruthy();
+      expect(appMock.use).toBeCalledTimes(3);
+      expect(typeof appMock.use.mock.calls[1][0]).toBe('function');
+      const next = jest.fn();
+      appMock.use.mock.calls[1][0](undefined, null, null, next);
+      expect(next).toHaveBeenCalledTimes(1);
+    });
   });
 
   describe('attachRouting()', () => {

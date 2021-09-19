@@ -175,17 +175,21 @@ export class Endpoint<
     logger: Logger
   }) {
     const options: any = {};
+    let isStreamClosed = false;
     for (const def of this.middlewares) {
       input = {...input, ...def.input.parse(input)}; // middleware can transform the input types
       Object.assign(options, await def.middleware({
         input, options, request,
         response, logger
       }));
-      if (response.writableEnded) {
+      isStreamClosed = ('writableEnded' in response && response.writableEnded) ||
+        ('finished' in response && response.finished); // Node v10 and below
+      if (isStreamClosed) {
+        logger.warn(`The middleware ${def.middleware.name} has closed the stream. Accumulated options:`, options);
         break;
       }
     }
-    return {input, options, isStreamClosed: response.writableEnded};
+    return {input, options, isStreamClosed};
   }
 
   async #parseAndRunHandler({input, options, logger}: {input: any, options: any, logger: Logger}) {
