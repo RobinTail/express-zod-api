@@ -312,6 +312,7 @@ describe('Endpoint', () => {
         header: jest.fn(() => mimeJson),
       };
       const responseMock: Record<string, jest.Mock> = {
+        end: jest.fn(),
         set: jest.fn().mockImplementation(() => responseMock),
         status: jest.fn().mockImplementation(() => responseMock),
         json: jest.fn().mockImplementation(() => responseMock)
@@ -327,8 +328,13 @@ describe('Endpoint', () => {
       });
       expect(loggerMock.error).toBeCalledTimes(1);
       expect(loggerMock.error.mock.calls[0][0]).toBe('Result handler failure: Something unexpected happened.');
-      expect(responseMock.status).toBeCalledTimes(0);
+      expect(responseMock.status).toBeCalledTimes(1);
+      expect(responseMock.status.mock.calls[0][0]).toBe(500);
       expect(responseMock.json).toBeCalledTimes(0);
+      expect(responseMock.end).toBeCalledTimes(1);
+      expect(responseMock.end.mock.calls[0][0]).toBe(
+        'An error occurred while serving the result: Something unexpected happened.'
+      );
     });
   });
 

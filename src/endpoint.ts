@@ -215,8 +215,8 @@ export class Endpoint<
     } catch (e) {
       if (e instanceof Error) {
         logger.error(`Result handler failure: ${e.message}.`);
+        response.status(500).end(`An error occurred while serving the result: ${e.message}.`);
       }
-      // throw e;
     }
   }
 
