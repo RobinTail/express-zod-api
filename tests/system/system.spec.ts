@@ -1,6 +1,14 @@
 import http from 'http';
 import fetch from 'node-fetch';
-import {createServer, EndpointsFactory, Method, z, defaultResultHandler} from '../../src';
+import {
+  createServer,
+  EndpointsFactory,
+  Method,
+  z,
+  defaultResultHandler,
+  createResultHandler,
+  createApiResponse
+} from '../../src';
 import {waitFor} from '../helpers';
 
 describe('App', () => {
@@ -9,6 +17,22 @@ describe('App', () => {
   beforeAll(() => {
     const routing = {
       v1: {
+        faulty: new EndpointsFactory(createResultHandler({
+          getPositiveResponse: () => createApiResponse(z.object({})),
+          getNegativeResponse: () => createApiResponse(z.object({})),
+          handler: () => {
+            throw new Error('I am faulty');
+          }
+        })).build({
+          method: 'get',
+          input: z.object({}),
+          output: z.object({
+            test: z.string()
+          }),
+          handler: async () => ({
+            test: 'Should not work'
+          })
+        }),
         test: new EndpointsFactory(defaultResultHandler)
           .addMiddleware({
             input: z.object({
@@ -107,6 +131,20 @@ describe('App', () => {
           method: 'post'
         }
       });
+    });
+  });
+
+  describe('Negative', () => {
+    test('Should call Last Resort Handler in case of faulty ResultHandler', async () => {
+      const response = await fetch('http://127.0.0.1:8055/v1/faulty', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+      });
+      expect(response.status).toBe(500);
+      const text = await response.text();
+      expect(text).toBe('An error occurred while serving the result: I am faulty.');
     });
   });
 

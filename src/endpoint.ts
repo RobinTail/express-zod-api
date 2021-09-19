@@ -3,6 +3,7 @@ import {Logger} from 'winston';
 import {z} from 'zod';
 import {ApiResponse} from './api-response';
 import {CommonConfig} from './config-type';
+import {ResultHandlerError} from './errors';
 import {
   combineEndpointAndMiddlewareInputSchemas,
   getInitialInput,
@@ -14,7 +15,7 @@ import {
 import {Method, MethodsDefinition} from './method';
 import {MiddlewareDefinition} from './middleware';
 import {mimeMultipart} from './mime';
-import {ResultHandlerDefinition} from './result-handler';
+import {lastResortHandler, ResultHandlerDefinition} from './result-handler';
 
 export type Handler<IN, OUT, OPT> = (params: {
   input: IN,
@@ -214,9 +215,11 @@ export class Endpoint<
       });
     } catch (e) {
       if (e instanceof Error) {
-        logger.error(`Result handler failure: ${e.message}.`);
+        lastResortHandler({
+          logger, response,
+          error: new ResultHandlerError(e.message, error)
+        });
       }
-      // throw e;
     }
   }
 
