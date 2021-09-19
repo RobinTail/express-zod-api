@@ -2,12 +2,19 @@ import {Request, Response} from 'express';
 import {Logger} from 'winston';
 import {z} from 'zod';
 import {ApiResponse, createApiResponse} from './api-response';
+import {ResultHandlerError} from './errors';
 import {
   getMessageFromError,
   getStatusCodeFromError,
   IOSchema,
   markOutput
 } from './helpers';
+
+interface LastResortParams {
+  error: ResultHandlerError;
+  logger: Logger;
+  response: Response;
+}
 
 interface ResultHandlerParams<RES> {
   error: Error | null;
@@ -66,8 +73,10 @@ export const defaultResultHandler = createResultHandler({
   }
 });
 
-// @todo make a specific error for this
-export const lastResortHandler = ({error, logger, response}: {error: Error, logger: Logger, response: Response}) => {
+export const lastResortHandler = ({error, logger, response}: LastResortParams) => {
   logger.error(`Result handler failure: ${error.message}.`);
-  response.status(500).end(`An error occurred while serving the result: ${error.message}.`);
+  response.status(500).end(
+    `An error occurred while serving the result: ${error.message}.` +
+    (error.hasOriginalError() ? `\nOriginal error: ${error.getOriginalErrorMessage()}.` : '')
+  );
 };

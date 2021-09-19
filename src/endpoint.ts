@@ -3,6 +3,7 @@ import {Logger} from 'winston';
 import {z} from 'zod';
 import {ApiResponse} from './api-response';
 import {CommonConfig} from './config-type';
+import {ResultHandlerError} from './errors';
 import {
   combineEndpointAndMiddlewareInputSchemas,
   getInitialInput,
@@ -214,7 +215,10 @@ export class Endpoint<
       });
     } catch (e) {
       if (e instanceof Error) {
-        lastResortHandler({error: e, logger, response});
+        lastResortHandler({
+          logger, response,
+          error: new ResultHandlerError(e.message, error || undefined)
+        });
       }
     }
   }

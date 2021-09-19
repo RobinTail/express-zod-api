@@ -3,6 +3,7 @@ import fileUpload from 'express-fileupload';
 import {Server} from 'http';
 import {Logger} from 'winston';
 import {AppConfig, CommonConfig, ServerConfig} from './config-type';
+import {ResultHandlerError} from './errors';
 import {isLoggerConfig} from './helpers';
 import {createLogger} from './logger';
 import {defaultResultHandler, lastResortHandler} from './result-handler';
@@ -23,16 +24,19 @@ export const createParserFailureHandler = (errorHandler: AnyResultHandler, logge
 
 export const createNotFoundHandler = (errorHandler: AnyResultHandler, logger: Logger): RequestHandler =>
   (request, response) => {
+    const error = createHttpError(404, `Can not ${request.method} ${request.path}`);
     try {
       errorHandler.handler({
-        request, response, logger,
-        error: createHttpError(404, `Can not ${request.method} ${request.path}`),
+        request, response, logger, error,
         input: null,
         output: null
       });
     } catch (e) {
       if (e instanceof Error) {
-        lastResortHandler({error: e, response, logger});
+        lastResortHandler({
+          response, logger,
+          error: new ResultHandlerError(e.message, error)
+        });
       }
     }
   };

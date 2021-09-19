@@ -212,7 +212,10 @@ describe('Server', () => {
       expect(responseMock.status).toHaveBeenCalledTimes(1);
       expect(responseMock.status.mock.calls[0][0]).toBe(500);
       expect(responseMock.end).toHaveBeenCalledTimes(1);
-      expect(responseMock.end.mock.calls[0][0]).toBe('An error occurred while serving the result: I am faulty.');
+      expect(responseMock.end.mock.calls[0][0]).toBe(
+        'An error occurred while serving the result: I am faulty.\n' +
+        'Original error: Can not POST /v1/test.'
+      );
     });
   });
 
