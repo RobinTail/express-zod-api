@@ -11,7 +11,7 @@ import createHttpError from 'http-errors';
 
 type AnyResultHandler = NonNullable<CommonConfig['errorHandler']>;
 
-const createParserFailureHandler = (errorHandler: AnyResultHandler, logger: Logger): ErrorRequestHandler =>
+export const createParserFailureHandler = (errorHandler: AnyResultHandler, logger: Logger): ErrorRequestHandler =>
   (error, request, response, next) => {
     if (!error) { return next(); }
     errorHandler.handler({
@@ -21,7 +21,7 @@ const createParserFailureHandler = (errorHandler: AnyResultHandler, logger: Logg
     });
   };
 
-const createLastResortHandler = (errorHandler: AnyResultHandler, logger: Logger): RequestHandler => 
+export const createLastResortHandler = (errorHandler: AnyResultHandler, logger: Logger): RequestHandler =>
   (request, response) => {
     errorHandler.handler({
       request, response, logger,

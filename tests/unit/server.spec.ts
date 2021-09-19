@@ -17,9 +17,12 @@ const expressMock = jest.mock('express', () => {
   return returnFunction;
 });
 
-import express from 'express'; // mocked above
+import express, {Request, Response} from 'express';
+import {Logger} from 'winston'; // mocked above
 import {createServer, attachRouting, EndpointsFactory, z, defaultResultHandler} from '../../src';
 import {AppConfig, CommonConfig, ServerConfig} from '../../src/config-type';
+import {mimeJson} from '../../src/mime';
+import {createLastResortHandler, createParserFailureHandler} from '../../src/server';
 
 describe('Server', () => {
   beforeEach(() => {
@@ -111,10 +114,7 @@ describe('Server', () => {
       expect(appMock.use).toBeCalledTimes(3);
       expect(Array.isArray(appMock.use.mock.calls[0][0])).toBeTruthy();
       expect(appMock.use.mock.calls[0][0][0]).toBe(configMock.server.jsonParser);
-      expect(typeof appMock.use.mock.calls[2][0]).toBe('function');
       expect(configMock.errorHandler.handler).toBeCalledTimes(0);
-      appMock.use.mock.calls[2][0]({method: 'get', path: '/v1/test'});
-      expect(configMock.errorHandler.handler).toBeCalledTimes(1);
       expect(configMock.logger.info).toBeCalledTimes(1);
       expect(configMock.logger.info).toBeCalledWith('Listening 8054');
       expect(appMock.get).toBeCalledTimes(1);
@@ -126,36 +126,56 @@ describe('Server', () => {
       expect(appMock.listen).toBeCalledTimes(1);
       expect(appMock.listen.mock.calls[0][0]).toBe(8054);
     });
+  });
 
-    test('parserFailureHandler should call next if there is no error', () => {
-      const configMock: ServerConfig & CommonConfig = {
-        server: {
-          listen: 8054,
-        },
-        cors: true,
-        logger: {
-          level: 'warn',
-          color: false
-        }
+  describe('createParserFailureHandler()', () => {
+    test('the handler should call next if there is no error', () => {
+      const loggerMock = {
+        info: jest.fn(),
+        warn: jest.fn(),
+        error: jest.fn(),
+        debug: jest.fn()
       };
-      const routingMock = {
-        v1: {
-          test: new EndpointsFactory(defaultResultHandler)
-            .build({
-              method: 'get',
-              input: z.object({}),
-              output: z.object({}),
-              handler: jest.fn()
-            })
-        }
-      };
-      createServer(configMock, routingMock);
-      expect(appMock).toBeTruthy();
-      expect(appMock.use).toBeCalledTimes(3);
-      expect(typeof appMock.use.mock.calls[1][0]).toBe('function');
+      const handler = createParserFailureHandler(defaultResultHandler, loggerMock as unknown as Logger);
       const next = jest.fn();
-      appMock.use.mock.calls[1][0](undefined, null, null, next);
+      handler(undefined, null as unknown as Request, null as unknown as Response, next);
       expect(next).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('createLastResortHandler()', () => {
+    test('the handler should call ResultHandler with 404 error', () => {
+      const loggerMock = {
+        info: jest.fn(),
+        warn: jest.fn(),
+        error: jest.fn(),
+        debug: jest.fn()
+      };
+      const resultHandler = {
+        ...defaultResultHandler,
+        handler: jest.fn()
+      };
+      const handler = createLastResortHandler(resultHandler, loggerMock as unknown as Logger);
+      const next = jest.fn();
+      const requestMock = {
+        method: 'POST',
+        header: jest.fn(() => mimeJson),
+        body: {
+          n: 453
+        }
+      };
+      const responseMock: Record<string, jest.Mock> = {
+        end: jest.fn(),
+        set: jest.fn().mockImplementation(() => responseMock),
+        status: jest.fn().mockImplementation(() => responseMock),
+        json: jest.fn().mockImplementation(() => responseMock)
+      };
+      handler(requestMock as unknown as Request, responseMock as unknown as Response, next);
+      // @todo has to be called
+      // @see https://expressjs.com/en/guide/error-handling.html
+      expect(next).toHaveBeenCalledTimes(0);
+      expect(resultHandler.handler).toHaveBeenCalledTimes(1);
+      expect(resultHandler.handler.mock.calls[0]).toMatchSnapshot();
     });
   });
 
