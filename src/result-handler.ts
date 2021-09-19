@@ -10,7 +10,7 @@ import {
   markOutput
 } from './helpers';
 
-interface LastResortParams {
+interface LastResortHandlerParams {
   error: ResultHandlerError;
   logger: Logger;
   response: Response;
@@ -73,7 +73,7 @@ export const defaultResultHandler = createResultHandler({
   }
 });
 
-export const lastResortHandler = ({error, logger, response}: LastResortParams) => {
+export const lastResortHandler = ({error, logger, response}: LastResortHandlerParams) => {
   logger.error(`Result handler failure: ${error.message}.`);
   response.status(500).end(
     `An error occurred while serving the result: ${error.message}.` +
