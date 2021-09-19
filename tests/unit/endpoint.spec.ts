@@ -150,6 +150,44 @@ describe('Endpoint', () => {
         }
       });
     });
+
+    test('should close the stream on OPTIONS request', async () => {
+      const handlerMock = jest.fn();
+      const endpoint = defaultEndpointsFactory.build({
+        method: 'get',
+        input: z.object({}),
+        output: z.object({}),
+        handler: handlerMock
+      });
+      const requestMock = {
+        method: 'OPTIONS',
+        header: jest.fn(() => mimeJson),
+      };
+      const responseMock: Record<string, jest.Mock> = {
+        end: jest.fn(),
+        set: jest.fn().mockImplementation(() => responseMock),
+        status: jest.fn().mockImplementation(() => responseMock),
+        json: jest.fn().mockImplementation(() => responseMock)
+      };
+      const configMock = {
+        cors: true
+      };
+      await endpoint.execute({
+        request: requestMock as unknown as Request,
+        response: responseMock as unknown as Response,
+        config: configMock as CommonConfig,
+        logger: loggerMock
+      });
+      expect(loggerMock.error).toBeCalledTimes(0);
+      expect(responseMock.status).toBeCalledTimes(0);
+      expect(responseMock.json).toBeCalledTimes(0);
+      expect(handlerMock).toBeCalledTimes(0);
+      expect(responseMock.set).toBeCalledTimes(3);
+      expect(responseMock.end).toBeCalledTimes(1);
+      expect(responseMock.set.mock.calls[0]).toEqual(['Access-Control-Allow-Origin', '*']);
+      expect(responseMock.set.mock.calls[1]).toEqual(['Access-Control-Allow-Methods', 'GET, OPTIONS']);
+      expect(responseMock.set.mock.calls[2]).toEqual(['Access-Control-Allow-Headers', 'content-type']);
+    });
   });
 
   describe('#parseOutput', () => {
