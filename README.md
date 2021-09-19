@@ -307,6 +307,9 @@ import {EndpointsFactory} from 'express-zod-api';
 const endpointsFactory = new EndpointsFactory(myResultHandler);
 ```
 
+Please note: `ResultHandler` must handle any errors and not throw its own. Otherwise, the case will be passed to the 
+`LastResortHandler`, which will set the status code to `500` and send the error message as plain text.
+
 ## Non-object response
 
 `ResultHandler` also supports non-object response types, for example, sending an image file including its MIME type 

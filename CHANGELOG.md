@@ -6,7 +6,7 @@
 
 - Fixed a bug due to which the API did not respond in case of an error within the `ResultHandler`.
   - In this case the `LastResortHandler` comes into play.
-  - It sets the status code to `500` and sends out flat text with an error message.
+  - It sets the status code to `500` and sends out plain text with an error message.
   - It is not customizable yet, and it's meant to be kept very simple in case of JSON conversion errors.
 
 ### v2.5.1
