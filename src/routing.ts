@@ -93,9 +93,10 @@ export const initRouting = ({app, logger, config, routing}: {
     routing,
     cors: config.cors,
     cb: (endpoint, fullPath, method) => {
-      app[method](fullPath, async (request, response) => {
+      app[method](fullPath, async (request, response, next) => {
         logger.info(`${request.method}: ${fullPath}`);
         await endpoint.execute({request, response, logger, config});
+        next();
       });
     }
   });

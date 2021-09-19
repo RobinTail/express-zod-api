@@ -15,6 +15,7 @@ import {
 import {CommonConfig} from '../../src/config-type';
 import {Endpoint} from '../../src/endpoint';
 import {Request, Response} from 'express';
+import {ResultHandlerError} from '../../src/errors';
 import {mimeJson} from '../../src/mime';
 import {serializeSchemaForTest} from '../helpers';
 
@@ -320,21 +321,21 @@ describe('Endpoint', () => {
       const configMock = {
         cors: true
       };
-      await endpoint.execute({
-        request: requestMock as unknown as Request,
-        response: responseMock as unknown as Response,
-        config: configMock as CommonConfig,
-        logger: loggerMock
-      });
+      try {
+        await endpoint.execute({
+          request: requestMock as unknown as Request,
+          response: responseMock as unknown as Response,
+          config: configMock as CommonConfig,
+          logger: loggerMock
+        });
+        fail('An error has to be thrown');
+      } catch (e) {
+        expect(e instanceof ResultHandlerError).toBeTruthy();
+        expect(e instanceof ResultHandlerError && e.message).toBe('Something unexpected happened');
+      }
       expect(loggerMock.error).toBeCalledTimes(1);
       expect(loggerMock.error.mock.calls[0][0]).toBe('Result handler failure: Something unexpected happened.');
-      expect(responseMock.status).toBeCalledTimes(1);
-      expect(responseMock.status.mock.calls[0][0]).toBe(500);
       expect(responseMock.json).toBeCalledTimes(0);
-      expect(responseMock.end).toBeCalledTimes(1);
-      expect(responseMock.end.mock.calls[0][0]).toBe(
-        'An error occurred while serving the result: Something unexpected happened.'
-      );
     });
   });
 

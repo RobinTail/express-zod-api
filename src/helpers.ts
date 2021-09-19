@@ -1,4 +1,4 @@
-import {Request} from 'express';
+import {Request, Response} from 'express';
 import {HttpError} from 'http-errors';
 import {z} from 'zod';
 import {LoggerConfig, loggerLevels} from './config-type';
@@ -106,6 +106,9 @@ export function getStatusCodeFromError(error: Error): number {
   }
   return 500;
 }
+
+export const isStreamClosed = (response: Response) => // .finished is for Node below v12.9
+  ('writableEnded' in response && response.writableEnded) || ('finished' in response && response.finished);
 
 // obtaining the private helper type from Zod
 export type ErrMessage = Exclude<Parameters<typeof z.ZodString.prototype.email>[0], undefined>;

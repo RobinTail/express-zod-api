@@ -7,7 +7,8 @@ const newAppMock = () => ({
   listen: jest.fn((port, cb) => {cb && cb(); return new http.Server(); }),
   get: jest.fn(),
   post: jest.fn(),
-  options: jest.fn()
+  options: jest.fn(),
+  all: jest.fn(),
 });
 
 const expressMock = jest.mock('express', () => {
@@ -18,9 +19,11 @@ const expressMock = jest.mock('express', () => {
 });
 
 import express, {Request, Response} from 'express';
+import createHttpError from 'http-errors';
 import {Logger} from 'winston'; // mocked above
 import {createServer, attachRouting, EndpointsFactory, z, defaultResultHandler} from '../../src';
 import {AppConfig, CommonConfig, ServerConfig} from '../../src/config-type';
+import {ResultHandlerError} from '../../src/errors';
 import {mimeJson} from '../../src/mime';
 import {createLastResortHandler, createParserFailureHandler} from '../../src/server';
 
@@ -69,6 +72,8 @@ describe('Server', () => {
       expect(appMock.use).toBeCalledTimes(3);
       expect(Array.isArray(appMock.use.mock.calls[0][0])).toBeTruthy();
       expect(appMock.use.mock.calls[0][0][0]).toBe(expressJsonMock);
+      expect(appMock.all).toHaveBeenCalledTimes(1);
+      expect(appMock.all.mock.calls[0][0]).toBe('*');
       expect(appMock.get).toBeCalledTimes(1);
       expect(appMock.get.mock.calls[0][0]).toBe('/v1/test');
       expect(appMock.post).toBeCalledTimes(1);
@@ -144,7 +149,7 @@ describe('Server', () => {
   });
 
   describe('createLastResortHandler()', () => {
-    test('the handler should call ResultHandler with 404 error', () => {
+    test('the handler should close the stream in case of ResultHandlerError', () => {
       const loggerMock = {
         info: jest.fn(),
         warn: jest.fn(),
@@ -170,10 +175,45 @@ describe('Server', () => {
         status: jest.fn().mockImplementation(() => responseMock),
         json: jest.fn().mockImplementation(() => responseMock)
       };
-      handler(requestMock as unknown as Request, responseMock as unknown as Response, next);
-      // @todo has to be called
-      // @see https://expressjs.com/en/guide/error-handling.html
-      expect(next).toHaveBeenCalledTimes(0);
+      const error = new ResultHandlerError('I am faulty');
+      handler(error, requestMock as unknown as Request, responseMock as unknown as Response, next);
+      expect(next).toHaveBeenCalledTimes(1);
+      expect(resultHandler.handler).toHaveBeenCalledTimes(0);
+      expect(responseMock.status).toHaveBeenCalledTimes(1);
+      expect(responseMock.status.mock.calls[0][0]).toBe(500);
+      expect(responseMock.end).toHaveBeenCalledTimes(1);
+      expect(responseMock.end.mock.calls[0][0]).toBe('An error occurred while serving the result: I am faulty.');
+    });
+
+    test('the handler should call ResultHandler with a supplied error', () => {
+      const loggerMock = {
+        info: jest.fn(),
+        warn: jest.fn(),
+        error: jest.fn(),
+        debug: jest.fn()
+      };
+      const resultHandler = {
+        ...defaultResultHandler,
+        handler: jest.fn()
+      };
+      const handler = createLastResortHandler(resultHandler, loggerMock as unknown as Logger);
+      const next = jest.fn();
+      const requestMock = {
+        method: 'POST',
+        header: jest.fn(() => mimeJson),
+        body: {
+          n: 453
+        }
+      };
+      const responseMock: Record<string, jest.Mock> = {
+        end: jest.fn(),
+        set: jest.fn().mockImplementation(() => responseMock),
+        status: jest.fn().mockImplementation(() => responseMock),
+        json: jest.fn().mockImplementation(() => responseMock)
+      };
+      const error = createHttpError(404, 'Not found');
+      handler(error, requestMock as unknown as Request, responseMock as unknown as Response, next);
+      expect(next).toHaveBeenCalledTimes(1);
       expect(resultHandler.handler).toHaveBeenCalledTimes(1);
       expect(resultHandler.handler.mock.calls[0]).toMatchSnapshot();
     });

@@ -6,10 +6,11 @@ import {
   getMessageFromError,
   getStatusCodeFromError,
   isLoggerConfig,
+  isStreamClosed,
   OutputMarker
 } from '../../src/helpers';
 import {createMiddleware, z, createHttpError, markOutput} from '../../src';
-import {Request} from 'express';
+import {Request, Response} from 'express';
 import {MiddlewareDefinition} from '../../src/middleware';
 import {serializeSchemaForTest} from '../helpers';
 
@@ -299,6 +300,20 @@ describe('Helpers', () => {
       const output = z.object({});
       expect(markOutput(output)).toEqual(output);
       expectType<OutputMarker>(markOutput(output));
+    });
+  });
+
+  describe('isStreamClosed()', () => {
+    test('should work for Node below v12.9', () => {
+      expect(isStreamClosed({finished: true} as Response)).toBeTruthy();
+      expect(isStreamClosed({finished: false} as Response)).toBeFalsy();
+      expect(isStreamClosed({} as Response)).toBeFalsy();
+    });
+
+    test('should work for Node from v12.9', () => {
+      expect(isStreamClosed({writableEnded: true} as Response)).toBeTruthy();
+      expect(isStreamClosed({writableEnded: false} as Response)).toBeFalsy();
+      expect(isStreamClosed({} as Response)).toBeFalsy();
     });
   });
 });

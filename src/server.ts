@@ -3,7 +3,8 @@ import fileUpload from 'express-fileupload';
 import {Server} from 'http';
 import {Logger} from 'winston';
 import {AppConfig, CommonConfig, ServerConfig} from './config-type';
-import {isLoggerConfig} from './helpers';
+import {ResultHandlerError} from './errors';
+import {isLoggerConfig, isStreamClosed} from './helpers';
 import {createLogger} from './logger';
 import {defaultResultHandler} from './result-handler';
 import {initRouting, Routing} from './routing';
@@ -21,14 +22,18 @@ export const createParserFailureHandler = (errorHandler: AnyResultHandler, logge
     });
   };
 
-export const createLastResortHandler = (errorHandler: AnyResultHandler, logger: Logger): RequestHandler =>
-  (request, response) => {
-    errorHandler.handler({
-      request, response, logger,
-      error: createHttpError(404, `Can not ${request.method} ${request.path}`),
-      input: null,
-      output: null
-    });
+export const createLastResortHandler = (errorHandler: AnyResultHandler, logger: Logger): ErrorRequestHandler =>
+  (error, request, response, next) => {
+    if (error instanceof ResultHandlerError) {
+      response.status(500).end(`An error occurred while serving the result: ${error.message}.`);
+    } else if (!isStreamClosed(response)) {
+      errorHandler.handler({
+        request, response, logger, error,
+        input: null,
+        output: null
+      });
+    }
+    next();
   };
 
 export function attachRouting(config: AppConfig & CommonConfig, routing: Routing): void {
@@ -50,6 +55,9 @@ export function createServer(config: ServerConfig & CommonConfig, routing: Routi
   app.use(([jsonParser] as RequestHandler[]).concat(multipartParser || []));
   app.use(createParserFailureHandler(errorHandler, logger));
   initRouting({app, routing, logger, config});
+  app.all('*', (request) => {
+    throw createHttpError(404, `Can not ${request.method} ${request.path}`);
+  });
   app.use(createLastResortHandler(errorHandler, logger));
 
   return app.listen(config.server.listen, () => {
