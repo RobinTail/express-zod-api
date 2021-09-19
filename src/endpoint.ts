@@ -182,6 +182,7 @@ export class Endpoint<
         response, logger
       }));
       if (response.writableEnded) {
+        logger.warn(`The middleware ${def.middleware.name} has closed the stream. Accumulated options:`, options);
         break;
       }
     }

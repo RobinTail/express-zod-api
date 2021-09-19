@@ -1,3 +1,4 @@
+import http from 'http';
 import {expectType} from 'tsd';
 import {
   z,
@@ -6,7 +7,8 @@ import {
   defaultResultHandler,
   EndpointInput,
   EndpointOutput,
-  EndpointResponse
+  EndpointResponse,
+  defaultEndpointsFactory
 } from '../../src';
 import {CommonConfig} from '../../src/config-type';
 import {Endpoint} from '../../src/endpoint';
@@ -188,6 +190,59 @@ describe('Endpoint', () => {
           message: 'Something unexpected'
         }
       });
+    });
+
+    test('Should handle middleware closing the response stream', async () => {
+      const middlewareMock = jest.fn().mockImplementationOnce(async ({input, response}) => {
+        response.end('to hell with all that!');
+        return { inc: input.n + 1 };
+      });
+      const middlewareDefinitionMock = createMiddleware({
+        input: z.object({
+          n: z.number()
+        }),
+        middleware: middlewareMock
+      });
+      const factory = defaultEndpointsFactory.addMiddleware(middlewareDefinitionMock);
+      const handlerMock = jest.fn();
+      const endpoint = factory.build({
+        method: 'post',
+        input: z.object({}),
+        output: z.object({}),
+        handler: handlerMock
+      });
+      const configMock = {
+        cors: true
+      };
+      const requestMock = {
+        method: 'POST',
+        header: jest.fn(() => mimeJson),
+        body: {
+          n: 453
+        }
+      };
+      const responseMock: any = new http.ServerResponse(requestMock as unknown as Request);
+      responseMock.set = jest.fn().mockImplementation(() => responseMock);
+      responseMock.status = jest.fn().mockImplementation(() => responseMock);
+      responseMock.json = jest.fn().mockImplementation(() => responseMock);
+      await endpoint.execute({
+        request: requestMock as unknown as Request,
+        response: responseMock as unknown as Response,
+        config: configMock as CommonConfig,
+        logger: loggerMock
+      });
+      expect(handlerMock).toHaveBeenCalledTimes(0);
+      expect(middlewareMock).toHaveBeenCalledTimes(1);
+      expect(loggerMock.error).toBeCalledTimes(0);
+      expect(loggerMock.warn).toBeCalledTimes(1);
+      expect(loggerMock.warn.mock.calls[0][0]).toBe(
+        'The middleware mockConstructor has closed the stream. Accumulated options:'
+      );
+      expect(loggerMock.warn.mock.calls[0][1]).toEqual({inc: 454});
+      expect(responseMock.status).toBeCalledTimes(0);
+      expect(responseMock.json).toBeCalledTimes(0);
+      expect(responseMock.statusCode).toBe(200);
+      expect(responseMock.statusMessage).toBe('OK');
     });
   });
 
