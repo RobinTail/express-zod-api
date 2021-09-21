@@ -46,6 +46,7 @@ If you're upgrading from v1 please check out the information in [Changelog](CHAN
 - [Typescript](https://www.typescriptlang.org/) first
 - Schema validation — [Zod 3.x](https://github.com/colinhacks/zod).
 - Webserver — [Express.js](https://expressjs.com/).
+- File uploads — [Express-FileUpload](https://github.com/richardgirges/express-fileupload) (based on [Busboy](https://github.com/mscdex/busboy))
 - Logger — [Winston](https://github.com/winstonjs/winston).
 - Swagger - [OpenAPI 3.x](https://github.com/metadevpro/openapi3-ts)
 
