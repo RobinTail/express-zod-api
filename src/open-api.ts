@@ -50,8 +50,7 @@ const describeSchema = (value: z.ZodTypeAny, isResponse: boolean): SchemaObject 
     case value instanceof z.ZodRecord:
       return {
         ...otherProps,
-        type: 'object',
-        additionalProperties: describeSchema((value as z.ZodRecord)._def.valueType, isResponse)
+        ...describeRecord((value as z.ZodRecord<z.ZodTypeAny>)._def, isResponse)
       };
     case value instanceof z.ZodObject:
       return {
@@ -135,6 +134,25 @@ const describeSchema = (value: z.ZodTypeAny, isResponse: boolean): SchemaObject 
     default:
       throw new OpenAPIError(`Zod type ${value.constructor.name} is unsupported`);
   }
+};
+
+const describeRecord = (definition: z.ZodRecordDef<z.ZodTypeAny>, isResponse: boolean): SchemaObject => {
+  if (definition.keyType instanceof z.ZodEnum || definition.keyType instanceof z.ZodNativeEnum) {
+    const keys = Object.values(definition.keyType._def.values) as string[];
+    const shape = keys.reduce((carry, key) => ({
+      ...carry,
+      [key]: definition.valueType
+    }), {} as z.ZodRawShape);
+    return {
+      type: 'object',
+      properties: describeObjectProperties(z.object(shape), isResponse),
+      required: keys
+    };
+  }
+  return {
+    type: 'object',
+    additionalProperties: describeSchema(definition.valueType, isResponse)
+  };
 };
 
 const describeArray = (definition: z.ZodArrayDef, isResponse: boolean): SchemaObject => ({
