@@ -216,25 +216,20 @@ const describeObjectProperties = (schema: z.AnyZodObject, isResponse: boolean): 
   }), {} as Record<string, SchemaObject>);
 };
 
-const getTransformationMod = (def: z.ZodEffectsDef): z.Mod<any> & { isPreprocess: boolean} | undefined => {
-  if ('effects' in def && def.effects && def.effects.length > 0) {
-    const effect = def.effects.filter((ef) => ef.type === 'transform').slice(-1)[0];
-    if (effect && 'transform' in effect) {
-      return { ...effect, isPreprocess: false };
-    }
-  }
-  if ('preprocess' in def && def.preprocess && def.preprocess.type === 'transform') {
-    return { ...def.preprocess, isPreprocess: true };
+type TransformationOrPreprocess = z.TransformEffect<any> | z.PreprocessEffect<any>;
+const getTransformationEffect = (def: z.ZodEffectsDef): TransformationOrPreprocess | undefined => {
+  if (def.effect.type === 'preprocess' || def.effect.type === 'transform') {
+    return def.effect;
   }
 };
 
 const describeTransformation = (value: z.ZodEffects<any>, isResponse: boolean): SchemaObject => {
   const input = describeSchema(value._def.schema, isResponse);
-  const mod = getTransformationMod(value._def);
-  if (isResponse && mod && !mod.isPreprocess) {
+  const effect = getTransformationEffect(value._def);
+  if (isResponse && effect && effect.type === 'transform') {
     let output = 'undefined';
     try {
-      output = typeof mod.transform(
+      output = typeof effect.transform(
         ['integer', 'number'].includes(`${input.type}`) ? 0 :
           'string' === input.type ? '' :
             'boolean' === input.type ? false :
@@ -252,7 +247,7 @@ const describeTransformation = (value: z.ZodEffects<any>, isResponse: boolean): 
       ),
     };
   }
-  if (!isResponse && mod && mod.isPreprocess) {
+  if (!isResponse && effect && effect.type === 'preprocess') {
     const { type: inputType, ...rest } = input;
     return {
       ...rest,
