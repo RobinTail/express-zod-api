@@ -1,4 +1,4 @@
-import {createRootContext} from 'zod';
+import {ParseContext} from 'zod';
 import {ZodUpload} from '../../src/upload-schema';
 
 describe('ZodUpload', () => {
@@ -12,7 +12,11 @@ describe('ZodUpload', () => {
 
   describe('_parse()', () => {
     test('should handle wrong parsed type', () => {
-      const context = createRootContext({});
+      const context = new ParseContext({
+        path: null,
+        issues: [],
+        async: false,
+      });
       const schema = ZodUpload.create();
       const result = schema._parse(context, 123, 'number');
       expect(result).toEqual({
@@ -26,7 +30,11 @@ describe('ZodUpload', () => {
     });
 
     test('should accept UploadedFile', () => {
-      const context = createRootContext({});
+      const context = new ParseContext({
+        path: null,
+        issues: [],
+        async: false,
+      });
       const schema = ZodUpload.create();
       const buffer = Buffer.from('something');
       const result = schema._parse(context, {

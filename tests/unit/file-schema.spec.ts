@@ -1,4 +1,4 @@
-import {createRootContext, getParsedType} from 'zod';
+import {ParseContext, getParsedType} from 'zod';
 import {ZodFile} from '../../src/file-schema';
 import fs from 'fs';
 
@@ -40,7 +40,11 @@ describe('ZodFile', () => {
 
   describe('_parse()', () => {
     test('should handle wrong parsed type', () => {
-      const context = createRootContext({});
+      const context = new ParseContext({
+        path: null,
+        issues: [],
+        async: false,
+      });
       const schema = ZodFile.create();
       const result = schema._parse(context, 123, 'number');
       expect(result).toEqual({
@@ -56,7 +60,11 @@ describe('ZodFile', () => {
     });
 
     test('should perform additional check for base64 file', () => {
-      const context = createRootContext({});
+      const context = new ParseContext({
+        path: null,
+        issues: [],
+        async: false,
+      });
       const schema = ZodFile.create().base64('this is not base64');
       const result = schema._parse(context, '~~~~', 'string');
       expect(result).toEqual({
@@ -70,7 +78,11 @@ describe('ZodFile', () => {
     });
 
     test('should accept string', () => {
-      const context = createRootContext({});
+      const context = new ParseContext({
+        path: null,
+        issues: [],
+        async: false,
+      });
       const schema = ZodFile.create();
       const result = schema._parse(context, 'some string', 'string');
       expect(result).toEqual({
@@ -81,7 +93,11 @@ describe('ZodFile', () => {
     });
 
     test('should accept binary read string', () => {
-      const context = createRootContext({});
+      const context = new ParseContext({
+        path: null,
+        issues: [],
+        async: false,
+      });
       const schema = ZodFile.create().binary();
       const data = fs.readFileSync('logo.svg', 'binary');
       const type = getParsedType(data);
@@ -94,7 +110,11 @@ describe('ZodFile', () => {
     });
 
     test('should accept base64 read string', () => {
-      const context = createRootContext({});
+      const context = new ParseContext({
+        path: null,
+        issues: [],
+        async: false,
+      });
       const schema = ZodFile.create().base64();
       const data = fs.readFileSync('logo.svg', 'base64');
       const type = getParsedType(data);
