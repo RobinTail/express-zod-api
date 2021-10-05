@@ -78,7 +78,7 @@ const describeSchema = (value: z.ZodTypeAny, isResponse: boolean): SchemaObject 
     case value instanceof z.ZodEffects:
       return {
         ...otherProps,
-        ...describeTransformation(value as z.ZodEffects<any> | z.ZodTransformer<any>, isResponse)
+        ...describeEffect(value as z.ZodEffects<any> | z.ZodTransformer<any>, isResponse)
       };
     case value instanceof z.ZodOptional:
     case value instanceof z.ZodNullable:
@@ -216,16 +216,9 @@ const describeObjectProperties = (schema: z.AnyZodObject, isResponse: boolean): 
   }), {} as Record<string, SchemaObject>);
 };
 
-type TransformationOrPreprocess = z.TransformEffect<any> | z.PreprocessEffect<any>;
-const getEffect = (def: z.ZodEffectsDef): TransformationOrPreprocess | undefined => {
-  if (def.effect.type === 'preprocess' || def.effect.type === 'transform') {
-    return def.effect;
-  }
-};
-
-const describeTransformation = (value: z.ZodEffects<any>, isResponse: boolean): SchemaObject => {
+const describeEffect = (value: z.ZodEffects<any>, isResponse: boolean): SchemaObject => {
   const input = describeSchema(value._def.schema, isResponse);
-  const effect = getEffect(value._def);
+  const effect = value._def.effect;
   if (isResponse && effect && effect.type === 'transform') {
     let output = 'undefined';
     try {
