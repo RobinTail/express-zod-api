@@ -1430,6 +1430,13 @@ paths:
                           type: boolean
                       literal:
                         type: object
+                        properties:
+                          only:
+                            type: boolean
+                        required:
+                          - only
+                      union:
+                        type: object
                         additionalProperties:
                           type: boolean
                       enum:
@@ -1447,6 +1454,7 @@ paths:
                       - stringy
                       - numeric
                       - literal
+                      - union
                       - enum
                 required:
                   - status

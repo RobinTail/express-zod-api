@@ -149,6 +149,15 @@ const describeRecord = (definition: z.ZodRecordDef<z.ZodTypeAny>, isResponse: bo
       required: keys
     };
   }
+  if (definition.keyType instanceof z.ZodLiteral) {
+    return {
+      type: 'object',
+      properties: describeObjectProperties(z.object({
+        [definition.keyType._def.value]: definition.valueType
+      }), isResponse),
+      required: [definition.keyType._def.value]
+    };
+  }
   return {
     type: 'object',
     additionalProperties: describeSchema(definition.valueType, isResponse)
