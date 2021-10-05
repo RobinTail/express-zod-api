@@ -217,7 +217,7 @@ const describeObjectProperties = (schema: z.AnyZodObject, isResponse: boolean): 
 };
 
 type TransformationOrPreprocess = z.TransformEffect<any> | z.PreprocessEffect<any>;
-const getTransformationEffect = (def: z.ZodEffectsDef): TransformationOrPreprocess | undefined => {
+const getEffect = (def: z.ZodEffectsDef): TransformationOrPreprocess | undefined => {
   if (def.effect.type === 'preprocess' || def.effect.type === 'transform') {
     return def.effect;
   }
@@ -225,7 +225,7 @@ const getTransformationEffect = (def: z.ZodEffectsDef): TransformationOrPreproce
 
 const describeTransformation = (value: z.ZodEffects<any>, isResponse: boolean): SchemaObject => {
   const input = describeSchema(value._def.schema, isResponse);
-  const effect = getTransformationEffect(value._def);
+  const effect = getEffect(value._def);
   if (isResponse && effect && effect.type === 'transform') {
     let output = 'undefined';
     try {
