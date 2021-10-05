@@ -6,12 +6,13 @@ import {
   ZodParsedType,
   ZodType,
   INVALID,
-  OK
+  OK,
+  ZodTypeDef
 } from 'zod';
 
 const zodUploadKind = 'ZodUpload';
 
-export interface ZodUploadDef {
+export interface ZodUploadDef extends ZodTypeDef {
   typeName: typeof zodUploadKind;
 }
 
