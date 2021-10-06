@@ -1437,8 +1437,14 @@ paths:
                           - only
                       union:
                         type: object
-                        additionalProperties:
-                          type: boolean
+                        properties:
+                          option1:
+                            type: boolean
+                          option2:
+                            type: boolean
+                        required:
+                          - option1
+                          - option2
                       enum:
                         type: object
                         properties:

@@ -158,6 +158,21 @@ const describeRecord = (definition: z.ZodRecordDef<z.ZodTypeAny>, isResponse: bo
       required: [definition.keyType._def.value]
     };
   }
+  if (definition.keyType instanceof z.ZodUnion) {
+    const areOptionsLiteral = definition.keyType.options
+      .reduce((carry: boolean, option: z.ZodTypeAny) => carry && option instanceof z.ZodLiteral, true);
+    if (areOptionsLiteral) {
+      const shape = definition.keyType.options.reduce((carry: z.ZodRawShape, option: z.ZodLiteral<any>) => ({
+        ...carry,
+        [option.value]: definition.valueType
+      }), {} as z.ZodRawShape);
+      return {
+        type: 'object',
+        properties: describeObjectProperties(z.object(shape), isResponse),
+        required: definition.keyType.options.map((option: z.ZodLiteral<any>) => option.value)
+      };
+    }
+  }
   return {
     type: 'object',
     additionalProperties: describeSchema(definition.valueType, isResponse)
