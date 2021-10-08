@@ -34,11 +34,11 @@ export class ZodFile extends ZodType<string, ZodFileDef> {
     parsedType: ZodParsedType
   ): ParseReturnType<string> {
     if (parsedType !== ZodParsedType.string) {
-      ctx.addIssue(data, {
+      this.addIssue(ctx, {
         code: ZodIssueCode.invalid_type,
         expected: ZodParsedType.string,
         received: parsedType,
-      });
+      }, { data });
       return INVALID;
     }
     let invalid = false;
@@ -47,10 +47,10 @@ export class ZodFile extends ZodType<string, ZodFileDef> {
       if (check.kind === 'base64') {
         if (!base64Regex.test(data)) {
           invalid = true;
-          ctx.addIssue(data, {
+          this.addIssue(ctx, {
             code: ZodIssueCode.custom,
             message: check.message,
-          });
+          }, { data });
         }
       }
     }
