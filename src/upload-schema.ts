@@ -31,10 +31,10 @@ export class ZodUpload extends ZodType<UploadedFile, ZodUploadDef> {
     parsedType: ZodParsedType
   ): ParseReturnType<UploadedFile> {
     if (parsedType !== ZodParsedType.object || !isUploadedFile(data)) {
-      ctx.addIssue(data, {
+      this.addIssue(ctx, {
         code: ZodIssueCode.custom,
         message: `Expected file upload, received ${parsedType}`
-      });
+      }, { data });
       return INVALID;
     }
 
