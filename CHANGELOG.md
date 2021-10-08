@@ -4,7 +4,7 @@
 
 ### v2.6.0
 
-- Zod version is 3.9.5
+- Zod version is 3.9.8
   - It supports the ability to specify the key schema of `z.record()`.
   - In case of using enums and literals in the key schema they will be described as required ones in the generated 
     OpenAPI / Swagger documentation.
