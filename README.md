@@ -13,8 +13,10 @@
 
 Start your API server with I/O schema validation and custom middlewares in minutes.
 
-1. [Technologies](#technologies)
-2. [Concept](#concept)
+1. [Why and what is it for](#why-and-what-is-it-for)
+2. [How it works](#how-it-works)
+   1. [Technologies](#technologies)
+   2. [Concept](#concept)
 3. [Installation](#installation)
 4. [Basic usage](#basic-usage)
    1. [Set up config](#set-up-config)
@@ -41,7 +43,26 @@ Start your API server with I/O schema validation and custom middlewares in minut
 
 If you're upgrading from v1 please check out the information in [Changelog](CHANGELOG.md).  
 
-# Technologies
+# Why and what is it for
+
+I made this library because of the often repetitive tasks of starting a web server APIs with the need to validate input
+data. It integrates and provides the capabilities of popular web server, logger, validation and documenting solutions. 
+Therefore, many basic tasks can be accomplished faster and easier, in particular:
+
+- You can describe web server routes as a hierarchical object.
+- You can keep the endpoint's input and output type declarations right next to its handler.
+- All input and output data types are validated, so it ensures you won't have an empty string, null or undefined where 
+  you expect a number.
+- Variables within an endpoint handler have types according to the declared schema, so your IDE and Typescript will 
+  provide you with necessary hints to focus on bringing your vision to life.
+- All of your endpoints can respond in a similar way.
+- The expected endpoint input and response types can be exported to the frontend, so you don't get confused about the 
+  field names when you implement the client for your API.
+- You can generate your API documentation in a Swagger / OpenAPI compatible format.
+
+# How it works
+
+## Technologies
 
 - [Typescript](https://www.typescriptlang.org/) first
 - Schema validation — [Zod 3.x](https://github.com/colinhacks/zod).
@@ -50,7 +71,7 @@ If you're upgrading from v1 please check out the information in [Changelog](CHAN
 - Logger — [Winston](https://github.com/winstonjs/winston).
 - Swagger - [OpenAPI 3.x](https://github.com/metadevpro/openapi3-ts)
 
-# Concept
+## Concept
 The API operates object schemas for input and output, including unions and intersections of object schemas
 (`.or()`, `.and()`), but in general the API can [respond with any data type](#non-object-response) and 
 accept [file uploads](#file-uploads).
