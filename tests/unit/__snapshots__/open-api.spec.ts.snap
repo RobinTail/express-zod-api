@@ -1411,7 +1411,7 @@ paths:
                   data:
                     type: object
                     properties:
-                      record:
+                      simple:
                         type: object
                         additionalProperties:
                           type: integer
@@ -1420,8 +1420,48 @@ paths:
                           exclusiveMinimum: false
                           maximum: 9007199254740991
                           exclusiveMaximum: false
+                      stringy:
+                        type: object
+                        additionalProperties:
+                          type: boolean
+                      numeric:
+                        type: object
+                        additionalProperties:
+                          type: boolean
+                      literal:
+                        type: object
+                        properties:
+                          only:
+                            type: boolean
+                        required:
+                          - only
+                      union:
+                        type: object
+                        properties:
+                          option1:
+                            type: boolean
+                          option2:
+                            type: boolean
+                        required:
+                          - option1
+                          - option2
+                      enum:
+                        type: object
+                        properties:
+                          option1:
+                            type: boolean
+                          option2:
+                            type: boolean
+                        required:
+                          - option1
+                          - option2
                     required:
-                      - record
+                      - simple
+                      - stringy
+                      - numeric
+                      - literal
+                      - union
+                      - enum
                 required:
                   - status
                   - data

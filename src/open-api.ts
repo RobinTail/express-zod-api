@@ -50,8 +50,7 @@ const describeSchema = (value: z.ZodTypeAny, isResponse: boolean): SchemaObject 
     case value instanceof z.ZodRecord:
       return {
         ...otherProps,
-        type: 'object',
-        additionalProperties: describeSchema((value as z.ZodRecord)._def.valueType, isResponse)
+        ...describeRecord((value as z.ZodRecord<z.ZodTypeAny>)._def, isResponse)
       };
     case value instanceof z.ZodObject:
       return {
@@ -78,7 +77,7 @@ const describeSchema = (value: z.ZodTypeAny, isResponse: boolean): SchemaObject 
     case value instanceof z.ZodEffects:
       return {
         ...otherProps,
-        ...describeTransformation(value as z.ZodEffects<any> | z.ZodTransformer<any>, isResponse)
+        ...describeEffect(value as z.ZodEffects<any> | z.ZodTransformer<any>, isResponse)
       };
     case value instanceof z.ZodOptional:
     case value instanceof z.ZodNullable:
@@ -135,6 +134,49 @@ const describeSchema = (value: z.ZodTypeAny, isResponse: boolean): SchemaObject 
     default:
       throw new OpenAPIError(`Zod type ${value.constructor.name} is unsupported`);
   }
+};
+
+const describeRecord = (definition: z.ZodRecordDef<z.ZodTypeAny>, isResponse: boolean): SchemaObject => {
+  if (definition.keyType instanceof z.ZodEnum || definition.keyType instanceof z.ZodNativeEnum) {
+    const keys = Object.values(definition.keyType._def.values) as string[];
+    const shape = keys.reduce((carry, key) => ({
+      ...carry,
+      [key]: definition.valueType
+    }), {} as z.ZodRawShape);
+    return {
+      type: 'object',
+      properties: describeObjectProperties(z.object(shape), isResponse),
+      required: keys
+    };
+  }
+  if (definition.keyType instanceof z.ZodLiteral) {
+    return {
+      type: 'object',
+      properties: describeObjectProperties(z.object({
+        [definition.keyType._def.value]: definition.valueType
+      }), isResponse),
+      required: [definition.keyType._def.value]
+    };
+  }
+  if (definition.keyType instanceof z.ZodUnion) {
+    const areOptionsLiteral = definition.keyType.options
+      .reduce((carry: boolean, option: z.ZodTypeAny) => carry && option instanceof z.ZodLiteral, true);
+    if (areOptionsLiteral) {
+      const shape = definition.keyType.options.reduce((carry: z.ZodRawShape, option: z.ZodLiteral<any>) => ({
+        ...carry,
+        [option.value]: definition.valueType
+      }), {} as z.ZodRawShape);
+      return {
+        type: 'object',
+        properties: describeObjectProperties(z.object(shape), isResponse),
+        required: definition.keyType.options.map((option: z.ZodLiteral<any>) => option.value)
+      };
+    }
+  }
+  return {
+    type: 'object',
+    additionalProperties: describeSchema(definition.valueType, isResponse)
+  };
 };
 
 const describeArray = (definition: z.ZodArrayDef, isResponse: boolean): SchemaObject => ({
@@ -216,25 +258,13 @@ const describeObjectProperties = (schema: z.AnyZodObject, isResponse: boolean): 
   }), {} as Record<string, SchemaObject>);
 };
 
-const getTransformationMod = (def: z.ZodEffectsDef): z.Mod<any> & { isPreprocess: boolean} | undefined => {
-  if ('effects' in def && def.effects && def.effects.length > 0) {
-    const effect = def.effects.filter((ef) => ef.type === 'transform').slice(-1)[0];
-    if (effect && 'transform' in effect) {
-      return { ...effect, isPreprocess: false };
-    }
-  }
-  if ('preprocess' in def && def.preprocess && def.preprocess.type === 'transform') {
-    return { ...def.preprocess, isPreprocess: true };
-  }
-};
-
-const describeTransformation = (value: z.ZodEffects<any>, isResponse: boolean): SchemaObject => {
+const describeEffect = (value: z.ZodEffects<any>, isResponse: boolean): SchemaObject => {
   const input = describeSchema(value._def.schema, isResponse);
-  const mod = getTransformationMod(value._def);
-  if (isResponse && mod && !mod.isPreprocess) {
+  const effect = value._def.effect;
+  if (isResponse && effect && effect.type === 'transform') {
     let output = 'undefined';
     try {
-      output = typeof mod.transform(
+      output = typeof effect.transform(
         ['integer', 'number'].includes(`${input.type}`) ? 0 :
           'string' === input.type ? '' :
             'boolean' === input.type ? false :
@@ -252,7 +282,7 @@ const describeTransformation = (value: z.ZodEffects<any>, isResponse: boolean): 
       ),
     };
   }
-  if (!isResponse && mod && mod.isPreprocess) {
+  if (!isResponse && effect && effect.type === 'preprocess') {
     const { type: inputType, ...rest } = input;
     return {
       ...rest,

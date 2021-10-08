@@ -5,7 +5,8 @@ import {
   ZodParsedType,
   ZodType,
   INVALID,
-  OK
+  OK,
+  ZodTypeDef
 } from 'zod';
 import {ErrMessage, errToObj} from './helpers';
 
@@ -19,7 +20,7 @@ declare type ZodFileCheck = {
   message?: string;
 };
 
-export interface ZodFileDef {
+export interface ZodFileDef extends ZodTypeDef {
   checks: ZodFileCheck[];
   typeName: typeof zodFileKind;
 }

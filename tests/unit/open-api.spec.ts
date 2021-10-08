@@ -206,7 +206,12 @@ describe('Open API generator', () => {
               method: 'post',
               input: z.object({}),
               output: z.object({
-                record: z.record(z.number().int()),
+                simple: z.record(z.number().int()),
+                stringy: z.record(z.string().regex(/[A-Z]+/), z.boolean()),
+                numeric: z.record(z.number().int(), z.boolean()),
+                literal: z.record(z.literal('only'), z.boolean()),
+                union: z.record(z.literal('option1').or(z.literal('option2')), z.boolean()),
+                enum: z.record(z.enum(['option1', 'option2']), z.boolean())
               }),
               handler: jest.fn()
             })
