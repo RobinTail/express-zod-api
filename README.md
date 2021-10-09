@@ -64,12 +64,13 @@ Therefore, many basic tasks can be accomplished faster and easier, in particular
 
 ## Technologies
 
-- [Typescript](https://www.typescriptlang.org/) first
+- [Typescript](https://www.typescriptlang.org/) first.
+- Web server — [Express.js](https://expressjs.com/).
 - Schema validation — [Zod 3.x](https://github.com/colinhacks/zod).
-- Webserver — [Express.js](https://expressjs.com/).
-- File uploads — [Express-FileUpload](https://github.com/richardgirges/express-fileupload) (based on [Busboy](https://github.com/mscdex/busboy))
 - Logger — [Winston](https://github.com/winstonjs/winston).
-- Swagger - [OpenAPI 3.x](https://github.com/metadevpro/openapi3-ts)
+- Documenting - [OpenAPI 3.x](https://github.com/metadevpro/openapi3-ts) (formerly known as the Swagger Specification).
+- File uploads — [Express-FileUpload](https://github.com/richardgirges/express-fileupload)
+  (based on [Busboy](https://github.com/mscdex/busboy))
 
 ## Concept
 The API operates object schemas for input and output, including unions and intersections of object schemas
