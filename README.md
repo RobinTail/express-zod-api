@@ -407,7 +407,7 @@ const fileUploadEndpoint = defaultEndpointsFactory.build({
    }),
    output: z.object({...}),
    handler: async ({input: {avatar}}) => {
-      // avatar: {name, mv(), mimetype, encoding, data, truncated, size, ...}
+      // avatar: {name, mv(), mimetype, data, size, ...}
       // avatar.truncated is true on failure
       return {...};
    }
