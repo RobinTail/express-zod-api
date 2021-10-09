@@ -134,13 +134,24 @@ const config = createConfig({
 
 ## Create an endpoints factory
 
+In the basic case, you can just import and use the default factory:
 ```typescript
 import {defaultEndpointsFactory} from 'express-zod-api';
-// same as: new EndpointsFactory(defaultResultHandler)
-const endpointsFactory = defaultEndpointsFactory;
 ```
 
-You can also instantly add middlewares to it using `.addMiddleware()` method.
+If you want to connect [middlewares](#create-a-middleware) to the default factory right away, you can do it the 
+following way:
+
+```typescript
+import {defaultEndpointsFactory} from 'express-zod-api';
+
+const endpointsFactory = defaultEndpointsFactory.addMiddleware(
+  yourMiddleware
+);
+```
+
+By the way, `defaultEndpointsFactory` is the same as `new EndpointsFactory(defaultResultHandler)`.
+Therefore, if you need to customize the response, see [ResultHandler](#resulthandler).
 
 ## Create your first endpoint
 
