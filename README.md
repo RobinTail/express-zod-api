@@ -121,7 +121,7 @@ import {createConfig} from 'express-zod-api';
 
 const config = createConfig({
   server: {
-    listen: 8090,
+    listen: 8090, // port or socket
   },
   cors: true,
   logger: {
@@ -181,6 +181,8 @@ before `.build()`.
 
 ## Set up routing
 
+Connect your endpoint to the `/v1/setUser` route:
+
 ```typescript
 import {Routing} from 'express-zod-api';
 
@@ -190,7 +192,6 @@ const routing: Routing = {
   }
 };
 ```
-This implementation sets up `setUserEndpoint` to handle requests to the `/v1/setUser` route.
 
 ## Start your server
 
