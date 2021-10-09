@@ -175,8 +175,9 @@ const setUserEndpoint = endpointsFactory.build({
 });
 ```
 
-The endpoint can also handle multiple types of requests, this feature is available by using `methods` property that 
-accepts an array. You can also add middlewares to the endpoint by using `.addMiddleware()` before `.build()`.
+Endpoints can also handle multiple types of requests, by using `methods` property instead of `method` that 
+accepts an array. You can also add [middlewares](#create-a-middleware) to the endpoint by using `.addMiddleware()` 
+before `.build()`.
 
 ## Set up routing
 
