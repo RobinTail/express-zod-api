@@ -248,9 +248,9 @@ describe('Server', () => {
             })
         }
       };
-      // noinspection JSVoidFunctionReturnValueUsed
-      const result = attachRouting(configMock as unknown as AppConfig & CommonConfig, routingMock);
-      expect(result).toBe(undefined);
+      const {logger, notFoundHandler} = attachRouting(configMock as unknown as AppConfig & CommonConfig, routingMock);
+      expect(logger).toEqual(configMock.logger);
+      expect(typeof notFoundHandler).toBe('function');
       expect(appMock.use).toBeCalledTimes(0);
       expect(configMock.errorHandler.handler).toBeCalledTimes(0);
       expect(configMock.logger.info).toBeCalledTimes(0);
