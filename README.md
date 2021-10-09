@@ -13,8 +13,10 @@
 
 Start your API server with I/O schema validation and custom middlewares in minutes.
 
-1. [Technologies](#technologies)
-2. [Concept](#concept)
+1. [Why and what is it for](#why-and-what-is-it-for)
+2. [How it works](#how-it-works)
+   1. [Technologies](#technologies)
+   2. [Concept](#concept)
 3. [Installation](#installation)
 4. [Basic usage](#basic-usage)
    1. [Set up config](#set-up-config)
@@ -39,18 +41,38 @@ Start your API server with I/O schema validation and custom middlewares in minut
    1. [Excess property check of endpoint output](#excess-property-check-of-endpoint-output)
 8. [Your input to my output](#your-input-to-my-output)
 
-If you're upgrading from v1 please check out the information in [Changelog](CHANGELOG.md).  
+If you're upgrading from v1 please check out the information in [Changelog](CHANGELOG.md#v200-beta1).  
 
-# Technologies
+# Why and what is it for
 
-- [Typescript](https://www.typescriptlang.org/) first
+I made this library because of the often repetitive tasks of starting a web server APIs with the need to validate input
+data. It integrates and provides the capabilities of popular web server, logger, validation and documenting solutions. 
+Therefore, many basic tasks can be accomplished faster and easier, in particular:
+
+- You can describe web server routes as a hierarchical object.
+- You can keep the endpoint's input and output type declarations right next to its handler.
+- All input and output data types are validated, so it ensures you won't have an empty string, null or undefined where 
+  you expect a number.
+- Variables within an endpoint handler have types according to the declared schema, so your IDE and Typescript will 
+  provide you with necessary hints to focus on bringing your vision to life.
+- All of your endpoints can respond in a similar way.
+- The expected endpoint input and response types can be exported to the frontend, so you don't get confused about the 
+  field names when you implement the client for your API.
+- You can generate your API documentation in a Swagger / OpenAPI compatible format.
+
+# How it works
+
+## Technologies
+
+- [Typescript](https://www.typescriptlang.org/) first.
+- Web server — [Express.js](https://expressjs.com/).
 - Schema validation — [Zod 3.x](https://github.com/colinhacks/zod).
-- Webserver — [Express.js](https://expressjs.com/).
-- File uploads — [Express-FileUpload](https://github.com/richardgirges/express-fileupload) (based on [Busboy](https://github.com/mscdex/busboy))
 - Logger — [Winston](https://github.com/winstonjs/winston).
-- Swagger - [OpenAPI 3.x](https://github.com/metadevpro/openapi3-ts)
+- Documenting - [OpenAPI 3.x](https://github.com/metadevpro/openapi3-ts) (formerly known as the Swagger Specification).
+- File uploads — [Express-FileUpload](https://github.com/richardgirges/express-fileupload)
+  (based on [Busboy](https://github.com/mscdex/busboy))
 
-# Concept
+## Concept
 The API operates object schemas for input and output, including unions and intersections of object schemas
 (`.or()`, `.and()`), but in general the API can [respond with any data type](#non-object-response) and 
 accept [file uploads](#file-uploads).
@@ -58,13 +80,13 @@ accept [file uploads](#file-uploads).
 The object being validated is the `request.query` for GET request, the `request.body` for PUT, PATCH and POST requests, 
 or their merging for DELETE requests.
 
-Middlewares can handle validated inputs and the original `request`, for example, to perform the authentication or 
-provide the endpoint's handler with some request properties like the actual method. The returns of middlewares are 
-combined into the `options` parameter available to the next middlewares and the endpoint's handler.
+Middlewares can handle inputs and the `request` properties, like headers, for example, to perform the authentication or
+provide the endpoint with some properties like the actual request method. The returns of middlewares are combined into
+the `options` parameter available to the next connected middlewares and the endpoint's handler.
 
-The handler's parameter `input` combines the validated inputs of all connected middlewares along with the handler's one.
-The result that the handler returns goes to the `ResultHandler` which is responsible for transmission of the final 
-response or possible error.
+The `input` parameter of the endpoint's handler consists of the inputs of all connected middlewares along with its own
+one. The output of the endpoint's handler goes to the `ResultHandler` which is responsible for transmission of the
+final response or possible error.
 
 All inputs and outputs are validated and there are also advanced powerful features like transformations and refinements.
 The diagram below can give you a better idea of the dataflow.
@@ -100,7 +122,7 @@ import {createConfig} from 'express-zod-api';
 
 const config = createConfig({
   server: {
-    listen: 8090,
+    listen: 8090, // port or socket
   },
   cors: true,
   logger: {
@@ -113,13 +135,24 @@ const config = createConfig({
 
 ## Create an endpoints factory
 
+In the basic case, you can just import and use the default factory:
 ```typescript
-import {defaultEndpointsFactory} from './endpoints-factory';
-// same as: new EndpointsFactory(defaultResultHandler)
-const endpointsFactory = defaultEndpointsFactory;
+import {defaultEndpointsFactory} from 'express-zod-api';
 ```
 
-You can also instantly add middlewares to it using `.addMiddleware()` method.
+If you want to connect [middlewares](#create-a-middleware) to the default factory right away, you can do it the 
+following way:
+
+```typescript
+import {defaultEndpointsFactory} from 'express-zod-api';
+
+const endpointsFactory = defaultEndpointsFactory.addMiddleware(
+  yourMiddleware
+);
+```
+
+By the way, `defaultEndpointsFactory` is the same as `new EndpointsFactory(defaultResultHandler)`.
+Therefore, if you need to customize the response, see [ResultHandler](#resulthandler).
 
 ## Create your first endpoint
 
@@ -143,10 +176,13 @@ const setUserEndpoint = endpointsFactory.build({
 });
 ```
 
-The endpoint can also handle multiple types of requests, this feature is available by using `methods` property that 
-accepts an array. You can also add middlewares to the endpoint by using `.addMiddleware()` before `.build()`.
+Endpoints can also handle multiple types of requests, by using `methods` property instead of `method` that 
+accepts an array. You can also add [middlewares](#create-a-middleware) to the endpoint by using `.addMiddleware()` 
+before `.build()`.
 
 ## Set up routing
+
+Connect your endpoint to the `/v1/setUser` route:
 
 ```typescript
 import {Routing} from 'express-zod-api';
@@ -157,7 +193,6 @@ const routing: Routing = {
   }
 };
 ```
-This implementation sets up `setUserEndpoint` to handle requests to the `/v1/setUser` route.
 
 ## Start your server
 
