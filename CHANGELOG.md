@@ -15,8 +15,8 @@ z.record(
   z.boolean() // values
 );
 ```
-- Feature #145: `attachRouting()` now returns `notFoundHandler` and the `logger` instance. You can use that handler 
-  with your custom express app for handling `404` (not found) errors:
+- Feature #145: `attachRouting()` now returns the `logger` instance and `notFoundHandler`. You can use it with your
+  custom express app for handling `404` (not found) errors:
 
 ```typescript
 const {notFoundHandler} = attachRouting(config, routing);
