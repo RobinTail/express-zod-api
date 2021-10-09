@@ -443,12 +443,17 @@ const app = express();
 const config = createConfig({app, ...});
 const routing = {...};
 
-attachRouting(config, routing);
+const {notFoundHandler, logger} = attachRouting(config, routing);
+
+app.use(notFoundHandler); // optional
 app.listen();
+
+logger.info('Glory to science!');
 ```
 
 **Please note** that in this case you probably need to: parse `request.body`, call `app.listen()` and handle `404` 
-errors yourself;
+errors yourself. In this regard `attachRouting()` provides you with `notFoundHandler` which you can optionally connect
+to your custom express app.
 
 ## Multiple schemas for a single route
 
