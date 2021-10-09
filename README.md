@@ -135,7 +135,7 @@ const config = createConfig({
 ## Create an endpoints factory
 
 ```typescript
-import {defaultEndpointsFactory} from './endpoints-factory';
+import {defaultEndpointsFactory} from 'express-zod-api';
 // same as: new EndpointsFactory(defaultResultHandler)
 const endpointsFactory = defaultEndpointsFactory;
 ```
