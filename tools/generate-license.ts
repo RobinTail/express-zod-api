@@ -67,6 +67,11 @@ const libs: Lib[] = [
     name: 'Express-FileUpload',
     url: 'https://github.com/richardgirges/express-fileupload',
     module: 'express-fileupload'
+  },
+  {
+    name: 'Chalk',
+    url: 'https://github.com/chalk/chalk',
+    module: 'chalk'
   }
 ];
 
