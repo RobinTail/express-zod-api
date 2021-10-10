@@ -19,7 +19,7 @@
     "prepublishOnly": "yarn test && yarn build",
     "postversion": "git push && git push --tags",
     "install_hooks": "husky install",
-    "postinstall": "ts-node tools/ansi-logo.ts"
+    "postinstall": "node dist/ansi-logo.js"
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
