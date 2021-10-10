@@ -1,3 +1,6 @@
+// ANSI font attribution
+// Colossal.flf (Jonathon - jon@mq.edu.au), 8 June 1994
+
 const logo = `
 [34m[39m
 [34m[39m
