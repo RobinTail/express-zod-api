@@ -1,7 +1,10 @@
 import chalk from 'chalk';
+import fs from 'fs';
 
+const fontAttribution = `
 // ANSI font attribution
 // Colossal.flf (Jonathon - jon@mq.edu.au), 8 June 1994
+`.trim();
 
 const proud = chalk.italic('Proudly supports transgender community.');
 const slogan = chalk.italic('Start your API server with I/O schema validation and custom middlewares in minutes.');
@@ -29,4 +32,13 @@ const logo = [
   chalk.reset('\n\n')
 ].join('');
 
+const theCode = `${fontAttribution}
+
+const logo = \`
+${logo.replace('`', '\\`')}
+\`;
+
 console.log(logo);
+`;
+
+fs.writeFileSync('postinstall.js', theCode);
