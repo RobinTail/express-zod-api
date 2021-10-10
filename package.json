@@ -18,7 +18,8 @@
     "precommit": "yarn lint && yarn test && yarn build && git add example/example.swagger.yaml ./LICENSE ./coverage.svg",
     "prepublishOnly": "yarn test && yarn build",
     "postversion": "git push && git push --tags",
-    "install_hooks": "husky install"
+    "install_hooks": "husky install",
+    "postinstall": "ts-node tools/ansi-logo.ts"
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
