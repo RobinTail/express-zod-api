@@ -5,11 +5,12 @@
   "license": "MIT",
   "scripts": {
     "start": "ts-node example/index.ts",
-    "build": "yarn build:cleanup && yarn build:compile && yarn build:swagger && yarn build:license",
+    "build": "yarn build:cleanup && yarn build:compile && yarn build:swagger && yarn build:license && yarn build:postinstall",
     "build:cleanup": "rm -rf ./dist && rm -f example/example.swagger.yaml && rm -f ./LICENSE",
     "build:compile": "tsc --build tsconfig.build.json",
     "build:swagger": "ts-node example/generate-open-api-schema.ts > example/example.swagger.yaml",
     "build:license": "ts-node tools/generate-license.ts > ./LICENSE",
+    "build:postinstall": "ts-node tools/generate-postinstall.ts",
     "test": "yarn test:jest && yarn test:badge",
     "test:u": "yarn test:jest -u",
     "test:jest": "yarn jest --detectOpenHandles ./tests/unit ./tests/system",
@@ -18,6 +19,7 @@
     "precommit": "yarn lint && yarn test && yarn build && git add example/example.swagger.yaml ./LICENSE ./coverage.svg",
     "prepublishOnly": "yarn test && yarn build",
     "postversion": "git push && git push --tags",
+    "postinstall": "node postinstall.js",
     "install_hooks": "husky install"
   },
   "main": "dist/index.js",
