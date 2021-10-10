@@ -8,7 +8,7 @@ const slogan = chalk.italic('Start your API server with I/O schema validation an
 const thanks = chalk.italic('Thank you for choosing Express Zod API for your project.');
 
 const logo = [
-  chalk.blue(`
+  chalk.blue(`\n
 8888888888                                                          8888888888P              888             d8888 8888888b. 8888888 
 888                                                                       d88P               888            d88888 888   Y88b  888`),
   chalk.magentaBright(`
