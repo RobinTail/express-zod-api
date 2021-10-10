@@ -19,8 +19,8 @@
     "precommit": "yarn lint && yarn test && yarn build && git add example/example.swagger.yaml ./LICENSE ./coverage.svg",
     "prepublishOnly": "yarn test && yarn build",
     "postversion": "git push && git push --tags",
-    "install_hooks": "husky install",
-    "postinstall": "node postinstall.js"
+    "postinstall": "node postinstall.js",
+    "install_hooks": "husky install"
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
