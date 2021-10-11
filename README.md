@@ -125,6 +125,7 @@ const config = createConfig({
     listen: 8090, // port or socket
   },
   cors: true,
+  startupLogo: true, // you can disable it
   logger: {
     level: 'debug',
     color: true
