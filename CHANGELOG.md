@@ -2,6 +2,22 @@
 
 ## Version 2
 
+### v2.7.0
+
+- From now on, I want to express my support to trans people in the IT world.
+  Transgender rights are human rights and all human beings are born free and equal in dignity.
+  I believe that the problem of discrimination against the rights of trans people is not visible enough,
+  so I add the startup logo in this regard.
+- However, you can turn it off with a simple setting:
+```typescript
+import {createConfig} from 'express-zod-api';
+
+const config = createConfig({
+  startupLogo: false,
+  ...
+});
+```
+
 ### v2.6.0
 
 - Zod version is 3.9.8
