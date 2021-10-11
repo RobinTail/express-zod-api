@@ -125,14 +125,14 @@ const config = createConfig({
     listen: 8090, // port or socket
   },
   cors: true,
-  startupLogo: true, // you can disable it
   logger: {
     level: 'debug',
     color: true
   }
 });
 ```
-*See all available options [here](https://github.com/RobinTail/express-zod-api/blob/master/src/config-type.ts).*
+*See all available options [here](https://github.com/RobinTail/express-zod-api/blob/master/src/config-type.ts). 
+You can disable startup logo with `startupLogo: false`.*
 
 ## Create an endpoints factory
 
