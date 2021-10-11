@@ -44,6 +44,7 @@ describe('Server', () => {
           listen: 8054,
         },
         cors: true,
+        startupLogo: false,
         logger: {
           level: 'warn',
           color: false
@@ -86,6 +87,7 @@ describe('Server', () => {
           jsonParser: jest.fn(),
         },
         cors: true,
+        startupLogo: false,
         errorHandler: {
           handler: jest.fn(),
         },
@@ -226,6 +228,7 @@ describe('Server', () => {
       const configMock = {
         app,
         cors: true,
+        startupLogo: false,
         errorHandler: {
           handler: jest.fn(),
         },

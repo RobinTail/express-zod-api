@@ -4,6 +4,7 @@ import {CommonConfig} from './config-type';
 import {AbstractEndpoint, Endpoint} from './endpoint';
 import {DependsOnMethodError, RoutingError} from './errors';
 import {AuxMethod, Method} from './method';
+import {getStartupLogo} from './startup-logo';
 
 export class DependsOnMethod {
   constructor(public readonly methods: {
@@ -89,6 +90,9 @@ export const initRouting = ({app, logger, config, routing}: {
   config: CommonConfig,
   routing: Routing
 }) => {
+  if (config.startupLogo !== false) {
+    console.log(getStartupLogo());
+  }
   routingCycle({
     routing,
     cors: config.cors,
