@@ -31,7 +31,8 @@ describe('Routing', () => {
     test('Should set right methods', () => {
       const handlerMock = jest.fn();
       const configMock = {
-        cors: true
+        cors: true,
+        startupLogo: false
       };
       const factory = new EndpointsFactory(defaultResultHandler);
       const getEndpoint = factory.build({
@@ -85,7 +86,8 @@ describe('Routing', () => {
     test('Should accept DependsOnMethod', () => {
       const handlerMock = jest.fn();
       const configMock = {
-        cors: true
+        cors: true,
+        startupLogo: false,
       };
       const factory = new EndpointsFactory(defaultResultHandler);
       const getEndpoint = factory.build({
@@ -137,7 +139,7 @@ describe('Routing', () => {
 
     test('Should accept parameters', () => {
       const handlerMock = jest.fn();
-      const configMock = {};
+      const configMock = {startupLogo: false};
       const endpointMock = new EndpointsFactory(defaultResultHandler)
         .build({
           methods: ['get'],
@@ -164,7 +166,7 @@ describe('Routing', () => {
 
     test('Should handle empty paths and trim spaces', () => {
       const handlerMock = jest.fn();
-      const configMock = {};
+      const configMock = {startupLogo: false};
       const endpointMock = new EndpointsFactory(defaultResultHandler)
         .build({
           methods: ['get'],
@@ -195,7 +197,7 @@ describe('Routing', () => {
 
     test('Should throw an error in case of slashes in route', () => {
       const handlerMock = jest.fn();
-      const configMock = {};
+      const configMock = {startupLogo: false};
       const endpointMock = new EndpointsFactory(defaultResultHandler)
         .build({
           methods: ['get'],
@@ -225,7 +227,7 @@ describe('Routing', () => {
 
     test('Should execute endpoints with right arguments', async () => {
       const handlerMock = jest.fn().mockImplementationOnce(() => ({result: true}));
-      const configMock = { cors: true };
+      const configMock = { cors: true, startupLogo: false };
       const setEndpoint = new EndpointsFactory(defaultResultHandler)
         .build({
           methods: ['post'],

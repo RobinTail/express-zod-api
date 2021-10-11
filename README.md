@@ -131,7 +131,8 @@ const config = createConfig({
   }
 });
 ```
-*See all available options [here](https://github.com/RobinTail/express-zod-api/blob/master/src/config-type.ts).*
+*See all available options [here](https://github.com/RobinTail/express-zod-api/blob/master/src/config-type.ts). 
+You can disable startup logo with `startupLogo: false`.*
 
 ## Create an endpoints factory
 

@@ -69,11 +69,13 @@ describe('App', () => {
           })
       }
     };
+    jest.spyOn(global.console, 'log').mockImplementation(jest.fn());
     server = createServer({
       server: {
         listen: 8055,
       },
       cors: true,
+      startupLogo: true,
       logger: {
         level: 'silent',
         color: false
@@ -85,6 +87,7 @@ describe('App', () => {
     server.close();
     // this approach works better than .close() callback
     await waitFor(() => !server.listening);
+    jest.restoreAllMocks();
   });
 
   describe('Positive', () => {

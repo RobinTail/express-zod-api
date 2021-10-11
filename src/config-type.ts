@@ -41,6 +41,7 @@ export interface CommonConfig {
   errorHandler?: ResultHandlerDefinition<any, any>;
   // logger configuration or your custom winston logger
   logger: LoggerConfig | Logger;
+  startupLogo?: boolean; // you can disable the startup logo
 }
 
 export const createConfig = <T extends (ServerConfig | AppConfig) & CommonConfig>(config: T): T => config;
