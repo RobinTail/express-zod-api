@@ -131,7 +131,7 @@ describe('Helpers', () => {
   });
   
   describe('getInitialInput()', () => {
-    test('should return body for POST, PUT and PATCH requests', () => {
+    test('should return body for POST, PUT and PATCH requests by default', () => {
       expect(getInitialInput({
         body: {
           param: 123
@@ -158,7 +158,7 @@ describe('Helpers', () => {
         param: 123
       });
     });
-    test('should return query for GET requests', () => {
+    test('should return query for GET requests by default', () => {
       expect(getInitialInput({
         query: {
           param: 123
@@ -168,7 +168,7 @@ describe('Helpers', () => {
         param: 123
       });
     });
-    test('should return both body and query for DELETE and unknown requests', () => {
+    test('should return both body and query for DELETE and unknown requests by default', () => {
       expect(getInitialInput({
         query: { a: 'query' },
         body: { b: 'body' },
@@ -178,7 +178,7 @@ describe('Helpers', () => {
         b: 'body'
       });
     });
-    test('should return body and files on demand for POST', () => {
+    test('should return body and files on demand for POST by default', () => {
       expect(getInitialInput({
         body: {
           param: 123
@@ -191,6 +191,23 @@ describe('Helpers', () => {
       } as unknown as Request, {})).toEqual({
         param: 123,
         file: '456'
+      });
+    });
+    test('Issue 158: should return query and body for POST on demand', () => {
+      expect(getInitialInput({
+        body: {
+          a: 'body'
+        },
+        query: {
+          b: 'query'
+        },
+        method: 'POST',
+        header: () => 'application/json'
+      } as unknown as Request, {
+        post: ['query', 'body']
+      })).toEqual({
+        a: 'body',
+        b: 'query'
       });
     });
   });
