@@ -2,6 +2,36 @@
 
 ## Version 2
 
+### v2.8.0
+
+- Feature #158: ability to specify the input sources for each request method.
+- New config option `inputSources` allows you to describe the properties of the request, which are combined into an 
+  input that is being validated and available to your endpoints and middleware.
+```typescript
+import {createConfig} from './config-type';
+
+createConfig({
+  ...,
+  inputSources: { // the default value is:
+    get: ['query'],
+    post: ['body', 'files'],
+    put: ['body'],
+    patch: ['body'],
+    delete: ['query', 'body']
+  }
+});
+```
+- For example, in case you need `query` along with `body` available to your endpoints handling POST requests, consider:
+```typescript
+createConfig({
+  ...,
+  inputSources: {
+    post: ['query', 'body', 'files'],
+  }
+});
+```
+- The order in array matters: last item has the highest priority in case of the same name properties.
+
 ### v2.7.0
 
 - From now on, I want to express my support to trans people in the IT world.
@@ -40,7 +70,7 @@ app.use(notFoundHandler);
 app.listen();
 ```
 
-Or you can use the `logger` instance with any `ResultHandler` for the same purpose:
+- Or you can use the `logger` instance with any `ResultHandler` for the same purpose:
 
 ```typescript
 const {logger} = attachRouting(config, routing);
