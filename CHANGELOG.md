@@ -8,7 +8,7 @@
 - New config option `inputSources` allows you to describe the properties of the request, which are combined into an 
   input that is being validated and available to your endpoints and middleware.
 ```typescript
-import {createConfig} from './config-type';
+import {createConfig} from 'express-zod-api';
 
 createConfig({
   ...,
