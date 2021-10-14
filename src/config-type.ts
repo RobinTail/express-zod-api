@@ -46,7 +46,7 @@ export interface CommonConfig {
   logger: LoggerConfig | Logger;
   // you can disable the startup logo, default: true
   startupLogo?: boolean;
-  // you can specify which parts of the request are combined into input
+  // you can specify which properties of the request are combined into input
   // default: { get: ['query'], post: ['body', 'files'],
   // put: ['body'], patch: ['body'], delete: ['query', 'body'] }
   inputSources?: Partial<InputSources>;
