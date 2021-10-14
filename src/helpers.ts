@@ -1,8 +1,10 @@
 import {Request} from 'express';
 import {HttpError} from 'http-errors';
 import {z} from 'zod';
-import {LoggerConfig, loggerLevels} from './config-type';
+import {CommonConfig, InputSources, LoggerConfig, loggerLevels} from './config-type';
+import {Method} from './method';
 import {MiddlewareDefinition} from './middleware';
+import {mimeMultipart} from './mime';
 
 export type FlatObject = Record<string, any>;
 
@@ -67,19 +69,36 @@ export function combineEndpointAndMiddlewareInputSchemas<IN extends IOSchema, mI
   return extractObjectSchema(mSchema).merge(extractObjectSchema(input)) as Merge<IN, mIN>;
 }
 
-export function getInitialInput(request: Request, isWithFiles: boolean): any {
-  switch (request.method) {
-    case 'POST':
-      return isWithFiles ? {...request.body, ...request.files} : request.body;
-    case 'PUT':
-    case 'PATCH':
-      return request.body;
-    case 'GET':
-      return request.query;
-    case 'DELETE': // _may_ have body
-    default:
-      return {...request.query, ...request.body};
+function areFilesAvailable(request: Request) {
+  const contentType = request.header('content-type') || '';
+  const isMultipart = contentType.substr(0, mimeMultipart.length).toLowerCase() === mimeMultipart;
+  return 'files' in request && isMultipart;
+}
+
+const defaultInputSources: InputSources = {
+  post: ['body', 'files'],
+  put: ['body'],
+  patch: ['body'],
+  get: ['query'],
+  delete: ['query', 'body']
+};
+const fallbackInputSource = defaultInputSources.delete;
+
+export function getInitialInput(request: Request, inputAssignment: CommonConfig['inputSources']): any {
+  const method = request.method.toLowerCase() as Method;
+  let props = fallbackInputSource;
+  if (method in defaultInputSources) {
+    props = defaultInputSources[method];
   }
+  if (inputAssignment && method in inputAssignment) {
+    props = inputAssignment[method] || props;
+  }
+  return props
+    .filter((prop) => prop === 'files' ? areFilesAvailable(request) : true)
+    .reduce((carry, prop) => ({
+      ...carry,
+      ...request[prop]
+    }), {});
 }
 
 export function isLoggerConfig(logger: any): logger is LoggerConfig {

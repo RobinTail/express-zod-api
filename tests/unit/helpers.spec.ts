@@ -133,30 +133,47 @@ describe('Helpers', () => {
   describe('getInitialInput()', () => {
     test('should return body for POST, PUT and PATCH requests', () => {
       expect(getInitialInput({
-        body: 'body',
-        method: 'POST'
-      } as Request, false)).toEqual('body');
+        body: {
+          param: 123
+        },
+        method: 'POST',
+        header: () => 'application/json'
+      } as unknown as Request, undefined)).toEqual({
+        param: 123
+      });
       expect(getInitialInput({
-        body: 'body',
+        body: {
+          param: 123
+        },
         method: 'PUT'
-      } as Request, false)).toEqual('body');
+      } as Request, {})).toEqual({
+        param: 123
+      });
       expect(getInitialInput({
-        body: 'body',
+        body: {
+          param: 123
+        },
         method: 'PATCH'
-      } as Request, false)).toEqual('body');
+      } as Request, undefined)).toEqual({
+        param: 123
+      });
     });
     test('should return query for GET requests', () => {
       expect(getInitialInput({
-        query: 'query',
+        query: {
+          param: 123
+        },
         method: 'GET'
-      } as unknown as Request, false)).toEqual('query');
+      } as unknown as Request, {})).toEqual({
+        param: 123
+      });
     });
     test('should return both body and query for DELETE and unknown requests', () => {
       expect(getInitialInput({
         query: { a: 'query' },
-        body: {b: 'body'},
+        body: { b: 'body' },
         method: 'DELETE'
-      } as unknown as Request, false)).toEqual({
+      } as unknown as Request, undefined)).toEqual({
         a: 'query',
         b: 'body'
       });
@@ -169,8 +186,9 @@ describe('Helpers', () => {
         files: {
           file: '456'
         },
-        method: 'POST'
-      } as unknown as Request, true)).toEqual({
+        method: 'POST',
+        header: () => 'multipart/form-data; charset=utf-8'
+      } as unknown as Request, {})).toEqual({
         param: 123,
         file: '456'
       });
