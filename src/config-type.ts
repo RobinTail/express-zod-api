@@ -44,8 +44,12 @@ export interface CommonConfig {
   errorHandler?: ResultHandlerDefinition<any, any>;
   // logger configuration or your custom winston logger
   logger: LoggerConfig | Logger;
-  startupLogo?: boolean; // you can disable the startup logo
-  inputSources?: Partial<InputSources>; // you can specify which parts of the request are combined into input
+  // you can disable the startup logo, default: true
+  startupLogo?: boolean;
+  // you can specify which parts of the request are combined into input
+  // default: { get: ['query'], post: ['body', 'files'],
+  // put: ['body'], patch: ['body'], delete: ['query', 'body'] }
+  inputSources?: Partial<InputSources>;
 }
 
 export const createConfig = <T extends (ServerConfig | AppConfig) & CommonConfig>(config: T): T => config;
