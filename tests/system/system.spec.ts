@@ -79,6 +79,9 @@ describe('App', () => {
       logger: {
         level: 'silent',
         color: false
+      },
+      inputSources: {
+        post: ['query', 'body', 'files']
       }
     }, routing);
   });
@@ -121,6 +124,27 @@ describe('App', () => {
           key: '123',
           something: 'joke'
         })
+      });
+      expect(response.status).toBe(200);
+      const json = await response.json();
+      expect(json).toEqual({
+        status: 'success',
+        data: {
+          anything: 300,
+          doubleKey: '123123',
+          userId: 354,
+          permissions: ['any'],
+          method: 'post'
+        }
+      });
+    });
+
+    test('Issue 158: should use query for POST on demand', async () => {
+      const response = await fetch('http://127.0.0.1:8055/v1/test?key=123&something=joke', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
       });
       expect(response.status).toBe(200);
       const json = await response.json();

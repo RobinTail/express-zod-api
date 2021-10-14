@@ -2,6 +2,7 @@ import {NextHandleFunction} from 'connect';
 import {Express} from 'express';
 import fileUpload from 'express-fileupload';
 import {Logger} from 'winston';
+import {Method} from './method';
 import {ResultHandlerDefinition} from './result-handler';
 
 export const loggerLevels = {
@@ -32,6 +33,8 @@ export interface AppConfig {
   app: Express; // or your custom express app
 }
 
+export type InputSources = Record<Method, ('query' | 'body' | 'files')[]>;
+
 export interface CommonConfig {
   // enable cross-origin resource sharing
   // https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
@@ -41,7 +44,12 @@ export interface CommonConfig {
   errorHandler?: ResultHandlerDefinition<any, any>;
   // logger configuration or your custom winston logger
   logger: LoggerConfig | Logger;
-  startupLogo?: boolean; // you can disable the startup logo
+  // you can disable the startup logo, default: true
+  startupLogo?: boolean;
+  // what request properties are combined into input for endpoints and middlewares
+  // default: { get: ['query'], post: ['body', 'files'],
+  // put: ['body'], patch: ['body'], delete: ['query', 'body'] }
+  inputSources?: Partial<InputSources>;
 }
 
 export const createConfig = <T extends (ServerConfig | AppConfig) & CommonConfig>(config: T): T => config;

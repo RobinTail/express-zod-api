@@ -14,7 +14,6 @@ import {
 } from './helpers';
 import {Method, MethodsDefinition} from './method';
 import {MiddlewareDefinition} from './middleware';
-import {mimeMultipart} from './mime';
 import {lastResortHandler, ResultHandlerDefinition} from './result-handler';
 
 export type Handler<IN, OUT, OPT> = (params: {
@@ -237,9 +236,7 @@ export class Endpoint<
     if (request.method === 'OPTIONS') {
       return response.end();
     }
-    const contentType = request.header('content-type') || '';
-    const isMultipart = contentType.substr(0, mimeMultipart.length).toLowerCase() === mimeMultipart;
-    const initialInput = getInitialInput(request, 'files' in request && isMultipart);
+    const initialInput = getInitialInput(request, config.inputSources);
     try {
       const {input, options, isStreamClosed} = await this.#runMiddlewares({
         input: {...initialInput}, // preserve the initial
