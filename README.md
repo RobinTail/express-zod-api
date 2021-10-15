@@ -74,23 +74,14 @@ Therefore, many basic tasks can be accomplished faster and easier, in particular
   (based on [Busboy](https://github.com/mscdex/busboy))
 
 ## Concept
-The API operates object schemas for input and output, including unions and intersections of object schemas
-(`.or()`, `.and()`), but in general the API can [respond with any data type](#non-object-response) and 
-accept [file uploads](#file-uploads).
 
-The object being validated is the `request.query` for GET request, the `request.body` for PUT, PATCH and POST requests, 
-or their merging for DELETE requests.
-
-Middlewares can handle inputs and the `request` properties, like headers, for example, to perform the authentication or
-provide the endpoint with some properties like the actual request method. The returns of middlewares are combined into
-the `options` parameter available to the next connected middlewares and the endpoint's handler.
-
-The `input` parameter of the endpoint's handler consists of the inputs of all connected middlewares along with its own
-one. The output of the endpoint's handler goes to the `ResultHandler` which is responsible for transmission of the
-final response or possible error.
-
-All inputs and outputs are validated and there are also advanced powerful features like transformations and refinements.
-The diagram below can give you a better idea of the dataflow.
+The API operates object schemas for input and output validation.
+The object being validated is the combination of certain `request` properties.
+It is available to the endpoint handler as the `input` parameter.
+Middlewares have access all `request` properties, they can provide endpoints with `options`.
+The object returned by the endpoint handler is called `output`. It goes to the `ResultHandler` which is 
+responsible for transmission of the final response containing the `output` or possible error.
+Much can be customized to fit your needs.
 
 ![Dataflow](https://raw.githubusercontent.com/RobinTail/express-zod-api/master/dataflow.svg)
 
