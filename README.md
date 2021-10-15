@@ -33,7 +33,7 @@ Start your API server with I/O schema validation and custom middlewares in minut
    5. [Non-object response](#non-object-response) including file downloads
    6. [File uploads](#file-uploads)
    7. [Customizing logger](#customizing-logger)
-   8. [Your custom server](#your-custom-server)
+   8. [Usage with your own express app](#usage-with-your-own-express-app)
    9. [Multiple schemas for a single route](#multiple-schemas-for-a-single-route)
 5. [Disclosing API specifications](#disclosing-api-specifications)
    1. [Reusing endpoint types on your frontend](#reusing-endpoint-types-on-your-frontend)
@@ -459,9 +459,10 @@ const logger = winston.createLogger({...});
 const config = createConfig({ logger, ... });
 ```
 
-## Your custom server
+## Usage with your own express app
 
-You can instantiate your own express app and connect your endpoints the following way.
+If you already have your own configured express application, or you find the library settings not enough,
+you can connect your routing to the app instead of using `createServer()`.
 
 ```typescript
 import * as express from 'express';
@@ -479,7 +480,7 @@ app.listen();
 logger.info('Glory to science!');
 ```
 
-**Please note** that in this case you probably need to: parse `request.body`, call `app.listen()` and handle `404` 
+**Please note** that in this case you probably need to parse `request.body`, call `app.listen()` and handle `404` 
 errors yourself. In this regard `attachRouting()` provides you with `notFoundHandler` which you can optionally connect
 to your custom express app.
 
