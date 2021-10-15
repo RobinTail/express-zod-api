@@ -380,13 +380,12 @@ Please note: `ResultHandler` must handle any errors and not throw its own. Other
 
 ## Non-object response
 
-`ResultHandler` also supports non-object response types, for example, sending an image file including its MIME type 
-in `Content-type` header.
+Thus, you can configure non-object responses too, for example, to send an image file.
 
 You can find two approaches to `EndpointsFactory` and `ResultHandler` implementation 
 [in this example](https://github.com/RobinTail/express-zod-api/blob/master/example/factories.ts). 
 One of them implements file streaming, in this case the endpoint just has to provide the filename.
-The response schema generally may be just `z.string()`, but there is also a specific one: `z.file()` that also supports
+The response schema generally may be just `z.string()`, but I made more specific `z.file()` that also supports
 `.binary()` and `.base64()` refinements which are reflected in the 
 [generated documentation](#swagger--openapi-specification).
 
