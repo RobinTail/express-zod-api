@@ -39,7 +39,7 @@ Start your API server with I/O schema validation and custom middlewares in minut
    1. [Exporting endpoint types to frontend](#exporting-endpoint-types-to-frontend)
    2. [Creating a documentation](#creating-a-documentation)
 6. [Known issues](#known-issues)
-   1. [Excess property check of endpoint output](#excess-property-check-of-endpoint-output)
+   1. [Excessive properties in endpoint output](#excessive-properties-in-endpoint-output)
 7. [Your input to my output](#your-input-to-my-output)
 
 If you're upgrading from v1 please check out the information in [Changelog](CHANGELOG.md#v200-beta1).  
@@ -545,29 +545,12 @@ const yamlString = new OpenAPI({
 
 # Known issues
 
-## Excess property check of endpoint output
+## Excessive properties in endpoint output
 
-Unfortunately Typescript does not perform 
-[excess property check](https://www.typescriptlang.org/docs/handbook/interfaces.html#excess-property-checks) for 
-objects resolved in `Promise`, so there is no error during development of endpoint's output.
-
-```typescript
-import {z} from 'express-zod-api';
-
-endpointsFactory.build({
-  methods, input,
-  output: z.object({
-    anything: z.number()
-  }),
-  handler: async () => ({
-    anything: 123,
-    excessive: 'something' // no type error
-  })
-});
-```
-
-You can achieve this check by assigning the output schema to a constant and reusing it in additional definition of 
-handler's return type:
+The schema validator removes excessive properties by default. However, Typescript 
+[does not yet display errors](https://www.typescriptlang.org/docs/handbook/interfaces.html#excess-property-checks)
+in this case during development. You can achieve this verification by assigning the output schema to a constant and 
+reusing it in forced type of the output:
 
 ```typescript
 import {z} from 'express-zod-api';
