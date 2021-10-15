@@ -235,7 +235,7 @@ const yourEndpoint = defaultEndpointsFactory
   });
 ```
 
-Here is an example the authentication middleware, that checks a `key` from input and `token` from headers:
+Here is an example of the authentication middleware, that checks a `key` from input and `token` from headers:
 
 ```typescript
 import {
