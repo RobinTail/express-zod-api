@@ -282,15 +282,18 @@ You can connect as many middlewares as you want, they will be executed in order.
 
 ## Refinements
 
-You can implement additional validation inside the schema:
+By the way, you can implement additional validation within schema. 
+Validation errors are reported in a response with a status code `400`.
 
 ```typescript
 import {createMiddleware, z} from 'express-zod-api';
 
-const authMiddleware = createMiddleware({
+const nicknameConstraintMiddleware = createMiddleware({
   input: z.object({
-    key: z.string().nonempty()
-      .refine((key) => key === '123', 'Invalid key')
+    nickname: z.string().nonempty().refine(
+      (nick) => !/^\d.*$/.test(nick), 
+      'Nickname cannot start with a digit'
+    )
   }),
   ...
 })
