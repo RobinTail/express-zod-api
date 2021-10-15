@@ -149,7 +149,7 @@ import {z} from 'express-zod-api';
 
 const helloWorldEndpoint = defaultEndpointsFactory.build({
   method: 'get',
-  input: z.object({
+  input: z.object({ // for empty input use z.object({})
     name: z.string().optional(),
   }),
   output: z.object({
