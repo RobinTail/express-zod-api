@@ -32,7 +32,7 @@ Start your API server with I/O schema validation and custom middlewares in minut
    4. [Response customization](#response-customization)
    5. [Non-object response](#non-object-response) including file downloads
    6. [File uploads](#file-uploads)
-   7. [Your custom logger](#your-custom-logger)
+   7. [Customizing logger](#customizing-logger)
    8. [Your custom server](#your-custom-server)
    9. [Multiple schemas for a single route](#multiple-schemas-for-a-single-route)
 5. [Disclosing API specifications](#disclosing-api-specifications)
@@ -447,19 +447,16 @@ const fileUploadEndpoint = defaultEndpointsFactory.build({
 
 *You can still send other data and specify additional `input` parameters, including arrays and objects.*
 
-## Your custom logger
+## Customizing logger
 
 You can specify your custom Winston logger in config:
 
 ```typescript
 import * as winston from 'winston';
-import {createConfig, createServer} from 'express-zod-api';
+import {createConfig} from 'express-zod-api';
 
-const config = createConfig({
-  logger: winston.createLogger(),
-  ...
-});
-createServer(config, routing);
+const logger = winston.createLogger({...}); 
+const config = createConfig({ logger, ... });
 ```
 
 ## Your custom server
