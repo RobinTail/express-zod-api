@@ -25,8 +25,8 @@ Start your API server with I/O schema validation and custom middlewares in minut
    5. [Set up routing](#set-up-routing)
    6. [Start your server](#start-your-server)
    7. [Try it](#try-it)
-4. [Advanced usage](#advanced-usage)
-   1. [Create a middleware](#create-a-middleware)
+4. [Fascinating features](#fascinating-features)
+   1. [Middlewares](#middlewares)
    2. [Refinements](#refinements)
    3. [Transformations](#transformations)
    4. [ResultHandler](#resulthandler)
@@ -139,7 +139,7 @@ In the basic case, you can just import and use the default factory:
 import {defaultEndpointsFactory} from 'express-zod-api';
 ```
 
-*In case you need a global middleware, see [Create as middleware](#create-a-middleware).*
+*In case you need a global middleware, see [Middlewares](#middlewares).*
 *In case you need to customize the response, see [ResultHandler](#resulthandler).*
 
 ## Create your first endpoint
@@ -201,8 +201,8 @@ You should receive the following response:
 {"status":"success","data":{"greetings":"Hello, Rick. Happy coding!"}}
 ```
 
-# Advanced usage
-## Create a middleware
+# Fascinating features
+## Middlewares
 
 You can create middlewares separately using `createMiddleware()` function and connect them later.
 All returns of the connected middlewares are combined into the `options` argument for the endpoint's handler.
