@@ -325,28 +325,24 @@ const getUserEndpoint = endpointsFactory.build({
 
 ## ResultHandler
 
-`ResultHandler` is the [type](https://github.com/RobinTail/express-zod-api/blob/master/src/result-handler.ts) of 
-function that is responsible for transmission of the final response or possible error.
-`ResultHandlerDefinition` contains this handler and additional methods defining the schema of the positive and 
-negative responses as well as their MIME types for the further disclosing to consumers and documentation.
-Positive schema is the schema of successful response. Negative schema is the one that describes the response in case
-of error. The `defaultResultHandler` sets the HTTP status code and ensures the following type of the response:
+`ResultHandler` is responsible for transmission of the response containing the endpoint output or an error.
+The `defaultResultHandler` sets the HTTP status code and ensures the following type of the response:
 
 ```typescript
-type DefaultResponse<OUT> = {
-  status: 'success',
-  data: OUT
-} | {
-  status: 'error',
-  error: {
-    message: string;
-  }
-};
+type DefaultResponse<OUT> =
+  | { // Positive response
+      status: 'success',
+      data: OUT
+    }
+  | { // or Negative response
+    status: 'error',
+    error: {
+      message: string;
+    }
+  };
 ```
 
-In order to customize the result handler you need to use `createResultHandler()` first wrapping the response schema in 
-`createApiResponse()` optionally specifying its mime types, and wrapping the endpoint output schema in `markOutput()`. 
-Here is an example you can use as a template:
+You can create your own result handler by using this example as a template:
 
 ```typescript
 import {
@@ -354,15 +350,13 @@ import {
   IOSchema, markOutput, z
 } from 'express-zod-api';
 
-const myResultHandler = createResultHandler({
-  getPositiveResponse: <OUT extends IOSchema>(output: OUT) => 
+export const yourResultHandler = createResultHandler({
+  getPositiveResponse: <OUT extends IOSchema>(output: OUT) =>
     createApiResponse(
       z.object({
-        ...,
-        someProperty: markOutput(output)
+        data: markOutput(output)
       }),
-      // optional, default: application/json
-      ['mime/type1', 'mime/type2']
+      'application/json' // optional, or array of mime types
     ),
   getNegativeResponse: () => createApiResponse(
     z.object({ error: z.string() })
@@ -378,7 +372,7 @@ Then you need to use it as an argument for `EndpointsFactory` instance creation:
 ```typescript
 import {EndpointsFactory} from 'express-zod-api';
 
-const endpointsFactory = new EndpointsFactory(myResultHandler);
+const endpointsFactory = new EndpointsFactory(yourResultHandler);
 ```
 
 Please note: `ResultHandler` must handle any errors and not throw its own. Otherwise, the case will be passed to the 
