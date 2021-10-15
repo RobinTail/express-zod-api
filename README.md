@@ -498,7 +498,7 @@ const routing: Routing = {
 
 ## Customizing input sources
 
-You customize the list of `request` properties that are combined into an `input` that is being validated and available
+You can customize the list of `request` properties that are combined into `input` that is being validated and available
 to your endpoints and middlewares.
 
 ```typescript
