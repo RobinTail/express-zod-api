@@ -35,12 +35,11 @@ Start your API server with I/O schema validation and custom middlewares in minut
    7. [Customizing logger](#customizing-logger)
    8. [Usage with your own express app](#usage-with-your-own-express-app)
    9. [Multiple schemas for one route](#multiple-schemas-for-one-route)
-5. [Disclosing API specification](#disclosing-api-specification)
-   1. [Exporting endpoint types to frontend](#exporting-endpoint-types-to-frontend)
-   2. [Creating a documentation](#creating-a-documentation)
-6. [Known issues](#known-issues)
+   10. [Exporting endpoint types to frontend](#exporting-endpoint-types-to-frontend)
+   11. [Creating a documentation](#creating-a-documentation)
+5. [Known issues](#known-issues)
    1. [Excessive properties in endpoint output](#excessive-properties-in-endpoint-output)
-7. [Your input to my output](#your-input-to-my-output)
+6. [Your input to my output](#your-input-to-my-output)
 
 If you're upgrading from v1 please check out the information in [Changelog](CHANGELOG.md#v200-beta1).  
 
@@ -504,8 +503,6 @@ const routing: Routing = {
   }
 };
 ```
-
-# Disclosing API specification
 
 ## Exporting endpoint types to frontend
 
