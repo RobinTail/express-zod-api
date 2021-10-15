@@ -202,30 +202,55 @@ You should receive the following response:
 ```
 
 # Fascinating features
+
 ## Middlewares
 
-You can create middlewares separately using `createMiddleware()` function and connect them later.
-All returns of the connected middlewares are combined into the `options` argument for the endpoint's handler.
-The inputs of middlewares are available to endpoint's handler as well within `input` argument.
+Middleware can authenticate using input or `request` headers, and can provide endpoint handlers with `options`.
+Inputs of middlewares are also available to endpoint handlers within `input`.
+
+Here is an example on how to provide parameters from the request path.
+
+```typescript
+import {createMiddleware} from 'express-zod-api';
+
+const paramsProviderMiddleware = createMiddleware({
+  input: z.object({}), // means no inputs
+  middleware: async ({request}) => ({
+    params: request.params
+  })
+});
+```
+
+Then, you can connect your endpoint to a path like `/user/:id`, where `id` is a parameter:
+
+```typescript
+const routing: Routing = {
+  user: {
+    ':id': yourEndpoint
+  }
+};
+```
+
+By using `.addMiddleware()` method before `.build()` you can connect it to the endpoint:
+
+```typescript
+const yourEndpoint = defaultEndpointsFactory
+  .addMiddleware(yourMiddleware)
+  .build({
+     ...,
+     handler: async ({options}) => {
+       // options.id is your param from /user/:id
+     }   
+  });
+```
+
+Here is an example the authentication middleware, that checks a `key` from input and `token` from headers:
 
 ```typescript
 import {
-  createMiddleware, z, Method, createHttpError
+  createMiddleware, createHttpError, z
 } from 'express-zod-api';
 
-// This one provides the method of the request to your 
-// endpoint. It's useful for the ones that handle 
-// multiple types of request (GET, POST, ...)
-const methodProviderMiddleware = createMiddleware({
-  input: z.object({}),
-  middleware: async ({request}) => ({
-    method: request.method.toLowerCase() as Method,
-  })
-});
-
-// This one performs the authentication using a key from 
-// the input and a token from headers. It supplies the
-// endpoint with a user from a database.
 const authMiddleware = createMiddleware({
   input: z.object({
     key: z.string().nonempty()
@@ -239,29 +264,21 @@ const authMiddleware = createMiddleware({
     if (request.headers['token'] !== user.token) {
       throw createHttpError(401, 'Invalid token');
     }
-    return { user };
+    return { user }; // provides endpoints with options.user
   }
 });
 ```
- 
-You can connect the middleware endpoints factory right away, making it kind of global:
+
+You can connect the middleware to endpoints factory right away, making it kind of global:
 
 ```typescript
 import {defaultEndpointsFactory} from 'express-zod-api';
 
 const endpointsFactory = defaultEndpointsFactory
-  .addMiddleware(yourMiddleware);
+  .addMiddleware(authMiddleware);
 ```
 
-Or you can connect the middleware to the endpoint by using:
-
-```typescript
-const yourEndpoint = defaultEndpointsFactory
-  .addMiddleware(yourMiddleware)
-  .build({...});
-```
-
-This way, you can connect as many middlewares as you want, they will be executed in order.
+You can connect as many middlewares as you want, they will be executed in order.
 
 ## Refinements
 
