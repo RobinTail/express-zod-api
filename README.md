@@ -29,7 +29,7 @@ Start your API server with I/O schema validation and custom middlewares in minut
    1. [Middlewares](#middlewares)
    2. [Refinements](#refinements)
    3. [Transformations](#transformations)
-   4. [ResultHandler](#resulthandler)
+   4. [Response customization](#response-customization)
    5. [Non-object response](#non-object-response) including file downloads
    6. [File uploads](#file-uploads)
    7. [Your custom logger](#your-custom-logger)
@@ -140,7 +140,7 @@ import {defaultEndpointsFactory} from 'express-zod-api';
 ```
 
 *In case you need a global middleware, see [Middlewares](#middlewares).*
-*In case you need to customize the response, see [ResultHandler](#resulthandler).*
+*In case you need to customize the response, see [Response customization](#response-customization).*
 
 ## Create your first endpoint
 
@@ -323,7 +323,7 @@ const getUserEndpoint = endpointsFactory.build({
 });
 ```
 
-## ResultHandler
+## Response customization
 
 `ResultHandler` is responsible for transmission of the response containing the endpoint output or an error.
 The `defaultResultHandler` sets the HTTP status code and ensures the following type of the response:
