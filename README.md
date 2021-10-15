@@ -35,8 +35,9 @@ Start your API server with I/O schema validation and custom middlewares in minut
    7. [Customizing logger](#customizing-logger)
    8. [Usage with your own express app](#usage-with-your-own-express-app)
    9. [Multiple schemas for one route](#multiple-schemas-for-one-route)
-   10. [Exporting endpoint types to frontend](#exporting-endpoint-types-to-frontend)
-   11. [Creating a documentation](#creating-a-documentation)
+   10. [Customizing input sources](#customizing-input-sources)
+   11. [Exporting endpoint types to frontend](#exporting-endpoint-types-to-frontend)
+   12. [Creating a documentation](#creating-a-documentation)
 5. [Known issues](#known-issues)
    1. [Excessive properties in endpoint output](#excessive-properties-in-endpoint-output)
 6. [Your input to my output](#your-input-to-my-output)
@@ -502,6 +503,26 @@ const routing: Routing = {
     })
   }
 };
+```
+
+## Customizing input sources
+
+You customize the list of `request` properties that are combined into an `input` that is being validated and available
+to your endpoints and middlewares.
+
+```typescript
+import {createConfig} from 'express-zod-api';
+
+createConfig({
+  ...,
+  inputSources: { // the default value is:
+    get: ['query'],
+    post: ['body', 'files'],
+    put: ['body'],
+    patch: ['body'],
+    delete: ['query', 'body']
+  }
+});
 ```
 
 ## Exporting endpoint types to frontend
