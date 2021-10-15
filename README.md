@@ -34,7 +34,7 @@ Start your API server with I/O schema validation and custom middlewares in minut
    6. [File uploads](#file-uploads)
    7. [Customizing logger](#customizing-logger)
    8. [Usage with your own express app](#usage-with-your-own-express-app)
-   9. [Multiple schemas for a single route](#multiple-schemas-for-a-single-route)
+   9. [Multiple schemas for one route](#multiple-schemas-for-one-route)
 5. [Disclosing API specifications](#disclosing-api-specifications)
    1. [Reusing endpoint types on your frontend](#reusing-endpoint-types-on-your-frontend)
    2. [Swagger / OpenAPI Specification](#swagger--openapi-specification)
@@ -484,7 +484,7 @@ logger.info('Glory to science!');
 errors yourself. In this regard `attachRouting()` provides you with `notFoundHandler` which you can optionally connect
 to your custom express app.
 
-## Multiple schemas for a single route
+## Multiple schemas for one route
 
 Thanks to the `DependsOnMethod` class a route may have multiple Endpoints attached depending on different methods.
 It can also be the same Endpoint that handles multiple methods as well.
@@ -496,10 +496,10 @@ import {DependsOnMethod} from 'express-zod-api';
 const routing: Routing = {
   v1: {
     user: new DependsOnMethod({
-      get: myEndpointForGetAndDelete,
-      delete: myEndpointForGetAndDelete,
-      post: myEndpointForPostAndPatch,
-      patch: myEndpointForPostAndPatch,
+      get: yourEndpointA,
+      delete: yourEndpointA,
+      post: yourEndpointB,
+      patch: yourEndpointB,
     })
   }
 };
