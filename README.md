@@ -24,6 +24,7 @@ Start your API server with I/O schema validation and custom middlewares in minut
    4. [Create your first endpoint](#create-your-first-endpoint)
    5. [Set up routing](#set-up-routing)
    6. [Start your server](#start-your-server)
+   7. [Try it](#try-it)
 4. [Advanced usage](#advanced-usage)
    1. [Create a middleware](#create-a-middleware)
    2. [Refinements](#refinements)
@@ -146,19 +147,17 @@ import {defaultEndpointsFactory} from 'express-zod-api';
 ```typescript
 import {z} from 'express-zod-api';
 
-const setUserEndpoint = defaultEndpointsFactory.build({
-  method: 'post',
+const helloWorldEndpoint = defaultEndpointsFactory.build({
+  method: 'get',
   input: z.object({
-    id: z.number(),
-    name: z.string(),
+    name: z.string().optional(),
   }),
   output: z.object({
-    timestamp: z.number(),
+    greetings: z.string(),
   }),
-  handler: async ({input: {id, name}, options, logger}) => {
-    logger.debug(`Requested id: ${id}`);
-    logger.debug('Options:', options); // provided by middlewares
-    return { timestamp: Date.now() };
+  handler: async ({input: {name}, options, logger}) => {
+    logger.debug('Options:', options); // middlewares provide options
+    return { greetings: `Hello, ${name || 'World'}. Happy coding!` };
   }
 });
 ```
@@ -167,14 +166,14 @@ const setUserEndpoint = defaultEndpointsFactory.build({
 
 ## Set up routing
 
-Connect your endpoint to the `/v1/setUser` route:
+Connect your endpoint to the `/v1/hello` route:
 
 ```typescript
 import {Routing} from 'express-zod-api';
 
 const routing: Routing = {
   v1: {
-    setUser: setUserEndpoint
+    hello: helloWorldEndpoint
   }
 };
 ```
@@ -189,6 +188,18 @@ createServer(config, routing);
 
 You can disable startup logo using `startupLogo` entry of your config.
 See the [full implementation example here](https://github.com/RobinTail/express-zod-api/tree/master/example).
+
+## Try it
+
+Execute the following command:
+```shell
+curl -L -X GET 'localhost:8090/v1/hello?name=Rick'
+```
+
+You should receive the following response:
+```json lines
+{"status":"success","data":{"greetings":"Hello, Rick. Happy coding!"}}
+```
 
 # Advanced usage
 ## Create a middleware
