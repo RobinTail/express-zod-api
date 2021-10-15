@@ -4,9 +4,10 @@
 
 ### v2.8.0
 
+- I did my best in order to improve the documentation and list the recently implemented features.
 - Feature #158: ability to specify the input sources for each request method.
-- New config option `inputSources` allows you to describe the properties of the request, which are combined into an 
-  input that is being validated and available to your endpoints and middleware.
+- New config option `inputSources` allows you to specify the properties of the request, that are combined into an 
+  input that is being validated and available to your endpoints and middlewares.
 ```typescript
 import {createConfig} from 'express-zod-api';
 
