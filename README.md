@@ -17,14 +17,14 @@ Start your API server with I/O schema validation and custom middlewares in minut
 2. [How it works](#how-it-works)
    1. [Technologies](#technologies)
    2. [Concept](#concept)
-3. [Installation](#installation)
-4. [Basic usage](#basic-usage)
-   1. [Set up config](#set-up-config)
-   2. [Create an endpoints factory](#create-an-endpoints-factory)
-   3. [Create your first endpoint](#create-your-first-endpoint)
-   4. [Set up routing](#set-up-routing)
-   5. [Start your server](#start-your-server)
-5. [Advanced usage](#advanced-usage)
+3. [Quick start](#quick-start) — Fast Track  
+   1. [Installation](#installation)
+   2. [Set up config](#set-up-config)
+   3. [Create an endpoints factory](#create-an-endpoints-factory)
+   4. [Create your first endpoint](#create-your-first-endpoint)
+   5. [Set up routing](#set-up-routing)
+   6. [Start your server](#start-your-server)
+4. [Advanced usage](#advanced-usage)
    1. [Create a middleware](#create-a-middleware)
    2. [Refinements](#refinements)
    3. [Transformations](#transformations)
@@ -34,12 +34,12 @@ Start your API server with I/O schema validation and custom middlewares in minut
    7. [Your custom logger](#your-custom-logger)
    8. [Your custom server](#your-custom-server)
    9. [Multiple schemas for a single route](#multiple-schemas-for-a-single-route)
-6. [Disclosing API specifications](#disclosing-api-specifications)
+5. [Disclosing API specifications](#disclosing-api-specifications)
    1. [Reusing endpoint types on your frontend](#reusing-endpoint-types-on-your-frontend)
    2. [Swagger / OpenAPI Specification](#swagger--openapi-specification)
-7. [Known issues](#known-issues)
+6. [Known issues](#known-issues)
    1. [Excess property check of endpoint output](#excess-property-check-of-endpoint-output)
-8. [Your input to my output](#your-input-to-my-output)
+7. [Your input to my output](#your-input-to-my-output)
 
 If you're upgrading from v1 please check out the information in [Changelog](CHANGELOG.md#v200-beta1).  
 
@@ -68,7 +68,7 @@ Therefore, many basic tasks can be accomplished faster and easier, in particular
 - Web server — [Express.js](https://expressjs.com/).
 - Schema validation — [Zod 3.x](https://github.com/colinhacks/zod).
 - Logger — [Winston](https://github.com/winstonjs/winston).
-- Documenting - [OpenAPI 3.x](https://github.com/metadevpro/openapi3-ts) (formerly known as the Swagger Specification).
+- Documenting — [OpenAPI 3.x](https://github.com/metadevpro/openapi3-ts) (formerly known as the Swagger Specification).
 - File uploads — [Express-FileUpload](https://github.com/richardgirges/express-fileupload)
   (based on [Busboy](https://github.com/mscdex/busboy))
 
@@ -93,11 +93,13 @@ The diagram below can give you a better idea of the dataflow.
 
 ![Dataflow](https://raw.githubusercontent.com/RobinTail/express-zod-api/master/dataflow.svg)
 
-# Installation
+# Quick start
+
+## Installation
 
 ```shell
 yarn add express-zod-api
-# or
+# or (not recommended)
 npm install express-zod-api
 ```
 
@@ -110,10 +112,6 @@ Add the following option to your `tsconfig.json` file in order to make it work a
   }
 }
 ```
-
-# Basic usage
-
-See the [full implementation example here](https://github.com/RobinTail/express-zod-api/tree/master/example).
 
 ## Set up config
 
@@ -131,8 +129,7 @@ const config = createConfig({
   }
 });
 ```
-*See all available options [here](https://github.com/RobinTail/express-zod-api/blob/master/src/config-type.ts). 
-You can disable startup logo with `startupLogo: false`.*
+*See all available options [here](https://github.com/RobinTail/express-zod-api/blob/master/src/config-type.ts).*
 
 ## Create an endpoints factory
 
@@ -141,26 +138,15 @@ In the basic case, you can just import and use the default factory:
 import {defaultEndpointsFactory} from 'express-zod-api';
 ```
 
-If you want to connect [middlewares](#create-a-middleware) to the default factory right away, you can do it the 
-following way:
-
-```typescript
-import {defaultEndpointsFactory} from 'express-zod-api';
-
-const endpointsFactory = defaultEndpointsFactory.addMiddleware(
-  yourMiddleware
-);
-```
-
-By the way, `defaultEndpointsFactory` is the same as `new EndpointsFactory(defaultResultHandler)`.
-Therefore, if you need to customize the response, see [ResultHandler](#resulthandler).
+*In case you need a global middleware, see [Create as middleware](#create-a-middleware).*
+*In case you need to customize the response, see [ResultHandler](#resulthandler).*
 
 ## Create your first endpoint
 
 ```typescript
 import {z} from 'express-zod-api';
 
-const setUserEndpoint = endpointsFactory.build({
+const setUserEndpoint = defaultEndpointsFactory.build({
   method: 'post',
   input: z.object({
     id: z.number(),
@@ -177,9 +163,7 @@ const setUserEndpoint = endpointsFactory.build({
 });
 ```
 
-Endpoints can also handle multiple types of requests, by using `methods` property instead of `method` that 
-accepts an array. You can also add [middlewares](#create-a-middleware) to the endpoint by using `.addMiddleware()` 
-before `.build()`.
+*In case you want it to handle multiple methods use `methods` property instead of `method`.* 
 
 ## Set up routing
 
@@ -203,12 +187,15 @@ import {createServer} from 'express-zod-api';
 createServer(config, routing);
 ```
 
+You can disable startup logo using `startupLogo` entry of your config.
+See the [full implementation example here](https://github.com/RobinTail/express-zod-api/tree/master/example).
+
 # Advanced usage
 ## Create a middleware
 
 You can create middlewares separately using `createMiddleware()` function and connect them later.
-All returns of the connected middlewares are combined into the `options` argument of the endpoint's handler.
-The inputs of middlewares are combined with the inputs of the endpoint's handler.
+All returns of the connected middlewares are combined into the `options` argument for the endpoint's handler.
+The inputs of middlewares are available to endpoint's handler as well within `input` argument.
 
 ```typescript
 import {
@@ -245,6 +232,25 @@ const authMiddleware = createMiddleware({
   }
 });
 ```
+ 
+You can connect the middleware endpoints factory right away, making it kind of global:
+
+```typescript
+import {defaultEndpointsFactory} from 'express-zod-api';
+
+const endpointsFactory = defaultEndpointsFactory
+  .addMiddleware(yourMiddleware);
+```
+
+Or you can connect the middleware to the endpoint by using:
+
+```typescript
+const yourEndpoint = defaultEndpointsFactory
+  .addMiddleware(yourMiddleware)
+  .build({...});
+```
+
+This way, you can connect as many middlewares as you want, they will be executed in order.
 
 ## Refinements
 
