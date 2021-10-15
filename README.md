@@ -37,7 +37,7 @@ Start your API server with I/O schema validation and custom middlewares in minut
    9. [Multiple schemas for one route](#multiple-schemas-for-one-route)
 5. [Disclosing API specification](#disclosing-api-specification)
    1. [Exporting endpoint types to frontend](#exporting-endpoint-types-to-frontend)
-   2. [Swagger / OpenAPI Specification](#swagger--openapi-specification)
+   2. [Creating a documentation](#creating-a-documentation)
 6. [Known issues](#known-issues)
    1. [Excess property check of endpoint output](#excess-property-check-of-endpoint-output)
 7. [Your input to my output](#your-input-to-my-output)
@@ -387,7 +387,7 @@ You can find two approaches to `EndpointsFactory` and `ResultHandler` implementa
 One of them implements file streaming, in this case the endpoint just has to provide the filename.
 The response schema generally may be just `z.string()`, but I made more specific `z.file()` that also supports
 `.binary()` and `.base64()` refinements which are reflected in the 
-[generated documentation](#swagger--openapi-specification).
+[generated documentation](#creating-a-documentation).
 
 ```typescript
 const fileStreamingEndpointsFactory = new EndpointsFactory(
@@ -525,10 +525,9 @@ type YourEndpointInput = EndpointInput<YourEndpointType>;
 type YourEndpointResponse = EndpointResponse<YourEndpointType>;
 ```
 
-## Swagger / OpenAPI Specification
+## Creating a documentation
 
-You can generate the specification of your API the following way and write it to a `.yaml` file, 
-that can be used as the documentation:
+You can generate the specification of your API and write it to a `.yaml` file, that can be used as the documentation:
 
 ```typescript
 import {OpenAPI} from 'express-zod-api';
@@ -537,7 +536,7 @@ const yamlString = new OpenAPI({
   routing, 
   version: '1.2.3',
   title: 'Example API',
-  serverUrl: 'http://example.com'
+  serverUrl: 'https://example.com'
 }).getSpecAsYaml();
 ```
 
