@@ -36,7 +36,7 @@ Start your API server with I/O schema validation and custom middlewares in minut
    8. [Usage with your own express app](#usage-with-your-own-express-app)
    9. [Multiple schemas for one route](#multiple-schemas-for-one-route)
 5. [Disclosing API specifications](#disclosing-api-specifications)
-   1. [Reusing endpoint types on your frontend](#reusing-endpoint-types-on-your-frontend)
+   1. [Exporting endpoint types to frontend](#exporting-endpoint-types-to-frontend)
    2. [Swagger / OpenAPI Specification](#swagger--openapi-specification)
 6. [Known issues](#known-issues)
    1. [Excess property check of endpoint output](#excess-property-check-of-endpoint-output)
@@ -506,23 +506,23 @@ const routing: Routing = {
 ```
 
 # Disclosing API specifications
-## Reusing endpoint types on your frontend
 
-You can export only the types of your endpoints for your front-end:
+## Exporting endpoint types to frontend
+
+You can export only the types of your endpoints for your frontend. Here is an approach:
 
 ```typescript
-export type MyEndpointType = typeof endpoint;
+export type YourEndpointType = typeof yourEndpoint;
 ```
 
 Then use provided helpers to obtain their input and response types:
 ```typescript
 import {EndpointInput, EndpointResponse} from 'express-zod-api'; 
-import type {MyEndpointType} from '../your/backend';
+import type {YourEndpointType} from '../your/backend';
 //     ^---- please note the import syntax of the type only
 
-type MyEndpointInput = EndpointInput<MyEndpointType>;
-// unites the positive and the negative response schemas:
-type MyEndpointResponse = EndpointResponse<MyEndpointType>;
+type YourEndpointInput = EndpointInput<YourEndpointType>;
+type YourEndpointResponse = EndpointResponse<YourEndpointType>;
 ```
 
 ## Swagger / OpenAPI Specification
