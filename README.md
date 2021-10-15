@@ -35,7 +35,7 @@ Start your API server with I/O schema validation and custom middlewares in minut
    7. [Customizing logger](#customizing-logger)
    8. [Usage with your own express app](#usage-with-your-own-express-app)
    9. [Multiple schemas for one route](#multiple-schemas-for-one-route)
-5. [Disclosing API specifications](#disclosing-api-specifications)
+5. [Disclosing API specification](#disclosing-api-specification)
    1. [Exporting endpoint types to frontend](#exporting-endpoint-types-to-frontend)
    2. [Swagger / OpenAPI Specification](#swagger--openapi-specification)
 6. [Known issues](#known-issues)
@@ -505,7 +505,7 @@ const routing: Routing = {
 };
 ```
 
-# Disclosing API specifications
+# Disclosing API specification
 
 ## Exporting endpoint types to frontend
 
