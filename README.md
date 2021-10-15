@@ -416,36 +416,36 @@ const fileStreamingEndpointsFactory = new EndpointsFactory(
 
 ## File uploads
 
-Starting from the version 2.5.0 you can switch the `Endpoint` to handle requests with the `multipart/formdata` 
-content type instead of JSON. Together with a corresponding configuration option, this makes it possible to handle 
-file uploads. Here is a simplified example:
+You can switch the `Endpoint` to handle requests with the `multipart/formdata` content type instead of JSON. 
+Together with a corresponding configuration option, this makes it possible to handle file uploads.
+Here is a simplified example:
 
 ```typescript
 import {createConfig, z, defaultEndpointsFactory} from 'express-zod-api';
 
 const config = createConfig({
-   server: {
-     upload: true, // <- required
-     ...
-   },
+  server: {
+    upload: true, // <- required
+    ...
+  },
 });
 
 const fileUploadEndpoint = defaultEndpointsFactory.build({
-   method: 'post',
-   type: 'upload', // <- required
-   input: z.object({
-      avatar: z.upload()
-   }),
-   output: z.object({...}),
-   handler: async ({input: {avatar}}) => {
-      // avatar: {name, mv(), mimetype, data, size, ...}
-      // avatar.truncated is true on failure
-      return {...};
-   }
+  method: 'post',
+  type: 'upload', // <- required
+  input: z.object({
+    avatar: z.upload()
+  }),
+  output: z.object({...}),
+  handler: async ({input: {avatar}}) => {
+    // avatar: {name, mv(), mimetype, data, size, ...}
+    // avatar.truncated is true on failure
+    return {...};
+  }
 });
 ```
 
-You can still send other data and specify additional `input` parameters, including arrays and objects.
+*You can still send other data and specify additional `input` parameters, including arrays and objects.*
 
 ## Your custom logger
 
