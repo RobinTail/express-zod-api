@@ -78,7 +78,7 @@ Therefore, many basic tasks can be accomplished faster and easier, in particular
 The API operates object schemas for input and output validation.
 The object being validated is the combination of certain `request` properties.
 It is available to the endpoint handler as the `input` parameter.
-Middlewares have access all `request` properties, they can provide endpoints with `options`.
+Middlewares have access to all `request` properties, they can provide endpoints with `options`.
 The object returned by the endpoint handler is called `output`. It goes to the `ResultHandler` which is 
 responsible for transmission of the final response containing the `output` or possible error.
 Much can be customized to fit your needs.
