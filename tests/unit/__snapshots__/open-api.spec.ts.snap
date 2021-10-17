@@ -670,11 +670,11 @@ info:
   title: Example API
   version: 1.2.3
 paths:
-  /v1/getUser:
+  /v1/user/retrieve:
     get:
       responses:
         \\"200\\":
-          description: GET /v1/getUser Successful response
+          description: GET /v1/user/retrieve Successful response
           content:
             application/json:
               schema:
@@ -703,7 +703,7 @@ paths:
                   - status
                   - data
         \\"400\\":
-          description: GET /v1/getUser Error response
+          description: GET /v1/user/retrieve Error response
           content:
             application/json:
               schema:
@@ -731,12 +731,136 @@ paths:
           schema:
             type: string
             pattern: /\\\\d+/
-            description: GET /v1/getUser parameter
-  /v1/setUser:
+            description: GET /v1/user/retrieve parameter
+  /v1/avatar/send:
+    get:
+      responses:
+        \\"200\\":
+          description: GET /v1/avatar/send Successful response
+          content:
+            image/svg+xml:
+              schema:
+                type: string
+        \\"400\\":
+          description: GET /v1/avatar/send Error response
+          content:
+            text/plain:
+              schema:
+                type: string
+      parameters:
+        - name: userId
+          in: query
+          required: true
+          schema:
+            type: string
+            pattern: /\\\\d+/
+            description: GET /v1/avatar/send parameter
+  /v1/avatar/stream:
+    get:
+      responses:
+        \\"200\\":
+          description: GET /v1/avatar/stream Successful response
+          content:
+            image/*:
+              schema:
+                type: string
+                format: binary
+        \\"400\\":
+          description: GET /v1/avatar/stream Error response
+          content:
+            text/plain:
+              schema:
+                type: string
+      parameters:
+        - name: userId
+          in: query
+          required: true
+          schema:
+            type: string
+            pattern: /\\\\d+/
+            description: GET /v1/avatar/stream parameter
+  /v1/avatar/upload:
     post:
       responses:
         \\"200\\":
-          description: POST /v1/setUser Successful response
+          description: POST /v1/avatar/upload Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - success
+                  data:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                      size:
+                        type: integer
+                        format: int64
+                        minimum: 0
+                        exclusiveMinimum: false
+                        maximum: 9007199254740991
+                        exclusiveMaximum: false
+                      mime:
+                        type: string
+                      hash:
+                        type: string
+                      otherInputs:
+                        type: object
+                        additionalProperties:
+                          nullable: true
+                          format: any
+                    required:
+                      - name
+                      - size
+                      - mime
+                      - hash
+                      - otherInputs
+                required:
+                  - status
+                  - data
+        \\"400\\":
+          description: POST /v1/avatar/upload Error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                required:
+                  - status
+                  - error
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                avatar:
+                  type: string
+                  format: binary
+              required:
+                - avatar
+              description: POST /v1/avatar/upload request body
+  /v2/user:
+    post:
+      responses:
+        \\"200\\":
+          description: POST /v2/user Successful response
           content:
             application/json:
               schema:
@@ -765,7 +889,7 @@ paths:
                   - status
                   - data
         \\"400\\":
-          description: POST /v1/setUser Error response
+          description: POST /v2/user Error response
           content:
             application/json:
               schema:
@@ -809,131 +933,7 @@ paths:
                 - key
                 - id
                 - name
-              description: POST /v1/setUser request body
-  /v1/avatar:
-    get:
-      responses:
-        \\"200\\":
-          description: GET /v1/avatar Successful response
-          content:
-            image/svg+xml:
-              schema:
-                type: string
-        \\"400\\":
-          description: GET /v1/avatar Error response
-          content:
-            text/plain:
-              schema:
-                type: string
-      parameters:
-        - name: userId
-          in: query
-          required: true
-          schema:
-            type: string
-            pattern: /\\\\d+/
-            description: GET /v1/avatar parameter
-  /v1/stream:
-    get:
-      responses:
-        \\"200\\":
-          description: GET /v1/stream Successful response
-          content:
-            image/*:
-              schema:
-                type: string
-                format: binary
-        \\"400\\":
-          description: GET /v1/stream Error response
-          content:
-            text/plain:
-              schema:
-                type: string
-      parameters:
-        - name: userId
-          in: query
-          required: true
-          schema:
-            type: string
-            pattern: /\\\\d+/
-            description: GET /v1/stream parameter
-  /v1/upload:
-    post:
-      responses:
-        \\"200\\":
-          description: POST /v1/upload Successful response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    enum:
-                      - success
-                  data:
-                    type: object
-                    properties:
-                      name:
-                        type: string
-                      size:
-                        type: integer
-                        format: int64
-                        minimum: 0
-                        exclusiveMinimum: false
-                        maximum: 9007199254740991
-                        exclusiveMaximum: false
-                      mime:
-                        type: string
-                      hash:
-                        type: string
-                      otherInputs:
-                        type: object
-                        additionalProperties:
-                          nullable: true
-                          format: any
-                    required:
-                      - name
-                      - size
-                      - mime
-                      - hash
-                      - otherInputs
-                required:
-                  - status
-                  - data
-        \\"400\\":
-          description: POST /v1/upload Error response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    enum:
-                      - error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                required:
-                  - status
-                  - error
-      requestBody:
-        content:
-          multipart/form-data:
-            schema:
-              type: object
-              properties:
-                avatar:
-                  type: string
-                  format: binary
-              required:
-                - avatar
-              description: POST /v1/upload request body
+              description: POST /v2/user request body
 components:
   schemas: {}
   responses: {}
