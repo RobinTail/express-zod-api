@@ -35,7 +35,7 @@ describe('Example', () => {
     });
 
     test('Should handle OPTIONS request', async () => {
-      const response = await fetch('http://localhost:8090/v2/user?test=123&id=50', {
+      const response = await fetch('http://localhost:8090/v2/user', {
         method: 'OPTIONS',
       });
       expect(response.status).toBe(200);
@@ -51,7 +51,7 @@ describe('Example', () => {
     });
 
     test('Should handle valid POST request', async () => {
-      const response = await fetch('http://localhost:8090/v2/user?test=123&id=50', {
+      const response = await fetch('http://localhost:8090/v2/user', {
         method: 'POST',
         headers: {
           token: '456',
