@@ -11,7 +11,7 @@ import fs from 'fs';
 
 export const keyAndTokenAuthenticatedEndpointsFactory = defaultEndpointsFactory.addMiddleware(authMiddleware);
 
-export const fileDownloadEndpointsFactory = new EndpointsFactory(createResultHandler({
+export const fileSendingEndpointsFactory = new EndpointsFactory(createResultHandler({
   getPositiveResponse: () => createApiResponse(z.string(), getType('svg') || 'image/svg+xml'),
   getNegativeResponse: () => createApiResponse(z.string(), getType('txt') || 'text/plain'),
   handler: ({response, error, output}) => {
