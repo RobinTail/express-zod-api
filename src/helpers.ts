@@ -116,11 +116,11 @@ function areFilesAvailable(request: Request) {
 }
 
 const defaultInputSources: InputSources = {
-  get: ["query"],
-  post: ["body", "files"],
-  put: ["body"],
-  patch: ["body"],
-  delete: ["query", "body"],
+  get: ["query", "params"],
+  post: ["body", "params", "files"],
+  put: ["body", "params"],
+  patch: ["body", "params"],
+  delete: ["query", "body", "params"],
 };
 const fallbackInputSource = defaultInputSources.delete;
 
