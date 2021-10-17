@@ -357,23 +357,28 @@ describe("Helpers", () => {
         b: "query",
       });
     });
-    test('URL params: should also be taken, with a higher priority by default', () => {
-      expect(getInitialInput({
-        body: {
-          a: 'body'
-        },
-        query: {
-          b: 'query'
-        },
-        params: {
-          a: 'url param',
-          b: 'url param'
-        },
-        method: 'POST',
-        header: () => 'application/json'
-      } as unknown as Request, undefined)).toEqual({
-        a: 'url param',
-        b: 'url param'
+    test("URL params: should also be taken, with a higher priority by default", () => {
+      expect(
+        getInitialInput(
+          {
+            body: {
+              a: "body",
+            },
+            query: {
+              b: "query",
+            },
+            params: {
+              a: "url param",
+              b: "url param",
+            },
+            method: "POST",
+            header: () => "application/json",
+          } as unknown as Request,
+          undefined
+        )
+      ).toEqual({
+        a: "url param",
+        b: "url param",
       });
     });
   });

@@ -6,10 +6,14 @@ import { updateUserEndpoint } from "./endpoints/update-user";
 import { streamAvatarEndpoint } from "./endpoints/stream-avatar";
 
 export const routing: Routing = {
-  // syntax 1: methods are defined within the endpoint
   v1: {
     user: {
+      // syntax 1: methods are defined within the endpoint
       retrieve: retrieveUserEndpoint, // path: /v1/user/retrieve
+      // syntax 2: methods are defined within the route (id is the URL param by the way)
+      ":id": new DependsOnMethod({
+        post: updateUserEndpoint, // the Endpoint should have at least the same method specified in .build()
+      }),
     },
     avatar: {
       // custom result handler examples with a file serving
@@ -18,13 +22,5 @@ export const routing: Routing = {
       // file upload example
       upload: uploadAvatarEndpoint,
     },
-  },
-
-  // syntax 2: methods are defined within the route
-  v2: {
-    user: new DependsOnMethod({
-      // withMeta().example() example here:
-      post: updateUserEndpoint, // the Endpoint should have at least the same method specified in .build()
-    }),
   },
 };
