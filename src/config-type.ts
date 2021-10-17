@@ -1,5 +1,5 @@
 import { NextHandleFunction } from "connect";
-import { Express } from "express";
+import { Express, Request } from "express";
 import fileUpload from "express-fileupload";
 import { Logger } from "winston";
 import { Method } from "./method";
@@ -41,7 +41,10 @@ export interface AppConfig {
   app: Express; // or your custom express app
 }
 
-export type InputSources = Record<Method, ("query" | "body" | "files")[]>;
+export type InputSources = Record<
+  Method,
+  Array<keyof Pick<Request, "query" | "body" | "files" | "params">>
+>;
 
 export interface CommonConfig {
   // enable cross-origin resource sharing
