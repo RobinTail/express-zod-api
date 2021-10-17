@@ -1,7 +1,7 @@
 import {z, createHttpError} from '../../src';
 import {keyAndTokenAuthenticatedEndpointsFactory} from '../factories';
 
-export const setUserEndpoint = keyAndTokenAuthenticatedEndpointsFactory.build({
+export const updateUserEndpoint = keyAndTokenAuthenticatedEndpointsFactory.build({
   method: 'post',
   description: 'example user update endpoint',
   input: z.object({
