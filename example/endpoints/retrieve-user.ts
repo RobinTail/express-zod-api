@@ -1,7 +1,7 @@
 import {z, createHttpError, defaultEndpointsFactory} from '../../src';
 import {methodProviderMiddleware} from '../middlewares';
 
-export const getUserEndpoint = defaultEndpointsFactory
+export const retrieveUserEndpoint = defaultEndpointsFactory
   .addMiddleware(methodProviderMiddleware)
   .build({
     method: 'get',

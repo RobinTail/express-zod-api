@@ -1,7 +1,7 @@
 import {z, defaultEndpointsFactory} from '../../src';
 import crypto from 'crypto';
 
-export const fileUploadEndpoint = defaultEndpointsFactory.build({
+export const uploadAvatarEndpoint = defaultEndpointsFactory.build({
   method: 'post',
   type: 'upload',
   input: z.object({
