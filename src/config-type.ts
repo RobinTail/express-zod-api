@@ -41,10 +41,8 @@ export interface AppConfig {
   app: Express; // or your custom express app
 }
 
-export type InputSources = Record<
-  Method,
-  Array<keyof Pick<Request, "query" | "body" | "files" | "params">>
->;
+type InputSource = keyof Pick<Request, "query" | "body" | "files" | "params">;
+export type InputSources = Record<Method, InputSource[]>;
 
 export interface CommonConfig {
   // enable cross-origin resource sharing
