@@ -22,11 +22,11 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "dependencies": {
-    "express": "^4.17.1",
-    "http-errors": "^1.8.0",
-    "openapi3-ts": "^2.0.1",
-    "winston": "^3.3.3",
-    "zod": "^3.0.0-alpha.4"
+    "express": "4.17.1",
+    "http-errors": "1.8.0",
+    "openapi3-ts": "2.0.1",
+    "winston": "3.3.3",
+    "zod": "3.2.0"
   },
   "devDependencies": {
     "@types/express": "^4.17.11",
