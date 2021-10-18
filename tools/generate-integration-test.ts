@@ -31,52 +31,24 @@ const tsConfigJson = `
 }
 `;
 
-const quickStart = `
-import {createConfig} from 'express-zod-api';
+const readme = fs.readFileSync('README.md', 'utf-8');
+const quickStartSection = readme.match(/# Quick start(.+)# Fascinating features/is);
 
-const config = createConfig({
-  server: {
-    listen: 8090, // port or socket
-  },
-  cors: true,
-  logger: {
-    level: 'debug',
-    color: true
-  }
-});
+if (!quickStartSection) {
+  throw new Error('Can not find Quick Start section');
+}
 
-import {defaultEndpointsFactory} from 'express-zod-api';
+const tsParts = quickStartSection[1].match(/```typescript(.+?)```/gis);
 
-import {z} from 'express-zod-api';
+if (!tsParts) {
+  throw new Error('Can not find typescript code samples');
+}
 
-const helloWorldEndpoint = defaultEndpointsFactory.build({
-  method: 'get',
-  input: z.object({ // for empty input use z.object({})
-    name: z.string().optional(),
-  }),
-  output: z.object({
-    greetings: z.string(),
-  }),
-  handler: async ({input: {name}, options, logger}) => {
-    logger.debug('Options:', options); // middlewares provide options
-    return { greetings: \`Hello, \${name || 'World'}. Happy coding!\` };
-  }
-});
-
-import {Routing} from 'express-zod-api';
-
-const routing: Routing = {
-  v1: {
-    hello: helloWorldEndpoint
-  }
-};
-
-import {createServer} from 'express-zod-api';
-
-createServer(config, routing);
-`;
+const quickStart = tsParts.map(
+  (part) => part.split('\n').slice(1,-1).join('\n')
+).join('\n\n');
 
 const dir = './tests/integration';
 fs.writeFileSync(`${dir}/package.json`, packageJson.trim());
-fs.writeFileSync(`${dir}/tsconfig.json`, packageJson.trim());
+fs.writeFileSync(`${dir}/tsconfig.json`, tsConfigJson.trim());
 fs.writeFileSync(`${dir}/quick-start.ts`, quickStart.trim());
