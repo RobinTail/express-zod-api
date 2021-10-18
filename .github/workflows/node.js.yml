@@ -34,14 +34,13 @@ jobs:
         path: ${{ steps.yarnCache.outputs.dir }}
         key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ matrix.node-version }}-${{ hashFiles('**/yarn.lock') }}
     - name: Install dependencies
-      run: |
-        yarn install
-        yarn build:intTest
-    - name: Test and build  
+      run: yarn install
+    - name: Test and build
       run: | 
         yarn lint
         yarn test
         yarn build
     - name: Integration test
       run: |
+        yarn build:intTest
         yarn test:int

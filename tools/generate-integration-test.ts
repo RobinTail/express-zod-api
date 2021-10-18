@@ -18,7 +18,7 @@ const packageJson = `
   "license": "MIT",
   "dependencies": {
     "@tsconfig/node${tsconfigBase}": "latest",
-    "express-zod-api": "latest",
+    "express-zod-api": "../../dist",
     "ts-node": "9.1.1",
     "typescript": "4.4.4"
   }
