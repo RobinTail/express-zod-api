@@ -3,26 +3,26 @@ import fetch from 'node-fetch';
 import {waitFor} from '../helpers';
 
 describe('Integration Test', () => {
-  let example: ChildProcessWithoutNullStreams;
+  let quickStart: ChildProcessWithoutNullStreams;
   let out = '';
   const listener = (chunk: Buffer) => {
     out += chunk.toString();
   };
 
   beforeAll(() => {
-    example = spawn(
+    quickStart = spawn(
       'yarn',
       ['start'],
       {cwd: './tests/integration'}
     );
-    example.stdout.on('data', listener);
-    example.stdout.on('data', listener);
+    quickStart.stdout.on('data', listener);
+    quickStart.stdout.on('data', listener);
   });
 
   afterAll(async () => {
-    example.stdout.removeListener('data', listener);
-    example.kill();
-    await waitFor(() => example.killed);
+    quickStart.stdout.removeListener('data', listener);
+    quickStart.kill();
+    await waitFor(() => quickStart.killed);
   });
 
   afterEach(() => {
