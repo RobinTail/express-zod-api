@@ -39,4 +39,5 @@ jobs:
       run: | 
         yarn lint
         yarn test
+        yarn test:int
         yarn build
