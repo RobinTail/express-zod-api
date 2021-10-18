@@ -32,7 +32,7 @@ const tsConfigJson = `
 `;
 
 const readme = fs.readFileSync('README.md', 'utf-8');
-const quickStartSection = readme.match(/# Quick start(.+)# Fascinating features/is);
+const quickStartSection = readme.match(/# Quick start(.+?)\n#\s[A-Z]+/s);
 
 if (!quickStartSection) {
   throw new Error('Can not find Quick Start section');
