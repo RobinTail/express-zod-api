@@ -23,13 +23,13 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "dependencies": {
-    "express": "^4.17.1",
-    "express-fileupload": "^1.2.1",
-    "http-errors": "^1.8.0",
-    "mime": "^2.5.2",
-    "openapi3-ts": "^2.0.1",
-    "winston": "^3.3.3",
-    "zod": "^3.9.8"
+    "express": "4.17.1",
+    "express-fileupload": "1.2.1",
+    "http-errors": "1.8.0",
+    "mime": "2.5.2",
+    "openapi3-ts": "2.0.1",
+    "winston": "3.3.3",
+    "zod": "3.9.8"
   },
   "devDependencies": {
     "@tsconfig/node10": "^1.0.8",

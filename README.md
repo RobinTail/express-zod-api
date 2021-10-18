@@ -91,7 +91,7 @@ Much can be customized to fit your needs.
 
 ```shell
 yarn add express-zod-api
-# or (not recommended)
+# or
 npm install express-zod-api
 ```
 
