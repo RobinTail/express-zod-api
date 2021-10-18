@@ -3,3 +3,7 @@ dist
 yarn-error.log
 .npmrc
 coverage
+tests/integration/node_modules
+tests/integration/yarn-error.log
+tests/integration/yarn.lock
+tests/integration/quick-start.ts
