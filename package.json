@@ -12,7 +12,7 @@
     "build:license": "ts-node tools/generate-license.ts > ./LICENSE",
     "build:intTest": "ts-node tools/generate-integration-test.ts && yarn install --cwd ./tests/integration",
     "test": "yarn test:jest && yarn test:badge",
-    "test:int": "yarn build:intTest && yarn jest --detectOpenHandles ./tests/integration",
+    "test:int": "yarn jest ./tests/integration",
     "test:u": "yarn test:jest -u",
     "test:jest": "yarn jest --detectOpenHandles ./tests/unit ./tests/system",
     "test:badge": "yarn make-coverage-badge --output-path ./coverage.svg",
