@@ -1,6 +1,7 @@
 import fs from 'fs';
 
 const nodeVersion = process.versions.node.split('.').shift();
+const tsconfigBase = nodeVersion === '15' ? '14' : nodeVersion;
 
 const packageJson = `
 {
@@ -16,7 +17,7 @@ const packageJson = `
   },
   "license": "MIT",
   "dependencies": {
-    "@tsconfig/node${nodeVersion}": "latest",
+    "@tsconfig/node${tsconfigBase}": "latest",
     "express-zod-api": "latest",
     "ts-node": "9.1.1",
     "typescript": "4.4.4"
@@ -26,7 +27,7 @@ const packageJson = `
 
 const tsConfigJson = `
 {
-  "extends": "@tsconfig/node${nodeVersion}/tsconfig.json",
+  "extends": "@tsconfig/node${tsconfigBase}/tsconfig.json",
 }
 `;
 
