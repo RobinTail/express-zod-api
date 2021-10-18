@@ -18,7 +18,7 @@ const packageJson = `
   "dependencies": {
     "@tsconfig/node${nodeVersion}": "latest",
     "express-zod-api": "latest",
-    "ts-node": "10.3.0",
+    "ts-node": "9.1.1",
     "typescript": "4.4.4"
   }
 }
