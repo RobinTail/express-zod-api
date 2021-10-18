@@ -1,4 +1,36 @@
-const out = `
+import fs from 'fs';
+
+const nodeVersion = process.versions.node.split('.').shift();
+
+const packageJson = `
+{
+  "name": "express-zod-api-integration-test",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "ts-node quick-start.ts"
+  },
+  "author": {
+    "name": "Anna Bocharova",
+    "url": "https://robintail.cz",
+    "email": "me@robintail.cz"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@tsconfig/node${nodeVersion}": "latest",
+    "express-zod-api": "latest",
+    "ts-node": "10.3.0",
+    "typescript": "4.4.4"
+  }
+}
+`;
+
+const tsConfigJson = `
+{
+  "extends": "@tsconfig/node${nodeVersion}/tsconfig.json",
+}
+`;
+
+const quickStart = `
 import {createConfig} from 'express-zod-api';
 
 const config = createConfig({
@@ -43,4 +75,7 @@ import {createServer} from 'express-zod-api';
 createServer(config, routing);
 `;
 
-console.log(out);
+const dir = './tests/integration';
+fs.writeFileSync(`${dir}/package.json`, packageJson.trim());
+fs.writeFileSync(`${dir}/tsconfig.json`, packageJson.trim());
+fs.writeFileSync(`${dir}/quick-start.ts`, quickStart.trim());

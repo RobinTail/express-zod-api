@@ -7,3 +7,5 @@ tests/integration/node_modules
 tests/integration/yarn-error.log
 tests/integration/yarn.lock
 tests/integration/quick-start.ts
+tests/integration/package.json
+tests/integration/tsconfig.json
