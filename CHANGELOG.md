@@ -2,6 +2,15 @@
 
 ## Version 2
 
+### v2.8.1
+
+- Fixed issue #169. Suddenly I found out that `yarn` does NOT respect `yarn.lock` files of sub-dependencies. So the
+  version of `zod` defined in my `yarn.lock` file does not actually mean anything when doing `yarn add express-zod-api`.
+  - The recently released version of Zod (3.10.x) seems to have some breaking changes, it should not be installed
+    according to my lock file.
+  - I'm locking the dependency versions in `package.json` file from now on.
+  - `npm` users are also affected since the distributed lock file is for `yarn`. 
+
 ### v2.8.0
 
 - I did my best in order to improve the documentation and list the recently implemented features.
