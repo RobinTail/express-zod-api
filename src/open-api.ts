@@ -15,6 +15,7 @@ import {
   ArrayElement,
   extractObjectSchema,
   getExamples,
+  getRouteParams,
   IOSchema,
 } from "./helpers";
 import { Routing, routingCycle, RoutingCycleParams } from "./routing";
@@ -447,6 +448,28 @@ const describeIOParamExamples = <T extends IOSchema>(
   };
 };
 
+const describeRouteParams = (
+  fullPath: string,
+  inputSchemaShape: z.ZodRawShape
+): ParameterObject[] => {
+  const params = getRouteParams(fullPath);
+  return params.map((name) => ({
+    name,
+    in: "path",
+    required:
+      name in inputSchemaShape
+        ? !inputSchemaShape[name].isOptional()
+        : undefined,
+    schema:
+      name in inputSchemaShape
+        ? {
+            ...describeSchema(inputSchemaShape[name], false),
+            description: `${fullPath} route parameter`,
+          }
+        : undefined,
+  }));
+};
+
 interface GenerationParams {
   title: string;
   version: string;
@@ -517,17 +540,20 @@ export class OpenAPI extends OpenApiBuilder {
       if (endpoint.getDescription()) {
         operation.description = endpoint.getDescription();
       }
+      const inputSchemaShape = extractObjectSchema(
+        endpoint.getInputSchema()
+      ).shape;
+      operation.parameters = describeRouteParams(fullPath, inputSchemaShape);
+      // @todo choosing the exact location of the parameters should depend on config.inputSources
       if (method === "get") {
-        operation.parameters = [];
-        const subject = extractObjectSchema(endpoint.getInputSchema()).shape;
-        Object.keys(subject).forEach((name) => {
+        Object.keys(inputSchemaShape).forEach((name) => {
           (operation.parameters as ParameterObject[]).push({
             name,
             in: "query",
-            required: !subject[name].isOptional(),
+            required: !inputSchemaShape[name].isOptional(),
             schema: {
               description: `${method.toUpperCase()} ${fullPath} parameter`,
-              ...describeSchema(subject[name], false),
+              ...describeSchema(inputSchemaShape[name], false),
             },
             ...describeIOParamExamples(endpoint.getInputSchema(), false, name),
           });

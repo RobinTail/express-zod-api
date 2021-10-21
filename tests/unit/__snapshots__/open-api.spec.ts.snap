@@ -123,6 +123,7 @@ paths:
                     status: error
                     error:
                       message: Sample error message
+      parameters: []
       requestBody:
         content:
           application/json:
@@ -223,6 +224,7 @@ paths:
                     status: error
                     error:
                       message: Sample error message
+      parameters: []
       requestBody:
         content:
           application/json:
@@ -323,6 +325,7 @@ paths:
                     status: error
                     error:
                       message: Sample error message
+      parameters: []
       requestBody:
         content:
           application/json:
@@ -524,6 +527,7 @@ paths:
                     status: error
                     error:
                       message: Sample error message
+      parameters: []
       requestBody:
         content:
           application/json:
@@ -915,6 +919,7 @@ paths:
                     status: error
                     error:
                       message: Sample error message
+      parameters: []
       requestBody:
         content:
           application/json:
@@ -1126,6 +1131,7 @@ paths:
                     status: error
                     error:
                       message: Sample error message
+      parameters: []
       requestBody:
         content:
           application/json:
@@ -1325,6 +1331,13 @@ paths:
                     error:
                       message: Sample error message
       description: example user update endpoint
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            description: /v1/user/:id route parameter
       requestBody:
         content:
           application/json:
@@ -1468,6 +1481,7 @@ paths:
                     status: error
                     error:
                       message: Sample error message
+      parameters: []
       requestBody:
         content:
           multipart/form-data:
@@ -1555,6 +1569,7 @@ paths:
                     status: error
                     error:
                       message: Sample error message
+      parameters: []
       requestBody:
         content:
           application/json:
@@ -1648,6 +1663,7 @@ paths:
                     status: error
                     error:
                       message: Sample error message
+      parameters: []
       requestBody:
         content:
           application/json:
@@ -1801,6 +1817,7 @@ paths:
                     status: error
                     error:
                       message: Sample error message
+      parameters: []
       requestBody:
         content:
           application/json:
@@ -1928,6 +1945,7 @@ paths:
                     status: error
                     error:
                       message: Sample error message
+      parameters: []
       requestBody:
         content:
           application/json:
@@ -2062,6 +2080,7 @@ paths:
                     status: error
                     error:
                       message: Sample error message
+      parameters: []
       requestBody:
         content:
           application/json:
@@ -2143,6 +2162,7 @@ paths:
                     status: error
                     error:
                       message: Sample error message
+      parameters: []
       requestBody:
         content:
           application/json:
@@ -2240,6 +2260,7 @@ paths:
                     status: error
                     error:
                       message: Sample error message
+      parameters: []
       requestBody:
         content:
           application/json:
