@@ -681,5 +681,20 @@ describe("Helpers", () => {
       expect(getRouteParams("")).toEqual([]);
       expect(getRouteParams("\n")).toEqual([]);
     });
+
+    test("should return an array of param names", () => {
+      expect(getRouteParams("/users/:userId/books/:bookId")).toEqual([
+        "userId",
+        "bookId",
+      ]);
+      expect(getRouteParams("/flights/:from-:to")).toEqual(["from", "to"]);
+      expect(getRouteParams("/test/:genus.:species")).toEqual([
+        "genus",
+        "species",
+      ]);
+      expect(getRouteParams("/something")).toEqual([]);
+      expect(getRouteParams("")).toEqual([]);
+      expect(getRouteParams("\n")).toEqual([]);
+    });
   });
 });
