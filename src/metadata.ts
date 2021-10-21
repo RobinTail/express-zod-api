@@ -3,6 +3,14 @@ import {z} from './index';
 // @todo this depends on IO, perhaps I need two parameters here
 type ExampleProp<T extends z.ZodTypeAny> = T['_output'] | T['_input'];
 type DescriptionProp = string;
+
+export interface MetadataDef<T extends z.ZodTypeAny> {
+  meta: {
+    example?: ExampleProp<T>;
+    description?: DescriptionProp;
+  }
+}
+
 type WithMeta<T extends z.ZodTypeAny> = T & {
   example: (example: ExampleProp<T>) => WithMeta<T>;
   description: (description: DescriptionProp) => WithMeta<T>;
@@ -10,7 +18,7 @@ type WithMeta<T extends z.ZodTypeAny> = T & {
 
 // @see https://github.com/RobinTail/express-zod-api/discussions/165
 
-const withMeta = <T extends z.ZodTypeAny>(schema: T) => {
+export const withMeta = <T extends z.ZodTypeAny>(schema: T) => {
   schema._def.meta = {};
   Object.defineProperties(schema, {
     example: {
@@ -32,11 +40,3 @@ const withMeta = <T extends z.ZodTypeAny>(schema: T) => {
   });
   return schema as WithMeta<T>;
 };
-
-// usage:
-
-const myType = withMeta(z.object({
-  id: z.string()
-})).example({
-  id: 'test'
-}).description('something');
