@@ -1,32 +1,42 @@
 import {z} from './index';
 
-interface Metadata<T extends z.ZodTypeAny> {
-  description?: string;
-  example?: T['_output'] | T['_input']; // @todo this depends on IO, perhaps I need two parameters here
+// @todo this depends on IO, perhaps I need two parameters here
+type ExampleProp<T extends z.ZodTypeAny> = T['_output'] | T['_input'];
+type DescriptionProp = string;
+type WithMeta<T extends z.ZodTypeAny> = T & {
+  example: (example: ExampleProp<T>) => WithMeta<T>;
+  description: (description: DescriptionProp) => WithMeta<T>;
 }
-
-type ExtendedDefinition<D extends z.ZodTypeDef, M extends Metadata<any>> = D & {meta: M};
 
 // @see https://github.com/RobinTail/express-zod-api/discussions/165
 
-const withMeta = <T extends z.ZodTypeAny>(schema: T, meta: Metadata<T>) => {
-  schema._def.meta = meta;
-  return schema as unknown as
-    T extends z.ZodType<infer O, infer D, infer I>
-      ? z.ZodType<O, ExtendedDefinition<D, typeof meta>, I>
-      : never;
+const withMeta = <T extends z.ZodTypeAny>(schema: T) => {
+  schema._def.meta = {};
+  Object.defineProperties(schema, {
+    example: {
+      get() {
+        return (value: ExampleProp<T>) => {
+          this._def.meta.example = value;
+          return this;
+        };
+      }
+    },
+    description: {
+      get() {
+        return (value: DescriptionProp) => {
+          this._def.meta.description = value;
+          return this;
+        };
+      }
+    }
+  });
+  return schema as WithMeta<T>;
 };
 
 // usage:
 
-const myType = withMeta(
-  z.object({
-    id: z.string()
-  }),
-  {
-    description: '...',
-    example: {
-      id: 'XZC'
-    }
-  }
-);
+const myType = withMeta(z.object({
+  id: z.string()
+})).example({
+  id: 'test'
+}).description('something');
