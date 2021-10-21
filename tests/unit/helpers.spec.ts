@@ -6,6 +6,7 @@ import {
   getExamples,
   getInitialInput,
   getMessageFromError,
+  getRouteParams,
   getStatusCodeFromError,
   isLoggerConfig,
   OutputMarker,
@@ -666,6 +667,19 @@ describe("Helpers", () => {
         value: [1, 2, 3],
       });
       expect(combinations([], [])).toEqual({ type: "single", value: [] });
+    });
+  });
+
+  describe("getRouteParams()", () => {
+    test("should return an array of param names", () => {
+      expect(getRouteParams("/users/:userId/books/:bookId")).toEqual([
+        "userId",
+        "bookId",
+      ]);
+      expect(getRouteParams("/flights/:from-:to")).toEqual(["from", "to"]);
+      expect(getRouteParams("/something")).toEqual([]);
+      expect(getRouteParams("")).toEqual([]);
+      expect(getRouteParams("\n")).toEqual([]);
     });
   });
 });

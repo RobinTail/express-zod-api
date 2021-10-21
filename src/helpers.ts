@@ -216,6 +216,14 @@ export const combinations = <T extends any>(
   return { type: "tuple", value: result };
 };
 
+export function getRouteParams(path: string): string[] {
+  const match = path.match(/:([A-Za-z0-9_]+)/g);
+  if (!match) {
+    return [];
+  }
+  return match.map((param) => param.slice(1));
+}
+
 // obtaining the private helper type from Zod
 export type ErrMessage = Exclude<
   Parameters<typeof z.ZodString.prototype.email>[0],
