@@ -9,9 +9,7 @@ describe('Metadata', () => {
       expect(schemaWithMeta).toBeInstanceOf(z.ZodString);
       expect(schemaWithMeta).toEqual(schema);
       expect(schemaWithMeta._def).toHaveProperty('meta');
-      expect((
-        schemaWithMeta._def as unknown as MetadataDef<typeof schemaWithMeta>
-      ).meta).toEqual({});
+      expect(schemaWithMeta._def.meta).toEqual({});
     });
 
     test('should provide description() method', () => {
@@ -31,31 +29,21 @@ describe('Metadata', () => {
     test('description() should set the corresponding metadata in the schema definition', () => {
       const schema = z.string();
       const schemaWithMeta = withMeta(schema).description('test');
-      expect((
-        schemaWithMeta._def as unknown as MetadataDef<typeof schemaWithMeta>
-      ).meta).toHaveProperty('description');
-      expect((
-        schemaWithMeta._def as unknown as MetadataDef<typeof schemaWithMeta>
-      ).meta.description).toBe('test');
+      expect(schemaWithMeta._def.meta).toHaveProperty('description');
+      expect(schemaWithMeta._def.meta.description).toBe('test');
     });
 
     test('example() should set the corresponding metadata in the schema definition', () => {
       const schema = z.string();
       const schemaWithMeta = withMeta(schema).example('test');
-      expect((
-        schemaWithMeta._def as unknown as MetadataDef<typeof schemaWithMeta>
-      ).meta).toHaveProperty('example');
-      expect((
-        schemaWithMeta._def as unknown as MetadataDef<typeof schemaWithMeta>
-      ).meta.example).toBe('test');
+      expect(schemaWithMeta._def.meta).toHaveProperty('example');
+      expect(schemaWithMeta._def.meta.example).toBe('test');
     });
 
     test('metadata should withstand refinements', () => {
       const schema = z.string();
       const schemaWithMeta = withMeta(schema).description('test');
-      expect((
-        schemaWithMeta._def as unknown as MetadataDef<typeof schemaWithMeta>
-      ).meta.description).toBe('test');
+      expect(schemaWithMeta._def.meta.description).toBe('test');
       expect((
         schemaWithMeta.email()._def as unknown as MetadataDef<typeof schemaWithMeta>
       ).meta.description).toBe('test');

@@ -14,6 +14,7 @@ export interface MetadataDef<T extends z.ZodTypeAny> {
 type WithMeta<T extends z.ZodTypeAny> = T & {
   example: (example: ExampleProp<T>) => WithMeta<T>;
   description: (description: DescriptionProp) => WithMeta<T>;
+  _def: T['_def'] & MetadataDef<T>;
 }
 
 // @see https://github.com/RobinTail/express-zod-api/discussions/165
