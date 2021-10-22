@@ -29,7 +29,7 @@ export const withMeta = <T extends z.ZodTypeAny>(schema: T) => {
       get() {
         return (value: ExampleProp<T>) => {
           def[metadataProp].example = value;
-          return this;
+          return schema;
         };
       }
     },
@@ -37,7 +37,7 @@ export const withMeta = <T extends z.ZodTypeAny>(schema: T) => {
       get() {
         return (value: DescriptionProp) => {
           def[metadataProp].description = value;
-          return this;
+          return schema;
         };
       }
     }
