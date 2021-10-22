@@ -26,19 +26,15 @@ export const withMeta = <T extends z.ZodTypeAny>(schema: T) => {
   def[metadataProp] = {};
   Object.defineProperties(schema, {
     example: {
-      get() {
-        return (value: ExampleProp<T>) => {
-          def[metadataProp].example = value;
-          return schema;
-        };
+      get: () => (value: ExampleProp<T>) => {
+        def[metadataProp].example = value;
+        return schema;
       }
     },
     description: {
-      get() {
-        return (value: DescriptionProp) => {
-          def[metadataProp].description = value;
-          return schema;
-        };
+      get: () => (value: DescriptionProp) => {
+        def[metadataProp].description = value;
+        return schema;
       }
     }
   });
