@@ -235,6 +235,86 @@ servers:
 "
 `;
 
+exports[`Open API generator Metadata should pass over the schema description 1`] = `
+"openapi: 3.0.0
+info:
+  title: Testing Metadata:description
+  version: 3.4.5
+paths:
+  /v1/getSomething:
+    get:
+      responses:
+        \\"200\\":
+          description: GET /v1/getSomething Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - success
+                  data:
+                    type: object
+                    properties:
+                      result:
+                        description: some positive integer
+                        type: integer
+                        format: int64
+                        minimum: 0
+                        exclusiveMinimum: true
+                        maximum: 9007199254740991
+                        exclusiveMaximum: false
+                    required:
+                      - result
+                required:
+                  - status
+                  - data
+        \\"400\\":
+          description: GET /v1/getSomething Error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                required:
+                  - status
+                  - error
+      parameters:
+        - name: str
+          in: query
+          required: true
+          schema:
+            description: here is the test
+            type: string
+components:
+  schemas: {}
+  responses: {}
+  parameters: {}
+  examples: {}
+  requestBodies: {}
+  headers: {}
+  securitySchemes: {}
+  links: {}
+  callbacks: {}
+tags: []
+servers:
+  - url: http://example.com
+"
+`;
+
 exports[`Open API generator generateOpenApi() should generate the correct schema for complex types 1`] = `
 "openapi: 3.0.0
 info:

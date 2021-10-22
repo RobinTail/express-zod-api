@@ -8,7 +8,7 @@ import {
 import {z} from 'zod';
 import {OpenAPIError} from './errors';
 import {ZodFile} from './file-schema';
-import {ArrayElement, extractObjectSchema} from './helpers';
+import {ArrayElement, extractObjectSchema, getMeta} from './helpers';
 import {Routing, routingCycle, RoutingCycleParams} from './routing';
 import {ZodUpload} from './upload-schema';
 
@@ -16,6 +16,10 @@ const describeSchema = (value: z.ZodTypeAny, isResponse: boolean): SchemaObject 
   const otherProps: SchemaObject = {};
   if (value.isNullable()) {
     otherProps.nullable = true;
+  }
+  const description = getMeta(value, 'description');
+  if (description) {
+    otherProps.description = description;
   }
   switch (true) {
     case value instanceof z.ZodString:
@@ -339,13 +343,14 @@ export class OpenAPI extends OpenApiBuilder {
         operation.parameters = [];
         const subject = extractObjectSchema(endpoint.getInputSchema()).shape;
         Object.keys(subject).forEach((name) => {
+          const paramSchema = describeSchema(subject[name], false);
           (operation.parameters as ParameterObject[]).push({
             name,
             in: 'query',
             required: !subject[name].isOptional(),
             schema: {
-              ...describeSchema(subject[name], false),
-              description: `${method.toUpperCase()} ${fullPath} parameter`
+              ...paramSchema,
+              description: paramSchema.description || `${method.toUpperCase()} ${fullPath} parameter`,
             },
           });
         });

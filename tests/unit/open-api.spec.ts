@@ -1,5 +1,5 @@
 import {routing} from '../../example/routing';
-import {z, OpenAPI, defaultEndpointsFactory} from '../../src';
+import {z, OpenAPI, defaultEndpointsFactory, withMeta} from '../../src';
 import {expectType} from 'tsd';
 
 describe('Open API generator', () => {
@@ -484,6 +484,31 @@ describe('Open API generator', () => {
         },
         version: '3.4.5',
         title: 'Testing issue #98',
+        serverUrl: 'http://example.com'
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
+    });
+  });
+
+  describe('Metadata', () => {
+    test('should pass over the schema description', () => {
+      const spec = new OpenAPI({
+        routing: {
+          v1: {
+            getSomething: defaultEndpointsFactory.build({
+              method: 'get',
+              input: z.object({
+                str: withMeta(z.string()).description('here is the test')
+              }),
+              output: z.object({
+                result: withMeta(z.number().int().positive()).description('some positive integer')
+              }),
+              handler: async () => ({ result: 123 })
+            })
+          }
+        },
+        version: '3.4.5',
+        title: 'Testing Metadata:description',
         serverUrl: 'http://example.com'
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
