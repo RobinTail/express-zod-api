@@ -41,6 +41,13 @@ describe('Metadata', () => {
       expect(schemaWithMeta._def[metadataProp].example).toBe('test');
     });
 
+    test('should handle multiple metas', () => {
+      const schema = z.string();
+      const schemaWithMeta = withMeta(schema).description('something').example('test');
+      expect(schemaWithMeta._def[metadataProp].description).toBe('something');
+      expect(schemaWithMeta._def[metadataProp].example).toBe('test');
+    });
+
     test('metadata should withstand refinements', () => {
       const schema = z.string();
       const schemaWithMeta = withMeta(schema).description('test');
