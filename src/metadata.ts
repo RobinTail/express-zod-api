@@ -24,21 +24,21 @@ type WithMeta<T extends z.ZodTypeAny> = T & {
 // @see https://github.com/RobinTail/express-zod-api/discussions/165
 
 export const withMeta = <T extends z.ZodTypeAny>(schema: T) => {
-  const schemaWithMeta = schema as WithMeta<T>;
-  schemaWithMeta._def[metadataProp] = {};
-  Object.defineProperties(schemaWithMeta, {
+  const def = schema._def as MetadataDef<T>;
+  def[metadataProp] = {};
+  Object.defineProperties(schema, {
     example: {
       get: (): ExampleSetter<T> => (value) => {
-        schemaWithMeta._def[metadataProp].example = value;
-        return schemaWithMeta;
+        def[metadataProp].example = value;
+        return schema as WithMeta<T>;
       }
     },
     description: {
       get: (): DescriptionSetter<T> => (value) => {
-        schemaWithMeta._def[metadataProp].description = value;
-        return schemaWithMeta;
+        def[metadataProp].description = value;
+        return schema as WithMeta<T>;
       }
     }
   });
-  return schemaWithMeta;
+  return schema as WithMeta<T>;
 };
