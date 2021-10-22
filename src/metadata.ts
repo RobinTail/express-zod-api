@@ -4,12 +4,14 @@ import {z} from './index';
 type ExampleProp<T extends z.ZodTypeAny> = T['_output'] | T['_input'];
 type DescriptionProp = string;
 
-export interface MetadataDef<T extends z.ZodTypeAny> {
-  expressZodApiMeta: {
+const metadataProp = 'expressZodApiMeta';
+
+export type MetadataDef<T extends z.ZodTypeAny> = {
+  [K in typeof metadataProp]: {
     example?: ExampleProp<T>;
     description?: DescriptionProp;
-  }
-}
+  };
+};
 
 type WithMeta<T extends z.ZodTypeAny> = T & {
   example: (example: ExampleProp<T>) => WithMeta<T>;
@@ -20,12 +22,12 @@ type WithMeta<T extends z.ZodTypeAny> = T & {
 // @see https://github.com/RobinTail/express-zod-api/discussions/165
 
 export const withMeta = <T extends z.ZodTypeAny>(schema: T) => {
-  schema._def.expressZodApiMeta = {};
+  schema._def[metadataProp] = {};
   Object.defineProperties(schema, {
     example: {
       get() {
         return (value: ExampleProp<T>) => {
-          this._def.expressZodApiMeta.example = value;
+          this._def[metadataProp].example = value;
           return this;
         };
       }
@@ -33,7 +35,7 @@ export const withMeta = <T extends z.ZodTypeAny>(schema: T) => {
     description: {
       get() {
         return (value: DescriptionProp) => {
-          this._def.expressZodApiMeta.description = value;
+          this._def[metadataProp].description = value;
           return this;
         };
       }
