@@ -5,7 +5,7 @@ type ExampleProp<T extends z.ZodTypeAny> = T['_output'] | T['_input'];
 type DescriptionProp = string;
 
 export interface MetadataDef<T extends z.ZodTypeAny> {
-  meta: {
+  expressZodApiMeta: {
     example?: ExampleProp<T>;
     description?: DescriptionProp;
   }
@@ -20,12 +20,12 @@ type WithMeta<T extends z.ZodTypeAny> = T & {
 // @see https://github.com/RobinTail/express-zod-api/discussions/165
 
 export const withMeta = <T extends z.ZodTypeAny>(schema: T) => {
-  schema._def.meta = {};
+  schema._def.expressZodApiMeta = {};
   Object.defineProperties(schema, {
     example: {
       get() {
         return (value: ExampleProp<T>) => {
-          this._def.meta.example = value;
+          this._def.expressZodApiMeta.example = value;
           return this;
         };
       }
@@ -33,7 +33,7 @@ export const withMeta = <T extends z.ZodTypeAny>(schema: T) => {
     description: {
       get() {
         return (value: DescriptionProp) => {
-          this._def.meta.description = value;
+          this._def.expressZodApiMeta.description = value;
           return this;
         };
       }
