@@ -3,13 +3,14 @@ import {
   combineEndpointAndMiddlewareInputSchemas,
   extractObjectSchema,
   getInitialInput,
-  getMessageFromError,
+  getMessageFromError, getMeta,
   getStatusCodeFromError,
   isLoggerConfig,
   OutputMarker
 } from '../../src/helpers';
-import {createMiddleware, z, createHttpError, markOutput} from '../../src';
+import {createMiddleware, z, createHttpError, markOutput, withMeta} from '../../src';
 import {Request} from 'express';
+import {metadataProp} from '../../src/metadata';
 import {MiddlewareDefinition} from '../../src/middleware';
 import {serializeSchemaForTest} from '../helpers';
 
@@ -334,6 +335,29 @@ describe('Helpers', () => {
       const output = z.object({});
       expect(markOutput(output)).toEqual(output);
       expectType<OutputMarker>(markOutput(output));
+    });
+  });
+
+  describe('getMeta()', () => {
+    test('should return undefined on a regular Zod schema or the malformed one', () => {
+      expect(getMeta(z.string(), 'description')).toBeUndefined();
+    });
+    test('should return undefined on malformed schema', () => {
+      const schema1 = z.string();
+      const schema2 = z.string();
+      Object.defineProperty(schema1._def, metadataProp, {value: null});
+      expect(getMeta(schema1, 'description')).toBeUndefined();
+      Object.defineProperty(schema2._def, metadataProp, {value: 123});
+      expect(getMeta(schema2, 'description')).toBeUndefined();
+    });
+    test('should return undefined if the value not set', () => {
+      expect(getMeta(withMeta(z.string()), 'description')).toBeUndefined();
+    });
+    test('should return the value that has been set', () => {
+      expect(getMeta(
+        withMeta(z.string()).description('test'),
+        'description')
+      ).toBe('test');
     });
   });
 });

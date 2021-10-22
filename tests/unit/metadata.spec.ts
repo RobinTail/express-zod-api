@@ -1,5 +1,5 @@
 import {z, withMeta} from '../../src';
-import {MetadataDef} from '../../src/metadata';
+import {MetadataDef, metadataProp} from '../../src/metadata';
 
 describe('Metadata', () => {
   describe('withMeta()', () => {
@@ -8,8 +8,9 @@ describe('Metadata', () => {
       const schemaWithMeta = withMeta(schema);
       expect(schemaWithMeta).toBeInstanceOf(z.ZodString);
       expect(schemaWithMeta).toEqual(schema);
-      expect(schemaWithMeta._def).toHaveProperty('expressZodApiMeta');
-      expect(schemaWithMeta._def.expressZodApiMeta).toEqual({});
+      expect(metadataProp).toBe('expressZodApiMeta');
+      expect(schemaWithMeta._def).toHaveProperty(metadataProp);
+      expect(schemaWithMeta._def[metadataProp]).toEqual({});
     });
 
     test('should provide description() method', () => {
@@ -29,24 +30,24 @@ describe('Metadata', () => {
     test('description() should set the corresponding metadata in the schema definition', () => {
       const schema = z.string();
       const schemaWithMeta = withMeta(schema).description('test');
-      expect(schemaWithMeta._def.expressZodApiMeta).toHaveProperty('description');
-      expect(schemaWithMeta._def.expressZodApiMeta.description).toBe('test');
+      expect(schemaWithMeta._def[metadataProp]).toHaveProperty('description');
+      expect(schemaWithMeta._def[metadataProp].description).toBe('test');
     });
 
     test('example() should set the corresponding metadata in the schema definition', () => {
       const schema = z.string();
       const schemaWithMeta = withMeta(schema).example('test');
-      expect(schemaWithMeta._def.expressZodApiMeta).toHaveProperty('example');
-      expect(schemaWithMeta._def.expressZodApiMeta.example).toBe('test');
+      expect(schemaWithMeta._def[metadataProp]).toHaveProperty('example');
+      expect(schemaWithMeta._def[metadataProp].example).toBe('test');
     });
 
     test('metadata should withstand refinements', () => {
       const schema = z.string();
       const schemaWithMeta = withMeta(schema).description('test');
-      expect(schemaWithMeta._def.expressZodApiMeta.description).toBe('test');
+      expect(schemaWithMeta._def[metadataProp].description).toBe('test');
       expect((
         schemaWithMeta.email()._def as unknown as MetadataDef<typeof schemaWithMeta>
-      ).expressZodApiMeta.description).toBe('test');
+      )[metadataProp].description).toBe('test');
     });
   });
 });

@@ -2,6 +2,7 @@ import {Request} from 'express';
 import {HttpError} from 'http-errors';
 import {z} from 'zod';
 import {CommonConfig, InputSources, LoggerConfig, loggerLevels} from './config-type';
+import {MetadataDef, metadataProp} from './metadata';
 import {Method} from './method';
 import {MiddlewareDefinition} from './middleware';
 import {mimeMultipart} from './mime';
@@ -124,6 +125,20 @@ export function getStatusCodeFromError(error: Error): number {
     return 400;
   }
   return 500;
+}
+
+export function getMeta<
+  T extends z.ZodTypeAny,
+  K extends keyof MetadataDef<T>[typeof metadataProp]
+>(schema: T, meta: K): MetadataDef<T>[typeof metadataProp][K] | undefined {
+  if (!(metadataProp in schema._def)) {
+    return undefined;
+  }
+  if (typeof schema._def[metadataProp] !== 'object' || schema._def[metadataProp] === null) {
+    return undefined;
+  }
+  const def = schema._def as MetadataDef<T>;
+  return meta in def[metadataProp] ? def[metadataProp][meta] : undefined;
 }
 
 // obtaining the private helper type from Zod

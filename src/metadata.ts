@@ -4,7 +4,7 @@ import {z} from './index';
 type ExampleProp<T extends z.ZodTypeAny> = T['_output'] | T['_input'];
 type DescriptionProp = string;
 
-const metadataProp = 'expressZodApiMeta';
+export const metadataProp = 'expressZodApiMeta';
 
 export type MetadataDef<T extends z.ZodTypeAny> = {
   [K in typeof metadataProp]: {
