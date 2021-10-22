@@ -13,9 +13,11 @@ export type MetadataDef<T extends z.ZodTypeAny> = {
   };
 };
 
+type ExampleSetter<T extends z.ZodTypeAny> = (example: ExampleProp<T>) => WithMeta<T>;
+type DescriptionSetter<T extends z.ZodTypeAny> = (description: DescriptionProp) => WithMeta<T>;
 type WithMeta<T extends z.ZodTypeAny> = T & {
-  example: (example: ExampleProp<T>) => WithMeta<T>;
-  description: (description: DescriptionProp) => WithMeta<T>;
+  example: ExampleSetter<T>;
+  description: DescriptionSetter<T>;
   _def: T['_def'] & MetadataDef<T>;
 }
 
@@ -26,15 +28,15 @@ export const withMeta = <T extends z.ZodTypeAny>(schema: T) => {
   def[metadataProp] = {};
   Object.defineProperties(schema, {
     example: {
-      get: () => (value: ExampleProp<T>) => {
+      get: (): ExampleSetter<T> => (value) => {
         def[metadataProp].example = value;
-        return schema;
+        return schema as WithMeta<T>;
       }
     },
     description: {
-      get: () => (value: DescriptionProp) => {
+      get: (): DescriptionSetter<T> => (value) => {
         def[metadataProp].description = value;
-        return schema;
+        return schema as WithMeta<T>;
       }
     }
   });
