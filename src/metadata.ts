@@ -8,7 +8,7 @@ export const metadataProp = 'expressZodApiMeta';
 
 export type MetadataDef<T extends z.ZodTypeAny> = {
   [K in typeof metadataProp]: {
-    example?: ExampleProp<T>;
+    examples: ExampleProp<T>[];
     description?: DescriptionProp;
   };
 };
@@ -25,11 +25,11 @@ type WithMeta<T extends z.ZodTypeAny> = T & {
 
 export const withMeta = <T extends z.ZodTypeAny>(schema: T) => {
   const def = schema._def as MetadataDef<T>;
-  def[metadataProp] = {};
+  def[metadataProp] = { examples: [] };
   Object.defineProperties(schema, {
     example: {
       get: (): ExampleSetter<T> => (value) => {
-        def[metadataProp].example = value;
+        def[metadataProp].examples.push(value);
         return schema as WithMeta<T>;
       }
     },

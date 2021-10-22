@@ -360,5 +360,12 @@ describe('Helpers', () => {
         'description')
       ).toBe('test');
     });
+    test('should return an array of examples', () => {
+      expect(getMeta(withMeta(z.string()), 'examples')).toEqual([]);
+      expect(getMeta(
+        withMeta(z.string()).example('test1').example('test2'),
+        'examples'
+      )).toEqual(['test1', 'test2']);
+    });
   });
 });
