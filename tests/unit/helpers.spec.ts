@@ -3,7 +3,8 @@ import {
   combineEndpointAndMiddlewareInputSchemas,
   extractObjectSchema,
   getInitialInput,
-  getMessageFromError, getMeta,
+  getMessageFromError,
+  getMeta,
   getStatusCodeFromError,
   isLoggerConfig,
   OutputMarker
