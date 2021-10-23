@@ -541,12 +541,39 @@ describe('Open API generator', () => {
       expect(spec).toMatchSnapshot();
     });
 
-    test('should pass over examples of the whole IO schema', () => {
+    test('should pass over examples of each param from the whole IO schema examples (GET)', () => {
       const spec = new OpenAPI({
         routing: {
           v1: {
             getSomething: defaultEndpointsFactory.build({
               method: 'get',
+              input: withMeta(z.object({
+                strNum: z.string().transform((v) => parseInt(v, 10))
+              })).example({
+                strNum: '123' // example is for input side of the transformation
+              }),
+              output: withMeta(z.object({
+                numericStr: z.number().transform((v) => `${v}`)
+              })).example({
+                numericStr: 123 // example is for input side of the transformation
+              }),
+              handler: async () => ({ numericStr: 123 })
+            })
+          }
+        },
+        version: '3.4.5',
+        title: 'Testing Metadata:example on IO schema',
+        serverUrl: 'http://example.com'
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
+    });
+
+    test('should pass over examples of the whole IO schema (POST)', () => {
+      const spec = new OpenAPI({
+        routing: {
+          v1: {
+            getSomething: defaultEndpointsFactory.build({
+              method: 'post',
               input: withMeta(z.object({
                 strNum: z.string().transform((v) => parseInt(v, 10))
               })).example({

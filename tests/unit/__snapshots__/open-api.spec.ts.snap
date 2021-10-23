@@ -253,7 +253,7 @@ servers:
 "
 `;
 
-exports[`Open API generator Metadata should pass over examples of the whole IO schema 1`] = `
+exports[`Open API generator Metadata should pass over examples of each param from the whole IO schema examples (GET) 1`] = `
 "openapi: 3.0.0
 info:
   title: Testing Metadata:example on IO schema
@@ -333,6 +333,107 @@ paths:
           examples:
             example1:
               value: \\"123\\"
+components:
+  schemas: {}
+  responses: {}
+  parameters: {}
+  examples: {}
+  requestBodies: {}
+  headers: {}
+  securitySchemes: {}
+  links: {}
+  callbacks: {}
+tags: []
+servers:
+  - url: http://example.com
+"
+`;
+
+exports[`Open API generator Metadata should pass over examples of the whole IO schema (POST) 1`] = `
+"openapi: 3.0.0
+info:
+  title: Testing Metadata:example on IO schema
+  version: 3.4.5
+paths:
+  /v1/getSomething:
+    post:
+      responses:
+        \\"200\\":
+          description: POST /v1/getSomething Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - success
+                  data:
+                    example:
+                      numericStr: \\"123\\"
+                    type: object
+                    properties:
+                      numericStr:
+                        type: string
+                        format: double
+                        minimum: 5e-324
+                        exclusiveMinimum: false
+                        maximum: 1.7976931348623157e+308
+                        exclusiveMaximum: false
+                    required:
+                      - numericStr
+                required:
+                  - status
+                  - data
+              examples:
+                example1:
+                  value:
+                    status: success
+                    data:
+                      numericStr: \\"123\\"
+        \\"400\\":
+          description: POST /v1/getSomething Error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                required:
+                  - status
+                  - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                strNum:
+                  type: string
+              required:
+                - strNum
+              description: POST /v1/getSomething request body
+            examples:
+              example1:
+                value:
+                  strNum: \\"123\\"
 components:
   schemas: {}
   responses: {}
