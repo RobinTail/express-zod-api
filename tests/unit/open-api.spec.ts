@@ -513,5 +513,28 @@ describe('Open API generator', () => {
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
+
+    test('should pass over the example of IO parameter', () => {
+      const spec = new OpenAPI({
+        routing: {
+          v1: {
+            getSomething: defaultEndpointsFactory.build({
+              method: 'get',
+              input: z.object({
+                str: withMeta(z.string()).example('test')
+              }),
+              output: z.object({
+                result: withMeta(z.number().int().positive()).example(123)
+              }),
+              handler: async () => ({ result: 123 })
+            })
+          }
+        },
+        version: '3.4.5',
+        title: 'Testing Metadata:example on IO parameter',
+        serverUrl: 'http://example.com'
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
+    });
   });
 });

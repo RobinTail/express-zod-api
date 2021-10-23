@@ -21,6 +21,10 @@ const describeSchema = (value: z.ZodTypeAny, isResponse: boolean): SchemaObject 
   if (description) {
     otherProps.description = description;
   }
+  const examples = getMeta(value, 'examples');
+  if (examples && examples.length > 0) {
+    otherProps.example = examples[0];
+  }
   switch (true) {
     case value instanceof z.ZodString:
       return {
