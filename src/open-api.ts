@@ -322,12 +322,12 @@ const describeIOExamples = <T extends IOSchema>(schema: T, isResponse: boolean) 
     return {};
   }
   return {
-    examples: examples.reduce((carry, example, index) => ({
+    examples: examples.reduce<ExamplesObject>((carry, example, index) => ({
       ...carry,
       [`example${index + 1}`]: <ExampleObject>{
         value: example
       }
-    }), {} as ExamplesObject)
+    }), {})
   };
 };
 
