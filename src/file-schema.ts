@@ -41,7 +41,7 @@ export class ZodFile extends ZodType<string, ZodFileDef> {
 
     for (const check of this._def.checks) {
       if (check.kind === 'base64') {
-        if (!base64Regex.test(input.data)) {
+        if (!base64Regex.test(ctx.data)) {
           addIssueToContext(ctx, {
             code: ZodIssueCode.custom,
             message: check.message,

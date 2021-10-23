@@ -28,7 +28,7 @@ const isUploadedFile = (data: any): data is UploadedFile =>
 export class ZodUpload extends ZodType<UploadedFile, ZodUploadDef> {
   _parse(input: ParseInput): ParseReturnType<UploadedFile> {
     const { ctx } = this._processInputParams(input);
-    if (ctx.parsedType !== ZodParsedType.object || !isUploadedFile(input.data)) {
+    if (ctx.parsedType !== ZodParsedType.object || !isUploadedFile(ctx.data)) {
       addIssueToContext(ctx, {
         code: ZodIssueCode.custom,
         message: `Expected file upload, received ${ctx.parsedType}`
@@ -36,7 +36,7 @@ export class ZodUpload extends ZodType<UploadedFile, ZodUploadDef> {
       return INVALID;
     }
 
-    return OK(input.data);
+    return OK(ctx.data);
   }
 
   static create = () => new ZodUpload({
