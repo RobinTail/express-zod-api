@@ -3,12 +3,14 @@ import {
   OperationObject,
   ParameterObject,
   SchemaObject,
-  ContentObject
+  ContentObject,
+  ExamplesObject,
+  ExampleObject
 } from 'openapi3-ts';
 import {z} from 'zod';
 import {OpenAPIError} from './errors';
 import {ZodFile} from './file-schema';
-import {ArrayElement, extractObjectSchema, getMeta} from './helpers';
+import {ArrayElement, extractObjectSchema, getMeta, IOSchema} from './helpers';
 import {Routing, routingCycle, RoutingCycleParams} from './routing';
 import {ZodUpload} from './upload-schema';
 
@@ -314,6 +316,21 @@ const getExamples = <T extends z.ZodTypeAny>(schema: T, isResponse: boolean) => 
   return examples;
 };
 
+const describeIOExamples = <T extends IOSchema>(schema: T, isResponse: boolean) => {
+  const examples = getExamples(schema, isResponse);
+  if (examples.length === 0) {
+    return {};
+  }
+  return {
+    examples: examples.reduce((carry, example, index) => ({
+      ...carry,
+      [`example${index + 1}`]: <ExampleObject>{
+        value: example
+      }
+    }), {} as ExamplesObject)
+  };
+};
+
 interface GenerationParams {
   title: string;
   version: string;
@@ -332,6 +349,10 @@ export class OpenAPI extends OpenApiBuilder {
     super();
     this.addInfo({title, version}).addServer({url: serverUrl});
     const cb: RoutingCycleParams['cb'] = (endpoint, fullPath, method) => {
+      const positiveResponseSchema = describeSchema(endpoint.getPositiveResponseSchema(), true);
+      delete positiveResponseSchema.example;
+      const negativeResponseSchema = describeSchema(endpoint.getNegativeResponseSchema(), true);
+      delete negativeResponseSchema.example;
       const operation: OperationObject = {
         responses: {
           '200': {
@@ -339,7 +360,8 @@ export class OpenAPI extends OpenApiBuilder {
             content: endpoint.getPositiveMimeTypes().reduce((carry, mimeType) => ({
               ...carry,
               [mimeType]: {
-                schema: describeSchema(endpoint.getPositiveResponseSchema(), true)
+                schema: positiveResponseSchema,
+                ...describeIOExamples(endpoint.getPositiveResponseSchema(), true)
               }
             }), {} as ContentObject),
           },
@@ -348,7 +370,8 @@ export class OpenAPI extends OpenApiBuilder {
             content: endpoint.getNegativeMimeTypes().reduce((carry, mimeType) => ({
               ...carry,
               [mimeType]: {
-                schema: describeSchema(endpoint.getNegativeResponseSchema(), true)
+                schema: negativeResponseSchema,
+                ...describeIOExamples(endpoint.getNegativeResponseSchema(), true)
               }
             }), {} as ContentObject),
           }
@@ -370,6 +393,7 @@ export class OpenAPI extends OpenApiBuilder {
               ...paramSchema,
               description: paramSchema.description || `${method.toUpperCase()} ${fullPath} parameter`,
             },
+            ...describeIOExamples(endpoint.getInputSchema(), false)
           });
         });
       } else {
@@ -380,7 +404,8 @@ export class OpenAPI extends OpenApiBuilder {
               schema: {
                 ...describeSchema(endpoint.getInputSchema(), false),
                 description: `${method.toUpperCase()} ${fullPath} request body`
-              }
+              },
+              ...describeIOExamples(endpoint.getInputSchema(), false)
             }
           }), {} as ContentObject)
         };

@@ -54,6 +54,12 @@ paths:
                 required:
                   - status
                   - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
       parameters:
         - name: arr
           in: query
@@ -111,6 +117,12 @@ paths:
                 required:
                   - status
                   - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
       requestBody:
         content:
           application/json:
@@ -205,6 +217,12 @@ paths:
                 required:
                   - status
                   - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
       requestBody:
         content:
           application/json:
@@ -235,7 +253,104 @@ servers:
 "
 `;
 
-exports[`Open API generator Metadata should pass over the example of IO parameter 1`] = `
+exports[`Open API generator Metadata should pass over examples of the whole IO schema 1`] = `
+"openapi: 3.0.0
+info:
+  title: Testing Metadata:example on IO schema
+  version: 3.4.5
+paths:
+  /v1/getSomething:
+    get:
+      responses:
+        \\"200\\":
+          description: GET /v1/getSomething Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - success
+                  data:
+                    example:
+                      numericStr: \\"123\\"
+                    type: object
+                    properties:
+                      numericStr:
+                        type: string
+                        format: double
+                        minimum: 5e-324
+                        exclusiveMinimum: false
+                        maximum: 1.7976931348623157e+308
+                        exclusiveMaximum: false
+                    required:
+                      - numericStr
+                required:
+                  - status
+                  - data
+              examples:
+                example1:
+                  value:
+                    status: success
+                    data:
+                      numericStr: \\"123\\"
+        \\"400\\":
+          description: GET /v1/getSomething Error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                required:
+                  - status
+                  - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
+      parameters:
+        - name: strNum
+          in: query
+          required: true
+          schema:
+            type: string
+            description: GET /v1/getSomething parameter
+          examples:
+            example1:
+              value:
+                strNum: \\"123\\"
+components:
+  schemas: {}
+  responses: {}
+  parameters: {}
+  examples: {}
+  requestBodies: {}
+  headers: {}
+  securitySchemes: {}
+  links: {}
+  callbacks: {}
+tags: []
+servers:
+  - url: http://example.com
+"
+`;
+
+exports[`Open API generator Metadata should pass over the example of an individual parameter 1`] = `
 "openapi: 3.0.0
 info:
   title: Testing Metadata:example on IO parameter
@@ -292,6 +407,12 @@ paths:
                 required:
                   - status
                   - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
       parameters:
         - name: strNum
           in: query
@@ -373,6 +494,12 @@ paths:
                 required:
                   - status
                   - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
       parameters:
         - name: str
           in: query
@@ -457,6 +584,12 @@ paths:
                 required:
                   - status
                   - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
       parameters:
         - name: array
           in: query
@@ -571,6 +704,12 @@ paths:
                 required:
                   - status
                   - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
       requestBody:
         content:
           application/json:
@@ -662,6 +801,12 @@ paths:
                 required:
                   - status
                   - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
       parameters:
         - name: optional
           in: query
@@ -770,6 +915,12 @@ paths:
                 required:
                   - status
                   - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
       requestBody:
         content:
           application/json:
@@ -884,6 +1035,12 @@ paths:
                 required:
                   - status
                   - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
       description: example user retrieval endpoint
       parameters:
         - name: id
@@ -1005,6 +1162,12 @@ paths:
                 required:
                   - status
                   - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
       requestBody:
         content:
           multipart/form-data:
@@ -1070,6 +1233,12 @@ paths:
                 required:
                   - status
                   - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
       description: example user update endpoint
       requestBody:
         content:
@@ -1164,6 +1333,12 @@ paths:
                 required:
                   - status
                   - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
       requestBody:
         content:
           application/json:
@@ -1251,6 +1426,12 @@ paths:
                 required:
                   - status
                   - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
       requestBody:
         content:
           application/json:
@@ -1398,6 +1579,12 @@ paths:
                 required:
                   - status
                   - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
       requestBody:
         content:
           application/json:
@@ -1519,6 +1706,12 @@ paths:
                 required:
                   - status
                   - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
       requestBody:
         content:
           application/json:
@@ -1647,6 +1840,12 @@ paths:
                 required:
                   - status
                   - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
       requestBody:
         content:
           application/json:
@@ -1722,6 +1921,12 @@ paths:
                 required:
                   - status
                   - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
       requestBody:
         content:
           application/json:
@@ -1813,6 +2018,12 @@ paths:
                 required:
                   - status
                   - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
       requestBody:
         content:
           application/json:
@@ -1927,6 +2138,12 @@ paths:
                 required:
                   - status
                   - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
       parameters:
         - name: any
           in: query
@@ -2002,6 +2219,12 @@ paths:
                 required:
                   - status
                   - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
       parameters:
         - name: string
           in: query

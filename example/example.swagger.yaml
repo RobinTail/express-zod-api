@@ -56,6 +56,12 @@ paths:
                 required:
                   - status
                   - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
       description: example user retrieval endpoint
       parameters:
         - name: id
@@ -177,6 +183,12 @@ paths:
                 required:
                   - status
                   - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
       requestBody:
         content:
           multipart/form-data:
@@ -242,6 +254,12 @@ paths:
                 required:
                   - status
                   - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
       description: example user update endpoint
       requestBody:
         content:
