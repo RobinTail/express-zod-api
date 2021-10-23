@@ -1,14 +1,15 @@
 import {UploadedFile} from 'express-fileupload';
 import {
-  ParseContext,
   ParseReturnType,
   ZodIssueCode,
   ZodParsedType,
   ZodType,
   INVALID,
   OK,
-  ZodTypeDef
+  ZodTypeDef,
+  addIssueToContext
 } from 'zod';
+import {ParseInput} from 'zod/lib/helpers/parseUtil';
 
 const zodUploadKind = 'ZodUpload';
 
@@ -25,20 +26,17 @@ const isUploadedFile = (data: any): data is UploadedFile =>
   typeof data.md5 === 'string' && typeof data.mv === 'function';
 
 export class ZodUpload extends ZodType<UploadedFile, ZodUploadDef> {
-  _parse(
-    ctx: ParseContext,
-    data: any,
-    parsedType: ZodParsedType
-  ): ParseReturnType<UploadedFile> {
-    if (parsedType !== ZodParsedType.object || !isUploadedFile(data)) {
-      this.addIssue(ctx, {
+  _parse(input: ParseInput): ParseReturnType<UploadedFile> {
+    const { ctx } = this._processInputParams(input);
+    if (ctx.parsedType !== ZodParsedType.object || !isUploadedFile(input.data)) {
+      addIssueToContext(ctx, {
         code: ZodIssueCode.custom,
-        message: `Expected file upload, received ${parsedType}`
-      }, { data });
+        message: `Expected file upload, received ${ctx.parsedType}`
+      });
       return INVALID;
     }
 
-    return OK(data);
+    return OK(input.data);
   }
 
   static create = () => new ZodUpload({

@@ -1,13 +1,13 @@
 import {
-  ParseContext,
   ParseReturnType,
   ZodIssueCode,
   ZodParsedType,
   ZodType,
   INVALID,
-  OK,
-  ZodTypeDef
+  ZodTypeDef,
+  addIssueToContext
 } from 'zod';
+import {ParseInput} from 'zod/lib/helpers/parseUtil';
 import {ErrMessage, errToObj} from './helpers';
 
 const zodFileKind = 'ZodFile';
@@ -28,34 +28,30 @@ export interface ZodFileDef extends ZodTypeDef {
 const base64Regex = /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/;
 
 export class ZodFile extends ZodType<string, ZodFileDef> {
-  _parse(
-    ctx: ParseContext,
-    data: any,
-    parsedType: ZodParsedType
-  ): ParseReturnType<string> {
-    if (parsedType !== ZodParsedType.string) {
-      this.addIssue(ctx, {
+  _parse(input: ParseInput): ParseReturnType<string> {
+    const { status, ctx } = this._processInputParams(input);
+    if (ctx.parsedType !== ZodParsedType.string) {
+      addIssueToContext(ctx, {
         code: ZodIssueCode.invalid_type,
         expected: ZodParsedType.string,
-        received: parsedType,
-      }, { data });
+        received: ctx.parsedType,
+      });
       return INVALID;
     }
-    let invalid = false;
 
     for (const check of this._def.checks) {
       if (check.kind === 'base64') {
-        if (!base64Regex.test(data)) {
-          invalid = true;
-          this.addIssue(ctx, {
+        if (!base64Regex.test(input.data)) {
+          addIssueToContext(ctx, {
             code: ZodIssueCode.custom,
             message: check.message,
-          }, { data });
+          });
+          status.dirty();
         }
       }
     }
 
-    return invalid ? INVALID : OK(data);
+    return { status: status.value, value: ctx.data };
   }
 
   binary = (message?: ErrMessage) =>
