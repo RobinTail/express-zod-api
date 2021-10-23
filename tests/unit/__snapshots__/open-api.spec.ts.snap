@@ -997,6 +997,9 @@ paths:
                     enum:
                       - success
                   data:
+                    example:
+                      id: 12
+                      name: John Doe
                     type: object
                     properties:
                       id:
@@ -1014,6 +1017,13 @@ paths:
                 required:
                   - status
                   - data
+              examples:
+                example1:
+                  value:
+                    status: success
+                    data:
+                      id: 12
+                      name: John Doe
         \\"400\\":
           description: GET /v1/user/retrieve Error response
           content:
@@ -1047,9 +1057,10 @@ paths:
           in: query
           required: true
           schema:
+            description: numeric string
+            example: \\"12\\"
             type: string
             pattern: /\\\\d+/
-            description: GET /v1/user/retrieve parameter
   /v1/avatar/send:
     get:
       responses:

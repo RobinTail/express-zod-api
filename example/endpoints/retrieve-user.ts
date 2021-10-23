@@ -1,4 +1,4 @@
-import {z, createHttpError, defaultEndpointsFactory} from '../../src';
+import {z, createHttpError, defaultEndpointsFactory, withMeta} from '../../src';
 import {methodProviderMiddleware} from '../middlewares';
 
 export const retrieveUserEndpoint = defaultEndpointsFactory
@@ -7,11 +7,17 @@ export const retrieveUserEndpoint = defaultEndpointsFactory
     method: 'get',
     description: 'example user retrieval endpoint',
     input: z.object({
-      id: z.string().regex(/\d+/).transform((id) => parseInt(id, 10))
+      id: withMeta(
+        z.string().regex(/\d+/)
+          .transform((id) => parseInt(id, 10))
+      ).description('numeric string').example('12') // single param example
     }),
-    output: z.object({
+    output: withMeta(z.object({
       id: z.number().int().nonnegative(),
       name: z.string(),
+    })).example({ // whole IO schema example
+      id: 12,
+      name: 'John Doe'
     }),
     handler: async ({input: {id}, options: {method}, logger}) => {
       logger.debug(`Requested id: ${id}, method ${method}`);
