@@ -43,3 +43,19 @@ export const withMeta = <T extends z.ZodTypeAny>(schema: T) => {
   });
   return schema as WithMeta<T>;
 };
+
+export const hasMetadata = <T extends z.ZodTypeAny>(schema: T): schema is WithMeta<T> => {
+  if (!(metadataProp in schema._def)) {
+    return false;
+  }
+  return typeof schema._def[metadataProp] === 'object' && schema._def[metadataProp] !== null;
+};
+
+export const copyMetadata = <A extends z.ZodTypeAny, B extends z.ZodTypeAny>(src: A, dest: B): B | WithMeta<B> => {
+  if (!hasMetadata(src)) {
+    return dest;
+  }
+  const def = dest._def as MetadataDef<B>;
+  def[metadataProp] = src._def[metadataProp];
+  return dest;
+};

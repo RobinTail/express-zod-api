@@ -78,10 +78,12 @@ paths:
           in: query
           required: true
           schema:
-            description: numeric string
-            example: "12"
             type: string
             pattern: /\d+/
+            description: GET /v1/user/retrieve parameter
+          examples:
+            example1:
+              value: "12"
   /v1/avatar/send:
     get:
       responses:

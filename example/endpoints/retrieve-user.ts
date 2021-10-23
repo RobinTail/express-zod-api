@@ -6,12 +6,9 @@ export const retrieveUserEndpoint = defaultEndpointsFactory
   .build({
     method: 'get',
     description: 'example user retrieval endpoint',
-    input: z.object({
-      id: withMeta(
-        z.string().regex(/\d+/)
-          .transform((id) => parseInt(id, 10))
-      ).description('numeric string').example('12') // single param example
-    }),
+    input: withMeta(z.object({
+      id: z.string().regex(/\d+/).transform((id) => parseInt(id, 10))
+    })).example({ id: '12' }), // whole IO schema example
     output: withMeta(z.object({
       id: z.number().int().nonnegative(),
       name: z.string(),

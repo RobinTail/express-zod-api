@@ -5,7 +5,8 @@ import {
   SchemaObject,
   ContentObject,
   ExamplesObject,
-  ExampleObject
+  ExampleObject,
+  MediaTypeObject
 } from 'openapi3-ts';
 import {z} from 'zod';
 import {OpenAPIError} from './errors';
@@ -316,7 +317,7 @@ const getExamples = <T extends z.ZodTypeAny>(schema: T, isResponse: boolean) => 
   return examples;
 };
 
-const describeIOExamples = <T extends IOSchema>(schema: T, isResponse: boolean) => {
+const describeIOExamples = <T extends IOSchema>(schema: T, isResponse: boolean): Pick<MediaTypeObject, 'examples'> => {
   const examples = getExamples(schema, isResponse);
   if (examples.length === 0) {
     return {};
@@ -328,6 +329,21 @@ const describeIOExamples = <T extends IOSchema>(schema: T, isResponse: boolean) 
         value: example
       }
     }), {})
+  };
+};
+
+const describeIOParamExamples = <T extends IOSchema>(schema: T, isResponse: boolean, param: string): Pick<MediaTypeObject, 'examples'> => {
+  const examples = getExamples(schema, isResponse);
+  if (examples.length === 0) {
+    return {};
+  }
+  return {
+    examples: examples.reduce<ExamplesObject>((carry, example, index) => param in example ? ({
+      ...carry,
+      [`example${index + 1}`]: <ExampleObject>{
+        value: example[param]
+      }
+    }) : carry, {})
   };
 };
 
@@ -393,7 +409,7 @@ export class OpenAPI extends OpenApiBuilder {
               ...paramSchema,
               description: paramSchema.description || `${method.toUpperCase()} ${fullPath} parameter`,
             },
-            ...describeIOExamples(endpoint.getInputSchema(), false)
+            ...describeIOParamExamples(endpoint.getInputSchema(), false, name)
           });
         });
       } else {
