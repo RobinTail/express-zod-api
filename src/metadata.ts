@@ -2,7 +2,7 @@ import {z} from './index';
 
 // example value is always for the schema input
 // output example (for the response) will be generated automatically: @see getExamples()
-export type ExampleProp<T extends z.ZodTypeAny> = T['_input'];
+type ExampleProp<T extends z.ZodTypeAny> = T['_input'];
 type DescriptionProp = string;
 
 export const metadataProp = 'expressZodApiMeta';
