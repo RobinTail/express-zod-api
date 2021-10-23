@@ -2,8 +2,7 @@
 
 exports[`ZodUpload _parse() should accept UploadedFile 1`] = `
 Object {
-  "valid": true,
-  "value": Object {
+  "data": Object {
     "data": Object {
       "data": Array [
         115,
@@ -27,5 +26,6 @@ Object {
     "tempFilePath": "",
     "truncated": false,
   },
+  "success": true,
 }
 `;
