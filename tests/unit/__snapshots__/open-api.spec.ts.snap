@@ -258,16 +258,16 @@ paths:
                   data:
                     type: object
                     properties:
-                      result:
-                        example: 123
-                        type: integer
-                        format: int64
-                        minimum: 0
-                        exclusiveMinimum: true
-                        maximum: 9007199254740991
+                      numericStr:
+                        example: \\"123\\"
+                        type: string
+                        format: double
+                        minimum: 5e-324
+                        exclusiveMinimum: false
+                        maximum: 1.7976931348623157e+308
                         exclusiveMaximum: false
                     required:
-                      - result
+                      - numericStr
                 required:
                   - status
                   - data
@@ -293,11 +293,11 @@ paths:
                   - status
                   - error
       parameters:
-        - name: str
+        - name: strNum
           in: query
           required: true
           schema:
-            example: test
+            example: \\"123\\"
             type: string
             description: GET /v1/getSomething parameter
 components:

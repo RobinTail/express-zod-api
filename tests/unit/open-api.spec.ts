@@ -521,12 +521,16 @@ describe('Open API generator', () => {
             getSomething: defaultEndpointsFactory.build({
               method: 'get',
               input: z.object({
-                str: withMeta(z.string()).example('test')
+                strNum: withMeta(
+                  z.string().transform((v) => parseInt(v, 10))
+                ).example('123') // example is for input side of the transformation
               }),
               output: z.object({
-                result: withMeta(z.number().int().positive()).example(123)
+                numericStr: withMeta(
+                  z.number().transform((v) => `${v}`)
+                ).example(123) // example is for input side of the transformation
               }),
-              handler: async () => ({ result: 123 })
+              handler: async () => ({ numericStr: 123 })
             })
           }
         },

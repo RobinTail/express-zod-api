@@ -1,7 +1,8 @@
 import {z} from './index';
 
-// @todo this depends on IO, perhaps I need two parameters here
-type ExampleProp<T extends z.ZodTypeAny> = T['_output'] | T['_input'];
+// example value is always for the schema input
+// output example (for the response) will be generated automatically: @see getExamples()
+export type ExampleProp<T extends z.ZodTypeAny> = T['_input'];
 type DescriptionProp = string;
 
 export const metadataProp = 'expressZodApiMeta';

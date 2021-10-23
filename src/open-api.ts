@@ -9,6 +9,7 @@ import {z} from 'zod';
 import {OpenAPIError} from './errors';
 import {ZodFile} from './file-schema';
 import {ArrayElement, extractObjectSchema, getMeta} from './helpers';
+import {ExampleProp} from './metadata';
 import {Routing, routingCycle, RoutingCycleParams} from './routing';
 import {ZodUpload} from './upload-schema';
 
@@ -21,8 +22,8 @@ const describeSchema = (value: z.ZodTypeAny, isResponse: boolean): SchemaObject 
   if (description) {
     otherProps.description = description;
   }
-  const examples = getMeta(value, 'examples');
-  if (examples && examples.length > 0) {
+  const examples = getExamples(value, isResponse);
+  if (examples.length > 0) {
     otherProps.example = examples[0];
   }
   switch (true) {
@@ -298,6 +299,20 @@ const describeEffect = (value: z.ZodEffects<any>, isResponse: boolean): SchemaOb
     };
   }
   return input;
+};
+
+const getExamples = <T extends z.ZodTypeAny>(schema: T, isResponse: boolean): ExampleProp<T>[] => {
+  const examples = getMeta(schema, 'examples');
+  if (examples === undefined) {
+    return [];
+  }
+  if (isResponse) {
+    return examples.reduce((carry, example) => {
+      const parsedExample = schema.safeParse(example);
+      return carry.concat(parsedExample.success ? parsedExample.data : []);
+    }, []);
+  }
+  return examples;
 };
 
 interface GenerationParams {
