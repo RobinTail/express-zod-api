@@ -1,5 +1,5 @@
 import {z, withMeta} from '../../src';
-import {MetaDef, metaProp} from '../../src/metadata';
+import {hasMeta, MetaDef, metaProp} from '../../src/metadata';
 
 describe('Metadata', () => {
   describe('withMeta()', () => {
@@ -64,6 +64,23 @@ describe('Metadata', () => {
       expect((
         schemaWithMeta.email()._def as unknown as MetaDef<typeof schemaWithMeta>
       )[metaProp].description).toBe('test');
+    });
+  });
+
+  describe('hasMeta()', () => {
+    test('should return false if the schema definition has no meta prop', () => {
+      expect(hasMeta(z.string())).toBeFalsy();
+    });
+    test('should return false if the meta prop has invalid type', () => {
+      const schema1 = z.string();
+      const schema2 = z.string();
+      Object.defineProperty(schema1._def, metaProp, {value: null});
+      expect(hasMeta(schema1)).toBeFalsy();
+      Object.defineProperty(schema2._def, metaProp, {value: 123});
+      expect(hasMeta(schema2)).toBeFalsy();
+    });
+    test('should return true if withMeta() has been used', () => {
+      expect(hasMeta(withMeta(z.string()))).toBeTruthy();
     });
   });
 });
