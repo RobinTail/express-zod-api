@@ -1,14 +1,14 @@
 import {expectType} from 'tsd';
 import {
   combineEndpointAndMiddlewareInputSchemas,
-  extractObjectSchema,
+  extractObjectSchema, getExamples,
   getInitialInput,
   getMessageFromError,
   getStatusCodeFromError,
   isLoggerConfig,
   OutputMarker
 } from '../../src/helpers';
-import {createMiddleware, z, createHttpError, markOutput} from '../../src';
+import {createMiddleware, z, createHttpError, markOutput, withMeta} from '../../src';
 import {Request} from 'express';
 import {MiddlewareDefinition} from '../../src/middleware';
 import {serializeSchemaForTest} from '../helpers';
@@ -334,6 +334,48 @@ describe('Helpers', () => {
       const output = z.object({});
       expect(markOutput(output)).toEqual(output);
       expectType<OutputMarker>(markOutput(output));
+    });
+  });
+
+  describe('getExamples()', () => {
+    test('should return an empty array in case examples are not set', () => {
+      expect(getExamples(z.string(), true)).toEqual([]);
+      expect(getExamples(z.string(), false)).toEqual([]);
+      expect(getExamples(withMeta(z.string()), true)).toEqual([]);
+      expect(getExamples(withMeta(z.string()), false)).toEqual([]);
+      expect(getExamples(withMeta(z.string()).description('some'), false)).toEqual([]);
+    });
+    test('should return examples as they are in case of no output parsing', () => {
+      expect(getExamples(
+        withMeta(z.string())
+          .example('some')
+          .example('another'),
+        false
+      )).toEqual(['some', 'another']);
+    });
+    test('should return parsed examples for output on demand', () => {
+      expect(getExamples(
+        withMeta(z.string().transform((v) => parseInt(v, 10)))
+          .example('123')
+          .example('456'),
+        true
+      )).toEqual([123, 456]);
+    });
+    test('should filter out invalid examples according to the schema in both cases', () => {
+      expect(getExamples(
+        withMeta(z.string())
+          .example('some')
+          .example(123 as unknown as string)
+          .example('another'),
+        false
+      )).toEqual(['some', 'another']);
+      expect(getExamples(
+        withMeta(z.string().transform((v) => parseInt(v, 10)))
+          .example('123')
+          .example(null as unknown as string)
+          .example('456'),
+        true
+      )).toEqual([123, 456]);
     });
   });
 });
