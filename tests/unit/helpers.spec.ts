@@ -11,7 +11,7 @@ import {
 } from '../../src/helpers';
 import {createMiddleware, z, createHttpError, markOutput, withMeta} from '../../src';
 import {Request} from 'express';
-import {metadataProp} from '../../src/metadata';
+import {metaProp} from '../../src/metadata';
 import {MiddlewareDefinition} from '../../src/middleware';
 import {serializeSchemaForTest} from '../helpers';
 
@@ -346,9 +346,9 @@ describe('Helpers', () => {
     test('should return undefined on malformed schema', () => {
       const schema1 = z.string();
       const schema2 = z.string();
-      Object.defineProperty(schema1._def, metadataProp, {value: null});
+      Object.defineProperty(schema1._def, metaProp, {value: null});
       expect(getMeta(schema1, 'description')).toBeUndefined();
-      Object.defineProperty(schema2._def, metadataProp, {value: 123});
+      Object.defineProperty(schema2._def, metaProp, {value: 123});
       expect(getMeta(schema2, 'description')).toBeUndefined();
     });
     test('should return undefined if the value not set', () => {

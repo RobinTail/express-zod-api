@@ -5,10 +5,11 @@ import {z} from './index';
 type ExampleProp<T extends z.ZodTypeAny> = z.input<T>;
 type DescriptionProp = string;
 
-export const metadataProp = 'expressZodApiMeta';
+export const metaProp = 'expressZodApiMeta';
+export type MetaProp = typeof metaProp;
 
 export type MetadataDef<T extends z.ZodTypeAny> = {
-  [K in typeof metadataProp]: {
+  [K in MetaProp]: {
     examples: ExampleProp<T>[];
     description?: DescriptionProp;
   };
@@ -26,17 +27,17 @@ type WithMeta<T extends z.ZodTypeAny> = T & {
 
 export const withMeta = <T extends z.ZodTypeAny>(schema: T) => {
   const def = schema._def as MetadataDef<T>;
-  def[metadataProp] = { examples: [] };
+  def[metaProp] = { examples: [] };
   Object.defineProperties(schema, {
     example: {
       get: (): ExampleSetter<T> => (value) => {
-        def[metadataProp].examples.push(value);
+        def[metaProp].examples.push(value);
         return schema as WithMeta<T>;
       }
     },
     description: {
       get: (): DescriptionSetter<T> => (value) => {
-        def[metadataProp].description = value;
+        def[metaProp].description = value;
         return schema as WithMeta<T>;
       }
     }
@@ -44,18 +45,18 @@ export const withMeta = <T extends z.ZodTypeAny>(schema: T) => {
   return schema as WithMeta<T>;
 };
 
-export const hasMetadata = <T extends z.ZodTypeAny>(schema: T): schema is WithMeta<T> => {
-  if (!(metadataProp in schema._def)) {
+export const hasMeta = <T extends z.ZodTypeAny>(schema: T): schema is WithMeta<T> => {
+  if (!(metaProp in schema._def)) {
     return false;
   }
-  return typeof schema._def[metadataProp] === 'object' && schema._def[metadataProp] !== null;
+  return typeof schema._def[metaProp] === 'object' && schema._def[metaProp] !== null;
 };
 
-export const copyMetadata = <A extends z.ZodTypeAny, B extends z.ZodTypeAny>(src: A, dest: B): B | WithMeta<B> => {
-  if (!hasMetadata(src)) {
+export const copyMeta = <A extends z.ZodTypeAny, B extends z.ZodTypeAny>(src: A, dest: B): B | WithMeta<B> => {
+  if (!hasMeta(src)) {
     return dest;
   }
   const def = dest._def as MetadataDef<B>;
-  def[metadataProp] = src._def[metadataProp];
+  def[metaProp] = src._def[metaProp];
   return dest;
 };

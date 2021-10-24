@@ -1,17 +1,17 @@
 import {
+  ContentObject,
+  ExampleObject,
+  ExamplesObject,
+  MediaTypeObject,
   OpenApiBuilder,
   OperationObject,
   ParameterObject,
-  SchemaObject,
-  ContentObject,
-  ExamplesObject,
-  ExampleObject,
-  MediaTypeObject
+  SchemaObject
 } from 'openapi3-ts';
 import {z} from 'zod';
 import {OpenAPIError} from './errors';
 import {ZodFile} from './file-schema';
-import {ArrayElement, extractObjectSchema, getMeta, IOSchema} from './helpers';
+import {ArrayElement, extractObjectSchema, getExamples, getMeta, IOSchema} from './helpers';
 import {Routing, routingCycle, RoutingCycleParams} from './routing';
 import {ZodUpload} from './upload-schema';
 
@@ -301,20 +301,6 @@ const describeEffect = (value: z.ZodEffects<any>, isResponse: boolean): SchemaOb
     };
   }
   return input;
-};
-
-const getExamples = <T extends z.ZodTypeAny>(schema: T, isResponse: boolean) => {
-  const examples = getMeta(schema, 'examples');
-  if (examples === undefined) {
-    return [];
-  }
-  if (isResponse) {
-    return examples.reduce((carry, example) => {
-      const parsedExample = schema.safeParse(example);
-      return carry.concat(parsedExample.success ? parsedExample.data : []);
-    }, [] as z.output<typeof schema>[]);
-  }
-  return examples;
 };
 
 const describeIOExamples = <T extends IOSchema>(schema: T, isResponse: boolean): Pick<MediaTypeObject, 'examples'> => {

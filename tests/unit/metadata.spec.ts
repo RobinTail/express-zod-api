@@ -1,5 +1,5 @@
 import {z, withMeta} from '../../src';
-import {MetadataDef, metadataProp} from '../../src/metadata';
+import {MetadataDef, metaProp} from '../../src/metadata';
 
 describe('Metadata', () => {
   describe('withMeta()', () => {
@@ -8,9 +8,9 @@ describe('Metadata', () => {
       const schemaWithMeta = withMeta(schema);
       expect(schemaWithMeta).toBeInstanceOf(z.ZodString);
       expect(schemaWithMeta).toEqual(schema);
-      expect(metadataProp).toBe('expressZodApiMeta');
-      expect(schemaWithMeta._def).toHaveProperty(metadataProp);
-      expect(schemaWithMeta._def[metadataProp]).toEqual({ examples: [] });
+      expect(metaProp).toBe('expressZodApiMeta');
+      expect(schemaWithMeta._def).toHaveProperty(metaProp);
+      expect(schemaWithMeta._def[metaProp]).toEqual({ examples: [] });
     });
 
     test('should provide description() method', () => {
@@ -30,15 +30,15 @@ describe('Metadata', () => {
     test('description() should set the corresponding metadata in the schema definition', () => {
       const schema = z.string();
       const schemaWithMeta = withMeta(schema).description('test');
-      expect(schemaWithMeta._def[metadataProp]).toHaveProperty('description');
-      expect(schemaWithMeta._def[metadataProp].description).toBe('test');
+      expect(schemaWithMeta._def[metaProp]).toHaveProperty('description');
+      expect(schemaWithMeta._def[metaProp].description).toBe('test');
     });
 
     test('example() should set the corresponding metadata in the schema definition', () => {
       const schema = z.string();
       const schemaWithMeta = withMeta(schema).example('test');
-      expect(schemaWithMeta._def[metadataProp]).toHaveProperty('examples');
-      expect(schemaWithMeta._def[metadataProp].examples).toEqual(['test']);
+      expect(schemaWithMeta._def[metaProp]).toHaveProperty('examples');
+      expect(schemaWithMeta._def[metaProp].examples).toEqual(['test']);
     });
 
     test('example() can set multiple examples', () => {
@@ -47,23 +47,23 @@ describe('Metadata', () => {
         .example('test1')
         .example('test2')
         .example('test3');
-      expect(schemaWithMeta._def[metadataProp].examples).toEqual(['test1', 'test2', 'test3']);
+      expect(schemaWithMeta._def[metaProp].examples).toEqual(['test1', 'test2', 'test3']);
     });
 
     test('should handle multiple metas', () => {
       const schema = z.string();
       const schemaWithMeta = withMeta(schema).description('something').example('test');
-      expect(schemaWithMeta._def[metadataProp].description).toBe('something');
-      expect(schemaWithMeta._def[metadataProp].examples).toEqual(['test']);
+      expect(schemaWithMeta._def[metaProp].description).toBe('something');
+      expect(schemaWithMeta._def[metaProp].examples).toEqual(['test']);
     });
 
     test('metadata should withstand refinements', () => {
       const schema = z.string();
       const schemaWithMeta = withMeta(schema).description('test');
-      expect(schemaWithMeta._def[metadataProp].description).toBe('test');
+      expect(schemaWithMeta._def[metaProp].description).toBe('test');
       expect((
         schemaWithMeta.email()._def as unknown as MetadataDef<typeof schemaWithMeta>
-      )[metadataProp].description).toBe('test');
+      )[metaProp].description).toBe('test');
     });
   });
 });

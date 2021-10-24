@@ -2,7 +2,7 @@ import {Request} from 'express';
 import {HttpError} from 'http-errors';
 import {z} from 'zod';
 import {CommonConfig, InputSources, LoggerConfig, loggerLevels} from './config-type';
-import {copyMetadata, hasMetadata, MetadataDef, metadataProp} from './metadata';
+import {copyMeta, hasMeta, MetadataDef, MetaProp, metaProp} from './metadata';
 import {Method} from './method';
 import {MiddlewareDefinition} from './middleware';
 import {mimeMultipart} from './mime';
@@ -67,7 +67,7 @@ export function combineEndpointAndMiddlewareInputSchemas<IN extends IOSchema, mI
     .reduce((carry, schema) =>
       extractObjectSchema(carry).merge(extractObjectSchema(schema))
     );
-  return copyMetadata(input, extractObjectSchema(mSchema).merge(extractObjectSchema(input)) as Merge<IN, mIN>);
+  return copyMeta(input, extractObjectSchema(mSchema).merge(extractObjectSchema(input)) as Merge<IN, mIN>);
 }
 
 function areFilesAvailable(request: Request) {
@@ -129,14 +129,28 @@ export function getStatusCodeFromError(error: Error): number {
 
 export function getMeta<
   T extends z.ZodTypeAny,
-  K extends keyof MetadataDef<T>[typeof metadataProp]
->(schema: T, meta: K): MetadataDef<T>[typeof metadataProp][K] | undefined {
-  if (!hasMetadata(schema)) {
+  K extends keyof MetadataDef<T>[MetaProp]
+>(schema: T, meta: K): MetadataDef<T>[MetaProp][K] | undefined {
+  if (!hasMeta(schema)) {
     return undefined;
   }
   const def = schema._def as MetadataDef<T>;
-  return meta in def[metadataProp] ? def[metadataProp][meta] : undefined;
+  return meta in def[metaProp] ? def[metaProp][meta] : undefined;
 }
+
+export const getExamples = <T extends z.ZodTypeAny>(schema: T, parseToOutput: boolean) => {
+  const examples = getMeta(schema, 'examples');
+  if (examples === undefined) {
+    return [];
+  }
+  if (parseToOutput) {
+    return examples.reduce((carry, example) => {
+      const parsedExample = schema.safeParse(example);
+      return carry.concat(parsedExample.success ? parsedExample.data : []);
+    }, [] as z.output<typeof schema>[]);
+  }
+  return examples;
+};
 
 // obtaining the private helper type from Zod
 export type ErrMessage = Exclude<Parameters<typeof z.ZodString.prototype.email>[0], undefined>;
