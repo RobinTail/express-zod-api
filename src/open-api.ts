@@ -303,7 +303,8 @@ const describeEffect = (value: z.ZodEffects<any>, isResponse: boolean): SchemaOb
   return input;
 };
 
-const describeIOExamples = <T extends IOSchema>(schema: T, isResponse: boolean): Pick<MediaTypeObject, 'examples'> => {
+type MediaExamples = Pick<MediaTypeObject, 'examples'>;
+const describeIOExamples = <T extends IOSchema>(schema: T, isResponse: boolean): MediaExamples => {
   const examples = getExamples(schema, isResponse);
   if (examples.length === 0) {
     return {};
@@ -318,7 +319,7 @@ const describeIOExamples = <T extends IOSchema>(schema: T, isResponse: boolean):
   };
 };
 
-const describeIOParamExamples = <T extends IOSchema>(schema: T, isResponse: boolean, param: string): Pick<MediaTypeObject, 'examples'> => {
+const describeIOParamExamples = <T extends IOSchema>(schema: T, isResponse: boolean, param: string): MediaExamples => {
   const examples = getExamples(schema, isResponse);
   if (examples.length === 0) {
     return {};
