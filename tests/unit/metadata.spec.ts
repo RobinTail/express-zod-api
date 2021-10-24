@@ -1,5 +1,6 @@
 import {z, withMeta} from '../../src';
-import {hasMeta, MetaDef, metaProp} from '../../src/metadata';
+import {getMeta} from '../../src/helpers';
+import {copyMeta, hasMeta, MetaDef, metaProp} from '../../src/metadata';
 
 describe('Metadata', () => {
   describe('withMeta()', () => {
@@ -81,6 +82,45 @@ describe('Metadata', () => {
     });
     test('should return true if withMeta() has been used', () => {
       expect(hasMeta(withMeta(z.string()))).toBeTruthy();
+    });
+  });
+
+  describe('copyMeta()', () => {
+    test('should return the same dest schema in case src one has no meta', () => {
+      const src = z.string();
+      const dest = z.number();
+      const result = copyMeta(src, dest);
+      expect(result).toEqual(dest);
+      expect(hasMeta(result)).toBeFalsy();
+      expect(hasMeta(dest)).toBeFalsy();
+    });
+    test('should copy meta from src to dest in case meta is defined', () => {
+      const src = withMeta(z.string()).description('test').example('some');
+      const dest = z.number();
+      const result = copyMeta(src, dest);
+      expect(hasMeta(result)).toBeTruthy();
+      expect(getMeta(result, 'description')).toBe(getMeta(src, 'description'));
+      expect(getMeta(result, 'examples')).toEqual(getMeta(src, 'examples'));
+      expect(result).toEqual(dest);
+    });
+
+    // @todo I believe it should actually merge them somehow
+    test('should replace meta in dest by the one from src', () => {
+      const src = withMeta(z.object({
+        a: z.string()
+      })).description('test').example({
+        a: 'some'
+      });
+      const dest = withMeta(z.object({
+        b: z.number()
+      })).description('other').example({
+        b: 123
+      });
+      const result = copyMeta(src, dest);
+      expect(hasMeta(result)).toBeTruthy();
+      expect(getMeta(result, 'description')).toBe(getMeta(src, 'description'));
+      expect(getMeta(result, 'examples')).toEqual(getMeta(src, 'examples'));
+      expect(result).toEqual(dest);
     });
   });
 });
