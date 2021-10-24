@@ -141,13 +141,14 @@ export const getExamples = <T extends z.ZodTypeAny>(schema: T, parseToOutput: bo
   if (examples === undefined) {
     return [];
   }
-  if (parseToOutput) {
-    return examples.reduce((carry, example) => {
-      const parsedExample = schema.safeParse(example);
-      return carry.concat(parsedExample.success ? parsedExample.data : []);
-    }, [] as z.output<typeof schema>[]);
-  }
-  return examples;
+  return examples.reduce((carry, example) => {
+    const parsedExample = schema.safeParse(example);
+    return carry.concat(parsedExample.success
+      ? parseToOutput
+        ? parsedExample.data
+        : example : []
+    );
+  }, [] as z.output<typeof schema>[]);
 };
 
 // obtaining the private helper type from Zod
