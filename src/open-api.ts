@@ -11,7 +11,8 @@ import {
 import {z} from 'zod';
 import {OpenAPIError} from './errors';
 import {ZodFile} from './file-schema';
-import {ArrayElement, extractObjectSchema, getExamples, getMeta, IOSchema} from './helpers';
+import {ArrayElement, extractObjectSchema, getExamples, IOSchema} from './helpers';
+import {getMeta} from './metadata';
 import {Routing, routingCycle, RoutingCycleParams} from './routing';
 import {ZodUpload} from './upload-schema';
 

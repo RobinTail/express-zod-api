@@ -5,12 +5,11 @@ import {ApiResponse, createApiResponse} from './api-response';
 import {ResultHandlerError} from './errors';
 import {
   getMessageFromError,
-  getMeta,
   getStatusCodeFromError,
   IOSchema,
   markOutput
 } from './helpers';
-import {withMeta} from './metadata';
+import {getMeta, withMeta} from './metadata';
 
 interface LastResortHandlerParams {
   error: ResultHandlerError;

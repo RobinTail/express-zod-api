@@ -1,6 +1,5 @@
 import {z, withMeta} from '../../src';
-import {getMeta} from '../../src/helpers';
-import {copyMeta, hasMeta, MetaDef, metaProp} from '../../src/metadata';
+import {copyMeta, getMeta, hasMeta, MetaDef, metaProp} from '../../src/metadata';
 
 describe('Metadata', () => {
   describe('withMeta()', () => {
@@ -82,6 +81,36 @@ describe('Metadata', () => {
     });
     test('should return true if withMeta() has been used', () => {
       expect(hasMeta(withMeta(z.string()))).toBeTruthy();
+    });
+  });
+
+  describe('getMeta()', () => {
+    test('should return undefined on a regular Zod schema or the malformed one', () => {
+      expect(getMeta(z.string(), 'description')).toBeUndefined();
+    });
+    test('should return undefined on malformed schema', () => {
+      const schema1 = z.string();
+      const schema2 = z.string();
+      Object.defineProperty(schema1._def, metaProp, {value: null});
+      expect(getMeta(schema1, 'description')).toBeUndefined();
+      Object.defineProperty(schema2._def, metaProp, {value: 123});
+      expect(getMeta(schema2, 'description')).toBeUndefined();
+    });
+    test('should return undefined if the value not set', () => {
+      expect(getMeta(withMeta(z.string()), 'description')).toBeUndefined();
+    });
+    test('should return the value that has been set', () => {
+      expect(getMeta(
+        withMeta(z.string()).description('test'),
+        'description')
+      ).toBe('test');
+    });
+    test('should return an array of examples', () => {
+      expect(getMeta(withMeta(z.string()), 'examples')).toEqual([]);
+      expect(getMeta(
+        withMeta(z.string()).example('test1').example('test2'),
+        'examples'
+      )).toEqual(['test1', 'test2']);
     });
   });
 

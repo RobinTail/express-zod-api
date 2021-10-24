@@ -2,7 +2,7 @@ import {Request} from 'express';
 import {HttpError} from 'http-errors';
 import {z} from 'zod';
 import {CommonConfig, InputSources, LoggerConfig, loggerLevels} from './config-type';
-import {copyMeta, hasMeta, MetaKey, MetaDef, metaProp, MetaValue} from './metadata';
+import {copyMeta, getMeta} from './metadata';
 import {Method} from './method';
 import {MiddlewareDefinition} from './middleware';
 import {mimeMultipart} from './mime';
@@ -125,14 +125,6 @@ export function getStatusCodeFromError(error: Error): number {
     return 400;
   }
   return 500;
-}
-
-export function getMeta<T extends z.ZodTypeAny, K extends MetaKey>(schema: T, meta: K): MetaValue<T, K> | undefined {
-  if (!hasMeta(schema)) {
-    return undefined;
-  }
-  const def = schema._def as MetaDef<T>;
-  return meta in def[metaProp] ? def[metaProp][meta] : undefined;
 }
 
 type Examples<T extends z.ZodTypeAny> = Readonly<z.input<T>[] | z.output<T>[]>;
