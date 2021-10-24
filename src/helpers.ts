@@ -135,7 +135,8 @@ export function getMeta<T extends z.ZodTypeAny, K extends MetaKey>(schema: T, me
   return meta in def[metaProp] ? def[metaProp][meta] : undefined;
 }
 
-export const getExamples = <T extends z.ZodTypeAny>(schema: T, parseToOutput: boolean) => {
+type Examples<T extends z.ZodTypeAny> = Readonly<z.input<T>[] | z.output<T>[]>;
+export const getExamples = <T extends z.ZodTypeAny>(schema: T, parseToOutput: boolean): Examples<T> => {
   const examples = getMeta(schema, 'examples');
   if (examples === undefined) {
     return [];

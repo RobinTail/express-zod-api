@@ -10,7 +10,7 @@ export type MetaDef<T extends z.ZodTypeAny> = {
   };
 };
 export type MetaKey = keyof MetaDef<any>[MetaProp];
-export type MetaValue<T extends z.ZodTypeAny, K extends MetaKey> = MetaDef<T>[MetaProp][K];
+export type MetaValue<T extends z.ZodTypeAny, K extends MetaKey> = Readonly<MetaDef<T>[MetaProp][K]>;
 
 type ExampleSetter<T extends z.ZodTypeAny> = (example: z.input<T>) => WithMeta<T>;
 type DescriptionSetter<T extends z.ZodTypeAny> = (description: string) => WithMeta<T>;
