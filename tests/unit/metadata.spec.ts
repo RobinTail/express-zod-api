@@ -1,5 +1,5 @@
 import {z, withMeta} from '../../src';
-import {MetadataDef, metaProp} from '../../src/metadata';
+import {MetaDef, metaProp} from '../../src/metadata';
 
 describe('Metadata', () => {
   describe('withMeta()', () => {
@@ -62,7 +62,7 @@ describe('Metadata', () => {
       const schemaWithMeta = withMeta(schema).description('test');
       expect(schemaWithMeta._def[metaProp].description).toBe('test');
       expect((
-        schemaWithMeta.email()._def as unknown as MetadataDef<typeof schemaWithMeta>
+        schemaWithMeta.email()._def as unknown as MetaDef<typeof schemaWithMeta>
       )[metaProp].description).toBe('test');
     });
   });

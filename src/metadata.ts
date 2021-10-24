@@ -1,32 +1,27 @@
 import {z} from './index';
 
-// example value is always for the schema input
-// output example (for the response) will be generated automatically: @see getExamples()
-type ExampleProp<T extends z.ZodTypeAny> = z.input<T>;
-type DescriptionProp = string;
-
 export const metaProp = 'expressZodApiMeta';
 export type MetaProp = typeof metaProp;
 
-export type MetadataDef<T extends z.ZodTypeAny> = {
+export type MetaDef<T extends z.ZodTypeAny> = {
   [K in MetaProp]: {
-    examples: ExampleProp<T>[];
-    description?: DescriptionProp;
+    examples: z.input<T>[];
+    description?: string;
   };
 };
+export type MetaKey = keyof MetaDef<any>[MetaProp];
+export type MetaValue<T extends z.ZodTypeAny, K extends MetaKey> = MetaDef<T>[MetaProp][K];
 
-type ExampleSetter<T extends z.ZodTypeAny> = (example: ExampleProp<T>) => WithMeta<T>;
-type DescriptionSetter<T extends z.ZodTypeAny> = (description: DescriptionProp) => WithMeta<T>;
+type ExampleSetter<T extends z.ZodTypeAny> = (example: z.input<T>) => WithMeta<T>;
+type DescriptionSetter<T extends z.ZodTypeAny> = (description: string) => WithMeta<T>;
 type WithMeta<T extends z.ZodTypeAny> = T & {
+  _def: T['_def'] & MetaDef<T>;
   example: ExampleSetter<T>;
   description: DescriptionSetter<T>;
-  _def: T['_def'] & MetadataDef<T>;
 }
 
-// @see https://github.com/RobinTail/express-zod-api/discussions/165
-
 export const withMeta = <T extends z.ZodTypeAny>(schema: T) => {
-  const def = schema._def as MetadataDef<T>;
+  const def = schema._def as MetaDef<T>;
   def[metaProp] = { examples: [] };
   Object.defineProperties(schema, {
     example: {
@@ -56,7 +51,7 @@ export const copyMeta = <A extends z.ZodTypeAny, B extends z.ZodTypeAny>(src: A,
   if (!hasMeta(src)) {
     return dest;
   }
-  const def = dest._def as MetadataDef<B>;
+  const def = dest._def as MetaDef<B>;
   def[metaProp] = src._def[metaProp];
   return dest;
 };
