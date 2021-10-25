@@ -17,6 +17,9 @@ const describeSchema = (value: z.ZodTypeAny, isResponse: boolean): SchemaObject 
   if (value.isNullable()) {
     otherProps.nullable = true;
   }
+  if (value.description) {
+    otherProps.description = `${value.description}`;
+  }
   switch (true) {
     case value instanceof z.ZodString:
       return {
@@ -344,8 +347,8 @@ export class OpenAPI extends OpenApiBuilder {
             in: 'query',
             required: !subject[name].isOptional(),
             schema: {
-              ...describeSchema(subject[name], false),
-              description: `${method.toUpperCase()} ${fullPath} parameter`
+              description: `${method.toUpperCase()} ${fullPath} parameter`,
+              ...describeSchema(subject[name], false)
             },
           });
         });
@@ -355,8 +358,8 @@ export class OpenAPI extends OpenApiBuilder {
             ...carry,
             [mimeType]: {
               schema: {
-                ...describeSchema(endpoint.getInputSchema(), false),
-                description: `${method.toUpperCase()} ${fullPath} request body`
+                description: `${method.toUpperCase()} ${fullPath} request body`,
+                ...describeSchema(endpoint.getInputSchema(), false)
               }
             }
           }), {} as ContentObject)
