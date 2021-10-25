@@ -62,9 +62,9 @@ paths:
           in: query
           required: true
           schema:
+            description: a numeric string containing the id of the user
             type: string
             pattern: /\d+/
-            description: GET /v1/user/retrieve parameter
   /v1/avatar/send:
     get:
       responses:
@@ -85,9 +85,9 @@ paths:
           in: query
           required: true
           schema:
+            description: GET /v1/avatar/send parameter
             type: string
             pattern: /\d+/
-            description: GET /v1/avatar/send parameter
   /v1/avatar/stream:
     get:
       responses:
@@ -109,9 +109,9 @@ paths:
           in: query
           required: true
           schema:
+            description: GET /v1/avatar/stream parameter
             type: string
             pattern: /\d+/
-            description: GET /v1/avatar/stream parameter
   /v1/avatar/upload:
     post:
       responses:
@@ -181,6 +181,7 @@ paths:
         content:
           multipart/form-data:
             schema:
+              description: POST /v1/avatar/upload request body
               type: object
               properties:
                 avatar:
@@ -188,7 +189,6 @@ paths:
                   format: binary
               required:
                 - avatar
-              description: POST /v1/avatar/upload request body
   /v2/user:
     post:
       responses:
@@ -247,6 +247,7 @@ paths:
         content:
           application/json:
             schema:
+              description: POST /v2/user request body
               type: object
               properties:
                 key:
@@ -266,7 +267,6 @@ paths:
                 - key
                 - id
                 - name
-              description: POST /v2/user request body
 components:
   schemas: {}
   responses: {}
