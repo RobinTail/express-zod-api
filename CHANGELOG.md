@@ -2,6 +2,10 @@
 
 ## Version 2
 
+### v2.8.2
+
+- Zod version is 3.10.3.
+
 ### v2.8.1
 
 - Fixed issue #169. Suddenly I found out that `yarn` does NOT respect `yarn.lock` files of sub-dependencies. So the
@@ -60,7 +64,7 @@ const config = createConfig({
 
 ### v2.6.0
 
-- Zod version is 3.9.8
+- Zod version is 3.9.8.
   - It supports the ability to specify the key schema of `z.record()`.
   - In case of using enums and literals in the key schema they will be described as required ones in the generated 
     OpenAPI / Swagger documentation.
