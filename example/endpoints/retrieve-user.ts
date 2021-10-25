@@ -7,7 +7,9 @@ export const retrieveUserEndpoint = defaultEndpointsFactory
     method: 'get',
     description: 'example user retrieval endpoint',
     input: withMeta(z.object({
-      id: z.string().regex(/\d+/).transform((id) => parseInt(id, 10))
+      id: z.string().regex(/\d+/)
+        .transform((id) => parseInt(id, 10))
+        .describe('a numeric string containing the id of the user')
     })).example({ id: '12' }), // whole IO schema example
     output: withMeta(z.object({
       id: z.number().int().nonnegative(),

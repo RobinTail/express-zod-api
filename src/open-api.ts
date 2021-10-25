@@ -12,7 +12,6 @@ import {z} from 'zod';
 import {OpenAPIError} from './errors';
 import {ZodFile} from './file-schema';
 import {ArrayElement, extractObjectSchema, getExamples, IOSchema} from './helpers';
-import {getMeta} from './metadata';
 import {Routing, routingCycle, RoutingCycleParams} from './routing';
 import {ZodUpload} from './upload-schema';
 
@@ -21,9 +20,8 @@ const describeSchema = (value: z.ZodTypeAny, isResponse: boolean): SchemaObject 
   if (value.isNullable()) {
     otherProps.nullable = true;
   }
-  const description = getMeta(value, 'description');
-  if (description) {
-    otherProps.description = description;
+  if (value.description) {
+    otherProps.description = `${value.description}`;
   }
   const examples = getExamples(value, isResponse);
   if (examples.length > 0) {
@@ -388,14 +386,13 @@ export class OpenAPI extends OpenApiBuilder {
         operation.parameters = [];
         const subject = extractObjectSchema(endpoint.getInputSchema()).shape;
         Object.keys(subject).forEach((name) => {
-          const paramSchema = describeSchema(subject[name], false);
           (operation.parameters as ParameterObject[]).push({
             name,
             in: 'query',
             required: !subject[name].isOptional(),
             schema: {
-              ...paramSchema,
-              description: paramSchema.description || `${method.toUpperCase()} ${fullPath} parameter`,
+              description: `${method.toUpperCase()} ${fullPath} parameter`,
+              ...describeSchema(subject[name], false)
             },
             ...describeIOParamExamples(endpoint.getInputSchema(), false, name)
           });
@@ -408,8 +405,8 @@ export class OpenAPI extends OpenApiBuilder {
             ...carry,
             [mimeType]: {
               schema: {
-                ...bodySchema,
-                description: `${method.toUpperCase()} ${fullPath} request body`
+                description: `${method.toUpperCase()} ${fullPath} request body`,
+                ...bodySchema
               },
               ...describeIOExamples(endpoint.getInputSchema(), false)
             }

@@ -498,10 +498,10 @@ describe('Open API generator', () => {
             getSomething: defaultEndpointsFactory.build({
               method: 'get',
               input: z.object({
-                str: withMeta(z.string()).description('here is the test')
+                str: z.string().describe('here is the test')
               }),
               output: z.object({
-                result: withMeta(z.number().int().positive()).description('some positive integer')
+                result: z.number().int().positive().describe('some positive integer')
               }),
               handler: async () => ({ result: 123 })
             })

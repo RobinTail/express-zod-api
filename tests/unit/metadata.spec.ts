@@ -13,25 +13,11 @@ describe('Metadata', () => {
       expect(schemaWithMeta._def[metaProp]).toEqual({ examples: [] });
     });
 
-    test('should provide description() method', () => {
-      const schema = z.string();
-      const schemaWithMeta = withMeta(schema);
-      expect(schemaWithMeta).toHaveProperty('description');
-      expect(typeof schemaWithMeta.description).toBe('function');
-    });
-
     test('should provide example() method', () => {
       const schema = z.string();
       const schemaWithMeta = withMeta(schema);
       expect(schemaWithMeta).toHaveProperty('example');
       expect(typeof schemaWithMeta.example).toBe('function');
-    });
-
-    test('description() should set the corresponding metadata in the schema definition', () => {
-      const schema = z.string();
-      const schemaWithMeta = withMeta(schema).description('test');
-      expect(schemaWithMeta._def[metaProp]).toHaveProperty('description');
-      expect(schemaWithMeta._def[metaProp].description).toBe('test');
     });
 
     test('example() should set the corresponding metadata in the schema definition', () => {
@@ -50,20 +36,13 @@ describe('Metadata', () => {
       expect(schemaWithMeta._def[metaProp].examples).toEqual(['test1', 'test2', 'test3']);
     });
 
-    test('should handle multiple metas', () => {
-      const schema = z.string();
-      const schemaWithMeta = withMeta(schema).description('something').example('test');
-      expect(schemaWithMeta._def[metaProp].description).toBe('something');
-      expect(schemaWithMeta._def[metaProp].examples).toEqual(['test']);
-    });
-
     test('metadata should withstand refinements', () => {
       const schema = z.string();
-      const schemaWithMeta = withMeta(schema).description('test');
-      expect(schemaWithMeta._def[metaProp].description).toBe('test');
+      const schemaWithMeta = withMeta(schema).example('test');
+      expect(schemaWithMeta._def[metaProp].examples).toEqual(['test']);
       expect((
         schemaWithMeta.email()._def as unknown as MetaDef<typeof schemaWithMeta>
-      )[metaProp].description).toBe('test');
+      )[metaProp].examples).toEqual(['test']);
     });
   });
 
@@ -86,24 +65,24 @@ describe('Metadata', () => {
 
   describe('getMeta()', () => {
     test('should return undefined on a regular Zod schema or the malformed one', () => {
-      expect(getMeta(z.string(), 'description')).toBeUndefined();
+      expect(getMeta(z.string(), 'examples')).toBeUndefined();
     });
     test('should return undefined on malformed schema', () => {
       const schema1 = z.string();
       const schema2 = z.string();
       Object.defineProperty(schema1._def, metaProp, {value: null});
-      expect(getMeta(schema1, 'description')).toBeUndefined();
+      expect(getMeta(schema1, 'examples')).toBeUndefined();
       Object.defineProperty(schema2._def, metaProp, {value: 123});
-      expect(getMeta(schema2, 'description')).toBeUndefined();
+      expect(getMeta(schema2, 'examples')).toBeUndefined();
     });
-    test('should return undefined if the value not set', () => {
-      expect(getMeta(withMeta(z.string()), 'description')).toBeUndefined();
+    test('should return initial value if the value not set', () => {
+      expect(getMeta(withMeta(z.string()), 'examples')).toEqual([]);
     });
     test('should return the value that has been set', () => {
       expect(getMeta(
-        withMeta(z.string()).description('test'),
-        'description')
-      ).toBe('test');
+        withMeta(z.string()).example('test'),
+        'examples')
+      ).toEqual(['test']);
     });
     test('should return an array of examples', () => {
       expect(getMeta(withMeta(z.string()), 'examples')).toEqual([]);
@@ -124,11 +103,10 @@ describe('Metadata', () => {
       expect(hasMeta(dest)).toBeFalsy();
     });
     test('should copy meta from src to dest in case meta is defined', () => {
-      const src = withMeta(z.string()).description('test').example('some');
+      const src = withMeta(z.string()).example('some');
       const dest = z.number();
       const result = copyMeta(src, dest);
       expect(hasMeta(result)).toBeTruthy();
-      expect(getMeta(result, 'description')).toBe(getMeta(src, 'description'));
       expect(getMeta(result, 'examples')).toEqual(getMeta(src, 'examples'));
       expect(result).toEqual(dest);
     });
@@ -137,17 +115,16 @@ describe('Metadata', () => {
     test('should replace meta in dest by the one from src', () => {
       const src = withMeta(z.object({
         a: z.string()
-      })).description('test').example({
+      })).example({
         a: 'some'
       });
       const dest = withMeta(z.object({
         b: z.number()
-      })).description('other').example({
+      })).example({
         b: 123
       });
       const result = copyMeta(src, dest);
       expect(hasMeta(result)).toBeTruthy();
-      expect(getMeta(result, 'description')).toBe(getMeta(src, 'description'));
       expect(getMeta(result, 'examples')).toEqual(getMeta(src, 'examples'));
       expect(result).toEqual(dest);
     });

@@ -343,7 +343,6 @@ describe('Helpers', () => {
       expect(getExamples(z.string(), false)).toEqual([]);
       expect(getExamples(withMeta(z.string()), true)).toEqual([]);
       expect(getExamples(withMeta(z.string()), false)).toEqual([]);
-      expect(getExamples(withMeta(z.string()).description('some'), false)).toEqual([]);
     });
     test('should return examples as they are in case of no output parsing', () => {
       expect(getExamples(

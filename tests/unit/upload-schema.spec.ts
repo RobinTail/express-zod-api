@@ -1,4 +1,3 @@
-import {ParseContext} from 'zod';
 import {ZodUpload} from '../../src/upload-schema';
 
 describe('ZodUpload', () => {
@@ -12,32 +11,22 @@ describe('ZodUpload', () => {
 
   describe('_parse()', () => {
     test('should handle wrong parsed type', () => {
-      const context = new ParseContext({
-        path: null,
-        issues: [],
-        async: false,
-      });
       const schema = ZodUpload.create();
-      const result = schema._parse(context, 123, 'number');
-      expect(result).toEqual({
-        valid: false
-      });
-      expect(context.issues).toEqual([{
-        code: 'custom',
-        message: 'Expected file upload, received number',
-        path: [],
-      }]);
+      const result = schema.safeParse(123);
+      expect(result.success).toBeFalsy();
+      if (!result.success) {
+        expect(result.error.issues).toEqual([{
+          code: 'custom',
+          message: 'Expected file upload, received number',
+          path: [],
+        }]);
+      }
     });
 
     test('should accept UploadedFile', () => {
-      const context = new ParseContext({
-        path: null,
-        issues: [],
-        async: false,
-      });
       const schema = ZodUpload.create();
       const buffer = Buffer.from('something');
-      const result = schema._parse(context, {
+      const result = schema.safeParse({
         name: 'avatar.jpg',
         mv: async () => Promise.resolve(),
         encoding: 'utf-8',
@@ -47,9 +36,8 @@ describe('ZodUpload', () => {
         truncated: false,
         size: 100500,
         md5: ''
-      }, 'object');
+      });
       expect(result).toMatchSnapshot();
-      expect(context.issues).toEqual([]);
     });
   });
 });

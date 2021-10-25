@@ -6,18 +6,15 @@ type MetaProp = typeof metaProp;
 export type MetaDef<T extends z.ZodTypeAny> = {
   [K in MetaProp]: {
     examples: z.input<T>[];
-    description?: string;
   };
 };
 type MetaKey = keyof MetaDef<any>[MetaProp];
 type MetaValue<T extends z.ZodTypeAny, K extends MetaKey> = Readonly<MetaDef<T>[MetaProp][K]>;
 
 type ExampleSetter<T extends z.ZodTypeAny> = (example: z.input<T>) => WithMeta<T>;
-type DescriptionSetter<T extends z.ZodTypeAny> = (description: string) => WithMeta<T>;
 type WithMeta<T extends z.ZodTypeAny> = T & {
   _def: T['_def'] & MetaDef<T>;
   example: ExampleSetter<T>;
-  description: DescriptionSetter<T>;
 }
 
 export const withMeta = <T extends z.ZodTypeAny>(schema: T) => {
@@ -27,12 +24,6 @@ export const withMeta = <T extends z.ZodTypeAny>(schema: T) => {
     example: {
       get: (): ExampleSetter<T> => (value) => {
         def[metaProp].examples.push(value);
-        return schema as WithMeta<T>;
-      }
-    },
-    description: {
-      get: (): DescriptionSetter<T> => (value) => {
-        def[metaProp].description = value;
         return schema as WithMeta<T>;
       }
     }

@@ -65,11 +65,11 @@ paths:
           in: query
           required: true
           schema:
+            description: GET /v1/getSomething parameter
             type: array
             items:
               type: string
             minItems: 1
-            description: GET /v1/getSomething parameter
     post:
       responses:
         \\"200\\":
@@ -127,6 +127,7 @@ paths:
         content:
           application/json:
             schema:
+              description: POST /v1/getSomething request body
               type: object
               properties:
                 arr:
@@ -136,7 +137,6 @@ paths:
                   minItems: 1
               required:
                 - arr
-              description: POST /v1/getSomething request body
 components:
   schemas: {}
   responses: {}
@@ -227,6 +227,7 @@ paths:
         content:
           application/json:
             schema:
+              description: POST /v1/getSomething request body
               type: object
               properties:
                 id:
@@ -236,7 +237,6 @@ paths:
                 field2:
                   type: string
               required: []
-              description: POST /v1/getSomething request body
 components:
   schemas: {}
   responses: {}
@@ -328,8 +328,8 @@ paths:
           in: query
           required: true
           schema:
-            type: string
             description: GET /v1/getSomething parameter
+            type: string
           examples:
             example1:
               value: \\"123\\"
@@ -423,13 +423,13 @@ paths:
         content:
           application/json:
             schema:
+              description: POST /v1/getSomething request body
               type: object
               properties:
                 strNum:
                   type: string
               required:
                 - strNum
-              description: POST /v1/getSomething request body
             examples:
               example1:
                 value:
@@ -518,9 +518,9 @@ paths:
           in: query
           required: true
           schema:
+            description: GET /v1/getSomething parameter
             example: \\"123\\"
             type: string
-            description: GET /v1/getSomething parameter
 components:
   schemas: {}
   responses: {}
@@ -695,6 +695,7 @@ paths:
           in: query
           required: true
           schema:
+            description: GET /v1/getSomething parameter
             type: array
             items:
               type: integer
@@ -705,21 +706,20 @@ paths:
               exclusiveMaximum: false
             minItems: 1
             maxItems: 3
-            description: GET /v1/getSomething parameter
         - name: unlimited
           in: query
           required: true
           schema:
+            description: GET /v1/getSomething parameter
             type: array
             items:
               type: boolean
-            description: GET /v1/getSomething parameter
         - name: transformer
           in: query
           required: true
           schema:
-            type: string
             description: GET /v1/getSomething parameter
+            type: string
 components:
   schemas: {}
   responses: {}
@@ -814,6 +814,7 @@ paths:
         content:
           application/json:
             schema:
+              description: POST /v1/getSomething request body
               type: object
               properties:
                 intersection:
@@ -832,7 +833,6 @@ paths:
                         - two
               required:
                 - intersection
-              description: POST /v1/getSomething request body
 components:
   schemas: {}
   responses: {}
@@ -912,26 +912,27 @@ paths:
           in: query
           required: false
           schema:
-            type: string
             description: GET /v1/getSomething parameter
+            type: string
         - name: optDefault
           in: query
           required: false
           schema:
+            description: GET /v1/getSomething parameter
             type: string
             default: test
-            description: GET /v1/getSomething parameter
         - name: nullish
           in: query
           required: false
           schema:
+            description: GET /v1/getSomething parameter
             nullable: true
             type: boolean
-            description: GET /v1/getSomething parameter
         - name: nuDefault
           in: query
           required: false
           schema:
+            description: GET /v1/getSomething parameter
             nullable: true
             type: integer
             format: int64
@@ -940,7 +941,6 @@ paths:
             maximum: 9007199254740991
             exclusiveMaximum: false
             default: 123
-            description: GET /v1/getSomething parameter
 components:
   schemas: {}
   responses: {}
@@ -1025,6 +1025,7 @@ paths:
         content:
           application/json:
             schema:
+              description: POST /v1/getSomething request body
               type: object
               properties:
                 union:
@@ -1059,7 +1060,6 @@ paths:
                         - three
               required:
                 - union
-              description: POST /v1/getSomething request body
 components:
   schemas: {}
   responses: {}
@@ -1157,9 +1157,9 @@ paths:
           in: query
           required: true
           schema:
+            description: a numeric string containing the id of the user
             type: string
             pattern: /\\\\d+/
-            description: GET /v1/user/retrieve parameter
           examples:
             example1:
               value: \\"12\\"
@@ -1183,9 +1183,9 @@ paths:
           in: query
           required: true
           schema:
+            description: GET /v1/avatar/send parameter
             type: string
             pattern: /\\\\d+/
-            description: GET /v1/avatar/send parameter
   /v1/avatar/stream:
     get:
       responses:
@@ -1207,9 +1207,9 @@ paths:
           in: query
           required: true
           schema:
+            description: GET /v1/avatar/stream parameter
             type: string
             pattern: /\\\\d+/
-            description: GET /v1/avatar/stream parameter
   /v1/avatar/upload:
     post:
       responses:
@@ -1285,6 +1285,7 @@ paths:
         content:
           multipart/form-data:
             schema:
+              description: POST /v1/avatar/upload request body
               type: object
               properties:
                 avatar:
@@ -1292,7 +1293,6 @@ paths:
                   format: binary
               required:
                 - avatar
-              description: POST /v1/avatar/upload request body
   /v2/user:
     post:
       responses:
@@ -1357,6 +1357,7 @@ paths:
         content:
           application/json:
             schema:
+              description: POST /v2/user request body
               type: object
               properties:
                 key:
@@ -1376,7 +1377,6 @@ paths:
                 - key
                 - id
                 - name
-              description: POST /v2/user request body
 components:
   schemas: {}
   responses: {}
@@ -1456,6 +1456,7 @@ paths:
         content:
           application/json:
             schema:
+              description: POST /v1/getSomething request body
               type: object
               properties:
                 bigint:
@@ -1470,7 +1471,6 @@ paths:
                 - bigint
                 - boolean
                 - date
-              description: POST /v1/getSomething request body
 components:
   schemas: {}
   responses: {}
@@ -1549,6 +1549,7 @@ paths:
         content:
           application/json:
             schema:
+              description: POST /v1/getSomething request body
               type: object
               properties:
                 double:
@@ -1623,7 +1624,6 @@ paths:
                 - intPositive
                 - intNegative
                 - intLimited
-              description: POST /v1/getSomething request body
 components:
   schemas: {}
   responses: {}
@@ -1702,6 +1702,7 @@ paths:
         content:
           application/json:
             schema:
+              description: POST /v1/getSomething request body
               type: object
               properties:
                 regular:
@@ -1748,7 +1749,6 @@ paths:
                 - url
                 - numeric
                 - combined
-              description: POST /v1/getSomething request body
 components:
   schemas: {}
   responses: {}
@@ -1829,6 +1829,7 @@ paths:
         content:
           application/json:
             schema:
+              description: POST /v1/getSomething request body
               type: object
               properties:
                 regularEnum:
@@ -1838,7 +1839,6 @@ paths:
                     - DEF
               required:
                 - regularEnum
-              description: POST /v1/getSomething request body
 components:
   schemas: {}
   responses: {}
@@ -1963,10 +1963,10 @@ paths:
         content:
           application/json:
             schema:
+              description: POST /v1/getSomething request body
               type: object
               properties: {}
               required: []
-              description: POST /v1/getSomething request body
 components:
   schemas: {}
   responses: {}
@@ -2044,6 +2044,7 @@ paths:
         content:
           application/json:
             schema:
+              description: POST /v1/getSomething request body
               type: object
               properties:
                 one:
@@ -2058,7 +2059,6 @@ paths:
               required:
                 - one
                 - two
-              description: POST /v1/getSomething request body
 components:
   schemas: {}
   responses: {}
@@ -2141,6 +2141,7 @@ paths:
         content:
           application/json:
             schema:
+              description: POST /v1/getSomething request body
               type: object
               properties:
                 ofOne:
@@ -2183,7 +2184,6 @@ paths:
                 - ofOne
                 - ofStrings
                 - complex
-              description: POST /v1/getSomething request body
 components:
   schemas: {}
   responses: {}
@@ -2262,9 +2262,9 @@ paths:
           in: query
           required: false
           schema:
+            description: GET /v1/getSomething parameter
             nullable: true
             format: any
-            description: GET /v1/getSomething parameter
 components:
   schemas: {}
   responses: {}
@@ -2343,19 +2343,19 @@ paths:
           in: query
           required: false
           schema:
+            description: GET /v1/getSomething parameter
             nullable: true
             format: string (preprocessed)
-            description: GET /v1/getSomething parameter
         - name: number
           in: query
           required: true
           schema:
+            description: GET /v1/getSomething parameter
             format: int64 (preprocessed)
             minimum: 0
             exclusiveMinimum: false
             maximum: 9007199254740991
             exclusiveMaximum: false
-            description: GET /v1/getSomething parameter
 components:
   schemas: {}
   responses: {}
