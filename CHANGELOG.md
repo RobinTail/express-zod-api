@@ -2,6 +2,25 @@
 
 ## Version 2
 
+### v2.9.0
+
+- Zod version is 3.11.6.
+- Feature #111:
+  - From now on you can add description to any Zod schema, for example: `z.string().describe('Something')`.
+  - You can add description to a whole I/O schema or its property.
+  - This description will be included into the generated Swagger / OpenAPI documentation.
+```yaml
+example:
+  parameters:
+    - name: id
+      in: query
+      required: true
+      schema:
+        description: a numeric string containing the id of the user
+        type: string
+        pattern: /\d+/
+```
+
 ### v2.8.2
 
 - Zod version is 3.10.3.
