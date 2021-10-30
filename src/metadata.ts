@@ -1,4 +1,5 @@
 import {z} from './index';
+import deepMerge from 'lodash.merge';
 
 export const metaProp = 'expressZodApiMeta';
 type MetaProp = typeof metaProp;
@@ -51,6 +52,6 @@ export const copyMeta = <A extends z.ZodTypeAny, B extends z.ZodTypeAny>(src: A,
     return dest;
   }
   const def = dest._def as MetaDef<B>;
-  def[metaProp] = src._def[metaProp];
+  def[metaProp] = deepMerge(def[metaProp], src._def[metaProp]);
   return dest;
 };

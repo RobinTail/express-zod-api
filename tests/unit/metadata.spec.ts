@@ -111,8 +111,7 @@ describe('Metadata', () => {
       expect(result).toEqual(dest);
     });
 
-    // @todo I believe it should actually merge them somehow
-    test('should replace meta in dest by the one from src', () => {
+    test('should merge the meta from src to dest (deep merge)', () => {
       const src = withMeta(z.object({
         a: z.string()
       })).example({
@@ -125,7 +124,10 @@ describe('Metadata', () => {
       });
       const result = copyMeta(src, dest);
       expect(hasMeta(result)).toBeTruthy();
-      expect(getMeta(result, 'examples')).toEqual(getMeta(src, 'examples'));
+      expect(getMeta(result, 'examples')).toEqual([{
+        a: 'some',
+        b: 123,
+      }]);
       expect(result).toEqual(dest);
     });
   });

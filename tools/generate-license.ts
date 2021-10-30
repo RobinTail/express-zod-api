@@ -67,6 +67,11 @@ const libs: Lib[] = [
     name: 'Express-FileUpload',
     url: 'https://github.com/richardgirges/express-fileupload',
     module: 'express-fileupload'
+  },
+  {
+    name: 'Lodash',
+    url: 'https://github.com/lodash/lodash',
+    module: 'lodash.merge',
   }
 ];
 
