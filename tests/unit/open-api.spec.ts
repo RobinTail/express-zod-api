@@ -594,5 +594,39 @@ describe('Open API generator', () => {
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
+
+    test('should merge endpoint handler examples with its middleware examples', () => {
+      const spec = new OpenAPI({
+        routing: {
+          v1: {
+            getSomething: defaultEndpointsFactory.addMiddleware({
+              input: withMeta(z.object({
+                key: z.string()
+              })).example({
+                key: '1234-56789-01'
+              }),
+              middleware: jest.fn()
+            }).build({
+              method: 'post',
+              input: withMeta(z.object({
+                str: z.string()
+              })).example({
+                str: 'test'
+              }),
+              output: withMeta(z.object({
+                num: z.number()
+              })).example({
+                num: 123
+              }),
+              handler: async () => ({ num: 123 })
+            })
+          }
+        },
+        version: '3.4.5',
+        title: 'Testing Metadata:example on IO schema + middleware',
+        serverUrl: 'http://example.com'
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
+    });
   });
 });
