@@ -116,18 +116,25 @@ describe('Metadata', () => {
         a: z.string()
       })).example({
         a: 'some'
+      }).example({
+        a: 'another'
       });
       const dest = withMeta(z.object({
         b: z.number()
       })).example({
         b: 123
+      }).example({
+        b: 456
+      }).example({
+        b: 789
       });
       const result = copyMeta(src, dest);
       expect(hasMeta(result)).toBeTruthy();
-      expect(getMeta(result, 'examples')).toEqual([{
-        a: 'some',
-        b: 123,
-      }]);
+      expect(getMeta(result, 'examples')).toEqual([
+        { a: 'some', b: 123 },
+        { a: 'another', b: 456 },
+        { b: 789 } // @todo this is wrong, it should combine examples in a many-to-many pattern (should be 6 of them)
+      ]);
       expect(result).toEqual(dest);
     });
   });
