@@ -45,13 +45,12 @@ export const defaultResultHandler = createResultHandler({
       status: z.literal('success'),
       data: markOutput(output)
     }));
-    // output example forwarding
-    examples.forEach((example) => {
+    for (const example of examples) { // forwarding output examples to response schema
       responseSchema.example({
         status: 'success',
         data: example
       });
-    });
+    }
     return createApiResponse(responseSchema);
   },
   getNegativeResponse: () => {
