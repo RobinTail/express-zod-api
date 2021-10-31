@@ -2,6 +2,7 @@ import {Request} from 'express';
 import {HttpError} from 'http-errors';
 import {z} from 'zod';
 import {CommonConfig, InputSources, LoggerConfig, loggerLevels} from './config-type';
+import {copyMeta, getMeta} from './metadata';
 import {Method} from './method';
 import {MiddlewareDefinition} from './middleware';
 import {mimeMultipart} from './mime';
@@ -44,14 +45,17 @@ export type ReplaceMarkerInShape<S extends z.ZodRawShape, OUT extends IOSchema> 
 }
 
 export function extractObjectSchema(subject: IOSchema): ObjectSchema {
+  if (subject instanceof z.ZodObject) {
+    return subject;
+  }
+  let objectSchema: ObjectSchema;
   if (subject instanceof z.ZodUnion) {
-    return subject.options.reduce((acc, option) =>
+    objectSchema = subject.options.reduce((acc, option) =>
       acc.partial().merge(option.partial()));
+  } else { // intersection schema
+    objectSchema = subject._def.left.merge(subject._def.right);
   }
-  if (subject instanceof z.ZodIntersection) {
-    return subject._def.left.merge(subject._def.right);
-  }
-  return subject;
+  return copyMeta(subject, objectSchema);
 }
 
 export function combineEndpointAndMiddlewareInputSchemas<IN extends IOSchema, mIN>(
@@ -66,7 +70,12 @@ export function combineEndpointAndMiddlewareInputSchemas<IN extends IOSchema, mI
     .reduce((carry, schema) =>
       extractObjectSchema(carry).merge(extractObjectSchema(schema))
     );
-  return extractObjectSchema(mSchema).merge(extractObjectSchema(input)) as Merge<IN, mIN>;
+  const result = extractObjectSchema(mSchema).merge(extractObjectSchema(input)) as Merge<IN, mIN>;
+  for (const middleware of middlewares) {
+    copyMeta(middleware.input, result);
+  }
+  copyMeta(input, result);
+  return result;
 }
 
 function areFilesAvailable(request: Request) {
@@ -125,6 +134,38 @@ export function getStatusCodeFromError(error: Error): number {
   }
   return 500;
 }
+
+type Examples<T extends z.ZodTypeAny> = Readonly<z.input<T>[] | z.output<T>[]>;
+export const getExamples = <T extends z.ZodTypeAny>(schema: T, parseToOutput: boolean): Examples<T> => {
+  const examples = getMeta(schema, 'examples');
+  if (examples === undefined) {
+    return [];
+  }
+  return examples.reduce((carry, example) => {
+    const parsedExample = schema.safeParse(example);
+    return carry.concat(parsedExample.success
+      ? parseToOutput
+        ? parsedExample.data
+        : example : []
+    );
+  }, [] as z.output<typeof schema>[]);
+};
+
+export const combinations = <T extends any>(a: T[], b: T[]): {type: 'single', value: T[]} | {type: 'tuple', value: [T, T][]} => {
+  if (a.length === 0) {
+    return {type: 'single', value: b};
+  }
+  if (b.length === 0) {
+    return {type: 'single', value: a};
+  }
+  const result: [T, T][] = [];
+  for (const itemA of a) {
+    for (const itemB of b) {
+      result.push([itemA, itemB]);
+    }
+  }
+  return {type: 'tuple', value: result};
+};
 
 // obtaining the private helper type from Zod
 export type ErrMessage = Exclude<Parameters<typeof z.ZodString.prototype.email>[0], undefined>;

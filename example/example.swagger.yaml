@@ -56,6 +56,12 @@ paths:
                 required:
                   - status
                   - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
       description: example user retrieval endpoint
       parameters:
         - name: id
@@ -177,6 +183,12 @@ paths:
                 required:
                   - status
                   - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
       requestBody:
         content:
           multipart/form-data:
@@ -204,6 +216,9 @@ paths:
                     enum:
                       - success
                   data:
+                    example:
+                      name: John Doe
+                      timestamp: 1235698995125
                     type: object
                     properties:
                       name:
@@ -221,6 +236,13 @@ paths:
                 required:
                   - status
                   - data
+              examples:
+                example1:
+                  value:
+                    status: success
+                    data:
+                      name: John Doe
+                      timestamp: 1235698995125
         "400":
           description: POST /v2/user Error response
           content:
@@ -242,6 +264,12 @@ paths:
                 required:
                   - status
                   - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
       description: example user update endpoint
       requestBody:
         content:
@@ -267,6 +295,12 @@ paths:
                 - key
                 - id
                 - name
+            examples:
+              example1:
+                value:
+                  key: 1234-5678-90
+                  id: 12
+                  name: John Doe
 components:
   schemas: {}
   responses: {}

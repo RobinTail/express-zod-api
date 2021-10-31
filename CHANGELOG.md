@@ -2,11 +2,46 @@
 
 ## Version 2
 
+### v2.10.0
+
+- Feature #165. You can add examples to the generated documentation.
+  - Introducing new method `withMeta()`. You can wrap any Zod schema in it, for example: `withMeta(z.string())`.
+  - `withMeta()` provides you with additional methods for generated documentation. At the moment there is one so far:
+    `withMeta().example()`.
+  - You can use `.example()` multiple times for specifying several examples for your schema.
+  - You can specify example for the whole IO schema or just for a one of its properties.
+  - `withMeta()` can be used within Endpoint and Middleware as well. Their input examples will be merged for the 
+    generated documentation.
+  - Check out the example of the generated documentation in the `example` folder.
+  - Notice: `withMeta()` mutates its argument.
+```typescript
+import {defaultEndpointsFactory} from 'express-zod-api';
+
+const exampleEndpoint = defaultEndpointsFactory.build({
+  method: 'post',
+  description: 'example user update endpoint',
+  input: withMeta(z.object({
+    id: z.number().int().nonnegative(),
+    name: z.string().nonempty()
+  })).example({
+    id: 12,
+    name: 'John Doe'
+  }),
+  output: withMeta(z.object({
+    name: z.string(),
+    timestamp: z.number().int().nonnegative()
+  })).example({
+    name: 'John Doe',
+    timestamp: 1235698995125,
+  }),
+  handler: async () => {}
+});
+```
+
 ### v2.9.0
 
 - Zod version is 3.11.6.
-- Feature #111:
-  - From now on you can add description to any Zod schema, for example: `z.string().describe('Something')`.
+- Feature #111. You can add description to any Zod schema, for example: `z.string().describe('Something')`.
   - You can add description to a whole I/O schema or its property.
   - This description will be included into the generated Swagger / OpenAPI documentation.
 ```yaml

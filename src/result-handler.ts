@@ -9,6 +9,7 @@ import {
   IOSchema,
   markOutput
 } from './helpers';
+import {getMeta, withMeta} from './metadata';
 
 interface LastResortHandlerParams {
   error: ResultHandlerError;
@@ -38,16 +39,34 @@ export const createResultHandler = <POS extends ApiResponse, NEG extends ApiResp
 ) => definition;
 
 export const defaultResultHandler = createResultHandler({
-  getPositiveResponse: <OUT extends IOSchema>(output: OUT) => createApiResponse(z.object({
-    status: z.literal('success'),
-    data: markOutput(output)
-  })),
-  getNegativeResponse: () => createApiResponse(z.object({
-    status: z.literal('error'),
-    error: z.object({
-      message: z.string()
-    })
-  })),
+  getPositiveResponse: <OUT extends IOSchema>(output: OUT) => {
+    const examples = getMeta(output, 'examples') || [];
+    const responseSchema = withMeta(z.object({
+      status: z.literal('success'),
+      data: markOutput(output)
+    }));
+    for (const example of examples) { // forwarding output examples to response schema
+      responseSchema.example({
+        status: 'success',
+        data: example
+      });
+    }
+    return createApiResponse(responseSchema);
+  },
+  getNegativeResponse: () => {
+    const responseSchema = withMeta(z.object({
+      status: z.literal('error'),
+      error: z.object({
+        message: z.string()
+      })
+    })).example({
+      status: 'error',
+      error: {
+        message: getMessageFromError(new Error('Sample error message'))
+      }
+    });
+    return createApiResponse(responseSchema);
+  },
   handler: ({error, input, output, request, response, logger}) => {
     if (!error) {
       response.status(200).json({
