@@ -1,7 +1,7 @@
-import fs from 'fs';
+import fs from "fs";
 
-const nodeVersion = process.versions.node.split('.').shift();
-const tsconfigBase = nodeVersion === '15' ? '14' : nodeVersion;
+const nodeVersion = process.versions.node.split(".").shift();
+const tsconfigBase = nodeVersion === "15" ? "14" : nodeVersion;
 
 const packageJson = `
 {
@@ -31,24 +31,24 @@ const tsConfigJson = `
 }
 `;
 
-const readme = fs.readFileSync('README.md', 'utf-8');
+const readme = fs.readFileSync("README.md", "utf-8");
 const quickStartSection = readme.match(/# Quick start(.+?)\n#\s[A-Z]+/s);
 
 if (!quickStartSection) {
-  throw new Error('Can not find Quick Start section');
+  throw new Error("Can not find Quick Start section");
 }
 
 const tsParts = quickStartSection[1].match(/```typescript(.+?)```/gis);
 
 if (!tsParts) {
-  throw new Error('Can not find typescript code samples');
+  throw new Error("Can not find typescript code samples");
 }
 
-const quickStart = tsParts.map(
-  (part) => part.split('\n').slice(1,-1).join('\n')
-).join('\n\n');
+const quickStart = tsParts
+  .map((part) => part.split("\n").slice(1, -1).join("\n"))
+  .join("\n\n");
 
-const dir = './tests/integration';
+const dir = "./tests/integration";
 fs.writeFileSync(`${dir}/package.json`, packageJson.trim());
 fs.writeFileSync(`${dir}/tsconfig.json`, tsConfigJson.trim());
 fs.writeFileSync(`${dir}/quick-start.ts`, quickStart.trim());

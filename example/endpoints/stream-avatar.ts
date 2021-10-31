@@ -1,13 +1,16 @@
-import {z} from '../../src';
-import {fileStreamingEndpointsFactory} from '../factories';
+import { z } from "../../src";
+import { fileStreamingEndpointsFactory } from "../factories";
 
 export const streamAvatarEndpoint = fileStreamingEndpointsFactory.build({
-  methods: ['get'],
+  methods: ["get"],
   input: z.object({
-    userId: z.string().regex(/\d+/).transform((str) => parseInt(str, 10))
+    userId: z
+      .string()
+      .regex(/\d+/)
+      .transform((str) => parseInt(str, 10)),
   }),
   output: z.object({
-    filename: z.string()
+    filename: z.string(),
   }),
-  handler: async () => ({ filename: 'logo.svg' })
+  handler: async () => ({ filename: "logo.svg" }),
 });

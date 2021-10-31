@@ -1,5 +1,5 @@
-import {createConfig, createServer} from '../src';
-import {routing} from './routing';
+import { createConfig, createServer } from "../src";
+import { routing } from "./routing";
 
 const config = createConfig({
   server: {
@@ -8,9 +8,9 @@ const config = createConfig({
   },
   cors: true,
   logger: {
-    level: 'debug',
-    color: true
-  }
+    level: "debug",
+    color: true,
+  },
 });
 
 createServer(config, routing);

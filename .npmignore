@@ -14,3 +14,4 @@ logo.svg
 .eslintrc.json
 tools
 coverage
+.prettierignore
