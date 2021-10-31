@@ -30,6 +30,7 @@ interface Lib {
   name: string;
   url: string;
   module: string;
+  file?: string;
 }
 
 const libs: Lib[] = [
@@ -69,16 +70,17 @@ const libs: Lib[] = [
     module: 'express-fileupload'
   },
   {
-    name: 'Lodash',
-    url: 'https://github.com/lodash/lodash',
-    module: 'lodash.merge',
+    name: 'Ramda',
+    url: 'https://github.com/ramda/ramda',
+    module: 'ramda',
+    file: 'LICENSE.txt'
   }
 ];
 
 const separator = '\n'.repeat(4);
 
-const otherLicenses = libs.map(({name, url, module}) => {
-  const license = fs.readFileSync(path.join('node_modules', module, 'LICENSE'), 'utf-8');
+const otherLicenses = libs.map(({name, url, module, file = 'LICENSE'}) => {
+  const license = fs.readFileSync(path.join('node_modules', module, file), 'utf-8');
   return `${name} - ${url}\n\n${license.trim()}`;
 }).join(separator);
 

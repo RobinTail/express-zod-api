@@ -1,6 +1,6 @@
 import {combinations} from './helpers';
 import {z} from './index';
-import deepMerge from 'lodash.merge';
+import {mergeDeepRight} from 'ramda';
 
 export const metaProp = 'expressZodApiMeta';
 type MetaProp = typeof metaProp;
@@ -58,7 +58,7 @@ export const copyMeta = <A extends z.ZodTypeAny, B extends z.ZodTypeAny>(src: A,
   const def = dest._def as MetaDef<B>;
   const examplesCombinations = combinations(def[metaProp].examples, src._def[metaProp].examples);
   // general deep merge except examples
-  def[metaProp] = deepMerge(
+  def[metaProp] = mergeDeepRight(
     { ...def[metaProp], examples: [] },
     { ...src._def[metaProp], examples: [] }
   );
@@ -67,7 +67,7 @@ export const copyMeta = <A extends z.ZodTypeAny, B extends z.ZodTypeAny>(src: A,
   } else {
     for (const [destExample, srcExample] of examplesCombinations.value) {
       def[metaProp].examples.push(
-        deepMerge({...destExample}, {...srcExample})
+        mergeDeepRight({...destExample}, {...srcExample})
       );
     }
   }
