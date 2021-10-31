@@ -11,10 +11,10 @@ export const authMiddleware = createMiddleware({
     if (key !== '123') {
       throw createHttpError(401, 'Invalid key');
     }
-    if (request.headers['token'] !== '456') {
+    if (request.headers.token !== '456') {
       throw createHttpError(401, 'Invalid token');
     }
-    return {token: request.headers['token']};
+    return {token: request.headers.token};
   }
 });
 

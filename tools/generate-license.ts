@@ -74,6 +74,11 @@ const libs: Lib[] = [
     url: 'https://github.com/ramda/ramda',
     module: 'ramda',
     file: 'LICENSE.txt'
+  },
+  {
+    name: 'Triple-Beam',
+    url: 'https://github.com/winstonjs/triple-beam',
+    module: 'triple-beam'
   }
 ];
 

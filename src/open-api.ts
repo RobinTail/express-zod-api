@@ -15,6 +15,8 @@ import {ArrayElement, extractObjectSchema, getExamples, IOSchema} from './helper
 import {Routing, routingCycle, RoutingCycleParams} from './routing';
 import {ZodUpload} from './upload-schema';
 
+/* eslint-disable @typescript-eslint/no-use-before-define */
+
 const describeSchema = (value: z.ZodTypeAny, isResponse: boolean): SchemaObject => {
   const otherProps: SchemaObject = {};
   if (value.isNullable()) {
@@ -207,7 +209,7 @@ const describeTuple = (schema: z.ZodTuple, isResponse: boolean): SchemaObject =>
       oneOf: types,
       format: 'tuple',
       ...(types.length === 0 ? {} : {
-        description: types.map((schema, index) => `${index}: ${schema.type}`).join(', ')
+        description: types.map((item, index) => `${index}: ${item.type}`).join(', ')
       })
     }
   };

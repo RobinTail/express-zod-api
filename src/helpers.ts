@@ -58,19 +58,19 @@ export function extractObjectSchema(subject: IOSchema): ObjectSchema {
   return copyMeta(subject, objectSchema);
 }
 
-export function combineEndpointAndMiddlewareInputSchemas<IN extends IOSchema, mIN>(
+export function combineEndpointAndMiddlewareInputSchemas<IN extends IOSchema, MwIN>(
   input: IN,
   middlewares: MiddlewareDefinition<IOSchema, any, any>[]
-): Merge<IN, mIN> {
+): Merge<IN, MwIN> {
   if (middlewares.length === 0) {
-    return extractObjectSchema(input) as Merge<IN, mIN>;
+    return extractObjectSchema(input) as Merge<IN, MwIN>;
   }
   const mSchema = middlewares
     .map((middleware) => middleware.input)
     .reduce((carry, schema) =>
       extractObjectSchema(carry).merge(extractObjectSchema(schema))
     );
-  const result = extractObjectSchema(mSchema).merge(extractObjectSchema(input)) as Merge<IN, mIN>;
+  const result = extractObjectSchema(mSchema).merge(extractObjectSchema(input)) as Merge<IN, MwIN>;
   for (const middleware of middlewares) {
     copyMeta(middleware.input, result);
   }

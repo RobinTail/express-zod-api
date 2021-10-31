@@ -5,6 +5,8 @@ import {expectType} from 'tsd';
 import {serializeSchemaForTest} from '../helpers';
 
 describe('EndpointsFactory', () => {
+  /* eslint-disable @typescript-eslint/dot-notation */
+
   describe('.constructor()', () => {
     test('Should create the empty factory with result handler', () => {
       const resultHandlerMock = { handler: jest.fn() };

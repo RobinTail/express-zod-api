@@ -19,5 +19,7 @@
     "prettier",
     "import"
   ],
-  "rules": {}
+  "rules": {
+    "@typescript-eslint/lines-between-class-members": "off"
+  }
 }

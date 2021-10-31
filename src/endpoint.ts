@@ -60,38 +60,38 @@ export type EndpointResponse<E extends AbstractEndpoint> = z.output<
 > | z.output<ReturnType<E['getNegativeResponseSchema']>>;
 
 type EndpointProps<
-  IN extends IOSchema, OUT extends IOSchema, mIN, OPT,
+  IN extends IOSchema, OUT extends IOSchema, MwIN, OPT,
   M extends Method, POS extends ApiResponse, NEG extends ApiResponse
 > = {
   middlewares: MiddlewareDefinition<any, any, any>[];
   inputSchema: IN;
   mimeTypes: string[];
   outputSchema: OUT;
-  handler: Handler<z.output<Merge<IN, mIN>>, z.input<OUT>, OPT>;
+  handler: Handler<z.output<Merge<IN, MwIN>>, z.input<OUT>, OPT>;
   resultHandler: ResultHandlerDefinition<POS, NEG>;
   description?: string;
 } & MethodsDefinition<M>;
 
 /** mIN, OPT - from Middlewares */
 export class Endpoint<
-  IN extends IOSchema, OUT extends IOSchema, mIN, OPT,
+  IN extends IOSchema, OUT extends IOSchema, MwIN, OPT,
   M extends Method, POS extends ApiResponse, NEG extends ApiResponse
 > extends AbstractEndpoint {
   protected readonly description?: string;
   protected readonly methods: M[] = [];
   protected readonly middlewares: MiddlewareDefinition<any, any, any>[] = [];
-  protected readonly inputSchema: Merge<IN, mIN>; // combined with middlewares input
+  protected readonly inputSchema: Merge<IN, MwIN>; // combined with middlewares input
   protected readonly mimeTypes: string[];
   protected readonly outputSchema: OUT;
-  protected readonly handler: Handler<z.output<Merge<IN, mIN>>, z.input<OUT>, OPT>
+  protected readonly handler: Handler<z.output<Merge<IN, MwIN>>, z.input<OUT>, OPT>
   protected readonly resultHandler: ResultHandlerDefinition<POS, NEG>;
 
   constructor({
     middlewares, inputSchema, outputSchema, handler, resultHandler, description, mimeTypes, ...rest
-  }: EndpointProps<IN, OUT, mIN, OPT, M, POS, NEG>) {
+  }: EndpointProps<IN, OUT, MwIN, OPT, M, POS, NEG>) {
     super();
     this.middlewares = middlewares;
-    this.inputSchema = combineEndpointAndMiddlewareInputSchemas<IN, mIN>(inputSchema, middlewares);
+    this.inputSchema = combineEndpointAndMiddlewareInputSchemas<IN, MwIN>(inputSchema, middlewares);
     this.mimeTypes = mimeTypes;
     this.outputSchema = outputSchema;
     this.handler = handler;
@@ -112,7 +112,7 @@ export class Endpoint<
     return this.methods;
   }
 
-  public override getInputSchema(): Merge<IN, mIN> {
+  public override getInputSchema(): Merge<IN, MwIN> {
     return this.inputSchema;
   }
 
@@ -193,7 +193,7 @@ export class Endpoint<
   }
 
   async #parseAndRunHandler({input, options, logger}: {input: any, options: any, logger: Logger}) {
-    return await this.handler({
+    return this.handler({
       input: this.inputSchema.parse(input), // final input types transformations for handler,
       options, logger
     });

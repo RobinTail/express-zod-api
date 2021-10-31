@@ -4,7 +4,9 @@ let appMock: ReturnType<typeof newAppMock>;
 const expressJsonMock = jest.fn();
 const newAppMock = () => ({
   use: jest.fn(),
-  listen: jest.fn((port, cb) => {cb && cb(); return new http.Server(); }),
+  listen: jest.fn((port, cb) => {
+    if (cb) { cb();} return new http.Server();
+  }),
   get: jest.fn(),
   post: jest.fn(),
   options: jest.fn()

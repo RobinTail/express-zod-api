@@ -2,9 +2,9 @@ import jestConfig from '../jest.config';
 import {z} from '../src';
 
 export const waitFor = async (cb: () => boolean) =>
-  await new Promise((resolve, reject) => {
+  new Promise((resolve, reject) => {
     const timeout = setTimeout(() => {
-      clearInterval(timer);
+      clearInterval(timer); // eslint-disable-line @typescript-eslint/no-use-before-define
       reject();
     }, jestConfig.testTimeout);
     const timer = setInterval(() => {
@@ -16,7 +16,7 @@ export const waitFor = async (cb: () => boolean) =>
     }, 100);
   });
 
-export const delay = async (ms: number) => await new Promise((resolve) => setTimeout(resolve, ms));
+export const delay = async (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export const serializeSchemaForTest = (schema: z.ZodTypeAny): Record<string, any> => {
   return {
