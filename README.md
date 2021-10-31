@@ -549,7 +549,7 @@ const yamlString = new OpenAPI({
 }).getSpecAsYaml();
 ```
 
-You can add descriptions and examples to any IO schema or its properties, and they will be included into the generated
+You can add descriptions and examples to any I/O schema or its properties, and they will be included into the generated
 documentation of your API. Consider the following example:
 
 ```typescript
