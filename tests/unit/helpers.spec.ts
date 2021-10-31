@@ -10,6 +10,7 @@ import {
 } from '../../src/helpers';
 import {createMiddleware, z, createHttpError, markOutput, withMeta} from '../../src';
 import {Request} from 'express';
+import {getMeta} from '../../src/metadata';
 import {MiddlewareDefinition} from '../../src/middleware';
 import {serializeSchemaForTest} from '../helpers';
 
@@ -127,6 +128,46 @@ describe('Helpers', () => {
       const result = combineEndpointAndMiddlewareInputSchemas(endpointInput, middlewares);
       expect(result).toBeInstanceOf(z.ZodObject);
       expect(serializeSchemaForTest(result)).toMatchSnapshot();
+    });
+
+    test('Should merge examples in case of using withMeta()', () => {
+      const middlewares = [
+        createMiddleware({
+          input: withMeta(z.object({
+            one: z.string()
+          }).and(z.object({
+            two: z.number()
+          }))).example({
+            one: 'test',
+            two: 123
+          }),
+          middleware: jest.fn()
+        }),
+        createMiddleware({
+          input: withMeta(z.object({
+            three: z.null()
+          }).or(z.object({
+            four: z.boolean()
+          }))).example({
+            three: null,
+            four: true
+          }),
+          middleware: jest.fn()
+        }),
+      ] as MiddlewareDefinition<any, any, any>[];
+      const endpointInput = withMeta(z.object({
+        five: z.string()
+      })).example({
+        five: 'some'
+      });
+      const result = combineEndpointAndMiddlewareInputSchemas(endpointInput, middlewares);
+      expect(getMeta(result, 'examples')).toEqual([{
+        one: 'test',
+        two: 123,
+        three: null,
+        four: true,
+        five: 'some'
+      }]);
     });
   });
   
@@ -270,6 +311,44 @@ describe('Helpers', () => {
       })));
       expect(subject).toBeInstanceOf(z.ZodObject);
       expect(serializeSchemaForTest(subject)).toMatchSnapshot();
+    });
+
+    test('should preserve examples', () => {
+      const objectSchema = withMeta(z.object({
+        one: z.string()
+      })).example({
+        one: 'test'
+      });
+      expect(getMeta(extractObjectSchema(objectSchema), 'examples')).toEqual([{
+        one: 'test'
+      }]);
+
+      const unionSchema = withMeta(z.object({
+        one: z.string()
+      }).or(z.object({
+        two: z.number()
+      }))).example({
+        one: 'test1'
+      }).example({
+        two: 123
+      });
+      expect(getMeta(extractObjectSchema(unionSchema), 'examples')).toEqual([
+        {one: 'test1'},
+        {two: 123}
+      ]);
+
+      const intersectionSchema = withMeta(z.object({
+        one: z.string()
+      }).and(z.object({
+        two: z.number()
+      }))).example({
+        one: 'test1',
+        two: 123
+      });
+      expect(getMeta(extractObjectSchema(intersectionSchema), 'examples')).toEqual([{
+        one: 'test1',
+        two: 123
+      }]);
     });
   });
 

@@ -2,7 +2,7 @@ import {Request} from 'express';
 import {HttpError} from 'http-errors';
 import {z} from 'zod';
 import {CommonConfig, InputSources, LoggerConfig, loggerLevels} from './config-type';
-import {copyMeta, getMeta} from './metadata';
+import {copyMeta, getMeta, MetaDef, metaProp} from './metadata';
 import {Method} from './method';
 import {MiddlewareDefinition} from './middleware';
 import {mimeMultipart} from './mime';
@@ -46,11 +46,13 @@ export type ReplaceMarkerInShape<S extends z.ZodRawShape, OUT extends IOSchema> 
 
 export function extractObjectSchema(subject: IOSchema): ObjectSchema {
   if (subject instanceof z.ZodUnion) {
-    return subject.options.reduce((acc, option) =>
+    const objectSchema = subject.options.reduce((acc, option) =>
       acc.partial().merge(option.partial()));
+    return copyMeta(subject, objectSchema);
   }
   if (subject instanceof z.ZodIntersection) {
-    return subject._def.left.merge(subject._def.right);
+    const objectSchema = subject._def.left.merge(subject._def.right);
+    return copyMeta(subject, objectSchema);
   }
   return subject;
 }
@@ -67,7 +69,10 @@ export function combineEndpointAndMiddlewareInputSchemas<IN extends IOSchema, mI
     .reduce((carry, schema) =>
       extractObjectSchema(carry).merge(extractObjectSchema(schema))
     );
-  return copyMeta(input, extractObjectSchema(mSchema).merge(extractObjectSchema(input)) as Merge<IN, mIN>);
+  const result = extractObjectSchema(mSchema).merge(extractObjectSchema(input)) as Merge<IN, mIN>;
+  middlewares.forEach((middleware) => copyMeta(middleware.input, result));
+  copyMeta(input, result);
+  return result;
 }
 
 function areFilesAvailable(request: Request) {
