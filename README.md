@@ -549,7 +549,23 @@ const yamlString = new OpenAPI({
 }).getSpecAsYaml();
 ```
 
-*See the example of the generated documentation 
+You can add descriptions and examples to any IO schema or its properties, and they will be included into the generated
+documentation of your API. Consider the following example:
+
+```typescript
+import {defaultEndpointsFactory, withMeta} from 'express-zod-api';
+
+const exampleEndpoint = defaultEndpointsFactory.build({
+  input: withMeta(z.object({
+    id: z.number().describe('the ID of the user')
+  })).example({
+    id: 123
+  }),
+  ... // similarly for output and middlewares
+});
+```
+
+*See the example of the generated documentation
 [here](https://github.com/RobinTail/express-zod-api/blob/master/example/example.swagger.yaml)*
 
 # Known issues
