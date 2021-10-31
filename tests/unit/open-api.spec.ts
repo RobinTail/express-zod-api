@@ -1,5 +1,5 @@
 import {routing} from '../../example/routing';
-import {z, OpenAPI, defaultEndpointsFactory} from '../../src';
+import {z, OpenAPI, defaultEndpointsFactory, withMeta} from '../../src';
 import {expectType} from 'tsd';
 
 describe('Open API generator', () => {
@@ -484,6 +484,146 @@ describe('Open API generator', () => {
         },
         version: '3.4.5',
         title: 'Testing issue #98',
+        serverUrl: 'http://example.com'
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
+    });
+  });
+
+  describe('Metadata', () => {
+    test('should pass over the schema description', () => {
+      const spec = new OpenAPI({
+        routing: {
+          v1: {
+            getSomething: defaultEndpointsFactory.build({
+              method: 'get',
+              input: z.object({
+                str: z.string().describe('here is the test')
+              }),
+              output: z.object({
+                result: z.number().int().positive().describe('some positive integer')
+              }),
+              handler: async () => ({ result: 123 })
+            })
+          }
+        },
+        version: '3.4.5',
+        title: 'Testing Metadata:description',
+        serverUrl: 'http://example.com'
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
+    });
+
+    test('should pass over the example of an individual parameter', () => {
+      const spec = new OpenAPI({
+        routing: {
+          v1: {
+            getSomething: defaultEndpointsFactory.build({
+              method: 'get',
+              input: z.object({
+                strNum: withMeta(
+                  z.string().transform((v) => parseInt(v, 10))
+                ).example('123') // example is for input side of the transformation
+              }),
+              output: z.object({
+                numericStr: withMeta(
+                  z.number().transform((v) => `${v}`)
+                ).example(123) // example is for input side of the transformation
+              }),
+              handler: async () => ({ numericStr: 123 })
+            })
+          }
+        },
+        version: '3.4.5',
+        title: 'Testing Metadata:example on IO parameter',
+        serverUrl: 'http://example.com'
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
+    });
+
+    test('should pass over examples of each param from the whole IO schema examples (GET)', () => {
+      const spec = new OpenAPI({
+        routing: {
+          v1: {
+            getSomething: defaultEndpointsFactory.build({
+              method: 'get',
+              input: withMeta(z.object({
+                strNum: z.string().transform((v) => parseInt(v, 10))
+              })).example({
+                strNum: '123' // example is for input side of the transformation
+              }),
+              output: withMeta(z.object({
+                numericStr: z.number().transform((v) => `${v}`)
+              })).example({
+                numericStr: 123 // example is for input side of the transformation
+              }),
+              handler: async () => ({ numericStr: 123 })
+            })
+          }
+        },
+        version: '3.4.5',
+        title: 'Testing Metadata:example on IO schema',
+        serverUrl: 'http://example.com'
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
+    });
+
+    test('should pass over examples of the whole IO schema (POST)', () => {
+      const spec = new OpenAPI({
+        routing: {
+          v1: {
+            getSomething: defaultEndpointsFactory.build({
+              method: 'post',
+              input: withMeta(z.object({
+                strNum: z.string().transform((v) => parseInt(v, 10))
+              })).example({
+                strNum: '123' // example is for input side of the transformation
+              }),
+              output: withMeta(z.object({
+                numericStr: z.number().transform((v) => `${v}`)
+              })).example({
+                numericStr: 123 // example is for input side of the transformation
+              }),
+              handler: async () => ({ numericStr: 123 })
+            })
+          }
+        },
+        version: '3.4.5',
+        title: 'Testing Metadata:example on IO schema',
+        serverUrl: 'http://example.com'
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
+    });
+
+    test('should merge endpoint handler examples with its middleware examples', () => {
+      const spec = new OpenAPI({
+        routing: {
+          v1: {
+            getSomething: defaultEndpointsFactory.addMiddleware({
+              input: withMeta(z.object({
+                key: z.string()
+              })).example({
+                key: '1234-56789-01'
+              }),
+              middleware: jest.fn()
+            }).build({
+              method: 'post',
+              input: withMeta(z.object({
+                str: z.string()
+              })).example({
+                str: 'test'
+              }),
+              output: withMeta(z.object({
+                num: z.number()
+              })).example({
+                num: 123
+              }),
+              handler: async () => ({ num: 123 })
+            })
+          }
+        },
+        version: '3.4.5',
+        title: 'Testing Metadata:example on IO schema + middleware',
         serverUrl: 'http://example.com'
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();

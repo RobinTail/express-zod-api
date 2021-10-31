@@ -1,15 +1,18 @@
 import {expectType} from 'tsd';
 import {
+  combinations,
   combineEndpointAndMiddlewareInputSchemas,
   extractObjectSchema,
+  getExamples,
   getInitialInput,
   getMessageFromError,
   getStatusCodeFromError,
   isLoggerConfig,
   OutputMarker
 } from '../../src/helpers';
-import {createMiddleware, z, createHttpError, markOutput} from '../../src';
+import {createMiddleware, z, createHttpError, markOutput, withMeta} from '../../src';
 import {Request} from 'express';
+import {getMeta} from '../../src/metadata';
 import {MiddlewareDefinition} from '../../src/middleware';
 import {serializeSchemaForTest} from '../helpers';
 
@@ -127,6 +130,46 @@ describe('Helpers', () => {
       const result = combineEndpointAndMiddlewareInputSchemas(endpointInput, middlewares);
       expect(result).toBeInstanceOf(z.ZodObject);
       expect(serializeSchemaForTest(result)).toMatchSnapshot();
+    });
+
+    test('Should merge examples in case of using withMeta()', () => {
+      const middlewares = [
+        createMiddleware({
+          input: withMeta(z.object({
+            one: z.string()
+          }).and(z.object({
+            two: z.number()
+          }))).example({
+            one: 'test',
+            two: 123
+          }),
+          middleware: jest.fn()
+        }),
+        createMiddleware({
+          input: withMeta(z.object({
+            three: z.null()
+          }).or(z.object({
+            four: z.boolean()
+          }))).example({
+            three: null,
+            four: true
+          }),
+          middleware: jest.fn()
+        }),
+      ] as MiddlewareDefinition<any, any, any>[];
+      const endpointInput = withMeta(z.object({
+        five: z.string()
+      })).example({
+        five: 'some'
+      });
+      const result = combineEndpointAndMiddlewareInputSchemas(endpointInput, middlewares);
+      expect(getMeta(result, 'examples')).toEqual([{
+        one: 'test',
+        two: 123,
+        three: null,
+        four: true,
+        five: 'some'
+      }]);
     });
   });
   
@@ -271,6 +314,44 @@ describe('Helpers', () => {
       expect(subject).toBeInstanceOf(z.ZodObject);
       expect(serializeSchemaForTest(subject)).toMatchSnapshot();
     });
+
+    test('should preserve examples', () => {
+      const objectSchema = withMeta(z.object({
+        one: z.string()
+      })).example({
+        one: 'test'
+      });
+      expect(getMeta(extractObjectSchema(objectSchema), 'examples')).toEqual([{
+        one: 'test'
+      }]);
+
+      const unionSchema = withMeta(z.object({
+        one: z.string()
+      }).or(z.object({
+        two: z.number()
+      }))).example({
+        one: 'test1'
+      }).example({
+        two: 123
+      });
+      expect(getMeta(extractObjectSchema(unionSchema), 'examples')).toEqual([
+        {one: 'test1'},
+        {two: 123}
+      ]);
+
+      const intersectionSchema = withMeta(z.object({
+        one: z.string()
+      }).and(z.object({
+        two: z.number()
+      }))).example({
+        one: 'test1',
+        two: 123
+      });
+      expect(getMeta(extractObjectSchema(intersectionSchema), 'examples')).toEqual([{
+        one: 'test1',
+        two: 123
+      }]);
+    });
   });
 
   describe('getMessageFromError()', () => {
@@ -334,6 +415,69 @@ describe('Helpers', () => {
       const output = z.object({});
       expect(markOutput(output)).toEqual(output);
       expectType<OutputMarker>(markOutput(output));
+    });
+  });
+
+  describe('getExamples()', () => {
+    test('should return an empty array in case examples are not set', () => {
+      expect(getExamples(z.string(), true)).toEqual([]);
+      expect(getExamples(z.string(), false)).toEqual([]);
+      expect(getExamples(withMeta(z.string()), true)).toEqual([]);
+      expect(getExamples(withMeta(z.string()), false)).toEqual([]);
+    });
+    test('should return examples as they are in case of no output parsing', () => {
+      expect(getExamples(
+        withMeta(z.string())
+          .example('some')
+          .example('another'),
+        false
+      )).toEqual(['some', 'another']);
+    });
+    test('should return parsed examples for output on demand', () => {
+      expect(getExamples(
+        withMeta(z.string().transform((v) => parseInt(v, 10)))
+          .example('123')
+          .example('456'),
+        true
+      )).toEqual([123, 456]);
+    });
+    test('should filter out invalid examples according to the schema in both cases', () => {
+      expect(getExamples(
+        withMeta(z.string())
+          .example('some')
+          .example(123 as unknown as string)
+          .example('another'),
+        false
+      )).toEqual(['some', 'another']);
+      expect(getExamples(
+        withMeta(z.string().transform((v) => parseInt(v, 10)))
+          .example('123')
+          .example(null as unknown as string)
+          .example('456'),
+        true
+      )).toEqual([123, 456]);
+    });
+  });
+
+  describe('combinations()', () => {
+    test('should run callback on each combination of items from two arrays', () => {
+      expect(combinations([1, 2], [4, 5, 6])).toEqual({
+        type: 'tuple',
+        value: [
+          [1, 4],
+          [1, 5],
+          [1, 6],
+          [2, 4],
+          [2, 5],
+          [2, 6]
+        ]
+      });
+    });
+
+    test('should handle one or two arrays are empty', () => {
+      expect(combinations([], [4,5,6])).toEqual({type: 'single', value: [4, 5, 6]});
+      expect(combinations([1, 2, 3], [])).toEqual({type: 'single', value: [1, 2, 3]});
+      expect(combinations([], [])).toEqual({type: 'single', value: []});
     });
   });
 });

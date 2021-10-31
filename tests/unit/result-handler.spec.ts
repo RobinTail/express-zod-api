@@ -1,5 +1,6 @@
 import {Request, Response} from 'express';
-import {z, createHttpError, defaultResultHandler} from '../../src';
+import {z, createHttpError, defaultResultHandler, withMeta} from '../../src';
+import {metaProp} from '../../src/metadata';
 
 let loggerMock: any;
 let responseMock: any;
@@ -115,6 +116,32 @@ describe('ResultHandler', () => {
         data: {
           anything: 118
         }
+      });
+    });
+
+    test('should forward output schema examples', () => {
+      expect(defaultResultHandler.getPositiveResponse(withMeta(z.object({
+        str: z.string()
+      })).example({
+        str: 'test'
+      })).schema._def[metaProp]).toEqual({
+        examples: [{
+          status: 'success',
+          data: {
+            str: 'test'
+          }
+        }]
+      });
+    });
+
+    test('should generate negative response example', () => {
+      expect(defaultResultHandler.getNegativeResponse().schema._def[metaProp]).toEqual({
+        examples: [{
+          status: 'error',
+          error: {
+            message: 'Sample error message'
+          }
+        }]
       });
     });
   });

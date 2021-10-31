@@ -1,14 +1,17 @@
 import {
+  ContentObject,
+  ExampleObject,
+  ExamplesObject,
+  MediaTypeObject,
   OpenApiBuilder,
   OperationObject,
   ParameterObject,
-  SchemaObject,
-  ContentObject
+  SchemaObject
 } from 'openapi3-ts';
 import {z} from 'zod';
 import {OpenAPIError} from './errors';
 import {ZodFile} from './file-schema';
-import {ArrayElement, extractObjectSchema} from './helpers';
+import {ArrayElement, extractObjectSchema, getExamples, IOSchema} from './helpers';
 import {Routing, routingCycle, RoutingCycleParams} from './routing';
 import {ZodUpload} from './upload-schema';
 
@@ -19,6 +22,10 @@ const describeSchema = (value: z.ZodTypeAny, isResponse: boolean): SchemaObject 
   }
   if (value.description) {
     otherProps.description = `${value.description}`;
+  }
+  const examples = getExamples(value, isResponse);
+  if (examples.length > 0) {
+    otherProps.example = examples[0];
   }
   switch (true) {
     case value instanceof z.ZodString:
@@ -295,6 +302,37 @@ const describeEffect = (value: z.ZodEffects<any>, isResponse: boolean): SchemaOb
   return input;
 };
 
+type MediaExamples = Pick<MediaTypeObject, 'examples'>;
+const describeIOExamples = <T extends IOSchema>(schema: T, isResponse: boolean): MediaExamples => {
+  const examples = getExamples(schema, isResponse);
+  if (examples.length === 0) {
+    return {};
+  }
+  return {
+    examples: examples.reduce<ExamplesObject>((carry, example, index) => ({
+      ...carry,
+      [`example${index + 1}`]: <ExampleObject>{
+        value: example
+      }
+    }), {})
+  };
+};
+
+const describeIOParamExamples = <T extends IOSchema>(schema: T, isResponse: boolean, param: string): MediaExamples => {
+  const examples = getExamples(schema, isResponse);
+  if (examples.length === 0) {
+    return {};
+  }
+  return {
+    examples: examples.reduce<ExamplesObject>((carry, example, index) => param in example ? ({
+      ...carry,
+      [`example${index + 1}`]: <ExampleObject>{
+        value: example[param]
+      }
+    }) : carry, {})
+  };
+};
+
 interface GenerationParams {
   title: string;
   version: string;
@@ -313,6 +351,10 @@ export class OpenAPI extends OpenApiBuilder {
     super();
     this.addInfo({title, version}).addServer({url: serverUrl});
     const cb: RoutingCycleParams['cb'] = (endpoint, fullPath, method) => {
+      const positiveResponseSchema = describeSchema(endpoint.getPositiveResponseSchema(), true);
+      delete positiveResponseSchema.example;
+      const negativeResponseSchema = describeSchema(endpoint.getNegativeResponseSchema(), true);
+      delete negativeResponseSchema.example;
       const operation: OperationObject = {
         responses: {
           '200': {
@@ -320,7 +362,8 @@ export class OpenAPI extends OpenApiBuilder {
             content: endpoint.getPositiveMimeTypes().reduce((carry, mimeType) => ({
               ...carry,
               [mimeType]: {
-                schema: describeSchema(endpoint.getPositiveResponseSchema(), true)
+                schema: positiveResponseSchema,
+                ...describeIOExamples(endpoint.getPositiveResponseSchema(), true)
               }
             }), {} as ContentObject),
           },
@@ -329,7 +372,8 @@ export class OpenAPI extends OpenApiBuilder {
             content: endpoint.getNegativeMimeTypes().reduce((carry, mimeType) => ({
               ...carry,
               [mimeType]: {
-                schema: describeSchema(endpoint.getNegativeResponseSchema(), true)
+                schema: negativeResponseSchema,
+                ...describeIOExamples(endpoint.getNegativeResponseSchema(), true)
               }
             }), {} as ContentObject),
           }
@@ -350,17 +394,21 @@ export class OpenAPI extends OpenApiBuilder {
               description: `${method.toUpperCase()} ${fullPath} parameter`,
               ...describeSchema(subject[name], false)
             },
+            ...describeIOParamExamples(endpoint.getInputSchema(), false, name)
           });
         });
       } else {
+        const bodySchema = describeSchema(endpoint.getInputSchema(), false);
+        delete bodySchema.example;
         operation.requestBody = {
           content: endpoint.getInputMimeTypes().reduce((carry, mimeType) => ({
             ...carry,
             [mimeType]: {
               schema: {
                 description: `${method.toUpperCase()} ${fullPath} request body`,
-                ...describeSchema(endpoint.getInputSchema(), false)
-              }
+                ...bodySchema
+              },
+              ...describeIOExamples(endpoint.getInputSchema(), false)
             }
           }), {} as ContentObject)
         };

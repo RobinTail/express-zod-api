@@ -54,6 +54,12 @@ paths:
                 required:
                   - status
                   - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
       parameters:
         - name: arr
           in: query
@@ -111,6 +117,12 @@ paths:
                 required:
                   - status
                   - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
       requestBody:
         content:
           application/json:
@@ -205,6 +217,12 @@ paths:
                 required:
                   - status
                   - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
       requestBody:
         content:
           application/json:
@@ -219,6 +237,481 @@ paths:
                 field2:
                   type: string
               required: []
+components:
+  schemas: {}
+  responses: {}
+  parameters: {}
+  examples: {}
+  requestBodies: {}
+  headers: {}
+  securitySchemes: {}
+  links: {}
+  callbacks: {}
+tags: []
+servers:
+  - url: http://example.com
+"
+`;
+
+exports[`Open API generator Metadata should merge endpoint handler examples with its middleware examples 1`] = `
+"openapi: 3.0.0
+info:
+  title: Testing Metadata:example on IO schema + middleware
+  version: 3.4.5
+paths:
+  /v1/getSomething:
+    post:
+      responses:
+        \\"200\\":
+          description: POST /v1/getSomething Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - success
+                  data:
+                    example:
+                      num: 123
+                    type: object
+                    properties:
+                      num:
+                        type: number
+                        format: double
+                        minimum: 5e-324
+                        exclusiveMinimum: false
+                        maximum: 1.7976931348623157e+308
+                        exclusiveMaximum: false
+                    required:
+                      - num
+                required:
+                  - status
+                  - data
+              examples:
+                example1:
+                  value:
+                    status: success
+                    data:
+                      num: 123
+        \\"400\\":
+          description: POST /v1/getSomething Error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                required:
+                  - status
+                  - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
+      requestBody:
+        content:
+          application/json:
+            schema:
+              description: POST /v1/getSomething request body
+              type: object
+              properties:
+                key:
+                  type: string
+                str:
+                  type: string
+              required:
+                - key
+                - str
+            examples:
+              example1:
+                value:
+                  key: 1234-56789-01
+                  str: test
+components:
+  schemas: {}
+  responses: {}
+  parameters: {}
+  examples: {}
+  requestBodies: {}
+  headers: {}
+  securitySchemes: {}
+  links: {}
+  callbacks: {}
+tags: []
+servers:
+  - url: http://example.com
+"
+`;
+
+exports[`Open API generator Metadata should pass over examples of each param from the whole IO schema examples (GET) 1`] = `
+"openapi: 3.0.0
+info:
+  title: Testing Metadata:example on IO schema
+  version: 3.4.5
+paths:
+  /v1/getSomething:
+    get:
+      responses:
+        \\"200\\":
+          description: GET /v1/getSomething Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - success
+                  data:
+                    example:
+                      numericStr: \\"123\\"
+                    type: object
+                    properties:
+                      numericStr:
+                        type: string
+                        format: double
+                        minimum: 5e-324
+                        exclusiveMinimum: false
+                        maximum: 1.7976931348623157e+308
+                        exclusiveMaximum: false
+                    required:
+                      - numericStr
+                required:
+                  - status
+                  - data
+              examples:
+                example1:
+                  value:
+                    status: success
+                    data:
+                      numericStr: \\"123\\"
+        \\"400\\":
+          description: GET /v1/getSomething Error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                required:
+                  - status
+                  - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
+      parameters:
+        - name: strNum
+          in: query
+          required: true
+          schema:
+            description: GET /v1/getSomething parameter
+            type: string
+          examples:
+            example1:
+              value: \\"123\\"
+components:
+  schemas: {}
+  responses: {}
+  parameters: {}
+  examples: {}
+  requestBodies: {}
+  headers: {}
+  securitySchemes: {}
+  links: {}
+  callbacks: {}
+tags: []
+servers:
+  - url: http://example.com
+"
+`;
+
+exports[`Open API generator Metadata should pass over examples of the whole IO schema (POST) 1`] = `
+"openapi: 3.0.0
+info:
+  title: Testing Metadata:example on IO schema
+  version: 3.4.5
+paths:
+  /v1/getSomething:
+    post:
+      responses:
+        \\"200\\":
+          description: POST /v1/getSomething Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - success
+                  data:
+                    example:
+                      numericStr: \\"123\\"
+                    type: object
+                    properties:
+                      numericStr:
+                        type: string
+                        format: double
+                        minimum: 5e-324
+                        exclusiveMinimum: false
+                        maximum: 1.7976931348623157e+308
+                        exclusiveMaximum: false
+                    required:
+                      - numericStr
+                required:
+                  - status
+                  - data
+              examples:
+                example1:
+                  value:
+                    status: success
+                    data:
+                      numericStr: \\"123\\"
+        \\"400\\":
+          description: POST /v1/getSomething Error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                required:
+                  - status
+                  - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
+      requestBody:
+        content:
+          application/json:
+            schema:
+              description: POST /v1/getSomething request body
+              type: object
+              properties:
+                strNum:
+                  type: string
+              required:
+                - strNum
+            examples:
+              example1:
+                value:
+                  strNum: \\"123\\"
+components:
+  schemas: {}
+  responses: {}
+  parameters: {}
+  examples: {}
+  requestBodies: {}
+  headers: {}
+  securitySchemes: {}
+  links: {}
+  callbacks: {}
+tags: []
+servers:
+  - url: http://example.com
+"
+`;
+
+exports[`Open API generator Metadata should pass over the example of an individual parameter 1`] = `
+"openapi: 3.0.0
+info:
+  title: Testing Metadata:example on IO parameter
+  version: 3.4.5
+paths:
+  /v1/getSomething:
+    get:
+      responses:
+        \\"200\\":
+          description: GET /v1/getSomething Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - success
+                  data:
+                    type: object
+                    properties:
+                      numericStr:
+                        example: \\"123\\"
+                        type: string
+                        format: double
+                        minimum: 5e-324
+                        exclusiveMinimum: false
+                        maximum: 1.7976931348623157e+308
+                        exclusiveMaximum: false
+                    required:
+                      - numericStr
+                required:
+                  - status
+                  - data
+        \\"400\\":
+          description: GET /v1/getSomething Error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                required:
+                  - status
+                  - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
+      parameters:
+        - name: strNum
+          in: query
+          required: true
+          schema:
+            description: GET /v1/getSomething parameter
+            example: \\"123\\"
+            type: string
+components:
+  schemas: {}
+  responses: {}
+  parameters: {}
+  examples: {}
+  requestBodies: {}
+  headers: {}
+  securitySchemes: {}
+  links: {}
+  callbacks: {}
+tags: []
+servers:
+  - url: http://example.com
+"
+`;
+
+exports[`Open API generator Metadata should pass over the schema description 1`] = `
+"openapi: 3.0.0
+info:
+  title: Testing Metadata:description
+  version: 3.4.5
+paths:
+  /v1/getSomething:
+    get:
+      responses:
+        \\"200\\":
+          description: GET /v1/getSomething Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - success
+                  data:
+                    type: object
+                    properties:
+                      result:
+                        description: some positive integer
+                        type: integer
+                        format: int64
+                        minimum: 0
+                        exclusiveMinimum: true
+                        maximum: 9007199254740991
+                        exclusiveMaximum: false
+                    required:
+                      - result
+                required:
+                  - status
+                  - data
+        \\"400\\":
+          description: GET /v1/getSomething Error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                required:
+                  - status
+                  - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
+      parameters:
+        - name: str
+          in: query
+          required: true
+          schema:
+            description: here is the test
+            type: string
 components:
   schemas: {}
   responses: {}
@@ -296,6 +789,12 @@ paths:
                 required:
                   - status
                   - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
       parameters:
         - name: array
           in: query
@@ -410,6 +909,12 @@ paths:
                 required:
                   - status
                   - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
       requestBody:
         content:
           application/json:
@@ -501,6 +1006,12 @@ paths:
                 required:
                   - status
                   - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
       parameters:
         - name: optional
           in: query
@@ -609,6 +1120,12 @@ paths:
                 required:
                   - status
                   - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
       requestBody:
         content:
           application/json:
@@ -723,6 +1240,12 @@ paths:
                 required:
                   - status
                   - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
       description: example user retrieval endpoint
       parameters:
         - name: id
@@ -844,6 +1367,12 @@ paths:
                 required:
                   - status
                   - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
       requestBody:
         content:
           multipart/form-data:
@@ -871,6 +1400,9 @@ paths:
                     enum:
                       - success
                   data:
+                    example:
+                      name: John Doe
+                      timestamp: 1235698995125
                     type: object
                     properties:
                       name:
@@ -888,6 +1420,13 @@ paths:
                 required:
                   - status
                   - data
+              examples:
+                example1:
+                  value:
+                    status: success
+                    data:
+                      name: John Doe
+                      timestamp: 1235698995125
         \\"400\\":
           description: POST /v2/user Error response
           content:
@@ -909,6 +1448,12 @@ paths:
                 required:
                   - status
                   - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
       description: example user update endpoint
       requestBody:
         content:
@@ -934,6 +1479,12 @@ paths:
                 - key
                 - id
                 - name
+            examples:
+              example1:
+                value:
+                  key: 1234-5678-90
+                  id: 12
+                  name: John Doe
 components:
   schemas: {}
   responses: {}
@@ -1003,6 +1554,12 @@ paths:
                 required:
                   - status
                   - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
       requestBody:
         content:
           application/json:
@@ -1090,6 +1647,12 @@ paths:
                 required:
                   - status
                   - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
       requestBody:
         content:
           application/json:
@@ -1237,6 +1800,12 @@ paths:
                 required:
                   - status
                   - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
       requestBody:
         content:
           application/json:
@@ -1358,6 +1927,12 @@ paths:
                 required:
                   - status
                   - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
       requestBody:
         content:
           application/json:
@@ -1486,6 +2061,12 @@ paths:
                 required:
                   - status
                   - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
       requestBody:
         content:
           application/json:
@@ -1561,6 +2142,12 @@ paths:
                 required:
                   - status
                   - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
       requestBody:
         content:
           application/json:
@@ -1652,6 +2239,12 @@ paths:
                 required:
                   - status
                   - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
       requestBody:
         content:
           application/json:
@@ -1766,6 +2359,12 @@ paths:
                 required:
                   - status
                   - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
       parameters:
         - name: any
           in: query
@@ -1841,6 +2440,12 @@ paths:
                 required:
                   - status
                   - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
       parameters:
         - name: string
           in: query
