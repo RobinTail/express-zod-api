@@ -151,6 +151,22 @@ export const getExamples = <T extends z.ZodTypeAny>(schema: T, parseToOutput: bo
   }, [] as z.output<typeof schema>[]);
 };
 
+export const combinations = <T extends any>(a: T[], b: T[]): {type: 'single', value: T[]} | {type: 'tuple', value: [T, T][]} => {
+  if (a.length === 0) {
+    return {type: 'single', value: b};
+  }
+  if (b.length === 0) {
+    return {type: 'single', value: a};
+  }
+  const result: [T, T][] = [];
+  for (const itemA of a) {
+    for (const itemB of b) {
+      result.push([itemA, itemB]);
+    }
+  }
+  return {type: 'tuple', value: result};
+};
+
 // obtaining the private helper type from Zod
 export type ErrMessage = Exclude<Parameters<typeof z.ZodString.prototype.email>[0], undefined>;
 

@@ -1,5 +1,6 @@
 import {expectType} from 'tsd';
 import {
+  combinations,
   combineEndpointAndMiddlewareInputSchemas,
   extractObjectSchema, getExamples,
   getInitialInput,
@@ -454,6 +455,28 @@ describe('Helpers', () => {
           .example('456'),
         true
       )).toEqual([123, 456]);
+    });
+  });
+
+  describe('combinations()', () => {
+    test('should run callback on each combination of items from two arrays', () => {
+      expect(combinations([1, 2], [4, 5, 6])).toEqual({
+        type: 'tuple',
+        value: [
+          [1, 4],
+          [1, 5],
+          [1, 6],
+          [2, 4],
+          [2, 5],
+          [2, 6]
+        ]
+      });
+    });
+
+    test('should handle one or two arrays are empty', () => {
+      expect(combinations([], [4,5,6])).toEqual({type: 'single', value: [4, 5, 6]});
+      expect(combinations([1, 2, 3], [])).toEqual({type: 'single', value: [1, 2, 3]});
+      expect(combinations([], [])).toEqual({type: 'single', value: []});
     });
   });
 });
