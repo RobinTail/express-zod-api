@@ -233,10 +233,10 @@ By using `.addMiddleware()` method before `.build()` you can connect it to the e
 const yourEndpoint = defaultEndpointsFactory
   .addMiddleware(yourMiddleware)
   .build({
-     ...,
-     handler: async ({options}) => {
-       // options.id is your param from /user/:id
-     }
+    // ...,
+    handler: async ({ options }) => {
+      // options.id is your param from /user/:id
+    },
   });
 ```
 
@@ -250,7 +250,7 @@ const authMiddleware = createMiddleware({
     key: z.string().nonempty(),
   }),
   middleware: async ({ input: { key }, request, logger }) => {
-    logger.debug("Checking the key and token...");
+    logger.debug("Checking the key and token");
     const user = await db.Users.findOne({ key });
     if (!user) {
       throw createHttpError(401, "Invalid key");
@@ -279,17 +279,20 @@ By the way, you can implement additional validation within schema.
 Validation errors are reported in a response with a status code `400`.
 
 ```typescript
-import {createMiddleware, z} from 'express-zod-api';
+import { createMiddleware, z } from "express-zod-api";
 
 const nicknameConstraintMiddleware = createMiddleware({
   input: z.object({
-    nickname: z.string().nonempty().refine(
-      (nick) => !/^\d.*$/.test(nick),
-      'Nickname cannot start with a digit'
-    )
+    nickname: z
+      .string()
+      .nonempty()
+      .refine(
+        (nick) => !/^\d.*$/.test(nick),
+        "Nickname cannot start with a digit"
+      ),
   }),
-  ...
-})
+  // ...,
+});
 ```
 
 ## Transformations
@@ -298,21 +301,23 @@ Since parameters of GET requests come in the form of strings, there is often a n
 arrays of numbers.
 
 ```typescript
-import {z} from 'express-zod-api';
+import { z } from "express-zod-api";
 
 const getUserEndpoint = endpointsFactory.build({
-  method: 'get',
+  method: "get",
   input: z.object({
     id: z.string().transform((id) => parseInt(id, 10)),
-    ids: z.string().transform(
-      (ids) => ids.split(',').map((id) => parseInt(id, 10))
-    )
+    ids: z
+      .string()
+      .transform((ids) => ids.split(",").map((id) => parseInt(id, 10))),
   }),
-  output: z.object({...}),
-  handler: async ({input: {id, ids}, logger}) => {
-    logger.debug('id', id); // type: number
-    logger.debug('ids', ids); // type: number[]
-  }
+  output: z.object({
+    /* ... */
+  }),
+  handler: async ({ input: { id, ids }, logger }) => {
+    logger.debug("id", id); // type: number
+    logger.debug("ids", ids); // type: number[]
+  },
 });
 ```
 
@@ -414,27 +419,31 @@ Together with a corresponding configuration option, this makes it possible to ha
 Here is a simplified example:
 
 ```typescript
-import {createConfig, z, defaultEndpointsFactory} from 'express-zod-api';
+import { createConfig, z, defaultEndpointsFactory } from "express-zod-api";
 
 const config = createConfig({
   server: {
     upload: true, // <- required
-    ...
+    // ...,
   },
 });
 
 const fileUploadEndpoint = defaultEndpointsFactory.build({
-  method: 'post',
-  type: 'upload', // <- required
+  method: "post",
+  type: "upload", // <- required
   input: z.object({
-    avatar: z.upload()
+    avatar: z.upload(),
   }),
-  output: z.object({...}),
-  handler: async ({input: {avatar}}) => {
-    // avatar: {name, mv(), mimetype, data, size, ...}
+  output: z.object({
+    /* ... */
+  }),
+  handler: async ({ input: { avatar } }) => {
+    // avatar: {name, mv(), mimetype, data, size, etc}
     // avatar.truncated is true on failure
-    return {...};
-  }
+    return {
+      /* ... */
+    };
+  },
 });
 ```
 
@@ -445,11 +454,13 @@ _You can still send other data and specify additional `input` parameters, includ
 You can specify your custom Winston logger in config:
 
 ```typescript
-import * as winston from 'winston';
-import {createConfig} from 'express-zod-api';
+import * as winston from "winston";
+import { createConfig } from "express-zod-api";
 
-const logger = winston.createLogger({...});
-const config = createConfig({ logger, ... });
+const logger = winston.createLogger({
+  /* ... */
+});
+const config = createConfig({ logger /* ..., */ });
 ```
 
 ## Usage with your own express app
@@ -458,19 +469,21 @@ If you already have your own configured express application, or you find the lib
 you can connect your routing to the app instead of using `createServer()`.
 
 ```typescript
-import * as express from 'express';
-import {createConfig, attachRouting} from 'express-zod-api';
+import * as express from "express";
+import { createConfig, attachRouting } from "express-zod-api";
 
 const app = express();
-const config = createConfig({app, ...});
-const routing = {...};
+const config = createConfig({ app /* ..., */ });
+const routing = {
+  /* ... */
+};
 
-const {notFoundHandler, logger} = attachRouting(config, routing);
+const { notFoundHandler, logger } = attachRouting(config, routing);
 
 app.use(notFoundHandler); // optional
 app.listen();
 
-logger.info('Glory to science!');
+logger.info("Glory to science!");
 ```
 
 **Please note** that in this case you probably need to parse `request.body`, call `app.listen()` and handle `404`
@@ -505,17 +518,18 @@ You can customize the list of `request` properties that are combined into `input
 to your endpoints and middlewares.
 
 ```typescript
-import {createConfig} from 'express-zod-api';
+import { createConfig } from "express-zod-api";
 
 createConfig({
-  ...,
-  inputSources: { // the default value is:
-    get: ['query'],
-    post: ['body', 'files'],
-    put: ['body'],
-    patch: ['body'],
-    delete: ['query', 'body']
-  }
+  // ...,
+  inputSources: {
+    // the default value is:
+    get: ["query"],
+    post: ["body", "files"],
+    put: ["body"],
+    patch: ["body"],
+    delete: ["query", "body"],
+  },
 });
 ```
 
@@ -557,15 +571,17 @@ You can add descriptions and examples to any I/O schema or its properties, and t
 documentation of your API. Consider the following example:
 
 ```typescript
-import {defaultEndpointsFactory, withMeta} from 'express-zod-api';
+import { defaultEndpointsFactory, withMeta } from "express-zod-api";
 
 const exampleEndpoint = defaultEndpointsFactory.build({
-  input: withMeta(z.object({
-    id: z.number().describe('the ID of the user')
-  })).example({
-    id: 123
+  input: withMeta(
+    z.object({
+      id: z.number().describe("the ID of the user"),
+    })
+  ).example({
+    id: 123,
   }),
-  ... // similarly for output and middlewares
+  // ..., // similarly for output and middlewares
 });
 ```
 

@@ -83,17 +83,18 @@ example:
   input that is being validated and available to your endpoints and middlewares.
 
 ```typescript
-import {createConfig} from 'express-zod-api';
+import { createConfig } from "express-zod-api";
 
 createConfig({
-  ...,
-  inputSources: { // the default value is:
-    get: ['query'],
-    post: ['body', 'files'],
-    put: ['body'],
-    patch: ['body'],
-    delete: ['query', 'body']
-  }
+  // ...,
+  inputSources: {
+    // the default value is:
+    get: ["query"],
+    post: ["body", "files"],
+    put: ["body"],
+    patch: ["body"],
+    delete: ["query", "body"],
+  },
 });
 ```
 
@@ -101,10 +102,10 @@ createConfig({
 
 ```typescript
 createConfig({
-  ...,
+  // ...,
   inputSources: {
-    post: ['query', 'body', 'files'],
-  }
+    post: ["query", "body", "files"],
+  },
 });
 ```
 
@@ -209,17 +210,21 @@ const config = createConfig({
 
 ```typescript
 const fileUploadEndpoint = defaultEndpointsFactory.build({
-  method: 'post',
-  type: 'upload', // <- new option, required
+  method: "post",
+  type: "upload", // <- new option, required
   input: z.object({
-    avatar: z.upload()
+    avatar: z.upload(),
   }),
-  output: z.object({...}),
-  handler: async ({input: {avatar}}) => {
-    // avatar: {name, mv(), mimetype, encoding, data, truncated, size, ...}
+  output: z.object({
+    /* ... */
+  }),
+  handler: async ({ input: { avatar } }) => {
+    // avatar: {name, mv(), mimetype, encoding, data, truncated, size, etc}
     // avatar.truncated is true on failure
-    return {...};
-  }
+    return {
+      /* ... */
+    };
+  },
 });
 ```
 
@@ -316,7 +321,7 @@ ZodTuple: # z.tuple()
       oneOf: [] # schemas of the tuple items
     minItems: value # number of items in the tuple
     maxItems: value # number of items in the tuple
-    description: "0: type, 1: type, ..."
+    description: "0: type, 1: type, etc"
 ```
 
 ### v2.2.0
@@ -375,16 +380,20 @@ ZodString: # z.string()
 
 ```typescript
 // before
-const fileStreamingEndpointsFactoryBefore = new EndpointsFactory(createResultHandler({
-  getPositiveResponse: () => createApiResponse(z.string(), 'image/*'),
-  ...
-}));
+const fileStreamingEndpointsFactoryBefore = new EndpointsFactory(
+  createResultHandler({
+    getPositiveResponse: () => createApiResponse(z.string(), "image/*"),
+    // ...,
+  })
+);
 
 // after
-const fileStreamingEndpointsFactoryAfter = new EndpointsFactory(createResultHandler({
-  getPositiveResponse: () => createApiResponse(z.file().binary(), 'image/*'),
-  ...
-}));
+const fileStreamingEndpointsFactoryAfter = new EndpointsFactory(
+  createResultHandler({
+    getPositiveResponse: () => createApiResponse(z.file().binary(), "image/*"),
+    // ...,
+  })
+);
 ```
 
 - Please do NOT use `z.file()` within the `Endpoint` input / output object schemas.
@@ -458,32 +467,38 @@ errorHandler: ResultHandlerDefinition<any, any>; // optional, default: defaultRe
 
 ```typescript
 // Example. Before (v1):
-import {EndpointOutput} from 'express-zod-api';
+import { EndpointOutput } from "express-zod-api";
 
-const myEndpointV1 = endpointsFactory
-  .build({
-    method: 'get',
-    input: z.object({...}),
-    output: z.object({
-      name: z.string(),
-    }),
-    handler: async () => ({...}),
-  });
+const myEndpointV1 = endpointsFactory.build({
+  method: "get",
+  input: z.object({
+    /* ... */
+  }),
+  output: z.object({
+    name: z.string(),
+  }),
+  handler: async () => ({
+    /* ... */
+  }),
+});
 type MyEndpointOutput = EndpointOutput<typeof myEndpointV1>; // => { name: string }
 
 // and after (v2):
-import {defaultEndpointsFactory, EndpointResponse} from 'express-zod-api';
+import { defaultEndpointsFactory, EndpointResponse } from "express-zod-api";
 
-const myEndpointV2 = defaultEndpointsFactory
-  .build({
-    method: 'get',
-    input: z.object({...}),
-    output: z.object({
-      name: z.string(),
-    }),
-    handler: async () => ({...}),
-  });
-type MyEndpointResponse = EndpointResponse<typeof myEndpointV2>; // => the following type
+const myEndpointV2 = defaultEndpointsFactory.build({
+  method: "get",
+  input: z.object({
+    /* ... */
+  }),
+  output: z.object({
+    name: z.string(),
+  }),
+  handler: async () => ({
+    /* ... */
+  }),
+});
+type MyEndpointResponse = EndpointResponse<typeof myEndpointV2>; // => the following type:
 //  {
 //    status: 'success';
 //    data: { name: string };
@@ -498,9 +513,13 @@ type MyEndpointResponse = EndpointResponse<typeof myEndpointV2>; // => the follo
 
 ```typescript
 // before
-new OpenAPI({...}).builder.getSpecAsYaml();
+new OpenAPI({
+  /* ... */
+}).builder.getSpecAsYaml();
 // after
-new OpenAPI({...}).getSpecAsYaml();
+new OpenAPI({
+  /* ... */
+}).getSpecAsYaml();
 ```
 
 - OpenAPI / Swagger specification no longer uses references for schemas and parameters, so they are inline now.
@@ -514,18 +533,35 @@ new OpenAPI({...}).getSpecAsYaml();
 
 ```typescript
 // before
-const myResultHandlerV1: ResultHandler = ({error, request, response, input, output, logger}) => {};
+const myResultHandlerV1: ResultHandler = ({
+  error,
+  request,
+  response,
+  input,
+  output,
+  logger,
+}) => {
+  /* ... */
+};
 // after
 const myResultHandlerV2 = createResultHandler({
-  getPositiveResponse: <OUT extends IOSchema>(output: OUT) => createApiResponse(
-    z.object({
-      ...,
-      someProperty: markOutput(output)
-    }),
-    ['mime/type1', 'mime/type2'] // optional, default: application/json
-  ),
-  getNegativeResponse: () => createApiResponse(z.object({...})),
-  handler: ({error, input, output, request, response, logger}) => {}
+  getPositiveResponse: <OUT extends IOSchema>(output: OUT) =>
+    createApiResponse(
+      z.object({
+        // ...,
+        someProperty: markOutput(output),
+      }),
+      ["mime/type1", "mime/type2"] // optional, default: application/json
+    ),
+  getNegativeResponse: () =>
+    createApiResponse(
+      z.object({
+        /* ... */
+      })
+    ),
+  handler: ({ error, input, output, request, response, logger }) => {
+    /* ... */
+  },
 });
 ```
 
@@ -556,8 +592,8 @@ const myResultHandlerV2 = createResultHandler({
 ```typescript
 // example
 const endpoint = endpointsFactory.build({
-  description: 'Here is an example description of the endpoint',
-  ...
+  description: "Here is an example description of the endpoint",
+  // ...,
 });
 ```
 
@@ -566,8 +602,8 @@ const endpoint = endpointsFactory.build({
 ```typescript
 // example
 const endpoint = endpointsFactory.build({
-  method: 'get', // same as methods:['get'] before
-  ...
+  method: "get", // same as methods:['get'] before
+  // ...,
 });
 ```
 
@@ -704,9 +740,9 @@ export type ConfigType = (
 
 ```typescript
 // before
-initRouting({app, logger, config, routing});
+initRouting({ app, logger, config, routing });
 // after
-const config: ConfigType = {app, ...};
+const config: ConfigType = { app /* ..., */ };
 attachRouting(config, routing);
 ```
 
