@@ -1,32 +1,53 @@
-import {z} from 'zod';
-import {ApiResponse} from './api-response';
-import {Endpoint, Handler} from './endpoint';
-import {FlatObject, IOSchema, Merge} from './helpers';
-import {Method, MethodsDefinition} from './method';
-import {MiddlewareDefinition} from './middleware';
-import {mimeJson, mimeMultipart} from './mime';
-import {defaultResultHandler, ResultHandlerDefinition} from './result-handler';
+import { z } from "zod";
+import { ApiResponse } from "./api-response";
+import { Endpoint, Handler } from "./endpoint";
+import { FlatObject, IOSchema, Merge } from "./helpers";
+import { Method, MethodsDefinition } from "./method";
+import { MiddlewareDefinition } from "./middleware";
+import { mimeJson, mimeMultipart } from "./mime";
+import {
+  defaultResultHandler,
+  ResultHandlerDefinition,
+} from "./result-handler";
 
-type BuildProps<IN extends IOSchema, OUT extends IOSchema, MwIN, MwOUT, M extends Method> = {
+type BuildProps<
+  IN extends IOSchema,
+  OUT extends IOSchema,
+  MwIN,
+  MwOUT,
+  M extends Method
+> = {
   input: IN;
   output: OUT;
   handler: Handler<z.output<Merge<IN, MwIN>>, z.input<OUT>, MwOUT>;
   description?: string;
-  type?: 'json' | 'upload'; // @todo can we detect the usage of z.upload() within input?
+  type?: "json" | "upload"; // @todo can we detect the usage of z.upload() within input?
 } & MethodsDefinition<M>;
 
-export class EndpointsFactory<MwIN, MwOUT, POS extends ApiResponse, NEG extends ApiResponse> {
+export class EndpointsFactory<
+  MwIN,
+  MwOUT,
+  POS extends ApiResponse,
+  NEG extends ApiResponse
+> {
   protected middlewares: MiddlewareDefinition<any, any, any>[] = [];
 
   constructor(protected resultHandler: ResultHandlerDefinition<POS, NEG>) {
     this.resultHandler = resultHandler;
   }
 
-  static #create<CrMwIN, CrMwOUT, CrPOS extends ApiResponse, CrNEG extends ApiResponse>(
+  static #create<
+    CrMwIN,
+    CrMwOUT,
+    CrPOS extends ApiResponse,
+    CrNEG extends ApiResponse
+  >(
     middlewares: MiddlewareDefinition<any, any, any>[],
     resultHandler: ResultHandlerDefinition<CrPOS, CrNEG>
   ) {
-    const factory = new EndpointsFactory<CrMwIN, CrMwOUT, CrPOS, CrNEG>(resultHandler);
+    const factory = new EndpointsFactory<CrMwIN, CrMwOUT, CrPOS, CrNEG>(
+      resultHandler
+    );
     factory.middlewares = middlewares;
     return factory;
   }
@@ -41,18 +62,26 @@ export class EndpointsFactory<MwIN, MwOUT, POS extends ApiResponse, NEG extends 
   }
 
   public build<IN extends IOSchema, OUT extends IOSchema, M extends Method>({
-    input, output, handler, description, type, ...rest
+    input,
+    output,
+    handler,
+    description,
+    type,
+    ...rest
   }: BuildProps<IN, OUT, MwIN, MwOUT, M>) {
     return new Endpoint<IN, OUT, MwIN, MwOUT, M, POS, NEG>({
-      handler, description,
+      handler,
+      description,
       middlewares: this.middlewares,
       inputSchema: input,
       outputSchema: output,
       resultHandler: this.resultHandler,
-      mimeTypes: type === 'upload' ? [mimeMultipart] : [mimeJson],
-      ...rest
+      mimeTypes: type === "upload" ? [mimeMultipart] : [mimeJson],
+      ...rest,
     });
   }
 }
 
-export const defaultEndpointsFactory = new EndpointsFactory(defaultResultHandler);
+export const defaultEndpointsFactory = new EndpointsFactory(
+  defaultResultHandler
+);

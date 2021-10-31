@@ -1,6 +1,6 @@
-import * as path from 'path';
-import * as fs from 'fs';
-import * as manifest from '../package.json';
+import * as path from "path";
+import * as fs from "fs";
+import * as manifest from "../package.json";
 
 const ownLicense = `
 MIT License
@@ -35,58 +35,63 @@ interface Lib {
 
 const libs: Lib[] = [
   {
-    name: 'Express',
-    url: 'https://github.com/expressjs/express',
-    module: 'express',
+    name: "Express",
+    url: "https://github.com/expressjs/express",
+    module: "express",
   },
   {
-    name: 'Zod',
-    url: 'https://github.com/colinhacks/zod',
-    module: 'zod',
+    name: "Zod",
+    url: "https://github.com/colinhacks/zod",
+    module: "zod",
   },
   {
-    name: 'HTTP Errors',
-    url: 'https://github.com/jshttp/http-errors',
-    module: 'http-errors',
+    name: "HTTP Errors",
+    url: "https://github.com/jshttp/http-errors",
+    module: "http-errors",
   },
   {
-    name: 'OpenApi3-TS',
-    url: 'https://github.com/metadevpro/openapi3-ts',
-    module: 'openapi3-ts'
+    name: "OpenApi3-TS",
+    url: "https://github.com/metadevpro/openapi3-ts",
+    module: "openapi3-ts",
   },
   {
-    name: 'Winston',
-    url: 'https://github.com/winstonjs/winston',
-    module: 'winston'
+    name: "Winston",
+    url: "https://github.com/winstonjs/winston",
+    module: "winston",
   },
   {
-    name: 'Mime',
-    url: 'https://github.com/broofa/mime',
-    module: 'mime'
+    name: "Mime",
+    url: "https://github.com/broofa/mime",
+    module: "mime",
   },
   {
-    name: 'Express-FileUpload',
-    url: 'https://github.com/richardgirges/express-fileupload',
-    module: 'express-fileupload'
+    name: "Express-FileUpload",
+    url: "https://github.com/richardgirges/express-fileupload",
+    module: "express-fileupload",
   },
   {
-    name: 'Ramda',
-    url: 'https://github.com/ramda/ramda',
-    module: 'ramda',
-    file: 'LICENSE.txt'
+    name: "Ramda",
+    url: "https://github.com/ramda/ramda",
+    module: "ramda",
+    file: "LICENSE.txt",
   },
   {
-    name: 'Triple-Beam',
-    url: 'https://github.com/winstonjs/triple-beam',
-    module: 'triple-beam'
-  }
+    name: "Triple-Beam",
+    url: "https://github.com/winstonjs/triple-beam",
+    module: "triple-beam",
+  },
 ];
 
-const separator = '\n'.repeat(4);
+const separator = "\n".repeat(4);
 
-const otherLicenses = libs.map(({name, url, module, file = 'LICENSE'}) => {
-  const license = fs.readFileSync(path.join('node_modules', module, file), 'utf-8');
-  return `${name} - ${url}\n\n${license.trim()}`;
-}).join(separator);
+const otherLicenses = libs
+  .map(({ name, url, module, file = "LICENSE" }) => {
+    const license = fs.readFileSync(
+      path.join("node_modules", module, file),
+      "utf-8"
+    );
+    return `${name} - ${url}\n\n${license.trim()}`;
+  })
+  .join(separator);
 
 console.log(`${ownLicense.trim()}${separator}${otherLicenses}`);

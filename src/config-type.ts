@@ -1,9 +1,9 @@
-import {NextHandleFunction} from 'connect';
-import {Express} from 'express';
-import fileUpload from 'express-fileupload';
-import {Logger} from 'winston';
-import {Method} from './method';
-import {ResultHandlerDefinition} from './result-handler';
+import { NextHandleFunction } from "connect";
+import { Express } from "express";
+import fileUpload from "express-fileupload";
+import { Logger } from "winston";
+import { Method } from "./method";
+import { ResultHandlerDefinition } from "./result-handler";
 
 export const loggerLevels = {
   silent: true,
@@ -16,24 +16,32 @@ export interface LoggerConfig {
   color: boolean;
 }
 
-type UploadOptions = Pick<fileUpload.Options,
-  'createParentPath' | 'uriDecodeFileNames' | 'safeFileNames' | 'preserveExtension' |
-  'useTempFiles' | 'tempFileDir' | 'debug' | 'uploadTimeout'
+type UploadOptions = Pick<
+  fileUpload.Options,
+  | "createParentPath"
+  | "uriDecodeFileNames"
+  | "safeFileNames"
+  | "preserveExtension"
+  | "useTempFiles"
+  | "tempFileDir"
+  | "debug"
+  | "uploadTimeout"
 >;
 
 export interface ServerConfig {
-  server: { // server configuration
+  server: {
+    // server configuration
     listen: number | string; // port or socket
     jsonParser?: NextHandleFunction; // custom JSON parser, default: express.json()
     upload?: boolean | UploadOptions;
-  }
+  };
 }
 
 export interface AppConfig {
   app: Express; // or your custom express app
 }
 
-export type InputSources = Record<Method, ('query' | 'body' | 'files')[]>;
+export type InputSources = Record<Method, ("query" | "body" | "files")[]>;
 
 export interface CommonConfig {
   // enable cross-origin resource sharing
@@ -52,7 +60,11 @@ export interface CommonConfig {
   inputSources?: Partial<InputSources>;
 }
 
-export const createConfig = <T extends (ServerConfig | AppConfig) & CommonConfig>(config: T): T => config;
+export const createConfig = <
+  T extends (ServerConfig | AppConfig) & CommonConfig
+>(
+  config: T
+): T => config;
 
 /**
  * @since v2.3.1

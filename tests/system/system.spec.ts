@@ -1,5 +1,5 @@
-import http from 'http';
-import fetch from 'node-fetch';
+import http from "http";
+import fetch from "node-fetch";
 import {
   createServer,
   EndpointsFactory,
@@ -7,83 +7,93 @@ import {
   z,
   defaultResultHandler,
   createResultHandler,
-  createApiResponse
-} from '../../src';
-import {waitFor} from '../helpers';
+  createApiResponse,
+} from "../../src";
+import { waitFor } from "../helpers";
 
-describe('App', () => {
+describe("App", () => {
   let server: http.Server;
 
   beforeAll(() => {
     const routing = {
       v1: {
-        faulty: new EndpointsFactory(createResultHandler({
-          getPositiveResponse: () => createApiResponse(z.object({})),
-          getNegativeResponse: () => createApiResponse(z.object({})),
-          handler: () => {
-            throw new Error('I am faulty');
-          }
-        })).build({
-          method: 'get',
+        faulty: new EndpointsFactory(
+          createResultHandler({
+            getPositiveResponse: () => createApiResponse(z.object({})),
+            getNegativeResponse: () => createApiResponse(z.object({})),
+            handler: () => {
+              throw new Error("I am faulty");
+            },
+          })
+        ).build({
+          method: "get",
           input: z.object({}),
           output: z.object({
-            test: z.string()
+            test: z.string(),
           }),
           handler: async () => ({
-            test: 'Should not work'
-          })
+            test: "Should not work",
+          }),
         }),
         test: new EndpointsFactory(defaultResultHandler)
           .addMiddleware({
             input: z.object({
-              key: z.string().refine((v) => v === '123', 'Invalid key')
+              key: z.string().refine((v) => v === "123", "Invalid key"),
             }),
             middleware: async () => ({
               user: {
-                id: 354
-              }
-            })
+                id: 354,
+              },
+            }),
           })
           .addMiddleware({
             input: z.object({}),
-            middleware: async ({request, options: {user}}) => ({
+            middleware: async ({ request, options: { user } }) => ({
               method: request.method.toLowerCase() as Method,
-              permissions: user.id === 354 ? ['any'] : []
-            })
+              permissions: user.id === 354 ? ["any"] : [],
+            }),
           })
           .build({
-            methods: ['get', 'post'],
+            methods: ["get", "post"],
             input: z.object({
-              something: z.string()
+              something: z.string(),
             }),
-            output: z.object({
-              anything: z.number().positive()
-            }).passthrough(), // allow excessive keys
-            handler: async ({input: {key, something}, options: {user, permissions, method}}) => ({
-              anything: something === 'joke' ? 300 : -100500,
+            output: z
+              .object({
+                anything: z.number().positive(),
+              })
+              .passthrough(), // allow excessive keys
+            handler: async ({
+              input: { key, something },
+              options: { user, permissions, method },
+            }) => ({
+              anything: something === "joke" ? 300 : -100500,
               doubleKey: key.repeat(2),
               userId: user.id,
               permissions,
-              method
-            })
-          })
-      }
+              method,
+            }),
+          }),
+      },
     };
-    jest.spyOn(global.console, 'log').mockImplementation(jest.fn());
-    server = createServer({
-      server: {
-        listen: 8055,
+    jest.spyOn(global.console, "log").mockImplementation(jest.fn());
+    server = createServer(
+      {
+        server: {
+          listen: 8055,
+        },
+        cors: true,
+        startupLogo: true,
+        logger: {
+          level: "silent",
+          color: false,
+        },
+        inputSources: {
+          post: ["query", "body", "files"],
+        },
       },
-      cors: true,
-      startupLogo: true,
-      logger: {
-        level: 'silent',
-        color: false
-      },
-      inputSources: {
-        post: ['query', 'body', 'files']
-      }
-    }, routing);
+      routing
+    );
   });
 
   afterAll(async () => {
@@ -93,125 +103,132 @@ describe('App', () => {
     jest.restoreAllMocks();
   });
 
-  describe('Positive', () => {
-    test('Is listening', () => {
+  describe("Positive", () => {
+    test("Is listening", () => {
       expect(server.listening).toBeTruthy();
     });
 
-    test('Should handle valid GET request', async () => {
-      const response = await fetch('http://127.0.0.1:8055/v1/test?key=123&something=joke');
+    test("Should handle valid GET request", async () => {
+      const response = await fetch(
+        "http://127.0.0.1:8055/v1/test?key=123&something=joke"
+      );
       expect(response.status).toBe(200);
       const json = await response.json();
       expect(json).toEqual({
-        status: 'success',
+        status: "success",
         data: {
           anything: 300,
-          doubleKey: '123123',
+          doubleKey: "123123",
           userId: 354,
-          permissions: ['any'],
-          method: 'get'
-        }
+          permissions: ["any"],
+          method: "get",
+        },
       });
     });
 
-    test('Should handle valid POST request', async () => {
-      const response = await fetch('http://127.0.0.1:8055/v1/test', {
-        method: 'POST',
+    test("Should handle valid POST request", async () => {
+      const response = await fetch("http://127.0.0.1:8055/v1/test", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          key: '123',
-          something: 'joke'
-        })
+          key: "123",
+          something: "joke",
+        }),
       });
       expect(response.status).toBe(200);
       const json = await response.json();
       expect(json).toEqual({
-        status: 'success',
+        status: "success",
         data: {
           anything: 300,
-          doubleKey: '123123',
+          doubleKey: "123123",
           userId: 354,
-          permissions: ['any'],
-          method: 'post'
-        }
+          permissions: ["any"],
+          method: "post",
+        },
       });
     });
 
-    test('Issue 158: should use query for POST on demand', async () => {
-      const response = await fetch('http://127.0.0.1:8055/v1/test?key=123&something=joke', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-      });
+    test("Issue 158: should use query for POST on demand", async () => {
+      const response = await fetch(
+        "http://127.0.0.1:8055/v1/test?key=123&something=joke",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
       expect(response.status).toBe(200);
       const json = await response.json();
       expect(json).toEqual({
-        status: 'success',
+        status: "success",
         data: {
           anything: 300,
-          doubleKey: '123123',
+          doubleKey: "123123",
           userId: 354,
-          permissions: ['any'],
-          method: 'post'
-        }
+          permissions: ["any"],
+          method: "post",
+        },
       });
     });
   });
 
-  describe('Negative', () => {
-    test('Should call Last Resort Handler in case of faulty ResultHandler', async () => {
-      const response = await fetch('http://127.0.0.1:8055/v1/faulty', {
-        method: 'GET',
+  describe("Negative", () => {
+    test("Should call Last Resort Handler in case of faulty ResultHandler", async () => {
+      const response = await fetch("http://127.0.0.1:8055/v1/faulty", {
+        method: "GET",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
       });
       expect(response.status).toBe(500);
       const text = await response.text();
-      expect(text).toBe('An error occurred while serving the result: I am faulty.');
+      expect(text).toBe(
+        "An error occurred while serving the result: I am faulty."
+      );
     });
   });
 
-  describe('Protocol', () => {
-    test('Should fail on invalid method', async () => {
-      const response = await fetch('http://127.0.0.1:8055/v1/test', {
-        method: 'PUT',
+  describe("Protocol", () => {
+    test("Should fail on invalid method", async () => {
+      const response = await fetch("http://127.0.0.1:8055/v1/test", {
+        method: "PUT",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          key: '123',
-          something: 'joke'
-        })
+          key: "123",
+          something: "joke",
+        }),
       });
       expect(response.status).toBe(404);
       const json = await response.json();
       expect(json).toMatchSnapshot();
     });
 
-    test('Should fail on malformed body', async () => {
-      const response = await fetch('http://127.0.0.1:8055/v1/test', {
-        method: 'PUT',
+    test("Should fail on malformed body", async () => {
+      const response = await fetch("http://127.0.0.1:8055/v1/test", {
+        method: "PUT",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
-        body: '{"key": "123", "something'
+        body: '{"key": "123", "something',
       });
       expect(response.status).toBe(500);
       const json = await response.json();
       expect(json).toMatchSnapshot();
     });
 
-    test('Should fail when missing content type header', async () => {
-      const response = await fetch('http://127.0.0.1:8055/v1/test', {
-        method: 'POST',
+    test("Should fail when missing content type header", async () => {
+      const response = await fetch("http://127.0.0.1:8055/v1/test", {
+        method: "POST",
         body: JSON.stringify({
-          key: '123',
-          something: 'joke'
-        })
+          key: "123",
+          something: "joke",
+        }),
       });
       expect(response.status).toBe(400);
       const json = await response.json();
@@ -219,65 +236,65 @@ describe('App', () => {
     });
   });
 
-  describe('Validation', () => {
-    test('Should fail on middleware input type mismatch', async () => {
-      const response = await fetch('http://127.0.0.1:8055/v1/test', {
-        method: 'POST',
+  describe("Validation", () => {
+    test("Should fail on middleware input type mismatch", async () => {
+      const response = await fetch("http://127.0.0.1:8055/v1/test", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           key: 123,
-          something: 'joke'
-        })
+          something: "joke",
+        }),
       });
       expect(response.status).toBe(400);
       const json = await response.json();
       expect(json).toMatchSnapshot();
     });
 
-    test('Should fail on middleware refinement mismatch', async () => {
-      const response = await fetch('http://127.0.0.1:8055/v1/test', {
-        method: 'POST',
+    test("Should fail on middleware refinement mismatch", async () => {
+      const response = await fetch("http://127.0.0.1:8055/v1/test", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          key: '456',
-          something: 'joke'
-        })
+          key: "456",
+          something: "joke",
+        }),
       });
       expect(response.status).toBe(400);
       const json = await response.json();
       expect(json).toMatchSnapshot();
     });
 
-    test('Should fail on handler input type mismatch', async () => {
-      const response = await fetch('http://127.0.0.1:8055/v1/test', {
-        method: 'POST',
+    test("Should fail on handler input type mismatch", async () => {
+      const response = await fetch("http://127.0.0.1:8055/v1/test", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          key: '123',
-          something: 123
-        })
+          key: "123",
+          something: 123,
+        }),
       });
       expect(response.status).toBe(400);
       const json = await response.json();
       expect(json).toMatchSnapshot();
     });
 
-    test('Should fail on handler output type mismatch', async () => {
-      const response = await fetch('http://127.0.0.1:8055/v1/test', {
-        method: 'POST',
+    test("Should fail on handler output type mismatch", async () => {
+      const response = await fetch("http://127.0.0.1:8055/v1/test", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          key: '123',
-          something: 'gimme fail'
-        })
+          key: "123",
+          something: "gimme fail",
+        }),
       });
       expect(response.status).toBe(400);
       const json = await response.json();
