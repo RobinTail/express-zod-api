@@ -1,8 +1,10 @@
-import {createMiddleware, Method, createHttpError, z} from '../src';
+import {createMiddleware, Method, createHttpError, z, withMeta} from '../src';
 
 export const authMiddleware = createMiddleware({
-  input: z.object({
+  input: withMeta(z.object({
     key: z.string().nonempty()
+  })).example({
+    key: '1234-5678-90'
   }),
   middleware: async ({input: {key}, request, logger}) => {
     logger.debug('Checking the key and token...');

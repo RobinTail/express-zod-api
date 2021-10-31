@@ -23,6 +23,7 @@ export const routing: Routing = {
   // syntax 2: methods are defined within the route
   v2: {
     user: new DependsOnMethod({
+      // withMeta().example() example here:
       post: updateUserEndpoint // the Endpoint should have at least the same method specified in .build()
     }),
   }

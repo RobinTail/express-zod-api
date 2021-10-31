@@ -1202,9 +1202,6 @@ paths:
                     enum:
                       - success
                   data:
-                    example:
-                      id: 12
-                      name: John Doe
                     type: object
                     properties:
                       id:
@@ -1222,13 +1219,6 @@ paths:
                 required:
                   - status
                   - data
-              examples:
-                example1:
-                  value:
-                    status: success
-                    data:
-                      id: 12
-                      name: John Doe
         \\"400\\":
           description: GET /v1/user/retrieve Error response
           content:
@@ -1265,9 +1255,6 @@ paths:
             description: a numeric string containing the id of the user
             type: string
             pattern: /\\\\d+/
-          examples:
-            example1:
-              value: \\"12\\"
   /v1/avatar/send:
     get:
       responses:
@@ -1413,6 +1400,9 @@ paths:
                     enum:
                       - success
                   data:
+                    example:
+                      name: John Doe
+                      timestamp: 1235698995125
                     type: object
                     properties:
                       name:
@@ -1430,6 +1420,13 @@ paths:
                 required:
                   - status
                   - data
+              examples:
+                example1:
+                  value:
+                    status: success
+                    data:
+                      name: John Doe
+                      timestamp: 1235698995125
         \\"400\\":
           description: POST /v2/user Error response
           content:
@@ -1482,6 +1479,12 @@ paths:
                 - key
                 - id
                 - name
+            examples:
+              example1:
+                value:
+                  key: 1234-5678-90
+                  id: 12
+                  name: John Doe
 components:
   schemas: {}
   responses: {}
