@@ -45,16 +45,17 @@ export type ReplaceMarkerInShape<S extends z.ZodRawShape, OUT extends IOSchema> 
 }
 
 export function extractObjectSchema(subject: IOSchema): ObjectSchema {
+  if (subject instanceof z.ZodObject) {
+    return subject;
+  }
+  let objectSchema: ObjectSchema;
   if (subject instanceof z.ZodUnion) {
-    const objectSchema = subject.options.reduce((acc, option) =>
+    objectSchema = subject.options.reduce((acc, option) =>
       acc.partial().merge(option.partial()));
-    return copyMeta(subject, objectSchema);
+  } else { // intersection schema
+    objectSchema = subject._def.left.merge(subject._def.right);
   }
-  if (subject instanceof z.ZodIntersection) {
-    const objectSchema = subject._def.left.merge(subject._def.right);
-    return copyMeta(subject, objectSchema);
-  }
-  return subject;
+  return copyMeta(subject, objectSchema);
 }
 
 export function combineEndpointAndMiddlewareInputSchemas<IN extends IOSchema, mIN>(
