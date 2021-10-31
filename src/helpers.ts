@@ -2,7 +2,7 @@ import {Request} from 'express';
 import {HttpError} from 'http-errors';
 import {z} from 'zod';
 import {CommonConfig, InputSources, LoggerConfig, loggerLevels} from './config-type';
-import {copyMeta, getMeta, MetaDef, metaProp} from './metadata';
+import {copyMeta, getMeta} from './metadata';
 import {Method} from './method';
 import {MiddlewareDefinition} from './middleware';
 import {mimeMultipart} from './mime';
@@ -70,7 +70,9 @@ export function combineEndpointAndMiddlewareInputSchemas<IN extends IOSchema, mI
       extractObjectSchema(carry).merge(extractObjectSchema(schema))
     );
   const result = extractObjectSchema(mSchema).merge(extractObjectSchema(input)) as Merge<IN, mIN>;
-  middlewares.forEach((middleware) => copyMeta(middleware.input, result));
+  for (const middleware of middlewares) {
+    copyMeta(middleware.input, result);
+  }
   copyMeta(input, result);
   return result;
 }
