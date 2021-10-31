@@ -2,7 +2,8 @@ import {expectType} from 'tsd';
 import {
   combinations,
   combineEndpointAndMiddlewareInputSchemas,
-  extractObjectSchema, getExamples,
+  extractObjectSchema,
+  getExamples,
   getInitialInput,
   getMessageFromError,
   getStatusCodeFromError,
