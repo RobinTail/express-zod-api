@@ -139,8 +139,11 @@ describe('Metadata', () => {
       expect(hasMeta(result)).toBeTruthy();
       expect(getMeta(result, 'examples')).toEqual([
         { a: 'some', b: 123 },
+        { a: 'another', b: 123 },
+        { a: 'some', b: 456 },
         { a: 'another', b: 456 },
-        { b: 789 } // @todo this is wrong, it should combine examples in a many-to-many pattern (should be 6 of them)
+        { a: 'some', b: 789 },
+        { a: 'another', b: 789 }
       ]);
       expect(result).toEqual(dest);
     });

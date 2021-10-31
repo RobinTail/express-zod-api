@@ -1,3 +1,4 @@
+import {combinations} from './helpers';
 import {z} from './index';
 import deepMerge from 'lodash.merge';
 
@@ -22,14 +23,14 @@ export const withMeta = <T extends z.ZodTypeAny>(schema: T) => {
   const def = schema._def as MetaDef<T>;
   def[metaProp] = def[metaProp] || { examples: [] };
   if (!('example' in schema)) {
-  Object.defineProperties(schema, {
-    example: {
-      get: (): ExampleSetter<T> => (value) => {
-        def[metaProp].examples.push(value);
-        return schema as WithMeta<T>;
+    Object.defineProperties(schema, {
+      example: {
+        get: (): ExampleSetter<T> => (value) => {
+          def[metaProp].examples.push(value);
+          return schema as WithMeta<T>;
+        }
       }
-    }
-  });
+    });
   }
   return schema as WithMeta<T>;
 };
@@ -53,7 +54,22 @@ export const copyMeta = <A extends z.ZodTypeAny, B extends z.ZodTypeAny>(src: A,
   if (!hasMeta(src)) {
     return dest;
   }
+  dest = withMeta(dest);
   const def = dest._def as MetaDef<B>;
-  def[metaProp] = deepMerge(def[metaProp], src._def[metaProp]);
+  const examplesCombinations = combinations(def[metaProp].examples, src._def[metaProp].examples);
+  // general deep merge except examples
+  def[metaProp] = deepMerge(
+    { ...def[metaProp], examples: [] },
+    { ...src._def[metaProp], examples: [] }
+  );
+  if (examplesCombinations.type === 'single') {
+    def[metaProp].examples = examplesCombinations.value;
+  } else {
+    for (const [destExample, srcExample] of examplesCombinations.value) {
+      def[metaProp].examples.push(
+        deepMerge({...destExample}, {...srcExample})
+      );
+    }
+  }
   return dest;
 };
