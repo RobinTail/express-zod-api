@@ -65,11 +65,3 @@ export const createConfig = <
 >(
   config: T
 ): T => config;
-
-/**
- * @since v2.3.1
- * @deprecated
- * @see createConfig()
- * @todo remove in v3
- * */
-export type ConfigType = (ServerConfig | AppConfig) & CommonConfig;
