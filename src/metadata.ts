@@ -20,7 +20,8 @@ type WithMeta<T extends z.ZodTypeAny> = T & {
 
 export const withMeta = <T extends z.ZodTypeAny>(schema: T) => {
   const def = schema._def as MetaDef<T>;
-  def[metaProp] = { examples: [] };
+  def[metaProp] = def[metaProp] || { examples: [] };
+  if (!('example' in schema)) {
   Object.defineProperties(schema, {
     example: {
       get: (): ExampleSetter<T> => (value) => {
@@ -29,6 +30,7 @@ export const withMeta = <T extends z.ZodTypeAny>(schema: T) => {
       }
     }
   });
+  }
   return schema as WithMeta<T>;
 };
 

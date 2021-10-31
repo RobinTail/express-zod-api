@@ -44,6 +44,13 @@ describe('Metadata', () => {
         schemaWithMeta.email()._def as unknown as MetaDef<typeof schemaWithMeta>
       )[metaProp].examples).toEqual(['test']);
     });
+
+    test('metadata should withstand double withMeta()', () => {
+      const schema = z.string();
+      const schemaWithMeta = withMeta(schema).example('test');
+      expect(withMeta(schemaWithMeta)._def[metaProp].examples).toEqual(['test']);
+      expect(withMeta(schemaWithMeta).example('another')._def[metaProp].examples).toEqual(['test', 'another']);
+    });
   });
 
   describe('hasMeta()', () => {
