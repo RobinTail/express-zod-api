@@ -1,6 +1,6 @@
 import * as path from "path";
 import * as fs from "fs";
-import * as manifest from "../package.json";
+import manifest from "../package.json";
 
 const ownLicense = `
 MIT License

@@ -24,6 +24,7 @@
     "postversion": "git push && git push --tags",
     "install_hooks": "husky install"
   },
+  "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "dependencies": {

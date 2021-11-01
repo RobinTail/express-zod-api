@@ -1,4 +1,3 @@
-import jestConfig from "../jest.config";
 import { z } from "../src";
 
 export const waitFor = async (cb: () => boolean) =>
@@ -6,7 +5,7 @@ export const waitFor = async (cb: () => boolean) =>
     const timeout = setTimeout(() => {
       clearInterval(timer); // eslint-disable-line @typescript-eslint/no-use-before-define
       reject();
-    }, jestConfig.testTimeout);
+    }, 10000);
     const timer = setInterval(() => {
       if (cb()) {
         clearInterval(timer);
