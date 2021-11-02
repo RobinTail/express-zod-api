@@ -44,3 +44,7 @@ jobs:
       run: |
         yarn build:intTest
         yarn test:int
+    - name: ESM test
+      run: |
+        yarn build:esmTest
+        yarn test:esm

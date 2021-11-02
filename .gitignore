@@ -10,3 +10,9 @@ tests/integration/yarn.lock
 tests/integration/quick-start.ts
 tests/integration/package.json
 tests/integration/tsconfig.json
+tests/esm/node_modules
+tests/esm/yarn-error.log
+tests/esm/yarn.lock
+tests/esm/quick-start.ts
+tests/esm/package.json
+tests/esm/tsconfig.json
