@@ -14,7 +14,7 @@ describe("Example", () => {
   };
 
   beforeAll(() => {
-    example = spawn("yarn", ["esm", "example/index.ts"]);
+    example = spawn("ts-node", ["example/index.ts"]);
     example.stdout.on("data", listener);
   });
 

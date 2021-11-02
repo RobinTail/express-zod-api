@@ -1,8 +1,6 @@
 {
   "extends": "@tsconfig/node12/tsconfig.json",
   "compilerOptions": {
-    "module": "es2015",
-    "moduleResolution": "node",
     "sourceMap": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
