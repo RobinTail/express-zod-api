@@ -18,7 +18,7 @@ const packageJson = `
   "license": "MIT",
   "type": "module",
   "dependencies": {
-    "@tsconfig/node12": "latest",
+    "@tsconfig/node${tsconfigBase}": "latest",
     "express-zod-api": "../../dist-esm",
     "ts-node": "10.4.0",
     "typescript": "4.4.4"
@@ -28,7 +28,7 @@ const packageJson = `
 
 const tsConfigJson = `
 {
-  "extends": "@tsconfig/node12/tsconfig.json",
+  "extends": "@tsconfig/node${tsconfigBase}/tsconfig.json",
   "compilerOptions": {
     "module": "ES2015",
     "moduleResolution": "Node"
