@@ -1,4 +1,5 @@
 src
+esm
 tsconfig.json
 tsconfig.build.json
 example
