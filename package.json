@@ -12,7 +12,7 @@
     "build:swagger": "ts-node example/generate-open-api-schema.ts > example/example.swagger.yaml",
     "build:license": "ts-node tools/license.ts > ./LICENSE",
     "build:intTest": "ts-node tools/integration-test.ts && yarn install --cwd ./tests/integration",
-    "build:esmTest": "ts-node tools/esm-test.ts && yarn install --cwd ./tests/esm && echo '{\"type\":\"module\",\"types\":\"../../../../dist/index.d.ts\"}\\n' > ./tests/esm/node_modules/express-zod-api/package.json",
+    "build:esmTest": "ts-node tools/esm-test.ts && yarn install --cwd ./tests/esm && ts-node tools/esm-test-package.ts",
     "test": "yarn test:jest && yarn test:badge",
     "test:int": "yarn jest ./tests/integration",
     "test:esm": "yarn jest ./tests/esm",
