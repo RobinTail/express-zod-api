@@ -1,4 +1,5 @@
 import fs from "fs";
+import { esmTestPort } from "../tests/helpers";
 
 const nodeVersion = process.versions.node.split(".").shift();
 const tsconfigBase = nodeVersion === "15" ? "14" : nodeVersion;
@@ -51,7 +52,8 @@ if (!tsParts) {
 
 const quickStart = tsParts
   .map((part) => part.split("\n").slice(1, -1).join("\n"))
-  .join("\n\n");
+  .join("\n\n")
+  .replace(/8090/g, `${esmTestPort}`);
 
 const dir = "./tests/esm";
 fs.writeFileSync(`${dir}/package.json`, packageJson.trim());
