@@ -9,7 +9,7 @@ const packageJson = `
   "name": "express-zod-api-esm-test",
   "version": "1.0.0",
   "scripts": {
-    "start": "NODE_OPTIONS=\\"--loader ts-node/esm --es-module-specifier-resolution=node\\" node quick-start.ts"
+    "start": "NODE_OPTIONS=\\"--loader ts-node/esm\\" node quick-start.ts"
   },
   "author": {
     "name": "Anna Bocharova",
