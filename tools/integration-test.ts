@@ -1,5 +1,4 @@
 import fs from "fs";
-import { esmTestPort } from "../tests/helpers";
 
 const nodeVersion = process.versions.node.split(".").shift();
 const tsconfigBase = nodeVersion === "15" ? "14" : nodeVersion;
