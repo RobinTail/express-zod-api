@@ -454,7 +454,7 @@ _You can still send other data and specify additional `input` parameters, includ
 You can specify your custom Winston logger in config:
 
 ```typescript
-import * as winston from "winston";
+import winston from "winston";
 import { createConfig } from "express-zod-api";
 
 const logger = winston.createLogger({
@@ -469,7 +469,7 @@ If you already have your own configured express application, or you find the lib
 you can connect your routing to the app instead of using `createServer()`.
 
 ```typescript
-import * as express from "express";
+import express from "express";
 import { createConfig, attachRouting } from "express-zod-api";
 
 const app = express();
