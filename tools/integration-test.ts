@@ -1,7 +1,8 @@
 import fs from "fs";
+import { extractReadmeQuickStart } from "./extract-quick-start";
+import { getTSConfigBase } from "./tsconfig-base";
 
-const nodeVersion = process.versions.node.split(".").shift();
-const tsconfigBase = nodeVersion === "15" ? "14" : nodeVersion;
+const tsconfigBase = getTSConfigBase();
 
 const packageJson = `
 {
@@ -10,12 +11,6 @@ const packageJson = `
   "scripts": {
     "start": "ts-node quick-start.ts"
   },
-  "author": {
-    "name": "Anna Bocharova",
-    "url": "https://robintail.cz",
-    "email": "me@robintail.cz"
-  },
-  "license": "MIT",
   "dependencies": {
     "@tsconfig/node${tsconfigBase}": "latest",
     "express-zod-api": "../../dist",
@@ -31,22 +26,7 @@ const tsConfigJson = `
 }
 `;
 
-const readme = fs.readFileSync("README.md", "utf-8");
-const quickStartSection = readme.match(/# Quick start(.+?)\n#\s[A-Z]+/s);
-
-if (!quickStartSection) {
-  throw new Error("Can not find Quick Start section");
-}
-
-const tsParts = quickStartSection[1].match(/```typescript(.+?)```/gis);
-
-if (!tsParts) {
-  throw new Error("Can not find typescript code samples");
-}
-
-const quickStart = tsParts
-  .map((part) => part.split("\n").slice(1, -1).join("\n"))
-  .join("\n\n");
+const quickStart = extractReadmeQuickStart();
 
 const dir = "./tests/integration";
 fs.writeFileSync(`${dir}/package.json`, packageJson.trim());

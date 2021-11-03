@@ -1,8 +1,9 @@
 import fs from "fs";
 import { esmTestPort } from "../tests/helpers";
+import { extractReadmeQuickStart } from "./extract-quick-start";
+import { getTSConfigBase } from "./tsconfig-base";
 
-const nodeVersion = process.versions.node.split(".").shift();
-const tsconfigBase = nodeVersion === "15" ? "14" : nodeVersion;
+const tsconfigBase = getTSConfigBase();
 
 const packageJson = `
 {
@@ -11,12 +12,6 @@ const packageJson = `
   "scripts": {
     "start": "NODE_OPTIONS=\\"--loader ts-node/esm\\" node quick-start.ts"
   },
-  "author": {
-    "name": "Anna Bocharova",
-    "url": "https://robintail.cz",
-    "email": "me@robintail.cz"
-  },
-  "license": "MIT",
   "type": "module",
   "dependencies": {
     "@tsconfig/node${tsconfigBase}": "latest",
@@ -50,10 +45,7 @@ if (!tsParts) {
   throw new Error("Can not find typescript code samples");
 }
 
-const quickStart = tsParts
-  .map((part) => part.split("\n").slice(1, -1).join("\n"))
-  .join("\n\n")
-  .replace(/8090/g, `${esmTestPort}`);
+const quickStart = extractReadmeQuickStart().replace(/8090/g, `${esmTestPort}`);
 
 const dir = "./tests/esm";
 fs.writeFileSync(`${dir}/package.json`, packageJson.trim());
