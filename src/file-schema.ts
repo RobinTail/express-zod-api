@@ -6,8 +6,8 @@ import {
   INVALID,
   ZodTypeDef,
   addIssueToContext,
+  ParseInput,
 } from "zod";
-import { ParseInput } from "zod/lib/helpers/parseUtil";
 import { ErrMessage, errToObj } from "./helpers";
 
 const zodFileKind = "ZodFile";
