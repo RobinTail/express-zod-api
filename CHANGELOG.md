@@ -2,6 +2,11 @@
 
 ## Version 2
 
+### v2.10.1
+
+- Mime version is 2.6.0.
+- Minor fix in importing Zod utility type.
+
 ### v2.10.0
 
 - Feature #165. You can add examples to the generated documentation.
