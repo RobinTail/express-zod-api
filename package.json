@@ -28,7 +28,7 @@
   "dependencies": {
     "express": "4.17.1",
     "express-fileupload": "1.2.1",
-    "http-errors": "1.8.0",
+    "http-errors": "1.8.1",
     "mime": "2.6.0",
     "openapi3-ts": "2.0.1",
     "ramda": "0.27.1",
