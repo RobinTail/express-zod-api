@@ -2,6 +2,10 @@
 
 ## Version 3
 
+### v3.0.0-beta2
+
+- No changes. Compiled using the recently released Typescript 4.5.2.
+
 ### v3.0.0-beta1
 
 - **Warning**: There are breaking changes described below:
