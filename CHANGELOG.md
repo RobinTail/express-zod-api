@@ -2,6 +2,10 @@
 
 ## Version 2
 
+### v2.10.2
+
+- The version of http-errors is 1.8.1.
+
 ### v2.10.1
 
 - Mime version is 2.6.0.
