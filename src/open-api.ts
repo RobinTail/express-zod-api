@@ -454,19 +454,16 @@ const describePathParams = (
   method: Method,
   schema: IOSchema
 ): ParameterObject[] => {
-  const params = getRouteParams(fullPath);
   const shape = extractObjectSchema(schema).shape;
+  const params = getRouteParams(fullPath).filter((name) => name in shape);
   return params.map((name) => ({
     name,
     in: "path",
-    required: name in shape ? !shape[name].isOptional() : undefined,
-    schema:
-      name in shape
-        ? {
-            ...describeSchema(shape[name], false),
-            description: `${method.toUpperCase()} ${fullPath} path parameter`,
-          }
-        : undefined,
+    required: !shape[name].isOptional(),
+    schema: {
+      ...describeSchema(shape[name], false),
+      description: `${method.toUpperCase()} ${fullPath} path parameter`,
+    },
     // @todo examples?
   }));
 };
