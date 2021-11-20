@@ -4,7 +4,7 @@
 
 ### v3.0.0
 
-- No changes. [November 20](https://www.glaad.org/tdor) release.
+- No changes. [November 20](https://en.wikipedia.org/wiki/Transgender_Day_of_Remembrance) release.
 
 ### v3.0.0-beta2
 
