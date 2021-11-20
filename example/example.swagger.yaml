@@ -146,8 +146,11 @@ paths:
           in: path
           required: true
           schema:
+            description: POST /v1/user/:id parameter
             type: string
-            description: POST /v1/user/:id path parameter
+          examples:
+            example1:
+              value: "12"
       requestBody:
         content:
           application/json:
@@ -193,7 +196,7 @@ paths:
           in: query
           required: true
           schema:
-            description: GET /v1/avatar/send query parameter
+            description: GET /v1/avatar/send parameter
             type: string
             pattern: /\d+/
   /v1/avatar/stream:
@@ -217,7 +220,7 @@ paths:
           in: query
           required: true
           schema:
-            description: GET /v1/avatar/stream query parameter
+            description: GET /v1/avatar/stream parameter
             type: string
             pattern: /\d+/
   /v1/avatar/upload:

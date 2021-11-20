@@ -449,41 +449,25 @@ const describeIOParamExamples = <T extends IOSchema>(
   };
 };
 
-const describePathParams = (
+const describeParams = (
   fullPath: string,
   method: Method,
   schema: IOSchema
 ): ParameterObject[] => {
   const shape = extractObjectSchema(schema).shape;
-  const params = getRouteParams(fullPath).filter((name) => name in shape);
-  return params.map((name) => ({
-    name,
-    in: "path",
-    required: !shape[name].isOptional(),
-    schema: {
-      ...describeSchema(shape[name], false),
-      description: `${method.toUpperCase()} ${fullPath} path parameter`,
-    },
-    // @todo examples?
-  }));
-};
-
-const describeQueryParams = (
-  fullPath: string,
-  method: Method,
-  schema: IOSchema
-): ParameterObject[] => {
-  const shape = extractObjectSchema(schema).shape;
-  return Object.keys(shape).map((name) => ({
-    name,
-    in: "query",
-    required: !shape[name].isOptional(),
-    schema: {
-      description: `${method.toUpperCase()} ${fullPath} query parameter`,
-      ...describeSchema(shape[name], false),
-    },
-    ...describeIOParamExamples(schema, false, name),
-  }));
+  const pathParams = getRouteParams(fullPath);
+  return Object.keys(shape)
+    .filter((name) => method === "get" || pathParams.includes(name))
+    .map((name) => ({
+      name,
+      in: pathParams.includes(name) ? "path" : "query",
+      required: !shape[name].isOptional(),
+      schema: {
+        description: `${method.toUpperCase()} ${fullPath} parameter`,
+        ...describeSchema(shape[name], false),
+      },
+      ...describeIOParamExamples(schema, false, name),
+    }));
 };
 
 interface GenerationParams {
@@ -556,19 +540,13 @@ export class OpenAPI extends OpenApiBuilder {
       if (endpoint.getDescription()) {
         operation.description = endpoint.getDescription();
       }
-      operation.parameters = describePathParams(
+      operation.parameters = describeParams(
         fullPath,
         method as Method,
         endpoint.getInputSchema()
       );
-      // @todo should combine route and query params somehow
-      if (method === "get") {
-        operation.parameters = describeQueryParams(
-          fullPath,
-          method,
-          endpoint.getInputSchema()
-        );
-      } else {
+      if (method !== "get") {
+        // @todo have to exclude path params from here somehow
         const bodySchema = describeSchema(endpoint.getInputSchema(), false);
         delete bodySchema.example;
         operation.requestBody = {

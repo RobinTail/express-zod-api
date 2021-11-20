@@ -65,7 +65,7 @@ paths:
           in: query
           required: true
           schema:
-            description: GET /v1/getSomething query parameter
+            description: GET /v1/getSomething parameter
             type: array
             items:
               type: string
@@ -436,7 +436,7 @@ paths:
           in: query
           required: true
           schema:
-            description: GET /v1/getSomething query parameter
+            description: GET /v1/getSomething parameter
             type: string
           examples:
             example1:
@@ -627,7 +627,7 @@ paths:
           in: query
           required: true
           schema:
-            description: GET /v1/getSomething query parameter
+            description: GET /v1/getSomething parameter
             example: \\"123\\"
             type: string
 components:
@@ -804,7 +804,7 @@ paths:
           in: query
           required: true
           schema:
-            description: GET /v1/getSomething query parameter
+            description: GET /v1/getSomething parameter
             type: array
             items:
               type: integer
@@ -819,7 +819,7 @@ paths:
           in: query
           required: true
           schema:
-            description: GET /v1/getSomething query parameter
+            description: GET /v1/getSomething parameter
             type: array
             items:
               type: boolean
@@ -827,7 +827,7 @@ paths:
           in: query
           required: true
           schema:
-            description: GET /v1/getSomething query parameter
+            description: GET /v1/getSomething parameter
             type: string
 components:
   schemas: {}
@@ -1022,27 +1022,27 @@ paths:
           in: query
           required: false
           schema:
-            description: GET /v1/getSomething query parameter
+            description: GET /v1/getSomething parameter
             type: string
         - name: optDefault
           in: query
           required: false
           schema:
-            description: GET /v1/getSomething query parameter
+            description: GET /v1/getSomething parameter
             type: string
             default: test
         - name: nullish
           in: query
           required: false
           schema:
-            description: GET /v1/getSomething query parameter
+            description: GET /v1/getSomething parameter
             nullable: true
             type: boolean
         - name: nuDefault
           in: query
           required: false
           schema:
-            description: GET /v1/getSomething query parameter
+            description: GET /v1/getSomething parameter
             nullable: true
             type: integer
             format: int64
@@ -1336,8 +1336,11 @@ paths:
           in: path
           required: true
           schema:
+            description: POST /v1/user/:id parameter
             type: string
-            description: POST /v1/user/:id path parameter
+          examples:
+            example1:
+              value: \\"12\\"
       requestBody:
         content:
           application/json:
@@ -1383,7 +1386,7 @@ paths:
           in: query
           required: true
           schema:
-            description: GET /v1/avatar/send query parameter
+            description: GET /v1/avatar/send parameter
             type: string
             pattern: /\\\\d+/
   /v1/avatar/stream:
@@ -1407,7 +1410,7 @@ paths:
           in: query
           required: true
           schema:
-            description: GET /v1/avatar/stream query parameter
+            description: GET /v1/avatar/stream parameter
             type: string
             pattern: /\\\\d+/
   /v1/avatar/upload:
@@ -2386,7 +2389,7 @@ paths:
           in: query
           required: false
           schema:
-            description: GET /v1/getSomething query parameter
+            description: GET /v1/getSomething parameter
             nullable: true
             format: any
 components:
@@ -2467,14 +2470,14 @@ paths:
           in: query
           required: false
           schema:
-            description: GET /v1/getSomething query parameter
+            description: GET /v1/getSomething parameter
             nullable: true
             format: string (preprocessed)
         - name: number
           in: query
           required: true
           schema:
-            description: GET /v1/getSomething query parameter
+            description: GET /v1/getSomething parameter
             format: int64 (preprocessed)
             minimum: 0
             exclusiveMinimum: false
