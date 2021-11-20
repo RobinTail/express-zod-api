@@ -4,27 +4,34 @@ import { ResultHandlerError } from "../../src/errors";
 describe("Errors", () => {
   describe("RoutingError", () => {
     test("should be an instance of Error", () => {
+      expect(new RoutingError("test") instanceof RoutingError).toBeTruthy();
       expect(new RoutingError("test") instanceof Error).toBeTruthy();
     });
   });
 
   describe("OpenAPIError", () => {
     test("should be an instance of Error", () => {
+      expect(new OpenAPIError("test") instanceof OpenAPIError).toBeTruthy();
       expect(new OpenAPIError("test") instanceof Error).toBeTruthy();
     });
   });
 
   describe("DependsOnMethodError", () => {
-    test("should be an instance of Error", () => {
+    test("should be an instance of RoutingError", () => {
+      expect(
+        new DependsOnMethodError("test") instanceof DependsOnMethodError
+      ).toBeTruthy();
       expect(
         new DependsOnMethodError("test") instanceof RoutingError
       ).toBeTruthy();
-      expect(new DependsOnMethodError("test") instanceof Error).toBeTruthy();
     });
   });
 
   describe("ResultHandlerError", () => {
     test("should be an instance of Error", () => {
+      expect(
+        new ResultHandlerError("test") instanceof ResultHandlerError
+      ).toBeTruthy();
       expect(new ResultHandlerError("test") instanceof Error).toBeTruthy();
     });
 

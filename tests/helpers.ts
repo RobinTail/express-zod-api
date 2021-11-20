@@ -1,6 +1,8 @@
 import jestConfig from "../jest.config";
 import { z } from "../src";
 
+export const esmTestPort = 8070;
+
 export const waitFor = async (cb: () => boolean) =>
   new Promise((resolve, reject) => {
     const timeout = setTimeout(() => {

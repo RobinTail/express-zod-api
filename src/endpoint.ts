@@ -242,9 +242,7 @@ export class Endpoint<
           logger,
         })
       );
-      isStreamClosed =
-        ("writableEnded" in response && response.writableEnded) ||
-        ("finished" in response && response.finished); // Node v10 and below
+      isStreamClosed = "writableEnded" in response && response.writableEnded;
       if (isStreamClosed) {
         logger.warn(
           `The middleware ${def.middleware.name} has closed the stream. Accumulated options:`,

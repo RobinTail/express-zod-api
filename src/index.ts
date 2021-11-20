@@ -1,4 +1,4 @@
-export { createConfig, LoggerConfig, ConfigType } from "./config-type";
+export { createConfig, LoggerConfig } from "./config-type";
 export {
   AbstractEndpoint,
   EndpointInput,

@@ -1,6 +1,7 @@
 src
 tsconfig.json
 tsconfig.build.json
+tsconfig.esm.json
 example
 .husky
 jest.config.ts

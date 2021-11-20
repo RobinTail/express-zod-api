@@ -42,7 +42,8 @@ Start your API server with I/O schema validation and custom middlewares in minut
    1. [Excessive properties in endpoint output](#excessive-properties-in-endpoint-output)
 6. [Your input to my output](#your-input-to-my-output)
 
-If you're upgrading from v1 please check out the information in [Changelog](CHANGELOG.md#v200-beta1).
+You can find the release notes in [Changelog](CHANGELOG.md). Along with recommendations for migrating from
+[from v2](CHANGELOG.md#v300-beta1) and [from v1](CHANGELOG.md#v200-beta1).
 
 # Why and what is it for
 
@@ -454,7 +455,7 @@ _You can still send other data and specify additional `input` parameters, includ
 You can specify your custom Winston logger in config:
 
 ```typescript
-import * as winston from "winston";
+import winston from "winston";
 import { createConfig } from "express-zod-api";
 
 const logger = winston.createLogger({
@@ -469,7 +470,7 @@ If you already have your own configured express application, or you find the lib
 you can connect your routing to the app instead of using `createServer()`.
 
 ```typescript
-import * as express from "express";
+import express from "express";
 import { createConfig, attachRouting } from "express-zod-api";
 
 const app = express();
