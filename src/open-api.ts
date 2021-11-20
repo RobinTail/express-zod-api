@@ -470,6 +470,19 @@ const describeParams = (
     }));
 };
 
+const excludeParamFromDescription = (
+  bodySchema: SchemaObject,
+  pathParam: string
+) => {
+  if (bodySchema.properties) {
+    // object
+    if (pathParam in bodySchema.properties) {
+      delete bodySchema.properties[pathParam];
+      // @todo delete from required
+    }
+  }
+};
+
 interface GenerationParams {
   title: string;
   version: string;
@@ -549,35 +562,16 @@ export class OpenAPI extends OpenApiBuilder {
         const bodySchema = describeSchema(endpoint.getInputSchema(), false);
         delete bodySchema.example;
         for (const pathParam of getRouteParams(fullPath)) {
-          // @todo DNRY
-          if (bodySchema.properties) {
-            // object
-            if (pathParam in bodySchema.properties) {
-              delete bodySchema.properties[pathParam];
-              // @todo delete from required
-            }
-          }
+          excludeParamFromDescription(bodySchema, pathParam);
           if (bodySchema.allOf) {
-            // intersection
-            bodySchema.allOf.forEach((obj: SchemaObject) => {
-              if (obj.properties) {
-                if (pathParam in obj.properties) {
-                  delete obj.properties[pathParam];
-                  // @todo delete from required
-                }
-              }
-            });
+            bodySchema.allOf.forEach((obj: SchemaObject) =>
+              excludeParamFromDescription(obj, pathParam)
+            );
           }
           if (bodySchema.oneOf) {
-            // union
-            bodySchema.oneOf.forEach((obj: SchemaObject) => {
-              if (obj.properties) {
-                if (pathParam in obj.properties) {
-                  delete obj.properties[pathParam];
-                  // @todo delete from required
-                }
-              }
-            });
+            bodySchema.oneOf.forEach((obj: SchemaObject) =>
+              excludeParamFromDescription(obj, pathParam)
+            );
           }
         }
         operation.requestBody = {
