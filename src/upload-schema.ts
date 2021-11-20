@@ -8,8 +8,8 @@ import {
   OK,
   ZodTypeDef,
   addIssueToContext,
+  ParseInput,
 } from "zod";
-import { ParseInput } from "zod/lib/helpers/parseUtil";
 
 const zodUploadKind = "ZodUpload";
 

@@ -1,25 +1,22 @@
 import fs from "fs";
+import { esmTestPort } from "../tests/helpers";
+import { extractReadmeQuickStart } from "./extract-quick-start";
+import { getTSConfigBase } from "./tsconfig-base";
 
-const nodeVersion = process.versions.node.split(".").shift();
-const tsconfigBase = nodeVersion === "15" ? "14" : nodeVersion;
+const tsconfigBase = getTSConfigBase();
 
 const packageJson = `
 {
-  "name": "express-zod-api-integration-test",
+  "name": "express-zod-api-esm-test",
   "version": "1.0.0",
   "scripts": {
-    "start": "ts-node quick-start.ts"
+    "start": "NODE_OPTIONS=\\"--loader ts-node/esm\\" node quick-start.ts"
   },
-  "author": {
-    "name": "Anna Bocharova",
-    "url": "https://robintail.cz",
-    "email": "me@robintail.cz"
-  },
-  "license": "MIT",
+  "type": "module",
   "dependencies": {
     "@tsconfig/node${tsconfigBase}": "latest",
-    "express-zod-api": "../../dist",
-    "ts-node": "9.1.1",
+    "express-zod-api": "../../dist-esm",
+    "ts-node": "10.4.0",
     "typescript": "4.4.4"
   }
 }
@@ -28,6 +25,10 @@ const packageJson = `
 const tsConfigJson = `
 {
   "extends": "@tsconfig/node${tsconfigBase}/tsconfig.json",
+  "compilerOptions": {
+    "module": "ES2015",
+    "moduleResolution": "Node"
+  }
 }
 `;
 
@@ -44,11 +45,9 @@ if (!tsParts) {
   throw new Error("Can not find typescript code samples");
 }
 
-const quickStart = tsParts
-  .map((part) => part.split("\n").slice(1, -1).join("\n"))
-  .join("\n\n");
+const quickStart = extractReadmeQuickStart().replace(/8090/g, `${esmTestPort}`);
 
-const dir = "./tests/integration";
+const dir = "./tests/esm";
 fs.writeFileSync(`${dir}/package.json`, packageJson.trim());
 fs.writeFileSync(`${dir}/tsconfig.json`, tsConfigJson.trim());
 fs.writeFileSync(`${dir}/quick-start.ts`, quickStart.trim());

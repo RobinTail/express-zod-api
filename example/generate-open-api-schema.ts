@@ -1,11 +1,11 @@
 import { OpenAPI } from "../src";
 import { routing } from "./routing";
-import { version } from "../package.json";
+import manifest from "../package.json";
 
 console.log(
   new OpenAPI({
     routing,
-    version,
+    version: manifest.version,
     title: "Example API",
     serverUrl: "http://example.com",
   }).getSpecAsYaml()

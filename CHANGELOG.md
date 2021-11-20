@@ -1,6 +1,34 @@
 # Changelog
 
+## Version 3
+
+### v3.0.0
+
+- No changes. [November 20](https://en.wikipedia.org/wiki/Transgender_Day_of_Remembrance) release.
+
+### v3.0.0-beta2
+
+- No changes. Compiled using the recently released Typescript 4.5.2.
+
+### v3.0.0-beta1
+
+- **Warning**: There are breaking changes described below:
+  - Minimum compatible Node version changed from ~~10~~ to 12.
+  - The exports map restricts the possibility to import/require the package files to the entry points only.
+  - The deprecated type `ConfigType` removed — please use `createConfig()` instead.
+- The library is now distributed as a dual package containing both CJS (CommonJS) and ESM (ECMAScript Module).
+- Mime version is 3.0.0.
+
 ## Version 2
+
+### v2.10.2
+
+- The version of http-errors is 1.8.1.
+
+### v2.10.1
+
+- Mime version is 2.6.0.
+- Minor fix in importing Zod utility type.
 
 ### v2.10.0
 
