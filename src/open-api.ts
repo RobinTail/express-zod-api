@@ -546,9 +546,40 @@ export class OpenAPI extends OpenApiBuilder {
         endpoint.getInputSchema()
       );
       if (method !== "get") {
-        // @todo have to exclude path params from here somehow
         const bodySchema = describeSchema(endpoint.getInputSchema(), false);
         delete bodySchema.example;
+        for (const pathParam of getRouteParams(fullPath)) {
+          // @todo DNRY
+          if (bodySchema.properties) {
+            // object
+            if (pathParam in bodySchema.properties) {
+              delete bodySchema.properties[pathParam];
+              // @todo delete from required
+            }
+          }
+          if (bodySchema.allOf) {
+            // intersection
+            bodySchema.allOf.forEach((obj: SchemaObject) => {
+              if (obj.properties) {
+                if (pathParam in obj.properties) {
+                  delete obj.properties[pathParam];
+                  // @todo delete from required
+                }
+              }
+            });
+          }
+          if (bodySchema.oneOf) {
+            // union
+            bodySchema.oneOf.forEach((obj: SchemaObject) => {
+              if (obj.properties) {
+                if (pathParam in obj.properties) {
+                  delete obj.properties[pathParam];
+                  // @todo delete from required
+                }
+              }
+            });
+          }
+        }
         operation.requestBody = {
           content: endpoint.getInputMimeTypes().reduce(
             (carry, mimeType) => ({

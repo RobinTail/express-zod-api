@@ -1351,8 +1351,6 @@ paths:
                 key:
                   type: string
                   minLength: 1
-                id:
-                  type: string
                 name:
                   type: string
                   minLength: 1
