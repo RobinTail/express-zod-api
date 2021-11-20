@@ -18,6 +18,7 @@ import {
   getRouteParams,
   IOSchema,
 } from "./helpers";
+import { Method } from "./method";
 import { Routing, routingCycle, RoutingCycleParams } from "./routing";
 import { ZodUpload } from "./upload-schema";
 
@@ -448,25 +449,43 @@ const describeIOParamExamples = <T extends IOSchema>(
   };
 };
 
-const describeRouteParams = (
+const describePathParams = (
   fullPath: string,
-  inputSchemaShape: z.ZodRawShape
+  method: Method,
+  schema: IOSchema
 ): ParameterObject[] => {
   const params = getRouteParams(fullPath);
+  const shape = extractObjectSchema(schema).shape;
   return params.map((name) => ({
     name,
     in: "path",
-    required:
-      name in inputSchemaShape
-        ? !inputSchemaShape[name].isOptional()
-        : undefined,
+    required: name in shape ? !shape[name].isOptional() : undefined,
     schema:
-      name in inputSchemaShape
+      name in shape
         ? {
-            ...describeSchema(inputSchemaShape[name], false),
-            description: `${fullPath} route parameter`,
+            ...describeSchema(shape[name], false),
+            description: `${method.toUpperCase()} ${fullPath} path parameter`,
           }
         : undefined,
+    // @todo examples?
+  }));
+};
+
+const describeQueryParams = (
+  fullPath: string,
+  method: Method,
+  schema: IOSchema
+): ParameterObject[] => {
+  const shape = extractObjectSchema(schema).shape;
+  return Object.keys(shape).map((name) => ({
+    name,
+    in: "query",
+    required: !shape[name].isOptional(),
+    schema: {
+      description: `${method.toUpperCase()} ${fullPath} query parameter`,
+      ...describeSchema(shape[name], false),
+    },
+    ...describeIOParamExamples(schema, false, name),
   }));
 };
 
@@ -540,24 +559,18 @@ export class OpenAPI extends OpenApiBuilder {
       if (endpoint.getDescription()) {
         operation.description = endpoint.getDescription();
       }
-      const inputSchemaShape = extractObjectSchema(
+      operation.parameters = describePathParams(
+        fullPath,
+        method as Method,
         endpoint.getInputSchema()
-      ).shape;
-      operation.parameters = describeRouteParams(fullPath, inputSchemaShape);
-      // @todo choosing the exact location of the parameters should depend on config.inputSources
+      );
+      // @todo should combine route and query params somehow
       if (method === "get") {
-        Object.keys(inputSchemaShape).forEach((name) => {
-          (operation.parameters as ParameterObject[]).push({
-            name,
-            in: "query",
-            required: !inputSchemaShape[name].isOptional(),
-            schema: {
-              description: `${method.toUpperCase()} ${fullPath} parameter`,
-              ...describeSchema(inputSchemaShape[name], false),
-            },
-            ...describeIOParamExamples(endpoint.getInputSchema(), false, name),
-          });
-        });
+        operation.parameters = describeQueryParams(
+          fullPath,
+          method,
+          endpoint.getInputSchema()
+        );
       } else {
         const bodySchema = describeSchema(endpoint.getInputSchema(), false);
         delete bodySchema.example;

@@ -86,6 +86,9 @@ paths:
                     enum:
                       - success
                   data:
+                    example:
+                      name: John Doe
+                      timestamp: 1235698995125
                     type: object
                     properties:
                       name:
@@ -103,6 +106,13 @@ paths:
                 required:
                   - status
                   - data
+              examples:
+                example1:
+                  value:
+                    status: success
+                    data:
+                      name: John Doe
+                      timestamp: 1235698995125
         "400":
           description: POST /v1/user/:id Error response
           content:
@@ -124,6 +134,12 @@ paths:
                 required:
                   - status
                   - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
       description: example user update endpoint
       parameters:
         - name: id
@@ -131,11 +147,12 @@ paths:
           required: true
           schema:
             type: string
-            description: /v1/user/:id route parameter
+            description: POST /v1/user/:id path parameter
       requestBody:
         content:
           application/json:
             schema:
+              description: POST /v1/user/:id request body
               type: object
               properties:
                 key:
@@ -150,7 +167,12 @@ paths:
                 - key
                 - id
                 - name
-              description: POST /v1/user/:id request body
+            examples:
+              example1:
+                value:
+                  key: 1234-5678-90
+                  id: "12"
+                  name: John Doe
   /v1/avatar/send:
     get:
       responses:
@@ -171,7 +193,7 @@ paths:
           in: query
           required: true
           schema:
-            description: GET /v1/avatar/send parameter
+            description: GET /v1/avatar/send query parameter
             type: string
             pattern: /\d+/
   /v1/avatar/stream:
@@ -195,7 +217,7 @@ paths:
           in: query
           required: true
           schema:
-            description: GET /v1/avatar/stream parameter
+            description: GET /v1/avatar/stream query parameter
             type: string
             pattern: /\d+/
   /v1/avatar/upload:
