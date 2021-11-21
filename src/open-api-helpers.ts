@@ -569,39 +569,51 @@ export const depictResponse = ({
   method,
   path,
   description,
-  mimeTypes,
-  depictedSchema,
-  examples,
+  endpoint,
+  isPositive,
 }: {
   method: Method;
   path: string;
   description: string;
-  mimeTypes: string[];
-  depictedSchema: SchemaObject;
-  examples: MediaExamples;
-}): ResponseObject => ({
-  description: `${method.toUpperCase()} ${path} ${description}`,
-  content: mimeTypes.reduce(
-    (carry, mimeType) => ({
-      ...carry,
-      [mimeType]: {
-        schema: depictedSchema,
-        ...examples,
-      },
-    }),
-    {} as ContentObject
-  ),
-});
+  endpoint: AbstractEndpoint;
+  isPositive: boolean;
+}): ResponseObject => {
+  const schema = isPositive
+    ? endpoint.getPositiveResponseSchema()
+    : endpoint.getNegativeResponseSchema();
+  const mimeTypes = isPositive
+    ? endpoint.getPositiveMimeTypes()
+    : endpoint.getNegativeMimeTypes();
+  const depictedSchema = excludeExampleFromDepiction(
+    depictSchema({
+      schema,
+      isResponse: true,
+    })
+  );
+  const examples = depictIOExamples(schema, true);
+
+  return {
+    description: `${method.toUpperCase()} ${path} ${description}`,
+    content: mimeTypes.reduce(
+      (carry, mimeType) => ({
+        ...carry,
+        [mimeType]: {
+          schema: depictedSchema,
+          ...examples,
+        },
+      }),
+      {} as ContentObject
+    ),
+  };
+};
 
 export const depictRequest = ({
   method,
   path,
-  mimeTypes,
   endpoint,
 }: {
   method: Method;
   path: string;
-  mimeTypes: string[];
   endpoint: AbstractEndpoint;
 }): RequestBodyObject => {
   const pathParams = getRoutePathParams(path);
@@ -621,7 +633,7 @@ export const depictRequest = ({
   );
 
   return {
-    content: mimeTypes.reduce(
+    content: endpoint.getInputMimeTypes().reduce(
       (carry, mimeType) => ({
         ...carry,
         [mimeType]: {
