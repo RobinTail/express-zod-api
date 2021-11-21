@@ -22,161 +22,222 @@ type MediaExamples = Pick<MediaTypeObject, "examples">;
 
 /* eslint-disable @typescript-eslint/no-use-before-define */
 export const depictSchema = (
-  value: z.ZodTypeAny,
+  schema: z.ZodTypeAny,
   isResponse: boolean
 ): SchemaObject => {
   const initial: SchemaObject = {};
-  if (value.isNullable()) {
+  if (schema.isNullable()) {
     initial.nullable = true;
   }
-  if (value.description) {
-    initial.description = `${value.description}`;
+  if (schema.description) {
+    initial.description = `${schema.description}`;
   }
-  const examples = getExamples(value, isResponse);
+  const examples = getExamples(schema, isResponse);
   if (examples.length > 0) {
     initial.example = examples[0];
   }
   switch (true) {
-    case value instanceof z.ZodString:
-      return depictString(value as z.ZodString, initial);
-    case value instanceof z.ZodNumber:
-      return depictNumber(value as z.ZodNumber, initial);
-    case value instanceof z.ZodBigInt:
-      return { ...initial, type: "integer", format: "bigint" };
-    case value instanceof z.ZodBoolean:
-      return { ...initial, type: "boolean" };
-    case value instanceof z.ZodDate:
-      return { ...initial, type: "string", format: "date" };
-    case value instanceof z.ZodNull:
-      // null is not supported https://swagger.io/docs/specification/data-models/data-types/
-      return { ...initial, type: "string", nullable: true, format: "null" };
-    case value instanceof z.ZodArray:
-      return depictArray(value._def as z.ZodArrayDef, initial, isResponse);
-    case value instanceof z.ZodTuple:
-      return depictTuple(value as z.ZodTuple, initial, isResponse);
-    case value instanceof z.ZodRecord:
+    case schema instanceof z.ZodString:
+      return depictString(schema as z.ZodString, initial);
+    case schema instanceof z.ZodNumber:
+      return depictNumber(schema as z.ZodNumber, initial);
+    case schema instanceof z.ZodBigInt:
+      return depictBigInt(initial);
+    case schema instanceof z.ZodBoolean:
+      return depictBoolean(initial);
+    case schema instanceof z.ZodDate:
+      return depictDate(initial);
+    case schema instanceof z.ZodNull:
+      return depictNull(initial);
+    case schema instanceof z.ZodArray:
+      return depictArray(schema._def as z.ZodArrayDef, initial, isResponse);
+    case schema instanceof z.ZodTuple:
+      return depictTuple(schema as z.ZodTuple, initial, isResponse);
+    case schema instanceof z.ZodRecord:
       return depictRecord(
-        (value as z.ZodRecord<z.ZodTypeAny>)._def,
+        (schema as z.ZodRecord<z.ZodTypeAny>)._def,
         initial,
         isResponse
       );
-    case value instanceof z.ZodObject:
-      return {
-        ...initial,
-        type: "object",
-        properties: depictObjectProperties(value as z.AnyZodObject, isResponse),
-        required: Object.keys((value as z.AnyZodObject).shape).filter(
-          (key) => !(value as z.AnyZodObject).shape[key].isOptional()
-        ),
-      };
-    case value instanceof z.ZodLiteral:
-      return {
-        ...initial,
-        type: typeof value._def.value as "string" | "number" | "boolean",
-        enum: [value._def.value],
-      };
-    case value instanceof z.ZodEnum:
-    case value instanceof z.ZodNativeEnum:
-      return {
-        ...initial,
-        type: typeof Object.values(value._def.values)[0] as "string" | "number",
-        enum: Object.values(value._def.values),
-      };
-    case value instanceof z.ZodTransformer:
-    case value instanceof z.ZodEffects:
+    case schema instanceof z.ZodObject:
+      return depictObject(schema as z.AnyZodObject, initial, isResponse);
+    case schema instanceof z.ZodLiteral:
+      return depictLiteral(schema as z.ZodLiteral<any>, initial);
+    case schema instanceof z.ZodEnum:
+    case schema instanceof z.ZodNativeEnum:
+      return depictEnum(schema, initial);
+    case schema instanceof z.ZodTransformer:
+    case schema instanceof z.ZodEffects:
       return depictEffect(
-        value as z.ZodEffects<any> | z.ZodTransformer<any>,
+        schema as z.ZodEffects<any> | z.ZodTransformer<any>,
         initial,
         isResponse
       );
-    case value instanceof z.ZodOptional:
-    case value instanceof z.ZodNullable:
-      return {
-        ...initial,
-        ...depictSchema(
-          (
-            value as z.ZodOptional<z.ZodTypeAny> | z.ZodNullable<z.ZodTypeAny>
-          ).unwrap(),
-          isResponse
-        ),
-      };
-    case value instanceof z.ZodIntersection:
-      return {
-        ...initial,
-        allOf: [
-          depictSchema(
-            (value as z.ZodIntersection<z.ZodTypeAny, z.ZodTypeAny>)._def.left,
-            isResponse
-          ),
-          depictSchema(
-            (value as z.ZodIntersection<z.ZodTypeAny, z.ZodTypeAny>)._def.right,
-            isResponse
-          ),
-        ],
-      };
-    case value instanceof z.ZodUnion:
-      return {
-        ...initial,
-        oneOf: (
-          value as z.ZodUnion<[z.ZodTypeAny, ...z.ZodTypeAny[]]>
-        )._def.options.map((schema) => depictSchema(schema, isResponse)),
-      };
-    case value instanceof ZodFile:
-      return {
-        ...initial,
-        type: "string",
-        format: (value as ZodFile).isBinary
-          ? "binary"
-          : (value as ZodFile).isBase64
-          ? "byte"
-          : "file",
-      };
-    case value instanceof ZodUpload:
-      return {
-        ...initial,
-        type: "string",
-        format: "binary",
-      };
-    case value instanceof z.ZodAny:
-      return {
-        ...initial,
-        format: "any",
-      };
-    case value instanceof z.ZodDefault:
-      return {
-        ...initial,
-        ...depictSchema((value._def as z.ZodDefaultDef).innerType, isResponse),
-        default: (value._def as z.ZodDefaultDef).defaultValue(),
-      };
-    case value instanceof z.ZodUndefined:
-    case value instanceof z.ZodMap:
-    case value instanceof z.ZodFunction:
-    case value instanceof z.ZodLazy:
-    case value instanceof z.ZodPromise:
-    case value instanceof z.ZodUnknown:
-    case value instanceof z.ZodNever:
-    case value instanceof z.ZodVoid:
+    case schema instanceof z.ZodOptional:
+    case schema instanceof z.ZodNullable:
+      return depictOptionalOrNullable(
+        schema as z.ZodOptional<any> | z.ZodNullable<any>,
+        initial,
+        isResponse
+      );
+    case schema instanceof z.ZodIntersection:
+      return depictIntersection(schema, initial, isResponse);
+    case schema instanceof z.ZodUnion:
+      return depictUnion(
+        schema as z.ZodUnion<[z.ZodTypeAny, ...z.ZodTypeAny[]]>,
+        initial,
+        isResponse
+      );
+    case schema instanceof ZodFile:
+      return depictFile(schema as ZodFile, initial);
+    case schema instanceof ZodUpload:
+      return depictUpload(initial);
+    case schema instanceof z.ZodAny:
+      return depictAny(initial);
+    case schema instanceof z.ZodDefault:
+      return depictDefault(schema as z.ZodDefault<any>, initial, isResponse);
+    case schema instanceof z.ZodUndefined:
+    case schema instanceof z.ZodMap:
+    case schema instanceof z.ZodFunction:
+    case schema instanceof z.ZodLazy:
+    case schema instanceof z.ZodPromise:
+    case schema instanceof z.ZodUnknown:
+    case schema instanceof z.ZodNever:
+    case schema instanceof z.ZodVoid:
     default:
       throw new OpenAPIError(
-        `Zod type ${value.constructor.name} is unsupported`
+        `Zod type ${schema.constructor.name} is unsupported`
       );
   }
 };
 
+const depictDefault = (
+  schema: z.ZodDefault<any>,
+  initial: SchemaObject,
+  isResponse: boolean
+): SchemaObject => ({
+  ...initial,
+  ...depictSchema(schema._def.innerType, isResponse),
+  default: schema._def.defaultValue(),
+});
+
+const depictAny = (initial: SchemaObject): SchemaObject => ({
+  ...initial,
+  format: "any",
+});
+
+const depictUpload = (initial: SchemaObject): SchemaObject => ({
+  ...initial,
+  type: "string",
+  format: "binary",
+});
+
+const depictFile = (schema: ZodFile, initial: SchemaObject): SchemaObject => ({
+  ...initial,
+  type: "string",
+  format: schema.isBinary ? "binary" : schema.isBase64 ? "byte" : "file",
+});
+
+const depictUnion = (
+  schema: z.ZodUnion<[z.ZodTypeAny, ...z.ZodTypeAny[]]>,
+  initial: SchemaObject,
+  isResponse: boolean
+): SchemaObject => ({
+  ...initial,
+  oneOf: schema._def.options.map((option) => depictSchema(option, isResponse)),
+});
+
+const depictIntersection = (
+  schema: z.ZodIntersection<z.ZodTypeAny, z.ZodTypeAny>,
+  initial: SchemaObject,
+  isResponse: boolean
+): SchemaObject => ({
+  ...initial,
+  allOf: [
+    depictSchema(schema._def.left, isResponse),
+    depictSchema(schema._def.right, isResponse),
+  ],
+});
+
+const depictOptionalOrNullable = (
+  schema: z.ZodOptional<any> | z.ZodNullable<any>,
+  initial: SchemaObject,
+  isResponse: boolean
+): SchemaObject => ({
+  ...initial,
+  ...depictSchema(schema.unwrap(), isResponse),
+});
+
+const depictEnum = (
+  schema: z.ZodEnum<any> | z.ZodNativeEnum<any>,
+  initial: SchemaObject
+): SchemaObject => ({
+  ...initial,
+  type: typeof Object.values(schema._def.values)[0] as "string" | "number",
+  enum: Object.values(schema._def.values),
+});
+
+const depictLiteral = (
+  schema: z.ZodLiteral<any>,
+  initial: SchemaObject
+): SchemaObject => ({
+  ...initial,
+  type: typeof schema._def.value as "string" | "number" | "boolean",
+  enum: [schema._def.value],
+});
+
+const depictObject = (
+  schema: z.AnyZodObject,
+  initial: SchemaObject,
+  isResponse: boolean
+): SchemaObject => ({
+  ...initial,
+  type: "object",
+  properties: depictObjectProperties(schema, isResponse),
+  required: Object.keys(schema.shape).filter(
+    (key) => !schema.shape[key].isOptional()
+  ),
+});
+
+/** @see https://swagger.io/docs/specification/data-models/data-types/ */
+const depictNull = (initial: SchemaObject): SchemaObject => ({
+  ...initial,
+  type: "string",
+  nullable: true,
+  format: "null",
+});
+
+const depictDate = (initial: SchemaObject): SchemaObject => ({
+  ...initial,
+  type: "string",
+  format: "date",
+});
+
+const depictBoolean = (initial: SchemaObject): SchemaObject => ({
+  ...initial,
+  type: "boolean",
+});
+
+const depictBigInt = (initial: SchemaObject): SchemaObject => ({
+  ...initial,
+  type: "integer",
+  format: "bigint",
+});
+
 const depictRecord = (
-  definition: z.ZodRecordDef<z.ZodTypeAny>,
+  def: z.ZodRecordDef<z.ZodTypeAny>,
   initial: SchemaObject,
   isResponse: boolean
 ): SchemaObject => {
   if (
-    definition.keyType instanceof z.ZodEnum ||
-    definition.keyType instanceof z.ZodNativeEnum
+    def.keyType instanceof z.ZodEnum ||
+    def.keyType instanceof z.ZodNativeEnum
   ) {
-    const keys = Object.values(definition.keyType._def.values) as string[];
+    const keys = Object.values(def.keyType._def.values) as string[];
     const shape = keys.reduce(
       (carry, key) => ({
         ...carry,
-        [key]: definition.valueType,
+        [key]: def.valueType,
       }),
       {} as z.ZodRawShape
     );
@@ -187,30 +248,30 @@ const depictRecord = (
       required: keys,
     };
   }
-  if (definition.keyType instanceof z.ZodLiteral) {
+  if (def.keyType instanceof z.ZodLiteral) {
     return {
       ...initial,
       type: "object",
       properties: depictObjectProperties(
         z.object({
-          [definition.keyType._def.value]: definition.valueType,
+          [def.keyType._def.value]: def.valueType,
         }),
         isResponse
       ),
-      required: [definition.keyType._def.value],
+      required: [def.keyType._def.value],
     };
   }
-  if (definition.keyType instanceof z.ZodUnion) {
-    const areOptionsLiteral = definition.keyType.options.reduce(
+  if (def.keyType instanceof z.ZodUnion) {
+    const areOptionsLiteral = def.keyType.options.reduce(
       (carry: boolean, option: z.ZodTypeAny) =>
         carry && option instanceof z.ZodLiteral,
       true
     );
     if (areOptionsLiteral) {
-      const shape = definition.keyType.options.reduce(
+      const shape = def.keyType.options.reduce(
         (carry: z.ZodRawShape, option: z.ZodLiteral<any>) => ({
           ...carry,
-          [option.value]: definition.valueType,
+          [option.value]: def.valueType,
         }),
         {} as z.ZodRawShape
       );
@@ -218,7 +279,7 @@ const depictRecord = (
         ...initial,
         type: "object",
         properties: depictObjectProperties(z.object(shape), isResponse),
-        required: definition.keyType.options.map(
+        required: def.keyType.options.map(
           (option: z.ZodLiteral<any>) => option.value
         ),
       };
@@ -226,20 +287,20 @@ const depictRecord = (
   }
   return {
     type: "object",
-    additionalProperties: depictSchema(definition.valueType, isResponse),
+    additionalProperties: depictSchema(def.valueType, isResponse),
   };
 };
 
 const depictArray = (
-  definition: z.ZodArrayDef,
+  def: z.ZodArrayDef,
   initial: SchemaObject,
   isResponse: boolean
 ): SchemaObject => ({
   ...initial,
   type: "array",
-  items: depictSchema(definition.type, isResponse),
-  ...(definition.minLength ? { minItems: definition.minLength.value } : {}),
-  ...(definition.maxLength ? { maxItems: definition.maxLength?.value } : {}),
+  items: depictSchema(def.type, isResponse),
+  ...(def.minLength ? { minItems: def.minLength.value } : {}),
+  ...(def.maxLength ? { maxItems: def.maxLength?.value } : {}),
 });
 
 /** @todo improve it when OpenAPI 3.1.0 will be released */
