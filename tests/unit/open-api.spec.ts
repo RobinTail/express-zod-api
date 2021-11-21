@@ -512,6 +512,52 @@ describe("Open API generator", () => {
     });
   });
 
+  describe("Route Path Params", () => {
+    test("should handle route path params for POST request", () => {
+      const spec = new OpenAPI({
+        routing: {
+          v1: {
+            ":name": defaultEndpointsFactory.build({
+              method: "post",
+              input: z.object({
+                name: z.literal("John").or(z.literal("Jane")),
+                other: z.boolean(),
+              }),
+              output: z.object({}),
+              handler: jest.fn(),
+            }),
+          },
+        },
+        version: "3.4.5",
+        title: "Testing route path params",
+        serverUrl: "http://example.com",
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
+    });
+
+    test("should handle route path params for GET request", () => {
+      const spec = new OpenAPI({
+        routing: {
+          v1: {
+            ":name": defaultEndpointsFactory.build({
+              method: "get",
+              input: z.object({
+                name: z.literal("John").or(z.literal("Jane")),
+                other: z.boolean(),
+              }),
+              output: z.object({}),
+              handler: jest.fn(),
+            }),
+          },
+        },
+        version: "3.4.5",
+        title: "Testing route path params",
+        serverUrl: "http://example.com",
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
+    });
+  });
+
   describe("Metadata", () => {
     test("should pass over the schema description", () => {
       const spec = new OpenAPI({

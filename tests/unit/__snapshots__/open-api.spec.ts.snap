@@ -728,6 +728,189 @@ servers:
 "
 `;
 
+exports[`Open API generator Route Path Params should handle route path params for GET request 1`] = `
+"openapi: 3.0.0
+info:
+  title: Testing route path params
+  version: 3.4.5
+paths:
+  /v1/:name:
+    get:
+      responses:
+        \\"200\\":
+          description: GET /v1/:name Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - success
+                  data:
+                    type: object
+                    properties: {}
+                    required: []
+                required:
+                  - status
+                  - data
+        \\"400\\":
+          description: GET /v1/:name Error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                required:
+                  - status
+                  - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            description: GET /v1/:name parameter
+            oneOf:
+              - type: string
+                enum:
+                  - John
+              - type: string
+                enum:
+                  - Jane
+        - name: other
+          in: query
+          required: true
+          schema:
+            description: GET /v1/:name parameter
+            type: boolean
+components:
+  schemas: {}
+  responses: {}
+  parameters: {}
+  examples: {}
+  requestBodies: {}
+  headers: {}
+  securitySchemes: {}
+  links: {}
+  callbacks: {}
+tags: []
+servers:
+  - url: http://example.com
+"
+`;
+
+exports[`Open API generator Route Path Params should handle route path params for POST request 1`] = `
+"openapi: 3.0.0
+info:
+  title: Testing route path params
+  version: 3.4.5
+paths:
+  /v1/:name:
+    post:
+      responses:
+        \\"200\\":
+          description: POST /v1/:name Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - success
+                  data:
+                    type: object
+                    properties: {}
+                    required: []
+                required:
+                  - status
+                  - data
+        \\"400\\":
+          description: POST /v1/:name Error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                required:
+                  - status
+                  - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            description: POST /v1/:name parameter
+            oneOf:
+              - type: string
+                enum:
+                  - John
+              - type: string
+                enum:
+                  - Jane
+      requestBody:
+        content:
+          application/json:
+            schema:
+              description: POST /v1/:name request body
+              type: object
+              properties:
+                other:
+                  type: boolean
+              required:
+                - other
+components:
+  schemas: {}
+  responses: {}
+  parameters: {}
+  examples: {}
+  requestBodies: {}
+  headers: {}
+  securitySchemes: {}
+  links: {}
+  callbacks: {}
+tags: []
+servers:
+  - url: http://example.com
+"
+`;
+
 exports[`Open API generator generateOpenApi() should generate the correct schema for complex types 1`] = `
 "openapi: 3.0.0
 info:
