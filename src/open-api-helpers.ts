@@ -41,57 +41,60 @@ export const depictSchema: DepictHelper<z.ZodTypeAny> = ({
   if (examples.length > 0) {
     initial.example = examples[0];
   }
+  let fn: DepictHelper<any> | null = null;
   if (schema instanceof z.ZodString) {
-    return depictString({ schema, initial, isResponse });
+    fn = depictString;
   } else if (schema instanceof z.ZodNumber) {
-    return depictNumber({ schema, initial, isResponse });
+    fn = depictNumber;
   } else if (schema instanceof z.ZodBigInt) {
-    return depictBigInt({ schema, initial, isResponse });
+    fn = depictBigInt;
   } else if (schema instanceof z.ZodBoolean) {
-    return depictBoolean({ schema, initial, isResponse });
+    fn = depictBoolean;
   } else if (schema instanceof z.ZodDate) {
-    return depictDate({ schema, initial, isResponse });
+    fn = depictDate;
   } else if (schema instanceof z.ZodNull) {
-    return depictNull({ schema, initial, isResponse });
+    fn = depictNull;
   } else if (schema instanceof z.ZodArray) {
-    return depictArray({ schema, initial, isResponse });
+    fn = depictArray;
   } else if (schema instanceof z.ZodTuple) {
-    return depictTuple({ schema, initial, isResponse });
+    fn = depictTuple;
   } else if (schema instanceof z.ZodRecord) {
-    return depictRecord({ schema, initial, isResponse });
+    fn = depictRecord;
   } else if (schema instanceof z.ZodObject) {
-    return depictObject({ schema, initial, isResponse });
+    fn = depictObject;
   } else if (schema instanceof z.ZodLiteral) {
-    return depictLiteral({ schema, initial, isResponse });
+    fn = depictLiteral;
+  } else if (schema instanceof z.ZodIntersection) {
+    fn = depictIntersection;
+  } else if (schema instanceof z.ZodUnion) {
+    fn = depictUnion;
+  } else if (schema instanceof ZodFile) {
+    fn = depictFile;
+  } else if (schema instanceof ZodUpload) {
+    fn = depictUpload;
+  } else if (schema instanceof z.ZodAny) {
+    fn = depictAny;
+  } else if (schema instanceof z.ZodDefault) {
+    fn = depictDefault;
   } else if (schema instanceof z.ZodEnum || schema instanceof z.ZodNativeEnum) {
-    return depictEnum({ schema, initial, isResponse });
+    fn = depictEnum;
   } else if (
     schema instanceof z.ZodTransformer ||
     schema instanceof z.ZodEffects
   ) {
-    return depictEffect({ schema, initial, isResponse });
+    fn = depictEffect;
   } else if (
     schema instanceof z.ZodOptional ||
     schema instanceof z.ZodNullable
   ) {
-    return depictOptionalOrNullable({ schema, initial, isResponse });
-  } else if (schema instanceof z.ZodIntersection) {
-    return depictIntersection({ schema, initial, isResponse });
-  } else if (schema instanceof z.ZodUnion) {
-    return depictUnion({ schema, initial, isResponse });
-  } else if (schema instanceof ZodFile) {
-    return depictFile({ schema, initial, isResponse });
-  } else if (schema instanceof ZodUpload) {
-    return depictUpload({ schema, initial, isResponse });
-  } else if (schema instanceof z.ZodAny) {
-    return depictAny({ schema, initial, isResponse });
-  } else if (schema instanceof z.ZodDefault) {
-    return depictDefault({ schema, initial, isResponse });
-  } else {
+    fn = depictOptionalOrNullable;
+  }
+  if (!fn) {
     throw new OpenAPIError(
       `Zod type ${schema.constructor.name} is unsupported`
     );
   }
+  return fn({ schema, initial, isResponse });
 };
 
 const depictDefault: DepictHelper<z.ZodDefault<z.ZodTypeAny>> = ({
