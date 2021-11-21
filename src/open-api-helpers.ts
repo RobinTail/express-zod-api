@@ -528,16 +528,16 @@ export const depictSchema: DepictHelper<z.ZodTypeAny> = ({
   if (examples.length > 0) {
     initial.example = examples[0];
   }
-  const fn =
+  const nextHelper =
     "typeName" in schema._def
       ? depictHelpers[schema._def.typeName as keyof typeof depictHelpers]
       : null;
-  if (!fn) {
+  if (!nextHelper) {
     throw new OpenAPIError(
       `Zod type ${schema.constructor.name} is unsupported`
     );
   }
-  return fn({ schema, initial, isResponse });
+  return nextHelper({ schema, initial, isResponse });
 };
 
 export const excludeParamsFromDepiction = (
