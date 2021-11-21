@@ -7,10 +7,10 @@ import {
 import { getRoutePathParams } from "./common-helpers";
 import { Method } from "./method";
 import {
-  describeIOExamples,
-  describeParams,
-  describeSchema,
-  excludeParamFromDescription,
+  depictIOExamples,
+  depictParams,
+  depictSchema,
+  excludeParamFromDepiction,
 } from "./open-api-helpers";
 import { Routing, routingCycle, RoutingCycleParams } from "./routing";
 
@@ -35,12 +35,12 @@ export class OpenAPI extends OpenApiBuilder {
     super();
     this.addInfo({ title, version }).addServer({ url: serverUrl });
     const cb: RoutingCycleParams["cb"] = (endpoint, fullPath, method) => {
-      const positiveResponseSchema = describeSchema(
+      const positiveResponseSchema = depictSchema(
         endpoint.getPositiveResponseSchema(),
         true
       );
       delete positiveResponseSchema.example;
-      const negativeResponseSchema = describeSchema(
+      const negativeResponseSchema = depictSchema(
         endpoint.getNegativeResponseSchema(),
         true
       );
@@ -54,7 +54,7 @@ export class OpenAPI extends OpenApiBuilder {
                 ...carry,
                 [mimeType]: {
                   schema: positiveResponseSchema,
-                  ...describeIOExamples(
+                  ...depictIOExamples(
                     endpoint.getPositiveResponseSchema(),
                     true
                   ),
@@ -70,7 +70,7 @@ export class OpenAPI extends OpenApiBuilder {
                 ...carry,
                 [mimeType]: {
                   schema: negativeResponseSchema,
-                  ...describeIOExamples(
+                  ...depictIOExamples(
                     endpoint.getNegativeResponseSchema(),
                     true
                   ),
@@ -84,24 +84,24 @@ export class OpenAPI extends OpenApiBuilder {
       if (endpoint.getDescription()) {
         operation.description = endpoint.getDescription();
       }
-      operation.parameters = describeParams(
+      operation.parameters = depictParams(
         fullPath,
         method as Method,
         endpoint.getInputSchema()
       );
       if (method !== "get") {
-        const bodySchema = describeSchema(endpoint.getInputSchema(), false);
+        const bodySchema = depictSchema(endpoint.getInputSchema(), false);
         delete bodySchema.example;
         for (const pathParam of getRoutePathParams(fullPath)) {
-          excludeParamFromDescription(bodySchema, pathParam);
+          excludeParamFromDepiction(bodySchema, pathParam);
           if (bodySchema.allOf) {
             bodySchema.allOf.forEach((obj: SchemaObject) =>
-              excludeParamFromDescription(obj, pathParam)
+              excludeParamFromDepiction(obj, pathParam)
             );
           }
           if (bodySchema.oneOf) {
             bodySchema.oneOf.forEach((obj: SchemaObject) =>
-              excludeParamFromDescription(obj, pathParam)
+              excludeParamFromDepiction(obj, pathParam)
             );
           }
         }
@@ -114,7 +114,7 @@ export class OpenAPI extends OpenApiBuilder {
                   description: `${method.toUpperCase()} ${fullPath} request body`,
                   ...bodySchema,
                 },
-                ...describeIOExamples(
+                ...depictIOExamples(
                   endpoint.getInputSchema(),
                   false,
                   getRoutePathParams(fullPath)
