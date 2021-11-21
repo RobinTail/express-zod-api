@@ -472,7 +472,10 @@ export const depictRequestParams = ({
   const shape = extractObjectSchema(schema).shape;
   const pathParams = getRoutePathParams(path);
   return Object.keys(shape)
-    .filter((name) => method === "get" || pathParams.includes(name))
+    .filter(
+      // @todo involve config/inputSources in v4
+      (name) => ["get", "delete"].includes(method) || pathParams.includes(name)
+    )
     .map((name) => ({
       name,
       in: pathParams.includes(name) ? "path" : "query",

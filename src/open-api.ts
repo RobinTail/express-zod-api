@@ -52,6 +52,7 @@ export class OpenAPI extends OpenApiBuilder {
         operation.parameters = depictedParams;
       }
       if (method !== "get") {
+        // @todo involve config/inputSources in v4
         operation.requestBody = depictRequest(commonParams);
       }
       this.addPath(path, {
