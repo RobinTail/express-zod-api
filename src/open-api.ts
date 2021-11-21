@@ -4,6 +4,7 @@ import { Method } from "./method";
 import {
   depictIOExamples,
   depictParams,
+  depictResponse,
   depictSchema,
   excludeExampleFromDepiction,
   excludeParamsFromDepiction,
@@ -59,32 +60,22 @@ export class OpenAPI extends OpenApiBuilder {
       );
       const operation: OperationObject = {
         responses: {
-          "200": {
-            description: `${method.toUpperCase()} ${path} ${successfulResponseDescription}`,
-            content: endpoint.getPositiveMimeTypes().reduce(
-              (carry, mimeType) => ({
-                ...carry,
-                [mimeType]: {
-                  schema: positiveDepiction,
-                  ...positiveExamples,
-                },
-              }),
-              {} as ContentObject
-            ),
-          },
-          "400": {
-            description: `${method.toUpperCase()} ${path} ${errorResponseDescription}`,
-            content: endpoint.getNegativeMimeTypes().reduce(
-              (carry, mimeType) => ({
-                ...carry,
-                [mimeType]: {
-                  schema: negativeDepiction,
-                  ...negativeExamples,
-                },
-              }),
-              {} as ContentObject
-            ),
-          },
+          "200": depictResponse({
+            method: method as Method,
+            path,
+            description: successfulResponseDescription,
+            mimeTypes: endpoint.getPositiveMimeTypes(),
+            depictedSchema: positiveDepiction,
+            examples: positiveExamples,
+          }),
+          "400": depictResponse({
+            method: method as Method,
+            path,
+            description: errorResponseDescription,
+            mimeTypes: endpoint.getNegativeMimeTypes(),
+            depictedSchema: negativeDepiction,
+            examples: negativeExamples,
+          }),
         },
       };
       if (endpoint.getDescription()) {

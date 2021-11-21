@@ -1,10 +1,12 @@
 import {
+  ContentObject,
   ExampleObject,
   ExamplesObject,
   MediaTypeObject,
   ParameterObject,
   SchemaObject,
 } from "openapi3-ts";
+import { ResponseObject } from "openapi3-ts/src/model/OpenApi";
 import { z } from "zod";
 import {
   ArrayElement,
@@ -463,45 +465,6 @@ export const depictParams = (
     }));
 };
 
-export const excludeParamsFromDepiction = (
-  depicted: SchemaObject,
-  pathParams: string[]
-): SchemaObject => {
-  const properties = depicted.properties
-    ? omit(pathParams, depicted.properties)
-    : undefined;
-  const required = depicted.required
-    ? depicted.required.filter((name) => !pathParams.includes(name))
-    : undefined;
-  const allOf = depicted.allOf?.length
-    ? depicted.allOf.map((entry) =>
-        excludeParamsFromDepiction(entry, pathParams)
-      )
-    : undefined;
-  const oneOf = depicted.oneOf?.length
-    ? depicted.oneOf.map((entry) =>
-        excludeParamsFromDepiction(entry, pathParams)
-      )
-    : undefined;
-
-  return omit(
-    Object.entries({ properties, required, allOf, oneOf })
-      .filter(([{}, value]) => value === undefined)
-      .map(([key]) => key),
-    {
-      ...depicted,
-      properties,
-      required,
-      allOf,
-      oneOf,
-    }
-  );
-};
-
-export const excludeExampleFromDepiction = (
-  depicted: SchemaObject
-): SchemaObject => omit(["example"], depicted);
-
 const depictHelpers: Partial<
   Record<
     z.ZodFirstPartyTypeKind | ZodFileDef["typeName"] | ZodUploadDef["typeName"],
@@ -558,3 +521,70 @@ export const depictSchema: DepictHelper<z.ZodTypeAny> = ({
   }
   return fn({ schema, initial, isResponse });
 };
+
+export const excludeParamsFromDepiction = (
+  depicted: SchemaObject,
+  pathParams: string[]
+): SchemaObject => {
+  const properties = depicted.properties
+    ? omit(pathParams, depicted.properties)
+    : undefined;
+  const required = depicted.required
+    ? depicted.required.filter((name) => !pathParams.includes(name))
+    : undefined;
+  const allOf = depicted.allOf?.length
+    ? depicted.allOf.map((entry) =>
+        excludeParamsFromDepiction(entry, pathParams)
+      )
+    : undefined;
+  const oneOf = depicted.oneOf?.length
+    ? depicted.oneOf.map((entry) =>
+        excludeParamsFromDepiction(entry, pathParams)
+      )
+    : undefined;
+
+  return omit(
+    Object.entries({ properties, required, allOf, oneOf })
+      .filter(([{}, value]) => value === undefined)
+      .map(([key]) => key),
+    {
+      ...depicted,
+      properties,
+      required,
+      allOf,
+      oneOf,
+    }
+  );
+};
+
+export const excludeExampleFromDepiction = (
+  depicted: SchemaObject
+): SchemaObject => omit(["example"], depicted);
+
+export const depictResponse = ({
+  method,
+  path,
+  description,
+  mimeTypes,
+  depictedSchema,
+  examples,
+}: {
+  method: Method;
+  path: string;
+  description: string;
+  mimeTypes: string[];
+  depictedSchema: SchemaObject;
+  examples: MediaExamples;
+}): ResponseObject => ({
+  description: `${method.toUpperCase()} ${path} ${description}`,
+  content: mimeTypes.reduce(
+    (carry, mimeType) => ({
+      ...carry,
+      [mimeType]: {
+        schema: depictedSchema,
+        ...examples,
+      },
+    }),
+    {} as ContentObject
+  ),
+});
