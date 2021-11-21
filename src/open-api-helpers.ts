@@ -17,6 +17,7 @@ import { OpenAPIError } from "./errors";
 import { ZodFile, ZodFileDef } from "./file-schema";
 import { Method } from "./method";
 import { ZodUpload, ZodUploadDef } from "./upload-schema";
+import { omit } from "ramda";
 
 type MediaExamples = Pick<MediaTypeObject, "examples">;
 type DepictHelper<T extends z.ZodType<any>> = (params: {
@@ -404,17 +405,15 @@ export const depictIOExamples = <T extends IOSchema>(
     return {};
   }
   return {
-    examples: examples.reduce<ExamplesObject>((carry, example, index) => {
-      for (const prop of omitProps) {
-        delete example[prop];
-      }
-      return {
+    examples: examples.reduce<ExamplesObject>(
+      (carry, example, index) => ({
         ...carry,
         [`example${index + 1}`]: <ExampleObject>{
-          value: example,
+          value: omit(omitProps, example),
         },
-      };
-    }, {}),
+      }),
+      {}
+    ),
   };
 };
 
