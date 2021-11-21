@@ -25,44 +25,44 @@ export const depictSchema = (
   value: z.ZodTypeAny,
   isResponse: boolean
 ): SchemaObject => {
-  const otherProps: SchemaObject = {};
+  const initial: SchemaObject = {};
   if (value.isNullable()) {
-    otherProps.nullable = true;
+    initial.nullable = true;
   }
   if (value.description) {
-    otherProps.description = `${value.description}`;
+    initial.description = `${value.description}`;
   }
   const examples = getExamples(value, isResponse);
   if (examples.length > 0) {
-    otherProps.example = examples[0];
+    initial.example = examples[0];
   }
   switch (true) {
     case value instanceof z.ZodString:
-      return depictString(value as z.ZodString, otherProps);
+      return depictString(value as z.ZodString, initial);
     case value instanceof z.ZodNumber:
-      return depictNumber(value as z.ZodNumber, otherProps);
+      return depictNumber(value as z.ZodNumber, initial);
     case value instanceof z.ZodBigInt:
-      return { ...otherProps, type: "integer", format: "bigint" };
+      return { ...initial, type: "integer", format: "bigint" };
     case value instanceof z.ZodBoolean:
-      return { ...otherProps, type: "boolean" };
+      return { ...initial, type: "boolean" };
     case value instanceof z.ZodDate:
-      return { ...otherProps, type: "string", format: "date" };
+      return { ...initial, type: "string", format: "date" };
     case value instanceof z.ZodNull:
       // null is not supported https://swagger.io/docs/specification/data-models/data-types/
-      return { ...otherProps, type: "string", nullable: true, format: "null" };
+      return { ...initial, type: "string", nullable: true, format: "null" };
     case value instanceof z.ZodArray:
-      return depictArray(value._def as z.ZodArrayDef, otherProps, isResponse);
+      return depictArray(value._def as z.ZodArrayDef, initial, isResponse);
     case value instanceof z.ZodTuple:
-      return depictTuple(value as z.ZodTuple, otherProps, isResponse);
+      return depictTuple(value as z.ZodTuple, initial, isResponse);
     case value instanceof z.ZodRecord:
       return depictRecord(
         (value as z.ZodRecord<z.ZodTypeAny>)._def,
-        otherProps,
+        initial,
         isResponse
       );
     case value instanceof z.ZodObject:
       return {
-        ...otherProps,
+        ...initial,
         type: "object",
         properties: depictObjectProperties(value as z.AnyZodObject, isResponse),
         required: Object.keys((value as z.AnyZodObject).shape).filter(
@@ -71,14 +71,14 @@ export const depictSchema = (
       };
     case value instanceof z.ZodLiteral:
       return {
-        ...otherProps,
+        ...initial,
         type: typeof value._def.value as "string" | "number" | "boolean",
         enum: [value._def.value],
       };
     case value instanceof z.ZodEnum:
     case value instanceof z.ZodNativeEnum:
       return {
-        ...otherProps,
+        ...initial,
         type: typeof Object.values(value._def.values)[0] as "string" | "number",
         enum: Object.values(value._def.values),
       };
@@ -86,13 +86,13 @@ export const depictSchema = (
     case value instanceof z.ZodEffects:
       return depictEffect(
         value as z.ZodEffects<any> | z.ZodTransformer<any>,
-        otherProps,
+        initial,
         isResponse
       );
     case value instanceof z.ZodOptional:
     case value instanceof z.ZodNullable:
       return {
-        ...otherProps,
+        ...initial,
         ...depictSchema(
           (
             value as z.ZodOptional<z.ZodTypeAny> | z.ZodNullable<z.ZodTypeAny>
@@ -102,7 +102,7 @@ export const depictSchema = (
       };
     case value instanceof z.ZodIntersection:
       return {
-        ...otherProps,
+        ...initial,
         allOf: [
           depictSchema(
             (value as z.ZodIntersection<z.ZodTypeAny, z.ZodTypeAny>)._def.left,
@@ -116,14 +116,14 @@ export const depictSchema = (
       };
     case value instanceof z.ZodUnion:
       return {
-        ...otherProps,
+        ...initial,
         oneOf: (
           value as z.ZodUnion<[z.ZodTypeAny, ...z.ZodTypeAny[]]>
         )._def.options.map((schema) => depictSchema(schema, isResponse)),
       };
     case value instanceof ZodFile:
       return {
-        ...otherProps,
+        ...initial,
         type: "string",
         format: (value as ZodFile).isBinary
           ? "binary"
@@ -133,18 +133,18 @@ export const depictSchema = (
       };
     case value instanceof ZodUpload:
       return {
-        ...otherProps,
+        ...initial,
         type: "string",
         format: "binary",
       };
     case value instanceof z.ZodAny:
       return {
-        ...otherProps,
+        ...initial,
         format: "any",
       };
     case value instanceof z.ZodDefault:
       return {
-        ...otherProps,
+        ...initial,
         ...depictSchema((value._def as z.ZodDefaultDef).innerType, isResponse),
         default: (value._def as z.ZodDefaultDef).defaultValue(),
       };
@@ -165,7 +165,7 @@ export const depictSchema = (
 
 const depictRecord = (
   definition: z.ZodRecordDef<z.ZodTypeAny>,
-  otherProps: SchemaObject,
+  initial: SchemaObject,
   isResponse: boolean
 ): SchemaObject => {
   if (
@@ -181,7 +181,7 @@ const depictRecord = (
       {} as z.ZodRawShape
     );
     return {
-      ...otherProps,
+      ...initial,
       type: "object",
       properties: depictObjectProperties(z.object(shape), isResponse),
       required: keys,
@@ -189,7 +189,7 @@ const depictRecord = (
   }
   if (definition.keyType instanceof z.ZodLiteral) {
     return {
-      ...otherProps,
+      ...initial,
       type: "object",
       properties: depictObjectProperties(
         z.object({
@@ -215,7 +215,7 @@ const depictRecord = (
         {} as z.ZodRawShape
       );
       return {
-        ...otherProps,
+        ...initial,
         type: "object",
         properties: depictObjectProperties(z.object(shape), isResponse),
         required: definition.keyType.options.map(
@@ -232,10 +232,10 @@ const depictRecord = (
 
 const depictArray = (
   definition: z.ZodArrayDef,
-  otherProps: SchemaObject,
+  initial: SchemaObject,
   isResponse: boolean
 ): SchemaObject => ({
-  ...otherProps,
+  ...initial,
   type: "array",
   items: depictSchema(definition.type, isResponse),
   ...(definition.minLength ? { minItems: definition.minLength.value } : {}),
@@ -245,12 +245,12 @@ const depictArray = (
 /** @todo improve it when OpenAPI 3.1.0 will be released */
 const depictTuple = (
   schema: z.ZodTuple,
-  otherProps: SchemaObject,
+  initial: SchemaObject,
   isResponse: boolean
 ): SchemaObject => {
   const types = schema.items.map((item) => depictSchema(item, isResponse));
   return {
-    ...otherProps,
+    ...initial,
     type: "array",
     minItems: types.length,
     maxItems: types.length,
@@ -270,7 +270,7 @@ const depictTuple = (
 
 const depictString = (
   schema: z.ZodString,
-  otherProps: SchemaObject
+  initial: SchemaObject
 ): SchemaObject => {
   const checks = schema._def.checks;
   const isEmail = checks.find(({ kind }) => kind === "email") !== undefined;
@@ -287,7 +287,7 @@ const depictString = (
     | Extract<ArrayElement<z.ZodStringDef["checks"]>, { kind: "regex" }>
     | undefined;
   return {
-    ...otherProps,
+    ...initial,
     type: "string" as const,
     ...(isEmail ? { format: "email" } : {}),
     ...(isUrl ? { format: "url" } : {}),
@@ -303,7 +303,7 @@ const depictString = (
 
 const depictNumber = (
   schema: z.ZodNumber,
-  otherProps: SchemaObject
+  initial: SchemaObject
 ): SchemaObject => {
   const minCheck = schema._def.checks.find(({ kind }) => kind === "min") as
     | Extract<ArrayElement<z.ZodNumberDef["checks"]>, { kind: "min" }>
@@ -314,7 +314,7 @@ const depictNumber = (
     | undefined;
   const isMaxInclusive = maxCheck ? maxCheck.inclusive : true;
   return {
-    ...otherProps,
+    ...initial,
     type: schema.isInt ? ("integer" as const) : ("number" as const),
     format: schema.isInt ? ("int64" as const) : ("double" as const),
     minimum:
@@ -349,7 +349,7 @@ const depictObjectProperties = (
 
 const depictEffect = (
   value: z.ZodEffects<any>,
-  otherProps: SchemaObject,
+  initial: SchemaObject,
   isResponse: boolean
 ): SchemaObject => {
   const input = depictSchema(value._def.schema, isResponse);
@@ -376,7 +376,7 @@ const depictEffect = (
       /**/
     }
     return {
-      ...otherProps,
+      ...initial,
       ...input,
       ...(["number", "string", "boolean"].includes(output)
         ? {
@@ -388,12 +388,12 @@ const depictEffect = (
   if (!isResponse && effect && effect.type === "preprocess") {
     const { type: inputType, ...rest } = input;
     return {
-      ...otherProps,
+      ...initial,
       ...rest,
       format: `${rest.format || inputType} (preprocessed)`,
     };
   }
-  return { ...otherProps, ...input };
+  return { ...initial, ...input };
 };
 
 export const depictIOExamples = <T extends IOSchema>(
