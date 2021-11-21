@@ -84,18 +84,22 @@ export class OpenAPI extends OpenApiBuilder {
       if (endpoint.getDescription()) {
         operation.description = endpoint.getDescription();
       }
-      operation.parameters = depictParams(
+      const pathParams = getRoutePathParams(path);
+      const depictedParams = depictParams(
         path,
         method as Method,
         endpoint.getInputSchema()
       );
+      if (depictedParams.length > 0) {
+        operation.parameters = depictedParams;
+      }
       if (method !== "get") {
         const bodySchema = depictSchema({
           schema: endpoint.getInputSchema(),
           isResponse: false,
         });
         delete bodySchema.example;
-        for (const pathParam of getRoutePathParams(path)) {
+        for (const pathParam of pathParams) {
           excludeParamFromDepiction(bodySchema, pathParam);
           if (bodySchema.allOf) {
             bodySchema.allOf.forEach((obj: SchemaObject) =>
@@ -120,7 +124,7 @@ export class OpenAPI extends OpenApiBuilder {
                 ...depictIOExamples(
                   endpoint.getInputSchema(),
                   false,
-                  getRoutePathParams(path)
+                  pathParams
                 ),
               },
             }),

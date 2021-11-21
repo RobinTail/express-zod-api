@@ -290,7 +290,6 @@ paths:
                     status: error
                     error:
                       message: Sample error message
-      parameters: []
       requestBody:
         content:
           multipart/form-data:
