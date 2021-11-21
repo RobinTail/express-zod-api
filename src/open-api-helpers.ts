@@ -448,11 +448,16 @@ const depictIOParamExamples = <T extends IOSchema>(
   };
 };
 
-export const depictParams = (
-  path: string,
-  method: Method,
-  schema: IOSchema
-): ParameterObject[] => {
+export const depictParams = ({
+  path,
+  method,
+  endpoint,
+}: {
+  path: string;
+  method: Method;
+  endpoint: AbstractEndpoint;
+}): ParameterObject[] => {
+  const schema = endpoint.getInputSchema();
   const shape = extractObjectSchema(schema).shape;
   const pathParams = getRoutePathParams(path);
   return Object.keys(shape)
