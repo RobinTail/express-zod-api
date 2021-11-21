@@ -6,7 +6,10 @@ import {
   ParameterObject,
   SchemaObject,
 } from "openapi3-ts";
-import { ResponseObject } from "openapi3-ts/src/model/OpenApi";
+import {
+  RequestBodyObject,
+  ResponseObject,
+} from "openapi3-ts/src/model/OpenApi";
 import { z } from "zod";
 import {
   ArrayElement,
@@ -582,6 +585,34 @@ export const depictResponse = ({
       ...carry,
       [mimeType]: {
         schema: depictedSchema,
+        ...examples,
+      },
+    }),
+    {} as ContentObject
+  ),
+});
+
+export const depictRequest = ({
+  method,
+  path,
+  mimeTypes,
+  depictedSchema,
+  examples,
+}: {
+  method: Method;
+  path: string;
+  mimeTypes: string[];
+  depictedSchema: SchemaObject;
+  examples: MediaExamples;
+}): RequestBodyObject => ({
+  content: mimeTypes.reduce(
+    (carry, mimeType) => ({
+      ...carry,
+      [mimeType]: {
+        schema: {
+          description: `${method.toUpperCase()} ${path} request body`,
+          ...depictedSchema,
+        },
         ...examples,
       },
     }),

@@ -1,9 +1,10 @@
-import { ContentObject, OpenApiBuilder, OperationObject } from "openapi3-ts";
+import { OpenApiBuilder, OperationObject } from "openapi3-ts";
 import { getRoutePathParams } from "./common-helpers";
 import { Method } from "./method";
 import {
   depictIOExamples,
   depictParams,
+  depictRequest,
   depictResponse,
   depictSchema,
   excludeExampleFromDepiction,
@@ -99,21 +100,13 @@ export class OpenAPI extends OpenApiBuilder {
           false,
           pathParams
         );
-        operation.requestBody = {
-          content: endpoint.getInputMimeTypes().reduce(
-            (carry, mimeType) => ({
-              ...carry,
-              [mimeType]: {
-                schema: {
-                  description: `${method.toUpperCase()} ${path} request body`,
-                  ...bodyDepiction,
-                },
-                ...bodyExamples,
-              },
-            }),
-            {} as ContentObject
-          ),
-        };
+        operation.requestBody = depictRequest({
+          method: method as Method,
+          path,
+          mimeTypes: endpoint.getInputMimeTypes(),
+          depictedSchema: bodyDepiction,
+          examples: bodyExamples,
+        });
       }
       this.addPath(path, {
         ...(this.rootDoc.paths?.[path] || {}),
