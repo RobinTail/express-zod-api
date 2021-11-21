@@ -26,11 +26,25 @@ import { ZodUpload, ZodUploadDef } from "./upload-schema";
 import { omit } from "ramda";
 
 type MediaExamples = Pick<MediaTypeObject, "examples">;
+
 type DepictHelper<T extends z.ZodType<any>> = (params: {
   schema: T;
   initial?: SchemaObject;
   isResponse: boolean;
 }) => SchemaObject;
+
+type DepictingRules = Partial<
+  Record<
+    z.ZodFirstPartyTypeKind | ZodFileDef["typeName"] | ZodUploadDef["typeName"],
+    DepictHelper<any>
+  >
+>;
+
+interface ReqResDepictHelperCommonProps {
+  method: Method;
+  path: string;
+  endpoint: AbstractEndpoint;
+}
 
 /* eslint-disable @typescript-eslint/no-use-before-define */
 
@@ -452,11 +466,7 @@ export const depictParams = ({
   path,
   method,
   endpoint,
-}: {
-  path: string;
-  method: Method;
-  endpoint: AbstractEndpoint;
-}): ParameterObject[] => {
+}: ReqResDepictHelperCommonProps): ParameterObject[] => {
   const schema = endpoint.getInputSchema();
   const shape = extractObjectSchema(schema).shape;
   const pathParams = getRoutePathParams(path);
@@ -474,12 +484,7 @@ export const depictParams = ({
     }));
 };
 
-const depictHelpers: Partial<
-  Record<
-    z.ZodFirstPartyTypeKind | ZodFileDef["typeName"] | ZodUploadDef["typeName"],
-    DepictHelper<any>
-  >
-> = {
+const depictHelpers: DepictingRules = {
   ZodString: depictString,
   ZodNumber: depictNumber,
   ZodBigInt: depictBigInt,
@@ -569,12 +574,6 @@ export const excludeParamsFromDepiction = (
 export const excludeExampleFromDepiction = (
   depicted: SchemaObject
 ): SchemaObject => omit(["example"], depicted);
-
-interface ReqResDepictHelperCommonProps {
-  method: Method;
-  path: string;
-  endpoint: AbstractEndpoint;
-}
 
 export const depictResponse = ({
   method,
