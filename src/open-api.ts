@@ -34,7 +34,7 @@ export class OpenAPI extends OpenApiBuilder {
   }: GeneratorParams) {
     super();
     this.addInfo({ title, version }).addServer({ url: serverUrl });
-    const cb: RoutingCycleParams["cb"] = (endpoint, fullPath, method) => {
+    const cb: RoutingCycleParams["cb"] = (endpoint, path, method) => {
       const positiveResponseSchema = depictSchema(
         endpoint.getPositiveResponseSchema(),
         true
@@ -48,7 +48,7 @@ export class OpenAPI extends OpenApiBuilder {
       const operation: OperationObject = {
         responses: {
           "200": {
-            description: `${method.toUpperCase()} ${fullPath} ${successfulResponseDescription}`,
+            description: `${method.toUpperCase()} ${path} ${successfulResponseDescription}`,
             content: endpoint.getPositiveMimeTypes().reduce(
               (carry, mimeType) => ({
                 ...carry,
@@ -64,7 +64,7 @@ export class OpenAPI extends OpenApiBuilder {
             ),
           },
           "400": {
-            description: `${method.toUpperCase()} ${fullPath} ${errorResponseDescription}`,
+            description: `${method.toUpperCase()} ${path} ${errorResponseDescription}`,
             content: endpoint.getNegativeMimeTypes().reduce(
               (carry, mimeType) => ({
                 ...carry,
@@ -85,14 +85,14 @@ export class OpenAPI extends OpenApiBuilder {
         operation.description = endpoint.getDescription();
       }
       operation.parameters = depictParams(
-        fullPath,
+        path,
         method as Method,
         endpoint.getInputSchema()
       );
       if (method !== "get") {
         const bodySchema = depictSchema(endpoint.getInputSchema(), false);
         delete bodySchema.example;
-        for (const pathParam of getRoutePathParams(fullPath)) {
+        for (const pathParam of getRoutePathParams(path)) {
           excludeParamFromDepiction(bodySchema, pathParam);
           if (bodySchema.allOf) {
             bodySchema.allOf.forEach((obj: SchemaObject) =>
@@ -111,13 +111,13 @@ export class OpenAPI extends OpenApiBuilder {
               ...carry,
               [mimeType]: {
                 schema: {
-                  description: `${method.toUpperCase()} ${fullPath} request body`,
+                  description: `${method.toUpperCase()} ${path} request body`,
                   ...bodySchema,
                 },
                 ...depictIOExamples(
                   endpoint.getInputSchema(),
                   false,
-                  getRoutePathParams(fullPath)
+                  getRoutePathParams(path)
                 ),
               },
             }),
@@ -125,8 +125,8 @@ export class OpenAPI extends OpenApiBuilder {
           ),
         };
       }
-      this.addPath(fullPath, {
-        ...(this.rootDoc.paths?.[fullPath] || {}),
+      this.addPath(path, {
+        ...(this.rootDoc.paths?.[path] || {}),
         [method]: operation,
       });
     };

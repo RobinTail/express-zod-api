@@ -437,12 +437,12 @@ const depictIOParamExamples = <T extends IOSchema>(
 };
 
 export const depictParams = (
-  fullPath: string,
+  path: string,
   method: Method,
   schema: IOSchema
 ): ParameterObject[] => {
   const shape = extractObjectSchema(schema).shape;
-  const pathParams = getRoutePathParams(fullPath);
+  const pathParams = getRoutePathParams(path);
   return Object.keys(shape)
     .filter((name) => method === "get" || pathParams.includes(name))
     .map((name) => ({
@@ -450,7 +450,7 @@ export const depictParams = (
       in: pathParams.includes(name) ? "path" : "query",
       required: !shape[name].isOptional(),
       schema: {
-        description: `${method.toUpperCase()} ${fullPath} parameter`,
+        description: `${method.toUpperCase()} ${path} parameter`,
         ...depictSchema(shape[name], false),
       },
       ...depictIOParamExamples(schema, false, name),

@@ -41,14 +41,14 @@ export class DependsOnMethod {
 }
 
 export interface Routing {
-  [PATH: string]: Routing | DependsOnMethod | AbstractEndpoint;
+  [SEGMENT: string]: Routing | DependsOnMethod | AbstractEndpoint;
 }
 
 export interface RoutingCycleParams {
   routing: Routing;
   cb: (
     endpoint: AbstractEndpoint,
-    fullPath: string,
+    path: string,
     method: Method | AuxMethod
   ) => void;
   parentPath?: string;
@@ -61,45 +61,45 @@ export const routingCycle = ({
   parentPath,
   cors,
 }: RoutingCycleParams) => {
-  Object.entries(routing).forEach(([path, element]) => {
-    path = path.trim();
-    if (path.match(/\//)) {
+  Object.entries(routing).forEach(([segment, element]) => {
+    segment = segment.trim();
+    if (segment.match(/\//)) {
       throw new RoutingError(
         "Routing elements should not contain '/' character.\n" +
           `The error caused by ${
             parentPath
-              ? `'${parentPath}' route that has a '${path}'`
-              : `'${path}'`
+              ? `'${parentPath}' route that has a '${segment}'`
+              : `'${segment}'`
           } entry.`
       );
     }
-    const fullPath = `${parentPath || ""}${path ? `/${path}` : ""}`;
+    const path = `${parentPath || ""}${segment ? `/${segment}` : ""}`;
     if (element instanceof AbstractEndpoint) {
       const methods: (Method | AuxMethod)[] = element.getMethods().slice();
       if (cors) {
         methods.push("options");
       }
       methods.forEach((method) => {
-        cb(element, fullPath, method);
+        cb(element, path, method);
       });
     } else if (element instanceof DependsOnMethod) {
       Object.entries<AbstractEndpoint>(element.methods).forEach(
         ([method, endpoint]) => {
-          cb(endpoint, fullPath, method as Method);
+          cb(endpoint, path, method as Method);
         }
       );
       if (cors && Object.keys(element.methods).length > 0) {
         const firstEndpoint = Object.values(
           element.methods
         )[0] as AbstractEndpoint;
-        cb(firstEndpoint, fullPath, "options");
+        cb(firstEndpoint, path, "options");
       }
     } else {
       routingCycle({
         routing: element,
         cb,
         cors,
-        parentPath: fullPath,
+        parentPath: path,
       });
     }
   });
@@ -122,9 +122,9 @@ export const initRouting = ({
   routingCycle({
     routing,
     cors: config.cors,
-    cb: (endpoint, fullPath, method) => {
-      app[method](fullPath, async (request, response) => {
-        logger.info(`${request.method}: ${fullPath}`);
+    cb: (endpoint, path, method) => {
+      app[method](path, async (request, response) => {
+        logger.info(`${request.method}: ${path}`);
         await endpoint.execute({ request, response, logger, config });
       });
     },
