@@ -1361,7 +1361,6 @@ paths:
               example1:
                 value:
                   key: 1234-5678-90
-                  id: \\"12\\"
                   name: John Doe
   /v1/avatar/send:
     get:

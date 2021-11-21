@@ -405,22 +405,25 @@ const describeEffect = (
 type MediaExamples = Pick<MediaTypeObject, "examples">;
 const describeIOExamples = <T extends IOSchema>(
   schema: T,
-  isResponse: boolean
+  isResponse: boolean,
+  omitProps: string[] = []
 ): MediaExamples => {
   const examples = getExamples(schema, isResponse);
   if (examples.length === 0) {
     return {};
   }
   return {
-    examples: examples.reduce<ExamplesObject>(
-      (carry, example, index) => ({
+    examples: examples.reduce<ExamplesObject>((carry, example, index) => {
+      for (const prop of omitProps) {
+        delete example[prop];
+      }
+      return {
         ...carry,
         [`example${index + 1}`]: <ExampleObject>{
           value: example,
         },
-      }),
-      {}
-    ),
+      };
+    }, {}),
   };
 };
 
@@ -484,7 +487,6 @@ const excludeParamFromDescription = (
       (name) => name !== pathParam
     );
   }
-  // @todo need also to exclude it from examples -> describeIOExamples()
 };
 
 interface GenerationParams {
@@ -587,7 +589,11 @@ export class OpenAPI extends OpenApiBuilder {
                   description: `${method.toUpperCase()} ${fullPath} request body`,
                   ...bodySchema,
                 },
-                ...describeIOExamples(endpoint.getInputSchema(), false),
+                ...describeIOExamples(
+                  endpoint.getInputSchema(),
+                  false,
+                  getRouteParams(fullPath)
+                ),
               },
             }),
             {} as ContentObject
