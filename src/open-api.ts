@@ -15,7 +15,7 @@ import {
   ArrayElement,
   extractObjectSchema,
   getExamples,
-  getRouteParams,
+  getRoutePathParams,
   IOSchema,
 } from "./helpers";
 import { Method } from "./method";
@@ -458,7 +458,7 @@ const describeParams = (
   schema: IOSchema
 ): ParameterObject[] => {
   const shape = extractObjectSchema(schema).shape;
-  const pathParams = getRouteParams(fullPath);
+  const pathParams = getRoutePathParams(fullPath);
   return Object.keys(shape)
     .filter((name) => method === "get" || pathParams.includes(name))
     .map((name) => ({
@@ -567,7 +567,7 @@ export class OpenAPI extends OpenApiBuilder {
       if (method !== "get") {
         const bodySchema = describeSchema(endpoint.getInputSchema(), false);
         delete bodySchema.example;
-        for (const pathParam of getRouteParams(fullPath)) {
+        for (const pathParam of getRoutePathParams(fullPath)) {
           excludeParamFromDescription(bodySchema, pathParam);
           if (bodySchema.allOf) {
             bodySchema.allOf.forEach((obj: SchemaObject) =>
@@ -592,7 +592,7 @@ export class OpenAPI extends OpenApiBuilder {
                 ...describeIOExamples(
                   endpoint.getInputSchema(),
                   false,
-                  getRouteParams(fullPath)
+                  getRoutePathParams(fullPath)
                 ),
               },
             }),

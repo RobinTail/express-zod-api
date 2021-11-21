@@ -7,7 +7,7 @@ export const updateUserEndpoint =
     description: "example user update endpoint",
     input: withMeta(
       z.object({
-        // id is the URL param
+        // id is the route path param of /v1/user/:id
         id: z
           .string()
           .transform((value) => parseInt(value, 10))

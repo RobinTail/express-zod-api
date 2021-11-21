@@ -216,7 +216,8 @@ export const combinations = <T extends any>(
   return { type: "tuple", value: result };
 };
 
-export function getRouteParams(path: string): string[] {
+/** @see https://expressjs.com/en/guide/routing.html */
+export function getRoutePathParams(path: string): string[] {
   const match = path.match(/:([A-Za-z0-9_]+)/g);
   if (!match) {
     return [];

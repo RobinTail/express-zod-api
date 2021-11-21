@@ -6,7 +6,7 @@ import {
   getExamples,
   getInitialInput,
   getMessageFromError,
-  getRouteParams,
+  getRoutePathParams,
   getStatusCodeFromError,
   isLoggerConfig,
   OutputMarker,
@@ -670,31 +670,31 @@ describe("Helpers", () => {
     });
   });
 
-  describe("getRouteParams()", () => {
+  describe("getRoutePathParams()", () => {
     test("should return an array of param names", () => {
-      expect(getRouteParams("/users/:userId/books/:bookId")).toEqual([
+      expect(getRoutePathParams("/users/:userId/books/:bookId")).toEqual([
         "userId",
         "bookId",
       ]);
-      expect(getRouteParams("/flights/:from-:to")).toEqual(["from", "to"]);
-      expect(getRouteParams("/something")).toEqual([]);
-      expect(getRouteParams("")).toEqual([]);
-      expect(getRouteParams("\n")).toEqual([]);
+      expect(getRoutePathParams("/flights/:from-:to")).toEqual(["from", "to"]);
+      expect(getRoutePathParams("/something")).toEqual([]);
+      expect(getRoutePathParams("")).toEqual([]);
+      expect(getRoutePathParams("\n")).toEqual([]);
     });
 
     test("should return an array of param names", () => {
-      expect(getRouteParams("/users/:userId/books/:bookId")).toEqual([
+      expect(getRoutePathParams("/users/:userId/books/:bookId")).toEqual([
         "userId",
         "bookId",
       ]);
-      expect(getRouteParams("/flights/:from-:to")).toEqual(["from", "to"]);
-      expect(getRouteParams("/test/:genus.:species")).toEqual([
+      expect(getRoutePathParams("/flights/:from-:to")).toEqual(["from", "to"]);
+      expect(getRoutePathParams("/test/:genus.:species")).toEqual([
         "genus",
         "species",
       ]);
-      expect(getRouteParams("/something")).toEqual([]);
-      expect(getRouteParams("")).toEqual([]);
-      expect(getRouteParams("\n")).toEqual([]);
+      expect(getRoutePathParams("/something")).toEqual([]);
+      expect(getRoutePathParams("")).toEqual([]);
+      expect(getRoutePathParams("\n")).toEqual([]);
     });
   });
 });

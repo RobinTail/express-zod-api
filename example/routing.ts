@@ -10,7 +10,7 @@ export const routing: Routing = {
     user: {
       // syntax 1: methods are defined within the endpoint
       retrieve: retrieveUserEndpoint, // path: /v1/user/retrieve
-      // syntax 2: methods are defined within the route (id is the URL param by the way)
+      // syntax 2: methods are defined within the route (id is the route path param by the way)
       ":id": new DependsOnMethod({
         post: updateUserEndpoint, // the Endpoint should have at least the same method specified in .build()
       }),
