@@ -1,0 +1,61 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Open API helpers excludeParamsFromDepiction() should handle intersection 1`] = `
+Object {
+  "allOf": Array [
+    Object {
+      "properties": Object {},
+      "required": Array [],
+      "type": "object",
+    },
+    Object {
+      "properties": Object {
+        "b": Object {
+          "type": "string",
+        },
+      },
+      "required": Array [
+        "b",
+      ],
+      "type": "object",
+    },
+  ],
+}
+`;
+
+exports[`Open API helpers excludeParamsFromDepiction() should handle union 1`] = `
+Object {
+  "oneOf": Array [
+    Object {
+      "properties": Object {},
+      "required": Array [],
+      "type": "object",
+    },
+    Object {
+      "properties": Object {
+        "b": Object {
+          "type": "string",
+        },
+      },
+      "required": Array [
+        "b",
+      ],
+      "type": "object",
+    },
+  ],
+}
+`;
+
+exports[`Open API helpers excludeParamsFromDepiction() should omit specified path params 1`] = `
+Object {
+  "properties": Object {
+    "b": Object {
+      "type": "string",
+    },
+  },
+  "required": Array [
+    "b",
+  ],
+  "type": "object",
+}
+`;
