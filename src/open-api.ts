@@ -35,15 +35,15 @@ export class OpenAPI extends OpenApiBuilder {
     super();
     this.addInfo({ title, version }).addServer({ url: serverUrl });
     const cb: RoutingCycleParams["cb"] = (endpoint, path, method) => {
-      const positiveResponseSchema = depictSchema(
-        endpoint.getPositiveResponseSchema(),
-        true
-      );
+      const positiveResponseSchema = depictSchema({
+        schema: endpoint.getPositiveResponseSchema(),
+        isResponse: true,
+      });
       delete positiveResponseSchema.example;
-      const negativeResponseSchema = depictSchema(
-        endpoint.getNegativeResponseSchema(),
-        true
-      );
+      const negativeResponseSchema = depictSchema({
+        schema: endpoint.getNegativeResponseSchema(),
+        isResponse: true,
+      });
       delete negativeResponseSchema.example;
       const operation: OperationObject = {
         responses: {
@@ -90,7 +90,10 @@ export class OpenAPI extends OpenApiBuilder {
         endpoint.getInputSchema()
       );
       if (method !== "get") {
-        const bodySchema = depictSchema(endpoint.getInputSchema(), false);
+        const bodySchema = depictSchema({
+          schema: endpoint.getInputSchema(),
+          isResponse: false,
+        });
         delete bodySchema.example;
         for (const pathParam of getRoutePathParams(path)) {
           excludeParamFromDepiction(bodySchema, pathParam);
