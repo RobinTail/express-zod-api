@@ -462,7 +462,7 @@ const depictIOParamExamples = <T extends IOSchema>(
   };
 };
 
-export const depictParams = ({
+export const depictRequestParams = ({
   path,
   method,
   endpoint,

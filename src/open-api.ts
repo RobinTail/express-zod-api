@@ -1,7 +1,7 @@
 import { OpenApiBuilder, OperationObject } from "openapi3-ts";
 import { Method } from "./method";
 import {
-  depictParams,
+  depictRequestParams,
   depictRequest,
   depictResponse,
 } from "./open-api-helpers";
@@ -30,7 +30,7 @@ export class OpenAPI extends OpenApiBuilder {
     const cb: RoutingCycleParams["cb"] = (endpoint, path, _method) => {
       const method = _method as Method;
       const commonParams = { path, method, endpoint };
-      const depictedParams = depictParams(commonParams);
+      const depictedParams = depictRequestParams(commonParams);
       const operation: OperationObject = {
         responses: {
           "200": depictResponse({
