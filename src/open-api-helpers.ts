@@ -498,6 +498,10 @@ export const excludeParamsFromDepiction = (
   );
 };
 
+export const excludeExampleFromDepiction = (
+  depicted: SchemaObject
+): SchemaObject => omit(["example"], depicted);
+
 const depictHelpers: Partial<
   Record<
     z.ZodFirstPartyTypeKind | ZodFileDef["typeName"] | ZodUploadDef["typeName"],

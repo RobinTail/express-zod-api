@@ -5,6 +5,7 @@ import {
   depictIOExamples,
   depictParams,
   depictSchema,
+  excludeExampleFromDepiction,
   excludeParamsFromDepiction,
 } from "./open-api-helpers";
 import { Routing, routingCycle, RoutingCycleParams } from "./routing";
@@ -30,16 +31,18 @@ export class OpenAPI extends OpenApiBuilder {
     super();
     this.addInfo({ title, version }).addServer({ url: serverUrl });
     const cb: RoutingCycleParams["cb"] = (endpoint, path, method) => {
-      const positiveResponseSchema = depictSchema({
-        schema: endpoint.getPositiveResponseSchema(),
-        isResponse: true,
-      });
-      delete positiveResponseSchema.example;
-      const negativeResponseSchema = depictSchema({
-        schema: endpoint.getNegativeResponseSchema(),
-        isResponse: true,
-      });
-      delete negativeResponseSchema.example;
+      const positiveResponseSchema = excludeExampleFromDepiction(
+        depictSchema({
+          schema: endpoint.getPositiveResponseSchema(),
+          isResponse: true,
+        })
+      );
+      const negativeResponseSchema = excludeExampleFromDepiction(
+        depictSchema({
+          schema: endpoint.getNegativeResponseSchema(),
+          isResponse: true,
+        })
+      );
       const operation: OperationObject = {
         responses: {
           "200": {
@@ -89,14 +92,15 @@ export class OpenAPI extends OpenApiBuilder {
         operation.parameters = depictedParams;
       }
       if (method !== "get") {
-        const bodySchema = excludeParamsFromDepiction(
-          depictSchema({
-            schema: endpoint.getInputSchema(),
-            isResponse: false,
-          }),
-          pathParams
+        const bodySchema = excludeExampleFromDepiction(
+          excludeParamsFromDepiction(
+            depictSchema({
+              schema: endpoint.getInputSchema(),
+              isResponse: false,
+            }),
+            pathParams
+          )
         );
-        delete bodySchema.example;
         operation.requestBody = {
           content: endpoint.getInputMimeTypes().reduce(
             (carry, mimeType) => ({
