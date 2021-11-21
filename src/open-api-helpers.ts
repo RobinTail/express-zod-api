@@ -14,9 +14,9 @@ import {
   IOSchema,
 } from "./common-helpers";
 import { OpenAPIError } from "./errors";
-import { ZodFile } from "./file-schema";
+import { ZodFile, ZodFileDef } from "./file-schema";
 import { Method } from "./method";
-import { ZodUpload } from "./upload-schema";
+import { ZodUpload, ZodUploadDef } from "./upload-schema";
 
 type MediaExamples = Pick<MediaTypeObject, "examples">;
 type DepictHelper<T extends z.ZodType<any>> = (params: {
@@ -26,76 +26,6 @@ type DepictHelper<T extends z.ZodType<any>> = (params: {
 }) => SchemaObject;
 
 /* eslint-disable @typescript-eslint/no-use-before-define */
-export const depictSchema: DepictHelper<z.ZodTypeAny> = ({
-  schema,
-  isResponse,
-}) => {
-  const initial: SchemaObject = {};
-  if (schema.isNullable()) {
-    initial.nullable = true;
-  }
-  if (schema.description) {
-    initial.description = `${schema.description}`;
-  }
-  const examples = getExamples(schema, isResponse);
-  if (examples.length > 0) {
-    initial.example = examples[0];
-  }
-  let fn: DepictHelper<any> | null = null;
-  if (schema instanceof z.ZodString) {
-    fn = depictString;
-  } else if (schema instanceof z.ZodNumber) {
-    fn = depictNumber;
-  } else if (schema instanceof z.ZodBigInt) {
-    fn = depictBigInt;
-  } else if (schema instanceof z.ZodBoolean) {
-    fn = depictBoolean;
-  } else if (schema instanceof z.ZodDate) {
-    fn = depictDate;
-  } else if (schema instanceof z.ZodNull) {
-    fn = depictNull;
-  } else if (schema instanceof z.ZodArray) {
-    fn = depictArray;
-  } else if (schema instanceof z.ZodTuple) {
-    fn = depictTuple;
-  } else if (schema instanceof z.ZodRecord) {
-    fn = depictRecord;
-  } else if (schema instanceof z.ZodObject) {
-    fn = depictObject;
-  } else if (schema instanceof z.ZodLiteral) {
-    fn = depictLiteral;
-  } else if (schema instanceof z.ZodIntersection) {
-    fn = depictIntersection;
-  } else if (schema instanceof z.ZodUnion) {
-    fn = depictUnion;
-  } else if (schema instanceof ZodFile) {
-    fn = depictFile;
-  } else if (schema instanceof ZodUpload) {
-    fn = depictUpload;
-  } else if (schema instanceof z.ZodAny) {
-    fn = depictAny;
-  } else if (schema instanceof z.ZodDefault) {
-    fn = depictDefault;
-  } else if (schema instanceof z.ZodEnum || schema instanceof z.ZodNativeEnum) {
-    fn = depictEnum;
-  } else if (
-    schema instanceof z.ZodTransformer ||
-    schema instanceof z.ZodEffects
-  ) {
-    fn = depictEffect;
-  } else if (
-    schema instanceof z.ZodOptional ||
-    schema instanceof z.ZodNullable
-  ) {
-    fn = depictOptionalOrNullable;
-  }
-  if (!fn) {
-    throw new OpenAPIError(
-      `Zod type ${schema.constructor.name} is unsupported`
-    );
-  }
-  return fn({ schema, initial, isResponse });
-};
 
 const depictDefault: DepictHelper<z.ZodDefault<z.ZodTypeAny>> = ({
   schema: {
@@ -546,4 +476,61 @@ export const excludeParamFromDepiction = (
   if (depicted.required) {
     depicted.required = depicted.required.filter((name) => name !== pathParam);
   }
+};
+
+const depictHelpers: Partial<
+  Record<
+    z.ZodFirstPartyTypeKind | ZodFileDef["typeName"] | ZodUploadDef["typeName"],
+    DepictHelper<any>
+  >
+> = {
+  ZodString: depictString,
+  ZodNumber: depictNumber,
+  ZodBigInt: depictBigInt,
+  ZodBoolean: depictBoolean,
+  ZodDate: depictDate,
+  ZodNull: depictNull,
+  ZodArray: depictArray,
+  ZodTuple: depictTuple,
+  ZodRecord: depictRecord,
+  ZodObject: depictObject,
+  ZodLiteral: depictLiteral,
+  ZodIntersection: depictIntersection,
+  ZodUnion: depictUnion,
+  ZodFile: depictFile,
+  ZodUpload: depictUpload,
+  ZodAny: depictAny,
+  ZodDefault: depictDefault,
+  ZodEnum: depictEnum,
+  ZodNativeEnum: depictEnum,
+  ZodEffects: depictEffect,
+  ZodOptional: depictOptionalOrNullable,
+  ZodNullable: depictOptionalOrNullable,
+};
+
+export const depictSchema: DepictHelper<z.ZodTypeAny> = ({
+  schema,
+  isResponse,
+}) => {
+  const initial: SchemaObject = {};
+  if (schema.isNullable()) {
+    initial.nullable = true;
+  }
+  if (schema.description) {
+    initial.description = `${schema.description}`;
+  }
+  const examples = getExamples(schema, isResponse);
+  if (examples.length > 0) {
+    initial.example = examples[0];
+  }
+  const fn =
+    "typeName" in schema._def
+      ? depictHelpers[schema._def.typeName as keyof typeof depictHelpers]
+      : null;
+  if (!fn) {
+    throw new OpenAPIError(
+      `Zod type ${schema.constructor.name} is unsupported`
+    );
+  }
+  return fn({ schema, initial, isResponse });
 };
