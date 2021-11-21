@@ -205,38 +205,28 @@ You should receive the following response:
 Middleware can authenticate using input or `request` headers, and can provide endpoint handlers with `options`.
 Inputs of middlewares are also available to endpoint handlers within `input`.
 
-Here is an example on how to provide parameters from the request path.
+Here is an example on how to provide headers of the request.
 
 ```typescript
 import { createMiddleware } from "express-zod-api";
 
-const paramsProviderMiddleware = createMiddleware({
+const headersProviderMiddleware = createMiddleware({
   input: z.object({}), // means no inputs
   middleware: async ({ request }) => ({
-    params: request.params,
+    headers: request.headers,
   }),
 });
-```
-
-Then, you can connect your endpoint to a path like `/user/:id`, where `id` is a parameter:
-
-```typescript
-const routing: Routing = {
-  user: {
-    ":id": yourEndpoint,
-  },
-};
 ```
 
 By using `.addMiddleware()` method before `.build()` you can connect it to the endpoint:
 
 ```typescript
 const yourEndpoint = defaultEndpointsFactory
-  .addMiddleware(yourMiddleware)
+  .addMiddleware(headersProviderMiddleware)
   .build({
     // ...,
     handler: async ({ options }) => {
-      // options.id is your param from /user/:id
+      // options.headers === request.options
     },
   });
 ```
