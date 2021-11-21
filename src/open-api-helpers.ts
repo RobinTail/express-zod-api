@@ -27,6 +27,7 @@ import { omit } from "ramda";
 
 type MediaExamples = Pick<MediaTypeObject, "examples">;
 
+// @todo export and test them separately
 type DepictHelper<T extends z.ZodType<any>> = (params: {
   schema: T;
   initial?: SchemaObject;
@@ -415,7 +416,7 @@ const depictEffect: DepictHelper<z.ZodEffects<z.ZodTypeAny>> = ({
   return { ...initial, ...input };
 };
 
-export const depictIOExamples = <T extends IOSchema>(
+const depictIOExamples = <T extends IOSchema>(
   schema: T,
   isResponse: boolean,
   omitProps: string[] = []
@@ -571,9 +572,8 @@ export const excludeParamsFromDepiction = (
   );
 };
 
-export const excludeExampleFromDepiction = (
-  depicted: SchemaObject
-): SchemaObject => omit(["example"], depicted);
+const excludeExampleFromDepiction = (depicted: SchemaObject): SchemaObject =>
+  omit(["example"], depicted);
 
 export const depictResponse = ({
   method,
