@@ -261,7 +261,7 @@ const depictArray: DepictHelper<z.ZodArray<z.ZodTypeAny>> = ({
   type: "array",
   items: depictSchema({ schema: def.type, isResponse }),
   ...(def.minLength ? { minItems: def.minLength.value } : {}),
-  ...(def.maxLength ? { maxItems: def.maxLength?.value } : {}),
+  ...(def.maxLength ? { maxItems: def.maxLength.value } : {}),
 });
 
 /** @todo improve it when OpenAPI 3.1.0 will be released */
