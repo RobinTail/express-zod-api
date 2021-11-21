@@ -546,12 +546,12 @@ export const excludeParamsFromDepiction = (
   const required = depicted.required
     ? depicted.required.filter((name) => !pathParams.includes(name))
     : undefined;
-  const allOf = depicted.allOf?.length
+  const allOf = depicted.allOf
     ? depicted.allOf.map((entry) =>
         excludeParamsFromDepiction(entry, pathParams)
       )
     : undefined;
-  const oneOf = depicted.oneOf?.length
+  const oneOf = depicted.oneOf
     ? depicted.oneOf.map((entry) =>
         excludeParamsFromDepiction(entry, pathParams)
       )
