@@ -37,11 +37,19 @@ export class OpenAPI extends OpenApiBuilder {
           isResponse: true,
         })
       );
+      const positiveExamples = depictIOExamples(
+        endpoint.getPositiveResponseSchema(),
+        true
+      );
       const negativeDepiction = excludeExampleFromDepiction(
         depictSchema({
           schema: endpoint.getNegativeResponseSchema(),
           isResponse: true,
         })
+      );
+      const negativeExamples = depictIOExamples(
+        endpoint.getNegativeResponseSchema(),
+        true
       );
       const pathParams = getRoutePathParams(path);
       const depictedParams = depictParams(
@@ -58,10 +66,7 @@ export class OpenAPI extends OpenApiBuilder {
                 ...carry,
                 [mimeType]: {
                   schema: positiveDepiction,
-                  ...depictIOExamples(
-                    endpoint.getPositiveResponseSchema(),
-                    true
-                  ),
+                  ...positiveExamples,
                 },
               }),
               {} as ContentObject
@@ -74,10 +79,7 @@ export class OpenAPI extends OpenApiBuilder {
                 ...carry,
                 [mimeType]: {
                   schema: negativeDepiction,
-                  ...depictIOExamples(
-                    endpoint.getNegativeResponseSchema(),
-                    true
-                  ),
+                  ...negativeExamples,
                 },
               }),
               {} as ContentObject
@@ -101,6 +103,11 @@ export class OpenAPI extends OpenApiBuilder {
             pathParams
           )
         );
+        const bodyExamples = depictIOExamples(
+          endpoint.getInputSchema(),
+          false,
+          pathParams
+        );
         operation.requestBody = {
           content: endpoint.getInputMimeTypes().reduce(
             (carry, mimeType) => ({
@@ -110,11 +117,7 @@ export class OpenAPI extends OpenApiBuilder {
                   description: `${method.toUpperCase()} ${path} request body`,
                   ...bodyDepiction,
                 },
-                ...depictIOExamples(
-                  endpoint.getInputSchema(),
-                  false,
-                  pathParams
-                ),
+                ...bodyExamples,
               },
             }),
             {} as ContentObject
