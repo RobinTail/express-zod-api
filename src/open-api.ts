@@ -1,5 +1,4 @@
 import { OpenApiBuilder, OperationObject } from "openapi3-ts";
-import { getRoutePathParams } from "./common-helpers";
 import { Method } from "./method";
 import {
   depictIOExamples,
@@ -8,7 +7,6 @@ import {
   depictResponse,
   depictSchema,
   excludeExampleFromDepiction,
-  excludeParamsFromDepiction,
 } from "./open-api-helpers";
 import { Routing, routingCycle, RoutingCycleParams } from "./routing";
 
@@ -53,7 +51,6 @@ export class OpenAPI extends OpenApiBuilder {
         endpoint.getNegativeResponseSchema(),
         true
       );
-      const pathParams = getRoutePathParams(path);
       const depictedParams = depictParams(
         path,
         method as Method,
@@ -86,26 +83,11 @@ export class OpenAPI extends OpenApiBuilder {
         operation.parameters = depictedParams;
       }
       if (method !== "get") {
-        const bodyDepiction = excludeExampleFromDepiction(
-          excludeParamsFromDepiction(
-            depictSchema({
-              schema: endpoint.getInputSchema(),
-              isResponse: false,
-            }),
-            pathParams
-          )
-        );
-        const bodyExamples = depictIOExamples(
-          endpoint.getInputSchema(),
-          false,
-          pathParams
-        );
         operation.requestBody = depictRequest({
           method: method as Method,
           path,
           mimeTypes: endpoint.getInputMimeTypes(),
-          depictedSchema: bodyDepiction,
-          examples: bodyExamples,
+          endpoint,
         });
       }
       this.addPath(path, {

@@ -18,6 +18,7 @@ import {
   getRoutePathParams,
   IOSchema,
 } from "./common-helpers";
+import { AbstractEndpoint } from "./endpoint";
 import { OpenAPIError } from "./errors";
 import { ZodFile, ZodFileDef } from "./file-schema";
 import { Method } from "./method";
@@ -596,26 +597,42 @@ export const depictRequest = ({
   method,
   path,
   mimeTypes,
-  depictedSchema,
-  examples,
+  endpoint,
 }: {
   method: Method;
   path: string;
   mimeTypes: string[];
-  depictedSchema: SchemaObject;
-  examples: MediaExamples;
-}): RequestBodyObject => ({
-  content: mimeTypes.reduce(
-    (carry, mimeType) => ({
-      ...carry,
-      [mimeType]: {
-        schema: {
-          description: `${method.toUpperCase()} ${path} request body`,
-          ...depictedSchema,
+  endpoint: AbstractEndpoint;
+}): RequestBodyObject => {
+  const pathParams = getRoutePathParams(path);
+  const bodyDepiction = excludeExampleFromDepiction(
+    excludeParamsFromDepiction(
+      depictSchema({
+        schema: endpoint.getInputSchema(),
+        isResponse: false,
+      }),
+      pathParams
+    )
+  );
+  const bodyExamples = depictIOExamples(
+    endpoint.getInputSchema(),
+    false,
+    pathParams
+  );
+
+  return {
+    content: mimeTypes.reduce(
+      (carry, mimeType) => ({
+        ...carry,
+        [mimeType]: {
+          schema: {
+            description: `${method.toUpperCase()} ${path} request body`,
+            ...bodyDepiction,
+          },
+          ...bodyExamples,
         },
-        ...examples,
-      },
-    }),
-    {} as ContentObject
-  ),
-});
+      }),
+      {} as ContentObject
+    ),
+  };
+};
