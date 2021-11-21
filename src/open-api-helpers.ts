@@ -570,17 +570,20 @@ export const excludeExampleFromDepiction = (
   depicted: SchemaObject
 ): SchemaObject => omit(["example"], depicted);
 
+interface ReqResDepictHelperCommonProps {
+  method: Method;
+  path: string;
+  endpoint: AbstractEndpoint;
+}
+
 export const depictResponse = ({
   method,
   path,
   description,
   endpoint,
   isPositive,
-}: {
-  method: Method;
-  path: string;
+}: ReqResDepictHelperCommonProps & {
   description: string;
-  endpoint: AbstractEndpoint;
   isPositive: boolean;
 }): ResponseObject => {
   const schema = isPositive
@@ -616,11 +619,7 @@ export const depictRequest = ({
   method,
   path,
   endpoint,
-}: {
-  method: Method;
-  path: string;
-  endpoint: AbstractEndpoint;
-}): RequestBodyObject => {
+}: ReqResDepictHelperCommonProps): RequestBodyObject => {
   const pathParams = getRoutePathParams(path);
   const bodyDepiction = excludeExampleFromDepiction(
     excludeParamsFromDepiction(
