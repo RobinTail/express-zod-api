@@ -27,26 +27,27 @@ export class OpenAPI extends OpenApiBuilder {
   }: GeneratorParams) {
     super();
     this.addInfo({ title, version }).addServer({ url: serverUrl });
-    const cb: RoutingCycleParams["cb"] = (endpoint, path, method) => {
+    const cb: RoutingCycleParams["cb"] = (endpoint, path, _method) => {
+      const method = _method as Method;
       const depictedParams = depictParams(
         path,
-        method as Method,
+        method,
         endpoint.getInputSchema()
       );
       const operation: OperationObject = {
         responses: {
           "200": depictResponse({
-            method: method as Method,
+            method,
             path,
-            description: successfulResponseDescription,
             endpoint,
+            description: successfulResponseDescription,
             isPositive: true,
           }),
           "400": depictResponse({
-            method: method as Method,
+            method,
             path,
-            description: errorResponseDescription,
             endpoint,
+            description: errorResponseDescription,
             isPositive: false,
           }),
         },
@@ -59,7 +60,7 @@ export class OpenAPI extends OpenApiBuilder {
       }
       if (method !== "get") {
         operation.requestBody = depictRequest({
-          method: method as Method,
+          method,
           path,
           endpoint,
         });
