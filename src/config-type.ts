@@ -56,8 +56,9 @@ export interface CommonConfig {
   // you can disable the startup logo, default: true
   startupLogo?: boolean;
   // what request properties are combined into input for endpoints and middlewares
-  // default: { get: ['query'], post: ['body', 'files'],
-  // put: ['body'], patch: ['body'], delete: ['query', 'body'] }
+  // the order matters: priority from lowest to highest
+  // default: { get: [query, params], post: [body, params, files],
+  // put: [body, params], patch: [body, params], delete: [body, query, params] }
   inputSources?: Partial<InputSources>;
 }
 
