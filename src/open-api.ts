@@ -471,16 +471,20 @@ const describeParams = (
 };
 
 const excludeParamFromDescription = (
-  bodySchema: SchemaObject,
+  objectSchema: SchemaObject,
   pathParam: string
 ) => {
-  if (bodySchema.properties) {
-    // object
-    if (pathParam in bodySchema.properties) {
-      delete bodySchema.properties[pathParam];
-      // @todo delete from required
+  if (objectSchema.properties) {
+    if (pathParam in objectSchema.properties) {
+      delete objectSchema.properties[pathParam];
     }
   }
+  if (objectSchema.required) {
+    objectSchema.required = objectSchema.required.filter(
+      (name) => name !== pathParam
+    );
+  }
+  // @todo need also to exclude it from examples -> describeIOExamples()
 };
 
 interface GenerationParams {

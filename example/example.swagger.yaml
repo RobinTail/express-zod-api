@@ -166,7 +166,6 @@ paths:
                   minLength: 1
               required:
                 - key
-                - id
                 - name
             examples:
               example1:
