@@ -7,7 +7,7 @@ export {
 } from "./endpoint";
 export { Method } from "./method";
 export { EndpointsFactory, defaultEndpointsFactory } from "./endpoints-factory";
-export { IOSchema, FlatObject, markOutput } from "./helpers";
+export { IOSchema, FlatObject, markOutput } from "./common-helpers";
 export { createApiResponse } from "./api-response";
 export { createLogger } from "./logger";
 export { createMiddleware } from "./middleware";

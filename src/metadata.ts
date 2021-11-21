@@ -1,4 +1,4 @@
-import { combinations } from "./helpers";
+import { combinations } from "./common-helpers";
 import { z } from "./index";
 import { mergeDeepRight } from "ramda";
 

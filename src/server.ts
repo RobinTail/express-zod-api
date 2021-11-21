@@ -4,7 +4,7 @@ import { Server } from "http";
 import { Logger } from "winston";
 import { AppConfig, CommonConfig, ServerConfig } from "./config-type";
 import { ResultHandlerError } from "./errors";
-import { isLoggerConfig } from "./helpers";
+import { isLoggerConfig } from "./common-helpers";
 import { createLogger } from "./logger";
 import { defaultResultHandler, lastResortHandler } from "./result-handler";
 import { initRouting, Routing } from "./routing";

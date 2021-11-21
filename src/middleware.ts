@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { Logger } from "winston";
 import { z } from "zod";
-import { FlatObject, IOSchema } from "./helpers";
+import { FlatObject, IOSchema } from "./common-helpers";
 
 interface MiddlewareParams<IN, OPT> {
   input: IN;

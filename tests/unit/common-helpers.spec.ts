@@ -10,7 +10,7 @@ import {
   getStatusCodeFromError,
   isLoggerConfig,
   OutputMarker,
-} from "../../src/helpers";
+} from "../../src/common-helpers";
 import {
   createMiddleware,
   z,
@@ -23,7 +23,7 @@ import { getMeta } from "../../src/metadata";
 import { MiddlewareDefinition } from "../../src/middleware";
 import { serializeSchemaForTest } from "../helpers";
 
-describe("Helpers", () => {
+describe("Common Helpers", () => {
   describe("combineEndpointAndMiddlewareInputSchemas()", () => {
     test("Should merge input object schemas", () => {
       const middlewares = [

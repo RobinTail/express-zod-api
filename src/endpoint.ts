@@ -11,7 +11,7 @@ import {
   Merge,
   OutputMarker,
   ReplaceMarkerInShape,
-} from "./helpers";
+} from "./common-helpers";
 import { Method, MethodsDefinition } from "./method";
 import { MiddlewareDefinition } from "./middleware";
 import { lastResortHandler, ResultHandlerDefinition } from "./result-handler";
