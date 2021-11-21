@@ -463,18 +463,39 @@ export const depictParams = (
     }));
 };
 
-export const excludeParamFromDepiction = (
+export const excludeParamsFromDepiction = (
   depicted: SchemaObject,
-  pathParam: string
-) => {
-  if (depicted.properties) {
-    if (pathParam in depicted.properties) {
-      delete depicted.properties[pathParam];
+  pathParams: string[]
+): SchemaObject => {
+  const properties = depicted.properties
+    ? omit(pathParams, depicted.properties)
+    : undefined;
+  const required = depicted.required
+    ? depicted.required.filter((name) => !pathParams.includes(name))
+    : undefined;
+  const allOf = depicted.allOf?.length
+    ? depicted.allOf.map((entry) =>
+        excludeParamsFromDepiction(entry, pathParams)
+      )
+    : undefined;
+  const oneOf = depicted.oneOf?.length
+    ? depicted.oneOf.map((entry) =>
+        excludeParamsFromDepiction(entry, pathParams)
+      )
+    : undefined;
+
+  return omit(
+    Object.entries({ properties, required, allOf, oneOf })
+      .filter(([{}, value]) => value === undefined)
+      .map(([key]) => key),
+    {
+      ...depicted,
+      properties,
+      required,
+      allOf,
+      oneOf,
     }
-  }
-  if (depicted.required) {
-    depicted.required = depicted.required.filter((name) => name !== pathParam);
-  }
+  );
 };
 
 const depictHelpers: Partial<

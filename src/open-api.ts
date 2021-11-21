@@ -1,16 +1,11 @@
-import {
-  ContentObject,
-  OpenApiBuilder,
-  OperationObject,
-  SchemaObject,
-} from "openapi3-ts";
+import { ContentObject, OpenApiBuilder, OperationObject } from "openapi3-ts";
 import { getRoutePathParams } from "./common-helpers";
 import { Method } from "./method";
 import {
   depictIOExamples,
   depictParams,
   depictSchema,
-  excludeParamFromDepiction,
+  excludeParamsFromDepiction,
 } from "./open-api-helpers";
 import { Routing, routingCycle, RoutingCycleParams } from "./routing";
 
@@ -94,24 +89,14 @@ export class OpenAPI extends OpenApiBuilder {
         operation.parameters = depictedParams;
       }
       if (method !== "get") {
-        const bodySchema = depictSchema({
-          schema: endpoint.getInputSchema(),
-          isResponse: false,
-        });
+        const bodySchema = excludeParamsFromDepiction(
+          depictSchema({
+            schema: endpoint.getInputSchema(),
+            isResponse: false,
+          }),
+          pathParams
+        );
         delete bodySchema.example;
-        for (const pathParam of pathParams) {
-          excludeParamFromDepiction(bodySchema, pathParam);
-          if (bodySchema.allOf) {
-            bodySchema.allOf.forEach((obj: SchemaObject) =>
-              excludeParamFromDepiction(obj, pathParam)
-            );
-          }
-          if (bodySchema.oneOf) {
-            bodySchema.oneOf.forEach((obj: SchemaObject) =>
-              excludeParamFromDepiction(obj, pathParam)
-            );
-          }
-        }
         operation.requestBody = {
           content: endpoint.getInputMimeTypes().reduce(
             (carry, mimeType) => ({
