@@ -29,15 +29,16 @@ Start your API server with I/O schema validation and custom middlewares in minut
    1. [Middlewares](#middlewares)
    2. [Refinements](#refinements)
    3. [Transformations](#transformations)
-   4. [Response customization](#response-customization)
-   5. [Non-object response](#non-object-response) including file downloads
-   6. [File uploads](#file-uploads)
-   7. [Customizing logger](#customizing-logger)
-   8. [Usage with your own express app](#usage-with-your-own-express-app)
-   9. [Multiple schemas for one route](#multiple-schemas-for-one-route)
-   10. [Customizing input sources](#customizing-input-sources)
-   11. [Exporting endpoint types to frontend](#exporting-endpoint-types-to-frontend)
-   12. [Creating a documentation](#creating-a-documentation)
+   4. [Route path params](#route-path-params)
+   5. [Response customization](#response-customization)
+   6. [Non-object response](#non-object-response) including file downloads
+   7. [File uploads](#file-uploads)
+   8. [Customizing logger](#customizing-logger)
+   9. [Usage with your own express app](#usage-with-your-own-express-app)
+   10. [Multiple schemas for one route](#multiple-schemas-for-one-route)
+   11. [Customizing input sources](#customizing-input-sources)
+   12. [Exporting endpoint types to frontend](#exporting-endpoint-types-to-frontend)
+   13. [Creating a documentation](#creating-a-documentation)
 5. [Known issues](#known-issues)
    1. [Excessive properties in endpoint output](#excessive-properties-in-endpoint-output)
 6. [Your input to my output](#your-input-to-my-output)
@@ -308,6 +309,43 @@ const getUserEndpoint = endpointsFactory.build({
   handler: async ({ input: { id, ids }, logger }) => {
     logger.debug("id", id); // type: number
     logger.debug("ids", ids); // type: number[]
+  },
+});
+```
+
+## Route path params
+
+You can describe the route of the endpoint using parameters:
+
+```typescript
+import { Routing } from "express-zod-api";
+
+const routing: Routing = {
+  v1: {
+    user: {
+      // route path /v1/user/:id, where :id is the path param
+      ":id": getUserEndpoint,
+    },
+  },
+};
+```
+
+You then need to specify these parameters in the endpoint input schema in the usual way:
+
+```typescript
+const getUserEndpoint = endpointsFactory.build({
+  method: "get",
+  input: z.object({
+    // id is the route path param, always string
+    id: z.string().transform((value) => parseInt(value, 10)),
+    // other inputs (in query):
+    withExtendedInformation: z.boolean().optinal(),
+  }),
+  output: z.object({
+    /* ... */
+  }),
+  handler: async ({ input: { id } }) => {
+    // id is the route path param, number
   },
 });
 ```
