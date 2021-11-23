@@ -227,7 +227,7 @@ const yourEndpoint = defaultEndpointsFactory
   .build({
     // ...,
     handler: async ({ options }) => {
-      // options.headers === request.options
+      // options.headers === request.headers
     },
   });
 ```
