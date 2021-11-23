@@ -339,7 +339,7 @@ const getUserEndpoint = endpointsFactory.build({
     // id is the route path param, always string
     id: z.string().transform((value) => parseInt(value, 10)),
     // other inputs (in query):
-    withExtendedInformation: z.boolean().optinal(),
+    withExtendedInformation: z.boolean().optional(),
   }),
   output: z.object({
     /* ... */
