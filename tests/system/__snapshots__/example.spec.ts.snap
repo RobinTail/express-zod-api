@@ -12,7 +12,7 @@ Object {
 exports[`Example Negative POST request should fail on schema validation 1`] = `
 Object {
   "error": Object {
-    "message": "id: Value should be greater than or equal to 0",
+    "message": "id: should be greater than or equal to 0",
   },
   "status": "error",
 }

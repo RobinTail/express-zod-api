@@ -6,10 +6,11 @@ import {
   getExamples,
   getInitialInput,
   getMessageFromError,
+  getRoutePathParams,
   getStatusCodeFromError,
   isLoggerConfig,
   OutputMarker,
-} from "../../src/helpers";
+} from "../../src/common-helpers";
 import {
   createMiddleware,
   z,
@@ -22,7 +23,7 @@ import { getMeta } from "../../src/metadata";
 import { MiddlewareDefinition } from "../../src/middleware";
 import { serializeSchemaForTest } from "../helpers";
 
-describe("Helpers", () => {
+describe("Common Helpers", () => {
   describe("combineEndpointAndMiddlewareInputSchemas()", () => {
     test("Should merge input object schemas", () => {
       const middlewares = [
@@ -357,6 +358,30 @@ describe("Helpers", () => {
         b: "query",
       });
     });
+    test("URL params: should also be taken, with a higher priority by default", () => {
+      expect(
+        getInitialInput(
+          {
+            body: {
+              a: "body",
+            },
+            query: {
+              b: "query",
+            },
+            params: {
+              a: "url param",
+              b: "url param",
+            },
+            method: "POST",
+            header: () => "application/json",
+          } as unknown as Request,
+          undefined
+        )
+      ).toEqual({
+        a: "url param",
+        b: "url param",
+      });
+    });
   });
 
   describe("isLoggerConfig()", () => {
@@ -642,6 +667,34 @@ describe("Helpers", () => {
         value: [1, 2, 3],
       });
       expect(combinations([], [])).toEqual({ type: "single", value: [] });
+    });
+  });
+
+  describe("getRoutePathParams()", () => {
+    test("should return an array of param names", () => {
+      expect(getRoutePathParams("/users/:userId/books/:bookId")).toEqual([
+        "userId",
+        "bookId",
+      ]);
+      expect(getRoutePathParams("/flights/:from-:to")).toEqual(["from", "to"]);
+      expect(getRoutePathParams("/something")).toEqual([]);
+      expect(getRoutePathParams("")).toEqual([]);
+      expect(getRoutePathParams("\n")).toEqual([]);
+    });
+
+    test("should return an array of param names", () => {
+      expect(getRoutePathParams("/users/:userId/books/:bookId")).toEqual([
+        "userId",
+        "bookId",
+      ]);
+      expect(getRoutePathParams("/flights/:from-:to")).toEqual(["from", "to"]);
+      expect(getRoutePathParams("/test/:genus.:species")).toEqual([
+        "genus",
+        "species",
+      ]);
+      expect(getRoutePathParams("/something")).toEqual([]);
+      expect(getRoutePathParams("")).toEqual([]);
+      expect(getRoutePathParams("\n")).toEqual([]);
     });
   });
 });

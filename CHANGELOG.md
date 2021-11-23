@@ -2,6 +2,52 @@
 
 ## Version 3
 
+### v3.1.0
+
+- Feature #174: Route path params as the new input source.
+  - `request.params` is validated against the input schema.
+  - The schema for validating the path params can now be described along with other inputs.
+  - You no longer need a middleware like `paramsProviderMiddleware` to handle path params.
+  - The route path params are now reflected in the generated documentation.
+
+```typescript
+const routingExample: Routing = {
+  v1: {
+    user: {
+      // route path /v1/user/:id, where :id is the path param
+      ":id": getUserEndpoint,
+    },
+  },
+};
+const getUserEndpoint = endpointsFactory.build({
+  method: "get",
+  input: withMeta(
+    z.object({
+      // id is the route path param, always string
+      id: z.string().transform((value) => parseInt(value, 10)),
+      // other inputs (in query):
+      withExtendedInformation: z.boolean().optinal(),
+    })
+  ).example({
+    id: "12",
+    withExtendedInformation: true,
+  }),
+  // ...
+});
+```
+
+- The default configuration of `inputSources` has been changed.
+
+```typescript
+const newInputSourcesByDefault: InputSources = {
+  get: ["query", "params"],
+  post: ["body", "params", "files"],
+  put: ["body", "params"],
+  patch: ["body", "params"],
+  delete: ["body", "query", "params"],
+};
+```
+
 ### v3.0.0
 
 - No changes. [November 20](https://en.wikipedia.org/wiki/Transgender_Day_of_Remembrance) release.

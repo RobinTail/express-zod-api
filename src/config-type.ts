@@ -1,5 +1,5 @@
 import { NextHandleFunction } from "connect";
-import { Express } from "express";
+import { Express, Request } from "express";
 import fileUpload from "express-fileupload";
 import { Logger } from "winston";
 import { Method } from "./method";
@@ -41,7 +41,8 @@ export interface AppConfig {
   app: Express; // or your custom express app
 }
 
-export type InputSources = Record<Method, ("query" | "body" | "files")[]>;
+type InputSource = keyof Pick<Request, "query" | "body" | "files" | "params">;
+export type InputSources = Record<Method, InputSource[]>;
 
 export interface CommonConfig {
   // enable cross-origin resource sharing
@@ -55,8 +56,9 @@ export interface CommonConfig {
   // you can disable the startup logo, default: true
   startupLogo?: boolean;
   // what request properties are combined into input for endpoints and middlewares
-  // default: { get: ['query'], post: ['body', 'files'],
-  // put: ['body'], patch: ['body'], delete: ['query', 'body'] }
+  // the order matters: priority from lowest to highest
+  // default: { get: [query, params], post: [body, params, files],
+  // put: [body, params], patch: [body, params], delete: [body, query, params] }
   inputSources?: Partial<InputSources>;
 }
 

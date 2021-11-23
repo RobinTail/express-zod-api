@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Helpers combineEndpointAndMiddlewareInputSchemas() Should merge input object schemas 1`] = `
+exports[`Common Helpers combineEndpointAndMiddlewareInputSchemas() Should merge input object schemas 1`] = `
 Object {
   "_type": "ZodObject",
   "shape": Object {
@@ -20,7 +20,7 @@ Object {
 }
 `;
 
-exports[`Helpers combineEndpointAndMiddlewareInputSchemas() Should merge intersection object schemas 1`] = `
+exports[`Common Helpers combineEndpointAndMiddlewareInputSchemas() Should merge intersection object schemas 1`] = `
 Object {
   "_type": "ZodObject",
   "shape": Object {
@@ -46,7 +46,7 @@ Object {
 }
 `;
 
-exports[`Helpers combineEndpointAndMiddlewareInputSchemas() Should merge mixed object schemas 1`] = `
+exports[`Common Helpers combineEndpointAndMiddlewareInputSchemas() Should merge mixed object schemas 1`] = `
 Object {
   "_type": "ZodObject",
   "shape": Object {
@@ -75,7 +75,7 @@ Object {
 }
 `;
 
-exports[`Helpers combineEndpointAndMiddlewareInputSchemas() Should merge union object schemas 1`] = `
+exports[`Common Helpers combineEndpointAndMiddlewareInputSchemas() Should merge union object schemas 1`] = `
 Object {
   "_type": "ZodObject",
   "shape": Object {
@@ -119,7 +119,7 @@ Object {
 }
 `;
 
-exports[`Helpers extractObjectSchema() should pass the object schema through 1`] = `
+exports[`Common Helpers extractObjectSchema() should pass the object schema through 1`] = `
 Object {
   "_type": "ZodObject",
   "shape": Object {
@@ -130,7 +130,7 @@ Object {
 }
 `;
 
-exports[`Helpers extractObjectSchema() should return object schema for the intersection of object schemas 1`] = `
+exports[`Common Helpers extractObjectSchema() should return object schema for the intersection of object schemas 1`] = `
 Object {
   "_type": "ZodObject",
   "shape": Object {
@@ -144,7 +144,7 @@ Object {
 }
 `;
 
-exports[`Helpers extractObjectSchema() should return object schema for the union of object schemas 1`] = `
+exports[`Common Helpers extractObjectSchema() should return object schema for the union of object schemas 1`] = `
 Object {
   "_type": "ZodObject",
   "shape": Object {
@@ -164,8 +164,8 @@ Object {
 }
 `;
 
-exports[`Helpers getMessageFromError() should compile a string from ZodError 1`] = `"user/id: expected number, got string; user/name: expected string, got number"`;
+exports[`Common Helpers getMessageFromError() should compile a string from ZodError 1`] = `"user/id: expected number, got string; user/name: expected string, got number"`;
 
-exports[`Helpers getMessageFromError() should pass message from other error types 1`] = `"something went wrong"`;
+exports[`Common Helpers getMessageFromError() should pass message from other error types 1`] = `"something went wrong"`;
 
-exports[`Helpers getMessageFromError() should pass message from other error types 2`] = `"something went wrong"`;
+exports[`Common Helpers getMessageFromError() should pass message from other error types 2`] = `"something went wrong"`;

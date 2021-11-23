@@ -35,7 +35,7 @@ describe("Example", () => {
     });
 
     test("Should handle OPTIONS request", async () => {
-      const response = await fetch("http://localhost:8090/v2/user", {
+      const response = await fetch("http://localhost:8090/v1/user/100", {
         method: "OPTIONS",
       });
       expect(response.status).toBe(200);
@@ -55,7 +55,7 @@ describe("Example", () => {
     });
 
     test("Should handle valid POST request", async () => {
-      const response = await fetch("http://localhost:8090/v2/user", {
+      const response = await fetch("http://localhost:8090/v1/user/50", {
         method: "POST",
         headers: {
           token: "456",
@@ -63,7 +63,6 @@ describe("Example", () => {
         },
         body: JSON.stringify({
           key: "123",
-          id: 50,
           name: "John Doe",
         }),
       });
@@ -76,7 +75,7 @@ describe("Example", () => {
           timestamp: expect.any(Number),
         },
       });
-      await waitFor(() => /v2\/user/.test(out));
+      await waitFor(() => /v1\/user/.test(out));
       await waitFor(() => /50, 123, 456/.test(out));
       expect(true).toBeTruthy();
     });
@@ -181,7 +180,7 @@ describe("Example", () => {
     });
 
     test("POST request should fail on auth middleware key check", async () => {
-      const response = await fetch("http://localhost:8090/v2/user", {
+      const response = await fetch("http://localhost:8090/v1/user/50", {
         method: "POST",
         headers: {
           token: "456",
@@ -189,7 +188,6 @@ describe("Example", () => {
         },
         body: JSON.stringify({
           key: "456",
-          id: 50,
           name: "John Doe",
         }),
       });
@@ -204,7 +202,7 @@ describe("Example", () => {
     });
 
     test("POST request should fail on auth middleware token check", async () => {
-      const response = await fetch("http://localhost:8090/v2/user", {
+      const response = await fetch("http://localhost:8090/v1/user/50", {
         method: "POST",
         headers: {
           token: "123",
@@ -212,7 +210,6 @@ describe("Example", () => {
         },
         body: JSON.stringify({
           key: "123",
-          id: 50,
           name: "John Doe",
         }),
       });
@@ -227,7 +224,7 @@ describe("Example", () => {
     });
 
     test("POST request should fail on schema validation", async () => {
-      const response = await fetch("http://localhost:8090/v2/user", {
+      const response = await fetch("http://localhost:8090/v1/user/-50", {
         method: "POST",
         headers: {
           token: "456",
@@ -235,7 +232,6 @@ describe("Example", () => {
         },
         body: JSON.stringify({
           key: "123",
-          id: -50,
           name: "John Doe",
         }),
       });
@@ -245,7 +241,7 @@ describe("Example", () => {
     });
 
     test("POST request should fail on specific value in handler implementation", async () => {
-      const response = await fetch("http://localhost:8090/v2/user", {
+      const response = await fetch("http://localhost:8090/v1/user/101", {
         method: "POST",
         headers: {
           token: "456",
@@ -253,7 +249,6 @@ describe("Example", () => {
         },
         body: JSON.stringify({
           key: "123",
-          id: 101,
           name: "John Doe",
         }),
       });

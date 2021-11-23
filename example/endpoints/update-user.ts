@@ -7,11 +7,18 @@ export const updateUserEndpoint =
     description: "example user update endpoint",
     input: withMeta(
       z.object({
-        id: z.number().int().nonnegative(),
+        // id is the route path param of /v1/user/:id
+        id: z
+          .string()
+          .transform((value) => parseInt(value, 10))
+          .refine(
+            (value) => value >= 0,
+            "should be greater than or equal to 0"
+          ),
         name: z.string().nonempty(),
       })
     ).example({
-      id: 12,
+      id: "12",
       name: "John Doe",
     }),
     output: withMeta(

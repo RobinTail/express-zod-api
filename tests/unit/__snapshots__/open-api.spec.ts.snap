@@ -728,6 +728,189 @@ servers:
 "
 `;
 
+exports[`Open API generator Route Path Params should handle route path params for GET request 1`] = `
+"openapi: 3.0.0
+info:
+  title: Testing route path params
+  version: 3.4.5
+paths:
+  /v1/:name:
+    get:
+      responses:
+        \\"200\\":
+          description: GET /v1/:name Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - success
+                  data:
+                    type: object
+                    properties: {}
+                    required: []
+                required:
+                  - status
+                  - data
+        \\"400\\":
+          description: GET /v1/:name Error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                required:
+                  - status
+                  - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            description: GET /v1/:name parameter
+            oneOf:
+              - type: string
+                enum:
+                  - John
+              - type: string
+                enum:
+                  - Jane
+        - name: other
+          in: query
+          required: true
+          schema:
+            description: GET /v1/:name parameter
+            type: boolean
+components:
+  schemas: {}
+  responses: {}
+  parameters: {}
+  examples: {}
+  requestBodies: {}
+  headers: {}
+  securitySchemes: {}
+  links: {}
+  callbacks: {}
+tags: []
+servers:
+  - url: http://example.com
+"
+`;
+
+exports[`Open API generator Route Path Params should handle route path params for POST request 1`] = `
+"openapi: 3.0.0
+info:
+  title: Testing route path params
+  version: 3.4.5
+paths:
+  /v1/:name:
+    post:
+      responses:
+        \\"200\\":
+          description: POST /v1/:name Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - success
+                  data:
+                    type: object
+                    properties: {}
+                    required: []
+                required:
+                  - status
+                  - data
+        \\"400\\":
+          description: POST /v1/:name Error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                required:
+                  - status
+                  - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            description: POST /v1/:name parameter
+            oneOf:
+              - type: string
+                enum:
+                  - John
+              - type: string
+                enum:
+                  - Jane
+      requestBody:
+        content:
+          application/json:
+            schema:
+              description: POST /v1/:name request body
+              type: object
+              properties:
+                other:
+                  type: boolean
+              required:
+                - other
+components:
+  schemas: {}
+  responses: {}
+  parameters: {}
+  examples: {}
+  requestBodies: {}
+  headers: {}
+  securitySchemes: {}
+  links: {}
+  callbacks: {}
+tags: []
+servers:
+  - url: http://example.com
+"
+`;
+
 exports[`Open API generator generateOpenApi() should generate the correct schema for complex types 1`] = `
 "openapi: 3.0.0
 info:
@@ -1255,6 +1438,107 @@ paths:
             description: a numeric string containing the id of the user
             type: string
             pattern: /\\\\d+/
+  /v1/user/:id:
+    post:
+      responses:
+        \\"200\\":
+          description: POST /v1/user/:id Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - success
+                  data:
+                    example:
+                      name: John Doe
+                      timestamp: 1235698995125
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                      timestamp:
+                        type: integer
+                        format: int64
+                        minimum: 0
+                        exclusiveMinimum: false
+                        maximum: 9007199254740991
+                        exclusiveMaximum: false
+                    required:
+                      - name
+                      - timestamp
+                required:
+                  - status
+                  - data
+              examples:
+                example1:
+                  value:
+                    status: success
+                    data:
+                      name: John Doe
+                      timestamp: 1235698995125
+        \\"400\\":
+          description: POST /v1/user/:id Error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                required:
+                  - status
+                  - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
+      description: example user update endpoint
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            description: POST /v1/user/:id parameter
+            type: string
+          examples:
+            example1:
+              value: \\"12\\"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              description: POST /v1/user/:id request body
+              type: object
+              properties:
+                key:
+                  type: string
+                  minLength: 1
+                name:
+                  type: string
+                  minLength: 1
+              required:
+                - key
+                - name
+            examples:
+              example1:
+                value:
+                  key: 1234-5678-90
+                  name: John Doe
   /v1/avatar/send:
     get:
       responses:
@@ -1385,106 +1669,6 @@ paths:
                   format: binary
               required:
                 - avatar
-  /v2/user:
-    post:
-      responses:
-        \\"200\\":
-          description: POST /v2/user Successful response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    enum:
-                      - success
-                  data:
-                    example:
-                      name: John Doe
-                      timestamp: 1235698995125
-                    type: object
-                    properties:
-                      name:
-                        type: string
-                      timestamp:
-                        type: integer
-                        format: int64
-                        minimum: 0
-                        exclusiveMinimum: false
-                        maximum: 9007199254740991
-                        exclusiveMaximum: false
-                    required:
-                      - name
-                      - timestamp
-                required:
-                  - status
-                  - data
-              examples:
-                example1:
-                  value:
-                    status: success
-                    data:
-                      name: John Doe
-                      timestamp: 1235698995125
-        \\"400\\":
-          description: POST /v2/user Error response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    enum:
-                      - error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                required:
-                  - status
-                  - error
-              examples:
-                example1:
-                  value:
-                    status: error
-                    error:
-                      message: Sample error message
-      description: example user update endpoint
-      requestBody:
-        content:
-          application/json:
-            schema:
-              description: POST /v2/user request body
-              type: object
-              properties:
-                key:
-                  type: string
-                  minLength: 1
-                id:
-                  type: integer
-                  format: int64
-                  minimum: 0
-                  exclusiveMinimum: false
-                  maximum: 9007199254740991
-                  exclusiveMaximum: false
-                name:
-                  type: string
-                  minLength: 1
-              required:
-                - key
-                - id
-                - name
-            examples:
-              example1:
-                value:
-                  key: 1234-5678-90
-                  id: 12
-                  name: John Doe
 components:
   schemas: {}
   responses: {}

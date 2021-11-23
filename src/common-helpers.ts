@@ -116,11 +116,11 @@ function areFilesAvailable(request: Request) {
 }
 
 const defaultInputSources: InputSources = {
-  get: ["query"],
-  post: ["body", "files"],
-  put: ["body"],
-  patch: ["body"],
-  delete: ["query", "body"],
+  get: ["query", "params"],
+  post: ["body", "params", "files"],
+  put: ["body", "params"],
+  patch: ["body", "params"],
+  delete: ["body", "query", "params"],
 };
 const fallbackInputSource = defaultInputSources.delete;
 
@@ -215,6 +215,15 @@ export const combinations = <T extends any>(
   }
   return { type: "tuple", value: result };
 };
+
+/** @see https://expressjs.com/en/guide/routing.html */
+export function getRoutePathParams(path: string): string[] {
+  const match = path.match(/:([A-Za-z0-9_]+)/g);
+  if (!match) {
+    return [];
+  }
+  return match.map((param) => param.slice(1));
+}
 
 // obtaining the private helper type from Zod
 export type ErrMessage = Exclude<

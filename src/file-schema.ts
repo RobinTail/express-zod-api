@@ -8,7 +8,7 @@ import {
   addIssueToContext,
   ParseInput,
 } from "zod";
-import { ErrMessage, errToObj } from "./helpers";
+import { ErrMessage, errToObj } from "./common-helpers";
 
 const zodFileKind = "ZodFile";
 
