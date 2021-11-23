@@ -58,7 +58,7 @@ Therefore, many basic tasks can be accomplished faster and easier, in particular
   you expect a number.
 - Variables within an endpoint handler have types according to the declared schema, so your IDE and Typescript will
   provide you with necessary hints to focus on bringing your vision to life.
-- All of your endpoints can respond in a similar way.
+- All of your endpoints can respond in a consistent way.
 - The expected endpoint input and response types can be exported to the frontend, so you don't get confused about the
   field names when you implement the client for your API.
 - You can generate your API documentation in a Swagger / OpenAPI compatible format.
@@ -82,7 +82,7 @@ The object being validated is the combination of certain `request` properties.
 It is available to the endpoint handler as the `input` parameter.
 Middlewares have access to all `request` properties, they can provide endpoints with `options`.
 The object returned by the endpoint handler is called `output`. It goes to the `ResultHandler` which is
-responsible for transmission of the final response containing the `output` or possible error.
+responsible for transmitting consistent responses containing the `output` or possible error.
 Much can be customized to fit your needs.
 
 ![Dataflow](https://raw.githubusercontent.com/RobinTail/express-zod-api/master/dataflow.svg)
@@ -352,7 +352,7 @@ const getUserEndpoint = endpointsFactory.build({
 
 ## Response customization
 
-`ResultHandler` is responsible for transmission of the response containing the endpoint output or an error.
+`ResultHandler` is responsible for transmitting consistent responses containing the endpoint output or an error.
 The `defaultResultHandler` sets the HTTP status code and ensures the following type of the response:
 
 ```typescript
