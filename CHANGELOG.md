@@ -2,6 +2,10 @@
 
 ## Version 3
 
+### v3.1.1
+
+- No changes. Releasing as 3.1.1 due to a typo in Readme I found after publishing 3.1.0.
+
 ### v3.1.0
 
 - Feature #174: Route path params as the new input source.
