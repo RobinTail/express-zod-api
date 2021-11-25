@@ -7,6 +7,14 @@ import {
 } from "./open-api-helpers";
 import { Routing, routingCycle, RoutingCycleParams } from "./routing";
 
+const convertColonToBrackets = (path: string): string =>
+  path
+    .split('/')
+    .map(segment =>
+        segment[0] === ':' ? `{${segment.substr(1)}}` : segment,
+    )
+    .join('/')
+
 interface GeneratorParams {
   title: string;
   version: string;
@@ -55,6 +63,7 @@ export class OpenAPI extends OpenApiBuilder {
         // @todo involve config/inputSources in v4
         operation.requestBody = depictRequest(commonParams);
       }
+      path = convertColonToBrackets(path);
       this.addPath(path, {
         ...(this.rootDoc.paths?.[path] || {}),
         [method]: operation,
