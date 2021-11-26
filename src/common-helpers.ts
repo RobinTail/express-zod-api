@@ -60,6 +60,9 @@ export type Merge<A extends IOSchema, B extends IOSchema | any> = z.ZodObject<
 export type OutputMarker = IOSchema & { _typeGuard: "OutputMarker" };
 export const markOutput = (output: IOSchema) => output as OutputMarker;
 
+/** @see https://expressjs.com/en/guide/routing.html */
+export const routePathParamsRegex = /:([A-Za-z0-9_]+)/g;
+
 export type ReplaceMarkerInShape<
   S extends z.ZodRawShape,
   OUT extends IOSchema
@@ -216,9 +219,8 @@ export const combinations = <T extends any>(
   return { type: "tuple", value: result };
 };
 
-/** @see https://expressjs.com/en/guide/routing.html */
 export function getRoutePathParams(path: string): string[] {
-  const match = path.match(/:([A-Za-z0-9_]+)/g);
+  const match = path.match(routePathParamsRegex);
   if (!match) {
     return [];
   }

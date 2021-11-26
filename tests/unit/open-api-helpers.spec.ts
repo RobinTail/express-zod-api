@@ -2,6 +2,7 @@ import { z } from "../../src/index";
 import {
   depictSchema,
   excludeParamsFromDepiction,
+  reformatParamsInPath,
 } from "../../src/open-api-helpers";
 
 describe("Open API helpers", () => {
@@ -47,6 +48,19 @@ describe("Open API helpers", () => {
         isResponse: false,
       });
       expect(excludeParamsFromDepiction(depicted, ["a"])).toMatchSnapshot();
+    });
+  });
+
+  describe("reformatParamsInPath()", () => {
+    test("should replace route path params from colon to curly braces notation", () => {
+      expect(reformatParamsInPath("/v1/user")).toBe("/v1/user");
+      expect(reformatParamsInPath("/v1/user/:id")).toBe("/v1/user/{id}");
+      expect(reformatParamsInPath("/v1/flight/:from-:to")).toBe(
+        "/v1/flight/{from}-{to}"
+      );
+      expect(reformatParamsInPath("/v1/flight/:from-:to/updates")).toBe(
+        "/v1/flight/{from}-{to}/updates"
+      );
     });
   });
 });

@@ -71,7 +71,7 @@ paths:
             description: a numeric string containing the id of the user
             type: string
             pattern: /\d+/
-  /v1/user/:id:
+  "/v1/user/{id}":
     post:
       responses:
         "200":
