@@ -2,6 +2,20 @@
 
 ## Version 3
 
+### v3.1.2
+
+- Fixed issue #202, originally reported in PR #201.
+  - Using curly braces notation instead of colon for route path params in generated documentation according to
+    OpenAPI / Swagger specification.
+  - See "Path templating" at https://swagger.io/specification/.
+
+```yaml
+# before
+/v1/user/:id:
+# after
+"/v1/user/{id}":
+```
+
 ### v3.1.1
 
 - No changes. Releasing as 3.1.1 due to a typo in Readme I found after publishing 3.1.0.

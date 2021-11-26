@@ -734,7 +734,7 @@ info:
   title: Testing route path params
   version: 3.4.5
 paths:
-  /v1/:name:
+  \\"/v1/{name}\\":
     get:
       responses:
         \\"200\\":
@@ -823,7 +823,7 @@ info:
   title: Testing route path params
   version: 3.4.5
 paths:
-  /v1/:name:
+  \\"/v1/{name}\\":
     post:
       responses:
         \\"200\\":
@@ -1438,7 +1438,7 @@ paths:
             description: a numeric string containing the id of the user
             type: string
             pattern: /\\\\d+/
-  /v1/user/:id:
+  \\"/v1/user/{id}\\":
     post:
       responses:
         \\"200\\":

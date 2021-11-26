@@ -4,6 +4,7 @@ import {
   depictRequestParams,
   depictRequest,
   depictResponse,
+  reformatParamsInPath,
 } from "./open-api-helpers";
 import { Routing, routingCycle, RoutingCycleParams } from "./routing";
 
@@ -55,8 +56,9 @@ export class OpenAPI extends OpenApiBuilder {
         // @todo involve config/inputSources in v4
         operation.requestBody = depictRequest(commonParams);
       }
-      this.addPath(path, {
-        ...(this.rootDoc.paths?.[path] || {}),
+      const swaggerCompatiblePath = reformatParamsInPath(path);
+      this.addPath(swaggerCompatiblePath, {
+        ...(this.rootDoc.paths?.[swaggerCompatiblePath] || {}),
         [method]: operation,
       });
     };

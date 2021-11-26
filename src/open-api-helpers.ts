@@ -17,6 +17,7 @@ import {
   getExamples,
   getRoutePathParams,
   IOSchema,
+  routePathParamsRegex,
 } from "./common-helpers";
 import { AbstractEndpoint } from "./endpoint";
 import { OpenAPIError } from "./errors";
@@ -48,6 +49,10 @@ interface ReqResDepictHelperCommonProps {
 }
 
 /* eslint-disable @typescript-eslint/no-use-before-define */
+
+export function reformatParamsInPath(path: string): string {
+  return path.replace(routePathParamsRegex, (param) => `{${param.slice(1)}}`);
+}
 
 const depictDefault: DepictHelper<z.ZodDefault<z.ZodTypeAny>> = ({
   schema: {
