@@ -33,7 +33,7 @@ export interface ServerConfig {
     // server configuration
     listen: number | string; // port or socket
     jsonParser?: NextHandleFunction; // custom JSON parser, default: express.json()
-    upload?: boolean | UploadOptions;
+    upload?: boolean | UploadOptions; // enable or configure uploads handling
   };
 }
 

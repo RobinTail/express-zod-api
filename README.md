@@ -459,7 +459,6 @@ const config = createConfig({
 
 const fileUploadEndpoint = defaultEndpointsFactory.build({
   method: "post",
-  type: "upload", // <- required
   input: z.object({
     avatar: z.upload(),
   }),
