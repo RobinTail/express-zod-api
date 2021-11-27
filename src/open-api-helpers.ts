@@ -86,19 +86,18 @@ const depictFile: DepictHelper<ZodFile> = ({
   format: isBinary ? "binary" : isBase64 ? "byte" : "file",
 });
 
-const depictUnion: DepictHelper<z.ZodUnion<[z.ZodTypeAny, ...z.ZodTypeAny[]]>> =
-  ({
-    schema: {
-      _def: { options },
-    },
-    initial,
-    isResponse,
-  }) => ({
-    ...initial,
-    oneOf: options.map((option) =>
-      depictSchema({ schema: option, isResponse })
-    ),
-  });
+const depictUnion: DepictHelper<
+  z.ZodUnion<[z.ZodTypeAny, ...z.ZodTypeAny[]]>
+> = ({
+  schema: {
+    _def: { options },
+  },
+  initial,
+  isResponse,
+}) => ({
+  ...initial,
+  oneOf: options.map((option) => depictSchema({ schema: option, isResponse })),
+});
 
 const depictIntersection: DepictHelper<
   z.ZodIntersection<z.ZodTypeAny, z.ZodTypeAny>
