@@ -443,8 +443,8 @@ const fileStreamingEndpointsFactory = new EndpointsFactory(
 
 ## File uploads
 
-You can switch the `Endpoint` to handle requests with the `multipart/form-data` content type instead of JSON.
-Together with a corresponding configuration option, this makes it possible to handle file uploads.
+You can switch the `Endpoint` to handle requests with the `multipart/form-data` content type instead of JSON by using
+`z.upload()` schema. Together with a corresponding configuration option, this makes it possible to handle file uploads.
 Here is a simplified example:
 
 ```typescript
@@ -460,7 +460,7 @@ const config = createConfig({
 const fileUploadEndpoint = defaultEndpointsFactory.build({
   method: "post",
   input: z.object({
-    avatar: z.upload(),
+    avatar: z.upload(), // <--
   }),
   output: z.object({
     /* ... */
@@ -468,9 +468,6 @@ const fileUploadEndpoint = defaultEndpointsFactory.build({
   handler: async ({ input: { avatar } }) => {
     // avatar: {name, mv(), mimetype, data, size, etc}
     // avatar.truncated is true on failure
-    return {
-      /* ... */
-    };
   },
 });
 ```
