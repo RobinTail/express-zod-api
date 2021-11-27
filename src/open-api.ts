@@ -1,4 +1,5 @@
 import { OpenApiBuilder, OperationObject } from "openapi3-ts";
+import { CommonConfig } from "./config-type";
 import { Method } from "./method";
 import {
   depictRequestParams,
@@ -13,6 +14,7 @@ interface GeneratorParams {
   version: string;
   serverUrl: string;
   routing: Routing;
+  config: CommonConfig;
   successfulResponseDescription?: string;
   errorResponseDescription?: string;
 }

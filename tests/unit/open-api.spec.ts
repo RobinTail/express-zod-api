@@ -1,12 +1,27 @@
 import { routing } from "../../example/routing";
-import { z, OpenAPI, defaultEndpointsFactory, withMeta } from "../../src";
+import {
+  z,
+  OpenAPI,
+  defaultEndpointsFactory,
+  withMeta,
+  createConfig,
+} from "../../src";
 import { expectType } from "tsd";
 
 describe("Open API generator", () => {
+  const config = createConfig({
+    cors: true,
+    logger: { level: "debug", color: true },
+    server: {
+      listen: 8090,
+    },
+  });
+
   describe("generateOpenApi()", () => {
     test("should generate the correct schema of example routing", () => {
       const spec = new OpenAPI({
         routing,
+        config,
         version: "1.2.3",
         title: "Example API",
         serverUrl: "http://example.com",
@@ -17,6 +32,7 @@ describe("Open API generator", () => {
     test("should generate the correct schema for complex types", () => {
       const literalValue = "something" as const;
       const spec = new OpenAPI({
+        config,
         routing: {
           v1: {
             getSomething: defaultEndpointsFactory.build({
@@ -46,6 +62,7 @@ describe("Open API generator", () => {
 
     test("should generate the correct schema for nullable and optional types", () => {
       const spec = new OpenAPI({
+        config,
         routing: {
           v1: {
             getSomething: defaultEndpointsFactory.build({
@@ -74,6 +91,7 @@ describe("Open API generator", () => {
 
     test("should generate the correct schema for intersection type", () => {
       const spec = new OpenAPI({
+        config,
         routing: {
           v1: {
             getSomething: defaultEndpointsFactory.build({
@@ -117,6 +135,7 @@ describe("Open API generator", () => {
 
     test("should generate the correct schema for union type", () => {
       const spec = new OpenAPI({
+        config,
         routing: {
           v1: {
             getSomething: defaultEndpointsFactory.build({
@@ -151,6 +170,7 @@ describe("Open API generator", () => {
 
     test("should handle transformation schema in output", () => {
       const spec = new OpenAPI({
+        config,
         routing: {
           v1: {
             getSomething: defaultEndpointsFactory.build({
@@ -177,6 +197,7 @@ describe("Open API generator", () => {
 
     test("should handle bigint, boolean, date and null", () => {
       const spec = new OpenAPI({
+        config,
         routing: {
           v1: {
             getSomething: defaultEndpointsFactory.build({
@@ -204,6 +225,7 @@ describe("Open API generator", () => {
 
     test("should handle record", () => {
       const spec = new OpenAPI({
+        config,
         routing: {
           v1: {
             getSomething: defaultEndpointsFactory.build({
@@ -233,6 +255,7 @@ describe("Open API generator", () => {
 
     test("should handle type any", () => {
       const spec = new OpenAPI({
+        config,
         routing: {
           v1: {
             getSomething: defaultEndpointsFactory.build({
@@ -256,6 +279,7 @@ describe("Open API generator", () => {
 
     test("should handle different number types", () => {
       const spec = new OpenAPI({
+        config,
         routing: {
           v1: {
             getSomething: defaultEndpointsFactory.build({
@@ -287,6 +311,7 @@ describe("Open API generator", () => {
 
     test("should handle different string types", () => {
       const spec = new OpenAPI({
+        config,
         routing: {
           v1: {
             getSomething: defaultEndpointsFactory.build({
@@ -324,6 +349,7 @@ describe("Open API generator", () => {
 
     test("should handle tuples", () => {
       const spec = new OpenAPI({
+        config,
         routing: {
           v1: {
             getSomething: defaultEndpointsFactory.build({
@@ -353,6 +379,7 @@ describe("Open API generator", () => {
 
     test("should handle enum types", () => {
       const spec = new OpenAPI({
+        config,
         routing: {
           v1: {
             getSomething: defaultEndpointsFactory.build({
@@ -384,6 +411,7 @@ describe("Open API generator", () => {
       );
       const boolean = z.preprocess((arg) => !!arg, z.boolean());
       const spec = new OpenAPI({
+        config,
         routing: {
           v1: {
             getSomething: defaultEndpointsFactory.build({
@@ -422,6 +450,7 @@ describe("Open API generator", () => {
         expect(
           () =>
             new OpenAPI({
+              config,
               routing: {
                 v1: {
                   getSomething: defaultEndpointsFactory.build({
@@ -449,6 +478,7 @@ describe("Open API generator", () => {
       // It existed though in Zod v3.6.x:
       // @see https://github.com/colinhacks/zod/blob/v3.6.1/src/types.ts#L1204
       const spec = new OpenAPI({
+        config,
         routing: {
           v1: {
             getSomething: defaultEndpointsFactory.build({
@@ -483,6 +513,7 @@ describe("Open API generator", () => {
       expectType<TestingType>({ id: "string", field2: "string" });
 
       const spec = new OpenAPI({
+        config,
         routing: {
           v1: {
             getSomething: defaultEndpointsFactory.build({
@@ -515,6 +546,7 @@ describe("Open API generator", () => {
   describe("Route Path Params", () => {
     test("should handle route path params for POST request", () => {
       const spec = new OpenAPI({
+        config,
         routing: {
           v1: {
             ":name": defaultEndpointsFactory.build({
@@ -537,6 +569,7 @@ describe("Open API generator", () => {
 
     test("should handle route path params for GET request", () => {
       const spec = new OpenAPI({
+        config,
         routing: {
           v1: {
             ":name": defaultEndpointsFactory.build({
@@ -561,6 +594,7 @@ describe("Open API generator", () => {
   describe("Metadata", () => {
     test("should pass over the schema description", () => {
       const spec = new OpenAPI({
+        config,
         routing: {
           v1: {
             getSomething: defaultEndpointsFactory.build({
@@ -588,6 +622,7 @@ describe("Open API generator", () => {
 
     test("should pass over the example of an individual parameter", () => {
       const spec = new OpenAPI({
+        config,
         routing: {
           v1: {
             getSomething: defaultEndpointsFactory.build({
@@ -615,6 +650,7 @@ describe("Open API generator", () => {
 
     test("should pass over examples of each param from the whole IO schema examples (GET)", () => {
       const spec = new OpenAPI({
+        config,
         routing: {
           v1: {
             getSomething: defaultEndpointsFactory.build({
@@ -646,6 +682,7 @@ describe("Open API generator", () => {
 
     test("should pass over examples of the whole IO schema (POST)", () => {
       const spec = new OpenAPI({
+        config,
         routing: {
           v1: {
             getSomething: defaultEndpointsFactory.build({
@@ -677,6 +714,7 @@ describe("Open API generator", () => {
 
     test("should merge endpoint handler examples with its middleware examples", () => {
       const spec = new OpenAPI({
+        config,
         routing: {
           v1: {
             getSomething: defaultEndpointsFactory
