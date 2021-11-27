@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { ApiResponse } from "./api-response";
 import { Endpoint, Handler } from "./endpoint";
-import { FlatObject, IOSchema, Merge } from "./common-helpers";
+import { FlatObject, IOSchema, hasUpload, Merge } from "./common-helpers";
 import { Method, MethodsDefinition } from "./method";
 import { MiddlewareDefinition } from "./middleware";
 import { mimeJson, mimeMultipart } from "./mime";
@@ -21,7 +21,8 @@ type BuildProps<
   output: OUT;
   handler: Handler<z.output<Merge<IN, MwIN>>, z.input<OUT>, MwOUT>;
   description?: string;
-  type?: "json" | "upload"; // @todo can we detect the usage of z.upload() within input?
+  /** @deprecated the factory automatically detects the usage of z.upload() within the input schema */
+  type?: "json" | "upload"; // @todo remove in v4
 } & MethodsDefinition<M>;
 
 export class EndpointsFactory<
@@ -76,7 +77,7 @@ export class EndpointsFactory<
       inputSchema: input,
       outputSchema: output,
       resultHandler: this.resultHandler,
-      mimeTypes: type === "upload" ? [mimeMultipart] : [mimeJson],
+      mimeTypes: hasUpload(input) ? [mimeMultipart] : [mimeJson],
       ...rest,
     });
   }
