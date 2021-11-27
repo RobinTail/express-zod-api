@@ -443,7 +443,7 @@ const fileStreamingEndpointsFactory = new EndpointsFactory(
 
 ## File uploads
 
-You can switch the `Endpoint` to handle requests with the `multipart/formdata` content type instead of JSON.
+You can switch the `Endpoint` to handle requests with the `multipart/form-data` content type instead of JSON.
 Together with a corresponding configuration option, this makes it possible to handle file uploads.
 Here is a simplified example:
 
