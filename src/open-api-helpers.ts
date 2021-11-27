@@ -19,6 +19,7 @@ import {
   IOSchema,
   routePathParamsRegex,
 } from "./common-helpers";
+import { InputSources } from "./config-type";
 import { AbstractEndpoint } from "./endpoint";
 import { OpenAPIError } from "./errors";
 import { ZodFile, ZodFileDef } from "./file-schema";
@@ -471,14 +472,16 @@ export const depictRequestParams = ({
   path,
   method,
   endpoint,
-}: ReqResDepictHelperCommonProps): ParameterObject[] => {
+  inputSources,
+}: ReqResDepictHelperCommonProps & {
+  inputSources: InputSources[Method];
+}): ParameterObject[] => {
   const schema = endpoint.getInputSchema();
   const shape = extractObjectSchema(schema).shape;
   const pathParams = getRoutePathParams(path);
   return Object.keys(shape)
     .filter(
-      // @todo involve config/inputSources in v4
-      (name) => ["get", "delete"].includes(method) || pathParams.includes(name)
+      (name) => inputSources.includes("query") || pathParams.includes(name)
     )
     .map((name) => ({
       name,

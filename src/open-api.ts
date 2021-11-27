@@ -1,4 +1,5 @@
 import { OpenApiBuilder, OperationObject } from "openapi3-ts";
+import { defaultInputSources } from "./common-helpers";
 import { CommonConfig } from "./config-type";
 import { Method } from "./method";
 import {
@@ -27,13 +28,19 @@ export class OpenAPI extends OpenApiBuilder {
     serverUrl,
     successfulResponseDescription = "Successful response",
     errorResponseDescription = "Error response",
+    config,
   }: GeneratorParams) {
     super();
     this.addInfo({ title, version }).addServer({ url: serverUrl });
     const cb: RoutingCycleParams["cb"] = (endpoint, path, _method) => {
       const method = _method as Method;
       const commonParams = { path, method, endpoint };
-      const depictedParams = depictRequestParams(commonParams);
+      const inputSources =
+        config.inputSources?.[method] || defaultInputSources[method];
+      const depictedParams = depictRequestParams({
+        ...commonParams,
+        inputSources,
+      });
       const operation: OperationObject = {
         responses: {
           "200": depictResponse({
@@ -54,8 +61,7 @@ export class OpenAPI extends OpenApiBuilder {
       if (depictedParams.length > 0) {
         operation.parameters = depictedParams;
       }
-      if (method !== "get") {
-        // @todo involve config/inputSources in v4
+      if (inputSources.includes("body")) {
         operation.requestBody = depictRequest(commonParams);
       }
       const swaggerCompatiblePath = reformatParamsInPath(path);
