@@ -1,3 +1,4 @@
+import { UploadedFile } from "express-fileupload";
 import { expectType } from "tsd";
 import {
   combinations,
@@ -8,6 +9,7 @@ import {
   getMessageFromError,
   getRoutePathParams,
   getStatusCodeFromError,
+  hasUpload,
   isLoggerConfig,
   OutputMarker,
 } from "../../src/common-helpers";
@@ -695,6 +697,34 @@ describe("Common Helpers", () => {
       expect(getRoutePathParams("/something")).toEqual([]);
       expect(getRoutePathParams("")).toEqual([]);
       expect(getRoutePathParams("\n")).toEqual([]);
+    });
+  });
+
+  describe("hasUpload()", () => {
+    test("should return true for z.upload()", () => {
+      expect(hasUpload(z.upload())).toBeTruthy();
+    });
+    test("should return true for wrapped z.upload()", () => {
+      expect(hasUpload(z.object({ test: z.upload() }))).toBeTruthy();
+      expect(hasUpload(z.upload().or(z.boolean()))).toBeTruthy();
+      expect(
+        hasUpload(
+          z.object({ test: z.boolean() }).and(z.object({ test2: z.upload() }))
+        )
+      ).toBeTruthy();
+      expect(hasUpload(z.optional(z.upload()))).toBeTruthy();
+      expect(hasUpload(z.upload().nullable())).toBeTruthy();
+      expect(hasUpload(z.upload().default({} as UploadedFile))).toBeTruthy();
+      expect(hasUpload(z.record(z.upload()))).toBeTruthy();
+      expect(hasUpload(z.upload().refine(() => true))).toBeTruthy();
+      expect(hasUpload(z.array(z.upload()))).toBeTruthy();
+    });
+    test("should return false in other cases", () => {
+      expect(hasUpload(z.object({}))).toBeFalsy();
+      expect(hasUpload(z.any())).toBeFalsy();
+      expect(hasUpload(z.literal("test"))).toBeFalsy();
+      expect(hasUpload(z.boolean().and(z.literal(true)))).toBeFalsy();
+      expect(hasUpload(z.number().or(z.string()))).toBeFalsy();
     });
   });
 });

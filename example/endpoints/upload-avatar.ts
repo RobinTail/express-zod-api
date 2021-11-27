@@ -3,7 +3,6 @@ import crypto from "crypto";
 
 export const uploadAvatarEndpoint = defaultEndpointsFactory.build({
   method: "post",
-  type: "upload",
   input: z
     .object({
       avatar: z

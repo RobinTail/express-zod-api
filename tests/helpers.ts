@@ -65,6 +65,11 @@ export const serializeSchemaForTest = (
       ? {
           value: schema._def.value,
         }
+      : schema instanceof z.ZodDefault
+      ? {
+          value: schema._def.innerType,
+          default: schema._def.defaultValue(),
+        }
       : {}),
   };
 };

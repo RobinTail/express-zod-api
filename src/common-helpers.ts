@@ -11,6 +11,7 @@ import { copyMeta, getMeta } from "./metadata";
 import { Method } from "./method";
 import { MiddlewareDefinition } from "./middleware";
 import { mimeMultipart } from "./mime";
+import { ZodUpload } from "./upload-schema";
 
 export type FlatObject = Record<string, any>;
 
@@ -225,6 +226,39 @@ export function getRoutePathParams(path: string): string[] {
     return [];
   }
   return match.map((param) => param.slice(1));
+}
+
+export function hasUpload(schema: z.ZodTypeAny): boolean {
+  if (schema instanceof ZodUpload) {
+    return true;
+  }
+  const reduceBool = (arr: boolean[]) =>
+    arr.reduce((carry, check) => carry || check, false);
+  if (schema instanceof z.ZodObject) {
+    return reduceBool(Object.values<z.ZodTypeAny>(schema.shape).map(hasUpload));
+  }
+  if (schema instanceof z.ZodUnion) {
+    return reduceBool(schema._def.options.map(hasUpload));
+  }
+  if (schema instanceof z.ZodIntersection) {
+    return reduceBool([schema._def.left, schema._def.right].map(hasUpload));
+  }
+  if (schema instanceof z.ZodOptional || schema instanceof z.ZodNullable) {
+    return hasUpload(schema.unwrap());
+  }
+  if (schema instanceof z.ZodEffects || schema instanceof z.ZodTransformer) {
+    return hasUpload(schema._def.schema);
+  }
+  if (schema instanceof z.ZodRecord) {
+    return hasUpload(schema._def.valueType);
+  }
+  if (schema instanceof z.ZodArray) {
+    return hasUpload(schema._def.type);
+  }
+  if (schema instanceof z.ZodDefault) {
+    return hasUpload(schema._def.innerType);
+  }
+  return false;
 }
 
 // obtaining the private helper type from Zod
