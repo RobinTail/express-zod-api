@@ -585,7 +585,8 @@ You can generate the specification of your API and write it to a `.yaml` file, t
 import { OpenAPI } from "express-zod-api";
 
 const yamlString = new OpenAPI({
-  routing,
+  routing, // the same routing and config that you use to start the server
+  config,
   version: "1.2.3",
   title: "Example API",
   serverUrl: "https://example.com",
