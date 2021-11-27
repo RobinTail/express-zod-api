@@ -2,6 +2,14 @@
 
 ## Version 3
 
+### v3.2.0
+
+- Feature #204. Detecting usage of `z.upload()` within Endpoint's input schema automatically.
+  - There is no longer need to specify `type: "upload"` for `endpointsFactory.build({...})`.
+  - In case you are using `z.upload()` in endpoint's input schema, inputs will be parsed by the
+    `multipart/form-data` parser.
+  - The optional parameter `type?: "json" | "upload"` of `build({...})` is deprecated.
+
 ### v3.1.2
 
 - Fixed issue #202, originally reported in PR #201.
