@@ -67,7 +67,7 @@ export class EndpointsFactory<
     output,
     handler,
     description,
-    type,
+    type, // @todo remove in v4
     ...rest
   }: BuildProps<IN, OUT, MwIN, MwOUT, M>) {
     return new Endpoint<IN, OUT, MwIN, MwOUT, M, POS, NEG>({

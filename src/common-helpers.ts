@@ -255,9 +255,6 @@ export function hasUpload(schema: z.ZodTypeAny): boolean {
   if (schema instanceof z.ZodArray) {
     return hasUpload(schema._def.type);
   }
-  if (schema instanceof z.ZodLiteral) {
-    return hasUpload(schema.value);
-  }
   if (schema instanceof z.ZodDefault) {
     return hasUpload(schema._def.innerType);
   }
