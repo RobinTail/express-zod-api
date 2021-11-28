@@ -23,12 +23,12 @@ interface GeneratorParams {
 export class OpenAPI extends OpenApiBuilder {
   public constructor({
     routing,
+    config,
     title,
     version,
     serverUrl,
     successfulResponseDescription = "Successful response",
     errorResponseDescription = "Error response",
-    config,
   }: GeneratorParams) {
     super();
     this.addInfo({ title, version }).addServer({ url: serverUrl });
