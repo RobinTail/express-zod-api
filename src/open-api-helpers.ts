@@ -586,9 +586,9 @@ export const excludeParamsFromDepiction = (
   );
 };
 
-// @todo export and test them separately
-const excludeExampleFromDepiction = (depicted: SchemaObject): SchemaObject =>
-  omit(["example"], depicted);
+export const excludeExampleFromDepiction = (
+  depicted: SchemaObject
+): SchemaObject => omit(["example"], depicted);
 
 export const depictResponse = ({
   method,

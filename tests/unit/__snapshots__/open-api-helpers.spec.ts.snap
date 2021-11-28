@@ -482,6 +482,12 @@ Object {
 }
 `;
 
+exports[`Open API helpers excludeExampleFromDepiction() should remove example property of supplied object 1`] = `
+Object {
+  "test": "some",
+}
+`;
+
 exports[`Open API helpers excludeParamsFromDepiction() should handle intersection 1`] = `
 Object {
   "allOf": Array [

@@ -25,6 +25,7 @@ import {
   depictTuple,
   depictUnion,
   depictUpload,
+  excludeExampleFromDepiction,
   excludeParamsFromDepiction,
   reformatParamsInPath,
 } from "../../src/open-api-helpers";
@@ -603,6 +604,17 @@ describe("Open API helpers", () => {
             handler: jest.fn(),
           }),
           inputSources: ["body", "params"], // @todo what if params disabled?
+        })
+      ).toMatchSnapshot();
+    });
+  });
+
+  describe("excludeExampleFromDepiction()", () => {
+    test("should remove example property of supplied object", () => {
+      expect(
+        excludeExampleFromDepiction({
+          test: "some",
+          example: "test",
         })
       ).toMatchSnapshot();
     });
