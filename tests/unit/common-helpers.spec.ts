@@ -3,6 +3,7 @@ import { expectType } from "tsd";
 import {
   combinations,
   combineEndpointAndMiddlewareInputSchemas,
+  defaultInputSources,
   extractObjectSchema,
   getExamples,
   getInitialInput,
@@ -242,6 +243,12 @@ describe("Common Helpers", () => {
           five: "some",
         },
       ]);
+    });
+  });
+
+  describe("defaultInputSources", () => {
+    test("should be declared in a certain way", () => {
+      expect(defaultInputSources).toMatchSnapshot();
     });
   });
 
