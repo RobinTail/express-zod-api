@@ -51,9 +51,8 @@ interface ReqResDepictHelperCommonProps {
 
 /* eslint-disable @typescript-eslint/no-use-before-define */
 
-export function reformatParamsInPath(path: string): string {
-  return path.replace(routePathParamsRegex, (param) => `{${param.slice(1)}}`);
-}
+export const reformatParamsInPath = (path: string) =>
+  path.replace(routePathParamsRegex, (param) => `{${param.slice(1)}}`);
 
 const depictDefault: DepictHelper<z.ZodDefault<z.ZodTypeAny>> = ({
   schema: {
