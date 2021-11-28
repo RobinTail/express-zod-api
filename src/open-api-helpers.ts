@@ -424,8 +424,7 @@ export const depictEffect: DepictHelper<z.ZodEffects<z.ZodTypeAny>> = ({
   return { ...initial, ...input };
 };
 
-// @todo export and test them separately
-const depictIOExamples = <T extends IOSchema>(
+export const depictIOExamples = <T extends IOSchema>(
   schema: T,
   isResponse: boolean,
   omitProps: string[] = []
@@ -447,7 +446,7 @@ const depictIOExamples = <T extends IOSchema>(
   };
 };
 
-const depictIOParamExamples = <T extends IOSchema>(
+export const depictIOParamExamples = <T extends IOSchema>(
   schema: T,
   isResponse: boolean,
   param: string
@@ -485,6 +484,7 @@ export const depictRequestParams = ({
   const pathParams = getRoutePathParams(path);
   return Object.keys(shape)
     .filter(
+      // @todo should check params enable in inputSources?
       (name) => inputSources.includes("query") || pathParams.includes(name)
     )
     .map((name) => ({
@@ -586,6 +586,7 @@ export const excludeParamsFromDepiction = (
   );
 };
 
+// @todo export and test them separately
 const excludeExampleFromDepiction = (depicted: SchemaObject): SchemaObject =>
   omit(["example"], depicted);
 

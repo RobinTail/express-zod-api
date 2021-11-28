@@ -96,6 +96,70 @@ Object {
 }
 `;
 
+exports[`Open API helpers depictIOExamples() should depict examples in case of request 1`] = `
+Object {
+  "examples": Object {
+    "example1": Object {
+      "value": Object {
+        "one": "test",
+        "two": 123,
+      },
+    },
+    "example2": Object {
+      "value": Object {
+        "one": "test2",
+        "two": 456,
+      },
+    },
+  },
+}
+`;
+
+exports[`Open API helpers depictIOExamples() should depict examples in case of response 1`] = `
+Object {
+  "examples": Object {
+    "example1": Object {
+      "value": Object {
+        "one": 4,
+        "two": "123",
+      },
+    },
+    "example2": Object {
+      "value": Object {
+        "one": 5,
+        "two": "456",
+      },
+    },
+  },
+}
+`;
+
+exports[`Open API helpers depictIOParamExamples() should depict examples in case of request 1`] = `
+Object {
+  "examples": Object {
+    "example1": Object {
+      "value": 123,
+    },
+    "example2": Object {
+      "value": 456,
+    },
+  },
+}
+`;
+
+exports[`Open API helpers depictIOParamExamples() should depict examples in case of response 1`] = `
+Object {
+  "examples": Object {
+    "example1": Object {
+      "value": "123",
+    },
+    "example2": Object {
+      "value": "456",
+    },
+  },
+}
+`;
+
 exports[`Open API helpers depictIntersection() should depict ZodIntersection 1`] = `
 Object {
   "allOf": Array [
@@ -300,6 +364,43 @@ Object {
   "description": "test",
   "type": "object",
 }
+`;
+
+exports[`Open API helpers depictRequestParams() should depict only path params if query is disabled 1`] = `
+Array [
+  Object {
+    "in": "path",
+    "name": "id",
+    "required": true,
+    "schema": Object {
+      "description": "GET /v1/user/:id parameter",
+      "type": "string",
+    },
+  },
+]
+`;
+
+exports[`Open API helpers depictRequestParams() should depict query and path params 1`] = `
+Array [
+  Object {
+    "in": "path",
+    "name": "id",
+    "required": true,
+    "schema": Object {
+      "description": "GET /v1/user/:id parameter",
+      "type": "string",
+    },
+  },
+  Object {
+    "in": "query",
+    "name": "test",
+    "required": true,
+    "schema": Object {
+      "description": "GET /v1/user/:id parameter",
+      "type": "boolean",
+    },
+  },
+]
 `;
 
 exports[`Open API helpers depictString() should depict ZodString with refinements 1`] = `

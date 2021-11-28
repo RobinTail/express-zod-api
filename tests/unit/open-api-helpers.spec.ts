@@ -1,4 +1,4 @@
-import { z } from "../../src/index";
+import { defaultEndpointsFactory, withMeta, z } from "../../src/index";
 import {
   depictAny,
   depictArray,
@@ -10,6 +10,8 @@ import {
   depictEnum,
   depictFile,
   depictIntersection,
+  depictIOExamples,
+  depictIOParamExamples,
   depictLiteral,
   depictNull,
   depictNumber,
@@ -17,6 +19,7 @@ import {
   depictObjectProperties,
   depictOptionalOrNullable,
   depictRecord,
+  depictRequestParams,
   depictSchema,
   depictString,
   depictTuple,
@@ -452,6 +455,154 @@ describe("Open API helpers", () => {
         depictEffect({
           schema: z.preprocess((v) => parseInt(`${v}`, 10), z.string()),
           isResponse: false,
+        })
+      ).toMatchSnapshot();
+    });
+  });
+
+  describe("depictIOExamples()", () => {
+    test("should depict examples in case of request", () => {
+      expect(
+        depictIOExamples(
+          withMeta(
+            z.object({
+              one: z.string().transform((v) => v.length),
+              two: z.number().transform((v) => `${v}`),
+              three: z.boolean(),
+            })
+          )
+            .example({
+              one: "test",
+              two: 123,
+              three: true,
+            })
+            .example({
+              one: "test2",
+              two: 456,
+              three: false,
+            }),
+          false,
+          ["three"]
+        )
+      ).toMatchSnapshot();
+    });
+
+    test("should depict examples in case of response", () => {
+      expect(
+        depictIOExamples(
+          withMeta(
+            z.object({
+              one: z.string().transform((v) => v.length),
+              two: z.number().transform((v) => `${v}`),
+              three: z.boolean(),
+            })
+          )
+            .example({
+              one: "test",
+              two: 123,
+              three: true,
+            })
+            .example({
+              one: "test2",
+              two: 456,
+              three: false,
+            }),
+          true,
+          ["three"]
+        )
+      ).toMatchSnapshot();
+    });
+  });
+
+  describe("depictIOParamExamples()", () => {
+    test("should depict examples in case of request", () => {
+      expect(
+        depictIOParamExamples(
+          withMeta(
+            z.object({
+              one: z.string().transform((v) => v.length),
+              two: z.number().transform((v) => `${v}`),
+              three: z.boolean(),
+            })
+          )
+            .example({
+              one: "test",
+              two: 123,
+              three: true,
+            })
+            .example({
+              one: "test2",
+              two: 456,
+              three: false,
+            }),
+          false,
+          "two"
+        )
+      ).toMatchSnapshot();
+    });
+
+    test("should depict examples in case of response", () => {
+      expect(
+        depictIOParamExamples(
+          withMeta(
+            z.object({
+              one: z.string().transform((v) => v.length),
+              two: z.number().transform((v) => `${v}`),
+              three: z.boolean(),
+            })
+          )
+            .example({
+              one: "test",
+              two: 123,
+              three: true,
+            })
+            .example({
+              one: "test2",
+              two: 456,
+              three: false,
+            }),
+          true,
+          "two"
+        )
+      ).toMatchSnapshot();
+    });
+  });
+
+  describe("depictRequestParams()", () => {
+    test("should depict query and path params", () => {
+      expect(
+        depictRequestParams({
+          path: "/v1/user/:id",
+          method: "get",
+          endpoint: defaultEndpointsFactory.build({
+            methods: ["get", "put", "delete"],
+            input: z.object({
+              id: z.string(),
+              test: z.boolean(),
+            }),
+            output: z.object({}),
+            handler: jest.fn(),
+          }),
+          inputSources: ["query", "params"],
+        })
+      ).toMatchSnapshot();
+    });
+
+    test("should depict only path params if query is disabled", () => {
+      expect(
+        depictRequestParams({
+          path: "/v1/user/:id",
+          method: "get",
+          endpoint: defaultEndpointsFactory.build({
+            methods: ["get", "put", "delete"],
+            input: z.object({
+              id: z.string(),
+              test: z.boolean(),
+            }),
+            output: z.object({}),
+            handler: jest.fn(),
+          }),
+          inputSources: ["body", "params"], // @todo what if params disabled?
         })
       ).toMatchSnapshot();
     });
