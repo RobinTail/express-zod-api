@@ -482,14 +482,13 @@ export const depictRequestParams = ({
   const schema = endpoint.getInputSchema();
   const shape = extractObjectSchema(schema).shape;
   const pathParams = getRoutePathParams(path);
+  const isPathParam = (name: string) =>
+    inputSources.includes("params") && pathParams.includes(name);
   return Object.keys(shape)
-    .filter(
-      // @todo should check params enable in inputSources?
-      (name) => inputSources.includes("query") || pathParams.includes(name)
-    )
+    .filter((name) => inputSources.includes("query") || isPathParam(name))
     .map((name) => ({
       name,
-      in: pathParams.includes(name) ? "path" : "query",
+      in: isPathParam(name) ? "path" : "query",
       required: !shape[name].isOptional(),
       schema: {
         description: `${method.toUpperCase()} ${path} parameter`,

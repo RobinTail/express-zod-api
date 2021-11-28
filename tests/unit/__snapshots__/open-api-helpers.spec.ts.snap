@@ -366,6 +366,8 @@ Object {
 }
 `;
 
+exports[`Open API helpers depictRequestParams() should depict none if both query and params are disabled 1`] = `Array []`;
+
 exports[`Open API helpers depictRequestParams() should depict only path params if query is disabled 1`] = `
 Array [
   Object {

@@ -603,7 +603,26 @@ describe("Open API helpers", () => {
             output: z.object({}),
             handler: jest.fn(),
           }),
-          inputSources: ["body", "params"], // @todo what if params disabled?
+          inputSources: ["body", "params"],
+        })
+      ).toMatchSnapshot();
+    });
+
+    test("should depict none if both query and params are disabled", () => {
+      expect(
+        depictRequestParams({
+          path: "/v1/user/:id",
+          method: "get",
+          endpoint: defaultEndpointsFactory.build({
+            methods: ["get", "put", "delete"],
+            input: z.object({
+              id: z.string(),
+              test: z.boolean(),
+            }),
+            output: z.object({}),
+            handler: jest.fn(),
+          }),
+          inputSources: ["body"],
         })
       ).toMatchSnapshot();
     });
