@@ -482,10 +482,12 @@ export const depictRequestParams = ({
   const schema = endpoint.getInputSchema();
   const shape = extractObjectSchema(schema).shape;
   const pathParams = getRoutePathParams(path);
+  const isQueryEnabled = inputSources.includes("query");
+  const isParamsEnabled = inputSources.includes("params");
   const isPathParam = (name: string) =>
-    inputSources.includes("params") && pathParams.includes(name);
+    isParamsEnabled && pathParams.includes(name);
   return Object.keys(shape)
-    .filter((name) => inputSources.includes("query") || isPathParam(name))
+    .filter((name) => isQueryEnabled || isPathParam(name))
     .map((name) => ({
       name,
       in: isPathParam(name) ? "path" : "query",
