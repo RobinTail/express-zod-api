@@ -9,14 +9,18 @@ const attribution = `
 // Colossal.flf (Jonathon - jon@mq.edu.au), 8 June 1994
 `.trim();
 
-const proud = chalk.italic("Proudly supports transgender community.");
+const proud = chalk.italic(
+  "Proudly supports transgender community.".padStart(109)
+);
 const slogan = chalk.italic(
-  "Start your API server with I/O schema validation and custom middlewares in minutes."
+  "Start your API server with I/O schema validation and custom middlewares in minutes.".padStart(
+    109
+  )
 );
 const thanks = chalk.italic(
-  "Thank you for choosing Express Zod API for your project."
+  "Thank you for choosing Express Zod API for your project.".padStart(132)
 );
-const remembrance = chalk.italic("for Xiona");
+const remembrance = chalk.italic("for Sharlie".padEnd(14));
 
 const logo = [
   chalk.blueBright(`\n
@@ -33,10 +37,9 @@ const logo = [
 8888888888 888  888 88888P"  888     "Y8888   88888P'  88888P'      d8888888888 "Y88P"   "Y88888      d88P     888 888       8888888`),
   chalk.blueBright(`
                     888
-                    888                                                                      ${proud}
-${remembrance}           888                          ${slogan}`),
-  chalk.grey(`
-                                                                            ${thanks}`),
+                    888${proud}
+${remembrance}      888${slogan}`),
+  chalk.grey(`\n${thanks}`),
   chalk.reset("\n\n"),
 ].join("");
 
