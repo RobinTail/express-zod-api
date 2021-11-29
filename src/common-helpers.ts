@@ -119,7 +119,7 @@ function areFilesAvailable(request: Request) {
   return "files" in request && isMultipart;
 }
 
-const defaultInputSources: InputSources = {
+export const defaultInputSources: InputSources = {
   get: ["query", "params"],
   post: ["body", "params", "files"],
   put: ["body", "params"],

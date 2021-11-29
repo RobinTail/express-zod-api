@@ -44,7 +44,7 @@ Start your API server with I/O schema validation and custom middlewares in minut
 6. [Your input to my output](#your-input-to-my-output)
 
 You can find the release notes in [Changelog](CHANGELOG.md). Along with recommendations for migrating from
-[from v2](CHANGELOG.md#v300-beta1) and [from v1](CHANGELOG.md#v200-beta1).
+[v3](CHANGELOG.md#v400), [v2](CHANGELOG.md#v300-beta1) and [v1](CHANGELOG.md#v200-beta1).
 
 # Why and what is it for
 
@@ -585,7 +585,8 @@ You can generate the specification of your API and write it to a `.yaml` file, t
 import { OpenAPI } from "express-zod-api";
 
 const yamlString = new OpenAPI({
-  routing,
+  routing, // the same routing and config that you use to start the server
+  config,
   version: "1.2.3",
   title: "Example API",
   serverUrl: "https://example.com",

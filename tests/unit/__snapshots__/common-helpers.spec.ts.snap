@@ -119,6 +119,33 @@ Object {
 }
 `;
 
+exports[`Common Helpers defaultInputSources should be declared in a certain way 1`] = `
+Object {
+  "delete": Array [
+    "body",
+    "query",
+    "params",
+  ],
+  "get": Array [
+    "query",
+    "params",
+  ],
+  "patch": Array [
+    "body",
+    "params",
+  ],
+  "post": Array [
+    "body",
+    "params",
+    "files",
+  ],
+  "put": Array [
+    "body",
+    "params",
+  ],
+}
+`;
+
 exports[`Common Helpers extractObjectSchema() should pass the object schema through 1`] = `
 Object {
   "_type": "ZodObject",

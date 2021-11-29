@@ -19,6 +19,7 @@ import {
   IOSchema,
   routePathParamsRegex,
 } from "./common-helpers";
+import { InputSources } from "./config-type";
 import { AbstractEndpoint } from "./endpoint";
 import { OpenAPIError } from "./errors";
 import { ZodFile, ZodFileDef } from "./file-schema";
@@ -28,7 +29,6 @@ import { omit } from "ramda";
 
 type MediaExamples = Pick<MediaTypeObject, "examples">;
 
-// @todo export and test them separately
 type DepictHelper<T extends z.ZodType<any>> = (params: {
   schema: T;
   initial?: SchemaObject;
@@ -50,11 +50,10 @@ interface ReqResDepictHelperCommonProps {
 
 /* eslint-disable @typescript-eslint/no-use-before-define */
 
-export function reformatParamsInPath(path: string): string {
-  return path.replace(routePathParamsRegex, (param) => `{${param.slice(1)}}`);
-}
+export const reformatParamsInPath = (path: string) =>
+  path.replace(routePathParamsRegex, (param) => `{${param.slice(1)}}`);
 
-const depictDefault: DepictHelper<z.ZodDefault<z.ZodTypeAny>> = ({
+export const depictDefault: DepictHelper<z.ZodDefault<z.ZodTypeAny>> = ({
   schema: {
     _def: { innerType, defaultValue },
   },
@@ -66,18 +65,18 @@ const depictDefault: DepictHelper<z.ZodDefault<z.ZodTypeAny>> = ({
   default: defaultValue(),
 });
 
-const depictAny: DepictHelper<z.ZodAny> = ({ initial }) => ({
+export const depictAny: DepictHelper<z.ZodAny> = ({ initial }) => ({
   ...initial,
   format: "any",
 });
 
-const depictUpload: DepictHelper<ZodUpload> = ({ initial }) => ({
+export const depictUpload: DepictHelper<ZodUpload> = ({ initial }) => ({
   ...initial,
   type: "string",
   format: "binary",
 });
 
-const depictFile: DepictHelper<ZodFile> = ({
+export const depictFile: DepictHelper<ZodFile> = ({
   schema: { isBinary, isBase64 },
   initial,
 }) => ({
@@ -86,7 +85,7 @@ const depictFile: DepictHelper<ZodFile> = ({
   format: isBinary ? "binary" : isBase64 ? "byte" : "file",
 });
 
-const depictUnion: DepictHelper<
+export const depictUnion: DepictHelper<
   z.ZodUnion<[z.ZodTypeAny, ...z.ZodTypeAny[]]>
 > = ({
   schema: {
@@ -99,7 +98,7 @@ const depictUnion: DepictHelper<
   oneOf: options.map((option) => depictSchema({ schema: option, isResponse })),
 });
 
-const depictIntersection: DepictHelper<
+export const depictIntersection: DepictHelper<
   z.ZodIntersection<z.ZodTypeAny, z.ZodTypeAny>
 > = ({
   schema: {
@@ -115,14 +114,16 @@ const depictIntersection: DepictHelper<
   ],
 });
 
-const depictOptionalOrNullable: DepictHelper<
+export const depictOptionalOrNullable: DepictHelper<
   z.ZodOptional<any> | z.ZodNullable<any>
 > = ({ schema, initial, isResponse }) => ({
   ...initial,
   ...depictSchema({ schema: schema.unwrap(), isResponse }),
 });
 
-const depictEnum: DepictHelper<z.ZodEnum<any> | z.ZodNativeEnum<any>> = ({
+export const depictEnum: DepictHelper<
+  z.ZodEnum<any> | z.ZodNativeEnum<any>
+> = ({
   schema: {
     _def: { values },
   },
@@ -133,7 +134,7 @@ const depictEnum: DepictHelper<z.ZodEnum<any> | z.ZodNativeEnum<any>> = ({
   enum: Object.values(values),
 });
 
-const depictLiteral: DepictHelper<z.ZodLiteral<any>> = ({
+export const depictLiteral: DepictHelper<z.ZodLiteral<any>> = ({
   schema: {
     _def: { value },
   },
@@ -144,7 +145,7 @@ const depictLiteral: DepictHelper<z.ZodLiteral<any>> = ({
   enum: [value],
 });
 
-const depictObject: DepictHelper<z.AnyZodObject> = ({
+export const depictObject: DepictHelper<z.AnyZodObject> = ({
   schema,
   initial,
   isResponse,
@@ -158,31 +159,31 @@ const depictObject: DepictHelper<z.AnyZodObject> = ({
 });
 
 /** @see https://swagger.io/docs/specification/data-models/data-types/ */
-const depictNull: DepictHelper<z.ZodNull> = ({ initial }) => ({
+export const depictNull: DepictHelper<z.ZodNull> = ({ initial }) => ({
   ...initial,
   type: "string",
   nullable: true,
   format: "null",
 });
 
-const depictDate: DepictHelper<z.ZodDate> = ({ initial }) => ({
+export const depictDate: DepictHelper<z.ZodDate> = ({ initial }) => ({
   ...initial,
   type: "string",
   format: "date",
 });
 
-const depictBoolean: DepictHelper<z.ZodBoolean> = ({ initial }) => ({
+export const depictBoolean: DepictHelper<z.ZodBoolean> = ({ initial }) => ({
   ...initial,
   type: "boolean",
 });
 
-const depictBigInt: DepictHelper<z.ZodBigInt> = ({ initial }) => ({
+export const depictBigInt: DepictHelper<z.ZodBigInt> = ({ initial }) => ({
   ...initial,
   type: "integer",
   format: "bigint",
 });
 
-const depictRecord: DepictHelper<z.ZodRecord<z.ZodTypeAny>> = ({
+export const depictRecord: DepictHelper<z.ZodRecord<z.ZodTypeAny>> = ({
   schema: { _def: def },
   initial,
   isResponse,
@@ -256,7 +257,7 @@ const depictRecord: DepictHelper<z.ZodRecord<z.ZodTypeAny>> = ({
   };
 };
 
-const depictArray: DepictHelper<z.ZodArray<z.ZodTypeAny>> = ({
+export const depictArray: DepictHelper<z.ZodArray<z.ZodTypeAny>> = ({
   schema: { _def: def },
   initial,
   isResponse,
@@ -269,7 +270,7 @@ const depictArray: DepictHelper<z.ZodArray<z.ZodTypeAny>> = ({
 });
 
 /** @todo improve it when OpenAPI 3.1.0 will be released */
-const depictTuple: DepictHelper<z.ZodTuple> = ({
+export const depictTuple: DepictHelper<z.ZodTuple> = ({
   schema: { items },
   initial,
   isResponse,
@@ -294,7 +295,7 @@ const depictTuple: DepictHelper<z.ZodTuple> = ({
   };
 };
 
-const depictString: DepictHelper<z.ZodString> = ({
+export const depictString: DepictHelper<z.ZodString> = ({
   schema: {
     _def: { checks },
   },
@@ -328,7 +329,10 @@ const depictString: DepictHelper<z.ZodString> = ({
   };
 };
 
-const depictNumber: DepictHelper<z.ZodNumber> = ({ schema, initial }) => {
+export const depictNumber: DepictHelper<z.ZodNumber> = ({
+  schema,
+  initial,
+}) => {
   const minCheck = schema._def.checks.find(({ kind }) => kind === "min") as
     | Extract<ArrayElement<z.ZodNumberDef["checks"]>, { kind: "min" }>
     | undefined;
@@ -358,7 +362,7 @@ const depictNumber: DepictHelper<z.ZodNumber> = ({ schema, initial }) => {
   };
 };
 
-const depictObjectProperties = ({
+export const depictObjectProperties = ({
   schema: { shape },
   isResponse,
 }: Parameters<DepictHelper<z.AnyZodObject>>[0]) => {
@@ -371,7 +375,7 @@ const depictObjectProperties = ({
   );
 };
 
-const depictEffect: DepictHelper<z.ZodEffects<z.ZodTypeAny>> = ({
+export const depictEffect: DepictHelper<z.ZodEffects<z.ZodTypeAny>> = ({
   schema,
   initial,
   isResponse,
@@ -420,7 +424,7 @@ const depictEffect: DepictHelper<z.ZodEffects<z.ZodTypeAny>> = ({
   return { ...initial, ...input };
 };
 
-const depictIOExamples = <T extends IOSchema>(
+export const depictIOExamples = <T extends IOSchema>(
   schema: T,
   isResponse: boolean,
   omitProps: string[] = []
@@ -442,7 +446,7 @@ const depictIOExamples = <T extends IOSchema>(
   };
 };
 
-const depictIOParamExamples = <T extends IOSchema>(
+export const depictIOParamExamples = <T extends IOSchema>(
   schema: T,
   isResponse: boolean,
   param: string
@@ -471,18 +475,22 @@ export const depictRequestParams = ({
   path,
   method,
   endpoint,
-}: ReqResDepictHelperCommonProps): ParameterObject[] => {
+  inputSources,
+}: ReqResDepictHelperCommonProps & {
+  inputSources: InputSources[Method];
+}): ParameterObject[] => {
   const schema = endpoint.getInputSchema();
   const shape = extractObjectSchema(schema).shape;
   const pathParams = getRoutePathParams(path);
+  const isQueryEnabled = inputSources.includes("query");
+  const isParamsEnabled = inputSources.includes("params");
+  const isPathParam = (name: string) =>
+    isParamsEnabled && pathParams.includes(name);
   return Object.keys(shape)
-    .filter(
-      // @todo involve config/inputSources in v4
-      (name) => ["get", "delete"].includes(method) || pathParams.includes(name)
-    )
+    .filter((name) => isQueryEnabled || isPathParam(name))
     .map((name) => ({
       name,
-      in: pathParams.includes(name) ? "path" : "query",
+      in: isPathParam(name) ? "path" : "query",
       required: !shape[name].isOptional(),
       schema: {
         description: `${method.toUpperCase()} ${path} parameter`,
@@ -579,8 +587,9 @@ export const excludeParamsFromDepiction = (
   );
 };
 
-const excludeExampleFromDepiction = (depicted: SchemaObject): SchemaObject =>
-  omit(["example"], depicted);
+export const excludeExampleFromDepiction = (
+  depicted: SchemaObject
+): SchemaObject => omit(["example"], depicted);
 
 export const depictResponse = ({
   method,

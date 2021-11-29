@@ -21,8 +21,6 @@ type BuildProps<
   output: OUT;
   handler: Handler<z.output<Merge<IN, MwIN>>, z.input<OUT>, MwOUT>;
   description?: string;
-  /** @deprecated the factory automatically detects the usage of z.upload() within the input schema */
-  type?: "json" | "upload"; // @todo remove in v4
 } & MethodsDefinition<M>;
 
 export class EndpointsFactory<
@@ -67,7 +65,6 @@ export class EndpointsFactory<
     output,
     handler,
     description,
-    type, // @todo remove in v4
     ...rest
   }: BuildProps<IN, OUT, MwIN, MwOUT, M>) {
     return new Endpoint<IN, OUT, MwIN, MwOUT, M, POS, NEG>({
