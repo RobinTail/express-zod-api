@@ -19,10 +19,10 @@
     "test:u": "yarn test:jest -u",
     "test:jest": "yarn jest --detectOpenHandles ./tests/unit ./tests/system",
     "test:badge": "yarn make-coverage-badge --output-path ./coverage.svg",
-    "lint": "yarn eslint ./src ./example ./tests && yarn prettier ./README.md ./CHANGELOG.md --check",
-    "mdfix": "yarn prettier ./README.md ./CHANGELOG.md --write",
+    "lint": "yarn eslint ./src ./example ./tests && yarn prettier *.md --check",
+    "mdfix": "yarn prettier *.md --write",
     "precommit": "yarn lint && yarn test && yarn build && git add example/example.swagger.yaml ./LICENSE ./coverage.svg",
-    "prepublishOnly": "yarn test && yarn build",
+    "prepublishOnly": "yarn lint && yarn test && yarn build",
     "postversion": "git push && git push --tags",
     "install_hooks": "husky install"
   },
