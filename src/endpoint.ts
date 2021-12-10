@@ -1,9 +1,9 @@
+import { once } from "events";
 import { Request, Response } from "express";
-import { Logger } from "winston";
+import { Writable } from "stream";
+import Winston, { Logger } from "winston";
 import { z } from "zod";
 import { ApiResponse } from "./api-response";
-import { CommonConfig } from "./config-type";
-import { ResultHandlerError } from "./errors";
 import {
   combineEndpointAndMiddlewareInputSchemas,
   getInitialInput,
@@ -12,6 +12,8 @@ import {
   OutputMarker,
   ReplaceMarkerInShape,
 } from "./common-helpers";
+import { CommonConfig } from "./config-type";
+import { ResultHandlerError } from "./errors";
 import { Method, MethodsDefinition } from "./method";
 import { MiddlewareDefinition } from "./middleware";
 import { lastResortHandler, ResultHandlerDefinition } from "./result-handler";
@@ -351,5 +353,28 @@ export class Endpoint<
       error,
       logger,
     });
+  }
+
+  public async runForTest(input: z.output<Merge<IN, MwIN>>, logger?: Logger) {
+    const logs: string[] = [];
+
+    const usedLogger =
+      logger ??
+      Winston.createLogger({
+        transports: new Winston.transports.Stream({
+          stream: new Writable({
+            write(x:Buffer) {
+              logs.push(x.toString("utf8"));
+            },
+          }),
+        }),
+      });
+    const output = await this.handler({
+      input,
+      logger: usedLogger,
+      options: {} as any,
+    });
+    usedLogger.end();
+    return { output, logs:logs.join("") };
   }
 }
