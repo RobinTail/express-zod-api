@@ -550,4 +550,24 @@ describe("Endpoint", () => {
       });
     });
   });
+
+  describe("runForTest", () => {
+    test("Successfully tests", async () => {
+      const factory = new EndpointsFactory(defaultResultHandler);
+      const endpoint = factory.build({
+        method: "get",
+        input: z.object({}),
+        output: z.object({
+          abc: z.string(),
+        }),
+        handler: async ({ logger }) => {
+          logger.info("Hello");
+          return { abc: "xyz" };
+        },
+      });
+      const { output, logs } = await endpoint.runForTest({ input: {} });
+      expect(output).toEqual({ abc: "xyz" });
+      expect(logs).toEqual('{"message":"Hello","level":"info"}\n');
+    });
+  });
 });
