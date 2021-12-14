@@ -3,7 +3,7 @@ import { ApiResponse } from "./api-response";
 import { Endpoint, Handler } from "./endpoint";
 import { FlatObject, IOSchema, hasUpload, Merge } from "./common-helpers";
 import { Method, MethodsDefinition } from "./method";
-import { MiddlewareDefinition } from "./middleware";
+import { createMiddleware, MiddlewareDefinition } from "./middleware";
 import { mimeJson, mimeMultipart } from "./mime";
 import {
   defaultResultHandler,
@@ -56,6 +56,18 @@ export class EndpointsFactory<
   ) {
     return EndpointsFactory.#create<Merge<IN, MwIN>, MwOUT & OUT, POS, NEG>(
       this.middlewares.concat(definition),
+      this.resultHandler
+    );
+  }
+
+  public addOptions<OUT extends FlatObject>(options: OUT) {
+    return EndpointsFactory.#create<MwIN, MwOUT & OUT, POS, NEG>(
+      this.middlewares.concat(
+        createMiddleware({
+          input: z.object({}),
+          middleware: async () => options,
+        })
+      ),
       this.resultHandler
     );
   }
