@@ -1,3 +1,5 @@
+import { Request, Response } from "express";
+import { Logger } from "winston";
 import { createMiddleware, EndpointsFactory, z } from "../../src";
 import { Endpoint } from "../../src/endpoint";
 import { ResultHandlerDefinition } from "../../src/result-handler";
@@ -50,6 +52,37 @@ describe("EndpointsFactory", () => {
       expect(factory["middlewares"]).toStrictEqual([]);
       expect(factory["resultHandler"]).toStrictEqual(resultHandlerMock);
       expect(newFactory["middlewares"]).toStrictEqual([middleware]);
+      expect(newFactory["resultHandler"]).toStrictEqual(resultHandlerMock);
+    });
+  });
+
+  describe(".addOptions()", () => {
+    test("Should create a new factory with an empty-input middleware and the same result handler", async () => {
+      const resultHandlerMock = { handler: jest.fn() };
+      const factory = new EndpointsFactory(
+        resultHandlerMock as unknown as ResultHandlerDefinition<any, any>
+      );
+      const newFactory = factory.addOptions({
+        option1: "some value",
+        option2: "other value",
+      });
+      expect(factory["middlewares"]).toStrictEqual([]);
+      expect(factory["resultHandler"]).toStrictEqual(resultHandlerMock);
+      expect(newFactory["middlewares"].length).toBe(1);
+      expect(newFactory["middlewares"][0].input).toBeInstanceOf(z.ZodObject);
+      expect(newFactory["middlewares"][0].input.shape).toEqual({});
+      expect(
+        await newFactory["middlewares"][0].middleware({
+          input: {},
+          options: {},
+          request: {} as Request,
+          response: {} as Response,
+          logger: {} as Logger,
+        })
+      ).toEqual({
+        option1: "some value",
+        option2: "other value",
+      });
       expect(newFactory["resultHandler"]).toStrictEqual(resultHandlerMock);
     });
   });
