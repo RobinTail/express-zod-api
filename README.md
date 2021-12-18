@@ -27,18 +27,19 @@ Start your API server with I/O schema validation and custom middlewares in minut
    7. [Try it](#try-it)
 4. [Fascinating features](#fascinating-features)
    1. [Middlewares](#middlewares)
-   2. [Refinements](#refinements)
-   3. [Transformations](#transformations)
-   4. [Route path params](#route-path-params)
-   5. [Response customization](#response-customization)
-   6. [Non-object response](#non-object-response) including file downloads
-   7. [File uploads](#file-uploads)
-   8. [Customizing logger](#customizing-logger)
-   9. [Usage with your own express app](#usage-with-your-own-express-app)
-   10. [Multiple schemas for one route](#multiple-schemas-for-one-route)
-   11. [Customizing input sources](#customizing-input-sources)
-   12. [Exporting endpoint types to frontend](#exporting-endpoint-types-to-frontend)
-   13. [Creating a documentation](#creating-a-documentation)
+   2. [Options](#options)
+   3. [Refinements](#refinements)
+   4. [Transformations](#transformations)
+   5. [Route path params](#route-path-params)
+   6. [Response customization](#response-customization)
+   7. [Non-object response](#non-object-response) including file downloads
+   8. [File uploads](#file-uploads)
+   9. [Customizing logger](#customizing-logger)
+   10. [Usage with your own express app](#usage-with-your-own-express-app)
+   11. [Multiple schemas for one route](#multiple-schemas-for-one-route)
+   12. [Customizing input sources](#customizing-input-sources)
+   13. [Exporting endpoint types to frontend](#exporting-endpoint-types-to-frontend)
+   14. [Creating a documentation](#creating-a-documentation)
 5. [Known issues](#known-issues)
    1. [Excessive properties in endpoint output](#excessive-properties-in-endpoint-output)
 6. [Your input to my output](#your-input-to-my-output)
@@ -264,6 +265,20 @@ const endpointsFactory = defaultEndpointsFactory.addMiddleware(authMiddleware);
 ```
 
 You can connect as many middlewares as you want, they will be executed in order.
+
+## Options
+
+In case you'd like to provide your endpoints with options that do not depend on Request, like database connection
+instance, consider shorthand method `addOptions`.
+
+```typescript
+import { defaultEndpointsFactory } from "express-zod-api";
+
+const endpointsFactory = defaultEndpointsFactory.addOptions({
+  db: mongoose.connect("mongodb://connection.string"),
+  privateKey: fs.readFileSync("private-key.pem", "utf-8"),
+});
+```
 
 ## Refinements
 

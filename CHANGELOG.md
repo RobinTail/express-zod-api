@@ -2,6 +2,32 @@
 
 ## Version 4
 
+### v4.1.0
+
+- Feature #230. The shorthand method `EndpointsFactory::addOptions()`.
+  - You may find it useful in case you'd like to provide your Endpoint's handler with some entities that do not depend
+    on Request, maybe a database connection instance of similar.
+  - Under the hood the method creates a middleware with an empty input and attaches it to the factory.
+  - The argument supplied to the method is available within `options` parameter of the Endpoint's `handler`.
+
+```typescript
+import { defaultEndpointsFactory } from "express-zod-api";
+
+const newFactory = defaultEndpointsFactory.addOptions({
+  db: mongoose.connect("mongodb://connection.string"),
+  privateKey: fs.readFileSync("private-key.pem", "utf-8"),
+});
+
+const endpoint = newFactory.build({
+  method: "get",
+  input: z.object({}),
+  output: z.object({}),
+  handler: async ({ options }) => {
+    return {}; // options: { db, privateKey }
+  },
+});
+```
+
 ### v4.0.0
 
 - The deprecated parameter `type` of `EndpointsFactory::build({...})` has been removed.
