@@ -98,11 +98,12 @@ export function createServer(
   });
 
   let httpsServer: https.Server | undefined;
-  if (config.server.ssl) {
-    const { listen: sslPort, ...sslOptions } = config.server.ssl;
-    httpsServer = https.createServer(sslOptions, app).listen(sslPort, () => {
-      logger.info(`Listening ${sslPort}`);
-    });
+  if (config.ssl) {
+    httpsServer = https
+      .createServer(config.ssl.options, app)
+      .listen(config.ssl.listen, () => {
+        logger.info(`Listening ${config.ssl!.listen}`);
+      });
   }
 
   return { app, httpServer, httpsServer, logger };
