@@ -23,6 +23,7 @@ const expressMock = jest.mock("express", () => {
 });
 
 import express, { Request, Response } from "express"; // express is mocked above
+import https from "https";
 import { Logger } from "winston";
 import {
   createServer,
@@ -146,6 +147,66 @@ describe("Server", () => {
       expect(appMock.options.mock.calls[0][0]).toBe("/v1/test");
       expect(appMock.listen).toBeCalledTimes(1);
       expect(appMock.listen.mock.calls[0][0]).toBe(8054);
+    });
+
+    test("should create a HTTPS server on request", () => {
+      const configMock = {
+        server: {
+          listen: 8054,
+          jsonParser: jest.fn(),
+        },
+        ssl: {
+          listen: 8443,
+          options: {
+            cert: "cert",
+            key: "key",
+          },
+        },
+        cors: true,
+        startupLogo: false,
+        errorHandler: {
+          handler: jest.fn(),
+        },
+        logger: {
+          info: jest.fn(),
+        },
+      };
+      const routingMock = {
+        v1: {
+          test: new EndpointsFactory(defaultResultHandler).build({
+            method: "get",
+            input: z.object({}),
+            output: z.object({}),
+            handler: jest.fn(),
+          }),
+        },
+      };
+      let httpsServerMock: { listen: jest.Mock } | undefined = undefined;
+      jest.spyOn(https, "createServer").mockImplementation(() => {
+        httpsServerMock = {
+          listen: jest.fn((port, cb) => {
+            cb();
+            return httpsServerMock;
+          }),
+        };
+        return httpsServerMock as unknown as https.Server;
+      });
+
+      const { httpServer, httpsServer } = createServer(
+        configMock as unknown as ServerConfig & CommonConfig,
+        routingMock
+      );
+      expect(httpServer).toBeInstanceOf(http.Server);
+      expect(httpsServer).toEqual(httpsServerMock);
+      expect(httpsServerMock).toBeTruthy();
+      expect(https.createServer).toHaveBeenCalledWith(
+        configMock.ssl.options,
+        appMock
+      );
+      expect(httpsServerMock!.listen).toBeCalledTimes(1);
+      expect(httpsServerMock!.listen.mock.calls[0][0]).toBe(
+        configMock.ssl.listen
+      );
     });
   });
 
