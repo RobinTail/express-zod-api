@@ -36,7 +36,7 @@ export interface ServerConfig {
     jsonParser?: NextHandleFunction; // custom JSON parser, default: express.json()
     upload?: boolean | UploadOptions; // enable or configure uploads handling
   };
-  ssl?: {
+  https?: {
     // enables HTTPS server as well
     options: ServerOptions; // at least "cert" and "key" options required
     listen: number | string; // port or socket

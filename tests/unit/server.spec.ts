@@ -155,7 +155,7 @@ describe("Server", () => {
           listen: 8054,
           jsonParser: jest.fn(),
         },
-        ssl: {
+        https: {
           listen: 8443,
           options: {
             cert: "cert",
@@ -200,12 +200,12 @@ describe("Server", () => {
       expect(httpsServer).toEqual(httpsServerMock);
       expect(httpsServerMock).toBeTruthy();
       expect(https.createServer).toHaveBeenCalledWith(
-        configMock.ssl.options,
+        configMock.https.options,
         appMock
       );
       expect(httpsServerMock!.listen).toBeCalledTimes(1);
       expect(httpsServerMock!.listen.mock.calls[0][0]).toBe(
-        configMock.ssl.listen
+        configMock.https.listen
       );
     });
   });
