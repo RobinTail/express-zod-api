@@ -122,11 +122,13 @@ describe("Server", () => {
           }),
         },
       };
-      const server = createServer(
+      const { httpServer, logger, app } = createServer(
         configMock as unknown as ServerConfig & CommonConfig,
         routingMock
       );
-      expect(server).toBeInstanceOf(http.Server);
+      expect(httpServer).toBeInstanceOf(http.Server);
+      expect(logger).toEqual(configMock.logger);
+      expect(app).toEqual(appMock);
       expect(appMock).toBeTruthy();
       expect(appMock.use).toBeCalledTimes(3);
       expect(Array.isArray(appMock.use.mock.calls[0][0])).toBeTruthy();

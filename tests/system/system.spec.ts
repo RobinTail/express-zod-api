@@ -93,7 +93,7 @@ describe("App", () => {
         },
       },
       routing
-    );
+    ).httpServer;
   });
 
   afterAll(async () => {

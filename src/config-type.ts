@@ -1,6 +1,7 @@
 import { NextHandleFunction } from "connect";
 import { Express, Request } from "express";
 import fileUpload from "express-fileupload";
+import { ServerOptions } from "https";
 import { Logger } from "winston";
 import { Method } from "./method";
 import { ResultHandlerDefinition } from "./result-handler";
@@ -34,6 +35,9 @@ export interface ServerConfig {
     listen: number | string; // port or socket
     jsonParser?: NextHandleFunction; // custom JSON parser, default: express.json()
     upload?: boolean | UploadOptions; // enable or configure uploads handling
+    ssl?: Pick<ServerOptions, "cert" | "key"> & {
+      listen: number | string; // port or socket
+    };
   };
 }
 

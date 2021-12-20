@@ -1,6 +1,6 @@
 import express, { ErrorRequestHandler, RequestHandler, json } from "express";
 import fileUpload from "express-fileupload";
-import { Server } from "http";
+import https from "https";
 import { Logger } from "winston";
 import { AppConfig, CommonConfig, ServerConfig } from "./config-type";
 import { ResultHandlerError } from "./errors";
@@ -71,7 +71,7 @@ export function attachRouting(
 export function createServer(
   config: ServerConfig & CommonConfig,
   routing: Routing
-): Server {
+) {
   const logger = isLoggerConfig(config.logger)
     ? createLogger(config.logger)
     : config.logger;
@@ -93,7 +93,17 @@ export function createServer(
   initRouting({ app, routing, logger, config });
   app.use(createNotFoundHandler(errorHandler, logger));
 
-  return app.listen(config.server.listen, () => {
+  const httpServer = app.listen(config.server.listen, () => {
     logger.info(`Listening ${config.server.listen}`);
   });
+
+  let httpsServer: https.Server | undefined;
+  if (config.server.ssl) {
+    const { listen: sslPort, ...sslOptions } = config.server.ssl;
+    httpsServer = https.createServer(sslOptions, app).listen(sslPort, () => {
+      logger.info(`Listening ${sslPort}`);
+    });
+  }
+
+  return { app, httpServer, httpsServer, logger };
 }
