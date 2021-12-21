@@ -32,6 +32,11 @@ const config = createConfig({
 
 ## Version 4
 
+### v4.2.0
+
+- `express` version is 4.17.2.
+- `http-errors` version is 2.0.0.
+
 ### v4.1.0
 
 - Feature #230. The shorthand method `EndpointsFactory::addOptions()`.
