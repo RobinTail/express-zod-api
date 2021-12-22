@@ -7,7 +7,7 @@
 - The ability to configure and run an additional HTTPS server to process requests over a secure protocol.
 - This option is only available when using `createServer()` method.
 - **Breaking changes**: Instead of HTTP Server the method `createServer()` now returns an object with the following
-  entities: app, httpServer, httpsServer, logger.
+  entities: `app, httpServer, httpsServer, logger`.
 - New configuration option `https`:
 
 ```typescript
@@ -17,7 +17,6 @@ const config = createConfig({
   server: {
     listen: 80,
   },
-  cors: true,
   // enables HTTPS server as well
   https: {
     // at least "cert" and "key" options required
@@ -27,6 +26,7 @@ const config = createConfig({
     },
     listen: 443, // port or socket
   },
+  // ...
 });
 ```
 
