@@ -2,6 +2,10 @@
 
 ## Version 5
 
+### v5.0.0
+
+- No changes.
+
 ### v5.0.0-beta1
 
 - The ability to configure and run an additional HTTPS server to process requests over a secure protocol.
