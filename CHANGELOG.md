@@ -1,5 +1,39 @@
 # Changelog
 
+## Version 5
+
+### v5.0.0
+
+- No changes.
+
+### v5.0.0-beta1
+
+- The ability to configure and run an additional HTTPS server to process requests over a secure protocol.
+- This option is only available when using `createServer()` method.
+- **Breaking changes**: Instead of HTTP Server the method `createServer()` now returns an object with the following
+  entities: `app, httpServer, httpsServer, logger`.
+- New configuration option `https`:
+
+```typescript
+import { createConfig } from "express-zod-api";
+
+const config = createConfig({
+  server: {
+    listen: 80,
+  },
+  // enables HTTPS server as well
+  https: {
+    // at least "cert" and "key" options required
+    options: {
+      cert: fs.readFileSync("fullchain.pem", "utf-8"),
+      key: fs.readFileSync("privkey.pem", "utf-8"),
+    },
+    listen: 443, // port or socket
+  },
+  // ...
+});
+```
+
 ## Version 4
 
 ### v4.2.0

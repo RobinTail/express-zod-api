@@ -38,14 +38,15 @@ Start your API server with I/O schema validation and custom middlewares in minut
    10. [Usage with your own express app](#usage-with-your-own-express-app)
    11. [Multiple schemas for one route](#multiple-schemas-for-one-route)
    12. [Customizing input sources](#customizing-input-sources)
-   13. [Exporting endpoint types to frontend](#exporting-endpoint-types-to-frontend)
-   14. [Creating a documentation](#creating-a-documentation)
+   13. [Enabling HTTPS](#enabling-https)
+   14. [Exporting endpoint types to frontend](#exporting-endpoint-types-to-frontend)
+   15. [Creating a documentation](#creating-a-documentation)
 5. [Known issues](#known-issues)
    1. [Excessive properties in endpoint output](#excessive-properties-in-endpoint-output)
 6. [Your input to my output](#your-input-to-my-output)
 
 You can find the release notes in [Changelog](CHANGELOG.md). Along with recommendations for migrating from
-[v3](CHANGELOG.md#v400), [v2](CHANGELOG.md#v300-beta1) and [v1](CHANGELOG.md#v200-beta1).
+[v4](CHANGELOG.md#v500-beta1), [v3](CHANGELOG.md#v400), [v2](CHANGELOG.md#v300-beta1) and [v1](CHANGELOG.md#v200-beta1).
 
 # Why and what is it for
 
@@ -572,6 +573,36 @@ createConfig({
   },
 });
 ```
+
+## Enabling HTTPS
+
+The modern API standard often assumes the use of a secure data transfer protocol, confirmed by a TLS certificate, also
+often called an SSL certificate in habit. When using the `createServer()` method, you can additionally configure and
+run the HTTPS server.
+
+```typescript
+import { createConfig, createServer } from "express-zod-api";
+
+const config = createConfig({
+  server: {
+    listen: 80,
+  },
+  https: {
+    options: {
+      cert: fs.readFileSync("fullchain.pem", "utf-8"),
+      key: fs.readFileSync("privkey.pem", "utf-8"),
+    },
+    listen: 443, // port or socket
+  },
+  // ... cors, logger, etc
+});
+
+const { app, httpServer, httpsServer, logger } = createServer(config, routing);
+```
+
+At least you need to specify the port or socket (usually it is 443), certificate and the key, issued by the
+certifying authority. For example, you can acquire a free TLS certificate for your API at
+[Let's Encrypt](https://letsencrypt.org/).
 
 ## Exporting endpoint types to frontend
 
