@@ -10,10 +10,10 @@ import {
   defaultEndpointsFactory,
   createResultHandler,
   createApiResponse,
+  testEndpoint,
 } from "../../src";
 import { Endpoint } from "../../src/endpoint";
 import { mimeJson } from "../../src/mime";
-import { testEndpoint } from "../../src/mock";
 import { serializeSchemaForTest } from "../helpers";
 
 describe("Endpoint", () => {
