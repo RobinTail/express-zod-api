@@ -2,6 +2,10 @@
 
 ## Version 5
 
+### v5.1.0-beta2
+
+- Fixing a warning message when using `testEndpoint()` method.
+
 ### v5.1.0-beta1
 
 - Feature #252: a helper method for testing your endpoints: `testEndpoint()`.
