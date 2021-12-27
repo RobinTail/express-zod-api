@@ -45,8 +45,8 @@
     "zod": "3.11.6"
   },
   "peerDependencies": {
-    "jest": ">=25 <28",
-    "@types/jest": "*"
+    "@types/jest": "*",
+    "jest": ">=25 <28"
   },
   "peerDependenciesMeta": {
     "jest": {

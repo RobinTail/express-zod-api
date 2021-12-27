@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
+import http from "http";
 import { Logger } from "winston";
 import { CommonConfig } from "./config-type";
 import { AbstractEndpoint } from "./endpoint";
-import { createHttpError } from "./index";
 import { mimeJson } from "./mime";
 
 interface TestEndpointProps<REQ, RES, LOG> {
@@ -51,11 +51,11 @@ export const testEndpoint = async <
   >{
     writableEnded: false,
     statusCode: 200,
-    statusMessage: createHttpError(200).message,
+    statusMessage: http.STATUS_CODES[200],
     set: jest.fn(() => responseMock),
-    status: jest.fn((value) => {
-      responseMock.statusCode = value;
-      responseMock.statusMessage = createHttpError(value).message;
+    status: jest.fn((code: number) => {
+      responseMock.statusCode = code;
+      responseMock.statusMessage = http.STATUS_CODES[code];
       return responseMock;
     }),
     json: jest.fn(() => responseMock),
