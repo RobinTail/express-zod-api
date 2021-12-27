@@ -1,4 +1,3 @@
-import http from "http";
 import { expectType } from "tsd";
 import {
   z,
@@ -12,24 +11,12 @@ import {
   createResultHandler,
   createApiResponse,
 } from "../../src";
-import { CommonConfig } from "../../src/config-type";
 import { Endpoint } from "../../src/endpoint";
-import { Request, Response } from "express";
 import { mimeJson } from "../../src/mime";
+import { testEndpoint } from "../../src/mock";
 import { serializeSchemaForTest } from "../helpers";
 
-let loggerMock: any;
-
 describe("Endpoint", () => {
-  beforeEach(() => {
-    loggerMock = {
-      info: jest.fn(),
-      warn: jest.fn(),
-      error: jest.fn(),
-      debug: jest.fn(),
-    };
-  });
-
   describe(".getMethods()", () => {
     test("Should return the correct set of methods", () => {
       const endpointMock = new Endpoint({
@@ -107,32 +94,16 @@ describe("Endpoint", () => {
         }),
         handler: handlerMock,
       });
-      const requestMock = {
-        method: "POST",
-        header: jest.fn(() => mimeJson),
-        body: {
-          n: 453,
+      const { requestMock, responseMock, loggerMock } = await testEndpoint({
+        endpoint,
+        requestProps: {
+          method: "POST",
+          body: { n: 453 },
         },
-      };
-      const responseMock: Record<string, jest.Mock> = {
-        set: jest.fn().mockImplementation(() => responseMock),
-        status: jest.fn().mockImplementation(() => responseMock),
-        json: jest.fn().mockImplementation(() => responseMock),
-      };
-      const configMock = {
-        cors: true,
-      };
-      await endpoint.execute({
-        request: requestMock as unknown as Request,
-        response: responseMock as unknown as Response,
-        config: configMock as CommonConfig,
-        logger: loggerMock,
       });
       expect(middlewareMock).toBeCalledTimes(1);
       expect(middlewareMock).toBeCalledWith({
-        input: {
-          n: 453,
-        },
+        input: { n: 453 },
         options: {
           inc: 454, // due to reassignment of options
         },
@@ -142,12 +113,8 @@ describe("Endpoint", () => {
       });
       expect(handlerMock).toBeCalledTimes(1);
       expect(handlerMock).toBeCalledWith({
-        input: {
-          n: 453,
-        },
-        options: {
-          inc: 454,
-        },
+        input: { n: 453 },
+        options: { inc: 454 },
         logger: loggerMock,
       });
       expect(loggerMock.error).toBeCalledTimes(0);
@@ -170,24 +137,14 @@ describe("Endpoint", () => {
         output: z.object({}),
         handler: handlerMock,
       });
-      const requestMock = {
-        method: "OPTIONS",
-        header: jest.fn(() => mimeJson),
-      };
-      const responseMock: Record<string, jest.Mock> = {
-        end: jest.fn(),
-        set: jest.fn().mockImplementation(() => responseMock),
-        status: jest.fn().mockImplementation(() => responseMock),
-        json: jest.fn().mockImplementation(() => responseMock),
-      };
-      const configMock = {
-        cors: true,
-      };
-      await endpoint.execute({
-        request: requestMock as unknown as Request,
-        response: responseMock as unknown as Response,
-        config: configMock as CommonConfig,
-        logger: loggerMock,
+      const { responseMock, loggerMock } = await testEndpoint({
+        endpoint,
+        requestProps: {
+          method: "OPTIONS",
+        },
+        configProps: {
+          cors: true,
+        },
       });
       expect(loggerMock.error).toBeCalledTimes(0);
       expect(responseMock.status).toBeCalledTimes(0);
@@ -225,24 +182,8 @@ describe("Endpoint", () => {
           test: 123,
         }),
       });
-      const requestMock = {
-        method: "GET",
-        header: jest.fn(() => mimeJson),
-        body: {},
-      };
-      const responseMock: Record<string, jest.Mock> = {
-        set: jest.fn().mockImplementation(() => responseMock),
-        status: jest.fn().mockImplementation(() => responseMock),
-        json: jest.fn().mockImplementation(() => responseMock),
-      };
-      const configMock = {
-        cors: true,
-      };
-      await endpoint.execute({
-        request: requestMock as unknown as Request,
-        response: responseMock as unknown as Response,
-        config: configMock as CommonConfig,
-        logger: loggerMock,
+      const { responseMock, loggerMock } = await testEndpoint({
+        endpoint,
       });
       expect(loggerMock.error).toBeCalledTimes(1);
       expect(responseMock.status).toBeCalledWith(500);
@@ -279,27 +220,12 @@ describe("Endpoint", () => {
         output: z.object({}),
         handler: handlerMock,
       });
-      const configMock = {
-        cors: true,
-      };
-      const requestMock = {
-        method: "POST",
-        header: jest.fn(() => mimeJson),
-        body: {
-          n: 453,
+      const { responseMock, loggerMock } = await testEndpoint({
+        endpoint,
+        requestProps: {
+          method: "POST",
+          body: { n: 453 },
         },
-      };
-      const responseMock: any = new http.ServerResponse(
-        requestMock as unknown as Request
-      );
-      responseMock.set = jest.fn().mockImplementation(() => responseMock);
-      responseMock.status = jest.fn().mockImplementation(() => responseMock);
-      responseMock.json = jest.fn().mockImplementation(() => responseMock);
-      await endpoint.execute({
-        request: requestMock as unknown as Request,
-        response: responseMock as unknown as Response,
-        config: configMock as CommonConfig,
-        logger: loggerMock,
       });
       expect(handlerMock).toHaveBeenCalledTimes(0);
       expect(middlewareMock).toHaveBeenCalledTimes(1);
@@ -335,25 +261,7 @@ describe("Endpoint", () => {
         }),
         handler: async () => ({ test: "OK" }),
       });
-      const requestMock = {
-        method: "GET",
-        header: jest.fn(() => mimeJson),
-      };
-      const responseMock: Record<string, jest.Mock> = {
-        end: jest.fn(),
-        set: jest.fn().mockImplementation(() => responseMock),
-        status: jest.fn().mockImplementation(() => responseMock),
-        json: jest.fn().mockImplementation(() => responseMock),
-      };
-      const configMock = {
-        cors: true,
-      };
-      await endpoint.execute({
-        request: requestMock as unknown as Request,
-        response: responseMock as unknown as Response,
-        config: configMock as CommonConfig,
-        logger: loggerMock,
-      });
+      const { loggerMock, responseMock } = await testEndpoint({ endpoint });
       expect(loggerMock.error).toBeCalledTimes(1);
       expect(loggerMock.error.mock.calls[0][0]).toBe(
         "Result handler failure: Something unexpected happened."

@@ -44,6 +44,18 @@
     "winston": "3.3.3",
     "zod": "3.11.6"
   },
+  "peerDependencies": {
+    "jest": "^27.3.1",
+    "@types/jest": "^27.0.2"
+  },
+  "peerDependenciesMeta": {
+    "jest": {
+      "optional": true
+    },
+    "@types/jest": {
+      "optional": true
+    }
+  },
   "devDependencies": {
     "@tsconfig/node12": "^1.0.9",
     "@types/express": "^4.17.13",
