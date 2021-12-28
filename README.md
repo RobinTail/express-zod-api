@@ -39,7 +39,7 @@ Start your API server with I/O schema validation and custom middlewares in minut
    11. [Multiple schemas for one route](#multiple-schemas-for-one-route)
    12. [Customizing input sources](#customizing-input-sources)
    13. [Enabling HTTPS](#enabling-https)
-   14. [Exporting endpoint types to frontend](#exporting-endpoint-types-to-frontend)
+   14. [Informing the frontend about the API](#informing-the-frontend-about-the-api)
    15. [Creating a documentation](#creating-a-documentation)
 5. [Additional hints](#additional-hints)
    1. [How to test endpoints](#how-to-test-endpoints)
@@ -605,23 +605,42 @@ At least you need to specify the port or socket (usually it is 443), certificate
 certifying authority. For example, you can acquire a free TLS certificate for your API at
 [Let's Encrypt](https://letsencrypt.org/).
 
-## Exporting endpoint types to frontend
+## Informing the frontend about the API
 
-You can export only the types of your endpoints for your frontend. Here is an approach:
+You can inform your frontend about the I/O types of your endpoints by exporting them to `.d.ts` files.
+To achieve that you are going to need an additional `tsconfig.dts.json` file with the following content:
 
-```typescript
-export type YourEndpointType = typeof yourEndpoint;
+```json
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "dts",
+    "declaration": true,
+    "emitDeclarationOnly": true
+  }
+}
 ```
 
-Then use provided helpers to obtain their input and response types:
+Most likely you have a file with all the configured routing, in which you can do the following:
 
 ```typescript
 import { EndpointInput, EndpointResponse } from "express-zod-api";
-import type { YourEndpointType } from "../your/backend";
-//     ^---- please note the import syntax of the type only
 
-type YourEndpointInput = EndpointInput<YourEndpointType>;
-type YourEndpointResponse = EndpointResponse<YourEndpointType>;
+export type YourEndpointInput = EndpointInput<typeof yourEndpoint>;
+export type YourEndpointResponse = EndpointResponse<typeof yourEndpoint>;
+```
+
+By executing the following command you'll get the compiled `/dts/routing.d.ts` file.
+
+```shell
+yarn tsc -p tsconfig.dts.json
+```
+
+The command might become a part of your CI/CD.
+Then import the I/O type of your endpoint from the compiled file using `import type` syntax on the frontend.
+
+```typescript
+import type { YourEndpointType } from "../your_backend/dts/routing";
 ```
 
 ## Creating a documentation
