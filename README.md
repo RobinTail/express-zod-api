@@ -667,7 +667,7 @@ _See the example of the generated documentation
 
 The way to test endpoints is to mock the request, response, and logger objects, invoke the `execute()` method, and
 assert the expectations for calls of certain mocked methods. The library provides a special method that makes mocking
-easier, so the test might look the following way:
+easier, it requires `jest` (and optionally `@types/jest`) to be installed, so the test might look the following way:
 
 ```typescript
 import { testEndpoint } from "express-zod-api";
@@ -675,11 +675,11 @@ import { testEndpoint } from "express-zod-api";
 test("should respond successfully", async () => {
   const { responseMock, loggerMock } = await testEndpoint({
     endpoint: yourEndpoint,
-    // available options: requestProps, responseProps, configProps, loggerProps
     requestProps: {
       method: "POST", // default: GET
       body: { ... },
     },
+    // responseProps, configProps, loggerProps
   });
   expect(loggerMock.error).toBeCalledTimes(0);
   expect(responseMock.status).toBeCalledWith(200);
