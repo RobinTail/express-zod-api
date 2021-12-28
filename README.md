@@ -607,8 +607,9 @@ certifying authority. For example, you can acquire a free TLS certificate for yo
 
 ## Informing the frontend about the API
 
-You can inform your frontend about the I/O types of your endpoints by exporting them to `.d.ts` files.
-To achieve that you are going to need an additional `tsconfig.dts.json` file with the following content:
+You can inform your frontend about the I/O types of your endpoints by exporting them to `.d.ts` files (they only
+contain types without any executable code). To achieve that you are going to need an additional `tsconfig.dts.json`
+file with the following content:
 
 ```json
 {
@@ -640,7 +641,10 @@ The command might become a part of your CI/CD.
 Then import the I/O type of your endpoint from the compiled file using `import type` syntax on the frontend.
 
 ```typescript
-import type { YourEndpointType } from "../your_backend/dts/routing";
+import type {
+  YourEndpointInput,
+  YourEndpointResponse,
+} from "../your_backend/dts/routing";
 ```
 
 ## Creating a documentation
