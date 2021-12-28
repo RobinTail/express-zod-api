@@ -17,6 +17,7 @@ export { createServer, attachRouting } from "./server";
 export { OpenAPI } from "./open-api";
 export { OpenAPIError, DependsOnMethodError, RoutingError } from "./errors";
 export { withMeta } from "./metadata";
+export { testEndpoint } from "./mock";
 
 import * as z from "./extend-zod";
 import createHttpError from "http-errors";

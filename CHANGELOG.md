@@ -2,6 +2,38 @@
 
 ## Version 5
 
+### v5.1.0-beta2
+
+- Fixing a warning message when using `testEndpoint()` method.
+
+### v5.1.0-beta1
+
+- Feature #252: a helper method for testing your endpoints: `testEndpoint()`.
+  - Requires `jest` (and optionally `@types/jest`) to be installed.
+  - The method helps to mock the request, response, config and logger required to execute the endpoint.
+  - The method executes the endpoint and returns the created mocks.
+  - After that you only need to assert your expectations in the test.
+
+```typescript
+import { testEndpoint } from "express-zod-api";
+
+test("should respond successfully", async () => {
+  const { responseMock, loggerMock } = await testEndpoint({
+    endpoint: yourEndpoint,
+    requestProps: {
+      method: "POST",
+      body: { ... },
+    },
+  });
+  expect(loggerMock.error).toBeCalledTimes(0);
+  expect(responseMock.status).toBeCalledWith(200);
+  expect(responseMock.json).toBeCalledWith({
+    status: "success",
+    data: { ... },
+  });
+});
+```
+
 ### v5.0.0
 
 - No changes.

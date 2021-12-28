@@ -41,8 +41,9 @@ Start your API server with I/O schema validation and custom middlewares in minut
    13. [Enabling HTTPS](#enabling-https)
    14. [Exporting endpoint types to frontend](#exporting-endpoint-types-to-frontend)
    15. [Creating a documentation](#creating-a-documentation)
-5. [Known issues](#known-issues)
-   1. [Excessive properties in endpoint output](#excessive-properties-in-endpoint-output)
+5. [Additional hints](#additional-hints)
+   1. [How to test endpoints](#how-to-test-endpoints)
+   2. [Excessive properties in endpoint output](#excessive-properties-in-endpoint-output)
 6. [Your input to my output](#your-input-to-my-output)
 
 You can find the release notes in [Changelog](CHANGELOG.md). Along with recommendations for migrating from
@@ -660,7 +661,37 @@ const exampleEndpoint = defaultEndpointsFactory.build({
 _See the example of the generated documentation
 [here](https://github.com/RobinTail/express-zod-api/blob/master/example/example.swagger.yaml)_
 
-# Known issues
+# Additional hints
+
+## How to test endpoints
+
+The way to test endpoints is to mock the request, response, and logger objects, invoke the `execute()` method, and
+assert the expectations for calls of certain mocked methods. The library provides a special method that makes mocking
+easier, it requires `jest` (and optionally `@types/jest`) to be installed, so the test might look the following way:
+
+```typescript
+import { testEndpoint } from "express-zod-api";
+
+test("should respond successfully", async () => {
+  const { responseMock, loggerMock } = await testEndpoint({
+    endpoint: yourEndpoint,
+    requestProps: {
+      method: "POST", // default: GET
+      body: { ... },
+    },
+    // responseProps, configProps, loggerProps
+  });
+  expect(loggerMock.error).toBeCalledTimes(0);
+  expect(responseMock.status).toBeCalledWith(200);
+  expect(responseMock.json).toBeCalledWith({
+    status: "success",
+    data: { ... },
+  });
+});
+```
+
+_This method is optimized for the standard result handler. With the flexibility to customize, you can add additional
+properties as needed._
 
 ## Excessive properties in endpoint output
 
