@@ -2,6 +2,10 @@
 
 ## Version 5
 
+### v5.1.0
+
+- No changes.
+
 ### v5.1.0-beta2
 
 - Fixing a warning message when using `testEndpoint()` method.
