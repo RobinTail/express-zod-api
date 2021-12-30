@@ -1,10 +1,17 @@
-import { Express } from "express";
+import { Express, static as _serveStatic } from "express";
 import { Logger } from "winston";
 import { CommonConfig } from "./config-type";
 import { AbstractEndpoint, Endpoint } from "./endpoint";
 import { DependsOnMethodError, RoutingError } from "./errors";
 import { AuxMethod, Method } from "./method";
 import { getStartupLogo } from "./startup-logo";
+
+export type StaticHandler = ReturnType<typeof _serveStatic> & {
+  _typeGuard: "StaticHandler";
+};
+
+export const serveStatic = (...params: Parameters<typeof _serveStatic>) =>
+  _serveStatic(...params) as StaticHandler;
 
 export class DependsOnMethod {
   constructor(
@@ -41,23 +48,29 @@ export class DependsOnMethod {
 }
 
 export interface Routing {
-  [SEGMENT: string]: Routing | DependsOnMethod | AbstractEndpoint;
+  [SEGMENT: string]:
+    | Routing
+    | DependsOnMethod
+    | AbstractEndpoint
+    | StaticHandler;
 }
 
 export interface RoutingCycleParams {
   routing: Routing;
-  cb: (
+  endpointCb: (
     endpoint: AbstractEndpoint,
     path: string,
     method: Method | AuxMethod
   ) => void;
+  staticCb?: (path: string, handler: StaticHandler) => void;
   parentPath?: string;
   cors?: boolean;
 }
 
 export const routingCycle = ({
   routing,
-  cb,
+  endpointCb,
+  staticCb,
   parentPath,
   cors,
 }: RoutingCycleParams) => {
@@ -80,24 +93,29 @@ export const routingCycle = ({
         methods.push("options");
       }
       methods.forEach((method) => {
-        cb(element, path, method);
+        endpointCb(element, path, method);
       });
+    } else if (typeof element === "function") {
+      if (staticCb) {
+        staticCb(path, element);
+      }
     } else if (element instanceof DependsOnMethod) {
       Object.entries<AbstractEndpoint>(element.methods).forEach(
         ([method, endpoint]) => {
-          cb(endpoint, path, method as Method);
+          endpointCb(endpoint, path, method as Method);
         }
       );
       if (cors && Object.keys(element.methods).length > 0) {
         const firstEndpoint = Object.values(
           element.methods
         )[0] as AbstractEndpoint;
-        cb(firstEndpoint, path, "options");
+        endpointCb(firstEndpoint, path, "options");
       }
     } else {
       routingCycle({
         routing: element,
-        cb,
+        endpointCb,
+        staticCb,
         cors,
         parentPath: path,
       });
@@ -122,11 +140,14 @@ export const initRouting = ({
   routingCycle({
     routing,
     cors: config.cors,
-    cb: (endpoint, path, method) => {
+    endpointCb: (endpoint, path, method) => {
       app[method](path, async (request, response) => {
         logger.info(`${request.method}: ${path}`);
         await endpoint.execute({ request, response, logger, config });
       });
+    },
+    staticCb: (path, handler) => {
+      app.use(path, handler);
     },
   });
 };

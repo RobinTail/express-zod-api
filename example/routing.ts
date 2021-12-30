@@ -1,9 +1,10 @@
-import { DependsOnMethod, Routing } from "../src";
+import { DependsOnMethod, Routing, serveStatic } from "../src";
 import { uploadAvatarEndpoint } from "./endpoints/upload-avatar";
 import { retrieveUserEndpoint } from "./endpoints/retrieve-user";
 import { sendAvatarEndpoint } from "./endpoints/send-avatar";
 import { updateUserEndpoint } from "./endpoints/update-user";
 import { streamAvatarEndpoint } from "./endpoints/stream-avatar";
+import path from "path";
 
 export const routing: Routing = {
   v1: {
@@ -23,4 +24,10 @@ export const routing: Routing = {
       upload: uploadAvatarEndpoint,
     },
   },
+  // path /public serves static files from /example/assets
+  public: serveStatic(path.join(__dirname, "assets"), {
+    dotfiles: "deny",
+    index: false,
+    redirect: false,
+  }),
 };

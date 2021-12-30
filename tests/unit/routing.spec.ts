@@ -6,10 +6,11 @@ import {
   Routing,
   DependsOnMethod,
   defaultResultHandler,
+  serveStatic,
 } from "../../src";
 import { CommonConfig } from "../../src/config-type";
 import { mimeJson } from "../../src/mime";
-import { initRouting } from "../../src/routing";
+import { initRouting, StaticHandler } from "../../src/routing";
 
 let appMock: any;
 let loggerMock: any;
@@ -24,6 +25,7 @@ describe("Routing", () => {
         delete: jest.fn(),
         patch: jest.fn(),
         options: jest.fn(),
+        use: jest.fn(),
       };
 
       loggerMock = {
@@ -72,7 +74,7 @@ describe("Routing", () => {
         app: appMock as Express,
         logger: loggerMock as Logger,
         config: configMock as CommonConfig,
-        routing: routing,
+        routing,
       });
       expect(appMock.get).toBeCalledTimes(2);
       expect(appMock.post).toBeCalledTimes(2);
@@ -87,6 +89,25 @@ describe("Routing", () => {
       expect(appMock.options.mock.calls[0][0]).toBe("/v1/user/get");
       expect(appMock.options.mock.calls[1][0]).toBe("/v1/user/set");
       expect(appMock.options.mock.calls[2][0]).toBe("/v1/user/universal");
+    });
+
+    test("Should accept serveStatic", () => {
+      const serveStaticMock = jest.fn(() => serveStatic(__dirname));
+      const routing: Routing = {
+        public: serveStaticMock as unknown as StaticHandler,
+      };
+      const configMock = {
+        cors: true,
+        startupLogo: false,
+      };
+      initRouting({
+        app: appMock,
+        logger: loggerMock,
+        config: configMock as CommonConfig,
+        routing,
+      });
+      expect(appMock.use).toHaveBeenCalledTimes(1);
+      expect(appMock.use).toHaveBeenCalledWith("/public", serveStaticMock);
     });
 
     test("Should accept DependsOnMethod", () => {
@@ -128,7 +149,7 @@ describe("Routing", () => {
         app: appMock as Express,
         logger: loggerMock as Logger,
         config: configMock as CommonConfig,
-        routing: routing,
+        routing,
       });
       expect(appMock.get).toBeCalledTimes(1);
       expect(appMock.post).toBeCalledTimes(1);
@@ -163,7 +184,7 @@ describe("Routing", () => {
         app: appMock as Express,
         logger: loggerMock as Logger,
         config: configMock as CommonConfig,
-        routing: routing,
+        routing,
       });
       expect(appMock.get).toBeCalledTimes(1);
       expect(appMock.get.mock.calls[0][0]).toBe("/v1/user/:id");
@@ -192,7 +213,7 @@ describe("Routing", () => {
         app: appMock as Express,
         logger: loggerMock as Logger,
         config: configMock as CommonConfig,
-        routing: routing,
+        routing,
       });
       expect(appMock.get).toBeCalledTimes(2);
       expect(appMock.get.mock.calls[0][0]).toBe("/v1/user/:id");
@@ -258,7 +279,7 @@ describe("Routing", () => {
         app: appMock as Express,
         logger: loggerMock as Logger,
         config: configMock as CommonConfig,
-        routing: routing,
+        routing,
       });
       expect(appMock.post).toBeCalledTimes(1);
       const routeHandler = appMock.post.mock.calls[0][1] as RequestHandler;

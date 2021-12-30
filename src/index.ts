@@ -12,7 +12,7 @@ export { createApiResponse } from "./api-response";
 export { createLogger } from "./logger";
 export { createMiddleware } from "./middleware";
 export { createResultHandler, defaultResultHandler } from "./result-handler";
-export { Routing, DependsOnMethod } from "./routing";
+export { Routing, DependsOnMethod, serveStatic } from "./routing";
 export { createServer, attachRouting } from "./server";
 export { OpenAPI } from "./open-api";
 export { OpenAPIError, DependsOnMethodError, RoutingError } from "./errors";

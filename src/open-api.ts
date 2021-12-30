@@ -32,7 +32,11 @@ export class OpenAPI extends OpenApiBuilder {
   }: GeneratorParams) {
     super();
     this.addInfo({ title, version }).addServer({ url: serverUrl });
-    const cb: RoutingCycleParams["cb"] = (endpoint, path, _method) => {
+    const endpointCb: RoutingCycleParams["endpointCb"] = (
+      endpoint,
+      path,
+      _method
+    ) => {
       const method = _method as Method;
       const commonParams = { path, method, endpoint };
       const inputSources =
@@ -70,6 +74,6 @@ export class OpenAPI extends OpenApiBuilder {
         [method]: operation,
       });
     };
-    routingCycle({ routing, cb });
+    routingCycle({ routing, endpointCb });
   }
 }
