@@ -1,9 +1,11 @@
-import { serveStatic } from "../../src";
+import { ServeStatic } from "../../src";
 
-describe("serveStatic()", () => {
-  test("should return static handling function", () => {
-    expect(typeof serveStatic(__dirname, { dotfiles: "deny" })).toBe(
-      "function"
-    );
+describe("ServeStatic", () => {
+  describe("constructor()", () => {
+    test("should create an instance that provides original params", () => {
+      const serverStatic = new ServeStatic(__dirname, { dotfiles: "deny" });
+      expect(serverStatic).toBeInstanceOf(ServeStatic);
+      expect(serverStatic.params).toEqual([__dirname, { dotfiles: "deny" }]);
+    });
   });
 });

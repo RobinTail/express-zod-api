@@ -1,19 +1,15 @@
-import { Express } from "express";
+import { Express, static as _serveStatic } from "express";
 import { Logger } from "winston";
 import { CommonConfig } from "./config-type";
 import { DependsOnMethod } from "./depends-on-method";
 import { AbstractEndpoint } from "./endpoint";
 import { RoutingError } from "./errors";
 import { AuxMethod, Method } from "./method";
-import { StaticHandler } from "./serve-static";
+import { ServeStatic, StaticHandler } from "./serve-static";
 import { getStartupLogo } from "./startup-logo";
 
 export interface Routing {
-  [SEGMENT: string]:
-    | Routing
-    | DependsOnMethod
-    | AbstractEndpoint
-    | StaticHandler;
+  [SEGMENT: string]: Routing | DependsOnMethod | AbstractEndpoint | ServeStatic;
 }
 
 export interface RoutingCycleParams {
@@ -56,9 +52,9 @@ export const routingCycle = ({
       methods.forEach((method) => {
         endpointCb(element, path, method);
       });
-    } else if (typeof element === "function") {
+    } else if (element instanceof ServeStatic) {
       if (staticCb) {
-        staticCb(path, element);
+        staticCb(path, _serveStatic(...element.params));
       }
     } else if (element instanceof DependsOnMethod) {
       Object.entries<AbstractEndpoint>(element.methods).forEach(

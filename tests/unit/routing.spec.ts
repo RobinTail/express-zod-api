@@ -1,3 +1,11 @@
+const staticHandler = jest.fn();
+const staticMock = jest.fn(() => staticHandler);
+
+jest.mock("express", () => ({
+  ...jest.requireActual("express"),
+  static: staticMock,
+}));
+
 import { Express, RequestHandler, Request, Response } from "express";
 import { Logger } from "winston";
 import {
@@ -6,12 +14,11 @@ import {
   Routing,
   DependsOnMethod,
   defaultResultHandler,
-  serveStatic,
+  ServeStatic,
 } from "../../src";
 import { CommonConfig } from "../../src/config-type";
 import { mimeJson } from "../../src/mime";
 import { initRouting } from "../../src/routing";
-import { StaticHandler } from "../../src/serve-static";
 
 let appMock: any;
 let loggerMock: any;
@@ -93,9 +100,8 @@ describe("Routing", () => {
     });
 
     test("Should accept serveStatic", () => {
-      const serveStaticMock = jest.fn(() => serveStatic(__dirname));
       const routing: Routing = {
-        public: serveStaticMock as unknown as StaticHandler,
+        public: new ServeStatic(__dirname, { dotfiles: "deny" }),
       };
       const configMock = {
         cors: true,
@@ -107,8 +113,9 @@ describe("Routing", () => {
         config: configMock as CommonConfig,
         routing,
       });
+      expect(staticMock).toHaveBeenCalledWith(__dirname, { dotfiles: "deny" });
       expect(appMock.use).toHaveBeenCalledTimes(1);
-      expect(appMock.use).toHaveBeenCalledWith("/public", serveStaticMock);
+      expect(appMock.use).toHaveBeenCalledWith("/public", staticHandler);
     });
 
     test("Should accept DependsOnMethod", () => {

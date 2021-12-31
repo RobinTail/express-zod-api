@@ -1,4 +1,4 @@
-import { DependsOnMethod, Routing, serveStatic } from "../src";
+import { DependsOnMethod, Routing, ServeStatic } from "../src";
 import { uploadAvatarEndpoint } from "./endpoints/upload-avatar";
 import { retrieveUserEndpoint } from "./endpoints/retrieve-user";
 import { sendAvatarEndpoint } from "./endpoints/send-avatar";
@@ -25,7 +25,7 @@ export const routing: Routing = {
     },
   },
   // path /public serves static files from /example/assets
-  public: serveStatic(path.join(__dirname, "assets"), {
+  public: new ServeStatic(path.join(__dirname, "assets"), {
     dotfiles: "deny",
     index: false,
     redirect: false,

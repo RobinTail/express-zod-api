@@ -13,7 +13,7 @@ export { createLogger } from "./logger";
 export { createMiddleware } from "./middleware";
 export { createResultHandler, defaultResultHandler } from "./result-handler";
 export { DependsOnMethod } from "./depends-on-method";
-export { serveStatic } from "./serve-static";
+export { ServeStatic } from "./serve-static";
 export { Routing } from "./routing";
 export { createServer, attachRouting } from "./server";
 export { OpenAPI } from "./open-api";
