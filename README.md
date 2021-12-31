@@ -35,7 +35,7 @@ Start your API server with I/O schema validation and custom middlewares in minut
    7. [Non-object response](#non-object-response) including file downloads
    8. [File uploads](#file-uploads)
    9. [Customizing logger](#customizing-logger)
-   10. [Usage with your own express app](#usage-with-your-own-express-app)
+   10. [Connect to your own express app](#connect-to-your-own-express-app)
    11. [Multiple schemas for one route](#multiple-schemas-for-one-route)
    12. [Customizing input sources](#customizing-input-sources)
    13. [Enabling HTTPS](#enabling-https)
@@ -505,7 +505,7 @@ const logger = winston.createLogger({
 const config = createConfig({ logger /* ..., */ });
 ```
 
-## Usage with your own express app
+## Connect to your own express app
 
 If you already have your own configured express application, or you find the library settings not enough,
 you can connect your routing to the app instead of using `createServer()`.
