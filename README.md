@@ -557,8 +557,9 @@ const routing: Routing = {
 
 ## Serving static files
 
-In case you want your server to serve static files, you can use `new ServeStatic()` in `Routing` using the options
-similar to `express.static()`. These options you may find [here](http://expressjs.com/en/4x/api.html#express.static).
+In case you want your server to serve static files, you can use `new ServeStatic()` in `Routing` using the arguments
+similar to `express.static()`.
+The documentation on these arguments you may find [here](http://expressjs.com/en/4x/api.html#express.static).
 
 ```typescript
 import { Routing, ServeStatic } from "express-zod-api";

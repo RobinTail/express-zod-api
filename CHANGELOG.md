@@ -5,8 +5,8 @@
 ### v5.2.0
 
 - Feature #254: the ability to configure routes for serving static files.
-  - Use `new ServeStatic()` with the same options as `express.static()`.
-  - You can find all options here: http://expressjs.com/en/4x/api.html#express.static
+  - Use `new ServeStatic()` with the same arguments as `express.static()`.
+  - You can find the documentation on these arguments here: http://expressjs.com/en/4x/api.html#express.static
 
 ```typescript
 import { Routing, ServeStatic } from "express-zod-api";
