@@ -1,63 +1,33 @@
-import { Express } from "express";
+import { Express, static as _serveStatic } from "express";
 import { Logger } from "winston";
 import { CommonConfig } from "./config-type";
-import { AbstractEndpoint, Endpoint } from "./endpoint";
-import { DependsOnMethodError, RoutingError } from "./errors";
+import { DependsOnMethod } from "./depends-on-method";
+import { AbstractEndpoint } from "./endpoint";
+import { RoutingError } from "./errors";
 import { AuxMethod, Method } from "./method";
+import { ServeStatic, StaticHandler } from "./serve-static";
 import { getStartupLogo } from "./startup-logo";
 
-export class DependsOnMethod {
-  constructor(
-    public readonly methods: {
-      [K in Method]?:
-        | Endpoint<any, any, any, any, K, any, any>
-        | Endpoint<any, any, any, any, Method, any, any>;
-    }
-  ) {
-    (Object.keys(methods) as (keyof typeof methods)[]).forEach((key) => {
-      if (key in methods) {
-        const endpointMethods = methods[key]?.getMethods() || [];
-        if (!endpointMethods.includes(key)) {
-          throw new DependsOnMethodError(
-            `The endpoint assigned to the '${key}' parameter must have at least this method in its specification.\n` +
-              "This error should prevent mistakes during the development process.\n" +
-              "Example:\n\n" +
-              `new ${this.constructor.name}({\n` +
-              `  ${key}: endpointsFactory.build({\n` +
-              `    methods: ['${key}', ` +
-              ((methods[key]?.getMethods() || [])
-                .map((m) => `'${m}'`)
-                .join(", ") || "...") +
-              "]\n" +
-              `    // or method: '${key}'\n` +
-              "    ...\n" +
-              "  })\n" +
-              "});\n"
-          );
-        }
-      }
-    });
-  }
-}
-
 export interface Routing {
-  [SEGMENT: string]: Routing | DependsOnMethod | AbstractEndpoint;
+  [SEGMENT: string]: Routing | DependsOnMethod | AbstractEndpoint | ServeStatic;
 }
 
 export interface RoutingCycleParams {
   routing: Routing;
-  cb: (
+  endpointCb: (
     endpoint: AbstractEndpoint,
     path: string,
     method: Method | AuxMethod
   ) => void;
+  staticCb?: (path: string, handler: StaticHandler) => void;
   parentPath?: string;
   cors?: boolean;
 }
 
 export const routingCycle = ({
   routing,
-  cb,
+  endpointCb,
+  staticCb,
   parentPath,
   cors,
 }: RoutingCycleParams) => {
@@ -80,24 +50,29 @@ export const routingCycle = ({
         methods.push("options");
       }
       methods.forEach((method) => {
-        cb(element, path, method);
+        endpointCb(element, path, method);
       });
+    } else if (element instanceof ServeStatic) {
+      if (staticCb) {
+        staticCb(path, _serveStatic(...element.params));
+      }
     } else if (element instanceof DependsOnMethod) {
       Object.entries<AbstractEndpoint>(element.methods).forEach(
         ([method, endpoint]) => {
-          cb(endpoint, path, method as Method);
+          endpointCb(endpoint, path, method as Method);
         }
       );
       if (cors && Object.keys(element.methods).length > 0) {
         const firstEndpoint = Object.values(
           element.methods
         )[0] as AbstractEndpoint;
-        cb(firstEndpoint, path, "options");
+        endpointCb(firstEndpoint, path, "options");
       }
     } else {
       routingCycle({
         routing: element,
-        cb,
+        endpointCb,
+        staticCb,
         cors,
         parentPath: path,
       });
@@ -122,11 +97,14 @@ export const initRouting = ({
   routingCycle({
     routing,
     cors: config.cors,
-    cb: (endpoint, path, method) => {
+    endpointCb: (endpoint, path, method) => {
       app[method](path, async (request, response) => {
         logger.info(`${request.method}: ${path}`);
         await endpoint.execute({ request, response, logger, config });
       });
+    },
+    staticCb: (path, handler) => {
+      app.use(path, handler);
     },
   });
 };

@@ -131,6 +131,17 @@ describe("Example", () => {
       expect(hash).toMatchSnapshot();
     });
 
+    test("Should serve static files", async () => {
+      const response = await fetch("http://localhost:8090/public/logo.svg");
+      expect(response.status).toBe(200);
+      expect(response.headers.get("Content-type")).toBe("image/svg+xml");
+      const hash = crypto
+        .createHash("sha1")
+        .update(await response.text())
+        .digest("hex");
+      expect(hash).toMatchSnapshot();
+    });
+
     test("Should upload the file", async () => {
       const filename = "logo.svg";
       const logo = readFileSync(filename, "utf-8");
@@ -260,6 +271,15 @@ describe("Example", () => {
           message: "User not found",
         },
       });
+    });
+
+    test("Should respond with error to the missing static file request", async () => {
+      const response = await fetch("http://localhost:8090/public/missing.svg");
+      expect(response.status).toBe(404);
+      expect(response.headers.get("Content-type")).toBe(
+        "application/json; charset=utf-8"
+      );
+      expect(await response.json()).toMatchSnapshot();
     });
   });
 });

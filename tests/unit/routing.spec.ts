@@ -1,3 +1,11 @@
+const staticHandler = jest.fn();
+const staticMock = jest.fn(() => staticHandler);
+
+jest.mock("express", () => ({
+  ...jest.requireActual("express"),
+  static: staticMock,
+}));
+
 import { Express, RequestHandler, Request, Response } from "express";
 import { Logger } from "winston";
 import {
@@ -6,6 +14,7 @@ import {
   Routing,
   DependsOnMethod,
   defaultResultHandler,
+  ServeStatic,
 } from "../../src";
 import { CommonConfig } from "../../src/config-type";
 import { mimeJson } from "../../src/mime";
@@ -24,6 +33,7 @@ describe("Routing", () => {
         delete: jest.fn(),
         patch: jest.fn(),
         options: jest.fn(),
+        use: jest.fn(),
       };
 
       loggerMock = {
@@ -72,7 +82,7 @@ describe("Routing", () => {
         app: appMock as Express,
         logger: loggerMock as Logger,
         config: configMock as CommonConfig,
-        routing: routing,
+        routing,
       });
       expect(appMock.get).toBeCalledTimes(2);
       expect(appMock.post).toBeCalledTimes(2);
@@ -87,6 +97,25 @@ describe("Routing", () => {
       expect(appMock.options.mock.calls[0][0]).toBe("/v1/user/get");
       expect(appMock.options.mock.calls[1][0]).toBe("/v1/user/set");
       expect(appMock.options.mock.calls[2][0]).toBe("/v1/user/universal");
+    });
+
+    test("Should accept serveStatic", () => {
+      const routing: Routing = {
+        public: new ServeStatic(__dirname, { dotfiles: "deny" }),
+      };
+      const configMock = {
+        cors: true,
+        startupLogo: false,
+      };
+      initRouting({
+        app: appMock,
+        logger: loggerMock,
+        config: configMock as CommonConfig,
+        routing,
+      });
+      expect(staticMock).toHaveBeenCalledWith(__dirname, { dotfiles: "deny" });
+      expect(appMock.use).toHaveBeenCalledTimes(1);
+      expect(appMock.use).toHaveBeenCalledWith("/public", staticHandler);
     });
 
     test("Should accept DependsOnMethod", () => {
@@ -128,7 +157,7 @@ describe("Routing", () => {
         app: appMock as Express,
         logger: loggerMock as Logger,
         config: configMock as CommonConfig,
-        routing: routing,
+        routing,
       });
       expect(appMock.get).toBeCalledTimes(1);
       expect(appMock.post).toBeCalledTimes(1);
@@ -163,7 +192,7 @@ describe("Routing", () => {
         app: appMock as Express,
         logger: loggerMock as Logger,
         config: configMock as CommonConfig,
-        routing: routing,
+        routing,
       });
       expect(appMock.get).toBeCalledTimes(1);
       expect(appMock.get.mock.calls[0][0]).toBe("/v1/user/:id");
@@ -192,7 +221,7 @@ describe("Routing", () => {
         app: appMock as Express,
         logger: loggerMock as Logger,
         config: configMock as CommonConfig,
-        routing: routing,
+        routing,
       });
       expect(appMock.get).toBeCalledTimes(2);
       expect(appMock.get.mock.calls[0][0]).toBe("/v1/user/:id");
@@ -258,7 +287,7 @@ describe("Routing", () => {
         app: appMock as Express,
         logger: loggerMock as Logger,
         config: configMock as CommonConfig,
-        routing: routing,
+        routing,
       });
       expect(appMock.post).toBeCalledTimes(1);
       const routeHandler = appMock.post.mock.calls[0][1] as RequestHandler;
@@ -298,59 +327,6 @@ describe("Routing", () => {
           result: true,
         },
       });
-    });
-  });
-
-  describe("DependsOnMethod", () => {
-    test("should accept empty object", () => {
-      const instance = new DependsOnMethod({});
-      expect(instance).toBeInstanceOf(DependsOnMethod);
-      expect(instance.methods).toEqual({});
-    });
-
-    test("should accept an endpoint with a corresponding method", () => {
-      const instance = new DependsOnMethod({
-        post: new EndpointsFactory(defaultResultHandler).build({
-          method: "post",
-          input: z.object({}),
-          output: z.object({}),
-          handler: async () => ({}),
-        }),
-      });
-      expect(instance).toBeInstanceOf(DependsOnMethod);
-      expect(instance.methods).toHaveProperty("post");
-    });
-
-    test("should accept an endpoint with additional methods", () => {
-      const endpoint = new EndpointsFactory(defaultResultHandler).build({
-        methods: ["get", "post"],
-        input: z.object({}),
-        output: z.object({}),
-        handler: async () => ({}),
-      });
-      const instance = new DependsOnMethod({
-        get: endpoint,
-        post: endpoint,
-      });
-      expect(instance).toBeInstanceOf(DependsOnMethod);
-      expect(instance.methods).toHaveProperty("get");
-      expect(instance.methods).toHaveProperty("post");
-    });
-
-    test("should throw an error if the endpoint does not have the corresponding method", () => {
-      const endpoint = new EndpointsFactory(defaultResultHandler).build({
-        methods: ["get", "patch"],
-        input: z.object({}),
-        output: z.object({}),
-        handler: async () => ({}),
-      });
-      expect(
-        () =>
-          new DependsOnMethod({
-            get: endpoint,
-            post: endpoint,
-          })
-      ).toThrowErrorMatchingSnapshot();
     });
   });
 });
