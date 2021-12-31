@@ -1,18 +1,12 @@
-import { Express, static as _serveStatic } from "express";
+import { Express } from "express";
 import { Logger } from "winston";
 import { CommonConfig } from "./config-type";
 import { DependsOnMethod } from "./depends-on-method";
 import { AbstractEndpoint } from "./endpoint";
 import { RoutingError } from "./errors";
 import { AuxMethod, Method } from "./method";
+import { StaticHandler } from "./serve-static";
 import { getStartupLogo } from "./startup-logo";
-
-export type StaticHandler = ReturnType<typeof _serveStatic> & {
-  _typeGuard: "StaticHandler";
-};
-
-export const serveStatic = (...params: Parameters<typeof _serveStatic>) =>
-  _serveStatic(...params) as StaticHandler;
 
 export interface Routing {
   [SEGMENT: string]:

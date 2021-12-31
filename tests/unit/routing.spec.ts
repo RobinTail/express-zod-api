@@ -10,7 +10,8 @@ import {
 } from "../../src";
 import { CommonConfig } from "../../src/config-type";
 import { mimeJson } from "../../src/mime";
-import { initRouting, StaticHandler } from "../../src/routing";
+import { initRouting } from "../../src/routing";
+import { StaticHandler } from "../../src/serve-static";
 
 let appMock: any;
 let loggerMock: any;
