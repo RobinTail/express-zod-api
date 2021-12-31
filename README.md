@@ -37,10 +37,11 @@ Start your API server with I/O schema validation and custom middlewares in minut
    9. [Customizing logger](#customizing-logger)
    10. [Connect to your own express app](#connect-to-your-own-express-app)
    11. [Multiple schemas for one route](#multiple-schemas-for-one-route)
-   12. [Customizing input sources](#customizing-input-sources)
-   13. [Enabling HTTPS](#enabling-https)
-   14. [Informing the frontend about the API](#informing-the-frontend-about-the-api)
-   15. [Creating a documentation](#creating-a-documentation)
+   12. [Serving static files](#serving-static-files)
+   13. [Customizing input sources](#customizing-input-sources)
+   14. [Enabling HTTPS](#enabling-https)
+   15. [Informing the frontend about the API](#informing-the-frontend-about-the-api)
+   16. [Creating a documentation](#creating-a-documentation)
 5. [Additional hints](#additional-hints)
    1. [How to test endpoints](#how-to-test-endpoints)
    2. [Excessive properties in endpoint output](#excessive-properties-in-endpoint-output)
@@ -551,6 +552,25 @@ const routing: Routing = {
       patch: yourEndpointB,
     }),
   },
+};
+```
+
+## Serving static files
+
+In case you want your server to serve static files, you can use `new ServeStatic()` in `Routing` using the options
+similar to `express.static()`. These options you may find [here](http://expressjs.com/en/4x/api.html#express.static).
+
+```typescript
+import { Routing, ServeStatic } from "express-zod-api";
+import path from "path";
+
+const routing: Routing = {
+  // path /public serves static files from ./assets
+  public: new ServeStatic(path.join(__dirname, "assets"), {
+    dotfiles: "deny",
+    index: false,
+    redirect: false,
+  }),
 };
 ```
 
