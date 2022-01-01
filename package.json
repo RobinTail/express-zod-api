@@ -34,7 +34,7 @@
     "import": "./dist-esm/index.js"
   },
   "dependencies": {
-    "express": "4.17.2",
+    "express": "5.0.0-alpha.8",
     "express-fileupload": "1.2.1",
     "http-errors": "2.0.0",
     "mime": "3.0.0",
