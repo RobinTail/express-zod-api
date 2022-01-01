@@ -142,13 +142,13 @@ export function getInitialInput(
   }
   return props
     .filter((prop) => (prop === "files" ? areFilesAvailable(request) : true))
-    .reduce(
-      (carry, prop) => ({
+    .reduce((carry, prop) => {
+      const source = request[prop];
+      return {
         ...carry,
-        ...request[prop],
-      }),
-      {}
-    );
+        ...(typeof source === "object" ? source : {}),
+      };
+    }, {});
 }
 
 export function isLoggerConfig(logger: any): logger is LoggerConfig {
