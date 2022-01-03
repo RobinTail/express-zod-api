@@ -2,6 +2,10 @@
 
 ## Version 5
 
+### v5.3.0
+
+- Supporting Node 17.
+
 ### v5.2.1
 
 - Fixing the compatibility with `@types/node@17.0.7`.
