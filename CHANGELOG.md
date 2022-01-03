@@ -2,6 +2,11 @@
 
 ## Version 5
 
+### v5.2.1
+
+- Fixing the compatibility with `@types/node@17.0.7`.
+  - Fixing the return type of `Endpoint::execute()` in case of `OPTIONS` method (it should be `void`).
+
 ### v5.2.0
 
 - Feature #254: the ability to configure routes for serving static files.

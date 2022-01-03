@@ -322,7 +322,8 @@ export class Endpoint<
       this.#setupCorsHeaders(response);
     }
     if (request.method === "OPTIONS") {
-      return response.end();
+      response.end();
+      return;
     }
     const initialInput = getInitialInput(request, config.inputSources);
     try {
