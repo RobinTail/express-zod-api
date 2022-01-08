@@ -231,7 +231,7 @@ export class Endpoint<
     const options: any = {};
     let isStreamClosed = false;
     for (const def of this.middlewares) {
-      input = { ...input, ...(await def.input.parseAsync(input)) }; // middleware can transform the input types
+      Object.assign(input, await def.input.parseAsync(input)); // middleware can transform the input types
       Object.assign(
         options,
         await def.middleware({
