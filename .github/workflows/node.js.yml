@@ -40,6 +40,12 @@ jobs:
         yarn lint
         yarn test
         yarn build
+    - name: Coveralls
+      uses: coverallsapp/github-action@master
+      with:
+        github-token: ${{ secrets.github_token }}
+        flag-name: run-${{ matrix.node-version }}
+        parallel: true
     - name: Integration test
       run: |
         yarn build:intTest
@@ -48,3 +54,12 @@ jobs:
       run: |
         yarn build:esmTest
         yarn test:esm
+  finish:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Coveralls Finished
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.github_token }}
+          parallel-finished: true
