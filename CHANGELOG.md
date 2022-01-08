@@ -2,6 +2,11 @@
 
 ## Version 5
 
+### v5.3.1
+
+- Fixed issue #269: async refinements in I/O schemas of endpoints and middlewares.
+  - There was an error `Async refinement encountered during synchronous parse operation. Use .parseAsync instead.`
+
 ### v5.3.0
 
 - Supporting Node 17.
