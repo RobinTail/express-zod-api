@@ -196,9 +196,9 @@ export class Endpoint<
     response.set("Access-Control-Allow-Headers", "content-type");
   }
 
-  #parseOutput(output: any) {
+  async #parseOutput(output: any) {
     try {
-      return this.outputSchema.parse(output);
+      return await this.outputSchema.parseAsync(output);
     } catch (e) {
       if (e instanceof z.ZodError) {
         throw new z.ZodError([
@@ -231,7 +231,7 @@ export class Endpoint<
     const options: any = {};
     let isStreamClosed = false;
     for (const def of this.middlewares) {
-      input = { ...input, ...def.input.parse(input) }; // middleware can transform the input types
+      input = { ...input, ...(await def.input.parseAsync(input)) }; // middleware can transform the input types
       Object.assign(
         options,
         await def.middleware({
@@ -264,7 +264,7 @@ export class Endpoint<
     logger: Logger;
   }) {
     return this.handler({
-      input: this.inputSchema.parse(input), // final input types transformations for handler,
+      input: await this.inputSchema.parseAsync(input), // final input types transformations for handler,
       options,
       logger,
     });
@@ -336,7 +336,7 @@ export class Endpoint<
       if (isStreamClosed) {
         return;
       }
-      output = this.#parseOutput(
+      output = await this.#parseOutput(
         await this.#parseAndRunHandler({ input, options, logger })
       );
     } catch (e) {
