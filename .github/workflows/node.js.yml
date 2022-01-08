@@ -40,6 +40,12 @@ jobs:
         yarn lint
         yarn test
         yarn build
+    - name: Coveralls
+      uses: coverallsapp/github-action@master
+      with:
+        github-token: ${{ secrets.github_token }}
+        flag-name: run-${{ matrix.test_number }}
+        parallel: true
     - name: Integration test
       run: |
         yarn build:intTest
