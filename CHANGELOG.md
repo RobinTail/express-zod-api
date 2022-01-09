@@ -2,6 +2,10 @@
 
 ## Version 5
 
+### v5.3.2
+
+- No changes.
+
 ### v5.3.1
 
 - Fixed issue #269: async refinements in I/O schemas of endpoints and middlewares.
