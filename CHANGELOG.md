@@ -2,6 +2,12 @@
 
 ## Version 5
 
+### v5.3.3
+
+- `winston` version is 3.4.0.
+  - The version of dependent package `colors` has been strictly set to 1.4.0.
+  - More about this incident here: https://github.com/winstonjs/winston/pull/2008
+
 ### v5.3.2
 
 - No changes.
