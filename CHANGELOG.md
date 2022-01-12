@@ -4,6 +4,7 @@
 
 ### v5.3.3
 
+- `ramda` version is 0.27.2.
 - `winston` version is 3.4.0.
   - The version of dependent package `colors` has been strictly set to 1.4.0.
   - More about this incident here: https://github.com/winstonjs/winston/pull/2008
