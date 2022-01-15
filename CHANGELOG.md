@@ -2,6 +2,30 @@
 
 ## Version 5
 
+### v5.4.0
+
+- Feature #281: Response compression.
+  - You can enable and configure the response compression using the new option `compression` in server configuration
+    when using `createServer()` method.
+  - In order to receive the compressed response the client should include the following header in the request:
+    `Accept-Encoding: gzip, deflate`.
+  - Only responses with compressible content types are subject to compression.
+  - There is also a default threshold of 1KB that can be configured.
+
+```typescript
+import { createConfig } from "express-zod-api";
+
+const config = createConfig({
+  server: {
+    // enabling and configuring the compression: bool or options
+    compression: {
+      threshold: "100b",
+    },
+    // other options
+  },
+});
+```
+
 ### v5.3.3
 
 - `ramda` version is 0.27.2.
