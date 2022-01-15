@@ -185,7 +185,7 @@ describe("App", () => {
           },
         }
       );
-      //expect(response.status).toBe(200);
+      expect(response.status).toBe(200);
       console.log(response.headers);
       expect(response.headers.get("Content-Encoding")).toBe("gzip");
       const json = await response.json();
