@@ -39,9 +39,10 @@ Start your API server with I/O schema validation and custom middlewares in minut
    11. [Multiple schemas for one route](#multiple-schemas-for-one-route)
    12. [Serving static files](#serving-static-files)
    13. [Customizing input sources](#customizing-input-sources)
-   14. [Enabling HTTPS](#enabling-https)
-   15. [Informing the frontend about the API](#informing-the-frontend-about-the-api)
-   16. [Creating a documentation](#creating-a-documentation)
+   14. [Enabling compression](#enabling-compression)
+   15. [Enabling HTTPS](#enabling-https)
+   16. [Informing the frontend about the API](#informing-the-frontend-about-the-api)
+   17. [Creating a documentation](#creating-a-documentation)
 5. [Additional hints](#additional-hints)
    1. [How to test endpoints](#how-to-test-endpoints)
    2. [Excessive properties in endpoint output](#excessive-properties-in-endpoint-output)
@@ -593,6 +594,32 @@ createConfig({
     patch: ["body"],
     delete: ["query", "body"],
   },
+});
+```
+
+## Enabling compression
+
+According to [Express JS best practices guide](http://expressjs.com/en/advanced/best-practice-performance.html)
+it might be a good idea to enable GZIP compression of your API responses. You can achieve and customize it by using the
+corresponding configuration option when using the `createServer()` method.
+
+In order to receive the compressed response the client should include the following header in the request:
+`Accept-Encoding: gzip, deflate`. Only responses with compressible content types are subject to compression. There is
+also a default threshold of 1KB that can be configured.
+
+```typescript
+import { createConfig } from "express-zod-api";
+
+const config = createConfig({
+  server: {
+    // compression: true, or:
+    compression: {
+      // @see https://www.npmjs.com/package/compression#options
+      threshold: "100b",
+    },
+    // ... other options
+  },
+  // ... other options
 });
 ```
 
