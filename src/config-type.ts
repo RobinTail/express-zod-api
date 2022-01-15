@@ -41,7 +41,7 @@ export interface ServerConfig {
     listen: number | string; // port or socket
     jsonParser?: NextHandleFunction; // custom JSON parser, default: express.json()
     upload?: boolean | UploadOptions; // enable or configure uploads handling
-    gzip?: boolean | CompressionOptions; // enable or configure response compression
+    compression?: boolean | CompressionOptions; // enable or configure response compression
   };
   https?: {
     // enables HTTPS server as well

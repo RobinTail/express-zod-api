@@ -78,9 +78,11 @@ export function createServer(
     : config.logger;
   const app = express();
   const errorHandler = config.errorHandler || defaultResultHandler;
-  const compressor = config.server.gzip
+  const compressor = config.server.compression
     ? compression({
-        ...(typeof config.server.gzip === "object" ? config.server.gzip : {}),
+        ...(typeof config.server.compression === "object"
+          ? config.server.compression
+          : {}),
       })
     : undefined;
   const jsonParser = config.server.jsonParser || json();

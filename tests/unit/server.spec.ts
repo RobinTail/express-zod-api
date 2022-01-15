@@ -217,7 +217,7 @@ describe("Server", () => {
         server: {
           listen: 8054,
           jsonParser: jest.fn(),
-          gzip: true,
+          compression: true,
         },
         cors: true,
         startupLogo: false,

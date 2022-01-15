@@ -81,7 +81,7 @@ describe("App", () => {
       {
         server: {
           listen: 8055,
-          gzip: { threshold: 1 },
+          compression: { threshold: 1 },
         },
         cors: true,
         startupLogo: true,
