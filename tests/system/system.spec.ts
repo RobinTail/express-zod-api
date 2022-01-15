@@ -81,6 +81,7 @@ describe("App", () => {
       {
         server: {
           listen: 8055,
+          compression: { threshold: 1 },
         },
         cors: true,
         startupLogo: true,
@@ -173,6 +174,23 @@ describe("App", () => {
           method: "post",
         },
       });
+    });
+
+    test("Should compress the response in case it is supported by client", async () => {
+      const response = await fetch(
+        "http://127.0.0.1:8055/v1/test?key=123&something=joke",
+        {
+          headers: {
+            "Accept-Encoding": "gzip, deflate",
+          },
+        }
+      );
+      expect(response.status).toBe(200);
+      console.log(response.headers);
+      expect(response.headers.get("Content-Encoding")).toBe("gzip");
+      const json = await response.json();
+      expect("status" in json).toBeTruthy();
+      expect(json.status).toBe("success");
     });
   });
 

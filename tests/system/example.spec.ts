@@ -107,7 +107,10 @@ describe("Example", () => {
       expect(response.headers.get("Content-type")).toBe(
         "image/svg+xml; charset=utf-8"
       );
-      expect(response.headers.has("Content-length")).toBeTruthy();
+      expect(response.headers.has("Content-encoding")).toBeTruthy();
+      expect(response.headers.get("Content-encoding")).toBe("gzip");
+      expect(response.headers.has("Transfer-encoding")).toBeTruthy();
+      expect(response.headers.get("Transfer-encoding")).toBe("chunked");
       const hash = crypto
         .createHash("sha1")
         .update(await response.text())

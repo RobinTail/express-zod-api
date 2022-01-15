@@ -65,6 +65,11 @@ const libs: Lib[] = [
     module: "mime",
   },
   {
+    name: "Compression",
+    url: "https://github.com/expressjs/compression",
+    module: "compression",
+  },
+  {
     name: "Express-FileUpload",
     url: "https://github.com/richardgirges/express-fileupload",
     module: "express-fileupload",
