@@ -243,7 +243,7 @@ describe("Server", () => {
         routingMock
       );
       expect(compressionMock).toHaveBeenCalledTimes(1);
-      expect(compressionMock).toHaveBeenCalledWith();
+      expect(compressionMock).toHaveBeenCalledWith({});
     });
   });
 
