@@ -2,6 +2,14 @@
 
 ## Version 5
 
+### v5.4.1-beta1
+
+- Listing the following types as the regular dependencies since certain exported methods refer to them:
+  `@types/compression, @types/express, @types/express-fileupload, @types/http-errors, @types/node`.
+- Here is the information that underlies this decision:
+  - https://www.typescriptlang.org/docs/handbook/declaration-files/publishing.html#dependencies
+  - https://github.com/DefinitelyTyped/DefinitelyTyped/issues/44777#issuecomment-629660992
+
 ### v5.4.0
 
 - Feature #281: Response compression.
