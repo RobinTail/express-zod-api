@@ -3,6 +3,7 @@ import http from "http";
 let appMock: ReturnType<typeof newAppMock>;
 const expressJsonMock = jest.fn();
 const newAppMock = () => ({
+  disable: jest.fn(),
   use: jest.fn(),
   listen: jest.fn((port, cb) => {
     if (cb) {
@@ -84,6 +85,7 @@ describe("Server", () => {
       };
       createServer(configMock, routingMock);
       expect(appMock).toBeTruthy();
+      expect(appMock.disable).toHaveBeenCalledWith("x-powered-by");
       expect(appMock.use).toBeCalledTimes(3);
       expect(Array.isArray(appMock.use.mock.calls[0][0])).toBeTruthy();
       expect(appMock.use.mock.calls[0][0][0]).toBe(expressJsonMock);
