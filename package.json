@@ -38,7 +38,7 @@
     "@types/express": "^4.17.13",
     "@types/express-fileupload": "^1.2.2",
     "@types/http-errors": "^1.8.2",
-    "@types/node": "^17.0.8",
+    "@types/node": "*",
     "compression": "1.7.4",
     "express": "4.17.2",
     "express-fileupload": "1.2.1",
