@@ -2,6 +2,10 @@
 
 ## Version 5
 
+### v5.4.1
+
+- No changes.
+
 ### v5.4.1-beta1
 
 - Listing the following types as the regular dependencies since certain exported methods refer to them:
