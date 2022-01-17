@@ -2,6 +2,12 @@
 
 ## Version 5
 
+### v5.4.2
+
+- `ramda` version is 0.28.0.
+- The header `X-Powered-By: Express` has been removed according to
+  [recommendations](https://expressjs.com/en/advanced/best-practice-security.html).
+
 ### v5.4.1
 
 - No changes.
