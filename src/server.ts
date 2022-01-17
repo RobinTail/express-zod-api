@@ -77,6 +77,7 @@ export function createServer(
     ? createLogger(config.logger)
     : config.logger;
   const app = express();
+  app.disable("x-powered-by");
   const errorHandler = config.errorHandler || defaultResultHandler;
   const compressor = config.server.compression
     ? compression({
