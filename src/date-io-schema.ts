@@ -55,12 +55,11 @@ export class ZodDateIn extends ZodType<Date, ZodDateInDef, string> {
     return { status: status.value, value: date };
   }
 
-  // @todo add params
-  static create = () =>
+  static create = (check?: ZodDateInDef["refinement"], message?: string) =>
     new ZodDateIn({
       typeName: zodDateInKind,
-      refinement: (str) => isoDateRegex.test(str),
-      invalidFormatMessage: "Invalid date format",
+      refinement: check || ((str) => isoDateRegex.test(str)),
+      invalidFormatMessage: message || "Invalid date format",
     });
 }
 
@@ -94,10 +93,9 @@ export class ZodDateOut extends ZodType<string, ZodDateOutDef, Date> {
     }
   }
 
-  // @todo add params
-  static create = () =>
+  static create = (transform?: ZodDateOutDef["transformer"]) =>
     new ZodDateOut({
       typeName: zodDateOutKind,
-      transformer: (date) => date.toISOString(),
+      transformer: transform || ((date) => date.toISOString()),
     });
 }
