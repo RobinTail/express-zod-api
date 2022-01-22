@@ -88,12 +88,12 @@ paths:
                   data:
                     example:
                       name: John Doe
-                      changedAt: 2021-12-31T00:00:00.000Z
+                      createdAt: 2021-12-31T00:00:00.000Z
                     type: object
                     properties:
                       name:
                         type: string
-                      changedAt:
+                      createdAt:
                         type: string
                         format: date-time
                         description: YYYY-MM-DDTHH:mm:ss.sssZ
@@ -101,7 +101,7 @@ paths:
                           url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
                     required:
                       - name
-                      - changedAt
+                      - createdAt
                 required:
                   - status
                   - data
@@ -111,7 +111,7 @@ paths:
                     status: success
                     data:
                       name: John Doe
-                      changedAt: 2021-12-31T00:00:00.000Z
+                      createdAt: 2021-12-31T00:00:00.000Z
         "400":
           description: POST /v1/user/:id Error response
           content:

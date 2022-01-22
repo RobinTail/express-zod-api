@@ -26,11 +26,11 @@ export const updateUserEndpoint =
     output: withMeta(
       z.object({
         name: z.string(),
-        changedAt: z.dateOut(),
+        createdAt: z.dateOut(),
       })
     ).example({
       name: "John Doe",
-      changedAt: new Date("2021-12-31"),
+      createdAt: new Date("2021-12-31"),
     }),
     handler: async ({
       input: { id, name, key },
@@ -42,7 +42,7 @@ export const updateUserEndpoint =
         throw createHttpError(404, "User not found");
       }
       return {
-        changedAt: new Date("2022-01-22"),
+        createdAt: new Date("2022-01-22"),
         name,
       };
     },
