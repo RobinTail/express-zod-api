@@ -1,5 +1,6 @@
 import { ZodDate } from "zod";
-import { ZodDateIn, ZodDateOut } from "./date-io-schema";
+import { ZodDateIn } from "./date-in-schema";
+import { ZodDateOut } from "./date-out-schema";
 import { ZodFile } from "./file-schema";
 import { ZodUpload } from "./upload-schema";
 
