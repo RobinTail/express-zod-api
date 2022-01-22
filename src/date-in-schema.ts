@@ -20,8 +20,8 @@ const zodDateInKind = "ZodDateIn";
 
 export interface ZodDateInDef extends ZodTypeDef {
   typeName: typeof zodDateInKind;
-  refinement: (str: string) => boolean;
-  invalidFormatMessage: string;
+  check: (str: string) => boolean;
+  checkErrorMessage: string;
 }
 export class ZodDateIn extends ZodType<Date, ZodDateInDef, string> {
   _parse(input: ParseInput): ParseReturnType<Date> {
@@ -35,10 +35,10 @@ export class ZodDateIn extends ZodType<Date, ZodDateInDef, string> {
       return INVALID;
     }
 
-    if (!this._def.refinement(ctx.data)) {
+    if (!this._def.check(ctx.data)) {
       addIssueToContext(ctx, {
         code: ZodIssueCode.custom,
-        message: this._def.invalidFormatMessage,
+        message: this._def.checkErrorMessage,
       });
       status.dirty();
     }
@@ -55,10 +55,10 @@ export class ZodDateIn extends ZodType<Date, ZodDateInDef, string> {
     return { status: status.value, value: date };
   }
 
-  static create = (check?: ZodDateInDef["refinement"], message?: string) =>
+  static create = (check?: ZodDateInDef["check"], message?: string) =>
     new ZodDateIn({
       typeName: zodDateInKind,
-      refinement: check || ((str) => isoDateRegex.test(str)),
-      invalidFormatMessage: message || "Invalid date format",
+      check: check || ((str) => isoDateRegex.test(str)),
+      checkErrorMessage: message || "Invalid date format",
     });
 }
