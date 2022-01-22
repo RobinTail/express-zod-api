@@ -8,6 +8,7 @@ import {
   ZodType,
   ZodTypeDef,
 } from "zod";
+import { isValidDate } from "./common-helpers";
 
 // simple regex for ISO date, supports the following formats:
 // 2021-01-01T00:00:00.000Z
@@ -44,7 +45,7 @@ export class ZodDateIn extends ZodType<Date, ZodDateInDef, string> {
 
     const date = new Date(ctx.data);
 
-    if (isNaN(date.getTime())) {
+    if (!isValidDate(date)) {
       addIssueToContext(ctx, {
         code: ZodIssueCode.invalid_date,
       });

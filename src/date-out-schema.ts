@@ -8,6 +8,7 @@ import {
   ZodType,
   ZodTypeDef,
 } from "zod";
+import { isValidDate } from "./common-helpers";
 
 const zodDateOutKind = "ZodDateOut";
 
@@ -27,7 +28,7 @@ export class ZodDateOut extends ZodType<string, ZodDateOutDef, Date> {
       return INVALID;
     }
 
-    if (isNaN((ctx.data as Date).getTime())) {
+    if (!isValidDate(ctx.data)) {
       addIssueToContext(ctx, {
         code: ZodIssueCode.invalid_date,
       });
