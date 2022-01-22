@@ -64,6 +64,7 @@ describe("Example", () => {
         body: JSON.stringify({
           key: "123",
           name: "John Doe",
+          birthday: "1974-10-28",
         }),
       });
       expect(response.status).toBe(200);
@@ -203,6 +204,7 @@ describe("Example", () => {
         body: JSON.stringify({
           key: "456",
           name: "John Doe",
+          birthday: "1974-10-28",
         }),
       });
       expect(response.status).toBe(401);
@@ -225,6 +227,7 @@ describe("Example", () => {
         body: JSON.stringify({
           key: "123",
           name: "John Doe",
+          birthday: "1974-10-28",
         }),
       });
       expect(response.status).toBe(401);
@@ -247,6 +250,7 @@ describe("Example", () => {
         body: JSON.stringify({
           key: "123",
           name: "John Doe",
+          birthday: "1974-10-28",
         }),
       });
       expect(response.status).toBe(400);
@@ -264,6 +268,7 @@ describe("Example", () => {
         body: JSON.stringify({
           key: "123",
           name: "John Doe",
+          birthday: "1974-10-28",
         }),
       });
       expect(response.status).toBe(404);

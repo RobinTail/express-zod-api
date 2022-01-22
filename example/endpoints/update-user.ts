@@ -16,10 +16,12 @@ export const updateUserEndpoint =
             "should be greater than or equal to 0"
           ),
         name: z.string().nonempty(),
+        birthday: z.dateIn(),
       })
     ).example({
       id: "12",
       name: "John Doe",
+      birthday: "1963-04-21",
     }),
     output: withMeta(
       z.object({
