@@ -27,6 +27,13 @@ export class ZodDateOut extends ZodType<string, ZodDateOutDef, Date> {
       return INVALID;
     }
 
+    if (isNaN((ctx.data as Date).getTime())) {
+      addIssueToContext(ctx, {
+        code: ZodIssueCode.invalid_date,
+      });
+      return INVALID;
+    }
+
     return { status: status.value, value: (ctx.data as Date).toISOString() };
   }
 
