@@ -34,8 +34,9 @@ Object {
 
 exports[`Open API helpers depictDate() should depict ZodDate 1`] = `
 Object {
-  "description": "test",
-  "format": "date",
+  "deprecated": true,
+  "description": "z.date() is deprecated, please use z.dateIn() instead.",
+  "format": "date-time",
   "type": "string",
 }
 `;

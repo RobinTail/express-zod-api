@@ -15,7 +15,8 @@ import { isValidDate } from "./common-helpers";
 // 2021-01-01T00:00:00Z
 // 2021-01-01T00:00:00
 // 2021-01-01
-const isoDateRegex = /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d{3})?)?Z?$/;
+export const isoDateRegex =
+  /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d{3})?)?Z?$/;
 
 const zodDateInKind = "ZodDateIn";
 

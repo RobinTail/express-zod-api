@@ -1758,7 +1758,9 @@ paths:
                   type: boolean
                 date:
                   type: string
-                  format: date
+                  format: date-time
+                  deprecated: true
+                  description: z.date() is deprecated, please use z.dateIn() instead.
               required:
                 - bigint
                 - boolean
