@@ -1,10 +1,17 @@
-import { defaultEndpointsFactory, withMeta, z } from "../../src/index";
+import {
+  defaultEndpointsFactory,
+  OpenAPIError,
+  withMeta,
+  z,
+} from "../../src/index";
 import {
   depictAny,
   depictArray,
   depictBigInt,
   depictBoolean,
   depictDate,
+  depictDateIn,
+  depictDateOut,
   depictDefault,
   depictEffect,
   depictEnum,
@@ -636,6 +643,56 @@ describe("Open API helpers", () => {
           example: "test",
         })
       ).toMatchSnapshot();
+    });
+  });
+
+  describe("depictDateIn", () => {
+    test("should depict ZodDateIn", () => {
+      expect(
+        depictDateIn({
+          schema: z.dateIn(),
+          isResponse: false,
+          initial: { description: "test" },
+        })
+      ).toMatchSnapshot();
+    });
+    test("should throw when ZodDateIn in response", () => {
+      try {
+        depictDateIn({
+          schema: z.dateIn(),
+          isResponse: true,
+          initial: { description: "test" },
+        });
+        fail("should not be here");
+      } catch (e) {
+        expect(e).toBeInstanceOf(OpenAPIError);
+        expect(e).toMatchSnapshot();
+      }
+    });
+  });
+
+  describe("depictDateOut", () => {
+    test("should depict ZodDateOut", () => {
+      expect(
+        depictDateOut({
+          schema: z.dateOut(),
+          isResponse: true,
+          initial: { description: "test" },
+        })
+      ).toMatchSnapshot();
+    });
+    test("should throw when ZodDateOut in request", () => {
+      try {
+        depictDateOut({
+          schema: z.dateOut(),
+          isResponse: false,
+          initial: { description: "test" },
+        });
+        fail("should not be here");
+      } catch (e) {
+        expect(e).toBeInstanceOf(OpenAPIError);
+        expect(e).toMatchSnapshot();
+      }
     });
   });
 });
