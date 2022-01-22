@@ -1455,21 +1455,20 @@ paths:
                   data:
                     example:
                       name: John Doe
-                      timestamp: 1235698995125
+                      changedAt: 2021-12-31T00:00:00.000Z
                     type: object
                     properties:
                       name:
                         type: string
-                      timestamp:
-                        type: integer
-                        format: int64
-                        minimum: 0
-                        exclusiveMinimum: false
-                        maximum: 9007199254740991
-                        exclusiveMaximum: false
+                      changedAt:
+                        type: string
+                        format: date-time
+                        description: YYYY-MM-DDTHH:mm:ss.sssZ
+                        externalDocs:
+                          url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
                     required:
                       - name
-                      - timestamp
+                      - changedAt
                 required:
                   - status
                   - data
@@ -1479,7 +1478,7 @@ paths:
                     status: success
                     data:
                       name: John Doe
-                      timestamp: 1235698995125
+                      changedAt: 2021-12-31T00:00:00.000Z
         \\"400\\":
           description: POST /v1/user/:id Error response
           content:

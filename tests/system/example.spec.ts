@@ -72,7 +72,7 @@ describe("Example", () => {
         status: "success",
         data: {
           name: "John Doe",
-          timestamp: expect.any(Number),
+          changedAt: "2022-01-22T00:00:00.000Z",
         },
       });
       await waitFor(() => /v1\/user/.test(out));
