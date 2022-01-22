@@ -20,9 +20,8 @@ const zodDateInKind = "ZodDateIn";
 
 export interface ZodDateInDef extends ZodTypeDef {
   typeName: typeof zodDateInKind;
-  check: (str: string) => boolean;
-  checkErrorMessage: string;
 }
+
 export class ZodDateIn extends ZodType<Date, ZodDateInDef, string> {
   _parse(input: ParseInput): ParseReturnType<Date> {
     const { status, ctx } = this._processInputParams(input);
@@ -35,10 +34,10 @@ export class ZodDateIn extends ZodType<Date, ZodDateInDef, string> {
       return INVALID;
     }
 
-    if (!this._def.check(ctx.data)) {
+    if (!isoDateRegex.test(ctx.data as string)) {
       addIssueToContext(ctx, {
-        code: ZodIssueCode.custom,
-        message: this._def.checkErrorMessage,
+        code: ZodIssueCode.invalid_string,
+        validation: "regex",
       });
       status.dirty();
     }
@@ -55,10 +54,8 @@ export class ZodDateIn extends ZodType<Date, ZodDateInDef, string> {
     return { status: status.value, value: date };
   }
 
-  static create = (check?: ZodDateInDef["check"], message?: string) =>
+  static create = () =>
     new ZodDateIn({
       typeName: zodDateInKind,
-      check: check || ((str) => isoDateRegex.test(str)),
-      checkErrorMessage: message || "Invalid date format",
     });
 }

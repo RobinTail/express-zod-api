@@ -13,7 +13,6 @@ const zodDateOutKind = "ZodDateOut";
 
 export interface ZodDateOutDef extends ZodTypeDef {
   typeName: typeof zodDateOutKind;
-  transform: (date: Date) => string;
 }
 
 export class ZodDateOut extends ZodType<string, ZodDateOutDef, Date> {
@@ -28,22 +27,11 @@ export class ZodDateOut extends ZodType<string, ZodDateOutDef, Date> {
       return INVALID;
     }
 
-    try {
-      return { status: status.value, value: this._def.transform(ctx.data) };
-    } catch (e) {
-      if (e instanceof Error) {
-        addIssueToContext(ctx, {
-          code: ZodIssueCode.custom,
-          message: e.message,
-        });
-      }
-      return INVALID;
-    }
+    return { status: status.value, value: (ctx.data as Date).toISOString() };
   }
 
-  static create = (transform?: ZodDateOutDef["transform"]) =>
+  static create = () =>
     new ZodDateOut({
       typeName: zodDateOutKind,
-      transform: transform || ((date) => date.toISOString()),
     });
 }
