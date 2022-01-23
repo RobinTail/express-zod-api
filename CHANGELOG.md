@@ -2,6 +2,10 @@
 
 ## Version 5
 
+### v5.5.0
+
+- No changes.
+
 ### v5.5.0-beta1
 
 - `z.date()` is deprecated for using within IO schemas of your API.
