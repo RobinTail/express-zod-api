@@ -737,19 +737,20 @@ _See the example of the generated documentation
 
 ## Dealing with dates
 
-Dates in Javascript are one of the most troublesome entities. In addition, dates cannot be passed directly in JSON
-format. Therefore, attempting to pass dates in the endpoint response results in them being converted to an ISO string
-by calling [toJSON()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toJSON),
+Dates in Javascript are one of the most troublesome entities. In addition, `Date` cannot be passed directly in JSON
+format. Therefore, attempting return `Date` from the endpoint handler results in it being converted to an ISO string
+in actual response by calling
+[toJSON()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toJSON),
 which in turn calls
 [toISOString()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString).
-It is also impossible to get the date in its original form as the input of the endpoint or middleware, and therefore
-there is confusion with `z.date()` that should not be used within API IO schemas.
+It is also impossible to transmit the `Date` in its original form to your endpoints within JSON. Therefore, there is
+confusion with original method `z.date()` that should not be used within API IO schemas.
 
 In order to solve this problem, the library provides two custom methods for dealing with dates: `z.dateIn()` and
-`z.dateOut()` for use as the input and output accordingly.
+`z.dateOut()` for using within input and output schemas accordingly.
 
 `z.dateIn()` is a transforming schema that accepts an ISO `string` representation of a `Date`, validates it, and
-converts it to a `Date`. It supports the following formats:
+provides your endpoint handler or middleware with a `Date`. It supports the following formats:
 
 ```text
 2021-12-31T23:59:59.000Z
@@ -758,8 +759,8 @@ converts it to a `Date`. It supports the following formats:
 2021-12-31
 ```
 
-`z.dateOut()`, on the contrary, accepts a `Date` and returns a `string` representation in ISO format for the response.
-Consider the following simplified example for better understanding:
+`z.dateOut()`, on the contrary, accepts a `Date` and provides `ResultHanlder` with a `string` representation in ISO
+format for the response transmission. Consider the following simplified example for better understanding:
 
 ```typescript
 import { z, defaultEndpointsFactory } from "express-zod-api";
