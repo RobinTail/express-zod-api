@@ -1720,8 +1720,15 @@ paths:
                         nullable: true
                         type: string
                         format: \\"null\\"
+                      dateOut:
+                        type: string
+                        format: date-time
+                        description: YYYY-MM-DDTHH:mm:ss.sssZ
+                        externalDocs:
+                          url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
                     required:
                       - \\"null\\"
+                      - dateOut
                 required:
                   - status
                   - data
@@ -1768,10 +1775,18 @@ paths:
                   type: string
                   format: date-time
                   description: z.date() is deprecated, please use z.dateIn() instead.
+                dateIn:
+                  type: string
+                  format: date-time
+                  pattern: ^\\\\d{4}-\\\\d{2}-\\\\d{2}(T\\\\d{2}:\\\\d{2}:\\\\d{2}(\\\\.\\\\d{3})?)?Z?$
+                  description: YYYY-MM-DDTHH:mm:ss.sssZ
+                  externalDocs:
+                    url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
               required:
                 - bigint
                 - boolean
                 - date
+                - dateIn
 components:
   schemas: {}
   responses: {}
