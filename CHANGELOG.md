@@ -2,6 +2,42 @@
 
 ## Version 5
 
+### v5.5.0
+
+- `z.date()` is deprecated for using within IO schemas of your API.
+- Feature #297: `z.dateIn()` and `z.dateOut()` schemas.
+  - Since `Date` cannot be passed directly in JSON format, attempting to return `Date` from the endpoint handler
+    results in it being converted to an ISO `string` in actual response. It is also impossible to transmit the `Date`
+    in its original form to your endpoints within JSON. Therefore, there is confusion with original method `z.date()`.
+  - In order to solve this problem, the library provides two custom methods for dealing with dates: `z.dateIn()` and
+    `z.dateOut()` for using within input and output schemas accordingly.
+  - `z.dateIn()` is a transforming schema that accepts an ISO `string` representation of a `Date`, validates it, and
+    provides your endpoint handler or middleware with a `Date`.
+  - `z.dateOut()`, on the contrary, accepts a `Date` and provides `ResultHanlder` with a `string` representation in ISO
+    format for the response transmission.
+
+```typescript
+import { z, defaultEndpointsFactory } from "express-zod-api";
+
+const updateUserEndpoint = defaultEndpointsFactory.build({
+  method: "post",
+  input: z.object({
+    userId: z.string(),
+    birthday: z.dateIn(), // string -> Date
+  }),
+  output: z.object({
+    createdAt: z.dateOut(), // Date -> string
+  }),
+  handler: async ({ input }) => {
+    // input.birthday is Date
+    return {
+      // transmitted as "2022-01-22T00:00:00.000Z"
+      createdAt: new Date("2022-01-22"),
+    };
+  },
+});
+```
+
 ### v5.4.2
 
 - `ramda` version is 0.28.0.
