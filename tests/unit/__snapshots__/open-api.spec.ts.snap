@@ -1767,7 +1767,6 @@ paths:
                 date:
                   type: string
                   format: date-time
-                  deprecated: true
                   description: z.date() is deprecated, please use z.dateIn() instead.
               required:
                 - bigint

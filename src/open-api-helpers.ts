@@ -183,7 +183,6 @@ export const depictDate: DepictHelper<z.ZodDate> = ({
   ...initial,
   type: "string",
   format: "date-time",
-  deprecated: true,
   description: `z.date() is deprecated, please use ${
     isResponse ? "z.dateOut()" : "z.dateIn()"
   } instead.`,
