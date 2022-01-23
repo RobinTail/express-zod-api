@@ -30,19 +30,20 @@ Start your API server with I/O schema validation and custom middlewares in minut
    2. [Options](#options)
    3. [Refinements](#refinements)
    4. [Transformations](#transformations)
-   5. [Route path params](#route-path-params)
-   6. [Response customization](#response-customization)
-   7. [Non-object response](#non-object-response) including file downloads
-   8. [File uploads](#file-uploads)
-   9. [Customizing logger](#customizing-logger)
-   10. [Connect to your own express app](#connect-to-your-own-express-app)
-   11. [Multiple schemas for one route](#multiple-schemas-for-one-route)
-   12. [Serving static files](#serving-static-files)
-   13. [Customizing input sources](#customizing-input-sources)
-   14. [Enabling compression](#enabling-compression)
-   15. [Enabling HTTPS](#enabling-https)
-   16. [Informing the frontend about the API](#informing-the-frontend-about-the-api)
-   17. [Creating a documentation](#creating-a-documentation)
+   5. [Dealing with dates](#dealing-with-dates)
+   6. [Route path params](#route-path-params)
+   7. [Response customization](#response-customization)
+   8. [Non-object response](#non-object-response) including file downloads
+   9. [File uploads](#file-uploads)
+   10. [Customizing logger](#customizing-logger)
+   11. [Connect to your own express app](#connect-to-your-own-express-app)
+   12. [Multiple schemas for one route](#multiple-schemas-for-one-route)
+   13. [Serving static files](#serving-static-files)
+   14. [Customizing input sources](#customizing-input-sources)
+   15. [Enabling compression](#enabling-compression)
+   16. [Enabling HTTPS](#enabling-https)
+   17. [Informing the frontend about the API](#informing-the-frontend-about-the-api)
+   18. [Creating a documentation](#creating-a-documentation)
 5. [Additional hints](#additional-hints)
    1. [How to test endpoints](#how-to-test-endpoints)
    2. [Excessive properties in endpoint output](#excessive-properties-in-endpoint-output)
@@ -328,6 +329,55 @@ const getUserEndpoint = endpointsFactory.build({
   handler: async ({ input: { id, ids }, logger }) => {
     logger.debug("id", id); // type: number
     logger.debug("ids", ids); // type: number[]
+  },
+});
+```
+
+## Dealing with dates
+
+Dates in Javascript are one of the most troublesome entities. In addition, `Date` cannot be passed directly in JSON
+format. Therefore, attempting to return `Date` from the endpoint handler results in it being converted to an ISO string
+in actual response by calling
+[toJSON()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toJSON),
+which in turn calls
+[toISOString()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString).
+It is also impossible to transmit the `Date` in its original form to your endpoints within JSON. Therefore, there is
+confusion with original method `z.date()` that should not be used within IO schemas of your API.
+
+In order to solve this problem, the library provides two custom methods for dealing with dates: `z.dateIn()` and
+`z.dateOut()` for using within input and output schemas accordingly.
+
+`z.dateIn()` is a transforming schema that accepts an ISO `string` representation of a `Date`, validates it, and
+provides your endpoint handler or middleware with a `Date`. It supports the following formats:
+
+```text
+2021-12-31T23:59:59.000Z
+2021-12-31T23:59:59Z
+2021-12-31T23:59:59
+2021-12-31
+```
+
+`z.dateOut()`, on the contrary, accepts a `Date` and provides `ResultHanlder` with a `string` representation in ISO
+format for the response transmission. Consider the following simplified example for better understanding:
+
+```typescript
+import { z, defaultEndpointsFactory } from "express-zod-api";
+
+const updateUserEndpoint = defaultEndpointsFactory.build({
+  method: "post",
+  input: z.object({
+    userId: z.string(),
+    birthday: z.dateIn(), // string -> Date
+  }),
+  output: z.object({
+    createdAt: z.dateOut(), // Date -> string
+  }),
+  handler: async ({ input }) => {
+    // input.birthday is Date
+    return {
+      // transmitted as "2022-01-22T00:00:00.000Z"
+      createdAt: new Date("2022-01-22"),
+    };
   },
 });
 ```

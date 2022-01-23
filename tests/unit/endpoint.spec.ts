@@ -416,6 +416,21 @@ describe("Endpoint", () => {
         ...mInput2._input,
       });
     });
+
+    test("should handle z.dateIn() correctly", () => {
+      const factory = new EndpointsFactory(defaultResultHandler);
+      const endpoint = factory.build({
+        method: "get",
+        output: z.object({}),
+        input: z.object({
+          birthday: z.dateIn(),
+        }),
+        handler: jest.fn(),
+      });
+      expectType<EndpointInput<typeof endpoint>>({
+        birthday: "1984-12-31T00:00:00Z",
+      });
+    });
   });
 
   describe("EndpointOutput<>", () => {
@@ -449,6 +464,28 @@ describe("Endpoint", () => {
       expectType<EndpointResponse<typeof endpoint>>({
         status: "success",
         data: output._output,
+      });
+      expectType<EndpointResponse<typeof endpoint>>({
+        status: "error",
+        error: {
+          message: "some error",
+        },
+      });
+    });
+
+    test("should handle z.dateOut() correctly", () => {
+      const factory = new EndpointsFactory(defaultResultHandler);
+      const endpoint = factory.build({
+        method: "get",
+        input: z.object({}),
+        output: z.object({
+          birthday: z.dateOut(),
+        }),
+        handler: jest.fn(),
+      });
+      expectType<EndpointResponse<typeof endpoint>>({
+        status: "success",
+        data: { birthday: "1984-12-31T00:00:00Z" },
       });
       expectType<EndpointResponse<typeof endpoint>>({
         status: "error",

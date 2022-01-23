@@ -16,19 +16,21 @@ export const updateUserEndpoint =
             "should be greater than or equal to 0"
           ),
         name: z.string().nonempty(),
+        birthday: z.dateIn(),
       })
     ).example({
       id: "12",
       name: "John Doe",
+      birthday: "1963-04-21",
     }),
     output: withMeta(
       z.object({
         name: z.string(),
-        timestamp: z.number().int().nonnegative(),
+        createdAt: z.dateOut(),
       })
     ).example({
       name: "John Doe",
-      timestamp: 1235698995125,
+      createdAt: new Date("2021-12-31"),
     }),
     handler: async ({
       input: { id, name, key },
@@ -40,7 +42,7 @@ export const updateUserEndpoint =
         throw createHttpError(404, "User not found");
       }
       return {
-        timestamp: Date.now(),
+        createdAt: new Date("2022-01-22"),
         name,
       };
     },

@@ -34,11 +34,38 @@ Object {
 
 exports[`Open API helpers depictDate() should depict ZodDate 1`] = `
 Object {
-  "description": "test",
-  "format": "date",
+  "description": "z.date() is deprecated, please use z.dateIn() instead.",
+  "format": "date-time",
   "type": "string",
 }
 `;
+
+exports[`Open API helpers depictDateIn should depict ZodDateIn 1`] = `
+Object {
+  "description": "YYYY-MM-DDTHH:mm:ss.sssZ",
+  "externalDocs": Object {
+    "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString",
+  },
+  "format": "date-time",
+  "pattern": "^\\\\d{4}-\\\\d{2}-\\\\d{2}(T\\\\d{2}:\\\\d{2}:\\\\d{2}(\\\\.\\\\d{3})?)?Z?$",
+  "type": "string",
+}
+`;
+
+exports[`Open API helpers depictDateIn should throw when ZodDateIn in response 1`] = `[Error: Please use z.dateOut() for output.]`;
+
+exports[`Open API helpers depictDateOut should depict ZodDateOut 1`] = `
+Object {
+  "description": "YYYY-MM-DDTHH:mm:ss.sssZ",
+  "externalDocs": Object {
+    "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString",
+  },
+  "format": "date-time",
+  "type": "string",
+}
+`;
+
+exports[`Open API helpers depictDateOut should throw when ZodDateOut in request 1`] = `[Error: Please use z.dateIn() for input.]`;
 
 exports[`Open API helpers depictDefault() should depict ZodDefault 1`] = `
 Object {

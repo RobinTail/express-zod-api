@@ -20,6 +20,8 @@ import {
   routePathParamsRegex,
 } from "./common-helpers";
 import { InputSources } from "./config-type";
+import { isoDateRegex, ZodDateIn, ZodDateInDef } from "./date-in-schema";
+import { ZodDateOut, ZodDateOutDef } from "./date-out-schema";
 import { AbstractEndpoint } from "./endpoint";
 import { OpenAPIError } from "./errors";
 import { ZodFile, ZodFileDef } from "./file-schema";
@@ -37,7 +39,11 @@ type DepictHelper<T extends z.ZodType<any>> = (params: {
 
 type DepictingRules = Partial<
   Record<
-    z.ZodFirstPartyTypeKind | ZodFileDef["typeName"] | ZodUploadDef["typeName"],
+    | z.ZodFirstPartyTypeKind
+    | ZodFileDef["typeName"]
+    | ZodUploadDef["typeName"]
+    | ZodDateInDef["typeName"]
+    | ZodDateOutDef["typeName"],
     DepictHelper<any>
   >
 >;
@@ -47,6 +53,9 @@ interface ReqResDepictHelperCommonProps {
   path: string;
   endpoint: AbstractEndpoint;
 }
+
+const isoDateDocumentationUrl =
+  "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString";
 
 /* eslint-disable @typescript-eslint/no-use-before-define */
 
@@ -166,11 +175,55 @@ export const depictNull: DepictHelper<z.ZodNull> = ({ initial }) => ({
   format: "null",
 });
 
-export const depictDate: DepictHelper<z.ZodDate> = ({ initial }) => ({
+/** @todo remove in next major update */
+export const depictDate: DepictHelper<z.ZodDate> = ({
+  initial,
+  isResponse,
+}) => ({
   ...initial,
   type: "string",
-  format: "date",
+  format: "date-time",
+  description: `z.date() is deprecated, please use ${
+    isResponse ? "z.dateOut()" : "z.dateIn()"
+  } instead.`,
 });
+
+export const depictDateIn: DepictHelper<ZodDateIn> = ({
+  initial,
+  isResponse,
+}) => {
+  if (isResponse) {
+    throw new OpenAPIError("Please use z.dateOut() for output.");
+  }
+  return {
+    ...initial,
+    type: "string",
+    format: "date-time",
+    pattern: isoDateRegex.source,
+    description: "YYYY-MM-DDTHH:mm:ss.sssZ",
+    externalDocs: {
+      url: isoDateDocumentationUrl,
+    },
+  };
+};
+
+export const depictDateOut: DepictHelper<ZodDateOut> = ({
+  initial,
+  isResponse,
+}) => {
+  if (!isResponse) {
+    throw new OpenAPIError("Please use z.dateIn() for input.");
+  }
+  return {
+    ...initial,
+    type: "string",
+    format: "date-time",
+    description: "YYYY-MM-DDTHH:mm:ss.sssZ",
+    externalDocs: {
+      url: isoDateDocumentationUrl,
+    },
+  };
+};
 
 export const depictBoolean: DepictHelper<z.ZodBoolean> = ({ initial }) => ({
   ...initial,
@@ -505,7 +558,10 @@ const depictHelpers: DepictingRules = {
   ZodNumber: depictNumber,
   ZodBigInt: depictBigInt,
   ZodBoolean: depictBoolean,
+  /** @todo remove in next major update */
   ZodDate: depictDate,
+  ZodDateIn: depictDateIn,
+  ZodDateOut: depictDateOut,
   ZodNull: depictNull,
   ZodArray: depictArray,
   ZodTuple: depictTuple,

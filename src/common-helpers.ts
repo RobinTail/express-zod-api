@@ -161,6 +161,10 @@ export function isLoggerConfig(logger: any): logger is LoggerConfig {
   );
 }
 
+export function isValidDate(date: Date): boolean {
+  return !isNaN(date.getTime());
+}
+
 export function getMessageFromError(error: Error): string {
   if (error instanceof z.ZodError) {
     return error.issues

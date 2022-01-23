@@ -206,12 +206,15 @@ describe("Open API generator", () => {
                 bigint: z.bigint(),
                 boolean: z.boolean(),
                 date: z.date(),
+                dateIn: z.dateIn(),
               }),
               output: z.object({
                 null: z.null(),
+                dateOut: z.dateOut(),
               }),
               handler: async () => ({
                 null: null,
+                dateOut: new Date("2021-12-31"),
               }),
             }),
           },
