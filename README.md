@@ -336,7 +336,7 @@ const getUserEndpoint = endpointsFactory.build({
 ## Dealing with dates
 
 Dates in Javascript are one of the most troublesome entities. In addition, `Date` cannot be passed directly in JSON
-format. Therefore, attempting return `Date` from the endpoint handler results in it being converted to an ISO string
+format. Therefore, attempting to return `Date` from the endpoint handler results in it being converted to an ISO string
 in actual response by calling
 [toJSON()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toJSON),
 which in turn calls
