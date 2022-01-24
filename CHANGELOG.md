@@ -2,6 +2,10 @@
 
 ## Version 5
 
+### v5.5.1
+
+- In this version, the OpenAPI documentation generator throws an error when using `z.upload()` within response schema.
+
 ### v5.5.0
 
 - No changes.
