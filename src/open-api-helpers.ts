@@ -79,11 +79,19 @@ export const depictAny: DepictHelper<z.ZodAny> = ({ initial }) => ({
   format: "any",
 });
 
-export const depictUpload: DepictHelper<ZodUpload> = ({ initial }) => ({
-  ...initial,
-  type: "string",
-  format: "binary",
-});
+export const depictUpload: DepictHelper<ZodUpload> = ({
+  initial,
+  isResponse,
+}) => {
+  if (isResponse) {
+    throw new OpenAPIError("Please use z.upload() only for input.");
+  }
+  return {
+    ...initial,
+    type: "string",
+    format: "binary",
+  };
+};
 
 export const depictFile: DepictHelper<ZodFile> = ({
   schema: { isBinary, isBase64 },

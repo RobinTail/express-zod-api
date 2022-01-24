@@ -130,6 +130,19 @@ describe("Open API helpers", () => {
         })
       ).toMatchSnapshot();
     });
+    test("should throw when using in response", () => {
+      try {
+        depictUpload({
+          schema: z.upload(),
+          isResponse: true,
+          initial: { description: "test" },
+        });
+        fail("Should not be here");
+      } catch (e) {
+        expect(e).toBeInstanceOf(OpenAPIError);
+        expect(e).toMatchSnapshot();
+      }
+    });
   });
 
   describe("depictFile()", () => {
