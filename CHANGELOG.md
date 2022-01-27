@@ -2,6 +2,10 @@
 
 ## Version 5
 
+### v5.5.2
+
+- `winston` version is 3.5.0.
+
 ### v5.5.1
 
 - In this version, the OpenAPI documentation generator throws an error when using `z.upload()` within response schema.
