@@ -96,6 +96,7 @@
     "type": "git",
     "url": "https://github.com/RobinTail/express-zod-api.git"
   },
+  "homepage": "https://ez.robintail.cz",
   "author": {
     "name": "Anna Bocharova",
     "url": "https://robintail.cz",
