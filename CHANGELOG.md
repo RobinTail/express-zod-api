@@ -2,6 +2,14 @@
 
 ## Version 5
 
+### v5.5.3
+
+- `winston` version is 3.5.1.
+- I made a website for the library available on following domains:
+  - [https://ez.robintail.cz](https://ez.robintail.cz) and
+  - [https://express-zod-api.vercel.app](https://express-zod-api.vercel.app).
+  - Currently, it provides the documentation for each release in a way I find more suitable.
+
 ### v5.5.2
 
 - `winston` version is 3.5.0.
