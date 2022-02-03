@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { Request, RequestHandler, Response } from "express";
 import { Logger } from "winston";
 import { createMiddleware, EndpointsFactory, z } from "../../src";
 import { Endpoint } from "../../src/endpoint";
@@ -84,6 +84,72 @@ describe("EndpointsFactory", () => {
         option2: "other value",
       });
       expect(newFactory["resultHandler"]).toStrictEqual(resultHandlerMock);
+    });
+  });
+
+  describe(".addExpressMiddleware()", () => {
+    test("Should create a new factory with a native express middleware wrapper", async () => {
+      const resultHandlerMock = { handler: jest.fn() };
+      const factory = new EndpointsFactory(
+        resultHandlerMock as unknown as ResultHandlerDefinition<any, any>
+      );
+      const middleware: RequestHandler = jest.fn((req, res, next) => {
+        req.body.test = "Here is the test";
+        next();
+      });
+      const newFactory = factory.addExpressMiddleware(middleware, (req) => ({
+        result: req.body.test,
+      }));
+      expect(newFactory["middlewares"].length).toBe(1);
+      expect(newFactory["middlewares"][0].input).toBeInstanceOf(z.ZodObject);
+      expect(newFactory["middlewares"][0].input.shape).toEqual({});
+      const requestMock = { body: { something: "awesome" } } as Request;
+      const responseMock = {} as Response;
+      const options = await newFactory["middlewares"][0].middleware({
+        input: {},
+        options: {},
+        request: requestMock,
+        response: responseMock,
+        logger: {} as Logger,
+      });
+      expect(middleware).toHaveBeenCalledTimes(1);
+      expect(middleware).toHaveBeenCalledWith(
+        requestMock,
+        responseMock,
+        expect.any(Function)
+      );
+      expect(requestMock.body).toHaveProperty("test");
+      expect(requestMock.body.test).toBe("Here is the test");
+      expect(options).toEqual({ result: "Here is the test" });
+    });
+
+    test("Should handle errors", async () => {
+      const resultHandlerMock = { handler: jest.fn() };
+      const factory = new EndpointsFactory(
+        resultHandlerMock as unknown as ResultHandlerDefinition<any, any>
+      );
+      const middleware: RequestHandler = jest.fn((req, res, next) => {
+        next(new Error("This one has failed"));
+      });
+      const newFactory = factory.addExpressMiddleware(middleware, (req) => ({
+        result: req.body.test,
+      }));
+      try {
+        await newFactory["middlewares"][0].middleware({
+          input: {},
+          options: {},
+          request: {} as Request,
+          response: {} as Response,
+          logger: {} as Logger,
+        });
+        fail("Should not be here");
+      } catch (e) {
+        expect(middleware).toHaveBeenCalledTimes(1);
+        expect(e).toBeInstanceOf(Error);
+        if (e instanceof Error) {
+          expect(e.message).toBe("This one has failed");
+        }
+      }
     });
   });
 
