@@ -1,8 +1,10 @@
 import { Request, Response } from "express";
+import { HttpError } from "http-errors";
 import { z } from "zod";
 import { ApiResponse } from "./api-response";
 import { Endpoint, Handler } from "./endpoint";
 import { FlatObject, IOSchema, hasUpload, Merge } from "./common-helpers";
+import { createHttpError } from "./index";
 import { Method, MethodsDefinition } from "./method";
 import { createMiddleware, MiddlewareDefinition } from "./middleware";
 import { mimeJson, mimeMultipart } from "./mime";
@@ -80,8 +82,18 @@ export class EndpointsFactory<
           middleware: async ({ request, response }) => {
             await new Promise<null>((resolve, reject) => {
               const next = (err?: any) => {
+                // @todo How can I simplify it? or should I delegate it to the user?
                 if (err && err instanceof Error) {
-                  reject(err);
+                  if ("status" in err || "statusCode" in err) {
+                    return reject(
+                      createHttpError(
+                        (err as HttpError).status ||
+                          (err as HttpError).statusCode,
+                        (err as Error).message
+                      )
+                    );
+                  }
+                  return reject(err);
                 }
                 resolve(null);
               };

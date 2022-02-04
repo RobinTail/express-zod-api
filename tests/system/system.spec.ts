@@ -1,3 +1,4 @@
+import { auth } from "express-oauth2-jwt-bearer";
 import http from "http";
 import fetch from "node-fetch";
 import {
@@ -17,6 +18,24 @@ describe("App", () => {
   beforeAll(() => {
     const routing = {
       v1: {
+        protected: new EndpointsFactory(defaultResultHandler)
+          .addExpressMiddleware(
+            auth({
+              issuerBaseURL: "https://sample.com",
+              audience: "https://example.com",
+            }),
+            (req) => ({
+              result: req.auth,
+            })
+          )
+          .build({
+            method: "get",
+            input: z.object({}),
+            output: z.object({ auth: z.any() }),
+            handler: async ({ options }) => ({
+              auth: options.result,
+            }),
+          }),
         faulty: new EndpointsFactory(
           createResultHandler({
             getPositiveResponse: () => createApiResponse(z.object({})),
@@ -207,6 +226,21 @@ describe("App", () => {
       expect(text).toBe(
         "An error occurred while serving the result: I am faulty."
       );
+    });
+
+    test("Should invalidate unauthorized request to the protected endpoint", async () => {
+      const response = await fetch("http://127.0.0.1:8055/v1/protected", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      expect(response.status).toBe(401);
+      const json = await response.json();
+      expect(json).toEqual({
+        status: "error",
+        error: { message: "Unauthorized" },
+      });
     });
   });
 
