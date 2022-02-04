@@ -71,22 +71,23 @@ export class EndpointsFactory<
       response: S,
       next: (error?: any) => void
     ) => void | Promise<void>,
-    provider: (request: R, response: S) => OUT
+    provider: (request: R, response: S) => OUT | Promise<OUT>
   ) {
     return EndpointsFactory.#create<MwIN, MwOUT & OUT, POS, NEG>(
       this.middlewares.concat(
         createMiddleware({
           input: z.object({}),
           middleware: async ({ request, response }) => {
-            return new Promise<OUT>((resolve, reject) => {
+            await new Promise<null>((resolve, reject) => {
               const next = (err?: any) => {
                 if (err && err instanceof Error) {
                   reject(err);
                 }
-                resolve(provider(request as R, response as S));
+                resolve(null);
               };
               middleware(request as R, response as S, next);
             });
+            return provider(request as R, response as S);
           },
         })
       ),
