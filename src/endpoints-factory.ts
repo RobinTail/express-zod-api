@@ -1,4 +1,4 @@
-import { RequestHandler, NextFunction } from "express";
+import { Request, Response } from "express";
 import { z } from "zod";
 import { ApiResponse } from "./api-response";
 import { Endpoint, Handler } from "./endpoint";
@@ -61,9 +61,17 @@ export class EndpointsFactory<
     );
   }
 
-  public addExpressMiddleware<M extends RequestHandler, OUT extends FlatObject>(
-    middleware: M,
-    provider: (request: Parameters<M>[0], response: Parameters<M>[1]) => OUT
+  public addExpressMiddleware<
+    R extends Request,
+    S extends Response,
+    OUT extends FlatObject
+  >(
+    middleware: (
+      request: R,
+      response: S,
+      next: (error?: any) => void
+    ) => void | Promise<void>,
+    provider: (request: R, response: S) => OUT
   ) {
     return EndpointsFactory.#create<MwIN, MwOUT & OUT, POS, NEG>(
       this.middlewares.concat(
@@ -71,13 +79,13 @@ export class EndpointsFactory<
           input: z.object({}),
           middleware: async ({ request, response }) => {
             return new Promise<OUT>((resolve, reject) => {
-              const next: NextFunction = (err) => {
+              const next = (err?: any) => {
                 if (err && err instanceof Error) {
                   reject(err);
                 }
-                resolve(provider(request, response));
+                resolve(provider(request as R, response as S));
               };
-              middleware(request, response, next);
+              middleware(request as R, response as S, next);
             });
           },
         })
