@@ -2,6 +2,10 @@
 
 ## Version 5
 
+### v5.5.4
+
+- `express-fileupload` version is 1.3.1.
+
 ### v5.5.3
 
 - `winston` version is 3.5.1.
