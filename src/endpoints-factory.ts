@@ -84,16 +84,15 @@ export class EndpointsFactory<
               const next = (err?: any) => {
                 // @todo How can I simplify it? or should I delegate it to the user?
                 if (err && err instanceof Error) {
-                  if ("status" in err || "statusCode" in err) {
-                    return reject(
-                      createHttpError(
-                        (err as HttpError).status ||
-                          (err as HttpError).statusCode,
-                        (err as Error).message
-                      )
-                    );
-                  }
-                  return reject(err);
+                  return reject(
+                    "status" in err || "statusCode" in err
+                      ? createHttpError(
+                          (err as HttpError).status ||
+                            (err as HttpError).statusCode,
+                          (err as Error).message
+                        )
+                      : err
+                  );
                 }
                 resolve(null);
               };
