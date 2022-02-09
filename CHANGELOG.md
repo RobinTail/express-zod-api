@@ -2,6 +2,10 @@
 
 ## Version 5
 
+### v5.5.5
+
+- `winston-transport` version is 4.5.0.
+
 ### v5.5.4
 
 - `express-fileupload` version is 1.3.1.
