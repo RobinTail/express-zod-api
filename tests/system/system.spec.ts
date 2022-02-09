@@ -1,4 +1,4 @@
-import { auth } from "express-oauth2-jwt-bearer";
+import cors from "cors";
 import http from "http";
 import fetch from "node-fetch";
 import {
@@ -18,22 +18,22 @@ describe("App", () => {
   beforeAll(() => {
     const routing = {
       v1: {
-        protected: new EndpointsFactory(defaultResultHandler)
+        corsed: new EndpointsFactory(defaultResultHandler)
           .addExpressMiddleware(
-            auth({
-              issuerBaseURL: "https://sample.com",
-              audience: "https://example.com",
+            cors({
+              credentials: true,
+              exposedHeaders: ["Content-Range", "X-Content-Range"],
             }),
-            (req) => ({
-              result: req.auth,
+            () => ({
+              corsDone: true,
             })
           )
           .build({
             method: "get",
             input: z.object({}),
-            output: z.object({ auth: z.any() }),
+            output: z.object({ corsDone: z.boolean() }),
             handler: async ({ options }) => ({
-              auth: options.result,
+              corsDone: options.corsDone,
             }),
           }),
         faulty: new EndpointsFactory(
@@ -102,7 +102,7 @@ describe("App", () => {
           listen: 8055,
           compression: { threshold: 1 },
         },
-        cors: true,
+        cors: false,
         startupLogo: true,
         logger: {
           level: "silent",
@@ -211,6 +211,24 @@ describe("App", () => {
       expect("status" in json).toBeTruthy();
       expect(json.status).toBe("success");
     });
+
+    test("Should execute native express middleware", async () => {
+      const response = await fetch("http://127.0.0.1:8055/v1/corsed", {
+        method: "GET",
+      });
+      expect(response.status).toBe(200);
+      const json = await response.json();
+      expect(json).toEqual({
+        status: "success",
+        data: { corsDone: true },
+      });
+      expect(response.headers.get("Access-Control-Allow-Credentials")).toBe(
+        "true"
+      );
+      expect(response.headers.get("Access-Control-Expose-Headers")).toBe(
+        "Content-Range,X-Content-Range"
+      );
+    });
   });
 
   describe("Negative", () => {
@@ -226,21 +244,6 @@ describe("App", () => {
       expect(text).toBe(
         "An error occurred while serving the result: I am faulty."
       );
-    });
-
-    test("Should invalidate unauthorized request to the protected endpoint", async () => {
-      const response = await fetch("http://127.0.0.1:8055/v1/protected", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      expect(response.status).toBe(401);
-      const json = await response.json();
-      expect(json).toEqual({
-        status: "error",
-        error: { message: "Unauthorized" },
-      });
     });
   });
 
