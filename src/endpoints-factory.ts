@@ -65,15 +65,19 @@ export class EndpointsFactory<
     R extends Request,
     S extends Response,
     OUT extends FlatObject = {}
-  >(
+  >({
+    middleware,
+    optionsProvider,
+    errorTransformer,
+  }: {
     middleware: (
       request: R,
       response: S,
       next: (error?: any) => void
-    ) => void | Promise<void>,
-    optionsProvider?: (request: R, response: S) => OUT | Promise<OUT>,
-    errorTransformer?: (err: Error) => Error
-  ) {
+    ) => void | Promise<void>;
+    optionsProvider?: (request: R, response: S) => OUT | Promise<OUT>;
+    errorTransformer?: (err: Error) => Error;
+  }) {
     return EndpointsFactory.#create<MwIN, MwOUT & OUT, POS, NEG>(
       this.middlewares.concat(
         createMiddleware({

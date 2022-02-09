@@ -97,9 +97,12 @@ describe("EndpointsFactory", () => {
         req.body.test = "Here is the test";
         next();
       });
-      const newFactory = factory.addExpressMiddleware(middleware, (req) => ({
-        result: req.body.test,
-      }));
+      const newFactory = factory.addExpressMiddleware({
+        middleware,
+        optionsProvider: (req) => ({
+          result: req.body.test,
+        }),
+      });
       expect(newFactory["middlewares"].length).toBe(1);
       expect(newFactory["middlewares"][0].input).toBeInstanceOf(z.ZodObject);
       expect(newFactory["middlewares"][0].input.shape).toEqual({});
@@ -131,9 +134,12 @@ describe("EndpointsFactory", () => {
       const middleware: RequestHandler = jest.fn((req, res, next) => {
         next(new Error("This one has failed"));
       });
-      const newFactory = factory.addExpressMiddleware(middleware, (req) => ({
-        result: req.body.test,
-      }));
+      const newFactory = factory.addExpressMiddleware({
+        middleware,
+        optionsProvider: (req) => ({
+          result: req.body.test,
+        }),
+      });
       try {
         await newFactory["middlewares"][0].middleware({
           input: {},
