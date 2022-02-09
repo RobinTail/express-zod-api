@@ -1,10 +1,8 @@
 import { Request, Response } from "express";
-import { HttpError } from "http-errors";
 import { z } from "zod";
 import { ApiResponse } from "./api-response";
 import { Endpoint, Handler } from "./endpoint";
 import { FlatObject, IOSchema, hasUpload, Merge } from "./common-helpers";
-import { createHttpError } from "./index";
 import { Method, MethodsDefinition } from "./method";
 import { createMiddleware, MiddlewareDefinition } from "./middleware";
 import { mimeJson, mimeMultipart } from "./mime";
@@ -66,14 +64,15 @@ export class EndpointsFactory<
   public addExpressMiddleware<
     R extends Request,
     S extends Response,
-    OUT extends FlatObject
+    OUT extends FlatObject = {}
   >(
     middleware: (
       request: R,
       response: S,
       next: (error?: any) => void
     ) => void | Promise<void>,
-    provider: (request: R, response: S) => OUT | Promise<OUT>
+    optionsProvider?: (request: R, response: S) => OUT | Promise<OUT>,
+    errorTransformer?: (err: Error) => Error
   ) {
     return EndpointsFactory.#create<MwIN, MwOUT & OUT, POS, NEG>(
       this.middlewares.concat(
@@ -82,23 +81,16 @@ export class EndpointsFactory<
           middleware: async ({ request, response }) => {
             await new Promise<null>((resolve, reject) => {
               const next = (err?: any) => {
-                // @todo How can I simplify it? or should I delegate it to the user?
                 if (err && err instanceof Error) {
-                  return reject(
-                    "status" in err || "statusCode" in err
-                      ? createHttpError(
-                          (err as HttpError).status ||
-                            (err as HttpError).statusCode,
-                          (err as Error).message
-                        )
-                      : err
-                  );
+                  return reject(errorTransformer ? errorTransformer(err) : err);
                 }
                 resolve(null);
               };
               middleware(request as R, response as S, next);
             });
-            return provider(request as R, response as S);
+            return optionsProvider
+              ? optionsProvider(request as R, response as S)
+              : {};
           },
         })
       ),
