@@ -4,7 +4,11 @@ import { ApiResponse } from "./api-response";
 import { Endpoint, Handler } from "./endpoint";
 import { FlatObject, IOSchema, hasUpload, Merge } from "./common-helpers";
 import { Method, MethodsDefinition } from "./method";
-import { createMiddleware, MiddlewareDefinition } from "./middleware";
+import {
+  createMiddleware,
+  ExpressMiddleware,
+  MiddlewareDefinition,
+} from "./middleware";
 import { mimeJson, mimeMultipart } from "./mime";
 import {
   defaultResultHandler,
@@ -70,11 +74,7 @@ export class EndpointsFactory<
     optionsProvider,
     errorTransformer,
   }: {
-    middleware: (
-      request: R,
-      response: S,
-      next: (error?: any) => void
-    ) => void | Promise<void>;
+    middleware: ExpressMiddleware<R, S>;
     optionsProvider?: (request: R, response: S) => OUT | Promise<OUT>;
     errorTransformer?: (err: Error) => Error;
   }) {

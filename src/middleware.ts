@@ -31,3 +31,9 @@ export const createMiddleware = <
 >(
   definition: MiddlewareDefinition<IN, OPT, OUT>
 ) => definition;
+
+export type ExpressMiddleware<R extends Request, S extends Response> = (
+  request: R,
+  response: S,
+  next: (error?: any) => void
+) => void | Promise<void>;
