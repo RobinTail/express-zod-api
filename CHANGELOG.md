@@ -9,7 +9,8 @@
   - You can connect any middleware that has a regular express middleware signature
     `(req, res, next) => void | Promise<void>` and can be supplied to `app.use()`.
   - You can also specify a provider of options for endpoint handlers and next middlewares.
-  - You can also specify an error transformer so that the result handler sends the status you need.
+  - You can also specify an error transformer so that the `ResultHandler` would send the status you need.
+    - In case the error is not a `HttpError`, the `ResultHandler` will send the status `500`.
 
 ```typescript
 import { defaultEndpointsFactory, createHttpError } from "express-zod-api";
