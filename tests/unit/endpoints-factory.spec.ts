@@ -126,6 +126,38 @@ describe("EndpointsFactory", () => {
       expect(options).toEqual({ result: "Here is the test" });
     });
 
+    test("Should operate without options provider", async () => {
+      const resultHandlerMock = { handler: jest.fn() };
+      const factory = new EndpointsFactory(
+        resultHandlerMock as unknown as ResultHandlerDefinition<any, any>
+      );
+      const middleware: RequestHandler = jest.fn((req, res, next) => {
+        req.body.test = "Here is the test";
+        next();
+      });
+      const newFactory = factory.addExpressMiddleware({ middleware });
+      expect(newFactory["middlewares"].length).toBe(1);
+      const requestMock = { body: { something: "awesome" } } as Request;
+      const responseMock = {} as Response;
+      const options = await newFactory["middlewares"][0].middleware({
+        input: {},
+        options: {},
+        request: requestMock,
+        response: responseMock,
+        logger: {} as Logger,
+      });
+      expect(middleware).toHaveBeenCalledTimes(1);
+      expect(middleware).toHaveBeenCalledWith(
+        requestMock,
+        responseMock,
+        expect.any(Function)
+      );
+      expect(requestMock.body).toHaveProperty("test");
+      expect(requestMock.body.test).toBe("Here is the test");
+      expect(options).toEqual({});
+      expectType<{}>(options);
+    });
+
     test("Should handle errors", async () => {
       const resultHandlerMock = { handler: jest.fn() };
       const factory = new EndpointsFactory(

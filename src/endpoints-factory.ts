@@ -80,20 +80,20 @@ export class EndpointsFactory<
   }) {
     const definition = createMiddleware({
       input: z.object({}),
-      middleware: async ({ request, response }) => {
-        await new Promise<null>((resolve, reject) => {
+      middleware: async ({ request, response }) =>
+        new Promise<OUT>((resolve, reject) => {
           const next = (err?: any) => {
             if (err && err instanceof Error) {
               return reject(errorTransformer ? errorTransformer(err) : err);
             }
-            resolve(null);
+            resolve(
+              optionsProvider
+                ? optionsProvider(request as R, response as S)
+                : ({} as OUT)
+            );
           };
           middleware(request as R, response as S, next);
-        });
-        return optionsProvider
-          ? optionsProvider(request as R, response as S)
-          : {};
-      },
+        }),
     });
     return EndpointsFactory.#create<MwIN, MwOUT & OUT, POS, NEG>(
       this.middlewares.concat(definition),
