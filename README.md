@@ -28,22 +28,23 @@ Start your API server with I/O schema validation and custom middlewares in minut
 4. [Fascinating features](#fascinating-features)
    1. [Middlewares](#middlewares)
    2. [Options](#options)
-   3. [Refinements](#refinements)
-   4. [Transformations](#transformations)
-   5. [Dealing with dates](#dealing-with-dates)
-   6. [Route path params](#route-path-params)
-   7. [Response customization](#response-customization)
-   8. [Non-object response](#non-object-response) including file downloads
-   9. [File uploads](#file-uploads)
-   10. [Customizing logger](#customizing-logger)
-   11. [Connect to your own express app](#connect-to-your-own-express-app)
-   12. [Multiple schemas for one route](#multiple-schemas-for-one-route)
-   13. [Serving static files](#serving-static-files)
-   14. [Customizing input sources](#customizing-input-sources)
-   15. [Enabling compression](#enabling-compression)
-   16. [Enabling HTTPS](#enabling-https)
-   17. [Informing the frontend about the API](#informing-the-frontend-about-the-api)
-   18. [Creating a documentation](#creating-a-documentation)
+   3. [Using native express middlewares](#using-native-express-middlewares)
+   4. [Refinements](#refinements)
+   5. [Transformations](#transformations)
+   6. [Dealing with dates](#dealing-with-dates)
+   7. [Route path params](#route-path-params)
+   8. [Response customization](#response-customization)
+   9. [Non-object response](#non-object-response) including file downloads
+   10. [File uploads](#file-uploads)
+   11. [Customizing logger](#customizing-logger)
+   12. [Connect to your own express app](#connect-to-your-own-express-app)
+   13. [Multiple schemas for one route](#multiple-schemas-for-one-route)
+   14. [Serving static files](#serving-static-files)
+   15. [Customizing input sources](#customizing-input-sources)
+   16. [Enabling compression](#enabling-compression)
+   17. [Enabling HTTPS](#enabling-https)
+   18. [Informing the frontend about the API](#informing-the-frontend-about-the-api)
+   19. [Creating a documentation](#creating-a-documentation)
 5. [Additional hints](#additional-hints)
    1. [How to test endpoints](#how-to-test-endpoints)
    2. [Excessive properties in endpoint output](#excessive-properties-in-endpoint-output)
@@ -282,6 +283,28 @@ import { defaultEndpointsFactory } from "express-zod-api";
 const endpointsFactory = defaultEndpointsFactory.addOptions({
   db: mongoose.connect("mongodb://connection.string"),
   privateKey: fs.readFileSync("private-key.pem", "utf-8"),
+});
+```
+
+## Using native express middlewares
+
+You can connect any native `express` middleware that can be supplied to `express` method `app.use()`.
+For this purpose the `EndpointsFactory` provides method `addExpressMiddleware()` and its alias `use()`.
+There are also two optional features available: a provider of options and an error transformer for `ResultHandler`.
+In case the error in middleware is not a `HttpError`, the `ResultHandler` will send the status `500`.
+
+```typescript
+import { defaultEndpointsFactory, createHttpError } from "express-zod-api";
+import cors from "cors";
+import { auth } from "express-oauth2-jwt-bearer";
+
+const simpleUsage = defaultEndpointsFactory.addExpressMiddleware(
+  cors({ credentials: true })
+);
+
+const advancedUsage = defaultEndpointsFactory.use(auth(), {
+  provider: (req) => ({ auth: req.auth }), // optional, can be async
+  transformer: (err) => createHttpError(401, err.message), // optional
 });
 ```
 
