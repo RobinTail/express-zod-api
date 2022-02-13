@@ -22,7 +22,7 @@ const simpleUsage = defaultEndpointsFactory.addExpressMiddleware(
 );
 
 const advancedUsage = defaultEndpointsFactory.addExpressMiddleware(auth(), {
-  provider: (req) => ({ auth: req.auth }), // optional
+  provider: (req) => ({ auth: req.auth }), // optional, can be async
   transformer: (err) => createHttpError(401, err.message), // optional
 });
 ```
