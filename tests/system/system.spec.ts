@@ -19,13 +19,15 @@ describe("App", () => {
     const routing = {
       v1: {
         corsed: new EndpointsFactory(defaultResultHandler)
-          .addExpressMiddleware({
-            middleware: cors({
+          .addExpressMiddleware(
+            cors({
               credentials: true,
               exposedHeaders: ["Content-Range", "X-Content-Range"],
             }),
-            optionsProvider: () => ({ corsDone: true }),
-          })
+            {
+              provider: () => ({ corsDone: true }),
+            }
+          )
           .build({
             method: "get",
             input: z.object({}),

@@ -1,4 +1,5 @@
 import { Request, RequestHandler, Response } from "express";
+import createHttpError, { HttpError } from "http-errors";
 import { Logger } from "winston";
 import { createMiddleware, EndpointsFactory, z } from "../../src";
 import { Endpoint } from "../../src/endpoint";
@@ -97,9 +98,8 @@ describe("EndpointsFactory", () => {
         req.body.test = "Here is the test";
         next();
       });
-      const newFactory = factory.addExpressMiddleware({
-        middleware,
-        optionsProvider: (req) => ({
+      const newFactory = factory.addExpressMiddleware(middleware, {
+        provider: (req) => ({
           result: req.body.test,
         }),
       });
@@ -135,7 +135,7 @@ describe("EndpointsFactory", () => {
         req.body.test = "Here is the test";
         next();
       });
-      const newFactory = factory.addExpressMiddleware({ middleware });
+      const newFactory = factory.addExpressMiddleware(middleware);
       expect(newFactory["middlewares"].length).toBe(1);
       const requestMock = { body: { something: "awesome" } } as Request;
       const responseMock = {} as Response;
@@ -166,11 +166,8 @@ describe("EndpointsFactory", () => {
       const middleware: RequestHandler = jest.fn((req, res, next) => {
         next(new Error("This one has failed"));
       });
-      const newFactory = factory.addExpressMiddleware({
-        middleware,
-        optionsProvider: (req) => ({
-          result: req.body.test,
-        }),
+      const newFactory = factory.addExpressMiddleware(middleware, {
+        transformer: (err) => createHttpError(401, err.message),
       });
       try {
         await newFactory["middlewares"][0].middleware({
@@ -183,8 +180,9 @@ describe("EndpointsFactory", () => {
         fail("Should not be here");
       } catch (e) {
         expect(middleware).toHaveBeenCalledTimes(1);
-        expect(e).toBeInstanceOf(Error);
-        if (e instanceof Error) {
+        expect(e).toBeInstanceOf(HttpError);
+        if (e instanceof HttpError) {
+          expect(e.status).toBe(401);
           expect(e.message).toBe("This one has failed");
         }
       }

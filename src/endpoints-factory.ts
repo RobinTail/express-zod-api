@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { HttpError } from "http-errors";
 import { z } from "zod";
 import { ApiResponse } from "./api-response";
 import { Endpoint, Handler } from "./endpoint";
@@ -69,26 +70,28 @@ export class EndpointsFactory<
     R extends Request,
     S extends Response,
     OUT extends FlatObject = {}
-  >({
-    middleware,
-    optionsProvider,
-    errorTransformer,
-  }: {
-    middleware: ExpressMiddleware<R, S>;
-    optionsProvider?: (request: R, response: S) => OUT | Promise<OUT>;
-    errorTransformer?: (err: Error) => Error;
-  }) {
+  >(
+    middleware: ExpressMiddleware<R, S>,
+    features?: {
+      provider?: (request: R, response: S) => OUT | Promise<OUT>;
+      transformer?: (err: Error) => HttpError | Error;
+    }
+  ) {
     const definition = createMiddleware({
       input: z.object({}),
       middleware: async ({ request, response }) =>
         new Promise<OUT>((resolve, reject) => {
           const next = (err?: any) => {
             if (err && err instanceof Error) {
-              return reject(errorTransformer ? errorTransformer(err) : err);
+              return reject(
+                features && features.transformer
+                  ? features.transformer(err)
+                  : err
+              );
             }
             resolve(
-              optionsProvider
-                ? optionsProvider(request as R, response as S)
+              features && features.provider
+                ? features.provider(request as R, response as S)
                 : ({} as OUT)
             );
           };
