@@ -2,6 +2,10 @@
 
 ## Version 5
 
+### v5.5.6
+
+- `winston` version is 3.6.0.
+
 ### v5.5.5
 
 - `winston-transport` version is 4.5.0.
