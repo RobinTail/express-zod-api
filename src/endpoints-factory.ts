@@ -66,6 +66,8 @@ export class EndpointsFactory<
     );
   }
 
+  public use = this.addExpressMiddleware;
+
   public addExpressMiddleware<
     R extends Request,
     S extends Response,

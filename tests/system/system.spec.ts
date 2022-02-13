@@ -19,7 +19,7 @@ describe("App", () => {
     const routing = {
       v1: {
         corsed: new EndpointsFactory(defaultResultHandler)
-          .addExpressMiddleware(
+          .use(
             cors({
               credentials: true,
               exposedHeaders: ["Content-Range", "X-Content-Range"],

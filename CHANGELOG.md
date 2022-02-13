@@ -4,7 +4,7 @@
 
 ### v5.6.0
 
-- Feature #311. `EndpointsFactory::addExpressMiddleware()`.
+- Feature #311. `EndpointsFactory::addExpressMiddleware()` or its alias `use()`.
   - A method to connect a native (regular) `express` middleware to your endpoint(s).
   - You can connect any middleware that has a regular express middleware signature
     `(req, res, next) => void | Promise<void>` and can be supplied to `app.use()`.
@@ -21,7 +21,7 @@ const simpleUsage = defaultEndpointsFactory.addExpressMiddleware(
   cors({ credentials: true })
 );
 
-const advancedUsage = defaultEndpointsFactory.addExpressMiddleware(auth(), {
+const advancedUsage = defaultEndpointsFactory.use(auth(), {
   provider: (req) => ({ auth: req.auth }), // optional, can be async
   transformer: (err) => createHttpError(401, err.message), // optional
 });
