@@ -77,23 +77,17 @@ export class EndpointsFactory<
       transformer?: (err: Error) => HttpError | Error;
     }
   ) {
+    const transformer = features?.transformer || ((err: Error) => err);
+    const provider = features?.provider || (() => ({} as OUT));
     const definition = createMiddleware({
       input: z.object({}),
       middleware: async ({ request, response }) =>
         new Promise<OUT>((resolve, reject) => {
           const next = (err?: any) => {
             if (err && err instanceof Error) {
-              return reject(
-                features && features.transformer
-                  ? features.transformer(err)
-                  : err
-              );
+              return reject(transformer(err));
             }
-            resolve(
-              features && features.provider
-                ? features.provider(request as R, response as S)
-                : ({} as OUT)
-            );
+            resolve(provider(request as R, response as S));
           };
           middleware(request as R, response as S, next);
         }),

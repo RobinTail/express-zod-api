@@ -166,6 +166,33 @@ describe("EndpointsFactory", () => {
       const middleware: RequestHandler = jest.fn((req, res, next) => {
         next(new Error("This one has failed"));
       });
+      const newFactory = factory.addExpressMiddleware(middleware);
+      try {
+        await newFactory["middlewares"][0].middleware({
+          input: {},
+          options: {},
+          request: {} as Request,
+          response: {} as Response,
+          logger: {} as Logger,
+        });
+        fail("Should not be here");
+      } catch (e) {
+        expect(middleware).toHaveBeenCalledTimes(1);
+        expect(e).toBeInstanceOf(Error);
+        if (e instanceof Error) {
+          expect(e.message).toBe("This one has failed");
+        }
+      }
+    });
+
+    test("Should transform errors", async () => {
+      const resultHandlerMock = { handler: jest.fn() };
+      const factory = new EndpointsFactory(
+        resultHandlerMock as unknown as ResultHandlerDefinition<any, any>
+      );
+      const middleware: RequestHandler = jest.fn((req, res, next) => {
+        next(new Error("This one has failed"));
+      });
       const newFactory = factory.addExpressMiddleware(middleware, {
         transformer: (err) => createHttpError(401, err.message),
       });
