@@ -78,26 +78,25 @@ export class EndpointsFactory<
     optionsProvider?: (request: R, response: S) => OUT | Promise<OUT>;
     errorTransformer?: (err: Error) => Error;
   }) {
+    const definition = createMiddleware({
+      input: z.object({}),
+      middleware: async ({ request, response }) => {
+        await new Promise<null>((resolve, reject) => {
+          const next = (err?: any) => {
+            if (err && err instanceof Error) {
+              return reject(errorTransformer ? errorTransformer(err) : err);
+            }
+            resolve(null);
+          };
+          middleware(request as R, response as S, next);
+        });
+        return optionsProvider
+          ? optionsProvider(request as R, response as S)
+          : {};
+      },
+    });
     return EndpointsFactory.#create<MwIN, MwOUT & OUT, POS, NEG>(
-      this.middlewares.concat(
-        createMiddleware({
-          input: z.object({}),
-          middleware: async ({ request, response }) => {
-            await new Promise<null>((resolve, reject) => {
-              const next = (err?: any) => {
-                if (err && err instanceof Error) {
-                  return reject(errorTransformer ? errorTransformer(err) : err);
-                }
-                resolve(null);
-              };
-              middleware(request as R, response as S, next);
-            });
-            return optionsProvider
-              ? optionsProvider(request as R, response as S)
-              : {};
-          },
-        })
-      ),
+      this.middlewares.concat(definition),
       this.resultHandler
     );
   }
