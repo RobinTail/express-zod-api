@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { HttpError } from "http-errors";
 import { Logger } from "winston";
 import { z } from "zod";
 import { FlatObject, IOSchema } from "./common-helpers";
@@ -37,3 +38,12 @@ export type ExpressMiddleware<R extends Request, S extends Response> = (
   response: S,
   next: (error?: any) => void
 ) => void | Promise<void>;
+
+export interface ExpressMiddlewareFeatures<
+  R extends Request,
+  S extends Response,
+  OUT extends FlatObject
+> {
+  provider?: (request: R, response: S) => OUT | Promise<OUT>;
+  transformer?: (err: Error) => HttpError | Error;
+}

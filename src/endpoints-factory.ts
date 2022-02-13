@@ -1,5 +1,4 @@
 import { Request, Response } from "express";
-import { HttpError } from "http-errors";
 import { z } from "zod";
 import { ApiResponse } from "./api-response";
 import { Endpoint, Handler } from "./endpoint";
@@ -8,6 +7,7 @@ import { Method, MethodsDefinition } from "./method";
 import {
   createMiddleware,
   ExpressMiddleware,
+  ExpressMiddlewareFeatures,
   MiddlewareDefinition,
 } from "./middleware";
 import { mimeJson, mimeMultipart } from "./mime";
@@ -72,10 +72,7 @@ export class EndpointsFactory<
     OUT extends FlatObject = {}
   >(
     middleware: ExpressMiddleware<R, S>,
-    features?: {
-      provider?: (request: R, response: S) => OUT | Promise<OUT>;
-      transformer?: (err: Error) => HttpError | Error;
-    }
+    features?: ExpressMiddlewareFeatures<R, S, OUT>
   ) {
     const transformer = features?.transformer || ((err: Error) => err);
     const provider = features?.provider || (() => ({} as OUT));
