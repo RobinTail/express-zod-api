@@ -2,6 +2,31 @@
 
 ## Version 5
 
+### v5.6.0
+
+- Feature #311. `EndpointsFactory::addExpressMiddleware()` or its alias `use()`.
+  - A method to connect a native (regular) `express` middleware to your endpoint(s).
+  - You can connect any middleware that has a regular express middleware signature
+    `(req, res, next) => void | Promise<void>` and can be supplied to `app.use()`.
+  - You can also specify a provider of options for endpoint handlers and next middlewares.
+  - You can also specify an error transformer so that the `ResultHandler` would send the status you need.
+    - In case the error is not a `HttpError`, the `ResultHandler` will send the status `500`.
+
+```typescript
+import { defaultEndpointsFactory, createHttpError } from "express-zod-api";
+import cors from "cors";
+import { auth } from "express-oauth2-jwt-bearer";
+
+const simpleUsage = defaultEndpointsFactory.addExpressMiddleware(
+  cors({ credentials: true })
+);
+
+const advancedUsage = defaultEndpointsFactory.use(auth(), {
+  provider: (req) => ({ auth: req.auth }), // optional, can be async
+  transformer: (err) => createHttpError(401, err.message), // optional
+});
+```
+
 ### v5.5.6
 
 - `winston` version is 3.6.0.

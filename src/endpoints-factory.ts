@@ -1,9 +1,15 @@
+import { Request, Response } from "express";
 import { z } from "zod";
 import { ApiResponse } from "./api-response";
 import { Endpoint, Handler } from "./endpoint";
 import { FlatObject, IOSchema, hasUpload, Merge } from "./common-helpers";
 import { Method, MethodsDefinition } from "./method";
-import { createMiddleware, MiddlewareDefinition } from "./middleware";
+import {
+  createMiddleware,
+  ExpressMiddleware,
+  ExpressMiddlewareFeatures,
+  MiddlewareDefinition,
+} from "./middleware";
 import { mimeJson, mimeMultipart } from "./mime";
 import {
   defaultResultHandler,
@@ -55,6 +61,37 @@ export class EndpointsFactory<
     definition: MiddlewareDefinition<IN, MwOUT, OUT>
   ) {
     return EndpointsFactory.#create<Merge<IN, MwIN>, MwOUT & OUT, POS, NEG>(
+      this.middlewares.concat(definition),
+      this.resultHandler
+    );
+  }
+
+  public use = this.addExpressMiddleware;
+
+  public addExpressMiddleware<
+    R extends Request,
+    S extends Response,
+    OUT extends FlatObject = {}
+  >(
+    middleware: ExpressMiddleware<R, S>,
+    features?: ExpressMiddlewareFeatures<R, S, OUT>
+  ) {
+    const transformer = features?.transformer || ((err: Error) => err);
+    const provider = features?.provider || (() => ({} as OUT));
+    const definition = createMiddleware({
+      input: z.object({}),
+      middleware: async ({ request, response }) =>
+        new Promise<OUT>((resolve, reject) => {
+          const next = (err?: any) => {
+            if (err && err instanceof Error) {
+              return reject(transformer(err));
+            }
+            resolve(provider(request as R, response as S));
+          };
+          middleware(request as R, response as S, next);
+        }),
+    });
+    return EndpointsFactory.#create<MwIN, MwOUT & OUT, POS, NEG>(
       this.middlewares.concat(definition),
       this.resultHandler
     );
