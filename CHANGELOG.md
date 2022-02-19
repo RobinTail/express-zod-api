@@ -2,6 +2,11 @@
 
 ## Version 5
 
+### v5.6.1
+
+- `express` version is 4.17.3.
+- `openapi3-ts` version is 2.0.2.
+
 ### v5.6.0
 
 - Feature #311. `EndpointsFactory::addExpressMiddleware()` or its alias `use()`.
