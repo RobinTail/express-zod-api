@@ -39,7 +39,7 @@ Object {
 exports[`App Validation Should fail on handler output type mismatch 1`] = `
 Object {
   "error": Object {
-    "message": "output: Invalid format; anything: Value should be greater than 0",
+    "message": "output: Invalid format; anything: Number must be greater than 0",
   },
   "status": "error",
 }
