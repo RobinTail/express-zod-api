@@ -115,6 +115,31 @@ export const depictUnion: DepictHelper<
   oneOf: options.map((option) => depictSchema({ schema: option, isResponse })),
 });
 
+export const depictDiscriminatedUnion: DepictHelper<
+  z.ZodDiscriminatedUnion<string, z.Primitive, z.ZodObject<any>>
+> = ({
+  schema: {
+    _def: { options, discriminator },
+  },
+  initial,
+  isResponse,
+}) => ({
+  ...initial,
+  type: "object",
+  properties: {
+    [discriminator]: {
+      type: "string",
+    },
+  },
+  required: [discriminator],
+  discriminator: {
+    propertyName: discriminator,
+  },
+  oneOf: Array.from(options.values()).map((option) =>
+    depictSchema({ schema: option, isResponse })
+  ),
+});
+
 export const depictIntersection: DepictHelper<
   z.ZodIntersection<z.ZodTypeAny, z.ZodTypeAny>
 > = ({
@@ -587,6 +612,7 @@ const depictHelpers: DepictingRules = {
   ZodEffects: depictEffect,
   ZodOptional: depictOptionalOrNullable,
   ZodNullable: depictOptionalOrNullable,
+  ZodDiscriminatedUnion: depictDiscriminatedUnion,
 };
 
 export const depictSchema: DepictHelper<z.ZodTypeAny> = ({
