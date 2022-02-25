@@ -1024,6 +1024,155 @@ servers:
 "
 `;
 
+exports[`Open API generator generateOpenApi() should generate the correct schema for discriminated union type 1`] = `
+"openapi: 3.0.0
+info:
+  title: Testing Discriminated Union Type
+  version: 3.4.5
+paths:
+  /v1/getSomething:
+    post:
+      responses:
+        \\"200\\":
+          description: POST /v1/getSomething Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - success
+                  data:
+                    type: object
+                    properties:
+                      switch:
+                        type: object
+                        properties:
+                          status:
+                            type: string
+                        required:
+                          - status
+                        discriminator:
+                          propertyName: status
+                        oneOf:
+                          - type: object
+                            properties:
+                              status:
+                                type: string
+                                enum:
+                                  - success
+                              data:
+                                nullable: true
+                                format: any
+                            required:
+                              - status
+                          - type: object
+                            properties:
+                              status:
+                                type: string
+                                enum:
+                                  - error
+                              error:
+                                type: object
+                                properties:
+                                  message:
+                                    type: string
+                                required:
+                                  - message
+                            required:
+                              - status
+                              - error
+                    required:
+                      - switch
+                required:
+                  - status
+                  - data
+        \\"400\\":
+          description: POST /v1/getSomething Error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                required:
+                  - status
+                  - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
+      requestBody:
+        content:
+          application/json:
+            schema:
+              description: POST /v1/getSomething request body
+              type: object
+              properties:
+                switch:
+                  type: object
+                  properties:
+                    type:
+                      type: string
+                  required:
+                    - type
+                  discriminator:
+                    propertyName: type
+                  oneOf:
+                    - type: object
+                      properties:
+                        type:
+                          type: string
+                          enum:
+                            - a
+                        a:
+                          type: string
+                      required:
+                        - type
+                        - a
+                    - type: object
+                      properties:
+                        type:
+                          type: string
+                          enum:
+                            - b
+                        b:
+                          type: string
+                      required:
+                        - type
+                        - b
+              required:
+                - switch
+components:
+  schemas: {}
+  responses: {}
+  parameters: {}
+  examples: {}
+  requestBodies: {}
+  headers: {}
+  securitySchemes: {}
+  links: {}
+  callbacks: {}
+tags: []
+servers:
+  - url: http://example.com
+"
+`;
+
 exports[`Open API generator generateOpenApi() should generate the correct schema for intersection type 1`] = `
 "openapi: 3.0.0
 info:
