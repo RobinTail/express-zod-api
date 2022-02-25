@@ -31,6 +31,7 @@ import {
   depictString,
   depictTuple,
   depictUnion,
+  depictDiscriminatedUnion,
   depictUpload,
   excludeExampleFromDepiction,
   excludeParamsFromDepiction,
@@ -162,6 +163,24 @@ describe("Open API helpers", () => {
       expect(
         depictUnion({
           schema: z.string().or(z.number()),
+          isResponse: false,
+          initial: { description: "test" },
+        })
+      ).toMatchSnapshot();
+    });
+  });
+
+  describe("depictDiscriminatedUnion()", () => {
+    test("should depict ZodDiscriminatedUnion", () => {
+      expect(
+        depictDiscriminatedUnion({
+          schema: z.discriminatedUnion("status", [
+            z.object({ status: z.literal("success"), data: z.any() }),
+            z.object({
+              status: z.literal("error"),
+              error: z.object({ message: z.string() }),
+            }),
+          ]),
           isResponse: false,
           initial: { description: "test" },
         })
