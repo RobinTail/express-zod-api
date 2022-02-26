@@ -1048,15 +1048,6 @@ paths:
                     type: object
                     properties:
                       switch:
-                        type: object
-                        properties:
-                          status:
-                            type: string
-                            enum:
-                              - success
-                              - error
-                        required:
-                          - status
                         discriminator:
                           propertyName: status
                         oneOf:
@@ -1127,15 +1118,6 @@ paths:
               type: object
               properties:
                 switch:
-                  type: object
-                  properties:
-                    type:
-                      type: string
-                      enum:
-                        - a
-                        - b
-                  required:
-                    - type
                   discriminator:
                     propertyName: type
                   oneOf:

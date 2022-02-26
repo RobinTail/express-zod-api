@@ -127,19 +127,6 @@ Object {
       "type": "object",
     },
   ],
-  "properties": Object {
-    "status": Object {
-      "enum": Array [
-        "success",
-        "error",
-      ],
-      "type": "string",
-    },
-  },
-  "required": Array [
-    "status",
-  ],
-  "type": "object",
 }
 `;
 

@@ -111,35 +111,9 @@ export const depictUnion: DepictHelper<
 
 export const depictDiscriminatedUnion: DepictHelper<
   z.ZodDiscriminatedUnion<string, z.Primitive, z.ZodObject<any>>
-> = ({
-  schema: { validDiscriminatorValues, options, discriminator },
-  initial,
-  isResponse,
-}) => {
-  const valueType: SchemaObject["type"] =
-    typeof validDiscriminatorValues[0] === "string"
-      ? "string"
-      : typeof validDiscriminatorValues[0] === "number"
-      ? "number"
-      : typeof validDiscriminatorValues[0] === "bigint"
-      ? "integer"
-      : typeof validDiscriminatorValues[0] === "boolean"
-      ? "boolean"
-      : undefined;
-
+> = ({ schema: { options, discriminator }, initial, isResponse }) => {
   return {
     ...initial,
-    type: "object",
-    properties: {
-      [discriminator]: {
-        ...(validDiscriminatorValues.includes(null)
-          ? { nullable: true, type: "string" }
-          : {}),
-        ...(valueType ? { type: valueType } : {}),
-        enum: validDiscriminatorValues,
-      },
-    },
-    required: [discriminator],
     discriminator: {
       propertyName: discriminator,
     },
