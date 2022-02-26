@@ -113,6 +113,7 @@ export function combineEndpointAndMiddlewareInputSchemas<
   return result;
 }
 
+// @todo substr replace .substr() with an alternative
 function areFilesAvailable(request: Request) {
   const contentType = request.header("content-type") || "";
   const isMultipart =
