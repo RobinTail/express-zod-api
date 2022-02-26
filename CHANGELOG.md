@@ -2,6 +2,11 @@
 
 ## Version 5
 
+### v5.7.0
+
+- `zod` version is 3.12.0.
+  - There is a new schema `z.discriminatedUnion()` and various fixes.
+
 ### v5.6.1
 
 - `express` version is 4.17.3.
