@@ -115,23 +115,39 @@ export const depictDiscriminatedUnion: DepictHelper<
   schema: { validDiscriminatorValues, options, discriminator },
   initial,
   isResponse,
-}) => ({
-  ...initial,
-  type: "object",
-  properties: {
-    [discriminator]: {
-      type: "string",
-      enum: validDiscriminatorValues,
+}) => {
+  const valueType: SchemaObject["type"] =
+    typeof validDiscriminatorValues[0] === "string"
+      ? "string"
+      : typeof validDiscriminatorValues[0] === "number"
+      ? "number"
+      : typeof validDiscriminatorValues[0] === "bigint"
+      ? "integer"
+      : typeof validDiscriminatorValues[0] === "boolean"
+      ? "boolean"
+      : undefined;
+
+  return {
+    ...initial,
+    type: "object",
+    properties: {
+      [discriminator]: {
+        ...(validDiscriminatorValues.includes(null)
+          ? { nullable: true, type: "string" }
+          : {}),
+        ...(valueType ? { type: valueType } : {}),
+        enum: validDiscriminatorValues,
+      },
     },
-  },
-  required: [discriminator],
-  discriminator: {
-    propertyName: discriminator,
-  },
-  oneOf: Array.from(options.values()).map((option) =>
-    depictSchema({ schema: option, isResponse })
-  ),
-});
+    required: [discriminator],
+    discriminator: {
+      propertyName: discriminator,
+    },
+    oneOf: Array.from(options.values()).map((option) =>
+      depictSchema({ schema: option, isResponse })
+    ),
+  };
+};
 
 export const depictIntersection: DepictHelper<
   z.ZodIntersection<z.ZodTypeAny, z.ZodTypeAny>
