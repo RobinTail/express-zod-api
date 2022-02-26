@@ -1052,6 +1052,9 @@ paths:
                         properties:
                           status:
                             type: string
+                            enum:
+                              - success
+                              - error
                         required:
                           - status
                         discriminator:
@@ -1128,6 +1131,9 @@ paths:
                   properties:
                     type:
                       type: string
+                      enum:
+                        - a
+                        - b
                   required:
                     - type
                   discriminator:

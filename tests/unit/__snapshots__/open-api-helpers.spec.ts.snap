@@ -129,6 +129,10 @@ Object {
   ],
   "properties": Object {
     "status": Object {
+      "enum": Array [
+        "success",
+        "error",
+      ],
       "type": "string",
     },
   },
