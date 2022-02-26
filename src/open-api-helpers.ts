@@ -104,16 +104,24 @@ export const depictFile: DepictHelper<ZodFile> = ({
 
 export const depictUnion: DepictHelper<
   z.ZodUnion<[z.ZodTypeAny, ...z.ZodTypeAny[]]>
-> = ({
-  schema: {
-    _def: { options },
-  },
-  initial,
-  isResponse,
-}) => ({
+> = ({ schema: { options }, initial, isResponse }) => ({
   ...initial,
   oneOf: options.map((option) => depictSchema({ schema: option, isResponse })),
 });
+
+export const depictDiscriminatedUnion: DepictHelper<
+  z.ZodDiscriminatedUnion<string, z.Primitive, z.ZodObject<any>>
+> = ({ schema: { options, discriminator }, initial, isResponse }) => {
+  return {
+    ...initial,
+    discriminator: {
+      propertyName: discriminator,
+    },
+    oneOf: Array.from(options.values()).map((option) =>
+      depictSchema({ schema: option, isResponse })
+    ),
+  };
+};
 
 export const depictIntersection: DepictHelper<
   z.ZodIntersection<z.ZodTypeAny, z.ZodTypeAny>
@@ -587,6 +595,7 @@ const depictHelpers: DepictingRules = {
   ZodEffects: depictEffect,
   ZodOptional: depictOptionalOrNullable,
   ZodNullable: depictOptionalOrNullable,
+  ZodDiscriminatedUnion: depictDiscriminatedUnion,
 };
 
 export const depictSchema: DepictHelper<z.ZodTypeAny> = ({

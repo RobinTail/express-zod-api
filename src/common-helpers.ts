@@ -25,6 +25,7 @@ type Extractable =
 type UnionSchema = z.ZodUnion<[ObjectSchema, ...ObjectSchema[]]>;
 type IntersectionSchema = z.ZodIntersection<ObjectSchema, ObjectSchema>;
 
+// @todo should support DiscriminatedUnion too
 export type IOSchema = ObjectSchema | UnionSchema | IntersectionSchema;
 
 export type ArrayElement<T extends readonly unknown[]> =
@@ -112,6 +113,7 @@ export function combineEndpointAndMiddlewareInputSchemas<
   return result;
 }
 
+// @todo substr replace .substr() with an alternative
 function areFilesAvailable(request: Request) {
   const contentType = request.header("content-type") || "";
   const isMultipart =

@@ -75,6 +75,61 @@ Object {
 }
 `;
 
+exports[`Open API helpers depictDiscriminatedUnion() should depict ZodDiscriminatedUnion 1`] = `
+Object {
+  "description": "test",
+  "discriminator": Object {
+    "propertyName": "status",
+  },
+  "oneOf": Array [
+    Object {
+      "properties": Object {
+        "data": Object {
+          "format": "any",
+          "nullable": true,
+        },
+        "status": Object {
+          "enum": Array [
+            "success",
+          ],
+          "type": "string",
+        },
+      },
+      "required": Array [
+        "status",
+      ],
+      "type": "object",
+    },
+    Object {
+      "properties": Object {
+        "error": Object {
+          "properties": Object {
+            "message": Object {
+              "type": "string",
+            },
+          },
+          "required": Array [
+            "message",
+          ],
+          "type": "object",
+        },
+        "status": Object {
+          "enum": Array [
+            "error",
+          ],
+          "type": "string",
+        },
+      },
+      "required": Array [
+        "status",
+        "error",
+      ],
+      "type": "object",
+    },
+  ],
+}
+`;
+
 exports[`Open API helpers depictEffect() should depict ZodEffects preprocess in case of request 1`] = `
 Object {
   "format": "string (preprocessed)",
