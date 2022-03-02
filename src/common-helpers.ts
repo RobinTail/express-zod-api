@@ -9,55 +9,28 @@ import {
 } from "./config-type";
 import { copyMeta, getMeta } from "./metadata";
 import { Method } from "./method";
-import { MiddlewareDefinition } from "./middleware";
 import { mimeMultipart } from "./mime";
 import { ZodUpload } from "./upload-schema";
 
 export type FlatObject = Record<string, any>;
 
 type ObjectSchema = z.AnyZodObject;
-type Extractable =
-  | "shape"
-  | "_unknownKeys"
-  | "_catchall"
-  | "_output"
-  | "_input";
-type UnionSchema = z.ZodUnion<[ObjectSchema, ...ObjectSchema[]]>;
-type IntersectionSchema = z.ZodIntersection<ObjectSchema, ObjectSchema>;
+type UnionSchema = z.ZodUnion<[IOSchema, ...IOSchema[]]>;
+type IntersectionSchema = z.ZodIntersection<IOSchema, IOSchema>;
+type DiscUnionSchema = z.ZodDiscriminatedUnion<
+  string,
+  z.Primitive,
+  ObjectSchema
+>;
 
-// @todo should support DiscriminatedUnion too
-export type IOSchema = ObjectSchema | UnionSchema | IntersectionSchema;
+export type IOSchema =
+  | ObjectSchema
+  | UnionSchema
+  | IntersectionSchema
+  | DiscUnionSchema;
 
 export type ArrayElement<T extends readonly unknown[]> =
   T extends readonly (infer K)[] ? K : never;
-
-type UnionResult<
-  T extends ObjectSchema[],
-  F extends Extractable
-> = ArrayElement<T>[F];
-type IntersectionResult<
-  T extends IntersectionSchema,
-  F extends Extractable
-> = T["_def"]["left"][F] & T["_def"]["right"][F];
-
-type IOExtract<
-  T extends IOSchema | any,
-  F extends Extractable
-> = T extends ObjectSchema
-  ? T[F]
-  : T extends UnionSchema
-  ? UnionResult<T["options"], F>
-  : T extends IntersectionSchema
-  ? IntersectionResult<T, F>
-  : unknown;
-
-export type Merge<A extends IOSchema, B extends IOSchema | any> = z.ZodObject<
-  IOExtract<A, "shape"> & IOExtract<B, "shape">,
-  IOExtract<A, "_unknownKeys">,
-  IOExtract<A, "_catchall">,
-  IOExtract<A, "_output"> & IOExtract<B, "_output">,
-  IOExtract<A, "_input"> & IOExtract<B, "_input">
->;
 
 export type OutputMarker = IOSchema & { _typeGuard: "OutputMarker" };
 export const markOutput = (output: IOSchema) => output as OutputMarker;
@@ -72,45 +45,29 @@ export type ReplaceMarkerInShape<
   [K in keyof S]: S[K] extends OutputMarker ? OUT : S[K];
 };
 
+// @todo can we get rid of it as well?
 export function extractObjectSchema(subject: IOSchema): ObjectSchema {
   if (subject instanceof z.ZodObject) {
     return subject;
   }
   let objectSchema: ObjectSchema;
-  if (subject instanceof z.ZodUnion) {
-    objectSchema = subject.options.reduce((acc, option) =>
-      acc.partial().merge(option.partial())
-    );
+  if (
+    subject instanceof z.ZodUnion ||
+    subject instanceof z.ZodDiscriminatedUnion
+  ) {
+    objectSchema = Array.from(subject.options.values())
+      .map((option) => extractObjectSchema(option))
+      .reduce(
+        (acc, option) => acc.partial().merge(option.partial()),
+        z.object({})
+      );
   } else {
     // intersection schema
-    objectSchema = subject._def.left.merge(subject._def.right);
+    objectSchema = extractObjectSchema(subject._def.left).merge(
+      extractObjectSchema(subject._def.right)
+    );
   }
   return copyMeta(subject, objectSchema);
-}
-
-export function combineEndpointAndMiddlewareInputSchemas<
-  IN extends IOSchema,
-  MwIN
->(
-  input: IN,
-  middlewares: MiddlewareDefinition<IOSchema, any, any>[]
-): Merge<IN, MwIN> {
-  if (middlewares.length === 0) {
-    return extractObjectSchema(input) as Merge<IN, MwIN>;
-  }
-  const mSchema = middlewares
-    .map((middleware) => middleware.input)
-    .reduce((carry, schema) =>
-      extractObjectSchema(carry).merge(extractObjectSchema(schema))
-    );
-  const result = extractObjectSchema(mSchema).merge(
-    extractObjectSchema(input)
-  ) as Merge<IN, MwIN>;
-  for (const middleware of middlewares) {
-    copyMeta(middleware.input, result);
-  }
-  copyMeta(input, result);
-  return result;
 }
 
 function areFilesAvailable(request: Request) {

@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
 import { z } from "zod";
 import { ApiResponse } from "./api-response";
+import { FlatObject, hasUpload, IOSchema } from "./common-helpers";
 import { Endpoint, Handler } from "./endpoint";
-import { FlatObject, IOSchema, hasUpload, Merge } from "./common-helpers";
 import { Method, MethodsDefinition } from "./method";
 import {
   createMiddleware,
@@ -16,54 +16,55 @@ import {
   ResultHandlerDefinition,
 } from "./result-handler";
 
+const initialInput = z.object({});
+type AnyMiddlewareDef = MiddlewareDefinition<any, any, any>;
+
 type BuildProps<
   IN extends IOSchema,
   OUT extends IOSchema,
-  MwIN,
-  MwOUT,
+  MIN extends IOSchema,
+  OPT extends FlatObject,
   M extends Method
 > = {
   input: IN;
   output: OUT;
-  handler: Handler<z.output<Merge<IN, MwIN>>, z.input<OUT>, MwOUT>;
+  handler: Handler<z.output<z.ZodIntersection<MIN, IN>>, z.input<OUT>, OPT>;
   description?: string;
 } & MethodsDefinition<M>;
 
 export class EndpointsFactory<
-  MwIN,
-  MwOUT,
   POS extends ApiResponse,
-  NEG extends ApiResponse
+  NEG extends ApiResponse,
+  IN extends IOSchema = typeof initialInput,
+  OUT extends FlatObject = {}
 > {
-  protected middlewares: MiddlewareDefinition<any, any, any>[] = [];
+  protected middlewares: AnyMiddlewareDef[] = [];
 
-  constructor(protected resultHandler: ResultHandlerDefinition<POS, NEG>) {
-    this.resultHandler = resultHandler;
-  }
+  constructor(protected resultHandler: ResultHandlerDefinition<POS, NEG>) {}
 
   static #create<
-    CrMwIN,
-    CrMwOUT,
-    CrPOS extends ApiResponse,
-    CrNEG extends ApiResponse
+    CPOS extends ApiResponse,
+    CNEG extends ApiResponse,
+    CIN extends IOSchema,
+    COUT extends FlatObject
   >(
-    middlewares: MiddlewareDefinition<any, any, any>[],
-    resultHandler: ResultHandlerDefinition<CrPOS, CrNEG>
+    middlewares: AnyMiddlewareDef[],
+    resultHandler: ResultHandlerDefinition<CPOS, CNEG>
   ) {
-    const factory = new EndpointsFactory<CrMwIN, CrMwOUT, CrPOS, CrNEG>(
-      resultHandler
-    );
+    const factory = new EndpointsFactory<CPOS, CNEG, CIN, COUT>(resultHandler);
     factory.middlewares = middlewares;
     return factory;
   }
 
-  public addMiddleware<IN extends IOSchema, OUT extends FlatObject>(
-    definition: MiddlewareDefinition<IN, MwOUT, OUT>
+  public addMiddleware<AIN extends IOSchema, AOUT extends FlatObject>(
+    definition: MiddlewareDefinition<AIN, OUT, AOUT>
   ) {
-    return EndpointsFactory.#create<Merge<IN, MwIN>, MwOUT & OUT, POS, NEG>(
-      this.middlewares.concat(definition),
-      this.resultHandler
-    );
+    return EndpointsFactory.#create<
+      POS,
+      NEG,
+      z.ZodIntersection<IN, AIN>,
+      OUT & AOUT
+    >(this.middlewares.concat(definition), this.resultHandler);
   }
 
   public use = this.addExpressMiddleware;
@@ -71,17 +72,17 @@ export class EndpointsFactory<
   public addExpressMiddleware<
     R extends Request,
     S extends Response,
-    OUT extends FlatObject = {}
+    AOUT extends FlatObject = {}
   >(
     middleware: ExpressMiddleware<R, S>,
-    features?: ExpressMiddlewareFeatures<R, S, OUT>
+    features?: ExpressMiddlewareFeatures<R, S, AOUT>
   ) {
     const transformer = features?.transformer || ((err: Error) => err);
-    const provider = features?.provider || (() => ({} as OUT));
+    const provider = features?.provider || (() => ({} as AOUT));
     const definition = createMiddleware({
       input: z.object({}),
       middleware: async ({ request, response }) =>
-        new Promise<OUT>((resolve, reject) => {
+        new Promise<AOUT>((resolve, reject) => {
           const next = (err?: any) => {
             if (err && err instanceof Error) {
               return reject(transformer(err));
@@ -91,14 +92,14 @@ export class EndpointsFactory<
           middleware(request as R, response as S, next);
         }),
     });
-    return EndpointsFactory.#create<MwIN, MwOUT & OUT, POS, NEG>(
+    return EndpointsFactory.#create<POS, NEG, IN, OUT & AOUT>(
       this.middlewares.concat(definition),
       this.resultHandler
     );
   }
 
-  public addOptions<OUT extends FlatObject>(options: OUT) {
-    return EndpointsFactory.#create<MwIN, MwOUT & OUT, POS, NEG>(
+  public addOptions<AOUT extends FlatObject>(options: AOUT) {
+    return EndpointsFactory.#create<POS, NEG, IN, OUT & AOUT>(
       this.middlewares.concat(
         createMiddleware({
           input: z.object({}),
@@ -109,18 +110,20 @@ export class EndpointsFactory<
     );
   }
 
-  public build<IN extends IOSchema, OUT extends IOSchema, M extends Method>({
+  public build<BIN extends IOSchema, BOUT extends IOSchema, M extends Method>({
     input,
     output,
     handler,
     description,
     ...rest
-  }: BuildProps<IN, OUT, MwIN, MwOUT, M>) {
-    return new Endpoint<IN, OUT, MwIN, MwOUT, M, POS, NEG>({
+  }: BuildProps<BIN, BOUT, IN, OUT, M>) {
+    return new Endpoint<z.ZodIntersection<IN, BIN>, BOUT, OUT, M, POS, NEG>({
       handler,
       description,
       middlewares: this.middlewares,
-      inputSchema: input,
+      inputSchema: this.middlewares
+        .map(({ input: schema }) => schema)
+        .reduce((acc, schema) => acc.and(schema), initialInput),
       outputSchema: output,
       resultHandler: this.resultHandler,
       mimeTypes: hasUpload(input) ? [mimeMultipart] : [mimeJson],

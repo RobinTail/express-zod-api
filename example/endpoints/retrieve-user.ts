@@ -1,4 +1,10 @@
-import { z, createHttpError, defaultEndpointsFactory } from "../../src";
+import {
+  z,
+  createHttpError,
+  defaultEndpointsFactory,
+  EndpointInput,
+  EndpointResponse,
+} from "../../src";
 import { methodProviderMiddleware } from "../middlewares";
 
 export const retrieveUserEndpoint = defaultEndpointsFactory
@@ -26,3 +32,7 @@ export const retrieveUserEndpoint = defaultEndpointsFactory
       return { id, name };
     },
   });
+
+// @todo remove
+type mmm = EndpointInput<typeof retrieveUserEndpoint>;
+type fff = EndpointResponse<typeof retrieveUserEndpoint>;
