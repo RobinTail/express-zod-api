@@ -16,8 +16,7 @@ import {
   ResultHandlerDefinition,
 } from "./result-handler";
 
-const initialInput = z.object({});
-type AnyMiddlewareDef = MiddlewareDefinition<any, any, any>;
+type AnyMiddlewareDef = MiddlewareDefinition<IOSchema, any, any>;
 
 type BuildProps<
   IN extends IOSchema,
@@ -35,8 +34,8 @@ type BuildProps<
 export class EndpointsFactory<
   POS extends ApiResponse,
   NEG extends ApiResponse,
-  IN extends IOSchema = typeof initialInput,
-  OUT extends FlatObject = {}
+  IN extends IOSchema,
+  OUT extends FlatObject
 > {
   protected middlewares: AnyMiddlewareDef[] = [];
 
@@ -64,7 +63,10 @@ export class EndpointsFactory<
       NEG,
       z.ZodIntersection<IN, AIN>,
       OUT & AOUT
-    >(this.middlewares.concat(definition), this.resultHandler);
+    >(
+      this.middlewares.concat(definition as unknown as AnyMiddlewareDef),
+      this.resultHandler
+    );
   }
 
   public use = this.addExpressMiddleware;
@@ -93,7 +95,7 @@ export class EndpointsFactory<
         }),
     });
     return EndpointsFactory.#create<POS, NEG, IN, OUT & AOUT>(
-      this.middlewares.concat(definition),
+      this.middlewares.concat(definition as AnyMiddlewareDef),
       this.resultHandler
     );
   }
@@ -104,7 +106,7 @@ export class EndpointsFactory<
         createMiddleware({
           input: z.object({}),
           middleware: async () => options,
-        })
+        }) as AnyMiddlewareDef
       ),
       this.resultHandler
     );
@@ -117,14 +119,15 @@ export class EndpointsFactory<
     description,
     ...rest
   }: BuildProps<BIN, BOUT, IN, OUT, M>) {
+    const inputSchema = this.middlewares
+      .map(({ input: schema }) => schema)
+      .concat(input)
+      .reduce((acc, schema) => acc.and(schema)) as z.ZodIntersection<IN, BIN>;
     return new Endpoint<z.ZodIntersection<IN, BIN>, BOUT, OUT, M, POS, NEG>({
       handler,
       description,
       middlewares: this.middlewares,
-      inputSchema: this.middlewares
-        .map(({ input: schema }) => schema)
-        .concat(input)
-        .reduce((acc, schema) => acc.and(schema), initialInput),
+      inputSchema,
       outputSchema: output,
       resultHandler: this.resultHandler,
       mimeTypes: hasUpload(input) ? [mimeMultipart] : [mimeJson],
