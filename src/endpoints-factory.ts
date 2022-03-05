@@ -123,6 +123,7 @@ export class EndpointsFactory<
       middlewares: this.middlewares,
       inputSchema: this.middlewares
         .map(({ input: schema }) => schema)
+        .concat(input)
         .reduce((acc, schema) => acc.and(schema), initialInput),
       outputSchema: output,
       resultHandler: this.resultHandler,
