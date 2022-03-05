@@ -31,9 +31,12 @@ export const serializeSchemaForTest = (
           left: serializeSchemaForTest(schema._def.left),
           right: serializeSchemaForTest(schema._def.right),
         }
-      : schema instanceof z.ZodUnion
+      : schema instanceof z.ZodUnion ||
+        schema instanceof z.ZodDiscriminatedUnion
       ? {
-          options: schema._def.options.map(serializeSchemaForTest),
+          options: Array.from(schema.options.values()).map((option) =>
+            serializeSchemaForTest(option as z.ZodTypeAny)
+          ),
         }
       : schema instanceof z.ZodObject
       ? {
