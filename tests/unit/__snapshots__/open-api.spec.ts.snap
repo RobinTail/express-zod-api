@@ -338,20 +338,23 @@ paths:
           application/json:
             schema:
               description: POST /v1/getSomething request body
-              type: object
-              properties:
-                key:
-                  type: string
-                str:
-                  type: string
-              required:
-                - key
-                - str
-            examples:
-              example1:
-                value:
-                  key: 1234-56789-01
-                  str: test
+              allOf:
+                - example:
+                    key: 1234-56789-01
+                  type: object
+                  properties:
+                    key:
+                      type: string
+                  required:
+                    - key
+                - example:
+                    str: test
+                  type: object
+                  properties:
+                    str:
+                      type: string
+                  required:
+                    - str
 components:
   schemas: {}
   responses: {}
