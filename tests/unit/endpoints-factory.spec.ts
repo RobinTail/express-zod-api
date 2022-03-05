@@ -71,7 +71,9 @@ describe("EndpointsFactory", () => {
       expect(factory["resultHandler"]).toStrictEqual(resultHandlerMock);
       expect(newFactory["middlewares"].length).toBe(1);
       expect(newFactory["middlewares"][0].input).toBeInstanceOf(z.ZodObject);
-      expect(newFactory["middlewares"][0].input.shape).toEqual({});
+      expect(
+        (newFactory["middlewares"][0].input as z.ZodObject<any>).shape
+      ).toEqual({});
       expect(
         await newFactory["middlewares"][0].middleware({
           input: {},
@@ -107,7 +109,9 @@ describe("EndpointsFactory", () => {
         });
         expect(newFactory["middlewares"].length).toBe(1);
         expect(newFactory["middlewares"][0].input).toBeInstanceOf(z.ZodObject);
-        expect(newFactory["middlewares"][0].input.shape).toEqual({});
+        expect(
+          (newFactory["middlewares"][0].input as z.ZodObject<any>).shape
+        ).toEqual({});
         const requestMock = { body: { something: "awesome" } } as Request;
         const responseMock = {} as Response;
         const options = await newFactory["middlewares"][0].middleware({
