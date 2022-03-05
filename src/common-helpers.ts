@@ -57,10 +57,7 @@ export function extractObjectSchema(subject: IOSchema): ObjectSchema {
   ) {
     objectSchema = Array.from(subject.options.values())
       .map((option) => extractObjectSchema(option))
-      .reduce(
-        (acc, option) => acc.partial().merge(option.partial()),
-        z.object({})
-      );
+      .reduce((acc, option) => acc.merge(option.partial()), z.object({}));
   } else {
     // intersection schema
     objectSchema = extractObjectSchema(subject._def.left).merge(
