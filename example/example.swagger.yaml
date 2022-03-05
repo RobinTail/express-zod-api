@@ -147,6 +147,9 @@ paths:
           schema:
             description: POST /v1/user/:id parameter
             type: string
+          examples:
+            example1:
+              value: "12"
       requestBody:
         content:
           application/json:
@@ -181,6 +184,12 @@ paths:
                   required:
                     - name
                     - birthday
+            examples:
+              example1:
+                value:
+                  key: 1234-5678-90
+                  name: John Doe
+                  birthday: 1963-04-21
   /v1/avatar/send:
     get:
       responses:

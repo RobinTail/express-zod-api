@@ -3,6 +3,7 @@ import { z } from "zod";
 import { ApiResponse } from "./api-response";
 import { FlatObject, hasUpload, IOSchema } from "./common-helpers";
 import { Endpoint, Handler } from "./endpoint";
+import { copyMeta } from "./metadata";
 import { Method, MethodsDefinition } from "./method";
 import {
   createMiddleware,
@@ -123,6 +124,10 @@ export class EndpointsFactory<
       .map(({ input: schema }) => schema)
       .concat(input)
       .reduce((acc, schema) => acc.and(schema)) as z.ZodIntersection<IN, BIN>;
+    for (const middleware of this.middlewares) {
+      copyMeta(middleware.input, inputSchema);
+    }
+    copyMeta(input, inputSchema);
     return new Endpoint<z.ZodIntersection<IN, BIN>, BOUT, OUT, M, POS, NEG>({
       handler,
       description,
