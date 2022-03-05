@@ -251,7 +251,8 @@ export class Endpoint<
     logger: Logger;
   }) {
     return this.handler({
-      input: await this.inputSchema.parseAsync(input), // final input types transformations for handler,
+      // final input types transformations for handler
+      input: (await this.inputSchema.parseAsync(input)) as z.output<IN>,
       options,
       logger,
     });
