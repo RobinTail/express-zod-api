@@ -228,15 +228,25 @@ paths:
           application/json:
             schema:
               description: POST /v1/getSomething request body
-              type: object
-              properties:
-                id:
-                  type: string
-                field1:
-                  type: string
-                field2:
-                  type: string
-              required: []
+              oneOf:
+                - type: object
+                  properties:
+                    id:
+                      type: string
+                    field1:
+                      type: string
+                  required:
+                    - id
+                    - field1
+                - type: object
+                  properties:
+                    id:
+                      type: string
+                    field2:
+                      type: string
+                  required:
+                    - id
+                    - field2
 components:
   schemas: {}
   responses: {}
