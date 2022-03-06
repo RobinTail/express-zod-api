@@ -12,7 +12,7 @@ import {
   ReplaceMarkerInShape,
 } from "./common-helpers";
 import { Method, MethodsDefinition } from "./method";
-import { MiddlewareDefinition } from "./middleware";
+import { AnyMiddlewareDef } from "./middleware";
 import { lastResortHandler, ResultHandlerDefinition } from "./result-handler";
 
 export type Handler<IN, OUT, OPT> = (params: {
@@ -86,7 +86,7 @@ type EndpointProps<
   POS extends ApiResponse,
   NEG extends ApiResponse
 > = {
-  middlewares: MiddlewareDefinition<any, any, any>[];
+  middlewares: AnyMiddlewareDef[];
   inputSchema: IN;
   mimeTypes: string[];
   outputSchema: OUT;
@@ -105,7 +105,7 @@ export class Endpoint<
 > extends AbstractEndpoint {
   protected readonly description?: string;
   protected readonly methods: M[] = [];
-  protected readonly middlewares: MiddlewareDefinition<any, any, any>[] = [];
+  protected readonly middlewares: AnyMiddlewareDef[] = [];
   protected readonly inputSchema: IN;
   protected readonly mimeTypes: string[];
   protected readonly outputSchema: OUT;

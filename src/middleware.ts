@@ -25,6 +25,8 @@ export interface MiddlewareDefinition<
   middleware: Middleware<z.output<IN>, OPT, OUT>;
 }
 
+export type AnyMiddlewareDef = MiddlewareDefinition<IOSchema, any, any>;
+
 export const createMiddleware = <
   IN extends IOSchema,
   OPT,

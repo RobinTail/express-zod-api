@@ -6,6 +6,7 @@ import { Endpoint, Handler } from "./endpoint";
 import { copyMeta } from "./metadata";
 import { Method, MethodsDefinition } from "./method";
 import {
+  AnyMiddlewareDef,
   createMiddleware,
   ExpressMiddleware,
   ExpressMiddlewareFeatures,
@@ -16,8 +17,6 @@ import {
   defaultResultHandler,
   ResultHandlerDefinition,
 } from "./result-handler";
-
-type AnyMiddlewareDef = MiddlewareDefinition<IOSchema, any, any>;
 
 type BuildProps<
   IN extends IOSchema,
