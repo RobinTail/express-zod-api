@@ -168,7 +168,6 @@ describe("Open API generator", () => {
       expect(spec).toMatchSnapshot();
     });
 
-    // @todo move it to the top level
     test("should generate the correct schema for discriminated union type", () => {
       const spec = new OpenAPI({
         config,
@@ -176,26 +175,20 @@ describe("Open API generator", () => {
           v1: {
             getSomething: defaultEndpointsFactory.build({
               methods: ["post"],
-              input: z.object({
-                switch: z.discriminatedUnion("type", [
-                  z.object({ type: z.literal("a"), a: z.string() }),
-                  z.object({ type: z.literal("b"), b: z.string() }),
-                ]),
-              }),
-              output: z.object({
-                switch: z.discriminatedUnion("status", [
-                  z.object({ status: z.literal("success"), data: z.any() }),
-                  z.object({
-                    status: z.literal("error"),
-                    error: z.object({ message: z.string() }),
-                  }),
-                ]),
-              }),
+              input: z.discriminatedUnion("type", [
+                z.object({ type: z.literal("a"), a: z.string() }),
+                z.object({ type: z.literal("b"), b: z.string() }),
+              ]),
+              output: z.discriminatedUnion("status", [
+                z.object({ status: z.literal("success"), data: z.any() }),
+                z.object({
+                  status: z.literal("error"),
+                  error: z.object({ message: z.string() }),
+                }),
+              ]),
               handler: async () => ({
-                switch: {
-                  status: "success" as const,
-                  data: "test",
-                },
+                status: "success" as const,
+                data: "test",
               }),
             }),
           },
