@@ -10,7 +10,7 @@ const packageJson = `
   "name": "express-zod-api-esm-test",
   "version": "1.0.0",
   "scripts": {
-    "start": "NODE_OPTIONS=\\"--loader ts-node/esm\\" node quick-start.ts"
+    "start": "ts-node-esm quick-start.ts"
   },
   "type": "module",
   "dependencies": {
