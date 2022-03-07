@@ -10,10 +10,10 @@ import {
   RequestBodyObject,
   ResponseObject,
 } from "openapi3-ts/src/model/OpenApi";
+import { omit } from "ramda";
 import { z } from "zod";
 import {
   ArrayElement,
-  extractObjectSchema,
   getExamples,
   getRoutePathParams,
   IOSchema,
@@ -25,9 +25,9 @@ import { ZodDateOut, ZodDateOutDef } from "./date-out-schema";
 import { AbstractEndpoint } from "./endpoint";
 import { OpenAPIError } from "./errors";
 import { ZodFile, ZodFileDef } from "./file-schema";
+import { copyMeta } from "./metadata";
 import { Method } from "./method";
 import { ZodUpload, ZodUploadDef } from "./upload-schema";
-import { omit } from "ramda";
 
 type MediaExamples = Pick<MediaTypeObject, "examples">;
 
@@ -539,6 +539,27 @@ export const depictIOParamExamples = <T extends IOSchema>(
     ),
   };
 };
+
+export function extractObjectSchema(subject: IOSchema) {
+  if (subject instanceof z.ZodObject) {
+    return subject;
+  }
+  let objectSchema: z.AnyZodObject;
+  if (
+    subject instanceof z.ZodUnion ||
+    subject instanceof z.ZodDiscriminatedUnion
+  ) {
+    objectSchema = Array.from(subject.options.values())
+      .map((option) => extractObjectSchema(option))
+      .reduce((acc, option) => acc.merge(option.partial()), z.object({}));
+  } else {
+    // intersection schema
+    objectSchema = extractObjectSchema(subject._def.left).merge(
+      extractObjectSchema(subject._def.right)
+    );
+  }
+  return copyMeta(subject, objectSchema);
+}
 
 export const depictRequestParams = ({
   path,

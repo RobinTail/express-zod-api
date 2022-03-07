@@ -3,7 +3,6 @@ import { expectType } from "tsd";
 import {
   combinations,
   defaultInputSources,
-  extractObjectSchema,
   getExamples,
   getFinalEndpointInputSchema,
   getInitialInput,
@@ -427,110 +426,6 @@ describe("Common Helpers", () => {
     test("Should reject non-objects", () => {
       expect(isLoggerConfig([1, 2, 3])).toBeFalsy();
       expect(isLoggerConfig("something")).toBeFalsy();
-    });
-  });
-
-  describe("extractObjectSchema()", () => {
-    test("should pass the object schema through", () => {
-      const subject = extractObjectSchema(
-        z.object({
-          one: z.string(),
-        })
-      );
-      expect(subject).toBeInstanceOf(z.ZodObject);
-      expect(serializeSchemaForTest(subject)).toMatchSnapshot();
-    });
-
-    test("should return object schema for the union of object schemas", () => {
-      const subject = extractObjectSchema(
-        z
-          .object({
-            one: z.string(),
-          })
-          .or(
-            z.object({
-              two: z.number(),
-            })
-          )
-      );
-      expect(subject).toBeInstanceOf(z.ZodObject);
-      expect(serializeSchemaForTest(subject)).toMatchSnapshot();
-    });
-
-    test("should return object schema for the intersection of object schemas", () => {
-      const subject = extractObjectSchema(
-        z
-          .object({
-            one: z.string(),
-          })
-          .and(
-            z.object({
-              two: z.number(),
-            })
-          )
-      );
-      expect(subject).toBeInstanceOf(z.ZodObject);
-      expect(serializeSchemaForTest(subject)).toMatchSnapshot();
-    });
-
-    test("should preserve examples", () => {
-      const objectSchema = withMeta(
-        z.object({
-          one: z.string(),
-        })
-      ).example({
-        one: "test",
-      });
-      expect(getMeta(extractObjectSchema(objectSchema), "examples")).toEqual([
-        {
-          one: "test",
-        },
-      ]);
-
-      const unionSchema = withMeta(
-        z
-          .object({
-            one: z.string(),
-          })
-          .or(
-            z.object({
-              two: z.number(),
-            })
-          )
-      )
-        .example({
-          one: "test1",
-        })
-        .example({
-          two: 123,
-        });
-      expect(getMeta(extractObjectSchema(unionSchema), "examples")).toEqual([
-        { one: "test1" },
-        { two: 123 },
-      ]);
-
-      const intersectionSchema = withMeta(
-        z
-          .object({
-            one: z.string(),
-          })
-          .and(
-            z.object({
-              two: z.number(),
-            })
-          )
-      ).example({
-        one: "test1",
-        two: 123,
-      });
-      expect(
-        getMeta(extractObjectSchema(intersectionSchema), "examples")
-      ).toEqual([
-        {
-          one: "test1",
-          two: 123,
-        },
-      ]);
     });
   });
 

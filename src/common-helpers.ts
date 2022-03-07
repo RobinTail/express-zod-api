@@ -46,28 +46,6 @@ export type ReplaceMarkerInShape<
   [K in keyof S]: S[K] extends OutputMarker ? OUT : S[K];
 };
 
-// @todo move to OpenAPI helpers
-export function extractObjectSchema(subject: IOSchema): ObjectSchema {
-  if (subject instanceof z.ZodObject) {
-    return subject;
-  }
-  let objectSchema: ObjectSchema;
-  if (
-    subject instanceof z.ZodUnion ||
-    subject instanceof z.ZodDiscriminatedUnion
-  ) {
-    objectSchema = Array.from(subject.options.values())
-      .map((option) => extractObjectSchema(option))
-      .reduce((acc, option) => acc.merge(option.partial()), z.object({}));
-  } else {
-    // intersection schema
-    objectSchema = extractObjectSchema(subject._def.left).merge(
-      extractObjectSchema(subject._def.right)
-    );
-  }
-  return copyMeta(subject, objectSchema);
-}
-
 /**
  * @description intersects input schemas of middlewares and the endpoint
  * @since 07.03.2022 former combineEndpointAndMiddlewareInputSchemas()
