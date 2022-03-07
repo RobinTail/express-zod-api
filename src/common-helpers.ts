@@ -9,6 +9,7 @@ import {
 } from "./config-type";
 import { copyMeta, getMeta } from "./metadata";
 import { Method } from "./method";
+import { AnyMiddlewareDef } from "./middleware";
 import { mimeMultipart } from "./mime";
 import { ZodUpload } from "./upload-schema";
 
@@ -45,7 +46,7 @@ export type ReplaceMarkerInShape<
   [K in keyof S]: S[K] extends OutputMarker ? OUT : S[K];
 };
 
-// @todo can we get rid of it as well?
+// @todo move to OpenAPI helpers
 export function extractObjectSchema(subject: IOSchema): ObjectSchema {
   if (subject instanceof z.ZodObject) {
     return subject;
@@ -66,6 +67,27 @@ export function extractObjectSchema(subject: IOSchema): ObjectSchema {
   }
   return copyMeta(subject, objectSchema);
 }
+
+/**
+ * @description intersects input schemas of middlewares and the endpoint
+ * @since 07.03.2022 former combineEndpointAndMiddlewareInputSchemas()
+ */
+export const getFinalEndpointInputSchema = <
+  A extends IOSchema,
+  B extends IOSchema
+>(
+  middlewares: AnyMiddlewareDef[],
+  input: B
+): z.ZodIntersection<A, B> => {
+  const inputSchema = middlewares
+    .map(({ input: schema }) => schema)
+    .concat(input)
+    .reduce((acc, schema) => acc.and(schema)) as z.ZodIntersection<A, B>;
+  for (const middleware of middlewares) {
+    copyMeta(middleware.input, inputSchema);
+  }
+  return copyMeta(input, inputSchema);
+};
 
 function areFilesAvailable(request: Request) {
   const contentType = request.header("content-type") || "";

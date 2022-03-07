@@ -5,6 +5,7 @@ import {
   defaultInputSources,
   extractObjectSchema,
   getExamples,
+  getFinalEndpointInputSchema,
   getInitialInput,
   getMessageFromError,
   getRoutePathParams,
@@ -14,12 +15,223 @@ import {
   isValidDate,
   OutputMarker,
 } from "../../src/common-helpers";
-import { z, createHttpError, markOutput, withMeta } from "../../src";
+import {
+  z,
+  createHttpError,
+  markOutput,
+  withMeta,
+  createMiddleware,
+} from "../../src";
 import { Request } from "express";
 import { getMeta } from "../../src/metadata";
+import { AnyMiddlewareDef } from "../../src/middleware";
 import { serializeSchemaForTest } from "../helpers";
 
 describe("Common Helpers", () => {
+  describe("getFinalEndpointInputSchema()", () => {
+    test("Should merge input object schemas", () => {
+      const middlewares = [
+        createMiddleware({
+          input: z.object({
+            one: z.string(),
+          }),
+          middleware: jest.fn(),
+        }),
+        createMiddleware({
+          input: z.object({
+            two: z.number(),
+          }),
+          middleware: jest.fn(),
+        }),
+        createMiddleware({
+          input: z.object({
+            three: z.null(),
+          }),
+          middleware: jest.fn(),
+        }),
+      ] as unknown as AnyMiddlewareDef[];
+      const endpointInput = z.object({
+        four: z.boolean(),
+      });
+      const result = getFinalEndpointInputSchema(middlewares, endpointInput);
+      expect(result).toBeInstanceOf(z.ZodIntersection);
+      expect(serializeSchemaForTest(result)).toMatchSnapshot();
+    });
+
+    test("Should merge union object schemas", () => {
+      const middlewares = [
+        createMiddleware({
+          input: z
+            .object({
+              one: z.string(),
+            })
+            .or(
+              z.object({
+                two: z.number(),
+              })
+            ),
+          middleware: jest.fn(),
+        }),
+        createMiddleware({
+          input: z
+            .object({
+              three: z.null(),
+            })
+            .or(
+              z.object({
+                four: z.boolean(),
+              })
+            ),
+          middleware: jest.fn(),
+        }),
+      ] as unknown as AnyMiddlewareDef[];
+      const endpointInput = z
+        .object({
+          five: z.string(),
+        })
+        .or(
+          z.object({
+            six: z.number(),
+          })
+        );
+      const result = getFinalEndpointInputSchema(middlewares, endpointInput);
+      expect(result).toBeInstanceOf(z.ZodIntersection);
+      expect(serializeSchemaForTest(result)).toMatchSnapshot();
+    });
+
+    test("Should merge intersection object schemas", () => {
+      const middlewares = [
+        createMiddleware({
+          input: z
+            .object({
+              one: z.string(),
+            })
+            .and(
+              z.object({
+                two: z.number(),
+              })
+            ),
+          middleware: jest.fn(),
+        }),
+        createMiddleware({
+          input: z
+            .object({
+              three: z.null(),
+            })
+            .and(
+              z.object({
+                four: z.boolean(),
+              })
+            ),
+          middleware: jest.fn(),
+        }),
+      ] as unknown as AnyMiddlewareDef[];
+      const endpointInput = z
+        .object({
+          five: z.string(),
+        })
+        .and(
+          z.object({
+            six: z.number(),
+          })
+        );
+      const result = getFinalEndpointInputSchema(middlewares, endpointInput);
+      expect(result).toBeInstanceOf(z.ZodIntersection);
+      expect(serializeSchemaForTest(result)).toMatchSnapshot();
+    });
+
+    test("Should merge mixed object schemas", () => {
+      const middlewares = [
+        createMiddleware({
+          input: z
+            .object({
+              one: z.string(),
+            })
+            .and(
+              z.object({
+                two: z.number(),
+              })
+            ),
+          middleware: jest.fn(),
+        }),
+        createMiddleware({
+          input: z
+            .object({
+              three: z.null(),
+            })
+            .or(
+              z.object({
+                four: z.boolean(),
+              })
+            ),
+          middleware: jest.fn(),
+        }),
+      ] as unknown as AnyMiddlewareDef[];
+      const endpointInput = z.object({
+        five: z.string(),
+      });
+      const result = getFinalEndpointInputSchema(middlewares, endpointInput);
+      expect(result).toBeInstanceOf(z.ZodIntersection);
+      expect(serializeSchemaForTest(result)).toMatchSnapshot();
+    });
+
+    test("Should merge examples in case of using withMeta()", () => {
+      const middlewares = [
+        createMiddleware({
+          input: withMeta(
+            z
+              .object({
+                one: z.string(),
+              })
+              .and(
+                z.object({
+                  two: z.number(),
+                })
+              )
+          ).example({
+            one: "test",
+            two: 123,
+          }),
+          middleware: jest.fn(),
+        }),
+        createMiddleware({
+          input: withMeta(
+            z
+              .object({
+                three: z.null(),
+              })
+              .or(
+                z.object({
+                  four: z.boolean(),
+                })
+              )
+          ).example({
+            three: null,
+            four: true,
+          }),
+          middleware: jest.fn(),
+        }),
+      ] as unknown as AnyMiddlewareDef[];
+      const endpointInput = withMeta(
+        z.object({
+          five: z.string(),
+        })
+      ).example({
+        five: "some",
+      });
+      const result = getFinalEndpointInputSchema(middlewares, endpointInput);
+      expect(getMeta(result, "examples")).toEqual([
+        {
+          one: "test",
+          two: 123,
+          three: null,
+          four: true,
+          five: "some",
+        },
+      ]);
+    });
+  });
+
   describe("defaultInputSources", () => {
     test("should be declared in a certain way", () => {
       expect(defaultInputSources).toMatchSnapshot();

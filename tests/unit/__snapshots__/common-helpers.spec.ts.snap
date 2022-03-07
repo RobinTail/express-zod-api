@@ -72,6 +72,245 @@ Object {
 }
 `;
 
+exports[`Common Helpers getFinalEndpointInputSchema() Should merge input object schemas 1`] = `
+Object {
+  "_type": "ZodIntersection",
+  "left": Object {
+    "_type": "ZodIntersection",
+    "left": Object {
+      "_type": "ZodIntersection",
+      "left": Object {
+        "_type": "ZodObject",
+        "shape": Object {
+          "one": Object {
+            "_type": "ZodString",
+          },
+        },
+      },
+      "right": Object {
+        "_type": "ZodObject",
+        "shape": Object {
+          "two": Object {
+            "_type": "ZodNumber",
+          },
+        },
+      },
+    },
+    "right": Object {
+      "_type": "ZodObject",
+      "shape": Object {
+        "three": Object {
+          "_type": "ZodNull",
+        },
+      },
+    },
+  },
+  "right": Object {
+    "_type": "ZodObject",
+    "shape": Object {
+      "four": Object {
+        "_type": "ZodBoolean",
+      },
+    },
+  },
+}
+`;
+
+exports[`Common Helpers getFinalEndpointInputSchema() Should merge intersection object schemas 1`] = `
+Object {
+  "_type": "ZodIntersection",
+  "left": Object {
+    "_type": "ZodIntersection",
+    "left": Object {
+      "_type": "ZodIntersection",
+      "left": Object {
+        "_type": "ZodObject",
+        "shape": Object {
+          "one": Object {
+            "_type": "ZodString",
+          },
+        },
+      },
+      "right": Object {
+        "_type": "ZodObject",
+        "shape": Object {
+          "two": Object {
+            "_type": "ZodNumber",
+          },
+        },
+      },
+    },
+    "right": Object {
+      "_type": "ZodIntersection",
+      "left": Object {
+        "_type": "ZodObject",
+        "shape": Object {
+          "three": Object {
+            "_type": "ZodNull",
+          },
+        },
+      },
+      "right": Object {
+        "_type": "ZodObject",
+        "shape": Object {
+          "four": Object {
+            "_type": "ZodBoolean",
+          },
+        },
+      },
+    },
+  },
+  "right": Object {
+    "_type": "ZodIntersection",
+    "left": Object {
+      "_type": "ZodObject",
+      "shape": Object {
+        "five": Object {
+          "_type": "ZodString",
+        },
+      },
+    },
+    "right": Object {
+      "_type": "ZodObject",
+      "shape": Object {
+        "six": Object {
+          "_type": "ZodNumber",
+        },
+      },
+    },
+  },
+}
+`;
+
+exports[`Common Helpers getFinalEndpointInputSchema() Should merge mixed object schemas 1`] = `
+Object {
+  "_type": "ZodIntersection",
+  "left": Object {
+    "_type": "ZodIntersection",
+    "left": Object {
+      "_type": "ZodIntersection",
+      "left": Object {
+        "_type": "ZodObject",
+        "shape": Object {
+          "one": Object {
+            "_type": "ZodString",
+          },
+        },
+      },
+      "right": Object {
+        "_type": "ZodObject",
+        "shape": Object {
+          "two": Object {
+            "_type": "ZodNumber",
+          },
+        },
+      },
+    },
+    "right": Object {
+      "_type": "ZodUnion",
+      "options": Array [
+        Object {
+          "_type": "ZodObject",
+          "shape": Object {
+            "three": Object {
+              "_type": "ZodNull",
+            },
+          },
+        },
+        Object {
+          "_type": "ZodObject",
+          "shape": Object {
+            "four": Object {
+              "_type": "ZodBoolean",
+            },
+          },
+        },
+      ],
+    },
+  },
+  "right": Object {
+    "_type": "ZodObject",
+    "shape": Object {
+      "five": Object {
+        "_type": "ZodString",
+      },
+    },
+  },
+}
+`;
+
+exports[`Common Helpers getFinalEndpointInputSchema() Should merge union object schemas 1`] = `
+Object {
+  "_type": "ZodIntersection",
+  "left": Object {
+    "_type": "ZodIntersection",
+    "left": Object {
+      "_type": "ZodUnion",
+      "options": Array [
+        Object {
+          "_type": "ZodObject",
+          "shape": Object {
+            "one": Object {
+              "_type": "ZodString",
+            },
+          },
+        },
+        Object {
+          "_type": "ZodObject",
+          "shape": Object {
+            "two": Object {
+              "_type": "ZodNumber",
+            },
+          },
+        },
+      ],
+    },
+    "right": Object {
+      "_type": "ZodUnion",
+      "options": Array [
+        Object {
+          "_type": "ZodObject",
+          "shape": Object {
+            "three": Object {
+              "_type": "ZodNull",
+            },
+          },
+        },
+        Object {
+          "_type": "ZodObject",
+          "shape": Object {
+            "four": Object {
+              "_type": "ZodBoolean",
+            },
+          },
+        },
+      ],
+    },
+  },
+  "right": Object {
+    "_type": "ZodUnion",
+    "options": Array [
+      Object {
+        "_type": "ZodObject",
+        "shape": Object {
+          "five": Object {
+            "_type": "ZodString",
+          },
+        },
+      },
+      Object {
+        "_type": "ZodObject",
+        "shape": Object {
+          "six": Object {
+            "_type": "ZodNumber",
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
 exports[`Common Helpers getMessageFromError() should compile a string from ZodError 1`] = `"user/id: expected number, got string; user/name: expected string, got number"`;
 
 exports[`Common Helpers getMessageFromError() should pass message from other error types 1`] = `"something went wrong"`;
