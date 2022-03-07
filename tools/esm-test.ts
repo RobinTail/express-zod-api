@@ -10,14 +10,14 @@ const packageJson = `
   "name": "express-zod-api-esm-test",
   "version": "1.0.0",
   "scripts": {
-    "start": "NODE_OPTIONS=\\"--loader ts-node/esm\\" node quick-start.ts"
+    "start": "ts-node-esm quick-start.ts"
   },
   "type": "module",
   "dependencies": {
     "@tsconfig/node${tsconfigBase}": "latest",
     "express-zod-api": "../../dist-esm",
-    "ts-node": "10.4.0",
-    "typescript": "4.4.4"
+    "ts-node": "10.7.0",
+    "typescript": "4.6.2"
   }
 }
 `;
