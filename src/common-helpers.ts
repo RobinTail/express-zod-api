@@ -71,6 +71,7 @@ export function extractObjectSchema(subject: IOSchema): ObjectSchema {
 /**
  * @description intersects input schemas of middlewares and the endpoint
  * @since 07.03.2022 former combineEndpointAndMiddlewareInputSchemas()
+ * @todo it actually can return ZodObject when no middlewares, need to improve type
  */
 export const getFinalEndpointInputSchema = <
   A extends IOSchema,

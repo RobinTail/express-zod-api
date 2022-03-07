@@ -29,6 +29,16 @@ import { serializeSchemaForTest } from "../helpers";
 
 describe("Common Helpers", () => {
   describe("getFinalEndpointInputSchema()", () => {
+    test("Should handle no middlewares", () => {
+      const middlewares: AnyMiddlewareDef[] = [];
+      const endpointInput = z.object({
+        four: z.boolean(),
+      });
+      const result = getFinalEndpointInputSchema(middlewares, endpointInput);
+      expect(result).toBeInstanceOf(z.ZodObject);
+      expect(serializeSchemaForTest(result)).toMatchSnapshot();
+    });
+
     test("Should merge input object schemas", () => {
       const middlewares = [
         createMiddleware({
