@@ -79,14 +79,14 @@ export const getFinalEndpointInputSchema = <
   middlewares: AnyMiddlewareDef[],
   input: B
 ): z.ZodIntersection<A, B> => {
-  const inputSchema = middlewares
+  const result = middlewares
     .map(({ input: schema }) => schema)
     .concat(input)
     .reduce((acc, schema) => acc.and(schema)) as z.ZodIntersection<A, B>;
   for (const middleware of middlewares) {
-    copyMeta(middleware.input, inputSchema);
+    copyMeta(middleware.input, result);
   }
-  return copyMeta(input, inputSchema);
+  return copyMeta(input, result);
 };
 
 function areFilesAvailable(request: Request) {
