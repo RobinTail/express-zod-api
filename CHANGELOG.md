@@ -2,6 +2,59 @@
 
 ## Version 5
 
+### v5.9.0-beta1
+
+- In this build, improvements have been made to the endpoint factory, in terms of combining the input schemas of
+  middlewares and the endpoint itself. Previously, I used the simplification of these schemas to the object ones and
+  applied a simple intersection of their shapes. The `ZodIntersection` schema is now applied with respect to the
+  original middleware and endpoint schemas.
+- This change brings an improvement to the representation of endpoint input parameters when using object union schemes:
+  - `input: z.union([ z.object(), ... ])`,
+  - `input: z.object().or( z.object() )`.
+- In addition, you can now also use the new `z.discriminatedUnion()` as the input schema on the top level.
+- The generated documentation has also improved in this case:
+  - Previously, fields from an object union were documented in a simplified way as optional.
+  - Instead, it is now documented using `oneOf` OpenAPI notation.
+
+```typescript
+// example for union input schema
+const endpointOne = defaultEndpointsFactory.build({
+  method: "post",
+  input: z.union([
+    z.object({ one: z.string() }),
+    z.object({ two: z.number() }),
+  ]),
+  output: z.object({...}),
+  handler: async ({ input }) => {
+    // the type of input before:
+    // { one?: string, two?: number }
+    // the type of input after:
+    // { one: string } | { two: number }
+  },
+});
+
+// example for the new discriminated union input schema
+const endpointTwo = defaultEndpointsFactory.build({
+  method: "post",
+  input: z.discriminatedUnion("type", [
+    z.object({
+      type: z.literal("text"),
+      str: z.string()
+    }),
+    z.object({
+      type: z.literal("numeric"),
+      num: z.number()
+    }),
+  ]),
+  output: z.object({...}),
+  handler: async ({ input }) => {
+    // the type of the input:
+    // | { type: "text", str: string }
+    // | { type: "numeric", num: number }
+  }
+});
+```
+
 ### v5.8.0
 
 - `zod` version is 3.13.4.
