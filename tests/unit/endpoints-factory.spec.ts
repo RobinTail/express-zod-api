@@ -4,7 +4,7 @@ import { Logger } from "winston";
 import { createMiddleware, EndpointsFactory, z } from "../../src";
 import { Endpoint } from "../../src/endpoint";
 import { ResultHandlerDefinition } from "../../src/result-handler";
-import { expectType, expectNotType } from "tsd";
+import { expectType } from "tsd";
 import { serializeSchemaForTest } from "../helpers";
 
 describe("EndpointsFactory", () => {
@@ -255,10 +255,12 @@ describe("EndpointsFactory", () => {
       ).toMatchSnapshot();
       expect(endpoint["handler"]).toStrictEqual(handlerMock);
       expect(endpoint["resultHandler"]).toStrictEqual(resultHandlerMock);
-      expectType<z.input<typeof endpoint["inputSchema"]>>({
-        n: 123,
-        s: "abc",
-      });
+      expectType<
+        z.ZodIntersection<
+          z.ZodObject<{ n: z.ZodNumber }>,
+          z.ZodObject<{ s: z.ZodString }>
+        >
+      >(endpoint.getInputSchema());
     });
 
     test("Should create an endpoint with intersection middleware", () => {
@@ -298,11 +300,15 @@ describe("EndpointsFactory", () => {
       ).toMatchSnapshot();
       expect(endpoint["handler"]).toStrictEqual(handlerMock);
       expect(endpoint["resultHandler"]).toStrictEqual(resultHandlerMock);
-      expectType<z.input<typeof endpoint["inputSchema"]>>({
-        n1: 123,
-        n2: 456,
-        s: "abc",
-      });
+      expectType<
+        z.ZodIntersection<
+          z.ZodIntersection<
+            z.ZodObject<{ n1: z.ZodNumber }>,
+            z.ZodObject<{ n2: z.ZodNumber }>
+          >,
+          z.ZodObject<{ s: z.ZodString }>
+        >
+      >(endpoint.getInputSchema());
     });
 
     test("Should create an endpoint with union middleware", () => {
@@ -345,17 +351,14 @@ describe("EndpointsFactory", () => {
       ).toMatchSnapshot();
       expect(endpoint["handler"]).toStrictEqual(handlerMock);
       expect(endpoint["resultHandler"]).toStrictEqual(resultHandlerMock);
-      expectType<z.input<typeof endpoint["inputSchema"]>>({
-        n1: 123,
-        s: "abc",
-      });
-      expectType<z.input<typeof endpoint["inputSchema"]>>({
-        n2: 123,
-        s: "abc",
-      });
-      expectNotType<z.input<typeof endpoint["inputSchema"]>>({
-        s: "abc",
-      });
+      expectType<
+        z.ZodIntersection<
+          z.ZodUnion<
+            [z.ZodObject<{ n1: z.ZodNumber }>, z.ZodObject<{ n2: z.ZodNumber }>]
+          >,
+          z.ZodObject<{ s: z.ZodString }>
+        >
+      >(endpoint.getInputSchema());
     });
   });
 });
