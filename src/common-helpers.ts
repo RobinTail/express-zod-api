@@ -7,7 +7,6 @@ import {
   LoggerConfig,
   loggerLevels,
 } from "./config-type";
-import { OptIntersection } from "./endpoints-factory";
 import { copyMeta, getMeta } from "./metadata";
 import { Method } from "./method";
 import { AnyMiddlewareDef } from "./middleware";
@@ -47,6 +46,11 @@ export type ReplaceMarkerInShape<
   [K in keyof S]: S[K] extends OutputMarker ? OUT : S[K];
 };
 
+export type ProbableIntersection<
+  A extends IOSchema | null,
+  B extends IOSchema
+> = A extends null ? B : A extends IOSchema ? z.ZodIntersection<A, B> : never;
+
 /**
  * @description intersects input schemas of middlewares and the endpoint
  * @since 07.03.2022 former combineEndpointAndMiddlewareInputSchemas()
@@ -57,11 +61,11 @@ export const getFinalEndpointInputSchema = <
 >(
   middlewares: AnyMiddlewareDef[],
   input: IN
-): OptIntersection<MIN, IN> => {
+): ProbableIntersection<MIN, IN> => {
   const result = middlewares
     .map(({ input: schema }) => schema)
     .concat(input)
-    .reduce((acc, schema) => acc.and(schema)) as OptIntersection<MIN, IN>;
+    .reduce((acc, schema) => acc.and(schema)) as ProbableIntersection<MIN, IN>;
   for (const middleware of middlewares) {
     copyMeta(middleware.input, result);
   }

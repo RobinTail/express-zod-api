@@ -2,10 +2,11 @@ import { Request, Response } from "express";
 import { z } from "zod";
 import { ApiResponse } from "./api-response";
 import {
-  getFinalEndpointInputSchema,
   FlatObject,
+  getFinalEndpointInputSchema,
   hasUpload,
   IOSchema,
+  ProbableIntersection,
 } from "./common-helpers";
 import { Endpoint, Handler } from "./endpoint";
 import { Method, MethodsDefinition } from "./method";
@@ -22,12 +23,6 @@ import {
   ResultHandlerDefinition,
 } from "./result-handler";
 
-// @todo move to common helpers and rename it
-export type OptIntersection<
-  A extends IOSchema | null,
-  B extends IOSchema
-> = A extends null ? B : A extends IOSchema ? z.ZodIntersection<A, B> : never;
-
 type BuildProps<
   IN extends IOSchema,
   OUT extends IOSchema,
@@ -37,7 +32,7 @@ type BuildProps<
 > = {
   input: IN;
   output: OUT;
-  handler: Handler<z.output<OptIntersection<MIN, IN>>, z.input<OUT>, OPT>;
+  handler: Handler<z.output<ProbableIntersection<MIN, IN>>, z.input<OUT>, OPT>;
   description?: string;
 } & MethodsDefinition<M>;
 
@@ -71,7 +66,7 @@ export class EndpointsFactory<
     return EndpointsFactory.#create<
       POS,
       NEG,
-      OptIntersection<IN, AIN>,
+      ProbableIntersection<IN, AIN>,
       OUT & AOUT
     >(
       this.middlewares.concat(definition as unknown as AnyMiddlewareDef),
@@ -129,7 +124,7 @@ export class EndpointsFactory<
     description,
     ...rest
   }: BuildProps<BIN, BOUT, IN, OUT, M>): Endpoint<
-    OptIntersection<IN, BIN>,
+    ProbableIntersection<IN, BIN>,
     BOUT,
     OUT,
     M,
