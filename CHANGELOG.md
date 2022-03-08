@@ -8,32 +8,13 @@
   middlewares and the endpoint itself. Previously, I used the simplification of these schemas to the object ones and
   applied a simple intersection of their shapes. The `ZodIntersection` schema is now applied with respect to the
   original schemas of the endpoint and middlewares.
-- This change brings an improvement to the type `input` parameter of the endpoint's handler when using union schemas:
-  - `z.union([ z.object(), ... ])`,
-  - `z.object().or( z.object() )`.
-- In addition, you can now also use the new `z.discriminatedUnion()` as the input schema on the top level.
-- The generated documentation has also improved in these cases:
+- The generated documentation has improved in this regard:
   - Previously, fields from an object union were documented in a simplified way as optional.
   - Instead, it is now documented using `oneOf` OpenAPI notation.
+- In addition, you can now also use the new `z.discriminatedUnion()` as the input schema on the top level.
 
 ```typescript
-// example for union input schema
-const endpointOne = defaultEndpointsFactory.build({
-  method: "post",
-  input: z.union([
-    z.object({ one: z.string() }),
-    z.object({ two: z.number() }),
-  ]),
-  output: z.object({...}),
-  handler: async ({ input }) => {
-    // the type of input before:
-    // { one?: string, two?: number }
-    // the type of input after:
-    // { one: string } | { two: number }
-  },
-});
-
-// example for the new discriminated union input schema
+// example
 const endpointTwo = defaultEndpointsFactory.build({
   method: "post",
   input: z.discriminatedUnion("type", [
