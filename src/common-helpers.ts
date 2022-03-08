@@ -7,6 +7,7 @@ import {
   LoggerConfig,
   loggerLevels,
 } from "./config-type";
+import { OptIntersection } from "./endpoints-factory";
 import { copyMeta, getMeta } from "./metadata";
 import { Method } from "./method";
 import { AnyMiddlewareDef } from "./middleware";
@@ -49,23 +50,23 @@ export type ReplaceMarkerInShape<
 /**
  * @description intersects input schemas of middlewares and the endpoint
  * @since 07.03.2022 former combineEndpointAndMiddlewareInputSchemas()
- * @todo it actually can return ZodObject when no middlewares, need to improve type
  */
 export const getFinalEndpointInputSchema = <
-  A extends IOSchema,
-  B extends IOSchema
+  MIN extends IOSchema | null,
+  IN extends IOSchema
 >(
   middlewares: AnyMiddlewareDef[],
-  input: B
-): z.ZodIntersection<A, B> => {
+  input: IN
+): OptIntersection<MIN, IN> => {
   const result = middlewares
     .map(({ input: schema }) => schema)
     .concat(input)
-    .reduce((acc, schema) => acc.and(schema)) as z.ZodIntersection<A, B>;
+    .reduce((acc, schema) => acc.and(schema)) as OptIntersection<MIN, IN>;
   for (const middleware of middlewares) {
     copyMeta(middleware.input, result);
   }
-  return copyMeta(input, result);
+  copyMeta(input, result);
+  return result;
 };
 
 function areFilesAvailable(request: Request) {

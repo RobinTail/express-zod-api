@@ -22,24 +22,30 @@ import {
   ResultHandlerDefinition,
 } from "./result-handler";
 
+// @todo move to common helpers and rename it
+export type OptIntersection<
+  A extends IOSchema | null,
+  B extends IOSchema
+> = A extends null ? B : A extends IOSchema ? z.ZodIntersection<A, B> : never;
+
 type BuildProps<
   IN extends IOSchema,
   OUT extends IOSchema,
-  MIN extends IOSchema,
+  MIN extends IOSchema | null,
   OPT extends FlatObject,
   M extends Method
 > = {
   input: IN;
   output: OUT;
-  handler: Handler<z.output<z.ZodIntersection<MIN, IN>>, z.input<OUT>, OPT>;
+  handler: Handler<z.output<OptIntersection<MIN, IN>>, z.input<OUT>, OPT>;
   description?: string;
 } & MethodsDefinition<M>;
 
 export class EndpointsFactory<
   POS extends ApiResponse,
   NEG extends ApiResponse,
-  IN extends IOSchema,
-  OUT extends FlatObject
+  IN extends IOSchema | null = null,
+  OUT extends FlatObject = {}
 > {
   protected middlewares: AnyMiddlewareDef[] = [];
 
@@ -48,7 +54,7 @@ export class EndpointsFactory<
   static #create<
     CPOS extends ApiResponse,
     CNEG extends ApiResponse,
-    CIN extends IOSchema,
+    CIN extends IOSchema | null,
     COUT extends FlatObject
   >(
     middlewares: AnyMiddlewareDef[],
@@ -65,7 +71,7 @@ export class EndpointsFactory<
     return EndpointsFactory.#create<
       POS,
       NEG,
-      z.ZodIntersection<IN, AIN>,
+      OptIntersection<IN, AIN>,
       OUT & AOUT
     >(
       this.middlewares.concat(definition as unknown as AnyMiddlewareDef),
@@ -123,7 +129,7 @@ export class EndpointsFactory<
     description,
     ...rest
   }: BuildProps<BIN, BOUT, IN, OUT, M>): Endpoint<
-    z.ZodIntersection<IN, BIN>,
+    OptIntersection<IN, BIN>,
     BOUT,
     OUT,
     M,
