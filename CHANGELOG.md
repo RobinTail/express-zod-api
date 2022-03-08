@@ -15,7 +15,7 @@
 
 ```typescript
 // example
-const endpointTwo = defaultEndpointsFactory.build({
+const endpoint = defaultEndpointsFactory.build({
   method: "post",
   input: z.discriminatedUnion("type", [
     z.object({
