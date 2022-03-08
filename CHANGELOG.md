@@ -4,15 +4,15 @@
 
 ### v5.9.0-beta1
 
-- In this build, improvements have been made to the endpoint factory, in terms of combining the input schemas of
+- In this build, improvements have been made to the `EndpointsFactory`, in terms of combining the input schemas of
   middlewares and the endpoint itself. Previously, I used the simplification of these schemas to the object ones and
   applied a simple intersection of their shapes. The `ZodIntersection` schema is now applied with respect to the
-  original middleware and endpoint schemas.
-- This change brings an improvement to the representation of endpoint input parameters when using object union schemes:
-  - `input: z.union([ z.object(), ... ])`,
-  - `input: z.object().or( z.object() )`.
+  original schemas of the endpoint and middlewares.
+- This change brings an improvement to the type `input` parameter of the endpoint's handler when using union schemas:
+  - `z.union([ z.object(), ... ])`,
+  - `z.object().or( z.object() )`.
 - In addition, you can now also use the new `z.discriminatedUnion()` as the input schema on the top level.
-- The generated documentation has also improved in this case:
+- The generated documentation has also improved in these cases:
   - Previously, fields from an object union were documented in a simplified way as optional.
   - Instead, it is now documented using `oneOf` OpenAPI notation.
 
