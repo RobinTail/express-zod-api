@@ -119,9 +119,9 @@ export class EndpointsFactory<
 
   public build<BIN extends IOSchema, BOUT extends IOSchema, M extends Method>({
     input,
-    output,
     handler,
     description,
+    output: outputSchema,
     ...rest
   }: BuildProps<BIN, BOUT, IN, OUT, M>): Endpoint<
     ProbableIntersection<IN, BIN>,
@@ -131,17 +131,14 @@ export class EndpointsFactory<
     POS,
     NEG
   > {
-    const inputSchema = getFinalEndpointInputSchema<IN, BIN>(
-      this.middlewares,
-      input
-    );
+    const { middlewares, resultHandler } = this;
     return new Endpoint({
       handler,
       description,
-      middlewares: this.middlewares,
-      inputSchema,
-      outputSchema: output,
-      resultHandler: this.resultHandler,
+      middlewares,
+      outputSchema,
+      resultHandler,
+      inputSchema: getFinalEndpointInputSchema<IN, BIN>(middlewares, input),
       mimeTypes: hasUpload(input) ? [mimeMultipart] : [mimeJson],
       ...rest,
     });
