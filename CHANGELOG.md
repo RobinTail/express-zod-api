@@ -5,7 +5,7 @@
 ### v5.8.0
 
 - `zod` version is 3.13.4.
-  - There is a new schema `z.nan()` as some fixes.
+  - There is a new schema `z.nan()` and some fixes.
 
 ### v5.7.0
 
