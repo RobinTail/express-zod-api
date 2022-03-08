@@ -72,7 +72,7 @@ describe("EndpointsFactory", () => {
       expect(newFactory["middlewares"].length).toBe(1);
       expect(newFactory["middlewares"][0].input).toBeInstanceOf(z.ZodObject);
       expect(
-        (newFactory["middlewares"][0].input as z.ZodObject<any>).shape
+        (newFactory["middlewares"][0].input as z.AnyZodObject).shape
       ).toEqual({});
       expect(
         await newFactory["middlewares"][0].middleware({
@@ -110,7 +110,7 @@ describe("EndpointsFactory", () => {
         expect(newFactory["middlewares"].length).toBe(1);
         expect(newFactory["middlewares"][0].input).toBeInstanceOf(z.ZodObject);
         expect(
-          (newFactory["middlewares"][0].input as z.ZodObject<any>).shape
+          (newFactory["middlewares"][0].input as z.AnyZodObject).shape
         ).toEqual({});
         const requestMock = { body: { something: "awesome" } } as Request;
         const responseMock = {} as Response;
