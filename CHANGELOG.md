@@ -5,9 +5,8 @@
 ### v5.9.0-beta1
 
 - In this build, improvements have been made to the `EndpointsFactory`, in terms of combining the input schemas of
-  middlewares and the endpoint itself. Previously, I used the simplification of these schemas to the object ones and
-  applied a simple intersection of their shapes. The `ZodIntersection` schema is now applied with respect to the
-  original schemas of the endpoint and middlewares.
+  middlewares and the endpoint itself. A custom type has been replaced with usage of `ZodIntersection` schema with
+  respect to the originals.
 - The generated documentation has improved in this regard:
   - Previously, fields from an object union were documented in a simplified way as optional.
   - Instead, it is now documented using `oneOf` OpenAPI notation.
