@@ -21,6 +21,7 @@
     "import"
   ],
   "rules": {
-    "@typescript-eslint/lines-between-class-members": "off"
+    "@typescript-eslint/lines-between-class-members": "off",
+    "@typescript-eslint/return-await": ["error", "in-try-catch"]
   }
 }
