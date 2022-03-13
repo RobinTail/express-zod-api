@@ -6,7 +6,6 @@ import {
   getFinalEndpointInputSchema,
   hasUpload,
   IOSchema,
-  IOSchemaStripped,
   ProbableIntersection,
 } from "./common-helpers";
 import { Endpoint, Handler } from "./endpoint";
@@ -27,7 +26,7 @@ import {
 type BuildProps<
   IN extends IOSchema,
   OUT extends IOSchema,
-  MIN extends IOSchemaStripped | null,
+  MIN extends IOSchema<"strip"> | null,
   OPT extends FlatObject,
   M extends Method
 > = {
@@ -40,7 +39,7 @@ type BuildProps<
 export class EndpointsFactory<
   POS extends ApiResponse,
   NEG extends ApiResponse,
-  IN extends IOSchemaStripped | null = null,
+  IN extends IOSchema<"strip"> | null = null,
   OUT extends FlatObject = {}
 > {
   protected middlewares: AnyMiddlewareDef[] = [];
@@ -50,7 +49,7 @@ export class EndpointsFactory<
   static #create<
     CPOS extends ApiResponse,
     CNEG extends ApiResponse,
-    CIN extends IOSchemaStripped | null,
+    CIN extends IOSchema<"strip"> | null,
     COUT extends FlatObject
   >(
     middlewares: AnyMiddlewareDef[],
@@ -61,7 +60,7 @@ export class EndpointsFactory<
     return factory;
   }
 
-  public addMiddleware<AIN extends IOSchemaStripped, AOUT extends FlatObject>(
+  public addMiddleware<AIN extends IOSchema<"strip">, AOUT extends FlatObject>(
     definition: MiddlewareDefinition<AIN, OUT, AOUT>
   ) {
     return EndpointsFactory.#create<

@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { HttpError } from "http-errors";
 import { Logger } from "winston";
 import { z } from "zod";
-import { FlatObject, IOSchemaStripped } from "./common-helpers";
+import { FlatObject, IOSchema } from "./common-helpers";
 
 interface MiddlewareParams<IN, OPT> {
   input: IN;
@@ -17,7 +17,7 @@ type Middleware<IN, OPT, OUT> = (
 ) => Promise<OUT>;
 
 export interface MiddlewareDefinition<
-  IN extends IOSchemaStripped,
+  IN extends IOSchema<"strip">,
   OPT,
   OUT extends FlatObject
 > {
@@ -25,10 +25,14 @@ export interface MiddlewareDefinition<
   middleware: Middleware<z.output<IN>, OPT, OUT>;
 }
 
-export type AnyMiddlewareDef = MiddlewareDefinition<IOSchemaStripped, any, any>;
+export type AnyMiddlewareDef = MiddlewareDefinition<
+  IOSchema<"strip">,
+  any,
+  any
+>;
 
 export const createMiddleware = <
-  IN extends IOSchemaStripped,
+  IN extends IOSchema<"strip">,
   OPT,
   OUT extends FlatObject
 >(
