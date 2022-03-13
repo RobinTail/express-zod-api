@@ -1,5 +1,29 @@
 # Changelog
 
+## Version 6
+
+### v6.0.0
+
+- Technically this version contains all the same changes and improvements as 5.9.0-beta1.
+- The new implementation of the `EndpointsFactory`, however, has more restrictive middleware input schema requirements.
+- To avoid possible backward incompatibility issues, I have decided to publish these changes as a major release.
+- The following changes are required to migrate to this version:
+  - You cannot use the `.strict()`, `.passthrough()` and its deprecated alias `.nonstrict()` methods in middlewares.
+  - Only `.strip()` is allowed in middlewares, which is actually default, so you should not use any of them at all.
+
+```typescript
+// how to migrate
+export const myMiddleware = createMiddleware({
+  input: z
+    .object({
+      key: z.string().nonempty(),
+    })
+    .passthrough(), // <— remove this if you have it in your code
+  middleware: async () => ({...}),
+});
+
+```
+
 ## Version 5
 
 ### v5.9.0-beta1
