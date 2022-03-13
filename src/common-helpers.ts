@@ -15,20 +15,21 @@ import { ZodUpload } from "./upload-schema";
 
 export type FlatObject = Record<string, any>;
 
-type ObjectSchema = z.AnyZodObject;
-type UnionSchema = z.ZodUnion<[IOSchema, ...IOSchema[]]>;
-type IntersectionSchema = z.ZodIntersection<IOSchema, IOSchema>;
-type DiscUnionSchema = z.ZodDiscriminatedUnion<
-  string,
-  z.Primitive,
-  ObjectSchema
->;
-
 export type IOSchema =
-  | ObjectSchema
-  | UnionSchema
-  | IntersectionSchema
-  | DiscUnionSchema;
+  | z.AnyZodObject
+  | z.ZodUnion<[IOSchema, ...IOSchema[]]>
+  | z.ZodIntersection<IOSchema, IOSchema>
+  | z.ZodDiscriminatedUnion<string, z.Primitive, z.AnyZodObject>;
+
+export type IOSchemaStripped =
+  | z.ZodObject<any, "strip", any>
+  | z.ZodUnion<[IOSchemaStripped, ...IOSchemaStripped[]]>
+  | z.ZodIntersection<IOSchemaStripped, IOSchemaStripped>
+  | z.ZodDiscriminatedUnion<
+      string,
+      z.Primitive,
+      z.ZodObject<any, "strip", any>
+    >;
 
 export type ArrayElement<T extends readonly unknown[]> =
   T extends readonly (infer K)[] ? K : never;
@@ -47,16 +48,20 @@ export type ReplaceMarkerInShape<
 };
 
 export type ProbableIntersection<
-  A extends IOSchema | null,
+  A extends IOSchemaStripped | null,
   B extends IOSchema
-> = A extends null ? B : A extends IOSchema ? z.ZodIntersection<A, B> : never;
+> = A extends null
+  ? B
+  : A extends IOSchemaStripped
+  ? z.ZodIntersection<A, B>
+  : never;
 
 /**
  * @description intersects input schemas of middlewares and the endpoint
  * @since 07.03.2022 former combineEndpointAndMiddlewareInputSchemas()
  */
 export const getFinalEndpointInputSchema = <
-  MIN extends IOSchema | null,
+  MIN extends IOSchemaStripped | null,
   IN extends IOSchema
 >(
   middlewares: AnyMiddlewareDef[],
