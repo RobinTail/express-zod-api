@@ -1,6 +1,63 @@
 # Changelog
 
+## Version 6
+
+### v6.0.0
+
+- Technically this version contains all the same changes and improvements as 5.9.0-beta1.
+- The new implementation of the `EndpointsFactory`, however, has more restrictive middleware input schema requirements.
+- To avoid possible backward incompatibility issues, I have decided to publish these changes as a major release.
+- The following changes are required to migrate to this version:
+  - You cannot use the `.strict()`, `.passthrough()` and its deprecated alias `.nonstrict()` methods in middlewares.
+  - Only `.strip()` is allowed in middlewares, which is actually default, so you should not use any of them at all.
+
+```typescript
+// how to migrate
+export const myMiddleware = createMiddleware({
+  input: z
+    .object({
+      key: z.string().nonempty(),
+    })
+    .passthrough(), // <— remove this if you have it in your code
+  middleware: async () => ({...}),
+});
+
+```
+
 ## Version 5
+
+### v5.9.0-beta1
+
+- In this build, improvements have been made to the `EndpointsFactory`, in terms of combining the input schemas of
+  middlewares and the endpoint itself. A custom type has been replaced with usage of `ZodIntersection` schema with
+  respect to the originals.
+- The generated documentation has improved in this regard:
+  - Previously, fields from an object union were documented in a simplified way as optional.
+  - Instead, it is now documented using `oneOf` OpenAPI notation.
+- In addition, you can now also use the new `z.discriminatedUnion()` as the input schema on the top level.
+
+```typescript
+// example
+const endpoint = defaultEndpointsFactory.build({
+  method: "post",
+  input: z.discriminatedUnion("type", [
+    z.object({
+      type: z.literal("text"),
+      str: z.string()
+    }),
+    z.object({
+      type: z.literal("numeric"),
+      num: z.number()
+    }),
+  ]),
+  output: z.object({...}),
+  handler: async ({ input }) => {
+    // the type of the input:
+    // | { type: "text", str: string }
+    // | { type: "numeric", num: number }
+  }
+});
+```
 
 ### v5.8.0
 

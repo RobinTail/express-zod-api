@@ -4,6 +4,7 @@ import {
   withMeta,
   z,
 } from "../../src/index";
+import { getMeta } from "../../src/metadata";
 import {
   depictAny,
   depictArray,
@@ -36,9 +37,115 @@ import {
   excludeExampleFromDepiction,
   excludeParamsFromDepiction,
   reformatParamsInPath,
+  extractObjectSchema,
 } from "../../src/open-api-helpers";
+import { serializeSchemaForTest } from "../helpers";
 
 describe("Open API helpers", () => {
+  describe("extractObjectSchema()", () => {
+    test("should pass the object schema through", () => {
+      const subject = extractObjectSchema(
+        z.object({
+          one: z.string(),
+        })
+      );
+      expect(subject).toBeInstanceOf(z.ZodObject);
+      expect(serializeSchemaForTest(subject)).toMatchSnapshot();
+    });
+
+    test("should return object schema for the union of object schemas", () => {
+      const subject = extractObjectSchema(
+        z
+          .object({
+            one: z.string(),
+          })
+          .or(
+            z.object({
+              two: z.number(),
+            })
+          )
+      );
+      expect(subject).toBeInstanceOf(z.ZodObject);
+      expect(serializeSchemaForTest(subject)).toMatchSnapshot();
+    });
+
+    test("should return object schema for the intersection of object schemas", () => {
+      const subject = extractObjectSchema(
+        z
+          .object({
+            one: z.string(),
+          })
+          .and(
+            z.object({
+              two: z.number(),
+            })
+          )
+      );
+      expect(subject).toBeInstanceOf(z.ZodObject);
+      expect(serializeSchemaForTest(subject)).toMatchSnapshot();
+    });
+
+    test("should preserve examples", () => {
+      const objectSchema = withMeta(
+        z.object({
+          one: z.string(),
+        })
+      ).example({
+        one: "test",
+      });
+      expect(getMeta(extractObjectSchema(objectSchema), "examples")).toEqual([
+        {
+          one: "test",
+        },
+      ]);
+
+      const unionSchema = withMeta(
+        z
+          .object({
+            one: z.string(),
+          })
+          .or(
+            z.object({
+              two: z.number(),
+            })
+          )
+      )
+        .example({
+          one: "test1",
+        })
+        .example({
+          two: 123,
+        });
+      expect(getMeta(extractObjectSchema(unionSchema), "examples")).toEqual([
+        { one: "test1" },
+        { two: 123 },
+      ]);
+
+      const intersectionSchema = withMeta(
+        z
+          .object({
+            one: z.string(),
+          })
+          .and(
+            z.object({
+              two: z.number(),
+            })
+          )
+      ).example({
+        one: "test1",
+        two: 123,
+      });
+      expect(
+        getMeta(extractObjectSchema(intersectionSchema), "examples")
+      ).toEqual([
+        {
+          one: "test1",
+          two: 123,
+        },
+      ]);
+    });
+  });
+
   describe("excludeParamsFromDepiction()", () => {
     test("should omit specified path params", () => {
       const depicted = depictSchema({

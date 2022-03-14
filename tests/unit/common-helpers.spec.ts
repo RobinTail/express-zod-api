@@ -2,10 +2,9 @@ import { UploadedFile } from "express-fileupload";
 import { expectType } from "tsd";
 import {
   combinations,
-  combineEndpointAndMiddlewareInputSchemas,
   defaultInputSources,
-  extractObjectSchema,
   getExamples,
+  getFinalEndpointInputSchema,
   getInitialInput,
   getMessageFromError,
   getRoutePathParams,
@@ -16,19 +15,29 @@ import {
   OutputMarker,
 } from "../../src/common-helpers";
 import {
-  createMiddleware,
   z,
   createHttpError,
   markOutput,
   withMeta,
+  createMiddleware,
 } from "../../src";
 import { Request } from "express";
 import { getMeta } from "../../src/metadata";
-import { MiddlewareDefinition } from "../../src/middleware";
+import { AnyMiddlewareDef } from "../../src/middleware";
 import { serializeSchemaForTest } from "../helpers";
 
 describe("Common Helpers", () => {
-  describe("combineEndpointAndMiddlewareInputSchemas()", () => {
+  describe("getFinalEndpointInputSchema()", () => {
+    test("Should handle no middlewares", () => {
+      const middlewares: AnyMiddlewareDef[] = [];
+      const endpointInput = z.object({
+        four: z.boolean(),
+      });
+      const result = getFinalEndpointInputSchema(middlewares, endpointInput);
+      expect(result).toBeInstanceOf(z.ZodObject);
+      expect(serializeSchemaForTest(result)).toMatchSnapshot();
+    });
+
     test("Should merge input object schemas", () => {
       const middlewares = [
         createMiddleware({
@@ -49,15 +58,12 @@ describe("Common Helpers", () => {
           }),
           middleware: jest.fn(),
         }),
-      ] as MiddlewareDefinition<any, any, any>[];
+      ] as unknown as AnyMiddlewareDef[];
       const endpointInput = z.object({
         four: z.boolean(),
       });
-      const result = combineEndpointAndMiddlewareInputSchemas(
-        endpointInput,
-        middlewares
-      );
-      expect(result).toBeInstanceOf(z.ZodObject);
+      const result = getFinalEndpointInputSchema(middlewares, endpointInput);
+      expect(result).toBeInstanceOf(z.ZodIntersection);
       expect(serializeSchemaForTest(result)).toMatchSnapshot();
     });
 
@@ -87,7 +93,7 @@ describe("Common Helpers", () => {
             ),
           middleware: jest.fn(),
         }),
-      ] as MiddlewareDefinition<any, any, any>[];
+      ] as unknown as AnyMiddlewareDef[];
       const endpointInput = z
         .object({
           five: z.string(),
@@ -97,11 +103,8 @@ describe("Common Helpers", () => {
             six: z.number(),
           })
         );
-      const result = combineEndpointAndMiddlewareInputSchemas(
-        endpointInput,
-        middlewares
-      );
-      expect(result).toBeInstanceOf(z.ZodObject);
+      const result = getFinalEndpointInputSchema(middlewares, endpointInput);
+      expect(result).toBeInstanceOf(z.ZodIntersection);
       expect(serializeSchemaForTest(result)).toMatchSnapshot();
     });
 
@@ -131,7 +134,7 @@ describe("Common Helpers", () => {
             ),
           middleware: jest.fn(),
         }),
-      ] as MiddlewareDefinition<any, any, any>[];
+      ] as unknown as AnyMiddlewareDef[];
       const endpointInput = z
         .object({
           five: z.string(),
@@ -141,11 +144,8 @@ describe("Common Helpers", () => {
             six: z.number(),
           })
         );
-      const result = combineEndpointAndMiddlewareInputSchemas(
-        endpointInput,
-        middlewares
-      );
-      expect(result).toBeInstanceOf(z.ZodObject);
+      const result = getFinalEndpointInputSchema(middlewares, endpointInput);
+      expect(result).toBeInstanceOf(z.ZodIntersection);
       expect(serializeSchemaForTest(result)).toMatchSnapshot();
     });
 
@@ -175,15 +175,12 @@ describe("Common Helpers", () => {
             ),
           middleware: jest.fn(),
         }),
-      ] as MiddlewareDefinition<any, any, any>[];
+      ] as unknown as AnyMiddlewareDef[];
       const endpointInput = z.object({
         five: z.string(),
       });
-      const result = combineEndpointAndMiddlewareInputSchemas(
-        endpointInput,
-        middlewares
-      );
-      expect(result).toBeInstanceOf(z.ZodObject);
+      const result = getFinalEndpointInputSchema(middlewares, endpointInput);
+      expect(result).toBeInstanceOf(z.ZodIntersection);
       expect(serializeSchemaForTest(result)).toMatchSnapshot();
     });
 
@@ -223,7 +220,7 @@ describe("Common Helpers", () => {
           }),
           middleware: jest.fn(),
         }),
-      ] as MiddlewareDefinition<any, any, any>[];
+      ] as unknown as AnyMiddlewareDef[];
       const endpointInput = withMeta(
         z.object({
           five: z.string(),
@@ -231,10 +228,7 @@ describe("Common Helpers", () => {
       ).example({
         five: "some",
       });
-      const result = combineEndpointAndMiddlewareInputSchemas(
-        endpointInput,
-        middlewares
-      );
+      const result = getFinalEndpointInputSchema(middlewares, endpointInput);
       expect(getMeta(result, "examples")).toEqual([
         {
           one: "test",
@@ -432,110 +426,6 @@ describe("Common Helpers", () => {
     test("Should reject non-objects", () => {
       expect(isLoggerConfig([1, 2, 3])).toBeFalsy();
       expect(isLoggerConfig("something")).toBeFalsy();
-    });
-  });
-
-  describe("extractObjectSchema()", () => {
-    test("should pass the object schema through", () => {
-      const subject = extractObjectSchema(
-        z.object({
-          one: z.string(),
-        })
-      );
-      expect(subject).toBeInstanceOf(z.ZodObject);
-      expect(serializeSchemaForTest(subject)).toMatchSnapshot();
-    });
-
-    test("should return object schema for the union of object schemas", () => {
-      const subject = extractObjectSchema(
-        z
-          .object({
-            one: z.string(),
-          })
-          .or(
-            z.object({
-              two: z.number(),
-            })
-          )
-      );
-      expect(subject).toBeInstanceOf(z.ZodObject);
-      expect(serializeSchemaForTest(subject)).toMatchSnapshot();
-    });
-
-    test("should return object schema for the intersection of object schemas", () => {
-      const subject = extractObjectSchema(
-        z
-          .object({
-            one: z.string(),
-          })
-          .and(
-            z.object({
-              two: z.number(),
-            })
-          )
-      );
-      expect(subject).toBeInstanceOf(z.ZodObject);
-      expect(serializeSchemaForTest(subject)).toMatchSnapshot();
-    });
-
-    test("should preserve examples", () => {
-      const objectSchema = withMeta(
-        z.object({
-          one: z.string(),
-        })
-      ).example({
-        one: "test",
-      });
-      expect(getMeta(extractObjectSchema(objectSchema), "examples")).toEqual([
-        {
-          one: "test",
-        },
-      ]);
-
-      const unionSchema = withMeta(
-        z
-          .object({
-            one: z.string(),
-          })
-          .or(
-            z.object({
-              two: z.number(),
-            })
-          )
-      )
-        .example({
-          one: "test1",
-        })
-        .example({
-          two: 123,
-        });
-      expect(getMeta(extractObjectSchema(unionSchema), "examples")).toEqual([
-        { one: "test1" },
-        { two: 123 },
-      ]);
-
-      const intersectionSchema = withMeta(
-        z
-          .object({
-            one: z.string(),
-          })
-          .and(
-            z.object({
-              two: z.number(),
-            })
-          )
-      ).example({
-        one: "test1",
-        two: 123,
-      });
-      expect(
-        getMeta(extractObjectSchema(intersectionSchema), "examples")
-      ).toEqual([
-        {
-          one: "test1",
-          two: 123,
-        },
-      ]);
     });
   });
 

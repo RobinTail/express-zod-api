@@ -5,15 +5,14 @@ import { ApiResponse } from "./api-response";
 import { CommonConfig } from "./config-type";
 import { ResultHandlerError } from "./errors";
 import {
-  combineEndpointAndMiddlewareInputSchemas,
+  FlatObject,
   getInitialInput,
   IOSchema,
-  Merge,
   OutputMarker,
   ReplaceMarkerInShape,
 } from "./common-helpers";
 import { Method, MethodsDefinition } from "./method";
-import { MiddlewareDefinition } from "./middleware";
+import { AnyMiddlewareDef } from "./middleware";
 import { lastResortHandler, ResultHandlerDefinition } from "./result-handler";
 
 export type Handler<IN, OUT, OPT> = (params: {
@@ -43,19 +42,17 @@ export abstract class AbstractEndpoint {
 export type EndpointInput<T> = T extends Endpoint<
   infer IN,
   any,
-  infer mIN,
   any,
   any,
   any,
   any
 >
-  ? z.input<Merge<IN, mIN>>
+  ? z.input<IN>
   : never;
 
 export type EndpointOutput<T> = T extends Endpoint<
   any,
   infer OUT,
-  any,
   any,
   any,
   any,
@@ -84,42 +81,35 @@ export type EndpointResponse<E extends AbstractEndpoint> =
 type EndpointProps<
   IN extends IOSchema,
   OUT extends IOSchema,
-  MwIN,
-  OPT,
+  OPT extends FlatObject,
   M extends Method,
   POS extends ApiResponse,
   NEG extends ApiResponse
 > = {
-  middlewares: MiddlewareDefinition<any, any, any>[];
+  middlewares: AnyMiddlewareDef[];
   inputSchema: IN;
   mimeTypes: string[];
   outputSchema: OUT;
-  handler: Handler<z.output<Merge<IN, MwIN>>, z.input<OUT>, OPT>;
+  handler: Handler<z.output<IN>, z.input<OUT>, OPT>;
   resultHandler: ResultHandlerDefinition<POS, NEG>;
   description?: string;
 } & MethodsDefinition<M>;
 
-/** mIN, OPT - from Middlewares */
 export class Endpoint<
   IN extends IOSchema,
   OUT extends IOSchema,
-  MwIN,
-  OPT,
+  OPT extends FlatObject,
   M extends Method,
   POS extends ApiResponse,
   NEG extends ApiResponse
 > extends AbstractEndpoint {
   protected readonly description?: string;
   protected readonly methods: M[] = [];
-  protected readonly middlewares: MiddlewareDefinition<any, any, any>[] = [];
-  protected readonly inputSchema: Merge<IN, MwIN>; // combined with middlewares input
+  protected readonly middlewares: AnyMiddlewareDef[] = [];
+  protected readonly inputSchema: IN;
   protected readonly mimeTypes: string[];
   protected readonly outputSchema: OUT;
-  protected readonly handler: Handler<
-    z.output<Merge<IN, MwIN>>,
-    z.input<OUT>,
-    OPT
-  >;
+  protected readonly handler: Handler<z.output<IN>, z.input<OUT>, OPT>;
   protected readonly resultHandler: ResultHandlerDefinition<POS, NEG>;
 
   constructor({
@@ -131,13 +121,10 @@ export class Endpoint<
     description,
     mimeTypes,
     ...rest
-  }: EndpointProps<IN, OUT, MwIN, OPT, M, POS, NEG>) {
+  }: EndpointProps<IN, OUT, OPT, M, POS, NEG>) {
     super();
     this.middlewares = middlewares;
-    this.inputSchema = combineEndpointAndMiddlewareInputSchemas<IN, MwIN>(
-      inputSchema,
-      middlewares
-    );
+    this.inputSchema = inputSchema;
     this.mimeTypes = mimeTypes;
     this.outputSchema = outputSchema;
     this.handler = handler;
@@ -158,7 +145,7 @@ export class Endpoint<
     return this.methods;
   }
 
-  public override getInputSchema(): Merge<IN, MwIN> {
+  public override getInputSchema(): IN {
     return this.inputSchema;
   }
 
@@ -264,7 +251,8 @@ export class Endpoint<
     logger: Logger;
   }) {
     return this.handler({
-      input: await this.inputSchema.parseAsync(input), // final input types transformations for handler,
+      // final input types transformations for handler
+      input: (await this.inputSchema.parseAsync(input)) as z.output<IN>,
       options,
       logger,
     });

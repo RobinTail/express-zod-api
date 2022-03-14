@@ -9,55 +9,20 @@ import {
 } from "./config-type";
 import { copyMeta, getMeta } from "./metadata";
 import { Method } from "./method";
-import { MiddlewareDefinition } from "./middleware";
+import { AnyMiddlewareDef } from "./middleware";
 import { mimeMultipart } from "./mime";
 import { ZodUpload } from "./upload-schema";
 
 export type FlatObject = Record<string, any>;
 
-type ObjectSchema = z.AnyZodObject;
-type Extractable =
-  | "shape"
-  | "_unknownKeys"
-  | "_catchall"
-  | "_output"
-  | "_input";
-type UnionSchema = z.ZodUnion<[ObjectSchema, ...ObjectSchema[]]>;
-type IntersectionSchema = z.ZodIntersection<ObjectSchema, ObjectSchema>;
-
-// @todo should support DiscriminatedUnion too
-export type IOSchema = ObjectSchema | UnionSchema | IntersectionSchema;
+export type IOSchema<U extends UnknownKeysParam = any> =
+  | z.ZodObject<any, U>
+  | z.ZodUnion<[IOSchema<U>, ...IOSchema<U>[]]>
+  | z.ZodIntersection<IOSchema<U>, IOSchema<U>>
+  | z.ZodDiscriminatedUnion<string, z.Primitive, z.ZodObject<any, U>>;
 
 export type ArrayElement<T extends readonly unknown[]> =
   T extends readonly (infer K)[] ? K : never;
-
-type UnionResult<
-  T extends ObjectSchema[],
-  F extends Extractable
-> = ArrayElement<T>[F];
-type IntersectionResult<
-  T extends IntersectionSchema,
-  F extends Extractable
-> = T["_def"]["left"][F] & T["_def"]["right"][F];
-
-type IOExtract<
-  T extends IOSchema | any,
-  F extends Extractable
-> = T extends ObjectSchema
-  ? T[F]
-  : T extends UnionSchema
-  ? UnionResult<T["options"], F>
-  : T extends IntersectionSchema
-  ? IntersectionResult<T, F>
-  : unknown;
-
-export type Merge<A extends IOSchema, B extends IOSchema | any> = z.ZodObject<
-  IOExtract<A, "shape"> & IOExtract<B, "shape">,
-  IOExtract<A, "_unknownKeys">,
-  IOExtract<A, "_catchall">,
-  IOExtract<A, "_output"> & IOExtract<B, "_output">,
-  IOExtract<A, "_input"> & IOExtract<B, "_input">
->;
 
 export type OutputMarker = IOSchema & { _typeGuard: "OutputMarker" };
 export const markOutput = (output: IOSchema) => output as OutputMarker;
@@ -72,46 +37,36 @@ export type ReplaceMarkerInShape<
   [K in keyof S]: S[K] extends OutputMarker ? OUT : S[K];
 };
 
-export function extractObjectSchema(subject: IOSchema): ObjectSchema {
-  if (subject instanceof z.ZodObject) {
-    return subject;
-  }
-  let objectSchema: ObjectSchema;
-  if (subject instanceof z.ZodUnion) {
-    objectSchema = subject.options.reduce((acc, option) =>
-      acc.partial().merge(option.partial())
-    );
-  } else {
-    // intersection schema
-    objectSchema = subject._def.left.merge(subject._def.right);
-  }
-  return copyMeta(subject, objectSchema);
-}
+export type ProbableIntersection<
+  A extends IOSchema<"strip"> | null,
+  B extends IOSchema
+> = A extends null
+  ? B
+  : A extends IOSchema<"strip">
+  ? z.ZodIntersection<A, B>
+  : never;
 
-export function combineEndpointAndMiddlewareInputSchemas<
-  IN extends IOSchema,
-  MwIN
+/**
+ * @description intersects input schemas of middlewares and the endpoint
+ * @since 07.03.2022 former combineEndpointAndMiddlewareInputSchemas()
+ */
+export const getFinalEndpointInputSchema = <
+  MIN extends IOSchema<"strip"> | null,
+  IN extends IOSchema
 >(
-  input: IN,
-  middlewares: MiddlewareDefinition<IOSchema, any, any>[]
-): Merge<IN, MwIN> {
-  if (middlewares.length === 0) {
-    return extractObjectSchema(input) as Merge<IN, MwIN>;
-  }
-  const mSchema = middlewares
-    .map((middleware) => middleware.input)
-    .reduce((carry, schema) =>
-      extractObjectSchema(carry).merge(extractObjectSchema(schema))
-    );
-  const result = extractObjectSchema(mSchema).merge(
-    extractObjectSchema(input)
-  ) as Merge<IN, MwIN>;
+  middlewares: AnyMiddlewareDef[],
+  input: IN
+): ProbableIntersection<MIN, IN> => {
+  const result = middlewares
+    .map(({ input: schema }) => schema)
+    .concat(input)
+    .reduce((acc, schema) => acc.and(schema)) as ProbableIntersection<MIN, IN>;
   for (const middleware of middlewares) {
     copyMeta(middleware.input, result);
   }
   copyMeta(input, result);
   return result;
-}
+};
 
 function areFilesAvailable(request: Request) {
   const contentType = request.header("content-type") || "";
@@ -275,3 +230,6 @@ export type ErrMessage = Exclude<
 // the copy of the private Zod errorUtil.errToObj
 export const errToObj = (message: ErrMessage | undefined) =>
   typeof message === "string" ? { message } : message || {};
+
+// the copy of the private Zod utility type of ZodObject
+type UnknownKeysParam = "passthrough" | "strict" | "strip";

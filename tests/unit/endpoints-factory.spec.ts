@@ -71,7 +71,9 @@ describe("EndpointsFactory", () => {
       expect(factory["resultHandler"]).toStrictEqual(resultHandlerMock);
       expect(newFactory["middlewares"].length).toBe(1);
       expect(newFactory["middlewares"][0].input).toBeInstanceOf(z.ZodObject);
-      expect(newFactory["middlewares"][0].input.shape).toEqual({});
+      expect(
+        (newFactory["middlewares"][0].input as z.AnyZodObject).shape
+      ).toEqual({});
       expect(
         await newFactory["middlewares"][0].middleware({
           input: {},
@@ -107,7 +109,9 @@ describe("EndpointsFactory", () => {
         });
         expect(newFactory["middlewares"].length).toBe(1);
         expect(newFactory["middlewares"][0].input).toBeInstanceOf(z.ZodObject);
-        expect(newFactory["middlewares"][0].input.shape).toEqual({});
+        expect(
+          (newFactory["middlewares"][0].input as z.AnyZodObject).shape
+        ).toEqual({});
         const requestMock = { body: { something: "awesome" } } as Request;
         const responseMock = {} as Response;
         const options = await newFactory["middlewares"][0].middleware({
@@ -251,10 +255,12 @@ describe("EndpointsFactory", () => {
       ).toMatchSnapshot();
       expect(endpoint["handler"]).toStrictEqual(handlerMock);
       expect(endpoint["resultHandler"]).toStrictEqual(resultHandlerMock);
-      expectType<{
-        n: z.ZodNumber;
-        s: z.ZodString;
-      }>(endpoint["inputSchema"].shape);
+      expectType<
+        z.ZodIntersection<
+          z.ZodObject<{ n: z.ZodNumber }>,
+          z.ZodObject<{ s: z.ZodString }>
+        >
+      >(endpoint.getInputSchema());
     });
 
     test("Should create an endpoint with intersection middleware", () => {
@@ -294,11 +300,15 @@ describe("EndpointsFactory", () => {
       ).toMatchSnapshot();
       expect(endpoint["handler"]).toStrictEqual(handlerMock);
       expect(endpoint["resultHandler"]).toStrictEqual(resultHandlerMock);
-      expectType<{
-        n1: z.ZodNumber;
-        n2: z.ZodNumber;
-        s: z.ZodString;
-      }>(endpoint["inputSchema"].shape);
+      expectType<
+        z.ZodIntersection<
+          z.ZodIntersection<
+            z.ZodObject<{ n1: z.ZodNumber }>,
+            z.ZodObject<{ n2: z.ZodNumber }>
+          >,
+          z.ZodObject<{ s: z.ZodString }>
+        >
+      >(endpoint.getInputSchema());
     });
 
     test("Should create an endpoint with union middleware", () => {
@@ -342,22 +352,13 @@ describe("EndpointsFactory", () => {
       expect(endpoint["handler"]).toStrictEqual(handlerMock);
       expect(endpoint["resultHandler"]).toStrictEqual(resultHandlerMock);
       expectType<
-        (
-          | {
-              n1: z.ZodNumber;
-            }
-          | {
-              n2: z.ZodNumber;
-            }
-        ) & {
-          s: z.ZodString;
-        }
-      >(endpoint["inputSchema"].shape);
-      expectType<{
-        n1?: z.ZodNumber;
-        n2?: z.ZodNumber;
-        s: z.ZodString;
-      }>(endpoint["inputSchema"].shape);
+        z.ZodIntersection<
+          z.ZodUnion<
+            [z.ZodObject<{ n1: z.ZodNumber }>, z.ZodObject<{ n2: z.ZodNumber }>]
+          >,
+          z.ZodObject<{ s: z.ZodString }>
+        >
+      >(endpoint.getInputSchema());
     });
   });
 });

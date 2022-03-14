@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Example API
-  version: 5.8.0
+  version: 5.9.0-beta1
 paths:
   /v1/user/retrieve:
     get:
@@ -155,25 +155,34 @@ paths:
           application/json:
             schema:
               description: POST /v1/user/:id request body
-              type: object
-              properties:
-                key:
-                  type: string
-                  minLength: 1
-                name:
-                  type: string
-                  minLength: 1
-                birthday:
-                  type: string
-                  format: date-time
-                  pattern: ^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d{3})?)?Z?$
-                  description: YYYY-MM-DDTHH:mm:ss.sssZ
-                  externalDocs:
-                    url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
-              required:
-                - key
-                - name
-                - birthday
+              allOf:
+                - example:
+                    key: 1234-5678-90
+                  type: object
+                  properties:
+                    key:
+                      type: string
+                      minLength: 1
+                  required:
+                    - key
+                - example:
+                    name: John Doe
+                    birthday: 1963-04-21
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                      minLength: 1
+                    birthday:
+                      type: string
+                      format: date-time
+                      pattern: ^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d{3})?)?Z?$
+                      description: YYYY-MM-DDTHH:mm:ss.sssZ
+                      externalDocs:
+                        url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
+                  required:
+                    - name
+                    - birthday
             examples:
               example1:
                 value:

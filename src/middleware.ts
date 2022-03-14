@@ -17,7 +17,7 @@ type Middleware<IN, OPT, OUT> = (
 ) => Promise<OUT>;
 
 export interface MiddlewareDefinition<
-  IN extends IOSchema,
+  IN extends IOSchema<"strip">,
   OPT,
   OUT extends FlatObject
 > {
@@ -25,8 +25,14 @@ export interface MiddlewareDefinition<
   middleware: Middleware<z.output<IN>, OPT, OUT>;
 }
 
+export type AnyMiddlewareDef = MiddlewareDefinition<
+  IOSchema<"strip">,
+  any,
+  any
+>;
+
 export const createMiddleware = <
-  IN extends IOSchema,
+  IN extends IOSchema<"strip">,
   OPT,
   OUT extends FlatObject
 >(

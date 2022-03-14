@@ -6,8 +6,8 @@ export class DependsOnMethod {
   constructor(
     public readonly methods: {
       [K in Method]?:
-        | Endpoint<any, any, any, any, K, any, any>
-        | Endpoint<any, any, any, any, Method, any, any>;
+        | Endpoint<any, any, any, K, any, any>
+        | Endpoint<any, any, any, Method, any, any>;
     }
   ) {
     (Object.keys(methods) as (keyof typeof methods)[]).forEach((key) => {

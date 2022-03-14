@@ -633,3 +633,48 @@ Object {
   "type": "object",
 }
 `;
+
+exports[`Open API helpers extractObjectSchema() should pass the object schema through 1`] = `
+Object {
+  "_type": "ZodObject",
+  "shape": Object {
+    "one": Object {
+      "_type": "ZodString",
+    },
+  },
+}
+`;
+
+exports[`Open API helpers extractObjectSchema() should return object schema for the intersection of object schemas 1`] = `
+Object {
+  "_type": "ZodObject",
+  "shape": Object {
+    "one": Object {
+      "_type": "ZodString",
+    },
+    "two": Object {
+      "_type": "ZodNumber",
+    },
+  },
+}
+`;
+
+exports[`Open API helpers extractObjectSchema() should return object schema for the union of object schemas 1`] = `
+Object {
+  "_type": "ZodObject",
+  "shape": Object {
+    "one": Object {
+      "_type": "ZodOptional",
+      "value": Object {
+        "_type": "ZodString",
+      },
+    },
+    "two": Object {
+      "_type": "ZodOptional",
+      "value": Object {
+        "_type": "ZodNumber",
+      },
+    },
+  },
+}
+`;
