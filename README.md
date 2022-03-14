@@ -343,7 +343,7 @@ in actual response by calling
 which in turn calls
 [toISOString()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString).
 It is also impossible to transmit the `Date` in its original form to your endpoints within JSON. Therefore, there is
-confusion with original method `z.date()` that should not be used within IO schemas of your API.
+confusion with original method ~~z.date()~~ that should not be used within IO schemas of your API.
 
 In order to solve this problem, the library provides two custom methods for dealing with dates: `z.dateIn()` and
 `z.dateOut()` for using within input and output schemas accordingly.
