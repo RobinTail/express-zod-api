@@ -7,9 +7,11 @@
 - Technically this version contains all the same changes and improvements as 5.9.0-beta1.
 - The new implementation of the `EndpointsFactory`, however, has more restrictive middleware input schema requirements.
 - To avoid possible backward incompatibility issues, I have decided to publish these changes as a major release.
+- In addition, the deprecated schema `z.date()` is no longer supported in documentation generator.
 - The following changes are required to migrate to this version:
   - You cannot use the `.strict()`, `.passthrough()` and its deprecated alias `.nonstrict()` methods in middlewares.
   - Only `.strip()` is allowed in middlewares, which is actually default, so you should not use any of them at all.
+  - Replace the `z.date()` with `z.dateIn()` in input schema and with `z.dateOut()` in output schema.
 
 ```typescript
 // how to migrate
@@ -17,6 +19,7 @@ export const myMiddleware = createMiddleware({
   input: z
     .object({
       key: z.string().nonempty(),
+      at: z.date(), // <— replace with z.dateIn()
     })
     .passthrough(), // <— remove this if you have it in your code
   middleware: async () => ({...}),

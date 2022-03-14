@@ -191,19 +191,6 @@ export const depictNull: DepictHelper<z.ZodNull> = ({ initial }) => ({
   format: "null",
 });
 
-/** @todo remove in next major update */
-export const depictDate: DepictHelper<z.ZodDate> = ({
-  initial,
-  isResponse,
-}) => ({
-  ...initial,
-  type: "string",
-  format: "date-time",
-  description: `z.date() is deprecated, please use ${
-    isResponse ? "z.dateOut()" : "z.dateIn()"
-  } instead.`,
-});
-
 export const depictDateIn: DepictHelper<ZodDateIn> = ({
   initial,
   isResponse,
@@ -595,8 +582,6 @@ const depictHelpers: DepictingRules = {
   ZodNumber: depictNumber,
   ZodBigInt: depictBigInt,
   ZodBoolean: depictBoolean,
-  /** @todo remove in next major update */
-  ZodDate: depictDate,
   ZodDateIn: depictDateIn,
   ZodDateOut: depictDateOut,
   ZodNull: depictNull,

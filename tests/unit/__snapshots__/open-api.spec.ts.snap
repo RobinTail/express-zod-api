@@ -1925,10 +1925,6 @@ paths:
                   format: bigint
                 boolean:
                   type: boolean
-                date:
-                  type: string
-                  format: date-time
-                  description: z.date() is deprecated, please use z.dateIn() instead.
                 dateIn:
                   type: string
                   format: date-time
@@ -1939,7 +1935,6 @@ paths:
               required:
                 - bigint
                 - boolean
-                - date
                 - dateIn
 components:
   schemas: {}

@@ -237,7 +237,6 @@ describe("Open API generator", () => {
               input: z.object({
                 bigint: z.bigint(),
                 boolean: z.boolean(),
-                date: z.date(),
                 dateIn: z.dateIn(),
               }),
               output: z.object({
