@@ -10,7 +10,6 @@ import {
   depictArray,
   depictBigInt,
   depictBoolean,
-  depictDate,
   depictDateIn,
   depictDateOut,
   depictDefault,
@@ -390,18 +389,6 @@ describe("Open API helpers", () => {
       expect(
         depictNull({
           schema: z.null(),
-          isResponse: false,
-          initial: { description: "test" },
-        })
-      ).toMatchSnapshot();
-    });
-  });
-
-  describe("depictDate()", () => {
-    test("should depict ZodDate", () => {
-      expect(
-        depictDate({
-          schema: z.date(),
           isResponse: false,
           initial: { description: "test" },
         })

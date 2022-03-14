@@ -9,8 +9,7 @@ export const file = ZodFile.create;
 export const upload = ZodUpload.create;
 
 /**
- * @todo sort this out in the next major release
- * @description z.date() represents the Date, it should not be used with IO schemas
+ * @description z.date() represents the Date, it should not be used within IO schemas
  * @deprecated Please use z.dateIn() or z.dateOut() within IO schemas
  * */
 export const date = ZodDate.create;
