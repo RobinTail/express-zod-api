@@ -151,18 +151,16 @@ describe("ResultHandler", () => {
     });
 
     test("should generate negative response example", () => {
-      expect(defaultResultHandler.getNegativeResponse()._def[metaProp]).toEqual(
-        {
-          examples: [
-            {
-              status: "error",
-              error: {
-                message: "Sample error message",
-              },
+      expect(defaultResultHandler.negativeResponse._def[metaProp]).toEqual({
+        examples: [
+          {
+            status: "error",
+            error: {
+              message: "Sample error message",
             },
-          ],
-        }
-      );
+          },
+        ],
+      });
     });
   });
 });

@@ -1,10 +1,6 @@
 import mime from "mime";
-import {
-  createResultHandler,
-  defaultEndpointsFactory,
-  EndpointsFactory,
-  z,
-} from "../src";
+import { defaultEndpointsFactory, EndpointsFactory, z } from "../src";
+import { ResultHandlerDefinition } from "../src/result-handler";
 import { authMiddleware } from "./middlewares";
 import fs from "fs";
 
@@ -12,11 +8,13 @@ export const keyAndTokenAuthenticatedEndpointsFactory =
   defaultEndpointsFactory.addMiddleware(authMiddleware);
 
 export const fileSendingEndpointsFactory = new EndpointsFactory(
-  createResultHandler({
-    positiveMimeTypes: [mime.getType("svg") || "image/svg+xml"],
-    negativeMimeTypes: [mime.getType("txt") || "text/plain"],
+  new ResultHandlerDefinition({
+    mimeTypes: {
+      positive: mime.getType("svg") || "image/svg+xml",
+      negative: mime.getType("txt") || "text/plain",
+    },
     getPositiveResponse: () => z.string(),
-    getNegativeResponse: () => z.string(),
+    negativeResponse: z.string(),
     handler: ({ response, error, output }) => {
       if (error) {
         response.status(400).send(error.message);
@@ -32,11 +30,13 @@ export const fileSendingEndpointsFactory = new EndpointsFactory(
 );
 
 export const fileStreamingEndpointsFactory = new EndpointsFactory(
-  createResultHandler({
-    positiveMimeTypes: ["image/*"],
-    negativeMimeTypes: [mime.getType("txt") || "text/plain"],
+  new ResultHandlerDefinition({
+    mimeTypes: {
+      positive: "image/*",
+      negative: mime.getType("txt") || "text/plain",
+    },
     getPositiveResponse: () => z.file().binary(),
-    getNegativeResponse: () => z.string(),
+    negativeResponse: z.string(),
     handler: ({ response, error, output }) => {
       if (error) {
         response.status(400).send(error.message);

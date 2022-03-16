@@ -157,7 +157,7 @@ export class Endpoint<
   }
 
   public override getNegativeResponseSchema(): NEG {
-    return this.resultHandler.getNegativeResponse();
+    return this.resultHandler.negativeResponse;
   }
 
   public override getInputMimeTypes() {
@@ -165,11 +165,11 @@ export class Endpoint<
   }
 
   public override getPositiveMimeTypes() {
-    return this.resultHandler.positiveMimeTypes;
+    return this.resultHandler.mimeTypes.positive;
   }
 
   public override getNegativeMimeTypes() {
-    return this.resultHandler.negativeMimeTypes;
+    return this.resultHandler.mimeTypes.negative;
   }
 
   #setupCorsHeaders(response: Response) {

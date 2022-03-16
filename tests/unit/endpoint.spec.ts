@@ -8,8 +8,8 @@ import {
   EndpointOutput,
   EndpointResponse,
   defaultEndpointsFactory,
-  createResultHandler,
   testEndpoint,
+  ResultHandlerDefinition,
 } from "../../src";
 import { Endpoint } from "../../src/endpoint";
 import { mimeJson } from "../../src/mime";
@@ -24,9 +24,9 @@ describe("Endpoint", () => {
         mimeTypes: [mimeJson],
         outputSchema: z.object({}),
         handler: jest.fn(),
-        resultHandler: createResultHandler({
+        resultHandler: new ResultHandlerDefinition({
           getPositiveResponse: jest.fn(),
-          getNegativeResponse: jest.fn(),
+          negativeResponse: z.any(),
           handler: jest.fn(),
         }),
         middlewares: [],
@@ -47,9 +47,9 @@ describe("Endpoint", () => {
         mimeTypes: [mimeJson],
         outputSchema: z.object({}),
         handler: jest.fn(),
-        resultHandler: createResultHandler({
+        resultHandler: new ResultHandlerDefinition({
           getPositiveResponse: jest.fn(),
-          getNegativeResponse: jest.fn(),
+          negativeResponse: z.any(),
           handler: jest.fn(),
         }),
         middlewares: [],
@@ -244,9 +244,9 @@ describe("Endpoint", () => {
   describe("#handleResult", () => {
     test("Should handle errors within ResultHandler", async () => {
       const factory = new EndpointsFactory(
-        createResultHandler({
+        new ResultHandlerDefinition({
           getPositiveResponse: () => z.object({}),
-          getNegativeResponse: () => z.object({}),
+          negativeResponse: z.object({}),
           handler: () => {
             throw new Error("Something unexpected happened");
           },

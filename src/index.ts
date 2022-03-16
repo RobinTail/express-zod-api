@@ -10,7 +10,10 @@ export { EndpointsFactory, defaultEndpointsFactory } from "./endpoints-factory";
 export { IOSchema, FlatObject, markOutput } from "./common-helpers";
 export { createLogger } from "./logger";
 export { createMiddleware } from "./middleware";
-export { createResultHandler, defaultResultHandler } from "./result-handler";
+export {
+  ResultHandlerDefinition,
+  defaultResultHandler,
+} from "./result-handler";
 export { DependsOnMethod } from "./depends-on-method";
 export { ServeStatic } from "./serve-static";
 export { Routing } from "./routing";

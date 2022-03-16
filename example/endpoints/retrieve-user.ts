@@ -1,4 +1,9 @@
-import { z, createHttpError, defaultEndpointsFactory } from "../../src";
+import {
+  z,
+  createHttpError,
+  defaultEndpointsFactory,
+  EndpointResponse,
+} from "../../src";
 import { methodProviderMiddleware } from "../middlewares";
 
 export const retrieveUserEndpoint = defaultEndpointsFactory
@@ -26,3 +31,7 @@ export const retrieveUserEndpoint = defaultEndpointsFactory
       return { id, name };
     },
   });
+
+// @todo remove
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+type TEST = EndpointResponse<typeof retrieveUserEndpoint>;

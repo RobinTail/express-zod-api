@@ -1,9 +1,13 @@
 import { Request, RequestHandler, Response } from "express";
 import createHttpError, { HttpError } from "http-errors";
 import { Logger } from "winston";
-import { createMiddleware, EndpointsFactory, z } from "../../src";
+import {
+  ResultHandlerDefinition,
+  createMiddleware,
+  EndpointsFactory,
+  z,
+} from "../../src";
 import { Endpoint } from "../../src/endpoint";
-import { ResultHandlerDefinition } from "../../src/result-handler";
 import { expectType } from "tsd";
 import { serializeSchemaForTest } from "../helpers";
 

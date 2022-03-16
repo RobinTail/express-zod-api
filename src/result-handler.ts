@@ -30,38 +30,52 @@ type ResultHandler<RES> = (
   params: ResultHandlerParams<RES>
 ) => void | Promise<void>;
 
-export interface ResultHandlerDefinition<
+export class ResultHandlerDefinition<
   POS extends z.ZodTypeAny,
   NEG extends z.ZodTypeAny
 > {
-  getPositiveResponse: <OUT extends IOSchema>(output: OUT) => POS;
-  getNegativeResponse: () => NEG;
-  handler: ResultHandler<z.output<POS> | z.output<NEG>>;
-  positiveMimeTypes: string[];
-  negativeMimeTypes: string[];
+  public readonly getPositiveResponse: <OUT extends IOSchema>(
+    output: OUT
+  ) => POS;
+  public readonly negativeResponse: NEG;
+  public readonly handler: ResultHandler<z.output<POS> | z.output<NEG>>;
+  public readonly mimeTypes: { positive: string[]; negative: string[] };
+
+  constructor({
+    getPositiveResponse,
+    negativeResponse,
+    handler,
+    mimeTypes,
+  }: {
+    getPositiveResponse: <OUT extends IOSchema>(output: OUT) => POS;
+    negativeResponse: NEG;
+    handler: ResultHandler<z.output<POS> | z.output<NEG>>;
+    mimeTypes?: {
+      positive?: string | string[];
+      negative?: string | string[];
+    };
+  }) {
+    this.getPositiveResponse = getPositiveResponse;
+    this.negativeResponse = negativeResponse;
+    this.handler = handler;
+    this.mimeTypes = {
+      positive:
+        mimeTypes && mimeTypes.positive
+          ? Array.isArray(mimeTypes.positive)
+            ? mimeTypes.positive
+            : [mimeTypes.positive]
+          : [mimeJson],
+      negative:
+        mimeTypes && mimeTypes.negative
+          ? Array.isArray(mimeTypes.negative)
+            ? mimeTypes.negative
+            : [mimeTypes.negative]
+          : [mimeJson],
+    };
+  }
 }
 
-export const createResultHandler = <
-  POS extends z.ZodTypeAny,
-  NEG extends z.ZodTypeAny
->(
-  definition: Omit<
-    ResultHandlerDefinition<POS, NEG>,
-    "positiveMimeTypes" | "negativeMimeTypes"
-  > &
-    Partial<
-      Pick<
-        ResultHandlerDefinition<POS, NEG>,
-        "positiveMimeTypes" | "negativeMimeTypes"
-      >
-    >
-): ResultHandlerDefinition<POS, NEG> => ({
-  ...definition,
-  positiveMimeTypes: definition.positiveMimeTypes || [mimeJson],
-  negativeMimeTypes: definition.negativeMimeTypes || [mimeJson],
-});
-
-export const defaultResultHandler = createResultHandler({
+export const defaultResultHandler = new ResultHandlerDefinition({
   getPositiveResponse: <OUT extends IOSchema>(output: OUT) => {
     const examples = getMeta(output, "examples") || [];
     const responseSchema = withMeta(
@@ -79,20 +93,19 @@ export const defaultResultHandler = createResultHandler({
     }
     return responseSchema;
   },
-  getNegativeResponse: () =>
-    withMeta(
-      z.object({
-        status: z.literal("error"),
-        error: z.object({
-          message: z.string(),
-        }),
-      })
-    ).example({
-      status: "error",
-      error: {
-        message: getMessageFromError(new Error("Sample error message")),
-      },
-    }),
+  negativeResponse: withMeta(
+    z.object({
+      status: z.literal("error"),
+      error: z.object({
+        message: z.string(),
+      }),
+    })
+  ).example({
+    status: "error",
+    error: {
+      message: getMessageFromError(new Error("Sample error message")),
+    },
+  }),
   handler: ({ error, input, output, request, response, logger }) => {
     if (!error) {
       response.status(200).json({
