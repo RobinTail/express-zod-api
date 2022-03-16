@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import { Logger } from "winston";
 import { z } from "zod";
-import { ApiResponse } from "./api-response";
 import { CommonConfig } from "./config-type";
 import { ResultHandlerError } from "./errors";
 import {
@@ -83,8 +82,8 @@ type EndpointProps<
   OUT extends IOSchema,
   OPT extends FlatObject,
   M extends Method,
-  POS extends ApiResponse,
-  NEG extends ApiResponse
+  POS extends z.ZodTypeAny,
+  NEG extends z.ZodTypeAny
 > = {
   middlewares: AnyMiddlewareDef[];
   inputSchema: IN;
@@ -100,8 +99,8 @@ export class Endpoint<
   OUT extends IOSchema,
   OPT extends FlatObject,
   M extends Method,
-  POS extends ApiResponse,
-  NEG extends ApiResponse
+  POS extends z.ZodTypeAny,
+  NEG extends z.ZodTypeAny
 > extends AbstractEndpoint {
   protected readonly description?: string;
   protected readonly methods: M[] = [];
@@ -153,12 +152,12 @@ export class Endpoint<
     return this.outputSchema;
   }
 
-  public override getPositiveResponseSchema(): POS["schema"] {
-    return this.resultHandler.getPositiveResponse(this.outputSchema).schema;
+  public override getPositiveResponseSchema(): POS {
+    return this.resultHandler.getPositiveResponse(this.outputSchema);
   }
 
-  public override getNegativeResponseSchema(): NEG["schema"] {
-    return this.resultHandler.getNegativeResponse().schema;
+  public override getNegativeResponseSchema(): NEG {
+    return this.resultHandler.getNegativeResponse();
   }
 
   public override getInputMimeTypes() {
@@ -166,11 +165,11 @@ export class Endpoint<
   }
 
   public override getPositiveMimeTypes() {
-    return this.resultHandler.getPositiveResponse(this.outputSchema).mimeTypes;
+    return this.resultHandler.positiveMimeTypes;
   }
 
   public override getNegativeMimeTypes() {
-    return this.resultHandler.getNegativeResponse().mimeTypes;
+    return this.resultHandler.negativeMimeTypes;
   }
 
   #setupCorsHeaders(response: Response) {

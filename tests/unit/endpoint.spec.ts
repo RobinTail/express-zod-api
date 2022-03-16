@@ -9,7 +9,6 @@ import {
   EndpointResponse,
   defaultEndpointsFactory,
   createResultHandler,
-  createApiResponse,
   testEndpoint,
 } from "../../src";
 import { Endpoint } from "../../src/endpoint";
@@ -25,11 +24,11 @@ describe("Endpoint", () => {
         mimeTypes: [mimeJson],
         outputSchema: z.object({}),
         handler: jest.fn(),
-        resultHandler: {
+        resultHandler: createResultHandler({
           getPositiveResponse: jest.fn(),
           getNegativeResponse: jest.fn(),
           handler: jest.fn(),
-        },
+        }),
         middlewares: [],
       });
       expect(endpointMock.getMethods()).toEqual([
@@ -48,11 +47,11 @@ describe("Endpoint", () => {
         mimeTypes: [mimeJson],
         outputSchema: z.object({}),
         handler: jest.fn(),
-        resultHandler: {
+        resultHandler: createResultHandler({
           getPositiveResponse: jest.fn(),
           getNegativeResponse: jest.fn(),
           handler: jest.fn(),
-        },
+        }),
         middlewares: [],
       });
       expect(endpointMock.getMethods()).toEqual(["patch"]);
@@ -246,8 +245,8 @@ describe("Endpoint", () => {
     test("Should handle errors within ResultHandler", async () => {
       const factory = new EndpointsFactory(
         createResultHandler({
-          getPositiveResponse: () => createApiResponse(z.object({})),
-          getNegativeResponse: () => createApiResponse(z.object({})),
+          getPositiveResponse: () => z.object({}),
+          getNegativeResponse: () => z.object({}),
           handler: () => {
             throw new Error("Something unexpected happened");
           },

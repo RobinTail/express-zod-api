@@ -1,6 +1,5 @@
 import mime from "mime";
 import {
-  createApiResponse,
   createResultHandler,
   defaultEndpointsFactory,
   EndpointsFactory,
@@ -14,10 +13,10 @@ export const keyAndTokenAuthenticatedEndpointsFactory =
 
 export const fileSendingEndpointsFactory = new EndpointsFactory(
   createResultHandler({
-    getPositiveResponse: () =>
-      createApiResponse(z.string(), mime.getType("svg") || "image/svg+xml"),
-    getNegativeResponse: () =>
-      createApiResponse(z.string(), mime.getType("txt") || "text/plain"),
+    positiveMimeTypes: [mime.getType("svg") || "image/svg+xml"],
+    negativeMimeTypes: [mime.getType("txt") || "text/plain"],
+    getPositiveResponse: () => z.string(),
+    getNegativeResponse: () => z.string(),
     handler: ({ response, error, output }) => {
       if (error) {
         response.status(400).send(error.message);
@@ -34,9 +33,10 @@ export const fileSendingEndpointsFactory = new EndpointsFactory(
 
 export const fileStreamingEndpointsFactory = new EndpointsFactory(
   createResultHandler({
-    getPositiveResponse: () => createApiResponse(z.file().binary(), "image/*"),
-    getNegativeResponse: () =>
-      createApiResponse(z.string(), mime.getType("txt") || "text/plain"),
+    positiveMimeTypes: ["image/*"],
+    negativeMimeTypes: [mime.getType("txt") || "text/plain"],
+    getPositiveResponse: () => z.file().binary(),
+    getNegativeResponse: () => z.string(),
     handler: ({ response, error, output }) => {
       if (error) {
         response.status(400).send(error.message);

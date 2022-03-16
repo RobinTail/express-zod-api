@@ -8,7 +8,6 @@ import {
   z,
   defaultResultHandler,
   createResultHandler,
-  createApiResponse,
 } from "../../src";
 import { waitFor } from "../helpers";
 
@@ -38,8 +37,8 @@ describe("App", () => {
           }),
         faulty: new EndpointsFactory(
           createResultHandler({
-            getPositiveResponse: () => createApiResponse(z.object({})),
-            getNegativeResponse: () => createApiResponse(z.object({})),
+            getPositiveResponse: () => z.object({}),
+            getNegativeResponse: () => z.object({}),
             handler: () => {
               throw new Error("I am faulty");
             },
