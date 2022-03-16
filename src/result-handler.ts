@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import { Logger } from "winston";
 import { z } from "zod";
-import { ApiResponse, createApiResponse } from "./api-response";
 import { ResultHandlerError } from "./errors";
 import {
   getMessageFromError,
@@ -10,6 +9,7 @@ import {
   markOutput,
 } from "./common-helpers";
 import { getMeta, withMeta } from "./metadata";
+import { mimeJson } from "./mime";
 
 interface LastResortHandlerParams {
   error: ResultHandlerError;
@@ -31,20 +31,35 @@ type ResultHandler<RES> = (
 ) => void | Promise<void>;
 
 export interface ResultHandlerDefinition<
-  POS extends ApiResponse,
-  NEG extends ApiResponse
+  POS extends z.ZodTypeAny,
+  NEG extends z.ZodTypeAny
 > {
   getPositiveResponse: <OUT extends IOSchema>(output: OUT) => POS;
   getNegativeResponse: () => NEG;
-  handler: ResultHandler<z.output<POS["schema"]> | z.output<NEG["schema"]>>;
+  handler: ResultHandler<z.output<POS> | z.output<NEG>>;
+  positiveMimeTypes: string[];
+  negativeMimeTypes: string[];
 }
 
 export const createResultHandler = <
-  POS extends ApiResponse,
-  NEG extends ApiResponse
+  POS extends z.ZodTypeAny,
+  NEG extends z.ZodTypeAny
 >(
-  definition: ResultHandlerDefinition<POS, NEG>
-) => definition;
+  definition: Omit<
+    ResultHandlerDefinition<POS, NEG>,
+    "positiveMimeTypes" | "negativeMimeTypes"
+  > &
+    Partial<
+      Pick<
+        ResultHandlerDefinition<POS, NEG>,
+        "positiveMimeTypes" | "negativeMimeTypes"
+      >
+    >
+): ResultHandlerDefinition<POS, NEG> => ({
+  ...definition,
+  positiveMimeTypes: definition.positiveMimeTypes || [mimeJson],
+  negativeMimeTypes: definition.negativeMimeTypes || [mimeJson],
+});
 
 export const defaultResultHandler = createResultHandler({
   getPositiveResponse: <OUT extends IOSchema>(output: OUT) => {
@@ -62,10 +77,10 @@ export const defaultResultHandler = createResultHandler({
         data: example,
       });
     }
-    return createApiResponse(responseSchema);
+    return responseSchema;
   },
-  getNegativeResponse: () => {
-    const responseSchema = withMeta(
+  getNegativeResponse: () =>
+    withMeta(
       z.object({
         status: z.literal("error"),
         error: z.object({
@@ -77,9 +92,7 @@ export const defaultResultHandler = createResultHandler({
       error: {
         message: getMessageFromError(new Error("Sample error message")),
       },
-    });
-    return createApiResponse(responseSchema);
-  },
+    }),
   handler: ({ error, input, output, request, response, logger }) => {
     if (!error) {
       response.status(200).json({

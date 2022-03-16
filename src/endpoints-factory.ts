@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import { z } from "zod";
-import { ApiResponse } from "./api-response";
 import {
   FlatObject,
   getFinalEndpointInputSchema,
@@ -37,8 +36,8 @@ type BuildProps<
 } & MethodsDefinition<M>;
 
 export class EndpointsFactory<
-  POS extends ApiResponse,
-  NEG extends ApiResponse,
+  POS extends z.ZodTypeAny,
+  NEG extends z.ZodTypeAny,
   IN extends IOSchema<"strip"> | null = null,
   OUT extends FlatObject = {}
 > {
@@ -47,8 +46,8 @@ export class EndpointsFactory<
   constructor(protected resultHandler: ResultHandlerDefinition<POS, NEG>) {}
 
   static #create<
-    CPOS extends ApiResponse,
-    CNEG extends ApiResponse,
+    CPOS extends z.ZodTypeAny,
+    CNEG extends z.ZodTypeAny,
     CIN extends IOSchema<"strip"> | null,
     COUT extends FlatObject
   >(

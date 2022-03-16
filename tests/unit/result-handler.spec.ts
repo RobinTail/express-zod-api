@@ -137,7 +137,7 @@ describe("ResultHandler", () => {
           ).example({
             str: "test",
           })
-        ).schema._def[metaProp]
+        )._def[metaProp]
       ).toEqual({
         examples: [
           {
@@ -151,18 +151,18 @@ describe("ResultHandler", () => {
     });
 
     test("should generate negative response example", () => {
-      expect(
-        defaultResultHandler.getNegativeResponse().schema._def[metaProp]
-      ).toEqual({
-        examples: [
-          {
-            status: "error",
-            error: {
-              message: "Sample error message",
+      expect(defaultResultHandler.getNegativeResponse()._def[metaProp]).toEqual(
+        {
+          examples: [
+            {
+              status: "error",
+              error: {
+                message: "Sample error message",
+              },
             },
-          },
-        ],
-      });
+          ],
+        }
+      );
     });
   });
 });
