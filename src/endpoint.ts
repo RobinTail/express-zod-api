@@ -3,13 +3,7 @@ import { Logger } from "winston";
 import { z } from "zod";
 import { CommonConfig } from "./config-type";
 import { ResultHandlerError } from "./errors";
-import {
-  FlatObject,
-  getInitialInput,
-  IOSchema,
-  OutputMarker,
-  ReplaceMarkerInShape,
-} from "./common-helpers";
+import { FlatObject, getInitialInput, IOSchema } from "./common-helpers";
 import { Method, MethodsDefinition } from "./method";
 import { AnyMiddlewareDef } from "./middleware";
 import { lastResortHandler, ResultHandlerDefinition } from "./result-handler";
@@ -60,29 +54,28 @@ export type EndpointOutput<T> = T extends Endpoint<
   ? z.output<OUT>
   : never;
 
-export type EndpointResponse<E extends AbstractEndpoint> =
-  | z.output<
-      ReturnType<
-        E["getPositiveResponseSchema"]
-      > extends z.ZodObject<z.ZodRawShape> // in object response
-        ? z.ZodObject<
-            ReplaceMarkerInShape<
-              ReturnType<E["getPositiveResponseSchema"]>["_shape"],
-              ReturnType<E["getOutputSchema"]>
-            >
-          >
-        : ReturnType<E["getPositiveResponseSchema"]> extends OutputMarker // "as is" response
-        ? ReturnType<E["getOutputSchema"]>
-        : ReturnType<E["getPositiveResponseSchema"]> // explicitly defined response
+export type EndpointResponse<E> = E extends Endpoint<
+  any,
+  infer OUT,
+  any,
+  any,
+  infer POS,
+  infer NEG
+>
+  ? z.output<
+      | ReturnType<
+          ResultHandlerDefinition<POS, NEG, OUT>["getPositiveResponse"]
+        >
+      | NEG
     >
-  | z.output<ReturnType<E["getNegativeResponseSchema"]>>;
+  : never;
 
 type EndpointProps<
   IN extends IOSchema,
   OUT extends IOSchema,
   OPT extends FlatObject,
   M extends Method,
-  POS extends z.ZodTypeAny,
+  POS extends (output: OUT) => z.ZodTypeAny,
   NEG extends z.ZodTypeAny
 > = {
   middlewares: AnyMiddlewareDef[];
@@ -90,7 +83,7 @@ type EndpointProps<
   mimeTypes: string[];
   outputSchema: OUT;
   handler: Handler<z.output<IN>, z.input<OUT>, OPT>;
-  resultHandler: ResultHandlerDefinition<POS, NEG>;
+  resultHandler: ResultHandlerDefinition<POS, NEG, OUT>;
   description?: string;
 } & MethodsDefinition<M>;
 
@@ -99,7 +92,7 @@ export class Endpoint<
   OUT extends IOSchema,
   OPT extends FlatObject,
   M extends Method,
-  POS extends z.ZodTypeAny,
+  POS extends (output: OUT) => z.ZodTypeAny,
   NEG extends z.ZodTypeAny
 > extends AbstractEndpoint {
   protected readonly description?: string;
@@ -109,7 +102,7 @@ export class Endpoint<
   protected readonly mimeTypes: string[];
   protected readonly outputSchema: OUT;
   protected readonly handler: Handler<z.output<IN>, z.input<OUT>, OPT>;
-  protected readonly resultHandler: ResultHandlerDefinition<POS, NEG>;
+  protected readonly resultHandler: ResultHandlerDefinition<POS, NEG, OUT>;
 
   constructor({
     middlewares,
@@ -152,7 +145,7 @@ export class Endpoint<
     return this.outputSchema;
   }
 
-  public override getPositiveResponseSchema(): POS {
+  public override getPositiveResponseSchema() {
     return this.resultHandler.getPositiveResponse(this.outputSchema);
   }
 

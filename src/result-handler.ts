@@ -6,7 +6,6 @@ import {
   getMessageFromError,
   getStatusCodeFromError,
   IOSchema,
-  markOutput,
 } from "./common-helpers";
 import { getMeta, withMeta } from "./metadata";
 import { mimeJson } from "./mime";
@@ -31,14 +30,13 @@ type ResultHandler<RES> = (
 ) => void | Promise<void>;
 
 export class ResultHandlerDefinition<
-  POS extends z.ZodTypeAny,
-  NEG extends z.ZodTypeAny
+  POS extends (output: OUT) => z.ZodTypeAny,
+  NEG extends z.ZodTypeAny,
+  OUT extends IOSchema = IOSchema
 > {
-  public readonly getPositiveResponse: <OUT extends IOSchema>(
-    output: OUT
-  ) => POS;
+  public readonly getPositiveResponse: POS;
   public readonly negativeResponse: NEG;
-  public readonly handler: ResultHandler<z.output<POS> | z.output<NEG>>;
+  public readonly handler: ResultHandler<z.output<ReturnType<POS> | NEG>>;
   public readonly mimeTypes: { positive: string[]; negative: string[] };
 
   constructor({
@@ -47,9 +45,9 @@ export class ResultHandlerDefinition<
     handler,
     mimeTypes,
   }: {
-    getPositiveResponse: <OUT extends IOSchema>(output: OUT) => POS;
+    getPositiveResponse: POS;
     negativeResponse: NEG;
-    handler: ResultHandler<z.output<POS> | z.output<NEG>>;
+    handler: ResultHandler<z.output<ReturnType<POS>> | z.output<NEG>>;
     mimeTypes?: {
       positive?: string | string[];
       negative?: string | string[];
@@ -81,13 +79,14 @@ export const defaultResultHandler = new ResultHandlerDefinition({
     const responseSchema = withMeta(
       z.object({
         status: z.literal("success"),
-        data: markOutput(output),
+        data: output,
       })
     );
     for (const example of examples) {
       // forwarding output examples to response schema
       responseSchema.example({
         status: "success",
+        // @ts-ignore // @todo fix this
         data: example,
       });
     }

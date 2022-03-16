@@ -7,8 +7,8 @@ import {
   Method,
   z,
   defaultResultHandler,
+  ResultHandlerDefinition,
 } from "../../src";
-import { ResultHandlerDefinition } from "../../src/result-handler";
 import { waitFor } from "../helpers";
 
 describe("App", () => {

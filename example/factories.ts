@@ -1,6 +1,10 @@
 import mime from "mime";
-import { defaultEndpointsFactory, EndpointsFactory, z } from "../src";
-import { ResultHandlerDefinition } from "../src/result-handler";
+import {
+  defaultEndpointsFactory,
+  EndpointsFactory,
+  z,
+  ResultHandlerDefinition,
+} from "../src";
 import { authMiddleware } from "./middlewares";
 import fs from "fs";
 

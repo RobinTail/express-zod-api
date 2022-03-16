@@ -36,37 +36,37 @@ type BuildProps<
 } & MethodsDefinition<M>;
 
 export class EndpointsFactory<
-  POS extends z.ZodTypeAny,
+  POS extends <OUT extends IOSchema>(output: OUT) => z.ZodTypeAny,
   NEG extends z.ZodTypeAny,
   IN extends IOSchema<"strip"> | null = null,
-  OUT extends FlatObject = {}
+  OPT extends FlatObject = {}
 > {
   protected middlewares: AnyMiddlewareDef[] = [];
 
   constructor(protected resultHandler: ResultHandlerDefinition<POS, NEG>) {}
 
   static #create<
-    CPOS extends z.ZodTypeAny,
+    CPOS extends <OUT extends IOSchema>(output: OUT) => z.ZodTypeAny,
     CNEG extends z.ZodTypeAny,
     CIN extends IOSchema<"strip"> | null,
-    COUT extends FlatObject
+    COPT extends FlatObject
   >(
     middlewares: AnyMiddlewareDef[],
     resultHandler: ResultHandlerDefinition<CPOS, CNEG>
   ) {
-    const factory = new EndpointsFactory<CPOS, CNEG, CIN, COUT>(resultHandler);
+    const factory = new EndpointsFactory<CPOS, CNEG, CIN, COPT>(resultHandler);
     factory.middlewares = middlewares;
     return factory;
   }
 
-  public addMiddleware<AIN extends IOSchema<"strip">, AOUT extends FlatObject>(
-    definition: MiddlewareDefinition<AIN, OUT, AOUT>
+  public addMiddleware<AIN extends IOSchema<"strip">, AOPT extends FlatObject>(
+    definition: MiddlewareDefinition<AIN, OPT, AOPT>
   ) {
     return EndpointsFactory.#create<
       POS,
       NEG,
       ProbableIntersection<IN, AIN>,
-      OUT & AOUT
+      OPT & AOPT
     >(
       this.middlewares.concat(definition as unknown as AnyMiddlewareDef),
       this.resultHandler
@@ -78,17 +78,17 @@ export class EndpointsFactory<
   public addExpressMiddleware<
     R extends Request,
     S extends Response,
-    AOUT extends FlatObject = {}
+    AOPT extends FlatObject = {}
   >(
     middleware: ExpressMiddleware<R, S>,
-    features?: ExpressMiddlewareFeatures<R, S, AOUT>
+    features?: ExpressMiddlewareFeatures<R, S, AOPT>
   ) {
     const transformer = features?.transformer || ((err: Error) => err);
-    const provider = features?.provider || (() => ({} as AOUT));
+    const provider = features?.provider || (() => ({} as AOPT));
     const definition = createMiddleware({
       input: z.object({}),
       middleware: async ({ request, response }) =>
-        new Promise<AOUT>((resolve, reject) => {
+        new Promise<AOPT>((resolve, reject) => {
           const next = (err?: any) => {
             if (err && err instanceof Error) {
               return reject(transformer(err));
@@ -98,14 +98,14 @@ export class EndpointsFactory<
           middleware(request as R, response as S, next);
         }),
     });
-    return EndpointsFactory.#create<POS, NEG, IN, OUT & AOUT>(
+    return EndpointsFactory.#create<POS, NEG, IN, OPT & AOPT>(
       this.middlewares.concat(definition as AnyMiddlewareDef),
       this.resultHandler
     );
   }
 
-  public addOptions<AOUT extends FlatObject>(options: AOUT) {
-    return EndpointsFactory.#create<POS, NEG, IN, OUT & AOUT>(
+  public addOptions<AOPT extends FlatObject>(options: AOPT) {
+    return EndpointsFactory.#create<POS, NEG, IN, OPT & AOPT>(
       this.middlewares.concat(
         createMiddleware({
           input: z.object({}),
@@ -122,16 +122,9 @@ export class EndpointsFactory<
     description,
     output: outputSchema,
     ...rest
-  }: BuildProps<BIN, BOUT, IN, OUT, M>): Endpoint<
-    ProbableIntersection<IN, BIN>,
-    BOUT,
-    OUT,
-    M,
-    POS,
-    NEG
-  > {
+  }: BuildProps<BIN, BOUT, IN, OPT, M>) {
     const { middlewares, resultHandler } = this;
-    return new Endpoint({
+    return new Endpoint<ProbableIntersection<IN, BIN>, BOUT, OPT, M, POS, NEG>({
       handler,
       description,
       middlewares,
