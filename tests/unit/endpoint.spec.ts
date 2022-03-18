@@ -3,15 +3,15 @@ import {
   z,
   EndpointsFactory,
   createMiddleware,
-  defaultResultHandler,
+  DefaultResultHandler,
   EndpointInput,
   EndpointOutput,
   EndpointResponse,
   defaultEndpointsFactory,
   testEndpoint,
-  ResultHandlerDefinition,
 } from "../../src";
 import { Endpoint } from "../../src/endpoint";
+import { Hkt } from "../../src/hkt";
 import { mimeJson } from "../../src/mime";
 import { serializeSchemaForTest } from "../helpers";
 
@@ -24,11 +24,7 @@ describe("Endpoint", () => {
         mimeTypes: [mimeJson],
         outputSchema: z.object({}),
         handler: jest.fn(),
-        resultHandler: new ResultHandlerDefinition({
-          getPositiveResponse: jest.fn(),
-          negativeResponse: z.any(),
-          handler: jest.fn(),
-        }),
+        resultHandler: new DefaultResultHandler(z.object({})),
         middlewares: [],
       });
       expect(endpointMock.getMethods()).toEqual([
@@ -47,11 +43,7 @@ describe("Endpoint", () => {
         mimeTypes: [mimeJson],
         outputSchema: z.object({}),
         handler: jest.fn(),
-        resultHandler: new ResultHandlerDefinition({
-          getPositiveResponse: jest.fn(),
-          negativeResponse: z.any(),
-          handler: jest.fn(),
-        }),
+        resultHandler: new DefaultResultHandler(z.object({})),
         middlewares: [],
       });
       expect(endpointMock.getMethods()).toEqual(["patch"]);
@@ -71,7 +63,7 @@ describe("Endpoint", () => {
         }),
         middleware: middlewareMock,
       });
-      const factory = new EndpointsFactory(defaultResultHandler).addMiddleware(
+      const factory = new EndpointsFactory(DefaultResultHandler).addMiddleware(
         middlewareDefinitionMock
       );
       const handlerMock = jest
@@ -168,7 +160,7 @@ describe("Endpoint", () => {
 
   describe("#parseOutput", () => {
     test("Should throw on output parsing non-Zod error", async () => {
-      const factory = new EndpointsFactory(defaultResultHandler);
+      const factory = new EndpointsFactory(DefaultResultHandler);
       const endpoint = factory.build({
         method: "post",
         input: z.object({}),
@@ -243,15 +235,17 @@ describe("Endpoint", () => {
 
   describe("#handleResult", () => {
     test("Should handle errors within ResultHandler", async () => {
-      const factory = new EndpointsFactory(
-        new ResultHandlerDefinition({
-          getPositiveResponse: () => z.object({}),
-          negativeResponse: z.object({}),
-          handler: () => {
-            throw new Error("Something unexpected happened");
-          },
-        })
-      );
+      interface TestResultHandlerHkt
+        extends Hkt<unknown, TestResultHandler<any>> {
+        [Hkt.output]: TestResultHandler<Hkt.Input<this>>;
+      }
+      class TestResultHandler<T> extends DefaultResultHandler<T> {
+        static hkt: TestResultHandlerHkt;
+        handler = () => {
+          throw new Error("Something unexpected happened");
+        };
+      }
+      const factory = new EndpointsFactory(TestResultHandler);
       const endpoint = factory.build({
         method: "get",
         input: z.object({}),
@@ -277,7 +271,7 @@ describe("Endpoint", () => {
 
   describe(".getInputSchema()", () => {
     test("should return input schema", () => {
-      const factory = new EndpointsFactory(defaultResultHandler);
+      const factory = new EndpointsFactory(DefaultResultHandler);
       const input = z.object({
         something: z.number(),
       });
@@ -293,7 +287,7 @@ describe("Endpoint", () => {
 
   describe(".getOutputSchema()", () => {
     test("should return output schema", () => {
-      const factory = new EndpointsFactory(defaultResultHandler);
+      const factory = new EndpointsFactory(DefaultResultHandler);
       const output = z.object({
         something: z.number(),
       });
@@ -309,7 +303,7 @@ describe("Endpoint", () => {
 
   describe(".getPositiveResponseSchema()", () => {
     test("should return schema according to the result handler", () => {
-      const factory = new EndpointsFactory(defaultResultHandler);
+      const factory = new EndpointsFactory(DefaultResultHandler);
       const output = z.object({
         something: z.number(),
       });
@@ -327,7 +321,7 @@ describe("Endpoint", () => {
 
   describe(".getNegativeResponseSchema()", () => {
     test("should return the negative schema of the result handler", () => {
-      const factory = new EndpointsFactory(defaultResultHandler);
+      const factory = new EndpointsFactory(DefaultResultHandler);
       const output = z.object({
         something: z.number(),
       });
@@ -345,7 +339,7 @@ describe("Endpoint", () => {
 
   describe(".getPositiveMimeTypes()", () => {
     test("should return an array according to the result handler", () => {
-      const factory = new EndpointsFactory(defaultResultHandler);
+      const factory = new EndpointsFactory(DefaultResultHandler);
       const endpoint = factory.build({
         method: "get",
         input: z.object({}),
@@ -358,7 +352,7 @@ describe("Endpoint", () => {
 
   describe(".getNegativeMimeTypes()", () => {
     test("should return an array according to the result handler", () => {
-      const factory = new EndpointsFactory(defaultResultHandler);
+      const factory = new EndpointsFactory(DefaultResultHandler);
       const endpoint = factory.build({
         method: "get",
         input: z.object({}),
@@ -371,7 +365,7 @@ describe("Endpoint", () => {
 
   describe("EndpointInput<>", () => {
     test("should be the type of input schema before transformations", () => {
-      const factory = new EndpointsFactory(defaultResultHandler);
+      const factory = new EndpointsFactory(DefaultResultHandler);
       const input = z.object({
         something: z.number().transform((value) => `${value}`),
       });
@@ -388,7 +382,7 @@ describe("Endpoint", () => {
       const mInput = z.object({
         key: z.string(),
       });
-      const factory = new EndpointsFactory(defaultResultHandler).addMiddleware({
+      const factory = new EndpointsFactory(DefaultResultHandler).addMiddleware({
         input: mInput,
         middleware: jest.fn(),
       });
@@ -417,7 +411,7 @@ describe("Endpoint", () => {
     });
 
     test("should handle z.dateIn() correctly", () => {
-      const factory = new EndpointsFactory(defaultResultHandler);
+      const factory = new EndpointsFactory(DefaultResultHandler);
       const endpoint = factory.build({
         method: "get",
         output: z.object({}),
@@ -434,7 +428,7 @@ describe("Endpoint", () => {
 
   describe("EndpointOutput<>", () => {
     test("should be the type of output schema after transformations", () => {
-      const factory = new EndpointsFactory(defaultResultHandler);
+      const factory = new EndpointsFactory(DefaultResultHandler);
       const output = z.object({
         something: z.number().transform((value) => `${value}`),
       });
@@ -450,7 +444,7 @@ describe("Endpoint", () => {
 
   describe("EndpointResponse<>", () => {
     test("should be the type declared in the result handler including positive and negative ones", () => {
-      const factory = new EndpointsFactory(defaultResultHandler);
+      const factory = new EndpointsFactory(DefaultResultHandler);
       const output = z.object({
         something: z.number().transform((value) => `${value}`),
       });
@@ -473,7 +467,7 @@ describe("Endpoint", () => {
     });
 
     test("should handle z.dateOut() correctly", () => {
-      const factory = new EndpointsFactory(defaultResultHandler);
+      const factory = new EndpointsFactory(DefaultResultHandler);
       const endpoint = factory.build({
         method: "get",
         input: z.object({}),
@@ -497,7 +491,7 @@ describe("Endpoint", () => {
 
   describe("Issue #269: Async refinements", () => {
     test("should handle async refinements in input, output and middleware", async () => {
-      const endpoint = new EndpointsFactory(defaultResultHandler)
+      const endpoint = new EndpointsFactory(DefaultResultHandler)
         .addMiddleware({
           input: z.object({
             m: z.number().refine(async (m) => m < 10),

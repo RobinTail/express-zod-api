@@ -24,18 +24,8 @@ export type IOSchema<U extends UnknownKeysParam = any> =
 export type ArrayElement<T extends readonly unknown[]> =
   T extends readonly (infer K)[] ? K : never;
 
-export type OutputMarker = IOSchema & { _typeGuard: "OutputMarker" };
-export const markOutput = (output: IOSchema) => output as OutputMarker;
-
 /** @see https://expressjs.com/en/guide/routing.html */
 export const routePathParamsRegex = /:([A-Za-z0-9_]+)/g;
-
-export type ReplaceMarkerInShape<
-  S extends z.ZodRawShape,
-  OUT extends IOSchema
-> = {
-  [K in keyof S]: S[K] extends OutputMarker ? OUT : S[K];
-};
 
 export type ProbableIntersection<
   A extends IOSchema<"strip"> | null,

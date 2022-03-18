@@ -8,6 +8,7 @@ import {
   ProbableIntersection,
 } from "./common-helpers";
 import { Endpoint, Handler } from "./endpoint";
+import { Hkt } from "./hkt";
 import { Method, MethodsDefinition } from "./method";
 import {
   AnyMiddlewareDef,
@@ -18,7 +19,7 @@ import {
 } from "./middleware";
 import { mimeJson, mimeMultipart } from "./mime";
 import {
-  defaultResultHandler,
+  DefaultResultHandler,
   ResultHandlerDefinition,
 } from "./result-handler";
 
@@ -36,25 +37,26 @@ type BuildProps<
 } & MethodsDefinition<M>;
 
 export class EndpointsFactory<
-  POS extends <OUT extends IOSchema>(output: OUT) => z.ZodTypeAny,
-  NEG extends z.ZodTypeAny,
+  Cons extends {
+    new <T>(output: T): Hkt.Output<Cons["hkt"], T>;
+    hkt: Hkt<unknown, ResultHandlerDefinition<any>>;
+  },
   IN extends IOSchema<"strip"> | null = null,
   OPT extends FlatObject = {}
 > {
   protected middlewares: AnyMiddlewareDef[] = [];
 
-  constructor(protected resultHandler: ResultHandlerDefinition<POS, NEG>) {}
+  constructor(protected ResultHandler: Cons) {}
 
   static #create<
-    CPOS extends <OUT extends IOSchema>(output: OUT) => z.ZodTypeAny,
-    CNEG extends z.ZodTypeAny,
+    Cons1 extends {
+      new <T>(output: T): Hkt.Output<Cons1["hkt"], T>;
+      hkt: Hkt<unknown, ResultHandlerDefinition<any>>;
+    },
     CIN extends IOSchema<"strip"> | null,
     COPT extends FlatObject
-  >(
-    middlewares: AnyMiddlewareDef[],
-    resultHandler: ResultHandlerDefinition<CPOS, CNEG>
-  ) {
-    const factory = new EndpointsFactory<CPOS, CNEG, CIN, COPT>(resultHandler);
+  >(middlewares: AnyMiddlewareDef[], resultHandler: Cons1) {
+    const factory = new EndpointsFactory<Cons1, CIN, COPT>(resultHandler);
     factory.middlewares = middlewares;
     return factory;
   }
@@ -63,13 +65,12 @@ export class EndpointsFactory<
     definition: MiddlewareDefinition<AIN, OPT, AOPT>
   ) {
     return EndpointsFactory.#create<
-      POS,
-      NEG,
+      Cons,
       ProbableIntersection<IN, AIN>,
       OPT & AOPT
     >(
       this.middlewares.concat(definition as unknown as AnyMiddlewareDef),
-      this.resultHandler
+      this.ResultHandler
     );
   }
 
@@ -98,21 +99,21 @@ export class EndpointsFactory<
           middleware(request as R, response as S, next);
         }),
     });
-    return EndpointsFactory.#create<POS, NEG, IN, OPT & AOPT>(
+    return EndpointsFactory.#create<Cons, IN, OPT & AOPT>(
       this.middlewares.concat(definition as AnyMiddlewareDef),
-      this.resultHandler
+      this.ResultHandler
     );
   }
 
   public addOptions<AOPT extends FlatObject>(options: AOPT) {
-    return EndpointsFactory.#create<POS, NEG, IN, OPT & AOPT>(
+    return EndpointsFactory.#create<Cons, IN, OPT & AOPT>(
       this.middlewares.concat(
         createMiddleware({
           input: z.object({}),
           middleware: async () => options,
         }) as AnyMiddlewareDef
       ),
-      this.resultHandler
+      this.ResultHandler
     );
   }
 
@@ -123,13 +124,13 @@ export class EndpointsFactory<
     output: outputSchema,
     ...rest
   }: BuildProps<BIN, BOUT, IN, OPT, M>) {
-    const { middlewares, resultHandler } = this;
-    return new Endpoint<ProbableIntersection<IN, BIN>, BOUT, OPT, M, POS, NEG>({
+    const { middlewares, ResultHandler } = this;
+    return new Endpoint({
       handler,
       description,
       middlewares,
       outputSchema,
-      resultHandler,
+      resultHandler: new ResultHandler(outputSchema),
       inputSchema: getFinalEndpointInputSchema<IN, BIN>(middlewares, input),
       mimeTypes: hasUpload(input) ? [mimeMultipart] : [mimeJson],
       ...rest,
@@ -138,5 +139,5 @@ export class EndpointsFactory<
 }
 
 export const defaultEndpointsFactory = new EndpointsFactory(
-  defaultResultHandler
+  DefaultResultHandler
 );

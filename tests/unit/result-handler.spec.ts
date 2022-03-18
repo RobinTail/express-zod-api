@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { z, createHttpError, defaultResultHandler, withMeta } from "../../src";
+import { z, createHttpError, DefaultResultHandler, withMeta } from "../../src";
 import { metaProp } from "../../src/metadata";
 
 let loggerMock: any;
@@ -26,7 +26,7 @@ describe("ResultHandler", () => {
         method: "POST",
         url: "http://something/v1/anything",
       };
-      defaultResultHandler.handler({
+      new DefaultResultHandler(z.object({ anything: z.number() })).handler({
         error: new Error("Some error"),
         input: { something: 453 },
         output: { anything: 118 },
@@ -60,7 +60,7 @@ describe("ResultHandler", () => {
         method: "POST",
         url: "http://something/v1/anything",
       };
-      defaultResultHandler.handler({
+      new DefaultResultHandler(z.object({ anything: z.number() })).handler({
         error: new z.ZodError([
           {
             code: "invalid_type",
@@ -86,7 +86,7 @@ describe("ResultHandler", () => {
         method: "POST",
         url: "http://something/v1/anything",
       };
-      defaultResultHandler.handler({
+      new DefaultResultHandler(z.object({ anything: z.number() })).handler({
         error: createHttpError(404, "Something not found"),
         input: { something: 453 },
         output: { anything: 118 },
@@ -109,7 +109,7 @@ describe("ResultHandler", () => {
         method: "POST",
         url: "http://something/v1/anything",
       };
-      defaultResultHandler.handler({
+      new DefaultResultHandler(z.object({ anything: z.number() })).handler({
         error: null,
         input: { something: 453 },
         output: { anything: 118 },
@@ -129,7 +129,7 @@ describe("ResultHandler", () => {
 
     test("should forward output schema examples", () => {
       expect(
-        defaultResultHandler.getPositiveResponse(
+        new DefaultResultHandler(
           withMeta(
             z.object({
               str: z.string(),
@@ -137,7 +137,7 @@ describe("ResultHandler", () => {
           ).example({
             str: "test",
           })
-        )._def[metaProp]
+        ).positiveResponse.schema._def[metaProp]
       ).toEqual({
         examples: [
           {
@@ -151,7 +151,9 @@ describe("ResultHandler", () => {
     });
 
     test("should generate negative response example", () => {
-      expect(defaultResultHandler.negativeResponse._def[metaProp]).toEqual({
+      expect(
+        new DefaultResultHandler(z.object({})).negativeResponse._def[metaProp]
+      ).toEqual({
         examples: [
           {
             status: "error",

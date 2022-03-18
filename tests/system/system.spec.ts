@@ -6,18 +6,29 @@ import {
   EndpointsFactory,
   Method,
   z,
-  defaultResultHandler,
-  ResultHandlerDefinition,
+  DefaultResultHandler,
 } from "../../src";
+import { Hkt } from "../../src/hkt";
 import { waitFor } from "../helpers";
 
 describe("App", () => {
   let server: http.Server;
 
   beforeAll(() => {
+    interface TestResultHandlerHkt
+      extends Hkt<unknown, TestResultHandler<any>> {
+      [Hkt.output]: TestResultHandler<Hkt.Input<this>>;
+    }
+    class TestResultHandler<T> extends DefaultResultHandler<T> {
+      static hkt: TestResultHandlerHkt;
+      handler = () => {
+        throw new Error("I am faulty");
+      };
+    }
+
     const routing = {
       v1: {
-        corsed: new EndpointsFactory(defaultResultHandler)
+        corsed: new EndpointsFactory(DefaultResultHandler)
           .use(
             cors({
               credentials: true,
@@ -35,15 +46,7 @@ describe("App", () => {
               corsDone: options.corsDone,
             }),
           }),
-        faulty: new EndpointsFactory(
-          new ResultHandlerDefinition({
-            getPositiveResponse: () => z.object({}),
-            negativeResponse: z.object({}),
-            handler: () => {
-              throw new Error("I am faulty");
-            },
-          })
-        ).build({
+        faulty: new EndpointsFactory(TestResultHandler).build({
           method: "get",
           input: z.object({}),
           output: z.object({
@@ -53,7 +56,7 @@ describe("App", () => {
             test: "Should not work",
           }),
         }),
-        test: new EndpointsFactory(defaultResultHandler)
+        test: new EndpointsFactory(DefaultResultHandler)
           .addMiddleware({
             input: z.object({
               key: z.string().refine((v) => v === "123", "Invalid key"),

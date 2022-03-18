@@ -63,7 +63,7 @@ export interface CommonConfig {
   cors: boolean;
   // custom ResultHandlerDefinition for common errors,
   // default: defaultResultHandler()
-  errorHandler?: ResultHandlerDefinition<any, any>;
+  errorHandler?: new <T = any>(output: T) => ResultHandlerDefinition<T>; // @todo capitalize
   // logger configuration or your custom winston logger
   logger: LoggerConfig | Logger;
   // you can disable the startup logo, default: true

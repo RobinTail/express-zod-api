@@ -1,5 +1,5 @@
 import {
-  defaultResultHandler,
+  DefaultResultHandler,
   DependsOnMethod,
   EndpointsFactory,
   z,
@@ -14,7 +14,7 @@ describe("DependsOnMethod", () => {
 
   test("should accept an endpoint with a corresponding method", () => {
     const instance = new DependsOnMethod({
-      post: new EndpointsFactory(defaultResultHandler).build({
+      post: new EndpointsFactory(DefaultResultHandler).build({
         method: "post",
         input: z.object({}),
         output: z.object({}),
@@ -26,7 +26,7 @@ describe("DependsOnMethod", () => {
   });
 
   test("should accept an endpoint with additional methods", () => {
-    const endpoint = new EndpointsFactory(defaultResultHandler).build({
+    const endpoint = new EndpointsFactory(DefaultResultHandler).build({
       methods: ["get", "post"],
       input: z.object({}),
       output: z.object({}),
@@ -42,7 +42,7 @@ describe("DependsOnMethod", () => {
   });
 
   test("should throw an error if the endpoint does not have the corresponding method", () => {
-    const endpoint = new EndpointsFactory(defaultResultHandler).build({
+    const endpoint = new EndpointsFactory(DefaultResultHandler).build({
       methods: ["get", "patch"],
       input: z.object({}),
       output: z.object({}),

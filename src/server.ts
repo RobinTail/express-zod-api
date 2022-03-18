@@ -7,19 +7,20 @@ import { AppConfig, CommonConfig, ServerConfig } from "./config-type";
 import { ResultHandlerError } from "./errors";
 import { isLoggerConfig } from "./common-helpers";
 import { createLogger } from "./logger";
-import { defaultResultHandler, lastResortHandler } from "./result-handler";
+import { DefaultResultHandler, lastResortHandler } from "./result-handler";
 import { initRouting, Routing } from "./routing";
 import createHttpError from "http-errors";
+import { z } from "zod";
 
 type AnyResultHandler = NonNullable<CommonConfig["errorHandler"]>;
 
 export const createParserFailureHandler =
-  (errorHandler: AnyResultHandler, logger: Logger): ErrorRequestHandler =>
+  (ErrorHandler: AnyResultHandler, logger: Logger): ErrorRequestHandler =>
   (error, request, response, next) => {
     if (!error) {
       return next();
     }
-    errorHandler.handler({
+    new ErrorHandler(z.null()).handler({
       error,
       request,
       response,
@@ -30,14 +31,14 @@ export const createParserFailureHandler =
   };
 
 export const createNotFoundHandler =
-  (errorHandler: AnyResultHandler, logger: Logger): RequestHandler =>
+  (ErrorHandler: AnyResultHandler, logger: Logger): RequestHandler =>
   (request, response) => {
     const error = createHttpError(
       404,
       `Can not ${request.method} ${request.path}`
     );
     try {
-      errorHandler.handler({
+      new ErrorHandler(z.null()).handler({
         request,
         response,
         logger,
@@ -64,8 +65,8 @@ export function attachRouting(
     ? createLogger(config.logger)
     : config.logger;
   initRouting({ app: config.app, routing, logger, config });
-  const errorHandler = config.errorHandler || defaultResultHandler;
-  const notFoundHandler = createNotFoundHandler(errorHandler, logger);
+  const ErrorHandler = config.errorHandler || DefaultResultHandler;
+  const notFoundHandler = createNotFoundHandler(ErrorHandler, logger);
   return { notFoundHandler, logger };
 }
 
@@ -78,7 +79,7 @@ export function createServer(
     : config.logger;
   const app = express();
   app.disable("x-powered-by");
-  const errorHandler = config.errorHandler || defaultResultHandler;
+  const ErrorHandler = config.errorHandler || DefaultResultHandler;
   const compressor = config.server.compression
     ? compression({
         ...(typeof config.server.compression === "object"
@@ -102,9 +103,9 @@ export function createServer(
     .concat(jsonParser)
     .concat(multipartParser || []);
   app.use(middlewares);
-  app.use(createParserFailureHandler(errorHandler, logger));
+  app.use(createParserFailureHandler(ErrorHandler, logger));
   initRouting({ app, routing, logger, config });
-  app.use(createNotFoundHandler(errorHandler, logger));
+  app.use(createNotFoundHandler(ErrorHandler, logger));
 
   const httpServer = app.listen(config.server.listen, () => {
     logger.info(`Listening ${config.server.listen}`);

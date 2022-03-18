@@ -34,9 +34,10 @@ import {
   attachRouting,
   EndpointsFactory,
   z,
-  defaultResultHandler,
+  DefaultResultHandler,
 } from "../../src";
 import { AppConfig, CommonConfig, ServerConfig } from "../../src/config-type";
+import { Hkt } from "../../src/hkt";
 import { mimeJson } from "../../src/mime";
 import {
   createNotFoundHandler,
@@ -71,7 +72,7 @@ describe("Server", () => {
       };
       const routingMock = {
         v1: {
-          test: new EndpointsFactory(defaultResultHandler).build({
+          test: new EndpointsFactory(DefaultResultHandler).build({
             methods: ["get", "post"],
             input: z.object({
               n: z.number(),
@@ -116,7 +117,7 @@ describe("Server", () => {
       };
       const routingMock = {
         v1: {
-          test: new EndpointsFactory(defaultResultHandler).build({
+          test: new EndpointsFactory(DefaultResultHandler).build({
             methods: ["get", "post"],
             input: z.object({
               n: z.number(),
@@ -178,7 +179,7 @@ describe("Server", () => {
       };
       const routingMock = {
         v1: {
-          test: new EndpointsFactory(defaultResultHandler).build({
+          test: new EndpointsFactory(DefaultResultHandler).build({
             method: "get",
             input: z.object({}),
             output: z.object({}),
@@ -232,7 +233,7 @@ describe("Server", () => {
       };
       const routingMock = {
         v1: {
-          test: new EndpointsFactory(defaultResultHandler).build({
+          test: new EndpointsFactory(DefaultResultHandler).build({
             method: "get",
             input: z.object({}),
             output: z.object({}),
@@ -258,7 +259,7 @@ describe("Server", () => {
         debug: jest.fn(),
       };
       const handler = createParserFailureHandler(
-        defaultResultHandler,
+        DefaultResultHandler,
         loggerMock as unknown as Logger
       );
       const next = jest.fn();
@@ -280,12 +281,17 @@ describe("Server", () => {
         error: jest.fn(),
         debug: jest.fn(),
       };
-      const resultHandler = {
-        ...defaultResultHandler,
-        handler: jest.fn(),
-      };
+      interface TestResultHandlerHkt
+        extends Hkt<unknown, TestResultHandler<any>> {
+        [Hkt.output]: TestResultHandler<Hkt.Input<this>>;
+      }
+      const handlerMock = jest.fn();
+      class TestResultHandler<T> extends DefaultResultHandler<T> {
+        static hkt: TestResultHandlerHkt;
+        handler = handlerMock;
+      }
       const handler = createNotFoundHandler(
-        resultHandler,
+        TestResultHandler,
         loggerMock as unknown as Logger
       );
       const next = jest.fn();
@@ -309,8 +315,8 @@ describe("Server", () => {
         next
       );
       expect(next).toHaveBeenCalledTimes(0);
-      expect(resultHandler.handler).toHaveBeenCalledTimes(1);
-      expect(resultHandler.handler.mock.calls[0]).toMatchSnapshot();
+      expect(handlerMock).toHaveBeenCalledTimes(1);
+      expect(handlerMock.mock.calls[0]).toMatchSnapshot();
     });
 
     test("should call Last Resort Handler in case of ResultHandler is faulty", () => {
@@ -320,14 +326,19 @@ describe("Server", () => {
         error: jest.fn(),
         debug: jest.fn(),
       };
-      const resultHandler = {
-        ...defaultResultHandler,
-        handler: jest.fn().mockImplementation(() => {
-          throw new Error("I am faulty");
-        }),
-      };
+      interface TestResultHandlerHkt
+        extends Hkt<unknown, TestResultHandler<any>> {
+        [Hkt.output]: TestResultHandler<Hkt.Input<this>>;
+      }
+      const handlerMock = jest.fn().mockImplementation(() => {
+        throw new Error("I am faulty");
+      });
+      class TestResultHandler<T> extends DefaultResultHandler<T> {
+        static hkt: TestResultHandlerHkt;
+        handler = handlerMock;
+      }
       const handler = createNotFoundHandler(
-        resultHandler,
+        TestResultHandler,
         loggerMock as unknown as Logger
       );
       const next = jest.fn();
@@ -351,7 +362,7 @@ describe("Server", () => {
         next
       );
       expect(next).toHaveBeenCalledTimes(0);
-      expect(resultHandler.handler).toHaveBeenCalledTimes(1);
+      expect(handlerMock).toHaveBeenCalledTimes(1);
       expect(responseMock.status).toHaveBeenCalledTimes(1);
       expect(responseMock.status.mock.calls[0][0]).toBe(500);
       expect(responseMock.end).toHaveBeenCalledTimes(1);
@@ -379,7 +390,7 @@ describe("Server", () => {
       };
       const routingMock = {
         v1: {
-          test: new EndpointsFactory(defaultResultHandler).build({
+          test: new EndpointsFactory(DefaultResultHandler).build({
             methods: ["get", "post"],
             input: z.object({
               n: z.number(),

@@ -7,6 +7,7 @@ import {
   getStatusCodeFromError,
   IOSchema,
 } from "./common-helpers";
+import { Hkt } from "./hkt";
 import { getMeta, withMeta } from "./metadata";
 import { mimeJson } from "./mime";
 
@@ -16,7 +17,7 @@ interface LastResortHandlerParams {
   response: Response;
 }
 
-interface ResultHandlerParams<RES> {
+export interface ResultHandlerParams<RES> {
   error: Error | null;
   input: any;
   output: any;
@@ -25,74 +26,56 @@ interface ResultHandlerParams<RES> {
   logger: Logger;
 }
 
-type ResultHandler<RES> = (
-  params: ResultHandlerParams<RES>
-) => void | Promise<void>;
-
-export class ResultHandlerDefinition<
-  POS extends (output: OUT) => z.ZodTypeAny,
-  NEG extends z.ZodTypeAny,
-  OUT extends IOSchema = IOSchema
-> {
-  public readonly getPositiveResponse: POS;
-  public readonly negativeResponse: NEG;
-  public readonly handler: ResultHandler<z.output<ReturnType<POS> | NEG>>;
-  public readonly mimeTypes: { positive: string[]; negative: string[] };
-
-  constructor({
-    getPositiveResponse,
-    negativeResponse,
-    handler,
-    mimeTypes,
-  }: {
-    getPositiveResponse: POS;
-    negativeResponse: NEG;
-    handler: ResultHandler<z.output<ReturnType<POS>> | z.output<NEG>>;
-    mimeTypes?: {
-      positive?: string | string[];
-      negative?: string | string[];
-    };
-  }) {
-    this.getPositiveResponse = getPositiveResponse;
-    this.negativeResponse = negativeResponse;
-    this.handler = handler;
-    this.mimeTypes = {
-      positive:
-        mimeTypes && mimeTypes.positive
-          ? Array.isArray(mimeTypes.positive)
-            ? mimeTypes.positive
-            : [mimeTypes.positive]
-          : [mimeJson],
-      negative:
-        mimeTypes && mimeTypes.negative
-          ? Array.isArray(mimeTypes.negative)
-            ? mimeTypes.negative
-            : [mimeTypes.negative]
-          : [mimeJson],
-    };
-  }
+export abstract class ResultHandlerDefinition<OUT> {
+  constructor(protected readonly output: OUT) {}
+  public abstract readonly positiveResponse: z.ZodLazy<any>;
+  public abstract readonly negativeResponse: z.ZodTypeAny;
+  public abstract readonly handler: (
+    params: ResultHandlerParams<
+      z.output<this["positiveResponse"]> | z.output<this["negativeResponse"]>
+    >
+  ) => void | Promise<void>;
+  public abstract readonly mimeTypes: {
+    positive: string[];
+    negative: string[];
+  };
 }
 
-export const defaultResultHandler = new ResultHandlerDefinition({
-  getPositiveResponse: <OUT extends IOSchema>(output: OUT) => {
-    const examples = getMeta(output, "examples") || [];
+interface DefaultResultHandlerHkt
+  extends Hkt<unknown, DefaultResultHandler<any>> {
+  [Hkt.output]: DefaultResultHandler<Hkt.Input<this>>;
+}
+
+// @todo provide lower-case backward compatibility alias
+export class DefaultResultHandler<OUT> extends ResultHandlerDefinition<OUT> {
+  static hkt: DefaultResultHandlerHkt;
+
+  positiveResponse = z.lazy(() => {
     const responseSchema = withMeta(
       z.object({
         status: z.literal("success"),
-        data: output,
-      })
+        data: this.output instanceof z.ZodType ? this.output : z.unknown(),
+      }) as z.ZodObject<{
+        // @todo get rid of this
+        status: z.ZodLiteral<"success">;
+        data: OUT extends IOSchema ? OUT : z.ZodUnknown;
+      }>
     );
-    for (const example of examples) {
-      // forwarding output examples to response schema
-      responseSchema.example({
-        status: "success",
-        // @ts-ignore // @todo fix this
-        data: example,
-      });
+    if (this.output instanceof z.ZodType) {
+      const examples = getMeta(this.output, "examples") || [];
+      for (const example of examples) {
+        // forwarding output examples to response schema
+        responseSchema.example({
+          status: "success",
+          // @ts-ignore // @todo fix it
+          data: example,
+        });
+      }
     }
     return responseSchema;
-  },
-  negativeResponse: withMeta(
+  });
+
+  negativeResponse = withMeta(
     z.object({
       status: z.literal("error"),
       error: z.object({
@@ -104,8 +87,18 @@ export const defaultResultHandler = new ResultHandlerDefinition({
     error: {
       message: getMessageFromError(new Error("Sample error message")),
     },
-  }),
-  handler: ({ error, input, output, request, response, logger }) => {
+  });
+
+  handler = ({
+    error,
+    input,
+    output,
+    request,
+    response,
+    logger,
+  }: ResultHandlerParams<
+    z.output<this["positiveResponse"]> | z.output<this["negativeResponse"]>
+  >) => {
     if (!error) {
       response.status(200).json({
         status: "success" as const,
@@ -124,8 +117,10 @@ export const defaultResultHandler = new ResultHandlerDefinition({
       status: "error" as const,
       error: { message: getMessageFromError(error) },
     });
-  },
-});
+  };
+
+  mimeTypes = { positive: [mimeJson], negative: [mimeJson] };
+}
 
 export const lastResortHandler = ({
   error,

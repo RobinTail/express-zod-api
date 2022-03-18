@@ -7,12 +7,13 @@ export {
 } from "./endpoint";
 export { Method } from "./method";
 export { EndpointsFactory, defaultEndpointsFactory } from "./endpoints-factory";
-export { IOSchema, FlatObject, markOutput } from "./common-helpers";
+export { IOSchema, FlatObject } from "./common-helpers";
 export { createLogger } from "./logger";
 export { createMiddleware } from "./middleware";
 export {
   ResultHandlerDefinition,
-  defaultResultHandler,
+  DefaultResultHandler,
+  ResultHandlerParams,
 } from "./result-handler";
 export { DependsOnMethod } from "./depends-on-method";
 export { ServeStatic } from "./serve-static";

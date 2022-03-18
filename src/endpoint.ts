@@ -32,21 +32,13 @@ export abstract class AbstractEndpoint {
   public abstract getNegativeMimeTypes(): string[];
 }
 
-export type EndpointInput<T> = T extends Endpoint<
-  infer IN,
-  any,
-  any,
-  any,
-  any,
-  any
->
+export type EndpointInput<T> = T extends Endpoint<infer IN, any, any, any, any>
   ? z.input<IN>
   : never;
 
 export type EndpointOutput<T> = T extends Endpoint<
   any,
   infer OUT,
-  any,
   any,
   any,
   any
@@ -56,18 +48,12 @@ export type EndpointOutput<T> = T extends Endpoint<
 
 export type EndpointResponse<E> = E extends Endpoint<
   any,
-  infer OUT,
   any,
   any,
-  infer POS,
-  infer NEG
+  any,
+  infer RH
 >
-  ? z.output<
-      | ReturnType<
-          ResultHandlerDefinition<POS, NEG, OUT>["getPositiveResponse"]
-        >
-      | NEG
-    >
+  ? z.output<RH["positiveResponse"]> | z.output<RH["negativeResponse"]>
   : never;
 
 type EndpointProps<
@@ -75,15 +61,14 @@ type EndpointProps<
   OUT extends IOSchema,
   OPT extends FlatObject,
   M extends Method,
-  POS extends (output: OUT) => z.ZodTypeAny,
-  NEG extends z.ZodTypeAny
+  RH extends ResultHandlerDefinition<OUT>
 > = {
   middlewares: AnyMiddlewareDef[];
   inputSchema: IN;
   mimeTypes: string[];
   outputSchema: OUT;
   handler: Handler<z.output<IN>, z.input<OUT>, OPT>;
-  resultHandler: ResultHandlerDefinition<POS, NEG, OUT>;
+  resultHandler: RH;
   description?: string;
 } & MethodsDefinition<M>;
 
@@ -92,8 +77,7 @@ export class Endpoint<
   OUT extends IOSchema,
   OPT extends FlatObject,
   M extends Method,
-  POS extends (output: OUT) => z.ZodTypeAny,
-  NEG extends z.ZodTypeAny
+  RH extends ResultHandlerDefinition<OUT>
 > extends AbstractEndpoint {
   protected readonly description?: string;
   protected readonly methods: M[] = [];
@@ -102,7 +86,7 @@ export class Endpoint<
   protected readonly mimeTypes: string[];
   protected readonly outputSchema: OUT;
   protected readonly handler: Handler<z.output<IN>, z.input<OUT>, OPT>;
-  protected readonly resultHandler: ResultHandlerDefinition<POS, NEG, OUT>;
+  protected readonly resultHandler: RH;
 
   constructor({
     middlewares,
@@ -113,7 +97,7 @@ export class Endpoint<
     description,
     mimeTypes,
     ...rest
-  }: EndpointProps<IN, OUT, OPT, M, POS, NEG>) {
+  }: EndpointProps<IN, OUT, OPT, M, RH>) {
     super();
     this.middlewares = middlewares;
     this.inputSchema = inputSchema;
@@ -146,10 +130,10 @@ export class Endpoint<
   }
 
   public override getPositiveResponseSchema() {
-    return this.resultHandler.getPositiveResponse(this.outputSchema);
+    return this.resultHandler.positiveResponse.schema;
   }
 
-  public override getNegativeResponseSchema(): NEG {
+  public override getNegativeResponseSchema() {
     return this.resultHandler.negativeResponse;
   }
 

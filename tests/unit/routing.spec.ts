@@ -13,7 +13,7 @@ import {
   z,
   Routing,
   DependsOnMethod,
-  defaultResultHandler,
+  DefaultResultHandler,
   ServeStatic,
 } from "../../src";
 import { CommonConfig } from "../../src/config-type";
@@ -50,7 +50,7 @@ describe("Routing", () => {
         cors: true,
         startupLogo: false,
       };
-      const factory = new EndpointsFactory(defaultResultHandler);
+      const factory = new EndpointsFactory(DefaultResultHandler);
       const getEndpoint = factory.build({
         methods: ["get"],
         input: z.object({}),
@@ -124,7 +124,7 @@ describe("Routing", () => {
         cors: true,
         startupLogo: false,
       };
-      const factory = new EndpointsFactory(defaultResultHandler);
+      const factory = new EndpointsFactory(DefaultResultHandler);
       const getEndpoint = factory.build({
         methods: ["get"],
         input: z.object({}),
@@ -175,7 +175,7 @@ describe("Routing", () => {
     test("Should accept parameters", () => {
       const handlerMock = jest.fn();
       const configMock = { startupLogo: false };
-      const endpointMock = new EndpointsFactory(defaultResultHandler).build({
+      const endpointMock = new EndpointsFactory(DefaultResultHandler).build({
         methods: ["get"],
         input: z.object({}),
         output: z.object({}),
@@ -201,7 +201,7 @@ describe("Routing", () => {
     test("Should handle empty paths and trim spaces", () => {
       const handlerMock = jest.fn();
       const configMock = { startupLogo: false };
-      const endpointMock = new EndpointsFactory(defaultResultHandler).build({
+      const endpointMock = new EndpointsFactory(DefaultResultHandler).build({
         methods: ["get"],
         input: z.object({}),
         output: z.object({}),
@@ -231,7 +231,7 @@ describe("Routing", () => {
     test("Should throw an error in case of slashes in route", () => {
       const handlerMock = jest.fn();
       const configMock = { startupLogo: false };
-      const endpointMock = new EndpointsFactory(defaultResultHandler).build({
+      const endpointMock = new EndpointsFactory(DefaultResultHandler).build({
         methods: ["get"],
         input: z.object({}),
         output: z.object({}),
@@ -266,7 +266,7 @@ describe("Routing", () => {
         .fn()
         .mockImplementationOnce(() => ({ result: true }));
       const configMock = { cors: true, startupLogo: false };
-      const setEndpoint = new EndpointsFactory(defaultResultHandler).build({
+      const setEndpoint = new EndpointsFactory(DefaultResultHandler).build({
         methods: ["post"],
         input: z.object({
           test: z.number(),
