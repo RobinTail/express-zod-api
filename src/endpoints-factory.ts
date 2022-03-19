@@ -34,8 +34,8 @@ type BuildProps<
 } & MethodsDefinition<M>;
 
 export class EndpointsFactory<
-  Cons extends {
-    new <T>(output: T): Hkt.Output<Cons["hkt"], T>;
+  RH extends {
+    new <T>(output: T): Hkt.Output<RH["hkt"], T>;
     hkt: Hkt<unknown, AbstractResultHandler<any>>;
   },
   IN extends IOSchema<"strip"> | null = null,
@@ -43,17 +43,17 @@ export class EndpointsFactory<
 > {
   protected middlewares: AnyMiddlewareDef[] = [];
 
-  constructor(protected ResultHandler: Cons) {}
+  constructor(protected ResultHandler: RH) {}
 
   static #create<
-    Cons1 extends {
-      new <T>(output: T): Hkt.Output<Cons1["hkt"], T>;
+    CRH extends {
+      new <T>(output: T): Hkt.Output<CRH["hkt"], T>;
       hkt: Hkt<unknown, AbstractResultHandler<any>>;
     },
     CIN extends IOSchema<"strip"> | null,
     COPT extends FlatObject
-  >(middlewares: AnyMiddlewareDef[], resultHandler: Cons1) {
-    const factory = new EndpointsFactory<Cons1, CIN, COPT>(resultHandler);
+  >(middlewares: AnyMiddlewareDef[], resultHandler: CRH) {
+    const factory = new EndpointsFactory<CRH, CIN, COPT>(resultHandler);
     factory.middlewares = middlewares;
     return factory;
   }
@@ -62,7 +62,7 @@ export class EndpointsFactory<
     definition: MiddlewareDefinition<AIN, OPT, AOPT>
   ) {
     return EndpointsFactory.#create<
-      Cons,
+      RH,
       ProbableIntersection<IN, AIN>,
       OPT & AOPT
     >(
@@ -96,14 +96,14 @@ export class EndpointsFactory<
           middleware(request as R, response as S, next);
         }),
     });
-    return EndpointsFactory.#create<Cons, IN, OPT & AOPT>(
+    return EndpointsFactory.#create<RH, IN, OPT & AOPT>(
       this.middlewares.concat(definition as AnyMiddlewareDef),
       this.ResultHandler
     );
   }
 
   public addOptions<AOPT extends FlatObject>(options: AOPT) {
-    return EndpointsFactory.#create<Cons, IN, OPT & AOPT>(
+    return EndpointsFactory.#create<RH, IN, OPT & AOPT>(
       this.middlewares.concat(
         createMiddleware({
           input: z.object({}),
