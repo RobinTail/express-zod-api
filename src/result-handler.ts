@@ -30,22 +30,22 @@ type EnsureSchema<OUT> = OUT extends IOSchema ? OUT : z.ZodNever;
 
 export abstract class AbstractResultHandler<OUT> {
   protected readonly output: EnsureSchema<OUT>;
+  public abstract readonly positiveResponse: z.ZodLazy<any>;
+  public abstract readonly negativeResponse: z.ZodTypeAny;
+  public readonly mimeTypes = {
+    positive: [mimeJson],
+    negative: [mimeJson],
+  };
   constructor(schema: OUT) {
     this.output = (
       schema instanceof z.ZodType ? schema : z.never()
     ) as EnsureSchema<OUT>;
   }
-  public abstract readonly positiveResponse: z.ZodLazy<any>;
-  public abstract readonly negativeResponse: z.ZodTypeAny;
-  public abstract readonly handler: (
+  public abstract handler(
     params: ResultHandlerParams<
       z.output<this["positiveResponse"]> | z.output<this["negativeResponse"]>
     >
-  ) => void | Promise<void>;
-  public readonly mimeTypes = {
-    positive: [mimeJson],
-    negative: [mimeJson],
-  };
+  ): void | Promise<void>;
 }
 
 interface DefaultResultHandlerHkt
@@ -57,7 +57,7 @@ interface DefaultResultHandlerHkt
 export class DefaultResultHandler<OUT> extends AbstractResultHandler<OUT> {
   static hkt: DefaultResultHandlerHkt;
 
-  positiveResponse = z.lazy(() => {
+  override positiveResponse = z.lazy(() => {
     const responseSchema = withMeta(
       z.object({
         status: z.literal("success"),
@@ -76,7 +76,7 @@ export class DefaultResultHandler<OUT> extends AbstractResultHandler<OUT> {
     return responseSchema;
   });
 
-  negativeResponse = withMeta(
+  override negativeResponse = withMeta(
     z.object({
       status: z.literal("error"),
       error: z.object({
@@ -90,7 +90,7 @@ export class DefaultResultHandler<OUT> extends AbstractResultHandler<OUT> {
     },
   });
 
-  handler = ({
+  override handler({
     error,
     input,
     output,
@@ -99,7 +99,7 @@ export class DefaultResultHandler<OUT> extends AbstractResultHandler<OUT> {
     logger,
   }: ResultHandlerParams<
     z.output<this["positiveResponse"]> | z.output<this["negativeResponse"]> // @todo shorten
-  >) => {
+  >) {
     if (!error) {
       response.status(200).json({
         status: "success" as const,
@@ -118,7 +118,7 @@ export class DefaultResultHandler<OUT> extends AbstractResultHandler<OUT> {
       status: "error" as const,
       error: { message: getMessageFromError(error) },
     });
-  };
+  }
 }
 
 export const lastResortHandler = ({

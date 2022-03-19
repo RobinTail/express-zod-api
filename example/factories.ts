@@ -28,13 +28,13 @@ class FileSendingResultHandler<T> extends AbstractResultHandler<T> {
   };
   positiveResponse = z.lazy(() => z.string());
   negativeResponse = z.string();
-  handler = ({
+  handler({
     response,
     error,
     output,
   }: ResultHandlerParams<
     z.output<this["positiveResponse"]> | z.output<this["negativeResponse"]>
-  >) => {
+  >) {
     if (error) {
       response.status(400).send(error.message);
       return;
@@ -44,7 +44,7 @@ class FileSendingResultHandler<T> extends AbstractResultHandler<T> {
     } else {
       response.status(400).send("Data is missing");
     }
-  };
+  }
 }
 
 export const fileSendingEndpointsFactory = new EndpointsFactory(
@@ -64,13 +64,13 @@ class FileStreamingResultHandler<T> extends AbstractResultHandler<T> {
   };
   positiveResponse = z.lazy(() => z.file().binary());
   negativeResponse = z.string();
-  handler = ({
+  handler({
     response,
     error,
     output,
   }: ResultHandlerParams<
     z.output<this["positiveResponse"]> | z.output<this["negativeResponse"]>
-  >) => {
+  >) {
     if (error) {
       response.status(400).send(error.message);
       return;
@@ -80,7 +80,7 @@ class FileStreamingResultHandler<T> extends AbstractResultHandler<T> {
     } else {
       response.status(400).send("Filename is missing");
     }
-  };
+  }
 }
 
 export const fileStreamingEndpointsFactory = new EndpointsFactory(
