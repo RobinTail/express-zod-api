@@ -54,12 +54,10 @@ export class DefaultResultHandler<OUT> extends ResultHandlerDefinition<OUT> {
     const responseSchema = withMeta(
       z.object({
         status: z.literal("success"),
-        data: this.output instanceof z.ZodType ? this.output : z.unknown(),
-      }) as z.ZodObject<{
-        // @todo get rid of this
-        status: z.ZodLiteral<"success">;
-        data: OUT extends IOSchema ? OUT : z.ZodUnknown;
-      }>
+        data: (this.output instanceof z.ZodType
+          ? this.output
+          : z.unknown()) as OUT extends IOSchema ? OUT : z.ZodUnknown,
+      })
     );
     if (this.output instanceof z.ZodType) {
       const examples = getMeta(this.output, "examples") || [];
@@ -97,7 +95,7 @@ export class DefaultResultHandler<OUT> extends ResultHandlerDefinition<OUT> {
     response,
     logger,
   }: ResultHandlerParams<
-    z.output<this["positiveResponse"]> | z.output<this["negativeResponse"]>
+    z.output<this["positiveResponse"]> | z.output<this["negativeResponse"]> // @todo shorten
   >) => {
     if (!error) {
       response.status(200).json({
