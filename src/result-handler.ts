@@ -27,7 +27,10 @@ export interface ResultHandlerParams<RES> {
 }
 
 export abstract class AbstractResultHandler<OUT> {
-  constructor(protected readonly output: OUT) {}
+  protected readonly output: OUT extends IOSchema ? OUT : z.ZodNever;
+  constructor(schema: OUT) {
+    this.output = schema as OUT extends IOSchema ? OUT : z.ZodNever;
+  }
   public abstract readonly positiveResponse: z.ZodLazy<any>;
   public abstract readonly negativeResponse: z.ZodTypeAny;
   public abstract readonly handler: (
@@ -54,19 +57,17 @@ export class DefaultResultHandler<OUT> extends AbstractResultHandler<OUT> {
     const responseSchema = withMeta(
       z.object({
         status: z.literal("success"),
-        data: this.output as OUT extends IOSchema ? OUT : z.ZodNever,
+        data: this.output,
       })
     );
-    if (this.output instanceof z.ZodType) {
-      const examples = getMeta(this.output, "examples") || [];
-      for (const example of examples) {
-        // forwarding output examples to response schema
-        responseSchema.example({
-          status: "success",
-          // @ts-ignore // @todo fix it
-          data: example,
-        });
-      }
+    const examples = getMeta(this.output, "examples") || [];
+    for (const example of examples) {
+      // forwarding output examples to response schema
+      responseSchema.example({
+        status: "success",
+        // @ts-ignore // @todo fix it
+        data: example,
+      });
     }
     return responseSchema;
   });
