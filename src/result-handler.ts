@@ -26,10 +26,14 @@ export interface ResultHandlerParams<RES> {
   logger: Logger;
 }
 
+type EnsureSchema<OUT> = OUT extends IOSchema ? OUT : z.ZodNever;
+
 export abstract class AbstractResultHandler<OUT> {
-  protected readonly output: OUT extends IOSchema ? OUT : z.ZodNever;
+  protected readonly output: EnsureSchema<OUT>;
   constructor(schema: OUT) {
-    this.output = schema as OUT extends IOSchema ? OUT : z.ZodNever;
+    this.output = (
+      schema instanceof z.ZodType ? schema : z.never()
+    ) as EnsureSchema<OUT>;
   }
   public abstract readonly positiveResponse: z.ZodLazy<any>;
   public abstract readonly negativeResponse: z.ZodTypeAny;
