@@ -18,10 +18,7 @@ import {
   MiddlewareDefinition,
 } from "./middleware";
 import { mimeJson, mimeMultipart } from "./mime";
-import {
-  DefaultResultHandler,
-  ResultHandlerDefinition,
-} from "./result-handler";
+import { DefaultResultHandler, AbstractResultHandler } from "./result-handler";
 
 type BuildProps<
   IN extends IOSchema,
@@ -39,7 +36,7 @@ type BuildProps<
 export class EndpointsFactory<
   Cons extends {
     new <T>(output: T): Hkt.Output<Cons["hkt"], T>;
-    hkt: Hkt<unknown, ResultHandlerDefinition<any>>;
+    hkt: Hkt<unknown, AbstractResultHandler<any>>;
   },
   IN extends IOSchema<"strip"> | null = null,
   OPT extends FlatObject = {}
@@ -51,7 +48,7 @@ export class EndpointsFactory<
   static #create<
     Cons1 extends {
       new <T>(output: T): Hkt.Output<Cons1["hkt"], T>;
-      hkt: Hkt<unknown, ResultHandlerDefinition<any>>;
+      hkt: Hkt<unknown, AbstractResultHandler<any>>;
     },
     CIN extends IOSchema<"strip"> | null,
     COPT extends FlatObject

@@ -5,7 +5,7 @@ import fileUpload from "express-fileupload";
 import { ServerOptions } from "https";
 import { Logger } from "winston";
 import { Method } from "./method";
-import { ResultHandlerDefinition } from "./result-handler";
+import { AbstractResultHandler } from "./result-handler";
 
 export const loggerLevels = {
   silent: true,
@@ -61,9 +61,9 @@ export interface CommonConfig {
   // enable cross-origin resource sharing
   // https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
   cors: boolean;
-  // custom ResultHandlerDefinition for common errors,
-  // default: defaultResultHandler()
-  errorHandler?: new <T = any>(output: T) => ResultHandlerDefinition<T>; // @todo capitalize
+  // custom ResultHandler for common errors,
+  // default: DefaultResultHandler
+  errorHandler?: new <T = any>(output: T) => AbstractResultHandler<T>; // @todo capitalize
   // logger configuration or your custom winston logger
   logger: LoggerConfig | Logger;
   // you can disable the startup logo, default: true

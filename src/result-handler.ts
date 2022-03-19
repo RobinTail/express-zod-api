@@ -26,7 +26,7 @@ export interface ResultHandlerParams<RES> {
   logger: Logger;
 }
 
-export abstract class ResultHandlerDefinition<OUT> {
+export abstract class AbstractResultHandler<OUT> {
   constructor(protected readonly output: OUT) {}
   public abstract readonly positiveResponse: z.ZodLazy<any>;
   public abstract readonly negativeResponse: z.ZodTypeAny;
@@ -47,7 +47,7 @@ interface DefaultResultHandlerHkt
 }
 
 // @todo provide lower-case backward compatibility alias
-export class DefaultResultHandler<OUT> extends ResultHandlerDefinition<OUT> {
+export class DefaultResultHandler<OUT> extends AbstractResultHandler<OUT> {
   static hkt: DefaultResultHandlerHkt;
 
   positiveResponse = z.lazy(() => {

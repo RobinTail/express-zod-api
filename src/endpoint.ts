@@ -6,7 +6,7 @@ import { ResultHandlerError } from "./errors";
 import { FlatObject, getInitialInput, IOSchema } from "./common-helpers";
 import { Method, MethodsDefinition } from "./method";
 import { AnyMiddlewareDef } from "./middleware";
-import { lastResortHandler, ResultHandlerDefinition } from "./result-handler";
+import { lastResortHandler, AbstractResultHandler } from "./result-handler";
 
 export type Handler<IN, OUT, OPT> = (params: {
   input: IN;
@@ -61,7 +61,7 @@ type EndpointProps<
   OUT extends IOSchema,
   OPT extends FlatObject,
   M extends Method,
-  RH extends ResultHandlerDefinition<OUT>
+  RH extends AbstractResultHandler<OUT>
 > = {
   middlewares: AnyMiddlewareDef[];
   inputSchema: IN;
@@ -77,7 +77,7 @@ export class Endpoint<
   OUT extends IOSchema,
   OPT extends FlatObject,
   M extends Method,
-  RH extends ResultHandlerDefinition<OUT>
+  RH extends AbstractResultHandler<OUT>
 > extends AbstractEndpoint {
   protected readonly description?: string;
   protected readonly methods: M[] = [];

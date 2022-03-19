@@ -11,7 +11,7 @@ export { IOSchema, FlatObject } from "./common-helpers";
 export { createLogger } from "./logger";
 export { createMiddleware } from "./middleware";
 export {
-  ResultHandlerDefinition,
+  AbstractResultHandler,
   DefaultResultHandler,
   ResultHandlerParams,
 } from "./result-handler";

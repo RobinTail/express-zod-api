@@ -3,7 +3,7 @@ import {
   defaultEndpointsFactory,
   EndpointsFactory,
   z,
-  ResultHandlerDefinition,
+  AbstractResultHandler,
   ResultHandlerParams,
 } from "../src";
 import { Hkt } from "../src/hkt";
@@ -20,7 +20,7 @@ interface FSResultHandlerHkt
   [Hkt.output]: FileSendingResultHandler<Hkt.Input<this>>;
 }
 
-class FileSendingResultHandler<T> extends ResultHandlerDefinition<T> {
+class FileSendingResultHandler<T> extends AbstractResultHandler<T> {
   static hkt: FSResultHandlerHkt;
   mimeTypes = {
     positive: [mime.getType("svg") || "image/svg+xml"],
@@ -56,7 +56,7 @@ interface FEResultHandlerHkt
   [Hkt.output]: FileStreamingResultHandler<Hkt.Input<this>>;
 }
 
-class FileStreamingResultHandler<T> extends ResultHandlerDefinition<T> {
+class FileStreamingResultHandler<T> extends AbstractResultHandler<T> {
   static hkt: FEResultHandlerHkt;
   mimeTypes = {
     positive: ["image/*"],
