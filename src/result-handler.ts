@@ -54,9 +54,7 @@ export class DefaultResultHandler<OUT> extends ResultHandlerDefinition<OUT> {
     const responseSchema = withMeta(
       z.object({
         status: z.literal("success"),
-        data: (this.output instanceof z.ZodType
-          ? this.output
-          : z.unknown()) as OUT extends IOSchema ? OUT : z.ZodUnknown,
+        data: this.output as OUT extends IOSchema ? OUT : z.ZodNever,
       })
     );
     if (this.output instanceof z.ZodType) {
