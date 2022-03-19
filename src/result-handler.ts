@@ -35,9 +35,9 @@ export abstract class ResultHandlerDefinition<OUT> {
       z.output<this["positiveResponse"]> | z.output<this["negativeResponse"]>
     >
   ) => void | Promise<void>;
-  public abstract readonly mimeTypes: {
-    positive: string[];
-    negative: string[];
+  public readonly mimeTypes = {
+    positive: [mimeJson],
+    negative: [mimeJson],
   };
 }
 
@@ -118,8 +118,6 @@ export class DefaultResultHandler<OUT> extends ResultHandlerDefinition<OUT> {
       error: { message: getMessageFromError(error) },
     });
   };
-
-  mimeTypes = { positive: [mimeJson], negative: [mimeJson] };
 }
 
 export const lastResortHandler = ({
