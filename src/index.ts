@@ -14,6 +14,7 @@ export {
   AbstractResultHandler,
   DefaultResultHandler,
   ResultHandlerParams,
+  defaultResultHandler,
 } from "./result-handler";
 export { DependsOnMethod } from "./depends-on-method";
 export { ServeStatic } from "./serve-static";

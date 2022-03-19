@@ -53,7 +53,6 @@ interface DefaultResultHandlerHkt
   [Hkt.output]: DefaultResultHandler<Hkt.Input<this>>;
 }
 
-// @todo provide lower-case backward compatibility alias
 export class DefaultResultHandler<OUT> extends AbstractResultHandler<OUT> {
   static hkt: DefaultResultHandlerHkt;
 
@@ -120,6 +119,13 @@ export class DefaultResultHandler<OUT> extends AbstractResultHandler<OUT> {
     });
   }
 }
+
+/**
+ * @todo remove
+ * @description the lower case version is for backward compatibility
+ * @deprecated use DefaultResultHandler
+ */
+export const defaultResultHandler = DefaultResultHandler;
 
 export const lastResortHandler = ({
   error,
