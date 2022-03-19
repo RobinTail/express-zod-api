@@ -7,6 +7,7 @@ describe("ESM Test", () => {
   let out = "";
   const listener = (chunk: Buffer) => {
     out += chunk.toString();
+    console.log(chunk.toString()); // @todo remove
   };
 
   beforeAll(() => {

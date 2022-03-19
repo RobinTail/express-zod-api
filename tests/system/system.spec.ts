@@ -8,7 +8,7 @@ import {
   z,
   DefaultResultHandler,
 } from "../../src";
-import { Hkt } from "../../src/hkt";
+import type { Hkt } from "../../src/hkt";
 import { waitFor } from "../helpers";
 
 describe("App", () => {

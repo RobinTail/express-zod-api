@@ -37,7 +37,7 @@ import {
   DefaultResultHandler,
 } from "../../src";
 import { AppConfig, CommonConfig, ServerConfig } from "../../src/config-type";
-import { Hkt } from "../../src/hkt";
+import type { Hkt } from "../../src/hkt";
 import { mimeJson } from "../../src/mime";
 import {
   createNotFoundHandler,

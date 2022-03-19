@@ -8,7 +8,7 @@ import {
   ProbableIntersection,
 } from "./common-helpers";
 import { Endpoint, Handler } from "./endpoint";
-import { Hkt } from "./hkt";
+import type { Hkt } from "./hkt";
 import { Method, MethodsDefinition } from "./method";
 import {
   AnyMiddlewareDef,

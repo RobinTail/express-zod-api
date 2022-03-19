@@ -7,7 +7,7 @@ import {
   getStatusCodeFromError,
   IOSchema,
 } from "./common-helpers";
-import { Hkt } from "./hkt";
+import type { Hkt } from "./hkt";
 import { getMeta, withMeta } from "./metadata";
 import { mimeJson } from "./mime";
 

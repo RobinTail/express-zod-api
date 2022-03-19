@@ -11,7 +11,7 @@ import {
   testEndpoint,
 } from "../../src";
 import { Endpoint } from "../../src/endpoint";
-import { Hkt } from "../../src/hkt";
+import type { Hkt } from "../../src/hkt";
 import { mimeJson } from "../../src/mime";
 import { serializeSchemaForTest } from "../helpers";
 
