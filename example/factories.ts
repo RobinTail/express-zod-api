@@ -5,8 +5,8 @@ import {
   z,
   AbstractResultHandler,
   ResultHandlerParams,
+  Hkt,
 } from "../src";
-import type { Hkt } from "../src/hkt"; // @todo make public
 import { authMiddleware } from "./middlewares";
 import fs from "fs";
 

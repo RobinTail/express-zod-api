@@ -35,9 +35,9 @@ import {
   EndpointsFactory,
   z,
   DefaultResultHandler,
+  Hkt,
 } from "../../src";
 import { AppConfig, CommonConfig, ServerConfig } from "../../src/config-type";
-import type { Hkt } from "../../src/hkt";
 import { mimeJson } from "../../src/mime";
 import {
   createNotFoundHandler,

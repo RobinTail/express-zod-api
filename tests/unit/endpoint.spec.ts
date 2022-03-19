@@ -9,9 +9,9 @@ import {
   EndpointResponse,
   defaultEndpointsFactory,
   testEndpoint,
+  Hkt,
 } from "../../src";
 import { Endpoint } from "../../src/endpoint";
-import type { Hkt } from "../../src/hkt";
 import { mimeJson } from "../../src/mime";
 import { serializeSchemaForTest } from "../helpers";
 
