@@ -25,6 +25,8 @@ describe("Endpoint", () => {
         outputSchema: z.object({}),
         handler: jest.fn(),
         resultHandler: createResultHandler({
+          positiveMimeTypes: [mimeJson],
+          negativeMimeTypes: [mimeJson],
           getPositiveResponse: jest.fn(),
           getNegativeResponse: jest.fn(),
           handler: jest.fn(),
@@ -48,6 +50,8 @@ describe("Endpoint", () => {
         outputSchema: z.object({}),
         handler: jest.fn(),
         resultHandler: createResultHandler({
+          positiveMimeTypes: [mimeJson],
+          negativeMimeTypes: [mimeJson],
           getPositiveResponse: jest.fn(),
           getNegativeResponse: jest.fn(),
           handler: jest.fn(),
@@ -245,6 +249,8 @@ describe("Endpoint", () => {
     test("Should handle errors within ResultHandler", async () => {
       const factory = new EndpointsFactory(
         createResultHandler({
+          positiveMimeTypes: [mimeJson],
+          negativeMimeTypes: [mimeJson],
           getPositiveResponse: () => z.object({}),
           getNegativeResponse: () => z.object({}),
           handler: () => {

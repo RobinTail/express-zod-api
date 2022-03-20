@@ -9,6 +9,7 @@ import {
   defaultResultHandler,
   createResultHandler,
 } from "../../src";
+import { mimeJson } from "../../src/mime";
 import { waitFor } from "../helpers";
 
 describe("App", () => {
@@ -37,6 +38,8 @@ describe("App", () => {
           }),
         faulty: new EndpointsFactory(
           createResultHandler({
+            positiveMimeTypes: [mimeJson],
+            negativeMimeTypes: [mimeJson],
             getPositiveResponse: () => z.object({}),
             getNegativeResponse: () => z.object({}),
             handler: () => {

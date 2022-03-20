@@ -45,23 +45,12 @@ export const createResultHandler = <
   POS extends z.ZodTypeAny,
   NEG extends z.ZodTypeAny
 >(
-  definition: Omit<
-    ResultHandlerDefinition<POS, NEG>,
-    "positiveMimeTypes" | "negativeMimeTypes"
-  > &
-    Partial<
-      Pick<
-        ResultHandlerDefinition<POS, NEG>,
-        "positiveMimeTypes" | "negativeMimeTypes"
-      >
-    >
-): ResultHandlerDefinition<POS, NEG> => ({
-  ...definition,
-  positiveMimeTypes: definition.positiveMimeTypes || [mimeJson],
-  negativeMimeTypes: definition.negativeMimeTypes || [mimeJson],
-});
+  definition: ResultHandlerDefinition<POS, NEG>
+): ResultHandlerDefinition<POS, NEG> => definition;
 
 export const defaultResultHandler = createResultHandler({
+  positiveMimeTypes: [mimeJson],
+  negativeMimeTypes: [mimeJson],
   getPositiveResponse: <OUT extends IOSchema>(output: OUT) => {
     const examples = getMeta(output, "examples") || [];
     const responseSchema = withMeta(
