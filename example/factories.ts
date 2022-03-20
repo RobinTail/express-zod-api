@@ -32,9 +32,7 @@ class FileSendingResultHandler<T> extends AbstractResultHandler<T> {
     response,
     error,
     output,
-  }: ResultHandlerParams<
-    z.output<this["positiveResponse"]> | z.output<this["negativeResponse"]>
-  >) {
+  }: ResultHandlerParams<this["_responseType"]>) {
     if (error) {
       response.status(400).send(error.message);
       return;
@@ -68,9 +66,7 @@ class FileStreamingResultHandler<T> extends AbstractResultHandler<T> {
     response,
     error,
     output,
-  }: ResultHandlerParams<
-    z.output<this["positiveResponse"]> | z.output<this["negativeResponse"]>
-  >) {
+  }: ResultHandlerParams<this["_responseType"]>) {
     if (error) {
       response.status(400).send(error.message);
       return;

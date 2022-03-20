@@ -30,6 +30,9 @@ type EnsureSchema<OUT> = OUT extends IOSchema ? OUT : z.ZodNever;
 
 export abstract class AbstractResultHandler<OUT> {
   protected readonly output: EnsureSchema<OUT>;
+  public readonly _responseType:
+    | z.output<this["positiveResponse"]>
+    | z.output<this["negativeResponse"]> = undefined;
   public abstract readonly positiveResponse: z.ZodLazy<any>;
   public abstract readonly negativeResponse: z.ZodTypeAny;
   public readonly mimeTypes = {
@@ -42,9 +45,7 @@ export abstract class AbstractResultHandler<OUT> {
     ) as EnsureSchema<OUT>;
   }
   public abstract handler(
-    params: ResultHandlerParams<
-      z.output<this["positiveResponse"]> | z.output<this["negativeResponse"]>
-    >
+    params: ResultHandlerParams<this["_responseType"]>
   ): void | Promise<void>;
 }
 
@@ -96,9 +97,7 @@ export class DefaultResultHandler<OUT> extends AbstractResultHandler<OUT> {
     request,
     response,
     logger,
-  }: ResultHandlerParams<
-    z.output<this["positiveResponse"]> | z.output<this["negativeResponse"]> // @todo shorten
-  >) {
+  }: ResultHandlerParams<this["_responseType"]>) {
     if (!error) {
       response.status(200).json({
         status: "success" as const,
