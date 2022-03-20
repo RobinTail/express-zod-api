@@ -52,7 +52,8 @@
   },
   "peerDependencies": {
     "@types/jest": "*",
-    "jest": ">=25 <28"
+    "jest": ">=25 <28",
+    "typescript": "^4.7.0-dev.20220320"
   },
   "peerDependenciesMeta": {
     "jest": {
@@ -60,6 +61,9 @@
     },
     "@types/jest": {
       "optional": true
+    },
+    "typescript": {
+      "optional": false
     }
   },
   "devDependencies": {
