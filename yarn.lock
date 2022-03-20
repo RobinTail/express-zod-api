@@ -4860,10 +4860,10 @@ typedarray-to-buffer@^3.1.5:
   dependencies:
     is-typedarray "^1.0.0"
 
-typescript@^4.5.2:
-  version "4.6.2"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.6.2.tgz#fe12d2727b708f4eef40f51598b3398baa9611d4"
-  integrity sha512-HM/hFigTBHZhLXshn9sN37H085+hQGeJHJ/X7LpBWLID/fbc2acUMfU+lGD98X81sKP+pFa9f0DZmCwB9GnbAg==
+typescript@^4.7.0-dev.20220320:
+  version "4.7.0-dev.20220320"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.7.0-dev.20220320.tgz#1fbef5bfc6e0be87241062a4fab48b50d764403e"
+  integrity sha512-BIkevbhxQtYhAi2jBB3bSNYnU02DyY/l+Ikh6o9oahxIiSu4DVJhu3yAZ2Gp9syaEulycfHMOik3eKNDozSmBQ==
 
 unbox-primitive@^1.0.1:
   version "1.0.1"
