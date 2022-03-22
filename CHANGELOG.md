@@ -2,6 +2,10 @@
 
 ## Version 6
 
+### v6.0.1
+
+- `zod` version is 3.14.2.
+
 ### v6.0.0
 
 - Technically this version contains all the same changes and improvements as 5.9.0-beta1.
