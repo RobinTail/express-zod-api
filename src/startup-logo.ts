@@ -15,7 +15,7 @@ export const getStartupLogo = () => {
 [95m8888888888 888  888 88888P"  888     "Y8888   88888P'  88888P'      d8888888888 "Y88P"   "Y88888      d88P     888 888       8888888[39m[94m[39m
 [94m                    888[39m
 [94m                    888[3m                                                                      Proudly supports transgender community.[23m[39m
-[94m[3mfor Ella      [23m      888[3m                          Start your API server with I/O schema validation and custom middlewares in minutes.[23m[39m[90m[39m
+[94m[3mfor Alice     [23m      888[3m                          Start your API server with I/O schema validation and custom middlewares in minutes.[23m[39m[90m[39m
 [90m[3m                                                                            Thank you for choosing Express Zod API for your project.[23m[39m[0m[0m
 [0m[0m
 [0m[0m

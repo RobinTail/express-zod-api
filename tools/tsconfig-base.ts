@@ -1,3 +1,1 @@
-export const getTSConfigBase = () => {
-  return process.versions.node.split(".").shift();
-};
+export const getTSConfigBase = () => process.versions.node.split(".").shift();

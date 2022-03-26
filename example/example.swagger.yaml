@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Example API
-  version: 5.2.0
+  version: 6.0.1
 paths:
   /v1/user/retrieve:
     get:
@@ -88,21 +88,20 @@ paths:
                   data:
                     example:
                       name: John Doe
-                      timestamp: 1235698995125
+                      createdAt: 2021-12-31T00:00:00.000Z
                     type: object
                     properties:
                       name:
                         type: string
-                      timestamp:
-                        type: integer
-                        format: int64
-                        minimum: 0
-                        exclusiveMinimum: false
-                        maximum: 9007199254740991
-                        exclusiveMaximum: false
+                      createdAt:
+                        type: string
+                        format: date-time
+                        description: YYYY-MM-DDTHH:mm:ss.sssZ
+                        externalDocs:
+                          url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
                     required:
                       - name
-                      - timestamp
+                      - createdAt
                 required:
                   - status
                   - data
@@ -112,7 +111,7 @@ paths:
                     status: success
                     data:
                       name: John Doe
-                      timestamp: 1235698995125
+                      createdAt: 2021-12-31T00:00:00.000Z
         "400":
           description: POST /v1/user/:id Error response
           content:
@@ -156,22 +155,40 @@ paths:
           application/json:
             schema:
               description: POST /v1/user/:id request body
-              type: object
-              properties:
-                key:
-                  type: string
-                  minLength: 1
-                name:
-                  type: string
-                  minLength: 1
-              required:
-                - key
-                - name
+              allOf:
+                - example:
+                    key: 1234-5678-90
+                  type: object
+                  properties:
+                    key:
+                      type: string
+                      minLength: 1
+                  required:
+                    - key
+                - example:
+                    name: John Doe
+                    birthday: 1963-04-21
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                      minLength: 1
+                    birthday:
+                      type: string
+                      format: date-time
+                      pattern: ^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d{3})?)?Z?$
+                      description: YYYY-MM-DDTHH:mm:ss.sssZ
+                      externalDocs:
+                        url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
+                  required:
+                    - name
+                    - birthday
             examples:
               example1:
                 value:
                   key: 1234-5678-90
                   name: John Doe
+                  birthday: 1963-04-21
   /v1/avatar/send:
     get:
       responses:

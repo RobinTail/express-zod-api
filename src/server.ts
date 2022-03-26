@@ -1,4 +1,5 @@
 import express, { ErrorRequestHandler, RequestHandler, json } from "express";
+import compression from "compression";
 import fileUpload from "express-fileupload";
 import https from "https";
 import { Logger } from "winston";
@@ -76,7 +77,15 @@ export function createServer(
     ? createLogger(config.logger)
     : config.logger;
   const app = express();
+  app.disable("x-powered-by");
   const errorHandler = config.errorHandler || defaultResultHandler;
+  const compressor = config.server.compression
+    ? compression({
+        ...(typeof config.server.compression === "object"
+          ? config.server.compression
+          : {}),
+      })
+    : undefined;
   const jsonParser = config.server.jsonParser || json();
   const multipartParser = config.server.upload
     ? fileUpload({
@@ -88,7 +97,11 @@ export function createServer(
       })
     : undefined;
 
-  app.use(([jsonParser] as RequestHandler[]).concat(multipartParser || []));
+  const middlewares = ([] as RequestHandler[])
+    .concat(compressor || [])
+    .concat(jsonParser)
+    .concat(multipartParser || []);
+  app.use(middlewares);
   app.use(createParserFailureHandler(errorHandler, logger));
   initRouting({ app, routing, logger, config });
   app.use(createNotFoundHandler(errorHandler, logger));

@@ -32,19 +32,93 @@ Object {
 }
 `;
 
-exports[`Open API helpers depictDate() should depict ZodDate 1`] = `
+exports[`Open API helpers depictDateIn should depict ZodDateIn 1`] = `
 Object {
-  "description": "test",
-  "format": "date",
+  "description": "YYYY-MM-DDTHH:mm:ss.sssZ",
+  "externalDocs": Object {
+    "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString",
+  },
+  "format": "date-time",
+  "pattern": "^\\\\d{4}-\\\\d{2}-\\\\d{2}(T\\\\d{2}:\\\\d{2}:\\\\d{2}(\\\\.\\\\d{3})?)?Z?$",
   "type": "string",
 }
 `;
+
+exports[`Open API helpers depictDateIn should throw when ZodDateIn in response 1`] = `[Error: Please use z.dateOut() for output.]`;
+
+exports[`Open API helpers depictDateOut should depict ZodDateOut 1`] = `
+Object {
+  "description": "YYYY-MM-DDTHH:mm:ss.sssZ",
+  "externalDocs": Object {
+    "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString",
+  },
+  "format": "date-time",
+  "type": "string",
+}
+`;
+
+exports[`Open API helpers depictDateOut should throw when ZodDateOut in request 1`] = `[Error: Please use z.dateIn() for input.]`;
 
 exports[`Open API helpers depictDefault() should depict ZodDefault 1`] = `
 Object {
   "default": true,
   "description": "test",
   "type": "boolean",
+}
+`;
+
+exports[`Open API helpers depictDiscriminatedUnion() should depict ZodDiscriminatedUnion 1`] = `
+Object {
+  "description": "test",
+  "discriminator": Object {
+    "propertyName": "status",
+  },
+  "oneOf": Array [
+    Object {
+      "properties": Object {
+        "data": Object {
+          "format": "any",
+          "nullable": true,
+        },
+        "status": Object {
+          "enum": Array [
+            "success",
+          ],
+          "type": "string",
+        },
+      },
+      "required": Array [
+        "status",
+      ],
+      "type": "object",
+    },
+    Object {
+      "properties": Object {
+        "error": Object {
+          "properties": Object {
+            "message": Object {
+              "type": "string",
+            },
+          },
+          "required": Array [
+            "message",
+          ],
+          "type": "object",
+        },
+        "status": Object {
+          "enum": Array [
+            "error",
+          ],
+          "type": "string",
+        },
+      },
+      "required": Array [
+        "status",
+        "error",
+      ],
+      "type": "object",
+    },
+  ],
 }
 `;
 
@@ -484,6 +558,8 @@ Object {
 }
 `;
 
+exports[`Open API helpers depictUpload() should throw when using in response 1`] = `[Error: Please use z.upload() only for input.]`;
+
 exports[`Open API helpers excludeExampleFromDepiction() should remove example property of supplied object 1`] = `
 Object {
   "test": "some",
@@ -547,5 +623,50 @@ Object {
     "b",
   ],
   "type": "object",
+}
+`;
+
+exports[`Open API helpers extractObjectSchema() should pass the object schema through 1`] = `
+Object {
+  "_type": "ZodObject",
+  "shape": Object {
+    "one": Object {
+      "_type": "ZodString",
+    },
+  },
+}
+`;
+
+exports[`Open API helpers extractObjectSchema() should return object schema for the intersection of object schemas 1`] = `
+Object {
+  "_type": "ZodObject",
+  "shape": Object {
+    "one": Object {
+      "_type": "ZodString",
+    },
+    "two": Object {
+      "_type": "ZodNumber",
+    },
+  },
+}
+`;
+
+exports[`Open API helpers extractObjectSchema() should return object schema for the union of object schemas 1`] = `
+Object {
+  "_type": "ZodObject",
+  "shape": Object {
+    "one": Object {
+      "_type": "ZodOptional",
+      "value": Object {
+        "_type": "ZodString",
+      },
+    },
+    "two": Object {
+      "_type": "ZodOptional",
+      "value": Object {
+        "_type": "ZodNumber",
+      },
+    },
+  },
 }
 `;

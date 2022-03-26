@@ -168,6 +168,38 @@ describe("Open API generator", () => {
       expect(spec).toMatchSnapshot();
     });
 
+    test("should generate the correct schema for discriminated union type", () => {
+      const spec = new OpenAPI({
+        config,
+        routing: {
+          v1: {
+            getSomething: defaultEndpointsFactory.build({
+              methods: ["post"],
+              input: z.discriminatedUnion("type", [
+                z.object({ type: z.literal("a"), a: z.string() }),
+                z.object({ type: z.literal("b"), b: z.string() }),
+              ]),
+              output: z.discriminatedUnion("status", [
+                z.object({ status: z.literal("success"), data: z.any() }),
+                z.object({
+                  status: z.literal("error"),
+                  error: z.object({ message: z.string() }),
+                }),
+              ]),
+              handler: async () => ({
+                status: "success" as const,
+                data: "test",
+              }),
+            }),
+          },
+        },
+        version: "3.4.5",
+        title: "Testing Discriminated Union Type",
+        serverUrl: "http://example.com",
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
+    });
+
     test("should handle transformation schema in output", () => {
       const spec = new OpenAPI({
         config,
@@ -205,13 +237,15 @@ describe("Open API generator", () => {
               input: z.object({
                 bigint: z.bigint(),
                 boolean: z.boolean(),
-                date: z.date(),
+                dateIn: z.dateIn(),
               }),
               output: z.object({
                 null: z.null(),
+                dateOut: z.dateOut(),
               }),
               handler: async () => ({
                 null: null,
+                dateOut: new Date("2021-12-31"),
               }),
             }),
           },

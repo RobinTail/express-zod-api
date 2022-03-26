@@ -416,6 +416,21 @@ describe("Endpoint", () => {
         ...mInput2._input,
       });
     });
+
+    test("should handle z.dateIn() correctly", () => {
+      const factory = new EndpointsFactory(defaultResultHandler);
+      const endpoint = factory.build({
+        method: "get",
+        output: z.object({}),
+        input: z.object({
+          birthday: z.dateIn(),
+        }),
+        handler: jest.fn(),
+      });
+      expectType<EndpointInput<typeof endpoint>>({
+        birthday: "1984-12-31T00:00:00Z",
+      });
+    });
   });
 
   describe("EndpointOutput<>", () => {
@@ -454,6 +469,65 @@ describe("Endpoint", () => {
         status: "error",
         error: {
           message: "some error",
+        },
+      });
+    });
+
+    test("should handle z.dateOut() correctly", () => {
+      const factory = new EndpointsFactory(defaultResultHandler);
+      const endpoint = factory.build({
+        method: "get",
+        input: z.object({}),
+        output: z.object({
+          birthday: z.dateOut(),
+        }),
+        handler: jest.fn(),
+      });
+      expectType<EndpointResponse<typeof endpoint>>({
+        status: "success",
+        data: { birthday: "1984-12-31T00:00:00Z" },
+      });
+      expectType<EndpointResponse<typeof endpoint>>({
+        status: "error",
+        error: {
+          message: "some error",
+        },
+      });
+    });
+  });
+
+  describe("Issue #269: Async refinements", () => {
+    test("should handle async refinements in input, output and middleware", async () => {
+      const endpoint = new EndpointsFactory(defaultResultHandler)
+        .addMiddleware({
+          input: z.object({
+            m: z.number().refine(async (m) => m < 10),
+          }),
+          middleware: async () => ({}),
+        })
+        .build({
+          methods: ["post"],
+          input: z.object({
+            n: z.number().refine(async (n) => n > 100),
+          }),
+          output: z.object({
+            str: z.string().refine(async (str) => str.length > 3),
+          }),
+          handler: async () => ({
+            str: "This is fine",
+          }),
+        });
+      const { responseMock } = await testEndpoint({
+        endpoint,
+        requestProps: {
+          method: "POST",
+          body: { n: 123, m: 5 },
+        },
+      });
+      expect(responseMock.json).toHaveBeenCalledWith({
+        status: "success",
+        data: {
+          str: "This is fine",
         },
       });
     });

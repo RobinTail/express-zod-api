@@ -1,10 +1,17 @@
-import { defaultEndpointsFactory, withMeta, z } from "../../src/index";
+import {
+  defaultEndpointsFactory,
+  OpenAPIError,
+  withMeta,
+  z,
+} from "../../src/index";
+import { getMeta } from "../../src/metadata";
 import {
   depictAny,
   depictArray,
   depictBigInt,
   depictBoolean,
-  depictDate,
+  depictDateIn,
+  depictDateOut,
   depictDefault,
   depictEffect,
   depictEnum,
@@ -24,13 +31,120 @@ import {
   depictString,
   depictTuple,
   depictUnion,
+  depictDiscriminatedUnion,
   depictUpload,
   excludeExampleFromDepiction,
   excludeParamsFromDepiction,
   reformatParamsInPath,
+  extractObjectSchema,
 } from "../../src/open-api-helpers";
+import { serializeSchemaForTest } from "../helpers";
 
 describe("Open API helpers", () => {
+  describe("extractObjectSchema()", () => {
+    test("should pass the object schema through", () => {
+      const subject = extractObjectSchema(
+        z.object({
+          one: z.string(),
+        })
+      );
+      expect(subject).toBeInstanceOf(z.ZodObject);
+      expect(serializeSchemaForTest(subject)).toMatchSnapshot();
+    });
+
+    test("should return object schema for the union of object schemas", () => {
+      const subject = extractObjectSchema(
+        z
+          .object({
+            one: z.string(),
+          })
+          .or(
+            z.object({
+              two: z.number(),
+            })
+          )
+      );
+      expect(subject).toBeInstanceOf(z.ZodObject);
+      expect(serializeSchemaForTest(subject)).toMatchSnapshot();
+    });
+
+    test("should return object schema for the intersection of object schemas", () => {
+      const subject = extractObjectSchema(
+        z
+          .object({
+            one: z.string(),
+          })
+          .and(
+            z.object({
+              two: z.number(),
+            })
+          )
+      );
+      expect(subject).toBeInstanceOf(z.ZodObject);
+      expect(serializeSchemaForTest(subject)).toMatchSnapshot();
+    });
+
+    test("should preserve examples", () => {
+      const objectSchema = withMeta(
+        z.object({
+          one: z.string(),
+        })
+      ).example({
+        one: "test",
+      });
+      expect(getMeta(extractObjectSchema(objectSchema), "examples")).toEqual([
+        {
+          one: "test",
+        },
+      ]);
+
+      const unionSchema = withMeta(
+        z
+          .object({
+            one: z.string(),
+          })
+          .or(
+            z.object({
+              two: z.number(),
+            })
+          )
+      )
+        .example({
+          one: "test1",
+        })
+        .example({
+          two: 123,
+        });
+      expect(getMeta(extractObjectSchema(unionSchema), "examples")).toEqual([
+        { one: "test1" },
+        { two: 123 },
+      ]);
+
+      const intersectionSchema = withMeta(
+        z
+          .object({
+            one: z.string(),
+          })
+          .and(
+            z.object({
+              two: z.number(),
+            })
+          )
+      ).example({
+        one: "test1",
+        two: 123,
+      });
+      expect(
+        getMeta(extractObjectSchema(intersectionSchema), "examples")
+      ).toEqual([
+        {
+          one: "test1",
+          two: 123,
+        },
+      ]);
+    });
+  });
+
   describe("excludeParamsFromDepiction()", () => {
     test("should omit specified path params", () => {
       const depicted = depictSchema({
@@ -123,6 +237,19 @@ describe("Open API helpers", () => {
         })
       ).toMatchSnapshot();
     });
+    test("should throw when using in response", () => {
+      try {
+        depictUpload({
+          schema: z.upload(),
+          isResponse: true,
+          initial: { description: "test" },
+        });
+        fail("Should not be here");
+      } catch (e) {
+        expect(e).toBeInstanceOf(OpenAPIError);
+        expect(e).toMatchSnapshot();
+      }
+    });
   });
 
   describe("depictFile()", () => {
@@ -142,6 +269,24 @@ describe("Open API helpers", () => {
       expect(
         depictUnion({
           schema: z.string().or(z.number()),
+          isResponse: false,
+          initial: { description: "test" },
+        })
+      ).toMatchSnapshot();
+    });
+  });
+
+  describe("depictDiscriminatedUnion()", () => {
+    test("should depict ZodDiscriminatedUnion", () => {
+      expect(
+        depictDiscriminatedUnion({
+          schema: z.discriminatedUnion("status", [
+            z.object({ status: z.literal("success"), data: z.any() }),
+            z.object({
+              status: z.literal("error"),
+              error: z.object({ message: z.string() }),
+            }),
+          ]),
           isResponse: false,
           initial: { description: "test" },
         })
@@ -244,18 +389,6 @@ describe("Open API helpers", () => {
       expect(
         depictNull({
           schema: z.null(),
-          isResponse: false,
-          initial: { description: "test" },
-        })
-      ).toMatchSnapshot();
-    });
-  });
-
-  describe("depictDate()", () => {
-    test("should depict ZodDate", () => {
-      expect(
-        depictDate({
-          schema: z.date(),
           isResponse: false,
           initial: { description: "test" },
         })
@@ -636,6 +769,56 @@ describe("Open API helpers", () => {
           example: "test",
         })
       ).toMatchSnapshot();
+    });
+  });
+
+  describe("depictDateIn", () => {
+    test("should depict ZodDateIn", () => {
+      expect(
+        depictDateIn({
+          schema: z.dateIn(),
+          isResponse: false,
+          initial: { description: "test" },
+        })
+      ).toMatchSnapshot();
+    });
+    test("should throw when ZodDateIn in response", () => {
+      try {
+        depictDateIn({
+          schema: z.dateIn(),
+          isResponse: true,
+          initial: { description: "test" },
+        });
+        fail("should not be here");
+      } catch (e) {
+        expect(e).toBeInstanceOf(OpenAPIError);
+        expect(e).toMatchSnapshot();
+      }
+    });
+  });
+
+  describe("depictDateOut", () => {
+    test("should depict ZodDateOut", () => {
+      expect(
+        depictDateOut({
+          schema: z.dateOut(),
+          isResponse: true,
+          initial: { description: "test" },
+        })
+      ).toMatchSnapshot();
+    });
+    test("should throw when ZodDateOut in request", () => {
+      try {
+        depictDateOut({
+          schema: z.dateOut(),
+          isResponse: false,
+          initial: { description: "test" },
+        });
+        fail("should not be here");
+      } catch (e) {
+        expect(e).toBeInstanceOf(OpenAPIError);
+        expect(e).toMatchSnapshot();
+      }
     });
   });
 });

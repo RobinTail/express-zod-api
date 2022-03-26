@@ -4,12 +4,12 @@
 
 ![CI](https://github.com/RobinTail/express-zod-api/actions/workflows/node.js.yml/badge.svg)
 ![Swagger Validator](https://img.shields.io/swagger/valid/3.0?specUrl=https%3A%2F%2Fraw.githubusercontent.com%2FRobinTail%2Fexpress-zod-api%2Fmaster%2Fexample%2Fexample.swagger.yaml)
-![Coverage](https://raw.githubusercontent.com/RobinTail/express-zod-api/master/coverage.svg)
+[![coverage](https://coveralls.io/repos/github/RobinTail/express-zod-api/badge.svg)](https://coveralls.io/github/RobinTail/express-zod-api)
 
-![downloads](https://img.shields.io/npm/dw/express-zod-api)
-![npm release](https://img.shields.io/npm/v/express-zod-api?color=teal&label=latest)
-![GitHub Repo stars](https://img.shields.io/github/stars/RobinTail/express-zod-api)
-![License](https://img.shields.io/npm/l/express-zod-api)
+![downloads](https://img.shields.io/npm/dw/express-zod-api.svg)
+![npm release](https://img.shields.io/npm/v/express-zod-api.svg?color=green25&label=latest)
+![GitHub Repo stars](https://img.shields.io/github/stars/RobinTail/express-zod-api.svg)
+![License](https://img.shields.io/npm/l/express-zod-api.svg?color=green25)
 
 Start your API server with I/O schema validation and custom middlewares in minutes.
 
@@ -30,18 +30,21 @@ Start your API server with I/O schema validation and custom middlewares in minut
    2. [Options](#options)
    3. [Refinements](#refinements)
    4. [Transformations](#transformations)
-   5. [Route path params](#route-path-params)
-   6. [Response customization](#response-customization)
-   7. [Non-object response](#non-object-response) including file downloads
-   8. [File uploads](#file-uploads)
-   9. [Customizing logger](#customizing-logger)
-   10. [Connect to your own express app](#connect-to-your-own-express-app)
-   11. [Multiple schemas for one route](#multiple-schemas-for-one-route)
-   12. [Serving static files](#serving-static-files)
-   13. [Customizing input sources](#customizing-input-sources)
-   14. [Enabling HTTPS](#enabling-https)
-   15. [Informing the frontend about the API](#informing-the-frontend-about-the-api)
-   16. [Creating a documentation](#creating-a-documentation)
+   5. [Dealing with dates](#dealing-with-dates)
+   6. [Route path params](#route-path-params)
+   7. [Response customization](#response-customization)
+   8. [Non-object response](#non-object-response) including file downloads
+   9. [Using native express middlewares](#using-native-express-middlewares)
+   10. [File uploads](#file-uploads)
+   11. [Customizing logger](#customizing-logger)
+   12. [Connect to your own express app](#connect-to-your-own-express-app)
+   13. [Multiple schemas for one route](#multiple-schemas-for-one-route)
+   14. [Serving static files](#serving-static-files)
+   15. [Customizing input sources](#customizing-input-sources)
+   16. [Enabling compression](#enabling-compression)
+   17. [Enabling HTTPS](#enabling-https)
+   18. [Informing the frontend about the API](#informing-the-frontend-about-the-api)
+   19. [Creating a documentation](#creating-a-documentation)
 5. [Additional hints](#additional-hints)
    1. [How to test endpoints](#how-to-test-endpoints)
    2. [Excessive properties in endpoint output](#excessive-properties-in-endpoint-output)
@@ -331,6 +334,55 @@ const getUserEndpoint = endpointsFactory.build({
 });
 ```
 
+## Dealing with dates
+
+Dates in Javascript are one of the most troublesome entities. In addition, `Date` cannot be passed directly in JSON
+format. Therefore, attempting to return `Date` from the endpoint handler results in it being converted to an ISO string
+in actual response by calling
+[toJSON()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toJSON),
+which in turn calls
+[toISOString()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString).
+It is also impossible to transmit the `Date` in its original form to your endpoints within JSON. Therefore, there is
+confusion with original method ~~z.date()~~ that should not be used within IO schemas of your API.
+
+In order to solve this problem, the library provides two custom methods for dealing with dates: `z.dateIn()` and
+`z.dateOut()` for using within input and output schemas accordingly.
+
+`z.dateIn()` is a transforming schema that accepts an ISO `string` representation of a `Date`, validates it, and
+provides your endpoint handler or middleware with a `Date`. It supports the following formats:
+
+```text
+2021-12-31T23:59:59.000Z
+2021-12-31T23:59:59Z
+2021-12-31T23:59:59
+2021-12-31
+```
+
+`z.dateOut()`, on the contrary, accepts a `Date` and provides `ResultHanlder` with a `string` representation in ISO
+format for the response transmission. Consider the following simplified example for better understanding:
+
+```typescript
+import { z, defaultEndpointsFactory } from "express-zod-api";
+
+const updateUserEndpoint = defaultEndpointsFactory.build({
+  method: "post",
+  input: z.object({
+    userId: z.string(),
+    birthday: z.dateIn(), // string -> Date
+  }),
+  output: z.object({
+    createdAt: z.dateOut(), // Date -> string
+  }),
+  handler: async ({ input }) => {
+    // input.birthday is Date
+    return {
+      // transmitted as "2022-01-22T00:00:00.000Z"
+      createdAt: new Date("2022-01-22"),
+    };
+  },
+});
+```
+
 ## Route path params
 
 You can describe the route of the endpoint using parameters:
@@ -457,6 +509,28 @@ const fileStreamingEndpointsFactory = new EndpointsFactory(
     },
   })
 );
+```
+
+## Using native express middlewares
+
+You can connect any native `express` middleware that can be supplied to `express` method `app.use()`.
+For this purpose the `EndpointsFactory` provides method `addExpressMiddleware()` and its alias `use()`.
+There are also two optional features available: a provider of options and an error transformer for `ResultHandler`.
+In case the error in middleware is not a `HttpError`, the `ResultHandler` will send the status `500`.
+
+```typescript
+import { defaultEndpointsFactory, createHttpError } from "express-zod-api";
+import cors from "cors";
+import { auth } from "express-oauth2-jwt-bearer";
+
+const simpleUsage = defaultEndpointsFactory.addExpressMiddleware(
+  cors({ credentials: true })
+);
+
+const advancedUsage = defaultEndpointsFactory.use(auth(), {
+  provider: (req) => ({ auth: req.auth }), // optional, can be async
+  transformer: (err) => createHttpError(401, err.message), // optional
+});
 ```
 
 ## File uploads
@@ -593,6 +667,32 @@ createConfig({
     patch: ["body"],
     delete: ["query", "body"],
   },
+});
+```
+
+## Enabling compression
+
+According to [Express JS best practices guide](http://expressjs.com/en/advanced/best-practice-performance.html)
+it might be a good idea to enable GZIP compression of your API responses. You can achieve and customize it by using the
+corresponding configuration option when using the `createServer()` method.
+
+In order to receive the compressed response the client should include the following header in the request:
+`Accept-Encoding: gzip, deflate`. Only responses with compressible content types are subject to compression. There is
+also a default threshold of 1KB that can be configured.
+
+```typescript
+import { createConfig } from "express-zod-api";
+
+const config = createConfig({
+  server: {
+    // compression: true, or:
+    compression: {
+      // @see https://www.npmjs.com/package/compression#options
+      threshold: "100b",
+    },
+    // ... other options
+  },
+  // ... other options
 });
 ```
 

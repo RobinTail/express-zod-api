@@ -1,5 +1,3 @@
-import path from "path";
-import fs from "fs";
 import manifest from "../package.json";
 
 const ownLicense = `
@@ -26,72 +24,4 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 `;
 
-interface Lib {
-  name: string;
-  url: string;
-  module: string;
-  file?: string;
-}
-
-const libs: Lib[] = [
-  {
-    name: "Express",
-    url: "https://github.com/expressjs/express",
-    module: "express",
-  },
-  {
-    name: "Zod",
-    url: "https://github.com/colinhacks/zod",
-    module: "zod",
-  },
-  {
-    name: "HTTP Errors",
-    url: "https://github.com/jshttp/http-errors",
-    module: "http-errors",
-  },
-  {
-    name: "OpenApi3-TS",
-    url: "https://github.com/metadevpro/openapi3-ts",
-    module: "openapi3-ts",
-  },
-  {
-    name: "Winston",
-    url: "https://github.com/winstonjs/winston",
-    module: "winston",
-  },
-  {
-    name: "Mime",
-    url: "https://github.com/broofa/mime",
-    module: "mime",
-  },
-  {
-    name: "Express-FileUpload",
-    url: "https://github.com/richardgirges/express-fileupload",
-    module: "express-fileupload",
-  },
-  {
-    name: "Ramda",
-    url: "https://github.com/ramda/ramda",
-    module: "ramda",
-    file: "LICENSE.txt",
-  },
-  {
-    name: "Triple-Beam",
-    url: "https://github.com/winstonjs/triple-beam",
-    module: "triple-beam",
-  },
-];
-
-const separator = "\n".repeat(4);
-
-const otherLicenses = libs
-  .map(({ name, url, module, file = "LICENSE" }) => {
-    const license = fs.readFileSync(
-      path.join("node_modules", module, file),
-      "utf-8"
-    );
-    return `${name} - ${url}\n\n${license.trim()}`;
-  })
-  .join(separator);
-
-console.log(`${ownLicense.trim()}${separator}${otherLicenses}`);
+console.log(ownLicense.trim());

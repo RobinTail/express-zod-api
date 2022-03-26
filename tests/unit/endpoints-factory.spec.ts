@@ -1,4 +1,5 @@
-import { Request, Response } from "express";
+import { Request, RequestHandler, Response } from "express";
+import createHttpError, { HttpError } from "http-errors";
 import { Logger } from "winston";
 import { createMiddleware, EndpointsFactory, z } from "../../src";
 import { Endpoint } from "../../src/endpoint";
@@ -70,7 +71,9 @@ describe("EndpointsFactory", () => {
       expect(factory["resultHandler"]).toStrictEqual(resultHandlerMock);
       expect(newFactory["middlewares"].length).toBe(1);
       expect(newFactory["middlewares"][0].input).toBeInstanceOf(z.ZodObject);
-      expect(newFactory["middlewares"][0].input.shape).toEqual({});
+      expect(
+        (newFactory["middlewares"][0].input as z.AnyZodObject).shape
+      ).toEqual({});
       expect(
         await newFactory["middlewares"][0].middleware({
           input: {},
@@ -86,6 +89,139 @@ describe("EndpointsFactory", () => {
       expect(newFactory["resultHandler"]).toStrictEqual(resultHandlerMock);
     });
   });
+
+  describe.each(["addExpressMiddleware" as const, "use" as const])(
+    ".%s()",
+    (method) => {
+      test("Should create a new factory with a native express middleware wrapper", async () => {
+        const resultHandlerMock = { handler: jest.fn() };
+        const factory = new EndpointsFactory(
+          resultHandlerMock as unknown as ResultHandlerDefinition<any, any>
+        );
+        const middleware: RequestHandler = jest.fn((req, res, next) => {
+          req.body.test = "Here is the test";
+          next();
+        });
+        const newFactory = factory[method](middleware, {
+          provider: (req) => ({
+            result: req.body.test,
+          }),
+        });
+        expect(newFactory["middlewares"].length).toBe(1);
+        expect(newFactory["middlewares"][0].input).toBeInstanceOf(z.ZodObject);
+        expect(
+          (newFactory["middlewares"][0].input as z.AnyZodObject).shape
+        ).toEqual({});
+        const requestMock = { body: { something: "awesome" } } as Request;
+        const responseMock = {} as Response;
+        const options = await newFactory["middlewares"][0].middleware({
+          input: {},
+          options: {},
+          request: requestMock,
+          response: responseMock,
+          logger: {} as Logger,
+        });
+        expect(middleware).toHaveBeenCalledTimes(1);
+        expect(middleware).toHaveBeenCalledWith(
+          requestMock,
+          responseMock,
+          expect.any(Function)
+        );
+        expect(requestMock.body).toHaveProperty("test");
+        expect(requestMock.body.test).toBe("Here is the test");
+        expect(options).toEqual({ result: "Here is the test" });
+      });
+
+      test("Should operate without options provider", async () => {
+        const resultHandlerMock = { handler: jest.fn() };
+        const factory = new EndpointsFactory(
+          resultHandlerMock as unknown as ResultHandlerDefinition<any, any>
+        );
+        const middleware: RequestHandler = jest.fn((req, res, next) => {
+          req.body.test = "Here is the test";
+          next();
+        });
+        const newFactory = factory[method](middleware);
+        expect(newFactory["middlewares"].length).toBe(1);
+        const requestMock = { body: { something: "awesome" } } as Request;
+        const responseMock = {} as Response;
+        const options = await newFactory["middlewares"][0].middleware({
+          input: {},
+          options: {},
+          request: requestMock,
+          response: responseMock,
+          logger: {} as Logger,
+        });
+        expect(middleware).toHaveBeenCalledTimes(1);
+        expect(middleware).toHaveBeenCalledWith(
+          requestMock,
+          responseMock,
+          expect.any(Function)
+        );
+        expect(requestMock.body).toHaveProperty("test");
+        expect(requestMock.body.test).toBe("Here is the test");
+        expect(options).toEqual({});
+        expectType<{}>(options);
+      });
+
+      test("Should handle errors", async () => {
+        const resultHandlerMock = { handler: jest.fn() };
+        const factory = new EndpointsFactory(
+          resultHandlerMock as unknown as ResultHandlerDefinition<any, any>
+        );
+        const middleware: RequestHandler = jest.fn((req, res, next) => {
+          next(new Error("This one has failed"));
+        });
+        const newFactory = factory[method](middleware);
+        try {
+          await newFactory["middlewares"][0].middleware({
+            input: {},
+            options: {},
+            request: {} as Request,
+            response: {} as Response,
+            logger: {} as Logger,
+          });
+          fail("Should not be here");
+        } catch (e) {
+          expect(middleware).toHaveBeenCalledTimes(1);
+          expect(e).toBeInstanceOf(Error);
+          if (e instanceof Error) {
+            expect(e.message).toBe("This one has failed");
+          }
+        }
+      });
+
+      test("Should transform errors", async () => {
+        const resultHandlerMock = { handler: jest.fn() };
+        const factory = new EndpointsFactory(
+          resultHandlerMock as unknown as ResultHandlerDefinition<any, any>
+        );
+        const middleware: RequestHandler = jest.fn((req, res, next) => {
+          next(new Error("This one has failed"));
+        });
+        const newFactory = factory[method](middleware, {
+          transformer: (err) => createHttpError(401, err.message),
+        });
+        try {
+          await newFactory["middlewares"][0].middleware({
+            input: {},
+            options: {},
+            request: {} as Request,
+            response: {} as Response,
+            logger: {} as Logger,
+          });
+          fail("Should not be here");
+        } catch (e) {
+          expect(middleware).toHaveBeenCalledTimes(1);
+          expect(e).toBeInstanceOf(HttpError);
+          if (e instanceof HttpError) {
+            expect(e.status).toBe(401);
+            expect(e.message).toBe("This one has failed");
+          }
+        }
+      });
+    }
+  );
 
   describe(".build()", () => {
     test("Should create an endpoint with simple middleware", () => {
@@ -119,10 +255,12 @@ describe("EndpointsFactory", () => {
       ).toMatchSnapshot();
       expect(endpoint["handler"]).toStrictEqual(handlerMock);
       expect(endpoint["resultHandler"]).toStrictEqual(resultHandlerMock);
-      expectType<{
-        n: z.ZodNumber;
-        s: z.ZodString;
-      }>(endpoint["inputSchema"].shape);
+      expectType<
+        z.ZodIntersection<
+          z.ZodObject<{ n: z.ZodNumber }>,
+          z.ZodObject<{ s: z.ZodString }>
+        >
+      >(endpoint.getInputSchema());
     });
 
     test("Should create an endpoint with intersection middleware", () => {
@@ -162,11 +300,15 @@ describe("EndpointsFactory", () => {
       ).toMatchSnapshot();
       expect(endpoint["handler"]).toStrictEqual(handlerMock);
       expect(endpoint["resultHandler"]).toStrictEqual(resultHandlerMock);
-      expectType<{
-        n1: z.ZodNumber;
-        n2: z.ZodNumber;
-        s: z.ZodString;
-      }>(endpoint["inputSchema"].shape);
+      expectType<
+        z.ZodIntersection<
+          z.ZodIntersection<
+            z.ZodObject<{ n1: z.ZodNumber }>,
+            z.ZodObject<{ n2: z.ZodNumber }>
+          >,
+          z.ZodObject<{ s: z.ZodString }>
+        >
+      >(endpoint.getInputSchema());
     });
 
     test("Should create an endpoint with union middleware", () => {
@@ -210,22 +352,13 @@ describe("EndpointsFactory", () => {
       expect(endpoint["handler"]).toStrictEqual(handlerMock);
       expect(endpoint["resultHandler"]).toStrictEqual(resultHandlerMock);
       expectType<
-        (
-          | {
-              n1: z.ZodNumber;
-            }
-          | {
-              n2: z.ZodNumber;
-            }
-        ) & {
-          s: z.ZodString;
-        }
-      >(endpoint["inputSchema"].shape);
-      expectType<{
-        n1?: z.ZodNumber;
-        n2?: z.ZodNumber;
-        s: z.ZodString;
-      }>(endpoint["inputSchema"].shape);
+        z.ZodIntersection<
+          z.ZodUnion<
+            [z.ZodObject<{ n1: z.ZodNumber }>, z.ZodObject<{ n2: z.ZodNumber }>]
+          >,
+          z.ZodObject<{ s: z.ZodString }>
+        >
+      >(endpoint.getInputSchema());
     });
   });
 });

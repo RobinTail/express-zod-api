@@ -1,6 +1,245 @@
 # Changelog
 
+## Version 6
+
+### v6.0.1
+
+- `zod` version is 3.14.2.
+
+### v6.0.0
+
+- Technically this version contains all the same changes and improvements as 5.9.0-beta1.
+- The new implementation of the `EndpointsFactory`, however, has more restrictive middleware input schema requirements.
+- To avoid possible backward incompatibility issues, I have decided to publish these changes as a major release.
+- In addition, the deprecated schema `z.date()` is no longer supported in documentation generator.
+- The following changes are required to migrate to this version:
+  - You cannot use the `.strict()`, `.passthrough()` and its deprecated alias `.nonstrict()` methods in middlewares.
+  - Only `.strip()` is allowed in middlewares, which is actually default, so you should not use any of them at all.
+  - Replace the `z.date()` with `z.dateIn()` in input schema and with `z.dateOut()` in output schema.
+
+```typescript
+// how to migrate
+export const myMiddleware = createMiddleware({
+  input: z
+    .object({
+      key: z.string().nonempty(),
+      at: z.date(), // <— replace with z.dateIn()
+    })
+    .passthrough(), // <— remove this if you have it in your code
+  middleware: async () => ({...}),
+});
+
+```
+
 ## Version 5
+
+### v5.9.0-beta1
+
+- In this build, improvements have been made to the `EndpointsFactory`, in terms of combining the input schemas of
+  middlewares and the endpoint itself. A custom type has been replaced with usage of `ZodIntersection` schema with
+  respect to the originals.
+- The generated documentation has improved in this regard:
+  - Previously, fields from an object union were documented in a simplified way as optional.
+  - Instead, it is now documented using `oneOf` OpenAPI notation.
+- In addition, you can now also use the new `z.discriminatedUnion()` as the input schema on the top level.
+
+```typescript
+// example
+const endpoint = defaultEndpointsFactory.build({
+  method: "post",
+  input: z.discriminatedUnion("type", [
+    z.object({
+      type: z.literal("text"),
+      str: z.string()
+    }),
+    z.object({
+      type: z.literal("numeric"),
+      num: z.number()
+    }),
+  ]),
+  output: z.object({...}),
+  handler: async ({ input }) => {
+    // the type of the input:
+    // | { type: "text", str: string }
+    // | { type: "numeric", num: number }
+  }
+});
+```
+
+### v5.8.0
+
+- `zod` version is 3.13.4.
+  - There is a new schema `z.nan()` and some fixes.
+
+### v5.7.0
+
+- `zod` version is 3.12.0.
+  - There is a new schema `z.discriminatedUnion()` and various fixes.
+
+### v5.6.1
+
+- `express` version is 4.17.3.
+- `openapi3-ts` version is 2.0.2.
+
+### v5.6.0
+
+- Feature #311. `EndpointsFactory::addExpressMiddleware()` or its alias `use()`.
+  - A method to connect a native (regular) `express` middleware to your endpoint(s).
+  - You can connect any middleware that has a regular express middleware signature
+    `(req, res, next) => void | Promise<void>` and can be supplied to `app.use()`.
+  - You can also specify a provider of options for endpoint handlers and next middlewares.
+  - You can also specify an error transformer so that the `ResultHandler` would send the status you need.
+    - In case the error is not a `HttpError`, the `ResultHandler` will send the status `500`.
+
+```typescript
+import { defaultEndpointsFactory, createHttpError } from "express-zod-api";
+import cors from "cors";
+import { auth } from "express-oauth2-jwt-bearer";
+
+const simpleUsage = defaultEndpointsFactory.addExpressMiddleware(
+  cors({ credentials: true })
+);
+
+const advancedUsage = defaultEndpointsFactory.use(auth(), {
+  provider: (req) => ({ auth: req.auth }), // optional, can be async
+  transformer: (err) => createHttpError(401, err.message), // optional
+});
+```
+
+### v5.5.6
+
+- `winston` version is 3.6.0.
+
+### v5.5.5
+
+- `winston-transport` version is 4.5.0.
+
+### v5.5.4
+
+- `express-fileupload` version is 1.3.1.
+
+### v5.5.3
+
+- `winston` version is 3.5.1.
+- I made a website for the library available on following domains:
+  - [https://ez.robintail.cz](https://ez.robintail.cz) and
+  - [https://express-zod-api.vercel.app](https://express-zod-api.vercel.app).
+  - Currently, it provides the documentation for each release in a way I find more suitable.
+
+### v5.5.2
+
+- `winston` version is 3.5.0.
+
+### v5.5.1
+
+- In this version, the OpenAPI documentation generator throws an error when using `z.upload()` within response schema.
+
+### v5.5.0
+
+- No changes.
+
+### v5.5.0-beta1
+
+- `z.date()` is deprecated for using within IO schemas of your API.
+- Feature #297: `z.dateIn()` and `z.dateOut()` schemas.
+  - Since `Date` cannot be passed directly in JSON format, attempting to return `Date` from the endpoint handler
+    results in it being converted to an ISO `string` in actual response. It is also impossible to transmit the `Date`
+    in its original form to your endpoints within JSON. Therefore, there is confusion with original method `z.date()`.
+  - In order to solve this problem, the library provides two custom methods for dealing with dates: `z.dateIn()` and
+    `z.dateOut()` for using within input and output schemas accordingly.
+  - `z.dateIn()` is a transforming schema that accepts an ISO `string` representation of a `Date`, validates it, and
+    provides your endpoint handler or middleware with a `Date`.
+  - `z.dateOut()`, on the contrary, accepts a `Date` and provides `ResultHanlder` with a `string` representation in ISO
+    format for the response transmission.
+
+```typescript
+import { z, defaultEndpointsFactory } from "express-zod-api";
+
+const updateUserEndpoint = defaultEndpointsFactory.build({
+  method: "post",
+  input: z.object({
+    userId: z.string(),
+    birthday: z.dateIn(), // string -> Date
+  }),
+  output: z.object({
+    createdAt: z.dateOut(), // Date -> string
+  }),
+  handler: async ({ input }) => {
+    // input.birthday is Date
+    return {
+      // transmitted as "2022-01-22T00:00:00.000Z"
+      createdAt: new Date("2022-01-22"),
+    };
+  },
+});
+```
+
+### v5.4.2
+
+- `ramda` version is 0.28.0.
+- The header `X-Powered-By: Express` has been removed according to
+  [recommendations](https://expressjs.com/en/advanced/best-practice-security.html).
+
+### v5.4.1
+
+- No changes.
+
+### v5.4.1-beta1
+
+- Listing the following types as the regular dependencies since certain exported methods refer to them:
+  `@types/compression, @types/express, @types/express-fileupload, @types/http-errors, @types/node`.
+- Here is the information that underlies this decision:
+  - https://www.typescriptlang.org/docs/handbook/declaration-files/publishing.html#dependencies
+  - https://github.com/DefinitelyTyped/DefinitelyTyped/issues/44777#issuecomment-629660992
+
+### v5.4.0
+
+- Feature #281: Response compression.
+  - You can enable and configure the response compression using the new option `compression` in server configuration
+    when using `createServer()` method.
+  - In order to receive the compressed response the client should include the following header in the request:
+    `Accept-Encoding: gzip, deflate`.
+  - Only responses with compressible content types are subject to compression.
+  - There is also a default threshold of 1KB that can be configured.
+
+```typescript
+import { createConfig } from "express-zod-api";
+
+const config = createConfig({
+  server: {
+    // enabling and configuring the compression: bool or options
+    compression: {
+      threshold: "100b",
+    },
+    // other options
+  },
+});
+```
+
+### v5.3.3
+
+- `ramda` version is 0.27.2.
+- `winston` version is 3.4.0.
+  - The version of dependent package `colors` has been strictly set to 1.4.0.
+  - More about this incident here: https://github.com/winstonjs/winston/pull/2008
+
+### v5.3.2
+
+- No changes.
+
+### v5.3.1
+
+- Fixed issue #269: async refinements in I/O schemas of endpoints and middlewares.
+  - There was an error `Async refinement encountered during synchronous parse operation. Use .parseAsync instead.`
+
+### v5.3.0
+
+- Supporting Node 17.
+
+### v5.2.1
+
+- Fixing the compatibility with `@types/node@17.0.7`.
+  - Fixing the return type of `Endpoint::execute()` in case of `OPTIONS` method (it should be `void`).
 
 ### v5.2.0
 

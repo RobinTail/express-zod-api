@@ -3,6 +3,7 @@ import http from "http";
 let appMock: ReturnType<typeof newAppMock>;
 const expressJsonMock = jest.fn();
 const newAppMock = () => ({
+  disable: jest.fn(),
   use: jest.fn(),
   listen: jest.fn((port, cb) => {
     if (cb) {
@@ -21,6 +22,9 @@ const expressMock = jest.mock("express", () => {
   returnFunction.json = () => expressJsonMock;
   return returnFunction;
 });
+
+const compressionMock = jest.fn();
+jest.mock("compression", () => compressionMock);
 
 import express, { Request, Response } from "express"; // express is mocked above
 import https from "https";
@@ -81,6 +85,7 @@ describe("Server", () => {
       };
       createServer(configMock, routingMock);
       expect(appMock).toBeTruthy();
+      expect(appMock.disable).toHaveBeenCalledWith("x-powered-by");
       expect(appMock.use).toBeCalledTimes(3);
       expect(Array.isArray(appMock.use.mock.calls[0][0])).toBeTruthy();
       expect(appMock.use.mock.calls[0][0][0]).toBe(expressJsonMock);
@@ -207,6 +212,40 @@ describe("Server", () => {
       expect(httpsServerMock!.listen.mock.calls[0][0]).toBe(
         configMock.https.listen
       );
+    });
+
+    test("should enable compression on request", () => {
+      const configMock = {
+        server: {
+          listen: 8054,
+          jsonParser: jest.fn(),
+          compression: true,
+        },
+        cors: true,
+        startupLogo: false,
+        errorHandler: {
+          handler: jest.fn(),
+        },
+        logger: {
+          info: jest.fn(),
+        },
+      };
+      const routingMock = {
+        v1: {
+          test: new EndpointsFactory(defaultResultHandler).build({
+            method: "get",
+            input: z.object({}),
+            output: z.object({}),
+            handler: jest.fn(),
+          }),
+        },
+      };
+      createServer(
+        configMock as unknown as ServerConfig & CommonConfig,
+        routingMock
+      );
+      expect(compressionMock).toHaveBeenCalledTimes(1);
+      expect(compressionMock).toHaveBeenCalledWith({});
     });
   });
 
