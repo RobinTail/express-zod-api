@@ -2,6 +2,10 @@
 
 ## Version 6
 
+### v6.0.2
+
+- `zod` version is 3.14.3.
+
 ### v6.0.1
 
 - `zod` version is 3.14.2.
