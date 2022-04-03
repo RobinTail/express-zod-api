@@ -970,10 +970,10 @@
   resolved "https://registry.yarnpkg.com/@tsconfig/node16/-/node16-1.0.2.tgz#423c77877d0569db20e1fc80885ac4118314010e"
   integrity sha512-eZxlbI8GZscaGS7kkc/trHTT5xgrjH3/1n2JDwusC9iahPKWMRvRjJSAN5mCXviuTGQ/lHnhvv8Q1YTpnfz9gA==
 
-"@tsd/typescript@~4.5.2":
-  version "4.5.2"
-  resolved "https://registry.yarnpkg.com/@tsd/typescript/-/typescript-4.5.2.tgz#5e1616fceb61c472557f09d855f27a97bf230f49"
-  integrity sha512-K778wcPuAsJ9Ch0/FlhQcaIMFEi+TfxNi5NSUbgZd3RucaktYUpR++1Ox2mW2G25oyxWb8gfgg+JUhulRbI6eQ==
+"@tsd/typescript@~4.6.3":
+  version "4.6.3"
+  resolved "https://registry.yarnpkg.com/@tsd/typescript/-/typescript-4.6.3.tgz#9b4c8198da7614fe1547436fbd5657cfe8327c1d"
+  integrity sha512-WjipklCf6qWQL4Hkw+FSwOXMA5JqKv04ro/c1aviYSzLJFdcFMrR/FHjOGBIEAIq7pb8Bw74wd+G45dWfC/Jnw==
 
 "@types/babel__core@^7.0.0":
   version "7.1.15"
@@ -4744,12 +4744,12 @@ tsconfig-paths@^3.12.0:
     minimist "^1.2.0"
     strip-bom "^3.0.0"
 
-tsd@^0.19.0:
-  version "0.19.1"
-  resolved "https://registry.yarnpkg.com/tsd/-/tsd-0.19.1.tgz#c37891ad907d6ce2122e4a20c99cceca5767d713"
-  integrity sha512-pSwchclr+ADdxlahRUQXUrdAIOjXx1T1PQV+fLfVLuo/S4z+T00YU84fH8iPlZxyA2pWgJjo42BG1p9SDb4NOw==
+tsd@^0.20.0:
+  version "0.20.0"
+  resolved "https://registry.yarnpkg.com/tsd/-/tsd-0.20.0.tgz#0346321ee3c506545486227e488e753109164248"
+  integrity sha512-iba/JlyT3qtnA9t8VrX2Fipu3L31U48oRIf1PNs+lIwQ7n63GTkt9eQlB5bLtfb7nYfy9t8oZzs+K4QEoEIS8Q==
   dependencies:
-    "@tsd/typescript" "~4.5.2"
+    "@tsd/typescript" "~4.6.3"
     eslint-formatter-pretty "^4.1.0"
     globby "^11.0.1"
     meow "^9.0.0"
