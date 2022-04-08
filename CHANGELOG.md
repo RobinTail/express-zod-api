@@ -2,6 +2,11 @@
 
 ## Version 6
 
+### v6.0.3
+
+- `zod` version is 3.14.4.
+- `winston` version is 3.7.2.
+
 ### v6.0.2
 
 - `zod` version is 3.14.3.
