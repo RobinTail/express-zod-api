@@ -1186,9 +1186,9 @@
   integrity sha512-FGa1F62FT09qcrueBA6qYTrJPVDzah9a+493+o2PCXsesWHIn27G98TsSMs3WPNbZIEj4+VJf6saSFpvD+3Zsw==
 
 "@types/ramda@^0.28.0":
-  version "0.28.8"
-  resolved "https://registry.yarnpkg.com/@types/ramda/-/ramda-0.28.8.tgz#aeccfd290772a7b2ad5dbdc618538f06eae07beb"
-  integrity sha512-ppkK4e2oV9aVoMJzw//4VrMUE9kjBC/LVS50oheq3JnVpesM/Np2mAGb+5zoe2MUjv8ps+5zf09Xy3FQTWzVEg==
+  version "0.28.10"
+  resolved "https://registry.yarnpkg.com/@types/ramda/-/ramda-0.28.10.tgz#0238862a7c340e9697abdaece82f3183cf287353"
+  integrity sha512-JwrpweZziJM73qMNw8tGxEEU3Q8MprJ54ST+IkaCpcFM+JxWVmcSTv69o/AulsEuxz3Bk+HqRTDCH4yKt2ikyw==
   dependencies:
     ts-toolbelt "^6.15.1"
 
