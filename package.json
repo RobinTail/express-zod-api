@@ -48,7 +48,8 @@
     "ramda": "0.28.0",
     "triple-beam": "1.3.0",
     "winston": "3.7.2",
-    "zod": "3.14.4"
+    "zod": "3.14.4",
+    "zod-to-ts": "^0.2.2"
   },
   "peerDependencies": {
     "@types/jest": "*",
