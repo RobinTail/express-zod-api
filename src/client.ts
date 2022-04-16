@@ -13,7 +13,7 @@ const cleanId = (path: string, method: string, suffix: string) => {
 };
 
 interface Registry {
-  [K: string]: string | Registry;
+  [PATH: string]: Record<"in" | "out", string>;
 }
 
 export class Client {
@@ -43,17 +43,7 @@ export class Client {
           .forEach((nativeEnum) => this.agg.push(printNode(nativeEnum)));
         this.agg.push(printNode(inputAlias));
         this.agg.push(printNode(responseAlias));
-        const way = path
-          .split("/")
-          .concat(method)
-          .filter((entry) => entry.trim() !== "");
-        way.reduce((parent, entry, index) => {
-          if (!(entry in parent)) {
-            parent[entry] =
-              index === way.length - 1 ? { in: inputId, out: responseId } : {};
-          }
-          return parent[entry] as Registry;
-        }, this.registry);
+        this.registry[path] = { in: inputId, out: responseId };
       },
     });
   }
