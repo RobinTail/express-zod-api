@@ -55,7 +55,7 @@ export class Client {
 
     const pathSchema = ts.factory.createTypeAliasDeclaration(
       undefined,
-      undefined,
+      [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
       "Path",
       undefined,
       ts.factory.createUnionTypeNode(
@@ -67,7 +67,7 @@ export class Client {
 
     const methodSchema = ts.factory.createTypeAliasDeclaration(
       undefined,
-      undefined,
+      [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
       "Method",
       undefined,
       ts.factory.createUnionTypeNode(
@@ -81,7 +81,7 @@ export class Client {
 
     const methodPathSchema = ts.factory.createTypeAliasDeclaration(
       undefined,
-      undefined,
+      [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
       "MethodPath",
       undefined,
       ts.factory.createTemplateLiteralType(ts.factory.createTemplateHead(""), [
@@ -110,7 +110,7 @@ export class Client {
 
     const inputSchema = ts.factory.createInterfaceDeclaration(
       undefined,
-      undefined,
+      [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
       "Input",
       undefined,
       extender,
@@ -126,7 +126,7 @@ export class Client {
 
     const responseSchema = ts.factory.createInterfaceDeclaration(
       undefined,
-      undefined,
+      [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
       "Response",
       undefined,
       extender,

@@ -76,18 +76,18 @@ type PostV1AvatarUploadResponse =
       };
     };
 
-type Path =
+export type Path =
   | "/v1/user/retrieve"
   | "/v1/user/:id"
   | "/v1/avatar/send"
   | "/v1/avatar/stream"
   | "/v1/avatar/upload";
 
-type Method = "get" | "post" | "put" | "delete" | "patch";
+export type Method = "get" | "post" | "put" | "delete" | "patch";
 
-type MethodPath = `${Method} ${Path}`;
+export type MethodPath = `${Method} ${Path}`;
 
-interface Input extends Record<MethodPath, any> {
+export interface Input extends Record<MethodPath, any> {
   "get /v1/user/retrieve": GetV1UserRetrieveInput;
   "post /v1/user/:id": PostV1UserIdInput;
   "get /v1/avatar/send": GetV1AvatarSendInput;
@@ -95,7 +95,7 @@ interface Input extends Record<MethodPath, any> {
   "post /v1/avatar/upload": PostV1AvatarUploadInput;
 }
 
-interface Response extends Record<MethodPath, any> {
+export interface Response extends Record<MethodPath, any> {
   "get /v1/user/retrieve": GetV1UserRetrieveResponse;
   "post /v1/user/:id": PostV1UserIdResponse;
   "get /v1/avatar/send": GetV1AvatarSendResponse;
