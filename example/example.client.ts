@@ -116,24 +116,26 @@ export type Provider = <M extends Method, P extends Path>(
 ) => Promise<Response[`${M} ${P}`]>;
 
 /*
-const defaultProvider: Provider = async (method, path, params) => {
-  const urlParams =
-    method === "get" ? new URLSearchParams(params).toString() : "";
-  const response = await fetch(`https://example.com${path}?${urlParams}`, {
-    method: `${method}`,
-    body: method === "get" ? undefined : JSON.stringify(params),
-  });
-  if (`${method} ${path}` in jsonEndpoints) {
-    return response.json();
-  }
-  return response.text();
-};
+export const createDefaultProvider =
+  (host: string): Provider =>
+  async (method, path, params) => {
+    const urlParams =
+      method === "get" ? new URLSearchParams(params).toString() : "";
+    const response = await fetch(`${host}${path}?${urlParams}`, {
+      method: `${method}`,
+      body: method === "get" ? undefined : JSON.stringify(params),
+    });
+    if (`${method} ${path}` in jsonEndpoints) {
+      return response.json();
+    }
+    return response.text();
+  };
 
-class ApiClient {
-  constructor(protected provider: Provider = defaultProvider) {}
+export class ApiClient {
+  constructor(protected provider: Provider) {}
   public provide = this.provider;
 }
 
-const client = new ApiClient();
+const client = new ApiClient(createDefaultProvider("https://example.com"));
 const m = client.provide("get", "/v1/user/retrieve", { id: "123" });
 */
