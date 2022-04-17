@@ -3,6 +3,7 @@ import { mimeJson } from "./mime";
 import { Routing, routingCycle } from "./routing";
 import { zodToTs, printNode, createTypeAlias } from "zod-to-ts";
 import ts from "typescript";
+const f = ts.factory;
 
 const cleanId = (path: string, method: string, suffix: string) => {
   return [method]
@@ -58,109 +59,101 @@ export class Client {
       },
     });
 
-    const pathSchema = ts.factory.createTypeAliasDeclaration(
+    const pathSchema = f.createTypeAliasDeclaration(
       undefined,
-      [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
+      [f.createModifier(ts.SyntaxKind.ExportKeyword)],
       "Path",
       undefined,
-      ts.factory.createUnionTypeNode(
+      f.createUnionTypeNode(
         this.paths.map((path) =>
-          ts.factory.createLiteralTypeNode(ts.factory.createStringLiteral(path))
+          f.createLiteralTypeNode(f.createStringLiteral(path))
         )
       )
     );
 
-    const methodSchema = ts.factory.createTypeAliasDeclaration(
+    const methodSchema = f.createTypeAliasDeclaration(
       undefined,
-      [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
+      [f.createModifier(ts.SyntaxKind.ExportKeyword)],
       "Method",
       undefined,
-      ts.factory.createUnionTypeNode(
+      f.createUnionTypeNode(
         (["get", "post", "put", "delete", "patch"] as Method[]).map((method) =>
-          ts.factory.createLiteralTypeNode(
-            ts.factory.createStringLiteral(method)
-          )
+          f.createLiteralTypeNode(f.createStringLiteral(method))
         )
       )
     );
 
-    const methodPathSchema = ts.factory.createTypeAliasDeclaration(
+    const methodPathSchema = f.createTypeAliasDeclaration(
       undefined,
-      [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
+      [f.createModifier(ts.SyntaxKind.ExportKeyword)],
       "MethodPath",
       undefined,
-      ts.factory.createTemplateLiteralType(ts.factory.createTemplateHead(""), [
-        ts.factory.createTemplateLiteralTypeSpan(
-          ts.factory.createTypeReferenceNode(methodSchema.name),
-          ts.factory.createTemplateMiddle(" ")
+      f.createTemplateLiteralType(f.createTemplateHead(""), [
+        f.createTemplateLiteralTypeSpan(
+          f.createTypeReferenceNode(methodSchema.name),
+          f.createTemplateMiddle(" ")
         ),
-        ts.factory.createTemplateLiteralTypeSpan(
-          ts.factory.createTypeReferenceNode(pathSchema.name),
-          ts.factory.createTemplateTail("")
+        f.createTemplateLiteralTypeSpan(
+          f.createTypeReferenceNode(pathSchema.name),
+          f.createTemplateTail("")
         ),
       ])
     );
 
     const extender = [
-      ts.factory.createHeritageClause(ts.SyntaxKind.ExtendsKeyword, [
-        ts.factory.createExpressionWithTypeArguments(
-          ts.factory.createIdentifier("Record"),
-          [
-            ts.factory.createTypeReferenceNode(methodPathSchema.name),
-            ts.factory.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword),
-          ]
-        ),
+      f.createHeritageClause(ts.SyntaxKind.ExtendsKeyword, [
+        f.createExpressionWithTypeArguments(f.createIdentifier("Record"), [
+          f.createTypeReferenceNode(methodPathSchema.name),
+          f.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword),
+        ]),
       ]),
     ];
 
-    const inputSchema = ts.factory.createInterfaceDeclaration(
+    const inputSchema = f.createInterfaceDeclaration(
       undefined,
-      [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
+      [f.createModifier(ts.SyntaxKind.ExportKeyword)],
       "Input",
       undefined,
       extender,
       Object.keys(this.registry).map((methodPath) =>
-        ts.factory.createPropertySignature(
+        f.createPropertySignature(
           undefined,
           `"${methodPath}"`,
           undefined,
-          ts.factory.createTypeReferenceNode(this.registry[methodPath].in)
+          f.createTypeReferenceNode(this.registry[methodPath].in)
         )
       )
     );
 
-    const responseSchema = ts.factory.createInterfaceDeclaration(
+    const responseSchema = f.createInterfaceDeclaration(
       undefined,
-      [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
+      [f.createModifier(ts.SyntaxKind.ExportKeyword)],
       "Response",
       undefined,
       extender,
       Object.keys(this.registry).map((methodPath) =>
-        ts.factory.createPropertySignature(
+        f.createPropertySignature(
           undefined,
           `"${methodPath}"`,
           undefined,
-          ts.factory.createTypeReferenceNode(this.registry[methodPath].out)
+          f.createTypeReferenceNode(this.registry[methodPath].out)
         )
       )
     );
 
-    const jsonResponseList = ts.factory.createVariableStatement(
-      [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
-      ts.factory.createVariableDeclarationList(
+    const jsonResponseList = f.createVariableStatement(
+      [f.createModifier(ts.SyntaxKind.ExportKeyword)],
+      f.createVariableDeclarationList(
         [
-          ts.factory.createVariableDeclaration(
+          f.createVariableDeclaration(
             "jsonEndpoints",
             undefined,
             undefined,
-            ts.factory.createObjectLiteralExpression(
+            f.createObjectLiteralExpression(
               Object.keys(this.registry)
                 .filter((methodPath) => this.registry[methodPath].isJson)
                 .map((methodPath) =>
-                  ts.factory.createPropertyAssignment(
-                    `"${methodPath}"`,
-                    ts.factory.createTrue()
-                  )
+                  f.createPropertyAssignment(`"${methodPath}"`, f.createTrue())
                 )
             )
           ),
@@ -169,68 +162,65 @@ export class Client {
       )
     );
 
-    const mpParams = ts.factory.createTemplateLiteralType(
-      ts.factory.createTemplateHead(""),
-      [
-        ts.factory.createTemplateLiteralTypeSpan(
-          ts.factory.createTypeReferenceNode("M"),
-          ts.factory.createTemplateMiddle(" ")
-        ),
-        ts.factory.createTemplateLiteralTypeSpan(
-          ts.factory.createTypeReferenceNode("P"),
-          ts.factory.createTemplateTail("")
-        ),
-      ]
-    );
+    const mpParams = f.createTemplateLiteralType(f.createTemplateHead(""), [
+      f.createTemplateLiteralTypeSpan(
+        f.createTypeReferenceNode("M"),
+        f.createTemplateMiddle(" ")
+      ),
+      f.createTemplateLiteralTypeSpan(
+        f.createTypeReferenceNode("P"),
+        f.createTemplateTail("")
+      ),
+    ]);
 
-    const providerSchema = ts.factory.createTypeAliasDeclaration(
+    const providerSchema = f.createTypeAliasDeclaration(
       undefined,
-      [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
+      [f.createModifier(ts.SyntaxKind.ExportKeyword)],
       "Provider",
       undefined,
-      ts.factory.createFunctionTypeNode(
+      f.createFunctionTypeNode(
         [
-          ts.factory.createTypeParameterDeclaration(
+          f.createTypeParameterDeclaration(
             "M",
-            ts.factory.createTypeReferenceNode(methodSchema.name)
+            f.createTypeReferenceNode(methodSchema.name)
           ),
-          ts.factory.createTypeParameterDeclaration(
+          f.createTypeParameterDeclaration(
             "P",
-            ts.factory.createTypeReferenceNode(pathSchema.name)
+            f.createTypeReferenceNode(pathSchema.name)
           ),
         ],
         [
-          ts.factory.createParameterDeclaration(
+          f.createParameterDeclaration(
             undefined,
             undefined,
             undefined,
             "method",
             undefined,
-            ts.factory.createTypeReferenceNode("M")
+            f.createTypeReferenceNode("M")
           ),
-          ts.factory.createParameterDeclaration(
+          f.createParameterDeclaration(
             undefined,
             undefined,
             undefined,
             "path",
             undefined,
-            ts.factory.createTypeReferenceNode("P")
+            f.createTypeReferenceNode("P")
           ),
-          ts.factory.createParameterDeclaration(
+          f.createParameterDeclaration(
             undefined,
             undefined,
             undefined,
             "params",
             undefined,
-            ts.factory.createIndexedAccessTypeNode(
-              ts.factory.createTypeReferenceNode(inputSchema.name),
+            f.createIndexedAccessTypeNode(
+              f.createTypeReferenceNode(inputSchema.name),
               mpParams
             )
           ),
         ],
-        ts.factory.createTypeReferenceNode("Promise", [
-          ts.factory.createIndexedAccessTypeNode(
-            ts.factory.createTypeReferenceNode(responseSchema.name),
+        f.createTypeReferenceNode("Promise", [
+          f.createIndexedAccessTypeNode(
+            f.createTypeReferenceNode(responseSchema.name),
             mpParams
           ),
         ])
