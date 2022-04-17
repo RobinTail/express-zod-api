@@ -115,11 +115,6 @@ export type Provider = <M extends Method, P extends Path>(
   params: Input[`${M} ${P}`]
 ) => Promise<Response[`${M} ${P}`]>;
 
-export class ExpressZodAPIClient {
-  constructor(protected readonly provider: Provider) {}
-  public provide = this.provider;
-}
-
 /*
 export const createDefaultProvider =
   (host: string): Provider =>
@@ -139,5 +134,8 @@ export const createDefaultProvider =
 const client = new ExpressZodAPIClient(
   createDefaultProvider("https://example.com")
 );
-const m = client.provide("get", "/v1/user/retrieve", { id: "123" });
 */
+export class ExpressZodAPIClient {
+  constructor(protected readonly provider: Provider) {}
+  public provide = this.provider;
+}

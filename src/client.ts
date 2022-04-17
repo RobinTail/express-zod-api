@@ -263,6 +263,31 @@ export class Client {
       ]
     );
 
+    ts.addSyntheticLeadingComment(
+      clientClass,
+      ts.SyntaxKind.MultiLineCommentTrivia,
+      "\n" +
+        "export const createDefaultProvider =\n" +
+        "  (host: string): Provider =>\n" +
+        "  async (method, path, params) => {\n" +
+        "    const urlParams =\n" +
+        '      method === "get" ? new URLSearchParams(params).toString() : "";\n' +
+        "    const response = await fetch(`${host}${path}?${urlParams}`, {\n" +
+        "      method: `${method}`,\n" +
+        '      body: method === "get" ? undefined : JSON.stringify(params),\n' +
+        "    });\n" +
+        "    if (`${method} ${path}` in jsonEndpoints) {\n" +
+        "      return response.json();\n" +
+        "    }\n" +
+        "    return response.text();\n" +
+        "  };\n" +
+        "\n" +
+        "const client = new ExpressZodAPIClient(\n" +
+        '  createDefaultProvider("https://example.com")\n' +
+        ");\n",
+      true
+    );
+
     this.agg.push(
       pathSchema,
       methodSchema,
