@@ -5,8 +5,8 @@
   "license": "MIT",
   "scripts": {
     "start": "ts-node example/index.ts",
-    "build": "yarn build:cleanup && yarn build:compile && yarn build:esm && yarn build:swagger && yarn build:license",
-    "build:cleanup": "rm -rf ./dist ./dist-esm example/example.swagger.yaml ./LICENSE",
+    "build": "yarn build:cleanup && yarn build:compile && yarn build:esm && yarn build:swagger && yarn build:client && yarn build:license",
+    "build:cleanup": "rm -rf ./dist ./dist-esm example/example.swagger.yaml example/example.client.ts ./LICENSE",
     "build:compile": "tsc --build tsconfig.build.json",
     "build:esm": "tsc --build tsconfig.esm.json && ts-node tools/esm-package.ts && ts-node tools/esm-extensions.ts",
     "build:swagger": "ts-node example/generate-open-api-schema.ts > example/example.swagger.yaml",
@@ -22,7 +22,7 @@
     "test:badge": "yarn make-coverage-badge --output-path ./coverage.svg",
     "lint": "yarn eslint ./src ./example ./tests && yarn prettier *.md --check",
     "mdfix": "yarn prettier *.md --write",
-    "precommit": "yarn lint && yarn test && yarn build && git add example/example.swagger.yaml ./LICENSE ./coverage.svg",
+    "precommit": "yarn lint && yarn test && yarn build && git add example/example.swagger.yaml example/example.client.ts ./LICENSE ./coverage.svg",
     "prepublishOnly": "yarn lint && yarn test && yarn build",
     "postversion": "git push && git push --tags",
     "install_hooks": "husky install"
