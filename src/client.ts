@@ -1,5 +1,6 @@
 import { Routing, routingCycle } from "./routing";
 import { zodToTs, printNode, createTypeAlias } from "zod-to-ts";
+import ts from "typescript";
 
 const cleanId = (path: string, method: string, suffix: string) => {
   return [method]
@@ -13,7 +14,7 @@ const cleanId = (path: string, method: string, suffix: string) => {
 };
 
 interface Registry {
-  [PATH: string]: Record<"in" | "out", string>;
+  [PATH: string]: Record<string, Record<"in" | "out", string>>;
 }
 
 export class Client {
@@ -43,14 +44,55 @@ export class Client {
           .forEach((nativeEnum) => this.agg.push(printNode(nativeEnum)));
         this.agg.push(printNode(inputAlias));
         this.agg.push(printNode(responseAlias));
-        this.registry[path] = { in: inputId, out: responseId };
+        if (!(path in this.registry)) {
+          this.registry[path] = {};
+        }
+        if (method !== "options") {
+          this.registry[path][method] = { in: inputId, out: responseId };
+        }
       },
     });
+
+    const registrySchema = ts.factory.createInterfaceDeclaration(
+      undefined,
+      undefined,
+      "Registry",
+      undefined,
+      undefined,
+      Object.keys(this.registry).map((path) =>
+        ts.factory.createPropertySignature(
+          undefined,
+          `"${path}"`,
+          undefined,
+          ts.factory.createTypeLiteralNode(
+            Object.keys(this.registry[path]).map((method) =>
+              ts.factory.createPropertySignature(
+                undefined,
+                method,
+                undefined,
+                ts.factory.createTypeLiteralNode(
+                  Object.keys(this.registry[path][method]).map((direction) =>
+                    ts.factory.createPropertySignature(
+                      undefined,
+                      direction,
+                      undefined,
+                      ts.factory.createTypeReferenceNode(
+                        this.registry[path][method].in
+                      )
+                    )
+                  )
+                )
+              )
+            )
+          )
+        )
+      )
+    );
+
+    this.agg.push(printNode(registrySchema));
   }
 
   public print() {
-    return (
-      this.agg.join("\n\n") + "\n\n" + JSON.stringify(this.registry, null, 2)
-    );
+    return this.agg.join("\n\n");
   }
 }
