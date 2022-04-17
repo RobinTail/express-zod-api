@@ -268,7 +268,7 @@ export class Client {
       ts.SyntaxKind.MultiLineCommentTrivia,
       "\n" +
         "export const createDefaultProvider =\n" +
-        "  (host: string): Provider =>\n" +
+        `  (host: string): ${providerSchema.name.text} =>\n` +
         "  async (method, path, params) => {\n" +
         "    const urlParams =\n" +
         '      method === "get" ? new URLSearchParams(params).toString() : "";\n' +
@@ -282,7 +282,7 @@ export class Client {
         "    return response.text();\n" +
         "  };\n" +
         "\n" +
-        "const client = new ExpressZodAPIClient(\n" +
+        `const client = new ${clientClass.name!.text}(\n` +
         '  createDefaultProvider("https://example.com")\n' +
         ");\n",
       true
