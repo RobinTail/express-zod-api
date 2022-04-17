@@ -1,0 +1,11 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Example Should perform the request with a positive response 1`] = `
+Object {
+  "data": Object {
+    "id": 10,
+    "name": "John Doe",
+  },
+  "status": "success",
+}
+`;
