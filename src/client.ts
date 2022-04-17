@@ -1,3 +1,4 @@
+import { Method } from "./method";
 import { Routing, routingCycle } from "./routing";
 import { zodToTs, printNode, createTypeAlias } from "zod-to-ts";
 import ts from "typescript";
@@ -14,12 +15,13 @@ const cleanId = (path: string, method: string, suffix: string) => {
 };
 
 interface Registry {
-  [PATH: string]: Record<string, Record<"in" | "out", string>>;
+  [METHOD_PATH: string]: Record<"in" | "out", string>;
 }
 
 export class Client {
   protected agg: string[] = [];
   protected registry: Registry = {};
+  protected paths: string[] = [];
 
   constructor(routing: Routing) {
     routingCycle({
@@ -44,52 +46,106 @@ export class Client {
           .forEach((nativeEnum) => this.agg.push(printNode(nativeEnum)));
         this.agg.push(printNode(inputAlias));
         this.agg.push(printNode(responseAlias));
-        if (!(path in this.registry)) {
-          this.registry[path] = {};
-        }
         if (method !== "options") {
-          this.registry[path][method] = { in: inputId, out: responseId };
+          this.paths.push(path);
+          this.registry[`${method} ${path}`] = { in: inputId, out: responseId };
         }
       },
     });
 
-    const registrySchema = ts.factory.createInterfaceDeclaration(
+    const pathSchema = ts.factory.createTypeAliasDeclaration(
       undefined,
       undefined,
-      "Registry",
+      "Path",
+      undefined,
+      ts.factory.createUnionTypeNode(
+        this.paths.map((path) =>
+          ts.factory.createLiteralTypeNode(ts.factory.createStringLiteral(path))
+        )
+      )
+    );
+
+    const methodSchema = ts.factory.createTypeAliasDeclaration(
       undefined,
       undefined,
-      Object.keys(this.registry).map((path) =>
-        ts.factory.createPropertySignature(
-          undefined,
-          `"${path}"`,
-          undefined,
-          ts.factory.createTypeLiteralNode(
-            Object.keys(this.registry[path]).map((method) =>
-              ts.factory.createPropertySignature(
-                undefined,
-                method,
-                undefined,
-                ts.factory.createTypeLiteralNode(
-                  Object.keys(this.registry[path][method]).map((direction) =>
-                    ts.factory.createPropertySignature(
-                      undefined,
-                      direction,
-                      undefined,
-                      ts.factory.createTypeReferenceNode(
-                        this.registry[path][method].in
-                      )
-                    )
-                  )
-                )
-              )
-            )
+      "Method",
+      undefined,
+      ts.factory.createUnionTypeNode(
+        (["get", "post", "put", "delete", "patch"] as Method[]).map((method) =>
+          ts.factory.createLiteralTypeNode(
+            ts.factory.createStringLiteral(method)
           )
         )
       )
     );
 
-    this.agg.push(printNode(registrySchema));
+    const methodPathSchema = ts.factory.createTypeAliasDeclaration(
+      undefined,
+      undefined,
+      "MethodPath",
+      undefined,
+      ts.factory.createTemplateLiteralType(ts.factory.createTemplateHead(""), [
+        ts.factory.createTemplateLiteralTypeSpan(
+          ts.factory.createTypeReferenceNode(methodSchema.name),
+          ts.factory.createTemplateMiddle(" ")
+        ),
+        ts.factory.createTemplateLiteralTypeSpan(
+          ts.factory.createTypeReferenceNode(pathSchema.name),
+          ts.factory.createTemplateTail("")
+        ),
+      ])
+    );
+
+    const extender = [
+      ts.factory.createHeritageClause(ts.SyntaxKind.ExtendsKeyword, [
+        ts.factory.createExpressionWithTypeArguments(
+          ts.factory.createIdentifier("Record"),
+          [
+            ts.factory.createTypeReferenceNode(methodPathSchema.name),
+            ts.factory.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword),
+          ]
+        ),
+      ]),
+    ];
+
+    const inputSchema = ts.factory.createInterfaceDeclaration(
+      undefined,
+      undefined,
+      "Input",
+      undefined,
+      extender,
+      Object.keys(this.registry).map((methodPath) =>
+        ts.factory.createPropertySignature(
+          undefined,
+          `"${methodPath}"`,
+          undefined,
+          ts.factory.createTypeReferenceNode(this.registry[methodPath].in)
+        )
+      )
+    );
+
+    const responseSchema = ts.factory.createInterfaceDeclaration(
+      undefined,
+      undefined,
+      "Response",
+      undefined,
+      extender,
+      Object.keys(this.registry).map((methodPath) =>
+        ts.factory.createPropertySignature(
+          undefined,
+          `"${methodPath}"`,
+          undefined,
+          ts.factory.createTypeReferenceNode(this.registry[methodPath].out)
+        )
+      )
+    );
+
+    this.agg.push(printNode(pathSchema));
+    this.agg.push(printNode(methodSchema));
+    this.agg.push(printNode(methodPathSchema));
+
+    this.agg.push(printNode(inputSchema));
+    this.agg.push(printNode(responseSchema));
   }
 
   public print() {
