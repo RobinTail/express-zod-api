@@ -240,7 +240,10 @@ export class Client {
           [
             f.createParameterDeclaration(
               undefined,
-              [f.createModifier(ts.SyntaxKind.ProtectedKeyword)],
+              [
+                f.createModifier(ts.SyntaxKind.ProtectedKeyword),
+                f.createModifier(ts.SyntaxKind.ReadonlyKeyword),
+              ],
               undefined,
               "provider",
               undefined,

@@ -116,7 +116,7 @@ export type Provider = <M extends Method, P extends Path>(
 ) => Promise<Response[`${M} ${P}`]>;
 
 export class ExpressZodAPIClient {
-  constructor(protected provider: Provider) {}
+  constructor(protected readonly provider: Provider) {}
   public provide = this.provider;
 }
 
