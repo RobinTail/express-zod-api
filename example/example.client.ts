@@ -22,7 +22,7 @@ type PostV1UserIdInput = {
 } & {
   id: string;
   name: string;
-  birthday: any;
+  birthday: string;
 };
 
 type PostV1UserIdResponse =
@@ -30,7 +30,7 @@ type PostV1UserIdResponse =
       status: "success";
       data: {
         name: string;
-        createdAt: any;
+        createdAt: string;
       };
     }
   | {
