@@ -115,6 +115,11 @@ export type Provider = <M extends Method, P extends Path>(
   params: Input[`${M} ${P}`]
 ) => Promise<Response[`${M} ${P}`]>;
 
+export class ExpressZodAPIClient {
+  constructor(protected provider: Provider) {}
+  public provide = this.provider;
+}
+
 /*
 export const createDefaultProvider =
   (host: string): Provider =>
@@ -131,11 +136,8 @@ export const createDefaultProvider =
     return response.text();
   };
 
-export class ApiClient {
-  constructor(protected provider: Provider) {}
-  public provide = this.provider;
-}
-
-const client = new ApiClient(createDefaultProvider("https://example.com"));
+const client = new ExpressZodAPIClient(
+  createDefaultProvider("https://example.com")
+);
 const m = client.provide("get", "/v1/user/retrieve", { id: "123" });
 */

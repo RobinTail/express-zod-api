@@ -227,6 +227,39 @@ export class Client {
       )
     );
 
+    const clientClass = f.createClassDeclaration(
+      undefined,
+      [f.createModifier(ts.SyntaxKind.ExportKeyword)],
+      "ExpressZodAPIClient",
+      undefined,
+      undefined,
+      [
+        f.createConstructorDeclaration(
+          undefined,
+          undefined,
+          [
+            f.createParameterDeclaration(
+              undefined,
+              [f.createModifier(ts.SyntaxKind.ProtectedKeyword)],
+              undefined,
+              "provider",
+              undefined,
+              f.createTypeReferenceNode(providerSchema.name)
+            ),
+          ],
+          f.createBlock([])
+        ),
+        f.createPropertyDeclaration(
+          undefined,
+          [f.createModifier(ts.SyntaxKind.PublicKeyword)],
+          "provide",
+          undefined,
+          undefined,
+          f.createPropertyAccessExpression(f.createThis(), "provider")
+        ),
+      ]
+    );
+
     this.agg.push(
       pathSchema,
       methodSchema,
@@ -234,7 +267,8 @@ export class Client {
       inputSchema,
       responseSchema,
       jsonResponseList,
-      providerSchema
+      providerSchema,
+      clientClass
     );
   }
 
