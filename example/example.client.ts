@@ -109,13 +109,13 @@ export const jsonEndpoints = {
   "post /v1/avatar/upload": true,
 };
 
-/*
-type Provider = <M extends Method, P extends Path>(
+export type Provider = <M extends Method, P extends Path>(
   method: M,
   path: P,
   params: Input[`${M} ${P}`]
 ) => Promise<Response[`${M} ${P}`]>;
 
+/*
 const defaultProvider: Provider = async (method, path, params) => {
   const urlParams =
     method === "get" ? new URLSearchParams(params).toString() : "";

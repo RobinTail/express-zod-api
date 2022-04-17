@@ -169,12 +169,83 @@ export class Client {
       )
     );
 
-    this.agg.push(pathSchema);
-    this.agg.push(methodSchema);
-    this.agg.push(methodPathSchema);
-    this.agg.push(inputSchema);
-    this.agg.push(responseSchema);
-    this.agg.push(jsonResponseList);
+    const mpParams = ts.factory.createTemplateLiteralType(
+      ts.factory.createTemplateHead(""),
+      [
+        ts.factory.createTemplateLiteralTypeSpan(
+          ts.factory.createTypeReferenceNode("M"),
+          ts.factory.createTemplateMiddle(" ")
+        ),
+        ts.factory.createTemplateLiteralTypeSpan(
+          ts.factory.createTypeReferenceNode("P"),
+          ts.factory.createTemplateTail("")
+        ),
+      ]
+    );
+
+    const providerSchema = ts.factory.createTypeAliasDeclaration(
+      undefined,
+      [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
+      "Provider",
+      undefined,
+      ts.factory.createFunctionTypeNode(
+        [
+          ts.factory.createTypeParameterDeclaration(
+            "M",
+            ts.factory.createTypeReferenceNode(methodSchema.name)
+          ),
+          ts.factory.createTypeParameterDeclaration(
+            "P",
+            ts.factory.createTypeReferenceNode(pathSchema.name)
+          ),
+        ],
+        [
+          ts.factory.createParameterDeclaration(
+            undefined,
+            undefined,
+            undefined,
+            "method",
+            undefined,
+            ts.factory.createTypeReferenceNode("M")
+          ),
+          ts.factory.createParameterDeclaration(
+            undefined,
+            undefined,
+            undefined,
+            "path",
+            undefined,
+            ts.factory.createTypeReferenceNode("P")
+          ),
+          ts.factory.createParameterDeclaration(
+            undefined,
+            undefined,
+            undefined,
+            "params",
+            undefined,
+            ts.factory.createIndexedAccessTypeNode(
+              ts.factory.createTypeReferenceNode(inputSchema.name),
+              mpParams
+            )
+          ),
+        ],
+        ts.factory.createTypeReferenceNode("Promise", [
+          ts.factory.createIndexedAccessTypeNode(
+            ts.factory.createTypeReferenceNode(responseSchema.name),
+            mpParams
+          ),
+        ])
+      )
+    );
+
+    this.agg.push(
+      pathSchema,
+      methodSchema,
+      methodPathSchema,
+      inputSchema,
+      responseSchema,
+      jsonResponseList,
+      providerSchema
+    );
   }
 
   public print() {
