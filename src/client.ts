@@ -1,4 +1,5 @@
 import { Method } from "./method";
+import { mimeJson } from "./mime";
 import { Routing, routingCycle } from "./routing";
 import { zodToTs, printNode, createTypeAlias } from "zod-to-ts";
 import ts from "typescript";
@@ -15,7 +16,7 @@ const cleanId = (path: string, method: string, suffix: string) => {
 };
 
 interface Registry {
-  [METHOD_PATH: string]: Record<"in" | "out", string>;
+  [METHOD_PATH: string]: Record<"in" | "out", string> & { isJson: boolean };
 }
 
 export class Client {
@@ -48,7 +49,11 @@ export class Client {
         this.agg.push(responseAlias);
         if (method !== "options") {
           this.paths.push(path);
-          this.registry[`${method} ${path}`] = { in: inputId, out: responseId };
+          this.registry[`${method} ${path}`] = {
+            in: inputId,
+            out: responseId,
+            isJson: endpoint.getPositiveMimeTypes().includes(mimeJson),
+          };
         }
       },
     });
@@ -140,12 +145,36 @@ export class Client {
       )
     );
 
+    const jsonResponseList = ts.factory.createVariableStatement(
+      [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
+      ts.factory.createVariableDeclarationList(
+        [
+          ts.factory.createVariableDeclaration(
+            "jsonEndpoints",
+            undefined,
+            undefined,
+            ts.factory.createObjectLiteralExpression(
+              Object.keys(this.registry)
+                .filter((methodPath) => this.registry[methodPath].isJson)
+                .map((methodPath) =>
+                  ts.factory.createPropertyAssignment(
+                    `"${methodPath}"`,
+                    ts.factory.createTrue()
+                  )
+                )
+            )
+          ),
+        ],
+        ts.NodeFlags.Const
+      )
+    );
+
     this.agg.push(pathSchema);
     this.agg.push(methodSchema);
     this.agg.push(methodPathSchema);
-
     this.agg.push(inputSchema);
     this.agg.push(responseSchema);
+    this.agg.push(jsonResponseList);
   }
 
   public print() {

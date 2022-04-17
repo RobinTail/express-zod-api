@@ -103,6 +103,12 @@ export interface Response extends Record<MethodPath, any> {
   "post /v1/avatar/upload": PostV1AvatarUploadResponse;
 }
 
+export const jsonEndpoints = {
+  "get /v1/user/retrieve": true,
+  "post /v1/user/:id": true,
+  "post /v1/avatar/upload": true,
+};
+
 /*
 class ApiClient {
   constructor(
