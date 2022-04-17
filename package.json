@@ -10,7 +10,7 @@
     "build:compile": "tsc --build tsconfig.build.json",
     "build:esm": "tsc --build tsconfig.esm.json && ts-node tools/esm-package.ts && ts-node tools/esm-extensions.ts",
     "build:swagger": "ts-node example/generate-open-api-schema.ts > example/example.swagger.yaml",
-    "build:client": "ts-node example/generate-client.ts > example/example.client.ts",
+    "build:client": "ts-node example/generate-client.ts > example/example.client.ts && yarn prettier example/example.client.ts --write",
     "build:license": "ts-node tools/license.ts > ./LICENSE",
     "build:intTest": "ts-node tools/integration-test.ts && yarn install --cwd ./tests/integration",
     "build:esmTest": "ts-node tools/esm-test.ts && yarn install --cwd ./tests/esm && ts-node tools/esm-test-package.ts",
