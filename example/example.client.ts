@@ -106,12 +106,14 @@ export interface Response extends Record<MethodPath, any> {
 /*
 class ApiClient {
   constructor(
-    public provider: <P extends Path, M extends Method>(
+    protected provider: <P extends Path, M extends Method>(
       path: P,
       method: M,
       params: Input[`${M} ${P}`]
     ) => Promise<Response[`${M} ${P}`]>
   ) {}
+
+  public provide = this.provider;
 }
 
 const client = new ApiClient(async (path, method, params) =>
@@ -123,6 +125,5 @@ const client = new ApiClient(async (path, method, params) =>
   ).json()
 );
 
-const m = client.provider("/v1/user/retrieve", "get", { id: "123" });
-
- */
+const m = client.provide("/v1/user/retrieve", "get", { id: "123" });
+*/
