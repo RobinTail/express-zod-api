@@ -19,7 +19,7 @@ interface Registry {
 }
 
 export class Client {
-  protected agg: string[] = [];
+  protected agg: ts.Node[] = [];
   protected registry: Registry = {};
   protected paths: string[] = [];
 
@@ -43,9 +43,9 @@ export class Client {
         const responseAlias = createTypeAlias(responseSchema.node, responseId);
         inputSchema.store.nativeEnums
           .concat(responseSchema.store.nativeEnums)
-          .forEach((nativeEnum) => this.agg.push(printNode(nativeEnum)));
-        this.agg.push(printNode(inputAlias));
-        this.agg.push(printNode(responseAlias));
+          .forEach((nativeEnum) => this.agg.push(nativeEnum));
+        this.agg.push(inputAlias);
+        this.agg.push(responseAlias);
         if (method !== "options") {
           this.paths.push(path);
           this.registry[`${method} ${path}`] = { in: inputId, out: responseId };
@@ -140,15 +140,15 @@ export class Client {
       )
     );
 
-    this.agg.push(printNode(pathSchema));
-    this.agg.push(printNode(methodSchema));
-    this.agg.push(printNode(methodPathSchema));
+    this.agg.push(pathSchema);
+    this.agg.push(methodSchema);
+    this.agg.push(methodPathSchema);
 
-    this.agg.push(printNode(inputSchema));
-    this.agg.push(printNode(responseSchema));
+    this.agg.push(inputSchema);
+    this.agg.push(responseSchema);
   }
 
   public print() {
-    return this.agg.join("\n\n");
+    return this.agg.map((node) => printNode(node)).join("\n\n");
   }
 }
