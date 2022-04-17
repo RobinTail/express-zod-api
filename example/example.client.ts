@@ -110,13 +110,13 @@ export const jsonEndpoints = {
 };
 
 /*
-type Provider = <P extends Path, M extends Method>(
-  path: P,
+type Provider = <M extends Method, P extends Path>(
   method: M,
+  path: P,
   params: Input[`${M} ${P}`]
 ) => Promise<Response[`${M} ${P}`]>;
 
-const defaultProvider: Provider = async (path, method, params) => {
+const defaultProvider: Provider = async (method, path, params) => {
   const urlParams =
     method === "get" ? new URLSearchParams(params).toString() : "";
   const response = await fetch(`https://example.com${path}?${urlParams}`, {
@@ -135,5 +135,5 @@ class ApiClient {
 }
 
 const client = new ApiClient();
-const m = client.provide("/v1/user/retrieve", "get", { id: "123" });
+const m = client.provide("get", "/v1/user/retrieve", { id: "123" });
 */
