@@ -101,6 +101,16 @@ export const makePublicType = (name: string, value: ts.TypeNode) =>
     value
   );
 
+export const makePublicProp = (name: string, value: ts.Expression) =>
+  f.createPropertyDeclaration(
+    undefined,
+    publicModifier,
+    name,
+    undefined,
+    undefined,
+    value
+  );
+
 export const cleanId = (path: string, method: string, suffix: string) => {
   return [method]
     .concat(path.split("/"))

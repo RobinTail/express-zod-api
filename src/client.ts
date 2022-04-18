@@ -8,13 +8,13 @@ import {
   makeEmptyConstructor,
   makeParam,
   makePublicLiteralType,
+  makePublicProp,
   makePublicType,
   makeQuotedProp,
   makeRecord,
   makeTemplate,
   parametricIndexNode,
   protectedReadonlyModifier,
-  publicModifier,
 } from "./client-helpers";
 import { methods } from "./method";
 import { mimeJson } from "./mime";
@@ -167,12 +167,8 @@ export class Client {
             type: f.createTypeReferenceNode(providerNode.name),
           }),
         ]),
-        f.createPropertyDeclaration(
-          undefined,
-          publicModifier,
+        makePublicProp(
           "provide",
-          undefined,
-          undefined,
           f.createPropertyAccessExpression(f.createThis(), "provider")
         ),
       ]
