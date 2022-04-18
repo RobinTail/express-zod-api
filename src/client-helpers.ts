@@ -130,6 +130,20 @@ export const makeIndexedPromise = (type: ts.Identifier, index: ts.TypeNode) =>
     f.createIndexedAccessTypeNode(f.createTypeReferenceNode(type), index),
   ]);
 
+export const makePublicExtendedInterface = (
+  name: string,
+  extender: ts.HeritageClause[],
+  props: ts.PropertySignature[]
+) =>
+  f.createInterfaceDeclaration(
+    undefined,
+    exportModifier,
+    name,
+    undefined,
+    extender,
+    props
+  );
+
 export const cleanId = (path: string, method: string, suffix: string) => {
   return [method]
     .concat(path.split("/"))

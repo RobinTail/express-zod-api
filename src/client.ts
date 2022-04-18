@@ -9,6 +9,7 @@ import {
   makeIndexedPromise,
   makeParam,
   makePublicClass,
+  makePublicExtendedInterface,
   makePublicLiteralType,
   makePublicProp,
   makePublicType,
@@ -80,22 +81,16 @@ export class Client {
       ]),
     ];
 
-    const inputNode = f.createInterfaceDeclaration(
-      undefined,
-      exportModifier,
+    const inputNode = makePublicExtendedInterface(
       "Input",
-      undefined,
       extenderClause,
       Object.keys(this.registry).map((methodPath) =>
         makeQuotedProp(methodPath, this.registry[methodPath].in)
       )
     );
 
-    const responseNode = f.createInterfaceDeclaration(
-      undefined,
-      exportModifier,
+    const responseNode = makePublicExtendedInterface(
       "Response",
-      undefined,
       extenderClause,
       Object.keys(this.registry).map((methodPath) =>
         makeQuotedProp(methodPath, this.registry[methodPath].out)
