@@ -7,6 +7,7 @@ import {
   makeConst,
   makeEmptyConstructor,
   makeParam,
+  makePublicClass,
   makePublicLiteralType,
   makePublicProp,
   makePublicType,
@@ -153,20 +154,16 @@ export class Client {
       )
     );
 
-    const clientNode = f.createClassDeclaration(
-      undefined,
-      exportModifier,
+    const clientNode = makePublicClass(
       "ExpressZodAPIClient",
-      undefined,
-      undefined,
+      makeEmptyConstructor([
+        makeParam({
+          mod: protectedReadonlyModifier,
+          name: "provider",
+          type: f.createTypeReferenceNode(providerNode.name),
+        }),
+      ]),
       [
-        makeEmptyConstructor([
-          makeParam({
-            mod: protectedReadonlyModifier,
-            name: "provider",
-            type: f.createTypeReferenceNode(providerNode.name),
-          }),
-        ]),
         makePublicProp(
           "provide",
           f.createPropertyAccessExpression(f.createThis(), "provider")

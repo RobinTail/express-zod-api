@@ -111,6 +111,20 @@ export const makePublicProp = (name: string, value: ts.Expression) =>
     value
   );
 
+export const makePublicClass = (
+  name: string,
+  constructor: ts.ConstructorDeclaration,
+  props: ts.PropertyDeclaration[] = []
+) =>
+  f.createClassDeclaration(
+    undefined,
+    exportModifier,
+    name,
+    undefined,
+    undefined,
+    [constructor, ...props]
+  );
+
 export const cleanId = (path: string, method: string, suffix: string) => {
   return [method]
     .concat(path.split("/"))
