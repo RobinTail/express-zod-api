@@ -46,6 +46,13 @@ const makeRecord = (key: ts.Identifier, value: ts.KeywordTypeSyntaxKind) =>
     f.createTypeReferenceNode(key),
     f.createKeywordTypeNode(value),
   ]);
+const makeEmptyConstructor = (params: ts.ParameterDeclaration[]) =>
+  f.createConstructorDeclaration(
+    undefined,
+    undefined,
+    params,
+    f.createBlock([])
+  );
 
 const cleanId = (path: string, method: string, suffix: string) => {
   return [method]
@@ -242,18 +249,13 @@ export class Client {
       undefined,
       undefined,
       [
-        f.createConstructorDeclaration(
-          undefined,
-          undefined,
-          [
-            makeParam({
-              mod: protectedReadonlyModifier,
-              name: "provider",
-              type: f.createTypeReferenceNode(providerNode.name),
-            }),
-          ],
-          f.createBlock([])
-        ),
+        makeEmptyConstructor([
+          makeParam({
+            mod: protectedReadonlyModifier,
+            name: "provider",
+            type: f.createTypeReferenceNode(providerNode.name),
+          }),
+        ]),
         f.createPropertyDeclaration(
           undefined,
           [f.createModifier(ts.SyntaxKind.PublicKeyword)],
