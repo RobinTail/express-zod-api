@@ -7,6 +7,7 @@ import {
   makeConst,
   makeEmptyConstructor,
   makeParam,
+  makePublicLiteralType,
   makeQuotedProp,
   makeRecord,
   makeTemplate,
@@ -14,7 +15,7 @@ import {
   protectedReadonlyModifier,
   publicModifier,
 } from "./client-helpers";
-import { Method } from "./method";
+import { methods } from "./method";
 import { mimeJson } from "./mime";
 import { Routing, routingCycle } from "./routing";
 
@@ -62,29 +63,8 @@ export class Client {
       },
     });
 
-    const pathNode = f.createTypeAliasDeclaration(
-      undefined,
-      exportModifier,
-      "Path",
-      undefined,
-      f.createUnionTypeNode(
-        this.paths.map((path) =>
-          f.createLiteralTypeNode(f.createStringLiteral(path))
-        )
-      )
-    );
-
-    const methodNode = f.createTypeAliasDeclaration(
-      undefined,
-      exportModifier,
-      "Method",
-      undefined,
-      f.createUnionTypeNode(
-        (["get", "post", "put", "delete", "patch"] as Method[]).map((method) =>
-          f.createLiteralTypeNode(f.createStringLiteral(method))
-        )
-      )
-    );
+    const pathNode = makePublicLiteralType("Path", this.paths);
+    const methodNode = makePublicLiteralType("Method", methods);
 
     const methodPathNode = f.createTypeAliasDeclaration(
       undefined,

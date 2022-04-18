@@ -79,6 +79,19 @@ export const makeConst = (name: string, value: ts.Expression) =>
     ts.NodeFlags.Const
   );
 
+export const makePublicLiteralType = (name: string, literals: string[]) =>
+  f.createTypeAliasDeclaration(
+    undefined,
+    exportModifier,
+    name,
+    undefined,
+    f.createUnionTypeNode(
+      literals.map((option) =>
+        f.createLiteralTypeNode(f.createStringLiteral(option))
+      )
+    )
+  );
+
 export const cleanId = (path: string, method: string, suffix: string) => {
   return [method]
     .concat(path.split("/"))
