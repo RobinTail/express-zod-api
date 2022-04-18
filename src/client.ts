@@ -9,6 +9,17 @@ const exportModifier = [f.createModifier(ts.SyntaxKind.ExportKeyword)];
 const emptyPrefix = f.createTemplateHead("");
 const emptyEnding = f.createTemplateTail("");
 const spacingSuffix = f.createTemplateMiddle(" ");
+const makeTemplate = (names: (ts.Identifier | string)[]) =>
+  f.createTemplateLiteralType(
+    emptyPrefix,
+    names.map((name, index) =>
+      f.createTemplateLiteralTypeSpan(
+        f.createTypeReferenceNode(name),
+        index === names.length - 1 ? emptyEnding : spacingSuffix
+      )
+    )
+  );
+const parametricIndexNode = makeTemplate(["M", "P"]);
 
 const cleanId = (path: string, method: string, suffix: string) => {
   return [method]
@@ -94,16 +105,7 @@ export class Client {
       exportModifier,
       "MethodPath",
       undefined,
-      f.createTemplateLiteralType(emptyPrefix, [
-        f.createTemplateLiteralTypeSpan(
-          f.createTypeReferenceNode(methodNode.name),
-          spacingSuffix
-        ),
-        f.createTemplateLiteralTypeSpan(
-          f.createTypeReferenceNode(pathNode.name),
-          emptyEnding
-        ),
-      ])
+      makeTemplate([methodNode.name, pathNode.name])
     );
 
     const extenderClause = [
@@ -167,17 +169,6 @@ export class Client {
         ts.NodeFlags.Const
       )
     );
-
-    const parametricIndexNode = f.createTemplateLiteralType(emptyPrefix, [
-      f.createTemplateLiteralTypeSpan(
-        f.createTypeReferenceNode("M"),
-        spacingSuffix
-      ),
-      f.createTemplateLiteralTypeSpan(
-        f.createTypeReferenceNode("P"),
-        emptyEnding
-      ),
-    ]);
 
     const providerNode = f.createTypeAliasDeclaration(
       undefined,
