@@ -1,69 +1,19 @@
+import ts from "typescript";
+import { createTypeAlias, printNode, zodToTs } from "zod-to-ts";
+import {
+  cleanId,
+  exportModifier,
+  f,
+  makeEmptyConstructor,
+  makeParam,
+  makeRecord,
+  makeTemplate,
+  parametricIndexNode,
+  protectedReadonlyModifier,
+} from "./client-helpers";
 import { Method } from "./method";
 import { mimeJson } from "./mime";
 import { Routing, routingCycle } from "./routing";
-import { zodToTs, printNode, createTypeAlias } from "zod-to-ts";
-import ts from "typescript";
-const f = ts.factory;
-
-const exportModifier = [f.createModifier(ts.SyntaxKind.ExportKeyword)];
-const protectedReadonlyModifier = [
-  f.createModifier(ts.SyntaxKind.ProtectedKeyword),
-  f.createModifier(ts.SyntaxKind.ReadonlyKeyword),
-];
-const emptyPrefix = f.createTemplateHead("");
-const emptyEnding = f.createTemplateTail("");
-const spacingSuffix = f.createTemplateMiddle(" ");
-const makeTemplate = (names: (ts.Identifier | string)[]) =>
-  f.createTemplateLiteralType(
-    emptyPrefix,
-    names.map((name, index) =>
-      f.createTemplateLiteralTypeSpan(
-        f.createTypeReferenceNode(name),
-        index === names.length - 1 ? emptyEnding : spacingSuffix
-      )
-    )
-  );
-const parametricIndexNode = makeTemplate(["M", "P"]);
-const makeParam = ({
-  name,
-  type,
-  mod,
-}: {
-  name: string;
-  type: ts.TypeNode;
-  mod?: ts.Modifier[];
-}) =>
-  f.createParameterDeclaration(
-    undefined,
-    mod,
-    undefined,
-    name,
-    undefined,
-    type
-  );
-const makeRecord = (key: ts.Identifier, value: ts.KeywordTypeSyntaxKind) =>
-  f.createExpressionWithTypeArguments(f.createIdentifier("Record"), [
-    f.createTypeReferenceNode(key),
-    f.createKeywordTypeNode(value),
-  ]);
-const makeEmptyConstructor = (params: ts.ParameterDeclaration[]) =>
-  f.createConstructorDeclaration(
-    undefined,
-    undefined,
-    params,
-    f.createBlock([])
-  );
-
-const cleanId = (path: string, method: string, suffix: string) => {
-  return [method]
-    .concat(path.split("/"))
-    .concat(suffix)
-    .map((entry) => entry.replace(/[^A-Z0-9]/i, ""))
-    .map(
-      (entry) => entry.slice(0, 1).toUpperCase() + entry.slice(1).toLowerCase()
-    )
-    .join("");
-};
 
 interface Registry {
   [METHOD_PATH: string]: Record<"in" | "out", string> & { isJson: boolean };
