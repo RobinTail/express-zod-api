@@ -92,6 +92,15 @@ export const makePublicLiteralType = (name: string, literals: string[]) =>
     )
   );
 
+export const makePublicType = (name: string, value: ts.TypeNode) =>
+  f.createTypeAliasDeclaration(
+    undefined,
+    exportModifier,
+    name,
+    undefined,
+    value
+  );
+
 export const cleanId = (path: string, method: string, suffix: string) => {
   return [method]
     .concat(path.split("/"))

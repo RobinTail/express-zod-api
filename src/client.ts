@@ -8,6 +8,7 @@ import {
   makeEmptyConstructor,
   makeParam,
   makePublicLiteralType,
+  makePublicType,
   makeQuotedProp,
   makeRecord,
   makeTemplate,
@@ -66,11 +67,8 @@ export class Client {
     const pathNode = makePublicLiteralType("Path", this.paths);
     const methodNode = makePublicLiteralType("Method", methods);
 
-    const methodPathNode = f.createTypeAliasDeclaration(
-      undefined,
-      exportModifier,
+    const methodPathNode = makePublicType(
       "MethodPath",
-      undefined,
       makeTemplate([methodNode.name, pathNode.name])
     );
 
@@ -116,11 +114,8 @@ export class Client {
       )
     );
 
-    const providerNode = f.createTypeAliasDeclaration(
-      undefined,
-      exportModifier,
+    const providerNode = makePublicType(
       "Provider",
-      undefined,
       f.createFunctionTypeNode(
         [
           f.createTypeParameterDeclaration(
