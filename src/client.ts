@@ -6,6 +6,7 @@ import {
   f,
   makeConst,
   makeEmptyConstructor,
+  makeIndexedPromise,
   makeParam,
   makePublicClass,
   makePublicLiteralType,
@@ -145,12 +146,7 @@ export class Client {
             ),
           }),
         ],
-        f.createTypeReferenceNode("Promise", [
-          f.createIndexedAccessTypeNode(
-            f.createTypeReferenceNode(responseNode.name),
-            parametricIndexNode
-          ),
-        ])
+        makeIndexedPromise(responseNode.name, parametricIndexNode)
       )
     );
 

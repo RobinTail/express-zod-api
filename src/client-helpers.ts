@@ -125,6 +125,11 @@ export const makePublicClass = (
     [constructor, ...props]
   );
 
+export const makeIndexedPromise = (type: ts.Identifier, index: ts.TypeNode) =>
+  f.createTypeReferenceNode("Promise", [
+    f.createIndexedAccessTypeNode(f.createTypeReferenceNode(type), index),
+  ]);
+
 export const cleanId = (path: string, method: string, suffix: string) => {
   return [method]
     .concat(path.split("/"))
