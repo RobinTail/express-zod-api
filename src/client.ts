@@ -17,6 +17,7 @@ import {
   makeQuotedProp,
   makeRecord,
   makeTemplate,
+  makeTypeParams,
   parametricIndexNode,
   protectedReadonlyModifier,
 } from "./client-helpers";
@@ -115,16 +116,7 @@ export class Client {
     const providerNode = makePublicType(
       "Provider",
       f.createFunctionTypeNode(
-        [
-          f.createTypeParameterDeclaration(
-            "M",
-            f.createTypeReferenceNode(methodNode.name)
-          ),
-          f.createTypeParameterDeclaration(
-            "P",
-            f.createTypeReferenceNode(pathNode.name)
-          ),
-        ],
+        makeTypeParams({ M: methodNode.name, P: pathNode.name }),
         makeParams({
           method: f.createTypeReferenceNode("M"),
           path: f.createTypeReferenceNode("P"),

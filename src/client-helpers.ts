@@ -149,6 +149,18 @@ export const makePublicExtendedInterface = (
     props
   );
 
+export const makeTypeParams = (params: Record<string, ts.Identifier>) =>
+  Object.keys(params).reduce(
+    (acc, name) =>
+      acc.concat(
+        f.createTypeParameterDeclaration(
+          name,
+          f.createTypeReferenceNode(params[name])
+        )
+      ),
+    [] as ts.TypeParameterDeclaration[]
+  );
+
 export const cleanId = (path: string, method: string, suffix: string) => {
   return [method]
     .concat(path.split("/"))
