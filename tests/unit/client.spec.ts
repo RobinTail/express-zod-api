@@ -1,5 +1,5 @@
 import { routing } from "../../example/routing";
-import { Client } from "../../src/client";
+import { Client } from "../../src";
 
 describe("API Client Generator", () => {
   test("Should generate a client for example API", () => {
