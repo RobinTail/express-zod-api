@@ -30,15 +30,11 @@ export const makeTemplate = (names: (ts.Identifier | string)[]) =>
 
 export const parametricIndexNode = makeTemplate(["M", "P"]);
 
-export const makeParam = ({
-  name,
-  type,
-  mod,
-}: {
-  name: string;
-  type: ts.TypeNode;
-  mod?: ts.Modifier[];
-}) =>
+export const makeParam = (
+  name: string,
+  type: ts.TypeNode,
+  mod?: ts.Modifier[]
+) =>
   f.createParameterDeclaration(
     undefined,
     mod,

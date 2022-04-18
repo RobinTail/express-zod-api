@@ -125,21 +125,15 @@ export class Client {
           ),
         ],
         [
-          makeParam({
-            name: "method",
-            type: f.createTypeReferenceNode("M"),
-          }),
-          makeParam({
-            name: "path",
-            type: f.createTypeReferenceNode("P"),
-          }),
-          makeParam({
-            name: "params",
-            type: f.createIndexedAccessTypeNode(
+          makeParam("method", f.createTypeReferenceNode("M")),
+          makeParam("path", f.createTypeReferenceNode("P")),
+          makeParam(
+            "params",
+            f.createIndexedAccessTypeNode(
               f.createTypeReferenceNode(inputNode.name),
               parametricIndexNode
-            ),
-          }),
+            )
+          ),
         ],
         makeIndexedPromise(responseNode.name, parametricIndexNode)
       )
@@ -148,11 +142,11 @@ export class Client {
     const clientNode = makePublicClass(
       "ExpressZodAPIClient",
       makeEmptyConstructor([
-        makeParam({
-          mod: protectedReadonlyModifier,
-          name: "provider",
-          type: f.createTypeReferenceNode(providerNode.name),
-        }),
+        makeParam(
+          "provider",
+          f.createTypeReferenceNode(providerNode.name),
+          protectedReadonlyModifier
+        ),
       ]),
       [
         makePublicProp(
