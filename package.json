@@ -63,6 +63,9 @@
     },
     "@types/jest": {
       "optional": true
+    },
+    "typescript": {
+      "optional": true
     }
   },
   "devDependencies": {
