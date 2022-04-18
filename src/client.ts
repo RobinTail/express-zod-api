@@ -151,9 +151,12 @@ export class Client {
       ts.SyntaxKind.MultiLineCommentTrivia,
       "\n" +
         "export const exampleProvider: Provider = async (method, path, params) => {\n" +
-        "  const urlParams =\n" +
-        '    method === "get" ? new URLSearchParams(params).toString() : "";\n' +
-        "  const response = await fetch(`https://example.com${path}?${urlParams}`, {\n" +
+        "  const pathWithParams =\n" +
+        "    Object.keys(params).reduce(\n" +
+        "      (acc, key) => acc.replace(`:${key}`, params[key]),\n" +
+        "      path\n" +
+        '    ) + (method === "get" ? `?${new URLSearchParams(params)}` : "");\n' +
+        "  const response = await fetch(`https://example.com${pathWithParams}`, {" +
         "    method,\n" +
         '    body: method === "get" ? undefined : JSON.stringify(params),\n' +
         "  });\n" +
