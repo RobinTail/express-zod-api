@@ -5,6 +5,8 @@ import { zodToTs, printNode, createTypeAlias } from "zod-to-ts";
 import ts from "typescript";
 const f = ts.factory;
 
+const exportModifier = [f.createModifier(ts.SyntaxKind.ExportKeyword)];
+
 const cleanId = (path: string, method: string, suffix: string) => {
   return [method]
     .concat(path.split("/"))
@@ -62,7 +64,7 @@ export class Client {
 
     const pathNode = f.createTypeAliasDeclaration(
       undefined,
-      [f.createModifier(ts.SyntaxKind.ExportKeyword)],
+      exportModifier,
       "Path",
       undefined,
       f.createUnionTypeNode(
@@ -74,7 +76,7 @@ export class Client {
 
     const methodNode = f.createTypeAliasDeclaration(
       undefined,
-      [f.createModifier(ts.SyntaxKind.ExportKeyword)],
+      exportModifier,
       "Method",
       undefined,
       f.createUnionTypeNode(
@@ -86,7 +88,7 @@ export class Client {
 
     const methodPathNode = f.createTypeAliasDeclaration(
       undefined,
-      [f.createModifier(ts.SyntaxKind.ExportKeyword)],
+      exportModifier,
       "MethodPath",
       undefined,
       f.createTemplateLiteralType(f.createTemplateHead(""), [
@@ -112,7 +114,7 @@ export class Client {
 
     const inputNode = f.createInterfaceDeclaration(
       undefined,
-      [f.createModifier(ts.SyntaxKind.ExportKeyword)],
+      exportModifier,
       "Input",
       undefined,
       extenderClause,
@@ -128,7 +130,7 @@ export class Client {
 
     const responseNode = f.createInterfaceDeclaration(
       undefined,
-      [f.createModifier(ts.SyntaxKind.ExportKeyword)],
+      exportModifier,
       "Response",
       undefined,
       extenderClause,
@@ -143,7 +145,7 @@ export class Client {
     );
 
     const jsonEndpointsNode = f.createVariableStatement(
-      [f.createModifier(ts.SyntaxKind.ExportKeyword)],
+      exportModifier,
       f.createVariableDeclarationList(
         [
           f.createVariableDeclaration(
@@ -179,7 +181,7 @@ export class Client {
 
     const providerNode = f.createTypeAliasDeclaration(
       undefined,
-      [f.createModifier(ts.SyntaxKind.ExportKeyword)],
+      exportModifier,
       "Provider",
       undefined,
       f.createFunctionTypeNode(
@@ -233,7 +235,7 @@ export class Client {
 
     const clientNode = f.createClassDeclaration(
       undefined,
-      [f.createModifier(ts.SyntaxKind.ExportKeyword)],
+      exportModifier,
       "ExpressZodAPIClient",
       undefined,
       undefined,
