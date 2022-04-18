@@ -31,21 +31,21 @@ export class Client {
       endpointCb: (endpoint, path, method) => {
         const inputId = cleanId(path, method, "input");
         const responseId = cleanId(path, method, "response");
-        const inputSchema = zodToTs(endpoint.getInputSchema(), inputId, {
+        const input = zodToTs(endpoint.getInputSchema(), inputId, {
           resolveNativeEnums: true,
         });
-        const responseSchema = zodToTs(
+        const response = zodToTs(
           endpoint
             .getPositiveResponseSchema()
             .or(endpoint.getNegativeResponseSchema()),
           responseId,
           { resolveNativeEnums: true }
         );
-        const inputAlias = createTypeAlias(inputSchema.node, inputId);
-        const responseAlias = createTypeAlias(responseSchema.node, responseId);
+        const inputAlias = createTypeAlias(input.node, inputId);
+        const responseAlias = createTypeAlias(response.node, responseId);
         this.agg.push(
-          ...inputSchema.store.nativeEnums,
-          ...responseSchema.store.nativeEnums
+          ...input.store.nativeEnums,
+          ...response.store.nativeEnums
         );
         this.agg.push(inputAlias);
         this.agg.push(responseAlias);
@@ -60,7 +60,7 @@ export class Client {
       },
     });
 
-    const pathSchema = f.createTypeAliasDeclaration(
+    const pathNode = f.createTypeAliasDeclaration(
       undefined,
       [f.createModifier(ts.SyntaxKind.ExportKeyword)],
       "Path",
@@ -72,7 +72,7 @@ export class Client {
       )
     );
 
-    const methodSchema = f.createTypeAliasDeclaration(
+    const methodNode = f.createTypeAliasDeclaration(
       undefined,
       [f.createModifier(ts.SyntaxKind.ExportKeyword)],
       "Method",
@@ -84,38 +84,38 @@ export class Client {
       )
     );
 
-    const methodPathSchema = f.createTypeAliasDeclaration(
+    const methodPathNode = f.createTypeAliasDeclaration(
       undefined,
       [f.createModifier(ts.SyntaxKind.ExportKeyword)],
       "MethodPath",
       undefined,
       f.createTemplateLiteralType(f.createTemplateHead(""), [
         f.createTemplateLiteralTypeSpan(
-          f.createTypeReferenceNode(methodSchema.name),
+          f.createTypeReferenceNode(methodNode.name),
           f.createTemplateMiddle(" ")
         ),
         f.createTemplateLiteralTypeSpan(
-          f.createTypeReferenceNode(pathSchema.name),
+          f.createTypeReferenceNode(pathNode.name),
           f.createTemplateTail("")
         ),
       ])
     );
 
-    const extender = [
+    const extenderClause = [
       f.createHeritageClause(ts.SyntaxKind.ExtendsKeyword, [
         f.createExpressionWithTypeArguments(f.createIdentifier("Record"), [
-          f.createTypeReferenceNode(methodPathSchema.name),
+          f.createTypeReferenceNode(methodPathNode.name),
           f.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword),
         ]),
       ]),
     ];
 
-    const inputSchema = f.createInterfaceDeclaration(
+    const inputNode = f.createInterfaceDeclaration(
       undefined,
       [f.createModifier(ts.SyntaxKind.ExportKeyword)],
       "Input",
       undefined,
-      extender,
+      extenderClause,
       Object.keys(this.registry).map((methodPath) =>
         f.createPropertySignature(
           undefined,
@@ -126,12 +126,12 @@ export class Client {
       )
     );
 
-    const responseSchema = f.createInterfaceDeclaration(
+    const responseNode = f.createInterfaceDeclaration(
       undefined,
       [f.createModifier(ts.SyntaxKind.ExportKeyword)],
       "Response",
       undefined,
-      extender,
+      extenderClause,
       Object.keys(this.registry).map((methodPath) =>
         f.createPropertySignature(
           undefined,
@@ -142,7 +142,7 @@ export class Client {
       )
     );
 
-    const jsonResponseList = f.createVariableStatement(
+    const jsonEndpointsNode = f.createVariableStatement(
       [f.createModifier(ts.SyntaxKind.ExportKeyword)],
       f.createVariableDeclarationList(
         [
@@ -163,18 +163,21 @@ export class Client {
       )
     );
 
-    const mpParams = f.createTemplateLiteralType(f.createTemplateHead(""), [
-      f.createTemplateLiteralTypeSpan(
-        f.createTypeReferenceNode("M"),
-        f.createTemplateMiddle(" ")
-      ),
-      f.createTemplateLiteralTypeSpan(
-        f.createTypeReferenceNode("P"),
-        f.createTemplateTail("")
-      ),
-    ]);
+    const parametricIndexNode = f.createTemplateLiteralType(
+      f.createTemplateHead(""),
+      [
+        f.createTemplateLiteralTypeSpan(
+          f.createTypeReferenceNode("M"),
+          f.createTemplateMiddle(" ")
+        ),
+        f.createTemplateLiteralTypeSpan(
+          f.createTypeReferenceNode("P"),
+          f.createTemplateTail("")
+        ),
+      ]
+    );
 
-    const providerSchema = f.createTypeAliasDeclaration(
+    const providerNode = f.createTypeAliasDeclaration(
       undefined,
       [f.createModifier(ts.SyntaxKind.ExportKeyword)],
       "Provider",
@@ -183,11 +186,11 @@ export class Client {
         [
           f.createTypeParameterDeclaration(
             "M",
-            f.createTypeReferenceNode(methodSchema.name)
+            f.createTypeReferenceNode(methodNode.name)
           ),
           f.createTypeParameterDeclaration(
             "P",
-            f.createTypeReferenceNode(pathSchema.name)
+            f.createTypeReferenceNode(pathNode.name)
           ),
         ],
         [
@@ -214,21 +217,21 @@ export class Client {
             "params",
             undefined,
             f.createIndexedAccessTypeNode(
-              f.createTypeReferenceNode(inputSchema.name),
-              mpParams
+              f.createTypeReferenceNode(inputNode.name),
+              parametricIndexNode
             )
           ),
         ],
         f.createTypeReferenceNode("Promise", [
           f.createIndexedAccessTypeNode(
-            f.createTypeReferenceNode(responseSchema.name),
-            mpParams
+            f.createTypeReferenceNode(responseNode.name),
+            parametricIndexNode
           ),
         ])
       )
     );
 
-    const clientClass = f.createClassDeclaration(
+    const clientNode = f.createClassDeclaration(
       undefined,
       [f.createModifier(ts.SyntaxKind.ExportKeyword)],
       "ExpressZodAPIClient",
@@ -248,7 +251,7 @@ export class Client {
               undefined,
               "provider",
               undefined,
-              f.createTypeReferenceNode(providerSchema.name)
+              f.createTypeReferenceNode(providerNode.name)
             ),
           ],
           f.createBlock([])
@@ -265,11 +268,11 @@ export class Client {
     );
 
     ts.addSyntheticLeadingComment(
-      clientClass,
+      clientNode,
       ts.SyntaxKind.MultiLineCommentTrivia,
       "\n" +
         "export const createDefaultProvider =\n" +
-        `  (host: string): ${providerSchema.name.text} =>\n` +
+        `  (host: string): ${providerNode.name.text} =>\n` +
         "  async (method, path, params) => {\n" +
         "    const urlParams =\n" +
         '      method === "get" ? new URLSearchParams(params).toString() : "";\n' +
@@ -283,21 +286,21 @@ export class Client {
         "    return response.text();\n" +
         "  };\n" +
         "\n" +
-        `const client = new ${clientClass.name!.text}(\n` +
+        `const client = new ${clientNode.name!.text}(\n` +
         '  createDefaultProvider("https://example.com")\n' +
         ");\n",
       true
     );
 
     this.agg.push(
-      pathSchema,
-      methodSchema,
-      methodPathSchema,
-      inputSchema,
-      responseSchema,
-      jsonResponseList,
-      providerSchema,
-      clientClass
+      pathNode,
+      methodNode,
+      methodPathNode,
+      inputNode,
+      responseNode,
+      jsonEndpointsNode,
+      providerNode,
+      clientNode
     );
   }
 
