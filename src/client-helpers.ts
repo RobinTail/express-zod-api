@@ -9,6 +9,8 @@ export const protectedReadonlyModifier = [
   f.createModifier(ts.SyntaxKind.ReadonlyKeyword),
 ];
 
+export const publicModifier = [f.createModifier(ts.SyntaxKind.PublicKeyword)];
+
 const emptyPrefix = f.createTemplateHead("");
 
 const emptyEnding = f.createTemplateTail("");

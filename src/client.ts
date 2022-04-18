@@ -12,6 +12,7 @@ import {
   makeTemplate,
   parametricIndexNode,
   protectedReadonlyModifier,
+  publicModifier,
 } from "./client-helpers";
 import { Method } from "./method";
 import { mimeJson } from "./mime";
@@ -193,7 +194,7 @@ export class Client {
         ]),
         f.createPropertyDeclaration(
           undefined,
-          [f.createModifier(ts.SyntaxKind.PublicKeyword)],
+          publicModifier,
           "provide",
           undefined,
           undefined,
