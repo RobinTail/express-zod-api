@@ -8,6 +8,7 @@ import {
   makeEmptyConstructor,
   makeIndexedPromise,
   makeParam,
+  makeParams,
   makePublicClass,
   makePublicExtendedInterface,
   makePublicLiteralType,
@@ -124,17 +125,14 @@ export class Client {
             f.createTypeReferenceNode(pathNode.name)
           ),
         ],
-        [
-          makeParam("method", f.createTypeReferenceNode("M")),
-          makeParam("path", f.createTypeReferenceNode("P")),
-          makeParam(
-            "params",
-            f.createIndexedAccessTypeNode(
-              f.createTypeReferenceNode(inputNode.name),
-              parametricIndexNode
-            )
+        makeParams({
+          method: f.createTypeReferenceNode("M"),
+          path: f.createTypeReferenceNode("P"),
+          params: f.createIndexedAccessTypeNode(
+            f.createTypeReferenceNode(inputNode.name),
+            parametricIndexNode
           ),
-        ],
+        }),
         makeIndexedPromise(responseNode.name, parametricIndexNode)
       )
     );

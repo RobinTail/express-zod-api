@@ -44,6 +44,15 @@ export const makeParam = (
     type
   );
 
+export const makeParams = (
+  params: Record<string, ts.TypeNode>,
+  mod?: ts.Modifier[]
+) =>
+  Object.keys(params).reduce(
+    (acc, name) => acc.concat(makeParam(name, params[name], mod)),
+    [] as ts.ParameterDeclaration[]
+  );
+
 export const makeRecord = (
   key: ts.Identifier,
   value: ts.KeywordTypeSyntaxKind
