@@ -150,24 +150,20 @@ export class Client {
       clientNode,
       ts.SyntaxKind.MultiLineCommentTrivia,
       "\n" +
-        "export const createDefaultProvider =\n" +
-        `  (host: string): ${providerNode.name.text} =>\n` +
-        "  async (method, path, params) => {\n" +
-        "    const urlParams =\n" +
-        '      method === "get" ? new URLSearchParams(params).toString() : "";\n' +
-        "    const response = await fetch(`${host}${path}?${urlParams}`, {\n" +
-        "      method: `${method}`,\n" +
-        '      body: method === "get" ? undefined : JSON.stringify(params),\n' +
-        "    });\n" +
-        "    if (`${method} ${path}` in jsonEndpoints) {\n" +
-        "      return response.json();\n" +
-        "    }\n" +
-        "    return response.text();\n" +
-        "  };\n" +
+        "export const exampleProvider: Provider = async (method, path, params) => {\n" +
+        "  const urlParams =\n" +
+        '    method === "get" ? new URLSearchParams(params).toString() : "";\n' +
+        "  const response = await fetch(`https://example.com${path}?${urlParams}`, {\n" +
+        "    method,\n" +
+        '    body: method === "get" ? undefined : JSON.stringify(params),\n' +
+        "  });\n" +
+        "  if (`${method} ${path}` in jsonEndpoints) {\n" +
+        "    return response.json();\n" +
+        "  }\n" +
+        "  return response.text();\n" +
+        "};\n" +
         "\n" +
-        `const client = new ${clientNode.name!.text}(\n` +
-        '  createDefaultProvider("https://example.com")\n' +
-        ");\n",
+        `const client = new ${clientNode.name!.text}(exampleProvider);\n`,
       true
     );
 

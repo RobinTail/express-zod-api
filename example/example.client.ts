@@ -116,24 +116,20 @@ export type Provider = <M extends Method, P extends Path>(
 ) => Promise<Response[`${M} ${P}`]>;
 
 /*
-export const createDefaultProvider =
-  (host: string): Provider =>
-  async (method, path, params) => {
-    const urlParams =
-      method === "get" ? new URLSearchParams(params).toString() : "";
-    const response = await fetch(`${host}${path}?${urlParams}`, {
-      method: `${method}`,
-      body: method === "get" ? undefined : JSON.stringify(params),
-    });
-    if (`${method} ${path}` in jsonEndpoints) {
-      return response.json();
-    }
-    return response.text();
-  };
+export const exampleProvider: Provider = async (method, path, params) => {
+  const urlParams =
+    method === "get" ? new URLSearchParams(params).toString() : "";
+  const response = await fetch(`https://example.com${path}?${urlParams}`, {
+    method,
+    body: method === "get" ? undefined : JSON.stringify(params),
+  });
+  if (`${method} ${path}` in jsonEndpoints) {
+    return response.json();
+  }
+  return response.text();
+};
 
-const client = new ExpressZodAPIClient(
-  createDefaultProvider("https://example.com")
-);
+const client = new ExpressZodAPIClient(exampleProvider);
 */
 export class ExpressZodAPIClient {
   constructor(protected readonly provider: Provider) {}
