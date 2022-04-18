@@ -117,10 +117,12 @@ export type Provider = <M extends Method, P extends Path>(
 
 /*
 export const exampleProvider: Provider = async (method, path, params) => {
-  const urlParams =
-    method === "get" ? new URLSearchParams(params).toString() : "";
-  const response = await fetch(`https://example.com${path}?${urlParams}`, {
-    method,
+  const pathWithParams =
+    Object.keys(params).reduce(
+      (acc, key) => acc.replace(`:${key}`, params[key]),
+      path
+    ) + (method === "get" ? `?${new URLSearchParams(params)}` : "");
+  const response = await fetch(`https://example.com${pathWithParams}`, {    method,
     body: method === "get" ? undefined : JSON.stringify(params),
   });
   if (`${method} ${path}` in jsonEndpoints) {
@@ -133,6 +135,8 @@ const client = new ExpressZodAPIClient(exampleProvider);
 client.provide("get", "/v1/user/retrieve", { id: "10" });
 */
 export class ExpressZodAPIClient {
-  constructor(protected readonly provider: Provider) {}
-  public provide = this.provider;
+  constructor(provider: Provider) {
+    this.provide = provider;
+  }
+  public readonly provide: Provider;
 }

@@ -4,12 +4,10 @@ export const f = ts.factory;
 
 export const exportModifier = [f.createModifier(ts.SyntaxKind.ExportKeyword)];
 
-export const protectedReadonlyModifier = [
-  f.createModifier(ts.SyntaxKind.ProtectedKeyword),
+export const publicReadonlyModifier = [
+  f.createModifier(ts.SyntaxKind.PublicKeyword),
   f.createModifier(ts.SyntaxKind.ReadonlyKeyword),
 ];
-
-export const publicModifier = [f.createModifier(ts.SyntaxKind.PublicKeyword)];
 
 const emptyPrefix = f.createTemplateHead("");
 
@@ -62,12 +60,15 @@ export const makeRecord = (
     f.createKeywordTypeNode(value),
   ]);
 
-export const makeEmptyConstructor = (params: ts.ParameterDeclaration[]) =>
+export const makeInitializingConstructor = (
+  params: ts.ParameterDeclaration[],
+  statements: ts.Statement[]
+) =>
   f.createConstructorDeclaration(
     undefined,
     undefined,
     params,
-    f.createBlock([])
+    f.createBlock(statements, true)
   );
 
 export const makeQuotedProp = (name: string, ref: string) =>
@@ -106,14 +107,14 @@ export const makePublicType = (name: string, value: ts.TypeNode) =>
     value
   );
 
-export const makePublicProp = (name: string, value: ts.Expression) =>
+export const makePublicReadonlyEmptyProp = (name: string, type: ts.TypeNode) =>
   f.createPropertyDeclaration(
     undefined,
-    publicModifier,
+    publicReadonlyModifier,
     name,
     undefined,
-    undefined,
-    value
+    type,
+    undefined
   );
 
 export const makePublicClass = (

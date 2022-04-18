@@ -5,21 +5,20 @@ import {
   exportModifier,
   f,
   makeConst,
-  makeEmptyConstructor,
+  makeInitializingConstructor,
   makeIndexedPromise,
   makeParam,
   makeParams,
   makePublicClass,
   makePublicExtendedInterface,
   makePublicLiteralType,
-  makePublicProp,
+  makePublicReadonlyEmptyProp,
   makePublicType,
   makeQuotedProp,
   makeRecord,
   makeTemplate,
   makeTypeParams,
   parametricIndexNode,
-  protectedReadonlyModifier,
 } from "./client-helpers";
 import { methods } from "./method";
 import { mimeJson } from "./mime";
@@ -131,17 +130,22 @@ export class Client {
 
     const clientNode = makePublicClass(
       "ExpressZodAPIClient",
-      makeEmptyConstructor([
-        makeParam(
-          "provider",
-          f.createTypeReferenceNode(providerNode.name),
-          protectedReadonlyModifier
-        ),
-      ]),
+      makeInitializingConstructor(
+        [makeParam("provider", f.createTypeReferenceNode(providerNode.name))],
+        [
+          f.createExpressionStatement(
+            f.createBinaryExpression(
+              f.createPropertyAccessExpression(f.createThis(), "provide"),
+              ts.SyntaxKind.EqualsToken,
+              f.createIdentifier("provider")
+            )
+          ),
+        ]
+      ),
       [
-        makePublicProp(
+        makePublicReadonlyEmptyProp(
           "provide",
-          f.createPropertyAccessExpression(f.createThis(), "provider")
+          f.createTypeReferenceNode(providerNode.name)
         ),
       ]
     );

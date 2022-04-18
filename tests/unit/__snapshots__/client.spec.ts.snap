@@ -119,7 +119,9 @@ const client = new ExpressZodAPIClient(exampleProvider);
 client.provide(\\"get\\", \\"/v1/user/retrieve\\", { id: \\"10\\" });
 */
 export class ExpressZodAPIClient {
-    constructor(protected readonly provider: Provider) { }
-    public provide = this.provider;
+    constructor(provider: Provider) {
+        this.provide = provider;
+    }
+    public readonly provide: Provider;
 }"
 `;
