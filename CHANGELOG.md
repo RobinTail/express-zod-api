@@ -2,6 +2,10 @@
 
 ## Version 6
 
+### v6.1.0-beta2
+
+- Fixing bugs and taking into account path params for feature #403 (API Client Generator).
+
 ### v6.1.0-beta1
 
 - This is a beta release of a new feature for public testing.
