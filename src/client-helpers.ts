@@ -71,6 +71,12 @@ export const makeQuotedProp = (name: string, ref: string) =>
     f.createTypeReferenceNode(ref)
   );
 
+export const makeConst = (name: string, value: ts.Expression) =>
+  f.createVariableDeclarationList(
+    [f.createVariableDeclaration(name, undefined, undefined, value)],
+    ts.NodeFlags.Const
+  );
+
 export const cleanId = (path: string, method: string, suffix: string) => {
   return [method]
     .concat(path.split("/"))

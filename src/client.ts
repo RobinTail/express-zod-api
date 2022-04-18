@@ -4,6 +4,7 @@ import {
   cleanId,
   exportModifier,
   f,
+  makeConst,
   makeEmptyConstructor,
   makeParam,
   makeQuotedProp,
@@ -122,22 +123,15 @@ export class Client {
 
     const jsonEndpointsNode = f.createVariableStatement(
       exportModifier,
-      f.createVariableDeclarationList(
-        [
-          f.createVariableDeclaration(
-            "jsonEndpoints",
-            undefined,
-            undefined,
-            f.createObjectLiteralExpression(
-              Object.keys(this.registry)
-                .filter((methodPath) => this.registry[methodPath].isJson)
-                .map((methodPath) =>
-                  f.createPropertyAssignment(`"${methodPath}"`, f.createTrue())
-                )
+      makeConst(
+        "jsonEndpoints",
+        f.createObjectLiteralExpression(
+          Object.keys(this.registry)
+            .filter((methodPath) => this.registry[methodPath].isJson)
+            .map((methodPath) =>
+              f.createPropertyAssignment(`"${methodPath}"`, f.createTrue())
             )
-          ),
-        ],
-        ts.NodeFlags.Const
+        )
       )
     );
 
