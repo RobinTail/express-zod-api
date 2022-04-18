@@ -6,6 +6,9 @@ import ts from "typescript";
 const f = ts.factory;
 
 const exportModifier = [f.createModifier(ts.SyntaxKind.ExportKeyword)];
+const emptyPrefix = f.createTemplateHead("");
+const emptyEnding = f.createTemplateTail("");
+const spacingSuffix = f.createTemplateMiddle(" ");
 
 const cleanId = (path: string, method: string, suffix: string) => {
   return [method]
@@ -91,14 +94,14 @@ export class Client {
       exportModifier,
       "MethodPath",
       undefined,
-      f.createTemplateLiteralType(f.createTemplateHead(""), [
+      f.createTemplateLiteralType(emptyPrefix, [
         f.createTemplateLiteralTypeSpan(
           f.createTypeReferenceNode(methodNode.name),
-          f.createTemplateMiddle(" ")
+          spacingSuffix
         ),
         f.createTemplateLiteralTypeSpan(
           f.createTypeReferenceNode(pathNode.name),
-          f.createTemplateTail("")
+          emptyEnding
         ),
       ])
     );
@@ -165,19 +168,16 @@ export class Client {
       )
     );
 
-    const parametricIndexNode = f.createTemplateLiteralType(
-      f.createTemplateHead(""),
-      [
-        f.createTemplateLiteralTypeSpan(
-          f.createTypeReferenceNode("M"),
-          f.createTemplateMiddle(" ")
-        ),
-        f.createTemplateLiteralTypeSpan(
-          f.createTypeReferenceNode("P"),
-          f.createTemplateTail("")
-        ),
-      ]
-    );
+    const parametricIndexNode = f.createTemplateLiteralType(emptyPrefix, [
+      f.createTemplateLiteralTypeSpan(
+        f.createTypeReferenceNode("M"),
+        spacingSuffix
+      ),
+      f.createTemplateLiteralTypeSpan(
+        f.createTypeReferenceNode("P"),
+        emptyEnding
+      ),
+    ]);
 
     const providerNode = f.createTypeAliasDeclaration(
       undefined,
