@@ -130,6 +130,7 @@ export const exampleProvider: Provider = async (method, path, params) => {
 };
 
 const client = new ExpressZodAPIClient(exampleProvider);
+client.provide("get", "/v1/user/retrieve", { id: "10" });
 */
 export class ExpressZodAPIClient {
   constructor(protected readonly provider: Provider) {}

@@ -163,7 +163,8 @@ export class Client {
         "  return response.text();\n" +
         "};\n" +
         "\n" +
-        `const client = new ${clientNode.name!.text}(exampleProvider);\n`,
+        `const client = new ${clientNode.name!.text}(exampleProvider);\n` +
+        'client.provide("get", "/v1/user/retrieve", { id: "10" });\n',
       true
     );
 
