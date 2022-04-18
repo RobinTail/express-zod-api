@@ -301,7 +301,7 @@ export class Client {
     );
   }
 
-  public print() {
-    return this.agg.map((node) => printNode(node)).join("\n\n");
+  public print(printerOptions?: ts.PrinterOptions) {
+    return this.agg.map((node) => printNode(node, printerOptions)).join("\n\n");
   }
 }
