@@ -43,9 +43,10 @@ export class Client {
         );
         const inputAlias = createTypeAlias(inputSchema.node, inputId);
         const responseAlias = createTypeAlias(responseSchema.node, responseId);
-        inputSchema.store.nativeEnums
-          .concat(responseSchema.store.nativeEnums)
-          .forEach((nativeEnum) => this.agg.push(nativeEnum));
+        this.agg.push(
+          ...inputSchema.store.nativeEnums,
+          ...responseSchema.store.nativeEnums
+        );
         this.agg.push(inputAlias);
         this.agg.push(responseAlias);
         if (method !== "options") {
