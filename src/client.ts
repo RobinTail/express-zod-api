@@ -41,6 +41,11 @@ const makeParam = ({
     undefined,
     type
   );
+const makeRecord = (key: ts.Identifier, value: ts.KeywordTypeSyntaxKind) =>
+  f.createExpressionWithTypeArguments(f.createIdentifier("Record"), [
+    f.createTypeReferenceNode(key),
+    f.createKeywordTypeNode(value),
+  ]);
 
 const cleanId = (path: string, method: string, suffix: string) => {
   return [method]
@@ -131,10 +136,7 @@ export class Client {
 
     const extenderClause = [
       f.createHeritageClause(ts.SyntaxKind.ExtendsKeyword, [
-        f.createExpressionWithTypeArguments(f.createIdentifier("Record"), [
-          f.createTypeReferenceNode(methodPathNode.name),
-          f.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword),
-        ]),
+        makeRecord(methodPathNode.name, ts.SyntaxKind.AnyKeyword),
       ]),
     ];
 
