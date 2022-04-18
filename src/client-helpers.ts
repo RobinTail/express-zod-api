@@ -63,6 +63,14 @@ export const makeEmptyConstructor = (params: ts.ParameterDeclaration[]) =>
     f.createBlock([])
   );
 
+export const makeQuotedProp = (name: string, ref: string) =>
+  f.createPropertySignature(
+    undefined,
+    `"${name}"`,
+    undefined,
+    f.createTypeReferenceNode(ref)
+  );
+
 export const cleanId = (path: string, method: string, suffix: string) => {
   return [method]
     .concat(path.split("/"))

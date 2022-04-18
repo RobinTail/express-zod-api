@@ -6,6 +6,7 @@ import {
   f,
   makeEmptyConstructor,
   makeParam,
+  makeQuotedProp,
   makeRecord,
   makeTemplate,
   parametricIndexNode,
@@ -104,12 +105,7 @@ export class Client {
       undefined,
       extenderClause,
       Object.keys(this.registry).map((methodPath) =>
-        f.createPropertySignature(
-          undefined,
-          `"${methodPath}"`,
-          undefined,
-          f.createTypeReferenceNode(this.registry[methodPath].in)
-        )
+        makeQuotedProp(methodPath, this.registry[methodPath].in)
       )
     );
 
@@ -120,12 +116,7 @@ export class Client {
       undefined,
       extenderClause,
       Object.keys(this.registry).map((methodPath) =>
-        f.createPropertySignature(
-          undefined,
-          `"${methodPath}"`,
-          undefined,
-          f.createTypeReferenceNode(this.registry[methodPath].out)
-        )
+        makeQuotedProp(methodPath, this.registry[methodPath].out)
       )
     );
 
