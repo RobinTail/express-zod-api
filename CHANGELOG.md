@@ -2,6 +2,42 @@
 
 ## Version 6
 
+### v6.1.0-beta1
+
+- This is a beta release of a new feature for public testing.
+- Feature #403: API Client Generator.
+  - A new way of informing the frontend about the I/O types of endpoints is proposed.
+  - The new approach offers automatic generation of a client based on routing to a typescript file.
+  - The generated client is flexibly configured on the frontend using a provider function that directly makes a
+    request to the endpoint using the libraries and methods of your choice.
+  - The client asserts the type request and response.
+  - More details coming soon.
+
+```typescript
+// example client-generator.ts
+import fs from "fs";
+import { Client } from "express-zod-api";
+
+fs.writeFileSync("./frontend/client.ts", new Client(routing).print(), "utf-8");
+```
+
+```typescript
+// example frontend using the most simple provider based on fetch
+import { ExpressZodAPIClient } from "./client.ts";
+
+const client = new ExpressZodAPIClient(async (method, path, params) => {
+  const urlParams =
+    method === "get" ? new URLSearchParams(params).toString() : "";
+  const response = await fetch(`https://example.com${path}?${urlParams}`, {
+    method,
+    body: method === "get" ? undefined : JSON.stringify(params),
+  });
+  return response.json();
+});
+
+client.provide("get", "/v1/user/retrieve", { id: "10" });
+```
+
 ### v6.0.3
 
 - `zod` version is 3.14.4.
