@@ -6,6 +6,10 @@ import ts from "typescript";
 const f = ts.factory;
 
 const exportModifier = [f.createModifier(ts.SyntaxKind.ExportKeyword)];
+const protectedReadonlyModifier = [
+  f.createModifier(ts.SyntaxKind.ProtectedKeyword),
+  f.createModifier(ts.SyntaxKind.ReadonlyKeyword),
+];
 const emptyPrefix = f.createTemplateHead("");
 const emptyEnding = f.createTemplateTail("");
 const spacingSuffix = f.createTemplateMiddle(" ");
@@ -20,6 +24,23 @@ const makeTemplate = (names: (ts.Identifier | string)[]) =>
     )
   );
 const parametricIndexNode = makeTemplate(["M", "P"]);
+const makeParam = ({
+  name,
+  type,
+  mod,
+}: {
+  name: string;
+  type: ts.TypeNode;
+  mod?: ts.Modifier[];
+}) =>
+  f.createParameterDeclaration(
+    undefined,
+    mod,
+    undefined,
+    name,
+    undefined,
+    type
+  );
 
 const cleanId = (path: string, method: string, suffix: string) => {
   return [method]
@@ -187,33 +208,21 @@ export class Client {
           ),
         ],
         [
-          f.createParameterDeclaration(
-            undefined,
-            undefined,
-            undefined,
-            "method",
-            undefined,
-            f.createTypeReferenceNode("M")
-          ),
-          f.createParameterDeclaration(
-            undefined,
-            undefined,
-            undefined,
-            "path",
-            undefined,
-            f.createTypeReferenceNode("P")
-          ),
-          f.createParameterDeclaration(
-            undefined,
-            undefined,
-            undefined,
-            "params",
-            undefined,
-            f.createIndexedAccessTypeNode(
+          makeParam({
+            name: "method",
+            type: f.createTypeReferenceNode("M"),
+          }),
+          makeParam({
+            name: "path",
+            type: f.createTypeReferenceNode("P"),
+          }),
+          makeParam({
+            name: "params",
+            type: f.createIndexedAccessTypeNode(
               f.createTypeReferenceNode(inputNode.name),
               parametricIndexNode
-            )
-          ),
+            ),
+          }),
         ],
         f.createTypeReferenceNode("Promise", [
           f.createIndexedAccessTypeNode(
@@ -235,17 +244,11 @@ export class Client {
           undefined,
           undefined,
           [
-            f.createParameterDeclaration(
-              undefined,
-              [
-                f.createModifier(ts.SyntaxKind.ProtectedKeyword),
-                f.createModifier(ts.SyntaxKind.ReadonlyKeyword),
-              ],
-              undefined,
-              "provider",
-              undefined,
-              f.createTypeReferenceNode(providerNode.name)
-            ),
+            makeParam({
+              mod: protectedReadonlyModifier,
+              name: "provider",
+              type: f.createTypeReferenceNode(providerNode.name),
+            }),
           ],
           f.createBlock([])
         ),
