@@ -19,6 +19,7 @@ import {
   makeTemplate,
   makeTypeParams,
   parametricIndexNode,
+  makeClassPropAssignment,
 } from "./client-helpers";
 import { methods } from "./method";
 import { mimeJson } from "./mime";
@@ -132,15 +133,7 @@ export class Client {
       "ExpressZodAPIClient",
       makeInitializingConstructor(
         [makeParam("provider", f.createTypeReferenceNode(providerNode.name))],
-        [
-          f.createExpressionStatement(
-            f.createBinaryExpression(
-              f.createPropertyAccessExpression(f.createThis(), "provide"),
-              ts.SyntaxKind.EqualsToken,
-              f.createIdentifier("provider")
-            )
-          ),
-        ]
+        [makeClassPropAssignment("provide", "provider")]
       ),
       [
         makePublicReadonlyEmptyProp(
