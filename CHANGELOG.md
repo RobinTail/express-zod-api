@@ -2,6 +2,31 @@
 
 ## Version 6
 
+### v6.1.0-beta3
+
+- Feature #403 improvements (API Client Generator):
+  - `ExpressZodAPIClient` now accepts a function parameter of `Implementation` type.
+    - Its parameter `path` now contains substitutions of path params.
+  - Path params are being substituted by `ExpressZodAPIClient.provide()`.
+  - Call signature remains.
+
+```typescript
+// example frontend using the most simple Implementation based on fetch
+import { ExpressZodAPIClient } from "./client.ts";
+
+const client = new ExpressZodAPIClient(async (method, path, params) => {
+  const searchParams =
+    method === "get" ? `?${new URLSearchParams(params)}` : "";
+  const response = await fetch(`https://example.com${path}${searchParams}`, {
+    method,
+    body: method === "get" ? undefined : JSON.stringify(params),
+  });
+  return response.json();
+});
+
+client.provide("get", "/v1/user/retrieve", { id: "10" });
+```
+
 ### v6.1.0-beta2
 
 - Fixing bugs and taking into account path params for feature #403 (API Client Generator).
