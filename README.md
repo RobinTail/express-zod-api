@@ -44,6 +44,8 @@ Start your API server with I/O schema validation and custom middlewares in minut
    16. [Enabling compression](#enabling-compression)
    17. [Enabling HTTPS](#enabling-https)
    18. [Informing the frontend about the API](#informing-the-frontend-about-the-api)
+       1. [Generating DTS files](#generating-dts-files)
+       2. [Generating a Client](#generating-a-client) _NEW approach_
    19. [Creating a documentation](#creating-a-documentation)
 5. [Additional hints](#additional-hints)
    1. [How to test endpoints](#how-to-test-endpoints)
@@ -730,6 +732,8 @@ certifying authority. For example, you can acquire a free TLS certificate for yo
 
 ## Informing the frontend about the API
 
+### Generating DTS files
+
 You can inform your frontend about the I/O types of your endpoints by exporting them to `.d.ts` files (they only
 contain types without any executable code). To achieve that you are going to need an additional `tsconfig.dts.json`
 file with the following content:
@@ -768,6 +772,41 @@ import type {
   YourEndpointInput,
   YourEndpointResponse,
 } from "../your_backend/dts/routing";
+```
+
+### Generating a Client
+
+There is a new way of informing the frontend about the I/O types of your endpoints starting the version 6.1.0.
+The new approach offers automatic generation of a client based on routing to a typescript file.
+The generated client is flexibly configurable on the frontend side using an implementation function that
+directly makes requests to an endpoint using the libraries and methods of your choice.
+The client asserts the type of request parameters and response.
+
+```typescript
+// example client-generator.ts
+import fs from "fs";
+import { Client } from "express-zod-api";
+
+fs.writeFileSync("./frontend/client.ts", new Client(routing).print(), "utf-8");
+```
+
+```typescript
+// example frontend, simple implementation based on fetch()
+import { ExpressZodAPIClient } from "./client.ts";
+
+const client = new ExpressZodAPIClient(async (method, path, params) => {
+  const searchParams =
+    method === "get" ? `?${new URLSearchParams(params)}` : "";
+  const response = await fetch(`https://example.com${path}${searchParams}`, {
+    method,
+    headers:
+      method === "get" ? undefined : { "Content-Type": "application/json" },
+    body: method === "get" ? undefined : JSON.stringify(params),
+  });
+  return response.json();
+});
+
+client.provide("get", "/v1/user/retrieve", { id: "10" });
 ```
 
 ## Creating a documentation
