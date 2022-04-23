@@ -7,7 +7,6 @@ import {
   getMessageFromError,
   getStatusCodeFromError,
   IOSchema,
-  markOutput,
 } from "./common-helpers";
 import { getMeta, withMeta } from "./metadata";
 
@@ -34,7 +33,7 @@ export interface ResultHandlerDefinition<
   POS extends ApiResponse,
   NEG extends ApiResponse
 > {
-  getPositiveResponse: <OUT extends IOSchema>(output: OUT) => POS;
+  getPositiveResponse: (output: IOSchema) => POS;
   getNegativeResponse: () => NEG;
   handler: ResultHandler<z.output<POS["schema"]> | z.output<NEG["schema"]>>;
 }
@@ -47,12 +46,12 @@ export const createResultHandler = <
 ) => definition;
 
 export const defaultResultHandler = createResultHandler({
-  getPositiveResponse: <OUT extends IOSchema>(output: OUT) => {
+  getPositiveResponse: (output: IOSchema) => {
     const examples = getMeta(output, "examples") || [];
     const responseSchema = withMeta(
       z.object({
         status: z.literal("success"),
-        data: markOutput(output),
+        data: output,
       })
     );
     for (const example of examples) {
