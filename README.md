@@ -807,6 +807,7 @@ const client = new ExpressZodAPIClient(async (method, path, params) => {
 });
 
 client.provide("get", "/v1/user/retrieve", { id: "10" });
+client.provide("post", "/v1/user/:id", { id: "10" }); // it also substitues path params
 ```
 
 ## Creating a documentation
