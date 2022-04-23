@@ -115,11 +115,17 @@ export type Provider = <M extends Method, P extends Path>(
   params: Input[`${M} ${P}`]
 ) => Promise<Response[`${M} ${P}`]>;
 
-/*
-export const exampleImplementation = async (
+export type Implementation = (
   method: Method,
   path: string,
   params: Record<string, any>
+) => Promise<any>;
+
+/*
+export const exampleImplementation: Implementation = async (
+  method,
+  path,
+  params
 ) => {
   const searchParams =
     method === "get" ? `?${new URLSearchParams(params)}` : "";
@@ -137,13 +143,7 @@ const client = new ExpressZodAPIClient(exampleImplementation);
 client.provide("get", "/v1/user/retrieve", { id: "10" });
 */
 export class ExpressZodAPIClient {
-  constructor(
-    protected readonly implementation: (
-      method: Method,
-      path: string,
-      params: Record<string, any>
-    ) => Promise<any>
-  ) {}
+  constructor(protected readonly implementation: Implementation) {}
   public readonly provide: Provider = (method, path, params) =>
     this.implementation(
       method,

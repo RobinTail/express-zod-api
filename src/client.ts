@@ -132,23 +132,28 @@ export class Client {
       )
     );
 
+    const implementationNode = makePublicType(
+      "Implementation",
+      f.createFunctionTypeNode(
+        undefined,
+        makeParams({
+          method: f.createTypeReferenceNode(methodNode.name),
+          path: f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
+          params: makeRecord(
+            ts.SyntaxKind.StringKeyword,
+            ts.SyntaxKind.AnyKeyword
+          ),
+        }),
+        makeAnyPromise()
+      )
+    );
+
     const clientNode = makePublicClass(
       "ExpressZodAPIClient",
       makeEmptyInitializingConstructor([
         makeParam(
           "implementation",
-          f.createFunctionTypeNode(
-            undefined,
-            makeParams({
-              method: f.createTypeReferenceNode(methodNode.name),
-              path: f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
-              params: makeRecord(
-                ts.SyntaxKind.StringKeyword,
-                ts.SyntaxKind.AnyKeyword
-              ),
-            }),
-            makeAnyPromise()
-          ),
+          f.createTypeReferenceNode(implementationNode.name),
           protectedReadonlyModifier
         ),
       ]),
@@ -194,10 +199,10 @@ export class Client {
       clientNode,
       ts.SyntaxKind.MultiLineCommentTrivia,
       "\n" +
-        "export const exampleImplementation = async (\n" +
-        "  method: Method,\n" +
-        "  path: string,\n" +
-        "  params: Record<string, any>\n" +
+        "export const exampleImplementation: Implementation = async (\n" +
+        "  method,\n" +
+        "  path,\n" +
+        "  params\n" +
         ") => {\n" +
         "  const searchParams =\n" +
         '    method === "get" ? `?${new URLSearchParams(params)}` : "";\n' +
@@ -211,7 +216,7 @@ export class Client {
         "  return response.text();\n" +
         "};\n" +
         "\n" +
-        `const client = new ExpressZodAPIClient(exampleImplementation);\n` +
+        "const client = new ExpressZodAPIClient(exampleImplementation);\n" +
         'client.provide("get", "/v1/user/retrieve", { id: "10" });\n',
       true
     );
@@ -224,6 +229,7 @@ export class Client {
       responseNode,
       jsonEndpointsNode,
       providerNode,
+      implementationNode,
       clientNode
     );
   }
