@@ -9,6 +9,11 @@ export const publicReadonlyModifier = [
   f.createModifier(ts.SyntaxKind.ReadonlyKeyword),
 ];
 
+export const protectedReadonlyModifier = [
+  f.createModifier(ts.SyntaxKind.ProtectedKeyword),
+  f.createModifier(ts.SyntaxKind.ReadonlyKeyword),
+];
+
 const emptyPrefix = f.createTemplateHead("");
 
 const emptyEnding = f.createTemplateTail("");
@@ -30,7 +35,7 @@ export const parametricIndexNode = makeTemplate(["M", "P"]);
 
 export const makeParam = (
   name: string,
-  type: ts.TypeNode,
+  type?: ts.TypeNode,
   mod?: ts.Modifier[]
 ) =>
   f.createParameterDeclaration(
@@ -43,7 +48,7 @@ export const makeParam = (
   );
 
 export const makeParams = (
-  params: Record<string, ts.TypeNode>,
+  params: Record<string, ts.TypeNode | undefined>,
   mod?: ts.Modifier[]
 ) =>
   Object.keys(params).reduce(
@@ -52,23 +57,24 @@ export const makeParams = (
   );
 
 export const makeRecord = (
-  key: ts.Identifier,
+  key: ts.Identifier | ts.KeywordTypeSyntaxKind,
   value: ts.KeywordTypeSyntaxKind
 ) =>
   f.createExpressionWithTypeArguments(f.createIdentifier("Record"), [
-    f.createTypeReferenceNode(key),
+    typeof key === "number"
+      ? f.createKeywordTypeNode(key)
+      : f.createTypeReferenceNode(key),
     f.createKeywordTypeNode(value),
   ]);
 
-export const makeInitializingConstructor = (
-  params: ts.ParameterDeclaration[],
-  statements: ts.Statement[]
+export const makeEmptyInitializingConstructor = (
+  params: ts.ParameterDeclaration[]
 ) =>
   f.createConstructorDeclaration(
     undefined,
     undefined,
     params,
-    f.createBlock(statements, true)
+    f.createBlock([])
   );
 
 export const makeClassPropAssignment = (prop: string, param: string) =>
@@ -116,14 +122,18 @@ export const makePublicType = (name: string, value: ts.TypeNode) =>
     value
   );
 
-export const makePublicReadonlyEmptyProp = (name: string, type: ts.TypeNode) =>
+export const makePublicReadonlyProp = (
+  name: string,
+  type: ts.TypeNode,
+  exp: ts.Expression
+) =>
   f.createPropertyDeclaration(
     undefined,
     publicReadonlyModifier,
     name,
     undefined,
     type,
-    undefined
+    exp
   );
 
 export const makePublicClass = (
@@ -143,6 +153,11 @@ export const makePublicClass = (
 export const makeIndexedPromise = (type: ts.Identifier, index: ts.TypeNode) =>
   f.createTypeReferenceNode("Promise", [
     f.createIndexedAccessTypeNode(f.createTypeReferenceNode(type), index),
+  ]);
+
+export const makeAnyPromise = () =>
+  f.createTypeReferenceNode("Promise", [
+    f.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword),
   ]);
 
 export const makePublicExtendedInterface = (
@@ -169,6 +184,51 @@ export const makeTypeParams = (params: Record<string, ts.Identifier>) =>
         )
       ),
     [] as ts.TypeParameterDeclaration[]
+  );
+
+export const makeImplementationCallFn = (
+  params: string[],
+  args: ts.Expression[]
+) =>
+  f.createArrowFunction(
+    undefined,
+    undefined,
+    params.map((key) => makeParam(key)),
+    undefined,
+    undefined,
+    f.createCallExpression(
+      f.createPropertyAccessExpression(f.createThis(), "implementation"),
+      undefined,
+      args
+    )
+  );
+
+export const makeObjectKeysReducer = (
+  obj: string,
+  exp: ts.Expression,
+  initial: ts.Expression
+) =>
+  f.createCallExpression(
+    f.createPropertyAccessExpression(
+      f.createCallExpression(
+        f.createPropertyAccessExpression(f.createIdentifier("Object"), "keys"),
+        undefined,
+        [f.createIdentifier(obj)]
+      ),
+      "reduce"
+    ),
+    undefined,
+    [
+      f.createArrowFunction(
+        undefined,
+        undefined,
+        makeParams({ acc: undefined, key: undefined }),
+        undefined,
+        undefined,
+        exp
+      ),
+      initial,
+    ]
   );
 
 export const cleanId = (path: string, method: string, suffix: string) => {

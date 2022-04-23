@@ -4,8 +4,8 @@ import { config } from "../../example/config";
 import { waitFor } from "../helpers";
 import {
   ExpressZodAPIClient,
-  Provider,
   jsonEndpoints,
+  Method,
 } from "../../example/example.client";
 import fetch from "node-fetch";
 
@@ -31,13 +31,13 @@ describe("Example", () => {
     out = "";
   });
 
-  const createDefaultProvider =
-    (host: string): Provider =>
-    async (method, path, params) => {
-      const urlParams =
-        method === "get" ? new URLSearchParams(params).toString() : "";
-      const response = await fetch(`${host}${path}?${urlParams}`, {
-        method: `${method}`,
+  const createDefaultImplementation =
+    (host: string) =>
+    async (method: Method, path: string, params: Record<string, any>) => {
+      const searchParams =
+        method === "get" ? `?${new URLSearchParams(params)}` : "";
+      const response = await fetch(`${host}${path}${searchParams}`, {
+        method,
         body: method === "get" ? undefined : JSON.stringify(params),
       });
       if (`${method} ${path}` in jsonEndpoints) {
@@ -47,7 +47,7 @@ describe("Example", () => {
     };
 
   const client = new ExpressZodAPIClient(
-    createDefaultProvider(`http://localhost:${config.server.listen}`)
+    createDefaultImplementation(`http://localhost:${config.server.listen}`)
   );
 
   test("Should listen", async () => {

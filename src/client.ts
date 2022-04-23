@@ -4,22 +4,25 @@ import {
   cleanId,
   exportModifier,
   f,
+  makeAnyPromise,
   makeConst,
-  makeInitializingConstructor,
+  makeEmptyInitializingConstructor,
+  makeImplementationCallFn,
   makeIndexedPromise,
+  makeObjectKeysReducer,
   makeParam,
   makeParams,
   makePublicClass,
   makePublicExtendedInterface,
   makePublicLiteralType,
-  makePublicReadonlyEmptyProp,
+  makePublicReadonlyProp,
   makePublicType,
   makeQuotedProp,
   makeRecord,
   makeTemplate,
   makeTypeParams,
   parametricIndexNode,
-  makeClassPropAssignment,
+  protectedReadonlyModifier,
 } from "./client-helpers";
 import { methods } from "./method";
 import { mimeJson } from "./mime";
@@ -131,14 +134,58 @@ export class Client {
 
     const clientNode = makePublicClass(
       "ExpressZodAPIClient",
-      makeInitializingConstructor(
-        [makeParam("provider", f.createTypeReferenceNode(providerNode.name))],
-        [makeClassPropAssignment("provide", "provider")]
-      ),
+      makeEmptyInitializingConstructor([
+        makeParam(
+          "implementation",
+          f.createFunctionTypeNode(
+            undefined,
+            makeParams({
+              method: f.createTypeReferenceNode(methodNode.name),
+              path: f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
+              params: makeRecord(
+                ts.SyntaxKind.StringKeyword,
+                ts.SyntaxKind.AnyKeyword
+              ),
+            }),
+            makeAnyPromise()
+          ),
+          protectedReadonlyModifier
+        ),
+      ]),
       [
-        makePublicReadonlyEmptyProp(
+        makePublicReadonlyProp(
           "provide",
-          f.createTypeReferenceNode(providerNode.name)
+          f.createTypeReferenceNode(providerNode.name),
+          makeImplementationCallFn(
+            ["method", "path", "params"],
+            [
+              f.createIdentifier("method"),
+              makeObjectKeysReducer(
+                "params",
+                f.createCallExpression(
+                  f.createPropertyAccessExpression(
+                    f.createIdentifier("acc"),
+                    "replace"
+                  ),
+                  undefined,
+                  [
+                    f.createTemplateExpression(f.createTemplateHead(":"), [
+                      f.createTemplateSpan(
+                        f.createIdentifier("key"),
+                        f.createTemplateTail("")
+                      ),
+                    ]),
+                    f.createElementAccessExpression(
+                      f.createIdentifier("params"),
+                      f.createIdentifier("key")
+                    ),
+                  ]
+                ),
+                f.createIdentifier("path")
+              ),
+              f.createIdentifier("params"),
+            ]
+          )
         ),
       ]
     );
@@ -147,13 +194,14 @@ export class Client {
       clientNode,
       ts.SyntaxKind.MultiLineCommentTrivia,
       "\n" +
-        "export const exampleProvider: Provider = async (method, path, params) => {\n" +
-        "  const pathWithParams =\n" +
-        "    Object.keys(params).reduce(\n" +
-        "      (acc, key) => acc.replace(`:${key}`, params[key]),\n" +
-        "      path\n" +
-        '    ) + (method === "get" ? `?${new URLSearchParams(params)}` : "");\n' +
-        "  const response = await fetch(`https://example.com${pathWithParams}`, {" +
+        "export const exampleImplementation = async (\n" +
+        "  method: Method,\n" +
+        "  path: string,\n" +
+        "  params: Record<string, any>\n" +
+        ") => {\n" +
+        "  const searchParams =\n" +
+        '    method === "get" ? `?${new URLSearchParams(params)}` : "";\n' +
+        "  const response = await fetch(`https://example.com${path}${searchParams}`, {\n" +
         "    method,\n" +
         '    body: method === "get" ? undefined : JSON.stringify(params),\n' +
         "  });\n" +
@@ -163,7 +211,7 @@ export class Client {
         "  return response.text();\n" +
         "};\n" +
         "\n" +
-        `const client = new ${clientNode.name!.text}(exampleProvider);\n` +
+        `const client = new ExpressZodAPIClient(exampleImplementation);\n` +
         'client.provide("get", "/v1/user/retrieve", { id: "10" });\n',
       true
     );
