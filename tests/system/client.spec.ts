@@ -38,6 +38,8 @@ describe("Example", () => {
         method === "get" ? `?${new URLSearchParams(params)}` : "";
       const response = await fetch(`${host}${path}${searchParams}`, {
         method,
+        headers:
+          method === "get" ? undefined : { "Content-Type": "application/json" },
         body: method === "get" ? undefined : JSON.stringify(params),
       });
       if (`${method} ${path}` in jsonEndpoints) {

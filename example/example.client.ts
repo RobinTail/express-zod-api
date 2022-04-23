@@ -131,6 +131,8 @@ export const exampleImplementation: Implementation = async (
     method === "get" ? `?${new URLSearchParams(params)}` : "";
   const response = await fetch(`https://example.com${path}${searchParams}`, {
     method,
+    headers:
+      method === "get" ? undefined : { "Content-Type": "application/json" },
     body: method === "get" ? undefined : JSON.stringify(params),
   });
   if (`${method} ${path}` in jsonEndpoints) {

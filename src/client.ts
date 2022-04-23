@@ -243,6 +243,8 @@ export class Client {
         '    method === "get" ? `?${new URLSearchParams(params)}` : "";\n' +
         "  const response = await fetch(`https://example.com${path}${searchParams}`, {\n" +
         "    method,\n" +
+        "    headers:\n" +
+        '      method === "get" ? undefined : { "Content-Type": "application/json" },\n' +
         '    body: method === "get" ? undefined : JSON.stringify(params),\n' +
         "  });\n" +
         "  if (`${method} ${path}` in jsonEndpoints) {\n" +
