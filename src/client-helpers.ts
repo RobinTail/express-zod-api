@@ -77,15 +77,6 @@ export const makeEmptyInitializingConstructor = (
     f.createBlock([])
   );
 
-export const makeClassPropAssignment = (prop: string, param: string) =>
-  f.createExpressionStatement(
-    f.createBinaryExpression(
-      f.createPropertyAccessExpression(f.createThis(), prop),
-      ts.SyntaxKind.EqualsToken,
-      f.createIdentifier(param)
-    )
-  );
-
 export const makeQuotedProp = (name: string, ref: string) =>
   f.createPropertySignature(
     undefined,
