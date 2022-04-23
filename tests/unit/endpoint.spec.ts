@@ -1,12 +1,8 @@
-import { expectType } from "tsd";
 import {
   z,
   EndpointsFactory,
   createMiddleware,
   defaultResultHandler,
-  EndpointInput,
-  EndpointOutput,
-  EndpointResponse,
   defaultEndpointsFactory,
   createResultHandler,
   createApiResponse,
@@ -367,132 +363,6 @@ describe("Endpoint", () => {
         handler: jest.fn(),
       });
       expect(endpoint.getNegativeMimeTypes()).toEqual(["application/json"]);
-    });
-  });
-
-  describe("EndpointInput<>", () => {
-    test("should be the type of input schema before transformations", () => {
-      const factory = new EndpointsFactory(defaultResultHandler);
-      const input = z.object({
-        something: z.number().transform((value) => `${value}`),
-      });
-      const endpoint = factory.build({
-        method: "get",
-        input,
-        output: z.object({}),
-        handler: jest.fn(),
-      });
-      expectType<EndpointInput<typeof endpoint>>(input._input);
-    });
-
-    test("should also include inputs of middlewares", () => {
-      const mInput = z.object({
-        key: z.string(),
-      });
-      const factory = new EndpointsFactory(defaultResultHandler).addMiddleware({
-        input: mInput,
-        middleware: jest.fn(),
-      });
-      const input = z.object({
-        something: z.number().transform((value) => `${value}`),
-      });
-      const mInput2 = z.object({
-        token: z.string(),
-      });
-      const endpoint = factory
-        .addMiddleware({
-          input: mInput2,
-          middleware: jest.fn(),
-        })
-        .build({
-          method: "get",
-          input,
-          output: z.object({}),
-          handler: jest.fn(),
-        });
-      expectType<EndpointInput<typeof endpoint>>({
-        ...input._input,
-        ...mInput._input,
-        ...mInput2._input,
-      });
-    });
-
-    test("should handle z.dateIn() correctly", () => {
-      const factory = new EndpointsFactory(defaultResultHandler);
-      const endpoint = factory.build({
-        method: "get",
-        output: z.object({}),
-        input: z.object({
-          birthday: z.dateIn(),
-        }),
-        handler: jest.fn(),
-      });
-      expectType<EndpointInput<typeof endpoint>>({
-        birthday: "1984-12-31T00:00:00Z",
-      });
-    });
-  });
-
-  describe("EndpointOutput<>", () => {
-    test("should be the type of output schema after transformations", () => {
-      const factory = new EndpointsFactory(defaultResultHandler);
-      const output = z.object({
-        something: z.number().transform((value) => `${value}`),
-      });
-      const endpoint = factory.build({
-        method: "get",
-        input: z.object({}),
-        output,
-        handler: jest.fn(),
-      });
-      expectType<EndpointOutput<typeof endpoint>>(output._output);
-    });
-  });
-
-  describe("EndpointResponse<>", () => {
-    test("should be the type declared in the result handler including positive and negative ones", () => {
-      const factory = new EndpointsFactory(defaultResultHandler);
-      const output = z.object({
-        something: z.number().transform((value) => `${value}`),
-      });
-      const endpoint = factory.build({
-        method: "get",
-        input: z.object({}),
-        output,
-        handler: jest.fn(),
-      });
-      expectType<EndpointResponse<typeof endpoint>>({
-        status: "success",
-        data: output._output,
-      });
-      expectType<EndpointResponse<typeof endpoint>>({
-        status: "error",
-        error: {
-          message: "some error",
-        },
-      });
-    });
-
-    test("should handle z.dateOut() correctly", () => {
-      const factory = new EndpointsFactory(defaultResultHandler);
-      const endpoint = factory.build({
-        method: "get",
-        input: z.object({}),
-        output: z.object({
-          birthday: z.dateOut(),
-        }),
-        handler: jest.fn(),
-      });
-      expectType<EndpointResponse<typeof endpoint>>({
-        status: "success",
-        data: { birthday: "1984-12-31T00:00:00Z" },
-      });
-      expectType<EndpointResponse<typeof endpoint>>({
-        status: "error",
-        error: {
-          message: "some error",
-        },
-      });
     });
   });
 
