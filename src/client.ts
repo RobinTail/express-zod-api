@@ -242,7 +242,7 @@ export class Client {
         "  const searchParams =\n" +
         '    method === "get" ? `?${new URLSearchParams(params)}` : "";\n' +
         "  const response = await fetch(`https://example.com${path}${searchParams}`, {\n" +
-        "    method,\n" +
+        "    method: method.toUpperCase(),\n" +
         "    headers:\n" +
         '      method === "get" ? undefined : { "Content-Type": "application/json" },\n' +
         '    body: method === "get" ? undefined : JSON.stringify(params),\n' +

@@ -37,7 +37,7 @@ describe("Example", () => {
       const searchParams =
         method === "get" ? `?${new URLSearchParams(params)}` : "";
       const response = await fetch(`${host}${path}${searchParams}`, {
-        method,
+        method: method.toUpperCase(),
         headers:
           method === "get" ? undefined : { "Content-Type": "application/json" },
         body: method === "get" ? undefined : JSON.stringify(params),
