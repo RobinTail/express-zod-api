@@ -2,50 +2,16 @@
 
 ## Version 6
 
-### v6.1.0-beta4
+### v6.1.0
 
-- Feature #403 improvements (API Client Generator):
-  - Path params are excluded from `params` after being substituted.
-
-### v6.1.0-beta3
-
-- Feature #403 improvements (API Client Generator):
-  - `ExpressZodAPIClient` now accepts a function parameter of `Implementation` type.
-    - Its parameter `path` now contains substitutions of path params.
-  - Path params are being substituted by `ExpressZodAPIClient.provide()`.
-  - Call signature remains.
-
-```typescript
-// example frontend using the most simple Implementation based on fetch
-import { ExpressZodAPIClient } from "./client.ts";
-
-const client = new ExpressZodAPIClient(async (method, path, params) => {
-  const searchParams =
-    method === "get" ? `?${new URLSearchParams(params)}` : "";
-  const response = await fetch(`https://example.com${path}${searchParams}`, {
-    method,
-    body: method === "get" ? undefined : JSON.stringify(params),
-  });
-  return response.json();
-});
-
-client.provide("get", "/v1/user/retrieve", { id: "10" });
-```
-
-### v6.1.0-beta2
-
-- Fixing bugs and taking into account path params for feature #403 (API Client Generator).
-
-### v6.1.0-beta1
-
-- This is a beta release of a new feature for public testing.
 - Feature #403: API Client Generator.
-  - A new way of informing the frontend about the I/O types of endpoints is proposed.
+  - A new way of informing the frontend about the I/O types of endpoints.
   - The new approach offers automatic generation of a client based on routing to a typescript file.
-  - The generated client is flexibly configured on the frontend using a provider function that directly makes a
-    request to the endpoint using the libraries and methods of your choice.
-  - The client asserts the type request and response.
-  - More details coming soon.
+  - The generated client is flexibly configurable on the frontend side using an implementation function that
+    directly makes requests to an endpoint using the libraries and methods of your choice.
+  - The client asserts the type of request parameters and response.
+- Changes since `beta4`:
+  - Add missing headers to example implementation.
 
 ```typescript
 // example client-generator.ts
@@ -56,14 +22,16 @@ fs.writeFileSync("./frontend/client.ts", new Client(routing).print(), "utf-8");
 ```
 
 ```typescript
-// example frontend using the most simple provider based on fetch
+// example frontend using the most simple Implementation based on fetch
 import { ExpressZodAPIClient } from "./client.ts";
 
 const client = new ExpressZodAPIClient(async (method, path, params) => {
-  const urlParams =
-    method === "get" ? new URLSearchParams(params).toString() : "";
-  const response = await fetch(`https://example.com${path}?${urlParams}`, {
+  const searchParams =
+    method === "get" ? `?${new URLSearchParams(params)}` : "";
+  const response = await fetch(`https://example.com${path}${searchParams}`, {
     method,
+    headers:
+      method === "get" ? undefined : { "Content-Type": "application/json" },
     body: method === "get" ? undefined : JSON.stringify(params),
   });
   return response.json();
@@ -71,6 +39,25 @@ const client = new ExpressZodAPIClient(async (method, path, params) => {
 
 client.provide("get", "/v1/user/retrieve", { id: "10" });
 ```
+
+### v6.1.0-beta4
+
+- Path params are excluded from `params` after being substituted.
+
+### v6.1.0-beta3
+
+- The client now accepts a function parameter of `Implementation` type.
+  - Its parameter `path` now contains substituted path params.
+
+### v6.1.0-beta2
+
+- Fixing bugs and taking into account path params.
+
+### v6.1.0-beta1
+
+- This is a beta release of a new feature for public testing.
+- Feature #403: API Client Generator.
+  - More details coming soon.
 
 ### v6.0.3
 
