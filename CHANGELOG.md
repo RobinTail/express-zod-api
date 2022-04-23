@@ -2,6 +2,11 @@
 
 ## Version 6
 
+### v6.1.0-beta4
+
+- Feature #403 improvements (API Client Generator):
+  - Path params are excluded from `params` after being substituted.
+
 ### v6.1.0-beta3
 
 - Feature #403 improvements (API Client Generator):
