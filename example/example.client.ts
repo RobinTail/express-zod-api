@@ -151,6 +151,10 @@ export class ExpressZodAPIClient {
         (acc, key) => acc.replace(`:${key}`, params[key]),
         path
       ),
-      params
+      Object.keys(params).reduce(
+        (acc, key) =>
+          path.indexOf(`:${key}`) >= 0 ? acc : { ...acc, [key]: params[key] },
+        {}
+      )
     );
 }

@@ -148,6 +148,16 @@ export class Client {
       )
     );
 
+    const keyParamExpression = f.createTemplateExpression(
+      f.createTemplateHead(":"),
+      [
+        f.createTemplateSpan(
+          f.createIdentifier("key"),
+          f.createTemplateTail("")
+        ),
+      ]
+    );
+
     const clientNode = makePublicClass(
       "ExpressZodAPIClient",
       makeEmptyInitializingConstructor([
@@ -174,12 +184,7 @@ export class Client {
                   ),
                   undefined,
                   [
-                    f.createTemplateExpression(f.createTemplateHead(":"), [
-                      f.createTemplateSpan(
-                        f.createIdentifier("key"),
-                        f.createTemplateTail("")
-                      ),
-                    ]),
+                    keyParamExpression,
                     f.createElementAccessExpression(
                       f.createIdentifier("params"),
                       f.createIdentifier("key")
@@ -188,7 +193,37 @@ export class Client {
                 ),
                 f.createIdentifier("path")
               ),
-              f.createIdentifier("params"),
+              makeObjectKeysReducer(
+                "params",
+                f.createConditionalExpression(
+                  f.createBinaryExpression(
+                    f.createCallExpression(
+                      f.createPropertyAccessExpression(
+                        f.createIdentifier("path"),
+                        "indexOf"
+                      ),
+                      undefined,
+                      [keyParamExpression]
+                    ),
+                    ts.SyntaxKind.GreaterThanEqualsToken,
+                    f.createNumericLiteral(0)
+                  ),
+                  undefined,
+                  f.createIdentifier("acc"),
+                  undefined,
+                  f.createObjectLiteralExpression([
+                    f.createSpreadAssignment(f.createIdentifier("acc")),
+                    f.createPropertyAssignment(
+                      "[key]", // @todo is there a better way to do it?
+                      f.createElementAccessExpression(
+                        f.createIdentifier("params"),
+                        f.createIdentifier("key")
+                      )
+                    ),
+                  ])
+                ),
+                f.createObjectLiteralExpression()
+              ),
             ]
           )
         ),
