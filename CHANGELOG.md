@@ -2,6 +2,10 @@
 
 ## Version 6
 
+### v6.1.1
+
+- Hotfix: capitalizing the method in example implementation (Client generator).
+
 ### v6.1.0
 
 - Feature #403: API Client Generator.
