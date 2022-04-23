@@ -4,8 +4,8 @@ import { config } from "../../example/config";
 import { waitFor } from "../helpers";
 import {
   ExpressZodAPIClient,
+  Implementation,
   jsonEndpoints,
-  Method,
 } from "../../example/example.client";
 import fetch from "node-fetch";
 
@@ -32,8 +32,8 @@ describe("Example", () => {
   });
 
   const createDefaultImplementation =
-    (host: string) =>
-    async (method: Method, path: string, params: Record<string, any>) => {
+    (host: string): Implementation =>
+    async (method, path, params) => {
       const searchParams =
         method === "get" ? `?${new URLSearchParams(params)}` : "";
       const response = await fetch(`${host}${path}${searchParams}`, {
