@@ -2,6 +2,22 @@
 
 ## Version 6
 
+### v6.1.2
+
+- `express` version is 4.18.0.
+  - Various new options and fixes.
+- `zod-to-ts` version is 1.0.0.
+  - The type of optional I/O parameters in the generated Client is aligned with `zod` definition.
+
+```typescript
+interface Before {
+  foo: number | undefined;
+}
+interface After {
+  foo?: number | undefined; // the question mark added
+}
+```
+
 ### v6.1.1
 
 - Hotfix: capitalizing the method in example implementation (Client generator).
