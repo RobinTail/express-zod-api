@@ -129,3 +129,69 @@ export class ExpressZodAPIClient {
     public readonly provide: Provider = (method, path, params) => this.implementation(method, Object.keys(params).reduce((acc, key) => acc.replace(\`:\${key}\`, params[key]), path), Object.keys(params).reduce((acc, key) => path.indexOf(\`:\${key}\`) >= 0 ? acc : { ...acc, [key]: params[key] }, {}));
 }"
 `;
+
+exports[`API Client Generator Should treat optionals the same way as z.infer() 1`] = `
+"type PostV1TestInput = {
+    opt?: string | undefined;
+};
+
+type PostV1TestResponse = {
+    status: \\"success\\";
+    data: {
+        similar?: number | undefined;
+    };
+} | {
+    status: \\"error\\";
+    error: {
+        message: string;
+    };
+};
+
+export type Path = \\"/v1/test\\";
+
+export type Method = \\"get\\" | \\"post\\" | \\"put\\" | \\"delete\\" | \\"patch\\";
+
+export type MethodPath = \`\${Method} \${Path}\`;
+
+export interface Input extends Record<MethodPath, any> {
+    \\"post /v1/test\\": PostV1TestInput;
+}
+
+export interface Response extends Record<MethodPath, any> {
+    \\"post /v1/test\\": PostV1TestResponse;
+}
+
+export const jsonEndpoints = { \\"post /v1/test\\": true };
+
+export type Provider = <M extends Method, P extends Path>(method: M, path: P, params: Input[\`\${M} \${P}\`]) => Promise<Response[\`\${M} \${P}\`]>;
+
+export type Implementation = (method: Method, path: string, params: Record<string, any>) => Promise<any>;
+
+/*
+export const exampleImplementation: Implementation = async (
+  method,
+  path,
+  params
+) => {
+  const searchParams =
+    method === \\"get\\" ? \`?\${new URLSearchParams(params)}\` : \\"\\";
+  const response = await fetch(\`https://example.com\${path}\${searchParams}\`, {
+    method: method.toUpperCase(),
+    headers:
+      method === \\"get\\" ? undefined : { \\"Content-Type\\": \\"application/json\\" },
+    body: method === \\"get\\" ? undefined : JSON.stringify(params),
+  });
+  if (\`\${method} \${path}\` in jsonEndpoints) {
+    return response.json();
+  }
+  return response.text();
+};
+
+const client = new ExpressZodAPIClient(exampleImplementation);
+client.provide(\\"get\\", \\"/v1/user/retrieve\\", { id: \\"10\\" });
+*/
+export class ExpressZodAPIClient {
+    constructor(protected readonly implementation: Implementation) { }
+    public readonly provide: Provider = (method, path, params) => this.implementation(method, Object.keys(params).reduce((acc, key) => acc.replace(\`:\${key}\`, params[key]), path), Object.keys(params).reduce((acc, key) => path.indexOf(\`:\${key}\`) >= 0 ? acc : { ...acc, [key]: params[key] }, {}));
+}"
+`;
