@@ -2,6 +2,11 @@
 
 ## Version 6
 
+### v6.1.3
+
+- `express` version is 4.18.1.
+- `zod-to-ts` version is 1.0.1.
+
 ### v6.1.2
 
 - `express` version is 4.18.0.
