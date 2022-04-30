@@ -39,6 +39,11 @@ export abstract class AbstractEndpoint {
   public abstract getNegativeMimeTypes(): string[];
 }
 
+/**
+ * @deprecated this utility type is going to be removed in the next major update
+ * @deprecated use Client generator for exporting the types of your API endpoints
+ * @see Client
+ * */
 export type EndpointInput<T> = T extends Endpoint<
   infer IN,
   any,
@@ -50,6 +55,11 @@ export type EndpointInput<T> = T extends Endpoint<
   ? z.input<IN>
   : never;
 
+/**
+ * @deprecated this utility type is going to be removed in the next major update
+ * @deprecated use Client generator for exporting the types of your API endpoints
+ * @see Client
+ * */
 export type EndpointOutput<T> = T extends Endpoint<
   any,
   infer OUT,
@@ -61,6 +71,11 @@ export type EndpointOutput<T> = T extends Endpoint<
   ? z.output<OUT>
   : never;
 
+/**
+ * @deprecated this utility type is going to be removed in the next major update
+ * @deprecated use Client generator for exporting the types of your API endpoints
+ * @see Client
+ * */
 export type EndpointResponse<E extends AbstractEndpoint> =
   | z.output<
       ReturnType<

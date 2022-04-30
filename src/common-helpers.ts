@@ -25,6 +25,12 @@ export type ArrayElement<T extends readonly unknown[]> =
   T extends readonly (infer K)[] ? K : never;
 
 export type OutputMarker = IOSchema & { _typeGuard: "OutputMarker" };
+
+/**
+ * @deprecated this method is going to be removed in the next major update
+ * @deprecated use Client generator for exporting the types of your API endpoints
+ * @see Client
+ * */
 export const markOutput = (output: IOSchema) => output as OutputMarker;
 
 /** @see https://expressjs.com/en/guide/routing.html */
