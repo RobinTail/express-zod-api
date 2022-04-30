@@ -2,6 +2,16 @@
 
 ## Version 6
 
+### v6.1.4
+
+- The following methods and utility types have been marked as deprecated:
+  - `markOutput()`,
+  - `EndpointInput<>`,
+  - `EndpointOutput<>`,
+  - `EndpointResponse<>`.
+- These entities were used for informing the Frontend on types of API endpoints.
+- Instead, consider the new approach on generating a Frontend Client (see Readme).
+
 ### v6.1.3
 
 - `express` version is 4.18.1.
