@@ -43,9 +43,7 @@ Start your API server with I/O schema validation and custom middlewares in minut
    15. [Customizing input sources](#customizing-input-sources)
    16. [Enabling compression](#enabling-compression)
    17. [Enabling HTTPS](#enabling-https)
-   18. [Informing the frontend about the API](#informing-the-frontend-about-the-api)
-       1. [Generating DTS files](#generating-dts-files)
-       2. [Generating a Client](#generating-a-client) _NEW approach_
+   18. [Generating a Frontend Client](#generating-a-frontend-client)
    19. [Creating a documentation](#creating-a-documentation)
 5. [Additional hints](#additional-hints)
    1. [How to test endpoints](#how-to-test-endpoints)
@@ -730,51 +728,7 @@ At least you need to specify the port or socket (usually it is 443), certificate
 certifying authority. For example, you can acquire a free TLS certificate for your API at
 [Let's Encrypt](https://letsencrypt.org/).
 
-## Informing the frontend about the API
-
-### Generating DTS files
-
-You can inform your frontend about the I/O types of your endpoints by exporting them to `.d.ts` files (they only
-contain types without any executable code). To achieve that you are going to need an additional `tsconfig.dts.json`
-file with the following content:
-
-```json
-{
-  "extends": "./tsconfig.json",
-  "compilerOptions": {
-    "outDir": "dts",
-    "declaration": true,
-    "emitDeclarationOnly": true
-  }
-}
-```
-
-Most likely you have a file with all the configured routing, in which you can do the following:
-
-```typescript
-import { EndpointInput, EndpointResponse } from "express-zod-api";
-
-export type YourEndpointInput = EndpointInput<typeof yourEndpoint>;
-export type YourEndpointResponse = EndpointResponse<typeof yourEndpoint>;
-```
-
-By executing the following command you'll get the compiled `/dts/routing.d.ts` file.
-
-```shell
-yarn tsc -p tsconfig.dts.json
-```
-
-The command might become a part of your CI/CD.
-Then import the I/O type of your endpoint from the compiled file using `import type` syntax on the frontend.
-
-```typescript
-import type {
-  YourEndpointInput,
-  YourEndpointResponse,
-} from "../your_backend/dts/routing";
-```
-
-### Generating a Client
+## Generating a Frontend Client
 
 There is a new way of informing the frontend about the I/O types of your endpoints starting the version 6.1.0.
 The new approach offers automatic generation of a client based on routing to a typescript file.
