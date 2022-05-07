@@ -5091,7 +5091,7 @@ zod-to-ts@1.0.1:
   resolved "https://registry.yarnpkg.com/zod-to-ts/-/zod-to-ts-1.0.1.tgz#69a58c0c7aa97d427060dc5f11ea84bd32e62364"
   integrity sha512-SoblitPNZo+Q+FK+sLfj8y4Q1HxgvO7F+0GbtArAMs/SLGCP6FuxTV+t5iKCo6qy5rq3X2t7i1djTU+NqJv5Cw==
 
-zod@3.14.4:
-  version "3.14.4"
-  resolved "https://registry.yarnpkg.com/zod/-/zod-3.14.4.tgz#e678fe9e5469f4663165a5c35c8f3dc66334a5d6"
-  integrity sha512-U9BFLb2GO34Sfo9IUYp0w3wJLlmcyGoMd75qU9yf+DrdGA4kEx6e+l9KOkAlyUO0PSQzZCa3TR4qVlcmwqSDuw==
+zod@3.15.1:
+  version "3.15.1"
+  resolved "https://registry.yarnpkg.com/zod/-/zod-3.15.1.tgz#9e404cd8002ccffb03baa94cff2e1638ed49d82f"
+  integrity sha512-WAdjcoOxa4S9oc/u7fTbC3CC7uVqptLLU0LKqS8RDBOrCXp2t5avM8BUfgNVZJymGWAx6SEUYxWPPoYuQ5rgwQ==
