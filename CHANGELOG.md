@@ -2,6 +2,10 @@
 
 ## Version 6
 
+### v6.1.4
+
+- `zod` version is 3.15.1.
+
 ### v6.1.3
 
 - `express` version is 4.18.1.
