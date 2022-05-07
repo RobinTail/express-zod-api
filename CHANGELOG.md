@@ -2,7 +2,7 @@
 
 ## Version 6
 
-### v6.1.4
+### v6.2.0
 
 - The following methods and utility types have been marked as deprecated:
   - `markOutput()`,
@@ -11,6 +11,10 @@
   - `EndpointResponse<>`.
 - These entities were used for informing the Frontend on types of API endpoints.
 - Instead, consider the new approach on generating a Frontend Client (see Readme).
+
+### v6.1.4
+
+- `zod` version is 3.15.1.
 
 ### v6.1.3
 

@@ -454,7 +454,8 @@ export const depictEffect: DepictHelper<z.ZodEffects<z.ZodTypeAny>> = ({
           ? null
           : "array" === input.type
           ? []
-          : undefined
+          : undefined,
+        { addIssue: () => {}, path: [] }
       );
     } catch (e) {
       /**/
