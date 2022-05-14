@@ -2,6 +2,10 @@
 
 ## Version 6
 
+### v6.2.1
+
+- `zod` version is 3.16.0.
+
 ### v6.2.0
 
 - The following methods and utility types have been marked as deprecated:
