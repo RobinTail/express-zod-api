@@ -450,16 +450,13 @@ import {
   createResultHandler,
   createApiResponse,
   IOSchema,
-  markOutput,
   z,
 } from "express-zod-api";
 
 export const yourResultHandler = createResultHandler({
-  getPositiveResponse: <OUT extends IOSchema>(output: OUT) =>
+  getPositiveResponse: (output: IOSchema) =>
     createApiResponse(
-      z.object({
-        data: markOutput(output),
-      }),
+      z.object({ data: output }),
       "application/json" // optional, or array of mime types
     ),
   getNegativeResponse: () => createApiResponse(z.object({ error: z.string() })),
