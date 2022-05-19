@@ -4,13 +4,7 @@ import { z } from "zod";
 import { ApiResponse } from "./api-response";
 import { CommonConfig } from "./config-type";
 import { ResultHandlerError } from "./errors";
-import {
-  FlatObject,
-  getInitialInput,
-  IOSchema,
-  OutputMarker,
-  ReplaceMarkerInShape,
-} from "./common-helpers";
+import { FlatObject, getInitialInput, IOSchema } from "./common-helpers";
 import { Method, MethodsDefinition } from "./method";
 import { AnyMiddlewareDef } from "./middleware";
 import { lastResortHandler, ResultHandlerDefinition } from "./result-handler";
@@ -38,60 +32,6 @@ export abstract class AbstractEndpoint {
   public abstract getPositiveMimeTypes(): string[];
   public abstract getNegativeMimeTypes(): string[];
 }
-
-/**
- * @deprecated this utility type is going to be removed in the next major update
- * @deprecated use Client generator for exporting the types of your API endpoints
- * @see Client
- * */
-export type EndpointInput<T> = T extends Endpoint<
-  infer IN,
-  any,
-  any,
-  any,
-  any,
-  any
->
-  ? z.input<IN>
-  : never;
-
-/**
- * @deprecated this utility type is going to be removed in the next major update
- * @deprecated use Client generator for exporting the types of your API endpoints
- * @see Client
- * */
-export type EndpointOutput<T> = T extends Endpoint<
-  any,
-  infer OUT,
-  any,
-  any,
-  any,
-  any
->
-  ? z.output<OUT>
-  : never;
-
-/**
- * @deprecated this utility type is going to be removed in the next major update
- * @deprecated use Client generator for exporting the types of your API endpoints
- * @see Client
- * */
-export type EndpointResponse<E extends AbstractEndpoint> =
-  | z.output<
-      ReturnType<
-        E["getPositiveResponseSchema"]
-      > extends z.ZodObject<z.ZodRawShape> // in object response
-        ? z.ZodObject<
-            ReplaceMarkerInShape<
-              ReturnType<E["getPositiveResponseSchema"]>["_shape"],
-              ReturnType<E["getOutputSchema"]>
-            >
-          >
-        : ReturnType<E["getPositiveResponseSchema"]> extends OutputMarker // "as is" response
-        ? ReturnType<E["getOutputSchema"]>
-        : ReturnType<E["getPositiveResponseSchema"]> // explicitly defined response
-    >
-  | z.output<ReturnType<E["getNegativeResponseSchema"]>>;
 
 type EndpointProps<
   IN extends IOSchema,

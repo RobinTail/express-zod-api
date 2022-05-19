@@ -1,5 +1,20 @@
 # Changelog
 
+## Version 7
+
+### v7.0.0
+
+- The deprecated methods and utility types have been removed:
+  - `markOutput(), EndpointInput<>, EndpointOutput<>, EndpointResponse<>`.
+- In case you've been using these entities for informing the Frontend on types of your endpoints, here is what you
+  need to do in order to migrate:
+  - Replace `markOutput(output)` with just `output` in your custom result handlers;
+  - Replace the type signature of `getPositiveResponse()` method of your custom result handlers:
+    - from `getPositiveResponse: <OUT extends IOSchema>(output: OUT) => {...}`
+    - to `getPositiveResponse: (output: IOSchema) => {...}`
+  - Replace usage of the utility types to the generated Frontend Client:
+    - See Readme file on how to do it.
+
 ## Version 6
 
 ### v6.2.1

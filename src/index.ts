@@ -1,13 +1,8 @@
 export { createConfig, LoggerConfig } from "./config-type";
-export {
-  AbstractEndpoint,
-  EndpointInput,
-  EndpointOutput,
-  EndpointResponse,
-} from "./endpoint";
+export { AbstractEndpoint } from "./endpoint";
 export { Method } from "./method";
 export { EndpointsFactory, defaultEndpointsFactory } from "./endpoints-factory";
-export { IOSchema, FlatObject, markOutput } from "./common-helpers";
+export { IOSchema, FlatObject } from "./common-helpers";
 export { createApiResponse } from "./api-response";
 export { createLogger } from "./logger";
 export { createMiddleware } from "./middleware";
