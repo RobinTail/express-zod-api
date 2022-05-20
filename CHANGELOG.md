@@ -2,6 +2,10 @@
 
 ## Version 7
 
+### v7.1.0
+
+- Supporting Node 18.
+
 ### v7.0.0
 
 - The deprecated methods and utility types have been removed:
