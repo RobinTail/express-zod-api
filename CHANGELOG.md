@@ -2,6 +2,10 @@
 
 ## Version 7
 
+### v7.1.1
+
+- `zod` version is 3.16.1.
+
 ### v7.1.0
 
 - Supporting Node 18.
