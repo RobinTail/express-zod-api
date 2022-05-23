@@ -2,6 +2,11 @@
 
 ## Version 7
 
+### v7.2.0
+
+- `zod` version is 3.17.2.
+  - `z.string()` schema now has `.trim()` method.
+
 ### v7.1.1
 
 - `zod` version is 3.16.1.
