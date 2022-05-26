@@ -2,6 +2,12 @@
 
 ## Version 7
 
+### v7.3.0
+
+- `express-fileupload` version is 1.4.0.
+  - `busboy` upgraded from 0.3.1 to 1.6.0.
+- `zod` version is 3.17.3.
+
 ### v7.2.0
 
 - `zod` version is 3.17.2.
