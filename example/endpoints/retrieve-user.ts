@@ -9,6 +9,7 @@ export const retrieveUserEndpoint = defaultEndpointsFactory
     input: z.object({
       id: z
         .string()
+        .trim()
         .regex(/\d+/)
         .transform((id) => parseInt(id, 10))
         .describe("a numeric string containing the id of the user"),

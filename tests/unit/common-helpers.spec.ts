@@ -1,5 +1,4 @@
 import { UploadedFile } from "express-fileupload";
-import { expectType } from "tsd";
 import {
   combinations,
   defaultInputSources,
@@ -12,15 +11,8 @@ import {
   hasUpload,
   isLoggerConfig,
   isValidDate,
-  OutputMarker,
 } from "../../src/common-helpers";
-import {
-  z,
-  createHttpError,
-  markOutput,
-  withMeta,
-  createMiddleware,
-} from "../../src";
+import { z, createHttpError, withMeta, createMiddleware } from "../../src";
 import { Request } from "express";
 import { getMeta } from "../../src/metadata";
 import { AnyMiddlewareDef } from "../../src/middleware";
@@ -484,14 +476,6 @@ describe("Common Helpers", () => {
       expect(getStatusCodeFromError(new Error("something went wrong"))).toEqual(
         500
       );
-    });
-  });
-
-  describe("markOutput()", () => {
-    test("should change the type of schema", () => {
-      const output = z.object({});
-      expect(markOutput(output)).toEqual(output);
-      expectType<OutputMarker>(markOutput(output));
     });
   });
 

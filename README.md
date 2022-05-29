@@ -43,15 +43,14 @@ Start your API server with I/O schema validation and custom middlewares in minut
    15. [Customizing input sources](#customizing-input-sources)
    16. [Enabling compression](#enabling-compression)
    17. [Enabling HTTPS](#enabling-https)
-   18. [Informing the frontend about the API](#informing-the-frontend-about-the-api)
+   18. [Generating a Frontend Client](#generating-a-frontend-client)
    19. [Creating a documentation](#creating-a-documentation)
 5. [Additional hints](#additional-hints)
    1. [How to test endpoints](#how-to-test-endpoints)
    2. [Excessive properties in endpoint output](#excessive-properties-in-endpoint-output)
 6. [Your input to my output](#your-input-to-my-output)
 
-You can find the release notes in [Changelog](CHANGELOG.md). Along with recommendations for migrating from
-[v4](CHANGELOG.md#v500-beta1), [v3](CHANGELOG.md#v400), [v2](CHANGELOG.md#v300-beta1) and [v1](CHANGELOG.md#v200-beta1).
+You can find the release notes and migration guides in [Changelog](CHANGELOG.md).
 
 # Why and what is it for
 
@@ -78,7 +77,9 @@ Therefore, many basic tasks can be accomplished faster and easier, in particular
 - Web server — [Express.js](https://expressjs.com/).
 - Schema validation — [Zod 3.x](https://github.com/colinhacks/zod).
 - Logger — [Winston](https://github.com/winstonjs/winston).
-- Documenting — [OpenAPI 3.x](https://github.com/metadevpro/openapi3-ts) (formerly known as the Swagger Specification).
+- Generators:
+  - Documentation — [OpenAPI 3.x](https://github.com/metadevpro/openapi3-ts) (Swagger Specification).
+  - Client side types — [Zod-to-TS](https://github.com/sachinraja/zod-to-ts)
 - File uploads — [Express-FileUpload](https://github.com/richardgirges/express-fileupload)
   (based on [Busboy](https://github.com/mscdex/busboy))
 
@@ -448,16 +449,13 @@ import {
   createResultHandler,
   createApiResponse,
   IOSchema,
-  markOutput,
   z,
 } from "express-zod-api";
 
 export const yourResultHandler = createResultHandler({
-  getPositiveResponse: <OUT extends IOSchema>(output: OUT) =>
+  getPositiveResponse: (output: IOSchema) =>
     createApiResponse(
-      z.object({
-        data: markOutput(output),
-      }),
+      z.object({ data: output }),
       "application/json" // optional, or array of mime types
     ),
   getNegativeResponse: () => createApiResponse(z.object({ error: z.string() })),
@@ -726,46 +724,40 @@ At least you need to specify the port or socket (usually it is 443), certificate
 certifying authority. For example, you can acquire a free TLS certificate for your API at
 [Let's Encrypt](https://letsencrypt.org/).
 
-## Informing the frontend about the API
+## Generating a Frontend Client
 
-You can inform your frontend about the I/O types of your endpoints by exporting them to `.d.ts` files (they only
-contain types without any executable code). To achieve that you are going to need an additional `tsconfig.dts.json`
-file with the following content:
-
-```json
-{
-  "extends": "./tsconfig.json",
-  "compilerOptions": {
-    "outDir": "dts",
-    "declaration": true,
-    "emitDeclarationOnly": true
-  }
-}
-```
-
-Most likely you have a file with all the configured routing, in which you can do the following:
+There is a new way of informing the frontend about the I/O types of your endpoints starting the version 6.1.0.
+The new approach offers automatic generation of a client based on routing to a typescript file.
+The generated client is flexibly configurable on the frontend side using an implementation function that
+directly makes requests to an endpoint using the libraries and methods of your choice.
+The client asserts the type of request parameters and response. The feature requires Typescript version 4.1 or higher.
 
 ```typescript
-import { EndpointInput, EndpointResponse } from "express-zod-api";
+// example client-generator.ts
+import fs from "fs";
+import { Client } from "express-zod-api";
 
-export type YourEndpointInput = EndpointInput<typeof yourEndpoint>;
-export type YourEndpointResponse = EndpointResponse<typeof yourEndpoint>;
+fs.writeFileSync("./frontend/client.ts", new Client(routing).print(), "utf-8");
 ```
-
-By executing the following command you'll get the compiled `/dts/routing.d.ts` file.
-
-```shell
-yarn tsc -p tsconfig.dts.json
-```
-
-The command might become a part of your CI/CD.
-Then import the I/O type of your endpoint from the compiled file using `import type` syntax on the frontend.
 
 ```typescript
-import type {
-  YourEndpointInput,
-  YourEndpointResponse,
-} from "../your_backend/dts/routing";
+// example frontend, simple implementation based on fetch()
+import { ExpressZodAPIClient } from "./client.ts";
+
+const client = new ExpressZodAPIClient(async (method, path, params) => {
+  const searchParams =
+    method === "get" ? `?${new URLSearchParams(params)}` : "";
+  const response = await fetch(`https://example.com${path}${searchParams}`, {
+    method: method.toUpperCase(),
+    headers:
+      method === "get" ? undefined : { "Content-Type": "application/json" },
+    body: method === "get" ? undefined : JSON.stringify(params),
+  });
+  return response.json();
+});
+
+client.provide("get", "/v1/user/retrieve", { id: "10" });
+client.provide("post", "/v1/user/:id", { id: "10" }); // it also substitues path params
 ```
 
 ## Creating a documentation

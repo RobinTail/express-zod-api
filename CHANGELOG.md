@@ -1,6 +1,149 @@
 # Changelog
 
+## Version 7
+
+### v7.3.0
+
+- `express-fileupload` version is 1.4.0.
+  - `busboy` upgraded from 0.3.1 to 1.6.0.
+- `zod` version is 3.17.3.
+
+### v7.2.0
+
+- `zod` version is 3.17.2.
+  - `z.string()` schema now has `.trim()` method.
+
+### v7.1.1
+
+- `zod` version is 3.16.1.
+
+### v7.1.0
+
+- Supporting Node 18.
+
+### v7.0.0
+
+- The deprecated methods and utility types have been removed:
+  - `markOutput(), EndpointInput<>, EndpointOutput<>, EndpointResponse<>`.
+- In case you've been using these entities for informing the Frontend on types of your endpoints, here is what you
+  need to do in order to migrate:
+  - Replace `markOutput(output)` with just `output` in your custom result handlers;
+  - Replace the type signature of `getPositiveResponse()` method of your custom result handlers:
+    - from `getPositiveResponse: <OUT extends IOSchema>(output: OUT) => {...}`
+    - to `getPositiveResponse: (output: IOSchema) => {...}`
+  - Replace usage of the utility types to the generated Frontend Client:
+    - See Readme file on how to do it.
+
 ## Version 6
+
+### v6.2.1
+
+- `zod` version is 3.16.0.
+
+### v6.2.0
+
+- The following methods and utility types have been marked as deprecated:
+  - `markOutput()`,
+  - `EndpointInput<>`,
+  - `EndpointOutput<>`,
+  - `EndpointResponse<>`.
+- These entities were used for informing the Frontend on types of API endpoints.
+- Instead, consider the new approach on generating a Frontend Client (see Readme).
+
+### v6.1.4
+
+- `zod` version is 3.15.1.
+
+### v6.1.3
+
+- `express` version is 4.18.1.
+- `zod-to-ts` version is 1.0.1.
+
+### v6.1.2
+
+- `express` version is 4.18.0.
+  - Various new options and fixes.
+- `zod-to-ts` version is 1.0.0.
+  - The type of optional I/O parameters in the generated Client is aligned with `zod` definition.
+
+```typescript
+interface Before {
+  foo: number | undefined;
+}
+interface After {
+  foo?: number | undefined; // the question mark added
+}
+```
+
+### v6.1.1
+
+- Hotfix: capitalizing the method in example implementation (Client generator).
+
+### v6.1.0
+
+- Feature #403: API Client Generator.
+  - A new way of informing the frontend about the I/O types of endpoints.
+  - The new approach offers automatic generation of a client based on routing to a typescript file.
+  - The generated client is flexibly configurable on the frontend side using an implementation function that
+    directly makes requests to an endpoint using the libraries and methods of your choice.
+  - The client asserts the type of request parameters and response.
+- Changes since `beta4`:
+  - Add missing headers to example implementation.
+
+```typescript
+// example client-generator.ts
+import fs from "fs";
+import { Client } from "express-zod-api";
+
+fs.writeFileSync("./frontend/client.ts", new Client(routing).print(), "utf-8");
+```
+
+```typescript
+// example frontend using the most simple Implementation based on fetch
+import { ExpressZodAPIClient } from "./client.ts";
+
+const client = new ExpressZodAPIClient(async (method, path, params) => {
+  const searchParams =
+    method === "get" ? `?${new URLSearchParams(params)}` : "";
+  const response = await fetch(`https://example.com${path}${searchParams}`, {
+    method: method.toUpperCase(),
+    headers:
+      method === "get" ? undefined : { "Content-Type": "application/json" },
+    body: method === "get" ? undefined : JSON.stringify(params),
+  });
+  return response.json();
+});
+
+client.provide("get", "/v1/user/retrieve", { id: "10" });
+```
+
+### v6.1.0-beta4
+
+- Path params are excluded from `params` after being substituted.
+
+### v6.1.0-beta3
+
+- The client now accepts a function parameter of `Implementation` type.
+  - Its parameter `path` now contains substituted path params.
+
+### v6.1.0-beta2
+
+- Fixing bugs and taking into account path params.
+
+### v6.1.0-beta1
+
+- This is a beta release of a new feature for public testing.
+- Feature #403: API Client Generator.
+  - More details coming soon.
+
+### v6.0.3
+
+- `zod` version is 3.14.4.
+- `winston` version is 3.7.2.
+
+### v6.0.2
+
+- `zod` version is 3.14.3.
 
 ### v6.0.1
 
