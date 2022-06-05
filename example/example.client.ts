@@ -1,5 +1,5 @@
 type GetV1UserRetrieveInput = {} & {
-  id: string;
+  /** a numeric string containing the id of the user */ id: string;
 };
 
 type GetV1UserRetrieveResponse =
