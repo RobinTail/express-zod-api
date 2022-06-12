@@ -10,5 +10,6 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 16
+      - uses: fregante/setup-git-user@v1
       - run: yarn install
       - run: npm version patch
