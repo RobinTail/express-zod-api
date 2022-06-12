@@ -14,5 +14,7 @@ jobs:
         with:
           node-version: 16
       - uses: fregante/setup-git-user@v1
-      - run: yarn install
+      - run: |
+          yarn install
+          yarn install_hooks
       - run: npm version patch
