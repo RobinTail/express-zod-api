@@ -2,6 +2,9 @@ name: Patch
 
 on: workflow_dispatch
 
+permissions:
+  contents: write
+
 jobs:
   bumpVersion:
     runs-on: ubuntu-latest
