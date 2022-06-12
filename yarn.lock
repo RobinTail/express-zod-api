@@ -5110,10 +5110,10 @@ yn@3.1.1:
   resolved "https://registry.yarnpkg.com/yn/-/yn-3.1.1.tgz#1e87401a09d767c1d5eab26a6e4c185182d2eb50"
   integrity sha512-Ux4ygGWsu2c7isFWe8Yu1YluJmqVhxqK2cLXNQA5AcC3QfbGNpM7fu0Y8b/z16pXLnFxZYvWhd3fhBY9DLmC6Q==
 
-zod-to-ts@1.1.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/zod-to-ts/-/zod-to-ts-1.1.0.tgz#6ac669d8bcbb89966abb1871330337ee2068b05b"
-  integrity sha512-XZLKOdnK6Os0Wzyk8hH+iiZmhot4gcRVE0jj1cKkL/hq2E3jOltb/v+4ahSElZoKK4oCzFbjrRWW3qhmm5avdQ==
+zod-to-ts@1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/zod-to-ts/-/zod-to-ts-1.1.1.tgz#3dce0454a9a4c3f1e6aa4a3c8079e9c32885c0ec"
+  integrity sha512-7UGV+GnuKLUyJbJeyrkfMqCP8wk37dFkOwguIWN/jVL7kQg2e1N5o0SDPVodlfTutxeAP9IRXsWLoSlEnmetCA==
 
 zod@3.17.3:
   version "3.17.3"
