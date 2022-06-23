@@ -1,7 +1,7 @@
 import { mimeJson } from "../../src/mime";
 
-jest.mock("mime", () => ({
-  getType: jest.fn(() => null),
+jest.mock("mime-types", () => ({
+  lookup: jest.fn(() => null),
 }));
 
 describe("Mime", () => {
