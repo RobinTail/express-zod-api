@@ -2,6 +2,7 @@
 
 exports[`API Client Generator Should generate a client for example API 1`] = `
 "type GetV1UserRetrieveInput = {} & {
+    /** a numeric string containing the id of the user */
     id: string;
 };
 

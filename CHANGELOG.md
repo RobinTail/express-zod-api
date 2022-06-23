@@ -2,6 +2,11 @@
 
 ## Version 7
 
+### v7.3.1
+
+- `zod-to-ts` version is 1.1.1.
+  - descriptions of the properties in the generated client.
+
 ### v7.3.0
 
 - `express-fileupload` version is 1.4.0.
