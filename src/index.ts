@@ -16,7 +16,6 @@ export { OpenAPIError, DependsOnMethodError, RoutingError } from "./errors";
 export { withMeta } from "./metadata";
 export { testEndpoint } from "./mock";
 export { Client } from "./client";
-export { EZContext, EZProvider, EZContextType } from "./context";
 export { useEndpoint } from "./hook";
 
 import * as z from "./extend-zod";

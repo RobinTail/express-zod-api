@@ -1,7 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`Context initial value is mocked 1`] = `
-<div>
-  EZContext is not initialized
-</div>
-`;
