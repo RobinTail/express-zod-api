@@ -2,18 +2,23 @@ import React from "react";
 
 interface UseEndpointProps<T> {
   request: () => Promise<T>;
+  when?: boolean;
 }
 
-export const useEndpoint = <T>({ request }: UseEndpointProps<T>) => {
+export const useEndpoint = <T>({
+  request,
+  when = true,
+}: UseEndpointProps<T>) => {
   const [data, setData] = React.useState<T | null>(null);
   const [error, setError] = React.useState<Error | null>(null);
   const [isLoading, setIsLoading] = React.useState(false);
 
   const hasData = React.useMemo(() => data !== null, [data]);
   const hasError = React.useMemo(() => error !== null, [error]);
+
   const shouldRequest = React.useMemo(
-    () => !hasData && !hasError && !isLoading,
-    [hasData, hasError, isLoading]
+    () => !hasData && !hasError && !isLoading && when,
+    [hasData, hasError, isLoading, when]
   );
 
   const reset = React.useCallback(() => {

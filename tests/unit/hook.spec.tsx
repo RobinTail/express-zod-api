@@ -74,4 +74,36 @@ describe("useEndpoint() hook", () => {
     });
     await waitForNextUpdate();
   });
+
+  test("should respect the condition", async () => {
+    const { result, waitForNextUpdate, rerender } = renderHook(
+      (props) => useEndpoint(props),
+      {
+        initialProps: {
+          request: async () => "test",
+          when: false,
+        },
+      }
+    );
+    expect(result.current).toEqual({
+      data: null,
+      error: null,
+      isLoading: false,
+      reset: expect.any(Function),
+    });
+    rerender({ request: async () => "test", when: true });
+    expect(result.current).toEqual({
+      data: null,
+      error: null,
+      isLoading: true,
+      reset: expect.any(Function),
+    });
+    await waitForNextUpdate();
+    expect(result.current).toEqual({
+      data: "test",
+      error: null,
+      isLoading: false,
+      reset: expect.any(Function),
+    });
+  });
 });
