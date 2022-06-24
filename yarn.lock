@@ -1149,6 +1149,11 @@
     "@types/qs" "*"
     "@types/serve-static" "*"
 
+"@types/fast-memory-cache@^2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@types/fast-memory-cache/-/fast-memory-cache-2.0.0.tgz#ee3cf3dc71bbf4bb9d408612852bc12d64b0eb86"
+  integrity sha512-0GBUNqbZLohEA5AO79fVcFByYnBOqtfbX74I1oqxXXn5iIMM8TlvugHOA3sTkIWzzLimOjaJ2bkmmBtgzUwIEQ==
+
 "@types/graceful-fs@^4.1.2":
   version "4.1.5"
   resolved "https://registry.yarnpkg.com/@types/graceful-fs/-/graceful-fs-4.1.5.tgz#21ffba0d98da4350db64891f92a9e5db3cdb4e15"
@@ -2537,6 +2542,11 @@ fast-levenshtein@^2.0.6, fast-levenshtein@~2.0.6:
   version "2.0.6"
   resolved "https://registry.yarnpkg.com/fast-levenshtein/-/fast-levenshtein-2.0.6.tgz#3d8a5c66883a16a30ca8643e851f19baa7797917"
   integrity sha1-PYpcZog6FqMMqGQ+hR8Zuqd5eRc=
+
+fast-memory-cache@2.0.4:
+  version "2.0.4"
+  resolved "https://registry.yarnpkg.com/fast-memory-cache/-/fast-memory-cache-2.0.4.tgz#aaac59efb56c17fe4ebf6f7c095db210f58cfb4d"
+  integrity sha512-lMHyGIeRw1M2DBaK0TwjuSodh29T6ftvqkidb7kckQ9DnMDBF0ItvRI6USSgvy+cEMaqkr6ZL6W1Q4vL/0kA7g==
 
 fastq@^1.6.0:
   version "1.13.0"

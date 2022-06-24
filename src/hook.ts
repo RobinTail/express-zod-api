@@ -1,4 +1,5 @@
 import React from "react";
+import { AbstractCache, DefaultCache } from "./cache";
 
 interface UseEndpointProps<T> {
   /** @desc call the ExpressZodAPIClient::provide() method here */
@@ -7,12 +8,18 @@ interface UseEndpointProps<T> {
   when?: boolean | (() => boolean);
   /** @desc observe changes of the specified variables and refresh the data accordingly */
   watch?: any[];
+  cache?: {
+    provider?: AbstractCache;
+    key: () => string;
+    expireInSeconds?: number;
+  };
 }
 
 export const useEndpoint = <T>({
   request,
   when = true,
   watch = [],
+  cache,
 }: UseEndpointProps<T>) => {
   const [data, setData] = React.useState<T | null>(null);
   const [error, setError] = React.useState<Error | null>(null);
@@ -29,7 +36,12 @@ export const useEndpoint = <T>({
     () => !hasData && !hasError && !isLoading && isConditionMet,
     [hasData, hasError, isLoading, isConditionMet]
   );
+  const cacheProvider = React.useMemo(
+    () => (cache && cache.provider ? cache.provider : new DefaultCache()),
+    [cache]
+  );
 
+  const dataProvider = React.useCallback(() => request(), [request]);
   const reset = React.useCallback(() => {
     setData(null);
     setError(null);
@@ -40,7 +52,13 @@ export const useEndpoint = <T>({
       setIsLoading(true);
       (async () => {
         try {
-          const newData = await request();
+          const newData = await (cache
+            ? cacheProvider.ensure<T>(
+                cache.key(),
+                dataProvider,
+                cache.expireInSeconds
+              )
+            : dataProvider());
           setData(newData);
         } catch (e) {
           if (e instanceof Error) {
