@@ -3,11 +3,13 @@ import React from "react";
 interface UseEndpointProps<T> {
   request: () => Promise<T>;
   when?: boolean;
+  watch?: any[];
 }
 
 export const useEndpoint = <T>({
   request,
   when = true,
+  watch = [],
 }: UseEndpointProps<T>) => {
   const [data, setData] = React.useState<T | null>(null);
   const [error, setError] = React.useState<Error | null>(null);
@@ -42,6 +44,13 @@ export const useEndpoint = <T>({
       })();
     }
   }, [request, shouldRequest]);
+
+  React.useEffect(() => {
+    if (watch.length > 0) {
+      reset();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [...watch]);
 
   return { isLoading, data, error, reset };
 };

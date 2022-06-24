@@ -106,4 +106,34 @@ describe("useEndpoint() hook", () => {
       reset: expect.any(Function),
     });
   });
+
+  test("should monitor variables", async () => {
+    let dependency = "something";
+    const request = async () => `test ${dependency}`;
+    const { result, waitForNextUpdate, rerender } = renderHook(
+      (props) => useEndpoint(props),
+      {
+        initialProps: {
+          request,
+          watch: [dependency],
+        },
+      }
+    );
+    await waitForNextUpdate();
+    expect(result.current).toEqual({
+      data: "test something",
+      error: null,
+      isLoading: false,
+      reset: expect.any(Function),
+    });
+    dependency = "anything";
+    rerender({ request, watch: [dependency] });
+    await waitForNextUpdate();
+    expect(result.current).toEqual({
+      data: "test anything",
+      error: null,
+      isLoading: false,
+      reset: expect.any(Function),
+    });
+  });
 });
