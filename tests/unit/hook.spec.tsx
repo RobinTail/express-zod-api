@@ -81,7 +81,7 @@ describe("useEndpoint() hook", () => {
       {
         initialProps: {
           request: async () => "test",
-          when: false,
+          when: false as boolean | (() => boolean),
         },
       }
     );
@@ -91,7 +91,7 @@ describe("useEndpoint() hook", () => {
       isLoading: false,
       reset: expect.any(Function),
     });
-    rerender({ request: async () => "test", when: true });
+    rerender({ request: async () => "test", when: () => true });
     expect(result.current).toEqual({
       data: null,
       error: null,
