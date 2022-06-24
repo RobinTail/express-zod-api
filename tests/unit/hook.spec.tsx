@@ -4,8 +4,21 @@
 
 import { renderHook, act } from "@testing-library/react-hooks";
 import { useEndpoint } from "../../src";
+import { ExpressZodAPIClient, Response } from "../../example/example.client";
+import { expectType } from "tsd";
 
 describe("useEndpoint() hook", () => {
+  test("should forward the type of response", () => {
+    const client = new ExpressZodAPIClient(async () => "test");
+    const { result } = renderHook(() =>
+      useEndpoint({
+        request: async () =>
+          client.provide("get", "/v1/user/retrieve", { id: "1" }),
+      })
+    );
+    expectType<Response["get /v1/user/retrieve"] | null>(result.current.data);
+  });
+
   test("Initially returns null and the data then", async () => {
     const { result, waitForNextUpdate } = renderHook(() =>
       useEndpoint({
