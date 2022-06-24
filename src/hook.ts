@@ -1,8 +1,11 @@
 import React from "react";
 
 interface UseEndpointProps<T> {
+  /** @desc call the ExpressZodAPIClient::provide() method here */
   request: () => Promise<T>;
+  /** @desc request the endpoint only in the specified case */
   when?: boolean | (() => boolean);
+  /** @desc observe changes of the specified variables and refresh the data accordingly */
   watch?: any[];
 }
 
