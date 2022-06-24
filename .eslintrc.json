@@ -18,9 +18,19 @@
   "plugins": [
     "@typescript-eslint",
     "prettier",
-    "import"
+    "import",
+    "react-hooks"
   ],
   "rules": {
     "@typescript-eslint/lines-between-class-members": "off"
-  }
+  },
+  "overrides": [
+    {
+      "files": ["./src/hook.ts"],
+      "rules": {
+        "react-hooks/rules-of-hooks": "error",
+        "react-hooks/exhaustive-deps": "warn"
+      }
+    }
+  ]
 }
