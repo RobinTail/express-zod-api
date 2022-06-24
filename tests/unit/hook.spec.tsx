@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 
-import { renderHook } from "@testing-library/react-hooks";
+import { renderHook, act } from "@testing-library/react-hooks";
 import { useEndpoint } from "../../src";
 
 describe("useEndpoint() hook", () => {
@@ -16,12 +16,14 @@ describe("useEndpoint() hook", () => {
       data: null,
       error: null,
       isLoading: true,
+      reset: expect.any(Function),
     });
     await waitForNextUpdate();
     expect(result.current).toEqual({
       data: "test",
       error: null,
       isLoading: false,
+      reset: expect.any(Function),
     });
   });
 
@@ -37,12 +39,39 @@ describe("useEndpoint() hook", () => {
       data: null,
       error: null,
       isLoading: true,
+      reset: expect.any(Function),
     });
     await waitForNextUpdate();
     expect(result.current).toEqual({
       data: null,
       error: new Error("something went wrong"),
       isLoading: false,
+      reset: expect.any(Function),
     });
+  });
+
+  test("should reset on demand", async () => {
+    const { result, waitForNextUpdate } = renderHook(() =>
+      useEndpoint({
+        request: async () => "test",
+      })
+    );
+    await waitForNextUpdate();
+    expect(result.current).toEqual({
+      data: "test",
+      error: null,
+      isLoading: false,
+      reset: expect.any(Function),
+    });
+    act(() => {
+      result.current.reset();
+    });
+    expect(result.current).toEqual({
+      data: null,
+      error: null,
+      isLoading: true,
+      reset: expect.any(Function),
+    });
+    await waitForNextUpdate();
   });
 });

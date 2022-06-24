@@ -8,12 +8,18 @@ export const useEndpoint = <T>({ request }: UseEndpointProps<T>) => {
   const [data, setData] = React.useState<T | null>(null);
   const [error, setError] = React.useState<Error | null>(null);
   const [isLoading, setIsLoading] = React.useState(false);
+
   const hasData = React.useMemo(() => data !== null, [data]);
   const hasError = React.useMemo(() => error !== null, [error]);
   const shouldRequest = React.useMemo(
     () => !hasData && !hasError && !isLoading,
     [hasData, hasError, isLoading]
   );
+
+  const reset = React.useCallback(() => {
+    setData(null);
+    setError(null);
+  }, []);
 
   React.useEffect(() => {
     if (shouldRequest) {
@@ -32,5 +38,5 @@ export const useEndpoint = <T>({ request }: UseEndpointProps<T>) => {
     }
   }, [request, shouldRequest]);
 
-  return { isLoading, data, error };
+  return { isLoading, data, error, reset };
 };
