@@ -68,7 +68,8 @@ export const useEndpoint = <T>({
         setIsLoading(false);
       })();
     }
-  }, [request, shouldRequest]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [shouldRequest]);
 
   React.useEffect(() => {
     if (watch.length > 0) {
