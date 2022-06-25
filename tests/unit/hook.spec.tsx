@@ -8,15 +8,16 @@ import { ExpressZodAPIClient, Response } from "../../example/example.client";
 import { expectType } from "tsd";
 
 describe("useEndpoint() hook", () => {
-  test("should forward the type of response", () => {
+  test("should forward the type of response", async () => {
     const client = new ExpressZodAPIClient(async () => "test");
-    const { result } = renderHook(() =>
+    const { result, waitForNextUpdate } = renderHook(() =>
       useEndpoint({
         request: async () =>
           client.provide("get", "/v1/user/retrieve", { id: "1" }),
       })
     );
     expectType<Response["get /v1/user/retrieve"] | null>(result.current.data);
+    await waitForNextUpdate();
   });
 
   test("Initially returns null and the data then", async () => {
