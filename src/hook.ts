@@ -27,7 +27,7 @@ interface UseEndpointProps<T> {
     /**
      * @desc key generating function, most likely should depend on the variables listed in watch option
      */
-    key: () => string;
+    keyGen: () => string;
     /**
      * @desc how long to keep the data in cache (number of seconds)
      * @default permanently
@@ -75,7 +75,7 @@ export const useEndpoint = <T>({
         try {
           const newData = await (cache
             ? cacheProvider.ensure<T>(
-                cache.key(),
+                cache.keyGen(),
                 dataProvider,
                 cache.expireInSeconds
               )
