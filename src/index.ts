@@ -17,6 +17,7 @@ export { withMeta } from "./metadata";
 export { testEndpoint } from "./mock";
 export { Client } from "./client";
 export { useEndpoint } from "./hook";
+export { AbstractCache, DefaultCache } from "./cache";
 
 import * as z from "./extend-zod";
 import createHttpError from "http-errors";
