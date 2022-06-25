@@ -15,6 +15,11 @@ interface UseEndpointProps<T> {
    * */
   watch?: any[];
   /**
+   * @desc optional error transformer
+   * @default as is
+   */
+  errorTransformer?: (error: Error) => Error;
+  /**
    * @desc optional cache settings
    * @default No cache
    * */
@@ -41,6 +46,7 @@ export const useEndpoint = <T>({
   when = true,
   watch = [],
   cache,
+  errorTransformer = (e) => e,
 }: UseEndpointProps<T>) => {
   const [data, setData] = React.useState<T | null>(null);
   const [error, setError] = React.useState<Error | null>(null);
@@ -83,7 +89,7 @@ export const useEndpoint = <T>({
           setData(newData);
         } catch (e) {
           if (e instanceof Error) {
-            setError(e);
+            setError(errorTransformer(e));
           }
         }
         setIsLoading(false);
