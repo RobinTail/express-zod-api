@@ -3,7 +3,7 @@
  */
 
 import { renderHook, act } from "@testing-library/react-hooks";
-import { useEndpoint } from "../../src";
+import { DefaultCache, useEndpoint } from "../../src";
 import { ExpressZodAPIClient, Response } from "../../example/example.client";
 import { expectType } from "tsd";
 
@@ -149,5 +149,40 @@ describe("useEndpoint() hook", () => {
       isLoading: false,
       reset: expect.any(Function),
     });
+  });
+
+  test("should accept custom cache provider", async () => {
+    const mock = jest.fn();
+    class MyCache extends DefaultCache {
+      get<T>(key: string): T | undefined {
+        mock(key);
+        return super.get(key);
+      }
+    }
+    const { result, waitForNextUpdate } = renderHook(() =>
+      useEndpoint({
+        request: async () => "test",
+        cache: {
+          provider: new MyCache(),
+          keyGen: () => "test_key",
+          expireInSeconds: 2,
+        },
+      })
+    );
+    expect(result.current).toEqual({
+      data: null,
+      error: null,
+      isLoading: true,
+      reset: expect.any(Function),
+    });
+    await waitForNextUpdate();
+    expect(result.current).toEqual({
+      data: "test",
+      error: null,
+      isLoading: false,
+      reset: expect.any(Function),
+    });
+    expect(mock).toHaveBeenCalledTimes(1);
+    expect(mock).toHaveBeenCalledWith("test_key");
   });
 });
