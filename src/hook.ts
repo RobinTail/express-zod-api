@@ -4,13 +4,34 @@ import { AbstractCache, DefaultCache } from "./cache";
 interface UseEndpointProps<T> {
   /** @desc call the ExpressZodAPIClient::provide() method here */
   request: () => Promise<T>;
-  /** @desc request the endpoint only in the specified case */
+  /**
+   * @desc request the endpoint only in the specified case
+   * @default true
+   * */
   when?: boolean | (() => boolean);
-  /** @desc observe changes of the specified variables and refresh the data accordingly */
+  /**
+   * @desc observe changes of the specified variables and refresh the data accordingly
+   * @default []
+   * */
   watch?: any[];
+  /**
+   * @desc optional cache settings
+   * @default No cache
+   * */
   cache?: {
+    /**
+     * @desc cache provider instance
+     * @default DefaultCache
+     * */
     provider?: AbstractCache;
+    /**
+     * @desc key generating function, most likely should depend on the variables listed in watch option
+     */
     key: () => string;
+    /**
+     * @desc how long to keep the data in cache (number of seconds)
+     * @default permanently
+     * */
     expireInSeconds?: number;
   };
 }
