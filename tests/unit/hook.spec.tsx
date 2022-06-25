@@ -64,6 +64,30 @@ describe("useEndpoint() hook", () => {
     });
   });
 
+  test("should transform errors if needed", async () => {
+    const { result, waitForNextUpdate } = renderHook(() =>
+      useEndpoint({
+        request: async () => {
+          throw new Error("something went wrong");
+        },
+        errorTransformer: (e) => new Error(`${e.message} (transformed)`),
+      })
+    );
+    expect(result.current).toEqual({
+      data: null,
+      error: null,
+      isLoading: true,
+      reset: expect.any(Function),
+    });
+    await waitForNextUpdate();
+    expect(result.current).toEqual({
+      data: null,
+      error: new Error("something went wrong (transformed)"),
+      isLoading: false,
+      reset: expect.any(Function),
+    });
+  });
+
   test("should reset on demand", async () => {
     const { result, waitForNextUpdate } = renderHook(() =>
       useEndpoint({
