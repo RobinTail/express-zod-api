@@ -2,6 +2,10 @@
 
 ## Version 7
 
+### v7.4.0
+
+- `winston` version is 3.8.1.
+
 ### v7.3.1
 
 - `zod-to-ts` version is 1.1.1.
