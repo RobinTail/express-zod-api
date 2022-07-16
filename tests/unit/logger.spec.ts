@@ -1,7 +1,8 @@
 import { createLogger, LoggerConfig } from "../../src";
 import { LEVEL, MESSAGE, SPLAT } from "triple-beam";
 import MockDate from "mockdate";
-import chalk from "chalk";
+import stripAnsi from "strip-ansi";
+import hasAnsi from "has-ansi";
 
 describe("Logger", () => {
   beforeEach(() => {
@@ -11,6 +12,18 @@ describe("Logger", () => {
   afterAll(() => {
     MockDate.reset();
   });
+
+  const dropColorInObjectProps = <T extends Record<string | symbol, any>>(
+    obj: T
+  ) => {
+    return Reflect.ownKeys(obj).reduce(
+      (acc, key) => ({
+        ...acc,
+        [key]: typeof obj[key] === "string" ? stripAnsi(obj[key]) : obj[key],
+      }),
+      {} as typeof obj
+    );
+  };
 
   describe("createLogger()", () => {
     test("Should create silent logger", () => {
@@ -57,6 +70,7 @@ describe("Logger", () => {
         [MESSAGE]:
           '2022-01-01T00:00:00.000Z warn: testing warn message {"withMeta":true}',
       });
+      expect(hasAnsi(params.level)).toBeFalsy();
     });
 
     test("Should create debug logger", () => {
@@ -75,17 +89,16 @@ describe("Logger", () => {
       logger.debug("testing debug message", { withColorful: "output" });
       expect(transform).toBeCalled();
       const params = transform.mock.calls[0][0];
-      expect(params).toEqual({
-        level: chalk.blue("debug"),
+      expect(dropColorInObjectProps(params)).toEqual({
+        level: "debug",
         [LEVEL]: "debug",
         timestamp: "2022-01-01T00:00:00.000Z",
         [SPLAT]: [{ withColorful: "output" }],
         withColorful: "output",
         message: "testing debug message",
-        [MESSAGE]: `2022-01-01T00:00:00.000Z ${chalk.blue(
-          "debug"
-        )}: testing debug message { withColorful: ${chalk.green("'output'")} }`,
+        [MESSAGE]: `2022-01-01T00:00:00.000Z debug: testing debug message { withColorful: 'output' }`,
       });
+      expect(hasAnsi(params.level)).toBeTruthy();
     });
 
     test("Should manage profiling", () => {
@@ -100,16 +113,15 @@ describe("Logger", () => {
       logger.profile("long-test");
       expect(transform).toBeCalled();
       const params = transform.mock.calls[0][0];
-      expect(params).toEqual({
+      expect(dropColorInObjectProps(params)).toEqual({
         durationMs: 554,
-        level: chalk.green("info"),
+        level: "info",
         [LEVEL]: "info",
         timestamp: "2022-01-01T00:00:00.554Z",
         message: "long-test",
-        [MESSAGE]: `2022-01-01T00:00:00.554Z ${chalk.green(
-          "info"
-        )}: long-test duration: 554ms`,
+        [MESSAGE]: `2022-01-01T00:00:00.554Z info: long-test duration: 554ms`,
       });
+      expect(hasAnsi(params.level)).toBeTruthy();
     });
 
     test("Should handle empty message", () => {
@@ -128,15 +140,14 @@ describe("Logger", () => {
       logger.error({ someData: "test" });
       expect(transform).toBeCalled();
       const params = transform.mock.calls[0][0];
-      expect(params).toEqual({
-        level: chalk.red("error"),
+      expect(dropColorInObjectProps(params)).toEqual({
+        level: "error",
         [LEVEL]: "error",
         timestamp: "2022-01-01T00:00:00.000Z",
         message: { someData: "test" },
-        [MESSAGE]: `2022-01-01T00:00:00.000Z ${chalk.red(
-          "error"
-        )}: [No message] { someData: ${chalk.green("'test'")} }`,
+        [MESSAGE]: `2022-01-01T00:00:00.000Z error: [No message] { someData: 'test' }`,
       });
+      expect(hasAnsi(params.level)).toBeTruthy();
     });
   });
 });
