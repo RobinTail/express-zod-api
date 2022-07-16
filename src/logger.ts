@@ -16,14 +16,19 @@ export function createLogger(loggerConfig: LoggerConfig): winston.Logger {
   };
 
   const getOutputFormat = (isPretty?: boolean) =>
-    printf(
-      ({ timestamp, message, level, durationMs, ...meta }) =>
+    printf(({ timestamp, message, level, durationMs, ...meta }) => {
+      if (typeof message === "object") {
+        meta = { ...meta, ...(message as object) };
+        message = "[No message]";
+      }
+      return (
         `${timestamp} ${level}: ${message}` +
         (durationMs === undefined ? "" : ` duration: ${durationMs}ms`) +
         (Object.keys(meta).length === 0
           ? ""
           : " " + (isPretty ? prettyPrint(meta) : JSON.stringify(meta)))
-    );
+      );
+    });
 
   const formats: Format[] = [useTimestamp()];
 
