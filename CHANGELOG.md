@@ -2,6 +2,17 @@
 
 ## Version 7
 
+### v7.4.1
+
+- There was an issue with logger when calling its methods without a message.
+  The output was empty, considering the first argument to be a message.
+  It's fixed in this version by adding `[No message]` message before printing the object.
+
+```typescript
+// reproduction example
+logger.debug({ something: "test" });
+```
+
 ### v7.4.0
 
 - `winston` version is 3.8.1.
