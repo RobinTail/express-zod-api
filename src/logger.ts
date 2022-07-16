@@ -9,10 +9,13 @@ const { combine, colorize, timestamp: useTimestamp, printf } = winston.format;
 
 export function createLogger(loggerConfig: LoggerConfig): winston.Logger {
   const prettyPrint = (meta: any) => {
-    delete meta[LEVEL];
-    delete meta[MESSAGE];
-    delete meta[SPLAT];
-    return inspect(meta, false, 1, loggerConfig.color);
+    const {
+      [LEVEL]: noLevel,
+      [MESSAGE]: noMessage,
+      [SPLAT]: noSplat,
+      ...rest
+    } = meta;
+    return inspect(rest, false, 1, loggerConfig.color);
   };
 
   const getOutputFormat = (isPretty?: boolean) =>
