@@ -14,7 +14,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [12.x, 14.x, 16.x, 17.x, 18.x]
+        # restore the 18.x once PR #502 would fix the issue with ts-node
+        node-version: [12.x, 14.x, 16.x, 17.x, 18.5]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
     steps:
     - name: Get yarn cache dir
