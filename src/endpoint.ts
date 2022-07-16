@@ -270,7 +270,7 @@ export class Endpoint<
           request,
           logger,
           endpoint: this,
-          default: headers,
+          defaultHeaders: headers,
         });
       }
       Object.entries(headers).forEach(([key, value]) =>

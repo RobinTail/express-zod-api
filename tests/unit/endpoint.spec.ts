@@ -139,14 +139,17 @@ describe("Endpoint", () => {
           method: "OPTIONS",
         },
         configProps: {
-          cors: true,
+          cors: ({ defaultHeaders }) => ({
+            ...defaultHeaders,
+            "X-Custom-Header": "Testing",
+          }),
         },
       });
       expect(loggerMock.error).toBeCalledTimes(0);
       expect(responseMock.status).toBeCalledTimes(0);
       expect(responseMock.json).toBeCalledTimes(0);
       expect(handlerMock).toBeCalledTimes(0);
-      expect(responseMock.set).toBeCalledTimes(3);
+      expect(responseMock.set).toBeCalledTimes(4);
       expect(responseMock.end).toBeCalledTimes(1);
       expect(responseMock.set.mock.calls[0]).toEqual([
         "Access-Control-Allow-Origin",
@@ -159,6 +162,10 @@ describe("Endpoint", () => {
       expect(responseMock.set.mock.calls[2]).toEqual([
         "Access-Control-Allow-Headers",
         "content-type",
+      ]);
+      expect(responseMock.set.mock.calls[3]).toEqual([
+        "X-Custom-Header",
+        "Testing",
       ]);
     });
   });

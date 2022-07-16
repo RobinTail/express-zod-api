@@ -59,7 +59,7 @@ type InputSource = keyof Pick<Request, "query" | "body" | "files" | "params">;
 export type InputSources = Record<Method, InputSource[]>;
 
 type OverrideCorsHeaders = (params: {
-  default: Record<string, string>; // the default headers to be overridden
+  defaultHeaders: Record<string, string>; // the default headers to be overridden
   request: Request;
   endpoint: AbstractEndpoint;
   logger: Logger;
