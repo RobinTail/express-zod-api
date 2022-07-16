@@ -4,6 +4,7 @@ import { Express, Request } from "express";
 import fileUpload from "express-fileupload";
 import { ServerOptions } from "https";
 import { Logger } from "winston";
+import { AbstractEndpoint } from "./endpoint";
 import { Method } from "./method";
 import { ResultHandlerDefinition } from "./result-handler";
 
@@ -57,10 +58,18 @@ export interface AppConfig {
 type InputSource = keyof Pick<Request, "query" | "body" | "files" | "params">;
 export type InputSources = Record<Method, InputSource[]>;
 
+type OverrideCorsHeaders = (params: {
+  default: Record<string, string>; // the default headers to be overridden
+  request: Request;
+  endpoint: AbstractEndpoint;
+  logger: Logger;
+}) => Record<string, string>;
+
 export interface CommonConfig {
   // enable cross-origin resource sharing
   // https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
-  cors: boolean;
+  // you can override the default CORS headers by setting a function here
+  cors: boolean | OverrideCorsHeaders;
   // custom ResultHandlerDefinition for common errors,
   // default: defaultResultHandler()
   errorHandler?: ResultHandlerDefinition<any, any>;

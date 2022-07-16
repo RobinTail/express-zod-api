@@ -96,7 +96,7 @@ export const initRouting = ({
   }
   routingCycle({
     routing,
-    cors: config.cors,
+    cors: !!config.cors,
     endpointCb: (endpoint, path, method) => {
       app[method](path, async (request, response) => {
         logger.info(`${request.method}: ${path}`);

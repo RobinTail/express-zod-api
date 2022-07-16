@@ -128,14 +128,16 @@ export class Endpoint<
     return this.resultHandler.getNegativeResponse().mimeTypes;
   }
 
-  #setupCorsHeaders(response: Response) {
+  #getDefaultCorsHeaders(): Record<string, string> {
     const accessMethods = this.methods
       .map((method) => method.toUpperCase())
       .concat("OPTIONS")
       .join(", ");
-    response.set("Access-Control-Allow-Origin", "*");
-    response.set("Access-Control-Allow-Methods", accessMethods);
-    response.set("Access-Control-Allow-Headers", "content-type");
+    return {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": accessMethods,
+      "Access-Control-Allow-Headers": "content-type",
+    };
   }
 
   async #parseOutput(output: any) {
@@ -262,7 +264,18 @@ export class Endpoint<
     let output: any;
     let error: Error | null = null;
     if (config.cors) {
-      this.#setupCorsHeaders(response);
+      let headers = this.#getDefaultCorsHeaders();
+      if (typeof config.cors === "function") {
+        headers = config.cors({
+          request,
+          logger,
+          endpoint: this,
+          default: headers,
+        });
+      }
+      Object.entries(headers).forEach(([key, value]) =>
+        response.set(key, value)
+      );
     }
     if (request.method === "OPTIONS") {
       response.end();
