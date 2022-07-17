@@ -59,7 +59,7 @@ type InputSource = keyof Pick<Request, "query" | "body" | "files" | "params">;
 export type InputSources = Record<Method, InputSource[]>;
 
 type Headers = Record<string, string>;
-type OverrideCorsHeaders = (params: {
+type HeadersProvider = (params: {
   defaultHeaders: Headers; // the default headers to be overridden
   request: Request;
   endpoint: AbstractEndpoint;
@@ -69,8 +69,8 @@ type OverrideCorsHeaders = (params: {
 export interface CommonConfig {
   // enable cross-origin resource sharing
   // https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
-  // you can override the default CORS headers by setting a function here
-  cors: boolean | OverrideCorsHeaders;
+  // you can override the default CORS headers by setting up a provider function here
+  cors: boolean | HeadersProvider;
   // custom ResultHandlerDefinition for common errors,
   // default: defaultResultHandler()
   errorHandler?: ResultHandlerDefinition<any, any>;
