@@ -58,12 +58,13 @@ export interface AppConfig {
 type InputSource = keyof Pick<Request, "query" | "body" | "files" | "params">;
 export type InputSources = Record<Method, InputSource[]>;
 
+type Headers = Record<string, string>;
 type OverrideCorsHeaders = (params: {
-  defaultHeaders: Record<string, string>; // the default headers to be overridden
+  defaultHeaders: Headers; // the default headers to be overridden
   request: Request;
   endpoint: AbstractEndpoint;
   logger: Logger;
-}) => Record<string, string>;
+}) => Headers | Promise<Headers>;
 
 export interface CommonConfig {
   // enable cross-origin resource sharing

@@ -266,7 +266,7 @@ export class Endpoint<
     if (config.cors) {
       let headers = this.#getDefaultCorsHeaders();
       if (typeof config.cors === "function") {
-        headers = config.cors({
+        headers = await config.cors({
           request,
           logger,
           endpoint: this,
