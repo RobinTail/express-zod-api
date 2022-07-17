@@ -278,7 +278,7 @@ export class Endpoint<
       );
     }
     if (request.method === "OPTIONS") {
-      response.end();
+      response.status(200).end();
       return;
     }
     const initialInput = getInitialInput(request, config.inputSources);

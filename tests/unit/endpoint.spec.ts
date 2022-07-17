@@ -146,7 +146,7 @@ describe("Endpoint", () => {
         },
       });
       expect(loggerMock.error).toBeCalledTimes(0);
-      expect(responseMock.status).toBeCalledTimes(0);
+      expect(responseMock.status).toBeCalledWith(200);
       expect(responseMock.json).toBeCalledTimes(0);
       expect(handlerMock).toBeCalledTimes(0);
       expect(responseMock.set).toBeCalledTimes(4);
