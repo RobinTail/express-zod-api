@@ -5,7 +5,7 @@ import { ApiResponse } from "./api-response";
 import { CommonConfig } from "./config-type";
 import { ResultHandlerError } from "./errors";
 import { FlatObject, getInitialInput, IOSchema } from "./common-helpers";
-import { Method, MethodsDefinition } from "./method";
+import { AuxMethod, Method, MethodsDefinition } from "./method";
 import { AnyMiddlewareDef } from "./middleware";
 import { lastResortHandler, ResultHandlerDefinition } from "./result-handler";
 
@@ -129,10 +129,10 @@ export class Endpoint<
   }
 
   #getDefaultCorsHeaders(): Record<string, string> {
-    const accessMethods = this.methods
-      .map((method) => method.toUpperCase())
-      .concat("OPTIONS")
-      .join(", ");
+    const accessMethods = (this.methods as (M | AuxMethod)[])
+      .concat("options")
+      .join(", ")
+      .toUpperCase();
     return {
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Methods": accessMethods,
