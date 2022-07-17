@@ -26,9 +26,9 @@ Start your API server with I/O schema validation and custom middlewares in minut
    6. [Start your server](#start-your-server)
    7. [Try it](#try-it)
 4. [Fascinating features](#fascinating-features)
-   1. [Middlewares](#middlewares)
-   2. [Options](#options)
-   3. [Cross-Origin Resource Sharing](#cross-origin-resource-sharing) (CORS)
+   1. [Cross-Origin Resource Sharing](#cross-origin-resource-sharing) (CORS)
+   2. [Middlewares](#middlewares)
+   3. [Options](#options)
    4. [Refinements](#refinements)
    5. [Transformations](#transformations)
    6. [Dealing with dates](#dealing-with-dates)
@@ -210,6 +210,31 @@ You should receive the following response:
 
 # Fascinating features
 
+## Cross-Origin Resource Sharing
+
+You can enable your API for other domains using the corresponding configuration option `cors`.
+It's _not optional_ to draw your attention to making the appropriate decision, however, it's enabled in the
+[Quick start example](#set-up-config) above, assuming that in most cases you will want to enable this feature.
+See [MDN article](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) for more information.
+
+In addition to being a boolean, `cors` can also be assigned a function that provides custom headers. That function
+has several parameters and can be asynchronous.
+
+```typescript
+import { createConfig } from "express-zod-api";
+
+const config = createConfig({
+  // ... other options
+  cors: ({ defaultHeaders, request, endpoint, logger }) => ({
+    ...defaultHeaders,
+    "Access-Control-Max-Age": "5000",
+  }),
+});
+```
+
+Please note: If you only want to send specific headers on requests to a specific endpoint, consider the
+[Middlewares](#middlewares) or [response customization approach](#response-customization).
+
 ## Middlewares
 
 Middleware can authenticate using input or `request` headers, and can provide endpoint handlers with `options`.
@@ -287,31 +312,6 @@ const endpointsFactory = defaultEndpointsFactory.addOptions({
   privateKey: fs.readFileSync("private-key.pem", "utf-8"),
 });
 ```
-
-## Cross-Origin Resource Sharing
-
-You can enable your API for other domains using the corresponding configuration option `cors`.
-It's _not optional_ to draw your attention to making the appropriate decision, however, it's enabled in the
-[Quick start example](#set-up-config) above, assuming that in most cases you will want to enable this feature.
-See [MDN article](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) for more information.
-
-In addition to being a boolean, `cors` can also be assigned a function that provides custom headers. That function
-has several parameters and can be asynchronous.
-
-```typescript
-import { createConfig } from "express-zod-api";
-
-const config = createConfig({
-  // ... other options
-  cors: ({ defaultHeaders, request, endpoint, logger }) => ({
-    ...defaultHeaders,
-    "Access-Control-Max-Age": "5000",
-  }),
-});
-```
-
-Please note: If you only want to send specific headers on requests to a specific endpoint, consider a
-[response customization approach](#response-customization).
 
 ## Refinements
 
