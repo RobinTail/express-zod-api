@@ -273,9 +273,9 @@ export class Endpoint<
           defaultHeaders: headers,
         });
       }
-      Object.entries(headers).forEach(([key, value]) =>
-        response.set(key, value)
-      );
+      for (const key in headers) {
+        response.set(key, headers[key]);
+      }
     }
     if (request.method === "OPTIONS") {
       response.status(200).end();
