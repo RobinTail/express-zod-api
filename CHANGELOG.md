@@ -2,6 +2,32 @@
 
 ## Version 7
 
+### v7.5.0
+
+- Feature #503: configurable CORS headers.
+  - The configuration options `cors` now accepts a function that returns custom headers.
+  - The function may be asynchronous.
+  - Setting `cors: true` implies the default headers.
+
+```typescript
+import { createConfig } from "express-zod-api";
+
+const config = createConfig({
+  // ...
+  cors: ({ defaultHeaders, request, endpoint, logger }) => ({
+    ...defaultHeaders,
+    "X-Custom-Header": "Glory to Science!",
+  }),
+});
+```
+
+```yaml
+# the default headers are:
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Methods: ..., OPTIONS # endpoint methods + OPTIONS
+Access-Control-Allow-Headers: content-type
+```
+
 ### v7.4.1
 
 - There was an issue with logger when calling its methods without a message.
