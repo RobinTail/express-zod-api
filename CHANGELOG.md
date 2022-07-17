@@ -16,7 +16,7 @@ const config = createConfig({
   // ...
   cors: ({ defaultHeaders, request, endpoint, logger }) => ({
     ...defaultHeaders,
-    "X-Custom-Header": "Glory to Science!",
+    "Access-Control-Max-Age": "5000",
   }),
 });
 ```
