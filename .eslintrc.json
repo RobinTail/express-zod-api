@@ -22,5 +22,16 @@
   ],
   "rules": {
     "@typescript-eslint/lines-between-class-members": "off"
-  }
+  },
+  "overrides": [
+    {
+      "files": [
+        "./tools/*.ts",
+        "./tests/**/*.spec.ts"
+      ],
+      "rules": {
+        "import/no-extraneous-dependencies": "off"
+      }
+    }
+  ]
 }
