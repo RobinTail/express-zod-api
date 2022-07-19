@@ -1,5 +1,5 @@
 import { ChildProcessWithoutNullStreams, spawn } from "child_process";
-import fetch from "node-fetch"; // eslint-disable-line import/no-extraneous-dependencies
+import fetch from "node-fetch";
 import { esmTestPort, waitFor } from "../helpers";
 
 describe("ESM Test", () => {
