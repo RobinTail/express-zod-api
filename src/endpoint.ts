@@ -4,7 +4,12 @@ import { z } from "zod";
 import { ApiResponse } from "./api-response";
 import { CommonConfig } from "./config-type";
 import { ResultHandlerError } from "./errors";
-import { FlatObject, getInitialInput, IOSchema } from "./common-helpers";
+import {
+  FlatObject,
+  getActualMethod,
+  getInitialInput,
+  IOSchema,
+} from "./common-helpers";
 import { AuxMethod, Method, MethodsDefinition } from "./method";
 import { AnyMiddlewareDef } from "./middleware";
 import { lastResortHandler, ResultHandlerDefinition } from "./result-handler";
@@ -172,7 +177,7 @@ export class Endpoint<
     response: Response;
     logger: Logger;
   }) {
-    const method = request.method.toLowerCase() as Method | AuxMethod;
+    const method = getActualMethod(request);
     const options: any = {};
     let isStreamClosed = false;
     for (const def of this.middlewares) {
@@ -292,7 +297,7 @@ export class Endpoint<
       if (isStreamClosed) {
         return;
       }
-      if (request.method === "OPTIONS") {
+      if (getActualMethod(request) === "options") {
         response.status(200).end();
         return;
       }
