@@ -21,7 +21,7 @@ export interface RoutingCycleParams {
   ) => void;
   staticCb?: (path: string, handler: StaticHandler) => void;
   parentPath?: string;
-  cors?: boolean;
+  hasCors?: boolean;
 }
 
 export const routingCycle = ({
@@ -29,7 +29,7 @@ export const routingCycle = ({
   endpointCb,
   staticCb,
   parentPath,
-  cors,
+  hasCors,
 }: RoutingCycleParams) => {
   Object.entries(routing).forEach(([segment, element]) => {
     segment = segment.trim();
@@ -46,7 +46,7 @@ export const routingCycle = ({
     const path = `${parentPath || ""}${segment ? `/${segment}` : ""}`;
     if (element instanceof AbstractEndpoint) {
       const methods: (Method | AuxMethod)[] = element.getMethods().slice();
-      if (cors) {
+      if (hasCors) {
         methods.push("options");
       }
       methods.forEach((method) => {
@@ -62,7 +62,7 @@ export const routingCycle = ({
           endpointCb(endpoint, path, method as Method);
         }
       );
-      if (cors && Object.keys(element.methods).length > 0) {
+      if (hasCors && Object.keys(element.methods).length > 0) {
         const firstEndpoint = Object.values(
           element.methods
         )[0] as AbstractEndpoint;
@@ -73,7 +73,7 @@ export const routingCycle = ({
         routing: element,
         endpointCb,
         staticCb,
-        cors,
+        hasCors: hasCors,
         parentPath: path,
       });
     }
@@ -96,7 +96,7 @@ export const initRouting = ({
   }
   routingCycle({
     routing,
-    cors: config.cors,
+    hasCors: !!config.cors,
     endpointCb: (endpoint, path, method) => {
       app[method](path, async (request, response) => {
         logger.info(`${request.method}: ${path}`);
