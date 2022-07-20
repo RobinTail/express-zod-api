@@ -5,7 +5,7 @@ import { ApiResponse } from "./api-response";
 import { CommonConfig } from "./config-type";
 import { ResultHandlerError } from "./errors";
 import { FlatObject, getInitialInput, IOSchema } from "./common-helpers";
-import { Method, MethodsDefinition } from "./method";
+import { AuxMethod, Method, MethodsDefinition } from "./method";
 import { AnyMiddlewareDef } from "./middleware";
 import { lastResortHandler, ResultHandlerDefinition } from "./result-handler";
 
@@ -128,14 +128,16 @@ export class Endpoint<
     return this.resultHandler.getNegativeResponse().mimeTypes;
   }
 
-  #setupCorsHeaders(response: Response) {
-    const accessMethods = this.methods
-      .map((method) => method.toUpperCase())
-      .concat("OPTIONS")
-      .join(", ");
-    response.set("Access-Control-Allow-Origin", "*");
-    response.set("Access-Control-Allow-Methods", accessMethods);
-    response.set("Access-Control-Allow-Headers", "content-type");
+  #getDefaultCorsHeaders(): Record<string, string> {
+    const accessMethods = (this.methods as (M | AuxMethod)[])
+      .concat("options")
+      .join(", ")
+      .toUpperCase();
+    return {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": accessMethods,
+      "Access-Control-Allow-Headers": "content-type",
+    };
   }
 
   async #parseOutput(output: any) {
@@ -262,10 +264,21 @@ export class Endpoint<
     let output: any;
     let error: Error | null = null;
     if (config.cors) {
-      this.#setupCorsHeaders(response);
+      let headers = this.#getDefaultCorsHeaders();
+      if (typeof config.cors === "function") {
+        headers = await config.cors({
+          request,
+          logger,
+          endpoint: this,
+          defaultHeaders: headers,
+        });
+      }
+      for (const key in headers) {
+        response.set(key, headers[key]);
+      }
     }
     if (request.method === "OPTIONS") {
-      response.end();
+      response.status(200).end();
       return;
     }
     const initialInput = getInitialInput(request, config.inputSources);
