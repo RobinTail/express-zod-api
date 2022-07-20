@@ -61,7 +61,13 @@ export class EndpointsFactory<
     return factory;
   }
 
-  // @todo should I add type overrides?
+  public addMiddleware<AIN extends IOSchema<"strip">, AOUT extends FlatObject>(
+    definition: MiddlewareDefinition<AIN, OUT, AOUT>
+  ): EndpointsFactory<POS, NEG, ProbableIntersection<IN, AIN>, OUT & AOUT>;
+  /** @deprecated please use createMiddleware() for the argument */
+  public addMiddleware<AIN extends IOSchema<"strip">, AOUT extends FlatObject>(
+    props: MiddlewareCreationProps<AIN, OUT, AOUT>
+  ): EndpointsFactory<POS, NEG, ProbableIntersection<IN, AIN>, OUT & AOUT>;
   public addMiddleware<AIN extends IOSchema<"strip">, AOUT extends FlatObject>(
     subject:
       | MiddlewareDefinition<AIN, OUT, AOUT>
