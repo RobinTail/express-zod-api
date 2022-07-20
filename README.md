@@ -273,7 +273,7 @@ import { createMiddleware, createHttpError, z } from "express-zod-api";
 
 const authMiddleware = createMiddleware({
   input: z.object({
-    key: z.string().nonempty(),
+    key: z.string().min(1),
   }),
   middleware: async ({ input: { key }, request, logger }) => {
     logger.debug("Checking the key and token");
@@ -325,7 +325,7 @@ const nicknameConstraintMiddleware = createMiddleware({
   input: z.object({
     nickname: z
       .string()
-      .nonempty()
+      .min(1)
       .refine(
         (nick) => !/^\d.*$/.test(nick),
         "Nickname cannot start with a digit"

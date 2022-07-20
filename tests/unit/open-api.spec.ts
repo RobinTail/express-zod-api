@@ -362,13 +362,13 @@ describe("Open API generator", () => {
                 numeric: z.string().regex(/\d+/),
                 combined: z
                   .string()
-                  .nonempty()
+                  .min(1)
                   .email()
                   .regex(/.*@example\.com/is)
                   .max(90),
               }),
               output: z.object({
-                nonempty: z.string().nonempty(),
+                nonempty: z.string().min(1),
               }),
               handler: jest.fn(),
             }),
@@ -518,10 +518,10 @@ describe("Open API generator", () => {
             getSomething: defaultEndpointsFactory.build({
               methods: ["get", "post"],
               input: z.object({
-                arr: z.array(z.string()).nonempty(),
+                arr: z.array(z.string()).min(1),
               }),
               output: z.object({
-                arr: z.array(z.string()).nonempty(),
+                arr: z.array(z.string()).min(1),
               }),
               handler: async ({ input }) => ({
                 arr: input.arr,
