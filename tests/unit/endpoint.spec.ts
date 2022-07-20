@@ -376,12 +376,14 @@ describe("Endpoint", () => {
   describe("Issue #269: Async refinements", () => {
     test("should handle async refinements in input, output and middleware", async () => {
       const endpoint = new EndpointsFactory(defaultResultHandler)
-        .addMiddleware({
-          input: z.object({
-            m: z.number().refine(async (m) => m < 10),
-          }),
-          middleware: async () => ({}),
-        })
+        .addMiddleware(
+          createMiddleware({
+            input: z.object({
+              m: z.number().refine(async (m) => m < 10),
+            }),
+            middleware: async () => ({}),
+          })
+        )
         .build({
           methods: ["post"],
           input: z.object({

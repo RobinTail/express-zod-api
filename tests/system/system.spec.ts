@@ -9,6 +9,7 @@ import {
   defaultResultHandler,
   createResultHandler,
   createApiResponse,
+  createMiddleware,
 } from "../../src";
 import { waitFor } from "../helpers";
 
@@ -55,23 +56,27 @@ describe("App", () => {
           }),
         }),
         test: new EndpointsFactory(defaultResultHandler)
-          .addMiddleware({
-            input: z.object({
-              key: z.string().refine((v) => v === "123", "Invalid key"),
-            }),
-            middleware: async () => ({
-              user: {
-                id: 354,
-              },
-            }),
-          })
-          .addMiddleware({
-            input: z.object({}),
-            middleware: async ({ request, options: { user } }) => ({
-              method: request.method.toLowerCase() as Method,
-              permissions: user.id === 354 ? ["any"] : [],
-            }),
-          })
+          .addMiddleware(
+            createMiddleware({
+              input: z.object({
+                key: z.string().refine((v) => v === "123", "Invalid key"),
+              }),
+              middleware: async () => ({
+                user: {
+                  id: 354,
+                },
+              }),
+            })
+          )
+          .addMiddleware(
+            createMiddleware({
+              input: z.object({}),
+              middleware: async ({ request, options: { user } }) => ({
+                method: request.method.toLowerCase() as Method,
+                permissions: user.id === 354 ? ["any"] : [],
+              }),
+            })
+          )
           .build({
             methods: ["get", "post"],
             input: z.object({

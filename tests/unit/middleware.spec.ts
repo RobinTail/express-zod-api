@@ -2,7 +2,7 @@ import { createMiddleware, z } from "../../src";
 
 describe("Middleware", () => {
   describe("createMiddleware()", () => {
-    test("Should simply return its argument", () => {
+    test("Should simply return the middleware of the proprietary type", () => {
       const definition = {
         input: z.object({
           something: z.number(),
@@ -10,7 +10,7 @@ describe("Middleware", () => {
         middleware: jest.fn(),
       };
       const middleware = createMiddleware(definition);
-      expect(middleware).toStrictEqual(definition);
+      expect(middleware).toStrictEqual({ ...definition, type: "proprietary" });
     });
   });
 });

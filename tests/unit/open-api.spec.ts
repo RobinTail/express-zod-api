@@ -5,6 +5,7 @@ import {
   defaultEndpointsFactory,
   withMeta,
   createConfig,
+  createMiddleware,
 } from "../../src";
 import { expectType } from "tsd";
 
@@ -752,16 +753,18 @@ describe("Open API generator", () => {
         routing: {
           v1: {
             getSomething: defaultEndpointsFactory
-              .addMiddleware({
-                input: withMeta(
-                  z.object({
-                    key: z.string(),
-                  })
-                ).example({
-                  key: "1234-56789-01",
-                }),
-                middleware: jest.fn(),
-              })
+              .addMiddleware(
+                createMiddleware({
+                  input: withMeta(
+                    z.object({
+                      key: z.string(),
+                    })
+                  ).example({
+                    key: "1234-56789-01",
+                  }),
+                  middleware: jest.fn(),
+                })
+              )
               .build({
                 method: "post",
                 input: withMeta(

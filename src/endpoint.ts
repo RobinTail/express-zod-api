@@ -172,9 +172,13 @@ export class Endpoint<
     response: Response;
     logger: Logger;
   }) {
+    const method = request.method.toLowerCase() as Method | AuxMethod;
     const options: any = {};
     let isStreamClosed = false;
     for (const def of this.middlewares) {
+      if (method === "options" && def.type === "proprietary") {
+        continue;
+      }
       Object.assign(input, await def.input.parseAsync(input)); // middleware can transform the input types
       Object.assign(
         options,
@@ -277,10 +281,6 @@ export class Endpoint<
         response.set(key, headers[key]);
       }
     }
-    if (request.method === "OPTIONS") {
-      response.status(200).end();
-      return;
-    }
     const initialInput = getInitialInput(request, config.inputSources);
     try {
       const { input, options, isStreamClosed } = await this.#runMiddlewares({
@@ -290,6 +290,10 @@ export class Endpoint<
         logger,
       });
       if (isStreamClosed) {
+        return;
+      }
+      if (request.method === "OPTIONS") {
+        response.status(200).end();
         return;
       }
       output = await this.#parseOutput(

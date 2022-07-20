@@ -60,6 +60,7 @@ export class EndpointsFactory<
     return factory;
   }
 
+  // @todo add backward compatibility for the MiddlewareCreationProps
   public addMiddleware<AIN extends IOSchema<"strip">, AOUT extends FlatObject>(
     definition: MiddlewareDefinition<AIN, OUT, AOUT>
   ) {
@@ -86,7 +87,8 @@ export class EndpointsFactory<
   ) {
     const transformer = features?.transformer || ((err: Error) => err);
     const provider = features?.provider || (() => ({} as AOUT));
-    const definition = createMiddleware({
+    const definition: AnyMiddlewareDef = {
+      type: "express",
       input: z.object({}),
       middleware: async ({ request, response }) =>
         new Promise<AOUT>((resolve, reject) => {
@@ -98,9 +100,9 @@ export class EndpointsFactory<
           };
           middleware(request as R, response as S, next);
         }),
-    });
+    };
     return EndpointsFactory.#create<POS, NEG, IN, OUT & AOUT>(
-      this.middlewares.concat(definition as AnyMiddlewareDef),
+      this.middlewares.concat(definition),
       this.resultHandler
     );
   }
