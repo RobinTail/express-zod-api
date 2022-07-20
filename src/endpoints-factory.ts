@@ -15,6 +15,7 @@ import {
   createMiddleware,
   ExpressMiddleware,
   ExpressMiddlewareFeatures,
+  MiddlewareCreationProps,
   MiddlewareDefinition,
 } from "./middleware";
 import { mimeJson, mimeMultipart } from "./mime";
@@ -60,9 +61,11 @@ export class EndpointsFactory<
     return factory;
   }
 
-  // @todo add backward compatibility for the MiddlewareCreationProps
+  // @todo should I add type overrides?
   public addMiddleware<AIN extends IOSchema<"strip">, AOUT extends FlatObject>(
-    definition: MiddlewareDefinition<AIN, OUT, AOUT>
+    subject:
+      | MiddlewareDefinition<AIN, OUT, AOUT>
+      | MiddlewareCreationProps<AIN, OUT, AOUT>
   ) {
     return EndpointsFactory.#create<
       POS,
@@ -70,7 +73,9 @@ export class EndpointsFactory<
       ProbableIntersection<IN, AIN>,
       OUT & AOUT
     >(
-      this.middlewares.concat(definition as unknown as AnyMiddlewareDef),
+      this.middlewares.concat(
+        "type" in subject ? subject : createMiddleware(subject)
+      ),
       this.resultHandler
     );
   }
@@ -113,7 +118,7 @@ export class EndpointsFactory<
         createMiddleware({
           input: z.object({}),
           middleware: async () => options,
-        }) as AnyMiddlewareDef
+        })
       ),
       this.resultHandler
     );
