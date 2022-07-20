@@ -2,6 +2,11 @@
 
 ## Version 7
 
+### v7.6.0
+
+- `zod` version is 3.17.9.
+  - Some new public methods have been introduced, so I'm changing the minor version.
+
 ### v7.5.0
 
 - Feature #503: configurable CORS headers.
