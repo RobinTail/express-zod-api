@@ -378,6 +378,11 @@ describe("Common Helpers", () => {
         b: "url param",
       });
     });
+    test("Issue 514: should return empty object for OPTIONS", () => {
+      expect(
+        getInitialInput({ method: "OPTIONS" } as unknown as Request, undefined)
+      ).toEqual({});
+    });
   });
 
   describe("isLoggerConfig()", () => {
