@@ -2,6 +2,27 @@
 
 ## Version 7
 
+### v7.6.1
+
+- Fixed issue #514: native express middlewares did not run for `OPTIONS` requests.
+  - Using `.addExpressMiddleware()` or its alias `.use()` of `EndpointsFactory` it did not work for requests having
+    `OPTIONS` method.
+  - This version introduces the difference between a proprietary and native express middlewares.
+  - Only native express middlewares are executed for `OPTIONS` request.
+  - It makes it possible to use `cors` package (express middleware), which is described in the
+    [Documentation](README.md#using-native-express-middlewares).
+    - **Please note:** If using both `cors` package (express middleware) and `cors` configuration option, the
+      configuration option runs first, so the middleware can override the global setting.
+
+```typescript
+import { defaultEndpointsFactory } from "express-zod-api";
+import cors from "cors";
+
+const myFactory = defaultEndpointsFactory.addExpressMiddleware(
+  cors({ credentials: true })
+);
+```
+
 ### v7.6.0
 
 - `zod` version is 3.17.9.
