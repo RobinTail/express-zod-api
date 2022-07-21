@@ -3,6 +3,8 @@
   "compilerOptions": {
     "noImplicitAny": true,
     "strictNullChecks": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "module": "node16",
+    "moduleResolution": "node16"
   },
 }
