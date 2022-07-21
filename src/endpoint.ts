@@ -167,17 +167,18 @@ export class Endpoint<
   }
 
   async #runMiddlewares({
+    method,
     input,
     request,
     response,
     logger,
   }: {
+    method: Method | AuxMethod;
     input: any;
     request: Request;
     response: Response;
     logger: Logger;
   }) {
-    const method = getActualMethod(request);
     const options: any = {};
     let isStreamClosed = false;
     for (const def of this.middlewares) {
@@ -270,6 +271,7 @@ export class Endpoint<
     logger: Logger;
     config: CommonConfig;
   }) {
+    const method = getActualMethod(request);
     let output: any;
     let error: Error | null = null;
     if (config.cors) {
@@ -289,6 +291,7 @@ export class Endpoint<
     const initialInput = getInitialInput(request, config.inputSources);
     try {
       const { input, options, isStreamClosed } = await this.#runMiddlewares({
+        method,
         input: { ...initialInput }, // preserve the initial
         request,
         response,
@@ -297,7 +300,7 @@ export class Endpoint<
       if (isStreamClosed) {
         return;
       }
-      if (getActualMethod(request) === "options") {
+      if (method === "options") {
         response.status(200).end();
         return;
       }
