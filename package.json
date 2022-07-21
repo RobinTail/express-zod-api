@@ -5,9 +5,8 @@
   "license": "MIT",
   "scripts": {
     "start": "ts-node example/index.ts",
-    "build": "yarn build:cleanup && yarn build:compile && yarn build:esm && yarn build:swagger && yarn build:client && yarn build:license",
-    "build:cleanup": "rm -rf ./dist ./dist-esm example/example.swagger.yaml example/example.client.ts ./LICENSE",
-    "build:compile": "tsc --build tsconfig.build.json",
+    "build": "yarn build:cleanup && yarn build:esm && yarn build:swagger && yarn build:client && yarn build:license",
+    "build:cleanup": "rm -rf ./dist-esm example/example.swagger.yaml example/example.client.ts ./LICENSE",
     "build:esm": "tsc --build tsconfig.esm.json && ts-node tools/esm-package.ts && ts-node tools/esm-extensions.ts",
     "build:swagger": "ts-node example/generate-open-api-schema.ts > example/example.swagger.yaml",
     "build:client": "ts-node example/generate-client.ts > example/example.client.ts && yarn prettier example/example.client.ts --write",
@@ -27,12 +26,10 @@
     "postversion": "git push && git push --tags",
     "install_hooks": "husky install"
   },
-  "types": "dist/index.d.ts",
+  "type": "module",
+  "types": "dist-esm/index.d.ts",
   "module": "dist-esm/index.js",
-  "exports": {
-    "require": "./dist/index.js",
-    "import": "./dist-esm/index.js"
-  },
+  "exports": "./dist-esm/index.js",
   "dependencies": {
     "@types/compression": "^1.7.2",
     "@types/express": "^4.17.13",
