@@ -23,7 +23,8 @@
   ],
   "rules": {
     "@typescript-eslint/lines-between-class-members": "off",
-    "unicorn/prefer-module": "error"
+    "unicorn/prefer-module": "error",
+    "unicorn/prefer-node-protocol": "error"
   },
   "overrides": [
     {
