@@ -15,10 +15,10 @@ import {
   DependsOnMethod,
   defaultResultHandler,
   ServeStatic,
-} from "../../src";
-import { CommonConfig } from "../../src/config-type";
-import { mimeJson } from "../../src/mime";
-import { initRouting } from "../../src/routing";
+} from "../../src/index.js";
+import { CommonConfig } from "../../src/config-type.js";
+import { mimeJson } from "../../src/mime.js";
+import { initRouting } from "../../src/routing.js";
 
 let appMock: any;
 let loggerMock: any;

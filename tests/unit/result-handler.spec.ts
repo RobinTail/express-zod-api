@@ -1,6 +1,11 @@
 import { Request, Response } from "express";
-import { z, createHttpError, defaultResultHandler, withMeta } from "../../src";
-import { metaProp } from "../../src/metadata";
+import {
+  z,
+  createHttpError,
+  defaultResultHandler,
+  withMeta,
+} from "../../src/index.js";
+import { metaProp } from "../../src/metadata.js";
 
 let loggerMock: any;
 let responseMock: any;

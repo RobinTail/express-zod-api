@@ -3,7 +3,7 @@ import {
   DependsOnMethod,
   EndpointsFactory,
   z,
-} from "../../src";
+} from "../../src/index.js";
 
 describe("DependsOnMethod", () => {
   test("should accept empty object", () => {

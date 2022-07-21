@@ -1,4 +1,4 @@
-import { ZodUpload } from "../../src/upload-schema";
+import { ZodUpload } from "../../src/upload-schema.js";
 
 describe("ZodUpload", () => {
   describe("static::create()", () => {

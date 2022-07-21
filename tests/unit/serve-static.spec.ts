@@ -1,4 +1,4 @@
-import { ServeStatic } from "../../src";
+import { ServeStatic } from "../../src/index.js";
 
 describe("ServeStatic", () => {
   describe("constructor()", () => {

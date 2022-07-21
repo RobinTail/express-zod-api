@@ -1,7 +1,7 @@
 import fetch from "node-fetch";
 import { spawn, ChildProcessWithoutNullStreams } from "child_process";
-import { mimeMultipart } from "../../src/mime";
-import { waitFor } from "../helpers";
+import { mimeMultipart } from "../../src/mime.js";
+import { waitFor } from "../helpers.js";
 import crypto from "crypto";
 import FormData from "form-data";
 import { readFileSync } from "fs";

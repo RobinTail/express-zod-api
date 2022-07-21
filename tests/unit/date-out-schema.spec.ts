@@ -1,4 +1,4 @@
-import { ZodDateOut } from "../../src/date-out-schema";
+import { ZodDateOut } from "../../src/date-out-schema.js";
 
 describe("ZodDateOut", () => {
   describe("static::create()", () => {

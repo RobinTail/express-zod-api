@@ -1,5 +1,5 @@
 import { Express } from "express";
-import { createConfig } from "../../src";
+import { createConfig } from "../../src/index.js";
 
 describe("ConfigType", () => {
   describe("createConfig()", () => {

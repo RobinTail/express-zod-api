@@ -3,8 +3,8 @@ import {
   OpenAPIError,
   withMeta,
   z,
-} from "../../src/index";
-import { getMeta } from "../../src/metadata";
+} from "../../src/index.js";
+import { getMeta } from "../../src/metadata.js";
 import {
   depictAny,
   depictArray,
@@ -37,8 +37,8 @@ import {
   excludeParamsFromDepiction,
   reformatParamsInPath,
   extractObjectSchema,
-} from "../../src/open-api-helpers";
-import { serializeSchemaForTest } from "../helpers";
+} from "../../src/open-api-helpers.js";
+import { serializeSchemaForTest } from "../helpers.js";
 
 describe("Open API helpers", () => {
   describe("extractObjectSchema()", () => {

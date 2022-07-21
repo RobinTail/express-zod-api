@@ -1,5 +1,5 @@
-import { routing } from "../../example/routing";
-import { Client, defaultEndpointsFactory, z } from "../../src";
+import { routing } from "../../example/routing.js";
+import { Client, defaultEndpointsFactory, z } from "../../src/index.js";
 
 describe("API Client Generator", () => {
   test("Should generate a client for example API", () => {

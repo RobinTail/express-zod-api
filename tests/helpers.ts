@@ -1,5 +1,5 @@
-import jestConfig from "../jest.config";
-import { z } from "../src";
+import jestConfig from "../jest.config.js";
+import { z } from "../src/index.js";
 
 export const esmTestPort = 8070;
 

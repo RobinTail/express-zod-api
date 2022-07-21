@@ -1,11 +1,11 @@
 import { Request, RequestHandler, Response } from "express";
 import createHttpError, { HttpError } from "http-errors";
 import { Logger } from "winston";
-import { createMiddleware, EndpointsFactory, z } from "../../src";
-import { Endpoint } from "../../src/endpoint";
-import { ResultHandlerDefinition } from "../../src/result-handler";
+import { createMiddleware, EndpointsFactory, z } from "../../src/index.js";
+import { Endpoint } from "../../src/endpoint.js";
+import { ResultHandlerDefinition } from "../../src/result-handler.js";
 import { expectType } from "tsd";
-import { serializeSchemaForTest } from "../helpers";
+import { serializeSchemaForTest } from "../helpers.js";
 
 describe("EndpointsFactory", () => {
   /* eslint-disable @typescript-eslint/dot-notation */

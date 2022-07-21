@@ -1,4 +1,4 @@
-import { ZodDateIn } from "../../src/date-in-schema";
+import { ZodDateIn } from "../../src/date-in-schema.js";
 
 describe("ZodDateIn", () => {
   describe("static::create()", () => {

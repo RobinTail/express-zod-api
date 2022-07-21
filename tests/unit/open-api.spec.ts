@@ -1,4 +1,4 @@
-import { routing } from "../../example/routing";
+import { routing } from "../../example/routing.js";
 import {
   z,
   OpenAPI,
@@ -6,7 +6,7 @@ import {
   withMeta,
   createConfig,
   createMiddleware,
-} from "../../src";
+} from "../../src/index.js";
 import { expectType } from "tsd";
 
 describe("Open API generator", () => {

@@ -1,4 +1,4 @@
-import { createApiResponse, z } from "../../src";
+import { createApiResponse, z } from "../../src/index.js";
 
 describe("ApiResponse", () => {
   describe("createApiResponse()", () => {

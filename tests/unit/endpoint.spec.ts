@@ -7,10 +7,10 @@ import {
   createResultHandler,
   createApiResponse,
   testEndpoint,
-} from "../../src";
-import { Endpoint } from "../../src/endpoint";
-import { mimeJson } from "../../src/mime";
-import { serializeSchemaForTest } from "../helpers";
+} from "../../src/index.js";
+import { Endpoint } from "../../src/endpoint.js";
+import { mimeJson } from "../../src/mime.js";
+import { serializeSchemaForTest } from "../helpers.js";
 
 describe("Endpoint", () => {
   describe(".getMethods()", () => {

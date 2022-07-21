@@ -1,6 +1,6 @@
 import { ChildProcessWithoutNullStreams, spawn } from "child_process";
 import fetch from "node-fetch";
-import { esmTestPort, waitFor } from "../helpers";
+import { esmTestPort, waitFor } from "../helpers.js";
 
 describe("ESM Test", () => {
   let quickStart: ChildProcessWithoutNullStreams;

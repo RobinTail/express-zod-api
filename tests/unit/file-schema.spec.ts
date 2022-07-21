@@ -1,4 +1,4 @@
-import { ZodFile } from "../../src/file-schema";
+import { ZodFile } from "../../src/file-schema.js";
 import fs from "fs";
 
 describe("ZodFile", () => {

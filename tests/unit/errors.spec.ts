@@ -1,5 +1,9 @@
-import { DependsOnMethodError, OpenAPIError, RoutingError } from "../../src";
-import { ResultHandlerError } from "../../src/errors";
+import {
+  DependsOnMethodError,
+  OpenAPIError,
+  RoutingError,
+} from "../../src/index.js";
+import { ResultHandlerError } from "../../src/errors.js";
 
 describe("Errors", () => {
   describe("RoutingError", () => {

@@ -1,12 +1,12 @@
 import { ChildProcessWithoutNullStreams, spawn } from "child_process";
 import { expectType } from "tsd";
-import { config } from "../../example/config";
-import { waitFor } from "../helpers";
+import { config } from "../../example/config.js";
+import { waitFor } from "../helpers.js";
 import {
   ExpressZodAPIClient,
   Implementation,
   jsonEndpoints,
-} from "../../example/example.client";
+} from "../../example/example.client.js";
 import fetch from "node-fetch";
 
 describe("Example", () => {

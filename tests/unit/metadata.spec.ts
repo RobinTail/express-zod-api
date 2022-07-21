@@ -1,11 +1,11 @@
-import { z, withMeta } from "../../src";
+import { z, withMeta } from "../../src/index.js";
 import {
   copyMeta,
   getMeta,
   hasMeta,
   MetaDef,
   metaProp,
-} from "../../src/metadata";
+} from "../../src/metadata.js";
 
 describe("Metadata", () => {
   describe("withMeta()", () => {

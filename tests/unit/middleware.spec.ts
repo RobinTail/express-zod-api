@@ -1,4 +1,4 @@
-import { createMiddleware, z } from "../../src";
+import { createMiddleware, z } from "../../src/index.js";
 
 describe("Middleware", () => {
   describe("createMiddleware()", () => {

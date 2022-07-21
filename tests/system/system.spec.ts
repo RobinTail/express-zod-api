@@ -10,8 +10,8 @@ import {
   createResultHandler,
   createApiResponse,
   createMiddleware,
-} from "../../src";
-import { waitFor } from "../helpers";
+} from "../../src/index.js";
+import { waitFor } from "../helpers.js";
 
 describe("App", () => {
   let server: http.Server;

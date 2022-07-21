@@ -1,4 +1,4 @@
-import { getStartupLogo } from "../../src/startup-logo";
+import { getStartupLogo } from "../../src/startup-logo.js";
 
 describe("Startup logo", () => {
   describe("getStartupLogo()", () => {

@@ -1,4 +1,4 @@
-import { mimeJson } from "../../src/mime";
+import { mimeJson } from "../../src/mime.js";
 
 jest.mock("mime", () => ({
   getType: jest.fn(() => null),

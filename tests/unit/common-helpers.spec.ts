@@ -11,12 +11,17 @@ import {
   hasUpload,
   isLoggerConfig,
   isValidDate,
-} from "../../src/common-helpers";
-import { z, createHttpError, withMeta, createMiddleware } from "../../src";
+} from "../../src/common-helpers.js";
+import {
+  z,
+  createHttpError,
+  withMeta,
+  createMiddleware,
+} from "../../src/index.js";
 import { Request } from "express";
-import { getMeta } from "../../src/metadata";
-import { AnyMiddlewareDef } from "../../src/middleware";
-import { serializeSchemaForTest } from "../helpers";
+import { getMeta } from "../../src/metadata.js";
+import { AnyMiddlewareDef } from "../../src/middleware.js";
+import { serializeSchemaForTest } from "../helpers.js";
 
 describe("Common Helpers", () => {
   describe("getFinalEndpointInputSchema()", () => {

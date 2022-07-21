@@ -35,13 +35,17 @@ import {
   EndpointsFactory,
   z,
   defaultResultHandler,
-} from "../../src";
-import { AppConfig, CommonConfig, ServerConfig } from "../../src/config-type";
-import { mimeJson } from "../../src/mime";
+} from "../../src/index.js";
+import {
+  AppConfig,
+  CommonConfig,
+  ServerConfig,
+} from "../../src/config-type.js";
+import { mimeJson } from "../../src/mime.js";
 import {
   createNotFoundHandler,
   createParserFailureHandler,
-} from "../../src/server";
+} from "../../src/server.js";
 
 describe("Server", () => {
   beforeEach(() => {
