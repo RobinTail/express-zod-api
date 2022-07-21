@@ -2,7 +2,7 @@ import compression from "compression";
 import { NextHandleFunction } from "connect";
 import { Express, Request } from "express";
 import fileUpload from "express-fileupload";
-import { ServerOptions } from "https";
+import { ServerOptions } from "node:https";
 import { Logger } from "winston";
 import { AbstractEndpoint } from "./endpoint.js";
 import { Method } from "./method.js";

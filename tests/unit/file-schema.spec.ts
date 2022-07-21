@@ -1,5 +1,5 @@
 import { ZodFile } from "../../src/file-schema.js";
-import fs from "fs";
+import fs from "node:fs";
 
 describe("ZodFile", () => {
   describe("static::create()", () => {

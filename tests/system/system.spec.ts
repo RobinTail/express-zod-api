@@ -1,5 +1,5 @@
 import cors from "cors";
-import http from "http";
+import http from "node:http";
 import fetch from "node-fetch";
 import {
   createServer,

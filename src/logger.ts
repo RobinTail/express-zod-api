@@ -1,4 +1,4 @@
-import { inspect } from "util";
+import { inspect } from "node:util";
 import type { Format } from "logform";
 import { LEVEL, MESSAGE, SPLAT } from "triple-beam";
 import winston from "winston";

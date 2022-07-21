@@ -1,10 +1,10 @@
 import fetch from "node-fetch";
-import { spawn, ChildProcessWithoutNullStreams } from "child_process";
+import { spawn, ChildProcessWithoutNullStreams } from "node:child_process";
 import { mimeMultipart } from "../../src/mime.js";
 import { waitFor } from "../helpers.js";
-import crypto from "crypto";
+import crypto from "node:crypto";
 import FormData from "form-data";
-import { readFileSync } from "fs";
+import { readFileSync } from "node:fs";
 
 describe("Example", () => {
   let example: ChildProcessWithoutNullStreams;

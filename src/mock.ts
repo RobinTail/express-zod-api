@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import http from "http";
+import http from "node:http";
 import { Logger } from "winston";
 import { CommonConfig } from "./config-type.js";
 import { AbstractEndpoint } from "./endpoint.js";

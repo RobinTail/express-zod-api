@@ -1,4 +1,4 @@
-import http from "http";
+import http from "node:http";
 
 let appMock: ReturnType<typeof newAppMock>;
 const expressJsonMock = jest.fn();
@@ -27,7 +27,7 @@ const compressionMock = jest.fn();
 jest.mock("compression", () => compressionMock);
 
 import express, { Request, Response } from "express"; // express is mocked above
-import https from "https";
+import https from "node:https";
 import { Logger } from "winston";
 import {
   createServer,

@@ -4,7 +4,7 @@ import { retrieveUserEndpoint } from "./endpoints/retrieve-user.js";
 import { sendAvatarEndpoint } from "./endpoints/send-avatar.js";
 import { updateUserEndpoint } from "./endpoints/update-user.js";
 import { streamAvatarEndpoint } from "./endpoints/stream-avatar.js";
-import path from "path";
+import path from "node:path";
 
 export const routing: Routing = {
   v1: {
