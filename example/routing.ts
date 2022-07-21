@@ -1,10 +1,10 @@
+import path from "node:path";
 import { DependsOnMethod, Routing, ServeStatic } from "../src/index.js";
 import { uploadAvatarEndpoint } from "./endpoints/upload-avatar.js";
 import { retrieveUserEndpoint } from "./endpoints/retrieve-user.js";
 import { sendAvatarEndpoint } from "./endpoints/send-avatar.js";
 import { updateUserEndpoint } from "./endpoints/update-user.js";
 import { streamAvatarEndpoint } from "./endpoints/stream-avatar.js";
-import { fileURLToPath } from "node:url";
 
 export const routing: Routing = {
   v1: {
@@ -25,7 +25,7 @@ export const routing: Routing = {
     },
   },
   // path /public serves static files from /example/assets
-  public: new ServeStatic(fileURLToPath(new URL("assets", import.meta.url)), {
+  public: new ServeStatic(path.join(process.cwd(), "example", "assets"), {
     dotfiles: "deny",
     index: false,
     redirect: false,

@@ -19,8 +19,6 @@ import {
 import { CommonConfig } from "../../src/config-type.js";
 import { mimeJson } from "../../src/mime.js";
 import { initRouting } from "../../src/routing.js";
-import { fileURLToPath } from "node:url";
-import path from "node:path";
 
 let appMock: any;
 let loggerMock: any;
@@ -103,7 +101,7 @@ describe("Routing", () => {
 
     test("Should accept serveStatic", () => {
       const routing: Routing = {
-        public: new ServeStatic(path.dirname(fileURLToPath(import.meta.url)), {
+        public: new ServeStatic(process.cwd(), {
           dotfiles: "deny",
         }),
       };
@@ -117,10 +115,9 @@ describe("Routing", () => {
         config: configMock as CommonConfig,
         routing,
       });
-      expect(staticMock).toHaveBeenCalledWith(
-        path.dirname(fileURLToPath(import.meta.url)),
-        { dotfiles: "deny" }
-      );
+      expect(staticMock).toHaveBeenCalledWith(process.cwd(), {
+        dotfiles: "deny",
+      });
       expect(appMock.use).toHaveBeenCalledTimes(1);
       expect(appMock.use).toHaveBeenCalledWith("/public", staticHandler);
     });
