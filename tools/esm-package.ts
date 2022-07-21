@@ -1,4 +1,4 @@
-import fs from "fs";
+import fs from "node:fs";
 import originalManifest from "../package.json";
 
 const manifest = {

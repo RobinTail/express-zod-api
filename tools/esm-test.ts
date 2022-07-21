@@ -1,7 +1,7 @@
-import fs from "fs";
-import { esmTestPort } from "../tests/helpers";
-import { extractReadmeQuickStart } from "./extract-quick-start";
-import { getTSConfigBase } from "./tsconfig-base";
+import fs from "node:fs";
+import { esmTestPort } from "../tests/helpers.js";
+import { extractReadmeQuickStart } from "./extract-quick-start.js";
+import { getTSConfigBase } from "./tsconfig-base.js";
 
 const tsconfigBase = getTSConfigBase();
 

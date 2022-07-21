@@ -1,6 +1,6 @@
 import chalk from "chalk";
 import { format } from "pretty-format";
-import fs from "fs";
+import fs from "node:fs";
 
 const attribution = `
 // ANSI font attribution
