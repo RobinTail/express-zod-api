@@ -1,5 +1,5 @@
-import { z } from "../../src";
-import { fileStreamingEndpointsFactory } from "../factories";
+import { z } from "../../src/index.js";
+import { fileStreamingEndpointsFactory } from "../factories.js";
 
 export const streamAvatarEndpoint = fileStreamingEndpointsFactory.build({
   methods: ["get"],

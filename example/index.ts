@@ -1,5 +1,5 @@
-import { createServer } from "../src";
-import { config } from "./config";
-import { routing } from "./routing";
+import { createServer } from "../src/index.js";
+import { config } from "./config.js";
+import { routing } from "./routing.js";
 
 createServer(config, routing);

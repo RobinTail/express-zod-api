@@ -5,8 +5,8 @@ import {
   defaultEndpointsFactory,
   EndpointsFactory,
   z,
-} from "../src";
-import { authMiddleware } from "./middlewares";
+} from "../src/index.js";
+import { authMiddleware } from "./middlewares.js";
 import fs from "fs";
 
 export const keyAndTokenAuthenticatedEndpointsFactory =

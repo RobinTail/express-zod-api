@@ -1,9 +1,9 @@
-import { DependsOnMethod, Routing, ServeStatic } from "../src";
-import { uploadAvatarEndpoint } from "./endpoints/upload-avatar";
-import { retrieveUserEndpoint } from "./endpoints/retrieve-user";
-import { sendAvatarEndpoint } from "./endpoints/send-avatar";
-import { updateUserEndpoint } from "./endpoints/update-user";
-import { streamAvatarEndpoint } from "./endpoints/stream-avatar";
+import { DependsOnMethod, Routing, ServeStatic } from "../src/index.js";
+import { uploadAvatarEndpoint } from "./endpoints/upload-avatar.js";
+import { retrieveUserEndpoint } from "./endpoints/retrieve-user.js";
+import { sendAvatarEndpoint } from "./endpoints/send-avatar.js";
+import { updateUserEndpoint } from "./endpoints/update-user.js";
+import { streamAvatarEndpoint } from "./endpoints/stream-avatar.js";
 import path from "path";
 
 export const routing: Routing = {

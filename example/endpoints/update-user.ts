@@ -1,5 +1,5 @@
-import { z, createHttpError, withMeta } from "../../src";
-import { keyAndTokenAuthenticatedEndpointsFactory } from "../factories";
+import { z, createHttpError, withMeta } from "../../src/index.js";
+import { keyAndTokenAuthenticatedEndpointsFactory } from "../factories.js";
 
 export const updateUserEndpoint =
   keyAndTokenAuthenticatedEndpointsFactory.build({

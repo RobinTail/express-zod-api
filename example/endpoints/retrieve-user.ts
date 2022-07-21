@@ -1,5 +1,9 @@
-import { z, createHttpError, defaultEndpointsFactory } from "../../src";
-import { methodProviderMiddleware } from "../middlewares";
+import {
+  z,
+  createHttpError,
+  defaultEndpointsFactory,
+} from "../../src/index.js";
+import { methodProviderMiddleware } from "../middlewares.js";
 
 export const retrieveUserEndpoint = defaultEndpointsFactory
   .addMiddleware(methodProviderMiddleware)

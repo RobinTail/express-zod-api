@@ -1,4 +1,10 @@
-import { createMiddleware, Method, createHttpError, z, withMeta } from "../src";
+import {
+  createMiddleware,
+  Method,
+  createHttpError,
+  z,
+  withMeta,
+} from "../src/index.js";
 
 export const authMiddleware = createMiddleware({
   input: withMeta(

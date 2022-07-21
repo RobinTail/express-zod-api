@@ -1,4 +1,4 @@
-import { createConfig } from "../src";
+import { createConfig } from "../src/index.js";
 
 export const config = createConfig({
   server: {

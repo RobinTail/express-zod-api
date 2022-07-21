@@ -1,5 +1,5 @@
-import { z } from "../../src";
-import { fileSendingEndpointsFactory } from "../factories";
+import { z } from "../../src/index.js";
+import { fileSendingEndpointsFactory } from "../factories.js";
 import fs from "fs";
 
 export const sendAvatarEndpoint = fileSendingEndpointsFactory.build({

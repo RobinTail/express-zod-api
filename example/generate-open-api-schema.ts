@@ -1,6 +1,6 @@
-import { OpenAPI } from "../src";
-import { config } from "./config";
-import { routing } from "./routing";
+import { OpenAPI } from "../src/index.js";
+import { config } from "./config.js";
+import { routing } from "./routing.js";
 import manifest from "../package.json";
 
 console.log(

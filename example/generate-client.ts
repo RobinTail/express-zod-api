@@ -1,4 +1,4 @@
-import { Client } from "../src";
-import { routing } from "./routing";
+import { Client } from "../src/index.js";
+import { routing } from "./routing.js";
 
 console.log(new Client(routing).print());

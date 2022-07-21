@@ -1,4 +1,4 @@
-import { z, defaultEndpointsFactory } from "../../src";
+import { z, defaultEndpointsFactory } from "../../src/index.js";
 import crypto from "crypto";
 
 export const uploadAvatarEndpoint = defaultEndpointsFactory.build({
