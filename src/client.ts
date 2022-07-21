@@ -23,10 +23,10 @@ import {
   makeTypeParams,
   parametricIndexNode,
   protectedReadonlyModifier,
-} from "./client-helpers";
-import { methods } from "./method";
-import { mimeJson } from "./mime";
-import { Routing, routingCycle } from "./routing";
+} from "./client-helpers.js";
+import { methods } from "./method.js";
+import { mimeJson } from "./mime.js";
+import { Routing, routingCycle } from "./routing.js";
 
 interface Registry {
   [METHOD_PATH: string]: Record<"in" | "out", string> & { isJson: boolean };

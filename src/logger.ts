@@ -3,7 +3,7 @@ import type { Format } from "logform";
 import { LEVEL, MESSAGE, SPLAT } from "triple-beam";
 import winston from "winston";
 import type Transport from "winston-transport";
-import { LoggerConfig } from "./config-type";
+import { LoggerConfig } from "./config-type.js";
 
 const { combine, colorize, timestamp: useTimestamp, printf } = winston.format;
 

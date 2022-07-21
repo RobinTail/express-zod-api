@@ -1,6 +1,6 @@
-import { Endpoint } from "./endpoint";
-import { DependsOnMethodError } from "./errors";
-import { Method } from "./method";
+import { Endpoint } from "./endpoint.js";
+import { DependsOnMethodError } from "./errors.js";
+import { Method } from "./method.js";
 
 export class DependsOnMethod {
   constructor(

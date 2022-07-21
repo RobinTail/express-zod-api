@@ -8,7 +8,7 @@ import {
   ZodType,
   ZodTypeDef,
 } from "zod";
-import { isValidDate } from "./common-helpers";
+import { isValidDate } from "./common-helpers.js";
 
 // simple regex for ISO date, supports the following formats:
 // 2021-01-01T00:00:00.000Z

@@ -1,12 +1,12 @@
 import { Express, static as _serveStatic } from "express";
 import { Logger } from "winston";
-import { CommonConfig } from "./config-type";
-import { DependsOnMethod } from "./depends-on-method";
-import { AbstractEndpoint } from "./endpoint";
-import { RoutingError } from "./errors";
-import { AuxMethod, Method } from "./method";
-import { ServeStatic, StaticHandler } from "./serve-static";
-import { getStartupLogo } from "./startup-logo";
+import { CommonConfig } from "./config-type.js";
+import { DependsOnMethod } from "./depends-on-method.js";
+import { AbstractEndpoint } from "./endpoint.js";
+import { RoutingError } from "./errors.js";
+import { AuxMethod, Method } from "./method.js";
+import { ServeStatic, StaticHandler } from "./serve-static.js";
+import { getStartupLogo } from "./startup-logo.js";
 
 export interface Routing {
   [SEGMENT: string]: Routing | DependsOnMethod | AbstractEndpoint | ServeStatic;

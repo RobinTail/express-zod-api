@@ -4,9 +4,9 @@ import { Express, Request } from "express";
 import fileUpload from "express-fileupload";
 import { ServerOptions } from "https";
 import { Logger } from "winston";
-import { AbstractEndpoint } from "./endpoint";
-import { Method } from "./method";
-import { ResultHandlerDefinition } from "./result-handler";
+import { AbstractEndpoint } from "./endpoint.js";
+import { Method } from "./method.js";
+import { ResultHandlerDefinition } from "./result-handler.js";
 
 export const loggerLevels = {
   silent: true,

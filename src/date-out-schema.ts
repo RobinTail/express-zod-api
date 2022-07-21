@@ -8,7 +8,7 @@ import {
   ZodType,
   ZodTypeDef,
 } from "zod";
-import { isValidDate } from "./common-helpers";
+import { isValidDate } from "./common-helpers.js";
 
 const zodDateOutKind = "ZodDateOut";
 

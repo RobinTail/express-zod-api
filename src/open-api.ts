@@ -1,14 +1,14 @@
 import { OpenApiBuilder, OperationObject } from "openapi3-ts";
-import { defaultInputSources } from "./common-helpers";
-import { CommonConfig } from "./config-type";
-import { Method } from "./method";
+import { defaultInputSources } from "./common-helpers.js";
+import { CommonConfig } from "./config-type.js";
+import { Method } from "./method.js";
 import {
   depictRequestParams,
   depictRequest,
   depictResponse,
   reformatParamsInPath,
-} from "./open-api-helpers";
-import { Routing, routingCycle, RoutingCycleParams } from "./routing";
+} from "./open-api-helpers.js";
+import { Routing, routingCycle, RoutingCycleParams } from "./routing.js";
 
 interface GeneratorParams {
   title: string;

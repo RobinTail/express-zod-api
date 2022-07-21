@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { HttpError } from "http-errors";
 import { Logger } from "winston";
 import { z } from "zod";
-import { FlatObject, IOSchema } from "./common-helpers";
+import { FlatObject, IOSchema } from "./common-helpers.js";
 
 interface MiddlewareParams<IN, OPT> {
   input: IN;

@@ -1,18 +1,21 @@
 import { Request, Response } from "express";
 import { Logger } from "winston";
 import { z } from "zod";
-import { ApiResponse } from "./api-response";
-import { CommonConfig } from "./config-type";
-import { ResultHandlerError } from "./errors";
+import { ApiResponse } from "./api-response.js";
+import { CommonConfig } from "./config-type.js";
+import { ResultHandlerError } from "./errors.js";
 import {
   FlatObject,
   getActualMethod,
   getInitialInput,
   IOSchema,
-} from "./common-helpers";
-import { AuxMethod, Method, MethodsDefinition } from "./method";
-import { AnyMiddlewareDef } from "./middleware";
-import { lastResortHandler, ResultHandlerDefinition } from "./result-handler";
+} from "./common-helpers.js";
+import { AuxMethod, Method, MethodsDefinition } from "./method.js";
+import { AnyMiddlewareDef } from "./middleware.js";
+import {
+  lastResortHandler,
+  ResultHandlerDefinition,
+} from "./result-handler.js";
 
 export type Handler<IN, OUT, OPT> = (params: {
   input: IN;

@@ -1,5 +1,5 @@
-import { combinations } from "./common-helpers";
-import { z } from "./index";
+import { combinations } from "./common-helpers.js";
+import { z } from "./index.js";
 import { mergeDeepRight } from "ramda";
 
 export const metaProp = "expressZodApiMeta";

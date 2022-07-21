@@ -1,15 +1,15 @@
 import { Request, Response } from "express";
 import { z } from "zod";
-import { ApiResponse } from "./api-response";
+import { ApiResponse } from "./api-response.js";
 import {
   FlatObject,
   getFinalEndpointInputSchema,
   hasUpload,
   IOSchema,
   ProbableIntersection,
-} from "./common-helpers";
-import { Endpoint, Handler } from "./endpoint";
-import { Method, MethodsDefinition } from "./method";
+} from "./common-helpers.js";
+import { Endpoint, Handler } from "./endpoint.js";
+import { Method, MethodsDefinition } from "./method.js";
 import {
   AnyMiddlewareDef,
   createMiddleware,
@@ -17,12 +17,12 @@ import {
   ExpressMiddlewareFeatures,
   MiddlewareCreationProps,
   MiddlewareDefinition,
-} from "./middleware";
-import { mimeJson, mimeMultipart } from "./mime";
+} from "./middleware.js";
+import { mimeJson, mimeMultipart } from "./mime.js";
 import {
   defaultResultHandler,
   ResultHandlerDefinition,
-} from "./result-handler";
+} from "./result-handler.js";
 
 type BuildProps<
   IN extends IOSchema,

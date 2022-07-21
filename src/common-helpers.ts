@@ -6,12 +6,12 @@ import {
   InputSources,
   LoggerConfig,
   loggerLevels,
-} from "./config-type";
-import { copyMeta, getMeta } from "./metadata";
-import { AuxMethod, Method } from "./method";
-import { AnyMiddlewareDef } from "./middleware";
-import { mimeMultipart } from "./mime";
-import { ZodUpload } from "./upload-schema";
+} from "./config-type.js";
+import { copyMeta, getMeta } from "./metadata.js";
+import { AuxMethod, Method } from "./method.js";
+import { AnyMiddlewareDef } from "./middleware.js";
+import { mimeMultipart } from "./mime.js";
+import { ZodUpload } from "./upload-schema.js";
 
 export type FlatObject = Record<string, any>;
 

@@ -3,12 +3,12 @@ import compression from "compression";
 import fileUpload from "express-fileupload";
 import https from "https";
 import { Logger } from "winston";
-import { AppConfig, CommonConfig, ServerConfig } from "./config-type";
-import { ResultHandlerError } from "./errors";
-import { isLoggerConfig } from "./common-helpers";
-import { createLogger } from "./logger";
-import { defaultResultHandler, lastResortHandler } from "./result-handler";
-import { initRouting, Routing } from "./routing";
+import { AppConfig, CommonConfig, ServerConfig } from "./config-type.js";
+import { ResultHandlerError } from "./errors.js";
+import { isLoggerConfig } from "./common-helpers.js";
+import { createLogger } from "./logger.js";
+import { defaultResultHandler, lastResortHandler } from "./result-handler.js";
+import { initRouting, Routing } from "./routing.js";
 import createHttpError from "http-errors";
 
 type AnyResultHandler = NonNullable<CommonConfig["errorHandler"]>;

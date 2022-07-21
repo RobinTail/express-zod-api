@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
 import http from "http";
 import { Logger } from "winston";
-import { CommonConfig } from "./config-type";
-import { AbstractEndpoint } from "./endpoint";
-import { mimeJson } from "./mime";
+import { CommonConfig } from "./config-type.js";
+import { AbstractEndpoint } from "./endpoint.js";
+import { mimeJson } from "./mime.js";
 
 interface TestEndpointProps<REQ, RES, LOG> {
   endpoint: AbstractEndpoint;

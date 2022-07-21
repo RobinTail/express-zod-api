@@ -1,15 +1,13 @@
-import {
+import type {
   ContentObject,
   ExampleObject,
   ExamplesObject,
   MediaTypeObject,
   ParameterObject,
   SchemaObject,
-} from "openapi3-ts";
-import {
   RequestBodyObject,
   ResponseObject,
-} from "openapi3-ts/src/model/OpenApi";
+} from "openapi3-ts";
 import { omit } from "ramda";
 import { z } from "zod";
 import {
@@ -18,16 +16,16 @@ import {
   getRoutePathParams,
   IOSchema,
   routePathParamsRegex,
-} from "./common-helpers";
-import { InputSources } from "./config-type";
-import { isoDateRegex, ZodDateIn, ZodDateInDef } from "./date-in-schema";
-import { ZodDateOut, ZodDateOutDef } from "./date-out-schema";
-import { AbstractEndpoint } from "./endpoint";
-import { OpenAPIError } from "./errors";
-import { ZodFile, ZodFileDef } from "./file-schema";
-import { copyMeta } from "./metadata";
-import { Method } from "./method";
-import { ZodUpload, ZodUploadDef } from "./upload-schema";
+} from "./common-helpers.js";
+import { InputSources } from "./config-type.js";
+import { isoDateRegex, ZodDateIn, ZodDateInDef } from "./date-in-schema.js";
+import { ZodDateOut, ZodDateOutDef } from "./date-out-schema.js";
+import { AbstractEndpoint } from "./endpoint.js";
+import { OpenAPIError } from "./errors.js";
+import { ZodFile, ZodFileDef } from "./file-schema.js";
+import { copyMeta } from "./metadata.js";
+import { Method } from "./method.js";
+import { ZodUpload, ZodUploadDef } from "./upload-schema.js";
 
 type MediaExamples = Pick<MediaTypeObject, "examples">;
 

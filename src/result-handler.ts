@@ -1,14 +1,14 @@
 import { Request, Response } from "express";
 import { Logger } from "winston";
 import { z } from "zod";
-import { ApiResponse, createApiResponse } from "./api-response";
-import { ResultHandlerError } from "./errors";
+import { ApiResponse, createApiResponse } from "./api-response.js";
+import { ResultHandlerError } from "./errors.js";
 import {
   getMessageFromError,
   getStatusCodeFromError,
   IOSchema,
-} from "./common-helpers";
-import { getMeta, withMeta } from "./metadata";
+} from "./common-helpers.js";
+import { getMeta, withMeta } from "./metadata.js";
 
 interface LastResortHandlerParams {
   error: ResultHandlerError;
