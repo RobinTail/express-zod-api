@@ -1,6 +1,6 @@
 {
   "env": {
-    "es6": true,
+    "es2022": true,
     "node": true,
     "jest": true
   },
@@ -11,17 +11,19 @@
   ],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
-    "ecmaVersion": 6,
+    "ecmaVersion": "latest",
     "sourceType": "module",
     "project": "./tsconfig.json"
   },
   "plugins": [
     "@typescript-eslint",
     "prettier",
-    "import"
+    "import",
+    "unicorn"
   ],
   "rules": {
-    "@typescript-eslint/lines-between-class-members": "off"
+    "@typescript-eslint/lines-between-class-members": "off",
+    "unicorn/prefer-module": "error"
   },
   "overrides": [
     {
