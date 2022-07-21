@@ -27,7 +27,6 @@
     "postversion": "git push && git push --tags",
     "install_hooks": "husky install"
   },
-  "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "module": "dist-esm/index.js",
   "exports": {
