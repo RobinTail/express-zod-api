@@ -1,5 +1,8 @@
 import fs from "node:fs";
-import originalManifest from "../package.json";
+import path from "node:path";
+const originalManifest = JSON.parse(
+  fs.readFileSync(path.join(process.cwd(), "package.json"), "utf-8")
+);
 
 const manifest = {
   type: "module",

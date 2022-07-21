@@ -1,6 +1,9 @@
 import fs from "node:fs";
 import path from "node:path";
-import esmConfig from "../tsconfig.esm.json";
+
+const esmConfig = JSON.parse(
+  fs.readFileSync(path.join(process.cwd(), "tsconfig.esm.json"), "utf-8")
+);
 
 const files = fs
   .readdirSync(esmConfig.compilerOptions.outDir)
