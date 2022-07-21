@@ -376,12 +376,14 @@ describe("Endpoint", () => {
   describe("Issue #269: Async refinements", () => {
     test("should handle async refinements in input, output and middleware", async () => {
       const endpoint = new EndpointsFactory(defaultResultHandler)
-        .addMiddleware({
-          input: z.object({
-            m: z.number().refine(async (m) => m < 10),
-          }),
-          middleware: async () => ({}),
-        })
+        .addMiddleware(
+          createMiddleware({
+            input: z.object({
+              m: z.number().refine(async (m) => m < 10),
+            }),
+            middleware: async () => ({}),
+          })
+        )
         .build({
           methods: ["post"],
           input: z.object({
@@ -407,6 +409,44 @@ describe("Endpoint", () => {
           str: "This is fine",
         },
       });
+    });
+  });
+
+  describe("Issue #514: Express native middlewares for OPTIONS request", () => {
+    test("should skip proprietary ones", async () => {
+      const endpoint = new EndpointsFactory(defaultResultHandler)
+        .addMiddleware({
+          // testing also the backward compatibility (without createMiddleware)
+          input: z.object({
+            shouldNotBeHere: z.boolean(),
+          }),
+          middleware: async () => {
+            throw new Error("Should not be here");
+          },
+        })
+        .addExpressMiddleware((req, res, next) => {
+          res.set("X-Custom-Header", "test");
+          next();
+        })
+        .build({
+          methods: ["post"],
+          input: z.object({
+            shouldNotBeThere: z.boolean(),
+          }),
+          output: z.object({
+            shouldNotComeHereAsWell: z.boolean(),
+          }),
+          handler: async () => ({ shouldNotComeHereAsWell: true }),
+        });
+      const { responseMock } = await testEndpoint({
+        endpoint,
+        requestProps: {
+          method: "OPTIONS",
+        },
+      });
+      expect(responseMock.status).toHaveBeenCalledWith(200);
+      expect(responseMock.json).toHaveBeenCalledTimes(0);
+      expect(responseMock.set).toHaveBeenCalledWith("X-Custom-Header", "test");
     });
   });
 });

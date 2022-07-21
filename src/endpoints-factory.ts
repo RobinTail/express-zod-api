@@ -15,6 +15,7 @@ import {
   createMiddleware,
   ExpressMiddleware,
   ExpressMiddlewareFeatures,
+  MiddlewareCreationProps,
   MiddlewareDefinition,
 } from "./middleware";
 import { mimeJson, mimeMultipart } from "./mime";
@@ -62,6 +63,15 @@ export class EndpointsFactory<
 
   public addMiddleware<AIN extends IOSchema<"strip">, AOUT extends FlatObject>(
     definition: MiddlewareDefinition<AIN, OUT, AOUT>
+  ): EndpointsFactory<POS, NEG, ProbableIntersection<IN, AIN>, OUT & AOUT>;
+  /** @deprecated please use createMiddleware() for the argument */
+  public addMiddleware<AIN extends IOSchema<"strip">, AOUT extends FlatObject>(
+    props: MiddlewareCreationProps<AIN, OUT, AOUT>
+  ): EndpointsFactory<POS, NEG, ProbableIntersection<IN, AIN>, OUT & AOUT>;
+  public addMiddleware<AIN extends IOSchema<"strip">, AOUT extends FlatObject>(
+    subject:
+      | MiddlewareDefinition<AIN, OUT, AOUT>
+      | MiddlewareCreationProps<AIN, OUT, AOUT>
   ) {
     return EndpointsFactory.#create<
       POS,
@@ -69,7 +79,9 @@ export class EndpointsFactory<
       ProbableIntersection<IN, AIN>,
       OUT & AOUT
     >(
-      this.middlewares.concat(definition as unknown as AnyMiddlewareDef),
+      this.middlewares.concat(
+        "type" in subject ? subject : createMiddleware(subject)
+      ),
       this.resultHandler
     );
   }
@@ -86,7 +98,8 @@ export class EndpointsFactory<
   ) {
     const transformer = features?.transformer || ((err: Error) => err);
     const provider = features?.provider || (() => ({} as AOUT));
-    const definition = createMiddleware({
+    const definition: AnyMiddlewareDef = {
+      type: "express",
       input: z.object({}),
       middleware: async ({ request, response }) =>
         new Promise<AOUT>((resolve, reject) => {
@@ -98,9 +111,9 @@ export class EndpointsFactory<
           };
           middleware(request as R, response as S, next);
         }),
-    });
+    };
     return EndpointsFactory.#create<POS, NEG, IN, OUT & AOUT>(
-      this.middlewares.concat(definition as AnyMiddlewareDef),
+      this.middlewares.concat(definition),
       this.resultHandler
     );
   }
@@ -111,7 +124,7 @@ export class EndpointsFactory<
         createMiddleware({
           input: z.object({}),
           middleware: async () => options,
-        }) as AnyMiddlewareDef
+        })
       ),
       this.resultHandler
     );

@@ -16,7 +16,7 @@ type Middleware<IN, OPT, OUT> = (
   params: MiddlewareParams<IN, OPT>
 ) => Promise<OUT>;
 
-export interface MiddlewareDefinition<
+export interface MiddlewareCreationProps<
   IN extends IOSchema<"strip">,
   OPT,
   OUT extends FlatObject
@@ -25,19 +25,26 @@ export interface MiddlewareDefinition<
   middleware: Middleware<z.output<IN>, OPT, OUT>;
 }
 
-export type AnyMiddlewareDef = MiddlewareDefinition<
-  IOSchema<"strip">,
-  any,
-  any
->;
+export interface MiddlewareDefinition<
+  IN extends IOSchema<"strip">,
+  OPT,
+  OUT extends FlatObject
+> extends MiddlewareCreationProps<IN, OPT, OUT> {
+  type: "proprietary" | "express";
+}
+
+export type AnyMiddlewareDef = MiddlewareDefinition<any, any, any>;
 
 export const createMiddleware = <
   IN extends IOSchema<"strip">,
   OPT,
   OUT extends FlatObject
 >(
-  definition: MiddlewareDefinition<IN, OPT, OUT>
-) => definition;
+  props: MiddlewareCreationProps<IN, OPT, OUT>
+): MiddlewareDefinition<IN, OPT, OUT> => ({
+  ...props,
+  type: "proprietary",
+});
 
 export type ExpressMiddleware<R extends Request, S extends Response> = (
   request: R,

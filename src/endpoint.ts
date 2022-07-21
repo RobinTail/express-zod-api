@@ -4,7 +4,12 @@ import { z } from "zod";
 import { ApiResponse } from "./api-response";
 import { CommonConfig } from "./config-type";
 import { ResultHandlerError } from "./errors";
-import { FlatObject, getInitialInput, IOSchema } from "./common-helpers";
+import {
+  FlatObject,
+  getActualMethod,
+  getInitialInput,
+  IOSchema,
+} from "./common-helpers";
 import { AuxMethod, Method, MethodsDefinition } from "./method";
 import { AnyMiddlewareDef } from "./middleware";
 import { lastResortHandler, ResultHandlerDefinition } from "./result-handler";
@@ -162,11 +167,13 @@ export class Endpoint<
   }
 
   async #runMiddlewares({
+    method,
     input,
     request,
     response,
     logger,
   }: {
+    method: Method | AuxMethod;
     input: any;
     request: Request;
     response: Response;
@@ -175,6 +182,9 @@ export class Endpoint<
     const options: any = {};
     let isStreamClosed = false;
     for (const def of this.middlewares) {
+      if (method === "options" && def.type === "proprietary") {
+        continue;
+      }
       Object.assign(input, await def.input.parseAsync(input)); // middleware can transform the input types
       Object.assign(
         options,
@@ -261,6 +271,7 @@ export class Endpoint<
     logger: Logger;
     config: CommonConfig;
   }) {
+    const method = getActualMethod(request);
     let output: any;
     let error: Error | null = null;
     if (config.cors) {
@@ -277,19 +288,20 @@ export class Endpoint<
         response.set(key, headers[key]);
       }
     }
-    if (request.method === "OPTIONS") {
-      response.status(200).end();
-      return;
-    }
     const initialInput = getInitialInput(request, config.inputSources);
     try {
       const { input, options, isStreamClosed } = await this.#runMiddlewares({
+        method,
         input: { ...initialInput }, // preserve the initial
         request,
         response,
         logger,
       });
       if (isStreamClosed) {
+        return;
+      }
+      if (method === "options") {
+        response.status(200).end();
         return;
       }
       output = await this.#parseOutput(
