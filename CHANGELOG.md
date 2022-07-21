@@ -8,6 +8,9 @@
   - Using `.addExpressMiddleware()` or its alias `.use()` of `EndpointsFactory` it did not work for requests having
     `OPTIONS` method.
   - This version introduces the difference between a proprietary and native express middlewares.
+    - Please ensure usage of the `.addMiddleware()` method along with `createMiddleware()`.
+    - For the backward compatibility `.addMiddleware()` temporary also accepts the same arguments that
+      `createMiddleware()` does, however this is deprecated and will be removed later.
   - Only native express middlewares are executed for `OPTIONS` request.
   - It makes it possible to use `cors` package (express middleware), which is described in the
     [Documentation](README.md#using-native-express-middlewares).
