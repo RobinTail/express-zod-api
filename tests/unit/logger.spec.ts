@@ -1,8 +1,8 @@
 import { createLogger, LoggerConfig } from "../../src/index.js";
 import { LEVEL, MESSAGE, SPLAT } from "triple-beam";
 import MockDate from "mockdate";
-import stripAnsi from "strip-ansi";
-import hasAnsi from "has-ansi";
+import { default as stripAnsi } from "strip-ansi";
+import { default as hasAnsi } from "has-ansi";
 
 describe("Logger", () => {
   beforeEach(() => {
