@@ -2,6 +2,10 @@
 
 ## Version 7
 
+### v7.6.2
+
+- `zod` version is 3.17.10.
+
 ### v7.6.1
 
 - Fixed issue #514: native express middlewares did not run for `OPTIONS` requests.
