@@ -23,7 +23,9 @@ export interface MiddlewareCreationProps<
   OUT extends FlatObject
 > {
   input: IN;
-  security?: Security | Security[];
+  security?:
+    | Security<keyof z.input<IN> & string>
+    | Security<keyof z.input<IN> & string>[];
   middleware: Middleware<z.output<IN>, OPT, OUT>;
 }
 

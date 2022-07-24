@@ -7,10 +7,9 @@ interface BearerSecurity {
   format?: "JWT" | string;
 }
 
-// @todo this one should require the actual MW input
-interface InputSecurity {
+interface InputSecurity<K extends string> {
   type: "input";
-  name: string;
+  name: K;
 }
 
 interface CustomHeaderSecurity {
@@ -36,10 +35,10 @@ interface OAuth2Security {
   type: "oauth2";
 }
 
-export type Security =
+export type Security<K extends string = string> =
   | BasicSecurity
   | BearerSecurity
-  | InputSecurity
+  | InputSecurity<K>
   | CustomHeaderSecurity
   | CookieSecurity
   | OpenIdSecurity
