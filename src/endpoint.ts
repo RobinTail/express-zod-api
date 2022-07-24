@@ -13,6 +13,7 @@ import {
 import { AuxMethod, Method, MethodsDefinition } from "./method";
 import { AnyMiddlewareDef } from "./middleware";
 import { lastResortHandler, ResultHandlerDefinition } from "./result-handler";
+import { Security } from "./security";
 
 export type Handler<IN, OUT, OPT> = (params: {
   input: IN;
@@ -36,6 +37,7 @@ export abstract class AbstractEndpoint {
   public abstract getInputMimeTypes(): string[];
   public abstract getPositiveMimeTypes(): string[];
   public abstract getNegativeMimeTypes(): string[];
+  public abstract getSecurity(): Security[][];
 }
 
 type EndpointProps<
@@ -131,6 +133,14 @@ export class Endpoint<
 
   public override getNegativeMimeTypes() {
     return this.resultHandler.getNegativeResponse().mimeTypes;
+  }
+
+  public override getSecurity(): Security[][] {
+    return this.middlewares
+      .map(({ security }) =>
+        Array.isArray(security) ? security : security ? [security] : []
+      )
+      .filter((entry) => entry.length);
   }
 
   #getDefaultCorsHeaders(): Record<string, string> {
