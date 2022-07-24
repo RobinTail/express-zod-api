@@ -7,7 +7,9 @@ import {
   depictRequest,
   depictResponse,
   reformatParamsInPath,
+  depictSecurity,
 } from "./open-api-helpers";
+import crypto from "crypto";
 import { Routing, routingCycle, RoutingCycleParams } from "./routing";
 
 interface GeneratorParams {
@@ -21,6 +23,14 @@ interface GeneratorParams {
 }
 
 export class OpenAPI extends OpenApiBuilder {
+  protected makeUniqKey(object: Record<string, any>, prefix: string): string {
+    let key: string;
+    do {
+      key = prefix + crypto.randomBytes(16).toString("hex");
+    } while (key in object);
+    return key;
+  }
+
   public constructor({
     routing,
     config,
@@ -67,6 +77,22 @@ export class OpenAPI extends OpenApiBuilder {
       }
       if (inputSources.includes("body")) {
         operation.requestBody = depictRequest(commonParams);
+      }
+      const securitySchemas = depictSecurity(commonParams);
+      if (securitySchemas.length > 0) {
+        for (const collection of securitySchemas) {
+          for (const securitySchema of collection) {
+            const securitySchemaName = this.makeUniqKey(
+              this.rootDoc.components?.securitySchemes || {},
+              `${securitySchema.type.toUpperCase()}_`
+            );
+            this.addSecurityScheme(securitySchemaName, securitySchema);
+            operation.security = [
+              ...(operation.security || []),
+              { [securitySchemaName]: [] },
+            ];
+          }
+        }
       }
       const swaggerCompatiblePath = reformatParamsInPath(path);
       this.addPath(swaggerCompatiblePath, {
