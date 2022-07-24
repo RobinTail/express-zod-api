@@ -3,6 +3,7 @@ import { HttpError } from "http-errors";
 import { Logger } from "winston";
 import { z } from "zod";
 import { FlatObject, IOSchema } from "./common-helpers";
+import { Security } from "./security";
 
 interface MiddlewareParams<IN, OPT> {
   input: IN;
@@ -15,40 +16,6 @@ interface MiddlewareParams<IN, OPT> {
 type Middleware<IN, OPT, OUT> = (
   params: MiddlewareParams<IN, OPT>
 ) => Promise<OUT>;
-
-interface BasicSecurity {
-  type: "basic";
-}
-interface BearerSecurity {
-  type: "bearer";
-  format?: "JWT" | string;
-}
-interface CustomHeaderSecurity {
-  type: "header";
-  name: string;
-}
-interface CookieSecurity {
-  type: "cookie";
-  name: string;
-}
-interface OpenIdSecurity {
-  type: "openid";
-  url: string;
-}
-/**
- * @todo add more fields here
- * @see https://swagger.io/docs/specification/authentication/oauth2/
- */
-interface OAuth2Security {
-  type: "oauth2";
-}
-type Security =
-  | BasicSecurity
-  | BearerSecurity
-  | CustomHeaderSecurity
-  | CookieSecurity
-  | OpenIdSecurity
-  | OAuth2Security;
 
 export interface MiddlewareCreationProps<
   IN extends IOSchema<"strip">,
