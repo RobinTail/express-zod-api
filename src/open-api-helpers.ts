@@ -9,6 +9,7 @@ import {
 import {
   RequestBodyObject,
   ResponseObject,
+  SecuritySchemeObject,
 } from "openapi3-ts/src/model/OpenApi";
 import { omit } from "ramda";
 import { z } from "zod";
@@ -27,6 +28,7 @@ import { OpenAPIError } from "./errors";
 import { ZodFile, ZodFileDef } from "./file-schema";
 import { copyMeta } from "./metadata";
 import { Method } from "./method";
+import { Security } from "./security";
 import { ZodUpload, ZodUploadDef } from "./upload-schema";
 
 type MediaExamples = Pick<MediaTypeObject, "examples">;
@@ -712,6 +714,60 @@ export const depictResponse = ({
       {} as ContentObject
     ),
   };
+};
+
+type SecurityHelper<K extends Security["type"]> = (
+  security: Security & { type: K }
+) => SecuritySchemeObject;
+
+const depictBasicSecurity: SecurityHelper<"basic"> = ({}) => ({
+  type: "http",
+  scheme: "basic",
+});
+const depictBearerSecurity: SecurityHelper<"bearer"> = ({
+  format: bearerFormat,
+}) => ({
+  type: "http",
+  scheme: "bearer",
+  bearerFormat,
+});
+const depictHeaderSecurity: SecurityHelper<"header"> = ({ name }) => ({
+  type: "apiKey",
+  in: "header",
+  name,
+});
+const depictCookieSecurity: SecurityHelper<"cookie"> = ({ name }) => ({
+  type: "apiKey",
+  in: "cookie",
+  name,
+});
+const depictOpenIdSecurity: SecurityHelper<"openid"> = ({
+  url: openIdConnectUrl,
+}) => ({
+  type: "openIdConnect",
+  openIdConnectUrl,
+});
+// @todo implement
+const depictOAuth2Security: SecurityHelper<"oauth2"> = ({}) => ({
+  type: "oauth2",
+});
+
+export const depictSecurity = ({ endpoint }: ReqResDepictHelperCommonProps) => {
+  const security = endpoint.getSecurity();
+  const methods: { [K in Security["type"]]: SecurityHelper<K> } = {
+    basic: depictBasicSecurity,
+    bearer: depictBearerSecurity,
+    header: depictHeaderSecurity,
+    cookie: depictCookieSecurity,
+    openid: depictOpenIdSecurity,
+    oauth2: depictOAuth2Security,
+  };
+  return security.map((collection) =>
+    collection.map((entry) => {
+      const helper = methods[entry.type] as SecurityHelper<typeof entry.type>;
+      return helper(entry);
+    })
+  );
 };
 
 export const depictRequest = ({
