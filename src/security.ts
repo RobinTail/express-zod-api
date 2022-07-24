@@ -7,6 +7,12 @@ interface BearerSecurity {
   format?: "JWT" | string;
 }
 
+// @todo this one should require the actual MW input
+interface InputSecurity {
+  type: "input";
+  name: string;
+}
+
 interface CustomHeaderSecurity {
   type: "header";
   name: string;
@@ -33,6 +39,7 @@ interface OAuth2Security {
 export type Security =
   | BasicSecurity
   | BearerSecurity
+  | InputSecurity
   | CustomHeaderSecurity
   | CookieSecurity
   | OpenIdSecurity

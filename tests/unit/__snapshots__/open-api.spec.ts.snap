@@ -1703,6 +1703,7 @@ paths:
                   birthday: 1963-04-21
       security:
         - APIKEY_1: []
+        - APIKEY_2: []
   /v1/avatar/send:
     get:
       responses:
@@ -1842,6 +1843,10 @@ components:
   headers: {}
   securitySchemes:
     APIKEY_1:
+      type: apiKey
+      in: query
+      name: key
+    APIKEY_2:
       type: apiKey
       in: header
       name: token

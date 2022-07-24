@@ -731,6 +731,12 @@ const depictBearerSecurity: SecurityHelper<"bearer"> = ({
   scheme: "bearer",
   bearerFormat,
 });
+// @todo add description on actual input placement
+const depictInputSecurity: SecurityHelper<"input"> = ({ name }) => ({
+  type: "apiKey",
+  in: "query", // body is not supported yet, https://swagger.io/docs/specification/authentication/api-keys/
+  name,
+});
 const depictHeaderSecurity: SecurityHelper<"header"> = ({ name }) => ({
   type: "apiKey",
   in: "header",
@@ -757,6 +763,7 @@ export const depictSecurity = ({ endpoint }: ReqResDepictHelperCommonProps) => {
   const methods: { [K in Security["type"]]: SecurityHelper<K> } = {
     basic: depictBasicSecurity,
     bearer: depictBearerSecurity,
+    input: depictInputSecurity,
     header: depictHeaderSecurity,
     cookie: depictCookieSecurity,
     openid: depictOpenIdSecurity,

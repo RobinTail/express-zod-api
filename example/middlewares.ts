@@ -1,7 +1,10 @@
 import { createMiddleware, Method, createHttpError, z, withMeta } from "../src";
 
 export const authMiddleware = createMiddleware({
-  security: [{ type: "header", name: "token" }],
+  security: [
+    { type: "input", name: "key" },
+    { type: "header", name: "token" },
+  ],
   input: withMeta(
     z.object({
       key: z.string().min(1),

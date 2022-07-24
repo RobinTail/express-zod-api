@@ -9,7 +9,6 @@ import {
   reformatParamsInPath,
   depictSecurity,
 } from "./open-api-helpers";
-import crypto from "crypto";
 import { Routing, routingCycle, RoutingCycleParams } from "./routing";
 
 interface GeneratorParams {
