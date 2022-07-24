@@ -1701,6 +1701,8 @@ paths:
                   key: 1234-5678-90
                   name: John Doe
                   birthday: 1963-04-21
+      security:
+        - APIKEY_1: []
   /v1/avatar/send:
     get:
       responses:
@@ -1838,7 +1840,11 @@ components:
   examples: {}
   requestBodies: {}
   headers: {}
-  securitySchemes: {}
+  securitySchemes:
+    APIKEY_1:
+      type: apiKey
+      in: header
+      name: token
   links: {}
   callbacks: {}
 tags: []

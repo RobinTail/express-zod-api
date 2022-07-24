@@ -23,13 +23,7 @@ interface GeneratorParams {
 }
 
 export class OpenAPI extends OpenApiBuilder {
-  protected makeUniqKey(object: Record<string, any>, prefix: string): string {
-    let key: string;
-    do {
-      key = prefix + crypto.randomBytes(16).toString("hex");
-    } while (key in object);
-    return key;
-  }
+  protected lastSecuritySchemaId = 0;
 
   public constructor({
     routing,
@@ -82,10 +76,10 @@ export class OpenAPI extends OpenApiBuilder {
       if (securitySchemas.length > 0) {
         for (const collection of securitySchemas) {
           for (const securitySchema of collection) {
-            const securitySchemaName = this.makeUniqKey(
-              this.rootDoc.components?.securitySchemes || {},
-              `${securitySchema.type.toUpperCase()}_`
-            );
+            this.lastSecuritySchemaId++;
+            const securitySchemaName = `${securitySchema.type.toUpperCase()}_${
+              this.lastSecuritySchemaId
+            }`;
             this.addSecurityScheme(securitySchemaName, securitySchema);
             operation.security = [
               ...(operation.security || []),
