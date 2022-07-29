@@ -137,10 +137,14 @@ export class Endpoint<
 
   public override getSecurity(): Security[][] {
     return this.middlewares
-      .map(({ security }) =>
-        Array.isArray(security) ? security : security ? [security] : []
+      .filter(
+        (
+          entry
+        ): entry is AnyMiddlewareDef & {
+          security: NonNullable<AnyMiddlewareDef["security"]>;
+        } => entry.security !== undefined
       )
-      .filter((entry) => entry.length);
+      .map(({ security }) => (Array.isArray(security) ? security : [security]));
   }
 
   #getDefaultCorsHeaders(): Record<string, string> {
