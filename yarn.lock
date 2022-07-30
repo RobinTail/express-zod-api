@@ -1080,9 +1080,9 @@
   integrity sha512-C6N5s2ZFtuZRj54k2/zyRhNDjJwwcViAM3Nbm8zjBpbqAdZ00mr0CFxvSKeO8Y/e03WVFLpQMdHYVfUd6SB+Hw==
 
 "@types/express-fileupload@^1.2.2":
-  version "1.2.2"
-  resolved "https://registry.yarnpkg.com/@types/express-fileupload/-/express-fileupload-1.2.2.tgz#98c10e900c222744bba16c848505a1fa95ab3ff0"
-  integrity sha512-sWU1EVFfLsdAginKVrkwTRbRPnbn7dawxEFEBgaRDcpNFCUuksZtASaAKEhqwEIg6fSdeTyI6dIUGl3thhrypg==
+  version "1.2.3"
+  resolved "https://registry.yarnpkg.com/@types/express-fileupload/-/express-fileupload-1.2.3.tgz#11bccae26a0686e6ec17e3b527eb360e8024309b"
+  integrity sha512-TaMmhgnWr5Nb/bJ7zPSNSTBMQTX7vwKzv8+HqX1vZtytXw/DzcvX/IzjENO2BdzttJfmWofzi0aRio6cXWPuAw==
   dependencies:
     "@types/busboy" "^0"
     "@types/express" "*"
