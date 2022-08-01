@@ -1,9 +1,9 @@
 export type LogicalContainer<T> =
   | {
-      or: (T | LogicalContainer<T>)[];
+      or: LogicalContainer<T>[];
     }
   | {
-      and: (T | LogicalContainer<T>)[];
+      and: LogicalContainer<T>[];
     }
   | T;
 
