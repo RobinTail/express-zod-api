@@ -1,6 +1,7 @@
 import { OpenApiBuilder, OperationObject } from "openapi3-ts";
 import { defaultInputSources } from "./common-helpers";
 import { CommonConfig } from "./config-type";
+import { mapLogicalContainer } from "./logical-container";
 import { Method } from "./method";
 import {
   depictRequestParams,
@@ -8,6 +9,7 @@ import {
   depictResponse,
   reformatParamsInPath,
   depictSecurity,
+  depictSecurityNames,
 } from "./open-api-helpers";
 import { Routing, routingCycle, RoutingCycleParams } from "./routing";
 
@@ -71,21 +73,21 @@ export class OpenAPI extends OpenApiBuilder {
       if (inputSources.includes("body")) {
         operation.requestBody = depictRequest(commonParams);
       }
-      const securitySchemas = depictSecurity(commonParams);
-      if (securitySchemas.length > 0) {
-        for (const collection of securitySchemas) {
-          for (const securitySchema of collection) {
+      const securityRefs = depictSecurityNames(
+        mapLogicalContainer(
+          depictSecurity(endpoint.getSecurity()),
+          (securitySchema) => {
             this.lastSecuritySchemaId++;
-            const securitySchemaName = `${securitySchema.type.toUpperCase()}_${
+            const name = `${securitySchema.type.toUpperCase()}_${
               this.lastSecuritySchemaId
             }`;
-            this.addSecurityScheme(securitySchemaName, securitySchema);
-            operation.security = [
-              ...(operation.security || []),
-              { [securitySchemaName]: [] },
-            ];
+            this.addSecurityScheme(name, securitySchema);
+            return name;
           }
-        }
+        )
+      );
+      if (securityRefs.length > 0) {
+        operation.security = securityRefs;
       }
       const swaggerCompatiblePath = reformatParamsInPath(path);
       this.addPath(swaggerCompatiblePath, {

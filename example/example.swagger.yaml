@@ -191,7 +191,7 @@ paths:
                   birthday: 1963-04-21
       security:
         - APIKEY_1: []
-        - APIKEY_2: []
+          APIKEY_2: []
   /v1/avatar/send:
     get:
       responses:

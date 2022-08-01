@@ -3,6 +3,7 @@ import { HttpError } from "http-errors";
 import { Logger } from "winston";
 import { z } from "zod";
 import { FlatObject, IOSchema } from "./common-helpers";
+import { LogicalContainer } from "./logical-container";
 import { Security } from "./security";
 
 interface MiddlewareParams<IN, OPT> {
@@ -23,9 +24,7 @@ export interface MiddlewareCreationProps<
   OUT extends FlatObject
 > {
   input: IN;
-  security?:
-    | Security<keyof z.input<IN> & string>
-    | Security<keyof z.input<IN> & string>[];
+  security?: LogicalContainer<Security<keyof z.input<IN> & string>>;
   middleware: Middleware<z.output<IN>, OPT, OUT>;
 }
 

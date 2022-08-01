@@ -9,9 +9,10 @@ import {
 import {
   RequestBodyObject,
   ResponseObject,
+  SecurityRequirementObject,
   SecuritySchemeObject,
 } from "openapi3-ts/src/model/OpenApi";
-import { omit } from "ramda";
+import { mergeAll, omit } from "ramda";
 import { z } from "zod";
 import {
   ArrayElement,
@@ -26,6 +27,7 @@ import { ZodDateOut, ZodDateOutDef } from "./date-out-schema";
 import { AbstractEndpoint } from "./endpoint";
 import { OpenAPIError } from "./errors";
 import { ZodFile, ZodFileDef } from "./file-schema";
+import { LogicalContainer, mapLogicalContainer } from "./logical-container";
 import { copyMeta } from "./metadata";
 import { Method } from "./method";
 import { Security } from "./security";
@@ -758,8 +760,9 @@ const depictOAuth2Security: SecurityHelper<"oauth2"> = ({}) => ({
   type: "oauth2",
 });
 
-export const depictSecurity = ({ endpoint }: ReqResDepictHelperCommonProps) => {
-  const security = endpoint.getSecurity();
+export const depictSecurity = (
+  container: LogicalContainer<Security>
+): LogicalContainer<SecuritySchemeObject> => {
   const methods: { [K in Security["type"]]: SecurityHelper<K> } = {
     basic: depictBasicSecurity,
     bearer: depictBearerSecurity,
@@ -769,12 +772,29 @@ export const depictSecurity = ({ endpoint }: ReqResDepictHelperCommonProps) => {
     openid: depictOpenIdSecurity,
     oauth2: depictOAuth2Security,
   };
-  return security.map((collection) =>
-    collection.map((entry) => {
-      const helper = methods[entry.type] as SecurityHelper<typeof entry.type>;
-      return helper(entry);
-    })
+  return mapLogicalContainer(container, (security) =>
+    (methods[security.type] as SecurityHelper<typeof security.type>)(security)
   );
+};
+
+export const depictSecurityNames = (
+  container: LogicalContainer<string>
+): SecurityRequirementObject[] => {
+  if (typeof container === "string") {
+    return [{ [container]: [] }];
+  } else if ("or" in container) {
+    return container.or.reduce(
+      (acc, entry) => acc.concat(depictSecurityNames(entry)),
+      [] as SecurityRequirementObject[]
+    );
+  }
+  const pre = container.and.reduce((acc, entry) => {
+    return {
+      ...acc,
+      ...mergeAll(depictSecurityNames(entry)),
+    };
+  }, {} as SecurityRequirementObject);
+  return Object.keys(pre).length > 0 ? [pre] : [];
 };
 
 export const depictRequest = ({
