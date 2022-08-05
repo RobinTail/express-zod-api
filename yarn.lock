@@ -1171,9 +1171,9 @@
   integrity sha512-YATxVxgRqNH6nHEIsvg6k2Boc1JHI9ZbH5iWFFv/MTkchz3b1ieGDa5T0a9RznNdI0KhVbdbWSN+KWWrQZRxTw==
 
 "@types/mime@^3.0.0":
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/@types/mime/-/mime-3.0.0.tgz#e9a9903894405c6a6551f1774df4e64d9804d69c"
-  integrity sha512-fccbsHKqFDXClBZTDLA43zl0+TbxyIwyzIzwwhvoJvhNjOErCdeX2xJbURimv2EbSVUGav001PaCJg4mZxMl4w==
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/@types/mime/-/mime-3.0.1.tgz#5f8f2bca0a5863cb69bc0b0acd88c96cb1d4ae10"
+  integrity sha512-Y4XFY5VJAuw0FgAqPNd6NNoV44jbq9Bz2L7Rh/J6jLTiHBSBJa9fxqQIvkIld4GsoDOcCbvzOUAbLPsSKKg+uA==
 
 "@types/minimist@^1.2.0":
   version "1.2.2"
