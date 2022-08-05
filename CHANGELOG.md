@@ -2,6 +2,10 @@
 
 ## Version 7
 
+### v7.6.3
+
+- [@rayzr522](https://github.com/rayzr522) has fixed the resolution of types in the ESM build for the `nodenext` case.
+
 ### v7.6.2
 
 - `zod` version is 3.17.10.
