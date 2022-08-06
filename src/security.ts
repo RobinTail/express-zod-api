@@ -22,6 +22,10 @@ interface CookieSecurity {
   name: string;
 }
 
+/**
+ * @todo add scopes
+ * @see https://swagger.io/docs/specification/authentication/openid-connect-discovery/
+ */
 interface OpenIdSecurity {
   type: "openid";
   url: string;
@@ -35,6 +39,7 @@ interface OAuth2Security {
   type: "oauth2";
 }
 
+/** @desc K is an optional input field used by InputSecurity */
 export type Security<K extends string = string> =
   | BasicSecurity
   | BearerSecurity
