@@ -12,7 +12,7 @@ import {
   SecurityRequirementObject,
   SecuritySchemeObject,
 } from "openapi3-ts/src/model/OpenApi";
-import { mergeAll, omit } from "ramda";
+import { omit } from "ramda";
 import { z } from "zod";
 import {
   ArrayElement,
@@ -27,7 +27,11 @@ import { ZodDateOut, ZodDateOutDef } from "./date-out-schema";
 import { AbstractEndpoint } from "./endpoint";
 import { OpenAPIError } from "./errors";
 import { ZodFile, ZodFileDef } from "./file-schema";
-import { LogicalContainer, mapLogicalContainer } from "./logical-container";
+import {
+  andToOr,
+  LogicalContainer,
+  mapLogicalContainer,
+} from "./logical-container";
 import { copyMeta } from "./metadata";
 import { Method } from "./method";
 import { Security } from "./security";
@@ -749,13 +753,14 @@ const depictCookieSecurity: SecurityHelper<"cookie"> = ({ name }) => ({
   in: "cookie",
   name,
 });
+// @todo implement scopes
 const depictOpenIdSecurity: SecurityHelper<"openid"> = ({
   url: openIdConnectUrl,
 }) => ({
   type: "openIdConnect",
   openIdConnectUrl,
 });
-// @todo implement
+// @todo implement scopes
 const depictOAuth2Security: SecurityHelper<"oauth2"> = ({}) => ({
   type: "oauth2",
 });
@@ -780,21 +785,26 @@ export const depictSecurity = (
 export const depictSecurityNames = (
   container: LogicalContainer<string>
 ): SecurityRequirementObject[] => {
-  if (typeof container === "string") {
-    return [{ [container]: [] }];
-  } else if ("or" in container) {
-    return container.or.reduce(
-      (acc, entry) => acc.concat(depictSecurityNames(entry)),
-      [] as SecurityRequirementObject[]
-    );
+  if (typeof container === "object") {
+    if ("or" in container) {
+      return container.or.map((entry) =>
+        (typeof entry === "string"
+          ? [entry]
+          : entry.and
+        ).reduce<SecurityRequirementObject>(
+          (agg, name) => ({
+            ...agg,
+            [name]: [],
+          }),
+          {}
+        )
+      );
+    }
+    if ("and" in container) {
+      return depictSecurityNames(andToOr(container));
+    }
   }
-  const pre = container.and.reduce((acc, entry) => {
-    return {
-      ...acc,
-      ...mergeAll(depictSecurityNames(entry)),
-    };
-  }, {} as SecurityRequirementObject);
-  return Object.keys(pre).length > 0 ? [pre] : [];
+  return depictSecurityNames({ or: [container] });
 };
 
 export const depictRequest = ({

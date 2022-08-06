@@ -38,6 +38,7 @@ import {
   reformatParamsInPath,
   extractObjectSchema,
   depictSecurity,
+  depictSecurityNames,
 } from "../../src/open-api-helpers";
 import { serializeSchemaForTest } from "../helpers";
 
@@ -854,6 +855,26 @@ describe("Open API helpers", () => {
           or: [{ type: "openid", url: "https://test.url" }, { type: "oauth2" }],
         })
       ).toMatchSnapshot();
+    });
+  });
+
+  describe("depictSecurityNames()", () => {
+    test("should handle LogicalAnd", () => {
+      expect(depictSecurityNames({ and: ["A", "B", "C"] })).toMatchSnapshot();
+      expect(
+        depictSecurityNames({ and: ["A", { or: ["B", "C"] }] })
+      ).toMatchSnapshot();
+    });
+
+    test("should handle LogicalOr", () => {
+      expect(depictSecurityNames({ or: ["A", "B", "C"] })).toMatchSnapshot();
+      expect(
+        depictSecurityNames({ or: ["A", { and: ["B", "C"] }] })
+      ).toMatchSnapshot();
+    });
+
+    test("should handle the plain value", () => {
+      expect(depictSecurityNames("A")).toMatchSnapshot();
     });
   });
 });

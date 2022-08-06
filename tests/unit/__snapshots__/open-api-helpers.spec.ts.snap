@@ -539,6 +539,63 @@ Object {
 }
 `;
 
+exports[`Open API helpers depictSecurityNames() should handle LogicalAnd 1`] = `
+Array [
+  Object {
+    "A": Array [],
+    "B": Array [],
+    "C": Array [],
+  },
+]
+`;
+
+exports[`Open API helpers depictSecurityNames() should handle LogicalAnd 2`] = `
+Array [
+  Object {
+    "A": Array [],
+    "B": Array [],
+  },
+  Object {
+    "A": Array [],
+    "C": Array [],
+  },
+]
+`;
+
+exports[`Open API helpers depictSecurityNames() should handle LogicalOr 1`] = `
+Array [
+  Object {
+    "A": Array [],
+  },
+  Object {
+    "B": Array [],
+  },
+  Object {
+    "C": Array [],
+  },
+]
+`;
+
+exports[`Open API helpers depictSecurityNames() should handle LogicalOr 2`] = `
+Array [
+  Object {
+    "A": Array [],
+  },
+  Object {
+    "B": Array [],
+    "C": Array [],
+  },
+]
+`;
+
+exports[`Open API helpers depictSecurityNames() should handle the plain value 1`] = `
+Array [
+  Object {
+    "A": Array [],
+  },
+]
+`;
+
 exports[`Open API helpers depictString() should depict ZodString with refinements 1`] = `
 Object {
   "description": "test",
