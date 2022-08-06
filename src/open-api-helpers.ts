@@ -777,7 +777,6 @@ export const depictSecurity = (
   );
 };
 
-// @todo simplify it
 export const depictSecurityNames = (
   container: LogicalContainer<string>
 ): SecurityRequirementObject[] => {

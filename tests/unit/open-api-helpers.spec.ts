@@ -37,6 +37,7 @@ import {
   excludeParamsFromDepiction,
   reformatParamsInPath,
   extractObjectSchema,
+  depictSecurity,
 } from "../../src/open-api-helpers";
 import { serializeSchemaForTest } from "../helpers";
 
@@ -819,6 +820,40 @@ describe("Open API helpers", () => {
         expect(e).toBeInstanceOf(OpenAPIError);
         expect(e).toMatchSnapshot();
       }
+    });
+  });
+
+  describe("depictSecurity()", () => {
+    test("should handle Basic, Bearer and CustomHeader Securities", () => {
+      expect(
+        depictSecurity({
+          or: [
+            { and: [{ type: "basic" }, { type: "bearer" }] },
+            { type: "header", name: "X-Key" },
+          ],
+        })
+      ).toMatchSnapshot();
+    });
+    test("should handle Input and Cookie Securities", () => {
+      expect(
+        depictSecurity({
+          and: [
+            {
+              or: [
+                { type: "input", name: "apiKey" },
+                { type: "cookie", name: "hash" },
+              ],
+            },
+          ],
+        })
+      ).toMatchSnapshot();
+    });
+    test("should handle OpenID and OAuth2 Securities", () => {
+      expect(
+        depictSecurity({
+          or: [{ type: "openid", url: "https://test.url" }, { type: "oauth2" }],
+        })
+      ).toMatchSnapshot();
     });
   });
 });
