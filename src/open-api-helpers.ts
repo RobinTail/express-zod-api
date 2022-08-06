@@ -735,7 +735,7 @@ const depictBearerSecurity: SecurityHelper<"bearer"> = ({
 }) => ({
   type: "http",
   scheme: "bearer",
-  bearerFormat,
+  ...(bearerFormat ? { bearerFormat } : {}),
 });
 // @todo add description on actual input placement
 const depictInputSecurity: SecurityHelper<"input"> = ({ name }) => ({

@@ -489,7 +489,6 @@ Object {
           "type": "http",
         },
         Object {
-          "bearerFormat": undefined,
           "scheme": "bearer",
           "type": "http",
         },
