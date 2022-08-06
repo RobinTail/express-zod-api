@@ -8,6 +8,7 @@ export type LogicalContainer<T> =
   | LogicalAnd<T | LogicalOr<T>>
   | T;
 
+/** @desc combines several LogicalAnds into a one */
 export const flattenAnds = <T>(
   subject: (T | LogicalAnd<T>)[]
 ): LogicalAnd<T> => ({
@@ -18,6 +19,7 @@ export const flattenAnds = <T>(
   ),
 });
 
+/** @desc creates a LogicalContainer out of another one */
 export const mapLogicalContainer = <T, S>(
   container: LogicalContainer<T>,
   fn: (subject: T) => S
@@ -45,6 +47,7 @@ export const mapLogicalContainer = <T, S>(
   return fn(container);
 };
 
+/** @desc converts LogicalAnd into LogicalOr */
 export const andToOr = <T>(
   subject: LogicalAnd<T | LogicalOr<T>>
 ): LogicalOr<T | LogicalAnd<T>> => {
@@ -67,6 +70,7 @@ export const andToOr = <T>(
   );
 };
 
+/** @desc reducer, combines two LogicalContainers */
 export const combineContainers = <T>(
   a: LogicalContainer<T>,
   b: LogicalContainer<T>
