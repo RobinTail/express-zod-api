@@ -2,6 +2,64 @@
 
 ## Version 7
 
+### v7.7.0
+
+- Feature #523: Ability to specify Security schemas of your Middlewares and depict the Authentication of your API.
+  - OpenAPI generator now can depict the [Authentication](https://swagger.io/docs/specification/authentication/) of your
+    endpoints as a part of the generated documentation.
+  - There is a new optional property `security` of `createMiddleware()`.
+  - You can specify a single or several security schemas in that property.
+  - For several security schemas `security` support a new `LogicalContainer` that can contain upto 2 nested levels.
+  - Supported security types: `basic`, `bearer`, `input`, `header`, `cookie`, `openid` and `oauth2`.
+  - OpenID and OAuth2 security types are currently have the limited support: without scopes.
+
+```typescript
+// example middleware
+import { createMiddleware } from "express-zod-api";
+
+const authMiddleware = createMiddleware({
+  security: {
+    // requires the "key" in inputs and a custom "token" headers
+    and: [
+      { type: "input", name: "key" },
+      { type: "header", name: "token" },
+    ],
+  },
+  input: z.object({
+    key: z.string().min(1),
+  }),
+  middleware: async ({ input: { key }, request }) => {
+    if (key !== "123") {
+      throw createHttpError(401, "Invalid key");
+    }
+    if (request.headers.token !== "456") {
+      throw createHttpError(401, "Invalid token");
+    }
+    return { token: request.headers.token };
+  },
+});
+
+// another example with logical OR
+createMiddleware({
+  security: {
+    // requires either input and header OR bearer header
+    or: [
+      {
+        and: [
+          { type: "input", name: "key" },
+          { type: "header", name: "token" },
+        ],
+      },
+      {
+        type: "bearer",
+        format: "JWT",
+      },
+    ],
+  },
+  //...
+});
+```
+
 ### v7.6.3
 
 - [@rayzr522](https://github.com/rayzr522) has fixed the resolution of types in the ESM build for the `nodenext` case.
