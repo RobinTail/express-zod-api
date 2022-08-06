@@ -12,24 +12,30 @@ export const mapLogicalContainer = <T, S>(
   container: LogicalContainer<T>,
   fn: (subject: T) => S
 ): LogicalContainer<S> => {
-  if ("and" in container) {
-    return {
-      and: container.and.map((entry) =>
-        "or" in entry ? { or: entry.or.map(fn) } : fn(entry)
-      ),
-    };
-  }
-  if ("or" in container) {
-    return {
-      or: container.or.map((entry) =>
-        "and" in entry ? { and: entry.and.map(fn) } : fn(entry)
-      ),
-    };
+  if (typeof container === "object") {
+    if ("and" in container) {
+      return {
+        and: container.and.map((entry) =>
+          typeof entry === "object" && "or" in entry
+            ? { or: entry.or.map(fn) }
+            : fn(entry)
+        ),
+      };
+    }
+    if ("or" in container) {
+      return {
+        or: container.or.map((entry) =>
+          typeof entry === "object" && "and" in entry
+            ? { and: entry.and.map(fn) }
+            : fn(entry)
+        ),
+      };
+    }
   }
   return fn(container);
 };
 
-const andToOr = <T>(
+export const andToOr = <T>(
   subject: LogicalAnd<T | LogicalOr<T>>
 ): LogicalOr<T | LogicalAnd<T>> => {
   return subject.and.reduce<LogicalOr<T | LogicalAnd<T>>>(
