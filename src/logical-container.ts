@@ -40,12 +40,23 @@ export const andToOr = <T>(
 ): LogicalOr<T | LogicalAnd<T>> => {
   return subject.and.reduce<LogicalOr<T | LogicalAnd<T>>>(
     (acc, item) => {
-      const combs = combinations(acc.or, "or" in item ? item.or : [item]);
-      acc.or.concat(
-        combs.type === "single"
-          ? combs.value
-          : [...combs.value[0], ...combs.value[1]]
+      const combs = combinations(
+        acc.or,
+        typeof item === "object" && "or" in item ? item.or : [item]
       );
+      if (combs.type === "single") {
+        acc.or.push(...combs.value);
+      } else {
+        acc.or = combs.value.map((ttt) => ({
+          and: ttt.reduce<T[]>(
+            (agg, mmm) =>
+              agg.concat(
+                typeof mmm === "object" && "and" in mmm ? mmm.and : mmm
+              ),
+            []
+          ),
+        }));
+      }
       return acc;
     },
     {
