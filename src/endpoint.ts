@@ -10,7 +10,7 @@ import {
   getInitialInput,
   IOSchema,
 } from "./common-helpers";
-import { LogicalContainer } from "./logical-container";
+import { combineContainers, LogicalContainer } from "./logical-container";
 import { AuxMethod, Method, MethodsDefinition } from "./method";
 import { AnyMiddlewareDef } from "./middleware";
 import { lastResortHandler, ResultHandlerDefinition } from "./result-handler";
@@ -137,13 +137,11 @@ export class Endpoint<
   }
 
   public override getSecurity(): LogicalContainer<Security> {
-    const container: LogicalContainer<Security> = { and: [] };
-    for (const middleware of this.middlewares) {
-      if (middleware.security) {
-        container.and.push(middleware.security);
-      }
-    }
-    return container;
+    return this.middlewares.reduce<LogicalContainer<Security>>(
+      (acc, middleware) =>
+        middleware.security ? combineContainers(acc, middleware.security) : acc,
+      { and: [] }
+    );
   }
 
   #getDefaultCorsHeaders(): Record<string, string> {
