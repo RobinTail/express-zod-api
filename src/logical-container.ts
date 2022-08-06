@@ -47,6 +47,7 @@ export const andToOr = <T>(
       if (combs.type === "single") {
         acc.or.push(...combs.value);
       } else {
+        // @todo extract and rename
         acc.or = combs.value.map((ttt) => ({
           and: ttt.reduce<T[]>(
             (agg, mmm) =>
@@ -69,26 +70,37 @@ export const combineContainers = <T>(
   a: LogicalContainer<T>,
   b: LogicalContainer<T>
 ): LogicalContainer<T> => {
-  if ("and" in a) {
-    if ("and" in b) {
-      return { and: a.and.concat(b.and) };
+  if (typeof a === "object" && typeof b === "object") {
+    if ("and" in a) {
+      if ("and" in b) {
+        return { and: a.and.concat(b.and) };
+      }
+      if ("or" in b) {
+        return combineContainers(andToOr(a), b);
+      }
     }
-    if ("or" in b) {
-      return combineContainers(andToOr(a), b);
-    }
-  }
-  if ("or" in a) {
-    if ("and" in b) {
-      return combineContainers(b, a);
-    }
-    if ("or" in b) {
-      const combs = combinations(a.or, b.or);
-      return {
-        or:
-          combs.type === "single"
-            ? combs.value
-            : [...combs.value[0], ...combs.value[1]],
-      };
+    if ("or" in a) {
+      if ("and" in b) {
+        return combineContainers(b, a);
+      }
+      if ("or" in b) {
+        const combs = combinations(a.or, b.or);
+        return {
+          or:
+            combs.type === "single"
+              ? combs.value
+              : // @todo extract and rename
+                combs.value.map((ttt) => ({
+                  and: ttt.reduce<T[]>(
+                    (agg, mmm) =>
+                      agg.concat(
+                        typeof mmm === "object" && "and" in mmm ? mmm.and : mmm
+                      ),
+                    []
+                  ),
+                })),
+        };
+      }
     }
   }
   return { and: [a as T, b as T] };
