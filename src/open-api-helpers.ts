@@ -781,29 +781,29 @@ export const depictSecurity = (
   );
 };
 
-export const depictSecurityNames = (
-  container: LogicalContainer<string>
+export const depictSecurityRefs = (
+  container: LogicalContainer<{ name: string; scopes: string[] }>
 ): SecurityRequirementObject[] => {
   if (typeof container === "object") {
     if ("or" in container) {
       return container.or.map((entry) =>
-        (typeof entry === "string"
-          ? [entry]
-          : entry.and
+        ("and" in entry
+          ? entry.and
+          : [entry]
         ).reduce<SecurityRequirementObject>(
-          (agg, name) => ({
+          (agg, { name, scopes }) => ({
             ...agg,
-            [name]: [],
+            [name]: scopes,
           }),
           {}
         )
       );
     }
     if ("and" in container) {
-      return depictSecurityNames(andToOr(container));
+      return depictSecurityRefs(andToOr(container));
     }
   }
-  return depictSecurityNames({ or: [container] });
+  return depictSecurityRefs({ or: [container] });
 };
 
 export const depictRequest = ({

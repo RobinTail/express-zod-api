@@ -579,7 +579,7 @@ Object {
 }
 `;
 
-exports[`Open API helpers depictSecurityNames() should handle LogicalAnd 1`] = `
+exports[`Open API helpers depictSecurityRefs() should handle LogicalAnd 1`] = `
 Array [
   Object {
     "A": Array [],
@@ -589,7 +589,7 @@ Array [
 ]
 `;
 
-exports[`Open API helpers depictSecurityNames() should handle LogicalAnd 2`] = `
+exports[`Open API helpers depictSecurityRefs() should handle LogicalAnd 2`] = `
 Array [
   Object {
     "A": Array [],
@@ -602,7 +602,7 @@ Array [
 ]
 `;
 
-exports[`Open API helpers depictSecurityNames() should handle LogicalOr 1`] = `
+exports[`Open API helpers depictSecurityRefs() should handle LogicalOr 1`] = `
 Array [
   Object {
     "A": Array [],
@@ -616,7 +616,7 @@ Array [
 ]
 `;
 
-exports[`Open API helpers depictSecurityNames() should handle LogicalOr 2`] = `
+exports[`Open API helpers depictSecurityRefs() should handle LogicalOr 2`] = `
 Array [
   Object {
     "A": Array [],
@@ -628,10 +628,31 @@ Array [
 ]
 `;
 
-exports[`Open API helpers depictSecurityNames() should handle the plain value 1`] = `
+exports[`Open API helpers depictSecurityRefs() should handle the plain value 1`] = `
 Array [
   Object {
     "A": Array [],
+  },
+]
+`;
+
+exports[`Open API helpers depictSecurityRefs() should populate the scopes 1`] = `
+Array [
+  Object {
+    "A": Array [
+      "write",
+    ],
+  },
+  Object {
+    "B": Array [
+      "read",
+    ],
+  },
+  Object {
+    "C": Array [
+      "read",
+      "write",
+    ],
   },
 ]
 `;

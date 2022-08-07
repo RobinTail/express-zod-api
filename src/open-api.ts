@@ -14,7 +14,7 @@ import {
   depictResponse,
   reformatParamsInPath,
   depictSecurity,
-  depictSecurityNames,
+  depictSecurityRefs,
 } from "./open-api-helpers";
 import { Routing, routingCycle, RoutingCycleParams } from "./routing";
 
@@ -95,13 +95,14 @@ export class OpenAPI extends OpenApiBuilder {
       if (inputSources.includes("body")) {
         operation.requestBody = depictRequest(commonParams);
       }
-      const securityRefs = depictSecurityNames(
+      const securityRefs = depictSecurityRefs(
         mapLogicalContainer(
           depictSecurity(endpoint.getSecurity()),
           (securitySchema) => {
             const name = this.ensureUniqSecuritySchemaName(securitySchema);
+            const scopes = endpoint.getScopes();
             this.addSecurityScheme(name, securitySchema);
-            return name;
+            return { name, scopes };
           }
         )
       );
