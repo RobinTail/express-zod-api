@@ -21,30 +21,33 @@ type Middleware<IN, OPT, OUT> = (
 export interface MiddlewareCreationProps<
   IN extends IOSchema<"strip">,
   OPT,
-  OUT extends FlatObject
+  OUT extends FlatObject,
+  SCO extends string
 > {
   input: IN;
-  security?: LogicalContainer<Security<keyof z.input<IN> & string>>;
+  security?: LogicalContainer<Security<keyof z.input<IN> & string, SCO>>;
   middleware: Middleware<z.output<IN>, OPT, OUT>;
 }
 
 export interface MiddlewareDefinition<
   IN extends IOSchema<"strip">,
   OPT,
-  OUT extends FlatObject
-> extends MiddlewareCreationProps<IN, OPT, OUT> {
+  OUT extends FlatObject,
+  SCO extends string
+> extends MiddlewareCreationProps<IN, OPT, OUT, SCO> {
   type: "proprietary" | "express";
 }
 
-export type AnyMiddlewareDef = MiddlewareDefinition<any, any, any>;
+export type AnyMiddlewareDef = MiddlewareDefinition<any, any, any, any>;
 
 export const createMiddleware = <
   IN extends IOSchema<"strip">,
   OPT,
-  OUT extends FlatObject
+  OUT extends FlatObject,
+  SCO extends string
 >(
-  props: MiddlewareCreationProps<IN, OPT, OUT>
-): MiddlewareDefinition<IN, OPT, OUT> => ({
+  props: MiddlewareCreationProps<IN, OPT, OUT, SCO>
+): MiddlewareDefinition<IN, OPT, OUT, SCO> => ({
   ...props,
   type: "proprietary",
 });

@@ -29,19 +29,22 @@ type BuildProps<
   OUT extends IOSchema,
   MIN extends IOSchema<"strip"> | null,
   OPT extends FlatObject,
-  M extends Method
+  M extends Method,
+  SCO extends string
 > = {
   input: IN;
   output: OUT;
   handler: Handler<z.output<ProbableIntersection<MIN, IN>>, z.input<OUT>, OPT>;
   description?: string;
+  scopes?: SCO[];
 } & MethodsDefinition<M>;
 
 export class EndpointsFactory<
   POS extends ApiResponse,
   NEG extends ApiResponse,
   IN extends IOSchema<"strip"> | null = null,
-  OUT extends FlatObject = {}
+  OUT extends FlatObject = {},
+  SCO extends string = string
 > {
   protected middlewares: AnyMiddlewareDef[] = [];
 
@@ -51,33 +54,63 @@ export class EndpointsFactory<
     CPOS extends ApiResponse,
     CNEG extends ApiResponse,
     CIN extends IOSchema<"strip"> | null,
-    COUT extends FlatObject
+    COUT extends FlatObject,
+    CSCO extends string
   >(
     middlewares: AnyMiddlewareDef[],
     resultHandler: ResultHandlerDefinition<CPOS, CNEG>
   ) {
-    const factory = new EndpointsFactory<CPOS, CNEG, CIN, COUT>(resultHandler);
+    const factory = new EndpointsFactory<CPOS, CNEG, CIN, COUT, CSCO>(
+      resultHandler
+    );
     factory.middlewares = middlewares;
     return factory;
   }
 
-  public addMiddleware<AIN extends IOSchema<"strip">, AOUT extends FlatObject>(
-    definition: MiddlewareDefinition<AIN, OUT, AOUT>
-  ): EndpointsFactory<POS, NEG, ProbableIntersection<IN, AIN>, OUT & AOUT>;
+  public addMiddleware<
+    AIN extends IOSchema<"strip">,
+    AOUT extends FlatObject,
+    ASCO extends string
+  >(
+    definition: MiddlewareDefinition<AIN, OUT, AOUT, ASCO>
+  ): EndpointsFactory<
+    POS,
+    NEG,
+    ProbableIntersection<IN, AIN>,
+    OUT & AOUT,
+    SCO & ASCO
+  >;
+
   /** @deprecated please use createMiddleware() for the argument */
-  public addMiddleware<AIN extends IOSchema<"strip">, AOUT extends FlatObject>(
-    props: MiddlewareCreationProps<AIN, OUT, AOUT>
-  ): EndpointsFactory<POS, NEG, ProbableIntersection<IN, AIN>, OUT & AOUT>;
-  public addMiddleware<AIN extends IOSchema<"strip">, AOUT extends FlatObject>(
+  public addMiddleware<
+    AIN extends IOSchema<"strip">,
+    AOUT extends FlatObject,
+    ASCO extends string
+  >(
+    props: MiddlewareCreationProps<AIN, OUT, AOUT, ASCO>
+  ): EndpointsFactory<
+    POS,
+    NEG,
+    ProbableIntersection<IN, AIN>,
+    OUT & AOUT,
+    SCO & ASCO
+  >;
+
+  public addMiddleware<
+    AIN extends IOSchema<"strip">,
+    AOUT extends FlatObject,
+    ASCO extends string
+  >(
     subject:
-      | MiddlewareDefinition<AIN, OUT, AOUT>
-      | MiddlewareCreationProps<AIN, OUT, AOUT>
+      | MiddlewareDefinition<AIN, OUT, AOUT, ASCO>
+      | MiddlewareCreationProps<AIN, OUT, AOUT, ASCO>
   ) {
     return EndpointsFactory.#create<
       POS,
       NEG,
       ProbableIntersection<IN, AIN>,
-      OUT & AOUT
+      OUT & AOUT,
+      SCO & ASCO
     >(
       this.middlewares.concat(
         "type" in subject ? subject : createMiddleware(subject)
@@ -112,14 +145,14 @@ export class EndpointsFactory<
           middleware(request as R, response as S, next);
         }),
     };
-    return EndpointsFactory.#create<POS, NEG, IN, OUT & AOUT>(
+    return EndpointsFactory.#create<POS, NEG, IN, OUT & AOUT, SCO>(
       this.middlewares.concat(definition),
       this.resultHandler
     );
   }
 
   public addOptions<AOUT extends FlatObject>(options: AOUT) {
-    return EndpointsFactory.#create<POS, NEG, IN, OUT & AOUT>(
+    return EndpointsFactory.#create<POS, NEG, IN, OUT & AOUT, SCO>(
       this.middlewares.concat(
         createMiddleware({
           input: z.object({}),
@@ -136,13 +169,14 @@ export class EndpointsFactory<
     description,
     output: outputSchema,
     ...rest
-  }: BuildProps<BIN, BOUT, IN, OUT, M>): Endpoint<
+  }: BuildProps<BIN, BOUT, IN, OUT, M, SCO>): Endpoint<
     ProbableIntersection<IN, BIN>,
     BOUT,
     OUT,
     M,
     POS,
-    NEG
+    NEG,
+    SCO
   > {
     const { middlewares, resultHandler } = this;
     return new Endpoint({
