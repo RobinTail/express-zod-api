@@ -1,4 +1,9 @@
-import { OpenApiBuilder, OperationObject } from "openapi3-ts";
+import {
+  OpenApiBuilder,
+  OperationObject,
+  SecuritySchemeObject,
+  SecuritySchemeType,
+} from "openapi3-ts";
 import { defaultInputSources } from "./common-helpers";
 import { CommonConfig } from "./config-type";
 import { mapLogicalContainer } from "./logical-container";
@@ -24,7 +29,24 @@ interface GeneratorParams {
 }
 
 export class OpenAPI extends OpenApiBuilder {
-  protected lastSecuritySchemaId = 0;
+  protected lastSecuritySchemaIds: Partial<Record<SecuritySchemeType, number>> =
+    {};
+
+  protected ensureUniqSecuritySchemaName(subject: SecuritySchemeObject) {
+    for (const name in this.rootDoc.components?.securitySchemes || {}) {
+      if (
+        JSON.stringify(subject) ===
+        JSON.stringify(this.rootDoc.components?.securitySchemes?.[name])
+      ) {
+        return name;
+      }
+    }
+    this.lastSecuritySchemaIds[subject.type] =
+      (this.lastSecuritySchemaIds?.[subject.type] || 0) + 1;
+    return `${subject.type.toUpperCase()}_${
+      this.lastSecuritySchemaIds[subject.type]
+    }`;
+  }
 
   public constructor({
     routing,
@@ -77,10 +99,7 @@ export class OpenAPI extends OpenApiBuilder {
         mapLogicalContainer(
           depictSecurity(endpoint.getSecurity()),
           (securitySchema) => {
-            this.lastSecuritySchemaId++;
-            const name = `${securitySchema.type.toUpperCase()}_${
-              this.lastSecuritySchemaId
-            }`;
+            const name = this.ensureUniqSecuritySchemaName(securitySchema);
             this.addSecurityScheme(name, securitySchema);
             return name;
           }

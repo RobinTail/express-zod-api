@@ -263,6 +263,174 @@ servers:
 "
 `;
 
+exports[`Open API generator Metadata should ensure uniq security schema names 1`] = `
+"openapi: 3.0.0
+info:
+  title: Testing Security
+  version: 3.4.5
+paths:
+  /v1/getSomething:
+    get:
+      responses:
+        \\"200\\":
+          description: GET /v1/getSomething Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - success
+                  data:
+                    type: object
+                    properties:
+                      num:
+                        type: number
+                        format: double
+                        minimum: 5e-324
+                        exclusiveMinimum: false
+                        maximum: 1.7976931348623157e+308
+                        exclusiveMaximum: false
+                    required:
+                      - num
+                required:
+                  - status
+                  - data
+        \\"400\\":
+          description: GET /v1/getSomething Error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                required:
+                  - status
+                  - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
+      parameters:
+        - name: key
+          in: query
+          required: true
+          schema:
+            description: GET /v1/getSomething parameter
+            type: string
+        - name: str
+          in: query
+          required: true
+          schema:
+            description: GET /v1/getSomething parameter
+            type: string
+      security:
+        - APIKEY_1: []
+        - HTTP_1: []
+  /v1/setSomething:
+    post:
+      responses:
+        \\"200\\":
+          description: POST /v1/setSomething Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - success
+                  data:
+                    type: object
+                    properties: {}
+                    required: []
+                required:
+                  - status
+                  - data
+        \\"400\\":
+          description: POST /v1/setSomething Error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                required:
+                  - status
+                  - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
+      requestBody:
+        content:
+          application/json:
+            schema:
+              description: POST /v1/setSomething request body
+              allOf:
+                - type: object
+                  properties: {}
+                  required: []
+                - type: object
+                  properties: {}
+                  required: []
+      security:
+        - HTTP_1: []
+          APIKEY_2: []
+components:
+  schemas: {}
+  responses: {}
+  parameters: {}
+  examples: {}
+  requestBodies: {}
+  headers: {}
+  securitySchemes:
+    APIKEY_1:
+      type: apiKey
+      in: query
+      name: key
+    HTTP_1:
+      type: http
+      scheme: bearer
+    APIKEY_2:
+      type: apiKey
+      in: cookie
+      name: someCookie
+  links: {}
+  callbacks: {}
+tags: []
+servers:
+  - url: http://example.com
+"
+`;
+
 exports[`Open API generator Metadata should merge endpoint handler examples with its middleware examples 1`] = `
 "openapi: 3.0.0
 info:
