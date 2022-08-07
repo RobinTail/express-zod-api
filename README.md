@@ -430,7 +430,7 @@ const routing: Routing = {
       // route path /v1/user/:id, where :id is the path param
       ":id": getUserEndpoint,
       // use the empty string to represent /v1/user if needed:
-      // "": listAllUsersEnpoint,
+      // "": listAllUsersEndpoint,
     },
   },
 };
