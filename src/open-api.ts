@@ -100,7 +100,11 @@ export class OpenAPI extends OpenApiBuilder {
           depictSecurity(endpoint.getSecurity()),
           (securitySchema) => {
             const name = this.ensureUniqSecuritySchemaName(securitySchema);
-            const scopes = endpoint.getScopes();
+            const scopes = ["oauth2", "openIdConnect"].includes(
+              securitySchema.type
+            )
+              ? endpoint.getScopes()
+              : [];
             this.addSecurityScheme(name, securitySchema);
             return { name, scopes };
           }

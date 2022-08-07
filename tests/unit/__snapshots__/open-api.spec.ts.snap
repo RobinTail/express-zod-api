@@ -403,7 +403,8 @@ paths:
                   required: []
       security:
         - HTTP_1: []
-          APIKEY_2: []
+          OAUTH2_1:
+            - write
 components:
   schemas: {}
   responses: {}
@@ -419,10 +420,14 @@ components:
     HTTP_1:
       type: http
       scheme: bearer
-    APIKEY_2:
-      type: apiKey
-      in: cookie
-      name: someCookie
+    OAUTH2_1:
+      type: oauth2
+      flows:
+        password:
+          tokenUrl: https://some.url
+          scopes:
+            read: read something
+            write: write something
   links: {}
   callbacks: {}
 tags: []
