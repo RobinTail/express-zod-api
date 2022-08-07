@@ -37,6 +37,8 @@ import {
   excludeParamsFromDepiction,
   reformatParamsInPath,
   extractObjectSchema,
+  depictSecurity,
+  depictSecurityNames,
 } from "../../src/open-api-helpers";
 import { serializeSchemaForTest } from "../helpers";
 
@@ -819,6 +821,60 @@ describe("Open API helpers", () => {
         expect(e).toBeInstanceOf(OpenAPIError);
         expect(e).toMatchSnapshot();
       }
+    });
+  });
+
+  describe("depictSecurity()", () => {
+    test("should handle Basic, Bearer and CustomHeader Securities", () => {
+      expect(
+        depictSecurity({
+          or: [
+            { and: [{ type: "basic" }, { type: "bearer" }] },
+            { type: "header", name: "X-Key" },
+          ],
+        })
+      ).toMatchSnapshot();
+    });
+    test("should handle Input and Cookie Securities", () => {
+      expect(
+        depictSecurity({
+          and: [
+            {
+              or: [
+                { type: "input", name: "apiKey" },
+                { type: "cookie", name: "hash" },
+              ],
+            },
+          ],
+        })
+      ).toMatchSnapshot();
+    });
+    test("should handle OpenID and OAuth2 Securities", () => {
+      expect(
+        depictSecurity({
+          or: [{ type: "openid", url: "https://test.url" }, { type: "oauth2" }],
+        })
+      ).toMatchSnapshot();
+    });
+  });
+
+  describe("depictSecurityNames()", () => {
+    test("should handle LogicalAnd", () => {
+      expect(depictSecurityNames({ and: ["A", "B", "C"] })).toMatchSnapshot();
+      expect(
+        depictSecurityNames({ and: ["A", { or: ["B", "C"] }] })
+      ).toMatchSnapshot();
+    });
+
+    test("should handle LogicalOr", () => {
+      expect(depictSecurityNames({ or: ["A", "B", "C"] })).toMatchSnapshot();
+      expect(
+        depictSecurityNames({ or: ["A", { and: ["B", "C"] }] })
+      ).toMatchSnapshot();
+    });
+
+    test("should handle the plain value", () => {
+      expect(depictSecurityNames("A")).toMatchSnapshot();
     });
   });
 });

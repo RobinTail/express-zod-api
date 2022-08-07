@@ -791,5 +791,51 @@ describe("Open API generator", () => {
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
+
+    test("should ensure uniq security schema names", () => {
+      const mw1 = createMiddleware({
+        security: {
+          or: [{ type: "input", name: "key" }, { type: "bearer" }],
+        },
+        input: z.object({
+          key: z.string(),
+        }),
+        middleware: jest.fn(),
+      });
+      const mw2 = createMiddleware({
+        security: {
+          and: [{ type: "bearer" }, { type: "cookie", name: "someCookie" }],
+        },
+        input: z.object({}),
+        middleware: jest.fn(),
+      });
+      const spec = new OpenAPI({
+        config,
+        routing: {
+          v1: {
+            getSomething: defaultEndpointsFactory.addMiddleware(mw1).build({
+              method: "get",
+              input: z.object({
+                str: z.string(),
+              }),
+              output: z.object({
+                num: z.number(),
+              }),
+              handler: async () => ({ num: 123 }),
+            }),
+            setSomething: defaultEndpointsFactory.addMiddleware(mw2).build({
+              method: "post",
+              input: z.object({}),
+              output: z.object({}),
+              handler: async () => ({}),
+            }),
+          },
+        },
+        version: "3.4.5",
+        title: "Testing Security",
+        serverUrl: "http://example.com",
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
+    });
   });
 });

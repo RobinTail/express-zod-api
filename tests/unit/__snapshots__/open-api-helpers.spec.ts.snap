@@ -479,6 +479,122 @@ Array [
 ]
 `;
 
+exports[`Open API helpers depictSecurity() should handle Basic, Bearer and CustomHeader Securities 1`] = `
+Object {
+  "or": Array [
+    Object {
+      "and": Array [
+        Object {
+          "scheme": "basic",
+          "type": "http",
+        },
+        Object {
+          "scheme": "bearer",
+          "type": "http",
+        },
+      ],
+    },
+    Object {
+      "in": "header",
+      "name": "X-Key",
+      "type": "apiKey",
+    },
+  ],
+}
+`;
+
+exports[`Open API helpers depictSecurity() should handle Input and Cookie Securities 1`] = `
+Object {
+  "and": Array [
+    Object {
+      "or": Array [
+        Object {
+          "in": "query",
+          "name": "apiKey",
+          "type": "apiKey",
+        },
+        Object {
+          "in": "cookie",
+          "name": "hash",
+          "type": "apiKey",
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`Open API helpers depictSecurity() should handle OpenID and OAuth2 Securities 1`] = `
+Object {
+  "or": Array [
+    Object {
+      "openIdConnectUrl": "https://test.url",
+      "type": "openIdConnect",
+    },
+    Object {
+      "type": "oauth2",
+    },
+  ],
+}
+`;
+
+exports[`Open API helpers depictSecurityNames() should handle LogicalAnd 1`] = `
+Array [
+  Object {
+    "A": Array [],
+    "B": Array [],
+    "C": Array [],
+  },
+]
+`;
+
+exports[`Open API helpers depictSecurityNames() should handle LogicalAnd 2`] = `
+Array [
+  Object {
+    "A": Array [],
+    "B": Array [],
+  },
+  Object {
+    "A": Array [],
+    "C": Array [],
+  },
+]
+`;
+
+exports[`Open API helpers depictSecurityNames() should handle LogicalOr 1`] = `
+Array [
+  Object {
+    "A": Array [],
+  },
+  Object {
+    "B": Array [],
+  },
+  Object {
+    "C": Array [],
+  },
+]
+`;
+
+exports[`Open API helpers depictSecurityNames() should handle LogicalOr 2`] = `
+Array [
+  Object {
+    "A": Array [],
+  },
+  Object {
+    "B": Array [],
+    "C": Array [],
+  },
+]
+`;
+
+exports[`Open API helpers depictSecurityNames() should handle the plain value 1`] = `
+Array [
+  Object {
+    "A": Array [],
+  },
+]
+`;
+
 exports[`Open API helpers depictString() should depict ZodString with refinements 1`] = `
 Object {
   "description": "test",

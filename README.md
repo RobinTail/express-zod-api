@@ -272,6 +272,13 @@ Here is an example of the authentication middleware, that checks a `key` from in
 import { createMiddleware, createHttpError, z } from "express-zod-api";
 
 const authMiddleware = createMiddleware({
+  security: {
+    // this information is optional and used for the generated documentation (OpenAPI)
+    and: [
+      { type: "input", name: "key" },
+      { type: "header", name: "token" },
+    ],
+  },
   input: z.object({
     key: z.string().min(1),
   }),

@@ -1,12 +1,20 @@
-import { OpenApiBuilder, OperationObject } from "openapi3-ts";
+import {
+  OpenApiBuilder,
+  OperationObject,
+  SecuritySchemeObject,
+  SecuritySchemeType,
+} from "openapi3-ts";
 import { defaultInputSources } from "./common-helpers";
 import { CommonConfig } from "./config-type";
+import { mapLogicalContainer } from "./logical-container";
 import { Method } from "./method";
 import {
   depictRequestParams,
   depictRequest,
   depictResponse,
   reformatParamsInPath,
+  depictSecurity,
+  depictSecurityNames,
 } from "./open-api-helpers";
 import { Routing, routingCycle, RoutingCycleParams } from "./routing";
 
@@ -21,6 +29,25 @@ interface GeneratorParams {
 }
 
 export class OpenAPI extends OpenApiBuilder {
+  protected lastSecuritySchemaIds: Partial<Record<SecuritySchemeType, number>> =
+    {};
+
+  protected ensureUniqSecuritySchemaName(subject: SecuritySchemeObject) {
+    for (const name in this.rootDoc.components?.securitySchemes || {}) {
+      if (
+        JSON.stringify(subject) ===
+        JSON.stringify(this.rootDoc.components?.securitySchemes?.[name])
+      ) {
+        return name;
+      }
+    }
+    this.lastSecuritySchemaIds[subject.type] =
+      (this.lastSecuritySchemaIds?.[subject.type] || 0) + 1;
+    return `${subject.type.toUpperCase()}_${
+      this.lastSecuritySchemaIds[subject.type]
+    }`;
+  }
+
   public constructor({
     routing,
     config,
@@ -67,6 +94,19 @@ export class OpenAPI extends OpenApiBuilder {
       }
       if (inputSources.includes("body")) {
         operation.requestBody = depictRequest(commonParams);
+      }
+      const securityRefs = depictSecurityNames(
+        mapLogicalContainer(
+          depictSecurity(endpoint.getSecurity()),
+          (securitySchema) => {
+            const name = this.ensureUniqSecuritySchemaName(securitySchema);
+            this.addSecurityScheme(name, securitySchema);
+            return name;
+          }
+        )
+      );
+      if (securityRefs.length > 0) {
+        operation.security = securityRefs;
       }
       const swaggerCompatiblePath = reformatParamsInPath(path);
       this.addPath(swaggerCompatiblePath, {

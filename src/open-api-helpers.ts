@@ -9,6 +9,8 @@ import {
 import {
   RequestBodyObject,
   ResponseObject,
+  SecurityRequirementObject,
+  SecuritySchemeObject,
 } from "openapi3-ts/src/model/OpenApi";
 import { omit } from "ramda";
 import { z } from "zod";
@@ -25,8 +27,14 @@ import { ZodDateOut, ZodDateOutDef } from "./date-out-schema";
 import { AbstractEndpoint } from "./endpoint";
 import { OpenAPIError } from "./errors";
 import { ZodFile, ZodFileDef } from "./file-schema";
+import {
+  andToOr,
+  LogicalContainer,
+  mapLogicalContainer,
+} from "./logical-container";
 import { copyMeta } from "./metadata";
 import { Method } from "./method";
+import { Security } from "./security";
 import { ZodUpload, ZodUploadDef } from "./upload-schema";
 
 type MediaExamples = Pick<MediaTypeObject, "examples">;
@@ -712,6 +720,91 @@ export const depictResponse = ({
       {} as ContentObject
     ),
   };
+};
+
+type SecurityHelper<K extends Security["type"]> = (
+  security: Security & { type: K }
+) => SecuritySchemeObject;
+
+const depictBasicSecurity: SecurityHelper<"basic"> = ({}) => ({
+  type: "http",
+  scheme: "basic",
+});
+const depictBearerSecurity: SecurityHelper<"bearer"> = ({
+  format: bearerFormat,
+}) => ({
+  type: "http",
+  scheme: "bearer",
+  ...(bearerFormat ? { bearerFormat } : {}),
+});
+// @todo add description on actual input placement
+const depictInputSecurity: SecurityHelper<"input"> = ({ name }) => ({
+  type: "apiKey",
+  in: "query", // body is not supported yet, https://swagger.io/docs/specification/authentication/api-keys/
+  name,
+});
+const depictHeaderSecurity: SecurityHelper<"header"> = ({ name }) => ({
+  type: "apiKey",
+  in: "header",
+  name,
+});
+const depictCookieSecurity: SecurityHelper<"cookie"> = ({ name }) => ({
+  type: "apiKey",
+  in: "cookie",
+  name,
+});
+// @todo implement scopes
+const depictOpenIdSecurity: SecurityHelper<"openid"> = ({
+  url: openIdConnectUrl,
+}) => ({
+  type: "openIdConnect",
+  openIdConnectUrl,
+});
+// @todo implement scopes
+const depictOAuth2Security: SecurityHelper<"oauth2"> = ({}) => ({
+  type: "oauth2",
+});
+
+export const depictSecurity = (
+  container: LogicalContainer<Security>
+): LogicalContainer<SecuritySchemeObject> => {
+  const methods: { [K in Security["type"]]: SecurityHelper<K> } = {
+    basic: depictBasicSecurity,
+    bearer: depictBearerSecurity,
+    input: depictInputSecurity,
+    header: depictHeaderSecurity,
+    cookie: depictCookieSecurity,
+    openid: depictOpenIdSecurity,
+    oauth2: depictOAuth2Security,
+  };
+  return mapLogicalContainer(container, (security) =>
+    (methods[security.type] as SecurityHelper<typeof security.type>)(security)
+  );
+};
+
+export const depictSecurityNames = (
+  container: LogicalContainer<string>
+): SecurityRequirementObject[] => {
+  if (typeof container === "object") {
+    if ("or" in container) {
+      return container.or.map((entry) =>
+        (typeof entry === "string"
+          ? [entry]
+          : entry.and
+        ).reduce<SecurityRequirementObject>(
+          (agg, name) => ({
+            ...agg,
+            [name]: [],
+          }),
+          {}
+        )
+      );
+    }
+    if ("and" in container) {
+      return depictSecurityNames(andToOr(container));
+    }
+  }
+  return depictSecurityNames({ or: [container] });
 };
 
 export const depictRequest = ({

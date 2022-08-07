@@ -10,9 +10,11 @@ import {
   getInitialInput,
   IOSchema,
 } from "./common-helpers";
+import { combineContainers, LogicalContainer } from "./logical-container";
 import { AuxMethod, Method, MethodsDefinition } from "./method";
 import { AnyMiddlewareDef } from "./middleware";
 import { lastResortHandler, ResultHandlerDefinition } from "./result-handler";
+import { Security } from "./security";
 
 export type Handler<IN, OUT, OPT> = (params: {
   input: IN;
@@ -36,6 +38,7 @@ export abstract class AbstractEndpoint {
   public abstract getInputMimeTypes(): string[];
   public abstract getPositiveMimeTypes(): string[];
   public abstract getNegativeMimeTypes(): string[];
+  public abstract getSecurity(): LogicalContainer<Security>;
 }
 
 type EndpointProps<
@@ -131,6 +134,14 @@ export class Endpoint<
 
   public override getNegativeMimeTypes() {
     return this.resultHandler.getNegativeResponse().mimeTypes;
+  }
+
+  public override getSecurity(): LogicalContainer<Security> {
+    return this.middlewares.reduce<LogicalContainer<Security>>(
+      (acc, middleware) =>
+        middleware.security ? combineContainers(acc, middleware.security) : acc,
+      { and: [] }
+    );
   }
 
   #getDefaultCorsHeaders(): Record<string, string> {
