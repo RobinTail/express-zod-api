@@ -753,16 +753,15 @@ const depictCookieSecurity: SecurityHelper<"cookie"> = ({ name }) => ({
   in: "cookie",
   name,
 });
-// @todo implement scopes
 const depictOpenIdSecurity: SecurityHelper<"openid"> = ({
   url: openIdConnectUrl,
 }) => ({
   type: "openIdConnect",
   openIdConnectUrl,
 });
-// @todo implement scopes
-const depictOAuth2Security: SecurityHelper<"oauth2"> = ({}) => ({
+const depictOAuth2Security: SecurityHelper<"oauth2"> = ({ flows }) => ({
   type: "oauth2",
+  ...(flows ? { flows } : {}),
 });
 
 export const depictSecurity = (

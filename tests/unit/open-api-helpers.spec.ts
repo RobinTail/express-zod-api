@@ -856,6 +856,48 @@ describe("Open API helpers", () => {
         })
       ).toMatchSnapshot();
     });
+    test("should depict OAuth2 Security with flows", () => {
+      expect(
+        depictSecurity({
+          type: "oauth2",
+          flows: {
+            implicit: {
+              authorizationUrl: "https://test.url",
+              refreshUrl: "https://test2.url",
+              scopes: {
+                read: "read something",
+                write: "write something",
+              },
+            },
+            authorizationCode: {
+              authorizationUrl: "https://test.url",
+              refreshUrl: "https://test2.url",
+              tokenUrl: "https://test3.url",
+              scopes: {
+                read: "read something",
+                write: "write something",
+              },
+            },
+            clientCredentials: {
+              refreshUrl: "https://test2.url",
+              tokenUrl: "https://test3.url",
+              scopes: {
+                read: "read something",
+                write: "write something",
+              },
+            },
+            password: {
+              refreshUrl: "https://test2.url",
+              tokenUrl: "https://test3.url",
+              scopes: {
+                read: "read something",
+                write: "write something",
+              },
+            },
+          },
+        })
+      ).toMatchSnapshot();
+    });
   });
 
   describe("depictSecurityNames()", () => {

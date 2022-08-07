@@ -479,6 +479,47 @@ Array [
 ]
 `;
 
+exports[`Open API helpers depictSecurity() should depict OAuth2 Security with flows 1`] = `
+Object {
+  "flows": Object {
+    "authorizationCode": Object {
+      "authorizationUrl": "https://test.url",
+      "refreshUrl": "https://test2.url",
+      "scopes": Object {
+        "read": "read something",
+        "write": "write something",
+      },
+      "tokenUrl": "https://test3.url",
+    },
+    "clientCredentials": Object {
+      "refreshUrl": "https://test2.url",
+      "scopes": Object {
+        "read": "read something",
+        "write": "write something",
+      },
+      "tokenUrl": "https://test3.url",
+    },
+    "implicit": Object {
+      "authorizationUrl": "https://test.url",
+      "refreshUrl": "https://test2.url",
+      "scopes": Object {
+        "read": "read something",
+        "write": "write something",
+      },
+    },
+    "password": Object {
+      "refreshUrl": "https://test2.url",
+      "scopes": Object {
+        "read": "read something",
+        "write": "write something",
+      },
+      "tokenUrl": "https://test3.url",
+    },
+  },
+  "type": "oauth2",
+}
+`;
+
 exports[`Open API helpers depictSecurity() should handle Basic, Bearer and CustomHeader Securities 1`] = `
 Object {
   "or": Array [
