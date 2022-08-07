@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Example API
-  version: 7.6.3
+  version: 7.7.0
 paths:
   /v1/user/retrieve:
     get:
