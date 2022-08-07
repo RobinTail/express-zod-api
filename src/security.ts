@@ -23,8 +23,8 @@ interface CookieSecurity {
 }
 
 /**
- * @todo add scopes
  * @see https://swagger.io/docs/specification/authentication/openid-connect-discovery/
+ * @desc available scopes has to be provided via the specified URL
  */
 interface OpenIdSecurity {
   type: "openid";
