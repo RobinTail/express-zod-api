@@ -5,13 +5,12 @@ import {
   MediaTypeObject,
   ParameterObject,
   SchemaObject,
-} from "openapi3-ts";
-import {
+  OAuthFlowsObject,
   RequestBodyObject,
   ResponseObject,
   SecurityRequirementObject,
   SecuritySchemeObject,
-} from "openapi3-ts/src/model/OpenApi";
+} from "openapi3-ts";
 import { omit } from "ramda";
 import { z } from "zod";
 import {
@@ -761,7 +760,20 @@ const depictOpenIdSecurity: SecurityHelper<"openid"> = ({
 });
 const depictOAuth2Security: SecurityHelper<"oauth2"> = ({ flows }) => ({
   type: "oauth2",
-  ...(flows ? { flows } : {}),
+  ...(flows
+    ? {
+        flows: (
+          Object.keys(flows) as (keyof typeof flows)[]
+        ).reduce<OAuthFlowsObject>((acc, key) => {
+          const flow = flows[key];
+          if (!flow) {
+            return acc;
+          }
+          const { scopes = {}, ...rest } = flow;
+          return { ...acc, [key]: { ...rest, scopes } };
+        }, {}),
+      }
+    : {}),
 });
 
 export const depictSecurity = (

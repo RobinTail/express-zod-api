@@ -50,8 +50,8 @@ interface RefreshUrl {
 }
 
 interface Scopes<K extends string> {
-  /** @desc The available scopes for the OAuth2 security and their short descriptions. */
-  scopes: Record<K, string>;
+  /** @desc The available scopes for the OAuth2 security and their short descriptions. Optional. */
+  scopes?: Record<K, string>;
 }
 
 type AuthCodeFlow<S extends string> = AuthUrl &
