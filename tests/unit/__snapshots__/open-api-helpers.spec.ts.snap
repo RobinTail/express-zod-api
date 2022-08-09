@@ -573,6 +573,7 @@ Object {
       "type": "openIdConnect",
     },
     Object {
+      "flows": Object {},
       "type": "oauth2",
     },
   ],
