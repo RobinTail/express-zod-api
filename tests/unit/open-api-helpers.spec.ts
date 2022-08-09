@@ -898,6 +898,17 @@ describe("Open API helpers", () => {
         })
       ).toMatchSnapshot();
     });
+    test("should handle undefined flows", () => {
+      expect(
+        depictSecurity({
+          type: "oauth2",
+          flows: {
+            implicit: undefined,
+            password: undefined,
+          },
+        })
+      ).toMatchSnapshot();
+    });
   });
 
   describe("depictSecurityRefs()", () => {

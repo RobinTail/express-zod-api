@@ -579,6 +579,13 @@ Object {
 }
 `;
 
+exports[`Open API helpers depictSecurity() should handle undefined flows 1`] = `
+Object {
+  "flows": Object {},
+  "type": "oauth2",
+}
+`;
+
 exports[`Open API helpers depictSecurityRefs() should handle LogicalAnd 1`] = `
 Array [
   Object {
