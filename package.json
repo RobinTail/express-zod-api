@@ -1,6 +1,6 @@
 {
   "name": "express-zod-api",
-  "version": "7.7.0",
+  "version": "7.8.0",
   "description": "A Typescript library to help you get an API server up and running with I/O schema validation and custom middlewares in minutes.",
   "license": "MIT",
   "scripts": {
@@ -50,7 +50,7 @@
     "ramda": "0.28.0",
     "triple-beam": "1.3.0",
     "winston": "3.8.1",
-    "zod": "3.17.10",
+    "zod": "3.18.0",
     "zod-to-ts": "1.1.1"
   },
   "peerDependencies": {

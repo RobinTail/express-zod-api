@@ -488,6 +488,11 @@ export const depictEffect: DepictHelper<z.ZodEffects<z.ZodTypeAny>> = ({
   return { ...initial, ...input };
 };
 
+export const depictZodBranded: DepictHelper<
+  z.ZodBranded<z.ZodTypeAny, any>
+> = ({ schema, initial, isResponse }) =>
+  depictSchema({ schema: schema.unwrap(), isResponse, initial });
+
 export const depictIOExamples = <T extends IOSchema>(
   schema: T,
   isResponse: boolean,
@@ -610,6 +615,7 @@ const depictHelpers: DepictingRules = {
   ZodOptional: depictOptionalOrNullable,
   ZodNullable: depictOptionalOrNullable,
   ZodDiscriminatedUnion: depictDiscriminatedUnion,
+  ZodBranded: depictZodBranded,
 };
 
 export const depictSchema: DepictHelper<z.ZodTypeAny> = ({

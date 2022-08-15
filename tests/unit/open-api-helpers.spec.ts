@@ -39,6 +39,7 @@ import {
   extractObjectSchema,
   depictSecurity,
   depictSecurityRefs,
+  depictZodBranded,
 } from "../../src/open-api-helpers";
 import { serializeSchemaForTest } from "../helpers";
 
@@ -821,6 +822,17 @@ describe("Open API helpers", () => {
         expect(e).toBeInstanceOf(OpenAPIError);
         expect(e).toMatchSnapshot();
       }
+    });
+  });
+
+  describe("depictZodBranded", () => {
+    test("should depict the actual schema", () => {
+      expect(
+        depictZodBranded({
+          schema: z.string().min(2).brand<"Test">(),
+          isResponse: true,
+        })
+      ).toMatchSnapshot();
     });
   });
 
