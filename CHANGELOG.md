@@ -2,6 +2,12 @@
 
 ## Version 7
 
+### v7.8.0
+
+- `zod` version 3.18.0.
+  - There is a new feature — [branded types](https://github.com/colinhacks/zod#brand).
+  - `ZodBranded` is supported by OpenAPI generator.
+
 ### v7.7.0
 
 - Feature #523: Ability to specify Security schemas of your Middlewares and depict the Authentication of your API.
