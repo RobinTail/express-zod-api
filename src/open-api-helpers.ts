@@ -5,13 +5,11 @@ import {
   MediaTypeObject,
   ParameterObject,
   SchemaObject,
-} from "openapi3-ts";
-import {
   RequestBodyObject,
   ResponseObject,
   SecurityRequirementObject,
   SecuritySchemeObject,
-} from "openapi3-ts/src/model/OpenApi";
+} from "openapi3-ts";
 import { omit } from "ramda";
 import { z } from "zod";
 import {
@@ -660,12 +658,12 @@ export const excludeParamsFromDepiction = (
     ? depicted.required.filter((name) => !pathParams.includes(name))
     : undefined;
   const allOf = depicted.allOf
-    ? depicted.allOf.map((entry) =>
+    ? (depicted.allOf as SchemaObject[]).map((entry) =>
         excludeParamsFromDepiction(entry, pathParams)
       )
     : undefined;
   const oneOf = depicted.oneOf
-    ? depicted.oneOf.map((entry) =>
+    ? (depicted.oneOf as SchemaObject[]).map((entry) =>
         excludeParamsFromDepiction(entry, pathParams)
       )
     : undefined;
