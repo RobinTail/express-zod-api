@@ -2,6 +2,11 @@
 
 ## Version 7
 
+### v7.8.1
+
+- This version should fix the issue #551:
+  - Supporting the peer dependency for `jest` version 28.
+
 ### v7.8.0
 
 - `zod` version 3.18.0.
