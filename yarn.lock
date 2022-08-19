@@ -1166,9 +1166,9 @@
     form-data "^3.0.0"
 
 "@types/node@*":
-  version "18.7.4"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-18.7.4.tgz#95baa50846ae112a7376869d49fec23b2506c69d"
-  integrity sha512-RzRcw8c0B8LzryWOR4Wj7YOTFXvdYKwvrb6xQQyuDfnlTxwYXGCV5RZ/TEbq5L5kn+w3rliHAUyRcG1RtbmTFg==
+  version "18.7.7"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-18.7.7.tgz#2f7e3443fb434315ff594c49043486fe49937182"
+  integrity sha512-sTKYCtQmaUpsAT+AbUTKg0Ya0dYyh20t3TBQebWrGXQHFmkrEyeedok2/IpTthlJopPSbUoc1hAKoK6UeFRCZw==
 
 "@types/normalize-package-data@^2.4.0":
   version "2.4.1"
