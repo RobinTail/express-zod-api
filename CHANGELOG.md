@@ -2,6 +2,48 @@
 
 ## Version 7
 
+### v7.9.0
+
+- Feature #540, an addition to the [#523](#v770): OAuth2 authentication with scopes.
+  - Middlewares utilizing the OAuth2 authentication (via `security` property) can now specify the information on their
+    flows including scopes.
+  - Endpoints utilizing those middlewares can now specify their `scopes`.
+
+```typescript
+import { createMiddleware, defaultEndpointsFactory, z } from "express-zod-api";
+
+// example middleware
+const myMiddleware = createMiddleware({
+  security: {
+    type: "oauth2",
+    flows: {
+      password: {
+        tokenUrl: "https://some.url",
+        scopes: {
+          read: "read something", // scope: description
+          write: "write something",
+        },
+      },
+    },
+  },
+  input: z.object({}),
+  middleware: async () => ({
+    /* ... */
+  }),
+});
+
+// example endpoint
+const myEndpoint = defaultEndpointsFactory.addMiddleware(myMiddleware).build({
+  scopes: ["write"], // <——
+  method: "post",
+  input: z.object({}),
+  output: z.object({}),
+  handler: async () => ({
+    /* ... */
+  }),
+});
+```
+
 ### v7.8.1
 
 - This version should fix the issue #551:
