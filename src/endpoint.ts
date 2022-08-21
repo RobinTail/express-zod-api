@@ -39,6 +39,7 @@ export abstract class AbstractEndpoint {
   public abstract getPositiveMimeTypes(): string[];
   public abstract getNegativeMimeTypes(): string[];
   public abstract getSecurity(): LogicalContainer<Security>;
+  public abstract getScopes(): string[];
 }
 
 type EndpointProps<
@@ -47,7 +48,8 @@ type EndpointProps<
   OPT extends FlatObject,
   M extends Method,
   POS extends ApiResponse,
-  NEG extends ApiResponse
+  NEG extends ApiResponse,
+  SCO extends string
 > = {
   middlewares: AnyMiddlewareDef[];
   inputSchema: IN;
@@ -56,6 +58,7 @@ type EndpointProps<
   handler: Handler<z.output<IN>, z.input<OUT>, OPT>;
   resultHandler: ResultHandlerDefinition<POS, NEG>;
   description?: string;
+  scopes?: SCO[];
 } & MethodsDefinition<M>;
 
 export class Endpoint<
@@ -64,7 +67,8 @@ export class Endpoint<
   OPT extends FlatObject,
   M extends Method,
   POS extends ApiResponse,
-  NEG extends ApiResponse
+  NEG extends ApiResponse,
+  SCO extends string
 > extends AbstractEndpoint {
   protected readonly description?: string;
   protected readonly methods: M[] = [];
@@ -74,6 +78,7 @@ export class Endpoint<
   protected readonly outputSchema: OUT;
   protected readonly handler: Handler<z.output<IN>, z.input<OUT>, OPT>;
   protected readonly resultHandler: ResultHandlerDefinition<POS, NEG>;
+  protected readonly scopes?: SCO[];
 
   constructor({
     middlewares,
@@ -83,8 +88,9 @@ export class Endpoint<
     resultHandler,
     description,
     mimeTypes,
+    scopes,
     ...rest
-  }: EndpointProps<IN, OUT, OPT, M, POS, NEG>) {
+  }: EndpointProps<IN, OUT, OPT, M, POS, NEG, SCO>) {
     super();
     this.middlewares = middlewares;
     this.inputSchema = inputSchema;
@@ -93,6 +99,7 @@ export class Endpoint<
     this.handler = handler;
     this.resultHandler = resultHandler;
     this.description = description;
+    this.scopes = scopes;
     if ("methods" in rest) {
       this.methods = rest.methods;
     } else {
@@ -136,12 +143,16 @@ export class Endpoint<
     return this.resultHandler.getNegativeResponse().mimeTypes;
   }
 
-  public override getSecurity(): LogicalContainer<Security> {
+  public override getSecurity() {
     return this.middlewares.reduce<LogicalContainer<Security>>(
       (acc, middleware) =>
         middleware.security ? combineContainers(acc, middleware.security) : acc,
       { and: [] }
     );
+  }
+
+  public override getScopes(): SCO[] {
+    return this.scopes || [];
   }
 
   #getDefaultCorsHeaders(): Record<string, string> {

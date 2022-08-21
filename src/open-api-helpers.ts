@@ -5,13 +5,12 @@ import {
   MediaTypeObject,
   ParameterObject,
   SchemaObject,
-} from "openapi3-ts";
-import {
+  OAuthFlowsObject,
   RequestBodyObject,
   ResponseObject,
   SecurityRequirementObject,
   SecuritySchemeObject,
-} from "openapi3-ts/src/model/OpenApi";
+} from "openapi3-ts";
 import { omit } from "ramda";
 import { z } from "zod";
 import {
@@ -759,16 +758,24 @@ const depictCookieSecurity: SecurityHelper<"cookie"> = ({ name }) => ({
   in: "cookie",
   name,
 });
-// @todo implement scopes
 const depictOpenIdSecurity: SecurityHelper<"openid"> = ({
   url: openIdConnectUrl,
 }) => ({
   type: "openIdConnect",
   openIdConnectUrl,
 });
-// @todo implement scopes
-const depictOAuth2Security: SecurityHelper<"oauth2"> = ({}) => ({
+const depictOAuth2Security: SecurityHelper<"oauth2"> = ({ flows = {} }) => ({
   type: "oauth2",
+  flows: (
+    Object.keys(flows) as (keyof typeof flows)[]
+  ).reduce<OAuthFlowsObject>((acc, key) => {
+    const flow = flows[key];
+    if (!flow) {
+      return acc;
+    }
+    const { scopes = {}, ...rest } = flow;
+    return { ...acc, [key]: { ...rest, scopes } };
+  }, {}),
 });
 
 export const depictSecurity = (
@@ -788,29 +795,29 @@ export const depictSecurity = (
   );
 };
 
-export const depictSecurityNames = (
-  container: LogicalContainer<string>
+export const depictSecurityRefs = (
+  container: LogicalContainer<{ name: string; scopes: string[] }>
 ): SecurityRequirementObject[] => {
   if (typeof container === "object") {
     if ("or" in container) {
       return container.or.map((entry) =>
-        (typeof entry === "string"
-          ? [entry]
-          : entry.and
+        ("and" in entry
+          ? entry.and
+          : [entry]
         ).reduce<SecurityRequirementObject>(
-          (agg, name) => ({
+          (agg, { name, scopes }) => ({
             ...agg,
-            [name]: [],
+            [name]: scopes,
           }),
           {}
         )
       );
     }
     if ("and" in container) {
-      return depictSecurityNames(andToOr(container));
+      return depictSecurityRefs(andToOr(container));
     }
   }
-  return depictSecurityNames({ or: [container] });
+  return depictSecurityRefs({ or: [container] });
 };
 
 export const depictRequest = ({
