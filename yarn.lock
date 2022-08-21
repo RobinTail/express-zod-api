@@ -1022,10 +1022,10 @@
     "@types/connect" "*"
     "@types/node" "*"
 
-"@types/busboy@^0":
-  version "0.3.2"
-  resolved "https://registry.yarnpkg.com/@types/busboy/-/busboy-0.3.2.tgz#2f29b017513415399c42632ae6a7cfcb1409b79c"
-  integrity sha512-iEvdm9Z9KdSs/ozuh1Z7ZsXrOl8F4M/CLMXPZHr3QuJ4d6Bjn+HBMC5EMKpwpAo8oi8iK9GZfFoHaIMrrZgwVw==
+"@types/busboy@*":
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/@types/busboy/-/busboy-1.5.0.tgz#62681556cbbd2afc8d2efa6bafaa15602f0838b9"
+  integrity sha512-ncOOhwmyFDW76c/Tuvv9MA9VGYUCn8blzyWmzYELcNGDb0WXWLSmFi7hJq25YdRBYJrmMBB5jZZwUjlJe9HCjQ==
   dependencies:
     "@types/node" "*"
 
@@ -1062,11 +1062,11 @@
   integrity sha512-C6N5s2ZFtuZRj54k2/zyRhNDjJwwcViAM3Nbm8zjBpbqAdZ00mr0CFxvSKeO8Y/e03WVFLpQMdHYVfUd6SB+Hw==
 
 "@types/express-fileupload@^1.2.2":
-  version "1.2.3"
-  resolved "https://registry.yarnpkg.com/@types/express-fileupload/-/express-fileupload-1.2.3.tgz#11bccae26a0686e6ec17e3b527eb360e8024309b"
-  integrity sha512-TaMmhgnWr5Nb/bJ7zPSNSTBMQTX7vwKzv8+HqX1vZtytXw/DzcvX/IzjENO2BdzttJfmWofzi0aRio6cXWPuAw==
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/@types/express-fileupload/-/express-fileupload-1.4.0.tgz#39e953c1501b9930b3cdf1999aeb5b08ad8dc037"
+  integrity sha512-vfSpVrA+IpM02Y5Zuq89SblOK0smVJIFoiKza2x2h9Xm+PEIt26P4KxxDEBWld8NmB+Za32DhCcd8QkXU+OSug==
   dependencies:
-    "@types/busboy" "^0"
+    "@types/busboy" "*"
     "@types/express" "*"
 
 "@types/express-serve-static-core@^4.17.18":
