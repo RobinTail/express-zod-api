@@ -8,7 +8,7 @@ import {
   loggerLevels,
 } from "./config-type";
 import { copyMeta, getMeta } from "./metadata";
-import { Method } from "./method";
+import { AuxMethod, Method } from "./method";
 import { AnyMiddlewareDef } from "./middleware";
 import { mimeMultipart } from "./mime";
 import { ZodUpload } from "./upload-schema";
@@ -74,11 +74,17 @@ export const defaultInputSources: InputSources = {
 };
 const fallbackInputSource = defaultInputSources.delete;
 
+export const getActualMethod = (request: Request) =>
+  request.method.toLowerCase() as Method | AuxMethod;
+
 export function getInitialInput(
   request: Request,
   inputAssignment: CommonConfig["inputSources"]
 ): any {
-  const method = request.method.toLowerCase() as Method;
+  const method = getActualMethod(request);
+  if (method === "options") {
+    return {};
+  }
   let props = fallbackInputSource;
   if (method in defaultInputSources) {
     props = defaultInputSources[method];

@@ -15,7 +15,7 @@ export const updateUserEndpoint =
             (value) => value >= 0,
             "should be greater than or equal to 0"
           ),
-        name: z.string().nonempty(),
+        name: z.string().min(1),
         birthday: z.dateIn(),
       })
     ).example({

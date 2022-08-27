@@ -2,6 +2,195 @@
 
 ## Version 7
 
+### v7.9.0
+
+- Feature #540, an addition to the [#523](#v770): OAuth2 authentication with scopes.
+  - Middlewares utilizing the OAuth2 authentication (via `security` property) can now specify the information on their
+    flows including scopes.
+  - Endpoints utilizing those middlewares can now specify their `scopes`.
+
+```typescript
+import { createMiddleware, defaultEndpointsFactory, z } from "express-zod-api";
+
+// example middleware
+const myMiddleware = createMiddleware({
+  security: {
+    type: "oauth2",
+    flows: {
+      password: {
+        tokenUrl: "https://some.url",
+        scopes: {
+          read: "read something", // scope: description
+          write: "write something",
+        },
+      },
+    },
+  },
+  input: z.object({}),
+  middleware: async () => ({
+    /* ... */
+  }),
+});
+
+// example endpoint
+const myEndpoint = defaultEndpointsFactory.addMiddleware(myMiddleware).build({
+  scopes: ["write"], // <——
+  method: "post",
+  input: z.object({}),
+  output: z.object({}),
+  handler: async () => ({
+    /* ... */
+  }),
+});
+```
+
+### v7.8.1
+
+- This version should fix the issue #551:
+  - Supporting the peer dependency for `jest` version 28.
+
+### v7.8.0
+
+- `zod` version 3.18.0.
+  - There is a new feature — [branded types](https://github.com/colinhacks/zod#brand).
+  - `ZodBranded` is supported by OpenAPI generator.
+
+### v7.7.0
+
+- Feature #523: Ability to specify Security schemas of your Middlewares and depict the Authentication of your API.
+  - OpenAPI generator now can depict the [Authentication](https://swagger.io/docs/specification/authentication/) of your
+    endpoints as a part of the generated documentation.
+  - There is a new optional property `security` of `createMiddleware()`.
+  - You can specify a single or several security schemas in that property.
+  - For several security schemas `security` support a new `LogicalContainer` that can contain upto 2 nested levels.
+  - Supported security types: `basic`, `bearer`, `input`, `header`, `cookie`, `openid` and `oauth2`.
+  - OpenID and OAuth2 security types are currently have the limited support: without scopes.
+
+```typescript
+// example middleware
+import { createMiddleware } from "express-zod-api";
+
+const authMiddleware = createMiddleware({
+  security: {
+    // requires the "key" in inputs and a custom "token" headers
+    and: [
+      { type: "input", name: "key" },
+      { type: "header", name: "token" },
+    ],
+  },
+  input: z.object({
+    key: z.string().min(1),
+  }),
+  middleware: async ({ input: { key }, request }) => {
+    if (key !== "123") {
+      throw createHttpError(401, "Invalid key");
+    }
+    if (request.headers.token !== "456") {
+      throw createHttpError(401, "Invalid token");
+    }
+    return { token: request.headers.token };
+  },
+});
+
+// another example with logical OR
+createMiddleware({
+  security: {
+    // requires either input and header OR bearer header
+    or: [
+      {
+        and: [
+          { type: "input", name: "key" },
+          { type: "header", name: "token" },
+        ],
+      },
+      {
+        type: "bearer",
+        format: "JWT",
+      },
+    ],
+  },
+  //...
+});
+```
+
+### v7.6.3
+
+- [@rayzr522](https://github.com/rayzr522) has fixed the resolution of types in the ESM build for the `nodenext` case.
+
+### v7.6.2
+
+- `zod` version is 3.17.10.
+
+### v7.6.1
+
+- Fixed issue #514: native express middlewares did not run for `OPTIONS` requests.
+  - Using `.addExpressMiddleware()` or its alias `.use()` of `EndpointsFactory` it did not work for requests having
+    `OPTIONS` method.
+  - This version introduces the difference between a proprietary and native express middlewares.
+    - Please ensure usage of the `.addMiddleware()` method along with `createMiddleware()`.
+    - For the backward compatibility `.addMiddleware()` temporary also accepts the same arguments that
+      `createMiddleware()` does, however this is deprecated and will be removed later.
+  - Only native express middlewares are executed for `OPTIONS` request.
+  - It makes it possible to use `cors` package (express middleware), which is described in the
+    [Documentation](README.md#using-native-express-middlewares).
+    - **Please note:** If using both `cors` package (express middleware) and `cors` configuration option, the
+      configuration option sets CORS headers first, so the middleware can override them if needed.
+
+```typescript
+import { defaultEndpointsFactory } from "express-zod-api";
+import cors from "cors";
+
+const myFactory = defaultEndpointsFactory.addExpressMiddleware(
+  cors({ credentials: true })
+);
+```
+
+### v7.6.0
+
+- `zod` version is 3.17.9.
+  - Some new public methods have been introduced, so I'm changing the minor version.
+
+### v7.5.0
+
+- Feature #503: configurable CORS headers.
+  - The configuration options `cors` now accepts a function that returns custom headers.
+  - The function may be asynchronous.
+  - Setting `cors: true` implies the default headers.
+
+```typescript
+import { createConfig } from "express-zod-api";
+
+const config = createConfig({
+  // ...
+  cors: ({ defaultHeaders, request, endpoint, logger }) => ({
+    ...defaultHeaders,
+    "Access-Control-Max-Age": "5000",
+  }),
+});
+```
+
+```yaml
+# the default headers are:
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Methods: ..., OPTIONS # endpoint methods + OPTIONS
+Access-Control-Allow-Headers: content-type
+```
+
+### v7.4.1
+
+- There was an issue with logger when calling its methods without a message.
+  The output was empty, considering the first argument to be a message.
+  It's fixed in this version by adding `[No message]` message before printing the object.
+
+```typescript
+// reproduction example
+logger.debug({ something: "test" });
+```
+
+### v7.4.0
+
+- `winston` version is 3.8.1.
+
 ### v7.3.1
 
 - `zod-to-ts` version is 1.1.1.

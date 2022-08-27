@@ -31,7 +31,7 @@ describe("Common Helpers", () => {
     });
 
     test("Should merge input object schemas", () => {
-      const middlewares = [
+      const middlewares: AnyMiddlewareDef[] = [
         createMiddleware({
           input: z.object({
             one: z.string(),
@@ -50,7 +50,7 @@ describe("Common Helpers", () => {
           }),
           middleware: jest.fn(),
         }),
-      ] as unknown as AnyMiddlewareDef[];
+      ];
       const endpointInput = z.object({
         four: z.boolean(),
       });
@@ -60,7 +60,7 @@ describe("Common Helpers", () => {
     });
 
     test("Should merge union object schemas", () => {
-      const middlewares = [
+      const middlewares: AnyMiddlewareDef[] = [
         createMiddleware({
           input: z
             .object({
@@ -85,7 +85,7 @@ describe("Common Helpers", () => {
             ),
           middleware: jest.fn(),
         }),
-      ] as unknown as AnyMiddlewareDef[];
+      ];
       const endpointInput = z
         .object({
           five: z.string(),
@@ -101,7 +101,7 @@ describe("Common Helpers", () => {
     });
 
     test("Should merge intersection object schemas", () => {
-      const middlewares = [
+      const middlewares: AnyMiddlewareDef[] = [
         createMiddleware({
           input: z
             .object({
@@ -126,7 +126,7 @@ describe("Common Helpers", () => {
             ),
           middleware: jest.fn(),
         }),
-      ] as unknown as AnyMiddlewareDef[];
+      ];
       const endpointInput = z
         .object({
           five: z.string(),
@@ -142,7 +142,7 @@ describe("Common Helpers", () => {
     });
 
     test("Should merge mixed object schemas", () => {
-      const middlewares = [
+      const middlewares: AnyMiddlewareDef[] = [
         createMiddleware({
           input: z
             .object({
@@ -167,7 +167,7 @@ describe("Common Helpers", () => {
             ),
           middleware: jest.fn(),
         }),
-      ] as unknown as AnyMiddlewareDef[];
+      ];
       const endpointInput = z.object({
         five: z.string(),
       });
@@ -177,7 +177,7 @@ describe("Common Helpers", () => {
     });
 
     test("Should merge examples in case of using withMeta()", () => {
-      const middlewares = [
+      const middlewares: AnyMiddlewareDef[] = [
         createMiddleware({
           input: withMeta(
             z
@@ -212,7 +212,7 @@ describe("Common Helpers", () => {
           }),
           middleware: jest.fn(),
         }),
-      ] as unknown as AnyMiddlewareDef[];
+      ];
       const endpointInput = withMeta(
         z.object({
           five: z.string(),
@@ -377,6 +377,11 @@ describe("Common Helpers", () => {
         a: "url param",
         b: "url param",
       });
+    });
+    test("Issue 514: should return empty object for OPTIONS", () => {
+      expect(
+        getInitialInput({ method: "OPTIONS" } as unknown as Request, undefined)
+      ).toEqual({});
     });
   });
 

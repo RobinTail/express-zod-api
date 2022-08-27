@@ -9,21 +9,29 @@ const { combine, colorize, timestamp: useTimestamp, printf } = winston.format;
 
 export function createLogger(loggerConfig: LoggerConfig): winston.Logger {
   const prettyPrint = (meta: any) => {
-    delete meta[LEVEL];
-    delete meta[MESSAGE];
-    delete meta[SPLAT];
-    return inspect(meta, false, 1, loggerConfig.color);
+    const {
+      [LEVEL]: noLevel,
+      [MESSAGE]: noMessage,
+      [SPLAT]: noSplat,
+      ...rest
+    } = meta;
+    return inspect(rest, false, 1, loggerConfig.color);
   };
 
   const getOutputFormat = (isPretty?: boolean) =>
-    printf(
-      ({ timestamp, message, level, durationMs, ...meta }) =>
+    printf(({ timestamp, message, level, durationMs, ...meta }) => {
+      if (typeof message === "object") {
+        meta = { ...meta, ...(message as object) };
+        message = "[No message]";
+      }
+      return (
         `${timestamp} ${level}: ${message}` +
         (durationMs === undefined ? "" : ` duration: ${durationMs}ms`) +
         (Object.keys(meta).length === 0
           ? ""
           : " " + (isPretty ? prettyPrint(meta) : JSON.stringify(meta)))
-    );
+      );
+    });
 
   const formats: Format[] = [useTimestamp()];
 

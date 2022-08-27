@@ -5,11 +5,12 @@ import {
   MediaTypeObject,
   ParameterObject,
   SchemaObject,
-} from "openapi3-ts";
-import {
+  OAuthFlowsObject,
   RequestBodyObject,
   ResponseObject,
-} from "openapi3-ts/src/model/OpenApi";
+  SecurityRequirementObject,
+  SecuritySchemeObject,
+} from "openapi3-ts";
 import { omit } from "ramda";
 import { z } from "zod";
 import {
@@ -25,8 +26,14 @@ import { ZodDateOut, ZodDateOutDef } from "./date-out-schema";
 import { AbstractEndpoint } from "./endpoint";
 import { OpenAPIError } from "./errors";
 import { ZodFile, ZodFileDef } from "./file-schema";
+import {
+  andToOr,
+  LogicalContainer,
+  mapLogicalContainer,
+} from "./logical-container";
 import { copyMeta } from "./metadata";
 import { Method } from "./method";
+import { Security } from "./security";
 import { ZodUpload, ZodUploadDef } from "./upload-schema";
 
 type MediaExamples = Pick<MediaTypeObject, "examples">;
@@ -481,6 +488,11 @@ export const depictEffect: DepictHelper<z.ZodEffects<z.ZodTypeAny>> = ({
   return { ...initial, ...input };
 };
 
+export const depictZodBranded: DepictHelper<
+  z.ZodBranded<z.ZodTypeAny, any>
+> = ({ schema, initial, isResponse }) =>
+  depictSchema({ schema: schema.unwrap(), isResponse, initial });
+
 export const depictIOExamples = <T extends IOSchema>(
   schema: T,
   isResponse: boolean,
@@ -603,6 +615,7 @@ const depictHelpers: DepictingRules = {
   ZodOptional: depictOptionalOrNullable,
   ZodNullable: depictOptionalOrNullable,
   ZodDiscriminatedUnion: depictDiscriminatedUnion,
+  ZodBranded: depictZodBranded,
 };
 
 export const depictSchema: DepictHelper<z.ZodTypeAny> = ({
@@ -712,6 +725,99 @@ export const depictResponse = ({
       {} as ContentObject
     ),
   };
+};
+
+type SecurityHelper<K extends Security["type"]> = (
+  security: Security & { type: K }
+) => SecuritySchemeObject;
+
+const depictBasicSecurity: SecurityHelper<"basic"> = ({}) => ({
+  type: "http",
+  scheme: "basic",
+});
+const depictBearerSecurity: SecurityHelper<"bearer"> = ({
+  format: bearerFormat,
+}) => ({
+  type: "http",
+  scheme: "bearer",
+  ...(bearerFormat ? { bearerFormat } : {}),
+});
+// @todo add description on actual input placement
+const depictInputSecurity: SecurityHelper<"input"> = ({ name }) => ({
+  type: "apiKey",
+  in: "query", // body is not supported yet, https://swagger.io/docs/specification/authentication/api-keys/
+  name,
+});
+const depictHeaderSecurity: SecurityHelper<"header"> = ({ name }) => ({
+  type: "apiKey",
+  in: "header",
+  name,
+});
+const depictCookieSecurity: SecurityHelper<"cookie"> = ({ name }) => ({
+  type: "apiKey",
+  in: "cookie",
+  name,
+});
+const depictOpenIdSecurity: SecurityHelper<"openid"> = ({
+  url: openIdConnectUrl,
+}) => ({
+  type: "openIdConnect",
+  openIdConnectUrl,
+});
+const depictOAuth2Security: SecurityHelper<"oauth2"> = ({ flows = {} }) => ({
+  type: "oauth2",
+  flows: (
+    Object.keys(flows) as (keyof typeof flows)[]
+  ).reduce<OAuthFlowsObject>((acc, key) => {
+    const flow = flows[key];
+    if (!flow) {
+      return acc;
+    }
+    const { scopes = {}, ...rest } = flow;
+    return { ...acc, [key]: { ...rest, scopes } };
+  }, {}),
+});
+
+export const depictSecurity = (
+  container: LogicalContainer<Security>
+): LogicalContainer<SecuritySchemeObject> => {
+  const methods: { [K in Security["type"]]: SecurityHelper<K> } = {
+    basic: depictBasicSecurity,
+    bearer: depictBearerSecurity,
+    input: depictInputSecurity,
+    header: depictHeaderSecurity,
+    cookie: depictCookieSecurity,
+    openid: depictOpenIdSecurity,
+    oauth2: depictOAuth2Security,
+  };
+  return mapLogicalContainer(container, (security) =>
+    (methods[security.type] as SecurityHelper<typeof security.type>)(security)
+  );
+};
+
+export const depictSecurityRefs = (
+  container: LogicalContainer<{ name: string; scopes: string[] }>
+): SecurityRequirementObject[] => {
+  if (typeof container === "object") {
+    if ("or" in container) {
+      return container.or.map((entry) =>
+        ("and" in entry
+          ? entry.and
+          : [entry]
+        ).reduce<SecurityRequirementObject>(
+          (agg, { name, scopes }) => ({
+            ...agg,
+            [name]: scopes,
+          }),
+          {}
+        )
+      );
+    }
+    if ("and" in container) {
+      return depictSecurityRefs(andToOr(container));
+    }
+  }
+  return depictSecurityRefs({ or: [container] });
 };
 
 export const depictRequest = ({

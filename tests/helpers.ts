@@ -18,9 +18,6 @@ export const waitFor = async (cb: () => boolean) =>
     }, 100);
   });
 
-export const delay = async (ms: number) =>
-  new Promise((resolve) => setTimeout(resolve, ms));
-
 export const serializeSchemaForTest = (
   schema: z.ZodTypeAny
 ): Record<string, any> => {

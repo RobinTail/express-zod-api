@@ -1,6 +1,4 @@
-// eslint-disable-next-line import/no-extraneous-dependencies
 import chalk from "chalk";
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { format } from "pretty-format";
 import fs from "fs";
 

@@ -5,6 +5,7 @@ import {
   defaultEndpointsFactory,
   withMeta,
   createConfig,
+  createMiddleware,
 } from "../../src";
 import { expectType } from "tsd";
 
@@ -362,13 +363,13 @@ describe("Open API generator", () => {
                 numeric: z.string().regex(/\d+/),
                 combined: z
                   .string()
-                  .nonempty()
+                  .min(1)
                   .email()
                   .regex(/.*@example\.com/is)
                   .max(90),
               }),
               output: z.object({
-                nonempty: z.string().nonempty(),
+                nonempty: z.string().min(1),
               }),
               handler: jest.fn(),
             }),
@@ -518,10 +519,10 @@ describe("Open API generator", () => {
             getSomething: defaultEndpointsFactory.build({
               methods: ["get", "post"],
               input: z.object({
-                arr: z.array(z.string()).nonempty(),
+                arr: z.array(z.string()).min(1),
               }),
               output: z.object({
-                arr: z.array(z.string()).nonempty(),
+                arr: z.array(z.string()).min(1),
               }),
               handler: async ({ input }) => ({
                 arr: input.arr,
@@ -752,16 +753,18 @@ describe("Open API generator", () => {
         routing: {
           v1: {
             getSomething: defaultEndpointsFactory
-              .addMiddleware({
-                input: withMeta(
-                  z.object({
-                    key: z.string(),
-                  })
-                ).example({
-                  key: "1234-56789-01",
-                }),
-                middleware: jest.fn(),
-              })
+              .addMiddleware(
+                createMiddleware({
+                  input: withMeta(
+                    z.object({
+                      key: z.string(),
+                    })
+                  ).example({
+                    key: "1234-56789-01",
+                  }),
+                  middleware: jest.fn(),
+                })
+              )
               .build({
                 method: "post",
                 input: withMeta(
@@ -784,6 +787,65 @@ describe("Open API generator", () => {
         },
         version: "3.4.5",
         title: "Testing Metadata:example on IO schema + middleware",
+        serverUrl: "http://example.com",
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
+    });
+
+    test("should ensure uniq security schema names", () => {
+      const mw1 = createMiddleware({
+        security: {
+          or: [{ type: "input", name: "key" }, { type: "bearer" }],
+        },
+        input: z.object({
+          key: z.string(),
+        }),
+        middleware: jest.fn(),
+      });
+      const mw2 = createMiddleware({
+        security: {
+          and: [
+            { type: "bearer" },
+            {
+              type: "oauth2",
+              flows: {
+                password: {
+                  tokenUrl: "https://some.url",
+                  scopes: { read: "read something", write: "write something" },
+                },
+              },
+            },
+          ],
+        },
+        input: z.object({}),
+        middleware: jest.fn(),
+      });
+      const spec = new OpenAPI({
+        config,
+        routing: {
+          v1: {
+            getSomething: defaultEndpointsFactory.addMiddleware(mw1).build({
+              scopes: ["this should be omitted"],
+              method: "get",
+              input: z.object({
+                str: z.string(),
+              }),
+              output: z.object({
+                num: z.number(),
+              }),
+              handler: async () => ({ num: 123 }),
+            }),
+            setSomething: defaultEndpointsFactory.addMiddleware(mw2).build({
+              scopes: ["write"],
+              method: "post",
+              input: z.object({}),
+              output: z.object({}),
+              handler: async () => ({}),
+            }),
+          },
+        },
+        version: "3.4.5",
+        title: "Testing Security",
         serverUrl: "http://example.com",
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();

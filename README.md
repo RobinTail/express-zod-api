@@ -26,25 +26,26 @@ Start your API server with I/O schema validation and custom middlewares in minut
    6. [Start your server](#start-your-server)
    7. [Try it](#try-it)
 4. [Fascinating features](#fascinating-features)
-   1. [Middlewares](#middlewares)
-   2. [Options](#options)
-   3. [Refinements](#refinements)
-   4. [Transformations](#transformations)
-   5. [Dealing with dates](#dealing-with-dates)
-   6. [Route path params](#route-path-params)
-   7. [Response customization](#response-customization)
-   8. [Non-object response](#non-object-response) including file downloads
-   9. [Using native express middlewares](#using-native-express-middlewares)
-   10. [File uploads](#file-uploads)
-   11. [Customizing logger](#customizing-logger)
-   12. [Connect to your own express app](#connect-to-your-own-express-app)
-   13. [Multiple schemas for one route](#multiple-schemas-for-one-route)
-   14. [Serving static files](#serving-static-files)
-   15. [Customizing input sources](#customizing-input-sources)
-   16. [Enabling compression](#enabling-compression)
-   17. [Enabling HTTPS](#enabling-https)
-   18. [Generating a Frontend Client](#generating-a-frontend-client)
-   19. [Creating a documentation](#creating-a-documentation)
+   1. [Cross-Origin Resource Sharing](#cross-origin-resource-sharing) (CORS)
+   2. [Middlewares](#middlewares)
+   3. [Options](#options)
+   4. [Refinements](#refinements)
+   5. [Transformations](#transformations)
+   6. [Dealing with dates](#dealing-with-dates)
+   7. [Route path params](#route-path-params)
+   8. [Response customization](#response-customization)
+   9. [Non-object response](#non-object-response) including file downloads
+   10. [Using native express middlewares](#using-native-express-middlewares)
+   11. [File uploads](#file-uploads)
+   12. [Customizing logger](#customizing-logger)
+   13. [Connect to your own express app](#connect-to-your-own-express-app)
+   14. [Multiple schemas for one route](#multiple-schemas-for-one-route)
+   15. [Serving static files](#serving-static-files)
+   16. [Customizing input sources](#customizing-input-sources)
+   17. [Enabling compression](#enabling-compression)
+   18. [Enabling HTTPS](#enabling-https)
+   19. [Generating a Frontend Client](#generating-a-frontend-client)
+   20. [Creating a documentation](#creating-a-documentation)
 5. [Additional hints](#additional-hints)
    1. [How to test endpoints](#how-to-test-endpoints)
    2. [Excessive properties in endpoint output](#excessive-properties-in-endpoint-output)
@@ -209,6 +210,31 @@ You should receive the following response:
 
 # Fascinating features
 
+## Cross-Origin Resource Sharing
+
+You can enable your API for other domains using the corresponding configuration option `cors`.
+It's _not optional_ to draw your attention to making the appropriate decision, however, it's enabled in the
+[Quick start example](#set-up-config) above, assuming that in most cases you will want to enable this feature.
+See [MDN article](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) for more information.
+
+In addition to being a boolean, `cors` can also be assigned a function that provides custom headers. That function
+has several parameters and can be asynchronous.
+
+```typescript
+import { createConfig } from "express-zod-api";
+
+const config = createConfig({
+  // ... other options
+  cors: ({ defaultHeaders, request, endpoint, logger }) => ({
+    ...defaultHeaders,
+    "Access-Control-Max-Age": "5000",
+  }),
+});
+```
+
+Please note: If you only want to send specific headers on requests to a specific endpoint, consider the
+[Middlewares](#middlewares) or [response customization approach](#response-customization).
+
 ## Middlewares
 
 Middleware can authenticate using input or `request` headers, and can provide endpoint handlers with `options`.
@@ -246,8 +272,15 @@ Here is an example of the authentication middleware, that checks a `key` from in
 import { createMiddleware, createHttpError, z } from "express-zod-api";
 
 const authMiddleware = createMiddleware({
+  security: {
+    // this information is optional and used for the generated documentation (OpenAPI)
+    and: [
+      { type: "input", name: "key" },
+      { type: "header", name: "token" },
+    ],
+  },
   input: z.object({
-    key: z.string().nonempty(),
+    key: z.string().min(1),
   }),
   middleware: async ({ input: { key }, request, logger }) => {
     logger.debug("Checking the key and token");
@@ -299,7 +332,7 @@ const nicknameConstraintMiddleware = createMiddleware({
   input: z.object({
     nickname: z
       .string()
-      .nonempty()
+      .min(1)
       .refine(
         (nick) => !/^\d.*$/.test(nick),
         "Nickname cannot start with a digit"
@@ -396,6 +429,8 @@ const routing: Routing = {
     user: {
       // route path /v1/user/:id, where :id is the path param
       ":id": getUserEndpoint,
+      // use the empty string to represent /v1/user if needed:
+      // "": listAllUsersEndpoint,
     },
   },
 };

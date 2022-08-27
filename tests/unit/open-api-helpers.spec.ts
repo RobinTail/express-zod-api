@@ -37,6 +37,9 @@ import {
   excludeParamsFromDepiction,
   reformatParamsInPath,
   extractObjectSchema,
+  depictSecurity,
+  depictSecurityRefs,
+  depictZodBranded,
 } from "../../src/open-api-helpers";
 import { serializeSchemaForTest } from "../helpers";
 
@@ -819,6 +822,172 @@ describe("Open API helpers", () => {
         expect(e).toBeInstanceOf(OpenAPIError);
         expect(e).toMatchSnapshot();
       }
+    });
+  });
+
+  describe("depictZodBranded", () => {
+    test("should depict the actual schema", () => {
+      expect(
+        depictZodBranded({
+          schema: z.string().min(2).brand<"Test">(),
+          isResponse: true,
+        })
+      ).toMatchSnapshot();
+    });
+  });
+
+  describe("depictSecurity()", () => {
+    test("should handle Basic, Bearer and CustomHeader Securities", () => {
+      expect(
+        depictSecurity({
+          or: [
+            { and: [{ type: "basic" }, { type: "bearer" }] },
+            { type: "header", name: "X-Key" },
+          ],
+        })
+      ).toMatchSnapshot();
+    });
+    test("should handle Input and Cookie Securities", () => {
+      expect(
+        depictSecurity({
+          and: [
+            {
+              or: [
+                { type: "input", name: "apiKey" },
+                { type: "cookie", name: "hash" },
+              ],
+            },
+          ],
+        })
+      ).toMatchSnapshot();
+    });
+    test("should handle OpenID and OAuth2 Securities", () => {
+      expect(
+        depictSecurity({
+          or: [{ type: "openid", url: "https://test.url" }, { type: "oauth2" }],
+        })
+      ).toMatchSnapshot();
+    });
+    test("should depict OAuth2 Security with flows", () => {
+      expect(
+        depictSecurity({
+          type: "oauth2",
+          flows: {
+            implicit: {
+              authorizationUrl: "https://test.url",
+              refreshUrl: "https://test2.url",
+              scopes: {
+                read: "read something",
+                write: "write something",
+              },
+            },
+            authorizationCode: {
+              authorizationUrl: "https://test.url",
+              refreshUrl: "https://test2.url",
+              tokenUrl: "https://test3.url",
+              scopes: {
+                read: "read something",
+                write: "write something",
+              },
+            },
+            clientCredentials: {
+              refreshUrl: "https://test2.url",
+              tokenUrl: "https://test3.url",
+              scopes: {
+                read: "read something",
+                write: "write something",
+              },
+            },
+            password: {
+              refreshUrl: "https://test2.url",
+              tokenUrl: "https://test3.url",
+              scopes: {
+                read: "read something",
+                write: "write something",
+              },
+            },
+          },
+        })
+      ).toMatchSnapshot();
+    });
+    test("should handle undefined flows", () => {
+      expect(
+        depictSecurity({
+          type: "oauth2",
+          flows: {
+            implicit: undefined,
+            password: undefined,
+          },
+        })
+      ).toMatchSnapshot();
+    });
+  });
+
+  describe("depictSecurityRefs()", () => {
+    test("should handle LogicalAnd", () => {
+      expect(
+        depictSecurityRefs({
+          and: [
+            { name: "A", scopes: [] },
+            { name: "B", scopes: [] },
+            { name: "C", scopes: [] },
+          ],
+        })
+      ).toMatchSnapshot();
+      expect(
+        depictSecurityRefs({
+          and: [
+            { name: "A", scopes: [] },
+            {
+              or: [
+                { name: "B", scopes: [] },
+                { name: "C", scopes: [] },
+              ],
+            },
+          ],
+        })
+      ).toMatchSnapshot();
+    });
+
+    test("should handle LogicalOr", () => {
+      expect(
+        depictSecurityRefs({
+          or: [
+            { name: "A", scopes: [] },
+            { name: "B", scopes: [] },
+            { name: "C", scopes: [] },
+          ],
+        })
+      ).toMatchSnapshot();
+      expect(
+        depictSecurityRefs({
+          or: [
+            { name: "A", scopes: [] },
+            {
+              and: [
+                { name: "B", scopes: [] },
+                { name: "C", scopes: [] },
+              ],
+            },
+          ],
+        })
+      ).toMatchSnapshot();
+    });
+
+    test("should handle the plain value", () => {
+      expect(depictSecurityRefs({ name: "A", scopes: [] })).toMatchSnapshot();
+    });
+
+    test("should populate the scopes", () => {
+      expect(
+        depictSecurityRefs({
+          or: [
+            { name: "A", scopes: ["write"] },
+            { name: "B", scopes: ["read"] },
+            { name: "C", scopes: ["read", "write"] },
+          ],
+        })
+      ).toMatchSnapshot();
     });
   });
 });

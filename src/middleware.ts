@@ -3,6 +3,8 @@ import { HttpError } from "http-errors";
 import { Logger } from "winston";
 import { z } from "zod";
 import { FlatObject, IOSchema } from "./common-helpers";
+import { LogicalContainer } from "./logical-container";
+import { Security } from "./security";
 
 interface MiddlewareParams<IN, OPT> {
   input: IN;
@@ -16,28 +18,39 @@ type Middleware<IN, OPT, OUT> = (
   params: MiddlewareParams<IN, OPT>
 ) => Promise<OUT>;
 
-export interface MiddlewareDefinition<
+export interface MiddlewareCreationProps<
   IN extends IOSchema<"strip">,
   OPT,
-  OUT extends FlatObject
+  OUT extends FlatObject,
+  SCO extends string
 > {
   input: IN;
+  security?: LogicalContainer<Security<keyof z.input<IN> & string, SCO>>;
   middleware: Middleware<z.output<IN>, OPT, OUT>;
 }
 
-export type AnyMiddlewareDef = MiddlewareDefinition<
-  IOSchema<"strip">,
-  any,
-  any
->;
+export interface MiddlewareDefinition<
+  IN extends IOSchema<"strip">,
+  OPT,
+  OUT extends FlatObject,
+  SCO extends string
+> extends MiddlewareCreationProps<IN, OPT, OUT, SCO> {
+  type: "proprietary" | "express";
+}
+
+export type AnyMiddlewareDef = MiddlewareDefinition<any, any, any, any>;
 
 export const createMiddleware = <
   IN extends IOSchema<"strip">,
   OPT,
-  OUT extends FlatObject
+  OUT extends FlatObject,
+  SCO extends string
 >(
-  definition: MiddlewareDefinition<IN, OPT, OUT>
-) => definition;
+  props: MiddlewareCreationProps<IN, OPT, OUT, SCO>
+): MiddlewareDefinition<IN, OPT, OUT, SCO> => ({
+  ...props,
+  type: "proprietary",
+});
 
 export type ExpressMiddleware<R extends Request, S extends Response> = (
   request: R,

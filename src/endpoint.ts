@@ -4,10 +4,17 @@ import { z } from "zod";
 import { ApiResponse } from "./api-response";
 import { CommonConfig } from "./config-type";
 import { ResultHandlerError } from "./errors";
-import { FlatObject, getInitialInput, IOSchema } from "./common-helpers";
-import { Method, MethodsDefinition } from "./method";
+import {
+  FlatObject,
+  getActualMethod,
+  getInitialInput,
+  IOSchema,
+} from "./common-helpers";
+import { combineContainers, LogicalContainer } from "./logical-container";
+import { AuxMethod, Method, MethodsDefinition } from "./method";
 import { AnyMiddlewareDef } from "./middleware";
 import { lastResortHandler, ResultHandlerDefinition } from "./result-handler";
+import { Security } from "./security";
 
 export type Handler<IN, OUT, OPT> = (params: {
   input: IN;
@@ -31,6 +38,8 @@ export abstract class AbstractEndpoint {
   public abstract getInputMimeTypes(): string[];
   public abstract getPositiveMimeTypes(): string[];
   public abstract getNegativeMimeTypes(): string[];
+  public abstract getSecurity(): LogicalContainer<Security>;
+  public abstract getScopes(): string[];
 }
 
 type EndpointProps<
@@ -39,7 +48,8 @@ type EndpointProps<
   OPT extends FlatObject,
   M extends Method,
   POS extends ApiResponse,
-  NEG extends ApiResponse
+  NEG extends ApiResponse,
+  SCO extends string
 > = {
   middlewares: AnyMiddlewareDef[];
   inputSchema: IN;
@@ -48,6 +58,7 @@ type EndpointProps<
   handler: Handler<z.output<IN>, z.input<OUT>, OPT>;
   resultHandler: ResultHandlerDefinition<POS, NEG>;
   description?: string;
+  scopes?: SCO[];
 } & MethodsDefinition<M>;
 
 export class Endpoint<
@@ -56,7 +67,8 @@ export class Endpoint<
   OPT extends FlatObject,
   M extends Method,
   POS extends ApiResponse,
-  NEG extends ApiResponse
+  NEG extends ApiResponse,
+  SCO extends string
 > extends AbstractEndpoint {
   protected readonly description?: string;
   protected readonly methods: M[] = [];
@@ -66,6 +78,7 @@ export class Endpoint<
   protected readonly outputSchema: OUT;
   protected readonly handler: Handler<z.output<IN>, z.input<OUT>, OPT>;
   protected readonly resultHandler: ResultHandlerDefinition<POS, NEG>;
+  protected readonly scopes?: SCO[];
 
   constructor({
     middlewares,
@@ -75,8 +88,9 @@ export class Endpoint<
     resultHandler,
     description,
     mimeTypes,
+    scopes,
     ...rest
-  }: EndpointProps<IN, OUT, OPT, M, POS, NEG>) {
+  }: EndpointProps<IN, OUT, OPT, M, POS, NEG, SCO>) {
     super();
     this.middlewares = middlewares;
     this.inputSchema = inputSchema;
@@ -85,6 +99,7 @@ export class Endpoint<
     this.handler = handler;
     this.resultHandler = resultHandler;
     this.description = description;
+    this.scopes = scopes;
     if ("methods" in rest) {
       this.methods = rest.methods;
     } else {
@@ -128,14 +143,28 @@ export class Endpoint<
     return this.resultHandler.getNegativeResponse().mimeTypes;
   }
 
-  #setupCorsHeaders(response: Response) {
-    const accessMethods = this.methods
-      .map((method) => method.toUpperCase())
-      .concat("OPTIONS")
-      .join(", ");
-    response.set("Access-Control-Allow-Origin", "*");
-    response.set("Access-Control-Allow-Methods", accessMethods);
-    response.set("Access-Control-Allow-Headers", "content-type");
+  public override getSecurity() {
+    return this.middlewares.reduce<LogicalContainer<Security>>(
+      (acc, middleware) =>
+        middleware.security ? combineContainers(acc, middleware.security) : acc,
+      { and: [] }
+    );
+  }
+
+  public override getScopes(): SCO[] {
+    return this.scopes || [];
+  }
+
+  #getDefaultCorsHeaders(): Record<string, string> {
+    const accessMethods = (this.methods as (M | AuxMethod)[])
+      .concat("options")
+      .join(", ")
+      .toUpperCase();
+    return {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": accessMethods,
+      "Access-Control-Allow-Headers": "content-type",
+    };
   }
 
   async #parseOutput(output: any) {
@@ -160,11 +189,13 @@ export class Endpoint<
   }
 
   async #runMiddlewares({
+    method,
     input,
     request,
     response,
     logger,
   }: {
+    method: Method | AuxMethod;
     input: any;
     request: Request;
     response: Response;
@@ -173,6 +204,9 @@ export class Endpoint<
     const options: any = {};
     let isStreamClosed = false;
     for (const def of this.middlewares) {
+      if (method === "options" && def.type === "proprietary") {
+        continue;
+      }
       Object.assign(input, await def.input.parseAsync(input)); // middleware can transform the input types
       Object.assign(
         options,
@@ -259,24 +293,37 @@ export class Endpoint<
     logger: Logger;
     config: CommonConfig;
   }) {
+    const method = getActualMethod(request);
     let output: any;
     let error: Error | null = null;
     if (config.cors) {
-      this.#setupCorsHeaders(response);
-    }
-    if (request.method === "OPTIONS") {
-      response.end();
-      return;
+      let headers = this.#getDefaultCorsHeaders();
+      if (typeof config.cors === "function") {
+        headers = await config.cors({
+          request,
+          logger,
+          endpoint: this,
+          defaultHeaders: headers,
+        });
+      }
+      for (const key in headers) {
+        response.set(key, headers[key]);
+      }
     }
     const initialInput = getInitialInput(request, config.inputSources);
     try {
       const { input, options, isStreamClosed } = await this.#runMiddlewares({
+        method,
         input: { ...initialInput }, // preserve the initial
         request,
         response,
         logger,
       });
       if (isStreamClosed) {
+        return;
+      }
+      if (method === "options") {
+        response.status(200).end();
         return;
       }
       output = await this.#parseOutput(
