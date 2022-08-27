@@ -768,7 +768,8 @@ describe("Open API helpers", () => {
     test("should remove example property of supplied object", () => {
       expect(
         excludeExampleFromDepiction({
-          test: "some",
+          type: "string",
+          description: "test",
           example: "test",
         })
       ).toMatchSnapshot();
