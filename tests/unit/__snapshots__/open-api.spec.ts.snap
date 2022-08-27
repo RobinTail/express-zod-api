@@ -3,13 +3,13 @@
 exports[`Open API generator Issue #98 Should describe non-empty array 1`] = `
 "openapi: 3.0.0
 info:
-  title: \\"Testing issue #98\\"
+  title: "Testing issue #98"
   version: 3.4.5
 paths:
   /v1/getSomething:
     get:
       responses:
-        \\"200\\":
+        "200":
           description: GET /v1/getSomething Successful response
           content:
             application/json:
@@ -33,7 +33,7 @@ paths:
                 required:
                   - status
                   - data
-        \\"400\\":
+        "400":
           description: GET /v1/getSomething Error response
           content:
             application/json:
@@ -72,7 +72,7 @@ paths:
             minItems: 1
     post:
       responses:
-        \\"200\\":
+        "200":
           description: POST /v1/getSomething Successful response
           content:
             application/json:
@@ -96,7 +96,7 @@ paths:
                 required:
                   - status
                   - data
-        \\"400\\":
+        "400":
           description: POST /v1/getSomething Error response
           content:
             application/json:
@@ -156,13 +156,13 @@ servers:
 exports[`Open API generator Issue #98 should union schemas 1`] = `
 "openapi: 3.0.0
 info:
-  title: \\"Testing issue #98\\"
+  title: "Testing issue #98"
   version: 3.4.5
 paths:
   /v1/getSomething:
     post:
       responses:
-        \\"200\\":
+        "200":
           description: POST /v1/getSomething Successful response
           content:
             application/json:
@@ -196,7 +196,7 @@ paths:
                 required:
                   - status
                   - data
-        \\"400\\":
+        "400":
           description: POST /v1/getSomething Error response
           content:
             application/json:
@@ -272,7 +272,7 @@ paths:
   /v1/getSomething:
     get:
       responses:
-        \\"200\\":
+        "200":
           description: GET /v1/getSomething Successful response
           content:
             application/json:
@@ -298,7 +298,7 @@ paths:
                 required:
                   - status
                   - data
-        \\"400\\":
+        "400":
           description: GET /v1/getSomething Error response
           content:
             application/json:
@@ -344,7 +344,7 @@ paths:
   /v1/setSomething:
     post:
       responses:
-        \\"200\\":
+        "200":
           description: POST /v1/setSomething Successful response
           content:
             application/json:
@@ -362,7 +362,7 @@ paths:
                 required:
                   - status
                   - data
-        \\"400\\":
+        "400":
           description: POST /v1/setSomething Error response
           content:
             application/json:
@@ -445,7 +445,7 @@ paths:
   /v1/getSomething:
     post:
       responses:
-        \\"200\\":
+        "200":
           description: POST /v1/getSomething Successful response
           content:
             application/json:
@@ -479,7 +479,7 @@ paths:
                     status: success
                     data:
                       num: 123
-        \\"400\\":
+        "400":
           description: POST /v1/getSomething Error response
           content:
             application/json:
@@ -558,7 +558,7 @@ paths:
   /v1/getSomething:
     get:
       responses:
-        \\"200\\":
+        "200":
           description: GET /v1/getSomething Successful response
           content:
             application/json:
@@ -571,7 +571,7 @@ paths:
                       - success
                   data:
                     example:
-                      numericStr: \\"123\\"
+                      numericStr: "123"
                     type: object
                     properties:
                       numericStr:
@@ -591,8 +591,8 @@ paths:
                   value:
                     status: success
                     data:
-                      numericStr: \\"123\\"
-        \\"400\\":
+                      numericStr: "123"
+        "400":
           description: GET /v1/getSomething Error response
           content:
             application/json:
@@ -628,7 +628,7 @@ paths:
             type: string
           examples:
             example1:
-              value: \\"123\\"
+              value: "123"
 components:
   schemas: {}
   responses: {}
@@ -654,7 +654,7 @@ paths:
   /v1/getSomething:
     post:
       responses:
-        \\"200\\":
+        "200":
           description: POST /v1/getSomething Successful response
           content:
             application/json:
@@ -667,7 +667,7 @@ paths:
                       - success
                   data:
                     example:
-                      numericStr: \\"123\\"
+                      numericStr: "123"
                     type: object
                     properties:
                       numericStr:
@@ -687,8 +687,8 @@ paths:
                   value:
                     status: success
                     data:
-                      numericStr: \\"123\\"
-        \\"400\\":
+                      numericStr: "123"
+        "400":
           description: POST /v1/getSomething Error response
           content:
             application/json:
@@ -729,7 +729,7 @@ paths:
             examples:
               example1:
                 value:
-                  strNum: \\"123\\"
+                  strNum: "123"
 components:
   schemas: {}
   responses: {}
@@ -755,7 +755,7 @@ paths:
   /v1/getSomething:
     get:
       responses:
-        \\"200\\":
+        "200":
           description: GET /v1/getSomething Successful response
           content:
             application/json:
@@ -770,7 +770,7 @@ paths:
                     type: object
                     properties:
                       numericStr:
-                        example: \\"123\\"
+                        example: "123"
                         type: string
                         format: double
                         minimum: 5e-324
@@ -782,7 +782,7 @@ paths:
                 required:
                   - status
                   - data
-        \\"400\\":
+        "400":
           description: GET /v1/getSomething Error response
           content:
             application/json:
@@ -815,7 +815,7 @@ paths:
           required: true
           schema:
             description: GET /v1/getSomething parameter
-            example: \\"123\\"
+            example: "123"
             type: string
 components:
   schemas: {}
@@ -842,7 +842,7 @@ paths:
   /v1/getSomething:
     get:
       responses:
-        \\"200\\":
+        "200":
           description: GET /v1/getSomething Successful response
           content:
             application/json:
@@ -869,7 +869,7 @@ paths:
                 required:
                   - status
                   - data
-        \\"400\\":
+        "400":
           description: GET /v1/getSomething Error response
           content:
             application/json:
@@ -925,10 +925,10 @@ info:
   title: Testing route path params
   version: 3.4.5
 paths:
-  \\"/v1/{name}\\":
+  "/v1/{name}":
     get:
       responses:
-        \\"200\\":
+        "200":
           description: GET /v1/:name Successful response
           content:
             application/json:
@@ -946,7 +946,7 @@ paths:
                 required:
                   - status
                   - data
-        \\"400\\":
+        "400":
           description: GET /v1/:name Error response
           content:
             application/json:
@@ -1014,10 +1014,10 @@ info:
   title: Testing route path params
   version: 3.4.5
 paths:
-  \\"/v1/{name}\\":
+  "/v1/{name}":
     post:
       responses:
-        \\"200\\":
+        "200":
           description: POST /v1/:name Successful response
           content:
             application/json:
@@ -1035,7 +1035,7 @@ paths:
                 required:
                   - status
                   - data
-        \\"400\\":
+        "400":
           description: POST /v1/:name Error response
           content:
             application/json:
@@ -1111,7 +1111,7 @@ paths:
   /v1/getSomething:
     get:
       responses:
-        \\"200\\":
+        "200":
           description: GET /v1/getSomething Successful response
           content:
             application/json:
@@ -1142,7 +1142,7 @@ paths:
                 required:
                   - status
                   - data
-        \\"400\\":
+        "400":
           description: GET /v1/getSomething Error response
           content:
             application/json:
@@ -1224,7 +1224,7 @@ paths:
   /v1/getSomething:
     post:
       responses:
-        \\"200\\":
+        "200":
           description: POST /v1/getSomething Successful response
           content:
             application/json:
@@ -1269,7 +1269,7 @@ paths:
                 required:
                   - status
                   - data
-        \\"400\\":
+        "400":
           description: POST /v1/getSomething Error response
           content:
             application/json:
@@ -1351,7 +1351,7 @@ paths:
   /v1/getSomething:
     post:
       responses:
-        \\"200\\":
+        "200":
           description: POST /v1/getSomething Successful response
           content:
             application/json:
@@ -1389,7 +1389,7 @@ paths:
                 required:
                   - status
                   - data
-        \\"400\\":
+        "400":
           description: POST /v1/getSomething Error response
           content:
             application/json:
@@ -1464,7 +1464,7 @@ paths:
   /v1/getSomething:
     get:
       responses:
-        \\"200\\":
+        "200":
           description: GET /v1/getSomething Successful response
           content:
             application/json:
@@ -1486,7 +1486,7 @@ paths:
                 required:
                   - status
                   - data
-        \\"400\\":
+        "400":
           description: GET /v1/getSomething Error response
           content:
             application/json:
@@ -1572,7 +1572,7 @@ paths:
   /v1/getSomething:
     post:
       responses:
-        \\"200\\":
+        "200":
           description: POST /v1/getSomething Successful response
           content:
             application/json:
@@ -1600,7 +1600,7 @@ paths:
                 required:
                   - status
                   - data
-        \\"400\\":
+        "400":
           description: POST /v1/getSomething Error response
           content:
             application/json:
@@ -1691,7 +1691,7 @@ paths:
   /v1/user/retrieve:
     get:
       responses:
-        \\"200\\":
+        "200":
           description: GET /v1/user/retrieve Successful response
           content:
             application/json:
@@ -1720,7 +1720,7 @@ paths:
                 required:
                   - status
                   - data
-        \\"400\\":
+        "400":
           description: GET /v1/user/retrieve Error response
           content:
             application/json:
@@ -1755,11 +1755,11 @@ paths:
           schema:
             description: a numeric string containing the id of the user
             type: string
-            pattern: /\\\\d+/
-  \\"/v1/user/{id}\\":
+            pattern: /\\d+/
+  "/v1/user/{id}":
     post:
       responses:
-        \\"200\\":
+        "200":
           description: POST /v1/user/:id Successful response
           content:
             application/json:
@@ -1797,7 +1797,7 @@ paths:
                     data:
                       name: John Doe
                       createdAt: 2021-12-31T00:00:00.000Z
-        \\"400\\":
+        "400":
           description: POST /v1/user/:id Error response
           content:
             application/json:
@@ -1834,7 +1834,7 @@ paths:
             type: string
           examples:
             example1:
-              value: \\"12\\"
+              value: "12"
       requestBody:
         content:
           application/json:
@@ -1861,7 +1861,7 @@ paths:
                     birthday:
                       type: string
                       format: date-time
-                      pattern: ^\\\\d{4}-\\\\d{2}-\\\\d{2}(T\\\\d{2}:\\\\d{2}:\\\\d{2}(\\\\.\\\\d{3})?)?Z?$
+                      pattern: ^\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2}:\\d{2}(\\.\\d{3})?)?Z?$
                       description: YYYY-MM-DDTHH:mm:ss.sssZ
                       externalDocs:
                         url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
@@ -1880,13 +1880,13 @@ paths:
   /v1/avatar/send:
     get:
       responses:
-        \\"200\\":
+        "200":
           description: GET /v1/avatar/send Successful response
           content:
             image/svg+xml:
               schema:
                 type: string
-        \\"400\\":
+        "400":
           description: GET /v1/avatar/send Error response
           content:
             text/plain:
@@ -1899,18 +1899,18 @@ paths:
           schema:
             description: GET /v1/avatar/send parameter
             type: string
-            pattern: /\\\\d+/
+            pattern: /\\d+/
   /v1/avatar/stream:
     get:
       responses:
-        \\"200\\":
+        "200":
           description: GET /v1/avatar/stream Successful response
           content:
             image/*:
               schema:
                 type: string
                 format: binary
-        \\"400\\":
+        "400":
           description: GET /v1/avatar/stream Error response
           content:
             text/plain:
@@ -1923,11 +1923,11 @@ paths:
           schema:
             description: GET /v1/avatar/stream parameter
             type: string
-            pattern: /\\\\d+/
+            pattern: /\\d+/
   /v1/avatar/upload:
     post:
       responses:
-        \\"200\\":
+        "200":
           description: POST /v1/avatar/upload Successful response
           content:
             application/json:
@@ -1968,7 +1968,7 @@ paths:
                 required:
                   - status
                   - data
-        \\"400\\":
+        "400":
           description: POST /v1/avatar/upload Error response
           content:
             application/json:
@@ -2040,7 +2040,7 @@ paths:
   /v1/getSomething:
     post:
       responses:
-        \\"200\\":
+        "200":
           description: POST /v1/getSomething Successful response
           content:
             application/json:
@@ -2054,10 +2054,10 @@ paths:
                   data:
                     type: object
                     properties:
-                      \\"null\\":
+                      "null":
                         nullable: true
                         type: string
-                        format: \\"null\\"
+                        format: "null"
                       dateOut:
                         type: string
                         format: date-time
@@ -2065,12 +2065,12 @@ paths:
                         externalDocs:
                           url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
                     required:
-                      - \\"null\\"
+                      - "null"
                       - dateOut
                 required:
                   - status
                   - data
-        \\"400\\":
+        "400":
           description: POST /v1/getSomething Error response
           content:
             application/json:
@@ -2112,7 +2112,7 @@ paths:
                 dateIn:
                   type: string
                   format: date-time
-                  pattern: ^\\\\d{4}-\\\\d{2}-\\\\d{2}(T\\\\d{2}:\\\\d{2}:\\\\d{2}(\\\\.\\\\d{3})?)?Z?$
+                  pattern: ^\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2}:\\d{2}(\\.\\d{3})?)?Z?$
                   description: YYYY-MM-DDTHH:mm:ss.sssZ
                   externalDocs:
                     url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
@@ -2145,7 +2145,7 @@ paths:
   /v1/getSomething:
     post:
       responses:
-        \\"200\\":
+        "200":
           description: POST /v1/getSomething Successful response
           content:
             application/json:
@@ -2167,7 +2167,7 @@ paths:
                 required:
                   - status
                   - data
-        \\"400\\":
+        "400":
           description: POST /v1/getSomething Error response
           content:
             application/json:
@@ -2298,7 +2298,7 @@ paths:
   /v1/getSomething:
     post:
       responses:
-        \\"200\\":
+        "200":
           description: POST /v1/getSomething Successful response
           content:
             application/json:
@@ -2320,7 +2320,7 @@ paths:
                 required:
                   - status
                   - data
-        \\"400\\":
+        "400":
           description: POST /v1/getSomething Error response
           content:
             application/json:
@@ -2380,13 +2380,13 @@ paths:
                   format: url
                 numeric:
                   type: string
-                  pattern: /\\\\d+/
+                  pattern: /\\d+/
                 combined:
                   type: string
                   format: email
                   minLength: 1
                   maxLength: 90
-                  pattern: /.*@example\\\\.com/is
+                  pattern: /.*@example\\.com/is
               required:
                 - regular
                 - min
@@ -2423,7 +2423,7 @@ paths:
   /v1/getSomething:
     post:
       responses:
-        \\"200\\":
+        "200":
           description: POST /v1/getSomething Successful response
           content:
             application/json:
@@ -2447,7 +2447,7 @@ paths:
                 required:
                   - status
                   - data
-        \\"400\\":
+        "400":
           description: POST /v1/getSomething Error response
           content:
             application/json:
@@ -2513,7 +2513,7 @@ paths:
   /v1/getSomething:
     post:
       responses:
-        \\"200\\":
+        "200":
           description: POST /v1/getSomething Successful response
           content:
             application/json:
@@ -2581,7 +2581,7 @@ paths:
                 required:
                   - status
                   - data
-        \\"400\\":
+        "400":
           description: POST /v1/getSomething Error response
           content:
             application/json:
@@ -2641,7 +2641,7 @@ paths:
   /v1/getSomething:
     post:
       responses:
-        \\"200\\":
+        "200":
           description: POST /v1/getSomething Successful response
           content:
             application/json:
@@ -2662,7 +2662,7 @@ paths:
                 required:
                   - status
                   - data
-        \\"400\\":
+        "400":
           description: POST /v1/getSomething Error response
           content:
             application/json:
@@ -2733,7 +2733,7 @@ paths:
   /v1/getSomething:
     post:
       responses:
-        \\"200\\":
+        "200":
           description: POST /v1/getSomething Successful response
           content:
             application/json:
@@ -2759,7 +2759,7 @@ paths:
                 required:
                   - status
                   - data
-        \\"400\\":
+        "400":
           description: POST /v1/getSomething Error response
           content:
             application/json:
@@ -2801,7 +2801,7 @@ paths:
                     oneOf:
                       - type: boolean
                     format: tuple
-                    description: \\"0: boolean\\"
+                    description: "0: boolean"
                 ofStrings:
                   type: array
                   minItems: 2
@@ -2812,7 +2812,7 @@ paths:
                       - nullable: true
                         type: string
                     format: tuple
-                    description: \\"0: string, 1: string\\"
+                    description: "0: string, 1: string"
                 complex:
                   type: array
                   minItems: 3
@@ -2828,7 +2828,7 @@ paths:
                         maximum: 9007199254740991
                         exclusiveMaximum: false
                     format: tuple
-                    description: \\"0: boolean, 1: string, 2: integer\\"
+                    description: "0: boolean, 1: string, 2: integer"
               required:
                 - ofOne
                 - ofStrings
@@ -2858,7 +2858,7 @@ paths:
   /v1/getSomething:
     get:
       responses:
-        \\"200\\":
+        "200":
           description: GET /v1/getSomething Successful response
           content:
             application/json:
@@ -2879,7 +2879,7 @@ paths:
                 required:
                   - status
                   - data
-        \\"400\\":
+        "400":
           description: GET /v1/getSomething Error response
           content:
             application/json:
@@ -2939,7 +2939,7 @@ paths:
   /v1/getSomething:
     get:
       responses:
-        \\"200\\":
+        "200":
           description: GET /v1/getSomething Successful response
           content:
             application/json:
@@ -2960,7 +2960,7 @@ paths:
                 required:
                   - status
                   - data
-        \\"400\\":
+        "400":
           description: GET /v1/getSomething Error response
           content:
             application/json:
