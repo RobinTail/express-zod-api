@@ -14,7 +14,11 @@ export const flattenAnds = <T>(
 ): LogicalAnd<T> => ({
   and: subject.reduce<T[]>(
     (agg, item) =>
-      agg.concat(typeof item === "object" && "and" in item ? item.and : item),
+      agg.concat(
+        typeof item === "object" && item !== null && "and" in item
+          ? item.and
+          : item
+      ),
     []
   ),
 });
@@ -24,11 +28,11 @@ export const mapLogicalContainer = <T, S>(
   container: LogicalContainer<T>,
   fn: (subject: T) => S
 ): LogicalContainer<S> => {
-  if (typeof container === "object") {
+  if (typeof container === "object" && container !== null) {
     if ("and" in container) {
       return {
         and: container.and.map((entry) =>
-          typeof entry === "object" && "or" in entry
+          typeof entry === "object" && entry !== null && "or" in entry
             ? { or: entry.or.map(fn) }
             : fn(entry)
         ),
@@ -37,7 +41,7 @@ export const mapLogicalContainer = <T, S>(
     if ("or" in container) {
       return {
         or: container.or.map((entry) =>
-          typeof entry === "object" && "and" in entry
+          typeof entry === "object" && entry !== null && "and" in entry
             ? { and: entry.and.map(fn) }
             : fn(entry)
         ),
@@ -55,7 +59,9 @@ export const andToOr = <T>(
     (acc, item) => {
       const combs = combinations(
         acc.or,
-        typeof item === "object" && "or" in item ? item.or : [item]
+        typeof item === "object" && item !== null && "or" in item
+          ? item.or
+          : [item]
       );
       if (combs.type === "single") {
         acc.or.push(...combs.value);
@@ -75,7 +81,12 @@ export const combineContainers = <T>(
   a: LogicalContainer<T>,
   b: LogicalContainer<T>
 ): LogicalContainer<T> => {
-  if (typeof a === "object" && typeof b === "object") {
+  if (
+    typeof a === "object" &&
+    a !== null &&
+    typeof b === "object" &&
+    b !== null
+  ) {
     if ("and" in a) {
       if ("and" in b) {
         return flattenAnds([a, b]);
