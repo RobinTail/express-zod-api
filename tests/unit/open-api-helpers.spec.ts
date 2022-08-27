@@ -38,7 +38,7 @@ import {
   reformatParamsInPath,
   extractObjectSchema,
   depictSecurity,
-  depictSecurityNames,
+  depictSecurityRefs,
   depictZodBranded,
 } from "../../src/open-api-helpers";
 import { serializeSchemaForTest } from "../helpers";
@@ -868,25 +868,126 @@ describe("Open API helpers", () => {
         })
       ).toMatchSnapshot();
     });
+    test("should depict OAuth2 Security with flows", () => {
+      expect(
+        depictSecurity({
+          type: "oauth2",
+          flows: {
+            implicit: {
+              authorizationUrl: "https://test.url",
+              refreshUrl: "https://test2.url",
+              scopes: {
+                read: "read something",
+                write: "write something",
+              },
+            },
+            authorizationCode: {
+              authorizationUrl: "https://test.url",
+              refreshUrl: "https://test2.url",
+              tokenUrl: "https://test3.url",
+              scopes: {
+                read: "read something",
+                write: "write something",
+              },
+            },
+            clientCredentials: {
+              refreshUrl: "https://test2.url",
+              tokenUrl: "https://test3.url",
+              scopes: {
+                read: "read something",
+                write: "write something",
+              },
+            },
+            password: {
+              refreshUrl: "https://test2.url",
+              tokenUrl: "https://test3.url",
+              scopes: {
+                read: "read something",
+                write: "write something",
+              },
+            },
+          },
+        })
+      ).toMatchSnapshot();
+    });
+    test("should handle undefined flows", () => {
+      expect(
+        depictSecurity({
+          type: "oauth2",
+          flows: {
+            implicit: undefined,
+            password: undefined,
+          },
+        })
+      ).toMatchSnapshot();
+    });
   });
 
-  describe("depictSecurityNames()", () => {
+  describe("depictSecurityRefs()", () => {
     test("should handle LogicalAnd", () => {
-      expect(depictSecurityNames({ and: ["A", "B", "C"] })).toMatchSnapshot();
       expect(
-        depictSecurityNames({ and: ["A", { or: ["B", "C"] }] })
+        depictSecurityRefs({
+          and: [
+            { name: "A", scopes: [] },
+            { name: "B", scopes: [] },
+            { name: "C", scopes: [] },
+          ],
+        })
+      ).toMatchSnapshot();
+      expect(
+        depictSecurityRefs({
+          and: [
+            { name: "A", scopes: [] },
+            {
+              or: [
+                { name: "B", scopes: [] },
+                { name: "C", scopes: [] },
+              ],
+            },
+          ],
+        })
       ).toMatchSnapshot();
     });
 
     test("should handle LogicalOr", () => {
-      expect(depictSecurityNames({ or: ["A", "B", "C"] })).toMatchSnapshot();
       expect(
-        depictSecurityNames({ or: ["A", { and: ["B", "C"] }] })
+        depictSecurityRefs({
+          or: [
+            { name: "A", scopes: [] },
+            { name: "B", scopes: [] },
+            { name: "C", scopes: [] },
+          ],
+        })
+      ).toMatchSnapshot();
+      expect(
+        depictSecurityRefs({
+          or: [
+            { name: "A", scopes: [] },
+            {
+              and: [
+                { name: "B", scopes: [] },
+                { name: "C", scopes: [] },
+              ],
+            },
+          ],
+        })
       ).toMatchSnapshot();
     });
 
     test("should handle the plain value", () => {
-      expect(depictSecurityNames("A")).toMatchSnapshot();
+      expect(depictSecurityRefs({ name: "A", scopes: [] })).toMatchSnapshot();
+    });
+
+    test("should populate the scopes", () => {
+      expect(
+        depictSecurityRefs({
+          or: [
+            { name: "A", scopes: ["write"] },
+            { name: "B", scopes: ["read"] },
+            { name: "C", scopes: ["read", "write"] },
+          ],
+        })
+      ).toMatchSnapshot();
     });
   });
 });

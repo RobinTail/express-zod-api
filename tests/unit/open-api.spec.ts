@@ -804,7 +804,18 @@ describe("Open API generator", () => {
       });
       const mw2 = createMiddleware({
         security: {
-          and: [{ type: "bearer" }, { type: "cookie", name: "someCookie" }],
+          and: [
+            { type: "bearer" },
+            {
+              type: "oauth2",
+              flows: {
+                password: {
+                  tokenUrl: "https://some.url",
+                  scopes: { read: "read something", write: "write something" },
+                },
+              },
+            },
+          ],
         },
         input: z.object({}),
         middleware: jest.fn(),
@@ -814,6 +825,7 @@ describe("Open API generator", () => {
         routing: {
           v1: {
             getSomething: defaultEndpointsFactory.addMiddleware(mw1).build({
+              scopes: ["this should be omitted"],
               method: "get",
               input: z.object({
                 str: z.string(),
@@ -824,6 +836,7 @@ describe("Open API generator", () => {
               handler: async () => ({ num: 123 }),
             }),
             setSomething: defaultEndpointsFactory.addMiddleware(mw2).build({
+              scopes: ["write"],
               method: "post",
               input: z.object({}),
               output: z.object({}),

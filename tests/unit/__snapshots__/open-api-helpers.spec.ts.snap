@@ -479,6 +479,47 @@ Array [
 ]
 `;
 
+exports[`Open API helpers depictSecurity() should depict OAuth2 Security with flows 1`] = `
+Object {
+  "flows": Object {
+    "authorizationCode": Object {
+      "authorizationUrl": "https://test.url",
+      "refreshUrl": "https://test2.url",
+      "scopes": Object {
+        "read": "read something",
+        "write": "write something",
+      },
+      "tokenUrl": "https://test3.url",
+    },
+    "clientCredentials": Object {
+      "refreshUrl": "https://test2.url",
+      "scopes": Object {
+        "read": "read something",
+        "write": "write something",
+      },
+      "tokenUrl": "https://test3.url",
+    },
+    "implicit": Object {
+      "authorizationUrl": "https://test.url",
+      "refreshUrl": "https://test2.url",
+      "scopes": Object {
+        "read": "read something",
+        "write": "write something",
+      },
+    },
+    "password": Object {
+      "refreshUrl": "https://test2.url",
+      "scopes": Object {
+        "read": "read something",
+        "write": "write something",
+      },
+      "tokenUrl": "https://test3.url",
+    },
+  },
+  "type": "oauth2",
+}
+`;
+
 exports[`Open API helpers depictSecurity() should handle Basic, Bearer and CustomHeader Securities 1`] = `
 Object {
   "or": Array [
@@ -532,13 +573,21 @@ Object {
       "type": "openIdConnect",
     },
     Object {
+      "flows": Object {},
       "type": "oauth2",
     },
   ],
 }
 `;
 
-exports[`Open API helpers depictSecurityNames() should handle LogicalAnd 1`] = `
+exports[`Open API helpers depictSecurity() should handle undefined flows 1`] = `
+Object {
+  "flows": Object {},
+  "type": "oauth2",
+}
+`;
+
+exports[`Open API helpers depictSecurityRefs() should handle LogicalAnd 1`] = `
 Array [
   Object {
     "A": Array [],
@@ -548,7 +597,7 @@ Array [
 ]
 `;
 
-exports[`Open API helpers depictSecurityNames() should handle LogicalAnd 2`] = `
+exports[`Open API helpers depictSecurityRefs() should handle LogicalAnd 2`] = `
 Array [
   Object {
     "A": Array [],
@@ -561,7 +610,7 @@ Array [
 ]
 `;
 
-exports[`Open API helpers depictSecurityNames() should handle LogicalOr 1`] = `
+exports[`Open API helpers depictSecurityRefs() should handle LogicalOr 1`] = `
 Array [
   Object {
     "A": Array [],
@@ -575,7 +624,7 @@ Array [
 ]
 `;
 
-exports[`Open API helpers depictSecurityNames() should handle LogicalOr 2`] = `
+exports[`Open API helpers depictSecurityRefs() should handle LogicalOr 2`] = `
 Array [
   Object {
     "A": Array [],
@@ -587,10 +636,31 @@ Array [
 ]
 `;
 
-exports[`Open API helpers depictSecurityNames() should handle the plain value 1`] = `
+exports[`Open API helpers depictSecurityRefs() should handle the plain value 1`] = `
 Array [
   Object {
     "A": Array [],
+  },
+]
+`;
+
+exports[`Open API helpers depictSecurityRefs() should populate the scopes 1`] = `
+Array [
+  Object {
+    "A": Array [
+      "write",
+    ],
+  },
+  Object {
+    "B": Array [
+      "read",
+    ],
+  },
+  Object {
+    "C": Array [
+      "read",
+      "write",
+    ],
   },
 ]
 `;
