@@ -8,17 +8,20 @@ export type LogicalContainer<T> =
   | LogicalAnd<T | LogicalOr<T>>
   | T;
 
+const isObject = <
+  T extends LogicalContainer<any> | LogicalAnd<any> | LogicalOr<any>
+>(
+  subject: T
+): subject is Exclude<T & {}, null> =>
+  typeof subject === "object" && subject !== null;
+
 /** @desc combines several LogicalAnds into a one */
 export const flattenAnds = <T>(
   subject: (T | LogicalAnd<T>)[]
 ): LogicalAnd<T> => ({
   and: subject.reduce<T[]>(
     (agg, item) =>
-      agg.concat(
-        typeof item === "object" && item !== null && "and" in item
-          ? item.and
-          : item
-      ),
+      agg.concat(isObject(item) && "and" in item ? item.and : item),
     []
   ),
 });
@@ -28,11 +31,11 @@ export const mapLogicalContainer = <T, S>(
   container: LogicalContainer<T>,
   fn: (subject: T) => S
 ): LogicalContainer<S> => {
-  if (typeof container === "object" && container !== null) {
+  if (isObject(container)) {
     if ("and" in container) {
       return {
         and: container.and.map((entry) =>
-          typeof entry === "object" && entry !== null && "or" in entry
+          isObject(entry) && "or" in entry
             ? { or: entry.or.map(fn) }
             : fn(entry)
         ),
@@ -41,7 +44,7 @@ export const mapLogicalContainer = <T, S>(
     if ("or" in container) {
       return {
         or: container.or.map((entry) =>
-          typeof entry === "object" && entry !== null && "and" in entry
+          isObject(entry) && "and" in entry
             ? { and: entry.and.map(fn) }
             : fn(entry)
         ),
@@ -59,9 +62,7 @@ export const andToOr = <T>(
     (acc, item) => {
       const combs = combinations(
         acc.or,
-        typeof item === "object" && item !== null && "or" in item
-          ? item.or
-          : [item]
+        isObject(item) && "or" in item ? item.or : [item]
       );
       if (combs.type === "single") {
         acc.or.push(...combs.value);
@@ -81,12 +82,7 @@ export const combineContainers = <T>(
   a: LogicalContainer<T>,
   b: LogicalContainer<T>
 ): LogicalContainer<T> => {
-  if (
-    typeof a === "object" &&
-    a !== null &&
-    typeof b === "object" &&
-    b !== null
-  ) {
+  if (isObject(a) && isObject(b)) {
     if ("and" in a) {
       if ("and" in b) {
         return flattenAnds([a, b]);
