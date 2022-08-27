@@ -70,7 +70,7 @@
     }
   },
   "devDependencies": {
-    "@tsconfig/node12": "^1.0.11",
+    "@tsconfig/node14": "^1.0.3",
     "@types/cors": "^2.8.12",
     "@types/has-ansi": "^5.0.0",
     "@types/jest": "^28.1.7",
