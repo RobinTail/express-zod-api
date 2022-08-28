@@ -40,6 +40,7 @@ export abstract class AbstractEndpoint {
   public abstract getNegativeMimeTypes(): string[];
   public abstract getSecurity(): LogicalContainer<Security>;
   public abstract getScopes(): string[];
+  public abstract getTags(): string[];
 }
 
 type EndpointProps<
@@ -79,6 +80,7 @@ export class Endpoint<
   protected readonly handler: Handler<z.output<IN>, z.input<OUT>, OPT>;
   protected readonly resultHandler: ResultHandlerDefinition<POS, NEG>;
   protected readonly scopes?: SCO[];
+  protected readonly tags?: string[];
 
   constructor({
     middlewares,
@@ -100,6 +102,7 @@ export class Endpoint<
     this.resultHandler = resultHandler;
     this.description = description;
     this.scopes = scopes;
+    this.tags = [];
     if ("methods" in rest) {
       this.methods = rest.methods;
     } else {
@@ -153,6 +156,10 @@ export class Endpoint<
 
   public override getScopes(): SCO[] {
     return this.scopes || [];
+  }
+
+  public override getTags(): string[] {
+    return this.tags || [];
   }
 
   #getDefaultCorsHeaders(): Record<string, string> {
