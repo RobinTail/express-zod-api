@@ -2,6 +2,10 @@
 
 ## Version 7
 
+### v7.9.1
+
+- Minor refactoring in order to support the recently released Typescript 4.8.2.
+
 ### v7.9.0
 
 - Feature #540, an addition to the [#523](#v770): OAuth2 authentication with scopes.
