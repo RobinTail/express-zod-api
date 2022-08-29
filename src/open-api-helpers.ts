@@ -392,6 +392,7 @@ export const depictString: DepictHelper<z.ZodString> = ({
   };
 };
 
+/** @todo support exclusive min/max as numbers in case of OpenAPI v3.1.x */
 export const depictNumber: DepictHelper<z.ZodNumber> = ({
   schema,
   initial,
