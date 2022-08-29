@@ -755,7 +755,8 @@ Object {
 
 exports[`Open API helpers excludeExampleFromDepiction() should remove example property of supplied object 1`] = `
 Object {
-  "test": "some",
+  "description": "test",
+  "type": "string",
 }
 `;
 
