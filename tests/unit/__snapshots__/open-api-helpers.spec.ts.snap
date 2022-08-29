@@ -1,16 +1,16 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Open API helpers depictAny() should depict ZodAny 1`] = `
-Object {
+{
   "description": "test",
   "format": "any",
 }
 `;
 
 exports[`Open API helpers depictArray() should depict ZodArray 1`] = `
-Object {
+{
   "description": "test",
-  "items": Object {
+  "items": {
     "type": "boolean",
   },
   "type": "array",
@@ -18,7 +18,7 @@ Object {
 `;
 
 exports[`Open API helpers depictBigInt() should depict ZodBigInt 1`] = `
-Object {
+{
   "description": "test",
   "format": "bigint",
   "type": "integer",
@@ -26,20 +26,20 @@ Object {
 `;
 
 exports[`Open API helpers depictBoolean() should depict ZodBoolean 1`] = `
-Object {
+{
   "description": "test",
   "type": "boolean",
 }
 `;
 
 exports[`Open API helpers depictDateIn should depict ZodDateIn 1`] = `
-Object {
+{
   "description": "YYYY-MM-DDTHH:mm:ss.sssZ",
-  "externalDocs": Object {
+  "externalDocs": {
     "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString",
   },
   "format": "date-time",
-  "pattern": "^\\\\d{4}-\\\\d{2}-\\\\d{2}(T\\\\d{2}:\\\\d{2}:\\\\d{2}(\\\\.\\\\d{3})?)?Z?$",
+  "pattern": "^\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2}:\\d{2}(\\.\\d{3})?)?Z?$",
   "type": "string",
 }
 `;
@@ -47,9 +47,9 @@ Object {
 exports[`Open API helpers depictDateIn should throw when ZodDateIn in response 1`] = `[Error: Please use z.dateOut() for output.]`;
 
 exports[`Open API helpers depictDateOut should depict ZodDateOut 1`] = `
-Object {
+{
   "description": "YYYY-MM-DDTHH:mm:ss.sssZ",
-  "externalDocs": Object {
+  "externalDocs": {
     "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString",
   },
   "format": "date-time",
@@ -60,7 +60,7 @@ Object {
 exports[`Open API helpers depictDateOut should throw when ZodDateOut in request 1`] = `[Error: Please use z.dateIn() for input.]`;
 
 exports[`Open API helpers depictDefault() should depict ZodDefault 1`] = `
-Object {
+{
   "default": true,
   "description": "test",
   "type": "boolean",
@@ -68,51 +68,51 @@ Object {
 `;
 
 exports[`Open API helpers depictDiscriminatedUnion() should depict ZodDiscriminatedUnion 1`] = `
-Object {
+{
   "description": "test",
-  "discriminator": Object {
+  "discriminator": {
     "propertyName": "status",
   },
-  "oneOf": Array [
-    Object {
-      "properties": Object {
-        "data": Object {
+  "oneOf": [
+    {
+      "properties": {
+        "data": {
           "format": "any",
           "nullable": true,
         },
-        "status": Object {
-          "enum": Array [
+        "status": {
+          "enum": [
             "success",
           ],
           "type": "string",
         },
       },
-      "required": Array [
+      "required": [
         "status",
       ],
       "type": "object",
     },
-    Object {
-      "properties": Object {
-        "error": Object {
-          "properties": Object {
-            "message": Object {
+    {
+      "properties": {
+        "error": {
+          "properties": {
+            "message": {
               "type": "string",
             },
           },
-          "required": Array [
+          "required": [
             "message",
           ],
           "type": "object",
         },
-        "status": Object {
-          "enum": Array [
+        "status": {
+          "enum": [
             "error",
           ],
           "type": "string",
         },
       },
-      "required": Array [
+      "required": [
         "status",
         "error",
       ],
@@ -123,27 +123,27 @@ Object {
 `;
 
 exports[`Open API helpers depictEffect() should depict ZodEffects preprocess in case of request 1`] = `
-Object {
+{
   "format": "string (preprocessed)",
 }
 `;
 
 exports[`Open API helpers depictEffect() should depict ZodEffects transformation in case of request 1`] = `
-Object {
+{
   "type": "string",
 }
 `;
 
 exports[`Open API helpers depictEffect() should depict ZodEffects transformation in case of response 1`] = `
-Object {
+{
   "type": "number",
 }
 `;
 
 exports[`Open API helpers depictEnum() should depict ZodEnum 1`] = `
-Object {
+{
   "description": "test",
-  "enum": Array [
+  "enum": [
     "one",
     "two",
   ],
@@ -152,9 +152,9 @@ Object {
 `;
 
 exports[`Open API helpers depictEnum() should depict ZodNativeEnum 1`] = `
-Object {
+{
   "description": "test",
-  "enum": Array [
+  "enum": [
     "ONE",
     "TWO",
   ],
@@ -163,7 +163,7 @@ Object {
 `;
 
 exports[`Open API helpers depictFile() should depict ZodFile 1`] = `
-Object {
+{
   "description": "test",
   "format": "binary",
   "type": "string",
@@ -171,16 +171,16 @@ Object {
 `;
 
 exports[`Open API helpers depictIOExamples() should depict examples in case of request 1`] = `
-Object {
-  "examples": Object {
-    "example1": Object {
-      "value": Object {
+{
+  "examples": {
+    "example1": {
+      "value": {
         "one": "test",
         "two": 123,
       },
     },
-    "example2": Object {
-      "value": Object {
+    "example2": {
+      "value": {
         "one": "test2",
         "two": 456,
       },
@@ -190,16 +190,16 @@ Object {
 `;
 
 exports[`Open API helpers depictIOExamples() should depict examples in case of response 1`] = `
-Object {
-  "examples": Object {
-    "example1": Object {
-      "value": Object {
+{
+  "examples": {
+    "example1": {
+      "value": {
         "one": 4,
         "two": "123",
       },
     },
-    "example2": Object {
-      "value": Object {
+    "example2": {
+      "value": {
         "one": 5,
         "two": "456",
       },
@@ -209,12 +209,12 @@ Object {
 `;
 
 exports[`Open API helpers depictIOParamExamples() should depict examples in case of request 1`] = `
-Object {
-  "examples": Object {
-    "example1": Object {
+{
+  "examples": {
+    "example1": {
       "value": 123,
     },
-    "example2": Object {
+    "example2": {
       "value": 456,
     },
   },
@@ -222,12 +222,12 @@ Object {
 `;
 
 exports[`Open API helpers depictIOParamExamples() should depict examples in case of response 1`] = `
-Object {
-  "examples": Object {
-    "example1": Object {
+{
+  "examples": {
+    "example1": {
       "value": "123",
     },
-    "example2": Object {
+    "example2": {
       "value": "456",
     },
   },
@@ -235,11 +235,11 @@ Object {
 `;
 
 exports[`Open API helpers depictIntersection() should depict ZodIntersection 1`] = `
-Object {
-  "allOf": Array [
-    Object {
-      "properties": Object {
-        "one": Object {
+{
+  "allOf": [
+    {
+      "properties": {
+        "one": {
           "exclusiveMaximum": false,
           "exclusiveMinimum": false,
           "format": "double",
@@ -248,14 +248,14 @@ Object {
           "type": "number",
         },
       },
-      "required": Array [
+      "required": [
         "one",
       ],
       "type": "object",
     },
-    Object {
-      "properties": Object {
-        "two": Object {
+    {
+      "properties": {
+        "two": {
           "exclusiveMaximum": false,
           "exclusiveMinimum": false,
           "format": "double",
@@ -264,7 +264,7 @@ Object {
           "type": "number",
         },
       },
-      "required": Array [
+      "required": [
         "two",
       ],
       "type": "object",
@@ -275,9 +275,9 @@ Object {
 `;
 
 exports[`Open API helpers depictLiteral() should depict ZodLiteral 1`] = `
-Object {
+{
   "description": "test",
-  "enum": Array [
+  "enum": [
     "testing",
   ],
   "type": "string",
@@ -285,7 +285,7 @@ Object {
 `;
 
 exports[`Open API helpers depictNull() should depict ZodNull 1`] = `
-Object {
+{
   "description": "test",
   "format": "null",
   "nullable": true,
@@ -294,7 +294,7 @@ Object {
 `;
 
 exports[`Open API helpers depictNumber() should depict ZodNumber with refinements 1`] = `
-Object {
+{
   "description": "test",
   "exclusiveMaximum": false,
   "exclusiveMinimum": false,
@@ -306,7 +306,7 @@ Object {
 `;
 
 exports[`Open API helpers depictNumber() should depict regular ZodNumber 1`] = `
-Object {
+{
   "description": "test",
   "exclusiveMaximum": false,
   "exclusiveMinimum": false,
@@ -318,10 +318,10 @@ Object {
 `;
 
 exports[`Open API helpers depictObject() should depict ZodObject 1`] = `
-Object {
+{
   "description": "test",
-  "properties": Object {
-    "one": Object {
+  "properties": {
+    "one": {
       "exclusiveMaximum": false,
       "exclusiveMinimum": false,
       "format": "double",
@@ -329,11 +329,11 @@ Object {
       "minimum": 5e-324,
       "type": "number",
     },
-    "two": Object {
+    "two": {
       "type": "string",
     },
   },
-  "required": Array [
+  "required": [
     "one",
     "two",
   ],
@@ -342,18 +342,18 @@ Object {
 `;
 
 exports[`Open API helpers depictObjectProperties() should depict ZodObject shape 1`] = `
-Object {
-  "one": Object {
+{
+  "one": {
     "type": "string",
   },
-  "two": Object {
+  "two": {
     "type": "boolean",
   },
 }
 `;
 
 exports[`Open API helpers depictOptionalOrNullable() should depict ZodNullable 1`] = `
-Object {
+{
   "description": "test",
   "nullable": true,
   "type": "string",
@@ -361,24 +361,24 @@ Object {
 `;
 
 exports[`Open API helpers depictOptionalOrNullable() should depict ZodOptional 1`] = `
-Object {
+{
   "description": "test",
   "type": "string",
 }
 `;
 
 exports[`Open API helpers depictRecord() should depict ZodRecord with key schema enum 1`] = `
-Object {
+{
   "description": "test",
-  "properties": Object {
-    "one": Object {
+  "properties": {
+    "one": {
       "type": "boolean",
     },
-    "two": Object {
+    "two": {
       "type": "boolean",
     },
   },
-  "required": Array [
+  "required": [
     "one",
     "two",
   ],
@@ -387,14 +387,14 @@ Object {
 `;
 
 exports[`Open API helpers depictRecord() should depict ZodRecord with key schema literal 1`] = `
-Object {
+{
   "description": "test",
-  "properties": Object {
-    "testing": Object {
+  "properties": {
+    "testing": {
       "type": "boolean",
     },
   },
-  "required": Array [
+  "required": [
     "testing",
   ],
   "type": "object",
@@ -402,8 +402,8 @@ Object {
 `;
 
 exports[`Open API helpers depictRecord() should depict ZodRecord with key schema string 1`] = `
-Object {
-  "additionalProperties": Object {
+{
+  "additionalProperties": {
     "type": "boolean",
   },
   "description": "test",
@@ -412,17 +412,17 @@ Object {
 `;
 
 exports[`Open API helpers depictRecord() should depict ZodRecord with key schema union of literals 1`] = `
-Object {
+{
   "description": "test",
-  "properties": Object {
-    "one": Object {
+  "properties": {
+    "one": {
       "type": "boolean",
     },
-    "two": Object {
+    "two": {
       "type": "boolean",
     },
   },
-  "required": Array [
+  "required": [
     "one",
     "two",
   ],
@@ -431,8 +431,8 @@ Object {
 `;
 
 exports[`Open API helpers depictRecord() should depict classic ZodRecord 1`] = `
-Object {
-  "additionalProperties": Object {
+{
+  "additionalProperties": {
     "type": "boolean",
   },
   "description": "test",
@@ -440,15 +440,15 @@ Object {
 }
 `;
 
-exports[`Open API helpers depictRequestParams() should depict none if both query and params are disabled 1`] = `Array []`;
+exports[`Open API helpers depictRequestParams() should depict none if both query and params are disabled 1`] = `[]`;
 
 exports[`Open API helpers depictRequestParams() should depict only path params if query is disabled 1`] = `
-Array [
-  Object {
+[
+  {
     "in": "path",
     "name": "id",
     "required": true,
-    "schema": Object {
+    "schema": {
       "description": "GET /v1/user/:id parameter",
       "type": "string",
     },
@@ -457,21 +457,21 @@ Array [
 `;
 
 exports[`Open API helpers depictRequestParams() should depict query and path params 1`] = `
-Array [
-  Object {
+[
+  {
     "in": "path",
     "name": "id",
     "required": true,
-    "schema": Object {
+    "schema": {
       "description": "GET /v1/user/:id parameter",
       "type": "string",
     },
   },
-  Object {
+  {
     "in": "query",
     "name": "test",
     "required": true,
-    "schema": Object {
+    "schema": {
       "description": "GET /v1/user/:id parameter",
       "type": "boolean",
     },
@@ -480,36 +480,36 @@ Array [
 `;
 
 exports[`Open API helpers depictSecurity() should depict OAuth2 Security with flows 1`] = `
-Object {
-  "flows": Object {
-    "authorizationCode": Object {
+{
+  "flows": {
+    "authorizationCode": {
       "authorizationUrl": "https://test.url",
       "refreshUrl": "https://test2.url",
-      "scopes": Object {
+      "scopes": {
         "read": "read something",
         "write": "write something",
       },
       "tokenUrl": "https://test3.url",
     },
-    "clientCredentials": Object {
+    "clientCredentials": {
       "refreshUrl": "https://test2.url",
-      "scopes": Object {
+      "scopes": {
         "read": "read something",
         "write": "write something",
       },
       "tokenUrl": "https://test3.url",
     },
-    "implicit": Object {
+    "implicit": {
       "authorizationUrl": "https://test.url",
       "refreshUrl": "https://test2.url",
-      "scopes": Object {
+      "scopes": {
         "read": "read something",
         "write": "write something",
       },
     },
-    "password": Object {
+    "password": {
       "refreshUrl": "https://test2.url",
-      "scopes": Object {
+      "scopes": {
         "read": "read something",
         "write": "write something",
       },
@@ -521,21 +521,21 @@ Object {
 `;
 
 exports[`Open API helpers depictSecurity() should handle Basic, Bearer and CustomHeader Securities 1`] = `
-Object {
-  "or": Array [
-    Object {
-      "and": Array [
-        Object {
+{
+  "or": [
+    {
+      "and": [
+        {
           "scheme": "basic",
           "type": "http",
         },
-        Object {
+        {
           "scheme": "bearer",
           "type": "http",
         },
       ],
     },
-    Object {
+    {
       "in": "header",
       "name": "X-Key",
       "type": "apiKey",
@@ -545,16 +545,16 @@ Object {
 `;
 
 exports[`Open API helpers depictSecurity() should handle Input and Cookie Securities 1`] = `
-Object {
-  "and": Array [
-    Object {
-      "or": Array [
-        Object {
+{
+  "and": [
+    {
+      "or": [
+        {
           "in": "query",
           "name": "apiKey",
           "type": "apiKey",
         },
-        Object {
+        {
           "in": "cookie",
           "name": "hash",
           "type": "apiKey",
@@ -566,14 +566,14 @@ Object {
 `;
 
 exports[`Open API helpers depictSecurity() should handle OpenID and OAuth2 Securities 1`] = `
-Object {
-  "or": Array [
-    Object {
+{
+  "or": [
+    {
       "openIdConnectUrl": "https://test.url",
       "type": "openIdConnect",
     },
-    Object {
-      "flows": Object {},
+    {
+      "flows": {},
       "type": "oauth2",
     },
   ],
@@ -581,83 +581,83 @@ Object {
 `;
 
 exports[`Open API helpers depictSecurity() should handle undefined flows 1`] = `
-Object {
-  "flows": Object {},
+{
+  "flows": {},
   "type": "oauth2",
 }
 `;
 
 exports[`Open API helpers depictSecurityRefs() should handle LogicalAnd 1`] = `
-Array [
-  Object {
-    "A": Array [],
-    "B": Array [],
-    "C": Array [],
+[
+  {
+    "A": [],
+    "B": [],
+    "C": [],
   },
 ]
 `;
 
 exports[`Open API helpers depictSecurityRefs() should handle LogicalAnd 2`] = `
-Array [
-  Object {
-    "A": Array [],
-    "B": Array [],
+[
+  {
+    "A": [],
+    "B": [],
   },
-  Object {
-    "A": Array [],
-    "C": Array [],
+  {
+    "A": [],
+    "C": [],
   },
 ]
 `;
 
 exports[`Open API helpers depictSecurityRefs() should handle LogicalOr 1`] = `
-Array [
-  Object {
-    "A": Array [],
+[
+  {
+    "A": [],
   },
-  Object {
-    "B": Array [],
+  {
+    "B": [],
   },
-  Object {
-    "C": Array [],
+  {
+    "C": [],
   },
 ]
 `;
 
 exports[`Open API helpers depictSecurityRefs() should handle LogicalOr 2`] = `
-Array [
-  Object {
-    "A": Array [],
+[
+  {
+    "A": [],
   },
-  Object {
-    "B": Array [],
-    "C": Array [],
+  {
+    "B": [],
+    "C": [],
   },
 ]
 `;
 
 exports[`Open API helpers depictSecurityRefs() should handle the plain value 1`] = `
-Array [
-  Object {
-    "A": Array [],
+[
+  {
+    "A": [],
   },
 ]
 `;
 
 exports[`Open API helpers depictSecurityRefs() should populate the scopes 1`] = `
-Array [
-  Object {
-    "A": Array [
+[
+  {
+    "A": [
       "write",
     ],
   },
-  Object {
-    "B": Array [
+  {
+    "B": [
       "read",
     ],
   },
-  Object {
-    "C": Array [
+  {
+    "C": [
       "read",
       "write",
     ],
@@ -666,7 +666,7 @@ Array [
 `;
 
 exports[`Open API helpers depictString() should depict ZodString with refinements 1`] = `
-Object {
+{
   "description": "test",
   "format": "email",
   "maxLength": 20,
@@ -676,35 +676,35 @@ Object {
 `;
 
 exports[`Open API helpers depictString() should depict ZodString with regex 1`] = `
-Object {
+{
   "description": "test",
-  "pattern": "/^\\\\d+.\\\\d+.\\\\d+$/",
+  "pattern": "/^\\d+.\\d+.\\d+$/",
   "type": "string",
 }
 `;
 
 exports[`Open API helpers depictString() should depict regular ZodString 1`] = `
-Object {
+{
   "description": "test",
   "type": "string",
 }
 `;
 
 exports[`Open API helpers depictTuple() should depict ZodTuple 1`] = `
-Object {
+{
   "description": "test",
-  "items": Object {
+  "items": {
     "description": "0: boolean, 1: string, 2: string",
     "format": "tuple",
-    "oneOf": Array [
-      Object {
+    "oneOf": [
+      {
         "type": "boolean",
       },
-      Object {
+      {
         "type": "string",
       },
-      Object {
-        "enum": Array [
+      {
+        "enum": [
           "test",
         ],
         "type": "string",
@@ -718,13 +718,13 @@ Object {
 `;
 
 exports[`Open API helpers depictUnion() should depict ZodUnion 1`] = `
-Object {
+{
   "description": "test",
-  "oneOf": Array [
-    Object {
+  "oneOf": [
+    {
       "type": "string",
     },
-    Object {
+    {
       "exclusiveMaximum": false,
       "exclusiveMinimum": false,
       "format": "double",
@@ -737,7 +737,7 @@ Object {
 `;
 
 exports[`Open API helpers depictUpload() should depict ZodUpload 1`] = `
-Object {
+{
   "description": "test",
   "format": "binary",
   "type": "string",
@@ -747,34 +747,34 @@ Object {
 exports[`Open API helpers depictUpload() should throw when using in response 1`] = `[Error: Please use z.upload() only for input.]`;
 
 exports[`Open API helpers depictZodBranded should depict the actual schema 1`] = `
-Object {
+{
   "minLength": 2,
   "type": "string",
 }
 `;
 
 exports[`Open API helpers excludeExampleFromDepiction() should remove example property of supplied object 1`] = `
-Object {
+{
   "description": "test",
   "type": "string",
 }
 `;
 
 exports[`Open API helpers excludeParamsFromDepiction() should handle intersection 1`] = `
-Object {
-  "allOf": Array [
-    Object {
-      "properties": Object {},
-      "required": Array [],
+{
+  "allOf": [
+    {
+      "properties": {},
+      "required": [],
       "type": "object",
     },
-    Object {
-      "properties": Object {
-        "b": Object {
+    {
+      "properties": {
+        "b": {
           "type": "string",
         },
       },
-      "required": Array [
+      "required": [
         "b",
       ],
       "type": "object",
@@ -784,20 +784,20 @@ Object {
 `;
 
 exports[`Open API helpers excludeParamsFromDepiction() should handle union 1`] = `
-Object {
-  "oneOf": Array [
-    Object {
-      "properties": Object {},
-      "required": Array [],
+{
+  "oneOf": [
+    {
+      "properties": {},
+      "required": [],
       "type": "object",
     },
-    Object {
-      "properties": Object {
-        "b": Object {
+    {
+      "properties": {
+        "b": {
           "type": "string",
         },
       },
-      "required": Array [
+      "required": [
         "b",
       ],
       "type": "object",
@@ -807,13 +807,13 @@ Object {
 `;
 
 exports[`Open API helpers excludeParamsFromDepiction() should omit specified path params 1`] = `
-Object {
-  "properties": Object {
-    "b": Object {
+{
+  "properties": {
+    "b": {
       "type": "string",
     },
   },
-  "required": Array [
+  "required": [
     "b",
   ],
   "type": "object",
@@ -821,10 +821,10 @@ Object {
 `;
 
 exports[`Open API helpers extractObjectSchema() should pass the object schema through 1`] = `
-Object {
+{
   "_type": "ZodObject",
-  "shape": Object {
-    "one": Object {
+  "shape": {
+    "one": {
       "_type": "ZodString",
     },
   },
@@ -832,13 +832,13 @@ Object {
 `;
 
 exports[`Open API helpers extractObjectSchema() should return object schema for the intersection of object schemas 1`] = `
-Object {
+{
   "_type": "ZodObject",
-  "shape": Object {
-    "one": Object {
+  "shape": {
+    "one": {
       "_type": "ZodString",
     },
-    "two": Object {
+    "two": {
       "_type": "ZodNumber",
     },
   },
@@ -846,18 +846,18 @@ Object {
 `;
 
 exports[`Open API helpers extractObjectSchema() should return object schema for the union of object schemas 1`] = `
-Object {
+{
   "_type": "ZodObject",
-  "shape": Object {
-    "one": Object {
+  "shape": {
+    "one": {
       "_type": "ZodOptional",
-      "value": Object {
+      "value": {
         "_type": "ZodString",
       },
     },
-    "two": Object {
+    "two": {
       "_type": "ZodOptional",
-      "value": Object {
+      "value": {
         "_type": "ZodNumber",
       },
     },
