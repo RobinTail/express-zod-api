@@ -170,6 +170,7 @@ export const makeTypeParams = (params: Record<string, ts.Identifier>) =>
     (acc, name) =>
       acc.concat(
         f.createTypeParameterDeclaration(
+          [],
           name,
           f.createTypeReferenceNode(params[name])
         )

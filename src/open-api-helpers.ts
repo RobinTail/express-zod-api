@@ -392,6 +392,7 @@ export const depictString: DepictHelper<z.ZodString> = ({
   };
 };
 
+/** @todo support exclusive min/max as numbers in case of OpenAPI v3.1.x */
 export const depictNumber: DepictHelper<z.ZodNumber> = ({
   schema,
   initial,
@@ -659,12 +660,12 @@ export const excludeParamsFromDepiction = (
     ? depicted.required.filter((name) => !pathParams.includes(name))
     : undefined;
   const allOf = depicted.allOf
-    ? depicted.allOf.map((entry) =>
+    ? (depicted.allOf as SchemaObject[]).map((entry) =>
         excludeParamsFromDepiction(entry, pathParams)
       )
     : undefined;
   const oneOf = depicted.oneOf
-    ? depicted.oneOf.map((entry) =>
+    ? (depicted.oneOf as SchemaObject[]).map((entry) =>
         excludeParamsFromDepiction(entry, pathParams)
       )
     : undefined;
