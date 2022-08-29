@@ -9,4 +9,11 @@ export class ServeStatic {
   constructor(...params: Parameters<OriginalStatic>) {
     this.params = params;
   }
+
+  public apply(
+    path: string,
+    cb: (path: string, handler: StaticHandler) => void
+  ): void {
+    return cb(path, _serveStatic(...this.params));
+  }
 }
