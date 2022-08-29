@@ -1,6 +1,6 @@
-import { static as _serveStatic } from "express";
+import express from "express";
 
-type OriginalStatic = typeof _serveStatic;
+type OriginalStatic = typeof express.static;
 export type StaticHandler = ReturnType<OriginalStatic>;
 
 export class ServeStatic {
@@ -14,6 +14,6 @@ export class ServeStatic {
     path: string,
     cb: (path: string, handler: StaticHandler) => void
   ): void {
-    return cb(path, _serveStatic(...this.params));
+    return cb(path, express.static(...this.params));
   }
 }
