@@ -73,7 +73,7 @@
     "@tsconfig/node14": "^1.0.3",
     "@types/cors": "^2.8.12",
     "@types/has-ansi": "^5.0.0",
-    "@types/jest": "^28.1.8",
+    "@types/jest": "^29.0.0",
     "@types/mime": "^3.0.1",
     "@types/node-fetch": "^2.6.2",
     "@types/ramda": "^0.28.15",
