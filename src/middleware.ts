@@ -18,7 +18,7 @@ type Middleware<IN, OPT, OUT> = (
   params: MiddlewareParams<IN, OPT>
 ) => Promise<OUT>;
 
-export interface MiddlewareCreationProps<
+interface MiddlewareCreationProps<
   IN extends IOSchema<"strip">,
   OPT,
   OUT extends FlatObject,
