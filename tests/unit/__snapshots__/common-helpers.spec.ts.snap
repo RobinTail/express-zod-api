@@ -1,26 +1,26 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Common Helpers defaultInputSources should be declared in a certain way 1`] = `
-Object {
-  "delete": Array [
+{
+  "delete": [
     "body",
     "query",
     "params",
   ],
-  "get": Array [
+  "get": [
     "query",
     "params",
   ],
-  "patch": Array [
+  "patch": [
     "body",
     "params",
   ],
-  "post": Array [
+  "post": [
     "body",
     "params",
     "files",
   ],
-  "put": Array [
+  "put": [
     "body",
     "params",
   ],
@@ -28,10 +28,10 @@ Object {
 `;
 
 exports[`Common Helpers getFinalEndpointInputSchema() Should handle no middlewares 1`] = `
-Object {
+{
   "_type": "ZodObject",
-  "shape": Object {
-    "four": Object {
+  "shape": {
+    "four": {
       "_type": "ZodBoolean",
     },
   },
@@ -39,42 +39,42 @@ Object {
 `;
 
 exports[`Common Helpers getFinalEndpointInputSchema() Should merge input object schemas 1`] = `
-Object {
+{
   "_type": "ZodIntersection",
-  "left": Object {
+  "left": {
     "_type": "ZodIntersection",
-    "left": Object {
+    "left": {
       "_type": "ZodIntersection",
-      "left": Object {
+      "left": {
         "_type": "ZodObject",
-        "shape": Object {
-          "one": Object {
+        "shape": {
+          "one": {
             "_type": "ZodString",
           },
         },
       },
-      "right": Object {
+      "right": {
         "_type": "ZodObject",
-        "shape": Object {
-          "two": Object {
+        "shape": {
+          "two": {
             "_type": "ZodNumber",
           },
         },
       },
     },
-    "right": Object {
+    "right": {
       "_type": "ZodObject",
-      "shape": Object {
-        "three": Object {
+      "shape": {
+        "three": {
           "_type": "ZodNull",
         },
       },
     },
   },
-  "right": Object {
+  "right": {
     "_type": "ZodObject",
-    "shape": Object {
-      "four": Object {
+    "shape": {
+      "four": {
         "_type": "ZodBoolean",
       },
     },
@@ -83,63 +83,63 @@ Object {
 `;
 
 exports[`Common Helpers getFinalEndpointInputSchema() Should merge intersection object schemas 1`] = `
-Object {
+{
   "_type": "ZodIntersection",
-  "left": Object {
+  "left": {
     "_type": "ZodIntersection",
-    "left": Object {
+    "left": {
       "_type": "ZodIntersection",
-      "left": Object {
+      "left": {
         "_type": "ZodObject",
-        "shape": Object {
-          "one": Object {
+        "shape": {
+          "one": {
             "_type": "ZodString",
           },
         },
       },
-      "right": Object {
+      "right": {
         "_type": "ZodObject",
-        "shape": Object {
-          "two": Object {
+        "shape": {
+          "two": {
             "_type": "ZodNumber",
           },
         },
       },
     },
-    "right": Object {
+    "right": {
       "_type": "ZodIntersection",
-      "left": Object {
+      "left": {
         "_type": "ZodObject",
-        "shape": Object {
-          "three": Object {
+        "shape": {
+          "three": {
             "_type": "ZodNull",
           },
         },
       },
-      "right": Object {
+      "right": {
         "_type": "ZodObject",
-        "shape": Object {
-          "four": Object {
+        "shape": {
+          "four": {
             "_type": "ZodBoolean",
           },
         },
       },
     },
   },
-  "right": Object {
+  "right": {
     "_type": "ZodIntersection",
-    "left": Object {
+    "left": {
       "_type": "ZodObject",
-      "shape": Object {
-        "five": Object {
+      "shape": {
+        "five": {
           "_type": "ZodString",
         },
       },
     },
-    "right": Object {
+    "right": {
       "_type": "ZodObject",
-      "shape": Object {
-        "six": Object {
+      "shape": {
+        "six": {
           "_type": "ZodNumber",
         },
       },
@@ -149,44 +149,44 @@ Object {
 `;
 
 exports[`Common Helpers getFinalEndpointInputSchema() Should merge mixed object schemas 1`] = `
-Object {
+{
   "_type": "ZodIntersection",
-  "left": Object {
+  "left": {
     "_type": "ZodIntersection",
-    "left": Object {
+    "left": {
       "_type": "ZodIntersection",
-      "left": Object {
+      "left": {
         "_type": "ZodObject",
-        "shape": Object {
-          "one": Object {
+        "shape": {
+          "one": {
             "_type": "ZodString",
           },
         },
       },
-      "right": Object {
+      "right": {
         "_type": "ZodObject",
-        "shape": Object {
-          "two": Object {
+        "shape": {
+          "two": {
             "_type": "ZodNumber",
           },
         },
       },
     },
-    "right": Object {
+    "right": {
       "_type": "ZodUnion",
-      "options": Array [
-        Object {
+      "options": [
+        {
           "_type": "ZodObject",
-          "shape": Object {
-            "three": Object {
+          "shape": {
+            "three": {
               "_type": "ZodNull",
             },
           },
         },
-        Object {
+        {
           "_type": "ZodObject",
-          "shape": Object {
-            "four": Object {
+          "shape": {
+            "four": {
               "_type": "ZodBoolean",
             },
           },
@@ -194,10 +194,10 @@ Object {
       ],
     },
   },
-  "right": Object {
+  "right": {
     "_type": "ZodObject",
-    "shape": Object {
-      "five": Object {
+    "shape": {
+      "five": {
         "_type": "ZodString",
       },
     },
@@ -206,46 +206,46 @@ Object {
 `;
 
 exports[`Common Helpers getFinalEndpointInputSchema() Should merge union object schemas 1`] = `
-Object {
+{
   "_type": "ZodIntersection",
-  "left": Object {
+  "left": {
     "_type": "ZodIntersection",
-    "left": Object {
+    "left": {
       "_type": "ZodUnion",
-      "options": Array [
-        Object {
+      "options": [
+        {
           "_type": "ZodObject",
-          "shape": Object {
-            "one": Object {
+          "shape": {
+            "one": {
               "_type": "ZodString",
             },
           },
         },
-        Object {
+        {
           "_type": "ZodObject",
-          "shape": Object {
-            "two": Object {
+          "shape": {
+            "two": {
               "_type": "ZodNumber",
             },
           },
         },
       ],
     },
-    "right": Object {
+    "right": {
       "_type": "ZodUnion",
-      "options": Array [
-        Object {
+      "options": [
+        {
           "_type": "ZodObject",
-          "shape": Object {
-            "three": Object {
+          "shape": {
+            "three": {
               "_type": "ZodNull",
             },
           },
         },
-        Object {
+        {
           "_type": "ZodObject",
-          "shape": Object {
-            "four": Object {
+          "shape": {
+            "four": {
               "_type": "ZodBoolean",
             },
           },
@@ -253,21 +253,21 @@ Object {
       ],
     },
   },
-  "right": Object {
+  "right": {
     "_type": "ZodUnion",
-    "options": Array [
-      Object {
+    "options": [
+      {
         "_type": "ZodObject",
-        "shape": Object {
-          "five": Object {
+        "shape": {
+          "five": {
             "_type": "ZodString",
           },
         },
       },
-      Object {
+      {
         "_type": "ZodObject",
-        "shape": Object {
-          "six": Object {
+        "shape": {
+          "six": {
             "_type": "ZodNumber",
           },
         },

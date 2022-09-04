@@ -1,4 +1,4 @@
-import { Express, static as _serveStatic } from "express";
+import { Express } from "express";
 import { Logger } from "winston";
 import { CommonConfig } from "./config-type";
 import { DependsOnMethod } from "./depends-on-method";
@@ -54,7 +54,7 @@ export const routingCycle = ({
       });
     } else if (element instanceof ServeStatic) {
       if (staticCb) {
-        staticCb(path, _serveStatic(...element.params));
+        element.apply(path, staticCb);
       }
     } else if (element instanceof DependsOnMethod) {
       Object.entries<AbstractEndpoint>(element.methods).forEach(

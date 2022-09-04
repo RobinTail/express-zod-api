@@ -1,6 +1,21 @@
 # Changelog
 
+## Version 8
+
+### 8.0.0-beta1
+
+- **Breaking**: Only the following Node versions are supported:
+  - 14.17.0 and higher,
+  - 16.10.0 and higher
+  - 18.0.0 and higher.
+- `openapi3-ts` version is 3.0.2.
+- Supporting `jest` (optional peer dependency) version 29.x.
+
 ## Version 7
+
+### v7.9.1
+
+- Minor refactoring in order to support the recently released Typescript 4.8.2.
 
 ### v7.9.0
 
