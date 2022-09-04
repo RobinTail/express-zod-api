@@ -88,7 +88,7 @@
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-prettier": "^4.2.1",
-    "form-data": "^3.0.1",
+    "form-data": "^4.0.0",
     "has-ansi": "^4.0.1",
     "husky": "^8.0.1",
     "jest": "^29.0.1",
