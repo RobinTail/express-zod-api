@@ -15,7 +15,6 @@ import {
   createMiddleware,
   ExpressMiddleware,
   ExpressMiddlewareFeatures,
-  MiddlewareCreationProps,
   MiddlewareDefinition,
 } from "./middleware";
 import { mimeJson, mimeMultipart } from "./mime";
@@ -71,52 +70,14 @@ export class EndpointsFactory<
     AIN extends IOSchema<"strip">,
     AOUT extends FlatObject,
     ASCO extends string
-  >(
-    definition: MiddlewareDefinition<AIN, OUT, AOUT, ASCO>
-  ): EndpointsFactory<
-    POS,
-    NEG,
-    ProbableIntersection<IN, AIN>,
-    OUT & AOUT,
-    SCO & ASCO
-  >;
-
-  /** @deprecated please use createMiddleware() for the argument */
-  public addMiddleware<
-    AIN extends IOSchema<"strip">,
-    AOUT extends FlatObject,
-    ASCO extends string
-  >(
-    props: MiddlewareCreationProps<AIN, OUT, AOUT, ASCO>
-  ): EndpointsFactory<
-    POS,
-    NEG,
-    ProbableIntersection<IN, AIN>,
-    OUT & AOUT,
-    SCO & ASCO
-  >;
-
-  public addMiddleware<
-    AIN extends IOSchema<"strip">,
-    AOUT extends FlatObject,
-    ASCO extends string
-  >(
-    subject:
-      | MiddlewareDefinition<AIN, OUT, AOUT, ASCO>
-      | MiddlewareCreationProps<AIN, OUT, AOUT, ASCO>
-  ) {
+  >(subject: MiddlewareDefinition<AIN, OUT, AOUT, ASCO>) {
     return EndpointsFactory.#create<
       POS,
       NEG,
       ProbableIntersection<IN, AIN>,
       OUT & AOUT,
       SCO & ASCO
-    >(
-      this.middlewares.concat(
-        "type" in subject ? subject : createMiddleware(subject)
-      ),
-      this.resultHandler
-    );
+    >(this.middlewares.concat(subject), this.resultHandler);
   }
 
   public use = this.addExpressMiddleware;

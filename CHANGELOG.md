@@ -2,6 +2,11 @@
 
 ## Version 8
 
+### 8.0.0-beta2
+
+- **Breaking**: removing the signature deprecated in v7.6.1.
+  - The argument of `EndpointsFactory::addMiddleware()` has to be the result of `createMiddleware()`.
+
 ### 8.0.0-beta1
 
 - **Breaking**: Only the following Node versions are supported:
