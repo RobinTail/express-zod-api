@@ -6,4 +6,4 @@ const manifest = {
   version: originalManifest.version, // for yarn in esm test
 };
 
-fs.writeFileSync("./dist-esm/package.json", `${JSON.stringify(manifest)}\n`);
+fs.writeFileSync("./dist/esm/package.json", `${JSON.stringify(manifest)}\n`);

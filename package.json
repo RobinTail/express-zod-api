@@ -6,9 +6,9 @@
   "scripts": {
     "start": "ts-node example/index.ts",
     "build": "yarn build:cleanup && yarn build:compile && yarn build:esm && yarn build:swagger && yarn build:client && yarn build:license",
-    "build:cleanup": "rm -rf ./dist ./dist-esm example/example.swagger.yaml example/example.client.ts ./LICENSE",
-    "build:compile": "tsc --build tsconfig.build.json",
-    "build:esm": "tsc --build tsconfig.esm.json && ts-node tools/esm-package.ts && ts-node tools/esm-extensions.ts",
+    "build:cleanup": "rm -rf example/example.swagger.yaml example/example.client.ts ./LICENSE",
+    "build:compile": "tsup",
+    "build:esm": "ts-node tools/esm-package.ts",
     "build:swagger": "ts-node example/generate-open-api-schema.ts > example/example.swagger.yaml",
     "build:client": "ts-node example/generate-client.ts > example/example.client.ts && yarn prettier example/example.client.ts --write",
     "build:license": "ts-node tools/license.ts > ./LICENSE",
