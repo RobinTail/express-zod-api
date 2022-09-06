@@ -661,6 +661,7 @@ describe("Common Helpers", () => {
       [-1, "-1"],
       [Infinity, "Infinity"],
       [BigInt(123), "123"],
+      [Symbol("symbol"), "Symbol(symbol)"],
     ])("%s => %s", (argument, expected) => {
       const result = makeErrorFromAnything(argument);
       expectType<Error>(result);
