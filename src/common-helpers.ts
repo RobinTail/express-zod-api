@@ -122,9 +122,9 @@ export function makeErrorFromAnything(subject: any): Error;
 export function makeErrorFromAnything<T>(subject: T): Error {
   return subject instanceof Error
     ? subject
-    : typeof subject === "symbol"
-    ? new Error(subject.toString())
-    : new Error(`${subject}`);
+    : new Error(
+        typeof subject === "symbol" ? subject.toString() : `${subject}`
+      );
 }
 
 export function getMessageFromError(error: Error): string {
