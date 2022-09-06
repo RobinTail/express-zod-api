@@ -664,7 +664,8 @@ describe("Common Helpers", () => {
       [Symbol("symbol"), "Symbol(symbol)"],
       [true, "true"],
       [false, "false"],
-    ])("%s => %s", (argument, expected) => {
+      [() => {}, "() => { }"],
+    ])("should accept %s", (argument, expected) => {
       const result = makeErrorFromAnything(argument);
       expectType<Error>(result);
       expect(result).toBeInstanceOf(Error);
