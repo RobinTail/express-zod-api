@@ -1,6 +1,5 @@
 import { UploadedFile } from "express-fileupload";
 import { expectType } from "tsd";
-import { ZodError } from "zod";
 import {
   combinations,
   defaultInputSources,
@@ -637,7 +636,7 @@ describe("Common Helpers", () => {
     test.each([
       [new Error("error"), "error"],
       [
-        new ZodError([
+        new z.ZodError([
           {
             code: "invalid_type",
             expected: "string",
