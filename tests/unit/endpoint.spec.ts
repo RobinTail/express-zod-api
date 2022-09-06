@@ -197,34 +197,6 @@ describe("Endpoint", () => {
         },
       });
     });
-
-    test("Issue 585: should handle non-Error exceptions thrown", async () => {
-      const factory = new EndpointsFactory(defaultResultHandler);
-      const endpoint = factory.build({
-        method: "post",
-        input: z.object({}),
-        output: z.object({
-          test: z.number().transform(() => {
-            // eslint-disable-next-line @typescript-eslint/no-throw-literal
-            throw "Something unexpected"; // intentional, @see https://github.com/RobinTail/express-zod-api/issues/585
-          }),
-        }),
-        handler: async () => ({
-          test: 123,
-        }),
-      });
-      const { responseMock, loggerMock } = await testEndpoint({
-        endpoint,
-      });
-      expect(loggerMock.error).toBeCalledTimes(1);
-      expect(responseMock.status).toBeCalledWith(500);
-      expect(responseMock.json).toBeCalledWith({
-        status: "error",
-        error: {
-          message: "Something unexpected",
-        },
-      });
-    });
   });
 
   describe("#runMiddlewares", () => {
@@ -281,39 +253,6 @@ describe("Endpoint", () => {
           getNegativeResponse: () => createApiResponse(z.object({})),
           handler: () => {
             throw new Error("Something unexpected happened");
-          },
-        })
-      );
-      const endpoint = factory.build({
-        method: "get",
-        input: z.object({}),
-        output: z.object({
-          test: z.string(),
-        }),
-        handler: async () => ({ test: "OK" }),
-      });
-      const { loggerMock, responseMock } = await testEndpoint({ endpoint });
-      expect(loggerMock.error).toBeCalledTimes(1);
-      expect(loggerMock.error.mock.calls[0][0]).toBe(
-        "Result handler failure: Something unexpected happened."
-      );
-      expect(responseMock.status).toBeCalledTimes(1);
-      expect(responseMock.status.mock.calls[0][0]).toBe(500);
-      expect(responseMock.json).toBeCalledTimes(0);
-      expect(responseMock.end).toBeCalledTimes(1);
-      expect(responseMock.end.mock.calls[0][0]).toBe(
-        "An error occurred while serving the result: Something unexpected happened."
-      );
-    });
-
-    test("Issue 585: should handle non-Error exception thrown", async () => {
-      const factory = new EndpointsFactory(
-        createResultHandler({
-          getPositiveResponse: () => createApiResponse(z.object({})),
-          getNegativeResponse: () => createApiResponse(z.object({})),
-          handler: () => {
-            // eslint-disable-next-line @typescript-eslint/no-throw-literal
-            throw "Something unexpected happened"; // intentional, @see https://github.com/RobinTail/express-zod-api/issues/585
           },
         })
       );
@@ -508,6 +447,100 @@ describe("Endpoint", () => {
       expect(responseMock.status).toHaveBeenCalledWith(200);
       expect(responseMock.json).toHaveBeenCalledTimes(0);
       expect(responseMock.set).toHaveBeenCalledWith("X-Custom-Header", "test");
+    });
+  });
+
+  describe("Issue #585: Handling non-Error exceptions", () => {
+    test("thrown in #parseOutput()", async () => {
+      const factory = new EndpointsFactory(defaultResultHandler);
+      const endpoint = factory.build({
+        method: "post",
+        input: z.object({}),
+        output: z.object({
+          test: z.number().transform(() => {
+            // eslint-disable-next-line @typescript-eslint/no-throw-literal
+            throw "Something unexpected";
+          }),
+        }),
+        handler: async () => ({
+          test: 123,
+        }),
+      });
+      const { responseMock, loggerMock } = await testEndpoint({
+        endpoint,
+      });
+      expect(loggerMock.error).toBeCalledTimes(1);
+      expect(responseMock.status).toBeCalledWith(500);
+      expect(responseMock.json).toBeCalledWith({
+        status: "error",
+        error: {
+          message: "Something unexpected",
+        },
+      });
+    });
+
+    test("thrown in #handleResult()", async () => {
+      const factory = new EndpointsFactory(
+        createResultHandler({
+          getPositiveResponse: () => createApiResponse(z.object({})),
+          getNegativeResponse: () => createApiResponse(z.object({})),
+          handler: () => {
+            // eslint-disable-next-line @typescript-eslint/no-throw-literal
+            throw "Something unexpected happened";
+          },
+        })
+      );
+      const endpoint = factory.build({
+        method: "get",
+        input: z.object({}),
+        output: z.object({
+          test: z.string(),
+        }),
+        handler: async () => ({ test: "OK" }),
+      });
+      const { loggerMock, responseMock } = await testEndpoint({ endpoint });
+      expect(loggerMock.error).toBeCalledTimes(1);
+      expect(loggerMock.error.mock.calls[0][0]).toBe(
+        "Result handler failure: Something unexpected happened."
+      );
+      expect(responseMock.status).toBeCalledTimes(1);
+      expect(responseMock.status.mock.calls[0][0]).toBe(500);
+      expect(responseMock.json).toBeCalledTimes(0);
+      expect(responseMock.end).toBeCalledTimes(1);
+      expect(responseMock.end.mock.calls[0][0]).toBe(
+        "An error occurred while serving the result: Something unexpected happened."
+      );
+    });
+
+    test("thrown in middleware and caught in execute()", async () => {
+      const factory = new EndpointsFactory(defaultResultHandler).addMiddleware(
+        createMiddleware({
+          input: z.object({}),
+          middleware: async () => {
+            // eslint-disable-next-line @typescript-eslint/no-throw-literal
+            throw "Something went wrong";
+          },
+        })
+      );
+      const endpoint = factory.build({
+        methods: ["post"],
+        input: z.object({}),
+        output: z.object({}),
+        handler: async () => ({}),
+      });
+      const { responseMock, loggerMock } = await testEndpoint({
+        endpoint,
+        requestProps: {
+          method: "POST",
+          body: {},
+        },
+      });
+      expect(loggerMock.error).toBeCalledTimes(1);
+      expect(responseMock.status).toBeCalledWith(500);
+      expect(responseMock.json).toBeCalledWith({
+        status: "error",
+        error: { message: "Something went wrong" },
+      });
     });
   });
 });
