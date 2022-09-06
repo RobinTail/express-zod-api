@@ -197,6 +197,34 @@ describe("Endpoint", () => {
         },
       });
     });
+
+    test("Issue 585: should handle non-Error exceptions thrown", async () => {
+      const factory = new EndpointsFactory(defaultResultHandler);
+      const endpoint = factory.build({
+        method: "post",
+        input: z.object({}),
+        output: z.object({
+          test: z.number().transform(() => {
+            // eslint-disable-next-line @typescript-eslint/no-throw-literal
+            throw "Something unexpected"; // intentional, @see https://github.com/RobinTail/express-zod-api/issues/585
+          }),
+        }),
+        handler: async () => ({
+          test: 123,
+        }),
+      });
+      const { responseMock, loggerMock } = await testEndpoint({
+        endpoint,
+      });
+      expect(loggerMock.error).toBeCalledTimes(1);
+      expect(responseMock.status).toBeCalledWith(500);
+      expect(responseMock.json).toBeCalledWith({
+        status: "error",
+        error: {
+          message: "Something unexpected",
+        },
+      });
+    });
   });
 
   describe("#runMiddlewares", () => {
