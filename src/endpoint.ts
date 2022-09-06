@@ -184,7 +184,7 @@ export class Endpoint<
           })),
         ]);
       }
-      throw e;
+      throw e instanceof Error ? e : new Error(`${e}`);
     }
   }
 
@@ -272,13 +272,14 @@ export class Endpoint<
         input: initialInput,
       });
     } catch (e) {
-      if (e instanceof Error) {
-        lastResortHandler({
-          logger,
-          response,
-          error: new ResultHandlerError(e.message, error),
-        });
-      }
+      lastResortHandler({
+        logger,
+        response,
+        error: new ResultHandlerError(
+          (e instanceof Error ? e : new Error(`${e}`)).message,
+          error
+        ),
+      });
     }
   }
 
@@ -330,9 +331,7 @@ export class Endpoint<
         await this.#parseAndRunHandler({ input, options, logger })
       );
     } catch (e) {
-      if (e instanceof Error) {
-        error = e;
-      }
+      error = e instanceof Error ? e : new Error(`${e}`);
     }
     await this.#handleResult({
       initialInput,
