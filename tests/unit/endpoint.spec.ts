@@ -305,6 +305,39 @@ describe("Endpoint", () => {
         "An error occurred while serving the result: Something unexpected happened."
       );
     });
+
+    test("Issue 585: should handle non-Error exception thrown", async () => {
+      const factory = new EndpointsFactory(
+        createResultHandler({
+          getPositiveResponse: () => createApiResponse(z.object({})),
+          getNegativeResponse: () => createApiResponse(z.object({})),
+          handler: () => {
+            // eslint-disable-next-line @typescript-eslint/no-throw-literal
+            throw "Something unexpected happened"; // intentional, @see https://github.com/RobinTail/express-zod-api/issues/585
+          },
+        })
+      );
+      const endpoint = factory.build({
+        method: "get",
+        input: z.object({}),
+        output: z.object({
+          test: z.string(),
+        }),
+        handler: async () => ({ test: "OK" }),
+      });
+      const { loggerMock, responseMock } = await testEndpoint({ endpoint });
+      expect(loggerMock.error).toBeCalledTimes(1);
+      expect(loggerMock.error.mock.calls[0][0]).toBe(
+        "Result handler failure: Something unexpected happened."
+      );
+      expect(responseMock.status).toBeCalledTimes(1);
+      expect(responseMock.status.mock.calls[0][0]).toBe(500);
+      expect(responseMock.json).toBeCalledTimes(0);
+      expect(responseMock.end).toBeCalledTimes(1);
+      expect(responseMock.end.mock.calls[0][0]).toBe(
+        "An error occurred while serving the result: Something unexpected happened."
+      );
+    });
   });
 
   describe(".getInputSchema()", () => {
