@@ -1,4 +1,6 @@
 import { UploadedFile } from "express-fileupload";
+import { expectType } from "tsd";
+import { ZodError } from "zod";
 import {
   combinations,
   defaultInputSources,
@@ -11,6 +13,7 @@ import {
   hasUpload,
   isLoggerConfig,
   isValidDate,
+  makeErrorFromAnything,
 } from "../../src/common-helpers";
 import { z, createHttpError, withMeta, createMiddleware } from "../../src";
 import { Request } from "express";
@@ -627,6 +630,45 @@ describe("Common Helpers", () => {
       expect(isValidDate(new Date("2021-01-32"))).toBeFalsy();
       expect(isValidDate(new Date("22/01/2022"))).toBeFalsy();
       expect(isValidDate(new Date("2021-01-31T25:00:00.000Z"))).toBeFalsy();
+    });
+  });
+
+  describe("makeErrorFromAnything()", () => {
+    test.each([
+      [new Error("error"), "error"],
+      [
+        new ZodError([
+          {
+            code: "invalid_type",
+            expected: "string",
+            received: "number",
+            path: [""],
+            message: "invalid type",
+          },
+        ]),
+        `[\n  {\n    "code": "invalid_type",\n    "expected": "string",\n` +
+          `    "received": "number",\n    "path": [\n      ""\n` +
+          `    ],\n    "message": "invalid type"\n  }\n]`,
+      ],
+      [undefined, "undefined"],
+      [null, "null"],
+      ["string", "string"],
+      [123, "123"],
+      [{}, "[object Object]"],
+      [{ test: "object" }, "[object Object]"],
+      [NaN, "NaN"],
+      [0, "0"],
+      ["", ""],
+      [-1, "-1"],
+      [Infinity, "Infinity"],
+      [BigInt(123), "123"],
+    ])("%s => %s", (argument, expected) => {
+      const result = makeErrorFromAnything(argument);
+      expectType<Error>(result);
+      expect(result).toBeInstanceOf(Error);
+      expect(result).toHaveProperty("message");
+      expect(typeof result.message).toBe("string");
+      expect(result.message).toBe(expected);
     });
   });
 });

@@ -5,7 +5,7 @@ import https from "https";
 import { Logger } from "winston";
 import { AppConfig, CommonConfig, ServerConfig } from "./config-type";
 import { ResultHandlerError } from "./errors";
-import { isLoggerConfig } from "./common-helpers";
+import { isLoggerConfig, makeErrorFromAnything } from "./common-helpers";
 import { createLogger } from "./logger";
 import { defaultResultHandler, lastResortHandler } from "./result-handler";
 import { initRouting, Routing } from "./routing";
@@ -49,10 +49,7 @@ export const createNotFoundHandler =
       lastResortHandler({
         response,
         logger,
-        error: new ResultHandlerError(
-          (e instanceof Error ? e : new Error(`${e}`)).message,
-          error
-        ),
+        error: new ResultHandlerError(makeErrorFromAnything(e).message, error),
       });
     }
   };

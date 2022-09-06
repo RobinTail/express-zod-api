@@ -117,6 +117,12 @@ export function isValidDate(date: Date): boolean {
   return !isNaN(date.getTime());
 }
 
+export function makeErrorFromAnything<T extends Error>(subject: T): T;
+export function makeErrorFromAnything(subject: any): Error;
+export function makeErrorFromAnything<T>(subject: T): Error {
+  return subject instanceof Error ? subject : new Error(`${subject}`);
+}
+
 export function getMessageFromError(error: Error): string {
   if (error instanceof z.ZodError) {
     return error.issues
