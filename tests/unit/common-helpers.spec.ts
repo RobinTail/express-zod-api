@@ -666,6 +666,7 @@ describe("Common Helpers", () => {
       [false, "false"],
       [() => {}, "() => { }"],
       [/regexp/is, "/regexp/is"],
+      [[1, 2, 3], "1,2,3"],
     ])("should accept %s", (argument, expected) => {
       const result = makeErrorFromAnything(argument);
       expectType<Error>(result);
