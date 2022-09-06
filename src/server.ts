@@ -46,13 +46,14 @@ export const createNotFoundHandler =
         output: null,
       });
     } catch (e) {
-      if (e instanceof Error) {
-        lastResortHandler({
-          response,
-          logger,
-          error: new ResultHandlerError(e.message, error),
-        });
-      }
+      lastResortHandler({
+        response,
+        logger,
+        error: new ResultHandlerError(
+          (e instanceof Error ? e : new Error(`${e}`)).message,
+          error
+        ),
+      });
     }
   };
 
