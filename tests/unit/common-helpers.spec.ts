@@ -649,6 +649,7 @@ describe("Common Helpers", () => {
           `    "received": "number",\n    "path": [\n      ""\n` +
           `    ],\n    "message": "invalid type"\n  }\n]`,
       ],
+      [createHttpError(500, "Internal Server Error"), "Internal Server Error"],
       [undefined, "undefined"],
       [null, "null"],
       ["string", "string"],
