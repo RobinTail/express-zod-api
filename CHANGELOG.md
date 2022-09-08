@@ -5,6 +5,7 @@
 ### 8.0.0-beta3
 
 - This version includes the fix from version 7.9.2.
+- `zod` version is 3.19.0.
 
 ### 8.0.0-beta2
 
