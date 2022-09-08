@@ -2,6 +2,36 @@
 
 ## Version 7
 
+### v7.9.2
+
+- Fixed issue #585 found and reported along with a suggested solution by [@rayzr522](https://github.com/rayzr522).
+  - In case you need to `throw` within an `Endpoint`'s handler or a `Middleware`, consider
+    [the best practice](https://eslint.org/docs/latest/rules/no-throw-literal) of only
+    throwing an `Error` or a _descendant_ that extends the `Error`.
+  - You can also `import { createHttpError } from "express-zod-api"` and use it for that purpose.
+  - However, this version fixes the issue caused by throwing something else.
+  - In this case that entity will be stringified into a `.message` of `Error`.
+  - The issue manifested itself as a positive API response without data.
+
+```typescript
+// reproduction example
+const myEndpoint = defaultEndpointsFactory.build({
+  method: "get",
+  input: z.object({}),
+  output: z.object({}),
+  handler: async () => {
+    throw "I'm not an Error";
+  },
+});
+```
+
+```json lines
+// response before:
+{"status":"success"}
+// response after:
+{"status":"error","error":{"message":"I'm not an Error"}}
+```
+
 ### v7.9.1
 
 - Minor refactoring in order to support the recently released Typescript 4.8.2.
