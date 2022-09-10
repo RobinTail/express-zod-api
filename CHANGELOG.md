@@ -2,13 +2,25 @@
 
 ## Version 8
 
-### 8.0.0-beta2
+### v8.0.0
+
+- `winston` version is 3.8.2.
+- This version is based on v8.0.0-beta3 and contains breaking changes from v8.0.0-beta1 and v8.0.0-beta2.
+  Check out the explanation of these breaking changes below in order to migrate to v8.0.0.
+
+### v8.0.0-beta3
+
+- This version includes the fix from version 7.9.2.
+- `zod` version is 3.19.0.
+
+### v8.0.0-beta2
 
 - **Breaking**: removing the signature deprecated in v7.6.1.
   - The argument of `EndpointsFactory::addMiddleware()` has to be the result of `createMiddleware()`.
 
-### 8.0.0-beta1
+### v8.0.0-beta1
 
+- This version is based on v7.9.1.
 - **Breaking**: Only the following Node versions are supported:
   - 14.17.0 and higher,
   - 16.10.0 and higher
@@ -17,6 +29,36 @@
 - Supporting `jest` (optional peer dependency) version 29.x.
 
 ## Version 7
+
+### v7.9.2
+
+- Fixed issue #585 found and reported along with a suggested solution by [@rayzr522](https://github.com/rayzr522).
+  - In case you need to `throw` within an `Endpoint`'s handler or a `Middleware`, consider
+    [the best practice](https://eslint.org/docs/latest/rules/no-throw-literal) of only
+    throwing an `Error` or a _descendant_ that extends the `Error`.
+  - You can also `import { createHttpError } from "express-zod-api"` and use it for that purpose.
+  - However, this version fixes the issue caused by throwing something else.
+  - In this case that entity will be stringified into a `.message` of `Error`.
+  - The issue manifested itself as a positive API response without data.
+
+```typescript
+// reproduction example
+const myEndpoint = defaultEndpointsFactory.build({
+  method: "get",
+  input: z.object({}),
+  output: z.object({}),
+  handler: async () => {
+    throw "I'm not an Error";
+  },
+});
+```
+
+```json lines
+// response before:
+{"status":"success"}
+// response after:
+{"status":"error","error":{"message":"I'm not an Error"}}
+```
 
 ### v7.9.1
 
