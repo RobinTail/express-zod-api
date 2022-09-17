@@ -2,6 +2,10 @@
 
 ## Version 8
 
+### v8.0.1
+
+- `zod` version is 3.19.1.
+
 ### v8.0.0
 
 - `winston` version is 3.8.2.
