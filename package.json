@@ -5,9 +5,10 @@
   "license": "MIT",
   "scripts": {
     "start": "ts-node example/index.ts",
-    "build": "yarn build:cleanup && yarn build:compile && yarn build:swagger && yarn build:client && yarn build:license",
-    "build:cleanup": "rm -rf example/example.swagger.yaml example/example.client.ts ./LICENSE",
+    "build": "yarn build:cleanup && yarn build:compile && yarn build:dts && yarn build:swagger && yarn build:client && yarn build:license",
+    "build:cleanup": "rm -rf dist example/example.swagger.yaml example/example.client.ts ./LICENSE",
     "build:compile": "tsup",
+    "build:dts": "yarn tsc -p tsconfig.dts.json",
     "build:swagger": "ts-node example/generate-open-api-schema.ts > example/example.swagger.yaml",
     "build:client": "ts-node example/generate-client.ts > example/example.client.ts && yarn prettier example/example.client.ts --write",
     "build:license": "ts-node tools/license.ts > ./LICENSE",
@@ -27,10 +28,10 @@
     "install_hooks": "husky install"
   },
   "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "types": "dist/dts/index.d.ts",
   "module": "dist/esm/index.js",
   "exports": {
-    "types": "./dist/index.d.ts",
+    "types": "./dist/dts/index.d.ts",
     "require": "./dist/index.js",
     "import": "./dist/esm/index.js"
   },
