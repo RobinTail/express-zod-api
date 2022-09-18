@@ -12,7 +12,7 @@
     "build:swagger": "ts-node example/generate-open-api-schema.ts > example/example.swagger.yaml",
     "build:client": "ts-node example/generate-client.ts > example/example.client.ts && yarn prettier example/example.client.ts --write",
     "build:license": "ts-node tools/license.ts > ./LICENSE",
-    "build:intTest": "ts-node tools/integration-test.ts && yarn install --cwd ./tests/integration",
+    "build:intTest": "ts-node tools/integration-test.ts && yarn install --cwd ./tests/integration && ts-node tools/int-test-package.ts",
     "build:esmTest": "ts-node tools/esm-test.ts && yarn install --cwd ./tests/esm && ts-node tools/esm-test-package.ts",
     "test": "yarn test:jest && yarn test:badge",
     "test:int": "yarn jest ./tests/integration",
