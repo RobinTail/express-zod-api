@@ -150,7 +150,6 @@ components:
 tags: []
 servers:
   - url: http://example.com
-webhooks: {}
 "
 `;
 
@@ -261,7 +260,6 @@ components:
 tags: []
 servers:
   - url: http://example.com
-webhooks: {}
 "
 `;
 
@@ -435,7 +433,6 @@ components:
 tags: []
 servers:
   - url: http://example.com
-webhooks: {}
 "
 `;
 
@@ -549,7 +546,6 @@ components:
 tags: []
 servers:
   - url: http://example.com
-webhooks: {}
 "
 `;
 
@@ -646,7 +642,6 @@ components:
 tags: []
 servers:
   - url: http://example.com
-webhooks: {}
 "
 `;
 
@@ -748,7 +743,6 @@ components:
 tags: []
 servers:
   - url: http://example.com
-webhooks: {}
 "
 `;
 
@@ -836,7 +830,6 @@ components:
 tags: []
 servers:
   - url: http://example.com
-webhooks: {}
 "
 `;
 
@@ -923,7 +916,6 @@ components:
 tags: []
 servers:
   - url: http://example.com
-webhooks: {}
 "
 `;
 
@@ -1013,7 +1005,6 @@ components:
 tags: []
 servers:
   - url: http://example.com
-webhooks: {}
 "
 `;
 
@@ -1108,7 +1099,6 @@ components:
 tags: []
 servers:
   - url: http://example.com
-webhooks: {}
 "
 `;
 
@@ -1222,7 +1212,6 @@ components:
 tags: []
 servers:
   - url: http://example.com
-webhooks: {}
 "
 `;
 
@@ -1350,7 +1339,6 @@ components:
 tags: []
 servers:
   - url: http://example.com
-webhooks: {}
 "
 `;
 
@@ -1464,7 +1452,6 @@ components:
 tags: []
 servers:
   - url: http://example.com
-webhooks: {}
 "
 `;
 
@@ -1573,7 +1560,6 @@ components:
 tags: []
 servers:
   - url: http://example.com
-webhooks: {}
 "
 `;
 
@@ -1693,7 +1679,6 @@ components:
 tags: []
 servers:
   - url: http://example.com
-webhooks: {}
 "
 `;
 
@@ -2043,7 +2028,6 @@ components:
 tags: []
 servers:
   - url: http://example.com
-webhooks: {}
 "
 `;
 
@@ -2149,7 +2133,6 @@ components:
 tags: []
 servers:
   - url: http://example.com
-webhooks: {}
 "
 `;
 
@@ -2303,7 +2286,6 @@ components:
 tags: []
 servers:
   - url: http://example.com
-webhooks: {}
 "
 `;
 
@@ -2429,7 +2411,6 @@ components:
 tags: []
 servers:
   - url: http://example.com
-webhooks: {}
 "
 `;
 
@@ -2520,7 +2501,6 @@ components:
 tags: []
 servers:
   - url: http://example.com
-webhooks: {}
 "
 `;
 
@@ -2649,7 +2629,6 @@ components:
 tags: []
 servers:
   - url: http://example.com
-webhooks: {}
 "
 `;
 
@@ -2742,7 +2721,6 @@ components:
 tags: []
 servers:
   - url: http://example.com
-webhooks: {}
 "
 `;
 
@@ -2868,7 +2846,6 @@ components:
 tags: []
 servers:
   - url: http://example.com
-webhooks: {}
 "
 `;
 
@@ -2950,7 +2927,6 @@ components:
 tags: []
 servers:
   - url: http://example.com
-webhooks: {}
 "
 `;
 
@@ -3042,6 +3018,5 @@ components:
 tags: []
 servers:
   - url: http://example.com
-webhooks: {}
 "
 `;
