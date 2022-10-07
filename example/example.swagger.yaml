@@ -343,4 +343,5 @@ components:
 tags: []
 servers:
   - url: http://example.com
+webhooks: {}
 
