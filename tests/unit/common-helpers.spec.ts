@@ -1,4 +1,5 @@
 import { UploadedFile } from "express-fileupload";
+import { expectType } from "tsd";
 import {
   combinations,
   defaultInputSources,
@@ -11,6 +12,7 @@ import {
   hasUpload,
   isLoggerConfig,
   isValidDate,
+  makeErrorFromAnything,
 } from "../../src/common-helpers";
 import { z, createHttpError, withMeta, createMiddleware } from "../../src";
 import { Request } from "express";
@@ -627,6 +629,52 @@ describe("Common Helpers", () => {
       expect(isValidDate(new Date("2021-01-32"))).toBeFalsy();
       expect(isValidDate(new Date("22/01/2022"))).toBeFalsy();
       expect(isValidDate(new Date("2021-01-31T25:00:00.000Z"))).toBeFalsy();
+    });
+  });
+
+  describe("makeErrorFromAnything()", () => {
+    test.each([
+      [new Error("error"), "error"],
+      [
+        new z.ZodError([
+          {
+            code: "invalid_type",
+            expected: "string",
+            received: "number",
+            path: [""],
+            message: "invalid type",
+          },
+        ]),
+        `[\n  {\n    "code": "invalid_type",\n    "expected": "string",\n` +
+          `    "received": "number",\n    "path": [\n      ""\n` +
+          `    ],\n    "message": "invalid type"\n  }\n]`,
+      ],
+      [createHttpError(500, "Internal Server Error"), "Internal Server Error"],
+      [undefined, "undefined"],
+      [null, "null"],
+      ["string", "string"],
+      [123, "123"],
+      [{}, "[object Object]"],
+      [{ test: "object" }, "[object Object]"],
+      [NaN, "NaN"],
+      [0, "0"],
+      ["", ""],
+      [-1, "-1"],
+      [Infinity, "Infinity"],
+      [BigInt(123), "123"],
+      [Symbol("symbol"), "Symbol(symbol)"],
+      [true, "true"],
+      [false, "false"],
+      [() => {}, "() => { }"],
+      [/regexp/is, "/regexp/is"],
+      [[1, 2, 3], "1,2,3"],
+    ])("should accept %s", (argument, expected) => {
+      const result = makeErrorFromAnything(argument);
+      expectType<Error>(result);
+      expect(result).toBeInstanceOf(Error);
+      expect(result).toHaveProperty("message");
+      expect(typeof result.message).toBe("string");
+      expect(result.message).toBe(expected);
     });
   });
 });

@@ -9,6 +9,7 @@ import {
   getActualMethod,
   getInitialInput,
   IOSchema,
+  makeErrorFromAnything,
 } from "./common-helpers";
 import { combineContainers, LogicalContainer } from "./logical-container";
 import { AuxMethod, Method, MethodsDefinition } from "./method";
@@ -191,7 +192,7 @@ export class Endpoint<
           })),
         ]);
       }
-      throw e;
+      throw makeErrorFromAnything(e);
     }
   }
 
@@ -279,13 +280,11 @@ export class Endpoint<
         input: initialInput,
       });
     } catch (e) {
-      if (e instanceof Error) {
-        lastResortHandler({
-          logger,
-          response,
-          error: new ResultHandlerError(e.message, error),
-        });
-      }
+      lastResortHandler({
+        logger,
+        response,
+        error: new ResultHandlerError(makeErrorFromAnything(e).message, error),
+      });
     }
   }
 
@@ -337,9 +336,7 @@ export class Endpoint<
         await this.#parseAndRunHandler({ input, options, logger })
       );
     } catch (e) {
-      if (e instanceof Error) {
-        error = e;
-      }
+      error = makeErrorFromAnything(e);
     }
     await this.#handleResult({
       initialInput,
