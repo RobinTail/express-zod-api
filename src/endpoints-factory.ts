@@ -37,7 +37,7 @@ type BuildProps<
   handler: Handler<z.output<ProbableIntersection<MIN, IN>>, z.input<OUT>, OPT>;
   description?: string;
   scopes?: SCO[];
-  tags?: TAG[];
+  tags?: TAG[]; // @todo consider singular variation of these prop, like "method"
 } & MethodsDefinition<M>;
 
 export class EndpointsFactory<
