@@ -51,7 +51,8 @@ type EndpointProps<
   M extends Method,
   POS extends ApiResponse,
   NEG extends ApiResponse,
-  SCO extends string
+  SCO extends string,
+  TAG extends string
 > = {
   middlewares: AnyMiddlewareDef[];
   inputSchema: IN;
@@ -61,6 +62,7 @@ type EndpointProps<
   resultHandler: ResultHandlerDefinition<POS, NEG>;
   description?: string;
   scopes?: SCO[];
+  tags?: TAG[];
 } & MethodsDefinition<M>;
 
 export class Endpoint<
@@ -70,7 +72,8 @@ export class Endpoint<
   M extends Method,
   POS extends ApiResponse,
   NEG extends ApiResponse,
-  SCO extends string
+  SCO extends string,
+  TAG extends string
 > extends AbstractEndpoint {
   protected readonly description?: string;
   protected readonly methods: M[] = [];
@@ -81,7 +84,7 @@ export class Endpoint<
   protected readonly handler: Handler<z.output<IN>, z.input<OUT>, OPT>;
   protected readonly resultHandler: ResultHandlerDefinition<POS, NEG>;
   protected readonly scopes?: SCO[];
-  protected readonly tags?: string[];
+  protected readonly tags?: TAG[];
 
   constructor({
     middlewares,
@@ -92,8 +95,9 @@ export class Endpoint<
     description,
     mimeTypes,
     scopes,
+    tags,
     ...rest
-  }: EndpointProps<IN, OUT, OPT, M, POS, NEG, SCO>) {
+  }: EndpointProps<IN, OUT, OPT, M, POS, NEG, SCO, TAG>) {
     super();
     this.middlewares = middlewares;
     this.inputSchema = inputSchema;
@@ -103,7 +107,7 @@ export class Endpoint<
     this.resultHandler = resultHandler;
     this.description = description;
     this.scopes = scopes;
-    this.tags = [];
+    this.tags = tags;
     if ("methods" in rest) {
       this.methods = rest.methods;
     } else {
@@ -159,7 +163,7 @@ export class Endpoint<
     return this.scopes || [];
   }
 
-  public override getTags(): string[] {
+  public override getTags(): TAG[] {
     return this.tags || [];
   }
 
