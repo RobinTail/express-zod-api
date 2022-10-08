@@ -9,7 +9,7 @@ import {
 import { authMiddleware } from "./middlewares";
 import fs from "fs";
 
-const tags = ["users" as const, "files" as const];
+const tags = ["users", "files"] as const;
 
 export const taggedEndpointsFactory = defaultEndpointsFactory.allowTags(tags);
 

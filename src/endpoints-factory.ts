@@ -70,7 +70,10 @@ export class EndpointsFactory<
     return factory;
   }
 
-  public allowTags<ATAG extends string>({}: ATAG[]) {
+  // @todo consider no arguments fn with a type param
+  public allowTags<ATAG extends string>({}:
+    | ATAG[]
+    | Readonly<[ATAG, ...ATAG[]]>) {
     return EndpointsFactory.#create<POS, NEG, IN, OUT, SCO, TAG & ATAG>(
       this.middlewares,
       this.resultHandler
