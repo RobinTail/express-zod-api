@@ -3,6 +3,7 @@ import { fileStreamingEndpointsFactory } from "../factories";
 
 export const streamAvatarEndpoint = fileStreamingEndpointsFactory.build({
   methods: ["get"],
+  tags: ["users", "files"],
   input: z.object({
     userId: z
       .string()

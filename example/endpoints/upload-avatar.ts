@@ -1,8 +1,10 @@
-import { z, defaultEndpointsFactory } from "../../src";
+import { z } from "../../src";
 import crypto from "crypto";
+import { taggedEndpointsFactory } from "../factories";
 
-export const uploadAvatarEndpoint = defaultEndpointsFactory.build({
+export const uploadAvatarEndpoint = taggedEndpointsFactory.build({
   method: "post",
+  tags: ["files"],
   input: z
     .object({
       avatar: z

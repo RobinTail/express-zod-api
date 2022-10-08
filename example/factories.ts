@@ -9,8 +9,12 @@ import {
 import { authMiddleware } from "./middlewares";
 import fs from "fs";
 
+const tags = ["users" as const, "files" as const];
+
+export const taggedEndpointsFactory = defaultEndpointsFactory.allowTags(tags);
+
 export const keyAndTokenAuthenticatedEndpointsFactory =
-  defaultEndpointsFactory.addMiddleware(authMiddleware);
+  taggedEndpointsFactory.addMiddleware(authMiddleware);
 
 export const fileSendingEndpointsFactory = new EndpointsFactory(
   createResultHandler({
@@ -30,7 +34,7 @@ export const fileSendingEndpointsFactory = new EndpointsFactory(
       }
     },
   })
-);
+).allowTags(tags);
 
 export const fileStreamingEndpointsFactory = new EndpointsFactory(
   createResultHandler({
@@ -51,4 +55,4 @@ export const fileStreamingEndpointsFactory = new EndpointsFactory(
       }
     },
   })
-);
+).allowTags(tags);

@@ -4,6 +4,7 @@ import fs from "fs";
 
 export const sendAvatarEndpoint = fileSendingEndpointsFactory.build({
   methods: ["get"],
+  tags: ["files", "users"],
   input: z.object({
     userId: z
       .string()

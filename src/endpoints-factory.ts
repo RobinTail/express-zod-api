@@ -70,7 +70,7 @@ export class EndpointsFactory<
     return factory;
   }
 
-  public allowTags<ATAG>({}: ATAG[]) {
+  public allowTags<ATAG extends string>({}: ATAG[]) {
     return EndpointsFactory.#create<POS, NEG, IN, OUT, SCO, TAG & ATAG>(
       this.middlewares,
       this.resultHandler

@@ -4,6 +4,7 @@ import { keyAndTokenAuthenticatedEndpointsFactory } from "../factories";
 export const updateUserEndpoint =
   keyAndTokenAuthenticatedEndpointsFactory.build({
     method: "post",
+    tags: ["users"],
     description: "example user update endpoint",
     input: withMeta(
       z.object({
