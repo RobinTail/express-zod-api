@@ -5,6 +5,7 @@ import { ApiResponse } from "./api-response";
 import { CommonConfig } from "./config-type";
 import { ResultHandlerError } from "./errors";
 import {
+  ensureShortDescription,
   FlatObject,
   getActualMethod,
   getInitialInput,
@@ -108,7 +109,11 @@ export class Endpoint<
     this.handler = handler;
     this.resultHandler = resultHandler;
     this.description = description;
-    this.shortDescription = shortDescription || description; // @todo ensure short
+    this.shortDescription = shortDescription
+      ? ensureShortDescription(shortDescription)
+      : description
+      ? ensureShortDescription(description)
+      : undefined;
     this.scopes = [];
     this.tags = [];
     if ("scopes" in rest && rest.scopes) {

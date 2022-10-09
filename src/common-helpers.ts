@@ -13,6 +13,8 @@ import { AnyMiddlewareDef } from "./middleware";
 import { mimeMultipart } from "./mime";
 import { ZodUpload } from "./upload-schema";
 
+const shortDescriptionLimit = 50;
+
 export type FlatObject = Record<string, any>;
 
 export type IOSchema<U extends UnknownKeysParam = any> =
@@ -226,6 +228,25 @@ export function hasUpload(schema: z.ZodTypeAny): boolean {
   }
   return false;
 }
+
+export const ensureShortDescription = (description: string) => {
+  const hasLetters = /^\w+/.test(description);
+  const hasSpaces = /\s/.test(description);
+  if (hasLetters && hasSpaces) {
+    const hasWords = /\w+\s+\w+/.test(description);
+    const hasSentences = /\./.test(description);
+    if (hasWords && hasSentences) {
+      const firstDot = description.indexOf(".");
+      if (firstDot >= 0 && firstDot < shortDescriptionLimit) {
+        return description.slice(0, firstDot + 1);
+      }
+    }
+  }
+  if (description.length <= shortDescriptionLimit) {
+    return description;
+  }
+  return description.slice(0, shortDescriptionLimit - 1) + "…";
+};
 
 // obtaining the private helper type from Zod
 export type ErrMessage = Exclude<

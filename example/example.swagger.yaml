@@ -143,7 +143,7 @@ paths:
                     error:
                       message: Sample error message
       description: Changes the user record. Example user update endpoint.
-      summary: Changes the user record. Example user update endpoint.
+      summary: Changes the user record.
       tags:
         - users
       parameters:
