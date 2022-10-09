@@ -352,7 +352,11 @@ components:
       name: token
   links: {}
   callbacks: {}
-tags: []
+tags:
+  - name: users
+    description: Everything about the users
+  - name: files
+    description: Everything about the files processing
 servers:
   - url: http://example.com
 
