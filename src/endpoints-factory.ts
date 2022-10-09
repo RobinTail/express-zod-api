@@ -53,6 +53,7 @@ export class EndpointsFactory<
   protected middlewares: AnyMiddlewareDef[] = [];
 
   constructor(resultHandler: ResultHandlerDefinition<POS, NEG>);
+  /** @desc Consider using the "config" prop with the "tags" option to enforce constraints on tagging the endpoints */
   constructor(params: {
     resultHandler: ResultHandlerDefinition<POS, NEG>;
     config?: CommonConfig<TAG>;
