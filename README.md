@@ -25,7 +25,7 @@ Start your API server with I/O schema validation and custom middlewares in minut
    5. [Set up routing](#set-up-routing)
    6. [Start your server](#start-your-server)
    7. [Try it](#try-it)
-4. [Fascinating features](#fascinating-features)
+4. [Charming features](#charming-features)
    1. [Cross-Origin Resource Sharing](#cross-origin-resource-sharing) (CORS)
    2. [Middlewares](#middlewares)
    3. [Options](#options)
@@ -46,6 +46,7 @@ Start your API server with I/O schema validation and custom middlewares in minut
    18. [Enabling HTTPS](#enabling-https)
    19. [Generating a Frontend Client](#generating-a-frontend-client)
    20. [Creating a documentation](#creating-a-documentation)
+   21. [Tagging the endpoints](#tagging-the-endpoints)
 5. [Additional hints](#additional-hints)
    1. [How to test endpoints](#how-to-test-endpoints)
    2. [Excessive properties in endpoint output](#excessive-properties-in-endpoint-output)
@@ -208,7 +209,7 @@ You should receive the following response:
 { "status": "success", "data": { "greetings": "Hello, Rick. Happy coding!" } }
 ```
 
-# Fascinating features
+# Charming features
 
 ## Cross-Origin Resource Sharing
 
@@ -831,6 +832,43 @@ const exampleEndpoint = defaultEndpointsFactory.build({
 
 _See the example of the generated documentation
 [here](https://github.com/RobinTail/express-zod-api/blob/master/example/example.swagger.yaml)_
+
+## Tagging the endpoints
+
+When generating documentation, you may find it necessary to classify endpoints into groups. For this, the
+possibility of tagging endpoints is provided. In order to achieve the consistency of tags across all endpoints, the
+possible tags should be declared in the configuration first and another instantiation approach of the
+`EndpointsFactory` is required. Consider the following example:
+
+```typescript
+import {
+  createConfig,
+  EndpointsFactory,
+  defaultResultHandler,
+} from "express-zod-api";
+
+const config = createConfig({
+  // ..., use the simple or the advanced syntax:
+  tags: {
+    users: "Everything about the users",
+    files: {
+      description: "Everything about the files processing",
+      url: "https://example.com",
+    },
+  },
+});
+
+// instead of defaultEndpointsFactory use the following approach:
+const taggedEndpointsFactory = new EndpointsFactory({
+  resultHandler: defaultResultHandler, // or use your custom one
+  config, // <—— supply your config here
+});
+
+const exampleEndpoint = taggedEndpointsFactory.build({
+  // ...
+  tag: "users", // or tags: ["users", "files"]
+});
+```
 
 # Additional hints
 

@@ -15,6 +15,7 @@ import {
   reformatParamsInPath,
   depictSecurity,
   depictSecurityRefs,
+  depictTags,
 } from "./open-api-helpers";
 import { Routing, routingCycle, RoutingCycleParams } from "./routing";
 
@@ -58,8 +59,6 @@ export class OpenAPI extends OpenApiBuilder {
     errorResponseDescription = "Error response",
   }: GeneratorParams) {
     super();
-    // @todo make this conditional when going to support OpenAPI 3.1.0
-    delete this.rootDoc.webhooks;
     this.addInfo({ title, version }).addServer({ url: serverUrl });
     const endpointCb: RoutingCycleParams["endpointCb"] = (
       endpoint,
@@ -90,6 +89,9 @@ export class OpenAPI extends OpenApiBuilder {
       };
       if (endpoint.getDescription()) {
         operation.description = endpoint.getDescription();
+      }
+      if (endpoint.getTags().length > 0) {
+        operation.tags = endpoint.getTags();
       }
       if (depictedParams.length > 0) {
         operation.parameters = depictedParams;
@@ -122,5 +124,8 @@ export class OpenAPI extends OpenApiBuilder {
       });
     };
     routingCycle({ routing, endpointCb });
+    // @todo make this conditional when going to support OpenAPI 3.1.0
+    delete this.rootDoc.webhooks;
+    this.rootDoc.tags = config.tags ? depictTags(config.tags) : [];
   }
 }

@@ -40,6 +40,7 @@ import {
   depictSecurity,
   depictSecurityRefs,
   depictZodBranded,
+  depictTags,
 } from "../../src/open-api-helpers";
 import { serializeSchemaForTest } from "../helpers";
 
@@ -987,6 +988,29 @@ describe("Open API helpers", () => {
             { name: "B", scopes: ["read"] },
             { name: "C", scopes: ["read", "write"] },
           ],
+        })
+      ).toMatchSnapshot();
+    });
+  });
+
+  describe("depictTags()", () => {
+    test("should accept plain descriptions", () => {
+      expect(
+        depictTags({
+          users: "Everything about users",
+          files: "Everything about files processing",
+        })
+      ).toMatchSnapshot();
+    });
+
+    test("should accept objects with URLs", () => {
+      expect(
+        depictTags({
+          users: { description: "Everything about users" },
+          files: {
+            description: "Everything about files processing",
+            url: "https://example.com",
+          },
         })
       ).toMatchSnapshot();
     });

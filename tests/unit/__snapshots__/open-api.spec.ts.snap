@@ -1748,6 +1748,8 @@ paths:
                     error:
                       message: Sample error message
       description: example user retrieval endpoint
+      tags:
+        - users
       parameters:
         - name: id
           in: query
@@ -1825,6 +1827,8 @@ paths:
                     error:
                       message: Sample error message
       description: example user update endpoint
+      tags:
+        - users
       parameters:
         - name: id
           in: path
@@ -1892,6 +1896,9 @@ paths:
             text/plain:
               schema:
                 type: string
+      tags:
+        - files
+        - users
       parameters:
         - name: userId
           in: query
@@ -1916,6 +1923,9 @@ paths:
             text/plain:
               schema:
                 type: string
+      tags:
+        - users
+        - files
       parameters:
         - name: userId
           in: query
@@ -1995,6 +2005,8 @@ paths:
                     status: error
                     error:
                       message: Sample error message
+      tags:
+        - files
       requestBody:
         content:
           multipart/form-data:
@@ -2025,7 +2037,11 @@ components:
       name: token
   links: {}
   callbacks: {}
-tags: []
+tags:
+  - name: users
+    description: Everything about the users
+  - name: files
+    description: Everything about the files processing
 servers:
   - url: http://example.com
 "

@@ -2,6 +2,49 @@
 
 ## Version 8
 
+### v8.1.0
+
+- Feature #571: tagging the endpoints.
+  - Good news dear community! You can now tag your endpoints using the new properties of the `.build()` method
+    of the `EndpointsFactory`.
+  - For your convenience and for the sake of Semantics, there are singular and plural properties: `tag` and `tags`.
+  - By default, these properties allow any string, so in order to enforce restrictions and achieve the consistency
+    across all endpoints, the possible tags should be declared in the configuration first and also a brand
+    new `EndpointsFactory` instantiation approach is required.
+  - The configuration has got a new `tags` property for declaring possible tags and their descriptions.
+  - Tags are an important part of the generated documentation for the OpenAPI standard.
+- The property `scopes` (introduced in v7.9.0) has got its singular variation `scope`.
+
+```typescript
+import {
+  createConfig,
+  EndpointsFactory,
+  defaultResultHandler,
+} from "express-zod-api";
+
+const config = createConfig({
+  // ..., use the simple or the advanced syntax:
+  tags: {
+    users: "Everything about the users",
+    files: {
+      description: "Everything about the files processing",
+      url: "https://example.com",
+    },
+  },
+});
+
+// instead of defaultEndpointsFactory use the following approach:
+const taggedEndpointsFactory = new EndpointsFactory({
+  resultHandler: defaultResultHandler, // or use your custom one
+  config,
+});
+
+const exampleEndpoint = taggedEndpointsFactory.build({
+  // ...
+  tag: "users", // or tags: ["users", "files"]
+});
+```
+
 ### v8.0.2
 
 - `express` version is 4.18.2.
