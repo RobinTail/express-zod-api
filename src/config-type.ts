@@ -66,6 +66,11 @@ type HeadersProvider = (params: {
   logger: Logger;
 }) => Headers | Promise<Headers>;
 
+type TagsConfig<TAG extends string> = Record<
+  TAG,
+  string | { description: string; url: string }
+>;
+
 export interface CommonConfig<TAG extends string = string> {
   // enable cross-origin resource sharing
   // https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
@@ -83,7 +88,8 @@ export interface CommonConfig<TAG extends string = string> {
   // default: { get: [query, params], post: [body, params, files],
   // put: [body, params], patch: [body, params], delete: [body, query, params] }
   inputSources?: Partial<InputSources>;
-  tags?: Record<TAG, string | { description: string; url: string }>;
+  // optional endpoints tagging configuration, example: { users: "Everything about the users" }
+  tags?: TagsConfig<TAG>;
 }
 
 export const createConfig = <
