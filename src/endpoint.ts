@@ -108,7 +108,7 @@ export class Endpoint<
     this.handler = handler;
     this.resultHandler = resultHandler;
     this.description = description;
-    this.shortDescription = shortDescription;
+    this.shortDescription = shortDescription || description; // @todo ensure short
     this.scopes = [];
     this.tags = [];
     if ("scopes" in rest && rest.scopes) {

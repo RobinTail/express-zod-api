@@ -87,14 +87,11 @@ export class OpenAPI extends OpenApiBuilder {
           }),
         },
       };
-      // @todo make it neat
       if (endpoint.getDescription()) {
         operation.description = endpoint.getDescription();
       }
       if (endpoint.getShortDescription()) {
         operation.summary = endpoint.getShortDescription();
-      } else if (endpoint.getDescription()) {
-        operation.summary = endpoint.getDescription(); // @todo ensure short
       }
       if (endpoint.getTags().length > 0) {
         operation.tags = endpoint.getTags();
