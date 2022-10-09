@@ -836,7 +836,7 @@ describe("Open API generator", () => {
               handler: async () => ({ num: 123 }),
             }),
             setSomething: defaultEndpointsFactory.addMiddleware(mw2).build({
-              scopes: ["write"],
+              scope: "write",
               method: "post",
               input: z.object({}),
               output: z.object({}),
