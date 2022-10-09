@@ -11,4 +11,8 @@ export const config = createConfig({
     level: "debug",
     color: true,
   },
+  tags: {
+    users: "Everything about the users",
+    files: "Everything about the files processing",
+  },
 });

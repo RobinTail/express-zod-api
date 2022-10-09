@@ -8,6 +8,7 @@ import {
   IOSchema,
   ProbableIntersection,
 } from "./common-helpers";
+import { CommonConfig } from "./config-type";
 import { Endpoint, Handler } from "./endpoint";
 import { Method, MethodsDefinition } from "./method";
 import {
@@ -70,11 +71,8 @@ export class EndpointsFactory<
     return factory;
   }
 
-  // @todo consider no arguments fn with a type param
-  // @todo consider keeping the tags in Config along with their descriptions
-  public allowTags<ATAG extends string>({}:
-    | ATAG[]
-    | Readonly<[ATAG, ...ATAG[]]>) {
+  // @todo can we move it to constructor in an elegant way preserving the backward compatibility?
+  public applyConfig<ATAG extends string>({}: CommonConfig<ATAG>) {
     return EndpointsFactory.#create<POS, NEG, IN, OUT, SCO, TAG & ATAG>(
       this.middlewares,
       this.resultHandler

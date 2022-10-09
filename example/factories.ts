@@ -2,16 +2,17 @@ import mime from "mime";
 import {
   createApiResponse,
   createResultHandler,
-  defaultEndpointsFactory,
+  defaultResultHandler,
   EndpointsFactory,
   z,
 } from "../src";
+import { config } from "./config";
 import { authMiddleware } from "./middlewares";
 import fs from "fs";
 
-const tags = ["users", "files"] as const;
-
-export const taggedEndpointsFactory = defaultEndpointsFactory.allowTags(tags);
+export const taggedEndpointsFactory = new EndpointsFactory(
+  defaultResultHandler
+).applyConfig(config);
 
 export const keyAndTokenAuthenticatedEndpointsFactory =
   taggedEndpointsFactory.addMiddleware(authMiddleware);
@@ -34,7 +35,7 @@ export const fileSendingEndpointsFactory = new EndpointsFactory(
       }
     },
   })
-).allowTags(tags);
+).applyConfig(config);
 
 export const fileStreamingEndpointsFactory = new EndpointsFactory(
   createResultHandler({
@@ -55,4 +56,4 @@ export const fileStreamingEndpointsFactory = new EndpointsFactory(
       }
     },
   })
-).allowTags(tags);
+).applyConfig(config);
