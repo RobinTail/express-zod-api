@@ -10,15 +10,17 @@ import { config } from "./config";
 import { authMiddleware } from "./middlewares";
 import fs from "fs";
 
-export const taggedEndpointsFactory = new EndpointsFactory(
-  defaultResultHandler
-).applyConfig(config);
+export const taggedEndpointsFactory = new EndpointsFactory({
+  resultHandler: defaultResultHandler,
+  config,
+});
 
 export const keyAndTokenAuthenticatedEndpointsFactory =
   taggedEndpointsFactory.addMiddleware(authMiddleware);
 
-export const fileSendingEndpointsFactory = new EndpointsFactory(
-  createResultHandler({
+export const fileSendingEndpointsFactory = new EndpointsFactory({
+  config,
+  resultHandler: createResultHandler({
     getPositiveResponse: () =>
       createApiResponse(z.string(), mime.getType("svg") || "image/svg+xml"),
     getNegativeResponse: () =>
@@ -34,11 +36,12 @@ export const fileSendingEndpointsFactory = new EndpointsFactory(
         response.status(400).send("Data is missing");
       }
     },
-  })
-).applyConfig(config);
+  }),
+});
 
-export const fileStreamingEndpointsFactory = new EndpointsFactory(
-  createResultHandler({
+export const fileStreamingEndpointsFactory = new EndpointsFactory({
+  config,
+  resultHandler: createResultHandler({
     getPositiveResponse: () => createApiResponse(z.file().binary(), "image/*"),
     getNegativeResponse: () =>
       createApiResponse(z.string(), mime.getType("txt") || "text/plain"),
@@ -55,5 +58,5 @@ export const fileStreamingEndpointsFactory = new EndpointsFactory(
         response.status(400).send("Filename is missing");
       }
     },
-  })
-).applyConfig(config);
+  }),
+});

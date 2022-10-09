@@ -49,9 +49,25 @@ export class EndpointsFactory<
   SCO extends string = string,
   TAG extends string = string
 > {
+  protected resultHandler: ResultHandlerDefinition<POS, NEG>;
   protected middlewares: AnyMiddlewareDef[] = [];
 
-  constructor(protected resultHandler: ResultHandlerDefinition<POS, NEG>) {}
+  constructor(resultHandler: ResultHandlerDefinition<POS, NEG>);
+  constructor(params: {
+    resultHandler: ResultHandlerDefinition<POS, NEG>;
+    config?: CommonConfig<TAG>;
+  });
+  constructor(
+    subject:
+      | ResultHandlerDefinition<POS, NEG>
+      | {
+          resultHandler: ResultHandlerDefinition<POS, NEG>;
+          config?: CommonConfig<TAG>;
+        }
+  ) {
+    this.resultHandler =
+      "resultHandler" in subject ? subject.resultHandler : subject;
+  }
 
   static #create<
     CPOS extends ApiResponse,
@@ -69,14 +85,6 @@ export class EndpointsFactory<
     );
     factory.middlewares = middlewares;
     return factory;
-  }
-
-  // @todo can we move it to constructor in an elegant way preserving the backward compatibility?
-  public applyConfig<ATAG extends string>({}: CommonConfig<ATAG>) {
-    return EndpointsFactory.#create<POS, NEG, IN, OUT, SCO, TAG & ATAG>(
-      this.middlewares,
-      this.resultHandler
-    );
   }
 
   public addMiddleware<
