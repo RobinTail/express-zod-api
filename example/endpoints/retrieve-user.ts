@@ -6,8 +6,8 @@ export const retrieveUserEndpoint = taggedEndpointsFactory
   .addMiddleware(methodProviderMiddleware)
   .build({
     method: "get",
+    tag: "users",
     description: "example user retrieval endpoint",
-    tags: ["users"],
     input: z.object({
       id: z
         .string()

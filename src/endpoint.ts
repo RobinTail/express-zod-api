@@ -61,9 +61,9 @@ type EndpointProps<
   handler: Handler<z.output<IN>, z.input<OUT>, OPT>;
   resultHandler: ResultHandlerDefinition<POS, NEG>;
   description?: string;
-  scopes?: SCO[];
-  tags?: TAG[];
-} & MethodsDefinition<M>;
+} & ({ scopes?: SCO[] } | { scope?: SCO }) &
+  ({ tags?: TAG[] } | { tag?: TAG }) &
+  MethodsDefinition<M>;
 
 export class Endpoint<
   IN extends IOSchema,
@@ -83,8 +83,8 @@ export class Endpoint<
   protected readonly outputSchema: OUT;
   protected readonly handler: Handler<z.output<IN>, z.input<OUT>, OPT>;
   protected readonly resultHandler: ResultHandlerDefinition<POS, NEG>;
-  protected readonly scopes?: SCO[];
-  protected readonly tags?: TAG[];
+  protected readonly scopes: SCO[];
+  protected readonly tags: TAG[];
 
   constructor({
     middlewares,
@@ -94,8 +94,6 @@ export class Endpoint<
     resultHandler,
     description,
     mimeTypes,
-    scopes,
-    tags,
     ...rest
   }: EndpointProps<IN, OUT, OPT, M, POS, NEG, SCO, TAG>) {
     super();
@@ -106,8 +104,20 @@ export class Endpoint<
     this.handler = handler;
     this.resultHandler = resultHandler;
     this.description = description;
-    this.scopes = scopes;
-    this.tags = tags;
+    this.scopes = [];
+    this.tags = [];
+    if ("scopes" in rest && rest.scopes) {
+      this.scopes.push(...rest.scopes);
+    }
+    if ("scope" in rest && rest.scope) {
+      this.scopes.push(rest.scope);
+    }
+    if ("tags" in rest && rest.tags) {
+      this.tags.push(...rest.tags);
+    }
+    if ("tag" in rest && rest.tag) {
+      this.tags.push(rest.tag);
+    }
     if ("methods" in rest) {
       this.methods = rest.methods;
     } else {
@@ -160,11 +170,11 @@ export class Endpoint<
   }
 
   public override getScopes(): SCO[] {
-    return this.scopes || [];
+    return this.scopes;
   }
 
   public override getTags(): TAG[] {
-    return this.tags || [];
+    return this.tags;
   }
 
   #getDefaultCorsHeaders(): Record<string, string> {

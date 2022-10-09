@@ -4,7 +4,7 @@ import { taggedEndpointsFactory } from "../factories";
 
 export const uploadAvatarEndpoint = taggedEndpointsFactory.build({
   method: "post",
-  tags: ["files"],
+  tag: "files",
   input: z
     .object({
       avatar: z
