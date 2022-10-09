@@ -151,7 +151,6 @@ export class EndpointsFactory<
   public build<BIN extends IOSchema, BOUT extends IOSchema, M extends Method>({
     input,
     handler,
-    description,
     output: outputSchema,
     ...rest
   }: BuildProps<BIN, BOUT, IN, OUT, M, SCO, TAG>): Endpoint<
@@ -167,7 +166,6 @@ export class EndpointsFactory<
     const { middlewares, resultHandler } = this;
     return new Endpoint({
       handler,
-      description,
       middlewares,
       outputSchema,
       resultHandler,
