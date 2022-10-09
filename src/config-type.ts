@@ -68,7 +68,7 @@ type HeadersProvider = (params: {
 
 export type TagsConfig<TAG extends string> = Record<
   TAG,
-  string | { description: string; url: string }
+  string | { description: string; url?: string }
 >;
 
 export interface CommonConfig<TAG extends string = string> {
