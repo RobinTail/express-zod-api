@@ -2,6 +2,11 @@
 
 ## Version 8
 
+### v8.0.2
+
+- `express` version is 4.18.2.
+- `openapi3-ts` version is 3.1.0.
+
 ### v8.0.1
 
 - `zod` version is 3.19.1.
