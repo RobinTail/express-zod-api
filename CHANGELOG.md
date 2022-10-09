@@ -2,6 +2,15 @@
 
 ## Version 8
 
+### v8.1.0
+
+- Feature #571: tagging the endpoints.
+  - _ability to tag the endpoints_
+  - _singular and plural props_
+  - _enforcing constraints_
+  - _new config option_
+- _singular variation of the scope prop_
+
 ### v8.0.2
 
 - `express` version is 4.18.2.
