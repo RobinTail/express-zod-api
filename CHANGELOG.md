@@ -39,7 +39,7 @@ const taggedEndpointsFactory = new EndpointsFactory({
   config,
 });
 
-const retrieveUserEndpoint = taggedEndpointsFactory.build({
+const exampleEndpoint = taggedEndpointsFactory.build({
   // ...
   tag: "users", // or tags: ["users", "files"]
 });
