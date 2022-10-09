@@ -71,6 +71,7 @@ export class EndpointsFactory<
   }
 
   // @todo consider no arguments fn with a type param
+  // @todo consider keeping the tags in Config along with their descriptions
   public allowTags<ATAG extends string>({}:
     | ATAG[]
     | Readonly<[ATAG, ...ATAG[]]>) {
