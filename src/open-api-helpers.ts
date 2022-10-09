@@ -10,6 +10,7 @@ import {
   ResponseObject,
   SecurityRequirementObject,
   SecuritySchemeObject,
+  TagObject,
 } from "openapi3-ts";
 import { omit } from "ramda";
 import { z } from "zod";
@@ -20,7 +21,7 @@ import {
   IOSchema,
   routePathParamsRegex,
 } from "./common-helpers";
-import { InputSources } from "./config-type";
+import { InputSources, TagsConfig } from "./config-type";
 import { isoDateRegex, ZodDateIn, ZodDateInDef } from "./date-in-schema";
 import { ZodDateOut, ZodDateOutDef } from "./date-out-schema";
 import { AbstractEndpoint } from "./endpoint";
@@ -858,3 +859,17 @@ export const depictRequest = ({
     ),
   };
 };
+
+export const depictTags = <TAG extends string>(
+  tags: TagsConfig<TAG>
+): TagObject[] =>
+  (Object.keys(tags) as TAG[]).map((tag) => {
+    const def = tags[tag];
+    return {
+      name: tag,
+      description: typeof def === "string" ? def : def.description,
+      ...(typeof def === "object" && def.url
+        ? { externalDocs: { url: def.url } }
+        : {}),
+    };
+  });

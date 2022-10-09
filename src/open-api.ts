@@ -15,6 +15,7 @@ import {
   reformatParamsInPath,
   depictSecurity,
   depictSecurityRefs,
+  depictTags,
 } from "./open-api-helpers";
 import { Routing, routingCycle, RoutingCycleParams } from "./routing";
 
@@ -125,18 +126,8 @@ export class OpenAPI extends OpenApiBuilder {
       });
     };
     routingCycle({ routing, endpointCb });
-    // @todo extract this to a helper
     if (config.tags) {
-      for (const tag in config.tags) {
-        const def = config.tags[tag];
-        this.addTag({
-          name: tag,
-          description: typeof def === "string" ? def : def.description,
-          ...(typeof def === "object" && def.url
-            ? { externalDocs: { url: def.url } }
-            : {}),
-        });
-      }
+      this.rootDoc.tags = depictTags(config.tags);
     }
   }
 }

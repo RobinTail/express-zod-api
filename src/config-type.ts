@@ -66,7 +66,7 @@ type HeadersProvider = (params: {
   logger: Logger;
 }) => Headers | Promise<Headers>;
 
-type TagsConfig<TAG extends string> = Record<
+export type TagsConfig<TAG extends string> = Record<
   TAG,
   string | { description: string; url: string }
 >;
