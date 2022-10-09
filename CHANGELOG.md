@@ -11,6 +11,37 @@
   - _new config option_
 - _singular variation of the scope prop_
 
+```typescript
+import {
+  createConfig,
+  EndpointsFactory,
+  defaultResultHandler,
+} from "express-zod-api";
+
+const config = createConfig({
+  // ...
+  tags: {
+    // use simple or advanced syntax:
+    users: "Everything about the users",
+    files: {
+      description: "Everything about the files processing",
+      url: "https://example.com",
+    },
+  },
+});
+
+// instead of defaultEndpointsFactory use the following approach:
+const taggedEndpointsFactory = new EndpointsFactory({
+  resultHandler: defaultResultHandler,
+  config,
+});
+
+const retrieveUserEndpoint = taggedEndpointsFactory.build({
+  // ...
+  tag: "users", // or tags: ["users", "files"]
+});
+```
+
 ### v8.0.2
 
 - `express` version is 4.18.2.
