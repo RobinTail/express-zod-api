@@ -19,9 +19,8 @@ import {
 } from "express-zod-api";
 
 const config = createConfig({
-  // ...
+  // ..., use the simple or the advanced syntax:
   tags: {
-    // use simple or advanced syntax:
     users: "Everything about the users",
     files: {
       description: "Everything about the files processing",
@@ -32,7 +31,7 @@ const config = createConfig({
 
 // instead of defaultEndpointsFactory use the following approach:
 const taggedEndpointsFactory = new EndpointsFactory({
-  resultHandler: defaultResultHandler,
+  resultHandler: defaultResultHandler, // or use your custom one
   config,
 });
 
