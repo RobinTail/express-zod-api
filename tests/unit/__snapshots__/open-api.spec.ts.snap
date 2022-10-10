@@ -1747,8 +1747,8 @@ paths:
                     status: error
                     error:
                       message: Sample error message
-      description: example user retrieval endpoint
-      summary: retrieves the user
+      description: Example user retrieval endpoint.
+      summary: Retrieves the user.
       tags:
         - users
       parameters:
@@ -1898,7 +1898,7 @@ paths:
             text/plain:
               schema:
                 type: string
-      summary: sends a file content
+      summary: Sends a file content.
       tags:
         - files
         - users
@@ -1926,7 +1926,7 @@ paths:
             text/plain:
               schema:
                 type: string
-      summary: streams a file content
+      summary: Streams a file content.
       tags:
         - users
         - files
@@ -2009,8 +2009,8 @@ paths:
                     status: error
                     error:
                       message: Sample error message
-      description: handles a file upload
-      summary: handles a file upload
+      description: Handles a file upload.
+      summary: Handles a file upload.
       tags:
         - files
       requestBody:
