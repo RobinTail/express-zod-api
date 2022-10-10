@@ -812,13 +812,15 @@ const yamlString = new OpenAPI({
 }).getSpecAsYaml();
 ```
 
-You can add descriptions and examples to any I/O schema or its properties, and they will be included into the generated
-documentation of your API. Consider the following example:
+You can add descriptions and examples to your endpoints, their I/O schemas and their properties. It will be included
+into the generated documentation of your API. Consider the following example:
 
 ```typescript
 import { defaultEndpointsFactory, withMeta } from "express-zod-api";
 
 const exampleEndpoint = defaultEndpointsFactory.build({
+  shortDescription: "Retrieves the user.", // <—— this becomes the summary line
+  description: "The detailed explanaition on what this endpoint does.",
   input: withMeta(
     z.object({
       id: z.number().describe("the ID of the user"),
@@ -826,7 +828,7 @@ const exampleEndpoint = defaultEndpointsFactory.build({
   ).example({
     id: 123,
   }),
-  // ..., // similarly for output and middlewares
+  // ..., similarly for output and middlewares
 });
 ```
 
