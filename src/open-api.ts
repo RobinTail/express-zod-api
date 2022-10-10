@@ -98,7 +98,7 @@ export class OpenAPI extends OpenApiBuilder {
       };
       if (longDesc) {
         operation.description = longDesc;
-        if (hasSummaryFromDescription) {
+        if (hasSummaryFromDescription && shortDesc === undefined) {
           operation.summary = ensureShortDescription(longDesc);
         }
       }
