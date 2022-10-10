@@ -73,6 +73,9 @@ export class OpenAPI extends OpenApiBuilder {
     ) => {
       const method = _method as Method;
       const commonParams = { path, method, endpoint };
+      const [shortDesc, longDesc] = (["short", "long"] as const).map(
+        endpoint.getDescription.bind(endpoint)
+      );
       const inputSources =
         config.inputSources?.[method] || defaultInputSources[method];
       const depictedParams = depictRequestParams({
@@ -93,18 +96,14 @@ export class OpenAPI extends OpenApiBuilder {
           }),
         },
       };
-      if (endpoint.getDescription("long")) {
-        operation.description = endpoint.getDescription("long");
+      if (longDesc) {
+        operation.description = longDesc;
         if (hasSummaryFromDescription) {
-          operation.summary = ensureShortDescription(
-            endpoint.getDescription("long")!
-          );
+          operation.summary = ensureShortDescription(longDesc);
         }
       }
-      if (endpoint.getDescription("short")) {
-        operation.summary = ensureShortDescription(
-          endpoint.getDescription("short")!
-        );
+      if (shortDesc) {
+        operation.summary = ensureShortDescription(shortDesc);
       }
       if (endpoint.getTags().length > 0) {
         operation.tags = endpoint.getTags();
