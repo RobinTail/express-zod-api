@@ -26,8 +26,12 @@ interface GeneratorParams {
   serverUrl: string;
   routing: Routing;
   config: CommonConfig;
+  /** @default Successful response */
   successfulResponseDescription?: string;
+  /** @default Error response */
   errorResponseDescription?: string;
+  /** @default true */
+  hasSummaryFromDescription?: boolean;
 }
 
 export class OpenAPI extends OpenApiBuilder {
@@ -58,6 +62,7 @@ export class OpenAPI extends OpenApiBuilder {
     serverUrl,
     successfulResponseDescription = "Successful response",
     errorResponseDescription = "Error response",
+    hasSummaryFromDescription = true,
   }: GeneratorParams) {
     super();
     this.addInfo({ title, version }).addServer({ url: serverUrl });
@@ -90,9 +95,11 @@ export class OpenAPI extends OpenApiBuilder {
       };
       if (endpoint.getDescription("long")) {
         operation.description = endpoint.getDescription("long");
-        operation.summary = ensureShortDescription(
-          endpoint.getDescription("short") || endpoint.getDescription("long")!
-        );
+        if (hasSummaryFromDescription) {
+          operation.summary = ensureShortDescription(
+            endpoint.getDescription("long")!
+          );
+        }
       }
       if (endpoint.getDescription("short")) {
         operation.summary = ensureShortDescription(
