@@ -3824,10 +3824,10 @@ onetime@^5.1.2:
   dependencies:
     mimic-fn "^2.1.0"
 
-openapi3-ts@3.1.0:
-  version "3.1.0"
-  resolved "https://registry.yarnpkg.com/openapi3-ts/-/openapi3-ts-3.1.0.tgz#da13bc6f4b41c14ae5c19ef2dcf3b35769ff10da"
-  integrity sha512-1qKTvCCVoV0rkwUh1zq5o8QyghmwYPuhdvtjv1rFjuOnJToXhQyF8eGjNETQ8QmGjr9Jz/tkAKLITIl2s7dw3A==
+openapi3-ts@3.1.1:
+  version "3.1.1"
+  resolved "https://registry.yarnpkg.com/openapi3-ts/-/openapi3-ts-3.1.1.tgz#6e5ffa44a9b47098c8b0a1c58794875bd7a6d967"
+  integrity sha512-lNUS87ncFqm1m8W21sbTGIeD7sydkQ4nnRUrkBiGlAzTngr50eBKU2suUXhdEk51z6m4cCgaXdB1SFgXtyn81Q==
   dependencies:
     yaml "^2.1.3"
 
