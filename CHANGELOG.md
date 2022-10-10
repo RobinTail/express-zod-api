@@ -2,6 +2,25 @@
 
 ## Version 8
 
+### v8.2.0
+
+- Feature #637: endpoint short description (summary).
+  - Added the ability to assign a `shortDescription` to endpoints.
+  - One sentence of no more than 50 characters is implied.
+  - This text is substituted into the `summary` property of the generated documentation.
+  - Visualizers of the generated OpenAPI documentation nicely display this text on the same line as the endpoint path.
+  - If a `shortDescription` is not specified, but a regular `description` is, then by default the `summary` will be
+    generated from the `description` by trimming.
+  - You can optionally disable this behavior with the new option `hasSummaryFromDescription` of the `OpenAPI` generator.
+
+```typescript
+const exampleEndpoint = yourEndpointsFactory.build({
+  // ...
+  description: "The detailed explanaition on what this endpoint does.",
+  shortDescription: "Retrieves the user.",
+});
+```
+
 ### v8.1.0
 
 - Feature #571: tagging the endpoints.
