@@ -230,18 +230,6 @@ export function hasUpload(schema: z.ZodTypeAny): boolean {
 }
 
 export const ensureShortDescription = (description: string) => {
-  const hasLetters = /^\w+/.test(description);
-  const hasSpaces = /\s/.test(description);
-  if (hasLetters && hasSpaces) {
-    const hasWords = /\w+\s+\w+/.test(description);
-    const hasSentences = /\./.test(description);
-    if (hasWords && hasSentences) {
-      const firstDot = description.indexOf(".");
-      if (firstDot >= 0 && firstDot < shortDescriptionLimit) {
-        return description.slice(0, firstDot + 1);
-      }
-    }
-  }
   if (description.length <= shortDescriptionLimit) {
     return description;
   }

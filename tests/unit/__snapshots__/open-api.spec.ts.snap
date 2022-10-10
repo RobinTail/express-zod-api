@@ -1828,7 +1828,7 @@ paths:
                     error:
                       message: Sample error message
       description: Changes the user record. Example user update endpoint.
-      summary: Changes the user record.
+      summary: Changes the user record. Example user update endp…
       tags:
         - users
       parameters:
