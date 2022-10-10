@@ -139,8 +139,6 @@ export class OpenAPI extends OpenApiBuilder {
       });
     };
     routingCycle({ routing, endpointCb });
-    // @todo make this conditional when going to support OpenAPI 3.1.0
-    delete this.rootDoc.webhooks;
     this.rootDoc.tags = config.tags ? depictTags(config.tags) : [];
   }
 }
