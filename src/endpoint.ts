@@ -76,8 +76,7 @@ export class Endpoint<
   SCO extends string,
   TAG extends string
 > extends AbstractEndpoint {
-  protected readonly description?: string;
-  protected readonly shortDescription?: string;
+  protected readonly descriptions: Record<"short" | "long", string | undefined>;
   protected readonly methods: M[] = [];
   protected readonly middlewares: AnyMiddlewareDef[] = [];
   protected readonly inputSchema: IN;
@@ -106,8 +105,7 @@ export class Endpoint<
     this.outputSchema = outputSchema;
     this.handler = handler;
     this.resultHandler = resultHandler;
-    this.description = description;
-    this.shortDescription = shortDescription;
+    this.descriptions = { long: description, short: shortDescription };
     this.scopes = [];
     this.tags = [];
     if ("scopes" in rest && rest.scopes) {
@@ -130,7 +128,7 @@ export class Endpoint<
   }
 
   public override getDescription(variant: "short" | "long") {
-    return variant === "short" ? this.shortDescription : this.description;
+    return this.descriptions[variant];
   }
 
   public override getMethods(): M[] {
