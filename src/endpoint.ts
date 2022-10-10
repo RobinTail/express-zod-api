@@ -5,7 +5,6 @@ import { ApiResponse } from "./api-response";
 import { CommonConfig } from "./config-type";
 import { ResultHandlerError } from "./errors";
 import {
-  ensureShortDescription,
   FlatObject,
   getActualMethod,
   getInitialInput,
@@ -31,8 +30,7 @@ export abstract class AbstractEndpoint {
     logger: Logger;
     config: CommonConfig;
   }): Promise<void>;
-  public abstract getDescription(): string | undefined;
-  public abstract getShortDescription(): string | undefined;
+  public abstract getDescription(variant: "short" | "long"): string | undefined;
   public abstract getMethods(): Method[];
   public abstract getInputSchema(): IOSchema;
   public abstract getOutputSchema(): IOSchema;
@@ -109,11 +107,7 @@ export class Endpoint<
     this.handler = handler;
     this.resultHandler = resultHandler;
     this.description = description;
-    this.shortDescription = shortDescription
-      ? ensureShortDescription(shortDescription)
-      : description
-      ? ensureShortDescription(description)
-      : undefined;
+    this.shortDescription = shortDescription;
     this.scopes = [];
     this.tags = [];
     if ("scopes" in rest && rest.scopes) {
@@ -135,12 +129,8 @@ export class Endpoint<
     }
   }
 
-  public override getDescription() {
-    return this.description;
-  }
-
-  public override getShortDescription() {
-    return this.shortDescription;
+  public override getDescription(variant: "short" | "long") {
+    return variant === "short" ? this.shortDescription : this.description;
   }
 
   public override getMethods(): M[] {

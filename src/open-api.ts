@@ -16,6 +16,7 @@ import {
   depictSecurity,
   depictSecurityRefs,
   depictTags,
+  ensureShortDescription,
 } from "./open-api-helpers";
 import { Routing, routingCycle, RoutingCycleParams } from "./routing";
 
@@ -87,11 +88,16 @@ export class OpenAPI extends OpenApiBuilder {
           }),
         },
       };
-      if (endpoint.getDescription()) {
-        operation.description = endpoint.getDescription();
+      if (endpoint.getDescription("long")) {
+        operation.description = endpoint.getDescription("long");
+        operation.summary = ensureShortDescription(
+          endpoint.getDescription("short") || endpoint.getDescription("long")!
+        );
       }
-      if (endpoint.getShortDescription()) {
-        operation.summary = endpoint.getShortDescription();
+      if (endpoint.getDescription("short")) {
+        operation.summary = ensureShortDescription(
+          endpoint.getDescription("short")!
+        );
       }
       if (endpoint.getTags().length > 0) {
         operation.tags = endpoint.getTags();
