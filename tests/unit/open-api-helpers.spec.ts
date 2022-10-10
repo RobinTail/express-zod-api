@@ -41,6 +41,7 @@ import {
   depictSecurityRefs,
   depictZodBranded,
   depictTags,
+  ensureShortDescription,
 } from "../../src/open-api-helpers";
 import { serializeSchemaForTest } from "../helpers";
 
@@ -1013,6 +1014,23 @@ describe("Open API helpers", () => {
           },
         })
       ).toMatchSnapshot();
+    });
+  });
+
+  describe("ensureShortDescription()", () => {
+    test("keeps the short text as it is", () => {
+      expect(ensureShortDescription("here is a short text")).toBe(
+        "here is a short text"
+      );
+      expect(ensureShortDescription(" ")).toBe(" ");
+      expect(ensureShortDescription("")).toBe("");
+    });
+    test("trims the long text", () => {
+      expect(
+        ensureShortDescription(
+          "this text is definitely too long for the short description"
+        )
+      ).toBe("this text is definitely too long for the short de…");
     });
   });
 });

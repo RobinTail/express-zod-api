@@ -30,7 +30,7 @@ export abstract class AbstractEndpoint {
     logger: Logger;
     config: CommonConfig;
   }): Promise<void>;
-  public abstract getDescription(): string | undefined;
+  public abstract getDescription(variant: "short" | "long"): string | undefined;
   public abstract getMethods(): Method[];
   public abstract getInputSchema(): IOSchema;
   public abstract getOutputSchema(): IOSchema;
@@ -61,6 +61,7 @@ type EndpointProps<
   handler: Handler<z.output<IN>, z.input<OUT>, OPT>;
   resultHandler: ResultHandlerDefinition<POS, NEG>;
   description?: string;
+  shortDescription?: string;
 } & ({ scopes?: SCO[] } | { scope?: SCO }) &
   ({ tags?: TAG[] } | { tag?: TAG }) &
   MethodsDefinition<M>;
@@ -75,7 +76,7 @@ export class Endpoint<
   SCO extends string,
   TAG extends string
 > extends AbstractEndpoint {
-  protected readonly description?: string;
+  protected readonly descriptions: Record<"short" | "long", string | undefined>;
   protected readonly methods: M[] = [];
   protected readonly middlewares: AnyMiddlewareDef[] = [];
   protected readonly inputSchema: IN;
@@ -93,6 +94,7 @@ export class Endpoint<
     handler,
     resultHandler,
     description,
+    shortDescription,
     mimeTypes,
     ...rest
   }: EndpointProps<IN, OUT, OPT, M, POS, NEG, SCO, TAG>) {
@@ -103,7 +105,7 @@ export class Endpoint<
     this.outputSchema = outputSchema;
     this.handler = handler;
     this.resultHandler = resultHandler;
-    this.description = description;
+    this.descriptions = { long: description, short: shortDescription };
     this.scopes = [];
     this.tags = [];
     if ("scopes" in rest && rest.scopes) {
@@ -125,8 +127,8 @@ export class Endpoint<
     }
   }
 
-  public override getDescription() {
-    return this.description;
+  public override getDescription(variant: "short" | "long") {
+    return this.descriptions[variant];
   }
 
   public override getMethods(): M[] {

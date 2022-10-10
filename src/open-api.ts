@@ -16,6 +16,7 @@ import {
   depictSecurity,
   depictSecurityRefs,
   depictTags,
+  ensureShortDescription,
 } from "./open-api-helpers";
 import { Routing, routingCycle, RoutingCycleParams } from "./routing";
 
@@ -25,8 +26,12 @@ interface GeneratorParams {
   serverUrl: string;
   routing: Routing;
   config: CommonConfig;
+  /** @default Successful response */
   successfulResponseDescription?: string;
+  /** @default Error response */
   errorResponseDescription?: string;
+  /** @default true */
+  hasSummaryFromDescription?: boolean;
 }
 
 export class OpenAPI extends OpenApiBuilder {
@@ -57,6 +62,7 @@ export class OpenAPI extends OpenApiBuilder {
     serverUrl,
     successfulResponseDescription = "Successful response",
     errorResponseDescription = "Error response",
+    hasSummaryFromDescription = true,
   }: GeneratorParams) {
     super();
     this.addInfo({ title, version }).addServer({ url: serverUrl });
@@ -67,6 +73,9 @@ export class OpenAPI extends OpenApiBuilder {
     ) => {
       const method = _method as Method;
       const commonParams = { path, method, endpoint };
+      const [shortDesc, longDesc] = (["short", "long"] as const).map(
+        endpoint.getDescription.bind(endpoint)
+      );
       const inputSources =
         config.inputSources?.[method] || defaultInputSources[method];
       const depictedParams = depictRequestParams({
@@ -87,8 +96,14 @@ export class OpenAPI extends OpenApiBuilder {
           }),
         },
       };
-      if (endpoint.getDescription()) {
-        operation.description = endpoint.getDescription();
+      if (longDesc) {
+        operation.description = longDesc;
+        if (hasSummaryFromDescription && shortDesc === undefined) {
+          operation.summary = ensureShortDescription(longDesc);
+        }
+      }
+      if (shortDesc) {
+        operation.summary = ensureShortDescription(shortDesc);
       }
       if (endpoint.getTags().length > 0) {
         operation.tags = endpoint.getTags();

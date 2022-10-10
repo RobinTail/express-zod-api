@@ -3,11 +3,11 @@ import {
   ExampleObject,
   ExamplesObject,
   MediaTypeObject,
-  ParameterObject,
-  SchemaObject,
   OAuthFlowsObject,
+  ParameterObject,
   RequestBodyObject,
   ResponseObject,
+  SchemaObject,
   SecurityRequirementObject,
   SecuritySchemeObject,
   TagObject,
@@ -62,6 +62,7 @@ interface ReqResDepictHelperCommonProps {
   endpoint: AbstractEndpoint;
 }
 
+const shortDescriptionLimit = 50;
 const isoDateDocumentationUrl =
   "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString";
 
@@ -873,3 +874,10 @@ export const depictTags = <TAG extends string>(
         : {}),
     };
   });
+
+export const ensureShortDescription = (description: string) => {
+  if (description.length <= shortDescriptionLimit) {
+    return description;
+  }
+  return description.slice(0, shortDescriptionLimit - 1) + "…";
+};
