@@ -5,16 +5,16 @@ name: Node.js CI
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, v7 ]
   pull_request:
-    branches: [ master ]
+    branches: [ master, v7 ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [12.x, 14.x, 16.x, 17.x, 18.x]
+        node-version: [14.17.0, 14.x, 16.10.0, 16.x, 18.0.0, 18.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
     steps:
     - name: Get yarn cache dir
@@ -41,7 +41,7 @@ jobs:
         yarn test
         yarn build
     - name: Coveralls
-      uses: coverallsapp/github-action@master
+      uses: coverallsapp/github-action@1.1.3
       continue-on-error: true
       with:
         github-token: ${{ secrets.github_token }}
@@ -61,7 +61,7 @@ jobs:
     steps:
       - name: Coveralls Finished
         continue-on-error: true
-        uses: coverallsapp/github-action@master
+        uses: coverallsapp/github-action@1.1.3
         with:
           github-token: ${{ secrets.github_token }}
           parallel-finished: true

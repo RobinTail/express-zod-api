@@ -1,11 +1,14 @@
-import { z, createHttpError, defaultEndpointsFactory } from "../../src";
+import { z, createHttpError } from "../../src";
+import { taggedEndpointsFactory } from "../factories";
 import { methodProviderMiddleware } from "../middlewares";
 
-export const retrieveUserEndpoint = defaultEndpointsFactory
+export const retrieveUserEndpoint = taggedEndpointsFactory
   .addMiddleware(methodProviderMiddleware)
   .build({
     method: "get",
-    description: "example user retrieval endpoint",
+    tag: "users",
+    shortDescription: "Retrieves the user.",
+    description: "Example user retrieval endpoint.",
     input: z.object({
       id: z
         .string()

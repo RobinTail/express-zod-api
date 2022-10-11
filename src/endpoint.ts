@@ -9,6 +9,7 @@ import {
   getActualMethod,
   getInitialInput,
   IOSchema,
+  makeErrorFromAnything,
 } from "./common-helpers";
 import { combineContainers, LogicalContainer } from "./logical-container";
 import { AuxMethod, Method, MethodsDefinition } from "./method";
@@ -29,7 +30,7 @@ export abstract class AbstractEndpoint {
     logger: Logger;
     config: CommonConfig;
   }): Promise<void>;
-  public abstract getDescription(): string | undefined;
+  public abstract getDescription(variant: "short" | "long"): string | undefined;
   public abstract getMethods(): Method[];
   public abstract getInputSchema(): IOSchema;
   public abstract getOutputSchema(): IOSchema;
@@ -40,6 +41,7 @@ export abstract class AbstractEndpoint {
   public abstract getNegativeMimeTypes(): string[];
   public abstract getSecurity(): LogicalContainer<Security>;
   public abstract getScopes(): string[];
+  public abstract getTags(): string[];
 }
 
 type EndpointProps<
@@ -49,7 +51,8 @@ type EndpointProps<
   M extends Method,
   POS extends ApiResponse,
   NEG extends ApiResponse,
-  SCO extends string
+  SCO extends string,
+  TAG extends string
 > = {
   middlewares: AnyMiddlewareDef[];
   inputSchema: IN;
@@ -58,8 +61,10 @@ type EndpointProps<
   handler: Handler<z.output<IN>, z.input<OUT>, OPT>;
   resultHandler: ResultHandlerDefinition<POS, NEG>;
   description?: string;
-  scopes?: SCO[];
-} & MethodsDefinition<M>;
+  shortDescription?: string;
+} & ({ scopes?: SCO[] } | { scope?: SCO }) &
+  ({ tags?: TAG[] } | { tag?: TAG }) &
+  MethodsDefinition<M>;
 
 export class Endpoint<
   IN extends IOSchema,
@@ -68,9 +73,10 @@ export class Endpoint<
   M extends Method,
   POS extends ApiResponse,
   NEG extends ApiResponse,
-  SCO extends string
+  SCO extends string,
+  TAG extends string
 > extends AbstractEndpoint {
-  protected readonly description?: string;
+  protected readonly descriptions: Record<"short" | "long", string | undefined>;
   protected readonly methods: M[] = [];
   protected readonly middlewares: AnyMiddlewareDef[] = [];
   protected readonly inputSchema: IN;
@@ -78,7 +84,8 @@ export class Endpoint<
   protected readonly outputSchema: OUT;
   protected readonly handler: Handler<z.output<IN>, z.input<OUT>, OPT>;
   protected readonly resultHandler: ResultHandlerDefinition<POS, NEG>;
-  protected readonly scopes?: SCO[];
+  protected readonly scopes: SCO[];
+  protected readonly tags: TAG[];
 
   constructor({
     middlewares,
@@ -87,10 +94,10 @@ export class Endpoint<
     handler,
     resultHandler,
     description,
+    shortDescription,
     mimeTypes,
-    scopes,
     ...rest
-  }: EndpointProps<IN, OUT, OPT, M, POS, NEG, SCO>) {
+  }: EndpointProps<IN, OUT, OPT, M, POS, NEG, SCO, TAG>) {
     super();
     this.middlewares = middlewares;
     this.inputSchema = inputSchema;
@@ -98,8 +105,21 @@ export class Endpoint<
     this.outputSchema = outputSchema;
     this.handler = handler;
     this.resultHandler = resultHandler;
-    this.description = description;
-    this.scopes = scopes;
+    this.descriptions = { long: description, short: shortDescription };
+    this.scopes = [];
+    this.tags = [];
+    if ("scopes" in rest && rest.scopes) {
+      this.scopes.push(...rest.scopes);
+    }
+    if ("scope" in rest && rest.scope) {
+      this.scopes.push(rest.scope);
+    }
+    if ("tags" in rest && rest.tags) {
+      this.tags.push(...rest.tags);
+    }
+    if ("tag" in rest && rest.tag) {
+      this.tags.push(rest.tag);
+    }
     if ("methods" in rest) {
       this.methods = rest.methods;
     } else {
@@ -107,8 +127,8 @@ export class Endpoint<
     }
   }
 
-  public override getDescription() {
-    return this.description;
+  public override getDescription(variant: "short" | "long") {
+    return this.descriptions[variant];
   }
 
   public override getMethods(): M[] {
@@ -152,7 +172,11 @@ export class Endpoint<
   }
 
   public override getScopes(): SCO[] {
-    return this.scopes || [];
+    return this.scopes;
+  }
+
+  public override getTags(): TAG[] {
+    return this.tags;
   }
 
   #getDefaultCorsHeaders(): Record<string, string> {
@@ -184,7 +208,7 @@ export class Endpoint<
           })),
         ]);
       }
-      throw e;
+      throw makeErrorFromAnything(e);
     }
   }
 
@@ -272,13 +296,11 @@ export class Endpoint<
         input: initialInput,
       });
     } catch (e) {
-      if (e instanceof Error) {
-        lastResortHandler({
-          logger,
-          response,
-          error: new ResultHandlerError(e.message, error),
-        });
-      }
+      lastResortHandler({
+        logger,
+        response,
+        error: new ResultHandlerError(makeErrorFromAnything(e).message, error),
+      });
     }
   }
 
@@ -330,9 +352,7 @@ export class Endpoint<
         await this.#parseAndRunHandler({ input, options, logger })
       );
     } catch (e) {
-      if (e instanceof Error) {
-        error = e;
-      }
+      error = makeErrorFromAnything(e);
     }
     await this.#handleResult({
       initialInput,

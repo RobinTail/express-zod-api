@@ -4,7 +4,8 @@ import { keyAndTokenAuthenticatedEndpointsFactory } from "../factories";
 export const updateUserEndpoint =
   keyAndTokenAuthenticatedEndpointsFactory.build({
     method: "post",
-    description: "example user update endpoint",
+    tag: "users",
+    description: "Changes the user record. Example user update endpoint.",
     input: withMeta(
       z.object({
         // id is the route path param of /v1/user/:id

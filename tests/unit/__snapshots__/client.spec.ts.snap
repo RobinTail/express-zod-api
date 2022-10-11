@@ -7,13 +7,13 @@ exports[`API Client Generator Should generate a client for example API 1`] = `
 };
 
 type GetV1UserRetrieveResponse = {
-    status: \\"success\\";
+    status: "success";
     data: {
         id: number;
         name: string;
     };
 } | {
-    status: \\"error\\";
+    status: "error";
     error: {
         message: string;
     };
@@ -28,13 +28,13 @@ type PostV1UserIdInput = {
 };
 
 type PostV1UserIdResponse = {
-    status: \\"success\\";
+    status: "success";
     data: {
         name: string;
         createdAt: string;
     };
 } | {
-    status: \\"error\\";
+    status: "error";
     error: {
         message: string;
     };
@@ -57,7 +57,7 @@ type PostV1AvatarUploadInput = {
 };
 
 type PostV1AvatarUploadResponse = {
-    status: \\"success\\";
+    status: "success";
     data: {
         name: string;
         size: number;
@@ -68,35 +68,35 @@ type PostV1AvatarUploadResponse = {
         };
     };
 } | {
-    status: \\"error\\";
+    status: "error";
     error: {
         message: string;
     };
 };
 
-export type Path = \\"/v1/user/retrieve\\" | \\"/v1/user/:id\\" | \\"/v1/avatar/send\\" | \\"/v1/avatar/stream\\" | \\"/v1/avatar/upload\\";
+export type Path = "/v1/user/retrieve" | "/v1/user/:id" | "/v1/avatar/send" | "/v1/avatar/stream" | "/v1/avatar/upload";
 
-export type Method = \\"get\\" | \\"post\\" | \\"put\\" | \\"delete\\" | \\"patch\\";
+export type Method = "get" | "post" | "put" | "delete" | "patch";
 
 export type MethodPath = \`\${Method} \${Path}\`;
 
 export interface Input extends Record<MethodPath, any> {
-    \\"get /v1/user/retrieve\\": GetV1UserRetrieveInput;
-    \\"post /v1/user/:id\\": PostV1UserIdInput;
-    \\"get /v1/avatar/send\\": GetV1AvatarSendInput;
-    \\"get /v1/avatar/stream\\": GetV1AvatarStreamInput;
-    \\"post /v1/avatar/upload\\": PostV1AvatarUploadInput;
+    "get /v1/user/retrieve": GetV1UserRetrieveInput;
+    "post /v1/user/:id": PostV1UserIdInput;
+    "get /v1/avatar/send": GetV1AvatarSendInput;
+    "get /v1/avatar/stream": GetV1AvatarStreamInput;
+    "post /v1/avatar/upload": PostV1AvatarUploadInput;
 }
 
 export interface Response extends Record<MethodPath, any> {
-    \\"get /v1/user/retrieve\\": GetV1UserRetrieveResponse;
-    \\"post /v1/user/:id\\": PostV1UserIdResponse;
-    \\"get /v1/avatar/send\\": GetV1AvatarSendResponse;
-    \\"get /v1/avatar/stream\\": GetV1AvatarStreamResponse;
-    \\"post /v1/avatar/upload\\": PostV1AvatarUploadResponse;
+    "get /v1/user/retrieve": GetV1UserRetrieveResponse;
+    "post /v1/user/:id": PostV1UserIdResponse;
+    "get /v1/avatar/send": GetV1AvatarSendResponse;
+    "get /v1/avatar/stream": GetV1AvatarStreamResponse;
+    "post /v1/avatar/upload": PostV1AvatarUploadResponse;
 }
 
-export const jsonEndpoints = { \\"get /v1/user/retrieve\\": true, \\"post /v1/user/:id\\": true, \\"post /v1/avatar/upload\\": true };
+export const jsonEndpoints = { "get /v1/user/retrieve": true, "post /v1/user/:id": true, "post /v1/avatar/upload": true };
 
 export type Provider = <M extends Method, P extends Path>(method: M, path: P, params: Input[\`\${M} \${P}\`]) => Promise<Response[\`\${M} \${P}\`]>;
 
@@ -109,12 +109,12 @@ export const exampleImplementation: Implementation = async (
   params
 ) => {
   const searchParams =
-    method === \\"get\\" ? \`?\${new URLSearchParams(params)}\` : \\"\\";
+    method === "get" ? \`?\${new URLSearchParams(params)}\` : "";
   const response = await fetch(\`https://example.com\${path}\${searchParams}\`, {
     method: method.toUpperCase(),
     headers:
-      method === \\"get\\" ? undefined : { \\"Content-Type\\": \\"application/json\\" },
-    body: method === \\"get\\" ? undefined : JSON.stringify(params),
+      method === "get" ? undefined : { "Content-Type": "application/json" },
+    body: method === "get" ? undefined : JSON.stringify(params),
   });
   if (\`\${method} \${path}\` in jsonEndpoints) {
     return response.json();
@@ -123,7 +123,7 @@ export const exampleImplementation: Implementation = async (
 };
 
 const client = new ExpressZodAPIClient(exampleImplementation);
-client.provide(\\"get\\", \\"/v1/user/retrieve\\", { id: \\"10\\" });
+client.provide("get", "/v1/user/retrieve", { id: "10" });
 */
 export class ExpressZodAPIClient {
     constructor(protected readonly implementation: Implementation) { }
@@ -137,32 +137,32 @@ exports[`API Client Generator Should treat optionals the same way as z.infer() 1
 };
 
 type PostV1TestResponse = {
-    status: \\"success\\";
+    status: "success";
     data: {
         similar?: number | undefined;
     };
 } | {
-    status: \\"error\\";
+    status: "error";
     error: {
         message: string;
     };
 };
 
-export type Path = \\"/v1/test\\";
+export type Path = "/v1/test";
 
-export type Method = \\"get\\" | \\"post\\" | \\"put\\" | \\"delete\\" | \\"patch\\";
+export type Method = "get" | "post" | "put" | "delete" | "patch";
 
 export type MethodPath = \`\${Method} \${Path}\`;
 
 export interface Input extends Record<MethodPath, any> {
-    \\"post /v1/test\\": PostV1TestInput;
+    "post /v1/test": PostV1TestInput;
 }
 
 export interface Response extends Record<MethodPath, any> {
-    \\"post /v1/test\\": PostV1TestResponse;
+    "post /v1/test": PostV1TestResponse;
 }
 
-export const jsonEndpoints = { \\"post /v1/test\\": true };
+export const jsonEndpoints = { "post /v1/test": true };
 
 export type Provider = <M extends Method, P extends Path>(method: M, path: P, params: Input[\`\${M} \${P}\`]) => Promise<Response[\`\${M} \${P}\`]>;
 
@@ -175,12 +175,12 @@ export const exampleImplementation: Implementation = async (
   params
 ) => {
   const searchParams =
-    method === \\"get\\" ? \`?\${new URLSearchParams(params)}\` : \\"\\";
+    method === "get" ? \`?\${new URLSearchParams(params)}\` : "";
   const response = await fetch(\`https://example.com\${path}\${searchParams}\`, {
     method: method.toUpperCase(),
     headers:
-      method === \\"get\\" ? undefined : { \\"Content-Type\\": \\"application/json\\" },
-    body: method === \\"get\\" ? undefined : JSON.stringify(params),
+      method === "get" ? undefined : { "Content-Type": "application/json" },
+    body: method === "get" ? undefined : JSON.stringify(params),
   });
   if (\`\${method} \${path}\` in jsonEndpoints) {
     return response.json();
@@ -189,7 +189,7 @@ export const exampleImplementation: Implementation = async (
 };
 
 const client = new ExpressZodAPIClient(exampleImplementation);
-client.provide(\\"get\\", \\"/v1/user/retrieve\\", { id: \\"10\\" });
+client.provide("get", "/v1/user/retrieve", { id: "10" });
 */
 export class ExpressZodAPIClient {
     constructor(protected readonly implementation: Implementation) { }

@@ -3,13 +3,14 @@ import {
   ExampleObject,
   ExamplesObject,
   MediaTypeObject,
-  ParameterObject,
-  SchemaObject,
   OAuthFlowsObject,
+  ParameterObject,
   RequestBodyObject,
   ResponseObject,
+  SchemaObject,
   SecurityRequirementObject,
   SecuritySchemeObject,
+  TagObject,
 } from "openapi3-ts";
 import { omit } from "ramda";
 import { z } from "zod";
@@ -20,7 +21,7 @@ import {
   IOSchema,
   routePathParamsRegex,
 } from "./common-helpers";
-import { InputSources } from "./config-type";
+import { InputSources, TagsConfig } from "./config-type";
 import { isoDateRegex, ZodDateIn, ZodDateInDef } from "./date-in-schema";
 import { ZodDateOut, ZodDateOutDef } from "./date-out-schema";
 import { AbstractEndpoint } from "./endpoint";
@@ -61,6 +62,7 @@ interface ReqResDepictHelperCommonProps {
   endpoint: AbstractEndpoint;
 }
 
+const shortDescriptionLimit = 50;
 const isoDateDocumentationUrl =
   "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString";
 
@@ -392,6 +394,7 @@ export const depictString: DepictHelper<z.ZodString> = ({
   };
 };
 
+/** @todo support exclusive min/max as numbers in case of OpenAPI v3.1.x */
 export const depictNumber: DepictHelper<z.ZodNumber> = ({
   schema,
   initial,
@@ -659,12 +662,12 @@ export const excludeParamsFromDepiction = (
     ? depicted.required.filter((name) => !pathParams.includes(name))
     : undefined;
   const allOf = depicted.allOf
-    ? depicted.allOf.map((entry) =>
+    ? (depicted.allOf as SchemaObject[]).map((entry) =>
         excludeParamsFromDepiction(entry, pathParams)
       )
     : undefined;
   const oneOf = depicted.oneOf
-    ? depicted.oneOf.map((entry) =>
+    ? (depicted.oneOf as SchemaObject[]).map((entry) =>
         excludeParamsFromDepiction(entry, pathParams)
       )
     : undefined;
@@ -856,4 +859,25 @@ export const depictRequest = ({
       {} as ContentObject
     ),
   };
+};
+
+export const depictTags = <TAG extends string>(
+  tags: TagsConfig<TAG>
+): TagObject[] =>
+  (Object.keys(tags) as TAG[]).map((tag) => {
+    const def = tags[tag];
+    return {
+      name: tag,
+      description: typeof def === "string" ? def : def.description,
+      ...(typeof def === "object" && def.url
+        ? { externalDocs: { url: def.url } }
+        : {}),
+    };
+  });
+
+export const ensureShortDescription = (description: string) => {
+  if (description.length <= shortDescriptionLimit) {
+    return description;
+  }
+  return description.slice(0, shortDescriptionLimit - 1) + "…";
 };

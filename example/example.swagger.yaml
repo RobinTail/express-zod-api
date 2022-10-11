@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Example API
-  version: 7.9.0
+  version: 8.2.0
 paths:
   /v1/user/retrieve:
     get:
@@ -62,7 +62,10 @@ paths:
                     status: error
                     error:
                       message: Sample error message
-      description: example user retrieval endpoint
+      description: Example user retrieval endpoint.
+      summary: Retrieves the user.
+      tags:
+        - users
       parameters:
         - name: id
           in: query
@@ -139,7 +142,10 @@ paths:
                     status: error
                     error:
                       message: Sample error message
-      description: example user update endpoint
+      description: Changes the user record. Example user update endpoint.
+      summary: Changes the user record. Example user update endp…
+      tags:
+        - users
       parameters:
         - name: id
           in: path
@@ -207,6 +213,10 @@ paths:
             text/plain:
               schema:
                 type: string
+      summary: Sends a file content.
+      tags:
+        - files
+        - users
       parameters:
         - name: userId
           in: query
@@ -231,6 +241,10 @@ paths:
             text/plain:
               schema:
                 type: string
+      summary: Streams a file content.
+      tags:
+        - users
+        - files
       parameters:
         - name: userId
           in: query
@@ -310,6 +324,10 @@ paths:
                     status: error
                     error:
                       message: Sample error message
+      description: Handles a file upload.
+      summary: Handles a file upload.
+      tags:
+        - files
       requestBody:
         content:
           multipart/form-data:
@@ -340,7 +358,11 @@ components:
       name: token
   links: {}
   callbacks: {}
-tags: []
+tags:
+  - name: users
+    description: Everything about the users
+  - name: files
+    description: Everything about the files processing
 servers:
   - url: http://example.com
 
