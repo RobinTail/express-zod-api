@@ -40,6 +40,8 @@ import {
   depictSecurity,
   depictSecurityRefs,
   depictZodBranded,
+  depictTags,
+  ensureShortDescription,
 } from "../../src/open-api-helpers";
 import { serializeSchemaForTest } from "../helpers";
 
@@ -989,6 +991,46 @@ describe("Open API helpers", () => {
           ],
         })
       ).toMatchSnapshot();
+    });
+  });
+
+  describe("depictTags()", () => {
+    test("should accept plain descriptions", () => {
+      expect(
+        depictTags({
+          users: "Everything about users",
+          files: "Everything about files processing",
+        })
+      ).toMatchSnapshot();
+    });
+
+    test("should accept objects with URLs", () => {
+      expect(
+        depictTags({
+          users: { description: "Everything about users" },
+          files: {
+            description: "Everything about files processing",
+            url: "https://example.com",
+          },
+        })
+      ).toMatchSnapshot();
+    });
+  });
+
+  describe("ensureShortDescription()", () => {
+    test("keeps the short text as it is", () => {
+      expect(ensureShortDescription("here is a short text")).toBe(
+        "here is a short text"
+      );
+      expect(ensureShortDescription(" ")).toBe(" ");
+      expect(ensureShortDescription("")).toBe("");
+    });
+    test("trims the long text", () => {
+      expect(
+        ensureShortDescription(
+          "this text is definitely too long for the short description"
+        )
+      ).toBe("this text is definitely too long for the short de…");
     });
   });
 });

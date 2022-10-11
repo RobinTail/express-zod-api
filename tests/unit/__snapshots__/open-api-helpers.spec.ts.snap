@@ -690,6 +690,35 @@ exports[`Open API helpers depictString() should depict regular ZodString 1`] = `
 }
 `;
 
+exports[`Open API helpers depictTags() should accept objects with URLs 1`] = `
+[
+  {
+    "description": "Everything about users",
+    "name": "users",
+  },
+  {
+    "description": "Everything about files processing",
+    "externalDocs": {
+      "url": "https://example.com",
+    },
+    "name": "files",
+  },
+]
+`;
+
+exports[`Open API helpers depictTags() should accept plain descriptions 1`] = `
+[
+  {
+    "description": "Everything about users",
+    "name": "users",
+  },
+  {
+    "description": "Everything about files processing",
+    "name": "files",
+  },
+]
+`;
+
 exports[`Open API helpers depictTuple() should depict ZodTuple 1`] = `
 {
   "description": "test",

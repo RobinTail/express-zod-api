@@ -2,6 +2,73 @@
 
 ## Version 8
 
+### v8.2.0
+
+- Feature #637: endpoint short description (summary).
+  - Added the ability to assign a `shortDescription` to endpoints.
+  - One sentence of no more than 50 characters is implied.
+  - This text is substituted into the `summary` property of the generated documentation.
+  - Visualizers of the generated OpenAPI documentation nicely display this text on the same line as the endpoint path.
+  - If a `shortDescription` is not specified, but a regular `description` is, then by default the `summary` will be
+    generated from the `description` by trimming.
+  - You can optionally disable this behavior with the new option `hasSummaryFromDescription` of the `OpenAPI` generator.
+
+```typescript
+const exampleEndpoint = yourEndpointsFactory.build({
+  // ...
+  description: "The detailed explanaition on what this endpoint does.",
+  shortDescription: "Retrieves the user.",
+});
+```
+
+### v8.1.0
+
+- Feature #571: tagging the endpoints.
+  - Good news dear community! You can now tag your endpoints using the new properties of the `.build()` method
+    of the `EndpointsFactory`.
+  - For your convenience and for the sake of Semantics, there are singular and plural properties: `tag` and `tags`.
+  - By default, these properties allow any string, so in order to enforce restrictions and achieve the consistency
+    across all endpoints, the possible tags should be declared in the configuration first and also a brand
+    new `EndpointsFactory` instantiation approach is required.
+  - The configuration has got a new `tags` property for declaring possible tags and their descriptions.
+  - Tags are an important part of the generated documentation for the OpenAPI standard.
+- The property `scopes` (introduced in v7.9.0) has got its singular variation `scope`.
+
+```typescript
+import {
+  createConfig,
+  EndpointsFactory,
+  defaultResultHandler,
+} from "express-zod-api";
+
+const config = createConfig({
+  // ..., use the simple or the advanced syntax:
+  tags: {
+    users: "Everything about the users",
+    files: {
+      description: "Everything about the files processing",
+      url: "https://example.com",
+    },
+  },
+});
+
+// instead of defaultEndpointsFactory use the following approach:
+const taggedEndpointsFactory = new EndpointsFactory({
+  resultHandler: defaultResultHandler, // or use your custom one
+  config,
+});
+
+const exampleEndpoint = taggedEndpointsFactory.build({
+  // ...
+  tag: "users", // or tags: ["users", "files"]
+});
+```
+
+### v8.0.2
+
+- `express` version is 4.18.2.
+- `openapi3-ts` version is 3.1.0.
+
 ### v8.0.1
 
 - `zod` version is 3.19.1.
