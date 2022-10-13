@@ -105,11 +105,17 @@ export const depictUpload: DepictHelper<ZodUpload> = ({
 export const depictFile: DepictHelper<ZodFile> = ({
   schema: { isBinary, isBase64 },
   initial,
-}) => ({
-  ...initial,
-  type: "string",
-  format: isBinary ? "binary" : isBase64 ? "byte" : "file",
-});
+  isResponse,
+}) => {
+  if (!isResponse) {
+    throw new OpenAPIError("Please use z.file() only within ResultHandler.");
+  }
+  return {
+    ...initial,
+    type: "string",
+    format: isBinary ? "binary" : isBase64 ? "byte" : "file",
+  };
+};
 
 export const depictUnion: DepictHelper<
   z.ZodUnion<[z.ZodTypeAny, ...z.ZodTypeAny[]]>
