@@ -513,6 +513,40 @@ describe("Endpoint", () => {
       );
     });
 
+    test("silence zod parse error option", async () => {
+      const endpoint = defaultEndpointsFactory.build({
+        method: "post",
+        input: z.object({
+          limit: z.preprocess(
+            (a) => parseInt(z.string().parse(a), 10),
+            z.number().positive().max(100)
+          ),
+        }),
+        output: z.object({
+          test: z.string(),
+          limit: z.number(),
+        }),
+        handler: async ({ input: { limit } }) => ({ test: "OK", limit }),
+      });
+      const { responseMock } = await testEndpoint({
+        endpoint,
+        requestProps: {
+          method: "POST",
+          body: { limit: 1000 },
+        },
+        configProps: {
+          isSilenceZodParseError: true,
+          logger: { level: "debug", color: true },
+        },
+      });
+
+      expect(responseMock.status).toBeCalledWith(200);
+      expect(responseMock.json).toBeCalledWith({
+        status: "success",
+        data: { test: "OK", limit: 1000 },
+      });
+    });
+
     test("thrown in middleware and caught in execute()", async () => {
       const factory = new EndpointsFactory(defaultResultHandler).addMiddleware(
         createMiddleware({

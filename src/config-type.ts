@@ -83,6 +83,10 @@ export interface CommonConfig<TAG extends string = string> {
   logger: LoggerConfig | Logger;
   // you can disable the startup logo, default: true
   startupLogo?: boolean;
+
+  // yes, you can swallow zod parse exception
+  isSilenceZodParseError?: boolean;
+
   // what request properties are combined into input for endpoints and middlewares
   // the order matters: priority from lowest to highest
   // default: { get: [query, params], post: [body, params, files],

@@ -191,11 +191,14 @@ export class Endpoint<
     };
   }
 
-  async #parseOutput(output: any) {
+  async #parseOutput(output: any, isSilenceZodParseError?: boolean) {
     try {
       return await this.outputSchema.parseAsync(output);
     } catch (e) {
       if (e instanceof z.ZodError) {
+        if (isSilenceZodParseError) {
+          return output;
+        }
         throw new z.ZodError([
           {
             message: "Invalid format",
@@ -258,14 +261,27 @@ export class Endpoint<
     input,
     options,
     logger,
+    isSilenceZodParseError = false,
   }: {
     input: any;
     options: any;
     logger: Logger;
+    isSilenceZodParseError?: boolean;
   }) {
+    let parsedInput: z.output<IN>;
+    try {
+      parsedInput = (await this.inputSchema.parseAsync(input)) as z.output<IN>;
+    } catch (error) {
+      if (isSilenceZodParseError) {
+        parsedInput = input;
+      } else {
+        throw error;
+      }
+    }
+
     return this.handler({
       // final input types transformations for handler
-      input: (await this.inputSchema.parseAsync(input)) as z.output<IN>,
+      input: parsedInput,
       options,
       logger,
     });
@@ -348,8 +364,15 @@ export class Endpoint<
         response.status(200).end();
         return;
       }
+
       output = await this.#parseOutput(
-        await this.#parseAndRunHandler({ input, options, logger })
+        await this.#parseAndRunHandler({
+          input,
+          options,
+          logger,
+          isSilenceZodParseError: config.isSilenceZodParseError,
+        }),
+        config.isSilenceZodParseError
       );
     } catch (e) {
       error = makeErrorFromAnything(e);
