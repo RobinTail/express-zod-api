@@ -15,11 +15,14 @@ import { ZodUpload } from "./upload-schema";
 
 export type FlatObject = Record<string, any>;
 
+type Refined<T extends z.ZodType> = ReturnType<T["refine"]>;
+
 export type IOSchema<U extends UnknownKeysParam = any> =
   | z.ZodObject<any, U>
   | z.ZodUnion<[IOSchema<U>, ...IOSchema<U>[]]>
   | z.ZodIntersection<IOSchema<U>, IOSchema<U>>
-  | z.ZodDiscriminatedUnion<string, z.Primitive, z.ZodObject<any, U>>;
+  | z.ZodDiscriminatedUnion<string, z.Primitive, z.ZodObject<any, U>>
+  | Refined<z.ZodObject<any, U>>;
 
 export type ArrayElement<T extends readonly unknown[]> =
   T extends readonly (infer K)[] ? K : never;
