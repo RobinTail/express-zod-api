@@ -1,5 +1,5 @@
 import { UploadedFile } from "express-fileupload";
-import { expectType } from "tsd";
+import { expectNotType, expectType } from "tsd";
 import {
   combinations,
   defaultInputSources,
@@ -10,6 +10,7 @@ import {
   getRoutePathParams,
   getStatusCodeFromError,
   hasUpload,
+  IOSchema,
   isLoggerConfig,
   isValidDate,
   makeErrorFromAnything,
@@ -21,6 +22,50 @@ import { AnyMiddlewareDef } from "../../src/middleware";
 import { serializeSchemaForTest } from "../helpers";
 
 describe("Common Helpers", () => {
+  describe("IOSchema", () => {
+    test("accepts object", () => {
+      expectType<IOSchema>(z.object({}));
+      expectType<IOSchema<"strip">>(z.object({}));
+      expectType<IOSchema<"strict">>(z.object({}).strict());
+      expectType<IOSchema<"passthrough">>(z.object({}).passthrough());
+      expectType<IOSchema<"strip">>(z.object({}).strip());
+      expectNotType<IOSchema<"passthrough">>(z.object({}));
+    });
+    test("accepts union of objects", () => {
+      expectType<IOSchema>(z.union([z.object({}), z.object({})]));
+      expectType<IOSchema>(z.object({}).or(z.object({})));
+      expectType<IOSchema>(z.object({}).or(z.object({}).or(z.object({}))));
+      expectNotType<IOSchema>(z.object({}).or(z.string()));
+    });
+    test("accepts intersection of objects", () => {
+      expectType<IOSchema>(z.intersection(z.object({}), z.object({})));
+      expectType<IOSchema>(z.object({}).and(z.object({})));
+      expectType<IOSchema>(z.object({}).and(z.object({}).and(z.object({}))));
+      expectNotType<IOSchema>(z.object({}).and(z.string()));
+    });
+    test("accepts discriminated union of objects", () => {
+      expectType<IOSchema>(
+        z.discriminatedUnion("type", [
+          z.object({ type: z.literal("one") }),
+          z.object({ type: z.literal("two") }),
+        ])
+      );
+    });
+    test("accepts a mix of types based on object", () => {
+      expectType<IOSchema>(z.object({}).or(z.object({}).and(z.object({}))));
+      expectType<IOSchema>(z.object({}).and(z.object({}).or(z.object({}))));
+    });
+    test("accepts a refinement of object", () => {
+      expectType<IOSchema>(z.object({}).refine(() => true));
+      expectType<IOSchema>(
+        z.object({}).refine((obj) => ({ ...obj, test: true }))
+      );
+      expectNotType<IOSchema>(
+        z.object({}).transform((obj) => Object.keys(obj))
+      );
+    });
+  });
+
   describe("getFinalEndpointInputSchema()", () => {
     test("Should handle no middlewares", () => {
       const middlewares: AnyMiddlewareDef[] = [];
