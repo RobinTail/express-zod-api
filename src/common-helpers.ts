@@ -15,7 +15,9 @@ import { ZodUpload } from "./upload-schema";
 
 export type FlatObject = Record<string, any>;
 
-type Refined<T extends z.ZodType> = ReturnType<T["refine"]>;
+type Refined<T extends z.ZodType> = T extends z.ZodType<infer O>
+  ? z.ZodEffects<T, O, O>
+  : never;
 
 export type IOSchema<U extends UnknownKeysParam = any> =
   | z.ZodObject<any, U>

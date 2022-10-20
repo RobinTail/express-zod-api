@@ -555,12 +555,13 @@ export function extractObjectSchema(subject: IOSchema) {
     objectSchema = Array.from(subject.options.values())
       .map((option) => extractObjectSchema(option))
       .reduce((acc, option) => acc.merge(option.partial()), z.object({}));
-  } else if (subject instanceof z.ZodIntersection) {
+  } else if (subject instanceof z.ZodEffects) {
+    objectSchema = extractObjectSchema(subject._def.schema); // object refinement
+  } else {
+    // intersection
     objectSchema = extractObjectSchema(subject._def.left).merge(
       extractObjectSchema(subject._def.right)
     );
-  } else {
-    objectSchema = extractObjectSchema(subject._def.schema); // object refinement
   }
   return copyMeta(subject, objectSchema);
 }
