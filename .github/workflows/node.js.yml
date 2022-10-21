@@ -19,7 +19,7 @@ jobs:
     steps:
     - name: Get yarn cache dir
       id: yarnCache
-      run: echo "::set-output name=dir::$(yarn cache dir)"
+      run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
     - name: Checkout
       uses: actions/checkout@v2
     - name: Install Node.js ${{ matrix.node-version }}
