@@ -559,9 +559,9 @@ describe("Endpoint", () => {
         .refine(
           (data) => {
             if (data.type === "type1") {
-              return !!(data.dynamicValue as any).type1Attribute;
+              return "type1Attribute" in data.dynamicValue;
             }
-            return true;
+            return "type2Attribute" in data.dynamicValue;
           },
           {
             message: "type1Attribute is required if type is type1",
