@@ -544,4 +544,70 @@ describe("Endpoint", () => {
       });
     });
   });
+
+  describe("Issue #654: Top level refinements", () => {
+    const endpoint = defaultEndpointsFactory.build({
+      method: "post",
+      input: z
+        .object({
+          type: z.union([z.literal("type1"), z.literal("type2")]),
+          dynamicValue: z.union([
+            z.object({ type1Attribute: z.number() }),
+            z.object({ type2Attribute: z.string() }),
+          ]),
+        })
+        .refine(
+          (data) => {
+            if (data.type === "type1") {
+              return !!(data.dynamicValue as any).type1Attribute;
+            }
+            return true;
+          },
+          {
+            message: "type1Attribute is required if type is type1",
+            path: ["dynamicValue"],
+          }
+        ),
+      output: z.object({}),
+      handler: async () => ({}),
+    });
+
+    test("should accept valid inputs", async () => {
+      const { responseMock } = await testEndpoint({
+        endpoint,
+        requestProps: {
+          method: "POST",
+          body: {
+            type: "type1",
+            dynamicValue: { type1Attribute: 123 },
+          },
+        },
+      });
+      expect(responseMock.json).toHaveBeenCalledWith({
+        data: {},
+        status: "success",
+      });
+      expect(responseMock.status).toHaveBeenCalledWith(200);
+    });
+
+    test("should fail during the refinement of invalid inputs", async () => {
+      const { responseMock } = await testEndpoint({
+        endpoint,
+        requestProps: {
+          method: "POST",
+          body: {
+            type: "type1",
+            dynamicValue: { type2Attribute: "test" },
+          },
+        },
+      });
+      expect(responseMock.json).toHaveBeenCalledWith({
+        error: {
+          message: "dynamicValue: type1Attribute is required if type is type1",
+        },
+        status: "error",
+      });
+      expect(responseMock.status).toHaveBeenCalledWith(400);
+    });
+  });
 });
