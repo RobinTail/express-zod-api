@@ -494,6 +494,13 @@ describe("Common Helpers", () => {
       expect(getMessageFromError(error)).toMatchSnapshot();
     });
 
+    test("should handle empty path in ZodIssue", () => {
+      const error = new z.ZodError([
+        { code: "custom", path: [], message: "Top level refinement issue" },
+      ]);
+      expect(getMessageFromError(error)).toMatchSnapshot();
+    });
+
     test("should pass message from other error types", () => {
       expect(
         getMessageFromError(createHttpError(502, "something went wrong"))
