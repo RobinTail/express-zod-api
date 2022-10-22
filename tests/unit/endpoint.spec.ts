@@ -171,6 +171,25 @@ describe("Endpoint", () => {
   });
 
   describe("#parseOutput", () => {
+    test("Should throw on output validation failure", async () => {
+      const endpoint = defaultEndpointsFactory.build({
+        method: "post",
+        input: z.object({}),
+        output: z.object({ email: z.string().email() }),
+        handler: async () => ({ email: "not email" }),
+      });
+      const { responseMock } = await testEndpoint({
+        endpoint,
+      });
+      expect(responseMock.status).toBeCalledWith(400);
+      expect(responseMock.json).toBeCalledWith({
+        status: "error",
+        error: {
+          message: "output: Invalid format; email: Invalid email",
+        },
+      });
+    });
+
     test("Should throw on output parsing non-Zod error", async () => {
       const factory = new EndpointsFactory(defaultResultHandler);
       const endpoint = factory.build({
@@ -655,7 +674,7 @@ describe("Endpoint", () => {
       });
       expect(responseMock.json).toHaveBeenCalledWith({
         error: {
-          message: ": Please provide at least one property", // @todo can we fix the missing field?
+          message: "Please provide at least one property",
         },
         status: "error",
       });

@@ -135,7 +135,9 @@ export function makeErrorFromAnything<T>(subject: T): Error {
 export function getMessageFromError(error: Error): string {
   if (error instanceof z.ZodError) {
     return error.issues
-      .map(({ path, message }) => `${path.join("/")}: ${message}`)
+      .map(({ path, message }) =>
+        (path.length ? [path.join("/")] : []).concat(message).join(": ")
+      )
       .join("; ");
   }
   return error.message;
