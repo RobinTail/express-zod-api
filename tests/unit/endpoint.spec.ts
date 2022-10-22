@@ -610,4 +610,56 @@ describe("Endpoint", () => {
       expect(responseMock.status).toHaveBeenCalledWith(400);
     });
   });
+
+  describe("Feature #600: Top level refinements", () => {
+    const endpoint = defaultEndpointsFactory.build({
+      method: "post",
+      input: z
+        .object({
+          email: z.string().email().optional(),
+          id: z.string().optional(),
+          otherThing: z.string().optional(),
+        })
+        .refine(
+          (x) => Object.keys(x).length >= 1,
+          "Please provide at least one property"
+        ),
+      output: z.object({}),
+      handler: async () => ({}),
+    });
+
+    test("should accept valid inputs", async () => {
+      const { responseMock } = await testEndpoint({
+        endpoint,
+        requestProps: {
+          method: "POST",
+          body: {
+            id: "test",
+          },
+        },
+      });
+      expect(responseMock.json).toHaveBeenCalledWith({
+        data: {},
+        status: "success",
+      });
+      expect(responseMock.status).toHaveBeenCalledWith(200);
+    });
+
+    test("should fail during the refinement of invalid inputs", async () => {
+      const { responseMock } = await testEndpoint({
+        endpoint,
+        requestProps: {
+          method: "POST",
+          body: {},
+        },
+      });
+      expect(responseMock.json).toHaveBeenCalledWith({
+        error: {
+          message: ": Please provide at least one property", // @todo can we fix the missing field?
+        },
+        status: "error",
+      });
+      expect(responseMock.status).toHaveBeenCalledWith(400);
+    });
+  });
 });
