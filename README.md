@@ -323,7 +323,7 @@ const endpointsFactory = defaultEndpointsFactory.addOptions({
 
 ## Refinements
 
-By the way, you can implement additional validation within schema.
+You can implement additional validation within schema.
 Validation errors are reported in a response with a status code `400`.
 
 ```typescript
@@ -339,6 +339,24 @@ const nicknameConstraintMiddleware = createMiddleware({
         "Nickname cannot start with a digit"
       ),
   }),
+  // ...,
+});
+```
+
+By the way, you can also refine the whole I/O object, for example in case you need a complex validation of its props.
+
+```typescript
+const endpoint = endpointsFactory.build({
+  input: z
+    .object({
+      email: z.string().email().optional(),
+      id: z.string().optional(),
+      otherThing: z.string().optional(),
+    })
+    .refine(
+      (inputs) => Object.keys(inputs).length >= 1,
+      "Please provide at least one property"
+    ),
   // ...,
 });
 ```

@@ -16,7 +16,6 @@
 import { z } from "express-zod-api";
 
 const endpoint = endpointsFactory.build({
-  method: "post",
   input: z
     .object({
       email: z.string().email().optional(),
@@ -24,7 +23,7 @@ const endpoint = endpointsFactory.build({
       otherThing: z.string().optional(),
     })
     .refine(
-      (x) => Object.keys(x).length >= 1,
+      (inputs) => Object.keys(inputs).length >= 1,
       "Please provide at least one property"
     ),
   // ...
