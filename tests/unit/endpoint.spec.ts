@@ -574,6 +574,7 @@ describe("Endpoint", () => {
             z.object({ type1Attribute: z.number() }),
             z.object({ type2Attribute: z.string() }),
           ]),
+          emitOutputValidationFailure: z.boolean().optional(),
         })
         .refine(
           (data) => {
@@ -587,8 +588,16 @@ describe("Endpoint", () => {
             path: ["dynamicValue"],
           }
         ),
-      output: z.object({}),
-      handler: async () => ({}),
+      output: z
+        .object({})
+        .passthrough()
+        .refine((obj) => !("emitOutputValidationFailure" in obj), {
+          message: "failure on demand",
+        }),
+      handler: async ({ input }) =>
+        input.emitOutputValidationFailure
+          ? { emitOutputValidationFailure: true }
+          : {},
     });
 
     test("should accept valid inputs", async () => {
@@ -625,6 +634,27 @@ describe("Endpoint", () => {
           message: "dynamicValue: type1Attribute is required if type is type1",
         },
         status: "error",
+      });
+      expect(responseMock.status).toHaveBeenCalledWith(400);
+    });
+
+    test("should refine the output schema as well", async () => {
+      const { responseMock } = await testEndpoint({
+        endpoint,
+        requestProps: {
+          method: "POST",
+          body: {
+            type: "type1",
+            dynamicValue: { type1Attribute: 123 },
+            emitOutputValidationFailure: true,
+          },
+        },
+      });
+      expect(responseMock.json).toHaveBeenCalledWith({
+        status: "error",
+        error: {
+          message: "output: Invalid format; output: failure on demand",
+        },
       });
       expect(responseMock.status).toHaveBeenCalledWith(400);
     });
