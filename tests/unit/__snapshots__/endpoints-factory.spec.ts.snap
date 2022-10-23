@@ -44,6 +44,51 @@ exports[`EndpointsFactory .build() Should create an endpoint with intersection m
 }
 `;
 
+exports[`EndpointsFactory .build() Should create an endpoint with refined object middleware 1`] = `
+{
+  "_type": "ZodIntersection",
+  "left": {
+    "_type": "ZodEffects",
+    "value": {
+      "_type": "ZodObject",
+      "shape": {
+        "a": {
+          "_type": "ZodOptional",
+          "value": {
+            "_type": "ZodNumber",
+          },
+        },
+        "b": {
+          "_type": "ZodOptional",
+          "value": {
+            "_type": "ZodString",
+          },
+        },
+      },
+    },
+  },
+  "right": {
+    "_type": "ZodObject",
+    "shape": {
+      "i": {
+        "_type": "ZodString",
+      },
+    },
+  },
+}
+`;
+
+exports[`EndpointsFactory .build() Should create an endpoint with refined object middleware 2`] = `
+{
+  "_type": "ZodObject",
+  "shape": {
+    "o": {
+      "_type": "ZodBoolean",
+    },
+  },
+}
+`;
+
 exports[`EndpointsFactory .build() Should create an endpoint with simple middleware 1`] = `
 {
   "_type": "ZodIntersection",
