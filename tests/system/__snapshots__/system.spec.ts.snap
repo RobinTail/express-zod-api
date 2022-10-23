@@ -12,7 +12,7 @@ exports[`App Protocol Should fail on invalid method 1`] = `
 exports[`App Protocol Should fail on malformed body 1`] = `
 {
   "error": {
-    "message": "Unexpected end of JSON input",
+    "message": StringMatching /\\(Unexpected end of JSON input\\|Unterminated string in JSON at position 25\\)/,
   },
   "status": "error",
 }

@@ -279,7 +279,14 @@ describe("App", () => {
       });
       expect(response.status).toBe(500);
       const json = await response.json();
-      expect(json).toMatchSnapshot();
+      expect(json).toMatchSnapshot({
+        error: {
+          message: expect.stringMatching(
+            // the 2nd option is for Node 19
+            /(Unexpected end of JSON input|Unterminated string in JSON at position 25)/
+          ),
+        },
+      });
     });
 
     test("Should fail when missing content type header", async () => {
