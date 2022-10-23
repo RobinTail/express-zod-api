@@ -279,6 +279,8 @@ exports[`Common Helpers getFinalEndpointInputSchema() Should merge union object 
 
 exports[`Common Helpers getMessageFromError() should compile a string from ZodError 1`] = `"user/id: expected number, got string; user/name: expected string, got number"`;
 
+exports[`Common Helpers getMessageFromError() should handle empty path in ZodIssue 1`] = `"Top level refinement issue"`;
+
 exports[`Common Helpers getMessageFromError() should pass message from other error types 1`] = `"something went wrong"`;
 
 exports[`Common Helpers getMessageFromError() should pass message from other error types 2`] = `"something went wrong"`;

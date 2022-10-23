@@ -57,6 +57,18 @@ describe("Open API helpers", () => {
       expect(serializeSchemaForTest(subject)).toMatchSnapshot();
     });
 
+    test("should handle refined object schema", () => {
+      const subject = extractObjectSchema(
+        z
+          .object({
+            one: z.string(),
+          })
+          .refine(() => true)
+      );
+      expect(subject).toBeInstanceOf(z.ZodObject);
+      expect(serializeSchemaForTest(subject)).toMatchSnapshot();
+    });
+
     test("should return object schema for the union of object schemas", () => {
       const subject = extractObjectSchema(
         z
@@ -98,6 +110,23 @@ describe("Open API helpers", () => {
         one: "test",
       });
       expect(getMeta(extractObjectSchema(objectSchema), "examples")).toEqual([
+        {
+          one: "test",
+        },
+      ]);
+
+      const refinedObjSchema = withMeta(
+        z
+          .object({
+            one: z.string(),
+          })
+          .refine(() => true)
+      ).example({
+        one: "test",
+      });
+      expect(
+        getMeta(extractObjectSchema(refinedObjSchema), "examples")
+      ).toEqual([
         {
           one: "test",
         },
@@ -606,6 +635,17 @@ describe("Open API helpers", () => {
       expect(
         depictEffect({
           schema: z.preprocess((v) => parseInt(`${v}`, 10), z.string()),
+          isResponse: false,
+        })
+      ).toMatchSnapshot();
+    });
+
+    test("should depict refinements", () => {
+      expect(
+        depictEffect({
+          schema: z
+            .object({ s: z.string() })
+            .refine(() => false, { message: "test" }),
           isResponse: false,
         })
       ).toMatchSnapshot();

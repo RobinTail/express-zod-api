@@ -263,6 +263,49 @@ describe("EndpointsFactory", () => {
       >(endpoint.getInputSchema());
     });
 
+    test("Should create an endpoint with refined object middleware", () => {
+      const middleware = createMiddleware({
+        input: z
+          .object({
+            a: z.number().optional(),
+            b: z.string().optional(),
+          })
+          .refine((props) => Object.keys(props).length, {
+            message: "Should be at least one option specified",
+          }),
+        middleware: jest.fn(),
+      });
+      const resultHandlerMock = { handler: jest.fn() };
+      const factory = new EndpointsFactory(
+        resultHandlerMock as unknown as ResultHandlerDefinition<any, any>
+      ).addMiddleware(middleware);
+      const endpoint = factory.build({
+        method: "get",
+        input: z.object({
+          i: z.string(),
+        }),
+        output: z.object({
+          o: z.boolean(),
+        }),
+        handler: jest.fn(),
+      });
+      expect(serializeSchemaForTest(endpoint["inputSchema"])).toMatchSnapshot();
+      expect(
+        serializeSchemaForTest(endpoint["outputSchema"])
+      ).toMatchSnapshot();
+      expectType<
+        z.ZodIntersection<
+          z.ZodEffects<
+            z.ZodObject<{
+              a: z.ZodOptional<z.ZodNumber>;
+              b: z.ZodOptional<z.ZodString>;
+            }>
+          >,
+          z.ZodObject<{ i: z.ZodString }>
+        >
+      >(endpoint.getInputSchema());
+    });
+
     test("Should create an endpoint with intersection middleware", () => {
       const middleware = createMiddleware({
         input: z

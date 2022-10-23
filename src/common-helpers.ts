@@ -15,11 +15,16 @@ import { ZodUpload } from "./upload-schema";
 
 export type FlatObject = Record<string, any>;
 
+type Refined<T extends z.ZodType> = T extends z.ZodType<infer O>
+  ? z.ZodEffects<T, O, O>
+  : never;
+
 export type IOSchema<U extends UnknownKeysParam = any> =
   | z.ZodObject<any, U>
   | z.ZodUnion<[IOSchema<U>, ...IOSchema<U>[]]>
   | z.ZodIntersection<IOSchema<U>, IOSchema<U>>
-  | z.ZodDiscriminatedUnion<string, z.Primitive, z.ZodObject<any, U>>;
+  | z.ZodDiscriminatedUnion<string, z.Primitive, z.ZodObject<any, U>>
+  | Refined<z.ZodObject<any, U>>;
 
 export type ArrayElement<T extends readonly unknown[]> =
   T extends readonly (infer K)[] ? K : never;
@@ -130,7 +135,9 @@ export function makeErrorFromAnything<T>(subject: T): Error {
 export function getMessageFromError(error: Error): string {
   if (error instanceof z.ZodError) {
     return error.issues
-      .map(({ path, message }) => `${path.join("/")}: ${message}`)
+      .map(({ path, message }) =>
+        (path.length ? [path.join("/")] : []).concat(message).join(": ")
+      )
       .join("; ");
   }
   return error.message;

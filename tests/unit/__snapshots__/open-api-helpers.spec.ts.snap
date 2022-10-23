@@ -140,6 +140,20 @@ exports[`Open API helpers depictEffect() should depict ZodEffects transformation
 }
 `;
 
+exports[`Open API helpers depictEffect() should depict refinements 1`] = `
+{
+  "properties": {
+    "s": {
+      "type": "string",
+    },
+  },
+  "required": [
+    "s",
+  ],
+  "type": "object",
+}
+`;
+
 exports[`Open API helpers depictEnum() should depict ZodEnum 1`] = `
 {
   "description": "test",
@@ -848,6 +862,17 @@ exports[`Open API helpers excludeParamsFromDepiction() should omit specified pat
     "b",
   ],
   "type": "object",
+}
+`;
+
+exports[`Open API helpers extractObjectSchema() should handle refined object schema 1`] = `
+{
+  "_type": "ZodObject",
+  "shape": {
+    "one": {
+      "_type": "ZodString",
+    },
+  },
 }
 `;
 

@@ -171,6 +171,25 @@ describe("Endpoint", () => {
   });
 
   describe("#parseOutput", () => {
+    test("Should throw on output validation failure", async () => {
+      const endpoint = defaultEndpointsFactory.build({
+        method: "post",
+        input: z.object({}),
+        output: z.object({ email: z.string().email() }),
+        handler: async () => ({ email: "not email" }),
+      });
+      const { responseMock } = await testEndpoint({
+        endpoint,
+      });
+      expect(responseMock.status).toBeCalledWith(400);
+      expect(responseMock.json).toBeCalledWith({
+        status: "error",
+        error: {
+          message: "output: Invalid format; email: Invalid email",
+        },
+      });
+    });
+
     test("Should throw on output parsing non-Zod error", async () => {
       const factory = new EndpointsFactory(defaultResultHandler);
       const endpoint = factory.build({
@@ -542,6 +561,154 @@ describe("Endpoint", () => {
         status: "error",
         error: { message: "Something went wrong" },
       });
+    });
+  });
+
+  describe("Issue #654: Top level refinements", () => {
+    const endpoint = defaultEndpointsFactory.build({
+      method: "post",
+      input: z
+        .object({
+          type: z.union([z.literal("type1"), z.literal("type2")]),
+          dynamicValue: z.union([
+            z.object({ type1Attribute: z.number() }),
+            z.object({ type2Attribute: z.string() }),
+          ]),
+          emitOutputValidationFailure: z.boolean().optional(),
+        })
+        .refine(
+          (data) => {
+            if (data.type === "type1") {
+              return "type1Attribute" in data.dynamicValue;
+            }
+            return "type2Attribute" in data.dynamicValue;
+          },
+          {
+            message: "type1Attribute is required if type is type1",
+            path: ["dynamicValue"],
+          }
+        ),
+      output: z
+        .object({})
+        .passthrough()
+        .refine((obj) => !("emitOutputValidationFailure" in obj), {
+          message: "failure on demand",
+        }),
+      handler: async ({ input }) =>
+        input.emitOutputValidationFailure
+          ? { emitOutputValidationFailure: true }
+          : {},
+    });
+
+    test("should accept valid inputs", async () => {
+      const { responseMock } = await testEndpoint({
+        endpoint,
+        requestProps: {
+          method: "POST",
+          body: {
+            type: "type1",
+            dynamicValue: { type1Attribute: 123 },
+          },
+        },
+      });
+      expect(responseMock.json).toHaveBeenCalledWith({
+        data: {},
+        status: "success",
+      });
+      expect(responseMock.status).toHaveBeenCalledWith(200);
+    });
+
+    test("should fail during the refinement of invalid inputs", async () => {
+      const { responseMock } = await testEndpoint({
+        endpoint,
+        requestProps: {
+          method: "POST",
+          body: {
+            type: "type1",
+            dynamicValue: { type2Attribute: "test" },
+          },
+        },
+      });
+      expect(responseMock.json).toHaveBeenCalledWith({
+        error: {
+          message: "dynamicValue: type1Attribute is required if type is type1",
+        },
+        status: "error",
+      });
+      expect(responseMock.status).toHaveBeenCalledWith(400);
+    });
+
+    test("should refine the output schema as well", async () => {
+      const { responseMock } = await testEndpoint({
+        endpoint,
+        requestProps: {
+          method: "POST",
+          body: {
+            type: "type1",
+            dynamicValue: { type1Attribute: 123 },
+            emitOutputValidationFailure: true,
+          },
+        },
+      });
+      expect(responseMock.json).toHaveBeenCalledWith({
+        status: "error",
+        error: {
+          message: "output: Invalid format; output: failure on demand",
+        },
+      });
+      expect(responseMock.status).toHaveBeenCalledWith(400);
+    });
+  });
+
+  describe("Feature #600: Top level refinements", () => {
+    const endpoint = defaultEndpointsFactory.build({
+      method: "post",
+      input: z
+        .object({
+          email: z.string().email().optional(),
+          id: z.string().optional(),
+          otherThing: z.string().optional(),
+        })
+        .refine(
+          (x) => Object.keys(x).length >= 1,
+          "Please provide at least one property"
+        ),
+      output: z.object({}),
+      handler: async () => ({}),
+    });
+
+    test("should accept valid inputs", async () => {
+      const { responseMock } = await testEndpoint({
+        endpoint,
+        requestProps: {
+          method: "POST",
+          body: {
+            id: "test",
+          },
+        },
+      });
+      expect(responseMock.json).toHaveBeenCalledWith({
+        data: {},
+        status: "success",
+      });
+      expect(responseMock.status).toHaveBeenCalledWith(200);
+    });
+
+    test("should fail during the refinement of invalid inputs", async () => {
+      const { responseMock } = await testEndpoint({
+        endpoint,
+        requestProps: {
+          method: "POST",
+          body: {},
+        },
+      });
+      expect(responseMock.json).toHaveBeenCalledWith({
+        error: {
+          message: "Please provide at least one property",
+        },
+        status: "error",
+      });
+      expect(responseMock.status).toHaveBeenCalledWith(400);
     });
   });
 });
