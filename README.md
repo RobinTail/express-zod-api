@@ -323,7 +323,7 @@ const endpointsFactory = defaultEndpointsFactory.addOptions({
 
 ## Refinements
 
-You can implement additional validation within schema.
+You can implement additional validations within schemas using refinements.
 Validation errors are reported in a response with a status code `400`.
 
 ```typescript
