@@ -170,6 +170,8 @@ exports[`Open API helpers depictFile() should depict ZodFile 1`] = `
 }
 `;
 
+exports[`Open API helpers depictFile() should throw when using in input 1`] = `[Error: Please use z.file() only within ResultHandler.]`;
+
 exports[`Open API helpers depictIOExamples() should depict examples in case of request 1`] = `
 {
   "examples": {

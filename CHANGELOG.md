@@ -2,6 +2,10 @@
 
 ## Version 8
 
+### v8.2.1
+
+- OpenAPI generator throws when attempting to use `z.file()` within input schema.
+
 ### v8.2.0
 
 - Feature #637: endpoint short description (summary).

@@ -291,10 +291,23 @@ describe("Open API helpers", () => {
       expect(
         depictFile({
           schema: z.file().binary(),
-          isResponse: false,
+          isResponse: true,
           initial: { description: "test" },
         })
       ).toMatchSnapshot();
+    });
+    test("should throw when using in input", () => {
+      try {
+        depictFile({
+          schema: z.file().binary(),
+          isResponse: false,
+          initial: { description: "test" },
+        });
+        fail("Should not be here");
+      } catch (e) {
+        expect(e).toBeInstanceOf(OpenAPIError);
+        expect(e).toMatchSnapshot();
+      }
     });
   });
 
