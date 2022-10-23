@@ -140,6 +140,20 @@ exports[`Open API helpers depictEffect() should depict ZodEffects transformation
 }
 `;
 
+exports[`Open API helpers depictEffect() should depict refinements 1`] = `
+{
+  "properties": {
+    "s": {
+      "type": "string",
+    },
+  },
+  "required": [
+    "s",
+  ],
+  "type": "object",
+}
+`;
+
 exports[`Open API helpers depictEnum() should depict ZodEnum 1`] = `
 {
   "description": "test",

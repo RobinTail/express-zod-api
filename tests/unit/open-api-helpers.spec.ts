@@ -639,6 +639,17 @@ describe("Open API helpers", () => {
         })
       ).toMatchSnapshot();
     });
+
+    test("should depict refinements", () => {
+      expect(
+        depictEffect({
+          schema: z
+            .object({ s: z.string() })
+            .refine(() => false, { message: "test" }),
+          isResponse: false,
+        })
+      ).toMatchSnapshot();
+    });
   });
 
   describe("depictIOExamples()", () => {
