@@ -798,6 +798,10 @@ exports[`Open API helpers depictZodBranded should depict the actual schema 1`] =
 }
 `;
 
+exports[`Open API helpers depictZodDate should throw clear error 1`] = `[Error: z.date() is not supported, please use z.dateOut() instead.]`;
+
+exports[`Open API helpers depictZodDate should throw clear error 2`] = `[Error: z.date() is not supported, please use z.dateIn() instead.]`;
+
 exports[`Open API helpers excludeExampleFromDepiction() should remove example property of supplied object 1`] = `
 {
   "description": "test",
