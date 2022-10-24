@@ -6,15 +6,15 @@ import { CommonConfig } from "./config-type";
 import { ResultHandlerError } from "./errors";
 import {
   FlatObject,
+  IOSchema,
   getActualMethod,
   getInitialInput,
-  IOSchema,
   makeErrorFromAnything,
 } from "./common-helpers";
-import { combineContainers, LogicalContainer } from "./logical-container";
+import { LogicalContainer, combineContainers } from "./logical-container";
 import { AuxMethod, Method, MethodsDefinition } from "./method";
 import { AnyMiddlewareDef } from "./middleware";
-import { lastResortHandler, ResultHandlerDefinition } from "./result-handler";
+import { ResultHandlerDefinition, lastResortHandler } from "./result-handler";
 import { Security } from "./security";
 
 export type Handler<IN, OUT, OPT> = (params: {

@@ -6,15 +6,15 @@ jest.mock("express", () => ({
   static: staticMock,
 }));
 
-import { Express, RequestHandler, Request, Response } from "express";
+import { Express, Request, RequestHandler, Response } from "express";
 import { Logger } from "winston";
 import {
-  EndpointsFactory,
-  z,
-  Routing,
   DependsOnMethod,
-  defaultResultHandler,
+  EndpointsFactory,
+  Routing,
   ServeStatic,
+  defaultResultHandler,
+  z,
 } from "../../src";
 import { CommonConfig } from "../../src/config-type";
 import { mimeJson } from "../../src/mime";
