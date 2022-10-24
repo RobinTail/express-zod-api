@@ -13,7 +13,7 @@ import {
   TagObject,
 } from "openapi3-ts";
 import { omit } from "ramda";
-import { z } from "zod";
+import { z, ZodDate } from "zod";
 import {
   ArrayElement,
   getExamples,
@@ -241,6 +241,15 @@ export const depictDateOut: DepictHelper<ZodDateOut> = ({
       url: isoDateDocumentationUrl,
     },
   };
+};
+
+/** @throws OpenAPIError */
+export const depictZodDate: DepictHelper<ZodDate> = ({ isResponse }) => {
+  throw new OpenAPIError(
+    `z.date() is not supported, please use z.date${
+      isResponse ? "Out" : "In"
+    }() instead.`
+  );
 };
 
 export const depictBoolean: DepictHelper<z.ZodBoolean> = ({ initial }) => ({
@@ -627,6 +636,7 @@ const depictHelpers: DepictingRules = {
   ZodNullable: depictOptionalOrNullable,
   ZodDiscriminatedUnion: depictDiscriminatedUnion,
   ZodBranded: depictZodBranded,
+  ZodDate: depictZodDate,
 };
 
 export const depictSchema: DepictHelper<z.ZodTypeAny> = ({
