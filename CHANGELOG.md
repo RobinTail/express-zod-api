@@ -2,6 +2,10 @@
 
 ## Version 8
 
+### v8.3.1
+
+- Clearer error message when using `z.date()` within I/O schema thrown by OpenAPI generator.
+
 ### v8.3.0
 
 - Feature #600: Top level refinements.
