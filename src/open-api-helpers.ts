@@ -246,9 +246,11 @@ export const depictDateOut: DepictHelper<ZodDateOut> = ({
 /** @throws OpenAPIError */
 export const depictZodDate: DepictHelper<z.ZodDate> = ({ isResponse }) => {
   throw new OpenAPIError(
-    `z.date() is not supported, please use z.date${
+    `Using z.date() within ${
+      isResponse ? "output" : "input"
+    } schema is forbidden. Please use z.date${
       isResponse ? "Out" : "In"
-    }() instead.`
+    }() instead. Check out the documentation for details.`
   );
 };
 
