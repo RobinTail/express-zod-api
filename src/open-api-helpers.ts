@@ -13,7 +13,7 @@ import {
   TagObject,
 } from "openapi3-ts";
 import { omit } from "ramda";
-import { z, ZodDate } from "zod";
+import { z } from "zod";
 import {
   ArrayElement,
   getExamples,
@@ -244,7 +244,7 @@ export const depictDateOut: DepictHelper<ZodDateOut> = ({
 };
 
 /** @throws OpenAPIError */
-export const depictZodDate: DepictHelper<ZodDate> = ({ isResponse }) => {
+export const depictZodDate: DepictHelper<z.ZodDate> = ({ isResponse }) => {
   throw new OpenAPIError(
     `z.date() is not supported, please use z.date${
       isResponse ? "Out" : "In"
