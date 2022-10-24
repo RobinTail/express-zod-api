@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { mimeJson, MimeDefinition } from "./mime";
+import { MimeDefinition, mimeJson } from "./mime";
 
 export type ApiResponse<A = z.ZodTypeAny> = {
   schema: A;

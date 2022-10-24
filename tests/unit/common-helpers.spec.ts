@@ -1,6 +1,7 @@
 import { UploadedFile } from "express-fileupload";
 import { expectNotType, expectType } from "tsd";
 import {
+  IOSchema,
   combinations,
   defaultInputSources,
   getExamples,
@@ -10,12 +11,11 @@ import {
   getRoutePathParams,
   getStatusCodeFromError,
   hasUpload,
-  IOSchema,
   isLoggerConfig,
   isValidDate,
   makeErrorFromAnything,
 } from "../../src/common-helpers";
-import { z, createHttpError, withMeta, createMiddleware } from "../../src";
+import { createHttpError, createMiddleware, withMeta, z } from "../../src";
 import { Request } from "express";
 import { getMeta } from "../../src/metadata";
 import { AnyMiddlewareDef } from "../../src/middleware";

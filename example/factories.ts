@@ -1,9 +1,9 @@
 import mime from "mime";
 import {
+  EndpointsFactory,
   createApiResponse,
   createResultHandler,
   defaultResultHandler,
-  EndpointsFactory,
   z,
 } from "../src";
 import { config } from "./config";

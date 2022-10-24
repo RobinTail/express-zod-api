@@ -8,7 +8,7 @@ import { ResultHandlerError } from "./errors";
 import { isLoggerConfig, makeErrorFromAnything } from "./common-helpers";
 import { createLogger } from "./logger";
 import { defaultResultHandler, lastResortHandler } from "./result-handler";
-import { initRouting, Routing } from "./routing";
+import { Routing, initRouting } from "./routing";
 import createHttpError from "http-errors";
 
 type AnyResultHandler = NonNullable<CommonConfig["errorHandler"]>;

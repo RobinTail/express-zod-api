@@ -3,25 +3,25 @@ import { z } from "zod";
 import { ApiResponse } from "./api-response";
 import {
   FlatObject,
-  getFinalEndpointInputSchema,
-  hasUpload,
   IOSchema,
   ProbableIntersection,
+  getFinalEndpointInputSchema,
+  hasUpload,
 } from "./common-helpers";
 import { CommonConfig } from "./config-type";
 import { Endpoint, Handler } from "./endpoint";
 import { Method, MethodsDefinition } from "./method";
 import {
   AnyMiddlewareDef,
-  createMiddleware,
   ExpressMiddleware,
   ExpressMiddlewareFeatures,
   MiddlewareDefinition,
+  createMiddleware,
 } from "./middleware";
 import { mimeJson, mimeMultipart } from "./mime";
 import {
-  defaultResultHandler,
   ResultHandlerDefinition,
+  defaultResultHandler,
 } from "./result-handler";
 
 type BuildProps<

@@ -1,9 +1,9 @@
-import { z, withMeta } from "../../src";
+import { withMeta, z } from "../../src";
 import {
+  MetaDef,
   copyMeta,
   getMeta,
   hasMeta,
-  MetaDef,
   metaProp,
 } from "../../src/metadata";
 
