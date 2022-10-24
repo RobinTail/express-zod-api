@@ -42,6 +42,7 @@ import {
   depictZodBranded,
   depictTags,
   ensureShortDescription,
+  depictZodDate,
 } from "../../src/open-api-helpers";
 import { serializeSchemaForTest } from "../helpers";
 
@@ -873,6 +874,25 @@ describe("Open API helpers", () => {
           isResponse: false,
           initial: { description: "test" },
         });
+        fail("should not be here");
+      } catch (e) {
+        expect(e).toBeInstanceOf(OpenAPIError);
+        expect(e).toMatchSnapshot();
+      }
+    });
+  });
+
+  describe("depictZodDate", () => {
+    test("should throw clear error", () => {
+      try {
+        depictZodDate({ isResponse: true, schema: z.date() });
+        fail("should not be here");
+      } catch (e) {
+        expect(e).toBeInstanceOf(OpenAPIError);
+        expect(e).toMatchSnapshot();
+      }
+      try {
+        depictZodDate({ isResponse: false, schema: z.date() });
         fail("should not be here");
       } catch (e) {
         expect(e).toBeInstanceOf(OpenAPIError);
