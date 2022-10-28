@@ -220,7 +220,7 @@ export class Endpoint<
     logger,
   }: {
     method: Method | AuxMethod;
-    input: Readonly<any>;
+    input: Readonly<any>; // Issue #673: input is immutable, since this.inputSchema is combined with ones of middlewares
     request: Request;
     response: Response;
     logger: Logger;
@@ -231,8 +231,6 @@ export class Endpoint<
       if (method === "options" && def.type === "proprietary") {
         continue;
       }
-      // Issue #673: do not transform the input here, since this.inputSchema is combined with middlewares' schemas
-      // Object.assign(input, await def.input.parseAsync(input)); // middleware can transform the input types
       Object.assign(
         options,
         await def.middleware({
