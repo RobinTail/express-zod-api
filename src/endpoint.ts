@@ -7,8 +7,8 @@ import { ResultHandlerError } from "./errors";
 import {
   FlatObject,
   getActualMethod,
-  getInitialInput,
   IOSchema,
+  getInput,
   makeErrorFromAnything,
 } from "./common-helpers";
 import { combineContainers, LogicalContainer } from "./logical-container";
@@ -197,7 +197,7 @@ export class Endpoint<
     logger,
   }: {
     method: Method | AuxMethod;
-    input: any;
+    input: Readonly<any>; // Issue #673: input is immutable, since this.inputSchema is combined with ones of middlewares
     request: Request;
     response: Response;
     logger: Logger;
@@ -208,11 +208,10 @@ export class Endpoint<
       if (method === "options" && def.type === "proprietary") {
         continue;
       }
-      Object.assign(input, await def.input.parseAsync(input)); // middleware can transform the input types
       Object.assign(
         options,
         await def.middleware({
-          input,
+          input: await def.input.parseAsync(input),
           options,
           request,
           response,
@@ -228,7 +227,7 @@ export class Endpoint<
         break;
       }
     }
-    return { input, options, isStreamClosed };
+    return { options, isStreamClosed };
   }
 
   async #parseAndRunHandler({
@@ -236,7 +235,7 @@ export class Endpoint<
     options,
     logger,
   }: {
-    input: any;
+    input: Readonly<any>;
     options: any;
     logger: Logger;
   }) {
@@ -253,14 +252,14 @@ export class Endpoint<
     request,
     response,
     logger,
-    initialInput,
+    input,
     output,
   }: {
     error: Error | null;
     request: Request;
     response: Response;
     logger: Logger;
-    initialInput: any;
+    input: any;
     output: any;
   }) {
     try {
@@ -270,7 +269,7 @@ export class Endpoint<
         request,
         response,
         logger,
-        input: initialInput,
+        input,
       });
     } catch (e) {
       lastResortHandler({
@@ -309,11 +308,11 @@ export class Endpoint<
         response.set(key, headers[key]);
       }
     }
-    const initialInput = getInitialInput(request, config.inputSources);
+    const input = getInput(request, config.inputSources);
     try {
-      const { input, options, isStreamClosed } = await this.#runMiddlewares({
+      const { options, isStreamClosed } = await this.#runMiddlewares({
         method,
-        input: { ...initialInput }, // preserve the initial
+        input,
         request,
         response,
         logger,
@@ -332,7 +331,7 @@ export class Endpoint<
       error = makeErrorFromAnything(e);
     }
     await this.#handleResult({
-      initialInput,
+      input,
       output,
       request,
       response,

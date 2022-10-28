@@ -5,7 +5,7 @@ import {
   defaultInputSources,
   getExamples,
   getFinalEndpointInputSchema,
-  getInitialInput,
+  getInput,
   getMessageFromError,
   getRoutePathParams,
   getStatusCodeFromError,
@@ -241,10 +241,10 @@ describe("Common Helpers", () => {
     });
   });
 
-  describe("getInitialInput()", () => {
+  describe("getInput()", () => {
     test("should return body for POST, PUT and PATCH requests by default", () => {
       expect(
-        getInitialInput(
+        getInput(
           {
             body: {
               param: 123,
@@ -258,7 +258,7 @@ describe("Common Helpers", () => {
         param: 123,
       });
       expect(
-        getInitialInput(
+        getInput(
           {
             body: {
               param: 123,
@@ -271,7 +271,7 @@ describe("Common Helpers", () => {
         param: 123,
       });
       expect(
-        getInitialInput(
+        getInput(
           {
             body: {
               param: 123,
@@ -286,7 +286,7 @@ describe("Common Helpers", () => {
     });
     test("should return query for GET requests by default", () => {
       expect(
-        getInitialInput(
+        getInput(
           {
             query: {
               param: 123,
@@ -301,7 +301,7 @@ describe("Common Helpers", () => {
     });
     test("should return both body and query for DELETE and unknown requests by default", () => {
       expect(
-        getInitialInput(
+        getInput(
           {
             query: { a: "query" },
             body: { b: "body" },
@@ -316,7 +316,7 @@ describe("Common Helpers", () => {
     });
     test("should return body and files on demand for POST by default", () => {
       expect(
-        getInitialInput(
+        getInput(
           {
             body: {
               param: 123,
@@ -336,7 +336,7 @@ describe("Common Helpers", () => {
     });
     test("Issue 158: should return query and body for POST on demand", () => {
       expect(
-        getInitialInput(
+        getInput(
           {
             body: {
               a: "body",
@@ -358,7 +358,7 @@ describe("Common Helpers", () => {
     });
     test("URL params: should also be taken, with a higher priority by default", () => {
       expect(
-        getInitialInput(
+        getInput(
           {
             body: {
               a: "body",
@@ -382,7 +382,7 @@ describe("Common Helpers", () => {
     });
     test("Issue 514: should return empty object for OPTIONS", () => {
       expect(
-        getInitialInput({ method: "OPTIONS" } as unknown as Request, undefined)
+        getInput({ method: "OPTIONS" } as unknown as Request, undefined)
       ).toEqual({});
     });
   });
