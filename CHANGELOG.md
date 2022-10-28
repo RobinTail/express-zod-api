@@ -4,6 +4,7 @@
 
 ### v7.9.3
 
+- This version is a cherry-pick of the fix made in v8.3.2.
 - Fixed the bug #673 found and reported by [@shroudedcode](https://github.com/shroudedcode).
   - Preventing double parsing of incoming data by input schemas of middlewares containing transformations.
   - The bug caused inability of using any transforming schema in middlewares.
