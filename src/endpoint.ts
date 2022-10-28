@@ -231,11 +231,12 @@ export class Endpoint<
       if (method === "options" && def.type === "proprietary") {
         continue;
       }
-      Object.assign(input, await def.input.parseAsync(input)); // middleware can transform the input types
+      // Issue #673: do not transform the input here, since this.inputSchema is combined with middlewares' schemas
+      // Object.assign(input, await def.input.parseAsync(input)); // middleware can transform the input types
       Object.assign(
         options,
         await def.middleware({
-          input,
+          input: await def.input.parseAsync(input),
           options,
           request,
           response,

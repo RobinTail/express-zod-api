@@ -748,7 +748,10 @@ describe("Endpoint", () => {
         },
       });
 
-      console.log(loggerMock.debug.mock.calls);
+      expect(loggerMock.debug.mock.calls).toEqual([
+        ["date in mw handler", "object"],
+        ["date in endpoint handler", "object"],
+      ]);
       expect(responseMock.status).toHaveBeenCalledWith(200);
     });
   });
