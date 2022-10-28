@@ -82,7 +82,7 @@ const fallbackInputSource = defaultInputSources.delete;
 export const getActualMethod = (request: Request) =>
   request.method.toLowerCase() as Method | AuxMethod;
 
-export function getInitialInput(
+export function getInput(
   request: Request,
   inputAssignment: CommonConfig["inputSources"]
 ): any {
