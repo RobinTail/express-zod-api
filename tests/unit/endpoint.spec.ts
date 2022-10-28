@@ -711,4 +711,45 @@ describe("Endpoint", () => {
       expect(responseMock.status).toHaveBeenCalledWith(400);
     });
   });
+
+  describe("Issue #673: using dateIn() in middleware", () => {
+    test("should support dateIn() within middlewares", async () => {
+      const dateInputMiddleware = createMiddleware({
+        input: z.object({
+          middleware_date_input: z.dateIn().optional(),
+        }),
+        middleware: async ({ input: { middleware_date_input }, logger }) => {
+          logger.debug("date in mw handler", typeof middleware_date_input);
+          return {};
+        },
+      });
+
+      const endpoint = defaultEndpointsFactory
+        .addMiddleware(dateInputMiddleware)
+        .build({
+          method: "get",
+          input: z.object({}),
+          output: z.object({}),
+          handler: async ({ input: { middleware_date_input }, logger }) => {
+            logger.debug(
+              "date in endpoint handler",
+              typeof middleware_date_input
+            );
+            return {};
+          },
+        });
+
+      const { loggerMock, responseMock } = await testEndpoint({
+        endpoint,
+        requestProps: {
+          query: {
+            middleware_date_input: "2022-09-28",
+          },
+        },
+      });
+
+      console.log(loggerMock.debug.mock.calls);
+      expect(responseMock.status).toHaveBeenCalledWith(200);
+    });
+  });
 });
