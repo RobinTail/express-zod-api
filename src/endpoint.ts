@@ -8,7 +8,7 @@ import {
   FlatObject,
   IOSchema,
   getActualMethod,
-  getInitialInput,
+  getInput,
   makeErrorFromAnything,
 } from "./common-helpers";
 import { LogicalContainer, combineContainers } from "./logical-container";
@@ -333,7 +333,7 @@ export class Endpoint<
         response.set(key, headers[key]);
       }
     }
-    const input = getInitialInput(request, config.inputSources);
+    const input = getInput(request, config.inputSources);
     try {
       const { options, isStreamClosed } = await this.#runMiddlewares({
         method,
