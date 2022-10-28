@@ -214,11 +214,11 @@ export const depictDateIn: DepictHelper<ZodDateIn> = ({
     throw new OpenAPIError("Please use z.dateOut() for output.");
   }
   return {
+    description: "YYYY-MM-DDTHH:mm:ss.sssZ",
     ...initial,
     type: "string",
     format: "date-time",
     pattern: isoDateRegex.source,
-    description: "YYYY-MM-DDTHH:mm:ss.sssZ",
     externalDocs: {
       url: isoDateDocumentationUrl,
     },
@@ -233,10 +233,10 @@ export const depictDateOut: DepictHelper<ZodDateOut> = ({
     throw new OpenAPIError("Please use z.dateIn() for input.");
   }
   return {
+    description: "YYYY-MM-DDTHH:mm:ss.sssZ",
     ...initial,
     type: "string",
     format: "date-time",
-    description: "YYYY-MM-DDTHH:mm:ss.sssZ",
     externalDocs: {
       url: isoDateDocumentationUrl,
     },

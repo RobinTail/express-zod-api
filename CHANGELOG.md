@@ -2,6 +2,19 @@
 
 ## Version 8
 
+### v8.3.3
+
+- Fixed the bug #672 found and reported by [@shroudedcode](https://github.com/shroudedcode).
+  - Preserving the custom description of `z.dateIn()` and `z.dateOut()` schemas when generating OpenAPI documentation.
+
+```yaml
+# z.dateIn().describe("custom description")
+before:
+  description: YYYY-MM-DDTHH:mm:ss.sssZ
+after:
+  description: custom description
+```
+
 ### v8.3.2
 
 - Fixed the bug #673 found and reported by [@shroudedcode](https://github.com/shroudedcode).
