@@ -712,8 +712,8 @@ describe("Endpoint", () => {
     });
   });
 
-  describe("Issue #673: using dateIn() in middleware", () => {
-    test("should support dateIn() within middlewares", async () => {
+  describe("Issue #673: transformations in middlewares", () => {
+    test("should avoid double parsing, should not mutate input", async () => {
       const dateInputMiddleware = createMiddleware({
         input: z.object({
           middleware_date_input: z.dateIn().optional(),
