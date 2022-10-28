@@ -220,7 +220,7 @@ export class Endpoint<
     logger,
   }: {
     method: Method | AuxMethod;
-    input: any;
+    input: Readonly<any>;
     request: Request;
     response: Response;
     logger: Logger;
@@ -260,7 +260,7 @@ export class Endpoint<
     options,
     logger,
   }: {
-    input: any;
+    input: Readonly<any>;
     options: any;
     logger: Logger;
   }) {
