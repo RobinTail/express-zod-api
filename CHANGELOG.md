@@ -2,6 +2,15 @@
 
 ## Version 8
 
+### v8.3.2
+
+- Fixed the bug #673 found and reported by [@shroudedcode](https://github.com/shroudedcode).
+  - Preventing double parsing of incoming data by input schemas of middlewares containing transformations.
+  - The bug caused inability of using any transforming schema in middlewares.
+  - In particular, but not limited with: using `z.dateIn()` in middlewares.
+    - Sample error message in this case: `Expected string, received date`.
+  - Using `.transform()` method in middlewares was also affected by this bug.
+
 ### v8.3.1
 
 - Clearer error message when using `z.date()` within I/O schema thrown by OpenAPI generator.
