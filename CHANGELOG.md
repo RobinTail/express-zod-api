@@ -2,6 +2,15 @@
 
 ## Version 7
 
+### v7.9.3
+
+- Fixed the bug #673 found and reported by [@shroudedcode](https://github.com/shroudedcode).
+  - Preventing double parsing of incoming data by input schemas of middlewares containing transformations.
+  - The bug caused inability of using any transforming schema in middlewares.
+  - In particular, but not limited with: using `z.dateIn()` in middlewares.
+    - Sample error message in this case: `Expected string, received date`.
+  - Using `.transform()` method in middlewares was also affected by this bug.
+
 ### v7.9.2
 
 - Fixed issue #585 found and reported along with a suggested solution by [@rayzr522](https://github.com/rayzr522).
