@@ -906,7 +906,7 @@ test("should respond successfully", async () => {
     endpoint: yourEndpoint,
     requestProps: {
       method: "POST", // default: GET
-      body: { ... },
+      body: { /* parsed JSON */ },
     },
     // responseProps, configProps, loggerProps
   });
@@ -919,7 +919,7 @@ test("should respond successfully", async () => {
 });
 ```
 
-_This method is optimized for the standard result handler. With the flexibility to customize, you can add additional
+_This method is optimized for the `defaultResultHandler`. With the flexibility to customize, you can add additional
 properties as needed._
 
 ## Excessive properties in endpoint output
