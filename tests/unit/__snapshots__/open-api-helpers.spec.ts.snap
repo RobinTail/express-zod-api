@@ -34,7 +34,7 @@ exports[`Open API helpers depictBoolean() should depict ZodBoolean 1`] = `
 
 exports[`Open API helpers depictDateIn should depict ZodDateIn 1`] = `
 {
-  "description": "YYYY-MM-DDTHH:mm:ss.sssZ",
+  "description": "test",
   "externalDocs": {
     "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString",
   },
@@ -48,7 +48,7 @@ exports[`Open API helpers depictDateIn should throw when ZodDateIn in response 1
 
 exports[`Open API helpers depictDateOut should depict ZodDateOut 1`] = `
 {
-  "description": "YYYY-MM-DDTHH:mm:ss.sssZ",
+  "description": "test",
   "externalDocs": {
     "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString",
   },
