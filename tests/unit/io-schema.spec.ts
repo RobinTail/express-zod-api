@@ -182,6 +182,21 @@ describe("I/O Schema and related helpers", () => {
       expect(serializeSchemaForTest(result)).toMatchSnapshot();
     });
 
+    test("Zod Issue #600: can not intersect object schema with passthrough and transformation", () => {
+      // @see https://github.com/colinhacks/zod/issues/600
+      // this is the reason why IOSchema is generic and middlewares have to be "strip"
+      const left = z.object({}).passthrough();
+      const right = z.object({
+        id: z.string().transform((str) => parseInt(str)),
+      });
+      const schema = z.intersection(left, right);
+      const result = schema.safeParse({
+        id: "123",
+      });
+      expect(result.success).toBeFalsy();
+      expect((result as z.SafeParseError<any>).error).toMatchSnapshot();
+    });
+
     test("Should merge mixed object schemas", () => {
       const middlewares: AnyMiddlewareDef[] = [
         createMiddleware({
