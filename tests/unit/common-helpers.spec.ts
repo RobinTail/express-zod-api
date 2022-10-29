@@ -1,5 +1,5 @@
 import { UploadedFile } from "express-fileupload";
-import { expectNotType, expectType } from "tsd";
+import { expectType } from "tsd";
 import {
   combinations,
   defaultInputSources,
