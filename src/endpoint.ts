@@ -6,11 +6,11 @@ import { CommonConfig } from "./config-type";
 import { ResultHandlerError } from "./errors";
 import {
   FlatObject,
-  IOSchema,
   getActualMethod,
   getInput,
   makeErrorFromAnything,
 } from "./common-helpers";
+import { IOSchema } from "./io-schema";
 import { LogicalContainer, combineContainers } from "./logical-container";
 import { AuxMethod, Method, MethodsDefinition } from "./method";
 import { AnyMiddlewareDef } from "./middleware";

@@ -1,15 +1,14 @@
 import { Request, Response } from "express";
 import { z } from "zod";
 import { ApiResponse } from "./api-response";
+import { FlatObject, hasUpload } from "./common-helpers";
+import { CommonConfig } from "./config-type";
+import { Endpoint, Handler } from "./endpoint";
 import {
-  FlatObject,
   IOSchema,
   ProbableIntersection,
   getFinalEndpointInputSchema,
-  hasUpload,
-} from "./common-helpers";
-import { CommonConfig } from "./config-type";
-import { Endpoint, Handler } from "./endpoint";
+} from "./io-schema";
 import { Method, MethodsDefinition } from "./method";
 import {
   AnyMiddlewareDef,

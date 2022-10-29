@@ -16,7 +16,6 @@ import { omit } from "ramda";
 import { z } from "zod";
 import {
   ArrayElement,
-  IOSchema,
   getExamples,
   getRoutePathParams,
   routePathParamsRegex,
@@ -27,6 +26,7 @@ import { ZodDateOut, ZodDateOutDef } from "./date-out-schema";
 import { AbstractEndpoint } from "./endpoint";
 import { OpenAPIError } from "./errors";
 import { ZodFile, ZodFileDef } from "./file-schema";
+import { IOSchema } from "./io-schema";
 import {
   LogicalContainer,
   andToOr,

@@ -7,61 +7,18 @@ import {
   LoggerConfig,
   loggerLevels,
 } from "./config-type";
-import { copyMeta, getMeta } from "./metadata";
+import { getMeta } from "./metadata";
 import { AuxMethod, Method } from "./method";
-import { AnyMiddlewareDef } from "./middleware";
 import { mimeMultipart } from "./mime";
 import { ZodUpload } from "./upload-schema";
 
 export type FlatObject = Record<string, any>;
-
-type Refined<T extends z.ZodType> = T extends z.ZodType<infer O>
-  ? z.ZodEffects<T, O, O>
-  : never;
-
-export type IOSchema<U extends UnknownKeysParam = any> =
-  | z.ZodObject<any, U>
-  | z.ZodUnion<[IOSchema<U>, ...IOSchema<U>[]]>
-  | z.ZodIntersection<IOSchema<U>, IOSchema<U>>
-  | z.ZodDiscriminatedUnion<string, z.Primitive, z.ZodObject<any, U>>
-  | Refined<z.ZodObject<any, U>>;
 
 export type ArrayElement<T extends readonly unknown[]> =
   T extends readonly (infer K)[] ? K : never;
 
 /** @see https://expressjs.com/en/guide/routing.html */
 export const routePathParamsRegex = /:([A-Za-z0-9_]+)/g;
-
-export type ProbableIntersection<
-  A extends IOSchema<"strip"> | null,
-  B extends IOSchema
-> = A extends null
-  ? B
-  : A extends IOSchema<"strip">
-  ? z.ZodIntersection<A, B>
-  : never;
-
-/**
- * @description intersects input schemas of middlewares and the endpoint
- * @since 07.03.2022 former combineEndpointAndMiddlewareInputSchemas()
- */
-export const getFinalEndpointInputSchema = <
-  MIN extends IOSchema<"strip"> | null,
-  IN extends IOSchema
->(
-  middlewares: AnyMiddlewareDef[],
-  input: IN
-): ProbableIntersection<MIN, IN> => {
-  const result = middlewares
-    .map(({ input: schema }) => schema)
-    .concat(input)
-    .reduce((acc, schema) => acc.and(schema)) as ProbableIntersection<MIN, IN>;
-  for (const middleware of middlewares) {
-    copyMeta(middleware.input, result);
-  }
-  copyMeta(input, result);
-  return result;
-};
 
 function areFilesAvailable(request: Request) {
   const contentType = request.header("content-type") || "";
@@ -243,6 +200,3 @@ export type ErrMessage = Exclude<
 // the copy of the private Zod errorUtil.errToObj
 export const errToObj = (message: ErrMessage | undefined) =>
   typeof message === "string" ? { message } : message || {};
-
-// the copy of the private Zod utility type of ZodObject
-type UnknownKeysParam = "passthrough" | "strict" | "strip";
