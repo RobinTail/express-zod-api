@@ -29,19 +29,25 @@ describe("Common Helpers", () => {
       expectType<IOSchema<"strict">>(z.object({}).strict());
       expectType<IOSchema<"passthrough">>(z.object({}).passthrough());
       expectType<IOSchema<"strip">>(z.object({}).strip());
+    });
+    test("respects the UnknownKeys type argument", () => {
       expectNotType<IOSchema<"passthrough">>(z.object({}));
     });
     test("accepts union of objects", () => {
       expectType<IOSchema>(z.union([z.object({}), z.object({})]));
       expectType<IOSchema>(z.object({}).or(z.object({})));
       expectType<IOSchema>(z.object({}).or(z.object({}).or(z.object({}))));
-      expectNotType<IOSchema>(z.object({}).or(z.string()));
+    });
+    test("does not accept union of object and array of objects", () => {
+      expectNotType<IOSchema>(z.object({}).or(z.array(z.object({}))));
     });
     test("accepts intersection of objects", () => {
       expectType<IOSchema>(z.intersection(z.object({}), z.object({})));
       expectType<IOSchema>(z.object({}).and(z.object({})));
       expectType<IOSchema>(z.object({}).and(z.object({}).and(z.object({}))));
-      expectNotType<IOSchema>(z.object({}).and(z.string()));
+    });
+    test("does not accepts intersection of object with array of objects", () => {
+      expectNotType<IOSchema>(z.object({}).and(z.array(z.object({}))));
     });
     test("accepts discriminated union of objects", () => {
       expectType<IOSchema>(
@@ -58,11 +64,14 @@ describe("Common Helpers", () => {
     test("accepts a refinement of object", () => {
       expectType<IOSchema>(z.object({}).refine(() => true));
       expectType<IOSchema>(
-        z.object({}).refine((obj) => ({ ...obj, test: true }))
+        z.object({}).refinement(() => true, {
+          code: "custom",
+          message: "test",
+        })
       );
-      expectNotType<IOSchema>(
-        z.object({}).transform((obj) => Object.keys(obj))
-      );
+    });
+    test("does not accept transformation of object", () => {
+      expectNotType<IOSchema>(z.object({}).transform(() => true));
     });
   });
 
