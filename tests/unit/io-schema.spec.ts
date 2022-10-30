@@ -58,6 +58,13 @@ describe("I/O Schema and related helpers", () => {
     test("does not accept transformation of object", () => {
       expectNotType<IOSchema>(z.object({}).transform(() => true));
     });
+    test("Issue 678: Insufficient type checking to detect transformation to object inheritor", () => {
+      // the issue has to be prevented programmatically using hasTopLevelTransformingEffect() helper
+      expectType<IOSchema>(z.object({}).transform(() => []));
+      expectType<IOSchema>(
+        z.object({ s: z.string() }).transform(() => ({ n: 123 }))
+      );
+    });
   });
 
   describe("getFinalEndpointInputSchema()", () => {
