@@ -2,7 +2,8 @@ import { Request, Response } from "express";
 import { HttpError } from "http-errors";
 import { Logger } from "winston";
 import { z } from "zod";
-import { FlatObject } from "./common-helpers";
+import { FlatObject, hasTopLevelTransformingEffect } from "./common-helpers";
+import { IOSchemaError } from "./errors";
 import { IOSchema } from "./io-schema";
 import { LogicalContainer } from "./logical-container";
 import { Security } from "./security";
@@ -48,10 +49,17 @@ export const createMiddleware = <
   SCO extends string
 >(
   props: MiddlewareCreationProps<IN, OPT, OUT, SCO>
-): MiddlewareDefinition<IN, OPT, OUT, SCO> => ({
-  ...props,
-  type: "proprietary",
-});
+): MiddlewareDefinition<IN, OPT, OUT, SCO> => {
+  if (hasTopLevelTransformingEffect(props.input)) {
+    throw new IOSchemaError(
+      "Using transformations on the top level of middleware input schema is not allowed."
+    );
+  }
+  return {
+    ...props,
+    type: "proprietary",
+  };
+};
 
 export type ExpressMiddleware<R extends Request, S extends Response> = (
   request: R,
