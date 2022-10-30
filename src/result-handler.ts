@@ -3,11 +3,8 @@ import { Logger } from "winston";
 import { z } from "zod";
 import { ApiResponse, createApiResponse } from "./api-response";
 import { ResultHandlerError } from "./errors";
-import {
-  IOSchema,
-  getMessageFromError,
-  getStatusCodeFromError,
-} from "./common-helpers";
+import { getMessageFromError, getStatusCodeFromError } from "./common-helpers";
+import { IOSchema } from "./io-schema";
 import { getMeta, withMeta } from "./metadata";
 
 interface LastResortHandlerParams {

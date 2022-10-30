@@ -2,7 +2,8 @@ import { Request, Response } from "express";
 import { HttpError } from "http-errors";
 import { Logger } from "winston";
 import { z } from "zod";
-import { FlatObject, IOSchema } from "./common-helpers";
+import { FlatObject } from "./common-helpers";
+import { IOSchema } from "./io-schema";
 import { LogicalContainer } from "./logical-container";
 import { Security } from "./security";
 
