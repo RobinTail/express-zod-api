@@ -24,6 +24,8 @@ import {
   parametricIndexNode,
   protectedReadonlyModifier,
 } from "./client-helpers";
+import { hasTopLevelTransformingEffect } from "./common-helpers";
+import { IOSchemaError } from "./errors";
 import { methods } from "./method";
 import { mimeJson } from "./mime";
 import { Routing, routingCycle } from "./routing";
@@ -43,6 +45,11 @@ export class Client {
       endpointCb: (endpoint, path, method) => {
         const inputId = cleanId(path, method, "input");
         const responseId = cleanId(path, method, "response");
+        if (hasTopLevelTransformingEffect(endpoint.getInputSchema())) {
+          throw new IOSchemaError(
+            "Using transformations on the top level of input schema is not allowed."
+          );
+        }
         const input = zodToTs(endpoint.getInputSchema(), inputId, {
           resolveNativeEnums: true,
         });
