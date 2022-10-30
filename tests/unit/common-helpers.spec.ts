@@ -8,6 +8,7 @@ import {
   getMessageFromError,
   getRoutePathParams,
   getStatusCodeFromError,
+  hasTopLevelTransformingEffect,
   hasUpload,
   isLoggerConfig,
   isValidDate,
@@ -375,6 +376,40 @@ describe("Common Helpers", () => {
       expect(getRoutePathParams("/something")).toEqual([]);
       expect(getRoutePathParams("")).toEqual([]);
       expect(getRoutePathParams("\n")).toEqual([]);
+    });
+  });
+
+  describe("hasTopLevelTransformingEffect()", () => {
+    test("should return true for transformation", () => {
+      expect(
+        hasTopLevelTransformingEffect(z.object({}).transform(() => []))
+      ).toBeTruthy();
+    });
+    test("should detect transformation in intersection", () => {
+      expect(
+        hasTopLevelTransformingEffect(
+          z.object({}).and(z.object({}).transform(() => []))
+        )
+      ).toBeTruthy();
+    });
+    test("should detect transformation in union", () => {
+      expect(
+        hasTopLevelTransformingEffect(
+          z.object({}).or(z.object({}).transform(() => []))
+        )
+      ).toBeTruthy();
+    });
+    test("should return false for object fields using transformations", () => {
+      expect(
+        hasTopLevelTransformingEffect(
+          z.object({ s: z.string().transform(() => 123) })
+        )
+      ).toBeFalsy();
+    });
+    test("should return false for refinement", () => {
+      expect(
+        hasTopLevelTransformingEffect(z.object({}).refine(() => true))
+      ).toBeFalsy();
     });
   });
 
