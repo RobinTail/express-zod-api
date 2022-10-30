@@ -18,6 +18,7 @@ import {
   ArrayElement,
   getExamples,
   getRoutePathParams,
+  hasTopLevelTransformingEffect,
   routePathParamsRegex,
 } from "./common-helpers";
 import { InputSources, TagsConfig } from "./config-type";
@@ -573,6 +574,11 @@ export function extractObjectSchema(subject: IOSchema) {
       .map((option) => extractObjectSchema(option))
       .reduce((acc, option) => acc.merge(option.partial()), z.object({}));
   } else if (subject instanceof z.ZodEffects) {
+    if (hasTopLevelTransformingEffect(subject)) {
+      throw new OpenAPIError(
+        "Using transformations on the top level of input schema is not allowed."
+      );
+    }
     objectSchema = extractObjectSchema(subject._def.schema); // object refinement
   } else {
     // intersection
