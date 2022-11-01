@@ -1,5 +1,8 @@
 import { routing } from "../../example/routing";
 import { Client, defaultEndpointsFactory, z } from "../../src";
+import { Endpoint } from "../../src/endpoint";
+import { IOSchemaError } from "../../src/errors";
+import { mimeJson } from "../../src/mime";
 
 describe("API Client Generator", () => {
   test("Should generate a client for example API", () => {
@@ -23,5 +26,34 @@ describe("API Client Generator", () => {
       },
     });
     expect(client.print()).toMatchSnapshot();
+  });
+
+  describe("Feature #600: Top level refinements", () => {
+    test("should throw when using transformation", () => {
+      expect(
+        () =>
+          new Client({
+            v1: {
+              test: new Endpoint({
+                method: "get",
+                inputSchema: z.object({}).transform(() => []),
+                mimeTypes: [mimeJson],
+                outputSchema: z.object({}),
+                handler: jest.fn(),
+                resultHandler: {
+                  getPositiveResponse: jest.fn(),
+                  getNegativeResponse: jest.fn(),
+                  handler: jest.fn(),
+                },
+                middlewares: [],
+              }),
+            },
+          })
+      ).toThrowError(
+        new IOSchemaError(
+          "Using transformations on the top level of input schema is not allowed."
+        )
+      );
+    });
   });
 });
