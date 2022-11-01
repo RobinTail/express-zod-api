@@ -869,7 +869,7 @@ exports[`Open API helpers excludeParamsFromDepiction() should omit specified pat
 }
 `;
 
-exports[`Open API helpers extractObjectSchema() should handle refined object schema 1`] = `
+exports[`Open API helpers extractObjectSchema() Feature #600: Top level refinements should handle refined object schema 1`] = `
 {
   "_type": "ZodObject",
   "shape": {

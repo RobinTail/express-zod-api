@@ -7,6 +7,7 @@ import {
   LoggerConfig,
   loggerLevels,
 } from "./config-type";
+import { IOSchema } from "./io-schema";
 import { getMeta } from "./metadata";
 import { AuxMethod, Method } from "./method";
 import { mimeMultipart } from "./mime";
@@ -158,17 +159,35 @@ export function getRoutePathParams(path: string): string[] {
   return match.map((param) => param.slice(1));
 }
 
+const reduceBool = (arr: boolean[]) =>
+  arr.reduce((carry, bool) => carry || bool, false);
+
+export function hasTopLevelTransformingEffect(schema: IOSchema): boolean {
+  if (schema instanceof z.ZodEffects) {
+    if (schema._def.effect.type !== "refinement") {
+      return true;
+    }
+  }
+  if (schema instanceof z.ZodUnion) {
+    return reduceBool(schema.options.map(hasTopLevelTransformingEffect));
+  }
+  if (schema instanceof z.ZodIntersection) {
+    return reduceBool(
+      [schema._def.left, schema._def.right].map(hasTopLevelTransformingEffect)
+    );
+  }
+  return false; // ZodObject left
+}
+
 export function hasUpload(schema: z.ZodTypeAny): boolean {
   if (schema instanceof ZodUpload) {
     return true;
   }
-  const reduceBool = (arr: boolean[]) =>
-    arr.reduce((carry, check) => carry || check, false);
   if (schema instanceof z.ZodObject) {
     return reduceBool(Object.values<z.ZodTypeAny>(schema.shape).map(hasUpload));
   }
   if (schema instanceof z.ZodUnion) {
-    return reduceBool(schema._def.options.map(hasUpload));
+    return reduceBool(schema.options.map(hasUpload));
   }
   if (schema instanceof z.ZodIntersection) {
     return reduceBool([schema._def.left, schema._def.right].map(hasUpload));

@@ -3,11 +3,12 @@ import { Logger } from "winston";
 import { z } from "zod";
 import { ApiResponse } from "./api-response";
 import { CommonConfig } from "./config-type";
-import { ResultHandlerError } from "./errors";
+import { IOSchemaError, ResultHandlerError } from "./errors";
 import {
   FlatObject,
   getActualMethod,
   getInput,
+  hasTopLevelTransformingEffect,
   makeErrorFromAnything,
 } from "./common-helpers";
 import { IOSchema } from "./io-schema";
@@ -99,6 +100,16 @@ export class Endpoint<
     ...rest
   }: EndpointProps<IN, OUT, OPT, M, POS, NEG, SCO, TAG>) {
     super();
+    [
+      { name: "input schema", schema: inputSchema },
+      { name: "output schema", schema: outputSchema },
+    ].forEach(({ name, schema }) => {
+      if (hasTopLevelTransformingEffect(schema)) {
+        throw new IOSchemaError(
+          `Using transformations on the top level of endpoint ${name} is not allowed.`
+        );
+      }
+    });
     this.middlewares = middlewares;
     this.inputSchema = inputSchema;
     this.mimeTypes = mimeTypes;

@@ -1,3 +1,4 @@
+import { IOSchemaError } from "../../src/errors";
 import {
   OpenAPIError,
   defaultEndpointsFactory,
@@ -53,18 +54,6 @@ describe("Open API helpers", () => {
         z.object({
           one: z.string(),
         })
-      );
-      expect(subject).toBeInstanceOf(z.ZodObject);
-      expect(serializeSchemaForTest(subject)).toMatchSnapshot();
-    });
-
-    test("should handle refined object schema", () => {
-      const subject = extractObjectSchema(
-        z
-          .object({
-            one: z.string(),
-          })
-          .refine(() => true)
       );
       expect(subject).toBeInstanceOf(z.ZodObject);
       expect(serializeSchemaForTest(subject)).toMatchSnapshot();
@@ -177,6 +166,36 @@ describe("Open API helpers", () => {
           two: 123,
         },
       ]);
+    });
+
+    describe("Feature #600: Top level refinements", () => {
+      test("should handle refined object schema", () => {
+        const subject = extractObjectSchema(
+          z
+            .object({
+              one: z.string(),
+            })
+            .refine(() => true)
+        );
+        expect(subject).toBeInstanceOf(z.ZodObject);
+        expect(serializeSchemaForTest(subject)).toMatchSnapshot();
+      });
+
+      test("should throw when using transformation", () => {
+        expect(() =>
+          extractObjectSchema(
+            z
+              .object({
+                one: z.string(),
+              })
+              .transform(() => [])
+          )
+        ).toThrowError(
+          new IOSchemaError(
+            "Using transformations on the top level of input schema is not allowed."
+          )
+        );
+      });
     });
   });
 

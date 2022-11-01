@@ -8,6 +8,7 @@ import {
   getMessageFromError,
   getRoutePathParams,
   getStatusCodeFromError,
+  hasTopLevelTransformingEffect,
   hasUpload,
   isLoggerConfig,
   isValidDate,
@@ -378,6 +379,40 @@ describe("Common Helpers", () => {
     });
   });
 
+  describe("hasTopLevelTransformingEffect()", () => {
+    test("should return true for transformation", () => {
+      expect(
+        hasTopLevelTransformingEffect(z.object({}).transform(() => []))
+      ).toBeTruthy();
+    });
+    test("should detect transformation in intersection", () => {
+      expect(
+        hasTopLevelTransformingEffect(
+          z.object({}).and(z.object({}).transform(() => []))
+        )
+      ).toBeTruthy();
+    });
+    test("should detect transformation in union", () => {
+      expect(
+        hasTopLevelTransformingEffect(
+          z.object({}).or(z.object({}).transform(() => []))
+        )
+      ).toBeTruthy();
+    });
+    test("should return false for object fields using transformations", () => {
+      expect(
+        hasTopLevelTransformingEffect(
+          z.object({ s: z.string().transform(() => 123) })
+        )
+      ).toBeFalsy();
+    });
+    test("should return false for refinement", () => {
+      expect(
+        hasTopLevelTransformingEffect(z.object({}).refine(() => true))
+      ).toBeFalsy();
+    });
+  });
+
   describe("hasUpload()", () => {
     test("should return true for z.upload()", () => {
       expect(hasUpload(z.upload())).toBeTruthy();
@@ -457,7 +492,7 @@ describe("Common Helpers", () => {
       [() => {}, "() => { }"],
       [/regexp/is, "/regexp/is"],
       [[1, 2, 3], "1,2,3"],
-    ])("should accept %s", (argument, expected) => {
+    ])("should accept %#", (argument, expected) => {
       const result = makeErrorFromAnything(argument);
       expectType<Error>(result);
       expect(result).toBeInstanceOf(Error);

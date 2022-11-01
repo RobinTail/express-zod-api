@@ -9,6 +9,7 @@ import {
   z,
 } from "../../src";
 import { Endpoint } from "../../src/endpoint";
+import { IOSchemaError } from "../../src/errors";
 import { mimeJson } from "../../src/mime";
 import { serializeSchemaForTest } from "../helpers";
 
@@ -709,6 +710,49 @@ describe("Endpoint", () => {
         status: "error",
       });
       expect(responseMock.status).toHaveBeenCalledWith(400);
+    });
+
+    test("should throw when using transformation (constructor)", () => {
+      expect(
+        () =>
+          new Endpoint({
+            method: "get",
+            inputSchema: z.object({}).transform(() => []),
+            mimeTypes: [mimeJson],
+            outputSchema: z.object({}),
+            handler: jest.fn(),
+            resultHandler: {
+              getPositiveResponse: jest.fn(),
+              getNegativeResponse: jest.fn(),
+              handler: jest.fn(),
+            },
+            middlewares: [],
+          })
+      ).toThrowError(
+        new IOSchemaError(
+          "Using transformations on the top level of endpoint input schema is not allowed."
+        )
+      );
+      expect(
+        () =>
+          new Endpoint({
+            method: "get",
+            inputSchema: z.object({}),
+            mimeTypes: [mimeJson],
+            outputSchema: z.object({}).transform(() => []),
+            handler: jest.fn(),
+            resultHandler: {
+              getPositiveResponse: jest.fn(),
+              getNegativeResponse: jest.fn(),
+              handler: jest.fn(),
+            },
+            middlewares: [],
+          })
+      ).toThrowError(
+        new IOSchemaError(
+          "Using transformations on the top level of endpoint output schema is not allowed."
+        )
+      );
     });
   });
 
