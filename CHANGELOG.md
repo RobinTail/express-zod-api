@@ -2,6 +2,26 @@
 
 ## Version 8
 
+### v8.3.4
+
+- Adjustments to the feature #600: Top level refinements.
+  - In some cases the type of refinement can be indistinguishable from the type of transformation, since both of them
+    are using the same class `ZodEffects` and the only difference is the _inequality_ if input and output types.
+  - However, both of these types may have a common ancestor, which make it challenging to recognize them on the level
+    of Types. So I made a decision to handle this case programmatically.
+  - `createMiddleware()` and `Endpoint::constructor()` will throw in case of using `.transform()` on the top level of
+    `IOSchema`.
+- **Help wanted**: In case anyone smarter than me is reading this, please let me know how I can improve `IOSchema`
+  [type](https://github.com/RobinTail/express-zod-api/blob/master/src/io-schema.ts) to allow refinements without
+  allowing transformations at the same time.
+
+```ts
+// ZodEffects<ZodObject<{}>, boolean, {}>
+z.object({}).transform(() => true); // OK, this is catchable
+// ZodEffects<ZodObject<{}>, never[], {}>
+z.object({}).transform(() => []); // never[] inherits Array inherits Object, {} inherits Object as well
+```
+
 ### v8.3.3
 
 - Fixed the bug #672 found and reported by [@shroudedcode](https://github.com/shroudedcode).
