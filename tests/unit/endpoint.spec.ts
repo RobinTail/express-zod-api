@@ -1,5 +1,4 @@
 import {
-  Client,
   EndpointsFactory,
   createApiResponse,
   createMiddleware,
@@ -716,22 +715,18 @@ describe("Endpoint", () => {
     test("should throw when using transformation (constructor)", () => {
       expect(
         () =>
-          new Client({
-            v1: {
-              test: new Endpoint({
-                method: "get",
-                inputSchema: z.object({}).transform(() => []),
-                mimeTypes: [mimeJson],
-                outputSchema: z.object({}),
-                handler: jest.fn(),
-                resultHandler: {
-                  getPositiveResponse: jest.fn(),
-                  getNegativeResponse: jest.fn(),
-                  handler: jest.fn(),
-                },
-                middlewares: [],
-              }),
+          new Endpoint({
+            method: "get",
+            inputSchema: z.object({}).transform(() => []),
+            mimeTypes: [mimeJson],
+            outputSchema: z.object({}),
+            handler: jest.fn(),
+            resultHandler: {
+              getPositiveResponse: jest.fn(),
+              getNegativeResponse: jest.fn(),
+              handler: jest.fn(),
             },
+            middlewares: [],
           })
       ).toThrowError(
         new IOSchemaError(
@@ -740,22 +735,18 @@ describe("Endpoint", () => {
       );
       expect(
         () =>
-          new Client({
-            v1: {
-              test: new Endpoint({
-                method: "get",
-                inputSchema: z.object({}),
-                mimeTypes: [mimeJson],
-                outputSchema: z.object({}).transform(() => []),
-                handler: jest.fn(),
-                resultHandler: {
-                  getPositiveResponse: jest.fn(),
-                  getNegativeResponse: jest.fn(),
-                  handler: jest.fn(),
-                },
-                middlewares: [],
-              }),
+          new Endpoint({
+            method: "get",
+            inputSchema: z.object({}),
+            mimeTypes: [mimeJson],
+            outputSchema: z.object({}).transform(() => []),
+            handler: jest.fn(),
+            resultHandler: {
+              getPositiveResponse: jest.fn(),
+              getNegativeResponse: jest.fn(),
+              handler: jest.fn(),
             },
+            middlewares: [],
           })
       ).toThrowError(
         new IOSchemaError(
