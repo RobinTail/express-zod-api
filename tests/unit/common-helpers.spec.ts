@@ -492,7 +492,7 @@ describe("Common Helpers", () => {
       [() => {}, "() => { }"],
       [/regexp/is, "/regexp/is"],
       [[1, 2, 3], "1,2,3"],
-    ])("should accept %s", (argument, expected) => {
+    ])("should accept %#", (argument, expected) => {
       const result = makeErrorFromAnything(argument);
       expectType<Error>(result);
       expect(result).toBeInstanceOf(Error);

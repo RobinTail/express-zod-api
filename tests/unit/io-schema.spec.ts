@@ -45,25 +45,27 @@ describe("I/O Schema and related helpers", () => {
       expectType<IOSchema>(z.object({}).or(z.object({}).and(z.object({}))));
       expectType<IOSchema>(z.object({}).and(z.object({}).or(z.object({}))));
     });
-    test("accepts a refinement of object", () => {
-      expectType<IOSchema>(z.object({}).refine(() => true));
-      expectType<IOSchema>(z.object({}).superRefine(() => true));
-      expectType<IOSchema>(
-        z.object({}).refinement(() => true, {
-          code: "custom",
-          message: "test",
-        })
-      );
-    });
-    test("does not accept transformation of object", () => {
-      expectNotType<IOSchema>(z.object({}).transform(() => true));
-    });
-    test("Issue 678: Insufficient type checking to detect transformation to object inheritor", () => {
-      // the issue has to be prevented programmatically using hasTopLevelTransformingEffect() helper
-      expectType<IOSchema>(z.object({}).transform(() => []));
-      expectType<IOSchema>(
-        z.object({ s: z.string() }).transform(() => ({ n: 123 }))
-      );
+    describe("Feature #600: Top level refinements", () => {
+      test("Problem: refinement is indistinguishable from transformation", () => {
+        // the issue has to be prevented programmatically using hasTopLevelTransformingEffect() helper
+        expectType<IOSchema>(z.object({}).transform(() => []));
+        expectType<IOSchema>(
+          z.object({ s: z.string() }).transform(() => ({ n: 123 }))
+        );
+      });
+      test("accepts a refinement of object", () => {
+        expectType<IOSchema>(z.object({}).refine(() => true));
+        expectType<IOSchema>(z.object({}).superRefine(() => true));
+        expectType<IOSchema>(
+          z.object({}).refinement(() => true, {
+            code: "custom",
+            message: "test",
+          })
+        );
+      });
+      test("does not accept transformation of object", () => {
+        expectNotType<IOSchema>(z.object({}).transform(() => true));
+      });
     });
   });
 
