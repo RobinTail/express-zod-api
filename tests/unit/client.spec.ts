@@ -27,33 +27,4 @@ describe("API Client Generator", () => {
     });
     expect(client.print()).toMatchSnapshot();
   });
-
-  describe("Feature #600: Top level refinements", () => {
-    test("should throw when using transformation", () => {
-      expect(
-        () =>
-          new Client({
-            v1: {
-              test: new Endpoint({
-                method: "get",
-                inputSchema: z.object({}).transform(() => []),
-                mimeTypes: [mimeJson],
-                outputSchema: z.object({}),
-                handler: jest.fn(),
-                resultHandler: {
-                  getPositiveResponse: jest.fn(),
-                  getNegativeResponse: jest.fn(),
-                  handler: jest.fn(),
-                },
-                middlewares: [],
-              }),
-            },
-          })
-      ).toThrowError(
-        new IOSchemaError(
-          "Using transformations on the top level of input schema is not allowed."
-        )
-      );
-    });
-  });
 });

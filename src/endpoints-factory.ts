@@ -1,14 +1,9 @@
 import { Request, Response } from "express";
 import { z } from "zod";
 import { ApiResponse } from "./api-response";
-import {
-  FlatObject,
-  hasTopLevelTransformingEffect,
-  hasUpload,
-} from "./common-helpers";
+import { FlatObject, hasUpload } from "./common-helpers";
 import { CommonConfig } from "./config-type";
 import { Endpoint, Handler } from "./endpoint";
-import { IOSchemaError } from "./errors";
 import {
   IOSchema,
   ProbableIntersection,
@@ -167,11 +162,6 @@ export class EndpointsFactory<
     SCO,
     TAG
   > {
-    if (hasTopLevelTransformingEffect(input)) {
-      throw new IOSchemaError(
-        "Using transformations on the top level of endpoint input schema is not allowed."
-      );
-    }
     const { middlewares, resultHandler } = this;
     return new Endpoint({
       handler,
