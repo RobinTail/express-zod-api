@@ -1,8 +1,5 @@
 import { routing } from "../../example/routing";
 import { Client, defaultEndpointsFactory, z } from "../../src";
-import { Endpoint } from "../../src/endpoint";
-import { IOSchemaError } from "../../src/errors";
-import { mimeJson } from "../../src/mime";
 
 describe("API Client Generator", () => {
   test("Should generate a client for example API", () => {
