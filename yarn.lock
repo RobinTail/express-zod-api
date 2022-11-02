@@ -1124,9 +1124,9 @@
   integrity sha512-1mwAilzr9t7E+h+KHaOE3Jxio9G3c2DSQTcjz/JV/xJ9DUuQastSiYmjJz4D07Vh12+tKM4owiFOe2+XOmvEig==
 
 "@types/http-errors@^2.0.0":
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/@types/http-errors/-/http-errors-2.0.0.tgz#c1f34eee7f9fd5ddee366d15e2fc39b93c31532a"
-  integrity sha512-6mkB8Gx7Of1yjqqh1nLH22ATNol5+mIXVFaQCOQY+R3JxB6/soiqKAxBgdSE6R/1IWu69rR4cJ/027TxLEs/Vg==
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/@types/http-errors/-/http-errors-2.0.1.tgz#20172f9578b225f6c7da63446f56d4ce108d5a65"
+  integrity sha512-/K3ds8TRAfBvi5vfjuz8y6+GiAYBZ0x4tXv1Av6CWBWn0IlADc+ZX9pMq7oU0fNQPnBwIZl3rmeLp6SBApbxSQ==
 
 "@types/istanbul-lib-coverage@*", "@types/istanbul-lib-coverage@^2.0.0", "@types/istanbul-lib-coverage@^2.0.1":
   version "2.0.3"
