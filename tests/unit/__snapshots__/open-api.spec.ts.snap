@@ -2074,6 +2074,9 @@ paths:
                     enum:
                       - success
                   data:
+                    example:
+                      "null": null
+                      dateOut: 2022-08-04
                     type: object
                     properties:
                       "null":
@@ -2081,7 +2084,7 @@ paths:
                         type: string
                         format: "null"
                       dateOut:
-                        description: YYYY-MM-DDTHH:mm:ss.sssZ
+                        description: "Discussion #694"
                         type: string
                         format: date-time
                         externalDocs:
@@ -2092,6 +2095,13 @@ paths:
                 required:
                   - status
                   - data
+              examples:
+                example1:
+                  value:
+                    status: success
+                    data:
+                      "null": null
+                      dateOut: 2022-08-04
         "400":
           description: POST /v1/getSomething Error response
           content:

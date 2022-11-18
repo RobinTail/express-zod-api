@@ -241,9 +241,17 @@ describe("Open API generator", () => {
                 boolean: z.boolean(),
                 dateIn: z.dateIn(),
               }),
-              output: z.object({
-                null: z.null(),
-                dateOut: z.dateOut(),
+              output: withMeta(
+                z.object({
+                  null: z.null(),
+                  dateOut: z
+                    .dateOut()
+                    .describe("Discussion #694")
+                    .transform((str) => str.slice(0, "yyyy-MM-dd".length)),
+                })
+              ).example({
+                null: null,
+                dateOut: new Date("2022-08-04"),
               }),
               handler: async () => ({
                 null: null,

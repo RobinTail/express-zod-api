@@ -321,6 +321,21 @@ describe("Common Helpers", () => {
         )
       ).toEqual([123, 456]);
     });
+    test("Discussion #694: should apply transformation to dateOut in case of output", () => {
+      const schema = withMeta(
+        z.object({
+          start_date: z
+            .dateOut()
+            .describe(
+              "The date this absence starts in the `yyyy-MM-dd` format."
+            )
+            .transform((str) => str.slice(0, "yyyy-MM-dd".length)),
+        })
+      ).example({
+        start_date: new Date("2022-08-04"),
+      });
+      expect(getExamples(schema, true)).toEqual([{ start_date: "2022-08-04" }]);
+    });
   });
 
   describe("combinations()", () => {
