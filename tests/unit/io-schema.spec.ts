@@ -63,6 +63,20 @@ describe("I/O Schema and related helpers", () => {
           })
         );
       });
+      test("Issue 662: accepts nested refinements", () => {
+        expectType<IOSchema>(
+          z
+            .object({})
+            .refine(() => true)
+            .refine(() => true)
+        );
+        expectType<IOSchema>(
+          z
+            .object({})
+            .superRefine(() => true)
+            .superRefine(() => true)
+        );
+      });
       test("does not accept transformation of object", () => {
         expectNotType<IOSchema>(z.object({}).transform(() => true));
       });
