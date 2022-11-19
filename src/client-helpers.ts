@@ -69,13 +69,7 @@ export const makeRecord = (
 
 export const makeEmptyInitializingConstructor = (
   params: ts.ParameterDeclaration[]
-) =>
-  f.createConstructorDeclaration(
-    undefined,
-    undefined,
-    params,
-    f.createBlock([])
-  );
+) => f.createConstructorDeclaration(undefined, params, f.createBlock([]));
 
 export const makeQuotedProp = (name: string, ref: string) =>
   f.createPropertySignature(
@@ -119,7 +113,6 @@ export const makePublicReadonlyProp = (
   exp: ts.Expression
 ) =>
   f.createPropertyDeclaration(
-    undefined,
     publicReadonlyModifier,
     name,
     undefined,
@@ -132,14 +125,10 @@ export const makePublicClass = (
   constructor: ts.ConstructorDeclaration,
   props: ts.PropertyDeclaration[] = []
 ) =>
-  f.createClassDeclaration(
-    undefined,
-    exportModifier,
-    name,
-    undefined,
-    undefined,
-    [constructor, ...props]
-  );
+  f.createClassDeclaration(exportModifier, name, undefined, undefined, [
+    constructor,
+    ...props,
+  ]);
 
 export const makeIndexedPromise = (type: ts.Identifier, index: ts.TypeNode) =>
   f.createTypeReferenceNode("Promise", [
@@ -157,7 +146,6 @@ export const makePublicExtendedInterface = (
   props: ts.PropertySignature[]
 ) =>
   f.createInterfaceDeclaration(
-    undefined,
     exportModifier,
     name,
     undefined,
