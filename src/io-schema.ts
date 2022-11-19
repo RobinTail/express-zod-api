@@ -6,7 +6,7 @@ import { AnyMiddlewareDef } from "./middleware";
 type UnknownKeysParam = "passthrough" | "strict" | "strip";
 
 type Refined<T extends z.ZodType> = T extends z.ZodType<infer O>
-  ? z.ZodEffects<T, O, O>
+  ? z.ZodEffects<T | Refined<T>, O, O>
   : never;
 
 /**
