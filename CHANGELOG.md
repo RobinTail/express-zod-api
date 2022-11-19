@@ -2,6 +2,26 @@
 
 ## Version 8
 
+### v8.4.0
+
+- Fixed the flaw found and reported by [@kirdk](https://github.com/kirdk) in issue #662.
+  - Now nested top level refinements are available:
+
+```ts
+import { z } from "express-zod-api";
+
+const endpoint = endpointsFactory.build({
+  input: z
+    .object({
+      /* ... */
+    })
+    .refine(() => true)
+    .refine(() => true)
+    .refine(() => true),
+  // ...
+});
+```
+
 ### v8.3.4
 
 - Adjustments to the feature #600: Top level refinements.
