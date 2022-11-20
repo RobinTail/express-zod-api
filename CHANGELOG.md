@@ -6,9 +6,10 @@
 
 - Fixing issue of inability to generate Client having Typescript 4.1-4.6.x installed.
   - Making Typescript a regular dependency of the library (it was dev + peer).
-  - Using Typescript version 4.9.3.
-  - The issue introduced in version 7.9.1 of the library.
-  - The library uses Typescript's factory methods got generating the frontend client.
+  - Using `typescript` version 4.9.3.
+  - The issue introduced in version 7.9.1 of the library due to changing the implementation in accordance with the
+    `typescript` upgrade to v4.8.2.
+  - The library uses Typescript's factory methods to generate the frontend client.
 
 ### v8.4.0
 
