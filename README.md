@@ -784,7 +784,8 @@ There is a new way of informing the frontend about the I/O types of your endpoin
 The new approach offers automatic generation of a client based on routing to a typescript file.
 The generated client is flexibly configurable on the frontend side using an implementation function that
 directly makes requests to an endpoint using the libraries and methods of your choice.
-The client asserts the type of request parameters and response. The feature requires Typescript version 4.1 or higher.
+The client asserts the type of request parameters and response.
+Consuming the generated client requires Typescript version 4.1 or higher.
 
 ```typescript
 // example client-generator.ts
