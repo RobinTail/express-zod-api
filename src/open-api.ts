@@ -134,7 +134,6 @@ export class OpenAPI extends OpenApiBuilder {
       }
       const swaggerCompatiblePath = reformatParamsInPath(path);
       this.addPath(swaggerCompatiblePath, {
-        ...(this.rootDoc.paths?.[swaggerCompatiblePath] || {}),
         [method]: operation,
       });
     };
