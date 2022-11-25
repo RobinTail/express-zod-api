@@ -82,32 +82,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    enum:
-                      - success
-                  data:
-                    example:
-                      name: John Doe
-                      createdAt: 2021-12-31T00:00:00.000Z
-                    type: object
-                    properties:
-                      name:
-                        type: string
-                      createdAt:
-                        description: YYYY-MM-DDTHH:mm:ss.sssZ
-                        type: string
-                        format: date-time
-                        externalDocs:
-                          url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
-                    required:
-                      - name
-                      - createdAt
-                required:
-                  - status
-                  - data
+                $ref: "#/components/schemas/UpdateUserResponse"
               examples:
                 example1:
                   value:
@@ -160,35 +135,7 @@ paths:
         content:
           application/json:
             schema:
-              description: POST /v1/user/:id request body
-              allOf:
-                - example:
-                    key: 1234-5678-90
-                  type: object
-                  properties:
-                    key:
-                      type: string
-                      minLength: 1
-                  required:
-                    - key
-                - example:
-                    name: John Doe
-                    birthday: 1963-04-21
-                  type: object
-                  properties:
-                    name:
-                      type: string
-                      minLength: 1
-                    birthday:
-                      description: YYYY-MM-DDTHH:mm:ss.sssZ
-                      type: string
-                      format: date-time
-                      pattern: ^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d{3})?)?Z?$
-                      externalDocs:
-                        url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
-                  required:
-                    - name
-                    - birthday
+              $ref: "#/components/schemas/UpdateUserRequest"
             examples:
               example1:
                 value:
@@ -341,7 +288,62 @@ paths:
               required:
                 - avatar
 components:
-  schemas: {}
+  schemas:
+    UpdateUserRequest:
+      example:
+        key: 1234-5678-90
+        id: "12"
+        name: John Doe
+        birthday: 1963-04-21
+      allOf:
+        - example:
+            key: 1234-5678-90
+          type: object
+          properties:
+            key:
+              type: string
+              minLength: 1
+          required:
+            - key
+        - example:
+            id: "12"
+            name: John Doe
+            birthday: 1963-04-21
+          type: object
+          properties:
+            id:
+              type: string
+            name:
+              type: string
+              minLength: 1
+            birthday:
+              description: YYYY-MM-DDTHH:mm:ss.sssZ
+              type: string
+              format: date-time
+              pattern: ^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d{3})?)?Z?$
+              externalDocs:
+                url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
+          required:
+            - id
+            - name
+            - birthday
+    UpdateUserResponse:
+      example:
+        name: John Doe
+        createdAt: 2021-12-31T00:00:00.000Z
+      type: object
+      properties:
+        name:
+          type: string
+        createdAt:
+          description: YYYY-MM-DDTHH:mm:ss.sssZ
+          type: string
+          format: date-time
+          externalDocs:
+            url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
+      required:
+        - name
+        - createdAt
   responses: {}
   parameters: {}
   examples: {}

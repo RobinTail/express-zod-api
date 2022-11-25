@@ -8,6 +8,7 @@ type MetaProp = typeof metaProp;
 export type MetaDef<T extends z.ZodTypeAny> = {
   [K in MetaProp]: {
     examples: z.input<T>[];
+    schemaName: string;
   };
 };
 type MetaKey = keyof MetaDef<any>[MetaProp];
@@ -18,6 +19,8 @@ type MetaValue<T extends z.ZodTypeAny, K extends MetaKey> = Readonly<
 type ExampleSetter<T extends z.ZodTypeAny> = (
   example: z.input<T>
 ) => WithMeta<T>;
+
+type SchemaSetter<T extends z.ZodTypeAny> = (schemaName: string) => WithMeta<T>;
 
 /**
  * @desc fixes the incompatibility of the ZodObject.keyof() method introduced in v3.17.9
@@ -30,16 +33,27 @@ type MetaFixForStrippedObject<T> = T extends z.ZodObject<any>
 type WithMeta<T extends z.ZodTypeAny> = MetaFixForStrippedObject<T> & {
   _def: T["_def"] & MetaDef<T>;
   example: ExampleSetter<T>;
+  schema: SchemaSetter<T>;
 };
 
 export const withMeta = <T extends z.ZodTypeAny>(schema: T) => {
   const def = schema._def as MetaDef<T>;
-  def[metaProp] = def[metaProp] || { examples: [] };
+  def[metaProp] = def[metaProp] || { examples: [], schemaName: undefined };
   if (!("example" in schema)) {
     Object.defineProperties(schema, {
       example: {
         get: (): ExampleSetter<T> => (value) => {
           def[metaProp].examples.push(value);
+          return schema as WithMeta<T>;
+        },
+      },
+    });
+  }
+  if (!("schema" in schema)) {
+    Object.defineProperties(schema, {
+      schema: {
+        get: (): SchemaSetter<T> => (value) => {
+          def[metaProp].schemaName = value;
           return schema as WithMeta<T>;
         },
       },

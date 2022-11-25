@@ -5,6 +5,7 @@ import {
   MediaTypeObject,
   OAuthFlowsObject,
   ParameterObject,
+  ReferenceObject,
   RequestBodyObject,
   ResponseObject,
   SchemaObject,
@@ -18,6 +19,7 @@ import {
   ArrayElement,
   getExamples,
   getRoutePathParams,
+  getSchemaName,
   hasTopLevelTransformingEffect,
   routePathParamsRegex,
 } from "./common-helpers";
@@ -727,7 +729,7 @@ export const depictResponse = ({
   description: string;
   isPositive: boolean;
 }): ResponseObject => {
-  const schema = isPositive
+  const zSchema = isPositive
     ? endpoint.getPositiveResponseSchema()
     : endpoint.getNegativeResponseSchema();
   const mimeTypes = isPositive
@@ -735,11 +737,19 @@ export const depictResponse = ({
     : endpoint.getNegativeMimeTypes();
   const depictedSchema = excludeExampleFromDepiction(
     depictSchema({
-      schema,
+      schema: zSchema,
       isResponse: true,
     })
   );
-  const examples = depictIOExamples(schema, true);
+  const examples = depictIOExamples(zSchema, true);
+
+  let schema: SchemaObject | ReferenceObject;
+  const schemaName = getSchemaName(endpoint.getOutputSchema());
+  if (!isPositive || !schemaName) schema = depictedSchema;
+  else
+    schema = {
+      $ref: `#/components/schemas/${schemaName}`,
+    } as ReferenceObject;
 
   return {
     description: `${method.toUpperCase()} ${path} ${description}`,
@@ -747,7 +757,7 @@ export const depictResponse = ({
       (carry, mimeType) => ({
         ...carry,
         [mimeType]: {
-          schema: depictedSchema,
+          schema,
           ...examples,
         },
       }),
@@ -870,15 +880,25 @@ export const depictRequest = ({
     pathParams
   );
 
+  let schema: SchemaObject | ReferenceObject;
+  const schemaName = getSchemaName(endpoint.getInputSchema());
+  if (!schemaName) {
+    schema = {
+      description: `${method.toUpperCase()} ${path} request body`,
+      ...bodyDepiction,
+    } as SchemaObject;
+  } else {
+    schema = {
+      $ref: `#/components/schemas/${schemaName}`,
+    } as ReferenceObject;
+  }
+
   return {
     content: endpoint.getInputMimeTypes().reduce(
       (carry, mimeType) => ({
         ...carry,
         [mimeType]: {
-          schema: {
-            description: `${method.toUpperCase()} ${path} request body`,
-            ...bodyDepiction,
-          },
+          schema,
           ...bodyExamples,
         },
       }),

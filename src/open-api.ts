@@ -4,7 +4,7 @@ import {
   SecuritySchemeObject,
   SecuritySchemeType,
 } from "openapi3-ts";
-import { defaultInputSources } from "./common-helpers";
+import { defaultInputSources, getSchemaName } from "./common-helpers";
 import { CommonConfig } from "./config-type";
 import { mapLogicalContainer } from "./logical-container";
 import { Method } from "./method";
@@ -12,6 +12,7 @@ import {
   depictRequest,
   depictRequestParams,
   depictResponse,
+  depictSchema,
   depictSecurity,
   depictSecurityRefs,
   depictTags,
@@ -136,6 +137,25 @@ export class OpenAPI extends OpenApiBuilder {
       this.addPath(swaggerCompatiblePath, {
         [method]: operation,
       });
+
+      const inputSchemaName = getSchemaName(endpoint.getInputSchema());
+      if (inputSchemaName)
+        this.addSchema(
+          inputSchemaName,
+          depictSchema({
+            schema: endpoint.getInputSchema(),
+            isResponse: false,
+          })
+        );
+      const outputSchemaName = getSchemaName(endpoint.getOutputSchema());
+      if (outputSchemaName)
+        this.addSchema(
+          outputSchemaName,
+          depictSchema({
+            schema: endpoint.getOutputSchema(),
+            isResponse: true,
+          })
+        );
     };
     routingCycle({ routing, endpointCb });
     this.rootDoc.tags = config.tags ? depictTags(config.tags) : [];

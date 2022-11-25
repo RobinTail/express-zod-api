@@ -19,20 +19,24 @@ export const updateUserEndpoint =
         name: z.string().min(1),
         birthday: z.dateIn(),
       })
-    ).example({
-      id: "12",
-      name: "John Doe",
-      birthday: "1963-04-21",
-    }),
+    )
+      .example({
+        id: "12",
+        name: "John Doe",
+        birthday: "1963-04-21",
+      })
+      .schema("UpdateUserRequest"),
     output: withMeta(
       z.object({
         name: z.string(),
         createdAt: z.dateOut(),
       })
-    ).example({
-      name: "John Doe",
-      createdAt: new Date("2021-12-31"),
-    }),
+    )
+      .example({
+        name: "John Doe",
+        createdAt: new Date("2021-12-31"),
+      })
+      .schema("UpdateUserResponse"),
     handler: async ({
       input: { id, name, key },
       options: { token },

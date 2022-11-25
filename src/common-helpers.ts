@@ -132,6 +132,12 @@ export const getExamples = <T extends z.ZodTypeAny>(
   }, [] as z.output<typeof schema>[]);
 };
 
+export const getSchemaName = <T extends z.ZodTypeAny>(
+  schema: T
+): string | undefined => {
+  return getMeta(schema, "schemaName");
+};
+
 export const combinations = <T extends any>(
   a: T[],
   b: T[]
