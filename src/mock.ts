@@ -15,6 +15,44 @@ interface TestEndpointProps<REQ, RES, LOG> {
   __noJest?: boolean;
 }
 
+export const makeRequestMock = <REQ>(requestProps?: REQ) =>
+  <
+    { method: string } & Record<"header", jest.Mock> &
+      (REQ extends undefined ? {} : REQ)
+  >{
+    method: "GET",
+    header: jest.fn(() => mimeJson),
+    ...requestProps,
+  };
+
+export const makeResponseMock = <RES>(responseProps?: RES) => {
+  const responseMock = <
+    {
+      writableEnded: boolean;
+      statusCode: number;
+      statusMessage: string;
+    } & Record<"set" | "status" | "json" | "end", jest.Mock> &
+      (RES extends undefined ? {} : RES)
+  >{
+    writableEnded: false,
+    statusCode: 200,
+    statusMessage: http.STATUS_CODES[200],
+    set: jest.fn(() => responseMock),
+    status: jest.fn((code: number) => {
+      responseMock.statusCode = code;
+      responseMock.statusMessage = http.STATUS_CODES[code]!;
+      return responseMock;
+    }),
+    json: jest.fn(() => responseMock),
+    end: jest.fn(() => {
+      responseMock.writableEnded = true;
+      return responseMock;
+    }),
+    ...responseProps,
+  };
+  return responseMock;
+};
+
 /**
  * @description You need to install Jest and probably @types/jest to use this method
  */
@@ -33,38 +71,8 @@ export const testEndpoint = async <
   if (!jest || __noJest) {
     throw new Error("You need to install Jest in order to use testEndpoint().");
   }
-  const requestMock = <
-    { method: string } & Record<"header", jest.Mock> &
-      (REQ extends undefined ? {} : REQ)
-  >{
-    method: "GET",
-    header: jest.fn(() => mimeJson),
-    ...requestProps,
-  };
-  const responseMock = <
-    {
-      writableEnded: boolean;
-      statusCode: number;
-      statusMessage: string;
-    } & Record<"set" | "status" | "json" | "end", jest.Mock> &
-      (RES extends undefined ? {} : RES)
-  >{
-    writableEnded: false,
-    statusCode: 200,
-    statusMessage: http.STATUS_CODES[200],
-    set: jest.fn(() => responseMock),
-    status: jest.fn((code: number) => {
-      responseMock.statusCode = code;
-      responseMock.statusMessage = http.STATUS_CODES[code];
-      return responseMock;
-    }),
-    json: jest.fn(() => responseMock),
-    end: jest.fn(() => {
-      responseMock.writableEnded = true;
-      return responseMock;
-    }),
-    ...responseProps,
-  };
+  const requestMock = makeRequestMock(requestProps);
+  const responseMock = makeResponseMock(responseProps);
   const loggerMock = <
     Record<"info" | "warn" | "error" | "debug", jest.Mock> &
       (LOG extends undefined ? {} : LOG)
