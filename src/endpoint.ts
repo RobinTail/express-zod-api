@@ -43,6 +43,7 @@ export abstract class AbstractEndpoint {
   public abstract getSecurity(): LogicalContainer<Security>;
   public abstract getScopes(): string[];
   public abstract getTags(): string[];
+  public abstract _setSiblingMethods(methods: Method[]): void;
 }
 
 type EndpointProps<
@@ -79,6 +80,7 @@ export class Endpoint<
 > extends AbstractEndpoint {
   protected readonly descriptions: Record<"short" | "long", string | undefined>;
   protected readonly methods: M[] = [];
+  protected siblingMethods: Method[] = [];
   protected readonly middlewares: AnyMiddlewareDef[] = [];
   protected readonly inputSchema: IN;
   protected readonly mimeTypes: string[];
@@ -138,6 +140,11 @@ export class Endpoint<
     }
   }
 
+  /** @private used by Routing in DependsOnMethod case */
+  _setSiblingMethods(methods: Method[]): void {
+    this.siblingMethods = methods;
+  }
+
   public override getDescription(variant: "short" | "long") {
     return this.descriptions[variant];
   }
@@ -191,7 +198,8 @@ export class Endpoint<
   }
 
   #getDefaultCorsHeaders(): Record<string, string> {
-    const accessMethods = (this.methods as (M | AuxMethod)[])
+    const accessMethods = (this.methods as Array<Method | AuxMethod>)
+      .concat(this.siblingMethods)
       .concat("options")
       .join(", ")
       .toUpperCase();
