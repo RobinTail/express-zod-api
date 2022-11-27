@@ -2,9 +2,29 @@
 
 ## Version 7
 
+### v7.9.4
+
+- This version contains a cherry-picked fix made in v8.4.1.
+- Fixed a bug found and reported by [@leosuncin](https://github.com/leosuncin) in issue #705.
+  - CORS didn't work well in case of using `DependsOnMethod`.
+  - The list of the allowed methods in the response to `OPTIONS` request did only contain the first method declared
+    within `DependsOnMethod` instance.
+
+```typescript
+// reproduction minimal setup
+const routing: Routing = {
+  test: new DependsOnMethod({
+    get: getEndpoint,
+    post: postEndpoint,
+  }),
+};
+// when requesting OPTIONS for "/test", the response has the following header:
+// Access-Control-Allow-Methods: GET, OPTIONS
+```
+
 ### v7.9.3
 
-- This version is a cherry-pick of the fix made in v8.3.2.
+- This version contains a cherry-picked fix made in v8.3.2.
 - Fixed the bug #673 found and reported by [@shroudedcode](https://github.com/shroudedcode).
   - Preventing double parsing of incoming data by input schemas of middlewares containing transformations.
   - The bug caused inability of using any transforming schema in middlewares.
