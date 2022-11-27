@@ -2,6 +2,25 @@
 
 ## Version 8
 
+### v8.4.1
+
+- Fixed a bug found and reported by [@leosuncin](https://github.com/leosuncin) in issue #705.
+  - CORS didn't work well in case of using `DependsOnMethod`.
+  - The list of the allowed methods in the response to `OPTIONS` request did only contain the first method declared
+    within `DependsOnMethod` instance.
+
+```typescript
+// reproduction minimal setup
+const routing: Routing = {
+  test: new DependsOnMethod({
+    get: getEndpoint,
+    post: postEndpoint,
+  }),
+};
+// when requesting OPTIONS for "/test", the response has the following header:
+// Access-Control-Allow-Methods: GET, OPTIONS
+```
+
 ### v8.4.0
 
 - Fixed the flaw found and reported by [@kirdk](https://github.com/kirdk) in issue #662.
