@@ -4,6 +4,7 @@
 
 ### v8.4.1
 
+- `openapi3-ts` version is 3.1.2.
 - Fixed a bug found and reported by [@leosuncin](https://github.com/leosuncin) in issue #705.
   - CORS didn't work well in case of using `DependsOnMethod`.
   - The list of the allowed methods in the response to `OPTIONS` request did only contain the first method declared
