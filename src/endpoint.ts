@@ -140,8 +140,11 @@ export class Endpoint<
     }
   }
 
-  /** @private used by Routing in DependsOnMethod case */
-  _setSiblingMethods(methods: Method[]): void {
+  /**
+   * @desc Sets the other methods supported by the same path. Used by Routing in DependsOnMethod case, for options.
+   * @deprecated This method is for internal needs of the library, please avoid using it.
+   * */
+  public override _setSiblingMethods(methods: Method[]): void {
     this.siblingMethods = methods;
   }
 
