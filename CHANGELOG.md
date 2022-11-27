@@ -2,7 +2,7 @@
 
 ## Version 8
 
-### v8.4.1
+### v8.4.2
 
 - Fixing issue of inability to generate Client having Typescript 4.1-4.6.x installed.
   - Making Typescript a regular dependency of the library (it was dev + peer).
@@ -10,6 +10,26 @@
   - The issue introduced in version 7.9.1 of the library due to changing the implementation in accordance with the
     `typescript` upgrade to v4.8.2.
   - The library uses Typescript's factory methods to generate the frontend client.
+
+### v8.4.1
+
+- `openapi3-ts` version is 3.1.2.
+- Fixed a bug found and reported by [@leosuncin](https://github.com/leosuncin) in issue #705.
+  - CORS didn't work well in case of using `DependsOnMethod`.
+  - The list of the allowed methods in the response to `OPTIONS` request did only contain the first method declared
+    within `DependsOnMethod` instance.
+
+```typescript
+// reproduction minimal setup
+const routing: Routing = {
+  test: new DependsOnMethod({
+    get: getEndpoint,
+    post: postEndpoint,
+  }),
+};
+// when requesting OPTIONS for "/test", the response has the following header:
+// Access-Control-Allow-Methods: GET, OPTIONS
+```
 
 ### v8.4.0
 

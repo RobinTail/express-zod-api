@@ -63,9 +63,11 @@ export const routingCycle = ({
         }
       );
       if (hasCors && Object.keys(element.methods).length > 0) {
-        const firstEndpoint = Object.values(
+        const [firstMethod, ...siblingMethods] = Object.keys(
           element.methods
-        )[0] as AbstractEndpoint;
+        ) as Method[];
+        const firstEndpoint = element.methods[firstMethod]!;
+        firstEndpoint._setSiblingMethods(siblingMethods);
         endpointCb(firstEndpoint, path, "options");
       }
     } else {
