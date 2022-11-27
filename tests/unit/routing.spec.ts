@@ -18,6 +18,7 @@ import {
 } from "../../src";
 import { CommonConfig } from "../../src/config-type";
 import { mimeJson } from "../../src/mime";
+import { makeRequestMock, makeResponseMock } from "../../src/mock";
 import { initRouting } from "../../src/routing";
 
 let appMock: any;
@@ -170,6 +171,62 @@ describe("Routing", () => {
       expect(appMock.put.mock.calls[0][0]).toBe("/v1/user");
       expect(appMock.patch.mock.calls[0][0]).toBe("/v1/user");
       expect(appMock.options.mock.calls[0][0]).toBe("/v1/user");
+    });
+
+    test("Issue 705: should set all DependsOnMethod' methods for CORS", async () => {
+      const handler = jest.fn(async () => ({}));
+      const configMock = {
+        cors: true,
+        startupLogo: false,
+      };
+      const factory = new EndpointsFactory(defaultResultHandler);
+      const input = z.object({});
+      const output = z.object({});
+      const getEndpoint = factory.build({
+        method: "get",
+        input,
+        output,
+        handler,
+      });
+      const postEndpoint = factory.build({
+        method: "post",
+        input,
+        output,
+        handler,
+      });
+      const putAndPatchEndpoint = factory.build({
+        methods: ["put", "patch"],
+        input,
+        output,
+        handler,
+      });
+      const routing: Routing = {
+        hello: new DependsOnMethod({
+          get: getEndpoint,
+          post: postEndpoint,
+          put: putAndPatchEndpoint,
+          patch: putAndPatchEndpoint,
+        }),
+      };
+      initRouting({
+        app: appMock as Express,
+        logger: loggerMock as Logger,
+        config: configMock as CommonConfig,
+        routing,
+      });
+      expect(appMock.options).toBeCalledTimes(1);
+      expect(appMock.options.mock.calls[0][0]).toBe("/hello");
+      const fn = appMock.options.mock.calls[0][1];
+      expect(typeof fn).toBe("function"); // async (req, res) => void
+      const requestMock = makeRequestMock({ method: "PUT" });
+      const responseMock = makeResponseMock();
+      await fn(requestMock, responseMock);
+      expect(responseMock.status).toHaveBeenCalledWith(200);
+      expect(responseMock.set).toHaveBeenCalledTimes(3);
+      expect(responseMock.set).toHaveBeenCalledWith(
+        "Access-Control-Allow-Methods",
+        "GET, POST, PUT, PATCH, OPTIONS"
+      );
     });
 
     test("Should accept parameters", () => {
