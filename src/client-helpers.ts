@@ -37,15 +37,7 @@ export const makeParam = (
   name: string,
   type?: ts.TypeNode,
   mod?: ts.Modifier[]
-) =>
-  f.createParameterDeclaration(
-    undefined,
-    mod,
-    undefined,
-    name,
-    undefined,
-    type
-  );
+) => f.createParameterDeclaration(mod, undefined, name, undefined, type);
 
 export const makeParams = (
   params: Record<string, ts.TypeNode | undefined>,
@@ -87,7 +79,6 @@ export const makeConst = (name: string, value: ts.Expression) =>
 
 export const makePublicLiteralType = (name: string, literals: string[]) =>
   f.createTypeAliasDeclaration(
-    undefined,
     exportModifier,
     name,
     undefined,
@@ -99,13 +90,7 @@ export const makePublicLiteralType = (name: string, literals: string[]) =>
   );
 
 export const makePublicType = (name: string, value: ts.TypeNode) =>
-  f.createTypeAliasDeclaration(
-    undefined,
-    exportModifier,
-    name,
-    undefined,
-    value
-  );
+  f.createTypeAliasDeclaration(exportModifier, name, undefined, value);
 
 export const makePublicReadonlyProp = (
   name: string,
