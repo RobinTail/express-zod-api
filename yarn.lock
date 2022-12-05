@@ -652,6 +652,11 @@
     minimatch "^3.1.2"
     strip-json-comments "^3.1.1"
 
+"@express-zod-api/zod-to-ts@1.1.1":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@express-zod-api/zod-to-ts/-/zod-to-ts-1.1.1.tgz#87910ab2fb774ef300bf6a0c81c83d1b0600fddc"
+  integrity sha512-yXbxW17SL7Aozr8hT8pdfnnnFhv0Ko+J56h/fL/AhY7FTsPm+AKqvIx2XMZ0LKLIYn9g2mZ9f54u9rNz2znjyQ==
+
 "@humanwhocodes/config-array@^0.11.6":
   version "0.11.6"
   resolved "https://registry.yarnpkg.com/@humanwhocodes/config-array/-/config-array-0.11.6.tgz#6a51d603a3aaf8d4cf45b42b3f2ac9318a4adc4b"
@@ -4836,11 +4841,6 @@ yocto-queue@^0.1.0:
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/yocto-queue/-/yocto-queue-0.1.0.tgz#0294eb3dee05028d31ee1a5fa2c556a6aaf10a1b"
   integrity sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==
-
-zod-to-ts@1.1.1:
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/zod-to-ts/-/zod-to-ts-1.1.1.tgz#3dce0454a9a4c3f1e6aa4a3c8079e9c32885c0ec"
-  integrity sha512-7UGV+GnuKLUyJbJeyrkfMqCP8wk37dFkOwguIWN/jVL7kQg2e1N5o0SDPVodlfTutxeAP9IRXsWLoSlEnmetCA==
 
 zod@3.19.1:
   version "3.19.1"

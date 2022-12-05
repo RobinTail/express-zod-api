@@ -1,5 +1,9 @@
 import ts from "typescript";
-import { createTypeAlias, printNode, zodToTs } from "zod-to-ts";
+import {
+  createTypeAlias,
+  printNode,
+  zodToTs,
+} from "@express-zod-api/zod-to-ts";
 import {
   cleanId,
   exportModifier,
