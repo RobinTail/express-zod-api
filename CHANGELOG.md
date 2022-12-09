@@ -2,6 +2,18 @@
 
 ## Version 8
 
+### v8.4.3
+
+- The regular expression used for validating `z.dateIn()` made easier
+  by [@shroudedcode](https://github.com/shroudedcode).
+
+```regexp
+# before
+/^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d{3})?)?Z?$/
+# after
+/^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d+)?)?Z?$/
+```
+
 ### v8.4.2
 
 - Fixing issue of inability to generate Client having Typescript 4.1-4.6.x installed.

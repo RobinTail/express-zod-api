@@ -1868,7 +1868,7 @@ paths:
                       description: YYYY-MM-DDTHH:mm:ss.sssZ
                       type: string
                       format: date-time
-                      pattern: ^\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2}:\\d{2}(\\.\\d{3})?)?Z?$
+                      pattern: ^\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?)?Z?$
                       externalDocs:
                         url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
                   required:
@@ -2135,7 +2135,7 @@ paths:
                   description: YYYY-MM-DDTHH:mm:ss.sssZ
                   type: string
                   format: date-time
-                  pattern: ^\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2}:\\d{2}(\\.\\d{3})?)?Z?$
+                  pattern: ^\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?)?Z?$
                   externalDocs:
                     url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
               required:
