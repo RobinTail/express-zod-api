@@ -652,12 +652,12 @@
     minimatch "^3.1.2"
     strip-json-comments "^3.1.1"
 
-"@express-zod-api/zod-to-ts@1.1.4":
-  version "1.1.4"
-  resolved "https://registry.yarnpkg.com/@express-zod-api/zod-to-ts/-/zod-to-ts-1.1.4.tgz#42e82171d5c94c8682544586ea840587396c71cb"
-  integrity sha512-eOJiUNz1PYG5McTQ84K85rQN0xsRvHAQOjxUW/VgbQUb6CXYErYCppkJqZVPmf0ko6M4sGgdPidD5IcbRP+aGA==
+"@express-zod-api/zod-to-ts@1.1.5":
+  version "1.1.5"
+  resolved "https://registry.yarnpkg.com/@express-zod-api/zod-to-ts/-/zod-to-ts-1.1.5.tgz#b7e1c717e21b4502d8fd8290aeaffc69693f2f6d"
+  integrity sha512-r7nbDNdQndqjLiSESUhgVL5qfvTQamyHoV2IDSGkc/1sYnyraesBCKl2buyaZa6ipnZx8NSTazFqlHfi7rgBkQ==
   dependencies:
-    typescript "4.9.3"
+    typescript "4.9.4"
 
 "@humanwhocodes/config-array@^0.11.6":
   version "0.11.6"
@@ -4634,11 +4634,6 @@ type-is@~1.6.18:
   dependencies:
     media-typer "0.3.0"
     mime-types "~2.1.24"
-
-typescript@4.9.3:
-  version "4.9.3"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.9.3.tgz#3aea307c1746b8c384435d8ac36b8a2e580d85db"
-  integrity sha512-CIfGzTelbKNEnLpLdGFgdyKhG23CKdKgQPOBc+OUNrkJ2vr+KSzsSV5kq5iWhEQbok+quxgGzrAtGWCyU7tHnA==
 
 typescript@4.9.4:
   version "4.9.4"
