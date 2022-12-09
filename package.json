@@ -52,7 +52,7 @@
     "winston": "3.8.2",
     "zod": "3.19.1",
     "zod-to-ts": "1.1.1",
-    "typescript": "4.9.3"
+    "typescript": "4.9.4"
   },
   "peerDependencies": {
     "@types/jest": "*",
