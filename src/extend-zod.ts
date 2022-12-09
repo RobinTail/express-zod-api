@@ -1,5 +1,5 @@
 import { ZodDate } from "zod";
-import { withGetType } from "zod-to-ts";
+import { withGetType } from "@express-zod-api/zod-to-ts";
 import { ZodDateIn } from "./date-in-schema";
 import { ZodDateOut } from "./date-out-schema";
 import { ZodFile } from "./file-schema";

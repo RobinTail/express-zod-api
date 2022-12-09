@@ -2,6 +2,14 @@
 
 ## Version 8
 
+### v8.4.4
+
+- `typescript` version is 4.9.4.
+- Following the changes made in v8.4.2, I'm switching to the [forked zod-to-ts](https://github.com/RobinTail/zod-to-ts)
+  - Typescript made a regular dependency inside that fork, since it's used for code generation.
+  - `@express-zod-api/zod-to-ts` version is v1.1.5.
+  - Fixed all warnings while generating a frontend client.
+
 ### v8.4.3
 
 - The regular expression used for validating `z.dateIn()` made easier
