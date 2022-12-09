@@ -81,9 +81,9 @@ Therefore, many basic tasks can be accomplished faster and easier, in particular
 - Logger — [Winston](https://github.com/winstonjs/winston).
 - Generators:
   - Documentation — [OpenAPI 3.x](https://github.com/metadevpro/openapi3-ts) (Swagger Specification).
-  - Client side types — [Zod-to-TS](https://github.com/sachinraja/zod-to-ts)
+  - Client side types — [forked zod-to-ts](https://github.com/RobinTail/zod-to-ts).
 - File uploads — [Express-FileUpload](https://github.com/richardgirges/express-fileupload)
-  (based on [Busboy](https://github.com/mscdex/busboy))
+  (based on [Busboy](https://github.com/mscdex/busboy)).
 
 ## Concept
 
