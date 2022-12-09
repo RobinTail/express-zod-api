@@ -1,9 +1,14 @@
-import {OpenAPI} from '../src';
-import {routing} from './routing';
-import {version} from '../package.json';
+import { OpenAPI } from "../src";
+import { config } from "./config";
+import { routing } from "./routing";
+import manifest from "../package.json";
 
-console.log(new OpenAPI({
-  routing, version,
-  title: 'Example API',
-  serverUrl: 'http://example.com'
-}).getSpecAsYaml());
+console.log(
+  new OpenAPI({
+    routing,
+    config,
+    version: manifest.version,
+    title: "Example API",
+    serverUrl: "http://example.com",
+  }).getSpecAsYaml()
+);

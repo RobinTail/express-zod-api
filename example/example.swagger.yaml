@@ -1,13 +1,13 @@
 openapi: 3.0.0
 info:
   title: Example API
-  version: 2.4.0
+  version: 8.4.4
 paths:
-  /v1/getUser:
+  /v1/user/retrieve:
     get:
       responses:
         "200":
-          description: GET /v1/getUser Successful response
+          description: GET /v1/user/retrieve Successful response
           content:
             application/json:
               schema:
@@ -36,7 +36,7 @@ paths:
                   - status
                   - data
         "400":
-          description: GET /v1/getUser Error response
+          description: GET /v1/user/retrieve Error response
           content:
             application/json:
               schema:
@@ -56,20 +56,29 @@ paths:
                 required:
                   - status
                   - error
-      description: example user retrieval endpoint
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
+      description: Example user retrieval endpoint.
+      summary: Retrieves the user.
+      tags:
+        - users
       parameters:
         - name: id
           in: query
           required: true
           schema:
+            description: a numeric string containing the id of the user
             type: string
             pattern: /\d+/
-            description: GET /v1/getUser parameter
-  /v1/setUser:
+  "/v1/user/{id}":
     post:
       responses:
         "200":
-          description: POST /v1/setUser Successful response
+          description: POST /v1/user/:id Successful response
           content:
             application/json:
               schema:
@@ -80,25 +89,34 @@ paths:
                     enum:
                       - success
                   data:
+                    example:
+                      name: John Doe
+                      createdAt: 2021-12-31T00:00:00.000Z
                     type: object
                     properties:
                       name:
                         type: string
-                      timestamp:
-                        type: integer
-                        format: int64
-                        minimum: 0
-                        exclusiveMinimum: false
-                        maximum: 9007199254740991
-                        exclusiveMaximum: false
+                      createdAt:
+                        description: YYYY-MM-DDTHH:mm:ss.sssZ
+                        type: string
+                        format: date-time
+                        externalDocs:
+                          url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
                     required:
                       - name
-                      - timestamp
+                      - createdAt
                 required:
                   - status
                   - data
+              examples:
+                example1:
+                  value:
+                    status: success
+                    data:
+                      name: John Doe
+                      createdAt: 2021-12-31T00:00:00.000Z
         "400":
-          description: POST /v1/setUser Error response
+          description: POST /v1/user/:id Error response
           content:
             application/json:
               schema:
@@ -118,83 +136,128 @@ paths:
                 required:
                   - status
                   - error
-      description: example user update endpoint
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
+      description: Changes the user record. Example user update endpoint.
+      summary: Changes the user record. Example user update endp…
+      tags:
+        - users
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            description: POST /v1/user/:id parameter
+            type: string
+          examples:
+            example1:
+              value: "12"
       requestBody:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                key:
-                  type: string
-                  minLength: 1
-                id:
-                  type: integer
-                  format: int64
-                  minimum: 0
-                  exclusiveMinimum: false
-                  maximum: 9007199254740991
-                  exclusiveMaximum: false
-                name:
-                  type: string
-                  minLength: 1
-              required:
-                - key
-                - id
-                - name
-              description: POST /v1/setUser request body
-  /v1/avatar:
+              description: POST /v1/user/:id request body
+              allOf:
+                - example:
+                    key: 1234-5678-90
+                  type: object
+                  properties:
+                    key:
+                      type: string
+                      minLength: 1
+                  required:
+                    - key
+                - example:
+                    name: John Doe
+                    birthday: 1963-04-21
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                      minLength: 1
+                    birthday:
+                      description: YYYY-MM-DDTHH:mm:ss.sssZ
+                      type: string
+                      format: date-time
+                      pattern: ^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d+)?)?Z?$
+                      externalDocs:
+                        url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
+                  required:
+                    - name
+                    - birthday
+            examples:
+              example1:
+                value:
+                  key: 1234-5678-90
+                  name: John Doe
+                  birthday: 1963-04-21
+      security:
+        - APIKEY_1: []
+          APIKEY_2: []
+  /v1/avatar/send:
     get:
       responses:
         "200":
-          description: GET /v1/avatar Successful response
+          description: GET /v1/avatar/send Successful response
           content:
             image/svg+xml:
               schema:
                 type: string
         "400":
-          description: GET /v1/avatar Error response
+          description: GET /v1/avatar/send Error response
           content:
             text/plain:
               schema:
                 type: string
+      summary: Sends a file content.
+      tags:
+        - files
+        - users
       parameters:
         - name: userId
           in: query
           required: true
           schema:
+            description: GET /v1/avatar/send parameter
             type: string
             pattern: /\d+/
-            description: GET /v1/avatar parameter
-  /v1/stream:
+  /v1/avatar/stream:
     get:
       responses:
         "200":
-          description: GET /v1/stream Successful response
+          description: GET /v1/avatar/stream Successful response
           content:
             image/*:
               schema:
                 type: string
                 format: binary
         "400":
-          description: GET /v1/stream Error response
+          description: GET /v1/avatar/stream Error response
           content:
             text/plain:
               schema:
                 type: string
+      summary: Streams a file content.
+      tags:
+        - users
+        - files
       parameters:
         - name: userId
           in: query
           required: true
           schema:
+            description: GET /v1/avatar/stream parameter
             type: string
             pattern: /\d+/
-            description: GET /v1/stream parameter
-  /v1/upload:
+  /v1/avatar/upload:
     post:
       responses:
         "200":
-          description: POST /v1/upload Successful response
+          description: POST /v1/avatar/upload Successful response
           content:
             application/json:
               schema:
@@ -235,7 +298,7 @@ paths:
                   - status
                   - data
         "400":
-          description: POST /v1/upload Error response
+          description: POST /v1/avatar/upload Error response
           content:
             application/json:
               schema:
@@ -255,10 +318,21 @@ paths:
                 required:
                   - status
                   - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
+      description: Handles a file upload.
+      summary: Handles a file upload.
+      tags:
+        - files
       requestBody:
         content:
           multipart/form-data:
             schema:
+              description: POST /v1/avatar/upload request body
               type: object
               properties:
                 avatar:
@@ -266,7 +340,6 @@ paths:
                   format: binary
               required:
                 - avatar
-              description: POST /v1/upload request body
 components:
   schemas: {}
   responses: {}
@@ -274,10 +347,22 @@ components:
   examples: {}
   requestBodies: {}
   headers: {}
-  securitySchemes: {}
+  securitySchemes:
+    APIKEY_1:
+      type: apiKey
+      in: query
+      name: key
+    APIKEY_2:
+      type: apiKey
+      in: header
+      name: token
   links: {}
   callbacks: {}
-tags: []
+tags:
+  - name: users
+    description: Everything about the users
+  - name: files
+    description: Everything about the files processing
 servers:
   - url: http://example.com
 

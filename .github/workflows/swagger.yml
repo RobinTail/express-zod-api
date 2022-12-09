@@ -1,0 +1,18 @@
+name: OpenAPI Validation
+
+on:
+  push:
+    branches: [ master, v7 ]
+  pull_request:
+    branches: [ master, v7 ]
+
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Validate example specification
+        uses: char0n/swagger-editor-validate@v1.3.1
+        with:
+          definition-file: example/example.swagger.yaml

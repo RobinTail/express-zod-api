@@ -1,24 +1,34 @@
-import {createMiddleware, Method, createHttpError, z} from '../src';
+import { Method, createHttpError, createMiddleware, withMeta, z } from "../src";
 
 export const authMiddleware = createMiddleware({
-  input: z.object({
-    key: z.string().nonempty()
+  security: {
+    and: [
+      { type: "input", name: "key" },
+      { type: "header", name: "token" },
+    ],
+  },
+  input: withMeta(
+    z.object({
+      key: z.string().min(1),
+    })
+  ).example({
+    key: "1234-5678-90",
   }),
-  middleware: async ({input: {key}, request, logger}) => {
-    logger.debug('Checking the key and token...');
-    if (key !== '123') {
-      throw createHttpError(401, 'Invalid key');
+  middleware: async ({ input: { key }, request, logger }) => {
+    logger.debug("Checking the key and token...");
+    if (key !== "123") {
+      throw createHttpError(401, "Invalid key");
     }
-    if (request.headers['token'] !== '456') {
-      throw createHttpError(401, 'Invalid token');
+    if (request.headers.token !== "456") {
+      throw createHttpError(401, "Invalid token");
     }
-    return {token: request.headers['token']};
-  }
+    return { token: request.headers.token };
+  },
 });
 
 export const methodProviderMiddleware = createMiddleware({
   input: z.object({}),
-  middleware: async ({request}) => ({
+  middleware: async ({ request }) => ({
     method: request.method.toLowerCase() as Method,
-  })
+  }),
 });

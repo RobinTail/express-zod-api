@@ -1,53 +1,121 @@
-import express from 'express';
-import fileUpload from 'express-fileupload';
-import {Server} from 'http';
-import {AppConfig, CommonConfig, ServerConfig} from './config-type';
-import {isLoggerConfig} from './helpers';
-import {createLogger} from './logger';
-import {defaultResultHandler} from './result-handler';
-import {initRouting, Routing} from './routing';
-import createHttpError from 'http-errors';
+import express, { ErrorRequestHandler, RequestHandler, json } from "express";
+import compression from "compression";
+import fileUpload from "express-fileupload";
+import https from "https";
+import { Logger } from "winston";
+import { AppConfig, CommonConfig, ServerConfig } from "./config-type";
+import { ResultHandlerError } from "./errors";
+import { isLoggerConfig, makeErrorFromAnything } from "./common-helpers";
+import { createLogger } from "./logger";
+import { defaultResultHandler, lastResortHandler } from "./result-handler";
+import { Routing, initRouting } from "./routing";
+import createHttpError from "http-errors";
 
-export function attachRouting(config: AppConfig & CommonConfig, routing: Routing): void {
-  const logger = isLoggerConfig(config.logger) ? createLogger(config.logger) : config.logger;
-  return initRouting({app: config.app, routing, logger, config});
+type AnyResultHandler = NonNullable<CommonConfig["errorHandler"]>;
+
+export const createParserFailureHandler =
+  (errorHandler: AnyResultHandler, logger: Logger): ErrorRequestHandler =>
+  (error, request, response, next) => {
+    if (!error) {
+      return next();
+    }
+    errorHandler.handler({
+      error,
+      request,
+      response,
+      logger,
+      input: request.body,
+      output: null,
+    });
+  };
+
+export const createNotFoundHandler =
+  (errorHandler: AnyResultHandler, logger: Logger): RequestHandler =>
+  (request, response) => {
+    const error = createHttpError(
+      404,
+      `Can not ${request.method} ${request.path}`
+    );
+    try {
+      errorHandler.handler({
+        request,
+        response,
+        logger,
+        error,
+        input: null,
+        output: null,
+      });
+    } catch (e) {
+      lastResortHandler({
+        response,
+        logger,
+        error: new ResultHandlerError(makeErrorFromAnything(e).message, error),
+      });
+    }
+  };
+
+export function attachRouting(
+  config: AppConfig & CommonConfig,
+  routing: Routing
+) {
+  const logger = isLoggerConfig(config.logger)
+    ? createLogger(config.logger)
+    : config.logger;
+  initRouting({ app: config.app, routing, logger, config });
+  const errorHandler = config.errorHandler || defaultResultHandler;
+  const notFoundHandler = createNotFoundHandler(errorHandler, logger);
+  return { notFoundHandler, logger };
 }
 
-export function createServer(config: ServerConfig & CommonConfig, routing: Routing): Server {
-  const logger = isLoggerConfig(config.logger) ? createLogger(config.logger) : config.logger;
+export function createServer(
+  config: ServerConfig & CommonConfig,
+  routing: Routing
+) {
+  const logger = isLoggerConfig(config.logger)
+    ? createLogger(config.logger)
+    : config.logger;
   const app = express();
+  app.disable("x-powered-by");
   const errorHandler = config.errorHandler || defaultResultHandler;
-  const jsonParser = config.server.jsonParser || express.json();
-  const multipartParser = config.server.upload ? fileUpload({
-    ...(typeof config.server.upload === 'object' ? config.server.upload : {}),
-    abortOnLimit: false,
-    parseNested: true,
-  }) : undefined;
+  const compressor = config.server.compression
+    ? compression({
+        ...(typeof config.server.compression === "object"
+          ? config.server.compression
+          : {}),
+      })
+    : undefined;
+  const jsonParser = config.server.jsonParser || json();
+  const multipartParser = config.server.upload
+    ? fileUpload({
+        ...(typeof config.server.upload === "object"
+          ? config.server.upload
+          : {}),
+        abortOnLimit: false,
+        parseNested: true,
+      })
+    : undefined;
 
-  const parserFailureHandler: express.ErrorRequestHandler = (error, request, response, next) => {
-    if (!error) { return next(); }
-    errorHandler.handler({
-      error, request, response, logger,
-      input: request.body,
-      output: null
-    });
-  };
+  const middlewares = ([] as RequestHandler[])
+    .concat(compressor || [])
+    .concat(jsonParser)
+    .concat(multipartParser || []);
+  app.use(middlewares);
+  app.use(createParserFailureHandler(errorHandler, logger));
+  initRouting({ app, routing, logger, config });
+  app.use(createNotFoundHandler(errorHandler, logger));
 
-  const lastResortHandler: express.RequestHandler = (request, response) => {
-    errorHandler.handler({
-      request, response, logger,
-      error: createHttpError(404, `Can not ${request.method} ${request.path}`),
-      input: null,
-      output: null
-    });
-  };
-
-  app.use(([jsonParser] as express.RequestHandler[]).concat(multipartParser || []));
-  app.use(parserFailureHandler);
-  initRouting({app, routing, logger, config});
-  app.use(lastResortHandler);
-
-  return app.listen(config.server.listen, () => {
+  const httpServer = app.listen(config.server.listen, () => {
     logger.info(`Listening ${config.server.listen}`);
   });
+
+  let httpsServer: https.Server | undefined;
+  if (config.https) {
+    httpsServer = https
+      .createServer(config.https.options, app)
+      .listen(config.https.listen, () => {
+        logger.info(`Listening ${config.https!.listen}`);
+      });
+  }
+
+  return { app, httpServer, httpsServer, logger };
 }

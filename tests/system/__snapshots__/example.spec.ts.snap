@@ -1,8 +1,8 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Example Negative GET request should fail on missing input param 1`] = `
-Object {
-  "error": Object {
+{
+  "error": {
     "message": "id: Required",
   },
   "status": "error",
@@ -10,9 +10,18 @@ Object {
 `;
 
 exports[`Example Negative POST request should fail on schema validation 1`] = `
-Object {
-  "error": Object {
-    "message": "id: Value should be greater than or equal to 0",
+{
+  "error": {
+    "message": "id: should be greater than or equal to 0",
+  },
+  "status": "error",
+}
+`;
+
+exports[`Example Negative Should respond with error to the missing static file request 1`] = `
+{
+  "error": {
+    "message": "Can not GET /public/missing.svg",
   },
   "status": "error",
 }
@@ -20,21 +29,23 @@ Object {
 
 exports[`Example Positive Should send an image with a correct header 1`] = `"f39beeff92379dc935586d726211c2620be6f879"`;
 
+exports[`Example Positive Should serve static files 1`] = `"f39beeff92379dc935586d726211c2620be6f879"`;
+
 exports[`Example Positive Should stream an image with a correct header 1`] = `"f39beeff92379dc935586d726211c2620be6f879"`;
 
 exports[`Example Positive Should upload the file 1`] = `
-Object {
-  "data": Object {
+{
+  "data": {
     "hash": "f39beeff92379dc935586d726211c2620be6f879",
     "mime": "image/svg+xml",
     "name": "logo.svg",
-    "otherInputs": Object {
-      "arr": Array [
+    "otherInputs": {
+      "arr": [
         "456",
         "789",
       ],
       "num": "123",
-      "obj": Object {
+      "obj": {
         "some": "thing",
       },
       "str": "test string value",

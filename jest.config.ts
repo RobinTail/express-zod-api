@@ -1,13 +1,13 @@
-import type {Config} from '@jest/types';
+import type { Config } from "@jest/types";
 
 const config: Config.InitialOptions = {
-  preset: 'ts-jest',
-  testEnvironment: 'node',
+  preset: "ts-jest",
+  testEnvironment: "node",
   verbose: true,
   forceExit: true,
   collectCoverage: true,
-  collectCoverageFrom: ['src/**'],
-  coverageReporters: ['json-summary', 'text', 'lcov'],
+  collectCoverageFrom: ["src/**"],
+  coverageReporters: ["json-summary", "text", "html", "lcov"],
   testTimeout: 10000,
 };
 

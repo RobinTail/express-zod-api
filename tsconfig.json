@@ -1,11 +1,8 @@
 {
-  "extends": "@tsconfig/node10/tsconfig.json",
+  "extends": "@tsconfig/node14/tsconfig.json",
   "compilerOptions": {
-    "sourceMap": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
-    "declaration": true,
-    "outDir": "./dist",
     "resolveJsonModule": true
   },
 }

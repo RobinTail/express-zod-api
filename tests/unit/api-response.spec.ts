@@ -1,28 +1,28 @@
-import {createApiResponse, z} from '../../src';
+import { createApiResponse, z } from "../../src";
 
-describe('ApiResponse', () => {
-  describe('createApiResponse()', () => {
-    test('should accept an array of mime types', () => {
+describe("ApiResponse", () => {
+  describe("createApiResponse()", () => {
+    test("should accept an array of mime types", () => {
       const output = z.object({});
-      expect(createApiResponse(output, ['something', 'anything'])).toEqual({
+      expect(createApiResponse(output, ["something", "anything"])).toEqual({
         schema: output,
-        mimeTypes: ['something', 'anything']
+        mimeTypes: ["something", "anything"],
       });
     });
 
-    test('should accept a single mime type', () => {
+    test("should accept a single mime type", () => {
       const output = z.object({});
-      expect(createApiResponse(output, 'something')).toEqual({
+      expect(createApiResponse(output, "something")).toEqual({
         schema: output,
-        mimeTypes: ['something']
+        mimeTypes: ["something"],
       });
     });
 
-    test('should assume json mime type by default', () => {
+    test("should assume json mime type by default", () => {
       const output = z.object({});
-      expect(createApiResponse(output, )).toEqual({
+      expect(createApiResponse(output)).toEqual({
         schema: output,
-        mimeTypes: ['application/json']
+        mimeTypes: ["application/json"],
       });
     });
   });

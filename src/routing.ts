@@ -1,102 +1,112 @@
-import {Express} from 'express';
-import {Logger} from 'winston';
-import {CommonConfig} from './config-type';
-import {AbstractEndpoint, Endpoint} from './endpoint';
-import {DependsOnMethodError, RoutingError} from './errors';
-import {AuxMethod, Method} from './method';
-
-export class DependsOnMethod {
-  constructor(public readonly methods: {
-    [K in Method]?: Endpoint<any, any, any, any, K, any, any> | Endpoint<any, any, any, any, Method, any, any>;
-  }) {
-    (Object.keys(methods) as (keyof typeof methods)[]).forEach((key) => {
-      if (key in methods) {
-        const endpointMethods = methods[key]?.getMethods() || [];
-        if (!endpointMethods.includes(key)) {
-          throw new DependsOnMethodError(
-            `The endpoint assigned to the '${key}' parameter must have at least this method in its specification.\n` +
-            'This error should prevent mistakes during the development process.\n' +
-            'Example:\n\n' +
-            `new ${this.constructor.name}({\n` +
-            `  ${key}: endpointsFactory.build({\n` +
-            `    methods: ['${key}', ` + (
-              (methods[key]?.getMethods() || [])
-                .map((m) => `'${m}'`)
-                .join(', ')
-              || '...'
-            ) + ']\n' +
-            `    // or method: '${key}'\n` +
-            '    ...\n' +
-            '  })\n' +
-            '});\n'
-          );
-        }
-      }
-    });
-  }
-}
+import { Express } from "express";
+import { Logger } from "winston";
+import { CommonConfig } from "./config-type";
+import { DependsOnMethod } from "./depends-on-method";
+import { AbstractEndpoint } from "./endpoint";
+import { RoutingError } from "./errors";
+import { AuxMethod, Method } from "./method";
+import { ServeStatic, StaticHandler } from "./serve-static";
+import { getStartupLogo } from "./startup-logo";
 
 export interface Routing {
-  [PATH: string]: Routing | DependsOnMethod | AbstractEndpoint;
+  [SEGMENT: string]: Routing | DependsOnMethod | AbstractEndpoint | ServeStatic;
 }
 
 export interface RoutingCycleParams {
   routing: Routing;
-  cb: (endpoint: AbstractEndpoint, fullPath: string, method: Method | AuxMethod) => void;
+  endpointCb: (
+    endpoint: AbstractEndpoint,
+    path: string,
+    method: Method | AuxMethod
+  ) => void;
+  staticCb?: (path: string, handler: StaticHandler) => void;
   parentPath?: string;
-  cors?: boolean;
+  hasCors?: boolean;
 }
 
-export const routingCycle = ({routing, cb, parentPath, cors}: RoutingCycleParams) => {
-  Object.entries(routing).forEach(([path, element]) => {
-    path = path.trim();
-    if (path.match(/\//)) {
+export const routingCycle = ({
+  routing,
+  endpointCb,
+  staticCb,
+  parentPath,
+  hasCors,
+}: RoutingCycleParams) => {
+  Object.entries(routing).forEach(([segment, element]) => {
+    segment = segment.trim();
+    if (segment.match(/\//)) {
       throw new RoutingError(
-        'Routing elements should not contain \'/\' character.\n' + 
-        `The error caused by ${parentPath ? `'${parentPath}' route that has a '${path}'` : `'${path}'`} entry.`
+        "Routing elements should not contain '/' character.\n" +
+          `The error caused by ${
+            parentPath
+              ? `'${parentPath}' route that has a '${segment}'`
+              : `'${segment}'`
+          } entry.`
       );
     }
-    const fullPath = `${parentPath || ''}${path ? `/${path}` : ''}`;
+    const path = `${parentPath || ""}${segment ? `/${segment}` : ""}`;
     if (element instanceof AbstractEndpoint) {
-      const methods: (Method | AuxMethod)[] = element.getMethods();
-      if (cors) {
-        methods.push('options');
+      const methods: (Method | AuxMethod)[] = element.getMethods().slice();
+      if (hasCors) {
+        methods.push("options");
       }
       methods.forEach((method) => {
-        cb(element, fullPath, method);
+        endpointCb(element, path, method);
       });
+    } else if (element instanceof ServeStatic) {
+      if (staticCb) {
+        element.apply(path, staticCb);
+      }
     } else if (element instanceof DependsOnMethod) {
-      Object.entries<AbstractEndpoint>(element.methods).forEach(([method, endpoint]) => {
-        cb(endpoint, fullPath, method as Method);
-      });
-      if (cors && Object.keys(element.methods).length > 0) {
-        const firstEndpoint = Object.values(element.methods)[0] as AbstractEndpoint;
-        cb(firstEndpoint, fullPath, 'options');
+      Object.entries<AbstractEndpoint>(element.methods).forEach(
+        ([method, endpoint]) => {
+          endpointCb(endpoint, path, method as Method);
+        }
+      );
+      if (hasCors && Object.keys(element.methods).length > 0) {
+        const [firstMethod, ...siblingMethods] = Object.keys(
+          element.methods
+        ) as Method[];
+        const firstEndpoint = element.methods[firstMethod]!;
+        firstEndpoint._setSiblingMethods(siblingMethods);
+        endpointCb(firstEndpoint, path, "options");
       }
     } else {
       routingCycle({
         routing: element,
-        cb, cors,
-        parentPath: fullPath
+        endpointCb,
+        staticCb,
+        hasCors: hasCors,
+        parentPath: path,
       });
     }
   });
 };
 
-export const initRouting = ({app, logger, config, routing}: {
-  app: Express,
-  logger: Logger,
-  config: CommonConfig,
-  routing: Routing
+export const initRouting = ({
+  app,
+  logger,
+  config,
+  routing,
+}: {
+  app: Express;
+  logger: Logger;
+  config: CommonConfig;
+  routing: Routing;
 }) => {
+  if (config.startupLogo !== false) {
+    console.log(getStartupLogo());
+  }
   routingCycle({
     routing,
-    cors: config.cors,
-    cb: (endpoint, fullPath, method) => {
-      app[method](fullPath, async (request, response) => {
-        logger.info(`${request.method}: ${fullPath}`);
-        await endpoint.execute({request, response, logger, config});
+    hasCors: !!config.cors,
+    endpointCb: (endpoint, path, method) => {
+      app[method](path, async (request, response) => {
+        logger.info(`${request.method}: ${path}`);
+        await endpoint.execute({ request, response, logger, config });
       });
-    }
+    },
+    staticCb: (path, handler) => {
+      app.use(path, handler);
+    },
   });
 };

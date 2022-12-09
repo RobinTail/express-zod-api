@@ -1,45 +1,62 @@
-import {getType} from 'mime';
+import mime from "mime";
 import {
+  EndpointsFactory,
   createApiResponse,
   createResultHandler,
-  defaultEndpointsFactory,
-  EndpointsFactory,
-  z
-} from '../src';
-import {authMiddleware} from './middlewares';
-import fs from 'fs';
+  defaultResultHandler,
+  z,
+} from "../src";
+import { config } from "./config";
+import { authMiddleware } from "./middlewares";
+import fs from "fs";
 
-export const keyAndTokenAuthenticatedEndpointsFactory = defaultEndpointsFactory.addMiddleware(authMiddleware);
+export const taggedEndpointsFactory = new EndpointsFactory({
+  resultHandler: defaultResultHandler,
+  config,
+});
 
-export const fileDownloadEndpointsFactory = new EndpointsFactory(createResultHandler({
-  getPositiveResponse: () => createApiResponse(z.string(), getType('svg') || 'image/svg+xml'),
-  getNegativeResponse: () => createApiResponse(z.string(), getType('txt') || 'text/plain'),
-  handler: ({response, error, output}) => {
-    if (error) {
-      response.status(400).send(error.message);
-      return;
-    }
-    if ('data' in output) {
-      response.type('svg').send(output.data);
-    } else {
-      response.status(400).send('Data is missing');
-    }
-  }
-}));
+export const keyAndTokenAuthenticatedEndpointsFactory =
+  taggedEndpointsFactory.addMiddleware(authMiddleware);
 
-export const fileStreamingEndpointsFactory = new EndpointsFactory(createResultHandler({
-  getPositiveResponse: () => createApiResponse(z.file().binary(), 'image/*'),
-  getNegativeResponse: () => createApiResponse(z.string(), getType('txt') || 'text/plain'),
-  handler: ({response, error, output}) => {
-    if (error) {
-      response.status(400).send(error.message);
-      return;
-    }
-    if ('filename' in output) {
-      fs.createReadStream(output.filename)
-        .pipe(response.type(output.filename));
-    } else {
-      response.status(400).send('Filename is missing');
-    }
-  }
-}));
+export const fileSendingEndpointsFactory = new EndpointsFactory({
+  config,
+  resultHandler: createResultHandler({
+    getPositiveResponse: () =>
+      createApiResponse(z.string(), mime.getType("svg") || "image/svg+xml"),
+    getNegativeResponse: () =>
+      createApiResponse(z.string(), mime.getType("txt") || "text/plain"),
+    handler: ({ response, error, output }) => {
+      if (error) {
+        response.status(400).send(error.message);
+        return;
+      }
+      if ("data" in output) {
+        response.type("svg").send(output.data);
+      } else {
+        response.status(400).send("Data is missing");
+      }
+    },
+  }),
+});
+
+export const fileStreamingEndpointsFactory = new EndpointsFactory({
+  config,
+  resultHandler: createResultHandler({
+    getPositiveResponse: () => createApiResponse(z.file().binary(), "image/*"),
+    getNegativeResponse: () =>
+      createApiResponse(z.string(), mime.getType("txt") || "text/plain"),
+    handler: ({ response, error, output }) => {
+      if (error) {
+        response.status(400).send(error.message);
+        return;
+      }
+      if ("filename" in output) {
+        fs.createReadStream(output.filename).pipe(
+          response.type(output.filename)
+        );
+      } else {
+        response.status(400).send("Filename is missing");
+      }
+    },
+  }),
+});

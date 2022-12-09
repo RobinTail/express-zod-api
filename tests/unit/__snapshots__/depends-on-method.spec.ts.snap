@@ -1,0 +1,16 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`DependsOnMethod should throw an error if the endpoint does not have the corresponding method 1`] = `
+"The endpoint assigned to the 'post' parameter must have at least this method in its specification.
+This error should prevent mistakes during the development process.
+Example:
+
+new DependsOnMethod({
+  post: endpointsFactory.build({
+    methods: ['post', 'get', 'patch']
+    // or method: 'post'
+    ...
+  })
+});
+"
+`;

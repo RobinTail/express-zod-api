@@ -1,27 +1,88 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`EndpointsFactory .build() Should create an endpoint with intersection middleware 1`] = `
-Object {
-  "_type": "ZodObject",
-  "shape": Object {
-    "n1": Object {
-      "_type": "ZodNumber",
+{
+  "_type": "ZodIntersection",
+  "left": {
+    "_type": "ZodIntersection",
+    "left": {
+      "_type": "ZodObject",
+      "shape": {
+        "n1": {
+          "_type": "ZodNumber",
+        },
+      },
     },
-    "n2": Object {
-      "_type": "ZodNumber",
+    "right": {
+      "_type": "ZodObject",
+      "shape": {
+        "n2": {
+          "_type": "ZodNumber",
+        },
+      },
     },
-    "s": Object {
-      "_type": "ZodString",
+  },
+  "right": {
+    "_type": "ZodObject",
+    "shape": {
+      "s": {
+        "_type": "ZodString",
+      },
     },
   },
 }
 `;
 
 exports[`EndpointsFactory .build() Should create an endpoint with intersection middleware 2`] = `
-Object {
+{
   "_type": "ZodObject",
-  "shape": Object {
-    "b": Object {
+  "shape": {
+    "b": {
+      "_type": "ZodBoolean",
+    },
+  },
+}
+`;
+
+exports[`EndpointsFactory .build() Should create an endpoint with refined object middleware 1`] = `
+{
+  "_type": "ZodIntersection",
+  "left": {
+    "_type": "ZodEffects",
+    "value": {
+      "_type": "ZodObject",
+      "shape": {
+        "a": {
+          "_type": "ZodOptional",
+          "value": {
+            "_type": "ZodNumber",
+          },
+        },
+        "b": {
+          "_type": "ZodOptional",
+          "value": {
+            "_type": "ZodString",
+          },
+        },
+      },
+    },
+  },
+  "right": {
+    "_type": "ZodObject",
+    "shape": {
+      "i": {
+        "_type": "ZodString",
+      },
+    },
+  },
+}
+`;
+
+exports[`EndpointsFactory .build() Should create an endpoint with refined object middleware 2`] = `
+{
+  "_type": "ZodObject",
+  "shape": {
+    "o": {
       "_type": "ZodBoolean",
     },
   },
@@ -29,24 +90,32 @@ Object {
 `;
 
 exports[`EndpointsFactory .build() Should create an endpoint with simple middleware 1`] = `
-Object {
-  "_type": "ZodObject",
-  "shape": Object {
-    "n": Object {
-      "_type": "ZodNumber",
+{
+  "_type": "ZodIntersection",
+  "left": {
+    "_type": "ZodObject",
+    "shape": {
+      "n": {
+        "_type": "ZodNumber",
+      },
     },
-    "s": Object {
-      "_type": "ZodString",
+  },
+  "right": {
+    "_type": "ZodObject",
+    "shape": {
+      "s": {
+        "_type": "ZodString",
+      },
     },
   },
 }
 `;
 
 exports[`EndpointsFactory .build() Should create an endpoint with simple middleware 2`] = `
-Object {
+{
   "_type": "ZodObject",
-  "shape": Object {
-    "b": Object {
+  "shape": {
+    "b": {
       "_type": "ZodBoolean",
     },
   },
@@ -54,33 +123,45 @@ Object {
 `;
 
 exports[`EndpointsFactory .build() Should create an endpoint with union middleware 1`] = `
-Object {
-  "_type": "ZodObject",
-  "shape": Object {
-    "n1": Object {
-      "_type": "ZodOptional",
-      "value": Object {
-        "_type": "ZodNumber",
+{
+  "_type": "ZodIntersection",
+  "left": {
+    "_type": "ZodUnion",
+    "options": [
+      {
+        "_type": "ZodObject",
+        "shape": {
+          "n1": {
+            "_type": "ZodNumber",
+          },
+        },
       },
-    },
-    "n2": Object {
-      "_type": "ZodOptional",
-      "value": Object {
-        "_type": "ZodNumber",
+      {
+        "_type": "ZodObject",
+        "shape": {
+          "n2": {
+            "_type": "ZodNumber",
+          },
+        },
       },
-    },
-    "s": Object {
-      "_type": "ZodString",
+    ],
+  },
+  "right": {
+    "_type": "ZodObject",
+    "shape": {
+      "s": {
+        "_type": "ZodString",
+      },
     },
   },
 }
 `;
 
 exports[`EndpointsFactory .build() Should create an endpoint with union middleware 2`] = `
-Object {
+{
   "_type": "ZodObject",
-  "shape": Object {
-    "b": Object {
+  "shape": {
+    "b": {
       "_type": "ZodBoolean",
     },
   },

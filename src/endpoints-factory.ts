@@ -1,59 +1,180 @@
-import {z} from 'zod';
-import {ApiResponse} from './api-response';
-import {Endpoint, Handler} from './endpoint';
-import {FlatObject, IOSchema, Merge} from './helpers';
-import {Method, MethodsDefinition} from './method';
-import {MiddlewareDefinition} from './middleware';
-import {mimeJson, mimeMultipart} from './mime';
-import {defaultResultHandler, ResultHandlerDefinition} from './result-handler';
+import { Request, Response } from "express";
+import { z } from "zod";
+import { ApiResponse } from "./api-response";
+import { FlatObject, hasUpload } from "./common-helpers";
+import { CommonConfig } from "./config-type";
+import { Endpoint, Handler } from "./endpoint";
+import {
+  IOSchema,
+  ProbableIntersection,
+  getFinalEndpointInputSchema,
+} from "./io-schema";
+import { Method, MethodsDefinition } from "./method";
+import {
+  AnyMiddlewareDef,
+  ExpressMiddleware,
+  ExpressMiddlewareFeatures,
+  MiddlewareDefinition,
+  createMiddleware,
+} from "./middleware";
+import { mimeJson, mimeMultipart } from "./mime";
+import {
+  ResultHandlerDefinition,
+  defaultResultHandler,
+} from "./result-handler";
 
-type BuildProps<IN extends IOSchema, OUT extends IOSchema, mIN, mOUT, M extends Method> = {
+type BuildProps<
+  IN extends IOSchema,
+  OUT extends IOSchema,
+  MIN extends IOSchema<"strip"> | null,
+  OPT extends FlatObject,
+  M extends Method,
+  SCO extends string,
+  TAG extends string
+> = {
   input: IN;
   output: OUT;
-  handler: Handler<z.output<Merge<IN, mIN>>, z.input<OUT>, mOUT>;
+  handler: Handler<z.output<ProbableIntersection<MIN, IN>>, z.input<OUT>, OPT>;
   description?: string;
-  type?: 'json' | 'upload'; // @todo can we detect the usage of z.upload() within input?
-} & MethodsDefinition<M>;
+  shortDescription?: string;
+} & ({ scopes?: SCO[] } | { scope?: SCO }) &
+  ({ tags?: TAG[] } | { tag?: TAG }) &
+  MethodsDefinition<M>;
 
-/** mIN, mOUT - accumulated from all middlewares */
-export class EndpointsFactory<mIN, mOUT, POS extends ApiResponse, NEG extends ApiResponse> {
-  protected middlewares: MiddlewareDefinition<any, any, any>[] = [];
+export class EndpointsFactory<
+  POS extends ApiResponse,
+  NEG extends ApiResponse,
+  IN extends IOSchema<"strip"> | null = null,
+  OUT extends FlatObject = {},
+  SCO extends string = string,
+  TAG extends string = string
+> {
+  protected resultHandler: ResultHandlerDefinition<POS, NEG>;
+  protected middlewares: AnyMiddlewareDef[] = [];
 
-  constructor(protected resultHandler: ResultHandlerDefinition<POS, NEG>) {
-    this.resultHandler = resultHandler;
+  constructor(resultHandler: ResultHandlerDefinition<POS, NEG>);
+  /** @desc Consider using the "config" prop with the "tags" option to enforce constraints on tagging the endpoints */
+  constructor(params: {
+    resultHandler: ResultHandlerDefinition<POS, NEG>;
+    config?: CommonConfig<TAG>;
+  });
+  constructor(
+    subject:
+      | ResultHandlerDefinition<POS, NEG>
+      | {
+          resultHandler: ResultHandlerDefinition<POS, NEG>;
+          config?: CommonConfig<TAG>;
+        }
+  ) {
+    this.resultHandler =
+      "resultHandler" in subject ? subject.resultHandler : subject;
   }
 
-  static #create<cmIN, cmOUT, cPOS extends ApiResponse, cNEG extends ApiResponse>(
-    middlewares: MiddlewareDefinition<any, any, any>[],
-    resultHandler: ResultHandlerDefinition<cPOS, cNEG>
+  static #create<
+    CPOS extends ApiResponse,
+    CNEG extends ApiResponse,
+    CIN extends IOSchema<"strip"> | null,
+    COUT extends FlatObject,
+    CSCO extends string,
+    CTAG extends string
+  >(
+    middlewares: AnyMiddlewareDef[],
+    resultHandler: ResultHandlerDefinition<CPOS, CNEG>
   ) {
-    const factory = new EndpointsFactory<cmIN, cmOUT, cPOS, cNEG>(resultHandler);
+    const factory = new EndpointsFactory<CPOS, CNEG, CIN, COUT, CSCO, CTAG>(
+      resultHandler
+    );
     factory.middlewares = middlewares;
     return factory;
   }
 
-  public addMiddleware<IN extends IOSchema, OUT extends FlatObject>(
-    definition: MiddlewareDefinition<IN, mOUT, OUT>
+  public addMiddleware<
+    AIN extends IOSchema<"strip">,
+    AOUT extends FlatObject,
+    ASCO extends string
+  >(subject: MiddlewareDefinition<AIN, OUT, AOUT, ASCO>) {
+    return EndpointsFactory.#create<
+      POS,
+      NEG,
+      ProbableIntersection<IN, AIN>,
+      OUT & AOUT,
+      SCO & ASCO,
+      TAG
+    >(this.middlewares.concat(subject), this.resultHandler);
+  }
+
+  public use = this.addExpressMiddleware;
+
+  public addExpressMiddleware<
+    R extends Request,
+    S extends Response,
+    AOUT extends FlatObject = {}
+  >(
+    middleware: ExpressMiddleware<R, S>,
+    features?: ExpressMiddlewareFeatures<R, S, AOUT>
   ) {
-    return EndpointsFactory.#create<Merge<IN, mIN>, mOUT & OUT, POS, NEG>(
+    const transformer = features?.transformer || ((err: Error) => err);
+    const provider = features?.provider || (() => ({} as AOUT));
+    const definition: AnyMiddlewareDef = {
+      type: "express",
+      input: z.object({}),
+      middleware: async ({ request, response }) =>
+        new Promise<AOUT>((resolve, reject) => {
+          const next = (err?: any) => {
+            if (err && err instanceof Error) {
+              return reject(transformer(err));
+            }
+            resolve(provider(request as R, response as S));
+          };
+          middleware(request as R, response as S, next);
+        }),
+    };
+    return EndpointsFactory.#create<POS, NEG, IN, OUT & AOUT, SCO, TAG>(
       this.middlewares.concat(definition),
       this.resultHandler
     );
   }
 
-  public build<IN extends IOSchema, OUT extends IOSchema, M extends Method>({
-    input, output, handler, description, type, ...rest
-  }: BuildProps<IN, OUT, mIN, mOUT, M>) {
-    return new Endpoint<IN, OUT, mIN, mOUT, M, POS, NEG>({
-      handler, description,
-      middlewares: this.middlewares,
-      inputSchema: input,
-      outputSchema: output,
-      resultHandler: this.resultHandler,
-      mimeTypes: type === 'upload' ? [mimeMultipart] : [mimeJson],
-      ...rest
+  public addOptions<AOUT extends FlatObject>(options: AOUT) {
+    return EndpointsFactory.#create<POS, NEG, IN, OUT & AOUT, SCO, TAG>(
+      this.middlewares.concat(
+        createMiddleware({
+          input: z.object({}),
+          middleware: async () => options,
+        })
+      ),
+      this.resultHandler
+    );
+  }
+
+  public build<BIN extends IOSchema, BOUT extends IOSchema, M extends Method>({
+    input,
+    handler,
+    output: outputSchema,
+    ...rest
+  }: BuildProps<BIN, BOUT, IN, OUT, M, SCO, TAG>): Endpoint<
+    ProbableIntersection<IN, BIN>,
+    BOUT,
+    OUT,
+    M,
+    POS,
+    NEG,
+    SCO,
+    TAG
+  > {
+    const { middlewares, resultHandler } = this;
+    return new Endpoint({
+      handler,
+      middlewares,
+      outputSchema,
+      resultHandler,
+      inputSchema: getFinalEndpointInputSchema<IN, BIN>(middlewares, input),
+      mimeTypes: hasUpload(input) ? [mimeMultipart] : [mimeJson],
+      ...rest,
     });
   }
 }
 
-export const defaultEndpointsFactory = new EndpointsFactory(defaultResultHandler);
+export const defaultEndpointsFactory = new EndpointsFactory(
+  defaultResultHandler
+);
