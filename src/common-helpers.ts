@@ -7,61 +7,19 @@ import {
   LoggerConfig,
   loggerLevels,
 } from "./config-type";
-import { copyMeta, getMeta } from "./metadata";
+import { IOSchema } from "./io-schema";
+import { getMeta } from "./metadata";
 import { AuxMethod, Method } from "./method";
-import { AnyMiddlewareDef } from "./middleware";
 import { mimeMultipart } from "./mime";
 import { ZodUpload } from "./upload-schema";
 
 export type FlatObject = Record<string, any>;
-
-type Refined<T extends z.ZodType> = T extends z.ZodType<infer O>
-  ? z.ZodEffects<T, O, O>
-  : never;
-
-export type IOSchema<U extends UnknownKeysParam = any> =
-  | z.ZodObject<any, U>
-  | z.ZodUnion<[IOSchema<U>, ...IOSchema<U>[]]>
-  | z.ZodIntersection<IOSchema<U>, IOSchema<U>>
-  | z.ZodDiscriminatedUnion<string, z.Primitive, z.ZodObject<any, U>>
-  | Refined<z.ZodObject<any, U>>;
 
 export type ArrayElement<T extends readonly unknown[]> =
   T extends readonly (infer K)[] ? K : never;
 
 /** @see https://expressjs.com/en/guide/routing.html */
 export const routePathParamsRegex = /:([A-Za-z0-9_]+)/g;
-
-export type ProbableIntersection<
-  A extends IOSchema<"strip"> | null,
-  B extends IOSchema
-> = A extends null
-  ? B
-  : A extends IOSchema<"strip">
-  ? z.ZodIntersection<A, B>
-  : never;
-
-/**
- * @description intersects input schemas of middlewares and the endpoint
- * @since 07.03.2022 former combineEndpointAndMiddlewareInputSchemas()
- */
-export const getFinalEndpointInputSchema = <
-  MIN extends IOSchema<"strip"> | null,
-  IN extends IOSchema
->(
-  middlewares: AnyMiddlewareDef[],
-  input: IN
-): ProbableIntersection<MIN, IN> => {
-  const result = middlewares
-    .map(({ input: schema }) => schema)
-    .concat(input)
-    .reduce((acc, schema) => acc.and(schema)) as ProbableIntersection<MIN, IN>;
-  for (const middleware of middlewares) {
-    copyMeta(middleware.input, result);
-  }
-  copyMeta(input, result);
-  return result;
-};
 
 function areFilesAvailable(request: Request) {
   const contentType = request.header("content-type") || "";
@@ -82,7 +40,7 @@ const fallbackInputSource = defaultInputSources.delete;
 export const getActualMethod = (request: Request) =>
   request.method.toLowerCase() as Method | AuxMethod;
 
-export function getInitialInput(
+export function getInput(
   request: Request,
   inputAssignment: CommonConfig["inputSources"]
 ): any {
@@ -201,17 +159,35 @@ export function getRoutePathParams(path: string): string[] {
   return match.map((param) => param.slice(1));
 }
 
+const reduceBool = (arr: boolean[]) =>
+  arr.reduce((carry, bool) => carry || bool, false);
+
+export function hasTopLevelTransformingEffect(schema: IOSchema): boolean {
+  if (schema instanceof z.ZodEffects) {
+    if (schema._def.effect.type !== "refinement") {
+      return true;
+    }
+  }
+  if (schema instanceof z.ZodUnion) {
+    return reduceBool(schema.options.map(hasTopLevelTransformingEffect));
+  }
+  if (schema instanceof z.ZodIntersection) {
+    return reduceBool(
+      [schema._def.left, schema._def.right].map(hasTopLevelTransformingEffect)
+    );
+  }
+  return false; // ZodObject left
+}
+
 export function hasUpload(schema: z.ZodTypeAny): boolean {
   if (schema instanceof ZodUpload) {
     return true;
   }
-  const reduceBool = (arr: boolean[]) =>
-    arr.reduce((carry, check) => carry || check, false);
   if (schema instanceof z.ZodObject) {
     return reduceBool(Object.values<z.ZodTypeAny>(schema.shape).map(hasUpload));
   }
   if (schema instanceof z.ZodUnion) {
-    return reduceBool(schema._def.options.map(hasUpload));
+    return reduceBool(schema.options.map(hasUpload));
   }
   if (schema instanceof z.ZodIntersection) {
     return reduceBool([schema._def.left, schema._def.right].map(hasUpload));
@@ -243,6 +219,3 @@ export type ErrMessage = Exclude<
 // the copy of the private Zod errorUtil.errToObj
 export const errToObj = (message: ErrMessage | undefined) =>
   typeof message === "string" ? { message } : message || {};
-
-// the copy of the private Zod utility type of ZodObject
-type UnknownKeysParam = "passthrough" | "strict" | "strip";

@@ -1,14 +1,15 @@
 import {
-  z,
   EndpointsFactory,
-  createMiddleware,
-  defaultResultHandler,
-  defaultEndpointsFactory,
-  createResultHandler,
   createApiResponse,
+  createMiddleware,
+  createResultHandler,
+  defaultEndpointsFactory,
+  defaultResultHandler,
   testEndpoint,
+  z,
 } from "../../src";
 import { Endpoint } from "../../src/endpoint";
+import { IOSchemaError } from "../../src/errors";
 import { mimeJson } from "../../src/mime";
 import { serializeSchemaForTest } from "../helpers";
 
@@ -709,6 +710,93 @@ describe("Endpoint", () => {
         status: "error",
       });
       expect(responseMock.status).toHaveBeenCalledWith(400);
+    });
+
+    test("should throw when using transformation (constructor)", () => {
+      expect(
+        () =>
+          new Endpoint({
+            method: "get",
+            inputSchema: z.object({}).transform(() => []),
+            mimeTypes: [mimeJson],
+            outputSchema: z.object({}),
+            handler: jest.fn(),
+            resultHandler: {
+              getPositiveResponse: jest.fn(),
+              getNegativeResponse: jest.fn(),
+              handler: jest.fn(),
+            },
+            middlewares: [],
+          })
+      ).toThrowError(
+        new IOSchemaError(
+          "Using transformations on the top level of endpoint input schema is not allowed."
+        )
+      );
+      expect(
+        () =>
+          new Endpoint({
+            method: "get",
+            inputSchema: z.object({}),
+            mimeTypes: [mimeJson],
+            outputSchema: z.object({}).transform(() => []),
+            handler: jest.fn(),
+            resultHandler: {
+              getPositiveResponse: jest.fn(),
+              getNegativeResponse: jest.fn(),
+              handler: jest.fn(),
+            },
+            middlewares: [],
+          })
+      ).toThrowError(
+        new IOSchemaError(
+          "Using transformations on the top level of endpoint output schema is not allowed."
+        )
+      );
+    });
+  });
+
+  describe("Issue #673: transformations in middlewares", () => {
+    test("should avoid double parsing, should not mutate input", async () => {
+      const dateInputMiddleware = createMiddleware({
+        input: z.object({
+          middleware_date_input: z.dateIn().optional(),
+        }),
+        middleware: async ({ input: { middleware_date_input }, logger }) => {
+          logger.debug("date in mw handler", typeof middleware_date_input);
+          return {};
+        },
+      });
+
+      const endpoint = defaultEndpointsFactory
+        .addMiddleware(dateInputMiddleware)
+        .build({
+          method: "get",
+          input: z.object({}),
+          output: z.object({}),
+          handler: async ({ input: { middleware_date_input }, logger }) => {
+            logger.debug(
+              "date in endpoint handler",
+              typeof middleware_date_input
+            );
+            return {};
+          },
+        });
+
+      const { loggerMock, responseMock } = await testEndpoint({
+        endpoint,
+        requestProps: {
+          query: {
+            middleware_date_input: "2022-09-28",
+          },
+        },
+      });
+
+      expect(loggerMock.debug.mock.calls).toEqual([
+        ["date in mw handler", "object"],
+        ["date in endpoint handler", "object"],
+      ]);
+      expect(responseMock.status).toHaveBeenCalledWith(200);
     });
   });
 });

@@ -9,16 +9,16 @@ import { CommonConfig } from "./config-type";
 import { mapLogicalContainer } from "./logical-container";
 import { Method } from "./method";
 import {
-  depictRequestParams,
   depictRequest,
+  depictRequestParams,
   depictResponse,
-  reformatParamsInPath,
   depictSecurity,
   depictSecurityRefs,
   depictTags,
   ensureShortDescription,
+  reformatParamsInPath,
 } from "./open-api-helpers";
-import { Routing, routingCycle, RoutingCycleParams } from "./routing";
+import { Routing, RoutingCycleParams, routingCycle } from "./routing";
 
 interface GeneratorParams {
   title: string;
@@ -134,7 +134,6 @@ export class OpenAPI extends OpenApiBuilder {
       }
       const swaggerCompatiblePath = reformatParamsInPath(path);
       this.addPath(swaggerCompatiblePath, {
-        ...(this.rootDoc.paths?.[swaggerCompatiblePath] || {}),
         [method]: operation,
       });
     };

@@ -1,5 +1,5 @@
 import { DependsOnMethodError, OpenAPIError, RoutingError } from "../../src";
-import { ResultHandlerError } from "../../src/errors";
+import { IOSchemaError, ResultHandlerError } from "../../src/errors";
 
 describe("Errors", () => {
   describe("RoutingError", () => {
@@ -13,6 +13,13 @@ describe("Errors", () => {
     test("should be an instance of Error", () => {
       expect(new OpenAPIError("test") instanceof OpenAPIError).toBeTruthy();
       expect(new OpenAPIError("test") instanceof Error).toBeTruthy();
+    });
+  });
+
+  describe("IOSchemaError", () => {
+    test("should be an instance of Error", () => {
+      expect(new IOSchemaError("test") instanceof IOSchemaError).toBeTruthy();
+      expect(new IOSchemaError("test") instanceof Error).toBeTruthy();
     });
   });
 

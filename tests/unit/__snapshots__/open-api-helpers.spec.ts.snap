@@ -34,12 +34,12 @@ exports[`Open API helpers depictBoolean() should depict ZodBoolean 1`] = `
 
 exports[`Open API helpers depictDateIn should depict ZodDateIn 1`] = `
 {
-  "description": "YYYY-MM-DDTHH:mm:ss.sssZ",
+  "description": "test",
   "externalDocs": {
     "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString",
   },
   "format": "date-time",
-  "pattern": "^\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2}:\\d{2}(\\.\\d{3})?)?Z?$",
+  "pattern": "^\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?)?Z?$",
   "type": "string",
 }
 `;
@@ -48,7 +48,7 @@ exports[`Open API helpers depictDateIn should throw when ZodDateIn in response 1
 
 exports[`Open API helpers depictDateOut should depict ZodDateOut 1`] = `
 {
-  "description": "YYYY-MM-DDTHH:mm:ss.sssZ",
+  "description": "test",
   "externalDocs": {
     "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString",
   },
@@ -798,6 +798,10 @@ exports[`Open API helpers depictZodBranded should depict the actual schema 1`] =
 }
 `;
 
+exports[`Open API helpers depictZodDate should throw clear error 1`] = `[Error: Using z.date() within output schema is forbidden. Please use z.dateOut() instead. Check out the documentation for details.]`;
+
+exports[`Open API helpers depictZodDate should throw clear error 2`] = `[Error: Using z.date() within input schema is forbidden. Please use z.dateIn() instead. Check out the documentation for details.]`;
+
 exports[`Open API helpers excludeExampleFromDepiction() should remove example property of supplied object 1`] = `
 {
   "description": "test",
@@ -865,7 +869,7 @@ exports[`Open API helpers excludeParamsFromDepiction() should omit specified pat
 }
 `;
 
-exports[`Open API helpers extractObjectSchema() should handle refined object schema 1`] = `
+exports[`Open API helpers extractObjectSchema() Feature #600: Top level refinements should handle refined object schema 1`] = `
 {
   "_type": "ZodObject",
   "shape": {

@@ -2,14 +2,14 @@ import cors from "cors";
 import http from "http";
 import fetch from "node-fetch";
 import {
-  createServer,
   EndpointsFactory,
   Method,
-  z,
-  defaultResultHandler,
-  createResultHandler,
   createApiResponse,
   createMiddleware,
+  createResultHandler,
+  createServer,
+  defaultResultHandler,
+  z,
 } from "../../src";
 import { waitFor } from "../helpers";
 

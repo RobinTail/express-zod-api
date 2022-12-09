@@ -1,4 +1,4 @@
-import { defaultEndpointsFactory, z, testEndpoint } from "../../src";
+import { defaultEndpointsFactory, testEndpoint, z } from "../../src";
 
 describe("Mock", () => {
   describe("testEndpoint()", () => {

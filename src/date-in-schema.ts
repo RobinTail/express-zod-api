@@ -1,5 +1,4 @@
 import {
-  addIssueToContext,
   INVALID,
   ParseInput,
   ParseReturnType,
@@ -7,16 +6,18 @@ import {
   ZodParsedType,
   ZodType,
   ZodTypeDef,
+  addIssueToContext,
 } from "zod";
 import { isValidDate } from "./common-helpers";
 
 // simple regex for ISO date, supports the following formats:
 // 2021-01-01T00:00:00.000Z
+// 2021-01-01T00:00:00.0Z
 // 2021-01-01T00:00:00Z
 // 2021-01-01T00:00:00
 // 2021-01-01
 export const isoDateRegex =
-  /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d{3})?)?Z?$/;
+  /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d+)?)?Z?$/;
 
 const zodDateInKind = "ZodDateIn";
 

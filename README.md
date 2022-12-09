@@ -81,9 +81,9 @@ Therefore, many basic tasks can be accomplished faster and easier, in particular
 - Logger — [Winston](https://github.com/winstonjs/winston).
 - Generators:
   - Documentation — [OpenAPI 3.x](https://github.com/metadevpro/openapi3-ts) (Swagger Specification).
-  - Client side types — [Zod-to-TS](https://github.com/sachinraja/zod-to-ts)
+  - Client side types — [forked zod-to-ts](https://github.com/RobinTail/zod-to-ts).
 - File uploads — [Express-FileUpload](https://github.com/richardgirges/express-fileupload)
-  (based on [Busboy](https://github.com/mscdex/busboy))
+  (based on [Busboy](https://github.com/mscdex/busboy)).
 
 ## Concept
 
@@ -784,7 +784,8 @@ There is a new way of informing the frontend about the I/O types of your endpoin
 The new approach offers automatic generation of a client based on routing to a typescript file.
 The generated client is flexibly configurable on the frontend side using an implementation function that
 directly makes requests to an endpoint using the libraries and methods of your choice.
-The client asserts the type of request parameters and response. The feature requires Typescript version 4.1 or higher.
+The client asserts the type of request parameters and response.
+Consuming the generated client requires Typescript version 4.1 or higher.
 
 ```typescript
 // example client-generator.ts
@@ -906,7 +907,7 @@ test("should respond successfully", async () => {
     endpoint: yourEndpoint,
     requestProps: {
       method: "POST", // default: GET
-      body: { ... },
+      body: { /* parsed JSON */ },
     },
     // responseProps, configProps, loggerProps
   });
@@ -919,7 +920,7 @@ test("should respond successfully", async () => {
 });
 ```
 
-_This method is optimized for the standard result handler. With the flexibility to customize, you can add additional
+_This method is optimized for the `defaultResultHandler`. With the flexibility to customize, you can add additional
 properties as needed._
 
 ## Excessive properties in endpoint output

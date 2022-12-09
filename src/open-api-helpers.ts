@@ -18,18 +18,19 @@ import {
   ArrayElement,
   getExamples,
   getRoutePathParams,
-  IOSchema,
+  hasTopLevelTransformingEffect,
   routePathParamsRegex,
 } from "./common-helpers";
 import { InputSources, TagsConfig } from "./config-type";
-import { isoDateRegex, ZodDateIn, ZodDateInDef } from "./date-in-schema";
+import { ZodDateIn, ZodDateInDef, isoDateRegex } from "./date-in-schema";
 import { ZodDateOut, ZodDateOutDef } from "./date-out-schema";
 import { AbstractEndpoint } from "./endpoint";
 import { OpenAPIError } from "./errors";
 import { ZodFile, ZodFileDef } from "./file-schema";
+import { IOSchema } from "./io-schema";
 import {
-  andToOr,
   LogicalContainer,
+  andToOr,
   mapLogicalContainer,
 } from "./logical-container";
 import { copyMeta } from "./metadata";
@@ -214,11 +215,11 @@ export const depictDateIn: DepictHelper<ZodDateIn> = ({
     throw new OpenAPIError("Please use z.dateOut() for output.");
   }
   return {
+    description: "YYYY-MM-DDTHH:mm:ss.sssZ",
     ...initial,
     type: "string",
     format: "date-time",
     pattern: isoDateRegex.source,
-    description: "YYYY-MM-DDTHH:mm:ss.sssZ",
     externalDocs: {
       url: isoDateDocumentationUrl,
     },
@@ -233,14 +234,25 @@ export const depictDateOut: DepictHelper<ZodDateOut> = ({
     throw new OpenAPIError("Please use z.dateIn() for input.");
   }
   return {
+    description: "YYYY-MM-DDTHH:mm:ss.sssZ",
     ...initial,
     type: "string",
     format: "date-time",
-    description: "YYYY-MM-DDTHH:mm:ss.sssZ",
     externalDocs: {
       url: isoDateDocumentationUrl,
     },
   };
+};
+
+/** @throws OpenAPIError */
+export const depictZodDate: DepictHelper<z.ZodDate> = ({ isResponse }) => {
+  throw new OpenAPIError(
+    `Using z.date() within ${
+      isResponse ? "output" : "input"
+    } schema is forbidden. Please use z.date${
+      isResponse ? "Out" : "In"
+    }() instead. Check out the documentation for details.`
+  );
 };
 
 export const depictBoolean: DepictHelper<z.ZodBoolean> = ({ initial }) => ({
@@ -562,6 +574,11 @@ export function extractObjectSchema(subject: IOSchema) {
       .map((option) => extractObjectSchema(option))
       .reduce((acc, option) => acc.merge(option.partial()), z.object({}));
   } else if (subject instanceof z.ZodEffects) {
+    if (hasTopLevelTransformingEffect(subject)) {
+      throw new OpenAPIError(
+        "Using transformations on the top level of input schema is not allowed."
+      );
+    }
     objectSchema = extractObjectSchema(subject._def.schema); // object refinement
   } else {
     // intersection
@@ -627,6 +644,7 @@ const depictHelpers: DepictingRules = {
   ZodNullable: depictOptionalOrNullable,
   ZodDiscriminatedUnion: depictDiscriminatedUnion,
   ZodBranded: depictZodBranded,
+  ZodDate: depictZodDate,
 };
 
 export const depictSchema: DepictHelper<z.ZodTypeAny> = ({
