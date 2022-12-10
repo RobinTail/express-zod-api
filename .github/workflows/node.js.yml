@@ -21,9 +21,9 @@ jobs:
       id: yarnCache
       run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     - name: Install Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v2
+      uses: actions/setup-node@v3
       with:
         node-version: ${{ matrix.node-version }}
     - name: Cache node modules
@@ -57,13 +57,3 @@ jobs:
       run: |
         yarn build:esmTest
         yarn test:esm
-  finish:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Coveralls Finished
-        continue-on-error: true
-        uses: coverallsapp/github-action@1.1.3
-        with:
-          github-token: ${{ secrets.github_token }}
-          parallel-finished: true
