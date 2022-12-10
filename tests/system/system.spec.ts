@@ -363,7 +363,7 @@ describe("App", () => {
           something: "gimme fail",
         }),
       });
-      expect(response.status).toBe(400);
+      expect(response.status).toBe(500);
       const json = await response.json();
       expect(json).toMatchSnapshot();
     });

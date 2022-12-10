@@ -39,7 +39,7 @@ exports[`App Validation Should fail on handler input type mismatch 1`] = `
 exports[`App Validation Should fail on handler output type mismatch 1`] = `
 {
   "error": {
-    "message": "output: Invalid format; anything: Number must be greater than 0",
+    "message": "output/anything: Invalid format: Number must be greater than 0",
   },
   "status": "error",
 }
