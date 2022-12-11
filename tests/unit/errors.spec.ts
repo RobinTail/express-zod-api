@@ -50,18 +50,11 @@ describe("Errors", () => {
       expect(new ResultHandlerError("test")).toBeInstanceOf(Error);
     });
 
-    test(".hasOriginalError() should depend on original error", () => {
+    test(".originalError should be the original error", () => {
       const error = new ResultHandlerError("test", new Error("test2"));
-      expect(error.hasOriginalError()).toBeTruthy();
+      expect(error.originalError).toEqual(new Error("test2"));
       const error2 = new ResultHandlerError("test");
-      expect(error2.hasOriginalError()).toBeFalsy();
-    });
-
-    test(".getOriginalErrorMessage() should depend on original error", () => {
-      const error = new ResultHandlerError("test", new Error("test2"));
-      expect(error.getOriginalErrorMessage()).toBe("test2");
-      const error2 = new ResultHandlerError("test");
-      expect(error2.getOriginalErrorMessage()).toBeUndefined();
+      expect(error2.originalError).toBeUndefined();
     });
   });
 });

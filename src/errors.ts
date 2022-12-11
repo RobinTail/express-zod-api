@@ -20,18 +20,10 @@ export class OutputValidationError extends IOSchemaError {
 
 export class ResultHandlerError extends Error {
   public override name = "ResultHandlerError";
-  protected readonly originalError?: Error;
+  public readonly originalError: Error | undefined;
 
   constructor(message: string, originalError?: Error | null) {
     super(message);
     this.originalError = originalError || undefined;
-  }
-
-  public hasOriginalError() {
-    return this.originalError !== undefined;
-  }
-
-  public getOriginalErrorMessage() {
-    return this.originalError ? this.originalError.message : undefined;
   }
 }
