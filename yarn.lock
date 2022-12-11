@@ -652,10 +652,10 @@
     minimatch "^3.1.2"
     strip-json-comments "^3.1.1"
 
-"@express-zod-api/zod-to-ts@1.1.5":
-  version "1.1.5"
-  resolved "https://registry.yarnpkg.com/@express-zod-api/zod-to-ts/-/zod-to-ts-1.1.5.tgz#b7e1c717e21b4502d8fd8290aeaffc69693f2f6d"
-  integrity sha512-r7nbDNdQndqjLiSESUhgVL5qfvTQamyHoV2IDSGkc/1sYnyraesBCKl2buyaZa6ipnZx8NSTazFqlHfi7rgBkQ==
+"@express-zod-api/zod-to-ts@1.1.6":
+  version "1.1.6"
+  resolved "https://registry.yarnpkg.com/@express-zod-api/zod-to-ts/-/zod-to-ts-1.1.6.tgz#60b071f9dee6f9f5fb24098287f89cb47f7fdd1a"
+  integrity sha512-0LAWRIYkzvCWM1sCDlawBqK8WjwEmja0Zu421PrfXLh7A24YuLj6GvS00C9uQpf+HHQ04lCack1gDXiee0rjWA==
   dependencies:
     typescript "4.9.4"
 
