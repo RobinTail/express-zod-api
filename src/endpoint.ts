@@ -3,11 +3,16 @@ import { Logger } from "winston";
 import { z } from "zod";
 import { ApiResponse } from "./api-response";
 import { CommonConfig } from "./config-type";
-import { IOSchemaError, ResultHandlerError } from "./errors";
+import {
+  IOSchemaError,
+  OutputValidationError,
+  ResultHandlerError,
+} from "./errors";
 import {
   FlatObject,
   getActualMethod,
   getInput,
+  getMessageFromError,
   hasTopLevelTransformingEffect,
   makeErrorFromAnything,
 } from "./common-helpers";
@@ -217,20 +222,16 @@ export class Endpoint<
     try {
       return await this.outputSchema.parseAsync(output);
     } catch (e) {
-      if (e instanceof z.ZodError) {
-        throw new z.ZodError([
-          {
-            message: "Invalid format",
-            code: "custom",
-            path: ["output"],
-          },
-          ...e.issues.map((issue) => ({
-            ...issue,
-            path: issue.path.length === 0 ? ["output"] : issue.path,
-          })),
-        ]);
-      }
-      throw makeErrorFromAnything(e);
+      const error =
+        e instanceof z.ZodError
+          ? new z.ZodError(
+              e.issues.map(({ path, ...rest }) => ({
+                ...rest,
+                path: (["output"] as typeof path).concat(path),
+              }))
+            )
+          : makeErrorFromAnything(e);
+      throw new OutputValidationError(getMessageFromError(error));
     }
   }
 

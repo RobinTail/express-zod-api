@@ -6,6 +6,8 @@ export class OpenAPIError extends Error {}
 
 export class IOSchemaError extends Error {}
 
+export class OutputValidationError extends IOSchemaError {}
+
 export class ResultHandlerError extends Error {
   protected readonly originalError?: Error;
 

@@ -182,11 +182,11 @@ describe("Endpoint", () => {
       const { responseMock } = await testEndpoint({
         endpoint,
       });
-      expect(responseMock.status).toBeCalledWith(400);
+      expect(responseMock.status).toBeCalledWith(500);
       expect(responseMock.json).toBeCalledWith({
         status: "error",
         error: {
-          message: "output: Invalid format; email: Invalid email",
+          message: "output/email: Invalid email",
         },
       });
     });
@@ -654,10 +654,10 @@ describe("Endpoint", () => {
       expect(responseMock.json).toHaveBeenCalledWith({
         status: "error",
         error: {
-          message: "output: Invalid format; output: failure on demand",
+          message: "output: failure on demand",
         },
       });
-      expect(responseMock.status).toHaveBeenCalledWith(400);
+      expect(responseMock.status).toHaveBeenCalledWith(500);
     });
   });
 
