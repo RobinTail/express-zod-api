@@ -108,8 +108,8 @@ export const lastResortHandler = ({
     .status(500)
     .end(
       `An error occurred while serving the result: ${error.message}.` +
-        (error.hasOriginalError()
-          ? `\nOriginal error: ${error.getOriginalErrorMessage()}.`
+        (error.originalError
+          ? `\nOriginal error: ${error.originalError.message}.`
           : "")
     );
 };
