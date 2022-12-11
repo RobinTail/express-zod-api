@@ -1,10 +1,13 @@
 import { Request, Response } from "express";
-import createHttpError from "http-errors";
 import { Logger } from "winston";
 import { z } from "zod";
 import { ApiResponse } from "./api-response";
 import { CommonConfig } from "./config-type";
-import { IOSchemaError, ResultHandlerError } from "./errors";
+import {
+  IOSchemaError,
+  OutputValidationError,
+  ResultHandlerError,
+} from "./errors";
 import {
   FlatObject,
   getActualMethod,
@@ -228,7 +231,7 @@ export class Endpoint<
               }))
             )
           : makeErrorFromAnything(e);
-      throw createHttpError(500, getMessageFromError(error));
+      throw new OutputValidationError(getMessageFromError(error));
     }
   }
 
