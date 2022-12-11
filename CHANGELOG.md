@@ -2,6 +2,27 @@
 
 ## Version 8
 
+### v8.5.0
+
+- Supporting Node 19.
+- `@express-zod-api/zod-to-ts` version is v1.1.6.
+- Custom errors have gotten their well deserved names matching their classes.
+  - The list of currently exposed custom errors: `OpenAPIError, DependsOnMethodError, RoutingError`.
+- Output validation errors now cause HTTP status code `500` instead of `400`.
+  - HTTP status codes `4xx` are supposed to reflect client errors (bad requests).
+  - The case when Endpoint's handler returns do not comply the Endpoint's output schema is the internal API error.
+  - Use [Typescript's strict mode](https://www.typescriptlang.org/tsconfig#strict) in order to prevent such cases
+    during the development.
+- Added [Code of Conduct](CODE_OF_CONDUCT.md).
+- Output validation error messages changed slightly in the response:
+
+```text
+// before:
+output: Invalid format; anything: Number must be greater than 0
+// after:
+output/anything: Number must be greater than 0
+```
+
 ### v8.4.4
 
 - `typescript` version is 4.9.4.
