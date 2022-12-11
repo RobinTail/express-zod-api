@@ -222,9 +222,8 @@ export class Endpoint<
       const error =
         e instanceof z.ZodError
           ? new z.ZodError(
-              e.issues.map(({ message, path, ...rest }) => ({
+              e.issues.map(({ path, ...rest }) => ({
                 ...rest,
-                message: `Invalid format: ${message}`,
                 path: (["output"] as typeof path).concat(path),
               }))
             )

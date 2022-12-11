@@ -186,7 +186,7 @@ describe("Endpoint", () => {
       expect(responseMock.json).toBeCalledWith({
         status: "error",
         error: {
-          message: "output/email: Invalid format: Invalid email",
+          message: "output/email: Invalid email",
         },
       });
     });
@@ -654,7 +654,7 @@ describe("Endpoint", () => {
       expect(responseMock.json).toHaveBeenCalledWith({
         status: "error",
         error: {
-          message: "output: Invalid format: failure on demand",
+          message: "output: failure on demand",
         },
       });
       expect(responseMock.status).toHaveBeenCalledWith(500);
