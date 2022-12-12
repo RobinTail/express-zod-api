@@ -422,7 +422,7 @@ export const depictString: DepictHelper<z.ZodString> = ({
   return {
     ...initial,
     type: "string" as const,
-    ...(isDatetime ? { format: "datetime" } : {}),
+    ...(isDatetime ? { format: "date-time" } : {}),
     ...(isEmail ? { format: "email" } : {}),
     ...(isURL ? { format: "url" } : {}),
     ...(isUUID ? { format: "uuid" } : {}),
