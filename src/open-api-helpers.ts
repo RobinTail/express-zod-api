@@ -397,7 +397,7 @@ export const depictString: DepictHelper<z.ZodString> = ({
     maxLength,
     isUUID,
     isCUID,
-    // isDatetime, // @todo this one does not work since it's not bound, use it when fixed
+    isDatetime,
     _def: { checks },
   },
   initial,
@@ -422,7 +422,7 @@ export const depictString: DepictHelper<z.ZodString> = ({
   return {
     ...initial,
     type: "string" as const,
-    ...(datetimeCheck ? { format: "datetime" } : {}),
+    ...(isDatetime ? { format: "datetime" } : {}),
     ...(isEmail ? { format: "email" } : {}),
     ...(isURL ? { format: "url" } : {}),
     ...(isUUID ? { format: "uuid" } : {}),
