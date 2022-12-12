@@ -32,6 +32,17 @@ exports[`Open API helpers depictBoolean() should depict ZodBoolean 1`] = `
 }
 `;
 
+exports[`Open API helpers depictBranded should depict the actual schema 1`] = `
+{
+  "minLength": 2,
+  "type": "string",
+}
+`;
+
+exports[`Open API helpers depictDate should throw clear error 1`] = `[OpenAPIError: Using z.date() within output schema is forbidden. Please use z.dateOut() instead. Check out the documentation for details.]`;
+
+exports[`Open API helpers depictDate should throw clear error 2`] = `[OpenAPIError: Using z.date() within input schema is forbidden. Please use z.dateIn() instead. Check out the documentation for details.]`;
+
 exports[`Open API helpers depictDateIn should depict ZodDateIn 1`] = `
 {
   "description": "test",
@@ -790,17 +801,6 @@ exports[`Open API helpers depictUpload() should depict ZodUpload 1`] = `
 `;
 
 exports[`Open API helpers depictUpload() should throw when using in response 1`] = `[OpenAPIError: Please use z.upload() only for input.]`;
-
-exports[`Open API helpers depictZodBranded should depict the actual schema 1`] = `
-{
-  "minLength": 2,
-  "type": "string",
-}
-`;
-
-exports[`Open API helpers depictZodDate should throw clear error 1`] = `[OpenAPIError: Using z.date() within output schema is forbidden. Please use z.dateOut() instead. Check out the documentation for details.]`;
-
-exports[`Open API helpers depictZodDate should throw clear error 2`] = `[OpenAPIError: Using z.date() within input schema is forbidden. Please use z.dateIn() instead. Check out the documentation for details.]`;
 
 exports[`Open API helpers excludeExampleFromDepiction() should remove example property of supplied object 1`] = `
 {

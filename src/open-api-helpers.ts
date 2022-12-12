@@ -245,7 +245,7 @@ export const depictDateOut: DepictHelper<ZodDateOut> = ({
 };
 
 /** @throws OpenAPIError */
-export const depictZodDate: DepictHelper<z.ZodDate> = ({ isResponse }) => {
+export const depictDate: DepictHelper<z.ZodDate> = ({ isResponse }) => {
   throw new OpenAPIError(
     `Using z.date() within ${
       isResponse ? "output" : "input"
@@ -509,10 +509,11 @@ export const depictEffect: DepictHelper<z.ZodEffects<z.ZodTypeAny>> = ({
   return { ...initial, ...input };
 };
 
-export const depictZodBranded: DepictHelper<
-  z.ZodBranded<z.ZodTypeAny, any>
-> = ({ schema, initial, isResponse }) =>
-  depictSchema({ schema: schema.unwrap(), isResponse, initial });
+export const depictBranded: DepictHelper<z.ZodBranded<z.ZodTypeAny, any>> = ({
+  schema,
+  initial,
+  isResponse,
+}) => depictSchema({ schema: schema.unwrap(), isResponse, initial });
 
 export const depictIOExamples = <T extends IOSchema>(
   schema: T,
@@ -643,8 +644,8 @@ const depictHelpers: DepictingRules = {
   ZodOptional: depictOptionalOrNullable,
   ZodNullable: depictOptionalOrNullable,
   ZodDiscriminatedUnion: depictDiscriminatedUnion,
-  ZodBranded: depictZodBranded,
-  ZodDate: depictZodDate,
+  ZodBranded: depictBranded,
+  ZodDate: depictDate,
 };
 
 export const depictSchema: DepictHelper<z.ZodTypeAny> = ({

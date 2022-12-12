@@ -11,6 +11,8 @@ import {
   depictArray,
   depictBigInt,
   depictBoolean,
+  depictBranded,
+  depictDate,
   depictDateIn,
   depictDateOut,
   depictDefault,
@@ -37,8 +39,6 @@ import {
   depictTuple,
   depictUnion,
   depictUpload,
-  depictZodBranded,
-  depictZodDate,
   ensureShortDescription,
   excludeExampleFromDepiction,
   excludeParamsFromDepiction,
@@ -901,17 +901,17 @@ describe("Open API helpers", () => {
     });
   });
 
-  describe("depictZodDate", () => {
+  describe("depictDate", () => {
     test("should throw clear error", () => {
       try {
-        depictZodDate({ isResponse: true, schema: z.date() });
+        depictDate({ isResponse: true, schema: z.date() });
         fail("should not be here");
       } catch (e) {
         expect(e).toBeInstanceOf(OpenAPIError);
         expect(e).toMatchSnapshot();
       }
       try {
-        depictZodDate({ isResponse: false, schema: z.date() });
+        depictDate({ isResponse: false, schema: z.date() });
         fail("should not be here");
       } catch (e) {
         expect(e).toBeInstanceOf(OpenAPIError);
@@ -920,10 +920,10 @@ describe("Open API helpers", () => {
     });
   });
 
-  describe("depictZodBranded", () => {
+  describe("depictBranded", () => {
     test("should depict the actual schema", () => {
       expect(
-        depictZodBranded({
+        depictBranded({
           schema: z.string().min(2).brand<"Test">(),
           isResponse: true,
         })
