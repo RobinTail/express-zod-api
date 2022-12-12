@@ -397,6 +397,7 @@ export const depictString: DepictHelper<z.ZodString> = ({
     maxLength,
     isUUID,
     isCUID,
+    // isDatetime, // @todo this one does not work since it's not bound, use it when fixed
     _def: { checks },
   },
   initial,
@@ -405,18 +406,30 @@ export const depictString: DepictHelper<z.ZodString> = ({
     (check): check is z.ZodStringCheck & { kind: "regex" } =>
       check.kind === "regex"
   );
+  const datetimeCheck = checks.find(
+    (check): check is z.ZodStringCheck & { kind: "datetime" } =>
+      check.kind === "datetime"
+  );
+  const regex = regexCheck
+    ? regexCheck.regex
+    : datetimeCheck
+    ? datetimeCheck.offset
+      ? new RegExp(
+          `^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?(([+-]\\d{2}:\\d{2})|Z)$`
+        )
+      : new RegExp(`^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?Z$`)
+    : undefined;
   return {
     ...initial,
     type: "string" as const,
+    ...(datetimeCheck ? { format: "datetime" } : {}),
     ...(isEmail ? { format: "email" } : {}),
     ...(isURL ? { format: "url" } : {}),
     ...(isUUID ? { format: "uuid" } : {}),
     ...(isCUID ? { format: "cuid" } : {}),
     ...(minLength ? { minLength } : {}),
     ...(maxLength ? { maxLength } : {}),
-    ...(regexCheck
-      ? { pattern: `/${regexCheck.regex.source}/${regexCheck.regex.flags}` }
-      : {}),
+    ...(regex ? { pattern: `/${regex.source}/${regex.flags}` } : {}),
   };
 };
 
