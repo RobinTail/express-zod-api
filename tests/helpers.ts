@@ -70,6 +70,11 @@ export const serializeSchemaForTest = (
           value: schema._def.innerType,
           default: schema._def.defaultValue(),
         }
+      : schema instanceof z.ZodCatch
+      ? {
+          value: schema._def.innerType,
+          fallback: schema._def.defaultValue(),
+        }
       : {}),
   };
 };

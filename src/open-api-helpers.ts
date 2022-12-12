@@ -84,6 +84,17 @@ export const depictDefault: DepictHelper<z.ZodDefault<z.ZodTypeAny>> = ({
   default: defaultValue(),
 });
 
+export const depictCatch: DepictHelper<z.ZodCatch<z.ZodTypeAny>> = ({
+  schema: {
+    _def: { innerType },
+  },
+  initial,
+  isResponse,
+}) => ({
+  ...initial,
+  ...depictSchema({ schema: innerType, initial, isResponse }),
+});
+
 export const depictAny: DepictHelper<z.ZodAny> = ({ initial }) => ({
   ...initial,
   format: "any",
@@ -646,6 +657,7 @@ const depictHelpers: DepictingRules = {
   ZodDiscriminatedUnion: depictDiscriminatedUnion,
   ZodBranded: depictBranded,
   ZodDate: depictDate,
+  ZodCatch: depictCatch,
 };
 
 export const depictSchema: DepictHelper<z.ZodTypeAny> = ({
