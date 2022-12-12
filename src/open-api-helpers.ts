@@ -530,6 +530,17 @@ export const depictEffect: DepictHelper<z.ZodEffects<z.ZodTypeAny>> = ({
   return { ...initial, ...input };
 };
 
+export const depictPipeline: DepictHelper<z.ZodPipeline<any, any>> = ({
+  schema,
+  initial,
+  isResponse,
+}) =>
+  depictSchema({
+    schema: schema._def[isResponse ? "out" : "in"],
+    isResponse,
+    initial,
+  });
+
 export const depictBranded: DepictHelper<z.ZodBranded<z.ZodTypeAny, any>> = ({
   schema,
   initial,
@@ -668,6 +679,7 @@ const depictHelpers: DepictingRules = {
   ZodBranded: depictBranded,
   ZodDate: depictDate,
   ZodCatch: depictCatch,
+  ZodPipeline: depictPipeline,
 };
 
 export const depictSchema: DepictHelper<z.ZodTypeAny> = ({
