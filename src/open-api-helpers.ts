@@ -391,32 +391,29 @@ export const depictTuple: DepictHelper<z.ZodTuple> = ({
 
 export const depictString: DepictHelper<z.ZodString> = ({
   schema: {
+    isEmail,
+    isURL,
+    minLength,
+    maxLength,
+    isUUID,
+    isCUID,
     _def: { checks },
   },
   initial,
 }) => {
-  const isEmail = checks.find(({ kind }) => kind === "email") !== undefined;
-  const isUrl = checks.find(({ kind }) => kind === "url") !== undefined;
-  const isUUID = checks.find(({ kind }) => kind === "uuid") !== undefined;
-  const isCUID = checks.find(({ kind }) => kind === "cuid") !== undefined;
-  const minLengthCheck = checks.find(({ kind }) => kind === "min") as
-    | Extract<ArrayElement<z.ZodStringDef["checks"]>, { kind: "min" }>
-    | undefined;
-  const maxLengthCheck = checks.find(({ kind }) => kind === "max") as
-    | Extract<ArrayElement<z.ZodStringDef["checks"]>, { kind: "max" }>
-    | undefined;
-  const regexCheck = checks.find(({ kind }) => kind === "regex") as
-    | Extract<ArrayElement<z.ZodStringDef["checks"]>, { kind: "regex" }>
-    | undefined;
+  const regexCheck = checks.find(
+    (check): check is z.ZodStringCheck & { kind: "regex" } =>
+      check.kind === "regex"
+  );
   return {
     ...initial,
     type: "string" as const,
     ...(isEmail ? { format: "email" } : {}),
-    ...(isUrl ? { format: "url" } : {}),
+    ...(isURL ? { format: "url" } : {}),
     ...(isUUID ? { format: "uuid" } : {}),
     ...(isCUID ? { format: "cuid" } : {}),
-    ...(minLengthCheck ? { minLength: minLengthCheck.value } : {}),
-    ...(maxLengthCheck ? { maxLength: maxLengthCheck.value } : {}),
+    ...(minLength ? { minLength } : {}),
+    ...(maxLength ? { maxLength } : {}),
     ...(regexCheck
       ? { pattern: `/${regexCheck.regex.source}/${regexCheck.regex.flags}` }
       : {}),
