@@ -126,7 +126,7 @@ export const depictUnion: DepictHelper<
 });
 
 export const depictDiscriminatedUnion: DepictHelper<
-  z.ZodDiscriminatedUnion<string, z.Primitive, z.ZodObject<any>>
+  z.ZodDiscriminatedUnion<string, z.ZodObject<any>[]>
 > = ({ schema: { options, discriminator }, initial, isResponse }) => {
   return {
     ...initial,
