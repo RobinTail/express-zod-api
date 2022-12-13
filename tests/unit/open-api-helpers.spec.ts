@@ -12,6 +12,7 @@ import {
   depictBigInt,
   depictBoolean,
   depictBranded,
+  depictCatch,
   depictDate,
   depictDateIn,
   depictDateOut,
@@ -262,6 +263,18 @@ describe("Open API helpers", () => {
       expect(
         depictDefault({
           schema: z.boolean().default(true),
+          isResponse: false,
+          initial: { description: "test" },
+        })
+      ).toMatchSnapshot();
+    });
+  });
+
+  describe("depictCatch()", () => {
+    test("should depict ZodCatch", () => {
+      expect(
+        depictCatch({
+          schema: z.boolean().catch(true),
           isResponse: false,
           initial: { description: "test" },
         })

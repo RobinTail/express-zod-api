@@ -39,6 +39,13 @@ exports[`Open API helpers depictBranded should depict the actual schema 1`] = `
 }
 `;
 
+exports[`Open API helpers depictCatch() should depict ZodCatch 1`] = `
+{
+  "description": "test",
+  "type": "boolean",
+}
+`;
+
 exports[`Open API helpers depictDate should throw clear error 1`] = `[OpenAPIError: Using z.date() within output schema is forbidden. Please use z.dateOut() instead. Check out the documentation for details.]`;
 
 exports[`Open API helpers depictDate should throw clear error 2`] = `[OpenAPIError: Using z.date() within input schema is forbidden. Please use z.dateIn() instead. Check out the documentation for details.]`;
