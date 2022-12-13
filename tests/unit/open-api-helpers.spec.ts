@@ -30,6 +30,7 @@ import {
   depictObject,
   depictObjectProperties,
   depictOptionalOrNullable,
+  depictPipeline,
   depictRecord,
   depictRequestParams,
   depictSchema,
@@ -693,6 +694,20 @@ describe("Open API helpers", () => {
         })
       ).toMatchSnapshot();
     });
+  });
+
+  describe("depictPipeline", () => {
+    test.each([{ isResponse: true }, { isResponse: false }])(
+      "should depict inner schema depending on IO direction %#",
+      ({ isResponse }) => {
+        expect(
+          depictPipeline({
+            isResponse,
+            schema: z.string().pipe(z.coerce.boolean()),
+          })
+        ).toMatchSnapshot();
+      }
+    );
   });
 
   describe("depictIOExamples()", () => {

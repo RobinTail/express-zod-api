@@ -417,6 +417,19 @@ exports[`Open API helpers depictOptionalOrNullable() should depict ZodOptional 1
 }
 `;
 
+exports[`Open API helpers depictPipeline should depict inner schema depending on IO direction 0 1`] = `
+{
+  "nullable": true,
+  "type": "boolean",
+}
+`;
+
+exports[`Open API helpers depictPipeline should depict inner schema depending on IO direction 1 1`] = `
+{
+  "type": "string",
+}
+`;
+
 exports[`Open API helpers depictRecord() should depict ZodRecord with key schema enum 1`] = `
 {
   "description": "test",
