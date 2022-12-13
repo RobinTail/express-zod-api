@@ -166,6 +166,7 @@ export const depictIntersection: DepictHelper<
   ],
 });
 
+// @todo need to set nullable/optional here too due to coerce
 export const depictOptionalOrNullable: DepictHelper<
   z.ZodOptional<any> | z.ZodNullable<any>
 > = ({ schema, initial, isResponse }) => ({
@@ -688,7 +689,11 @@ export const depictSchema: DepictHelper<z.ZodTypeAny> = ({
 }) => {
   const initial: SchemaObject = {};
   if (schema.isNullable()) {
-    initial.nullable = true;
+    // isNullable validates the schema's input, that is nullable in case of coercion
+    const hasCoercion = "coerce" in schema._def ? schema._def.coerce : false;
+    if (!(isResponse && hasCoercion)) {
+      initial.nullable = true;
+    }
   }
   if (schema.description) {
     initial.description = `${schema.description}`;

@@ -408,7 +408,7 @@ describe("Open API helpers", () => {
         depictOptionalOrNullable({
           schema: z.string().nullable(),
           isResponse: false,
-          initial: { description: "test", nullable: true },
+          initial: { description: "test", nullable: true }, // @todo remove nullable from initial
         })
       ).toMatchSnapshot();
     });

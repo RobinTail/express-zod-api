@@ -419,7 +419,6 @@ exports[`Open API helpers depictOptionalOrNullable() should depict ZodOptional 1
 
 exports[`Open API helpers depictPipeline should depict inner schema depending on IO direction 0 1`] = `
 {
-  "nullable": true,
   "type": "boolean",
 }
 `;
