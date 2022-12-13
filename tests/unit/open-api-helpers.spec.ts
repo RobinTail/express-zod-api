@@ -320,15 +320,18 @@ describe("Open API helpers", () => {
   });
 
   describe("depictFile()", () => {
-    test("should depict ZodFile", () => {
-      expect(
-        depictFile({
-          schema: z.file().binary(),
-          isResponse: true,
-          initial: { description: "test" },
-        })
-      ).toMatchSnapshot();
-    });
+    test.each([z.file(), z.file().binary(), z.file().base64()])(
+      "should depict ZodFile %#",
+      (schema) => {
+        expect(
+          depictFile({
+            schema,
+            isResponse: true,
+            initial: { description: "test" },
+          })
+        ).toMatchSnapshot();
+      }
+    );
     test("should throw when using in input", () => {
       try {
         depictFile({

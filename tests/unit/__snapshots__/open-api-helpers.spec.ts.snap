@@ -194,10 +194,26 @@ exports[`Open API helpers depictEnum() should depict ZodNativeEnum 1`] = `
 }
 `;
 
-exports[`Open API helpers depictFile() should depict ZodFile 1`] = `
+exports[`Open API helpers depictFile() should depict ZodFile 0 1`] = `
+{
+  "description": "test",
+  "format": "file",
+  "type": "string",
+}
+`;
+
+exports[`Open API helpers depictFile() should depict ZodFile 1 1`] = `
 {
   "description": "test",
   "format": "binary",
+  "type": "string",
+}
+`;
+
+exports[`Open API helpers depictFile() should depict ZodFile 2 1`] = `
+{
+  "description": "test",
+  "format": "byte",
   "type": "string",
 }
 `;
