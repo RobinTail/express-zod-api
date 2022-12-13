@@ -587,10 +587,17 @@ describe("Open API helpers", () => {
       ).toMatchSnapshot();
     });
 
-    test("should depict ZodString with refinements", () => {
+    test.each([
+      z.string().email().min(10).max(20),
+      z.string().url().length(15),
+      z.string().uuid(),
+      z.string().cuid(),
+      z.string().datetime(),
+      z.string().datetime({ offset: true }),
+    ])("should depict ZodString with refinements %#", (schema) => {
       expect(
         depictString({
-          schema: z.string().email().min(10).max(20),
+          schema,
           isResponse: false,
           initial: { description: "test" },
         })

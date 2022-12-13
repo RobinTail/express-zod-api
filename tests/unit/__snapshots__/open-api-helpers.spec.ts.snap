@@ -699,12 +699,54 @@ exports[`Open API helpers depictSecurityRefs() should populate the scopes 1`] = 
 ]
 `;
 
-exports[`Open API helpers depictString() should depict ZodString with refinements 1`] = `
+exports[`Open API helpers depictString() should depict ZodString with refinements 0 1`] = `
 {
   "description": "test",
   "format": "email",
   "maxLength": 20,
   "minLength": 10,
+  "type": "string",
+}
+`;
+
+exports[`Open API helpers depictString() should depict ZodString with refinements 1 1`] = `
+{
+  "description": "test",
+  "format": "url",
+  "type": "string",
+}
+`;
+
+exports[`Open API helpers depictString() should depict ZodString with refinements 2 1`] = `
+{
+  "description": "test",
+  "format": "uuid",
+  "type": "string",
+}
+`;
+
+exports[`Open API helpers depictString() should depict ZodString with refinements 3 1`] = `
+{
+  "description": "test",
+  "format": "cuid",
+  "type": "string",
+}
+`;
+
+exports[`Open API helpers depictString() should depict ZodString with refinements 4 1`] = `
+{
+  "description": "test",
+  "format": "date-time",
+  "pattern": "/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?Z$/",
+  "type": "string",
+}
+`;
+
+exports[`Open API helpers depictString() should depict ZodString with refinements 5 1`] = `
+{
+  "description": "test",
+  "format": "date-time",
+  "pattern": "/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?(([+-]\\d{2}:\\d{2})|Z)$/",
   "type": "string",
 }
 `;
