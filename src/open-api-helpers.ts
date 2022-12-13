@@ -166,11 +166,22 @@ export const depictIntersection: DepictHelper<
   ],
 });
 
-// @todo need to set nullable/optional here too due to coerce
-export const depictOptionalOrNullable: DepictHelper<
-  z.ZodOptional<any> | z.ZodNullable<any>
-> = ({ schema, initial, isResponse }) => ({
+export const depictOptional: DepictHelper<z.ZodOptional<any>> = ({
+  schema,
+  initial,
+  isResponse,
+}) => ({
   ...initial,
+  ...depictSchema({ schema: schema.unwrap(), isResponse }),
+});
+
+export const depictNullable: DepictHelper<z.ZodNullable<any>> = ({
+  schema,
+  initial,
+  isResponse,
+}) => ({
+  ...initial,
+  nullable: true,
   ...depictSchema({ schema: schema.unwrap(), isResponse }),
 });
 
@@ -674,8 +685,8 @@ const depictHelpers: DepictingRules = {
   ZodEnum: depictEnum,
   ZodNativeEnum: depictEnum,
   ZodEffects: depictEffect,
-  ZodOptional: depictOptionalOrNullable,
-  ZodNullable: depictOptionalOrNullable,
+  ZodOptional: depictOptional,
+  ZodNullable: depictNullable,
   ZodDiscriminatedUnion: depictDiscriminatedUnion,
   ZodBranded: depictBranded,
   ZodDate: depictDate,

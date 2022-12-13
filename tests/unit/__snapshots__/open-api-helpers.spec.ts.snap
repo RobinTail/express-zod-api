@@ -343,6 +343,22 @@ exports[`Open API helpers depictNull() should depict ZodNull 1`] = `
 }
 `;
 
+exports[`Open API helpers depictNullable() should depict ZodNullable 0 1`] = `
+{
+  "description": "test",
+  "nullable": true,
+  "type": "string",
+}
+`;
+
+exports[`Open API helpers depictNullable() should depict ZodNullable 1 1`] = `
+{
+  "description": "test",
+  "nullable": true,
+  "type": "string",
+}
+`;
+
 exports[`Open API helpers depictNumber() should depict ZodNumber with refinements 1`] = `
 {
   "description": "test",
@@ -402,15 +418,14 @@ exports[`Open API helpers depictObjectProperties() should depict ZodObject shape
 }
 `;
 
-exports[`Open API helpers depictOptionalOrNullable() should depict ZodNullable 1`] = `
+exports[`Open API helpers depictOptional() should depict ZodOptional 0 1`] = `
 {
   "description": "test",
-  "nullable": true,
   "type": "string",
 }
 `;
 
-exports[`Open API helpers depictOptionalOrNullable() should depict ZodOptional 1`] = `
+exports[`Open API helpers depictOptional() should depict ZodOptional 1 1`] = `
 {
   "description": "test",
   "type": "string",

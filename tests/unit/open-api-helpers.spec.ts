@@ -26,10 +26,11 @@ import {
   depictIntersection,
   depictLiteral,
   depictNull,
+  depictNullable,
   depictNumber,
   depictObject,
   depictObjectProperties,
-  depictOptionalOrNullable,
+  depictOptional,
   depictPipeline,
   depictRecord,
   depictRequestParams,
@@ -392,26 +393,34 @@ describe("Open API helpers", () => {
     });
   });
 
-  describe("depictOptionalOrNullable()", () => {
-    test("should depict ZodOptional", () => {
-      expect(
-        depictOptionalOrNullable({
-          schema: z.string().optional(),
-          isResponse: false,
-          initial: { description: "test" },
-        })
-      ).toMatchSnapshot();
-    });
+  describe("depictOptional()", () => {
+    test.each([{ isResponse: false }, { isResponse: true }])(
+      "should depict ZodOptional %#",
+      ({ isResponse }) => {
+        expect(
+          depictOptional({
+            schema: z.string().optional(),
+            isResponse,
+            initial: { description: "test" },
+          })
+        ).toMatchSnapshot();
+      }
+    );
+  });
 
-    test("should depict ZodNullable", () => {
-      expect(
-        depictOptionalOrNullable({
-          schema: z.string().nullable(),
-          isResponse: false,
-          initial: { description: "test", nullable: true }, // @todo remove nullable from initial
-        })
-      ).toMatchSnapshot();
-    });
+  describe("depictNullable()", () => {
+    test.each([{ isResponse: false }, { isResponse: true }])(
+      "should depict ZodNullable %#",
+      ({ isResponse }) => {
+        expect(
+          depictNullable({
+            schema: z.string().nullable(),
+            isResponse,
+            initial: { description: "test" },
+          })
+        ).toMatchSnapshot();
+      }
+    );
   });
 
   describe("depictEnum()", () => {
