@@ -225,7 +225,10 @@ export const depictObject: DepictHelper<z.AnyZodObject> = ({
   }),
 });
 
-/** @see https://swagger.io/docs/specification/data-models/data-types/ */
+/**
+ * @see https://swagger.io/docs/specification/data-models/data-types/
+ * @todo use type:"null" for OpenAPI 3.1
+ * */
 export const depictNull: DepictHelper<z.ZodNull> = ({ initial }) => ({
   ...initial,
   type: "string",
