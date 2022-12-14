@@ -694,15 +694,22 @@ const depictHelpers: DepictingRules = {
   ZodPipeline: depictPipeline,
 };
 
+/**
+ * @desc isNullable() and isOptional() validate the schema's input
+ * @desc They always return true in case of coercion, which should be taken into account when depicting response
+ */
+export const hasCoercion = (schema: z.ZodType): boolean =>
+  "coerce" in schema._def && typeof schema._def.coerce === "boolean"
+    ? schema._def.coerce
+    : false;
+
 export const depictSchema: DepictHelper<z.ZodTypeAny> = ({
   schema,
   isResponse,
 }) => {
   const initial: SchemaObject = {};
   if (schema.isNullable()) {
-    // isNullable validates the schema's input, that is nullable in case of coercion
-    const hasCoercion = "coerce" in schema._def ? schema._def.coerce : false;
-    if (!(isResponse && hasCoercion)) {
+    if (!(isResponse && hasCoercion(schema))) {
       initial.nullable = true;
     }
   }

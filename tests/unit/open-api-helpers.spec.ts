@@ -46,6 +46,7 @@ import {
   excludeExampleFromDepiction,
   excludeParamsFromDepiction,
   extractObjectSchema,
+  hasCoercion,
   reformatParamsInPath,
 } from "../../src/open-api-helpers";
 import { serializeSchemaForTest } from "../helpers";
@@ -391,6 +392,20 @@ describe("Open API helpers", () => {
         })
       ).toMatchSnapshot();
     });
+  });
+
+  describe("hasCoercion", () => {
+    test.each([
+      { schema: z.string(), coercion: false },
+      { schema: z.coerce.string(), coercion: true },
+      { schema: z.boolean({ coerce: true }), coercion: true },
+      { schema: z.custom(), coercion: false },
+    ])(
+      "should check the presence and value of coerce prop %#",
+      ({ schema, coercion }) => {
+        expect(hasCoercion(schema)).toBe(coercion);
+      }
+    );
   });
 
   describe("depictOptional()", () => {
