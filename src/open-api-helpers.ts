@@ -657,7 +657,7 @@ export const depictRequestParams = ({
     .map((name) => ({
       name,
       in: isPathParam(name) ? "path" : "query",
-      required: !shape[name].isOptional(), // @todo fix this one as well
+      required: !shape[name].isOptional(),
       schema: {
         description: `${method.toUpperCase()} ${path} parameter`,
         ...depictSchema({ schema: shape[name], isResponse: false }),
