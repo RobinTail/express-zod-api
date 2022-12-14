@@ -364,13 +364,13 @@ export const depictRecord: DepictHelper<z.ZodRecord<z.ZodTypeAny>> = ({
 };
 
 export const depictArray: DepictHelper<z.ZodArray<z.ZodTypeAny>> = ({
-  schema: { _def: def },
+  schema: { _def: def, element },
   initial,
   isResponse,
 }) => ({
   ...initial,
   type: "array",
-  items: depictSchema({ schema: def.type, isResponse }),
+  items: depictSchema({ schema: element, isResponse }),
   ...(def.minLength ? { minItems: def.minLength.value } : {}),
   ...(def.maxLength ? { maxItems: def.maxLength.value } : {}),
 });
