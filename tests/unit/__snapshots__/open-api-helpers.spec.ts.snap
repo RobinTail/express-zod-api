@@ -383,11 +383,11 @@ exports[`Open API helpers depictNumber() should depict regular ZodNumber 1`] = `
 }
 `;
 
-exports[`Open API helpers depictObject() should depict ZodObject 1`] = `
+exports[`Open API helpers depictObject() should depict ZodObject 0 1`] = `
 {
   "description": "test",
   "properties": {
-    "one": {
+    "a": {
       "exclusiveMaximum": false,
       "exclusiveMinimum": false,
       "format": "double",
@@ -395,14 +395,59 @@ exports[`Open API helpers depictObject() should depict ZodObject 1`] = `
       "minimum": 5e-324,
       "type": "number",
     },
-    "two": {
+    "b": {
       "type": "string",
     },
   },
   "required": [
-    "one",
-    "two",
+    "a",
+    "b",
   ],
+  "type": "object",
+}
+`;
+
+exports[`Open API helpers depictObject() should depict ZodObject 1 1`] = `
+{
+  "description": "test",
+  "properties": {
+    "a": {
+      "exclusiveMaximum": false,
+      "exclusiveMinimum": false,
+      "format": "double",
+      "maximum": 1.7976931348623157e+308,
+      "minimum": 5e-324,
+      "type": "number",
+    },
+    "b": {
+      "type": "string",
+    },
+  },
+  "required": [
+    "a",
+    "b",
+  ],
+  "type": "object",
+}
+`;
+
+exports[`Open API helpers depictObject() should depict ZodObject 2 1`] = `
+{
+  "description": "test",
+  "properties": {
+    "a": {
+      "exclusiveMaximum": false,
+      "exclusiveMinimum": false,
+      "format": "double",
+      "maximum": 1.7976931348623157e+308,
+      "minimum": 5e-324,
+      "type": "number",
+    },
+    "b": {
+      "type": "string",
+    },
+  },
+  "required": [],
   "type": "object",
 }
 `;

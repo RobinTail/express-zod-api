@@ -217,9 +217,12 @@ export const depictObject: DepictHelper<z.AnyZodObject> = ({
   ...initial,
   type: "object",
   properties: depictObjectProperties({ schema, isResponse }),
-  required: Object.keys(schema.shape).filter(
-    (key) => !schema.shape[key].isOptional()
-  ),
+  required: Object.keys(schema.shape).filter((key) => {
+    const prop = schema.shape[key];
+    return isResponse && hasCoercion(prop)
+      ? prop instanceof z.ZodOptional
+      : !prop.isOptional();
+  }),
 });
 
 /** @see https://swagger.io/docs/specification/data-models/data-types/ */
@@ -654,7 +657,7 @@ export const depictRequestParams = ({
     .map((name) => ({
       name,
       in: isPathParam(name) ? "path" : "query",
-      required: !shape[name].isOptional(),
+      required: !shape[name].isOptional(), // @todo fix this one as well
       schema: {
         description: `${method.toUpperCase()} ${path} parameter`,
         ...depictSchema({ schema: shape[name], isResponse: false }),

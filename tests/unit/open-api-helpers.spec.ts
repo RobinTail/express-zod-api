@@ -478,14 +478,24 @@ describe("Open API helpers", () => {
   });
 
   describe("depictObject()", () => {
-    test("should depict ZodObject", () => {
+    test.each([
+      {
+        isResponse: false,
+        shape: { a: z.number(), b: z.string() },
+      },
+      {
+        isResponse: true,
+        shape: { a: z.number(), b: z.string() },
+      },
+      {
+        isResponse: true,
+        shape: { a: z.coerce.number(), b: z.string({ coerce: true }) },
+      },
+    ])("should depict ZodObject %#", ({ isResponse, shape }) => {
       expect(
         depictObject({
-          schema: z.object({
-            one: z.number(),
-            two: z.string(),
-          }),
-          isResponse: false,
+          schema: z.object(shape),
+          isResponse,
           initial: { description: "test" },
         })
       ).toMatchSnapshot();
