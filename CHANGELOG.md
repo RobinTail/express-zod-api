@@ -2,6 +2,16 @@
 
 ## Version 8
 
+### v8.6.0
+
+- `zod` version is 3.20.2.
+- OpenAPI docs generator supports the following new features:
+  - `ZodCatch`;
+  - `z.string().datetime()` including `offset` option;
+  - `z.string().length()`;
+  - `ZodPipeline`;
+  - `coerce` option available on `ZodString, ZodNumber, ZodBigInt, ZodBoolean` and `ZodDate`.
+
 ### v8.5.0
 
 - Supporting Node 19.
