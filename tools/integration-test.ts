@@ -15,7 +15,7 @@ const packageJson = `
     "@tsconfig/node${tsconfigBase}": "latest",
     "express-zod-api": "../../dist",
     "ts-node": "10.9.1",
-    "typescript": "4.8.2",
+    "typescript": "4.9.4",
     "@types/node": "*"
   }
 }

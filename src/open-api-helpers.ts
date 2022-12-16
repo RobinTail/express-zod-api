@@ -84,6 +84,17 @@ export const depictDefault: DepictHelper<z.ZodDefault<z.ZodTypeAny>> = ({
   default: defaultValue(),
 });
 
+export const depictCatch: DepictHelper<z.ZodCatch<z.ZodTypeAny>> = ({
+  schema: {
+    _def: { innerType },
+  },
+  initial,
+  isResponse,
+}) => ({
+  ...initial,
+  ...depictSchema({ schema: innerType, initial, isResponse }),
+});
+
 export const depictAny: DepictHelper<z.ZodAny> = ({ initial }) => ({
   ...initial,
   format: "any",
@@ -126,7 +137,7 @@ export const depictUnion: DepictHelper<
 });
 
 export const depictDiscriminatedUnion: DepictHelper<
-  z.ZodDiscriminatedUnion<string, z.Primitive, z.ZodObject<any>>
+  z.ZodDiscriminatedUnion<string, z.ZodObject<any>[]>
 > = ({ schema: { options, discriminator }, initial, isResponse }) => {
   return {
     ...initial,
@@ -155,10 +166,22 @@ export const depictIntersection: DepictHelper<
   ],
 });
 
-export const depictOptionalOrNullable: DepictHelper<
-  z.ZodOptional<any> | z.ZodNullable<any>
-> = ({ schema, initial, isResponse }) => ({
+export const depictOptional: DepictHelper<z.ZodOptional<any>> = ({
+  schema,
+  initial,
+  isResponse,
+}) => ({
   ...initial,
+  ...depictSchema({ schema: schema.unwrap(), isResponse }),
+});
+
+export const depictNullable: DepictHelper<z.ZodNullable<any>> = ({
+  schema,
+  initial,
+  isResponse,
+}) => ({
+  ...initial,
+  nullable: true,
   ...depictSchema({ schema: schema.unwrap(), isResponse }),
 });
 
@@ -194,12 +217,18 @@ export const depictObject: DepictHelper<z.AnyZodObject> = ({
   ...initial,
   type: "object",
   properties: depictObjectProperties({ schema, isResponse }),
-  required: Object.keys(schema.shape).filter(
-    (key) => !schema.shape[key].isOptional()
-  ),
+  required: Object.keys(schema.shape).filter((key) => {
+    const prop = schema.shape[key];
+    return isResponse && hasCoercion(prop)
+      ? prop instanceof z.ZodOptional
+      : !prop.isOptional();
+  }),
 });
 
-/** @see https://swagger.io/docs/specification/data-models/data-types/ */
+/**
+ * @see https://swagger.io/docs/specification/data-models/data-types/
+ * @todo use type:"null" for OpenAPI 3.1
+ * */
 export const depictNull: DepictHelper<z.ZodNull> = ({ initial }) => ({
   ...initial,
   type: "string",
@@ -245,7 +274,7 @@ export const depictDateOut: DepictHelper<ZodDateOut> = ({
 };
 
 /** @throws OpenAPIError */
-export const depictZodDate: DepictHelper<z.ZodDate> = ({ isResponse }) => {
+export const depictDate: DepictHelper<z.ZodDate> = ({ isResponse }) => {
   throw new OpenAPIError(
     `Using z.date() within ${
       isResponse ? "output" : "input"
@@ -341,13 +370,13 @@ export const depictRecord: DepictHelper<z.ZodRecord<z.ZodTypeAny>> = ({
 };
 
 export const depictArray: DepictHelper<z.ZodArray<z.ZodTypeAny>> = ({
-  schema: { _def: def },
+  schema: { _def: def, element },
   initial,
   isResponse,
 }) => ({
   ...initial,
   type: "array",
-  items: depictSchema({ schema: def.type, isResponse }),
+  items: depictSchema({ schema: element, isResponse }),
   ...(def.minLength ? { minItems: def.minLength.value } : {}),
   ...(def.maxLength ? { maxItems: def.maxLength.value } : {}),
 });
@@ -380,35 +409,45 @@ export const depictTuple: DepictHelper<z.ZodTuple> = ({
 
 export const depictString: DepictHelper<z.ZodString> = ({
   schema: {
+    isEmail,
+    isURL,
+    minLength,
+    maxLength,
+    isUUID,
+    isCUID,
+    isDatetime,
     _def: { checks },
   },
   initial,
 }) => {
-  const isEmail = checks.find(({ kind }) => kind === "email") !== undefined;
-  const isUrl = checks.find(({ kind }) => kind === "url") !== undefined;
-  const isUUID = checks.find(({ kind }) => kind === "uuid") !== undefined;
-  const isCUID = checks.find(({ kind }) => kind === "cuid") !== undefined;
-  const minLengthCheck = checks.find(({ kind }) => kind === "min") as
-    | Extract<ArrayElement<z.ZodStringDef["checks"]>, { kind: "min" }>
-    | undefined;
-  const maxLengthCheck = checks.find(({ kind }) => kind === "max") as
-    | Extract<ArrayElement<z.ZodStringDef["checks"]>, { kind: "max" }>
-    | undefined;
-  const regexCheck = checks.find(({ kind }) => kind === "regex") as
-    | Extract<ArrayElement<z.ZodStringDef["checks"]>, { kind: "regex" }>
-    | undefined;
+  const regexCheck = checks.find(
+    (check): check is z.ZodStringCheck & { kind: "regex" } =>
+      check.kind === "regex"
+  );
+  const datetimeCheck = checks.find(
+    (check): check is z.ZodStringCheck & { kind: "datetime" } =>
+      check.kind === "datetime"
+  );
+  const regex = regexCheck
+    ? regexCheck.regex
+    : datetimeCheck
+    ? datetimeCheck.offset
+      ? new RegExp(
+          `^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?(([+-]\\d{2}:\\d{2})|Z)$`
+        )
+      : new RegExp(`^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?Z$`)
+    : undefined;
   return {
     ...initial,
     type: "string" as const,
+    ...(isDatetime ? { format: "date-time" } : {}),
     ...(isEmail ? { format: "email" } : {}),
-    ...(isUrl ? { format: "url" } : {}),
+    ...(isURL ? { format: "url" } : {}),
     ...(isUUID ? { format: "uuid" } : {}),
     ...(isCUID ? { format: "cuid" } : {}),
-    ...(minLengthCheck ? { minLength: minLengthCheck.value } : {}),
-    ...(maxLengthCheck ? { maxLength: maxLengthCheck.value } : {}),
-    ...(regexCheck
-      ? { pattern: `/${regexCheck.regex.source}/${regexCheck.regex.flags}` }
-      : {}),
+    ...(minLength ? { minLength } : {}),
+    ...(maxLength ? { maxLength } : {}),
+    ...(regex ? { pattern: `/${regex.source}/${regex.flags}` } : {}),
   };
 };
 
@@ -509,10 +548,22 @@ export const depictEffect: DepictHelper<z.ZodEffects<z.ZodTypeAny>> = ({
   return { ...initial, ...input };
 };
 
-export const depictZodBranded: DepictHelper<
-  z.ZodBranded<z.ZodTypeAny, any>
-> = ({ schema, initial, isResponse }) =>
-  depictSchema({ schema: schema.unwrap(), isResponse, initial });
+export const depictPipeline: DepictHelper<z.ZodPipeline<any, any>> = ({
+  schema,
+  initial,
+  isResponse,
+}) =>
+  depictSchema({
+    schema: schema._def[isResponse ? "out" : "in"],
+    isResponse,
+    initial,
+  });
+
+export const depictBranded: DepictHelper<z.ZodBranded<z.ZodTypeAny, any>> = ({
+  schema,
+  initial,
+  isResponse,
+}) => depictSchema({ schema: schema.unwrap(), isResponse, initial });
 
 export const depictIOExamples = <T extends IOSchema>(
   schema: T,
@@ -640,12 +691,23 @@ const depictHelpers: DepictingRules = {
   ZodEnum: depictEnum,
   ZodNativeEnum: depictEnum,
   ZodEffects: depictEffect,
-  ZodOptional: depictOptionalOrNullable,
-  ZodNullable: depictOptionalOrNullable,
+  ZodOptional: depictOptional,
+  ZodNullable: depictNullable,
   ZodDiscriminatedUnion: depictDiscriminatedUnion,
-  ZodBranded: depictZodBranded,
-  ZodDate: depictZodDate,
+  ZodBranded: depictBranded,
+  ZodDate: depictDate,
+  ZodCatch: depictCatch,
+  ZodPipeline: depictPipeline,
 };
+
+/**
+ * @desc isNullable() and isOptional() validate the schema's input
+ * @desc They always return true in case of coercion, which should be taken into account when depicting response
+ */
+export const hasCoercion = (schema: z.ZodType): boolean =>
+  "coerce" in schema._def && typeof schema._def.coerce === "boolean"
+    ? schema._def.coerce
+    : false;
 
 export const depictSchema: DepictHelper<z.ZodTypeAny> = ({
   schema,
@@ -653,7 +715,9 @@ export const depictSchema: DepictHelper<z.ZodTypeAny> = ({
 }) => {
   const initial: SchemaObject = {};
   if (schema.isNullable()) {
-    initial.nullable = true;
+    if (!(isResponse && hasCoercion(schema))) {
+      initial.nullable = true;
+    }
   }
   if (schema.description) {
     initial.description = `${schema.description}`;

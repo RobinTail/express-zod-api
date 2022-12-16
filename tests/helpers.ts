@@ -67,8 +67,18 @@ export const serializeSchemaForTest = (
         }
       : schema instanceof z.ZodDefault
       ? {
-          value: schema._def.innerType,
+          value: serializeSchemaForTest(schema._def.innerType),
           default: schema._def.defaultValue(),
+        }
+      : schema instanceof z.ZodCatch
+      ? {
+          value: serializeSchemaForTest(schema._def.innerType),
+          fallback: schema._def.defaultValue(),
+        }
+      : schema instanceof z.ZodPipeline
+      ? {
+          from: serializeSchemaForTest(schema._def.in),
+          to: serializeSchemaForTest(schema._def.out),
         }
       : {}),
   };

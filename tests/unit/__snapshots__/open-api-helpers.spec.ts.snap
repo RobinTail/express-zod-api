@@ -32,6 +32,24 @@ exports[`Open API helpers depictBoolean() should depict ZodBoolean 1`] = `
 }
 `;
 
+exports[`Open API helpers depictBranded should depict the actual schema 1`] = `
+{
+  "minLength": 2,
+  "type": "string",
+}
+`;
+
+exports[`Open API helpers depictCatch() should depict ZodCatch 1`] = `
+{
+  "description": "test",
+  "type": "boolean",
+}
+`;
+
+exports[`Open API helpers depictDate should throw clear error 1`] = `[OpenAPIError: Using z.date() within output schema is forbidden. Please use z.dateOut() instead. Check out the documentation for details.]`;
+
+exports[`Open API helpers depictDate should throw clear error 2`] = `[OpenAPIError: Using z.date() within input schema is forbidden. Please use z.dateIn() instead. Check out the documentation for details.]`;
+
 exports[`Open API helpers depictDateIn should depict ZodDateIn 1`] = `
 {
   "description": "test",
@@ -176,10 +194,26 @@ exports[`Open API helpers depictEnum() should depict ZodNativeEnum 1`] = `
 }
 `;
 
-exports[`Open API helpers depictFile() should depict ZodFile 1`] = `
+exports[`Open API helpers depictFile() should depict ZodFile 0 1`] = `
+{
+  "description": "test",
+  "format": "file",
+  "type": "string",
+}
+`;
+
+exports[`Open API helpers depictFile() should depict ZodFile 1 1`] = `
 {
   "description": "test",
   "format": "binary",
+  "type": "string",
+}
+`;
+
+exports[`Open API helpers depictFile() should depict ZodFile 2 1`] = `
+{
+  "description": "test",
+  "format": "byte",
   "type": "string",
 }
 `;
@@ -309,6 +343,22 @@ exports[`Open API helpers depictNull() should depict ZodNull 1`] = `
 }
 `;
 
+exports[`Open API helpers depictNullable() should depict ZodNullable 0 1`] = `
+{
+  "description": "test",
+  "nullable": true,
+  "type": "string",
+}
+`;
+
+exports[`Open API helpers depictNullable() should depict ZodNullable 1 1`] = `
+{
+  "description": "test",
+  "nullable": true,
+  "type": "string",
+}
+`;
+
 exports[`Open API helpers depictNumber() should depict ZodNumber with refinements 1`] = `
 {
   "description": "test",
@@ -333,11 +383,11 @@ exports[`Open API helpers depictNumber() should depict regular ZodNumber 1`] = `
 }
 `;
 
-exports[`Open API helpers depictObject() should depict ZodObject 1`] = `
+exports[`Open API helpers depictObject() should depict ZodObject 0 1`] = `
 {
   "description": "test",
   "properties": {
-    "one": {
+    "a": {
       "exclusiveMaximum": false,
       "exclusiveMinimum": false,
       "format": "double",
@@ -345,14 +395,59 @@ exports[`Open API helpers depictObject() should depict ZodObject 1`] = `
       "minimum": 5e-324,
       "type": "number",
     },
-    "two": {
+    "b": {
       "type": "string",
     },
   },
   "required": [
-    "one",
-    "two",
+    "a",
+    "b",
   ],
+  "type": "object",
+}
+`;
+
+exports[`Open API helpers depictObject() should depict ZodObject 1 1`] = `
+{
+  "description": "test",
+  "properties": {
+    "a": {
+      "exclusiveMaximum": false,
+      "exclusiveMinimum": false,
+      "format": "double",
+      "maximum": 1.7976931348623157e+308,
+      "minimum": 5e-324,
+      "type": "number",
+    },
+    "b": {
+      "type": "string",
+    },
+  },
+  "required": [
+    "a",
+    "b",
+  ],
+  "type": "object",
+}
+`;
+
+exports[`Open API helpers depictObject() should depict ZodObject 2 1`] = `
+{
+  "description": "test",
+  "properties": {
+    "a": {
+      "exclusiveMaximum": false,
+      "exclusiveMinimum": false,
+      "format": "double",
+      "maximum": 1.7976931348623157e+308,
+      "minimum": 5e-324,
+      "type": "number",
+    },
+    "b": {
+      "type": "string",
+    },
+  },
+  "required": [],
   "type": "object",
 }
 `;
@@ -368,17 +463,28 @@ exports[`Open API helpers depictObjectProperties() should depict ZodObject shape
 }
 `;
 
-exports[`Open API helpers depictOptionalOrNullable() should depict ZodNullable 1`] = `
+exports[`Open API helpers depictOptional() should depict ZodOptional 0 1`] = `
 {
   "description": "test",
-  "nullable": true,
   "type": "string",
 }
 `;
 
-exports[`Open API helpers depictOptionalOrNullable() should depict ZodOptional 1`] = `
+exports[`Open API helpers depictOptional() should depict ZodOptional 1 1`] = `
 {
   "description": "test",
+  "type": "string",
+}
+`;
+
+exports[`Open API helpers depictPipeline should depict inner schema depending on IO direction 0 1`] = `
+{
+  "type": "boolean",
+}
+`;
+
+exports[`Open API helpers depictPipeline should depict inner schema depending on IO direction 1 1`] = `
+{
   "type": "string",
 }
 `;
@@ -681,12 +787,54 @@ exports[`Open API helpers depictSecurityRefs() should populate the scopes 1`] = 
 ]
 `;
 
-exports[`Open API helpers depictString() should depict ZodString with refinements 1`] = `
+exports[`Open API helpers depictString() should depict ZodString with refinements 0 1`] = `
 {
   "description": "test",
   "format": "email",
   "maxLength": 20,
   "minLength": 10,
+  "type": "string",
+}
+`;
+
+exports[`Open API helpers depictString() should depict ZodString with refinements 1 1`] = `
+{
+  "description": "test",
+  "format": "url",
+  "type": "string",
+}
+`;
+
+exports[`Open API helpers depictString() should depict ZodString with refinements 2 1`] = `
+{
+  "description": "test",
+  "format": "uuid",
+  "type": "string",
+}
+`;
+
+exports[`Open API helpers depictString() should depict ZodString with refinements 3 1`] = `
+{
+  "description": "test",
+  "format": "cuid",
+  "type": "string",
+}
+`;
+
+exports[`Open API helpers depictString() should depict ZodString with refinements 4 1`] = `
+{
+  "description": "test",
+  "format": "date-time",
+  "pattern": "/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?Z$/",
+  "type": "string",
+}
+`;
+
+exports[`Open API helpers depictString() should depict ZodString with refinements 5 1`] = `
+{
+  "description": "test",
+  "format": "date-time",
+  "pattern": "/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?(([+-]\\d{2}:\\d{2})|Z)$/",
   "type": "string",
 }
 `;
@@ -790,17 +938,6 @@ exports[`Open API helpers depictUpload() should depict ZodUpload 1`] = `
 `;
 
 exports[`Open API helpers depictUpload() should throw when using in response 1`] = `[OpenAPIError: Please use z.upload() only for input.]`;
-
-exports[`Open API helpers depictZodBranded should depict the actual schema 1`] = `
-{
-  "minLength": 2,
-  "type": "string",
-}
-`;
-
-exports[`Open API helpers depictZodDate should throw clear error 1`] = `[OpenAPIError: Using z.date() within output schema is forbidden. Please use z.dateOut() instead. Check out the documentation for details.]`;
-
-exports[`Open API helpers depictZodDate should throw clear error 2`] = `[OpenAPIError: Using z.date() within input schema is forbidden. Please use z.dateIn() instead. Check out the documentation for details.]`;
 
 exports[`Open API helpers excludeExampleFromDepiction() should remove example property of supplied object 1`] = `
 {

@@ -11,6 +11,9 @@ import {
   depictArray,
   depictBigInt,
   depictBoolean,
+  depictBranded,
+  depictCatch,
+  depictDate,
   depictDateIn,
   depictDateOut,
   depictDefault,
@@ -23,10 +26,12 @@ import {
   depictIntersection,
   depictLiteral,
   depictNull,
+  depictNullable,
   depictNumber,
   depictObject,
   depictObjectProperties,
-  depictOptionalOrNullable,
+  depictOptional,
+  depictPipeline,
   depictRecord,
   depictRequestParams,
   depictSchema,
@@ -37,12 +42,11 @@ import {
   depictTuple,
   depictUnion,
   depictUpload,
-  depictZodBranded,
-  depictZodDate,
   ensureShortDescription,
   excludeExampleFromDepiction,
   excludeParamsFromDepiction,
   extractObjectSchema,
+  hasCoercion,
   reformatParamsInPath,
 } from "../../src/open-api-helpers";
 import { serializeSchemaForTest } from "../helpers";
@@ -269,6 +273,18 @@ describe("Open API helpers", () => {
     });
   });
 
+  describe("depictCatch()", () => {
+    test("should depict ZodCatch", () => {
+      expect(
+        depictCatch({
+          schema: z.boolean().catch(true),
+          isResponse: false,
+          initial: { description: "test" },
+        })
+      ).toMatchSnapshot();
+    });
+  });
+
   describe("depictAny()", () => {
     test("should depict ZodAny", () => {
       expect(
@@ -307,15 +323,18 @@ describe("Open API helpers", () => {
   });
 
   describe("depictFile()", () => {
-    test("should depict ZodFile", () => {
-      expect(
-        depictFile({
-          schema: z.file().binary(),
-          isResponse: true,
-          initial: { description: "test" },
-        })
-      ).toMatchSnapshot();
-    });
+    test.each([z.file(), z.file().binary(), z.file().base64()])(
+      "should depict ZodFile %#",
+      (schema) => {
+        expect(
+          depictFile({
+            schema,
+            isResponse: true,
+            initial: { description: "test" },
+          })
+        ).toMatchSnapshot();
+      }
+    );
     test("should throw when using in input", () => {
       try {
         depictFile({
@@ -375,26 +394,48 @@ describe("Open API helpers", () => {
     });
   });
 
-  describe("depictOptionalOrNullable()", () => {
-    test("should depict ZodOptional", () => {
-      expect(
-        depictOptionalOrNullable({
-          schema: z.string().optional(),
-          isResponse: false,
-          initial: { description: "test" },
-        })
-      ).toMatchSnapshot();
-    });
+  describe("hasCoercion", () => {
+    test.each([
+      { schema: z.string(), coercion: false },
+      { schema: z.coerce.string(), coercion: true },
+      { schema: z.boolean({ coerce: true }), coercion: true },
+      { schema: z.custom(), coercion: false },
+    ])(
+      "should check the presence and value of coerce prop %#",
+      ({ schema, coercion }) => {
+        expect(hasCoercion(schema)).toBe(coercion);
+      }
+    );
+  });
 
-    test("should depict ZodNullable", () => {
-      expect(
-        depictOptionalOrNullable({
-          schema: z.string().nullable(),
-          isResponse: false,
-          initial: { description: "test", nullable: true },
-        })
-      ).toMatchSnapshot();
-    });
+  describe("depictOptional()", () => {
+    test.each([{ isResponse: false }, { isResponse: true }])(
+      "should depict ZodOptional %#",
+      ({ isResponse }) => {
+        expect(
+          depictOptional({
+            schema: z.string().optional(),
+            isResponse,
+            initial: { description: "test" },
+          })
+        ).toMatchSnapshot();
+      }
+    );
+  });
+
+  describe("depictNullable()", () => {
+    test.each([{ isResponse: false }, { isResponse: true }])(
+      "should depict ZodNullable %#",
+      ({ isResponse }) => {
+        expect(
+          depictNullable({
+            schema: z.string().nullable(),
+            isResponse,
+            initial: { description: "test" },
+          })
+        ).toMatchSnapshot();
+      }
+    );
   });
 
   describe("depictEnum()", () => {
@@ -437,14 +478,24 @@ describe("Open API helpers", () => {
   });
 
   describe("depictObject()", () => {
-    test("should depict ZodObject", () => {
+    test.each([
+      {
+        isResponse: false,
+        shape: { a: z.number(), b: z.string() },
+      },
+      {
+        isResponse: true,
+        shape: { a: z.number(), b: z.string() },
+      },
+      {
+        isResponse: true,
+        shape: { a: z.coerce.number(), b: z.string({ coerce: true }) },
+      },
+    ])("should depict ZodObject %#", ({ isResponse, shape }) => {
       expect(
         depictObject({
-          schema: z.object({
-            one: z.number(),
-            two: z.string(),
-          }),
-          isResponse: false,
+          schema: z.object(shape),
+          isResponse,
           initial: { description: "test" },
         })
       ).toMatchSnapshot();
@@ -574,10 +625,17 @@ describe("Open API helpers", () => {
       ).toMatchSnapshot();
     });
 
-    test("should depict ZodString with refinements", () => {
+    test.each([
+      z.string().email().min(10).max(20),
+      z.string().url().length(15),
+      z.string().uuid(),
+      z.string().cuid(),
+      z.string().datetime(),
+      z.string().datetime({ offset: true }),
+    ])("should depict ZodString with refinements %#", (schema) => {
       expect(
         depictString({
-          schema: z.string().email().min(10).max(20),
+          schema,
           isResponse: false,
           initial: { description: "test" },
         })
@@ -670,6 +728,20 @@ describe("Open API helpers", () => {
         })
       ).toMatchSnapshot();
     });
+  });
+
+  describe("depictPipeline", () => {
+    test.each([{ isResponse: true }, { isResponse: false }])(
+      "should depict inner schema depending on IO direction %#",
+      ({ isResponse }) => {
+        expect(
+          depictPipeline({
+            isResponse,
+            schema: z.string().pipe(z.coerce.boolean()),
+          })
+        ).toMatchSnapshot();
+      }
+    );
   });
 
   describe("depictIOExamples()", () => {
@@ -901,17 +973,17 @@ describe("Open API helpers", () => {
     });
   });
 
-  describe("depictZodDate", () => {
+  describe("depictDate", () => {
     test("should throw clear error", () => {
       try {
-        depictZodDate({ isResponse: true, schema: z.date() });
+        depictDate({ isResponse: true, schema: z.date() });
         fail("should not be here");
       } catch (e) {
         expect(e).toBeInstanceOf(OpenAPIError);
         expect(e).toMatchSnapshot();
       }
       try {
-        depictZodDate({ isResponse: false, schema: z.date() });
+        depictDate({ isResponse: false, schema: z.date() });
         fail("should not be here");
       } catch (e) {
         expect(e).toBeInstanceOf(OpenAPIError);
@@ -920,10 +992,10 @@ describe("Open API helpers", () => {
     });
   });
 
-  describe("depictZodBranded", () => {
+  describe("depictBranded", () => {
     test("should depict the actual schema", () => {
       expect(
-        depictZodBranded({
+        depictBranded({
           schema: z.string().min(2).brand<"Test">(),
           isResponse: true,
         })
