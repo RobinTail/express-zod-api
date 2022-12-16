@@ -12,25 +12,25 @@ export interface Routing {
   [SEGMENT: string]: Routing | DependsOnMethod | AbstractEndpoint | ServeStatic;
 }
 
-export interface RoutingCycleParams {
+export interface WalkRoutingParams {
   routing: Routing;
-  endpointCb: (
+  onEndpoint: (
     endpoint: AbstractEndpoint,
     path: string,
     method: Method | AuxMethod
   ) => void;
-  staticCb?: (path: string, handler: StaticHandler) => void;
+  onStatic?: (path: string, handler: StaticHandler) => void;
   parentPath?: string;
   hasCors?: boolean;
 }
 
-export const routingCycle = ({
+export const walkRouting = ({
   routing,
-  endpointCb,
-  staticCb,
+  onEndpoint,
+  onStatic,
   parentPath,
   hasCors,
-}: RoutingCycleParams) => {
+}: WalkRoutingParams) => {
   Object.entries(routing).forEach(([segment, element]) => {
     segment = segment.trim();
     if (segment.match(/\//)) {
@@ -50,16 +50,16 @@ export const routingCycle = ({
         methods.push("options");
       }
       methods.forEach((method) => {
-        endpointCb(element, path, method);
+        onEndpoint(element, path, method);
       });
     } else if (element instanceof ServeStatic) {
-      if (staticCb) {
-        element.apply(path, staticCb);
+      if (onStatic) {
+        element.apply(path, onStatic);
       }
     } else if (element instanceof DependsOnMethod) {
       Object.entries<AbstractEndpoint>(element.methods).forEach(
         ([method, endpoint]) => {
-          endpointCb(endpoint, path, method as Method);
+          onEndpoint(endpoint, path, method as Method);
         }
       );
       if (hasCors && Object.keys(element.methods).length > 0) {
@@ -68,13 +68,13 @@ export const routingCycle = ({
         ) as Method[];
         const firstEndpoint = element.methods[firstMethod]!;
         firstEndpoint._setSiblingMethods(siblingMethods);
-        endpointCb(firstEndpoint, path, "options");
+        onEndpoint(firstEndpoint, path, "options");
       }
     } else {
-      routingCycle({
+      walkRouting({
         routing: element,
-        endpointCb,
-        staticCb,
+        onEndpoint: onEndpoint,
+        onStatic: onStatic,
         hasCors: hasCors,
         parentPath: path,
       });
@@ -96,16 +96,16 @@ export const initRouting = ({
   if (config.startupLogo !== false) {
     console.log(getStartupLogo());
   }
-  routingCycle({
+  walkRouting({
     routing,
     hasCors: !!config.cors,
-    endpointCb: (endpoint, path, method) => {
+    onEndpoint: (endpoint, path, method) => {
       app[method](path, async (request, response) => {
         logger.info(`${request.method}: ${path}`);
         await endpoint.execute({ request, response, logger, config });
       });
     },
-    staticCb: (path, handler) => {
+    onStatic: (path, handler) => {
       app.use(path, handler);
     },
   });

@@ -18,7 +18,7 @@ import {
   ensureShortDescription,
   reformatParamsInPath,
 } from "./open-api-helpers";
-import { Routing, RoutingCycleParams, routingCycle } from "./routing";
+import { Routing, WalkRoutingParams, walkRouting } from "./routing";
 
 interface GeneratorParams {
   title: string;
@@ -66,7 +66,7 @@ export class OpenAPI extends OpenApiBuilder {
   }: GeneratorParams) {
     super();
     this.addInfo({ title, version }).addServer({ url: serverUrl });
-    const endpointCb: RoutingCycleParams["endpointCb"] = (
+    const endpointCb: WalkRoutingParams["onEndpoint"] = (
       endpoint,
       path,
       _method
@@ -137,7 +137,7 @@ export class OpenAPI extends OpenApiBuilder {
         [method]: operation,
       });
     };
-    routingCycle({ routing, endpointCb });
+    walkRouting({ routing, onEndpoint: endpointCb });
     this.rootDoc.tags = config.tags ? depictTags(config.tags) : [];
   }
 }
