@@ -35,21 +35,20 @@ import {
 } from "./logical-container";
 import { copyMeta } from "./metadata";
 import { Method } from "./method";
-import {
-  DepictingRules,
-  InitialDepicter,
-  SchemaDepicter,
-  walkSchema,
-} from "./schema-walker";
+import { DepictingRules, SchemaDepicter, walkSchema } from "./schema-walker";
 import { Security } from "./security";
 import { ZodUpload } from "./upload-schema";
 
 type MediaExamples = Pick<MediaTypeObject, "examples">;
 
+interface OpenAPIProps {
+  isResponse: boolean;
+}
+
 type OpenAPIDepicter<T extends z.ZodTypeAny> = SchemaDepicter<
   T,
   SchemaObject,
-  { isResponse: boolean }
+  OpenAPIProps
 >;
 
 interface ReqResDepictHelperCommonProps {
@@ -598,7 +597,7 @@ export const depictRequestParams = ({
     }));
 };
 
-const depicters: DepictingRules<SchemaObject, { isResponse: boolean }> = {
+const depicters: DepictingRules<SchemaObject, OpenAPIProps> = {
   ZodString: depictString,
   ZodNumber: depictNumber,
   ZodBigInt: depictBigInt,
@@ -638,10 +637,11 @@ export const hasCoercion = (schema: z.ZodType): boolean =>
     ? schema._def.coerce
     : false;
 
-const beforeEach: InitialDepicter<
+const beforeEach: SchemaDepicter<
   z.ZodTypeAny,
   SchemaObject,
-  { isResponse: boolean }
+  OpenAPIProps,
+  "last"
 > = ({ schema, isResponse }) => {
   const common: SchemaObject = {};
   if (schema.isNullable()) {
@@ -656,10 +656,11 @@ const beforeEach: InitialDepicter<
   return common;
 };
 
-const afterEach: InitialDepicter<
+const afterEach: SchemaDepicter<
   z.ZodTypeAny,
   SchemaObject,
-  { isResponse: boolean }
+  OpenAPIProps,
+  "last"
 > = ({ schema: { description } }) => (description ? { description } : {});
 
 const onMissing = (schema: z.ZodTypeAny) => {

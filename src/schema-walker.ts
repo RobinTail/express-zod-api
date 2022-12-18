@@ -4,24 +4,26 @@ import { ZodDateOutDef } from "./date-out-schema";
 import { ZodFileDef } from "./file-schema";
 import { ZodUploadDef } from "./upload-schema";
 
-type InitialDepicterProps<T extends z.ZodTypeAny, ExtraProps> = {
-  schema: T;
-} & ExtraProps;
-export type InitialDepicter<T extends z.ZodTypeAny, U, ExtraProps> = (
-  params: InitialDepicterProps<T, ExtraProps>
-) => U;
-
 type SchemaDepicterProps<
   T extends z.ZodTypeAny,
   U,
-  ExtraProps
-> = InitialDepicterProps<T, ExtraProps> & {
-  next: InitialDepicter<z.ZodTypeAny, U, {}>;
-};
+  ExtraProps,
+  Variant extends "last" | undefined = undefined
+> = {
+  schema: T;
+} & ExtraProps &
+  (Variant extends "last"
+    ? {}
+    : {
+        next: SchemaDepicter<z.ZodTypeAny, U, {}, "last">;
+      });
 
-export type SchemaDepicter<T extends z.ZodTypeAny, U, ExtraProps> = (
-  params: SchemaDepicterProps<T, U, ExtraProps>
-) => U;
+export type SchemaDepicter<
+  T extends z.ZodTypeAny,
+  U,
+  ExtraProps,
+  Variant extends "last" | undefined = undefined
+> = (params: SchemaDepicterProps<T, U, ExtraProps, Variant>) => U;
 
 type ProprietaryKinds =
   | ZodFileDef["typeName"]
@@ -43,9 +45,9 @@ export const walkSchema = <U, ExtraProps>({
   depicters,
   onMissing,
   ...rest
-}: InitialDepicterProps<z.ZodTypeAny, ExtraProps> & {
-  beforeEach: InitialDepicter<z.ZodTypeAny, U, ExtraProps>;
-  afterEach: InitialDepicter<z.ZodTypeAny, U, ExtraProps>;
+}: SchemaDepicterProps<z.ZodTypeAny, U, ExtraProps, "last"> & {
+  beforeEach: SchemaDepicter<z.ZodTypeAny, U, ExtraProps, "last">;
+  afterEach: SchemaDepicter<z.ZodTypeAny, U, ExtraProps, "last">;
   depicters: DepictingRules<U, ExtraProps>;
   onMissing: (schema: z.ZodTypeAny) => U | void;
 }): U => {
@@ -55,7 +57,7 @@ export const walkSchema = <U, ExtraProps>({
     "typeName" in schema._def
       ? depicters[schema._def.typeName as keyof typeof depicters]
       : undefined;
-  const next: InitialDepicter<z.ZodTypeAny, U, {}> = (params) =>
+  const next: SchemaDepicter<z.ZodTypeAny, U, {}, "last"> = (params) =>
     walkSchema({
       ...params,
       ...(rest as ExtraProps),
