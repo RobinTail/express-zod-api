@@ -591,6 +591,7 @@ export const depictRequestParams = ({
           beforeEach,
           afterEach,
           depicters,
+          onMissing,
         }),
       },
       ...depictIOParamExamples(schema, false, name),
@@ -661,6 +662,10 @@ const afterEach: InitialDepicter<
   { isResponse: boolean }
 > = ({ schema: { description } }) => (description ? { description } : {});
 
+const onMissing = (schema: z.ZodTypeAny) => {
+  throw new OpenAPIError(`Zod type ${schema.constructor.name} is unsupported`);
+};
+
 export const excludeParamsFromDepiction = (
   depicted: SchemaObject,
   pathParams: string[]
@@ -728,6 +733,7 @@ export const depictResponse = ({
       beforeEach,
       afterEach,
       depicters,
+      onMissing,
     })
   );
   const examples = depictIOExamples(schema, true);
@@ -855,6 +861,7 @@ export const depictRequest = ({
         beforeEach,
         afterEach,
         depicters,
+        onMissing,
       }),
       pathParams
     )

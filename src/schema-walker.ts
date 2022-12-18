@@ -1,7 +1,6 @@
 import { z } from "zod";
 import { ZodDateInDef } from "./date-in-schema";
 import { ZodDateOutDef } from "./date-out-schema";
-import { OpenAPIError } from "./errors";
 import { ZodFileDef } from "./file-schema";
 import { ZodUploadDef } from "./upload-schema";
 
@@ -17,7 +16,7 @@ type SchemaDepicterProps<
   U,
   ExtraProps
 > = InitialDepicterProps<T, ExtraProps> & {
-  next: InitialDepicter<z.ZodTypeAny, U, {}>; // @todo consider avoiding ExtraProps here
+  next: InitialDepicter<z.ZodTypeAny, U, {}>;
 };
 
 export type SchemaDepicter<T extends z.ZodTypeAny, U, ExtraProps> = (
@@ -42,11 +41,13 @@ export const walkSchema = <U, ExtraProps>({
   beforeEach,
   afterEach,
   depicters,
+  onMissing,
   ...rest
 }: InitialDepicterProps<z.ZodTypeAny, ExtraProps> & {
   beforeEach: InitialDepicter<z.ZodTypeAny, U, ExtraProps>;
   afterEach: InitialDepicter<z.ZodTypeAny, U, ExtraProps>;
   depicters: DepictingRules<U, ExtraProps>;
+  onMissing: (schema: z.ZodTypeAny) => U | void;
 }): U => {
   const initial = beforeEach({ schema, ...(rest as ExtraProps) });
   const final = afterEach({ schema, ...(rest as ExtraProps) });
@@ -54,12 +55,6 @@ export const walkSchema = <U, ExtraProps>({
     "typeName" in schema._def
       ? depicters[schema._def.typeName as keyof typeof depicters]
       : undefined;
-  if (!depicter) {
-    // @todo extract into "onError" or something
-    throw new OpenAPIError(
-      `Zod type ${schema.constructor.name} is unsupported`
-    );
-  }
   const next: InitialDepicter<z.ZodTypeAny, U, {}> = (params) =>
     walkSchema({
       ...params,
@@ -67,14 +62,21 @@ export const walkSchema = <U, ExtraProps>({
       beforeEach,
       afterEach,
       depicters,
+      onMissing,
     });
+  const depiction = depicter
+    ? depicter({
+        schema,
+        ...(rest as ExtraProps),
+        next,
+      })
+    : onMissing(schema);
+  if (!depicter) {
+    onMissing(schema);
+  }
   return {
     ...initial,
-    ...depicter({
-      schema,
-      ...(rest as ExtraProps),
-      next,
-    }),
+    ...depiction,
     ...final,
   };
 };

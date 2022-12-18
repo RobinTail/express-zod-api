@@ -217,6 +217,7 @@ describe("Open API helpers", () => {
           ZodObject: depictObject,
           ZodString: depictString,
         },
+        onMissing: () => ({}),
       });
       expect(excludeParamsFromDepiction(depicted, ["a"])).toMatchSnapshot();
     });
@@ -240,6 +241,7 @@ describe("Open API helpers", () => {
           ZodString: depictString,
           ZodUnion: depictUnion,
         },
+        onMissing: () => ({}),
       });
       expect(excludeParamsFromDepiction(depicted, ["a"])).toMatchSnapshot();
     });
@@ -263,6 +265,7 @@ describe("Open API helpers", () => {
           ZodString: depictString,
           ZodIntersection: depictIntersection,
         },
+        onMissing: () => ({}),
       });
       expect(excludeParamsFromDepiction(depicted, ["a"])).toMatchSnapshot();
     });
