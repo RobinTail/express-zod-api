@@ -40,13 +40,16 @@ export type DepictingRules<U, ExtraProps> = Partial<
 export const walkSchema = <U, ExtraProps>({
   schema,
   beforeEach,
+  afterEach,
   depicters,
   ...rest
 }: InitialDepicterProps<z.ZodTypeAny, ExtraProps> & {
   beforeEach: InitialDepicter<z.ZodTypeAny, U, ExtraProps>;
+  afterEach: InitialDepicter<z.ZodTypeAny, U, ExtraProps>;
   depicters: DepictingRules<U, ExtraProps>;
 }): U => {
   const initial = beforeEach({ schema, ...(rest as ExtraProps) });
+  const final = afterEach({ schema, ...(rest as ExtraProps) });
   const depicter =
     "typeName" in schema._def
       ? depicters[schema._def.typeName as keyof typeof depicters]
@@ -58,7 +61,13 @@ export const walkSchema = <U, ExtraProps>({
     );
   }
   const next: InitialDepicter<z.ZodTypeAny, U, {}> = (params) =>
-    walkSchema({ ...params, ...(rest as ExtraProps), beforeEach, depicters });
+    walkSchema({
+      ...params,
+      ...(rest as ExtraProps),
+      beforeEach,
+      afterEach,
+      depicters,
+    });
   return {
     ...initial,
     ...depicter({
@@ -66,5 +75,6 @@ export const walkSchema = <U, ExtraProps>({
       ...(rest as ExtraProps),
       next,
     }),
+    ...final,
   };
 };

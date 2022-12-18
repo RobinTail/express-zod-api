@@ -589,6 +589,7 @@ export const depictRequestParams = ({
           schema: shape[name],
           isResponse: false,
           beforeEach,
+          afterEach,
           depicters,
         }),
       },
@@ -637,7 +638,7 @@ export const hasCoercion = (schema: z.ZodType): boolean =>
     : false;
 
 const beforeEach: InitialDepicter<
-  any,
+  z.ZodTypeAny,
   SchemaObject,
   { isResponse: boolean }
 > = ({ schema, isResponse }) => {
@@ -647,15 +648,18 @@ const beforeEach: InitialDepicter<
       common.nullable = true;
     }
   }
-  if (schema.description) {
-    common.description = `${schema.description}`; // @todo consider moving to afterEach
-  }
   const examples = getExamples(schema, isResponse);
   if (examples.length > 0) {
     common.example = examples[0];
   }
   return common;
 };
+
+const afterEach: InitialDepicter<
+  z.ZodTypeAny,
+  SchemaObject,
+  { isResponse: boolean }
+> = ({ schema: { description } }) => (description ? { description } : {});
 
 export const excludeParamsFromDepiction = (
   depicted: SchemaObject,
@@ -722,6 +726,7 @@ export const depictResponse = ({
       schema,
       isResponse: true,
       beforeEach,
+      afterEach,
       depicters,
     })
   );
@@ -848,6 +853,7 @@ export const depictRequest = ({
         schema: endpoint.getInputSchema(),
         isResponse: false,
         beforeEach,
+        afterEach,
         depicters,
       }),
       pathParams

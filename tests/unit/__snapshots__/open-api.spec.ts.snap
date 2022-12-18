@@ -857,13 +857,13 @@ paths:
                     type: object
                     properties:
                       result:
-                        description: some positive integer
                         type: integer
                         format: int64
                         minimum: 0
                         exclusiveMinimum: true
                         maximum: 9007199254740991
                         exclusiveMaximum: false
+                        description: some positive integer
                     required:
                       - result
                 required:

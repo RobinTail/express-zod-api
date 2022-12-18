@@ -212,6 +212,7 @@ describe("Open API helpers", () => {
         }),
         isResponse: false,
         beforeEach: () => ({}),
+        afterEach: () => ({}),
         depicters: {
           ZodObject: depictObject,
           ZodString: depictString,
@@ -233,6 +234,7 @@ describe("Open API helpers", () => {
           ),
         isResponse: false,
         beforeEach: () => ({}),
+        afterEach: () => ({}),
         depicters: {
           ZodObject: depictObject,
           ZodString: depictString,
@@ -255,6 +257,7 @@ describe("Open API helpers", () => {
           ),
         isResponse: false,
         beforeEach: () => ({}),
+        afterEach: () => ({}),
         depicters: {
           ZodObject: depictObject,
           ZodString: depictString,
