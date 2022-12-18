@@ -24,8 +24,7 @@ export const serializeSchemaForTest = (
 ): Record<string, any> => {
   const onSomeUnion: SchemaDepicter<
     z.ZodUnion<any> | z.ZodDiscriminatedUnion<any, any>,
-    object,
-    {}
+    object
   > = ({ schema: subject, next }) => ({
     options: Array.from(subject.options.values()).map((option) =>
       next({ schema: option as z.ZodTypeAny })
@@ -33,8 +32,7 @@ export const serializeSchemaForTest = (
   });
   const onOptionalOrNullable: SchemaDepicter<
     z.ZodOptional<any> | z.ZodNullable<any>,
-    object,
-    {}
+    object
   > = ({ schema: subject, next }) => ({
     value: next({ schema: subject.unwrap() }),
   });

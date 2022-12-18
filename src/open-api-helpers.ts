@@ -35,20 +35,25 @@ import {
 } from "./logical-container";
 import { copyMeta } from "./metadata";
 import { Method } from "./method";
-import { DepictingRules, SchemaDepicter, walkSchema } from "./schema-walker";
+import {
+  DepicterVariant,
+  DepictingRules,
+  SchemaDepicter,
+  walkSchema,
+} from "./schema-walker";
 import { Security } from "./security";
 import { ZodUpload } from "./upload-schema";
 
 type MediaExamples = Pick<MediaTypeObject, "examples">;
 
-interface OpenAPIProps {
+interface OpenAPISpecifics {
   isResponse: boolean;
 }
 
 type OpenAPIDepicter<
   T extends z.ZodTypeAny,
-  Variant extends "last" | undefined = undefined
-> = SchemaDepicter<T, SchemaObject, OpenAPIProps, Variant>;
+  Variant extends DepicterVariant = "regular"
+> = SchemaDepicter<T, SchemaObject, OpenAPISpecifics, Variant>;
 
 interface ReqResDepictHelperCommonProps {
   method: Method;
@@ -592,7 +597,7 @@ export const depictRequestParams = ({
     }));
 };
 
-const depicters: DepictingRules<SchemaObject, OpenAPIProps> = {
+const depicters: DepictingRules<SchemaObject, OpenAPISpecifics> = {
   ZodString: depictString,
   ZodNumber: depictNumber,
   ZodBigInt: depictBigInt,
