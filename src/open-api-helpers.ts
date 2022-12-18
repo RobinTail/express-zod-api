@@ -71,10 +71,9 @@ export const depictDefault: OpenAPIDepicter<z.ZodDefault<z.ZodTypeAny>> = ({
   schema: {
     _def: { innerType, defaultValue },
   },
-  isResponse,
   next,
 }) => ({
-  ...next({ schema: innerType, isResponse }),
+  ...next({ schema: innerType }),
   default: defaultValue(),
 });
 
@@ -82,9 +81,8 @@ export const depictCatch: OpenAPIDepicter<z.ZodCatch<z.ZodTypeAny>> = ({
   schema: {
     _def: { innerType },
   },
-  isResponse,
   next,
-}) => next({ schema: innerType, isResponse });
+}) => next({ schema: innerType });
 
 export const depictAny: OpenAPIDepicter<z.ZodAny> = () => ({
   format: "any",
@@ -115,19 +113,17 @@ export const depictFile: OpenAPIDepicter<ZodFile> = ({
 
 export const depictUnion: OpenAPIDepicter<
   z.ZodUnion<[z.ZodTypeAny, ...z.ZodTypeAny[]]>
-> = ({ schema: { options }, isResponse, next }) => ({
-  oneOf: options.map((option) => next({ schema: option, isResponse })),
+> = ({ schema: { options }, next }) => ({
+  oneOf: options.map((option) => next({ schema: option })),
 });
 
 export const depictDiscriminatedUnion: OpenAPIDepicter<
   z.ZodDiscriminatedUnion<string, z.ZodObject<any>[]>
-> = ({ schema: { options, discriminator }, isResponse, next }) => {
+> = ({ schema: { options, discriminator }, next }) => {
   return {
-    discriminator: {
-      propertyName: discriminator,
-    },
+    discriminator: { propertyName: discriminator },
     oneOf: Array.from(options.values()).map((option) =>
-      next({ schema: option, isResponse })
+      next({ schema: option })
     ),
   };
 };
@@ -138,25 +134,22 @@ export const depictIntersection: OpenAPIDepicter<
   schema: {
     _def: { left, right },
   },
-  isResponse,
   next,
 }) => ({
-  allOf: [left, right].map((entry) => next({ schema: entry, isResponse })),
+  allOf: [left, right].map((entry) => next({ schema: entry })),
 });
 
 export const depictOptional: OpenAPIDepicter<z.ZodOptional<any>> = ({
   schema,
-  isResponse,
   next,
-}) => next({ schema: schema.unwrap(), isResponse });
+}) => next({ schema: schema.unwrap() });
 
 export const depictNullable: OpenAPIDepicter<z.ZodNullable<any>> = ({
   schema,
-  isResponse,
   next,
 }) => ({
   nullable: true,
-  ...next({ schema: schema.unwrap(), isResponse }),
+  ...next({ schema: schema.unwrap() }),
 });
 
 export const depictEnum: OpenAPIDepicter<
@@ -313,20 +306,16 @@ export const depictRecord: OpenAPIDepicter<z.ZodRecord<z.ZodTypeAny>> = ({
   }
   return {
     type: "object",
-    additionalProperties: next({
-      schema: valueSchema,
-      isResponse,
-    }),
+    additionalProperties: next({ schema: valueSchema }),
   };
 };
 
 export const depictArray: OpenAPIDepicter<z.ZodArray<z.ZodTypeAny>> = ({
   schema: { _def: def, element },
-  isResponse,
   next,
 }) => ({
   type: "array",
-  items: next({ schema: element, isResponse }),
+  items: next({ schema: element }),
   ...(def.minLength ? { minItems: def.minLength.value } : {}),
   ...(def.maxLength ? { maxItems: def.maxLength.value } : {}),
 });
@@ -334,10 +323,9 @@ export const depictArray: OpenAPIDepicter<z.ZodArray<z.ZodTypeAny>> = ({
 /** @todo improve it when OpenAPI 3.1.0 will be released */
 export const depictTuple: OpenAPIDepicter<z.ZodTuple> = ({
   schema: { items },
-  isResponse,
   next,
 }) => {
-  const types = items.map((item) => next({ schema: item, isResponse }));
+  const types = items.map((item) => next({ schema: item }));
   return {
     type: "array",
     minItems: types.length,
@@ -430,16 +418,12 @@ export const depictNumber: OpenAPIDepicter<z.ZodNumber> = ({ schema }) => {
 
 export const depictObjectProperties = ({
   schema: { shape },
-  isResponse,
   next,
 }: Parameters<OpenAPIDepicter<z.AnyZodObject>>[0]) => {
   return Object.keys(shape).reduce(
     (carry, key) => ({
       ...carry,
-      [key]: next({
-        schema: shape[key],
-        isResponse,
-      }),
+      [key]: next({ schema: shape[key] }),
     }),
     {} as Record<string, SchemaObject>
   );
@@ -450,10 +434,7 @@ export const depictEffect: OpenAPIDepicter<z.ZodEffects<z.ZodTypeAny>> = ({
   isResponse,
   next,
 }) => {
-  const input = next({
-    schema: schema._def.schema,
-    isResponse,
-  });
+  const input = next({ schema: schema._def.schema });
   const effect = schema._def.effect;
   if (isResponse && effect && effect.type === "transform") {
     let output = "undefined";
@@ -500,16 +481,11 @@ export const depictPipeline: OpenAPIDepicter<z.ZodPipeline<any, any>> = ({
   schema,
   isResponse,
   next,
-}) =>
-  next({
-    schema: schema._def[isResponse ? "out" : "in"],
-    isResponse,
-  });
+}) => next({ schema: schema._def[isResponse ? "out" : "in"] });
 
 export const depictBranded: OpenAPIDepicter<
   z.ZodBranded<z.ZodTypeAny, any>
-> = ({ schema, isResponse, next }) =>
-  next({ schema: schema.unwrap(), isResponse });
+> = ({ schema, next }) => next({ schema: schema.unwrap() });
 
 export const depictIOExamples = <T extends IOSchema>(
   schema: T,

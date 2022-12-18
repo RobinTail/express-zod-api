@@ -17,7 +17,7 @@ type SchemaDepicterProps<
   U,
   ExtraProps
 > = InitialDepicterProps<T, ExtraProps> & {
-  next: InitialDepicter<z.ZodTypeAny, U, ExtraProps>; // @todo consider avoiding ExtraProps here
+  next: InitialDepicter<z.ZodTypeAny, U, {}>; // @todo consider avoiding ExtraProps here
 };
 
 export type SchemaDepicter<T extends z.ZodTypeAny, U, ExtraProps> = (
@@ -57,8 +57,8 @@ export const walkSchema = <U, ExtraProps>({
       `Zod type ${schema.constructor.name} is unsupported`
     );
   }
-  const next: InitialDepicter<z.ZodTypeAny, U, ExtraProps> = (params) =>
-    walkSchema({ ...params, beforeEach, depicters });
+  const next: InitialDepicter<z.ZodTypeAny, U, {}> = (params) =>
+    walkSchema({ ...params, ...(rest as ExtraProps), beforeEach, depicters });
   return {
     ...initial,
     ...depicter({
