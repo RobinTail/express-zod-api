@@ -726,7 +726,6 @@ export const depictResponse = ({
   const mimeTypes = isPositive
     ? endpoint.getPositiveMimeTypes()
     : endpoint.getNegativeMimeTypes();
-  // @todo consider variation
   const depictedSchema = excludeExampleFromDepiction(
     walkSchema({
       schema,
@@ -853,7 +852,6 @@ export const depictRequest = ({
   endpoint,
 }: ReqResDepictHelperCommonProps): RequestBodyObject => {
   const pathParams = getRoutePathParams(path);
-  // @todo consider variation
   const bodyDepiction = excludeExampleFromDepiction(
     excludeParamsFromDepiction(
       walkSchema({
