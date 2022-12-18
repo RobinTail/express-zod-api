@@ -643,17 +643,12 @@ const beforeEach: SchemaDepicter<
   OpenAPIProps,
   "last"
 > = ({ schema, isResponse }) => {
-  const common: SchemaObject = {};
-  if (schema.isNullable()) {
-    if (!(isResponse && hasCoercion(schema))) {
-      common.nullable = true;
-    }
-  }
   const examples = getExamples(schema, isResponse);
-  if (examples.length > 0) {
-    common.example = examples[0];
-  }
-  return common;
+  return {
+    ...(schema.isNullable() &&
+      !(isResponse && hasCoercion(schema)) && { nullable: true }),
+    ...(examples.length > 0 && { example: examples[0] }),
+  };
 };
 
 const afterEach: SchemaDepicter<
