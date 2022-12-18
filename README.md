@@ -642,7 +642,7 @@ import express from "express";
 import { createConfig, attachRouting } from "express-zod-api";
 
 const app = express();
-const config = createConfig({ app /* ..., */ });
+const config = createConfig({ app /* cors, logger, ... */ });
 const routing = {
   /* ... */
 };
