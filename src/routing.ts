@@ -12,7 +12,7 @@ export interface Routing {
   [SEGMENT: string]: Routing | DependsOnMethod | AbstractEndpoint | ServeStatic;
 }
 
-export interface WalkRoutingParams {
+export interface RoutingWalkerParams {
   routing: Routing;
   onEndpoint: (
     endpoint: AbstractEndpoint,
@@ -30,7 +30,7 @@ export const walkRouting = ({
   onStatic,
   parentPath,
   hasCors,
-}: WalkRoutingParams) => {
+}: RoutingWalkerParams) => {
   Object.entries(routing).forEach(([segment, element]) => {
     segment = segment.trim();
     if (segment.match(/\//)) {
