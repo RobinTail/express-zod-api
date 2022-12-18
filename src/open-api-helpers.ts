@@ -315,8 +315,8 @@ export const depictArray: OpenAPIDepicter<z.ZodArray<z.ZodTypeAny>> = ({
 }) => ({
   type: "array",
   items: next({ schema: element }),
-  ...(def.minLength ? { minItems: def.minLength.value } : {}),
-  ...(def.maxLength ? { maxItems: def.maxLength.value } : {}),
+  ...(def.minLength !== null && { minItems: def.minLength.value }),
+  ...(def.maxLength !== null && { maxItems: def.maxLength.value }),
 });
 
 /** @todo improve it when OpenAPI 3.1.0 will be released */
@@ -332,13 +332,11 @@ export const depictTuple: OpenAPIDepicter<z.ZodTuple> = ({
     items: {
       oneOf: types,
       format: "tuple",
-      ...(types.length === 0
-        ? {}
-        : {
-            description: types
-              .map((item, index) => `${index}: ${item.type}`)
-              .join(", "),
-          }),
+      ...(types.length > 0 && {
+        description: types
+          .map((item, index) => `${index}: ${item.type}`)
+          .join(", "),
+      }),
     },
   };
 };
@@ -374,14 +372,14 @@ export const depictString: OpenAPIDepicter<z.ZodString> = ({
     : undefined;
   return {
     type: "string" as const,
-    ...(isDatetime ? { format: "date-time" } : {}),
-    ...(isEmail ? { format: "email" } : {}),
-    ...(isURL ? { format: "url" } : {}),
-    ...(isUUID ? { format: "uuid" } : {}),
-    ...(isCUID ? { format: "cuid" } : {}),
-    ...(minLength ? { minLength } : {}),
-    ...(maxLength ? { maxLength } : {}),
-    ...(regex ? { pattern: `/${regex.source}/${regex.flags}` } : {}),
+    ...(isDatetime && { format: "date-time" }),
+    ...(isEmail && { format: "email" }),
+    ...(isURL && { format: "url" }),
+    ...(isUUID && { format: "uuid" }),
+    ...(isCUID && { format: "cuid" }),
+    ...(minLength !== null && { minLength }),
+    ...(maxLength !== null && { maxLength }),
+    ...(regex && { pattern: `/${regex.source}/${regex.flags}` }),
   };
 };
 
@@ -459,11 +457,9 @@ export const depictEffect: OpenAPIDepicter<z.ZodEffects<z.ZodTypeAny>> = ({
     }
     return {
       ...input,
-      ...(["number", "string", "boolean"].includes(output)
-        ? {
-            type: output as "number" | "string" | "boolean",
-          }
-        : {}),
+      ...(["number", "string", "boolean"].includes(output) && {
+        type: output as "number" | "string" | "boolean",
+      }),
     };
   }
   if (!isResponse && effect && effect.type === "preprocess") {
@@ -656,7 +652,7 @@ const afterEach: SchemaDepicter<
   SchemaObject,
   OpenAPIProps,
   "last"
-> = ({ schema: { description } }) => (description ? { description } : {});
+> = ({ schema: { description } }) => ({ ...(description && { description }) });
 
 const onMissing = (schema: z.ZodTypeAny) => {
   throw new OpenAPIError(`Zod type ${schema.constructor.name} is unsupported`);
@@ -752,7 +748,7 @@ type SecurityHelper<K extends Security["type"]> = (
   security: Security & { type: K }
 ) => SecuritySchemeObject;
 
-const depictBasicSecurity: SecurityHelper<"basic"> = ({}) => ({
+const depictBasicSecurity: SecurityHelper<"basic"> = () => ({
   type: "http",
   scheme: "basic",
 });
@@ -761,7 +757,7 @@ const depictBearerSecurity: SecurityHelper<"bearer"> = ({
 }) => ({
   type: "http",
   scheme: "bearer",
-  ...(bearerFormat ? { bearerFormat } : {}),
+  ...(bearerFormat && { bearerFormat }),
 });
 // @todo add description on actual input placement
 const depictInputSecurity: SecurityHelper<"input"> = ({ name }) => ({
@@ -891,9 +887,8 @@ export const depictTags = <TAG extends string>(
     return {
       name: tag,
       description: typeof def === "string" ? def : def.description,
-      ...(typeof def === "object" && def.url
-        ? { externalDocs: { url: def.url } }
-        : {}),
+      ...(typeof def === "object" &&
+        def.url && { externalDocs: { url: def.url } }),
     };
   });
 
