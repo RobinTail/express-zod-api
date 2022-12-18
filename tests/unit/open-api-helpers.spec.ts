@@ -34,7 +34,6 @@ import {
   depictPipeline,
   depictRecord,
   depictRequestParams,
-  depictSchema,
   depictSecurity,
   depictSecurityRefs,
   depictString,
@@ -49,6 +48,7 @@ import {
   hasCoercion,
   reformatParamsInPath,
 } from "../../src/open-api-helpers";
+import { walkSchema } from "../../src/schema-walker";
 import { serializeSchemaForTest } from "../helpers";
 
 describe("Open API helpers", () => {
@@ -205,18 +205,23 @@ describe("Open API helpers", () => {
 
   describe("excludeParamsFromDepiction()", () => {
     test("should omit specified path params", () => {
-      const depicted = depictSchema({
+      const depicted = walkSchema({
         schema: z.object({
           a: z.string(),
           b: z.string(),
         }),
         isResponse: false,
+        beforeEach: () => ({}),
+        depicters: {
+          ZodObject: depictObject,
+          ZodString: depictString,
+        },
       });
       expect(excludeParamsFromDepiction(depicted, ["a"])).toMatchSnapshot();
     });
 
     test("should handle union", () => {
-      const depicted = depictSchema({
+      const depicted = walkSchema({
         schema: z
           .object({
             a: z.string(),
@@ -227,12 +232,18 @@ describe("Open API helpers", () => {
             })
           ),
         isResponse: false,
+        beforeEach: () => ({}),
+        depicters: {
+          ZodObject: depictObject,
+          ZodString: depictString,
+          ZodUnion: depictUnion,
+        },
       });
       expect(excludeParamsFromDepiction(depicted, ["a"])).toMatchSnapshot();
     });
 
     test("should handle intersection", () => {
-      const depicted = depictSchema({
+      const depicted = walkSchema({
         schema: z
           .object({
             a: z.string(),
@@ -243,6 +254,12 @@ describe("Open API helpers", () => {
             })
           ),
         isResponse: false,
+        beforeEach: () => ({}),
+        depicters: {
+          ZodObject: depictObject,
+          ZodString: depictString,
+          ZodIntersection: depictIntersection,
+        },
       });
       expect(excludeParamsFromDepiction(depicted, ["a"])).toMatchSnapshot();
     });

@@ -22,11 +22,11 @@ import {
   routePathParamsRegex,
 } from "./common-helpers";
 import { InputSources, TagsConfig } from "./config-type";
-import { ZodDateIn, ZodDateInDef, isoDateRegex } from "./date-in-schema";
-import { ZodDateOut, ZodDateOutDef } from "./date-out-schema";
+import { ZodDateIn, isoDateRegex } from "./date-in-schema";
+import { ZodDateOut } from "./date-out-schema";
 import { AbstractEndpoint } from "./endpoint";
 import { OpenAPIError } from "./errors";
-import { ZodFile, ZodFileDef } from "./file-schema";
+import { ZodFile } from "./file-schema";
 import { IOSchema } from "./io-schema";
 import {
   LogicalContainer,
@@ -35,24 +35,13 @@ import {
 } from "./logical-container";
 import { copyMeta } from "./metadata";
 import { Method } from "./method";
-import { SchemaDepicter } from "./schema-walker";
+import { DepictingRules, SchemaDepicter, walkSchema } from "./schema-walker";
 import { Security } from "./security";
-import { ZodUpload, ZodUploadDef } from "./upload-schema";
+import { ZodUpload } from "./upload-schema";
 
 type MediaExamples = Pick<MediaTypeObject, "examples">;
 
 type OpenAPIDepicter<T extends z.ZodTypeAny> = SchemaDepicter<T, SchemaObject>;
-
-type DepictingRules = Partial<
-  Record<
-    | z.ZodFirstPartyTypeKind
-    | ZodFileDef["typeName"]
-    | ZodUploadDef["typeName"]
-    | ZodDateInDef["typeName"]
-    | ZodDateOutDef["typeName"],
-    OpenAPIDepicter<any>
-  >
->;
 
 interface ReqResDepictHelperCommonProps {
   method: Method;
@@ -77,7 +66,7 @@ export const depictDefault: OpenAPIDepicter<z.ZodDefault<z.ZodTypeAny>> = ({
   isResponse,
 }) => ({
   ...initial,
-  ...depictSchema({ schema: innerType, initial, isResponse }),
+  ...walkSchema({ schema: innerType, isResponse, beforeEach, depicters }),
   default: defaultValue(),
 });
 
@@ -89,7 +78,7 @@ export const depictCatch: OpenAPIDepicter<z.ZodCatch<z.ZodTypeAny>> = ({
   isResponse,
 }) => ({
   ...initial,
-  ...depictSchema({ schema: innerType, initial, isResponse }),
+  ...walkSchema({ schema: innerType, isResponse, beforeEach, depicters }),
 });
 
 export const depictAny: OpenAPIDepicter<z.ZodAny> = ({ initial }) => ({
@@ -130,7 +119,9 @@ export const depictUnion: OpenAPIDepicter<
   z.ZodUnion<[z.ZodTypeAny, ...z.ZodTypeAny[]]>
 > = ({ schema: { options }, initial, isResponse }) => ({
   ...initial,
-  oneOf: options.map((option) => depictSchema({ schema: option, isResponse })),
+  oneOf: options.map((option) =>
+    walkSchema({ schema: option, isResponse, beforeEach, depicters })
+  ),
 });
 
 export const depictDiscriminatedUnion: OpenAPIDepicter<
@@ -142,7 +133,7 @@ export const depictDiscriminatedUnion: OpenAPIDepicter<
       propertyName: discriminator,
     },
     oneOf: Array.from(options.values()).map((option) =>
-      depictSchema({ schema: option, isResponse })
+      walkSchema({ schema: option, isResponse, beforeEach, depicters })
     ),
   };
 };
@@ -158,8 +149,8 @@ export const depictIntersection: OpenAPIDepicter<
 }) => ({
   ...initial,
   allOf: [
-    depictSchema({ schema: left, isResponse }),
-    depictSchema({ schema: right, isResponse }),
+    walkSchema({ schema: left, isResponse, beforeEach, depicters }),
+    walkSchema({ schema: right, isResponse, beforeEach, depicters }),
   ],
 });
 
@@ -169,7 +160,7 @@ export const depictOptional: OpenAPIDepicter<z.ZodOptional<any>> = ({
   isResponse,
 }) => ({
   ...initial,
-  ...depictSchema({ schema: schema.unwrap(), isResponse }),
+  ...walkSchema({ schema: schema.unwrap(), isResponse, beforeEach, depicters }),
 });
 
 export const depictNullable: OpenAPIDepicter<z.ZodNullable<any>> = ({
@@ -179,7 +170,7 @@ export const depictNullable: OpenAPIDepicter<z.ZodNullable<any>> = ({
 }) => ({
   ...initial,
   nullable: true,
-  ...depictSchema({ schema: schema.unwrap(), isResponse }),
+  ...walkSchema({ schema: schema.unwrap(), isResponse, beforeEach, depicters }),
 });
 
 export const depictEnum: OpenAPIDepicter<
@@ -362,7 +353,12 @@ export const depictRecord: OpenAPIDepicter<z.ZodRecord<z.ZodTypeAny>> = ({
   return {
     ...initial,
     type: "object",
-    additionalProperties: depictSchema({ schema: def.valueType, isResponse }),
+    additionalProperties: walkSchema({
+      schema: def.valueType,
+      isResponse,
+      beforeEach,
+      depicters,
+    }),
   };
 };
 
@@ -373,7 +369,7 @@ export const depictArray: OpenAPIDepicter<z.ZodArray<z.ZodTypeAny>> = ({
 }) => ({
   ...initial,
   type: "array",
-  items: depictSchema({ schema: element, isResponse }),
+  items: walkSchema({ schema: element, isResponse, beforeEach, depicters }),
   ...(def.minLength ? { minItems: def.minLength.value } : {}),
   ...(def.maxLength ? { maxItems: def.maxLength.value } : {}),
 });
@@ -384,7 +380,9 @@ export const depictTuple: OpenAPIDepicter<z.ZodTuple> = ({
   initial,
   isResponse,
 }) => {
-  const types = items.map((item) => depictSchema({ schema: item, isResponse }));
+  const types = items.map((item) =>
+    walkSchema({ schema: item, isResponse, beforeEach, depicters })
+  );
   return {
     ...initial,
     type: "array",
@@ -489,7 +487,12 @@ export const depictObjectProperties = ({
   return Object.keys(shape).reduce(
     (carry, key) => ({
       ...carry,
-      [key]: depictSchema({ schema: shape[key], isResponse }),
+      [key]: walkSchema({
+        schema: shape[key],
+        isResponse,
+        beforeEach,
+        depicters,
+      }),
     }),
     {} as Record<string, SchemaObject>
   );
@@ -500,7 +503,12 @@ export const depictEffect: OpenAPIDepicter<z.ZodEffects<z.ZodTypeAny>> = ({
   initial,
   isResponse,
 }) => {
-  const input = depictSchema({ schema: schema._def.schema, isResponse });
+  const input = walkSchema({
+    schema: schema._def.schema,
+    isResponse,
+    beforeEach,
+    depicters,
+  });
   const effect = schema._def.effect;
   if (isResponse && effect && effect.type === "transform") {
     let output = "undefined";
@@ -549,17 +557,22 @@ export const depictPipeline: OpenAPIDepicter<z.ZodPipeline<any, any>> = ({
   schema,
   initial,
   isResponse,
-}) =>
-  depictSchema({
+}) => ({
+  ...initial,
+  ...walkSchema({
     schema: schema._def[isResponse ? "out" : "in"],
     isResponse,
-    initial,
-  });
+    beforeEach,
+    depicters,
+  }),
+});
 
 export const depictBranded: OpenAPIDepicter<
   z.ZodBranded<z.ZodTypeAny, any>
-> = ({ schema, initial, isResponse }) =>
-  depictSchema({ schema: schema.unwrap(), isResponse, initial });
+> = ({ schema, initial, isResponse }) => ({
+  ...initial,
+  ...walkSchema({ schema: schema.unwrap(), isResponse, beforeEach, depicters }),
+});
 
 export const depictIOExamples = <T extends IOSchema>(
   schema: T,
@@ -659,13 +672,18 @@ export const depictRequestParams = ({
       required: !shape[name].isOptional(),
       schema: {
         description: `${method.toUpperCase()} ${path} parameter`,
-        ...depictSchema({ schema: shape[name], isResponse: false }),
+        ...walkSchema({
+          schema: shape[name],
+          isResponse: false,
+          beforeEach,
+          depicters,
+        }),
       },
       ...depictIOParamExamples(schema, false, name),
     }));
 };
 
-const depictHelpers: DepictingRules = {
+const depicters: DepictingRules<SchemaObject> = {
   ZodString: depictString,
   ZodNumber: depictNumber,
   ZodBigInt: depictBigInt,
@@ -705,33 +723,21 @@ export const hasCoercion = (schema: z.ZodType): boolean =>
     ? schema._def.coerce
     : false;
 
-export const depictSchema: OpenAPIDepicter<z.ZodTypeAny> = ({
-  schema,
-  isResponse,
-}) => {
-  const initial: SchemaObject = {};
+const beforeEach: OpenAPIDepicter<any> = ({ schema, isResponse }) => {
+  const common: SchemaObject = {};
   if (schema.isNullable()) {
     if (!(isResponse && hasCoercion(schema))) {
-      initial.nullable = true;
+      common.nullable = true;
     }
   }
   if (schema.description) {
-    initial.description = `${schema.description}`;
+    common.description = `${schema.description}`;
   }
   const examples = getExamples(schema, isResponse);
   if (examples.length > 0) {
-    initial.example = examples[0];
+    common.example = examples[0];
   }
-  const nextHelper =
-    "typeName" in schema._def
-      ? depictHelpers[schema._def.typeName as keyof typeof depictHelpers]
-      : null;
-  if (!nextHelper) {
-    throw new OpenAPIError(
-      `Zod type ${schema.constructor.name} is unsupported`
-    );
-  }
-  return nextHelper({ schema, initial, isResponse });
+  return common;
 };
 
 export const excludeParamsFromDepiction = (
@@ -793,10 +799,13 @@ export const depictResponse = ({
   const mimeTypes = isPositive
     ? endpoint.getPositiveMimeTypes()
     : endpoint.getNegativeMimeTypes();
+  // @todo consider variation
   const depictedSchema = excludeExampleFromDepiction(
-    depictSchema({
+    walkSchema({
       schema,
       isResponse: true,
+      beforeEach,
+      depicters,
     })
   );
   const examples = depictIOExamples(schema, true);
@@ -915,11 +924,14 @@ export const depictRequest = ({
   endpoint,
 }: ReqResDepictHelperCommonProps): RequestBodyObject => {
   const pathParams = getRoutePathParams(path);
+  // @todo consider variation
   const bodyDepiction = excludeExampleFromDepiction(
     excludeParamsFromDepiction(
-      depictSchema({
+      walkSchema({
         schema: endpoint.getInputSchema(),
         isResponse: false,
+        beforeEach,
+        depicters,
       }),
       pathParams
     )
