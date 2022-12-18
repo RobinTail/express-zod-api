@@ -45,11 +45,10 @@ interface OpenAPIProps {
   isResponse: boolean;
 }
 
-type OpenAPIDepicter<T extends z.ZodTypeAny> = SchemaDepicter<
-  T,
-  SchemaObject,
-  OpenAPIProps
->;
+type OpenAPIDepicter<
+  T extends z.ZodTypeAny,
+  Variant extends "last" | undefined = undefined
+> = SchemaDepicter<T, SchemaObject, OpenAPIProps, Variant>;
 
 interface ReqResDepictHelperCommonProps {
   method: Method;
@@ -633,12 +632,10 @@ export const hasCoercion = (schema: z.ZodType): boolean =>
     ? schema._def.coerce
     : false;
 
-const beforeEach: SchemaDepicter<
-  z.ZodTypeAny,
-  SchemaObject,
-  OpenAPIProps,
-  "last"
-> = ({ schema, isResponse }) => {
+const beforeEach: OpenAPIDepicter<z.ZodTypeAny, "last"> = ({
+  schema,
+  isResponse,
+}) => {
   const examples = getExamples(schema, isResponse);
   return {
     ...(schema.isNullable() &&
@@ -647,12 +644,9 @@ const beforeEach: SchemaDepicter<
   };
 };
 
-const afterEach: SchemaDepicter<
-  z.ZodTypeAny,
-  SchemaObject,
-  OpenAPIProps,
-  "last"
-> = ({ schema: { description } }) => ({ ...(description && { description }) });
+const afterEach: OpenAPIDepicter<z.ZodTypeAny, "last"> = ({
+  schema: { description },
+}) => ({ ...(description && { description }) });
 
 const onMissing = (schema: z.ZodTypeAny) => {
   throw new OpenAPIError(`Zod type ${schema.constructor.name} is unsupported`);
