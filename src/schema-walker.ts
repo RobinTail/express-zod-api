@@ -17,19 +17,19 @@ type VariantDependingProps<
 type SchemaDepicterProps<
   T extends z.ZodTypeAny,
   U,
-  Specifics extends object,
+  Context extends object,
   Variant extends DepicterVariant
 > = {
   schema: T;
-} & Specifics &
+} & Context &
   VariantDependingProps<Variant, U>;
 
 export type SchemaDepicter<
   T extends z.ZodTypeAny,
   U,
-  Specifics extends object = {},
+  Context extends object = {},
   Variant extends DepicterVariant = "regular"
-> = (params: SchemaDepicterProps<T, U, Specifics, Variant>) => U;
+> = (params: SchemaDepicterProps<T, U, Context, Variant>) => U;
 
 type ProprietaryKinds =
   | ZodFileDef["typeName"]
@@ -37,28 +37,28 @@ type ProprietaryKinds =
   | ZodDateInDef["typeName"]
   | ZodDateOutDef["typeName"];
 
-export type DepictingRules<U, Specifics extends object = {}> = Partial<
+export type DepictingRules<U, Context extends object = {}> = Partial<
   Record<
     z.ZodFirstPartyTypeKind | ProprietaryKinds,
-    SchemaDepicter<any, U, Specifics>
+    SchemaDepicter<any, U, Context>
   >
 >;
 
-export const walkSchema = <U, Specifics extends object = {}>({
+export const walkSchema = <U, Context extends object = {}>({
   schema,
   beforeEach,
   afterEach,
   depicters,
   onMissing,
-  ...rest
-}: SchemaDepicterProps<z.ZodTypeAny, U, Specifics, "last"> & {
-  beforeEach: SchemaDepicter<z.ZodTypeAny, U, Specifics, "last">;
-  afterEach: SchemaDepicter<z.ZodTypeAny, U, Specifics, "last">;
-  depicters: DepictingRules<U, Specifics>;
+  ...context
+}: SchemaDepicterProps<z.ZodTypeAny, U, Context, "last"> & {
+  beforeEach: SchemaDepicter<z.ZodTypeAny, U, Context, "last">;
+  afterEach: SchemaDepicter<z.ZodTypeAny, U, Context, "last">;
+  depicters: DepictingRules<U, Context>;
   onMissing: (schema: z.ZodTypeAny) => U | void;
 }): U => {
-  const initial = beforeEach({ schema, ...(rest as Specifics) });
-  const final = afterEach({ schema, ...(rest as Specifics) });
+  const initial = beforeEach({ schema, ...(context as Context) });
+  const final = afterEach({ schema, ...(context as Context) });
   const depicter =
     "typeName" in schema._def
       ? depicters[schema._def.typeName as keyof typeof depicters]
@@ -66,7 +66,7 @@ export const walkSchema = <U, Specifics extends object = {}>({
   const next: SchemaDepicter<z.ZodTypeAny, U, {}, "last"> = (params) =>
     walkSchema({
       ...params,
-      ...(rest as Specifics),
+      ...(context as Context),
       beforeEach,
       afterEach,
       depicters,
@@ -75,7 +75,7 @@ export const walkSchema = <U, Specifics extends object = {}>({
   const depiction = depicter
     ? depicter({
         schema,
-        ...(rest as Specifics),
+        ...(context as Context),
         next,
       })
     : onMissing(schema);
