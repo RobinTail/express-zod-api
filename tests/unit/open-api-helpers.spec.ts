@@ -1003,7 +1003,7 @@ describe("Open API helpers", () => {
 
   describe("depictDate", () => {
     test.each([{ isResponse: true }, { isResponse: false }])(
-      "should throw clear error #%",
+      "should throw clear error %#",
       ({ isResponse }) => {
         try {
           depictDate({
