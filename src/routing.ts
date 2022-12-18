@@ -72,10 +72,10 @@ export const walkRouting = ({
       }
     } else {
       walkRouting({
+        onEndpoint,
+        onStatic,
+        hasCors,
         routing: element,
-        onEndpoint: onEndpoint,
-        onStatic: onStatic,
-        hasCors: hasCors,
         parentPath: path,
       });
     }
