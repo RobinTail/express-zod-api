@@ -284,7 +284,7 @@ describe("Open API helpers", () => {
         depictDefault({
           schema: z.boolean().default(true),
           isResponse: false,
-          initial: { description: "test" },
+          next: () => ({ description: "next" }),
         })
       ).toMatchSnapshot();
     });
@@ -296,7 +296,7 @@ describe("Open API helpers", () => {
         depictCatch({
           schema: z.boolean().catch(true),
           isResponse: false,
-          initial: { description: "test" },
+          next: () => ({ description: "next" }),
         })
       ).toMatchSnapshot();
     });
@@ -308,7 +308,7 @@ describe("Open API helpers", () => {
         depictAny({
           schema: z.any(),
           isResponse: false,
-          initial: { description: "test" },
+          next: () => ({ description: "next" }),
         })
       ).toMatchSnapshot();
     });
@@ -320,7 +320,7 @@ describe("Open API helpers", () => {
         depictUpload({
           schema: z.upload(),
           isResponse: false,
-          initial: { description: "test" },
+          next: () => ({ description: "next" }),
         })
       ).toMatchSnapshot();
     });
@@ -329,7 +329,7 @@ describe("Open API helpers", () => {
         depictUpload({
           schema: z.upload(),
           isResponse: true,
-          initial: { description: "test" },
+          next: () => ({ description: "next" }),
         });
         fail("Should not be here");
       } catch (e) {
@@ -347,7 +347,7 @@ describe("Open API helpers", () => {
           depictFile({
             schema,
             isResponse: true,
-            initial: { description: "test" },
+            next: () => ({ description: "next" }),
           })
         ).toMatchSnapshot();
       }
@@ -357,7 +357,7 @@ describe("Open API helpers", () => {
         depictFile({
           schema: z.file().binary(),
           isResponse: false,
-          initial: { description: "test" },
+          next: () => ({ description: "next" }),
         });
         fail("Should not be here");
       } catch (e) {
@@ -373,7 +373,7 @@ describe("Open API helpers", () => {
         depictUnion({
           schema: z.string().or(z.number()),
           isResponse: false,
-          initial: { description: "test" },
+          next: () => ({ description: "next" }),
         })
       ).toMatchSnapshot();
     });
@@ -391,7 +391,7 @@ describe("Open API helpers", () => {
             }),
           ]),
           isResponse: false,
-          initial: { description: "test" },
+          next: () => ({ description: "next" }),
         })
       ).toMatchSnapshot();
     });
@@ -405,7 +405,7 @@ describe("Open API helpers", () => {
             .object({ one: z.number() })
             .and(z.object({ two: z.number() })),
           isResponse: false,
-          initial: { description: "test" },
+          next: () => ({ description: "next" }),
         })
       ).toMatchSnapshot();
     });
@@ -433,7 +433,7 @@ describe("Open API helpers", () => {
           depictOptional({
             schema: z.string().optional(),
             isResponse,
-            initial: { description: "test" },
+            next: () => ({ description: "next" }),
           })
         ).toMatchSnapshot();
       }
@@ -448,7 +448,7 @@ describe("Open API helpers", () => {
           depictNullable({
             schema: z.string().nullable(),
             isResponse,
-            initial: { description: "test" },
+            next: () => ({ description: "next" }),
           })
         ).toMatchSnapshot();
       }
@@ -461,7 +461,7 @@ describe("Open API helpers", () => {
         depictEnum({
           schema: z.enum(["one", "two"]),
           isResponse: false,
-          initial: { description: "test" },
+          next: () => ({ description: "next" }),
         })
       ).toMatchSnapshot();
     });
@@ -476,7 +476,7 @@ describe("Open API helpers", () => {
         depictEnum({
           schema: z.nativeEnum(Test),
           isResponse: false,
-          initial: { description: "test" },
+          next: () => ({ description: "next" }),
         })
       ).toMatchSnapshot();
     });
@@ -488,7 +488,7 @@ describe("Open API helpers", () => {
         depictLiteral({
           schema: z.literal("testing"),
           isResponse: false,
-          initial: { description: "test" },
+          next: () => ({ description: "next" }),
         })
       ).toMatchSnapshot();
     });
@@ -513,7 +513,7 @@ describe("Open API helpers", () => {
         depictObject({
           schema: z.object(shape),
           isResponse,
-          initial: { description: "test" },
+          next: () => ({ description: "next" }),
         })
       ).toMatchSnapshot();
     });
@@ -525,7 +525,7 @@ describe("Open API helpers", () => {
         depictNull({
           schema: z.null(),
           isResponse: false,
-          initial: { description: "test" },
+          next: () => ({ description: "next" }),
         })
       ).toMatchSnapshot();
     });
@@ -537,7 +537,7 @@ describe("Open API helpers", () => {
         depictBoolean({
           schema: z.boolean(),
           isResponse: false,
-          initial: { description: "test" },
+          next: () => ({ description: "next" }),
         })
       ).toMatchSnapshot();
     });
@@ -549,7 +549,7 @@ describe("Open API helpers", () => {
         depictBigInt({
           schema: z.bigint(),
           isResponse: false,
-          initial: { description: "test" },
+          next: () => ({ description: "next" }),
         })
       ).toMatchSnapshot();
     });
@@ -561,7 +561,7 @@ describe("Open API helpers", () => {
         depictRecord({
           schema: z.record(z.boolean()),
           isResponse: false,
-          initial: { description: "test" },
+          next: () => ({ description: "next" }),
         })
       ).toMatchSnapshot();
     });
@@ -571,7 +571,7 @@ describe("Open API helpers", () => {
         depictRecord({
           schema: z.record(z.string(), z.boolean()),
           isResponse: false,
-          initial: { description: "test" },
+          next: () => ({ description: "next" }),
         })
       ).toMatchSnapshot();
     });
@@ -581,7 +581,7 @@ describe("Open API helpers", () => {
         depictRecord({
           schema: z.record(z.enum(["one", "two"]), z.boolean()),
           isResponse: false,
-          initial: { description: "test" },
+          next: () => ({ description: "next" }),
         })
       ).toMatchSnapshot();
     });
@@ -591,7 +591,7 @@ describe("Open API helpers", () => {
         depictRecord({
           schema: z.record(z.literal("testing"), z.boolean()),
           isResponse: false,
-          initial: { description: "test" },
+          next: () => ({ description: "next" }),
         })
       ).toMatchSnapshot();
     });
@@ -601,7 +601,7 @@ describe("Open API helpers", () => {
         depictRecord({
           schema: z.record(z.literal("one").or(z.literal("two")), z.boolean()),
           isResponse: false,
-          initial: { description: "test" },
+          next: () => ({ description: "next" }),
         })
       ).toMatchSnapshot();
     });
@@ -613,7 +613,7 @@ describe("Open API helpers", () => {
         depictArray({
           schema: z.array(z.boolean()),
           isResponse: false,
-          initial: { description: "test" },
+          next: () => ({ description: "next" }),
         })
       ).toMatchSnapshot();
     });
@@ -625,7 +625,7 @@ describe("Open API helpers", () => {
         depictTuple({
           schema: z.tuple([z.boolean(), z.string(), z.literal("test")]),
           isResponse: false,
-          initial: { description: "test" },
+          next: () => ({ description: "next" }),
         })
       ).toMatchSnapshot();
     });
@@ -637,7 +637,7 @@ describe("Open API helpers", () => {
         depictString({
           schema: z.string(),
           isResponse: false,
-          initial: { description: "test" },
+          next: () => ({ description: "next" }),
         })
       ).toMatchSnapshot();
     });
@@ -654,7 +654,7 @@ describe("Open API helpers", () => {
         depictString({
           schema,
           isResponse: false,
-          initial: { description: "test" },
+          next: () => ({ description: "next" }),
         })
       ).toMatchSnapshot();
     });
@@ -664,7 +664,7 @@ describe("Open API helpers", () => {
         depictString({
           schema: z.string().regex(/^\d+.\d+.\d+$/),
           isResponse: false,
-          initial: { description: "test" },
+          next: () => ({ description: "next" }),
         })
       ).toMatchSnapshot();
     });
@@ -676,7 +676,7 @@ describe("Open API helpers", () => {
         depictNumber({
           schema: z.number(),
           isResponse: false,
-          initial: { description: "test" },
+          next: () => ({ description: "next" }),
         })
       ).toMatchSnapshot();
     });
@@ -686,7 +686,7 @@ describe("Open API helpers", () => {
         depictNumber({
           schema: z.number().int().min(10).max(20),
           isResponse: false,
-          initial: { description: "test" },
+          next: () => ({ description: "next" }),
         })
       ).toMatchSnapshot();
     });
@@ -701,7 +701,7 @@ describe("Open API helpers", () => {
             two: z.boolean(),
           }),
           isResponse: false,
-          initial: { description: "test" },
+          next: () => ({ description: "next" }),
         })
       ).toMatchSnapshot();
     });
@@ -713,6 +713,7 @@ describe("Open API helpers", () => {
         depictEffect({
           schema: z.string().transform((v) => parseInt(v, 10)),
           isResponse: true,
+          next: () => ({ description: "next" }),
         })
       ).toMatchSnapshot();
     });
@@ -722,6 +723,7 @@ describe("Open API helpers", () => {
         depictEffect({
           schema: z.string().transform((v) => parseInt(v, 10)),
           isResponse: false,
+          next: () => ({ description: "next" }),
         })
       ).toMatchSnapshot();
     });
@@ -731,6 +733,7 @@ describe("Open API helpers", () => {
         depictEffect({
           schema: z.preprocess((v) => parseInt(`${v}`, 10), z.string()),
           isResponse: false,
+          next: () => ({ description: "next" }),
         })
       ).toMatchSnapshot();
     });
@@ -742,6 +745,7 @@ describe("Open API helpers", () => {
             .object({ s: z.string() })
             .refine(() => false, { message: "test" }),
           isResponse: false,
+          next: () => ({ description: "next" }),
         })
       ).toMatchSnapshot();
     });
@@ -755,6 +759,7 @@ describe("Open API helpers", () => {
           depictPipeline({
             isResponse,
             schema: z.string().pipe(z.coerce.boolean()),
+            next: () => ({ description: "next" }),
           })
         ).toMatchSnapshot();
       }
@@ -946,7 +951,7 @@ describe("Open API helpers", () => {
         depictDateIn({
           schema: z.dateIn(),
           isResponse: false,
-          initial: { description: "test" },
+          next: () => ({ description: "next" }),
         })
       ).toMatchSnapshot();
     });
@@ -955,7 +960,7 @@ describe("Open API helpers", () => {
         depictDateIn({
           schema: z.dateIn(),
           isResponse: true,
-          initial: { description: "test" },
+          next: () => ({ description: "next" }),
         });
         fail("should not be here");
       } catch (e) {
@@ -971,7 +976,7 @@ describe("Open API helpers", () => {
         depictDateOut({
           schema: z.dateOut(),
           isResponse: true,
-          initial: { description: "test" },
+          next: () => ({ description: "next" }),
         })
       ).toMatchSnapshot();
     });
@@ -980,7 +985,7 @@ describe("Open API helpers", () => {
         depictDateOut({
           schema: z.dateOut(),
           isResponse: false,
-          initial: { description: "test" },
+          next: () => ({ description: "next" }),
         });
         fail("should not be here");
       } catch (e) {
@@ -991,22 +996,22 @@ describe("Open API helpers", () => {
   });
 
   describe("depictDate", () => {
-    test("should throw clear error", () => {
-      try {
-        depictDate({ isResponse: true, schema: z.date() });
-        fail("should not be here");
-      } catch (e) {
-        expect(e).toBeInstanceOf(OpenAPIError);
-        expect(e).toMatchSnapshot();
+    test.each([{ isResponse: true }, { isResponse: false }])(
+      "should throw clear error #%",
+      ({ isResponse }) => {
+        try {
+          depictDate({
+            isResponse,
+            schema: z.date(),
+            next: () => ({ description: "next" }),
+          });
+          fail("should not be here");
+        } catch (e) {
+          expect(e).toBeInstanceOf(OpenAPIError);
+          expect(e).toMatchSnapshot();
+        }
       }
-      try {
-        depictDate({ isResponse: false, schema: z.date() });
-        fail("should not be here");
-      } catch (e) {
-        expect(e).toBeInstanceOf(OpenAPIError);
-        expect(e).toMatchSnapshot();
-      }
-    });
+    );
   });
 
   describe("depictBranded", () => {
@@ -1015,6 +1020,7 @@ describe("Open API helpers", () => {
         depictBranded({
           schema: z.string().min(2).brand<"Test">(),
           isResponse: true,
+          next: () => ({ description: "next" }),
         })
       ).toMatchSnapshot();
     });

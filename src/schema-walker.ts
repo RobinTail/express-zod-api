@@ -1,13 +1,24 @@
 import { z } from "zod";
 import { ZodDateInDef } from "./date-in-schema";
 import { ZodDateOutDef } from "./date-out-schema";
+import { OpenAPIError } from "./errors";
 import { ZodFileDef } from "./file-schema";
 import { ZodUploadDef } from "./upload-schema";
 
-type SchemaDepicterProps<T extends z.ZodTypeAny, U, ExtraProps> = {
+type InitialDepicterProps<T extends z.ZodTypeAny, ExtraProps> = {
   schema: T;
-  initial?: U;
 } & ExtraProps;
+export type InitialDepicter<T extends z.ZodTypeAny, U, ExtraProps> = (
+  params: InitialDepicterProps<T, ExtraProps>
+) => U;
+
+type SchemaDepicterProps<
+  T extends z.ZodTypeAny,
+  U,
+  ExtraProps
+> = InitialDepicterProps<T, ExtraProps> & {
+  next: InitialDepicter<z.ZodTypeAny, U, ExtraProps>; // @todo consider avoiding ExtraProps here
+};
 
 export type SchemaDepicter<T extends z.ZodTypeAny, U, ExtraProps> = (
   params: SchemaDepicterProps<T, U, ExtraProps>
@@ -26,13 +37,13 @@ export type DepictingRules<U, ExtraProps> = Partial<
   >
 >;
 
-export const walkSchema = <T extends z.ZodTypeAny, U, ExtraProps>({
+export const walkSchema = <U, ExtraProps>({
   schema,
   beforeEach,
   depicters,
   ...rest
-}: Omit<SchemaDepicterProps<T, U, ExtraProps>, "initial"> & {
-  beforeEach: SchemaDepicter<T, U, ExtraProps>;
+}: InitialDepicterProps<z.ZodTypeAny, ExtraProps> & {
+  beforeEach: InitialDepicter<z.ZodTypeAny, U, ExtraProps>;
   depicters: DepictingRules<U, ExtraProps>;
 }): U => {
   const initial = beforeEach({ schema, ...(rest as ExtraProps) });
@@ -41,8 +52,19 @@ export const walkSchema = <T extends z.ZodTypeAny, U, ExtraProps>({
       ? depicters[schema._def.typeName as keyof typeof depicters]
       : undefined;
   if (!depicter) {
-    // @todo use another error
-    throw new Error(`Zod type ${schema.constructor.name} is unsupported`);
+    // @todo extract into "onError" or something
+    throw new OpenAPIError(
+      `Zod type ${schema.constructor.name} is unsupported`
+    );
   }
-  return depicter({ schema, initial, ...(rest as ExtraProps) });
+  const next: InitialDepicter<z.ZodTypeAny, U, ExtraProps> = (params) =>
+    walkSchema({ ...params, beforeEach, depicters });
+  return {
+    ...initial,
+    ...depicter({
+      schema,
+      ...(rest as ExtraProps),
+      next,
+    }),
+  };
 };
