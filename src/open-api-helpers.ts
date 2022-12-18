@@ -179,15 +179,10 @@ export const depictNullable: OpenAPIDepicter<z.ZodNullable<any>> = ({
 
 export const depictEnum: OpenAPIDepicter<
   z.ZodEnum<any> | z.ZodNativeEnum<any>
-> = ({
-  schema: {
-    _def: { values },
-  },
-  initial,
-}) => ({
+> = ({ schema, initial }) => ({
   ...initial,
-  type: typeof Object.values(values)[0] as "string" | "number",
-  enum: Object.values(values),
+  type: typeof Object.values(schema.enum)[0] as "string" | "number",
+  enum: Object.values(schema.enum),
 });
 
 export const depictLiteral: OpenAPIDepicter<z.ZodLiteral<any>> = ({
