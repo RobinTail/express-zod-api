@@ -191,9 +191,7 @@ export const depictEnum: OpenAPIDepicter<
 });
 
 export const depictLiteral: OpenAPIDepicter<z.ZodLiteral<any>> = ({
-  schema: {
-    _def: { value },
-  },
+  schema: { value },
   initial,
 }) => ({
   ...initial,
@@ -288,19 +286,16 @@ export const depictBigInt: OpenAPIDepicter<z.ZodBigInt> = ({ initial }) => ({
 });
 
 export const depictRecord: OpenAPIDepicter<z.ZodRecord<z.ZodTypeAny>> = ({
-  schema: { _def: def },
+  schema: { keySchema, valueSchema },
   initial,
   isResponse,
 }) => {
-  if (
-    def.keyType instanceof z.ZodEnum ||
-    def.keyType instanceof z.ZodNativeEnum
-  ) {
-    const keys = Object.values(def.keyType._def.values) as string[];
+  if (keySchema instanceof z.ZodEnum || keySchema instanceof z.ZodNativeEnum) {
+    const keys = Object.values(keySchema.enum) as string[];
     const shape = keys.reduce(
       (carry, key) => ({
         ...carry,
-        [key]: def.valueType,
+        [key]: valueSchema,
       }),
       {} as z.ZodRawShape
     );
@@ -314,30 +309,30 @@ export const depictRecord: OpenAPIDepicter<z.ZodRecord<z.ZodTypeAny>> = ({
       required: keys,
     };
   }
-  if (def.keyType instanceof z.ZodLiteral) {
+  if (keySchema instanceof z.ZodLiteral) {
     return {
       ...initial,
       type: "object",
       properties: depictObjectProperties({
         schema: z.object({
-          [def.keyType._def.value]: def.valueType,
+          [keySchema.value]: valueSchema,
         }),
         isResponse,
       }),
-      required: [def.keyType._def.value],
+      required: [keySchema.value],
     };
   }
-  if (def.keyType instanceof z.ZodUnion) {
-    const areOptionsLiteral = def.keyType.options.reduce(
+  if (keySchema instanceof z.ZodUnion) {
+    const areOptionsLiteral = keySchema.options.reduce(
       (carry: boolean, option: z.ZodTypeAny) =>
         carry && option instanceof z.ZodLiteral,
       true
     );
     if (areOptionsLiteral) {
-      const shape = def.keyType.options.reduce(
+      const shape = keySchema.options.reduce(
         (carry: z.ZodRawShape, option: z.ZodLiteral<any>) => ({
           ...carry,
-          [option.value]: def.valueType,
+          [option.value]: valueSchema,
         }),
         {} as z.ZodRawShape
       );
@@ -348,7 +343,7 @@ export const depictRecord: OpenAPIDepicter<z.ZodRecord<z.ZodTypeAny>> = ({
           schema: z.object(shape),
           isResponse,
         }),
-        required: def.keyType.options.map(
+        required: keySchema.options.map(
           (option: z.ZodLiteral<any>) => option.value
         ),
       };
@@ -358,7 +353,7 @@ export const depictRecord: OpenAPIDepicter<z.ZodRecord<z.ZodTypeAny>> = ({
     ...initial,
     type: "object",
     additionalProperties: walkSchema({
-      schema: def.valueType,
+      schema: valueSchema,
       isResponse,
       beforeEach,
       depicters,
