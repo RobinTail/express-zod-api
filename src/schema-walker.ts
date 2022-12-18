@@ -53,12 +53,12 @@ export const walkSchema = <U, Context extends object = {}>({
   ...context
 }: SchemaDepicterProps<z.ZodTypeAny, U, Context, "last"> & {
   beforeEach: SchemaDepicter<z.ZodTypeAny, U, Context, "last">;
-  afterEach: SchemaDepicter<z.ZodTypeAny, U, Context, "last">;
+  afterEach?: SchemaDepicter<z.ZodTypeAny, U, Context, "last">;
   depicters: DepictingRules<U, Context>;
   onMissing: (schema: z.ZodTypeAny) => U | void;
 }): U => {
   const initial = beforeEach({ schema, ...(context as Context) });
-  const final = afterEach({ schema, ...(context as Context) });
+  const final = afterEach && afterEach({ schema, ...(context as Context) });
   const depicter =
     "typeName" in schema._def
       ? depicters[schema._def.typeName as keyof typeof depicters]

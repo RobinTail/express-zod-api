@@ -40,7 +40,6 @@ export const serializeSchemaForTest = (
   return walkSchema({
     schema,
     beforeEach: ({ schema: subject }) => ({ _type: subject._def.typeName }),
-    afterEach: () => ({}),
     depicters: {
       ZodNull: onPrimitive,
       ZodNumber: onPrimitive,
