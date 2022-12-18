@@ -73,9 +73,6 @@ export const walkSchema = <U, ExtraProps>({
         next,
       })
     : onMissing(schema);
-  if (!depicter) {
-    onMissing(schema);
-  }
   return {
     ...initial,
     ...depiction,
