@@ -41,7 +41,11 @@ import { ZodUpload } from "./upload-schema";
 
 type MediaExamples = Pick<MediaTypeObject, "examples">;
 
-type OpenAPIDepicter<T extends z.ZodTypeAny> = SchemaDepicter<T, SchemaObject>;
+type OpenAPIDepicter<T extends z.ZodTypeAny> = SchemaDepicter<
+  T,
+  SchemaObject,
+  { isResponse: boolean }
+>;
 
 interface ReqResDepictHelperCommonProps {
   method: Method;
@@ -683,7 +687,7 @@ export const depictRequestParams = ({
     }));
 };
 
-const depicters: DepictingRules<SchemaObject> = {
+const depicters: DepictingRules<SchemaObject, { isResponse: boolean }> = {
   ZodString: depictString,
   ZodNumber: depictNumber,
   ZodBigInt: depictBigInt,

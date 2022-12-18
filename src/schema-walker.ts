@@ -4,14 +4,13 @@ import { ZodDateOutDef } from "./date-out-schema";
 import { ZodFileDef } from "./file-schema";
 import { ZodUploadDef } from "./upload-schema";
 
-interface SchemaDepicterProps<T extends z.ZodTypeAny, U> {
+type SchemaDepicterProps<T extends z.ZodTypeAny, U, ExtraProps> = {
   schema: T;
   initial?: U;
-  isResponse: boolean;
-}
+} & ExtraProps;
 
-export type SchemaDepicter<T extends z.ZodTypeAny, U> = (
-  params: SchemaDepicterProps<T, U>
+export type SchemaDepicter<T extends z.ZodTypeAny, U, ExtraProps> = (
+  params: SchemaDepicterProps<T, U, ExtraProps>
 ) => U;
 
 type ProprietaryKinds =
@@ -20,20 +19,23 @@ type ProprietaryKinds =
   | ZodDateInDef["typeName"]
   | ZodDateOutDef["typeName"];
 
-export type DepictingRules<U> = Partial<
-  Record<z.ZodFirstPartyTypeKind | ProprietaryKinds, SchemaDepicter<any, U>>
+export type DepictingRules<U, ExtraProps> = Partial<
+  Record<
+    z.ZodFirstPartyTypeKind | ProprietaryKinds,
+    SchemaDepicter<any, U, ExtraProps>
+  >
 >;
 
-export const walkSchema = <T extends z.ZodTypeAny, U>({
+export const walkSchema = <T extends z.ZodTypeAny, U, ExtraProps>({
   schema,
-  isResponse,
   beforeEach,
   depicters,
-}: Omit<SchemaDepicterProps<T, U>, "initial"> & {
-  beforeEach: SchemaDepicter<T, U>;
-  depicters: DepictingRules<U>;
+  ...rest
+}: Omit<SchemaDepicterProps<T, U, ExtraProps>, "initial"> & {
+  beforeEach: SchemaDepicter<T, U, ExtraProps>;
+  depicters: DepictingRules<U, ExtraProps>;
 }): U => {
-  const initial = beforeEach({ schema, isResponse });
+  const initial = beforeEach({ schema, ...(rest as ExtraProps) });
   const depicter =
     "typeName" in schema._def
       ? depicters[schema._def.typeName as keyof typeof depicters]
@@ -42,5 +44,5 @@ export const walkSchema = <T extends z.ZodTypeAny, U>({
     // @todo use another error
     throw new Error(`Zod type ${schema.constructor.name} is unsupported`);
   }
-  return depicter({ schema, initial, isResponse });
+  return depicter({ schema, initial, ...(rest as ExtraProps) });
 };
