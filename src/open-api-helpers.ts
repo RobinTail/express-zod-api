@@ -587,9 +587,8 @@ export const depictRequestParams = ({
         ...walkSchema({
           schema: shape[name],
           isResponse: false,
-          beforeEach,
-          afterEach,
           depicters,
+          onEach,
           onMissing,
         }),
       },
@@ -637,21 +636,19 @@ export const hasCoercion = (schema: z.ZodType): boolean =>
     ? schema._def.coerce
     : false;
 
-export const beforeEach: OpenAPIDepicter<z.ZodTypeAny, "last"> = ({
+export const onEach: OpenAPIDepicter<z.ZodTypeAny, "last"> = ({
   schema,
   isResponse,
 }) => {
+  const { description } = schema;
   const examples = getExamples(schema, isResponse);
   return {
+    ...(description && { description }),
     ...(schema.isNullable() &&
       !(isResponse && hasCoercion(schema)) && { nullable: true }),
     ...(examples.length > 0 && { example: examples[0] }),
   };
 };
-
-export const afterEach: OpenAPIDepicter<z.ZodTypeAny, "last"> = ({
-  schema: { description },
-}) => ({ ...(description && { description }) });
 
 export const onMissing = (schema: z.ZodTypeAny) => {
   throw new OpenAPIError(`Zod type ${schema.constructor.name} is unsupported`);
@@ -720,9 +717,8 @@ export const depictResponse = ({
     walkSchema({
       schema,
       isResponse: true,
-      beforeEach,
-      afterEach,
       depicters,
+      onEach,
       onMissing,
     })
   );
@@ -847,9 +843,8 @@ export const depictRequest = ({
       walkSchema({
         schema: endpoint.getInputSchema(),
         isResponse: false,
-        beforeEach,
-        afterEach,
         depicters,
+        onEach,
         onMissing,
       }),
       pathParams

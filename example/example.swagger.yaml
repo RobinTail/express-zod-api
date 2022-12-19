@@ -89,9 +89,6 @@ paths:
                     enum:
                       - success
                   data:
-                    example:
-                      name: John Doe
-                      createdAt: 2021-12-31T00:00:00.000Z
                     type: object
                     properties:
                       name:
@@ -105,6 +102,9 @@ paths:
                     required:
                       - name
                       - createdAt
+                    example:
+                      name: John Doe
+                      createdAt: 2021-12-31T00:00:00.000Z
                 required:
                   - status
                   - data
@@ -162,19 +162,16 @@ paths:
             schema:
               description: POST /v1/user/:id request body
               allOf:
-                - example:
-                    key: 1234-5678-90
-                  type: object
+                - type: object
                   properties:
                     key:
                       type: string
                       minLength: 1
                   required:
                     - key
-                - example:
-                    name: John Doe
-                    birthday: 1963-04-21
-                  type: object
+                  example:
+                    key: 1234-5678-90
+                - type: object
                   properties:
                     name:
                       type: string
@@ -189,6 +186,9 @@ paths:
                   required:
                     - name
                     - birthday
+                  example:
+                    name: John Doe
+                    birthday: 1963-04-21
             examples:
               example1:
                 value:
@@ -286,8 +286,8 @@ paths:
                       otherInputs:
                         type: object
                         additionalProperties:
-                          nullable: true
                           format: any
+                          nullable: true
                     required:
                       - name
                       - size

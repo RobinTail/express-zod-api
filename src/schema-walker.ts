@@ -46,19 +46,16 @@ export type DepictingRules<U, Context extends object = {}> = Partial<
 
 export const walkSchema = <U, Context extends object = {}>({
   schema,
-  beforeEach,
-  afterEach,
+  onEach,
   depicters,
   onMissing,
   ...context
 }: SchemaDepicterProps<z.ZodTypeAny, U, Context, "last"> & {
-  beforeEach: SchemaDepicter<z.ZodTypeAny, U, Context, "last">;
-  afterEach?: SchemaDepicter<z.ZodTypeAny, U, Context, "last">;
+  onEach?: SchemaDepicter<z.ZodTypeAny, U, Context, "last">;
   depicters: DepictingRules<U, Context>;
-  onMissing: (schema: z.ZodTypeAny) => U | void;
+  onMissing: (schema: z.ZodTypeAny) => U;
 }): U => {
-  const initial = beforeEach({ schema, ...(context as Context) });
-  const final = afterEach && afterEach({ schema, ...(context as Context) });
+  const final = onEach && onEach({ schema, ...(context as Context) });
   const depicter =
     "typeName" in schema._def
       ? depicters[schema._def.typeName as keyof typeof depicters]
@@ -67,8 +64,7 @@ export const walkSchema = <U, Context extends object = {}>({
     walkSchema({
       ...params,
       ...(context as Context),
-      beforeEach,
-      afterEach,
+      onEach,
       depicters,
       onMissing,
     });
@@ -80,7 +76,6 @@ export const walkSchema = <U, Context extends object = {}>({
       })
     : onMissing(schema);
   return {
-    ...initial,
     ...depiction,
     ...final,
   };

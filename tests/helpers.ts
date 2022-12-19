@@ -39,7 +39,6 @@ export const serializeSchemaForTest = (
   const onPrimitive = () => ({});
   return walkSchema({
     schema,
-    beforeEach: ({ schema: subject }) => ({ _type: subject._def.typeName }),
     depicters: {
       ZodNull: onPrimitive,
       ZodNumber: onPrimitive,
@@ -86,8 +85,10 @@ export const serializeSchemaForTest = (
         to: next({ schema: subject._def.out }),
       }),
     },
+    onEach: ({ schema: subject }) => ({ _type: subject._def.typeName }),
     onMissing: (subject) => {
       console.warn(`There is no serializer for ${subject._def.typeName}`);
+      return {};
     },
   });
 };

@@ -9,8 +9,6 @@ import {
 import { getMeta } from "../../src/metadata";
 import {
   OpenAPIContext,
-  afterEach as afterEachSchema,
-  beforeEach as beforeEachSchema,
   depictAny,
   depictArray,
   depictBigInt,
@@ -51,6 +49,7 @@ import {
   excludeParamsFromDepiction,
   extractObjectSchema,
   hasCoercion,
+  onEach,
   onMissing,
   reformatParamsInPath,
 } from "../../src/open-api-helpers";
@@ -69,8 +68,7 @@ describe("Open API helpers", () => {
         schema,
         depicters,
         ...context,
-        beforeEach: beforeEachSchema,
-        afterEach: afterEachSchema,
+        onEach,
         onMissing,
       });
 
@@ -160,8 +158,7 @@ describe("Open API helpers", () => {
       const depicted = walkSchema({
         schema,
         ...requestContext,
-        beforeEach: beforeEachSchema,
-        afterEach: afterEachSchema,
+        onEach,
         depicters,
         onMissing,
       });
