@@ -50,7 +50,7 @@ export interface OpenAPIContext {
   isResponse: boolean;
 }
 
-type OpenAPIDepicter<
+type Depicter<
   T extends z.ZodTypeAny,
   Variant extends HandlingVariant = "regular"
 > = SchemaHandler<T, SchemaObject, OpenAPIContext, Variant>;
@@ -70,7 +70,7 @@ const isoDateDocumentationUrl =
 export const reformatParamsInPath = (path: string) =>
   path.replace(routePathParamsRegex, (param) => `{${param.slice(1)}}`);
 
-export const depictDefault: OpenAPIDepicter<z.ZodDefault<z.ZodTypeAny>> = ({
+export const depictDefault: Depicter<z.ZodDefault<z.ZodTypeAny>> = ({
   schema: {
     _def: { innerType, defaultValue },
   },
@@ -80,18 +80,18 @@ export const depictDefault: OpenAPIDepicter<z.ZodDefault<z.ZodTypeAny>> = ({
   default: defaultValue(),
 });
 
-export const depictCatch: OpenAPIDepicter<z.ZodCatch<z.ZodTypeAny>> = ({
+export const depictCatch: Depicter<z.ZodCatch<z.ZodTypeAny>> = ({
   schema: {
     _def: { innerType },
   },
   next,
 }) => next({ schema: innerType });
 
-export const depictAny: OpenAPIDepicter<z.ZodAny> = () => ({
+export const depictAny: Depicter<z.ZodAny> = () => ({
   format: "any",
 });
 
-export const depictUpload: OpenAPIDepicter<ZodUpload> = ({ isResponse }) => {
+export const depictUpload: Depicter<ZodUpload> = ({ isResponse }) => {
   if (isResponse) {
     throw new OpenAPIError("Please use z.upload() only for input.");
   }
@@ -101,7 +101,7 @@ export const depictUpload: OpenAPIDepicter<ZodUpload> = ({ isResponse }) => {
   };
 };
 
-export const depictFile: OpenAPIDepicter<ZodFile> = ({
+export const depictFile: Depicter<ZodFile> = ({
   schema: { isBinary, isBase64 },
   isResponse,
 }) => {
@@ -114,13 +114,13 @@ export const depictFile: OpenAPIDepicter<ZodFile> = ({
   };
 };
 
-export const depictUnion: OpenAPIDepicter<
+export const depictUnion: Depicter<
   z.ZodUnion<[z.ZodTypeAny, ...z.ZodTypeAny[]]>
 > = ({ schema: { options }, next }) => ({
   oneOf: options.map((option) => next({ schema: option })),
 });
 
-export const depictDiscriminatedUnion: OpenAPIDepicter<
+export const depictDiscriminatedUnion: Depicter<
   z.ZodDiscriminatedUnion<string, z.ZodObject<any>[]>
 > = ({ schema: { options, discriminator }, next }) => {
   return {
@@ -131,7 +131,7 @@ export const depictDiscriminatedUnion: OpenAPIDepicter<
   };
 };
 
-export const depictIntersection: OpenAPIDepicter<
+export const depictIntersection: Depicter<
   z.ZodIntersection<z.ZodTypeAny, z.ZodTypeAny>
 > = ({
   schema: {
@@ -142,12 +142,12 @@ export const depictIntersection: OpenAPIDepicter<
   allOf: [left, right].map((entry) => next({ schema: entry })),
 });
 
-export const depictOptional: OpenAPIDepicter<z.ZodOptional<any>> = ({
+export const depictOptional: Depicter<z.ZodOptional<any>> = ({
   schema,
   next,
 }) => next({ schema: schema.unwrap() });
 
-export const depictNullable: OpenAPIDepicter<z.ZodNullable<any>> = ({
+export const depictNullable: Depicter<z.ZodNullable<any>> = ({
   schema,
   next,
 }) => ({
@@ -155,21 +155,21 @@ export const depictNullable: OpenAPIDepicter<z.ZodNullable<any>> = ({
   ...next({ schema: schema.unwrap() }),
 });
 
-export const depictEnum: OpenAPIDepicter<
-  z.ZodEnum<any> | z.ZodNativeEnum<any>
-> = ({ schema }) => ({
+export const depictEnum: Depicter<z.ZodEnum<any> | z.ZodNativeEnum<any>> = ({
+  schema,
+}) => ({
   type: typeof Object.values(schema.enum)[0] as "string" | "number",
   enum: Object.values(schema.enum),
 });
 
-export const depictLiteral: OpenAPIDepicter<z.ZodLiteral<any>> = ({
+export const depictLiteral: Depicter<z.ZodLiteral<any>> = ({
   schema: { value },
 }) => ({
   type: typeof value as "string" | "number" | "boolean",
   enum: [value],
 });
 
-export const depictObject: OpenAPIDepicter<z.AnyZodObject> = ({
+export const depictObject: Depicter<z.AnyZodObject> = ({
   schema,
   isResponse,
   next,
@@ -188,13 +188,13 @@ export const depictObject: OpenAPIDepicter<z.AnyZodObject> = ({
  * @see https://swagger.io/docs/specification/data-models/data-types/
  * @todo use type:"null" for OpenAPI 3.1
  * */
-export const depictNull: OpenAPIDepicter<z.ZodNull> = () => ({
+export const depictNull: Depicter<z.ZodNull> = () => ({
   type: "string",
   nullable: true,
   format: "null",
 });
 
-export const depictDateIn: OpenAPIDepicter<ZodDateIn> = ({ isResponse }) => {
+export const depictDateIn: Depicter<ZodDateIn> = ({ isResponse }) => {
   if (isResponse) {
     throw new OpenAPIError("Please use z.dateOut() for output.");
   }
@@ -209,7 +209,7 @@ export const depictDateIn: OpenAPIDepicter<ZodDateIn> = ({ isResponse }) => {
   };
 };
 
-export const depictDateOut: OpenAPIDepicter<ZodDateOut> = ({ isResponse }) => {
+export const depictDateOut: Depicter<ZodDateOut> = ({ isResponse }) => {
   if (!isResponse) {
     throw new OpenAPIError("Please use z.dateIn() for input.");
   }
@@ -224,7 +224,7 @@ export const depictDateOut: OpenAPIDepicter<ZodDateOut> = ({ isResponse }) => {
 };
 
 /** @throws OpenAPIError */
-export const depictDate: OpenAPIDepicter<z.ZodDate> = ({ isResponse }) => {
+export const depictDate: Depicter<z.ZodDate> = ({ isResponse }) => {
   throw new OpenAPIError(
     `Using z.date() within ${
       isResponse ? "output" : "input"
@@ -234,16 +234,16 @@ export const depictDate: OpenAPIDepicter<z.ZodDate> = ({ isResponse }) => {
   );
 };
 
-export const depictBoolean: OpenAPIDepicter<z.ZodBoolean> = () => ({
+export const depictBoolean: Depicter<z.ZodBoolean> = () => ({
   type: "boolean",
 });
 
-export const depictBigInt: OpenAPIDepicter<z.ZodBigInt> = () => ({
+export const depictBigInt: Depicter<z.ZodBigInt> = () => ({
   type: "integer",
   format: "bigint",
 });
 
-export const depictRecord: OpenAPIDepicter<z.ZodRecord<z.ZodTypeAny>> = ({
+export const depictRecord: Depicter<z.ZodRecord<z.ZodTypeAny>> = ({
   schema: { keySchema, valueSchema },
   isResponse,
   next,
@@ -313,7 +313,7 @@ export const depictRecord: OpenAPIDepicter<z.ZodRecord<z.ZodTypeAny>> = ({
   };
 };
 
-export const depictArray: OpenAPIDepicter<z.ZodArray<z.ZodTypeAny>> = ({
+export const depictArray: Depicter<z.ZodArray<z.ZodTypeAny>> = ({
   schema: { _def: def, element },
   next,
 }) => ({
@@ -324,7 +324,7 @@ export const depictArray: OpenAPIDepicter<z.ZodArray<z.ZodTypeAny>> = ({
 });
 
 /** @todo improve it when OpenAPI 3.1.0 will be released */
-export const depictTuple: OpenAPIDepicter<z.ZodTuple> = ({
+export const depictTuple: Depicter<z.ZodTuple> = ({
   schema: { items },
   next,
 }) => {
@@ -345,7 +345,7 @@ export const depictTuple: OpenAPIDepicter<z.ZodTuple> = ({
   };
 };
 
-export const depictString: OpenAPIDepicter<z.ZodString> = ({
+export const depictString: Depicter<z.ZodString> = ({
   schema: {
     isEmail,
     isURL,
@@ -388,7 +388,7 @@ export const depictString: OpenAPIDepicter<z.ZodString> = ({
 };
 
 /** @todo support exclusive min/max as numbers in case of OpenAPI v3.1.x */
-export const depictNumber: OpenAPIDepicter<z.ZodNumber> = ({ schema }) => {
+export const depictNumber: Depicter<z.ZodNumber> = ({ schema }) => {
   const minCheck = schema._def.checks.find(({ kind }) => kind === "min") as
     | Extract<ArrayElement<z.ZodNumberDef["checks"]>, { kind: "min" }>
     | undefined;
@@ -420,7 +420,7 @@ export const depictNumber: OpenAPIDepicter<z.ZodNumber> = ({ schema }) => {
 export const depictObjectProperties = ({
   schema: { shape },
   next,
-}: Parameters<OpenAPIDepicter<z.AnyZodObject>>[0]) => {
+}: Parameters<Depicter<z.AnyZodObject>>[0]) => {
   return Object.keys(shape).reduce(
     (carry, key) => ({
       ...carry,
@@ -430,7 +430,7 @@ export const depictObjectProperties = ({
   );
 };
 
-export const depictEffect: OpenAPIDepicter<z.ZodEffects<z.ZodTypeAny>> = ({
+export const depictEffect: Depicter<z.ZodEffects<z.ZodTypeAny>> = ({
   schema,
   isResponse,
   next,
@@ -476,15 +476,16 @@ export const depictEffect: OpenAPIDepicter<z.ZodEffects<z.ZodTypeAny>> = ({
   return input;
 };
 
-export const depictPipeline: OpenAPIDepicter<z.ZodPipeline<any, any>> = ({
+export const depictPipeline: Depicter<z.ZodPipeline<any, any>> = ({
   schema,
   isResponse,
   next,
 }) => next({ schema: schema._def[isResponse ? "out" : "in"] });
 
-export const depictBranded: OpenAPIDepicter<
-  z.ZodBranded<z.ZodTypeAny, any>
-> = ({ schema, next }) => next({ schema: schema.unwrap() });
+export const depictBranded: Depicter<z.ZodBranded<z.ZodTypeAny, any>> = ({
+  schema,
+  next,
+}) => next({ schema: schema.unwrap() });
 
 export const depictIOExamples = <T extends IOSchema>(
   schema: T,
@@ -636,7 +637,7 @@ export const hasCoercion = (schema: z.ZodType): boolean =>
     ? schema._def.coerce
     : false;
 
-export const onEach: OpenAPIDepicter<z.ZodTypeAny, "last"> = ({
+export const onEach: Depicter<z.ZodTypeAny, "last"> = ({
   schema,
   isResponse,
 }) => {
