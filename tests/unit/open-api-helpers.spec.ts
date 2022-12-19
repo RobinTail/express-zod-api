@@ -53,9 +53,10 @@ import { walkSchema } from "../../src/schema-walker";
 import { serializeSchemaForTest } from "../helpers";
 
 describe("Open API helpers", () => {
-  const next = (): SchemaObject => ({
+  const next = ({ schema }: { schema: z.ZodTypeAny }): SchemaObject => ({
     title: "_next depicter here_",
-    type: "number",
+    type: "null",
+    format: schema._def.typeName,
   });
 
   describe("extractObjectSchema()", () => {
@@ -668,43 +669,34 @@ describe("Open API helpers", () => {
   });
 
   describe("depictEffect()", () => {
-    test("should depict ZodEffects transformation in case of response", () => {
+    test.each([
+      {
+        schema: z.string().transform((v) => parseInt(v, 10)),
+        isResponse: true,
+        expected: "number (out)",
+      },
+      {
+        schema: z.string().transform((v) => parseInt(v, 10)),
+        isResponse: false,
+        expected: "string (in)",
+      },
+      {
+        schema: z.preprocess((v) => parseInt(`${v}`, 10), z.string()),
+        isResponse: false,
+        expected: "string (preprocess)",
+      },
+      {
+        schema: z
+          .object({ s: z.string() })
+          .refine(() => false, { message: "test" }),
+        isResponse: false,
+        expected: "object (refinement)",
+      },
+    ])("should depict as $expected", ({ schema, isResponse }) => {
       expect(
         depictEffect({
-          schema: z.string().transform((v) => parseInt(v, 10)),
-          isResponse: true,
-          next,
-        })
-      ).toMatchSnapshot();
-    });
-
-    test("should depict ZodEffects transformation in case of request", () => {
-      expect(
-        depictEffect({
-          schema: z.string().transform((v) => parseInt(v, 10)),
-          isResponse: false,
-          next,
-        })
-      ).toMatchSnapshot();
-    });
-
-    test("should depict ZodEffects preprocess in case of request", () => {
-      expect(
-        depictEffect({
-          schema: z.preprocess((v) => parseInt(`${v}`, 10), z.string()),
-          isResponse: false,
-          next,
-        })
-      ).toMatchSnapshot();
-    });
-
-    test("should depict refinements", () => {
-      expect(
-        depictEffect({
-          schema: z
-            .object({ s: z.string() })
-            .refine(() => false, { message: "test" }),
-          isResponse: false,
+          schema,
+          isResponse,
           next,
         })
       ).toMatchSnapshot();
