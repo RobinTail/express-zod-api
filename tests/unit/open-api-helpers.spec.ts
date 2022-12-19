@@ -76,26 +76,14 @@ describe("Open API helpers", () => {
 
   describe("extractObjectSchema()", () => {
     test("should pass the object schema through", () => {
-      const subject = extractObjectSchema(
-        z.object({
-          one: z.string(),
-        })
-      );
+      const subject = extractObjectSchema(z.object({ one: z.string() }));
       expect(subject).toBeInstanceOf(z.ZodObject);
       expect(serializeSchemaForTest(subject)).toMatchSnapshot();
     });
 
     test("should return object schema for the union of object schemas", () => {
       const subject = extractObjectSchema(
-        z
-          .object({
-            one: z.string(),
-          })
-          .or(
-            z.object({
-              two: z.number(),
-            })
-          )
+        z.object({ one: z.string() }).or(z.object({ two: z.number() }))
       );
       expect(subject).toBeInstanceOf(z.ZodObject);
       expect(serializeSchemaForTest(subject)).toMatchSnapshot();
@@ -103,105 +91,49 @@ describe("Open API helpers", () => {
 
     test("should return object schema for the intersection of object schemas", () => {
       const subject = extractObjectSchema(
-        z
-          .object({
-            one: z.string(),
-          })
-          .and(
-            z.object({
-              two: z.number(),
-            })
-          )
+        z.object({ one: z.string() }).and(z.object({ two: z.number() }))
       );
       expect(subject).toBeInstanceOf(z.ZodObject);
       expect(serializeSchemaForTest(subject)).toMatchSnapshot();
     });
 
     test("should preserve examples", () => {
-      const objectSchema = withMeta(
-        z.object({
-          one: z.string(),
-        })
-      ).example({
+      const objectSchema = withMeta(z.object({ one: z.string() })).example({
         one: "test",
       });
       expect(getMeta(extractObjectSchema(objectSchema), "examples")).toEqual([
-        {
-          one: "test",
-        },
+        { one: "test" },
       ]);
 
       const refinedObjSchema = withMeta(
-        z
-          .object({
-            one: z.string(),
-          })
-          .refine(() => true)
-      ).example({
-        one: "test",
-      });
+        z.object({ one: z.string() }).refine(() => true)
+      ).example({ one: "test" });
       expect(
         getMeta(extractObjectSchema(refinedObjSchema), "examples")
-      ).toEqual([
-        {
-          one: "test",
-        },
-      ]);
+      ).toEqual([{ one: "test" }]);
 
       const unionSchema = withMeta(
-        z
-          .object({
-            one: z.string(),
-          })
-          .or(
-            z.object({
-              two: z.number(),
-            })
-          )
+        z.object({ one: z.string() }).or(z.object({ two: z.number() }))
       )
-        .example({
-          one: "test1",
-        })
-        .example({
-          two: 123,
-        });
+        .example({ one: "test1" })
+        .example({ two: 123 });
       expect(getMeta(extractObjectSchema(unionSchema), "examples")).toEqual([
         { one: "test1" },
         { two: 123 },
       ]);
 
       const intersectionSchema = withMeta(
-        z
-          .object({
-            one: z.string(),
-          })
-          .and(
-            z.object({
-              two: z.number(),
-            })
-          )
-      ).example({
-        one: "test1",
-        two: 123,
-      });
+        z.object({ one: z.string() }).and(z.object({ two: z.number() }))
+      ).example({ one: "test1", two: 123 });
       expect(
         getMeta(extractObjectSchema(intersectionSchema), "examples")
-      ).toEqual([
-        {
-          one: "test1",
-          two: 123,
-        },
-      ]);
+      ).toEqual([{ one: "test1", two: 123 }]);
     });
 
     describe("Feature #600: Top level refinements", () => {
       test("should handle refined object schema", () => {
         const subject = extractObjectSchema(
-          z
-            .object({
-              one: z.string(),
-            })
-            .refine(() => true)
+          z.object({ one: z.string() }).refine(() => true)
         );
         expect(subject).toBeInstanceOf(z.ZodObject);
         expect(serializeSchemaForTest(subject)).toMatchSnapshot();
@@ -209,13 +141,7 @@ describe("Open API helpers", () => {
 
       test("should throw when using transformation", () => {
         expect(() =>
-          extractObjectSchema(
-            z
-              .object({
-                one: z.string(),
-              })
-              .transform(() => [])
-          )
+          extractObjectSchema(z.object({ one: z.string() }).transform(() => []))
         ).toThrowError(
           new IOSchemaError(
             "Using transformations on the top level of input schema is not allowed."
