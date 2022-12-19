@@ -30,7 +30,7 @@ exports[`Open API helpers depictBoolean() should set type:boolean 1`] = `
 }
 `;
 
-exports[`Open API helpers depictBranded should depict the actual schema 1`] = `
+exports[`Open API helpers depictBranded should pass the next depicter 1`] = `
 {
   "format": "ZodString",
   "title": "_next depicter here_",
@@ -50,7 +50,7 @@ exports[`Open API helpers depictDate should throw clear error 0 1`] = `[OpenAPIE
 
 exports[`Open API helpers depictDate should throw clear error 1 1`] = `[OpenAPIError: Using z.date() within input schema is forbidden. Please use z.dateIn() instead. Check out the documentation for details.]`;
 
-exports[`Open API helpers depictDateIn should depict ZodDateIn 1`] = `
+exports[`Open API helpers depictDateIn should set type:string, pattern and format 1`] = `
 {
   "description": "YYYY-MM-DDTHH:mm:ss.sssZ",
   "externalDocs": {
@@ -64,7 +64,7 @@ exports[`Open API helpers depictDateIn should depict ZodDateIn 1`] = `
 
 exports[`Open API helpers depictDateIn should throw when ZodDateIn in response 1`] = `[OpenAPIError: Please use z.dateOut() for output.]`;
 
-exports[`Open API helpers depictDateOut should depict ZodDateOut 1`] = `
+exports[`Open API helpers depictDateOut should set type:string, description and format 1`] = `
 {
   "description": "YYYY-MM-DDTHH:mm:ss.sssZ",
   "externalDocs": {

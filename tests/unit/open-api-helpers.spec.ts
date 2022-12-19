@@ -852,7 +852,7 @@ describe("Open API helpers", () => {
   });
 
   describe("depictDateIn", () => {
-    test("should depict ZodDateIn", () => {
+    test("should set type:string, pattern and format", () => {
       expect(
         depictDateIn({
           schema: z.dateIn(),
@@ -877,7 +877,7 @@ describe("Open API helpers", () => {
   });
 
   describe("depictDateOut", () => {
-    test("should depict ZodDateOut", () => {
+    test("should set type:string, description and format", () => {
       expect(
         depictDateOut({
           schema: z.dateOut(),
@@ -921,7 +921,7 @@ describe("Open API helpers", () => {
   });
 
   describe("depictBranded", () => {
-    test("should depict the actual schema", () => {
+    test("should pass the next depicter", () => {
       expect(
         depictBranded({
           schema: z.string().min(2).brand<"Test">(),
