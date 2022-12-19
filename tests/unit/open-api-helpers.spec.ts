@@ -304,7 +304,7 @@ describe("Open API helpers", () => {
   });
 
   describe("depictCatch()", () => {
-    test("should proxy next depicter", () => {
+    test("should pass next depicter", () => {
       expect(
         depictCatch({
           schema: z.boolean().catch(true),
@@ -440,7 +440,7 @@ describe("Open API helpers", () => {
 
   describe("depictOptional()", () => {
     test.each([{ isResponse: false }, { isResponse: true }])(
-      "should proxy the next depicter %#",
+      "should pass the next depicter %#",
       ({ isResponse }) => {
         expect(
           depictOptional({
@@ -585,7 +585,7 @@ describe("Open API helpers", () => {
   });
 
   describe("depictArray()", () => {
-    test("should set type:array and proxy items depiction", () => {
+    test("should set type:array and pass items depiction", () => {
       expect(
         depictArray({
           schema: z.array(z.boolean()),
@@ -719,7 +719,10 @@ describe("Open API helpers", () => {
   });
 
   describe("depictIOExamples()", () => {
-    test("should depict examples in case of request", () => {
+    test.each([
+      { isResponse: false, case: "request", action: "pass" },
+      { isResponse: true, case: "response", action: "transform" },
+    ])("should $action examples in case of $case", ({ isResponse }) => {
       expect(
         depictIOExamples(
           withMeta(
@@ -739,33 +742,7 @@ describe("Open API helpers", () => {
               two: 456,
               three: false,
             }),
-          false,
-          ["three"]
-        )
-      ).toMatchSnapshot();
-    });
-
-    test("should depict examples in case of response", () => {
-      expect(
-        depictIOExamples(
-          withMeta(
-            z.object({
-              one: z.string().transform((v) => v.length),
-              two: z.number().transform((v) => `${v}`),
-              three: z.boolean(),
-            })
-          )
-            .example({
-              one: "test",
-              two: 123,
-              three: true,
-            })
-            .example({
-              one: "test2",
-              two: 456,
-              three: false,
-            }),
-          true,
+          isResponse,
           ["three"]
         )
       ).toMatchSnapshot();

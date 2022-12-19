@@ -6,7 +6,7 @@ exports[`Open API helpers depictAny() should set format:any 1`] = `
 }
 `;
 
-exports[`Open API helpers depictArray() should set type:array and proxy items depiction 1`] = `
+exports[`Open API helpers depictArray() should set type:array and pass items depiction 1`] = `
 {
   "items": {
     "format": "ZodBoolean",
@@ -38,7 +38,7 @@ exports[`Open API helpers depictBranded should depict the actual schema 1`] = `
 }
 `;
 
-exports[`Open API helpers depictCatch() should proxy next depicter 1`] = `
+exports[`Open API helpers depictCatch() should pass next depicter 1`] = `
 {
   "format": "ZodBoolean",
   "title": "_next depicter here_",
@@ -180,7 +180,7 @@ exports[`Open API helpers depictFile() should set type:string and format accordi
 
 exports[`Open API helpers depictFile() should throw when using in input 1`] = `[OpenAPIError: Please use z.file() only within ResultHandler.]`;
 
-exports[`Open API helpers depictIOExamples() should depict examples in case of request 1`] = `
+exports[`Open API helpers depictIOExamples() should pass examples in case of request 1`] = `
 {
   "examples": {
     "example1": {
@@ -199,7 +199,7 @@ exports[`Open API helpers depictIOExamples() should depict examples in case of r
 }
 `;
 
-exports[`Open API helpers depictIOExamples() should depict examples in case of response 1`] = `
+exports[`Open API helpers depictIOExamples() should transform examples in case of response 1`] = `
 {
   "examples": {
     "example1": {
@@ -396,7 +396,7 @@ exports[`Open API helpers depictObjectProperties() should wrap next depicters in
 }
 `;
 
-exports[`Open API helpers depictOptional() should proxy the next depicter 0 1`] = `
+exports[`Open API helpers depictOptional() should pass the next depicter 0 1`] = `
 {
   "format": "ZodString",
   "title": "_next depicter here_",
@@ -404,7 +404,7 @@ exports[`Open API helpers depictOptional() should proxy the next depicter 0 1`] 
 }
 `;
 
-exports[`Open API helpers depictOptional() should proxy the next depicter 1 1`] = `
+exports[`Open API helpers depictOptional() should pass the next depicter 1 1`] = `
 {
   "format": "ZodString",
   "title": "_next depicter here_",
