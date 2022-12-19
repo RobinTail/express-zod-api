@@ -30,7 +30,8 @@ import {
 } from "./client-helpers";
 import { methods } from "./method";
 import { mimeJson } from "./mime";
-import { Routing, walkRouting } from "./routing";
+import { Routing } from "./routing";
+import { walkRouting } from "./routing-walker";
 
 interface Registry {
   [METHOD_PATH: string]: Record<"in" | "out", string> & { isJson: boolean };

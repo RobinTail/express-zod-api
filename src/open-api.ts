@@ -18,7 +18,8 @@ import {
   ensureShortDescription,
   reformatParamsInPath,
 } from "./open-api-helpers";
-import { Routing, RoutingWalkerParams, walkRouting } from "./routing";
+import { Routing } from "./routing";
+import { RoutingWalkerParams, walkRouting } from "./routing-walker";
 
 interface GeneratorParams {
   title: string;
