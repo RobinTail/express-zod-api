@@ -412,7 +412,7 @@ exports[`Open API helpers depictOptional() should proxy the next depicter 1 1`] 
 }
 `;
 
-exports[`Open API helpers depictPipeline should depict inner schema depending on IO direction 0 1`] = `
+exports[`Open API helpers depictPipeline should depict as boolean (out) 1`] = `
 {
   "format": "ZodBoolean",
   "title": "_next depicter here_",
@@ -420,7 +420,7 @@ exports[`Open API helpers depictPipeline should depict inner schema depending on
 }
 `;
 
-exports[`Open API helpers depictPipeline should depict inner schema depending on IO direction 1 1`] = `
+exports[`Open API helpers depictPipeline should depict as string (in) 1`] = `
 {
   "format": "ZodString",
   "title": "_next depicter here_",

@@ -704,18 +704,18 @@ describe("Open API helpers", () => {
   });
 
   describe("depictPipeline", () => {
-    test.each([{ isResponse: true }, { isResponse: false }])(
-      "should depict inner schema depending on IO direction %#",
-      ({ isResponse }) => {
-        expect(
-          depictPipeline({
-            isResponse,
-            schema: z.string().pipe(z.coerce.boolean()),
-            next,
-          })
-        ).toMatchSnapshot();
-      }
-    );
+    test.each([
+      { isResponse: true, expected: "boolean (out)" },
+      { isResponse: false, expected: "string (in)" },
+    ])("should depict as $expected", ({ isResponse }) => {
+      expect(
+        depictPipeline({
+          isResponse,
+          schema: z.string().pipe(z.coerce.boolean()),
+          next,
+        })
+      ).toMatchSnapshot();
+    });
   });
 
   describe("depictIOExamples()", () => {
