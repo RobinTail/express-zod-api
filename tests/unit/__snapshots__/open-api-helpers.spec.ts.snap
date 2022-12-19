@@ -1,28 +1,29 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Open API helpers depictAny() should depict ZodAny 1`] = `
+exports[`Open API helpers depictAny() should set format:any 1`] = `
 {
   "format": "any",
 }
 `;
 
-exports[`Open API helpers depictArray() should depict ZodArray 1`] = `
+exports[`Open API helpers depictArray() should set type:array and proxy items depiction 1`] = `
 {
   "items": {
-    "description": "next",
+    "title": "_next depicter here_",
+    "type": "number",
   },
   "type": "array",
 }
 `;
 
-exports[`Open API helpers depictBigInt() should depict ZodBigInt 1`] = `
+exports[`Open API helpers depictBigInt() should set type:integer and format:bigint 1`] = `
 {
   "format": "bigint",
   "type": "integer",
 }
 `;
 
-exports[`Open API helpers depictBoolean() should depict ZodBoolean 1`] = `
+exports[`Open API helpers depictBoolean() should set type:boolean 1`] = `
 {
   "type": "boolean",
 }
@@ -30,13 +31,15 @@ exports[`Open API helpers depictBoolean() should depict ZodBoolean 1`] = `
 
 exports[`Open API helpers depictBranded should depict the actual schema 1`] = `
 {
-  "description": "next",
+  "title": "_next depicter here_",
+  "type": "number",
 }
 `;
 
-exports[`Open API helpers depictCatch() should depict ZodCatch 1`] = `
+exports[`Open API helpers depictCatch() should proxy next depicter 1`] = `
 {
-  "description": "next",
+  "title": "_next depicter here_",
+  "type": "number",
 }
 `;
 
@@ -71,24 +74,27 @@ exports[`Open API helpers depictDateOut should depict ZodDateOut 1`] = `
 
 exports[`Open API helpers depictDateOut should throw when ZodDateOut in request 1`] = `[OpenAPIError: Please use z.dateIn() for input.]`;
 
-exports[`Open API helpers depictDefault() should depict ZodDefault 1`] = `
+exports[`Open API helpers depictDefault() should set default property 1`] = `
 {
   "default": true,
-  "description": "next",
+  "title": "_next depicter here_",
+  "type": "number",
 }
 `;
 
-exports[`Open API helpers depictDiscriminatedUnion() should depict ZodDiscriminatedUnion 1`] = `
+exports[`Open API helpers depictDiscriminatedUnion() should wrap next depicters in oneOf prop and set discriminator prop 1`] = `
 {
   "discriminator": {
     "propertyName": "status",
   },
   "oneOf": [
     {
-      "description": "next",
+      "title": "_next depicter here_",
+      "type": "number",
     },
     {
-      "description": "next",
+      "title": "_next depicter here_",
+      "type": "number",
     },
   ],
 }
@@ -96,31 +102,33 @@ exports[`Open API helpers depictDiscriminatedUnion() should depict ZodDiscrimina
 
 exports[`Open API helpers depictEffect() should depict ZodEffects preprocess in case of request 1`] = `
 {
-  "description": "next",
-  "format": "undefined (preprocessed)",
+  "format": "number (preprocessed)",
+  "title": "_next depicter here_",
 }
 `;
 
 exports[`Open API helpers depictEffect() should depict ZodEffects transformation in case of request 1`] = `
 {
-  "description": "next",
+  "title": "_next depicter here_",
+  "type": "number",
 }
 `;
 
 exports[`Open API helpers depictEffect() should depict ZodEffects transformation in case of response 1`] = `
 {
-  "description": "next",
+  "title": "_next depicter here_",
   "type": "number",
 }
 `;
 
 exports[`Open API helpers depictEffect() should depict refinements 1`] = `
 {
-  "description": "next",
+  "title": "_next depicter here_",
+  "type": "number",
 }
 `;
 
-exports[`Open API helpers depictEnum() should depict ZodEnum 1`] = `
+exports[`Open API helpers depictEnum() should set type and enum properties 1`] = `
 {
   "enum": [
     "one",
@@ -130,7 +138,7 @@ exports[`Open API helpers depictEnum() should depict ZodEnum 1`] = `
 }
 `;
 
-exports[`Open API helpers depictEnum() should depict ZodNativeEnum 1`] = `
+exports[`Open API helpers depictEnum() should set type and enum properties 2`] = `
 {
   "enum": [
     "ONE",
@@ -140,21 +148,21 @@ exports[`Open API helpers depictEnum() should depict ZodNativeEnum 1`] = `
 }
 `;
 
-exports[`Open API helpers depictFile() should depict ZodFile 0 1`] = `
+exports[`Open API helpers depictFile() should set type:string and format accordingly 0 1`] = `
 {
   "format": "file",
   "type": "string",
 }
 `;
 
-exports[`Open API helpers depictFile() should depict ZodFile 1 1`] = `
+exports[`Open API helpers depictFile() should set type:string and format accordingly 1 1`] = `
 {
   "format": "binary",
   "type": "string",
 }
 `;
 
-exports[`Open API helpers depictFile() should depict ZodFile 2 1`] = `
+exports[`Open API helpers depictFile() should set type:string and format accordingly 2 1`] = `
 {
   "format": "byte",
   "type": "string",
@@ -227,20 +235,22 @@ exports[`Open API helpers depictIOParamExamples() should depict examples in case
 }
 `;
 
-exports[`Open API helpers depictIntersection() should depict ZodIntersection 1`] = `
+exports[`Open API helpers depictIntersection() should wrap next depicters in allOf property 1`] = `
 {
   "allOf": [
     {
-      "description": "next",
+      "title": "_next depicter here_",
+      "type": "number",
     },
     {
-      "description": "next",
+      "title": "_next depicter here_",
+      "type": "number",
     },
   ],
 }
 `;
 
-exports[`Open API helpers depictLiteral() should depict ZodLiteral 1`] = `
+exports[`Open API helpers depictLiteral() should set type and involve enum property 1`] = `
 {
   "enum": [
     "testing",
@@ -249,7 +259,7 @@ exports[`Open API helpers depictLiteral() should depict ZodLiteral 1`] = `
 }
 `;
 
-exports[`Open API helpers depictNull() should depict ZodNull 1`] = `
+exports[`Open API helpers depictNull() should set type:string format:null and nullable:true props 1`] = `
 {
   "format": "null",
   "nullable": true,
@@ -257,32 +267,23 @@ exports[`Open API helpers depictNull() should depict ZodNull 1`] = `
 }
 `;
 
-exports[`Open API helpers depictNullable() should depict ZodNullable 0 1`] = `
+exports[`Open API helpers depictNullable() should set nullable:true 0 1`] = `
 {
-  "description": "next",
   "nullable": true,
+  "title": "_next depicter here_",
+  "type": "number",
 }
 `;
 
-exports[`Open API helpers depictNullable() should depict ZodNullable 1 1`] = `
+exports[`Open API helpers depictNullable() should set nullable:true 1 1`] = `
 {
-  "description": "next",
   "nullable": true,
+  "title": "_next depicter here_",
+  "type": "number",
 }
 `;
 
-exports[`Open API helpers depictNumber() should depict ZodNumber with refinements 1`] = `
-{
-  "exclusiveMaximum": false,
-  "exclusiveMinimum": false,
-  "format": "int64",
-  "maximum": 20,
-  "minimum": 10,
-  "type": "integer",
-}
-`;
-
-exports[`Open API helpers depictNumber() should depict regular ZodNumber 1`] = `
+exports[`Open API helpers depictNumber() should type:number, min/max, format and exclusiveness props 1`] = `
 {
   "exclusiveMaximum": false,
   "exclusiveMinimum": false,
@@ -293,14 +294,27 @@ exports[`Open API helpers depictNumber() should depict regular ZodNumber 1`] = `
 }
 `;
 
-exports[`Open API helpers depictObject() should depict ZodObject 0 1`] = `
+exports[`Open API helpers depictNumber() should type:number, min/max, format and exclusiveness props 2`] = `
+{
+  "exclusiveMaximum": false,
+  "exclusiveMinimum": false,
+  "format": "int64",
+  "maximum": 20,
+  "minimum": 10,
+  "type": "integer",
+}
+`;
+
+exports[`Open API helpers depictObject() should type:object, properties and required props 0 1`] = `
 {
   "properties": {
     "a": {
-      "description": "next",
+      "title": "_next depicter here_",
+      "type": "number",
     },
     "b": {
-      "description": "next",
+      "title": "_next depicter here_",
+      "type": "number",
     },
   },
   "required": [
@@ -311,14 +325,16 @@ exports[`Open API helpers depictObject() should depict ZodObject 0 1`] = `
 }
 `;
 
-exports[`Open API helpers depictObject() should depict ZodObject 1 1`] = `
+exports[`Open API helpers depictObject() should type:object, properties and required props 1 1`] = `
 {
   "properties": {
     "a": {
-      "description": "next",
+      "title": "_next depicter here_",
+      "type": "number",
     },
     "b": {
-      "description": "next",
+      "title": "_next depicter here_",
+      "type": "number",
     },
   },
   "required": [
@@ -329,14 +345,16 @@ exports[`Open API helpers depictObject() should depict ZodObject 1 1`] = `
 }
 `;
 
-exports[`Open API helpers depictObject() should depict ZodObject 2 1`] = `
+exports[`Open API helpers depictObject() should type:object, properties and required props 2 1`] = `
 {
   "properties": {
     "a": {
-      "description": "next",
+      "title": "_next depicter here_",
+      "type": "number",
     },
     "b": {
-      "description": "next",
+      "title": "_next depicter here_",
+      "type": "number",
     },
   },
   "required": [],
@@ -344,49 +362,77 @@ exports[`Open API helpers depictObject() should depict ZodObject 2 1`] = `
 }
 `;
 
-exports[`Open API helpers depictObjectProperties() should depict ZodObject shape 1`] = `
+exports[`Open API helpers depictObjectProperties() should wrap next depicters in a shape of object 1`] = `
 {
   "one": {
-    "description": "next",
+    "title": "_next depicter here_",
+    "type": "number",
   },
   "two": {
-    "description": "next",
+    "title": "_next depicter here_",
+    "type": "number",
   },
 }
 `;
 
-exports[`Open API helpers depictOptional() should depict ZodOptional 0 1`] = `
+exports[`Open API helpers depictOptional() should proxy the next depicter 0 1`] = `
 {
-  "description": "next",
+  "title": "_next depicter here_",
+  "type": "number",
 }
 `;
 
-exports[`Open API helpers depictOptional() should depict ZodOptional 1 1`] = `
+exports[`Open API helpers depictOptional() should proxy the next depicter 1 1`] = `
 {
-  "description": "next",
+  "title": "_next depicter here_",
+  "type": "number",
 }
 `;
 
 exports[`Open API helpers depictPipeline should depict inner schema depending on IO direction 0 1`] = `
 {
-  "description": "next",
+  "title": "_next depicter here_",
+  "type": "number",
 }
 `;
 
 exports[`Open API helpers depictPipeline should depict inner schema depending on IO direction 1 1`] = `
 {
-  "description": "next",
+  "title": "_next depicter here_",
+  "type": "number",
 }
 `;
 
-exports[`Open API helpers depictRecord() should depict ZodRecord with key schema enum 1`] = `
+exports[`Open API helpers depictRecord() should set properties+required or additionalProperties props 1`] = `
+{
+  "additionalProperties": {
+    "title": "_next depicter here_",
+    "type": "number",
+  },
+  "type": "object",
+}
+`;
+
+exports[`Open API helpers depictRecord() should set properties+required or additionalProperties props 2`] = `
+{
+  "additionalProperties": {
+    "title": "_next depicter here_",
+    "type": "number",
+  },
+  "type": "object",
+}
+`;
+
+exports[`Open API helpers depictRecord() should set properties+required or additionalProperties props 3`] = `
 {
   "properties": {
     "one": {
-      "description": "next",
+      "title": "_next depicter here_",
+      "type": "number",
     },
     "two": {
-      "description": "next",
+      "title": "_next depicter here_",
+      "type": "number",
     },
   },
   "required": [
@@ -397,11 +443,12 @@ exports[`Open API helpers depictRecord() should depict ZodRecord with key schema
 }
 `;
 
-exports[`Open API helpers depictRecord() should depict ZodRecord with key schema literal 1`] = `
+exports[`Open API helpers depictRecord() should set properties+required or additionalProperties props 4`] = `
 {
   "properties": {
     "testing": {
-      "description": "next",
+      "title": "_next depicter here_",
+      "type": "number",
     },
   },
   "required": [
@@ -411,38 +458,22 @@ exports[`Open API helpers depictRecord() should depict ZodRecord with key schema
 }
 `;
 
-exports[`Open API helpers depictRecord() should depict ZodRecord with key schema string 1`] = `
-{
-  "additionalProperties": {
-    "description": "next",
-  },
-  "type": "object",
-}
-`;
-
-exports[`Open API helpers depictRecord() should depict ZodRecord with key schema union of literals 1`] = `
+exports[`Open API helpers depictRecord() should set properties+required or additionalProperties props 5`] = `
 {
   "properties": {
     "one": {
-      "description": "next",
+      "title": "_next depicter here_",
+      "type": "number",
     },
     "two": {
-      "description": "next",
+      "title": "_next depicter here_",
+      "type": "number",
     },
   },
   "required": [
     "one",
     "two",
   ],
-  "type": "object",
-}
-`;
-
-exports[`Open API helpers depictRecord() should depict classic ZodRecord 1`] = `
-{
-  "additionalProperties": {
-    "description": "next",
-  },
   "type": "object",
 }
 `;
@@ -672,7 +703,7 @@ exports[`Open API helpers depictSecurityRefs() should populate the scopes 1`] = 
 ]
 `;
 
-exports[`Open API helpers depictString() should depict ZodString with refinements 0 1`] = `
+exports[`Open API helpers depictString() should set format, pattern and min/maxLength props 0 1`] = `
 {
   "format": "email",
   "maxLength": 20,
@@ -681,28 +712,28 @@ exports[`Open API helpers depictString() should depict ZodString with refinement
 }
 `;
 
-exports[`Open API helpers depictString() should depict ZodString with refinements 1 1`] = `
+exports[`Open API helpers depictString() should set format, pattern and min/maxLength props 1 1`] = `
 {
   "format": "url",
   "type": "string",
 }
 `;
 
-exports[`Open API helpers depictString() should depict ZodString with refinements 2 1`] = `
+exports[`Open API helpers depictString() should set format, pattern and min/maxLength props 2 1`] = `
 {
   "format": "uuid",
   "type": "string",
 }
 `;
 
-exports[`Open API helpers depictString() should depict ZodString with refinements 3 1`] = `
+exports[`Open API helpers depictString() should set format, pattern and min/maxLength props 3 1`] = `
 {
   "format": "cuid",
   "type": "string",
 }
 `;
 
-exports[`Open API helpers depictString() should depict ZodString with refinements 4 1`] = `
+exports[`Open API helpers depictString() should set format, pattern and min/maxLength props 4 1`] = `
 {
   "format": "date-time",
   "pattern": "/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?Z$/",
@@ -710,7 +741,7 @@ exports[`Open API helpers depictString() should depict ZodString with refinement
 }
 `;
 
-exports[`Open API helpers depictString() should depict ZodString with refinements 5 1`] = `
+exports[`Open API helpers depictString() should set format, pattern and min/maxLength props 5 1`] = `
 {
   "format": "date-time",
   "pattern": "/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?(([+-]\\d{2}:\\d{2})|Z)$/",
@@ -718,14 +749,14 @@ exports[`Open API helpers depictString() should depict ZodString with refinement
 }
 `;
 
-exports[`Open API helpers depictString() should depict ZodString with regex 1`] = `
+exports[`Open API helpers depictString() should set format, pattern and min/maxLength props 6 1`] = `
 {
   "pattern": "/^\\d+.\\d+.\\d+$/",
   "type": "string",
 }
 `;
 
-exports[`Open API helpers depictString() should depict regular ZodString 1`] = `
+exports[`Open API helpers depictString() should set type:string 1`] = `
 {
   "type": "string",
 }
@@ -760,20 +791,23 @@ exports[`Open API helpers depictTags() should accept plain descriptions 1`] = `
 ]
 `;
 
-exports[`Open API helpers depictTuple() should depict ZodTuple 1`] = `
+exports[`Open API helpers depictTuple() should set type:array, max- and minLength, oneOf, format:tuple and description 1`] = `
 {
   "items": {
-    "description": "0: undefined, 1: undefined, 2: undefined",
+    "description": "0: number, 1: number, 2: number",
     "format": "tuple",
     "oneOf": [
       {
-        "description": "next",
+        "title": "_next depicter here_",
+        "type": "number",
       },
       {
-        "description": "next",
+        "title": "_next depicter here_",
+        "type": "number",
       },
       {
-        "description": "next",
+        "title": "_next depicter here_",
+        "type": "number",
       },
     ],
   },
@@ -783,20 +817,22 @@ exports[`Open API helpers depictTuple() should depict ZodTuple 1`] = `
 }
 `;
 
-exports[`Open API helpers depictUnion() should depict ZodUnion 1`] = `
+exports[`Open API helpers depictUnion() should wrap next depicters into oneOf property 1`] = `
 {
   "oneOf": [
     {
-      "description": "next",
+      "title": "_next depicter here_",
+      "type": "number",
     },
     {
-      "description": "next",
+      "title": "_next depicter here_",
+      "type": "number",
     },
   ],
 }
 `;
 
-exports[`Open API helpers depictUpload() should depict ZodUpload 1`] = `
+exports[`Open API helpers depictUpload() should set format:binary and type:string 1`] = `
 {
   "format": "binary",
   "type": "string",

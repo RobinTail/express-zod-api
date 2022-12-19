@@ -1,3 +1,4 @@
+import { SchemaObject } from "openapi3-ts";
 import { IOSchemaError } from "../../src/errors";
 import {
   OpenAPIError,
@@ -52,6 +53,11 @@ import { walkSchema } from "../../src/schema-walker";
 import { serializeSchemaForTest } from "../helpers";
 
 describe("Open API helpers", () => {
+  const next = (): SchemaObject => ({
+    title: "_next depicter here_",
+    type: "number",
+  });
+
   describe("extractObjectSchema()", () => {
     test("should pass the object schema through", () => {
       const subject = extractObjectSchema(
@@ -285,48 +291,48 @@ describe("Open API helpers", () => {
   });
 
   describe("depictDefault()", () => {
-    test("should depict ZodDefault", () => {
+    test("should set default property", () => {
       expect(
         depictDefault({
           schema: z.boolean().default(true),
           isResponse: false,
-          next: () => ({ description: "next" }),
+          next,
         })
       ).toMatchSnapshot();
     });
   });
 
   describe("depictCatch()", () => {
-    test("should depict ZodCatch", () => {
+    test("should proxy next depicter", () => {
       expect(
         depictCatch({
           schema: z.boolean().catch(true),
           isResponse: false,
-          next: () => ({ description: "next" }),
+          next,
         })
       ).toMatchSnapshot();
     });
   });
 
   describe("depictAny()", () => {
-    test("should depict ZodAny", () => {
+    test("should set format:any", () => {
       expect(
         depictAny({
           schema: z.any(),
           isResponse: false,
-          next: () => ({ description: "next" }),
+          next,
         })
       ).toMatchSnapshot();
     });
   });
 
   describe("depictUpload()", () => {
-    test("should depict ZodUpload", () => {
+    test("should set format:binary and type:string", () => {
       expect(
         depictUpload({
           schema: z.upload(),
           isResponse: false,
-          next: () => ({ description: "next" }),
+          next,
         })
       ).toMatchSnapshot();
     });
@@ -335,7 +341,7 @@ describe("Open API helpers", () => {
         depictUpload({
           schema: z.upload(),
           isResponse: true,
-          next: () => ({ description: "next" }),
+          next,
         });
         fail("Should not be here");
       } catch (e) {
@@ -347,13 +353,13 @@ describe("Open API helpers", () => {
 
   describe("depictFile()", () => {
     test.each([z.file(), z.file().binary(), z.file().base64()])(
-      "should depict ZodFile %#",
+      "should set type:string and format accordingly %#",
       (schema) => {
         expect(
           depictFile({
             schema,
             isResponse: true,
-            next: () => ({ description: "next" }),
+            next,
           })
         ).toMatchSnapshot();
       }
@@ -363,7 +369,7 @@ describe("Open API helpers", () => {
         depictFile({
           schema: z.file().binary(),
           isResponse: false,
-          next: () => ({ description: "next" }),
+          next,
         });
         fail("Should not be here");
       } catch (e) {
@@ -374,19 +380,19 @@ describe("Open API helpers", () => {
   });
 
   describe("depictUnion()", () => {
-    test("should depict ZodUnion", () => {
+    test("should wrap next depicters into oneOf property", () => {
       expect(
         depictUnion({
           schema: z.string().or(z.number()),
           isResponse: false,
-          next: () => ({ description: "next" }),
+          next,
         })
       ).toMatchSnapshot();
     });
   });
 
   describe("depictDiscriminatedUnion()", () => {
-    test("should depict ZodDiscriminatedUnion", () => {
+    test("should wrap next depicters in oneOf prop and set discriminator prop", () => {
       expect(
         depictDiscriminatedUnion({
           schema: z.discriminatedUnion("status", [
@@ -397,21 +403,21 @@ describe("Open API helpers", () => {
             }),
           ]),
           isResponse: false,
-          next: () => ({ description: "next" }),
+          next,
         })
       ).toMatchSnapshot();
     });
   });
 
   describe("depictIntersection()", () => {
-    test("should depict ZodIntersection", () => {
+    test("should wrap next depicters in allOf property", () => {
       expect(
         depictIntersection({
           schema: z
             .object({ one: z.number() })
             .and(z.object({ two: z.number() })),
           isResponse: false,
-          next: () => ({ description: "next" }),
+          next,
         })
       ).toMatchSnapshot();
     });
@@ -433,13 +439,13 @@ describe("Open API helpers", () => {
 
   describe("depictOptional()", () => {
     test.each([{ isResponse: false }, { isResponse: true }])(
-      "should depict ZodOptional %#",
+      "should proxy the next depicter %#",
       ({ isResponse }) => {
         expect(
           depictOptional({
             schema: z.string().optional(),
             isResponse,
-            next: () => ({ description: "next" }),
+            next,
           })
         ).toMatchSnapshot();
       }
@@ -448,13 +454,13 @@ describe("Open API helpers", () => {
 
   describe("depictNullable()", () => {
     test.each([{ isResponse: false }, { isResponse: true }])(
-      "should depict ZodNullable %#",
+      "should set nullable:true %#",
       ({ isResponse }) => {
         expect(
           depictNullable({
             schema: z.string().nullable(),
             isResponse,
-            next: () => ({ description: "next" }),
+            next,
           })
         ).toMatchSnapshot();
       }
@@ -462,39 +468,31 @@ describe("Open API helpers", () => {
   });
 
   describe("depictEnum()", () => {
-    test("should depict ZodEnum", () => {
-      expect(
-        depictEnum({
-          schema: z.enum(["one", "two"]),
-          isResponse: false,
-          next: () => ({ description: "next" }),
-        })
-      ).toMatchSnapshot();
-    });
-
-    test("should depict ZodNativeEnum", () => {
-      enum Test {
-        one = "ONE",
-        two = "TWO",
+    enum Test {
+      one = "ONE",
+      two = "TWO",
+    }
+    test.each([z.enum(["one", "two"]), z.nativeEnum(Test)])(
+      "should set type and enum properties",
+      (schema) => {
+        expect(
+          depictEnum({
+            schema,
+            isResponse: false,
+            next,
+          })
+        ).toMatchSnapshot();
       }
-
-      expect(
-        depictEnum({
-          schema: z.nativeEnum(Test),
-          isResponse: false,
-          next: () => ({ description: "next" }),
-        })
-      ).toMatchSnapshot();
-    });
+    );
   });
 
   describe("depictLiteral()", () => {
-    test("should depict ZodLiteral", () => {
+    test("should set type and involve enum property", () => {
       expect(
         depictLiteral({
           schema: z.literal("testing"),
           isResponse: false,
-          next: () => ({ description: "next" }),
+          next,
         })
       ).toMatchSnapshot();
     });
@@ -514,136 +512,108 @@ describe("Open API helpers", () => {
         isResponse: true,
         shape: { a: z.coerce.number(), b: z.string({ coerce: true }) },
       },
-    ])("should depict ZodObject %#", ({ isResponse, shape }) => {
-      expect(
-        depictObject({
-          schema: z.object(shape),
-          isResponse,
-          next: () => ({ description: "next" }),
-        })
-      ).toMatchSnapshot();
-    });
+    ])(
+      "should type:object, properties and required props %#",
+      ({ isResponse, shape }) => {
+        expect(
+          depictObject({
+            schema: z.object(shape),
+            isResponse,
+            next,
+          })
+        ).toMatchSnapshot();
+      }
+    );
   });
 
   describe("depictNull()", () => {
-    test("should depict ZodNull", () => {
+    test("should set type:string format:null and nullable:true props", () => {
       expect(
         depictNull({
           schema: z.null(),
           isResponse: false,
-          next: () => ({ description: "next" }),
+          next,
         })
       ).toMatchSnapshot();
     });
   });
 
   describe("depictBoolean()", () => {
-    test("should depict ZodBoolean", () => {
+    test("should set type:boolean", () => {
       expect(
         depictBoolean({
           schema: z.boolean(),
           isResponse: false,
-          next: () => ({ description: "next" }),
+          next,
         })
       ).toMatchSnapshot();
     });
   });
 
   describe("depictBigInt()", () => {
-    test("should depict ZodBigInt", () => {
+    test("should set type:integer and format:bigint", () => {
       expect(
         depictBigInt({
           schema: z.bigint(),
           isResponse: false,
-          next: () => ({ description: "next" }),
+          next,
         })
       ).toMatchSnapshot();
     });
   });
 
   describe("depictRecord()", () => {
-    test("should depict classic ZodRecord", () => {
-      expect(
-        depictRecord({
-          schema: z.record(z.boolean()),
-          isResponse: false,
-          next: () => ({ description: "next" }),
-        })
-      ).toMatchSnapshot();
-    });
-
-    test("should depict ZodRecord with key schema string", () => {
-      expect(
-        depictRecord({
-          schema: z.record(z.string(), z.boolean()),
-          isResponse: false,
-          next: () => ({ description: "next" }),
-        })
-      ).toMatchSnapshot();
-    });
-
-    test("should depict ZodRecord with key schema enum", () => {
-      expect(
-        depictRecord({
-          schema: z.record(z.enum(["one", "two"]), z.boolean()),
-          isResponse: false,
-          next: () => ({ description: "next" }),
-        })
-      ).toMatchSnapshot();
-    });
-
-    test("should depict ZodRecord with key schema literal", () => {
-      expect(
-        depictRecord({
-          schema: z.record(z.literal("testing"), z.boolean()),
-          isResponse: false,
-          next: () => ({ description: "next" }),
-        })
-      ).toMatchSnapshot();
-    });
-
-    test("should depict ZodRecord with key schema union of literals", () => {
-      expect(
-        depictRecord({
-          schema: z.record(z.literal("one").or(z.literal("two")), z.boolean()),
-          isResponse: false,
-          next: () => ({ description: "next" }),
-        })
-      ).toMatchSnapshot();
-    });
+    test.each([
+      z.record(z.boolean()),
+      z.record(z.string(), z.boolean()),
+      z.record(z.enum(["one", "two"]), z.boolean()),
+      z.record(z.literal("testing"), z.boolean()),
+      z.record(z.literal("one").or(z.literal("two")), z.boolean()),
+    ])(
+      "should set properties+required or additionalProperties props",
+      (schema) => {
+        expect(
+          depictRecord({
+            schema,
+            isResponse: false,
+            next,
+          })
+        ).toMatchSnapshot();
+      }
+    );
   });
 
   describe("depictArray()", () => {
-    test("should depict ZodArray", () => {
+    test("should set type:array and proxy items depiction", () => {
       expect(
         depictArray({
           schema: z.array(z.boolean()),
           isResponse: false,
-          next: () => ({ description: "next" }),
+          next,
         })
       ).toMatchSnapshot();
     });
   });
 
   describe("depictTuple()", () => {
-    test("should depict ZodTuple", () => {
+    test("should set type:array, max- and minLength, oneOf, format:tuple and description", () => {
       expect(
         depictTuple({
           schema: z.tuple([z.boolean(), z.string(), z.literal("test")]),
           isResponse: false,
-          next: () => ({ description: "next" }),
+          next,
         })
       ).toMatchSnapshot();
     });
   });
 
   describe("depictString()", () => {
-    test("should depict regular ZodString", () => {
+    test("should set type:string", () => {
       expect(
         depictString({
           schema: z.string(),
           isResponse: false,
-          next: () => ({ description: "next" }),
+          next,
         })
       ).toMatchSnapshot();
     });
@@ -655,51 +625,35 @@ describe("Open API helpers", () => {
       z.string().cuid(),
       z.string().datetime(),
       z.string().datetime({ offset: true }),
-    ])("should depict ZodString with refinements %#", (schema) => {
+      z.string().regex(/^\d+.\d+.\d+$/),
+    ])("should set format, pattern and min/maxLength props %#", (schema) => {
       expect(
         depictString({
           schema,
           isResponse: false,
-          next: () => ({ description: "next" }),
-        })
-      ).toMatchSnapshot();
-    });
-
-    test("should depict ZodString with regex", () => {
-      expect(
-        depictString({
-          schema: z.string().regex(/^\d+.\d+.\d+$/),
-          isResponse: false,
-          next: () => ({ description: "next" }),
+          next,
         })
       ).toMatchSnapshot();
     });
   });
 
   describe("depictNumber()", () => {
-    test("should depict regular ZodNumber", () => {
-      expect(
-        depictNumber({
-          schema: z.number(),
-          isResponse: false,
-          next: () => ({ description: "next" }),
-        })
-      ).toMatchSnapshot();
-    });
-
-    test("should depict ZodNumber with refinements", () => {
-      expect(
-        depictNumber({
-          schema: z.number().int().min(10).max(20),
-          isResponse: false,
-          next: () => ({ description: "next" }),
-        })
-      ).toMatchSnapshot();
-    });
+    test.each([z.number(), z.number().int().min(10).max(20)])(
+      "should type:number, min/max, format and exclusiveness props",
+      (schema) => {
+        expect(
+          depictNumber({
+            schema,
+            isResponse: false,
+            next,
+          })
+        ).toMatchSnapshot();
+      }
+    );
   });
 
   describe("depictObjectProperties()", () => {
-    test("should depict ZodObject shape", () => {
+    test("should wrap next depicters in a shape of object", () => {
       expect(
         depictObjectProperties({
           schema: z.object({
@@ -707,7 +661,7 @@ describe("Open API helpers", () => {
             two: z.boolean(),
           }),
           isResponse: false,
-          next: () => ({ description: "next" }),
+          next,
         })
       ).toMatchSnapshot();
     });
@@ -719,7 +673,7 @@ describe("Open API helpers", () => {
         depictEffect({
           schema: z.string().transform((v) => parseInt(v, 10)),
           isResponse: true,
-          next: () => ({ description: "next" }),
+          next,
         })
       ).toMatchSnapshot();
     });
@@ -729,7 +683,7 @@ describe("Open API helpers", () => {
         depictEffect({
           schema: z.string().transform((v) => parseInt(v, 10)),
           isResponse: false,
-          next: () => ({ description: "next" }),
+          next,
         })
       ).toMatchSnapshot();
     });
@@ -739,7 +693,7 @@ describe("Open API helpers", () => {
         depictEffect({
           schema: z.preprocess((v) => parseInt(`${v}`, 10), z.string()),
           isResponse: false,
-          next: () => ({ description: "next" }),
+          next,
         })
       ).toMatchSnapshot();
     });
@@ -751,7 +705,7 @@ describe("Open API helpers", () => {
             .object({ s: z.string() })
             .refine(() => false, { message: "test" }),
           isResponse: false,
-          next: () => ({ description: "next" }),
+          next,
         })
       ).toMatchSnapshot();
     });
@@ -765,7 +719,7 @@ describe("Open API helpers", () => {
           depictPipeline({
             isResponse,
             schema: z.string().pipe(z.coerce.boolean()),
-            next: () => ({ description: "next" }),
+            next,
           })
         ).toMatchSnapshot();
       }
@@ -957,7 +911,7 @@ describe("Open API helpers", () => {
         depictDateIn({
           schema: z.dateIn(),
           isResponse: false,
-          next: () => ({ description: "next" }),
+          next,
         })
       ).toMatchSnapshot();
     });
@@ -966,7 +920,7 @@ describe("Open API helpers", () => {
         depictDateIn({
           schema: z.dateIn(),
           isResponse: true,
-          next: () => ({ description: "next" }),
+          next,
         });
         fail("should not be here");
       } catch (e) {
@@ -982,7 +936,7 @@ describe("Open API helpers", () => {
         depictDateOut({
           schema: z.dateOut(),
           isResponse: true,
-          next: () => ({ description: "next" }),
+          next,
         })
       ).toMatchSnapshot();
     });
@@ -991,7 +945,7 @@ describe("Open API helpers", () => {
         depictDateOut({
           schema: z.dateOut(),
           isResponse: false,
-          next: () => ({ description: "next" }),
+          next,
         });
         fail("should not be here");
       } catch (e) {
@@ -1009,7 +963,7 @@ describe("Open API helpers", () => {
           depictDate({
             isResponse,
             schema: z.date(),
-            next: () => ({ description: "next" }),
+            next,
           });
           fail("should not be here");
         } catch (e) {
@@ -1026,7 +980,7 @@ describe("Open API helpers", () => {
         depictBranded({
           schema: z.string().min(2).brand<"Test">(),
           isResponse: true,
-          next: () => ({ description: "next" }),
+          next,
         })
       ).toMatchSnapshot();
     });
