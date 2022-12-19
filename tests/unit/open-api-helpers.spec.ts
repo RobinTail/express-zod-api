@@ -8,6 +8,9 @@ import {
 } from "../../src/index";
 import { getMeta } from "../../src/metadata";
 import {
+  OpenAPIContext,
+  afterEach as afterEachSchema,
+  beforeEach as beforeEachSchema,
   depictAny,
   depictArray,
   depictBigInt,
@@ -42,22 +45,34 @@ import {
   depictTuple,
   depictUnion,
   depictUpload,
+  depicters,
   ensureShortDescription,
   excludeExampleFromDepiction,
   excludeParamsFromDepiction,
   extractObjectSchema,
   hasCoercion,
+  onMissing,
   reformatParamsInPath,
 } from "../../src/open-api-helpers";
-import { walkSchema } from "../../src/schema-walker";
+import { SchemaDepicter, walkSchema } from "../../src/schema-walker";
 import { serializeSchemaForTest } from "../helpers";
 
 describe("Open API helpers", () => {
-  const next = ({ schema }: { schema: z.ZodTypeAny }): SchemaObject => ({
-    title: "_next depicter here_",
-    type: "null",
-    format: schema._def.typeName,
-  });
+  const requestContext: OpenAPIContext = { isResponse: false };
+  const responseContext: OpenAPIContext = { isResponse: true };
+  const makeNext =
+    (
+      context: OpenAPIContext
+    ): SchemaDepicter<z.ZodTypeAny, SchemaObject, {}, "last"> =>
+    ({ schema }) =>
+      walkSchema({
+        schema,
+        depicters,
+        ...context,
+        beforeEach: beforeEachSchema,
+        afterEach: afterEachSchema,
+        onMissing,
+      });
 
   describe("extractObjectSchema()", () => {
     test("should pass the object schema through", () => {
@@ -296,8 +311,8 @@ describe("Open API helpers", () => {
       expect(
         depictDefault({
           schema: z.boolean().default(true),
-          isResponse: false,
-          next,
+          ...requestContext,
+          next: makeNext(requestContext),
         })
       ).toMatchSnapshot();
     });
@@ -308,8 +323,8 @@ describe("Open API helpers", () => {
       expect(
         depictCatch({
           schema: z.boolean().catch(true),
-          isResponse: false,
-          next,
+          ...requestContext,
+          next: makeNext(requestContext),
         })
       ).toMatchSnapshot();
     });
@@ -320,8 +335,8 @@ describe("Open API helpers", () => {
       expect(
         depictAny({
           schema: z.any(),
-          isResponse: false,
-          next,
+          ...requestContext,
+          next: makeNext(requestContext),
         })
       ).toMatchSnapshot();
     });
@@ -332,8 +347,8 @@ describe("Open API helpers", () => {
       expect(
         depictUpload({
           schema: z.upload(),
-          isResponse: false,
-          next,
+          ...requestContext,
+          next: makeNext(requestContext),
         })
       ).toMatchSnapshot();
     });
@@ -341,8 +356,8 @@ describe("Open API helpers", () => {
       try {
         depictUpload({
           schema: z.upload(),
-          isResponse: true,
-          next,
+          ...responseContext,
+          next: makeNext(responseContext),
         });
         fail("Should not be here");
       } catch (e) {
@@ -359,8 +374,8 @@ describe("Open API helpers", () => {
         expect(
           depictFile({
             schema,
-            isResponse: true,
-            next,
+            ...responseContext,
+            next: makeNext(responseContext),
           })
         ).toMatchSnapshot();
       }
@@ -369,8 +384,8 @@ describe("Open API helpers", () => {
       try {
         depictFile({
           schema: z.file().binary(),
-          isResponse: false,
-          next,
+          ...requestContext,
+          next: makeNext(requestContext),
         });
         fail("Should not be here");
       } catch (e) {
@@ -385,8 +400,8 @@ describe("Open API helpers", () => {
       expect(
         depictUnion({
           schema: z.string().or(z.number()),
-          isResponse: false,
-          next,
+          ...requestContext,
+          next: makeNext(requestContext),
         })
       ).toMatchSnapshot();
     });
@@ -403,8 +418,8 @@ describe("Open API helpers", () => {
               error: z.object({ message: z.string() }),
             }),
           ]),
-          isResponse: false,
-          next,
+          ...requestContext,
+          next: makeNext(requestContext),
         })
       ).toMatchSnapshot();
     });
@@ -417,8 +432,8 @@ describe("Open API helpers", () => {
           schema: z
             .object({ one: z.number() })
             .and(z.object({ two: z.number() })),
-          isResponse: false,
-          next,
+          ...requestContext,
+          next: makeNext(requestContext),
         })
       ).toMatchSnapshot();
     });
@@ -439,14 +454,14 @@ describe("Open API helpers", () => {
   });
 
   describe("depictOptional()", () => {
-    test.each([{ isResponse: false }, { isResponse: true }])(
+    test.each<OpenAPIContext>([{ isResponse: false }, { isResponse: true }])(
       "should pass the next depicter %#",
-      ({ isResponse }) => {
+      (context) => {
         expect(
           depictOptional({
             schema: z.string().optional(),
-            isResponse,
-            next,
+            ...context,
+            next: makeNext(context),
           })
         ).toMatchSnapshot();
       }
@@ -454,14 +469,14 @@ describe("Open API helpers", () => {
   });
 
   describe("depictNullable()", () => {
-    test.each([{ isResponse: false }, { isResponse: true }])(
+    test.each<OpenAPIContext>([{ isResponse: false }, { isResponse: true }])(
       "should set nullable:true %#",
-      ({ isResponse }) => {
+      (context) => {
         expect(
           depictNullable({
             schema: z.string().nullable(),
-            isResponse,
-            next,
+            ...context,
+            next: makeNext(context),
           })
         ).toMatchSnapshot();
       }
@@ -479,8 +494,8 @@ describe("Open API helpers", () => {
         expect(
           depictEnum({
             schema,
-            isResponse: false,
-            next,
+            ...requestContext,
+            next: makeNext(requestContext),
           })
         ).toMatchSnapshot();
       }
@@ -492,15 +507,15 @@ describe("Open API helpers", () => {
       expect(
         depictLiteral({
           schema: z.literal("testing"),
-          isResponse: false,
-          next,
+          ...requestContext,
+          next: makeNext(requestContext),
         })
       ).toMatchSnapshot();
     });
   });
 
   describe("depictObject()", () => {
-    test.each([
+    test.each<OpenAPIContext & { shape: z.ZodRawShape }>([
       {
         isResponse: false,
         shape: { a: z.number(), b: z.string() },
@@ -515,12 +530,12 @@ describe("Open API helpers", () => {
       },
     ])(
       "should type:object, properties and required props %#",
-      ({ isResponse, shape }) => {
+      ({ shape, ...context }) => {
         expect(
           depictObject({
             schema: z.object(shape),
-            isResponse,
-            next,
+            ...context,
+            next: makeNext(context),
           })
         ).toMatchSnapshot();
       }
@@ -532,8 +547,8 @@ describe("Open API helpers", () => {
       expect(
         depictNull({
           schema: z.null(),
-          isResponse: false,
-          next,
+          ...requestContext,
+          next: makeNext(requestContext),
         })
       ).toMatchSnapshot();
     });
@@ -544,8 +559,8 @@ describe("Open API helpers", () => {
       expect(
         depictBoolean({
           schema: z.boolean(),
-          isResponse: false,
-          next,
+          ...requestContext,
+          next: makeNext(requestContext),
         })
       ).toMatchSnapshot();
     });
@@ -556,8 +571,8 @@ describe("Open API helpers", () => {
       expect(
         depictBigInt({
           schema: z.bigint(),
-          isResponse: false,
-          next,
+          ...requestContext,
+          next: makeNext(requestContext),
         })
       ).toMatchSnapshot();
     });
@@ -576,8 +591,8 @@ describe("Open API helpers", () => {
         expect(
           depictRecord({
             schema,
-            isResponse: false,
-            next,
+            ...requestContext,
+            next: makeNext(requestContext),
           })
         ).toMatchSnapshot();
       }
@@ -589,8 +604,8 @@ describe("Open API helpers", () => {
       expect(
         depictArray({
           schema: z.array(z.boolean()),
-          isResponse: false,
-          next,
+          ...requestContext,
+          next: makeNext(requestContext),
         })
       ).toMatchSnapshot();
     });
@@ -601,8 +616,8 @@ describe("Open API helpers", () => {
       expect(
         depictTuple({
           schema: z.tuple([z.boolean(), z.string(), z.literal("test")]),
-          isResponse: false,
-          next,
+          ...requestContext,
+          next: makeNext(requestContext),
         })
       ).toMatchSnapshot();
     });
@@ -613,8 +628,8 @@ describe("Open API helpers", () => {
       expect(
         depictString({
           schema: z.string(),
-          isResponse: false,
-          next,
+          ...requestContext,
+          next: makeNext(requestContext),
         })
       ).toMatchSnapshot();
     });
@@ -631,8 +646,8 @@ describe("Open API helpers", () => {
       expect(
         depictString({
           schema,
-          isResponse: false,
-          next,
+          ...requestContext,
+          next: makeNext(requestContext),
         })
       ).toMatchSnapshot();
     });
@@ -645,8 +660,8 @@ describe("Open API helpers", () => {
         expect(
           depictNumber({
             schema,
-            isResponse: false,
-            next,
+            ...requestContext,
+            next: makeNext(requestContext),
           })
         ).toMatchSnapshot();
       }
@@ -661,65 +676,67 @@ describe("Open API helpers", () => {
             one: z.string(),
             two: z.boolean(),
           }),
-          isResponse: false,
-          next,
+          ...requestContext,
+          next: makeNext(requestContext),
         })
       ).toMatchSnapshot();
     });
   });
 
   describe("depictEffect()", () => {
-    test.each([
-      {
-        schema: z.string().transform((v) => parseInt(v, 10)),
-        isResponse: true,
-        expected: "number (out)",
-      },
-      {
-        schema: z.string().transform((v) => parseInt(v, 10)),
-        isResponse: false,
-        expected: "string (in)",
-      },
-      {
-        schema: z.preprocess((v) => parseInt(`${v}`, 10), z.string()),
-        isResponse: false,
-        expected: "string (preprocess)",
-      },
-      {
-        schema: z
-          .object({ s: z.string() })
-          .refine(() => false, { message: "test" }),
-        isResponse: false,
-        expected: "object (refinement)",
-      },
-    ])("should depict as $expected", ({ schema, isResponse }) => {
+    test.each<OpenAPIContext & { schema: z.ZodEffects<any>; expected: string }>(
+      [
+        {
+          schema: z.string().transform((v) => parseInt(v, 10)),
+          isResponse: true,
+          expected: "number (out)",
+        },
+        {
+          schema: z.string().transform((v) => parseInt(v, 10)),
+          isResponse: false,
+          expected: "string (in)",
+        },
+        {
+          schema: z.preprocess((v) => parseInt(`${v}`, 10), z.string()),
+          isResponse: false,
+          expected: "string (preprocess)",
+        },
+        {
+          schema: z
+            .object({ s: z.string() })
+            .refine(() => false, { message: "test" }),
+          isResponse: false,
+          expected: "object (refinement)",
+        },
+      ]
+    )("should depict as $expected", ({ schema, ...context }) => {
       expect(
         depictEffect({
           schema,
-          isResponse,
-          next,
+          ...context,
+          next: makeNext(context),
         })
       ).toMatchSnapshot();
     });
   });
 
   describe("depictPipeline", () => {
-    test.each([
+    test.each<OpenAPIContext & { expected: string }>([
       { isResponse: true, expected: "boolean (out)" },
       { isResponse: false, expected: "string (in)" },
-    ])("should depict as $expected", ({ isResponse }) => {
+    ])("should depict as $expected", (context) => {
       expect(
         depictPipeline({
-          isResponse,
           schema: z.string().pipe(z.coerce.boolean()),
-          next,
+          ...context,
+          next: makeNext(context),
         })
       ).toMatchSnapshot();
     });
   });
 
   describe("depictIOExamples()", () => {
-    test.each([
+    test.each<OpenAPIContext & Record<"case" | "action", string>>([
       { isResponse: false, case: "request", action: "pass" },
       { isResponse: true, case: "response", action: "transform" },
     ])("should $action examples in case of $case", ({ isResponse }) => {
@@ -750,7 +767,7 @@ describe("Open API helpers", () => {
   });
 
   describe("depictIOParamExamples()", () => {
-    test.each([
+    test.each<OpenAPIContext & Record<"case" | "action", string>>([
       { isResponse: false, case: "request", action: "pass" },
       { isResponse: true, case: "response", action: "transform" },
     ])("should $action examples in case of $case", ({ isResponse }) => {
@@ -856,8 +873,8 @@ describe("Open API helpers", () => {
       expect(
         depictDateIn({
           schema: z.dateIn(),
-          isResponse: false,
-          next,
+          ...requestContext,
+          next: makeNext(requestContext),
         })
       ).toMatchSnapshot();
     });
@@ -865,8 +882,8 @@ describe("Open API helpers", () => {
       try {
         depictDateIn({
           schema: z.dateIn(),
-          isResponse: true,
-          next,
+          ...responseContext,
+          next: makeNext(responseContext),
         });
         fail("should not be here");
       } catch (e) {
@@ -881,8 +898,8 @@ describe("Open API helpers", () => {
       expect(
         depictDateOut({
           schema: z.dateOut(),
-          isResponse: true,
-          next,
+          ...responseContext,
+          next: makeNext(responseContext),
         })
       ).toMatchSnapshot();
     });
@@ -890,8 +907,8 @@ describe("Open API helpers", () => {
       try {
         depictDateOut({
           schema: z.dateOut(),
-          isResponse: false,
-          next,
+          ...requestContext,
+          next: makeNext(requestContext),
         });
         fail("should not be here");
       } catch (e) {
@@ -902,14 +919,14 @@ describe("Open API helpers", () => {
   });
 
   describe("depictDate", () => {
-    test.each([{ isResponse: true }, { isResponse: false }])(
+    test.each<OpenAPIContext>([{ isResponse: true }, { isResponse: false }])(
       "should throw clear error %#",
-      ({ isResponse }) => {
+      (context) => {
         try {
           depictDate({
-            isResponse,
             schema: z.date(),
-            next,
+            ...context,
+            next: makeNext(context),
           });
           fail("should not be here");
         } catch (e) {
@@ -925,8 +942,8 @@ describe("Open API helpers", () => {
       expect(
         depictBranded({
           schema: z.string().min(2).brand<"Test">(),
-          isResponse: true,
-          next,
+          ...responseContext,
+          next: makeNext(responseContext),
         })
       ).toMatchSnapshot();
     });

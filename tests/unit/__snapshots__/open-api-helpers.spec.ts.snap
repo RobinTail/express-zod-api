@@ -9,9 +9,7 @@ exports[`Open API helpers depictAny() should set format:any 1`] = `
 exports[`Open API helpers depictArray() should set type:array and pass items depiction 1`] = `
 {
   "items": {
-    "format": "ZodBoolean",
-    "title": "_next depicter here_",
-    "type": "null",
+    "type": "boolean",
   },
   "type": "array",
 }
@@ -32,17 +30,14 @@ exports[`Open API helpers depictBoolean() should set type:boolean 1`] = `
 
 exports[`Open API helpers depictBranded should pass the next depicter 1`] = `
 {
-  "format": "ZodString",
-  "title": "_next depicter here_",
-  "type": "null",
+  "minLength": 2,
+  "type": "string",
 }
 `;
 
 exports[`Open API helpers depictCatch() should pass next depicter 1`] = `
 {
-  "format": "ZodBoolean",
-  "title": "_next depicter here_",
-  "type": "null",
+  "type": "boolean",
 }
 `;
 
@@ -80,9 +75,7 @@ exports[`Open API helpers depictDateOut should throw when ZodDateOut in request 
 exports[`Open API helpers depictDefault() should set default property 1`] = `
 {
   "default": true,
-  "format": "ZodBoolean",
-  "title": "_next depicter here_",
-  "type": "null",
+  "type": "boolean",
 }
 `;
 
@@ -93,14 +86,48 @@ exports[`Open API helpers depictDiscriminatedUnion() should wrap next depicters 
   },
   "oneOf": [
     {
-      "format": "ZodObject",
-      "title": "_next depicter here_",
-      "type": "null",
+      "properties": {
+        "data": {
+          "format": "any",
+          "nullable": true,
+        },
+        "status": {
+          "enum": [
+            "success",
+          ],
+          "type": "string",
+        },
+      },
+      "required": [
+        "status",
+      ],
+      "type": "object",
     },
     {
-      "format": "ZodObject",
-      "title": "_next depicter here_",
-      "type": "null",
+      "properties": {
+        "error": {
+          "properties": {
+            "message": {
+              "type": "string",
+            },
+          },
+          "required": [
+            "message",
+          ],
+          "type": "object",
+        },
+        "status": {
+          "enum": [
+            "error",
+          ],
+          "type": "string",
+        },
+      },
+      "required": [
+        "status",
+        "error",
+      ],
+      "type": "object",
     },
   ],
 }
@@ -108,32 +135,33 @@ exports[`Open API helpers depictDiscriminatedUnion() should wrap next depicters 
 
 exports[`Open API helpers depictEffect() should depict as number (out) 1`] = `
 {
-  "format": "ZodString",
-  "title": "_next depicter here_",
   "type": "number",
 }
 `;
 
 exports[`Open API helpers depictEffect() should depict as object (refinement) 1`] = `
 {
-  "format": "ZodObject",
-  "title": "_next depicter here_",
-  "type": "null",
+  "properties": {
+    "s": {
+      "type": "string",
+    },
+  },
+  "required": [
+    "s",
+  ],
+  "type": "object",
 }
 `;
 
 exports[`Open API helpers depictEffect() should depict as string (in) 1`] = `
 {
-  "format": "ZodString",
-  "title": "_next depicter here_",
-  "type": "null",
+  "type": "string",
 }
 `;
 
 exports[`Open API helpers depictEffect() should depict as string (preprocess) 1`] = `
 {
-  "format": "ZodString (preprocessed)",
-  "title": "_next depicter here_",
+  "format": "string (preprocessed)",
 }
 `;
 
@@ -248,14 +276,36 @@ exports[`Open API helpers depictIntersection() should wrap next depicters in all
 {
   "allOf": [
     {
-      "format": "ZodObject",
-      "title": "_next depicter here_",
-      "type": "null",
+      "properties": {
+        "one": {
+          "exclusiveMaximum": false,
+          "exclusiveMinimum": false,
+          "format": "double",
+          "maximum": 1.7976931348623157e+308,
+          "minimum": 5e-324,
+          "type": "number",
+        },
+      },
+      "required": [
+        "one",
+      ],
+      "type": "object",
     },
     {
-      "format": "ZodObject",
-      "title": "_next depicter here_",
-      "type": "null",
+      "properties": {
+        "two": {
+          "exclusiveMaximum": false,
+          "exclusiveMinimum": false,
+          "format": "double",
+          "maximum": 1.7976931348623157e+308,
+          "minimum": 5e-324,
+          "type": "number",
+        },
+      },
+      "required": [
+        "two",
+      ],
+      "type": "object",
     },
   ],
 }
@@ -280,19 +330,15 @@ exports[`Open API helpers depictNull() should set type:string format:null and nu
 
 exports[`Open API helpers depictNullable() should set nullable:true 0 1`] = `
 {
-  "format": "ZodString",
   "nullable": true,
-  "title": "_next depicter here_",
-  "type": "null",
+  "type": "string",
 }
 `;
 
 exports[`Open API helpers depictNullable() should set nullable:true 1 1`] = `
 {
-  "format": "ZodString",
   "nullable": true,
-  "title": "_next depicter here_",
-  "type": "null",
+  "type": "string",
 }
 `;
 
@@ -322,14 +368,15 @@ exports[`Open API helpers depictObject() should type:object, properties and requ
 {
   "properties": {
     "a": {
-      "format": "ZodNumber",
-      "title": "_next depicter here_",
-      "type": "null",
+      "exclusiveMaximum": false,
+      "exclusiveMinimum": false,
+      "format": "double",
+      "maximum": 1.7976931348623157e+308,
+      "minimum": 5e-324,
+      "type": "number",
     },
     "b": {
-      "format": "ZodString",
-      "title": "_next depicter here_",
-      "type": "null",
+      "type": "string",
     },
   },
   "required": [
@@ -344,14 +391,15 @@ exports[`Open API helpers depictObject() should type:object, properties and requ
 {
   "properties": {
     "a": {
-      "format": "ZodNumber",
-      "title": "_next depicter here_",
-      "type": "null",
+      "exclusiveMaximum": false,
+      "exclusiveMinimum": false,
+      "format": "double",
+      "maximum": 1.7976931348623157e+308,
+      "minimum": 5e-324,
+      "type": "number",
     },
     "b": {
-      "format": "ZodString",
-      "title": "_next depicter here_",
-      "type": "null",
+      "type": "string",
     },
   },
   "required": [
@@ -366,14 +414,15 @@ exports[`Open API helpers depictObject() should type:object, properties and requ
 {
   "properties": {
     "a": {
-      "format": "ZodNumber",
-      "title": "_next depicter here_",
-      "type": "null",
+      "exclusiveMaximum": false,
+      "exclusiveMinimum": false,
+      "format": "double",
+      "maximum": 1.7976931348623157e+308,
+      "minimum": 5e-324,
+      "type": "number",
     },
     "b": {
-      "format": "ZodString",
-      "title": "_next depicter here_",
-      "type": "null",
+      "type": "string",
     },
   },
   "required": [],
@@ -384,56 +433,42 @@ exports[`Open API helpers depictObject() should type:object, properties and requ
 exports[`Open API helpers depictObjectProperties() should wrap next depicters in a shape of object 1`] = `
 {
   "one": {
-    "format": "ZodString",
-    "title": "_next depicter here_",
-    "type": "null",
+    "type": "string",
   },
   "two": {
-    "format": "ZodBoolean",
-    "title": "_next depicter here_",
-    "type": "null",
+    "type": "boolean",
   },
 }
 `;
 
 exports[`Open API helpers depictOptional() should pass the next depicter 0 1`] = `
 {
-  "format": "ZodString",
-  "title": "_next depicter here_",
-  "type": "null",
+  "type": "string",
 }
 `;
 
 exports[`Open API helpers depictOptional() should pass the next depicter 1 1`] = `
 {
-  "format": "ZodString",
-  "title": "_next depicter here_",
-  "type": "null",
+  "type": "string",
 }
 `;
 
 exports[`Open API helpers depictPipeline should depict as boolean (out) 1`] = `
 {
-  "format": "ZodBoolean",
-  "title": "_next depicter here_",
-  "type": "null",
+  "type": "boolean",
 }
 `;
 
 exports[`Open API helpers depictPipeline should depict as string (in) 1`] = `
 {
-  "format": "ZodString",
-  "title": "_next depicter here_",
-  "type": "null",
+  "type": "string",
 }
 `;
 
 exports[`Open API helpers depictRecord() should set properties+required or additionalProperties props 1`] = `
 {
   "additionalProperties": {
-    "format": "ZodBoolean",
-    "title": "_next depicter here_",
-    "type": "null",
+    "type": "boolean",
   },
   "type": "object",
 }
@@ -442,9 +477,7 @@ exports[`Open API helpers depictRecord() should set properties+required or addit
 exports[`Open API helpers depictRecord() should set properties+required or additionalProperties props 2`] = `
 {
   "additionalProperties": {
-    "format": "ZodBoolean",
-    "title": "_next depicter here_",
-    "type": "null",
+    "type": "boolean",
   },
   "type": "object",
 }
@@ -454,14 +487,10 @@ exports[`Open API helpers depictRecord() should set properties+required or addit
 {
   "properties": {
     "one": {
-      "format": "ZodBoolean",
-      "title": "_next depicter here_",
-      "type": "null",
+      "type": "boolean",
     },
     "two": {
-      "format": "ZodBoolean",
-      "title": "_next depicter here_",
-      "type": "null",
+      "type": "boolean",
     },
   },
   "required": [
@@ -476,9 +505,7 @@ exports[`Open API helpers depictRecord() should set properties+required or addit
 {
   "properties": {
     "testing": {
-      "format": "ZodBoolean",
-      "title": "_next depicter here_",
-      "type": "null",
+      "type": "boolean",
     },
   },
   "required": [
@@ -492,14 +519,10 @@ exports[`Open API helpers depictRecord() should set properties+required or addit
 {
   "properties": {
     "one": {
-      "format": "ZodBoolean",
-      "title": "_next depicter here_",
-      "type": "null",
+      "type": "boolean",
     },
     "two": {
-      "format": "ZodBoolean",
-      "title": "_next depicter here_",
-      "type": "null",
+      "type": "boolean",
     },
   },
   "required": [
@@ -826,23 +849,20 @@ exports[`Open API helpers depictTags() should accept plain descriptions 1`] = `
 exports[`Open API helpers depictTuple() should set type:array, max- and minLength, oneOf, format:tuple and description 1`] = `
 {
   "items": {
-    "description": "0: null, 1: null, 2: null",
+    "description": "0: boolean, 1: string, 2: string",
     "format": "tuple",
     "oneOf": [
       {
-        "format": "ZodBoolean",
-        "title": "_next depicter here_",
-        "type": "null",
+        "type": "boolean",
       },
       {
-        "format": "ZodString",
-        "title": "_next depicter here_",
-        "type": "null",
+        "type": "string",
       },
       {
-        "format": "ZodLiteral",
-        "title": "_next depicter here_",
-        "type": "null",
+        "enum": [
+          "test",
+        ],
+        "type": "string",
       },
     ],
   },
@@ -856,14 +876,15 @@ exports[`Open API helpers depictUnion() should wrap next depicters into oneOf pr
 {
   "oneOf": [
     {
-      "format": "ZodString",
-      "title": "_next depicter here_",
-      "type": "null",
+      "type": "string",
     },
     {
-      "format": "ZodNumber",
-      "title": "_next depicter here_",
-      "type": "null",
+      "exclusiveMaximum": false,
+      "exclusiveMinimum": false,
+      "format": "double",
+      "maximum": 1.7976931348623157e+308,
+      "minimum": 5e-324,
+      "type": "number",
     },
   ],
 }

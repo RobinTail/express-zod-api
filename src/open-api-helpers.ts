@@ -46,7 +46,7 @@ import { ZodUpload } from "./upload-schema";
 
 type MediaExamples = Pick<MediaTypeObject, "examples">;
 
-interface OpenAPIContext {
+export interface OpenAPIContext {
   isResponse: boolean;
 }
 
@@ -597,7 +597,7 @@ export const depictRequestParams = ({
     }));
 };
 
-const depicters: DepictingRules<SchemaObject, OpenAPIContext> = {
+export const depicters: DepictingRules<SchemaObject, OpenAPIContext> = {
   ZodString: depictString,
   ZodNumber: depictNumber,
   ZodBigInt: depictBigInt,
@@ -637,7 +637,7 @@ export const hasCoercion = (schema: z.ZodType): boolean =>
     ? schema._def.coerce
     : false;
 
-const beforeEach: OpenAPIDepicter<z.ZodTypeAny, "last"> = ({
+export const beforeEach: OpenAPIDepicter<z.ZodTypeAny, "last"> = ({
   schema,
   isResponse,
 }) => {
@@ -649,11 +649,11 @@ const beforeEach: OpenAPIDepicter<z.ZodTypeAny, "last"> = ({
   };
 };
 
-const afterEach: OpenAPIDepicter<z.ZodTypeAny, "last"> = ({
+export const afterEach: OpenAPIDepicter<z.ZodTypeAny, "last"> = ({
   schema: { description },
 }) => ({ ...(description && { description }) });
 
-const onMissing = (schema: z.ZodTypeAny) => {
+export const onMissing = (schema: z.ZodTypeAny) => {
   throw new OpenAPIError(`Zod type ${schema.constructor.name} is unsupported`);
 };
 
