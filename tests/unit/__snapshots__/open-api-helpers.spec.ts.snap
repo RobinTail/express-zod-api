@@ -906,30 +906,21 @@ exports[`Open API helpers excludeExampleFromDepiction() should remove example pr
 }
 `;
 
-exports[`Open API helpers excludeParamsFromDepiction() should handle intersection 1`] = `
+exports[`Open API helpers excludeParamsFromDepiction() should omit specified path params 0 1`] = `
 {
-  "allOf": [
-    {
-      "properties": {},
-      "required": [],
-      "type": "object",
+  "properties": {
+    "b": {
+      "type": "string",
     },
-    {
-      "properties": {
-        "b": {
-          "type": "string",
-        },
-      },
-      "required": [
-        "b",
-      ],
-      "type": "object",
-    },
+  },
+  "required": [
+    "b",
   ],
+  "type": "object",
 }
 `;
 
-exports[`Open API helpers excludeParamsFromDepiction() should handle union 1`] = `
+exports[`Open API helpers excludeParamsFromDepiction() should omit specified path params 1 1`] = `
 {
   "oneOf": [
     {
@@ -952,17 +943,26 @@ exports[`Open API helpers excludeParamsFromDepiction() should handle union 1`] =
 }
 `;
 
-exports[`Open API helpers excludeParamsFromDepiction() should omit specified path params 1`] = `
+exports[`Open API helpers excludeParamsFromDepiction() should omit specified path params 2 1`] = `
 {
-  "properties": {
-    "b": {
-      "type": "string",
+  "allOf": [
+    {
+      "properties": {},
+      "required": [],
+      "type": "object",
     },
-  },
-  "required": [
-    "b",
+    {
+      "properties": {
+        "b": {
+          "type": "string",
+        },
+      },
+      "required": [
+        "b",
+      ],
+      "type": "object",
+    },
   ],
-  "type": "object",
 }
 `;
 

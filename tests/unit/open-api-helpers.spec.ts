@@ -226,68 +226,18 @@ describe("Open API helpers", () => {
   });
 
   describe("excludeParamsFromDepiction()", () => {
-    test("should omit specified path params", () => {
+    test.each<z.ZodTypeAny>([
+      z.object({ a: z.string(), b: z.string() }),
+      z.object({ a: z.string() }).or(z.object({ b: z.string() })),
+      z.object({ a: z.string() }).and(z.object({ b: z.string() })),
+    ])("should omit specified path params %#", (schema) => {
       const depicted = walkSchema({
-        schema: z.object({
-          a: z.string(),
-          b: z.string(),
-        }),
-        isResponse: false,
-        beforeEach: () => ({}),
-        afterEach: () => ({}),
-        depicters: {
-          ZodObject: depictObject,
-          ZodString: depictString,
-        },
-        onMissing: () => ({}),
-      });
-      expect(excludeParamsFromDepiction(depicted, ["a"])).toMatchSnapshot();
-    });
-
-    test("should handle union", () => {
-      const depicted = walkSchema({
-        schema: z
-          .object({
-            a: z.string(),
-          })
-          .or(
-            z.object({
-              b: z.string(),
-            })
-          ),
-        isResponse: false,
-        beforeEach: () => ({}),
-        afterEach: () => ({}),
-        depicters: {
-          ZodObject: depictObject,
-          ZodString: depictString,
-          ZodUnion: depictUnion,
-        },
-        onMissing: () => ({}),
-      });
-      expect(excludeParamsFromDepiction(depicted, ["a"])).toMatchSnapshot();
-    });
-
-    test("should handle intersection", () => {
-      const depicted = walkSchema({
-        schema: z
-          .object({
-            a: z.string(),
-          })
-          .and(
-            z.object({
-              b: z.string(),
-            })
-          ),
-        isResponse: false,
-        beforeEach: () => ({}),
-        afterEach: () => ({}),
-        depicters: {
-          ZodObject: depictObject,
-          ZodString: depictString,
-          ZodIntersection: depictIntersection,
-        },
-        onMissing: () => ({}),
+        schema,
+        ...requestContext,
+        beforeEach: beforeEachSchema,
+        afterEach: afterEachSchema,
+        depicters,
+        onMissing,
       });
       expect(excludeParamsFromDepiction(depicted, ["a"])).toMatchSnapshot();
     });
