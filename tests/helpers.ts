@@ -1,6 +1,6 @@
 import jestConfig from "../jest.config";
 import { z } from "../src";
-import { SchemaDepicter, walkSchema } from "../src/schema-walker";
+import { SchemaHandler, walkSchema } from "../src/schema-walker";
 
 export const esmTestPort = 8070;
 
@@ -22,7 +22,7 @@ export const waitFor = async (cb: () => boolean) =>
 export const serializeSchemaForTest = (
   schema: z.ZodTypeAny
 ): Record<string, any> => {
-  const onSomeUnion: SchemaDepicter<
+  const onSomeUnion: SchemaHandler<
     z.ZodUnion<any> | z.ZodDiscriminatedUnion<any, any>,
     object
   > = ({ schema: subject, next }) => ({
@@ -30,7 +30,7 @@ export const serializeSchemaForTest = (
       next({ schema: option as z.ZodTypeAny })
     ),
   });
-  const onOptionalOrNullable: SchemaDepicter<
+  const onOptionalOrNullable: SchemaHandler<
     z.ZodOptional<any> | z.ZodNullable<any>,
     object
   > = ({ schema: subject, next }) => ({
@@ -39,7 +39,7 @@ export const serializeSchemaForTest = (
   const onPrimitive = () => ({});
   return walkSchema({
     schema,
-    depicters: {
+    rules: {
       ZodNull: onPrimitive,
       ZodNumber: onPrimitive,
       ZodString: onPrimitive,

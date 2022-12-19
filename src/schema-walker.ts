@@ -4,32 +4,32 @@ import { ZodDateOutDef } from "./date-out-schema";
 import { ZodFileDef } from "./file-schema";
 import { ZodUploadDef } from "./upload-schema";
 
-export type DepicterVariant = "last" | "regular";
+export type HandlingVariant = "last" | "regular";
 type VariantDependingProps<
-  Variant extends DepicterVariant,
+  Variant extends HandlingVariant,
   U
 > = Variant extends "regular"
   ? {
-      next: SchemaDepicter<z.ZodTypeAny, U, {}, "last">;
+      next: SchemaHandler<z.ZodTypeAny, U, {}, "last">;
     }
   : {};
 
-type SchemaDepicterProps<
+type SchemaHandlingProps<
   T extends z.ZodTypeAny,
   U,
   Context extends object,
-  Variant extends DepicterVariant
+  Variant extends HandlingVariant
 > = {
   schema: T;
 } & Context &
   VariantDependingProps<Variant, U>;
 
-export type SchemaDepicter<
+export type SchemaHandler<
   T extends z.ZodTypeAny,
   U,
   Context extends object = {},
-  Variant extends DepicterVariant = "regular"
-> = (params: SchemaDepicterProps<T, U, Context, Variant>) => U;
+  Variant extends HandlingVariant = "regular"
+> = (params: SchemaHandlingProps<T, U, Context, Variant>) => U;
 
 type ProprietaryKinds =
   | ZodFileDef["typeName"]
@@ -37,46 +37,43 @@ type ProprietaryKinds =
   | ZodDateInDef["typeName"]
   | ZodDateOutDef["typeName"];
 
-export type DepictingRules<U, Context extends object = {}> = Partial<
+export type HandlingRules<U, Context extends object = {}> = Partial<
   Record<
     z.ZodFirstPartyTypeKind | ProprietaryKinds,
-    SchemaDepicter<any, U, Context>
+    SchemaHandler<any, U, Context>
   >
 >;
 
 export const walkSchema = <U, Context extends object = {}>({
   schema,
   onEach,
-  depicters,
+  rules,
   onMissing,
   ...context
-}: SchemaDepicterProps<z.ZodTypeAny, U, Context, "last"> & {
-  onEach?: SchemaDepicter<z.ZodTypeAny, U, Context, "last">;
-  depicters: DepictingRules<U, Context>;
+}: SchemaHandlingProps<z.ZodTypeAny, U, Context, "last"> & {
+  onEach?: SchemaHandler<z.ZodTypeAny, U, Context, "last">;
+  rules: HandlingRules<U, Context>;
   onMissing: (schema: z.ZodTypeAny) => U;
 }): U => {
-  const final = onEach && onEach({ schema, ...(context as Context) });
-  const depicter =
+  const overrides = onEach && onEach({ schema, ...(context as Context) });
+  const handler =
     "typeName" in schema._def
-      ? depicters[schema._def.typeName as keyof typeof depicters]
+      ? rules[schema._def.typeName as keyof typeof rules]
       : undefined;
-  const next: SchemaDepicter<z.ZodTypeAny, U, {}, "last"> = (params) =>
+  const next: SchemaHandler<z.ZodTypeAny, U, {}, "last"> = (params) =>
     walkSchema({
       ...params,
       ...(context as Context),
       onEach,
-      depicters,
+      rules: rules,
       onMissing,
     });
-  const depiction = depicter
-    ? depicter({
+  const result = handler
+    ? handler({
         schema,
         ...(context as Context),
         next,
       })
     : onMissing(schema);
-  return {
-    ...depiction,
-    ...final,
-  };
+  return overrides ? { ...result, ...overrides } : result;
 };

@@ -53,7 +53,7 @@ import {
   onMissing,
   reformatParamsInPath,
 } from "../../src/open-api-helpers";
-import { SchemaDepicter, walkSchema } from "../../src/schema-walker";
+import { SchemaHandler, walkSchema } from "../../src/schema-walker";
 import { serializeSchemaForTest } from "../helpers";
 
 describe("Open API helpers", () => {
@@ -62,11 +62,11 @@ describe("Open API helpers", () => {
   const makeNext =
     (
       context: OpenAPIContext
-    ): SchemaDepicter<z.ZodTypeAny, SchemaObject, {}, "last"> =>
+    ): SchemaHandler<z.ZodTypeAny, SchemaObject, {}, "last"> =>
     ({ schema }) =>
       walkSchema({
         schema,
-        depicters,
+        rules: depicters,
         ...context,
         onEach,
         onMissing,
@@ -159,7 +159,7 @@ describe("Open API helpers", () => {
         schema,
         ...requestContext,
         onEach,
-        depicters,
+        rules: depicters,
         onMissing,
       });
       expect(excludeParamsFromDepiction(depicted, ["a"])).toMatchSnapshot();

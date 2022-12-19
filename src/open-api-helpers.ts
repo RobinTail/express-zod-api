@@ -36,9 +36,9 @@ import {
 import { copyMeta } from "./metadata";
 import { Method } from "./method";
 import {
-  DepicterVariant,
-  DepictingRules,
-  SchemaDepicter,
+  HandlingRules,
+  HandlingVariant,
+  SchemaHandler,
   walkSchema,
 } from "./schema-walker";
 import { Security } from "./security";
@@ -52,8 +52,8 @@ export interface OpenAPIContext {
 
 type OpenAPIDepicter<
   T extends z.ZodTypeAny,
-  Variant extends DepicterVariant = "regular"
-> = SchemaDepicter<T, SchemaObject, OpenAPIContext, Variant>;
+  Variant extends HandlingVariant = "regular"
+> = SchemaHandler<T, SchemaObject, OpenAPIContext, Variant>;
 
 interface ReqResDepictHelperCommonProps {
   method: Method;
@@ -587,7 +587,7 @@ export const depictRequestParams = ({
         ...walkSchema({
           schema: shape[name],
           isResponse: false,
-          depicters,
+          rules: depicters,
           onEach,
           onMissing,
         }),
@@ -596,7 +596,7 @@ export const depictRequestParams = ({
     }));
 };
 
-export const depicters: DepictingRules<SchemaObject, OpenAPIContext> = {
+export const depicters: HandlingRules<SchemaObject, OpenAPIContext> = {
   ZodString: depictString,
   ZodNumber: depictNumber,
   ZodBigInt: depictBigInt,
@@ -717,7 +717,7 @@ export const depictResponse = ({
     walkSchema({
       schema,
       isResponse: true,
-      depicters,
+      rules: depicters,
       onEach,
       onMissing,
     })
@@ -843,7 +843,7 @@ export const depictRequest = ({
       walkSchema({
         schema: endpoint.getInputSchema(),
         isResponse: false,
-        depicters,
+        rules: depicters,
         onEach,
         onMissing,
       }),
