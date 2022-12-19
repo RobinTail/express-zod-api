@@ -218,7 +218,7 @@ exports[`Open API helpers depictIOExamples() should transform examples in case o
 }
 `;
 
-exports[`Open API helpers depictIOParamExamples() should depict examples in case of request 1`] = `
+exports[`Open API helpers depictIOParamExamples() should pass examples in case of request 1`] = `
 {
   "examples": {
     "example1": {
@@ -231,7 +231,7 @@ exports[`Open API helpers depictIOParamExamples() should depict examples in case
 }
 `;
 
-exports[`Open API helpers depictIOParamExamples() should depict examples in case of response 1`] = `
+exports[`Open API helpers depictIOParamExamples() should transform examples in case of response 1`] = `
 {
   "examples": {
     "example1": {

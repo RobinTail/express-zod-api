@@ -750,7 +750,10 @@ describe("Open API helpers", () => {
   });
 
   describe("depictIOParamExamples()", () => {
-    test("should depict examples in case of request", () => {
+    test.each([
+      { isResponse: false, case: "request", action: "pass" },
+      { isResponse: true, case: "response", action: "transform" },
+    ])("should $action examples in case of $case", ({ isResponse }) => {
       expect(
         depictIOParamExamples(
           withMeta(
@@ -770,33 +773,7 @@ describe("Open API helpers", () => {
               two: 456,
               three: false,
             }),
-          false,
-          "two"
-        )
-      ).toMatchSnapshot();
-    });
-
-    test("should depict examples in case of response", () => {
-      expect(
-        depictIOParamExamples(
-          withMeta(
-            z.object({
-              one: z.string().transform((v) => v.length),
-              two: z.number().transform((v) => `${v}`),
-              three: z.boolean(),
-            })
-          )
-            .example({
-              one: "test",
-              two: 123,
-              three: true,
-            })
-            .example({
-              one: "test2",
-              two: 456,
-              three: false,
-            }),
-          true,
+          isResponse,
           "two"
         )
       ).toMatchSnapshot();
