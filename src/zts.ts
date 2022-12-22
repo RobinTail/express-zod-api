@@ -32,16 +32,9 @@ import {
   addJsDocComment,
   createUnknownKeywordNode,
   makePropertyIdentifier,
-  makeTypeReference,
 } from "./zts-utils";
 
 const { factory: f } = ts;
-
-const onLazy: Producer<z.ZodLazy<any>> = ({ identifier }) => {
-  // it is impossible to determine what the lazy value is referring to
-  // so we force the user to declare it
-  return makeTypeReference(identifier);
-};
 
 const onLiteral: Producer<z.ZodLiteral<LiteralType>> = ({ schema }) => {
   // z.literal('hi') -> 'hi'
@@ -288,7 +281,6 @@ export const zodToTs = ({
       ZodAny: () => f.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword),
       ZodUnknown: () => createUnknownKeywordNode(),
       ZodNever: () => f.createKeywordTypeNode(ts.SyntaxKind.NeverKeyword),
-      ZodLazy: onLazy,
       ZodLiteral: onLiteral,
       ZodObject: onObject,
       ZodArray: onArray,

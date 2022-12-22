@@ -228,30 +228,6 @@ describe("zod-to-ts", () => {
     });
   });
 
-  describe("z.lazy() referencing root type", () => {
-    type User = {
-      username: string;
-      friends: User[];
-    };
-
-    const UserSchema: z.ZodSchema<User> = z.object({
-      username: z.string(),
-      friends: z.lazy(() => UserSchema).array(),
-    });
-
-    it("outputs correct typescript", () => {
-      const node = zodToTs({ schema: UserSchema, identifier: "User" });
-      expect(printNodeTest(node)).toMatchSnapshot();
-    });
-
-    it("uses `Identifier` when no identifier is passed", () => {
-      const nodeWithoutSpecifiedIdentifier = zodToTs({
-        schema: UserSchema,
-      });
-      expect(printNodeTest(nodeWithoutSpecifiedIdentifier)).toMatchSnapshot();
-    });
-  });
-
   describe("z.optional()", () => {
     const OptionalStringSchema = z.string().optional();
     const ObjectWithOptionals = z.object({

@@ -8,7 +8,7 @@ exports[`zod-to-ts Example should produce the expected results 1`] = `
         a: string;
     }[];
     d: boolean;
-    e: Example;
+    e: any;
     f: {
         a: number;
     } | "hi";
@@ -59,7 +59,7 @@ exports[`zod-to-ts Example should produce the expected results 1`] = `
     y?: string;
     z: (string | number) & ((bigint | undefined) | null);
     aa: "A" | "apple" | "banana" | "cantaloupe" | 5;
-    cc: Example;
+    cc: any;
     dd: "A" | "apple" | "banana" | "cantaloupe" | 5;
     ee: {
         kind: "circle";
@@ -140,20 +140,6 @@ exports[`zod-to-ts z.function() prints correct typescript 2 1`] = `
     price: number;
     comment: string;
 }, ...args_1: unknown[]) => unknown"
-`;
-
-exports[`zod-to-ts z.lazy() referencing root type outputs correct typescript 1`] = `
-"{
-    username: string;
-    friends: User[];
-}"
-`;
-
-exports[`zod-to-ts z.lazy() referencing root type uses \`Identifier\` when no identifier is passed 1`] = `
-"{
-    username: string;
-    friends: Identifier[];
-}"
 `;
 
 exports[`zod-to-ts z.nullable() outputs correct typescript 1`] = `
