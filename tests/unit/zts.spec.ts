@@ -24,14 +24,10 @@
  * SOFTWARE.
  */
 
+import { createTypeAlias, printNode, withGetType } from "../../src/zts-utils";
 import { NewLineKind, Node } from "typescript";
 import { z } from "../../src";
-import {
-  createTypeAlias,
-  printNode,
-  withGetType,
-  zodToTs,
-} from "../../src/zts";
+import { zodToTs } from "../../src/zts";
 
 describe("zod-to-ts", () => {
   const printNodeTest = (node: Node) =>
