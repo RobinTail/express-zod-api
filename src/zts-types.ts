@@ -28,24 +28,24 @@ import ts from "typescript";
 
 export type LiteralType = string | number | boolean;
 
-export type ZodToTsOptions = {
+export type ZTSOptions = {
   resolveNativeEnums?: boolean;
 };
-export type RequiredZodToTsOptions = Required<ZodToTsOptions>;
+export type RequiredZTSOptions = Required<ZTSOptions>;
 
-export type ZodToTsStore = {
+export type ZTSStore = {
   nativeEnums: ts.EnumDeclaration[];
 };
 
-export type ZodToTsReturn = {
+export type ZTSReturns = {
   node: ts.TypeNode;
-  store: ZodToTsStore;
+  store: ZTSStore;
 };
 
-export type GetTypeFunction = (
+export type GetTypeFn = (
   typescript: typeof ts,
   identifier: string,
-  options: RequiredZodToTsOptions
+  options: RequiredZTSOptions
 ) => ts.Identifier | ts.TypeNode;
 
-export type GetType = { getType?: GetTypeFunction };
+export type GetType = { getType?: GetTypeFn };

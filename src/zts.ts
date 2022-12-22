@@ -28,12 +28,12 @@ import ts from "typescript";
 import { ZodTypeAny } from "zod";
 import {
   GetType,
-  GetTypeFunction,
+  GetTypeFn,
   LiteralType,
-  RequiredZodToTsOptions,
-  ZodToTsOptions,
-  ZodToTsReturn,
-  ZodToTsStore,
+  RequiredZTSOptions,
+  ZTSOptions,
+  ZTSReturns,
+  ZTSStore,
 } from "./zts-types";
 import {
   addJsDocComment,
@@ -48,27 +48,25 @@ const { factory: f } = ts;
 const callGetType = (
   zod: ZodTypeAny & GetType,
   identifier: string,
-  options: RequiredZodToTsOptions
+  options: RequiredZTSOptions
 ) => {
-  let type: ReturnType<GetTypeFunction> | null = null;
+  let type: ReturnType<GetTypeFn> | null = null;
 
   // this must be called before accessing 'type'
   if (zod.getType) type = zod.getType(ts, identifier, options);
   return type;
 };
 
-export const resolveOptions = (
-  raw?: ZodToTsOptions
-): RequiredZodToTsOptions => {
-  const resolved: RequiredZodToTsOptions = { resolveNativeEnums: true };
+export const resolveOptions = (raw?: ZTSOptions): RequiredZTSOptions => {
+  const resolved: RequiredZTSOptions = { resolveNativeEnums: true };
   return { ...resolved, ...raw };
 };
 
 const zodToTsNode = (
   zod: ZodTypeAny,
   identifier: string,
-  store: ZodToTsStore,
-  options: RequiredZodToTsOptions
+  store: ZTSStore,
+  options: RequiredZTSOptions
 ): ts.TypeNode => {
   const { typeName } = zod._def;
 
@@ -363,11 +361,11 @@ const zodToTsNode = (
 export const zodToTs = (
   zod: ZodTypeAny,
   identifier?: string,
-  options?: ZodToTsOptions
-): ZodToTsReturn => {
+  options?: ZTSOptions
+): ZTSReturns => {
   const resolvedIdentifier = identifier ?? "Identifier";
   const resolvedOptions = resolveOptions(options);
-  const store: ZodToTsStore = { nativeEnums: [] };
+  const store: ZTSStore = { nativeEnums: [] };
   const node = zodToTsNode(zod, resolvedIdentifier, store, resolvedOptions);
   return { node, store };
 };

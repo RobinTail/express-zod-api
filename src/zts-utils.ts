@@ -41,7 +41,7 @@ import {
   isIdentifier,
 } from "typescript";
 import { ZodTypeAny } from "zod";
-import { GetType, GetTypeFunction } from "./zts-types";
+import { GetType, GetTypeFn } from "./zts-types";
 
 export const ensureTypeNode = (
   subject: Identifier | TypeNode
@@ -98,7 +98,7 @@ export const printNode = (node: Node, printerOptions?: PrinterOptions) => {
 
 export const withGetType = <T extends ZodTypeAny & GetType>(
   schema: T,
-  getType: GetTypeFunction
+  getType: GetTypeFn
 ): T => {
   schema.getType = getType;
   return schema;
