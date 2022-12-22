@@ -104,13 +104,13 @@ const onNativeEnum: Producer<z.ZodNativeEnum<z.EnumLike>> = ({ schema }) =>
 
 const onOptional: Producer<z.ZodOptional<z.ZodTypeAny>> = ({ next, schema }) =>
   f.createUnionTypeNode([
-    next({ schema: schema._def.innerType }),
+    next({ schema: schema.unwrap() }),
     f.createKeywordTypeNode(ts.SyntaxKind.UndefinedKeyword),
   ]);
 
 const onNullable: Producer<z.ZodNullable<z.ZodTypeAny>> = ({ next, schema }) =>
   f.createUnionTypeNode([
-    next({ schema: schema._def.innerType }),
+    next({ schema: schema.unwrap() }),
     f.createLiteralTypeNode(f.createNull()),
   ]);
 
