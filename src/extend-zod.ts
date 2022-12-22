@@ -1,9 +1,9 @@
 import { ZodDate } from "zod";
-import { withGetType } from "@express-zod-api/zod-to-ts";
 import { ZodDateIn } from "./date-in-schema";
 import { ZodDateOut } from "./date-out-schema";
 import { ZodFile } from "./file-schema";
 import { ZodUpload } from "./upload-schema";
+import { withGetType } from "./zts-utils";
 
 export * from "zod";
 export const file = ZodFile.create;

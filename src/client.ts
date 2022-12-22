@@ -1,10 +1,5 @@
 import ts from "typescript";
 import {
-  createTypeAlias,
-  printNode,
-  zodToTs,
-} from "@express-zod-api/zod-to-ts";
-import {
   cleanId,
   exportModifier,
   f,
@@ -32,6 +27,8 @@ import { methods } from "./method";
 import { mimeJson } from "./mime";
 import { Routing } from "./routing";
 import { walkRouting } from "./routing-walker";
+import { zodToTs } from "./zts";
+import { createTypeAlias, printNode } from "./zts-utils";
 
 interface Registry {
   [METHOD_PATH: string]: Record<"in" | "out", string> & { isJson: boolean };
