@@ -30,7 +30,8 @@ import {
 } from "./client-helpers";
 import { methods } from "./method";
 import { mimeJson } from "./mime";
-import { Routing, routingCycle } from "./routing";
+import { Routing } from "./routing";
+import { walkRouting } from "./routing-walker";
 
 interface Registry {
   [METHOD_PATH: string]: Record<"in" | "out", string> & { isJson: boolean };
@@ -42,9 +43,9 @@ export class Client {
   protected paths: string[] = [];
 
   constructor(routing: Routing) {
-    routingCycle({
+    walkRouting({
       routing,
-      endpointCb: (endpoint, path, method) => {
+      onEndpoint: (endpoint, path, method) => {
         const inputId = cleanId(path, method, "input");
         const responseId = cleanId(path, method, "response");
         const input = zodToTs(endpoint.getInputSchema(), inputId, {

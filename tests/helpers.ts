@@ -1,5 +1,6 @@
 import jestConfig from "../jest.config";
 import { z } from "../src";
+import { SchemaHandler, walkSchema } from "../src/schema-walker";
 
 export const esmTestPort = 8070;
 
@@ -21,65 +22,73 @@ export const waitFor = async (cb: () => boolean) =>
 export const serializeSchemaForTest = (
   schema: z.ZodTypeAny
 ): Record<string, any> => {
-  return {
-    _type: schema._def.typeName,
-    ...(schema instanceof z.ZodIntersection
-      ? {
-          left: serializeSchemaForTest(schema._def.left),
-          right: serializeSchemaForTest(schema._def.right),
-        }
-      : schema instanceof z.ZodUnion ||
-        schema instanceof z.ZodDiscriminatedUnion
-      ? {
-          options: Array.from(schema.options.values()).map((option) =>
-            serializeSchemaForTest(option as z.ZodTypeAny)
-          ),
-        }
-      : schema instanceof z.ZodObject
-      ? {
-          shape: Object.keys(schema.shape).reduce(
-            (carry, key) => ({
-              ...carry,
-              [key]: serializeSchemaForTest(schema.shape[key]),
-            }),
-            {}
-          ),
-        }
-      : schema instanceof z.ZodOptional || schema instanceof z.ZodNullable
-      ? {
-          value: serializeSchemaForTest(schema.unwrap()),
-        }
-      : schema instanceof z.ZodEffects || schema instanceof z.ZodTransformer
-      ? {
-          value: serializeSchemaForTest(schema._def.schema),
-        }
-      : schema instanceof z.ZodRecord
-      ? {
-          values: serializeSchemaForTest(schema._def.valueType),
-        }
-      : schema instanceof z.ZodArray
-      ? {
-          items: serializeSchemaForTest(schema._def.type),
-        }
-      : schema instanceof z.ZodLiteral
-      ? {
-          value: schema._def.value,
-        }
-      : schema instanceof z.ZodDefault
-      ? {
-          value: serializeSchemaForTest(schema._def.innerType),
-          default: schema._def.defaultValue(),
-        }
-      : schema instanceof z.ZodCatch
-      ? {
-          value: serializeSchemaForTest(schema._def.innerType),
-          fallback: schema._def.defaultValue(),
-        }
-      : schema instanceof z.ZodPipeline
-      ? {
-          from: serializeSchemaForTest(schema._def.in),
-          to: serializeSchemaForTest(schema._def.out),
-        }
-      : {}),
-  };
+  const onSomeUnion: SchemaHandler<
+    z.ZodUnion<any> | z.ZodDiscriminatedUnion<any, any>,
+    object
+  > = ({ schema: subject, next }) => ({
+    options: Array.from(subject.options.values()).map((option) =>
+      next({ schema: option as z.ZodTypeAny })
+    ),
+  });
+  const onOptionalOrNullable: SchemaHandler<
+    z.ZodOptional<any> | z.ZodNullable<any>,
+    object
+  > = ({ schema: subject, next }) => ({
+    value: next({ schema: subject.unwrap() }),
+  });
+  const onPrimitive = () => ({});
+  return walkSchema({
+    schema,
+    rules: {
+      ZodNull: onPrimitive,
+      ZodNumber: onPrimitive,
+      ZodString: onPrimitive,
+      ZodBoolean: onPrimitive,
+      ZodUnion: onSomeUnion,
+      ZodDiscriminatedUnion: onSomeUnion,
+      ZodOptional: onOptionalOrNullable,
+      ZodNullable: onOptionalOrNullable,
+      ZodIntersection: ({ schema: subject, next }) => ({
+        left: next({ schema: subject._def.left }),
+        right: next({ schema: subject._def.right }),
+      }),
+      ZodObject: ({ schema: subject, next }) => ({
+        shape: Object.keys(subject.shape).reduce(
+          (carry, key) => ({
+            ...carry,
+            [key]: next({ schema: subject.shape[key] }),
+          }),
+          {}
+        ),
+      }),
+      ZodEffects: ({ schema: subject, next }) => ({
+        value: next({ schema: subject._def.schema }),
+      }),
+      ZodRecord: ({ schema: subject, next }) => ({
+        keys: next({ schema: subject.keySchema }),
+        values: next({ schema: subject.valueSchema }),
+      }),
+      ZodArray: ({ schema: subject, next }) => ({
+        items: next({ schema: subject.element }),
+      }),
+      ZodLiteral: ({ schema: subject }) => ({ value: subject.value }),
+      ZodDefault: ({ schema: subject, next }) => ({
+        value: next({ schema: subject._def.innerType }),
+        default: schema._def.defaultValue(),
+      }),
+      ZodCatch: ({ schema: subject, next }) => ({
+        value: next({ schema: subject._def.innerType }),
+        fallback: schema._def.defaultValue(),
+      }),
+      ZodPipeline: ({ schema: subject, next }) => ({
+        from: next({ schema: subject._def.in }),
+        to: next({ schema: subject._def.out }),
+      }),
+    },
+    onEach: ({ schema: subject }) => ({ _type: subject._def.typeName }),
+    onMissing: (subject) => {
+      console.warn(`There is no serializer for ${subject._def.typeName}`);
+      return {};
+    },
+  });
 };

@@ -22,11 +22,11 @@ import {
   routePathParamsRegex,
 } from "./common-helpers";
 import { InputSources, TagsConfig } from "./config-type";
-import { ZodDateIn, ZodDateInDef, isoDateRegex } from "./date-in-schema";
-import { ZodDateOut, ZodDateOutDef } from "./date-out-schema";
+import { ZodDateIn, isoDateRegex } from "./date-in-schema";
+import { ZodDateOut } from "./date-out-schema";
 import { AbstractEndpoint } from "./endpoint";
 import { OpenAPIError } from "./errors";
-import { ZodFile, ZodFileDef } from "./file-schema";
+import { ZodFile } from "./file-schema";
 import { IOSchema } from "./io-schema";
 import {
   LogicalContainer,
@@ -35,27 +35,25 @@ import {
 } from "./logical-container";
 import { copyMeta } from "./metadata";
 import { Method } from "./method";
+import {
+  HandlingRules,
+  HandlingVariant,
+  SchemaHandler,
+  walkSchema,
+} from "./schema-walker";
 import { Security } from "./security";
-import { ZodUpload, ZodUploadDef } from "./upload-schema";
+import { ZodUpload } from "./upload-schema";
 
 type MediaExamples = Pick<MediaTypeObject, "examples">;
 
-type DepictHelper<T extends z.ZodType<any>> = (params: {
-  schema: T;
-  initial?: SchemaObject;
+export interface OpenAPIContext {
   isResponse: boolean;
-}) => SchemaObject;
+}
 
-type DepictingRules = Partial<
-  Record<
-    | z.ZodFirstPartyTypeKind
-    | ZodFileDef["typeName"]
-    | ZodUploadDef["typeName"]
-    | ZodDateInDef["typeName"]
-    | ZodDateOutDef["typeName"],
-    DepictHelper<any>
-  >
->;
+type Depicter<
+  T extends z.ZodTypeAny,
+  Variant extends HandlingVariant = "regular"
+> = SchemaHandler<T, SchemaObject, OpenAPIContext, Variant>;
 
 interface ReqResDepictHelperCommonProps {
   method: Method;
@@ -72,151 +70,112 @@ const isoDateDocumentationUrl =
 export const reformatParamsInPath = (path: string) =>
   path.replace(routePathParamsRegex, (param) => `{${param.slice(1)}}`);
 
-export const depictDefault: DepictHelper<z.ZodDefault<z.ZodTypeAny>> = ({
+export const depictDefault: Depicter<z.ZodDefault<z.ZodTypeAny>> = ({
   schema: {
     _def: { innerType, defaultValue },
   },
-  initial,
-  isResponse,
+  next,
 }) => ({
-  ...initial,
-  ...depictSchema({ schema: innerType, initial, isResponse }),
+  ...next({ schema: innerType }),
   default: defaultValue(),
 });
 
-export const depictCatch: DepictHelper<z.ZodCatch<z.ZodTypeAny>> = ({
+export const depictCatch: Depicter<z.ZodCatch<z.ZodTypeAny>> = ({
   schema: {
     _def: { innerType },
   },
-  initial,
-  isResponse,
-}) => ({
-  ...initial,
-  ...depictSchema({ schema: innerType, initial, isResponse }),
-});
+  next,
+}) => next({ schema: innerType });
 
-export const depictAny: DepictHelper<z.ZodAny> = ({ initial }) => ({
-  ...initial,
+export const depictAny: Depicter<z.ZodAny> = () => ({
   format: "any",
 });
 
-export const depictUpload: DepictHelper<ZodUpload> = ({
-  initial,
-  isResponse,
-}) => {
+export const depictUpload: Depicter<ZodUpload> = ({ isResponse }) => {
   if (isResponse) {
     throw new OpenAPIError("Please use z.upload() only for input.");
   }
   return {
-    ...initial,
     type: "string",
     format: "binary",
   };
 };
 
-export const depictFile: DepictHelper<ZodFile> = ({
+export const depictFile: Depicter<ZodFile> = ({
   schema: { isBinary, isBase64 },
-  initial,
   isResponse,
 }) => {
   if (!isResponse) {
     throw new OpenAPIError("Please use z.file() only within ResultHandler.");
   }
   return {
-    ...initial,
     type: "string",
     format: isBinary ? "binary" : isBase64 ? "byte" : "file",
   };
 };
 
-export const depictUnion: DepictHelper<
+export const depictUnion: Depicter<
   z.ZodUnion<[z.ZodTypeAny, ...z.ZodTypeAny[]]>
-> = ({ schema: { options }, initial, isResponse }) => ({
-  ...initial,
-  oneOf: options.map((option) => depictSchema({ schema: option, isResponse })),
+> = ({ schema: { options }, next }) => ({
+  oneOf: options.map((option) => next({ schema: option })),
 });
 
-export const depictDiscriminatedUnion: DepictHelper<
+export const depictDiscriminatedUnion: Depicter<
   z.ZodDiscriminatedUnion<string, z.ZodObject<any>[]>
-> = ({ schema: { options, discriminator }, initial, isResponse }) => {
+> = ({ schema: { options, discriminator }, next }) => {
   return {
-    ...initial,
-    discriminator: {
-      propertyName: discriminator,
-    },
+    discriminator: { propertyName: discriminator },
     oneOf: Array.from(options.values()).map((option) =>
-      depictSchema({ schema: option, isResponse })
+      next({ schema: option })
     ),
   };
 };
 
-export const depictIntersection: DepictHelper<
+export const depictIntersection: Depicter<
   z.ZodIntersection<z.ZodTypeAny, z.ZodTypeAny>
 > = ({
   schema: {
     _def: { left, right },
   },
-  initial,
-  isResponse,
+  next,
 }) => ({
-  ...initial,
-  allOf: [
-    depictSchema({ schema: left, isResponse }),
-    depictSchema({ schema: right, isResponse }),
-  ],
+  allOf: [left, right].map((entry) => next({ schema: entry })),
 });
 
-export const depictOptional: DepictHelper<z.ZodOptional<any>> = ({
+export const depictOptional: Depicter<z.ZodOptional<any>> = ({
   schema,
-  initial,
-  isResponse,
-}) => ({
-  ...initial,
-  ...depictSchema({ schema: schema.unwrap(), isResponse }),
-});
+  next,
+}) => next({ schema: schema.unwrap() });
 
-export const depictNullable: DepictHelper<z.ZodNullable<any>> = ({
+export const depictNullable: Depicter<z.ZodNullable<any>> = ({
   schema,
-  initial,
-  isResponse,
+  next,
 }) => ({
-  ...initial,
   nullable: true,
-  ...depictSchema({ schema: schema.unwrap(), isResponse }),
+  ...next({ schema: schema.unwrap() }),
 });
 
-export const depictEnum: DepictHelper<
-  z.ZodEnum<any> | z.ZodNativeEnum<any>
-> = ({
-  schema: {
-    _def: { values },
-  },
-  initial,
+export const depictEnum: Depicter<z.ZodEnum<any> | z.ZodNativeEnum<any>> = ({
+  schema,
 }) => ({
-  ...initial,
-  type: typeof Object.values(values)[0] as "string" | "number",
-  enum: Object.values(values),
+  type: typeof Object.values(schema.enum)[0] as "string" | "number",
+  enum: Object.values(schema.enum),
 });
 
-export const depictLiteral: DepictHelper<z.ZodLiteral<any>> = ({
-  schema: {
-    _def: { value },
-  },
-  initial,
+export const depictLiteral: Depicter<z.ZodLiteral<any>> = ({
+  schema: { value },
 }) => ({
-  ...initial,
   type: typeof value as "string" | "number" | "boolean",
   enum: [value],
 });
 
-export const depictObject: DepictHelper<z.AnyZodObject> = ({
+export const depictObject: Depicter<z.AnyZodObject> = ({
   schema,
-  initial,
   isResponse,
+  next,
 }) => ({
-  ...initial,
   type: "object",
-  properties: depictObjectProperties({ schema, isResponse }),
+  properties: depictObjectProperties({ schema, isResponse, next }),
   required: Object.keys(schema.shape).filter((key) => {
     const prop = schema.shape[key];
     return isResponse && hasCoercion(prop)
@@ -229,23 +188,18 @@ export const depictObject: DepictHelper<z.AnyZodObject> = ({
  * @see https://swagger.io/docs/specification/data-models/data-types/
  * @todo use type:"null" for OpenAPI 3.1
  * */
-export const depictNull: DepictHelper<z.ZodNull> = ({ initial }) => ({
-  ...initial,
+export const depictNull: Depicter<z.ZodNull> = () => ({
   type: "string",
   nullable: true,
   format: "null",
 });
 
-export const depictDateIn: DepictHelper<ZodDateIn> = ({
-  initial,
-  isResponse,
-}) => {
+export const depictDateIn: Depicter<ZodDateIn> = ({ isResponse }) => {
   if (isResponse) {
     throw new OpenAPIError("Please use z.dateOut() for output.");
   }
   return {
     description: "YYYY-MM-DDTHH:mm:ss.sssZ",
-    ...initial,
     type: "string",
     format: "date-time",
     pattern: isoDateRegex.source,
@@ -255,16 +209,12 @@ export const depictDateIn: DepictHelper<ZodDateIn> = ({
   };
 };
 
-export const depictDateOut: DepictHelper<ZodDateOut> = ({
-  initial,
-  isResponse,
-}) => {
+export const depictDateOut: Depicter<ZodDateOut> = ({ isResponse }) => {
   if (!isResponse) {
     throw new OpenAPIError("Please use z.dateIn() for input.");
   }
   return {
     description: "YYYY-MM-DDTHH:mm:ss.sssZ",
-    ...initial,
     type: "string",
     format: "date-time",
     externalDocs: {
@@ -274,7 +224,7 @@ export const depictDateOut: DepictHelper<ZodDateOut> = ({
 };
 
 /** @throws OpenAPIError */
-export const depictDate: DepictHelper<z.ZodDate> = ({ isResponse }) => {
+export const depictDate: Depicter<z.ZodDate> = ({ isResponse }) => {
   throw new OpenAPIError(
     `Using z.date() within ${
       isResponse ? "output" : "input"
@@ -284,130 +234,118 @@ export const depictDate: DepictHelper<z.ZodDate> = ({ isResponse }) => {
   );
 };
 
-export const depictBoolean: DepictHelper<z.ZodBoolean> = ({ initial }) => ({
-  ...initial,
+export const depictBoolean: Depicter<z.ZodBoolean> = () => ({
   type: "boolean",
 });
 
-export const depictBigInt: DepictHelper<z.ZodBigInt> = ({ initial }) => ({
-  ...initial,
+export const depictBigInt: Depicter<z.ZodBigInt> = () => ({
   type: "integer",
   format: "bigint",
 });
 
-export const depictRecord: DepictHelper<z.ZodRecord<z.ZodTypeAny>> = ({
-  schema: { _def: def },
-  initial,
+export const depictRecord: Depicter<z.ZodRecord<z.ZodTypeAny>> = ({
+  schema: { keySchema, valueSchema },
   isResponse,
+  next,
 }) => {
-  if (
-    def.keyType instanceof z.ZodEnum ||
-    def.keyType instanceof z.ZodNativeEnum
-  ) {
-    const keys = Object.values(def.keyType._def.values) as string[];
+  if (keySchema instanceof z.ZodEnum || keySchema instanceof z.ZodNativeEnum) {
+    const keys = Object.values(keySchema.enum) as string[];
     const shape = keys.reduce(
       (carry, key) => ({
         ...carry,
-        [key]: def.valueType,
+        [key]: valueSchema,
       }),
       {} as z.ZodRawShape
     );
     return {
-      ...initial,
       type: "object",
       properties: depictObjectProperties({
         schema: z.object(shape),
         isResponse,
+        next,
       }),
       required: keys,
     };
   }
-  if (def.keyType instanceof z.ZodLiteral) {
+  if (keySchema instanceof z.ZodLiteral) {
     return {
-      ...initial,
       type: "object",
       properties: depictObjectProperties({
         schema: z.object({
-          [def.keyType._def.value]: def.valueType,
+          [keySchema.value]: valueSchema,
         }),
         isResponse,
+        next,
       }),
-      required: [def.keyType._def.value],
+      required: [keySchema.value],
     };
   }
-  if (def.keyType instanceof z.ZodUnion) {
-    const areOptionsLiteral = def.keyType.options.reduce(
+  if (keySchema instanceof z.ZodUnion) {
+    const areOptionsLiteral = keySchema.options.reduce(
       (carry: boolean, option: z.ZodTypeAny) =>
         carry && option instanceof z.ZodLiteral,
       true
     );
     if (areOptionsLiteral) {
-      const shape = def.keyType.options.reduce(
+      const shape = keySchema.options.reduce(
         (carry: z.ZodRawShape, option: z.ZodLiteral<any>) => ({
           ...carry,
-          [option.value]: def.valueType,
+          [option.value]: valueSchema,
         }),
         {} as z.ZodRawShape
       );
       return {
-        ...initial,
         type: "object",
         properties: depictObjectProperties({
           schema: z.object(shape),
           isResponse,
+          next,
         }),
-        required: def.keyType.options.map(
+        required: keySchema.options.map(
           (option: z.ZodLiteral<any>) => option.value
         ),
       };
     }
   }
   return {
-    ...initial,
     type: "object",
-    additionalProperties: depictSchema({ schema: def.valueType, isResponse }),
+    additionalProperties: next({ schema: valueSchema }),
   };
 };
 
-export const depictArray: DepictHelper<z.ZodArray<z.ZodTypeAny>> = ({
+export const depictArray: Depicter<z.ZodArray<z.ZodTypeAny>> = ({
   schema: { _def: def, element },
-  initial,
-  isResponse,
+  next,
 }) => ({
-  ...initial,
   type: "array",
-  items: depictSchema({ schema: element, isResponse }),
-  ...(def.minLength ? { minItems: def.minLength.value } : {}),
-  ...(def.maxLength ? { maxItems: def.maxLength.value } : {}),
+  items: next({ schema: element }),
+  ...(def.minLength !== null && { minItems: def.minLength.value }),
+  ...(def.maxLength !== null && { maxItems: def.maxLength.value }),
 });
 
 /** @todo improve it when OpenAPI 3.1.0 will be released */
-export const depictTuple: DepictHelper<z.ZodTuple> = ({
+export const depictTuple: Depicter<z.ZodTuple> = ({
   schema: { items },
-  initial,
-  isResponse,
+  next,
 }) => {
-  const types = items.map((item) => depictSchema({ schema: item, isResponse }));
+  const types = items.map((item) => next({ schema: item }));
   return {
-    ...initial,
     type: "array",
     minItems: types.length,
     maxItems: types.length,
     items: {
       oneOf: types,
       format: "tuple",
-      ...(types.length === 0
-        ? {}
-        : {
-            description: types
-              .map((item, index) => `${index}: ${item.type}`)
-              .join(", "),
-          }),
+      ...(types.length > 0 && {
+        description: types
+          .map((item, index) => `${index}: ${item.type}`)
+          .join(", "),
+      }),
     },
   };
 };
 
-export const depictString: DepictHelper<z.ZodString> = ({
+export const depictString: Depicter<z.ZodString> = ({
   schema: {
     isEmail,
     isURL,
@@ -418,7 +356,6 @@ export const depictString: DepictHelper<z.ZodString> = ({
     isDatetime,
     _def: { checks },
   },
-  initial,
 }) => {
   const regexCheck = checks.find(
     (check): check is z.ZodStringCheck & { kind: "regex" } =>
@@ -438,24 +375,20 @@ export const depictString: DepictHelper<z.ZodString> = ({
       : new RegExp(`^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?Z$`)
     : undefined;
   return {
-    ...initial,
     type: "string" as const,
-    ...(isDatetime ? { format: "date-time" } : {}),
-    ...(isEmail ? { format: "email" } : {}),
-    ...(isURL ? { format: "url" } : {}),
-    ...(isUUID ? { format: "uuid" } : {}),
-    ...(isCUID ? { format: "cuid" } : {}),
-    ...(minLength ? { minLength } : {}),
-    ...(maxLength ? { maxLength } : {}),
-    ...(regex ? { pattern: `/${regex.source}/${regex.flags}` } : {}),
+    ...(isDatetime && { format: "date-time" }),
+    ...(isEmail && { format: "email" }),
+    ...(isURL && { format: "url" }),
+    ...(isUUID && { format: "uuid" }),
+    ...(isCUID && { format: "cuid" }),
+    ...(minLength !== null && { minLength }),
+    ...(maxLength !== null && { maxLength }),
+    ...(regex && { pattern: `/${regex.source}/${regex.flags}` }),
   };
 };
 
 /** @todo support exclusive min/max as numbers in case of OpenAPI v3.1.x */
-export const depictNumber: DepictHelper<z.ZodNumber> = ({
-  schema,
-  initial,
-}) => {
+export const depictNumber: Depicter<z.ZodNumber> = ({ schema }) => {
   const minCheck = schema._def.checks.find(({ kind }) => kind === "min") as
     | Extract<ArrayElement<z.ZodNumberDef["checks"]>, { kind: "min" }>
     | undefined;
@@ -465,7 +398,6 @@ export const depictNumber: DepictHelper<z.ZodNumber> = ({
     | undefined;
   const isMaxInclusive = maxCheck ? maxCheck.inclusive : true;
   return {
-    ...initial,
     type: schema.isInt ? ("integer" as const) : ("number" as const),
     format: schema.isInt ? ("int64" as const) : ("double" as const),
     minimum:
@@ -487,23 +419,23 @@ export const depictNumber: DepictHelper<z.ZodNumber> = ({
 
 export const depictObjectProperties = ({
   schema: { shape },
-  isResponse,
-}: Parameters<DepictHelper<z.AnyZodObject>>[0]) => {
+  next,
+}: Parameters<Depicter<z.AnyZodObject>>[0]) => {
   return Object.keys(shape).reduce(
     (carry, key) => ({
       ...carry,
-      [key]: depictSchema({ schema: shape[key], isResponse }),
+      [key]: next({ schema: shape[key] }),
     }),
     {} as Record<string, SchemaObject>
   );
 };
 
-export const depictEffect: DepictHelper<z.ZodEffects<z.ZodTypeAny>> = ({
+export const depictEffect: Depicter<z.ZodEffects<z.ZodTypeAny>> = ({
   schema,
-  initial,
   isResponse,
+  next,
 }) => {
-  const input = depictSchema({ schema: schema._def.schema, isResponse });
+  const input = next({ schema: schema._def.schema });
   const effect = schema._def.effect;
   if (isResponse && effect && effect.type === "transform") {
     let output = "undefined";
@@ -528,42 +460,32 @@ export const depictEffect: DepictHelper<z.ZodEffects<z.ZodTypeAny>> = ({
       /**/
     }
     return {
-      ...initial,
       ...input,
-      ...(["number", "string", "boolean"].includes(output)
-        ? {
-            type: output as "number" | "string" | "boolean",
-          }
-        : {}),
+      ...(["number", "string", "boolean"].includes(output) && {
+        type: output as "number" | "string" | "boolean",
+      }),
     };
   }
   if (!isResponse && effect && effect.type === "preprocess") {
     const { type: inputType, ...rest } = input;
     return {
-      ...initial,
       ...rest,
       format: `${rest.format || inputType} (preprocessed)`,
     };
   }
-  return { ...initial, ...input };
+  return input;
 };
 
-export const depictPipeline: DepictHelper<z.ZodPipeline<any, any>> = ({
+export const depictPipeline: Depicter<z.ZodPipeline<any, any>> = ({
   schema,
-  initial,
   isResponse,
-}) =>
-  depictSchema({
-    schema: schema._def[isResponse ? "out" : "in"],
-    isResponse,
-    initial,
-  });
+  next,
+}) => next({ schema: schema._def[isResponse ? "out" : "in"] });
 
-export const depictBranded: DepictHelper<z.ZodBranded<z.ZodTypeAny, any>> = ({
+export const depictBranded: Depicter<z.ZodBranded<z.ZodTypeAny, any>> = ({
   schema,
-  initial,
-  isResponse,
-}) => depictSchema({ schema: schema.unwrap(), isResponse, initial });
+  next,
+}) => next({ schema: schema.unwrap() });
 
 export const depictIOExamples = <T extends IOSchema>(
   schema: T,
@@ -663,13 +585,19 @@ export const depictRequestParams = ({
       required: !shape[name].isOptional(),
       schema: {
         description: `${method.toUpperCase()} ${path} parameter`,
-        ...depictSchema({ schema: shape[name], isResponse: false }),
+        ...walkSchema({
+          schema: shape[name],
+          isResponse: false,
+          rules: depicters,
+          onEach,
+          onMissing,
+        }),
       },
       ...depictIOParamExamples(schema, false, name),
     }));
 };
 
-const depictHelpers: DepictingRules = {
+export const depicters: HandlingRules<SchemaObject, OpenAPIContext> = {
   ZodString: depictString,
   ZodNumber: depictNumber,
   ZodBigInt: depictBigInt,
@@ -709,33 +637,22 @@ export const hasCoercion = (schema: z.ZodType): boolean =>
     ? schema._def.coerce
     : false;
 
-export const depictSchema: DepictHelper<z.ZodTypeAny> = ({
+export const onEach: Depicter<z.ZodTypeAny, "last"> = ({
   schema,
   isResponse,
 }) => {
-  const initial: SchemaObject = {};
-  if (schema.isNullable()) {
-    if (!(isResponse && hasCoercion(schema))) {
-      initial.nullable = true;
-    }
-  }
-  if (schema.description) {
-    initial.description = `${schema.description}`;
-  }
+  const { description } = schema;
   const examples = getExamples(schema, isResponse);
-  if (examples.length > 0) {
-    initial.example = examples[0];
-  }
-  const nextHelper =
-    "typeName" in schema._def
-      ? depictHelpers[schema._def.typeName as keyof typeof depictHelpers]
-      : null;
-  if (!nextHelper) {
-    throw new OpenAPIError(
-      `Zod type ${schema.constructor.name} is unsupported`
-    );
-  }
-  return nextHelper({ schema, initial, isResponse });
+  return {
+    ...(description && { description }),
+    ...(schema.isNullable() &&
+      !(isResponse && hasCoercion(schema)) && { nullable: true }),
+    ...(examples.length > 0 && { example: examples[0] }),
+  };
+};
+
+export const onMissing = (schema: z.ZodTypeAny) => {
+  throw new OpenAPIError(`Zod type ${schema.constructor.name} is unsupported`);
 };
 
 export const excludeParamsFromDepiction = (
@@ -798,9 +715,12 @@ export const depictResponse = ({
     ? endpoint.getPositiveMimeTypes()
     : endpoint.getNegativeMimeTypes();
   const depictedSchema = excludeExampleFromDepiction(
-    depictSchema({
+    walkSchema({
       schema,
       isResponse: true,
+      rules: depicters,
+      onEach,
+      onMissing,
     })
   );
   const examples = depictIOExamples(schema, true);
@@ -824,7 +744,7 @@ type SecurityHelper<K extends Security["type"]> = (
   security: Security & { type: K }
 ) => SecuritySchemeObject;
 
-const depictBasicSecurity: SecurityHelper<"basic"> = ({}) => ({
+const depictBasicSecurity: SecurityHelper<"basic"> = () => ({
   type: "http",
   scheme: "basic",
 });
@@ -833,7 +753,7 @@ const depictBearerSecurity: SecurityHelper<"bearer"> = ({
 }) => ({
   type: "http",
   scheme: "bearer",
-  ...(bearerFormat ? { bearerFormat } : {}),
+  ...(bearerFormat && { bearerFormat }),
 });
 // @todo add description on actual input placement
 const depictInputSecurity: SecurityHelper<"input"> = ({ name }) => ({
@@ -921,9 +841,12 @@ export const depictRequest = ({
   const pathParams = getRoutePathParams(path);
   const bodyDepiction = excludeExampleFromDepiction(
     excludeParamsFromDepiction(
-      depictSchema({
+      walkSchema({
         schema: endpoint.getInputSchema(),
         isResponse: false,
+        rules: depicters,
+        onEach,
+        onMissing,
       }),
       pathParams
     )
@@ -959,9 +882,8 @@ export const depictTags = <TAG extends string>(
     return {
       name: tag,
       description: typeof def === "string" ? def : def.description,
-      ...(typeof def === "object" && def.url
-        ? { externalDocs: { url: def.url } }
-        : {}),
+      ...(typeof def === "object" &&
+        def.url && { externalDocs: { url: def.url } }),
     };
   });
 

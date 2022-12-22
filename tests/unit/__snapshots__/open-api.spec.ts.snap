@@ -457,8 +457,6 @@ paths:
                     enum:
                       - success
                   data:
-                    example:
-                      num: 123
                     type: object
                     properties:
                       num:
@@ -470,6 +468,8 @@ paths:
                         exclusiveMaximum: false
                     required:
                       - num
+                    example:
+                      num: 123
                 required:
                   - status
                   - data
@@ -512,22 +512,22 @@ paths:
             schema:
               description: POST /v1/getSomething request body
               allOf:
-                - example:
-                    key: 1234-56789-01
-                  type: object
+                - type: object
                   properties:
                     key:
                       type: string
                   required:
                     - key
-                - example:
-                    str: test
-                  type: object
+                  example:
+                    key: 1234-56789-01
+                - type: object
                   properties:
                     str:
                       type: string
                   required:
                     - str
+                  example:
+                    str: test
             examples:
               example1:
                 value:
@@ -570,8 +570,6 @@ paths:
                     enum:
                       - success
                   data:
-                    example:
-                      numericStr: "123"
                     type: object
                     properties:
                       numericStr:
@@ -583,6 +581,8 @@ paths:
                         exclusiveMaximum: false
                     required:
                       - numericStr
+                    example:
+                      numericStr: "123"
                 required:
                   - status
                   - data
@@ -666,8 +666,6 @@ paths:
                     enum:
                       - success
                   data:
-                    example:
-                      numericStr: "123"
                     type: object
                     properties:
                       numericStr:
@@ -679,6 +677,8 @@ paths:
                         exclusiveMaximum: false
                     required:
                       - numericStr
+                    example:
+                      numericStr: "123"
                 required:
                   - status
                   - data
@@ -770,13 +770,13 @@ paths:
                     type: object
                     properties:
                       numericStr:
-                        example: "123"
                         type: string
                         format: double
                         minimum: 5e-324
                         exclusiveMinimum: false
                         maximum: 1.7976931348623157e+308
                         exclusiveMaximum: false
+                        example: "123"
                     required:
                       - numericStr
                 required:
@@ -815,8 +815,8 @@ paths:
           required: true
           schema:
             description: GET /v1/getSomething parameter
-            example: "123"
             type: string
+            example: "123"
 components:
   schemas: {}
   responses: {}
@@ -857,13 +857,13 @@ paths:
                     type: object
                     properties:
                       result:
-                        description: some positive integer
                         type: integer
                         format: int64
                         minimum: 0
                         exclusiveMinimum: true
                         maximum: 9007199254740991
                         exclusiveMaximum: false
+                        description: some positive integer
                     required:
                       - result
                 required:
@@ -1246,8 +1246,8 @@ paths:
                             enum:
                               - success
                           data:
-                            nullable: true
                             format: any
+                            nullable: true
                         required:
                           - status
                       - type: object
@@ -1774,9 +1774,6 @@ paths:
                     enum:
                       - success
                   data:
-                    example:
-                      name: John Doe
-                      createdAt: 2021-12-31T00:00:00.000Z
                     type: object
                     properties:
                       name:
@@ -1790,6 +1787,9 @@ paths:
                     required:
                       - name
                       - createdAt
+                    example:
+                      name: John Doe
+                      createdAt: 2021-12-31T00:00:00.000Z
                 required:
                   - status
                   - data
@@ -1847,19 +1847,16 @@ paths:
             schema:
               description: POST /v1/user/:id request body
               allOf:
-                - example:
-                    key: 1234-5678-90
-                  type: object
+                - type: object
                   properties:
                     key:
                       type: string
                       minLength: 1
                   required:
                     - key
-                - example:
-                    name: John Doe
-                    birthday: 1963-04-21
-                  type: object
+                  example:
+                    key: 1234-5678-90
+                - type: object
                   properties:
                     name:
                       type: string
@@ -1874,6 +1871,9 @@ paths:
                   required:
                     - name
                     - birthday
+                  example:
+                    name: John Doe
+                    birthday: 1963-04-21
             examples:
               example1:
                 value:
@@ -1971,8 +1971,8 @@ paths:
                       otherInputs:
                         type: object
                         additionalProperties:
-                          nullable: true
                           format: any
+                          nullable: true
                     required:
                       - name
                       - size
@@ -2077,8 +2077,8 @@ paths:
                     type: object
                     properties:
                       "null":
-                        nullable: true
                         type: string
+                        nullable: true
                         format: "null"
                       dateOut:
                         description: YYYY-MM-DDTHH:mm:ss.sssZ
@@ -2895,8 +2895,8 @@ paths:
                     type: object
                     properties:
                       any:
-                        nullable: true
                         format: any
+                        nullable: true
                     required: []
                 required:
                   - status
@@ -2934,8 +2934,8 @@ paths:
           required: false
           schema:
             description: GET /v1/getSomething parameter
-            nullable: true
             format: any
+            nullable: true
 components:
   schemas: {}
   responses: {}
@@ -2976,8 +2976,8 @@ paths:
                     type: object
                     properties:
                       boolean:
-                        nullable: true
                         type: boolean
+                        nullable: true
                     required: []
                 required:
                   - status
@@ -3015,8 +3015,8 @@ paths:
           required: false
           schema:
             description: GET /v1/getSomething parameter
-            nullable: true
             format: string (preprocessed)
+            nullable: true
         - name: number
           in: query
           required: true
