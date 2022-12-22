@@ -82,16 +82,9 @@ const onEnum: Producer<z.ZodEnum<[string, ...string[]]>> = ({ schema }) =>
     )
   );
 
-const onUnion: Producer<z.ZodUnion<[z.ZodTypeAny, ...z.ZodTypeAny[]]>> = ({
-  schema,
-  next,
-}) =>
-  f.createUnionTypeNode(
-    schema._def.options.map((option) => next({ schema: option }))
-  );
-
-const onDiscriminatedUnion: Producer<
-  z.ZodDiscriminatedUnion<string, z.ZodObject<z.ZodRawShape>[]>
+const onSomeUnion: Producer<
+  | z.ZodUnion<[z.ZodTypeAny, ...z.ZodTypeAny[]]>
+  | z.ZodDiscriminatedUnion<string, z.ZodObject<z.ZodRawShape>[]>
 > = ({ schema, next }) =>
   f.createUnionTypeNode(
     schema._def.options.map((option) => next({ schema: option }))
@@ -189,8 +182,8 @@ export const zodToTs = ({
       ZodObject: onObject,
       ZodArray: onArray,
       ZodEnum: onEnum,
-      ZodUnion: onUnion,
-      ZodDiscriminatedUnion: onDiscriminatedUnion,
+      ZodUnion: onSomeUnion,
+      ZodDiscriminatedUnion: onSomeUnion,
       ZodEffects: onEffects,
       ZodNativeEnum: onNativeEnum,
       ZodOptional: onOptional,
