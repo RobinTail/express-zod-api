@@ -65,9 +65,7 @@ type PostV1AvatarUploadResponse =
         size: number;
         mime: string;
         hash: string;
-        otherInputs: {
-          [x: string]: any;
-        };
+        otherInputs: Record<string, any>;
       };
     }
   | {
