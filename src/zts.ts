@@ -32,22 +32,18 @@ import { addJsDocComment, makePropertyIdentifier } from "./zts-utils";
 
 const { factory: f } = ts;
 
-const onLiteral: Producer<z.ZodLiteral<LiteralType>> = ({ schema }) => {
-  let literal: ts.LiteralExpression | ts.BooleanLiteral;
-  const literalValue = schema._def.value;
-  switch (typeof literalValue) {
-    case "number":
-      literal = f.createNumericLiteral(literalValue);
-      break;
-    case "boolean":
-      literal = literalValue ? f.createTrue() : f.createFalse();
-      break;
-    default:
-      literal = f.createStringLiteral(literalValue);
-      break;
-  }
-  return f.createLiteralTypeNode(literal);
-};
+const onLiteral: Producer<z.ZodLiteral<LiteralType>> = ({
+  schema: { value },
+}) =>
+  f.createLiteralTypeNode(
+    typeof value === "number"
+      ? f.createNumericLiteral(value)
+      : typeof value === "boolean"
+      ? value
+        ? f.createTrue()
+        : f.createFalse()
+      : f.createStringLiteral(value)
+  );
 
 const onObject: Producer<z.ZodObject<z.ZodRawShape>> = ({ schema, next }) => {
   const members = Object.entries(schema._def.shape()).map<ts.TypeElement>(
