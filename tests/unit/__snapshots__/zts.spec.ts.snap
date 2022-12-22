@@ -127,6 +127,14 @@ exports[`zod-to-ts z.discriminatedUnion() outputs correct typescript 1`] = `
 }"
 `;
 
+exports[`zod-to-ts z.literal() Should produce the correct typescript 0 1`] = `""test""`;
+
+exports[`zod-to-ts z.literal() Should produce the correct typescript 1 1`] = `"true"`;
+
+exports[`zod-to-ts z.literal() Should produce the correct typescript 2 1`] = `"false"`;
+
+exports[`zod-to-ts z.literal() Should produce the correct typescript 3 1`] = `"123"`;
+
 exports[`zod-to-ts z.nullable() outputs correct typescript 1`] = `
 "{
     username: string | null;

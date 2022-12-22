@@ -320,4 +320,15 @@ describe("zod-to-ts", () => {
       expect(printNodeTest(node)).toMatchSnapshot();
     });
   });
+
+  describe("z.literal()", () => {
+    test.each([
+      z.literal("test"),
+      z.literal(true),
+      z.literal(false),
+      z.literal(123),
+    ])("Should produce the correct typescript %#", (schema) => {
+      expect(printNodeTest(zodToTs({ schema }))).toMatchSnapshot();
+    });
+  });
 });

@@ -40,8 +40,7 @@ const onLiteral: Producer<z.ZodLiteral<LiteralType>> = ({ schema }) => {
       literal = f.createNumericLiteral(literalValue);
       break;
     case "boolean":
-      if (literalValue) literal = f.createTrue();
-      else literal = f.createFalse();
+      literal = literalValue ? f.createTrue() : f.createFalse();
       break;
     default:
       literal = f.createStringLiteral(literalValue);
