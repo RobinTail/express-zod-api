@@ -273,11 +273,6 @@ export const zodToTs = ({
       ZodUndefined: () =>
         f.createKeywordTypeNode(ts.SyntaxKind.UndefinedKeyword),
       ZodNull: () => f.createLiteralTypeNode(f.createNull()),
-      ZodVoid: () =>
-        f.createUnionTypeNode([
-          f.createKeywordTypeNode(ts.SyntaxKind.VoidKeyword),
-          f.createKeywordTypeNode(ts.SyntaxKind.UndefinedKeyword),
-        ]),
       ZodAny: () => f.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword),
       ZodUnknown: () => createUnknownKeywordNode(),
       ZodNever: () => f.createKeywordTypeNode(ts.SyntaxKind.NeverKeyword),
