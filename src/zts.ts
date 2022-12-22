@@ -117,10 +117,13 @@ const onNullable: Producer<z.ZodNullable<z.ZodTypeAny>> = ({ next, schema }) =>
 const onTuple: Producer<z.ZodTuple> = ({ next, schema: { items } }) =>
   f.createTupleTypeNode(items.map((option) => next({ schema: option })));
 
-const onRecord: Producer<z.ZodRecord> = ({ next, schema }) =>
+const onRecord: Producer<z.ZodRecord> = ({
+  next,
+  schema: { keySchema, valueSchema },
+}) =>
   f.createExpressionWithTypeArguments(f.createIdentifier("Record"), [
-    next({ schema: schema._def.keyType }),
-    next({ schema: schema._def.valueType }),
+    next({ schema: keySchema }),
+    next({ schema: valueSchema }),
   ]);
 
 const onIntersection: Producer<
