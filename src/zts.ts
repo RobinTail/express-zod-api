@@ -45,25 +45,25 @@ const onLiteral: Producer<z.ZodLiteral<LiteralType>> = ({
       : f.createStringLiteral(value)
   );
 
-const onObject: Producer<z.ZodObject<z.ZodRawShape>> = ({ schema, next }) => {
-  const members = Object.entries(schema._def.shape()).map<ts.TypeElement>(
-    ([key, value]) => {
-      const type = next({ schema: value });
-      const { typeName: nextZodNodeTypeName } = value._def;
-      const isOptional =
-        nextZodNodeTypeName === "ZodOptional" || value.isOptional();
-      const propertySignature = f.createPropertySignature(
-        undefined,
-        makePropertyIdentifier(key),
-        isOptional ? f.createToken(ts.SyntaxKind.QuestionToken) : undefined,
-        type
-      );
-      if (value.description) {
-        addJsDocComment(propertySignature, value.description);
-      }
-      return propertySignature;
+// @todo align treating optionals
+const onObject: Producer<z.ZodObject<z.ZodRawShape>> = ({
+  schema: { shape },
+  next,
+}) => {
+  const members = Object.entries(shape).map<ts.TypeElement>(([key, value]) => {
+    const { typeName: propTypeName } = value._def;
+    const isOptional = propTypeName === "ZodOptional" || value.isOptional();
+    const propertySignature = f.createPropertySignature(
+      undefined,
+      makePropertyIdentifier(key),
+      isOptional ? f.createToken(ts.SyntaxKind.QuestionToken) : undefined,
+      next({ schema: value })
+    );
+    if (value.description) {
+      addJsDocComment(propertySignature, value.description);
     }
-  );
+    return propertySignature;
+  });
   return f.createTypeLiteralNode(members);
 };
 
@@ -87,7 +87,7 @@ const onSomeUnion: Producer<
 > = ({ schema: { options }, next }) =>
   f.createUnionTypeNode(options.map((option) => next({ schema: option })));
 
-// @todo
+// @todo implement effects handling
 const onEffects: Producer<z.ZodEffects<any>> = ({ schema, next }) =>
   next({ schema: schema._def.schema });
 
