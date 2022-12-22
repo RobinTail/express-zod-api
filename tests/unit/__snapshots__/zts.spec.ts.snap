@@ -37,18 +37,16 @@ exports[`zod-to-ts Example should produce the expected results 1`] = `
             name: string;
         }
     ];
-    s: {
-        [x: string]: {
-            de: {
-                me: ([
-                    string,
-                    {
-                        a: string;
-                    }
-                ] | bigint)[];
-            };
+    s: Record<string, {
+        de: {
+            me: ([
+                string,
+                {
+                    a: string;
+                }
+            ] | bigint)[];
         };
-    };
+    }>;
     t: any;
     u: any;
     v: (string & number) | bigint;

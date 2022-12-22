@@ -122,23 +122,10 @@ const onTuple: Producer<z.ZodTuple> = ({ next, schema }) =>
     schema._def.items.map((option) => next({ schema: option }))
   );
 
-// @todo use Record
 const onRecord: Producer<z.ZodRecord> = ({ next, schema }) =>
-  f.createTypeLiteralNode([
-    f.createIndexSignature(
-      undefined,
-      [
-        f.createParameterDeclaration(
-          undefined,
-          undefined,
-          f.createIdentifier("x"),
-          undefined,
-          f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
-          undefined
-        ),
-      ],
-      next({ schema: schema._def.valueType })
-    ),
+  f.createExpressionWithTypeArguments(f.createIdentifier("Record"), [
+    next({ schema: schema._def.keyType }),
+    next({ schema: schema._def.valueType }),
   ]);
 
 const onIntersection: Producer<
