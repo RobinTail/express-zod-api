@@ -423,7 +423,7 @@ describe("zod-to-ts", () => {
       nu: z.null(),
       vo: z.void(),
       an: z.any(),
-      unknow: z.unknown(),
+      unknown: z.unknown(),
       nev: z.never(),
     });
     const { node } = zodToTs(PrimitiveSchema, "User");

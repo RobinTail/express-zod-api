@@ -94,7 +94,7 @@ exports[`zod-to-ts PrimitiveSchema outputs correct typescript 1`] = `
     nu: null;
     vo?: void | undefined;
     an?: any;
-    unknow?: unknown;
+    unknown?: unknown;
     nev: never;
 }"
 `;
