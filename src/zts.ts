@@ -84,10 +84,8 @@ const onEnum: Producer<z.ZodEnum<[string, ...string[]]>> = ({
 const onSomeUnion: Producer<
   | z.ZodUnion<[z.ZodTypeAny, ...z.ZodTypeAny[]]>
   | z.ZodDiscriminatedUnion<string, z.ZodObject<z.ZodRawShape>[]>
-> = ({ schema, next }) =>
-  f.createUnionTypeNode(
-    schema._def.options.map((option) => next({ schema: option }))
-  );
+> = ({ schema: { options }, next }) =>
+  f.createUnionTypeNode(options.map((option) => next({ schema: option })));
 
 // @todo
 const onEffects: Producer<z.ZodEffects<any>> = ({ schema, next }) =>
