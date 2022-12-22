@@ -49,10 +49,8 @@ exports[`zod-to-ts Example should produce the expected results 1`] = `
             };
         };
     };
-    t: Map<string, {
-        p: string;
-    }[]>;
-    u: Set<string>;
+    t: any;
+    u: any;
     v: (string & number) | bigint;
     w: any;
     x: any;

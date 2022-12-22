@@ -169,22 +169,6 @@ const onRecord: Producer<z.ZodRecord> = ({ next, schema }) => {
   ]);
 };
 
-const onMap: Producer<z.ZodMap> = ({ next, schema }) => {
-  // z.map(z.string()) -> Map<string>
-  const valueType = next({ schema: schema._def.valueType });
-  const keyType = next({ schema: schema._def.keyType });
-  return f.createTypeReferenceNode(f.createIdentifier("Map"), [
-    keyType,
-    valueType,
-  ]);
-};
-
-const onSet: Producer<z.ZodSet> = ({ next, schema }) => {
-  // z.set(z.string()) -> Set<string>
-  const type = next({ schema: schema._def.valueType });
-  return f.createTypeReferenceNode(f.createIdentifier("Set"), [type]);
-};
-
 const onIntersection: Producer<
   z.ZodIntersection<z.ZodTypeAny, z.ZodTypeAny>
 > = ({ next, schema }) => {
@@ -236,8 +220,6 @@ export const zodToTs = ({
       ZodNullable: onNullable,
       ZodTuple: onTuple,
       ZodRecord: onRecord,
-      ZodMap: onMap,
-      ZodSet: onSet,
       ZodIntersection: onIntersection,
       ZodDefault: onDefault,
     },

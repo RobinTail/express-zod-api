@@ -38,12 +38,6 @@ import {
   factory as f,
 } from "typescript";
 
-export const makeTypeReference = (name: string) =>
-  f.createTypeReferenceNode(f.createIdentifier(name));
-
-export const createUnknownKeywordNode = () =>
-  f.createKeywordTypeNode(SyntaxKind.UnknownKeyword);
-
 export const addJsDocComment = (node: Node, text: string) => {
   addSyntheticLeadingComment(
     node,
@@ -82,10 +76,10 @@ export const printNode = (node: Node, printerOptions?: PrinterOptions) => {
   return printer.printNode(EmitHint.Unspecified, node, sourceFile);
 };
 
-const identifierRegex = /^[A-Za-z_$][A-Za-z0-9_$]*$/;
+const safePropRegex = /^[A-Za-z_$][A-Za-z0-9_$]*$/;
 
 export const makePropertyIdentifier = (name: string) => {
-  if (identifierRegex.test(name)) {
+  if (safePropRegex.test(name)) {
     return f.createIdentifier(name);
   }
   return f.createStringLiteral(name);
