@@ -2,6 +2,12 @@
 
 ## Version 8
 
+### v8.7.0
+
+- No new features, no any fixes.
+- However, the routing initialization and the schema documenting processes have been refactored.
+  - Some properties in the documentation may change their order, but the overall depiction should remain.
+
 ### v8.6.0
 
 - `zod` version is 3.20.2.
