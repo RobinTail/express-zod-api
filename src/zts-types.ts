@@ -32,24 +32,7 @@ export type LiteralType = string | number | boolean;
 
 export type ZTSOptions = {};
 
-export type ZTSStore = {
-  nativeEnums: ts.EnumDeclaration[];
-};
-
-export type ZTSReturns = {
-  node: ts.TypeNode;
-  store: ZTSStore;
-};
-
-export type GetTypeFn = (
-  typescript: typeof ts,
-  identifier: string
-) => ts.Identifier | ts.TypeNode;
-
-export type GetType = { getType?: GetTypeFn };
-
 export type ZTSContext = {
-  store: ZTSStore;
   identifier: string;
 } & ZTSOptions;
 

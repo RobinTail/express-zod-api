@@ -8,7 +8,7 @@ exports[`zod-to-ts Example should produce the expected results 1`] = `
         a: string;
     }[];
     d: boolean;
-    e: Example["b"];
+    e: Example;
     f: {
         a: number;
     } | "hi";
@@ -58,10 +58,9 @@ exports[`zod-to-ts Example should produce the expected results 1`] = `
     x: (args_0: (string | undefined) | null, args_1: boolean, args_2: boolean, ...args_3: unknown[]) => string;
     y?: string;
     z: (string | number) & ((bigint | undefined) | null);
-    aa: Fruits;
-    bb: Date;
+    aa: "A" | "apple" | "banana" | "cantaloupe" | 5;
     cc: Example;
-    dd: unknown;
+    dd: "A" | "apple" | "banana" | "cantaloupe" | 5;
     ee: {
         kind: "circle";
         radius: number;
@@ -73,14 +72,6 @@ exports[`zod-to-ts Example should produce the expected results 1`] = `
         x: number;
         y: number;
     };
-}
-
-enum Fruits {
-    "5" = "A",
-    Apple = "apple",
-    Banana = "banana",
-    Cantaloupe = "cantaloupe",
-    A = 5
 }"
 `;
 
@@ -114,37 +105,11 @@ exports[`zod-to-ts createTypeAlias() outputs correct typescript 1`] = `
 };"
 `;
 
-exports[`zod-to-ts enums handles numeric literals with resolveNativeEnums 1`] = `
-"enum Color {
-    "0" = "Red",
-    "1" = "Green",
-    "2" = "Blue",
-    Red = 0,
-    Green = 1,
-    Blue = 2
-}"
-`;
+exports[`zod-to-ts enums handles numeric literals with resolveNativeEnums 1`] = `""Red" | "Green" | "Blue" | 0 | 1 | 2"`;
 
-exports[`zod-to-ts enums handles string literal properties 1`] = `
-"enum StringLiteral {
-    "0" = "Two Words",
-    "1" = "'Quotes\\"",
-    "2" = "\\\\\\"Escaped\\\\\\"",
-    "Two Words" = 0,
-    "'Quotes\\"" = 1,
-    "\\\\\\"Escaped\\\\\\"" = 2
-}"
-`;
+exports[`zod-to-ts enums handles string literal properties 1`] = `""Two Words" | "'Quotes\\"" | "\\\\\\"Escaped\\\\\\"" | 0 | 1 | 2"`;
 
-exports[`zod-to-ts enums handles string literals with resolveNativeEnums 1`] = `
-"enum Fruit {
-    Apple = "apple",
-    Banana = "banana",
-    Cantaloupe = "cantaloupe"
-}"
-`;
-
-exports[`zod-to-ts enums uses identifier provided using \`withGetType\` 1`] = `"Color"`;
+exports[`zod-to-ts enums handles string literals with resolveNativeEnums 1`] = `""apple" | "banana" | "cantaloupe""`;
 
 exports[`zod-to-ts z.array() outputs correct typescript 1`] = `
 "{
@@ -175,13 +140,6 @@ exports[`zod-to-ts z.function() prints correct typescript 2 1`] = `
     price: number;
     comment: string;
 }, ...args_1: unknown[]) => unknown"
-`;
-
-exports[`zod-to-ts z.instanceof() outputs correct typescript 1`] = `
-"{
-    name: string;
-    date: Date;
-}"
 `;
 
 exports[`zod-to-ts z.lazy() referencing root type outputs correct typescript 1`] = `

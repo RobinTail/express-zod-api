@@ -26,31 +26,17 @@
 
 import {
   EmitHint,
-  Identifier,
   Node,
   PrinterOptions,
   ScriptKind,
   ScriptTarget,
   SyntaxKind,
   TypeNode,
-  TypeReferenceNode,
   addSyntheticLeadingComment,
   createPrinter,
   createSourceFile,
   factory as f,
-  isIdentifier,
 } from "typescript";
-import { ZodTypeAny } from "zod";
-import { GetType, GetTypeFn } from "./zts-types";
-
-export const ensureTypeNode = (
-  subject: Identifier | TypeNode
-): TypeNode | TypeReferenceNode => {
-  if (isIdentifier(subject)) {
-    return f.createTypeReferenceNode(subject);
-  }
-  return subject;
-};
 
 export const makeTypeReference = (name: string) =>
   f.createTypeReferenceNode(f.createIdentifier(name));
@@ -94,14 +80,6 @@ export const printNode = (node: Node, printerOptions?: PrinterOptions) => {
   );
   const printer = createPrinter(printerOptions);
   return printer.printNode(EmitHint.Unspecified, node, sourceFile);
-};
-
-export const withGetType = <T extends ZodTypeAny & GetType>(
-  schema: T,
-  getType: GetTypeFn
-): T => {
-  schema.getType = getType;
-  return schema;
 };
 
 const identifierRegex = /^[A-Za-z_$][A-Za-z0-9_$]*$/;

@@ -55,12 +55,8 @@ export class Client {
             .or(endpoint.getNegativeResponseSchema()),
           identifier: responseId,
         });
-        const inputAlias = createTypeAlias(input.node, inputId);
-        const responseAlias = createTypeAlias(response.node, responseId);
-        this.agg.push(
-          ...input.store.nativeEnums,
-          ...response.store.nativeEnums
-        );
+        const inputAlias = createTypeAlias(input, inputId);
+        const responseAlias = createTypeAlias(response, responseId);
         this.agg.push(inputAlias);
         this.agg.push(responseAlias);
         if (method !== "options") {
