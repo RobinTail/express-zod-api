@@ -4,7 +4,7 @@ import { ZodDateOutDef } from "./date-out-schema";
 import { ZodFileDef } from "./file-schema";
 import { ZodUploadDef } from "./upload-schema";
 
-export type HandlingVariant = "last" | "regular";
+export type HandlingVariant = "last" | "each" | "regular";
 type VariantDependingProps<
   Variant extends HandlingVariant,
   U
@@ -29,7 +29,9 @@ export type SchemaHandler<
   U,
   Context extends object = {},
   Variant extends HandlingVariant = "regular"
-> = (params: SchemaHandlingProps<T, U, Context, Variant>) => U;
+> = (
+  params: SchemaHandlingProps<T, U, Context, Variant>
+) => Variant extends "each" ? U | undefined : U;
 
 type ProprietaryKinds =
   | ZodFileDef["typeName"]
@@ -51,7 +53,7 @@ export const walkSchema = <U, Context extends object = {}>({
   onMissing,
   ...context
 }: SchemaHandlingProps<z.ZodTypeAny, U, Context, "last"> & {
-  onEach?: SchemaHandler<z.ZodTypeAny, U, Context, "last">;
+  onEach?: SchemaHandler<z.ZodTypeAny, U, Context, "each">;
   rules: HandlingRules<U, Context>;
   onMissing: (schema: z.ZodTypeAny) => U;
 }): U => {

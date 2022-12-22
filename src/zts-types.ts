@@ -25,6 +25,8 @@
  */
 
 import ts from "typescript";
+import { z } from "zod";
+import { HandlingVariant, SchemaHandler } from "./schema-walker";
 
 export type LiteralType = string | number | boolean;
 
@@ -49,3 +51,13 @@ export type GetTypeFn = (
 ) => ts.Identifier | ts.TypeNode;
 
 export type GetType = { getType?: GetTypeFn };
+
+export type ZTSContext = {
+  store: ZTSStore;
+  identifier: string;
+} & RequiredZTSOptions;
+
+export type Producer<
+  T extends z.ZodTypeAny,
+  Variant extends HandlingVariant = "regular"
+> = SchemaHandler<T, ts.TypeNode, ZTSContext, Variant>;
