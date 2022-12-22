@@ -28,11 +28,7 @@ import ts from "typescript";
 import { z } from "zod";
 import { walkSchema } from "./schema-walker";
 import { LiteralType, Producer, ZTSContext, ZTSOptions } from "./zts-types";
-import {
-  addJsDocComment,
-  createUnknownKeywordNode,
-  makePropertyIdentifier,
-} from "./zts-utils";
+import { addJsDocComment, makePropertyIdentifier } from "./zts-utils";
 
 const { factory: f } = ts;
 
@@ -198,55 +194,9 @@ const onIntersection: Producer<
   return f.createIntersectionTypeNode([left, right]);
 };
 
-const onPromise: Producer<z.ZodPromise<z.ZodTypeAny>> = ({ next, schema }) => {
-  // z.promise(z.string()) -> Promise<string>
-  const type = next({ schema: schema._def.type });
-  return f.createTypeReferenceNode(f.createIdentifier("Promise"), [type]);
-};
-
-const onFunction: Producer<z.ZodFunction<z.ZodTuple, z.ZodTypeAny>> = ({
-  schema,
-  next,
-}) => {
-  // z.function().args(z.string()).returns(z.number()) -> (args_0: string) => number
-  const argTypes = schema._def.args._def.items.map((arg, index) => {
-    const argType = next({ schema: arg });
-    return f.createParameterDeclaration(
-      undefined,
-      undefined,
-      f.createIdentifier(`args_${index}`),
-      undefined,
-      argType,
-      undefined
-    );
-  });
-  argTypes.push(
-    f.createParameterDeclaration(
-      undefined,
-      f.createToken(ts.SyntaxKind.DotDotDotToken),
-      f.createIdentifier(`args_${argTypes.length}`),
-      undefined,
-      f.createArrayTypeNode(createUnknownKeywordNode()),
-      undefined
-    )
-  );
-
-  const returnType = next({ schema: schema._def.returns });
-  return f.createFunctionTypeNode(undefined, argTypes, returnType);
-};
-
 const onDefault: Producer<z.ZodDefault<z.ZodTypeAny>> = ({ next, schema }) => {
   // z.string().optional().default('hi') -> string
-  const type = next({ schema: schema._def.innerType });
-  const filteredNodes: ts.Node[] = [];
-  type.forEachChild((entry) => {
-    if (entry.kind !== ts.SyntaxKind.UndefinedKeyword) {
-      filteredNodes.push(entry);
-    }
-  });
-  // @ts-expect-error needed to set children
-  type.types = filteredNodes;
-  return type;
+  return next({ schema: schema._def.innerType }); // fixed by Robin
 };
 
 export const zodToTs = ({

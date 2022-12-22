@@ -56,7 +56,7 @@ exports[`zod-to-ts Example should produce the expected results 1`] = `
     v: (string & number) | bigint;
     w: any;
     x: any;
-    y?: string;
+    y?: string | undefined;
     z: (string | number) & ((bigint | undefined) | null);
     aa: "A" | "apple" | "banana" | "cantaloupe" | 5;
     cc: any;
