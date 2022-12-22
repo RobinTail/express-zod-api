@@ -19,8 +19,8 @@ exports[`zod-to-ts Example should produce the expected results 1`] = `
     k: null;
     l?: any;
     m?: any;
-    n?: unknown;
-    o: never;
+    n?: any;
+    o: any;
     p?: string | undefined;
     q: {
         a?: string | undefined;
@@ -54,8 +54,8 @@ exports[`zod-to-ts Example should produce the expected results 1`] = `
     }[]>;
     u: Set<string>;
     v: (string & number) | bigint;
-    w: Promise<number>;
-    x: (args_0: (string | undefined) | null, args_1: boolean, args_2: boolean, ...args_3: unknown[]) => string;
+    w: any;
+    x: any;
     y?: string;
     z: (string | number) & ((bigint | undefined) | null);
     aa: "A" | "apple" | "banana" | "cantaloupe" | 5;
@@ -85,8 +85,8 @@ exports[`zod-to-ts PrimitiveSchema outputs correct typescript 1`] = `
     nu: null;
     vo?: any;
     an?: any;
-    unknown?: unknown;
-    nev: never;
+    unknown?: any;
+    nev: any;
 }"
 `;
 
@@ -130,16 +130,6 @@ exports[`zod-to-ts z.discriminatedUnion() outputs correct typescript 1`] = `
     x: number;
     y: number;
 }"
-`;
-
-exports[`zod-to-ts z.function() prints correct typescript 1`] = `"(args_0: (string | undefined) | null, args_1: boolean, args_2: boolean, ...args_3: unknown[]) => string"`;
-
-exports[`zod-to-ts z.function() prints correct typescript 2 1`] = `
-"(args_0: {
-    name: string;
-    price: number;
-    comment: string;
-}, ...args_1: unknown[]) => unknown"
 `;
 
 exports[`zod-to-ts z.nullable() outputs correct typescript 1`] = `

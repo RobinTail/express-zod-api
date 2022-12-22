@@ -206,28 +206,6 @@ describe("zod-to-ts", () => {
     });
   });
 
-  describe("z.function()", () => {
-    it("prints correct typescript", () => {
-      const schema = z
-        .function()
-        .args(z.string().nullish().default("name"), z.boolean(), z.boolean())
-        .returns(z.string());
-      const node = zodToTs({ schema, identifier: "Function" });
-      expect(printNodeTest(node)).toMatchSnapshot();
-    });
-
-    it("prints correct typescript 2", () => {
-      const schema = z
-        .function()
-        .args(
-          z.object({ name: z.string(), price: z.number(), comment: z.string() })
-        )
-        .describe("create an item");
-      const node = zodToTs({ schema });
-      expect(printNodeTest(node)).toMatchSnapshot();
-    });
-  });
-
   describe("z.optional()", () => {
     const OptionalStringSchema = z.string().optional();
     const ObjectWithOptionals = z.object({
