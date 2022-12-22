@@ -24,38 +24,51 @@
  * SOFTWARE.
  */
 
-import ts from "typescript";
+import {
+  EmitHint,
+  Identifier,
+  Node,
+  PrinterOptions,
+  ScriptKind,
+  ScriptTarget,
+  SyntaxKind,
+  TypeNode,
+  TypeReferenceNode,
+  addSyntheticLeadingComment,
+  createPrinter,
+  createSourceFile,
+  factory as f,
+  isIdentifier,
+} from "typescript";
 import { ZodTypeAny } from "zod";
 import { GetType, GetTypeFunction } from "./zts-types";
-const { factory: f } = ts;
 
-export const maybeIdentifierToTypeReference = (
-  identifier: ts.Identifier | ts.TypeNode
-) => {
-  if (ts.isIdentifier(identifier)) {
-    return f.createTypeReferenceNode(identifier);
+export const ensureTypeNode = (
+  subject: Identifier | TypeNode
+): TypeNode | TypeReferenceNode => {
+  if (isIdentifier(subject)) {
+    return f.createTypeReferenceNode(subject);
   }
-
-  return identifier;
+  return subject;
 };
 
-export const createTypeReferenceFromString = (identifier: string) =>
-  f.createTypeReferenceNode(f.createIdentifier(identifier));
+export const makeTypeReference = (name: string) =>
+  f.createTypeReferenceNode(f.createIdentifier(name));
 
 export const createUnknownKeywordNode = () =>
-  f.createKeywordTypeNode(ts.SyntaxKind.UnknownKeyword);
+  f.createKeywordTypeNode(SyntaxKind.UnknownKeyword);
 
-export const addJsDocComment = (node: ts.Node, text: string) => {
-  ts.addSyntheticLeadingComment(
+export const addJsDocComment = (node: Node, text: string) => {
+  addSyntheticLeadingComment(
     node,
-    ts.SyntaxKind.MultiLineCommentTrivia,
+    SyntaxKind.MultiLineCommentTrivia,
     `* ${text} `,
     true
   );
 };
 
 export const createTypeAlias = (
-  node: ts.TypeNode,
+  node: TypeNode,
   identifier: string,
   comment?: string
 ) => {
@@ -65,27 +78,22 @@ export const createTypeAlias = (
     undefined,
     node
   );
-
   if (comment) {
     addJsDocComment(typeAlias, comment);
   }
-
   return typeAlias;
 };
 
-export const printNode = (
-  node: ts.Node,
-  printerOptions?: ts.PrinterOptions
-) => {
-  const sourceFile = ts.createSourceFile(
+export const printNode = (node: Node, printerOptions?: PrinterOptions) => {
+  const sourceFile = createSourceFile(
     "print.ts",
     "",
-    ts.ScriptTarget.Latest,
+    ScriptTarget.Latest,
     false,
-    ts.ScriptKind.TS
+    ScriptKind.TS
   );
-  const printer = ts.createPrinter(printerOptions);
-  return printer.printNode(ts.EmitHint.Unspecified, node, sourceFile);
+  const printer = createPrinter(printerOptions);
+  return printer.printNode(EmitHint.Unspecified, node, sourceFile);
 };
 
 export const withGetType = <T extends ZodTypeAny & GetType>(
@@ -96,12 +104,11 @@ export const withGetType = <T extends ZodTypeAny & GetType>(
   return schema;
 };
 
-const identifierRE = /^[A-Za-z_$][A-Za-z0-9_$]*$/;
+const identifierRegex = /^[A-Za-z_$][A-Za-z0-9_$]*$/;
 
-export const getIdentifierOrStringLiteral = (str: string) => {
-  if (identifierRE.test(str)) {
-    return f.createIdentifier(str);
+export const makePropertyIdentifier = (name: string) => {
+  if (identifierRegex.test(name)) {
+    return f.createIdentifier(name);
   }
-
-  return f.createStringLiteral(str);
+  return f.createStringLiteral(name);
 };

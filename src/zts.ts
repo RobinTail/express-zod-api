@@ -38,10 +38,10 @@ import {
 import {
   addJsDocComment,
   createTypeAlias,
-  createTypeReferenceFromString,
   createUnknownKeywordNode,
-  getIdentifierOrStringLiteral,
-  maybeIdentifierToTypeReference,
+  ensureTypeNode,
+  makePropertyIdentifier,
+  makeTypeReference,
   printNode,
 } from "./zts-utils";
 
@@ -93,7 +93,7 @@ const zodToTsNode = (
   const getTypeType = callGetType(zod, identifier, options);
   // special case native enum, which needs an identifier node
   if (getTypeType && typeName !== "ZodNativeEnum") {
-    return maybeIdentifierToTypeReference(getTypeType);
+    return ensureTypeNode(getTypeType);
   }
 
   const otherArgs = [identifier, store, options] as const;
@@ -127,7 +127,7 @@ const zodToTsNode = (
     case "ZodLazy": {
       // it is impossible to determine what the lazy value is referring to
       // so we force the user to declare it
-      if (!getTypeType) return createTypeReferenceFromString(identifier);
+      if (!getTypeType) return makeTypeReference(identifier);
       break;
     }
     case "ZodLiteral": {
@@ -163,7 +163,7 @@ const zodToTsNode = (
 
         const propertySignature = f.createPropertySignature(
           undefined,
-          getIdentifierOrStringLiteral(key),
+          makePropertyIdentifier(key),
           isOptional ? f.createToken(ts.SyntaxKind.QuestionToken) : undefined,
           type
         );
@@ -230,7 +230,7 @@ const zodToTsNode = (
               ? f.createNumericLiteral(value)
               : f.createStringLiteral(value);
 
-          return f.createEnumMember(getIdentifierOrStringLiteral(key), literal);
+          return f.createEnumMember(makePropertyIdentifier(key), literal);
         });
 
         if (ts.isIdentifier(type)) {
@@ -244,7 +244,7 @@ const zodToTsNode = (
         }
       }
 
-      type = maybeIdentifierToTypeReference(type);
+      type = ensureTypeNode(type);
 
       return type;
     }
