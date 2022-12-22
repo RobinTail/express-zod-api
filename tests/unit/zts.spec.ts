@@ -81,17 +81,17 @@ describe("zod-to-ts", () => {
       '\\"Escaped\\"',
     }
 
-    it("handles numeric literals with resolveNativeEnums", () => {
+    it("handles numeric literals", () => {
       const node = zodToTs({ schema: z.nativeEnum(Color) });
       expect(printNodeTest(node)).toMatchSnapshot();
     });
 
-    it("handles string literals with resolveNativeEnums", () => {
+    it("handles string literals", () => {
       const node = zodToTs({ schema: z.nativeEnum(Fruit) });
       expect(printNodeTest(node)).toMatchSnapshot();
     });
 
-    it("handles string literal properties", () => {
+    it("handles quoted string literals", () => {
       const node = zodToTs({ schema: z.nativeEnum(StringLiteral) });
       expect(printNodeTest(node)).toMatchSnapshot();
     });
@@ -106,89 +106,84 @@ describe("zod-to-ts", () => {
       A = 5,
     }
 
-    const example2 = z.object({
-      a: z.string(),
-      b: z.number(),
-      c: z.array(z.string()).nonempty().length(10),
-      d: z.object({
-        e: z.string(),
-      }),
-    });
+    const pickedSchema = z
+      .object({
+        string: z.string(),
+        number: z.number(),
+        fixedArrayOfString: z.array(z.string()).nonempty().length(10),
+        object: z.object({
+          string: z.string(),
+        }),
+      })
+      .partial();
 
-    const pickedSchema = example2.partial();
-
-    const nativeEnum = z.nativeEnum(Fruits);
-
-    type ELazy = {
-      a: string;
-      b: ELazy;
-    };
-
-    // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    const eLazy: z.ZodSchema<ELazy> = z.lazy(() => e3);
-
-    const e3 = z.object({
-      a: z.string(),
-      b: eLazy,
-    });
+    const circular: z.ZodLazy<z.ZodTypeAny> = z.lazy(() =>
+      z.object({
+        a: z.string(),
+        b: circular,
+      })
+    );
 
     const example = z.object({
-      a: z.string(),
-      b: z.number(),
-      c: z.array(
+      string: z.string(),
+      number: z.number(),
+      arrayOfObjects: z.array(
         z.object({
-          a: z.string(),
+          string: z.string(),
         })
       ),
-      d: z.boolean(),
-      e: eLazy,
-      f: z.union([z.object({ a: z.number() }), z.literal("hi")]),
-      g: z.enum(["hi", "bye"]),
-      h: z
+      boolean: z.boolean(),
+      circular,
+      union: z.union([z.object({ number: z.number() }), z.literal("hi")]),
+      enum: z.enum(["hi", "bye"]),
+      intersectionWithTransform: z
         .number()
         .and(z.bigint())
         .and(z.number().and(z.string()))
         .transform((arg) => console.log(arg)),
-      i: z.date(),
-      j: z.undefined(),
-      k: z.null(),
-      l: z.void(),
-      m: z.any(),
-      n: z.unknown(),
-      o: z.never(),
-      p: z.optional(z.string()),
-      q: z.nullable(pickedSchema),
-      r: z.tuple([z.string(), z.number(), z.object({ name: z.string() })]),
-      s: z.record(
+      date: z.date(),
+      undefined: z.undefined(),
+      null: z.null(),
+      void: z.void(),
+      any: z.any(),
+      unknown: z.unknown(),
+      never: z.never(),
+      optionalString: z.optional(z.string()),
+      nullablePartialObject: z.nullable(pickedSchema),
+      tuple: z.tuple([
+        z.string(),
+        z.number(),
+        z.object({ string: z.string() }),
+      ]),
+      record: z.record(
         z.object({
-          de: z.object({
-            me: z
+          object: z.object({
+            arrayOfUnions: z
               .union([
-                z.tuple([z.string(), z.object({ a: z.string() })]),
+                z.tuple([z.string(), z.object({ string: z.string() })]),
                 z.bigint(),
               ])
               .array(),
           }),
         })
       ),
-      t: z.map(z.string(), z.array(z.object({ p: z.string() }))),
-      u: z.set(z.string()),
-      v: z.intersection(z.string(), z.number()).or(z.bigint()),
-      w: z.promise(z.number()),
-      x: z
+      map: z.map(z.string(), z.array(z.object({ string: z.string() }))),
+      set: z.set(z.string()),
+      intersection: z.intersection(z.string(), z.number()).or(z.bigint()),
+      promise: z.promise(z.number()),
+      function: z
         .function()
         .args(z.string().nullish().default("heo"), z.boolean(), z.boolean())
         .returns(z.string()),
-      y: z.string().optional().default("hi"),
-      z: z
+      optDefaultString: z.string().optional().default("hi"),
+      refinedStringWithSomeBullshit: z
         .string()
         .refine((val) => val.length > 10)
         .or(z.number())
         .and(z.bigint().nullish().default(1000n)),
-      aa: nativeEnum,
-      cc: z.lazy(() => z.string()),
-      dd: z.nativeEnum(Fruits),
-      ee: z.discriminatedUnion("kind", [
+      nativeEnum: z.nativeEnum(Fruits),
+      lazy: z.lazy(() => z.string()),
+      discUnion: z.discriminatedUnion("kind", [
         z.object({ kind: z.literal("circle"), radius: z.number() }),
         z.object({ kind: z.literal("square"), x: z.number() }),
         z.object({ kind: z.literal("triangle"), x: z.number(), y: z.number() }),
@@ -204,9 +199,9 @@ describe("zod-to-ts", () => {
   });
 
   describe("z.optional()", () => {
-    const OptionalStringSchema = z.string().optional();
-    const ObjectWithOptionals = z.object({
-      optional: OptionalStringSchema,
+    const optionalStringSchema = z.string().optional();
+    const objectWithOptionals = z.object({
+      optional: optionalStringSchema,
       required: z.string(),
       transform: z
         .number()
@@ -226,21 +221,21 @@ describe("zod-to-ts", () => {
     });
 
     it("outputs correct typescript", () => {
-      const node = zodToTs({ schema: OptionalStringSchema });
+      const node = zodToTs({ schema: optionalStringSchema });
       expect(printNodeTest(node)).toMatchSnapshot();
     });
 
     it("should output `?:` and undefined union for optional properties", () => {
-      const node = zodToTs({ schema: ObjectWithOptionals });
+      const node = zodToTs({ schema: objectWithOptionals });
       expect(printNodeTest(node)).toMatchSnapshot();
     });
   });
 
   describe("z.nullable()", () => {
-    const NullableUsernameSchema = z.object({
+    const nullableUsernameSchema = z.object({
       username: z.string().nullable(),
     });
-    const node = zodToTs({ schema: NullableUsernameSchema });
+    const node = zodToTs({ schema: nullableUsernameSchema });
 
     it("outputs correct typescript", () => {
       expect(printNodeTest(node)).toMatchSnapshot();
@@ -294,19 +289,19 @@ describe("zod-to-ts", () => {
   });
 
   describe("PrimitiveSchema", () => {
-    const PrimitiveSchema = z.object({
-      username: z.string(),
-      age: z.number(),
-      isAdmin: z.boolean(),
-      createdAt: z.date(),
-      undef: z.undefined(),
-      nu: z.null(),
-      vo: z.void(),
-      an: z.any(),
+    const primitiveSchema = z.object({
+      string: z.string(),
+      number: z.number(),
+      boolean: z.boolean(),
+      date: z.date(),
+      undefined: z.undefined(),
+      null: z.null(),
+      void: z.void(),
+      any: z.any(),
       unknown: z.unknown(),
-      nev: z.never(),
+      never: z.never(),
     });
-    const node = zodToTs({ schema: PrimitiveSchema });
+    const node = zodToTs({ schema: primitiveSchema });
 
     it("outputs correct typescript", () => {
       expect(printNodeTest(node)).toMatchSnapshot();
@@ -314,12 +309,12 @@ describe("zod-to-ts", () => {
   });
 
   describe("z.discriminatedUnion()", () => {
-    const ShapeSchema = z.discriminatedUnion("kind", [
+    const shapeSchema = z.discriminatedUnion("kind", [
       z.object({ kind: z.literal("circle"), radius: z.number() }),
       z.object({ kind: z.literal("square"), x: z.number() }),
       z.object({ kind: z.literal("triangle"), x: z.number(), y: z.number() }),
     ]);
-    const node = zodToTs({ schema: ShapeSchema });
+    const node = zodToTs({ schema: shapeSchema });
 
     it("outputs correct typescript", () => {
       expect(printNodeTest(node)).toMatchSnapshot();

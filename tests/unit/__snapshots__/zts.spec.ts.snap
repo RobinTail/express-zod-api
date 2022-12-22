@@ -2,62 +2,61 @@
 
 exports[`zod-to-ts Example should produce the expected results 1`] = `
 "{
-    a: string;
-    b: number;
-    c: {
-        a: string;
+    string: string;
+    number: number;
+    arrayOfObjects: {
+        string: string;
     }[];
-    d: boolean;
-    e: any;
-    f: {
-        a: number;
+    boolean: boolean;
+    circular: any;
+    union: {
+        number: number;
     } | "hi";
-    g: "hi" | "bye";
-    h: (number & bigint) & (number & string);
-    i: Date;
-    j?: undefined;
-    k: null;
-    l?: any;
-    m?: any;
-    n?: any;
-    o: any;
-    p?: string | undefined;
-    q: {
-        a?: string | undefined;
-        b?: number | undefined;
-        c?: string[] | undefined;
-        d?: {
-            e: string;
+    enum: "hi" | "bye";
+    intersectionWithTransform: (number & bigint) & (number & string);
+    date: Date;
+    undefined?: undefined;
+    null: null;
+    void?: any;
+    any?: any;
+    unknown?: any;
+    never: any;
+    optionalString?: string | undefined;
+    nullablePartialObject: {
+        string?: string | undefined;
+        number?: number | undefined;
+        fixedArrayOfString?: string[] | undefined;
+        object?: {
+            string: string;
         } | undefined;
     } | null;
-    r: [
+    tuple: [
         string,
         number,
         {
-            name: string;
+            string: string;
         }
     ];
-    s: Record<string, {
-        de: {
-            me: ([
+    record: Record<string, {
+        object: {
+            arrayOfUnions: ([
                 string,
                 {
-                    a: string;
+                    string: string;
                 }
             ] | bigint)[];
         };
     }>;
-    t: any;
-    u: any;
-    v: (string & number) | bigint;
-    w: any;
-    x: any;
-    y?: string | undefined;
-    z: (string | number) & ((bigint | undefined) | null);
-    aa: "A" | "apple" | "banana" | "cantaloupe" | 5;
-    cc: any;
-    dd: "A" | "apple" | "banana" | "cantaloupe" | 5;
-    ee: {
+    map: any;
+    set: any;
+    intersection: (string & number) | bigint;
+    promise: any;
+    function: any;
+    optDefaultString?: string | undefined;
+    refinedStringWithSomeBullshit: (string | number) & ((bigint | undefined) | null);
+    nativeEnum: "A" | "apple" | "banana" | "cantaloupe" | 5;
+    lazy: any;
+    discUnion: {
         kind: "circle";
         radius: number;
     } | {
@@ -73,16 +72,16 @@ exports[`zod-to-ts Example should produce the expected results 1`] = `
 
 exports[`zod-to-ts PrimitiveSchema outputs correct typescript 1`] = `
 "{
-    username: string;
-    age: number;
-    isAdmin: boolean;
-    createdAt: Date;
-    undef?: undefined;
-    nu: null;
-    vo?: any;
-    an?: any;
+    string: string;
+    number: number;
+    boolean: boolean;
+    date: Date;
+    undefined?: undefined;
+    null: null;
+    void?: any;
+    any?: any;
     unknown?: any;
-    nev: any;
+    never: any;
 }"
 `;
 
@@ -101,11 +100,11 @@ exports[`zod-to-ts createTypeAlias() outputs correct typescript 1`] = `
 };"
 `;
 
-exports[`zod-to-ts enums handles numeric literals with resolveNativeEnums 1`] = `""Red" | "Green" | "Blue" | 0 | 1 | 2"`;
+exports[`zod-to-ts enums handles numeric literals 1`] = `""Red" | "Green" | "Blue" | 0 | 1 | 2"`;
 
-exports[`zod-to-ts enums handles string literal properties 1`] = `""Two Words" | "'Quotes\\"" | "\\\\\\"Escaped\\\\\\"" | 0 | 1 | 2"`;
+exports[`zod-to-ts enums handles quoted string literals 1`] = `""Two Words" | "'Quotes\\"" | "\\\\\\"Escaped\\\\\\"" | 0 | 1 | 2"`;
 
-exports[`zod-to-ts enums handles string literals with resolveNativeEnums 1`] = `""apple" | "banana" | "cantaloupe""`;
+exports[`zod-to-ts enums handles string literals 1`] = `""apple" | "banana" | "cantaloupe""`;
 
 exports[`zod-to-ts z.array() outputs correct typescript 1`] = `
 "{
