@@ -37,7 +37,6 @@ describe("zod-to-ts", () => {
     it("outputs correct typescript", () => {
       const node = zodToTs({
         schema: z.object({ id: z.number(), value: z.string() }).array(),
-        identifier: "User",
       });
       expect(printNodeTest(node)).toMatchSnapshot();
     });
@@ -47,7 +46,6 @@ describe("zod-to-ts", () => {
     const identifier = "User";
     const node = zodToTs({
       schema: z.object({ username: z.string(), age: z.number() }),
-      identifier,
     });
 
     it("outputs correct typescript", () => {
@@ -200,7 +198,6 @@ describe("zod-to-ts", () => {
     it("should produce the expected results", () => {
       const node = zodToTs({
         schema: example,
-        identifier: "Example",
       });
       expect(printNode(node)).toMatchSnapshot();
     });
@@ -309,7 +306,7 @@ describe("zod-to-ts", () => {
       unknown: z.unknown(),
       nev: z.never(),
     });
-    const node = zodToTs({ schema: PrimitiveSchema, identifier: "User" });
+    const node = zodToTs({ schema: PrimitiveSchema });
 
     it("outputs correct typescript", () => {
       expect(printNodeTest(node)).toMatchSnapshot();
@@ -322,7 +319,7 @@ describe("zod-to-ts", () => {
       z.object({ kind: z.literal("square"), x: z.number() }),
       z.object({ kind: z.literal("triangle"), x: z.number(), y: z.number() }),
     ]);
-    const node = zodToTs({ schema: ShapeSchema, identifier: "Shape" });
+    const node = zodToTs({ schema: ShapeSchema });
 
     it("outputs correct typescript", () => {
       expect(printNodeTest(node)).toMatchSnapshot();

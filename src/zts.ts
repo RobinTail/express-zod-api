@@ -155,15 +155,12 @@ const onDefault: Producer<z.ZodDefault<z.ZodTypeAny>> = ({ next, schema }) =>
 
 export const zodToTs = ({
   schema,
-  identifier,
   ...options
 }: {
   schema: z.ZodTypeAny;
-  identifier?: string;
 } & ZTSOptions): ts.TypeNode => {
   return walkSchema<ts.TypeNode, ZTSContext>({
     schema,
-    identifier: identifier || "Identifier",
     rules: {
       ZodDateIn: () =>
         ts.factory.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),

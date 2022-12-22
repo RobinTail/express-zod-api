@@ -47,13 +47,11 @@ export class Client {
         const responseId = cleanId(path, method, "response");
         const input = zodToTs({
           schema: endpoint.getInputSchema(),
-          identifier: inputId,
         });
         const response = zodToTs({
           schema: endpoint
             .getPositiveResponseSchema()
             .or(endpoint.getNegativeResponseSchema()),
-          identifier: responseId,
         });
         const inputAlias = createTypeAlias(input, inputId);
         const responseAlias = createTypeAlias(response, responseId);

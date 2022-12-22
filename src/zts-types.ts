@@ -32,9 +32,7 @@ export type LiteralType = string | number | boolean;
 
 export type ZTSOptions = {};
 
-export type ZTSContext = {
-  identifier: string;
-} & ZTSOptions;
+export type ZTSContext = {} & ZTSOptions;
 
 export type Producer<
   T extends z.ZodTypeAny,
