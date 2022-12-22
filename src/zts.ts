@@ -93,7 +93,7 @@ const onEffects: Producer<z.ZodEffects<any>> = ({ schema, next }) =>
 
 const onNativeEnum: Producer<z.ZodNativeEnum<z.EnumLike>> = ({ schema }) =>
   f.createUnionTypeNode(
-    Object.values(schema._def.values).map((value) =>
+    Object.values(schema.enum).map((value) =>
       f.createLiteralTypeNode(
         typeof value === "number"
           ? f.createNumericLiteral(value)
