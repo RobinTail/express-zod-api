@@ -67,8 +67,10 @@ const onObject: Producer<z.ZodObject<z.ZodRawShape>> = ({ schema, next }) => {
   return f.createTypeLiteralNode(members);
 };
 
-const onArray: Producer<z.ZodArray<z.ZodTypeAny>> = ({ schema, next }) =>
-  f.createArrayTypeNode(next({ schema: schema._def.type }));
+const onArray: Producer<z.ZodArray<z.ZodTypeAny>> = ({
+  schema: { element },
+  next,
+}) => f.createArrayTypeNode(next({ schema: element }));
 
 const onEnum: Producer<z.ZodEnum<[string, ...string[]]>> = ({ schema }) =>
   f.createUnionTypeNode(
