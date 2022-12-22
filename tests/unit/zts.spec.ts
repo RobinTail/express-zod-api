@@ -24,10 +24,10 @@
  * SOFTWARE.
  */
 
-import { createTypeAlias, printNode, withGetType } from "../../src/zts-utils";
 import { NewLineKind, Node } from "typescript";
 import { z } from "../../src";
 import { zodToTs } from "../../src/zts";
+import { createTypeAlias, printNode, withGetType } from "../../src/zts-utils";
 
 describe("zod-to-ts", () => {
   const printNodeTest = (node: Node) =>
@@ -35,28 +35,20 @@ describe("zod-to-ts", () => {
 
   describe("z.array()", () => {
     it("outputs correct typescript", () => {
-      const { node } = zodToTs(
-        z
-          .object({
-            id: z.number(),
-            value: z.string(),
-          })
-          .array(),
-        "User"
-      );
+      const { node } = zodToTs({
+        schema: z.object({ id: z.number(), value: z.string() }).array(),
+        identifier: "User",
+      });
       expect(printNodeTest(node)).toMatchSnapshot();
     });
   });
 
   describe("createTypeAlias()", () => {
     const identifier = "User";
-    const { node } = zodToTs(
-      z.object({
-        username: z.string(),
-        age: z.number(),
-      }),
-      identifier
-    );
+    const { node } = zodToTs({
+      schema: z.object({ username: z.string(), age: z.number() }),
+      identifier,
+    });
 
     it("outputs correct typescript", () => {
       const typeAlias = createTypeAlias(node, identifier);
@@ -95,7 +87,7 @@ describe("zod-to-ts", () => {
       const schema = withGetType(z.nativeEnum(Color), (ts) =>
         ts.factory.createIdentifier("Color")
       );
-      const { node } = zodToTs(schema);
+      const { node } = zodToTs({ schema });
       expect(printNodeTest(node)).toMatchSnapshot();
     });
 
@@ -103,9 +95,7 @@ describe("zod-to-ts", () => {
       const schema = withGetType(z.nativeEnum(Color), (ts) =>
         ts.factory.createIdentifier("Color")
       );
-      const { store } = zodToTs(schema, undefined, {
-        resolveNativeEnums: true,
-      });
+      const { store } = zodToTs({ schema });
       expect(printNodeTest(store.nativeEnums[0])).toMatchSnapshot();
     });
 
@@ -113,9 +103,7 @@ describe("zod-to-ts", () => {
       const schema = withGetType(z.nativeEnum(Fruit), (ts) =>
         ts.factory.createIdentifier("Fruit")
       );
-      const { store } = zodToTs(schema, undefined, {
-        resolveNativeEnums: true,
-      });
+      const { store } = zodToTs({ schema });
       expect(printNodeTest(store.nativeEnums[0])).toMatchSnapshot();
     });
 
@@ -123,9 +111,7 @@ describe("zod-to-ts", () => {
       const schema = withGetType(z.nativeEnum(StringLiteral), (ts) =>
         ts.factory.createIdentifier("StringLiteral")
       );
-      const { store } = zodToTs(schema, undefined, {
-        resolveNativeEnums: true,
-      });
+      const { store } = zodToTs({ schema });
       expect(printNodeTest(store.nativeEnums[0])).toMatchSnapshot();
     });
   });
@@ -150,12 +136,8 @@ describe("zod-to-ts", () => {
 
     const pickedSchema = example2.partial();
 
-    const nativeEnum = withGetType(z.nativeEnum(Fruits), (ts, _, options) => {
-      const identifier = ts.factory.createIdentifier("Fruits");
-
-      if (options.resolveNativeEnums) return identifier;
-
-      return ts.factory.createTypeReferenceNode(identifier, undefined);
+    const nativeEnum = withGetType(z.nativeEnum(Fruits), (ts) => {
+      return ts.factory.createIdentifier("Fruits");
     });
 
     type ELazy = {
@@ -250,8 +232,9 @@ describe("zod-to-ts", () => {
     });
 
     it("should produce the expected results", () => {
-      const { node, store } = zodToTs(example, "Example", {
-        resolveNativeEnums: true,
+      const { node, store } = zodToTs({
+        schema: example,
+        identifier: "Example",
       });
       const output = [printNode(node)]
         .concat(store.nativeEnums.map((e) => printNode(e)))
@@ -266,7 +249,7 @@ describe("zod-to-ts", () => {
         .function()
         .args(z.string().nullish().default("name"), z.boolean(), z.boolean())
         .returns(z.string());
-      const { node } = zodToTs(schema, "Function");
+      const { node } = zodToTs({ schema, identifier: "Function" });
       expect(printNodeTest(node)).toMatchSnapshot();
     });
 
@@ -277,7 +260,7 @@ describe("zod-to-ts", () => {
           z.object({ name: z.string(), price: z.number(), comment: z.string() })
         )
         .describe("create an item");
-      const { node } = zodToTs(schema);
+      const { node } = zodToTs({ schema });
       expect(printNodeTest(node)).toMatchSnapshot();
     });
   });
@@ -290,7 +273,7 @@ describe("zod-to-ts", () => {
       name: z.string(),
       date: dateType,
     });
-    const { node } = zodToTs(schema, "Item");
+    const { node } = zodToTs({ schema, identifier: "Item" });
 
     it("outputs correct typescript", () => {
       expect(printNodeTest(node)).toMatchSnapshot();
@@ -307,14 +290,16 @@ describe("zod-to-ts", () => {
       username: z.string(),
       friends: z.lazy(() => UserSchema).array(),
     });
-    const { node } = zodToTs(UserSchema, "User");
+    const { node } = zodToTs({ schema: UserSchema, identifier: "User" });
 
     it("outputs correct typescript", () => {
       expect(printNodeTest(node)).toMatchSnapshot();
     });
 
     it("uses `Identifier` when no identifier is passed", () => {
-      const { node: nodeWithoutSpecifiedIdentifier } = zodToTs(UserSchema);
+      const { node: nodeWithoutSpecifiedIdentifier } = zodToTs({
+        schema: UserSchema,
+      });
       expect(printNodeTest(nodeWithoutSpecifiedIdentifier)).toMatchSnapshot();
     });
   });
@@ -342,12 +327,12 @@ describe("zod-to-ts", () => {
     });
 
     it("outputs correct typescript", () => {
-      const { node } = zodToTs(OptionalStringSchema);
+      const { node } = zodToTs({ schema: OptionalStringSchema });
       expect(printNodeTest(node)).toMatchSnapshot();
     });
 
     it("should output `?:` and undefined union for optional properties", () => {
-      const { node } = zodToTs(ObjectWithOptionals);
+      const { node } = zodToTs({ schema: ObjectWithOptionals });
       expect(printNodeTest(node)).toMatchSnapshot();
     });
   });
@@ -356,7 +341,7 @@ describe("zod-to-ts", () => {
     const NullableUsernameSchema = z.object({
       username: z.string().nullable(),
     });
-    const { node } = zodToTs(NullableUsernameSchema);
+    const { node } = zodToTs({ schema: NullableUsernameSchema });
 
     it("outputs correct typescript", () => {
       expect(printNodeTest(node)).toMatchSnapshot();
@@ -369,7 +354,7 @@ describe("zod-to-ts", () => {
         "string-literal": z.string(),
         5: z.number(),
       });
-      const { node } = zodToTs(schema);
+      const { node } = zodToTs({ schema });
       expect(printNodeTest(node)).toMatchSnapshot();
     });
 
@@ -379,7 +364,7 @@ describe("zod-to-ts", () => {
         name: z.string(),
         countryOfOrigin: z.string(),
       });
-      const { node } = zodToTs(schema);
+      const { node } = zodToTs({ schema });
       expect(printNodeTest(node)).toMatchSnapshot();
     });
 
@@ -395,7 +380,7 @@ describe("zod-to-ts", () => {
         _r: z.any(),
         "-r": z.undefined(),
       });
-      const { node } = zodToTs(schema);
+      const { node } = zodToTs({ schema });
       expect(printNodeTest(node)).toMatchSnapshot();
     });
 
@@ -404,7 +389,7 @@ describe("zod-to-ts", () => {
         name: z.string().describe("The name of the item"),
         price: z.number().describe("The price of the item"),
       });
-      const { node } = zodToTs(schema);
+      const { node } = zodToTs({ schema });
       expect(printNodeTest(node)).toMatchSnapshot();
     });
   });
@@ -422,7 +407,7 @@ describe("zod-to-ts", () => {
       unknown: z.unknown(),
       nev: z.never(),
     });
-    const { node } = zodToTs(PrimitiveSchema, "User");
+    const { node } = zodToTs({ schema: PrimitiveSchema, identifier: "User" });
 
     it("outputs correct typescript", () => {
       expect(printNodeTest(node)).toMatchSnapshot();
@@ -435,7 +420,7 @@ describe("zod-to-ts", () => {
       z.object({ kind: z.literal("square"), x: z.number() }),
       z.object({ kind: z.literal("triangle"), x: z.number(), y: z.number() }),
     ]);
-    const { node } = zodToTs(ShapeSchema, "Shape");
+    const { node } = zodToTs({ schema: ShapeSchema, identifier: "Shape" });
 
     it("outputs correct typescript", () => {
       expect(printNodeTest(node)).toMatchSnapshot();

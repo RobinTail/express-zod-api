@@ -30,10 +30,7 @@ import { HandlingVariant, SchemaHandler } from "./schema-walker";
 
 export type LiteralType = string | number | boolean;
 
-export type ZTSOptions = {
-  resolveNativeEnums?: boolean;
-};
-export type RequiredZTSOptions = Required<ZTSOptions>;
+export type ZTSOptions = {};
 
 export type ZTSStore = {
   nativeEnums: ts.EnumDeclaration[];
@@ -46,8 +43,7 @@ export type ZTSReturns = {
 
 export type GetTypeFn = (
   typescript: typeof ts,
-  identifier: string,
-  options: RequiredZTSOptions
+  identifier: string
 ) => ts.Identifier | ts.TypeNode;
 
 export type GetType = { getType?: GetTypeFn };
@@ -55,7 +51,7 @@ export type GetType = { getType?: GetTypeFn };
 export type ZTSContext = {
   store: ZTSStore;
   identifier: string;
-} & RequiredZTSOptions;
+} & ZTSOptions;
 
 export type Producer<
   T extends z.ZodTypeAny,

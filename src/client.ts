@@ -45,16 +45,16 @@ export class Client {
       onEndpoint: (endpoint, path, method) => {
         const inputId = cleanId(path, method, "input");
         const responseId = cleanId(path, method, "response");
-        const input = zodToTs(endpoint.getInputSchema(), inputId, {
-          resolveNativeEnums: true,
+        const input = zodToTs({
+          schema: endpoint.getInputSchema(),
+          identifier: inputId,
         });
-        const response = zodToTs(
-          endpoint
+        const response = zodToTs({
+          schema: endpoint
             .getPositiveResponseSchema()
             .or(endpoint.getNegativeResponseSchema()),
-          responseId,
-          { resolveNativeEnums: true }
-        );
+          identifier: responseId,
+        });
         const inputAlias = createTypeAlias(input.node, inputId);
         const responseAlias = createTypeAlias(response.node, responseId);
         this.agg.push(

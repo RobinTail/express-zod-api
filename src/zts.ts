@@ -32,7 +32,6 @@ import {
   GetTypeFn,
   LiteralType,
   Producer,
-  RequiredZTSOptions,
   ZTSContext,
   ZTSOptions,
   ZTSReturns,
@@ -48,31 +47,17 @@ import {
 
 const { factory: f } = ts;
 
-const callGetType = (
-  zod: z.ZodTypeAny & GetType,
-  identifier: string,
-  options: RequiredZTSOptions
-) => {
+const callGetType = (zod: z.ZodTypeAny & GetType, identifier: string) => {
   let type: ReturnType<GetTypeFn> | null = null;
-
   // this must be called before accessing 'type'
-  if (zod.getType) type = zod.getType(ts, identifier, options);
+  if (zod.getType) type = zod.getType(ts, identifier);
   return type;
 };
 
-export const resolveOptions = (raw?: ZTSOptions): RequiredZTSOptions => {
-  const resolved: RequiredZTSOptions = { resolveNativeEnums: true };
-  return { ...resolved, ...raw };
-};
-
-const onLazy: Producer<z.ZodLazy<any>> = ({
-  schema,
-  resolveNativeEnums,
-  identifier,
-}) => {
+const onLazy: Producer<z.ZodLazy<any>> = ({ schema, identifier }) => {
   // it is impossible to determine what the lazy value is referring to
   // so we force the user to declare it
-  const customNode = callGetType(schema, identifier, { resolveNativeEnums });
+  const customNode = callGetType(schema, identifier);
   if (!customNode) return makeTypeReference(identifier);
   return f.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword);
 };
@@ -157,35 +142,28 @@ const onEffects: Producer<z.ZodEffects<any>> = ({ schema, next }) => {
 const onNativeEnum: Producer<z.ZodNativeEnum<z.EnumLike>> = ({
   schema,
   identifier,
-  resolveNativeEnums,
   store,
 }) => {
   // z.nativeEnum(Fruits) -> Fruits
   // can resolve Fruits into store and user can handle enums
-  let type = callGetType(schema, identifier, {
-    resolveNativeEnums,
-  });
+  let type = callGetType(schema, identifier);
   if (!type) return createUnknownKeywordNode();
-  if (resolveNativeEnums) {
-    const enumMembers = Object.entries(schema._def.values).map(
-      ([key, value]) => {
-        const literal =
-          typeof value === "number"
-            ? f.createNumericLiteral(value)
-            : f.createStringLiteral(value);
+  const enumMembers = Object.entries(schema._def.values).map(([key, value]) => {
+    const literal =
+      typeof value === "number"
+        ? f.createNumericLiteral(value)
+        : f.createStringLiteral(value);
 
-        return f.createEnumMember(makePropertyIdentifier(key), literal);
-      }
+    return f.createEnumMember(makePropertyIdentifier(key), literal);
+  });
+  if (ts.isIdentifier(type)) {
+    store.nativeEnums.push(
+      f.createEnumDeclaration(undefined, type, enumMembers)
     );
-    if (ts.isIdentifier(type)) {
-      store.nativeEnums.push(
-        f.createEnumDeclaration(undefined, type, enumMembers)
-      );
-    } else {
-      throw new Error(
-        "getType on nativeEnum must return an identifier when resolveNativeEnums is set"
-      );
-    }
+  } else {
+    throw new Error(
+      "getType on nativeEnum must return an identifier when resolveNativeEnums is set"
+    );
   }
   return ensureTypeNode(type);
 };
@@ -315,28 +293,27 @@ const onDefault: Producer<z.ZodDefault<z.ZodTypeAny>> = ({ next, schema }) => {
   return type;
 };
 
-const onEach: Producer<z.ZodTypeAny, "each"> = ({
-  schema,
-  resolveNativeEnums,
-  identifier,
-}) => {
-  const customNode = callGetType(schema, identifier, {
-    resolveNativeEnums,
-  });
+const onEach: Producer<z.ZodTypeAny, "each"> = ({ schema, identifier }) => {
+  const customNode = callGetType(schema, identifier);
   // special case native enum, which needs an identifier node
   if (customNode) {
     return ensureTypeNode(customNode);
   }
 };
 
-export const zodToTs = (
-  zod: z.ZodTypeAny,
-  identifier?: string,
-  options?: ZTSOptions
-): ZTSReturns => {
+export const zodToTs = ({
+  schema,
+  identifier,
+  ...options
+}: {
+  schema: z.ZodTypeAny;
+  identifier?: string;
+} & ZTSOptions): ZTSReturns => {
   const store: ZTSStore = { nativeEnums: [] };
   const node = walkSchema<ts.TypeNode, ZTSContext>({
-    schema: zod,
+    schema,
+    identifier: identifier || "Identifier",
+    store,
     rules: {
       ZodString: () => f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
       ZodNumber: () => f.createKeywordTypeNode(ts.SyntaxKind.NumberKeyword),
@@ -376,9 +353,7 @@ export const zodToTs = (
     },
     onEach,
     onMissing: () => f.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword),
-    store,
-    identifier: identifier || "Identifier",
-    ...resolveOptions(options),
+    ...options,
   });
   return { node, store };
 };
