@@ -24,31 +24,20 @@
  * SOFTWARE.
  */
 
-import {
-  EmitHint,
-  Node,
-  PrinterOptions,
-  ScriptKind,
-  ScriptTarget,
-  SyntaxKind,
-  TypeNode,
-  addSyntheticLeadingComment,
-  createPrinter,
-  createSourceFile,
-  factory as f,
-} from "typescript";
+import ts from "typescript";
+const { factory: f } = ts;
 
-export const addJsDocComment = (node: Node, text: string) => {
-  addSyntheticLeadingComment(
+export const addJsDocComment = (node: ts.Node, text: string) => {
+  ts.addSyntheticLeadingComment(
     node,
-    SyntaxKind.MultiLineCommentTrivia,
+    ts.SyntaxKind.MultiLineCommentTrivia,
     `* ${text} `,
     true
   );
 };
 
 export const createTypeAlias = (
-  node: TypeNode,
+  node: ts.TypeNode,
   identifier: string,
   comment?: string
 ) => {
@@ -64,16 +53,19 @@ export const createTypeAlias = (
   return typeAlias;
 };
 
-export const printNode = (node: Node, printerOptions?: PrinterOptions) => {
-  const sourceFile = createSourceFile(
+export const printNode = (
+  node: ts.Node,
+  printerOptions?: ts.PrinterOptions
+) => {
+  const sourceFile = ts.createSourceFile(
     "print.ts",
     "",
-    ScriptTarget.Latest,
+    ts.ScriptTarget.Latest,
     false,
-    ScriptKind.TS
+    ts.ScriptKind.TS
   );
-  const printer = createPrinter(printerOptions);
-  return printer.printNode(EmitHint.Unspecified, node, sourceFile);
+  const printer = ts.createPrinter(printerOptions);
+  return printer.printNode(ts.EmitHint.Unspecified, node, sourceFile);
 };
 
 const safePropRegex = /^[A-Za-z_$][A-Za-z0-9_$]*$/;
