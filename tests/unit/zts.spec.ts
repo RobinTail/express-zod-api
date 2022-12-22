@@ -24,14 +24,14 @@
  * SOFTWARE.
  */
 
-import { NewLineKind, Node } from "typescript";
+import ts from "typescript";
 import { z } from "../../src";
 import { zodToTs } from "../../src/zts";
 import { createTypeAlias, printNode } from "../../src/zts-utils";
 
 describe("zod-to-ts", () => {
-  const printNodeTest = (node: Node) =>
-    printNode(node, { newLine: NewLineKind.LineFeed });
+  const printNodeTest = (node: ts.Node) =>
+    printNode(node, { newLine: ts.NewLineKind.LineFeed });
 
   describe("z.array()", () => {
     it("outputs correct typescript", () => {
