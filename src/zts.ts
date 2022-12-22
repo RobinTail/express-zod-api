@@ -72,10 +72,12 @@ const onArray: Producer<z.ZodArray<z.ZodTypeAny>> = ({
   next,
 }) => f.createArrayTypeNode(next({ schema: element }));
 
-const onEnum: Producer<z.ZodEnum<[string, ...string[]]>> = ({ schema }) =>
+const onEnum: Producer<z.ZodEnum<[string, ...string[]]>> = ({
+  schema: { options },
+}) =>
   f.createUnionTypeNode(
-    schema._def.values.map(
-      (value) => f.createLiteralTypeNode(f.createStringLiteral(value)) // fixed by Robin
+    options.map((option) =>
+      f.createLiteralTypeNode(f.createStringLiteral(option))
     )
   );
 
@@ -135,7 +137,7 @@ const onIntersection: Producer<
   );
 
 const onDefault: Producer<z.ZodDefault<z.ZodTypeAny>> = ({ next, schema }) =>
-  next({ schema: schema._def.innerType }); // fixed by Robin
+  next({ schema: schema._def.innerType });
 
 export const zodToTs = ({
   schema,
