@@ -33,7 +33,6 @@ import { addJsDocComment, makePropertyIdentifier } from "./zts-utils";
 const { factory: f } = ts;
 
 const onLiteral: Producer<z.ZodLiteral<LiteralType>> = ({ schema }) => {
-  // z.literal('hi') -> 'hi'
   let literal: ts.LiteralExpression | ts.BooleanLiteral;
   const literalValue = schema._def.value;
   switch (typeof literalValue) {
@@ -52,106 +51,87 @@ const onLiteral: Producer<z.ZodLiteral<LiteralType>> = ({ schema }) => {
 };
 
 const onObject: Producer<z.ZodObject<z.ZodRawShape>> = ({ schema, next }) => {
-  const properties = Object.entries(schema._def.shape());
-  const members: ts.TypeElement[] = properties.map(([key, value]) => {
-    const nextZodNode = value;
-    const type = next({ schema: nextZodNode });
-    const { typeName: nextZodNodeTypeName } = nextZodNode._def;
-    const isOptional =
-      nextZodNodeTypeName === "ZodOptional" || nextZodNode.isOptional();
-    const propertySignature = f.createPropertySignature(
-      undefined,
-      makePropertyIdentifier(key),
-      isOptional ? f.createToken(ts.SyntaxKind.QuestionToken) : undefined,
-      type
-    );
-    if (nextZodNode.description) {
-      addJsDocComment(propertySignature, nextZodNode.description);
+  const members = Object.entries(schema._def.shape()).map<ts.TypeElement>(
+    ([key, value]) => {
+      const type = next({ schema: value });
+      const { typeName: nextZodNodeTypeName } = value._def;
+      const isOptional =
+        nextZodNodeTypeName === "ZodOptional" || value.isOptional();
+      const propertySignature = f.createPropertySignature(
+        undefined,
+        makePropertyIdentifier(key),
+        isOptional ? f.createToken(ts.SyntaxKind.QuestionToken) : undefined,
+        type
+      );
+      if (value.description) {
+        addJsDocComment(propertySignature, value.description);
+      }
+      return propertySignature;
     }
-    return propertySignature;
-  });
+  );
   return f.createTypeLiteralNode(members);
 };
 
-const onArray: Producer<z.ZodArray<z.ZodTypeAny>> = ({ schema, next }) => {
-  const type = next({ schema: schema._def.type });
-  return f.createArrayTypeNode(type);
-};
+const onArray: Producer<z.ZodArray<z.ZodTypeAny>> = ({ schema, next }) =>
+  f.createArrayTypeNode(next({ schema: schema._def.type }));
 
-const onEnum: Producer<z.ZodEnum<[string, ...string[]]>> = ({ schema }) => {
-  // z.enum['a', 'b', 'c'] -> 'a' | 'b' | 'c
-  const types = schema._def.values.map(
-    (value) => f.createLiteralTypeNode(f.createStringLiteral(value)) // fixed by Robin
+const onEnum: Producer<z.ZodEnum<[string, ...string[]]>> = ({ schema }) =>
+  f.createUnionTypeNode(
+    schema._def.values.map(
+      (value) => f.createLiteralTypeNode(f.createStringLiteral(value)) // fixed by Robin
+    )
   );
-  return f.createUnionTypeNode(types);
-};
 
 const onUnion: Producer<z.ZodUnion<[z.ZodTypeAny, ...z.ZodTypeAny[]]>> = ({
   schema,
   next,
-}) => {
-  // z.union([z.string(), z.number()]) -> string | number
-  const types = schema._def.options.map((option) => next({ schema: option }));
-  return f.createUnionTypeNode(types);
-};
+}) =>
+  f.createUnionTypeNode(
+    schema._def.options.map((option) => next({ schema: option }))
+  );
 
 const onDiscriminatedUnion: Producer<
   z.ZodDiscriminatedUnion<string, z.ZodObject<z.ZodRawShape>[]>
-> = ({ schema, next }) => {
-  // z.discriminatedUnion('kind', [z.object({ kind: z.literal('a'), a: z.string() }), z.object({ kind: z.literal('b'), b: z.number() })]) -> { kind: 'a', a: string } | { kind: 'b', b: number }
-  const unionOptions = [...schema._def.options.values()];
-  const types = unionOptions.map((option) => next({ schema: option }));
-  return f.createUnionTypeNode(types);
-};
+> = ({ schema, next }) =>
+  f.createUnionTypeNode(
+    schema._def.options.map((option) => next({ schema: option }))
+  );
 
-const onEffects: Producer<z.ZodEffects<any>> = ({ schema, next }) => {
-  // ignore any effects, they won't factor into the types
-  return next({ schema: schema._def.schema });
-};
+// @todo
+const onEffects: Producer<z.ZodEffects<any>> = ({ schema, next }) =>
+  next({ schema: schema._def.schema });
 
-const onNativeEnum: Producer<z.ZodNativeEnum<z.EnumLike>> = ({ schema }) => {
-  const types = Object.values(schema._def.values).map((value) =>
-    f.createLiteralTypeNode(
-      typeof value === "number"
-        ? f.createNumericLiteral(value)
-        : f.createStringLiteral(value)
+const onNativeEnum: Producer<z.ZodNativeEnum<z.EnumLike>> = ({ schema }) =>
+  f.createUnionTypeNode(
+    Object.values(schema._def.values).map((value) =>
+      f.createLiteralTypeNode(
+        typeof value === "number"
+          ? f.createNumericLiteral(value)
+          : f.createStringLiteral(value)
+      )
     )
   );
-  return f.createUnionTypeNode(types);
-};
 
-const onOptional: Producer<z.ZodOptional<z.ZodTypeAny>> = ({
-  next,
-  schema,
-}) => {
-  const innerType = next({ schema: schema._def.innerType });
-  return f.createUnionTypeNode([
-    innerType,
+const onOptional: Producer<z.ZodOptional<z.ZodTypeAny>> = ({ next, schema }) =>
+  f.createUnionTypeNode([
+    next({ schema: schema._def.innerType }),
     f.createKeywordTypeNode(ts.SyntaxKind.UndefinedKeyword),
   ]);
-};
 
-const onNullable: Producer<z.ZodNullable<z.ZodTypeAny>> = ({
-  next,
-  schema,
-}) => {
-  const innerType = next({ schema: schema._def.innerType });
-  return f.createUnionTypeNode([
-    innerType,
+const onNullable: Producer<z.ZodNullable<z.ZodTypeAny>> = ({ next, schema }) =>
+  f.createUnionTypeNode([
+    next({ schema: schema._def.innerType }),
     f.createLiteralTypeNode(f.createNull()),
   ]);
-};
 
-const onTuple: Producer<z.ZodTuple> = ({ next, schema }) => {
-  // z.tuple([z.string(), z.number()]) -> [string, number]
-  const types = schema._def.items.map((option) => next({ schema: option }));
-  return f.createTupleTypeNode(types);
-};
+const onTuple: Producer<z.ZodTuple> = ({ next, schema }) =>
+  f.createTupleTypeNode(
+    schema._def.items.map((option) => next({ schema: option }))
+  );
 
-const onRecord: Producer<z.ZodRecord> = ({ next, schema }) => {
-  // z.record(z.number()) -> { [x: string]: number }
-  const valueType = next({ schema: schema._def.valueType });
-  return f.createTypeLiteralNode([
+// @todo use Record
+const onRecord: Producer<z.ZodRecord> = ({ next, schema }) =>
+  f.createTypeLiteralNode([
     f.createIndexSignature(
       undefined,
       [
@@ -164,24 +144,21 @@ const onRecord: Producer<z.ZodRecord> = ({ next, schema }) => {
           undefined
         ),
       ],
-      valueType
+      next({ schema: schema._def.valueType })
     ),
   ]);
-};
 
 const onIntersection: Producer<
   z.ZodIntersection<z.ZodTypeAny, z.ZodTypeAny>
-> = ({ next, schema }) => {
-  // z.number().and(z.string()) -> number & string
-  const left = next({ schema: schema._def.left });
-  const right = next({ schema: schema._def.right });
-  return f.createIntersectionTypeNode([left, right]);
-};
+> = ({ next, schema }) =>
+  f.createIntersectionTypeNode(
+    [schema._def.left, schema._def.right].map((entry) =>
+      next({ schema: entry })
+    )
+  );
 
-const onDefault: Producer<z.ZodDefault<z.ZodTypeAny>> = ({ next, schema }) => {
-  // z.string().optional().default('hi') -> string
-  return next({ schema: schema._def.innerType }); // fixed by Robin
-};
+const onDefault: Producer<z.ZodDefault<z.ZodTypeAny>> = ({ next, schema }) =>
+  next({ schema: schema._def.innerType }); // fixed by Robin
 
 export const zodToTs = ({
   schema,
