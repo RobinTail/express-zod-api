@@ -637,7 +637,7 @@ export const hasCoercion = (schema: z.ZodType): boolean =>
     ? schema._def.coerce
     : false;
 
-export const onEach: Depicter<z.ZodTypeAny, "each"> = ({
+export const onEach: Depicter<z.ZodTypeAny, "last"> = ({
   schema,
   isResponse,
 }) => {
