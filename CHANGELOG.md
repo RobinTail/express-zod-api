@@ -2,6 +2,30 @@
 
 ## Version 8
 
+### v8.8.0
+
+- Another step on generating better Typescript from your IO schemas.
+  - I rewrote and refactored the functionality of `zod-to-ts` within the library.
+  - Using the abstract schema walker I made in the previous release.
+  - So far only minor improvements were made according to the specific needs of the library.
+
+```typescript
+interface ChangesToFrontendClientTypes<T> {
+  ZodFile: {
+    before: any;
+    after: string;
+  };
+  ZodRecord: {
+    before: { [x: string]: T };
+    after: Record<string, T>;
+  };
+  ZodNativeEnum: {
+    before: Error; // unsupported
+    after: "Option1" | "Option2" | "..."; // same as ZodEnum
+  };
+}
+```
+
 ### v8.7.0
 
 - No new features, no any fixes.
@@ -52,11 +76,9 @@ output/anything: Number must be greater than 0
 - The regular expression used for validating `z.dateIn()` made easier
   by [@shroudedcode](https://github.com/shroudedcode).
 
-```regexp
-# before
-/^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d{3})?)?Z?$/
-# after
-/^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d+)?)?Z?$/
+```typescript
+const before = /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d{3})?)?Z?$/;
+const after = /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d+)?)?Z?$/;
 ```
 
 ### v8.4.2
