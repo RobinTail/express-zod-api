@@ -25,7 +25,21 @@
  */
 
 import ts from "typescript";
+import { z } from "zod";
+import { HandlingVariant, SchemaHandler } from "./schema-walker";
+
 const { factory: f } = ts;
+
+export type LiteralType = string | number | boolean;
+
+export type ZTSOptions = {};
+
+export type ZTSContext = {} & ZTSOptions;
+
+export type Producer<
+  T extends z.ZodTypeAny,
+  Variant extends HandlingVariant = "regular"
+> = SchemaHandler<T, ts.TypeNode, ZTSContext, Variant>;
 
 export const addJsDocComment = (node: ts.Node, text: string) => {
   ts.addSyntheticLeadingComment(

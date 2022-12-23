@@ -27,7 +27,7 @@
 import ts from "typescript";
 import { z } from "../../src";
 import { zodToTs } from "../../src/zts";
-import { createTypeAlias, printNode } from "../../src/zts-utils";
+import { createTypeAlias, printNode } from "../../src/zts-helpers";
 
 describe("zod-to-ts", () => {
   const printNodeTest = (node: ts.Node) =>

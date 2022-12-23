@@ -27,8 +27,14 @@
 import ts from "typescript";
 import { z } from "zod";
 import { walkSchema } from "./schema-walker";
-import { LiteralType, Producer, ZTSContext, ZTSOptions } from "./zts-types";
-import { addJsDocComment, makePropertyIdentifier } from "./zts-utils";
+import {
+  LiteralType,
+  Producer,
+  ZTSContext,
+  ZTSOptions,
+  addJsDocComment,
+  makePropertyIdentifier,
+} from "./zts-helpers";
 
 const { factory: f } = ts;
 

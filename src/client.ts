@@ -28,7 +28,7 @@ import { mimeJson } from "./mime";
 import { Routing } from "./routing";
 import { walkRouting } from "./routing-walker";
 import { zodToTs } from "./zts";
-import { createTypeAlias, printNode } from "./zts-utils";
+import { createTypeAlias, printNode } from "./zts-helpers";
 
 interface Registry {
   [METHOD_PATH: string]: Record<"in" | "out", string> & { isJson: boolean };
