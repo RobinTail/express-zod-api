@@ -81,19 +81,12 @@ describe("zod-to-ts", () => {
       '\\"Escaped\\"',
     }
 
-    it("handles numeric literals", () => {
-      const node = zodToTs({ schema: z.nativeEnum(Color) });
-      expect(printNodeTest(node)).toMatchSnapshot();
-    });
-
-    it("handles string literals", () => {
-      const node = zodToTs({ schema: z.nativeEnum(Fruit) });
-      expect(printNodeTest(node)).toMatchSnapshot();
-    });
-
-    it("handles quoted string literals", () => {
-      const node = zodToTs({ schema: z.nativeEnum(StringLiteral) });
-      expect(printNodeTest(node)).toMatchSnapshot();
+    it.each([
+      { schema: z.nativeEnum(Color), feature: "numeric" },
+      { schema: z.nativeEnum(Fruit), feature: "string" },
+      { schema: z.nativeEnum(StringLiteral), feature: "quoted string" },
+    ])("handles $feature literals", ({ schema }) => {
+      expect(printNodeTest(zodToTs({ schema }))).toMatchSnapshot();
     });
   });
 
