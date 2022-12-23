@@ -179,7 +179,7 @@ export const depictObject: Depicter<z.AnyZodObject> = ({
   required: Object.keys(schema.shape).filter((key) => {
     const prop = schema.shape[key];
     return isResponse && hasCoercion(prop)
-      ? prop instanceof z.ZodOptional
+      ? !(prop instanceof z.ZodOptional)
       : !prop.isOptional();
   }),
 });

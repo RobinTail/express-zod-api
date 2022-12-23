@@ -425,7 +425,10 @@ exports[`Open API helpers depictObject() should type:object, properties and requ
       "type": "string",
     },
   },
-  "required": [],
+  "required": [
+    "a",
+    "b",
+  ],
   "type": "object",
 }
 `;
