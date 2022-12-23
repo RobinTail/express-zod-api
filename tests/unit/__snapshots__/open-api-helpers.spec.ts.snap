@@ -433,6 +433,49 @@ exports[`Open API helpers depictObject() should type:object, properties and requ
 }
 `;
 
+exports[`Open API helpers depictObject() should type:object, properties and required props 3 1`] = `
+{
+  "properties": {
+    "a": {
+      "exclusiveMaximum": false,
+      "exclusiveMinimum": false,
+      "format": "double",
+      "maximum": 1.7976931348623157e+308,
+      "minimum": 5e-324,
+      "type": "number",
+    },
+    "b": {
+      "type": "string",
+    },
+  },
+  "required": [
+    "a",
+  ],
+  "type": "object",
+}
+`;
+
+exports[`Open API helpers depictObject() should type:object, properties and required props 4 1`] = `
+{
+  "properties": {
+    "a": {
+      "exclusiveMaximum": false,
+      "exclusiveMinimum": false,
+      "format": "double",
+      "maximum": 1.7976931348623157e+308,
+      "minimum": 5e-324,
+      "type": "number",
+    },
+    "b": {
+      "nullable": true,
+      "type": "string",
+    },
+  },
+  "required": [],
+  "type": "object",
+}
+`;
+
 exports[`Open API helpers depictObjectProperties() should wrap next depicters in a shape of object 1`] = `
 {
   "one": {

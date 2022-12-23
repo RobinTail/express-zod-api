@@ -401,6 +401,14 @@ describe("Open API helpers", () => {
         isResponse: true,
         shape: { a: z.coerce.number(), b: z.string({ coerce: true }) },
       },
+      {
+        isResponse: true,
+        shape: { a: z.number(), b: z.string().optional() },
+      },
+      {
+        isResponse: false,
+        shape: { a: z.number().optional(), b: z.coerce.string() },
+      },
     ])(
       "should type:object, properties and required props %#",
       ({ shape, ...context }) => {
