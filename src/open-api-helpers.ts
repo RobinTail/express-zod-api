@@ -21,6 +21,7 @@ import {
   hasCoercion,
   hasTopLevelTransformingEffect,
   routePathParamsRegex,
+  tryToTransform,
 } from "./common-helpers";
 import { InputSources, TagsConfig } from "./config-type";
 import { ZodDateIn, isoDateRegex } from "./date-in-schema";
@@ -461,19 +462,9 @@ export const depictEffect: Depicter<z.ZodEffects<z.ZodTypeAny>> = ({
   const input = next({ schema: schema.innerType() });
   const { effect } = schema._def;
   if (isResponse && effect.type === "transform") {
-    try {
-      const outputType = typeof effect.transform(makeSample(input), {
-        addIssue: () => {},
-        path: [],
-      });
-      if (["number", "string", "boolean"].includes(outputType)) {
-        return {
-          ...input,
-          type: outputType as "number" | "string" | "boolean",
-        };
-      }
-    } catch (e) {
-      /**/
+    const outputType = tryToTransform({ effect, sample: makeSample(input) });
+    if (outputType && ["number", "string", "boolean"].includes(outputType)) {
+      return { type: outputType as "number" | "string" | "boolean" };
     }
   }
   if (!isResponse && effect.type === "preprocess") {

@@ -219,6 +219,23 @@ export const hasCoercion = (schema: z.ZodType): boolean =>
     ? schema._def.coerce
     : false;
 
+export const tryToTransform = ({
+  effect,
+  sample,
+}: {
+  effect: z.Effect<any> & { type: "transform" };
+  sample: any;
+}) => {
+  try {
+    return typeof effect.transform(sample, {
+      addIssue: () => {},
+      path: [],
+    });
+  } catch (e) {
+    return undefined;
+  }
+};
+
 // obtaining the private helper type from Zod
 export type ErrMessage = Exclude<
   Parameters<typeof z.ZodString.prototype.email>[0],

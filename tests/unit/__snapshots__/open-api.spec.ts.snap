@@ -574,11 +574,6 @@ paths:
                     properties:
                       numericStr:
                         type: string
-                        format: double
-                        minimum: 5e-324
-                        exclusiveMinimum: false
-                        maximum: 1.7976931348623157e+308
-                        exclusiveMaximum: false
                     required:
                       - numericStr
                     example:
@@ -670,11 +665,6 @@ paths:
                     properties:
                       numericStr:
                         type: string
-                        format: double
-                        minimum: 5e-324
-                        exclusiveMinimum: false
-                        maximum: 1.7976931348623157e+308
-                        exclusiveMaximum: false
                     required:
                       - numericStr
                     example:
@@ -771,11 +761,6 @@ paths:
                     properties:
                       numericStr:
                         type: string
-                        format: double
-                        minimum: 5e-324
-                        exclusiveMinimum: false
-                        maximum: 1.7976931348623157e+308
-                        exclusiveMaximum: false
                         example: "123"
                     required:
                       - numericStr

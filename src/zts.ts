@@ -26,7 +26,7 @@
 
 import ts from "typescript";
 import { z } from "zod";
-import { hasCoercion } from "./common-helpers";
+import { hasCoercion, tryToTransform } from "./common-helpers";
 import { HandlingRules, walkSchema } from "./schema-walker";
 import {
   LiteralType,
@@ -116,11 +116,8 @@ const onEffects: Producer<z.ZodEffects<z.ZodTypeAny>> = ({
   const input = next({ schema: schema.innerType() });
   const effect = schema._def.effect;
   if (isResponse && effect.type === "transform") {
-    try {
-      const outputType = typeof effect.transform(makeSample(input), {
-        addIssue: () => {},
-        path: [],
-      });
+    const outputType = tryToTransform({ effect, sample: makeSample(input) });
+    if (outputType) {
       const resolutions: Partial<
         Record<typeof outputType, ts.KeywordTypeSyntaxKind>
       > = {
@@ -134,8 +131,6 @@ const onEffects: Producer<z.ZodEffects<z.ZodTypeAny>> = ({
       return f.createKeywordTypeNode(
         resolutions[outputType] || ts.SyntaxKind.AnyKeyword
       );
-    } catch (e) {
-      /**/
     }
   }
   return input;
