@@ -32,9 +32,7 @@ const { factory: f } = ts;
 
 export type LiteralType = string | number | boolean;
 
-export type ZTSOptions = {};
-
-export type ZTSContext = {} & ZTSOptions;
+export type ZTSContext = { isResponse?: boolean };
 
 export type Producer<
   T extends z.ZodTypeAny,

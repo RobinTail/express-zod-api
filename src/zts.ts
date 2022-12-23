@@ -31,7 +31,6 @@ import {
   LiteralType,
   Producer,
   ZTSContext,
-  ZTSOptions,
   addJsDocComment,
   makePropertyIdentifier,
 } from "./zts-helpers";
@@ -146,10 +145,10 @@ const onDefault: Producer<z.ZodDefault<z.ZodTypeAny>> = ({ next, schema }) =>
 
 export const zodToTs = ({
   schema,
-  ...options
+  ...context
 }: {
   schema: z.ZodTypeAny;
-} & ZTSOptions): ts.TypeNode => {
+} & ZTSContext): ts.TypeNode => {
   return walkSchema<ts.TypeNode, ZTSContext>({
     schema,
     rules: {
@@ -182,6 +181,6 @@ export const zodToTs = ({
       ZodDefault: onDefault,
     },
     onMissing: () => f.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword),
-    ...options,
+    ...context,
   });
 };
