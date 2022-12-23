@@ -148,6 +148,20 @@ const onPrimitive =
   () =>
     f.createKeywordTypeNode(syntaxKind);
 
+const onBranded: Producer<z.ZodBranded<z.ZodTypeAny, any>> = ({
+  next,
+  schema,
+}) => next({ schema: schema.unwrap() });
+
+const onCatch: Producer<z.ZodCatch<z.ZodTypeAny>> = ({ next, schema }) =>
+  next({ schema: schema._def.innerType });
+
+const onPipeline: Producer<z.ZodPipeline<z.ZodTypeAny, z.ZodTypeAny>> = ({
+  schema,
+  next,
+  isResponse,
+}) => next({ schema: schema._def[isResponse ? "out" : "in"] });
+
 const producers: HandlingRules<ts.TypeNode, ZTSContext> = {
   ZodString: onPrimitive(ts.SyntaxKind.StringKeyword),
   ZodNumber: onPrimitive(ts.SyntaxKind.NumberKeyword),
@@ -173,10 +187,10 @@ const producers: HandlingRules<ts.TypeNode, ZTSContext> = {
   ZodOptional: onOptional,
   ZodNullable: onNullable,
   ZodDiscriminatedUnion: onSomeUnion,
-  // ZodBranded:
+  ZodBranded: onBranded,
   // ZodDate:
-  // ZodCatch:
-  // ZodPipeline:
+  ZodCatch: onCatch,
+  ZodPipeline: onPipeline,
   // ZodUndefined: () => f.createKeywordTypeNode(ts.SyntaxKind.UndefinedKeyword),
 };
 
