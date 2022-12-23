@@ -162,6 +162,9 @@ const onPipeline: Producer<z.ZodPipeline<z.ZodTypeAny, z.ZodTypeAny>> = ({
   isResponse,
 }) => next({ schema: schema._def[isResponse ? "out" : "in"] });
 
+const onNull: Producer<z.ZodNull> = () =>
+  f.createLiteralTypeNode(f.createNull());
+
 const producers: HandlingRules<ts.TypeNode, ZTSContext> = {
   ZodString: onPrimitive(ts.SyntaxKind.StringKeyword),
   ZodNumber: onPrimitive(ts.SyntaxKind.NumberKeyword),
@@ -169,7 +172,7 @@ const producers: HandlingRules<ts.TypeNode, ZTSContext> = {
   ZodBoolean: onPrimitive(ts.SyntaxKind.BooleanKeyword),
   ZodDateIn: onPrimitive(ts.SyntaxKind.StringKeyword),
   ZodDateOut: onPrimitive(ts.SyntaxKind.StringKeyword),
-  ZodNull: () => f.createLiteralTypeNode(f.createNull()),
+  ZodNull: onNull,
   ZodArray: onArray,
   ZodTuple: onTuple,
   ZodRecord: onRecord,
