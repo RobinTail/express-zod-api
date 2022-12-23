@@ -4,13 +4,20 @@
 
 ### v8.8.0
 
-- Another step on generating better Typescript from your IO schemas.
+- First step on generating better Typescript from your IO schemas.
   - I rewrote and refactored the functionality of `zod-to-ts` within the library.
   - Using the abstract schema walker I made in the previous release.
+  - In general, I'm aiming to achieve the consistency between OpenAPI and Client generators.
   - So far only minor improvements were made according to the specific needs of the library.
+  - The following schemas are no longer supported by client generator, since they are not transmittable:
+    - `ZodUndefined`, `ZodMap`, `ZodSet`, `ZodPromise`, `ZodFunction`, `ZodLazy`, `ZodVoid`, `ZodNever`, `ZodDate`.
+    - From now on they are described as `any`.
+  - In opposite, the following schemas are now supported:
+    - `ZodNativeEnum` (similar to `ZodEnum`), `ZodCatch`, `ZodBranded`, `ZodPipeline`.
+  - Additionally, the representation of some schemas have been changed slightly:
 
 ```typescript
-interface ChangesToFrontendClientTypes<T> {
+interface Changes<T> {
   ZodFile: {
     before: any;
     after: string;
@@ -18,10 +25,6 @@ interface ChangesToFrontendClientTypes<T> {
   ZodRecord: {
     before: { [x: string]: T };
     after: Record<string, T>;
-  };
-  ZodNativeEnum: {
-    before: Error; // unsupported
-    after: "Option1" | "Option2" | "..."; // same as ZodEnum
   };
 }
 ```
