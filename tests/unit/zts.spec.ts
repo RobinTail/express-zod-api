@@ -181,6 +181,9 @@ describe("zod-to-ts", () => {
         z.object({ kind: z.literal("square"), x: z.number() }),
         z.object({ kind: z.literal("triangle"), x: z.number(), y: z.number() }),
       ]),
+      branded: z.string().brand("BRAND"),
+      catch: z.number().catch(123),
+      pipeline: z.string().regex(/\d+/).pipe(z.coerce.number()),
     });
 
     it("should produce the expected results", () => {

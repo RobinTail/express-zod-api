@@ -67,6 +67,9 @@ exports[`zod-to-ts Example should produce the expected results 1`] = `
         x: number;
         y: number;
     };
+    branded: string;
+    catch?: number;
+    pipeline: string;
 }"
 `;
 
