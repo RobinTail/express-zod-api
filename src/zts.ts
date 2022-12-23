@@ -26,6 +26,7 @@
 
 import ts from "typescript";
 import { z } from "zod";
+import { hasCoercion } from "./common-helpers";
 import { HandlingRules, walkSchema } from "./schema-walker";
 import {
   LiteralType,
@@ -50,14 +51,16 @@ const onLiteral: Producer<z.ZodLiteral<LiteralType>> = ({
       : f.createStringLiteral(value)
   );
 
-// @todo align treating optionals
 const onObject: Producer<z.ZodObject<z.ZodRawShape>> = ({
   schema: { shape },
+  isResponse,
   next,
 }) => {
   const members = Object.entries(shape).map<ts.TypeElement>(([key, value]) => {
-    const { typeName: propTypeName } = value._def;
-    const isOptional = propTypeName === "ZodOptional" || value.isOptional();
+    const isOptional =
+      isResponse && hasCoercion(value)
+        ? value instanceof z.ZodOptional
+        : value.isOptional();
     const propertySignature = f.createPropertySignature(
       undefined,
       makePropertyIdentifier(key),
