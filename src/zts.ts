@@ -95,9 +95,52 @@ const onSomeUnion: Producer<
 > = ({ schema: { options }, next }) =>
   f.createUnionTypeNode(options.map((option) => next({ schema: option })));
 
-// @todo implement effects handling
-const onEffects: Producer<z.ZodEffects<any>> = ({ schema, next }) =>
-  next({ schema: schema._def.schema });
+const onEffects: Producer<z.ZodEffects<z.ZodTypeAny>> = ({
+  schema,
+  next,
+  isResponse,
+}) => {
+  const input = next({ schema: schema.innerType() });
+  const effect = schema._def.effect;
+  if (isResponse && effect.type === "transform") {
+    const samples: Partial<Record<ts.KeywordTypeSyntaxKind, any>> = {
+      [ts.SyntaxKind.AnyKeyword]: "",
+      [ts.SyntaxKind.BigIntKeyword]: BigInt(0),
+      [ts.SyntaxKind.BooleanKeyword]: false,
+      [ts.SyntaxKind.NumberKeyword]: 0,
+      [ts.SyntaxKind.ObjectKeyword]: {},
+      [ts.SyntaxKind.StringKeyword]: "",
+      [ts.SyntaxKind.UndefinedKeyword]: undefined,
+    };
+    try {
+      const outputType = typeof effect.transform(
+        input.kind in samples
+          ? samples?.[input.kind as keyof typeof samples]
+          : undefined,
+        {
+          addIssue: () => {},
+          path: [],
+        }
+      );
+      const resolutions: Partial<
+        Record<typeof outputType, ts.KeywordTypeSyntaxKind>
+      > = {
+        number: ts.SyntaxKind.NumberKeyword,
+        bigint: ts.SyntaxKind.BigIntKeyword,
+        boolean: ts.SyntaxKind.BooleanKeyword,
+        string: ts.SyntaxKind.StringKeyword,
+        undefined: ts.SyntaxKind.UndefinedKeyword,
+        object: ts.SyntaxKind.ObjectKeyword,
+      };
+      return f.createKeywordTypeNode(
+        resolutions[outputType] || ts.SyntaxKind.AnyKeyword
+      );
+    } catch (e) {
+      /**/
+    }
+  }
+  return input;
+};
 
 const onNativeEnum: Producer<z.ZodNativeEnum<z.EnumLike>> = ({ schema }) =>
   f.createUnionTypeNode(

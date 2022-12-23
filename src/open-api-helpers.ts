@@ -441,33 +441,38 @@ export const depictEffect: Depicter<z.ZodEffects<z.ZodTypeAny>> = ({
   const input = next({ schema: schema.innerType() });
   const { effect } = schema._def;
   if (isResponse && effect.type === "transform") {
-    let output = "undefined";
+    const samples: Record<
+      Exclude<NonNullable<SchemaObject["type"]>, Array<any>>,
+      any
+    > = {
+      integer: 0,
+      number: 0,
+      string: "",
+      boolean: false,
+      object: {},
+      null: null,
+      array: [],
+    };
+    const depictedInputType = Array.isArray(input.type)
+      ? input.type[0]
+      : input.type;
     try {
-      output = typeof effect.transform(
-        ["integer", "number"].includes(`${input.type}`)
-          ? 0
-          : "string" === input.type
-          ? ""
-          : "boolean" === input.type
-          ? false
-          : "object" === input.type
-          ? {}
-          : "null" === input.type
-          ? null
-          : "array" === input.type
-          ? []
-          : undefined,
-        { addIssue: () => {}, path: [] }
+      const outputType = typeof effect.transform(
+        depictedInputType ? samples[depictedInputType] : undefined,
+        {
+          addIssue: () => {},
+          path: [],
+        }
       );
+      if (["number", "string", "boolean"].includes(outputType)) {
+        return {
+          ...input,
+          type: outputType as "number" | "string" | "boolean",
+        };
+      }
     } catch (e) {
       /**/
     }
-    return {
-      ...input,
-      ...(["number", "string", "boolean"].includes(output) && {
-        type: output as "number" | "string" | "boolean",
-      }),
-    };
   }
   if (!isResponse && effect.type === "preprocess") {
     const { type: inputType, ...rest } = input;

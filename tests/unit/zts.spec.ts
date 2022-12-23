@@ -327,4 +327,18 @@ describe("zod-to-ts", () => {
       expect(printNodeTest(zodToTs({ schema }))).toMatchSnapshot();
     });
   });
+
+  describe("z.effect()", () => {
+    describe("transformations", () => {
+      test.each([
+        { isResponse: false, expected: "intact" },
+        { isResponse: true, expected: "transformed" },
+      ])("should produce the schema type $expected", ({ isResponse }) => {
+        const schema = z.number().transform((num) => `${num}`);
+        expect(
+          printNodeTest(zodToTs({ schema, isResponse }))
+        ).toMatchSnapshot();
+      });
+    });
+  });
 });

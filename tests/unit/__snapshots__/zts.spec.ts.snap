@@ -130,6 +130,10 @@ exports[`zod-to-ts z.discriminatedUnion() outputs correct typescript 1`] = `
 }"
 `;
 
+exports[`zod-to-ts z.effect() transformations should produce the schema type intact 1`] = `"number"`;
+
+exports[`zod-to-ts z.effect() transformations should produce the schema type transformed 1`] = `"string"`;
+
 exports[`zod-to-ts z.literal() Should produce the correct typescript 0 1`] = `""test""`;
 
 exports[`zod-to-ts z.literal() Should produce the correct typescript 1 1`] = `"true"`;
