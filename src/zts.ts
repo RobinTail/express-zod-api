@@ -26,7 +26,7 @@
 
 import ts from "typescript";
 import { z } from "zod";
-import { walkSchema } from "./schema-walker";
+import { HandlingRules, walkSchema } from "./schema-walker";
 import {
   LiteralType,
   Producer,
@@ -143,44 +143,49 @@ const onIntersection: Producer<
 const onDefault: Producer<z.ZodDefault<z.ZodTypeAny>> = ({ next, schema }) =>
   next({ schema: schema._def.innerType });
 
+const producers: HandlingRules<ts.TypeNode, ZTSContext> = {
+  ZodString: () => f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
+  ZodNumber: () => f.createKeywordTypeNode(ts.SyntaxKind.NumberKeyword),
+  ZodBigInt: () => f.createKeywordTypeNode(ts.SyntaxKind.BigIntKeyword),
+  ZodBoolean: () => f.createKeywordTypeNode(ts.SyntaxKind.BooleanKeyword),
+  ZodDateIn: () =>
+    ts.factory.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
+  ZodDateOut: () =>
+    ts.factory.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
+  ZodNull: () => f.createLiteralTypeNode(f.createNull()),
+  ZodArray: onArray,
+  ZodTuple: onTuple,
+  ZodRecord: onRecord,
+  ZodObject: onObject,
+  ZodLiteral: onLiteral,
+  ZodIntersection: onIntersection,
+  ZodUnion: onSomeUnion,
+  // ZodFile: () => f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
+  // ZodUpload: ,
+  ZodAny: () => f.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword),
+  ZodDefault: onDefault,
+  ZodEnum: onEnum,
+  ZodNativeEnum: onNativeEnum,
+  ZodEffects: onEffects,
+  ZodOptional: onOptional,
+  ZodNullable: onNullable,
+  ZodDiscriminatedUnion: onSomeUnion,
+  // ZodBranded:
+  // ZodDate:
+  // ZodCatch:
+  // ZodPipeline:
+  // ZodUndefined: () => f.createKeywordTypeNode(ts.SyntaxKind.UndefinedKeyword),
+};
+
 export const zodToTs = ({
   schema,
   ...context
 }: {
   schema: z.ZodTypeAny;
-} & ZTSContext): ts.TypeNode => {
-  return walkSchema<ts.TypeNode, ZTSContext>({
+} & ZTSContext) =>
+  walkSchema<ts.TypeNode, ZTSContext>({
     schema,
-    rules: {
-      ZodDateIn: () =>
-        ts.factory.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
-      ZodDateOut: () =>
-        ts.factory.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
-      ZodString: () => f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
-      ZodNumber: () => f.createKeywordTypeNode(ts.SyntaxKind.NumberKeyword),
-      ZodBigInt: () => f.createKeywordTypeNode(ts.SyntaxKind.BigIntKeyword),
-      ZodBoolean: () => f.createKeywordTypeNode(ts.SyntaxKind.BooleanKeyword),
-      ZodDate: () => f.createTypeReferenceNode(f.createIdentifier("Date")),
-      ZodUndefined: () =>
-        f.createKeywordTypeNode(ts.SyntaxKind.UndefinedKeyword),
-      ZodNull: () => f.createLiteralTypeNode(f.createNull()),
-      ZodAny: () => f.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword),
-      ZodLiteral: onLiteral,
-      ZodObject: onObject,
-      ZodArray: onArray,
-      ZodEnum: onEnum,
-      ZodUnion: onSomeUnion,
-      ZodDiscriminatedUnion: onSomeUnion,
-      ZodEffects: onEffects,
-      ZodNativeEnum: onNativeEnum,
-      ZodOptional: onOptional,
-      ZodNullable: onNullable,
-      ZodTuple: onTuple,
-      ZodRecord: onRecord,
-      ZodIntersection: onIntersection,
-      ZodDefault: onDefault,
-    },
+    rules: producers,
     onMissing: () => f.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword),
     ...context,
   });
-};

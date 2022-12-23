@@ -14,8 +14,8 @@ exports[`zod-to-ts Example should produce the expected results 1`] = `
     } | "hi";
     enum: "hi" | "bye";
     intersectionWithTransform: (number & bigint) & (number & string);
-    date: Date;
-    undefined?: undefined;
+    date: any;
+    undefined?: any;
     null: null;
     void?: any;
     any?: any;
@@ -75,8 +75,8 @@ exports[`zod-to-ts PrimitiveSchema outputs correct typescript 1`] = `
     string: string;
     number: number;
     boolean: boolean;
-    date: Date;
-    undefined?: undefined;
+    date: any;
+    undefined?: any;
     null: null;
     void?: any;
     any?: any;
@@ -159,7 +159,7 @@ exports[`zod-to-ts z.object() escapes correctly 1`] = `
     $e?: any;
     "4t"?: any;
     _r?: any;
-    "-r"?: undefined;
+    "-r"?: any;
 }"
 `;
 
