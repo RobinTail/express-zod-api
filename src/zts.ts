@@ -143,15 +143,18 @@ const onIntersection: Producer<
 const onDefault: Producer<z.ZodDefault<z.ZodTypeAny>> = ({ next, schema }) =>
   next({ schema: schema._def.innerType });
 
+const onPrimitive =
+  (syntaxKind: ts.KeywordTypeSyntaxKind): Producer<z.ZodTypeAny> =>
+  () =>
+    f.createKeywordTypeNode(syntaxKind);
+
 const producers: HandlingRules<ts.TypeNode, ZTSContext> = {
-  ZodString: () => f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
-  ZodNumber: () => f.createKeywordTypeNode(ts.SyntaxKind.NumberKeyword),
-  ZodBigInt: () => f.createKeywordTypeNode(ts.SyntaxKind.BigIntKeyword),
-  ZodBoolean: () => f.createKeywordTypeNode(ts.SyntaxKind.BooleanKeyword),
-  ZodDateIn: () =>
-    ts.factory.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
-  ZodDateOut: () =>
-    ts.factory.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
+  ZodString: onPrimitive(ts.SyntaxKind.StringKeyword),
+  ZodNumber: onPrimitive(ts.SyntaxKind.NumberKeyword),
+  ZodBigInt: onPrimitive(ts.SyntaxKind.BigIntKeyword),
+  ZodBoolean: onPrimitive(ts.SyntaxKind.BooleanKeyword),
+  ZodDateIn: onPrimitive(ts.SyntaxKind.StringKeyword),
+  ZodDateOut: onPrimitive(ts.SyntaxKind.StringKeyword),
   ZodNull: () => f.createLiteralTypeNode(f.createNull()),
   ZodArray: onArray,
   ZodTuple: onTuple,
@@ -162,7 +165,7 @@ const producers: HandlingRules<ts.TypeNode, ZTSContext> = {
   ZodUnion: onSomeUnion,
   // ZodFile: () => f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
   // ZodUpload: ,
-  ZodAny: () => f.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword),
+  ZodAny: onPrimitive(ts.SyntaxKind.AnyKeyword),
   ZodDefault: onDefault,
   ZodEnum: onEnum,
   ZodNativeEnum: onNativeEnum,
