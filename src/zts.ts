@@ -38,6 +38,16 @@ import {
 
 const { factory: f } = ts;
 
+const samples: Partial<Record<ts.KeywordTypeSyntaxKind, any>> = {
+  [ts.SyntaxKind.AnyKeyword]: "",
+  [ts.SyntaxKind.BigIntKeyword]: BigInt(0),
+  [ts.SyntaxKind.BooleanKeyword]: false,
+  [ts.SyntaxKind.NumberKeyword]: 0,
+  [ts.SyntaxKind.ObjectKeyword]: {},
+  [ts.SyntaxKind.StringKeyword]: "",
+  [ts.SyntaxKind.UndefinedKeyword]: undefined,
+};
+
 const onLiteral: Producer<z.ZodLiteral<LiteralType>> = ({
   schema: { value },
 }) =>
@@ -95,6 +105,9 @@ const onSomeUnion: Producer<
 > = ({ schema: { options }, next }) =>
   f.createUnionTypeNode(options.map((option) => next({ schema: option })));
 
+const makeSample = (produced: ts.TypeNode) =>
+  samples?.[produced.kind as keyof typeof samples];
+
 const onEffects: Producer<z.ZodEffects<z.ZodTypeAny>> = ({
   schema,
   next,
@@ -103,23 +116,11 @@ const onEffects: Producer<z.ZodEffects<z.ZodTypeAny>> = ({
   const input = next({ schema: schema.innerType() });
   const effect = schema._def.effect;
   if (isResponse && effect.type === "transform") {
-    const samples: Partial<Record<ts.KeywordTypeSyntaxKind, any>> = {
-      [ts.SyntaxKind.AnyKeyword]: "",
-      [ts.SyntaxKind.BigIntKeyword]: BigInt(0),
-      [ts.SyntaxKind.BooleanKeyword]: false,
-      [ts.SyntaxKind.NumberKeyword]: 0,
-      [ts.SyntaxKind.ObjectKeyword]: {},
-      [ts.SyntaxKind.StringKeyword]: "",
-      [ts.SyntaxKind.UndefinedKeyword]: undefined,
-    };
     try {
-      const outputType = typeof effect.transform(
-        samples?.[input.kind as keyof typeof samples],
-        {
-          addIssue: () => {},
-          path: [],
-        }
-      );
+      const outputType = typeof effect.transform(makeSample(input), {
+        addIssue: () => {},
+        path: [],
+      });
       const resolutions: Partial<
         Record<typeof outputType, ts.KeywordTypeSyntaxKind>
       > = {

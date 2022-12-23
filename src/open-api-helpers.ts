@@ -66,6 +66,19 @@ const shortDescriptionLimit = 50;
 const isoDateDocumentationUrl =
   "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString";
 
+const samples: Record<
+  Exclude<NonNullable<SchemaObject["type"]>, Array<any>>,
+  any
+> = {
+  integer: 0,
+  number: 0,
+  string: "",
+  boolean: false,
+  object: {},
+  null: null,
+  array: [],
+};
+
 /* eslint-disable @typescript-eslint/no-use-before-define */
 
 export const reformatParamsInPath = (path: string) =>
@@ -433,6 +446,13 @@ export const depictObjectProperties = ({
   );
 };
 
+const makeSample = (depicted: SchemaObject) => {
+  const type = (
+    Array.isArray(depicted.type) ? depicted.type[0] : depicted.type
+  ) as keyof typeof samples;
+  return samples?.[type];
+};
+
 export const depictEffect: Depicter<z.ZodEffects<z.ZodTypeAny>> = ({
   schema,
   isResponse,
@@ -441,23 +461,8 @@ export const depictEffect: Depicter<z.ZodEffects<z.ZodTypeAny>> = ({
   const input = next({ schema: schema.innerType() });
   const { effect } = schema._def;
   if (isResponse && effect.type === "transform") {
-    const samples: Record<
-      Exclude<NonNullable<SchemaObject["type"]>, Array<any>>,
-      any
-    > = {
-      integer: 0,
-      number: 0,
-      string: "",
-      boolean: false,
-      object: {},
-      null: null,
-      array: [],
-    };
-    const depictedInputType = (
-      Array.isArray(input.type) ? input.type[0] : input.type
-    ) as keyof typeof samples;
     try {
-      const outputType = typeof effect.transform(samples?.[depictedInputType], {
+      const outputType = typeof effect.transform(makeSample(input), {
         addIssue: () => {},
         path: [],
       });
