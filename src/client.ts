@@ -1,10 +1,5 @@
 import ts from "typescript";
 import {
-  createTypeAlias,
-  printNode,
-  zodToTs,
-} from "@express-zod-api/zod-to-ts";
-import {
   cleanId,
   exportModifier,
   f,
@@ -32,6 +27,8 @@ import { methods } from "./method";
 import { mimeJson } from "./mime";
 import { Routing } from "./routing";
 import { walkRouting } from "./routing-walker";
+import { zodToTs } from "./zts";
+import { createTypeAlias, printNode } from "./zts-helpers";
 
 interface Registry {
   [METHOD_PATH: string]: Record<"in" | "out", string> & { isJson: boolean };
@@ -48,22 +45,18 @@ export class Client {
       onEndpoint: (endpoint, path, method) => {
         const inputId = cleanId(path, method, "input");
         const responseId = cleanId(path, method, "response");
-        const input = zodToTs(endpoint.getInputSchema(), inputId, {
-          resolveNativeEnums: true,
+        const input = zodToTs({
+          schema: endpoint.getInputSchema(),
+          isResponse: false,
         });
-        const response = zodToTs(
-          endpoint
+        const response = zodToTs({
+          isResponse: true,
+          schema: endpoint
             .getPositiveResponseSchema()
             .or(endpoint.getNegativeResponseSchema()),
-          responseId,
-          { resolveNativeEnums: true }
-        );
-        const inputAlias = createTypeAlias(input.node, inputId);
-        const responseAlias = createTypeAlias(response.node, responseId);
-        this.agg.push(
-          ...input.store.nativeEnums,
-          ...response.store.nativeEnums
-        );
+        });
+        const inputAlias = createTypeAlias(input, inputId);
+        const responseAlias = createTypeAlias(response, responseId);
         this.agg.push(inputAlias);
         this.agg.push(responseAlias);
         if (method !== "options") {

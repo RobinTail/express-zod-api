@@ -2,6 +2,33 @@
 
 ## Version 8
 
+### v8.8.0
+
+- First step on generating better Typescript from your IO schemas.
+  - I rewrote and refactored the functionality of `zod-to-ts` within the library.
+  - Using the abstract schema walker I made in the previous release.
+  - In general, I'm aiming to achieve the consistency between OpenAPI and Client generators.
+  - So far only minor improvements were made according to the specific needs of the library.
+  - The following schemas are no longer supported by client generator, since they are not transmittable:
+    - `ZodUndefined`, `ZodMap`, `ZodSet`, `ZodPromise`, `ZodFunction`, `ZodLazy`, `ZodVoid`, `ZodNever`, `ZodDate`.
+    - From now on they are described as `any`.
+  - In opposite, the following schemas are now supported:
+    - `ZodNativeEnum` (similar to `ZodEnum`), `ZodCatch`, `ZodBranded`, `ZodPipeline`.
+  - Additionally, the representation of some schemas have been changed slightly:
+
+```typescript
+interface Changes<T> {
+  ZodFile: {
+    before: any;
+    after: string;
+  };
+  ZodRecord: {
+    before: { [x: string]: T };
+    after: Record<string, T>;
+  };
+}
+```
+
 ### v8.7.0
 
 - No new features, no any fixes.
@@ -52,11 +79,9 @@ output/anything: Number must be greater than 0
 - The regular expression used for validating `z.dateIn()` made easier
   by [@shroudedcode](https://github.com/shroudedcode).
 
-```regexp
-# before
-/^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d{3})?)?Z?$/
-# after
-/^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d+)?)?Z?$/
+```typescript
+const before = /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d{3})?)?Z?$/;
+const after = /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d+)?)?Z?$/;
 ```
 
 ### v8.4.2
