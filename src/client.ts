@@ -47,8 +47,10 @@ export class Client {
         const responseId = cleanId(path, method, "response");
         const input = zodToTs({
           schema: endpoint.getInputSchema(),
+          isResponse: false,
         });
         const response = zodToTs({
+          isResponse: true,
           schema: endpoint
             .getPositiveResponseSchema()
             .or(endpoint.getNegativeResponseSchema()),
