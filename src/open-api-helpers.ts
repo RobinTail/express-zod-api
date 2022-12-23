@@ -18,6 +18,7 @@ import {
   ArrayElement,
   getExamples,
   getRoutePathParams,
+  hasCoercion,
   hasTopLevelTransformingEffect,
   routePathParamsRegex,
 } from "./common-helpers";
@@ -627,15 +628,6 @@ export const depicters: HandlingRules<SchemaObject, OpenAPIContext> = {
   ZodCatch: depictCatch,
   ZodPipeline: depictPipeline,
 };
-
-/**
- * @desc isNullable() and isOptional() validate the schema's input
- * @desc They always return true in case of coercion, which should be taken into account when depicting response
- */
-export const hasCoercion = (schema: z.ZodType): boolean =>
-  "coerce" in schema._def && typeof schema._def.coerce === "boolean"
-    ? schema._def.coerce
-    : false;
 
 export const onEach: Depicter<z.ZodTypeAny, "last"> = ({
   schema,
