@@ -453,17 +453,14 @@ export const depictEffect: Depicter<z.ZodEffects<z.ZodTypeAny>> = ({
       null: null,
       array: [],
     };
-    const depictedInputType = Array.isArray(input.type)
-      ? input.type[0]
-      : input.type;
+    const depictedInputType = (
+      Array.isArray(input.type) ? input.type[0] : input.type
+    ) as keyof typeof samples;
     try {
-      const outputType = typeof effect.transform(
-        depictedInputType ? samples[depictedInputType] : undefined,
-        {
-          addIssue: () => {},
-          path: [],
-        }
-      );
+      const outputType = typeof effect.transform(samples?.[depictedInputType], {
+        addIssue: () => {},
+        path: [],
+      });
       if (["number", "string", "boolean"].includes(outputType)) {
         return {
           ...input,

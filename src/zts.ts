@@ -114,9 +114,7 @@ const onEffects: Producer<z.ZodEffects<z.ZodTypeAny>> = ({
     };
     try {
       const outputType = typeof effect.transform(
-        input.kind in samples
-          ? samples?.[input.kind as keyof typeof samples]
-          : undefined,
+        samples?.[input.kind as keyof typeof samples],
         {
           addIssue: () => {},
           path: [],
