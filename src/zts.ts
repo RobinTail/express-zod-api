@@ -180,8 +180,8 @@ const producers: HandlingRules<ts.TypeNode, ZTSContext> = {
   ZodLiteral: onLiteral,
   ZodIntersection: onIntersection,
   ZodUnion: onSomeUnion,
-  // ZodFile: () => f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
-  // ZodUpload: ,
+  ZodFile: onPrimitive(ts.SyntaxKind.StringKeyword),
+  // ZodUpload:
   ZodAny: onPrimitive(ts.SyntaxKind.AnyKeyword),
   ZodDefault: onDefault,
   ZodEnum: onEnum,
@@ -191,10 +191,8 @@ const producers: HandlingRules<ts.TypeNode, ZTSContext> = {
   ZodNullable: onNullable,
   ZodDiscriminatedUnion: onSomeUnion,
   ZodBranded: onBranded,
-  // ZodDate:
   ZodCatch: onCatch,
   ZodPipeline: onPipeline,
-  // ZodUndefined: () => f.createKeywordTypeNode(ts.SyntaxKind.UndefinedKeyword),
 };
 
 export const zodToTs = ({

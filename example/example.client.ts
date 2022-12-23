@@ -51,7 +51,7 @@ type GetV1AvatarStreamInput = {
   userId: string;
 };
 
-type GetV1AvatarStreamResponse = any | string;
+type GetV1AvatarStreamResponse = string | string;
 
 type PostV1AvatarUploadInput = {
   avatar: any;
