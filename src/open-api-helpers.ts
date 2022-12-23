@@ -438,9 +438,9 @@ export const depictEffect: Depicter<z.ZodEffects<z.ZodTypeAny>> = ({
   isResponse,
   next,
 }) => {
-  const input = next({ schema: schema._def.schema });
-  const effect = schema._def.effect;
-  if (isResponse && effect && effect.type === "transform") {
+  const input = next({ schema: schema.innerType() });
+  const { effect } = schema._def;
+  if (isResponse && effect.type === "transform") {
     let output = "undefined";
     try {
       output = typeof effect.transform(
@@ -469,7 +469,7 @@ export const depictEffect: Depicter<z.ZodEffects<z.ZodTypeAny>> = ({
       }),
     };
   }
-  if (!isResponse && effect && effect.type === "preprocess") {
+  if (!isResponse && effect.type === "preprocess") {
     const { type: inputType, ...rest } = input;
     return {
       ...rest,
