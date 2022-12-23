@@ -421,6 +421,21 @@ describe("Open API helpers", () => {
         ).toMatchSnapshot();
       }
     );
+
+    test("Bug #758", () => {
+      const schema = z.object({
+        a: z.string(),
+        b: z.coerce.string(),
+        c: z.coerce.string().optional(),
+      });
+      expect(
+        depictObject({
+          schema,
+          ...responseContext,
+          next: makeNext(responseContext),
+        })
+      ).toMatchSnapshot();
+    });
   });
 
   describe("depictNull()", () => {

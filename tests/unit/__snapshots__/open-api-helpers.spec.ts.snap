@@ -364,6 +364,28 @@ exports[`Open API helpers depictNumber() should type:number, min/max, format and
 }
 `;
 
+exports[`Open API helpers depictObject() Bug #758 1`] = `
+{
+  "properties": {
+    "a": {
+      "type": "string",
+    },
+    "b": {
+      "type": "string",
+    },
+    "c": {
+      "nullable": true,
+      "type": "string",
+    },
+  },
+  "required": [
+    "a",
+    "b",
+  ],
+  "type": "object",
+}
+`;
+
 exports[`Open API helpers depictObject() should type:object, properties and required props 0 1`] = `
 {
   "properties": {
