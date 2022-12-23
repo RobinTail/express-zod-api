@@ -364,6 +364,28 @@ exports[`Open API helpers depictNumber() should type:number, min/max, format and
 }
 `;
 
+exports[`Open API helpers depictObject() Bug #758 1`] = `
+{
+  "properties": {
+    "a": {
+      "type": "string",
+    },
+    "b": {
+      "type": "string",
+    },
+    "c": {
+      "nullable": true,
+      "type": "string",
+    },
+  },
+  "required": [
+    "a",
+    "b",
+  ],
+  "type": "object",
+}
+`;
+
 exports[`Open API helpers depictObject() should type:object, properties and required props 0 1`] = `
 {
   "properties": {
@@ -422,6 +444,52 @@ exports[`Open API helpers depictObject() should type:object, properties and requ
       "type": "number",
     },
     "b": {
+      "type": "string",
+    },
+  },
+  "required": [
+    "a",
+    "b",
+  ],
+  "type": "object",
+}
+`;
+
+exports[`Open API helpers depictObject() should type:object, properties and required props 3 1`] = `
+{
+  "properties": {
+    "a": {
+      "exclusiveMaximum": false,
+      "exclusiveMinimum": false,
+      "format": "double",
+      "maximum": 1.7976931348623157e+308,
+      "minimum": 5e-324,
+      "type": "number",
+    },
+    "b": {
+      "type": "string",
+    },
+  },
+  "required": [
+    "a",
+  ],
+  "type": "object",
+}
+`;
+
+exports[`Open API helpers depictObject() should type:object, properties and required props 4 1`] = `
+{
+  "properties": {
+    "a": {
+      "exclusiveMaximum": false,
+      "exclusiveMinimum": false,
+      "format": "double",
+      "maximum": 1.7976931348623157e+308,
+      "minimum": 5e-324,
+      "type": "number",
+    },
+    "b": {
+      "nullable": true,
       "type": "string",
     },
   },

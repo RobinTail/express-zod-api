@@ -2,6 +2,34 @@
 
 ## Version 8
 
+### v8.8.1
+
+- Fixed a bug introduced in v8.6.0.
+  - The list of required object properties was depicted incorrectly by the OpenAPI generator in case of using the new
+    `coerce` feature in the response schema.
+
+```typescript
+// reproduction example
+const endpoint = defaultEndpointsFactory.build({
+  // ...
+  output: z.object({
+    a: z.string(),
+    b: z.coerce.string(),
+    c: z.coerce.string().optional(),
+  }),
+});
+```
+
+```yaml
+before:
+  required:
+    - a
+after:
+  required:
+    - a
+    - b
+```
+
 ### v8.8.0
 
 - First step on generating better Typescript from your IO schemas.

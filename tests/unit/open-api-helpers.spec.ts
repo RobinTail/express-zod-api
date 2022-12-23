@@ -401,6 +401,14 @@ describe("Open API helpers", () => {
         isResponse: true,
         shape: { a: z.coerce.number(), b: z.string({ coerce: true }) },
       },
+      {
+        isResponse: true,
+        shape: { a: z.number(), b: z.string().optional() },
+      },
+      {
+        isResponse: false,
+        shape: { a: z.number().optional(), b: z.coerce.string() },
+      },
     ])(
       "should type:object, properties and required props %#",
       ({ shape, ...context }) => {
@@ -413,6 +421,21 @@ describe("Open API helpers", () => {
         ).toMatchSnapshot();
       }
     );
+
+    test("Bug #758", () => {
+      const schema = z.object({
+        a: z.string(),
+        b: z.coerce.string(),
+        c: z.coerce.string().optional(),
+      });
+      expect(
+        depictObject({
+          schema,
+          ...responseContext,
+          next: makeNext(responseContext),
+        })
+      ).toMatchSnapshot();
+    });
   });
 
   describe("depictNull()", () => {
