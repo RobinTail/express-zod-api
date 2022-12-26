@@ -339,6 +339,22 @@ describe("zod-to-ts", () => {
           printNodeTest(zodToTs({ schema, isResponse }))
         ).toMatchSnapshot();
       });
+
+      test("should handle unsupported transformation in response", () => {
+        const schema = z.number().transform((num) => () => num);
+        expect(
+          printNodeTest(zodToTs({ schema, isResponse: true }))
+        ).toMatchSnapshot();
+      });
+
+      test("should handle an error within the transformation", () => {
+        const schema = z.number().transform(() => {
+          throw new Error("this should be handled");
+        });
+        expect(
+          printNodeTest(zodToTs({ schema, isResponse: true }))
+        ).toMatchSnapshot();
+      });
     });
   });
 });

@@ -599,6 +599,21 @@ describe("Open API helpers", () => {
         })
       ).toMatchSnapshot();
     });
+
+    test.each([
+      z.number().transform((num) => () => num),
+      z.number().transform(() => {
+        throw new Error("this should be handled");
+      }),
+    ])("should handle edge cases", (schema) => {
+      expect(
+        depictEffect({
+          schema,
+          ...responseContext,
+          next: makeNext(responseContext),
+        })
+      ).toMatchSnapshot();
+    });
   });
 
   describe("depictPipeline", () => {

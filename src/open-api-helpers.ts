@@ -465,6 +465,8 @@ export const depictEffect: Depicter<z.ZodEffects<z.ZodTypeAny>> = ({
     const outputType = tryToTransform({ effect, sample: makeSample(input) });
     if (outputType && ["number", "string", "boolean"].includes(outputType)) {
       return { type: outputType as "number" | "string" | "boolean" };
+    } else {
+      return next({ schema: z.any() });
     }
   }
   if (!isResponse && effect.type === "preprocess") {

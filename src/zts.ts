@@ -117,21 +117,19 @@ const onEffects: Producer<z.ZodEffects<z.ZodTypeAny>> = ({
   const effect = schema._def.effect;
   if (isResponse && effect.type === "transform") {
     const outputType = tryToTransform({ effect, sample: makeSample(input) });
-    if (outputType) {
-      const resolutions: Partial<
-        Record<typeof outputType, ts.KeywordTypeSyntaxKind>
-      > = {
-        number: ts.SyntaxKind.NumberKeyword,
-        bigint: ts.SyntaxKind.BigIntKeyword,
-        boolean: ts.SyntaxKind.BooleanKeyword,
-        string: ts.SyntaxKind.StringKeyword,
-        undefined: ts.SyntaxKind.UndefinedKeyword,
-        object: ts.SyntaxKind.ObjectKeyword,
-      };
-      return f.createKeywordTypeNode(
-        resolutions[outputType] || ts.SyntaxKind.AnyKeyword
-      );
-    }
+    const resolutions: Partial<
+      Record<NonNullable<typeof outputType>, ts.KeywordTypeSyntaxKind>
+    > = {
+      number: ts.SyntaxKind.NumberKeyword,
+      bigint: ts.SyntaxKind.BigIntKeyword,
+      boolean: ts.SyntaxKind.BooleanKeyword,
+      string: ts.SyntaxKind.StringKeyword,
+      undefined: ts.SyntaxKind.UndefinedKeyword,
+      object: ts.SyntaxKind.ObjectKeyword,
+    };
+    return f.createKeywordTypeNode(
+      (outputType && resolutions[outputType]) || ts.SyntaxKind.AnyKeyword
+    );
   }
   return input;
 };
