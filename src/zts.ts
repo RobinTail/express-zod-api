@@ -26,6 +26,7 @@
 
 import ts from "typescript";
 import { z } from "zod";
+import { hasCoercion, tryToTransform } from "./common-helpers";
 import { HandlingRules, walkSchema } from "./schema-walker";
 import {
   LiteralType,
@@ -36,6 +37,16 @@ import {
 } from "./zts-helpers";
 
 const { factory: f } = ts;
+
+const samples: Partial<Record<ts.KeywordTypeSyntaxKind, any>> = {
+  [ts.SyntaxKind.AnyKeyword]: "",
+  [ts.SyntaxKind.BigIntKeyword]: BigInt(0),
+  [ts.SyntaxKind.BooleanKeyword]: false,
+  [ts.SyntaxKind.NumberKeyword]: 0,
+  [ts.SyntaxKind.ObjectKeyword]: {},
+  [ts.SyntaxKind.StringKeyword]: "",
+  [ts.SyntaxKind.UndefinedKeyword]: undefined,
+};
 
 const onLiteral: Producer<z.ZodLiteral<LiteralType>> = ({
   schema: { value },
@@ -50,14 +61,16 @@ const onLiteral: Producer<z.ZodLiteral<LiteralType>> = ({
       : f.createStringLiteral(value)
   );
 
-// @todo align treating optionals
 const onObject: Producer<z.ZodObject<z.ZodRawShape>> = ({
   schema: { shape },
+  isResponse,
   next,
 }) => {
   const members = Object.entries(shape).map<ts.TypeElement>(([key, value]) => {
-    const { typeName: propTypeName } = value._def;
-    const isOptional = propTypeName === "ZodOptional" || value.isOptional();
+    const isOptional =
+      isResponse && hasCoercion(value)
+        ? value instanceof z.ZodOptional
+        : value.isOptional();
     const propertySignature = f.createPropertySignature(
       undefined,
       makePropertyIdentifier(key),
@@ -92,9 +105,34 @@ const onSomeUnion: Producer<
 > = ({ schema: { options }, next }) =>
   f.createUnionTypeNode(options.map((option) => next({ schema: option })));
 
-// @todo implement effects handling
-const onEffects: Producer<z.ZodEffects<any>> = ({ schema, next }) =>
-  next({ schema: schema._def.schema });
+const makeSample = (produced: ts.TypeNode) =>
+  samples?.[produced.kind as keyof typeof samples];
+
+const onEffects: Producer<z.ZodEffects<z.ZodTypeAny>> = ({
+  schema,
+  next,
+  isResponse,
+}) => {
+  const input = next({ schema: schema.innerType() });
+  const effect = schema._def.effect;
+  if (isResponse && effect.type === "transform") {
+    const outputType = tryToTransform({ effect, sample: makeSample(input) });
+    const resolutions: Partial<
+      Record<NonNullable<typeof outputType>, ts.KeywordTypeSyntaxKind>
+    > = {
+      number: ts.SyntaxKind.NumberKeyword,
+      bigint: ts.SyntaxKind.BigIntKeyword,
+      boolean: ts.SyntaxKind.BooleanKeyword,
+      string: ts.SyntaxKind.StringKeyword,
+      undefined: ts.SyntaxKind.UndefinedKeyword,
+      object: ts.SyntaxKind.ObjectKeyword,
+    };
+    return f.createKeywordTypeNode(
+      (outputType && resolutions[outputType]) || ts.SyntaxKind.AnyKeyword
+    );
+  }
+  return input;
+};
 
 const onNativeEnum: Producer<z.ZodNativeEnum<z.EnumLike>> = ({ schema }) =>
   f.createUnionTypeNode(

@@ -2,6 +2,17 @@
 
 ## Version 8
 
+### v8.9.0
+
+- Fixes of the documentation generator (OpenAPI).
+  - Transformations in the `output` schema:
+    - If failed to figure out their output type, now depicted as `any`.
+    - No excessive properties are inherited from their input types.
+- Improvements of the frontend client generator
+  - Achieving the similarity with the OpenAPI generator.
+  - Transformations in the `output` schema are not recognized and typed, similar to OpenAPI generator.
+  - The `coerce` feature in output schema now does not lead to marking the property as optional.
+
 ### v8.8.2
 
 - No new features, no any fixes.
@@ -37,7 +48,7 @@ after:
 
 ### v8.8.0
 
-- First step on generating better Typescript from your IO schemas.
+- First step on generating better types from your IO schemas for the frontend client.
   - I rewrote and refactored the functionality of `zod-to-ts` within the library.
   - Using the abstract schema walker I made in the previous release.
   - In general, I'm aiming to achieve the consistency between OpenAPI and Client generators.

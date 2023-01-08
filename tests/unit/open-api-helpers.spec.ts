@@ -48,7 +48,6 @@ import {
   excludeExampleFromDepiction,
   excludeParamsFromDepiction,
   extractObjectSchema,
-  hasCoercion,
   onEach,
   onMissing,
   reformatParamsInPath,
@@ -310,20 +309,6 @@ describe("Open API helpers", () => {
         })
       ).toMatchSnapshot();
     });
-  });
-
-  describe("hasCoercion", () => {
-    test.each([
-      { schema: z.string(), coercion: false },
-      { schema: z.coerce.string(), coercion: true },
-      { schema: z.boolean({ coerce: true }), coercion: true },
-      { schema: z.custom(), coercion: false },
-    ])(
-      "should check the presence and value of coerce prop %#",
-      ({ schema, coercion }) => {
-        expect(hasCoercion(schema)).toBe(coercion);
-      }
-    );
   });
 
   describe("depictOptional()", () => {
@@ -611,6 +596,21 @@ describe("Open API helpers", () => {
           schema,
           ...context,
           next: makeNext(context),
+        })
+      ).toMatchSnapshot();
+    });
+
+    test.each([
+      z.number().transform((num) => () => num),
+      z.number().transform(() => {
+        throw new Error("this should be handled");
+      }),
+    ])("should handle edge cases", (schema) => {
+      expect(
+        depictEffect({
+          schema,
+          ...responseContext,
+          next: makeNext(responseContext),
         })
       ).toMatchSnapshot();
     });

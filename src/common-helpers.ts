@@ -210,6 +210,32 @@ export function hasUpload(schema: z.ZodTypeAny): boolean {
   return false;
 }
 
+/**
+ * @desc isNullable() and isOptional() validate the schema's input
+ * @desc They always return true in case of coercion, which should be taken into account when depicting response
+ */
+export const hasCoercion = (schema: z.ZodType): boolean =>
+  "coerce" in schema._def && typeof schema._def.coerce === "boolean"
+    ? schema._def.coerce
+    : false;
+
+export const tryToTransform = ({
+  effect,
+  sample,
+}: {
+  effect: z.Effect<any> & { type: "transform" };
+  sample: any;
+}) => {
+  try {
+    return typeof effect.transform(sample, {
+      addIssue: () => {},
+      path: [],
+    });
+  } catch (e) {
+    return undefined;
+  }
+};
+
 // obtaining the private helper type from Zod
 export type ErrMessage = Exclude<
   Parameters<typeof z.ZodString.prototype.email>[0],

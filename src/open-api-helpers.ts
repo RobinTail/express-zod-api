@@ -18,8 +18,10 @@ import {
   ArrayElement,
   getExamples,
   getRoutePathParams,
+  hasCoercion,
   hasTopLevelTransformingEffect,
   routePathParamsRegex,
+  tryToTransform,
 } from "./common-helpers";
 import { InputSources, TagsConfig } from "./config-type";
 import { ZodDateIn, isoDateRegex } from "./date-in-schema";
@@ -64,6 +66,19 @@ interface ReqResDepictHelperCommonProps {
 const shortDescriptionLimit = 50;
 const isoDateDocumentationUrl =
   "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString";
+
+const samples: Record<
+  Exclude<NonNullable<SchemaObject["type"]>, Array<any>>,
+  any
+> = {
+  integer: 0,
+  number: 0,
+  string: "",
+  boolean: false,
+  object: {},
+  null: null,
+  array: [],
+};
 
 /* eslint-disable @typescript-eslint/no-use-before-define */
 
@@ -432,43 +447,29 @@ export const depictObjectProperties = ({
   );
 };
 
+const makeSample = (depicted: SchemaObject) => {
+  const type = (
+    Array.isArray(depicted.type) ? depicted.type[0] : depicted.type
+  ) as keyof typeof samples;
+  return samples?.[type];
+};
+
 export const depictEffect: Depicter<z.ZodEffects<z.ZodTypeAny>> = ({
   schema,
   isResponse,
   next,
 }) => {
-  const input = next({ schema: schema._def.schema });
-  const effect = schema._def.effect;
-  if (isResponse && effect && effect.type === "transform") {
-    let output = "undefined";
-    try {
-      output = typeof effect.transform(
-        ["integer", "number"].includes(`${input.type}`)
-          ? 0
-          : "string" === input.type
-          ? ""
-          : "boolean" === input.type
-          ? false
-          : "object" === input.type
-          ? {}
-          : "null" === input.type
-          ? null
-          : "array" === input.type
-          ? []
-          : undefined,
-        { addIssue: () => {}, path: [] }
-      );
-    } catch (e) {
-      /**/
+  const input = next({ schema: schema.innerType() });
+  const { effect } = schema._def;
+  if (isResponse && effect.type === "transform") {
+    const outputType = tryToTransform({ effect, sample: makeSample(input) });
+    if (outputType && ["number", "string", "boolean"].includes(outputType)) {
+      return { type: outputType as "number" | "string" | "boolean" };
+    } else {
+      return next({ schema: z.any() });
     }
-    return {
-      ...input,
-      ...(["number", "string", "boolean"].includes(output) && {
-        type: output as "number" | "string" | "boolean",
-      }),
-    };
   }
-  if (!isResponse && effect && effect.type === "preprocess") {
+  if (!isResponse && effect.type === "preprocess") {
     const { type: inputType, ...rest } = input;
     return {
       ...rest,
@@ -629,15 +630,6 @@ export const depicters: HandlingRules<SchemaObject, OpenAPIContext> = {
   ZodCatch: depictCatch,
   ZodPipeline: depictPipeline,
 };
-
-/**
- * @desc isNullable() and isOptional() validate the schema's input
- * @desc They always return true in case of coercion, which should be taken into account when depicting response
- */
-export const hasCoercion = (schema: z.ZodType): boolean =>
-  "coerce" in schema._def && typeof schema._def.coerce === "boolean"
-    ? schema._def.coerce
-    : false;
 
 export const onEach: Depicter<z.ZodTypeAny, "last"> = ({
   schema,
