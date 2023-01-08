@@ -1,27 +1,26 @@
 import { Request, Response } from "express";
 import { z } from "zod";
 import { ApiResponse } from "./api-response";
-import {
-  FlatObject,
-  getFinalEndpointInputSchema,
-  hasUpload,
-  IOSchema,
-  ProbableIntersection,
-} from "./common-helpers";
+import { FlatObject, hasUpload } from "./common-helpers";
 import { CommonConfig } from "./config-type";
 import { Endpoint, Handler } from "./endpoint";
+import {
+  IOSchema,
+  ProbableIntersection,
+  getFinalEndpointInputSchema,
+} from "./io-schema";
 import { Method, MethodsDefinition } from "./method";
 import {
   AnyMiddlewareDef,
-  createMiddleware,
   ExpressMiddleware,
   ExpressMiddlewareFeatures,
   MiddlewareDefinition,
+  createMiddleware,
 } from "./middleware";
 import { mimeJson, mimeMultipart } from "./mime";
 import {
-  defaultResultHandler,
   ResultHandlerDefinition,
+  defaultResultHandler,
 } from "./result-handler";
 
 type BuildProps<

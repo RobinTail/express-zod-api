@@ -1,4 +1,4 @@
-import { createLogger, LoggerConfig } from "../../src";
+import { LoggerConfig, createLogger } from "../../src";
 import { LEVEL, MESSAGE, SPLAT } from "triple-beam";
 import MockDate from "mockdate";
 import stripAnsi from "strip-ansi";

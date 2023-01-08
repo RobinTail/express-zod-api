@@ -3,11 +3,8 @@ import { Logger } from "winston";
 import { z } from "zod";
 import { ApiResponse, createApiResponse } from "./api-response";
 import { ResultHandlerError } from "./errors";
-import {
-  getMessageFromError,
-  getStatusCodeFromError,
-  IOSchema,
-} from "./common-helpers";
+import { getMessageFromError, getStatusCodeFromError } from "./common-helpers";
+import { IOSchema } from "./io-schema";
 import { getMeta, withMeta } from "./metadata";
 
 interface LastResortHandlerParams {
@@ -111,8 +108,8 @@ export const lastResortHandler = ({
     .status(500)
     .end(
       `An error occurred while serving the result: ${error.message}.` +
-        (error.hasOriginalError()
-          ? `\nOriginal error: ${error.getOriginalErrorMessage()}.`
+        (error.originalError
+          ? `\nOriginal error: ${error.originalError.message}.`
           : "")
     );
 };

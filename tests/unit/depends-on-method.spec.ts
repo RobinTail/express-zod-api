@@ -1,7 +1,7 @@
 import {
-  defaultResultHandler,
   DependsOnMethod,
   EndpointsFactory,
+  defaultResultHandler,
   z,
 } from "../../src";
 

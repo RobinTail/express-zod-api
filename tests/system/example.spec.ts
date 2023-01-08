@@ -1,5 +1,5 @@
 import fetch from "node-fetch";
-import { spawn, ChildProcessWithoutNullStreams } from "child_process";
+import { ChildProcessWithoutNullStreams, spawn } from "child_process";
 import { mimeMultipart } from "../../src/mime";
 import { waitFor } from "../helpers";
 import crypto from "crypto";
