@@ -2,6 +2,11 @@
 
 ## Version 8
 
+### v8.8.2
+
+- No new features, no any fixes.
+- Just a technical release due to the upgrade of many dev dependencies.
+
 ### v8.8.1
 
 - Fixed a bug introduced in v8.6.0.
