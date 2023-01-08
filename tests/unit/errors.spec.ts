@@ -1,52 +1,81 @@
 import { DependsOnMethodError, OpenAPIError, RoutingError } from "../../src";
-import { ResultHandlerError } from "../../src/errors";
+import {
+  IOSchemaError,
+  OutputValidationError,
+  ResultHandlerError,
+} from "../../src/errors";
 
 describe("Errors", () => {
   describe("RoutingError", () => {
     test("should be an instance of Error", () => {
-      expect(new RoutingError("test") instanceof RoutingError).toBeTruthy();
-      expect(new RoutingError("test") instanceof Error).toBeTruthy();
+      expect(new RoutingError("test")).toBeInstanceOf(Error);
+    });
+
+    test("should have the name matching its class", () => {
+      expect(new RoutingError("test").name).toBe("RoutingError");
     });
   });
 
   describe("OpenAPIError", () => {
     test("should be an instance of Error", () => {
-      expect(new OpenAPIError("test") instanceof OpenAPIError).toBeTruthy();
-      expect(new OpenAPIError("test") instanceof Error).toBeTruthy();
+      expect(new OpenAPIError("test")).toBeInstanceOf(Error);
+    });
+
+    test("should have the name matching its class", () => {
+      expect(new OpenAPIError("test").name).toBe("OpenAPIError");
+    });
+  });
+
+  describe("IOSchemaError", () => {
+    test("should be an instance of Error", () => {
+      expect(new IOSchemaError("test")).toBeInstanceOf(Error);
+    });
+
+    test("should have the name matching its class", () => {
+      expect(new IOSchemaError("test").name).toBe("IOSchemaError");
     });
   });
 
   describe("DependsOnMethodError", () => {
-    test("should be an instance of RoutingError", () => {
-      expect(
-        new DependsOnMethodError("test") instanceof DependsOnMethodError
-      ).toBeTruthy();
-      expect(
-        new DependsOnMethodError("test") instanceof RoutingError
-      ).toBeTruthy();
+    test("should be an instance of RoutingError and Error", () => {
+      expect(new DependsOnMethodError("test")).toBeInstanceOf(RoutingError);
+      expect(new DependsOnMethodError("test")).toBeInstanceOf(Error);
+    });
+
+    test("should have the name matching its class", () => {
+      expect(new DependsOnMethodError("test").name).toBe(
+        "DependsOnMethodError"
+      );
+    });
+  });
+
+  describe("OutputValidationError", () => {
+    test("should be an instance of IOSchemaError and Error", () => {
+      expect(new OutputValidationError("test")).toBeInstanceOf(IOSchemaError);
+      expect(new OutputValidationError("test")).toBeInstanceOf(Error);
+    });
+
+    test("should have the name matching its class", () => {
+      expect(new OutputValidationError("test").name).toBe(
+        "OutputValidationError"
+      );
     });
   });
 
   describe("ResultHandlerError", () => {
     test("should be an instance of Error", () => {
-      expect(
-        new ResultHandlerError("test") instanceof ResultHandlerError
-      ).toBeTruthy();
-      expect(new ResultHandlerError("test") instanceof Error).toBeTruthy();
+      expect(new ResultHandlerError("test")).toBeInstanceOf(Error);
     });
 
-    test(".hasOriginalError() should depend on original error", () => {
-      const error = new ResultHandlerError("test", new Error("test2"));
-      expect(error.hasOriginalError()).toBeTruthy();
-      const error2 = new ResultHandlerError("test");
-      expect(error2.hasOriginalError()).toBeFalsy();
+    test("should have the name matching its class", () => {
+      expect(new ResultHandlerError("test").name).toBe("ResultHandlerError");
     });
 
-    test(".getOriginalErrorMessage() should depend on original error", () => {
+    test(".originalError should be the original error", () => {
       const error = new ResultHandlerError("test", new Error("test2"));
-      expect(error.getOriginalErrorMessage()).toBe("test2");
+      expect(error.originalError).toEqual(new Error("test2"));
       const error2 = new ResultHandlerError("test");
-      expect(error2.getOriginalErrorMessage()).toBeUndefined();
+      expect(error2.originalError).toBeUndefined();
     });
   });
 });

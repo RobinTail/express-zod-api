@@ -4,247 +4,31 @@ import {
   combinations,
   defaultInputSources,
   getExamples,
-  getFinalEndpointInputSchema,
-  getInitialInput,
+  getInput,
   getMessageFromError,
   getRoutePathParams,
   getStatusCodeFromError,
+  hasCoercion,
+  hasTopLevelTransformingEffect,
   hasUpload,
   isLoggerConfig,
   isValidDate,
   makeErrorFromAnything,
 } from "../../src/common-helpers";
-import { z, createHttpError, withMeta, createMiddleware } from "../../src";
+import { createHttpError, withMeta, z } from "../../src";
 import { Request } from "express";
-import { getMeta } from "../../src/metadata";
-import { AnyMiddlewareDef } from "../../src/middleware";
-import { serializeSchemaForTest } from "../helpers";
 
 describe("Common Helpers", () => {
-  describe("getFinalEndpointInputSchema()", () => {
-    test("Should handle no middlewares", () => {
-      const middlewares: AnyMiddlewareDef[] = [];
-      const endpointInput = z.object({
-        four: z.boolean(),
-      });
-      const result = getFinalEndpointInputSchema(middlewares, endpointInput);
-      expect(result).toBeInstanceOf(z.ZodObject);
-      expect(serializeSchemaForTest(result)).toMatchSnapshot();
-    });
-
-    test("Should merge input object schemas", () => {
-      const middlewares: AnyMiddlewareDef[] = [
-        createMiddleware({
-          input: z.object({
-            one: z.string(),
-          }),
-          middleware: jest.fn(),
-        }),
-        createMiddleware({
-          input: z.object({
-            two: z.number(),
-          }),
-          middleware: jest.fn(),
-        }),
-        createMiddleware({
-          input: z.object({
-            three: z.null(),
-          }),
-          middleware: jest.fn(),
-        }),
-      ];
-      const endpointInput = z.object({
-        four: z.boolean(),
-      });
-      const result = getFinalEndpointInputSchema(middlewares, endpointInput);
-      expect(result).toBeInstanceOf(z.ZodIntersection);
-      expect(serializeSchemaForTest(result)).toMatchSnapshot();
-    });
-
-    test("Should merge union object schemas", () => {
-      const middlewares: AnyMiddlewareDef[] = [
-        createMiddleware({
-          input: z
-            .object({
-              one: z.string(),
-            })
-            .or(
-              z.object({
-                two: z.number(),
-              })
-            ),
-          middleware: jest.fn(),
-        }),
-        createMiddleware({
-          input: z
-            .object({
-              three: z.null(),
-            })
-            .or(
-              z.object({
-                four: z.boolean(),
-              })
-            ),
-          middleware: jest.fn(),
-        }),
-      ];
-      const endpointInput = z
-        .object({
-          five: z.string(),
-        })
-        .or(
-          z.object({
-            six: z.number(),
-          })
-        );
-      const result = getFinalEndpointInputSchema(middlewares, endpointInput);
-      expect(result).toBeInstanceOf(z.ZodIntersection);
-      expect(serializeSchemaForTest(result)).toMatchSnapshot();
-    });
-
-    test("Should merge intersection object schemas", () => {
-      const middlewares: AnyMiddlewareDef[] = [
-        createMiddleware({
-          input: z
-            .object({
-              one: z.string(),
-            })
-            .and(
-              z.object({
-                two: z.number(),
-              })
-            ),
-          middleware: jest.fn(),
-        }),
-        createMiddleware({
-          input: z
-            .object({
-              three: z.null(),
-            })
-            .and(
-              z.object({
-                four: z.boolean(),
-              })
-            ),
-          middleware: jest.fn(),
-        }),
-      ];
-      const endpointInput = z
-        .object({
-          five: z.string(),
-        })
-        .and(
-          z.object({
-            six: z.number(),
-          })
-        );
-      const result = getFinalEndpointInputSchema(middlewares, endpointInput);
-      expect(result).toBeInstanceOf(z.ZodIntersection);
-      expect(serializeSchemaForTest(result)).toMatchSnapshot();
-    });
-
-    test("Should merge mixed object schemas", () => {
-      const middlewares: AnyMiddlewareDef[] = [
-        createMiddleware({
-          input: z
-            .object({
-              one: z.string(),
-            })
-            .and(
-              z.object({
-                two: z.number(),
-              })
-            ),
-          middleware: jest.fn(),
-        }),
-        createMiddleware({
-          input: z
-            .object({
-              three: z.null(),
-            })
-            .or(
-              z.object({
-                four: z.boolean(),
-              })
-            ),
-          middleware: jest.fn(),
-        }),
-      ];
-      const endpointInput = z.object({
-        five: z.string(),
-      });
-      const result = getFinalEndpointInputSchema(middlewares, endpointInput);
-      expect(result).toBeInstanceOf(z.ZodIntersection);
-      expect(serializeSchemaForTest(result)).toMatchSnapshot();
-    });
-
-    test("Should merge examples in case of using withMeta()", () => {
-      const middlewares: AnyMiddlewareDef[] = [
-        createMiddleware({
-          input: withMeta(
-            z
-              .object({
-                one: z.string(),
-              })
-              .and(
-                z.object({
-                  two: z.number(),
-                })
-              )
-          ).example({
-            one: "test",
-            two: 123,
-          }),
-          middleware: jest.fn(),
-        }),
-        createMiddleware({
-          input: withMeta(
-            z
-              .object({
-                three: z.null(),
-              })
-              .or(
-                z.object({
-                  four: z.boolean(),
-                })
-              )
-          ).example({
-            three: null,
-            four: true,
-          }),
-          middleware: jest.fn(),
-        }),
-      ];
-      const endpointInput = withMeta(
-        z.object({
-          five: z.string(),
-        })
-      ).example({
-        five: "some",
-      });
-      const result = getFinalEndpointInputSchema(middlewares, endpointInput);
-      expect(getMeta(result, "examples")).toEqual([
-        {
-          one: "test",
-          two: 123,
-          three: null,
-          four: true,
-          five: "some",
-        },
-      ]);
-    });
-  });
-
   describe("defaultInputSources", () => {
     test("should be declared in a certain way", () => {
       expect(defaultInputSources).toMatchSnapshot();
     });
   });
 
-  describe("getInitialInput()", () => {
+  describe("getInput()", () => {
     test("should return body for POST, PUT and PATCH requests by default", () => {
       expect(
-        getInitialInput(
+        getInput(
           {
             body: {
               param: 123,
@@ -258,7 +42,7 @@ describe("Common Helpers", () => {
         param: 123,
       });
       expect(
-        getInitialInput(
+        getInput(
           {
             body: {
               param: 123,
@@ -271,7 +55,7 @@ describe("Common Helpers", () => {
         param: 123,
       });
       expect(
-        getInitialInput(
+        getInput(
           {
             body: {
               param: 123,
@@ -286,7 +70,7 @@ describe("Common Helpers", () => {
     });
     test("should return query for GET requests by default", () => {
       expect(
-        getInitialInput(
+        getInput(
           {
             query: {
               param: 123,
@@ -301,7 +85,7 @@ describe("Common Helpers", () => {
     });
     test("should return both body and query for DELETE and unknown requests by default", () => {
       expect(
-        getInitialInput(
+        getInput(
           {
             query: { a: "query" },
             body: { b: "body" },
@@ -316,7 +100,7 @@ describe("Common Helpers", () => {
     });
     test("should return body and files on demand for POST by default", () => {
       expect(
-        getInitialInput(
+        getInput(
           {
             body: {
               param: 123,
@@ -336,7 +120,7 @@ describe("Common Helpers", () => {
     });
     test("Issue 158: should return query and body for POST on demand", () => {
       expect(
-        getInitialInput(
+        getInput(
           {
             body: {
               a: "body",
@@ -358,7 +142,7 @@ describe("Common Helpers", () => {
     });
     test("URL params: should also be taken, with a higher priority by default", () => {
       expect(
-        getInitialInput(
+        getInput(
           {
             body: {
               a: "body",
@@ -382,7 +166,7 @@ describe("Common Helpers", () => {
     });
     test("Issue 514: should return empty object for OPTIONS", () => {
       expect(
-        getInitialInput({ method: "OPTIONS" } as unknown as Request, undefined)
+        getInput({ method: "OPTIONS" } as unknown as Request, undefined)
       ).toEqual({});
     });
   });
@@ -445,6 +229,13 @@ describe("Common Helpers", () => {
           expected: "string",
           received: "number",
         },
+      ]);
+      expect(getMessageFromError(error)).toMatchSnapshot();
+    });
+
+    test("should handle empty path in ZodIssue", () => {
+      const error = new z.ZodError([
+        { code: "custom", path: [], message: "Top level refinement issue" },
       ]);
       expect(getMessageFromError(error)).toMatchSnapshot();
     });
@@ -589,6 +380,40 @@ describe("Common Helpers", () => {
     });
   });
 
+  describe("hasTopLevelTransformingEffect()", () => {
+    test("should return true for transformation", () => {
+      expect(
+        hasTopLevelTransformingEffect(z.object({}).transform(() => []))
+      ).toBeTruthy();
+    });
+    test("should detect transformation in intersection", () => {
+      expect(
+        hasTopLevelTransformingEffect(
+          z.object({}).and(z.object({}).transform(() => []))
+        )
+      ).toBeTruthy();
+    });
+    test("should detect transformation in union", () => {
+      expect(
+        hasTopLevelTransformingEffect(
+          z.object({}).or(z.object({}).transform(() => []))
+        )
+      ).toBeTruthy();
+    });
+    test("should return false for object fields using transformations", () => {
+      expect(
+        hasTopLevelTransformingEffect(
+          z.object({ s: z.string().transform(() => 123) })
+        )
+      ).toBeFalsy();
+    });
+    test("should return false for refinement", () => {
+      expect(
+        hasTopLevelTransformingEffect(z.object({}).refine(() => true))
+      ).toBeFalsy();
+    });
+  });
+
   describe("hasUpload()", () => {
     test("should return true for z.upload()", () => {
       expect(hasUpload(z.upload())).toBeTruthy();
@@ -668,7 +493,7 @@ describe("Common Helpers", () => {
       [() => {}, "() => { }"],
       [/regexp/is, "/regexp/is"],
       [[1, 2, 3], "1,2,3"],
-    ])("should accept %s", (argument, expected) => {
+    ])("should accept %#", (argument, expected) => {
       const result = makeErrorFromAnything(argument);
       expectType<Error>(result);
       expect(result).toBeInstanceOf(Error);
@@ -676,5 +501,19 @@ describe("Common Helpers", () => {
       expect(typeof result.message).toBe("string");
       expect(result.message).toBe(expected);
     });
+  });
+
+  describe("hasCoercion", () => {
+    test.each([
+      { schema: z.string(), coercion: false },
+      { schema: z.coerce.string(), coercion: true },
+      { schema: z.boolean({ coerce: true }), coercion: true },
+      { schema: z.custom(), coercion: false },
+    ])(
+      "should check the presence and value of coerce prop %#",
+      ({ schema, coercion }) => {
+        expect(hasCoercion(schema)).toBe(coercion);
+      }
+    );
   });
 });

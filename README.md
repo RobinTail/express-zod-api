@@ -81,9 +81,9 @@ Therefore, many basic tasks can be accomplished faster and easier, in particular
 - Logger — [Winston](https://github.com/winstonjs/winston).
 - Generators:
   - Documentation — [OpenAPI 3.x](https://github.com/metadevpro/openapi3-ts) (Swagger Specification).
-  - Client side types — [Zod-to-TS](https://github.com/sachinraja/zod-to-ts)
+  - Client side types — inspired by [zod-to-ts](https://github.com/sachinraja/zod-to-ts).
 - File uploads — [Express-FileUpload](https://github.com/richardgirges/express-fileupload)
-  (based on [Busboy](https://github.com/mscdex/busboy))
+  (based on [Busboy](https://github.com/mscdex/busboy)).
 
 ## Concept
 
@@ -323,7 +323,7 @@ const endpointsFactory = defaultEndpointsFactory.addOptions({
 
 ## Refinements
 
-By the way, you can implement additional validation within schema.
+You can implement additional validations within schemas using refinements.
 Validation errors are reported in a response with a status code `400`.
 
 ```typescript
@@ -339,6 +339,24 @@ const nicknameConstraintMiddleware = createMiddleware({
         "Nickname cannot start with a digit"
       ),
   }),
+  // ...,
+});
+```
+
+By the way, you can also refine the whole I/O object, for example in case you need a complex validation of its props.
+
+```typescript
+const endpoint = endpointsFactory.build({
+  input: z
+    .object({
+      email: z.string().email().optional(),
+      id: z.string().optional(),
+      otherThing: z.string().optional(),
+    })
+    .refine(
+      (inputs) => Object.keys(inputs).length >= 1,
+      "Please provide at least one property"
+    ),
   // ...,
 });
 ```
@@ -624,7 +642,7 @@ import express from "express";
 import { createConfig, attachRouting } from "express-zod-api";
 
 const app = express();
-const config = createConfig({ app /* ..., */ });
+const config = createConfig({ app /* cors, logger, ... */ });
 const routing = {
   /* ... */
 };
@@ -766,7 +784,8 @@ There is a new way of informing the frontend about the I/O types of your endpoin
 The new approach offers automatic generation of a client based on routing to a typescript file.
 The generated client is flexibly configurable on the frontend side using an implementation function that
 directly makes requests to an endpoint using the libraries and methods of your choice.
-The client asserts the type of request parameters and response. The feature requires Typescript version 4.1 or higher.
+The client asserts the type of request parameters and response.
+Consuming the generated client requires Typescript version 4.1 or higher.
 
 ```typescript
 // example client-generator.ts
@@ -888,7 +907,7 @@ test("should respond successfully", async () => {
     endpoint: yourEndpoint,
     requestProps: {
       method: "POST", // default: GET
-      body: { ... },
+      body: { /* parsed JSON */ },
     },
     // responseProps, configProps, loggerProps
   });
@@ -901,7 +920,7 @@ test("should respond successfully", async () => {
 });
 ```
 
-_This method is optimized for the standard result handler. With the flexibility to customize, you can add additional
+_This method is optimized for the `defaultResultHandler`. With the flexibility to customize, you can add additional
 properties as needed._
 
 ## Excessive properties in endpoint output

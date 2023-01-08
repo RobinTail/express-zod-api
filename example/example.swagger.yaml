@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Example API
-  version: 8.2.0
+  version: 8.8.2
 paths:
   /v1/user/retrieve:
     get:
@@ -89,22 +89,22 @@ paths:
                     enum:
                       - success
                   data:
-                    example:
-                      name: John Doe
-                      createdAt: 2021-12-31T00:00:00.000Z
                     type: object
                     properties:
                       name:
                         type: string
                       createdAt:
+                        description: YYYY-MM-DDTHH:mm:ss.sssZ
                         type: string
                         format: date-time
-                        description: YYYY-MM-DDTHH:mm:ss.sssZ
                         externalDocs:
                           url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
                     required:
                       - name
                       - createdAt
+                    example:
+                      name: John Doe
+                      createdAt: 2021-12-31T00:00:00.000Z
                 required:
                   - status
                   - data
@@ -162,33 +162,33 @@ paths:
             schema:
               description: POST /v1/user/:id request body
               allOf:
-                - example:
-                    key: 1234-5678-90
-                  type: object
+                - type: object
                   properties:
                     key:
                       type: string
                       minLength: 1
                   required:
                     - key
-                - example:
-                    name: John Doe
-                    birthday: 1963-04-21
-                  type: object
+                  example:
+                    key: 1234-5678-90
+                - type: object
                   properties:
                     name:
                       type: string
                       minLength: 1
                     birthday:
+                      description: YYYY-MM-DDTHH:mm:ss.sssZ
                       type: string
                       format: date-time
-                      pattern: ^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d{3})?)?Z?$
-                      description: YYYY-MM-DDTHH:mm:ss.sssZ
+                      pattern: ^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d+)?)?Z?$
                       externalDocs:
                         url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
                   required:
                     - name
                     - birthday
+                  example:
+                    name: John Doe
+                    birthday: 1963-04-21
             examples:
               example1:
                 value:
@@ -286,8 +286,8 @@ paths:
                       otherInputs:
                         type: object
                         additionalProperties:
-                          nullable: true
                           format: any
+                          nullable: true
                     required:
                       - name
                       - size

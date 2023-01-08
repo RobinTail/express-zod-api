@@ -2,6 +2,260 @@
 
 ## Version 8
 
+### v8.9.0
+
+- Fixes of the documentation generator (OpenAPI).
+  - Transformations in the `output` schema:
+    - If failed to figure out their output type, now depicted as `any`.
+    - No excessive properties are inherited from their input types.
+- Improvements of the frontend client generator
+  - Achieving the similarity with the OpenAPI generator.
+  - Transformations in the `output` schema are not recognized and typed, similar to OpenAPI generator.
+  - The `coerce` feature in output schema now does not lead to marking the property as optional.
+
+### v8.8.2
+
+- No new features, no any fixes.
+- Just a technical release due to the upgrade of many dev dependencies.
+
+### v8.8.1
+
+- Fixed a bug introduced in v8.6.0.
+  - The list of required object properties was depicted incorrectly by the OpenAPI generator in case of using the new
+    `coerce` feature in the response schema.
+
+```typescript
+// reproduction example
+const endpoint = defaultEndpointsFactory.build({
+  // ...
+  output: z.object({
+    a: z.string(),
+    b: z.coerce.string(),
+    c: z.coerce.string().optional(),
+  }),
+});
+```
+
+```yaml
+before:
+  required:
+    - a
+after:
+  required:
+    - a
+    - b
+```
+
+### v8.8.0
+
+- First step on generating better types from your IO schemas for the frontend client.
+  - I rewrote and refactored the functionality of `zod-to-ts` within the library.
+  - Using the abstract schema walker I made in the previous release.
+  - In general, I'm aiming to achieve the consistency between OpenAPI and Client generators.
+  - So far only minor improvements were made according to the specific needs of the library.
+  - The following schemas are no longer supported by client generator, since they are not transmittable:
+    - `ZodUndefined`, `ZodMap`, `ZodSet`, `ZodPromise`, `ZodFunction`, `ZodLazy`, `ZodVoid`, `ZodNever`, `ZodDate`.
+    - From now on they are described as `any`.
+  - In opposite, the following schemas are now supported:
+    - `ZodNativeEnum` (similar to `ZodEnum`), `ZodCatch`, `ZodBranded`, `ZodPipeline`.
+  - Additionally, the representation of some schemas have been changed slightly:
+
+```typescript
+interface Changes<T> {
+  ZodFile: {
+    before: any;
+    after: string;
+  };
+  ZodRecord: {
+    before: { [x: string]: T };
+    after: Record<string, T>;
+  };
+}
+```
+
+### v8.7.0
+
+- No new features, no any fixes.
+- However, the routing initialization and the schema documenting processes have been refactored.
+  - Some properties in the documentation may change their order, but the overall depiction should remain.
+
+### v8.6.0
+
+- `zod` version is 3.20.2.
+- OpenAPI docs generator supports the following new features:
+  - `ZodCatch`;
+  - `z.string().datetime()` including `offset` option;
+  - `z.string().length()`;
+  - `ZodPipeline`;
+  - `coerce` option available on `ZodString, ZodNumber, ZodBigInt, ZodBoolean` and `ZodDate`.
+
+### v8.5.0
+
+- Supporting Node 19.
+- `@express-zod-api/zod-to-ts` version is v1.1.6.
+- Custom errors have gotten their well deserved names matching their classes.
+  - The list of currently exposed custom errors: `OpenAPIError, DependsOnMethodError, RoutingError`.
+- Output validation errors now cause HTTP status code `500` instead of `400`.
+  - HTTP status codes `4xx` are supposed to reflect client errors (bad requests).
+  - The case when Endpoint's handler returns do not comply the Endpoint's output schema is the internal API error.
+  - Use [Typescript's strict mode](https://www.typescriptlang.org/tsconfig#strict) in order to prevent such cases
+    during the development.
+- Added [Code of Conduct](CODE_OF_CONDUCT.md).
+- Output validation error messages changed slightly in the response:
+
+```text
+// before:
+output: Invalid format; anything: Number must be greater than 0
+// after:
+output/anything: Number must be greater than 0
+```
+
+### v8.4.4
+
+- `typescript` version is 4.9.4.
+- Following the changes made in v8.4.2, I'm switching to the [forked zod-to-ts](https://github.com/RobinTail/zod-to-ts)
+  - Typescript made a regular dependency inside that fork, since it's used for code generation.
+  - `@express-zod-api/zod-to-ts` version is v1.1.5.
+  - Fixed all warnings while generating a frontend client.
+
+### v8.4.3
+
+- The regular expression used for validating `z.dateIn()` made easier
+  by [@shroudedcode](https://github.com/shroudedcode).
+
+```typescript
+const before = /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d{3})?)?Z?$/;
+const after = /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d+)?)?Z?$/;
+```
+
+### v8.4.2
+
+- Fixing issue of inability to generate Client having Typescript 4.1-4.6.x installed.
+  - Making Typescript a regular dependency of the library (it was dev + peer).
+  - Using `typescript` version 4.9.3.
+  - This version also partially fixes the deprecation warnings in case you're using Typescript 4.9.x.
+  - The issue introduced in version 7.9.1 of the library due to changing the implementation in accordance with the
+    `typescript` upgrade to v4.8.2.
+  - The library uses Typescript's factory methods to generate the frontend client.
+
+### v8.4.1
+
+- `openapi3-ts` version is 3.1.2.
+- Fixed a bug found and reported by [@leosuncin](https://github.com/leosuncin) in issue #705.
+  - CORS didn't work well in case of using `DependsOnMethod`.
+  - The list of the allowed methods in the response to `OPTIONS` request did only contain the first method declared
+    within `DependsOnMethod` instance.
+
+```typescript
+// reproduction minimal setup
+const routing: Routing = {
+  test: new DependsOnMethod({
+    get: getEndpoint,
+    post: postEndpoint,
+  }),
+};
+// when requesting OPTIONS for "/test", the response has the following header:
+// Access-Control-Allow-Methods: GET, OPTIONS
+```
+
+### v8.4.0
+
+- Fixed the flaw found and reported by [@kirdk](https://github.com/kirdk) in issue #662.
+  - Now nested top level refinements are available:
+
+```ts
+import { z } from "express-zod-api";
+
+const endpoint = endpointsFactory.build({
+  input: z
+    .object({
+      /* ... */
+    })
+    .refine(() => true)
+    .refine(() => true)
+    .refine(() => true),
+  // ...
+});
+```
+
+### v8.3.4
+
+- Adjustments to the feature #600: Top level refinements.
+  - In some cases the type of refinement can be indistinguishable from the type of transformation, since both of them
+    are using the same class `ZodEffects` and the only difference is the _inequality_ if input and output types.
+  - However, both of these types may have a common ancestor, which make it challenging to recognize them on the level
+    of Types. So I made a decision to handle this case programmatically.
+  - `createMiddleware()` and `Endpoint::constructor()` will throw in case of using `.transform()` on the top level of
+    `IOSchema`.
+- **Help wanted**: In case anyone smarter than me is reading this, please let me know how I can improve `IOSchema`
+  [type](https://github.com/RobinTail/express-zod-api/blob/master/src/io-schema.ts) to allow refinements without
+  allowing transformations at the same time.
+
+```ts
+// ZodEffects<ZodObject<{}>, boolean, {}>
+z.object({}).transform(() => true); // OK, this is catchable
+// ZodEffects<ZodObject<{}>, never[], {}>
+z.object({}).transform(() => []); // never[] inherits Array inherits Object, {} inherits Object as well
+```
+
+### v8.3.3
+
+- Fixed the bug #672 found and reported by [@shroudedcode](https://github.com/shroudedcode).
+  - Preserving the custom description of `z.dateIn()` and `z.dateOut()` schemas when generating OpenAPI documentation.
+
+```yaml
+# z.dateIn().describe("custom description")
+before:
+  description: YYYY-MM-DDTHH:mm:ss.sssZ
+after:
+  description: custom description
+```
+
+### v8.3.2
+
+- Fixed the bug #673 found and reported by [@shroudedcode](https://github.com/shroudedcode).
+  - Preventing double parsing of incoming data by input schemas of middlewares containing transformations.
+  - The bug caused inability of using any transforming schema in middlewares.
+  - In particular, but not limited with: using `z.dateIn()` in middlewares.
+    - Sample error message in this case: `Expected string, received date`.
+  - Using `.transform()` method in middlewares was also affected by this bug.
+
+### v8.3.1
+
+- Clearer error message when using `z.date()` within I/O schema thrown by OpenAPI generator.
+
+### v8.3.0
+
+- Feature #600: Top level refinements.
+  - Starting this version you can use the `.refine()` method on the `z.object()` of the input schema.
+  - This feature might be useful, for example, when you have multiple optional properties on the top level, but at
+    least one of them has to be specified.
+  - Currently, only the refinements of `z.object()` are supported.
+    - You can not combine it with `z.union()`, `z.intersetion()`, `z.discriminatedUnion()`, `.or()`, `.and()` yet.
+
+```typescript
+// example
+import { z } from "express-zod-api";
+
+const endpoint = endpointsFactory.build({
+  input: z
+    .object({
+      email: z.string().email().optional(),
+      id: z.string().optional(),
+      otherThing: z.string().optional(),
+    })
+    .refine(
+      (inputs) => Object.keys(inputs).length >= 1,
+      "Please provide at least one property"
+    ),
+  // ...
+});
+```
+
+### v8.2.1
+
+- OpenAPI generator throws when attempting to use `z.file()` within input schema.
+
 ### v8.2.0
 
 - Feature #637: endpoint short description (summary).
@@ -498,7 +752,6 @@ export const myMiddleware = createMiddleware({
     .passthrough(), // <— remove this if you have it in your code
   middleware: async () => ({...}),
 });
-
 ```
 
 ## Version 5

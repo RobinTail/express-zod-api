@@ -3,18 +3,24 @@ import { Logger } from "winston";
 import { z } from "zod";
 import { ApiResponse } from "./api-response";
 import { CommonConfig } from "./config-type";
-import { ResultHandlerError } from "./errors";
+import {
+  IOSchemaError,
+  OutputValidationError,
+  ResultHandlerError,
+} from "./errors";
 import {
   FlatObject,
   getActualMethod,
-  getInitialInput,
-  IOSchema,
+  getInput,
+  getMessageFromError,
+  hasTopLevelTransformingEffect,
   makeErrorFromAnything,
 } from "./common-helpers";
-import { combineContainers, LogicalContainer } from "./logical-container";
+import { IOSchema } from "./io-schema";
+import { LogicalContainer, combineContainers } from "./logical-container";
 import { AuxMethod, Method, MethodsDefinition } from "./method";
 import { AnyMiddlewareDef } from "./middleware";
-import { lastResortHandler, ResultHandlerDefinition } from "./result-handler";
+import { ResultHandlerDefinition, lastResortHandler } from "./result-handler";
 import { Security } from "./security";
 
 export type Handler<IN, OUT, OPT> = (params: {
@@ -42,6 +48,7 @@ export abstract class AbstractEndpoint {
   public abstract getSecurity(): LogicalContainer<Security>;
   public abstract getScopes(): string[];
   public abstract getTags(): string[];
+  public abstract _setSiblingMethods(methods: Method[]): void;
 }
 
 type EndpointProps<
@@ -78,6 +85,7 @@ export class Endpoint<
 > extends AbstractEndpoint {
   protected readonly descriptions: Record<"short" | "long", string | undefined>;
   protected readonly methods: M[] = [];
+  protected siblingMethods: Method[] = [];
   protected readonly middlewares: AnyMiddlewareDef[] = [];
   protected readonly inputSchema: IN;
   protected readonly mimeTypes: string[];
@@ -99,6 +107,16 @@ export class Endpoint<
     ...rest
   }: EndpointProps<IN, OUT, OPT, M, POS, NEG, SCO, TAG>) {
     super();
+    [
+      { name: "input schema", schema: inputSchema },
+      { name: "output schema", schema: outputSchema },
+    ].forEach(({ name, schema }) => {
+      if (hasTopLevelTransformingEffect(schema)) {
+        throw new IOSchemaError(
+          `Using transformations on the top level of endpoint ${name} is not allowed.`
+        );
+      }
+    });
     this.middlewares = middlewares;
     this.inputSchema = inputSchema;
     this.mimeTypes = mimeTypes;
@@ -125,6 +143,14 @@ export class Endpoint<
     } else {
       this.methods = [rest.method];
     }
+  }
+
+  /**
+   * @desc Sets the other methods supported by the same path. Used by Routing in DependsOnMethod case, for options.
+   * @deprecated This method is for internal needs of the library, please avoid using it.
+   * */
+  public override _setSiblingMethods(methods: Method[]): void {
+    this.siblingMethods = methods;
   }
 
   public override getDescription(variant: "short" | "long") {
@@ -180,7 +206,8 @@ export class Endpoint<
   }
 
   #getDefaultCorsHeaders(): Record<string, string> {
-    const accessMethods = (this.methods as (M | AuxMethod)[])
+    const accessMethods = (this.methods as Array<Method | AuxMethod>)
+      .concat(this.siblingMethods)
       .concat("options")
       .join(", ")
       .toUpperCase();
@@ -195,20 +222,16 @@ export class Endpoint<
     try {
       return await this.outputSchema.parseAsync(output);
     } catch (e) {
-      if (e instanceof z.ZodError) {
-        throw new z.ZodError([
-          {
-            message: "Invalid format",
-            code: "custom",
-            path: ["output"],
-          },
-          ...e.issues.map((issue) => ({
-            ...issue,
-            path: issue.path.length === 0 ? ["output"] : issue.path,
-          })),
-        ]);
-      }
-      throw makeErrorFromAnything(e);
+      const error =
+        e instanceof z.ZodError
+          ? new z.ZodError(
+              e.issues.map(({ path, ...rest }) => ({
+                ...rest,
+                path: (["output"] as typeof path).concat(path),
+              }))
+            )
+          : makeErrorFromAnything(e);
+      throw new OutputValidationError(getMessageFromError(error));
     }
   }
 
@@ -220,7 +243,7 @@ export class Endpoint<
     logger,
   }: {
     method: Method | AuxMethod;
-    input: any;
+    input: Readonly<any>; // Issue #673: input is immutable, since this.inputSchema is combined with ones of middlewares
     request: Request;
     response: Response;
     logger: Logger;
@@ -231,11 +254,10 @@ export class Endpoint<
       if (method === "options" && def.type === "proprietary") {
         continue;
       }
-      Object.assign(input, await def.input.parseAsync(input)); // middleware can transform the input types
       Object.assign(
         options,
         await def.middleware({
-          input,
+          input: await def.input.parseAsync(input),
           options,
           request,
           response,
@@ -251,7 +273,7 @@ export class Endpoint<
         break;
       }
     }
-    return { input, options, isStreamClosed };
+    return { options, isStreamClosed };
   }
 
   async #parseAndRunHandler({
@@ -259,7 +281,7 @@ export class Endpoint<
     options,
     logger,
   }: {
-    input: any;
+    input: Readonly<any>;
     options: any;
     logger: Logger;
   }) {
@@ -276,14 +298,14 @@ export class Endpoint<
     request,
     response,
     logger,
-    initialInput,
+    input,
     output,
   }: {
     error: Error | null;
     request: Request;
     response: Response;
     logger: Logger;
-    initialInput: any;
+    input: any;
     output: any;
   }) {
     try {
@@ -293,7 +315,7 @@ export class Endpoint<
         request,
         response,
         logger,
-        input: initialInput,
+        input,
       });
     } catch (e) {
       lastResortHandler({
@@ -332,11 +354,11 @@ export class Endpoint<
         response.set(key, headers[key]);
       }
     }
-    const initialInput = getInitialInput(request, config.inputSources);
+    const input = getInput(request, config.inputSources);
     try {
-      const { input, options, isStreamClosed } = await this.#runMiddlewares({
+      const { options, isStreamClosed } = await this.#runMiddlewares({
         method,
-        input: { ...initialInput }, // preserve the initial
+        input,
         request,
         response,
         logger,
@@ -355,7 +377,7 @@ export class Endpoint<
       error = makeErrorFromAnything(e);
     }
     await this.#handleResult({
-      initialInput,
+      input,
       output,
       request,
       response,

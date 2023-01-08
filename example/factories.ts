@@ -1,9 +1,9 @@
 import { lookup } from "mime-types";
 import {
+  EndpointsFactory,
   createApiResponse,
   createResultHandler,
   defaultResultHandler,
-  EndpointsFactory,
   z,
 } from "../src";
 import { config } from "./config";

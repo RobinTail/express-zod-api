@@ -1,14 +1,15 @@
 import {
-  z,
   EndpointsFactory,
-  createMiddleware,
-  defaultResultHandler,
-  defaultEndpointsFactory,
-  createResultHandler,
   createApiResponse,
+  createMiddleware,
+  createResultHandler,
+  defaultEndpointsFactory,
+  defaultResultHandler,
   testEndpoint,
+  z,
 } from "../../src";
 import { Endpoint } from "../../src/endpoint";
+import { IOSchemaError } from "../../src/errors";
 import { mimeJson } from "../../src/mime";
 import { serializeSchemaForTest } from "../helpers";
 
@@ -171,6 +172,25 @@ describe("Endpoint", () => {
   });
 
   describe("#parseOutput", () => {
+    test("Should throw on output validation failure", async () => {
+      const endpoint = defaultEndpointsFactory.build({
+        method: "post",
+        input: z.object({}),
+        output: z.object({ email: z.string().email() }),
+        handler: async () => ({ email: "not email" }),
+      });
+      const { responseMock } = await testEndpoint({
+        endpoint,
+      });
+      expect(responseMock.status).toBeCalledWith(500);
+      expect(responseMock.json).toBeCalledWith({
+        status: "error",
+        error: {
+          message: "output/email: Invalid email",
+        },
+      });
+    });
+
     test("Should throw on output parsing non-Zod error", async () => {
       const factory = new EndpointsFactory(defaultResultHandler);
       const endpoint = factory.build({
@@ -542,6 +562,241 @@ describe("Endpoint", () => {
         status: "error",
         error: { message: "Something went wrong" },
       });
+    });
+  });
+
+  describe("Issue #654: Top level refinements", () => {
+    const endpoint = defaultEndpointsFactory.build({
+      method: "post",
+      input: z
+        .object({
+          type: z.union([z.literal("type1"), z.literal("type2")]),
+          dynamicValue: z.union([
+            z.object({ type1Attribute: z.number() }),
+            z.object({ type2Attribute: z.string() }),
+          ]),
+          emitOutputValidationFailure: z.boolean().optional(),
+        })
+        .refine(
+          (data) => {
+            if (data.type === "type1") {
+              return "type1Attribute" in data.dynamicValue;
+            }
+            return "type2Attribute" in data.dynamicValue;
+          },
+          {
+            message: "type1Attribute is required if type is type1",
+            path: ["dynamicValue"],
+          }
+        ),
+      output: z
+        .object({})
+        .passthrough()
+        .refine((obj) => !("emitOutputValidationFailure" in obj), {
+          message: "failure on demand",
+        }),
+      handler: async ({ input }) =>
+        input.emitOutputValidationFailure
+          ? { emitOutputValidationFailure: true }
+          : {},
+    });
+
+    test("should accept valid inputs", async () => {
+      const { responseMock } = await testEndpoint({
+        endpoint,
+        requestProps: {
+          method: "POST",
+          body: {
+            type: "type1",
+            dynamicValue: { type1Attribute: 123 },
+          },
+        },
+      });
+      expect(responseMock.json).toHaveBeenCalledWith({
+        data: {},
+        status: "success",
+      });
+      expect(responseMock.status).toHaveBeenCalledWith(200);
+    });
+
+    test("should fail during the refinement of invalid inputs", async () => {
+      const { responseMock } = await testEndpoint({
+        endpoint,
+        requestProps: {
+          method: "POST",
+          body: {
+            type: "type1",
+            dynamicValue: { type2Attribute: "test" },
+          },
+        },
+      });
+      expect(responseMock.json).toHaveBeenCalledWith({
+        error: {
+          message: "dynamicValue: type1Attribute is required if type is type1",
+        },
+        status: "error",
+      });
+      expect(responseMock.status).toHaveBeenCalledWith(400);
+    });
+
+    test("should refine the output schema as well", async () => {
+      const { responseMock } = await testEndpoint({
+        endpoint,
+        requestProps: {
+          method: "POST",
+          body: {
+            type: "type1",
+            dynamicValue: { type1Attribute: 123 },
+            emitOutputValidationFailure: true,
+          },
+        },
+      });
+      expect(responseMock.json).toHaveBeenCalledWith({
+        status: "error",
+        error: {
+          message: "output: failure on demand",
+        },
+      });
+      expect(responseMock.status).toHaveBeenCalledWith(500);
+    });
+  });
+
+  describe("Feature #600: Top level refinements", () => {
+    const endpoint = defaultEndpointsFactory.build({
+      method: "post",
+      input: z
+        .object({
+          email: z.string().email().optional(),
+          id: z.string().optional(),
+          otherThing: z.string().optional(),
+        })
+        .refine(
+          (x) => Object.keys(x).length >= 1,
+          "Please provide at least one property"
+        ),
+      output: z.object({}),
+      handler: async () => ({}),
+    });
+
+    test("should accept valid inputs", async () => {
+      const { responseMock } = await testEndpoint({
+        endpoint,
+        requestProps: {
+          method: "POST",
+          body: {
+            id: "test",
+          },
+        },
+      });
+      expect(responseMock.json).toHaveBeenCalledWith({
+        data: {},
+        status: "success",
+      });
+      expect(responseMock.status).toHaveBeenCalledWith(200);
+    });
+
+    test("should fail during the refinement of invalid inputs", async () => {
+      const { responseMock } = await testEndpoint({
+        endpoint,
+        requestProps: {
+          method: "POST",
+          body: {},
+        },
+      });
+      expect(responseMock.json).toHaveBeenCalledWith({
+        error: {
+          message: "Please provide at least one property",
+        },
+        status: "error",
+      });
+      expect(responseMock.status).toHaveBeenCalledWith(400);
+    });
+
+    test("should throw when using transformation (constructor)", () => {
+      expect(
+        () =>
+          new Endpoint({
+            method: "get",
+            inputSchema: z.object({}).transform(() => []),
+            mimeTypes: [mimeJson],
+            outputSchema: z.object({}),
+            handler: jest.fn(),
+            resultHandler: {
+              getPositiveResponse: jest.fn(),
+              getNegativeResponse: jest.fn(),
+              handler: jest.fn(),
+            },
+            middlewares: [],
+          })
+      ).toThrowError(
+        new IOSchemaError(
+          "Using transformations on the top level of endpoint input schema is not allowed."
+        )
+      );
+      expect(
+        () =>
+          new Endpoint({
+            method: "get",
+            inputSchema: z.object({}),
+            mimeTypes: [mimeJson],
+            outputSchema: z.object({}).transform(() => []),
+            handler: jest.fn(),
+            resultHandler: {
+              getPositiveResponse: jest.fn(),
+              getNegativeResponse: jest.fn(),
+              handler: jest.fn(),
+            },
+            middlewares: [],
+          })
+      ).toThrowError(
+        new IOSchemaError(
+          "Using transformations on the top level of endpoint output schema is not allowed."
+        )
+      );
+    });
+  });
+
+  describe("Issue #673: transformations in middlewares", () => {
+    test("should avoid double parsing, should not mutate input", async () => {
+      const dateInputMiddleware = createMiddleware({
+        input: z.object({
+          middleware_date_input: z.dateIn().optional(),
+        }),
+        middleware: async ({ input: { middleware_date_input }, logger }) => {
+          logger.debug("date in mw handler", typeof middleware_date_input);
+          return {};
+        },
+      });
+
+      const endpoint = defaultEndpointsFactory
+        .addMiddleware(dateInputMiddleware)
+        .build({
+          method: "get",
+          input: z.object({}),
+          output: z.object({}),
+          handler: async ({ input: { middleware_date_input }, logger }) => {
+            logger.debug(
+              "date in endpoint handler",
+              typeof middleware_date_input
+            );
+            return {};
+          },
+        });
+
+      const { loggerMock, responseMock } = await testEndpoint({
+        endpoint,
+        requestProps: {
+          query: {
+            middleware_date_input: "2022-09-28",
+          },
+        },
+      });
+
+      expect(loggerMock.debug.mock.calls).toEqual([
+        ["date in mw handler", "object"],
+        ["date in endpoint handler", "object"],
+      ]);
+      expect(responseMock.status).toHaveBeenCalledWith(200);
     });
   });
 });

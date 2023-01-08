@@ -1,12 +1,12 @@
 import { config as exampleConfig } from "../../example/config";
 import { routing } from "../../example/routing";
 import {
-  z,
   OpenAPI,
-  defaultEndpointsFactory,
-  withMeta,
   createConfig,
   createMiddleware,
+  defaultEndpointsFactory,
+  withMeta,
+  z,
 } from "../../src";
 import { expectType } from "tsd";
 
