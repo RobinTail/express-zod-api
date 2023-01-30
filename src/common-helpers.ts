@@ -1,5 +1,5 @@
 import { Request } from "express";
-import { HttpError } from "http-errors";
+import createHttpError, { HttpError } from "http-errors";
 import { z } from "zod";
 import {
   CommonConfig,
@@ -101,12 +101,17 @@ export function getMessageFromError(error: Error): string {
   return error.message;
 }
 
-export function getStatusCodeFromError(error: Error): number {
-  if (error instanceof HttpError) {
-    return error.statusCode;
+export async function parseInput(schema: z.ZodSchema, input: any) {
+  try {
+    return await schema.parseAsync(input);
+  } catch (e) {
+    throw createHttpError(400, makeErrorFromAnything(e));
   }
-  if (error instanceof z.ZodError) {
-    return 400;
+}
+
+export function getStatusCodeFromError(error: Error): number {
+  if (createHttpError.isHttpError(error)) {
+    return (error as HttpError).statusCode;
   }
   return 500;
 }

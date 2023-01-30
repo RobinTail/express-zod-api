@@ -257,19 +257,6 @@ describe("Common Helpers", () => {
       ).toEqual(403);
     });
 
-    test("should return 400 for ZodError", () => {
-      const error = new z.ZodError([
-        {
-          code: "invalid_type",
-          path: ["user", "id"],
-          message: "expected number, got string",
-          expected: "number",
-          received: "string",
-        },
-      ]);
-      expect(getStatusCodeFromError(error)).toEqual(400);
-    });
-
     test("should return 500 for other errors", () => {
       expect(getStatusCodeFromError(new Error("something went wrong"))).toEqual(
         500

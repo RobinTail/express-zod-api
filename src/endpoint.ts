@@ -15,6 +15,7 @@ import {
   getMessageFromError,
   hasTopLevelTransformingEffect,
   makeErrorFromAnything,
+  parseInput,
 } from "./common-helpers";
 import { IOSchema } from "./io-schema";
 import { LogicalContainer, combineContainers } from "./logical-container";
@@ -257,7 +258,7 @@ export class Endpoint<
       Object.assign(
         options,
         await def.middleware({
-          input: await def.input.parseAsync(input),
+          input: await parseInput(def.input, input),
           options,
           request,
           response,
@@ -287,7 +288,7 @@ export class Endpoint<
   }) {
     return this.handler({
       // final input types transformations for handler
-      input: (await this.inputSchema.parseAsync(input)) as z.output<IN>,
+      input: (await parseInput(this.inputSchema, input)) as z.output<IN>,
       options,
       logger,
     });
@@ -376,6 +377,7 @@ export class Endpoint<
     } catch (e) {
       error = makeErrorFromAnything(e);
     }
+
     await this.#handleResult({
       input,
       output,

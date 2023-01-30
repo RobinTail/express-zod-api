@@ -55,32 +55,6 @@ describe("ResultHandler", () => {
       });
     });
 
-    test("Should handle schema error", () => {
-      const requestMock = {
-        method: "POST",
-        url: "http://something/v1/anything",
-      };
-      defaultResultHandler.handler({
-        error: new z.ZodError([
-          {
-            code: "invalid_type",
-            message: "Expected string, got number",
-            path: ["something"],
-            expected: "string",
-            received: "number",
-          },
-        ]),
-        input: { something: 453 },
-        output: { anything: 118 },
-        request: requestMock as Request,
-        response: responseMock as Response,
-        logger: loggerMock,
-      });
-      expect(loggerMock.error).toBeCalledTimes(0);
-      expect(responseMock.status).toBeCalledWith(400);
-      expect(responseMock.json.mock.calls[0]).toMatchSnapshot();
-    });
-
     test("Should handle HTTP error", () => {
       const requestMock = {
         method: "POST",
