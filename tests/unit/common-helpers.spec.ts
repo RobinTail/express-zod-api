@@ -14,9 +14,12 @@ import {
   isLoggerConfig,
   isValidDate,
   makeErrorFromAnything,
+  parseInput,
 } from "../../src/common-helpers";
 import { createHttpError, withMeta, z } from "../../src";
 import { Request } from "express";
+import { ZodError } from "zod";
+import { HttpError } from "http-errors";
 
 describe("Common Helpers", () => {
   describe("defaultInputSources", () => {
@@ -261,6 +264,27 @@ describe("Common Helpers", () => {
       expect(getStatusCodeFromError(new Error("something went wrong"))).toEqual(
         500
       );
+    });
+  });
+
+  describe("parseInput()", () => {
+    test("Should parse the input according to the schema", async () => {
+      expect(
+        await parseInput(z.object({ a: z.string() }), { a: "123" })
+      ).toEqual({
+        a: "123",
+      });
+    });
+
+    test("Should throw an error if the input is invalid", async () => {
+      try {
+        await parseInput(z.object({ a: z.string() }), { b: 123 });
+        fail("Should have thrown an error");
+      } catch (e) {
+        expect(e).toBeInstanceOf(ZodError);
+        expect(createHttpError.isHttpError(e));
+        expect((e as HttpError).statusCode).toEqual(400);
+      }
     });
   });
 
