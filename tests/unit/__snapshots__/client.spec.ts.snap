@@ -130,11 +130,11 @@ export class ExpressZodAPIClient {
 `;
 
 exports[`API Client Generator Should treat optionals the same way as z.infer() 1`] = `
-"type PostV1TestwithdashesInput = {
+"type PostV1TestWithDashesInput = {
     opt?: string | undefined;
 };
 
-type PostV1TestwithdashesResponse = {
+type PostV1TestWithDashesResponse = {
     status: "success";
     data: {
         similar?: number | undefined;
@@ -153,11 +153,11 @@ export type Method = "get" | "post" | "put" | "delete" | "patch";
 export type MethodPath = \`\${Method} \${Path}\`;
 
 export interface Input extends Record<MethodPath, any> {
-    "post /v1/test-with-dashes": PostV1TestwithdashesInput;
+    "post /v1/test-with-dashes": PostV1TestWithDashesInput;
 }
 
 export interface Response extends Record<MethodPath, any> {
-    "post /v1/test-with-dashes": PostV1TestwithdashesResponse;
+    "post /v1/test-with-dashes": PostV1TestWithDashesResponse;
 }
 
 export const jsonEndpoints = { "post /v1/test-with-dashes": true };
