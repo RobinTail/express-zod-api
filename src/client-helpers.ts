@@ -200,7 +200,7 @@ export const cleanId = (path: string, method: string, suffix: string) => {
   return [method]
     .concat(path.split("/"))
     .concat(suffix)
-    .map((entry) => entry.replace(/[^A-Z0-9]/i, ""))
+    .map((entry) => entry.replace(/[^A-Z0-9]/gi, ""))
     .map(
       (entry) => entry.slice(0, 1).toUpperCase() + entry.slice(1).toLowerCase()
     )
