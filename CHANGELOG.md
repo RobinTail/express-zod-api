@@ -2,6 +2,11 @@
 
 ## Version 8
 
+### v8.9.1
+
+- Fixed issue #805, reported and resolved by [@TheWisestOne](https://github.com/TheWisestOne).
+  - The frontend client generator was failing to generate a valid code in case of a routing path having multiple non-alphanumeric characters.
+
 ### v8.9.0
 
 - Fixes of the documentation generator (OpenAPI).
