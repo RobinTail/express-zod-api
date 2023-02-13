@@ -405,6 +405,68 @@ paths:
         - HTTP_1: []
           OAUTH2_1:
             - write
+  /v1/updateSomething:
+    put:
+      responses:
+        "200":
+          description: PUT /v1/updateSomething Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - success
+                  data:
+                    type: object
+                    properties: {}
+                    required: []
+                required:
+                  - status
+                  - data
+        "400":
+          description: PUT /v1/updateSomething Error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                required:
+                  - status
+                  - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
+      requestBody:
+        content:
+          application/json:
+            schema:
+              description: PUT /v1/updateSomething request body
+              allOf:
+                - type: object
+                  properties: {}
+                  required: []
+                - type: object
+                  properties: {}
+                  required: []
+      security:
+        - HTTP_2: []
 components:
   schemas: {}
   responses: {}
@@ -428,6 +490,10 @@ components:
           scopes:
             read: read something
             write: write something
+    HTTP_2:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
   links: {}
   callbacks: {}
 tags: []

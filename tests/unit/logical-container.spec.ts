@@ -107,5 +107,8 @@ describe("LogicalContainer", () => {
         or: [{ and: [3, 4, 1] }, { and: [3, 4, 2] }],
       });
     });
+    test("should combine LogicalAnd and flat", () => {
+      expect(combineContainers({ and: [] }, 1)).toEqual({ and: [1] });
+    });
   });
 });

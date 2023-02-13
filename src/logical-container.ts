@@ -106,5 +106,8 @@ export const combineContainers = <T>(
       }
     }
   }
+  if (isObject(a) && "and" in a && Array.isArray(a.and) && a.and.length === 0)
+    return { and: [b as T] };
+
   return { and: [a as T, b as T] };
 };
