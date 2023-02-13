@@ -82,32 +82,40 @@ export const combineContainers = <T>(
   a: LogicalContainer<T>,
   b: LogicalContainer<T>
 ): LogicalContainer<T> => {
-  if (isObject(a) && isObject(b)) {
+  if (isObject(a)) {
     if ("and" in a) {
-      if ("and" in b) {
-        return flattenAnds([a, b]);
+      if (isObject(b)) {
+        if ("and" in b) {
+          return flattenAnds([a, b]);
+        }
+        if ("or" in b) {
+          return combineContainers(andToOr(a), b);
+        }
       }
-      if ("or" in b) {
-        return combineContainers(andToOr(a), b);
-      }
+      return flattenAnds([a, b]);
     }
     if ("or" in a) {
-      if ("and" in b) {
-        return combineContainers(b, a);
+      if (isObject(b)) {
+        if ("and" in b) {
+          return combineContainers(b, a);
+        }
+        if ("or" in b) {
+          const combs = combinations(a.or, b.or);
+          return {
+            or:
+              combs.type === "single"
+                ? combs.value
+                : combs.value.map(flattenAnds),
+          };
+        }
       }
-      if ("or" in b) {
-        const combs = combinations(a.or, b.or);
-        return {
-          or:
-            combs.type === "single"
-              ? combs.value
-              : combs.value.map(flattenAnds),
-        };
-      }
+      return combineContainers(a, { and: [b] });
     }
   }
-  if (isObject(a) && "and" in a && Array.isArray(a.and) && a.and.length === 0)
-    return { and: [b as T] };
+
+  if (isObject(b) && ("and" in b || "or" in b)) {
+    return combineContainers(b, a);
+  }
 
   return { and: [a as T, b as T] };
 };
