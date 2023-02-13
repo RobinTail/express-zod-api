@@ -2,6 +2,12 @@
 
 ## Version 8
 
+### v8.9.2
+
+- Fixed issue #816 (related to discussion #803), reported and resolved by [@McMerph](https://github.com/McMerph).
+  - Assigning a singular `Security` schema to a `Middleware` led to an error during the generation of OpenAPI docs.
+  - Also, preventing the `required` prop to be an empty array when depicting objects and records in OpenAPI docs.
+
 ### v8.9.1
 
 - Fixed issue #805, reported and resolved by [@TheWisestOne](https://github.com/TheWisestOne).
