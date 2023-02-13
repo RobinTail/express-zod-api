@@ -821,6 +821,11 @@ describe("Open API generator", () => {
         input: z.object({}),
         middleware: jest.fn(),
       });
+      const mw3 = createMiddleware({
+        security: { type: "bearer", format: "JWT" },
+        input: z.object({}),
+        middleware: jest.fn(),
+      });
       const spec = new OpenAPI({
         config: sampleConfig,
         routing: {
@@ -839,6 +844,13 @@ describe("Open API generator", () => {
             setSomething: defaultEndpointsFactory.addMiddleware(mw2).build({
               scope: "write",
               method: "post",
+              input: z.object({}),
+              output: z.object({}),
+              handler: async () => ({}),
+            }),
+            updateSomething: defaultEndpointsFactory.addMiddleware(mw3).build({
+              scopes: ["this should be omitted"],
+              method: "put",
               input: z.object({}),
               output: z.object({}),
               handler: async () => ({}),

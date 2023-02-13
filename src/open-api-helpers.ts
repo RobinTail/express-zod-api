@@ -188,18 +188,21 @@ export const depictObject: Depicter<z.AnyZodObject> = ({
   schema,
   isResponse,
   next,
-}) => ({
-  type: "object",
-  properties: depictObjectProperties({ schema, isResponse, next }),
-  required: Object.keys(schema.shape).filter((key) => {
+}) => {
+  const required = Object.keys(schema.shape).filter((key) => {
     const prop = schema.shape[key];
     const isOptional =
       isResponse && hasCoercion(prop)
         ? prop instanceof z.ZodOptional
         : prop.isOptional();
     return !isOptional;
-  }),
-});
+  });
+  return {
+    type: "object",
+    properties: depictObjectProperties({ schema, isResponse, next }),
+    ...(required.length ? { required } : {}),
+  };
+};
 
 /**
  * @see https://swagger.io/docs/specification/data-models/data-types/
@@ -281,7 +284,7 @@ export const depictRecord: Depicter<z.ZodRecord<z.ZodTypeAny>> = ({
         isResponse,
         next,
       }),
-      required: keys,
+      ...(keys.length ? { required: keys } : {}),
     };
   }
   if (keySchema instanceof z.ZodLiteral) {
