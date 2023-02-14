@@ -13,7 +13,13 @@ export { ServeStatic } from "./serve-static";
 export { Routing } from "./routing";
 export { createServer, attachRouting } from "./server";
 export { OpenAPI } from "./open-api";
-export { OpenAPIError, DependsOnMethodError, RoutingError } from "./errors";
+export {
+  OpenAPIError,
+  DependsOnMethodError,
+  RoutingError,
+  OutputValidationError,
+  EndpointHandlerError,
+} from "./errors";
 export { withMeta } from "./metadata";
 export { testEndpoint } from "./mock";
 export { Client } from "./client";
