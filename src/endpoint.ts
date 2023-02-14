@@ -4,6 +4,7 @@ import { z } from "zod";
 import { ApiResponse } from "./api-response";
 import { CommonConfig } from "./config-type";
 import {
+  EndpointHandlerError,
   IOSchemaError,
   OutputValidationError,
   ResultHandlerError,
@@ -285,12 +286,25 @@ export class Endpoint<
     options: any;
     logger: Logger;
   }) {
-    return this.handler({
-      // final input types transformations for handler
-      input: (await this.inputSchema.parseAsync(input)) as z.output<IN>,
-      options,
-      logger,
-    });
+    // final input types transformations for handler
+    const finalInput = (await this.inputSchema.parseAsync(
+      input
+    )) as z.output<IN>;
+    try {
+      return await this.handler({
+        input: finalInput,
+        options,
+        logger,
+      });
+    } catch (e) {
+      if (e instanceof z.ZodError) {
+        // Discussion #787
+        // if Zod used in the Endpoint's handler implementation as tool for checking something not I/O-related
+        // we're transforming the possible parsing error into a custom one for the further handling by ResultHandler
+        throw new EndpointHandlerError(getMessageFromError(e));
+      }
+      throw e;
+    }
   }
 
   async #handleResult({

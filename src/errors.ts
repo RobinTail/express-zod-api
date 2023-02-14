@@ -18,6 +18,10 @@ export class OutputValidationError extends IOSchemaError {
   public override name = "OutputValidationError";
 }
 
+export class EndpointHandlerError extends Error {
+  public override name = "EndpointHandlerError";
+}
+
 export class ResultHandlerError extends Error {
   public override name = "ResultHandlerError";
   public readonly originalError: Error | undefined;
