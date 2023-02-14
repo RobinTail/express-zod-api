@@ -31,6 +31,30 @@ describe("Open API generator", () => {
       expect(spec).toMatchSnapshot();
     });
 
+    test("should generate the correct schema for DELETE request without body", () => {
+      const spec = new OpenAPI({
+        routing: {
+          v1: {
+            deleteSomething: defaultEndpointsFactory.build({
+              methods: ["delete"],
+              input: z.object({}),
+              output: z.object({
+                whatever: z.number(),
+              }),
+              handler: async () => ({
+                whatever: 42,
+              }),
+            }),
+          },
+        },
+        config: sampleConfig,
+        version: "3.4.5",
+        title: "Testing DELETE request without body",
+        serverUrl: "http://example.com",
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
+    });
+
     test("should generate the correct schema for complex types", () => {
       const literalValue = "something" as const;
       const spec = new OpenAPI({
