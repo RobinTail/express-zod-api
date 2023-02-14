@@ -33,7 +33,7 @@ export const defaultInputSources: InputSources = {
   post: ["body", "params", "files"],
   put: ["body", "params"],
   patch: ["body", "params"],
-  delete: ["body", "query", "params"],
+  delete: ["query", "params"],
 };
 const fallbackInputSource = defaultInputSources.delete;
 

@@ -112,8 +112,7 @@ export class OpenAPI extends OpenApiBuilder {
       if (depictedParams.length > 0) {
         operation.parameters = depictedParams;
       }
-      // https://stackoverflow.com/a/54980985
-      if (inputSources.includes("body") && method !== "delete") {
+      if (inputSources.includes("body")) {
         operation.requestBody = depictRequest(commonParams);
       }
       const securityRefs = depictSecurityRefs(

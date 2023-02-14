@@ -95,7 +95,6 @@ describe("Common Helpers", () => {
         )
       ).toEqual({
         a: "query",
-        b: "body",
       });
     });
     test("should return body and files on demand for POST by default", () => {
