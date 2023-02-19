@@ -18,7 +18,7 @@ export {
   DependsOnMethodError,
   RoutingError,
   OutputValidationError,
-  EndpointHandlerError,
+  EndpointHandlerZodError,
 } from "./errors";
 export { withMeta } from "./metadata";
 export { testEndpoint } from "./mock";
