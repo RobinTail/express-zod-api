@@ -4,7 +4,7 @@ import { z } from "zod";
 import { ApiResponse } from "./api-response";
 import { CommonConfig } from "./config-type";
 import {
-  EndpointHandlerError,
+  EndpointHandlerZodError,
   IOSchemaError,
   OutputValidationError,
   ResultHandlerError,
@@ -301,7 +301,7 @@ export class Endpoint<
         // Discussion #787
         // if Zod used in the Endpoint's handler implementation as tool for checking something not I/O-related
         // we're transforming the possible parsing error into a custom one for the further handling by ResultHandler
-        throw new EndpointHandlerError(getMessageFromError(e));
+        throw new EndpointHandlerZodError(getMessageFromError(e));
       }
       throw e;
     }

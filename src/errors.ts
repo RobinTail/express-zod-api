@@ -18,8 +18,8 @@ export class OutputValidationError extends IOSchemaError {
   public override name = "OutputValidationError";
 }
 
-export class EndpointHandlerError extends Error {
-  public override name = "EndpointHandlerError";
+export class EndpointHandlerZodError extends Error {
+  public override name = "EndpointHandlerZodError";
 }
 
 export class ResultHandlerError extends Error {

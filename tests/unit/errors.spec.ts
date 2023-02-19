@@ -1,6 +1,6 @@
 import { DependsOnMethodError, OpenAPIError, RoutingError } from "../../src";
 import {
-  EndpointHandlerError,
+  EndpointHandlerZodError,
   IOSchemaError,
   OutputValidationError,
   ResultHandlerError,
@@ -65,12 +65,12 @@ describe("Errors", () => {
 
   describe("EndpointHandlerError", () => {
     test("should be an instance of Error", () => {
-      expect(new EndpointHandlerError("test")).toBeInstanceOf(Error);
+      expect(new EndpointHandlerZodError("test")).toBeInstanceOf(Error);
     });
 
     test("should have the name matching its class", () => {
-      expect(new EndpointHandlerError("test").name).toBe(
-        "EndpointHandlerError"
+      expect(new EndpointHandlerZodError("test").name).toBe(
+        "EndpointHandlerZodError"
       );
     });
   });
