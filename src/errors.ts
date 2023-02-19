@@ -1,3 +1,6 @@
+import { ZodError } from "zod";
+import { getMessageFromError } from "./common-helpers";
+
 export class RoutingError extends Error {
   public override name = "RoutingError";
 }
@@ -20,6 +23,12 @@ export class OutputValidationError extends IOSchemaError {
 
 export class EndpointHandlerZodError extends Error {
   public override name = "EndpointHandlerZodError";
+  public readonly originalError: ZodError;
+
+  constructor(originalError: ZodError) {
+    super(getMessageFromError(originalError));
+    this.originalError = originalError;
+  }
 }
 
 export class ResultHandlerError extends Error {

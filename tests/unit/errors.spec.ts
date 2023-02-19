@@ -1,3 +1,4 @@
+import { ZodError } from "zod";
 import { DependsOnMethodError, OpenAPIError, RoutingError } from "../../src";
 import {
   EndpointHandlerZodError,
@@ -64,13 +65,21 @@ describe("Errors", () => {
   });
 
   describe("EndpointHandlerError", () => {
+    const zodError = new ZodError([]);
+
     test("should be an instance of Error", () => {
-      expect(new EndpointHandlerZodError("test")).toBeInstanceOf(Error);
+      expect(new EndpointHandlerZodError(zodError)).toBeInstanceOf(Error);
     });
 
     test("should have the name matching its class", () => {
-      expect(new EndpointHandlerZodError("test").name).toBe(
+      expect(new EndpointHandlerZodError(zodError).name).toBe(
         "EndpointHandlerZodError"
+      );
+    });
+
+    test("should have .originalError property matching the one used for constructing", () => {
+      expect(new EndpointHandlerZodError(zodError).originalError).toEqual(
+        zodError
       );
     });
   });
