@@ -2,6 +2,10 @@
 
 ## Version 8
 
+### v8.9.3
+
+- `zod` version is 3.20.6.
+
 ### v8.9.2
 
 - Fixed issue #816 (related to discussion #803), reported and resolved by [@McMerph](https://github.com/McMerph).
