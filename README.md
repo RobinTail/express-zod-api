@@ -504,6 +504,8 @@ import {
   createApiResponse,
   IOSchema,
   z,
+  getStatusCodeFromError,
+  getMessageFromError,
 } from "express-zod-api";
 
 export const yourResultHandler = createResultHandler({
@@ -514,12 +516,20 @@ export const yourResultHandler = createResultHandler({
     ),
   getNegativeResponse: () => createApiResponse(z.object({ error: z.string() })),
   handler: ({ error, input, output, request, response, logger }) => {
+    if (!error) {
+      // your implementation
+      return;
+    }
+    const statusCode = getStatusCodeFromError(error);
+    const message = getMessageFromError(error);
     // your implementation
   },
 });
 ```
 
-Then you need to use it as an argument for `EndpointsFactory` instance creation:
+Note: `OutputValidationError` and `InputValidationError` are also available for your custom error handling.
+
+After creating your custom `ResultHandler` you can use it as an argument for `EndpointsFactory` instance creation:
 
 ```typescript
 import { EndpointsFactory } from "express-zod-api";
