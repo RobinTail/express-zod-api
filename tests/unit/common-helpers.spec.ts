@@ -83,7 +83,6 @@ describe("Common Helpers", () => {
         param: 123,
       });
     });
-    // @todo add test for unknown request
     test("should return only query for DELETE requests by default", () => {
       expect(
         getInput(
@@ -96,6 +95,21 @@ describe("Common Helpers", () => {
         )
       ).toEqual({
         a: "query",
+      });
+    });
+    test("should return body and query for unknown requests by default", () => {
+      expect(
+        getInput(
+          {
+            query: { a: "query" },
+            body: { b: "body" },
+            method: "UNSUPPORTED",
+          } as unknown as Request,
+          undefined
+        )
+      ).toEqual({
+        a: "query",
+        b: "body",
       });
     });
     test("should return body and files on demand for POST by default", () => {

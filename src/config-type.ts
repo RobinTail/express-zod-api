@@ -55,7 +55,10 @@ export interface AppConfig {
   app: Express; // or your custom express app
 }
 
-type InputSource = keyof Pick<Request, "query" | "body" | "files" | "params">;
+export type InputSource = keyof Pick<
+  Request,
+  "query" | "body" | "files" | "params"
+>;
 export type InputSources = Record<Method, InputSource[]>;
 
 type Headers = Record<string, string>;
