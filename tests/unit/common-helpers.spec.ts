@@ -15,7 +15,7 @@ import {
   isValidDate,
   makeErrorFromAnything,
 } from "../../src/common-helpers";
-import { createHttpError, withMeta, z } from "../../src";
+import { InputValidationError, createHttpError, withMeta, z } from "../../src";
 import { Request } from "express";
 
 describe("Common Helpers", () => {
@@ -271,8 +271,24 @@ describe("Common Helpers", () => {
       ).toEqual(403);
     });
 
-    test("should return 400 for ZodError", () => {
-      const error = new z.ZodError([
+    test("should return 400 for InputValidationError", () => {
+      const error = new InputValidationError(
+        new z.ZodError([
+          {
+            code: "invalid_type",
+            path: ["user", "id"],
+            message: "expected number, got string",
+            expected: "number",
+            received: "string",
+          },
+        ])
+      );
+      expect(getStatusCodeFromError(error)).toEqual(400);
+    });
+
+    test.each([
+      new Error("something went wrong"),
+      new z.ZodError([
         {
           code: "invalid_type",
           path: ["user", "id"],
@@ -280,14 +296,9 @@ describe("Common Helpers", () => {
           expected: "number",
           received: "string",
         },
-      ]);
-      expect(getStatusCodeFromError(error)).toEqual(400);
-    });
-
-    test("should return 500 for other errors", () => {
-      expect(getStatusCodeFromError(new Error("something went wrong"))).toEqual(
-        500
-      );
+      ]),
+    ])("should return 500 for other errors %#", (error) => {
+      expect(getStatusCodeFromError(error)).toEqual(500);
     });
   });
 

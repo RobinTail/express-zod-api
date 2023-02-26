@@ -8,6 +8,7 @@ import {
   LoggerConfig,
   loggerLevels,
 } from "./config-type";
+import { InputValidationError, OutputValidationError } from "./errors";
 import { IOSchema } from "./io-schema";
 import { getMeta } from "./metadata";
 import { AuxMethod, Method } from "./method";
@@ -99,6 +100,10 @@ export function getMessageFromError(error: Error): string {
       )
       .join("; ");
   }
+  if (error instanceof OutputValidationError) {
+    const hasFirstField = error.originalError.issues[0].path.length > 0;
+    return `output${hasFirstField ? "/" : ": "}${error.message}`;
+  }
   return error.message;
 }
 
@@ -106,7 +111,7 @@ export function getStatusCodeFromError(error: Error): number {
   if (error instanceof HttpError) {
     return error.statusCode;
   }
-  if (error instanceof z.ZodError) {
+  if (error instanceof InputValidationError) {
     return 400;
   }
   return 500;
