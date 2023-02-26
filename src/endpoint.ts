@@ -36,6 +36,7 @@ export abstract class AbstractEndpoint {
     logger: Logger;
     config: CommonConfig;
   }): Promise<void>;
+  public abstract getOperationId(): string | undefined;
   public abstract getDescription(variant: "short" | "long"): string | undefined;
   public abstract getMethods(): Method[];
   public abstract getInputSchema(): IOSchema;
@@ -67,6 +68,7 @@ type EndpointProps<
   outputSchema: OUT;
   handler: Handler<z.output<IN>, z.input<OUT>, OPT>;
   resultHandler: ResultHandlerDefinition<POS, NEG>;
+  operationId?: string;
   description?: string;
   shortDescription?: string;
 } & ({ scopes?: SCO[] } | { scope?: SCO }) &
@@ -83,6 +85,7 @@ export class Endpoint<
   SCO extends string,
   TAG extends string
 > extends AbstractEndpoint {
+  protected readonly operationId: string | undefined;
   protected readonly descriptions: Record<"short" | "long", string | undefined>;
   protected readonly methods: M[] = [];
   protected siblingMethods: Method[] = [];
@@ -101,6 +104,7 @@ export class Endpoint<
     outputSchema,
     handler,
     resultHandler,
+    operationId,
     description,
     shortDescription,
     mimeTypes,
@@ -123,6 +127,7 @@ export class Endpoint<
     this.outputSchema = outputSchema;
     this.handler = handler;
     this.resultHandler = resultHandler;
+    this.operationId = operationId;
     this.descriptions = { long: description, short: shortDescription };
     this.scopes = [];
     this.tags = [];
@@ -151,6 +156,10 @@ export class Endpoint<
    * */
   public override _setSiblingMethods(methods: Method[]): void {
     this.siblingMethods = methods;
+  }
+
+  public override getOperationId() {
+    return this.operationId;
   }
 
   public override getDescription(variant: "short" | "long") {

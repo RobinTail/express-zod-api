@@ -840,6 +840,7 @@ import { defaultEndpointsFactory, withMeta } from "express-zod-api";
 const exampleEndpoint = defaultEndpointsFactory.build({
   shortDescription: "Retrieves the user.", // <—— this becomes the summary line
   description: "The detailed explanaition on what this endpoint does.",
+  operationId: "retrieveUser",
   input: withMeta(
     z.object({
       id: z.number().describe("the ID of the user"),

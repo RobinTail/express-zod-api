@@ -62,6 +62,7 @@ paths:
                     status: error
                     error:
                       message: Sample error message
+      operationId: retrieveUser
       description: Example user retrieval endpoint.
       summary: Retrieves the user.
       tags:

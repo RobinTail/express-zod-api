@@ -35,6 +35,7 @@ type BuildProps<
   input: IN;
   output: OUT;
   handler: Handler<z.output<ProbableIntersection<MIN, IN>>, z.input<OUT>, OPT>;
+  operationId?: string;
   description?: string;
   shortDescription?: string;
 } & ({ scopes?: SCO[] } | { scope?: SCO }) &

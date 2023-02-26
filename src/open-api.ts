@@ -74,6 +74,7 @@ export class OpenAPI extends OpenApiBuilder {
     ) => {
       const method = _method as Method;
       const commonParams = { path, method, endpoint };
+      const operationId = endpoint.getOperationId();
       const [shortDesc, longDesc] = (["short", "long"] as const).map(
         endpoint.getDescription.bind(endpoint)
       );
@@ -97,6 +98,7 @@ export class OpenAPI extends OpenApiBuilder {
           }),
         },
       };
+      operation.operationId = operationId;
       if (longDesc) {
         operation.description = longDesc;
         if (hasSummaryFromDescription && shortDesc === undefined) {
