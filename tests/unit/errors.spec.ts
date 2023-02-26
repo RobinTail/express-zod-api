@@ -75,7 +75,8 @@ describe("Errors", () => {
   describe("InputValidationError", () => {
     const zodError = new ZodError([]);
 
-    test("should be an instance of Error", () => {
+    test("should be an instance of IOSchemaError and Error", () => {
+      expect(new InputValidationError(zodError)).toBeInstanceOf(IOSchemaError);
       expect(new InputValidationError(zodError)).toBeInstanceOf(Error);
     });
 
