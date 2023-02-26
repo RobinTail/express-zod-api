@@ -1,5 +1,24 @@
 # Changelog
 
+## Version 9
+
+### v9.0.0-beta1
+
+- Potentially **BREAKING** changes:
+  - Fixed issue #820, reported and resolved by [@McMerph](https://github.com/McMerph).
+    - Request `body` is no longer considered as an input source for `DELETE` request.
+    - Despite the fact that this method MAY contain `body` (it's not explicitly prohibited), it's currently considered
+      a bad practice to rely on it. Also, it led to a syntax error in the generated documentation according to OpenAPI
+      3.0 specification.
+    - In case you have such Endpoints that rely on inputs collected from `DELETE` request body and want to continue,
+      add the following property to your configuration in order to keep the previous behavior without changes to your
+      implementation.
+    - Read the [customization instructions](https://github.com/RobinTail/express-zod-api#customizing-input-sources).
+
+```yaml
+inputSources: { delete: ["body", "query", "params"] }
+```
+
 ## Version 8
 
 ### v8.9.4
