@@ -3,7 +3,11 @@ export { AbstractEndpoint } from "./endpoint";
 export { Method } from "./method";
 export { EndpointsFactory, defaultEndpointsFactory } from "./endpoints-factory";
 export { IOSchema } from "./io-schema";
-export { FlatObject } from "./common-helpers";
+export {
+  FlatObject,
+  getMessageFromError,
+  getStatusCodeFromError,
+} from "./common-helpers";
 export { createApiResponse } from "./api-response";
 export { createLogger } from "./logger";
 export { createMiddleware } from "./middleware";
