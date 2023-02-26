@@ -2,6 +2,40 @@
 
 ## Version 9
 
+### v9.0.0-beta2
+
+- Potentially **BREAKING** changes:
+  - Fixed problem #787, reported and resolved by [@TheWisestOne](https://github.com/TheWisestOne).
+    - Validation errors thrown from within the Middlewares and Endpoint handlers unrelated to the IO do now lead to the
+      status code `500` instead of `400`, when you're using the `defaultResultHandler` or `defaultEndpointsFactory`.
+      - It enables you to use zod (via the exposed `z` namespace) for the internal needs of your implementation, such as
+        validating the data coming from your database, for example.
+    - Historically, `ZodError` meant the error related to the input validation, but it's changed.
+      - New error class created: `InputValidationError`.
+      - If you have a custom `ResultHandler` that relies on `ZodError` for responding with `400` code, you need to
+        change that condition to `InputValidationError` in order to keep that behaviour.
+    - Luckily, the following entities were exposed and became available for the convenience of your migration:
+      - `OutputValidationError`,
+      - `InputValidationError` _(new)_,
+      - `getMessageFromError()`,
+      - `getStatusCodeFromError()`.
+    - Consider using `getStatusCodeFromError()` inside your custom `ResultHandler`, or make the following changes:
+
+```typescript
+// Your custom ResultHandler
+// Before: if you're having an expression like this:
+if (error instanceof z.ZodError) {
+  response.status(400).json(/* ... */);
+}
+// After: replace it to this:
+if (error instanceof InputValidationError) {
+  response.status(400).json(/* ... */);
+}
+// Or: consider the alternative:
+const statusCode = getStatusCodeFromError(error);
+response.status(statusCode).json(/* ... */);
+```
+
 ### v9.0.0-beta1
 
 - Potentially **BREAKING** changes:
