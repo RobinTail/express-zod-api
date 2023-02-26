@@ -4,8 +4,8 @@ import { z } from "zod";
 import { ApiResponse } from "./api-response";
 import { CommonConfig } from "./config-type";
 import {
-  EndpointHandlerZodError,
   IOSchemaError,
+  InputValidationError,
   OutputValidationError,
   ResultHandlerError,
 } from "./errors";
@@ -13,7 +13,6 @@ import {
   FlatObject,
   getActualMethod,
   getInput,
-  getMessageFromError,
   hasTopLevelTransformingEffect,
   makeErrorFromAnything,
 } from "./common-helpers";
@@ -223,16 +222,10 @@ export class Endpoint<
     try {
       return await this.outputSchema.parseAsync(output);
     } catch (e) {
-      const error =
-        e instanceof z.ZodError
-          ? new z.ZodError(
-              e.issues.map(({ path, ...rest }) => ({
-                ...rest,
-                path: (["output"] as typeof path).concat(path),
-              }))
-            )
-          : makeErrorFromAnything(e);
-      throw new OutputValidationError(getMessageFromError(error));
+      if (e instanceof z.ZodError) {
+        throw new OutputValidationError(e);
+      }
+      throw e;
     }
   }
 
@@ -255,10 +248,19 @@ export class Endpoint<
       if (method === "options" && def.type === "proprietary") {
         continue;
       }
+      let finalInput: any;
+      try {
+        finalInput = await def.input.parseAsync(input);
+      } catch (e) {
+        if (e instanceof z.ZodError) {
+          throw new InputValidationError(e);
+        }
+        throw e;
+      }
       Object.assign(
         options,
         await def.middleware({
-          input: await def.input.parseAsync(input),
+          input: finalInput,
           options,
           request,
           response,
@@ -286,25 +288,20 @@ export class Endpoint<
     options: any;
     logger: Logger;
   }) {
-    // final input types transformations for handler
-    const finalInput = (await this.inputSchema.parseAsync(
-      input
-    )) as z.output<IN>;
+    let finalInput: z.output<IN>; // final input types transformations for handler
     try {
-      return await this.handler({
-        input: finalInput,
-        options,
-        logger,
-      });
+      finalInput = (await this.inputSchema.parseAsync(input)) as z.output<IN>;
     } catch (e) {
       if (e instanceof z.ZodError) {
-        // Discussion #787
-        // if Zod used in the Endpoint's handler implementation as tool for checking something not I/O-related
-        // we're transforming the possible parsing error into a custom one for the further handling by ResultHandler
-        throw new EndpointHandlerZodError(e);
+        throw new InputValidationError(e);
       }
       throw e;
     }
+    return this.handler({
+      input: finalInput,
+      options,
+      logger,
+    });
   }
 
   async #handleResult({
