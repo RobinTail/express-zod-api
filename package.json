@@ -1,6 +1,6 @@
 {
   "name": "express-zod-api",
-  "version": "8.9.2",
+  "version": "8.9.4",
   "description": "A Typescript library to help you get an API server up and running with I/O schema validation and custom middlewares in minutes.",
   "license": "MIT",
   "scripts": {
@@ -46,12 +46,12 @@
     "express-fileupload": "1.4.0",
     "http-errors": "2.0.0",
     "mime": "3.0.0",
-    "openapi3-ts": "3.1.2",
+    "openapi3-ts": "3.2.0",
     "ramda": "0.28.0",
     "triple-beam": "1.3.0",
     "typescript": "4.9.5",
     "winston": "3.8.2",
-    "zod": "3.20.2"
+    "zod": "3.20.6"
   },
   "peerDependencies": {
     "@types/jest": "*",
