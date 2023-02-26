@@ -712,12 +712,12 @@ import { createConfig } from "express-zod-api";
 createConfig({
   // ...,
   inputSources: {
-    // the default value is:
-    get: ["query"],
-    post: ["body", "files"],
-    put: ["body"],
-    patch: ["body"],
-    delete: ["query", "body"],
+    // the defaults are:
+    get: ["query", "params"],
+    post: ["body", "params", "files"],
+    put: ["body", "params"],
+    patch: ["body", "params"],
+    delete: ["query", "params"],
   },
 });
 ```
