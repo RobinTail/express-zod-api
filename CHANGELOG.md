@@ -2,6 +2,10 @@
 
 ## Version 8
 
+### v8.9.4
+
+- `openapi3-ts` version is 3.2.0.
+
 ### v8.9.3
 
 - `zod` version is 3.20.6.
