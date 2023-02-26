@@ -25,15 +25,16 @@
 // Your custom ResultHandler
 // Before: if you're having an expression like this:
 if (error instanceof z.ZodError) {
-  response.status(400).json(/* ... */);
+  response.status(400);
 }
 // After: replace it to this:
 if (error instanceof InputValidationError) {
-  response.status(400).json(/* ... */);
+  response.status(400);
 }
 // Or: consider the alternative:
 const statusCode = getStatusCodeFromError(error);
-response.status(statusCode).json(/* ... */);
+const message = getMessageFromError(error);
+response.status(statusCode);
 ```
 
 ### v9.0.0-beta1
