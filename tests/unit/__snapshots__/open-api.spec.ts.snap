@@ -1145,6 +1145,84 @@ servers:
 "
 `;
 
+exports[`Open API generator generateOpenApi() should generate the correct schema for DELETE request without body 1`] = `
+"openapi: 3.0.0
+info:
+  title: Testing DELETE request without body
+  version: 3.4.5
+paths:
+  /v1/deleteSomething:
+    delete:
+      responses:
+        "200":
+          description: DELETE /v1/deleteSomething Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - success
+                  data:
+                    type: object
+                    properties:
+                      whatever:
+                        type: number
+                        format: double
+                        minimum: 5e-324
+                        exclusiveMinimum: false
+                        maximum: 1.7976931348623157e+308
+                        exclusiveMaximum: false
+                    required:
+                      - whatever
+                required:
+                  - status
+                  - data
+        "400":
+          description: DELETE /v1/deleteSomething Error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                required:
+                  - status
+                  - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
+components:
+  schemas: {}
+  responses: {}
+  parameters: {}
+  examples: {}
+  requestBodies: {}
+  headers: {}
+  securitySchemes: {}
+  links: {}
+  callbacks: {}
+tags: []
+servers:
+  - url: http://example.com
+"
+`;
+
 exports[`Open API generator generateOpenApi() should generate the correct schema for complex types 1`] = `
 "openapi: 3.0.0
 info:

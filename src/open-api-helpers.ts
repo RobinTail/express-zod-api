@@ -24,7 +24,7 @@ import {
   routePathParamsRegex,
   tryToTransform,
 } from "./common-helpers";
-import { InputSources, TagsConfig } from "./config-type";
+import { InputSource, TagsConfig } from "./config-type";
 import { ZodDateIn, isoDateRegex } from "./date-in-schema";
 import { ZodDateOut } from "./date-out-schema";
 import { AbstractEndpoint } from "./endpoint";
@@ -575,7 +575,7 @@ export const depictRequestParams = ({
   endpoint,
   inputSources,
 }: ReqResDepictHelperCommonProps & {
-  inputSources: InputSources[Method];
+  inputSources: InputSource[];
 }): ParameterObject[] => {
   const schema = endpoint.getInputSchema();
   const shape = extractObjectSchema(schema).shape;

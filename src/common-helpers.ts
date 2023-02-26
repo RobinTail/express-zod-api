@@ -3,6 +3,7 @@ import { HttpError } from "http-errors";
 import { z } from "zod";
 import {
   CommonConfig,
+  InputSource,
   InputSources,
   LoggerConfig,
   loggerLevels,
@@ -33,9 +34,9 @@ export const defaultInputSources: InputSources = {
   post: ["body", "params", "files"],
   put: ["body", "params"],
   patch: ["body", "params"],
-  delete: ["body", "query", "params"],
+  delete: ["query", "params"],
 };
-const fallbackInputSource = defaultInputSources.delete;
+const fallbackInputSource: InputSource[] = ["body", "query", "params"];
 
 export const getActualMethod = (request: Request) =>
   request.method.toLowerCase() as Method | AuxMethod;

@@ -83,13 +83,27 @@ describe("Common Helpers", () => {
         param: 123,
       });
     });
-    test("should return both body and query for DELETE and unknown requests by default", () => {
+    test("should return only query for DELETE requests by default", () => {
       expect(
         getInput(
           {
             query: { a: "query" },
             body: { b: "body" },
             method: "DELETE",
+          } as unknown as Request,
+          undefined
+        )
+      ).toEqual({
+        a: "query",
+      });
+    });
+    test("should return body and query for unknown requests by default", () => {
+      expect(
+        getInput(
+          {
+            query: { a: "query" },
+            body: { b: "body" },
+            method: "UNSUPPORTED",
           } as unknown as Request,
           undefined
         )
