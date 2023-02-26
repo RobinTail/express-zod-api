@@ -35,6 +35,7 @@ export const defaultInputSources: InputSources = {
   patch: ["body", "params"],
   delete: ["query", "params"],
 };
+// @todo use ["body", "query", "params"] as the fallback
 const fallbackInputSource = defaultInputSources.delete;
 
 export const getActualMethod = (request: Request) =>

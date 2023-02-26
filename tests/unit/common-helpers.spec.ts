@@ -83,7 +83,8 @@ describe("Common Helpers", () => {
         param: 123,
       });
     });
-    test("should return both body and query for DELETE and unknown requests by default", () => {
+    // @todo add test for unknown request
+    test("should return only query for DELETE requests by default", () => {
       expect(
         getInput(
           {
