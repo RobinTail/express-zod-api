@@ -101,7 +101,7 @@ export function getMessageFromError(error: Error): string {
       .join("; ");
   }
   if (error instanceof OutputValidationError) {
-    const hasFirstField = error.originalError.issues[0].path.length > 0;
+    const hasFirstField = error.originalError.issues[0]?.path.length > 0;
     return `output${hasFirstField ? "/" : ": "}${error.message}`;
   }
   return error.message;
