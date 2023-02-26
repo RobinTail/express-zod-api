@@ -119,13 +119,19 @@ describe("App", () => {
             handler: async ({
               input: { key, something },
               options: { user, permissions, method },
-            }) => ({
-              anything: something === "joke" ? 300 : -100500,
-              doubleKey: key.repeat(2),
-              userId: user.id,
-              permissions,
-              method,
-            }),
+            }) => {
+              // Problem 787: should lead to ZodError that is NOT considered as the IOSchema validation error
+              if (something === "internal_zod_error") {
+                z.number().parse("");
+              }
+              return {
+                anything: something === "joke" ? 300 : -100500,
+                doubleKey: key.repeat(2),
+                userId: user.id,
+                permissions,
+                method,
+              };
+            },
           }),
       },
     };
@@ -426,6 +432,22 @@ describe("App", () => {
         body: JSON.stringify({
           key: "123",
           something: "gimme fail",
+        }),
+      });
+      expect(response.status).toBe(500);
+      const json = await response.json();
+      expect(json).toMatchSnapshot();
+    });
+
+    test("Problem 787: Should NOT treat ZodError thrown from within the handler as IOSchema validation error", async () => {
+      const response = await fetch("http://127.0.0.1:8055/v1/test", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          key: "123",
+          something: "internal_zod_error",
         }),
       });
       expect(response.status).toBe(500);
