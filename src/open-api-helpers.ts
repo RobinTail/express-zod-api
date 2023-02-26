@@ -8,6 +8,7 @@ import {
   RequestBodyObject,
   ResponseObject,
   SchemaObject,
+  SchemaObjectType,
   SecurityRequirementObject,
   SecuritySchemeObject,
   TagObject,
@@ -68,7 +69,7 @@ const isoDateDocumentationUrl =
   "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString";
 
 const samples: Record<
-  Exclude<NonNullable<SchemaObject["type"]>, Array<any>>,
+  Exclude<NonNullable<SchemaObjectType>, Array<any>>,
   any
 > = {
   integer: 0,
