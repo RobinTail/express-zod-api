@@ -4,7 +4,7 @@ import {
   SecuritySchemeObject,
   SecuritySchemeType,
 } from "openapi3-ts";
-import { defaultInputSources } from "./common-helpers";
+import { defaultInputSources, makeCleanId } from "./common-helpers";
 import { CommonConfig } from "./config-type";
 import { mapLogicalContainer } from "./logical-container";
 import { Method } from "./method";
@@ -84,6 +84,7 @@ export class OpenAPI extends OpenApiBuilder {
         inputSources,
       });
       const operation: OperationObject = {
+        operationId: makeCleanId(path, method),
         responses: {
           "200": depictResponse({
             ...commonParams,

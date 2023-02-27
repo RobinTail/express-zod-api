@@ -219,6 +219,17 @@ export const hasCoercion = (schema: z.ZodType): boolean =>
     ? schema._def.coerce
     : false;
 
+export const makeCleanId = (path: string, method: string, suffix?: string) => {
+  return [method]
+    .concat(path.split("/"))
+    .concat(suffix || [])
+    .flatMap((entry) => entry.split(/[^A-Z0-9]/gi))
+    .map(
+      (entry) => entry.slice(0, 1).toUpperCase() + entry.slice(1).toLowerCase()
+    )
+    .join("");
+};
+
 export const tryToTransform = ({
   effect,
   sample,
