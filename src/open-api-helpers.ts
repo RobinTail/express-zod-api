@@ -494,6 +494,11 @@ export const depictBranded: Depicter<z.ZodBranded<z.ZodTypeAny, any>> = ({
   next,
 }) => next({ schema: schema.unwrap() });
 
+export const depictLazy: Depicter<z.ZodLazy<z.ZodTypeAny>> = ({
+  next,
+  schema,
+}) => next({ schema: schema.schema }); // @todo add a capacitor to the context
+
 export const depictIOExamples = <T extends IOSchema>(
   schema: T,
   isResponse: boolean,
