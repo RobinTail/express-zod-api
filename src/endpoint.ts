@@ -27,6 +27,7 @@ export type Handler<IN, OUT, OPT> = (params: {
   input: IN;
   options: OPT;
   logger: Logger;
+  positiveStatusCode: number;
 }) => Promise<OUT>;
 
 export abstract class AbstractEndpoint {
@@ -49,6 +50,7 @@ export abstract class AbstractEndpoint {
   public abstract getScopes(): string[];
   public abstract getTags(): string[];
   public abstract _setSiblingMethods(methods: Method[]): void;
+  public abstract getPositiveStatusCode(): number;
 }
 
 type EndpointProps<
@@ -205,6 +207,10 @@ export class Endpoint<
     return this.tags;
   }
 
+  public override getPositiveStatusCode(): number {
+    return this.resultHandler.positiveStatusCode ?? 200;
+  }
+
   #getDefaultCorsHeaders(): Record<string, string> {
     const accessMethods = (this.methods as Array<Method | AuxMethod>)
       .concat(this.siblingMethods)
@@ -290,6 +296,7 @@ export class Endpoint<
       input: (await this.inputSchema.parseAsync(input)) as z.output<IN>,
       options,
       logger,
+      positiveStatusCode: this.getPositiveStatusCode(),
     });
   }
 
@@ -316,6 +323,7 @@ export class Endpoint<
         response,
         logger,
         input,
+        positiveStatusCode: this.getPositiveStatusCode(),
       });
     } catch (e) {
       lastResortHandler({

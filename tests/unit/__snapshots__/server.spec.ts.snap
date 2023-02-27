@@ -12,6 +12,7 @@ exports[`Server createNotFoundHandler() the handler should call ResultHandler wi
       "warn": [MockFunction],
     },
     "output": null,
+    "positiveStatusCode": 200,
     "request": {
       "body": {
         "n": 453,

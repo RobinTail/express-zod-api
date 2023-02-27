@@ -1,10 +1,12 @@
 import { config as exampleConfig } from "../../example/config";
 import { routing } from "../../example/routing";
 import {
+  EndpointsFactory,
   OpenAPI,
   createConfig,
   createMiddleware,
   defaultEndpointsFactory,
+  defaultResultHandler,
   withMeta,
   z,
 } from "../../src";
@@ -863,5 +865,28 @@ describe("Open API generator", () => {
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
+  });
+
+  test("should generate OpenAPI spec with custom response status", () => {
+    const spec = new OpenAPI({
+      config: sampleConfig,
+      routing: {
+        v1: {
+          ":name": new EndpointsFactory({
+            ...defaultResultHandler,
+            positiveStatusCode: 201,
+          }).build({
+            method: "post",
+            input: z.object({}),
+            output: z.object({}),
+            handler: jest.fn(),
+          }),
+        },
+      },
+      version: "3.4.5",
+      title: "Testing custom response status",
+      serverUrl: "http://example.com",
+    }).getSpecAsYaml();
+    expect(spec).toMatchSnapshot();
   });
 });

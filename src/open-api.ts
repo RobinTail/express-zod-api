@@ -85,7 +85,7 @@ export class OpenAPI extends OpenApiBuilder {
       });
       const operation: OperationObject = {
         responses: {
-          "200": depictResponse({
+          [endpoint.getPositiveStatusCode()]: depictResponse({
             ...commonParams,
             description: successfulResponseDescription,
             isPositive: true,

@@ -113,6 +113,7 @@ describe("Endpoint", () => {
         input: { n: 453 },
         options: { inc: 454 },
         logger: loggerMock,
+        positiveStatusCode: 200,
       });
       expect(loggerMock.error).toBeCalledTimes(0);
       expect(responseMock.status).toBeCalledWith(200);
@@ -797,6 +798,40 @@ describe("Endpoint", () => {
         ["date in endpoint handler", "object"],
       ]);
       expect(responseMock.status).toHaveBeenCalledWith(200);
+    });
+  });
+
+  test("should respond with custom status code", async () => {
+    const factory = new EndpointsFactory({
+      ...defaultResultHandler,
+      positiveStatusCode: 201,
+    });
+    const handlerMock = jest
+      .fn()
+      .mockImplementationOnce(async () => ({ answer: 42 }));
+    const endpoint = factory.build({
+      method: "post",
+      input: z.object({}),
+      output: z.object({ answer: z.number() }),
+      handler: handlerMock,
+    });
+
+    const { responseMock, loggerMock } = await testEndpoint({
+      endpoint,
+      requestProps: { method: "POST" },
+    });
+    expect(handlerMock).toBeCalledTimes(1);
+    expect(handlerMock).toBeCalledWith({
+      input: {},
+      options: {},
+      logger: loggerMock,
+      positiveStatusCode: 201,
+    });
+    expect(loggerMock.error).toBeCalledTimes(0);
+    expect(responseMock.status).toBeCalledWith(201);
+    expect(responseMock.json).toBeCalledWith({
+      status: "success",
+      data: { answer: 42 },
     });
   });
 });

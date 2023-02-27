@@ -26,6 +26,7 @@ export const createParserFailureHandler =
       logger,
       input: request.body,
       output: null,
+      positiveStatusCode: 200,
     });
   };
 
@@ -44,6 +45,7 @@ export const createNotFoundHandler =
         error,
         input: null,
         output: null,
+        positiveStatusCode: 200,
       });
     } catch (e) {
       lastResortHandler({

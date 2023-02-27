@@ -33,6 +33,7 @@ describe("ResultHandler", () => {
         request: requestMock as Request,
         response: responseMock as Response,
         logger: loggerMock,
+        positiveStatusCode: 200,
       });
       expect(loggerMock.error).toBeCalledTimes(1);
       expect(loggerMock.error.mock.calls[0][0]).toMatch(
@@ -75,6 +76,7 @@ describe("ResultHandler", () => {
         request: requestMock as Request,
         response: responseMock as Response,
         logger: loggerMock,
+        positiveStatusCode: 200,
       });
       expect(loggerMock.error).toBeCalledTimes(0);
       expect(responseMock.status).toBeCalledWith(400);
@@ -93,6 +95,7 @@ describe("ResultHandler", () => {
         request: requestMock as Request,
         response: responseMock as Response,
         logger: loggerMock,
+        positiveStatusCode: 200,
       });
       expect(loggerMock.error).toBeCalledTimes(0);
       expect(responseMock.status).toBeCalledWith(404);
@@ -116,6 +119,7 @@ describe("ResultHandler", () => {
         request: requestMock as Request,
         response: responseMock as Response,
         logger: loggerMock,
+        positiveStatusCode: 200,
       });
       expect(loggerMock.error).toBeCalledTimes(0);
       expect(responseMock.status).toBeCalledWith(200);

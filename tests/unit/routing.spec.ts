@@ -376,6 +376,7 @@ describe("Routing", () => {
         },
         options: {},
         logger: loggerMock,
+        positiveStatusCode: 200,
       });
       expect(responseMock.status).toBeCalledWith(200);
       expect(responseMock.json).toBeCalledWith({

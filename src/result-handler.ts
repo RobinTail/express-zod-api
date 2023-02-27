@@ -20,6 +20,7 @@ interface ResultHandlerParams<RES> {
   request: Request;
   response: Response<RES>;
   logger: Logger;
+  positiveStatusCode: number;
 }
 
 type ResultHandler<RES> = (
@@ -30,6 +31,7 @@ export interface ResultHandlerDefinition<
   POS extends ApiResponse,
   NEG extends ApiResponse
 > {
+  positiveStatusCode?: number;
   getPositiveResponse: (output: IOSchema) => POS;
   getNegativeResponse: () => NEG;
   handler: ResultHandler<z.output<POS["schema"]> | z.output<NEG["schema"]>>;
@@ -76,9 +78,17 @@ export const defaultResultHandler = createResultHandler({
     });
     return createApiResponse(responseSchema);
   },
-  handler: ({ error, input, output, request, response, logger }) => {
+  handler: ({
+    error,
+    input,
+    output,
+    request,
+    response,
+    logger,
+    positiveStatusCode,
+  }) => {
     if (!error) {
-      response.status(200).json({
+      response.status(positiveStatusCode).json({
         status: "success" as const,
         data: output,
       });

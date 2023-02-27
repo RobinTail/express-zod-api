@@ -3082,3 +3082,79 @@ servers:
   - url: http://example.com
 "
 `;
+
+exports[`Open API generator should generate OpenAPI spec with custom response status 1`] = `
+"openapi: 3.0.0
+info:
+  title: Testing custom response status
+  version: 3.4.5
+paths:
+  "/v1/{name}":
+    post:
+      responses:
+        "201":
+          description: POST /v1/:name Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - success
+                  data:
+                    type: object
+                    properties: {}
+                required:
+                  - status
+                  - data
+        "400":
+          description: POST /v1/:name Error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                required:
+                  - status
+                  - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
+      requestBody:
+        content:
+          application/json:
+            schema:
+              description: POST /v1/:name request body
+              type: object
+              properties: {}
+components:
+  schemas: {}
+  responses: {}
+  parameters: {}
+  examples: {}
+  requestBodies: {}
+  headers: {}
+  securitySchemes: {}
+  links: {}
+  callbacks: {}
+tags: []
+servers:
+  - url: http://example.com
+"
+`;
