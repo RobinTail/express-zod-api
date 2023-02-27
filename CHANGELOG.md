@@ -39,6 +39,7 @@ response.status(statusCode);
 
 ### v9.0.0-beta1
 
+- This release is based on version 8.9.4.
 - Potentially **BREAKING** changes:
   - Fixed issue #820, reported and resolved by [@McMerph](https://github.com/McMerph).
     - Request `body` is no longer considered as an input source for `DELETE` request.
