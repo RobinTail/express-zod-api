@@ -1,7 +1,6 @@
 import mime from "mime";
 import {
   EndpointsFactory,
-  createApiResponse,
   createResultHandler,
   defaultResultHandler,
   z,
@@ -21,16 +20,14 @@ export const keyAndTokenAuthenticatedEndpointsFactory =
 export const fileSendingEndpointsFactory = new EndpointsFactory({
   config,
   resultHandler: createResultHandler({
-    getPositiveResponse: () =>
-      createApiResponse({
-        schema: z.string(),
-        mimeType: mime.getType("svg") || "image/svg+xml",
-      }),
-    getNegativeResponse: () =>
-      createApiResponse({
-        schema: z.string(),
-        mimeType: mime.getType("txt") || "text/plain",
-      }),
+    getPositiveResponse: () => ({
+      schema: z.string(),
+      mimeType: mime.getType("svg") || "image/svg+xml",
+    }),
+    getNegativeResponse: () => ({
+      schema: z.string(),
+      mimeType: mime.getType("txt") || "text/plain",
+    }),
     handler: ({ response, error, output }) => {
       if (error) {
         response.status(400).send(error.message);
@@ -48,13 +45,14 @@ export const fileSendingEndpointsFactory = new EndpointsFactory({
 export const fileStreamingEndpointsFactory = new EndpointsFactory({
   config,
   resultHandler: createResultHandler({
-    getPositiveResponse: () =>
-      createApiResponse({ schema: z.file().binary(), mimeType: "image/*" }),
-    getNegativeResponse: () =>
-      createApiResponse({
-        schema: z.string(),
-        mimeType: mime.getType("txt") || "text/plain",
-      }),
+    getPositiveResponse: () => ({
+      schema: z.file().binary(),
+      mimeType: "image/*",
+    }),
+    getNegativeResponse: () => ({
+      schema: z.string(),
+      mimeType: mime.getType("txt") || "text/plain",
+    }),
     handler: ({ response, error, output }) => {
       if (error) {
         response.status(400).send(error.message);

@@ -185,15 +185,23 @@ export class Endpoint<
   }
 
   public override getPositiveMimeTypes() {
-    return (
-      this.resultHandler.getPositiveResponse(this.outputSchema).mimeTypes || [
-        mimeJson,
-      ]
+    const apiResponse = this.resultHandler.getPositiveResponse(
+      this.outputSchema
     );
+    return "mimeType" in apiResponse && apiResponse.mimeType
+      ? [apiResponse.mimeType]
+      : "mimeTypes" in apiResponse && apiResponse.mimeTypes
+      ? apiResponse.mimeTypes
+      : [mimeJson];
   }
 
   public override getNegativeMimeTypes() {
-    return this.resultHandler.getNegativeResponse().mimeTypes || [mimeJson];
+    const apiResponse = this.resultHandler.getNegativeResponse();
+    return "mimeType" in apiResponse && apiResponse.mimeType
+      ? [apiResponse.mimeType]
+      : "mimeTypes" in apiResponse && apiResponse.mimeTypes
+      ? apiResponse.mimeTypes
+      : [mimeJson];
   }
 
   public override getPositiveStatusCode() {
