@@ -6,10 +6,16 @@ export type ApiResponse<A = z.ZodTypeAny> = {
   mimeTypes: string[];
 };
 
-interface ApiResponseCreationProps<S extends z.ZodTypeAny> {
+type ApiResponseCreationProps<S extends z.ZodTypeAny> = {
   schema: S;
-  mimeTypes: MimeDefinition;
-}
+} & (
+  | {
+      mimeTypes?: string[];
+    }
+  | {
+      mimeType?: string;
+    }
+);
 
 /**
  * @deprecated Use the overload below that accepts object
@@ -38,8 +44,10 @@ export function createApiResponse<S extends z.ZodTypeAny>(
   return {
     schema: param1.schema,
     mimeTypes:
-      typeof param1.mimeTypes === "string"
-        ? [param1.mimeTypes]
-        : param1.mimeTypes,
+      "mimeType" in param1
+        ? [param1.mimeType || mimeJson]
+        : "mimeTypes" in param1
+        ? param1.mimeTypes || [mimeJson]
+        : [mimeJson],
   };
 }
