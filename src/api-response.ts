@@ -28,8 +28,8 @@ export function createApiResponse<S extends z.ZodTypeAny>(
 ): ApiResponse<S>;
 
 export function createApiResponse<S extends z.ZodTypeAny>(
-  param1: S | ApiResponseCreationProps<S>,
-  param2: MimeDefinition | undefined = mimeJson
+  param1: S | ApiResponseCreationProps<S>, // @todo explode to {schema, ...rest} in v9
+  param2: MimeDefinition | undefined = mimeJson // @todo remove in v9
 ): ApiResponse<S> {
   if (param1 instanceof z.ZodType) {
     // @todo remove this block in v9
