@@ -6,13 +6,13 @@ export type ApiResponse<A = z.ZodTypeAny> = {
   /** @default application/json */
   mimeTypes?: string[];
   /** @default 200 for a positive response, 400 for a negative response */
-  statusCodes?: number[];
+  statusCode?: number;
 };
 
 type ApiResponseCreationProps<S extends z.ZodTypeAny> = {
   schema: S;
-} & ({ mimeTypes?: [string, ...string[]] } | { mimeType?: string }) &
-  ({ statusCodes?: [number, ...number[]] } | { statusCode?: number });
+  statusCode?: number;
+} & ({ mimeTypes?: [string, ...string[]] } | { mimeType?: string });
 
 export function createApiResponse<S extends z.ZodTypeAny>(
   schema: S,
@@ -41,11 +41,6 @@ export function createApiResponse<S extends z.ZodTypeAny>(
         : "mimeTypes" in param1
         ? param1.mimeTypes
         : [mimeJson],
-    statusCodes:
-      "statusCode" in param1 && param1.statusCode
-        ? [param1.statusCode]
-        : "statusCodes" in param1
-        ? param1.statusCodes
-        : undefined,
+    statusCode: "statusCode" in param1 ? param1.statusCode : undefined,
   };
 }
