@@ -1,7 +1,7 @@
 import { z } from "zod";
 
-export type ApiResponse<A = z.ZodTypeAny> = {
-  schema: A;
+export type ApiResponse<S = z.ZodTypeAny> = {
+  schema: S;
   /** @default 200 for a positive response, 400 for a negative response */
   statusCode?: number;
 } & (
