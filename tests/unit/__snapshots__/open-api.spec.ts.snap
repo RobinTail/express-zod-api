@@ -8,6 +8,7 @@ info:
 paths:
   /v1/getSomething:
     get:
+      operationId: GetV1Getsomething
       responses:
         "200":
           description: GET /v1/getSomething Successful response
@@ -71,6 +72,7 @@ paths:
               type: string
             minItems: 1
     post:
+      operationId: PostV1Getsomething
       responses:
         "200":
           description: POST /v1/getSomething Successful response
@@ -161,6 +163,7 @@ info:
 paths:
   /v1/getSomething:
     post:
+      operationId: PostV1Getsomething
       responses:
         "200":
           description: POST /v1/getSomething Successful response
@@ -263,6 +266,128 @@ servers:
 "
 `;
 
+exports[`Open API generator Metadata should ensure the uniq operation ids 1`] = `
+"openapi: 3.0.0
+info:
+  title: Testing Operation IDs
+  version: 3.4.5
+paths:
+  /v1/getSome/thing:
+    get:
+      operationId: GetV1GetsomeThing
+      responses:
+        "200":
+          description: GET /v1/getSome/thing Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - success
+                  data:
+                    type: object
+                    properties: {}
+                required:
+                  - status
+                  - data
+        "400":
+          description: GET /v1/getSome/thing Error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                required:
+                  - status
+                  - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
+      description: thing is the path segment
+      summary: thing is the path segment
+  "/v1/getSome/{thing}":
+    get:
+      operationId: GetV1GetsomeThing2
+      responses:
+        "200":
+          description: GET /v1/getSome/:thing Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - success
+                  data:
+                    type: object
+                    properties: {}
+                required:
+                  - status
+                  - data
+        "400":
+          description: GET /v1/getSome/:thing Error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                required:
+                  - status
+                  - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
+      description: thing is the path parameter
+      summary: thing is the path parameter
+components:
+  schemas: {}
+  responses: {}
+  parameters: {}
+  examples: {}
+  requestBodies: {}
+  headers: {}
+  securitySchemes: {}
+  links: {}
+  callbacks: {}
+tags: []
+servers:
+  - url: http://example.com
+"
+`;
+
 exports[`Open API generator Metadata should ensure uniq security schema names 1`] = `
 "openapi: 3.0.0
 info:
@@ -271,6 +396,7 @@ info:
 paths:
   /v1/getSomething:
     get:
+      operationId: GetV1Getsomething
       responses:
         "200":
           description: GET /v1/getSomething Successful response
@@ -343,6 +469,7 @@ paths:
         - HTTP_1: []
   /v1/setSomething:
     post:
+      operationId: PostV1Setsomething
       responses:
         "200":
           description: POST /v1/setSomething Successful response
@@ -404,6 +531,7 @@ paths:
             - write
   /v1/updateSomething:
     put:
+      operationId: PutV1Updatesomething
       responses:
         "200":
           description: PUT /v1/updateSomething Successful response
@@ -504,6 +632,7 @@ info:
 paths:
   /v1/getSomething:
     post:
+      operationId: PostV1Getsomething
       responses:
         "200":
           description: POST /v1/getSomething Successful response
@@ -617,6 +746,7 @@ info:
 paths:
   /v1/getSomething:
     get:
+      operationId: GetV1Getsomething
       responses:
         "200":
           description: GET /v1/getSomething Successful response
@@ -708,6 +838,7 @@ info:
 paths:
   /v1/getSomething:
     post:
+      operationId: PostV1Getsomething
       responses:
         "200":
           description: POST /v1/getSomething Successful response
@@ -804,6 +935,7 @@ info:
 paths:
   /v1/getSomething:
     get:
+      operationId: GetV1Getsomething
       responses:
         "200":
           description: GET /v1/getSomething Successful response
@@ -886,6 +1018,7 @@ info:
 paths:
   /v1/getSomething:
     get:
+      operationId: GetV1Getsomething
       responses:
         "200":
           description: GET /v1/getSomething Successful response
@@ -972,6 +1105,7 @@ info:
 paths:
   "/v1/{name}":
     get:
+      operationId: GetV1Name
       responses:
         "200":
           description: GET /v1/:name Successful response
@@ -1060,6 +1194,7 @@ info:
 paths:
   "/v1/{name}":
     post:
+      operationId: PostV1Name
       responses:
         "200":
           description: POST /v1/:name Successful response
@@ -1153,6 +1288,7 @@ info:
 paths:
   /v1/getSomething:
     get:
+      operationId: GetV1Getsomething
       responses:
         "200":
           description: GET /v1/getSomething Successful response
@@ -1266,6 +1402,7 @@ info:
 paths:
   /v1/getSomething:
     post:
+      operationId: PostV1Getsomething
       responses:
         "200":
           description: POST /v1/getSomething Successful response
@@ -1393,6 +1530,7 @@ info:
 paths:
   /v1/getSomething:
     post:
+      operationId: PostV1Getsomething
       responses:
         "200":
           description: POST /v1/getSomething Successful response
@@ -1506,6 +1644,7 @@ info:
 paths:
   /v1/getSomething:
     get:
+      operationId: GetV1Getsomething
       responses:
         "200":
           description: GET /v1/getSomething Successful response
@@ -1614,6 +1753,7 @@ info:
 paths:
   /v1/getSomething:
     post:
+      operationId: PostV1Getsomething
       responses:
         "200":
           description: POST /v1/getSomething Successful response
@@ -1733,6 +1873,7 @@ info:
 paths:
   /v1/user/retrieve:
     get:
+      operationId: GetV1UserRetrieve
       responses:
         "200":
           description: GET /v1/user/retrieve Successful response
@@ -1804,6 +1945,7 @@ paths:
             pattern: /\\d+/
   "/v1/user/{id}":
     post:
+      operationId: PostV1UserId
       responses:
         "200":
           description: POST /v1/user/:id Successful response
@@ -1928,6 +2070,7 @@ paths:
           APIKEY_2: []
   /v1/avatar/send:
     get:
+      operationId: GetV1AvatarSend
       responses:
         "200":
           description: GET /v1/avatar/send Successful response
@@ -1955,6 +2098,7 @@ paths:
             pattern: /\\d+/
   /v1/avatar/stream:
     get:
+      operationId: GetV1AvatarStream
       responses:
         "200":
           description: GET /v1/avatar/stream Successful response
@@ -1983,6 +2127,7 @@ paths:
             pattern: /\\d+/
   /v1/avatar/upload:
     post:
+      operationId: PostV1AvatarUpload
       responses:
         "200":
           description: POST /v1/avatar/upload Successful response
@@ -2104,6 +2249,7 @@ info:
 paths:
   /v1/getSomething:
     post:
+      operationId: PostV1Getsomething
       responses:
         "200":
           description: POST /v1/getSomething Successful response
@@ -2209,6 +2355,7 @@ info:
 paths:
   /v1/getSomething:
     post:
+      operationId: PostV1Getsomething
       responses:
         "200":
           description: POST /v1/getSomething Successful response
@@ -2362,6 +2509,7 @@ info:
 paths:
   /v1/getSomething:
     post:
+      operationId: PostV1Getsomething
       responses:
         "200":
           description: POST /v1/getSomething Successful response
@@ -2487,6 +2635,7 @@ info:
 paths:
   /v1/getSomething:
     post:
+      operationId: PostV1Getsomething
       responses:
         "200":
           description: POST /v1/getSomething Successful response
@@ -2577,6 +2726,7 @@ info:
 paths:
   /v1/getSomething:
     post:
+      operationId: PostV1Getsomething
       responses:
         "200":
           description: POST /v1/getSomething Successful response
@@ -2704,6 +2854,7 @@ info:
 paths:
   /v1/getSomething:
     post:
+      operationId: PostV1Getsomething
       responses:
         "200":
           description: POST /v1/getSomething Successful response
@@ -2796,6 +2947,7 @@ info:
 paths:
   /v1/getSomething:
     post:
+      operationId: PostV1Getsomething
       responses:
         "200":
           description: POST /v1/getSomething Successful response
@@ -2921,6 +3073,7 @@ info:
 paths:
   /v1/getSomething:
     get:
+      operationId: GetV1Getsomething
       responses:
         "200":
           description: GET /v1/getSomething Successful response
@@ -3001,6 +3154,7 @@ info:
 paths:
   /v1/getSomething:
     get:
+      operationId: GetV1Getsomething
       responses:
         "200":
           description: GET /v1/getSomething Successful response

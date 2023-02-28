@@ -2,6 +2,26 @@
 
 ## Version 8
 
+### v8.10.0
+
+- Feature #845, proposed by [@lazylace37](https://github.com/lazylace37).
+  - Equipping the generated documentation with automatically generated and unique `operationId`.
+  - The `operationId` consists of method, path and optional numeric suffix.
+
+```yaml
+before:
+  paths:
+    /v1/user/retrieve:
+      get:
+        responses:
+after:
+  paths:
+    /v1/user/retrieve:
+      get:
+        operationId: GetV1UserRetrieve
+        responses:
+```
+
 ### v8.9.4
 
 - `openapi3-ts` version is 3.2.0.
