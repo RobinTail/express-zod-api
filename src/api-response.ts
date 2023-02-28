@@ -14,13 +14,9 @@ type ApiResponseCreationProps<S extends z.ZodTypeAny> = {
 } & ({ mimeTypes?: [string, ...string[]] } | { mimeType?: string }) &
   ({ statusCodes?: [number, ...number[]] } | { statusCode?: number });
 
-/**
- * @deprecated Use the overload below that accepts object
- * @todo remove in v9
- * */
 export function createApiResponse<S extends z.ZodTypeAny>(
   schema: S,
-  mimeTypes?: MimeDefinition
+  mimeTypes?: MimeDefinition // @todo remove in v9
 ): ApiResponse<S>;
 
 export function createApiResponse<S extends z.ZodTypeAny>(
@@ -28,14 +24,13 @@ export function createApiResponse<S extends z.ZodTypeAny>(
 ): ApiResponse<S>;
 
 export function createApiResponse<S extends z.ZodTypeAny>(
-  param1: S | ApiResponseCreationProps<S>, // @todo explode to {schema, ...rest} in v9
+  param1: S | ApiResponseCreationProps<S>,
   param2: MimeDefinition | undefined = mimeJson // @todo remove in v9
 ): ApiResponse<S> {
   if (param1 instanceof z.ZodType) {
-    // @todo remove this block in v9
     return {
       schema: param1,
-      mimeTypes: typeof param2 === "string" ? [param2] : param2,
+      mimeTypes: typeof param2 === "string" ? [param2] : param2, // @todo set to undefined in v9
     };
   }
   return {
