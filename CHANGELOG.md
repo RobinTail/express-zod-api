@@ -2,6 +2,10 @@
 
 ## Version 9
 
+### v9.0.0-beta3
+
+- This release contains the feature from version [8.10.0](#v8100).
+
 ### v9.0.0-beta2
 
 - Potentially **BREAKING** changes:
