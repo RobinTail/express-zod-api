@@ -10,7 +10,7 @@ describe("API Client Generator", () => {
   test("Should treat optionals the same way as z.infer()", () => {
     const client = new Client({
       v1: {
-        test: defaultEndpointsFactory.build({
+        "test-with-dashes": defaultEndpointsFactory.build({
           method: "post",
           input: z.object({
             opt: z.string().optional(),

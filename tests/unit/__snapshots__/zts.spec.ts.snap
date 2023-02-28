@@ -53,7 +53,7 @@ exports[`zod-to-ts Example should produce the expected results 1`] = `
     promise: any;
     function: any;
     optDefaultString?: string | undefined;
-    refinedStringWithSomeBullshit: (string | number) & ((bigint | undefined) | null);
+    refinedStringWithSomeBullshit: (string | number) & ((bigint | null) | undefined);
     nativeEnum: "A" | "apple" | "banana" | "cantaloupe" | 5;
     lazy: any;
     discUnion: {

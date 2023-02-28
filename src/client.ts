@@ -1,6 +1,5 @@
 import ts from "typescript";
 import {
-  cleanId,
   exportModifier,
   f,
   makeAnyPromise,
@@ -23,6 +22,7 @@ import {
   parametricIndexNode,
   protectedReadonlyModifier,
 } from "./client-helpers";
+import { makeCleanId } from "./common-helpers";
 import { methods } from "./method";
 import { mimeJson } from "./mime";
 import { Routing } from "./routing";
@@ -43,8 +43,8 @@ export class Client {
     walkRouting({
       routing,
       onEndpoint: (endpoint, path, method) => {
-        const inputId = cleanId(path, method, "input");
-        const responseId = cleanId(path, method, "response");
+        const inputId = makeCleanId(path, method, "input");
+        const responseId = makeCleanId(path, method, "response");
         const input = zodToTs({
           schema: endpoint.getInputSchema(),
           isResponse: false,

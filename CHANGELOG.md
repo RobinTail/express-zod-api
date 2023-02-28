@@ -2,6 +2,45 @@
 
 ## Version 8
 
+### v8.10.0
+
+- Feature #845, proposed by [@lazylace37](https://github.com/lazylace37).
+  - Equipping the generated documentation with automatically generated and unique `operationId`.
+  - The `operationId` consists of method, path and optional numeric suffix.
+
+```yaml
+before:
+  paths:
+    /v1/user/retrieve:
+      get:
+        responses:
+after:
+  paths:
+    /v1/user/retrieve:
+      get:
+        operationId: GetV1UserRetrieve
+        responses:
+```
+
+### v8.9.4
+
+- `openapi3-ts` version is 3.2.0.
+
+### v8.9.3
+
+- `zod` version is 3.20.6.
+
+### v8.9.2
+
+- Fixed issue #816 (related to discussion #803), reported and resolved by [@McMerph](https://github.com/McMerph).
+  - Assigning a singular `Security` schema to a `Middleware` led to an error during the generation of OpenAPI docs.
+  - Also, preventing the `required` prop to be an empty array when depicting objects and records in OpenAPI docs.
+
+### v8.9.1
+
+- Fixed issue #805, reported and resolved by [@TheWisestOne](https://github.com/TheWisestOne).
+  - The frontend client generator was failing to generate a valid code in case of a routing path having multiple non-alphanumeric characters.
+
 ### v8.9.0
 
 - Fixes of the documentation generator (OpenAPI).
