@@ -20,6 +20,7 @@ import { IOSchema } from "./io-schema";
 import { LogicalContainer, combineContainers } from "./logical-container";
 import { AuxMethod, Method, MethodsDefinition } from "./method";
 import { AnyMiddlewareDef } from "./middleware";
+import { mimeJson } from "./mime";
 import { ResultHandlerDefinition, lastResortHandler } from "./result-handler";
 import { Security } from "./security";
 
@@ -182,11 +183,15 @@ export class Endpoint<
   }
 
   public override getPositiveMimeTypes() {
-    return this.resultHandler.getPositiveResponse(this.outputSchema).mimeTypes;
+    return (
+      this.resultHandler.getPositiveResponse(this.outputSchema).mimeTypes || [
+        mimeJson,
+      ]
+    );
   }
 
   public override getNegativeMimeTypes() {
-    return this.resultHandler.getNegativeResponse().mimeTypes;
+    return this.resultHandler.getNegativeResponse().mimeTypes || [mimeJson];
   }
 
   public override getSecurity() {

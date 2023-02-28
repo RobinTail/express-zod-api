@@ -3,19 +3,16 @@ import { MimeDefinition, mimeJson } from "./mime";
 
 export type ApiResponse<A = z.ZodTypeAny> = {
   schema: A;
-  mimeTypes: string[];
+  /** @default application/json */
+  mimeTypes?: string[];
+  /** @default 200 for a positive response, 500 for a negative response */
+  statusCodes?: number[];
 };
 
 type ApiResponseCreationProps<S extends z.ZodTypeAny> = {
   schema: S;
-} & (
-  | {
-      mimeTypes?: string[];
-    }
-  | {
-      mimeType?: string;
-    }
-);
+} & ({ mimeTypes?: string[] } | { mimeType?: string }) &
+  ({ statusCodes?: number[] } | { statusCode?: number });
 
 /**
  * @deprecated Use the overload below that accepts object
@@ -44,10 +41,16 @@ export function createApiResponse<S extends z.ZodTypeAny>(
   return {
     schema: param1.schema,
     mimeTypes:
-      "mimeType" in param1
-        ? [param1.mimeType || mimeJson]
+      "mimeType" in param1 && param1.mimeType
+        ? [param1.mimeType]
         : "mimeTypes" in param1
-        ? param1.mimeTypes || [mimeJson]
+        ? param1.mimeTypes
         : [mimeJson],
+    statusCodes:
+      "statusCode" in param1 && param1.statusCode
+        ? [param1.statusCode]
+        : "statusCodes" in param1
+        ? param1.statusCodes
+        : undefined,
   };
 }
