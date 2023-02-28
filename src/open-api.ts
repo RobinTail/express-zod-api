@@ -96,19 +96,22 @@ export class OpenAPI extends OpenApiBuilder {
       });
       const operation: OperationObject = {
         operationId: this.ensureUniqOperationId(path, method),
-        responses: {
-          "200": depictResponse({
-            ...commonParams,
-            description: successfulResponseDescription,
-            isPositive: true,
-          }),
-          "400": depictResponse({
-            ...commonParams,
-            description: errorResponseDescription,
-            isPositive: false,
-          }),
-        },
+        responses: {},
       };
+      for (const code of endpoint.getPositiveStatusCodes()) {
+        operation.responses[code] = depictResponse({
+          ...commonParams,
+          description: successfulResponseDescription,
+          isPositive: true,
+        });
+      }
+      for (const code of endpoint.getNegativeStatusCodes()) {
+        operation.responses[code] = depictResponse({
+          ...commonParams,
+          description: errorResponseDescription,
+          isPositive: false,
+        });
+      }
       if (longDesc) {
         operation.description = longDesc;
         if (hasSummaryFromDescription && shortDesc === undefined) {

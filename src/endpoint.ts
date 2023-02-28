@@ -46,6 +46,8 @@ export abstract class AbstractEndpoint {
   public abstract getInputMimeTypes(): string[];
   public abstract getPositiveMimeTypes(): string[];
   public abstract getNegativeMimeTypes(): string[];
+  public abstract getPositiveStatusCodes(): number[];
+  public abstract getNegativeStatusCodes(): number[];
   public abstract getSecurity(): LogicalContainer<Security>;
   public abstract getScopes(): string[];
   public abstract getTags(): string[];
@@ -192,6 +194,18 @@ export class Endpoint<
 
   public override getNegativeMimeTypes() {
     return this.resultHandler.getNegativeResponse().mimeTypes || [mimeJson];
+  }
+
+  public override getPositiveStatusCodes() {
+    return (
+      this.resultHandler.getPositiveResponse(this.outputSchema).statusCodes || [
+        200,
+      ]
+    );
+  }
+
+  public override getNegativeStatusCodes() {
+    return this.resultHandler.getNegativeResponse().statusCodes || [400];
   }
 
   public override getSecurity() {

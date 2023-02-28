@@ -5,14 +5,14 @@ export type ApiResponse<A = z.ZodTypeAny> = {
   schema: A;
   /** @default application/json */
   mimeTypes?: string[];
-  /** @default 200 for a positive response, 500 for a negative response */
+  /** @default 200 for a positive response, 400 for a negative response */
   statusCodes?: number[];
 };
 
 type ApiResponseCreationProps<S extends z.ZodTypeAny> = {
   schema: S;
-} & ({ mimeTypes?: string[] } | { mimeType?: string }) &
-  ({ statusCodes?: number[] } | { statusCode?: number });
+} & ({ mimeTypes?: [string, ...string[]] } | { mimeType?: string }) &
+  ({ statusCodes?: [number, ...number[]] } | { statusCode?: number });
 
 /**
  * @deprecated Use the overload below that accepts object
