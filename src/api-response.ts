@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export type ApiResponse<S = z.ZodTypeAny> = {
+export type ApiResponse<S extends z.ZodType> = {
   schema: S;
   /**
    * @default 200 for a positive response
@@ -22,7 +22,7 @@ export type ApiResponse<S = z.ZodTypeAny> = {
  * @deprecated replace with { schema, mimeType } or { schema, mimeTypes } object
  * @todo remove in v9
  */
-export const createApiResponse = <S extends z.ZodTypeAny>(
+export const createApiResponse = <S extends z.ZodType>(
   schema: S,
   mimeTypes?: string | [string, ...string[]]
 ): ApiResponse<S> => ({

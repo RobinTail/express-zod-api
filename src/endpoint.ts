@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import { Logger } from "winston";
 import { z } from "zod";
-import { ApiResponse } from "./api-response";
 import { CommonConfig } from "./config-type";
 import {
   IOSchemaError,
@@ -59,8 +58,8 @@ type EndpointProps<
   OUT extends IOSchema,
   OPT extends FlatObject,
   M extends Method,
-  POS extends ApiResponse,
-  NEG extends ApiResponse,
+  POS extends z.ZodType,
+  NEG extends z.ZodType,
   SCO extends string,
   TAG extends string
 > = {
@@ -81,8 +80,8 @@ export class Endpoint<
   OUT extends IOSchema,
   OPT extends FlatObject,
   M extends Method,
-  POS extends ApiResponse,
-  NEG extends ApiResponse,
+  POS extends z.ZodType,
+  NEG extends z.ZodType,
   SCO extends string,
   TAG extends string
 > extends AbstractEndpoint {
@@ -172,11 +171,11 @@ export class Endpoint<
     return this.outputSchema;
   }
 
-  public override getPositiveResponseSchema(): POS["schema"] {
+  public override getPositiveResponseSchema(): POS {
     return this.resultHandler.getPositiveResponse(this.outputSchema).schema;
   }
 
-  public override getNegativeResponseSchema(): NEG["schema"] {
+  public override getNegativeResponseSchema(): NEG {
     return this.resultHandler.getNegativeResponse().schema;
   }
 

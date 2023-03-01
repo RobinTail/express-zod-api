@@ -27,17 +27,17 @@ type ResultHandler<RES> = (
 ) => void | Promise<void>;
 
 export interface ResultHandlerDefinition<
-  POS extends ApiResponse,
-  NEG extends ApiResponse
+  POS extends z.ZodType,
+  NEG extends z.ZodType
 > {
-  getPositiveResponse: (output: IOSchema) => POS;
-  getNegativeResponse: () => NEG;
-  handler: ResultHandler<z.output<POS["schema"]> | z.output<NEG["schema"]>>;
+  getPositiveResponse: (output: IOSchema) => ApiResponse<POS>;
+  getNegativeResponse: () => ApiResponse<NEG>;
+  handler: ResultHandler<z.output<POS> | z.output<NEG>>;
 }
 
 export const createResultHandler = <
-  POS extends ApiResponse,
-  NEG extends ApiResponse
+  POS extends z.ZodType,
+  NEG extends z.ZodType
 >(
   definition: ResultHandlerDefinition<POS, NEG>
 ) => definition;

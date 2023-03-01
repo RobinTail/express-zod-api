@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import { z } from "zod";
-import { ApiResponse } from "./api-response";
 import { FlatObject, hasUpload } from "./common-helpers";
 import { CommonConfig } from "./config-type";
 import { Endpoint, Handler } from "./endpoint";
@@ -42,8 +41,8 @@ type BuildProps<
   MethodsDefinition<M>;
 
 export class EndpointsFactory<
-  POS extends ApiResponse,
-  NEG extends ApiResponse,
+  POS extends z.ZodType,
+  NEG extends z.ZodType,
   IN extends IOSchema<"strip"> | null = null,
   OUT extends FlatObject = {},
   SCO extends string = string,
@@ -71,8 +70,8 @@ export class EndpointsFactory<
   }
 
   static #create<
-    CPOS extends ApiResponse,
-    CNEG extends ApiResponse,
+    CPOS extends z.ZodType,
+    CNEG extends z.ZodType,
     CIN extends IOSchema<"strip"> | null,
     COUT extends FlatObject,
     CSCO extends string,
