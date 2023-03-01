@@ -7,16 +7,14 @@ export type ApiResponse<S extends z.ZodType> = {
    * @default 400 for a negative response
    * */
   statusCode?: number;
-} & (
-  | {
-      /** @default [ "application/json" ] */
-      mimeTypes?: [string, ...string[]];
-    }
-  | {
-      /** @default "application/json" */
-      mimeType?: string;
-    }
-);
+  /**
+   * @default "application/json"
+   * @override mimeTypes
+   * */
+  mimeType?: string;
+  /** @default [ "application/json" ] */
+  mimeTypes?: [string, ...string[]];
+};
 
 /**
  * @deprecated replace with just a schema, or { schema, mimeType } or { schema, mimeTypes } object
@@ -24,11 +22,10 @@ export type ApiResponse<S extends z.ZodType> = {
  */
 export const createApiResponse = <S extends z.ZodType>(
   schema: S,
-  mimeTypes?: string | [string, ...string[]]
+  mimeDefinition?: string | [string, ...string[]]
 ): ApiResponse<S> => ({
   schema,
-  ...(typeof mimeTypes === "string" && mimeTypes
-    ? { mimeType: mimeTypes }
-    : {}),
-  ...(typeof mimeTypes === "string" ? {} : { mimeTypes }),
+  ...(typeof mimeDefinition === "string"
+    ? { mimeType: mimeDefinition }
+    : { mimeTypes: mimeDefinition }),
 });
