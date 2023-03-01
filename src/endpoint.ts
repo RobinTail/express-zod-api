@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { Logger } from "winston";
 import { z } from "zod";
+import { ApiResponse } from "./api-response";
 import { CommonConfig } from "./config-type";
 import {
   IOSchemaError,
@@ -187,28 +188,29 @@ export class Endpoint<
     return this.mimeTypes;
   }
 
+  #getMimeTypesFromApiResponse<S extends z.ZodType>(
+    subject: S | ApiResponse<S>,
+    fallback = [mimeJson]
+  ) {
+    return subject instanceof z.ZodType
+      ? fallback
+      : "mimeType" in subject && subject.mimeType
+      ? [subject.mimeType]
+      : "mimeTypes" in subject && subject.mimeTypes
+      ? subject.mimeTypes
+      : fallback;
+  }
+
   public override getPositiveMimeTypes() {
-    const apiResponse = this.resultHandler.getPositiveResponse(
-      this.outputSchema
+    return this.#getMimeTypesFromApiResponse(
+      this.resultHandler.getPositiveResponse(this.outputSchema)
     );
-    return apiResponse instanceof z.ZodType
-      ? [mimeJson]
-      : "mimeType" in apiResponse && apiResponse.mimeType
-      ? [apiResponse.mimeType]
-      : "mimeTypes" in apiResponse && apiResponse.mimeTypes
-      ? apiResponse.mimeTypes
-      : [mimeJson];
   }
 
   public override getNegativeMimeTypes() {
-    const apiResponse = this.resultHandler.getNegativeResponse();
-    return apiResponse instanceof z.ZodType
-      ? [mimeJson]
-      : "mimeType" in apiResponse && apiResponse.mimeType
-      ? [apiResponse.mimeType]
-      : "mimeTypes" in apiResponse && apiResponse.mimeTypes
-      ? apiResponse.mimeTypes
-      : [mimeJson];
+    return this.#getMimeTypesFromApiResponse(
+      this.resultHandler.getNegativeResponse()
+    );
   }
 
   public override getPositiveStatusCode() {
