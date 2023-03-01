@@ -24,6 +24,17 @@ import { mimeJson } from "./mime";
 import { ResultHandlerDefinition, lastResortHandler } from "./result-handler";
 import { Security } from "./security";
 
+const getMimeTypesFromApiResponse = <S extends z.ZodType>(
+  subject: S | ApiResponse<S>,
+  fallback = [mimeJson]
+) => {
+  if (subject instanceof z.ZodType) {
+    return fallback;
+  }
+  const { mimeTypes, mimeType } = subject;
+  return mimeType ? [mimeType] : mimeTypes || fallback;
+};
+
 export type Handler<IN, OUT, OPT> = (params: {
   input: IN;
   options: OPT;
@@ -76,6 +87,7 @@ type EndpointProps<
   ({ tags?: TAG[] } | { tag?: TAG }) &
   MethodsDefinition<M>;
 
+// @todo v9: reduce methods, initialize schemas in constructor to extract mime types and status codes
 export class Endpoint<
   IN extends IOSchema,
   OUT extends IOSchema,
@@ -188,25 +200,14 @@ export class Endpoint<
     return this.mimeTypes;
   }
 
-  #getMimeTypesFromApiResponse<S extends z.ZodType>(
-    subject: S | ApiResponse<S>,
-    fallback = [mimeJson]
-  ) {
-    if (subject instanceof z.ZodType) {
-      return fallback;
-    }
-    const { mimeTypes, mimeType } = subject;
-    return mimeType ? [mimeType] : mimeTypes || fallback;
-  }
-
   public override getPositiveMimeTypes() {
-    return this.#getMimeTypesFromApiResponse(
+    return getMimeTypesFromApiResponse(
       this.resultHandler.getPositiveResponse(this.outputSchema)
     );
   }
 
   public override getNegativeMimeTypes() {
-    return this.#getMimeTypesFromApiResponse(
+    return getMimeTypesFromApiResponse(
       this.resultHandler.getNegativeResponse()
     );
   }
