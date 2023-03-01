@@ -2,15 +2,18 @@ import { z } from "zod";
 
 export type ApiResponse<S = z.ZodTypeAny> = {
   schema: S;
-  /** @default 200 for a positive response, 400 for a negative response */
+  /**
+   * @default 200 for a positive response
+   * @default 400 for a negative response
+   * */
   statusCode?: number;
 } & (
   | {
-      /** @default [application/json] */
-      mimeTypes?: string[];
+      /** @default [ "application/json" ] */
+      mimeTypes?: [string, ...string[]];
     }
   | {
-      /** @default application/json */
+      /** @default "application/json" */
       mimeType?: string;
     }
 );
