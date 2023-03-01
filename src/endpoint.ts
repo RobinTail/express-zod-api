@@ -211,20 +211,20 @@ export class Endpoint<
     );
   }
 
-  public override getPositiveStatusCode() {
+  public override getPositiveStatusCode(fallback = 200) {
     const apiResponse = this.resultHandler.getPositiveResponse(
       this.outputSchema
     );
     return apiResponse instanceof z.ZodType
-      ? 200
-      : apiResponse.statusCode || 200;
+      ? fallback
+      : apiResponse.statusCode || fallback;
   }
 
-  public override getNegativeStatusCode() {
+  public override getNegativeStatusCode(fallback = 400) {
     const apiResponse = this.resultHandler.getNegativeResponse();
     return apiResponse instanceof z.ZodType
-      ? 400
-      : apiResponse.statusCode || 400;
+      ? fallback
+      : apiResponse.statusCode || fallback;
   }
 
   public override getSecurity() {
