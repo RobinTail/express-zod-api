@@ -172,11 +172,15 @@ export class Endpoint<
   }
 
   public override getPositiveResponseSchema(): POS {
-    return this.resultHandler.getPositiveResponse(this.outputSchema).schema;
+    const apiResponse = this.resultHandler.getPositiveResponse(
+      this.outputSchema
+    );
+    return apiResponse instanceof z.ZodType ? apiResponse : apiResponse.schema;
   }
 
   public override getNegativeResponseSchema(): NEG {
-    return this.resultHandler.getNegativeResponse().schema;
+    const apiResponse = this.resultHandler.getNegativeResponse();
+    return apiResponse instanceof z.ZodType ? apiResponse : apiResponse.schema;
   }
 
   public override getInputMimeTypes() {
@@ -187,7 +191,9 @@ export class Endpoint<
     const apiResponse = this.resultHandler.getPositiveResponse(
       this.outputSchema
     );
-    return "mimeType" in apiResponse && apiResponse.mimeType
+    return apiResponse instanceof z.ZodType
+      ? [mimeJson]
+      : "mimeType" in apiResponse && apiResponse.mimeType
       ? [apiResponse.mimeType]
       : "mimeTypes" in apiResponse && apiResponse.mimeTypes
       ? apiResponse.mimeTypes
@@ -196,7 +202,9 @@ export class Endpoint<
 
   public override getNegativeMimeTypes() {
     const apiResponse = this.resultHandler.getNegativeResponse();
-    return "mimeType" in apiResponse && apiResponse.mimeType
+    return apiResponse instanceof z.ZodType
+      ? [mimeJson]
+      : "mimeType" in apiResponse && apiResponse.mimeType
       ? [apiResponse.mimeType]
       : "mimeTypes" in apiResponse && apiResponse.mimeTypes
       ? apiResponse.mimeTypes
@@ -204,14 +212,19 @@ export class Endpoint<
   }
 
   public override getPositiveStatusCode() {
-    return (
-      this.resultHandler.getPositiveResponse(this.outputSchema).statusCode ||
-      200
+    const apiResponse = this.resultHandler.getPositiveResponse(
+      this.outputSchema
     );
+    return apiResponse instanceof z.ZodType
+      ? 200
+      : apiResponse.statusCode || 200;
   }
 
   public override getNegativeStatusCode() {
-    return this.resultHandler.getNegativeResponse().statusCode || 400;
+    const apiResponse = this.resultHandler.getNegativeResponse();
+    return apiResponse instanceof z.ZodType
+      ? 400
+      : apiResponse.statusCode || 400;
   }
 
   public override getSecurity() {

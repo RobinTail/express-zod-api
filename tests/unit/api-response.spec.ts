@@ -1,5 +1,6 @@
 import { createApiResponse, z } from "../../src";
 
+/** @todo remove in v9 */
 describe("ApiResponse", () => {
   describe("createApiResponse()", () => {
     test("should accept an array of mime types", () => {

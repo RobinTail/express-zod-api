@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { Logger } from "winston";
 import { z } from "zod";
-import { ApiResponse, createApiResponse } from "./api-response";
+import { ApiResponse } from "./api-response";
 import { ResultHandlerError } from "./errors";
 import { getMessageFromError, getStatusCodeFromError } from "./common-helpers";
 import { IOSchema } from "./io-schema";
@@ -30,8 +30,8 @@ export interface ResultHandlerDefinition<
   POS extends z.ZodType,
   NEG extends z.ZodType
 > {
-  getPositiveResponse: (output: IOSchema) => ApiResponse<POS>;
-  getNegativeResponse: () => ApiResponse<NEG>;
+  getPositiveResponse: (output: IOSchema) => POS | ApiResponse<POS>;
+  getNegativeResponse: () => NEG | ApiResponse<NEG>;
   handler: ResultHandler<z.output<POS> | z.output<NEG>>;
 }
 
@@ -58,10 +58,10 @@ export const defaultResultHandler = createResultHandler({
         data: example,
       });
     }
-    return createApiResponse(responseSchema);
+    return responseSchema;
   },
-  getNegativeResponse: () => {
-    const responseSchema = withMeta(
+  getNegativeResponse: () =>
+    withMeta(
       z.object({
         status: z.literal("error"),
         error: z.object({
@@ -73,9 +73,7 @@ export const defaultResultHandler = createResultHandler({
       error: {
         message: getMessageFromError(new Error("Sample error message")),
       },
-    });
-    return createApiResponse(responseSchema);
-  },
+    }),
   handler: ({ error, input, output, request, response, logger }) => {
     if (!error) {
       response.status(200).json({

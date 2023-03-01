@@ -19,7 +19,7 @@ export type ApiResponse<S extends z.ZodType> = {
 );
 
 /**
- * @deprecated replace with { schema, mimeType } or { schema, mimeTypes } object
+ * @deprecated replace with just a schema, or { schema, mimeType } or { schema, mimeTypes } object
  * @todo remove in v9
  */
 export const createApiResponse = <S extends z.ZodType>(
