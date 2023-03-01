@@ -192,13 +192,11 @@ export class Endpoint<
     subject: S | ApiResponse<S>,
     fallback = [mimeJson]
   ) {
-    return subject instanceof z.ZodType
-      ? fallback
-      : subject.mimeType
-      ? [subject.mimeType]
-      : subject.mimeTypes
-      ? subject.mimeTypes
-      : fallback;
+    if (subject instanceof z.ZodType) {
+      return fallback;
+    }
+    const { mimeTypes, mimeType } = subject;
+    return mimeType ? [mimeType] : mimeTypes || fallback;
   }
 
   public override getPositiveMimeTypes() {
