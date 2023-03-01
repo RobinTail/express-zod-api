@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export type ApiResponse<S extends z.ZodType> = {
+export interface ApiResponse<S extends z.ZodType> {
   schema: S;
   /**
    * @default 200 for a positive response
@@ -14,7 +14,7 @@ export type ApiResponse<S extends z.ZodType> = {
   mimeType?: string;
   /** @default [ "application/json" ] */
   mimeTypes?: [string, ...string[]];
-};
+}
 
 /**
  * @deprecated replace with just a schema, or { schema, mimeType } or { schema, mimeTypes } object
