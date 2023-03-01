@@ -194,9 +194,9 @@ export class Endpoint<
   ) {
     return subject instanceof z.ZodType
       ? fallback
-      : "mimeType" in subject && subject.mimeType
+      : subject.mimeType
       ? [subject.mimeType]
-      : "mimeTypes" in subject && subject.mimeTypes
+      : subject.mimeTypes
       ? subject.mimeTypes
       : fallback;
   }
