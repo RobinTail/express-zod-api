@@ -499,20 +499,14 @@ type DefaultResponse<OUT> =
 You can create your own result handler by using this example as a template:
 
 ```typescript
-import {
-  createResultHandler,
-  createApiResponse,
-  IOSchema,
-  z,
-} from "express-zod-api";
+import { createResultHandler, IOSchema, z } from "express-zod-api";
 
 export const yourResultHandler = createResultHandler({
-  getPositiveResponse: (output: IOSchema) =>
-    createApiResponse(
-      z.object({ data: output }),
-      "application/json" // optional, or array of mime types
-    ),
-  getNegativeResponse: () => createApiResponse(z.object({ error: z.string() })),
+  getPositiveResponse: (output: IOSchema) => ({
+    schema: z.object({ data: output }),
+    mimeType: "application/json", // optinal, or mimeTypes for array
+  }),
+  getNegativeResponse: () => z.object({ error: z.string() }),
   handler: ({ error, input, output, request, response, logger }) => {
     // your implementation
   },
@@ -544,8 +538,11 @@ The response schema generally may be just `z.string()`, but I made more specific
 ```typescript
 const fileStreamingEndpointsFactory = new EndpointsFactory(
   createResultHandler({
-    getPositiveResponse: () => createApiResponse(z.file().binary(), "image/*"),
-    getNegativeResponse: () => createApiResponse(z.string(), "text/plain"),
+    getPositiveResponse: () => ({
+      schema: z.file().binary(),
+      mimeType: "image/*",
+    }),
+    getNegativeResponse: () => ({ schrma: z.string(), mimeType: "text/plain" }),
     handler: ({ response, error, output }) => {
       if (error) {
         response.status(400).send(error.message);
