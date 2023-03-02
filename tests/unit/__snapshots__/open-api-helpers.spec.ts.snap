@@ -199,6 +199,44 @@ exports[`Open API helpers depictEnum() should set type and enum properties 2`] =
 }
 `;
 
+exports[`Open API helpers depictExamples() should pass examples in case of request 1`] = `
+{
+  "examples": {
+    "example1": {
+      "value": {
+        "one": "test",
+        "two": 123,
+      },
+    },
+    "example2": {
+      "value": {
+        "one": "test2",
+        "two": 456,
+      },
+    },
+  },
+}
+`;
+
+exports[`Open API helpers depictExamples() should transform examples in case of response 1`] = `
+{
+  "examples": {
+    "example1": {
+      "value": {
+        "one": 4,
+        "two": "123",
+      },
+    },
+    "example2": {
+      "value": {
+        "one": 5,
+        "two": "456",
+      },
+    },
+  },
+}
+`;
+
 exports[`Open API helpers depictFile() should set type:string and format accordingly 0 1`] = `
 {
   "format": "file",
@@ -221,70 +259,6 @@ exports[`Open API helpers depictFile() should set type:string and format accordi
 `;
 
 exports[`Open API helpers depictFile() should throw when using in input 1`] = `[OpenAPIError: Please use z.file() only within ResultHandler.]`;
-
-exports[`Open API helpers depictIOExamples() should pass examples in case of request 1`] = `
-{
-  "examples": {
-    "example1": {
-      "value": {
-        "one": "test",
-        "two": 123,
-      },
-    },
-    "example2": {
-      "value": {
-        "one": "test2",
-        "two": 456,
-      },
-    },
-  },
-}
-`;
-
-exports[`Open API helpers depictIOExamples() should transform examples in case of response 1`] = `
-{
-  "examples": {
-    "example1": {
-      "value": {
-        "one": 4,
-        "two": "123",
-      },
-    },
-    "example2": {
-      "value": {
-        "one": 5,
-        "two": "456",
-      },
-    },
-  },
-}
-`;
-
-exports[`Open API helpers depictIOParamExamples() should pass examples in case of request 1`] = `
-{
-  "examples": {
-    "example1": {
-      "value": 123,
-    },
-    "example2": {
-      "value": 456,
-    },
-  },
-}
-`;
-
-exports[`Open API helpers depictIOParamExamples() should transform examples in case of response 1`] = `
-{
-  "examples": {
-    "example1": {
-      "value": "123",
-    },
-    "example2": {
-      "value": "456",
-    },
-  },
-}
-`;
 
 exports[`Open API helpers depictIntersection() should wrap next depicters in allOf property 1`] = `
 {
@@ -531,6 +505,32 @@ exports[`Open API helpers depictOptional() should pass the next depicter 0 1`] =
 exports[`Open API helpers depictOptional() should pass the next depicter 1 1`] = `
 {
   "type": "string",
+}
+`;
+
+exports[`Open API helpers depictParamExamples() should pass examples in case of request 1`] = `
+{
+  "examples": {
+    "example1": {
+      "value": 123,
+    },
+    "example2": {
+      "value": 456,
+    },
+  },
+}
+`;
+
+exports[`Open API helpers depictParamExamples() should transform examples in case of response 1`] = `
+{
+  "examples": {
+    "example1": {
+      "value": "123",
+    },
+    "example2": {
+      "value": "456",
+    },
+  },
 }
 `;
 

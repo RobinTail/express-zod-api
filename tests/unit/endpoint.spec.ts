@@ -307,28 +307,16 @@ describe("Endpoint", () => {
         output: z.object({}),
         handler: jest.fn(),
       });
-      expect(endpoint.getInputSchema()).toEqual(input);
+      expect(endpoint.getSchema("input")).toEqual(input);
     });
   });
 
   describe(".outputSchema", () => {
     test("should be the output schema", () => {
-      class EndpointWithPublicOutputSchema extends Endpoint<
-        any,
-        any,
-        any,
-        any,
-        any,
-        any,
-        any,
-        any
-      > {
-        public override outputSchema: any;
-      }
       const outputSchema = z.object({
         something: z.number(),
       });
-      const endpoint = new EndpointWithPublicOutputSchema({
+      const endpoint = new Endpoint({
         method: "get",
         middlewares: [],
         inputSchema: z.object({}),
@@ -336,7 +324,7 @@ describe("Endpoint", () => {
         handler: jest.fn(),
         resultHandler: defaultResultHandler,
       });
-      expect(endpoint.outputSchema).toEqual(outputSchema);
+      expect(endpoint.getSchema("output")).toEqual(outputSchema);
     });
   });
 
@@ -353,7 +341,7 @@ describe("Endpoint", () => {
         handler: jest.fn(),
       });
       expect(
-        serializeSchemaForTest(endpoint.getPositiveResponseSchema())
+        serializeSchemaForTest(endpoint.getSchema("positive"))
       ).toMatchSnapshot();
     });
   });
@@ -371,7 +359,7 @@ describe("Endpoint", () => {
         handler: jest.fn(),
       });
       expect(
-        serializeSchemaForTest(endpoint.getNegativeResponseSchema())
+        serializeSchemaForTest(endpoint.getSchema("negative"))
       ).toMatchSnapshot();
     });
   });

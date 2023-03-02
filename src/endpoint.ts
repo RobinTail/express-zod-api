@@ -55,9 +55,8 @@ export abstract class AbstractEndpoint {
   }): Promise<void>;
   public abstract getDescription(variant: "short" | "long"): string | undefined;
   public abstract getMethods(): Method[];
-  public abstract getInputSchema(): IOSchema;
-  public abstract getPositiveResponseSchema(): z.ZodTypeAny;
-  public abstract getNegativeResponseSchema(): z.ZodTypeAny;
+  public abstract getSchema(variant: "input" | "output"): IOSchema;
+  public abstract getSchema(variant: "positive" | "negative"): z.ZodType;
   public abstract getMimeTypes(
     variant: "input" | "positive" | "negative"
   ): string[];
@@ -104,16 +103,19 @@ export class Endpoint<
   protected readonly methods: M[] = [];
   protected siblingMethods: Method[] = [];
   protected readonly middlewares: AnyMiddlewareDef[] = [];
-  protected readonly inputSchema: IN;
   protected readonly mimeTypes: Record<
     "input" | "positive" | "negative",
     string[]
   >;
   protected readonly statusCodes: Record<"positive" | "negative", number>;
-  protected readonly outputSchema: OUT;
   protected readonly handler: Handler<z.output<IN>, z.input<OUT>, OPT>;
   protected readonly resultHandler: ResultHandlerDefinition<POS, NEG>;
-  protected readonly responseSchema: { positive: POS; negative: NEG };
+  protected readonly schemas: {
+    input: IN;
+    output: OUT;
+    positive: POS;
+    negative: NEG;
+  };
   protected readonly scopes: SCO[] = [];
   protected readonly tags: TAG[] = [];
 
@@ -139,7 +141,6 @@ export class Endpoint<
       }
     });
     this.middlewares = middlewares;
-    this.inputSchema = inputSchema;
     const apiResponse = {
       positive: resultHandler.getPositiveResponse(outputSchema),
       negative: resultHandler.getNegativeResponse(),
@@ -149,7 +150,9 @@ export class Endpoint<
       positive: getMimeTypesFromApiResponse(apiResponse.positive),
       negative: getMimeTypesFromApiResponse(apiResponse.negative),
     };
-    this.responseSchema = {
+    this.schemas = {
+      input: inputSchema,
+      output: outputSchema,
       positive:
         apiResponse.positive instanceof z.ZodType
           ? apiResponse.positive
@@ -169,7 +172,6 @@ export class Endpoint<
           ? defaultStatusCodes.negative
           : apiResponse.negative.statusCode || defaultStatusCodes.negative,
     };
-    this.outputSchema = outputSchema;
     this.handler = handler;
     this.resultHandler = resultHandler;
     this.descriptions = { long: description, short: shortDescription };
@@ -208,23 +210,21 @@ export class Endpoint<
     return this.methods;
   }
 
-  public override getInputSchema(): IN {
-    return this.inputSchema;
+  public override getSchema(variant: "input"): IN;
+  public override getSchema(variant: "output"): OUT;
+  public override getSchema(variant: "positive"): POS;
+  public override getSchema(variant: "negative"): NEG;
+  public override getSchema(
+    variant: "input" | "output" | "positive" | "negative"
+  ) {
+    return this.schemas[variant];
   }
 
-  public override getPositiveResponseSchema(): POS {
-    return this.responseSchema.positive;
-  }
-
-  public override getNegativeResponseSchema(): NEG {
-    return this.responseSchema.negative;
-  }
-
-  public override getMimeTypes(variant: keyof typeof this.mimeTypes) {
+  public override getMimeTypes(variant: "input" | "positive" | "negative") {
     return this.mimeTypes[variant];
   }
 
-  public override getStatusCode(variant: keyof typeof this.statusCodes) {
+  public override getStatusCode(variant: "positive" | "negative") {
     return this.statusCodes[variant];
   }
 
@@ -259,7 +259,7 @@ export class Endpoint<
 
   async #parseOutput(output: any) {
     try {
-      return await this.outputSchema.parseAsync(output);
+      return await this.schemas.output.parseAsync(output);
     } catch (e) {
       if (e instanceof z.ZodError) {
         throw new OutputValidationError(e);
@@ -329,7 +329,7 @@ export class Endpoint<
   }) {
     let finalInput: z.output<IN>; // final input types transformations for handler
     try {
-      finalInput = (await this.inputSchema.parseAsync(input)) as z.output<IN>;
+      finalInput = (await this.schemas.input.parseAsync(input)) as z.output<IN>;
     } catch (e) {
       if (e instanceof z.ZodError) {
         throw new InputValidationError(e);

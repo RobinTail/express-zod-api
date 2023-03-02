@@ -22,9 +22,8 @@ import {
   depictDiscriminatedUnion,
   depictEffect,
   depictEnum,
+  depictExamples,
   depictFile,
-  depictIOExamples,
-  depictIOParamExamples,
   depictIntersection,
   depictLiteral,
   depictNull,
@@ -33,6 +32,7 @@ import {
   depictObject,
   depictObjectProperties,
   depictOptional,
+  depictParamExamples,
   depictPipeline,
   depictRecord,
   depictRequestParams,
@@ -631,13 +631,13 @@ describe("Open API helpers", () => {
     });
   });
 
-  describe("depictIOExamples()", () => {
+  describe("depictExamples()", () => {
     test.each<OpenAPIContext & Record<"case" | "action", string>>([
       { isResponse: false, case: "request", action: "pass" },
       { isResponse: true, case: "response", action: "transform" },
     ])("should $action examples in case of $case", ({ isResponse }) => {
       expect(
-        depictIOExamples(
+        depictExamples(
           withMeta(
             z.object({
               one: z.string().transform((v) => v.length),
@@ -662,13 +662,13 @@ describe("Open API helpers", () => {
     });
   });
 
-  describe("depictIOParamExamples()", () => {
+  describe("depictParamExamples()", () => {
     test.each<OpenAPIContext & Record<"case" | "action", string>>([
       { isResponse: false, case: "request", action: "pass" },
       { isResponse: true, case: "response", action: "transform" },
     ])("should $action examples in case of $case", ({ isResponse }) => {
       expect(
-        depictIOParamExamples(
+        depictParamExamples(
           withMeta(
             z.object({
               one: z.string().transform((v) => v.length),
