@@ -20,7 +20,7 @@ import { IOSchema } from "./io-schema";
 import { LogicalContainer, combineContainers } from "./logical-container";
 import { AuxMethod, Method, MethodsDefinition } from "./method";
 import { AnyMiddlewareDef } from "./middleware";
-import { mimeJson } from "./mime";
+import { mimeJson, mimeMultipart } from "./mime";
 import { ResultHandlerDefinition, lastResortHandler } from "./result-handler";
 import { Security } from "./security";
 
@@ -77,7 +77,7 @@ type EndpointProps<
 > = {
   middlewares: AnyMiddlewareDef[];
   inputSchema: IN;
-  mimeTypes: string[];
+  hasUpload?: boolean;
   outputSchema: OUT;
   handler: Handler<z.output<IN>, z.input<OUT>, OPT>;
   resultHandler: ResultHandlerDefinition<POS, NEG>;
@@ -103,7 +103,10 @@ export class Endpoint<
   protected siblingMethods: Method[] = [];
   protected readonly middlewares: AnyMiddlewareDef[] = [];
   protected readonly inputSchema: IN;
-  protected readonly mimeTypes: string[];
+  protected readonly mimeTypes: Record<
+    "input" | "positive" | "negative",
+    string[]
+  >;
   protected readonly outputSchema: OUT;
   protected readonly handler: Handler<z.output<IN>, z.input<OUT>, OPT>;
   protected readonly resultHandler: ResultHandlerDefinition<POS, NEG>;
@@ -118,7 +121,7 @@ export class Endpoint<
     resultHandler,
     description,
     shortDescription,
-    mimeTypes,
+    hasUpload,
     ...rest
   }: EndpointProps<IN, OUT, OPT, M, POS, NEG, SCO, TAG>) {
     super();
@@ -134,7 +137,15 @@ export class Endpoint<
     });
     this.middlewares = middlewares;
     this.inputSchema = inputSchema;
-    this.mimeTypes = mimeTypes;
+    this.mimeTypes = {
+      input: hasUpload ? [mimeMultipart] : [mimeJson],
+      positive: getMimeTypesFromApiResponse(
+        resultHandler.getPositiveResponse(outputSchema)
+      ),
+      negative: getMimeTypesFromApiResponse(
+        resultHandler.getNegativeResponse()
+      ),
+    };
     this.outputSchema = outputSchema;
     this.handler = handler;
     this.resultHandler = resultHandler;
@@ -195,19 +206,15 @@ export class Endpoint<
   }
 
   public override getInputMimeTypes() {
-    return this.mimeTypes;
+    return this.mimeTypes.input;
   }
 
   public override getPositiveMimeTypes() {
-    return getMimeTypesFromApiResponse(
-      this.resultHandler.getPositiveResponse(this.outputSchema)
-    );
+    return this.mimeTypes.positive;
   }
 
   public override getNegativeMimeTypes() {
-    return getMimeTypesFromApiResponse(
-      this.resultHandler.getNegativeResponse()
-    );
+    return this.mimeTypes.negative;
   }
 
   public override getPositiveStatusCode(fallback = 200) {

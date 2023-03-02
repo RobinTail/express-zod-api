@@ -16,7 +16,6 @@ import {
   MiddlewareDefinition,
   createMiddleware,
 } from "./middleware";
-import { mimeJson, mimeMultipart } from "./mime";
 import {
   ResultHandlerDefinition,
   defaultResultHandler,
@@ -168,7 +167,7 @@ export class EndpointsFactory<
       outputSchema,
       resultHandler,
       inputSchema: getFinalEndpointInputSchema<IN, BIN>(middlewares, input),
-      mimeTypes: hasUpload(input) ? [mimeMultipart] : [mimeJson],
+      hasUpload: hasUpload(input),
       ...rest,
     });
   }

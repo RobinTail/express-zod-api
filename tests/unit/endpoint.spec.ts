@@ -9,7 +9,6 @@ import {
 } from "../../src";
 import { Endpoint } from "../../src/endpoint";
 import { IOSchemaError } from "../../src/errors";
-import { mimeJson } from "../../src/mime";
 import { serializeSchemaForTest } from "../helpers";
 
 describe("Endpoint", () => {
@@ -18,14 +17,13 @@ describe("Endpoint", () => {
       const endpointMock = new Endpoint({
         methods: ["get", "post", "put", "delete", "patch"],
         inputSchema: z.object({}),
-        mimeTypes: [mimeJson],
         outputSchema: z.object({}),
         handler: jest.fn(),
-        resultHandler: {
-          getPositiveResponse: jest.fn(),
-          getNegativeResponse: jest.fn(),
+        resultHandler: createResultHandler({
+          getPositiveResponse: () => z.string(),
+          getNegativeResponse: () => z.string(),
           handler: jest.fn(),
-        },
+        }),
         middlewares: [],
       });
       expect(endpointMock.getMethods()).toEqual([
@@ -41,14 +39,13 @@ describe("Endpoint", () => {
       const endpointMock = new Endpoint({
         method: "patch",
         inputSchema: z.object({}),
-        mimeTypes: [mimeJson],
         outputSchema: z.object({}),
         handler: jest.fn(),
-        resultHandler: {
-          getPositiveResponse: jest.fn(),
-          getNegativeResponse: jest.fn(),
+        resultHandler: createResultHandler({
+          getPositiveResponse: () => z.string(),
+          getNegativeResponse: () => z.string(),
           handler: jest.fn(),
-        },
+        }),
         middlewares: [],
       });
       expect(endpointMock.getMethods()).toEqual(["patch"]);
@@ -717,7 +714,6 @@ describe("Endpoint", () => {
           new Endpoint({
             method: "get",
             inputSchema: z.object({}).transform(() => []),
-            mimeTypes: [mimeJson],
             outputSchema: z.object({}),
             handler: jest.fn(),
             resultHandler: {
@@ -737,7 +733,6 @@ describe("Endpoint", () => {
           new Endpoint({
             method: "get",
             inputSchema: z.object({}),
-            mimeTypes: [mimeJson],
             outputSchema: z.object({}).transform(() => []),
             handler: jest.fn(),
             resultHandler: {
