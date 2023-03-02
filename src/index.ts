@@ -8,7 +8,6 @@ export {
   getMessageFromError,
   getStatusCodeFromError,
 } from "./common-helpers";
-export { createApiResponse } from "./api-response";
 export { createLogger } from "./logger";
 export { createMiddleware } from "./middleware";
 export { createResultHandler, defaultResultHandler } from "./result-handler";
