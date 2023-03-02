@@ -710,8 +710,8 @@ export const depictResponse = ({
     ? endpoint.getPositiveResponseSchema()
     : endpoint.getNegativeResponseSchema();
   const mimeTypes = isPositive
-    ? endpoint.getPositiveMimeTypes()
-    : endpoint.getNegativeMimeTypes();
+    ? endpoint.getMimeTypes("positive")
+    : endpoint.getMimeTypes("negative");
   const depictedSchema = excludeExampleFromDepiction(
     walkSchema({
       schema,
@@ -856,7 +856,7 @@ export const depictRequest = ({
   );
 
   return {
-    content: endpoint.getInputMimeTypes().reduce(
+    content: endpoint.getMimeTypes("input").reduce(
       (carry, mimeType) => ({
         ...carry,
         [mimeType]: {

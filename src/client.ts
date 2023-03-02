@@ -64,7 +64,7 @@ export class Client {
           this.registry[`${method} ${path}`] = {
             in: inputId,
             out: responseId,
-            isJson: endpoint.getPositiveMimeTypes().includes(mimeJson),
+            isJson: endpoint.getMimeTypes("positive").includes(mimeJson),
           };
         }
       },

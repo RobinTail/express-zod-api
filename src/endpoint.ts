@@ -55,9 +55,9 @@ export abstract class AbstractEndpoint {
   public abstract getOutputSchema(): IOSchema;
   public abstract getPositiveResponseSchema(): z.ZodTypeAny;
   public abstract getNegativeResponseSchema(): z.ZodTypeAny;
-  public abstract getInputMimeTypes(): string[];
-  public abstract getPositiveMimeTypes(): string[];
-  public abstract getNegativeMimeTypes(): string[];
+  public abstract getMimeTypes(
+    variant: "input" | "positive" | "negative"
+  ): string[];
   public abstract getPositiveStatusCode(): number;
   public abstract getNegativeStatusCode(): number;
   public abstract getSecurity(): LogicalContainer<Security>;
@@ -204,16 +204,8 @@ export class Endpoint<
     return apiResponse instanceof z.ZodType ? apiResponse : apiResponse.schema;
   }
 
-  public override getInputMimeTypes() {
-    return this.mimeTypes.input;
-  }
-
-  public override getPositiveMimeTypes() {
-    return this.mimeTypes.positive;
-  }
-
-  public override getNegativeMimeTypes() {
-    return this.mimeTypes.negative;
+  public override getMimeTypes(variant: keyof typeof this.mimeTypes) {
+    return this.mimeTypes[variant];
   }
 
   public override getPositiveStatusCode(fallback = 200) {

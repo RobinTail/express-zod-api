@@ -372,7 +372,7 @@ describe("Endpoint", () => {
         output: z.object({}),
         handler: jest.fn(),
       });
-      expect(endpoint.getPositiveMimeTypes()).toEqual(["application/json"]);
+      expect(endpoint.getMimeTypes("positive")).toEqual(["application/json"]);
     });
   });
 
@@ -385,7 +385,7 @@ describe("Endpoint", () => {
         output: z.object({}),
         handler: jest.fn(),
       });
-      expect(endpoint.getNegativeMimeTypes()).toEqual(["application/json"]);
+      expect(endpoint.getMimeTypes("negative")).toEqual(["application/json"]);
     });
   });
 
