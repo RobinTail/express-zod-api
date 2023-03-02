@@ -46,6 +46,11 @@ export type Handler<IN, OUT, OPT> = (params: {
   logger: Logger;
 }) => Promise<OUT>;
 
+type DescriptionVariant = "short" | "long";
+type IOVariant = "input" | "output";
+type ResponseVariant = "positive" | "negative";
+type MimeVariant = Extract<IOVariant, "input"> | ResponseVariant;
+
 export abstract class AbstractEndpoint {
   public abstract execute(params: {
     request: Request;
@@ -53,14 +58,14 @@ export abstract class AbstractEndpoint {
     logger: Logger;
     config: CommonConfig;
   }): Promise<void>;
-  public abstract getDescription(variant: "short" | "long"): string | undefined;
+  public abstract getDescription(
+    variant: DescriptionVariant
+  ): string | undefined;
   public abstract getMethods(): Method[];
-  public abstract getSchema(variant: "input" | "output"): IOSchema;
-  public abstract getSchema(variant: "positive" | "negative"): z.ZodType;
-  public abstract getMimeTypes(
-    variant: "input" | "positive" | "negative"
-  ): string[];
-  public abstract getStatusCode(variant: "positive" | "negative"): number;
+  public abstract getSchema(variant: IOVariant): IOSchema;
+  public abstract getSchema(variant: ResponseVariant): z.ZodType;
+  public abstract getMimeTypes(variant: MimeVariant): string[];
+  public abstract getStatusCode(variant: ResponseVariant): number;
   public abstract getSecurity(): LogicalContainer<Security>;
   public abstract getScopes(): string[];
   public abstract getTags(): string[];
@@ -88,7 +93,6 @@ type EndpointProps<
   ({ tags?: TAG[] } | { tag?: TAG }) &
   MethodsDefinition<M>;
 
-// @todo v9: reduce methods, initialize schemas in constructor to extract mime types and status codes
 export class Endpoint<
   IN extends IOSchema,
   OUT extends IOSchema,
@@ -99,15 +103,15 @@ export class Endpoint<
   SCO extends string,
   TAG extends string
 > extends AbstractEndpoint {
-  protected readonly descriptions: Record<"short" | "long", string | undefined>;
+  protected readonly descriptions: Record<
+    DescriptionVariant,
+    string | undefined
+  >;
   protected readonly methods: M[] = [];
   protected siblingMethods: Method[] = [];
   protected readonly middlewares: AnyMiddlewareDef[] = [];
-  protected readonly mimeTypes: Record<
-    "input" | "positive" | "negative",
-    string[]
-  >;
-  protected readonly statusCodes: Record<"positive" | "negative", number>;
+  protected readonly mimeTypes: Record<MimeVariant, string[]>;
+  protected readonly statusCodes: Record<ResponseVariant, number>;
   protected readonly handler: Handler<z.output<IN>, z.input<OUT>, OPT>;
   protected readonly resultHandler: ResultHandlerDefinition<POS, NEG>;
   protected readonly schemas: {
@@ -202,7 +206,7 @@ export class Endpoint<
     this.siblingMethods = methods;
   }
 
-  public override getDescription(variant: "short" | "long") {
+  public override getDescription(variant: DescriptionVariant) {
     return this.descriptions[variant];
   }
 
@@ -214,17 +218,15 @@ export class Endpoint<
   public override getSchema(variant: "output"): OUT;
   public override getSchema(variant: "positive"): POS;
   public override getSchema(variant: "negative"): NEG;
-  public override getSchema(
-    variant: "input" | "output" | "positive" | "negative"
-  ) {
+  public override getSchema(variant: IOVariant | ResponseVariant) {
     return this.schemas[variant];
   }
 
-  public override getMimeTypes(variant: "input" | "positive" | "negative") {
+  public override getMimeTypes(variant: MimeVariant) {
     return this.mimeTypes[variant];
   }
 
-  public override getStatusCode(variant: "positive" | "negative") {
+  public override getStatusCode(variant: ResponseVariant) {
     return this.statusCodes[variant];
   }
 
