@@ -44,7 +44,7 @@ createResultHandler({
     statusCode: 201,
   }),
   getNegativeResponse: () => ({
-    schrma: z.string(),
+    schema: z.string(),
     mimeType: "text/plain",
     statusCode: 403,
   }),

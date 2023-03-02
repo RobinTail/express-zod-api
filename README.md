@@ -542,7 +542,7 @@ const fileStreamingEndpointsFactory = new EndpointsFactory(
       schema: z.file().binary(),
       mimeType: "image/*",
     }),
-    getNegativeResponse: () => ({ schrma: z.string(), mimeType: "text/plain" }),
+    getNegativeResponse: () => ({ schema: z.string(), mimeType: "text/plain" }),
     handler: ({ response, error, output }) => {
       if (error) {
         response.status(400).send(error.message);
