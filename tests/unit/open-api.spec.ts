@@ -1,14 +1,17 @@
 import { config as exampleConfig } from "../../example/config";
 import { routing } from "../../example/routing";
 import {
+  EndpointsFactory,
   OpenAPI,
   createConfig,
   createMiddleware,
+  createResultHandler,
   defaultEndpointsFactory,
   withMeta,
   z,
 } from "../../src";
 import { expectType } from "tsd";
+import { mimeJson } from "../../src/mime";
 
 describe("Open API generator", () => {
   const sampleConfig = createConfig({
@@ -506,6 +509,141 @@ describe("Open API generator", () => {
         ).toThrowError(/Zod type Zod\w+ is unsupported/);
       });
     });
+
+    test("should ensure uniq security schema names", () => {
+      const mw1 = createMiddleware({
+        security: {
+          or: [{ type: "input", name: "key" }, { type: "bearer" }],
+        },
+        input: z.object({
+          key: z.string(),
+        }),
+        middleware: jest.fn(),
+      });
+      const mw2 = createMiddleware({
+        security: {
+          and: [
+            { type: "bearer" },
+            {
+              type: "oauth2",
+              flows: {
+                password: {
+                  tokenUrl: "https://some.url",
+                  scopes: { read: "read something", write: "write something" },
+                },
+              },
+            },
+          ],
+        },
+        input: z.object({}),
+        middleware: jest.fn(),
+      });
+      const mw3 = createMiddleware({
+        security: { type: "bearer", format: "JWT" },
+        input: z.object({}),
+        middleware: jest.fn(),
+      });
+      const spec = new OpenAPI({
+        config: sampleConfig,
+        routing: {
+          v1: {
+            getSomething: defaultEndpointsFactory.addMiddleware(mw1).build({
+              scopes: ["this should be omitted"],
+              method: "get",
+              input: z.object({
+                str: z.string(),
+              }),
+              output: z.object({
+                num: z.number(),
+              }),
+              handler: async () => ({ num: 123 }),
+            }),
+            setSomething: defaultEndpointsFactory.addMiddleware(mw2).build({
+              scope: "write",
+              method: "post",
+              input: z.object({}),
+              output: z.object({}),
+              handler: async () => ({}),
+            }),
+            updateSomething: defaultEndpointsFactory.addMiddleware(mw3).build({
+              scopes: ["this should be omitted"],
+              method: "put",
+              input: z.object({}),
+              output: z.object({}),
+              handler: async () => ({}),
+            }),
+          },
+        },
+        version: "3.4.5",
+        title: "Testing Security",
+        serverUrl: "http://example.com",
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
+    });
+
+    test("should ensure the uniq operation ids", () => {
+      const spec = new OpenAPI({
+        config: sampleConfig,
+        routing: {
+          v1: {
+            getSome: {
+              thing: defaultEndpointsFactory.build({
+                description: "thing is the path segment",
+                method: "get",
+                input: z.object({}),
+                output: z.object({}),
+                handler: async () => ({}),
+              }),
+              ":thing": defaultEndpointsFactory.build({
+                description: "thing is the path parameter",
+                method: "get",
+                input: z.object({}),
+                output: z.object({}),
+                handler: async () => ({}),
+              }),
+            },
+          },
+        },
+        version: "3.4.5",
+        title: "Testing Operation IDs",
+        serverUrl: "http://example.com",
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
+    });
+
+    test("should handle custom mime types and status codes", () => {
+      const resultHandler = createResultHandler({
+        getPositiveResponse: (output) => ({
+          schema: z.object({ status: z.literal("OK"), result: output }),
+          mimeTypes: [mimeJson, "text/vnd.yaml"],
+          statusCode: 201,
+        }),
+        getNegativeResponse: () => ({
+          schema: z.object({ status: z.literal("NOT OK") }),
+          mimeType: "text/vnd.yaml",
+          statusCode: 403,
+        }),
+        handler: () => {},
+      });
+      const factory = new EndpointsFactory(resultHandler);
+      const spec = new OpenAPI({
+        config: sampleConfig,
+        routing: {
+          v1: {
+            getSomething: factory.build({
+              method: "get",
+              input: z.object({}),
+              output: z.object({}),
+              handler: async () => ({}),
+            }),
+          },
+        },
+        version: "3.4.5",
+        title: "Testing MIME types and status codes",
+        serverUrl: "http://example.com",
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
+    });
   });
 
   describe("Issue #98", () => {
@@ -788,107 +926,6 @@ describe("Open API generator", () => {
         },
         version: "3.4.5",
         title: "Testing Metadata:example on IO schema + middleware",
-        serverUrl: "http://example.com",
-      }).getSpecAsYaml();
-      expect(spec).toMatchSnapshot();
-    });
-
-    test("should ensure uniq security schema names", () => {
-      const mw1 = createMiddleware({
-        security: {
-          or: [{ type: "input", name: "key" }, { type: "bearer" }],
-        },
-        input: z.object({
-          key: z.string(),
-        }),
-        middleware: jest.fn(),
-      });
-      const mw2 = createMiddleware({
-        security: {
-          and: [
-            { type: "bearer" },
-            {
-              type: "oauth2",
-              flows: {
-                password: {
-                  tokenUrl: "https://some.url",
-                  scopes: { read: "read something", write: "write something" },
-                },
-              },
-            },
-          ],
-        },
-        input: z.object({}),
-        middleware: jest.fn(),
-      });
-      const mw3 = createMiddleware({
-        security: { type: "bearer", format: "JWT" },
-        input: z.object({}),
-        middleware: jest.fn(),
-      });
-      const spec = new OpenAPI({
-        config: sampleConfig,
-        routing: {
-          v1: {
-            getSomething: defaultEndpointsFactory.addMiddleware(mw1).build({
-              scopes: ["this should be omitted"],
-              method: "get",
-              input: z.object({
-                str: z.string(),
-              }),
-              output: z.object({
-                num: z.number(),
-              }),
-              handler: async () => ({ num: 123 }),
-            }),
-            setSomething: defaultEndpointsFactory.addMiddleware(mw2).build({
-              scope: "write",
-              method: "post",
-              input: z.object({}),
-              output: z.object({}),
-              handler: async () => ({}),
-            }),
-            updateSomething: defaultEndpointsFactory.addMiddleware(mw3).build({
-              scopes: ["this should be omitted"],
-              method: "put",
-              input: z.object({}),
-              output: z.object({}),
-              handler: async () => ({}),
-            }),
-          },
-        },
-        version: "3.4.5",
-        title: "Testing Security",
-        serverUrl: "http://example.com",
-      }).getSpecAsYaml();
-      expect(spec).toMatchSnapshot();
-    });
-
-    test("should ensure the uniq operation ids", () => {
-      const spec = new OpenAPI({
-        config: sampleConfig,
-        routing: {
-          v1: {
-            getSome: {
-              thing: defaultEndpointsFactory.build({
-                description: "thing is the path segment",
-                method: "get",
-                input: z.object({}),
-                output: z.object({}),
-                handler: async () => ({}),
-              }),
-              ":thing": defaultEndpointsFactory.build({
-                description: "thing is the path parameter",
-                method: "get",
-                input: z.object({}),
-                output: z.object({}),
-                handler: async () => ({}),
-              }),
-            },
-          },
-        },
-        version: "3.4.5",
-        title: "Testing Operation IDs",
         serverUrl: "http://example.com",
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
