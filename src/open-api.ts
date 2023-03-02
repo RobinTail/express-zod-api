@@ -97,12 +97,12 @@ export class OpenAPI extends OpenApiBuilder {
       const operation: OperationObject = {
         operationId: this.ensureUniqOperationId(path, method),
         responses: {
-          [endpoint.getPositiveStatusCode()]: depictResponse({
+          [endpoint.getStatusCode("positive")]: depictResponse({
             ...commonParams,
             description: successfulResponseDescription,
             isPositive: true,
           }),
-          [endpoint.getNegativeStatusCode()]: depictResponse({
+          [endpoint.getStatusCode("negative")]: depictResponse({
             ...commonParams,
             description: errorResponseDescription,
             isPositive: false,

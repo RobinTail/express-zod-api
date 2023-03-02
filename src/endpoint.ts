@@ -62,8 +62,7 @@ export abstract class AbstractEndpoint {
   public abstract getMimeTypes(
     variant: "input" | "positive" | "negative"
   ): string[];
-  public abstract getPositiveStatusCode(): number;
-  public abstract getNegativeStatusCode(): number;
+  public abstract getStatusCode(variant: "positive" | "negative"): number;
   public abstract getSecurity(): LogicalContainer<Security>;
   public abstract getScopes(): string[];
   public abstract getTags(): string[];
@@ -230,12 +229,8 @@ export class Endpoint<
     return this.mimeTypes[variant];
   }
 
-  public override getPositiveStatusCode() {
-    return this.statusCodes.positive;
-  }
-
-  public override getNegativeStatusCode() {
-    return this.statusCodes.negative;
+  public override getStatusCode(variant: keyof typeof this.statusCodes) {
+    return this.statusCodes[variant];
   }
 
   public override getSecurity() {
