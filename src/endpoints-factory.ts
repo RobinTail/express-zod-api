@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { z } from "zod";
-import { FlatObject, hasUpload } from "./common-helpers";
+import { FlatObject } from "./common-helpers";
 import { CommonConfig } from "./config-type";
 import { Endpoint, Handler } from "./endpoint";
 import {
@@ -167,7 +167,6 @@ export class EndpointsFactory<
       outputSchema,
       resultHandler,
       inputSchema: getFinalEndpointInputSchema<IN, BIN>(middlewares, input),
-      hasUpload: hasUpload(input),
       ...rest,
     });
   }

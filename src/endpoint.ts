@@ -14,6 +14,7 @@ import {
   getActualMethod,
   getInput,
   hasTopLevelTransformingEffect,
+  hasUpload,
   makeErrorFromAnything,
 } from "./common-helpers";
 import { IOSchema } from "./io-schema";
@@ -77,7 +78,6 @@ type EndpointProps<
 > = {
   middlewares: AnyMiddlewareDef[];
   inputSchema: IN;
-  hasUpload?: boolean;
   outputSchema: OUT;
   handler: Handler<z.output<IN>, z.input<OUT>, OPT>;
   resultHandler: ResultHandlerDefinition<POS, NEG>;
@@ -121,7 +121,6 @@ export class Endpoint<
     resultHandler,
     description,
     shortDescription,
-    hasUpload,
     ...rest
   }: EndpointProps<IN, OUT, OPT, M, POS, NEG, SCO, TAG>) {
     super();
@@ -138,7 +137,7 @@ export class Endpoint<
     this.middlewares = middlewares;
     this.inputSchema = inputSchema;
     this.mimeTypes = {
-      input: hasUpload ? [mimeMultipart] : [mimeJson],
+      input: hasUpload(inputSchema) ? [mimeMultipart] : [mimeJson],
       positive: getMimeTypesFromApiResponse(
         resultHandler.getPositiveResponse(outputSchema)
       ),
