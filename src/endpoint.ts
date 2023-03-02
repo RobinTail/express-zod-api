@@ -22,7 +22,11 @@ import { LogicalContainer, combineContainers } from "./logical-container";
 import { AuxMethod, Method, MethodsDefinition } from "./method";
 import { AnyMiddlewareDef } from "./middleware";
 import { mimeJson, mimeMultipart } from "./mime";
-import { ResultHandlerDefinition, lastResortHandler } from "./result-handler";
+import {
+  ResultHandlerDefinition,
+  defaultStatusCodes,
+  lastResortHandler,
+} from "./result-handler";
 import { Security } from "./security";
 
 const getMimeTypesFromApiResponse = <S extends z.ZodType>(
@@ -107,9 +111,11 @@ export class Endpoint<
     "input" | "positive" | "negative",
     string[]
   >;
+  protected readonly statusCodes: Record<"positive" | "negative", number>;
   protected readonly outputSchema: OUT;
   protected readonly handler: Handler<z.output<IN>, z.input<OUT>, OPT>;
   protected readonly resultHandler: ResultHandlerDefinition<POS, NEG>;
+  protected readonly responseSchema: { positive: POS; negative: NEG };
   protected readonly scopes: SCO[] = [];
   protected readonly tags: TAG[] = [];
 
@@ -136,14 +142,34 @@ export class Endpoint<
     });
     this.middlewares = middlewares;
     this.inputSchema = inputSchema;
+    const apiResponse = {
+      positive: resultHandler.getPositiveResponse(outputSchema),
+      negative: resultHandler.getNegativeResponse(),
+    };
     this.mimeTypes = {
       input: hasUpload(inputSchema) ? [mimeMultipart] : [mimeJson],
-      positive: getMimeTypesFromApiResponse(
-        resultHandler.getPositiveResponse(outputSchema)
-      ),
-      negative: getMimeTypesFromApiResponse(
-        resultHandler.getNegativeResponse()
-      ),
+      positive: getMimeTypesFromApiResponse(apiResponse.positive),
+      negative: getMimeTypesFromApiResponse(apiResponse.negative),
+    };
+    this.responseSchema = {
+      positive:
+        apiResponse.positive instanceof z.ZodType
+          ? apiResponse.positive
+          : apiResponse.positive.schema,
+      negative:
+        apiResponse.negative instanceof z.ZodType
+          ? apiResponse.negative
+          : apiResponse.negative.schema,
+    };
+    this.statusCodes = {
+      positive:
+        apiResponse.positive instanceof z.ZodType
+          ? defaultStatusCodes.positive
+          : apiResponse.positive.statusCode || defaultStatusCodes.positive,
+      negative:
+        apiResponse.negative instanceof z.ZodType
+          ? defaultStatusCodes.negative
+          : apiResponse.negative.statusCode || defaultStatusCodes.negative,
     };
     this.outputSchema = outputSchema;
     this.handler = handler;
@@ -193,35 +219,23 @@ export class Endpoint<
   }
 
   public override getPositiveResponseSchema(): POS {
-    const apiResponse = this.resultHandler.getPositiveResponse(
-      this.outputSchema
-    );
-    return apiResponse instanceof z.ZodType ? apiResponse : apiResponse.schema;
+    return this.responseSchema.positive;
   }
 
   public override getNegativeResponseSchema(): NEG {
-    const apiResponse = this.resultHandler.getNegativeResponse();
-    return apiResponse instanceof z.ZodType ? apiResponse : apiResponse.schema;
+    return this.responseSchema.negative;
   }
 
   public override getMimeTypes(variant: keyof typeof this.mimeTypes) {
     return this.mimeTypes[variant];
   }
 
-  public override getPositiveStatusCode(fallback = 200) {
-    const apiResponse = this.resultHandler.getPositiveResponse(
-      this.outputSchema
-    );
-    return apiResponse instanceof z.ZodType
-      ? fallback
-      : apiResponse.statusCode || fallback;
+  public override getPositiveStatusCode() {
+    return this.statusCodes.positive;
   }
 
-  public override getNegativeStatusCode(fallback = 400) {
-    const apiResponse = this.resultHandler.getNegativeResponse();
-    return apiResponse instanceof z.ZodType
-      ? fallback
-      : apiResponse.statusCode || fallback;
+  public override getNegativeStatusCode() {
+    return this.statusCodes.negative;
   }
 
   public override getSecurity() {
