@@ -40,8 +40,8 @@ type BuildProps<
   MethodsDefinition<M>;
 
 export class EndpointsFactory<
-  POS extends z.ZodType,
-  NEG extends z.ZodType,
+  POS extends z.ZodTypeAny,
+  NEG extends z.ZodTypeAny,
   IN extends IOSchema<"strip"> | null = null,
   OUT extends FlatObject = {},
   SCO extends string = string,
@@ -69,8 +69,8 @@ export class EndpointsFactory<
   }
 
   static #create<
-    CPOS extends z.ZodType,
-    CNEG extends z.ZodType,
+    CPOS extends z.ZodTypeAny,
+    CNEG extends z.ZodTypeAny,
     CIN extends IOSchema<"strip"> | null,
     COUT extends FlatObject,
     CSCO extends string,

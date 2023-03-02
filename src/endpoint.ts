@@ -29,7 +29,7 @@ import {
 } from "./result-handler";
 import { Security } from "./security";
 
-const getMimeTypesFromApiResponse = <S extends z.ZodType>(
+const getMimeTypesFromApiResponse = <S extends z.ZodTypeAny>(
   subject: S | ApiResponse<S>,
   fallback = [mimeJson]
 ) => {
@@ -63,7 +63,7 @@ export abstract class AbstractEndpoint {
   ): string | undefined;
   public abstract getMethods(): Method[];
   public abstract getSchema(variant: IOVariant): IOSchema;
-  public abstract getSchema(variant: ResponseVariant): z.ZodType;
+  public abstract getSchema(variant: ResponseVariant): z.ZodTypeAny;
   public abstract getMimeTypes(variant: MimeVariant): string[];
   public abstract getStatusCode(variant: ResponseVariant): number;
   public abstract getSecurity(): LogicalContainer<Security>;
@@ -77,8 +77,8 @@ type EndpointProps<
   OUT extends IOSchema,
   OPT extends FlatObject,
   M extends Method,
-  POS extends z.ZodType,
-  NEG extends z.ZodType,
+  POS extends z.ZodTypeAny,
+  NEG extends z.ZodTypeAny,
   SCO extends string,
   TAG extends string
 > = {
@@ -98,8 +98,8 @@ export class Endpoint<
   OUT extends IOSchema,
   OPT extends FlatObject,
   M extends Method,
-  POS extends z.ZodType,
-  NEG extends z.ZodType,
+  POS extends z.ZodTypeAny,
+  NEG extends z.ZodTypeAny,
   SCO extends string,
   TAG extends string
 > extends AbstractEndpoint {

@@ -220,7 +220,7 @@ export function hasUpload(schema: z.ZodTypeAny): boolean {
  * @desc isNullable() and isOptional() validate the schema's input
  * @desc They always return true in case of coercion, which should be taken into account when depicting response
  */
-export const hasCoercion = (schema: z.ZodType): boolean =>
+export const hasCoercion = (schema: z.ZodTypeAny): boolean =>
   "coerce" in schema._def && typeof schema._def.coerce === "boolean"
     ? schema._def.coerce
     : false;

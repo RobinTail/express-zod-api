@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export interface ApiResponse<S extends z.ZodType> {
+export interface ApiResponse<S extends z.ZodTypeAny> {
   schema: S;
   /**
    * @default 200 for a positive response

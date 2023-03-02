@@ -27,8 +27,8 @@ type ResultHandler<RES> = (
 ) => void | Promise<void>;
 
 export interface ResultHandlerDefinition<
-  POS extends z.ZodType,
-  NEG extends z.ZodType
+  POS extends z.ZodTypeAny,
+  NEG extends z.ZodTypeAny
 > {
   getPositiveResponse: (output: IOSchema) => POS | ApiResponse<POS>;
   getNegativeResponse: () => NEG | ApiResponse<NEG>;
@@ -41,8 +41,8 @@ export const defaultStatusCodes = {
 };
 
 export const createResultHandler = <
-  POS extends z.ZodType,
-  NEG extends z.ZodType
+  POS extends z.ZodTypeAny,
+  NEG extends z.ZodTypeAny
 >(
   definition: ResultHandlerDefinition<POS, NEG>
 ) => definition;

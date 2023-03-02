@@ -495,7 +495,7 @@ export const depictBranded: Depicter<z.ZodBranded<z.ZodTypeAny, any>> = ({
 }) => next({ schema: schema.unwrap() });
 
 export const depictExamples = (
-  schema: z.ZodType,
+  schema: z.ZodTypeAny,
   isResponse: boolean,
   omitProps: string[] = []
 ): MediaExamples => {
@@ -517,7 +517,7 @@ export const depictExamples = (
 };
 
 export const depictParamExamples = (
-  schema: z.ZodType,
+  schema: z.ZodTypeAny,
   isResponse: boolean,
   param: string
 ): MediaExamples => {
