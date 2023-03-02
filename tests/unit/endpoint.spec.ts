@@ -311,19 +311,32 @@ describe("Endpoint", () => {
     });
   });
 
-  describe(".getOutputSchema()", () => {
-    test("should return output schema", () => {
-      const factory = new EndpointsFactory(defaultResultHandler);
-      const output = z.object({
+  describe(".outputSchema", () => {
+    test("should be the output schema", () => {
+      class EndpointWithPublicOutputSchema extends Endpoint<
+        any,
+        any,
+        any,
+        any,
+        any,
+        any,
+        any,
+        any
+      > {
+        public override outputSchema: any;
+      }
+      const outputSchema = z.object({
         something: z.number(),
       });
-      const endpoint = factory.build({
+      const endpoint = new EndpointWithPublicOutputSchema({
         method: "get",
-        input: z.object({}),
-        output,
+        middlewares: [],
+        inputSchema: z.object({}),
+        outputSchema,
         handler: jest.fn(),
+        resultHandler: defaultResultHandler,
       });
-      expect(endpoint.getOutputSchema()).toEqual(output);
+      expect(endpoint.outputSchema).toEqual(outputSchema);
     });
   });
 

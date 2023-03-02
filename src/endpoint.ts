@@ -56,7 +56,6 @@ export abstract class AbstractEndpoint {
   public abstract getDescription(variant: "short" | "long"): string | undefined;
   public abstract getMethods(): Method[];
   public abstract getInputSchema(): IOSchema;
-  public abstract getOutputSchema(): IOSchema;
   public abstract getPositiveResponseSchema(): z.ZodTypeAny;
   public abstract getNegativeResponseSchema(): z.ZodTypeAny;
   public abstract getMimeTypes(
@@ -211,10 +210,6 @@ export class Endpoint<
 
   public override getInputSchema(): IN {
     return this.inputSchema;
-  }
-
-  public override getOutputSchema(): OUT {
-    return this.outputSchema;
   }
 
   public override getPositiveResponseSchema(): POS {
