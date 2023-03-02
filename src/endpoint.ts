@@ -107,8 +107,8 @@ export class Endpoint<
   protected readonly outputSchema: OUT;
   protected readonly handler: Handler<z.output<IN>, z.input<OUT>, OPT>;
   protected readonly resultHandler: ResultHandlerDefinition<POS, NEG>;
-  protected readonly scopes: SCO[];
-  protected readonly tags: TAG[];
+  protected readonly scopes: SCO[] = [];
+  protected readonly tags: TAG[] = [];
 
   constructor({
     middlewares,
@@ -139,8 +139,6 @@ export class Endpoint<
     this.handler = handler;
     this.resultHandler = resultHandler;
     this.descriptions = { long: description, short: shortDescription };
-    this.scopes = [];
-    this.tags = [];
     if ("scopes" in rest && rest.scopes) {
       this.scopes.push(...rest.scopes);
     }
