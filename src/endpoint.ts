@@ -20,8 +20,20 @@ import { IOSchema } from "./io-schema";
 import { LogicalContainer, combineContainers } from "./logical-container";
 import { AuxMethod, Method, MethodsDefinition } from "./method";
 import { AnyMiddlewareDef } from "./middleware";
+import { mimeJson } from "./mime";
 import { ResultHandlerDefinition, lastResortHandler } from "./result-handler";
 import { Security } from "./security";
+
+const getMimeTypesFromApiResponse = <S extends z.ZodType>(
+  subject: S | ApiResponse<S>,
+  fallback = [mimeJson]
+) => {
+  if (subject instanceof z.ZodType) {
+    return fallback;
+  }
+  const { mimeTypes, mimeType } = subject;
+  return mimeType ? [mimeType] : mimeTypes || fallback;
+};
 
 export type Handler<IN, OUT, OPT> = (params: {
   input: IN;
@@ -45,6 +57,8 @@ export abstract class AbstractEndpoint {
   public abstract getInputMimeTypes(): string[];
   public abstract getPositiveMimeTypes(): string[];
   public abstract getNegativeMimeTypes(): string[];
+  public abstract getPositiveStatusCode(): number;
+  public abstract getNegativeStatusCode(): number;
   public abstract getSecurity(): LogicalContainer<Security>;
   public abstract getScopes(): string[];
   public abstract getTags(): string[];
@@ -56,8 +70,8 @@ type EndpointProps<
   OUT extends IOSchema,
   OPT extends FlatObject,
   M extends Method,
-  POS extends ApiResponse,
-  NEG extends ApiResponse,
+  POS extends z.ZodType,
+  NEG extends z.ZodType,
   SCO extends string,
   TAG extends string
 > = {
@@ -73,13 +87,14 @@ type EndpointProps<
   ({ tags?: TAG[] } | { tag?: TAG }) &
   MethodsDefinition<M>;
 
+// @todo v9: reduce methods, initialize schemas in constructor to extract mime types and status codes
 export class Endpoint<
   IN extends IOSchema,
   OUT extends IOSchema,
   OPT extends FlatObject,
   M extends Method,
-  POS extends ApiResponse,
-  NEG extends ApiResponse,
+  POS extends z.ZodType,
+  NEG extends z.ZodType,
   SCO extends string,
   TAG extends string
 > extends AbstractEndpoint {
@@ -169,12 +184,16 @@ export class Endpoint<
     return this.outputSchema;
   }
 
-  public override getPositiveResponseSchema(): POS["schema"] {
-    return this.resultHandler.getPositiveResponse(this.outputSchema).schema;
+  public override getPositiveResponseSchema(): POS {
+    const apiResponse = this.resultHandler.getPositiveResponse(
+      this.outputSchema
+    );
+    return apiResponse instanceof z.ZodType ? apiResponse : apiResponse.schema;
   }
 
-  public override getNegativeResponseSchema(): NEG["schema"] {
-    return this.resultHandler.getNegativeResponse().schema;
+  public override getNegativeResponseSchema(): NEG {
+    const apiResponse = this.resultHandler.getNegativeResponse();
+    return apiResponse instanceof z.ZodType ? apiResponse : apiResponse.schema;
   }
 
   public override getInputMimeTypes() {
@@ -182,11 +201,31 @@ export class Endpoint<
   }
 
   public override getPositiveMimeTypes() {
-    return this.resultHandler.getPositiveResponse(this.outputSchema).mimeTypes;
+    return getMimeTypesFromApiResponse(
+      this.resultHandler.getPositiveResponse(this.outputSchema)
+    );
   }
 
   public override getNegativeMimeTypes() {
-    return this.resultHandler.getNegativeResponse().mimeTypes;
+    return getMimeTypesFromApiResponse(
+      this.resultHandler.getNegativeResponse()
+    );
+  }
+
+  public override getPositiveStatusCode(fallback = 200) {
+    const apiResponse = this.resultHandler.getPositiveResponse(
+      this.outputSchema
+    );
+    return apiResponse instanceof z.ZodType
+      ? fallback
+      : apiResponse.statusCode || fallback;
+  }
+
+  public override getNegativeStatusCode(fallback = 400) {
+    const apiResponse = this.resultHandler.getNegativeResponse();
+    return apiResponse instanceof z.ZodType
+      ? fallback
+      : apiResponse.statusCode || fallback;
   }
 
   public override getSecurity() {

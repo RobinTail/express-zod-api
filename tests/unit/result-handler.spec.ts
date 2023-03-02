@@ -136,17 +136,19 @@ describe("ResultHandler", () => {
     });
 
     test("should forward output schema examples", () => {
-      expect(
-        defaultResultHandler.getPositiveResponse(
-          withMeta(
-            z.object({
-              str: z.string(),
-            })
-          ).example({
-            str: "test",
+      const apiResponse = defaultResultHandler.getPositiveResponse(
+        withMeta(
+          z.object({
+            str: z.string(),
           })
-        ).schema._def[metaProp]
-      ).toEqual({
+        ).example({
+          str: "test",
+        })
+      );
+      if (!(apiResponse instanceof z.ZodType)) {
+        fail(new Error("should not be here"));
+      }
+      expect(apiResponse._def[metaProp]).toEqual({
         examples: [
           {
             status: "success",
@@ -159,9 +161,11 @@ describe("ResultHandler", () => {
     });
 
     test("should generate negative response example", () => {
-      expect(
-        defaultResultHandler.getNegativeResponse().schema._def[metaProp]
-      ).toEqual({
+      const apiResponse = defaultResultHandler.getNegativeResponse();
+      if (!(apiResponse instanceof z.ZodType)) {
+        fail(new Error("should not be here"));
+      }
+      expect(apiResponse._def[metaProp]).toEqual({
         examples: [
           {
             status: "error",

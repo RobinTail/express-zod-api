@@ -1,5 +1,6 @@
 import { createApiResponse, z } from "../../src";
 
+/** @todo remove in v9 */
 describe("ApiResponse", () => {
   describe("createApiResponse()", () => {
     test("should accept an array of mime types", () => {
@@ -14,16 +15,13 @@ describe("ApiResponse", () => {
       const output = z.object({});
       expect(createApiResponse(output, "something")).toEqual({
         schema: output,
-        mimeTypes: ["something"],
+        mimeType: "something",
       });
     });
 
-    test("should assume json mime type by default", () => {
+    test("mime type can be optional", () => {
       const output = z.object({});
-      expect(createApiResponse(output)).toEqual({
-        schema: output,
-        mimeTypes: ["application/json"],
-      });
+      expect(createApiResponse(output)).toEqual({ schema: output });
     });
   });
 });

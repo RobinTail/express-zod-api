@@ -1,6 +1,5 @@
 import {
   EndpointsFactory,
-  createApiResponse,
   createMiddleware,
   createResultHandler,
   defaultEndpointsFactory,
@@ -269,8 +268,8 @@ describe("Endpoint", () => {
     test("Should handle errors within ResultHandler", async () => {
       const factory = new EndpointsFactory(
         createResultHandler({
-          getPositiveResponse: () => createApiResponse(z.object({})),
-          getNegativeResponse: () => createApiResponse(z.object({})),
+          getPositiveResponse: () => z.object({}),
+          getNegativeResponse: () => z.object({}),
           handler: () => {
             throw new Error("Something unexpected happened");
           },
@@ -503,8 +502,8 @@ describe("Endpoint", () => {
     test("thrown in #handleResult()", async () => {
       const factory = new EndpointsFactory(
         createResultHandler({
-          getPositiveResponse: () => createApiResponse(z.object({})),
-          getNegativeResponse: () => createApiResponse(z.object({})),
+          getPositiveResponse: () => z.object({}),
+          getNegativeResponse: () => z.object({}),
           handler: () => {
             // eslint-disable-next-line @typescript-eslint/no-throw-literal
             throw "Something unexpected happened";

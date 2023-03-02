@@ -61,6 +61,55 @@ inputSources: { delete: ["body", "query", "params"] }
 
 ## Version 8
 
+### v8.11.0
+
+- Feature #824, proposed by [@McMerph](https://github.com/McMerph).
+  - In your custom `ResultHandler` you can now specify the status codes used for positive and negative responses.
+  - This declarative information is used for generating a better documentation on your API.
+- Declaring API Response for `ResultHandler` made easier.
+  - When responding with JSON, `getPositiveResponse` and `getNegativeResponse` can now just return the schema.
+  - For any customizations on MIME types and status codes those methods of your custom `ResultHandler` implementation
+    should return object with corresponding optional properties: `mimeType` (or `mimeTypes`) and `statusCode`.
+  - `mimeType` overrides `mimeTypes` when both are specified.
+  - The `createApiResponse()` method is deprecated and will be removed in next major release.
+
+```typescript
+// JSON responding ResultHandler Example
+// before
+createResultHandler({
+  getPositiveResponse: (output: IOSchema) =>
+    createApiResponse(z.object({ data: output })),
+  getNegativeResponse: () => createApiResponse(z.object({ error: z.string() })),
+});
+// after
+createResultHandler({
+  getPositiveResponse: (output: IOSchema) => z.object({ data: output }),
+  getNegativeResponse: () => z.object({ error: z.string() }),
+});
+```
+
+```typescript
+// Example on customizing MIME types and status codes
+// before
+createResultHandler({
+  getPositiveResponse: () => createApiResponse(z.file().binary(), "image/*"),
+  getNegativeResponse: () => createApiResponse(z.string(), "text/plain"),
+});
+// after
+createResultHandler({
+  getPositiveResponse: () => ({
+    schema: z.file().binary(),
+    mimeType: "image/*",
+    statusCode: 201,
+  }),
+  getNegativeResponse: () => ({
+    schema: z.string(),
+    mimeType: "text/plain",
+    statusCode: 403,
+  }),
+});
+```
+
 ### v8.10.0
 
 - Feature #845, proposed by [@lazylace37](https://github.com/lazylace37).

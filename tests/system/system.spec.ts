@@ -4,7 +4,6 @@ import fetch from "node-fetch";
 import {
   EndpointsFactory,
   Method,
-  createApiResponse,
   createMiddleware,
   createResultHandler,
   createServer,
@@ -39,8 +38,8 @@ describe("App", () => {
           }),
         faulty: new EndpointsFactory(
           createResultHandler({
-            getPositiveResponse: () => createApiResponse(z.object({})),
-            getNegativeResponse: () => createApiResponse(z.object({})),
+            getPositiveResponse: () => z.object({}),
+            getNegativeResponse: () => z.object({}),
             handler: () => {
               throw new Error("I am faulty");
             },
