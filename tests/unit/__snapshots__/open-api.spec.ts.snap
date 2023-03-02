@@ -2347,6 +2347,64 @@ servers:
 "
 `;
 
+exports[`Open API generator generateOpenApi() should handle custom mime types and status codes 1`] = `
+"openapi: 3.0.0
+info:
+  title: Testing MIME types and status codes
+  version: 3.4.5
+paths:
+  /v1/getSomething:
+    get:
+      operationId: GetV1Getsomething
+      responses:
+        "201":
+          description: GET /v1/getSomething Successful response
+          content:
+            application/json:
+              schema: &a1
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - OK
+                  result:
+                    type: object
+                    properties: {}
+                required:
+                  - status
+                  - result
+            text/vnd.yaml:
+              schema: *a1
+        "403":
+          description: GET /v1/getSomething Error response
+          content:
+            text/vnd.yaml:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - NOT OK
+                required:
+                  - status
+components:
+  schemas: {}
+  responses: {}
+  parameters: {}
+  examples: {}
+  requestBodies: {}
+  headers: {}
+  securitySchemes: {}
+  links: {}
+  callbacks: {}
+tags: []
+servers:
+  - url: http://example.com
+"
+`;
+
 exports[`Open API generator generateOpenApi() should handle different number types 1`] = `
 "openapi: 3.0.0
 info:

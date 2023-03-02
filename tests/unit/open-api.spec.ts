@@ -1,14 +1,17 @@
 import { config as exampleConfig } from "../../example/config";
 import { routing } from "../../example/routing";
 import {
+  EndpointsFactory,
   OpenAPI,
   createConfig,
   createMiddleware,
+  createResultHandler,
   defaultEndpointsFactory,
   withMeta,
   z,
 } from "../../src";
 import { expectType } from "tsd";
+import { mimeJson } from "../../src/mime";
 
 describe("Open API generator", () => {
   const sampleConfig = createConfig({
@@ -603,6 +606,40 @@ describe("Open API generator", () => {
         },
         version: "3.4.5",
         title: "Testing Operation IDs",
+        serverUrl: "http://example.com",
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
+    });
+
+    test("should handle custom mime types and status codes", () => {
+      const resultHandler = createResultHandler({
+        getPositiveResponse: (output) => ({
+          schema: z.object({ status: z.literal("OK"), result: output }),
+          mimeTypes: [mimeJson, "text/vnd.yaml"],
+          statusCode: 201,
+        }),
+        getNegativeResponse: () => ({
+          schema: z.object({ status: z.literal("NOT OK") }),
+          mimeType: "text/vnd.yaml",
+          statusCode: 403,
+        }),
+        handler: () => {},
+      });
+      const factory = new EndpointsFactory(resultHandler);
+      const spec = new OpenAPI({
+        config: sampleConfig,
+        routing: {
+          v1: {
+            getSomething: factory.build({
+              method: "get",
+              input: z.object({}),
+              output: z.object({}),
+              handler: async () => ({}),
+            }),
+          },
+        },
+        version: "3.4.5",
+        title: "Testing MIME types and status codes",
         serverUrl: "http://example.com",
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
