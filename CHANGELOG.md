@@ -2,6 +2,26 @@
 
 ## Version 9
 
+### v9.0.0-beta4
+
+- This release contains the feature from version [8.11.0](#v8110).
+- **BREAKING** changes:
+  - `createApiResponse()` method is removed. Read the release notes to v8.11.0 for migration strategy.
+- Potentially **BREAKING** changes:
+  - The following changes correspond to the entities that are not supposed to be used directly, however they are public.
+  - `Endpoint::constructor()`
+    - `mimeTypes` property is removed from the argument.
+  - `Endpoint` public methods replaced:
+    - `getPositiveStatusCode()` —> `getStatusCode("positive")`
+    - `getNegativeStatusCode()` —> `getStatusCode("negative")`
+    - `getInputSchema()` —> `getSchema("input")`
+    - `getOutputSchema()` —> `getSchema("output")`
+    - `getPositiveResponseSchema()` —> `getSchema("positive")`
+    - `getNegativeResponseSchema()` —> `getSchema("negative")`
+    - `getInputMimeTypes()` —> `getMimeTypes("input")`
+    - `getPositiveMimeTypes()` —> `getMimeTypes("positive")`
+    - `getNegatuveMimeTypes()` —> `getMimeTypes("negative")`
+
 ### v9.0.0-beta3
 
 - This release contains the feature from version [8.10.0](#v8100).
