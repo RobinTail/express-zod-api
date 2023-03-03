@@ -20,7 +20,7 @@
     - `getNegativeResponseSchema()` —> `getSchema("negative")`
     - `getInputMimeTypes()` —> `getMimeTypes("input")`
     - `getPositiveMimeTypes()` —> `getMimeTypes("positive")`
-    - `getNegatuveMimeTypes()` —> `getMimeTypes("negative")`
+    - `getNegativeMimeTypes()` —> `getMimeTypes("negative")`
 
 ### v9.0.0-beta3
 
