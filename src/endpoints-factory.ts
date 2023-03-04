@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { z } from "zod";
-import { FlatObject, hasUpload } from "./common-helpers";
+import { FlatObject } from "./common-helpers";
 import { CommonConfig } from "./config-type";
 import { Endpoint, Handler } from "./endpoint";
 import {
@@ -16,7 +16,6 @@ import {
   MiddlewareDefinition,
   createMiddleware,
 } from "./middleware";
-import { mimeJson, mimeMultipart } from "./mime";
 import {
   ResultHandlerDefinition,
   defaultResultHandler,
@@ -41,8 +40,8 @@ type BuildProps<
   MethodsDefinition<M>;
 
 export class EndpointsFactory<
-  POS extends z.ZodType,
-  NEG extends z.ZodType,
+  POS extends z.ZodTypeAny,
+  NEG extends z.ZodTypeAny,
   IN extends IOSchema<"strip"> | null = null,
   OUT extends FlatObject = {},
   SCO extends string = string,
@@ -70,8 +69,8 @@ export class EndpointsFactory<
   }
 
   static #create<
-    CPOS extends z.ZodType,
-    CNEG extends z.ZodType,
+    CPOS extends z.ZodTypeAny,
+    CNEG extends z.ZodTypeAny,
     CIN extends IOSchema<"strip"> | null,
     COUT extends FlatObject,
     CSCO extends string,
@@ -168,7 +167,6 @@ export class EndpointsFactory<
       outputSchema,
       resultHandler,
       inputSchema: getFinalEndpointInputSchema<IN, BIN>(middlewares, input),
-      mimeTypes: hasUpload(input) ? [mimeMultipart] : [mimeJson],
       ...rest,
     });
   }

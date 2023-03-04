@@ -5,6 +5,7 @@ import { ApiResponse } from "./api-response";
 import { CommonConfig } from "./config-type";
 import {
   IOSchemaError,
+  InputValidationError,
   OutputValidationError,
   ResultHandlerError,
 } from "./errors";
@@ -12,19 +13,23 @@ import {
   FlatObject,
   getActualMethod,
   getInput,
-  getMessageFromError,
   hasTopLevelTransformingEffect,
+  hasUpload,
   makeErrorFromAnything,
 } from "./common-helpers";
 import { IOSchema } from "./io-schema";
 import { LogicalContainer, combineContainers } from "./logical-container";
 import { AuxMethod, Method, MethodsDefinition } from "./method";
 import { AnyMiddlewareDef } from "./middleware";
-import { mimeJson } from "./mime";
-import { ResultHandlerDefinition, lastResortHandler } from "./result-handler";
+import { mimeJson, mimeMultipart } from "./mime";
+import {
+  ResultHandlerDefinition,
+  defaultStatusCodes,
+  lastResortHandler,
+} from "./result-handler";
 import { Security } from "./security";
 
-const getMimeTypesFromApiResponse = <S extends z.ZodType>(
+const getMimeTypesFromApiResponse = <S extends z.ZodTypeAny>(
   subject: S | ApiResponse<S>,
   fallback = [mimeJson]
 ) => {
@@ -41,6 +46,11 @@ export type Handler<IN, OUT, OPT> = (params: {
   logger: Logger;
 }) => Promise<OUT>;
 
+type DescriptionVariant = "short" | "long";
+type IOVariant = "input" | "output";
+type ResponseVariant = "positive" | "negative";
+type MimeVariant = Extract<IOVariant, "input"> | ResponseVariant;
+
 export abstract class AbstractEndpoint {
   public abstract execute(params: {
     request: Request;
@@ -48,17 +58,14 @@ export abstract class AbstractEndpoint {
     logger: Logger;
     config: CommonConfig;
   }): Promise<void>;
-  public abstract getDescription(variant: "short" | "long"): string | undefined;
+  public abstract getDescription(
+    variant: DescriptionVariant
+  ): string | undefined;
   public abstract getMethods(): Method[];
-  public abstract getInputSchema(): IOSchema;
-  public abstract getOutputSchema(): IOSchema;
-  public abstract getPositiveResponseSchema(): z.ZodTypeAny;
-  public abstract getNegativeResponseSchema(): z.ZodTypeAny;
-  public abstract getInputMimeTypes(): string[];
-  public abstract getPositiveMimeTypes(): string[];
-  public abstract getNegativeMimeTypes(): string[];
-  public abstract getPositiveStatusCode(): number;
-  public abstract getNegativeStatusCode(): number;
+  public abstract getSchema(variant: IOVariant): IOSchema;
+  public abstract getSchema(variant: ResponseVariant): z.ZodTypeAny;
+  public abstract getMimeTypes(variant: MimeVariant): string[];
+  public abstract getStatusCode(variant: ResponseVariant): number;
   public abstract getSecurity(): LogicalContainer<Security>;
   public abstract getScopes(): string[];
   public abstract getTags(): string[];
@@ -70,14 +77,13 @@ type EndpointProps<
   OUT extends IOSchema,
   OPT extends FlatObject,
   M extends Method,
-  POS extends z.ZodType,
-  NEG extends z.ZodType,
+  POS extends z.ZodTypeAny,
+  NEG extends z.ZodTypeAny,
   SCO extends string,
   TAG extends string
 > = {
   middlewares: AnyMiddlewareDef[];
   inputSchema: IN;
-  mimeTypes: string[];
   outputSchema: OUT;
   handler: Handler<z.output<IN>, z.input<OUT>, OPT>;
   resultHandler: ResultHandlerDefinition<POS, NEG>;
@@ -87,28 +93,35 @@ type EndpointProps<
   ({ tags?: TAG[] } | { tag?: TAG }) &
   MethodsDefinition<M>;
 
-// @todo v9: reduce methods, initialize schemas in constructor to extract mime types and status codes
 export class Endpoint<
   IN extends IOSchema,
   OUT extends IOSchema,
   OPT extends FlatObject,
   M extends Method,
-  POS extends z.ZodType,
-  NEG extends z.ZodType,
+  POS extends z.ZodTypeAny,
+  NEG extends z.ZodTypeAny,
   SCO extends string,
   TAG extends string
 > extends AbstractEndpoint {
-  protected readonly descriptions: Record<"short" | "long", string | undefined>;
+  protected readonly descriptions: Record<
+    DescriptionVariant,
+    string | undefined
+  >;
   protected readonly methods: M[] = [];
   protected siblingMethods: Method[] = [];
   protected readonly middlewares: AnyMiddlewareDef[] = [];
-  protected readonly inputSchema: IN;
-  protected readonly mimeTypes: string[];
-  protected readonly outputSchema: OUT;
+  protected readonly mimeTypes: Record<MimeVariant, string[]>;
+  protected readonly statusCodes: Record<ResponseVariant, number>;
   protected readonly handler: Handler<z.output<IN>, z.input<OUT>, OPT>;
   protected readonly resultHandler: ResultHandlerDefinition<POS, NEG>;
-  protected readonly scopes: SCO[];
-  protected readonly tags: TAG[];
+  protected readonly schemas: {
+    input: IN;
+    output: OUT;
+    positive: POS;
+    negative: NEG;
+  };
+  protected readonly scopes: SCO[] = [];
+  protected readonly tags: TAG[] = [];
 
   constructor({
     middlewares,
@@ -118,7 +131,6 @@ export class Endpoint<
     resultHandler,
     description,
     shortDescription,
-    mimeTypes,
     ...rest
   }: EndpointProps<IN, OUT, OPT, M, POS, NEG, SCO, TAG>) {
     super();
@@ -133,14 +145,40 @@ export class Endpoint<
       }
     });
     this.middlewares = middlewares;
-    this.inputSchema = inputSchema;
-    this.mimeTypes = mimeTypes;
-    this.outputSchema = outputSchema;
+    const apiResponse = {
+      positive: resultHandler.getPositiveResponse(outputSchema),
+      negative: resultHandler.getNegativeResponse(),
+    };
+    this.mimeTypes = {
+      input: hasUpload(inputSchema) ? [mimeMultipart] : [mimeJson],
+      positive: getMimeTypesFromApiResponse(apiResponse.positive),
+      negative: getMimeTypesFromApiResponse(apiResponse.negative),
+    };
+    this.schemas = {
+      input: inputSchema,
+      output: outputSchema,
+      positive:
+        apiResponse.positive instanceof z.ZodType
+          ? apiResponse.positive
+          : apiResponse.positive.schema,
+      negative:
+        apiResponse.negative instanceof z.ZodType
+          ? apiResponse.negative
+          : apiResponse.negative.schema,
+    };
+    this.statusCodes = {
+      positive:
+        apiResponse.positive instanceof z.ZodType
+          ? defaultStatusCodes.positive
+          : apiResponse.positive.statusCode || defaultStatusCodes.positive,
+      negative:
+        apiResponse.negative instanceof z.ZodType
+          ? defaultStatusCodes.negative
+          : apiResponse.negative.statusCode || defaultStatusCodes.negative,
+    };
     this.handler = handler;
     this.resultHandler = resultHandler;
     this.descriptions = { long: description, short: shortDescription };
-    this.scopes = [];
-    this.tags = [];
     if ("scopes" in rest && rest.scopes) {
       this.scopes.push(...rest.scopes);
     }
@@ -168,7 +206,7 @@ export class Endpoint<
     this.siblingMethods = methods;
   }
 
-  public override getDescription(variant: "short" | "long") {
+  public override getDescription(variant: DescriptionVariant) {
     return this.descriptions[variant];
   }
 
@@ -176,56 +214,20 @@ export class Endpoint<
     return this.methods;
   }
 
-  public override getInputSchema(): IN {
-    return this.inputSchema;
+  public override getSchema(variant: "input"): IN;
+  public override getSchema(variant: "output"): OUT;
+  public override getSchema(variant: "positive"): POS;
+  public override getSchema(variant: "negative"): NEG;
+  public override getSchema(variant: IOVariant | ResponseVariant) {
+    return this.schemas[variant];
   }
 
-  public override getOutputSchema(): OUT {
-    return this.outputSchema;
+  public override getMimeTypes(variant: MimeVariant) {
+    return this.mimeTypes[variant];
   }
 
-  public override getPositiveResponseSchema(): POS {
-    const apiResponse = this.resultHandler.getPositiveResponse(
-      this.outputSchema
-    );
-    return apiResponse instanceof z.ZodType ? apiResponse : apiResponse.schema;
-  }
-
-  public override getNegativeResponseSchema(): NEG {
-    const apiResponse = this.resultHandler.getNegativeResponse();
-    return apiResponse instanceof z.ZodType ? apiResponse : apiResponse.schema;
-  }
-
-  public override getInputMimeTypes() {
-    return this.mimeTypes;
-  }
-
-  public override getPositiveMimeTypes() {
-    return getMimeTypesFromApiResponse(
-      this.resultHandler.getPositiveResponse(this.outputSchema)
-    );
-  }
-
-  public override getNegativeMimeTypes() {
-    return getMimeTypesFromApiResponse(
-      this.resultHandler.getNegativeResponse()
-    );
-  }
-
-  public override getPositiveStatusCode(fallback = 200) {
-    const apiResponse = this.resultHandler.getPositiveResponse(
-      this.outputSchema
-    );
-    return apiResponse instanceof z.ZodType
-      ? fallback
-      : apiResponse.statusCode || fallback;
-  }
-
-  public override getNegativeStatusCode(fallback = 400) {
-    const apiResponse = this.resultHandler.getNegativeResponse();
-    return apiResponse instanceof z.ZodType
-      ? fallback
-      : apiResponse.statusCode || fallback;
+  public override getStatusCode(variant: ResponseVariant) {
+    return this.statusCodes[variant];
   }
 
   public override getSecurity() {
@@ -259,18 +261,12 @@ export class Endpoint<
 
   async #parseOutput(output: any) {
     try {
-      return await this.outputSchema.parseAsync(output);
+      return await this.schemas.output.parseAsync(output);
     } catch (e) {
-      const error =
-        e instanceof z.ZodError
-          ? new z.ZodError(
-              e.issues.map(({ path, ...rest }) => ({
-                ...rest,
-                path: (["output"] as typeof path).concat(path),
-              }))
-            )
-          : makeErrorFromAnything(e);
-      throw new OutputValidationError(getMessageFromError(error));
+      if (e instanceof z.ZodError) {
+        throw new OutputValidationError(e);
+      }
+      throw e;
     }
   }
 
@@ -293,10 +289,19 @@ export class Endpoint<
       if (method === "options" && def.type === "proprietary") {
         continue;
       }
+      let finalInput: any;
+      try {
+        finalInput = await def.input.parseAsync(input);
+      } catch (e) {
+        if (e instanceof z.ZodError) {
+          throw new InputValidationError(e);
+        }
+        throw e;
+      }
       Object.assign(
         options,
         await def.middleware({
-          input: await def.input.parseAsync(input),
+          input: finalInput,
           options,
           request,
           response,
@@ -324,9 +329,17 @@ export class Endpoint<
     options: any;
     logger: Logger;
   }) {
+    let finalInput: z.output<IN>; // final input types transformations for handler
+    try {
+      finalInput = (await this.schemas.input.parseAsync(input)) as z.output<IN>;
+    } catch (e) {
+      if (e instanceof z.ZodError) {
+        throw new InputValidationError(e);
+      }
+      throw e;
+    }
     return this.handler({
-      // final input types transformations for handler
-      input: (await this.inputSchema.parseAsync(input)) as z.output<IN>,
+      input: finalInput,
       options,
       logger,
     });

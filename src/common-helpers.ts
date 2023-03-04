@@ -3,10 +3,12 @@ import { HttpError } from "http-errors";
 import { z } from "zod";
 import {
   CommonConfig,
+  InputSource,
   InputSources,
   LoggerConfig,
   loggerLevels,
 } from "./config-type";
+import { InputValidationError, OutputValidationError } from "./errors";
 import { IOSchema } from "./io-schema";
 import { getMeta } from "./metadata";
 import { AuxMethod, Method } from "./method";
@@ -33,9 +35,9 @@ export const defaultInputSources: InputSources = {
   post: ["body", "params", "files"],
   put: ["body", "params"],
   patch: ["body", "params"],
-  delete: ["body", "query", "params"],
+  delete: ["query", "params"],
 };
-const fallbackInputSource = defaultInputSources.delete;
+const fallbackInputSource: InputSource[] = ["body", "query", "params"];
 
 export const getActualMethod = (request: Request) =>
   request.method.toLowerCase() as Method | AuxMethod;
@@ -98,6 +100,10 @@ export function getMessageFromError(error: Error): string {
       )
       .join("; ");
   }
+  if (error instanceof OutputValidationError) {
+    const hasFirstField = error.originalError.issues[0]?.path.length > 0;
+    return `output${hasFirstField ? "/" : ": "}${error.message}`;
+  }
   return error.message;
 }
 
@@ -105,7 +111,7 @@ export function getStatusCodeFromError(error: Error): number {
   if (error instanceof HttpError) {
     return error.statusCode;
   }
-  if (error instanceof z.ZodError) {
+  if (error instanceof InputValidationError) {
     return 400;
   }
   return 500;
@@ -214,7 +220,7 @@ export function hasUpload(schema: z.ZodTypeAny): boolean {
  * @desc isNullable() and isOptional() validate the schema's input
  * @desc They always return true in case of coercion, which should be taken into account when depicting response
  */
-export const hasCoercion = (schema: z.ZodType): boolean =>
+export const hasCoercion = (schema: z.ZodTypeAny): boolean =>
   "coerce" in schema._def && typeof schema._def.coerce === "boolean"
     ? schema._def.coerce
     : false;

@@ -499,7 +499,13 @@ type DefaultResponse<OUT> =
 You can create your own result handler by using this example as a template:
 
 ```typescript
-import { createResultHandler, IOSchema, z } from "express-zod-api";
+import {
+  createResultHandler,
+  IOSchema,
+  z,
+  getStatusCodeFromError,
+  getMessageFromError,
+} from "express-zod-api";
 
 export const yourResultHandler = createResultHandler({
   getPositiveResponse: (output: IOSchema) => ({
@@ -508,12 +514,20 @@ export const yourResultHandler = createResultHandler({
   }),
   getNegativeResponse: () => z.object({ error: z.string() }),
   handler: ({ error, input, output, request, response, logger }) => {
+    if (!error) {
+      // your implementation
+      return;
+    }
+    const statusCode = getStatusCodeFromError(error);
+    const message = getMessageFromError(error);
     // your implementation
   },
 });
 ```
 
-Then you need to use it as an argument for `EndpointsFactory` instance creation:
+Note: `OutputValidationError` and `InputValidationError` are also available for your custom error handling.
+
+After creating your custom `ResultHandler` you can use it as an argument for `EndpointsFactory` instance creation:
 
 ```typescript
 import { EndpointsFactory } from "express-zod-api";
@@ -709,12 +723,12 @@ import { createConfig } from "express-zod-api";
 createConfig({
   // ...,
   inputSources: {
-    // the default value is:
-    get: ["query"],
-    post: ["body", "files"],
-    put: ["body"],
-    patch: ["body"],
-    delete: ["query", "body"],
+    // the defaults are:
+    get: ["query", "params"],
+    post: ["body", "params", "files"],
+    put: ["body", "params"],
+    patch: ["body", "params"],
+    delete: ["query", "params"],
   },
 });
 ```

@@ -27,17 +27,22 @@ type ResultHandler<RES> = (
 ) => void | Promise<void>;
 
 export interface ResultHandlerDefinition<
-  POS extends z.ZodType,
-  NEG extends z.ZodType
+  POS extends z.ZodTypeAny,
+  NEG extends z.ZodTypeAny
 > {
   getPositiveResponse: (output: IOSchema) => POS | ApiResponse<POS>;
   getNegativeResponse: () => NEG | ApiResponse<NEG>;
   handler: ResultHandler<z.output<POS> | z.output<NEG>>;
 }
 
+export const defaultStatusCodes = {
+  positive: 200,
+  negative: 400,
+};
+
 export const createResultHandler = <
-  POS extends z.ZodType,
-  NEG extends z.ZodType
+  POS extends z.ZodTypeAny,
+  NEG extends z.ZodTypeAny
 >(
   definition: ResultHandlerDefinition<POS, NEG>
 ) => definition;
@@ -76,7 +81,7 @@ export const defaultResultHandler = createResultHandler({
     }),
   handler: ({ error, input, output, request, response, logger }) => {
     if (!error) {
-      response.status(200).json({
+      response.status(defaultStatusCodes.positive).json({
         status: "success" as const,
         data: output,
       });

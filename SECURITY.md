@@ -4,8 +4,9 @@
 
 | Version | Supported          |
 | ------- | ------------------ |
+| 9.x.x   | :white_check_mark: |
 | 8.x.x   | :white_check_mark: |
-| 7.x.x   | :white_check_mark: |
+| 7.x.x   | :x:                |
 | 6.x.x   | :x:                |
 | 5.x.x   | :x:                |
 | 4.x.x   | :x:                |
@@ -19,6 +20,6 @@
 Found a vulnerability or other security issue?
 
 Please urgently inform me privately by
-[email](https://github.com/RobinTail/express-zod-api/blob/master/package.json#L116).
+[email](https://github.com/RobinTail/express-zod-api/blob/master/package.json#L115).
 
 I will try to fix it as soon as possible.
