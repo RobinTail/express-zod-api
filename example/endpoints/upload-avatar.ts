@@ -1,4 +1,4 @@
-import { z } from "../../src";
+import { ez, z } from "../../src";
 import crypto from "crypto";
 import { taggedEndpointsFactory } from "../factories";
 
@@ -8,7 +8,7 @@ export const uploadAvatarEndpoint = taggedEndpointsFactory.build({
   description: "Handles a file upload.",
   input: z
     .object({
-      avatar: z
+      avatar: ez
         .upload()
         .refine(
           (file) => file.mimetype.match(/image\/.+/),

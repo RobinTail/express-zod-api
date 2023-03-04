@@ -4,6 +4,7 @@ import {
   createResultHandler,
   defaultEndpointsFactory,
   defaultResultHandler,
+  ez,
   testEndpoint,
   z,
 } from "../../src";
@@ -755,7 +756,7 @@ describe("Endpoint", () => {
     test("should avoid double parsing, should not mutate input", async () => {
       const dateInputMiddleware = createMiddleware({
         input: z.object({
-          middleware_date_input: z.dateIn().optional(),
+          middleware_date_input: ez.dateIn().optional(),
         }),
         middleware: async ({ input: { middleware_date_input }, logger }) => {
           logger.debug("date in mw handler", typeof middleware_date_input);
