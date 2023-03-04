@@ -2,6 +2,11 @@
 
 ## Version 9
 
+### v9.0.0
+
+- No additional changes since v9.0.0-beta4.
+  - Read the release notes on beta versions for migration strategy from v8.
+
 ### v9.0.0-beta4
 
 - This release contains the feature from version [8.11.0](#v8110).
