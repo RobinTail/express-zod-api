@@ -1,6 +1,6 @@
 import { combinations } from "./common-helpers";
 import { z } from "./index";
-import { mergeDeepRight } from "ramda";
+import { clone, mergeDeepRight } from "ramda";
 
 export const metaProp = "expressZodApiMeta";
 type MetaProp = typeof metaProp;
@@ -34,7 +34,7 @@ type WithMeta<T extends z.ZodTypeAny> = MetaFixForStrippedObject<T> & {
 
 const cloneSchemaForMeta = <T extends z.ZodTypeAny>(schema: T): WithMeta<T> => {
   const This = (schema as any).constructor;
-  const def = { ...schema._def } as MetaDef<T>;
+  const def = clone(schema._def) as MetaDef<T>;
   def[metaProp] = def[metaProp] || { examples: [] };
   return new This({ ...def }) as WithMeta<T>;
 };
