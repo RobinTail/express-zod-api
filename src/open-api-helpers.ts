@@ -16,7 +16,6 @@ import {
 import { omit } from "ramda";
 import { z } from "zod";
 import {
-  ArrayElement,
   getExamples,
   getRoutePathParams,
   hasCoercion,
@@ -417,11 +416,11 @@ export const depictString: Depicter<z.ZodString> = ({
 /** @todo support exclusive min/max as numbers in case of OpenAPI v3.1.x */
 export const depictNumber: Depicter<z.ZodNumber> = ({ schema }) => {
   const minCheck = schema._def.checks.find(({ kind }) => kind === "min") as
-    | Extract<ArrayElement<z.ZodNumberDef["checks"]>, { kind: "min" }>
+    | Extract<z.ZodNumberCheck, { kind: "min" }>
     | undefined;
   const isMinInclusive = minCheck ? minCheck.inclusive : true;
   const maxCheck = schema._def.checks.find(({ kind }) => kind === "max") as
-    | Extract<ArrayElement<z.ZodNumberDef["checks"]>, { kind: "max" }>
+    | Extract<z.ZodNumberCheck, { kind: "max" }>
     | undefined;
   const isMaxInclusive = maxCheck ? maxCheck.inclusive : true;
   return {
