@@ -13,10 +13,11 @@ describe("Metadata", () => {
       const schema = z.string();
       const schemaWithMeta = withMeta(schema);
       expect(schemaWithMeta).toBeInstanceOf(z.ZodString);
-      expect(schemaWithMeta).toEqual(schema);
       expect(metaProp).toBe("expressZodApiMeta");
       expect(schemaWithMeta._def).toHaveProperty(metaProp);
-      expect(schemaWithMeta._def[metaProp]).toEqual({ examples: [] });
+      const { expressZodApiMeta, ...rest } = schemaWithMeta._def;
+      expect(rest).toEqual(schema._def);
+      expect(expressZodApiMeta).toEqual({ examples: [] });
     });
 
     test("should provide example() method", () => {
