@@ -50,20 +50,20 @@ export const createResultHandler = <
 export const defaultResultHandler = createResultHandler({
   getPositiveResponse: (output: IOSchema) => {
     const examples = getMeta(output, "examples") || [];
-    let responseSchema = withMeta(
+    const responseSchema = withMeta(
       z.object({
         status: z.literal("success"),
         data: output,
       })
     );
-    for (const example of examples) {
-      // forwarding output examples to response schema
-      responseSchema = responseSchema.example({
-        status: "success",
-        data: example,
-      });
-    }
-    return responseSchema;
+    return examples.reduce<typeof responseSchema>(
+      (acc, example) =>
+        acc.example({
+          status: "success",
+          data: example,
+        }),
+      responseSchema
+    );
   },
   getNegativeResponse: () =>
     withMeta(
