@@ -32,6 +32,8 @@ export type ProbableIntersection<
 /**
  * @description intersects input schemas of middlewares and the endpoint
  * @since 07.03.2022 former combineEndpointAndMiddlewareInputSchemas()
+ * @since 05.03.2023 is immutable to metadata
+ * @see copy
  */
 export const getFinalEndpointInputSchema = <
   MIN extends IOSchema<"strip"> | null,
@@ -40,13 +42,13 @@ export const getFinalEndpointInputSchema = <
   middlewares: AnyMiddlewareDef[],
   input: IN
 ): ProbableIntersection<MIN, IN> => {
-  const result = middlewares
+  let result = middlewares
     .map(({ input: schema }) => schema)
     .concat(input)
     .reduce((acc, schema) => acc.and(schema)) as ProbableIntersection<MIN, IN>;
   for (const middleware of middlewares) {
-    copyMeta(middleware.input, result);
+    result = copyMeta(middleware.input, result) as typeof result;
   }
-  copyMeta(input, result);
+  result = copyMeta(input, result) as typeof result;
   return result;
 };
