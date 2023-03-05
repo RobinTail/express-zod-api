@@ -84,25 +84,24 @@ export const copyMeta = <A extends z.ZodTypeAny, B extends z.ZodTypeAny>(
   if (!hasMeta(src)) {
     return dest;
   }
-  dest = withMeta(dest);
-  const def = dest._def as MetaDef<B>;
-  const examplesCombinations = combinations(
-    def[metaProp].examples,
+  const result = withMeta(dest);
+  const examplesCombinations = combinations<B>(
+    result._def[metaProp].examples,
     src._def[metaProp].examples
   );
   // general deep merge except examples
-  def[metaProp] = mergeDeepRight(
-    { ...def[metaProp], examples: [] },
+  result._def[metaProp] = mergeDeepRight(
+    { ...result._def[metaProp], examples: [] },
     { ...src._def[metaProp], examples: [] }
   );
   if (examplesCombinations.type === "single") {
-    def[metaProp].examples = examplesCombinations.value;
+    result._def[metaProp].examples = examplesCombinations.value;
   } else {
     for (const [destExample, srcExample] of examplesCombinations.value) {
-      def[metaProp].examples.push(
+      result._def[metaProp].examples.push(
         mergeDeepRight({ ...destExample }, { ...srcExample })
       );
     }
   }
-  return dest;
+  return result;
 };

@@ -59,24 +59,25 @@ describe("Metadata", () => {
     test("metadata should withstand refinements", () => {
       const schema = z.string();
       const schemaWithMeta = withMeta(schema).example("test");
-      expect(schemaWithMeta._def[metaProp].examples).toEqual(["test"]);
+      expect(schemaWithMeta._def.expressZodApiMeta.examples).toEqual(["test"]);
       expect(
         (
           schemaWithMeta.email()._def as unknown as MetaDef<
             typeof schemaWithMeta
           >
-        )[metaProp].examples
+        ).expressZodApiMeta.examples
       ).toEqual(["test"]);
     });
 
     test("metadata should withstand double withMeta()", () => {
       const schema = z.string();
       const schemaWithMeta = withMeta(schema).example("test");
-      expect(withMeta(schemaWithMeta)._def[metaProp].examples).toEqual([
+      expect(withMeta(schemaWithMeta)._def.expressZodApiMeta.examples).toEqual([
         "test",
       ]);
       expect(
-        withMeta(schemaWithMeta).example("another")._def[metaProp].examples
+        withMeta(schemaWithMeta).example("another")._def.expressZodApiMeta
+          .examples
       ).toEqual(["test", "another"]);
     });
   });
@@ -144,7 +145,6 @@ describe("Metadata", () => {
       const result = copyMeta(src, dest);
       expect(hasMeta(result)).toBeTruthy();
       expect(getMeta(result, "examples")).toEqual(getMeta(src, "examples"));
-      expect(result).toEqual(dest);
     });
 
     test("should merge the meta from src to dest (deep merge)", () => {
@@ -183,7 +183,6 @@ describe("Metadata", () => {
         { a: "some", b: 789 },
         { a: "another", b: 789 },
       ]);
-      expect(result).toEqual(dest);
     });
   });
 });
