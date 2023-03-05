@@ -2,6 +2,11 @@
 
 ## Version 9
 
+### v9.1.0
+
+- `zod` version 3.21.0
+  - General support of the following string formats in the documentation: `cuid2`, `ip`, `emoji`.
+
 ### v9.0.0
 
 - No additional changes since v9.0.0-beta4.
