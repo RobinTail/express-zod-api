@@ -32,6 +32,7 @@ type WithMeta<T extends z.ZodTypeAny> = MetaFixForStrippedObject<T> & {
   example: ExampleSetter<T>;
 };
 
+/** @desc it's the same approach as in zod's .describe() */
 const cloneSchemaForMeta = <T extends z.ZodTypeAny>(schema: T): WithMeta<T> => {
   const This = (schema as any).constructor;
   const def = clone(schema._def) as MetaDef<T>;
@@ -40,19 +41,17 @@ const cloneSchemaForMeta = <T extends z.ZodTypeAny>(schema: T): WithMeta<T> => {
 };
 
 export const withMeta = <T extends z.ZodTypeAny>(schema: T): WithMeta<T> => {
-  const result = cloneSchemaForMeta<T>(schema);
-
-  Object.defineProperties(result, {
+  const copy = cloneSchemaForMeta<T>(schema);
+  Object.defineProperties(copy, {
     example: {
       get: (): ExampleSetter<T> => (value) => {
-        const result2 = withMeta<T>(result);
-        result2._def[metaProp].examples.push(value);
-        return result2;
+        const localCopy = withMeta<T>(copy);
+        localCopy._def[metaProp].examples.push(value);
+        return localCopy;
       },
     },
   });
-
-  return result;
+  return copy;
 };
 
 export const hasMeta = <T extends z.ZodTypeAny>(
