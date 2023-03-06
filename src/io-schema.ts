@@ -33,7 +33,7 @@ export type ProbableIntersection<
  * @description intersects input schemas of middlewares and the endpoint
  * @since 07.03.2022 former combineEndpointAndMiddlewareInputSchemas()
  * @since 05.03.2023 is immutable to metadata
- * @see copy
+ * @see copyMeta
  */
 export const getFinalEndpointInputSchema = <
   MIN extends IOSchema<"strip"> | null,
