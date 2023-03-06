@@ -41,7 +41,7 @@ const cloneSchemaForMeta = <T extends z.ZodTypeAny>(schema: T): WithMeta<T> => {
 };
 
 export const withMeta = <T extends z.ZodTypeAny>(schema: T): WithMeta<T> => {
-  const copy = cloneSchemaForMeta<T>(schema);
+  const copy = cloneSchemaForMeta(schema);
   Object.defineProperties(copy, {
     example: {
       get: (): ExampleSetter<T> => (value) => {
