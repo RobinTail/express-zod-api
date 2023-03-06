@@ -37,7 +37,7 @@ const cloneSchemaForMeta = <T extends z.ZodTypeAny>(schema: T): WithMeta<T> => {
   const This = (schema as any).constructor;
   const def = clone(schema._def) as MetaDef<T>;
   def[metaProp] = def[metaProp] || { examples: [] };
-  return new This({ ...def }) as WithMeta<T>;
+  return new This(def) as WithMeta<T>;
 };
 
 export const withMeta = <T extends z.ZodTypeAny>(schema: T): WithMeta<T> => {
