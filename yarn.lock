@@ -688,10 +688,10 @@
   resolved "https://registry.yarnpkg.com/@tsconfig/node16/-/node16-1.0.3.tgz#472eaab5f15c1ffdd7f8628bd4c4f753995ec79e"
   integrity sha512-yOlFc+7UtL/89t2ZhjPvvB/DeAr3r+Dq58IgzsFkOAvVC6NMJXmCGjbptdXdR9qsX7pKcTL+s87FtYREi2dEEQ==
 
-"@tsd/typescript@~4.9.3":
-  version "4.9.4"
-  resolved "https://registry.yarnpkg.com/@tsd/typescript/-/typescript-4.9.4.tgz#03ddbae4249621ee83bd496e701e6fec3c3d9944"
-  integrity sha512-70j1vy95LsMvciXWJLrQ9pQaaG1inJJ+gZ/dW/bPdzHUH1VTeSl3BBU6QxqFWh5IjPy6s7xHcUw45R71dw4J3w==
+"@tsd/typescript@~4.9.5":
+  version "4.9.5"
+  resolved "https://registry.yarnpkg.com/@tsd/typescript/-/typescript-4.9.5.tgz#85daafcf51f4af92bd8caf0e82b655ceaf948f99"
+  integrity sha512-+UgxOvJUl5rQdPFSSOOwhmSmpThm8DJ3HwHxAOq5XYe7CcmG1LcM2QeqWwILzUIT5tbeMqY8qABiCsRtIjk/2g==
 
 "@types/babel__core@^7.1.14":
   version "7.1.20"
@@ -1807,9 +1807,9 @@ eslint-config-airbnb-typescript@^17.0.0:
     eslint-config-airbnb-base "^15.0.0"
 
 eslint-config-prettier@^8.5.0:
-  version "8.6.0"
-  resolved "https://registry.yarnpkg.com/eslint-config-prettier/-/eslint-config-prettier-8.6.0.tgz#dec1d29ab728f4fa63061774e1672ac4e363d207"
-  integrity sha512-bAF0eLpLVqP5oEVUFKpMA+NnRFICwn9X8B5jrR9FcqnYBuPbqWEjTEspPWMj5ye6czoSLDweCzSo3Ko7gGrZaA==
+  version "8.7.0"
+  resolved "https://registry.yarnpkg.com/eslint-config-prettier/-/eslint-config-prettier-8.7.0.tgz#f1cc58a8afebc50980bd53475451df146c13182d"
+  integrity sha512-HHVXLSlVUhMSmyW4ZzEuvjpwqamgmlfkutD53cYXLikh4pt/modINRcCIApJ84czDxM4GZInwUrromsDdTImTA==
 
 eslint-formatter-pretty@^4.1.0:
   version "4.1.0"
@@ -4362,12 +4362,12 @@ tsconfig-paths@^3.14.1:
     minimist "^1.2.6"
     strip-bom "^3.0.0"
 
-tsd@^0.25.0:
-  version "0.25.0"
-  resolved "https://registry.yarnpkg.com/tsd/-/tsd-0.25.0.tgz#bed2a937ab414e1c5ae1ca687bb44ea3a6f549ba"
-  integrity sha512-liUlvKtsdr+70XEZP/kkF6U8+Q9URZi4Pw58ih7a9x3kjJblG8rdVgvG62xcvkgRva1q3yWX5qAxfYZuYiC5CA==
+tsd@^0.26.0:
+  version "0.26.0"
+  resolved "https://registry.yarnpkg.com/tsd/-/tsd-0.26.0.tgz#2c5ae86b1365b734706fb6e95ba8de7b8f04d8ce"
+  integrity sha512-CNkmeivuy6rH+8iijKf5dRf7lVgHYR2vet+YZFjQgoObDuI9v22ojaOh8Zf2lfJ4wnyT60QYbRsPAN68KVZ+9g==
   dependencies:
-    "@tsd/typescript" "~4.9.3"
+    "@tsd/typescript" "~4.9.5"
     eslint-formatter-pretty "^4.1.0"
     globby "^11.0.1"
     meow "^9.0.0"
