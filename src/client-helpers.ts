@@ -195,14 +195,3 @@ export const makeObjectKeysReducer = (
       initial,
     ]
   );
-
-export const cleanId = (path: string, method: string, suffix: string) => {
-  return [method]
-    .concat(path.split("/"))
-    .concat(suffix)
-    .flatMap((entry) => entry.split(/[^A-Z0-9]/gi))
-    .map(
-      (entry) => entry.slice(0, 1).toUpperCase() + entry.slice(1).toLowerCase()
-    )
-    .join("");
-};

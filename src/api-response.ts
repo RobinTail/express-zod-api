@@ -1,17 +1,17 @@
 import { z } from "zod";
-import { MimeDefinition, mimeJson } from "./mime";
 
-export type ApiResponse<A = z.ZodTypeAny> = {
-  schema: A;
-  mimeTypes: string[];
-};
-
-export const createApiResponse = <S extends z.ZodTypeAny>(
-  schema: S,
-  mimeTypes: MimeDefinition = mimeJson
-) => {
-  return {
-    schema,
-    mimeTypes: typeof mimeTypes === "string" ? [mimeTypes] : mimeTypes,
-  } as ApiResponse<S>;
-};
+export interface ApiResponse<S extends z.ZodTypeAny> {
+  schema: S;
+  /**
+   * @default 200 for a positive response
+   * @default 400 for a negative response
+   * */
+  statusCode?: number;
+  /**
+   * @default "application/json"
+   * @override mimeTypes
+   * */
+  mimeType?: string;
+  /** @default [ "application/json" ] */
+  mimeTypes?: [string, ...string[]];
+}

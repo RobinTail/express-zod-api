@@ -1,10 +1,11 @@
 openapi: 3.0.0
 info:
   title: Example API
-  version: 8.9.4
+  version: 9.1.0
 paths:
   /v1/user/retrieve:
     get:
+      operationId: GetV1UserRetrieve
       responses:
         "200":
           description: GET /v1/user/retrieve Successful response
@@ -76,6 +77,7 @@ paths:
             pattern: /\d+/
   "/v1/user/{id}":
     post:
+      operationId: PostV1UserId
       responses:
         "200":
           description: POST /v1/user/:id Successful response
@@ -200,6 +202,7 @@ paths:
           APIKEY_2: []
   /v1/avatar/send:
     get:
+      operationId: GetV1AvatarSend
       responses:
         "200":
           description: GET /v1/avatar/send Successful response
@@ -227,6 +230,7 @@ paths:
             pattern: /\d+/
   /v1/avatar/stream:
     get:
+      operationId: GetV1AvatarStream
       responses:
         "200":
           description: GET /v1/avatar/stream Successful response
@@ -255,6 +259,7 @@ paths:
             pattern: /\d+/
   /v1/avatar/upload:
     post:
+      operationId: PostV1AvatarUpload
       responses:
         "200":
           description: POST /v1/avatar/upload Successful response

@@ -1,5 +1,11 @@
 import { Request, Response } from "express";
-import { createHttpError, defaultResultHandler, withMeta, z } from "../../src";
+import {
+  InputValidationError,
+  createHttpError,
+  defaultResultHandler,
+  withMeta,
+  z,
+} from "../../src";
 import { metaProp } from "../../src/metadata";
 
 let loggerMock: any;
@@ -61,15 +67,17 @@ describe("ResultHandler", () => {
         url: "http://something/v1/anything",
       };
       defaultResultHandler.handler({
-        error: new z.ZodError([
-          {
-            code: "invalid_type",
-            message: "Expected string, got number",
-            path: ["something"],
-            expected: "string",
-            received: "number",
-          },
-        ]),
+        error: new InputValidationError(
+          new z.ZodError([
+            {
+              code: "invalid_type",
+              message: "Expected string, got number",
+              path: ["something"],
+              expected: "string",
+              received: "number",
+            },
+          ])
+        ),
         input: { something: 453 },
         output: { anything: 118 },
         request: requestMock as Request,
@@ -128,17 +136,19 @@ describe("ResultHandler", () => {
     });
 
     test("should forward output schema examples", () => {
-      expect(
-        defaultResultHandler.getPositiveResponse(
-          withMeta(
-            z.object({
-              str: z.string(),
-            })
-          ).example({
-            str: "test",
+      const apiResponse = defaultResultHandler.getPositiveResponse(
+        withMeta(
+          z.object({
+            str: z.string(),
           })
-        ).schema._def[metaProp]
-      ).toEqual({
+        ).example({
+          str: "test",
+        })
+      );
+      if (!(apiResponse instanceof z.ZodType)) {
+        fail(new Error("should not be here"));
+      }
+      expect(apiResponse._def[metaProp]).toEqual({
         examples: [
           {
             status: "success",
@@ -151,9 +161,11 @@ describe("ResultHandler", () => {
     });
 
     test("should generate negative response example", () => {
-      expect(
-        defaultResultHandler.getNegativeResponse().schema._def[metaProp]
-      ).toEqual({
+      const apiResponse = defaultResultHandler.getNegativeResponse();
+      if (!(apiResponse instanceof z.ZodType)) {
+        fail(new Error("should not be here"));
+      }
+      expect(apiResponse._def[metaProp]).toEqual({
         examples: [
           {
             status: "error",

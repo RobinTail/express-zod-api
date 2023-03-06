@@ -16,7 +16,6 @@ import {
 import { omit } from "ramda";
 import { z } from "zod";
 import {
-  ArrayElement,
   getExamples,
   getRoutePathParams,
   hasCoercion,
@@ -24,7 +23,7 @@ import {
   routePathParamsRegex,
   tryToTransform,
 } from "./common-helpers";
-import { InputSources, TagsConfig } from "./config-type";
+import { InputSource, TagsConfig } from "./config-type";
 import { ZodDateIn, isoDateRegex } from "./date-in-schema";
 import { ZodDateOut } from "./date-out-schema";
 import { AbstractEndpoint } from "./endpoint";
@@ -374,6 +373,10 @@ export const depictString: Depicter<z.ZodString> = ({
     maxLength,
     isUUID,
     isCUID,
+    isCUID2,
+    isULID,
+    isIP,
+    isEmoji,
     isDatetime,
     _def: { checks },
   },
@@ -402,6 +405,10 @@ export const depictString: Depicter<z.ZodString> = ({
     ...(isURL && { format: "url" }),
     ...(isUUID && { format: "uuid" }),
     ...(isCUID && { format: "cuid" }),
+    ...(isCUID2 && { format: "cuid2" }),
+    ...(isULID && { format: "ulid" }),
+    ...(isIP && { format: "ip" }),
+    ...(isEmoji && { format: "emoji" }),
     ...(minLength !== null && { minLength }),
     ...(maxLength !== null && { maxLength }),
     ...(regex && { pattern: `/${regex.source}/${regex.flags}` }),
@@ -411,11 +418,11 @@ export const depictString: Depicter<z.ZodString> = ({
 /** @todo support exclusive min/max as numbers in case of OpenAPI v3.1.x */
 export const depictNumber: Depicter<z.ZodNumber> = ({ schema }) => {
   const minCheck = schema._def.checks.find(({ kind }) => kind === "min") as
-    | Extract<ArrayElement<z.ZodNumberDef["checks"]>, { kind: "min" }>
+    | Extract<z.ZodNumberCheck, { kind: "min" }>
     | undefined;
   const isMinInclusive = minCheck ? minCheck.inclusive : true;
   const maxCheck = schema._def.checks.find(({ kind }) => kind === "max") as
-    | Extract<ArrayElement<z.ZodNumberDef["checks"]>, { kind: "max" }>
+    | Extract<z.ZodNumberCheck, { kind: "max" }>
     | undefined;
   const isMaxInclusive = maxCheck ? maxCheck.inclusive : true;
   return {
@@ -499,8 +506,8 @@ export const depictLazy: Depicter<z.ZodLazy<z.ZodTypeAny>> = ({
   schema,
 }) => next({ schema: schema.schema }); // @todo add a capacitor to the context
 
-export const depictIOExamples = <T extends IOSchema>(
-  schema: T,
+export const depictExamples = (
+  schema: z.ZodTypeAny,
   isResponse: boolean,
   omitProps: string[] = []
 ): MediaExamples => {
@@ -521,8 +528,8 @@ export const depictIOExamples = <T extends IOSchema>(
   };
 };
 
-export const depictIOParamExamples = <T extends IOSchema>(
-  schema: T,
+export const depictParamExamples = (
+  schema: z.ZodTypeAny,
   isResponse: boolean,
   param: string
 ): MediaExamples => {
@@ -580,9 +587,9 @@ export const depictRequestParams = ({
   endpoint,
   inputSources,
 }: ReqResDepictHelperCommonProps & {
-  inputSources: InputSources[Method];
+  inputSources: InputSource[];
 }): ParameterObject[] => {
-  const schema = endpoint.getInputSchema();
+  const schema = endpoint.getSchema("input");
   const shape = extractObjectSchema(schema).shape;
   const pathParams = getRoutePathParams(path);
   const isQueryEnabled = inputSources.includes("query");
@@ -605,7 +612,7 @@ export const depictRequestParams = ({
           onMissing,
         }),
       },
-      ...depictIOParamExamples(schema, false, name),
+      ...depictParamExamples(schema, false, name),
     }));
 };
 
@@ -712,11 +719,11 @@ export const depictResponse = ({
   isPositive: boolean;
 }): ResponseObject => {
   const schema = isPositive
-    ? endpoint.getPositiveResponseSchema()
-    : endpoint.getNegativeResponseSchema();
+    ? endpoint.getSchema("positive")
+    : endpoint.getSchema("negative");
   const mimeTypes = isPositive
-    ? endpoint.getPositiveMimeTypes()
-    : endpoint.getNegativeMimeTypes();
+    ? endpoint.getMimeTypes("positive")
+    : endpoint.getMimeTypes("negative");
   const depictedSchema = excludeExampleFromDepiction(
     walkSchema({
       schema,
@@ -726,7 +733,7 @@ export const depictResponse = ({
       onMissing,
     })
   );
-  const examples = depictIOExamples(schema, true);
+  const examples = depictExamples(schema, true);
 
   return {
     description: `${method.toUpperCase()} ${path} ${description}`,
@@ -845,7 +852,7 @@ export const depictRequest = ({
   const bodyDepiction = excludeExampleFromDepiction(
     excludeParamsFromDepiction(
       walkSchema({
-        schema: endpoint.getInputSchema(),
+        schema: endpoint.getSchema("input"),
         isResponse: false,
         rules: depicters,
         onEach,
@@ -854,14 +861,14 @@ export const depictRequest = ({
       pathParams
     )
   );
-  const bodyExamples = depictIOExamples(
-    endpoint.getInputSchema(),
+  const bodyExamples = depictExamples(
+    endpoint.getSchema("input"),
     false,
     pathParams
   );
 
   return {
-    content: endpoint.getInputMimeTypes().reduce(
+    content: endpoint.getMimeTypes("input").reduce(
       (carry, mimeType) => ({
         ...carry,
         [mimeType]: {

@@ -4,7 +4,7 @@ import {
   SecuritySchemeObject,
   SecuritySchemeType,
 } from "openapi3-ts";
-import { defaultInputSources } from "./common-helpers";
+import { defaultInputSources, makeCleanId } from "./common-helpers";
 import { CommonConfig } from "./config-type";
 import { mapLogicalContainer } from "./logical-container";
 import { Method } from "./method";
@@ -38,6 +38,17 @@ interface GeneratorParams {
 export class OpenAPI extends OpenApiBuilder {
   protected lastSecuritySchemaIds: Partial<Record<SecuritySchemeType, number>> =
     {};
+  protected lastOperationIdSuffixes: Record<string, number> = {};
+
+  protected ensureUniqOperationId(path: string, method: Method) {
+    const operationId = makeCleanId(path, method);
+    if (operationId in this.lastOperationIdSuffixes) {
+      this.lastOperationIdSuffixes[operationId]++;
+      return `${operationId}${this.lastOperationIdSuffixes[operationId]}`;
+    }
+    this.lastOperationIdSuffixes[operationId] = 1;
+    return operationId;
+  }
 
   protected ensureUniqSecuritySchemaName(subject: SecuritySchemeObject) {
     for (const name in this.rootDoc.components?.securitySchemes || {}) {
@@ -84,13 +95,14 @@ export class OpenAPI extends OpenApiBuilder {
         inputSources,
       });
       const operation: OperationObject = {
+        operationId: this.ensureUniqOperationId(path, method),
         responses: {
-          "200": depictResponse({
+          [endpoint.getStatusCode("positive")]: depictResponse({
             ...commonParams,
             description: successfulResponseDescription,
             isPositive: true,
           }),
-          "400": depictResponse({
+          [endpoint.getStatusCode("negative")]: depictResponse({
             ...commonParams,
             description: errorResponseDescription,
             isPositive: false,

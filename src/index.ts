@@ -3,8 +3,11 @@ export { AbstractEndpoint } from "./endpoint";
 export { Method } from "./method";
 export { EndpointsFactory, defaultEndpointsFactory } from "./endpoints-factory";
 export { IOSchema } from "./io-schema";
-export { FlatObject } from "./common-helpers";
-export { createApiResponse } from "./api-response";
+export {
+  FlatObject,
+  getMessageFromError,
+  getStatusCodeFromError,
+} from "./common-helpers";
 export { createLogger } from "./logger";
 export { createMiddleware } from "./middleware";
 export { createResultHandler, defaultResultHandler } from "./result-handler";
@@ -13,7 +16,13 @@ export { ServeStatic } from "./serve-static";
 export { Routing } from "./routing";
 export { createServer, attachRouting } from "./server";
 export { OpenAPI } from "./open-api";
-export { OpenAPIError, DependsOnMethodError, RoutingError } from "./errors";
+export {
+  OpenAPIError,
+  DependsOnMethodError,
+  RoutingError,
+  OutputValidationError,
+  InputValidationError,
+} from "./errors";
 export { withMeta } from "./metadata";
 export { testEndpoint } from "./mock";
 export { Client } from "./client";

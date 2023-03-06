@@ -4,7 +4,6 @@ import fetch from "node-fetch";
 import {
   EndpointsFactory,
   Method,
-  createApiResponse,
   createMiddleware,
   createResultHandler,
   createServer,
@@ -39,22 +38,51 @@ describe("App", () => {
           }),
         faulty: new EndpointsFactory(
           createResultHandler({
-            getPositiveResponse: () => createApiResponse(z.object({})),
-            getNegativeResponse: () => createApiResponse(z.object({})),
+            getPositiveResponse: () => z.object({}),
+            getNegativeResponse: () => z.object({}),
             handler: () => {
               throw new Error("I am faulty");
             },
           })
-        ).build({
-          method: "get",
-          input: z.object({}),
-          output: z.object({
-            test: z.string(),
+        )
+          .addMiddleware(
+            createMiddleware({
+              input: z.object({
+                mwError: z
+                  .any()
+                  .optional()
+                  .transform((value) => {
+                    if (value) {
+                      throw new Error(
+                        "Custom error in the Middleware input validation"
+                      );
+                    }
+                  }),
+              }),
+              middleware: async () => ({}),
+            })
+          )
+          .build({
+            method: "get",
+            input: z.object({
+              epError: z
+                .any()
+                .optional()
+                .transform((value) => {
+                  if (value) {
+                    throw new Error(
+                      "Custom error in the Endpoint input validation"
+                    );
+                  }
+                }),
+            }),
+            output: z.object({
+              test: z.string(),
+            }),
+            handler: async () => ({
+              test: "Should not work",
+            }),
           }),
-          handler: async () => ({
-            test: "Should not work",
-          }),
-        }),
         test: new EndpointsFactory(defaultResultHandler)
           .addMiddleware(
             createMiddleware({
@@ -90,13 +118,19 @@ describe("App", () => {
             handler: async ({
               input: { key, something },
               options: { user, permissions, method },
-            }) => ({
-              anything: something === "joke" ? 300 : -100500,
-              doubleKey: key.repeat(2),
-              userId: user.id,
-              permissions,
-              method,
-            }),
+            }) => {
+              // Problem 787: should lead to ZodError that is NOT considered as the IOSchema validation error
+              if (something === "internal_zod_error") {
+                z.number().parse("");
+              }
+              return {
+                anything: something === "joke" ? 300 : -100500,
+                doubleKey: key.repeat(2),
+                userId: user.id,
+                permissions,
+                method,
+              };
+            },
           }),
       },
     };
@@ -250,6 +284,42 @@ describe("App", () => {
         "An error occurred while serving the result: I am faulty."
       );
     });
+
+    test("Should treat custom errors in middleware input validations as they are", async () => {
+      const response = await fetch(
+        "http://127.0.0.1:8055/v1/faulty?mwError=1",
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      expect(response.status).toBe(500);
+      const text = await response.text();
+      expect(text).toBe(
+        "An error occurred while serving the result: I am faulty.\n" +
+          "Original error: Custom error in the Middleware input validation."
+      );
+    });
+
+    test("Should treat custom errors in middleware input validations as they are", async () => {
+      const response = await fetch(
+        "http://127.0.0.1:8055/v1/faulty?epError=1",
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      expect(response.status).toBe(500);
+      const text = await response.text();
+      expect(text).toBe(
+        "An error occurred while serving the result: I am faulty.\n" +
+          "Original error: Custom error in the Endpoint input validation."
+      );
+    });
   });
 
   describe("Protocol", () => {
@@ -361,6 +431,22 @@ describe("App", () => {
         body: JSON.stringify({
           key: "123",
           something: "gimme fail",
+        }),
+      });
+      expect(response.status).toBe(500);
+      const json = await response.json();
+      expect(json).toMatchSnapshot();
+    });
+
+    test("Problem 787: Should NOT treat ZodError thrown from within the handler as IOSchema validation error", async () => {
+      const response = await fetch("http://127.0.0.1:8055/v1/test", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          key: "123",
+          something: "internal_zod_error",
         }),
       });
       expect(response.status).toBe(500);
