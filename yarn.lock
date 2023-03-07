@@ -4368,9 +4368,9 @@ tsconfig-paths@^3.14.1:
     strip-bom "^3.0.0"
 
 tsd@^0.26.0:
-  version "0.26.0"
-  resolved "https://registry.yarnpkg.com/tsd/-/tsd-0.26.0.tgz#2c5ae86b1365b734706fb6e95ba8de7b8f04d8ce"
-  integrity sha512-CNkmeivuy6rH+8iijKf5dRf7lVgHYR2vet+YZFjQgoObDuI9v22ojaOh8Zf2lfJ4wnyT60QYbRsPAN68KVZ+9g==
+  version "0.26.1"
+  resolved "https://registry.yarnpkg.com/tsd/-/tsd-0.26.1.tgz#e54f7b1fbc456c0d49abce8c9a0c6587c779c89f"
+  integrity sha512-HbYaRQqL7imva6ZbSE/7KSIPN/dhwyoLIwPfbjyE7nwWqjkLUTwvyvyhhOUuMLOKWMo4mIx66KyqlTpEqNngdA==
   dependencies:
     "@tsd/typescript" "~4.9.5"
     eslint-formatter-pretty "^4.1.0"
