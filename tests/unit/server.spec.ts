@@ -29,12 +29,12 @@ jest.mock("compression", () => compressionMock);
 import express, { Request, Response } from "express"; // express is mocked above
 import https from "https";
 import { Logger } from "winston";
+import { z } from "zod";
 import {
   EndpointsFactory,
   attachRouting,
   createServer,
   defaultResultHandler,
-  z,
 } from "../../src";
 import { AppConfig, CommonConfig, ServerConfig } from "../../src/config-type";
 import { mimeJson } from "../../src/mime";

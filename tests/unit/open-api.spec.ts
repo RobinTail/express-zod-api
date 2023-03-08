@@ -7,11 +7,12 @@ import {
   createMiddleware,
   createResultHandler,
   defaultEndpointsFactory,
+  ez,
   withMeta,
-  z,
 } from "../../src";
 import { expectType } from "tsd";
 import { mimeJson } from "../../src/mime";
+import { z } from "zod";
 
 describe("Open API generator", () => {
   const sampleConfig = createConfig({
@@ -266,11 +267,11 @@ describe("Open API generator", () => {
               input: z.object({
                 bigint: z.bigint(),
                 boolean: z.boolean(),
-                dateIn: z.dateIn(),
+                dateIn: ez.dateIn(),
               }),
               output: z.object({
                 null: z.null(),
-                dateOut: z.dateOut(),
+                dateOut: ez.dateOut(),
               }),
               handler: async () => ({
                 null: null,
