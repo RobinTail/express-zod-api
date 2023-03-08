@@ -8,13 +8,13 @@ jest.mock("express", () => ({
 
 import { Express, Request, RequestHandler, Response } from "express";
 import { Logger } from "winston";
+import { z } from "zod";
 import {
   DependsOnMethod,
   EndpointsFactory,
   Routing,
   ServeStatic,
   defaultResultHandler,
-  z,
 } from "../../src";
 import { CommonConfig } from "../../src/config-type";
 import { mimeJson } from "../../src/mime";

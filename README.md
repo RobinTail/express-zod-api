@@ -150,7 +150,7 @@ _In case you need to customize the response, see [Response customization](#respo
 ## Create your first endpoint
 
 ```typescript
-import { z } from "express-zod-api";
+import { z } from "zod";
 
 const helloWorldEndpoint = defaultEndpointsFactory.build({
   method: "get",

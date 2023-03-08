@@ -3,11 +3,12 @@ import {
   EndpointsFactory,
   createResultHandler,
   defaultResultHandler,
-  z,
+  ez,
 } from "../src";
 import { config } from "./config";
 import { authMiddleware } from "./middlewares";
 import fs from "fs";
+import { z } from "zod";
 
 export const taggedEndpointsFactory = new EndpointsFactory({
   resultHandler: defaultResultHandler,
@@ -46,7 +47,7 @@ export const fileStreamingEndpointsFactory = new EndpointsFactory({
   config,
   resultHandler: createResultHandler({
     getPositiveResponse: () => ({
-      schema: z.file().binary(),
+      schema: ez.file().binary(),
       mimeType: "image/*",
     }),
     getNegativeResponse: () => ({

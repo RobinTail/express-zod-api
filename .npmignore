@@ -16,3 +16,4 @@ logo.svg
 tools
 coverage
 .prettierignore
+tsup.config.ts

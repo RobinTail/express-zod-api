@@ -1,4 +1,4 @@
-import { z } from "../../src";
+import { z } from "zod";
 import { fileSendingEndpointsFactory } from "../factories";
 import fs from "fs";
 
