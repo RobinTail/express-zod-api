@@ -1,8 +1,9 @@
 import fs from "fs";
+import * as original from "../dist/esm/package.json";
 
 const manifest = {
-  type: "module",
-  types: "../../../../dist/index.d.ts",
+  ...original,
+  types: "../../../../dist/index.d.ts", // also add types for it
 };
 
 fs.writeFileSync(

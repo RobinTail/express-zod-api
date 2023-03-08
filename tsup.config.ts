@@ -15,7 +15,9 @@ export default defineConfig({
   onSuccess: async () => {
     const manifest = {
       type: "module",
-      version: originalManifest.version, // for yarn in esm test
+      // version is needed for `yarn install` in esm test
+      // see also tools/esm-test-package.ts for setting dts link
+      version: originalManifest.version,
     };
     fs.writeFileSync(
       "./dist/esm/package.json",
