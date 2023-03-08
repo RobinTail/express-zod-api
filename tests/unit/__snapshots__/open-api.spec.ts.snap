@@ -2725,6 +2725,18 @@ paths:
                 cuid:
                   type: string
                   format: cuid
+                cuid2:
+                  type: string
+                  format: cuid2
+                ulid:
+                  type: string
+                  format: ulid
+                ip:
+                  type: string
+                  format: ip
+                emoji:
+                  type: string
+                  format: emoji
                 url:
                   type: string
                   format: url
@@ -2745,6 +2757,10 @@ paths:
                 - email
                 - uuid
                 - cuid
+                - cuid2
+                - ulid
+                - ip
+                - emoji
                 - url
                 - numeric
                 - combined

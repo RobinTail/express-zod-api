@@ -388,6 +388,10 @@ describe("Open API generator", () => {
                 email: z.string().email(),
                 uuid: z.string().uuid(),
                 cuid: z.string().cuid(),
+                cuid2: z.string().cuid2(),
+                ulid: z.string().ulid(),
+                ip: z.string().ip(),
+                emoji: z.string().emoji(),
                 url: z.string().url(),
                 numeric: z.string().regex(/\d+/),
                 combined: z

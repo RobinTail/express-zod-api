@@ -17,9 +17,6 @@ import { ZodUpload } from "./upload-schema";
 
 export type FlatObject = Record<string, any>;
 
-export type ArrayElement<T extends readonly unknown[]> =
-  T extends readonly (infer K)[] ? K : never;
-
 /** @see https://expressjs.com/en/guide/routing.html */
 export const routePathParamsRegex = /:([A-Za-z0-9_]+)/g;
 
