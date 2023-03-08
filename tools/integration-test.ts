@@ -16,7 +16,8 @@ const packageJson = `
     "express-zod-api": "../../dist",
     "ts-node": "10.9.1",
     "typescript": "4.9.4",
-    "@types/node": "*"
+    "@types/node": "*",
+    "zod": "^3.21.4"
   }
 }
 `;
