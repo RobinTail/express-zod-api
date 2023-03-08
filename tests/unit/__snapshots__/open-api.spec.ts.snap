@@ -266,364 +266,6 @@ servers:
 "
 `;
 
-exports[`Open API generator Metadata should ensure the uniq operation ids 1`] = `
-"openapi: 3.0.0
-info:
-  title: Testing Operation IDs
-  version: 3.4.5
-paths:
-  /v1/getSome/thing:
-    get:
-      operationId: GetV1GetsomeThing
-      responses:
-        "200":
-          description: GET /v1/getSome/thing Successful response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    enum:
-                      - success
-                  data:
-                    type: object
-                    properties: {}
-                required:
-                  - status
-                  - data
-        "400":
-          description: GET /v1/getSome/thing Error response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    enum:
-                      - error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                required:
-                  - status
-                  - error
-              examples:
-                example1:
-                  value:
-                    status: error
-                    error:
-                      message: Sample error message
-      description: thing is the path segment
-      summary: thing is the path segment
-  "/v1/getSome/{thing}":
-    get:
-      operationId: GetV1GetsomeThing2
-      responses:
-        "200":
-          description: GET /v1/getSome/:thing Successful response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    enum:
-                      - success
-                  data:
-                    type: object
-                    properties: {}
-                required:
-                  - status
-                  - data
-        "400":
-          description: GET /v1/getSome/:thing Error response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    enum:
-                      - error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                required:
-                  - status
-                  - error
-              examples:
-                example1:
-                  value:
-                    status: error
-                    error:
-                      message: Sample error message
-      description: thing is the path parameter
-      summary: thing is the path parameter
-components:
-  schemas: {}
-  responses: {}
-  parameters: {}
-  examples: {}
-  requestBodies: {}
-  headers: {}
-  securitySchemes: {}
-  links: {}
-  callbacks: {}
-tags: []
-servers:
-  - url: http://example.com
-"
-`;
-
-exports[`Open API generator Metadata should ensure uniq security schema names 1`] = `
-"openapi: 3.0.0
-info:
-  title: Testing Security
-  version: 3.4.5
-paths:
-  /v1/getSomething:
-    get:
-      operationId: GetV1Getsomething
-      responses:
-        "200":
-          description: GET /v1/getSomething Successful response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    enum:
-                      - success
-                  data:
-                    type: object
-                    properties:
-                      num:
-                        type: number
-                        format: double
-                        minimum: 5e-324
-                        exclusiveMinimum: false
-                        maximum: 1.7976931348623157e+308
-                        exclusiveMaximum: false
-                    required:
-                      - num
-                required:
-                  - status
-                  - data
-        "400":
-          description: GET /v1/getSomething Error response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    enum:
-                      - error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                required:
-                  - status
-                  - error
-              examples:
-                example1:
-                  value:
-                    status: error
-                    error:
-                      message: Sample error message
-      parameters:
-        - name: key
-          in: query
-          required: true
-          schema:
-            description: GET /v1/getSomething parameter
-            type: string
-        - name: str
-          in: query
-          required: true
-          schema:
-            description: GET /v1/getSomething parameter
-            type: string
-      security:
-        - APIKEY_1: []
-        - HTTP_1: []
-  /v1/setSomething:
-    post:
-      operationId: PostV1Setsomething
-      responses:
-        "200":
-          description: POST /v1/setSomething Successful response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    enum:
-                      - success
-                  data:
-                    type: object
-                    properties: {}
-                required:
-                  - status
-                  - data
-        "400":
-          description: POST /v1/setSomething Error response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    enum:
-                      - error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                required:
-                  - status
-                  - error
-              examples:
-                example1:
-                  value:
-                    status: error
-                    error:
-                      message: Sample error message
-      requestBody:
-        content:
-          application/json:
-            schema:
-              description: POST /v1/setSomething request body
-              allOf:
-                - type: object
-                  properties: {}
-                - type: object
-                  properties: {}
-      security:
-        - HTTP_1: []
-          OAUTH2_1:
-            - write
-  /v1/updateSomething:
-    put:
-      operationId: PutV1Updatesomething
-      responses:
-        "200":
-          description: PUT /v1/updateSomething Successful response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    enum:
-                      - success
-                  data:
-                    type: object
-                    properties: {}
-                required:
-                  - status
-                  - data
-        "400":
-          description: PUT /v1/updateSomething Error response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    enum:
-                      - error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                required:
-                  - status
-                  - error
-              examples:
-                example1:
-                  value:
-                    status: error
-                    error:
-                      message: Sample error message
-      requestBody:
-        content:
-          application/json:
-            schema:
-              description: PUT /v1/updateSomething request body
-              allOf:
-                - type: object
-                  properties: {}
-                - type: object
-                  properties: {}
-      security:
-        - HTTP_2: []
-components:
-  schemas: {}
-  responses: {}
-  parameters: {}
-  examples: {}
-  requestBodies: {}
-  headers: {}
-  securitySchemes:
-    APIKEY_1:
-      type: apiKey
-      in: query
-      name: key
-    HTTP_1:
-      type: http
-      scheme: bearer
-    OAUTH2_1:
-      type: oauth2
-      flows:
-        password:
-          tokenUrl: https://some.url
-          scopes:
-            read: read something
-            write: write something
-    HTTP_2:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
-  links: {}
-  callbacks: {}
-tags: []
-servers:
-  - url: http://example.com
-"
-`;
-
 exports[`Open API generator Metadata should merge endpoint handler examples with its middleware examples 1`] = `
 "openapi: 3.0.0
 info:
@@ -1264,6 +906,443 @@ paths:
                   type: boolean
               required:
                 - other
+components:
+  schemas: {}
+  responses: {}
+  parameters: {}
+  examples: {}
+  requestBodies: {}
+  headers: {}
+  securitySchemes: {}
+  links: {}
+  callbacks: {}
+tags: []
+servers:
+  - url: http://example.com
+"
+`;
+
+exports[`Open API generator generateOpenApi() should ensure the uniq operation ids 1`] = `
+"openapi: 3.0.0
+info:
+  title: Testing Operation IDs
+  version: 3.4.5
+paths:
+  /v1/getSome/thing:
+    get:
+      operationId: GetV1GetsomeThing
+      responses:
+        "200":
+          description: GET /v1/getSome/thing Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - success
+                  data:
+                    type: object
+                    properties: {}
+                required:
+                  - status
+                  - data
+        "400":
+          description: GET /v1/getSome/thing Error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                required:
+                  - status
+                  - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
+      description: thing is the path segment
+      summary: thing is the path segment
+  "/v1/getSome/{thing}":
+    get:
+      operationId: GetV1GetsomeThing2
+      responses:
+        "200":
+          description: GET /v1/getSome/:thing Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - success
+                  data:
+                    type: object
+                    properties: {}
+                required:
+                  - status
+                  - data
+        "400":
+          description: GET /v1/getSome/:thing Error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                required:
+                  - status
+                  - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
+      description: thing is the path parameter
+      summary: thing is the path parameter
+components:
+  schemas: {}
+  responses: {}
+  parameters: {}
+  examples: {}
+  requestBodies: {}
+  headers: {}
+  securitySchemes: {}
+  links: {}
+  callbacks: {}
+tags: []
+servers:
+  - url: http://example.com
+"
+`;
+
+exports[`Open API generator generateOpenApi() should ensure uniq security schema names 1`] = `
+"openapi: 3.0.0
+info:
+  title: Testing Security
+  version: 3.4.5
+paths:
+  /v1/getSomething:
+    get:
+      operationId: GetV1Getsomething
+      responses:
+        "200":
+          description: GET /v1/getSomething Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - success
+                  data:
+                    type: object
+                    properties:
+                      num:
+                        type: number
+                        format: double
+                        minimum: 5e-324
+                        exclusiveMinimum: false
+                        maximum: 1.7976931348623157e+308
+                        exclusiveMaximum: false
+                    required:
+                      - num
+                required:
+                  - status
+                  - data
+        "400":
+          description: GET /v1/getSomething Error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                required:
+                  - status
+                  - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
+      parameters:
+        - name: key
+          in: query
+          required: true
+          schema:
+            description: GET /v1/getSomething parameter
+            type: string
+        - name: str
+          in: query
+          required: true
+          schema:
+            description: GET /v1/getSomething parameter
+            type: string
+      security:
+        - APIKEY_1: []
+        - HTTP_1: []
+  /v1/setSomething:
+    post:
+      operationId: PostV1Setsomething
+      responses:
+        "200":
+          description: POST /v1/setSomething Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - success
+                  data:
+                    type: object
+                    properties: {}
+                required:
+                  - status
+                  - data
+        "400":
+          description: POST /v1/setSomething Error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                required:
+                  - status
+                  - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
+      requestBody:
+        content:
+          application/json:
+            schema:
+              description: POST /v1/setSomething request body
+              allOf:
+                - type: object
+                  properties: {}
+                - type: object
+                  properties: {}
+      security:
+        - HTTP_1: []
+          OAUTH2_1:
+            - write
+  /v1/updateSomething:
+    put:
+      operationId: PutV1Updatesomething
+      responses:
+        "200":
+          description: PUT /v1/updateSomething Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - success
+                  data:
+                    type: object
+                    properties: {}
+                required:
+                  - status
+                  - data
+        "400":
+          description: PUT /v1/updateSomething Error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                required:
+                  - status
+                  - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
+      requestBody:
+        content:
+          application/json:
+            schema:
+              description: PUT /v1/updateSomething request body
+              allOf:
+                - type: object
+                  properties: {}
+                - type: object
+                  properties: {}
+      security:
+        - HTTP_2: []
+components:
+  schemas: {}
+  responses: {}
+  parameters: {}
+  examples: {}
+  requestBodies: {}
+  headers: {}
+  securitySchemes:
+    APIKEY_1:
+      type: apiKey
+      in: query
+      name: key
+    HTTP_1:
+      type: http
+      scheme: bearer
+    OAUTH2_1:
+      type: oauth2
+      flows:
+        password:
+          tokenUrl: https://some.url
+          scopes:
+            read: read something
+            write: write something
+    HTTP_2:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  links: {}
+  callbacks: {}
+tags: []
+servers:
+  - url: http://example.com
+"
+`;
+
+exports[`Open API generator generateOpenApi() should generate the correct schema for DELETE request without body 1`] = `
+"openapi: 3.0.0
+info:
+  title: Testing DELETE request without body
+  version: 3.4.5
+paths:
+  /v1/deleteSomething:
+    delete:
+      operationId: DeleteV1Deletesomething
+      responses:
+        "200":
+          description: DELETE /v1/deleteSomething Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - success
+                  data:
+                    type: object
+                    properties:
+                      whatever:
+                        type: number
+                        format: double
+                        minimum: 5e-324
+                        exclusiveMinimum: false
+                        maximum: 1.7976931348623157e+308
+                        exclusiveMaximum: false
+                    required:
+                      - whatever
+                required:
+                  - status
+                  - data
+        "400":
+          description: DELETE /v1/deleteSomething Error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                required:
+                  - status
+                  - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
 components:
   schemas: {}
   responses: {}
@@ -2347,6 +2426,64 @@ servers:
 "
 `;
 
+exports[`Open API generator generateOpenApi() should handle custom mime types and status codes 1`] = `
+"openapi: 3.0.0
+info:
+  title: Testing MIME types and status codes
+  version: 3.4.5
+paths:
+  /v1/getSomething:
+    get:
+      operationId: GetV1Getsomething
+      responses:
+        "201":
+          description: GET /v1/getSomething Successful response
+          content:
+            application/json:
+              schema: &a1
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - OK
+                  result:
+                    type: object
+                    properties: {}
+                required:
+                  - status
+                  - result
+            text/vnd.yaml:
+              schema: *a1
+        "403":
+          description: GET /v1/getSomething Error response
+          content:
+            text/vnd.yaml:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - NOT OK
+                required:
+                  - status
+components:
+  schemas: {}
+  responses: {}
+  parameters: {}
+  examples: {}
+  requestBodies: {}
+  headers: {}
+  securitySchemes: {}
+  links: {}
+  callbacks: {}
+tags: []
+servers:
+  - url: http://example.com
+"
+`;
+
 exports[`Open API generator generateOpenApi() should handle different number types 1`] = `
 "openapi: 3.0.0
 info:
@@ -2588,6 +2725,18 @@ paths:
                 cuid:
                   type: string
                   format: cuid
+                cuid2:
+                  type: string
+                  format: cuid2
+                ulid:
+                  type: string
+                  format: ulid
+                ip:
+                  type: string
+                  format: ip
+                emoji:
+                  type: string
+                  format: emoji
                 url:
                   type: string
                   format: url
@@ -2608,6 +2757,10 @@ paths:
                 - email
                 - uuid
                 - cuid
+                - cuid2
+                - ulid
+                - ip
+                - emoji
                 - url
                 - numeric
                 - combined

@@ -5,7 +5,7 @@ import { AnyMiddlewareDef } from "./middleware";
 // the copy of the private Zod utility type of ZodObject
 type UnknownKeysParam = "passthrough" | "strict" | "strip";
 
-type Refined<T extends z.ZodType> = T extends z.ZodType<infer O>
+type Refined<T extends z.ZodTypeAny> = T extends z.ZodType<infer O>
   ? z.ZodEffects<T | Refined<T>, O, O>
   : never;
 
