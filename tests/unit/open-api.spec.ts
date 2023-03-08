@@ -7,6 +7,7 @@ import {
   createMiddleware,
   createResultHandler,
   defaultEndpointsFactory,
+  ez,
   withMeta,
   z,
 } from "../../src";
@@ -266,11 +267,11 @@ describe("Open API generator", () => {
               input: z.object({
                 bigint: z.bigint(),
                 boolean: z.boolean(),
-                dateIn: z.dateIn(),
+                dateIn: ez.dateIn(),
               }),
               output: z.object({
                 null: z.null(),
-                dateOut: z.dateOut(),
+                dateOut: ez.dateOut(),
               }),
               handler: async () => ({
                 null: null,

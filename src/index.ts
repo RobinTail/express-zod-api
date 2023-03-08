@@ -27,7 +27,8 @@ export { withMeta } from "./metadata";
 export { testEndpoint } from "./mock";
 export { Client } from "./client";
 
-import * as z from "./extend-zod";
-import createHttpError from "http-errors";
+export { z } from "zod";
+export { ez } from "./ez-namespace";
 
-export { createHttpError, z };
+import createHttpError from "http-errors";
+export { createHttpError };

@@ -3,6 +3,7 @@ import { IOSchemaError } from "../../src/errors";
 import {
   OpenAPIError,
   defaultEndpointsFactory,
+  ez,
   withMeta,
   z,
 } from "../../src/index";
@@ -218,7 +219,7 @@ describe("Open API helpers", () => {
     test("should set format:binary and type:string", () => {
       expect(
         depictUpload({
-          schema: z.upload(),
+          schema: ez.upload(),
           ...requestContext,
           next: makeNext(requestContext),
         })
@@ -227,7 +228,7 @@ describe("Open API helpers", () => {
     test("should throw when using in response", () => {
       try {
         depictUpload({
-          schema: z.upload(),
+          schema: ez.upload(),
           ...responseContext,
           next: makeNext(responseContext),
         });
@@ -240,7 +241,7 @@ describe("Open API helpers", () => {
   });
 
   describe("depictFile()", () => {
-    test.each([z.file(), z.file().binary(), z.file().base64()])(
+    test.each([ez.file(), ez.file().binary(), ez.file().base64()])(
       "should set type:string and format accordingly %#",
       (schema) => {
         expect(
@@ -255,7 +256,7 @@ describe("Open API helpers", () => {
     test("should throw when using in input", () => {
       try {
         depictFile({
-          schema: z.file().binary(),
+          schema: ez.file().binary(),
           ...requestContext,
           next: makeNext(requestContext),
         });
@@ -768,7 +769,7 @@ describe("Open API helpers", () => {
     test("should set type:string, pattern and format", () => {
       expect(
         depictDateIn({
-          schema: z.dateIn(),
+          schema: ez.dateIn(),
           ...requestContext,
           next: makeNext(requestContext),
         })
@@ -777,7 +778,7 @@ describe("Open API helpers", () => {
     test("should throw when ZodDateIn in response", () => {
       try {
         depictDateIn({
-          schema: z.dateIn(),
+          schema: ez.dateIn(),
           ...responseContext,
           next: makeNext(responseContext),
         });
@@ -793,7 +794,7 @@ describe("Open API helpers", () => {
     test("should set type:string, description and format", () => {
       expect(
         depictDateOut({
-          schema: z.dateOut(),
+          schema: ez.dateOut(),
           ...responseContext,
           next: makeNext(responseContext),
         })
@@ -802,7 +803,7 @@ describe("Open API helpers", () => {
     test("should throw when ZodDateOut in request", () => {
       try {
         depictDateOut({
-          schema: z.dateOut(),
+          schema: ez.dateOut(),
           ...requestContext,
           next: makeNext(requestContext),
         });

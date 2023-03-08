@@ -3,6 +3,7 @@ import {
   EndpointsFactory,
   createResultHandler,
   defaultResultHandler,
+  ez,
   z,
 } from "../src";
 import { config } from "./config";
@@ -46,7 +47,7 @@ export const fileStreamingEndpointsFactory = new EndpointsFactory({
   config,
   resultHandler: createResultHandler({
     getPositiveResponse: () => ({
-      schema: z.file().binary(),
+      schema: ez.file().binary(),
       mimeType: "image/*",
     }),
     getNegativeResponse: () => ({

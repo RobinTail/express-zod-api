@@ -1,4 +1,4 @@
-import { createHttpError, withMeta, z } from "../../src";
+import { createHttpError, ez, withMeta, z } from "../../src";
 import { keyAndTokenAuthenticatedEndpointsFactory } from "../factories";
 
 export const updateUserEndpoint =
@@ -17,7 +17,7 @@ export const updateUserEndpoint =
             "should be greater than or equal to 0"
           ),
         name: z.string().min(1),
-        birthday: z.dateIn(),
+        birthday: ez.dateIn(),
       })
     ).example({
       id: "12",
@@ -27,7 +27,7 @@ export const updateUserEndpoint =
     output: withMeta(
       z.object({
         name: z.string(),
-        createdAt: z.dateOut(),
+        createdAt: ez.dateOut(),
       })
     ).example({
       name: "John Doe",
