@@ -2,9 +2,18 @@
 
 ## Version 9
 
+### v9.2.1
+
+- `zod` version is 3.21.4.
+
+### v9.2.0
+
+- `zod` version is 3.21.2.
+  - `ulid` string format support added.
+
 ### v9.1.0
 
-- `zod` version 3.21.0
+- `zod` version is 3.21.0
   - General support of the following string formats in the documentation: `cuid2`, `ip`, `emoji`.
 
 ### v9.0.0
