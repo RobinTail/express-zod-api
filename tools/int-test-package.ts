@@ -1,7 +1,7 @@
 import fs from "fs";
 
 const manifest = {
-  types: "../../../../dist/dts/index.d.ts",
+  types: "../../../../dist/index.d.ts",
 };
 
 fs.writeFileSync(
