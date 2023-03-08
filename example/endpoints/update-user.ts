@@ -1,4 +1,5 @@
-import { createHttpError, ez, withMeta, z } from "../../src";
+import { z } from "zod";
+import { createHttpError, ez, withMeta } from "../../src";
 import { keyAndTokenAuthenticatedEndpointsFactory } from "../factories";
 
 export const updateUserEndpoint =

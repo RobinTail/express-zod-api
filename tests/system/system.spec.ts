@@ -1,6 +1,7 @@
 import cors from "cors";
 import http from "http";
 import fetch from "node-fetch";
+import { z } from "zod";
 import {
   EndpointsFactory,
   Method,
@@ -8,7 +9,6 @@ import {
   createResultHandler,
   createServer,
   defaultResultHandler,
-  z,
 } from "../../src";
 import { waitFor } from "../helpers";
 

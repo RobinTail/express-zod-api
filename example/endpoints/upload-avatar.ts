@@ -1,4 +1,5 @@
-import { ez, z } from "../../src";
+import { z } from "zod";
+import { ez } from "../../src";
 import crypto from "crypto";
 import { taggedEndpointsFactory } from "../factories";
 

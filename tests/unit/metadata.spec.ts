@@ -1,4 +1,5 @@
-import { withMeta, z } from "../../src";
+import { z } from "zod";
+import { withMeta } from "../../src";
 import {
   MetaDef,
   copyMeta,

@@ -1,12 +1,7 @@
 import { SchemaObject } from "openapi3-ts";
+import { z } from "zod";
 import { IOSchemaError } from "../../src/errors";
-import {
-  OpenAPIError,
-  defaultEndpointsFactory,
-  ez,
-  withMeta,
-  z,
-} from "../../src/index";
+import { OpenAPIError, defaultEndpointsFactory, ez, withMeta } from "../../src";
 import { getMeta } from "../../src/metadata";
 import {
   OpenAPIContext,

@@ -4,11 +4,11 @@ import {
   createResultHandler,
   defaultResultHandler,
   ez,
-  z,
 } from "../src";
 import { config } from "./config";
 import { authMiddleware } from "./middlewares";
 import fs from "fs";
+import { z } from "zod";
 
 export const taggedEndpointsFactory = new EndpointsFactory({
   resultHandler: defaultResultHandler,

@@ -1,5 +1,6 @@
+import { z } from "zod";
 import { routing } from "../../example/routing";
-import { Client, defaultEndpointsFactory, z } from "../../src";
+import { Client, defaultEndpointsFactory } from "../../src";
 
 describe("API Client Generator", () => {
   test("Should generate a client for example API", () => {

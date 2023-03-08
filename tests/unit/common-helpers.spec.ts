@@ -15,14 +15,9 @@ import {
   isValidDate,
   makeErrorFromAnything,
 } from "../../src/common-helpers";
-import {
-  InputValidationError,
-  createHttpError,
-  ez,
-  withMeta,
-  z,
-} from "../../src";
+import { InputValidationError, createHttpError, ez, withMeta } from "../../src";
 import { Request } from "express";
+import { z } from "zod";
 
 describe("Common Helpers", () => {
   describe("defaultInputSources", () => {
