@@ -1,10 +1,10 @@
 import { Request, Response } from "express";
+import { z } from "zod";
 import {
   InputValidationError,
   createHttpError,
   defaultResultHandler,
   withMeta,
-  z,
 } from "../../src";
 import { metaProp } from "../../src/metadata";
 

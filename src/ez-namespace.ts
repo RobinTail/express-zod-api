@@ -1,7 +1,7 @@
-import { ZodDateIn } from "./date-in-schema";
-import { ZodDateOut } from "./date-out-schema";
-import { ZodFile } from "./file-schema";
-import { ZodUpload } from "./upload-schema";
+import { ZodDateIn, ZodDateInDef } from "./date-in-schema";
+import { ZodDateOut, ZodDateOutDef } from "./date-out-schema";
+import { ZodFile, ZodFileDef } from "./file-schema";
+import { ZodUpload, ZodUploadDef } from "./upload-schema";
 
 export namespace ez {
   export const file = ZodFile.create;
@@ -9,3 +9,9 @@ export namespace ez {
   export const dateIn = ZodDateIn.create;
   export const dateOut = ZodDateOut.create;
 }
+
+export type ProprietaryKinds =
+  | ZodFileDef["typeName"]
+  | ZodUploadDef["typeName"]
+  | ZodDateInDef["typeName"]
+  | ZodDateOutDef["typeName"];

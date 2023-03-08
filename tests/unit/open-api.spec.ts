@@ -9,10 +9,10 @@ import {
   defaultEndpointsFactory,
   ez,
   withMeta,
-  z,
 } from "../../src";
 import { expectType } from "tsd";
 import { mimeJson } from "../../src/mime";
+import { z } from "zod";
 
 describe("Open API generator", () => {
   const sampleConfig = createConfig({

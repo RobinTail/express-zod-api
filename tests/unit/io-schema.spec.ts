@@ -1,5 +1,6 @@
 import { expectNotType, expectType } from "tsd";
-import { IOSchema, createMiddleware, withMeta, z } from "../../src";
+import { z } from "zod";
+import { IOSchema, createMiddleware, withMeta } from "../../src";
 import { getFinalEndpointInputSchema } from "../../src/io-schema";
 import { getMeta } from "../../src/metadata";
 import { AnyMiddlewareDef } from "../../src/middleware";

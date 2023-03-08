@@ -5,11 +5,11 @@ import {
   EndpointsFactory,
   createMiddleware,
   createResultHandler,
-  z,
 } from "../../src";
 import { Endpoint } from "../../src/endpoint";
 import { expectType } from "tsd";
 import { serializeSchemaForTest } from "../helpers";
+import { z } from "zod";
 
 describe("EndpointsFactory", () => {
   /* eslint-disable @typescript-eslint/dot-notation */

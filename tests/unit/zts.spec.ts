@@ -25,7 +25,7 @@
  */
 
 import ts from "typescript";
-import { z } from "../../src";
+import { z } from "zod";
 import { zodToTs } from "../../src/zts";
 import { createTypeAlias, printNode } from "../../src/zts-helpers";
 

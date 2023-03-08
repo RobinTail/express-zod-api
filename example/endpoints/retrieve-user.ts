@@ -1,4 +1,5 @@
-import { createHttpError, z } from "../../src";
+import { z } from "zod";
+import { createHttpError } from "../../src";
 import { taggedEndpointsFactory } from "../factories";
 import { methodProviderMiddleware } from "../middlewares";
 

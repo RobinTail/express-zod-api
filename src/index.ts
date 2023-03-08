@@ -26,8 +26,6 @@ export {
 export { withMeta } from "./metadata";
 export { testEndpoint } from "./mock";
 export { Client } from "./client";
-
-export { z } from "zod";
 export { ez } from "./ez-namespace";
 
 import createHttpError from "http-errors";

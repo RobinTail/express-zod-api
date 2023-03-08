@@ -1,3 +1,4 @@
+import { z } from "zod";
 import {
   EndpointsFactory,
   createMiddleware,
@@ -6,7 +7,6 @@ import {
   defaultResultHandler,
   ez,
   testEndpoint,
-  z,
 } from "../../src";
 import { Endpoint } from "../../src/endpoint";
 import { IOSchemaError } from "../../src/errors";
