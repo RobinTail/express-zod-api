@@ -1,5 +1,27 @@
 # Changelog
 
+## Version 10
+
+### v10.0.0-beta1
+
+- **BREAKING** changes to the concept of dependencies.
+  - `zod` becomes a peer dependency, fixes issue #822.
+    - You need to install it manually and adjust your imports accordingly.
+  - `express` becomes a peer dependency as well.
+    - You need to install it manually.
+  - `typescript` becomes an optional peer dependency.
+    - When using a client generator, you need to install it manually.
+    - The minimal supported version is 4.9.3.
+  - Proprietary schemas are now exported under the namespace `ez`.
+    - Imports and utilization should be adjusted accordingly.
+    - Affected schemas: `file`, `dateIn`, `dateOut`, `upload`.
+- **BREAKING** changes to the engines.
+  - The minimal Node version is now 14.18.0.
+- Due to switching to `tsup` builder, the file structure has changed:
+  - `/dist/index.js` — CommonJS bundle;
+  - `/dist/esm/index.js` — ESM bundle;
+  - `/dist/index.d.ts` — types declaration bundle.
+
 ## Version 9
 
 ### v9.2.1
