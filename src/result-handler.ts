@@ -56,14 +56,14 @@ export const defaultResultHandler = createResultHandler({
         data: output,
       })
     );
-    for (const example of examples) {
-      // forwarding output examples to response schema
-      responseSchema.example({
-        status: "success",
-        data: example,
-      });
-    }
-    return responseSchema;
+    return examples.reduce<typeof responseSchema>(
+      (acc, example) =>
+        acc.example({
+          status: "success",
+          data: example,
+        }),
+      responseSchema
+    );
   },
   getNegativeResponse: () =>
     withMeta(

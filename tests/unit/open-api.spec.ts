@@ -959,5 +959,28 @@ describe("Open API generator", () => {
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
+
+    test("Issue #827: withMeta() should be immutable", () => {
+      const zodSchema = z.object({ a: z.string() });
+      const spec = new OpenAPI({
+        config: sampleConfig,
+        routing: {
+          v1: {
+            addSomething: defaultEndpointsFactory.build({
+              method: "post",
+              input: withMeta(zodSchema).example({ a: "first" }),
+              output: withMeta(zodSchema.extend({ b: z.string() }))
+                .example({ a: "first", b: "prefix_first" })
+                .example({ a: "second", b: "prefix_second" }),
+              handler: async ({ input: { a } }) => ({ a, b: `prefix_${a}` }),
+            }),
+          },
+        },
+        version: "3.4.5",
+        title: "Testing Metadata:example on IO parameter",
+        serverUrl: "http://example.com",
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
+    });
   });
 });
