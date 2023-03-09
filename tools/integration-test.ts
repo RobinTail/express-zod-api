@@ -1,4 +1,3 @@
-import manifest from "../package.json";
 import fs from "fs";
 import { extractReadmeQuickStart } from "./extract-quick-start";
 import { getTSConfigBase } from "./tsconfig-base";
@@ -14,12 +13,10 @@ const packageJson = `
   },
   "dependencies": {
     "@tsconfig/node${tsconfigBase}": "latest",
-    "@types/node": "*",
-    "ts-node": "^10.9.1",
     "express-zod-api": "../../dist",
-    "typescript": "${manifest.peerDependencies.typescript}",
-    "zod": "${manifest.peerDependencies.zod}",
-    "express": "${manifest.peerDependencies.express}"
+    "ts-node": "10.9.1",
+    "typescript": "4.9.4",
+    "@types/node": "*"
   }
 }
 `;
