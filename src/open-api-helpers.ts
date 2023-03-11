@@ -14,6 +14,7 @@ import {
   SecurityRequirementObject,
   SecuritySchemeObject,
   TagObject,
+  isReferenceObject,
   isSchemaObject,
 } from "openapi3-ts";
 import { omit } from "ramda";
@@ -702,10 +703,14 @@ export const onMissing = (schema: z.ZodTypeAny) => {
   throw new OpenAPIError(`Zod type ${schema.constructor.name} is unsupported`);
 };
 
+// @todo should correct the reference?
 export const excludeParamsFromDepiction = (
-  depicted: SchemaObject,
+  depicted: SchemaObject | ReferenceObject,
   pathParams: string[]
-): SchemaObject => {
+): SchemaObject | ReferenceObject => {
+  if (isReferenceObject(depicted)) {
+    return depicted;
+  }
   const properties = depicted.properties
     ? omit(pathParams, depicted.properties)
     : undefined;
@@ -892,8 +897,6 @@ export const depictRequest = ({
   const pathParams = getRoutePathParams(path);
   const bodyDepiction = excludeExampleFromDepiction(
     excludeParamsFromDepiction(
-      // @todo fix it
-      // @ts-ignore
       walkSchema({
         schema: endpoint.getSchema("input"),
         isResponse: false,

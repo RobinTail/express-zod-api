@@ -181,8 +181,6 @@ describe("Open API helpers", () => {
         rules: depicters,
         onMissing,
       });
-      // @todo fix it
-      // @ts-ignore
       expect(excludeParamsFromDepiction(depicted, ["a"])).toMatchSnapshot();
     });
   });
