@@ -741,9 +741,11 @@ export const excludeParamsFromDepiction = (
   );
 };
 
+// @todo should process the reference?
 export const excludeExampleFromDepiction = (
-  depicted: SchemaObject
-): SchemaObject => omit(["example"], depicted);
+  depicted: SchemaObject | ReferenceObject
+): SchemaObject | ReferenceObject =>
+  isSchemaObject(depicted) ? omit(["example"], depicted) : depicted;
 
 export const depictResponse = ({
   method,
@@ -764,8 +766,6 @@ export const depictResponse = ({
     ? endpoint.getMimeTypes("positive")
     : endpoint.getMimeTypes("negative");
   const depictedSchema = excludeExampleFromDepiction(
-    // @todo fix it
-    // @ts-ignore
     walkSchema({
       schema,
       isResponse: true,
