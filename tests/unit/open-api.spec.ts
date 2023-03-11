@@ -503,6 +503,49 @@ describe("Open API generator", () => {
       expect(boolean.parse(null)).toBe(false);
     });
 
+    test("should handle circular schemas via z.lazy()", () => {
+      const baseCategorySchema = z.object({
+        name: z.string(),
+      });
+      type Category = z.infer<typeof baseCategorySchema> & {
+        subcategories: Category[];
+      };
+      const categorySchema: z.ZodType<Category> = baseCategorySchema.extend({
+        subcategories: z.lazy(() => categorySchema.array()),
+      });
+      const spec = new OpenAPI({
+        config: sampleConfig,
+        routing: {
+          v1: {
+            getSomething: defaultEndpointsFactory.build({
+              method: "post",
+              input: baseCategorySchema,
+              output: z.object({
+                zodExample: categorySchema,
+              }),
+              handler: async () => ({
+                zodExample: {
+                  name: "People",
+                  subcategories: [
+                    {
+                      name: "Politicians",
+                      subcategories: [
+                        { name: "Presidents", subcategories: [] },
+                      ],
+                    },
+                  ],
+                },
+              }),
+            }),
+          },
+        },
+        version: "3.4.5",
+        title: "Testing Lazy",
+        serverUrl: "http://example.com",
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
+    });
+
     test("should throw on unsupported types", () => {
       [
         z.undefined(),
