@@ -701,7 +701,6 @@ export const onMissing = (schema: z.ZodTypeAny) => {
   throw new OpenAPIError(`Zod type ${schema.constructor.name} is unsupported`);
 };
 
-// @todo should correct the reference?
 export const excludeParamsFromDepiction = (
   depicted: SchemaObject | ReferenceObject,
   pathParams: string[]
