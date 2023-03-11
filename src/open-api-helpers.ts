@@ -759,12 +759,8 @@ export const depictResponse = ({
   description: string;
   isPositive: boolean;
 }): ResponseObject => {
-  const schema = isPositive
-    ? endpoint.getSchema("positive")
-    : endpoint.getSchema("negative");
-  const mimeTypes = isPositive
-    ? endpoint.getMimeTypes("positive")
-    : endpoint.getMimeTypes("negative");
+  const schema = endpoint.getSchema(isPositive ? "positive" : "negative");
+  const mimeTypes = endpoint.getMimeTypes(isPositive ? "positive" : "negative");
   const depictedSchema = excludeExampleFromDepiction(
     walkSchema({
       schema,
