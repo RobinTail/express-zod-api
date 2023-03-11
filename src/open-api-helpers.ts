@@ -53,8 +53,8 @@ type MediaExamples = Pick<MediaTypeObject, "examples">;
 
 export interface OpenAPIContext {
   isResponse: boolean;
-  hasRef?: (name: string) => boolean;
-  makeRef?: (
+  hasRef: (name: string) => boolean;
+  makeRef: (
     name: string,
     schema: SchemaObject | ReferenceObject
   ) => ReferenceObject;
@@ -69,6 +69,8 @@ interface ReqResDepictHelperCommonProps {
   method: Method;
   path: string;
   endpoint: AbstractEndpoint;
+  hasRef: OpenAPIContext["hasRef"];
+  makeRef: OpenAPIContext["makeRef"];
 }
 
 const shortDescriptionLimit = 50;
@@ -195,7 +197,7 @@ export const depictLiteral: Depicter<z.ZodLiteral<any>> = ({
 export const depictObject: Depicter<z.AnyZodObject> = ({
   schema,
   isResponse,
-  next,
+  ...rest
 }) => {
   const required = Object.keys(schema.shape).filter((key) => {
     const prop = schema.shape[key];
@@ -207,7 +209,7 @@ export const depictObject: Depicter<z.AnyZodObject> = ({
   });
   return {
     type: "object",
-    properties: depictObjectProperties({ schema, isResponse, next }),
+    properties: depictObjectProperties({ schema, isResponse, ...rest }),
     ...(required.length ? { required } : {}),
   };
 };
@@ -273,8 +275,7 @@ export const depictBigInt: Depicter<z.ZodBigInt> = () => ({
 
 export const depictRecord: Depicter<z.ZodRecord<z.ZodTypeAny>> = ({
   schema: { keySchema, valueSchema },
-  isResponse,
-  next,
+  ...rest
 }) => {
   if (keySchema instanceof z.ZodEnum || keySchema instanceof z.ZodNativeEnum) {
     const keys = Object.values(keySchema.enum) as string[];
@@ -289,8 +290,7 @@ export const depictRecord: Depicter<z.ZodRecord<z.ZodTypeAny>> = ({
       type: "object",
       properties: depictObjectProperties({
         schema: z.object(shape),
-        isResponse,
-        next,
+        ...rest,
       }),
       ...(keys.length ? { required: keys } : {}),
     };
@@ -302,8 +302,7 @@ export const depictRecord: Depicter<z.ZodRecord<z.ZodTypeAny>> = ({
         schema: z.object({
           [keySchema.value]: valueSchema,
         }),
-        isResponse,
-        next,
+        ...rest,
       }),
       required: [keySchema.value],
     };
@@ -326,8 +325,7 @@ export const depictRecord: Depicter<z.ZodRecord<z.ZodTypeAny>> = ({
         type: "object",
         properties: depictObjectProperties({
           schema: z.object(shape),
-          isResponse,
-          next,
+          ...rest,
         }),
         required: keySchema.options.map(
           (option: z.ZodLiteral<any>) => option.value
@@ -337,7 +335,7 @@ export const depictRecord: Depicter<z.ZodRecord<z.ZodTypeAny>> = ({
   }
   return {
     type: "object",
-    additionalProperties: next({ schema: valueSchema }),
+    additionalProperties: rest.next({ schema: valueSchema }),
   };
 };
 
@@ -526,12 +524,10 @@ export const depictLazy: Depicter<z.ZodLazy<z.ZodTypeAny>> = ({
     .update(serializedSchema, "utf8")
     .digest("hex");
   // 3. check if this hash already has a reference
-  // @todo add method to context
   if (hasRef!(hash)) {
     return { $ref: hash };
   }
   // 4. create an empty reference
-  // @todo add method to context
   const ref = makeRef!(hash, {});
   // 5. update the reference with a deeper depicted schema
   makeRef!(hash, next({ schema: lazy.schema }));
@@ -619,6 +615,8 @@ export const depictRequestParams = ({
   method,
   endpoint,
   inputSources,
+  hasRef,
+  makeRef,
 }: ReqResDepictHelperCommonProps & {
   inputSources: InputSource[];
 }): ParameterObject[] => {
@@ -643,6 +641,8 @@ export const depictRequestParams = ({
           rules: depicters,
           onEach,
           onMissing,
+          hasRef,
+          makeRef,
         }),
       },
       ...depictParamExamples(schema, false, name),
@@ -751,6 +751,8 @@ export const depictResponse = ({
   description,
   endpoint,
   isPositive,
+  hasRef,
+  makeRef,
 }: ReqResDepictHelperCommonProps & {
   description: string;
   isPositive: boolean;
@@ -770,6 +772,8 @@ export const depictResponse = ({
       rules: depicters,
       onEach,
       onMissing,
+      hasRef,
+      makeRef,
     })
   );
   const examples = depictExamples(schema, true);
@@ -886,6 +890,8 @@ export const depictRequest = ({
   method,
   path,
   endpoint,
+  hasRef,
+  makeRef,
 }: ReqResDepictHelperCommonProps): RequestBodyObject => {
   const pathParams = getRoutePathParams(path);
   const bodyDepiction = excludeExampleFromDepiction(
@@ -898,6 +904,8 @@ export const depictRequest = ({
         rules: depicters,
         onEach,
         onMissing,
+        hasRef,
+        makeRef,
       }),
       pathParams
     )

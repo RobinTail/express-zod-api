@@ -57,8 +57,10 @@ import { SchemaHandler, walkSchema } from "../../src/schema-walker";
 import { serializeSchemaForTest } from "../helpers";
 
 describe("Open API helpers", () => {
-  const requestContext: OpenAPIContext = { isResponse: false };
-  const responseContext: OpenAPIContext = { isResponse: true };
+  const hasRef = jest.fn();
+  const makeRef = jest.fn((name: string): ReferenceObject => ({ $ref: name }));
+  const requestContext: OpenAPIContext = { isResponse: false, hasRef, makeRef };
+  const responseContext: OpenAPIContext = { isResponse: true, hasRef, makeRef };
   const makeNext =
     (
       context: OpenAPIContext
@@ -320,7 +322,7 @@ describe("Open API helpers", () => {
   });
 
   describe("depictOptional()", () => {
-    test.each<OpenAPIContext>([{ isResponse: false }, { isResponse: true }])(
+    test.each<OpenAPIContext>([requestContext, responseContext])(
       "should pass the next depicter %#",
       (context) => {
         expect(
@@ -335,7 +337,7 @@ describe("Open API helpers", () => {
   });
 
   describe("depictNullable()", () => {
-    test.each<OpenAPIContext>([{ isResponse: false }, { isResponse: true }])(
+    test.each<OpenAPIContext>([requestContext, responseContext])(
       "should set nullable:true %#",
       (context) => {
         expect(
@@ -381,30 +383,30 @@ describe("Open API helpers", () => {
   });
 
   describe("depictObject()", () => {
-    test.each<OpenAPIContext & { shape: z.ZodRawShape }>([
+    test.each<{ context: OpenAPIContext; shape: z.ZodRawShape }>([
       {
-        isResponse: false,
+        context: requestContext,
         shape: { a: z.number(), b: z.string() },
       },
       {
-        isResponse: true,
+        context: responseContext,
         shape: { a: z.number(), b: z.string() },
       },
       {
-        isResponse: true,
+        context: responseContext,
         shape: { a: z.coerce.number(), b: z.string({ coerce: true }) },
       },
       {
-        isResponse: true,
+        context: responseContext,
         shape: { a: z.number(), b: z.string().optional() },
       },
       {
-        isResponse: false,
+        context: requestContext,
         shape: { a: z.number().optional(), b: z.coerce.string() },
       },
     ])(
       "should type:object, properties and required props %#",
-      ({ shape, ...context }) => {
+      ({ shape, context }) => {
         expect(
           depictObject({
             schema: z.object(shape),
@@ -573,32 +575,34 @@ describe("Open API helpers", () => {
   });
 
   describe("depictEffect()", () => {
-    test.each<OpenAPIContext & { schema: z.ZodEffects<any>; expected: string }>(
-      [
-        {
-          schema: z.string().transform((v) => parseInt(v, 10)),
-          isResponse: true,
-          expected: "number (out)",
-        },
-        {
-          schema: z.string().transform((v) => parseInt(v, 10)),
-          isResponse: false,
-          expected: "string (in)",
-        },
-        {
-          schema: z.preprocess((v) => parseInt(`${v}`, 10), z.string()),
-          isResponse: false,
-          expected: "string (preprocess)",
-        },
-        {
-          schema: z
-            .object({ s: z.string() })
-            .refine(() => false, { message: "test" }),
-          isResponse: false,
-          expected: "object (refinement)",
-        },
-      ]
-    )("should depict as $expected", ({ schema, ...context }) => {
+    test.each<{
+      context: OpenAPIContext;
+      schema: z.ZodEffects<any>;
+      expected: string;
+    }>([
+      {
+        schema: z.string().transform((v) => parseInt(v, 10)),
+        context: responseContext,
+        expected: "number (out)",
+      },
+      {
+        schema: z.string().transform((v) => parseInt(v, 10)),
+        context: requestContext,
+        expected: "string (in)",
+      },
+      {
+        schema: z.preprocess((v) => parseInt(`${v}`, 10), z.string()),
+        context: requestContext,
+        expected: "string (preprocess)",
+      },
+      {
+        schema: z
+          .object({ s: z.string() })
+          .refine(() => false, { message: "test" }),
+        context: requestContext,
+        expected: "object (refinement)",
+      },
+    ])("should depict as $expected", ({ schema, context }) => {
       expect(
         depictEffect({
           schema,
@@ -625,10 +629,10 @@ describe("Open API helpers", () => {
   });
 
   describe("depictPipeline", () => {
-    test.each<OpenAPIContext & { expected: string }>([
-      { isResponse: true, expected: "boolean (out)" },
-      { isResponse: false, expected: "string (in)" },
-    ])("should depict as $expected", (context) => {
+    test.each<{ context: OpenAPIContext; expected: string }>([
+      { context: responseContext, expected: "boolean (out)" },
+      { context: requestContext, expected: "string (in)" },
+    ])("should depict as $expected", ({ context }) => {
       expect(
         depictPipeline({
           schema: z.string().pipe(z.coerce.boolean()),
@@ -640,7 +644,7 @@ describe("Open API helpers", () => {
   });
 
   describe("depictExamples()", () => {
-    test.each<OpenAPIContext & Record<"case" | "action", string>>([
+    test.each<{ isResponse: boolean } & Record<"case" | "action", string>>([
       { isResponse: false, case: "request", action: "pass" },
       { isResponse: true, case: "response", action: "transform" },
     ])("should $action examples in case of $case", ({ isResponse }) => {
@@ -671,7 +675,7 @@ describe("Open API helpers", () => {
   });
 
   describe("depictParamExamples()", () => {
-    test.each<OpenAPIContext & Record<"case" | "action", string>>([
+    test.each<{ isResponse: boolean } & Record<"case" | "action", string>>([
       { isResponse: false, case: "request", action: "pass" },
       { isResponse: true, case: "response", action: "transform" },
     ])("should $action examples in case of $case", ({ isResponse }) => {
@@ -717,6 +721,8 @@ describe("Open API helpers", () => {
             handler: jest.fn(),
           }),
           inputSources: ["query", "params"],
+          hasRef,
+          makeRef,
         })
       ).toMatchSnapshot();
     });
@@ -736,6 +742,8 @@ describe("Open API helpers", () => {
             handler: jest.fn(),
           }),
           inputSources: ["body", "params"],
+          hasRef,
+          makeRef,
         })
       ).toMatchSnapshot();
     });
@@ -755,6 +763,8 @@ describe("Open API helpers", () => {
             handler: jest.fn(),
           }),
           inputSources: ["body"],
+          hasRef,
+          makeRef,
         })
       ).toMatchSnapshot();
     });
@@ -823,7 +833,7 @@ describe("Open API helpers", () => {
   });
 
   describe("depictDate", () => {
-    test.each<OpenAPIContext>([{ isResponse: true }, { isResponse: false }])(
+    test.each<OpenAPIContext>([responseContext, requestContext])(
       "should throw clear error %#",
       (context) => {
         try {
@@ -856,20 +866,14 @@ describe("Open API helpers", () => {
   describe("depictLazy", () => {
     test("should handle circular references", () => {
       const schema: z.ZodLazy<z.ZodArray<any>> = z.lazy(() => schema.array());
-      const hasRef = jest
-        .fn()
+      hasRef
         .mockImplementationOnce(() => false)
         .mockImplementationOnce(() => true);
-      const makeRef = jest.fn(
-        (name: string): ReferenceObject => ({ $ref: name })
-      );
       expect(
         depictLazy({
           schema,
           ...responseContext,
-          hasRef,
-          makeRef,
-          next: makeNext({ ...responseContext, hasRef, makeRef }), // @todo make it a part of the context
+          next: makeNext(responseContext),
         })
       ).toMatchSnapshot();
       expect(hasRef).toHaveBeenCalledTimes(2);

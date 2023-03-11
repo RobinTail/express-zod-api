@@ -99,7 +99,13 @@ export class OpenAPI extends OpenApiBuilder {
       _method
     ) => {
       const method = _method as Method;
-      const commonParams = { path, method, endpoint };
+      const commonParams = {
+        path,
+        method,
+        endpoint,
+        hasRef: this.hasRef.bind(this),
+        makeRef: this.makeRef.bind(this),
+      };
       const [shortDesc, longDesc] = (["short", "long"] as const).map(
         endpoint.getDescription.bind(endpoint)
       );
