@@ -508,7 +508,6 @@ describe("Open API generator", () => {
         z.undefined(),
         z.map(z.any(), z.any()),
         z.function(),
-        z.lazy(() => z.any()),
         z.promise(z.any()),
         z.unknown(),
         z.never(),

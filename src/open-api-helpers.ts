@@ -1,3 +1,4 @@
+import { createHash } from "crypto";
 import {
   ContentObject,
   ExampleObject,
@@ -5,6 +6,7 @@ import {
   MediaTypeObject,
   OAuthFlowsObject,
   ParameterObject,
+  ReferenceObject,
   RequestBodyObject,
   ResponseObject,
   SchemaObject,
@@ -50,6 +52,11 @@ type MediaExamples = Pick<MediaTypeObject, "examples">;
 
 export interface OpenAPIContext {
   isResponse: boolean;
+  hasRef?: (name: string) => boolean;
+  makeRef?: (
+    name: string,
+    schema: SchemaObject | ReferenceObject
+  ) => ReferenceObject;
 }
 
 type Depicter<
@@ -501,10 +508,32 @@ export const depictBranded: Depicter<z.ZodBranded<z.ZodTypeAny, any>> = ({
   next,
 }) => next({ schema: schema.unwrap() });
 
+// @ts-ignore
 export const depictLazy: Depicter<z.ZodLazy<z.ZodTypeAny>> = ({
   next,
-  schema,
-}) => next({ schema: schema.schema }); // @todo add a capacitor to the context
+  schema: lazy,
+  hasRef,
+  makeRef,
+}): ReferenceObject => {
+  // 1. serialize the schema
+  const serializedSchema = JSON.stringify(lazy.schema);
+  // 2. make hash out of it
+  const hash = createHash("sha1")
+    .update(serializedSchema, "utf8")
+    .digest("hex");
+  // 3. check if this hash already has a reference
+  // @todo add method to context
+  if (hasRef!(hash)) {
+    return { $ref: hash };
+  }
+  // 4. create an empty reference
+  // @todo add method to context
+  const ref = makeRef!(hash, {});
+  // 5. update the reference with a deeper depicted schema
+  makeRef!(hash, next({ schema: lazy.schema }));
+  // 6. return the previously created reference
+  return ref;
+};
 
 export const depictExamples = (
   schema: z.ZodTypeAny,
@@ -645,6 +674,7 @@ export const depicters: HandlingRules<SchemaObject, OpenAPIContext> = {
   ZodDate: depictDate,
   ZodCatch: depictCatch,
   ZodPipeline: depictPipeline,
+  ZodLazy: depictLazy,
 };
 
 export const onEach: Depicter<z.ZodTypeAny, "last"> = ({

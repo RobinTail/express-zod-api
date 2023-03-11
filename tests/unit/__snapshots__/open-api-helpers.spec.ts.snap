@@ -299,6 +299,12 @@ exports[`Open API helpers depictIntersection() should wrap next depicters in all
 }
 `;
 
+exports[`Open API helpers depictLazy should handle circular references 1`] = `
+{
+  "$ref": "6cbbd837811754902ea1e68d3e5c75e36250b880",
+}
+`;
+
 exports[`Open API helpers depictLiteral() should set type and involve enum property 1`] = `
 {
   "enum": [

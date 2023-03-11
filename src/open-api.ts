@@ -5,7 +5,6 @@ import {
   SchemaObject,
   SecuritySchemeObject,
   SecuritySchemeType,
-  isReferenceObject,
 } from "openapi3-ts";
 import { defaultInputSources, makeCleanId } from "./common-helpers";
 import { CommonConfig } from "./config-type";
@@ -42,30 +41,17 @@ export class OpenAPI extends OpenApiBuilder {
   protected lastSecuritySchemaIds: Partial<Record<SecuritySchemeType, number>> =
     {};
   protected lastOperationIdSuffixes: Record<string, number> = {};
-  protected lastSchemaRefSuffix: number = 0;
 
-  protected ensureSchemaReference(
-    subject: SchemaObject | ReferenceObject
+  protected makeRef(
+    name: string,
+    schema: SchemaObject | ReferenceObject
   ): ReferenceObject {
-    if (isReferenceObject(subject)) {
-      return subject;
-    }
-    const serializedSubject = JSON.stringify(subject);
-    for (const ref in this.rootDoc.components?.schemas || {}) {
-      const entry = this.rootDoc.components?.schemas?.[ref];
-      if (entry && serializedSubject === JSON.stringify(entry)) {
-        return { $ref: ref };
-      }
-    }
-    this.lastSchemaRefSuffix++;
-    const ref = makeCleanId(
-      subject.description?.split(/\s/).join("/") || "Schema",
-      (Array.isArray(subject.type) ? subject.type[0] : subject.type) ||
-        "Custom",
-      `${this.lastSchemaRefSuffix}`
-    );
-    this.addSchema(ref, subject);
-    return { $ref: ref };
+    this.addSchema(name, schema);
+    return { $ref: name };
+  }
+
+  protected hasRef(name: string): boolean {
+    return name in (this.rootDoc.components?.schemas || {});
   }
 
   protected ensureUniqOperationId(path: string, method: Method) {

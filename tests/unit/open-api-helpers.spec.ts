@@ -1,4 +1,4 @@
-import { SchemaObject } from "openapi3-ts";
+import { ReferenceObject, SchemaObject } from "openapi3-ts";
 import { IOSchemaError } from "../../src/errors";
 import {
   OpenAPIError,
@@ -25,6 +25,7 @@ import {
   depictExamples,
   depictFile,
   depictIntersection,
+  depictLazy,
   depictLiteral,
   depictNull,
   depictNullable,
@@ -842,6 +843,46 @@ describe("Open API helpers", () => {
           next: makeNext(responseContext),
         })
       ).toMatchSnapshot();
+    });
+  });
+
+  describe("depictLazy", () => {
+    test("should handle circular references", () => {
+      const schema: z.ZodLazy<z.ZodArray<any>> = z.lazy(() => schema.array());
+      const hasRef = jest
+        .fn()
+        .mockImplementationOnce(() => false)
+        .mockImplementationOnce(() => true);
+      const makeRef = jest.fn(
+        (name: string): ReferenceObject => ({ $ref: name })
+      );
+      expect(
+        depictLazy({
+          schema,
+          ...responseContext,
+          hasRef,
+          makeRef,
+          next: makeNext({ ...responseContext, hasRef, makeRef }), // @todo make it a part of the context
+        })
+      ).toMatchSnapshot();
+      expect(hasRef).toHaveBeenCalledTimes(2);
+      for (const call of hasRef.mock.calls) {
+        expect(call[0]).toBe("6cbbd837811754902ea1e68d3e5c75e36250b880");
+      }
+      expect(makeRef).toHaveBeenCalledTimes(2);
+      expect(makeRef.mock.calls[0]).toEqual([
+        "6cbbd837811754902ea1e68d3e5c75e36250b880",
+        {},
+      ]);
+      expect(makeRef.mock.calls[1]).toEqual([
+        "6cbbd837811754902ea1e68d3e5c75e36250b880",
+        {
+          items: {
+            $ref: "6cbbd837811754902ea1e68d3e5c75e36250b880",
+          },
+          type: "array",
+        },
+      ]);
     });
   });
 
