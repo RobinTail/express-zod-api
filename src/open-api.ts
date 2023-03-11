@@ -1,8 +1,11 @@
 import {
   OpenApiBuilder,
   OperationObject,
+  ReferenceObject,
+  SchemaObject,
   SecuritySchemeObject,
   SecuritySchemeType,
+  isSchemaObject,
 } from "openapi3-ts";
 import { defaultInputSources, makeCleanId } from "./common-helpers";
 import { CommonConfig } from "./config-type";
@@ -39,6 +42,30 @@ export class OpenAPI extends OpenApiBuilder {
   protected lastSecuritySchemaIds: Partial<Record<SecuritySchemeType, number>> =
     {};
   protected lastOperationIdSuffixes: Record<string, number> = {};
+  protected lastSchemaRefSuffix: number = 0;
+
+  protected ensureSchemaReference(subject: SchemaObject): ReferenceObject {
+    const serializedSubject = JSON.stringify(subject);
+    for (const ref in this.rootDoc.components?.schemas || {}) {
+      const entry = this.rootDoc.components?.schemas?.[ref];
+      if (
+        entry &&
+        isSchemaObject(entry) &&
+        serializedSubject === JSON.stringify(entry)
+      ) {
+        return { $ref: ref };
+      }
+    }
+    this.lastSchemaRefSuffix++;
+    const ref = makeCleanId(
+      subject.description?.split(/\s/).join("/") || "Schema",
+      (Array.isArray(subject.type) ? subject.type[0] : subject.type) ||
+        "Custom",
+      `${this.lastSchemaRefSuffix}`
+    );
+    this.addSchema(ref, subject);
+    return { $ref: ref };
+  }
 
   protected ensureUniqOperationId(path: string, method: Method) {
     const operationId = makeCleanId(path, method);
@@ -51,9 +78,10 @@ export class OpenAPI extends OpenApiBuilder {
   }
 
   protected ensureUniqSecuritySchemaName(subject: SecuritySchemeObject) {
+    const serializedSubject = JSON.stringify(subject);
     for (const name in this.rootDoc.components?.securitySchemes || {}) {
       if (
-        JSON.stringify(subject) ===
+        serializedSubject ===
         JSON.stringify(this.rootDoc.components?.securitySchemes?.[name])
       ) {
         return name;
