@@ -6,6 +6,7 @@ import {
   SecuritySchemeObject,
   SecuritySchemeType,
 } from "openapi3-ts";
+import { z } from "zod";
 import { defaultInputSources, makeCleanId } from "./common-helpers";
 import { CommonConfig } from "./config-type";
 import { mapLogicalContainer } from "./logical-container";
@@ -35,6 +36,11 @@ interface GeneratorParams {
   errorResponseDescription?: string;
   /** @default true */
   hasSummaryFromDescription?: boolean;
+  /**
+   * @desc Used for comparing schemas wrapped into z.lazy() to limit the recursion
+   * @default JSON.stringify()
+   * */
+  serializer?: (schema: z.ZodTypeAny) => string;
 }
 
 export class OpenAPI extends OpenApiBuilder {
@@ -90,6 +96,7 @@ export class OpenAPI extends OpenApiBuilder {
     successfulResponseDescription = "Successful response",
     errorResponseDescription = "Error response",
     hasSummaryFromDescription = true,
+    serializer = JSON.stringify,
   }: GeneratorParams) {
     super();
     this.addInfo({ title, version }).addServer({ url: serverUrl });
@@ -103,6 +110,7 @@ export class OpenAPI extends OpenApiBuilder {
         path,
         method,
         endpoint,
+        serializer,
         hasRef: this.hasRef.bind(this),
         makeRef: this.makeRef.bind(this),
       };

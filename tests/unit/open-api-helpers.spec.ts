@@ -67,11 +67,13 @@ describe("Open API helpers", () => {
     isResponse: false,
     hasRef: hasRefMock,
     makeRef: makeRefMock,
+    serializer: JSON.stringify,
   };
   const responseContext: OpenAPIContext = {
     isResponse: true,
     hasRef: hasRefMock,
     makeRef: makeRefMock,
+    serializer: JSON.stringify,
   };
   const makeNext =
     (
@@ -744,6 +746,7 @@ describe("Open API helpers", () => {
           inputSources: ["query", "params"],
           hasRef: hasRefMock,
           makeRef: makeRefMock,
+          serializer: JSON.stringify,
         })
       ).toMatchSnapshot();
     });
@@ -765,6 +768,7 @@ describe("Open API helpers", () => {
           inputSources: ["body", "params"],
           hasRef: hasRefMock,
           makeRef: makeRefMock,
+          serializer: JSON.stringify,
         })
       ).toMatchSnapshot();
     });
@@ -786,6 +790,7 @@ describe("Open API helpers", () => {
           inputSources: ["body"],
           hasRef: hasRefMock,
           makeRef: makeRefMock,
+          serializer: JSON.stringify,
         })
       ).toMatchSnapshot();
     });

@@ -54,6 +54,7 @@ type MediaExamples = Pick<MediaTypeObject, "examples">;
 
 export interface OpenAPIContext {
   isResponse: boolean;
+  serializer: (schema: z.ZodTypeAny) => string;
   hasRef: (name: string) => boolean;
   makeRef: (
     name: string,
@@ -66,12 +67,11 @@ type Depicter<
   Variant extends HandlingVariant = "regular"
 > = SchemaHandler<T, SchemaObject | ReferenceObject, OpenAPIContext, Variant>;
 
-interface ReqResDepictHelperCommonProps {
+interface ReqResDepictHelperCommonProps
+  extends Pick<OpenAPIContext, "serializer" | "hasRef" | "makeRef"> {
   method: Method;
   path: string;
   endpoint: AbstractEndpoint;
-  hasRef: OpenAPIContext["hasRef"];
-  makeRef: OpenAPIContext["makeRef"];
 }
 
 const shortDescriptionLimit = 50;
@@ -514,12 +514,12 @@ export const depictBranded: Depicter<z.ZodBranded<z.ZodTypeAny, any>> = ({
 export const depictLazy: Depicter<z.ZodLazy<z.ZodTypeAny>> = ({
   next,
   schema: lazy,
+  serializer: serialize,
   hasRef,
   makeRef,
 }): ReferenceObject => {
   // 1. serialize the schema
-  // @todo make the serializer/comparator configurable
-  const serializedSchema = JSON.stringify(lazy.schema);
+  const serializedSchema = serialize(lazy.schema);
   // 2. make hash out of it
   const hash = createHash("sha1")
     .update(serializedSchema, "utf8")
@@ -616,6 +616,7 @@ export const depictRequestParams = ({
   method,
   endpoint,
   inputSources,
+  serializer,
   hasRef,
   makeRef,
 }: ReqResDepictHelperCommonProps & {
@@ -642,6 +643,7 @@ export const depictRequestParams = ({
           rules: depicters,
           onEach,
           onMissing,
+          serializer,
           hasRef,
           makeRef,
         }),
@@ -760,6 +762,7 @@ export const depictResponse = ({
   description,
   endpoint,
   isPositive,
+  serializer,
   hasRef,
   makeRef,
 }: ReqResDepictHelperCommonProps & {
@@ -775,6 +778,7 @@ export const depictResponse = ({
       rules: depicters,
       onEach,
       onMissing,
+      serializer,
       hasRef,
       makeRef,
     })
@@ -893,6 +897,7 @@ export const depictRequest = ({
   method,
   path,
   endpoint,
+  serializer,
   hasRef,
   makeRef,
 }: ReqResDepictHelperCommonProps): RequestBodyObject => {
@@ -905,6 +910,7 @@ export const depictRequest = ({
         rules: depicters,
         onEach,
         onMissing,
+        serializer,
         hasRef,
         makeRef,
       }),
