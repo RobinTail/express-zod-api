@@ -9,6 +9,7 @@ import {
 import { getMeta } from "../../src/metadata";
 import {
   OpenAPIContext,
+  defaultSerializer,
   depictAny,
   depictArray,
   depictBigInt,
@@ -67,13 +68,13 @@ describe("Open API helpers", () => {
     isResponse: false,
     hasRef: hasRefMock,
     makeRef: makeRefMock,
-    serializer: JSON.stringify,
+    serializer: defaultSerializer,
   };
   const responseContext: OpenAPIContext = {
     isResponse: true,
     hasRef: hasRefMock,
     makeRef: makeRefMock,
-    serializer: JSON.stringify,
+    serializer: defaultSerializer,
   };
   const makeNext =
     (
@@ -746,7 +747,7 @@ describe("Open API helpers", () => {
           inputSources: ["query", "params"],
           hasRef: hasRefMock,
           makeRef: makeRefMock,
-          serializer: JSON.stringify,
+          serializer: defaultSerializer,
         })
       ).toMatchSnapshot();
     });
@@ -768,7 +769,7 @@ describe("Open API helpers", () => {
           inputSources: ["body", "params"],
           hasRef: hasRefMock,
           makeRef: makeRefMock,
-          serializer: JSON.stringify,
+          serializer: defaultSerializer,
         })
       ).toMatchSnapshot();
     });
@@ -790,7 +791,7 @@ describe("Open API helpers", () => {
           inputSources: ["body"],
           hasRef: hasRefMock,
           makeRef: makeRefMock,
-          serializer: JSON.stringify,
+          serializer: defaultSerializer,
         })
       ).toMatchSnapshot();
     });

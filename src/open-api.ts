@@ -12,6 +12,7 @@ import { CommonConfig } from "./config-type";
 import { mapLogicalContainer } from "./logical-container";
 import { Method } from "./method";
 import {
+  defaultSerializer,
   depictRequest,
   depictRequestParams,
   depictResponse,
@@ -38,7 +39,7 @@ interface GeneratorParams {
   hasSummaryFromDescription?: boolean;
   /**
    * @desc Used for comparing schemas wrapped into z.lazy() to limit the recursion
-   * @default JSON.stringify()
+   * @default JSON.stringify() + SHA1 hash as a hex digest
    * */
   serializer?: (schema: z.ZodTypeAny) => string;
 }
@@ -96,7 +97,7 @@ export class OpenAPI extends OpenApiBuilder {
     successfulResponseDescription = "Successful response",
     errorResponseDescription = "Error response",
     hasSummaryFromDescription = true,
-    serializer = JSON.stringify,
+    serializer = defaultSerializer,
   }: GeneratorParams) {
     super();
     this.addInfo({ title, version }).addServer({ url: serverUrl });

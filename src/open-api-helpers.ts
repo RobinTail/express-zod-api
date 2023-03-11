@@ -511,6 +511,9 @@ export const depictBranded: Depicter<z.ZodBranded<z.ZodTypeAny, any>> = ({
   next,
 }) => next({ schema: schema.unwrap() });
 
+export const defaultSerializer = (schema: z.ZodTypeAny): string =>
+  createHash("sha1").update(JSON.stringify(schema), "utf8").digest("hex");
+
 export const depictLazy: Depicter<z.ZodLazy<z.ZodTypeAny>> = ({
   next,
   schema: lazy,
@@ -519,11 +522,8 @@ export const depictLazy: Depicter<z.ZodLazy<z.ZodTypeAny>> = ({
   makeRef,
 }): ReferenceObject => {
   // 1. serialize the schema
-  const serializedSchema = serialize(lazy.schema);
   // 2. make hash out of it
-  const hash = createHash("sha1")
-    .update(serializedSchema, "utf8")
-    .digest("hex");
+  const hash = serialize(lazy.schema);
   // 3. check if this hash already has a reference
   if (hasRef(hash)) {
     return { $ref: hash };
