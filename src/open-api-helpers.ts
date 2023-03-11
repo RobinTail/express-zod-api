@@ -14,6 +14,7 @@ import {
   SecurityRequirementObject,
   SecuritySchemeObject,
   TagObject,
+  isSchemaObject,
 } from "openapi3-ts";
 import { omit } from "ramda";
 import { z } from "zod";
@@ -62,7 +63,7 @@ export interface OpenAPIContext {
 type Depicter<
   T extends z.ZodTypeAny,
   Variant extends HandlingVariant = "regular"
-> = SchemaHandler<T, SchemaObject, OpenAPIContext, Variant>;
+> = SchemaHandler<T, SchemaObject | ReferenceObject, OpenAPIContext, Variant>;
 
 interface ReqResDepictHelperCommonProps {
   method: Method;
@@ -365,7 +366,10 @@ export const depictTuple: Depicter<z.ZodTuple> = ({
       format: "tuple",
       ...(types.length > 0 && {
         description: types
-          .map((item, index) => `${index}: ${item.type}`)
+          .map(
+            (item, index) =>
+              `${index}: ${isSchemaObject(item) ? item.type : item.$ref}`
+          )
           .join(", "),
       }),
     },
@@ -461,7 +465,7 @@ export const depictObjectProperties = ({
       ...carry,
       [key]: next({ schema: shape[key] }),
     }),
-    {} as Record<string, SchemaObject>
+    {} as Record<string, SchemaObject | ReferenceObject>
   );
 };
 
@@ -479,7 +483,7 @@ export const depictEffect: Depicter<z.ZodEffects<z.ZodTypeAny>> = ({
 }) => {
   const input = next({ schema: schema.innerType() });
   const { effect } = schema._def;
-  if (isResponse && effect.type === "transform") {
+  if (isResponse && effect.type === "transform" && isSchemaObject(input)) {
     const outputType = tryToTransform({ effect, sample: makeSample(input) });
     if (outputType && ["number", "string", "boolean"].includes(outputType)) {
       return { type: outputType as "number" | "string" | "boolean" };
@@ -487,7 +491,7 @@ export const depictEffect: Depicter<z.ZodEffects<z.ZodTypeAny>> = ({
       return next({ schema: z.any() });
     }
   }
-  if (!isResponse && effect.type === "preprocess") {
+  if (!isResponse && effect.type === "preprocess" && isSchemaObject(input)) {
     const { type: inputType, ...rest } = input;
     return {
       ...rest,
@@ -508,7 +512,6 @@ export const depictBranded: Depicter<z.ZodBranded<z.ZodTypeAny, any>> = ({
   next,
 }) => next({ schema: schema.unwrap() });
 
-// @ts-ignore
 export const depictLazy: Depicter<z.ZodLazy<z.ZodTypeAny>> = ({
   next,
   schema: lazy,
@@ -646,7 +649,10 @@ export const depictRequestParams = ({
     }));
 };
 
-export const depicters: HandlingRules<SchemaObject, OpenAPIContext> = {
+export const depicters: HandlingRules<
+  SchemaObject | ReferenceObject,
+  OpenAPIContext
+> = {
   ZodString: depictString,
   ZodNumber: depictNumber,
   ZodBigInt: depictBigInt,
@@ -756,6 +762,8 @@ export const depictResponse = ({
     ? endpoint.getMimeTypes("positive")
     : endpoint.getMimeTypes("negative");
   const depictedSchema = excludeExampleFromDepiction(
+    // @todo fix it
+    // @ts-ignore
     walkSchema({
       schema,
       isResponse: true,
@@ -882,6 +890,8 @@ export const depictRequest = ({
   const pathParams = getRoutePathParams(path);
   const bodyDepiction = excludeExampleFromDepiction(
     excludeParamsFromDepiction(
+      // @todo fix it
+      // @ts-ignore
       walkSchema({
         schema: endpoint.getSchema("input"),
         isResponse: false,
