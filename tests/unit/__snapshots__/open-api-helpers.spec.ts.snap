@@ -314,6 +314,18 @@ exports[`Open API helpers depictLazy should handle circular references 0 2`] = `
 }
 `;
 
+exports[`Open API helpers depictLazy should handle circular references 1 1`] = `
+{
+  "$ref": "7a225c55e65ab4a2fd3ce390265b255ee6747049",
+}
+`;
+
+exports[`Open API helpers depictLazy should handle circular references 1 2`] = `
+{
+  "$ref": "7a225c55e65ab4a2fd3ce390265b255ee6747049",
+}
+`;
+
 exports[`Open API helpers depictLiteral() should set type and involve enum property 1`] = `
 {
   "enum": [

@@ -91,6 +91,11 @@ describe("Open API helpers", () => {
         onMissing,
       });
 
+  beforeEach(() => {
+    hasRefMock.mockClear();
+    makeRefMock.mockClear();
+  });
+
   describe("extractObjectSchema()", () => {
     test("should pass the object schema through", () => {
       const subject = extractObjectSchema(z.object({ one: z.string() }));
@@ -883,16 +888,22 @@ describe("Open API helpers", () => {
     const recursiveArray: z.ZodLazy<z.ZodArray<any>> = z.lazy(() =>
       recursiveArray.array()
     );
+    const directlyRecursive: z.ZodLazy<any> = z.lazy(() => directlyRecursive);
 
     test.each([
       {
         schema: recursiveArray,
         hash: "6cbbd837811754902ea1e68d3e5c75e36250b880",
       },
+      {
+        schema: directlyRecursive,
+        hash: "7a225c55e65ab4a2fd3ce390265b255ee6747049",
+      },
     ])("should handle circular references %#", ({ schema, hash }) => {
       hasRefMock
         .mockImplementationOnce(() => false)
         .mockImplementationOnce(() => true);
+      expect(hasRefMock.mock.calls.length).toBe(0);
       expect(
         depictLazy({
           schema,
