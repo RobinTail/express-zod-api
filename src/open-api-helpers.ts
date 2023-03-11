@@ -521,18 +521,12 @@ export const depictLazy: Depicter<z.ZodLazy<z.ZodTypeAny>> = ({
   hasRef,
   makeRef,
 }): ReferenceObject => {
-  // 1. serialize the schema
-  // 2. make hash out of it
   const hash = serialize(lazy.schema);
-  // 3. check if this hash already has a reference
   if (hasRef(hash)) {
     return { $ref: hash };
   }
-  // 4. create an empty reference
-  const ref = makeRef!(hash, {});
-  // 5. update the reference with a deeper depicted schema
-  makeRef(hash, next({ schema: lazy.schema }));
-  // 6. return the previously created reference
+  const ref = makeRef!(hash, {}); // make empty ref first
+  makeRef(hash, next({ schema: lazy.schema })); // update
   return ref;
 };
 
