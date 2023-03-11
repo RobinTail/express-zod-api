@@ -183,6 +183,12 @@ describe("Open API helpers", () => {
       });
       expect(excludeParamsFromDepiction(depicted, ["a"])).toMatchSnapshot();
     });
+
+    test("should handle the ReferenceObject", () => {
+      expect(
+        excludeParamsFromDepiction({ $ref: "test" }, ["a"])
+      ).toMatchSnapshot();
+    });
   });
 
   describe("reformatParamsInPath()", () => {

@@ -1002,6 +1002,12 @@ exports[`Open API helpers excludeExampleFromDepiction() should remove example pr
 }
 `;
 
+exports[`Open API helpers excludeParamsFromDepiction() should handle the ReferenceObject 1`] = `
+{
+  "$ref": "test",
+}
+`;
+
 exports[`Open API helpers excludeParamsFromDepiction() should omit specified path params 0 1`] = `
 {
   "properties": {
