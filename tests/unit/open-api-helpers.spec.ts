@@ -58,7 +58,11 @@ import { serializeSchemaForTest } from "../helpers";
 
 describe("Open API helpers", () => {
   const hasRef = jest.fn();
-  const makeRef = jest.fn((name: string): ReferenceObject => ({ $ref: name }));
+  const makeRef = jest.fn(
+    (name: string, {}: SchemaObject | ReferenceObject): ReferenceObject => ({
+      $ref: name,
+    })
+  );
   const requestContext: OpenAPIContext = { isResponse: false, hasRef, makeRef };
   const responseContext: OpenAPIContext = { isResponse: true, hasRef, makeRef };
   const makeNext =
@@ -864,8 +868,16 @@ describe("Open API helpers", () => {
   });
 
   describe("depictLazy", () => {
-    test("should handle circular references", () => {
-      const schema: z.ZodLazy<z.ZodArray<any>> = z.lazy(() => schema.array());
+    const recursiveArray: z.ZodLazy<z.ZodArray<any>> = z.lazy(() =>
+      recursiveArray.array()
+    );
+
+    test.each([
+      {
+        schema: recursiveArray,
+        hash: "6cbbd837811754902ea1e68d3e5c75e36250b880",
+      },
+    ])("should handle circular references %#", ({ schema, hash }) => {
       hasRef
         .mockImplementationOnce(() => false)
         .mockImplementationOnce(() => true);
@@ -878,22 +890,12 @@ describe("Open API helpers", () => {
       ).toMatchSnapshot();
       expect(hasRef).toHaveBeenCalledTimes(2);
       for (const call of hasRef.mock.calls) {
-        expect(call[0]).toBe("6cbbd837811754902ea1e68d3e5c75e36250b880");
+        expect(call[0]).toBe(hash);
       }
       expect(makeRef).toHaveBeenCalledTimes(2);
-      expect(makeRef.mock.calls[0]).toEqual([
-        "6cbbd837811754902ea1e68d3e5c75e36250b880",
-        {},
-      ]);
-      expect(makeRef.mock.calls[1]).toEqual([
-        "6cbbd837811754902ea1e68d3e5c75e36250b880",
-        {
-          items: {
-            $ref: "6cbbd837811754902ea1e68d3e5c75e36250b880",
-          },
-          type: "array",
-        },
-      ]);
+      expect(makeRef.mock.calls[0]).toEqual([hash, {}]);
+      expect(makeRef.mock.calls[1][0]).toBe(hash);
+      expect(makeRef.mock.calls[1][1]).toMatchSnapshot();
     });
   });
 
