@@ -889,6 +889,9 @@ describe("Open API helpers", () => {
       recursiveArray.array()
     );
     const directlyRecursive: z.ZodLazy<any> = z.lazy(() => directlyRecursive);
+    const recursiveObject: z.ZodLazy<z.ZodObject<any>> = z.lazy(() =>
+      z.object({ prop: recursiveObject })
+    );
 
     test.each([
       {
@@ -898,6 +901,10 @@ describe("Open API helpers", () => {
       {
         schema: directlyRecursive,
         hash: "7a225c55e65ab4a2fd3ce390265b255ee6747049",
+      },
+      {
+        schema: recursiveObject,
+        hash: "118cb3b11b8a1f3b6b1e60a89f96a8be9da32a0f",
       },
     ])("should handle circular references %#", ({ schema, hash }) => {
       hasRefMock
