@@ -57,14 +57,22 @@ import { SchemaHandler, walkSchema } from "../../src/schema-walker";
 import { serializeSchemaForTest } from "../helpers";
 
 describe("Open API helpers", () => {
-  const hasRef = jest.fn();
-  const makeRef = jest.fn(
+  const hasRefMock = jest.fn();
+  const makeRefMock = jest.fn(
     (name: string, {}: SchemaObject | ReferenceObject): ReferenceObject => ({
       $ref: name,
     })
   );
-  const requestContext: OpenAPIContext = { isResponse: false, hasRef, makeRef };
-  const responseContext: OpenAPIContext = { isResponse: true, hasRef, makeRef };
+  const requestContext: OpenAPIContext = {
+    isResponse: false,
+    hasRef: hasRefMock,
+    makeRef: makeRefMock,
+  };
+  const responseContext: OpenAPIContext = {
+    isResponse: true,
+    hasRef: hasRefMock,
+    makeRef: makeRefMock,
+  };
   const makeNext =
     (
       context: OpenAPIContext
@@ -725,8 +733,8 @@ describe("Open API helpers", () => {
             handler: jest.fn(),
           }),
           inputSources: ["query", "params"],
-          hasRef,
-          makeRef,
+          hasRef: hasRefMock,
+          makeRef: makeRefMock,
         })
       ).toMatchSnapshot();
     });
@@ -746,8 +754,8 @@ describe("Open API helpers", () => {
             handler: jest.fn(),
           }),
           inputSources: ["body", "params"],
-          hasRef,
-          makeRef,
+          hasRef: hasRefMock,
+          makeRef: makeRefMock,
         })
       ).toMatchSnapshot();
     });
@@ -767,8 +775,8 @@ describe("Open API helpers", () => {
             handler: jest.fn(),
           }),
           inputSources: ["body"],
-          hasRef,
-          makeRef,
+          hasRef: hasRefMock,
+          makeRef: makeRefMock,
         })
       ).toMatchSnapshot();
     });
@@ -878,7 +886,7 @@ describe("Open API helpers", () => {
         hash: "6cbbd837811754902ea1e68d3e5c75e36250b880",
       },
     ])("should handle circular references %#", ({ schema, hash }) => {
-      hasRef
+      hasRefMock
         .mockImplementationOnce(() => false)
         .mockImplementationOnce(() => true);
       expect(
@@ -888,14 +896,14 @@ describe("Open API helpers", () => {
           next: makeNext(responseContext),
         })
       ).toMatchSnapshot();
-      expect(hasRef).toHaveBeenCalledTimes(2);
-      for (const call of hasRef.mock.calls) {
+      expect(hasRefMock).toHaveBeenCalledTimes(2);
+      for (const call of hasRefMock.mock.calls) {
         expect(call[0]).toBe(hash);
       }
-      expect(makeRef).toHaveBeenCalledTimes(2);
-      expect(makeRef.mock.calls[0]).toEqual([hash, {}]);
-      expect(makeRef.mock.calls[1][0]).toBe(hash);
-      expect(makeRef.mock.calls[1][1]).toMatchSnapshot();
+      expect(makeRefMock).toHaveBeenCalledTimes(2);
+      expect(makeRefMock.mock.calls[0]).toEqual([hash, {}]);
+      expect(makeRefMock.mock.calls[1][0]).toBe(hash);
+      expect(makeRefMock.mock.calls[1][1]).toMatchSnapshot();
     });
   });
 
