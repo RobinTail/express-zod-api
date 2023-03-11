@@ -5,7 +5,7 @@ import {
   SchemaObject,
   SecuritySchemeObject,
   SecuritySchemeType,
-  isSchemaObject,
+  isReferenceObject,
 } from "openapi3-ts";
 import { defaultInputSources, makeCleanId } from "./common-helpers";
 import { CommonConfig } from "./config-type";
@@ -44,15 +44,16 @@ export class OpenAPI extends OpenApiBuilder {
   protected lastOperationIdSuffixes: Record<string, number> = {};
   protected lastSchemaRefSuffix: number = 0;
 
-  protected ensureSchemaReference(subject: SchemaObject): ReferenceObject {
+  protected ensureSchemaReference(
+    subject: SchemaObject | ReferenceObject
+  ): ReferenceObject {
+    if (isReferenceObject(subject)) {
+      return subject;
+    }
     const serializedSubject = JSON.stringify(subject);
     for (const ref in this.rootDoc.components?.schemas || {}) {
       const entry = this.rootDoc.components?.schemas?.[ref];
-      if (
-        entry &&
-        isSchemaObject(entry) &&
-        serializedSubject === JSON.stringify(entry)
-      ) {
+      if (entry && serializedSubject === JSON.stringify(entry)) {
         return { $ref: ref };
       }
     }
