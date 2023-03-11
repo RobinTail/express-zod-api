@@ -744,7 +744,6 @@ export const excludeParamsFromDepiction = (
   );
 };
 
-// @todo should process the reference?
 export const excludeExampleFromDepiction = (
   depicted: SchemaObject | ReferenceObject
 ): SchemaObject | ReferenceObject =>
