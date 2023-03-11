@@ -516,6 +516,7 @@ export const depictLazy: Depicter<z.ZodLazy<z.ZodTypeAny>> = ({
   makeRef,
 }): ReferenceObject => {
   // 1. serialize the schema
+  // @todo make the serializer/comparator configurable
   const serializedSchema = JSON.stringify(lazy.schema);
   // 2. make hash out of it
   const hash = createHash("sha1")
