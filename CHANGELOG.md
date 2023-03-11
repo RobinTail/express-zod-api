@@ -2,6 +2,10 @@
 
 ## Version 9
 
+### v9.2.1
+
+- `zod` version is 3.21.4.
+
 ### v9.2.0
 
 - `zod` version is 3.21.2.
