@@ -222,13 +222,9 @@ export const hasCoercion = (schema: z.ZodTypeAny): boolean =>
     ? schema._def.coerce
     : false;
 
-export const makeCleanId = (
-  pathLike: string,
-  methodLike: string,
-  suffix?: string
-) => {
-  return [methodLike]
-    .concat(pathLike.split("/"))
+export const makeCleanId = (path: string, method: string, suffix?: string) => {
+  return [method]
+    .concat(path.split("/"))
     .concat(suffix || [])
     .flatMap((entry) => entry.split(/[^A-Z0-9]/gi))
     .map(
