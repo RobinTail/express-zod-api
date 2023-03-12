@@ -2,6 +2,10 @@
 
 ## Version 10
 
+### v10.0.0-beta4
+
+- No changes.
+
 ### v10.0.0-beta3
 
 - This release contains features from versions 9.3.0 (incl. hotfix 9.3.1) and 9.4.0.
