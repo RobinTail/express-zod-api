@@ -299,6 +299,53 @@ exports[`Open API helpers depictIntersection() should wrap next depicters in all
 }
 `;
 
+exports[`Open API helpers depictLazy should handle circular references 0 1`] = `
+{
+  "$ref": "6cbbd837811754902ea1e68d3e5c75e36250b880",
+}
+`;
+
+exports[`Open API helpers depictLazy should handle circular references 0 2`] = `
+{
+  "items": {
+    "$ref": "6cbbd837811754902ea1e68d3e5c75e36250b880",
+  },
+  "type": "array",
+}
+`;
+
+exports[`Open API helpers depictLazy should handle circular references 1 1`] = `
+{
+  "$ref": "7a225c55e65ab4a2fd3ce390265b255ee6747049",
+}
+`;
+
+exports[`Open API helpers depictLazy should handle circular references 1 2`] = `
+{
+  "$ref": "7a225c55e65ab4a2fd3ce390265b255ee6747049",
+}
+`;
+
+exports[`Open API helpers depictLazy should handle circular references 2 1`] = `
+{
+  "$ref": "118cb3b11b8a1f3b6b1e60a89f96a8be9da32a0f",
+}
+`;
+
+exports[`Open API helpers depictLazy should handle circular references 2 2`] = `
+{
+  "properties": {
+    "prop": {
+      "$ref": "118cb3b11b8a1f3b6b1e60a89f96a8be9da32a0f",
+    },
+  },
+  "required": [
+    "prop",
+  ],
+  "type": "object",
+}
+`;
+
 exports[`Open API helpers depictLiteral() should set type and involve enum property 1`] = `
 {
   "enum": [
@@ -984,6 +1031,12 @@ exports[`Open API helpers excludeExampleFromDepiction() should remove example pr
 {
   "description": "test",
   "type": "string",
+}
+`;
+
+exports[`Open API helpers excludeParamsFromDepiction() should handle the ReferenceObject 1`] = `
+{
+  "$ref": "test",
 }
 `;
 

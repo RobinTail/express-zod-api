@@ -1,3 +1,4 @@
+import { createHash } from "crypto";
 import {
   ContentObject,
   ExampleObject,
@@ -5,6 +6,7 @@ import {
   MediaTypeObject,
   OAuthFlowsObject,
   ParameterObject,
+  ReferenceObject,
   RequestBodyObject,
   ResponseObject,
   SchemaObject,
@@ -12,6 +14,8 @@ import {
   SecurityRequirementObject,
   SecuritySchemeObject,
   TagObject,
+  isReferenceObject,
+  isSchemaObject,
 } from "openapi3-ts";
 import { omit } from "ramda";
 import { z } from "zod";
@@ -50,14 +54,21 @@ type MediaExamples = Pick<MediaTypeObject, "examples">;
 
 export interface OpenAPIContext {
   isResponse: boolean;
+  serializer: (schema: z.ZodTypeAny) => string;
+  hasRef: (name: string) => boolean;
+  makeRef: (
+    name: string,
+    schema: SchemaObject | ReferenceObject
+  ) => ReferenceObject;
 }
 
 type Depicter<
   T extends z.ZodTypeAny,
   Variant extends HandlingVariant = "regular"
-> = SchemaHandler<T, SchemaObject, OpenAPIContext, Variant>;
+> = SchemaHandler<T, SchemaObject | ReferenceObject, OpenAPIContext, Variant>;
 
-interface ReqResDepictHelperCommonProps {
+interface ReqResDepictHelperCommonProps
+  extends Pick<OpenAPIContext, "serializer" | "hasRef" | "makeRef"> {
   method: Method;
   path: string;
   endpoint: AbstractEndpoint;
@@ -187,7 +198,7 @@ export const depictLiteral: Depicter<z.ZodLiteral<any>> = ({
 export const depictObject: Depicter<z.AnyZodObject> = ({
   schema,
   isResponse,
-  next,
+  ...rest
 }) => {
   const required = Object.keys(schema.shape).filter((key) => {
     const prop = schema.shape[key];
@@ -199,7 +210,7 @@ export const depictObject: Depicter<z.AnyZodObject> = ({
   });
   return {
     type: "object",
-    properties: depictObjectProperties({ schema, isResponse, next }),
+    properties: depictObjectProperties({ schema, isResponse, ...rest }),
     ...(required.length ? { required } : {}),
   };
 };
@@ -265,8 +276,7 @@ export const depictBigInt: Depicter<z.ZodBigInt> = () => ({
 
 export const depictRecord: Depicter<z.ZodRecord<z.ZodTypeAny>> = ({
   schema: { keySchema, valueSchema },
-  isResponse,
-  next,
+  ...rest
 }) => {
   if (keySchema instanceof z.ZodEnum || keySchema instanceof z.ZodNativeEnum) {
     const keys = Object.values(keySchema.enum) as string[];
@@ -281,8 +291,7 @@ export const depictRecord: Depicter<z.ZodRecord<z.ZodTypeAny>> = ({
       type: "object",
       properties: depictObjectProperties({
         schema: z.object(shape),
-        isResponse,
-        next,
+        ...rest,
       }),
       ...(keys.length ? { required: keys } : {}),
     };
@@ -294,8 +303,7 @@ export const depictRecord: Depicter<z.ZodRecord<z.ZodTypeAny>> = ({
         schema: z.object({
           [keySchema.value]: valueSchema,
         }),
-        isResponse,
-        next,
+        ...rest,
       }),
       required: [keySchema.value],
     };
@@ -318,8 +326,7 @@ export const depictRecord: Depicter<z.ZodRecord<z.ZodTypeAny>> = ({
         type: "object",
         properties: depictObjectProperties({
           schema: z.object(shape),
-          isResponse,
-          next,
+          ...rest,
         }),
         required: keySchema.options.map(
           (option: z.ZodLiteral<any>) => option.value
@@ -329,7 +336,7 @@ export const depictRecord: Depicter<z.ZodRecord<z.ZodTypeAny>> = ({
   }
   return {
     type: "object",
-    additionalProperties: next({ schema: valueSchema }),
+    additionalProperties: rest.next({ schema: valueSchema }),
   };
 };
 
@@ -358,7 +365,10 @@ export const depictTuple: Depicter<z.ZodTuple> = ({
       format: "tuple",
       ...(types.length > 0 && {
         description: types
-          .map((item, index) => `${index}: ${item.type}`)
+          .map(
+            (item, index) =>
+              `${index}: ${isSchemaObject(item) ? item.type : item.$ref}`
+          )
           .join(", "),
       }),
     },
@@ -454,7 +464,7 @@ export const depictObjectProperties = ({
       ...carry,
       [key]: next({ schema: shape[key] }),
     }),
-    {} as Record<string, SchemaObject>
+    {} as Record<string, SchemaObject | ReferenceObject>
   );
 };
 
@@ -472,7 +482,7 @@ export const depictEffect: Depicter<z.ZodEffects<z.ZodTypeAny>> = ({
 }) => {
   const input = next({ schema: schema.innerType() });
   const { effect } = schema._def;
-  if (isResponse && effect.type === "transform") {
+  if (isResponse && effect.type === "transform" && isSchemaObject(input)) {
     const outputType = tryToTransform({ effect, sample: makeSample(input) });
     if (outputType && ["number", "string", "boolean"].includes(outputType)) {
       return { type: outputType as "number" | "string" | "boolean" };
@@ -480,7 +490,7 @@ export const depictEffect: Depicter<z.ZodEffects<z.ZodTypeAny>> = ({
       return next({ schema: z.any() });
     }
   }
-  if (!isResponse && effect.type === "preprocess") {
+  if (!isResponse && effect.type === "preprocess" && isSchemaObject(input)) {
     const { type: inputType, ...rest } = input;
     return {
       ...rest,
@@ -500,6 +510,25 @@ export const depictBranded: Depicter<z.ZodBranded<z.ZodTypeAny, any>> = ({
   schema,
   next,
 }) => next({ schema: schema.unwrap() });
+
+export const defaultSerializer = (schema: z.ZodTypeAny): string =>
+  createHash("sha1").update(JSON.stringify(schema), "utf8").digest("hex");
+
+export const depictLazy: Depicter<z.ZodLazy<z.ZodTypeAny>> = ({
+  next,
+  schema: lazy,
+  serializer: serialize,
+  hasRef,
+  makeRef,
+}): ReferenceObject => {
+  const hash = serialize(lazy.schema);
+  if (hasRef(hash)) {
+    return { $ref: hash };
+  }
+  const ref = makeRef!(hash, {}); // make empty ref first
+  makeRef(hash, next({ schema: lazy.schema })); // update
+  return ref;
+};
 
 export const depictExamples = (
   schema: z.ZodTypeAny,
@@ -581,6 +610,9 @@ export const depictRequestParams = ({
   method,
   endpoint,
   inputSources,
+  serializer,
+  hasRef,
+  makeRef,
 }: ReqResDepictHelperCommonProps & {
   inputSources: InputSource[];
 }): ParameterObject[] => {
@@ -605,13 +637,19 @@ export const depictRequestParams = ({
           rules: depicters,
           onEach,
           onMissing,
+          serializer,
+          hasRef,
+          makeRef,
         }),
       },
       ...depictParamExamples(schema, false, name),
     }));
 };
 
-export const depicters: HandlingRules<SchemaObject, OpenAPIContext> = {
+export const depicters: HandlingRules<
+  SchemaObject | ReferenceObject,
+  OpenAPIContext
+> = {
   ZodString: depictString,
   ZodNumber: depictNumber,
   ZodBigInt: depictBigInt,
@@ -640,6 +678,7 @@ export const depicters: HandlingRules<SchemaObject, OpenAPIContext> = {
   ZodDate: depictDate,
   ZodCatch: depictCatch,
   ZodPipeline: depictPipeline,
+  ZodLazy: depictLazy,
 };
 
 export const onEach: Depicter<z.ZodTypeAny, "last"> = ({
@@ -647,10 +686,12 @@ export const onEach: Depicter<z.ZodTypeAny, "last"> = ({
   isResponse,
 }) => {
   const { description } = schema;
-  const examples = getExamples(schema, isResponse);
+  const shouldAvoidParsing = schema instanceof z.ZodLazy;
+  const examples = shouldAvoidParsing ? [] : getExamples(schema, isResponse);
   return {
     ...(description && { description }),
-    ...(schema.isNullable() &&
+    ...(!shouldAvoidParsing &&
+      schema.isNullable() &&
       !(isResponse && hasCoercion(schema)) && { nullable: true }),
     ...(examples.length > 0 && { example: examples[0] }),
   };
@@ -661,9 +702,12 @@ export const onMissing = (schema: z.ZodTypeAny) => {
 };
 
 export const excludeParamsFromDepiction = (
-  depicted: SchemaObject,
+  depicted: SchemaObject | ReferenceObject,
   pathParams: string[]
-): SchemaObject => {
+): SchemaObject | ReferenceObject => {
+  if (isReferenceObject(depicted)) {
+    return depicted;
+  }
   const properties = depicted.properties
     ? omit(pathParams, depicted.properties)
     : undefined;
@@ -700,8 +744,9 @@ export const excludeParamsFromDepiction = (
 };
 
 export const excludeExampleFromDepiction = (
-  depicted: SchemaObject
-): SchemaObject => omit(["example"], depicted);
+  depicted: SchemaObject | ReferenceObject
+): SchemaObject | ReferenceObject =>
+  isSchemaObject(depicted) ? omit(["example"], depicted) : depicted;
 
 export const depictResponse = ({
   method,
@@ -709,16 +754,15 @@ export const depictResponse = ({
   description,
   endpoint,
   isPositive,
+  serializer,
+  hasRef,
+  makeRef,
 }: ReqResDepictHelperCommonProps & {
   description: string;
   isPositive: boolean;
 }): ResponseObject => {
-  const schema = isPositive
-    ? endpoint.getSchema("positive")
-    : endpoint.getSchema("negative");
-  const mimeTypes = isPositive
-    ? endpoint.getMimeTypes("positive")
-    : endpoint.getMimeTypes("negative");
+  const schema = endpoint.getSchema(isPositive ? "positive" : "negative");
+  const mimeTypes = endpoint.getMimeTypes(isPositive ? "positive" : "negative");
   const depictedSchema = excludeExampleFromDepiction(
     walkSchema({
       schema,
@@ -726,6 +770,9 @@ export const depictResponse = ({
       rules: depicters,
       onEach,
       onMissing,
+      serializer,
+      hasRef,
+      makeRef,
     })
   );
   const examples = depictExamples(schema, true);
@@ -842,6 +889,9 @@ export const depictRequest = ({
   method,
   path,
   endpoint,
+  serializer,
+  hasRef,
+  makeRef,
 }: ReqResDepictHelperCommonProps): RequestBodyObject => {
   const pathParams = getRoutePathParams(path);
   const bodyDepiction = excludeExampleFromDepiction(
@@ -852,6 +902,9 @@ export const depictRequest = ({
         rules: depicters,
         onEach,
         onMissing,
+        serializer,
+        hasRef,
+        makeRef,
       }),
       pathParams
     )
