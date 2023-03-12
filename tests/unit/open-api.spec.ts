@@ -23,16 +23,23 @@ describe("Open API generator", () => {
   });
 
   describe("generateOpenApi()", () => {
-    test("should generate the correct schema of example routing", () => {
-      const spec = new OpenAPI({
-        routing,
-        config: exampleConfig,
-        version: "1.2.3",
-        title: "Example API",
-        serverUrl: "http://example.com",
-      }).getSpecAsYaml();
-      expect(spec).toMatchSnapshot();
-    });
+    test.each([
+      { composition: "inline" },
+      { composition: "components" },
+    ] as const)(
+      "should generate the correct schema of example routing %#",
+      ({ composition }) => {
+        const spec = new OpenAPI({
+          routing,
+          config: exampleConfig,
+          version: "1.2.3",
+          title: "Example API",
+          serverUrl: "http://example.com",
+          composition,
+        }).getSpecAsYaml();
+        expect(spec).toMatchSnapshot();
+      }
+    );
 
     test("should generate the correct schema for DELETE request without body", () => {
       const spec = new OpenAPI({

@@ -37,6 +37,8 @@ interface GeneratorParams {
   errorResponseDescription?: string;
   /** @default true */
   hasSummaryFromDescription?: boolean;
+  /** @default inline */
+  composition?: "inline" | "components";
   /**
    * @desc Used for comparing schemas wrapped into z.lazy() to limit the recursion
    * @default JSON.stringify() + SHA1 hash as a hex digest
@@ -97,6 +99,7 @@ export class OpenAPI extends OpenApiBuilder {
     successfulResponseDescription = "Successful response",
     errorResponseDescription = "Error response",
     hasSummaryFromDescription = true,
+    composition = "inline",
     serializer = defaultSerializer,
   }: GeneratorParams) {
     super();
@@ -111,6 +114,7 @@ export class OpenAPI extends OpenApiBuilder {
         path,
         method,
         endpoint,
+        composition,
         serializer,
         hasRef: this.hasRef.bind(this),
         makeRef: this.makeRef.bind(this),
@@ -129,12 +133,12 @@ export class OpenAPI extends OpenApiBuilder {
         responses: {
           [endpoint.getStatusCode("positive")]: depictResponse({
             ...commonParams,
-            description: successfulResponseDescription,
+            clue: successfulResponseDescription,
             isPositive: true,
           }),
           [endpoint.getStatusCode("negative")]: depictResponse({
             ...commonParams,
-            description: errorResponseDescription,
+            clue: errorResponseDescription,
             isPositive: false,
           }),
         },
