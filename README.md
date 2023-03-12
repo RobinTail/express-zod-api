@@ -811,7 +811,11 @@ Consuming the generated client requires Typescript version 4.1 or higher.
 import fs from "fs";
 import { Client } from "express-zod-api";
 
-fs.writeFileSync("./frontend/client.ts", new Client(routing).print(), "utf-8");
+fs.writeFileSync(
+  "./frontend/client.ts",
+  new Client({ routing }).print(),
+  "utf-8"
+);
 ```
 
 ```typescript
