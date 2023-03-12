@@ -35,6 +35,11 @@ interface Registry {
   [METHOD_PATH: string]: Record<"in" | "out", string> & { isJson: boolean };
 }
 
+interface GeneratorParams {
+  routing: Routing;
+  serializer?: (schema: z.ZodTypeAny) => string;
+}
+
 export class Client {
   protected agg: ts.Node[] = [];
   protected registry: Registry = {};
@@ -50,13 +55,7 @@ export class Client {
     return f.createTypeReferenceNode(name);
   }
 
-  constructor({
-    routing,
-    serializer = defaultSerializer,
-  }: {
-    routing: Routing;
-    serializer?: (schema: z.ZodTypeAny) => string;
-  }) {
+  constructor({ routing, serializer = defaultSerializer }: GeneratorParams) {
     walkRouting({
       routing,
       onEndpoint: (endpoint, path, method) => {
