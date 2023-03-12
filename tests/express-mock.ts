@@ -25,15 +25,12 @@ const newAppMock = () => ({
 
 const renewApp = () => {
   appMock = newAppMock();
+  return appMock;
 };
+renewApp.json = () => expressJsonMock;
+renewApp.static = staticMock;
 
-const expressMock = jest.mock("express", () => {
-  renewApp();
-  const returnFunction = () => appMock;
-  returnFunction.json = () => expressJsonMock;
-  returnFunction.static = staticMock;
-  return returnFunction;
-});
+const expressMock = jest.mock("express", () => renewApp);
 
 export {
   compressionMock,
