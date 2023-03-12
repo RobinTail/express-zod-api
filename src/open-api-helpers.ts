@@ -649,7 +649,7 @@ export const depictRequestParams = ({
         schema:
           composition === "references"
             ? makeRef(
-                makeCleanId(path, method, `${name} ${description}`),
+                makeCleanId(path, method, `${description} ${name}`),
                 depicted
               )
             : depicted,
