@@ -1,4 +1,5 @@
 import ts from "typescript";
+import { z } from "zod";
 import {
   exportModifier,
   f,
@@ -22,7 +23,7 @@ import {
   parametricIndexNode,
   protectedReadonlyModifier,
 } from "./client-helpers";
-import { makeCleanId } from "./common-helpers";
+import { defaultSerializer, makeCleanId } from "./common-helpers";
 import { methods } from "./method";
 import { mimeJson } from "./mime";
 import { Routing } from "./routing";
@@ -38,19 +39,41 @@ export class Client {
   protected agg: ts.Node[] = [];
   protected registry: Registry = {};
   protected paths: string[] = [];
+  protected aliases: Record<string, ts.TypeNode> = {};
 
-  constructor({ routing }: { routing: Routing }) {
+  protected hasAlias(name: string): boolean {
+    return name in this.aliases;
+  }
+
+  protected makeAlias(name: string, type: ts.TypeNode): ts.TypeReferenceNode {
+    this.aliases[name] = type;
+    return f.createTypeReferenceNode(name);
+  }
+
+  constructor({
+    routing,
+    serializer = defaultSerializer,
+  }: {
+    routing: Routing;
+    serializer?: (schema: z.ZodTypeAny) => string;
+  }) {
     walkRouting({
       routing,
       onEndpoint: (endpoint, path, method) => {
         const inputId = makeCleanId(path, method, "input");
         const responseId = makeCleanId(path, method, "response");
         const input = zodToTs({
+          serializer,
           schema: endpoint.getSchema("input"),
           isResponse: false,
+          hasAlias: this.hasAlias.bind(this),
+          makeAlias: this.makeAlias.bind(this),
         });
         const response = zodToTs({
+          serializer,
           isResponse: true,
+          hasAlias: this.hasAlias.bind(this),
+          makeAlias: this.makeAlias.bind(this),
           schema: endpoint
             .getSchema("positive")
             .or(endpoint.getSchema("negative")),
@@ -69,6 +92,10 @@ export class Client {
         }
       },
     });
+
+    this.agg = Object.entries(this.aliases)
+      .map<ts.Node>(([name, type]) => createTypeAlias(type, name))
+      .concat(this.agg);
 
     const pathNode = makePublicLiteralType("Path", this.paths);
     const methodNode = makePublicLiteralType("Method", methods);

@@ -1,11 +1,11 @@
 import { ReferenceObject, SchemaObject } from "openapi3-ts";
 import { z } from "zod";
+import { defaultSerializer } from "../../src/common-helpers";
 import { IOSchemaError } from "../../src/errors";
 import { OpenAPIError, defaultEndpointsFactory, ez, withMeta } from "../../src";
 import { getMeta } from "../../src/metadata";
 import {
   OpenAPIContext,
-  defaultSerializer,
   depictAny,
   depictArray,
   depictBigInt,

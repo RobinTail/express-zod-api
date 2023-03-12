@@ -7,12 +7,15 @@ import {
   SecuritySchemeType,
 } from "openapi3-ts";
 import { z } from "zod";
-import { defaultInputSources, makeCleanId } from "./common-helpers";
+import {
+  defaultInputSources,
+  defaultSerializer,
+  makeCleanId,
+} from "./common-helpers";
 import { CommonConfig } from "./config-type";
 import { mapLogicalContainer } from "./logical-container";
 import { Method } from "./method";
 import {
-  defaultSerializer,
   depictRequest,
   depictRequestParams,
   depictResponse,

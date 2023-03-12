@@ -203,6 +203,22 @@ const onPipeline: Producer<z.ZodPipeline<z.ZodTypeAny, z.ZodTypeAny>> = ({
 const onNull: Producer<z.ZodNull> = () =>
   f.createLiteralTypeNode(f.createNull());
 
+const onLazy: Producer<z.ZodLazy<z.ZodTypeAny>> = ({
+  hasAlias,
+  makeAlias,
+  next,
+  serializer: serialize,
+  schema: lazy,
+}) => {
+  const hash = `Type${serialize(lazy.schema)}`;
+  if (hasAlias(hash)) {
+    return f.createTypeReferenceNode(hash); // @todo consider changing it to getAlias
+  }
+  const ref = makeAlias(hash, f.createLiteralTypeNode(f.createNull())); // make empty type first
+  makeAlias(hash, next({ schema: lazy.schema })); // update
+  return ref;
+};
+
 const producers: HandlingRules<ts.TypeNode, ZTSContext> = {
   ZodString: onPrimitive(ts.SyntaxKind.StringKeyword),
   ZodNumber: onPrimitive(ts.SyntaxKind.NumberKeyword),
@@ -231,6 +247,7 @@ const producers: HandlingRules<ts.TypeNode, ZTSContext> = {
   ZodBranded: onBranded,
   ZodCatch: onCatch,
   ZodPipeline: onPipeline,
+  ZodLazy: onLazy,
 };
 
 export const zodToTs = ({

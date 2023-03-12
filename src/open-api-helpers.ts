@@ -1,4 +1,3 @@
-import { createHash } from "crypto";
 import {
   ContentObject,
   ExampleObject,
@@ -513,9 +512,6 @@ export const depictBranded: Depicter<z.ZodBranded<z.ZodTypeAny, any>> = ({
   schema,
   next,
 }) => next({ schema: schema.unwrap() });
-
-export const defaultSerializer = (schema: z.ZodTypeAny): string =>
-  createHash("sha1").update(JSON.stringify(schema), "utf8").digest("hex");
 
 export const depictLazy: Depicter<z.ZodLazy<z.ZodTypeAny>> = ({
   next,
