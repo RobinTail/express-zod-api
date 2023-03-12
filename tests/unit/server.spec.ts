@@ -20,7 +20,7 @@ import {
   createNotFoundHandler,
   createParserFailureHandler,
 } from "../../src/server";
-import express, { Request, Response } from "express"; // express is mocked server-mock.inc.ts
+import express, { Request, Response } from "express"; // express is mocked in express-mock.ts
 
 describe("Server", () => {
   afterAll(() => {

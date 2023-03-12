@@ -12,7 +12,7 @@ import { CommonConfig } from "../../src/config-type";
 import { mimeJson } from "../../src/mime";
 import { makeRequestMock, makeResponseMock } from "../../src/mock";
 import { initRouting } from "../../src/routing";
-import { Express, Request, RequestHandler, Response } from "express";
+import type { Express, Request, RequestHandler, Response } from "express";
 
 let appMock: any;
 let loggerMock: any;
