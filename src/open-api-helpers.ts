@@ -648,7 +648,10 @@ export const depictRequestParams = ({
         description: `${method.toUpperCase()} ${path} ${description}`,
         schema:
           composition === "references"
-            ? makeRef(makeCleanId(path, method, description), depicted)
+            ? makeRef(
+                makeCleanId(path, method, `${name} ${description}`),
+                depicted
+              )
             : depicted,
         ...depictParamExamples(schema, false, name),
       };
