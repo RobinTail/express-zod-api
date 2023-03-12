@@ -30,9 +30,22 @@ paths:
                         exclusiveMaximum: false
                       name:
                         type: string
+                      features:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            title:
+                              type: string
+                            features:
+                              $ref: 2048581c137c5b2130eb860e3ae37da196dfc25b
+                          required:
+                            - title
+                            - features
                     required:
                       - id
                       - name
+                      - features
                 required:
                   - status
                   - data
@@ -346,7 +359,19 @@ paths:
               required:
                 - avatar
 components:
-  schemas: {}
+  schemas:
+    2048581c137c5b2130eb860e3ae37da196dfc25b:
+      type: array
+      items:
+        type: object
+        properties:
+          title:
+            type: string
+          features:
+            $ref: 2048581c137c5b2130eb860e3ae37da196dfc25b
+        required:
+          - title
+          - features
   responses: {}
   parameters: {}
   examples: {}

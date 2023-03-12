@@ -9,6 +9,10 @@ type GetV1UserRetrieveResponse =
       data: {
         id: number;
         name: string;
+        features: {
+          title: string;
+          features: any;
+        }[];
       };
     }
   | {
