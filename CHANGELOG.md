@@ -7,7 +7,7 @@
 - Feature #875, proposed by [@VideoSystemsTech](https://github.com/VideoSystemsTech).
   - Ability to document the API specification keeping the schemas organized within named components.
   - `OpenAPI::constructor()` is equipped with a new optional property `composition` that can be:
-    - `inline` (default) — schemas are depicted directly in place of their usage;
+    - `inline` (default) — schemas are depicted directly in a place of their usage;
     - `components` (feature) — schemas are depicted within the `components` section and have references by their names.
 
 ```ts
