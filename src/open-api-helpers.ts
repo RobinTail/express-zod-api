@@ -73,8 +73,8 @@ interface ReqResDepictHelperCommonProps
   method: Method;
   path: string;
   endpoint: AbstractEndpoint;
+  composition: "inline" | "components";
   description?: string;
-  composition?: "inline" | "components";
 }
 
 const shortDescriptionLimit = 50;
@@ -616,7 +616,7 @@ export const depictRequestParams = ({
   serializer,
   hasRef,
   makeRef,
-  composition = "inline",
+  composition,
   description = "parameter",
 }: ReqResDepictHelperCommonProps & {
   inputSources: InputSource[];
@@ -768,8 +768,8 @@ export const depictResponse = ({
   serializer,
   hasRef,
   makeRef,
+  composition,
   description = isPositive ? "Successful response" : "Error response",
-  composition = "inline",
 }: ReqResDepictHelperCommonProps & {
   isPositive: boolean;
 }): ResponseObject => {
@@ -907,7 +907,7 @@ export const depictRequest = ({
   serializer,
   hasRef,
   makeRef,
-  composition = "inline",
+  composition,
   description = "request body",
 }: ReqResDepictHelperCommonProps): RequestBodyObject => {
   const pathParams = getRoutePathParams(path);
