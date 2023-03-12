@@ -641,15 +641,16 @@ export const depictRequestParams = ({
         hasRef,
         makeRef,
       });
+      const result =
+        composition === "components"
+          ? makeRef(makeCleanId(path, method, `${clue} ${name}`), depicted)
+          : depicted;
       return {
         name,
         in: isPathParam(name) ? "path" : "query",
         required: !shape[name].isOptional(),
         description: `${method.toUpperCase()} ${path} ${clue}`,
-        schema:
-          composition === "components"
-            ? makeRef(makeCleanId(path, method, `${clue} ${name}`), depicted)
-            : depicted,
+        schema: result,
         ...depictParamExamples(schema, false, name),
       };
     });
@@ -785,19 +786,17 @@ export const depictResponse = ({
     })
   );
   const examples = depictExamples(schema, true);
+  const result =
+    composition === "components"
+      ? makeRef(makeCleanId(path, method, clue), depictedSchema)
+      : depictedSchema;
 
   return {
     description: `${method.toUpperCase()} ${path} ${clue}`,
     content: mimeTypes.reduce(
       (carry, mimeType) => ({
         ...carry,
-        [mimeType]: {
-          schema:
-            composition === "components"
-              ? makeRef(makeCleanId(path, method, clue), depictedSchema)
-              : depictedSchema,
-          ...examples,
-        },
+        [mimeType]: { schema: result, ...examples },
       }),
       {} as ContentObject
     ),
@@ -928,19 +927,17 @@ export const depictRequest = ({
     false,
     pathParams
   );
+  const result =
+    composition === "components"
+      ? makeRef(makeCleanId(path, method, clue), bodyDepiction)
+      : bodyDepiction;
 
   return {
     description: `${method.toUpperCase()} ${path} ${clue}`,
     content: endpoint.getMimeTypes("input").reduce(
       (carry, mimeType) => ({
         ...carry,
-        [mimeType]: {
-          schema:
-            composition === "components"
-              ? makeRef(makeCleanId(path, method, clue), bodyDepiction)
-              : bodyDepiction,
-          ...bodyExamples,
-        },
+        [mimeType]: { schema: result, ...bodyExamples },
       }),
       {} as ContentObject
     ),
