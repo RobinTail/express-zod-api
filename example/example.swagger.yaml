@@ -84,10 +84,11 @@ paths:
         - name: id
           in: query
           required: true
+          description: GET /v1/user/retrieve parameter
           schema:
-            description: a numeric string containing the id of the user
             type: string
             pattern: /\d+/
+            description: a numeric string containing the id of the user
   "/v1/user/{id}":
     post:
       operationId: PostV1UserId
@@ -165,17 +166,17 @@ paths:
         - name: id
           in: path
           required: true
+          description: POST /v1/user/:id parameter
           schema:
-            description: POST /v1/user/:id parameter
             type: string
           examples:
             example1:
               value: "12"
       requestBody:
+        description: POST /v1/user/:id request body
         content:
           application/json:
             schema:
-              description: POST /v1/user/:id request body
               allOf:
                 - type: object
                   properties:
@@ -237,8 +238,8 @@ paths:
         - name: userId
           in: query
           required: true
+          description: GET /v1/avatar/send parameter
           schema:
-            description: GET /v1/avatar/send parameter
             type: string
             pattern: /\d+/
   /v1/avatar/stream:
@@ -266,8 +267,8 @@ paths:
         - name: userId
           in: query
           required: true
+          description: GET /v1/avatar/stream parameter
           schema:
-            description: GET /v1/avatar/stream parameter
             type: string
             pattern: /\d+/
   /v1/avatar/upload:
@@ -347,10 +348,10 @@ paths:
       tags:
         - files
       requestBody:
+        description: POST /v1/avatar/upload request body
         content:
           multipart/form-data:
             schema:
-              description: POST /v1/avatar/upload request body
               type: object
               properties:
                 avatar:

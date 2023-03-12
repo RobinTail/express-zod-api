@@ -64,10 +64,37 @@ const uploadSchema = ez.upload(); // namespace changed
 
 ## Version 9
 
+### v9.4.0
+
+- Feature #875, proposed by [@VideoSystemsTech](https://github.com/VideoSystemsTech).
+  - Ability to document the API specification keeping the schemas organized within named components.
+  - `OpenAPI::constructor()` is equipped with a new optional property `composition` that can be:
+    - `inline` (default) — schemas are depicted directly in a place of their usage;
+    - `components` (feature) — schemas are depicted within the `components` section and have references by their names.
+
+```ts
+// example usage
+new OpenAPI({
+  routing,
+  config,
+  version: "1.2.3",
+  title: "My API",
+  serverUrl: "https://example.com",
+  composition: "components", // <——
+}).getSpecAsYaml();
+```
+
 ### v9.3.1
 
 - Hotfix for the feature #856
   - `$ref` is equipped with the required prefix: `#/components/schemas/`.
+
+```yaml
+before:
+  $ref: 2048581c137c5b2130eb860e3ae37da196dfc25b
+after:
+  $ref: "#/components/schemas/2048581c137c5b2130eb860e3ae37da196dfc25b"
+```
 
 ### v9.3.0
 

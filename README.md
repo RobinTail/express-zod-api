@@ -847,6 +847,7 @@ const yamlString = new OpenAPI({
   version: "1.2.3",
   title: "Example API",
   serverUrl: "https://example.com",
+  composition: "inline", // optional, or "components" for keeping schemas in a separate dedicated section using refs
 }).getSpecAsYaml();
 ```
 
