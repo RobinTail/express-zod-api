@@ -44,14 +44,14 @@ export class Client {
   protected agg: ts.Node[] = [];
   protected registry: Registry = {};
   protected paths: string[] = [];
-  protected aliases: Record<string, ts.TypeNode> = {};
+  protected aliases: Record<string, ts.TypeAliasDeclaration> = {};
 
   protected hasAlias(name: string): boolean {
     return name in this.aliases;
   }
 
   protected makeAlias(name: string, type: ts.TypeNode): ts.TypeReferenceNode {
-    this.aliases[name] = type;
+    this.aliases[name] = createTypeAlias(type, name);
     return f.createTypeReferenceNode(name);
   }
 
@@ -92,9 +92,7 @@ export class Client {
       },
     });
 
-    this.agg = Object.entries(this.aliases)
-      .map<ts.Node>(([name, type]) => createTypeAlias(type, name))
-      .concat(this.agg);
+    this.agg = Object.values<ts.Node>(this.aliases).concat(this.agg);
 
     const pathNode = makePublicLiteralType("Path", this.paths);
     const methodNode = makePublicLiteralType("Method", methods);
