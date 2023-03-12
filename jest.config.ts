@@ -9,7 +9,6 @@ const config: Config.InitialOptions = {
   forceExit: true,
   collectCoverage: true,
   collectCoverageFrom: ["src/**"],
-  coveragePathIgnorePatterns: ["src/index.ts"],
   coverageReporters: ["json-summary", "text", "html", "lcov"],
   testTimeout: 10000,
 };
