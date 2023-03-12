@@ -1,14 +1,18 @@
 import {
   OpenApiBuilder,
   OperationObject,
+  ReferenceObject,
+  SchemaObject,
   SecuritySchemeObject,
   SecuritySchemeType,
 } from "openapi3-ts";
+import { z } from "zod";
 import { defaultInputSources, makeCleanId } from "./common-helpers";
 import { CommonConfig } from "./config-type";
 import { mapLogicalContainer } from "./logical-container";
 import { Method } from "./method";
 import {
+  defaultSerializer,
   depictRequest,
   depictRequestParams,
   depictResponse,
@@ -33,12 +37,29 @@ interface GeneratorParams {
   errorResponseDescription?: string;
   /** @default true */
   hasSummaryFromDescription?: boolean;
+  /**
+   * @desc Used for comparing schemas wrapped into z.lazy() to limit the recursion
+   * @default JSON.stringify() + SHA1 hash as a hex digest
+   * */
+  serializer?: (schema: z.ZodTypeAny) => string;
 }
 
 export class OpenAPI extends OpenApiBuilder {
   protected lastSecuritySchemaIds: Partial<Record<SecuritySchemeType, number>> =
     {};
   protected lastOperationIdSuffixes: Record<string, number> = {};
+
+  protected makeRef(
+    name: string,
+    schema: SchemaObject | ReferenceObject
+  ): ReferenceObject {
+    this.addSchema(name, schema);
+    return { $ref: `#/components/schemas/${name}` };
+  }
+
+  protected hasRef(name: string): boolean {
+    return name in (this.rootDoc.components?.schemas || {});
+  }
 
   protected ensureUniqOperationId(path: string, method: Method) {
     const operationId = makeCleanId(path, method);
@@ -51,9 +72,10 @@ export class OpenAPI extends OpenApiBuilder {
   }
 
   protected ensureUniqSecuritySchemaName(subject: SecuritySchemeObject) {
+    const serializedSubject = JSON.stringify(subject);
     for (const name in this.rootDoc.components?.securitySchemes || {}) {
       if (
-        JSON.stringify(subject) ===
+        serializedSubject ===
         JSON.stringify(this.rootDoc.components?.securitySchemes?.[name])
       ) {
         return name;
@@ -75,6 +97,7 @@ export class OpenAPI extends OpenApiBuilder {
     successfulResponseDescription = "Successful response",
     errorResponseDescription = "Error response",
     hasSummaryFromDescription = true,
+    serializer = defaultSerializer,
   }: GeneratorParams) {
     super();
     this.addInfo({ title, version }).addServer({ url: serverUrl });
@@ -84,7 +107,14 @@ export class OpenAPI extends OpenApiBuilder {
       _method
     ) => {
       const method = _method as Method;
-      const commonParams = { path, method, endpoint };
+      const commonParams = {
+        path,
+        method,
+        endpoint,
+        serializer,
+        hasRef: this.hasRef.bind(this),
+        makeRef: this.makeRef.bind(this),
+      };
       const [shortDesc, longDesc] = (["short", "long"] as const).map(
         endpoint.getDescription.bind(endpoint)
       );

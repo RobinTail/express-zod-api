@@ -2085,9 +2085,22 @@ paths:
                         exclusiveMaximum: false
                       name:
                         type: string
+                      features:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            title:
+                              type: string
+                            features:
+                              $ref: "#/components/schemas/2048581c137c5b2130eb860e3ae37da196dfc25b"
+                          required:
+                            - title
+                            - features
                     required:
                       - id
                       - name
+                      - features
                 required:
                   - status
                   - data
@@ -2401,7 +2414,19 @@ paths:
               required:
                 - avatar
 components:
-  schemas: {}
+  schemas:
+    2048581c137c5b2130eb860e3ae37da196dfc25b:
+      type: array
+      items:
+        type: object
+        properties:
+          title:
+            type: string
+          features:
+            $ref: "#/components/schemas/2048581c137c5b2130eb860e3ae37da196dfc25b"
+        required:
+          - title
+          - features
   responses: {}
   parameters: {}
   examples: {}
@@ -2520,6 +2545,111 @@ paths:
                 - dateIn
 components:
   schemas: {}
+  responses: {}
+  parameters: {}
+  examples: {}
+  requestBodies: {}
+  headers: {}
+  securitySchemes: {}
+  links: {}
+  callbacks: {}
+tags: []
+servers:
+  - url: http://example.com
+"
+`;
+
+exports[`Open API generator generateOpenApi() should handle circular schemas via z.lazy() 1`] = `
+"openapi: 3.0.0
+info:
+  title: Testing Lazy
+  version: 3.4.5
+paths:
+  /v1/getSomething:
+    post:
+      operationId: PostV1Getsomething
+      responses:
+        "200":
+          description: POST /v1/getSomething Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - success
+                  data:
+                    type: object
+                    properties:
+                      zodExample:
+                        type: object
+                        properties:
+                          name:
+                            type: string
+                          subcategories:
+                            $ref: "#/components/schemas/2048581c137c5b2130eb860e3ae37da196dfc25b"
+                        required:
+                          - name
+                          - subcategories
+                    required:
+                      - zodExample
+                required:
+                  - status
+                  - data
+        "400":
+          description: POST /v1/getSomething Error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                required:
+                  - status
+                  - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
+      requestBody:
+        content:
+          application/json:
+            schema:
+              description: POST /v1/getSomething request body
+              type: object
+              properties:
+                name:
+                  type: string
+              required:
+                - name
+components:
+  schemas:
+    2048581c137c5b2130eb860e3ae37da196dfc25b:
+      type: array
+      items:
+        type: object
+        properties:
+          name:
+            type: string
+          subcategories:
+            $ref: "#/components/schemas/2048581c137c5b2130eb860e3ae37da196dfc25b"
+        required:
+          - name
+          - subcategories
   responses: {}
   parameters: {}
   examples: {}

@@ -92,6 +92,22 @@ describe("Example", () => {
         data: {
           id: 50,
           name: "John Doe",
+          features: [
+            {
+              title: "Tall",
+              features: [{ title: "Above 180cm", features: [] }],
+            },
+            { title: "Young", features: [] },
+            {
+              title: "Cute",
+              features: [
+                {
+                  title: "Tells funny jokes",
+                  features: [{ title: "About Typescript", features: [] }],
+                },
+              ],
+            },
+          ],
         },
       });
       await waitFor(() => /v1\/user\/retrieve/.test(out));

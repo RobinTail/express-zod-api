@@ -3,6 +3,17 @@ import { createHttpError } from "../../src";
 import { taggedEndpointsFactory } from "../factories";
 import { methodProviderMiddleware } from "../middlewares";
 
+// Demonstrating circular schemas using z.lazy()
+const baseFeature = z.object({
+  title: z.string(),
+});
+type Feature = z.infer<typeof baseFeature> & {
+  features: Feature[];
+};
+const feature: z.ZodType<Feature> = baseFeature.extend({
+  features: z.lazy(() => feature.array()),
+});
+
 export const retrieveUserEndpoint = taggedEndpointsFactory
   .addMiddleware(methodProviderMiddleware)
   .build({
@@ -21,6 +32,7 @@ export const retrieveUserEndpoint = taggedEndpointsFactory
     output: z.object({
       id: z.number().int().nonnegative(),
       name: z.string(),
+      features: feature.array(),
     }),
     handler: async ({ input: { id }, options: { method }, logger }) => {
       logger.debug(`Requested id: ${id}, method ${method}`);
@@ -28,6 +40,22 @@ export const retrieveUserEndpoint = taggedEndpointsFactory
       if (id > 100) {
         throw createHttpError(404, "User not found");
       }
-      return { id, name };
+      return {
+        id,
+        name,
+        features: [
+          { title: "Tall", features: [{ title: "Above 180cm", features: [] }] },
+          { title: "Young", features: [] },
+          {
+            title: "Cute",
+            features: [
+              {
+                title: "Tells funny jokes",
+                features: [{ title: "About Typescript", features: [] }],
+              },
+            ],
+          },
+        ],
+      };
     },
   });
