@@ -24,6 +24,7 @@ import {
   getRoutePathParams,
   hasCoercion,
   hasTopLevelTransformingEffect,
+  makeCleanId,
   routePathParamsRegex,
   tryToTransform,
 } from "./common-helpers";
@@ -72,6 +73,8 @@ interface ReqResDepictHelperCommonProps
   method: Method;
   path: string;
   endpoint: AbstractEndpoint;
+  description?: string;
+  composition?: "inline" | "references";
 }
 
 const shortDescriptionLimit = 50;
@@ -613,6 +616,8 @@ export const depictRequestParams = ({
   serializer,
   hasRef,
   makeRef,
+  composition = "inline",
+  description = "parameter",
 }: ReqResDepictHelperCommonProps & {
   inputSources: InputSource[];
 }): ParameterObject[] => {
@@ -625,25 +630,29 @@ export const depictRequestParams = ({
     isParamsEnabled && pathParams.includes(name);
   return Object.keys(shape)
     .filter((name) => isQueryEnabled || isPathParam(name))
-    .map((name) => ({
-      name,
-      in: isPathParam(name) ? "path" : "query",
-      required: !shape[name].isOptional(),
-      schema: {
-        description: `${method.toUpperCase()} ${path} parameter`,
-        ...walkSchema({
-          schema: shape[name],
-          isResponse: false,
-          rules: depicters,
-          onEach,
-          onMissing,
-          serializer,
-          hasRef,
-          makeRef,
-        }),
-      },
-      ...depictParamExamples(schema, false, name),
-    }));
+    .map((name) => {
+      const depicted = walkSchema({
+        schema: shape[name],
+        isResponse: false,
+        rules: depicters,
+        onEach,
+        onMissing,
+        serializer,
+        hasRef,
+        makeRef,
+      });
+      return {
+        name,
+        in: isPathParam(name) ? "path" : "query",
+        required: !shape[name].isOptional(),
+        description: `${method.toUpperCase()} ${path} ${description}`,
+        schema:
+          composition === "references"
+            ? makeRef(makeCleanId(path, method, description), depicted)
+            : depicted,
+        ...depictParamExamples(schema, false, name),
+      };
+    });
 };
 
 export const depicters: HandlingRules<
@@ -751,14 +760,14 @@ export const excludeExampleFromDepiction = (
 export const depictResponse = ({
   method,
   path,
-  description,
   endpoint,
   isPositive,
   serializer,
   hasRef,
   makeRef,
+  description = isPositive ? "Successful response" : "Error response",
+  composition = "inline",
 }: ReqResDepictHelperCommonProps & {
-  description: string;
   isPositive: boolean;
 }): ResponseObject => {
   const schema = endpoint.getSchema(isPositive ? "positive" : "negative");
@@ -783,7 +792,10 @@ export const depictResponse = ({
       (carry, mimeType) => ({
         ...carry,
         [mimeType]: {
-          schema: depictedSchema,
+          schema:
+            composition === "references"
+              ? makeRef(makeCleanId(path, method, description), depictedSchema)
+              : depictedSchema,
           ...examples,
         },
       }),
@@ -892,6 +904,8 @@ export const depictRequest = ({
   serializer,
   hasRef,
   makeRef,
+  composition = "inline",
+  description = "request body",
 }: ReqResDepictHelperCommonProps): RequestBodyObject => {
   const pathParams = getRoutePathParams(path);
   const bodyDepiction = excludeExampleFromDepiction(
@@ -916,14 +930,15 @@ export const depictRequest = ({
   );
 
   return {
+    description: `${method.toUpperCase()} ${path} ${description}`,
     content: endpoint.getMimeTypes("input").reduce(
       (carry, mimeType) => ({
         ...carry,
         [mimeType]: {
-          schema: {
-            description: `${method.toUpperCase()} ${path} request body`,
-            ...bodyDepiction,
-          },
+          schema:
+            composition === "references"
+              ? makeRef(makeCleanId(path, method, description), bodyDepiction)
+              : bodyDepiction,
           ...bodyExamples,
         },
       }),

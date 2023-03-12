@@ -666,11 +666,11 @@ exports[`Open API helpers depictRequestParams() should depict none if both query
 exports[`Open API helpers depictRequestParams() should depict only path params if query is disabled 1`] = `
 [
   {
+    "description": "GET /v1/user/:id parameter",
     "in": "path",
     "name": "id",
     "required": true,
     "schema": {
-      "description": "GET /v1/user/:id parameter",
       "type": "string",
     },
   },
@@ -680,20 +680,20 @@ exports[`Open API helpers depictRequestParams() should depict only path params i
 exports[`Open API helpers depictRequestParams() should depict query and path params 1`] = `
 [
   {
+    "description": "GET /v1/user/:id parameter",
     "in": "path",
     "name": "id",
     "required": true,
     "schema": {
-      "description": "GET /v1/user/:id parameter",
       "type": "string",
     },
   },
   {
+    "description": "GET /v1/user/:id parameter",
     "in": "query",
     "name": "test",
     "required": true,
     "schema": {
-      "description": "GET /v1/user/:id parameter",
       "type": "boolean",
     },
   },
