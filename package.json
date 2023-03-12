@@ -30,7 +30,7 @@
   "types": "dist/index.d.ts",
   "module": "dist/esm/index.js",
   "exports": {
-    "types": "./dist/dts/index.d.ts",
+    "types": "./dist/index.d.ts",
     "require": "./dist/index.js",
     "import": "./dist/esm/index.js"
   },
