@@ -523,9 +523,9 @@ export const depictLazy: Depicter<z.ZodLazy<z.ZodTypeAny>> = ({
 }): ReferenceObject => {
   const hash = serialize(lazy.schema);
   if (hasRef(hash)) {
-    return { $ref: hash };
+    return { $ref: `#/components/schemas/${hash}` }; // @todo consider changing it to getRef that return ReferenceObject
   }
-  const ref = makeRef!(hash, {}); // make empty ref first
+  const ref = makeRef(hash, {}); // make empty ref first
   makeRef(hash, next({ schema: lazy.schema })); // update
   return ref;
 };

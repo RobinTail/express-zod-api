@@ -1985,7 +1985,7 @@ paths:
                             title:
                               type: string
                             features:
-                              $ref: 2048581c137c5b2130eb860e3ae37da196dfc25b
+                              $ref: "#/components/schemas/2048581c137c5b2130eb860e3ae37da196dfc25b"
                           required:
                             - title
                             - features
@@ -2315,7 +2315,7 @@ components:
           title:
             type: string
           features:
-            $ref: 2048581c137c5b2130eb860e3ae37da196dfc25b
+            $ref: "#/components/schemas/2048581c137c5b2130eb860e3ae37da196dfc25b"
         required:
           - title
           - features
@@ -2481,7 +2481,7 @@ paths:
                           name:
                             type: string
                           subcategories:
-                            $ref: 2048581c137c5b2130eb860e3ae37da196dfc25b
+                            $ref: "#/components/schemas/2048581c137c5b2130eb860e3ae37da196dfc25b"
                         required:
                           - name
                           - subcategories
@@ -2538,7 +2538,7 @@ components:
           name:
             type: string
           subcategories:
-            $ref: 2048581c137c5b2130eb860e3ae37da196dfc25b
+            $ref: "#/components/schemas/2048581c137c5b2130eb860e3ae37da196dfc25b"
         required:
           - name
           - subcategories
