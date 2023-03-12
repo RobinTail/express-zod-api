@@ -1,36 +1,38 @@
 // @see https://github.com/swc-project/jest/issues/14#issuecomment-970189585
 import http from "http";
 
+const expressJsonMock = jest.fn();
 const compressionMock = jest.fn();
 jest.mock("compression", () => compressionMock);
 
 const staticHandler = jest.fn();
 const staticMock = jest.fn(() => staticHandler);
 
-let appMock: ReturnType<typeof newAppMock>;
-const expressJsonMock = jest.fn();
-const newAppMock = () => ({
-  disable: jest.fn(),
-  use: jest.fn(),
-  listen: jest.fn((port, cb) => {
-    if (cb) {
-      cb();
-    }
-    return new http.Server();
-  }),
-  get: jest.fn(),
-  post: jest.fn(),
-  options: jest.fn(),
-});
+let appMock: Record<
+  "disable" | "use" | "listen" | "get" | "post" | "options",
+  jest.Mock
+>;
 
-const renewApp = () => {
-  appMock = newAppMock();
+const appCreatorMock = () => {
+  appMock = {
+    disable: jest.fn(),
+    use: jest.fn(),
+    listen: jest.fn((port, cb) => {
+      if (cb) {
+        cb();
+      }
+      return new http.Server();
+    }),
+    get: jest.fn(),
+    post: jest.fn(),
+    options: jest.fn(),
+  };
   return appMock;
 };
-renewApp.json = () => expressJsonMock;
-renewApp.static = staticMock;
+appCreatorMock.json = () => expressJsonMock;
+appCreatorMock.static = staticMock;
 
-const expressMock = jest.mock("express", () => renewApp);
+const expressMock = jest.mock("express", () => appCreatorMock);
 
 export {
   compressionMock,
