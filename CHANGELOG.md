@@ -2,6 +2,10 @@
 
 ## Version 10
 
+### v10.0.0-beta3
+
+- This release contains features from versions 9.3.0 (incl. hotfix 9.3.1) and 9.4.0.
+
 ### v10.0.0-beta2
 
 - **BREAKING** changes to the behavior of a public method.
@@ -29,6 +33,7 @@ const schemaB = withMeta(originalSchema).example("B");
 
 ### v10.0.0-beta1
 
+- This release is based on the features of version 9.2.1.
 - **BREAKING** changes to the concept of dependencies.
   - `zod` becomes a peer dependency, fixes issue #822.
     - You need to install it manually and adjust your imports accordingly.
@@ -40,6 +45,7 @@ const schemaB = withMeta(originalSchema).example("B");
   - Proprietary schemas are now exported under the namespace `ez`.
     - Imports and utilization should be adjusted accordingly.
     - Affected schemas: `file`, `dateIn`, `dateOut`, `upload`.
+  - If facing Typescript errors `TS4023` or `TS4094`, ensure disabling `declaration` option in your `tsconfig.json`.
 - **BREAKING** changes to the engines.
   - The minimal Node version is now 14.18.0.
 - Due to switching to `tsup` builder, the file structure has changed:
