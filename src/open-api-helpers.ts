@@ -74,7 +74,7 @@ interface ReqResDepictHelperCommonProps
   path: string;
   endpoint: AbstractEndpoint;
   description?: string;
-  composition?: "inline" | "references";
+  composition?: "inline" | "components";
 }
 
 const shortDescriptionLimit = 50;
@@ -647,7 +647,7 @@ export const depictRequestParams = ({
         required: !shape[name].isOptional(),
         description: `${method.toUpperCase()} ${path} ${description}`,
         schema:
-          composition === "references"
+          composition === "components"
             ? makeRef(
                 makeCleanId(path, method, `${description} ${name}`),
                 depicted
@@ -796,7 +796,7 @@ export const depictResponse = ({
         ...carry,
         [mimeType]: {
           schema:
-            composition === "references"
+            composition === "components"
               ? makeRef(makeCleanId(path, method, description), depictedSchema)
               : depictedSchema,
           ...examples,
@@ -939,7 +939,7 @@ export const depictRequest = ({
         ...carry,
         [mimeType]: {
           schema:
-            composition === "references"
+            composition === "components"
               ? makeRef(makeCleanId(path, method, description), bodyDepiction)
               : bodyDepiction,
           ...bodyExamples,

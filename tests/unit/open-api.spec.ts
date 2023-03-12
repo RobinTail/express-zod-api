@@ -25,7 +25,7 @@ describe("Open API generator", () => {
   describe("generateOpenApi()", () => {
     test.each([
       { composition: "inline" },
-      { composition: "references" },
+      { composition: "components" },
     ] as const)(
       "should generate the correct schema of example routing %#",
       ({ composition }) => {

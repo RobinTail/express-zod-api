@@ -38,7 +38,7 @@ interface GeneratorParams {
   /** @default true */
   hasSummaryFromDescription?: boolean;
   /** @default inline */
-  composition?: "inline" | "references";
+  composition?: "inline" | "components";
   /**
    * @desc Used for comparing schemas wrapped into z.lazy() to limit the recursion
    * @default JSON.stringify() + SHA1 hash as a hex digest
