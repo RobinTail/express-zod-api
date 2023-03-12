@@ -16,9 +16,7 @@ const isObject = <
   typeof subject === "object" && subject !== null;
 
 /** @desc combines several LogicalAnds into a one */
-export const flattenAnds = <T>(
-  subject: (T | LogicalAnd<T>)[]
-): LogicalAnd<T> => ({
+const flattenAnds = <T>(subject: (T | LogicalAnd<T>)[]): LogicalAnd<T> => ({
   and: subject.reduce<T[]>(
     (agg, item) =>
       agg.concat(isObject(item) && "and" in item ? item.and : item),
