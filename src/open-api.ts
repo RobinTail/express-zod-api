@@ -54,7 +54,7 @@ export class OpenAPI extends OpenApiBuilder {
     schema: SchemaObject | ReferenceObject
   ): ReferenceObject {
     this.addSchema(name, schema);
-    return { $ref: name };
+    return { $ref: `#/components/schemas/${name}` };
   }
 
   protected hasRef(name: string): boolean {

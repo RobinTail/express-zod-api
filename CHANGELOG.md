@@ -2,6 +2,11 @@
 
 ## Version 9
 
+### v9.3.1
+
+- Hotfix for the feature #856
+  - `$ref` is equipped with the required prefix: `#/components/schemas/`.
+
 ### v9.3.0
 
 - Feature #856, proposed by [@TheWisestOne](https://github.com/TheWisestOne) in discussion #801.
