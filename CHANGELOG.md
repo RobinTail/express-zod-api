@@ -2,6 +2,35 @@
 
 ## Version 9
 
+### v9.3.0
+
+- Feature #856, proposed by [@TheWisestOne](https://github.com/TheWisestOne) in discussion #801.
+  - Supporting `z.lazy()` in the documentation generator (OpenAPI), including circular schemas.
+  - The feature is only available for the OpenAPI generator, it's not available for the client generator yet.
+  - OpenAPI references are utilized in order to limit the possible recursion.
+  - A new optional property added to the constructor of the OpenAPI class:
+    - `serializer` is the function that accepts a schema and returns its unique identifier in order to compare them.
+    - When omitted, the default one used, which is `JSON.stringify()` + `SHA1` hash as a `hex` digest.
+    - If/when it's not enough precise, consider specifying your own implementation.
+
+```yaml
+# having z.lazy() within your IO schema
+before:
+  error: Zod type ZodLazy is unsupported
+after:
+  schema:
+    type: object
+    properties:
+      lazyProperty:
+        $ref: 2048581c137c5b2130eb860e3ae37da196dfc25b # sample reference
+  components:
+    schemas:
+      2048581c137c5b2130eb860e3ae37da196dfc25b:
+        type: array
+        items:
+          $ref: 2048581c137c5b2130eb860e3ae37da196dfc25b # circular reference
+```
+
 ### v9.2.1
 
 - `zod` version is 3.21.4.
