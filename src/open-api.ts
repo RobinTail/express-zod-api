@@ -133,12 +133,12 @@ export class OpenAPI extends OpenApiBuilder {
         responses: {
           [endpoint.getStatusCode("positive")]: depictResponse({
             ...commonParams,
-            description: successfulResponseDescription,
+            clue: successfulResponseDescription,
             isPositive: true,
           }),
           [endpoint.getStatusCode("negative")]: depictResponse({
             ...commonParams,
-            description: errorResponseDescription,
+            clue: errorResponseDescription,
             isPositive: false,
           }),
         },

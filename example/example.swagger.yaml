@@ -8,7 +8,7 @@ paths:
       operationId: GetV1UserRetrieve
       responses:
         "200":
-          description: GET /v1/user/retrieve Successful response
+          description: GET /v1/user/retrieve response
           content:
             application/json:
               schema:
@@ -50,7 +50,7 @@ paths:
                   - status
                   - data
         "400":
-          description: GET /v1/user/retrieve Error response
+          description: GET /v1/user/retrieve response
           content:
             application/json:
               schema:
@@ -94,7 +94,7 @@ paths:
       operationId: PostV1UserId
       responses:
         "200":
-          description: POST /v1/user/:id Successful response
+          description: POST /v1/user/:id response
           content:
             application/json:
               schema:
@@ -132,7 +132,7 @@ paths:
                       name: John Doe
                       createdAt: 2021-12-31T00:00:00.000Z
         "400":
-          description: POST /v1/user/:id Error response
+          description: POST /v1/user/:id response
           content:
             application/json:
               schema:
@@ -219,13 +219,13 @@ paths:
       operationId: GetV1AvatarSend
       responses:
         "200":
-          description: GET /v1/avatar/send Successful response
+          description: GET /v1/avatar/send response
           content:
             image/svg+xml:
               schema:
                 type: string
         "400":
-          description: GET /v1/avatar/send Error response
+          description: GET /v1/avatar/send response
           content:
             text/plain:
               schema:
@@ -247,14 +247,14 @@ paths:
       operationId: GetV1AvatarStream
       responses:
         "200":
-          description: GET /v1/avatar/stream Successful response
+          description: GET /v1/avatar/stream response
           content:
             image/*:
               schema:
                 type: string
                 format: binary
         "400":
-          description: GET /v1/avatar/stream Error response
+          description: GET /v1/avatar/stream response
           content:
             text/plain:
               schema:
@@ -276,7 +276,7 @@ paths:
       operationId: PostV1AvatarUpload
       responses:
         "200":
-          description: POST /v1/avatar/upload Successful response
+          description: POST /v1/avatar/upload response
           content:
             application/json:
               schema:
@@ -317,7 +317,7 @@ paths:
                   - status
                   - data
         "400":
-          description: POST /v1/avatar/upload Error response
+          description: POST /v1/avatar/upload response
           content:
             application/json:
               schema:

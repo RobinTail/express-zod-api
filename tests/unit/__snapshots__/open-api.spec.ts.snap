@@ -11,7 +11,7 @@ paths:
       operationId: GetV1Getsomething
       responses:
         "200":
-          description: GET /v1/getSomething Successful response
+          description: GET /v1/getSomething response
           content:
             application/json:
               schema:
@@ -35,7 +35,7 @@ paths:
                   - status
                   - data
         "400":
-          description: GET /v1/getSomething Error response
+          description: GET /v1/getSomething response
           content:
             application/json:
               schema:
@@ -75,7 +75,7 @@ paths:
       operationId: PostV1Getsomething
       responses:
         "200":
-          description: POST /v1/getSomething Successful response
+          description: POST /v1/getSomething response
           content:
             application/json:
               schema:
@@ -99,7 +99,7 @@ paths:
                   - status
                   - data
         "400":
-          description: POST /v1/getSomething Error response
+          description: POST /v1/getSomething response
           content:
             application/json:
               schema:
@@ -166,7 +166,7 @@ paths:
       operationId: PostV1Getsomething
       responses:
         "200":
-          description: POST /v1/getSomething Successful response
+          description: POST /v1/getSomething response
           content:
             application/json:
               schema:
@@ -200,7 +200,7 @@ paths:
                   - status
                   - data
         "400":
-          description: POST /v1/getSomething Error response
+          description: POST /v1/getSomething response
           content:
             application/json:
               schema:
@@ -277,7 +277,7 @@ paths:
       operationId: PostV1Getsomething
       responses:
         "200":
-          description: POST /v1/getSomething Successful response
+          description: POST /v1/getSomething response
           content:
             application/json:
               schema:
@@ -311,7 +311,7 @@ paths:
                     data:
                       num: 123
         "400":
-          description: POST /v1/getSomething Error response
+          description: POST /v1/getSomething response
           content:
             application/json:
               schema:
@@ -391,7 +391,7 @@ paths:
       operationId: GetV1Getsomething
       responses:
         "200":
-          description: GET /v1/getSomething Successful response
+          description: GET /v1/getSomething response
           content:
             application/json:
               schema:
@@ -420,7 +420,7 @@ paths:
                     data:
                       numericStr: "123"
         "400":
-          description: GET /v1/getSomething Error response
+          description: GET /v1/getSomething response
           content:
             application/json:
               schema:
@@ -483,7 +483,7 @@ paths:
       operationId: PostV1Getsomething
       responses:
         "200":
-          description: POST /v1/getSomething Successful response
+          description: POST /v1/getSomething response
           content:
             application/json:
               schema:
@@ -512,7 +512,7 @@ paths:
                     data:
                       numericStr: "123"
         "400":
-          description: POST /v1/getSomething Error response
+          description: POST /v1/getSomething response
           content:
             application/json:
               schema:
@@ -580,7 +580,7 @@ paths:
       operationId: GetV1Getsomething
       responses:
         "200":
-          description: GET /v1/getSomething Successful response
+          description: GET /v1/getSomething response
           content:
             application/json:
               schema:
@@ -602,7 +602,7 @@ paths:
                   - status
                   - data
         "400":
-          description: GET /v1/getSomething Error response
+          description: GET /v1/getSomething response
           content:
             application/json:
               schema:
@@ -663,7 +663,7 @@ paths:
       operationId: GetV1Getsomething
       responses:
         "200":
-          description: GET /v1/getSomething Successful response
+          description: GET /v1/getSomething response
           content:
             application/json:
               schema:
@@ -690,7 +690,7 @@ paths:
                   - status
                   - data
         "400":
-          description: GET /v1/getSomething Error response
+          description: GET /v1/getSomething response
           content:
             application/json:
               schema:
@@ -751,7 +751,7 @@ paths:
       operationId: GetV1Name
       responses:
         "200":
-          description: GET /v1/:name Successful response
+          description: GET /v1/:name response
           content:
             application/json:
               schema:
@@ -768,7 +768,7 @@ paths:
                   - status
                   - data
         "400":
-          description: GET /v1/:name Error response
+          description: GET /v1/:name response
           content:
             application/json:
               schema:
@@ -840,7 +840,7 @@ paths:
       operationId: PostV1Name
       responses:
         "200":
-          description: POST /v1/:name Successful response
+          description: POST /v1/:name response
           content:
             application/json:
               schema:
@@ -857,7 +857,7 @@ paths:
                   - status
                   - data
         "400":
-          description: POST /v1/:name Error response
+          description: POST /v1/:name response
           content:
             application/json:
               schema:
@@ -934,7 +934,7 @@ paths:
       operationId: GetV1GetsomeThing
       responses:
         "200":
-          description: GET /v1/getSome/thing Successful response
+          description: GET /v1/getSome/thing response
           content:
             application/json:
               schema:
@@ -951,7 +951,7 @@ paths:
                   - status
                   - data
         "400":
-          description: GET /v1/getSome/thing Error response
+          description: GET /v1/getSome/thing response
           content:
             application/json:
               schema:
@@ -984,7 +984,7 @@ paths:
       operationId: GetV1GetsomeThing2
       responses:
         "200":
-          description: GET /v1/getSome/:thing Successful response
+          description: GET /v1/getSome/:thing response
           content:
             application/json:
               schema:
@@ -1001,7 +1001,7 @@ paths:
                   - status
                   - data
         "400":
-          description: GET /v1/getSome/:thing Error response
+          description: GET /v1/getSome/:thing response
           content:
             application/json:
               schema:
@@ -1056,7 +1056,7 @@ paths:
       operationId: GetV1Getsomething
       responses:
         "200":
-          description: GET /v1/getSomething Successful response
+          description: GET /v1/getSomething response
           content:
             application/json:
               schema:
@@ -1082,7 +1082,7 @@ paths:
                   - status
                   - data
         "400":
-          description: GET /v1/getSomething Error response
+          description: GET /v1/getSomething response
           content:
             application/json:
               schema:
@@ -1129,7 +1129,7 @@ paths:
       operationId: PostV1Setsomething
       responses:
         "200":
-          description: POST /v1/setSomething Successful response
+          description: POST /v1/setSomething response
           content:
             application/json:
               schema:
@@ -1146,7 +1146,7 @@ paths:
                   - status
                   - data
         "400":
-          description: POST /v1/setSomething Error response
+          description: POST /v1/setSomething response
           content:
             application/json:
               schema:
@@ -1191,7 +1191,7 @@ paths:
       operationId: PutV1Updatesomething
       responses:
         "200":
-          description: PUT /v1/updateSomething Successful response
+          description: PUT /v1/updateSomething response
           content:
             application/json:
               schema:
@@ -1208,7 +1208,7 @@ paths:
                   - status
                   - data
         "400":
-          description: PUT /v1/updateSomething Error response
+          description: PUT /v1/updateSomething response
           content:
             application/json:
               schema:
@@ -1292,7 +1292,7 @@ paths:
       operationId: DeleteV1Deletesomething
       responses:
         "200":
-          description: DELETE /v1/deleteSomething Successful response
+          description: DELETE /v1/deleteSomething response
           content:
             application/json:
               schema:
@@ -1318,7 +1318,7 @@ paths:
                   - status
                   - data
         "400":
-          description: DELETE /v1/deleteSomething Error response
+          description: DELETE /v1/deleteSomething response
           content:
             application/json:
               schema:
@@ -1371,7 +1371,7 @@ paths:
       operationId: GetV1Getsomething
       responses:
         "200":
-          description: GET /v1/getSomething Successful response
+          description: GET /v1/getSomething response
           content:
             application/json:
               schema:
@@ -1402,7 +1402,7 @@ paths:
                   - status
                   - data
         "400":
-          description: GET /v1/getSomething Error response
+          description: GET /v1/getSomething response
           content:
             application/json:
               schema:
@@ -1485,7 +1485,7 @@ paths:
       operationId: PostV1Getsomething
       responses:
         "200":
-          description: POST /v1/getSomething Successful response
+          description: POST /v1/getSomething response
           content:
             application/json:
               schema:
@@ -1530,7 +1530,7 @@ paths:
                   - status
                   - data
         "400":
-          description: POST /v1/getSomething Error response
+          description: POST /v1/getSomething response
           content:
             application/json:
               schema:
@@ -1613,7 +1613,7 @@ paths:
       operationId: PostV1Getsomething
       responses:
         "200":
-          description: POST /v1/getSomething Successful response
+          description: POST /v1/getSomething response
           content:
             application/json:
               schema:
@@ -1651,7 +1651,7 @@ paths:
                   - status
                   - data
         "400":
-          description: POST /v1/getSomething Error response
+          description: POST /v1/getSomething response
           content:
             application/json:
               schema:
@@ -1727,7 +1727,7 @@ paths:
       operationId: GetV1Getsomething
       responses:
         "200":
-          description: GET /v1/getSomething Successful response
+          description: GET /v1/getSomething response
           content:
             application/json:
               schema:
@@ -1749,7 +1749,7 @@ paths:
                   - status
                   - data
         "400":
-          description: GET /v1/getSomething Error response
+          description: GET /v1/getSomething response
           content:
             application/json:
               schema:
@@ -1836,7 +1836,7 @@ paths:
       operationId: PostV1Getsomething
       responses:
         "200":
-          description: POST /v1/getSomething Successful response
+          description: POST /v1/getSomething response
           content:
             application/json:
               schema:
@@ -1864,7 +1864,7 @@ paths:
                   - status
                   - data
         "400":
-          description: POST /v1/getSomething Error response
+          description: POST /v1/getSomething response
           content:
             application/json:
               schema:
@@ -1956,7 +1956,7 @@ paths:
       operationId: GetV1UserRetrieve
       responses:
         "200":
-          description: GET /v1/user/retrieve Successful response
+          description: GET /v1/user/retrieve response
           content:
             application/json:
               schema:
@@ -1998,7 +1998,7 @@ paths:
                   - status
                   - data
         "400":
-          description: GET /v1/user/retrieve Error response
+          description: GET /v1/user/retrieve response
           content:
             application/json:
               schema:
@@ -2042,7 +2042,7 @@ paths:
       operationId: PostV1UserId
       responses:
         "200":
-          description: POST /v1/user/:id Successful response
+          description: POST /v1/user/:id response
           content:
             application/json:
               schema:
@@ -2080,7 +2080,7 @@ paths:
                       name: John Doe
                       createdAt: 2021-12-31T00:00:00.000Z
         "400":
-          description: POST /v1/user/:id Error response
+          description: POST /v1/user/:id response
           content:
             application/json:
               schema:
@@ -2167,13 +2167,13 @@ paths:
       operationId: GetV1AvatarSend
       responses:
         "200":
-          description: GET /v1/avatar/send Successful response
+          description: GET /v1/avatar/send response
           content:
             image/svg+xml:
               schema:
                 type: string
         "400":
-          description: GET /v1/avatar/send Error response
+          description: GET /v1/avatar/send response
           content:
             text/plain:
               schema:
@@ -2195,14 +2195,14 @@ paths:
       operationId: GetV1AvatarStream
       responses:
         "200":
-          description: GET /v1/avatar/stream Successful response
+          description: GET /v1/avatar/stream response
           content:
             image/*:
               schema:
                 type: string
                 format: binary
         "400":
-          description: GET /v1/avatar/stream Error response
+          description: GET /v1/avatar/stream response
           content:
             text/plain:
               schema:
@@ -2224,7 +2224,7 @@ paths:
       operationId: PostV1AvatarUpload
       responses:
         "200":
-          description: POST /v1/avatar/upload Successful response
+          description: POST /v1/avatar/upload response
           content:
             application/json:
               schema:
@@ -2265,7 +2265,7 @@ paths:
                   - status
                   - data
         "400":
-          description: POST /v1/avatar/upload Error response
+          description: POST /v1/avatar/upload response
           content:
             application/json:
               schema:
@@ -2358,17 +2358,17 @@ paths:
       operationId: GetV1UserRetrieve
       responses:
         "200":
-          description: GET /v1/user/retrieve Successful response
+          description: GET /v1/user/retrieve response
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/GetV1UserRetrieveSuccessfulResponse"
+                $ref: "#/components/schemas/GetV1UserRetrieveResponse"
         "400":
-          description: GET /v1/user/retrieve Error response
+          description: GET /v1/user/retrieve response
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/GetV1UserRetrieveErrorResponse"
+                $ref: "#/components/schemas/GetV1UserRetrieveResponse"
               examples:
                 example1:
                   value:
@@ -2391,11 +2391,11 @@ paths:
       operationId: PostV1UserId
       responses:
         "200":
-          description: POST /v1/user/:id Successful response
+          description: POST /v1/user/:id response
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PostV1UserIdSuccessfulResponse"
+                $ref: "#/components/schemas/PostV1UserIdResponse"
               examples:
                 example1:
                   value:
@@ -2404,11 +2404,11 @@ paths:
                       name: John Doe
                       createdAt: 2021-12-31T00:00:00.000Z
         "400":
-          description: POST /v1/user/:id Error response
+          description: POST /v1/user/:id response
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PostV1UserIdErrorResponse"
+                $ref: "#/components/schemas/PostV1UserIdResponse"
               examples:
                 example1:
                   value:
@@ -2449,17 +2449,17 @@ paths:
       operationId: GetV1AvatarSend
       responses:
         "200":
-          description: GET /v1/avatar/send Successful response
+          description: GET /v1/avatar/send response
           content:
             image/svg+xml:
               schema:
-                $ref: "#/components/schemas/GetV1AvatarSendSuccessfulResponse"
+                $ref: "#/components/schemas/GetV1AvatarSendResponse"
         "400":
-          description: GET /v1/avatar/send Error response
+          description: GET /v1/avatar/send response
           content:
             text/plain:
               schema:
-                $ref: "#/components/schemas/GetV1AvatarSendErrorResponse"
+                $ref: "#/components/schemas/GetV1AvatarSendResponse"
       summary: Sends a file content.
       tags:
         - files
@@ -2476,17 +2476,17 @@ paths:
       operationId: GetV1AvatarStream
       responses:
         "200":
-          description: GET /v1/avatar/stream Successful response
+          description: GET /v1/avatar/stream response
           content:
             image/*:
               schema:
-                $ref: "#/components/schemas/GetV1AvatarStreamSuccessfulResponse"
+                $ref: "#/components/schemas/GetV1AvatarStreamResponse"
         "400":
-          description: GET /v1/avatar/stream Error response
+          description: GET /v1/avatar/stream response
           content:
             text/plain:
               schema:
-                $ref: "#/components/schemas/GetV1AvatarStreamErrorResponse"
+                $ref: "#/components/schemas/GetV1AvatarStreamResponse"
       summary: Streams a file content.
       tags:
         - users
@@ -2503,17 +2503,17 @@ paths:
       operationId: PostV1AvatarUpload
       responses:
         "200":
-          description: POST /v1/avatar/upload Successful response
+          description: POST /v1/avatar/upload response
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PostV1AvatarUploadSuccessfulResponse"
+                $ref: "#/components/schemas/PostV1AvatarUploadResponse"
         "400":
-          description: POST /v1/avatar/upload Error response
+          description: POST /v1/avatar/upload response
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PostV1AvatarUploadErrorResponse"
+                $ref: "#/components/schemas/PostV1AvatarUploadResponse"
               examples:
                 example1:
                   value:
@@ -2548,45 +2548,7 @@ components:
         required:
           - title
           - features
-    GetV1UserRetrieveSuccessfulResponse:
-      type: object
-      properties:
-        status:
-          type: string
-          enum:
-            - success
-        data:
-          type: object
-          properties:
-            id:
-              type: integer
-              format: int64
-              minimum: 0
-              exclusiveMinimum: false
-              maximum: 9007199254740991
-              exclusiveMaximum: false
-            name:
-              type: string
-            features:
-              type: array
-              items:
-                type: object
-                properties:
-                  title:
-                    type: string
-                  features:
-                    $ref: "#/components/schemas/2048581c137c5b2130eb860e3ae37da196dfc25b"
-                required:
-                  - title
-                  - features
-          required:
-            - id
-            - name
-            - features
-      required:
-        - status
-        - data
-    GetV1UserRetrieveErrorResponse:
+    GetV1UserRetrieveResponse:
       type: object
       properties:
         status:
@@ -2605,34 +2567,7 @@ components:
         - error
     PostV1UserIdParameterId:
       type: string
-    PostV1UserIdSuccessfulResponse:
-      type: object
-      properties:
-        status:
-          type: string
-          enum:
-            - success
-        data:
-          type: object
-          properties:
-            name:
-              type: string
-            createdAt:
-              description: YYYY-MM-DDTHH:mm:ss.sssZ
-              type: string
-              format: date-time
-              externalDocs:
-                url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
-          required:
-            - name
-            - createdAt
-          example:
-            name: John Doe
-            createdAt: 2021-12-31T00:00:00.000Z
-      required:
-        - status
-        - data
-    PostV1UserIdErrorResponse:
+    PostV1UserIdResponse:
       type: object
       properties:
         status:
@@ -2681,56 +2616,14 @@ components:
     GetV1AvatarSendParameterUserid:
       type: string
       pattern: /\\d+/
-    GetV1AvatarSendSuccessfulResponse:
-      type: string
-    GetV1AvatarSendErrorResponse:
+    GetV1AvatarSendResponse:
       type: string
     GetV1AvatarStreamParameterUserid:
       type: string
       pattern: /\\d+/
-    GetV1AvatarStreamSuccessfulResponse:
+    GetV1AvatarStreamResponse:
       type: string
-      format: binary
-    GetV1AvatarStreamErrorResponse:
-      type: string
-    PostV1AvatarUploadSuccessfulResponse:
-      type: object
-      properties:
-        status:
-          type: string
-          enum:
-            - success
-        data:
-          type: object
-          properties:
-            name:
-              type: string
-            size:
-              type: integer
-              format: int64
-              minimum: 0
-              exclusiveMinimum: false
-              maximum: 9007199254740991
-              exclusiveMaximum: false
-            mime:
-              type: string
-            hash:
-              type: string
-            otherInputs:
-              type: object
-              additionalProperties:
-                format: any
-                nullable: true
-          required:
-            - name
-            - size
-            - mime
-            - hash
-            - otherInputs
-      required:
-        - status
-        - data
-    PostV1AvatarUploadErrorResponse:
+    PostV1AvatarUploadResponse:
       type: object
       properties:
         status:
@@ -2792,7 +2685,7 @@ paths:
       operationId: PostV1Getsomething
       responses:
         "200":
-          description: POST /v1/getSomething Successful response
+          description: POST /v1/getSomething response
           content:
             application/json:
               schema:
@@ -2822,7 +2715,7 @@ paths:
                   - status
                   - data
         "400":
-          description: POST /v1/getSomething Error response
+          description: POST /v1/getSomething response
           content:
             application/json:
               schema:
@@ -2898,7 +2791,7 @@ paths:
       operationId: PostV1Getsomething
       responses:
         "200":
-          description: POST /v1/getSomething Successful response
+          description: POST /v1/getSomething response
           content:
             application/json:
               schema:
@@ -2927,7 +2820,7 @@ paths:
                   - status
                   - data
         "400":
-          description: POST /v1/getSomething Error response
+          description: POST /v1/getSomething response
           content:
             application/json:
               schema:
@@ -3003,7 +2896,7 @@ paths:
       operationId: GetV1Getsomething
       responses:
         "201":
-          description: GET /v1/getSomething Successful response
+          description: GET /v1/getSomething response
           content:
             application/json:
               schema: &a1
@@ -3022,7 +2915,7 @@ paths:
             text/vnd.yaml:
               schema: *a1
         "403":
-          description: GET /v1/getSomething Error response
+          description: GET /v1/getSomething response
           content:
             text/vnd.yaml:
               schema:
@@ -3061,7 +2954,7 @@ paths:
       operationId: PostV1Getsomething
       responses:
         "200":
-          description: POST /v1/getSomething Successful response
+          description: POST /v1/getSomething response
           content:
             application/json:
               schema:
@@ -3083,7 +2976,7 @@ paths:
                   - status
                   - data
         "400":
-          description: POST /v1/getSomething Error response
+          description: POST /v1/getSomething response
           content:
             application/json:
               schema:
@@ -3215,7 +3108,7 @@ paths:
       operationId: PostV1Getsomething
       responses:
         "200":
-          description: POST /v1/getSomething Successful response
+          description: POST /v1/getSomething response
           content:
             application/json:
               schema:
@@ -3237,7 +3130,7 @@ paths:
                   - status
                   - data
         "400":
-          description: POST /v1/getSomething Error response
+          description: POST /v1/getSomething response
           content:
             application/json:
               schema:
@@ -3357,7 +3250,7 @@ paths:
       operationId: PostV1Getsomething
       responses:
         "200":
-          description: POST /v1/getSomething Successful response
+          description: POST /v1/getSomething response
           content:
             application/json:
               schema:
@@ -3381,7 +3274,7 @@ paths:
                   - status
                   - data
         "400":
-          description: POST /v1/getSomething Error response
+          description: POST /v1/getSomething response
           content:
             application/json:
               schema:
@@ -3448,7 +3341,7 @@ paths:
       operationId: PostV1Getsomething
       responses:
         "200":
-          description: POST /v1/getSomething Successful response
+          description: POST /v1/getSomething response
           content:
             application/json:
               schema:
@@ -3516,7 +3409,7 @@ paths:
                   - status
                   - data
         "400":
-          description: POST /v1/getSomething Error response
+          description: POST /v1/getSomething response
           content:
             application/json:
               schema:
@@ -3576,7 +3469,7 @@ paths:
       operationId: PostV1Getsomething
       responses:
         "200":
-          description: POST /v1/getSomething Successful response
+          description: POST /v1/getSomething response
           content:
             application/json:
               schema:
@@ -3597,7 +3490,7 @@ paths:
                   - status
                   - data
         "400":
-          description: POST /v1/getSomething Error response
+          description: POST /v1/getSomething response
           content:
             application/json:
               schema:
@@ -3669,7 +3562,7 @@ paths:
       operationId: PostV1Getsomething
       responses:
         "200":
-          description: POST /v1/getSomething Successful response
+          description: POST /v1/getSomething response
           content:
             application/json:
               schema:
@@ -3695,7 +3588,7 @@ paths:
                   - status
                   - data
         "400":
-          description: POST /v1/getSomething Error response
+          description: POST /v1/getSomething response
           content:
             application/json:
               schema:
@@ -3795,7 +3688,7 @@ paths:
       operationId: GetV1Getsomething
       responses:
         "200":
-          description: GET /v1/getSomething Successful response
+          description: GET /v1/getSomething response
           content:
             application/json:
               schema:
@@ -3815,7 +3708,7 @@ paths:
                   - status
                   - data
         "400":
-          description: GET /v1/getSomething Error response
+          description: GET /v1/getSomething response
           content:
             application/json:
               schema:
@@ -3876,7 +3769,7 @@ paths:
       operationId: GetV1Getsomething
       responses:
         "200":
-          description: GET /v1/getSomething Successful response
+          description: GET /v1/getSomething response
           content:
             application/json:
               schema:
@@ -3896,7 +3789,7 @@ paths:
                   - status
                   - data
         "400":
-          description: GET /v1/getSomething Error response
+          description: GET /v1/getSomething response
           content:
             application/json:
               schema:
