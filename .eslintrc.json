@@ -30,7 +30,7 @@
     {
       "files": [
         "./tools/*.ts",
-        "./tests/**/*.spec.ts"
+        "./tests/**/*.ts"
       ],
       "rules": {
         "import/no-extraneous-dependencies": "off"

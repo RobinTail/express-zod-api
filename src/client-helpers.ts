@@ -4,7 +4,7 @@ export const f = ts.factory;
 
 export const exportModifier = [f.createModifier(ts.SyntaxKind.ExportKeyword)];
 
-export const publicReadonlyModifier = [
+const publicReadonlyModifier = [
   f.createModifier(ts.SyntaxKind.PublicKeyword),
   f.createModifier(ts.SyntaxKind.ReadonlyKeyword),
 ];
