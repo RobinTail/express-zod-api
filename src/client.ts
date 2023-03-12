@@ -39,8 +39,7 @@ export class Client {
   protected registry: Registry = {};
   protected paths: string[] = [];
 
-  // @todo for v10: change to an object, similar to OpenAPI
-  constructor(routing: Routing) {
+  constructor({ routing }: { routing: Routing }) {
     walkRouting({
       routing,
       onEndpoint: (endpoint, path, method) => {
