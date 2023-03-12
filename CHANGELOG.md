@@ -5,6 +5,15 @@
 ### v10.0.0-beta3
 
 - This release contains features from versions 9.3.0 (incl. hotfix 9.3.1) and 9.4.0.
+- **BREAKING** changes:
+  - `Client::constructor()` now requires an object argument having `routing` property.
+
+```ts
+// before
+new Client(routing).print();
+// after
+new Client({ routing }).print();
+```
 
 ### v10.0.0-beta2
 
