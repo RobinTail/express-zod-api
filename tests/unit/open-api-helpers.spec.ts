@@ -1,10 +1,11 @@
-import { SchemaObject } from "openapi3-ts";
+import { ReferenceObject, SchemaObject } from "openapi3-ts";
 import { z } from "zod";
 import { IOSchemaError } from "../../src/errors";
 import { OpenAPIError, defaultEndpointsFactory, ez, withMeta } from "../../src";
 import { getMeta } from "../../src/metadata";
 import {
   OpenAPIContext,
+  defaultSerializer,
   depictAny,
   depictArray,
   depictBigInt,
@@ -21,6 +22,7 @@ import {
   depictExamples,
   depictFile,
   depictIntersection,
+  depictLazy,
   depictLiteral,
   depictNull,
   depictNullable,
@@ -52,12 +54,33 @@ import { SchemaHandler, walkSchema } from "../../src/schema-walker";
 import { serializeSchemaForTest } from "../helpers";
 
 describe("Open API helpers", () => {
-  const requestContext: OpenAPIContext = { isResponse: false };
-  const responseContext: OpenAPIContext = { isResponse: true };
+  const hasRefMock = jest.fn();
+  const makeRefMock = jest.fn(
+    (name: string, {}: SchemaObject | ReferenceObject): ReferenceObject => ({
+      $ref: name,
+    })
+  );
+  const requestContext: OpenAPIContext = {
+    isResponse: false,
+    hasRef: hasRefMock,
+    makeRef: makeRefMock,
+    serializer: defaultSerializer,
+  };
+  const responseContext: OpenAPIContext = {
+    isResponse: true,
+    hasRef: hasRefMock,
+    makeRef: makeRefMock,
+    serializer: defaultSerializer,
+  };
   const makeNext =
     (
       context: OpenAPIContext
-    ): SchemaHandler<z.ZodTypeAny, SchemaObject, {}, "last"> =>
+    ): SchemaHandler<
+      z.ZodTypeAny,
+      SchemaObject | ReferenceObject,
+      {},
+      "last"
+    > =>
     ({ schema }) =>
       walkSchema({
         schema,
@@ -66,6 +89,11 @@ describe("Open API helpers", () => {
         onEach,
         onMissing,
       });
+
+  beforeEach(() => {
+    hasRefMock.mockClear();
+    makeRefMock.mockClear();
+  });
 
   describe("extractObjectSchema()", () => {
     test("should pass the object schema through", () => {
@@ -158,6 +186,12 @@ describe("Open API helpers", () => {
         onMissing,
       });
       expect(excludeParamsFromDepiction(depicted, ["a"])).toMatchSnapshot();
+    });
+
+    test("should handle the ReferenceObject", () => {
+      expect(
+        excludeParamsFromDepiction({ $ref: "test" }, ["a"])
+      ).toMatchSnapshot();
     });
   });
 
@@ -308,7 +342,7 @@ describe("Open API helpers", () => {
   });
 
   describe("depictOptional()", () => {
-    test.each<OpenAPIContext>([{ isResponse: false }, { isResponse: true }])(
+    test.each<OpenAPIContext>([requestContext, responseContext])(
       "should pass the next depicter %#",
       (context) => {
         expect(
@@ -323,7 +357,7 @@ describe("Open API helpers", () => {
   });
 
   describe("depictNullable()", () => {
-    test.each<OpenAPIContext>([{ isResponse: false }, { isResponse: true }])(
+    test.each<OpenAPIContext>([requestContext, responseContext])(
       "should set nullable:true %#",
       (context) => {
         expect(
@@ -369,30 +403,30 @@ describe("Open API helpers", () => {
   });
 
   describe("depictObject()", () => {
-    test.each<OpenAPIContext & { shape: z.ZodRawShape }>([
+    test.each<{ context: OpenAPIContext; shape: z.ZodRawShape }>([
       {
-        isResponse: false,
+        context: requestContext,
         shape: { a: z.number(), b: z.string() },
       },
       {
-        isResponse: true,
+        context: responseContext,
         shape: { a: z.number(), b: z.string() },
       },
       {
-        isResponse: true,
+        context: responseContext,
         shape: { a: z.coerce.number(), b: z.string({ coerce: true }) },
       },
       {
-        isResponse: true,
+        context: responseContext,
         shape: { a: z.number(), b: z.string().optional() },
       },
       {
-        isResponse: false,
+        context: requestContext,
         shape: { a: z.number().optional(), b: z.coerce.string() },
       },
     ])(
       "should type:object, properties and required props %#",
-      ({ shape, ...context }) => {
+      ({ shape, context }) => {
         expect(
           depictObject({
             schema: z.object(shape),
@@ -561,32 +595,34 @@ describe("Open API helpers", () => {
   });
 
   describe("depictEffect()", () => {
-    test.each<OpenAPIContext & { schema: z.ZodEffects<any>; expected: string }>(
-      [
-        {
-          schema: z.string().transform((v) => parseInt(v, 10)),
-          isResponse: true,
-          expected: "number (out)",
-        },
-        {
-          schema: z.string().transform((v) => parseInt(v, 10)),
-          isResponse: false,
-          expected: "string (in)",
-        },
-        {
-          schema: z.preprocess((v) => parseInt(`${v}`, 10), z.string()),
-          isResponse: false,
-          expected: "string (preprocess)",
-        },
-        {
-          schema: z
-            .object({ s: z.string() })
-            .refine(() => false, { message: "test" }),
-          isResponse: false,
-          expected: "object (refinement)",
-        },
-      ]
-    )("should depict as $expected", ({ schema, ...context }) => {
+    test.each<{
+      context: OpenAPIContext;
+      schema: z.ZodEffects<any>;
+      expected: string;
+    }>([
+      {
+        schema: z.string().transform((v) => parseInt(v, 10)),
+        context: responseContext,
+        expected: "number (out)",
+      },
+      {
+        schema: z.string().transform((v) => parseInt(v, 10)),
+        context: requestContext,
+        expected: "string (in)",
+      },
+      {
+        schema: z.preprocess((v) => parseInt(`${v}`, 10), z.string()),
+        context: requestContext,
+        expected: "string (preprocess)",
+      },
+      {
+        schema: z
+          .object({ s: z.string() })
+          .refine(() => false, { message: "test" }),
+        context: requestContext,
+        expected: "object (refinement)",
+      },
+    ])("should depict as $expected", ({ schema, context }) => {
       expect(
         depictEffect({
           schema,
@@ -613,10 +649,10 @@ describe("Open API helpers", () => {
   });
 
   describe("depictPipeline", () => {
-    test.each<OpenAPIContext & { expected: string }>([
-      { isResponse: true, expected: "boolean (out)" },
-      { isResponse: false, expected: "string (in)" },
-    ])("should depict as $expected", (context) => {
+    test.each<{ context: OpenAPIContext; expected: string }>([
+      { context: responseContext, expected: "boolean (out)" },
+      { context: requestContext, expected: "string (in)" },
+    ])("should depict as $expected", ({ context }) => {
       expect(
         depictPipeline({
           schema: z.string().pipe(z.coerce.boolean()),
@@ -628,7 +664,7 @@ describe("Open API helpers", () => {
   });
 
   describe("depictExamples()", () => {
-    test.each<OpenAPIContext & Record<"case" | "action", string>>([
+    test.each<{ isResponse: boolean } & Record<"case" | "action", string>>([
       { isResponse: false, case: "request", action: "pass" },
       { isResponse: true, case: "response", action: "transform" },
     ])("should $action examples in case of $case", ({ isResponse }) => {
@@ -659,7 +695,7 @@ describe("Open API helpers", () => {
   });
 
   describe("depictParamExamples()", () => {
-    test.each<OpenAPIContext & Record<"case" | "action", string>>([
+    test.each<{ isResponse: boolean } & Record<"case" | "action", string>>([
       { isResponse: false, case: "request", action: "pass" },
       { isResponse: true, case: "response", action: "transform" },
     ])("should $action examples in case of $case", ({ isResponse }) => {
@@ -705,6 +741,9 @@ describe("Open API helpers", () => {
             handler: jest.fn(),
           }),
           inputSources: ["query", "params"],
+          hasRef: hasRefMock,
+          makeRef: makeRefMock,
+          serializer: defaultSerializer,
         })
       ).toMatchSnapshot();
     });
@@ -724,6 +763,9 @@ describe("Open API helpers", () => {
             handler: jest.fn(),
           }),
           inputSources: ["body", "params"],
+          hasRef: hasRefMock,
+          makeRef: makeRefMock,
+          serializer: defaultSerializer,
         })
       ).toMatchSnapshot();
     });
@@ -743,6 +785,9 @@ describe("Open API helpers", () => {
             handler: jest.fn(),
           }),
           inputSources: ["body"],
+          hasRef: hasRefMock,
+          makeRef: makeRefMock,
+          serializer: defaultSerializer,
         })
       ).toMatchSnapshot();
     });
@@ -811,7 +856,7 @@ describe("Open API helpers", () => {
   });
 
   describe("depictDate", () => {
-    test.each<OpenAPIContext>([{ isResponse: true }, { isResponse: false }])(
+    test.each<OpenAPIContext>([responseContext, requestContext])(
       "should throw clear error %#",
       (context) => {
         try {
@@ -838,6 +883,51 @@ describe("Open API helpers", () => {
           next: makeNext(responseContext),
         })
       ).toMatchSnapshot();
+    });
+  });
+
+  describe("depictLazy", () => {
+    const recursiveArray: z.ZodLazy<z.ZodArray<any>> = z.lazy(() =>
+      recursiveArray.array()
+    );
+    const directlyRecursive: z.ZodLazy<any> = z.lazy(() => directlyRecursive);
+    const recursiveObject: z.ZodLazy<z.ZodObject<any>> = z.lazy(() =>
+      z.object({ prop: recursiveObject })
+    );
+
+    test.each([
+      {
+        schema: recursiveArray,
+        hash: "6cbbd837811754902ea1e68d3e5c75e36250b880",
+      },
+      {
+        schema: directlyRecursive,
+        hash: "7a225c55e65ab4a2fd3ce390265b255ee6747049",
+      },
+      {
+        schema: recursiveObject,
+        hash: "118cb3b11b8a1f3b6b1e60a89f96a8be9da32a0f",
+      },
+    ])("should handle circular references %#", ({ schema, hash }) => {
+      hasRefMock
+        .mockImplementationOnce(() => false)
+        .mockImplementationOnce(() => true);
+      expect(hasRefMock.mock.calls.length).toBe(0);
+      expect(
+        depictLazy({
+          schema,
+          ...responseContext,
+          next: makeNext(responseContext),
+        })
+      ).toMatchSnapshot();
+      expect(hasRefMock).toHaveBeenCalledTimes(2);
+      for (const call of hasRefMock.mock.calls) {
+        expect(call[0]).toBe(hash);
+      }
+      expect(makeRefMock).toHaveBeenCalledTimes(2);
+      expect(makeRefMock.mock.calls[0]).toEqual([hash, {}]);
+      expect(makeRefMock.mock.calls[1][0]).toBe(hash);
+      expect(makeRefMock.mock.calls[1][1]).toMatchSnapshot();
     });
   });
 
