@@ -17,3 +17,4 @@ tools
 coverage
 .prettierignore
 tsup.config.ts
+dist-esm
