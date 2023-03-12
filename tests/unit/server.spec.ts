@@ -5,7 +5,6 @@ import {
   compressionMock,
   expressJsonMock,
   expressMock,
-  renewApp,
 } from "../express-mock";
 import { Logger } from "winston";
 import { z } from "zod";
@@ -24,8 +23,6 @@ import {
 import express, { Request, Response } from "express"; // express is mocked server-mock.inc.ts
 
 describe("Server", () => {
-  beforeEach(renewApp);
-
   afterAll(() => {
     jest.restoreAllMocks();
   });

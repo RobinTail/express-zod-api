@@ -37,7 +37,6 @@ export {
   expressMock,
   appMock,
   expressJsonMock,
-  renewApp,
   staticMock,
   staticHandler,
 };
