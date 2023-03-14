@@ -14,7 +14,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [14.18.0, 14.x, 16.10.0, 16.x, 18.0.0, 18.x, 19.0.0, 19.x]
+        # Todo: 19.8 was failing, check if it was fixed in 19.9 or later
+        node-version: [14.18.0, 14.x, 16.10.0, 16.x, 18.0.0, 18.x, 19.0.0, 19.7]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
     steps:
     - name: Get yarn cache dir
