@@ -2,6 +2,10 @@
 
 ## Version 10
 
+### v10.0.0-beta5
+
+- Fixed DTS path for ESM in package.json.
+
 ### v10.0.0-beta4
 
 - No changes.
