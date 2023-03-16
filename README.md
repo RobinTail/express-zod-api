@@ -811,13 +811,12 @@ fs.writeFileSync("./frontend/client.ts", new Client(routing).print(), "utf-8");
 import { ExpressZodAPIClient } from "./client.ts";
 
 const client = new ExpressZodAPIClient(async (method, path, params) => {
-  const searchParams =
-    method === "get" ? `?${new URLSearchParams(params)}` : "";
+  const hasBody = !["get", "delete"].includes(method);
+  const searchParams = hasBody ? "" : `?${new URLSearchParams(params)}`;
   const response = await fetch(`https://example.com${path}${searchParams}`, {
     method: method.toUpperCase(),
-    headers:
-      method === "get" ? undefined : { "Content-Type": "application/json" },
-    body: method === "get" ? undefined : JSON.stringify(params),
+    headers: hasBody ? { "Content-Type": "application/json" } : undefined,
+    body: hasBody ? JSON.stringify(params) : undefined,
   });
   return response.json();
 });
