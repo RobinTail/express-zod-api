@@ -87,6 +87,12 @@ const uploadSchema = ez.upload(); // namespace changed
 
 ## Version 9
 
+### v9.4.1
+
+- Fixing the example implementation for the generated client in case of `DELETE` method.
+  - Since v9.0.0-beta1 request `body` is no longer accepted (by default) as an input source.
+  - The example implementation is now aligned accordingly to use query parameters.
+
 ### v9.4.0
 
 - Feature #875, proposed by [@VideoSystemsTech](https://github.com/VideoSystemsTech).
