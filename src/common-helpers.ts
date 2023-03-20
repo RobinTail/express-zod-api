@@ -116,14 +116,14 @@ export function getStatusCodeFromError(error: Error): number {
 
 export const getExamples = <T extends z.ZodTypeAny, V extends boolean>(
   schema: T,
-  isForOutput: V // This does not control parsing — it happens anyway
-): V extends true ? ReadonlyArray<z.output<T>> : ReadonlyArray<z.input<T>> => {
+  isParsed: V // This does not control parsing — it happens anyway
+): ReadonlyArray<V extends true ? z.output<T> : z.input<T>> => {
   const result: Array<z.input<T> | z.output<T>> = [];
   const examples = getMeta(schema, "examples");
   for (const example of examples || []) {
     const parsedExample = schema.safeParse(example); // I parse anyway in order to filter out invalid examples
     if (parsedExample.success) {
-      result.push(isForOutput ? parsedExample.data : example);
+      result.push(isParsed ? parsedExample.data : example);
     }
   }
   return result;
