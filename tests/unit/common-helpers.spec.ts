@@ -348,6 +348,17 @@ describe("Common Helpers", () => {
         )
       ).toEqual([123, 456]);
     });
+    test.each([z.array(z.number().int()), z.tuple([z.number(), z.number()])])(
+      "Issue #892: should handle examples of arrays and tuples %#",
+      (schema) => {
+        expect(
+          getExamples(withMeta(schema).example([1, 2]).example([3, 4]), false)
+        ).toEqual([
+          [1, 2],
+          [3, 4],
+        ]);
+      }
+    );
   });
 
   describe("combinations()", () => {
@@ -516,7 +527,7 @@ describe("Common Helpers", () => {
       [Symbol("symbol"), "Symbol(symbol)"],
       [true, "true"],
       [false, "false"],
-      [() => {}, "() => { }"],
+      [() => {}, "()=>{}"],
       [/regexp/is, "/regexp/is"],
       [[1, 2, 3], "1,2,3"],
     ])("should accept %#", (argument, expected) => {

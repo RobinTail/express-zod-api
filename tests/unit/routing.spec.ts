@@ -1,12 +1,4 @@
-const staticHandler = jest.fn();
-const staticMock = jest.fn(() => staticHandler);
-
-jest.mock("express", () => ({
-  ...jest.requireActual("express"),
-  static: staticMock,
-}));
-
-import { Express, Request, RequestHandler, Response } from "express";
+import { staticHandler, staticMock } from "../express-mock";
 import { Logger } from "winston";
 import { z } from "zod";
 import {
@@ -20,6 +12,7 @@ import { CommonConfig } from "../../src/config-type";
 import { mimeJson } from "../../src/mime";
 import { makeRequestMock, makeResponseMock } from "../../src/mock";
 import { initRouting } from "../../src/routing";
+import type { Express, Request, RequestHandler, Response } from "express";
 
 let appMock: any;
 let loggerMock: any;

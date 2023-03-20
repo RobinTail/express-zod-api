@@ -2,6 +2,19 @@
 
 ## Version 10
 
+### v10.0.0
+
+- This release contains the fix from version 9.4.2.
+- Read the release notes on beta versions for migration strategy from v9.
+
+### v10.0.0-beta6
+
+- This release contains the fix from version 9.4.1.
+
+### v10.0.0-beta5
+
+- Fixed DTS path for ESM in package.json.
+
 ### v10.0.0-beta4
 
 - No changes.
@@ -82,6 +95,17 @@ const uploadSchema = ez.upload(); // namespace changed
 ```
 
 ## Version 9
+
+### v9.4.2
+
+- Fixed issue #892, found and reported by [@McMerph](https://github.com/McMerph).
+  - Several examples for Array-Like schemas (`z.array()` and `z.tuple()`) used to be merged in the generated documentation due to the bug in `getExamples()` method.
+
+### v9.4.1
+
+- Fixing the example implementation for the generated client in case of `DELETE` method.
+  - Since v9.0.0-beta1 request `body` is no longer accepted (by default) as an input source.
+  - The example implementation is now aligned accordingly to use query parameters.
 
 ### v9.4.0
 
