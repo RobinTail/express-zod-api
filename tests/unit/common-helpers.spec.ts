@@ -347,6 +347,17 @@ describe("Common Helpers", () => {
         )
       ).toEqual([123, 456]);
     });
+    test("Issue #892: should handle examples of arrays", () => {
+      expect(
+        getExamples(
+          withMeta(z.array(z.number().int())).example([1, 2]).example([3, 4]),
+          false
+        )
+      ).toEqual([
+        [1, 2],
+        [3, 4],
+      ]);
+    });
   });
 
   describe("combinations()", () => {
