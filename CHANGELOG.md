@@ -2,6 +2,11 @@
 
 ## Version 10
 
+### v10.0.0
+
+- This release contains the fix from version 9.4.2.
+- Read the release notes on beta versions for migration strategy from v9.
+
 ### v10.0.0-beta6
 
 - This release contains the fix from version 9.4.1.
