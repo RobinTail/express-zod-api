@@ -1,5 +1,94 @@
 # Changelog
 
+## Version 10
+
+### v10.0.0-beta6
+
+- This release contains the fix from version 9.4.1.
+
+### v10.0.0-beta5
+
+- Fixed DTS path for ESM in package.json.
+
+### v10.0.0-beta4
+
+- No changes.
+
+### v10.0.0-beta3
+
+- This release contains features from versions 9.3.0 (incl. hotfix 9.3.1) and 9.4.0.
+- **BREAKING** changes:
+  - `Client::constructor()` now requires an object argument having `routing` property.
+
+```ts
+// before
+new Client(routing).print();
+// after
+new Client({ routing }).print();
+```
+
+### v10.0.0-beta2
+
+- **BREAKING** changes to the behavior of a public method.
+  - The feature method `withMeta` _(introduced in v2.1.0)_ used to mutate its argument (`zod` schema) in order to
+    extend it with additional methods.
+  - If you're using this feature _within_ the call of `EndpointsFactory::build()`, there is no issue.
+  - However, if you're using a schema assignment (to some const) along with this method, this might lead to unexpected
+    results.
+  - The following case is reported by [@McMerph](https://github.com/McMerph) in issue #827.
+    - Reusing a schema assigned to a const for its several wrappings by `withMeta` and setting different examples.
+    - In this case all examples were set to the original const.
+  - This release fixes that behavior by making `withMeta` immutable: it returns a new copy of its argument.
+
+```ts
+// the example case
+const originalSchema = z.string();
+const schemaA = withMeta(originalSchema).example("A");
+const schemaB = withMeta(originalSchema).example("B");
+// BEFORE: all three const have both examples "A" and "B"
+// AFTER:
+// - originalSchema remains intact
+// - schemaA has example "A"
+// - schemaB has example "B"
+```
+
+### v10.0.0-beta1
+
+- This release is based on the features of version 9.2.1.
+- **BREAKING** changes to the concept of dependencies.
+  - `zod` becomes a peer dependency, fixes issue #822.
+    - You need to install it manually and adjust your imports accordingly.
+  - `express` becomes a peer dependency as well.
+    - You need to install it manually.
+  - `typescript` becomes an optional peer dependency.
+    - When using a client generator, you need to install it manually.
+    - The minimal supported version is 4.9.3.
+  - Proprietary schemas are now exported under the namespace `ez`.
+    - Imports and utilization should be adjusted accordingly.
+    - Affected schemas: `file`, `dateIn`, `dateOut`, `upload`.
+  - If facing Typescript errors `TS4023` or `TS4094`, ensure disabling `declaration` option in your `tsconfig.json`.
+- **BREAKING** changes to the engines.
+  - The minimal Node version is now 14.18.0.
+- Due to switching to `tsup` builder, the file structure has changed:
+  - `/dist/index.js` — CommonJS bundle;
+  - `/dist/esm/index.js` — ESM bundle;
+  - `/dist/index.d.ts` — types declaration bundle.
+
+```ts
+// before
+import { z } from "express-zod-api";
+const stringSchema = z.string();
+const uploadSchema = z.upload();
+```
+
+```ts
+// after
+import { z } from "zod"; // module changed
+import { ez } from "express-zod-api"; // new namespace
+const stringSchema = z.string(); // remains the same
+const uploadSchema = ez.upload(); // namespace changed
+```
+
 ## Version 9
 
 ### v9.4.2

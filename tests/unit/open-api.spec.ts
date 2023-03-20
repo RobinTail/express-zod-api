@@ -7,11 +7,12 @@ import {
   createMiddleware,
   createResultHandler,
   defaultEndpointsFactory,
+  ez,
   withMeta,
-  z,
 } from "../../src";
 import { expectType } from "tsd";
 import { mimeJson } from "../../src/mime";
+import { z } from "zod";
 
 describe("Open API generator", () => {
   const sampleConfig = createConfig({
@@ -273,11 +274,11 @@ describe("Open API generator", () => {
               input: z.object({
                 bigint: z.bigint(),
                 boolean: z.boolean(),
-                dateIn: z.dateIn(),
+                dateIn: ez.dateIn(),
               }),
               output: z.object({
                 null: z.null(),
-                dateOut: z.dateOut(),
+                dateOut: ez.dateOut(),
               }),
               handler: async () => ({
                 null: null,
@@ -1003,6 +1004,29 @@ describe("Open API generator", () => {
         },
         version: "3.4.5",
         title: "Testing Metadata:example on IO schema + middleware",
+        serverUrl: "http://example.com",
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
+    });
+
+    test("Issue #827: withMeta() should be immutable", () => {
+      const zodSchema = z.object({ a: z.string() });
+      const spec = new OpenAPI({
+        config: sampleConfig,
+        routing: {
+          v1: {
+            addSomething: defaultEndpointsFactory.build({
+              method: "post",
+              input: withMeta(zodSchema).example({ a: "first" }),
+              output: withMeta(zodSchema.extend({ b: z.string() }))
+                .example({ a: "first", b: "prefix_first" })
+                .example({ a: "second", b: "prefix_second" }),
+              handler: async ({ input: { a } }) => ({ a, b: `prefix_${a}` }),
+            }),
+          },
+        },
+        version: "3.4.5",
+        title: "Testing Metadata:example on IO parameter",
         serverUrl: "http://example.com",
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();

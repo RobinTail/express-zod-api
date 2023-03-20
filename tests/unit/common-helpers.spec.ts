@@ -15,8 +15,9 @@ import {
   isValidDate,
   makeErrorFromAnything,
 } from "../../src/common-helpers";
-import { InputValidationError, createHttpError, withMeta, z } from "../../src";
+import { InputValidationError, createHttpError, ez, withMeta } from "../../src";
 import { Request } from "express";
+import { z } from "zod";
 
 describe("Common Helpers", () => {
   describe("defaultInputSources", () => {
@@ -452,29 +453,29 @@ describe("Common Helpers", () => {
 
   describe("hasUpload()", () => {
     test("should return true for z.upload()", () => {
-      expect(hasUpload(z.upload())).toBeTruthy();
+      expect(hasUpload(ez.upload())).toBeTruthy();
     });
-    test("should return true for wrapped z.upload()", () => {
-      expect(hasUpload(z.object({ test: z.upload() }))).toBeTruthy();
-      expect(hasUpload(z.upload().or(z.boolean()))).toBeTruthy();
-      expect(
-        hasUpload(
-          z.object({ test: z.boolean() }).and(z.object({ test2: z.upload() }))
-        )
-      ).toBeTruthy();
-      expect(hasUpload(z.optional(z.upload()))).toBeTruthy();
-      expect(hasUpload(z.upload().nullable())).toBeTruthy();
-      expect(hasUpload(z.upload().default({} as UploadedFile))).toBeTruthy();
-      expect(hasUpload(z.record(z.upload()))).toBeTruthy();
-      expect(hasUpload(z.upload().refine(() => true))).toBeTruthy();
-      expect(hasUpload(z.array(z.upload()))).toBeTruthy();
+    test.each([
+      z.object({ test: ez.upload() }),
+      ez.upload().or(z.boolean()),
+      z.object({ test: z.boolean() }).and(z.object({ test2: ez.upload() })),
+      z.optional(ez.upload()),
+      ez.upload().nullable(),
+      ez.upload().default({} as UploadedFile),
+      z.record(ez.upload()),
+      ez.upload().refine(() => true),
+      z.array(ez.upload()),
+    ])("should return true for wrapped z.upload() %#", (subject) => {
+      expect(hasUpload(subject)).toBeTruthy();
     });
-    test("should return false in other cases", () => {
-      expect(hasUpload(z.object({}))).toBeFalsy();
-      expect(hasUpload(z.any())).toBeFalsy();
-      expect(hasUpload(z.literal("test"))).toBeFalsy();
-      expect(hasUpload(z.boolean().and(z.literal(true)))).toBeFalsy();
-      expect(hasUpload(z.number().or(z.string()))).toBeFalsy();
+    test.each([
+      z.object({}),
+      z.any(),
+      z.literal("test"),
+      z.boolean().and(z.literal(true)),
+      z.number().or(z.string()),
+    ])("should return false in other cases %#", (subject) => {
+      expect(hasUpload(subject)).toBeFalsy();
     });
   });
 
@@ -526,7 +527,7 @@ describe("Common Helpers", () => {
       [Symbol("symbol"), "Symbol(symbol)"],
       [true, "true"],
       [false, "false"],
-      [() => {}, "() => { }"],
+      [() => {}, "()=>{}"],
       [/regexp/is, "/regexp/is"],
       [[1, 2, 3], "1,2,3"],
     ])("should accept %#", (argument, expected) => {

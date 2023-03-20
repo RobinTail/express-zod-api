@@ -1,40 +1,18 @@
 import http from "http";
-
-let appMock: ReturnType<typeof newAppMock>;
-const expressJsonMock = jest.fn();
-const newAppMock = () => ({
-  disable: jest.fn(),
-  use: jest.fn(),
-  listen: jest.fn((port, cb) => {
-    if (cb) {
-      cb();
-    }
-    return new http.Server();
-  }),
-  get: jest.fn(),
-  post: jest.fn(),
-  options: jest.fn(),
-});
-
-const expressMock = jest.mock("express", () => {
-  appMock = newAppMock();
-  const returnFunction = () => appMock;
-  returnFunction.json = () => expressJsonMock;
-  return returnFunction;
-});
-
-const compressionMock = jest.fn();
-jest.mock("compression", () => compressionMock);
-
-import express, { Request, Response } from "express"; // express is mocked above
 import https from "https";
+import {
+  appMock,
+  compressionMock,
+  expressJsonMock,
+  expressMock,
+} from "../express-mock";
 import { Logger } from "winston";
+import { z } from "zod";
 import {
   EndpointsFactory,
   attachRouting,
   createServer,
   defaultResultHandler,
-  z,
 } from "../../src";
 import { AppConfig, CommonConfig, ServerConfig } from "../../src/config-type";
 import { mimeJson } from "../../src/mime";
@@ -42,12 +20,9 @@ import {
   createNotFoundHandler,
   createParserFailureHandler,
 } from "../../src/server";
+import express, { Request, Response } from "express"; // express is mocked in express-mock.ts
 
 describe("Server", () => {
-  beforeEach(() => {
-    appMock = newAppMock();
-  });
-
   afterAll(() => {
     jest.restoreAllMocks();
   });

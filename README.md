@@ -101,10 +101,14 @@ Much can be customized to fit your needs.
 
 ## Installation
 
+Run one of the following commands to install the library and its peer dependencies.
+Typescript is an optional dependency, however, it's required if you're going to
+[generate a frontend client](#generating-a-frontend-client) for your API.
+
 ```shell
-yarn add express-zod-api
+yarn add express-zod-api express zod typescript
 # or
-npm install express-zod-api
+npm install express-zod-api express zod typescript
 ```
 
 Add the following option to your `tsconfig.json` file in order to make it work as expected:
@@ -150,7 +154,7 @@ _In case you need to customize the response, see [Response customization](#respo
 ## Create your first endpoint
 
 ```typescript
-import { z } from "express-zod-api";
+import { z } from "zod";
 
 const helloWorldEndpoint = defaultEndpointsFactory.build({
   method: "get",
@@ -270,7 +274,8 @@ const yourEndpoint = defaultEndpointsFactory
 Here is an example of the authentication middleware, that checks a `key` from input and `token` from headers:
 
 ```typescript
-import { createMiddleware, createHttpError, z } from "express-zod-api";
+import { z } from "zod";
+import { createMiddleware, createHttpError } from "express-zod-api";
 
 const authMiddleware = createMiddleware({
   security: {
@@ -327,7 +332,8 @@ You can implement additional validations within schemas using refinements.
 Validation errors are reported in a response with a status code `400`.
 
 ```typescript
-import { createMiddleware, z } from "express-zod-api";
+import { z } from "zod";
+import { createMiddleware } from "express-zod-api";
 
 const nicknameConstraintMiddleware = createMiddleware({
   input: z.object({
@@ -367,7 +373,7 @@ Since parameters of GET requests come in the form of strings, there is often a n
 arrays of numbers.
 
 ```typescript
-import { z } from "express-zod-api";
+import { z } from "zod";
 
 const getUserEndpoint = endpointsFactory.build({
   method: "get",
@@ -398,10 +404,10 @@ which in turn calls
 It is also impossible to transmit the `Date` in its original form to your endpoints within JSON. Therefore, there is
 confusion with original method ~~z.date()~~ that should not be used within IO schemas of your API.
 
-In order to solve this problem, the library provides two custom methods for dealing with dates: `z.dateIn()` and
-`z.dateOut()` for using within input and output schemas accordingly.
+In order to solve this problem, the library provides two custom methods for dealing with dates: `ez.dateIn()` and
+`ez.dateOut()` for using within input and output schemas accordingly.
 
-`z.dateIn()` is a transforming schema that accepts an ISO `string` representation of a `Date`, validates it, and
+`ez.dateIn()` is a transforming schema that accepts an ISO `string` representation of a `Date`, validates it, and
 provides your endpoint handler or middleware with a `Date`. It supports the following formats:
 
 ```text
@@ -411,20 +417,21 @@ provides your endpoint handler or middleware with a `Date`. It supports the foll
 2021-12-31
 ```
 
-`z.dateOut()`, on the contrary, accepts a `Date` and provides `ResultHanlder` with a `string` representation in ISO
+`ez.dateOut()`, on the contrary, accepts a `Date` and provides `ResultHanlder` with a `string` representation in ISO
 format for the response transmission. Consider the following simplified example for better understanding:
 
 ```typescript
-import { z, defaultEndpointsFactory } from "express-zod-api";
+import { z } from "zod";
+import { ez, defaultEndpointsFactory } from "express-zod-api";
 
 const updateUserEndpoint = defaultEndpointsFactory.build({
   method: "post",
   input: z.object({
     userId: z.string(),
-    birthday: z.dateIn(), // string -> Date
+    birthday: ez.dateIn(), // string -> Date
   }),
   output: z.object({
-    createdAt: z.dateOut(), // Date -> string
+    createdAt: ez.dateOut(), // Date -> string
   }),
   handler: async ({ input }) => {
     // input.birthday is Date
@@ -499,10 +506,10 @@ type DefaultResponse<OUT> =
 You can create your own result handler by using this example as a template:
 
 ```typescript
+import { z } from "zod";
 import {
   createResultHandler,
   IOSchema,
-  z,
   getStatusCodeFromError,
   getMessageFromError,
 } from "express-zod-api";
@@ -545,7 +552,7 @@ Thus, you can configure non-object responses too, for example, to send an image 
 You can find two approaches to `EndpointsFactory` and `ResultHandler` implementation
 [in this example](https://github.com/RobinTail/express-zod-api/blob/master/example/factories.ts).
 One of them implements file streaming, in this case the endpoint just has to provide the filename.
-The response schema generally may be just `z.string()`, but I made more specific `z.file()` that also supports
+The response schema generally may be just `z.string()`, but I made more specific `ez.file()` that also supports
 `.binary()` and `.base64()` refinements which are reflected in the
 [generated documentation](#creating-a-documentation).
 
@@ -553,7 +560,7 @@ The response schema generally may be just `z.string()`, but I made more specific
 const fileStreamingEndpointsFactory = new EndpointsFactory(
   createResultHandler({
     getPositiveResponse: () => ({
-      schema: z.file().binary(),
+      schema: ez.file().binary(),
       mimeType: "image/*",
     }),
     getNegativeResponse: () => ({ schema: z.string(), mimeType: "text/plain" }),
@@ -599,11 +606,12 @@ const advancedUsage = defaultEndpointsFactory.use(auth(), {
 ## File uploads
 
 You can switch the `Endpoint` to handle requests with the `multipart/form-data` content type instead of JSON by using
-`z.upload()` schema. Together with a corresponding configuration option, this makes it possible to handle file uploads.
+`ez.upload()` schema. Together with a corresponding configuration option, this makes it possible to handle file uploads.
 Here is a simplified example:
 
 ```typescript
-import { createConfig, z, defaultEndpointsFactory } from "express-zod-api";
+import { z } from "zod";
+import { createConfig, ez, defaultEndpointsFactory } from "express-zod-api";
 
 const config = createConfig({
   server: {
@@ -615,7 +623,7 @@ const config = createConfig({
 const fileUploadEndpoint = defaultEndpointsFactory.build({
   method: "post",
   input: z.object({
-    avatar: z.upload(), // <--
+    avatar: ez.upload(), // <--
   }),
   output: z.object({
     /* ... */
@@ -803,7 +811,11 @@ Consuming the generated client requires Typescript version 4.1 or higher.
 import fs from "fs";
 import { Client } from "express-zod-api";
 
-fs.writeFileSync("./frontend/client.ts", new Client(routing).print(), "utf-8");
+fs.writeFileSync(
+  "./frontend/client.ts",
+  new Client({ routing }).print(),
+  "utf-8"
+);
 ```
 
 ```typescript
@@ -942,7 +954,7 @@ in this case during development. You can achieve this verification by assigning 
 reusing it in forced type of the output:
 
 ```typescript
-import { z } from "express-zod-api";
+import { z } from "zod";
 
 const output = z.object({
   anything: z.number(),

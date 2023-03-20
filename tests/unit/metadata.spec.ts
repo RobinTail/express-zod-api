@@ -1,4 +1,5 @@
-import { withMeta, z } from "../../src";
+import { z } from "zod";
+import { withMeta } from "../../src";
 import {
   MetaDef,
   copyMeta,
@@ -13,10 +14,11 @@ describe("Metadata", () => {
       const schema = z.string();
       const schemaWithMeta = withMeta(schema);
       expect(schemaWithMeta).toBeInstanceOf(z.ZodString);
-      expect(schemaWithMeta).toEqual(schema);
       expect(metaProp).toBe("expressZodApiMeta");
       expect(schemaWithMeta._def).toHaveProperty(metaProp);
-      expect(schemaWithMeta._def[metaProp]).toEqual({ examples: [] });
+      const { expressZodApiMeta, ...rest } = schemaWithMeta._def;
+      expect(rest).toEqual(schema._def);
+      expect(expressZodApiMeta).toEqual({ examples: [] });
     });
 
     test("should provide example() method", () => {
@@ -29,8 +31,17 @@ describe("Metadata", () => {
     test("example() should set the corresponding metadata in the schema definition", () => {
       const schema = z.string();
       const schemaWithMeta = withMeta(schema).example("test");
-      expect(schemaWithMeta._def[metaProp]).toHaveProperty("examples");
-      expect(schemaWithMeta._def[metaProp].examples).toEqual(["test"]);
+      expect(schemaWithMeta._def.expressZodApiMeta).toHaveProperty("examples");
+      expect(schemaWithMeta._def.expressZodApiMeta.examples).toEqual(["test"]);
+    });
+
+    test("Issue 827: example() should be immutable", () => {
+      const schemaWithMeta = withMeta(z.string());
+      const schemaWithExample = schemaWithMeta.example("test");
+      expect(schemaWithExample._def.expressZodApiMeta.examples).toEqual([
+        "test",
+      ]);
+      expect(schemaWithMeta._def.expressZodApiMeta.examples).toEqual([]);
     });
 
     test("example() can set multiple examples", () => {
@@ -39,7 +50,7 @@ describe("Metadata", () => {
         .example("test1")
         .example("test2")
         .example("test3");
-      expect(schemaWithMeta._def[metaProp].examples).toEqual([
+      expect(schemaWithMeta._def.expressZodApiMeta.examples).toEqual([
         "test1",
         "test2",
         "test3",
@@ -49,24 +60,25 @@ describe("Metadata", () => {
     test("metadata should withstand refinements", () => {
       const schema = z.string();
       const schemaWithMeta = withMeta(schema).example("test");
-      expect(schemaWithMeta._def[metaProp].examples).toEqual(["test"]);
+      expect(schemaWithMeta._def.expressZodApiMeta.examples).toEqual(["test"]);
       expect(
         (
           schemaWithMeta.email()._def as unknown as MetaDef<
             typeof schemaWithMeta
           >
-        )[metaProp].examples
+        ).expressZodApiMeta.examples
       ).toEqual(["test"]);
     });
 
     test("metadata should withstand double withMeta()", () => {
       const schema = z.string();
       const schemaWithMeta = withMeta(schema).example("test");
-      expect(withMeta(schemaWithMeta)._def[metaProp].examples).toEqual([
+      expect(withMeta(schemaWithMeta)._def.expressZodApiMeta.examples).toEqual([
         "test",
       ]);
       expect(
-        withMeta(schemaWithMeta).example("another")._def[metaProp].examples
+        withMeta(schemaWithMeta).example("another")._def.expressZodApiMeta
+          .examples
       ).toEqual(["test", "another"]);
     });
   });
@@ -134,7 +146,6 @@ describe("Metadata", () => {
       const result = copyMeta(src, dest);
       expect(hasMeta(result)).toBeTruthy();
       expect(getMeta(result, "examples")).toEqual(getMeta(src, "examples"));
-      expect(result).toEqual(dest);
     });
 
     test("should merge the meta from src to dest (deep merge)", () => {
@@ -173,7 +184,6 @@ describe("Metadata", () => {
         { a: "some", b: 789 },
         { a: "another", b: 789 },
       ]);
-      expect(result).toEqual(dest);
     });
   });
 });

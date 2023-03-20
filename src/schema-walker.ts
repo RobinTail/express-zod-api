@@ -1,8 +1,5 @@
 import { z } from "zod";
-import { ZodDateInDef } from "./date-in-schema";
-import { ZodDateOutDef } from "./date-out-schema";
-import { ZodFileDef } from "./file-schema";
-import { ZodUploadDef } from "./upload-schema";
+import { ProprietaryKinds } from "./ez-namespace";
 
 export type HandlingVariant = "last" | "regular";
 type VariantDependingProps<
@@ -30,12 +27,6 @@ export type SchemaHandler<
   Context extends object = {},
   Variant extends HandlingVariant = "regular"
 > = (params: SchemaHandlingProps<T, U, Context, Variant>) => U;
-
-type ProprietaryKinds =
-  | ZodFileDef["typeName"]
-  | ZodUploadDef["typeName"]
-  | ZodDateInDef["typeName"]
-  | ZodDateOutDef["typeName"];
 
 export type HandlingRules<U, Context extends object = {}> = Partial<
   Record<

@@ -1,4 +1,5 @@
-import { createMiddleware, z } from "../../src";
+import { z } from "zod";
+import { createMiddleware } from "../../src";
 import { IOSchemaError } from "../../src/errors";
 
 describe("Middleware", () => {

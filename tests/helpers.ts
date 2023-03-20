@@ -1,5 +1,5 @@
 import jestConfig from "../jest.config";
-import { z } from "../src";
+import { z } from "zod";
 import { SchemaHandler, walkSchema } from "../src/schema-walker";
 
 export const esmTestPort = 8070;
