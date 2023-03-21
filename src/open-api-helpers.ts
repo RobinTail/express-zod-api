@@ -521,12 +521,13 @@ export const depictLazy: Depicter<z.ZodLazy<z.ZodTypeAny>> = ({
   makeRef,
 }): ReferenceObject => {
   const hash = serialize(lazy.schema);
-  const ref = getRef(hash);
-  if (ref) {
-    return ref;
-  }
-  makeRef(hash, {}); // make empty ref first
-  return makeRef(hash, next({ schema: lazy.schema })); // update
+  return (
+    getRef(hash) ||
+    (() => {
+      makeRef(hash, {}); // make empty ref first
+      return makeRef(hash, next({ schema: lazy.schema })); // update
+    })()
+  );
 };
 
 export const depictExamples = (

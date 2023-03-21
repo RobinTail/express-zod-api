@@ -211,12 +211,13 @@ const onLazy: Producer<z.ZodLazy<z.ZodTypeAny>> = ({
   schema: lazy,
 }) => {
   const name = `Type${serialize(lazy.schema)}`;
-  const alias = getAlias(name);
-  if (alias) {
-    return alias;
-  }
-  makeAlias(name, f.createLiteralTypeNode(f.createNull())); // make empty type first
-  return makeAlias(name, next({ schema: lazy.schema })); // update
+  return (
+    getAlias(name) ||
+    (() => {
+      makeAlias(name, f.createLiteralTypeNode(f.createNull())); // make empty type first
+      return makeAlias(name, next({ schema: lazy.schema })); // update
+    })()
+  );
 };
 
 const producers: HandlingRules<ts.TypeNode, ZTSContext> = {
