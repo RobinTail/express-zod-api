@@ -2,8 +2,18 @@
 
 name: Publish to NPM
 
-on: workflow_dispatch
-
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release channel'
+        required: true
+        default: 'latest'
+        type: choice
+        options:
+          - latest
+          - beta
+          - prev
 jobs:
   publish:
     runs-on: ubuntu-latest
@@ -14,6 +24,6 @@ jobs:
           node-version: 16
           registry-url: https://registry.npmjs.org/
       - run: yarn install
-      - run: npm publish
+      - run: npm publish --tag ${{ inputs.tag }}
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_KEY}}
