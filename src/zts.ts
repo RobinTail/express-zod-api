@@ -204,19 +204,19 @@ const onNull: Producer<z.ZodNull> = () =>
   f.createLiteralTypeNode(f.createNull());
 
 const onLazy: Producer<z.ZodLazy<z.ZodTypeAny>> = ({
-  hasAlias,
+  getAlias,
   makeAlias,
   next,
   serializer: serialize,
   schema: lazy,
 }) => {
-  const hash = `Type${serialize(lazy.schema)}`;
-  if (hasAlias(hash)) {
-    return f.createTypeReferenceNode(hash); // @todo consider changing it to getAlias
+  const name = `Type${serialize(lazy.schema)}`;
+  const alias = getAlias(name);
+  if (alias) {
+    return alias;
   }
-  const ref = makeAlias(hash, f.createLiteralTypeNode(f.createNull())); // make empty type first
-  makeAlias(hash, next({ schema: lazy.schema })); // update
-  return ref;
+  makeAlias(name, f.createLiteralTypeNode(f.createNull())); // make empty type first
+  return makeAlias(name, next({ schema: lazy.schema })); // update
 };
 
 const producers: HandlingRules<ts.TypeNode, ZTSContext> = {

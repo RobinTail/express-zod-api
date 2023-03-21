@@ -34,7 +34,7 @@ export type LiteralType = string | number | boolean;
 
 export type ZTSContext = {
   isResponse: boolean;
-  hasAlias: (name: string) => boolean;
+  getAlias: (name: string) => ts.TypeReferenceNode | undefined;
   makeAlias: (name: string, type: ts.TypeNode) => ts.TypeReferenceNode;
   serializer: (schema: z.ZodTypeAny) => string;
 };

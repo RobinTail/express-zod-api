@@ -26,6 +26,7 @@
 
 import ts from "typescript";
 import { z } from "zod";
+import { f } from "../../src/client-helpers";
 import { defaultSerializer } from "../../src/common-helpers";
 import { zodToTs } from "../../src/zts";
 import { createTypeAlias, printNode } from "../../src/zts-helpers";
@@ -35,7 +36,7 @@ describe("zod-to-ts", () => {
     printNode(node, { newLine: ts.NewLineKind.LineFeed });
   const defaultCtx = {
     isResponse: false,
-    hasAlias: jest.fn(() => true),
+    getAlias: jest.fn((name: string) => f.createTypeReferenceNode(name)),
     makeAlias: jest.fn(),
     serializer: defaultSerializer,
   };

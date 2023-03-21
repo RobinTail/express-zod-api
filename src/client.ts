@@ -46,13 +46,13 @@ export class Client {
   protected paths: string[] = [];
   protected aliases: Record<string, ts.TypeAliasDeclaration> = {};
 
-  protected hasAlias(name: string): boolean {
-    return name in this.aliases;
+  protected getAlias(name: string): ts.TypeReferenceNode | undefined {
+    return name in this.aliases ? f.createTypeReferenceNode(name) : undefined;
   }
 
   protected makeAlias(name: string, type: ts.TypeNode): ts.TypeReferenceNode {
     this.aliases[name] = createTypeAlias(type, name);
-    return f.createTypeReferenceNode(name);
+    return this.getAlias(name)!;
   }
 
   constructor({ routing, serializer = defaultSerializer }: GeneratorParams) {
@@ -65,13 +65,13 @@ export class Client {
           serializer,
           schema: endpoint.getSchema("input"),
           isResponse: false,
-          hasAlias: this.hasAlias.bind(this),
+          getAlias: this.getAlias.bind(this),
           makeAlias: this.makeAlias.bind(this),
         });
         const response = zodToTs({
           serializer,
           isResponse: true,
-          hasAlias: this.hasAlias.bind(this),
+          getAlias: this.getAlias.bind(this),
           makeAlias: this.makeAlias.bind(this),
           schema: endpoint
             .getSchema("positive")
