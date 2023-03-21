@@ -61,26 +61,27 @@ export class Client {
       onEndpoint: (endpoint, path, method) => {
         const inputId = makeCleanId(path, method, "input");
         const responseId = makeCleanId(path, method, "response");
-        const input = zodToTs({
+        const commons = {
           serializer,
+          getAlias: this.getAlias.bind(this),
+          makeAlias: this.makeAlias.bind(this),
+        };
+        const input = zodToTs({
+          ...commons,
           schema: endpoint.getSchema("input"),
           isResponse: false,
-          getAlias: this.getAlias.bind(this),
-          makeAlias: this.makeAlias.bind(this),
         });
         const response = zodToTs({
-          serializer,
+          ...commons,
           isResponse: true,
-          getAlias: this.getAlias.bind(this),
-          makeAlias: this.makeAlias.bind(this),
           schema: endpoint
             .getSchema("positive")
             .or(endpoint.getSchema("negative")),
         });
-        const inputAlias = createTypeAlias(input, inputId);
-        const responseAlias = createTypeAlias(response, responseId);
-        this.agg.push(inputAlias);
-        this.agg.push(responseAlias);
+        this.agg.push(
+          createTypeAlias(input, inputId),
+          createTypeAlias(response, responseId)
+        );
         if (method !== "options") {
           this.paths.push(path);
           this.registry[`${method} ${path}`] = {
