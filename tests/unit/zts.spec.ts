@@ -26,17 +26,26 @@
 
 import ts from "typescript";
 import { z } from "zod";
+import { f } from "../../src/client-helpers";
+import { defaultSerializer } from "../../src/common-helpers";
 import { zodToTs } from "../../src/zts";
 import { createTypeAlias, printNode } from "../../src/zts-helpers";
 
 describe("zod-to-ts", () => {
   const printNodeTest = (node: ts.Node) =>
     printNode(node, { newLine: ts.NewLineKind.LineFeed });
+  const defaultCtx = {
+    isResponse: false,
+    getAlias: jest.fn((name: string) => f.createTypeReferenceNode(name)),
+    makeAlias: jest.fn(),
+    serializer: defaultSerializer,
+  };
 
   describe("z.array()", () => {
     it("outputs correct typescript", () => {
       const node = zodToTs({
         schema: z.object({ id: z.number(), value: z.string() }).array(),
+        ...defaultCtx,
       });
       expect(printNodeTest(node)).toMatchSnapshot();
     });
@@ -46,6 +55,7 @@ describe("zod-to-ts", () => {
     const identifier = "User";
     const node = zodToTs({
       schema: z.object({ username: z.string(), age: z.number() }),
+      ...defaultCtx,
     });
 
     it("outputs correct typescript", () => {
@@ -86,7 +96,9 @@ describe("zod-to-ts", () => {
       { schema: z.nativeEnum(Fruit), feature: "string" },
       { schema: z.nativeEnum(StringLiteral), feature: "quoted string" },
     ])("handles $feature literals", ({ schema }) => {
-      expect(printNodeTest(zodToTs({ schema }))).toMatchSnapshot();
+      expect(
+        printNodeTest(zodToTs({ schema, ...defaultCtx }))
+      ).toMatchSnapshot();
     });
   });
 
@@ -189,6 +201,7 @@ describe("zod-to-ts", () => {
     it("should produce the expected results", () => {
       const node = zodToTs({
         schema: example,
+        ...defaultCtx,
       });
       expect(printNode(node)).toMatchSnapshot();
     });
@@ -217,12 +230,12 @@ describe("zod-to-ts", () => {
     });
 
     it("outputs correct typescript", () => {
-      const node = zodToTs({ schema: optionalStringSchema });
+      const node = zodToTs({ schema: optionalStringSchema, ...defaultCtx });
       expect(printNodeTest(node)).toMatchSnapshot();
     });
 
     it("should output `?:` and undefined union for optional properties", () => {
-      const node = zodToTs({ schema: objectWithOptionals });
+      const node = zodToTs({ schema: objectWithOptionals, ...defaultCtx });
       expect(printNodeTest(node)).toMatchSnapshot();
     });
   });
@@ -231,7 +244,7 @@ describe("zod-to-ts", () => {
     const nullableUsernameSchema = z.object({
       username: z.string().nullable(),
     });
-    const node = zodToTs({ schema: nullableUsernameSchema });
+    const node = zodToTs({ schema: nullableUsernameSchema, ...defaultCtx });
 
     it("outputs correct typescript", () => {
       expect(printNodeTest(node)).toMatchSnapshot();
@@ -244,7 +257,7 @@ describe("zod-to-ts", () => {
         "string-literal": z.string(),
         5: z.number(),
       });
-      const node = zodToTs({ schema });
+      const node = zodToTs({ schema, ...defaultCtx });
       expect(printNodeTest(node)).toMatchSnapshot();
     });
 
@@ -254,7 +267,7 @@ describe("zod-to-ts", () => {
         name: z.string(),
         countryOfOrigin: z.string(),
       });
-      const node = zodToTs({ schema });
+      const node = zodToTs({ schema, ...defaultCtx });
       expect(printNodeTest(node)).toMatchSnapshot();
     });
 
@@ -270,7 +283,7 @@ describe("zod-to-ts", () => {
         _r: z.any(),
         "-r": z.undefined(),
       });
-      const node = zodToTs({ schema });
+      const node = zodToTs({ schema, ...defaultCtx });
       expect(printNodeTest(node)).toMatchSnapshot();
     });
 
@@ -279,7 +292,7 @@ describe("zod-to-ts", () => {
         name: z.string().describe("The name of the item"),
         price: z.number().describe("The price of the item"),
       });
-      const node = zodToTs({ schema });
+      const node = zodToTs({ schema, ...defaultCtx });
       expect(printNodeTest(node)).toMatchSnapshot();
     });
   });
@@ -297,7 +310,7 @@ describe("zod-to-ts", () => {
       unknown: z.unknown(),
       never: z.never(),
     });
-    const node = zodToTs({ schema: primitiveSchema });
+    const node = zodToTs({ schema: primitiveSchema, ...defaultCtx });
 
     it("outputs correct typescript", () => {
       expect(printNodeTest(node)).toMatchSnapshot();
@@ -310,7 +323,7 @@ describe("zod-to-ts", () => {
       z.object({ kind: z.literal("square"), x: z.number() }),
       z.object({ kind: z.literal("triangle"), x: z.number(), y: z.number() }),
     ]);
-    const node = zodToTs({ schema: shapeSchema });
+    const node = zodToTs({ schema: shapeSchema, ...defaultCtx });
 
     it("outputs correct typescript", () => {
       expect(printNodeTest(node)).toMatchSnapshot();
@@ -324,7 +337,9 @@ describe("zod-to-ts", () => {
       z.literal(false),
       z.literal(123),
     ])("Should produce the correct typescript %#", (schema) => {
-      expect(printNodeTest(zodToTs({ schema }))).toMatchSnapshot();
+      expect(
+        printNodeTest(zodToTs({ schema, ...defaultCtx }))
+      ).toMatchSnapshot();
     });
   });
 
@@ -336,14 +351,14 @@ describe("zod-to-ts", () => {
       ])("should produce the schema type $expected", ({ isResponse }) => {
         const schema = z.number().transform((num) => `${num}`);
         expect(
-          printNodeTest(zodToTs({ schema, isResponse }))
+          printNodeTest(zodToTs({ schema, ...defaultCtx, isResponse }))
         ).toMatchSnapshot();
       });
 
       test("should handle unsupported transformation in response", () => {
         const schema = z.number().transform((num) => () => num);
         expect(
-          printNodeTest(zodToTs({ schema, isResponse: true }))
+          printNodeTest(zodToTs({ schema, ...defaultCtx, isResponse: true }))
         ).toMatchSnapshot();
       });
 
@@ -352,7 +367,7 @@ describe("zod-to-ts", () => {
           throw new Error("this should be handled");
         });
         expect(
-          printNodeTest(zodToTs({ schema, isResponse: true }))
+          printNodeTest(zodToTs({ schema, ...defaultCtx, isResponse: true }))
         ).toMatchSnapshot();
       });
     });

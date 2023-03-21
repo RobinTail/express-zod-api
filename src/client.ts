@@ -1,4 +1,5 @@
 import ts from "typescript";
+import { z } from "zod";
 import {
   exportModifier,
   f,
@@ -22,7 +23,7 @@ import {
   parametricIndexNode,
   protectedReadonlyModifier,
 } from "./client-helpers";
-import { makeCleanId } from "./common-helpers";
+import { defaultSerializer, makeCleanId } from "./common-helpers";
 import { methods } from "./method";
 import { mimeJson } from "./mime";
 import { Routing } from "./routing";
@@ -34,31 +35,53 @@ interface Registry {
   [METHOD_PATH: string]: Record<"in" | "out", string> & { isJson: boolean };
 }
 
+interface GeneratorParams {
+  routing: Routing;
+  serializer?: (schema: z.ZodTypeAny) => string;
+}
+
 export class Client {
   protected agg: ts.Node[] = [];
   protected registry: Registry = {};
   protected paths: string[] = [];
+  protected aliases: Record<string, ts.TypeAliasDeclaration> = {};
 
-  constructor({ routing }: { routing: Routing }) {
+  protected getAlias(name: string): ts.TypeReferenceNode | undefined {
+    return name in this.aliases ? f.createTypeReferenceNode(name) : undefined;
+  }
+
+  protected makeAlias(name: string, type: ts.TypeNode): ts.TypeReferenceNode {
+    this.aliases[name] = createTypeAlias(type, name);
+    return this.getAlias(name)!;
+  }
+
+  constructor({ routing, serializer = defaultSerializer }: GeneratorParams) {
     walkRouting({
       routing,
       onEndpoint: (endpoint, path, method) => {
         const inputId = makeCleanId(path, method, "input");
         const responseId = makeCleanId(path, method, "response");
+        const commons = {
+          serializer,
+          getAlias: this.getAlias.bind(this),
+          makeAlias: this.makeAlias.bind(this),
+        };
         const input = zodToTs({
+          ...commons,
           schema: endpoint.getSchema("input"),
           isResponse: false,
         });
         const response = zodToTs({
+          ...commons,
           isResponse: true,
           schema: endpoint
             .getSchema("positive")
             .or(endpoint.getSchema("negative")),
         });
-        const inputAlias = createTypeAlias(input, inputId);
-        const responseAlias = createTypeAlias(response, responseId);
-        this.agg.push(inputAlias);
-        this.agg.push(responseAlias);
+        this.agg.push(
+          createTypeAlias(input, inputId),
+          createTypeAlias(response, responseId)
+        );
         if (method !== "options") {
           this.paths.push(path);
           this.registry[`${method} ${path}`] = {
@@ -69,6 +92,8 @@ export class Client {
         }
       },
     });
+
+    this.agg = Object.values<ts.Node>(this.aliases).concat(this.agg);
 
     const pathNode = makePublicLiteralType("Path", this.paths);
     const methodNode = makePublicLiteralType("Method", methods);

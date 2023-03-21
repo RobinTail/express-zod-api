@@ -32,7 +32,12 @@ const { factory: f } = ts;
 
 export type LiteralType = string | number | boolean;
 
-export type ZTSContext = { isResponse?: boolean };
+export type ZTSContext = {
+  isResponse: boolean;
+  getAlias: (name: string) => ts.TypeReferenceNode | undefined;
+  makeAlias: (name: string, type: ts.TypeNode) => ts.TypeReferenceNode;
+  serializer: (schema: z.ZodTypeAny) => string;
+};
 
 export type Producer<T extends z.ZodTypeAny> = SchemaHandler<
   T,

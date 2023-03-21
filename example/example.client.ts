@@ -1,3 +1,8 @@
+type Type2048581c137c5b2130eb860e3ae37da196dfc25b = {
+  title: string;
+  features: Type2048581c137c5b2130eb860e3ae37da196dfc25b;
+}[];
+
 type GetV1UserRetrieveInput = {} & {
   /** a numeric string containing the id of the user */
   id: string;
@@ -11,7 +16,7 @@ type GetV1UserRetrieveResponse =
         name: string;
         features: {
           title: string;
-          features: any;
+          features: Type2048581c137c5b2130eb860e3ae37da196dfc25b;
         }[];
       };
     }

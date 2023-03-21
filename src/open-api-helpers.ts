@@ -1,4 +1,3 @@
-import { createHash } from "crypto";
 import {
   ContentObject,
   ExampleObject,
@@ -56,7 +55,7 @@ type MediaExamples = Pick<MediaTypeObject, "examples">;
 export interface OpenAPIContext {
   isResponse: boolean;
   serializer: (schema: z.ZodTypeAny) => string;
-  hasRef: (name: string) => boolean;
+  getRef: (name: string) => ReferenceObject | undefined;
   makeRef: (
     name: string,
     schema: SchemaObject | ReferenceObject
@@ -69,7 +68,7 @@ type Depicter<
 > = SchemaHandler<T, SchemaObject | ReferenceObject, OpenAPIContext, Variant>;
 
 interface ReqResDepictHelperCommonProps
-  extends Pick<OpenAPIContext, "serializer" | "hasRef" | "makeRef"> {
+  extends Pick<OpenAPIContext, "serializer" | "getRef" | "makeRef"> {
   method: Method;
   path: string;
   endpoint: AbstractEndpoint;
@@ -514,23 +513,21 @@ export const depictBranded: Depicter<z.ZodBranded<z.ZodTypeAny, any>> = ({
   next,
 }) => next({ schema: schema.unwrap() });
 
-export const defaultSerializer = (schema: z.ZodTypeAny): string =>
-  createHash("sha1").update(JSON.stringify(schema), "utf8").digest("hex");
-
 export const depictLazy: Depicter<z.ZodLazy<z.ZodTypeAny>> = ({
   next,
   schema: lazy,
   serializer: serialize,
-  hasRef,
+  getRef,
   makeRef,
 }): ReferenceObject => {
   const hash = serialize(lazy.schema);
-  if (hasRef(hash)) {
-    return { $ref: `#/components/schemas/${hash}` }; // @todo consider changing it to getRef that return ReferenceObject
-  }
-  const ref = makeRef(hash, {}); // make empty ref first
-  makeRef(hash, next({ schema: lazy.schema })); // update
-  return ref;
+  return (
+    getRef(hash) ||
+    (() => {
+      makeRef(hash, {}); // make empty ref first
+      return makeRef(hash, next({ schema: lazy.schema })); // update
+    })()
+  );
 };
 
 export const depictExamples = (
@@ -614,7 +611,7 @@ export const depictRequestParams = ({
   endpoint,
   inputSources,
   serializer,
-  hasRef,
+  getRef,
   makeRef,
   composition,
   clue = "parameter",
@@ -638,7 +635,7 @@ export const depictRequestParams = ({
         onEach,
         onMissing,
         serializer,
-        hasRef,
+        getRef,
         makeRef,
       });
       const result =
@@ -764,7 +761,7 @@ export const depictResponse = ({
   endpoint,
   isPositive,
   serializer,
-  hasRef,
+  getRef,
   makeRef,
   composition,
   clue = "response",
@@ -781,7 +778,7 @@ export const depictResponse = ({
       onEach,
       onMissing,
       serializer,
-      hasRef,
+      getRef,
       makeRef,
     })
   );
@@ -901,7 +898,7 @@ export const depictRequest = ({
   path,
   endpoint,
   serializer,
-  hasRef,
+  getRef,
   makeRef,
   composition,
   clue = "request body",
@@ -916,7 +913,7 @@ export const depictRequest = ({
         onEach,
         onMissing,
         serializer,
-        hasRef,
+        getRef,
         makeRef,
       }),
       pathParams

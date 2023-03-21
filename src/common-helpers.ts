@@ -1,3 +1,4 @@
+import { createHash } from "crypto";
 import { Request } from "express";
 import { HttpError } from "http-errors";
 import { z } from "zod";
@@ -226,6 +227,9 @@ export const makeCleanId = (path: string, method: string, suffix?: string) => {
     )
     .join("");
 };
+
+export const defaultSerializer = (schema: z.ZodTypeAny): string =>
+  createHash("sha1").update(JSON.stringify(schema), "utf8").digest("hex");
 
 export const tryToTransform = ({
   effect,
