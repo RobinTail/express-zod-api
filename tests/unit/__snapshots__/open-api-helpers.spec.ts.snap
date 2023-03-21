@@ -301,7 +301,7 @@ exports[`Open API helpers depictIntersection() should wrap next depicters in all
 
 exports[`Open API helpers depictLazy should handle circular references 0 1`] = `
 {
-  "$ref": "6cbbd837811754902ea1e68d3e5c75e36250b880",
+  "$ref": "#/components/schemas/6cbbd837811754902ea1e68d3e5c75e36250b880",
 }
 `;
 
@@ -316,7 +316,7 @@ exports[`Open API helpers depictLazy should handle circular references 0 2`] = `
 
 exports[`Open API helpers depictLazy should handle circular references 1 1`] = `
 {
-  "$ref": "7a225c55e65ab4a2fd3ce390265b255ee6747049",
+  "$ref": "#/components/schemas/7a225c55e65ab4a2fd3ce390265b255ee6747049",
 }
 `;
 
@@ -328,7 +328,7 @@ exports[`Open API helpers depictLazy should handle circular references 1 2`] = `
 
 exports[`Open API helpers depictLazy should handle circular references 2 1`] = `
 {
-  "$ref": "118cb3b11b8a1f3b6b1e60a89f96a8be9da32a0f",
+  "$ref": "#/components/schemas/118cb3b11b8a1f3b6b1e60a89f96a8be9da32a0f",
 }
 `;
 

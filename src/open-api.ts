@@ -59,11 +59,13 @@ export class OpenAPI extends OpenApiBuilder {
     schema: SchemaObject | ReferenceObject
   ): ReferenceObject {
     this.addSchema(name, schema);
-    return { $ref: `#/components/schemas/${name}` };
+    return this.getRef(name)!;
   }
 
-  protected hasRef(name: string): boolean {
-    return name in (this.rootDoc.components?.schemas || {});
+  protected getRef(name: string): ReferenceObject | undefined {
+    return name in (this.rootDoc.components?.schemas || {})
+      ? { $ref: `#/components/schemas/${name}` }
+      : undefined;
   }
 
   protected ensureUniqOperationId(path: string, method: Method) {
@@ -119,7 +121,7 @@ export class OpenAPI extends OpenApiBuilder {
         endpoint,
         composition,
         serializer,
-        hasRef: this.hasRef.bind(this),
+        getRef: this.getRef.bind(this),
         makeRef: this.makeRef.bind(this),
       };
       const [shortDesc, longDesc] = (["short", "long"] as const).map(

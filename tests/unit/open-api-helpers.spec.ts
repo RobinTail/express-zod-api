@@ -54,21 +54,21 @@ import { SchemaHandler, walkSchema } from "../../src/schema-walker";
 import { serializeSchemaForTest } from "../helpers";
 
 describe("Open API helpers", () => {
-  const hasRefMock = jest.fn();
+  const getRefMock = jest.fn();
   const makeRefMock = jest.fn(
     (name: string, {}: SchemaObject | ReferenceObject): ReferenceObject => ({
-      $ref: name,
+      $ref: `#/components/schemas/${name}`,
     })
   );
   const requestContext: OpenAPIContext = {
     isResponse: false,
-    hasRef: hasRefMock,
+    getRef: getRefMock,
     makeRef: makeRefMock,
     serializer: defaultSerializer,
   };
   const responseContext: OpenAPIContext = {
     isResponse: true,
-    hasRef: hasRefMock,
+    getRef: getRefMock,
     makeRef: makeRefMock,
     serializer: defaultSerializer,
   };
@@ -91,7 +91,7 @@ describe("Open API helpers", () => {
       });
 
   beforeEach(() => {
-    hasRefMock.mockClear();
+    getRefMock.mockClear();
     makeRefMock.mockClear();
   });
 
@@ -742,7 +742,7 @@ describe("Open API helpers", () => {
           }),
           inputSources: ["query", "params"],
           composition: "inline",
-          hasRef: hasRefMock,
+          getRef: getRefMock,
           makeRef: makeRefMock,
           serializer: defaultSerializer,
         })
@@ -765,7 +765,7 @@ describe("Open API helpers", () => {
           }),
           inputSources: ["body", "params"],
           composition: "inline",
-          hasRef: hasRefMock,
+          getRef: getRefMock,
           makeRef: makeRefMock,
           serializer: defaultSerializer,
         })
@@ -788,7 +788,7 @@ describe("Open API helpers", () => {
           }),
           inputSources: ["body"],
           composition: "inline",
-          hasRef: hasRefMock,
+          getRef: getRefMock,
           makeRef: makeRefMock,
           serializer: defaultSerializer,
         })
@@ -912,10 +912,14 @@ describe("Open API helpers", () => {
         hash: "118cb3b11b8a1f3b6b1e60a89f96a8be9da32a0f",
       },
     ])("should handle circular references %#", ({ schema, hash }) => {
-      hasRefMock
-        .mockImplementationOnce(() => false)
-        .mockImplementationOnce(() => true);
-      expect(hasRefMock.mock.calls.length).toBe(0);
+      getRefMock
+        .mockImplementationOnce(() => undefined)
+        .mockImplementationOnce(
+          (name: string): ReferenceObject => ({
+            $ref: `#/components/schemas/${name}`,
+          })
+        );
+      expect(getRefMock.mock.calls.length).toBe(0);
       expect(
         depictLazy({
           schema,
@@ -923,8 +927,8 @@ describe("Open API helpers", () => {
           next: makeNext(responseContext),
         })
       ).toMatchSnapshot();
-      expect(hasRefMock).toHaveBeenCalledTimes(2);
-      for (const call of hasRefMock.mock.calls) {
+      expect(getRefMock).toHaveBeenCalledTimes(2);
+      for (const call of getRefMock.mock.calls) {
         expect(call[0]).toBe(hash);
       }
       expect(makeRefMock).toHaveBeenCalledTimes(2);
