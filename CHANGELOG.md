@@ -2,6 +2,11 @@
 
 ## Version 10
 
+### v10.1.0
+
+- Feature #876: Supporting `z.lazy()` (including circular schemas) for the client generator.
+  - This is an addition to the feature #856 released in version 9.3.0.
+
 ### v10.0.0
 
 - This release contains the fix from version 9.4.2.
