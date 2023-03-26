@@ -29,7 +29,13 @@ import { Routing } from "./routing";
 import { RoutingWalkerParams, walkRouting } from "./routing-walker";
 
 interface GeneratorParams {
+  /**
+   * Version of the OpenAPI specification
+   * @default 3.0
+   * */
+  variant?: "3.0" | "3.1";
   title: string;
+  /** Version of the generated documentation */
   version: string;
   serverUrl: string;
   routing: Routing;
@@ -106,8 +112,10 @@ export class OpenAPI extends OpenApiBuilder {
     hasSummaryFromDescription = true,
     composition = "inline",
     serializer = defaultSerializer,
+    variant = "3.0",
   }: GeneratorParams) {
     super();
+    this.addOpenApiVersion(`${variant}.0`);
     this.addInfo({ title, version }).addServer({ url: serverUrl });
     const onEndpoint: RoutingWalkerParams["onEndpoint"] = (
       endpoint,

@@ -15,5 +15,5 @@ jobs:
       - name: OpenAPI 3.0 spec
         uses: char0n/swagger-editor-validate@v1
         with:
-          definition-file: example/example.swagger.yaml
+          definition-file: example/example.documentation.3.0.yaml
 
