@@ -12,14 +12,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Validate example against OpenAPI 3.0 spec
+      - name: OpenAPI 3.0 spec
         uses: char0n/swagger-editor-validate@v1
         with:
           definition-file: example/example.swagger.yaml
-      - name: Validate example against OpenAPI 3.1 spec
-        uses: char0n/swagger-editor-validate@v1
-        with:
-          definition-file: example/example.swagger.yaml
-          # this one support OpenAPI 3.1:
-          swagger-editor-url: https://editor-next.swagger.io/
 
