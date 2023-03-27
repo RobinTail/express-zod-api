@@ -2,6 +2,11 @@
 
 ## Version 10
 
+### v10.1.2
+
+- Fixed issue #907, found and reported by [@McMerph](https://github.com/McMerph).
+  - HTTP response status code in case of malformed body or other body-parser errors changed from `500` to `400`.
+
 ### v10.1.1
 
 - Fixed issue #900, found and reported by [Max Cohn](https://github.com/maxcohn).

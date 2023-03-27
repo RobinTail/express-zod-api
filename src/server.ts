@@ -20,7 +20,7 @@ export const createParserFailureHandler =
       return next();
     }
     errorHandler.handler({
-      error,
+      error: createHttpError(400, makeErrorFromAnything(error).message),
       request,
       response,
       logger,

@@ -80,9 +80,7 @@ export function isValidDate(date: Date): boolean {
   return !isNaN(date.getTime());
 }
 
-export function makeErrorFromAnything<T extends Error>(subject: T): T;
-export function makeErrorFromAnything(subject: any): Error;
-export function makeErrorFromAnything<T>(subject: T): Error {
+export function makeErrorFromAnything(subject: any): Error {
   return subject instanceof Error
     ? subject
     : new Error(
