@@ -89,7 +89,6 @@ exports[`Open API helpers depictDiscriminatedUnion() should wrap next depicters 
       "properties": {
         "data": {
           "format": "any",
-          "nullable": true,
         },
         "status": {
           "enum": [
@@ -168,14 +167,12 @@ exports[`Open API helpers depictEffect() should depict as string (preprocess) 1`
 exports[`Open API helpers depictEffect() should handle edge cases 1`] = `
 {
   "format": "any",
-  "nullable": true,
 }
 `;
 
 exports[`Open API helpers depictEffect() should handle edge cases 2`] = `
 {
   "format": "any",
-  "nullable": true,
 }
 `;
 

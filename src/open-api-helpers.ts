@@ -688,16 +688,20 @@ export const depicters: HandlingRules<
   ZodLazy: depictLazy,
 };
 
-export const onEach: Depicter<z.ZodTypeAny, "last"> = ({
+export const onEach: Depicter<z.ZodTypeAny, "each"> = ({
   schema,
   isResponse,
+  current,
 }) => {
   const { description } = schema;
   const shouldAvoidParsing = schema instanceof z.ZodLazy;
+  const hasTypePropertyInDepiction =
+    isSchemaObject(current) && current.type !== undefined;
   const examples = shouldAvoidParsing ? [] : getExamples(schema, isResponse);
   return {
     ...(description && { description }),
     ...(!shouldAvoidParsing &&
+      hasTypePropertyInDepiction &&
       schema.isNullable() &&
       !(isResponse && hasCoercion(schema)) && { nullable: true }),
     ...(examples.length > 0 && { example: examples[0] }),
