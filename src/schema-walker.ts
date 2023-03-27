@@ -1,14 +1,14 @@
 import { z } from "zod";
 import { ProprietaryKinds } from "./ez-namespace";
 
-export type HandlingVariant = "last" | "regular";
+export type HandlingVariant = "last" | "regular" | "each";
 type VariantDependingProps<
   Variant extends HandlingVariant,
   U
 > = Variant extends "regular"
-  ? {
-      next: SchemaHandler<z.ZodTypeAny, U, {}, "last">;
-    }
+  ? { next: SchemaHandler<z.ZodTypeAny, U, {}, "last"> }
+  : Variant extends "each"
+  ? { current: U }
   : {};
 
 type SchemaHandlingProps<
@@ -42,7 +42,7 @@ export const walkSchema = <U, Context extends object = {}>({
   onMissing,
   ...context
 }: SchemaHandlingProps<z.ZodTypeAny, U, Context, "last"> & {
-  onEach?: SchemaHandler<z.ZodTypeAny, U, Context & { current: U }, "last">;
+  onEach?: SchemaHandler<z.ZodTypeAny, U, Context, "each">;
   rules: HandlingRules<U, Context>;
   onMissing: (schema: z.ZodTypeAny) => U;
 }): U => {
