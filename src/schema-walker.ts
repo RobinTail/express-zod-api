@@ -42,11 +42,10 @@ export const walkSchema = <U, Context extends object = {}>({
   onMissing,
   ...context
 }: SchemaHandlingProps<z.ZodTypeAny, U, Context, "last"> & {
-  onEach?: SchemaHandler<z.ZodTypeAny, U, Context, "last">;
+  onEach?: SchemaHandler<z.ZodTypeAny, U, Context & { current: U }, "last">;
   rules: HandlingRules<U, Context>;
   onMissing: (schema: z.ZodTypeAny) => U;
 }): U => {
-  const overrides = onEach && onEach({ schema, ...(context as Context) });
   const handler =
     "typeName" in schema._def
       ? rules[schema._def.typeName as keyof typeof rules]
@@ -66,5 +65,7 @@ export const walkSchema = <U, Context extends object = {}>({
         next,
       })
     : onMissing(schema);
+  const overrides =
+    onEach && onEach({ schema, current: result, ...(context as Context) });
   return overrides ? { ...result, ...overrides } : result;
 };
