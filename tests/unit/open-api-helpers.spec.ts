@@ -500,8 +500,9 @@ describe("Open API helpers", () => {
       z.record(z.enum(["one", "two"]), z.boolean()),
       z.record(z.literal("testing"), z.boolean()),
       z.record(z.literal("one").or(z.literal("two")), z.boolean()),
+      z.record(z.any()), // Issue #900
     ])(
-      "should set properties+required or additionalProperties props",
+      "should set properties+required or additionalProperties props %#",
       (schema) => {
         expect(
           depictRecord({
