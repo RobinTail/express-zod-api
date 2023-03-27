@@ -4,14 +4,15 @@ import { ZodDateOutDef } from "./date-out-schema";
 import { ZodFileDef } from "./file-schema";
 import { ZodUploadDef } from "./upload-schema";
 
-export type HandlingVariant = "last" | "regular";
+export type HandlingVariant = "last" | "regular" | "each";
+
 type VariantDependingProps<
   Variant extends HandlingVariant,
   U
 > = Variant extends "regular"
-  ? {
-      next: SchemaHandler<z.ZodTypeAny, U, {}, "last">;
-    }
+  ? { next: SchemaHandler<z.ZodTypeAny, U, {}, "last"> }
+  : Variant extends "each"
+  ? { prev: U }
   : {};
 
 type SchemaHandlingProps<
@@ -51,11 +52,11 @@ export const walkSchema = <U, Context extends object = {}>({
   onMissing,
   ...context
 }: SchemaHandlingProps<z.ZodTypeAny, U, Context, "last"> & {
-  onEach?: SchemaHandler<z.ZodTypeAny, U, Context, "last">;
+  /** @since 10.1.1 calling onEach _after_ handler and giving it its result */
+  onEach?: SchemaHandler<z.ZodTypeAny, U, Context, "each">;
   rules: HandlingRules<U, Context>;
   onMissing: (schema: z.ZodTypeAny) => U;
 }): U => {
-  const overrides = onEach && onEach({ schema, ...(context as Context) });
   const handler =
     "typeName" in schema._def
       ? rules[schema._def.typeName as keyof typeof rules]
@@ -75,5 +76,7 @@ export const walkSchema = <U, Context extends object = {}>({
         next,
       })
     : onMissing(schema);
+  const overrides =
+    onEach && onEach({ schema, prev: result, ...(context as Context) });
   return overrides ? { ...result, ...overrides } : result;
 };

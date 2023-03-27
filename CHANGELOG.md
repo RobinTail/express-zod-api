@@ -2,6 +2,22 @@
 
 ## Version 9
 
+### v9.4.3
+
+- This version contains a cherry-picked fix made in v10.1.1
+- Fixed issue #900, found and reported by [Max Cohn](https://github.com/maxcohn).
+  - Do not set `nullable` property to the depictions having no `type` property according to OpenAPI specification.
+  - Affected schemas: `z.any()` and `z.preprocess()`.
+
+```yaml
+# depiction of z.any() in the generated documentation
+before:
+  format: any
+  nullable: true
+after:
+  format: any
+```
+
 ### v9.4.2
 
 - Fixed issue #892, found and reported by [@McMerph](https://github.com/McMerph).

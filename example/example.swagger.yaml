@@ -306,7 +306,6 @@ paths:
                         type: object
                         additionalProperties:
                           format: any
-                          nullable: true
                     required:
                       - name
                       - size
