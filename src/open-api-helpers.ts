@@ -693,10 +693,12 @@ export const onEach: Depicter<z.ZodTypeAny, "each"> = ({
   isResponse,
   current,
 }) => {
+  if (isReferenceObject(current)) {
+    return {};
+  }
   const { description } = schema;
   const shouldAvoidParsing = schema instanceof z.ZodLazy;
-  const hasTypePropertyInDepiction =
-    isSchemaObject(current) && current.type !== undefined;
+  const hasTypePropertyInDepiction = current.type !== undefined;
   const isResponseHavingCoercion = isResponse && hasCoercion(schema);
   const isActuallyNullable =
     !shouldAvoidParsing &&
