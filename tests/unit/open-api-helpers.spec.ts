@@ -1,4 +1,7 @@
-import { ReferenceObject, SchemaObject } from "openapi3-ts";
+import {
+  ReferenceObject,
+  SchemaObject,
+} from "openapi3-ts/dist/cjs/model/openapi30";
 import { z } from "zod";
 import { defaultSerializer } from "../../src/common-helpers";
 import { IOSchemaError } from "../../src/errors";

@@ -15,7 +15,7 @@ import {
   TagObject,
   isReferenceObject,
   isSchemaObject,
-} from "openapi3-ts";
+} from "openapi3-ts/dist/cjs/model/openapi30";
 import { omit } from "ramda";
 import { z } from "zod";
 import {

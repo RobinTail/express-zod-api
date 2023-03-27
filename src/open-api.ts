@@ -1,11 +1,11 @@
+import { OpenApiBuilder } from "openapi3-ts/dist/cjs/dsl/openapi-builder30";
 import {
-  OpenApiBuilder,
   OperationObject,
   ReferenceObject,
   SchemaObject,
   SecuritySchemeObject,
   SecuritySchemeType,
-} from "openapi3-ts";
+} from "openapi3-ts/dist/cjs/model/openapi30";
 import { z } from "zod";
 import {
   defaultInputSources,
