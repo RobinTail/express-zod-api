@@ -347,7 +347,7 @@ describe("App", () => {
         },
         body: '{"key": "123", "something',
       });
-      expect(response.status).toBe(500);
+      expect(response.status).toBe(400); // Issue #907
       const json = await response.json();
       expect(json).toMatchSnapshot({
         error: {
