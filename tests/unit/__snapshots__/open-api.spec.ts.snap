@@ -1615,7 +1615,6 @@ paths:
                               - success
                           data:
                             format: any
-                            nullable: true
                         required:
                           - status
                       - type: object
@@ -2362,7 +2361,6 @@ paths:
                         type: object
                         additionalProperties:
                           format: any
-                          nullable: true
                     required:
                       - name
                       - size
@@ -2828,7 +2826,6 @@ components:
               type: object
               additionalProperties:
                 format: any
-                nullable: true
           required:
             - name
             - size
@@ -3918,7 +3915,6 @@ paths:
                     properties:
                       any:
                         format: any
-                        nullable: true
                 required:
                   - status
                   - data
@@ -3956,7 +3952,6 @@ paths:
           description: GET /v1/getSomething parameter
           schema:
             format: any
-            nullable: true
 components:
   schemas: {}
   responses: {}
@@ -4037,7 +4032,6 @@ paths:
           description: GET /v1/getSomething parameter
           schema:
             format: string (preprocessed)
-            nullable: true
         - name: number
           in: query
           required: true
