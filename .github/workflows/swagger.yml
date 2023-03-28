@@ -13,7 +13,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Validate against OpenAPI 3.0
-        uses: char0n/apidom-validate@v1
+        uses: char0n/swagger-editor-validate@v1
         with:
           definition-file: example/example.documentation.3.0.yaml
       - name: Validate against OpenAPI 3.1
