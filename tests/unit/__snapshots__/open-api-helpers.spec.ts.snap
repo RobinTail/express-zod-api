@@ -89,7 +89,6 @@ exports[`Open API helpers depictDiscriminatedUnion() should wrap next depicters 
       "properties": {
         "data": {
           "format": "any",
-          "nullable": true,
         },
         "status": {
           "enum": [
@@ -168,14 +167,12 @@ exports[`Open API helpers depictEffect() should depict as string (preprocess) 1`
 exports[`Open API helpers depictEffect() should handle edge cases 1`] = `
 {
   "format": "any",
-  "nullable": true,
 }
 `;
 
 exports[`Open API helpers depictEffect() should handle edge cases 2`] = `
 {
   "format": "any",
-  "nullable": true,
 }
 `;
 
@@ -593,7 +590,7 @@ exports[`Open API helpers depictPipeline should depict as string (in) 1`] = `
 }
 `;
 
-exports[`Open API helpers depictRecord() should set properties+required or additionalProperties props 1`] = `
+exports[`Open API helpers depictRecord() should set properties+required or additionalProperties props 0 1`] = `
 {
   "additionalProperties": {
     "type": "boolean",
@@ -602,7 +599,7 @@ exports[`Open API helpers depictRecord() should set properties+required or addit
 }
 `;
 
-exports[`Open API helpers depictRecord() should set properties+required or additionalProperties props 2`] = `
+exports[`Open API helpers depictRecord() should set properties+required or additionalProperties props 1 1`] = `
 {
   "additionalProperties": {
     "type": "boolean",
@@ -611,7 +608,7 @@ exports[`Open API helpers depictRecord() should set properties+required or addit
 }
 `;
 
-exports[`Open API helpers depictRecord() should set properties+required or additionalProperties props 3`] = `
+exports[`Open API helpers depictRecord() should set properties+required or additionalProperties props 2 1`] = `
 {
   "properties": {
     "one": {
@@ -629,7 +626,7 @@ exports[`Open API helpers depictRecord() should set properties+required or addit
 }
 `;
 
-exports[`Open API helpers depictRecord() should set properties+required or additionalProperties props 4`] = `
+exports[`Open API helpers depictRecord() should set properties+required or additionalProperties props 3 1`] = `
 {
   "properties": {
     "testing": {
@@ -643,7 +640,7 @@ exports[`Open API helpers depictRecord() should set properties+required or addit
 }
 `;
 
-exports[`Open API helpers depictRecord() should set properties+required or additionalProperties props 5`] = `
+exports[`Open API helpers depictRecord() should set properties+required or additionalProperties props 4 1`] = `
 {
   "properties": {
     "one": {
@@ -657,6 +654,15 @@ exports[`Open API helpers depictRecord() should set properties+required or addit
     "one",
     "two",
   ],
+  "type": "object",
+}
+`;
+
+exports[`Open API helpers depictRecord() should set properties+required or additionalProperties props 5 1`] = `
+{
+  "additionalProperties": {
+    "format": "any",
+  },
   "type": "object",
 }
 `;

@@ -2,6 +2,26 @@
 
 ## Version 10
 
+### v10.1.2
+
+- Fixed issue #907, found and reported by [@McMerph](https://github.com/McMerph).
+  - HTTP response status code in case of malformed body or other body-parser errors changed from `500` to `400`.
+
+### v10.1.1
+
+- Fixed issue #900, found and reported by [Max Cohn](https://github.com/maxcohn).
+  - Do not set `nullable` property to the depictions having no `type` property according to OpenAPI specification.
+  - Affected schemas: `z.any()` and `z.preprocess()`.
+
+```yaml
+# depiction of z.any() in the generated documentation
+before:
+  format: any
+  nullable: true
+after:
+  format: any
+```
+
 ### v10.1.0
 
 - Feature #876: Supporting `z.lazy()` (including circular schemas) for the client generator.
@@ -711,6 +731,36 @@ const exampleEndpoint = taggedEndpointsFactory.build({
 - Supporting `jest` (optional peer dependency) version 29.x.
 
 ## Version 7
+
+### v7.9.4
+
+- This version contains a cherry-picked fix made in v8.4.1.
+- Fixed a bug found and reported by [@leosuncin](https://github.com/leosuncin) in issue #705.
+  - CORS didn't work well in case of using `DependsOnMethod`.
+  - The list of the allowed methods in the response to `OPTIONS` request did only contain the first method declared
+    within `DependsOnMethod` instance.
+
+```typescript
+// reproduction minimal setup
+const routing: Routing = {
+  test: new DependsOnMethod({
+    get: getEndpoint,
+    post: postEndpoint,
+  }),
+};
+// when requesting OPTIONS for "/test", the response has the following header:
+// Access-Control-Allow-Methods: GET, OPTIONS
+```
+
+### v7.9.3
+
+- This version contains a cherry-picked fix made in v8.3.2.
+- Fixed the bug #673 found and reported by [@shroudedcode](https://github.com/shroudedcode).
+  - Preventing double parsing of incoming data by input schemas of middlewares containing transformations.
+  - The bug caused inability of using any transforming schema in middlewares.
+  - In particular, but not limited with: using `z.dateIn()` in middlewares.
+    - Sample error message in this case: `Expected string, received date`.
+  - Using `.transform()` method in middlewares was also affected by this bug.
 
 ### v7.9.2
 

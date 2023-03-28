@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Example API
-  version: 10.1.0
+  version: 10.1.2
 paths:
   /v1/user/retrieve:
     get:
@@ -306,7 +306,6 @@ paths:
                         type: object
                         additionalProperties:
                           format: any
-                          nullable: true
                     required:
                       - name
                       - size
