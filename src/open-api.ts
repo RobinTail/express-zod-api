@@ -1,11 +1,4 @@
-import { OpenApiBuilder } from "openapi3-ts/dist/cjs/dsl/openapi-builder30";
-import {
-  OperationObject,
-  ReferenceObject,
-  SchemaObject,
-  SecuritySchemeObject,
-  SecuritySchemeType,
-} from "openapi3-ts/dist/cjs/model/openapi30";
+import { oas30 } from "openapi3-ts";
 import { z } from "zod";
 import {
   defaultInputSources,
@@ -49,20 +42,21 @@ interface GeneratorParams {
   serializer?: (schema: z.ZodTypeAny) => string;
 }
 
-export class OpenAPI extends OpenApiBuilder {
-  protected lastSecuritySchemaIds: Partial<Record<SecuritySchemeType, number>> =
-    {};
+export class OpenAPI extends oas30.OpenApiBuilder {
+  protected lastSecuritySchemaIds: Partial<
+    Record<oas30.SecuritySchemeType, number>
+  > = {};
   protected lastOperationIdSuffixes: Record<string, number> = {};
 
   protected makeRef(
     name: string,
-    schema: SchemaObject | ReferenceObject
-  ): ReferenceObject {
+    schema: oas30.SchemaObject | oas30.ReferenceObject
+  ): oas30.ReferenceObject {
     this.addSchema(name, schema);
     return this.getRef(name)!;
   }
 
-  protected getRef(name: string): ReferenceObject | undefined {
+  protected getRef(name: string): oas30.ReferenceObject | undefined {
     return name in (this.rootDoc.components?.schemas || {})
       ? { $ref: `#/components/schemas/${name}` }
       : undefined;
@@ -78,7 +72,7 @@ export class OpenAPI extends OpenApiBuilder {
     return operationId;
   }
 
-  protected ensureUniqSecuritySchemaName(subject: SecuritySchemeObject) {
+  protected ensureUniqSecuritySchemaName(subject: oas30.SecuritySchemeObject) {
     const serializedSubject = JSON.stringify(subject);
     for (const name in this.rootDoc.components?.securitySchemes || {}) {
       if (
@@ -133,7 +127,7 @@ export class OpenAPI extends OpenApiBuilder {
         ...commonParams,
         inputSources,
       });
-      const operation: OperationObject = {
+      const operation: oas30.OperationObject = {
         operationId: this.ensureUniqOperationId(path, method),
         responses: {
           [endpoint.getStatusCode("positive")]: depictResponse({
