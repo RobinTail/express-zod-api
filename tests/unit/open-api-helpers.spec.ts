@@ -1,4 +1,4 @@
-import { ReferenceObject, SchemaObject } from "openapi3-ts";
+import { oas30 } from "openapi3-ts";
 import { z } from "zod";
 import { defaultSerializer } from "../../src/common-helpers";
 import { IOSchemaError } from "../../src/errors";
@@ -56,7 +56,10 @@ import { serializeSchemaForTest } from "../helpers";
 describe("Open API helpers", () => {
   const getRefMock = jest.fn();
   const makeRefMock = jest.fn(
-    (name: string, {}: SchemaObject | ReferenceObject): ReferenceObject => ({
+    (
+      name: string,
+      {}: oas30.SchemaObject | oas30.ReferenceObject
+    ): oas30.ReferenceObject => ({
       $ref: `#/components/schemas/${name}`,
     })
   );
@@ -77,7 +80,7 @@ describe("Open API helpers", () => {
       context: OpenAPIContext
     ): SchemaHandler<
       z.ZodTypeAny,
-      SchemaObject | ReferenceObject,
+      oas30.SchemaObject | oas30.ReferenceObject,
       {},
       "last"
     > =>
@@ -916,7 +919,7 @@ describe("Open API helpers", () => {
       getRefMock
         .mockImplementationOnce(() => undefined)
         .mockImplementationOnce(
-          (name: string): ReferenceObject => ({
+          (name: string): oas30.ReferenceObject => ({
             $ref: `#/components/schemas/${name}`,
           })
         );
