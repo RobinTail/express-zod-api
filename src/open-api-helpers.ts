@@ -1,21 +1,4 @@
-import {
-  ContentObject,
-  ExampleObject,
-  ExamplesObject,
-  MediaTypeObject,
-  OAuthFlowsObject,
-  ParameterObject,
-  ReferenceObject,
-  RequestBodyObject,
-  ResponseObject,
-  SchemaObject,
-  SchemaObjectType,
-  SecurityRequirementObject,
-  SecuritySchemeObject,
-  TagObject,
-  isReferenceObject,
-  isSchemaObject,
-} from "openapi3-ts";
+import { oas30 } from "openapi3-ts";
 import { omit } from "ramda";
 import { z } from "zod";
 import {
@@ -50,22 +33,27 @@ import {
 import { Security } from "./security";
 import { ZodUpload } from "./upload-schema";
 
-type MediaExamples = Pick<MediaTypeObject, "examples">;
+type MediaExamples = Pick<oas30.MediaTypeObject, "examples">;
 
 export interface OpenAPIContext {
   isResponse: boolean;
   serializer: (schema: z.ZodTypeAny) => string;
-  getRef: (name: string) => ReferenceObject | undefined;
+  getRef: (name: string) => oas30.ReferenceObject | undefined;
   makeRef: (
     name: string,
-    schema: SchemaObject | ReferenceObject
-  ) => ReferenceObject;
+    schema: oas30.SchemaObject | oas30.ReferenceObject
+  ) => oas30.ReferenceObject;
 }
 
 type Depicter<
   T extends z.ZodTypeAny,
   Variant extends HandlingVariant = "regular"
-> = SchemaHandler<T, SchemaObject | ReferenceObject, OpenAPIContext, Variant>;
+> = SchemaHandler<
+  T,
+  oas30.SchemaObject | oas30.ReferenceObject,
+  OpenAPIContext,
+  Variant
+>;
 
 interface ReqResDepictHelperCommonProps
   extends Pick<OpenAPIContext, "serializer" | "getRef" | "makeRef"> {
@@ -81,7 +69,7 @@ const isoDateDocumentationUrl =
   "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString";
 
 const samples: Record<
-  Exclude<NonNullable<SchemaObjectType>, Array<any>>,
+  Exclude<NonNullable<oas30.SchemaObjectType>, Array<any>>,
   any
 > = {
   integer: 0,
@@ -369,7 +357,7 @@ export const depictTuple: Depicter<z.ZodTuple> = ({
         description: types
           .map(
             (item, index) =>
-              `${index}: ${isSchemaObject(item) ? item.type : item.$ref}`
+              `${index}: ${oas30.isSchemaObject(item) ? item.type : item.$ref}`
           )
           .join(", "),
       }),
@@ -466,11 +454,11 @@ export const depictObjectProperties = ({
       ...carry,
       [key]: next({ schema: shape[key] }),
     }),
-    {} as Record<string, SchemaObject | ReferenceObject>
+    {} as Record<string, oas30.SchemaObject | oas30.ReferenceObject>
   );
 };
 
-const makeSample = (depicted: SchemaObject) => {
+const makeSample = (depicted: oas30.SchemaObject) => {
   const type = (
     Array.isArray(depicted.type) ? depicted.type[0] : depicted.type
   ) as keyof typeof samples;
@@ -484,7 +472,11 @@ export const depictEffect: Depicter<z.ZodEffects<z.ZodTypeAny>> = ({
 }) => {
   const input = next({ schema: schema.innerType() });
   const { effect } = schema._def;
-  if (isResponse && effect.type === "transform" && isSchemaObject(input)) {
+  if (
+    isResponse &&
+    effect.type === "transform" &&
+    oas30.isSchemaObject(input)
+  ) {
     const outputType = tryToTransform({ effect, sample: makeSample(input) });
     if (outputType && ["number", "string", "boolean"].includes(outputType)) {
       return { type: outputType as "number" | "string" | "boolean" };
@@ -492,7 +484,11 @@ export const depictEffect: Depicter<z.ZodEffects<z.ZodTypeAny>> = ({
       return next({ schema: z.any() });
     }
   }
-  if (!isResponse && effect.type === "preprocess" && isSchemaObject(input)) {
+  if (
+    !isResponse &&
+    effect.type === "preprocess" &&
+    oas30.isSchemaObject(input)
+  ) {
     const { type: inputType, ...rest } = input;
     return {
       ...rest,
@@ -519,7 +515,7 @@ export const depictLazy: Depicter<z.ZodLazy<z.ZodTypeAny>> = ({
   serializer: serialize,
   getRef,
   makeRef,
-}): ReferenceObject => {
+}): oas30.ReferenceObject => {
   const hash = serialize(lazy.schema);
   return (
     getRef(hash) ||
@@ -540,10 +536,10 @@ export const depictExamples = (
     return {};
   }
   return {
-    examples: examples.reduce<ExamplesObject>(
+    examples: examples.reduce<oas30.ExamplesObject>(
       (carry, example, index) => ({
         ...carry,
-        [`example${index + 1}`]: <ExampleObject>{
+        [`example${index + 1}`]: <oas30.ExampleObject>{
           value: omit(omitProps, example),
         },
       }),
@@ -562,12 +558,12 @@ export const depictParamExamples = (
     return {};
   }
   return {
-    examples: examples.reduce<ExamplesObject>(
+    examples: examples.reduce<oas30.ExamplesObject>(
       (carry, example, index) =>
         param in example
           ? {
               ...carry,
-              [`example${index + 1}`]: <ExampleObject>{
+              [`example${index + 1}`]: <oas30.ExampleObject>{
                 value: example[param],
               },
             }
@@ -617,7 +613,7 @@ export const depictRequestParams = ({
   clue = "parameter",
 }: ReqResDepictHelperCommonProps & {
   inputSources: InputSource[];
-}): ParameterObject[] => {
+}): oas30.ParameterObject[] => {
   const schema = endpoint.getSchema("input");
   const shape = extractObjectSchema(schema).shape;
   const pathParams = getRoutePathParams(path);
@@ -654,7 +650,7 @@ export const depictRequestParams = ({
 };
 
 export const depicters: HandlingRules<
-  SchemaObject | ReferenceObject,
+  oas30.SchemaObject | oas30.ReferenceObject,
   OpenAPIContext
 > = {
   ZodString: depictString,
@@ -693,7 +689,7 @@ export const onEach: Depicter<z.ZodTypeAny, "each"> = ({
   isResponse,
   prev,
 }) => {
-  if (isReferenceObject(prev)) {
+  if (oas30.isReferenceObject(prev)) {
     return {};
   }
   const { description } = schema;
@@ -718,10 +714,10 @@ export const onMissing = (schema: z.ZodTypeAny) => {
 };
 
 export const excludeParamsFromDepiction = (
-  depicted: SchemaObject | ReferenceObject,
+  depicted: oas30.SchemaObject | oas30.ReferenceObject,
   pathParams: string[]
-): SchemaObject | ReferenceObject => {
-  if (isReferenceObject(depicted)) {
+): oas30.SchemaObject | oas30.ReferenceObject => {
+  if (oas30.isReferenceObject(depicted)) {
     return depicted;
   }
   const properties = depicted.properties
@@ -734,12 +730,12 @@ export const excludeParamsFromDepiction = (
     ? depicted.required.filter((name) => !pathParams.includes(name))
     : undefined;
   const allOf = depicted.allOf
-    ? (depicted.allOf as SchemaObject[]).map((entry) =>
+    ? (depicted.allOf as oas30.SchemaObject[]).map((entry) =>
         excludeParamsFromDepiction(entry, pathParams)
       )
     : undefined;
   const oneOf = depicted.oneOf
-    ? (depicted.oneOf as SchemaObject[]).map((entry) =>
+    ? (depicted.oneOf as oas30.SchemaObject[]).map((entry) =>
         excludeParamsFromDepiction(entry, pathParams)
       )
     : undefined;
@@ -760,9 +756,9 @@ export const excludeParamsFromDepiction = (
 };
 
 export const excludeExampleFromDepiction = (
-  depicted: SchemaObject | ReferenceObject
-): SchemaObject | ReferenceObject =>
-  isSchemaObject(depicted) ? omit(["example"], depicted) : depicted;
+  depicted: oas30.SchemaObject | oas30.ReferenceObject
+): oas30.SchemaObject | oas30.ReferenceObject =>
+  oas30.isSchemaObject(depicted) ? omit(["example"], depicted) : depicted;
 
 export const depictResponse = ({
   method,
@@ -776,7 +772,7 @@ export const depictResponse = ({
   clue = "response",
 }: ReqResDepictHelperCommonProps & {
   isPositive: boolean;
-}): ResponseObject => {
+}): oas30.ResponseObject => {
   const schema = endpoint.getSchema(isPositive ? "positive" : "negative");
   const mimeTypes = endpoint.getMimeTypes(isPositive ? "positive" : "negative");
   const depictedSchema = excludeExampleFromDepiction(
@@ -804,14 +800,14 @@ export const depictResponse = ({
         ...carry,
         [mimeType]: { schema: result, ...examples },
       }),
-      {} as ContentObject
+      {} as oas30.ContentObject
     ),
   };
 };
 
 type SecurityHelper<K extends Security["type"]> = (
   security: Security & { type: K }
-) => SecuritySchemeObject;
+) => oas30.SecuritySchemeObject;
 
 const depictBasicSecurity: SecurityHelper<"basic"> = () => ({
   type: "http",
@@ -850,7 +846,7 @@ const depictOAuth2Security: SecurityHelper<"oauth2"> = ({ flows = {} }) => ({
   type: "oauth2",
   flows: (
     Object.keys(flows) as (keyof typeof flows)[]
-  ).reduce<OAuthFlowsObject>((acc, key) => {
+  ).reduce<oas30.OAuthFlowsObject>((acc, key) => {
     const flow = flows[key];
     if (!flow) {
       return acc;
@@ -862,7 +858,7 @@ const depictOAuth2Security: SecurityHelper<"oauth2"> = ({ flows = {} }) => ({
 
 export const depictSecurity = (
   container: LogicalContainer<Security>
-): LogicalContainer<SecuritySchemeObject> => {
+): LogicalContainer<oas30.SecuritySchemeObject> => {
   const methods: { [K in Security["type"]]: SecurityHelper<K> } = {
     basic: depictBasicSecurity,
     bearer: depictBearerSecurity,
@@ -879,14 +875,14 @@ export const depictSecurity = (
 
 export const depictSecurityRefs = (
   container: LogicalContainer<{ name: string; scopes: string[] }>
-): SecurityRequirementObject[] => {
+): oas30.SecurityRequirementObject[] => {
   if (typeof container === "object") {
     if ("or" in container) {
       return container.or.map((entry) =>
         ("and" in entry
           ? entry.and
           : [entry]
-        ).reduce<SecurityRequirementObject>(
+        ).reduce<oas30.SecurityRequirementObject>(
           (agg, { name, scopes }) => ({
             ...agg,
             [name]: scopes,
@@ -911,7 +907,7 @@ export const depictRequest = ({
   makeRef,
   composition,
   clue = "request body",
-}: ReqResDepictHelperCommonProps): RequestBodyObject => {
+}: ReqResDepictHelperCommonProps): oas30.RequestBodyObject => {
   const pathParams = getRoutePathParams(path);
   const bodyDepiction = excludeExampleFromDepiction(
     excludeParamsFromDepiction(
@@ -945,14 +941,14 @@ export const depictRequest = ({
         ...carry,
         [mimeType]: { schema: result, ...bodyExamples },
       }),
-      {} as ContentObject
+      {} as oas30.ContentObject
     ),
   };
 };
 
 export const depictTags = <TAG extends string>(
   tags: TagsConfig<TAG>
-): TagObject[] =>
+): oas30.TagObject[] =>
   (Object.keys(tags) as TAG[]).map((tag) => {
     const def = tags[tag];
     return {
