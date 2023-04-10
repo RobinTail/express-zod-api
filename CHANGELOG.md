@@ -5,7 +5,7 @@
 ### v10.1.3
 
 - Fixed issue #929, found and reported by [@shroudedcode](https://github.com/shroudedcode).
-  - Customized description of request parameters have not been taken into account when generating the documentation.
+  - Customized description of request parameters have not been depicted correctly when generating the documentation.
 
 ### v10.1.2
 
