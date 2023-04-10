@@ -872,6 +872,35 @@ describe("Open API generator", () => {
       expect(spec).toMatchSnapshot();
     });
 
+    test("Issue #929: the location of the custom description should be on the param level", () => {
+      const spec = new OpenAPI({
+        composition: "components",
+        config: sampleConfig,
+        routing: {
+          hris: {
+            employees: defaultEndpointsFactory.build({
+              method: "get",
+              input: z.object({
+                cursor: z
+                  .string()
+                  .optional()
+                  .describe(
+                    "An optional cursor string used for pagination." +
+                      " This can be retrieved from the `next` property of the previous page response."
+                  ),
+              }),
+              output: z.object({}),
+              handler: async () => ({}),
+            }),
+          },
+        },
+        version: "3.4.5",
+        title: "Testing Metadata:description",
+        serverUrl: "http://example.com",
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
+    });
+
     test("should pass over the example of an individual parameter", () => {
       const spec = new OpenAPI({
         config: sampleConfig,

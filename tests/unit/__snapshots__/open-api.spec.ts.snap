@@ -374,6 +374,92 @@ servers:
 "
 `;
 
+exports[`Open API generator Metadata Issue #929: the location of the custom description should be on the param level 1`] = `
+"openapi: 3.0.0
+info:
+  title: Testing Metadata:description
+  version: 3.4.5
+paths:
+  /hris/employees:
+    get:
+      operationId: GetHrisEmployees
+      responses:
+        "200":
+          description: GET /hris/employees Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetHrisEmployeesSuccessfulResponse"
+        "400":
+          description: GET /hris/employees Error response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetHrisEmployeesErrorResponse"
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
+      parameters:
+        - name: cursor
+          in: query
+          required: false
+          description: An optional cursor string used for pagination. This can be
+            retrieved from the \`next\` property of the previous page response.
+          schema:
+            $ref: "#/components/schemas/GetHrisEmployeesParameterCursor"
+components:
+  schemas:
+    GetHrisEmployeesParameterCursor:
+      type: string
+      description: An optional cursor string used for pagination. This can be
+        retrieved from the \`next\` property of the previous page response.
+    GetHrisEmployeesSuccessfulResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+            - success
+        data:
+          type: object
+          properties: {}
+      required:
+        - status
+        - data
+    GetHrisEmployeesErrorResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+            - error
+        error:
+          type: object
+          properties:
+            message:
+              type: string
+          required:
+            - message
+      required:
+        - status
+        - error
+  responses: {}
+  parameters: {}
+  examples: {}
+  requestBodies: {}
+  headers: {}
+  securitySchemes: {}
+  links: {}
+  callbacks: {}
+tags: []
+servers:
+  - url: http://example.com
+"
+`;
+
 exports[`Open API generator Metadata should merge endpoint handler examples with its middleware examples 1`] = `
 "openapi: 3.0.0
 info:
