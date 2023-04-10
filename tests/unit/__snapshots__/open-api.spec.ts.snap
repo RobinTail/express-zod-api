@@ -828,7 +828,7 @@ paths:
         - name: str
           in: query
           required: true
-          description: GET /v1/getSomething parameter
+          description: here is the test
           schema:
             type: string
             description: here is the test
@@ -2139,7 +2139,7 @@ paths:
         - name: id
           in: query
           required: true
-          description: GET /v1/user/retrieve parameter
+          description: a numeric string containing the id of the user
           schema:
             type: string
             pattern: /\\d+/
@@ -2489,7 +2489,7 @@ paths:
         - name: id
           in: query
           required: true
-          description: GET /v1/user/retrieve parameter
+          description: a numeric string containing the id of the user
           schema:
             $ref: "#/components/schemas/GetV1UserRetrieveParameterId"
   "/v1/user/{id}":
