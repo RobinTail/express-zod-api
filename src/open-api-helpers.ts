@@ -642,7 +642,9 @@ export const depictRequestParams = ({
         name,
         in: isPathParam(name) ? "path" : "query",
         required: !shape[name].isOptional(),
-        description: `${method.toUpperCase()} ${path} ${clue}`,
+        description:
+          (oas30.isSchemaObject(depicted) && depicted.description) ||
+          `${method.toUpperCase()} ${path} ${clue}`,
         schema: result,
         ...depictParamExamples(schema, false, name),
       };

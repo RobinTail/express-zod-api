@@ -84,7 +84,7 @@ paths:
         - name: id
           in: query
           required: true
-          description: GET /v1/user/retrieve parameter
+          description: a numeric string containing the id of the user
           schema:
             type: string
             pattern: /\d+/
