@@ -2,6 +2,11 @@
 
 ## Version 10
 
+### v10.1.3
+
+- Fixed issue #929, found and reported by [@shroudedcode](https://github.com/shroudedcode).
+  - Customized description of request parameters have not been depicted correctly when generating the documentation.
+
 ### v10.1.2
 
 - Fixed issue #907, found and reported by [@McMerph](https://github.com/McMerph).
