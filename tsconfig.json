@@ -3,7 +3,8 @@
   "compilerOptions": {
     "noImplicitAny": true,
     "strictNullChecks": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "moduleResolution": "node16"
   },
   "ts-node": {
     "swc": true
