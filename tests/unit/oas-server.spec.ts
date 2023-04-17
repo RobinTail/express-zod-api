@@ -23,21 +23,26 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import { addExtension } from "../../src/oas-common";
-import { ISpecificationExtension } from "../../src/oas-extension";
+import { Server, ServerVariable } from "../../src/oas-server";
 
-describe("OAS Commons", () => {
-  describe("addExtension()", () => {
-    it("valid extension", () => {
-      const subject: ISpecificationExtension = {};
-      addExtension(subject, "x-extension1", "myvalue");
-      expect(subject["x-extension1"]).toBe("myvalue");
-    });
-    it("invalid extension", () => {
-      const subject: ISpecificationExtension = {};
-      addExtension(subject, "ZZ-extension1", "myvalue");
-      // @ts-ignore testing invalid assignment
-      expect(subject["ZZ-extension1"]).not.toBe("myvalue");
-    });
+describe("OAS Server", () => {
+  it("create server", () => {
+    const v1 = new ServerVariable("dev", ["dev", "qa", "prod"], "environment");
+    const sut = new Server("http://api.qa.machine.org", "qa maquine");
+    sut.addVariable("environment", v1);
+
+    expect(sut.url).toBe("http://api.qa.machine.org");
+    expect(sut.description).toBe("qa maquine");
+    expect(sut.variables.environment.default).toBe("dev");
+  });
+});
+
+describe("ServerVariable", () => {
+  it("server var", () => {
+    const sut = new ServerVariable("dev", ["dev", "qa", "prod"], "environment");
+
+    expect(sut.default).toBe("dev");
+    expect(sut.description).toBe("environment");
+    expect(sut.enum).toStrictEqual(["dev", "qa", "prod"]);
   });
 });

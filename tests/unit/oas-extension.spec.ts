@@ -25,7 +25,7 @@
 
 import { SpecificationExtension } from "../../src/oas-extension";
 
-describe("SpecificationExtension", () => {
+describe("OAS SpecificationExtension", () => {
   it("addExtension() ok", () => {
     const sut = new SpecificationExtension();
     const extensionValue = { payload: 5 };
