@@ -422,6 +422,7 @@ describe("OpenApiBuilder", () => {
 
     expect(getExtension(sut.paths, "x-my-extension")).toBe(42);
     expect(getExtension(sut.paths, "x-other")).toBeUndefined();
+    expect(getExtension(undefined, "x-my-extension")).toBeUndefined();
   });
   it("retrieve invalid extension", () => {
     const path1 = {
