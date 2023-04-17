@@ -2,6 +2,11 @@
 
 ## Version 10
 
+### v10.2.0
+
+- The functionality of `openapi3-ts` is implemented inside the library.
+  - The code state corresponds to the version 4.1.1 of `openapi3-ts`.
+
 ### v10.1.3
 
 - Fixed issue #929, found and reported by [@shroudedcode](https://github.com/shroudedcode).
