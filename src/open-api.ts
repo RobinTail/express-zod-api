@@ -1,4 +1,3 @@
-import { oas30 } from "openapi3-ts";
 import { z } from "zod";
 import {
   defaultInputSources,
@@ -8,6 +7,14 @@ import {
 import { CommonConfig } from "./config-type";
 import { mapLogicalContainer } from "./logical-container";
 import { Method } from "./method";
+import { OpenApiBuilder } from "./oas-builder";
+import {
+  OperationObject,
+  ReferenceObject,
+  SchemaObject,
+  SecuritySchemeObject,
+  SecuritySchemeType,
+} from "./oas-model";
 import {
   depictRequest,
   depictRequestParams,
@@ -42,21 +49,20 @@ interface GeneratorParams {
   serializer?: (schema: z.ZodTypeAny) => string;
 }
 
-export class OpenAPI extends oas30.OpenApiBuilder {
-  protected lastSecuritySchemaIds: Partial<
-    Record<oas30.SecuritySchemeType, number>
-  > = {};
+export class OpenAPI extends OpenApiBuilder {
+  protected lastSecuritySchemaIds: Partial<Record<SecuritySchemeType, number>> =
+    {};
   protected lastOperationIdSuffixes: Record<string, number> = {};
 
   protected makeRef(
     name: string,
-    schema: oas30.SchemaObject | oas30.ReferenceObject
-  ): oas30.ReferenceObject {
+    schema: SchemaObject | ReferenceObject
+  ): ReferenceObject {
     this.addSchema(name, schema);
     return this.getRef(name)!;
   }
 
-  protected getRef(name: string): oas30.ReferenceObject | undefined {
+  protected getRef(name: string): ReferenceObject | undefined {
     return name in (this.rootDoc.components?.schemas || {})
       ? { $ref: `#/components/schemas/${name}` }
       : undefined;
@@ -72,7 +78,7 @@ export class OpenAPI extends oas30.OpenApiBuilder {
     return operationId;
   }
 
-  protected ensureUniqSecuritySchemaName(subject: oas30.SecuritySchemeObject) {
+  protected ensureUniqSecuritySchemaName(subject: SecuritySchemeObject) {
     const serializedSubject = JSON.stringify(subject);
     for (const name in this.rootDoc.components?.securitySchemes || {}) {
       if (
@@ -127,7 +133,7 @@ export class OpenAPI extends oas30.OpenApiBuilder {
         ...commonParams,
         inputSources,
       });
-      const operation: oas30.OperationObject = {
+      const operation: OperationObject = {
         operationId: this.ensureUniqOperationId(path, method),
         responses: {
           [endpoint.getStatusCode("positive")]: depictResponse({
