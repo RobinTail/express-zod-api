@@ -813,7 +813,10 @@ import { Client } from "express-zod-api";
 
 fs.writeFileSync(
   "./frontend/client.ts",
-  new Client({ routing }).print(),
+  new Client({
+    routing,
+    optionalPropStyle: { withQuestionMark: true, withUndefined: true }, // optional
+  }).print(),
   "utf-8"
 );
 ```
