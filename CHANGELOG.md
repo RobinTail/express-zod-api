@@ -2,6 +2,25 @@
 
 ## Version 10
 
+### v10.3.0
+
+- Feature #945 for a client generator, proposed by [@McMerph](https://github.com/McMerph).
+  - Configurable style of object's optional properties.
+  - Client generator has gotten a new parameter `optionalPropStyle` which is an optional object having two optional
+    properties: `withQuestionMark` and `withUndefined` that enable customization on the generated types.
+    - Example with question mark: `{ someProp?: boolean }`.
+    - Example with undefined: `{ someProp: boolean | undefined }`.
+  - For backward compatibility the default value is `{ withQuestionMark: true, withUndefined: true }`.
+    - Example of default behavior: `{ someProp?: boolean | undefined }`
+
+```ts
+// example
+new Client({
+  routing,
+  optionalPropStyle: { withQuestionMark: true }, // no `| undefined`
+}).print();
+```
+
 ### v10.2.0
 
 - The functionality of `openapi3-ts` is implemented inside the library.
