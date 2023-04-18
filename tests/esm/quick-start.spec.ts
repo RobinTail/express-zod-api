@@ -12,11 +12,12 @@ describe("ESM Test", () => {
   beforeAll(() => {
     quickStart = spawn("yarn", ["start"], { cwd: "./tests/esm" });
     quickStart.stdout.on("data", listener);
-    quickStart.stdout.on("data", listener);
+    quickStart.stderr.on("data", listener);
   });
 
   afterAll(async () => {
     quickStart.stdout.removeListener("data", listener);
+    quickStart.stderr.removeListener("data", listener);
     quickStart.kill();
     await waitFor(() => quickStart.killed);
   });
