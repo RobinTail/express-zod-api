@@ -37,7 +37,27 @@ interface Registry {
 
 interface GeneratorParams {
   routing: Routing;
+  /**
+   * @desc Used for comparing schemas wrapped into z.lazy() to limit the recursion
+   * @default JSON.stringify() + SHA1 hash as a hex digest
+   * */
   serializer?: (schema: z.ZodTypeAny) => string;
+  /**
+   * @desc configures the style of object's optional properties
+   * @default { withQuestionMark: true, withUndefined: true }
+   */
+  optionalPropStyle?: {
+    /**
+     * @desc add question mark to the optional property definition
+     * @example { someProp?: boolean }
+     * */
+    withQuestionMark?: boolean;
+    /**
+     * @desc add undefined to the property union type
+     * @example { someProp: boolean | undefined }
+     */
+    withUndefined?: boolean;
+  };
 }
 
 export class Client {
@@ -55,7 +75,11 @@ export class Client {
     return this.getAlias(name)!;
   }
 
-  constructor({ routing, serializer = defaultSerializer }: GeneratorParams) {
+  constructor({
+    routing,
+    serializer = defaultSerializer,
+    optionalPropStyle = { withQuestionMark: true, withUndefined: true },
+  }: GeneratorParams) {
     walkRouting({
       routing,
       onEndpoint: (endpoint, path, method) => {
@@ -65,6 +89,7 @@ export class Client {
           serializer,
           getAlias: this.getAlias.bind(this),
           makeAlias: this.makeAlias.bind(this),
+          optionalPropStyle,
         };
         const input = zodToTs({
           ...commons,
