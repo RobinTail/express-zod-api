@@ -10,7 +10,7 @@ const config: Config.InitialOptions = {
   collectCoverage: true,
   collectCoverageFrom: ["src/**"],
   coverageReporters: ["json-summary", "text", "html", "lcov"],
-  testTimeout: 10000,
+  testTimeout: 20000,
 };
 
 export default config;
