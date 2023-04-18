@@ -65,7 +65,7 @@ const onObject: Producer<z.ZodObject<z.ZodRawShape>> = ({
   schema: { shape },
   isResponse,
   next,
-  optionalPropStyle,
+  optionalPropStyle: { withQuestionMark: hasQuestionMark },
 }) => {
   const members = Object.entries(shape).map<ts.TypeElement>(([key, value]) => {
     const isOptional =
@@ -75,7 +75,7 @@ const onObject: Producer<z.ZodObject<z.ZodRawShape>> = ({
     const propertySignature = f.createPropertySignature(
       undefined,
       makePropertyIdentifier(key),
-      isOptional && optionalPropStyle.withQuestionMark
+      isOptional && hasQuestionMark
         ? f.createToken(ts.SyntaxKind.QuestionToken)
         : undefined,
       next({ schema: value })
@@ -151,10 +151,10 @@ const onNativeEnum: Producer<z.ZodNativeEnum<z.EnumLike>> = ({ schema }) =>
 const onOptional: Producer<z.ZodOptional<z.ZodTypeAny>> = ({
   next,
   schema,
-  optionalPropStyle,
+  optionalPropStyle: { withUndefined: hasUndefined },
 }) => {
   const actualTypeNode = next({ schema: schema.unwrap() });
-  return optionalPropStyle.withUndefined
+  return hasUndefined
     ? f.createUnionTypeNode([
         actualTypeNode,
         f.createKeywordTypeNode(ts.SyntaxKind.UndefinedKeyword),
