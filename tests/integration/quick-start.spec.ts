@@ -22,6 +22,7 @@ describe("Integration Test", () => {
   });
 
   afterEach(() => {
+    console.log(out);
     out = "";
   });
 

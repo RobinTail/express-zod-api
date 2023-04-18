@@ -22,6 +22,7 @@ describe("ESM Test", () => {
   });
 
   afterEach(() => {
+    console.log(out);
     out = "";
   });
 
