@@ -37,6 +37,7 @@ export type ZTSContext = {
   getAlias: (name: string) => ts.TypeReferenceNode | undefined;
   makeAlias: (name: string, type: ts.TypeNode) => ts.TypeReferenceNode;
   serializer: (schema: z.ZodTypeAny) => string;
+  optionalPropStyle: { withQuestionMark?: boolean; withUndefined?: boolean };
 };
 
 export type Producer<T extends z.ZodTypeAny> = SchemaHandler<

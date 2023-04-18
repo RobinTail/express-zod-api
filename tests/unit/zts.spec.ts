@@ -29,16 +29,17 @@ import { z } from "zod";
 import { f } from "../../src/client-helpers";
 import { defaultSerializer } from "../../src/common-helpers";
 import { zodToTs } from "../../src/zts";
-import { createTypeAlias, printNode } from "../../src/zts-helpers";
+import { ZTSContext, createTypeAlias, printNode } from "../../src/zts-helpers";
 
 describe("zod-to-ts", () => {
   const printNodeTest = (node: ts.Node) =>
     printNode(node, { newLine: ts.NewLineKind.LineFeed });
-  const defaultCtx = {
+  const defaultCtx: ZTSContext = {
     isResponse: false,
     getAlias: jest.fn((name: string) => f.createTypeReferenceNode(name)),
     makeAlias: jest.fn(),
     serializer: defaultSerializer,
+    optionalPropStyle: { withQuestionMark: true, withUndefined: true },
   };
 
   describe("z.array()", () => {
