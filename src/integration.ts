@@ -36,14 +36,14 @@ interface Registry {
 }
 
 interface IntegrationParams {
+  routing: Routing;
   /**
    * @desc What should be generated
-   * @example "typesOnly" — types of endpoint requests and responses
-   * @example "client" — a class for performing requests that ensures types the parameters and results
+   * @example "typesOnly" — types of your endpoint requests and responses (for a DIT solution)
+   * @example "client" — an entity for performing typed requests and receiving typed responses
    * @default "client"
    * */
-  variant: "typesOnly" | "client";
-  routing: Routing;
+  variant?: "typesOnly" | "client";
   /**
    * @desc Used for comparing schemas wrapped into z.lazy() to limit the recursion
    * @default JSON.stringify() + SHA1 hash as a hex digest
@@ -339,4 +339,8 @@ export class Integration {
  * @deprecated Use Integration instead
  * @todo remove in v11
  * */
-export class Client extends Integration {}
+export class Client extends Integration {
+  constructor(params: Omit<IntegrationParams, "variant">) {
+    super({ variant: "client", ...params });
+  }
+}
