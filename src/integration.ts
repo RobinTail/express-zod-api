@@ -36,6 +36,13 @@ interface Registry {
 }
 
 interface IntegrationParams {
+  /**
+   * @desc What should be generated
+   * @example "typesOnly" — types of endpoint requests and responses
+   * @example "client" — a class for performing requests that ensures types the parameters and results
+   * @default "client"
+   * */
+  variant: "typesOnly" | "client";
   routing: Routing;
   /**
    * @desc Used for comparing schemas wrapped into z.lazy() to limit the recursion
@@ -77,6 +84,7 @@ export class Integration {
 
   constructor({
     routing,
+    variant = "client",
     serializer = defaultSerializer,
     optionalPropStyle = { withQuestionMark: true, withUndefined: true },
   }: IntegrationParams) {
@@ -119,6 +127,10 @@ export class Integration {
     });
 
     this.agg = Object.values<ts.Node>(this.aliases).concat(this.agg);
+
+    if (variant === "typesOnly") {
+      return;
+    }
 
     const pathNode = makePublicLiteralType("Path", this.paths);
     const methodNode = makePublicLiteralType("Method", methods);
