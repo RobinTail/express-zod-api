@@ -15,7 +15,7 @@ export { DependsOnMethod } from "./depends-on-method";
 export { ServeStatic } from "./serve-static";
 export { Routing } from "./routing";
 export { createServer, attachRouting } from "./server";
-export { OpenAPI } from "./open-api";
+export { Documentation, OpenAPI } from "./documentation";
 export {
   OpenAPIError,
   DependsOnMethodError,
@@ -25,7 +25,7 @@ export {
 } from "./errors";
 export { withMeta } from "./metadata";
 export { testEndpoint } from "./mock";
-export { Client } from "./client";
+export { Integration, Client } from "./integration";
 export { ez } from "./ez-namespace";
 
 import createHttpError from "http-errors";

@@ -8,9 +8,13 @@ exports[`Index Entrypoint exports DependsOnMethod should have certain value 1`] 
 
 exports[`Index Entrypoint exports DependsOnMethodError should have certain value 1`] = `[Function]`;
 
+exports[`Index Entrypoint exports Documentation should have certain value 1`] = `[Function]`;
+
 exports[`Index Entrypoint exports EndpointsFactory should have certain value 1`] = `[Function]`;
 
 exports[`Index Entrypoint exports InputValidationError should have certain value 1`] = `[Function]`;
+
+exports[`Index Entrypoint exports Integration should have certain value 1`] = `[Function]`;
 
 exports[`Index Entrypoint exports OpenAPI should have certain value 1`] = `[Function]`;
 
@@ -90,6 +94,7 @@ exports[`Index Entrypoint exports should have certain entities exposed 1`] = `
   "Routing",
   "createServer",
   "attachRouting",
+  "Documentation",
   "OpenAPI",
   "OpenAPIError",
   "DependsOnMethodError",
@@ -98,6 +103,7 @@ exports[`Index Entrypoint exports should have certain entities exposed 1`] = `
   "InputValidationError",
   "withMeta",
   "testEndpoint",
+  "Integration",
   "Client",
   "ez",
   "createHttpError",

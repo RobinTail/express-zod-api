@@ -35,7 +35,7 @@ interface Registry {
   [METHOD_PATH: string]: Record<"in" | "out", string> & { isJson: boolean };
 }
 
-interface GeneratorParams {
+interface IntegrationParams {
   routing: Routing;
   /**
    * @desc Used for comparing schemas wrapped into z.lazy() to limit the recursion
@@ -60,7 +60,7 @@ interface GeneratorParams {
   };
 }
 
-export class Client {
+export class Integration {
   protected agg: ts.Node[] = [];
   protected registry: Registry = {};
   protected paths: string[] = [];
@@ -79,7 +79,7 @@ export class Client {
     routing,
     serializer = defaultSerializer,
     optionalPropStyle = { withQuestionMark: true, withUndefined: true },
-  }: GeneratorParams) {
+  }: IntegrationParams) {
     walkRouting({
       routing,
       onEndpoint: (endpoint, path, method) => {
@@ -322,3 +322,9 @@ export class Client {
     return this.agg.map((node) => printNode(node, printerOptions)).join("\n\n");
   }
 }
+
+/**
+ * @deprecated Use Integration instead
+ * @todo remove in v11
+ * */
+export class Client extends Integration {}
