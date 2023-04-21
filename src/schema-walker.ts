@@ -1,10 +1,8 @@
 import { z } from "zod";
-import {
-  ZodDateInDef,
-  ZodDateOutDef,
-  ZodFileDef,
-  ZodUploadDef,
-} from "./proprietary-schemas";
+import type { ZodDateInDef } from "./date-in-schema";
+import type { ZodDateOutDef } from "./date-out-schema";
+import type { ZodFileDef } from "./file-schema";
+import type { ZodUploadDef } from "./upload-schema";
 
 export type HandlingVariant = "last" | "regular" | "each";
 
