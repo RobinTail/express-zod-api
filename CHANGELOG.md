@@ -2,6 +2,16 @@
 
 ## Version 10
 
+### v10.3.1
+
+- Fixed issue of the insufficient exports of the proprietary schema definitions.
+  - The issue introduced in version 10.0.0-beta1 due to changing the compiler to `tsup`.
+  - The issue manifested only when `declaration` is enabled in your `tsconfig.json`.
+  - The issue caused following error:
+    - `TS4023: Exported variable '' has or is using name 'ZodFileDef' from external module "" but cannot be named.`
+  - The following interfaces are now available within the exported `ez` namespace:
+    - `ez.ZodFileDef`, `ez.ZodUploadDef`, `ez.ZodDateInDef`, `ez.ZodDateOutDef`.
+
 ### v10.3.0
 
 - Feature #945 for a client generator, proposed by [@McMerph](https://github.com/McMerph).
