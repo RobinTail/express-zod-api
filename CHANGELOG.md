@@ -2,6 +2,23 @@
 
 ## Version 10
 
+### v10.4.0
+
+- For the future features and improvements the following entities are renamed:
+  - ~~`Client`~~ class becomes the `Integration`.
+  - ~~`OpenAPI`~~ class becomes the `Documentation`.
+  - For backward compatibility the previously assigned names are still supported until the next major release.
+  - Developers are advised to adjust their implementation accordingly.
+
+```ts
+// before
+new Client(/*...*/);
+new OpenAPI(/*...*/);
+// after
+new Integration(/*...*/);
+new Documentation(/*...*/);
+```
+
 ### v10.3.2
 
 - Hotfix on fixing the previously mentioned issue #952.
