@@ -39,7 +39,7 @@ interface IntegrationParams {
   routing: Routing;
   /**
    * @desc What should be generated
-   * @example "typesOnly" — types of your endpoint requests and responses (for a DIT solution)
+   * @example "typesOnly" — types of your endpoint requests and responses (for a DIY solution)
    * @example "client" — an entity for performing typed requests and receiving typed responses
    * @default "client"
    * */
