@@ -122,18 +122,12 @@ export const depictAny: Depicter<z.ZodAny> = () => ({
   format: "any",
 });
 
-export const depictUpload: Depicter<ZodUpload> = ({
-  isResponse,
-  path,
-  method,
-}) => {
-  if (isResponse) {
-    throw new OpenAPIError(
-      "Please use z.upload() only for input.",
-      path,
-      method,
-      isResponse
-    );
+export const depictUpload: Depicter<ZodUpload> = (ctx) => {
+  if (ctx.isResponse) {
+    throw new OpenAPIError({
+      message: "Please use z.upload() only for input.",
+      ...ctx,
+    });
   }
   return {
     type: "string",
@@ -143,17 +137,13 @@ export const depictUpload: Depicter<ZodUpload> = ({
 
 export const depictFile: Depicter<ZodFile> = ({
   schema: { isBinary, isBase64 },
-  isResponse,
-  path,
-  method,
+  ...ctx
 }) => {
-  if (!isResponse) {
-    throw new OpenAPIError(
-      "Please use z.file() only within ResultHandler.",
-      path,
-      method,
-      isResponse
-    );
+  if (!ctx.isResponse) {
+    throw new OpenAPIError({
+      message: "Please use z.file() only within ResultHandler.",
+      ...ctx,
+    });
   }
   return {
     type: "string",
@@ -246,18 +236,12 @@ export const depictNull: Depicter<z.ZodNull> = () => ({
   format: "null",
 });
 
-export const depictDateIn: Depicter<ZodDateIn> = ({
-  isResponse,
-  path,
-  method,
-}) => {
-  if (isResponse) {
-    throw new OpenAPIError(
-      "Please use z.dateOut() for output.",
-      path,
-      method,
-      isResponse
-    );
+export const depictDateIn: Depicter<ZodDateIn> = (ctx) => {
+  if (ctx.isResponse) {
+    throw new OpenAPIError({
+      message: "Please use z.dateOut() for output.",
+      ...ctx,
+    });
   }
   return {
     description: "YYYY-MM-DDTHH:mm:ss.sssZ",
@@ -270,18 +254,12 @@ export const depictDateIn: Depicter<ZodDateIn> = ({
   };
 };
 
-export const depictDateOut: Depicter<ZodDateOut> = ({
-  isResponse,
-  path,
-  method,
-}) => {
-  if (!isResponse) {
-    throw new OpenAPIError(
-      "Please use z.dateIn() for input.",
-      path,
-      method,
-      isResponse
-    );
+export const depictDateOut: Depicter<ZodDateOut> = (ctx) => {
+  if (!ctx.isResponse) {
+    throw new OpenAPIError({
+      message: "Please use z.dateIn() for input.",
+      ...ctx,
+    });
   }
   return {
     description: "YYYY-MM-DDTHH:mm:ss.sssZ",
@@ -294,21 +272,15 @@ export const depictDateOut: Depicter<ZodDateOut> = ({
 };
 
 /** @throws OpenAPIError */
-export const depictDate: Depicter<z.ZodDate> = ({
-  isResponse,
-  path,
-  method,
-}) => {
-  throw new OpenAPIError(
-    `Using z.date() within ${
-      isResponse ? "output" : "input"
+export const depictDate: Depicter<z.ZodDate> = (ctx) => {
+  throw new OpenAPIError({
+    message: `Using z.date() within ${
+      ctx.isResponse ? "output" : "input"
     } schema is forbidden. Please use z.date${
-      isResponse ? "Out" : "In"
+      ctx.isResponse ? "Out" : "In"
     }() instead. Check out the documentation for details.`,
-    path,
-    method,
-    isResponse
-  );
+    ...ctx,
+  });
 };
 
 export const depictBoolean: Depicter<z.ZodBoolean> = () => ({
@@ -623,7 +595,7 @@ export const depictParamExamples = (
 
 export function extractObjectSchema(
   subject: IOSchema,
-  ctx: Pick<OpenAPIContext, "path" | "method">
+  ctx: Pick<OpenAPIContext, "path" | "method" | "isResponse">
 ) {
   if (subject instanceof z.ZodObject) {
     return subject;
@@ -638,12 +610,12 @@ export function extractObjectSchema(
       .reduce((acc, option) => acc.merge(option.partial()), z.object({}));
   } else if (subject instanceof z.ZodEffects) {
     if (hasTopLevelTransformingEffect(subject)) {
-      throw new OpenAPIError(
-        "Using transformations on the top level of input schema is not allowed.",
-        ctx.path,
-        ctx.method,
-        false
-      );
+      throw new OpenAPIError({
+        message: `Using transformations on the top level of ${
+          ctx.isResponse ? "response" : "input"
+        } schema is not allowed.`,
+        ...ctx,
+      });
     }
     objectSchema = extractObjectSchema(subject._def.schema, ctx); // object refinement
   } else {
@@ -669,7 +641,11 @@ export const depictRequestParams = ({
   inputSources: InputSource[];
 }): ParameterObject[] => {
   const schema = endpoint.getSchema("input");
-  const shape = extractObjectSchema(schema, { path, method }).shape;
+  const shape = extractObjectSchema(schema, {
+    path,
+    method,
+    isResponse: false,
+  }).shape;
   const pathParams = getRoutePathParams(path);
   const isQueryEnabled = inputSources.includes("query");
   const isParamsEnabled = inputSources.includes("params");
@@ -768,17 +744,13 @@ export const onEach: Depicter<z.ZodTypeAny, "each"> = ({
 };
 
 export const onMissing: Depicter<z.ZodTypeAny, "last"> = ({
-  path,
-  method,
-  isResponse,
   schema,
+  ...ctx
 }) => {
-  throw new OpenAPIError(
-    `Zod type ${schema.constructor.name} is unsupported`,
-    path,
-    method,
-    isResponse
-  );
+  throw new OpenAPIError({
+    message: `Zod type ${schema.constructor.name} is unsupported`,
+    ...ctx,
+  });
 };
 
 export const excludeParamsFromDepiction = (

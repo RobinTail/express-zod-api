@@ -1,6 +1,6 @@
 import { ZodError } from "zod";
 import { getMessageFromError } from "./common-helpers";
-import { Method } from "./method";
+import { OpenAPIContext } from "./documentation-helpers";
 
 /** @desc An error related to the wrong Routing declaration */
 export class RoutingError extends Error {
@@ -15,21 +15,28 @@ export class DependsOnMethodError extends RoutingError {
 /**
  * @desc An error related to the generating of the documentation
  * @todo rename to DocumentationError in v11
+ * @todo remove params:string variation in v11
  * */
 export class OpenAPIError extends Error {
   public override name = "OpenAPIError";
 
   constructor(
-    message: string,
-    path: string,
-    method: Method,
-    isResponse: boolean
+    params:
+      | string // backward compatibility
+      | ({ message: string } & Pick<
+          OpenAPIContext,
+          "path" | "method" | "isResponse"
+        >)
   ) {
-    super(
-      `${message}\nCaused by ${
-        isResponse ? "response" : "input"
-      } schema of an Endpoint assigned to ${method} method of ${path} path.`
-    );
+    const finalMessage =
+      typeof params === "string"
+        ? params
+        : `${params.message}\nCaused by ${
+            params.isResponse ? "response" : "input"
+          } schema of an Endpoint assigned to ${params.method} method of ${
+            params.path
+          } path.`;
+    super(finalMessage);
   }
 }
 

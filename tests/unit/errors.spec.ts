@@ -19,22 +19,27 @@ describe("Errors", () => {
   });
 
   describe("OpenAPIError", () => {
+    const params = {
+      message: "test",
+      path: "/v1/testPath",
+      method: "get" as const,
+      isResponse: true,
+    };
+
     test("should be an instance of Error", () => {
-      expect(
-        new OpenAPIError("test", "/v1/testPath", "get", true)
-      ).toBeInstanceOf(Error);
+      expect(new OpenAPIError(params)).toBeInstanceOf(Error);
     });
 
     test("should include more details into the message", () => {
-      expect(
-        new OpenAPIError("test", "/v1/testPath", "get", true).message
-      ).toMatchSnapshot();
+      expect(new OpenAPIError(params).message).toMatchSnapshot();
     });
 
     test("should have the name matching its class", () => {
-      expect(new OpenAPIError("test", "/v1/testPath", "get", true).name).toBe(
-        "OpenAPIError"
-      );
+      expect(new OpenAPIError(params).name).toBe("OpenAPIError");
+    });
+
+    test("should be backward compatible", () => {
+      expect(new OpenAPIError(params.message).message).toBe(params.message);
     });
   });
 
