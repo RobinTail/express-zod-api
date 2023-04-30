@@ -748,7 +748,7 @@ export const onMissing: Depicter<z.ZodTypeAny, "last"> = ({
   ...ctx
 }) => {
   throw new OpenAPIError({
-    message: `Zod type ${schema.constructor.name} is unsupported`,
+    message: `Zod type ${schema.constructor.name} is unsupported.`,
     ...ctx,
   });
 };
