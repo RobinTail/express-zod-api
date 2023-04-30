@@ -184,7 +184,7 @@ describe("Documentation helpers", () => {
         ).toThrowError(
           new IOSchemaError(
             "Using transformations on the top level of input schema is not allowed.\n" +
-              "Caused by input schema of an Endpoint assigned to get method of /v1/user/:id path."
+              "Caused by input schema of an Endpoint assigned to GET method of /v1/user/:id path."
           )
         );
       });

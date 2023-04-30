@@ -33,7 +33,7 @@ export class OpenAPIError extends Error {
         ? params
         : `${params.message}\nCaused by ${
             params.isResponse ? "response" : "input"
-          } schema of an Endpoint assigned to ${params.method} method of ${
+          } schema of an Endpoint assigned to ${params.method.toUpperCase()} method of ${
             params.path
           } path.`;
     super(finalMessage);
