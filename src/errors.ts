@@ -28,7 +28,7 @@ export class OpenAPIError extends Error {
     super(
       `${message}\nCaused by ${
         isResponse ? "response" : "input"
-      } schema of an Endpoint assigned to ${method} method of ${path} path`
+      } schema of an Endpoint assigned to ${method} method of ${path} path.`
     );
   }
 }
