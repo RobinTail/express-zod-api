@@ -2,6 +2,20 @@
 
 ## Version 10
 
+### v10.5.0
+
+- Errors that may occur when generating documentation are now more informative.
+  - Changes made to the message of `OpenAPIError` class.
+
+```yaml
+# example of additional details in the second line of the error message
+before: >-
+  Using transformations on the top level of input schema is not allowed.
+after: |-
+  Using transformations on the top level of input schema is not allowed.
+  Caused by input schema of an Endpoint assigned to POST method of /v1/user/:id path.
+```
+
 ### v10.4.0
 
 - For the future features and improvements the following entities are renamed:
