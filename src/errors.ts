@@ -11,7 +11,10 @@ export class DependsOnMethodError extends RoutingError {
   public override name = "DependsOnMethodError";
 }
 
-/** @desc An error related to the generating of the documentation */
+/**
+ * @desc An error related to the generating of the documentation
+ * @todo rename to DocumentationError in v11
+ * */
 export class OpenAPIError extends Error {
   public override name = "OpenAPIError";
 }
