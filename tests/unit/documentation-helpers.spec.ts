@@ -49,11 +49,11 @@ import {
   onEach,
   onMissing,
   reformatParamsInPath,
-} from "../../src/open-api-helpers";
+} from "../../src/documentation-helpers";
 import { SchemaHandler, walkSchema } from "../../src/schema-walker";
 import { serializeSchemaForTest } from "../helpers";
 
-describe("Open API helpers", () => {
+describe("Documentation helpers", () => {
   const getRefMock = jest.fn();
   const makeRefMock = jest.fn(
     (name: string, {}: SchemaObject | ReferenceObject): ReferenceObject => ({

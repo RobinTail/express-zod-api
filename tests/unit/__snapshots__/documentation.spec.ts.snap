@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Open API generator Issue #98 Should describe non-empty array 1`] = `
+exports[`Documentation generator Issue #98 Should describe non-empty array 1`] = `
 "openapi: 3.0.0
 info:
   title: "Testing issue #98"
@@ -155,7 +155,7 @@ servers:
 "
 `;
 
-exports[`Open API generator Issue #98 should union schemas 1`] = `
+exports[`Documentation generator Issue #98 should union schemas 1`] = `
 "openapi: 3.0.0
 info:
   title: "Testing issue #98"
@@ -266,7 +266,7 @@ servers:
 "
 `;
 
-exports[`Open API generator Metadata Issue #827: withMeta() should be immutable 1`] = `
+exports[`Documentation generator Metadata Issue #827: withMeta() should be immutable 1`] = `
 "openapi: 3.0.0
 info:
   title: Testing Metadata:example on IO parameter
@@ -374,7 +374,7 @@ servers:
 "
 `;
 
-exports[`Open API generator Metadata Issue #929: the location of the custom description should be on the param level 1`] = `
+exports[`Documentation generator Metadata Issue #929: the location of the custom description should be on the param level 1`] = `
 "openapi: 3.0.0
 info:
   title: Testing Metadata:description
@@ -460,7 +460,7 @@ servers:
 "
 `;
 
-exports[`Open API generator Metadata should merge endpoint handler examples with its middleware examples 1`] = `
+exports[`Documentation generator Metadata should merge endpoint handler examples with its middleware examples 1`] = `
 "openapi: 3.0.0
 info:
   title: Testing Metadata:example on IO schema + middleware
@@ -574,7 +574,7 @@ servers:
 "
 `;
 
-exports[`Open API generator Metadata should pass over examples of each param from the whole IO schema examples (GET) 1`] = `
+exports[`Documentation generator Metadata should pass over examples of each param from the whole IO schema examples (GET) 1`] = `
 "openapi: 3.0.0
 info:
   title: Testing Metadata:example on IO schema
@@ -666,7 +666,7 @@ servers:
 "
 `;
 
-exports[`Open API generator Metadata should pass over examples of the whole IO schema (POST) 1`] = `
+exports[`Documentation generator Metadata should pass over examples of the whole IO schema (POST) 1`] = `
 "openapi: 3.0.0
 info:
   title: Testing Metadata:example on IO schema
@@ -763,7 +763,7 @@ servers:
 "
 `;
 
-exports[`Open API generator Metadata should pass over the example of an individual parameter 1`] = `
+exports[`Documentation generator Metadata should pass over the example of an individual parameter 1`] = `
 "openapi: 3.0.0
 info:
   title: Testing Metadata:example on IO parameter
@@ -846,7 +846,7 @@ servers:
 "
 `;
 
-exports[`Open API generator Metadata should pass over the schema description 1`] = `
+exports[`Documentation generator Metadata should pass over the schema description 1`] = `
 "openapi: 3.0.0
 info:
   title: Testing Metadata:description
@@ -934,7 +934,7 @@ servers:
 "
 `;
 
-exports[`Open API generator Route Path Params should handle route path params for GET request 1`] = `
+exports[`Documentation generator Route Path Params should handle route path params for GET request 1`] = `
 "openapi: 3.0.0
 info:
   title: Testing route path params
@@ -1023,7 +1023,7 @@ servers:
 "
 `;
 
-exports[`Open API generator Route Path Params should handle route path params for POST request 1`] = `
+exports[`Documentation generator Route Path Params should handle route path params for POST request 1`] = `
 "openapi: 3.0.0
 info:
   title: Testing route path params
@@ -1117,7 +1117,7 @@ servers:
 "
 `;
 
-exports[`Open API generator generateOpenApi() should ensure the uniq operation ids 1`] = `
+exports[`Documentation generator getSpecAsYaml() should ensure the uniq operation ids 1`] = `
 "openapi: 3.0.0
 info:
   title: Testing Operation IDs
@@ -1239,7 +1239,7 @@ servers:
 "
 `;
 
-exports[`Open API generator generateOpenApi() should ensure uniq security schema names 1`] = `
+exports[`Documentation generator getSpecAsYaml() should ensure uniq security schema names 1`] = `
 "openapi: 3.0.0
 info:
   title: Testing Security
@@ -1475,7 +1475,7 @@ servers:
 "
 `;
 
-exports[`Open API generator generateOpenApi() should generate the correct schema for DELETE request without body 1`] = `
+exports[`Documentation generator getSpecAsYaml() should generate the correct schema for DELETE request without body 1`] = `
 "openapi: 3.0.0
 info:
   title: Testing DELETE request without body
@@ -1554,7 +1554,7 @@ servers:
 "
 `;
 
-exports[`Open API generator generateOpenApi() should generate the correct schema for complex types 1`] = `
+exports[`Documentation generator getSpecAsYaml() should generate the correct schema for complex types 1`] = `
 "openapi: 3.0.0
 info:
   title: Testing Complex Types
@@ -1668,7 +1668,7 @@ servers:
 "
 `;
 
-exports[`Open API generator generateOpenApi() should generate the correct schema for discriminated union type 1`] = `
+exports[`Documentation generator getSpecAsYaml() should generate the correct schema for discriminated union type 1`] = `
 "openapi: 3.0.0
 info:
   title: Testing Discriminated Union Type
@@ -1795,7 +1795,7 @@ servers:
 "
 `;
 
-exports[`Open API generator generateOpenApi() should generate the correct schema for intersection type 1`] = `
+exports[`Documentation generator getSpecAsYaml() should generate the correct schema for intersection type 1`] = `
 "openapi: 3.0.0
 info:
   title: Testing Intersection and And types
@@ -1909,7 +1909,7 @@ servers:
 "
 `;
 
-exports[`Open API generator generateOpenApi() should generate the correct schema for nullable and optional types 1`] = `
+exports[`Documentation generator getSpecAsYaml() should generate the correct schema for nullable and optional types 1`] = `
 "openapi: 3.0.0
 info:
   title: Testing Nullable and Optional Types
@@ -2018,7 +2018,7 @@ servers:
 "
 `;
 
-exports[`Open API generator generateOpenApi() should generate the correct schema for union type 1`] = `
+exports[`Documentation generator getSpecAsYaml() should generate the correct schema for union type 1`] = `
 "openapi: 3.0.0
 info:
   title: Testing Union and Or Types
@@ -2138,7 +2138,7 @@ servers:
 "
 `;
 
-exports[`Open API generator generateOpenApi() should generate the correct schema of example routing 0 1`] = `
+exports[`Documentation generator getSpecAsYaml() should generate the correct schema of example routing 0 1`] = `
 "openapi: 3.0.0
 info:
   title: Example API
@@ -2539,7 +2539,7 @@ servers:
 "
 `;
 
-exports[`Open API generator generateOpenApi() should generate the correct schema of example routing 1 1`] = `
+exports[`Documentation generator getSpecAsYaml() should generate the correct schema of example routing 1 1`] = `
 "openapi: 3.0.0
 info:
   title: Example API
@@ -2972,7 +2972,7 @@ servers:
 "
 `;
 
-exports[`Open API generator generateOpenApi() should handle bigint, boolean, date and null 1`] = `
+exports[`Documentation generator getSpecAsYaml() should handle bigint, boolean, date and null 1`] = `
 "openapi: 3.0.0
 info:
   title: Testing additional types
@@ -3078,7 +3078,7 @@ servers:
 "
 `;
 
-exports[`Open API generator generateOpenApi() should handle circular schemas via z.lazy() 1`] = `
+exports[`Documentation generator getSpecAsYaml() should handle circular schemas via z.lazy() 1`] = `
 "openapi: 3.0.0
 info:
   title: Testing Lazy
@@ -3183,7 +3183,7 @@ servers:
 "
 `;
 
-exports[`Open API generator generateOpenApi() should handle custom mime types and status codes 1`] = `
+exports[`Documentation generator getSpecAsYaml() should handle custom mime types and status codes 1`] = `
 "openapi: 3.0.0
 info:
   title: Testing MIME types and status codes
@@ -3241,7 +3241,7 @@ servers:
 "
 `;
 
-exports[`Open API generator generateOpenApi() should handle different number types 1`] = `
+exports[`Documentation generator getSpecAsYaml() should handle different number types 1`] = `
 "openapi: 3.0.0
 info:
   title: Testing numbers
@@ -3395,7 +3395,7 @@ servers:
 "
 `;
 
-exports[`Open API generator generateOpenApi() should handle different string types 1`] = `
+exports[`Documentation generator getSpecAsYaml() should handle different string types 1`] = `
 "openapi: 3.0.0
 info:
   title: Testing strings
@@ -3537,7 +3537,7 @@ servers:
 "
 `;
 
-exports[`Open API generator generateOpenApi() should handle enum types 1`] = `
+exports[`Documentation generator getSpecAsYaml() should handle enum types 1`] = `
 "openapi: 3.0.0
 info:
   title: Testing enums
@@ -3628,7 +3628,7 @@ servers:
 "
 `;
 
-exports[`Open API generator generateOpenApi() should handle record 1`] = `
+exports[`Documentation generator getSpecAsYaml() should handle record 1`] = `
 "openapi: 3.0.0
 info:
   title: Testing record
@@ -3756,7 +3756,7 @@ servers:
 "
 `;
 
-exports[`Open API generator generateOpenApi() should handle transformation schema in output 1`] = `
+exports[`Documentation generator getSpecAsYaml() should handle transformation schema in output 1`] = `
 "openapi: 3.0.0
 info:
   title: Testing Transformation in response schema
@@ -3849,7 +3849,7 @@ servers:
 "
 `;
 
-exports[`Open API generator generateOpenApi() should handle tuples 1`] = `
+exports[`Documentation generator getSpecAsYaml() should handle tuples 1`] = `
 "openapi: 3.0.0
 info:
   title: Testing tuples
@@ -3975,7 +3975,7 @@ servers:
 "
 `;
 
-exports[`Open API generator generateOpenApi() should handle type any 1`] = `
+exports[`Documentation generator getSpecAsYaml() should handle type any 1`] = `
 "openapi: 3.0.0
 info:
   title: Testing type any
@@ -4054,7 +4054,7 @@ servers:
 "
 `;
 
-exports[`Open API generator generateOpenApi() should handle z.preprocess() 1`] = `
+exports[`Documentation generator getSpecAsYaml() should handle z.preprocess() 1`] = `
 "openapi: 3.0.0
 info:
   title: Testing z.preprocess()
