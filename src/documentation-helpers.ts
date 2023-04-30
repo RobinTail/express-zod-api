@@ -60,6 +60,8 @@ export interface OpenAPIContext {
     name: string,
     schema: SchemaObject | ReferenceObject
   ) => ReferenceObject;
+  path: string;
+  method: Method;
 }
 
 type Depicter<
@@ -68,9 +70,10 @@ type Depicter<
 > = SchemaHandler<T, SchemaObject | ReferenceObject, OpenAPIContext, Variant>;
 
 interface ReqResDepictHelperCommonProps
-  extends Pick<OpenAPIContext, "serializer" | "getRef" | "makeRef"> {
-  method: Method;
-  path: string;
+  extends Pick<
+    OpenAPIContext,
+    "serializer" | "getRef" | "makeRef" | "path" | "method"
+  > {
   endpoint: AbstractEndpoint;
   composition: "inline" | "components";
   clue?: string;
@@ -119,9 +122,18 @@ export const depictAny: Depicter<z.ZodAny> = () => ({
   format: "any",
 });
 
-export const depictUpload: Depicter<ZodUpload> = ({ isResponse }) => {
+export const depictUpload: Depicter<ZodUpload> = ({
+  isResponse,
+  path,
+  method,
+}) => {
   if (isResponse) {
-    throw new OpenAPIError("Please use z.upload() only for input.");
+    throw new OpenAPIError(
+      "Please use z.upload() only for input.",
+      path,
+      method,
+      isResponse
+    );
   }
   return {
     type: "string",
@@ -132,9 +144,16 @@ export const depictUpload: Depicter<ZodUpload> = ({ isResponse }) => {
 export const depictFile: Depicter<ZodFile> = ({
   schema: { isBinary, isBase64 },
   isResponse,
+  path,
+  method,
 }) => {
   if (!isResponse) {
-    throw new OpenAPIError("Please use z.file() only within ResultHandler.");
+    throw new OpenAPIError(
+      "Please use z.file() only within ResultHandler.",
+      path,
+      method,
+      isResponse
+    );
   }
   return {
     type: "string",
@@ -227,9 +246,18 @@ export const depictNull: Depicter<z.ZodNull> = () => ({
   format: "null",
 });
 
-export const depictDateIn: Depicter<ZodDateIn> = ({ isResponse }) => {
+export const depictDateIn: Depicter<ZodDateIn> = ({
+  isResponse,
+  path,
+  method,
+}) => {
   if (isResponse) {
-    throw new OpenAPIError("Please use z.dateOut() for output.");
+    throw new OpenAPIError(
+      "Please use z.dateOut() for output.",
+      path,
+      method,
+      isResponse
+    );
   }
   return {
     description: "YYYY-MM-DDTHH:mm:ss.sssZ",
@@ -242,9 +270,18 @@ export const depictDateIn: Depicter<ZodDateIn> = ({ isResponse }) => {
   };
 };
 
-export const depictDateOut: Depicter<ZodDateOut> = ({ isResponse }) => {
+export const depictDateOut: Depicter<ZodDateOut> = ({
+  isResponse,
+  path,
+  method,
+}) => {
   if (!isResponse) {
-    throw new OpenAPIError("Please use z.dateIn() for input.");
+    throw new OpenAPIError(
+      "Please use z.dateIn() for input.",
+      path,
+      method,
+      isResponse
+    );
   }
   return {
     description: "YYYY-MM-DDTHH:mm:ss.sssZ",
@@ -257,13 +294,20 @@ export const depictDateOut: Depicter<ZodDateOut> = ({ isResponse }) => {
 };
 
 /** @throws OpenAPIError */
-export const depictDate: Depicter<z.ZodDate> = ({ isResponse }) => {
+export const depictDate: Depicter<z.ZodDate> = ({
+  isResponse,
+  path,
+  method,
+}) => {
   throw new OpenAPIError(
     `Using z.date() within ${
       isResponse ? "output" : "input"
     } schema is forbidden. Please use z.date${
       isResponse ? "Out" : "In"
-    }() instead. Check out the documentation for details.`
+    }() instead. Check out the documentation for details.`,
+    path,
+    method,
+    isResponse
   );
 };
 
@@ -577,7 +621,10 @@ export const depictParamExamples = (
   };
 };
 
-export function extractObjectSchema(subject: IOSchema) {
+export function extractObjectSchema(
+  subject: IOSchema,
+  ctx: Pick<OpenAPIContext, "path" | "method">
+) {
   if (subject instanceof z.ZodObject) {
     return subject;
   }
@@ -587,19 +634,22 @@ export function extractObjectSchema(subject: IOSchema) {
     subject instanceof z.ZodDiscriminatedUnion
   ) {
     objectSchema = Array.from(subject.options.values())
-      .map((option) => extractObjectSchema(option))
+      .map((option) => extractObjectSchema(option, ctx))
       .reduce((acc, option) => acc.merge(option.partial()), z.object({}));
   } else if (subject instanceof z.ZodEffects) {
     if (hasTopLevelTransformingEffect(subject)) {
       throw new OpenAPIError(
-        "Using transformations on the top level of input schema is not allowed."
+        "Using transformations on the top level of input schema is not allowed.",
+        ctx.path,
+        ctx.method,
+        false
       );
     }
-    objectSchema = extractObjectSchema(subject._def.schema); // object refinement
+    objectSchema = extractObjectSchema(subject._def.schema, ctx); // object refinement
   } else {
     // intersection
-    objectSchema = extractObjectSchema(subject._def.left).merge(
-      extractObjectSchema(subject._def.right)
+    objectSchema = extractObjectSchema(subject._def.left, ctx).merge(
+      extractObjectSchema(subject._def.right, ctx)
     );
   }
   return copyMeta(subject, objectSchema);
@@ -619,7 +669,7 @@ export const depictRequestParams = ({
   inputSources: InputSource[];
 }): ParameterObject[] => {
   const schema = endpoint.getSchema("input");
-  const shape = extractObjectSchema(schema).shape;
+  const shape = extractObjectSchema(schema, { path, method }).shape;
   const pathParams = getRoutePathParams(path);
   const isQueryEnabled = inputSources.includes("query");
   const isParamsEnabled = inputSources.includes("params");
@@ -637,6 +687,8 @@ export const depictRequestParams = ({
         serializer,
         getRef,
         makeRef,
+        path,
+        method,
       });
       const result =
         composition === "components"
@@ -715,8 +767,16 @@ export const onEach: Depicter<z.ZodTypeAny, "each"> = ({
   };
 };
 
-export const onMissing = (schema: z.ZodTypeAny) => {
-  throw new OpenAPIError(`Zod type ${schema.constructor.name} is unsupported`);
+export const onMissing = (
+  schema: z.ZodTypeAny,
+  { path, method, isResponse }: OpenAPIContext
+) => {
+  throw new OpenAPIError(
+    `Zod type ${schema.constructor.name} is unsupported`,
+    path,
+    method,
+    isResponse
+  );
 };
 
 export const excludeParamsFromDepiction = (
@@ -791,6 +851,8 @@ export const depictResponse = ({
       serializer,
       getRef,
       makeRef,
+      path,
+      method,
     })
   );
   const examples = depictExamples(schema, true);
@@ -926,6 +988,8 @@ export const depictRequest = ({
         serializer,
         getRef,
         makeRef,
+        path,
+        method,
       }),
       pathParams
     )

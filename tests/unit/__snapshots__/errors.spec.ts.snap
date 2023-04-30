@@ -1,0 +1,6 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Errors OpenAPIError should include more details into the message 1`] = `
+"test
+Caused by response schema of an Endpoint assigned to get method of /v1/testPath path"
+`;

@@ -20,11 +20,21 @@ describe("Errors", () => {
 
   describe("OpenAPIError", () => {
     test("should be an instance of Error", () => {
-      expect(new OpenAPIError("test")).toBeInstanceOf(Error);
+      expect(
+        new OpenAPIError("test", "/v1/testPath", "get", true)
+      ).toBeInstanceOf(Error);
+    });
+
+    test("should include more details into the message", () => {
+      expect(
+        new OpenAPIError("test", "/v1/testPath", "get", true).message
+      ).toMatchSnapshot();
     });
 
     test("should have the name matching its class", () => {
-      expect(new OpenAPIError("test").name).toBe("OpenAPIError");
+      expect(new OpenAPIError("test", "/v1/testPath", "get", true).name).toBe(
+        "OpenAPIError"
+      );
     });
   });
 

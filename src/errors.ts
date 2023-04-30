@@ -1,5 +1,6 @@
 import { ZodError } from "zod";
 import { getMessageFromError } from "./common-helpers";
+import { Method } from "./method";
 
 /** @desc An error related to the wrong Routing declaration */
 export class RoutingError extends Error {
@@ -17,6 +18,19 @@ export class DependsOnMethodError extends RoutingError {
  * */
 export class OpenAPIError extends Error {
   public override name = "OpenAPIError";
+
+  constructor(
+    message: string,
+    path: string,
+    method: Method,
+    isResponse: boolean
+  ) {
+    super(
+      `${message}\nCaused by ${
+        isResponse ? "response" : "input"
+      } schema of an Endpoint assigned to ${method} method of ${path} path`
+    );
+  }
 }
 
 /** @desc An error related to the input and output schemas declaration */
