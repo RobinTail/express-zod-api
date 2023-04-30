@@ -55,7 +55,7 @@ export const walkSchema = <U, Context extends object = {}>({
   /** @since 10.1.1 calling onEach _after_ handler and giving it its result */
   onEach?: SchemaHandler<z.ZodTypeAny, U, Context, "each">;
   rules: HandlingRules<U, Context>;
-  onMissing: (params: { schema: z.ZodTypeAny } & Context) => U;
+  onMissing: SchemaHandler<z.ZodTypeAny, U, Context, "last">;
 }): U => {
   const handler =
     "typeName" in schema._def

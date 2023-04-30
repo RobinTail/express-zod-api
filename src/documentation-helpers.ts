@@ -767,12 +767,12 @@ export const onEach: Depicter<z.ZodTypeAny, "each"> = ({
   };
 };
 
-export const onMissing = ({
+export const onMissing: Depicter<z.ZodTypeAny, "last"> = ({
   path,
   method,
   isResponse,
   schema,
-}: OpenAPIContext & { schema: z.ZodTypeAny }) => {
+}) => {
   throw new OpenAPIError(
     `Zod type ${schema.constructor.name} is unsupported`,
     path,
