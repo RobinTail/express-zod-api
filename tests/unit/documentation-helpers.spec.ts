@@ -1,9 +1,9 @@
+import { ReferenceObject, SchemaObject } from "openapi3-ts/oas30";
 import { z } from "zod";
 import { defaultSerializer } from "../../src/common-helpers";
 import { IOSchemaError } from "../../src/errors";
 import { OpenAPIError, defaultEndpointsFactory, ez, withMeta } from "../../src";
 import { getMeta } from "../../src/metadata";
-import { ReferenceObject, SchemaObject } from "../../src/oas-model";
 import {
   OpenAPIContext,
   depictAny,

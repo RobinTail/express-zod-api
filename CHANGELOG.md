@@ -2,6 +2,11 @@
 
 ## Version 10
 
+### v10.7.0
+
+- Reverting the changes made in v10.2.0: restoring `openapi3-ts` dependency.
+  - `openapi3-ts` version is 4.1.2.
+
 ### v10.6.0
 
 - Feature #974: Integration variant.
