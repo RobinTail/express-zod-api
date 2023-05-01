@@ -1,3 +1,11 @@
+import {
+  OpenApiBuilder,
+  OperationObject,
+  ReferenceObject,
+  SchemaObject,
+  SecuritySchemeObject,
+  SecuritySchemeType,
+} from "openapi3-ts/oas30";
 import { z } from "zod";
 import {
   defaultInputSources,
@@ -7,14 +15,6 @@ import {
 import { CommonConfig } from "./config-type";
 import { mapLogicalContainer } from "./logical-container";
 import { Method } from "./method";
-import { OpenApiBuilder } from "./oas-builder";
-import {
-  OperationObject,
-  ReferenceObject,
-  SchemaObject,
-  SecuritySchemeObject,
-  SecuritySchemeType,
-} from "./oas-model";
 import {
   depictRequest,
   depictRequestParams,

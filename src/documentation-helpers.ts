@@ -1,3 +1,21 @@
+import {
+  ContentObject,
+  ExampleObject,
+  ExamplesObject,
+  MediaTypeObject,
+  OAuthFlowsObject,
+  ParameterObject,
+  ReferenceObject,
+  RequestBodyObject,
+  ResponseObject,
+  SchemaObject,
+  SchemaObjectType,
+  SecurityRequirementObject,
+  SecuritySchemeObject,
+  TagObject,
+  isReferenceObject,
+  isSchemaObject,
+} from "openapi3-ts/oas30";
 import { omit } from "ramda";
 import { z } from "zod";
 import {
@@ -23,24 +41,6 @@ import {
 } from "./logical-container";
 import { copyMeta } from "./metadata";
 import { Method } from "./method";
-import {
-  ContentObject,
-  ExampleObject,
-  ExamplesObject,
-  MediaTypeObject,
-  OAuthFlowsObject,
-  ParameterObject,
-  ReferenceObject,
-  RequestBodyObject,
-  ResponseObject,
-  SchemaObject,
-  SchemaObjectType,
-  SecurityRequirementObject,
-  SecuritySchemeObject,
-  TagObject,
-  isReferenceObject,
-  isSchemaObject,
-} from "./oas-model";
 import {
   HandlingRules,
   HandlingVariant,
