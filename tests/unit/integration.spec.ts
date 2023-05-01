@@ -1,12 +1,15 @@
 import { z } from "zod";
 import { routing } from "../../example/routing";
-import { Integration, defaultEndpointsFactory } from "../../src";
+import { Client, Integration, defaultEndpointsFactory } from "../../src";
 
 describe("API Integration Generator", () => {
-  test("Should generate a client for example API", () => {
-    const client = new Integration({ routing });
-    expect(client.print()).toMatchSnapshot();
-  });
+  test.each(["client", "types"] as const)(
+    "Should generate a %s for example API",
+    (variant) => {
+      const client = new Integration({ variant, routing });
+      expect(client.print()).toMatchSnapshot();
+    }
+  );
 
   test("Should treat optionals the same way as z.infer() by default", () => {
     const client = new Integration({
@@ -51,4 +54,12 @@ describe("API Integration Generator", () => {
       expect(client.print()).toMatchSnapshot();
     }
   );
+});
+
+describe("Client generator", () => {
+  test("Should be the same as Integration with the client variant", () => {
+    const gauge = new Integration({ variant: "client", routing }).print();
+    const client = new Client({ routing });
+    expect(client.print()).toEqual(gauge);
+  });
 });

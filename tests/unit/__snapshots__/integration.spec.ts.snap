@@ -332,6 +332,88 @@ export class ExpressZodAPIClient {
 }"
 `;
 
+exports[`API Integration Generator Should generate a types for example API 1`] = `
+"type Type2048581c137c5b2130eb860e3ae37da196dfc25b = {
+    title: string;
+    features: Type2048581c137c5b2130eb860e3ae37da196dfc25b;
+}[];
+
+type GetV1UserRetrieveInput = {} & {
+    /** a numeric string containing the id of the user */
+    id: string;
+};
+
+type GetV1UserRetrieveResponse = {
+    status: "success";
+    data: {
+        id: number;
+        name: string;
+        features: {
+            title: string;
+            features: Type2048581c137c5b2130eb860e3ae37da196dfc25b;
+        }[];
+    };
+} | {
+    status: "error";
+    error: {
+        message: string;
+    };
+};
+
+type PostV1UserIdInput = {
+    key: string;
+} & {
+    id: string;
+    name: string;
+    birthday: string;
+};
+
+type PostV1UserIdResponse = {
+    status: "success";
+    data: {
+        name: string;
+        createdAt: string;
+    };
+} | {
+    status: "error";
+    error: {
+        message: string;
+    };
+};
+
+type GetV1AvatarSendInput = {
+    userId: string;
+};
+
+type GetV1AvatarSendResponse = string | string;
+
+type GetV1AvatarStreamInput = {
+    userId: string;
+};
+
+type GetV1AvatarStreamResponse = string | string;
+
+type PostV1AvatarUploadInput = {
+    avatar: any;
+};
+
+type PostV1AvatarUploadResponse = {
+    status: "success";
+    data: {
+        name: string;
+        size: number;
+        mime: string;
+        hash: string;
+        otherInputs: Record<string, any>;
+    };
+} | {
+    status: "error";
+    error: {
+        message: string;
+    };
+};"
+`;
+
 exports[`API Integration Generator Should treat optionals the same way as z.infer() by default 1`] = `
 "type PostV1TestWithDashesInput = {
     opt?: string | undefined;

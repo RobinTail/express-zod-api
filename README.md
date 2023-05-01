@@ -815,6 +815,7 @@ fs.writeFileSync(
   "./frontend/client.ts",
   new Integration({
     routing,
+    variant: "client", // <— optional, see also "types" for a DIY solution
     optionalPropStyle: { withQuestionMark: true, withUndefined: true }, // optional
   }).print(),
   "utf-8"

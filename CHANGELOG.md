@@ -2,6 +2,14 @@
 
 ## Version 10
 
+### v10.6.0
+
+- Feature #974: Integration variant.
+  - `Integration::constructor()` has gotten a new property `variant` with two possible values:
+    - `client` _(default)_ — the familiar entity for making typed requests and received typed responses;
+    - `types` — only types of your endpoint requests and responses (for making a DIY solution).
+  - The deprecated ~~`Client::constructor()`~~ implies `client` variant of `Integration`.
+
 ### v10.5.0
 
 - Errors that may occur when generating documentation are now more informative.

@@ -38,6 +38,13 @@ interface Registry {
 interface IntegrationParams {
   routing: Routing;
   /**
+   * @desc What should be generated
+   * @example "types" — types of your endpoint requests and responses (for a DIY solution)
+   * @example "client" — an entity for performing typed requests and receiving typed responses
+   * @default "client"
+   * */
+  variant?: "types" | "client";
+  /**
    * @desc Used for comparing schemas wrapped into z.lazy() to limit the recursion
    * @default JSON.stringify() + SHA1 hash as a hex digest
    * */
@@ -77,6 +84,7 @@ export class Integration {
 
   constructor({
     routing,
+    variant = "client",
     serializer = defaultSerializer,
     optionalPropStyle = { withQuestionMark: true, withUndefined: true },
   }: IntegrationParams) {
@@ -119,6 +127,10 @@ export class Integration {
     });
 
     this.agg = Object.values<ts.Node>(this.aliases).concat(this.agg);
+
+    if (variant === "types") {
+      return;
+    }
 
     const pathNode = makePublicLiteralType("Path", this.paths);
     const methodNode = makePublicLiteralType("Method", methods);
@@ -327,4 +339,8 @@ export class Integration {
  * @deprecated Use Integration instead
  * @todo remove in v11
  * */
-export class Client extends Integration {}
+export class Client extends Integration {
+  constructor(params: Omit<IntegrationParams, "variant">) {
+    super({ variant: "client", ...params });
+  }
+}
