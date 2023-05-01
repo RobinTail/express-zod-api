@@ -39,11 +39,11 @@ interface IntegrationParams {
   routing: Routing;
   /**
    * @desc What should be generated
-   * @example "typesOnly" — types of your endpoint requests and responses (for a DIY solution)
+   * @example "types" — types of your endpoint requests and responses (for a DIY solution)
    * @example "client" — an entity for performing typed requests and receiving typed responses
    * @default "client"
    * */
-  variant?: "typesOnly" | "client";
+  variant?: "types" | "client";
   /**
    * @desc Used for comparing schemas wrapped into z.lazy() to limit the recursion
    * @default JSON.stringify() + SHA1 hash as a hex digest
@@ -128,7 +128,7 @@ export class Integration {
 
     this.agg = Object.values<ts.Node>(this.aliases).concat(this.agg);
 
-    if (variant === "typesOnly") {
+    if (variant === "types") {
       return;
     }
 

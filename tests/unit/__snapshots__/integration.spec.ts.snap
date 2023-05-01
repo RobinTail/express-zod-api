@@ -332,7 +332,7 @@ export class ExpressZodAPIClient {
 }"
 `;
 
-exports[`API Integration Generator Should generate a typesOnly for example API 1`] = `
+exports[`API Integration Generator Should generate a types for example API 1`] = `
 "type Type2048581c137c5b2130eb860e3ae37da196dfc25b = {
     title: string;
     features: Type2048581c137c5b2130eb860e3ae37da196dfc25b;
