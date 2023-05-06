@@ -5,6 +5,7 @@
     "strictNullChecks": true,
     "resolveJsonModule": true
   },
+  "exclude": ["example/miracle.ts"],
   "ts-node": {
     "swc": true
   }
