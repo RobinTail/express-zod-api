@@ -1,3 +1,11 @@
+import {
+  OpenApiBuilder,
+  OperationObject,
+  ReferenceObject,
+  SchemaObject,
+  SecuritySchemeObject,
+  SecuritySchemeType,
+} from "openapi3-ts/oas30";
 import { z } from "zod";
 import {
   defaultInputSources,
@@ -7,14 +15,6 @@ import {
 import { CommonConfig } from "./config-type";
 import { mapLogicalContainer } from "./logical-container";
 import { Method } from "./method";
-import { OpenApiBuilder } from "./oas-builder";
-import {
-  OperationObject,
-  ReferenceObject,
-  SchemaObject,
-  SecuritySchemeObject,
-  SecuritySchemeType,
-} from "./oas-model";
 import {
   depictRequest,
   depictRequestParams,
@@ -24,11 +24,11 @@ import {
   depictTags,
   ensureShortDescription,
   reformatParamsInPath,
-} from "./open-api-helpers";
+} from "./documentation-helpers";
 import { Routing } from "./routing";
 import { RoutingWalkerParams, walkRouting } from "./routing-walker";
 
-interface GeneratorParams {
+interface DocumentationParams {
   title: string;
   version: string;
   serverUrl: string;
@@ -49,7 +49,7 @@ interface GeneratorParams {
   serializer?: (schema: z.ZodTypeAny) => string;
 }
 
-export class OpenAPI extends OpenApiBuilder {
+export class Documentation extends OpenApiBuilder {
   protected lastSecuritySchemaIds: Partial<Record<SecuritySchemeType, number>> =
     {};
   protected lastOperationIdSuffixes: Record<string, number> = {};
@@ -106,7 +106,7 @@ export class OpenAPI extends OpenApiBuilder {
     hasSummaryFromDescription = true,
     composition = "inline",
     serializer = defaultSerializer,
-  }: GeneratorParams) {
+  }: DocumentationParams) {
     super();
     this.addInfo({ title, version }).addServer({ url: serverUrl });
     const onEndpoint: RoutingWalkerParams["onEndpoint"] = (
@@ -193,3 +193,9 @@ export class OpenAPI extends OpenApiBuilder {
     this.rootDoc.tags = config.tags ? depictTags(config.tags) : [];
   }
 }
+
+/**
+ * @deprecated Use Documentation instead.
+ * @todo remove in v11
+ * */
+export class OpenAPI extends Documentation {}

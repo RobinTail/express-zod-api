@@ -2,12 +2,67 @@
 
 ## Version 10
 
+### v10.7.1
+
+- For the `new Integration({ variant: "types" })` the following types added:
+  - `Path`, `Method`, `MethodPath`, `Input`, `Response`.
+
+### v10.7.0
+
+- Reverting the changes made in v10.2.0: restoring `openapi3-ts` dependency.
+  - `openapi3-ts` version is 4.1.2.
+
+### v10.6.0
+
+- Feature #974: Integration variant.
+  - `Integration::constructor()` has gotten a new property `variant` with two possible values:
+    - `client` _(default)_ — the familiar entity for making typed requests and received typed responses;
+    - `types` — only types of your endpoint requests and responses (for making a DIY solution).
+  - The deprecated ~~`Client::constructor()`~~ implies `client` variant of `Integration`.
+
+### v10.5.0
+
+- Errors that may occur when generating documentation are now more informative.
+  - Changes made to the message of `OpenAPIError` class.
+
+```yaml
+# example of additional details in the second line of the error message
+before: >-
+  Using transformations on the top level of input schema is not allowed.
+after: |-
+  Using transformations on the top level of input schema is not allowed.
+  Caused by input schema of an Endpoint assigned to POST method of /v1/user/:id path.
+```
+
+### v10.4.0
+
+- For the future features and improvements the following entities are renamed:
+  - ~~`Client`~~ class becomes the `Integration`.
+  - ~~`OpenAPI`~~ class becomes the `Documentation`.
+  - For backward compatibility the previously assigned names are still supported until the next major release.
+  - Developers are advised to adjust their implementation accordingly.
+
+```ts
+// before
+new Client(/*...*/);
+new OpenAPI(/*...*/);
+// after
+new Integration(/*...*/);
+new Documentation(/*...*/);
+```
+
+### v10.3.2
+
+- Hotfix on fixing the previously mentioned issue #952.
+  - The following interfaces are now exported from the index file directly:
+    - `ZodFileDef`, `ZodUploadDef`, `ZodDateInDef`, `ZodDateOutDef`.
+
 ### v10.3.1
 
-- Fixed issue of the insufficient exports of the proprietary schema definitions.
+- Attempted to fix the issue #952 of the insufficient exports of the proprietary schema definitions.
   - The issue introduced in version 10.0.0-beta1 due to changing the compiler to `tsup`.
-  - The issue manifested only when `declaration` is enabled in your `tsconfig.json`.
-  - The issue caused following error:
+  - The issue manifests only when `declaration` is enabled in your `tsconfig.json`.
+  - The issue causes following error:
     - `TS4023: Exported variable '' has or is using name 'ZodFileDef' from external module "" but cannot be named.`
   - The following interfaces are now available within the exported `ez` namespace:
     - `ez.ZodFileDef`, `ez.ZodUploadDef`, `ez.ZodDateInDef`, `ez.ZodDateOutDef`.

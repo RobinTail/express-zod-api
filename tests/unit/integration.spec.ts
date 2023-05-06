@@ -1,15 +1,18 @@
 import { z } from "zod";
 import { routing } from "../../example/routing";
-import { Client, defaultEndpointsFactory } from "../../src";
+import { Client, Integration, defaultEndpointsFactory } from "../../src";
 
-describe("API Client Generator", () => {
-  test("Should generate a client for example API", () => {
-    const client = new Client({ routing });
-    expect(client.print()).toMatchSnapshot();
-  });
+describe("API Integration Generator", () => {
+  test.each(["client", "types"] as const)(
+    "Should generate a %s for example API",
+    (variant) => {
+      const client = new Integration({ variant, routing });
+      expect(client.print()).toMatchSnapshot();
+    }
+  );
 
   test("Should treat optionals the same way as z.infer() by default", () => {
-    const client = new Client({
+    const client = new Integration({
       routing: {
         v1: {
           "test-with-dashes": defaultEndpointsFactory.build({
@@ -31,7 +34,7 @@ describe("API Client Generator", () => {
   test.each([{ withQuestionMark: true }, { withUndefined: true }, {}])(
     "Feature #945: should have configurable treatment of optionals %#",
     (optionalPropStyle) => {
-      const client = new Client({
+      const client = new Integration({
         optionalPropStyle,
         routing: {
           v1: {
@@ -51,4 +54,12 @@ describe("API Client Generator", () => {
       expect(client.print()).toMatchSnapshot();
     }
   );
+});
+
+describe("Client generator", () => {
+  test("Should be the same as Integration with the client variant", () => {
+    const gauge = new Integration({ variant: "client", routing }).print();
+    const client = new Client({ routing });
+    expect(client.print()).toEqual(gauge);
+  });
 });

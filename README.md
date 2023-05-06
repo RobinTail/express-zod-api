@@ -80,7 +80,7 @@ Therefore, many basic tasks can be accomplished faster and easier, in particular
 - Schema validation — [Zod 3.x](https://github.com/colinhacks/zod).
 - Logger — [Winston](https://github.com/winstonjs/winston).
 - Generators:
-  - Documentation — OpenAPI 3.x, aka Swagger, inspired by [openapi3-ts](https://github.com/metadevpro/openapi3-ts).
+  - Documentation — [OpenAPI 3.x](https://github.com/metadevpro/openapi3-ts) (Swagger Specification).
   - Client side types — inspired by [zod-to-ts](https://github.com/sachinraja/zod-to-ts).
 - File uploads — [Express-FileUpload](https://github.com/richardgirges/express-fileupload)
   (based on [Busboy](https://github.com/mscdex/busboy)).
@@ -279,7 +279,7 @@ import { createMiddleware, createHttpError } from "express-zod-api";
 
 const authMiddleware = createMiddleware({
   security: {
-    // this information is optional and used for the generated documentation (OpenAPI)
+    // this information is optional and used for generating documentation
     and: [
       { type: "input", name: "key" },
       { type: "header", name: "token" },
@@ -809,12 +809,13 @@ Consuming the generated client requires Typescript version 4.1 or higher.
 ```typescript
 // example client-generator.ts
 import fs from "fs";
-import { Client } from "express-zod-api";
+import { Integration } from "express-zod-api";
 
 fs.writeFileSync(
   "./frontend/client.ts",
-  new Client({
+  new Integration({
     routing,
+    variant: "client", // <— optional, see also "types" for a DIY solution
     optionalPropStyle: { withQuestionMark: true, withUndefined: true }, // optional
   }).print(),
   "utf-8"
@@ -845,9 +846,9 @@ client.provide("post", "/v1/user/:id", { id: "10" }); // it also substitues path
 You can generate the specification of your API and write it to a `.yaml` file, that can be used as the documentation:
 
 ```typescript
-import { OpenAPI } from "express-zod-api";
+import { Documentation } from "express-zod-api";
 
-const yamlString = new OpenAPI({
+const yamlString = new Documentation({
   routing, // the same routing and config that you use to start the server
   config,
   version: "1.2.3",
