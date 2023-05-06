@@ -2,6 +2,11 @@
 
 ## Version 10
 
+### v10.8.0
+
+- Supporting Node 20.
+  - Minimum supported version of Node 20.x is 20.1.0.
+
 ### v10.7.1
 
 - For the `new Integration({ variant: "types" })` the following types added:
