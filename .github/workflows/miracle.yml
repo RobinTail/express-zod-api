@@ -1,0 +1,34 @@
+name: Issue 976
+
+on:
+  pull_request:
+    branches:
+      - master
+
+
+jobs:
+  reproduce:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get yarn cache dir
+        id: yarnCache
+        run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Install Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Cache node modules
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-yarn
+        with:
+          path: ${{ steps.yarnCache.outputs.dir }}
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ matrix.node-version }}-${{ hashFiles('**/yarn.lock') }}
+      - name: Install dependencies
+        run: yarn install
+      - name: Build express-zod-api
+        run: yarn build
+      - name: Trying to reproduce the issue <———— see here
+        run: yarn ts-node example/miracle.ts
