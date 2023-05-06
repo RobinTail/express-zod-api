@@ -2,6 +2,10 @@
 
 ## Version 10
 
+### v10.8.1
+
+- Add missing `async` keyword to `ExpressZodAPIClient::provide()` method.
+
 ### v10.8.0
 
 - Supporting Node 20.
