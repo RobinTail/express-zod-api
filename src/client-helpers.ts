@@ -4,6 +4,8 @@ export const f = ts.factory;
 
 export const exportModifier = [f.createModifier(ts.SyntaxKind.ExportKeyword)];
 
+const asyncModifier = [f.createModifier(ts.SyntaxKind.AsyncKeyword)];
+
 const publicReadonlyModifier = [
   f.createModifier(ts.SyntaxKind.PublicKeyword),
   f.createModifier(ts.SyntaxKind.ReadonlyKeyword),
@@ -156,7 +158,7 @@ export const makeImplementationCallFn = (
   args: ts.Expression[]
 ) =>
   f.createArrowFunction(
-    undefined,
+    asyncModifier,
     undefined,
     params.map((key) => makeParam(key)),
     undefined,
