@@ -156,7 +156,7 @@ export const makeImplementationCallFn = (
   args: ts.Expression[]
 ) =>
   f.createArrowFunction(
-    undefined,
+    [f.createModifier(ts.SyntaxKind.AsyncKeyword)],
     undefined,
     params.map((key) => makeParam(key)),
     undefined,
