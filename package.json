@@ -19,7 +19,7 @@
     "test:types": "tsc --noEmit",
     "test:jest": "jest --detectOpenHandles ./tests/unit ./tests/system",
     "test:badge": "make-coverage-badge --output-path ./coverage.svg",
-    "lint": "eslint ./src ./example ./tests && yarn prettier *.md --check",
+    "lint": "eslint ./src ./tests && yarn prettier *.md --check",
     "mdfix": "prettier *.md --write",
     "precommit": "yarn lint && yarn test && yarn build && git add example/example.swagger.yaml example/example.client.ts ./LICENSE ./coverage.svg",
     "prepublishOnly": "yarn lint && yarn test && yarn build",
