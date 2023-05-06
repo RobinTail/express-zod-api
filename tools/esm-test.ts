@@ -5,6 +5,8 @@ import { getTSConfigBase } from "./tsconfig-base";
 
 const tsconfigBase = getTSConfigBase();
 
+// @todo revert "start" to "ts-node-esm quick-start.ts" when the ts-node issue fixed
+// @link https://github.com/TypeStrong/ts-node/issues/1997
 const packageJson = `
 {
   "name": "express-zod-api-esm-test",
