@@ -128,10 +128,6 @@ export class Integration {
 
     this.agg = Object.values<ts.Node>(this.aliases).concat(this.agg);
 
-    if (variant === "types") {
-      return;
-    }
-
     const pathNode = makePublicLiteralType("Path", this.paths);
     const methodNode = makePublicLiteralType("Method", methods);
 
@@ -161,6 +157,18 @@ export class Integration {
         makeQuotedProp(methodPath, this.registry[methodPath].out)
       )
     );
+
+    this.agg.push(
+      pathNode,
+      methodNode,
+      methodPathNode,
+      inputNode,
+      responseNode
+    );
+
+    if (variant === "types") {
+      return;
+    }
 
     const jsonEndpointsNode = f.createVariableStatement(
       exportModifier,
@@ -318,11 +326,6 @@ export class Integration {
     );
 
     this.agg.push(
-      pathNode,
-      methodNode,
-      methodPathNode,
-      inputNode,
-      responseNode,
       jsonEndpointsNode,
       providerNode,
       implementationNode,

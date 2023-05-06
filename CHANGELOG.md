@@ -2,6 +2,11 @@
 
 ## Version 10
 
+### v10.7.1
+
+- For the `new Integration({ variant: "types" })` the following types added:
+  - `Path`, `Method`, `MethodPath`, `Input`, `Response`.
+
 ### v10.7.0
 
 - Reverting the changes made in v10.2.0: restoring `openapi3-ts` dependency.
