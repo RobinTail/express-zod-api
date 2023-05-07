@@ -1,4 +1,3 @@
-import { oas30, oas31 } from "openapi3-ts";
 import { z } from "zod";
 import {
   defaultInputSources,
@@ -6,11 +5,7 @@ import {
   makeCleanId,
 } from "./common-helpers";
 import { CommonConfig } from "./config-type";
-import { OpenAPIError } from "./errors";
-import { mapLogicalContainer } from "./logical-container";
-import { Method } from "./method";
 import {
-  OASVersion,
   depictRequest,
   depictRequestParams,
   depictResponse,
@@ -20,6 +15,23 @@ import {
   ensureShortDescription,
   reformatParamsInPath,
 } from "./documentation-helpers";
+import { OpenAPIError } from "./errors";
+import { mapLogicalContainer } from "./logical-container";
+import { Method } from "./method";
+import {
+  OASVersion,
+  OpenApiBuilder,
+  OperationObject,
+  ReferenceObject,
+  SchemaObject,
+  SecuritySchemeObject,
+  SecuritySchemeType,
+  isOpenApiBuilder30,
+  isOpenApiBuilder31,
+  isSchemaObject30,
+  isSchemaObject31,
+  makeBuilder,
+} from "./oas-domain";
 import { Routing } from "./routing";
 import { RoutingWalkerParams, walkRouting } from "./routing-walker";
 
@@ -50,22 +62,8 @@ interface DocumentationParams {
   serializer?: (schema: z.ZodTypeAny) => string;
 }
 
-// @todo move
-type SchemaObject = oas30.SchemaObject | oas31.SchemaObject;
-type ReferenceObject = oas30.ReferenceObject | oas31.ReferenceObject;
-type SecuritySchemeType = oas30.SecuritySchemeType | oas31.SecuritySchemeType;
-type SecuritySchemeObject =
-  | oas30.SecuritySchemeObject
-  | oas31.SecuritySchemeObject;
-type OperationObject = oas30.OperationObject | oas31.OperationObject;
-
-const isSchemaObject31 = (subject: any): subject is oas31.SchemaObject =>
-  oas31.isSchemaObject(subject);
-const isSchemaObject30 = (subject: any): subject is oas30.SchemaObject =>
-  oas30.isSchemaObject(subject);
-
 export class Documentation {
-  public builder: oas31.OpenApiBuilder | oas30.OpenApiBuilder;
+  public builder: OpenApiBuilder;
   protected lastSecuritySchemaIds: Partial<Record<SecuritySchemeType, number>> =
     {};
   protected lastOperationIdSuffixes: Record<string, number> = {};
@@ -74,15 +72,9 @@ export class Documentation {
     name: string,
     schema: SchemaObject | ReferenceObject
   ): ReferenceObject {
-    if (
-      this.builder instanceof oas31.OpenApiBuilder &&
-      isSchemaObject31(schema)
-    ) {
+    if (isOpenApiBuilder31(this.builder) && isSchemaObject31(schema)) {
       this.builder.addSchema(name, schema);
-    } else if (
-      this.builder instanceof oas30.OpenApiBuilder &&
-      isSchemaObject30(schema)
-    ) {
+    } else if (isOpenApiBuilder30(this.builder) && isSchemaObject30(schema)) {
       this.builder.addSchema(name, schema);
     } else {
       throw new OpenAPIError(
@@ -138,7 +130,7 @@ export class Documentation {
     serializer = defaultSerializer,
     variant = "3.0",
   }: DocumentationParams) {
-    this.builder = new (variant === "3.1" ? oas31 : oas30).OpenApiBuilder();
+    this.builder = makeBuilder(variant);
     this.builder.addOpenApiVersion(`${variant}.0`);
     this.builder.addInfo({ title, version }).addServer({ url: serverUrl });
     const onEndpoint: RoutingWalkerParams["onEndpoint"] = (
