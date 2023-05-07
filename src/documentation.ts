@@ -1,11 +1,4 @@
-import {
-  OpenApiBuilder,
-  OperationObject,
-  ReferenceObject,
-  SchemaObject,
-  SecuritySchemeObject,
-  SecuritySchemeType,
-} from "openapi3-ts/oas30";
+import { oas30, oas31 } from "openapi3-ts";
 import { z } from "zod";
 import {
   defaultInputSources,
@@ -13,6 +6,7 @@ import {
   makeCleanId,
 } from "./common-helpers";
 import { CommonConfig } from "./config-type";
+import { OpenAPIError } from "./errors";
 import { mapLogicalContainer } from "./logical-container";
 import { Method } from "./method";
 import {
@@ -56,8 +50,22 @@ interface DocumentationParams {
   serializer?: (schema: z.ZodTypeAny) => string;
 }
 
+// @todo move
+type SchemaObject = oas30.SchemaObject | oas31.SchemaObject;
+type ReferenceObject = oas30.ReferenceObject | oas31.ReferenceObject;
+type SecuritySchemeType = oas30.SecuritySchemeType | oas31.SecuritySchemeType;
+type SecuritySchemeObject =
+  | oas30.SecuritySchemeObject
+  | oas31.SecuritySchemeObject;
+type OperationObject = oas30.OperationObject | oas31.OperationObject;
+
+const isSchemaObject31 = (subject: any): subject is oas31.SchemaObject =>
+  oas31.isSchemaObject(subject);
+const isSchemaObject30 = (subject: any): subject is oas30.SchemaObject =>
+  oas30.isSchemaObject(subject);
+
 export class Documentation {
-  public builder: OpenApiBuilder;
+  public builder: oas31.OpenApiBuilder | oas30.OpenApiBuilder;
   protected lastSecuritySchemaIds: Partial<Record<SecuritySchemeType, number>> =
     {};
   protected lastOperationIdSuffixes: Record<string, number> = {};
@@ -66,7 +74,21 @@ export class Documentation {
     name: string,
     schema: SchemaObject | ReferenceObject
   ): ReferenceObject {
-    this.builder.addSchema(name, schema);
+    if (
+      this.builder instanceof oas31.OpenApiBuilder &&
+      isSchemaObject31(schema)
+    ) {
+      this.builder.addSchema(name, schema);
+    } else if (
+      this.builder instanceof oas30.OpenApiBuilder &&
+      isSchemaObject30(schema)
+    ) {
+      this.builder.addSchema(name, schema);
+    } else {
+      throw new OpenAPIError(
+        "Incompatible types met in Documentation::makeRef"
+      );
+    }
     return this.getRef(name)!;
   }
 
@@ -116,7 +138,7 @@ export class Documentation {
     serializer = defaultSerializer,
     variant = "3.0",
   }: DocumentationParams) {
-    this.builder = new OpenApiBuilder();
+    this.builder = new (variant === "3.1" ? oas31 : oas30).OpenApiBuilder();
     this.builder.addOpenApiVersion(`${variant}.0`);
     this.builder.addInfo({ title, version }).addServer({ url: serverUrl });
     const onEndpoint: RoutingWalkerParams["onEndpoint"] = (
