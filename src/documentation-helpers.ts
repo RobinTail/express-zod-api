@@ -3,6 +3,7 @@ import {
   ExampleObject,
   ExamplesObject,
   MediaTypeObject,
+  OASVersion,
   OAuthFlowsObject,
   ParameterObject,
   ReferenceObject,
@@ -13,9 +14,11 @@ import {
   SecurityRequirementObject,
   SecuritySchemeObject,
   TagObject,
+  assertVersion,
   isReferenceObject,
   isSchemaObject,
-} from "openapi3-ts/oas30";
+  isSchemaObject31,
+} from "./oas-domain";
 import { omit } from "ramda";
 import { z } from "zod";
 import {
@@ -50,29 +53,34 @@ import {
 import { Security } from "./security";
 import { ZodUpload } from "./upload-schema";
 
-type MediaExamples = Pick<MediaTypeObject, "examples">;
-
-export interface OpenAPIContext {
+export interface OpenAPIContext<V extends OASVersion = OASVersion> {
+  version: V;
   isResponse: boolean;
   serializer: (schema: z.ZodTypeAny) => string;
-  getRef: (name: string) => ReferenceObject | undefined;
+  getRef: (name: string) => ReferenceObject<V> | undefined;
   makeRef: (
     name: string,
-    schema: SchemaObject | ReferenceObject
-  ) => ReferenceObject;
+    schema: SchemaObject<V> | ReferenceObject<V>
+  ) => ReferenceObject<V>;
   path: string;
   method: Method;
 }
 
 type Depicter<
   T extends z.ZodTypeAny,
+  V extends OASVersion = OASVersion,
   Variant extends HandlingVariant = "regular"
-> = SchemaHandler<T, SchemaObject | ReferenceObject, OpenAPIContext, Variant>;
+> = SchemaHandler<
+  T,
+  SchemaObject<V> | ReferenceObject<V>,
+  OpenAPIContext<V>,
+  Variant
+>;
 
 interface ReqResDepictHelperCommonProps
   extends Pick<
-    OpenAPIContext,
-    "serializer" | "getRef" | "makeRef" | "path" | "method"
+    OpenAPIContext<OASVersion>,
+    "serializer" | "getRef" | "makeRef" | "path" | "method" | "version"
   > {
   endpoint: AbstractEndpoint;
   composition: "inline" | "components";
@@ -153,44 +161,92 @@ export const depictFile: Depicter<ZodFile> = ({
 
 export const depictUnion: Depicter<
   z.ZodUnion<[z.ZodTypeAny, ...z.ZodTypeAny[]]>
-> = ({ schema: { options }, next }) => ({
-  oneOf: options.map((option) => next({ schema: option })),
-});
+> = ({ version, schema: { options }, next }) =>
+  version === "3.1"
+    ? ({
+        oneOf: options.map((option) =>
+          assertVersion(version, next({ schema: option }))
+        ),
+      } satisfies SchemaObject<typeof version>)
+    : ({
+        oneOf: options.map((option) =>
+          assertVersion(version, next({ schema: option }))
+        ),
+      } satisfies SchemaObject<typeof version>);
 
 export const depictDiscriminatedUnion: Depicter<
   z.ZodDiscriminatedUnion<string, z.ZodObject<any>[]>
-> = ({ schema: { options, discriminator }, next }) => {
-  return {
-    discriminator: { propertyName: discriminator },
-    oneOf: Array.from(options.values()).map((option) =>
-      next({ schema: option })
-    ),
-  };
+> = ({ version, schema: { options, discriminator }, next }) => {
+  const commons = { discriminator: { propertyName: discriminator } };
+  const subject = Array.from(options.values());
+
+  return version === "3.1"
+    ? ({
+        ...commons,
+        oneOf: subject.map((option) =>
+          assertVersion(version, next({ schema: option }))
+        ),
+      } satisfies SchemaObject<typeof version>)
+    : ({
+        ...commons,
+        oneOf: subject.map((option) =>
+          assertVersion(version, next({ schema: option }))
+        ),
+      } satisfies SchemaObject<typeof version>);
 };
 
 export const depictIntersection: Depicter<
   z.ZodIntersection<z.ZodTypeAny, z.ZodTypeAny>
 > = ({
+  version,
   schema: {
     _def: { left, right },
   },
   next,
-}) => ({
-  allOf: [left, right].map((entry) => next({ schema: entry })),
-});
+}) => {
+  const subject = [left, right];
+  return version === "3.1"
+    ? ({
+        allOf: subject.map((entry) =>
+          assertVersion(version, next({ schema: entry }))
+        ),
+      } satisfies SchemaObject<typeof version>)
+    : ({
+        allOf: subject.map((entry) =>
+          assertVersion(version, next({ schema: entry }))
+        ),
+      } satisfies SchemaObject<typeof version>);
+};
 
 export const depictOptional: Depicter<z.ZodOptional<any>> = ({
+  version,
   schema,
   next,
-}) => next({ schema: schema.unwrap() });
+}) => assertVersion(version, next({ schema: schema.unwrap() }));
 
 export const depictNullable: Depicter<z.ZodNullable<any>> = ({
+  version,
   schema,
   next,
-}) => ({
-  nullable: true,
-  ...next({ schema: schema.unwrap() }),
-});
+}) => {
+  const commons = next({ schema: schema.unwrap() });
+  if (version === "3.1") {
+    const depictedTypes =
+      isSchemaObject31(commons) && commons.type
+        ? Array.isArray(commons.type)
+          ? commons.type
+          : [commons.type]
+        : [];
+    return {
+      ...assertVersion(version, commons),
+      type: depictedTypes.concat("null"),
+    } satisfies SchemaObject<typeof version>;
+  }
+  return {
+    nullable: true,
+    ...assertVersion(version, commons),
+  } satisfies SchemaObject<typeof version>;
+};
 
 export const depictEnum: Depicter<z.ZodEnum<any> | z.ZodNativeEnum<any>> = ({
   schema,
@@ -207,6 +263,7 @@ export const depictLiteral: Depicter<z.ZodLiteral<any>> = ({
 });
 
 export const depictObject: Depicter<z.AnyZodObject> = ({
+  version,
   schema,
   isResponse,
   ...rest
@@ -219,11 +276,30 @@ export const depictObject: Depicter<z.AnyZodObject> = ({
         : prop.isOptional();
     return !isOptional;
   });
-  return {
-    type: "object",
-    properties: depictObjectProperties({ schema, isResponse, ...rest }),
+  const commons = {
+    type: "object" as const,
     ...(required.length ? { required } : {}),
   };
+
+  return version === "3.1"
+    ? ({
+        ...commons,
+        properties: depictObjectProperties({
+          version,
+          schema,
+          isResponse,
+          ...rest,
+        }),
+      } satisfies SchemaObject<typeof version>)
+    : ({
+        ...commons,
+        properties: depictObjectProperties({
+          version,
+          schema,
+          isResponse,
+          ...rest,
+        }),
+      } satisfies SchemaObject<typeof version>);
 };
 
 /**
@@ -293,6 +369,7 @@ export const depictBigInt: Depicter<z.ZodBigInt> = () => ({
 });
 
 export const depictRecord: Depicter<z.ZodRecord<z.ZodTypeAny>> = ({
+  version,
   schema: { keySchema, valueSchema },
   ...rest
 }) => {
@@ -305,26 +382,54 @@ export const depictRecord: Depicter<z.ZodRecord<z.ZodTypeAny>> = ({
       }),
       {} as z.ZodRawShape
     );
-    return {
-      type: "object",
-      properties: depictObjectProperties({
-        schema: z.object(shape),
-        ...rest,
-      }),
+    const commons = {
+      type: "object" as const,
       ...(keys.length ? { required: keys } : {}),
     };
+    return version === "3.1"
+      ? ({
+          ...commons,
+          properties: depictObjectProperties({
+            version,
+            schema: z.object(shape),
+            ...rest,
+          }),
+        } satisfies SchemaObject<typeof version>)
+      : ({
+          ...commons,
+          properties: depictObjectProperties({
+            version,
+            schema: z.object(shape),
+            ...rest,
+          }),
+        } satisfies SchemaObject<typeof version>);
   }
   if (keySchema instanceof z.ZodLiteral) {
-    return {
-      type: "object",
-      properties: depictObjectProperties({
-        schema: z.object({
-          [keySchema.value]: valueSchema,
-        }),
-        ...rest,
-      }),
+    const commons = {
+      type: "object" as const,
       required: [keySchema.value],
     };
+    return version === "3.1"
+      ? ({
+          ...commons,
+          properties: depictObjectProperties({
+            version,
+            schema: z.object({
+              [keySchema.value]: valueSchema,
+            }),
+            ...rest,
+          }),
+        } satisfies SchemaObject<typeof version>)
+      : ({
+          ...commons,
+          properties: depictObjectProperties({
+            version,
+            schema: z.object({
+              [keySchema.value]: valueSchema,
+            }),
+            ...rest,
+          }),
+        } satisfies SchemaObject<typeof version>);
   }
   if (keySchema instanceof z.ZodUnion) {
     const areOptionsLiteral = keySchema.options.reduce(
@@ -340,57 +445,102 @@ export const depictRecord: Depicter<z.ZodRecord<z.ZodTypeAny>> = ({
         }),
         {} as z.ZodRawShape
       );
-      return {
-        type: "object",
-        properties: depictObjectProperties({
-          schema: z.object(shape),
-          ...rest,
-        }),
+      const commons = {
+        type: "object" as const,
         required: keySchema.options.map(
           (option: z.ZodLiteral<any>) => option.value
         ),
       };
+      return version === "3.1"
+        ? ({
+            ...commons,
+            properties: depictObjectProperties({
+              version,
+              schema: z.object(shape),
+              ...rest,
+            }),
+          } satisfies SchemaObject<typeof version>)
+        : ({
+            ...commons,
+            properties: depictObjectProperties({
+              version,
+              schema: z.object(shape),
+              ...rest,
+            }),
+          } satisfies SchemaObject<typeof version>);
     }
   }
-  return {
-    type: "object",
-    additionalProperties: rest.next({ schema: valueSchema }),
-  };
+  const commons = { type: "object" as const };
+  return version === "3.1"
+    ? ({
+        ...commons,
+        additionalProperties: assertVersion(
+          version,
+          rest.next({ schema: valueSchema })
+        ),
+      } satisfies SchemaObject<typeof version>)
+    : ({
+        ...commons,
+        additionalProperties: assertVersion(
+          version,
+          rest.next({ schema: valueSchema })
+        ),
+      } satisfies SchemaObject<typeof version>);
 };
 
 export const depictArray: Depicter<z.ZodArray<z.ZodTypeAny>> = ({
+  version,
   schema: { _def: def, element },
   next,
-}) => ({
-  type: "array",
-  items: next({ schema: element }),
-  ...(def.minLength !== null && { minItems: def.minLength.value }),
-  ...(def.maxLength !== null && { maxItems: def.maxLength.value }),
-});
+}) => {
+  const commons = {
+    type: "array" as const,
+    ...(def.minLength !== null && { minItems: def.minLength.value }),
+    ...(def.maxLength !== null && { maxItems: def.maxLength.value }),
+  };
 
-/** @todo improve it when OpenAPI 3.1.0 will be released */
+  return version === "3.1"
+    ? ({
+        ...commons,
+        items: assertVersion(version, next({ schema: element })),
+      } satisfies SchemaObject<typeof version>)
+    : ({
+        ...commons,
+        items: assertVersion(version, next({ schema: element })),
+      } satisfies SchemaObject<typeof version>);
+};
+
 export const depictTuple: Depicter<z.ZodTuple> = ({
+  version,
   schema: { items },
   next,
 }) => {
   const types = items.map((item) => next({ schema: item }));
-  return {
-    type: "array",
+  const commons = {
+    type: "array" as const,
     minItems: types.length,
     maxItems: types.length,
-    items: {
-      oneOf: types,
-      format: "tuple",
-      ...(types.length > 0 && {
-        description: types
-          .map(
-            (item, index) =>
-              `${index}: ${isSchemaObject(item) ? item.type : item.$ref}`
-          )
-          .join(", "),
-      }),
-    },
   };
+  return version === "3.1"
+    ? ({
+        ...commons,
+        prefixItems: types.map((item) => assertVersion(version, item)),
+      } satisfies SchemaObject<typeof version>)
+    : ({
+        ...commons,
+        items: {
+          oneOf: types.map((item) => assertVersion(version, item)),
+          format: "tuple",
+          ...(types.length > 0 && {
+            description: types
+              .map(
+                (item, index) =>
+                  `${index}: ${isSchemaObject(item) ? item.type : item.$ref}`
+              )
+              .join(", "),
+          }),
+        },
+      } satisfies SchemaObject<typeof version>);
 };
 
 export const depictString: Depicter<z.ZodString> = ({
@@ -443,48 +593,56 @@ export const depictString: Depicter<z.ZodString> = ({
   };
 };
 
-/** @todo support exclusive min/max as numbers in case of OpenAPI v3.1.x */
-export const depictNumber: Depicter<z.ZodNumber> = ({ schema }) => {
+export const depictNumber: Depicter<z.ZodNumber> = ({ version, schema }) => {
   const minCheck = schema._def.checks.find(({ kind }) => kind === "min") as
     | Extract<z.ZodNumberCheck, { kind: "min" }>
     | undefined;
   const isMinInclusive = minCheck ? minCheck.inclusive : true;
+  const minimum =
+    schema.minValue === null
+      ? schema.isInt
+        ? Number.MIN_SAFE_INTEGER
+        : Number.MIN_VALUE
+      : schema.minValue;
   const maxCheck = schema._def.checks.find(({ kind }) => kind === "max") as
     | Extract<z.ZodNumberCheck, { kind: "max" }>
     | undefined;
   const isMaxInclusive = maxCheck ? maxCheck.inclusive : true;
-  return {
-    type: schema.isInt ? ("integer" as const) : ("number" as const),
-    format: schema.isInt ? ("int64" as const) : ("double" as const),
-    minimum:
-      schema.minValue === null
-        ? schema.isInt
-          ? Number.MIN_SAFE_INTEGER
-          : Number.MIN_VALUE
-        : schema.minValue,
-    exclusiveMinimum: !isMinInclusive,
-    maximum:
-      schema.maxValue === null
-        ? schema.isInt
-          ? Number.MAX_SAFE_INTEGER
-          : Number.MAX_VALUE
-        : schema.maxValue,
-    exclusiveMaximum: !isMaxInclusive,
-  };
+  const maximum =
+    schema.maxValue === null
+      ? schema.isInt
+        ? Number.MAX_SAFE_INTEGER
+        : Number.MAX_VALUE
+      : schema.maxValue;
+  return version === "3.1"
+    ? ({
+        type: schema.isInt ? ("integer" as const) : ("number" as const),
+        format: schema.isInt ? ("int64" as const) : ("double" as const),
+        ...(isMinInclusive ? { minimum } : { exclusiveMinimum: minimum }),
+        ...(isMinInclusive ? { maximum } : { exclusiveMaximum: maximum }),
+      } satisfies SchemaObject<typeof version>)
+    : ({
+        type: schema.isInt ? ("integer" as const) : ("number" as const),
+        format: schema.isInt ? ("int64" as const) : ("double" as const),
+        minimum,
+        exclusiveMinimum: !isMinInclusive,
+        maximum,
+        exclusiveMaximum: !isMaxInclusive,
+      } satisfies SchemaObject<typeof version>);
 };
 
-export const depictObjectProperties = ({
+export const depictObjectProperties = <V extends OASVersion>({
+  version,
   schema: { shape },
   next,
-}: Parameters<Depicter<z.AnyZodObject>>[0]) => {
-  return Object.keys(shape).reduce(
+}: Parameters<Depicter<z.AnyZodObject>>[0] & { version: V }) =>
+  Object.keys(shape).reduce(
     (carry, key) => ({
       ...carry,
-      [key]: next({ schema: shape[key] }),
+      [key]: assertVersion(version, next({ schema: shape[key] })),
     }),
-    {} as Record<string, SchemaObject | ReferenceObject>
+    {} as Record<string, SchemaObject<V> | ReferenceObject<V>>
   );
-};
 
 const makeSample = (depicted: SchemaObject) => {
   const type = (
@@ -550,7 +708,7 @@ export const depictExamples = (
   schema: z.ZodTypeAny,
   isResponse: boolean,
   omitProps: string[] = []
-): MediaExamples => {
+): Pick<MediaTypeObject, "examples"> => {
   const examples = getExamples(schema, isResponse);
   if (examples.length === 0) {
     return {};
@@ -559,9 +717,9 @@ export const depictExamples = (
     examples: examples.reduce<ExamplesObject>(
       (carry, example, index) => ({
         ...carry,
-        [`example${index + 1}`]: <ExampleObject>{
+        [`example${index + 1}`]: {
           value: omit(omitProps, example),
-        },
+        } satisfies ExampleObject,
       }),
       {}
     ),
@@ -572,7 +730,7 @@ export const depictParamExamples = (
   schema: z.ZodTypeAny,
   isResponse: boolean,
   param: string
-): MediaExamples => {
+): MediaTypeObject => {
   const examples = getExamples(schema, isResponse);
   if (examples.length === 0) {
     return {};
@@ -583,14 +741,14 @@ export const depictParamExamples = (
         param in example
           ? {
               ...carry,
-              [`example${index + 1}`]: <ExampleObject>{
+              [`example${index + 1}`]: {
                 value: example[param],
-              },
+              } satisfies ExampleObject,
             }
           : carry,
       {}
     ),
-  };
+  } satisfies MediaTypeObject;
 };
 
 export function extractObjectSchema(
@@ -628,6 +786,7 @@ export function extractObjectSchema(
 }
 
 export const depictRequestParams = ({
+  version,
   path,
   method,
   endpoint,
@@ -651,36 +810,47 @@ export const depictRequestParams = ({
   const isParamsEnabled = inputSources.includes("params");
   const isPathParam = (name: string) =>
     isParamsEnabled && pathParams.includes(name);
-  return Object.keys(shape)
-    .filter((name) => isQueryEnabled || isPathParam(name))
-    .map((name) => {
-      const depicted = walkSchema({
-        schema: shape[name],
-        isResponse: false,
-        rules: depicters,
-        onEach,
-        onMissing,
-        serializer,
-        getRef,
-        makeRef,
-        path,
-        method,
-      });
-      const result =
-        composition === "components"
-          ? makeRef(makeCleanId(path, method, `${clue} ${name}`), depicted)
-          : depicted;
-      return {
-        name,
-        in: isPathParam(name) ? "path" : "query",
-        required: !shape[name].isOptional(),
-        description:
-          (isSchemaObject(depicted) && depicted.description) ||
-          `${method.toUpperCase()} ${path} ${clue}`,
-        schema: result,
-        ...depictParamExamples(schema, false, name),
-      };
+  const filteredParams = Object.keys(shape).filter(
+    (name) => isQueryEnabled || isPathParam(name)
+  );
+
+  return filteredParams.map<ParameterObject>((name) => {
+    const depicted = walkSchema({
+      version,
+      schema: shape[name],
+      isResponse: false,
+      rules: depicters,
+      onEach,
+      onMissing,
+      serializer,
+      getRef,
+      makeRef,
+      path,
+      method,
     });
+    const commons = {
+      name,
+      in: isPathParam(name) ? ("path" as const) : ("query" as const),
+      required: !shape[name].isOptional(),
+      description:
+        (isSchemaObject(depicted) && depicted.description) ||
+        `${method.toUpperCase()} ${path} ${clue}`,
+      ...depictParamExamples(schema, false, name),
+    };
+    const result =
+      composition === "components"
+        ? makeRef(makeCleanId(path, method, `${clue} ${name}`), depicted)
+        : depicted;
+    return version === "3.1"
+      ? ({
+          ...commons,
+          schema: assertVersion(version, result),
+        } satisfies ParameterObject<typeof version>)
+      : ({
+          ...commons,
+          schema: assertVersion(version, result),
+        } satisfies ParameterObject<typeof version>);
+  });
 };
 
 export const depicters: HandlingRules<
@@ -718,7 +888,7 @@ export const depicters: HandlingRules<
   ZodLazy: depictLazy,
 };
 
-export const onEach: Depicter<z.ZodTypeAny, "each"> = ({
+export const onEach: Depicter<z.ZodTypeAny, OASVersion, "each"> = ({
   schema,
   isResponse,
   prev,
@@ -740,10 +910,10 @@ export const onEach: Depicter<z.ZodTypeAny, "each"> = ({
     ...(description && { description }),
     ...(isActuallyNullable && { nullable: true }),
     ...(examples.length > 0 && { example: examples[0] }),
-  };
+  } satisfies SchemaObject;
 };
 
-export const onMissing: Depicter<z.ZodTypeAny, "last"> = ({
+export const onMissing: Depicter<z.ZodTypeAny, OASVersion, "last"> = ({
   schema,
   ...ctx
 }) => {
@@ -798,9 +968,12 @@ export const excludeParamsFromDepiction = (
 export const excludeExampleFromDepiction = (
   depicted: SchemaObject | ReferenceObject
 ): SchemaObject | ReferenceObject =>
-  isSchemaObject(depicted) ? omit(["example"], depicted) : depicted;
+  isSchemaObject(depicted)
+    ? (omit(["example"], depicted) as SchemaObject)
+    : depicted;
 
 export const depictResponse = ({
+  version,
   method,
   path,
   endpoint,
@@ -817,6 +990,7 @@ export const depictResponse = ({
   const mimeTypes = endpoint.getMimeTypes(isPositive ? "positive" : "negative");
   const depictedSchema = excludeExampleFromDepiction(
     walkSchema({
+      version,
       schema,
       isResponse: true,
       rules: depicters,
@@ -834,17 +1008,35 @@ export const depictResponse = ({
     composition === "components"
       ? makeRef(makeCleanId(path, method, clue), depictedSchema)
       : depictedSchema;
+  const commons = { description: `${method.toUpperCase()} ${path} ${clue}` };
 
-  return {
-    description: `${method.toUpperCase()} ${path} ${clue}`,
-    content: mimeTypes.reduce(
-      (carry, mimeType) => ({
-        ...carry,
-        [mimeType]: { schema: result, ...examples },
-      }),
-      {} as ContentObject
-    ),
-  };
+  return version === "3.1"
+    ? ({
+        ...commons,
+        content: mimeTypes.reduce<ContentObject<typeof version>>(
+          (carry, mimeType) => ({
+            ...carry,
+            [mimeType]: {
+              schema: assertVersion(version, result),
+              ...examples,
+            } satisfies MediaTypeObject<typeof version>,
+          }),
+          {}
+        ),
+      } satisfies ResponseObject<typeof version>)
+    : ({
+        ...commons,
+        content: mimeTypes.reduce<ContentObject<typeof version>>(
+          (carry, mimeType) => ({
+            ...carry,
+            [mimeType]: {
+              schema: assertVersion(version, result),
+              ...examples,
+            } satisfies MediaTypeObject<typeof version>,
+          }),
+          {}
+        ),
+      } satisfies ResponseObject<typeof version>);
 };
 
 type SecurityHelper<K extends Security["type"]> = (
@@ -941,6 +1133,7 @@ export const depictSecurityRefs = (
 };
 
 export const depictRequest = ({
+  version,
   method,
   path,
   endpoint,
@@ -954,6 +1147,7 @@ export const depictRequest = ({
   const bodyDepiction = excludeExampleFromDepiction(
     excludeParamsFromDepiction(
       walkSchema({
+        version,
         schema: endpoint.getSchema("input"),
         isResponse: false,
         rules: depicters,
@@ -977,17 +1171,38 @@ export const depictRequest = ({
     composition === "components"
       ? makeRef(makeCleanId(path, method, clue), bodyDepiction)
       : bodyDepiction;
-
-  return {
+  const mimeTypes = endpoint.getMimeTypes("input");
+  const commons = {
     description: `${method.toUpperCase()} ${path} ${clue}`,
-    content: endpoint.getMimeTypes("input").reduce(
-      (carry, mimeType) => ({
-        ...carry,
-        [mimeType]: { schema: result, ...bodyExamples },
-      }),
-      {} as ContentObject
-    ),
   };
+
+  return version === "3.1"
+    ? ({
+        ...commons,
+        content: mimeTypes.reduce<ContentObject<typeof version>>(
+          (carry, mimeType) => ({
+            ...carry,
+            [mimeType]: {
+              schema: assertVersion(version, result),
+              ...bodyExamples,
+            } satisfies MediaTypeObject<typeof version>,
+          }),
+          {}
+        ),
+      } satisfies RequestBodyObject<typeof version>)
+    : ({
+        ...commons,
+        content: mimeTypes.reduce<ContentObject<typeof version>>(
+          (carry, mimeType) => ({
+            ...carry,
+            [mimeType]: {
+              schema: assertVersion(version, result),
+              ...bodyExamples,
+            } satisfies MediaTypeObject<typeof version>,
+          }),
+          {}
+        ),
+      } satisfies RequestBodyObject<typeof version>);
 };
 
 export const depictTags = <TAG extends string>(

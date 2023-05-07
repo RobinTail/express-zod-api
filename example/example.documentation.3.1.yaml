@@ -13,6 +13,9 @@ paths:
             application/json:
               schema:
                 type: object
+                required:
+                  - status
+                  - data
                 properties:
                   status:
                     type: string
@@ -20,41 +23,39 @@ paths:
                       - success
                   data:
                     type: object
+                    required:
+                      - id
+                      - name
+                      - features
                     properties:
                       id:
                         type: integer
                         format: int64
                         minimum: 0
-                        exclusiveMinimum: false
                         maximum: 9007199254740991
-                        exclusiveMaximum: false
                       name:
                         type: string
                       features:
                         type: array
                         items:
                           type: object
+                          required:
+                            - title
+                            - features
                           properties:
                             title:
                               type: string
                             features:
                               $ref: "#/components/schemas/2048581c137c5b2130eb860e3ae37da196dfc25b"
-                          required:
-                            - title
-                            - features
-                    required:
-                      - id
-                      - name
-                      - features
-                required:
-                  - status
-                  - data
         "400":
           description: GET /v1/user/retrieve Error response
           content:
             application/json:
               schema:
                 type: object
+                required:
+                  - status
+                  - error
                 properties:
                   status:
                     type: string
@@ -62,14 +63,11 @@ paths:
                       - error
                   error:
                     type: object
+                    required:
+                      - message
                     properties:
                       message:
                         type: string
-                    required:
-                      - message
-                required:
-                  - status
-                  - error
               examples:
                 example1:
                   value:
@@ -99,6 +97,9 @@ paths:
             application/json:
               schema:
                 type: object
+                required:
+                  - status
+                  - data
                 properties:
                   status:
                     type: string
@@ -106,6 +107,9 @@ paths:
                       - success
                   data:
                     type: object
+                    required:
+                      - name
+                      - createdAt
                     properties:
                       name:
                         type: string
@@ -115,15 +119,9 @@ paths:
                         format: date-time
                         externalDocs:
                           url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
-                    required:
-                      - name
-                      - createdAt
                     example:
                       name: John Doe
                       createdAt: 2021-12-31T00:00:00.000Z
-                required:
-                  - status
-                  - data
               examples:
                 example1:
                   value:
@@ -137,6 +135,9 @@ paths:
             application/json:
               schema:
                 type: object
+                required:
+                  - status
+                  - error
                 properties:
                   status:
                     type: string
@@ -144,14 +145,11 @@ paths:
                       - error
                   error:
                     type: object
+                    required:
+                      - message
                     properties:
                       message:
                         type: string
-                    required:
-                      - message
-                required:
-                  - status
-                  - error
               examples:
                 example1:
                   value:
@@ -167,11 +165,11 @@ paths:
           in: path
           required: true
           description: POST /v1/user/:id parameter
-          schema:
-            type: string
           examples:
             example1:
               value: "12"
+          schema:
+            type: string
       requestBody:
         description: POST /v1/user/:id request body
         content:
@@ -179,15 +177,18 @@ paths:
             schema:
               allOf:
                 - type: object
+                  required:
+                    - key
                   properties:
                     key:
                       type: string
                       minLength: 1
-                  required:
-                    - key
                   example:
                     key: 1234-5678-90
                 - type: object
+                  required:
+                    - name
+                    - birthday
                   properties:
                     name:
                       type: string
@@ -199,9 +200,6 @@ paths:
                       pattern: ^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d+)?)?Z?$
                       externalDocs:
                         url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
-                  required:
-                    - name
-                    - birthday
                   example:
                     name: John Doe
                     birthday: 1963-04-21
@@ -281,6 +279,9 @@ paths:
             application/json:
               schema:
                 type: object
+                required:
+                  - status
+                  - data
                 properties:
                   status:
                     type: string
@@ -288,6 +289,12 @@ paths:
                       - success
                   data:
                     type: object
+                    required:
+                      - name
+                      - size
+                      - mime
+                      - hash
+                      - otherInputs
                     properties:
                       name:
                         type: string
@@ -295,9 +302,7 @@ paths:
                         type: integer
                         format: int64
                         minimum: 0
-                        exclusiveMinimum: false
                         maximum: 9007199254740991
-                        exclusiveMaximum: false
                       mime:
                         type: string
                       hash:
@@ -306,21 +311,15 @@ paths:
                         type: object
                         additionalProperties:
                           format: any
-                    required:
-                      - name
-                      - size
-                      - mime
-                      - hash
-                      - otherInputs
-                required:
-                  - status
-                  - data
         "400":
           description: POST /v1/avatar/upload Error response
           content:
             application/json:
               schema:
                 type: object
+                required:
+                  - status
+                  - error
                 properties:
                   status:
                     type: string
@@ -328,14 +327,11 @@ paths:
                       - error
                   error:
                     type: object
+                    required:
+                      - message
                     properties:
                       message:
                         type: string
-                    required:
-                      - message
-                required:
-                  - status
-                  - error
               examples:
                 example1:
                   value:
@@ -352,26 +348,26 @@ paths:
           multipart/form-data:
             schema:
               type: object
+              required:
+                - avatar
               properties:
                 avatar:
                   type: string
                   format: binary
-              required:
-                - avatar
 components:
   schemas:
     2048581c137c5b2130eb860e3ae37da196dfc25b:
       type: array
       items:
         type: object
+        required:
+          - title
+          - features
         properties:
           title:
             type: string
           features:
             $ref: "#/components/schemas/2048581c137c5b2130eb860e3ae37da196dfc25b"
-        required:
-          - title
-          - features
   responses: {}
   parameters: {}
   examples: {}

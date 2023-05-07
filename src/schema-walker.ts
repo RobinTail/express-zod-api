@@ -20,10 +20,7 @@ type SchemaHandlingProps<
   U,
   Context extends object,
   Variant extends HandlingVariant
-> = {
-  schema: T;
-} & Context &
-  VariantDependingProps<Variant, U>;
+> = { schema: T } & Context & VariantDependingProps<Variant, U>;
 
 export type SchemaHandler<
   T extends z.ZodTypeAny,

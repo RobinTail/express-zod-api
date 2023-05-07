@@ -147,6 +147,7 @@ export class Documentation {
         serializer,
         getRef: this.getRef.bind(this),
         makeRef: this.makeRef.bind(this),
+        version: variant,
       };
       const [shortDesc, longDesc] = (["short", "long"] as const).map(
         endpoint.getDescription.bind(endpoint)
@@ -185,6 +186,8 @@ export class Documentation {
         operation.tags = endpoint.getTags();
       }
       if (depictedParams.length > 0) {
+        // @todo fix it
+        // @ts-ignore
         operation.parameters = depictedParams;
       }
       if (inputSources.includes("body")) {

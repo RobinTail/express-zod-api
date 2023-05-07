@@ -1,4 +1,4 @@
-import { ReferenceObject, SchemaObject } from "openapi3-ts/oas30";
+import { ReferenceObject, SchemaObject } from "../../src/oas-domain";
 import { z } from "zod";
 import { defaultSerializer } from "../../src/common-helpers";
 import { IOSchemaError } from "../../src/errors";
@@ -61,6 +61,7 @@ describe("Documentation helpers", () => {
     })
   );
   const requestContext: OpenAPIContext = {
+    version: "3.0", // @todo make parameter
     path: "/v1/user/:id",
     method: "get",
     isResponse: false,
@@ -69,6 +70,7 @@ describe("Documentation helpers", () => {
     serializer: defaultSerializer,
   };
   const responseContext: OpenAPIContext = {
+    version: "3.0", // @todo make parameter
     path: "/v1/user/:id",
     method: "get",
     isResponse: true,

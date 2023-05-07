@@ -16,6 +16,9 @@ paths:
             application/json:
               schema:
                 type: object
+                required:
+                  - status
+                  - data
                 properties:
                   status:
                     type: string
@@ -23,23 +26,23 @@ paths:
                       - success
                   data:
                     type: object
+                    required:
+                      - arr
                     properties:
                       arr:
                         type: array
+                        minItems: 1
                         items:
                           type: string
-                        minItems: 1
-                    required:
-                      - arr
-                required:
-                  - status
-                  - data
         "400":
           description: GET /v1/getSomething Error response
           content:
             application/json:
               schema:
                 type: object
+                required:
+                  - status
+                  - error
                 properties:
                   status:
                     type: string
@@ -47,14 +50,11 @@ paths:
                       - error
                   error:
                     type: object
+                    required:
+                      - message
                     properties:
                       message:
                         type: string
-                    required:
-                      - message
-                required:
-                  - status
-                  - error
               examples:
                 example1:
                   value:
@@ -68,9 +68,9 @@ paths:
           description: GET /v1/getSomething parameter
           schema:
             type: array
+            minItems: 1
             items:
               type: string
-            minItems: 1
     post:
       operationId: PostV1Getsomething
       responses:
@@ -80,6 +80,9 @@ paths:
             application/json:
               schema:
                 type: object
+                required:
+                  - status
+                  - data
                 properties:
                   status:
                     type: string
@@ -87,23 +90,23 @@ paths:
                       - success
                   data:
                     type: object
+                    required:
+                      - arr
                     properties:
                       arr:
                         type: array
+                        minItems: 1
                         items:
                           type: string
-                        minItems: 1
-                    required:
-                      - arr
-                required:
-                  - status
-                  - data
         "400":
           description: POST /v1/getSomething Error response
           content:
             application/json:
               schema:
                 type: object
+                required:
+                  - status
+                  - error
                 properties:
                   status:
                     type: string
@@ -111,14 +114,11 @@ paths:
                       - error
                   error:
                     type: object
+                    required:
+                      - message
                     properties:
                       message:
                         type: string
-                    required:
-                      - message
-                required:
-                  - status
-                  - error
               examples:
                 example1:
                   value:
@@ -131,14 +131,14 @@ paths:
           application/json:
             schema:
               type: object
+              required:
+                - arr
               properties:
                 arr:
                   type: array
+                  minItems: 1
                   items:
                     type: string
-                  minItems: 1
-              required:
-                - arr
 components:
   schemas: {}
   responses: {}
@@ -171,6 +171,9 @@ paths:
             application/json:
               schema:
                 type: object
+                required:
+                  - status
+                  - data
                 properties:
                   status:
                     type: string
@@ -179,32 +182,32 @@ paths:
                   data:
                     oneOf:
                       - type: object
+                        required:
+                          - id
+                          - field1
                         properties:
                           id:
                             type: string
                           field1:
                             type: string
+                      - type: object
                         required:
                           - id
-                          - field1
-                      - type: object
+                          - field2
                         properties:
                           id:
                             type: string
                           field2:
                             type: string
-                        required:
-                          - id
-                          - field2
-                required:
-                  - status
-                  - data
         "400":
           description: POST /v1/getSomething Error response
           content:
             application/json:
               schema:
                 type: object
+                required:
+                  - status
+                  - error
                 properties:
                   status:
                     type: string
@@ -212,14 +215,11 @@ paths:
                       - error
                   error:
                     type: object
+                    required:
+                      - message
                     properties:
                       message:
                         type: string
-                    required:
-                      - message
-                required:
-                  - status
-                  - error
               examples:
                 example1:
                   value:
@@ -233,23 +233,23 @@ paths:
             schema:
               oneOf:
                 - type: object
+                  required:
+                    - id
+                    - field1
                   properties:
                     id:
                       type: string
                     field1:
                       type: string
+                - type: object
                   required:
                     - id
-                    - field1
-                - type: object
+                    - field2
                   properties:
                     id:
                       type: string
                     field2:
                       type: string
-                  required:
-                    - id
-                    - field2
 components:
   schemas: {}
   responses: {}
@@ -282,6 +282,9 @@ paths:
             application/json:
               schema:
                 type: object
+                required:
+                  - status
+                  - data
                 properties:
                   status:
                     type: string
@@ -289,20 +292,17 @@ paths:
                       - success
                   data:
                     type: object
+                    required:
+                      - a
+                      - b
                     properties:
                       a:
                         type: string
                       b:
                         type: string
-                    required:
-                      - a
-                      - b
                     example:
                       a: first
                       b: prefix_first
-                required:
-                  - status
-                  - data
               examples:
                 example1:
                   value:
@@ -322,6 +322,9 @@ paths:
             application/json:
               schema:
                 type: object
+                required:
+                  - status
+                  - error
                 properties:
                   status:
                     type: string
@@ -329,14 +332,11 @@ paths:
                       - error
                   error:
                     type: object
+                    required:
+                      - message
                     properties:
                       message:
                         type: string
-                    required:
-                      - message
-                required:
-                  - status
-                  - error
               examples:
                 example1:
                   value:
@@ -349,11 +349,11 @@ paths:
           application/json:
             schema:
               type: object
+              required:
+                - a
               properties:
                 a:
                   type: string
-              required:
-                - a
             examples:
               example1:
                 value:
@@ -418,6 +418,9 @@ components:
         retrieved from the \`next\` property of the previous page response.
     GetHrisEmployeesSuccessfulResponse:
       type: object
+      required:
+        - status
+        - data
       properties:
         status:
           type: string
@@ -426,11 +429,11 @@ components:
         data:
           type: object
           properties: {}
-      required:
-        - status
-        - data
     GetHrisEmployeesErrorResponse:
       type: object
+      required:
+        - status
+        - error
       properties:
         status:
           type: string
@@ -438,14 +441,11 @@ components:
             - error
         error:
           type: object
+          required:
+            - message
           properties:
             message:
               type: string
-          required:
-            - message
-      required:
-        - status
-        - error
   responses: {}
   parameters: {}
   examples: {}
@@ -476,6 +476,9 @@ paths:
             application/json:
               schema:
                 type: object
+                required:
+                  - status
+                  - data
                 properties:
                   status:
                     type: string
@@ -483,6 +486,8 @@ paths:
                       - success
                   data:
                     type: object
+                    required:
+                      - num
                     properties:
                       num:
                         type: number
@@ -491,13 +496,8 @@ paths:
                         exclusiveMinimum: false
                         maximum: 1.7976931348623157e+308
                         exclusiveMaximum: false
-                    required:
-                      - num
                     example:
                       num: 123
-                required:
-                  - status
-                  - data
               examples:
                 example1:
                   value:
@@ -510,6 +510,9 @@ paths:
             application/json:
               schema:
                 type: object
+                required:
+                  - status
+                  - error
                 properties:
                   status:
                     type: string
@@ -517,14 +520,11 @@ paths:
                       - error
                   error:
                     type: object
+                    required:
+                      - message
                     properties:
                       message:
                         type: string
-                    required:
-                      - message
-                required:
-                  - status
-                  - error
               examples:
                 example1:
                   value:
@@ -538,19 +538,19 @@ paths:
             schema:
               allOf:
                 - type: object
+                  required:
+                    - key
                   properties:
                     key:
                       type: string
-                  required:
-                    - key
                   example:
                     key: 1234-56789-01
                 - type: object
+                  required:
+                    - str
                   properties:
                     str:
                       type: string
-                  required:
-                    - str
                   example:
                     str: test
             examples:
@@ -590,6 +590,9 @@ paths:
             application/json:
               schema:
                 type: object
+                required:
+                  - status
+                  - data
                 properties:
                   status:
                     type: string
@@ -597,16 +600,13 @@ paths:
                       - success
                   data:
                     type: object
+                    required:
+                      - numericStr
                     properties:
                       numericStr:
                         type: string
-                    required:
-                      - numericStr
                     example:
                       numericStr: "123"
-                required:
-                  - status
-                  - data
               examples:
                 example1:
                   value:
@@ -619,6 +619,9 @@ paths:
             application/json:
               schema:
                 type: object
+                required:
+                  - status
+                  - error
                 properties:
                   status:
                     type: string
@@ -626,14 +629,11 @@ paths:
                       - error
                   error:
                     type: object
+                    required:
+                      - message
                     properties:
                       message:
                         type: string
-                    required:
-                      - message
-                required:
-                  - status
-                  - error
               examples:
                 example1:
                   value:
@@ -645,11 +645,11 @@ paths:
           in: query
           required: true
           description: GET /v1/getSomething parameter
-          schema:
-            type: string
           examples:
             example1:
               value: "123"
+          schema:
+            type: string
 components:
   schemas: {}
   responses: {}
@@ -682,6 +682,9 @@ paths:
             application/json:
               schema:
                 type: object
+                required:
+                  - status
+                  - data
                 properties:
                   status:
                     type: string
@@ -689,16 +692,13 @@ paths:
                       - success
                   data:
                     type: object
+                    required:
+                      - numericStr
                     properties:
                       numericStr:
                         type: string
-                    required:
-                      - numericStr
                     example:
                       numericStr: "123"
-                required:
-                  - status
-                  - data
               examples:
                 example1:
                   value:
@@ -711,6 +711,9 @@ paths:
             application/json:
               schema:
                 type: object
+                required:
+                  - status
+                  - error
                 properties:
                   status:
                     type: string
@@ -718,14 +721,11 @@ paths:
                       - error
                   error:
                     type: object
+                    required:
+                      - message
                     properties:
                       message:
                         type: string
-                    required:
-                      - message
-                required:
-                  - status
-                  - error
               examples:
                 example1:
                   value:
@@ -738,11 +738,11 @@ paths:
           application/json:
             schema:
               type: object
+              required:
+                - strNum
               properties:
                 strNum:
                   type: string
-              required:
-                - strNum
             examples:
               example1:
                 value:
@@ -779,6 +779,9 @@ paths:
             application/json:
               schema:
                 type: object
+                required:
+                  - status
+                  - data
                 properties:
                   status:
                     type: string
@@ -786,21 +789,21 @@ paths:
                       - success
                   data:
                     type: object
+                    required:
+                      - numericStr
                     properties:
                       numericStr:
                         type: string
                         example: "123"
-                    required:
-                      - numericStr
-                required:
-                  - status
-                  - data
         "400":
           description: GET /v1/getSomething Error response
           content:
             application/json:
               schema:
                 type: object
+                required:
+                  - status
+                  - error
                 properties:
                   status:
                     type: string
@@ -808,14 +811,11 @@ paths:
                       - error
                   error:
                     type: object
+                    required:
+                      - message
                     properties:
                       message:
                         type: string
-                    required:
-                      - message
-                required:
-                  - status
-                  - error
               examples:
                 example1:
                   value:
@@ -862,6 +862,9 @@ paths:
             application/json:
               schema:
                 type: object
+                required:
+                  - status
+                  - data
                 properties:
                   status:
                     type: string
@@ -869,6 +872,8 @@ paths:
                       - success
                   data:
                     type: object
+                    required:
+                      - result
                     properties:
                       result:
                         type: integer
@@ -878,17 +883,15 @@ paths:
                         maximum: 9007199254740991
                         exclusiveMaximum: false
                         description: some positive integer
-                    required:
-                      - result
-                required:
-                  - status
-                  - data
         "400":
           description: GET /v1/getSomething Error response
           content:
             application/json:
               schema:
                 type: object
+                required:
+                  - status
+                  - error
                 properties:
                   status:
                     type: string
@@ -896,14 +899,11 @@ paths:
                       - error
                   error:
                     type: object
+                    required:
+                      - message
                     properties:
                       message:
                         type: string
-                    required:
-                      - message
-                required:
-                  - status
-                  - error
               examples:
                 example1:
                   value:
@@ -950,6 +950,9 @@ paths:
             application/json:
               schema:
                 type: object
+                required:
+                  - status
+                  - data
                 properties:
                   status:
                     type: string
@@ -958,15 +961,15 @@ paths:
                   data:
                     type: object
                     properties: {}
-                required:
-                  - status
-                  - data
         "400":
           description: GET /v1/:name Error response
           content:
             application/json:
               schema:
                 type: object
+                required:
+                  - status
+                  - error
                 properties:
                   status:
                     type: string
@@ -974,14 +977,11 @@ paths:
                       - error
                   error:
                     type: object
+                    required:
+                      - message
                     properties:
                       message:
                         type: string
-                    required:
-                      - message
-                required:
-                  - status
-                  - error
               examples:
                 example1:
                   value:
@@ -1039,6 +1039,9 @@ paths:
             application/json:
               schema:
                 type: object
+                required:
+                  - status
+                  - data
                 properties:
                   status:
                     type: string
@@ -1047,15 +1050,15 @@ paths:
                   data:
                     type: object
                     properties: {}
-                required:
-                  - status
-                  - data
         "400":
           description: POST /v1/:name Error response
           content:
             application/json:
               schema:
                 type: object
+                required:
+                  - status
+                  - error
                 properties:
                   status:
                     type: string
@@ -1063,14 +1066,11 @@ paths:
                       - error
                   error:
                     type: object
+                    required:
+                      - message
                     properties:
                       message:
                         type: string
-                    required:
-                      - message
-                required:
-                  - status
-                  - error
               examples:
                 example1:
                   value:
@@ -1096,11 +1096,11 @@ paths:
           application/json:
             schema:
               type: object
+              required:
+                - other
               properties:
                 other:
                   type: boolean
-              required:
-                - other
 components:
   schemas: {}
   responses: {}
@@ -1133,6 +1133,9 @@ paths:
             application/json:
               schema:
                 type: object
+                required:
+                  - status
+                  - data
                 properties:
                   status:
                     type: string
@@ -1141,15 +1144,15 @@ paths:
                   data:
                     type: object
                     properties: {}
-                required:
-                  - status
-                  - data
         "400":
           description: GET /v1/getSome/thing Error response
           content:
             application/json:
               schema:
                 type: object
+                required:
+                  - status
+                  - error
                 properties:
                   status:
                     type: string
@@ -1157,14 +1160,11 @@ paths:
                       - error
                   error:
                     type: object
+                    required:
+                      - message
                     properties:
                       message:
                         type: string
-                    required:
-                      - message
-                required:
-                  - status
-                  - error
               examples:
                 example1:
                   value:
@@ -1183,6 +1183,9 @@ paths:
             application/json:
               schema:
                 type: object
+                required:
+                  - status
+                  - data
                 properties:
                   status:
                     type: string
@@ -1191,15 +1194,15 @@ paths:
                   data:
                     type: object
                     properties: {}
-                required:
-                  - status
-                  - data
         "400":
           description: GET /v1/getSome/:thing Error response
           content:
             application/json:
               schema:
                 type: object
+                required:
+                  - status
+                  - error
                 properties:
                   status:
                     type: string
@@ -1207,14 +1210,11 @@ paths:
                       - error
                   error:
                     type: object
+                    required:
+                      - message
                     properties:
                       message:
                         type: string
-                    required:
-                      - message
-                required:
-                  - status
-                  - error
               examples:
                 example1:
                   value:
@@ -1255,6 +1255,9 @@ paths:
             application/json:
               schema:
                 type: object
+                required:
+                  - status
+                  - data
                 properties:
                   status:
                     type: string
@@ -1262,6 +1265,8 @@ paths:
                       - success
                   data:
                     type: object
+                    required:
+                      - num
                     properties:
                       num:
                         type: number
@@ -1270,17 +1275,15 @@ paths:
                         exclusiveMinimum: false
                         maximum: 1.7976931348623157e+308
                         exclusiveMaximum: false
-                    required:
-                      - num
-                required:
-                  - status
-                  - data
         "400":
           description: GET /v1/getSomething Error response
           content:
             application/json:
               schema:
                 type: object
+                required:
+                  - status
+                  - error
                 properties:
                   status:
                     type: string
@@ -1288,14 +1291,11 @@ paths:
                       - error
                   error:
                     type: object
+                    required:
+                      - message
                     properties:
                       message:
                         type: string
-                    required:
-                      - message
-                required:
-                  - status
-                  - error
               examples:
                 example1:
                   value:
@@ -1328,6 +1328,9 @@ paths:
             application/json:
               schema:
                 type: object
+                required:
+                  - status
+                  - data
                 properties:
                   status:
                     type: string
@@ -1336,15 +1339,15 @@ paths:
                   data:
                     type: object
                     properties: {}
-                required:
-                  - status
-                  - data
         "400":
           description: POST /v1/setSomething Error response
           content:
             application/json:
               schema:
                 type: object
+                required:
+                  - status
+                  - error
                 properties:
                   status:
                     type: string
@@ -1352,14 +1355,11 @@ paths:
                       - error
                   error:
                     type: object
+                    required:
+                      - message
                     properties:
                       message:
                         type: string
-                    required:
-                      - message
-                required:
-                  - status
-                  - error
               examples:
                 example1:
                   value:
@@ -1390,6 +1390,9 @@ paths:
             application/json:
               schema:
                 type: object
+                required:
+                  - status
+                  - data
                 properties:
                   status:
                     type: string
@@ -1398,15 +1401,15 @@ paths:
                   data:
                     type: object
                     properties: {}
-                required:
-                  - status
-                  - data
         "400":
           description: PUT /v1/updateSomething Error response
           content:
             application/json:
               schema:
                 type: object
+                required:
+                  - status
+                  - error
                 properties:
                   status:
                     type: string
@@ -1414,14 +1417,11 @@ paths:
                       - error
                   error:
                     type: object
+                    required:
+                      - message
                     properties:
                       message:
                         type: string
-                    required:
-                      - message
-                required:
-                  - status
-                  - error
               examples:
                 example1:
                   value:
@@ -1491,6 +1491,9 @@ paths:
             application/json:
               schema:
                 type: object
+                required:
+                  - status
+                  - data
                 properties:
                   status:
                     type: string
@@ -1498,6 +1501,8 @@ paths:
                       - success
                   data:
                     type: object
+                    required:
+                      - whatever
                     properties:
                       whatever:
                         type: number
@@ -1506,17 +1511,15 @@ paths:
                         exclusiveMinimum: false
                         maximum: 1.7976931348623157e+308
                         exclusiveMaximum: false
-                    required:
-                      - whatever
-                required:
-                  - status
-                  - data
         "400":
           description: DELETE /v1/deleteSomething Error response
           content:
             application/json:
               schema:
                 type: object
+                required:
+                  - status
+                  - error
                 properties:
                   status:
                     type: string
@@ -1524,14 +1527,11 @@ paths:
                       - error
                   error:
                     type: object
+                    required:
+                      - message
                     properties:
                       message:
                         type: string
-                    required:
-                      - message
-                required:
-                  - status
-                  - error
               examples:
                 example1:
                   value:
@@ -1570,6 +1570,9 @@ paths:
             application/json:
               schema:
                 type: object
+                required:
+                  - status
+                  - data
                 properties:
                   status:
                     type: string
@@ -1577,6 +1580,9 @@ paths:
                       - success
                   data:
                     type: object
+                    required:
+                      - literal
+                      - transformation
                     properties:
                       literal:
                         type: string
@@ -1589,18 +1595,15 @@ paths:
                         exclusiveMinimum: false
                         maximum: 1.7976931348623157e+308
                         exclusiveMaximum: false
-                    required:
-                      - literal
-                      - transformation
-                required:
-                  - status
-                  - data
         "400":
           description: GET /v1/getSomething Error response
           content:
             application/json:
               schema:
                 type: object
+                required:
+                  - status
+                  - error
                 properties:
                   status:
                     type: string
@@ -1608,14 +1611,11 @@ paths:
                       - error
                   error:
                     type: object
+                    required:
+                      - message
                     properties:
                       message:
                         type: string
-                    required:
-                      - message
-                required:
-                  - status
-                  - error
               examples:
                 example1:
                   value:
@@ -1629,6 +1629,8 @@ paths:
           description: GET /v1/getSomething parameter
           schema:
             type: array
+            minItems: 1
+            maxItems: 3
             items:
               type: integer
               format: int64
@@ -1636,8 +1638,6 @@ paths:
               exclusiveMinimum: true
               maximum: 9007199254740991
               exclusiveMaximum: false
-            minItems: 1
-            maxItems: 3
         - name: unlimited
           in: query
           required: true
@@ -1684,6 +1684,9 @@ paths:
             application/json:
               schema:
                 type: object
+                required:
+                  - status
+                  - data
                 properties:
                   status:
                     type: string
@@ -1694,6 +1697,8 @@ paths:
                       propertyName: status
                     oneOf:
                       - type: object
+                        required:
+                          - status
                         properties:
                           status:
                             type: string
@@ -1701,9 +1706,10 @@ paths:
                               - success
                           data:
                             format: any
+                      - type: object
                         required:
                           - status
-                      - type: object
+                          - error
                         properties:
                           status:
                             type: string
@@ -1711,23 +1717,20 @@ paths:
                               - error
                           error:
                             type: object
+                            required:
+                              - message
                             properties:
                               message:
                                 type: string
-                            required:
-                              - message
-                        required:
-                          - status
-                          - error
-                required:
-                  - status
-                  - data
         "400":
           description: POST /v1/getSomething Error response
           content:
             application/json:
               schema:
                 type: object
+                required:
+                  - status
+                  - error
                 properties:
                   status:
                     type: string
@@ -1735,14 +1738,11 @@ paths:
                       - error
                   error:
                     type: object
+                    required:
+                      - message
                     properties:
                       message:
                         type: string
-                    required:
-                      - message
-                required:
-                  - status
-                  - error
               examples:
                 example1:
                   value:
@@ -1758,6 +1758,9 @@ paths:
                 propertyName: type
               oneOf:
                 - type: object
+                  required:
+                    - type
+                    - a
                   properties:
                     type:
                       type: string
@@ -1765,10 +1768,10 @@ paths:
                         - a
                     a:
                       type: string
+                - type: object
                   required:
                     - type
-                    - a
-                - type: object
+                    - b
                   properties:
                     type:
                       type: string
@@ -1776,9 +1779,6 @@ paths:
                         - b
                     b:
                       type: string
-                  required:
-                    - type
-                    - b
 components:
   schemas: {}
   responses: {}
@@ -1811,6 +1811,9 @@ paths:
             application/json:
               schema:
                 type: object
+                required:
+                  - status
+                  - data
                 properties:
                   status:
                     type: string
@@ -1818,10 +1821,14 @@ paths:
                       - success
                   data:
                     type: object
+                    required:
+                      - and
                     properties:
                       and:
                         allOf:
                           - type: object
+                            required:
+                              - five
                             properties:
                               five:
                                 type: integer
@@ -1830,25 +1837,21 @@ paths:
                                 exclusiveMinimum: false
                                 maximum: 9007199254740991
                                 exclusiveMaximum: false
-                            required:
-                              - five
                           - type: object
+                            required:
+                              - six
                             properties:
                               six:
                                 type: string
-                            required:
-                              - six
-                    required:
-                      - and
-                required:
-                  - status
-                  - data
         "400":
           description: POST /v1/getSomething Error response
           content:
             application/json:
               schema:
                 type: object
+                required:
+                  - status
+                  - error
                 properties:
                   status:
                     type: string
@@ -1856,14 +1859,11 @@ paths:
                       - error
                   error:
                     type: object
+                    required:
+                      - message
                     properties:
                       message:
                         type: string
-                    required:
-                      - message
-                required:
-                  - status
-                  - error
               examples:
                 example1:
                   value:
@@ -1876,23 +1876,23 @@ paths:
           application/json:
             schema:
               type: object
+              required:
+                - intersection
               properties:
                 intersection:
                   allOf:
                     - type: object
+                      required:
+                        - one
                       properties:
                         one:
                           type: string
-                      required:
-                        - one
                     - type: object
+                      required:
+                        - two
                       properties:
                         two:
                           type: string
-                      required:
-                        - two
-              required:
-                - intersection
 components:
   schemas: {}
   responses: {}
@@ -1925,6 +1925,9 @@ paths:
             application/json:
               schema:
                 type: object
+                required:
+                  - status
+                  - data
                 properties:
                   status:
                     type: string
@@ -1932,21 +1935,21 @@ paths:
                       - success
                   data:
                     type: object
+                    required:
+                      - nullable
                     properties:
                       nullable:
                         nullable: true
                         type: string
-                    required:
-                      - nullable
-                required:
-                  - status
-                  - data
         "400":
           description: GET /v1/getSomething Error response
           content:
             application/json:
               schema:
                 type: object
+                required:
+                  - status
+                  - error
                 properties:
                   status:
                     type: string
@@ -1954,14 +1957,11 @@ paths:
                       - error
                   error:
                     type: object
+                    required:
+                      - message
                     properties:
                       message:
                         type: string
-                    required:
-                      - message
-                required:
-                  - status
-                  - error
               examples:
                 example1:
                   value:
@@ -2034,6 +2034,9 @@ paths:
             application/json:
               schema:
                 type: object
+                required:
+                  - status
+                  - data
                 properties:
                   status:
                     type: string
@@ -2041,6 +2044,8 @@ paths:
                       - success
                   data:
                     type: object
+                    required:
+                      - or
                     properties:
                       or:
                         oneOf:
@@ -2051,17 +2056,15 @@ paths:
                             exclusiveMinimum: true
                             maximum: 9007199254740991
                             exclusiveMaximum: false
-                    required:
-                      - or
-                required:
-                  - status
-                  - data
         "400":
           description: POST /v1/getSomething Error response
           content:
             application/json:
               schema:
                 type: object
+                required:
+                  - status
+                  - error
                 properties:
                   status:
                     type: string
@@ -2069,14 +2072,11 @@ paths:
                       - error
                   error:
                     type: object
+                    required:
+                      - message
                     properties:
                       message:
                         type: string
-                    required:
-                      - message
-                required:
-                  - status
-                  - error
               examples:
                 example1:
                   value:
@@ -2089,10 +2089,15 @@ paths:
           application/json:
             schema:
               type: object
+              required:
+                - union
               properties:
                 union:
                   oneOf:
                     - type: object
+                      required:
+                        - one
+                        - two
                       properties:
                         one:
                           type: string
@@ -2103,10 +2108,10 @@ paths:
                           exclusiveMinimum: true
                           maximum: 9007199254740991
                           exclusiveMaximum: false
-                      required:
-                        - one
-                        - two
                     - type: object
+                      required:
+                        - two
+                        - three
                       properties:
                         two:
                           type: integer
@@ -2117,11 +2122,6 @@ paths:
                           exclusiveMaximum: true
                         three:
                           type: string
-                      required:
-                        - two
-                        - three
-              required:
-                - union
 components:
   schemas: {}
   responses: {}
@@ -2154,6 +2154,9 @@ paths:
             application/json:
               schema:
                 type: object
+                required:
+                  - status
+                  - data
                 properties:
                   status:
                     type: string
@@ -2161,6 +2164,10 @@ paths:
                       - success
                   data:
                     type: object
+                    required:
+                      - id
+                      - name
+                      - features
                     properties:
                       id:
                         type: integer
@@ -2175,27 +2182,23 @@ paths:
                         type: array
                         items:
                           type: object
+                          required:
+                            - title
+                            - features
                           properties:
                             title:
                               type: string
                             features:
                               $ref: "#/components/schemas/2048581c137c5b2130eb860e3ae37da196dfc25b"
-                          required:
-                            - title
-                            - features
-                    required:
-                      - id
-                      - name
-                      - features
-                required:
-                  - status
-                  - data
         "400":
           description: GET /v1/user/retrieve Error response
           content:
             application/json:
               schema:
                 type: object
+                required:
+                  - status
+                  - error
                 properties:
                   status:
                     type: string
@@ -2203,14 +2206,11 @@ paths:
                       - error
                   error:
                     type: object
+                    required:
+                      - message
                     properties:
                       message:
                         type: string
-                    required:
-                      - message
-                required:
-                  - status
-                  - error
               examples:
                 example1:
                   value:
@@ -2240,6 +2240,9 @@ paths:
             application/json:
               schema:
                 type: object
+                required:
+                  - status
+                  - data
                 properties:
                   status:
                     type: string
@@ -2247,6 +2250,9 @@ paths:
                       - success
                   data:
                     type: object
+                    required:
+                      - name
+                      - createdAt
                     properties:
                       name:
                         type: string
@@ -2256,15 +2262,9 @@ paths:
                         format: date-time
                         externalDocs:
                           url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
-                    required:
-                      - name
-                      - createdAt
                     example:
                       name: John Doe
                       createdAt: 2021-12-31T00:00:00.000Z
-                required:
-                  - status
-                  - data
               examples:
                 example1:
                   value:
@@ -2278,6 +2278,9 @@ paths:
             application/json:
               schema:
                 type: object
+                required:
+                  - status
+                  - error
                 properties:
                   status:
                     type: string
@@ -2285,14 +2288,11 @@ paths:
                       - error
                   error:
                     type: object
+                    required:
+                      - message
                     properties:
                       message:
                         type: string
-                    required:
-                      - message
-                required:
-                  - status
-                  - error
               examples:
                 example1:
                   value:
@@ -2308,11 +2308,11 @@ paths:
           in: path
           required: true
           description: POST /v1/user/:id parameter
-          schema:
-            type: string
           examples:
             example1:
               value: "12"
+          schema:
+            type: string
       requestBody:
         description: POST /v1/user/:id request body
         content:
@@ -2320,15 +2320,18 @@ paths:
             schema:
               allOf:
                 - type: object
+                  required:
+                    - key
                   properties:
                     key:
                       type: string
                       minLength: 1
-                  required:
-                    - key
                   example:
                     key: 1234-5678-90
                 - type: object
+                  required:
+                    - name
+                    - birthday
                   properties:
                     name:
                       type: string
@@ -2340,9 +2343,6 @@ paths:
                       pattern: ^\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?)?Z?$
                       externalDocs:
                         url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
-                  required:
-                    - name
-                    - birthday
                   example:
                     name: John Doe
                     birthday: 1963-04-21
@@ -2422,6 +2422,9 @@ paths:
             application/json:
               schema:
                 type: object
+                required:
+                  - status
+                  - data
                 properties:
                   status:
                     type: string
@@ -2429,6 +2432,12 @@ paths:
                       - success
                   data:
                     type: object
+                    required:
+                      - name
+                      - size
+                      - mime
+                      - hash
+                      - otherInputs
                     properties:
                       name:
                         type: string
@@ -2447,21 +2456,15 @@ paths:
                         type: object
                         additionalProperties:
                           format: any
-                    required:
-                      - name
-                      - size
-                      - mime
-                      - hash
-                      - otherInputs
-                required:
-                  - status
-                  - data
         "400":
           description: POST /v1/avatar/upload Error response
           content:
             application/json:
               schema:
                 type: object
+                required:
+                  - status
+                  - error
                 properties:
                   status:
                     type: string
@@ -2469,14 +2472,11 @@ paths:
                       - error
                   error:
                     type: object
+                    required:
+                      - message
                     properties:
                       message:
                         type: string
-                    required:
-                      - message
-                required:
-                  - status
-                  - error
               examples:
                 example1:
                   value:
@@ -2493,26 +2493,26 @@ paths:
           multipart/form-data:
             schema:
               type: object
+              required:
+                - avatar
               properties:
                 avatar:
                   type: string
                   format: binary
-              required:
-                - avatar
 components:
   schemas:
     2048581c137c5b2130eb860e3ae37da196dfc25b:
       type: array
       items:
         type: object
+        required:
+          - title
+          - features
         properties:
           title:
             type: string
           features:
             $ref: "#/components/schemas/2048581c137c5b2130eb860e3ae37da196dfc25b"
-        required:
-          - title
-          - features
   responses: {}
   parameters: {}
   examples: {}
@@ -2616,11 +2616,11 @@ paths:
           in: path
           required: true
           description: POST /v1/user/:id parameter
-          schema:
-            $ref: "#/components/schemas/PostV1UserIdParameterId"
           examples:
             example1:
               value: "12"
+          schema:
+            $ref: "#/components/schemas/PostV1UserIdParameterId"
       requestBody:
         description: POST /v1/user/:id request body
         content:
@@ -2732,16 +2732,19 @@ components:
       type: array
       items:
         type: object
+        required:
+          - title
+          - features
         properties:
           title:
             type: string
           features:
             $ref: "#/components/schemas/2048581c137c5b2130eb860e3ae37da196dfc25b"
-        required:
-          - title
-          - features
     GetV1UserRetrieveSuccessfulResponse:
       type: object
+      required:
+        - status
+        - data
       properties:
         status:
           type: string
@@ -2749,6 +2752,10 @@ components:
             - success
         data:
           type: object
+          required:
+            - id
+            - name
+            - features
           properties:
             id:
               type: integer
@@ -2763,23 +2770,19 @@ components:
               type: array
               items:
                 type: object
+                required:
+                  - title
+                  - features
                 properties:
                   title:
                     type: string
                   features:
                     $ref: "#/components/schemas/2048581c137c5b2130eb860e3ae37da196dfc25b"
-                required:
-                  - title
-                  - features
-          required:
-            - id
-            - name
-            - features
-      required:
-        - status
-        - data
     GetV1UserRetrieveErrorResponse:
       type: object
+      required:
+        - status
+        - error
       properties:
         status:
           type: string
@@ -2787,18 +2790,18 @@ components:
             - error
         error:
           type: object
+          required:
+            - message
           properties:
             message:
               type: string
-          required:
-            - message
-      required:
-        - status
-        - error
     PostV1UserIdParameterId:
       type: string
     PostV1UserIdSuccessfulResponse:
       type: object
+      required:
+        - status
+        - data
       properties:
         status:
           type: string
@@ -2806,6 +2809,9 @@ components:
             - success
         data:
           type: object
+          required:
+            - name
+            - createdAt
           properties:
             name:
               type: string
@@ -2815,17 +2821,14 @@ components:
               format: date-time
               externalDocs:
                 url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
-          required:
-            - name
-            - createdAt
           example:
             name: John Doe
             createdAt: 2021-12-31T00:00:00.000Z
-      required:
-        - status
-        - data
     PostV1UserIdErrorResponse:
       type: object
+      required:
+        - status
+        - error
       properties:
         status:
           type: string
@@ -2833,26 +2836,26 @@ components:
             - error
         error:
           type: object
+          required:
+            - message
           properties:
             message:
               type: string
-          required:
-            - message
-      required:
-        - status
-        - error
     PostV1UserIdRequestBody:
       allOf:
         - type: object
+          required:
+            - key
           properties:
             key:
               type: string
               minLength: 1
-          required:
-            - key
           example:
             key: 1234-5678-90
         - type: object
+          required:
+            - name
+            - birthday
           properties:
             name:
               type: string
@@ -2864,9 +2867,6 @@ components:
               pattern: ^\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?)?Z?$
               externalDocs:
                 url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
-          required:
-            - name
-            - birthday
           example:
             name: John Doe
             birthday: 1963-04-21
@@ -2887,6 +2887,9 @@ components:
       type: string
     PostV1AvatarUploadSuccessfulResponse:
       type: object
+      required:
+        - status
+        - data
       properties:
         status:
           type: string
@@ -2894,6 +2897,12 @@ components:
             - success
         data:
           type: object
+          required:
+            - name
+            - size
+            - mime
+            - hash
+            - otherInputs
           properties:
             name:
               type: string
@@ -2912,17 +2921,11 @@ components:
               type: object
               additionalProperties:
                 format: any
-          required:
-            - name
-            - size
-            - mime
-            - hash
-            - otherInputs
-      required:
-        - status
-        - data
     PostV1AvatarUploadErrorResponse:
       type: object
+      required:
+        - status
+        - error
       properties:
         status:
           type: string
@@ -2930,22 +2933,19 @@ components:
             - error
         error:
           type: object
+          required:
+            - message
           properties:
             message:
               type: string
-          required:
-            - message
-      required:
-        - status
-        - error
     PostV1AvatarUploadRequestBody:
       type: object
+      required:
+        - avatar
       properties:
         avatar:
           type: string
           format: binary
-      required:
-        - avatar
   responses: {}
   parameters: {}
   examples: {}
@@ -2988,6 +2988,9 @@ paths:
             application/json:
               schema:
                 type: object
+                required:
+                  - status
+                  - data
                 properties:
                   status:
                     type: string
@@ -2995,6 +2998,9 @@ paths:
                       - success
                   data:
                     type: object
+                    required:
+                      - "null"
+                      - dateOut
                     properties:
                       "null":
                         type: string
@@ -3006,18 +3012,15 @@ paths:
                         format: date-time
                         externalDocs:
                           url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
-                    required:
-                      - "null"
-                      - dateOut
-                required:
-                  - status
-                  - data
         "400":
           description: POST /v1/getSomething Error response
           content:
             application/json:
               schema:
                 type: object
+                required:
+                  - status
+                  - error
                 properties:
                   status:
                     type: string
@@ -3025,14 +3028,11 @@ paths:
                       - error
                   error:
                     type: object
+                    required:
+                      - message
                     properties:
                       message:
                         type: string
-                    required:
-                      - message
-                required:
-                  - status
-                  - error
               examples:
                 example1:
                   value:
@@ -3045,6 +3045,10 @@ paths:
           application/json:
             schema:
               type: object
+              required:
+                - bigint
+                - boolean
+                - dateIn
               properties:
                 bigint:
                   type: integer
@@ -3058,10 +3062,6 @@ paths:
                   pattern: ^\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?)?Z?$
                   externalDocs:
                     url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
-              required:
-                - bigint
-                - boolean
-                - dateIn
 components:
   schemas: {}
   responses: {}
@@ -3094,6 +3094,9 @@ paths:
             application/json:
               schema:
                 type: object
+                required:
+                  - status
+                  - data
                 properties:
                   status:
                     type: string
@@ -3101,28 +3104,28 @@ paths:
                       - success
                   data:
                     type: object
+                    required:
+                      - zodExample
                     properties:
                       zodExample:
                         type: object
+                        required:
+                          - name
+                          - subcategories
                         properties:
                           name:
                             type: string
                           subcategories:
                             $ref: "#/components/schemas/2048581c137c5b2130eb860e3ae37da196dfc25b"
-                        required:
-                          - name
-                          - subcategories
-                    required:
-                      - zodExample
-                required:
-                  - status
-                  - data
         "400":
           description: POST /v1/getSomething Error response
           content:
             application/json:
               schema:
                 type: object
+                required:
+                  - status
+                  - error
                 properties:
                   status:
                     type: string
@@ -3130,14 +3133,11 @@ paths:
                       - error
                   error:
                     type: object
+                    required:
+                      - message
                     properties:
                       message:
                         type: string
-                    required:
-                      - message
-                required:
-                  - status
-                  - error
               examples:
                 example1:
                   value:
@@ -3150,25 +3150,25 @@ paths:
           application/json:
             schema:
               type: object
+              required:
+                - name
               properties:
                 name:
                   type: string
-              required:
-                - name
 components:
   schemas:
     2048581c137c5b2130eb860e3ae37da196dfc25b:
       type: array
       items:
         type: object
+        required:
+          - name
+          - subcategories
         properties:
           name:
             type: string
           subcategories:
             $ref: "#/components/schemas/2048581c137c5b2130eb860e3ae37da196dfc25b"
-        required:
-          - name
-          - subcategories
   responses: {}
   parameters: {}
   examples: {}
@@ -3199,6 +3199,9 @@ paths:
             application/json:
               schema: &a1
                 type: object
+                required:
+                  - status
+                  - result
                 properties:
                   status:
                     type: string
@@ -3207,9 +3210,6 @@ paths:
                   result:
                     type: object
                     properties: {}
-                required:
-                  - status
-                  - result
             text/vnd.yaml:
               schema: *a1
         "403":
@@ -3218,13 +3218,13 @@ paths:
             text/vnd.yaml:
               schema:
                 type: object
+                required:
+                  - status
                 properties:
                   status:
                     type: string
                     enum:
                       - NOT OK
-                required:
-                  - status
 components:
   schemas: {}
   responses: {}
@@ -3257,6 +3257,9 @@ paths:
             application/json:
               schema:
                 type: object
+                required:
+                  - status
+                  - data
                 properties:
                   status:
                     type: string
@@ -3264,21 +3267,21 @@ paths:
                       - success
                   data:
                     type: object
+                    required:
+                      - bigint
                     properties:
                       bigint:
                         type: integer
                         format: bigint
-                    required:
-                      - bigint
-                required:
-                  - status
-                  - data
         "400":
           description: POST /v1/getSomething Error response
           content:
             application/json:
               schema:
                 type: object
+                required:
+                  - status
+                  - error
                 properties:
                   status:
                     type: string
@@ -3286,14 +3289,11 @@ paths:
                       - error
                   error:
                     type: object
+                    required:
+                      - message
                     properties:
                       message:
                         type: string
-                    required:
-                      - message
-                required:
-                  - status
-                  - error
               examples:
                 example1:
                   value:
@@ -3306,6 +3306,15 @@ paths:
           application/json:
             schema:
               type: object
+              required:
+                - double
+                - doublePositive
+                - doubleNegative
+                - doubleLimited
+                - int
+                - intPositive
+                - intNegative
+                - intLimited
               properties:
                 double:
                   type: number
@@ -3370,15 +3379,6 @@ paths:
                   exclusiveMinimum: false
                   maximum: 0
                   exclusiveMaximum: false
-              required:
-                - double
-                - doublePositive
-                - doubleNegative
-                - doubleLimited
-                - int
-                - intPositive
-                - intNegative
-                - intLimited
 components:
   schemas: {}
   responses: {}
@@ -3411,6 +3411,9 @@ paths:
             application/json:
               schema:
                 type: object
+                required:
+                  - status
+                  - data
                 properties:
                   status:
                     type: string
@@ -3418,21 +3421,21 @@ paths:
                       - success
                   data:
                     type: object
+                    required:
+                      - nonempty
                     properties:
                       nonempty:
                         type: string
                         minLength: 1
-                    required:
-                      - nonempty
-                required:
-                  - status
-                  - data
         "400":
           description: POST /v1/getSomething Error response
           content:
             application/json:
               schema:
                 type: object
+                required:
+                  - status
+                  - error
                 properties:
                   status:
                     type: string
@@ -3440,14 +3443,11 @@ paths:
                       - error
                   error:
                     type: object
+                    required:
+                      - message
                     properties:
                       message:
                         type: string
-                    required:
-                      - message
-                required:
-                  - status
-                  - error
               examples:
                 example1:
                   value:
@@ -3460,6 +3460,21 @@ paths:
           application/json:
             schema:
               type: object
+              required:
+                - regular
+                - min
+                - max
+                - range
+                - email
+                - uuid
+                - cuid
+                - cuid2
+                - ulid
+                - ip
+                - emoji
+                - url
+                - numeric
+                - combined
               properties:
                 regular:
                   type: string
@@ -3506,21 +3521,6 @@ paths:
                   minLength: 1
                   maxLength: 90
                   pattern: /.*@example\\.com/is
-              required:
-                - regular
-                - min
-                - max
-                - range
-                - email
-                - uuid
-                - cuid
-                - cuid2
-                - ulid
-                - ip
-                - emoji
-                - url
-                - numeric
-                - combined
 components:
   schemas: {}
   responses: {}
@@ -3553,6 +3553,9 @@ paths:
             application/json:
               schema:
                 type: object
+                required:
+                  - status
+                  - data
                 properties:
                   status:
                     type: string
@@ -3560,23 +3563,23 @@ paths:
                       - success
                   data:
                     type: object
+                    required:
+                      - nativeEnum
                     properties:
                       nativeEnum:
                         type: number
                         enum:
                           - 1
                           - 2
-                    required:
-                      - nativeEnum
-                required:
-                  - status
-                  - data
         "400":
           description: POST /v1/getSomething Error response
           content:
             application/json:
               schema:
                 type: object
+                required:
+                  - status
+                  - error
                 properties:
                   status:
                     type: string
@@ -3584,14 +3587,11 @@ paths:
                       - error
                   error:
                     type: object
+                    required:
+                      - message
                     properties:
                       message:
                         type: string
-                    required:
-                      - message
-                required:
-                  - status
-                  - error
               examples:
                 example1:
                   value:
@@ -3604,14 +3604,14 @@ paths:
           application/json:
             schema:
               type: object
+              required:
+                - regularEnum
               properties:
                 regularEnum:
                   type: string
                   enum:
                     - ABC
                     - DEF
-              required:
-                - regularEnum
 components:
   schemas: {}
   responses: {}
@@ -3644,6 +3644,9 @@ paths:
             application/json:
               schema:
                 type: object
+                required:
+                  - status
+                  - data
                 properties:
                   status:
                     type: string
@@ -3651,6 +3654,13 @@ paths:
                       - success
                   data:
                     type: object
+                    required:
+                      - simple
+                      - stringy
+                      - numeric
+                      - literal
+                      - union
+                      - enum
                     properties:
                       simple:
                         type: object
@@ -3671,47 +3681,40 @@ paths:
                           type: boolean
                       literal:
                         type: object
+                        required:
+                          - only
                         properties:
                           only:
                             type: boolean
-                        required:
-                          - only
                       union:
                         type: object
+                        required:
+                          - option1
+                          - option2
                         properties:
                           option1:
                             type: boolean
                           option2:
                             type: boolean
-                        required:
-                          - option1
-                          - option2
                       enum:
                         type: object
+                        required:
+                          - option1
+                          - option2
                         properties:
                           option1:
                             type: boolean
                           option2:
                             type: boolean
-                        required:
-                          - option1
-                          - option2
-                    required:
-                      - simple
-                      - stringy
-                      - numeric
-                      - literal
-                      - union
-                      - enum
-                required:
-                  - status
-                  - data
         "400":
           description: POST /v1/getSomething Error response
           content:
             application/json:
               schema:
                 type: object
+                required:
+                  - status
+                  - error
                 properties:
                   status:
                     type: string
@@ -3719,14 +3722,11 @@ paths:
                       - error
                   error:
                     type: object
+                    required:
+                      - message
                     properties:
                       message:
                         type: string
-                    required:
-                      - message
-                required:
-                  - status
-                  - error
               examples:
                 example1:
                   value:
@@ -3772,6 +3772,9 @@ paths:
             application/json:
               schema:
                 type: object
+                required:
+                  - status
+                  - data
                 properties:
                   status:
                     type: string
@@ -3779,20 +3782,20 @@ paths:
                       - success
                   data:
                     type: object
+                    required:
+                      - transform
                     properties:
                       transform:
                         type: number
-                    required:
-                      - transform
-                required:
-                  - status
-                  - data
         "400":
           description: POST /v1/getSomething Error response
           content:
             application/json:
               schema:
                 type: object
+                required:
+                  - status
+                  - error
                 properties:
                   status:
                     type: string
@@ -3800,14 +3803,11 @@ paths:
                       - error
                   error:
                     type: object
+                    required:
+                      - message
                     properties:
                       message:
                         type: string
-                    required:
-                      - message
-                required:
-                  - status
-                  - error
               examples:
                 example1:
                   value:
@@ -3820,6 +3820,9 @@ paths:
           application/json:
             schema:
               type: object
+              required:
+                - one
+                - two
               properties:
                 one:
                   type: string
@@ -3830,9 +3833,6 @@ paths:
                   exclusiveMinimum: true
                   maximum: 9007199254740991
                   exclusiveMaximum: false
-              required:
-                - one
-                - two
 components:
   schemas: {}
   responses: {}
@@ -3865,6 +3865,9 @@ paths:
             application/json:
               schema:
                 type: object
+                required:
+                  - status
+                  - data
                 properties:
                   status:
                     type: string
@@ -3872,6 +3875,8 @@ paths:
                       - success
                   data:
                     type: object
+                    required:
+                      - empty
                     properties:
                       empty:
                         type: array
@@ -3880,17 +3885,15 @@ paths:
                         items:
                           oneOf: []
                           format: tuple
-                    required:
-                      - empty
-                required:
-                  - status
-                  - data
         "400":
           description: POST /v1/getSomething Error response
           content:
             application/json:
               schema:
                 type: object
+                required:
+                  - status
+                  - error
                 properties:
                   status:
                     type: string
@@ -3898,14 +3901,11 @@ paths:
                       - error
                   error:
                     type: object
+                    required:
+                      - message
                     properties:
                       message:
                         type: string
-                    required:
-                      - message
-                required:
-                  - status
-                  - error
               examples:
                 example1:
                   value:
@@ -3918,6 +3918,10 @@ paths:
           application/json:
             schema:
               type: object
+              required:
+                - ofOne
+                - ofStrings
+                - complex
               properties:
                 ofOne:
                   type: array
@@ -3955,10 +3959,6 @@ paths:
                         exclusiveMaximum: false
                     format: tuple
                     description: "0: boolean, 1: string, 2: integer"
-              required:
-                - ofOne
-                - ofStrings
-                - complex
 components:
   schemas: {}
   responses: {}
@@ -3991,6 +3991,9 @@ paths:
             application/json:
               schema:
                 type: object
+                required:
+                  - status
+                  - data
                 properties:
                   status:
                     type: string
@@ -4001,15 +4004,15 @@ paths:
                     properties:
                       any:
                         format: any
-                required:
-                  - status
-                  - data
         "400":
           description: GET /v1/getSomething Error response
           content:
             application/json:
               schema:
                 type: object
+                required:
+                  - status
+                  - error
                 properties:
                   status:
                     type: string
@@ -4017,14 +4020,11 @@ paths:
                       - error
                   error:
                     type: object
+                    required:
+                      - message
                     properties:
                       message:
                         type: string
-                    required:
-                      - message
-                required:
-                  - status
-                  - error
               examples:
                 example1:
                   value:
@@ -4070,6 +4070,9 @@ paths:
             application/json:
               schema:
                 type: object
+                required:
+                  - status
+                  - data
                 properties:
                   status:
                     type: string
@@ -4081,15 +4084,15 @@ paths:
                       boolean:
                         type: boolean
                         nullable: true
-                required:
-                  - status
-                  - data
         "400":
           description: GET /v1/getSomething Error response
           content:
             application/json:
               schema:
                 type: object
+                required:
+                  - status
+                  - error
                 properties:
                   status:
                     type: string
@@ -4097,14 +4100,11 @@ paths:
                       - error
                   error:
                     type: object
+                    required:
+                      - message
                     properties:
                       message:
                         type: string
-                    required:
-                      - message
-                required:
-                  - status
-                  - error
               examples:
                 example1:
                   value:
