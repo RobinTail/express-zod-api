@@ -16,6 +16,7 @@ import { CommonConfig } from "./config-type";
 import { mapLogicalContainer } from "./logical-container";
 import { Method } from "./method";
 import {
+  OASVersion,
   depictRequest,
   depictRequestParams,
   depictResponse,
@@ -33,7 +34,7 @@ interface DocumentationParams {
    * Version of the OpenAPI specification
    * @default 3.0
    * */
-  variant?: "3.0" | "3.1";
+  variant?: OASVersion;
   title: string;
   /** Version of the generated documentation */
   version: string;

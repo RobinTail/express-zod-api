@@ -52,6 +52,8 @@ import { ZodUpload } from "./upload-schema";
 
 type MediaExamples = Pick<MediaTypeObject, "examples">;
 
+export type OASVersion = "3.0" | "3.1";
+
 export interface OpenAPIContext {
   isResponse: boolean;
   serializer: (schema: z.ZodTypeAny) => string;
