@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`API Client Generator Feature #945: should have configurable treatment of optionals 0 1`] = `
+exports[`API Integration Generator Feature #945: should have configurable treatment of optionals 0 1`] = `
 "type PostV1TestWithDashesInput = {
     opt?: string;
 };
@@ -61,11 +61,11 @@ client.provide("get", "/v1/user/retrieve", { id: "10" });
 */
 export class ExpressZodAPIClient {
     constructor(protected readonly implementation: Implementation) { }
-    public readonly provide: Provider = (method, path, params) => this.implementation(method, Object.keys(params).reduce((acc, key) => acc.replace(\`:\${key}\`, params[key]), path), Object.keys(params).reduce((acc, key) => path.indexOf(\`:\${key}\`) >= 0 ? acc : { ...acc, [key]: params[key] }, {}));
+    public readonly provide: Provider = async (method, path, params) => this.implementation(method, Object.keys(params).reduce((acc, key) => acc.replace(\`:\${key}\`, params[key]), path), Object.keys(params).reduce((acc, key) => path.indexOf(\`:\${key}\`) >= 0 ? acc : { ...acc, [key]: params[key] }, {}));
 }"
 `;
 
-exports[`API Client Generator Feature #945: should have configurable treatment of optionals 1 1`] = `
+exports[`API Integration Generator Feature #945: should have configurable treatment of optionals 1 1`] = `
 "type PostV1TestWithDashesInput = {
     opt: string | undefined;
 };
@@ -126,11 +126,11 @@ client.provide("get", "/v1/user/retrieve", { id: "10" });
 */
 export class ExpressZodAPIClient {
     constructor(protected readonly implementation: Implementation) { }
-    public readonly provide: Provider = (method, path, params) => this.implementation(method, Object.keys(params).reduce((acc, key) => acc.replace(\`:\${key}\`, params[key]), path), Object.keys(params).reduce((acc, key) => path.indexOf(\`:\${key}\`) >= 0 ? acc : { ...acc, [key]: params[key] }, {}));
+    public readonly provide: Provider = async (method, path, params) => this.implementation(method, Object.keys(params).reduce((acc, key) => acc.replace(\`:\${key}\`, params[key]), path), Object.keys(params).reduce((acc, key) => path.indexOf(\`:\${key}\`) >= 0 ? acc : { ...acc, [key]: params[key] }, {}));
 }"
 `;
 
-exports[`API Client Generator Feature #945: should have configurable treatment of optionals 2 1`] = `
+exports[`API Integration Generator Feature #945: should have configurable treatment of optionals 2 1`] = `
 "type PostV1TestWithDashesInput = {
     opt: string;
 };
@@ -191,11 +191,11 @@ client.provide("get", "/v1/user/retrieve", { id: "10" });
 */
 export class ExpressZodAPIClient {
     constructor(protected readonly implementation: Implementation) { }
-    public readonly provide: Provider = (method, path, params) => this.implementation(method, Object.keys(params).reduce((acc, key) => acc.replace(\`:\${key}\`, params[key]), path), Object.keys(params).reduce((acc, key) => path.indexOf(\`:\${key}\`) >= 0 ? acc : { ...acc, [key]: params[key] }, {}));
+    public readonly provide: Provider = async (method, path, params) => this.implementation(method, Object.keys(params).reduce((acc, key) => acc.replace(\`:\${key}\`, params[key]), path), Object.keys(params).reduce((acc, key) => path.indexOf(\`:\${key}\`) >= 0 ? acc : { ...acc, [key]: params[key] }, {}));
 }"
 `;
 
-exports[`API Client Generator Should generate a client for example API 1`] = `
+exports[`API Integration Generator Should generate a client for example API 1`] = `
 "type Type2048581c137c5b2130eb860e3ae37da196dfc25b = {
     title: string;
     features: Type2048581c137c5b2130eb860e3ae37da196dfc25b;
@@ -328,11 +328,115 @@ client.provide("get", "/v1/user/retrieve", { id: "10" });
 */
 export class ExpressZodAPIClient {
     constructor(protected readonly implementation: Implementation) { }
-    public readonly provide: Provider = (method, path, params) => this.implementation(method, Object.keys(params).reduce((acc, key) => acc.replace(\`:\${key}\`, params[key]), path), Object.keys(params).reduce((acc, key) => path.indexOf(\`:\${key}\`) >= 0 ? acc : { ...acc, [key]: params[key] }, {}));
+    public readonly provide: Provider = async (method, path, params) => this.implementation(method, Object.keys(params).reduce((acc, key) => acc.replace(\`:\${key}\`, params[key]), path), Object.keys(params).reduce((acc, key) => path.indexOf(\`:\${key}\`) >= 0 ? acc : { ...acc, [key]: params[key] }, {}));
 }"
 `;
 
-exports[`API Client Generator Should treat optionals the same way as z.infer() by default 1`] = `
+exports[`API Integration Generator Should generate a types for example API 1`] = `
+"type Type2048581c137c5b2130eb860e3ae37da196dfc25b = {
+    title: string;
+    features: Type2048581c137c5b2130eb860e3ae37da196dfc25b;
+}[];
+
+type GetV1UserRetrieveInput = {} & {
+    /** a numeric string containing the id of the user */
+    id: string;
+};
+
+type GetV1UserRetrieveResponse = {
+    status: "success";
+    data: {
+        id: number;
+        name: string;
+        features: {
+            title: string;
+            features: Type2048581c137c5b2130eb860e3ae37da196dfc25b;
+        }[];
+    };
+} | {
+    status: "error";
+    error: {
+        message: string;
+    };
+};
+
+type PostV1UserIdInput = {
+    key: string;
+} & {
+    id: string;
+    name: string;
+    birthday: string;
+};
+
+type PostV1UserIdResponse = {
+    status: "success";
+    data: {
+        name: string;
+        createdAt: string;
+    };
+} | {
+    status: "error";
+    error: {
+        message: string;
+    };
+};
+
+type GetV1AvatarSendInput = {
+    userId: string;
+};
+
+type GetV1AvatarSendResponse = string | string;
+
+type GetV1AvatarStreamInput = {
+    userId: string;
+};
+
+type GetV1AvatarStreamResponse = string | string;
+
+type PostV1AvatarUploadInput = {
+    avatar: any;
+};
+
+type PostV1AvatarUploadResponse = {
+    status: "success";
+    data: {
+        name: string;
+        size: number;
+        mime: string;
+        hash: string;
+        otherInputs: Record<string, any>;
+    };
+} | {
+    status: "error";
+    error: {
+        message: string;
+    };
+};
+
+export type Path = "/v1/user/retrieve" | "/v1/user/:id" | "/v1/avatar/send" | "/v1/avatar/stream" | "/v1/avatar/upload";
+
+export type Method = "get" | "post" | "put" | "delete" | "patch";
+
+export type MethodPath = \`\${Method} \${Path}\`;
+
+export interface Input extends Record<MethodPath, any> {
+    "get /v1/user/retrieve": GetV1UserRetrieveInput;
+    "post /v1/user/:id": PostV1UserIdInput;
+    "get /v1/avatar/send": GetV1AvatarSendInput;
+    "get /v1/avatar/stream": GetV1AvatarStreamInput;
+    "post /v1/avatar/upload": PostV1AvatarUploadInput;
+}
+
+export interface Response extends Record<MethodPath, any> {
+    "get /v1/user/retrieve": GetV1UserRetrieveResponse;
+    "post /v1/user/:id": PostV1UserIdResponse;
+    "get /v1/avatar/send": GetV1AvatarSendResponse;
+    "get /v1/avatar/stream": GetV1AvatarStreamResponse;
+    "post /v1/avatar/upload": PostV1AvatarUploadResponse;
+}"
+`;
+
+exports[`API Integration Generator Should treat optionals the same way as z.infer() by default 1`] = `
 "type PostV1TestWithDashesInput = {
     opt?: string | undefined;
 };
@@ -393,6 +497,6 @@ client.provide("get", "/v1/user/retrieve", { id: "10" });
 */
 export class ExpressZodAPIClient {
     constructor(protected readonly implementation: Implementation) { }
-    public readonly provide: Provider = (method, path, params) => this.implementation(method, Object.keys(params).reduce((acc, key) => acc.replace(\`:\${key}\`, params[key]), path), Object.keys(params).reduce((acc, key) => path.indexOf(\`:\${key}\`) >= 0 ? acc : { ...acc, [key]: params[key] }, {}));
+    public readonly provide: Provider = async (method, path, params) => this.implementation(method, Object.keys(params).reduce((acc, key) => acc.replace(\`:\${key}\`, params[key]), path), Object.keys(params).reduce((acc, key) => path.indexOf(\`:\${key}\`) >= 0 ? acc : { ...acc, [key]: params[key] }, {}));
 }"
 `;

@@ -1,9 +1,9 @@
+import { ReferenceObject, SchemaObject } from "openapi3-ts/oas30";
 import { z } from "zod";
 import { defaultSerializer } from "../../src/common-helpers";
 import { IOSchemaError } from "../../src/errors";
 import { OpenAPIError, defaultEndpointsFactory, ez, withMeta } from "../../src";
 import { getMeta } from "../../src/metadata";
-import { ReferenceObject, SchemaObject } from "../../src/oas-model";
 import {
   OpenAPIContext,
   depictAny,
@@ -49,11 +49,11 @@ import {
   onEach,
   onMissing,
   reformatParamsInPath,
-} from "../../src/open-api-helpers";
+} from "../../src/documentation-helpers";
 import { SchemaHandler, walkSchema } from "../../src/schema-walker";
 import { serializeSchemaForTest } from "../helpers";
 
-describe("Open API helpers", () => {
+describe("Documentation helpers", () => {
   const getRefMock = jest.fn();
   const makeRefMock = jest.fn(
     (name: string, {}: SchemaObject | ReferenceObject): ReferenceObject => ({
@@ -61,12 +61,16 @@ describe("Open API helpers", () => {
     })
   );
   const requestContext: OpenAPIContext = {
+    path: "/v1/user/:id",
+    method: "get",
     isResponse: false,
     getRef: getRefMock,
     makeRef: makeRefMock,
     serializer: defaultSerializer,
   };
   const responseContext: OpenAPIContext = {
+    path: "/v1/user/:id",
+    method: "get",
     isResponse: true,
     getRef: getRefMock,
     makeRef: makeRefMock,
@@ -97,14 +101,18 @@ describe("Open API helpers", () => {
 
   describe("extractObjectSchema()", () => {
     test("should pass the object schema through", () => {
-      const subject = extractObjectSchema(z.object({ one: z.string() }));
+      const subject = extractObjectSchema(
+        z.object({ one: z.string() }),
+        requestContext
+      );
       expect(subject).toBeInstanceOf(z.ZodObject);
       expect(serializeSchemaForTest(subject)).toMatchSnapshot();
     });
 
     test("should return object schema for the union of object schemas", () => {
       const subject = extractObjectSchema(
-        z.object({ one: z.string() }).or(z.object({ two: z.number() }))
+        z.object({ one: z.string() }).or(z.object({ two: z.number() })),
+        requestContext
       );
       expect(subject).toBeInstanceOf(z.ZodObject);
       expect(serializeSchemaForTest(subject)).toMatchSnapshot();
@@ -112,7 +120,8 @@ describe("Open API helpers", () => {
 
     test("should return object schema for the intersection of object schemas", () => {
       const subject = extractObjectSchema(
-        z.object({ one: z.string() }).and(z.object({ two: z.number() }))
+        z.object({ one: z.string() }).and(z.object({ two: z.number() })),
+        requestContext
       );
       expect(subject).toBeInstanceOf(z.ZodObject);
       expect(serializeSchemaForTest(subject)).toMatchSnapshot();
@@ -122,15 +131,18 @@ describe("Open API helpers", () => {
       const objectSchema = withMeta(z.object({ one: z.string() })).example({
         one: "test",
       });
-      expect(getMeta(extractObjectSchema(objectSchema), "examples")).toEqual([
-        { one: "test" },
-      ]);
+      expect(
+        getMeta(extractObjectSchema(objectSchema, requestContext), "examples")
+      ).toEqual([{ one: "test" }]);
 
       const refinedObjSchema = withMeta(
         z.object({ one: z.string() }).refine(() => true)
       ).example({ one: "test" });
       expect(
-        getMeta(extractObjectSchema(refinedObjSchema), "examples")
+        getMeta(
+          extractObjectSchema(refinedObjSchema, requestContext),
+          "examples"
+        )
       ).toEqual([{ one: "test" }]);
 
       const unionSchema = withMeta(
@@ -138,23 +150,26 @@ describe("Open API helpers", () => {
       )
         .example({ one: "test1" })
         .example({ two: 123 });
-      expect(getMeta(extractObjectSchema(unionSchema), "examples")).toEqual([
-        { one: "test1" },
-        { two: 123 },
-      ]);
+      expect(
+        getMeta(extractObjectSchema(unionSchema, requestContext), "examples")
+      ).toEqual([{ one: "test1" }, { two: 123 }]);
 
       const intersectionSchema = withMeta(
         z.object({ one: z.string() }).and(z.object({ two: z.number() }))
       ).example({ one: "test1", two: 123 });
       expect(
-        getMeta(extractObjectSchema(intersectionSchema), "examples")
+        getMeta(
+          extractObjectSchema(intersectionSchema, requestContext),
+          "examples"
+        )
       ).toEqual([{ one: "test1", two: 123 }]);
     });
 
     describe("Feature #600: Top level refinements", () => {
       test("should handle refined object schema", () => {
         const subject = extractObjectSchema(
-          z.object({ one: z.string() }).refine(() => true)
+          z.object({ one: z.string() }).refine(() => true),
+          requestContext
         );
         expect(subject).toBeInstanceOf(z.ZodObject);
         expect(serializeSchemaForTest(subject)).toMatchSnapshot();
@@ -162,10 +177,14 @@ describe("Open API helpers", () => {
 
       test("should throw when using transformation", () => {
         expect(() =>
-          extractObjectSchema(z.object({ one: z.string() }).transform(() => []))
+          extractObjectSchema(
+            z.object({ one: z.string() }).transform(() => []),
+            requestContext
+          )
         ).toThrowError(
           new IOSchemaError(
-            "Using transformations on the top level of input schema is not allowed."
+            "Using transformations on the top level of input schema is not allowed.\n" +
+              "Caused by input schema of an Endpoint assigned to GET method of /v1/user/:id path."
           )
         );
       });
@@ -730,8 +749,6 @@ describe("Open API helpers", () => {
     test("should depict query and path params", () => {
       expect(
         depictRequestParams({
-          path: "/v1/user/:id",
-          method: "get",
           endpoint: defaultEndpointsFactory.build({
             methods: ["get", "put", "delete"],
             input: z.object({
@@ -743,9 +760,7 @@ describe("Open API helpers", () => {
           }),
           inputSources: ["query", "params"],
           composition: "inline",
-          getRef: getRefMock,
-          makeRef: makeRefMock,
-          serializer: defaultSerializer,
+          ...requestContext,
         })
       ).toMatchSnapshot();
     });
@@ -753,8 +768,6 @@ describe("Open API helpers", () => {
     test("should depict only path params if query is disabled", () => {
       expect(
         depictRequestParams({
-          path: "/v1/user/:id",
-          method: "get",
           endpoint: defaultEndpointsFactory.build({
             methods: ["get", "put", "delete"],
             input: z.object({
@@ -766,9 +779,7 @@ describe("Open API helpers", () => {
           }),
           inputSources: ["body", "params"],
           composition: "inline",
-          getRef: getRefMock,
-          makeRef: makeRefMock,
-          serializer: defaultSerializer,
+          ...requestContext,
         })
       ).toMatchSnapshot();
     });
@@ -776,8 +787,6 @@ describe("Open API helpers", () => {
     test("should depict none if both query and params are disabled", () => {
       expect(
         depictRequestParams({
-          path: "/v1/user/:id",
-          method: "get",
           endpoint: defaultEndpointsFactory.build({
             methods: ["get", "put", "delete"],
             input: z.object({
@@ -789,9 +798,7 @@ describe("Open API helpers", () => {
           }),
           inputSources: ["body"],
           composition: "inline",
-          getRef: getRefMock,
-          makeRef: makeRefMock,
-          serializer: defaultSerializer,
+          ...requestContext,
         })
       ).toMatchSnapshot();
     });

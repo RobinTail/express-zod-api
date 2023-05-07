@@ -1,8 +1,8 @@
 import { config as exampleConfig } from "../../example/config";
 import { routing } from "../../example/routing";
 import {
+  Documentation,
   EndpointsFactory,
-  OpenAPI,
   createConfig,
   createMiddleware,
   createResultHandler,
@@ -14,7 +14,7 @@ import { expectType } from "tsd";
 import { mimeJson } from "../../src/mime";
 import { z } from "zod";
 
-describe("Open API generator", () => {
+describe("Documentation generator", () => {
   const sampleConfig = createConfig({
     cors: true,
     logger: { level: "debug", color: true },
@@ -23,14 +23,14 @@ describe("Open API generator", () => {
     },
   });
 
-  describe("generateOpenApi()", () => {
+  describe("getSpecAsYaml()", () => {
     test.each([
       { composition: "inline" },
       { composition: "components" },
     ] as const)(
       "should generate the correct schema of example routing %#",
       ({ composition }) => {
-        const spec = new OpenAPI({
+        const spec = new Documentation({
           routing,
           config: exampleConfig,
           version: "1.2.3",
@@ -43,7 +43,7 @@ describe("Open API generator", () => {
     );
 
     test("should generate the correct schema for DELETE request without body", () => {
-      const spec = new OpenAPI({
+      const spec = new Documentation({
         routing: {
           v1: {
             deleteSomething: defaultEndpointsFactory.build({
@@ -68,7 +68,7 @@ describe("Open API generator", () => {
 
     test("should generate the correct schema for complex types", () => {
       const literalValue = "something" as const;
-      const spec = new OpenAPI({
+      const spec = new Documentation({
         config: sampleConfig,
         routing: {
           v1: {
@@ -98,7 +98,7 @@ describe("Open API generator", () => {
     });
 
     test("should generate the correct schema for nullable and optional types", () => {
-      const spec = new OpenAPI({
+      const spec = new Documentation({
         config: sampleConfig,
         routing: {
           v1: {
@@ -127,7 +127,7 @@ describe("Open API generator", () => {
     });
 
     test("should generate the correct schema for intersection type", () => {
-      const spec = new OpenAPI({
+      const spec = new Documentation({
         config: sampleConfig,
         routing: {
           v1: {
@@ -171,7 +171,7 @@ describe("Open API generator", () => {
     });
 
     test("should generate the correct schema for union type", () => {
-      const spec = new OpenAPI({
+      const spec = new Documentation({
         config: sampleConfig,
         routing: {
           v1: {
@@ -206,7 +206,7 @@ describe("Open API generator", () => {
     });
 
     test("should generate the correct schema for discriminated union type", () => {
-      const spec = new OpenAPI({
+      const spec = new Documentation({
         config: sampleConfig,
         routing: {
           v1: {
@@ -238,7 +238,7 @@ describe("Open API generator", () => {
     });
 
     test("should handle transformation schema in output", () => {
-      const spec = new OpenAPI({
+      const spec = new Documentation({
         config: sampleConfig,
         routing: {
           v1: {
@@ -265,7 +265,7 @@ describe("Open API generator", () => {
     });
 
     test("should handle bigint, boolean, date and null", () => {
-      const spec = new OpenAPI({
+      const spec = new Documentation({
         config: sampleConfig,
         routing: {
           v1: {
@@ -295,7 +295,7 @@ describe("Open API generator", () => {
     });
 
     test("should handle record", () => {
-      const spec = new OpenAPI({
+      const spec = new Documentation({
         config: sampleConfig,
         routing: {
           v1: {
@@ -325,7 +325,7 @@ describe("Open API generator", () => {
     });
 
     test("should handle type any", () => {
-      const spec = new OpenAPI({
+      const spec = new Documentation({
         config: sampleConfig,
         routing: {
           v1: {
@@ -349,7 +349,7 @@ describe("Open API generator", () => {
     });
 
     test("should handle different number types", () => {
-      const spec = new OpenAPI({
+      const spec = new Documentation({
         config: sampleConfig,
         routing: {
           v1: {
@@ -381,7 +381,7 @@ describe("Open API generator", () => {
     });
 
     test("should handle different string types", () => {
-      const spec = new OpenAPI({
+      const spec = new Documentation({
         config: sampleConfig,
         routing: {
           v1: {
@@ -423,7 +423,7 @@ describe("Open API generator", () => {
     });
 
     test("should handle tuples", () => {
-      const spec = new OpenAPI({
+      const spec = new Documentation({
         config: sampleConfig,
         routing: {
           v1: {
@@ -453,7 +453,7 @@ describe("Open API generator", () => {
     });
 
     test("should handle enum types", () => {
-      const spec = new OpenAPI({
+      const spec = new Documentation({
         config: sampleConfig,
         routing: {
           v1: {
@@ -485,7 +485,7 @@ describe("Open API generator", () => {
         z.number().int().nonnegative()
       );
       const boolean = z.preprocess((arg) => !!arg, z.boolean());
-      const spec = new OpenAPI({
+      const spec = new Documentation({
         config: sampleConfig,
         routing: {
           v1: {
@@ -521,7 +521,7 @@ describe("Open API generator", () => {
       const categorySchema: z.ZodType<Category> = baseCategorySchema.extend({
         subcategories: z.lazy(() => categorySchema.array()),
       });
-      const spec = new OpenAPI({
+      const spec = new Documentation({
         config: sampleConfig,
         routing: {
           v1: {
@@ -566,7 +566,7 @@ describe("Open API generator", () => {
       ].forEach((zodType) => {
         expect(
           () =>
-            new OpenAPI({
+            new Documentation({
               config: sampleConfig,
               routing: {
                 v1: {
@@ -621,7 +621,7 @@ describe("Open API generator", () => {
         input: z.object({}),
         middleware: jest.fn(),
       });
-      const spec = new OpenAPI({
+      const spec = new Documentation({
         config: sampleConfig,
         routing: {
           v1: {
@@ -660,7 +660,7 @@ describe("Open API generator", () => {
     });
 
     test("should ensure the uniq operation ids", () => {
-      const spec = new OpenAPI({
+      const spec = new Documentation({
         config: sampleConfig,
         routing: {
           v1: {
@@ -704,7 +704,7 @@ describe("Open API generator", () => {
         handler: () => {},
       });
       const factory = new EndpointsFactory(resultHandler);
-      const spec = new OpenAPI({
+      const spec = new Documentation({
         config: sampleConfig,
         routing: {
           v1: {
@@ -729,7 +729,7 @@ describe("Open API generator", () => {
       // There is no such class as ZodNonEmptyArray in Zod v3.7.0+
       // It existed though in Zod v3.6.x:
       // @see https://github.com/colinhacks/zod/blob/v3.6.1/src/types.ts#L1204
-      const spec = new OpenAPI({
+      const spec = new Documentation({
         config: sampleConfig,
         routing: {
           v1: {
@@ -764,7 +764,7 @@ describe("Open API generator", () => {
       expectType<TestingType>({ id: "string", field1: "string" });
       expectType<TestingType>({ id: "string", field2: "string" });
 
-      const spec = new OpenAPI({
+      const spec = new Documentation({
         config: sampleConfig,
         routing: {
           v1: {
@@ -797,7 +797,7 @@ describe("Open API generator", () => {
 
   describe("Route Path Params", () => {
     test("should handle route path params for POST request", () => {
-      const spec = new OpenAPI({
+      const spec = new Documentation({
         config: sampleConfig,
         routing: {
           v1: {
@@ -820,7 +820,7 @@ describe("Open API generator", () => {
     });
 
     test("should handle route path params for GET request", () => {
-      const spec = new OpenAPI({
+      const spec = new Documentation({
         config: sampleConfig,
         routing: {
           v1: {
@@ -845,7 +845,7 @@ describe("Open API generator", () => {
 
   describe("Metadata", () => {
     test("should pass over the schema description", () => {
-      const spec = new OpenAPI({
+      const spec = new Documentation({
         config: sampleConfig,
         routing: {
           v1: {
@@ -873,7 +873,7 @@ describe("Open API generator", () => {
     });
 
     test("Issue #929: the location of the custom description should be on the param level", () => {
-      const spec = new OpenAPI({
+      const spec = new Documentation({
         composition: "components",
         config: sampleConfig,
         routing: {
@@ -902,7 +902,7 @@ describe("Open API generator", () => {
     });
 
     test("should pass over the example of an individual parameter", () => {
-      const spec = new OpenAPI({
+      const spec = new Documentation({
         config: sampleConfig,
         routing: {
           v1: {
@@ -930,7 +930,7 @@ describe("Open API generator", () => {
     });
 
     test("should pass over examples of each param from the whole IO schema examples (GET)", () => {
-      const spec = new OpenAPI({
+      const spec = new Documentation({
         config: sampleConfig,
         routing: {
           v1: {
@@ -962,7 +962,7 @@ describe("Open API generator", () => {
     });
 
     test("should pass over examples of the whole IO schema (POST)", () => {
-      const spec = new OpenAPI({
+      const spec = new Documentation({
         config: sampleConfig,
         routing: {
           v1: {
@@ -994,7 +994,7 @@ describe("Open API generator", () => {
     });
 
     test("should merge endpoint handler examples with its middleware examples", () => {
-      const spec = new OpenAPI({
+      const spec = new Documentation({
         config: sampleConfig,
         routing: {
           v1: {
@@ -1040,7 +1040,7 @@ describe("Open API generator", () => {
 
     test("Issue #827: withMeta() should be immutable", () => {
       const zodSchema = z.object({ a: z.string() });
-      const spec = new OpenAPI({
+      const spec = new Documentation({
         config: sampleConfig,
         routing: {
           v1: {

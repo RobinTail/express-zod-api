@@ -153,7 +153,7 @@ client.provide("get", "/v1/user/retrieve", { id: "10" });
 */
 export class ExpressZodAPIClient {
   constructor(protected readonly implementation: Implementation) {}
-  public readonly provide: Provider = (method, path, params) =>
+  public readonly provide: Provider = async (method, path, params) =>
     this.implementation(
       method,
       Object.keys(params).reduce(

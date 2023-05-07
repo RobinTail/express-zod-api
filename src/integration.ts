@@ -35,8 +35,15 @@ interface Registry {
   [METHOD_PATH: string]: Record<"in" | "out", string> & { isJson: boolean };
 }
 
-interface GeneratorParams {
+interface IntegrationParams {
   routing: Routing;
+  /**
+   * @desc What should be generated
+   * @example "types" — types of your endpoint requests and responses (for a DIY solution)
+   * @example "client" — an entity for performing typed requests and receiving typed responses
+   * @default "client"
+   * */
+  variant?: "types" | "client";
   /**
    * @desc Used for comparing schemas wrapped into z.lazy() to limit the recursion
    * @default JSON.stringify() + SHA1 hash as a hex digest
@@ -60,7 +67,7 @@ interface GeneratorParams {
   };
 }
 
-export class Client {
+export class Integration {
   protected agg: ts.Node[] = [];
   protected registry: Registry = {};
   protected paths: string[] = [];
@@ -77,9 +84,10 @@ export class Client {
 
   constructor({
     routing,
+    variant = "client",
     serializer = defaultSerializer,
     optionalPropStyle = { withQuestionMark: true, withUndefined: true },
-  }: GeneratorParams) {
+  }: IntegrationParams) {
     walkRouting({
       routing,
       onEndpoint: (endpoint, path, method) => {
@@ -149,6 +157,18 @@ export class Client {
         makeQuotedProp(methodPath, this.registry[methodPath].out)
       )
     );
+
+    this.agg.push(
+      pathNode,
+      methodNode,
+      methodPathNode,
+      inputNode,
+      responseNode
+    );
+
+    if (variant === "types") {
+      return;
+    }
 
     const jsonEndpointsNode = f.createVariableStatement(
       exportModifier,
@@ -306,11 +326,6 @@ export class Client {
     );
 
     this.agg.push(
-      pathNode,
-      methodNode,
-      methodPathNode,
-      inputNode,
-      responseNode,
       jsonEndpointsNode,
       providerNode,
       implementationNode,
@@ -320,5 +335,15 @@ export class Client {
 
   public print(printerOptions?: ts.PrinterOptions) {
     return this.agg.map((node) => printNode(node, printerOptions)).join("\n\n");
+  }
+}
+
+/**
+ * @deprecated Use Integration instead
+ * @todo remove in v11
+ * */
+export class Client extends Integration {
+  constructor(params: Omit<IntegrationParams, "variant">) {
+    super({ variant: "client", ...params });
   }
 }

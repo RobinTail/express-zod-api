@@ -1,5 +1,6 @@
 import { ZodError } from "zod";
 import { getMessageFromError } from "./common-helpers";
+import { OpenAPIContext } from "./documentation-helpers";
 
 /** @desc An error related to the wrong Routing declaration */
 export class RoutingError extends Error {
@@ -11,9 +12,32 @@ export class DependsOnMethodError extends RoutingError {
   public override name = "DependsOnMethodError";
 }
 
-/** @desc An error related to the generating of the documentation */
+/**
+ * @desc An error related to the generating of the documentation
+ * @todo rename to DocumentationError in v11
+ * @todo remove params:string variation in v11
+ * */
 export class OpenAPIError extends Error {
   public override name = "OpenAPIError";
+
+  constructor(
+    params:
+      | string // backward compatibility
+      | ({ message: string } & Pick<
+          OpenAPIContext,
+          "path" | "method" | "isResponse"
+        >)
+  ) {
+    const finalMessage =
+      typeof params === "string"
+        ? params
+        : `${params.message}\nCaused by ${
+            params.isResponse ? "response" : "input"
+          } schema of an Endpoint assigned to ${params.method.toUpperCase()} method of ${
+            params.path
+          } path.`;
+    super(finalMessage);
+  }
 }
 
 /** @desc An error related to the input and output schemas declaration */

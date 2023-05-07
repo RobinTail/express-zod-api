@@ -1,5 +1,5 @@
 import fs from "node:fs";
-import { OpenAPI } from "../src";
+import { Documentation } from "../src";
 import { config } from "./config";
 import { routing } from "./routing";
 import manifest from "../package.json";
@@ -7,7 +7,7 @@ import manifest from "../package.json";
 for (const variant of ["3.0", "3.1"] as const) {
   fs.writeFileSync(
     `example/example.documentation.${variant}.yaml`,
-    new OpenAPI({
+    new Documentation({
       variant,
       routing,
       config,
