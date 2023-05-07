@@ -56,7 +56,8 @@ interface DocumentationParams {
   serializer?: (schema: z.ZodTypeAny) => string;
 }
 
-export class Documentation extends OpenApiBuilder {
+export class Documentation {
+  public builder: OpenApiBuilder;
   protected lastSecuritySchemaIds: Partial<Record<SecuritySchemeType, number>> =
     {};
   protected lastOperationIdSuffixes: Record<string, number> = {};
@@ -65,12 +66,12 @@ export class Documentation extends OpenApiBuilder {
     name: string,
     schema: SchemaObject | ReferenceObject
   ): ReferenceObject {
-    this.addSchema(name, schema);
+    this.builder.addSchema(name, schema);
     return this.getRef(name)!;
   }
 
   protected getRef(name: string): ReferenceObject | undefined {
-    return name in (this.rootDoc.components?.schemas || {})
+    return name in (this.builder.rootDoc.components?.schemas || {})
       ? { $ref: `#/components/schemas/${name}` }
       : undefined;
   }
@@ -87,10 +88,10 @@ export class Documentation extends OpenApiBuilder {
 
   protected ensureUniqSecuritySchemaName(subject: SecuritySchemeObject) {
     const serializedSubject = JSON.stringify(subject);
-    for (const name in this.rootDoc.components?.securitySchemes || {}) {
+    for (const name in this.builder.rootDoc.components?.securitySchemes || {}) {
       if (
         serializedSubject ===
-        JSON.stringify(this.rootDoc.components?.securitySchemes?.[name])
+        JSON.stringify(this.builder.rootDoc.components?.securitySchemes?.[name])
       ) {
         return name;
       }
@@ -115,9 +116,9 @@ export class Documentation extends OpenApiBuilder {
     serializer = defaultSerializer,
     variant = "3.0",
   }: DocumentationParams) {
-    super();
-    this.addOpenApiVersion(`${variant}.0`);
-    this.addInfo({ title, version }).addServer({ url: serverUrl });
+    this.builder = new OpenApiBuilder();
+    this.builder.addOpenApiVersion(`${variant}.0`);
+    this.builder.addInfo({ title, version }).addServer({ url: serverUrl });
     const onEndpoint: RoutingWalkerParams["onEndpoint"] = (
       endpoint,
       path,
@@ -185,7 +186,7 @@ export class Documentation extends OpenApiBuilder {
             )
               ? endpoint.getScopes()
               : [];
-            this.addSecurityScheme(name, securitySchema);
+            this.builder.addSecurityScheme(name, securitySchema);
             return { name, scopes };
           }
         )
@@ -194,12 +195,17 @@ export class Documentation extends OpenApiBuilder {
         operation.security = securityRefs;
       }
       const swaggerCompatiblePath = reformatParamsInPath(path);
-      this.addPath(swaggerCompatiblePath, {
+      this.builder.addPath(swaggerCompatiblePath, {
         [method]: operation,
       });
     };
     walkRouting({ routing, onEndpoint });
-    this.rootDoc.tags = config.tags ? depictTags(config.tags) : [];
+    this.builder.rootDoc.tags = config.tags ? depictTags(config.tags) : [];
+  }
+
+  /** @see Documentation.builder */
+  public getSpecAsYaml() {
+    return this.builder.getSpecAsYaml();
   }
 }
 

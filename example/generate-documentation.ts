@@ -14,7 +14,7 @@ for (const variant of ["3.0", "3.1"] as const) {
       version: manifest.version,
       title: "Example API",
       serverUrl: "http://example.com",
-    }).getSpecAsYaml(),
+    }).builder.getSpecAsYaml(),
     "utf8"
   );
 }
