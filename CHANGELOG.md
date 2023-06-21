@@ -2,6 +2,10 @@
 
 ## Version 10
 
+### v10.9.0
+
+- `winston` version is 3.9.0.
+
 ### v10.8.1
 
 - Add missing `async` keyword to `ExpressZodAPIClient::provide()` method.
