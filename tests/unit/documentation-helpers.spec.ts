@@ -2,7 +2,12 @@ import { ReferenceObject, SchemaObject } from "openapi3-ts/oas30";
 import { z } from "zod";
 import { defaultSerializer } from "../../src/common-helpers";
 import { IOSchemaError } from "../../src/errors";
-import { OpenAPIError, defaultEndpointsFactory, ez, withMeta } from "../../src";
+import {
+  DocumentationError,
+  defaultEndpointsFactory,
+  ez,
+  withMeta,
+} from "../../src";
 import { getMeta } from "../../src/metadata";
 import {
   OpenAPIContext,
@@ -282,7 +287,7 @@ describe("Documentation helpers", () => {
         });
         fail("Should not be here");
       } catch (e) {
-        expect(e).toBeInstanceOf(OpenAPIError);
+        expect(e).toBeInstanceOf(DocumentationError);
         expect(e).toMatchSnapshot();
       }
     });
@@ -310,7 +315,7 @@ describe("Documentation helpers", () => {
         });
         fail("Should not be here");
       } catch (e) {
-        expect(e).toBeInstanceOf(OpenAPIError);
+        expect(e).toBeInstanceOf(DocumentationError);
         expect(e).toMatchSnapshot();
       }
     });
@@ -835,7 +840,7 @@ describe("Documentation helpers", () => {
         });
         fail("should not be here");
       } catch (e) {
-        expect(e).toBeInstanceOf(OpenAPIError);
+        expect(e).toBeInstanceOf(DocumentationError);
         expect(e).toMatchSnapshot();
       }
     });
@@ -860,7 +865,7 @@ describe("Documentation helpers", () => {
         });
         fail("should not be here");
       } catch (e) {
-        expect(e).toBeInstanceOf(OpenAPIError);
+        expect(e).toBeInstanceOf(DocumentationError);
         expect(e).toMatchSnapshot();
       }
     });
@@ -878,7 +883,7 @@ describe("Documentation helpers", () => {
           });
           fail("should not be here");
         } catch (e) {
-          expect(e).toBeInstanceOf(OpenAPIError);
+          expect(e).toBeInstanceOf(DocumentationError);
           expect(e).toMatchSnapshot();
         }
       }

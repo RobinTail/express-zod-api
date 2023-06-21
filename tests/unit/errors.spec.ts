@@ -1,5 +1,9 @@
 import { ZodError } from "zod";
-import { DependsOnMethodError, OpenAPIError, RoutingError } from "../../src";
+import {
+  DependsOnMethodError,
+  DocumentationError,
+  RoutingError,
+} from "../../src";
 import {
   IOSchemaError,
   InputValidationError,
@@ -18,7 +22,7 @@ describe("Errors", () => {
     });
   });
 
-  describe("OpenAPIError", () => {
+  describe("DocumentationError", () => {
     const params = {
       message: "test",
       path: "/v1/testPath",
@@ -27,19 +31,15 @@ describe("Errors", () => {
     };
 
     test("should be an instance of Error", () => {
-      expect(new OpenAPIError(params)).toBeInstanceOf(Error);
+      expect(new DocumentationError(params)).toBeInstanceOf(Error);
     });
 
     test("should include more details into the message", () => {
-      expect(new OpenAPIError(params).message).toMatchSnapshot();
+      expect(new DocumentationError(params).message).toMatchSnapshot();
     });
 
     test("should have the name matching its class", () => {
-      expect(new OpenAPIError(params).name).toBe("OpenAPIError");
-    });
-
-    test("should be backward compatible", () => {
-      expect(new OpenAPIError(params.message).message).toBe(params.message);
+      expect(new DocumentationError(params).name).toBe("DocumentationError");
     });
   });
 
