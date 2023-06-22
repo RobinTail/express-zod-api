@@ -1,5 +1,14 @@
 # Changelog
 
+## Version 11
+
+- **Breaking changes**:
+  - Minimum Node version supported: 16.14.0.
+  - `OpenAPIError` renamed to `DocumentationError`.
+    - It's also now only accepts object argument. Use its `message` prop instead.
+  - `OpenAPI` class removed. Use `Documentation` one instead (same constructor props).
+  - `Client` class removed. Use `Integration` one instead (the default `variant` is `client`).
+
 ## Version 10
 
 ### v10.9.0

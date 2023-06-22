@@ -193,9 +193,3 @@ export class Documentation extends OpenApiBuilder {
     this.rootDoc.tags = config.tags ? depictTags(config.tags) : [];
   }
 }
-
-/**
- * @deprecated Use Documentation instead.
- * @todo remove in v11
- * */
-export class OpenAPI extends Documentation {}

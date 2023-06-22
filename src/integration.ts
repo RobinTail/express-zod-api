@@ -337,13 +337,3 @@ export class Integration {
     return this.agg.map((node) => printNode(node, printerOptions)).join("\n\n");
   }
 }
-
-/**
- * @deprecated Use Integration instead
- * @todo remove in v11
- * */
-export class Client extends Integration {
-  constructor(params: Omit<IntegrationParams, "variant">) {
-    super({ variant: "client", ...params });
-  }
-}

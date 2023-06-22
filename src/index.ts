@@ -15,9 +15,9 @@ export { DependsOnMethod } from "./depends-on-method";
 export { ServeStatic } from "./serve-static";
 export { Routing } from "./routing";
 export { createServer, attachRouting } from "./server";
-export { Documentation, OpenAPI } from "./documentation";
+export { Documentation } from "./documentation";
 export {
-  OpenAPIError,
+  DocumentationError,
   DependsOnMethodError,
   RoutingError,
   OutputValidationError,
@@ -25,7 +25,7 @@ export {
 } from "./errors";
 export { withMeta } from "./metadata";
 export { testEndpoint } from "./mock";
-export { Integration, Client } from "./integration";
+export { Integration } from "./integration";
 
 export * as ez from "./proprietary-schemas";
 export type { ZodDateInDef } from "./date-in-schema";

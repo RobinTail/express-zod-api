@@ -31,7 +31,7 @@ import { InputSource, TagsConfig } from "./config-type";
 import { ZodDateIn, isoDateRegex } from "./date-in-schema";
 import { ZodDateOut } from "./date-out-schema";
 import { AbstractEndpoint } from "./endpoint";
-import { OpenAPIError } from "./errors";
+import { DocumentationError } from "./errors";
 import { ZodFile } from "./file-schema";
 import { IOSchema } from "./io-schema";
 import {
@@ -124,7 +124,7 @@ export const depictAny: Depicter<z.ZodAny> = () => ({
 
 export const depictUpload: Depicter<ZodUpload> = (ctx) => {
   if (ctx.isResponse) {
-    throw new OpenAPIError({
+    throw new DocumentationError({
       message: "Please use z.upload() only for input.",
       ...ctx,
     });
@@ -140,7 +140,7 @@ export const depictFile: Depicter<ZodFile> = ({
   ...ctx
 }) => {
   if (!ctx.isResponse) {
-    throw new OpenAPIError({
+    throw new DocumentationError({
       message: "Please use z.file() only within ResultHandler.",
       ...ctx,
     });
@@ -238,7 +238,7 @@ export const depictNull: Depicter<z.ZodNull> = () => ({
 
 export const depictDateIn: Depicter<ZodDateIn> = (ctx) => {
   if (ctx.isResponse) {
-    throw new OpenAPIError({
+    throw new DocumentationError({
       message: "Please use z.dateOut() for output.",
       ...ctx,
     });
@@ -256,7 +256,7 @@ export const depictDateIn: Depicter<ZodDateIn> = (ctx) => {
 
 export const depictDateOut: Depicter<ZodDateOut> = (ctx) => {
   if (!ctx.isResponse) {
-    throw new OpenAPIError({
+    throw new DocumentationError({
       message: "Please use z.dateIn() for input.",
       ...ctx,
     });
@@ -271,9 +271,9 @@ export const depictDateOut: Depicter<ZodDateOut> = (ctx) => {
   };
 };
 
-/** @throws OpenAPIError */
+/** @throws DocumentationError */
 export const depictDate: Depicter<z.ZodDate> = (ctx) => {
-  throw new OpenAPIError({
+  throw new DocumentationError({
     message: `Using z.date() within ${
       ctx.isResponse ? "output" : "input"
     } schema is forbidden. Please use z.date${
@@ -610,7 +610,7 @@ export function extractObjectSchema(
       .reduce((acc, option) => acc.merge(option.partial()), z.object({}));
   } else if (subject instanceof z.ZodEffects) {
     if (hasTopLevelTransformingEffect(subject)) {
-      throw new OpenAPIError({
+      throw new DocumentationError({
         message: `Using transformations on the top level of ${
           ctx.isResponse ? "response" : "input"
         } schema is not allowed.`,
@@ -747,7 +747,7 @@ export const onMissing: Depicter<z.ZodTypeAny, "last"> = ({
   schema,
   ...ctx
 }) => {
-  throw new OpenAPIError({
+  throw new DocumentationError({
     message: `Zod type ${schema.constructor.name} is unsupported.`,
     ...ctx,
   });
