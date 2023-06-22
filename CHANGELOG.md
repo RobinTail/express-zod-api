@@ -7,8 +7,7 @@
   - `OpenAPIError` renamed to `DocumentationError`.
     - It's also now only accepts object argument. Use its `message` prop instead.
   - `OpenAPI` class removed. Use `Documentation` one instead (same constructor props).
-  - `Client` class removed. Use `Integration` one instead.
-    - Instantiate by `new Integration({ variant: "client" })` for achieving the same behavior.
+  - `Client` class removed. Use `Integration` one instead (the default `variant` is `client`).
 
 ## Version 10
 
