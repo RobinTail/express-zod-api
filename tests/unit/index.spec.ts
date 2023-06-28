@@ -6,7 +6,7 @@ describe("Index Entrypoint", () => {
     let imported: typeof entrypoint;
 
     beforeAll(async () => {
-      imported = await import("../../src");
+      imported = await import("../../src/index.ts");
     });
 
     test("should have certain entities exposed", () => {
