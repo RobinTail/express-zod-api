@@ -17,7 +17,7 @@
     "test:int": "jest ./tests/integration",
     "test:esm": "jest ./tests/esm",
     "test:u": "yarn test:jest -u && yarn test:badge",
-    "test:types": "tsc --noEmit",
+    "test:types": "tsc",
     "test:jest": "jest --detectOpenHandles ./tests/unit ./tests/system",
     "test:badge": "make-coverage-badge --output-path ./coverage.svg",
     "lint": "eslint ./src ./example ./tests && yarn prettier *.md --check",

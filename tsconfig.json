@@ -4,8 +4,10 @@
     "noImplicitAny": true,
     "strictNullChecks": true,
     "resolveJsonModule": true,
-    "allowImportingTsExtensions": true
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
   },
+  "exclude": ["tests/integration", "tests/esm"],
   "ts-node": {
     "swc": true
   }
