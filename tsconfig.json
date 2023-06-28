@@ -5,6 +5,7 @@
     "strictNullChecks": true,
     "resolveJsonModule": true
   },
+  "exclude": ["tests/integration", "tests/esm"],
   "ts-node": {
     "swc": true
   }

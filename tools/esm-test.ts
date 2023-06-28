@@ -19,7 +19,7 @@ const packageJson = `
     "@tsconfig/node${tsconfigBase}": "latest",
     "express-zod-api": "../../dist/esm",
     "ts-node": "10.9.1",
-    "typescript": "5.0.4",
+    "typescript": "5.1.5",
     "@types/node": "*"
   }
 }
@@ -29,8 +29,8 @@ const tsConfigJson = `
 {
   "extends": "@tsconfig/node${tsconfigBase}/tsconfig.json",
   "compilerOptions": {
-    "module": "ES2015",
-    "moduleResolution": "Node"
+    "module": "ES2022",
+    "moduleResolution": "Bundler"
   }
 }
 `;
