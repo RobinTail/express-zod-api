@@ -9,7 +9,7 @@ import { Rule } from "eslint";
  */
 
 export default {
-  "core-node-prefix": <Rule.RuleModule>{
+  "core-node-prefix": {
     meta: {
       type: "problem",
       docs: {
@@ -42,4 +42,4 @@ export default {
       },
     }),
   },
-};
+} satisfies Record<"core-node-prefix", Rule.RuleModule>;
