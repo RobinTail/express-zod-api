@@ -35,11 +35,15 @@ jobs:
         key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ matrix.node-version }}-${{ hashFiles('**/yarn.lock') }}
     - name: Install dependencies
       run: yarn install
-    - name: Test and build
-      run: | 
-        yarn lint
-        yarn test
+    - name: Build
+      run: |
         yarn build
+        yarn build:intTest
+        yarn build:esmTest
+    - name: Lint
+      run: yarn lint
+    - name: Test
+      run: yarn test
     - name: Coveralls
       uses: coverallsapp/github-action@v1
       continue-on-error: true
@@ -48,13 +52,9 @@ jobs:
         flag-name: run-${{ matrix.node-version }}
         parallel: true
     - name: Integration test
-      run: |
-        yarn build:intTest
-        yarn test:int
+      run: yarn test:int
     - name: ESM test
-      run: |
-        yarn build:esmTest
-        yarn test:esm
+      run: yarn test:esm
   finish:
     needs: build
     runs-on: ubuntu-latest
