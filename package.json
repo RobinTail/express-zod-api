@@ -5,8 +5,9 @@
   "license": "MIT",
   "scripts": {
     "start": "ts-node example/index.ts",
-    "build": "yarn build:compile && yarn build:swagger && yarn build:client && yarn build:license",
-    "build:compile": "tsup && mv dist/index.d.mts dist/esm/index.d.ts",
+    "build": "yarn build:compile && yarn build:dts && yarn build:swagger && yarn build:client && yarn build:license",
+    "build:compile": "tsup",
+    "build:dts": "mv dist/index.d.mts dist/esm/index.d.ts && attw --pack",
     "build:swagger": "ts-node example/generate-open-api-schema.ts > example/example.swagger.yaml",
     "build:client": "ts-node example/generate-client.ts > example/example.client.ts && yarn prettier example/example.client.ts --write",
     "build:license": "ts-node tools/license.ts > ./LICENSE",
@@ -30,9 +31,16 @@
   "types": "dist/index.d.ts",
   "module": "dist/esm/index.js",
   "exports": {
-    "types": "./dist/index.d.ts",
-    "require": "./dist/index.js",
-    "import": "./dist/esm/index.js"
+    ".": {
+      "import": {
+        "default": "./dist/esm/index.js",
+        "types": "./dist/esm/index.d.ts"
+      },
+      "require": {
+        "default": "./dist/index.js",
+        "types": "./dist/index.d.ts"
+      }
+    }
   },
   "dependencies": {
     "@types/compression": "^1.7.2",
@@ -71,6 +79,7 @@
     }
   },
   "devDependencies": {
+    "@arethetypeswrong/cli": "^0.4.2",
     "@swc/core": "^1.3.39",
     "@swc/jest": "^0.2.24",
     "@tsconfig/node16": "^1.0.4",
