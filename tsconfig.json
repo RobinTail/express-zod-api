@@ -3,9 +3,7 @@
   "compilerOptions": {
     "noImplicitAny": true,
     "strictNullChecks": true,
-    "resolveJsonModule": true,
-    "noEmit": true,
-    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true
   },
   "exclude": ["tests/integration", "tests/esm"],
   "ts-node": {
