@@ -3,6 +3,13 @@ import { defineConfig } from "tsup";
 import { writeFile } from "node:fs/promises";
 import originalManifest from "./package.json";
 
+/**
+ * @todo install @arethetypeswrong/cli and run attw --pack after dropping Node 16
+ *
+ * @todo get rid of build:dts command after the following issue fixed:
+ * @link https://github.com/egoist/tsup/issues/938
+ * */
+
 export default defineConfig({
   entry: ["src/index.ts"],
   format: ["cjs", "esm"],
