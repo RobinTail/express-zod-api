@@ -18,13 +18,15 @@
   "plugins": [
     "@typescript-eslint",
     "prettier",
-    "import"
+    "import",
+    "eslint-plugin-local-rules"
   ],
   "rules": {
     "@typescript-eslint/lines-between-class-members": "off",
     "sort-imports": ["warn", {
       "ignoreDeclarationSort": true
-    }]
+    }],
+    "local-rules/core-node-prefix": "error"
   },
   "overrides": [
     {
