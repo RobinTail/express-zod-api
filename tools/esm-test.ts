@@ -29,9 +29,8 @@ const tsConfigJson = `
 {
   "extends": "@tsconfig/node${tsconfigBase}/tsconfig.json",
   "compilerOptions": {
-    "module": "ES2015",
-    "moduleResolution": "Node16",
-    "allowImportingTsExtensions": true
+    "module": "ES2022",
+    "moduleResolution": "Bundler"
   }
 }
 `;

@@ -1,12 +1,6 @@
 import { ChildProcessWithoutNullStreams, spawn } from "child_process";
-import { esmTestPort, waitFor } from "../helpers.ts";
-
-/**
- * @todo replace with importing v3 when jest fixes the ESM support
- * @link https://jestjs.io/docs/ecmascript-modules
- * @link https://github.com/jestjs/jest/issues/9430
- */
-const { default: fetch } = require("node-fetch");
+import fetch from "node-fetch";
+import { esmTestPort, waitFor } from "../helpers";
 
 describe("ESM Test", () => {
   let quickStart: ChildProcessWithoutNullStreams;
