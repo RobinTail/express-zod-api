@@ -1,10 +1,10 @@
 import fetch from "node-fetch";
-import { ChildProcessWithoutNullStreams, spawn } from "child_process";
+import { ChildProcessWithoutNullStreams, spawn } from "node:child_process";
 import { mimeMultipart } from "../../src/mime";
 import { waitFor } from "../helpers";
-import crypto from "crypto";
+import { createHash } from "node:crypto";
 import FormData from "form-data";
-import { readFileSync } from "fs";
+import { readFile } from "node:fs/promises";
 
 describe("Example", () => {
   let example: ChildProcessWithoutNullStreams;
@@ -128,8 +128,7 @@ describe("Example", () => {
       expect(response.headers.get("Content-encoding")).toBe("gzip");
       expect(response.headers.has("Transfer-encoding")).toBeTruthy();
       expect(response.headers.get("Transfer-encoding")).toBe("chunked");
-      const hash = crypto
-        .createHash("sha1")
+      const hash = createHash("sha1")
         .update(await response.text())
         .digest("hex");
       expect(hash).toMatchSnapshot();
@@ -144,8 +143,7 @@ describe("Example", () => {
       expect(response.headers.get("Content-type")).toBe("image/svg+xml");
       expect(response.headers.has("Transfer-encoding")).toBeTruthy();
       expect(response.headers.get("Transfer-encoding")).toBe("chunked");
-      const hash = crypto
-        .createHash("sha1")
+      const hash = createHash("sha1")
         .update(await response.text())
         .digest("hex");
       expect(hash).toMatchSnapshot();
@@ -155,8 +153,7 @@ describe("Example", () => {
       const response = await fetch("http://localhost:8090/public/logo.svg");
       expect(response.status).toBe(200);
       expect(response.headers.get("Content-type")).toBe("image/svg+xml");
-      const hash = crypto
-        .createHash("sha1")
+      const hash = createHash("sha1")
         .update(await response.text())
         .digest("hex");
       expect(hash).toMatchSnapshot();
@@ -164,7 +161,7 @@ describe("Example", () => {
 
     test("Should upload the file", async () => {
       const filename = "logo.svg";
-      const logo = readFileSync(filename, "utf-8");
+      const logo = await readFile(filename, "utf-8");
       const data = new FormData();
       data.append("avatar", logo, { filename });
       data.append("str", "test string value");

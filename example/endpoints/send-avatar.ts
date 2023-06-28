@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { fileSendingEndpointsFactory } from "../factories";
-import fs from "fs";
+import { readFile } from "node:fs/promises";
 
 export const sendAvatarEndpoint = fileSendingEndpointsFactory.build({
   method: "get",
@@ -16,7 +16,7 @@ export const sendAvatarEndpoint = fileSendingEndpointsFactory.build({
     data: z.string(),
   }),
   handler: async () => {
-    const data = fs.readFileSync("logo.svg", "utf-8");
+    const data = await readFile("logo.svg", "utf-8");
     return { data };
   },
 });

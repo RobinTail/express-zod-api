@@ -7,7 +7,7 @@ import {
 } from "../src";
 import { config } from "./config";
 import { authMiddleware } from "./middlewares";
-import fs from "fs";
+import { createReadStream } from "node:fs";
 import { z } from "zod";
 
 export const taggedEndpointsFactory = new EndpointsFactory({
@@ -60,9 +60,7 @@ export const fileStreamingEndpointsFactory = new EndpointsFactory({
         return;
       }
       if ("filename" in output) {
-        fs.createReadStream(output.filename).pipe(
-          response.type(output.filename)
-        );
+        createReadStream(output.filename).pipe(response.type(output.filename));
       } else {
         response.status(400).send("Filename is missing");
       }

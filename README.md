@@ -708,11 +708,11 @@ The documentation on these arguments you may find [here](http://expressjs.com/en
 
 ```typescript
 import { Routing, ServeStatic } from "express-zod-api";
-import path from "path";
+import { join } from "node:path";
 
 const routing: Routing = {
   // path /public serves static files from ./assets
-  public: new ServeStatic(path.join(__dirname, "assets"), {
+  public: new ServeStatic(join(__dirname, "assets"), {
     dotfiles: "deny",
     index: false,
     redirect: false,
@@ -808,10 +808,10 @@ Consuming the generated client requires Typescript version 4.1 or higher.
 
 ```typescript
 // example client-generator.ts
-import fs from "fs";
+import { writeFileSync } from "node:fs";
 import { Integration } from "express-zod-api";
 
-fs.writeFileSync(
+writeFileSync(
   "./frontend/client.ts",
   new Integration({
     routing,

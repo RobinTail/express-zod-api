@@ -1,7 +1,7 @@
 import express, { ErrorRequestHandler, RequestHandler, json } from "express";
 import compression from "compression";
 import fileUpload from "express-fileupload";
-import https from "https";
+import https from "node:https";
 import { Logger } from "winston";
 import { AppConfig, CommonConfig, ServerConfig } from "./config-type";
 import { ResultHandlerError } from "./errors";

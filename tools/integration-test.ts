@@ -1,4 +1,4 @@
-import fs from "fs";
+import { writeFileSync } from "node:fs";
 import { extractReadmeQuickStart } from "./extract-quick-start";
 import { getTSConfigBase } from "./tsconfig-base";
 
@@ -30,6 +30,6 @@ const tsConfigJson = `
 const quickStart = extractReadmeQuickStart();
 
 const dir = "./tests/integration";
-fs.writeFileSync(`${dir}/package.json`, packageJson.trim());
-fs.writeFileSync(`${dir}/tsconfig.json`, tsConfigJson.trim());
-fs.writeFileSync(`${dir}/quick-start.ts`, quickStart.trim());
+writeFileSync(`${dir}/package.json`, packageJson.trim());
+writeFileSync(`${dir}/tsconfig.json`, tsConfigJson.trim());
+writeFileSync(`${dir}/quick-start.ts`, quickStart.trim());
