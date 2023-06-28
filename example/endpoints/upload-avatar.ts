@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { ez } from "../../src";
-import crypto from "crypto";
+import { createHash } from "node:crypto";
 import { taggedEndpointsFactory } from "../factories";
 
 export const uploadAvatarEndpoint = taggedEndpointsFactory.build({
@@ -29,7 +29,7 @@ export const uploadAvatarEndpoint = taggedEndpointsFactory.build({
       name: avatar.name,
       size: avatar.size,
       mime: avatar.mimetype,
-      hash: crypto.createHash("sha1").update(avatar.data).digest("hex"),
+      hash: createHash("sha1").update(avatar.data).digest("hex"),
       otherInputs: rest,
     };
   },

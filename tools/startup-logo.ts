@@ -1,6 +1,6 @@
 import chalk from "chalk";
 import { format } from "pretty-format";
-import fs from "fs";
+import { writeFileSync } from "node:fs";
 
 const attribution = `
 // ANSI font attribution
@@ -53,4 +53,4 @@ ${serialized}
 };
 `;
 
-fs.writeFileSync("./src/startup-logo.ts", output);
+writeFileSync("./src/startup-logo.ts", output);

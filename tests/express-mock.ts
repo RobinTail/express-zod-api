@@ -1,5 +1,5 @@
 // @see https://github.com/swc-project/jest/issues/14#issuecomment-970189585
-import http from "http";
+import http from "node:http";
 
 const expressJsonMock = jest.fn();
 const compressionMock = jest.fn();
