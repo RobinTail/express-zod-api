@@ -32,7 +32,8 @@
     {
       "files": [
         "./tools/*.ts",
-        "./tests/**/*.ts"
+        "./tests/**/*.ts",
+        "./eslint-local-rules/*.*s"
       ],
       "rules": {
         "import/no-extraneous-dependencies": "off"

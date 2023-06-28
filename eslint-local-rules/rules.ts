@@ -1,17 +1,15 @@
+import { builtinModules } from "node:module";
+import { Rule } from "eslint";
+
 /**
  * @link https://gist.github.com/alex-kinokon/f8f373e1a6bb01aa654d9085f2cff834
  * @todo remove when the issue fixed:
  * @link https://github.com/import-js/eslint-plugin-import/issues/2717
  * @licence https://unlicense.org/
- * @ts-check
  */
-const { builtinModules } = require("module");
 
-/**
- * @type {import("eslint").Rule.RuleModule}
- */
-module.exports = {
-  "core-node-prefix": {
+export default {
+  "core-node-prefix": <Rule.RuleModule>{
     meta: {
       type: "problem",
       docs: {

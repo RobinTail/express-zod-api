@@ -18,4 +18,4 @@ coverage
 .prettierignore
 tsup.config.ts
 dist-esm
-eslint-local-rules.js
+eslint-local-rules
