@@ -2,6 +2,18 @@
 
 ## Version 11
 
+### v11.1.0
+
+- Sourcemaps are removed from the distribution.
+  - No one has ever used them for reporting issues.
+  - Their size is significantly large.
+- Both CJS and ESM bundles have their own declaration files:
+  - `/dist/index.d.ts` for CJS,
+  - `/dist/esm/index.d.ts` for ESM.
+  - The `exports` entry of `package.json` is adjusted accordingly.
+
+### v11.0.0
+
 - **Breaking changes**:
   - Minimum Node version supported: 16.14.0.
   - `OpenAPIError` renamed to `DocumentationError`.
