@@ -1,14 +1,21 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { defineConfig } from "tsup";
-import fs from "fs";
+import { writeFile } from "node:fs/promises";
 import originalManifest from "./package.json";
+
+/**
+ * @todo install @arethetypeswrong/cli and run attw --pack after dropping Node 16
+ *
+ * @todo get rid of build:dts command after the following issue fixed:
+ * @link https://github.com/egoist/tsup/issues/938
+ * */
 
 export default defineConfig({
   entry: ["src/index.ts"],
   format: ["cjs", "esm"],
   legacyOutput: true,
   splitting: false,
-  sourcemap: true,
+  sourcemap: false,
   clean: true,
   dts: true,
   minify: true,
@@ -17,9 +24,6 @@ export default defineConfig({
       type: "module",
       version: originalManifest.version, // for yarn in esm test
     };
-    fs.writeFileSync(
-      "./dist/esm/package.json",
-      `${JSON.stringify(manifest)}\n`
-    );
+    await writeFile("./dist/esm/package.json", `${JSON.stringify(manifest)}\n`);
   },
 });
