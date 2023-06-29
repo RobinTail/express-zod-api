@@ -2,6 +2,13 @@
 
 ## Version 11
 
+### v11.1.1
+
+- Technical update, no new features.
+  - `@tsconfig/node16` base version is 16.1.0.
+  - Using `node:` prefix for importing builtin modules.
+  - `typescript` v5.1.6, `esbuild` v0.18.10 and `rollup` v3.25.3.
+
 ### v11.1.0
 
 - Sourcemaps are removed from the distribution.
