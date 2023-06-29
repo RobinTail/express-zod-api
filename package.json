@@ -5,7 +5,7 @@
   "license": "MIT",
   "scripts": {
     "start": "ts-node example/index.ts",
-    "build": "yarn build:compile && yarn build:dts && yarn build:tests yarn build:swagger && yarn build:client && yarn build:license",
+    "build": "yarn build:compile && yarn build:dts && yarn build:tests && yarn build:swagger && yarn build:client && yarn build:license",
     "build:compile": "tsup",
     "build:dts": "mv dist/index.d.mts dist/esm/index.d.ts",
     "build:swagger": "ts-node example/generate-open-api-schema.ts > example/example.swagger.yaml",
