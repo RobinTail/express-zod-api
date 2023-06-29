@@ -36,10 +36,7 @@ jobs:
     - name: Install dependencies
       run: yarn install
     - name: Build
-      run: |
-        yarn build
-        yarn build:intTest
-        yarn build:esmTest
+      run: yarn build
     - name: Lint
       run: yarn lint
     - name: Test
