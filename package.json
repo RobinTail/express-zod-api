@@ -34,12 +34,12 @@
   "exports": {
     ".": {
       "import": {
-        "default": "./dist/esm/index.js",
-        "types": "./dist/esm/index.d.ts"
+        "types": "./dist/esm/index.d.ts",
+        "default": "./dist/esm/index.js"
       },
       "require": {
-        "default": "./dist/index.js",
-        "types": "./dist/index.d.ts"
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
       }
     }
   },
