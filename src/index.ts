@@ -23,7 +23,7 @@ export {
   OutputValidationError,
   InputValidationError,
 } from "./errors";
-export { withMeta } from "./metadata";
+export { getMeta, withMeta } from "./metadata";
 export { testEndpoint } from "./mock";
 export { Integration } from "./integration";
 
