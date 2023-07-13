@@ -34,7 +34,7 @@ export const createNotFoundHandler =
   (request, response) => {
     const error = createHttpError(
       404,
-      `Can not ${request.method} ${request.path}`
+      `Can not ${request.method} ${request.path}`,
     );
     try {
       errorHandler.handler({
@@ -56,7 +56,7 @@ export const createNotFoundHandler =
 
 export function attachRouting(
   config: AppConfig & CommonConfig,
-  routing: Routing
+  routing: Routing,
 ) {
   const logger = isLoggerConfig(config.logger)
     ? createLogger(config.logger)
@@ -69,7 +69,7 @@ export function attachRouting(
 
 export function createServer(
   config: ServerConfig & CommonConfig,
-  routing: Routing
+  routing: Routing,
 ) {
   const logger = isLoggerConfig(config.logger)
     ? createLogger(config.logger)

@@ -6,5 +6,5 @@ const manifest = {
 
 writeFileSync(
   "./tests/integration/node_modules/express-zod-api/package.json",
-  `${JSON.stringify(manifest)}\n`
+  `${JSON.stringify(manifest)}\n`,
 );

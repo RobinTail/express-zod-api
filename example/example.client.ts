@@ -120,13 +120,13 @@ export const jsonEndpoints = {
 export type Provider = <M extends Method, P extends Path>(
   method: M,
   path: P,
-  params: Input[`${M} ${P}`]
+  params: Input[`${M} ${P}`],
 ) => Promise<Response[`${M} ${P}`]>;
 
 export type Implementation = (
   method: Method,
   path: string,
-  params: Record<string, any>
+  params: Record<string, any>,
 ) => Promise<any>;
 
 /*
@@ -158,12 +158,12 @@ export class ExpressZodAPIClient {
       method,
       Object.keys(params).reduce(
         (acc, key) => acc.replace(`:${key}`, params[key]),
-        path
+        path,
       ),
       Object.keys(params).reduce(
         (acc, key) =>
           path.indexOf(`:${key}`) >= 0 ? acc : { ...acc, [key]: params[key] },
-        {}
-      )
+        {},
+      ),
     );
 }

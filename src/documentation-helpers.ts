@@ -58,7 +58,7 @@ export interface OpenAPIContext {
   getRef: (name: string) => ReferenceObject | undefined;
   makeRef: (
     name: string,
-    schema: SchemaObject | ReferenceObject
+    schema: SchemaObject | ReferenceObject,
   ) => ReferenceObject;
   path: string;
   method: Method;
@@ -66,7 +66,7 @@ export interface OpenAPIContext {
 
 type Depicter<
   T extends z.ZodTypeAny,
-  Variant extends HandlingVariant = "regular"
+  Variant extends HandlingVariant = "regular",
 > = SchemaHandler<T, SchemaObject | ReferenceObject, OpenAPIContext, Variant>;
 
 interface ReqResDepictHelperCommonProps
@@ -163,7 +163,7 @@ export const depictDiscriminatedUnion: Depicter<
   return {
     discriminator: { propertyName: discriminator },
     oneOf: Array.from(options.values()).map((option) =>
-      next({ schema: option })
+      next({ schema: option }),
     ),
   };
 };
@@ -303,7 +303,7 @@ export const depictRecord: Depicter<z.ZodRecord<z.ZodTypeAny>> = ({
         ...carry,
         [key]: valueSchema,
       }),
-      {} as z.ZodRawShape
+      {} as z.ZodRawShape,
     );
     return {
       type: "object",
@@ -330,7 +330,7 @@ export const depictRecord: Depicter<z.ZodRecord<z.ZodTypeAny>> = ({
     const areOptionsLiteral = keySchema.options.reduce(
       (carry: boolean, option: z.ZodTypeAny) =>
         carry && option instanceof z.ZodLiteral,
-      true
+      true,
     );
     if (areOptionsLiteral) {
       const shape = keySchema.options.reduce(
@@ -338,7 +338,7 @@ export const depictRecord: Depicter<z.ZodRecord<z.ZodTypeAny>> = ({
           ...carry,
           [option.value]: valueSchema,
         }),
-        {} as z.ZodRawShape
+        {} as z.ZodRawShape,
       );
       return {
         type: "object",
@@ -347,7 +347,7 @@ export const depictRecord: Depicter<z.ZodRecord<z.ZodTypeAny>> = ({
           ...rest,
         }),
         required: keySchema.options.map(
-          (option: z.ZodLiteral<any>) => option.value
+          (option: z.ZodLiteral<any>) => option.value,
         ),
       };
     }
@@ -385,7 +385,7 @@ export const depictTuple: Depicter<z.ZodTuple> = ({
         description: types
           .map(
             (item, index) =>
-              `${index}: ${isSchemaObject(item) ? item.type : item.$ref}`
+              `${index}: ${isSchemaObject(item) ? item.type : item.$ref}`,
           )
           .join(", "),
       }),
@@ -411,18 +411,18 @@ export const depictString: Depicter<z.ZodString> = ({
 }) => {
   const regexCheck = checks.find(
     (check): check is z.ZodStringCheck & { kind: "regex" } =>
-      check.kind === "regex"
+      check.kind === "regex",
   );
   const datetimeCheck = checks.find(
     (check): check is z.ZodStringCheck & { kind: "datetime" } =>
-      check.kind === "datetime"
+      check.kind === "datetime",
   );
   const regex = regexCheck
     ? regexCheck.regex
     : datetimeCheck
     ? datetimeCheck.offset
       ? new RegExp(
-          `^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?(([+-]\\d{2}:\\d{2})|Z)$`
+          `^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?(([+-]\\d{2}:\\d{2})|Z)$`,
         )
       : new RegExp(`^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?Z$`)
     : undefined;
@@ -482,7 +482,7 @@ export const depictObjectProperties = ({
       ...carry,
       [key]: next({ schema: shape[key] }),
     }),
-    {} as Record<string, SchemaObject | ReferenceObject>
+    {} as Record<string, SchemaObject | ReferenceObject>,
   );
 };
 
@@ -549,7 +549,7 @@ export const depictLazy: Depicter<z.ZodLazy<z.ZodTypeAny>> = ({
 export const depictExamples = (
   schema: z.ZodTypeAny,
   isResponse: boolean,
-  omitProps: string[] = []
+  omitProps: string[] = [],
 ): MediaExamples => {
   const examples = getExamples(schema, isResponse);
   if (examples.length === 0) {
@@ -563,7 +563,7 @@ export const depictExamples = (
           value: omit(omitProps, example),
         },
       }),
-      {}
+      {},
     ),
   };
 };
@@ -571,7 +571,7 @@ export const depictExamples = (
 export const depictParamExamples = (
   schema: z.ZodTypeAny,
   isResponse: boolean,
-  param: string
+  param: string,
 ): MediaExamples => {
   const examples = getExamples(schema, isResponse);
   if (examples.length === 0) {
@@ -588,14 +588,14 @@ export const depictParamExamples = (
               },
             }
           : carry,
-      {}
+      {},
     ),
   };
 };
 
 export function extractObjectSchema(
   subject: IOSchema,
-  ctx: Pick<OpenAPIContext, "path" | "method" | "isResponse">
+  ctx: Pick<OpenAPIContext, "path" | "method" | "isResponse">,
 ) {
   if (subject instanceof z.ZodObject) {
     return subject;
@@ -621,7 +621,7 @@ export function extractObjectSchema(
   } else {
     // intersection
     objectSchema = extractObjectSchema(subject._def.left, ctx).merge(
-      extractObjectSchema(subject._def.right, ctx)
+      extractObjectSchema(subject._def.right, ctx),
     );
   }
   return copyMeta(subject, objectSchema);
@@ -755,7 +755,7 @@ export const onMissing: Depicter<z.ZodTypeAny, "last"> = ({
 
 export const excludeParamsFromDepiction = (
   depicted: SchemaObject | ReferenceObject,
-  pathParams: string[]
+  pathParams: string[],
 ): SchemaObject | ReferenceObject => {
   if (isReferenceObject(depicted)) {
     return depicted;
@@ -771,12 +771,12 @@ export const excludeParamsFromDepiction = (
     : undefined;
   const allOf = depicted.allOf
     ? (depicted.allOf as SchemaObject[]).map((entry) =>
-        excludeParamsFromDepiction(entry, pathParams)
+        excludeParamsFromDepiction(entry, pathParams),
       )
     : undefined;
   const oneOf = depicted.oneOf
     ? (depicted.oneOf as SchemaObject[]).map((entry) =>
-        excludeParamsFromDepiction(entry, pathParams)
+        excludeParamsFromDepiction(entry, pathParams),
       )
     : undefined;
 
@@ -791,12 +791,12 @@ export const excludeParamsFromDepiction = (
       example,
       allOf,
       oneOf,
-    }
+    },
   );
 };
 
 export const excludeExampleFromDepiction = (
-  depicted: SchemaObject | ReferenceObject
+  depicted: SchemaObject | ReferenceObject,
 ): SchemaObject | ReferenceObject =>
   isSchemaObject(depicted) ? omit(["example"], depicted) : depicted;
 
@@ -827,7 +827,7 @@ export const depictResponse = ({
       makeRef,
       path,
       method,
-    })
+    }),
   );
   const examples = depictExamples(schema, true);
   const result =
@@ -842,13 +842,13 @@ export const depictResponse = ({
         ...carry,
         [mimeType]: { schema: result, ...examples },
       }),
-      {} as ContentObject
+      {} as ContentObject,
     ),
   };
 };
 
 type SecurityHelper<K extends Security["type"]> = (
-  security: Security & { type: K }
+  security: Security & { type: K },
 ) => SecuritySchemeObject;
 
 const depictBasicSecurity: SecurityHelper<"basic"> = () => ({
@@ -899,7 +899,7 @@ const depictOAuth2Security: SecurityHelper<"oauth2"> = ({ flows = {} }) => ({
 });
 
 export const depictSecurity = (
-  container: LogicalContainer<Security>
+  container: LogicalContainer<Security>,
 ): LogicalContainer<SecuritySchemeObject> => {
   const methods: { [K in Security["type"]]: SecurityHelper<K> } = {
     basic: depictBasicSecurity,
@@ -911,12 +911,12 @@ export const depictSecurity = (
     oauth2: depictOAuth2Security,
   };
   return mapLogicalContainer(container, (security) =>
-    (methods[security.type] as SecurityHelper<typeof security.type>)(security)
+    (methods[security.type] as SecurityHelper<typeof security.type>)(security),
   );
 };
 
 export const depictSecurityRefs = (
-  container: LogicalContainer<{ name: string; scopes: string[] }>
+  container: LogicalContainer<{ name: string; scopes: string[] }>,
 ): SecurityRequirementObject[] => {
   if (typeof container === "object") {
     if ("or" in container) {
@@ -929,8 +929,8 @@ export const depictSecurityRefs = (
             ...agg,
             [name]: scopes,
           }),
-          {}
-        )
+          {},
+        ),
       );
     }
     if ("and" in container) {
@@ -965,13 +965,13 @@ export const depictRequest = ({
         path,
         method,
       }),
-      pathParams
-    )
+      pathParams,
+    ),
   );
   const bodyExamples = depictExamples(
     endpoint.getSchema("input"),
     false,
-    pathParams
+    pathParams,
   );
   const result =
     composition === "components"
@@ -985,13 +985,13 @@ export const depictRequest = ({
         ...carry,
         [mimeType]: { schema: result, ...bodyExamples },
       }),
-      {} as ContentObject
+      {} as ContentObject,
     ),
   };
 };
 
 export const depictTags = <TAG extends string>(
-  tags: TagsConfig<TAG>
+  tags: TagsConfig<TAG>,
 ): TagObject[] =>
   (Object.keys(tags) as TAG[]).map((tag) => {
     const def = tags[tag];

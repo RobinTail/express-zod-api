@@ -17,7 +17,7 @@ describe("Mock", () => {
         expect(e).toBeInstanceOf(Error);
         if (e instanceof Error) {
           expect(e.message).toBe(
-            "You need to install Jest in order to use testEndpoint()."
+            "You need to install Jest in order to use testEndpoint().",
           );
         }
       }

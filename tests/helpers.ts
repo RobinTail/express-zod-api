@@ -20,14 +20,14 @@ export const waitFor = async (cb: () => boolean) =>
   });
 
 export const serializeSchemaForTest = (
-  schema: z.ZodTypeAny
+  schema: z.ZodTypeAny,
 ): Record<string, any> => {
   const onSomeUnion: SchemaHandler<
     z.ZodUnion<any> | z.ZodDiscriminatedUnion<any, any>,
     object
   > = ({ schema: subject, next }) => ({
     options: Array.from(subject.options.values()).map((option) =>
-      next({ schema: option as z.ZodTypeAny })
+      next({ schema: option as z.ZodTypeAny }),
     ),
   });
   const onOptionalOrNullable: SchemaHandler<
@@ -58,7 +58,7 @@ export const serializeSchemaForTest = (
             ...carry,
             [key]: next({ schema: subject.shape[key] }),
           }),
-          {}
+          {},
         ),
       }),
       ZodEffects: ({ schema: subject, next }) => ({

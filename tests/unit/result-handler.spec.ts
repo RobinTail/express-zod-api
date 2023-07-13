@@ -42,11 +42,11 @@ describe("ResultHandler", () => {
       });
       expect(loggerMock.error).toBeCalledTimes(1);
       expect(loggerMock.error.mock.calls[0][0]).toMatch(
-        /^Internal server error\nError: Some error/
+        /^Internal server error\nError: Some error/,
       );
       expect(loggerMock.error.mock.calls[0][1]).toHaveProperty("url");
       expect(loggerMock.error.mock.calls[0][1].url).toBe(
-        "http://something/v1/anything"
+        "http://something/v1/anything",
       );
       expect(loggerMock.error.mock.calls[0][1]).toHaveProperty("payload");
       expect(loggerMock.error.mock.calls[0][1].payload).toEqual({
@@ -76,7 +76,7 @@ describe("ResultHandler", () => {
               expected: "string",
               received: "number",
             },
-          ])
+          ]),
         ),
         input: { something: 453 },
         output: { anything: 118 },
@@ -140,10 +140,10 @@ describe("ResultHandler", () => {
         withMeta(
           z.object({
             str: z.string(),
-          })
+          }),
         ).example({
           str: "test",
-        })
+        }),
       );
       if (!(apiResponse instanceof z.ZodType)) {
         fail(new Error("should not be here"));

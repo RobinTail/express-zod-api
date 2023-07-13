@@ -47,10 +47,10 @@ describe("Example", () => {
       expect(response.headers.has("access-control-allow-headers")).toBeTruthy();
       expect(response.headers.get("access-control-allow-origin")).toBe("*");
       expect(response.headers.get("access-control-allow-methods")).toBe(
-        "POST, OPTIONS"
+        "POST, OPTIONS",
       );
       expect(response.headers.get("access-control-allow-headers")).toBe(
-        "content-type"
+        "content-type",
       );
     });
 
@@ -83,7 +83,7 @@ describe("Example", () => {
 
     test("Should handle valid GET request", async () => {
       const response = await fetch(
-        "http://localhost:8090/v1/user/retrieve?test=123&id=50"
+        "http://localhost:8090/v1/user/retrieve?test=123&id=50",
       );
       expect(response.status).toBe(200);
       const json = await response.json();
@@ -117,12 +117,12 @@ describe("Example", () => {
 
     test("Should send an image with a correct header", async () => {
       const response = await fetch(
-        "http://localhost:8090/v1/avatar/send?userId=123"
+        "http://localhost:8090/v1/avatar/send?userId=123",
       );
       expect(response.status).toBe(200);
       expect(response.headers.has("Content-type")).toBeTruthy();
       expect(response.headers.get("Content-type")).toBe(
-        "image/svg+xml; charset=utf-8"
+        "image/svg+xml; charset=utf-8",
       );
       expect(response.headers.has("Content-encoding")).toBeTruthy();
       expect(response.headers.get("Content-encoding")).toBe("gzip");
@@ -136,7 +136,7 @@ describe("Example", () => {
 
     test("Should stream an image with a correct header", async () => {
       const response = await fetch(
-        "http://localhost:8090/v1/avatar/stream?userId=123"
+        "http://localhost:8090/v1/avatar/stream?userId=123",
       );
       expect(response.status).toBe(200);
       expect(response.headers.has("Content-type")).toBeTruthy();
@@ -184,7 +184,7 @@ describe("Example", () => {
   describe("Negative", () => {
     test("GET request should fail on missing input param", async () => {
       const response = await fetch(
-        "http://localhost:8090/v1/user/retrieve?test=123"
+        "http://localhost:8090/v1/user/retrieve?test=123",
       );
       expect(response.status).toBe(400);
       const json = await response.json();
@@ -193,7 +193,7 @@ describe("Example", () => {
 
     test("GET request should fail on specific value in handler implementation", async () => {
       const response = await fetch(
-        "http://localhost:8090/v1/user/retrieve?test=123&id=101"
+        "http://localhost:8090/v1/user/retrieve?test=123&id=101",
       );
       expect(response.status).toBe(404);
       const json = await response.json();
@@ -298,7 +298,7 @@ describe("Example", () => {
       const response = await fetch("http://localhost:8090/public/missing.svg");
       expect(response.status).toBe(404);
       expect(response.headers.get("Content-type")).toBe(
-        "application/json; charset=utf-8"
+        "application/json; charset=utf-8",
       );
       expect(await response.json()).toMatchSnapshot();
     });

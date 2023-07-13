@@ -11,7 +11,7 @@ export const authMiddleware = createMiddleware({
   input: withMeta(
     z.object({
       key: z.string().min(1),
-    })
+    }),
   ).example({
     key: "1234-5678-90",
   }),

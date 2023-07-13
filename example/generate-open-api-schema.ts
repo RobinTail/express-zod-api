@@ -10,5 +10,5 @@ console.log(
     version: manifest.version,
     title: "Example API",
     serverUrl: "http://example.com",
-  }).getSpecAsYaml()
+  }).getSpecAsYaml(),
 );

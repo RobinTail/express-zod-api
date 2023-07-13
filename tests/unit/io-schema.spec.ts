@@ -39,7 +39,7 @@ describe("I/O Schema and related helpers", () => {
         z.discriminatedUnion("type", [
           z.object({ type: z.literal("one") }),
           z.object({ type: z.literal("two") }),
-        ])
+        ]),
       );
     });
     test("accepts a mix of types based on object", () => {
@@ -51,7 +51,7 @@ describe("I/O Schema and related helpers", () => {
         // the issue has to be prevented programmatically using hasTopLevelTransformingEffect() helper
         expectType<IOSchema>(z.object({}).transform(() => []));
         expectType<IOSchema>(
-          z.object({ s: z.string() }).transform(() => ({ n: 123 }))
+          z.object({ s: z.string() }).transform(() => ({ n: 123 })),
         );
       });
       test("accepts a refinement of object", () => {
@@ -61,7 +61,7 @@ describe("I/O Schema and related helpers", () => {
           z.object({}).refinement(() => true, {
             code: "custom",
             message: "test",
-          })
+          }),
         );
       });
       test("Issue 662: accepts nested refinements", () => {
@@ -69,13 +69,13 @@ describe("I/O Schema and related helpers", () => {
           z
             .object({})
             .refine(() => true)
-            .refine(() => true)
+            .refine(() => true),
         );
         expectType<IOSchema>(
           z
             .object({})
             .superRefine(() => true)
-            .superRefine(() => true)
+            .superRefine(() => true),
         );
       });
       test("does not accept transformation of object", () => {
@@ -134,7 +134,7 @@ describe("I/O Schema and related helpers", () => {
             .or(
               z.object({
                 two: z.number(),
-              })
+              }),
             ),
           middleware: jest.fn(),
         }),
@@ -146,7 +146,7 @@ describe("I/O Schema and related helpers", () => {
             .or(
               z.object({
                 four: z.boolean(),
-              })
+              }),
             ),
           middleware: jest.fn(),
         }),
@@ -158,7 +158,7 @@ describe("I/O Schema and related helpers", () => {
         .or(
           z.object({
             six: z.number(),
-          })
+          }),
         );
       const result = getFinalEndpointInputSchema(middlewares, endpointInput);
       expect(result).toBeInstanceOf(z.ZodIntersection);
@@ -175,7 +175,7 @@ describe("I/O Schema and related helpers", () => {
             .and(
               z.object({
                 two: z.number(),
-              })
+              }),
             ),
           middleware: jest.fn(),
         }),
@@ -187,7 +187,7 @@ describe("I/O Schema and related helpers", () => {
             .and(
               z.object({
                 four: z.boolean(),
-              })
+              }),
             ),
           middleware: jest.fn(),
         }),
@@ -199,7 +199,7 @@ describe("I/O Schema and related helpers", () => {
         .and(
           z.object({
             six: z.number(),
-          })
+          }),
         );
       const result = getFinalEndpointInputSchema(middlewares, endpointInput);
       expect(result).toBeInstanceOf(z.ZodIntersection);
@@ -231,7 +231,7 @@ describe("I/O Schema and related helpers", () => {
             .and(
               z.object({
                 two: z.number(),
-              })
+              }),
             ),
           middleware: jest.fn(),
         }),
@@ -243,7 +243,7 @@ describe("I/O Schema and related helpers", () => {
             .or(
               z.object({
                 four: z.boolean(),
-              })
+              }),
             ),
           middleware: jest.fn(),
         }),
@@ -267,8 +267,8 @@ describe("I/O Schema and related helpers", () => {
               .and(
                 z.object({
                   two: z.number(),
-                })
-              )
+                }),
+              ),
           ).example({
             one: "test",
             two: 123,
@@ -284,8 +284,8 @@ describe("I/O Schema and related helpers", () => {
               .or(
                 z.object({
                   four: z.boolean(),
-                })
-              )
+                }),
+              ),
           ).example({
             three: null,
             four: true,
@@ -296,7 +296,7 @@ describe("I/O Schema and related helpers", () => {
       const endpointInput = withMeta(
         z.object({
           five: z.string(),
-        })
+        }),
       ).example({
         five: "some",
       });

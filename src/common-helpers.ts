@@ -42,7 +42,7 @@ export const getActualMethod = (request: Request) =>
 
 export function getInput(
   request: Request,
-  inputAssignment: CommonConfig["inputSources"]
+  inputAssignment: CommonConfig["inputSources"],
 ): any {
   const method = getActualMethod(request);
   if (method === "options") {
@@ -62,7 +62,7 @@ export function getInput(
         ...carry,
         ...request[prop],
       }),
-      {}
+      {},
     );
 }
 
@@ -84,7 +84,7 @@ export function makeErrorFromAnything(subject: any): Error {
   return subject instanceof Error
     ? subject
     : new Error(
-        typeof subject === "symbol" ? subject.toString() : `${subject}`
+        typeof subject === "symbol" ? subject.toString() : `${subject}`,
       );
 }
 
@@ -92,7 +92,7 @@ export function getMessageFromError(error: Error): string {
   if (error instanceof z.ZodError) {
     return error.issues
       .map(({ path, message }) =>
-        (path.length ? [path.join("/")] : []).concat(message).join(": ")
+        (path.length ? [path.join("/")] : []).concat(message).join(": "),
       )
       .join("; ");
   }
@@ -115,7 +115,7 @@ export function getStatusCodeFromError(error: Error): number {
 
 export const getExamples = <T extends z.ZodTypeAny, V extends boolean>(
   schema: T,
-  isParsed: V // This does not control parsing — it happens anyway
+  isParsed: V, // This does not control parsing — it happens anyway
 ): ReadonlyArray<V extends true ? z.output<T> : z.input<T>> => {
   const result: Array<z.input<T> | z.output<T>> = [];
   const examples = getMeta(schema, "examples");
@@ -130,7 +130,7 @@ export const getExamples = <T extends z.ZodTypeAny, V extends boolean>(
 
 export const combinations = <T extends any>(
   a: T[],
-  b: T[]
+  b: T[],
 ): { type: "single"; value: T[] } | { type: "tuple"; value: [T, T][] } => {
   if (a.length === 0) {
     return { type: "single", value: b };
@@ -169,7 +169,7 @@ export function hasTopLevelTransformingEffect(schema: IOSchema): boolean {
   }
   if (schema instanceof z.ZodIntersection) {
     return reduceBool(
-      [schema._def.left, schema._def.right].map(hasTopLevelTransformingEffect)
+      [schema._def.left, schema._def.right].map(hasTopLevelTransformingEffect),
     );
   }
   return false; // ZodObject left
@@ -221,7 +221,7 @@ export const makeCleanId = (path: string, method: string, suffix?: string) => {
     .concat(suffix || [])
     .flatMap((entry) => entry.split(/[^A-Z0-9]/gi))
     .map(
-      (entry) => entry.slice(0, 1).toUpperCase() + entry.slice(1).toLowerCase()
+      (entry) => entry.slice(0, 1).toUpperCase() + entry.slice(1).toLowerCase(),
     )
     .join("");
 };

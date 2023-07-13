@@ -113,7 +113,7 @@ export class Integration {
         });
         this.agg.push(
           createTypeAlias(input, inputId),
-          createTypeAlias(response, responseId)
+          createTypeAlias(response, responseId),
         );
         if (method !== "options") {
           this.paths.push(path);
@@ -133,7 +133,7 @@ export class Integration {
 
     const methodPathNode = makePublicType(
       "MethodPath",
-      makeTemplate([methodNode.name, pathNode.name])
+      makeTemplate([methodNode.name, pathNode.name]),
     );
 
     const extenderClause = [
@@ -146,16 +146,16 @@ export class Integration {
       "Input",
       extenderClause,
       Object.keys(this.registry).map((methodPath) =>
-        makeQuotedProp(methodPath, this.registry[methodPath].in)
-      )
+        makeQuotedProp(methodPath, this.registry[methodPath].in),
+      ),
     );
 
     const responseNode = makePublicExtendedInterface(
       "Response",
       extenderClause,
       Object.keys(this.registry).map((methodPath) =>
-        makeQuotedProp(methodPath, this.registry[methodPath].out)
-      )
+        makeQuotedProp(methodPath, this.registry[methodPath].out),
+      ),
     );
 
     this.agg.push(
@@ -163,7 +163,7 @@ export class Integration {
       methodNode,
       methodPathNode,
       inputNode,
-      responseNode
+      responseNode,
     );
 
     if (variant === "types") {
@@ -178,10 +178,10 @@ export class Integration {
           Object.keys(this.registry)
             .filter((methodPath) => this.registry[methodPath].isJson)
             .map((methodPath) =>
-              f.createPropertyAssignment(`"${methodPath}"`, f.createTrue())
-            )
-        )
-      )
+              f.createPropertyAssignment(`"${methodPath}"`, f.createTrue()),
+            ),
+        ),
+      ),
     );
 
     const providerNode = makePublicType(
@@ -193,11 +193,11 @@ export class Integration {
           path: f.createTypeReferenceNode("P"),
           params: f.createIndexedAccessTypeNode(
             f.createTypeReferenceNode(inputNode.name),
-            parametricIndexNode
+            parametricIndexNode,
           ),
         }),
-        makeIndexedPromise(responseNode.name, parametricIndexNode)
-      )
+        makeIndexedPromise(responseNode.name, parametricIndexNode),
+      ),
     );
 
     const implementationNode = makePublicType(
@@ -209,11 +209,11 @@ export class Integration {
           path: f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
           params: makeRecord(
             ts.SyntaxKind.StringKeyword,
-            ts.SyntaxKind.AnyKeyword
+            ts.SyntaxKind.AnyKeyword,
           ),
         }),
-        makeAnyPromise()
-      )
+        makeAnyPromise(),
+      ),
     );
 
     const keyParamExpression = f.createTemplateExpression(
@@ -221,9 +221,9 @@ export class Integration {
       [
         f.createTemplateSpan(
           f.createIdentifier("key"),
-          f.createTemplateTail("")
+          f.createTemplateTail(""),
         ),
-      ]
+      ],
     );
 
     const clientNode = makePublicClass(
@@ -232,7 +232,7 @@ export class Integration {
         makeParam(
           "implementation",
           f.createTypeReferenceNode(implementationNode.name),
-          protectedReadonlyModifier
+          protectedReadonlyModifier,
         ),
       ]),
       [
@@ -248,18 +248,18 @@ export class Integration {
                 f.createCallExpression(
                   f.createPropertyAccessExpression(
                     f.createIdentifier("acc"),
-                    "replace"
+                    "replace",
                   ),
                   undefined,
                   [
                     keyParamExpression,
                     f.createElementAccessExpression(
                       f.createIdentifier("params"),
-                      f.createIdentifier("key")
+                      f.createIdentifier("key"),
                     ),
-                  ]
+                  ],
                 ),
-                f.createIdentifier("path")
+                f.createIdentifier("path"),
               ),
               makeObjectKeysReducer(
                 "params",
@@ -268,13 +268,13 @@ export class Integration {
                     f.createCallExpression(
                       f.createPropertyAccessExpression(
                         f.createIdentifier("path"),
-                        "indexOf"
+                        "indexOf",
                       ),
                       undefined,
-                      [keyParamExpression]
+                      [keyParamExpression],
                     ),
                     ts.SyntaxKind.GreaterThanEqualsToken,
-                    f.createNumericLiteral(0)
+                    f.createNumericLiteral(0),
                   ),
                   undefined,
                   f.createIdentifier("acc"),
@@ -285,17 +285,17 @@ export class Integration {
                       "[key]", // @todo is there a better way to do it?
                       f.createElementAccessExpression(
                         f.createIdentifier("params"),
-                        f.createIdentifier("key")
-                      )
+                        f.createIdentifier("key"),
+                      ),
                     ),
-                  ])
+                  ]),
                 ),
-                f.createObjectLiteralExpression()
+                f.createObjectLiteralExpression(),
               ),
-            ]
-          )
+            ],
+          ),
         ),
-      ]
+      ],
     );
 
     ts.addSyntheticLeadingComment(
@@ -322,14 +322,14 @@ export class Integration {
         "\n" +
         "const client = new ExpressZodAPIClient(exampleImplementation);\n" +
         'client.provide("get", "/v1/user/retrieve", { id: "10" });\n',
-      true
+      true,
     );
 
     this.agg.push(
       jsonEndpointsNode,
       providerNode,
       implementationNode,
-      clientNode
+      clientNode,
     );
   }
 

@@ -17,14 +17,14 @@ interface MiddlewareParams<IN, OPT> {
 }
 
 type Middleware<IN, OPT, OUT> = (
-  params: MiddlewareParams<IN, OPT>
+  params: MiddlewareParams<IN, OPT>,
 ) => Promise<OUT>;
 
 interface MiddlewareCreationProps<
   IN extends IOSchema<"strip">,
   OPT,
   OUT extends FlatObject,
-  SCO extends string
+  SCO extends string,
 > {
   input: IN;
   security?: LogicalContainer<Security<keyof z.input<IN> & string, SCO>>;
@@ -35,7 +35,7 @@ export interface MiddlewareDefinition<
   IN extends IOSchema<"strip">,
   OPT,
   OUT extends FlatObject,
-  SCO extends string
+  SCO extends string,
 > extends MiddlewareCreationProps<IN, OPT, OUT, SCO> {
   type: "proprietary" | "express";
 }
@@ -46,13 +46,13 @@ export const createMiddleware = <
   IN extends IOSchema<"strip">,
   OPT,
   OUT extends FlatObject,
-  SCO extends string
+  SCO extends string,
 >(
-  props: MiddlewareCreationProps<IN, OPT, OUT, SCO>
+  props: MiddlewareCreationProps<IN, OPT, OUT, SCO>,
 ): MiddlewareDefinition<IN, OPT, OUT, SCO> => {
   if (hasTopLevelTransformingEffect(props.input)) {
     throw new IOSchemaError(
-      "Using transformations on the top level of middleware input schema is not allowed."
+      "Using transformations on the top level of middleware input schema is not allowed.",
     );
   }
   return {
@@ -64,13 +64,13 @@ export const createMiddleware = <
 export type ExpressMiddleware<R extends Request, S extends Response> = (
   request: R,
   response: S,
-  next: (error?: any) => void
+  next: (error?: any) => void,
 ) => void | Promise<void>;
 
 export interface ExpressMiddlewareFeatures<
   R extends Request,
   S extends Response,
-  OUT extends FlatObject
+  OUT extends FlatObject,
 > {
   provider?: (request: R, response: S) => OUT | Promise<OUT>;
   transformer?: (err: Error) => HttpError | Error;

@@ -40,7 +40,7 @@ describe("EndpointsFactory", () => {
         handler: jest.fn(),
       });
       const factory = new EndpointsFactory(resultHandlerMock).addMiddleware(
-        middleware
+        middleware,
       );
       expect(factory["middlewares"]).toStrictEqual([middleware]);
       expect(factory["resultHandler"]).toStrictEqual(resultHandlerMock);
@@ -86,7 +86,7 @@ describe("EndpointsFactory", () => {
       expect(newFactory["middlewares"].length).toBe(1);
       expect(newFactory["middlewares"][0].input).toBeInstanceOf(z.ZodObject);
       expect(
-        (newFactory["middlewares"][0].input as z.AnyZodObject).shape
+        (newFactory["middlewares"][0].input as z.AnyZodObject).shape,
       ).toEqual({});
       expect(
         await newFactory["middlewares"][0].middleware({
@@ -95,7 +95,7 @@ describe("EndpointsFactory", () => {
           request: {} as Request,
           response: {} as Response,
           logger: {} as Logger,
-        })
+        }),
       ).toEqual({
         option1: "some value",
         option2: "other value",
@@ -126,7 +126,7 @@ describe("EndpointsFactory", () => {
         expect(newFactory["middlewares"].length).toBe(1);
         expect(newFactory["middlewares"][0].input).toBeInstanceOf(z.ZodObject);
         expect(
-          (newFactory["middlewares"][0].input as z.AnyZodObject).shape
+          (newFactory["middlewares"][0].input as z.AnyZodObject).shape,
         ).toEqual({});
         const requestMock = { body: { something: "awesome" } } as Request;
         const responseMock = {} as Response;
@@ -141,7 +141,7 @@ describe("EndpointsFactory", () => {
         expect(middleware).toHaveBeenCalledWith(
           requestMock,
           responseMock,
-          expect.any(Function)
+          expect.any(Function),
         );
         expect(requestMock.body).toHaveProperty("test");
         expect(requestMock.body.test).toBe("Here is the test");
@@ -174,7 +174,7 @@ describe("EndpointsFactory", () => {
         expect(middleware).toHaveBeenCalledWith(
           requestMock,
           responseMock,
-          expect.any(Function)
+          expect.any(Function),
         );
         expect(requestMock.body).toHaveProperty("test");
         expect(requestMock.body.test).toBe("Here is the test");
@@ -242,7 +242,7 @@ describe("EndpointsFactory", () => {
           }
         }
       });
-    }
+    },
   );
 
   describe(".build()", () => {
@@ -259,7 +259,7 @@ describe("EndpointsFactory", () => {
         handler: jest.fn(),
       });
       const factory = new EndpointsFactory(resultHandlerMock).addMiddleware(
-        middleware
+        middleware,
       );
       const handlerMock = jest.fn();
       const endpoint = factory.build({
@@ -276,10 +276,10 @@ describe("EndpointsFactory", () => {
       expect(endpoint.getMethods()).toStrictEqual(["get"]);
       expect(endpoint["middlewares"]).toStrictEqual([middleware]);
       expect(
-        serializeSchemaForTest(endpoint.getSchema("input"))
+        serializeSchemaForTest(endpoint.getSchema("input")),
       ).toMatchSnapshot();
       expect(
-        serializeSchemaForTest(endpoint.getSchema("output"))
+        serializeSchemaForTest(endpoint.getSchema("output")),
       ).toMatchSnapshot();
       expect(endpoint["handler"]).toStrictEqual(handlerMock);
       expect(endpoint["resultHandler"]).toStrictEqual(resultHandlerMock);
@@ -309,7 +309,7 @@ describe("EndpointsFactory", () => {
         handler: jest.fn(),
       });
       const factory = new EndpointsFactory(resultHandlerMock).addMiddleware(
-        middleware
+        middleware,
       );
       const endpoint = factory.build({
         method: "get",
@@ -322,10 +322,10 @@ describe("EndpointsFactory", () => {
         handler: jest.fn(),
       });
       expect(
-        serializeSchemaForTest(endpoint.getSchema("input"))
+        serializeSchemaForTest(endpoint.getSchema("input")),
       ).toMatchSnapshot();
       expect(
-        serializeSchemaForTest(endpoint.getSchema("output"))
+        serializeSchemaForTest(endpoint.getSchema("output")),
       ).toMatchSnapshot();
       expectType<
         z.ZodIntersection<
@@ -349,7 +349,7 @@ describe("EndpointsFactory", () => {
           .and(
             z.object({
               n2: z.number(),
-            })
+            }),
           ),
         middleware: jest.fn(),
       });
@@ -359,7 +359,7 @@ describe("EndpointsFactory", () => {
         handler: jest.fn(),
       });
       const factory = new EndpointsFactory(resultHandlerMock).addMiddleware(
-        middleware
+        middleware,
       );
       const handlerMock = jest.fn();
       const endpoint = factory.build({
@@ -376,10 +376,10 @@ describe("EndpointsFactory", () => {
       expect(endpoint.getMethods()).toStrictEqual(["get"]);
       expect(endpoint["middlewares"]).toStrictEqual([middleware]);
       expect(
-        serializeSchemaForTest(endpoint.getSchema("input"))
+        serializeSchemaForTest(endpoint.getSchema("input")),
       ).toMatchSnapshot();
       expect(
-        serializeSchemaForTest(endpoint.getSchema("output"))
+        serializeSchemaForTest(endpoint.getSchema("output")),
       ).toMatchSnapshot();
       expect(endpoint["handler"]).toStrictEqual(handlerMock);
       expect(endpoint["resultHandler"]).toStrictEqual(resultHandlerMock);
@@ -403,7 +403,7 @@ describe("EndpointsFactory", () => {
           .or(
             z.object({
               n2: z.number(),
-            })
+            }),
           ),
         middleware: jest.fn(),
       });
@@ -413,7 +413,7 @@ describe("EndpointsFactory", () => {
         handler: jest.fn(),
       });
       const factory = new EndpointsFactory(resultHandlerMock).addMiddleware(
-        middleware
+        middleware,
       );
       const handlerMock = jest.fn().mockImplementation((params) => ({
         input: params.input,
@@ -433,10 +433,10 @@ describe("EndpointsFactory", () => {
       expect(endpoint.getMethods()).toStrictEqual(["get"]);
       expect(endpoint["middlewares"]).toStrictEqual([middleware]);
       expect(
-        serializeSchemaForTest(endpoint.getSchema("input"))
+        serializeSchemaForTest(endpoint.getSchema("input")),
       ).toMatchSnapshot();
       expect(
-        serializeSchemaForTest(endpoint.getSchema("output"))
+        serializeSchemaForTest(endpoint.getSchema("output")),
       ).toMatchSnapshot();
       expect(endpoint["handler"]).toStrictEqual(handlerMock);
       expect(endpoint["resultHandler"]).toStrictEqual(resultHandlerMock);

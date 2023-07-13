@@ -9,9 +9,9 @@ export type LogicalContainer<T> =
   | T;
 
 const isObject = <
-  T extends LogicalContainer<any> | LogicalAnd<any> | LogicalOr<any>
+  T extends LogicalContainer<any> | LogicalAnd<any> | LogicalOr<any>,
 >(
-  subject: T
+  subject: T,
 ): subject is Exclude<T & {}, null> =>
   typeof subject === "object" && subject !== null;
 
@@ -20,14 +20,14 @@ const flattenAnds = <T>(subject: (T | LogicalAnd<T>)[]): LogicalAnd<T> => ({
   and: subject.reduce<T[]>(
     (agg, item) =>
       agg.concat(isObject(item) && "and" in item ? item.and : item),
-    []
+    [],
   ),
 });
 
 /** @desc creates a LogicalContainer out of another one */
 export const mapLogicalContainer = <T, S>(
   container: LogicalContainer<T>,
-  fn: (subject: T) => S
+  fn: (subject: T) => S,
 ): LogicalContainer<S> => {
   if (isObject(container)) {
     if ("and" in container) {
@@ -35,7 +35,7 @@ export const mapLogicalContainer = <T, S>(
         and: container.and.map((entry) =>
           isObject(entry) && "or" in entry
             ? { or: entry.or.map(fn) }
-            : fn(entry)
+            : fn(entry),
         ),
       };
     }
@@ -44,7 +44,7 @@ export const mapLogicalContainer = <T, S>(
         or: container.or.map((entry) =>
           isObject(entry) && "and" in entry
             ? { and: entry.and.map(fn) }
-            : fn(entry)
+            : fn(entry),
         ),
       };
     }
@@ -54,13 +54,13 @@ export const mapLogicalContainer = <T, S>(
 
 /** @desc converts LogicalAnd into LogicalOr */
 export const andToOr = <T>(
-  subject: LogicalAnd<T | LogicalOr<T>>
+  subject: LogicalAnd<T | LogicalOr<T>>,
 ): LogicalOr<T | LogicalAnd<T>> => {
   return subject.and.reduce<LogicalOr<T | LogicalAnd<T>>>(
     (acc, item) => {
       const combs = combinations(
         acc.or,
-        isObject(item) && "or" in item ? item.or : [item]
+        isObject(item) && "or" in item ? item.or : [item],
       );
       if (combs.type === "single") {
         acc.or.push(...combs.value);
@@ -71,14 +71,14 @@ export const andToOr = <T>(
     },
     {
       or: [],
-    }
+    },
   );
 };
 
 /** @desc reducer, combines two LogicalContainers */
 export const combineContainers = <T>(
   a: LogicalContainer<T>,
-  b: LogicalContainer<T>
+  b: LogicalContainer<T>,
 ): LogicalContainer<T> => {
   if (isObject(a)) {
     if ("and" in a) {

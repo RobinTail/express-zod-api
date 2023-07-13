@@ -23,12 +23,12 @@ interface ResultHandlerParams<RES> {
 }
 
 type ResultHandler<RES> = (
-  params: ResultHandlerParams<RES>
+  params: ResultHandlerParams<RES>,
 ) => void | Promise<void>;
 
 export interface ResultHandlerDefinition<
   POS extends z.ZodTypeAny,
-  NEG extends z.ZodTypeAny
+  NEG extends z.ZodTypeAny,
 > {
   getPositiveResponse: (output: IOSchema) => POS | ApiResponse<POS>;
   getNegativeResponse: () => NEG | ApiResponse<NEG>;
@@ -42,9 +42,9 @@ export const defaultStatusCodes = {
 
 export const createResultHandler = <
   POS extends z.ZodTypeAny,
-  NEG extends z.ZodTypeAny
+  NEG extends z.ZodTypeAny,
 >(
-  definition: ResultHandlerDefinition<POS, NEG>
+  definition: ResultHandlerDefinition<POS, NEG>,
 ) => definition;
 
 export const defaultResultHandler = createResultHandler({
@@ -54,7 +54,7 @@ export const defaultResultHandler = createResultHandler({
       z.object({
         status: z.literal("success"),
         data: output,
-      })
+      }),
     );
     return examples.reduce<typeof responseSchema>(
       (acc, example) =>
@@ -62,7 +62,7 @@ export const defaultResultHandler = createResultHandler({
           status: "success",
           data: example,
         }),
-      responseSchema
+      responseSchema,
     );
   },
   getNegativeResponse: () =>
@@ -72,7 +72,7 @@ export const defaultResultHandler = createResultHandler({
         error: z.object({
           message: z.string(),
         }),
-      })
+      }),
     ).example({
       status: "error",
       error: {
@@ -113,6 +113,6 @@ export const lastResortHandler = ({
       `An error occurred while serving the result: ${error.message}.` +
         (error.originalError
           ? `\nOriginal error: ${error.originalError.message}.`
-          : "")
+          : ""),
     );
 };

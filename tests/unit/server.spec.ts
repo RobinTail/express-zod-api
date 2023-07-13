@@ -105,7 +105,7 @@ describe("Server", () => {
       };
       const { httpServer, logger, app } = createServer(
         configMock as unknown as ServerConfig & CommonConfig,
-        routingMock
+        routingMock,
       );
       expect(httpServer).toBeInstanceOf(http.Server);
       expect(logger).toEqual(configMock.logger);
@@ -114,7 +114,7 @@ describe("Server", () => {
       expect(appMock.use).toBeCalledTimes(3);
       expect(Array.isArray(appMock.use.mock.calls[0][0])).toBeTruthy();
       expect(appMock.use.mock.calls[0][0][0]).toBe(
-        configMock.server.jsonParser
+        configMock.server.jsonParser,
       );
       expect(configMock.errorHandler.handler).toBeCalledTimes(0);
       expect(configMock.logger.info).toBeCalledTimes(1);
@@ -174,18 +174,18 @@ describe("Server", () => {
 
       const { httpServer, httpsServer } = createServer(
         configMock as unknown as ServerConfig & CommonConfig,
-        routingMock
+        routingMock,
       );
       expect(httpServer).toBeInstanceOf(http.Server);
       expect(httpsServer).toEqual(httpsServerMock);
       expect(httpsServerMock).toBeTruthy();
       expect(https.createServer).toHaveBeenCalledWith(
         configMock.https.options,
-        appMock
+        appMock,
       );
       expect(httpsServerMock!.listen).toBeCalledTimes(1);
       expect(httpsServerMock!.listen.mock.calls[0][0]).toBe(
-        configMock.https.listen
+        configMock.https.listen,
       );
     });
 
@@ -217,7 +217,7 @@ describe("Server", () => {
       };
       createServer(
         configMock as unknown as ServerConfig & CommonConfig,
-        routingMock
+        routingMock,
       );
       expect(compressionMock).toHaveBeenCalledTimes(1);
       expect(compressionMock).toHaveBeenCalledWith({});
@@ -234,14 +234,14 @@ describe("Server", () => {
       };
       const handler = createParserFailureHandler(
         defaultResultHandler,
-        loggerMock as unknown as Logger
+        loggerMock as unknown as Logger,
       );
       const next = jest.fn();
       handler(
         undefined,
         null as unknown as Request,
         null as unknown as Response,
-        next
+        next,
       );
       expect(next).toHaveBeenCalledTimes(1);
     });
@@ -261,7 +261,7 @@ describe("Server", () => {
       };
       const handler = createNotFoundHandler(
         resultHandler,
-        loggerMock as unknown as Logger
+        loggerMock as unknown as Logger,
       );
       const next = jest.fn();
       const requestMock = {
@@ -281,7 +281,7 @@ describe("Server", () => {
       handler(
         requestMock as unknown as Request,
         responseMock as unknown as Response,
-        next
+        next,
       );
       expect(next).toHaveBeenCalledTimes(0);
       expect(resultHandler.handler).toHaveBeenCalledTimes(1);
@@ -303,7 +303,7 @@ describe("Server", () => {
       };
       const handler = createNotFoundHandler(
         resultHandler,
-        loggerMock as unknown as Logger
+        loggerMock as unknown as Logger,
       );
       const next = jest.fn();
       const requestMock = {
@@ -323,7 +323,7 @@ describe("Server", () => {
       handler(
         requestMock as unknown as Request,
         responseMock as unknown as Response,
-        next
+        next,
       );
       expect(next).toHaveBeenCalledTimes(0);
       expect(resultHandler.handler).toHaveBeenCalledTimes(1);
@@ -332,7 +332,7 @@ describe("Server", () => {
       expect(responseMock.end).toHaveBeenCalledTimes(1);
       expect(responseMock.end.mock.calls[0][0]).toBe(
         "An error occurred while serving the result: I am faulty.\n" +
-          "Original error: Can not POST /v1/test."
+          "Original error: Can not POST /v1/test.",
       );
     });
   });
@@ -368,7 +368,7 @@ describe("Server", () => {
       };
       const { logger, notFoundHandler } = attachRouting(
         configMock as unknown as AppConfig & CommonConfig,
-        routingMock
+        routingMock,
       );
       expect(logger).toEqual(configMock.logger);
       expect(typeof notFoundHandler).toBe("function");

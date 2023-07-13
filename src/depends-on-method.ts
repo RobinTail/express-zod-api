@@ -8,7 +8,7 @@ export class DependsOnMethod {
       [K in Method]?:
         | Endpoint<any, any, any, K, any, any, any, any>
         | Endpoint<any, any, any, Method, any, any, any, any>;
-    }
+    },
   ) {
     (Object.keys(methods) as (keyof typeof methods)[]).forEach((key) => {
       if (key in methods) {
@@ -28,7 +28,7 @@ export class DependsOnMethod {
               `    // or method: '${key}'\n` +
               "    ...\n" +
               "  })\n" +
-              "});\n"
+              "});\n",
           );
         }
       }
