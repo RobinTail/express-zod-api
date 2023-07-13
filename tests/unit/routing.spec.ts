@@ -218,7 +218,7 @@ describe("Routing", () => {
       expect(responseMock.set).toHaveBeenCalledTimes(3);
       expect(responseMock.set).toHaveBeenCalledWith(
         "Access-Control-Allow-Methods",
-        "GET, POST, PUT, PATCH, OPTIONS"
+        "GET, POST, PUT, PATCH, OPTIONS",
       );
     });
 
@@ -297,7 +297,7 @@ describe("Routing", () => {
               "user/retrieve": endpointMock,
             },
           },
-        })
+        }),
       ).toThrowErrorMatchingSnapshot();
       expect(() =>
         initRouting({
@@ -307,7 +307,7 @@ describe("Routing", () => {
           routing: {
             "v1/user/retrieve": endpointMock,
           },
-        })
+        }),
       ).toThrowErrorMatchingSnapshot();
     });
 
@@ -357,7 +357,7 @@ describe("Routing", () => {
       await routeHandler(
         requestMock as unknown as Request,
         responseMock as unknown as Response,
-        nextMock
+        nextMock,
       );
       expect(nextMock).toBeCalledTimes(0);
       expect(handlerMock).toBeCalledTimes(1);

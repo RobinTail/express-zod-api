@@ -97,7 +97,7 @@ export interface CommonConfig<TAG extends string = string> {
 
 export const createConfig = <
   TAG extends string,
-  T extends (ServerConfig | AppConfig) & CommonConfig<TAG>
+  T extends (ServerConfig | AppConfig) & CommonConfig<TAG>,
 >(
-  config: T
+  config: T,
 ): T => config;

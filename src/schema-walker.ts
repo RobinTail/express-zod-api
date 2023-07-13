@@ -8,7 +8,7 @@ export type HandlingVariant = "last" | "regular" | "each";
 
 type VariantDependingProps<
   Variant extends HandlingVariant,
-  U
+  U,
 > = Variant extends "regular"
   ? { next: SchemaHandler<z.ZodTypeAny, U, {}, "last"> }
   : Variant extends "each"
@@ -19,7 +19,7 @@ type SchemaHandlingProps<
   T extends z.ZodTypeAny,
   U,
   Context extends object,
-  Variant extends HandlingVariant
+  Variant extends HandlingVariant,
 > = {
   schema: T;
 } & Context &
@@ -29,7 +29,7 @@ export type SchemaHandler<
   T extends z.ZodTypeAny,
   U,
   Context extends object = {},
-  Variant extends HandlingVariant = "regular"
+  Variant extends HandlingVariant = "regular",
 > = (params: SchemaHandlingProps<T, U, Context, Variant>) => U;
 
 export type ProprietaryKinds =

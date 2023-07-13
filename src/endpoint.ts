@@ -31,7 +31,7 @@ import { Security } from "./security";
 
 const getMimeTypesFromApiResponse = <S extends z.ZodTypeAny>(
   subject: S | ApiResponse<S>,
-  fallback = [mimeJson]
+  fallback = [mimeJson],
 ) => {
   if (subject instanceof z.ZodType) {
     return fallback;
@@ -59,7 +59,7 @@ export abstract class AbstractEndpoint {
     config: CommonConfig;
   }): Promise<void>;
   public abstract getDescription(
-    variant: DescriptionVariant
+    variant: DescriptionVariant,
   ): string | undefined;
   public abstract getMethods(): Method[];
   public abstract getSchema(variant: IOVariant): IOSchema;
@@ -80,7 +80,7 @@ type EndpointProps<
   POS extends z.ZodTypeAny,
   NEG extends z.ZodTypeAny,
   SCO extends string,
-  TAG extends string
+  TAG extends string,
 > = {
   middlewares: AnyMiddlewareDef[];
   inputSchema: IN;
@@ -101,7 +101,7 @@ export class Endpoint<
   POS extends z.ZodTypeAny,
   NEG extends z.ZodTypeAny,
   SCO extends string,
-  TAG extends string
+  TAG extends string,
 > extends AbstractEndpoint {
   protected readonly descriptions: Record<
     DescriptionVariant,
@@ -140,7 +140,7 @@ export class Endpoint<
     ].forEach(({ name, schema }) => {
       if (hasTopLevelTransformingEffect(schema)) {
         throw new IOSchemaError(
-          `Using transformations on the top level of endpoint ${name} is not allowed.`
+          `Using transformations on the top level of endpoint ${name} is not allowed.`,
         );
       }
     });
@@ -234,7 +234,7 @@ export class Endpoint<
     return this.middlewares.reduce<LogicalContainer<Security>>(
       (acc, middleware) =>
         middleware.security ? combineContainers(acc, middleware.security) : acc,
-      { and: [] }
+      { and: [] },
     );
   }
 
@@ -306,13 +306,13 @@ export class Endpoint<
           request,
           response,
           logger,
-        })
+        }),
       );
       isStreamClosed = "writableEnded" in response && response.writableEnded;
       if (isStreamClosed) {
         logger.warn(
           `The middleware ${def.middleware.name} has closed the stream. Accumulated options:`,
-          options
+          options,
         );
         break;
       }
@@ -423,7 +423,7 @@ export class Endpoint<
         return;
       }
       output = await this.#parseOutput(
-        await this.#parseAndRunHandler({ input, options, logger })
+        await this.#parseAndRunHandler({ input, options, logger }),
       );
     } catch (e) {
       error = makeErrorFromAnything(e);

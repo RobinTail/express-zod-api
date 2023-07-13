@@ -67,7 +67,7 @@ describe("Endpoint", () => {
         middleware: middlewareMock,
       });
       const factory = new EndpointsFactory(defaultResultHandler).addMiddleware(
-        middlewareDefinitionMock
+        middlewareDefinitionMock,
       );
       const handlerMock = jest
         .fn()
@@ -231,7 +231,7 @@ describe("Endpoint", () => {
         middleware: middlewareMock,
       });
       const factory = defaultEndpointsFactory.addMiddleware(
-        middlewareDefinitionMock
+        middlewareDefinitionMock,
       );
       const handlerMock = jest.fn();
       const endpoint = factory.build({
@@ -252,7 +252,7 @@ describe("Endpoint", () => {
       expect(loggerMock.error).toBeCalledTimes(0);
       expect(loggerMock.warn).toBeCalledTimes(1);
       expect(loggerMock.warn.mock.calls[0][0]).toBe(
-        "The middleware mockConstructor has closed the stream. Accumulated options:"
+        "The middleware mockConstructor has closed the stream. Accumulated options:",
       );
       expect(loggerMock.warn.mock.calls[0][1]).toEqual({ inc: 454 });
       expect(responseMock.status).toBeCalledTimes(0);
@@ -271,7 +271,7 @@ describe("Endpoint", () => {
           handler: () => {
             throw new Error("Something unexpected happened");
           },
-        })
+        }),
       );
       const endpoint = factory.build({
         method: "get",
@@ -284,14 +284,14 @@ describe("Endpoint", () => {
       const { loggerMock, responseMock } = await testEndpoint({ endpoint });
       expect(loggerMock.error).toBeCalledTimes(1);
       expect(loggerMock.error.mock.calls[0][0]).toBe(
-        "Result handler failure: Something unexpected happened."
+        "Result handler failure: Something unexpected happened.",
       );
       expect(responseMock.status).toBeCalledTimes(1);
       expect(responseMock.status.mock.calls[0][0]).toBe(500);
       expect(responseMock.json).toBeCalledTimes(0);
       expect(responseMock.end).toBeCalledTimes(1);
       expect(responseMock.end.mock.calls[0][0]).toBe(
-        "An error occurred while serving the result: Something unexpected happened."
+        "An error occurred while serving the result: Something unexpected happened.",
       );
     });
   });
@@ -342,7 +342,7 @@ describe("Endpoint", () => {
         handler: jest.fn(),
       });
       expect(
-        serializeSchemaForTest(endpoint.getSchema("positive"))
+        serializeSchemaForTest(endpoint.getSchema("positive")),
       ).toMatchSnapshot();
     });
   });
@@ -360,7 +360,7 @@ describe("Endpoint", () => {
         handler: jest.fn(),
       });
       expect(
-        serializeSchemaForTest(endpoint.getSchema("negative"))
+        serializeSchemaForTest(endpoint.getSchema("negative")),
       ).toMatchSnapshot();
     });
   });
@@ -400,7 +400,7 @@ describe("Endpoint", () => {
               m: z.number().refine(async (m) => m < 10),
             }),
             middleware: async () => ({}),
-          })
+          }),
         )
         .build({
           methods: ["post"],
@@ -441,7 +441,7 @@ describe("Endpoint", () => {
             middleware: async () => {
               throw new Error("Should not be here");
             },
-          })
+          }),
         )
         .addExpressMiddleware((req, res, next) => {
           res.set("X-Custom-Header", "test");
@@ -507,7 +507,7 @@ describe("Endpoint", () => {
             // eslint-disable-next-line @typescript-eslint/no-throw-literal
             throw "Something unexpected happened";
           },
-        })
+        }),
       );
       const endpoint = factory.build({
         method: "get",
@@ -520,14 +520,14 @@ describe("Endpoint", () => {
       const { loggerMock, responseMock } = await testEndpoint({ endpoint });
       expect(loggerMock.error).toBeCalledTimes(1);
       expect(loggerMock.error.mock.calls[0][0]).toBe(
-        "Result handler failure: Something unexpected happened."
+        "Result handler failure: Something unexpected happened.",
       );
       expect(responseMock.status).toBeCalledTimes(1);
       expect(responseMock.status.mock.calls[0][0]).toBe(500);
       expect(responseMock.json).toBeCalledTimes(0);
       expect(responseMock.end).toBeCalledTimes(1);
       expect(responseMock.end.mock.calls[0][0]).toBe(
-        "An error occurred while serving the result: Something unexpected happened."
+        "An error occurred while serving the result: Something unexpected happened.",
       );
     });
 
@@ -539,7 +539,7 @@ describe("Endpoint", () => {
             // eslint-disable-next-line @typescript-eslint/no-throw-literal
             throw "Something went wrong";
           },
-        })
+        }),
       );
       const endpoint = factory.build({
         methods: ["post"],
@@ -585,7 +585,7 @@ describe("Endpoint", () => {
           {
             message: "type1Attribute is required if type is type1",
             path: ["dynamicValue"],
-          }
+          },
         ),
       output: z
         .object({})
@@ -670,7 +670,7 @@ describe("Endpoint", () => {
         })
         .refine(
           (x) => Object.keys(x).length >= 1,
-          "Please provide at least one property"
+          "Please provide at least one property",
         ),
       output: z.object({}),
       handler: async () => ({}),
@@ -724,11 +724,11 @@ describe("Endpoint", () => {
               handler: jest.fn(),
             },
             middlewares: [],
-          })
+          }),
       ).toThrowError(
         new IOSchemaError(
-          "Using transformations on the top level of endpoint input schema is not allowed."
-        )
+          "Using transformations on the top level of endpoint input schema is not allowed.",
+        ),
       );
       expect(
         () =>
@@ -743,11 +743,11 @@ describe("Endpoint", () => {
               handler: jest.fn(),
             },
             middlewares: [],
-          })
+          }),
       ).toThrowError(
         new IOSchemaError(
-          "Using transformations on the top level of endpoint output schema is not allowed."
-        )
+          "Using transformations on the top level of endpoint output schema is not allowed.",
+        ),
       );
     });
   });
@@ -773,7 +773,7 @@ describe("Endpoint", () => {
           handler: async ({ input: { middleware_date_input }, logger }) => {
             logger.debug(
               "date in endpoint handler",
-              typeof middleware_date_input
+              typeof middleware_date_input,
             );
             return {};
           },

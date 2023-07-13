@@ -58,7 +58,7 @@ const onLiteral: Producer<z.ZodLiteral<LiteralType>> = ({
       ? value
         ? f.createTrue()
         : f.createFalse()
-      : f.createStringLiteral(value)
+      : f.createStringLiteral(value),
   );
 
 const onObject: Producer<z.ZodObject<z.ZodRawShape>> = ({
@@ -78,7 +78,7 @@ const onObject: Producer<z.ZodObject<z.ZodRawShape>> = ({
       isOptional && hasQuestionMark
         ? f.createToken(ts.SyntaxKind.QuestionToken)
         : undefined,
-      next({ schema: value })
+      next({ schema: value }),
     );
     if (value.description) {
       addJsDocComment(propertySignature, value.description);
@@ -98,8 +98,8 @@ const onEnum: Producer<z.ZodEnum<[string, ...string[]]>> = ({
 }) =>
   f.createUnionTypeNode(
     options.map((option) =>
-      f.createLiteralTypeNode(f.createStringLiteral(option))
-    )
+      f.createLiteralTypeNode(f.createStringLiteral(option)),
+    ),
   );
 
 const onSomeUnion: Producer<
@@ -131,7 +131,7 @@ const onEffects: Producer<z.ZodEffects<z.ZodTypeAny>> = ({
       object: ts.SyntaxKind.ObjectKeyword,
     };
     return f.createKeywordTypeNode(
-      (outputType && resolutions[outputType]) || ts.SyntaxKind.AnyKeyword
+      (outputType && resolutions[outputType]) || ts.SyntaxKind.AnyKeyword,
     );
   }
   return input;
@@ -143,9 +143,9 @@ const onNativeEnum: Producer<z.ZodNativeEnum<z.EnumLike>> = ({ schema }) =>
       f.createLiteralTypeNode(
         typeof value === "number"
           ? f.createNumericLiteral(value)
-          : f.createStringLiteral(value)
-      )
-    )
+          : f.createStringLiteral(value),
+      ),
+    ),
   );
 
 const onOptional: Producer<z.ZodOptional<z.ZodTypeAny>> = ({
@@ -185,8 +185,8 @@ const onIntersection: Producer<
 > = ({ next, schema }) =>
   f.createIntersectionTypeNode(
     [schema._def.left, schema._def.right].map((entry) =>
-      next({ schema: entry })
-    )
+      next({ schema: entry }),
+    ),
   );
 
 const onDefault: Producer<z.ZodDefault<z.ZodTypeAny>> = ({ next, schema }) =>

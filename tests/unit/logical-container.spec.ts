@@ -11,16 +11,16 @@ describe("LogicalContainer", () => {
       expect(
         mapLogicalContainer(
           { and: [1, 2, { or: [3, 4] }, 5] },
-          (value) => value * 2
-        )
+          (value) => value * 2,
+        ),
       ).toEqual<LogicalContainer<number>>({ and: [2, 4, { or: [6, 8] }, 10] });
     });
     test("should map LogicalOr", () => {
       expect(
         mapLogicalContainer(
           { or: [1, 2, { and: [3, 4] }, 5] },
-          (value) => value * 2
-        )
+          (value) => value * 2,
+        ),
       ).toEqual<LogicalContainer<number>>({ or: [2, 4, { and: [6, 8] }, 10] });
     });
     test("should accept plain value", () => {
@@ -70,8 +70,8 @@ describe("LogicalContainer", () => {
       expect(
         combineContainers(
           { and: [{ or: [1, 2] }, { or: [3, 4] }] },
-          { and: [{ or: [5, 6] }, { or: [7, 8] }] }
-        )
+          { and: [{ or: [5, 6] }, { or: [7, 8] }] },
+        ),
       ).toEqual<LogicalContainer<number>>({
         and: [{ or: [1, 2] }, { or: [3, 4] }, { or: [5, 6] }, { or: [7, 8] }],
       });
@@ -99,8 +99,8 @@ describe("LogicalContainer", () => {
       expect(
         combineContainers(
           { or: [{ and: [1, 2] }, { and: [3, 4] }] },
-          { or: [{ and: [5, 6] }, { and: [7, 8] }] }
-        )
+          { or: [{ and: [5, 6] }, { and: [7, 8] }] },
+        ),
       ).toEqual<LogicalContainer<number>>({
         or: [
           { and: [1, 2, 5, 6] },
@@ -157,10 +157,10 @@ describe("LogicalContainer", () => {
 
     test("Issue #816: combining empty LogicalAnd with a flat that is an object", () => {
       expect(
-        combineContainers({ and: [] }, { type: "bearer", format: "JWT" })
+        combineContainers({ and: [] }, { type: "bearer", format: "JWT" }),
       ).toEqual({ and: [{ type: "bearer", format: "JWT" }] });
       expect(
-        combineContainers({ type: "bearer", format: "JWT" }, { and: [] })
+        combineContainers({ type: "bearer", format: "JWT" }, { and: [] }),
       ).toEqual({ and: [{ type: "bearer", format: "JWT" }] });
     });
   });

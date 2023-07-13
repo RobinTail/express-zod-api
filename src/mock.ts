@@ -59,7 +59,7 @@ export const makeResponseMock = <RES>(responseProps?: RES) => {
 export const testEndpoint = async <
   REQ extends Partial<Record<keyof Request, any>> | undefined = undefined,
   RES extends Partial<Record<keyof Response, any>> | undefined = undefined,
-  LOG extends Partial<Record<keyof Logger, any>> | undefined = undefined
+  LOG extends Partial<Record<keyof Logger, any>> | undefined = undefined,
 >({
   endpoint,
   requestProps,

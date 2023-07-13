@@ -61,7 +61,7 @@ describe("Errors", () => {
 
     test("should have the name matching its class", () => {
       expect(new DependsOnMethodError("test").name).toBe(
-        "DependsOnMethodError"
+        "DependsOnMethodError",
       );
     });
   });
@@ -76,13 +76,13 @@ describe("Errors", () => {
 
     test("should have the name matching its class", () => {
       expect(new OutputValidationError(zodError).name).toBe(
-        "OutputValidationError"
+        "OutputValidationError",
       );
     });
 
     test("should have .originalError property matching the one used for constructing", () => {
       expect(new OutputValidationError(zodError).originalError).toEqual(
-        zodError
+        zodError,
       );
     });
   });
@@ -97,13 +97,13 @@ describe("Errors", () => {
 
     test("should have the name matching its class", () => {
       expect(new InputValidationError(zodError).name).toBe(
-        "InputValidationError"
+        "InputValidationError",
       );
     });
 
     test("should have .originalError property matching the one used for constructing", () => {
       expect(new InputValidationError(zodError).originalError).toEqual(
-        zodError
+        zodError,
       );
     });
   });

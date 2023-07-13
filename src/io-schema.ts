@@ -22,7 +22,7 @@ export type IOSchema<U extends UnknownKeysParam = any> =
 
 export type ProbableIntersection<
   A extends IOSchema<"strip"> | null,
-  B extends IOSchema
+  B extends IOSchema,
 > = A extends null
   ? B
   : A extends IOSchema<"strip">
@@ -37,17 +37,17 @@ export type ProbableIntersection<
  */
 export const getFinalEndpointInputSchema = <
   MIN extends IOSchema<"strip"> | null,
-  IN extends IOSchema
+  IN extends IOSchema,
 >(
   middlewares: AnyMiddlewareDef[],
-  input: IN
+  input: IN,
 ): ProbableIntersection<MIN, IN> => {
   const allSchemas = middlewares
     .map(({ input: schema }) => schema)
     .concat(input);
 
   const finalSchema = allSchemas.reduce((acc, schema) =>
-    acc.and(schema)
+    acc.and(schema),
   ) as ProbableIntersection<MIN, IN>;
 
   return allSchemas.reduce((acc, schema) => copyMeta(schema, acc), finalSchema);

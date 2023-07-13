@@ -758,7 +758,7 @@ const endpoint = endpointsFactory.build({
     })
     .refine(
       (inputs) => Object.keys(inputs).length >= 1,
-      "Please provide at least one property"
+      "Please provide at least one property",
     ),
   // ...
 });
@@ -1070,7 +1070,7 @@ import { defaultEndpointsFactory } from "express-zod-api";
 import cors from "cors";
 
 const myFactory = defaultEndpointsFactory.addExpressMiddleware(
-  cors({ credentials: true })
+  cors({ credentials: true }),
 );
 ```
 
@@ -1362,7 +1362,7 @@ import cors from "cors";
 import { auth } from "express-oauth2-jwt-bearer";
 
 const simpleUsage = defaultEndpointsFactory.addExpressMiddleware(
-  cors({ credentials: true })
+  cors({ credentials: true }),
 );
 
 const advancedUsage = defaultEndpointsFactory.use(auth(), {
@@ -1686,7 +1686,7 @@ const getUserEndpoint = endpointsFactory.build({
       id: z.string().transform((value) => parseInt(value, 10)),
       // other inputs (in query):
       withExtendedInformation: z.boolean().optional(),
-    })
+    }),
   ).example({
     id: "12",
     withExtendedInformation: true,
@@ -1758,7 +1758,7 @@ const exampleEndpoint = defaultEndpointsFactory.build({
     z.object({
       id: z.number().int().nonnegative(),
       name: z.string().nonempty(),
-    })
+    }),
   ).example({
     id: 12,
     name: "John Doe",
@@ -1767,7 +1767,7 @@ const exampleEndpoint = defaultEndpointsFactory.build({
     z.object({
       name: z.string(),
       timestamp: z.number().int().nonnegative(),
-    })
+    }),
   ).example({
     name: "John Doe",
     timestamp: 1235698995125,
@@ -1872,7 +1872,7 @@ const config = createConfig({
 // example
 z.record(
   z.enum(["option1", "option2"]), // keys
-  z.boolean() // values
+  z.boolean(), // values
 );
 ```
 
@@ -2117,7 +2117,7 @@ const fileStreamingEndpointsFactoryBefore = new EndpointsFactory(
   createResultHandler({
     getPositiveResponse: () => createApiResponse(z.string(), "image/*"),
     // ...,
-  })
+  }),
 );
 
 // after
@@ -2125,7 +2125,7 @@ const fileStreamingEndpointsFactoryAfter = new EndpointsFactory(
   createResultHandler({
     getPositiveResponse: () => createApiResponse(z.file().binary(), "image/*"),
     // ...,
-  })
+  }),
 );
 ```
 
@@ -2284,13 +2284,13 @@ const myResultHandlerV2 = createResultHandler({
         // ...,
         someProperty: markOutput(output),
       }),
-      ["mime/type1", "mime/type2"] // optional, default: application/json
+      ["mime/type1", "mime/type2"], // optional, default: application/json
     ),
   getNegativeResponse: () =>
     createApiResponse(
       z.object({
         /* ... */
-      })
+      }),
     ),
   handler: ({ error, input, output, request, response, logger }) => {
     /* ... */
@@ -2399,7 +2399,7 @@ const middleware = createMiddleware({
     .or(
       z.object({
         two: z.number(),
-      })
+      }),
     ),
   middleware: async ({ input }) => ({
     input, // => type: { one: string } | { two: number }

@@ -37,8 +37,8 @@ describe("Common Helpers", () => {
             method: "POST",
             header: () => "application/json",
           } as unknown as Request,
-          undefined
-        )
+          undefined,
+        ),
       ).toEqual({
         param: 123,
       });
@@ -50,8 +50,8 @@ describe("Common Helpers", () => {
             },
             method: "PUT",
           } as Request,
-          {}
-        )
+          {},
+        ),
       ).toEqual({
         param: 123,
       });
@@ -63,8 +63,8 @@ describe("Common Helpers", () => {
             },
             method: "PATCH",
           } as Request,
-          undefined
-        )
+          undefined,
+        ),
       ).toEqual({
         param: 123,
       });
@@ -78,8 +78,8 @@ describe("Common Helpers", () => {
             },
             method: "GET",
           } as unknown as Request,
-          {}
-        )
+          {},
+        ),
       ).toEqual({
         param: 123,
       });
@@ -92,8 +92,8 @@ describe("Common Helpers", () => {
             body: { b: "body" },
             method: "DELETE",
           } as unknown as Request,
-          undefined
-        )
+          undefined,
+        ),
       ).toEqual({
         a: "query",
       });
@@ -106,8 +106,8 @@ describe("Common Helpers", () => {
             body: { b: "body" },
             method: "UNSUPPORTED",
           } as unknown as Request,
-          undefined
-        )
+          undefined,
+        ),
       ).toEqual({
         a: "query",
         b: "body",
@@ -126,8 +126,8 @@ describe("Common Helpers", () => {
             method: "POST",
             header: () => "multipart/form-data; charset=utf-8",
           } as unknown as Request,
-          {}
-        )
+          {},
+        ),
       ).toEqual({
         param: 123,
         file: "456",
@@ -148,8 +148,8 @@ describe("Common Helpers", () => {
           } as unknown as Request,
           {
             post: ["query", "body"],
-          }
-        )
+          },
+        ),
       ).toEqual({
         a: "body",
         b: "query",
@@ -172,8 +172,8 @@ describe("Common Helpers", () => {
             method: "POST",
             header: () => "application/json",
           } as unknown as Request,
-          undefined
-        )
+          undefined,
+        ),
       ).toEqual({
         a: "url param",
         b: "url param",
@@ -181,7 +181,7 @@ describe("Common Helpers", () => {
     });
     test("Issue 514: should return empty object for OPTIONS", () => {
       expect(
-        getInput({ method: "OPTIONS" } as unknown as Request, undefined)
+        getInput({ method: "OPTIONS" } as unknown as Request, undefined),
       ).toEqual({});
     });
   });
@@ -192,7 +192,7 @@ describe("Common Helpers", () => {
         isLoggerConfig({
           level: "debug",
           color: true,
-        })
+        }),
       ).toBeTruthy();
     });
     test("Should reject the object with invalid properties", () => {
@@ -200,25 +200,25 @@ describe("Common Helpers", () => {
         isLoggerConfig({
           level: "something",
           color: true,
-        })
+        }),
       ).toBeFalsy();
       expect(
         isLoggerConfig({
           level: "debug",
           color: null,
-        })
+        }),
       ).toBeFalsy();
     });
     test("Should reject the object with missing properties", () => {
       expect(
         isLoggerConfig({
           level: "something",
-        })
+        }),
       ).toBeFalsy();
       expect(
         isLoggerConfig({
           color: null,
-        })
+        }),
       ).toBeFalsy();
     });
     test("Should reject non-objects", () => {
@@ -257,10 +257,10 @@ describe("Common Helpers", () => {
 
     test("should pass message from other error types", () => {
       expect(
-        getMessageFromError(createHttpError(502, "something went wrong"))
+        getMessageFromError(createHttpError(502, "something went wrong")),
       ).toMatchSnapshot();
       expect(
-        getMessageFromError(new Error("something went wrong"))
+        getMessageFromError(new Error("something went wrong")),
       ).toMatchSnapshot();
     });
   });
@@ -268,7 +268,7 @@ describe("Common Helpers", () => {
   describe("getStatusCodeFromError()", () => {
     test("should get status code from HttpError", () => {
       expect(
-        getStatusCodeFromError(createHttpError(403, "Access denied"))
+        getStatusCodeFromError(createHttpError(403, "Access denied")),
       ).toEqual(403);
     });
 
@@ -282,7 +282,7 @@ describe("Common Helpers", () => {
             expected: "number",
             received: "string",
           },
-        ])
+        ]),
       );
       expect(getStatusCodeFromError(error)).toEqual(400);
     });
@@ -314,8 +314,8 @@ describe("Common Helpers", () => {
       expect(
         getExamples(
           withMeta(z.string()).example("some").example("another"),
-          false
-        )
+          false,
+        ),
       ).toEqual(["some", "another"]);
     });
     test("should return parsed examples for output on demand", () => {
@@ -324,8 +324,8 @@ describe("Common Helpers", () => {
           withMeta(z.string().transform((v) => parseInt(v, 10)))
             .example("123")
             .example("456"),
-          true
-        )
+          true,
+        ),
       ).toEqual([123, 456]);
     });
     test("should filter out invalid examples according to the schema in both cases", () => {
@@ -335,8 +335,8 @@ describe("Common Helpers", () => {
             .example("some")
             .example(123 as unknown as string)
             .example("another"),
-          false
-        )
+          false,
+        ),
       ).toEqual(["some", "another"]);
       expect(
         getExamples(
@@ -344,20 +344,20 @@ describe("Common Helpers", () => {
             .example("123")
             .example(null as unknown as string)
             .example("456"),
-          true
-        )
+          true,
+        ),
       ).toEqual([123, 456]);
     });
     test.each([z.array(z.number().int()), z.tuple([z.number(), z.number()])])(
       "Issue #892: should handle examples of arrays and tuples %#",
       (schema) => {
         expect(
-          getExamples(withMeta(schema).example([1, 2]).example([3, 4]), false)
+          getExamples(withMeta(schema).example([1, 2]).example([3, 4]), false),
         ).toEqual([
           [1, 2],
           [3, 4],
         ]);
-      }
+      },
     );
   });
 
@@ -420,33 +420,33 @@ describe("Common Helpers", () => {
   describe("hasTopLevelTransformingEffect()", () => {
     test("should return true for transformation", () => {
       expect(
-        hasTopLevelTransformingEffect(z.object({}).transform(() => []))
+        hasTopLevelTransformingEffect(z.object({}).transform(() => [])),
       ).toBeTruthy();
     });
     test("should detect transformation in intersection", () => {
       expect(
         hasTopLevelTransformingEffect(
-          z.object({}).and(z.object({}).transform(() => []))
-        )
+          z.object({}).and(z.object({}).transform(() => [])),
+        ),
       ).toBeTruthy();
     });
     test("should detect transformation in union", () => {
       expect(
         hasTopLevelTransformingEffect(
-          z.object({}).or(z.object({}).transform(() => []))
-        )
+          z.object({}).or(z.object({}).transform(() => [])),
+        ),
       ).toBeTruthy();
     });
     test("should return false for object fields using transformations", () => {
       expect(
         hasTopLevelTransformingEffect(
-          z.object({ s: z.string().transform(() => 123) })
-        )
+          z.object({ s: z.string().transform(() => 123) }),
+        ),
       ).toBeFalsy();
     });
     test("should return false for refinement", () => {
       expect(
-        hasTopLevelTransformingEffect(z.object({}).refine(() => true))
+        hasTopLevelTransformingEffect(z.object({}).refine(() => true)),
       ).toBeFalsy();
     });
   });
@@ -550,7 +550,7 @@ describe("Common Helpers", () => {
       "should check the presence and value of coerce prop %#",
       ({ schema, coercion }) => {
         expect(hasCoercion(schema)).toBe(coercion);
-      }
+      },
     );
   });
 });

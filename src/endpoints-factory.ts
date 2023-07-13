@@ -28,7 +28,7 @@ type BuildProps<
   OPT extends FlatObject,
   M extends Method,
   SCO extends string,
-  TAG extends string
+  TAG extends string,
 > = {
   input: IN;
   output: OUT;
@@ -45,7 +45,7 @@ export class EndpointsFactory<
   IN extends IOSchema<"strip"> | null = null,
   OUT extends FlatObject = {},
   SCO extends string = string,
-  TAG extends string = string
+  TAG extends string = string,
 > {
   protected resultHandler: ResultHandlerDefinition<POS, NEG>;
   protected middlewares: AnyMiddlewareDef[] = [];
@@ -62,7 +62,7 @@ export class EndpointsFactory<
       | {
           resultHandler: ResultHandlerDefinition<POS, NEG>;
           config?: CommonConfig<TAG>;
-        }
+        },
   ) {
     this.resultHandler =
       "resultHandler" in subject ? subject.resultHandler : subject;
@@ -74,13 +74,13 @@ export class EndpointsFactory<
     CIN extends IOSchema<"strip"> | null,
     COUT extends FlatObject,
     CSCO extends string,
-    CTAG extends string
+    CTAG extends string,
   >(
     middlewares: AnyMiddlewareDef[],
-    resultHandler: ResultHandlerDefinition<CPOS, CNEG>
+    resultHandler: ResultHandlerDefinition<CPOS, CNEG>,
   ) {
     const factory = new EndpointsFactory<CPOS, CNEG, CIN, COUT, CSCO, CTAG>(
-      resultHandler
+      resultHandler,
     );
     factory.middlewares = middlewares;
     return factory;
@@ -89,7 +89,7 @@ export class EndpointsFactory<
   public addMiddleware<
     AIN extends IOSchema<"strip">,
     AOUT extends FlatObject,
-    ASCO extends string
+    ASCO extends string,
   >(subject: MiddlewareDefinition<AIN, OUT, AOUT, ASCO>) {
     return EndpointsFactory.#create<
       POS,
@@ -106,13 +106,13 @@ export class EndpointsFactory<
   public addExpressMiddleware<
     R extends Request,
     S extends Response,
-    AOUT extends FlatObject = {}
+    AOUT extends FlatObject = {},
   >(
     middleware: ExpressMiddleware<R, S>,
-    features?: ExpressMiddlewareFeatures<R, S, AOUT>
+    features?: ExpressMiddlewareFeatures<R, S, AOUT>,
   ) {
     const transformer = features?.transformer || ((err: Error) => err);
-    const provider = features?.provider || (() => ({} as AOUT));
+    const provider = features?.provider || (() => ({}) as AOUT);
     const definition: AnyMiddlewareDef = {
       type: "express",
       input: z.object({}),
@@ -129,7 +129,7 @@ export class EndpointsFactory<
     };
     return EndpointsFactory.#create<POS, NEG, IN, OUT & AOUT, SCO, TAG>(
       this.middlewares.concat(definition),
-      this.resultHandler
+      this.resultHandler,
     );
   }
 
@@ -139,9 +139,9 @@ export class EndpointsFactory<
         createMiddleware({
           input: z.object({}),
           middleware: async () => options,
-        })
+        }),
       ),
-      this.resultHandler
+      this.resultHandler,
     );
   }
 
@@ -173,5 +173,5 @@ export class EndpointsFactory<
 }
 
 export const defaultEndpointsFactory = new EndpointsFactory(
-  defaultResultHandler
+  defaultResultHandler,
 );

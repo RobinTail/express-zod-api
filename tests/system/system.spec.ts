@@ -26,7 +26,7 @@ describe("App", () => {
             }),
             {
               provider: () => ({ corsDone: true }),
-            }
+            },
           )
           .build({
             method: "get",
@@ -43,7 +43,7 @@ describe("App", () => {
             handler: () => {
               throw new Error("I am faulty");
             },
-          })
+          }),
         )
           .addMiddleware(
             createMiddleware({
@@ -54,13 +54,13 @@ describe("App", () => {
                   .transform((value) => {
                     if (value) {
                       throw new Error(
-                        "Custom error in the Middleware input validation"
+                        "Custom error in the Middleware input validation",
                       );
                     }
                   }),
               }),
               middleware: async () => ({}),
-            })
+            }),
           )
           .build({
             method: "get",
@@ -71,7 +71,7 @@ describe("App", () => {
                 .transform((value) => {
                   if (value) {
                     throw new Error(
-                      "Custom error in the Endpoint input validation"
+                      "Custom error in the Endpoint input validation",
                     );
                   }
                 }),
@@ -94,7 +94,7 @@ describe("App", () => {
                   id: 354,
                 },
               }),
-            })
+            }),
           )
           .addMiddleware(
             createMiddleware({
@@ -103,7 +103,7 @@ describe("App", () => {
                 method: request.method.toLowerCase() as Method,
                 permissions: user.id === 354 ? ["any"] : [],
               }),
-            })
+            }),
           )
           .build({
             methods: ["get", "post"],
@@ -151,7 +151,7 @@ describe("App", () => {
           post: ["query", "body", "files"],
         },
       },
-      routing
+      routing,
     ).httpServer;
   });
 
@@ -169,7 +169,7 @@ describe("App", () => {
 
     test("Should handle valid GET request", async () => {
       const response = await fetch(
-        "http://127.0.0.1:8055/v1/test?key=123&something=joke"
+        "http://127.0.0.1:8055/v1/test?key=123&something=joke",
       );
       expect(response.status).toBe(200);
       const json = await response.json();
@@ -218,7 +218,7 @@ describe("App", () => {
           headers: {
             "Content-Type": "application/json",
           },
-        }
+        },
       );
       expect(response.status).toBe(200);
       const json = await response.json();
@@ -241,7 +241,7 @@ describe("App", () => {
           headers: {
             "Accept-Encoding": "gzip, deflate",
           },
-        }
+        },
       );
       expect(response.status).toBe(200);
       console.log(response.headers);
@@ -262,10 +262,10 @@ describe("App", () => {
         data: { corsDone: true },
       });
       expect(response.headers.get("Access-Control-Allow-Credentials")).toBe(
-        "true"
+        "true",
       );
       expect(response.headers.get("Access-Control-Expose-Headers")).toBe(
-        "Content-Range,X-Content-Range"
+        "Content-Range,X-Content-Range",
       );
     });
   });
@@ -281,7 +281,7 @@ describe("App", () => {
       expect(response.status).toBe(500);
       const text = await response.text();
       expect(text).toBe(
-        "An error occurred while serving the result: I am faulty."
+        "An error occurred while serving the result: I am faulty.",
       );
     });
 
@@ -293,13 +293,13 @@ describe("App", () => {
           headers: {
             "Content-Type": "application/json",
           },
-        }
+        },
       );
       expect(response.status).toBe(500);
       const text = await response.text();
       expect(text).toBe(
         "An error occurred while serving the result: I am faulty.\n" +
-          "Original error: Custom error in the Middleware input validation."
+          "Original error: Custom error in the Middleware input validation.",
       );
     });
 
@@ -311,13 +311,13 @@ describe("App", () => {
           headers: {
             "Content-Type": "application/json",
           },
-        }
+        },
       );
       expect(response.status).toBe(500);
       const text = await response.text();
       expect(text).toBe(
         "An error occurred while serving the result: I am faulty.\n" +
-          "Original error: Custom error in the Endpoint input validation."
+          "Original error: Custom error in the Endpoint input validation.",
       );
     });
   });
@@ -353,7 +353,7 @@ describe("App", () => {
         error: {
           message: expect.stringMatching(
             // the 2nd option is for Node 19
-            /(Unexpected end of JSON input|Unterminated string in JSON at position 25)/
+            /(Unexpected end of JSON input|Unterminated string in JSON at position 25)/,
           ),
         },
       });

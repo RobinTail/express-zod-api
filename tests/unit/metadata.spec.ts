@@ -66,7 +66,7 @@ describe("Metadata", () => {
           schemaWithMeta.email()._def as unknown as MetaDef<
             typeof schemaWithMeta
           >
-        ).expressZodApiMeta.examples
+        ).expressZodApiMeta.examples,
       ).toEqual(["test"]);
     });
 
@@ -78,7 +78,7 @@ describe("Metadata", () => {
       ]);
       expect(
         withMeta(schemaWithMeta).example("another")._def.expressZodApiMeta
-          .examples
+          .examples,
       ).toEqual(["test", "another"]);
     });
   });
@@ -117,7 +117,7 @@ describe("Metadata", () => {
     });
     test("should return the value that has been set", () => {
       expect(getMeta(withMeta(z.string()).example("test"), "examples")).toEqual(
-        ["test"]
+        ["test"],
       );
     });
     test("should return an array of examples", () => {
@@ -125,8 +125,8 @@ describe("Metadata", () => {
       expect(
         getMeta(
           withMeta(z.string()).example("test1").example("test2"),
-          "examples"
-        )
+          "examples",
+        ),
       ).toEqual(["test1", "test2"]);
     });
   });
@@ -152,7 +152,7 @@ describe("Metadata", () => {
       const src = withMeta(
         z.object({
           a: z.string(),
-        })
+        }),
       )
         .example({
           a: "some",
@@ -163,7 +163,7 @@ describe("Metadata", () => {
       const dest = withMeta(
         z.object({
           b: z.number(),
-        })
+        }),
       )
         .example({
           b: 123,

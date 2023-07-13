@@ -35,7 +35,7 @@ describe("ESM Test", () => {
 
     test("Should handle valid GET request", async () => {
       const response = await fetch(
-        `http://localhost:${esmTestPort}/v1/hello?name=Rick`
+        `http://localhost:${esmTestPort}/v1/hello?name=Rick`,
       );
       expect(response.status).toBe(200);
       const json = await response.json();

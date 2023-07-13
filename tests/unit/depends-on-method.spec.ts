@@ -53,7 +53,7 @@ describe("DependsOnMethod", () => {
         new DependsOnMethod({
           get: endpoint,
           post: endpoint,
-        })
+        }),
     ).toThrowErrorMatchingSnapshot();
   });
 });

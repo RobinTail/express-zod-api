@@ -8,15 +8,15 @@ const attribution = `
 `.trim();
 
 const proud = chalk.italic(
-  "Proudly supports transgender community.".padStart(109)
+  "Proudly supports transgender community.".padStart(109),
 );
 const slogan = chalk.italic(
   "Start your API server with I/O schema validation and custom middlewares in minutes.".padStart(
-    109
-  )
+    109,
+  ),
 );
 const thanks = chalk.italic(
-  "Thank you for choosing Express Zod API for your project.".padStart(132)
+  "Thank you for choosing Express Zod API for your project.".padStart(132),
 );
 const dedication = chalk.italic("for trans sisters".padEnd(20));
 

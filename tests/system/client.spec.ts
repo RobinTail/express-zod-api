@@ -49,7 +49,7 @@ describe("Example", () => {
     };
 
   const client = new ExpressZodAPIClient(
-    createDefaultImplementation(`http://localhost:${config.server.listen}`)
+    createDefaultImplementation(`http://localhost:${config.server.listen}`),
   );
 
   test("Should listen", async () => {

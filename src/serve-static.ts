@@ -12,7 +12,7 @@ export class ServeStatic {
 
   public apply(
     path: string,
-    cb: (path: string, handler: StaticHandler) => void
+    cb: (path: string, handler: StaticHandler) => void,
   ): void {
     return cb(path, express.static(...this.params));
   }

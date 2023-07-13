@@ -51,20 +51,20 @@ export const addJsDocComment = (node: ts.Node, text: string) => {
     node,
     ts.SyntaxKind.MultiLineCommentTrivia,
     `* ${text} `,
-    true
+    true,
   );
 };
 
 export const createTypeAlias = (
   node: ts.TypeNode,
   identifier: string,
-  comment?: string
+  comment?: string,
 ) => {
   const typeAlias = f.createTypeAliasDeclaration(
     undefined,
     f.createIdentifier(identifier),
     undefined,
-    node
+    node,
   );
   if (comment) {
     addJsDocComment(typeAlias, comment);
@@ -74,14 +74,14 @@ export const createTypeAlias = (
 
 export const printNode = (
   node: ts.Node,
-  printerOptions?: ts.PrinterOptions
+  printerOptions?: ts.PrinterOptions,
 ) => {
   const sourceFile = ts.createSourceFile(
     "print.ts",
     "",
     ts.ScriptTarget.Latest,
     false,
-    ts.ScriptKind.TS
+    ts.ScriptKind.TS,
   );
   const printer = ts.createPrinter(printerOptions);
   return printer.printNode(ts.EmitHint.Unspecified, node, sourceFile);

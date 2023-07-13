@@ -13,7 +13,7 @@ export const uploadAvatarEndpoint = taggedEndpointsFactory.build({
         .upload()
         .refine(
           (file) => file.mimetype.match(/image\/.+/),
-          "Should be an image"
+          "Should be an image",
         ),
     })
     .passthrough(),

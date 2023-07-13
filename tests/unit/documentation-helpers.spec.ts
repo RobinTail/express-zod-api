@@ -63,7 +63,7 @@ describe("Documentation helpers", () => {
   const makeRefMock = jest.fn(
     (name: string, {}: SchemaObject | ReferenceObject): ReferenceObject => ({
       $ref: `#/components/schemas/${name}`,
-    })
+    }),
   );
   const requestContext: OpenAPIContext = {
     path: "/v1/user/:id",
@@ -83,7 +83,7 @@ describe("Documentation helpers", () => {
   };
   const makeNext =
     (
-      context: OpenAPIContext
+      context: OpenAPIContext,
     ): SchemaHandler<
       z.ZodTypeAny,
       SchemaObject | ReferenceObject,
@@ -108,7 +108,7 @@ describe("Documentation helpers", () => {
     test("should pass the object schema through", () => {
       const subject = extractObjectSchema(
         z.object({ one: z.string() }),
-        requestContext
+        requestContext,
       );
       expect(subject).toBeInstanceOf(z.ZodObject);
       expect(serializeSchemaForTest(subject)).toMatchSnapshot();
@@ -117,7 +117,7 @@ describe("Documentation helpers", () => {
     test("should return object schema for the union of object schemas", () => {
       const subject = extractObjectSchema(
         z.object({ one: z.string() }).or(z.object({ two: z.number() })),
-        requestContext
+        requestContext,
       );
       expect(subject).toBeInstanceOf(z.ZodObject);
       expect(serializeSchemaForTest(subject)).toMatchSnapshot();
@@ -126,7 +126,7 @@ describe("Documentation helpers", () => {
     test("should return object schema for the intersection of object schemas", () => {
       const subject = extractObjectSchema(
         z.object({ one: z.string() }).and(z.object({ two: z.number() })),
-        requestContext
+        requestContext,
       );
       expect(subject).toBeInstanceOf(z.ZodObject);
       expect(serializeSchemaForTest(subject)).toMatchSnapshot();
@@ -137,36 +137,36 @@ describe("Documentation helpers", () => {
         one: "test",
       });
       expect(
-        getMeta(extractObjectSchema(objectSchema, requestContext), "examples")
+        getMeta(extractObjectSchema(objectSchema, requestContext), "examples"),
       ).toEqual([{ one: "test" }]);
 
       const refinedObjSchema = withMeta(
-        z.object({ one: z.string() }).refine(() => true)
+        z.object({ one: z.string() }).refine(() => true),
       ).example({ one: "test" });
       expect(
         getMeta(
           extractObjectSchema(refinedObjSchema, requestContext),
-          "examples"
-        )
+          "examples",
+        ),
       ).toEqual([{ one: "test" }]);
 
       const unionSchema = withMeta(
-        z.object({ one: z.string() }).or(z.object({ two: z.number() }))
+        z.object({ one: z.string() }).or(z.object({ two: z.number() })),
       )
         .example({ one: "test1" })
         .example({ two: 123 });
       expect(
-        getMeta(extractObjectSchema(unionSchema, requestContext), "examples")
+        getMeta(extractObjectSchema(unionSchema, requestContext), "examples"),
       ).toEqual([{ one: "test1" }, { two: 123 }]);
 
       const intersectionSchema = withMeta(
-        z.object({ one: z.string() }).and(z.object({ two: z.number() }))
+        z.object({ one: z.string() }).and(z.object({ two: z.number() })),
       ).example({ one: "test1", two: 123 });
       expect(
         getMeta(
           extractObjectSchema(intersectionSchema, requestContext),
-          "examples"
-        )
+          "examples",
+        ),
       ).toEqual([{ one: "test1", two: 123 }]);
     });
 
@@ -174,7 +174,7 @@ describe("Documentation helpers", () => {
       test("should handle refined object schema", () => {
         const subject = extractObjectSchema(
           z.object({ one: z.string() }).refine(() => true),
-          requestContext
+          requestContext,
         );
         expect(subject).toBeInstanceOf(z.ZodObject);
         expect(serializeSchemaForTest(subject)).toMatchSnapshot();
@@ -184,13 +184,13 @@ describe("Documentation helpers", () => {
         expect(() =>
           extractObjectSchema(
             z.object({ one: z.string() }).transform(() => []),
-            requestContext
-          )
+            requestContext,
+          ),
         ).toThrowError(
           new IOSchemaError(
             "Using transformations on the top level of input schema is not allowed.\n" +
-              "Caused by input schema of an Endpoint assigned to GET method of /v1/user/:id path."
-          )
+              "Caused by input schema of an Endpoint assigned to GET method of /v1/user/:id path.",
+          ),
         );
       });
     });
@@ -214,7 +214,7 @@ describe("Documentation helpers", () => {
 
     test("should handle the ReferenceObject", () => {
       expect(
-        excludeParamsFromDepiction({ $ref: "test" }, ["a"])
+        excludeParamsFromDepiction({ $ref: "test" }, ["a"]),
       ).toMatchSnapshot();
     });
   });
@@ -224,10 +224,10 @@ describe("Documentation helpers", () => {
       expect(reformatParamsInPath("/v1/user")).toBe("/v1/user");
       expect(reformatParamsInPath("/v1/user/:id")).toBe("/v1/user/{id}");
       expect(reformatParamsInPath("/v1/flight/:from-:to")).toBe(
-        "/v1/flight/{from}-{to}"
+        "/v1/flight/{from}-{to}",
       );
       expect(reformatParamsInPath("/v1/flight/:from-:to/updates")).toBe(
-        "/v1/flight/{from}-{to}/updates"
+        "/v1/flight/{from}-{to}/updates",
       );
     });
   });
@@ -239,7 +239,7 @@ describe("Documentation helpers", () => {
           schema: z.boolean().default(true),
           ...requestContext,
           next: makeNext(requestContext),
-        })
+        }),
       ).toMatchSnapshot();
     });
   });
@@ -251,7 +251,7 @@ describe("Documentation helpers", () => {
           schema: z.boolean().catch(true),
           ...requestContext,
           next: makeNext(requestContext),
-        })
+        }),
       ).toMatchSnapshot();
     });
   });
@@ -263,7 +263,7 @@ describe("Documentation helpers", () => {
           schema: z.any(),
           ...requestContext,
           next: makeNext(requestContext),
-        })
+        }),
       ).toMatchSnapshot();
     });
   });
@@ -275,7 +275,7 @@ describe("Documentation helpers", () => {
           schema: ez.upload(),
           ...requestContext,
           next: makeNext(requestContext),
-        })
+        }),
       ).toMatchSnapshot();
     });
     test("should throw when using in response", () => {
@@ -302,9 +302,9 @@ describe("Documentation helpers", () => {
             schema,
             ...responseContext,
             next: makeNext(responseContext),
-          })
+          }),
         ).toMatchSnapshot();
-      }
+      },
     );
     test("should throw when using in input", () => {
       try {
@@ -328,7 +328,7 @@ describe("Documentation helpers", () => {
           schema: z.string().or(z.number()),
           ...requestContext,
           next: makeNext(requestContext),
-        })
+        }),
       ).toMatchSnapshot();
     });
   });
@@ -346,7 +346,7 @@ describe("Documentation helpers", () => {
           ]),
           ...requestContext,
           next: makeNext(requestContext),
-        })
+        }),
       ).toMatchSnapshot();
     });
   });
@@ -360,7 +360,7 @@ describe("Documentation helpers", () => {
             .and(z.object({ two: z.number() })),
           ...requestContext,
           next: makeNext(requestContext),
-        })
+        }),
       ).toMatchSnapshot();
     });
   });
@@ -374,9 +374,9 @@ describe("Documentation helpers", () => {
             schema: z.string().optional(),
             ...context,
             next: makeNext(context),
-          })
+          }),
         ).toMatchSnapshot();
-      }
+      },
     );
   });
 
@@ -389,9 +389,9 @@ describe("Documentation helpers", () => {
             schema: z.string().nullable(),
             ...context,
             next: makeNext(context),
-          })
+          }),
         ).toMatchSnapshot();
-      }
+      },
     );
   });
 
@@ -408,9 +408,9 @@ describe("Documentation helpers", () => {
             schema,
             ...requestContext,
             next: makeNext(requestContext),
-          })
+          }),
         ).toMatchSnapshot();
-      }
+      },
     );
   });
 
@@ -421,7 +421,7 @@ describe("Documentation helpers", () => {
           schema: z.literal("testing"),
           ...requestContext,
           next: makeNext(requestContext),
-        })
+        }),
       ).toMatchSnapshot();
     });
   });
@@ -456,9 +456,9 @@ describe("Documentation helpers", () => {
             schema: z.object(shape),
             ...context,
             next: makeNext(context),
-          })
+          }),
         ).toMatchSnapshot();
-      }
+      },
     );
 
     test("Bug #758", () => {
@@ -472,7 +472,7 @@ describe("Documentation helpers", () => {
           schema,
           ...responseContext,
           next: makeNext(responseContext),
-        })
+        }),
       ).toMatchSnapshot();
     });
   });
@@ -484,7 +484,7 @@ describe("Documentation helpers", () => {
           schema: z.null(),
           ...requestContext,
           next: makeNext(requestContext),
-        })
+        }),
       ).toMatchSnapshot();
     });
   });
@@ -496,7 +496,7 @@ describe("Documentation helpers", () => {
           schema: z.boolean(),
           ...requestContext,
           next: makeNext(requestContext),
-        })
+        }),
       ).toMatchSnapshot();
     });
   });
@@ -508,7 +508,7 @@ describe("Documentation helpers", () => {
           schema: z.bigint(),
           ...requestContext,
           next: makeNext(requestContext),
-        })
+        }),
       ).toMatchSnapshot();
     });
   });
@@ -529,9 +529,9 @@ describe("Documentation helpers", () => {
             schema,
             ...requestContext,
             next: makeNext(requestContext),
-          })
+          }),
         ).toMatchSnapshot();
-      }
+      },
     );
   });
 
@@ -542,7 +542,7 @@ describe("Documentation helpers", () => {
           schema: z.array(z.boolean()),
           ...requestContext,
           next: makeNext(requestContext),
-        })
+        }),
       ).toMatchSnapshot();
     });
   });
@@ -554,7 +554,7 @@ describe("Documentation helpers", () => {
           schema: z.tuple([z.boolean(), z.string(), z.literal("test")]),
           ...requestContext,
           next: makeNext(requestContext),
-        })
+        }),
       ).toMatchSnapshot();
     });
   });
@@ -566,7 +566,7 @@ describe("Documentation helpers", () => {
           schema: z.string(),
           ...requestContext,
           next: makeNext(requestContext),
-        })
+        }),
       ).toMatchSnapshot();
     });
 
@@ -584,7 +584,7 @@ describe("Documentation helpers", () => {
           schema,
           ...requestContext,
           next: makeNext(requestContext),
-        })
+        }),
       ).toMatchSnapshot();
     });
   });
@@ -598,9 +598,9 @@ describe("Documentation helpers", () => {
             schema,
             ...requestContext,
             next: makeNext(requestContext),
-          })
+          }),
         ).toMatchSnapshot();
-      }
+      },
     );
   });
 
@@ -614,7 +614,7 @@ describe("Documentation helpers", () => {
           }),
           ...requestContext,
           next: makeNext(requestContext),
-        })
+        }),
       ).toMatchSnapshot();
     });
   });
@@ -653,7 +653,7 @@ describe("Documentation helpers", () => {
           schema,
           ...context,
           next: makeNext(context),
-        })
+        }),
       ).toMatchSnapshot();
     });
 
@@ -668,7 +668,7 @@ describe("Documentation helpers", () => {
           schema,
           ...responseContext,
           next: makeNext(responseContext),
-        })
+        }),
       ).toMatchSnapshot();
     });
   });
@@ -683,7 +683,7 @@ describe("Documentation helpers", () => {
           schema: z.string().pipe(z.coerce.boolean()),
           ...context,
           next: makeNext(context),
-        })
+        }),
       ).toMatchSnapshot();
     });
   });
@@ -700,7 +700,7 @@ describe("Documentation helpers", () => {
               one: z.string().transform((v) => v.length),
               two: z.number().transform((v) => `${v}`),
               three: z.boolean(),
-            })
+            }),
           )
             .example({
               one: "test",
@@ -713,8 +713,8 @@ describe("Documentation helpers", () => {
               three: false,
             }),
           isResponse,
-          ["three"]
-        )
+          ["three"],
+        ),
       ).toMatchSnapshot();
     });
   });
@@ -731,7 +731,7 @@ describe("Documentation helpers", () => {
               one: z.string().transform((v) => v.length),
               two: z.number().transform((v) => `${v}`),
               three: z.boolean(),
-            })
+            }),
           )
             .example({
               one: "test",
@@ -744,8 +744,8 @@ describe("Documentation helpers", () => {
               three: false,
             }),
           isResponse,
-          "two"
-        )
+          "two",
+        ),
       ).toMatchSnapshot();
     });
   });
@@ -766,7 +766,7 @@ describe("Documentation helpers", () => {
           inputSources: ["query", "params"],
           composition: "inline",
           ...requestContext,
-        })
+        }),
       ).toMatchSnapshot();
     });
 
@@ -785,7 +785,7 @@ describe("Documentation helpers", () => {
           inputSources: ["body", "params"],
           composition: "inline",
           ...requestContext,
-        })
+        }),
       ).toMatchSnapshot();
     });
 
@@ -804,7 +804,7 @@ describe("Documentation helpers", () => {
           inputSources: ["body"],
           composition: "inline",
           ...requestContext,
-        })
+        }),
       ).toMatchSnapshot();
     });
   });
@@ -816,7 +816,7 @@ describe("Documentation helpers", () => {
           type: "string",
           description: "test",
           example: "test",
-        })
+        }),
       ).toMatchSnapshot();
     });
   });
@@ -828,7 +828,7 @@ describe("Documentation helpers", () => {
           schema: ez.dateIn(),
           ...requestContext,
           next: makeNext(requestContext),
-        })
+        }),
       ).toMatchSnapshot();
     });
     test("should throw when ZodDateIn in response", () => {
@@ -853,7 +853,7 @@ describe("Documentation helpers", () => {
           schema: ez.dateOut(),
           ...responseContext,
           next: makeNext(responseContext),
-        })
+        }),
       ).toMatchSnapshot();
     });
     test("should throw when ZodDateOut in request", () => {
@@ -886,7 +886,7 @@ describe("Documentation helpers", () => {
           expect(e).toBeInstanceOf(DocumentationError);
           expect(e).toMatchSnapshot();
         }
-      }
+      },
     );
   });
 
@@ -897,18 +897,18 @@ describe("Documentation helpers", () => {
           schema: z.string().min(2).brand<"Test">(),
           ...responseContext,
           next: makeNext(responseContext),
-        })
+        }),
       ).toMatchSnapshot();
     });
   });
 
   describe("depictLazy", () => {
     const recursiveArray: z.ZodLazy<z.ZodArray<any>> = z.lazy(() =>
-      recursiveArray.array()
+      recursiveArray.array(),
     );
     const directlyRecursive: z.ZodLazy<any> = z.lazy(() => directlyRecursive);
     const recursiveObject: z.ZodLazy<z.ZodObject<any>> = z.lazy(() =>
-      z.object({ prop: recursiveObject })
+      z.object({ prop: recursiveObject }),
     );
 
     test.each([
@@ -930,7 +930,7 @@ describe("Documentation helpers", () => {
         .mockImplementationOnce(
           (name: string): ReferenceObject => ({
             $ref: `#/components/schemas/${name}`,
-          })
+          }),
         );
       expect(getRefMock.mock.calls.length).toBe(0);
       expect(
@@ -938,7 +938,7 @@ describe("Documentation helpers", () => {
           schema,
           ...responseContext,
           next: makeNext(responseContext),
-        })
+        }),
       ).toMatchSnapshot();
       expect(getRefMock).toHaveBeenCalledTimes(2);
       for (const call of getRefMock.mock.calls) {
@@ -959,7 +959,7 @@ describe("Documentation helpers", () => {
             { and: [{ type: "basic" }, { type: "bearer" }] },
             { type: "header", name: "X-Key" },
           ],
-        })
+        }),
       ).toMatchSnapshot();
     });
     test("should handle Input and Cookie Securities", () => {
@@ -973,14 +973,14 @@ describe("Documentation helpers", () => {
               ],
             },
           ],
-        })
+        }),
       ).toMatchSnapshot();
     });
     test("should handle OpenID and OAuth2 Securities", () => {
       expect(
         depictSecurity({
           or: [{ type: "openid", url: "https://test.url" }, { type: "oauth2" }],
-        })
+        }),
       ).toMatchSnapshot();
     });
     test("should depict OAuth2 Security with flows", () => {
@@ -1022,7 +1022,7 @@ describe("Documentation helpers", () => {
               },
             },
           },
-        })
+        }),
       ).toMatchSnapshot();
     });
     test("should handle undefined flows", () => {
@@ -1033,7 +1033,7 @@ describe("Documentation helpers", () => {
             implicit: undefined,
             password: undefined,
           },
-        })
+        }),
       ).toMatchSnapshot();
     });
   });
@@ -1047,7 +1047,7 @@ describe("Documentation helpers", () => {
             { name: "B", scopes: [] },
             { name: "C", scopes: [] },
           ],
-        })
+        }),
       ).toMatchSnapshot();
       expect(
         depictSecurityRefs({
@@ -1060,7 +1060,7 @@ describe("Documentation helpers", () => {
               ],
             },
           ],
-        })
+        }),
       ).toMatchSnapshot();
     });
 
@@ -1072,7 +1072,7 @@ describe("Documentation helpers", () => {
             { name: "B", scopes: [] },
             { name: "C", scopes: [] },
           ],
-        })
+        }),
       ).toMatchSnapshot();
       expect(
         depictSecurityRefs({
@@ -1085,7 +1085,7 @@ describe("Documentation helpers", () => {
               ],
             },
           ],
-        })
+        }),
       ).toMatchSnapshot();
     });
 
@@ -1101,7 +1101,7 @@ describe("Documentation helpers", () => {
             { name: "B", scopes: ["read"] },
             { name: "C", scopes: ["read", "write"] },
           ],
-        })
+        }),
       ).toMatchSnapshot();
     });
   });
@@ -1112,7 +1112,7 @@ describe("Documentation helpers", () => {
         depictTags({
           users: "Everything about users",
           files: "Everything about files processing",
-        })
+        }),
       ).toMatchSnapshot();
     });
 
@@ -1124,7 +1124,7 @@ describe("Documentation helpers", () => {
             description: "Everything about files processing",
             url: "https://example.com",
           },
-        })
+        }),
       ).toMatchSnapshot();
     });
   });
@@ -1132,7 +1132,7 @@ describe("Documentation helpers", () => {
   describe("ensureShortDescription()", () => {
     test("keeps the short text as it is", () => {
       expect(ensureShortDescription("here is a short text")).toBe(
-        "here is a short text"
+        "here is a short text",
       );
       expect(ensureShortDescription(" ")).toBe(" ");
       expect(ensureShortDescription("")).toBe("");
@@ -1140,8 +1140,8 @@ describe("Documentation helpers", () => {
     test("trims the long text", () => {
       expect(
         ensureShortDescription(
-          "this text is definitely too long for the short description"
-        )
+          "this text is definitely too long for the short description",
+        ),
       ).toBe("this text is definitely too long for the short de…");
     });
   });

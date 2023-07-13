@@ -342,7 +342,7 @@ const nicknameConstraintMiddleware = createMiddleware({
       .min(1)
       .refine(
         (nick) => !/^\d.*$/.test(nick),
-        "Nickname cannot start with a digit"
+        "Nickname cannot start with a digit",
       ),
   }),
   // ...,
@@ -361,7 +361,7 @@ const endpoint = endpointsFactory.build({
     })
     .refine(
       (inputs) => Object.keys(inputs).length >= 1,
-      "Please provide at least one property"
+      "Please provide at least one property",
     ),
   // ...,
 });
@@ -571,13 +571,13 @@ const fileStreamingEndpointsFactory = new EndpointsFactory(
       }
       if ("filename" in output) {
         fs.createReadStream(output.filename).pipe(
-          response.type(output.filename)
+          response.type(output.filename),
         );
       } else {
         response.status(400).send("Filename is missing");
       }
     },
-  })
+  }),
 );
 ```
 
@@ -594,7 +594,7 @@ import cors from "cors";
 import { auth } from "express-oauth2-jwt-bearer";
 
 const simpleUsage = defaultEndpointsFactory.addExpressMiddleware(
-  cors({ credentials: true })
+  cors({ credentials: true }),
 );
 
 const advancedUsage = defaultEndpointsFactory.use(auth(), {
@@ -818,7 +818,7 @@ writeFileSync(
     variant: "client", // <— optional, see also "types" for a DIY solution
     optionalPropStyle: { withQuestionMark: true, withUndefined: true }, // optional
   }).print(),
-  "utf-8"
+  "utf-8",
 );
 ```
 
@@ -870,7 +870,7 @@ const exampleEndpoint = defaultEndpointsFactory.build({
   input: withMeta(
     z.object({
       id: z.number().describe("the ID of the user"),
-    })
+    }),
   ).example({
     id: 123,
   }),

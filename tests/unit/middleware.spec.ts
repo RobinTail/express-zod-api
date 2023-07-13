@@ -43,8 +43,8 @@ describe("Middleware", () => {
         };
         expect(() => createMiddleware(definition)).toThrowError(
           new IOSchemaError(
-            "Using transformations on the top level of middleware input schema is not allowed."
-          )
+            "Using transformations on the top level of middleware input schema is not allowed.",
+          ),
         );
       });
     });

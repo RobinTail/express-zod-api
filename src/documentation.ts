@@ -56,7 +56,7 @@ export class Documentation extends OpenApiBuilder {
 
   protected makeRef(
     name: string,
-    schema: SchemaObject | ReferenceObject
+    schema: SchemaObject | ReferenceObject,
   ): ReferenceObject {
     this.addSchema(name, schema);
     return this.getRef(name)!;
@@ -112,7 +112,7 @@ export class Documentation extends OpenApiBuilder {
     const onEndpoint: RoutingWalkerParams["onEndpoint"] = (
       endpoint,
       path,
-      _method
+      _method,
     ) => {
       const method = _method as Method;
       const commonParams = {
@@ -125,7 +125,7 @@ export class Documentation extends OpenApiBuilder {
         makeRef: this.makeRef.bind(this),
       };
       const [shortDesc, longDesc] = (["short", "long"] as const).map(
-        endpoint.getDescription.bind(endpoint)
+        endpoint.getDescription.bind(endpoint),
       );
       const inputSources =
         config.inputSources?.[method] || defaultInputSources[method];
@@ -172,14 +172,14 @@ export class Documentation extends OpenApiBuilder {
           (securitySchema) => {
             const name = this.ensureUniqSecuritySchemaName(securitySchema);
             const scopes = ["oauth2", "openIdConnect"].includes(
-              securitySchema.type
+              securitySchema.type,
             )
               ? endpoint.getScopes()
               : [];
             this.addSecurityScheme(name, securitySchema);
             return { name, scopes };
-          }
-        )
+          },
+        ),
       );
       if (securityRefs.length > 0) {
         operation.security = securityRefs;

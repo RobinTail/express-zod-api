@@ -8,7 +8,7 @@ describe("API Integration Generator", () => {
     (variant) => {
       const client = new Integration({ variant, routing });
       expect(client.print()).toMatchSnapshot();
-    }
+    },
   );
 
   test("Should treat optionals the same way as z.infer() by default", () => {
@@ -52,6 +52,6 @@ describe("API Integration Generator", () => {
         },
       });
       expect(client.print()).toMatchSnapshot();
-    }
+    },
   );
 });

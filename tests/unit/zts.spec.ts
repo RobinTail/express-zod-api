@@ -98,7 +98,7 @@ describe("zod-to-ts", () => {
       { schema: z.nativeEnum(StringLiteral), feature: "quoted string" },
     ])("handles $feature literals", ({ schema }) => {
       expect(
-        printNodeTest(zodToTs({ schema, ...defaultCtx }))
+        printNodeTest(zodToTs({ schema, ...defaultCtx })),
       ).toMatchSnapshot();
     });
   });
@@ -127,7 +127,7 @@ describe("zod-to-ts", () => {
       z.object({
         a: z.string(),
         b: circular,
-      })
+      }),
     );
 
     const example = z.object({
@@ -136,7 +136,7 @@ describe("zod-to-ts", () => {
       arrayOfObjects: z.array(
         z.object({
           string: z.string(),
-        })
+        }),
       ),
       boolean: z.boolean(),
       circular,
@@ -171,7 +171,7 @@ describe("zod-to-ts", () => {
               ])
               .array(),
           }),
-        })
+        }),
       ),
       map: z.map(z.string(), z.array(z.object({ string: z.string() }))),
       set: z.set(z.string()),
@@ -339,7 +339,7 @@ describe("zod-to-ts", () => {
       z.literal(123),
     ])("Should produce the correct typescript %#", (schema) => {
       expect(
-        printNodeTest(zodToTs({ schema, ...defaultCtx }))
+        printNodeTest(zodToTs({ schema, ...defaultCtx })),
       ).toMatchSnapshot();
     });
   });
@@ -352,14 +352,14 @@ describe("zod-to-ts", () => {
       ])("should produce the schema type $expected", ({ isResponse }) => {
         const schema = z.number().transform((num) => `${num}`);
         expect(
-          printNodeTest(zodToTs({ schema, ...defaultCtx, isResponse }))
+          printNodeTest(zodToTs({ schema, ...defaultCtx, isResponse })),
         ).toMatchSnapshot();
       });
 
       test("should handle unsupported transformation in response", () => {
         const schema = z.number().transform((num) => () => num);
         expect(
-          printNodeTest(zodToTs({ schema, ...defaultCtx, isResponse: true }))
+          printNodeTest(zodToTs({ schema, ...defaultCtx, isResponse: true })),
         ).toMatchSnapshot();
       });
 
@@ -368,7 +368,7 @@ describe("zod-to-ts", () => {
           throw new Error("this should be handled");
         });
         expect(
-          printNodeTest(zodToTs({ schema, ...defaultCtx, isResponse: true }))
+          printNodeTest(zodToTs({ schema, ...defaultCtx, isResponse: true })),
         ).toMatchSnapshot();
       });
     });
