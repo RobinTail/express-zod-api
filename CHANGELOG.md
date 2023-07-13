@@ -2,6 +2,12 @@
 
 ## Version 11
 
+### v11.2.0
+
+- `winston` version is 3.10.0.
+- `triple-beam` version is 1.4.1.
+- Rearranged exports in `package.json`.
+
 ### v11.1.1
 
 - Technical update, no new features.
