@@ -305,54 +305,56 @@ describe("Common Helpers", () => {
 
   describe("getExamples()", () => {
     test("should return an empty array in case examples are not set", () => {
-      expect(getExamples(z.string(), true)).toEqual([]);
-      expect(getExamples(z.string(), false)).toEqual([]);
-      expect(getExamples(withMeta(z.string()), true)).toEqual([]);
-      expect(getExamples(withMeta(z.string()), false)).toEqual([]);
-    });
-    test("should return examples as they are in case of no output parsing", () => {
+      expect(getExamples({ schema: z.string(), isResponse: true })).toEqual([]);
+      expect(getExamples({ schema: z.string() })).toEqual([]);
       expect(
-        getExamples(
-          withMeta(z.string()).example("some").example("another"),
-          false,
-        ),
+        getExamples({ schema: withMeta(z.string()), isResponse: true }),
+      ).toEqual([]);
+      expect(getExamples({ schema: withMeta(z.string()) })).toEqual([]);
+    });
+    test("should return examples as they are in case of input schema", () => {
+      expect(
+        getExamples({
+          schema: withMeta(z.string()).example("some").example("another"),
+        }),
       ).toEqual(["some", "another"]);
     });
-    test("should return parsed examples for output on demand", () => {
+    test("should return parsed examples for response schema", () => {
       expect(
-        getExamples(
-          withMeta(z.string().transform((v) => parseInt(v, 10)))
+        getExamples({
+          schema: withMeta(z.string().transform((v) => parseInt(v, 10)))
             .example("123")
             .example("456"),
-          true,
-        ),
+          isResponse: true,
+        }),
       ).toEqual([123, 456]);
     });
     test("should filter out invalid examples according to the schema in both cases", () => {
       expect(
-        getExamples(
-          withMeta(z.string())
+        getExamples({
+          schema: withMeta(z.string())
             .example("some")
             .example(123 as unknown as string)
             .example("another"),
-          false,
-        ),
+        }),
       ).toEqual(["some", "another"]);
       expect(
-        getExamples(
-          withMeta(z.string().transform((v) => parseInt(v, 10)))
+        getExamples({
+          schema: withMeta(z.string().transform((v) => parseInt(v, 10)))
             .example("123")
             .example(null as unknown as string)
             .example("456"),
-          true,
-        ),
+          isResponse: true,
+        }),
       ).toEqual([123, 456]);
     });
     test.each([z.array(z.number().int()), z.tuple([z.number(), z.number()])])(
       "Issue #892: should handle examples of arrays and tuples %#",
       (schema) => {
         expect(
-          getExamples(withMeta(schema).example([1, 2]).example([3, 4]), false),
+          getExamples({
+            schema: withMeta(schema).example([1, 2]).example([3, 4]),
+          }),
         ).toEqual([
           [1, 2],
           [3, 4],
