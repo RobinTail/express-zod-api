@@ -53,6 +53,7 @@ export const createResultHandler = <
 
 export const defaultResultHandler = createResultHandler({
   getPositiveResponse: (output: IOSchema) => {
+    // Examples are taken for proxying: no validation needed for this
     const examples = getExamples({ schema: output });
     const responseSchema = withMeta(
       z.object({
