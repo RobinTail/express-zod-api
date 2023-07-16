@@ -314,14 +314,14 @@ describe("Common Helpers", () => {
       ).toEqual([]);
       expect(getExamples({ schema: withMeta(z.string()) })).toEqual([]);
     });
-    test("should return examples as they are in case of input schema", () => {
+    test("should return original examples by default", () => {
       expect(
         getExamples({
           schema: withMeta(z.string()).example("some").example("another"),
         }),
       ).toEqual(["some", "another"]);
     });
-    test("should return parsed examples for response schema", () => {
+    test("should return parsed examples on demand", () => {
       expect(
         getExamples({
           schema: withMeta(z.string().transform((v) => parseInt(v, 10)))
@@ -331,7 +331,7 @@ describe("Common Helpers", () => {
         }),
       ).toEqual([123, 456]);
     });
-    test("should filter out invalid examples according to the schema in both cases", () => {
+    test("should not filter out invalid examples by default", () => {
       expect(
         getExamples({
           schema: withMeta(z.string())
@@ -339,7 +339,20 @@ describe("Common Helpers", () => {
             .example(123 as unknown as string)
             .example("another"),
         }),
+      ).toEqual(["some", 123, "another"]);
+    });
+    test("should filter out invalid examples on demand", () => {
+      expect(
+        getExamples({
+          schema: withMeta(z.string())
+            .example("some")
+            .example(123 as unknown as string)
+            .example("another"),
+          validate: true,
+        }),
       ).toEqual(["some", "another"]);
+    });
+    test("should filter out invalid examples for the parsed variant", () => {
       expect(
         getExamples({
           schema: withMeta(z.string().transform((v) => parseInt(v, 10)))

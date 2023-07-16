@@ -554,6 +554,7 @@ export const depictExamples = (
   const examples = getExamples({
     schema,
     variant: isResponse ? "parsed" : "original",
+    validate: true,
   });
   if (examples.length === 0) {
     return {};
@@ -579,6 +580,7 @@ export const depictParamExamples = (
   const examples = getExamples({
     schema,
     variant: isResponse ? "parsed" : "original",
+    validate: true,
   });
   if (examples.length === 0) {
     return {};
@@ -743,7 +745,11 @@ export const onEach: Depicter<z.ZodTypeAny, "each"> = ({
     schema.isNullable();
   const examples = shouldAvoidParsing
     ? []
-    : getExamples({ schema, variant: isResponse ? "parsed" : "original" });
+    : getExamples({
+        schema,
+        variant: isResponse ? "parsed" : "original",
+        validate: true,
+      });
   return {
     ...(description && { description }),
     ...(isActuallyNullable && { nullable: true }),

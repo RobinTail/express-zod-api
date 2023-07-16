@@ -119,7 +119,7 @@ export const getExamples = <
 >({
   schema,
   variant = "original",
-  validate = variant === "parsed" || true,
+  validate = variant === "parsed",
 }: {
   schema: T;
   /**
@@ -130,14 +130,15 @@ export const getExamples = <
    * */
   variant?: V;
   /**
-   * @desc should check that the examples match the schema
-   * @default true
+   * @desc filters out the examples that do not match the schema
+   * @default variant === "parsed"
    * */
   validate?: boolean;
 }): ReadonlyArray<V extends "parsed" ? z.output<T> : z.input<T>> => {
   const result: Array<z.input<T> | z.output<T>> = [];
   const examples = getMeta(schema, "examples") || [];
-  if (!validate && !variant) {
+  if (!validate && variant === "original") {
+    console.log("here");
     return examples;
   }
   for (const example of examples) {
