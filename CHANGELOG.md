@@ -2,6 +2,43 @@
 
 ## Version 11
 
+### v11.3.0
+
+- Thanks to [@dev-m1-macbook](https://github.com/dev-m1-macbook) who noticed that the method needed for getting
+  examples within a custom `ResultHandler` is not exported. This problem is now fixed.
+  - Exposing `getExamples()` method having object based parameter with following props:
+    - `schema` — the subject to retrieve examples from (previously set by `withMeta().example()` method).
+    - `variant` _(optional)_ — either `original` _(default)_ or `parsed` literal. The last one applies possible
+      transformations.
+    - `validate` _(optional)_ — boolean, filters out invalid examples, enabled for `parsed` variant.
+  - **Warning**: Getting parsed or validated examples of `z.lazy()` having circular references must be avoided.
+  - Despite having two options for various needs, in case of proxying your examples withing a custom `ResultHandler`
+    those are not required. Consider the following approach implemented in the default `ResultHandler`:
+
+```ts
+const defaultResultHandler = createResultHandler({
+  getPositiveResponse: (output: IOSchema) => {
+    // Examples are taken for proxying: no validation needed for this
+    const examples = getExamples({ schema: output });
+    const responseSchema = withMeta(
+      z.object({
+        status: z.literal("success"),
+        data: output,
+      }),
+    );
+    return examples.reduce<typeof responseSchema>(
+      (acc, example) =>
+        acc.example({
+          status: "success",
+          data: example,
+        }),
+      responseSchema,
+    );
+  },
+  // ...
+});
+```
+
 ### v11.2.0
 
 - `winston` version is 3.10.0.

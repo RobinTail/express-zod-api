@@ -5,6 +5,7 @@ export { EndpointsFactory, defaultEndpointsFactory } from "./endpoints-factory";
 export { IOSchema } from "./io-schema";
 export {
   FlatObject,
+  getExamples,
   getMessageFromError,
   getStatusCodeFromError,
 } from "./common-helpers";

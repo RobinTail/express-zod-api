@@ -3,9 +3,13 @@ import { Logger } from "winston";
 import { z } from "zod";
 import { ApiResponse } from "./api-response";
 import { ResultHandlerError } from "./errors";
-import { getMessageFromError, getStatusCodeFromError } from "./common-helpers";
+import {
+  getExamples,
+  getMessageFromError,
+  getStatusCodeFromError,
+} from "./common-helpers";
 import { IOSchema } from "./io-schema";
-import { getMeta, withMeta } from "./metadata";
+import { withMeta } from "./metadata";
 
 interface LastResortHandlerParams {
   error: ResultHandlerError;
@@ -49,7 +53,8 @@ export const createResultHandler = <
 
 export const defaultResultHandler = createResultHandler({
   getPositiveResponse: (output: IOSchema) => {
-    const examples = getMeta(output, "examples") || [];
+    // Examples are taken for proxying: no validation needed for this
+    const examples = getExamples({ schema: output });
     const responseSchema = withMeta(
       z.object({
         status: z.literal("success"),
