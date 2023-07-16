@@ -305,10 +305,12 @@ describe("Common Helpers", () => {
 
   describe("getExamples()", () => {
     test("should return an empty array in case examples are not set", () => {
-      expect(getExamples({ schema: z.string(), isResponse: true })).toEqual([]);
+      expect(getExamples({ schema: z.string(), variant: "parsed" })).toEqual(
+        [],
+      );
       expect(getExamples({ schema: z.string() })).toEqual([]);
       expect(
-        getExamples({ schema: withMeta(z.string()), isResponse: true }),
+        getExamples({ schema: withMeta(z.string()), variant: "parsed" }),
       ).toEqual([]);
       expect(getExamples({ schema: withMeta(z.string()) })).toEqual([]);
     });
@@ -325,7 +327,7 @@ describe("Common Helpers", () => {
           schema: withMeta(z.string().transform((v) => parseInt(v, 10)))
             .example("123")
             .example("456"),
-          isResponse: true,
+          variant: "parsed",
         }),
       ).toEqual([123, 456]);
     });
@@ -344,7 +346,7 @@ describe("Common Helpers", () => {
             .example("123")
             .example(null as unknown as string)
             .example("456"),
-          isResponse: true,
+          variant: "parsed",
         }),
       ).toEqual([123, 456]);
     });

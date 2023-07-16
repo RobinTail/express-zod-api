@@ -115,34 +115,35 @@ export function getStatusCodeFromError(error: Error): number {
 
 export const getExamples = <
   T extends z.ZodTypeAny,
-  V extends boolean | undefined,
+  V extends "original" | "parsed" | undefined,
 >({
   schema,
-  isResponse = false,
-  validate = isResponse || true,
+  variant = "original",
+  validate = variant === "parsed" || true,
 }: {
   schema: T;
   /**
-   * @desc should check that the example matches the schema
+   * @desc examples variant: original or parsed
+   * @example "parsed" — for the case when possible schema transformations should be applied
+   * @default "original"
+   * @override validate: variant "parsed" activates validation as well
+   * */
+  variant?: V;
+  /**
+   * @desc should check that the examples match the schema
    * @default true
    * */
   validate?: boolean;
-  /**
-   * @desc should return parsed examples (in case the schema has a transformation, this option should be enabled for the examples of output)
-   * @default false
-   * @override validate — examples of response are always being validated
-   * */
-  isResponse?: V;
-}): ReadonlyArray<V extends true ? z.output<T> : z.input<T>> => {
+}): ReadonlyArray<V extends "parsed" ? z.output<T> : z.input<T>> => {
   const result: Array<z.input<T> | z.output<T>> = [];
   const examples = getMeta(schema, "examples") || [];
-  if (!validate && !isResponse) {
+  if (!validate && !variant) {
     return examples;
   }
   for (const example of examples) {
-    const parsedExample = schema.safeParse(example); // I parse anyway in order to filter out invalid examples
+    const parsedExample = schema.safeParse(example);
     if (parsedExample.success) {
-      result.push(isResponse ? parsedExample.data : example);
+      result.push(variant === "parsed" ? parsedExample.data : example);
     }
   }
   return result;

@@ -551,7 +551,10 @@ export const depictExamples = (
   isResponse: boolean,
   omitProps: string[] = [],
 ): MediaExamples => {
-  const examples = getExamples({ schema, isResponse });
+  const examples = getExamples({
+    schema,
+    variant: isResponse ? "parsed" : "original",
+  });
   if (examples.length === 0) {
     return {};
   }
@@ -573,7 +576,10 @@ export const depictParamExamples = (
   isResponse: boolean,
   param: string,
 ): MediaExamples => {
-  const examples = getExamples({ schema, isResponse });
+  const examples = getExamples({
+    schema,
+    variant: isResponse ? "parsed" : "original",
+  });
   if (examples.length === 0) {
     return {};
   }
@@ -737,7 +743,7 @@ export const onEach: Depicter<z.ZodTypeAny, "each"> = ({
     schema.isNullable();
   const examples = shouldAvoidParsing
     ? []
-    : getExamples({ schema, isResponse });
+    : getExamples({ schema, variant: isResponse ? "parsed" : "original" });
   return {
     ...(description && { description }),
     ...(isActuallyNullable && { nullable: true }),
