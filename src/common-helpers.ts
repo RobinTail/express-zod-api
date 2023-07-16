@@ -138,7 +138,6 @@ export const getExamples = <
   const result: Array<z.input<T> | z.output<T>> = [];
   const examples = getMeta(schema, "examples") || [];
   if (!validate && variant === "original") {
-    console.log("here");
     return examples;
   }
   for (const example of examples) {
