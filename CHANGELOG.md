@@ -11,6 +11,7 @@
     - `variant` _(optional)_ — either `original` _(default)_ or `parsed` literal. The last one applies possible
       transformations.
     - `validate` _(optional)_ — boolean, filters out invalid examples, enabled for `parsed` variant.
+  - **Warning**: Getting parsed or validated examples of `z.lazy()` having circular references must be avoided.
   - Despite having two options for various needs, in case of proxying your examples withing a custom `ResultHandler`
     those are not required. Consider the following approach implemented in the default `ResultHandler`:
 
