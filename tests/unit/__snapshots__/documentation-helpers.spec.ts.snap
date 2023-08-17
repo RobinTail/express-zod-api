@@ -605,6 +605,12 @@ exports[`Documentation helpers depictPipeline should depict as string (in) 1`] =
 }
 `;
 
+exports[`Documentation helpers depictReadonly should pass the next depicter 1`] = `
+{
+  "type": "string",
+}
+`;
+
 exports[`Documentation helpers depictRecord() should set properties+required or additionalProperties props 0 1`] = `
 {
   "additionalProperties": {
