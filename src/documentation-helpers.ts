@@ -184,6 +184,11 @@ export const depictOptional: Depicter<z.ZodOptional<any>> = ({
   next,
 }) => next({ schema: schema.unwrap() });
 
+export const depictReadonly: Depicter<z.ZodReadonly<any>> = ({
+  schema,
+  next,
+}) => next({ schema: schema._def.innerType });
+
 export const depictNullable: Depicter<z.ZodNullable<any>> = ({
   schema,
   next,
@@ -724,6 +729,7 @@ export const depicters: HandlingRules<
   ZodCatch: depictCatch,
   ZodPipeline: depictPipeline,
   ZodLazy: depictLazy,
+  ZodReadonly: depictReadonly,
 };
 
 export const onEach: Depicter<z.ZodTypeAny, "each"> = ({

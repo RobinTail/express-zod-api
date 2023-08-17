@@ -202,6 +202,9 @@ const onBranded: Producer<z.ZodBranded<z.ZodTypeAny, any>> = ({
   schema,
 }) => next({ schema: schema.unwrap() });
 
+const onReadonly: Producer<z.ZodReadonly<any>> = ({ next, schema }) =>
+  next({ schema: schema._def.innerType });
+
 const onCatch: Producer<z.ZodCatch<z.ZodTypeAny>> = ({ next, schema }) =>
   next({ schema: schema._def.innerType });
 
@@ -260,6 +263,7 @@ const producers: HandlingRules<ts.TypeNode, ZTSContext> = {
   ZodCatch: onCatch,
   ZodPipeline: onPipeline,
   ZodLazy: onLazy,
+  ZodReadonly: onReadonly,
 };
 
 export const zodToTs = ({
