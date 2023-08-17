@@ -70,6 +70,7 @@ exports[`zod-to-ts Example should produce the expected results 1`] = `
     branded: string;
     catch?: number;
     pipeline: string;
+    readonly: string;
 }"
 `;
 
