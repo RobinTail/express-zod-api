@@ -2972,7 +2972,7 @@ servers:
 "
 `;
 
-exports[`Documentation generator getSpecAsYaml() should handle bigint, boolean, date and null 1`] = `
+exports[`Documentation generator getSpecAsYaml() should handle bigint, boolean, date, null and readonly 1`] = `
 "openapi: 3.0.0
 info:
   title: Testing additional types

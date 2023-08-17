@@ -264,7 +264,7 @@ describe("Documentation generator", () => {
       expect(spec).toMatchSnapshot();
     });
 
-    test("should handle bigint, boolean, date and null", () => {
+    test("should handle bigint, boolean, date, null and readonly", () => {
       const spec = new Documentation({
         config: sampleConfig,
         routing: {
@@ -273,7 +273,7 @@ describe("Documentation generator", () => {
               method: "post",
               input: z.object({
                 bigint: z.bigint(),
-                boolean: z.boolean(),
+                boolean: z.boolean().readonly(),
                 dateIn: ez.dateIn(),
               }),
               output: z.object({

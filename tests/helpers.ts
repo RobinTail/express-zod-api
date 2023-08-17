@@ -76,6 +76,8 @@ export const serializeSchemaForTest = (
         value: next({ schema: subject._def.innerType }),
         default: schema._def.defaultValue(),
       }),
+      ZodReadonly: ({ schema: subject, next }) =>
+        next({ schema: subject._def.innerType }),
       ZodCatch: ({ schema: subject, next }) => ({
         value: next({ schema: subject._def.innerType }),
         fallback: schema._def.defaultValue(),

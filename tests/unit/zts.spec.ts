@@ -197,6 +197,7 @@ describe("zod-to-ts", () => {
       branded: z.string().brand("BRAND"),
       catch: z.number().catch(123),
       pipeline: z.string().regex(/\d+/).pipe(z.coerce.number()),
+      readonly: z.string().readonly(),
     });
 
     it("should produce the expected results", () => {

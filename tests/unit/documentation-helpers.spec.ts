@@ -37,6 +37,7 @@ import {
   depictOptional,
   depictParamExamples,
   depictPipeline,
+  depictReadonly,
   depictRecord,
   depictRequestParams,
   depictSecurity,
@@ -895,6 +896,18 @@ describe("Documentation helpers", () => {
       expect(
         depictBranded({
           schema: z.string().min(2).brand<"Test">(),
+          ...responseContext,
+          next: makeNext(responseContext),
+        }),
+      ).toMatchSnapshot();
+    });
+  });
+
+  describe("depictReadonly", () => {
+    test("should pass the next depicter", () => {
+      expect(
+        depictReadonly({
+          schema: z.string().readonly(),
           ...responseContext,
           next: makeNext(responseContext),
         }),
