@@ -56,7 +56,7 @@ describe("I/O Schema and related helpers", () => {
       });
       test("accepts a refinement of object", () => {
         expectType<IOSchema>(z.object({}).refine(() => true));
-        expectType<IOSchema>(z.object({}).superRefine(() => true));
+        expectType<IOSchema>(z.object({}).superRefine(() => {}));
         expectType<IOSchema>(
           z.object({}).refinement(() => true, {
             code: "custom",
@@ -74,8 +74,8 @@ describe("I/O Schema and related helpers", () => {
         expectType<IOSchema>(
           z
             .object({})
-            .superRefine(() => true)
-            .superRefine(() => true),
+            .superRefine(() => {})
+            .superRefine(() => {}),
         );
       });
       test("does not accept transformation of object", () => {
