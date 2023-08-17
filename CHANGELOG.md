@@ -2,6 +2,11 @@
 
 ## Version 11
 
+### v11.4.0
+
+- Supporting `z.readonly()` of `zod` v3.22.
+  - For the purposes of depicting REST APIs `ZodReadonly` is described the same way as its inner schema.
+
 ### v11.3.0
 
 - Thanks to [@dev-m1-macbook](https://github.com/dev-m1-macbook) who noticed that the method needed for getting
