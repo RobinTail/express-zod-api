@@ -117,6 +117,14 @@ export const jsonEndpoints = {
   "post /v1/avatar/upload": true,
 };
 
+export const endpointTags = {
+  "get /v1/user/retrieve": [],
+  "post /v1/user/:id": [],
+  "get /v1/avatar/send": [],
+  "get /v1/avatar/stream": [],
+  "post /v1/avatar/upload": [],
+};
+
 export type Provider = <M extends Method, P extends Path>(
   method: M,
   path: P,

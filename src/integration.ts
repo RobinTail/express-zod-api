@@ -184,6 +184,21 @@ export class Integration {
       ),
     );
 
+    const endpointTagsNode = f.createVariableStatement(
+      exportModifier,
+      makeConst(
+        "endpointTags",
+        f.createObjectLiteralExpression(
+          Object.keys(this.registry).map((methodPath) =>
+            f.createPropertyAssignment(
+              `"${methodPath}"`,
+              f.createArrayLiteralExpression(),
+            ),
+          ),
+        ),
+      ),
+    );
+
     const providerNode = makePublicType(
       "Provider",
       f.createFunctionTypeNode(
@@ -327,6 +342,7 @@ export class Integration {
 
     this.agg.push(
       jsonEndpointsNode,
+      endpointTagsNode,
       providerNode,
       implementationNode,
       clientNode,
