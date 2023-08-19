@@ -32,7 +32,10 @@ import { zodToTs } from "./zts";
 import { createTypeAlias, printNode } from "./zts-helpers";
 
 interface Registry {
-  [METHOD_PATH: string]: Record<"in" | "out", string> & { isJson: boolean };
+  [METHOD_PATH: string]: Record<"in" | "out", string> & {
+    isJson: boolean;
+    tags: string[];
+  };
 }
 
 interface IntegrationParams {
@@ -121,6 +124,7 @@ export class Integration {
             in: inputId,
             out: responseId,
             isJson: endpoint.getMimeTypes("positive").includes(mimeJson),
+            tags: endpoint.getTags(),
           };
         }
       },
@@ -189,12 +193,15 @@ export class Integration {
       makeConst(
         "endpointTags",
         f.createObjectLiteralExpression(
-          Object.keys(this.registry).map((methodPath) =>
-            f.createPropertyAssignment(
+          Object.keys(this.registry).map((methodPath) => {
+            const tags = this.registry[methodPath].tags.map((tag) =>
+              f.createStringLiteral(tag),
+            );
+            return f.createPropertyAssignment(
               `"${methodPath}"`,
-              f.createArrayLiteralExpression(),
-            ),
-          ),
+              f.createArrayLiteralExpression(tags),
+            );
+          }),
         ),
       ),
     );
