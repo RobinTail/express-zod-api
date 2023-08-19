@@ -193,15 +193,16 @@ export class Integration {
       makeConst(
         "endpointTags",
         f.createObjectLiteralExpression(
-          Object.keys(this.registry).map((methodPath) => {
-            const tags = this.registry[methodPath].tags.map((tag) =>
-              f.createStringLiteral(tag),
-            );
-            return f.createPropertyAssignment(
+          Object.keys(this.registry).map((methodPath) =>
+            f.createPropertyAssignment(
               `"${methodPath}"`,
-              f.createArrayLiteralExpression(tags),
-            );
-          }),
+              f.createArrayLiteralExpression(
+                this.registry[methodPath].tags.map((tag) =>
+                  f.createStringLiteral(tag),
+                ),
+              ),
+            ),
+          ),
         ),
       ),
     );
