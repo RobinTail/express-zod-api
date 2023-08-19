@@ -2,6 +2,11 @@
 
 ## Version 11
 
+### v11.5.0
+
+- The following methods added to the mocked `response` object for `testEndpoint()` method:
+  - `send`, `setHeader`, `header`.
+
 ### v11.4.0
 
 - Supporting `z.readonly()` of `zod` v3.22.
