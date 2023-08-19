@@ -31,19 +31,25 @@ export const makeResponseMock = <RES>(responseProps?: RES) => {
       writableEnded: boolean;
       statusCode: number;
       statusMessage: string;
-    } & Record<"set" | "status" | "json" | "end", jest.Mock> &
+    } & Record<
+      "set" | "setHeader" | "header" | "status" | "json" | "send" | "end",
+      jest.Mock
+    > &
       (RES extends undefined ? {} : RES)
   >{
     writableEnded: false,
     statusCode: 200,
     statusMessage: http.STATUS_CODES[200],
     set: jest.fn(() => responseMock),
+    setHeader: jest.fn(() => responseMock),
+    header: jest.fn(() => responseMock),
     status: jest.fn((code: number) => {
       responseMock.statusCode = code;
       responseMock.statusMessage = http.STATUS_CODES[code]!;
       return responseMock;
     }),
     json: jest.fn(() => responseMock),
+    send: jest.fn(() => responseMock),
     end: jest.fn(() => {
       responseMock.writableEnded = true;
       return responseMock;
