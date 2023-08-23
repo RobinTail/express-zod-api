@@ -33,6 +33,8 @@ export interface Response extends Record<MethodPath, any> {
 
 export const jsonEndpoints = { "post /v1/test-with-dashes": true };
 
+export const endpointTags = { "post /v1/test-with-dashes": [] };
+
 export type Provider = <M extends Method, P extends Path>(method: M, path: P, params: Input[\`\${M} \${P}\`]) => Promise<Response[\`\${M} \${P}\`]>;
 
 export type Implementation = (method: Method, path: string, params: Record<string, any>) => Promise<any>;
@@ -98,6 +100,8 @@ export interface Response extends Record<MethodPath, any> {
 
 export const jsonEndpoints = { "post /v1/test-with-dashes": true };
 
+export const endpointTags = { "post /v1/test-with-dashes": [] };
+
 export type Provider = <M extends Method, P extends Path>(method: M, path: P, params: Input[\`\${M} \${P}\`]) => Promise<Response[\`\${M} \${P}\`]>;
 
 export type Implementation = (method: Method, path: string, params: Record<string, any>) => Promise<any>;
@@ -162,6 +166,8 @@ export interface Response extends Record<MethodPath, any> {
 }
 
 export const jsonEndpoints = { "post /v1/test-with-dashes": true };
+
+export const endpointTags = { "post /v1/test-with-dashes": [] };
 
 export type Provider = <M extends Method, P extends Path>(method: M, path: P, params: Input[\`\${M} \${P}\`]) => Promise<Response[\`\${M} \${P}\`]>;
 
@@ -299,6 +305,8 @@ export interface Response extends Record<MethodPath, any> {
 }
 
 export const jsonEndpoints = { "get /v1/user/retrieve": true, "post /v1/user/:id": true, "post /v1/avatar/upload": true };
+
+export const endpointTags = { "get /v1/user/retrieve": ["users"], "post /v1/user/:id": ["users"], "get /v1/avatar/send": ["files", "users"], "get /v1/avatar/stream": ["users", "files"], "post /v1/avatar/upload": ["files"] };
 
 export type Provider = <M extends Method, P extends Path>(method: M, path: P, params: Input[\`\${M} \${P}\`]) => Promise<Response[\`\${M} \${P}\`]>;
 
@@ -468,6 +476,8 @@ export interface Response extends Record<MethodPath, any> {
 }
 
 export const jsonEndpoints = { "post /v1/test-with-dashes": true };
+
+export const endpointTags = { "post /v1/test-with-dashes": [] };
 
 export type Provider = <M extends Method, P extends Path>(method: M, path: P, params: Input[\`\${M} \${P}\`]) => Promise<Response[\`\${M} \${P}\`]>;
 
