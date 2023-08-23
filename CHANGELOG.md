@@ -2,6 +2,11 @@
 
 ## Version 11
 
+### v11.6.0
+
+- The generated client is now equipped with the `endpointTags` constant that can be involved into your implementation.
+  - Thanks to [@miki725](https://github.com/miki725) for the idea of this feature.
+
 ### v11.5.0
 
 - The following methods added to the mocked `response` object for `testEndpoint()` method:
