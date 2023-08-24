@@ -31,8 +31,7 @@ const tsConfigJson = `
   "compilerOptions": {
     "module": "ES2022",
     "moduleResolution": "Bundler"
-  },
-  "include": ["../fetch.d.ts"]
+  }
 }
 `;
 

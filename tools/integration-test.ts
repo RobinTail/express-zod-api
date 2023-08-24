@@ -23,8 +23,7 @@ const packageJson = `
 
 const tsConfigJson = `
 {
-  "extends": "@tsconfig/node${tsconfigBase}/tsconfig.json",
-  "include": ["../fetch.d.ts"]
+  "extends": "@tsconfig/node${tsconfigBase}/tsconfig.json"
 }
 `;
 
