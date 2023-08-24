@@ -55,7 +55,7 @@
     "mime": "3.0.0",
     "openapi3-ts": "^4.1.2",
     "ramda": "0.29.0",
-    "triple-beam": "1.4.1"
+    "triple-beam": "^1.4.1"
   },
   "peerDependencies": {
     "@types/express": "^4.17.13",
