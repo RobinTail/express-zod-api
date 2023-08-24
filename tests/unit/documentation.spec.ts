@@ -493,9 +493,7 @@ describe("Documentation generator", () => {
               method: "get",
               input: z.object({ string, number }),
               output: z.object({ boolean }),
-              handler: async () => ({
-                boolean: [] as unknown as boolean, // @todo check this out without type forcing in future Zod versions
-              }),
+              handler: async () => ({ boolean: [] }),
             }),
           },
         },
