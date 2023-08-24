@@ -958,9 +958,10 @@ should be aware of them.
 
 Despite being supported by the library, `z.coerce.*` schema
 [does not work intuitively](https://github.com/RobinTail/express-zod-api/issues/759).
-Please be aware that using `z.coerce.number()` or `z.number({ coerce: true })` will NOT transform anything into a
-number. Moreover, this schema is NOT fail-safe and its type is confusing.
-If possible, try to avoid using this type of schemas. This issue will not be fixed in the current major version of Zod.
+Please be aware that `z.coerce.number()` and `z.number({ coerce: true })` (being typed not well) still will NOT allow
+you to assign anything but number. Moreover, coercive schemas are not fail-safe and their methods `.isOptional()` and
+`.isNullable()` are buggy. If possible, try to avoid using this type of schemas. This issue will not be fixed in the
+current major version of Zod.
 
 ## Excessive properties in endpoint output
 
