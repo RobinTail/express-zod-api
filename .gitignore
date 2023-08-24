@@ -2,6 +2,7 @@ node_modules
 dist
 dist-esm
 yarn-error.log
+.idea
 .npmrc
 coverage
 tests/integration/node_modules
