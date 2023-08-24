@@ -5,8 +5,9 @@
   "license": "MIT",
   "scripts": {
     "start": "ts-node example/index.ts",
-    "build": "yarn build:compile && yarn build:tests && yarn build:assets",
+    "build": "yarn build:compile && yarn build:validate && yarn build:tests && yarn build:assets",
     "build:compile": "tsup && mv dist/index.d.mts dist/esm/index.d.ts",
+    "build:validate": "attw --pack",
     "build:tests": "yarn build:intTest && yarn build:esmTest",
     "build:intTest": "ts-node tools/integration-test.ts && yarn install --cwd ./tests/integration && ts-node tools/int-test-package.ts",
     "build:esmTest": "ts-node tools/esm-test.ts && yarn install --cwd ./tests/esm && ts-node tools/esm-test-package.ts",
@@ -80,6 +81,7 @@
     }
   },
   "devDependencies": {
+    "@arethetypeswrong/cli": "^0.7.1",
     "@swc/core": "^1.3.39",
     "@swc/jest": "^0.2.24",
     "@tsconfig/node18": "^18.2.1",
