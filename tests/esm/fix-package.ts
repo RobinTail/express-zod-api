@@ -2,10 +2,11 @@ import { writeFileSync } from "node:fs";
 
 const manifest = {
   type: "module",
-  types: "../../../../dist/index.d.ts",
+  main: "index.mjs",
+  types: "../../../../dist/index.d.mts",
 };
 
 writeFileSync(
-  "./tests/esm/node_modules/express-zod-api/package.json",
+  "./node_modules/express-zod-api/package.json",
   `${JSON.stringify(manifest)}\n`,
 );

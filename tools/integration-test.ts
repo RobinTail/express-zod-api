@@ -9,6 +9,7 @@ const packageJson = `
   "name": "express-zod-api-integration-test",
   "version": "1.0.0",
   "scripts": {
+    "postinstall": "ts-node fix-package.ts",
     "start": "ts-node quick-start.ts"
   },
   "dependencies": {

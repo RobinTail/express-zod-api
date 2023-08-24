@@ -5,12 +5,11 @@
   "license": "MIT",
   "scripts": {
     "start": "ts-node example/index.ts",
-    "build": "yarn build:compile && yarn build:validate && yarn build:tests && yarn build:assets",
-    "build:compile": "tsup && mv dist/index.d.mts dist/esm/index.d.ts",
-    "build:validate": "attw --pack",
-    "build:tests": "yarn build:intTest && yarn build:esmTest",
-    "build:intTest": "ts-node tools/integration-test.ts && yarn install --cwd ./tests/integration && ts-node tools/int-test-package.ts",
-    "build:esmTest": "ts-node tools/esm-test.ts && yarn install --cwd ./tests/esm && ts-node tools/esm-test-package.ts",
+    "build": "yarn build:compile && yarn build:tests && yarn build:assets",
+    "build:compile": "tsup && attw --pack",
+    "build:tests": "yarn build:int && yarn build:esm",
+    "build:int": "ts-node tools/integration-test.ts && yarn install --cwd ./tests/integration",
+    "build:esm": "ts-node tools/esm-test.ts && yarn install --cwd ./tests/esm",
     "build:assets": "yarn build:swagger && yarn build:client && yarn build:license",
     "build:swagger": "ts-node example/generate-open-api-schema.ts > example/example.swagger.yaml",
     "build:client": "ts-node example/generate-client.ts > example/example.client.ts && yarn prettier example/example.client.ts --write",
@@ -31,12 +30,12 @@
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "module": "dist/esm/index.js",
+  "module": "dist/index.mjs",
   "exports": {
     ".": {
       "import": {
-        "types": "./dist/esm/index.d.ts",
-        "default": "./dist/esm/index.js"
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
       },
       "require": {
         "types": "./dist/index.d.ts",
