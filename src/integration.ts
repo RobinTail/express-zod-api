@@ -305,7 +305,7 @@ export class Integration {
                   f.createObjectLiteralExpression([
                     f.createSpreadAssignment(f.createIdentifier("acc")),
                     f.createPropertyAssignment(
-                      "[key]", // @todo is there a better way to do it?
+                      f.createComputedPropertyName(f.createIdentifier("key")),
                       f.createElementAccessExpression(
                         f.createIdentifier("params"),
                         f.createIdentifier("key"),
