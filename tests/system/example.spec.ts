@@ -1,4 +1,3 @@
-import fetch from "node-fetch";
 import { ChildProcessWithoutNullStreams, spawn } from "node:child_process";
 import { mimeMultipart } from "../../src/mime";
 import { waitFor } from "../helpers";
@@ -174,7 +173,7 @@ describe("Example", () => {
         headers: {
           "Content-Type": `${mimeMultipart}; boundary=${data.getBoundary()}`,
         },
-        body: data,
+        body: data.getBuffer().toString("utf8"),
       });
       const json = await response.json();
       expect(json).toMatchSnapshot();

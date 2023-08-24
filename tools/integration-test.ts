@@ -23,7 +23,7 @@ const packageJson = `
 
 const tsConfigJson = `
 {
-  "extends": "@tsconfig/node${tsconfigBase}/tsconfig.json",
+  "extends": "@tsconfig/node${tsconfigBase}/tsconfig.json"
 }
 `;
 
