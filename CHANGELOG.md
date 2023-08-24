@@ -7,6 +7,7 @@
 - **Breaking changes**:
   - Minimum Node versions supported: 18.0.0 and 20.1.0.
   - Node versions 16 and 19 are EOL no longer supported.
+  - `winston` becomes a peer dependency — you need to install it manually.
 
 ## Version 11
 
