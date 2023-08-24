@@ -7,7 +7,6 @@ import {
   Implementation,
   jsonEndpoints,
 } from "../../example/example.client";
-import fetch from "node-fetch";
 
 describe("Example", () => {
   let example: ChildProcessWithoutNullStreams;

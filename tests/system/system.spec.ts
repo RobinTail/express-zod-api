@@ -1,6 +1,5 @@
 import cors from "cors";
 import http from "node:http";
-import fetch from "node-fetch"; // @todo get rid of this in v12: use globals of Node 18
 import { z } from "zod";
 import {
   EndpointsFactory,
