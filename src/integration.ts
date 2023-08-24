@@ -22,7 +22,7 @@ import {
   makeTypeParams,
   parametricIndexNode,
   protectedReadonlyModifier,
-} from "./client-helpers";
+} from "./integration-helpers";
 import { defaultSerializer, makeCleanId } from "./common-helpers";
 import { methods } from "./method";
 import { mimeJson } from "./mime";
