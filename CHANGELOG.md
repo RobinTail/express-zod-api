@@ -10,6 +10,10 @@
     - Node versions 16 and 19 are EOL no longer supported.
   - Minimum Typescript version supported: 5.1.3.
   - Minimum Jest version supported: 28 (optional peer dependency for testing endpoints).
+- Other changes:
+  - The distribution now consists of 4 files in `dist` directory:
+    - for ESM: `index.mjs` and `index.d.mts`,
+    - for CJS: `index.js` and `index.d.ts`.
 
 ## Version 11
 
