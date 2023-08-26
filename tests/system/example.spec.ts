@@ -1,10 +1,10 @@
 import fetch from "node-fetch";
-import { ChildProcessWithoutNullStreams, spawn } from "child_process";
+import { ChildProcessWithoutNullStreams, spawn } from "node:child_process";
 import { mimeMultipart } from "../../src/mime";
 import { waitFor } from "../helpers";
-import crypto from "crypto";
+import { createHash } from "node:crypto";
 import FormData from "form-data";
-import { readFileSync } from "fs";
+import { readFile } from "node:fs/promises";
 
 describe("Example", () => {
   let example: ChildProcessWithoutNullStreams;
@@ -47,10 +47,10 @@ describe("Example", () => {
       expect(response.headers.has("access-control-allow-headers")).toBeTruthy();
       expect(response.headers.get("access-control-allow-origin")).toBe("*");
       expect(response.headers.get("access-control-allow-methods")).toBe(
-        "POST, OPTIONS"
+        "POST, OPTIONS",
       );
       expect(response.headers.get("access-control-allow-headers")).toBe(
-        "content-type"
+        "content-type",
       );
     });
 
@@ -83,7 +83,7 @@ describe("Example", () => {
 
     test("Should handle valid GET request", async () => {
       const response = await fetch(
-        "http://localhost:8090/v1/user/retrieve?test=123&id=50"
+        "http://localhost:8090/v1/user/retrieve?test=123&id=50",
       );
       expect(response.status).toBe(200);
       const json = await response.json();
@@ -92,6 +92,22 @@ describe("Example", () => {
         data: {
           id: 50,
           name: "John Doe",
+          features: [
+            {
+              title: "Tall",
+              features: [{ title: "Above 180cm", features: [] }],
+            },
+            { title: "Young", features: [] },
+            {
+              title: "Cute",
+              features: [
+                {
+                  title: "Tells funny jokes",
+                  features: [{ title: "About Typescript", features: [] }],
+                },
+              ],
+            },
+          ],
         },
       });
       await waitFor(() => /v1\/user\/retrieve/.test(out));
@@ -101,19 +117,18 @@ describe("Example", () => {
 
     test("Should send an image with a correct header", async () => {
       const response = await fetch(
-        "http://localhost:8090/v1/avatar/send?userId=123"
+        "http://localhost:8090/v1/avatar/send?userId=123",
       );
       expect(response.status).toBe(200);
       expect(response.headers.has("Content-type")).toBeTruthy();
       expect(response.headers.get("Content-type")).toBe(
-        "image/svg+xml; charset=utf-8"
+        "image/svg+xml; charset=utf-8",
       );
       expect(response.headers.has("Content-encoding")).toBeTruthy();
       expect(response.headers.get("Content-encoding")).toBe("gzip");
       expect(response.headers.has("Transfer-encoding")).toBeTruthy();
       expect(response.headers.get("Transfer-encoding")).toBe("chunked");
-      const hash = crypto
-        .createHash("sha1")
+      const hash = createHash("sha1")
         .update(await response.text())
         .digest("hex");
       expect(hash).toMatchSnapshot();
@@ -121,15 +136,14 @@ describe("Example", () => {
 
     test("Should stream an image with a correct header", async () => {
       const response = await fetch(
-        "http://localhost:8090/v1/avatar/stream?userId=123"
+        "http://localhost:8090/v1/avatar/stream?userId=123",
       );
       expect(response.status).toBe(200);
       expect(response.headers.has("Content-type")).toBeTruthy();
       expect(response.headers.get("Content-type")).toBe("image/svg+xml");
       expect(response.headers.has("Transfer-encoding")).toBeTruthy();
       expect(response.headers.get("Transfer-encoding")).toBe("chunked");
-      const hash = crypto
-        .createHash("sha1")
+      const hash = createHash("sha1")
         .update(await response.text())
         .digest("hex");
       expect(hash).toMatchSnapshot();
@@ -139,8 +153,7 @@ describe("Example", () => {
       const response = await fetch("http://localhost:8090/public/logo.svg");
       expect(response.status).toBe(200);
       expect(response.headers.get("Content-type")).toBe("image/svg+xml");
-      const hash = crypto
-        .createHash("sha1")
+      const hash = createHash("sha1")
         .update(await response.text())
         .digest("hex");
       expect(hash).toMatchSnapshot();
@@ -148,7 +161,7 @@ describe("Example", () => {
 
     test("Should upload the file", async () => {
       const filename = "logo.svg";
-      const logo = readFileSync(filename, "utf-8");
+      const logo = await readFile(filename, "utf-8");
       const data = new FormData();
       data.append("avatar", logo, { filename });
       data.append("str", "test string value");
@@ -171,7 +184,7 @@ describe("Example", () => {
   describe("Negative", () => {
     test("GET request should fail on missing input param", async () => {
       const response = await fetch(
-        "http://localhost:8090/v1/user/retrieve?test=123"
+        "http://localhost:8090/v1/user/retrieve?test=123",
       );
       expect(response.status).toBe(400);
       const json = await response.json();
@@ -180,7 +193,7 @@ describe("Example", () => {
 
     test("GET request should fail on specific value in handler implementation", async () => {
       const response = await fetch(
-        "http://localhost:8090/v1/user/retrieve?test=123&id=101"
+        "http://localhost:8090/v1/user/retrieve?test=123&id=101",
       );
       expect(response.status).toBe(404);
       const json = await response.json();
@@ -285,7 +298,7 @@ describe("Example", () => {
       const response = await fetch("http://localhost:8090/public/missing.svg");
       expect(response.status).toBe(404);
       expect(response.headers.get("Content-type")).toBe(
-        "application/json; charset=utf-8"
+        "application/json; charset=utf-8",
       );
       expect(await response.json()).toMatchSnapshot();
     });

@@ -1,6 +1,6 @@
 {
   "env": {
-    "es6": true,
+    "es2022": true,
     "node": true,
     "jest": true
   },
@@ -11,26 +11,29 @@
   ],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
-    "ecmaVersion": 6,
+    "ecmaVersion": "latest",
     "sourceType": "module",
-    "project": "./tsconfig.json"
+    "project": true
   },
   "plugins": [
     "@typescript-eslint",
     "prettier",
-    "import"
+    "import",
+    "unicorn"
   ],
   "rules": {
     "@typescript-eslint/lines-between-class-members": "off",
     "sort-imports": ["warn", {
       "ignoreDeclarationSort": true
-    }]
+    }],
+    "unicorn/prefer-node-protocol": "error"
   },
   "overrides": [
     {
       "files": [
         "./tools/*.ts",
-        "./tests/**/*.spec.ts"
+        "./tests/**/*.ts",
+        "./eslint-local-rules/*.*s"
       ],
       "rules": {
         "import/no-extraneous-dependencies": "off"

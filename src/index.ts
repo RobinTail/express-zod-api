@@ -3,8 +3,12 @@ export { AbstractEndpoint } from "./endpoint";
 export { Method } from "./method";
 export { EndpointsFactory, defaultEndpointsFactory } from "./endpoints-factory";
 export { IOSchema } from "./io-schema";
-export { FlatObject } from "./common-helpers";
-export { createApiResponse } from "./api-response";
+export {
+  FlatObject,
+  getExamples,
+  getMessageFromError,
+  getStatusCodeFromError,
+} from "./common-helpers";
 export { createLogger } from "./logger";
 export { createMiddleware } from "./middleware";
 export { createResultHandler, defaultResultHandler } from "./result-handler";
@@ -12,13 +16,23 @@ export { DependsOnMethod } from "./depends-on-method";
 export { ServeStatic } from "./serve-static";
 export { Routing } from "./routing";
 export { createServer, attachRouting } from "./server";
-export { OpenAPI } from "./open-api";
-export { OpenAPIError, DependsOnMethodError, RoutingError } from "./errors";
+export { Documentation } from "./documentation";
+export {
+  DocumentationError,
+  DependsOnMethodError,
+  RoutingError,
+  OutputValidationError,
+  InputValidationError,
+} from "./errors";
 export { withMeta } from "./metadata";
 export { testEndpoint } from "./mock";
-export { Client } from "./client";
+export { Integration } from "./integration";
 
-import * as z from "./extend-zod";
+export * as ez from "./proprietary-schemas";
+export type { ZodDateInDef } from "./date-in-schema";
+export type { ZodDateOutDef } from "./date-out-schema";
+export type { ZodFileDef } from "./file-schema";
+export type { ZodUploadDef } from "./upload-schema";
+
 import createHttpError from "http-errors";
-
-export { createHttpError, z };
+export { createHttpError };

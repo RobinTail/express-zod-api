@@ -1,6 +1,6 @@
 import { combinations } from "./common-helpers";
-import { z } from "./index";
-import { mergeDeepRight } from "ramda";
+import { z } from "zod";
+import { clone, mergeDeepRight } from "ramda";
 
 export const metaProp = "expressZodApiMeta";
 type MetaProp = typeof metaProp;
@@ -16,7 +16,7 @@ type MetaValue<T extends z.ZodTypeAny, K extends MetaKey> = Readonly<
 >;
 
 type ExampleSetter<T extends z.ZodTypeAny> = (
-  example: z.input<T>
+  example: z.input<T>,
 ) => WithMeta<T>;
 
 /**
@@ -32,24 +32,30 @@ type WithMeta<T extends z.ZodTypeAny> = MetaFixForStrippedObject<T> & {
   example: ExampleSetter<T>;
 };
 
-export const withMeta = <T extends z.ZodTypeAny>(schema: T) => {
-  const def = schema._def as MetaDef<T>;
+/** @desc it's the same approach as in zod's .describe() */
+const cloneSchemaForMeta = <T extends z.ZodTypeAny>(schema: T): WithMeta<T> => {
+  const This = (schema as any).constructor;
+  const def = clone(schema._def) as MetaDef<T>;
   def[metaProp] = def[metaProp] || { examples: [] };
-  if (!("example" in schema)) {
-    Object.defineProperties(schema, {
-      example: {
-        get: (): ExampleSetter<T> => (value) => {
-          def[metaProp].examples.push(value);
-          return schema as WithMeta<T>;
-        },
+  return new This(def) as WithMeta<T>;
+};
+
+export const withMeta = <T extends z.ZodTypeAny>(schema: T): WithMeta<T> => {
+  const copy = cloneSchemaForMeta(schema);
+  Object.defineProperties(copy, {
+    example: {
+      get: (): ExampleSetter<T> => (value) => {
+        const localCopy = withMeta<T>(copy);
+        localCopy._def[metaProp].examples.push(value);
+        return localCopy;
       },
-    });
-  }
-  return schema as WithMeta<T>;
+    },
+  });
+  return copy;
 };
 
 export const hasMeta = <T extends z.ZodTypeAny>(
-  schema: T
+  schema: T,
 ): schema is WithMeta<T> => {
   if (!(metaProp in schema._def)) {
     return false;
@@ -61,7 +67,7 @@ export const hasMeta = <T extends z.ZodTypeAny>(
 
 export function getMeta<T extends z.ZodTypeAny, K extends MetaKey>(
   schema: T,
-  meta: K
+  meta: K,
 ): MetaValue<T, K> | undefined {
   if (!hasMeta(schema)) {
     return undefined;
@@ -72,30 +78,25 @@ export function getMeta<T extends z.ZodTypeAny, K extends MetaKey>(
 
 export const copyMeta = <A extends z.ZodTypeAny, B extends z.ZodTypeAny>(
   src: A,
-  dest: B
+  dest: B,
 ): B | WithMeta<B> => {
   if (!hasMeta(src)) {
     return dest;
   }
-  dest = withMeta(dest);
-  const def = dest._def as MetaDef<B>;
-  const examplesCombinations = combinations(
-    def[metaProp].examples,
-    src._def[metaProp].examples
+  const result = withMeta(dest);
+  const examplesCombinations = combinations<B>(
+    result._def[metaProp].examples,
+    src._def[metaProp].examples,
   );
-  // general deep merge except examples
-  def[metaProp] = mergeDeepRight(
-    { ...def[metaProp], examples: [] },
-    { ...src._def[metaProp], examples: [] }
-  );
+  result._def[metaProp].examples = []; // if added more meta, restore mergeDeepRight
   if (examplesCombinations.type === "single") {
-    def[metaProp].examples = examplesCombinations.value;
+    result._def[metaProp].examples = examplesCombinations.value;
   } else {
     for (const [destExample, srcExample] of examplesCombinations.value) {
-      def[metaProp].examples.push(
-        mergeDeepRight({ ...destExample }, { ...srcExample })
+      result._def[metaProp].examples.push(
+        mergeDeepRight({ ...destExample }, { ...srcExample }),
       );
     }
   }
-  return dest;
+  return result;
 };

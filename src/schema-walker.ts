@@ -1,24 +1,25 @@
 import { z } from "zod";
-import { ZodDateInDef } from "./date-in-schema";
-import { ZodDateOutDef } from "./date-out-schema";
-import { ZodFileDef } from "./file-schema";
-import { ZodUploadDef } from "./upload-schema";
+import type { ZodDateInDef } from "./date-in-schema";
+import type { ZodDateOutDef } from "./date-out-schema";
+import type { ZodFileDef } from "./file-schema";
+import type { ZodUploadDef } from "./upload-schema";
 
-export type HandlingVariant = "last" | "regular";
+export type HandlingVariant = "last" | "regular" | "each";
+
 type VariantDependingProps<
   Variant extends HandlingVariant,
-  U
+  U,
 > = Variant extends "regular"
-  ? {
-      next: SchemaHandler<z.ZodTypeAny, U, {}, "last">;
-    }
+  ? { next: SchemaHandler<z.ZodTypeAny, U, {}, "last"> }
+  : Variant extends "each"
+  ? { prev: U }
   : {};
 
 type SchemaHandlingProps<
   T extends z.ZodTypeAny,
   U,
   Context extends object,
-  Variant extends HandlingVariant
+  Variant extends HandlingVariant,
 > = {
   schema: T;
 } & Context &
@@ -28,10 +29,10 @@ export type SchemaHandler<
   T extends z.ZodTypeAny,
   U,
   Context extends object = {},
-  Variant extends HandlingVariant = "regular"
+  Variant extends HandlingVariant = "regular",
 > = (params: SchemaHandlingProps<T, U, Context, Variant>) => U;
 
-type ProprietaryKinds =
+export type ProprietaryKinds =
   | ZodFileDef["typeName"]
   | ZodUploadDef["typeName"]
   | ZodDateInDef["typeName"]
@@ -51,11 +52,11 @@ export const walkSchema = <U, Context extends object = {}>({
   onMissing,
   ...context
 }: SchemaHandlingProps<z.ZodTypeAny, U, Context, "last"> & {
-  onEach?: SchemaHandler<z.ZodTypeAny, U, Context, "last">;
+  /** @since 10.1.1 calling onEach _after_ handler and giving it its result */
+  onEach?: SchemaHandler<z.ZodTypeAny, U, Context, "each">;
   rules: HandlingRules<U, Context>;
-  onMissing: (schema: z.ZodTypeAny) => U;
+  onMissing: SchemaHandler<z.ZodTypeAny, U, Context, "last">;
 }): U => {
-  const overrides = onEach && onEach({ schema, ...(context as Context) });
   const handler =
     "typeName" in schema._def
       ? rules[schema._def.typeName as keyof typeof rules]
@@ -74,6 +75,8 @@ export const walkSchema = <U, Context extends object = {}>({
         ...(context as Context),
         next,
       })
-    : onMissing(schema);
+    : onMissing({ schema, ...(context as Context) });
+  const overrides =
+    onEach && onEach({ schema, prev: result, ...(context as Context) });
   return overrides ? { ...result, ...overrides } : result;
 };

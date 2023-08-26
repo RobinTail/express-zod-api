@@ -1,11 +1,15 @@
 import { Request, Response } from "express";
 import { Logger } from "winston";
 import { z } from "zod";
-import { ApiResponse, createApiResponse } from "./api-response";
+import { ApiResponse } from "./api-response";
 import { ResultHandlerError } from "./errors";
-import { getMessageFromError, getStatusCodeFromError } from "./common-helpers";
+import {
+  getExamples,
+  getMessageFromError,
+  getStatusCodeFromError,
+} from "./common-helpers";
 import { IOSchema } from "./io-schema";
-import { getMeta, withMeta } from "./metadata";
+import { withMeta } from "./metadata";
 
 interface LastResortHandlerParams {
   error: ResultHandlerError;
@@ -23,62 +27,66 @@ interface ResultHandlerParams<RES> {
 }
 
 type ResultHandler<RES> = (
-  params: ResultHandlerParams<RES>
+  params: ResultHandlerParams<RES>,
 ) => void | Promise<void>;
 
 export interface ResultHandlerDefinition<
-  POS extends ApiResponse,
-  NEG extends ApiResponse
+  POS extends z.ZodTypeAny,
+  NEG extends z.ZodTypeAny,
 > {
-  getPositiveResponse: (output: IOSchema) => POS;
-  getNegativeResponse: () => NEG;
-  handler: ResultHandler<z.output<POS["schema"]> | z.output<NEG["schema"]>>;
+  getPositiveResponse: (output: IOSchema) => POS | ApiResponse<POS>;
+  getNegativeResponse: () => NEG | ApiResponse<NEG>;
+  handler: ResultHandler<z.output<POS> | z.output<NEG>>;
 }
 
+export const defaultStatusCodes = {
+  positive: 200,
+  negative: 400,
+};
+
 export const createResultHandler = <
-  POS extends ApiResponse,
-  NEG extends ApiResponse
+  POS extends z.ZodTypeAny,
+  NEG extends z.ZodTypeAny,
 >(
-  definition: ResultHandlerDefinition<POS, NEG>
+  definition: ResultHandlerDefinition<POS, NEG>,
 ) => definition;
 
 export const defaultResultHandler = createResultHandler({
   getPositiveResponse: (output: IOSchema) => {
-    const examples = getMeta(output, "examples") || [];
+    // Examples are taken for proxying: no validation needed for this
+    const examples = getExamples({ schema: output });
     const responseSchema = withMeta(
       z.object({
         status: z.literal("success"),
         data: output,
-      })
+      }),
     );
-    for (const example of examples) {
-      // forwarding output examples to response schema
-      responseSchema.example({
-        status: "success",
-        data: example,
-      });
-    }
-    return createApiResponse(responseSchema);
+    return examples.reduce<typeof responseSchema>(
+      (acc, example) =>
+        acc.example({
+          status: "success",
+          data: example,
+        }),
+      responseSchema,
+    );
   },
-  getNegativeResponse: () => {
-    const responseSchema = withMeta(
+  getNegativeResponse: () =>
+    withMeta(
       z.object({
         status: z.literal("error"),
         error: z.object({
           message: z.string(),
         }),
-      })
+      }),
     ).example({
       status: "error",
       error: {
         message: getMessageFromError(new Error("Sample error message")),
       },
-    });
-    return createApiResponse(responseSchema);
-  },
+    }),
   handler: ({ error, input, output, request, response, logger }) => {
     if (!error) {
-      response.status(200).json({
+      response.status(defaultStatusCodes.positive).json({
         status: "success" as const,
         data: output,
       });
@@ -110,6 +118,6 @@ export const lastResortHandler = ({
       `An error occurred while serving the result: ${error.message}.` +
         (error.originalError
           ? `\nOriginal error: ${error.originalError.message}.`
-          : "")
+          : ""),
     );
 };

@@ -1,16 +1,20 @@
 import { config as exampleConfig } from "../../example/config";
 import { routing } from "../../example/routing";
 import {
-  OpenAPI,
+  Documentation,
+  EndpointsFactory,
   createConfig,
   createMiddleware,
+  createResultHandler,
   defaultEndpointsFactory,
+  ez,
   withMeta,
-  z,
 } from "../../src";
 import { expectType } from "tsd";
+import { mimeJson } from "../../src/mime";
+import { z } from "zod";
 
-describe("Open API generator", () => {
+describe("Documentation generator", () => {
   const sampleConfig = createConfig({
     cors: true,
     logger: { level: "debug", color: true },
@@ -19,13 +23,44 @@ describe("Open API generator", () => {
     },
   });
 
-  describe("generateOpenApi()", () => {
-    test("should generate the correct schema of example routing", () => {
-      const spec = new OpenAPI({
-        routing,
-        config: exampleConfig,
-        version: "1.2.3",
-        title: "Example API",
+  describe("getSpecAsYaml()", () => {
+    test.each([
+      { composition: "inline" },
+      { composition: "components" },
+    ] as const)(
+      "should generate the correct schema of example routing %#",
+      ({ composition }) => {
+        const spec = new Documentation({
+          routing,
+          config: exampleConfig,
+          version: "1.2.3",
+          title: "Example API",
+          serverUrl: "http://example.com",
+          composition,
+        }).getSpecAsYaml();
+        expect(spec).toMatchSnapshot();
+      },
+    );
+
+    test("should generate the correct schema for DELETE request without body", () => {
+      const spec = new Documentation({
+        routing: {
+          v1: {
+            deleteSomething: defaultEndpointsFactory.build({
+              methods: ["delete"],
+              input: z.object({}),
+              output: z.object({
+                whatever: z.number(),
+              }),
+              handler: async () => ({
+                whatever: 42,
+              }),
+            }),
+          },
+        },
+        config: sampleConfig,
+        version: "3.4.5",
+        title: "Testing DELETE request without body",
         serverUrl: "http://example.com",
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
@@ -33,7 +68,7 @@ describe("Open API generator", () => {
 
     test("should generate the correct schema for complex types", () => {
       const literalValue = "something" as const;
-      const spec = new OpenAPI({
+      const spec = new Documentation({
         config: sampleConfig,
         routing: {
           v1: {
@@ -63,7 +98,7 @@ describe("Open API generator", () => {
     });
 
     test("should generate the correct schema for nullable and optional types", () => {
-      const spec = new OpenAPI({
+      const spec = new Documentation({
         config: sampleConfig,
         routing: {
           v1: {
@@ -92,7 +127,7 @@ describe("Open API generator", () => {
     });
 
     test("should generate the correct schema for intersection type", () => {
-      const spec = new OpenAPI({
+      const spec = new Documentation({
         config: sampleConfig,
         routing: {
           v1: {
@@ -105,7 +140,7 @@ describe("Open API generator", () => {
                   }),
                   z.object({
                     two: z.string(),
-                  })
+                  }),
                 ),
               }),
               output: z.object({
@@ -116,7 +151,7 @@ describe("Open API generator", () => {
                   .and(
                     z.object({
                       six: z.string(),
-                    })
+                    }),
                   ),
               }),
               handler: async () => ({
@@ -136,7 +171,7 @@ describe("Open API generator", () => {
     });
 
     test("should generate the correct schema for union type", () => {
-      const spec = new OpenAPI({
+      const spec = new Documentation({
         config: sampleConfig,
         routing: {
           v1: {
@@ -171,7 +206,7 @@ describe("Open API generator", () => {
     });
 
     test("should generate the correct schema for discriminated union type", () => {
-      const spec = new OpenAPI({
+      const spec = new Documentation({
         config: sampleConfig,
         routing: {
           v1: {
@@ -203,7 +238,7 @@ describe("Open API generator", () => {
     });
 
     test("should handle transformation schema in output", () => {
-      const spec = new OpenAPI({
+      const spec = new Documentation({
         config: sampleConfig,
         routing: {
           v1: {
@@ -229,8 +264,8 @@ describe("Open API generator", () => {
       expect(spec).toMatchSnapshot();
     });
 
-    test("should handle bigint, boolean, date and null", () => {
-      const spec = new OpenAPI({
+    test("should handle bigint, boolean, date, null and readonly", () => {
+      const spec = new Documentation({
         config: sampleConfig,
         routing: {
           v1: {
@@ -238,12 +273,12 @@ describe("Open API generator", () => {
               method: "post",
               input: z.object({
                 bigint: z.bigint(),
-                boolean: z.boolean(),
-                dateIn: z.dateIn(),
+                boolean: z.boolean().readonly(),
+                dateIn: ez.dateIn(),
               }),
               output: z.object({
                 null: z.null(),
-                dateOut: z.dateOut(),
+                dateOut: ez.dateOut(),
               }),
               handler: async () => ({
                 null: null,
@@ -260,7 +295,7 @@ describe("Open API generator", () => {
     });
 
     test("should handle record", () => {
-      const spec = new OpenAPI({
+      const spec = new Documentation({
         config: sampleConfig,
         routing: {
           v1: {
@@ -274,7 +309,7 @@ describe("Open API generator", () => {
                 literal: z.record(z.literal("only"), z.boolean()),
                 union: z.record(
                   z.literal("option1").or(z.literal("option2")),
-                  z.boolean()
+                  z.boolean(),
                 ),
                 enum: z.record(z.enum(["option1", "option2"]), z.boolean()),
               }),
@@ -290,7 +325,7 @@ describe("Open API generator", () => {
     });
 
     test("should handle type any", () => {
-      const spec = new OpenAPI({
+      const spec = new Documentation({
         config: sampleConfig,
         routing: {
           v1: {
@@ -314,7 +349,7 @@ describe("Open API generator", () => {
     });
 
     test("should handle different number types", () => {
-      const spec = new OpenAPI({
+      const spec = new Documentation({
         config: sampleConfig,
         routing: {
           v1: {
@@ -346,7 +381,7 @@ describe("Open API generator", () => {
     });
 
     test("should handle different string types", () => {
-      const spec = new OpenAPI({
+      const spec = new Documentation({
         config: sampleConfig,
         routing: {
           v1: {
@@ -360,6 +395,10 @@ describe("Open API generator", () => {
                 email: z.string().email(),
                 uuid: z.string().uuid(),
                 cuid: z.string().cuid(),
+                cuid2: z.string().cuid2(),
+                ulid: z.string().ulid(),
+                ip: z.string().ip(),
+                emoji: z.string().emoji(),
                 url: z.string().url(),
                 numeric: z.string().regex(/\d+/),
                 combined: z
@@ -384,7 +423,7 @@ describe("Open API generator", () => {
     });
 
     test("should handle tuples", () => {
-      const spec = new OpenAPI({
+      const spec = new Documentation({
         config: sampleConfig,
         routing: {
           v1: {
@@ -414,7 +453,7 @@ describe("Open API generator", () => {
     });
 
     test("should handle enum types", () => {
-      const spec = new OpenAPI({
+      const spec = new Documentation({
         config: sampleConfig,
         routing: {
           v1: {
@@ -443,10 +482,10 @@ describe("Open API generator", () => {
       const string = z.preprocess((arg) => String(arg), z.string());
       const number = z.preprocess(
         (arg) => parseInt(String(arg), 16),
-        z.number().int().nonnegative()
+        z.number().int().nonnegative(),
       );
       const boolean = z.preprocess((arg) => !!arg, z.boolean());
-      const spec = new OpenAPI({
+      const spec = new Documentation({
         config: sampleConfig,
         routing: {
           v1: {
@@ -472,12 +511,54 @@ describe("Open API generator", () => {
       expect(boolean.parse(null)).toBe(false);
     });
 
+    test("should handle circular schemas via z.lazy()", () => {
+      const baseCategorySchema = z.object({
+        name: z.string(),
+      });
+      type Category = z.infer<typeof baseCategorySchema> & {
+        subcategories: Category[];
+      };
+      const categorySchema: z.ZodType<Category> = baseCategorySchema.extend({
+        subcategories: z.lazy(() => categorySchema.array()),
+      });
+      const spec = new Documentation({
+        config: sampleConfig,
+        routing: {
+          v1: {
+            getSomething: defaultEndpointsFactory.build({
+              method: "post",
+              input: baseCategorySchema,
+              output: z.object({
+                zodExample: categorySchema,
+              }),
+              handler: async () => ({
+                zodExample: {
+                  name: "People",
+                  subcategories: [
+                    {
+                      name: "Politicians",
+                      subcategories: [
+                        { name: "Presidents", subcategories: [] },
+                      ],
+                    },
+                  ],
+                },
+              }),
+            }),
+          },
+        },
+        version: "3.4.5",
+        title: "Testing Lazy",
+        serverUrl: "http://example.com",
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
+    });
+
     test("should throw on unsupported types", () => {
       [
         z.undefined(),
         z.map(z.any(), z.any()),
         z.function(),
-        z.lazy(() => z.any()),
         z.promise(z.any()),
         z.unknown(),
         z.never(),
@@ -485,7 +566,7 @@ describe("Open API generator", () => {
       ].forEach((zodType) => {
         expect(
           () =>
-            new OpenAPI({
+            new Documentation({
               config: sampleConfig,
               routing: {
                 v1: {
@@ -502,9 +583,144 @@ describe("Open API generator", () => {
               version: "3.4.5",
               title: "Testing unsupported types",
               serverUrl: "http://example.com",
-            })
+            }),
         ).toThrowError(/Zod type Zod\w+ is unsupported/);
       });
+    });
+
+    test("should ensure uniq security schema names", () => {
+      const mw1 = createMiddleware({
+        security: {
+          or: [{ type: "input", name: "key" }, { type: "bearer" }],
+        },
+        input: z.object({
+          key: z.string(),
+        }),
+        middleware: jest.fn(),
+      });
+      const mw2 = createMiddleware({
+        security: {
+          and: [
+            { type: "bearer" },
+            {
+              type: "oauth2",
+              flows: {
+                password: {
+                  tokenUrl: "https://some.url",
+                  scopes: { read: "read something", write: "write something" },
+                },
+              },
+            },
+          ],
+        },
+        input: z.object({}),
+        middleware: jest.fn(),
+      });
+      const mw3 = createMiddleware({
+        security: { type: "bearer", format: "JWT" },
+        input: z.object({}),
+        middleware: jest.fn(),
+      });
+      const spec = new Documentation({
+        config: sampleConfig,
+        routing: {
+          v1: {
+            getSomething: defaultEndpointsFactory.addMiddleware(mw1).build({
+              scopes: ["this should be omitted"],
+              method: "get",
+              input: z.object({
+                str: z.string(),
+              }),
+              output: z.object({
+                num: z.number(),
+              }),
+              handler: async () => ({ num: 123 }),
+            }),
+            setSomething: defaultEndpointsFactory.addMiddleware(mw2).build({
+              scope: "write",
+              method: "post",
+              input: z.object({}),
+              output: z.object({}),
+              handler: async () => ({}),
+            }),
+            updateSomething: defaultEndpointsFactory.addMiddleware(mw3).build({
+              scopes: ["this should be omitted"],
+              method: "put",
+              input: z.object({}),
+              output: z.object({}),
+              handler: async () => ({}),
+            }),
+          },
+        },
+        version: "3.4.5",
+        title: "Testing Security",
+        serverUrl: "http://example.com",
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
+    });
+
+    test("should ensure the uniq operation ids", () => {
+      const spec = new Documentation({
+        config: sampleConfig,
+        routing: {
+          v1: {
+            getSome: {
+              thing: defaultEndpointsFactory.build({
+                description: "thing is the path segment",
+                method: "get",
+                input: z.object({}),
+                output: z.object({}),
+                handler: async () => ({}),
+              }),
+              ":thing": defaultEndpointsFactory.build({
+                description: "thing is the path parameter",
+                method: "get",
+                input: z.object({}),
+                output: z.object({}),
+                handler: async () => ({}),
+              }),
+            },
+          },
+        },
+        version: "3.4.5",
+        title: "Testing Operation IDs",
+        serverUrl: "http://example.com",
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
+    });
+
+    test("should handle custom mime types and status codes", () => {
+      const resultHandler = createResultHandler({
+        getPositiveResponse: (output) => ({
+          schema: z.object({ status: z.literal("OK"), result: output }),
+          mimeTypes: [mimeJson, "text/vnd.yaml"],
+          statusCode: 201,
+        }),
+        getNegativeResponse: () => ({
+          schema: z.object({ status: z.literal("NOT OK") }),
+          mimeType: "text/vnd.yaml",
+          statusCode: 403,
+        }),
+        handler: () => {},
+      });
+      const factory = new EndpointsFactory(resultHandler);
+      const spec = new Documentation({
+        config: sampleConfig,
+        routing: {
+          v1: {
+            getSomething: factory.build({
+              method: "get",
+              input: z.object({}),
+              output: z.object({}),
+              handler: async () => ({}),
+            }),
+          },
+        },
+        version: "3.4.5",
+        title: "Testing MIME types and status codes",
+        serverUrl: "http://example.com",
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
     });
   });
 
@@ -513,7 +729,7 @@ describe("Open API generator", () => {
       // There is no such class as ZodNonEmptyArray in Zod v3.7.0+
       // It existed though in Zod v3.6.x:
       // @see https://github.com/colinhacks/zod/blob/v3.6.1/src/types.ts#L1204
-      const spec = new OpenAPI({
+      const spec = new Documentation({
         config: sampleConfig,
         routing: {
           v1: {
@@ -548,7 +764,7 @@ describe("Open API generator", () => {
       expectType<TestingType>({ id: "string", field1: "string" });
       expectType<TestingType>({ id: "string", field2: "string" });
 
-      const spec = new OpenAPI({
+      const spec = new Documentation({
         config: sampleConfig,
         routing: {
           v1: {
@@ -581,7 +797,7 @@ describe("Open API generator", () => {
 
   describe("Route Path Params", () => {
     test("should handle route path params for POST request", () => {
-      const spec = new OpenAPI({
+      const spec = new Documentation({
         config: sampleConfig,
         routing: {
           v1: {
@@ -604,7 +820,7 @@ describe("Open API generator", () => {
     });
 
     test("should handle route path params for GET request", () => {
-      const spec = new OpenAPI({
+      const spec = new Documentation({
         config: sampleConfig,
         routing: {
           v1: {
@@ -629,7 +845,7 @@ describe("Open API generator", () => {
 
   describe("Metadata", () => {
     test("should pass over the schema description", () => {
-      const spec = new OpenAPI({
+      const spec = new Documentation({
         config: sampleConfig,
         routing: {
           v1: {
@@ -656,8 +872,37 @@ describe("Open API generator", () => {
       expect(spec).toMatchSnapshot();
     });
 
+    test("Issue #929: the location of the custom description should be on the param level", () => {
+      const spec = new Documentation({
+        composition: "components",
+        config: sampleConfig,
+        routing: {
+          hris: {
+            employees: defaultEndpointsFactory.build({
+              method: "get",
+              input: z.object({
+                cursor: z
+                  .string()
+                  .optional()
+                  .describe(
+                    "An optional cursor string used for pagination." +
+                      " This can be retrieved from the `next` property of the previous page response.",
+                  ),
+              }),
+              output: z.object({}),
+              handler: async () => ({}),
+            }),
+          },
+        },
+        version: "3.4.5",
+        title: "Testing Metadata:description",
+        serverUrl: "http://example.com",
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
+    });
+
     test("should pass over the example of an individual parameter", () => {
-      const spec = new OpenAPI({
+      const spec = new Documentation({
         config: sampleConfig,
         routing: {
           v1: {
@@ -665,12 +910,12 @@ describe("Open API generator", () => {
               method: "get",
               input: z.object({
                 strNum: withMeta(
-                  z.string().transform((v) => parseInt(v, 10))
+                  z.string().transform((v) => parseInt(v, 10)),
                 ).example("123"), // example is for input side of the transformation
               }),
               output: z.object({
                 numericStr: withMeta(
-                  z.number().transform((v) => `${v}`)
+                  z.number().transform((v) => `${v}`),
                 ).example(123), // example is for input side of the transformation
               }),
               handler: async () => ({ numericStr: 123 }),
@@ -685,7 +930,7 @@ describe("Open API generator", () => {
     });
 
     test("should pass over examples of each param from the whole IO schema examples (GET)", () => {
-      const spec = new OpenAPI({
+      const spec = new Documentation({
         config: sampleConfig,
         routing: {
           v1: {
@@ -694,14 +939,14 @@ describe("Open API generator", () => {
               input: withMeta(
                 z.object({
                   strNum: z.string().transform((v) => parseInt(v, 10)),
-                })
+                }),
               ).example({
                 strNum: "123", // example is for input side of the transformation
               }),
               output: withMeta(
                 z.object({
                   numericStr: z.number().transform((v) => `${v}`),
-                })
+                }),
               ).example({
                 numericStr: 123, // example is for input side of the transformation
               }),
@@ -717,7 +962,7 @@ describe("Open API generator", () => {
     });
 
     test("should pass over examples of the whole IO schema (POST)", () => {
-      const spec = new OpenAPI({
+      const spec = new Documentation({
         config: sampleConfig,
         routing: {
           v1: {
@@ -726,14 +971,14 @@ describe("Open API generator", () => {
               input: withMeta(
                 z.object({
                   strNum: z.string().transform((v) => parseInt(v, 10)),
-                })
+                }),
               ).example({
                 strNum: "123", // example is for input side of the transformation
               }),
               output: withMeta(
                 z.object({
                   numericStr: z.number().transform((v) => `${v}`),
-                })
+                }),
               ).example({
                 numericStr: 123, // example is for input side of the transformation
               }),
@@ -749,7 +994,7 @@ describe("Open API generator", () => {
     });
 
     test("should merge endpoint handler examples with its middleware examples", () => {
-      const spec = new OpenAPI({
+      const spec = new Documentation({
         config: sampleConfig,
         routing: {
           v1: {
@@ -759,26 +1004,26 @@ describe("Open API generator", () => {
                   input: withMeta(
                     z.object({
                       key: z.string(),
-                    })
+                    }),
                   ).example({
                     key: "1234-56789-01",
                   }),
                   middleware: jest.fn(),
-                })
+                }),
               )
               .build({
                 method: "post",
                 input: withMeta(
                   z.object({
                     str: z.string(),
-                  })
+                  }),
                 ).example({
                   str: "test",
                 }),
                 output: withMeta(
                   z.object({
                     num: z.number(),
-                  })
+                  }),
                 ).example({
                   num: 123,
                 }),
@@ -793,60 +1038,24 @@ describe("Open API generator", () => {
       expect(spec).toMatchSnapshot();
     });
 
-    test("should ensure uniq security schema names", () => {
-      const mw1 = createMiddleware({
-        security: {
-          or: [{ type: "input", name: "key" }, { type: "bearer" }],
-        },
-        input: z.object({
-          key: z.string(),
-        }),
-        middleware: jest.fn(),
-      });
-      const mw2 = createMiddleware({
-        security: {
-          and: [
-            { type: "bearer" },
-            {
-              type: "oauth2",
-              flows: {
-                password: {
-                  tokenUrl: "https://some.url",
-                  scopes: { read: "read something", write: "write something" },
-                },
-              },
-            },
-          ],
-        },
-        input: z.object({}),
-        middleware: jest.fn(),
-      });
-      const spec = new OpenAPI({
+    test("Issue #827: withMeta() should be immutable", () => {
+      const zodSchema = z.object({ a: z.string() });
+      const spec = new Documentation({
         config: sampleConfig,
         routing: {
           v1: {
-            getSomething: defaultEndpointsFactory.addMiddleware(mw1).build({
-              scopes: ["this should be omitted"],
-              method: "get",
-              input: z.object({
-                str: z.string(),
-              }),
-              output: z.object({
-                num: z.number(),
-              }),
-              handler: async () => ({ num: 123 }),
-            }),
-            setSomething: defaultEndpointsFactory.addMiddleware(mw2).build({
-              scope: "write",
+            addSomething: defaultEndpointsFactory.build({
               method: "post",
-              input: z.object({}),
-              output: z.object({}),
-              handler: async () => ({}),
+              input: withMeta(zodSchema).example({ a: "first" }),
+              output: withMeta(zodSchema.extend({ b: z.string() }))
+                .example({ a: "first", b: "prefix_first" })
+                .example({ a: "second", b: "prefix_second" }),
+              handler: async ({ input: { a } }) => ({ a, b: `prefix_${a}` }),
             }),
           },
         },
         version: "3.4.5",
-        title: "Testing Security",
+        title: "Testing Metadata:example on IO parameter",
         serverUrl: "http://example.com",
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();

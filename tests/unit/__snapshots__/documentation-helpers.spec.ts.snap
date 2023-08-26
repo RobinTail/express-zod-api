@@ -1,12 +1,12 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Open API helpers depictAny() should set format:any 1`] = `
+exports[`Documentation helpers depictAny() should set format:any 1`] = `
 {
   "format": "any",
 }
 `;
 
-exports[`Open API helpers depictArray() should set type:array and pass items depiction 1`] = `
+exports[`Documentation helpers depictArray() should set type:array and pass items depiction 1`] = `
 {
   "items": {
     "type": "boolean",
@@ -15,37 +15,43 @@ exports[`Open API helpers depictArray() should set type:array and pass items dep
 }
 `;
 
-exports[`Open API helpers depictBigInt() should set type:integer and format:bigint 1`] = `
+exports[`Documentation helpers depictBigInt() should set type:integer and format:bigint 1`] = `
 {
   "format": "bigint",
   "type": "integer",
 }
 `;
 
-exports[`Open API helpers depictBoolean() should set type:boolean 1`] = `
+exports[`Documentation helpers depictBoolean() should set type:boolean 1`] = `
 {
   "type": "boolean",
 }
 `;
 
-exports[`Open API helpers depictBranded should pass the next depicter 1`] = `
+exports[`Documentation helpers depictBranded should pass the next depicter 1`] = `
 {
   "minLength": 2,
   "type": "string",
 }
 `;
 
-exports[`Open API helpers depictCatch() should pass next depicter 1`] = `
+exports[`Documentation helpers depictCatch() should pass next depicter 1`] = `
 {
   "type": "boolean",
 }
 `;
 
-exports[`Open API helpers depictDate should throw clear error 0 1`] = `[OpenAPIError: Using z.date() within output schema is forbidden. Please use z.dateOut() instead. Check out the documentation for details.]`;
+exports[`Documentation helpers depictDate should throw clear error 0 1`] = `
+[DocumentationError: Using z.date() within output schema is forbidden. Please use z.dateOut() instead. Check out the documentation for details.
+Caused by response schema of an Endpoint assigned to GET method of /v1/user/:id path.]
+`;
 
-exports[`Open API helpers depictDate should throw clear error 1 1`] = `[OpenAPIError: Using z.date() within input schema is forbidden. Please use z.dateIn() instead. Check out the documentation for details.]`;
+exports[`Documentation helpers depictDate should throw clear error 1 1`] = `
+[DocumentationError: Using z.date() within input schema is forbidden. Please use z.dateIn() instead. Check out the documentation for details.
+Caused by input schema of an Endpoint assigned to GET method of /v1/user/:id path.]
+`;
 
-exports[`Open API helpers depictDateIn should set type:string, pattern and format 1`] = `
+exports[`Documentation helpers depictDateIn should set type:string, pattern and format 1`] = `
 {
   "description": "YYYY-MM-DDTHH:mm:ss.sssZ",
   "externalDocs": {
@@ -57,9 +63,12 @@ exports[`Open API helpers depictDateIn should set type:string, pattern and forma
 }
 `;
 
-exports[`Open API helpers depictDateIn should throw when ZodDateIn in response 1`] = `[OpenAPIError: Please use z.dateOut() for output.]`;
+exports[`Documentation helpers depictDateIn should throw when ZodDateIn in response 1`] = `
+[DocumentationError: Please use z.dateOut() for output.
+Caused by response schema of an Endpoint assigned to GET method of /v1/user/:id path.]
+`;
 
-exports[`Open API helpers depictDateOut should set type:string, description and format 1`] = `
+exports[`Documentation helpers depictDateOut should set type:string, description and format 1`] = `
 {
   "description": "YYYY-MM-DDTHH:mm:ss.sssZ",
   "externalDocs": {
@@ -70,16 +79,19 @@ exports[`Open API helpers depictDateOut should set type:string, description and 
 }
 `;
 
-exports[`Open API helpers depictDateOut should throw when ZodDateOut in request 1`] = `[OpenAPIError: Please use z.dateIn() for input.]`;
+exports[`Documentation helpers depictDateOut should throw when ZodDateOut in request 1`] = `
+[DocumentationError: Please use z.dateIn() for input.
+Caused by input schema of an Endpoint assigned to GET method of /v1/user/:id path.]
+`;
 
-exports[`Open API helpers depictDefault() should set default property 1`] = `
+exports[`Documentation helpers depictDefault() should set default property 1`] = `
 {
   "default": true,
   "type": "boolean",
 }
 `;
 
-exports[`Open API helpers depictDiscriminatedUnion() should wrap next depicters in oneOf prop and set discriminator prop 1`] = `
+exports[`Documentation helpers depictDiscriminatedUnion() should wrap next depicters in oneOf prop and set discriminator prop 1`] = `
 {
   "discriminator": {
     "propertyName": "status",
@@ -89,7 +101,6 @@ exports[`Open API helpers depictDiscriminatedUnion() should wrap next depicters 
       "properties": {
         "data": {
           "format": "any",
-          "nullable": true,
         },
         "status": {
           "enum": [
@@ -133,13 +144,13 @@ exports[`Open API helpers depictDiscriminatedUnion() should wrap next depicters 
 }
 `;
 
-exports[`Open API helpers depictEffect() should depict as number (out) 1`] = `
+exports[`Documentation helpers depictEffect() should depict as number (out) 1`] = `
 {
   "type": "number",
 }
 `;
 
-exports[`Open API helpers depictEffect() should depict as object (refinement) 1`] = `
+exports[`Documentation helpers depictEffect() should depict as object (refinement) 1`] = `
 {
   "properties": {
     "s": {
@@ -153,33 +164,31 @@ exports[`Open API helpers depictEffect() should depict as object (refinement) 1`
 }
 `;
 
-exports[`Open API helpers depictEffect() should depict as string (in) 1`] = `
+exports[`Documentation helpers depictEffect() should depict as string (in) 1`] = `
 {
   "type": "string",
 }
 `;
 
-exports[`Open API helpers depictEffect() should depict as string (preprocess) 1`] = `
+exports[`Documentation helpers depictEffect() should depict as string (preprocess) 1`] = `
 {
   "format": "string (preprocessed)",
 }
 `;
 
-exports[`Open API helpers depictEffect() should handle edge cases 1`] = `
+exports[`Documentation helpers depictEffect() should handle edge cases 1`] = `
 {
   "format": "any",
-  "nullable": true,
 }
 `;
 
-exports[`Open API helpers depictEffect() should handle edge cases 2`] = `
+exports[`Documentation helpers depictEffect() should handle edge cases 2`] = `
 {
   "format": "any",
-  "nullable": true,
 }
 `;
 
-exports[`Open API helpers depictEnum() should set type and enum properties 1`] = `
+exports[`Documentation helpers depictEnum() should set type and enum properties 1`] = `
 {
   "enum": [
     "one",
@@ -189,7 +198,7 @@ exports[`Open API helpers depictEnum() should set type and enum properties 1`] =
 }
 `;
 
-exports[`Open API helpers depictEnum() should set type and enum properties 2`] = `
+exports[`Documentation helpers depictEnum() should set type and enum properties 2`] = `
 {
   "enum": [
     "ONE",
@@ -199,30 +208,7 @@ exports[`Open API helpers depictEnum() should set type and enum properties 2`] =
 }
 `;
 
-exports[`Open API helpers depictFile() should set type:string and format accordingly 0 1`] = `
-{
-  "format": "file",
-  "type": "string",
-}
-`;
-
-exports[`Open API helpers depictFile() should set type:string and format accordingly 1 1`] = `
-{
-  "format": "binary",
-  "type": "string",
-}
-`;
-
-exports[`Open API helpers depictFile() should set type:string and format accordingly 2 1`] = `
-{
-  "format": "byte",
-  "type": "string",
-}
-`;
-
-exports[`Open API helpers depictFile() should throw when using in input 1`] = `[OpenAPIError: Please use z.file() only within ResultHandler.]`;
-
-exports[`Open API helpers depictIOExamples() should pass examples in case of request 1`] = `
+exports[`Documentation helpers depictExamples() should pass examples in case of request 1`] = `
 {
   "examples": {
     "example1": {
@@ -241,7 +227,7 @@ exports[`Open API helpers depictIOExamples() should pass examples in case of req
 }
 `;
 
-exports[`Open API helpers depictIOExamples() should transform examples in case of response 1`] = `
+exports[`Documentation helpers depictExamples() should transform examples in case of response 1`] = `
 {
   "examples": {
     "example1": {
@@ -260,33 +246,33 @@ exports[`Open API helpers depictIOExamples() should transform examples in case o
 }
 `;
 
-exports[`Open API helpers depictIOParamExamples() should pass examples in case of request 1`] = `
+exports[`Documentation helpers depictFile() should set type:string and format accordingly 0 1`] = `
 {
-  "examples": {
-    "example1": {
-      "value": 123,
-    },
-    "example2": {
-      "value": 456,
-    },
-  },
+  "format": "file",
+  "type": "string",
 }
 `;
 
-exports[`Open API helpers depictIOParamExamples() should transform examples in case of response 1`] = `
+exports[`Documentation helpers depictFile() should set type:string and format accordingly 1 1`] = `
 {
-  "examples": {
-    "example1": {
-      "value": "123",
-    },
-    "example2": {
-      "value": "456",
-    },
-  },
+  "format": "binary",
+  "type": "string",
 }
 `;
 
-exports[`Open API helpers depictIntersection() should wrap next depicters in allOf property 1`] = `
+exports[`Documentation helpers depictFile() should set type:string and format accordingly 2 1`] = `
+{
+  "format": "byte",
+  "type": "string",
+}
+`;
+
+exports[`Documentation helpers depictFile() should throw when using in input 1`] = `
+[DocumentationError: Please use z.file() only within ResultHandler.
+Caused by input schema of an Endpoint assigned to GET method of /v1/user/:id path.]
+`;
+
+exports[`Documentation helpers depictIntersection() should wrap next depicters in allOf property 1`] = `
 {
   "allOf": [
     {
@@ -325,7 +311,54 @@ exports[`Open API helpers depictIntersection() should wrap next depicters in all
 }
 `;
 
-exports[`Open API helpers depictLiteral() should set type and involve enum property 1`] = `
+exports[`Documentation helpers depictLazy should handle circular references 0 1`] = `
+{
+  "$ref": "#/components/schemas/6cbbd837811754902ea1e68d3e5c75e36250b880",
+}
+`;
+
+exports[`Documentation helpers depictLazy should handle circular references 0 2`] = `
+{
+  "items": {
+    "$ref": "#/components/schemas/6cbbd837811754902ea1e68d3e5c75e36250b880",
+  },
+  "type": "array",
+}
+`;
+
+exports[`Documentation helpers depictLazy should handle circular references 1 1`] = `
+{
+  "$ref": "#/components/schemas/7a225c55e65ab4a2fd3ce390265b255ee6747049",
+}
+`;
+
+exports[`Documentation helpers depictLazy should handle circular references 1 2`] = `
+{
+  "$ref": "#/components/schemas/7a225c55e65ab4a2fd3ce390265b255ee6747049",
+}
+`;
+
+exports[`Documentation helpers depictLazy should handle circular references 2 1`] = `
+{
+  "$ref": "#/components/schemas/118cb3b11b8a1f3b6b1e60a89f96a8be9da32a0f",
+}
+`;
+
+exports[`Documentation helpers depictLazy should handle circular references 2 2`] = `
+{
+  "properties": {
+    "prop": {
+      "$ref": "#/components/schemas/118cb3b11b8a1f3b6b1e60a89f96a8be9da32a0f",
+    },
+  },
+  "required": [
+    "prop",
+  ],
+  "type": "object",
+}
+`;
+
+exports[`Documentation helpers depictLiteral() should set type and involve enum property 1`] = `
 {
   "enum": [
     "testing",
@@ -334,7 +367,7 @@ exports[`Open API helpers depictLiteral() should set type and involve enum prope
 }
 `;
 
-exports[`Open API helpers depictNull() should set type:string format:null and nullable:true props 1`] = `
+exports[`Documentation helpers depictNull() should set type:string format:null and nullable:true props 1`] = `
 {
   "format": "null",
   "nullable": true,
@@ -342,21 +375,21 @@ exports[`Open API helpers depictNull() should set type:string format:null and nu
 }
 `;
 
-exports[`Open API helpers depictNullable() should set nullable:true 0 1`] = `
+exports[`Documentation helpers depictNullable() should set nullable:true 0 1`] = `
 {
   "nullable": true,
   "type": "string",
 }
 `;
 
-exports[`Open API helpers depictNullable() should set nullable:true 1 1`] = `
+exports[`Documentation helpers depictNullable() should set nullable:true 1 1`] = `
 {
   "nullable": true,
   "type": "string",
 }
 `;
 
-exports[`Open API helpers depictNumber() should type:number, min/max, format and exclusiveness props 1`] = `
+exports[`Documentation helpers depictNumber() should type:number, min/max, format and exclusiveness props 1`] = `
 {
   "exclusiveMaximum": false,
   "exclusiveMinimum": false,
@@ -367,7 +400,7 @@ exports[`Open API helpers depictNumber() should type:number, min/max, format and
 }
 `;
 
-exports[`Open API helpers depictNumber() should type:number, min/max, format and exclusiveness props 2`] = `
+exports[`Documentation helpers depictNumber() should type:number, min/max, format and exclusiveness props 2`] = `
 {
   "exclusiveMaximum": false,
   "exclusiveMinimum": false,
@@ -378,7 +411,7 @@ exports[`Open API helpers depictNumber() should type:number, min/max, format and
 }
 `;
 
-exports[`Open API helpers depictObject() Bug #758 1`] = `
+exports[`Documentation helpers depictObject() Bug #758 1`] = `
 {
   "properties": {
     "a": {
@@ -400,7 +433,7 @@ exports[`Open API helpers depictObject() Bug #758 1`] = `
 }
 `;
 
-exports[`Open API helpers depictObject() should type:object, properties and required props 0 1`] = `
+exports[`Documentation helpers depictObject() should type:object, properties and required props 0 1`] = `
 {
   "properties": {
     "a": {
@@ -423,7 +456,7 @@ exports[`Open API helpers depictObject() should type:object, properties and requ
 }
 `;
 
-exports[`Open API helpers depictObject() should type:object, properties and required props 1 1`] = `
+exports[`Documentation helpers depictObject() should type:object, properties and required props 1 1`] = `
 {
   "properties": {
     "a": {
@@ -446,7 +479,7 @@ exports[`Open API helpers depictObject() should type:object, properties and requ
 }
 `;
 
-exports[`Open API helpers depictObject() should type:object, properties and required props 2 1`] = `
+exports[`Documentation helpers depictObject() should type:object, properties and required props 2 1`] = `
 {
   "properties": {
     "a": {
@@ -469,7 +502,7 @@ exports[`Open API helpers depictObject() should type:object, properties and requ
 }
 `;
 
-exports[`Open API helpers depictObject() should type:object, properties and required props 3 1`] = `
+exports[`Documentation helpers depictObject() should type:object, properties and required props 3 1`] = `
 {
   "properties": {
     "a": {
@@ -491,7 +524,7 @@ exports[`Open API helpers depictObject() should type:object, properties and requ
 }
 `;
 
-exports[`Open API helpers depictObject() should type:object, properties and required props 4 1`] = `
+exports[`Documentation helpers depictObject() should type:object, properties and required props 4 1`] = `
 {
   "properties": {
     "a": {
@@ -507,12 +540,11 @@ exports[`Open API helpers depictObject() should type:object, properties and requ
       "type": "string",
     },
   },
-  "required": [],
   "type": "object",
 }
 `;
 
-exports[`Open API helpers depictObjectProperties() should wrap next depicters in a shape of object 1`] = `
+exports[`Documentation helpers depictObjectProperties() should wrap next depicters in a shape of object 1`] = `
 {
   "one": {
     "type": "string",
@@ -523,31 +555,63 @@ exports[`Open API helpers depictObjectProperties() should wrap next depicters in
 }
 `;
 
-exports[`Open API helpers depictOptional() should pass the next depicter 0 1`] = `
+exports[`Documentation helpers depictOptional() should pass the next depicter 0 1`] = `
 {
   "type": "string",
 }
 `;
 
-exports[`Open API helpers depictOptional() should pass the next depicter 1 1`] = `
+exports[`Documentation helpers depictOptional() should pass the next depicter 1 1`] = `
 {
   "type": "string",
 }
 `;
 
-exports[`Open API helpers depictPipeline should depict as boolean (out) 1`] = `
+exports[`Documentation helpers depictParamExamples() should pass examples in case of request 1`] = `
+{
+  "examples": {
+    "example1": {
+      "value": 123,
+    },
+    "example2": {
+      "value": 456,
+    },
+  },
+}
+`;
+
+exports[`Documentation helpers depictParamExamples() should transform examples in case of response 1`] = `
+{
+  "examples": {
+    "example1": {
+      "value": "123",
+    },
+    "example2": {
+      "value": "456",
+    },
+  },
+}
+`;
+
+exports[`Documentation helpers depictPipeline should depict as boolean (out) 1`] = `
 {
   "type": "boolean",
 }
 `;
 
-exports[`Open API helpers depictPipeline should depict as string (in) 1`] = `
+exports[`Documentation helpers depictPipeline should depict as string (in) 1`] = `
 {
   "type": "string",
 }
 `;
 
-exports[`Open API helpers depictRecord() should set properties+required or additionalProperties props 1`] = `
+exports[`Documentation helpers depictReadonly should pass the next depicter 1`] = `
+{
+  "type": "string",
+}
+`;
+
+exports[`Documentation helpers depictRecord() should set properties+required or additionalProperties props 0 1`] = `
 {
   "additionalProperties": {
     "type": "boolean",
@@ -556,7 +620,7 @@ exports[`Open API helpers depictRecord() should set properties+required or addit
 }
 `;
 
-exports[`Open API helpers depictRecord() should set properties+required or additionalProperties props 2`] = `
+exports[`Documentation helpers depictRecord() should set properties+required or additionalProperties props 1 1`] = `
 {
   "additionalProperties": {
     "type": "boolean",
@@ -565,7 +629,7 @@ exports[`Open API helpers depictRecord() should set properties+required or addit
 }
 `;
 
-exports[`Open API helpers depictRecord() should set properties+required or additionalProperties props 3`] = `
+exports[`Documentation helpers depictRecord() should set properties+required or additionalProperties props 2 1`] = `
 {
   "properties": {
     "one": {
@@ -583,7 +647,7 @@ exports[`Open API helpers depictRecord() should set properties+required or addit
 }
 `;
 
-exports[`Open API helpers depictRecord() should set properties+required or additionalProperties props 4`] = `
+exports[`Documentation helpers depictRecord() should set properties+required or additionalProperties props 3 1`] = `
 {
   "properties": {
     "testing": {
@@ -597,7 +661,7 @@ exports[`Open API helpers depictRecord() should set properties+required or addit
 }
 `;
 
-exports[`Open API helpers depictRecord() should set properties+required or additionalProperties props 5`] = `
+exports[`Documentation helpers depictRecord() should set properties+required or additionalProperties props 4 1`] = `
 {
   "properties": {
     "one": {
@@ -615,46 +679,55 @@ exports[`Open API helpers depictRecord() should set properties+required or addit
 }
 `;
 
-exports[`Open API helpers depictRequestParams() should depict none if both query and params are disabled 1`] = `[]`;
+exports[`Documentation helpers depictRecord() should set properties+required or additionalProperties props 5 1`] = `
+{
+  "additionalProperties": {
+    "format": "any",
+  },
+  "type": "object",
+}
+`;
 
-exports[`Open API helpers depictRequestParams() should depict only path params if query is disabled 1`] = `
+exports[`Documentation helpers depictRequestParams() should depict none if both query and params are disabled 1`] = `[]`;
+
+exports[`Documentation helpers depictRequestParams() should depict only path params if query is disabled 1`] = `
 [
   {
+    "description": "GET /v1/user/:id parameter",
     "in": "path",
     "name": "id",
     "required": true,
     "schema": {
-      "description": "GET /v1/user/:id parameter",
       "type": "string",
     },
   },
 ]
 `;
 
-exports[`Open API helpers depictRequestParams() should depict query and path params 1`] = `
+exports[`Documentation helpers depictRequestParams() should depict query and path params 1`] = `
 [
   {
+    "description": "GET /v1/user/:id parameter",
     "in": "path",
     "name": "id",
     "required": true,
     "schema": {
-      "description": "GET /v1/user/:id parameter",
       "type": "string",
     },
   },
   {
+    "description": "GET /v1/user/:id parameter",
     "in": "query",
     "name": "test",
     "required": true,
     "schema": {
-      "description": "GET /v1/user/:id parameter",
       "type": "boolean",
     },
   },
 ]
 `;
 
-exports[`Open API helpers depictSecurity() should depict OAuth2 Security with flows 1`] = `
+exports[`Documentation helpers depictSecurity() should depict OAuth2 Security with flows 1`] = `
 {
   "flows": {
     "authorizationCode": {
@@ -695,7 +768,7 @@ exports[`Open API helpers depictSecurity() should depict OAuth2 Security with fl
 }
 `;
 
-exports[`Open API helpers depictSecurity() should handle Basic, Bearer and CustomHeader Securities 1`] = `
+exports[`Documentation helpers depictSecurity() should handle Basic, Bearer and CustomHeader Securities 1`] = `
 {
   "or": [
     {
@@ -719,7 +792,7 @@ exports[`Open API helpers depictSecurity() should handle Basic, Bearer and Custo
 }
 `;
 
-exports[`Open API helpers depictSecurity() should handle Input and Cookie Securities 1`] = `
+exports[`Documentation helpers depictSecurity() should handle Input and Cookie Securities 1`] = `
 {
   "and": [
     {
@@ -740,7 +813,7 @@ exports[`Open API helpers depictSecurity() should handle Input and Cookie Securi
 }
 `;
 
-exports[`Open API helpers depictSecurity() should handle OpenID and OAuth2 Securities 1`] = `
+exports[`Documentation helpers depictSecurity() should handle OpenID and OAuth2 Securities 1`] = `
 {
   "or": [
     {
@@ -755,14 +828,14 @@ exports[`Open API helpers depictSecurity() should handle OpenID and OAuth2 Secur
 }
 `;
 
-exports[`Open API helpers depictSecurity() should handle undefined flows 1`] = `
+exports[`Documentation helpers depictSecurity() should handle undefined flows 1`] = `
 {
   "flows": {},
   "type": "oauth2",
 }
 `;
 
-exports[`Open API helpers depictSecurityRefs() should handle LogicalAnd 1`] = `
+exports[`Documentation helpers depictSecurityRefs() should handle LogicalAnd 1`] = `
 [
   {
     "A": [],
@@ -772,7 +845,7 @@ exports[`Open API helpers depictSecurityRefs() should handle LogicalAnd 1`] = `
 ]
 `;
 
-exports[`Open API helpers depictSecurityRefs() should handle LogicalAnd 2`] = `
+exports[`Documentation helpers depictSecurityRefs() should handle LogicalAnd 2`] = `
 [
   {
     "A": [],
@@ -785,7 +858,7 @@ exports[`Open API helpers depictSecurityRefs() should handle LogicalAnd 2`] = `
 ]
 `;
 
-exports[`Open API helpers depictSecurityRefs() should handle LogicalOr 1`] = `
+exports[`Documentation helpers depictSecurityRefs() should handle LogicalOr 1`] = `
 [
   {
     "A": [],
@@ -799,7 +872,7 @@ exports[`Open API helpers depictSecurityRefs() should handle LogicalOr 1`] = `
 ]
 `;
 
-exports[`Open API helpers depictSecurityRefs() should handle LogicalOr 2`] = `
+exports[`Documentation helpers depictSecurityRefs() should handle LogicalOr 2`] = `
 [
   {
     "A": [],
@@ -811,7 +884,7 @@ exports[`Open API helpers depictSecurityRefs() should handle LogicalOr 2`] = `
 ]
 `;
 
-exports[`Open API helpers depictSecurityRefs() should handle the plain value 1`] = `
+exports[`Documentation helpers depictSecurityRefs() should handle the plain value 1`] = `
 [
   {
     "A": [],
@@ -819,7 +892,7 @@ exports[`Open API helpers depictSecurityRefs() should handle the plain value 1`]
 ]
 `;
 
-exports[`Open API helpers depictSecurityRefs() should populate the scopes 1`] = `
+exports[`Documentation helpers depictSecurityRefs() should populate the scopes 1`] = `
 [
   {
     "A": [
@@ -840,7 +913,7 @@ exports[`Open API helpers depictSecurityRefs() should populate the scopes 1`] = 
 ]
 `;
 
-exports[`Open API helpers depictString() should set format, pattern and min/maxLength props 0 1`] = `
+exports[`Documentation helpers depictString() should set format, pattern and min/maxLength props 0 1`] = `
 {
   "format": "email",
   "maxLength": 20,
@@ -849,28 +922,28 @@ exports[`Open API helpers depictString() should set format, pattern and min/maxL
 }
 `;
 
-exports[`Open API helpers depictString() should set format, pattern and min/maxLength props 1 1`] = `
+exports[`Documentation helpers depictString() should set format, pattern and min/maxLength props 1 1`] = `
 {
   "format": "url",
   "type": "string",
 }
 `;
 
-exports[`Open API helpers depictString() should set format, pattern and min/maxLength props 2 1`] = `
+exports[`Documentation helpers depictString() should set format, pattern and min/maxLength props 2 1`] = `
 {
   "format": "uuid",
   "type": "string",
 }
 `;
 
-exports[`Open API helpers depictString() should set format, pattern and min/maxLength props 3 1`] = `
+exports[`Documentation helpers depictString() should set format, pattern and min/maxLength props 3 1`] = `
 {
   "format": "cuid",
   "type": "string",
 }
 `;
 
-exports[`Open API helpers depictString() should set format, pattern and min/maxLength props 4 1`] = `
+exports[`Documentation helpers depictString() should set format, pattern and min/maxLength props 4 1`] = `
 {
   "format": "date-time",
   "pattern": "/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?Z$/",
@@ -878,7 +951,7 @@ exports[`Open API helpers depictString() should set format, pattern and min/maxL
 }
 `;
 
-exports[`Open API helpers depictString() should set format, pattern and min/maxLength props 5 1`] = `
+exports[`Documentation helpers depictString() should set format, pattern and min/maxLength props 5 1`] = `
 {
   "format": "date-time",
   "pattern": "/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?(([+-]\\d{2}:\\d{2})|Z)$/",
@@ -886,20 +959,20 @@ exports[`Open API helpers depictString() should set format, pattern and min/maxL
 }
 `;
 
-exports[`Open API helpers depictString() should set format, pattern and min/maxLength props 6 1`] = `
+exports[`Documentation helpers depictString() should set format, pattern and min/maxLength props 6 1`] = `
 {
   "pattern": "/^\\d+.\\d+.\\d+$/",
   "type": "string",
 }
 `;
 
-exports[`Open API helpers depictString() should set type:string 1`] = `
+exports[`Documentation helpers depictString() should set type:string 1`] = `
 {
   "type": "string",
 }
 `;
 
-exports[`Open API helpers depictTags() should accept objects with URLs 1`] = `
+exports[`Documentation helpers depictTags() should accept objects with URLs 1`] = `
 [
   {
     "description": "Everything about users",
@@ -915,7 +988,7 @@ exports[`Open API helpers depictTags() should accept objects with URLs 1`] = `
 ]
 `;
 
-exports[`Open API helpers depictTags() should accept plain descriptions 1`] = `
+exports[`Documentation helpers depictTags() should accept plain descriptions 1`] = `
 [
   {
     "description": "Everything about users",
@@ -928,7 +1001,7 @@ exports[`Open API helpers depictTags() should accept plain descriptions 1`] = `
 ]
 `;
 
-exports[`Open API helpers depictTuple() should set type:array, max- and minLength, oneOf, format:tuple and description 1`] = `
+exports[`Documentation helpers depictTuple() should set type:array, max- and minLength, oneOf, format:tuple and description 1`] = `
 {
   "items": {
     "description": "0: boolean, 1: string, 2: string",
@@ -954,7 +1027,7 @@ exports[`Open API helpers depictTuple() should set type:array, max- and minLengt
 }
 `;
 
-exports[`Open API helpers depictUnion() should wrap next depicters into oneOf property 1`] = `
+exports[`Documentation helpers depictUnion() should wrap next depicters into oneOf property 1`] = `
 {
   "oneOf": [
     {
@@ -972,23 +1045,32 @@ exports[`Open API helpers depictUnion() should wrap next depicters into oneOf pr
 }
 `;
 
-exports[`Open API helpers depictUpload() should set format:binary and type:string 1`] = `
+exports[`Documentation helpers depictUpload() should set format:binary and type:string 1`] = `
 {
   "format": "binary",
   "type": "string",
 }
 `;
 
-exports[`Open API helpers depictUpload() should throw when using in response 1`] = `[OpenAPIError: Please use z.upload() only for input.]`;
+exports[`Documentation helpers depictUpload() should throw when using in response 1`] = `
+[DocumentationError: Please use z.upload() only for input.
+Caused by response schema of an Endpoint assigned to GET method of /v1/user/:id path.]
+`;
 
-exports[`Open API helpers excludeExampleFromDepiction() should remove example property of supplied object 1`] = `
+exports[`Documentation helpers excludeExampleFromDepiction() should remove example property of supplied object 1`] = `
 {
   "description": "test",
   "type": "string",
 }
 `;
 
-exports[`Open API helpers excludeParamsFromDepiction() should omit specified path params 0 1`] = `
+exports[`Documentation helpers excludeParamsFromDepiction() should handle the ReferenceObject 1`] = `
+{
+  "$ref": "test",
+}
+`;
+
+exports[`Documentation helpers excludeParamsFromDepiction() should omit specified path params 0 1`] = `
 {
   "properties": {
     "b": {
@@ -1002,7 +1084,7 @@ exports[`Open API helpers excludeParamsFromDepiction() should omit specified pat
 }
 `;
 
-exports[`Open API helpers excludeParamsFromDepiction() should omit specified path params 1 1`] = `
+exports[`Documentation helpers excludeParamsFromDepiction() should omit specified path params 1 1`] = `
 {
   "oneOf": [
     {
@@ -1025,7 +1107,7 @@ exports[`Open API helpers excludeParamsFromDepiction() should omit specified pat
 }
 `;
 
-exports[`Open API helpers excludeParamsFromDepiction() should omit specified path params 2 1`] = `
+exports[`Documentation helpers excludeParamsFromDepiction() should omit specified path params 2 1`] = `
 {
   "allOf": [
     {
@@ -1048,7 +1130,7 @@ exports[`Open API helpers excludeParamsFromDepiction() should omit specified pat
 }
 `;
 
-exports[`Open API helpers extractObjectSchema() Feature #600: Top level refinements should handle refined object schema 1`] = `
+exports[`Documentation helpers extractObjectSchema() Feature #600: Top level refinements should handle refined object schema 1`] = `
 {
   "_type": "ZodObject",
   "shape": {
@@ -1059,7 +1141,7 @@ exports[`Open API helpers extractObjectSchema() Feature #600: Top level refineme
 }
 `;
 
-exports[`Open API helpers extractObjectSchema() should pass the object schema through 1`] = `
+exports[`Documentation helpers extractObjectSchema() should pass the object schema through 1`] = `
 {
   "_type": "ZodObject",
   "shape": {
@@ -1070,7 +1152,7 @@ exports[`Open API helpers extractObjectSchema() should pass the object schema th
 }
 `;
 
-exports[`Open API helpers extractObjectSchema() should return object schema for the intersection of object schemas 1`] = `
+exports[`Documentation helpers extractObjectSchema() should return object schema for the intersection of object schemas 1`] = `
 {
   "_type": "ZodObject",
   "shape": {
@@ -1084,7 +1166,7 @@ exports[`Open API helpers extractObjectSchema() should return object schema for 
 }
 `;
 
-exports[`Open API helpers extractObjectSchema() should return object schema for the union of object schemas 1`] = `
+exports[`Documentation helpers extractObjectSchema() should return object schema for the union of object schemas 1`] = `
 {
   "_type": "ZodObject",
   "shape": {

@@ -1,5 +1,6 @@
-import { z } from "../../src";
-import crypto from "crypto";
+import { z } from "zod";
+import { ez } from "../../src";
+import { createHash } from "node:crypto";
 import { taggedEndpointsFactory } from "../factories";
 
 export const uploadAvatarEndpoint = taggedEndpointsFactory.build({
@@ -8,11 +9,11 @@ export const uploadAvatarEndpoint = taggedEndpointsFactory.build({
   description: "Handles a file upload.",
   input: z
     .object({
-      avatar: z
+      avatar: ez
         .upload()
         .refine(
           (file) => file.mimetype.match(/image\/.+/),
-          "Should be an image"
+          "Should be an image",
         ),
     })
     .passthrough(),
@@ -28,7 +29,7 @@ export const uploadAvatarEndpoint = taggedEndpointsFactory.build({
       name: avatar.name,
       size: avatar.size,
       mime: avatar.mimetype,
-      hash: crypto.createHash("sha1").update(avatar.data).digest("hex"),
+      hash: createHash("sha1").update(avatar.data).digest("hex"),
       otherInputs: rest,
     };
   },

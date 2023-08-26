@@ -1,23 +1,25 @@
-import fs from "fs";
+import { readFileSync, writeFileSync } from "node:fs";
 import { esmTestPort } from "../tests/helpers";
 import { extractReadmeQuickStart } from "./extract-quick-start";
 import { getTSConfigBase } from "./tsconfig-base";
 
 const tsconfigBase = getTSConfigBase();
 
+// @todo revert "start" to "ts-node-esm quick-start.ts" when the ts-node issue fixed
+// @link https://github.com/TypeStrong/ts-node/issues/1997
 const packageJson = `
 {
   "name": "express-zod-api-esm-test",
   "version": "1.0.0",
   "scripts": {
-    "start": "ts-node-esm quick-start.ts"
+    "start": "node --no-warnings=ExperimentalWarning --loader ts-node/esm quick-start.ts"
   },
   "type": "module",
   "dependencies": {
     "@tsconfig/node${tsconfigBase}": "latest",
-    "express-zod-api": "../../dist-esm",
+    "express-zod-api": "../../dist/esm",
     "ts-node": "10.9.1",
-    "typescript": "4.9.4",
+    "typescript": "5.1.5",
     "@types/node": "*"
   }
 }
@@ -27,13 +29,13 @@ const tsConfigJson = `
 {
   "extends": "@tsconfig/node${tsconfigBase}/tsconfig.json",
   "compilerOptions": {
-    "module": "ES2015",
-    "moduleResolution": "Node"
+    "module": "ES2022",
+    "moduleResolution": "Bundler"
   }
 }
 `;
 
-const readme = fs.readFileSync("README.md", "utf-8");
+const readme = readFileSync("README.md", "utf-8");
 const quickStartSection = readme.match(/# Quick start(.+?)\n#\s[A-Z]+/s);
 
 if (!quickStartSection) {
@@ -49,6 +51,6 @@ if (!tsParts) {
 const quickStart = extractReadmeQuickStart().replace(/8090/g, `${esmTestPort}`);
 
 const dir = "./tests/esm";
-fs.writeFileSync(`${dir}/package.json`, packageJson.trim());
-fs.writeFileSync(`${dir}/tsconfig.json`, tsConfigJson.trim());
-fs.writeFileSync(`${dir}/quick-start.ts`, quickStart.trim());
+writeFileSync(`${dir}/package.json`, packageJson.trim());
+writeFileSync(`${dir}/tsconfig.json`, tsConfigJson.trim());
+writeFileSync(`${dir}/quick-start.ts`, quickStart.trim());

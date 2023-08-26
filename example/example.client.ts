@@ -1,3 +1,8 @@
+type Type2048581c137c5b2130eb860e3ae37da196dfc25b = {
+  title: string;
+  features: Type2048581c137c5b2130eb860e3ae37da196dfc25b;
+}[];
+
 type GetV1UserRetrieveInput = {} & {
   /** a numeric string containing the id of the user */
   id: string;
@@ -9,6 +14,10 @@ type GetV1UserRetrieveResponse =
       data: {
         id: number;
         name: string;
+        features: {
+          title: string;
+          features: Type2048581c137c5b2130eb860e3ae37da196dfc25b;
+        }[];
       };
     }
   | {
@@ -108,16 +117,24 @@ export const jsonEndpoints = {
   "post /v1/avatar/upload": true,
 };
 
+export const endpointTags = {
+  "get /v1/user/retrieve": ["users"],
+  "post /v1/user/:id": ["users"],
+  "get /v1/avatar/send": ["files", "users"],
+  "get /v1/avatar/stream": ["users", "files"],
+  "post /v1/avatar/upload": ["files"],
+};
+
 export type Provider = <M extends Method, P extends Path>(
   method: M,
   path: P,
-  params: Input[`${M} ${P}`]
+  params: Input[`${M} ${P}`],
 ) => Promise<Response[`${M} ${P}`]>;
 
 export type Implementation = (
   method: Method,
   path: string,
-  params: Record<string, any>
+  params: Record<string, any>,
 ) => Promise<any>;
 
 /*
@@ -126,13 +143,12 @@ export const exampleImplementation: Implementation = async (
   path,
   params
 ) => {
-  const searchParams =
-    method === "get" ? `?${new URLSearchParams(params)}` : "";
+  const hasBody = !["get", "delete"].includes(method);
+  const searchParams = hasBody ? "" : `?${new URLSearchParams(params)}`;
   const response = await fetch(`https://example.com${path}${searchParams}`, {
     method: method.toUpperCase(),
-    headers:
-      method === "get" ? undefined : { "Content-Type": "application/json" },
-    body: method === "get" ? undefined : JSON.stringify(params),
+    headers: hasBody ? { "Content-Type": "application/json" } : undefined,
+    body: hasBody ? JSON.stringify(params) : undefined,
   });
   if (`${method} ${path}` in jsonEndpoints) {
     return response.json();
@@ -145,17 +161,17 @@ client.provide("get", "/v1/user/retrieve", { id: "10" });
 */
 export class ExpressZodAPIClient {
   constructor(protected readonly implementation: Implementation) {}
-  public readonly provide: Provider = (method, path, params) =>
+  public readonly provide: Provider = async (method, path, params) =>
     this.implementation(
       method,
       Object.keys(params).reduce(
         (acc, key) => acc.replace(`:${key}`, params[key]),
-        path
+        path,
       ),
       Object.keys(params).reduce(
         (acc, key) =>
           path.indexOf(`:${key}`) >= 0 ? acc : { ...acc, [key]: params[key] },
-        {}
-      )
+        {},
+      ),
     );
 }

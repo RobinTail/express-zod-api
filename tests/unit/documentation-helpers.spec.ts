@@ -1,11 +1,13 @@
-import { SchemaObject } from "openapi3-ts";
+import { ReferenceObject, SchemaObject } from "openapi3-ts/oas30";
+import { z } from "zod";
+import { defaultSerializer } from "../../src/common-helpers";
 import { IOSchemaError } from "../../src/errors";
 import {
-  OpenAPIError,
+  DocumentationError,
   defaultEndpointsFactory,
+  ez,
   withMeta,
-  z,
-} from "../../src/index";
+} from "../../src";
 import { getMeta } from "../../src/metadata";
 import {
   OpenAPIContext,
@@ -22,10 +24,10 @@ import {
   depictDiscriminatedUnion,
   depictEffect,
   depictEnum,
+  depictExamples,
   depictFile,
-  depictIOExamples,
-  depictIOParamExamples,
   depictIntersection,
+  depictLazy,
   depictLiteral,
   depictNull,
   depictNullable,
@@ -33,7 +35,9 @@ import {
   depictObject,
   depictObjectProperties,
   depictOptional,
+  depictParamExamples,
   depictPipeline,
+  depictReadonly,
   depictRecord,
   depictRequestParams,
   depictSecurity,
@@ -51,17 +55,42 @@ import {
   onEach,
   onMissing,
   reformatParamsInPath,
-} from "../../src/open-api-helpers";
+} from "../../src/documentation-helpers";
 import { SchemaHandler, walkSchema } from "../../src/schema-walker";
 import { serializeSchemaForTest } from "../helpers";
 
-describe("Open API helpers", () => {
-  const requestContext: OpenAPIContext = { isResponse: false };
-  const responseContext: OpenAPIContext = { isResponse: true };
+describe("Documentation helpers", () => {
+  const getRefMock = jest.fn();
+  const makeRefMock = jest.fn(
+    (name: string, {}: SchemaObject | ReferenceObject): ReferenceObject => ({
+      $ref: `#/components/schemas/${name}`,
+    }),
+  );
+  const requestContext: OpenAPIContext = {
+    path: "/v1/user/:id",
+    method: "get",
+    isResponse: false,
+    getRef: getRefMock,
+    makeRef: makeRefMock,
+    serializer: defaultSerializer,
+  };
+  const responseContext: OpenAPIContext = {
+    path: "/v1/user/:id",
+    method: "get",
+    isResponse: true,
+    getRef: getRefMock,
+    makeRef: makeRefMock,
+    serializer: defaultSerializer,
+  };
   const makeNext =
     (
-      context: OpenAPIContext
-    ): SchemaHandler<z.ZodTypeAny, SchemaObject, {}, "last"> =>
+      context: OpenAPIContext,
+    ): SchemaHandler<
+      z.ZodTypeAny,
+      SchemaObject | ReferenceObject,
+      {},
+      "last"
+    > =>
     ({ schema }) =>
       walkSchema({
         schema,
@@ -71,16 +100,25 @@ describe("Open API helpers", () => {
         onMissing,
       });
 
+  beforeEach(() => {
+    getRefMock.mockClear();
+    makeRefMock.mockClear();
+  });
+
   describe("extractObjectSchema()", () => {
     test("should pass the object schema through", () => {
-      const subject = extractObjectSchema(z.object({ one: z.string() }));
+      const subject = extractObjectSchema(
+        z.object({ one: z.string() }),
+        requestContext,
+      );
       expect(subject).toBeInstanceOf(z.ZodObject);
       expect(serializeSchemaForTest(subject)).toMatchSnapshot();
     });
 
     test("should return object schema for the union of object schemas", () => {
       const subject = extractObjectSchema(
-        z.object({ one: z.string() }).or(z.object({ two: z.number() }))
+        z.object({ one: z.string() }).or(z.object({ two: z.number() })),
+        requestContext,
       );
       expect(subject).toBeInstanceOf(z.ZodObject);
       expect(serializeSchemaForTest(subject)).toMatchSnapshot();
@@ -88,7 +126,8 @@ describe("Open API helpers", () => {
 
     test("should return object schema for the intersection of object schemas", () => {
       const subject = extractObjectSchema(
-        z.object({ one: z.string() }).and(z.object({ two: z.number() }))
+        z.object({ one: z.string() }).and(z.object({ two: z.number() })),
+        requestContext,
       );
       expect(subject).toBeInstanceOf(z.ZodObject);
       expect(serializeSchemaForTest(subject)).toMatchSnapshot();
@@ -98,39 +137,45 @@ describe("Open API helpers", () => {
       const objectSchema = withMeta(z.object({ one: z.string() })).example({
         one: "test",
       });
-      expect(getMeta(extractObjectSchema(objectSchema), "examples")).toEqual([
-        { one: "test" },
-      ]);
+      expect(
+        getMeta(extractObjectSchema(objectSchema, requestContext), "examples"),
+      ).toEqual([{ one: "test" }]);
 
       const refinedObjSchema = withMeta(
-        z.object({ one: z.string() }).refine(() => true)
+        z.object({ one: z.string() }).refine(() => true),
       ).example({ one: "test" });
       expect(
-        getMeta(extractObjectSchema(refinedObjSchema), "examples")
+        getMeta(
+          extractObjectSchema(refinedObjSchema, requestContext),
+          "examples",
+        ),
       ).toEqual([{ one: "test" }]);
 
       const unionSchema = withMeta(
-        z.object({ one: z.string() }).or(z.object({ two: z.number() }))
+        z.object({ one: z.string() }).or(z.object({ two: z.number() })),
       )
         .example({ one: "test1" })
         .example({ two: 123 });
-      expect(getMeta(extractObjectSchema(unionSchema), "examples")).toEqual([
-        { one: "test1" },
-        { two: 123 },
-      ]);
+      expect(
+        getMeta(extractObjectSchema(unionSchema, requestContext), "examples"),
+      ).toEqual([{ one: "test1" }, { two: 123 }]);
 
       const intersectionSchema = withMeta(
-        z.object({ one: z.string() }).and(z.object({ two: z.number() }))
+        z.object({ one: z.string() }).and(z.object({ two: z.number() })),
       ).example({ one: "test1", two: 123 });
       expect(
-        getMeta(extractObjectSchema(intersectionSchema), "examples")
+        getMeta(
+          extractObjectSchema(intersectionSchema, requestContext),
+          "examples",
+        ),
       ).toEqual([{ one: "test1", two: 123 }]);
     });
 
     describe("Feature #600: Top level refinements", () => {
       test("should handle refined object schema", () => {
         const subject = extractObjectSchema(
-          z.object({ one: z.string() }).refine(() => true)
+          z.object({ one: z.string() }).refine(() => true),
+          requestContext,
         );
         expect(subject).toBeInstanceOf(z.ZodObject);
         expect(serializeSchemaForTest(subject)).toMatchSnapshot();
@@ -138,11 +183,15 @@ describe("Open API helpers", () => {
 
       test("should throw when using transformation", () => {
         expect(() =>
-          extractObjectSchema(z.object({ one: z.string() }).transform(() => []))
+          extractObjectSchema(
+            z.object({ one: z.string() }).transform(() => []),
+            requestContext,
+          ),
         ).toThrowError(
           new IOSchemaError(
-            "Using transformations on the top level of input schema is not allowed."
-          )
+            "Using transformations on the top level of input schema is not allowed.\n" +
+              "Caused by input schema of an Endpoint assigned to GET method of /v1/user/:id path.",
+          ),
         );
       });
     });
@@ -163,6 +212,12 @@ describe("Open API helpers", () => {
       });
       expect(excludeParamsFromDepiction(depicted, ["a"])).toMatchSnapshot();
     });
+
+    test("should handle the ReferenceObject", () => {
+      expect(
+        excludeParamsFromDepiction({ $ref: "test" }, ["a"]),
+      ).toMatchSnapshot();
+    });
   });
 
   describe("reformatParamsInPath()", () => {
@@ -170,10 +225,10 @@ describe("Open API helpers", () => {
       expect(reformatParamsInPath("/v1/user")).toBe("/v1/user");
       expect(reformatParamsInPath("/v1/user/:id")).toBe("/v1/user/{id}");
       expect(reformatParamsInPath("/v1/flight/:from-:to")).toBe(
-        "/v1/flight/{from}-{to}"
+        "/v1/flight/{from}-{to}",
       );
       expect(reformatParamsInPath("/v1/flight/:from-:to/updates")).toBe(
-        "/v1/flight/{from}-{to}/updates"
+        "/v1/flight/{from}-{to}/updates",
       );
     });
   });
@@ -185,7 +240,7 @@ describe("Open API helpers", () => {
           schema: z.boolean().default(true),
           ...requestContext,
           next: makeNext(requestContext),
-        })
+        }),
       ).toMatchSnapshot();
     });
   });
@@ -197,7 +252,7 @@ describe("Open API helpers", () => {
           schema: z.boolean().catch(true),
           ...requestContext,
           next: makeNext(requestContext),
-        })
+        }),
       ).toMatchSnapshot();
     });
   });
@@ -209,7 +264,7 @@ describe("Open API helpers", () => {
           schema: z.any(),
           ...requestContext,
           next: makeNext(requestContext),
-        })
+        }),
       ).toMatchSnapshot();
     });
   });
@@ -218,29 +273,29 @@ describe("Open API helpers", () => {
     test("should set format:binary and type:string", () => {
       expect(
         depictUpload({
-          schema: z.upload(),
+          schema: ez.upload(),
           ...requestContext,
           next: makeNext(requestContext),
-        })
+        }),
       ).toMatchSnapshot();
     });
     test("should throw when using in response", () => {
       try {
         depictUpload({
-          schema: z.upload(),
+          schema: ez.upload(),
           ...responseContext,
           next: makeNext(responseContext),
         });
         fail("Should not be here");
       } catch (e) {
-        expect(e).toBeInstanceOf(OpenAPIError);
+        expect(e).toBeInstanceOf(DocumentationError);
         expect(e).toMatchSnapshot();
       }
     });
   });
 
   describe("depictFile()", () => {
-    test.each([z.file(), z.file().binary(), z.file().base64()])(
+    test.each([ez.file(), ez.file().binary(), ez.file().base64()])(
       "should set type:string and format accordingly %#",
       (schema) => {
         expect(
@@ -248,20 +303,20 @@ describe("Open API helpers", () => {
             schema,
             ...responseContext,
             next: makeNext(responseContext),
-          })
+          }),
         ).toMatchSnapshot();
-      }
+      },
     );
     test("should throw when using in input", () => {
       try {
         depictFile({
-          schema: z.file().binary(),
+          schema: ez.file().binary(),
           ...requestContext,
           next: makeNext(requestContext),
         });
         fail("Should not be here");
       } catch (e) {
-        expect(e).toBeInstanceOf(OpenAPIError);
+        expect(e).toBeInstanceOf(DocumentationError);
         expect(e).toMatchSnapshot();
       }
     });
@@ -274,7 +329,7 @@ describe("Open API helpers", () => {
           schema: z.string().or(z.number()),
           ...requestContext,
           next: makeNext(requestContext),
-        })
+        }),
       ).toMatchSnapshot();
     });
   });
@@ -292,7 +347,7 @@ describe("Open API helpers", () => {
           ]),
           ...requestContext,
           next: makeNext(requestContext),
-        })
+        }),
       ).toMatchSnapshot();
     });
   });
@@ -306,13 +361,13 @@ describe("Open API helpers", () => {
             .and(z.object({ two: z.number() })),
           ...requestContext,
           next: makeNext(requestContext),
-        })
+        }),
       ).toMatchSnapshot();
     });
   });
 
   describe("depictOptional()", () => {
-    test.each<OpenAPIContext>([{ isResponse: false }, { isResponse: true }])(
+    test.each<OpenAPIContext>([requestContext, responseContext])(
       "should pass the next depicter %#",
       (context) => {
         expect(
@@ -320,14 +375,14 @@ describe("Open API helpers", () => {
             schema: z.string().optional(),
             ...context,
             next: makeNext(context),
-          })
+          }),
         ).toMatchSnapshot();
-      }
+      },
     );
   });
 
   describe("depictNullable()", () => {
-    test.each<OpenAPIContext>([{ isResponse: false }, { isResponse: true }])(
+    test.each<OpenAPIContext>([requestContext, responseContext])(
       "should set nullable:true %#",
       (context) => {
         expect(
@@ -335,9 +390,9 @@ describe("Open API helpers", () => {
             schema: z.string().nullable(),
             ...context,
             next: makeNext(context),
-          })
+          }),
         ).toMatchSnapshot();
-      }
+      },
     );
   });
 
@@ -354,9 +409,9 @@ describe("Open API helpers", () => {
             schema,
             ...requestContext,
             next: makeNext(requestContext),
-          })
+          }),
         ).toMatchSnapshot();
-      }
+      },
     );
   });
 
@@ -367,44 +422,44 @@ describe("Open API helpers", () => {
           schema: z.literal("testing"),
           ...requestContext,
           next: makeNext(requestContext),
-        })
+        }),
       ).toMatchSnapshot();
     });
   });
 
   describe("depictObject()", () => {
-    test.each<OpenAPIContext & { shape: z.ZodRawShape }>([
+    test.each<{ context: OpenAPIContext; shape: z.ZodRawShape }>([
       {
-        isResponse: false,
+        context: requestContext,
         shape: { a: z.number(), b: z.string() },
       },
       {
-        isResponse: true,
+        context: responseContext,
         shape: { a: z.number(), b: z.string() },
       },
       {
-        isResponse: true,
+        context: responseContext,
         shape: { a: z.coerce.number(), b: z.string({ coerce: true }) },
       },
       {
-        isResponse: true,
+        context: responseContext,
         shape: { a: z.number(), b: z.string().optional() },
       },
       {
-        isResponse: false,
+        context: requestContext,
         shape: { a: z.number().optional(), b: z.coerce.string() },
       },
     ])(
       "should type:object, properties and required props %#",
-      ({ shape, ...context }) => {
+      ({ shape, context }) => {
         expect(
           depictObject({
             schema: z.object(shape),
             ...context,
             next: makeNext(context),
-          })
+          }),
         ).toMatchSnapshot();
-      }
+      },
     );
 
     test("Bug #758", () => {
@@ -418,7 +473,7 @@ describe("Open API helpers", () => {
           schema,
           ...responseContext,
           next: makeNext(responseContext),
-        })
+        }),
       ).toMatchSnapshot();
     });
   });
@@ -430,7 +485,7 @@ describe("Open API helpers", () => {
           schema: z.null(),
           ...requestContext,
           next: makeNext(requestContext),
-        })
+        }),
       ).toMatchSnapshot();
     });
   });
@@ -442,7 +497,7 @@ describe("Open API helpers", () => {
           schema: z.boolean(),
           ...requestContext,
           next: makeNext(requestContext),
-        })
+        }),
       ).toMatchSnapshot();
     });
   });
@@ -454,7 +509,7 @@ describe("Open API helpers", () => {
           schema: z.bigint(),
           ...requestContext,
           next: makeNext(requestContext),
-        })
+        }),
       ).toMatchSnapshot();
     });
   });
@@ -466,17 +521,18 @@ describe("Open API helpers", () => {
       z.record(z.enum(["one", "two"]), z.boolean()),
       z.record(z.literal("testing"), z.boolean()),
       z.record(z.literal("one").or(z.literal("two")), z.boolean()),
+      z.record(z.any()), // Issue #900
     ])(
-      "should set properties+required or additionalProperties props",
+      "should set properties+required or additionalProperties props %#",
       (schema) => {
         expect(
           depictRecord({
             schema,
             ...requestContext,
             next: makeNext(requestContext),
-          })
+          }),
         ).toMatchSnapshot();
-      }
+      },
     );
   });
 
@@ -487,7 +543,7 @@ describe("Open API helpers", () => {
           schema: z.array(z.boolean()),
           ...requestContext,
           next: makeNext(requestContext),
-        })
+        }),
       ).toMatchSnapshot();
     });
   });
@@ -499,7 +555,7 @@ describe("Open API helpers", () => {
           schema: z.tuple([z.boolean(), z.string(), z.literal("test")]),
           ...requestContext,
           next: makeNext(requestContext),
-        })
+        }),
       ).toMatchSnapshot();
     });
   });
@@ -511,7 +567,7 @@ describe("Open API helpers", () => {
           schema: z.string(),
           ...requestContext,
           next: makeNext(requestContext),
-        })
+        }),
       ).toMatchSnapshot();
     });
 
@@ -529,7 +585,7 @@ describe("Open API helpers", () => {
           schema,
           ...requestContext,
           next: makeNext(requestContext),
-        })
+        }),
       ).toMatchSnapshot();
     });
   });
@@ -543,9 +599,9 @@ describe("Open API helpers", () => {
             schema,
             ...requestContext,
             next: makeNext(requestContext),
-          })
+          }),
         ).toMatchSnapshot();
-      }
+      },
     );
   });
 
@@ -559,44 +615,46 @@ describe("Open API helpers", () => {
           }),
           ...requestContext,
           next: makeNext(requestContext),
-        })
+        }),
       ).toMatchSnapshot();
     });
   });
 
   describe("depictEffect()", () => {
-    test.each<OpenAPIContext & { schema: z.ZodEffects<any>; expected: string }>(
-      [
-        {
-          schema: z.string().transform((v) => parseInt(v, 10)),
-          isResponse: true,
-          expected: "number (out)",
-        },
-        {
-          schema: z.string().transform((v) => parseInt(v, 10)),
-          isResponse: false,
-          expected: "string (in)",
-        },
-        {
-          schema: z.preprocess((v) => parseInt(`${v}`, 10), z.string()),
-          isResponse: false,
-          expected: "string (preprocess)",
-        },
-        {
-          schema: z
-            .object({ s: z.string() })
-            .refine(() => false, { message: "test" }),
-          isResponse: false,
-          expected: "object (refinement)",
-        },
-      ]
-    )("should depict as $expected", ({ schema, ...context }) => {
+    test.each<{
+      context: OpenAPIContext;
+      schema: z.ZodEffects<any>;
+      expected: string;
+    }>([
+      {
+        schema: z.string().transform((v) => parseInt(v, 10)),
+        context: responseContext,
+        expected: "number (out)",
+      },
+      {
+        schema: z.string().transform((v) => parseInt(v, 10)),
+        context: requestContext,
+        expected: "string (in)",
+      },
+      {
+        schema: z.preprocess((v) => parseInt(`${v}`, 10), z.string()),
+        context: requestContext,
+        expected: "string (preprocess)",
+      },
+      {
+        schema: z
+          .object({ s: z.string() })
+          .refine(() => false, { message: "test" }),
+        context: requestContext,
+        expected: "object (refinement)",
+      },
+    ])("should depict as $expected", ({ schema, context }) => {
       expect(
         depictEffect({
           schema,
           ...context,
           next: makeNext(context),
-        })
+        }),
       ).toMatchSnapshot();
     });
 
@@ -611,39 +669,39 @@ describe("Open API helpers", () => {
           schema,
           ...responseContext,
           next: makeNext(responseContext),
-        })
+        }),
       ).toMatchSnapshot();
     });
   });
 
   describe("depictPipeline", () => {
-    test.each<OpenAPIContext & { expected: string }>([
-      { isResponse: true, expected: "boolean (out)" },
-      { isResponse: false, expected: "string (in)" },
-    ])("should depict as $expected", (context) => {
+    test.each<{ context: OpenAPIContext; expected: string }>([
+      { context: responseContext, expected: "boolean (out)" },
+      { context: requestContext, expected: "string (in)" },
+    ])("should depict as $expected", ({ context }) => {
       expect(
         depictPipeline({
           schema: z.string().pipe(z.coerce.boolean()),
           ...context,
           next: makeNext(context),
-        })
+        }),
       ).toMatchSnapshot();
     });
   });
 
-  describe("depictIOExamples()", () => {
-    test.each<OpenAPIContext & Record<"case" | "action", string>>([
+  describe("depictExamples()", () => {
+    test.each<{ isResponse: boolean } & Record<"case" | "action", string>>([
       { isResponse: false, case: "request", action: "pass" },
       { isResponse: true, case: "response", action: "transform" },
     ])("should $action examples in case of $case", ({ isResponse }) => {
       expect(
-        depictIOExamples(
+        depictExamples(
           withMeta(
             z.object({
               one: z.string().transform((v) => v.length),
               two: z.number().transform((v) => `${v}`),
               three: z.boolean(),
-            })
+            }),
           )
             .example({
               one: "test",
@@ -656,25 +714,25 @@ describe("Open API helpers", () => {
               three: false,
             }),
           isResponse,
-          ["three"]
-        )
+          ["three"],
+        ),
       ).toMatchSnapshot();
     });
   });
 
-  describe("depictIOParamExamples()", () => {
-    test.each<OpenAPIContext & Record<"case" | "action", string>>([
+  describe("depictParamExamples()", () => {
+    test.each<{ isResponse: boolean } & Record<"case" | "action", string>>([
       { isResponse: false, case: "request", action: "pass" },
       { isResponse: true, case: "response", action: "transform" },
     ])("should $action examples in case of $case", ({ isResponse }) => {
       expect(
-        depictIOParamExamples(
+        depictParamExamples(
           withMeta(
             z.object({
               one: z.string().transform((v) => v.length),
               two: z.number().transform((v) => `${v}`),
               three: z.boolean(),
-            })
+            }),
           )
             .example({
               one: "test",
@@ -687,8 +745,8 @@ describe("Open API helpers", () => {
               three: false,
             }),
           isResponse,
-          "two"
-        )
+          "two",
+        ),
       ).toMatchSnapshot();
     });
   });
@@ -697,8 +755,6 @@ describe("Open API helpers", () => {
     test("should depict query and path params", () => {
       expect(
         depictRequestParams({
-          path: "/v1/user/:id",
-          method: "get",
           endpoint: defaultEndpointsFactory.build({
             methods: ["get", "put", "delete"],
             input: z.object({
@@ -709,15 +765,15 @@ describe("Open API helpers", () => {
             handler: jest.fn(),
           }),
           inputSources: ["query", "params"],
-        })
+          composition: "inline",
+          ...requestContext,
+        }),
       ).toMatchSnapshot();
     });
 
     test("should depict only path params if query is disabled", () => {
       expect(
         depictRequestParams({
-          path: "/v1/user/:id",
-          method: "get",
           endpoint: defaultEndpointsFactory.build({
             methods: ["get", "put", "delete"],
             input: z.object({
@@ -728,15 +784,15 @@ describe("Open API helpers", () => {
             handler: jest.fn(),
           }),
           inputSources: ["body", "params"],
-        })
+          composition: "inline",
+          ...requestContext,
+        }),
       ).toMatchSnapshot();
     });
 
     test("should depict none if both query and params are disabled", () => {
       expect(
         depictRequestParams({
-          path: "/v1/user/:id",
-          method: "get",
           endpoint: defaultEndpointsFactory.build({
             methods: ["get", "put", "delete"],
             input: z.object({
@@ -747,7 +803,9 @@ describe("Open API helpers", () => {
             handler: jest.fn(),
           }),
           inputSources: ["body"],
-        })
+          composition: "inline",
+          ...requestContext,
+        }),
       ).toMatchSnapshot();
     });
   });
@@ -759,7 +817,7 @@ describe("Open API helpers", () => {
           type: "string",
           description: "test",
           example: "test",
-        })
+        }),
       ).toMatchSnapshot();
     });
   });
@@ -768,22 +826,22 @@ describe("Open API helpers", () => {
     test("should set type:string, pattern and format", () => {
       expect(
         depictDateIn({
-          schema: z.dateIn(),
+          schema: ez.dateIn(),
           ...requestContext,
           next: makeNext(requestContext),
-        })
+        }),
       ).toMatchSnapshot();
     });
     test("should throw when ZodDateIn in response", () => {
       try {
         depictDateIn({
-          schema: z.dateIn(),
+          schema: ez.dateIn(),
           ...responseContext,
           next: makeNext(responseContext),
         });
         fail("should not be here");
       } catch (e) {
-        expect(e).toBeInstanceOf(OpenAPIError);
+        expect(e).toBeInstanceOf(DocumentationError);
         expect(e).toMatchSnapshot();
       }
     });
@@ -793,29 +851,29 @@ describe("Open API helpers", () => {
     test("should set type:string, description and format", () => {
       expect(
         depictDateOut({
-          schema: z.dateOut(),
+          schema: ez.dateOut(),
           ...responseContext,
           next: makeNext(responseContext),
-        })
+        }),
       ).toMatchSnapshot();
     });
     test("should throw when ZodDateOut in request", () => {
       try {
         depictDateOut({
-          schema: z.dateOut(),
+          schema: ez.dateOut(),
           ...requestContext,
           next: makeNext(requestContext),
         });
         fail("should not be here");
       } catch (e) {
-        expect(e).toBeInstanceOf(OpenAPIError);
+        expect(e).toBeInstanceOf(DocumentationError);
         expect(e).toMatchSnapshot();
       }
     });
   });
 
   describe("depictDate", () => {
-    test.each<OpenAPIContext>([{ isResponse: true }, { isResponse: false }])(
+    test.each<OpenAPIContext>([responseContext, requestContext])(
       "should throw clear error %#",
       (context) => {
         try {
@@ -826,10 +884,10 @@ describe("Open API helpers", () => {
           });
           fail("should not be here");
         } catch (e) {
-          expect(e).toBeInstanceOf(OpenAPIError);
+          expect(e).toBeInstanceOf(DocumentationError);
           expect(e).toMatchSnapshot();
         }
-      }
+      },
     );
   });
 
@@ -840,8 +898,69 @@ describe("Open API helpers", () => {
           schema: z.string().min(2).brand<"Test">(),
           ...responseContext,
           next: makeNext(responseContext),
-        })
+        }),
       ).toMatchSnapshot();
+    });
+  });
+
+  describe("depictReadonly", () => {
+    test("should pass the next depicter", () => {
+      expect(
+        depictReadonly({
+          schema: z.string().readonly(),
+          ...responseContext,
+          next: makeNext(responseContext),
+        }),
+      ).toMatchSnapshot();
+    });
+  });
+
+  describe("depictLazy", () => {
+    const recursiveArray: z.ZodLazy<z.ZodArray<any>> = z.lazy(() =>
+      recursiveArray.array(),
+    );
+    const directlyRecursive: z.ZodLazy<any> = z.lazy(() => directlyRecursive);
+    const recursiveObject: z.ZodLazy<z.ZodObject<any>> = z.lazy(() =>
+      z.object({ prop: recursiveObject }),
+    );
+
+    test.each([
+      {
+        schema: recursiveArray,
+        hash: "6cbbd837811754902ea1e68d3e5c75e36250b880",
+      },
+      {
+        schema: directlyRecursive,
+        hash: "7a225c55e65ab4a2fd3ce390265b255ee6747049",
+      },
+      {
+        schema: recursiveObject,
+        hash: "118cb3b11b8a1f3b6b1e60a89f96a8be9da32a0f",
+      },
+    ])("should handle circular references %#", ({ schema, hash }) => {
+      getRefMock
+        .mockImplementationOnce(() => undefined)
+        .mockImplementationOnce(
+          (name: string): ReferenceObject => ({
+            $ref: `#/components/schemas/${name}`,
+          }),
+        );
+      expect(getRefMock.mock.calls.length).toBe(0);
+      expect(
+        depictLazy({
+          schema,
+          ...responseContext,
+          next: makeNext(responseContext),
+        }),
+      ).toMatchSnapshot();
+      expect(getRefMock).toHaveBeenCalledTimes(2);
+      for (const call of getRefMock.mock.calls) {
+        expect(call[0]).toBe(hash);
+      }
+      expect(makeRefMock).toHaveBeenCalledTimes(2);
+      expect(makeRefMock.mock.calls[0]).toEqual([hash, {}]);
+      expect(makeRefMock.mock.calls[1][0]).toBe(hash);
+      expect(makeRefMock.mock.calls[1][1]).toMatchSnapshot();
     });
   });
 
@@ -853,7 +972,7 @@ describe("Open API helpers", () => {
             { and: [{ type: "basic" }, { type: "bearer" }] },
             { type: "header", name: "X-Key" },
           ],
-        })
+        }),
       ).toMatchSnapshot();
     });
     test("should handle Input and Cookie Securities", () => {
@@ -867,14 +986,14 @@ describe("Open API helpers", () => {
               ],
             },
           ],
-        })
+        }),
       ).toMatchSnapshot();
     });
     test("should handle OpenID and OAuth2 Securities", () => {
       expect(
         depictSecurity({
           or: [{ type: "openid", url: "https://test.url" }, { type: "oauth2" }],
-        })
+        }),
       ).toMatchSnapshot();
     });
     test("should depict OAuth2 Security with flows", () => {
@@ -916,7 +1035,7 @@ describe("Open API helpers", () => {
               },
             },
           },
-        })
+        }),
       ).toMatchSnapshot();
     });
     test("should handle undefined flows", () => {
@@ -927,7 +1046,7 @@ describe("Open API helpers", () => {
             implicit: undefined,
             password: undefined,
           },
-        })
+        }),
       ).toMatchSnapshot();
     });
   });
@@ -941,7 +1060,7 @@ describe("Open API helpers", () => {
             { name: "B", scopes: [] },
             { name: "C", scopes: [] },
           ],
-        })
+        }),
       ).toMatchSnapshot();
       expect(
         depictSecurityRefs({
@@ -954,7 +1073,7 @@ describe("Open API helpers", () => {
               ],
             },
           ],
-        })
+        }),
       ).toMatchSnapshot();
     });
 
@@ -966,7 +1085,7 @@ describe("Open API helpers", () => {
             { name: "B", scopes: [] },
             { name: "C", scopes: [] },
           ],
-        })
+        }),
       ).toMatchSnapshot();
       expect(
         depictSecurityRefs({
@@ -979,7 +1098,7 @@ describe("Open API helpers", () => {
               ],
             },
           ],
-        })
+        }),
       ).toMatchSnapshot();
     });
 
@@ -995,7 +1114,7 @@ describe("Open API helpers", () => {
             { name: "B", scopes: ["read"] },
             { name: "C", scopes: ["read", "write"] },
           ],
-        })
+        }),
       ).toMatchSnapshot();
     });
   });
@@ -1006,7 +1125,7 @@ describe("Open API helpers", () => {
         depictTags({
           users: "Everything about users",
           files: "Everything about files processing",
-        })
+        }),
       ).toMatchSnapshot();
     });
 
@@ -1018,7 +1137,7 @@ describe("Open API helpers", () => {
             description: "Everything about files processing",
             url: "https://example.com",
           },
-        })
+        }),
       ).toMatchSnapshot();
     });
   });
@@ -1026,7 +1145,7 @@ describe("Open API helpers", () => {
   describe("ensureShortDescription()", () => {
     test("keeps the short text as it is", () => {
       expect(ensureShortDescription("here is a short text")).toBe(
-        "here is a short text"
+        "here is a short text",
       );
       expect(ensureShortDescription(" ")).toBe(" ");
       expect(ensureShortDescription("")).toBe("");
@@ -1034,8 +1153,8 @@ describe("Open API helpers", () => {
     test("trims the long text", () => {
       expect(
         ensureShortDescription(
-          "this text is definitely too long for the short description"
-        )
+          "this text is definitely too long for the short description",
+        ),
       ).toBe("this text is definitely too long for the short de…");
     });
   });

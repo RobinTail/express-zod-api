@@ -1,40 +1,18 @@
-import http from "http";
-
-let appMock: ReturnType<typeof newAppMock>;
-const expressJsonMock = jest.fn();
-const newAppMock = () => ({
-  disable: jest.fn(),
-  use: jest.fn(),
-  listen: jest.fn((port, cb) => {
-    if (cb) {
-      cb();
-    }
-    return new http.Server();
-  }),
-  get: jest.fn(),
-  post: jest.fn(),
-  options: jest.fn(),
-});
-
-const expressMock = jest.mock("express", () => {
-  appMock = newAppMock();
-  const returnFunction = () => appMock;
-  returnFunction.json = () => expressJsonMock;
-  return returnFunction;
-});
-
-const compressionMock = jest.fn();
-jest.mock("compression", () => compressionMock);
-
-import express, { Request, Response } from "express"; // express is mocked above
-import https from "https";
+import http from "node:http";
+import https from "node:https";
+import {
+  appMock,
+  compressionMock,
+  expressJsonMock,
+  expressMock,
+} from "../express-mock";
 import { Logger } from "winston";
+import { z } from "zod";
 import {
   EndpointsFactory,
   attachRouting,
   createServer,
   defaultResultHandler,
-  z,
 } from "../../src";
 import { AppConfig, CommonConfig, ServerConfig } from "../../src/config-type";
 import { mimeJson } from "../../src/mime";
@@ -42,12 +20,9 @@ import {
   createNotFoundHandler,
   createParserFailureHandler,
 } from "../../src/server";
+import express, { Request, Response } from "express"; // express is mocked in express-mock.ts
 
 describe("Server", () => {
-  beforeEach(() => {
-    appMock = newAppMock();
-  });
-
   afterAll(() => {
     jest.restoreAllMocks();
   });
@@ -130,7 +105,7 @@ describe("Server", () => {
       };
       const { httpServer, logger, app } = createServer(
         configMock as unknown as ServerConfig & CommonConfig,
-        routingMock
+        routingMock,
       );
       expect(httpServer).toBeInstanceOf(http.Server);
       expect(logger).toEqual(configMock.logger);
@@ -139,7 +114,7 @@ describe("Server", () => {
       expect(appMock.use).toBeCalledTimes(3);
       expect(Array.isArray(appMock.use.mock.calls[0][0])).toBeTruthy();
       expect(appMock.use.mock.calls[0][0][0]).toBe(
-        configMock.server.jsonParser
+        configMock.server.jsonParser,
       );
       expect(configMock.errorHandler.handler).toBeCalledTimes(0);
       expect(configMock.logger.info).toBeCalledTimes(1);
@@ -199,18 +174,18 @@ describe("Server", () => {
 
       const { httpServer, httpsServer } = createServer(
         configMock as unknown as ServerConfig & CommonConfig,
-        routingMock
+        routingMock,
       );
       expect(httpServer).toBeInstanceOf(http.Server);
       expect(httpsServer).toEqual(httpsServerMock);
       expect(httpsServerMock).toBeTruthy();
       expect(https.createServer).toHaveBeenCalledWith(
         configMock.https.options,
-        appMock
+        appMock,
       );
       expect(httpsServerMock!.listen).toBeCalledTimes(1);
       expect(httpsServerMock!.listen.mock.calls[0][0]).toBe(
-        configMock.https.listen
+        configMock.https.listen,
       );
     });
 
@@ -242,7 +217,7 @@ describe("Server", () => {
       };
       createServer(
         configMock as unknown as ServerConfig & CommonConfig,
-        routingMock
+        routingMock,
       );
       expect(compressionMock).toHaveBeenCalledTimes(1);
       expect(compressionMock).toHaveBeenCalledWith({});
@@ -259,14 +234,14 @@ describe("Server", () => {
       };
       const handler = createParserFailureHandler(
         defaultResultHandler,
-        loggerMock as unknown as Logger
+        loggerMock as unknown as Logger,
       );
       const next = jest.fn();
       handler(
         undefined,
         null as unknown as Request,
         null as unknown as Response,
-        next
+        next,
       );
       expect(next).toHaveBeenCalledTimes(1);
     });
@@ -286,7 +261,7 @@ describe("Server", () => {
       };
       const handler = createNotFoundHandler(
         resultHandler,
-        loggerMock as unknown as Logger
+        loggerMock as unknown as Logger,
       );
       const next = jest.fn();
       const requestMock = {
@@ -306,7 +281,7 @@ describe("Server", () => {
       handler(
         requestMock as unknown as Request,
         responseMock as unknown as Response,
-        next
+        next,
       );
       expect(next).toHaveBeenCalledTimes(0);
       expect(resultHandler.handler).toHaveBeenCalledTimes(1);
@@ -328,7 +303,7 @@ describe("Server", () => {
       };
       const handler = createNotFoundHandler(
         resultHandler,
-        loggerMock as unknown as Logger
+        loggerMock as unknown as Logger,
       );
       const next = jest.fn();
       const requestMock = {
@@ -348,7 +323,7 @@ describe("Server", () => {
       handler(
         requestMock as unknown as Request,
         responseMock as unknown as Response,
-        next
+        next,
       );
       expect(next).toHaveBeenCalledTimes(0);
       expect(resultHandler.handler).toHaveBeenCalledTimes(1);
@@ -357,7 +332,7 @@ describe("Server", () => {
       expect(responseMock.end).toHaveBeenCalledTimes(1);
       expect(responseMock.end.mock.calls[0][0]).toBe(
         "An error occurred while serving the result: I am faulty.\n" +
-          "Original error: Can not POST /v1/test."
+          "Original error: Can not POST /v1/test.",
       );
     });
   });
@@ -393,7 +368,7 @@ describe("Server", () => {
       };
       const { logger, notFoundHandler } = attachRouting(
         configMock as unknown as AppConfig & CommonConfig,
-        routingMock
+        routingMock,
       );
       expect(logger).toEqual(configMock.logger);
       expect(typeof notFoundHandler).toBe("function");

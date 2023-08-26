@@ -1,4 +1,5 @@
-import { createHttpError, withMeta, z } from "../../src";
+import { z } from "zod";
+import { createHttpError, ez, withMeta } from "../../src";
 import { keyAndTokenAuthenticatedEndpointsFactory } from "../factories";
 
 export const updateUserEndpoint =
@@ -14,11 +15,11 @@ export const updateUserEndpoint =
           .transform((value) => parseInt(value, 10))
           .refine(
             (value) => value >= 0,
-            "should be greater than or equal to 0"
+            "should be greater than or equal to 0",
           ),
         name: z.string().min(1),
-        birthday: z.dateIn(),
-      })
+        birthday: ez.dateIn(),
+      }),
     ).example({
       id: "12",
       name: "John Doe",
@@ -27,8 +28,8 @@ export const updateUserEndpoint =
     output: withMeta(
       z.object({
         name: z.string(),
-        createdAt: z.dateOut(),
-      })
+        createdAt: ez.dateOut(),
+      }),
     ).example({
       name: "John Doe",
       createdAt: new Date("2021-12-31"),

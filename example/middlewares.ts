@@ -1,4 +1,5 @@
-import { Method, createHttpError, createMiddleware, withMeta, z } from "../src";
+import { z } from "zod";
+import { Method, createHttpError, createMiddleware, withMeta } from "../src";
 
 export const authMiddleware = createMiddleware({
   security: {
@@ -10,7 +11,7 @@ export const authMiddleware = createMiddleware({
   input: withMeta(
     z.object({
       key: z.string().min(1),
-    })
+    }),
   ).example({
     key: "1234-5678-90",
   }),

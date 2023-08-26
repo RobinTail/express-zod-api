@@ -1,5 +1,5 @@
 import jestConfig from "../jest.config";
-import { z } from "../src";
+import { z } from "zod";
 import { SchemaHandler, walkSchema } from "../src/schema-walker";
 
 export const esmTestPort = 8070;
@@ -20,14 +20,14 @@ export const waitFor = async (cb: () => boolean) =>
   });
 
 export const serializeSchemaForTest = (
-  schema: z.ZodTypeAny
+  schema: z.ZodTypeAny,
 ): Record<string, any> => {
   const onSomeUnion: SchemaHandler<
     z.ZodUnion<any> | z.ZodDiscriminatedUnion<any, any>,
     object
   > = ({ schema: subject, next }) => ({
     options: Array.from(subject.options.values()).map((option) =>
-      next({ schema: option as z.ZodTypeAny })
+      next({ schema: option as z.ZodTypeAny }),
     ),
   });
   const onOptionalOrNullable: SchemaHandler<
@@ -58,7 +58,7 @@ export const serializeSchemaForTest = (
             ...carry,
             [key]: next({ schema: subject.shape[key] }),
           }),
-          {}
+          {},
         ),
       }),
       ZodEffects: ({ schema: subject, next }) => ({
@@ -76,6 +76,8 @@ export const serializeSchemaForTest = (
         value: next({ schema: subject._def.innerType }),
         default: schema._def.defaultValue(),
       }),
+      ZodReadonly: ({ schema: subject, next }) =>
+        next({ schema: subject._def.innerType }),
       ZodCatch: ({ schema: subject, next }) => ({
         value: next({ schema: subject._def.innerType }),
         fallback: schema._def.defaultValue(),
@@ -86,7 +88,7 @@ export const serializeSchemaForTest = (
       }),
     },
     onEach: ({ schema: subject }) => ({ _type: subject._def.typeName }),
-    onMissing: (subject) => {
+    onMissing: ({ schema: subject }) => {
       console.warn(`There is no serializer for ${subject._def.typeName}`);
       return {};
     },

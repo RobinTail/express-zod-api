@@ -1,4 +1,4 @@
-import { Client } from "../src";
+import { Integration } from "../src";
 import { routing } from "./routing";
 
-console.log(new Client(routing).print());
+console.log(new Integration({ routing }).print());

@@ -2,16 +2,16 @@ name: OpenAPI Validation
 
 on:
   push:
-    branches: [ master, v7 ]
+    branches: [ master, v8, v9 ]
   pull_request:
-    branches: [ master, v7 ]
+    branches: [ master, v8, v9 ]
 
 
 jobs:
   validate:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Validate example specification
         uses: char0n/swagger-editor-validate@v1.3.1
         with:

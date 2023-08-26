@@ -1,12 +1,15 @@
+import { createHash } from "node:crypto";
 import { Request } from "express";
 import { HttpError } from "http-errors";
 import { z } from "zod";
 import {
   CommonConfig,
+  InputSource,
   InputSources,
   LoggerConfig,
   loggerLevels,
 } from "./config-type";
+import { InputValidationError, OutputValidationError } from "./errors";
 import { IOSchema } from "./io-schema";
 import { getMeta } from "./metadata";
 import { AuxMethod, Method } from "./method";
@@ -14,9 +17,6 @@ import { mimeMultipart } from "./mime";
 import { ZodUpload } from "./upload-schema";
 
 export type FlatObject = Record<string, any>;
-
-export type ArrayElement<T extends readonly unknown[]> =
-  T extends readonly (infer K)[] ? K : never;
 
 /** @see https://expressjs.com/en/guide/routing.html */
 export const routePathParamsRegex = /:([A-Za-z0-9_]+)/g;
@@ -33,16 +33,16 @@ export const defaultInputSources: InputSources = {
   post: ["body", "params", "files"],
   put: ["body", "params"],
   patch: ["body", "params"],
-  delete: ["body", "query", "params"],
+  delete: ["query", "params"],
 };
-const fallbackInputSource = defaultInputSources.delete;
+const fallbackInputSource: InputSource[] = ["body", "query", "params"];
 
 export const getActualMethod = (request: Request) =>
   request.method.toLowerCase() as Method | AuxMethod;
 
 export function getInput(
   request: Request,
-  inputAssignment: CommonConfig["inputSources"]
+  inputAssignment: CommonConfig["inputSources"],
 ): any {
   const method = getActualMethod(request);
   if (method === "options") {
@@ -80,13 +80,11 @@ export function isValidDate(date: Date): boolean {
   return !isNaN(date.getTime());
 }
 
-export function makeErrorFromAnything<T extends Error>(subject: T): T;
-export function makeErrorFromAnything(subject: any): Error;
-export function makeErrorFromAnything<T>(subject: T): Error {
+export function makeErrorFromAnything(subject: any): Error {
   return subject instanceof Error
     ? subject
     : new Error(
-        typeof subject === "symbol" ? subject.toString() : `${subject}`
+        typeof subject === "symbol" ? subject.toString() : `${subject}`,
       );
 }
 
@@ -94,9 +92,13 @@ export function getMessageFromError(error: Error): string {
   if (error instanceof z.ZodError) {
     return error.issues
       .map(({ path, message }) =>
-        (path.length ? [path.join("/")] : []).concat(message).join(": ")
+        (path.length ? [path.join("/")] : []).concat(message).join(": "),
       )
       .join("; ");
+  }
+  if (error instanceof OutputValidationError) {
+    const hasFirstField = error.originalError.issues[0]?.path.length > 0;
+    return `output${hasFirstField ? "/" : ": "}${error.message}`;
   }
   return error.message;
 }
@@ -105,36 +107,51 @@ export function getStatusCodeFromError(error: Error): number {
   if (error instanceof HttpError) {
     return error.statusCode;
   }
-  if (error instanceof z.ZodError) {
+  if (error instanceof InputValidationError) {
     return 400;
   }
   return 500;
 }
 
-type Examples<T extends z.ZodTypeAny> = Readonly<z.input<T>[] | z.output<T>[]>;
-export const getExamples = <T extends z.ZodTypeAny>(
-  schema: T,
-  parseToOutput: boolean
-): Examples<T> => {
-  const examples = getMeta(schema, "examples");
-  if (examples === undefined) {
-    return [];
+export const getExamples = <
+  T extends z.ZodTypeAny,
+  V extends "original" | "parsed" | undefined,
+>({
+  schema,
+  variant = "original",
+  validate = variant === "parsed",
+}: {
+  schema: T;
+  /**
+   * @desc examples variant: original or parsed
+   * @example "parsed" — for the case when possible schema transformations should be applied
+   * @default "original"
+   * @override validate: variant "parsed" activates validation as well
+   * */
+  variant?: V;
+  /**
+   * @desc filters out the examples that do not match the schema
+   * @default variant === "parsed"
+   * */
+  validate?: boolean;
+}): ReadonlyArray<V extends "parsed" ? z.output<T> : z.input<T>> => {
+  const examples = getMeta(schema, "examples") || [];
+  if (!validate && variant === "original") {
+    return examples;
   }
-  return examples.reduce((carry, example) => {
+  const result: Array<z.input<T> | z.output<T>> = [];
+  for (const example of examples) {
     const parsedExample = schema.safeParse(example);
-    return carry.concat(
-      parsedExample.success
-        ? parseToOutput
-          ? parsedExample.data
-          : example
-        : []
-    );
-  }, [] as z.output<typeof schema>[]);
+    if (parsedExample.success) {
+      result.push(variant === "parsed" ? parsedExample.data : example);
+    }
+  }
+  return result;
 };
 
 export const combinations = <T extends any>(
   a: T[],
-  b: T[]
+  b: T[],
 ): { type: "single"; value: T[] } | { type: "tuple"; value: [T, T][] } => {
   if (a.length === 0) {
     return { type: "single", value: b };
@@ -173,7 +190,7 @@ export function hasTopLevelTransformingEffect(schema: IOSchema): boolean {
   }
   if (schema instanceof z.ZodIntersection) {
     return reduceBool(
-      [schema._def.left, schema._def.right].map(hasTopLevelTransformingEffect)
+      [schema._def.left, schema._def.right].map(hasTopLevelTransformingEffect),
     );
   }
   return false; // ZodObject left
@@ -214,10 +231,24 @@ export function hasUpload(schema: z.ZodTypeAny): boolean {
  * @desc isNullable() and isOptional() validate the schema's input
  * @desc They always return true in case of coercion, which should be taken into account when depicting response
  */
-export const hasCoercion = (schema: z.ZodType): boolean =>
+export const hasCoercion = (schema: z.ZodTypeAny): boolean =>
   "coerce" in schema._def && typeof schema._def.coerce === "boolean"
     ? schema._def.coerce
     : false;
+
+export const makeCleanId = (path: string, method: string, suffix?: string) => {
+  return [method]
+    .concat(path.split("/"))
+    .concat(suffix || [])
+    .flatMap((entry) => entry.split(/[^A-Z0-9]/gi))
+    .map(
+      (entry) => entry.slice(0, 1).toUpperCase() + entry.slice(1).toLowerCase(),
+    )
+    .join("");
+};
+
+export const defaultSerializer = (schema: z.ZodTypeAny): string =>
+  createHash("sha1").update(JSON.stringify(schema), "utf8").digest("hex");
 
 export const tryToTransform = ({
   effect,

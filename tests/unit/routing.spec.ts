@@ -1,25 +1,18 @@
-const staticHandler = jest.fn();
-const staticMock = jest.fn(() => staticHandler);
-
-jest.mock("express", () => ({
-  ...jest.requireActual("express"),
-  static: staticMock,
-}));
-
-import { Express, Request, RequestHandler, Response } from "express";
+import { staticHandler, staticMock } from "../express-mock";
 import { Logger } from "winston";
+import { z } from "zod";
 import {
   DependsOnMethod,
   EndpointsFactory,
   Routing,
   ServeStatic,
   defaultResultHandler,
-  z,
 } from "../../src";
 import { CommonConfig } from "../../src/config-type";
 import { mimeJson } from "../../src/mime";
 import { makeRequestMock, makeResponseMock } from "../../src/mock";
 import { initRouting } from "../../src/routing";
+import type { Express, Request, RequestHandler, Response } from "express";
 
 let appMock: any;
 let loggerMock: any;
@@ -225,7 +218,7 @@ describe("Routing", () => {
       expect(responseMock.set).toHaveBeenCalledTimes(3);
       expect(responseMock.set).toHaveBeenCalledWith(
         "Access-Control-Allow-Methods",
-        "GET, POST, PUT, PATCH, OPTIONS"
+        "GET, POST, PUT, PATCH, OPTIONS",
       );
     });
 
@@ -304,7 +297,7 @@ describe("Routing", () => {
               "user/retrieve": endpointMock,
             },
           },
-        })
+        }),
       ).toThrowErrorMatchingSnapshot();
       expect(() =>
         initRouting({
@@ -314,7 +307,7 @@ describe("Routing", () => {
           routing: {
             "v1/user/retrieve": endpointMock,
           },
-        })
+        }),
       ).toThrowErrorMatchingSnapshot();
     });
 
@@ -364,7 +357,7 @@ describe("Routing", () => {
       await routeHandler(
         requestMock as unknown as Request,
         responseMock as unknown as Response,
-        nextMock
+        nextMock,
       );
       expect(nextMock).toBeCalledTimes(0);
       expect(handlerMock).toBeCalledTimes(1);

@@ -1,4 +1,4 @@
-import { ChildProcessWithoutNullStreams, spawn } from "child_process";
+import { ChildProcessWithoutNullStreams, spawn } from "node:child_process";
 import fetch from "node-fetch";
 import { esmTestPort, waitFor } from "../helpers";
 
@@ -12,16 +12,18 @@ describe("ESM Test", () => {
   beforeAll(() => {
     quickStart = spawn("yarn", ["start"], { cwd: "./tests/esm" });
     quickStart.stdout.on("data", listener);
-    quickStart.stdout.on("data", listener);
+    quickStart.stderr.on("data", listener);
   });
 
   afterAll(async () => {
     quickStart.stdout.removeListener("data", listener);
+    quickStart.stderr.removeListener("data", listener);
     quickStart.kill();
     await waitFor(() => quickStart.killed);
   });
 
   afterEach(() => {
+    console.log(out);
     out = "";
   });
 
@@ -33,7 +35,7 @@ describe("ESM Test", () => {
 
     test("Should handle valid GET request", async () => {
       const response = await fetch(
-        `http://localhost:${esmTestPort}/v1/hello?name=Rick`
+        `http://localhost:${esmTestPort}/v1/hello?name=Rick`,
       );
       expect(response.status).toBe(200);
       const json = await response.json();

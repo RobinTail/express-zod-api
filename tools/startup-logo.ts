@@ -1,6 +1,6 @@
 import chalk from "chalk";
 import { format } from "pretty-format";
-import fs from "fs";
+import { writeFileSync } from "node:fs";
 
 const attribution = `
 // ANSI font attribution
@@ -8,17 +8,17 @@ const attribution = `
 `.trim();
 
 const proud = chalk.italic(
-  "Proudly supports transgender community.".padStart(109)
+  "Proudly supports transgender community.".padStart(109),
 );
 const slogan = chalk.italic(
   "Start your API server with I/O schema validation and custom middlewares in minutes.".padStart(
-    109
-  )
+    109,
+  ),
 );
 const thanks = chalk.italic(
-  "Thank you for choosing Express Zod API for your project.".padStart(132)
+  "Thank you for choosing Express Zod API for your project.".padStart(132),
 );
-const remembrance = chalk.italic("for Ariyanna".padEnd(14));
+const dedication = chalk.italic("for trans sisters".padEnd(20));
 
 const logo = [
   chalk.blueBright(`\n
@@ -36,7 +36,7 @@ const logo = [
   chalk.blueBright(`
                     888
                     888${proud}
-${remembrance}      888${slogan}`),
+${dedication}888${slogan}`),
   chalk.grey(`\n${thanks}`),
   chalk.reset("\n\n"),
 ].join("");
@@ -53,4 +53,4 @@ ${serialized}
 };
 `;
 
-fs.writeFileSync("./src/startup-logo.ts", output);
+writeFileSync("./src/startup-logo.ts", output);

@@ -14,14 +14,14 @@ describe("Logger", () => {
   });
 
   const dropColorInObjectProps = <T extends Record<string | symbol, any>>(
-    obj: T
+    obj: T,
   ) => {
     return Reflect.ownKeys(obj).reduce(
       (acc, key) => ({
         ...acc,
         [key]: typeof obj[key] === "string" ? stripAnsi(obj[key]) : obj[key],
       }),
-      {} as typeof obj
+      {} as typeof obj,
     );
   };
 

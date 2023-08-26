@@ -1,16 +1,15 @@
+import { z } from "zod";
 import {
   EndpointsFactory,
-  createApiResponse,
   createMiddleware,
   createResultHandler,
   defaultEndpointsFactory,
   defaultResultHandler,
+  ez,
   testEndpoint,
-  z,
 } from "../../src";
 import { Endpoint } from "../../src/endpoint";
 import { IOSchemaError } from "../../src/errors";
-import { mimeJson } from "../../src/mime";
 import { serializeSchemaForTest } from "../helpers";
 
 describe("Endpoint", () => {
@@ -19,14 +18,13 @@ describe("Endpoint", () => {
       const endpointMock = new Endpoint({
         methods: ["get", "post", "put", "delete", "patch"],
         inputSchema: z.object({}),
-        mimeTypes: [mimeJson],
         outputSchema: z.object({}),
         handler: jest.fn(),
-        resultHandler: {
-          getPositiveResponse: jest.fn(),
-          getNegativeResponse: jest.fn(),
+        resultHandler: createResultHandler({
+          getPositiveResponse: () => z.string(),
+          getNegativeResponse: () => z.string(),
           handler: jest.fn(),
-        },
+        }),
         middlewares: [],
       });
       expect(endpointMock.getMethods()).toEqual([
@@ -42,14 +40,13 @@ describe("Endpoint", () => {
       const endpointMock = new Endpoint({
         method: "patch",
         inputSchema: z.object({}),
-        mimeTypes: [mimeJson],
         outputSchema: z.object({}),
         handler: jest.fn(),
-        resultHandler: {
-          getPositiveResponse: jest.fn(),
-          getNegativeResponse: jest.fn(),
+        resultHandler: createResultHandler({
+          getPositiveResponse: () => z.string(),
+          getNegativeResponse: () => z.string(),
           handler: jest.fn(),
-        },
+        }),
         middlewares: [],
       });
       expect(endpointMock.getMethods()).toEqual(["patch"]);
@@ -70,7 +67,7 @@ describe("Endpoint", () => {
         middleware: middlewareMock,
       });
       const factory = new EndpointsFactory(defaultResultHandler).addMiddleware(
-        middlewareDefinitionMock
+        middlewareDefinitionMock,
       );
       const handlerMock = jest
         .fn()
@@ -234,7 +231,7 @@ describe("Endpoint", () => {
         middleware: middlewareMock,
       });
       const factory = defaultEndpointsFactory.addMiddleware(
-        middlewareDefinitionMock
+        middlewareDefinitionMock,
       );
       const handlerMock = jest.fn();
       const endpoint = factory.build({
@@ -255,7 +252,7 @@ describe("Endpoint", () => {
       expect(loggerMock.error).toBeCalledTimes(0);
       expect(loggerMock.warn).toBeCalledTimes(1);
       expect(loggerMock.warn.mock.calls[0][0]).toBe(
-        "The middleware mockConstructor has closed the stream. Accumulated options:"
+        "The middleware mockConstructor has closed the stream. Accumulated options:",
       );
       expect(loggerMock.warn.mock.calls[0][1]).toEqual({ inc: 454 });
       expect(responseMock.status).toBeCalledTimes(0);
@@ -269,12 +266,12 @@ describe("Endpoint", () => {
     test("Should handle errors within ResultHandler", async () => {
       const factory = new EndpointsFactory(
         createResultHandler({
-          getPositiveResponse: () => createApiResponse(z.object({})),
-          getNegativeResponse: () => createApiResponse(z.object({})),
+          getPositiveResponse: () => z.object({}),
+          getNegativeResponse: () => z.object({}),
           handler: () => {
             throw new Error("Something unexpected happened");
           },
-        })
+        }),
       );
       const endpoint = factory.build({
         method: "get",
@@ -287,14 +284,14 @@ describe("Endpoint", () => {
       const { loggerMock, responseMock } = await testEndpoint({ endpoint });
       expect(loggerMock.error).toBeCalledTimes(1);
       expect(loggerMock.error.mock.calls[0][0]).toBe(
-        "Result handler failure: Something unexpected happened."
+        "Result handler failure: Something unexpected happened.",
       );
       expect(responseMock.status).toBeCalledTimes(1);
       expect(responseMock.status.mock.calls[0][0]).toBe(500);
       expect(responseMock.json).toBeCalledTimes(0);
       expect(responseMock.end).toBeCalledTimes(1);
       expect(responseMock.end.mock.calls[0][0]).toBe(
-        "An error occurred while serving the result: Something unexpected happened."
+        "An error occurred while serving the result: Something unexpected happened.",
       );
     });
   });
@@ -311,23 +308,24 @@ describe("Endpoint", () => {
         output: z.object({}),
         handler: jest.fn(),
       });
-      expect(endpoint.getInputSchema()).toEqual(input);
+      expect(endpoint.getSchema("input")).toEqual(input);
     });
   });
 
-  describe(".getOutputSchema()", () => {
-    test("should return output schema", () => {
-      const factory = new EndpointsFactory(defaultResultHandler);
-      const output = z.object({
+  describe(".outputSchema", () => {
+    test("should be the output schema", () => {
+      const outputSchema = z.object({
         something: z.number(),
       });
-      const endpoint = factory.build({
+      const endpoint = new Endpoint({
         method: "get",
-        input: z.object({}),
-        output,
+        middlewares: [],
+        inputSchema: z.object({}),
+        outputSchema,
         handler: jest.fn(),
+        resultHandler: defaultResultHandler,
       });
-      expect(endpoint.getOutputSchema()).toEqual(output);
+      expect(endpoint.getSchema("output")).toEqual(outputSchema);
     });
   });
 
@@ -344,7 +342,7 @@ describe("Endpoint", () => {
         handler: jest.fn(),
       });
       expect(
-        serializeSchemaForTest(endpoint.getPositiveResponseSchema())
+        serializeSchemaForTest(endpoint.getSchema("positive")),
       ).toMatchSnapshot();
     });
   });
@@ -362,7 +360,7 @@ describe("Endpoint", () => {
         handler: jest.fn(),
       });
       expect(
-        serializeSchemaForTest(endpoint.getNegativeResponseSchema())
+        serializeSchemaForTest(endpoint.getSchema("negative")),
       ).toMatchSnapshot();
     });
   });
@@ -376,7 +374,7 @@ describe("Endpoint", () => {
         output: z.object({}),
         handler: jest.fn(),
       });
-      expect(endpoint.getPositiveMimeTypes()).toEqual(["application/json"]);
+      expect(endpoint.getMimeTypes("positive")).toEqual(["application/json"]);
     });
   });
 
@@ -389,7 +387,7 @@ describe("Endpoint", () => {
         output: z.object({}),
         handler: jest.fn(),
       });
-      expect(endpoint.getNegativeMimeTypes()).toEqual(["application/json"]);
+      expect(endpoint.getMimeTypes("negative")).toEqual(["application/json"]);
     });
   });
 
@@ -402,7 +400,7 @@ describe("Endpoint", () => {
               m: z.number().refine(async (m) => m < 10),
             }),
             middleware: async () => ({}),
-          })
+          }),
         )
         .build({
           methods: ["post"],
@@ -443,7 +441,7 @@ describe("Endpoint", () => {
             middleware: async () => {
               throw new Error("Should not be here");
             },
-          })
+          }),
         )
         .addExpressMiddleware((req, res, next) => {
           res.set("X-Custom-Header", "test");
@@ -503,13 +501,13 @@ describe("Endpoint", () => {
     test("thrown in #handleResult()", async () => {
       const factory = new EndpointsFactory(
         createResultHandler({
-          getPositiveResponse: () => createApiResponse(z.object({})),
-          getNegativeResponse: () => createApiResponse(z.object({})),
+          getPositiveResponse: () => z.object({}),
+          getNegativeResponse: () => z.object({}),
           handler: () => {
             // eslint-disable-next-line @typescript-eslint/no-throw-literal
             throw "Something unexpected happened";
           },
-        })
+        }),
       );
       const endpoint = factory.build({
         method: "get",
@@ -522,14 +520,14 @@ describe("Endpoint", () => {
       const { loggerMock, responseMock } = await testEndpoint({ endpoint });
       expect(loggerMock.error).toBeCalledTimes(1);
       expect(loggerMock.error.mock.calls[0][0]).toBe(
-        "Result handler failure: Something unexpected happened."
+        "Result handler failure: Something unexpected happened.",
       );
       expect(responseMock.status).toBeCalledTimes(1);
       expect(responseMock.status.mock.calls[0][0]).toBe(500);
       expect(responseMock.json).toBeCalledTimes(0);
       expect(responseMock.end).toBeCalledTimes(1);
       expect(responseMock.end.mock.calls[0][0]).toBe(
-        "An error occurred while serving the result: Something unexpected happened."
+        "An error occurred while serving the result: Something unexpected happened.",
       );
     });
 
@@ -541,7 +539,7 @@ describe("Endpoint", () => {
             // eslint-disable-next-line @typescript-eslint/no-throw-literal
             throw "Something went wrong";
           },
-        })
+        }),
       );
       const endpoint = factory.build({
         methods: ["post"],
@@ -587,7 +585,7 @@ describe("Endpoint", () => {
           {
             message: "type1Attribute is required if type is type1",
             path: ["dynamicValue"],
-          }
+          },
         ),
       output: z
         .object({})
@@ -672,7 +670,7 @@ describe("Endpoint", () => {
         })
         .refine(
           (x) => Object.keys(x).length >= 1,
-          "Please provide at least one property"
+          "Please provide at least one property",
         ),
       output: z.object({}),
       handler: async () => ({}),
@@ -718,7 +716,6 @@ describe("Endpoint", () => {
           new Endpoint({
             method: "get",
             inputSchema: z.object({}).transform(() => []),
-            mimeTypes: [mimeJson],
             outputSchema: z.object({}),
             handler: jest.fn(),
             resultHandler: {
@@ -727,18 +724,17 @@ describe("Endpoint", () => {
               handler: jest.fn(),
             },
             middlewares: [],
-          })
+          }),
       ).toThrowError(
         new IOSchemaError(
-          "Using transformations on the top level of endpoint input schema is not allowed."
-        )
+          "Using transformations on the top level of endpoint input schema is not allowed.",
+        ),
       );
       expect(
         () =>
           new Endpoint({
             method: "get",
             inputSchema: z.object({}),
-            mimeTypes: [mimeJson],
             outputSchema: z.object({}).transform(() => []),
             handler: jest.fn(),
             resultHandler: {
@@ -747,11 +743,11 @@ describe("Endpoint", () => {
               handler: jest.fn(),
             },
             middlewares: [],
-          })
+          }),
       ).toThrowError(
         new IOSchemaError(
-          "Using transformations on the top level of endpoint output schema is not allowed."
-        )
+          "Using transformations on the top level of endpoint output schema is not allowed.",
+        ),
       );
     });
   });
@@ -760,7 +756,7 @@ describe("Endpoint", () => {
     test("should avoid double parsing, should not mutate input", async () => {
       const dateInputMiddleware = createMiddleware({
         input: z.object({
-          middleware_date_input: z.dateIn().optional(),
+          middleware_date_input: ez.dateIn().optional(),
         }),
         middleware: async ({ input: { middleware_date_input }, logger }) => {
           logger.debug("date in mw handler", typeof middleware_date_input);
@@ -777,7 +773,7 @@ describe("Endpoint", () => {
           handler: async ({ input: { middleware_date_input }, logger }) => {
             logger.debug(
               "date in endpoint handler",
-              typeof middleware_date_input
+              typeof middleware_date_input,
             );
             return {};
           },

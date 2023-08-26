@@ -1,4 +1,5 @@
-import { createMiddleware, z } from "../../src";
+import { z } from "zod";
+import { createMiddleware } from "../../src";
 import { IOSchemaError } from "../../src/errors";
 
 describe("Middleware", () => {
@@ -42,8 +43,8 @@ describe("Middleware", () => {
         };
         expect(() => createMiddleware(definition)).toThrowError(
           new IOSchemaError(
-            "Using transformations on the top level of middleware input schema is not allowed."
-          )
+            "Using transformations on the top level of middleware input schema is not allowed.",
+          ),
         );
       });
     });

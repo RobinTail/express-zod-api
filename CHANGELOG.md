@@ -1,6 +1,576 @@
 # Changelog
 
+## Version 11
+
+### v11.6.0
+
+- The generated client is now equipped with the `endpointTags` constant that can be involved into your implementation.
+  - Thanks to [@miki725](https://github.com/miki725) for the idea of this feature.
+
+### v11.5.0
+
+- The following methods added to the mocked `response` object for `testEndpoint()` method:
+  - `send`, `setHeader`, `header`.
+
+### v11.4.0
+
+- Supporting `z.readonly()` of `zod` v3.22.
+  - For the purposes of depicting REST APIs `ZodReadonly` is described the same way as its inner schema.
+
+### v11.3.0
+
+- Thanks to [@dev-m1-macbook](https://github.com/dev-m1-macbook) who noticed that the method needed for getting
+  examples within a custom `ResultHandler` is not exported. This problem is now fixed.
+  - Exposing `getExamples()` method having object based parameter with following props:
+    - `schema` — the subject to retrieve examples from (previously set by `withMeta().example()` method).
+    - `variant` _(optional)_ — either `original` _(default)_ or `parsed` literal. The last one applies possible
+      transformations.
+    - `validate` _(optional)_ — boolean, filters out invalid examples, enabled for `parsed` variant.
+  - **Warning**: Getting parsed or validated examples of `z.lazy()` having circular references must be avoided.
+  - Despite having two options for various needs, in case of proxying your examples withing a custom `ResultHandler`
+    those are not required. Consider the following approach implemented in the default `ResultHandler`:
+
+```ts
+const defaultResultHandler = createResultHandler({
+  getPositiveResponse: (output: IOSchema) => {
+    // Examples are taken for proxying: no validation needed for this
+    const examples = getExamples({ schema: output });
+    const responseSchema = withMeta(
+      z.object({
+        status: z.literal("success"),
+        data: output,
+      }),
+    );
+    return examples.reduce<typeof responseSchema>(
+      (acc, example) =>
+        acc.example({
+          status: "success",
+          data: example,
+        }),
+      responseSchema,
+    );
+  },
+  // ...
+});
+```
+
+### v11.2.0
+
+- `winston` version is 3.10.0.
+- `triple-beam` version is 1.4.1.
+- Rearranged exports in `package.json`.
+
+### v11.1.1
+
+- Technical update, no new features.
+  - `@tsconfig/node16` base version is 16.1.0.
+  - Using `node:` prefix for importing builtin modules.
+  - `typescript` v5.1.6, `esbuild` v0.18.10 and `rollup` v3.25.3.
+
+### v11.1.0
+
+- Sourcemaps are removed from the distribution.
+  - No one has ever used them for reporting issues.
+  - Their size is significantly large.
+- Both CJS and ESM bundles have their own declaration files:
+  - `/dist/index.d.ts` for CJS,
+  - `/dist/esm/index.d.ts` for ESM.
+  - The `exports` entry of `package.json` is adjusted accordingly.
+
+### v11.0.0
+
+- **Breaking changes**:
+  - Minimum Node version supported: 16.14.0.
+  - `OpenAPIError` renamed to `DocumentationError`.
+    - It also now only accepts an object argument. Use its `message` prop instead.
+  - `OpenAPI` class removed. Use `Documentation` one instead (same constructor props).
+  - `Client` class removed. Use `Integration` one instead (the default `variant` is `client`).
+
+## Version 10
+
+### v10.9.0
+
+- `winston` version is 3.9.0.
+
+### v10.8.1
+
+- Add missing `async` keyword to `ExpressZodAPIClient::provide()` method.
+
+### v10.8.0
+
+- Supporting Node 20.
+  - Minimum supported version of Node 20.x is 20.1.0.
+
+### v10.7.1
+
+- For the `new Integration({ variant: "types" })` the following types added:
+  - `Path`, `Method`, `MethodPath`, `Input`, `Response`.
+
+### v10.7.0
+
+- Reverting the changes made in v10.2.0: restoring `openapi3-ts` dependency.
+  - `openapi3-ts` version is 4.1.2.
+
+### v10.6.0
+
+- Feature #974: Integration variant.
+  - `Integration::constructor()` has gotten a new property `variant` with two possible values:
+    - `client` _(default)_ — the familiar entity for making typed requests and received typed responses;
+    - `types` — only types of your endpoint requests and responses (for making a DIY solution).
+  - The deprecated ~~`Client::constructor()`~~ implies `client` variant of `Integration`.
+
+### v10.5.0
+
+- Errors that may occur when generating documentation are now more informative.
+  - Changes made to the message of `OpenAPIError` class.
+
+```yaml
+# example of additional details in the second line of the error message
+before: >-
+  Using transformations on the top level of input schema is not allowed.
+after: |-
+  Using transformations on the top level of input schema is not allowed.
+  Caused by input schema of an Endpoint assigned to POST method of /v1/user/:id path.
+```
+
+### v10.4.0
+
+- For the future features and improvements the following entities are renamed:
+  - ~~`Client`~~ class becomes the `Integration`.
+  - ~~`OpenAPI`~~ class becomes the `Documentation`.
+  - For backward compatibility the previously assigned names are still supported until the next major release.
+  - Developers are advised to adjust their implementation accordingly.
+
+```ts
+// before
+new Client(/*...*/);
+new OpenAPI(/*...*/);
+// after
+new Integration(/*...*/);
+new Documentation(/*...*/);
+```
+
+### v10.3.2
+
+- Hotfix on fixing the previously mentioned issue #952.
+  - The following interfaces are now exported from the index file directly:
+    - `ZodFileDef`, `ZodUploadDef`, `ZodDateInDef`, `ZodDateOutDef`.
+
+### v10.3.1
+
+- Attempted to fix the issue #952 of the insufficient exports of the proprietary schema definitions.
+  - The issue introduced in version 10.0.0-beta1 due to changing the compiler to `tsup`.
+  - The issue manifests only when `declaration` is enabled in your `tsconfig.json`.
+  - The issue causes following error:
+    - `TS4023: Exported variable '' has or is using name 'ZodFileDef' from external module "" but cannot be named.`
+  - The following interfaces are now available within the exported `ez` namespace:
+    - `ez.ZodFileDef`, `ez.ZodUploadDef`, `ez.ZodDateInDef`, `ez.ZodDateOutDef`.
+
+### v10.3.0
+
+- Feature #945 for a client generator, proposed by [@McMerph](https://github.com/McMerph).
+  - Configurable style of object's optional properties.
+  - Client generator has gotten a new parameter `optionalPropStyle` which is an optional object having two optional
+    properties: `withQuestionMark` and `withUndefined` that enable customization on the generated types.
+    - Example with question mark: `{ someProp?: boolean }`.
+    - Example with undefined: `{ someProp: boolean | undefined }`.
+  - For backward compatibility the default value is `{ withQuestionMark: true, withUndefined: true }`.
+    - Example of default behavior: `{ someProp?: boolean | undefined }`
+
+```ts
+// example
+new Client({
+  routing,
+  optionalPropStyle: { withQuestionMark: true }, // no `| undefined`
+}).print();
+```
+
+### v10.2.0
+
+- The functionality of `openapi3-ts` is implemented inside the library.
+  - The code state corresponds to the version 4.1.1 of `openapi3-ts`.
+
+### v10.1.3
+
+- Fixed issue #929, found and reported by [@shroudedcode](https://github.com/shroudedcode).
+  - Customized description of request parameters have not been depicted correctly when generating the documentation.
+
+### v10.1.2
+
+- Fixed issue #907, found and reported by [@McMerph](https://github.com/McMerph).
+  - HTTP response status code in case of malformed body or other body-parser errors changed from `500` to `400`.
+
+### v10.1.1
+
+- Fixed issue #900, found and reported by [Max Cohn](https://github.com/maxcohn).
+  - Do not set `nullable` property to the depictions having no `type` property according to OpenAPI specification.
+  - Affected schemas: `z.any()` and `z.preprocess()`.
+
+```yaml
+# depiction of z.any() in the generated documentation
+before:
+  format: any
+  nullable: true
+after:
+  format: any
+```
+
+### v10.1.0
+
+- Feature #876: Supporting `z.lazy()` (including circular schemas) for the client generator.
+  - This is an addition to the feature #856 released in version 9.3.0.
+
+### v10.0.0
+
+- This release contains the fix from version 9.4.2.
+- Read the release notes on beta versions for migration strategy from v9.
+
+### v10.0.0-beta6
+
+- This release contains the fix from version 9.4.1.
+
+### v10.0.0-beta5
+
+- Fixed DTS path for ESM in package.json.
+
+### v10.0.0-beta4
+
+- No changes.
+
+### v10.0.0-beta3
+
+- This release contains features from versions 9.3.0 (incl. hotfix 9.3.1) and 9.4.0.
+- **BREAKING** changes:
+  - `Client::constructor()` now requires an object argument having `routing` property.
+
+```ts
+// before
+new Client(routing).print();
+// after
+new Client({ routing }).print();
+```
+
+### v10.0.0-beta2
+
+- **BREAKING** changes to the behavior of a public method.
+  - The feature method `withMeta` _(introduced in v2.1.0)_ used to mutate its argument (`zod` schema) in order to
+    extend it with additional methods.
+  - If you're using this feature _within_ the call of `EndpointsFactory::build()`, there is no issue.
+  - However, if you're using a schema assignment (to some const) along with this method, this might lead to unexpected
+    results.
+  - The following case is reported by [@McMerph](https://github.com/McMerph) in issue #827.
+    - Reusing a schema assigned to a const for its several wrappings by `withMeta` and setting different examples.
+    - In this case all examples were set to the original const.
+  - This release fixes that behavior by making `withMeta` immutable: it returns a new copy of its argument.
+
+```ts
+// the example case
+const originalSchema = z.string();
+const schemaA = withMeta(originalSchema).example("A");
+const schemaB = withMeta(originalSchema).example("B");
+// BEFORE: all three const have both examples "A" and "B"
+// AFTER:
+// - originalSchema remains intact
+// - schemaA has example "A"
+// - schemaB has example "B"
+```
+
+### v10.0.0-beta1
+
+- This release is based on the features of version 9.2.1.
+- **BREAKING** changes to the concept of dependencies.
+  - `zod` becomes a peer dependency, fixes issue #822.
+    - You need to install it manually and adjust your imports accordingly.
+  - `express` becomes a peer dependency as well.
+    - You need to install it manually.
+  - `typescript` becomes an optional peer dependency.
+    - When using a client generator, you need to install it manually.
+    - The minimal supported version is 4.9.3.
+  - Proprietary schemas are now exported under the namespace `ez`.
+    - Imports and utilization should be adjusted accordingly.
+    - Affected schemas: `file`, `dateIn`, `dateOut`, `upload`.
+  - If facing Typescript errors `TS4023` or `TS4094`, ensure disabling `declaration` option in your `tsconfig.json`.
+- **BREAKING** changes to the engines.
+  - The minimal Node version is now 14.18.0.
+- Due to switching to `tsup` builder, the file structure has changed:
+  - `/dist/index.js` — CommonJS bundle;
+  - `/dist/esm/index.js` — ESM bundle;
+  - `/dist/index.d.ts` — types declaration bundle.
+
+```ts
+// before
+import { z } from "express-zod-api";
+const stringSchema = z.string();
+const uploadSchema = z.upload();
+```
+
+```ts
+// after
+import { z } from "zod"; // module changed
+import { ez } from "express-zod-api"; // new namespace
+const stringSchema = z.string(); // remains the same
+const uploadSchema = ez.upload(); // namespace changed
+```
+
+## Version 9
+
+### v9.4.2
+
+- Fixed issue #892, found and reported by [@McMerph](https://github.com/McMerph).
+  - Several examples for Array-Like schemas (`z.array()` and `z.tuple()`) used to be merged in the generated documentation due to the bug in `getExamples()` method.
+
+### v9.4.1
+
+- Fixing the example implementation for the generated client in case of `DELETE` method.
+  - Since v9.0.0-beta1 request `body` is no longer accepted (by default) as an input source.
+  - The example implementation is now aligned accordingly to use query parameters.
+
+### v9.4.0
+
+- Feature #875, proposed by [@VideoSystemsTech](https://github.com/VideoSystemsTech).
+  - Ability to document the API specification keeping the schemas organized within named components.
+  - `OpenAPI::constructor()` is equipped with a new optional property `composition` that can be:
+    - `inline` (default) — schemas are depicted directly in a place of their usage;
+    - `components` (feature) — schemas are depicted within the `components` section and have references by their names.
+
+```ts
+// example usage
+new OpenAPI({
+  routing,
+  config,
+  version: "1.2.3",
+  title: "My API",
+  serverUrl: "https://example.com",
+  composition: "components", // <——
+}).getSpecAsYaml();
+```
+
+### v9.3.1
+
+- Hotfix for the feature #856
+  - `$ref` is equipped with the required prefix: `#/components/schemas/`.
+
+```yaml
+before:
+  $ref: 2048581c137c5b2130eb860e3ae37da196dfc25b
+after:
+  $ref: "#/components/schemas/2048581c137c5b2130eb860e3ae37da196dfc25b"
+```
+
+### v9.3.0
+
+- Feature #856, proposed by [@TheWisestOne](https://github.com/TheWisestOne) in discussion #801.
+  - Supporting `z.lazy()` in the documentation generator (OpenAPI), including circular schemas.
+  - The feature is only available for the OpenAPI generator, it's not available for the client generator yet.
+  - OpenAPI references are utilized in order to limit the possible recursion.
+  - A new optional property added to the constructor of the OpenAPI class:
+    - `serializer` is the function that accepts a schema and returns its unique identifier in order to compare them.
+    - When omitted, the default one used, which is `JSON.stringify()` + `SHA1` hash as a `hex` digest.
+    - If/when it's not enough precise, consider specifying your own implementation.
+
+```yaml
+# having z.lazy() within your IO schema
+before:
+  error: Zod type ZodLazy is unsupported
+after:
+  schema:
+    type: object
+    properties:
+      lazyProperty:
+        $ref: 2048581c137c5b2130eb860e3ae37da196dfc25b # sample reference
+  components:
+    schemas:
+      2048581c137c5b2130eb860e3ae37da196dfc25b:
+        type: array
+        items:
+          $ref: 2048581c137c5b2130eb860e3ae37da196dfc25b # circular reference
+```
+
+### v9.2.1
+
+- `zod` version is 3.21.4.
+
+### v9.2.0
+
+- `zod` version is 3.21.2.
+  - `ulid` string format support added.
+
+### v9.1.0
+
+- `zod` version is 3.21.0
+  - General support of the following string formats in the documentation: `cuid2`, `ip`, `emoji`.
+
+### v9.0.0
+
+- No additional changes since v9.0.0-beta4.
+  - Read the release notes on beta versions for migration strategy from v8.
+
+### v9.0.0-beta4
+
+- This release contains the feature from version [8.11.0](#v8110).
+- **BREAKING** changes:
+  - `createApiResponse()` method is removed. Read the release notes to v8.11.0 for migration strategy.
+- Potentially **BREAKING** changes:
+  - The following changes correspond to the entities that are not supposed to be used directly, however they are public.
+  - `Endpoint::constructor()`
+    - `mimeTypes` property is removed from the argument.
+  - `Endpoint` public methods replaced:
+    - `getPositiveStatusCode()` —> `getStatusCode("positive")`
+    - `getNegativeStatusCode()` —> `getStatusCode("negative")`
+    - `getInputSchema()` —> `getSchema("input")`
+    - `getOutputSchema()` —> `getSchema("output")`
+    - `getPositiveResponseSchema()` —> `getSchema("positive")`
+    - `getNegativeResponseSchema()` —> `getSchema("negative")`
+    - `getInputMimeTypes()` —> `getMimeTypes("input")`
+    - `getPositiveMimeTypes()` —> `getMimeTypes("positive")`
+    - `getNegativeMimeTypes()` —> `getMimeTypes("negative")`
+
+### v9.0.0-beta3
+
+- This release contains the feature from version [8.10.0](#v8100).
+
+### v9.0.0-beta2
+
+- Potentially **BREAKING** changes:
+  - Fixed problem #787, reported and resolved by [@TheWisestOne](https://github.com/TheWisestOne).
+    - Validation errors thrown from within the Middlewares and Endpoint handlers unrelated to the IO do now lead to the
+      status code `500` instead of `400`, when you're using the `defaultResultHandler` or `defaultEndpointsFactory`.
+      - It enables you to use zod (via the exposed `z` namespace) for the internal needs of your implementation, such as
+        validating the data coming from your database, for example.
+    - Historically, `ZodError` meant the error related to the input validation, but it's changed.
+      - New error class created: `InputValidationError`.
+      - If you have a custom `ResultHandler` that relies on `ZodError` for responding with `400` code, you need to
+        change that condition to `InputValidationError` in order to keep that behaviour.
+    - Luckily, the following entities were exposed and became available for the convenience of your migration:
+      - `OutputValidationError`,
+      - `InputValidationError` _(new)_,
+      - `getMessageFromError()`,
+      - `getStatusCodeFromError()`.
+    - Consider using `getStatusCodeFromError()` inside your custom `ResultHandler`, or make the following changes:
+
+```typescript
+// Your custom ResultHandler
+// Before: if you're having an expression like this:
+if (error instanceof z.ZodError) {
+  response.status(400);
+}
+// After: replace it to this:
+if (error instanceof InputValidationError) {
+  response.status(400);
+}
+// Or: consider the alternative:
+const statusCode = getStatusCodeFromError(error);
+const message = getMessageFromError(error);
+response.status(statusCode);
+```
+
+### v9.0.0-beta1
+
+- This release is based on version 8.9.4.
+- Potentially **BREAKING** changes:
+  - Fixed issue #820, reported and resolved by [@McMerph](https://github.com/McMerph).
+    - Request `body` is no longer considered as an input source for `DELETE` request.
+    - Despite the fact that this method MAY contain `body` (it's not explicitly prohibited), it's currently considered
+      a bad practice to rely on it. Also, it led to a syntax error in the generated documentation according to OpenAPI
+      3.0 specification.
+    - In case you have such Endpoints that rely on inputs collected from `DELETE` request body and want to continue,
+      add the following property to your configuration in order to keep the previous behavior without changes to your
+      implementation.
+    - Read the [customization instructions](https://github.com/RobinTail/express-zod-api#customizing-input-sources).
+
+```yaml
+inputSources: { delete: ["body", "query", "params"] }
+```
+
 ## Version 8
+
+### v8.11.0
+
+- Feature #824, proposed by [@McMerph](https://github.com/McMerph).
+  - In your custom `ResultHandler` you can now specify the status codes used for positive and negative responses.
+  - This declarative information is used for generating a better documentation on your API.
+- Declaring API Response for `ResultHandler` made easier.
+  - When responding with JSON, `getPositiveResponse` and `getNegativeResponse` can now just return the schema.
+  - For any customizations on MIME types and status codes those methods of your custom `ResultHandler` implementation
+    should return object with corresponding optional properties: `mimeType` (or `mimeTypes`) and `statusCode`.
+  - `mimeType` overrides `mimeTypes` when both are specified.
+  - The `createApiResponse()` method is deprecated and will be removed in next major release.
+
+```typescript
+// JSON responding ResultHandler Example
+// before
+createResultHandler({
+  getPositiveResponse: (output: IOSchema) =>
+    createApiResponse(z.object({ data: output })),
+  getNegativeResponse: () => createApiResponse(z.object({ error: z.string() })),
+});
+// after
+createResultHandler({
+  getPositiveResponse: (output: IOSchema) => z.object({ data: output }),
+  getNegativeResponse: () => z.object({ error: z.string() }),
+});
+```
+
+```typescript
+// Example on customizing MIME types and status codes
+// before
+createResultHandler({
+  getPositiveResponse: () => createApiResponse(z.file().binary(), "image/*"),
+  getNegativeResponse: () => createApiResponse(z.string(), "text/plain"),
+});
+// after
+createResultHandler({
+  getPositiveResponse: () => ({
+    schema: z.file().binary(),
+    mimeType: "image/*",
+    statusCode: 201,
+  }),
+  getNegativeResponse: () => ({
+    schema: z.string(),
+    mimeType: "text/plain",
+    statusCode: 403,
+  }),
+});
+```
+
+### v8.10.0
+
+- Feature #845, proposed by [@lazylace37](https://github.com/lazylace37).
+  - Equipping the generated documentation with automatically generated and unique `operationId`.
+  - The `operationId` consists of method, path and optional numeric suffix.
+
+```yaml
+before:
+  paths:
+    /v1/user/retrieve:
+      get:
+        responses:
+after:
+  paths:
+    /v1/user/retrieve:
+      get:
+        operationId: GetV1UserRetrieve
+        responses:
+```
+
+### v8.9.4
+
+- `openapi3-ts` version is 3.2.0.
+
+### v8.9.3
+
+- `zod` version is 3.20.6.
+
+### v8.9.2
+
+- Fixed issue #816 (related to discussion #803), reported and resolved by [@McMerph](https://github.com/McMerph).
+  - Assigning a singular `Security` schema to a `Middleware` led to an error during the generation of OpenAPI docs.
+  - Also, preventing the `required` prop to be an empty array when depicting objects and records in OpenAPI docs.
+
+### v8.9.1
+
+- Fixed issue #805, reported and resolved by [@TheWisestOne](https://github.com/TheWisestOne).
+  - The frontend client generator was failing to generate a valid code in case of a routing path having multiple non-alphanumeric characters.
 
 ### v8.9.0
 
@@ -246,7 +816,7 @@ const endpoint = endpointsFactory.build({
     })
     .refine(
       (inputs) => Object.keys(inputs).length >= 1,
-      "Please provide at least one property"
+      "Please provide at least one property",
     ),
   // ...
 });
@@ -354,6 +924,36 @@ const exampleEndpoint = taggedEndpointsFactory.build({
 - Supporting `jest` (optional peer dependency) version 29.x.
 
 ## Version 7
+
+### v7.9.4
+
+- This version contains a cherry-picked fix made in v8.4.1.
+- Fixed a bug found and reported by [@leosuncin](https://github.com/leosuncin) in issue #705.
+  - CORS didn't work well in case of using `DependsOnMethod`.
+  - The list of the allowed methods in the response to `OPTIONS` request did only contain the first method declared
+    within `DependsOnMethod` instance.
+
+```typescript
+// reproduction minimal setup
+const routing: Routing = {
+  test: new DependsOnMethod({
+    get: getEndpoint,
+    post: postEndpoint,
+  }),
+};
+// when requesting OPTIONS for "/test", the response has the following header:
+// Access-Control-Allow-Methods: GET, OPTIONS
+```
+
+### v7.9.3
+
+- This version contains a cherry-picked fix made in v8.3.2.
+- Fixed the bug #673 found and reported by [@shroudedcode](https://github.com/shroudedcode).
+  - Preventing double parsing of incoming data by input schemas of middlewares containing transformations.
+  - The bug caused inability of using any transforming schema in middlewares.
+  - In particular, but not limited with: using `z.dateIn()` in middlewares.
+    - Sample error message in this case: `Expected string, received date`.
+  - Using `.transform()` method in middlewares was also affected by this bug.
 
 ### v7.9.2
 
@@ -528,7 +1128,7 @@ import { defaultEndpointsFactory } from "express-zod-api";
 import cors from "cors";
 
 const myFactory = defaultEndpointsFactory.addExpressMiddleware(
-  cors({ credentials: true })
+  cors({ credentials: true }),
 );
 ```
 
@@ -820,7 +1420,7 @@ import cors from "cors";
 import { auth } from "express-oauth2-jwt-bearer";
 
 const simpleUsage = defaultEndpointsFactory.addExpressMiddleware(
-  cors({ credentials: true })
+  cors({ credentials: true }),
 );
 
 const advancedUsage = defaultEndpointsFactory.use(auth(), {
@@ -1144,7 +1744,7 @@ const getUserEndpoint = endpointsFactory.build({
       id: z.string().transform((value) => parseInt(value, 10)),
       // other inputs (in query):
       withExtendedInformation: z.boolean().optional(),
-    })
+    }),
   ).example({
     id: "12",
     withExtendedInformation: true,
@@ -1216,7 +1816,7 @@ const exampleEndpoint = defaultEndpointsFactory.build({
     z.object({
       id: z.number().int().nonnegative(),
       name: z.string().nonempty(),
-    })
+    }),
   ).example({
     id: 12,
     name: "John Doe",
@@ -1225,7 +1825,7 @@ const exampleEndpoint = defaultEndpointsFactory.build({
     z.object({
       name: z.string(),
       timestamp: z.number().int().nonnegative(),
-    })
+    }),
   ).example({
     name: "John Doe",
     timestamp: 1235698995125,
@@ -1330,7 +1930,7 @@ const config = createConfig({
 // example
 z.record(
   z.enum(["option1", "option2"]), // keys
-  z.boolean() // values
+  z.boolean(), // values
 );
 ```
 
@@ -1575,7 +2175,7 @@ const fileStreamingEndpointsFactoryBefore = new EndpointsFactory(
   createResultHandler({
     getPositiveResponse: () => createApiResponse(z.string(), "image/*"),
     // ...,
-  })
+  }),
 );
 
 // after
@@ -1583,7 +2183,7 @@ const fileStreamingEndpointsFactoryAfter = new EndpointsFactory(
   createResultHandler({
     getPositiveResponse: () => createApiResponse(z.file().binary(), "image/*"),
     // ...,
-  })
+  }),
 );
 ```
 
@@ -1742,13 +2342,13 @@ const myResultHandlerV2 = createResultHandler({
         // ...,
         someProperty: markOutput(output),
       }),
-      ["mime/type1", "mime/type2"] // optional, default: application/json
+      ["mime/type1", "mime/type2"], // optional, default: application/json
     ),
   getNegativeResponse: () =>
     createApiResponse(
       z.object({
         /* ... */
-      })
+      }),
     ),
   handler: ({ error, input, output, request, response, logger }) => {
     /* ... */
@@ -1857,7 +2457,7 @@ const middleware = createMiddleware({
     .or(
       z.object({
         two: z.number(),
-      })
+      }),
     ),
   middleware: async ({ input }) => ({
     input, // => type: { one: string } | { two: number }

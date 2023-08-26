@@ -2,7 +2,7 @@ import compression from "compression";
 import { NextHandleFunction } from "connect";
 import { Express, Request } from "express";
 import fileUpload from "express-fileupload";
-import { ServerOptions } from "https";
+import { ServerOptions } from "node:https";
 import { Logger } from "winston";
 import { AbstractEndpoint } from "./endpoint";
 import { Method } from "./method";
@@ -55,7 +55,10 @@ export interface AppConfig {
   app: Express; // or your custom express app
 }
 
-type InputSource = keyof Pick<Request, "query" | "body" | "files" | "params">;
+export type InputSource = keyof Pick<
+  Request,
+  "query" | "body" | "files" | "params"
+>;
 export type InputSources = Record<Method, InputSource[]>;
 
 type Headers = Record<string, string>;
@@ -86,7 +89,7 @@ export interface CommonConfig<TAG extends string = string> {
   // what request properties are combined into input for endpoints and middlewares
   // the order matters: priority from lowest to highest
   // default: { get: [query, params], post: [body, params, files],
-  // put: [body, params], patch: [body, params], delete: [body, query, params] }
+  // put: [body, params], patch: [body, params], delete: [query, params] }
   inputSources?: Partial<InputSources>;
   // optional endpoints tagging configuration, example: { users: "Everything about the users" }
   tags?: TagsConfig<TAG>;
@@ -94,7 +97,7 @@ export interface CommonConfig<TAG extends string = string> {
 
 export const createConfig = <
   TAG extends string,
-  T extends (ServerConfig | AppConfig) & CommonConfig<TAG>
+  T extends (ServerConfig | AppConfig) & CommonConfig<TAG>,
 >(
-  config: T
+  config: T,
 ): T => config;

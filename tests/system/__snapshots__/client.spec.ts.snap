@@ -3,6 +3,35 @@
 exports[`Example Should perform the request with a positive response 1`] = `
 {
   "data": {
+    "features": [
+      {
+        "features": [
+          {
+            "features": [],
+            "title": "Above 180cm",
+          },
+        ],
+        "title": "Tall",
+      },
+      {
+        "features": [],
+        "title": "Young",
+      },
+      {
+        "features": [
+          {
+            "features": [
+              {
+                "features": [],
+                "title": "About Typescript",
+              },
+            ],
+            "title": "Tells funny jokes",
+          },
+        ],
+        "title": "Cute",
+      },
+    ],
     "id": 10,
     "name": "John Doe",
   },

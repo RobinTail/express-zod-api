@@ -8,7 +8,7 @@ exports[`zod-to-ts Example should produce the expected results 1`] = `
         string: string;
     }[];
     boolean: boolean;
-    circular: any;
+    circular: Type118cb3b11b8a1f3b6b1e60a89f96a8be9da32a0f;
     union: {
         number: number;
     } | "hi";
@@ -53,9 +53,9 @@ exports[`zod-to-ts Example should produce the expected results 1`] = `
     promise: any;
     function: any;
     optDefaultString?: string | undefined;
-    refinedStringWithSomeBullshit: (string | number) & ((bigint | undefined) | null);
+    refinedStringWithSomeBullshit: (string | number) & ((bigint | null) | undefined);
     nativeEnum: "A" | "apple" | "banana" | "cantaloupe" | 5;
-    lazy: any;
+    lazy: Type51497f7e879bae48c3fbad2fa68050d1e08bbf82;
     discUnion: {
         kind: "circle";
         radius: number;
@@ -70,6 +70,7 @@ exports[`zod-to-ts Example should produce the expected results 1`] = `
     branded: string;
     catch?: number;
     pipeline: string;
+    readonly: string;
 }"
 `;
 

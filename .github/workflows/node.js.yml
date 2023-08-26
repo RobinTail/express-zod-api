@@ -5,25 +5,25 @@ name: Node.js CI
 
 on:
   push:
-    branches: [ master, v7 ]
+    branches: [ master, v9, v10 ]
   pull_request:
-    branches: [ master, v7 ]
+    branches: [ master, v9, v10 ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [14.17.0, 14.x, 16.10.0, 16.x, 18.0.0, 18.x, 19.0.0, 19.x]
+        node-version: [16.14.0, 16.x, 18.0.0, 18.x, 19.0.0, 19.x, 20.1.0, 20.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
     steps:
     - name: Get yarn cache dir
       id: yarnCache
       run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     - name: Install Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v2
+      uses: actions/setup-node@v3
       with:
         node-version: ${{ matrix.node-version }}
     - name: Cache node modules
@@ -35,33 +35,30 @@ jobs:
         key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ matrix.node-version }}-${{ hashFiles('**/yarn.lock') }}
     - name: Install dependencies
       run: yarn install
-    - name: Test and build
-      run: | 
-        yarn lint
-        yarn test
-        yarn build
+    - name: Build
+      run: yarn build
+    - name: Lint
+      run: yarn lint
+    - name: Test
+      run: yarn test
     - name: Coveralls
-      uses: coverallsapp/github-action@1.1.3
+      uses: coverallsapp/github-action@v2
       continue-on-error: true
       with:
         github-token: ${{ secrets.github_token }}
         flag-name: run-${{ matrix.node-version }}
         parallel: true
     - name: Integration test
-      run: |
-        yarn build:intTest
-        yarn test:int
+      run: yarn test:int
     - name: ESM test
-      run: |
-        yarn build:esmTest
-        yarn test:esm
+      run: yarn test:esm
   finish:
     needs: build
     runs-on: ubuntu-latest
     steps:
       - name: Coveralls Finished
         continue-on-error: true
-        uses: coverallsapp/github-action@1.1.3
+        uses: coverallsapp/github-action@v2
         with:
           github-token: ${{ secrets.github_token }}
           parallel-finished: true

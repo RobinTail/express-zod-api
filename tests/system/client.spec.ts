@@ -1,4 +1,4 @@
-import { ChildProcessWithoutNullStreams, spawn } from "child_process";
+import { ChildProcessWithoutNullStreams, spawn } from "node:child_process";
 import { expectType } from "tsd";
 import { config } from "../../example/config";
 import { waitFor } from "../helpers";
@@ -49,7 +49,7 @@ describe("Example", () => {
     };
 
   const client = new ExpressZodAPIClient(
-    createDefaultImplementation(`http://localhost:${config.server.listen}`)
+    createDefaultImplementation(`http://localhost:${config.server.listen}`),
   );
 
   test("Should listen", async () => {

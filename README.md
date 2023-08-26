@@ -47,8 +47,9 @@ Start your API server with I/O schema validation and custom middlewares in minut
    19. [Generating a Frontend Client](#generating-a-frontend-client)
    20. [Creating a documentation](#creating-a-documentation)
    21. [Tagging the endpoints](#tagging-the-endpoints)
-5. [Additional hints](#additional-hints)
-   1. [How to test endpoints](#how-to-test-endpoints)
+   22. [How to test endpoints](#how-to-test-endpoints)
+5. [Caveats](#caveats)
+   1. [Coercive schema of Zod](#coercive-schema-of-zod)
    2. [Excessive properties in endpoint output](#excessive-properties-in-endpoint-output)
 6. [Your input to my output](#your-input-to-my-output)
 
@@ -101,10 +102,14 @@ Much can be customized to fit your needs.
 
 ## Installation
 
+Run one of the following commands to install the library and its peer dependencies.
+Typescript is an optional dependency, however, it's required if you're going to
+[generate a frontend client](#generating-a-frontend-client) for your API.
+
 ```shell
-yarn add express-zod-api
+yarn add express-zod-api express zod typescript
 # or
-npm install express-zod-api
+npm install express-zod-api express zod typescript
 ```
 
 Add the following option to your `tsconfig.json` file in order to make it work as expected:
@@ -150,7 +155,7 @@ _In case you need to customize the response, see [Response customization](#respo
 ## Create your first endpoint
 
 ```typescript
-import { z } from "express-zod-api";
+import { z } from "zod";
 
 const helloWorldEndpoint = defaultEndpointsFactory.build({
   method: "get",
@@ -270,11 +275,12 @@ const yourEndpoint = defaultEndpointsFactory
 Here is an example of the authentication middleware, that checks a `key` from input and `token` from headers:
 
 ```typescript
-import { createMiddleware, createHttpError, z } from "express-zod-api";
+import { z } from "zod";
+import { createMiddleware, createHttpError } from "express-zod-api";
 
 const authMiddleware = createMiddleware({
   security: {
-    // this information is optional and used for the generated documentation (OpenAPI)
+    // this information is optional and used for generating documentation
     and: [
       { type: "input", name: "key" },
       { type: "header", name: "token" },
@@ -327,7 +333,8 @@ You can implement additional validations within schemas using refinements.
 Validation errors are reported in a response with a status code `400`.
 
 ```typescript
-import { createMiddleware, z } from "express-zod-api";
+import { z } from "zod";
+import { createMiddleware } from "express-zod-api";
 
 const nicknameConstraintMiddleware = createMiddleware({
   input: z.object({
@@ -336,7 +343,7 @@ const nicknameConstraintMiddleware = createMiddleware({
       .min(1)
       .refine(
         (nick) => !/^\d.*$/.test(nick),
-        "Nickname cannot start with a digit"
+        "Nickname cannot start with a digit",
       ),
   }),
   // ...,
@@ -355,7 +362,7 @@ const endpoint = endpointsFactory.build({
     })
     .refine(
       (inputs) => Object.keys(inputs).length >= 1,
-      "Please provide at least one property"
+      "Please provide at least one property",
     ),
   // ...,
 });
@@ -367,7 +374,7 @@ Since parameters of GET requests come in the form of strings, there is often a n
 arrays of numbers.
 
 ```typescript
-import { z } from "express-zod-api";
+import { z } from "zod";
 
 const getUserEndpoint = endpointsFactory.build({
   method: "get",
@@ -398,10 +405,10 @@ which in turn calls
 It is also impossible to transmit the `Date` in its original form to your endpoints within JSON. Therefore, there is
 confusion with original method ~~z.date()~~ that should not be used within IO schemas of your API.
 
-In order to solve this problem, the library provides two custom methods for dealing with dates: `z.dateIn()` and
-`z.dateOut()` for using within input and output schemas accordingly.
+In order to solve this problem, the library provides two custom methods for dealing with dates: `ez.dateIn()` and
+`ez.dateOut()` for using within input and output schemas accordingly.
 
-`z.dateIn()` is a transforming schema that accepts an ISO `string` representation of a `Date`, validates it, and
+`ez.dateIn()` is a transforming schema that accepts an ISO `string` representation of a `Date`, validates it, and
 provides your endpoint handler or middleware with a `Date`. It supports the following formats:
 
 ```text
@@ -411,20 +418,21 @@ provides your endpoint handler or middleware with a `Date`. It supports the foll
 2021-12-31
 ```
 
-`z.dateOut()`, on the contrary, accepts a `Date` and provides `ResultHanlder` with a `string` representation in ISO
+`ez.dateOut()`, on the contrary, accepts a `Date` and provides `ResultHanlder` with a `string` representation in ISO
 format for the response transmission. Consider the following simplified example for better understanding:
 
 ```typescript
-import { z, defaultEndpointsFactory } from "express-zod-api";
+import { z } from "zod";
+import { ez, defaultEndpointsFactory } from "express-zod-api";
 
 const updateUserEndpoint = defaultEndpointsFactory.build({
   method: "post",
   input: z.object({
     userId: z.string(),
-    birthday: z.dateIn(), // string -> Date
+    birthday: ez.dateIn(), // string -> Date
   }),
   output: z.object({
-    createdAt: z.dateOut(), // Date -> string
+    createdAt: ez.dateOut(), // Date -> string
   }),
   handler: async ({ input }) => {
     // input.birthday is Date
@@ -499,27 +507,35 @@ type DefaultResponse<OUT> =
 You can create your own result handler by using this example as a template:
 
 ```typescript
+import { z } from "zod";
 import {
   createResultHandler,
-  createApiResponse,
   IOSchema,
-  z,
+  getStatusCodeFromError,
+  getMessageFromError,
 } from "express-zod-api";
 
 export const yourResultHandler = createResultHandler({
-  getPositiveResponse: (output: IOSchema) =>
-    createApiResponse(
-      z.object({ data: output }),
-      "application/json" // optional, or array of mime types
-    ),
-  getNegativeResponse: () => createApiResponse(z.object({ error: z.string() })),
+  getPositiveResponse: (output: IOSchema) => ({
+    schema: z.object({ data: output }),
+    mimeType: "application/json", // optinal, or mimeTypes for array
+  }),
+  getNegativeResponse: () => z.object({ error: z.string() }),
   handler: ({ error, input, output, request, response, logger }) => {
+    if (!error) {
+      // your implementation
+      return;
+    }
+    const statusCode = getStatusCodeFromError(error);
+    const message = getMessageFromError(error);
     // your implementation
   },
 });
 ```
 
-Then you need to use it as an argument for `EndpointsFactory` instance creation:
+Note: `OutputValidationError` and `InputValidationError` are also available for your custom error handling.
+
+After creating your custom `ResultHandler` you can use it as an argument for `EndpointsFactory` instance creation:
 
 ```typescript
 import { EndpointsFactory } from "express-zod-api";
@@ -537,15 +553,18 @@ Thus, you can configure non-object responses too, for example, to send an image 
 You can find two approaches to `EndpointsFactory` and `ResultHandler` implementation
 [in this example](https://github.com/RobinTail/express-zod-api/blob/master/example/factories.ts).
 One of them implements file streaming, in this case the endpoint just has to provide the filename.
-The response schema generally may be just `z.string()`, but I made more specific `z.file()` that also supports
+The response schema generally may be just `z.string()`, but I made more specific `ez.file()` that also supports
 `.binary()` and `.base64()` refinements which are reflected in the
 [generated documentation](#creating-a-documentation).
 
 ```typescript
 const fileStreamingEndpointsFactory = new EndpointsFactory(
   createResultHandler({
-    getPositiveResponse: () => createApiResponse(z.file().binary(), "image/*"),
-    getNegativeResponse: () => createApiResponse(z.string(), "text/plain"),
+    getPositiveResponse: () => ({
+      schema: ez.file().binary(),
+      mimeType: "image/*",
+    }),
+    getNegativeResponse: () => ({ schema: z.string(), mimeType: "text/plain" }),
     handler: ({ response, error, output }) => {
       if (error) {
         response.status(400).send(error.message);
@@ -553,13 +572,13 @@ const fileStreamingEndpointsFactory = new EndpointsFactory(
       }
       if ("filename" in output) {
         fs.createReadStream(output.filename).pipe(
-          response.type(output.filename)
+          response.type(output.filename),
         );
       } else {
         response.status(400).send("Filename is missing");
       }
     },
-  })
+  }),
 );
 ```
 
@@ -576,7 +595,7 @@ import cors from "cors";
 import { auth } from "express-oauth2-jwt-bearer";
 
 const simpleUsage = defaultEndpointsFactory.addExpressMiddleware(
-  cors({ credentials: true })
+  cors({ credentials: true }),
 );
 
 const advancedUsage = defaultEndpointsFactory.use(auth(), {
@@ -588,11 +607,12 @@ const advancedUsage = defaultEndpointsFactory.use(auth(), {
 ## File uploads
 
 You can switch the `Endpoint` to handle requests with the `multipart/form-data` content type instead of JSON by using
-`z.upload()` schema. Together with a corresponding configuration option, this makes it possible to handle file uploads.
+`ez.upload()` schema. Together with a corresponding configuration option, this makes it possible to handle file uploads.
 Here is a simplified example:
 
 ```typescript
-import { createConfig, z, defaultEndpointsFactory } from "express-zod-api";
+import { z } from "zod";
+import { createConfig, ez, defaultEndpointsFactory } from "express-zod-api";
 
 const config = createConfig({
   server: {
@@ -604,7 +624,7 @@ const config = createConfig({
 const fileUploadEndpoint = defaultEndpointsFactory.build({
   method: "post",
   input: z.object({
-    avatar: z.upload(), // <--
+    avatar: ez.upload(), // <--
   }),
   output: z.object({
     /* ... */
@@ -689,11 +709,11 @@ The documentation on these arguments you may find [here](http://expressjs.com/en
 
 ```typescript
 import { Routing, ServeStatic } from "express-zod-api";
-import path from "path";
+import { join } from "node:path";
 
 const routing: Routing = {
   // path /public serves static files from ./assets
-  public: new ServeStatic(path.join(__dirname, "assets"), {
+  public: new ServeStatic(join(__dirname, "assets"), {
     dotfiles: "deny",
     index: false,
     redirect: false,
@@ -712,12 +732,12 @@ import { createConfig } from "express-zod-api";
 createConfig({
   // ...,
   inputSources: {
-    // the default value is:
-    get: ["query"],
-    post: ["body", "files"],
-    put: ["body"],
-    patch: ["body"],
-    delete: ["query", "body"],
+    // the defaults are:
+    get: ["query", "params"],
+    post: ["body", "params", "files"],
+    put: ["body", "params"],
+    patch: ["body", "params"],
+    delete: ["query", "params"],
   },
 });
 ```
@@ -789,10 +809,18 @@ Consuming the generated client requires Typescript version 4.1 or higher.
 
 ```typescript
 // example client-generator.ts
-import fs from "fs";
-import { Client } from "express-zod-api";
+import { writeFileSync } from "node:fs";
+import { Integration } from "express-zod-api";
 
-fs.writeFileSync("./frontend/client.ts", new Client(routing).print(), "utf-8");
+writeFileSync(
+  "./frontend/client.ts",
+  new Integration({
+    routing,
+    variant: "client", // <— optional, see also "types" for a DIY solution
+    optionalPropStyle: { withQuestionMark: true, withUndefined: true }, // optional
+  }).print(),
+  "utf-8",
+);
 ```
 
 ```typescript
@@ -800,13 +828,12 @@ fs.writeFileSync("./frontend/client.ts", new Client(routing).print(), "utf-8");
 import { ExpressZodAPIClient } from "./client.ts";
 
 const client = new ExpressZodAPIClient(async (method, path, params) => {
-  const searchParams =
-    method === "get" ? `?${new URLSearchParams(params)}` : "";
+  const hasBody = !["get", "delete"].includes(method);
+  const searchParams = hasBody ? "" : `?${new URLSearchParams(params)}`;
   const response = await fetch(`https://example.com${path}${searchParams}`, {
     method: method.toUpperCase(),
-    headers:
-      method === "get" ? undefined : { "Content-Type": "application/json" },
-    body: method === "get" ? undefined : JSON.stringify(params),
+    headers: hasBody ? { "Content-Type": "application/json" } : undefined,
+    body: hasBody ? JSON.stringify(params) : undefined,
   });
   return response.json();
 });
@@ -820,14 +847,15 @@ client.provide("post", "/v1/user/:id", { id: "10" }); // it also substitues path
 You can generate the specification of your API and write it to a `.yaml` file, that can be used as the documentation:
 
 ```typescript
-import { OpenAPI } from "express-zod-api";
+import { Documentation } from "express-zod-api";
 
-const yamlString = new OpenAPI({
+const yamlString = new Documentation({
   routing, // the same routing and config that you use to start the server
   config,
   version: "1.2.3",
   title: "Example API",
   serverUrl: "https://example.com",
+  composition: "inline", // optional, or "components" for keeping schemas in a separate dedicated section using refs
 }).getSpecAsYaml();
 ```
 
@@ -843,7 +871,7 @@ const exampleEndpoint = defaultEndpointsFactory.build({
   input: withMeta(
     z.object({
       id: z.number().describe("the ID of the user"),
-    })
+    }),
   ).example({
     id: 123,
   }),
@@ -891,8 +919,6 @@ const exampleEndpoint = taggedEndpointsFactory.build({
 });
 ```
 
-# Additional hints
-
 ## How to test endpoints
 
 The way to test endpoints is to mock the request, response, and logger objects, invoke the `execute()` method, and
@@ -923,6 +949,21 @@ test("should respond successfully", async () => {
 _This method is optimized for the `defaultResultHandler`. With the flexibility to customize, you can add additional
 properties as needed._
 
+# Caveats
+
+There are some well-known issue and limitations, or third party bugs that cannot be fixed in the usual way, but you
+should be aware of them.
+
+## Coercive schema of Zod
+
+Despite being supported by the library, `z.coerce.*` schema
+[does not work intuitively](https://github.com/RobinTail/express-zod-api/issues/759).
+Please be aware that `z.coerce.number()` and `z.number({ coerce: true })` (being typed not well) still will NOT allow
+you to assign anything but number. Moreover, coercive schemas are not fail-safe and their methods `.isOptional()` and
+`.isNullable()` [are buggy](https://github.com/colinhacks/zod/issues/1911). If possible, try to avoid using this type
+of schemas. This issue [will NOT be fixed](https://github.com/colinhacks/zod/issues/1760#issuecomment-1407816838) in
+Zod version 3.x.
+
 ## Excessive properties in endpoint output
 
 The schema validator removes excessive properties by default. However, Typescript
@@ -931,7 +972,7 @@ in this case during development. You can achieve this verification by assigning 
 reusing it in forced type of the output:
 
 ```typescript
-import { z } from "express-zod-api";
+import { z } from "zod";
 
 const output = z.object({
   anything: z.number(),

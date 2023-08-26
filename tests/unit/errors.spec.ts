@@ -1,6 +1,12 @@
-import { DependsOnMethodError, OpenAPIError, RoutingError } from "../../src";
+import { ZodError } from "zod";
+import {
+  DependsOnMethodError,
+  DocumentationError,
+  RoutingError,
+} from "../../src";
 import {
   IOSchemaError,
+  InputValidationError,
   OutputValidationError,
   ResultHandlerError,
 } from "../../src/errors";
@@ -16,13 +22,24 @@ describe("Errors", () => {
     });
   });
 
-  describe("OpenAPIError", () => {
+  describe("DocumentationError", () => {
+    const params = {
+      message: "test",
+      path: "/v1/testPath",
+      method: "get" as const,
+      isResponse: true,
+    };
+
     test("should be an instance of Error", () => {
-      expect(new OpenAPIError("test")).toBeInstanceOf(Error);
+      expect(new DocumentationError(params)).toBeInstanceOf(Error);
+    });
+
+    test("should include more details into the message", () => {
+      expect(new DocumentationError(params).message).toMatchSnapshot();
     });
 
     test("should have the name matching its class", () => {
-      expect(new OpenAPIError("test").name).toBe("OpenAPIError");
+      expect(new DocumentationError(params).name).toBe("DocumentationError");
     });
   });
 
@@ -44,20 +61,49 @@ describe("Errors", () => {
 
     test("should have the name matching its class", () => {
       expect(new DependsOnMethodError("test").name).toBe(
-        "DependsOnMethodError"
+        "DependsOnMethodError",
       );
     });
   });
 
   describe("OutputValidationError", () => {
+    const zodError = new ZodError([]);
+
     test("should be an instance of IOSchemaError and Error", () => {
-      expect(new OutputValidationError("test")).toBeInstanceOf(IOSchemaError);
-      expect(new OutputValidationError("test")).toBeInstanceOf(Error);
+      expect(new OutputValidationError(zodError)).toBeInstanceOf(IOSchemaError);
+      expect(new OutputValidationError(zodError)).toBeInstanceOf(Error);
     });
 
     test("should have the name matching its class", () => {
-      expect(new OutputValidationError("test").name).toBe(
-        "OutputValidationError"
+      expect(new OutputValidationError(zodError).name).toBe(
+        "OutputValidationError",
+      );
+    });
+
+    test("should have .originalError property matching the one used for constructing", () => {
+      expect(new OutputValidationError(zodError).originalError).toEqual(
+        zodError,
+      );
+    });
+  });
+
+  describe("InputValidationError", () => {
+    const zodError = new ZodError([]);
+
+    test("should be an instance of IOSchemaError and Error", () => {
+      expect(new InputValidationError(zodError)).toBeInstanceOf(IOSchemaError);
+      expect(new InputValidationError(zodError)).toBeInstanceOf(Error);
+    });
+
+    test("should have the name matching its class", () => {
+      expect(new InputValidationError(zodError).name).toBe(
+        "InputValidationError",
+      );
+    });
+
+    test("should have .originalError property matching the one used for constructing", () => {
+      expect(new InputValidationError(zodError).originalError).toEqual(
+        zodError,
       );
     });
   });

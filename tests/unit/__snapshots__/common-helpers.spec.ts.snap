@@ -3,7 +3,6 @@
 exports[`Common Helpers defaultInputSources should be declared in a certain way 1`] = `
 {
   "delete": [
-    "body",
     "query",
     "params",
   ],
