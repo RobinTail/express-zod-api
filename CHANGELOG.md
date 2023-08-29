@@ -7,7 +7,7 @@
 - **Breaking changes**:
   - `winston` becomes a peer dependency — you need to install it manually.
   - Minimum Node versions supported: 18.0.0 and 20.1.0.
-    - Node versions 16 and 19 are EOL no longer supported.
+    - Node versions 16 and 19 are EOL and no longer supported.
   - Minimum Typescript version supported: 5.1.3.
   - Minimum Jest version supported: 28 (optional peer dependency for testing endpoints).
 - Other changes:
