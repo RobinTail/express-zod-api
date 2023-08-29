@@ -940,7 +940,7 @@ info:
   title: Testing route path params
   version: 3.4.5
 paths:
-  "/v1/{name}":
+  /v1/{name}:
     get:
       operationId: GetV1Name
       responses:
@@ -1029,7 +1029,7 @@ info:
   title: Testing route path params
   version: 3.4.5
 paths:
-  "/v1/{name}":
+  /v1/{name}:
     post:
       operationId: PostV1Name
       responses:
@@ -1173,7 +1173,7 @@ paths:
                       message: Sample error message
       description: thing is the path segment
       summary: thing is the path segment
-  "/v1/getSome/{thing}":
+  /v1/getSome/{thing}:
     get:
       operationId: GetV1GetsomeThing2
       responses:
@@ -2230,7 +2230,7 @@ paths:
             type: string
             pattern: /\\d+/
             description: a numeric string containing the id of the user
-  "/v1/user/{id}":
+  /v1/user/{id}:
     post:
       operationId: PostV1UserId
       responses:
@@ -2578,7 +2578,7 @@ paths:
           description: a numeric string containing the id of the user
           schema:
             $ref: "#/components/schemas/GetV1UserRetrieveParameterId"
-  "/v1/user/{id}":
+  /v1/user/{id}:
     post:
       operationId: PostV1UserId
       responses:

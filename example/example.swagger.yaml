@@ -89,7 +89,7 @@ paths:
             type: string
             pattern: /\d+/
             description: a numeric string containing the id of the user
-  "/v1/user/{id}":
+  /v1/user/{id}:
     post:
       operationId: PostV1UserId
       responses:
