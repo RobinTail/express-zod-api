@@ -14,6 +14,15 @@
   - The distribution now consists of 4 files in `dist` directory:
     - for ESM: `index.mjs` and `index.d.mts`,
     - for CJS: `index.js` and `index.d.ts`.
+  - Routes having URL params are no longer quoted in the generated documentation.
+    - This change is caused by a fix to the `yaml` dependency.
+
+```yaml
+before:
+  "/v1/user/{id}":
+after:
+  /v1/user/{id}:
+```
 
 ## Version 11
 
