@@ -1,5 +1,45 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`ResultHandler arrayResultHandler Should handle HTTP error 1`] = `
+[
+  "Something not found",
+]
+`;
+
+exports[`ResultHandler arrayResultHandler Should handle generic error 1`] = `
+[
+  "Some error",
+]
+`;
+
+exports[`ResultHandler arrayResultHandler Should handle regular response 1`] = `
+[
+  [
+    "One",
+    "Two",
+    "Three",
+  ],
+]
+`;
+
+exports[`ResultHandler arrayResultHandler Should handle schema error 1`] = `
+[
+  "something: Expected string, got number",
+]
+`;
+
+exports[`ResultHandler arrayResultHandler should forward output schema examples 1`] = `
+{
+  "examples": [],
+}
+`;
+
+exports[`ResultHandler arrayResultHandler should generate negative response example 1`] = `
+{
+  "examples": [],
+}
+`;
+
 exports[`ResultHandler defaultResultHandler Should handle HTTP error 1`] = `
 [
   {
@@ -27,6 +67,11 @@ exports[`ResultHandler defaultResultHandler Should handle regular response 1`] =
   {
     "data": {
       "anything": 118,
+      "array": [
+        "One",
+        "Two",
+        "Three",
+      ],
     },
     "status": "success",
   },

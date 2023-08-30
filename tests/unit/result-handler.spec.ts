@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { z } from "zod";
 import {
   InputValidationError,
+  arrayResultHandler,
   createHttpError,
   defaultResultHandler,
   withMeta,
@@ -20,18 +21,29 @@ describe("ResultHandler", () => {
       debug: jest.fn(),
     };
     responseMock = {
-      set: jest.fn().mockImplementation(() => responseMock),
-      status: jest.fn().mockImplementation(() => responseMock),
-      json: jest.fn().mockImplementation(() => responseMock),
+      set: jest.fn(() => responseMock),
+      status: jest.fn(() => responseMock),
+      json: jest.fn(() => responseMock),
+      send: jest.fn(() => responseMock),
     };
   });
 
   describe.each([
-    { resultHandler: defaultResultHandler, name: "defaultResultHandler" },
+    {
+      resultHandler: defaultResultHandler,
+      name: "defaultResultHandler",
+      errorMethod: "json",
+    },
+    {
+      resultHandler: arrayResultHandler,
+      name: "arrayResultHandler",
+      errorMethod: "send",
+    },
   ])(
     "$name",
     ({
       resultHandler: { handler, getPositiveResponse, getNegativeResponse },
+      errorMethod,
     }) => {
       test("Should handle generic error", () => {
         const requestMock = {
@@ -59,8 +71,8 @@ describe("ResultHandler", () => {
           something: 453,
         });
         expect(responseMock.status).toBeCalledWith(500);
-        expect(responseMock.json).toHaveBeenCalledTimes(1);
-        expect(responseMock.json.mock.calls[0]).toMatchSnapshot();
+        expect(responseMock[errorMethod]).toHaveBeenCalledTimes(1);
+        expect(responseMock[errorMethod].mock.calls[0]).toMatchSnapshot();
       });
 
       test("Should handle schema error", () => {
@@ -88,8 +100,8 @@ describe("ResultHandler", () => {
         });
         expect(loggerMock.error).toBeCalledTimes(0);
         expect(responseMock.status).toBeCalledWith(400);
-        expect(responseMock.json).toHaveBeenCalledTimes(1);
-        expect(responseMock.json.mock.calls[0]).toMatchSnapshot();
+        expect(responseMock[errorMethod]).toHaveBeenCalledTimes(1);
+        expect(responseMock[errorMethod].mock.calls[0]).toMatchSnapshot();
       });
 
       test("Should handle HTTP error", () => {
@@ -107,8 +119,8 @@ describe("ResultHandler", () => {
         });
         expect(loggerMock.error).toBeCalledTimes(0);
         expect(responseMock.status).toBeCalledWith(404);
-        expect(responseMock.json).toHaveBeenCalledTimes(1);
-        expect(responseMock.json.mock.calls[0]).toMatchSnapshot();
+        expect(responseMock[errorMethod]).toHaveBeenCalledTimes(1);
+        expect(responseMock[errorMethod].mock.calls[0]).toMatchSnapshot();
       });
 
       test("Should handle regular response", () => {
@@ -119,7 +131,7 @@ describe("ResultHandler", () => {
         handler({
           error: null,
           input: { something: 453 },
-          output: { anything: 118 },
+          output: { anything: 118, array: ["One", "Two", "Three"] },
           request: requestMock as Request,
           response: responseMock as Response,
           logger: loggerMock,

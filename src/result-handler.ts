@@ -109,12 +109,14 @@ export const defaultResultHandler = createResultHandler({
  * */
 export const arrayResultHandler = createResultHandler({
   getPositiveResponse: (output) =>
-    "shape" in output &&
-    "array" in output.shape &&
-    output.shape.array instanceof z.ZodArray
-      ? output.shape.array
-      : z.array(z.any()),
-  getNegativeResponse: () => z.string(),
+    withMeta(
+      "shape" in output &&
+        "array" in output.shape &&
+        output.shape.array instanceof z.ZodArray
+        ? output.shape.array
+        : z.array(z.any()),
+    ),
+  getNegativeResponse: () => withMeta(z.string()),
   handler: ({ response, output, error, logger, request, input }) => {
     if (error) {
       const statusCode = getStatusCodeFromError(error);
