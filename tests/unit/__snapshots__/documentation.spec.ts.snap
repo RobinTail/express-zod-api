@@ -2355,6 +2355,31 @@ paths:
       security:
         - APIKEY_1: []
           APIKEY_2: []
+  /v1/user/list:
+    get:
+      operationId: GetV1UserList
+      responses:
+        "200":
+          description: GET /v1/user/list Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                  required:
+                    - name
+        "400":
+          description: GET /v1/user/list Error response
+          content:
+            application/json:
+              schema:
+                type: string
+      tags:
+        - users
   /v1/avatar/send:
     get:
       operationId: GetV1AvatarSend
@@ -2636,6 +2661,24 @@ paths:
       security:
         - APIKEY_1: []
           APIKEY_2: []
+  /v1/user/list:
+    get:
+      operationId: GetV1UserList
+      responses:
+        "200":
+          description: GET /v1/user/list Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetV1UserListSuccessfulResponse"
+        "400":
+          description: GET /v1/user/list Error response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetV1UserListErrorResponse"
+      tags:
+        - users
   /v1/avatar/send:
     get:
       operationId: GetV1AvatarSend
@@ -2870,6 +2913,17 @@ components:
           example:
             name: John Doe
             birthday: 1963-04-21
+    GetV1UserListSuccessfulResponse:
+      type: array
+      items:
+        type: object
+        properties:
+          name:
+            type: string
+        required:
+          - name
+    GetV1UserListErrorResponse:
+      type: string
     GetV1AvatarSendParameterUserid:
       type: string
       pattern: /\\d+/

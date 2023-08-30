@@ -5,6 +5,7 @@ import {
   defaultResultHandler,
   ez,
 } from "../src";
+import { arrayResultHandler } from "../src/result-handler";
 import { config } from "./config";
 import { authMiddleware } from "./middlewares";
 import { createReadStream } from "node:fs";
@@ -66,4 +67,9 @@ export const fileStreamingEndpointsFactory = new EndpointsFactory({
       }
     },
   }),
+});
+
+export const arrayRespondingFactory = new EndpointsFactory({
+  config,
+  resultHandler: arrayResultHandler,
 });
