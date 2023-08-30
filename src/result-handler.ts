@@ -106,6 +106,11 @@ export const defaultResultHandler = createResultHandler({
   },
 });
 
+/**
+ * @deprecated Resist the urge of using it: this handler is designed only to simplify the migration of legacy APIs.
+ * @desc Responding with array is a bad practice keeping your endpoints from evolving without breaking changes.
+ * @desc This handler expects your endpoint to have the property 'array' in the output object schema
+ * */
 export const arrayResultHandler = createResultHandler({
   getPositiveResponse: (output) =>
     "shape" in output &&
