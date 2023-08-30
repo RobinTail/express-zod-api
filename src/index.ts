@@ -11,7 +11,11 @@ export {
 } from "./common-helpers";
 export { createLogger } from "./logger";
 export { createMiddleware } from "./middleware";
-export { createResultHandler, defaultResultHandler } from "./result-handler";
+export {
+  createResultHandler,
+  defaultResultHandler,
+  arrayResultHandler,
+} from "./result-handler";
 export { DependsOnMethod } from "./depends-on-method";
 export { ServeStatic } from "./serve-static";
 export { Routing } from "./routing";

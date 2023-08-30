@@ -22,6 +22,14 @@ exports[`Index Entrypoint exports RoutingError should have certain value 1`] = `
 
 exports[`Index Entrypoint exports ServeStatic should have certain value 1`] = `[Function]`;
 
+exports[`Index Entrypoint exports arrayResultHandler should have certain value 1`] = `
+{
+  "getNegativeResponse": [Function],
+  "getPositiveResponse": [Function],
+  "handler": [Function],
+}
+`;
+
 exports[`Index Entrypoint exports attachRouting should have certain value 1`] = `[Function]`;
 
 exports[`Index Entrypoint exports createConfig should have certain value 1`] = `[Function]`;
@@ -88,6 +96,7 @@ exports[`Index Entrypoint exports should have certain entities exposed 1`] = `
   "createMiddleware",
   "createResultHandler",
   "defaultResultHandler",
+  "arrayResultHandler",
   "DependsOnMethod",
   "ServeStatic",
   "Routing",
