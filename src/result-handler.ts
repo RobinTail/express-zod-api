@@ -44,6 +44,27 @@ export const defaultStatusCodes = {
   negative: 400,
 };
 
+const logInternalErrors = ({
+  logger,
+  request,
+  input,
+  error,
+  statusCode,
+}: {
+  logger: Logger;
+  request: Request;
+  input: any;
+  error: Error;
+  statusCode: number;
+}) => {
+  if (statusCode === 500) {
+    logger.error(`Internal server error\n${error.stack}\n`, {
+      url: request.url,
+      payload: input,
+    });
+  }
+};
+
 export const createResultHandler = <
   POS extends z.ZodTypeAny,
   NEG extends z.ZodTypeAny,
@@ -93,12 +114,7 @@ export const defaultResultHandler = createResultHandler({
       return;
     }
     const statusCode = getStatusCodeFromError(error);
-    if (statusCode === 500) {
-      logger.error(`Internal server error\n${error.stack}\n`, {
-        url: request.url,
-        payload: input,
-      });
-    }
+    logInternalErrors({ logger, statusCode, request, error, input });
     response.status(statusCode).json({
       status: "error" as const,
       error: { message: getMessageFromError(error) },
@@ -122,12 +138,7 @@ export const arrayResultHandler = createResultHandler({
   handler: ({ response, output, error, logger, request, input }) => {
     if (error) {
       const statusCode = getStatusCodeFromError(error);
-      if (statusCode === 500) {
-        logger.error(`Internal server error\n${error.stack}\n`, {
-          url: request.url,
-          payload: input,
-        });
-      }
+      logInternalErrors({ logger, statusCode, request, error, input });
       response.status(statusCode).send(error.message);
       return;
     }
