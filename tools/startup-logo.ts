@@ -1,6 +1,7 @@
 import chalk from "chalk";
 import { format } from "pretty-format";
 import { writeFileSync } from "node:fs";
+import manifest from "../package.json";
 
 const attribution = `
 // ANSI font attribution
@@ -18,7 +19,10 @@ const slogan = chalk.italic(
 const thanks = chalk.italic(
   "Thank you for choosing Express Zod API for your project.".padStart(132),
 );
-const dedication = chalk.italic("for Adriana".padEnd(20));
+const dedication = chalk.italic("Adriana".padEnd(20));
+const version = chalk.italic(
+  `v${manifest.version.split(".")[0]} is for`.padEnd(17),
+);
 
 const logo = [
   chalk.blueBright(`\n
@@ -35,7 +39,7 @@ const logo = [
 8888888888 888  888 88888P"  888     "Y8888   88888P'  88888P'      d8888888888 "Y88P"   "Y88888      d88P     888 888       8888888`),
   chalk.blueBright(`
                     888
-                    888${proud}
+${version}   888${proud}
 ${dedication}888${slogan}`),
   chalk.grey(`\n${thanks}`),
   chalk.reset("\n\n"),
