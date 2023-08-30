@@ -108,7 +108,9 @@ export const defaultResultHandler = createResultHandler({
 
 export const arrayResultHandler = createResultHandler({
   getPositiveResponse: (output) =>
-    "shape" in output && "array" in output.shape
+    "shape" in output &&
+    "array" in output.shape &&
+    output.shape.array instanceof z.ZodArray
       ? output.shape.array
       : z.array(z.any()),
   getNegativeResponse: () => z.string(),
