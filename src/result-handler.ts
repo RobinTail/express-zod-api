@@ -128,7 +128,7 @@ export const arrayResultHandler = createResultHandler({
           payload: input,
         });
       }
-      response.status(getStatusCodeFromError(error)).send(error.message);
+      response.status(statusCode).send(error.message);
       return;
     }
     if ("array" in output && Array.isArray(output.array)) {
