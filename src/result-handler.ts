@@ -2,12 +2,13 @@ import { Request, Response } from "express";
 import { Logger } from "winston";
 import { z } from "zod";
 import { ApiResponse } from "./api-response";
-import { ResultHandlerError } from "./errors";
 import {
   getExamples,
   getMessageFromError,
   getStatusCodeFromError,
+  logInternalError,
 } from "./common-helpers";
+import { ResultHandlerError } from "./errors";
 import { IOSchema } from "./io-schema";
 import { withMeta } from "./metadata";
 
@@ -42,27 +43,6 @@ export interface ResultHandlerDefinition<
 export const defaultStatusCodes = {
   positive: 200,
   negative: 400,
-};
-
-const logInternalErrors = ({
-  logger,
-  request,
-  input,
-  error,
-  statusCode,
-}: {
-  logger: Logger;
-  request: Request;
-  input: any;
-  error: Error;
-  statusCode: number;
-}) => {
-  if (statusCode === 500) {
-    logger.error(`Internal server error\n${error.stack}\n`, {
-      url: request.url,
-      payload: input,
-    });
-  }
 };
 
 export const createResultHandler = <
@@ -114,7 +94,7 @@ export const defaultResultHandler = createResultHandler({
       return;
     }
     const statusCode = getStatusCodeFromError(error);
-    logInternalErrors({ logger, statusCode, request, error, input });
+    logInternalError({ logger, statusCode, request, error, input });
     response.status(statusCode).json({
       status: "error" as const,
       error: { message: getMessageFromError(error) },
@@ -138,7 +118,7 @@ export const arrayResultHandler = createResultHandler({
   handler: ({ response, output, error, logger, request, input }) => {
     if (error) {
       const statusCode = getStatusCodeFromError(error);
-      logInternalErrors({ logger, statusCode, request, error, input });
+      logInternalError({ logger, statusCode, request, error, input });
       response.status(statusCode).send(error.message);
       return;
     }
