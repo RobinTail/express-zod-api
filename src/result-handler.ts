@@ -106,6 +106,34 @@ export const defaultResultHandler = createResultHandler({
   },
 });
 
+export const arrayResultHandler = createResultHandler({
+  getPositiveResponse: (output) =>
+    "shape" in output && "array" in output.shape
+      ? output.shape.array
+      : z.array(z.any()),
+  getNegativeResponse: () => z.string(),
+  handler: ({ response, output, error, logger, request, input }) => {
+    if (error) {
+      const statusCode = getStatusCodeFromError(error);
+      if (statusCode === 500) {
+        logger.error(`Internal server error\n${error.stack}\n`, {
+          url: request.url,
+          payload: input,
+        });
+      }
+      response.status(getStatusCodeFromError(error)).send(error.message);
+      return;
+    }
+    if ("array" in output && Array.isArray(output.array)) {
+      response.status(200).json(output.array);
+    } else {
+      response
+        .status(500)
+        .send("Property 'array' is missing in the endpoint output");
+    }
+  },
+});
+
 export const lastResortHandler = ({
   error,
   logger,
