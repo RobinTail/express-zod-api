@@ -1,5 +1,38 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`ResultHandler defaultResultHandler Should handle HTTP error 1`] = `
+[
+  {
+    "error": {
+      "message": "Something not found",
+    },
+    "status": "error",
+  },
+]
+`;
+
+exports[`ResultHandler defaultResultHandler Should handle generic error 1`] = `
+[
+  {
+    "error": {
+      "message": "Some error",
+    },
+    "status": "error",
+  },
+]
+`;
+
+exports[`ResultHandler defaultResultHandler Should handle regular response 1`] = `
+[
+  {
+    "data": {
+      "anything": 118,
+    },
+    "status": "success",
+  },
+]
+`;
+
 exports[`ResultHandler defaultResultHandler Should handle schema error 1`] = `
 [
   {
@@ -9,4 +42,30 @@ exports[`ResultHandler defaultResultHandler Should handle schema error 1`] = `
     "status": "error",
   },
 ]
+`;
+
+exports[`ResultHandler defaultResultHandler should forward output schema examples 1`] = `
+{
+  "examples": [
+    {
+      "data": {
+        "str": "test",
+      },
+      "status": "success",
+    },
+  ],
+}
+`;
+
+exports[`ResultHandler defaultResultHandler should generate negative response example 1`] = `
+{
+  "examples": [
+    {
+      "error": {
+        "message": "Sample error message",
+      },
+      "status": "error",
+    },
+  ],
+}
 `;

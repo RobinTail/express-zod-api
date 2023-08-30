@@ -12,21 +12,21 @@ let loggerMock: any;
 let responseMock: any;
 
 describe("ResultHandler", () => {
-  describe("defaultResultHandler", () => {
-    beforeEach(() => {
-      loggerMock = {
-        info: jest.fn(),
-        warn: jest.fn(),
-        error: jest.fn(),
-        debug: jest.fn(),
-      };
-      responseMock = {
-        set: jest.fn().mockImplementation(() => responseMock),
-        status: jest.fn().mockImplementation(() => responseMock),
-        json: jest.fn().mockImplementation(() => responseMock),
-      };
-    });
+  beforeEach(() => {
+    loggerMock = {
+      info: jest.fn(),
+      warn: jest.fn(),
+      error: jest.fn(),
+      debug: jest.fn(),
+    };
+    responseMock = {
+      set: jest.fn().mockImplementation(() => responseMock),
+      status: jest.fn().mockImplementation(() => responseMock),
+      json: jest.fn().mockImplementation(() => responseMock),
+    };
+  });
 
+  describe("defaultResultHandler", () => {
     test("Should handle generic error", () => {
       const requestMock = {
         method: "POST",
@@ -53,12 +53,8 @@ describe("ResultHandler", () => {
         something: 453,
       });
       expect(responseMock.status).toBeCalledWith(500);
-      expect(responseMock.json).toBeCalledWith({
-        status: "error",
-        error: {
-          message: "Some error",
-        },
-      });
+      expect(responseMock.json).toHaveBeenCalledTimes(1);
+      expect(responseMock.json.mock.calls[0]).toMatchSnapshot();
     });
 
     test("Should handle schema error", () => {
@@ -86,6 +82,7 @@ describe("ResultHandler", () => {
       });
       expect(loggerMock.error).toBeCalledTimes(0);
       expect(responseMock.status).toBeCalledWith(400);
+      expect(responseMock.json).toHaveBeenCalledTimes(1);
       expect(responseMock.json.mock.calls[0]).toMatchSnapshot();
     });
 
@@ -104,12 +101,8 @@ describe("ResultHandler", () => {
       });
       expect(loggerMock.error).toBeCalledTimes(0);
       expect(responseMock.status).toBeCalledWith(404);
-      expect(responseMock.json).toBeCalledWith({
-        status: "error",
-        error: {
-          message: "Something not found",
-        },
-      });
+      expect(responseMock.json).toHaveBeenCalledTimes(1);
+      expect(responseMock.json.mock.calls[0]).toMatchSnapshot();
     });
 
     test("Should handle regular response", () => {
@@ -127,12 +120,8 @@ describe("ResultHandler", () => {
       });
       expect(loggerMock.error).toBeCalledTimes(0);
       expect(responseMock.status).toBeCalledWith(200);
-      expect(responseMock.json).toBeCalledWith({
-        status: "success",
-        data: {
-          anything: 118,
-        },
-      });
+      expect(responseMock.json).toHaveBeenCalledTimes(1);
+      expect(responseMock.json.mock.calls[0]).toMatchSnapshot();
     });
 
     test("should forward output schema examples", () => {
@@ -148,16 +137,7 @@ describe("ResultHandler", () => {
       if (!(apiResponse instanceof z.ZodType)) {
         fail(new Error("should not be here"));
       }
-      expect(apiResponse._def[metaProp]).toEqual({
-        examples: [
-          {
-            status: "success",
-            data: {
-              str: "test",
-            },
-          },
-        ],
-      });
+      expect(apiResponse._def[metaProp]).toMatchSnapshot();
     });
 
     test("should generate negative response example", () => {
@@ -165,16 +145,7 @@ describe("ResultHandler", () => {
       if (!(apiResponse instanceof z.ZodType)) {
         fail(new Error("should not be here"));
       }
-      expect(apiResponse._def[metaProp]).toEqual({
-        examples: [
-          {
-            status: "error",
-            error: {
-              message: "Sample error message",
-            },
-          },
-        ],
-      });
+      expect(apiResponse._def[metaProp]).toMatchSnapshot();
     });
   });
 });
