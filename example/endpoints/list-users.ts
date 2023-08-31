@@ -12,6 +12,7 @@ export const listUsersEndpoint = arrayRespondingFactory.build({
   input: z.object({}),
   output: withMeta(
     z.object({
+      // the arrayResultHandler will take the "array" prop as the response
       array: z.array(
         z.object({
           name: z.string(),
