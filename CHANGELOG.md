@@ -8,10 +8,10 @@
 - New feature: `arrayResultHandler` (and corresponding `arrayEndpointsFactory`).
   - Please avoid using them for new projects: responding with array is a bad practice keeping your endpoints from
     evolving without breaking changes.
-  - This result handler expects your endpoint to have the property named `array` in its output schema.
-  - The `array` property should be the `ZodArray` schema.
+  - This result handler expects your endpoint to have the property named `items` in its output schema.
+  - The `items` property should be the `ZodArray` schema.
   - The value of that property is used as the response.
-  - Missing the `array` property will result in internal error (status code `500`).
+  - Missing the `items` property will result in internal error (status code `500`).
   - The negative response schema is `z.string()`, meaning that in case of error the response will be its plain message.
   - The result handler also supports examples, as well as documentation and client generation.
   - Check out the [example endpoint](/example/endpoints/list-users.ts) for details.

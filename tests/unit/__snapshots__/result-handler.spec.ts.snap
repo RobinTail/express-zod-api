@@ -28,9 +28,9 @@ exports[`ResultHandler arrayResultHandler Should handle schema error 1`] = `
 ]
 `;
 
-exports[`ResultHandler arrayResultHandler should fail when there is no array prop in the output 1`] = `
+exports[`ResultHandler arrayResultHandler should fail when there is no items prop in the output 1`] = `
 [
-  "Property 'array' is missing in the endpoint output",
+  "Property 'items' is missing in the endpoint output",
 ]
 `;
 
@@ -81,7 +81,7 @@ exports[`ResultHandler defaultResultHandler Should handle regular response 1`] =
   {
     "data": {
       "anything": 118,
-      "array": [
+      "items": [
         "One",
         "Two",
         "Three",
@@ -108,7 +108,7 @@ exports[`ResultHandler defaultResultHandler should forward output schema example
   "examples": [
     {
       "data": {
-        "array": [
+        "items": [
           "One",
           "Two",
           "Three",

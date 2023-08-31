@@ -131,7 +131,7 @@ describe("ResultHandler", () => {
         handler({
           error: null,
           input: { something: 453 },
-          output: { anything: 118, array: ["One", "Two", "Three"] },
+          output: { anything: 118, items: ["One", "Two", "Three"] },
           request: requestMock as Request,
           response: responseMock as Response,
           logger: loggerMock,
@@ -147,11 +147,11 @@ describe("ResultHandler", () => {
           withMeta(
             z.object({
               str: z.string(),
-              array: z.array(z.string()),
+              items: z.array(z.string()),
             }),
           ).example({
             str: "test",
-            array: ["One", "Two", "Three"],
+            items: ["One", "Two", "Three"],
           }),
         );
         if (!(apiResponse instanceof z.ZodType)) {
@@ -170,7 +170,7 @@ describe("ResultHandler", () => {
     },
   );
 
-  test("arrayResultHandler should fail when there is no array prop in the output", () => {
+  test("arrayResultHandler should fail when there is no items prop in the output", () => {
     const requestMock = {
       method: "POST",
       url: "http://something/v1/anything",

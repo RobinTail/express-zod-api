@@ -12,22 +12,22 @@ export const listUsersEndpoint = arrayRespondingFactory.build({
   input: z.object({}),
   output: withMeta(
     z.object({
-      // the arrayResultHandler will take the "array" prop as the response
-      array: z.array(
+      // the arrayResultHandler will take the "items" prop as the response
+      items: z.array(
         z.object({
           name: z.string(),
         }),
       ),
     }),
   ).example({
-    array: [
+    items: [
       { name: "Hunter Schafer" },
       { name: "Laverne Cox" },
       { name: "Patti Harrison" },
     ],
   }),
   handler: async () => ({
-    array: [
+    items: [
       { name: "Maria Merian" },
       { name: "Mary Anning" },
       { name: "Marie Skłodowska Curie" },
