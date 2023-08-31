@@ -1,4 +1,5 @@
 import { DependsOnMethod, Routing, ServeStatic } from "../src";
+import { listUsersEndpoint } from "./endpoints/list-users";
 import { uploadAvatarEndpoint } from "./endpoints/upload-avatar";
 import { retrieveUserEndpoint } from "./endpoints/retrieve-user";
 import { sendAvatarEndpoint } from "./endpoints/send-avatar";
@@ -15,6 +16,8 @@ export const routing: Routing = {
       ":id": new DependsOnMethod({
         post: updateUserEndpoint, // the Endpoint should have at least the same method specified in .build()
       }),
+      // this one demonstrates the legacy array based response
+      list: listUsersEndpoint,
     },
     avatar: {
       // custom result handler examples with a file serving

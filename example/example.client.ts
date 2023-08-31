@@ -50,6 +50,14 @@ type PostV1UserIdResponse =
       };
     };
 
+type GetV1UserListInput = {};
+
+type GetV1UserListResponse =
+  | {
+      name: string;
+    }[]
+  | string;
+
 type GetV1AvatarSendInput = {
   userId: string;
 };
@@ -87,6 +95,7 @@ type PostV1AvatarUploadResponse =
 export type Path =
   | "/v1/user/retrieve"
   | "/v1/user/:id"
+  | "/v1/user/list"
   | "/v1/avatar/send"
   | "/v1/avatar/stream"
   | "/v1/avatar/upload";
@@ -98,6 +107,7 @@ export type MethodPath = `${Method} ${Path}`;
 export interface Input extends Record<MethodPath, any> {
   "get /v1/user/retrieve": GetV1UserRetrieveInput;
   "post /v1/user/:id": PostV1UserIdInput;
+  "get /v1/user/list": GetV1UserListInput;
   "get /v1/avatar/send": GetV1AvatarSendInput;
   "get /v1/avatar/stream": GetV1AvatarStreamInput;
   "post /v1/avatar/upload": PostV1AvatarUploadInput;
@@ -106,6 +116,7 @@ export interface Input extends Record<MethodPath, any> {
 export interface Response extends Record<MethodPath, any> {
   "get /v1/user/retrieve": GetV1UserRetrieveResponse;
   "post /v1/user/:id": PostV1UserIdResponse;
+  "get /v1/user/list": GetV1UserListResponse;
   "get /v1/avatar/send": GetV1AvatarSendResponse;
   "get /v1/avatar/stream": GetV1AvatarStreamResponse;
   "post /v1/avatar/upload": PostV1AvatarUploadResponse;
@@ -114,12 +125,14 @@ export interface Response extends Record<MethodPath, any> {
 export const jsonEndpoints = {
   "get /v1/user/retrieve": true,
   "post /v1/user/:id": true,
+  "get /v1/user/list": true,
   "post /v1/avatar/upload": true,
 };
 
 export const endpointTags = {
   "get /v1/user/retrieve": ["users"],
   "post /v1/user/:id": ["users"],
+  "get /v1/user/list": ["users"],
   "get /v1/avatar/send": ["files", "users"],
   "get /v1/avatar/stream": ["users", "files"],
   "post /v1/avatar/upload": ["files"],
