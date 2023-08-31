@@ -5,8 +5,8 @@
 ### v11.7.0
 
 - Good news for array lovers and those struggling with migrating legacy APIs to use this library.
-- New feature: `arrayResultHandler`.
-  - Please avoid using it for new projects: responding with array is a bad practice keeping your endpoints from
+- New feature: `arrayResultHandler` (and corresponding `arrayEndpointsFactory`).
+  - Please avoid using them for new projects: responding with array is a bad practice keeping your endpoints from
     evolving without breaking changes.
   - This result handler expects your endpoint to have the property named `array` in its output schema.
   - The `array` property should be the `ZodArray` schema.
