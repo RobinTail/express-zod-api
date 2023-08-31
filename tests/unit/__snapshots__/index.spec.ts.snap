@@ -22,6 +22,18 @@ exports[`Index Entrypoint exports RoutingError should have certain value 1`] = `
 
 exports[`Index Entrypoint exports ServeStatic should have certain value 1`] = `[Function]`;
 
+exports[`Index Entrypoint exports arrayEndpointsFactory should have certain value 1`] = `
+EndpointsFactory {
+  "middlewares": [],
+  "resultHandler": {
+    "getNegativeResponse": [Function],
+    "getPositiveResponse": [Function],
+    "handler": [Function],
+  },
+  "use": [Function],
+}
+`;
+
 exports[`Index Entrypoint exports arrayResultHandler should have certain value 1`] = `
 {
   "getNegativeResponse": [Function],
@@ -87,6 +99,7 @@ exports[`Index Entrypoint exports should have certain entities exposed 1`] = `
   "Method",
   "EndpointsFactory",
   "defaultEndpointsFactory",
+  "arrayEndpointsFactory",
   "IOSchema",
   "FlatObject",
   "getExamples",

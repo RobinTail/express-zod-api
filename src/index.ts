@@ -1,7 +1,11 @@
 export { createConfig, LoggerConfig } from "./config-type";
 export { AbstractEndpoint } from "./endpoint";
 export { Method } from "./method";
-export { EndpointsFactory, defaultEndpointsFactory } from "./endpoints-factory";
+export {
+  EndpointsFactory,
+  defaultEndpointsFactory,
+  arrayEndpointsFactory,
+} from "./endpoints-factory";
 export { IOSchema } from "./io-schema";
 export {
   FlatObject,
