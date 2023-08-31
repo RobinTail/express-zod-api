@@ -147,9 +147,11 @@ describe("ResultHandler", () => {
           withMeta(
             z.object({
               str: z.string(),
+              array: z.array(z.string()),
             }),
           ).example({
             str: "test",
+            array: ["One", "Two", "Three"],
           }),
         );
         if (!(apiResponse instanceof z.ZodType)) {

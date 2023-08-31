@@ -108,15 +108,28 @@ export const defaultResultHandler = createResultHandler({
  * @desc This handler expects your endpoint to have the property 'array' in the output object schema
  * */
 export const arrayResultHandler = createResultHandler({
-  getPositiveResponse: (output) =>
-    withMeta(
+  getPositiveResponse: (output) => {
+    // Examples are taken for proxying: no validation needed for this
+    const examples = getExamples({ schema: output });
+    const responseSchema = withMeta(
       "shape" in output &&
         "array" in output.shape &&
         output.shape.array instanceof z.ZodArray
         ? output.shape.array
         : z.array(z.any()),
+    );
+    return examples.reduce<typeof responseSchema>(
+      (acc, example) =>
+        typeof example === "object" && example !== null && "array" in example
+          ? acc.example(example.array)
+          : acc,
+      responseSchema,
+    );
+  },
+  getNegativeResponse: () =>
+    withMeta(z.string()).example(
+      getMessageFromError(new Error("Sample error message")),
     ),
-  getNegativeResponse: () => withMeta(z.string()),
   handler: ({ response, output, error, logger, request, input }) => {
     if (error) {
       const statusCode = getStatusCodeFromError(error);

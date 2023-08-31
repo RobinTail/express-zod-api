@@ -30,13 +30,21 @@ exports[`ResultHandler arrayResultHandler Should handle schema error 1`] = `
 
 exports[`ResultHandler arrayResultHandler should forward output schema examples 1`] = `
 {
-  "examples": [],
+  "examples": [
+    [
+      "One",
+      "Two",
+      "Three",
+    ],
+  ],
 }
 `;
 
 exports[`ResultHandler arrayResultHandler should generate negative response example 1`] = `
 {
-  "examples": [],
+  "examples": [
+    "Sample error message",
+  ],
 }
 `;
 
@@ -94,6 +102,11 @@ exports[`ResultHandler defaultResultHandler should forward output schema example
   "examples": [
     {
       "data": {
+        "array": [
+          "One",
+          "Two",
+          "Three",
+        ],
         "str": "test",
       },
       "status": "success",

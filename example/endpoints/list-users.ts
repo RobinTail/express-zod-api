@@ -1,16 +1,25 @@
 import z from "zod";
+import { withMeta } from "../../src";
 import { arrayRespondingFactory } from "../factories";
 
 export const listUsersEndpoint = arrayRespondingFactory.build({
   method: "get",
   tag: "users",
   input: z.object({}),
-  output: z.object({
-    array: z.array(
-      z.object({
-        name: z.string(),
-      }),
-    ),
+  output: withMeta(
+    z.object({
+      array: z.array(
+        z.object({
+          name: z.string(),
+        }),
+      ),
+    }),
+  ).example({
+    array: [
+      { name: "Hunter Schafer" },
+      { name: "Laverne Cox" },
+      { name: "Patti Harrison" },
+    ],
   }),
   handler: async () => ({
     array: [
