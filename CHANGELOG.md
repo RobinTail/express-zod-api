@@ -13,7 +13,7 @@
   - The value of that property is used as the response.
   - Missing the `array` property will result in internal error (status code `500`).
   - The negative response schema is `z.string()`, meaning that in case of error the response will be its plain message.
-  - The result handler also supports examples, being supported by documentation and client generators.
+  - The result handler also supports examples, as well as documentation and client generation.
   - Check out the [example endpoint](/example/endpoints/list-users.ts) for details.
 - This version also contains a corresponding fix:
   - Fixed depicting the examples in case of `z.array()` and `z.string()` as response schemas in `ResultHandler`.
