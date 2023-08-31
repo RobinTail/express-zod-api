@@ -28,6 +28,12 @@ exports[`ResultHandler arrayResultHandler Should handle schema error 1`] = `
 ]
 `;
 
+exports[`ResultHandler arrayResultHandler should fail when there is no array prop in the output 1`] = `
+[
+  "Property 'array' is missing in the endpoint output",
+]
+`;
+
 exports[`ResultHandler arrayResultHandler should forward output schema examples 1`] = `
 {
   "examples": [

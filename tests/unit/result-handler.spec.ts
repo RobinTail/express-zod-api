@@ -169,4 +169,23 @@ describe("ResultHandler", () => {
       });
     },
   );
+
+  test("arrayResultHandler should fail when there is no array prop in the output", () => {
+    const requestMock = {
+      method: "POST",
+      url: "http://something/v1/anything",
+    };
+    arrayResultHandler.handler({
+      error: null,
+      input: { something: 453 },
+      output: { anything: 118 },
+      request: requestMock as Request,
+      response: responseMock as Response,
+      logger: loggerMock,
+    });
+    expect(loggerMock.error).toBeCalledTimes(0);
+    expect(responseMock.status).toBeCalledWith(500);
+    expect(responseMock.send).toHaveBeenCalledTimes(1);
+    expect(responseMock.send.mock.calls[0]).toMatchSnapshot();
+  });
 });
