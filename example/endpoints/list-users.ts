@@ -2,6 +2,10 @@ import z from "zod";
 import { withMeta } from "../../src";
 import { arrayRespondingFactory } from "../factories";
 
+/**
+ * This endpoint demonstrates the ability to respond with array.
+ * Avoid doing this in new projects. This feature is only for easier migration of legacy APIs.
+ * */
 export const listUsersEndpoint = arrayRespondingFactory.build({
   method: "get",
   tag: "users",
