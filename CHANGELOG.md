@@ -2262,7 +2262,7 @@ const fileStreamingEndpointsFactoryAfter = new EndpointsFactory(
 ### v2.0.0
 
 - First stable release of the v2.
-- All dependencies are up to date.
+- All dependencies are up-to-date.
 - Minor changes of response descriptions in OpenAPI / Swagger documentation generator.
 
 ### v2.0.0-beta4
