@@ -589,7 +589,7 @@ Please avoid doing this in new projects: responding with array is a bad practice
 in backward compatible way (without making breaking changes). Nevertheless, for the purpose of easier migration of
 legacy APIs to this library consider using `arrayResultHandler` or `arrayEndpointsFactory` instead of default ones,
 or implement your own ones in a similar way.
-The `arrayResultHandler` expects your endpoint to have `array` property in the `output` object schema. The array
+The `arrayResultHandler` expects your endpoint to have `items` property in the `output` object schema. The array
 assigned to that property is used as the response. This approach also supports examples, as well as documentation and
 client generation. Check out [the example endpoint](/example/endpoints/list-users.ts) for more details.
 

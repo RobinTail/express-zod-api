@@ -180,6 +180,6 @@ export const defaultEndpointsFactory = new EndpointsFactory(
 /**
  * @deprecated Resist the urge of using it: this factory is designed only to simplify the migration of legacy APIs.
  * @desc Responding with array is a bad practice keeping your endpoints from evolving without breaking changes.
- * @desc The result handler of this factory expects your endpoint to have the property 'array' in the output schema
+ * @desc The result handler of this factory expects your endpoint to have the property 'items' in the output schema
  */
 export const arrayEndpointsFactory = new EndpointsFactory(arrayResultHandler);

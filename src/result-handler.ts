@@ -105,7 +105,7 @@ export const defaultResultHandler = createResultHandler({
 /**
  * @deprecated Resist the urge of using it: this handler is designed only to simplify the migration of legacy APIs.
  * @desc Responding with array is a bad practice keeping your endpoints from evolving without breaking changes.
- * @desc This handler expects your endpoint to have the property 'array' in the output object schema
+ * @desc This handler expects your endpoint to have the property 'items' in the output object schema
  * */
 export const arrayResultHandler = createResultHandler({
   getPositiveResponse: (output) => {
@@ -113,15 +113,15 @@ export const arrayResultHandler = createResultHandler({
     const examples = getExamples({ schema: output });
     const responseSchema = withMeta(
       "shape" in output &&
-        "array" in output.shape &&
-        output.shape.array instanceof z.ZodArray
-        ? output.shape.array
+        "items" in output.shape &&
+        output.shape.items instanceof z.ZodArray
+        ? output.shape.items
         : z.array(z.any()),
     );
     return examples.reduce<typeof responseSchema>(
       (acc, example) =>
-        typeof example === "object" && example !== null && "array" in example
-          ? acc.example(example.array)
+        typeof example === "object" && example !== null && "items" in example
+          ? acc.example(example.items)
           : acc,
       responseSchema,
     );
@@ -137,12 +137,12 @@ export const arrayResultHandler = createResultHandler({
       response.status(statusCode).send(error.message);
       return;
     }
-    if ("array" in output && Array.isArray(output.array)) {
-      response.status(200).json(output.array);
+    if ("items" in output && Array.isArray(output.items)) {
+      response.status(200).json(output.items);
     } else {
       response
         .status(500)
-        .send("Property 'array' is missing in the endpoint output");
+        .send("Property 'items' is missing in the endpoint output");
     }
   },
 });
