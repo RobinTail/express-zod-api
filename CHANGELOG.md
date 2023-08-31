@@ -4,7 +4,7 @@
 
 ### v11.7.0
 
-- Good news for array lovers and those who struggles migrating their legacy APIs to using this library.
+- Good news for array lovers and those struggling with migrating legacy APIs to use this library.
 - New feature: `arrayResultHandler`.
   - Please avoid using it for new projects: responding with array is a bad practice keeping your endpoints from
     evolving without breaking changes.
