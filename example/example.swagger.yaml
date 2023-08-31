@@ -428,5 +428,5 @@ tags:
   - name: files
     description: Everything about the files processing
 servers:
-  - url: http://example.com
+  - url: https://example.com
 

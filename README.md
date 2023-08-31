@@ -755,7 +755,7 @@ createConfig({
 
 ## Enabling compression
 
-According to [Express JS best practices guide](http://expressjs.com/en/advanced/best-practice-performance.html)
+According to [Express.js best practices guide](http://expressjs.com/en/advanced/best-practice-performance.html)
 it might be a good idea to enable GZIP compression of your API responses. You can achieve and customize it by using the
 corresponding configuration option when using the `createServer()` method.
 
@@ -972,7 +972,7 @@ Despite being supported by the library, `z.coerce.*` schema
 Please be aware that `z.coerce.number()` and `z.number({ coerce: true })` (being typed not well) still will NOT allow
 you to assign anything but number. Moreover, coercive schemas are not fail-safe and their methods `.isOptional()` and
 `.isNullable()` [are buggy](https://github.com/colinhacks/zod/issues/1911). If possible, try to avoid using this type
-of schemas. This issue [will NOT be fixed](https://github.com/colinhacks/zod/issues/1760#issuecomment-1407816838) in
+of schema. This issue [will NOT be fixed](https://github.com/colinhacks/zod/issues/1760#issuecomment-1407816838) in
 Zod version 3.x.
 
 ## Excessive properties in endpoint output
