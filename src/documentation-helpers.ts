@@ -570,7 +570,9 @@ export const depictExamples = (
         ...carry,
         [`example${index + 1}`]: <ExampleObject>{
           value:
-            typeof example === "object" ? omit(omitProps, example) : example,
+            typeof example === "object" && !Array.isArray(example)
+              ? omit(omitProps, example)
+              : example,
         },
       }),
       {},

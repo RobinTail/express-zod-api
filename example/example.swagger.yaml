@@ -234,12 +234,9 @@ paths:
               examples:
                 example1:
                   value:
-                    "0":
-                      name: Hunter Schafer
-                    "1":
-                      name: Laverne Cox
-                    "2":
-                      name: Patti Harrison
+                    - name: Hunter Schafer
+                    - name: Laverne Cox
+                    - name: Patti Harrison
         "400":
           description: GET /v1/user/list Error response
           content:
