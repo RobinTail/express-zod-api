@@ -16,7 +16,7 @@ export const routing: Routing = {
       ":id": new DependsOnMethod({
         post: updateUserEndpoint, // the Endpoint should have at least the same method specified in .build()
       }),
-      // this one has a legacy array based response
+      // this one demonstrates the legacy array based response
       list: listUsersEndpoint,
     },
     avatar: {
