@@ -1,5 +1,97 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`ResultHandler arrayResultHandler Should handle HTTP error 1`] = `
+[
+  "Something not found",
+]
+`;
+
+exports[`ResultHandler arrayResultHandler Should handle generic error 1`] = `
+[
+  "Some error",
+]
+`;
+
+exports[`ResultHandler arrayResultHandler Should handle regular response 1`] = `
+[
+  [
+    "One",
+    "Two",
+    "Three",
+  ],
+]
+`;
+
+exports[`ResultHandler arrayResultHandler Should handle schema error 1`] = `
+[
+  "something: Expected string, got number",
+]
+`;
+
+exports[`ResultHandler arrayResultHandler should fail when there is no items prop in the output 1`] = `
+[
+  "Property 'items' is missing in the endpoint output",
+]
+`;
+
+exports[`ResultHandler arrayResultHandler should forward output schema examples 1`] = `
+{
+  "examples": [
+    [
+      "One",
+      "Two",
+      "Three",
+    ],
+  ],
+}
+`;
+
+exports[`ResultHandler arrayResultHandler should generate negative response example 1`] = `
+{
+  "examples": [
+    "Sample error message",
+  ],
+}
+`;
+
+exports[`ResultHandler defaultResultHandler Should handle HTTP error 1`] = `
+[
+  {
+    "error": {
+      "message": "Something not found",
+    },
+    "status": "error",
+  },
+]
+`;
+
+exports[`ResultHandler defaultResultHandler Should handle generic error 1`] = `
+[
+  {
+    "error": {
+      "message": "Some error",
+    },
+    "status": "error",
+  },
+]
+`;
+
+exports[`ResultHandler defaultResultHandler Should handle regular response 1`] = `
+[
+  {
+    "data": {
+      "anything": 118,
+      "items": [
+        "One",
+        "Two",
+        "Three",
+      ],
+    },
+    "status": "success",
+  },
+]
+`;
+
 exports[`ResultHandler defaultResultHandler Should handle schema error 1`] = `
 [
   {
@@ -9,4 +101,35 @@ exports[`ResultHandler defaultResultHandler Should handle schema error 1`] = `
     "status": "error",
   },
 ]
+`;
+
+exports[`ResultHandler defaultResultHandler should forward output schema examples 1`] = `
+{
+  "examples": [
+    {
+      "data": {
+        "items": [
+          "One",
+          "Two",
+          "Three",
+        ],
+        "str": "test",
+      },
+      "status": "success",
+    },
+  ],
+}
+`;
+
+exports[`ResultHandler defaultResultHandler should generate negative response example 1`] = `
+{
+  "examples": [
+    {
+      "error": {
+        "message": "Sample error message",
+      },
+      "status": "error",
+    },
+  ],
+}
 `;

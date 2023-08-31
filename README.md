@@ -35,19 +35,20 @@ Start your API server with I/O schema validation and custom middlewares in minut
    7. [Route path params](#route-path-params)
    8. [Response customization](#response-customization)
    9. [Non-object response](#non-object-response) including file downloads
-   10. [Using native express middlewares](#using-native-express-middlewares)
-   11. [File uploads](#file-uploads)
-   12. [Customizing logger](#customizing-logger)
-   13. [Connect to your own express app](#connect-to-your-own-express-app)
-   14. [Multiple schemas for one route](#multiple-schemas-for-one-route)
-   15. [Serving static files](#serving-static-files)
-   16. [Customizing input sources](#customizing-input-sources)
-   17. [Enabling compression](#enabling-compression)
-   18. [Enabling HTTPS](#enabling-https)
-   19. [Generating a Frontend Client](#generating-a-frontend-client)
-   20. [Creating a documentation](#creating-a-documentation)
-   21. [Tagging the endpoints](#tagging-the-endpoints)
-   22. [How to test endpoints](#how-to-test-endpoints)
+   10. [Array response](#array-response) for migrating legacy APIs
+   11. [Using native express middlewares](#using-native-express-middlewares)
+   12. [File uploads](#file-uploads)
+   13. [Customizing logger](#customizing-logger)
+   14. [Connect to your own express app](#connect-to-your-own-express-app)
+   15. [Multiple schemas for one route](#multiple-schemas-for-one-route)
+   16. [Serving static files](#serving-static-files)
+   17. [Customizing input sources](#customizing-input-sources)
+   18. [Enabling compression](#enabling-compression)
+   19. [Enabling HTTPS](#enabling-https)
+   20. [Generating a Frontend Client](#generating-a-frontend-client)
+   21. [Creating a documentation](#creating-a-documentation)
+   22. [Tagging the endpoints](#tagging-the-endpoints)
+   23. [How to test endpoints](#how-to-test-endpoints)
 5. [Caveats](#caveats)
    1. [Coercive schema of Zod](#coercive-schema-of-zod)
    2. [Excessive properties in endpoint output](#excessive-properties-in-endpoint-output)
@@ -581,6 +582,16 @@ const fileStreamingEndpointsFactory = new EndpointsFactory(
   }),
 );
 ```
+
+## Array response
+
+Please avoid doing this in new projects: responding with array is a bad practice keeping your endpoints from evolving
+in backward compatible way (without making breaking changes). Nevertheless, for the purpose of easier migration of
+legacy APIs to this library consider using `arrayResultHandler` or `arrayEndpointsFactory` instead of default ones,
+or implement your own ones in a similar way.
+The `arrayResultHandler` expects your endpoint to have `items` property in the `output` object schema. The array
+assigned to that property is used as the response. This approach also supports examples, as well as documentation and
+client generation. Check out [the example endpoint](/example/endpoints/list-users.ts) for more details.
 
 ## Using native express middlewares
 

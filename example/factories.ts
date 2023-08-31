@@ -1,6 +1,7 @@
 import mime from "mime";
 import {
   EndpointsFactory,
+  arrayResultHandler,
   createResultHandler,
   defaultResultHandler,
   ez,
@@ -66,4 +67,9 @@ export const fileStreamingEndpointsFactory = new EndpointsFactory({
       }
     },
   }),
+});
+
+export const arrayRespondingFactory = new EndpointsFactory({
+  config,
+  resultHandler: arrayResultHandler,
 });

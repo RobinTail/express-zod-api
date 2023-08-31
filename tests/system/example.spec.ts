@@ -114,6 +114,22 @@ describe("Example", () => {
       expect(true).toBeTruthy();
     });
 
+    test("Should respond with array (legacy API ResultHandler)", async () => {
+      const response = await fetch("http://localhost:8090/v1/user/list");
+      expect(response.status).toBe(200);
+      const json = await response.json();
+      expect(json).toEqual([
+        { name: "Maria Merian" },
+        { name: "Mary Anning" },
+        { name: "Marie Skłodowska Curie" },
+        { name: "Henrietta Leavitt" },
+        { name: "Lise Meitner" },
+        { name: "Alice Ball" },
+        { name: "Gerty Cori" },
+        { name: "Helen Taussig" },
+      ]);
+    });
+
     test("Should send an image with a correct header", async () => {
       const response = await fetch(
         "http://localhost:8090/v1/avatar/send?userId=123",

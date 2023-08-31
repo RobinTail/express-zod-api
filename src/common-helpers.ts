@@ -1,6 +1,7 @@
-import { createHash } from "node:crypto";
 import { Request } from "express";
 import { HttpError } from "http-errors";
+import { createHash } from "node:crypto";
+import { Logger } from "winston";
 import { z } from "zod";
 import {
   CommonConfig,
@@ -112,6 +113,27 @@ export function getStatusCodeFromError(error: Error): number {
   }
   return 500;
 }
+
+export const logInternalError = ({
+  logger,
+  request,
+  input,
+  error,
+  statusCode,
+}: {
+  logger: Logger;
+  request: Request;
+  input: any;
+  error: Error;
+  statusCode: number;
+}) => {
+  if (statusCode === 500) {
+    logger.error(`Internal server error\n${error.stack}\n`, {
+      url: request.url,
+      payload: input,
+    });
+  }
+};
 
 export const getExamples = <
   T extends z.ZodTypeAny,

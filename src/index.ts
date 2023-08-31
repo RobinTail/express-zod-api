@@ -1,7 +1,11 @@
 export { createConfig, LoggerConfig } from "./config-type";
 export { AbstractEndpoint } from "./endpoint";
 export { Method } from "./method";
-export { EndpointsFactory, defaultEndpointsFactory } from "./endpoints-factory";
+export {
+  EndpointsFactory,
+  defaultEndpointsFactory,
+  arrayEndpointsFactory,
+} from "./endpoints-factory";
 export { IOSchema } from "./io-schema";
 export {
   FlatObject,
@@ -11,7 +15,11 @@ export {
 } from "./common-helpers";
 export { createLogger } from "./logger";
 export { createMiddleware } from "./middleware";
-export { createResultHandler, defaultResultHandler } from "./result-handler";
+export {
+  createResultHandler,
+  defaultResultHandler,
+  arrayResultHandler,
+} from "./result-handler";
 export { DependsOnMethod } from "./depends-on-method";
 export { ServeStatic } from "./serve-static";
 export { Routing } from "./routing";
