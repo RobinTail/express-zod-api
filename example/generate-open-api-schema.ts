@@ -9,6 +9,6 @@ console.log(
     config,
     version: manifest.version,
     title: "Example API",
-    serverUrl: "http://example.com",
+    serverUrl: "https://example.com",
   }).getSpecAsYaml(),
 );
