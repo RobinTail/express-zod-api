@@ -962,7 +962,7 @@ properties as needed._
 
 # Caveats
 
-There are some well-known issue and limitations, or third party bugs that cannot be fixed in the usual way, but you
+There are some well-known issues and limitations, or third party bugs that cannot be fixed in the usual way, but you
 should be aware of them.
 
 ## Coercive schema of Zod
