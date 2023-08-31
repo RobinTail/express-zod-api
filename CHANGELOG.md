@@ -10,7 +10,7 @@
     evolving without breaking changes.
   - This result handler expects your endpoint to have the property named `array` in its output schema.
   - The `array` property should be the `ZodArray` schema.
-  - The value of that property used as the response.
+  - The value of that property is used as the response.
   - Missing the `array` property will result in internal error (status code `500`).
   - The negative response schema is `z.string()`, meaning that in case of error the response will be its plain message.
   - The result handler also supports examples, being supported by documentation and client generators.
