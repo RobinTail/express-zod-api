@@ -2,6 +2,52 @@
 
 ## Version 11
 
+### v11.7.0
+
+- Good news for array lovers and those who struggles migrating their legacy APIs to using this library.
+- New feature: `arrayResultHandler`.
+  - Please avoid using it for new projects: responding with array is a bad practice keeping your endpoints from
+    evolving without breaking changes.
+  - This result handler expects your endpoint to have the property named `array` in its output schema.
+  - The `array` property should be the `ZodArray` schema.
+  - The value of that property used as the response.
+  - Missing the `array` property will result in internal error (status code `500`).
+  - The negative response schema is `z.string()`, meaning that in case of error the response will be its plain message.
+  - The result handler also supports examples, being supported by documentation and client generators.
+  - Check out the [example endpoint](/example/endpoints/list-users.ts) for details.
+- This version also contains a corresponding fix:
+  - Fixed depicting the examples in case of `z.array()` and `z.string()` as response schemas in `ResultHandler`.
+
+```yaml
+before:
+  examples:
+    arrayResponseExample:
+      value:
+        "0":
+          name: Hunter Schafer
+        "1":
+          name: Laverne Cox
+        "2":
+          name: Patti Harrison
+    stringResponseExample:
+      value:
+        "0": S
+        "1": a
+        "2": m
+        "3": p
+        "4": l
+        "5": e
+after:
+  examples:
+    arrayResponseExample:
+      value:
+        - name: Hunter Schafer
+        - name: Laverne Cox
+        - name: Patti Harrison
+    stringResponseExample:
+      value: Sample
+```
+
 ### v11.6.0
 
 - The generated client is now equipped with the `endpointTags` constant that can be involved into your implementation.
