@@ -35,7 +35,9 @@ export interface ResultHandlerDefinition<
   POS extends z.ZodTypeAny,
   NEG extends z.ZodTypeAny,
 > {
-  getPositiveResponse: (output: IOSchema) => POS | ApiResponse<POS>;
+  getPositiveResponse: <T extends IOSchema>(
+    output: T,
+  ) => POS | ApiResponse<POS>;
   getNegativeResponse: () => NEG | ApiResponse<NEG>;
   handler: ResultHandler<z.output<POS> | z.output<NEG>>;
 }
@@ -108,14 +110,16 @@ export const defaultResultHandler = createResultHandler({
  * @desc This handler expects your endpoint to have the property 'items' in the output object schema
  * */
 export const arrayResultHandler = createResultHandler({
-  getPositiveResponse: (output) => {
+  getPositiveResponse: <S extends { items: z.ZodArray<any> }>(
+    output: IOSchema<any, S>,
+  ) => {
     // Examples are taken for proxying: no validation needed for this
     const examples = getExamples({ schema: output });
     const responseSchema = withMeta(
       "shape" in output &&
         "items" in output.shape &&
         output.shape.items instanceof z.ZodArray
-        ? (output.shape.items as z.ZodArray<any>)
+        ? output.shape.items
         : z.array(z.any()),
     );
     return examples.reduce<typeof responseSchema>(
