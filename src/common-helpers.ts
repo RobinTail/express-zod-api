@@ -276,7 +276,7 @@ export const tryToTransform = ({
   effect,
   sample,
 }: {
-  effect: z.Effect<any> & { type: "transform" };
+  effect: z.TransformEffect<any>;
   sample: any;
 }) => {
   try {
