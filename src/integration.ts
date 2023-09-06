@@ -22,7 +22,7 @@ import {
   makeTypeParams,
   parametricIndexNode,
   protectedReadonlyModifier,
-} from "./client-helpers";
+} from "./integration-helpers";
 import { defaultSerializer, makeCleanId } from "./common-helpers";
 import { methods } from "./method";
 import { mimeJson } from "./mime";
@@ -305,7 +305,7 @@ export class Integration {
                   f.createObjectLiteralExpression([
                     f.createSpreadAssignment(f.createIdentifier("acc")),
                     f.createPropertyAssignment(
-                      "[key]", // @todo is there a better way to do it?
+                      f.createComputedPropertyName(f.createIdentifier("key")),
                       f.createElementAccessExpression(
                         f.createIdentifier("params"),
                         f.createIdentifier("key"),

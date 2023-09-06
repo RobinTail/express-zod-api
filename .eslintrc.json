@@ -33,7 +33,8 @@
       "files": [
         "./tools/*.ts",
         "./tests/**/*.ts",
-        "./eslint-local-rules/*.*s"
+        "./eslint-local-rules/*.*s",
+        "./tsup.config.ts"
       ],
       "rules": {
         "import/no-extraneous-dependencies": "off"

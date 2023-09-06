@@ -12,14 +12,16 @@ const packageJson = `
   "name": "express-zod-api-esm-test",
   "version": "1.0.0",
   "scripts": {
-    "start": "node --no-warnings=ExperimentalWarning --loader ts-node/esm quick-start.ts"
+    "launch": "node --no-warnings=ExperimentalWarning --loader ts-node/esm",
+    "postinstall": "yarn launch fix-package.ts",
+    "start": "yarn launch quick-start.ts"
   },
   "type": "module",
   "dependencies": {
     "@tsconfig/node${tsconfigBase}": "latest",
-    "express-zod-api": "../../dist/esm",
+    "express-zod-api": "../../dist",
     "ts-node": "10.9.1",
-    "typescript": "5.1.5",
+    "typescript": "5.2.2",
     "@types/node": "*"
   }
 }

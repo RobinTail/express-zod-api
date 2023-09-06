@@ -19,15 +19,7 @@ type ExampleSetter<T extends z.ZodTypeAny> = (
   example: z.input<T>,
 ) => WithMeta<T>;
 
-/**
- * @desc fixes the incompatibility of the ZodObject.keyof() method introduced in v3.17.9
- * @todo remove it if/when it will be compatible
- */
-type MetaFixForStrippedObject<T> = T extends z.ZodObject<any>
-  ? T & { keyof: z.ZodObject<any>["keyof"] }
-  : T;
-
-type WithMeta<T extends z.ZodTypeAny> = MetaFixForStrippedObject<T> & {
+type WithMeta<T extends z.ZodTypeAny> = T & {
   _def: T["_def"] & MetaDef<T>;
   example: ExampleSetter<T>;
 };

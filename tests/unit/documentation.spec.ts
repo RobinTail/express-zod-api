@@ -35,7 +35,7 @@ describe("Documentation generator", () => {
           config: exampleConfig,
           version: "1.2.3",
           title: "Example API",
-          serverUrl: "http://example.com",
+          serverUrl: "https://example.com",
           composition,
         }).getSpecAsYaml();
         expect(spec).toMatchSnapshot();
@@ -61,7 +61,7 @@ describe("Documentation generator", () => {
         config: sampleConfig,
         version: "3.4.5",
         title: "Testing DELETE request without body",
-        serverUrl: "http://example.com",
+        serverUrl: "https://example.com",
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -92,7 +92,7 @@ describe("Documentation generator", () => {
         },
         version: "3.4.5",
         title: "Testing Complex Types",
-        serverUrl: "http://example.com",
+        serverUrl: "https://example.com",
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -121,7 +121,7 @@ describe("Documentation generator", () => {
         },
         version: "3.4.5",
         title: "Testing Nullable and Optional Types",
-        serverUrl: "http://example.com",
+        serverUrl: "https://example.com",
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -165,7 +165,7 @@ describe("Documentation generator", () => {
         },
         version: "3.4.5",
         title: "Testing Intersection and And types",
-        serverUrl: "http://example.com",
+        serverUrl: "https://example.com",
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -200,7 +200,7 @@ describe("Documentation generator", () => {
         },
         version: "3.4.5",
         title: "Testing Union and Or Types",
-        serverUrl: "http://example.com",
+        serverUrl: "https://example.com",
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -232,7 +232,7 @@ describe("Documentation generator", () => {
         },
         version: "3.4.5",
         title: "Testing Discriminated Union Type",
-        serverUrl: "http://example.com",
+        serverUrl: "https://example.com",
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -259,7 +259,7 @@ describe("Documentation generator", () => {
         },
         version: "3.4.5",
         title: "Testing Transformation in response schema",
-        serverUrl: "http://example.com",
+        serverUrl: "https://example.com",
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -289,7 +289,7 @@ describe("Documentation generator", () => {
         },
         version: "3.4.5",
         title: "Testing additional types",
-        serverUrl: "http://example.com",
+        serverUrl: "https://example.com",
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -319,7 +319,7 @@ describe("Documentation generator", () => {
         },
         version: "3.4.5",
         title: "Testing record",
-        serverUrl: "http://example.com",
+        serverUrl: "https://example.com",
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -343,7 +343,7 @@ describe("Documentation generator", () => {
         },
         version: "3.4.5",
         title: "Testing type any",
-        serverUrl: "http://example.com",
+        serverUrl: "https://example.com",
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -375,7 +375,7 @@ describe("Documentation generator", () => {
         },
         version: "3.4.5",
         title: "Testing numbers",
-        serverUrl: "http://example.com",
+        serverUrl: "https://example.com",
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -417,7 +417,7 @@ describe("Documentation generator", () => {
         },
         version: "3.4.5",
         title: "Testing strings",
-        serverUrl: "http://example.com",
+        serverUrl: "https://example.com",
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -447,7 +447,7 @@ describe("Documentation generator", () => {
         },
         version: "3.4.5",
         title: "Testing tuples",
-        serverUrl: "http://example.com",
+        serverUrl: "https://example.com",
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -473,7 +473,7 @@ describe("Documentation generator", () => {
         },
         version: "3.4.5",
         title: "Testing enums",
-        serverUrl: "http://example.com",
+        serverUrl: "https://example.com",
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -493,15 +493,13 @@ describe("Documentation generator", () => {
               method: "get",
               input: z.object({ string, number }),
               output: z.object({ boolean }),
-              handler: async () => ({
-                boolean: [] as unknown as boolean, // @todo check this out without type forcing in future Zod versions
-              }),
+              handler: async () => ({ boolean: [] }),
             }),
           },
         },
         version: "3.4.5",
         title: "Testing z.preprocess()",
-        serverUrl: "http://example.com",
+        serverUrl: "https://example.com",
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
       expect(string.parse(123)).toBe("123");
@@ -549,7 +547,7 @@ describe("Documentation generator", () => {
         },
         version: "3.4.5",
         title: "Testing Lazy",
-        serverUrl: "http://example.com",
+        serverUrl: "https://example.com",
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -582,7 +580,7 @@ describe("Documentation generator", () => {
               },
               version: "3.4.5",
               title: "Testing unsupported types",
-              serverUrl: "http://example.com",
+              serverUrl: "https://example.com",
             }),
         ).toThrowError(/Zod type Zod\w+ is unsupported/);
       });
@@ -654,7 +652,7 @@ describe("Documentation generator", () => {
         },
         version: "3.4.5",
         title: "Testing Security",
-        serverUrl: "http://example.com",
+        serverUrl: "https://example.com",
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -684,7 +682,7 @@ describe("Documentation generator", () => {
         },
         version: "3.4.5",
         title: "Testing Operation IDs",
-        serverUrl: "http://example.com",
+        serverUrl: "https://example.com",
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -718,7 +716,7 @@ describe("Documentation generator", () => {
         },
         version: "3.4.5",
         title: "Testing MIME types and status codes",
-        serverUrl: "http://example.com",
+        serverUrl: "https://example.com",
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -749,7 +747,7 @@ describe("Documentation generator", () => {
         },
         version: "3.4.5",
         title: "Testing issue #98",
-        serverUrl: "http://example.com",
+        serverUrl: "https://example.com",
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -789,7 +787,7 @@ describe("Documentation generator", () => {
         },
         version: "3.4.5",
         title: "Testing issue #98",
-        serverUrl: "http://example.com",
+        serverUrl: "https://example.com",
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -814,7 +812,7 @@ describe("Documentation generator", () => {
         },
         version: "3.4.5",
         title: "Testing route path params",
-        serverUrl: "http://example.com",
+        serverUrl: "https://example.com",
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -837,7 +835,7 @@ describe("Documentation generator", () => {
         },
         version: "3.4.5",
         title: "Testing route path params",
-        serverUrl: "http://example.com",
+        serverUrl: "https://example.com",
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -867,7 +865,7 @@ describe("Documentation generator", () => {
         },
         version: "3.4.5",
         title: "Testing Metadata:description",
-        serverUrl: "http://example.com",
+        serverUrl: "https://example.com",
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -896,7 +894,7 @@ describe("Documentation generator", () => {
         },
         version: "3.4.5",
         title: "Testing Metadata:description",
-        serverUrl: "http://example.com",
+        serverUrl: "https://example.com",
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -924,7 +922,7 @@ describe("Documentation generator", () => {
         },
         version: "3.4.5",
         title: "Testing Metadata:example on IO parameter",
-        serverUrl: "http://example.com",
+        serverUrl: "https://example.com",
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -956,7 +954,7 @@ describe("Documentation generator", () => {
         },
         version: "3.4.5",
         title: "Testing Metadata:example on IO schema",
-        serverUrl: "http://example.com",
+        serverUrl: "https://example.com",
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -988,7 +986,7 @@ describe("Documentation generator", () => {
         },
         version: "3.4.5",
         title: "Testing Metadata:example on IO schema",
-        serverUrl: "http://example.com",
+        serverUrl: "https://example.com",
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -1033,7 +1031,7 @@ describe("Documentation generator", () => {
         },
         version: "3.4.5",
         title: "Testing Metadata:example on IO schema + middleware",
-        serverUrl: "http://example.com",
+        serverUrl: "https://example.com",
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
@@ -1056,7 +1054,7 @@ describe("Documentation generator", () => {
         },
         version: "3.4.5",
         title: "Testing Metadata:example on IO parameter",
-        serverUrl: "http://example.com",
+        serverUrl: "https://example.com",
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });

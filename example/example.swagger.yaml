@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Example API
-  version: 11.7.0
+  version: 12.0.0-beta3
 paths:
   /v1/user/retrieve:
     get:
@@ -89,7 +89,7 @@ paths:
             type: string
             pattern: /\d+/
             description: a numeric string containing the id of the user
-  "/v1/user/{id}":
+  /v1/user/{id}:
     post:
       operationId: PostV1UserId
       responses:
@@ -428,5 +428,5 @@ tags:
   - name: files
     description: Everything about the files processing
 servers:
-  - url: http://example.com
+  - url: https://example.com
 

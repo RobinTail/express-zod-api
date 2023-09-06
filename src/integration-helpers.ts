@@ -39,7 +39,15 @@ export const makeParam = (
   name: string,
   type?: ts.TypeNode,
   mod?: ts.Modifier[],
-) => f.createParameterDeclaration(mod, undefined, name, undefined, type);
+) =>
+  f.createParameterDeclaration(
+    mod,
+    undefined,
+    name,
+    undefined,
+    type,
+    undefined,
+  );
 
 export const makeParams = (
   params: Record<string, ts.TypeNode | undefined>,

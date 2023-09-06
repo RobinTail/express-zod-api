@@ -1,5 +1,29 @@
 # Changelog
 
+## Version 12
+
+### v12.0.0
+
+- **Breaking changes**:
+  - `winston` becomes a peer dependency — you need to install it manually.
+  - Minimum Node versions supported: 18.0.0 and 20.1.0.
+    - Node versions 16 and 19 are EOL and no longer supported.
+  - Minimum Typescript version supported: 5.1.3.
+  - Minimum Jest version supported: 28 (optional peer dependency for testing endpoints).
+- Other changes:
+  - The distribution now consists of 4 files in `dist` directory:
+    - for ESM: `index.mjs` and `index.d.mts`,
+    - for CJS: `index.js` and `index.d.ts`.
+  - Routes having URL params are no longer quoted in the generated documentation.
+    - This change is caused by a fix to the `yaml` dependency.
+
+```yaml
+before:
+  "/v1/user/{id}":
+after:
+  /v1/user/{id}:
+```
+
 ## Version 11
 
 ### v11.7.0
@@ -2238,7 +2262,7 @@ const fileStreamingEndpointsFactoryAfter = new EndpointsFactory(
 ### v2.0.0
 
 - First stable release of the v2.
-- All dependencies are up to date.
+- All dependencies are up-to-date.
 - Minor changes of response descriptions in OpenAPI / Swagger documentation generator.
 
 ### v2.0.0-beta4

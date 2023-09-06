@@ -151,7 +151,7 @@ components:
   callbacks: {}
 tags: []
 servers:
-  - url: http://example.com
+  - url: https://example.com
 "
 `;
 
@@ -262,7 +262,7 @@ components:
   callbacks: {}
 tags: []
 servers:
-  - url: http://example.com
+  - url: https://example.com
 "
 `;
 
@@ -370,7 +370,7 @@ components:
   callbacks: {}
 tags: []
 servers:
-  - url: http://example.com
+  - url: https://example.com
 "
 `;
 
@@ -456,7 +456,7 @@ components:
   callbacks: {}
 tags: []
 servers:
-  - url: http://example.com
+  - url: https://example.com
 "
 `;
 
@@ -570,7 +570,7 @@ components:
   callbacks: {}
 tags: []
 servers:
-  - url: http://example.com
+  - url: https://example.com
 "
 `;
 
@@ -662,7 +662,7 @@ components:
   callbacks: {}
 tags: []
 servers:
-  - url: http://example.com
+  - url: https://example.com
 "
 `;
 
@@ -759,7 +759,7 @@ components:
   callbacks: {}
 tags: []
 servers:
-  - url: http://example.com
+  - url: https://example.com
 "
 `;
 
@@ -842,7 +842,7 @@ components:
   callbacks: {}
 tags: []
 servers:
-  - url: http://example.com
+  - url: https://example.com
 "
 `;
 
@@ -930,7 +930,7 @@ components:
   callbacks: {}
 tags: []
 servers:
-  - url: http://example.com
+  - url: https://example.com
 "
 `;
 
@@ -940,7 +940,7 @@ info:
   title: Testing route path params
   version: 3.4.5
 paths:
-  "/v1/{name}":
+  /v1/{name}:
     get:
       operationId: GetV1Name
       responses:
@@ -1019,7 +1019,7 @@ components:
   callbacks: {}
 tags: []
 servers:
-  - url: http://example.com
+  - url: https://example.com
 "
 `;
 
@@ -1029,7 +1029,7 @@ info:
   title: Testing route path params
   version: 3.4.5
 paths:
-  "/v1/{name}":
+  /v1/{name}:
     post:
       operationId: PostV1Name
       responses:
@@ -1113,7 +1113,7 @@ components:
   callbacks: {}
 tags: []
 servers:
-  - url: http://example.com
+  - url: https://example.com
 "
 `;
 
@@ -1173,7 +1173,7 @@ paths:
                       message: Sample error message
       description: thing is the path segment
       summary: thing is the path segment
-  "/v1/getSome/{thing}":
+  /v1/getSome/{thing}:
     get:
       operationId: GetV1GetsomeThing2
       responses:
@@ -1235,7 +1235,7 @@ components:
   callbacks: {}
 tags: []
 servers:
-  - url: http://example.com
+  - url: https://example.com
 "
 `;
 
@@ -1471,7 +1471,7 @@ components:
   callbacks: {}
 tags: []
 servers:
-  - url: http://example.com
+  - url: https://example.com
 "
 `;
 
@@ -1550,7 +1550,7 @@ components:
   callbacks: {}
 tags: []
 servers:
-  - url: http://example.com
+  - url: https://example.com
 "
 `;
 
@@ -1664,7 +1664,7 @@ components:
   callbacks: {}
 tags: []
 servers:
-  - url: http://example.com
+  - url: https://example.com
 "
 `;
 
@@ -1791,7 +1791,7 @@ components:
   callbacks: {}
 tags: []
 servers:
-  - url: http://example.com
+  - url: https://example.com
 "
 `;
 
@@ -1905,7 +1905,7 @@ components:
   callbacks: {}
 tags: []
 servers:
-  - url: http://example.com
+  - url: https://example.com
 "
 `;
 
@@ -2014,7 +2014,7 @@ components:
   callbacks: {}
 tags: []
 servers:
-  - url: http://example.com
+  - url: https://example.com
 "
 `;
 
@@ -2134,7 +2134,7 @@ components:
   callbacks: {}
 tags: []
 servers:
-  - url: http://example.com
+  - url: https://example.com
 "
 `;
 
@@ -2230,7 +2230,7 @@ paths:
             type: string
             pattern: /\\d+/
             description: a numeric string containing the id of the user
-  "/v1/user/{id}":
+  /v1/user/{id}:
     post:
       operationId: PostV1UserId
       responses:
@@ -2569,7 +2569,7 @@ tags:
   - name: files
     description: Everything about the files processing
 servers:
-  - url: http://example.com
+  - url: https://example.com
 "
 `;
 
@@ -2612,7 +2612,7 @@ paths:
           description: a numeric string containing the id of the user
           schema:
             $ref: "#/components/schemas/GetV1UserRetrieveParameterId"
-  "/v1/user/{id}":
+  /v1/user/{id}:
     post:
       operationId: PostV1UserId
       responses:
@@ -3040,7 +3040,7 @@ tags:
   - name: files
     description: Everything about the files processing
 servers:
-  - url: http://example.com
+  - url: https://example.com
 "
 `;
 
@@ -3146,7 +3146,7 @@ components:
   callbacks: {}
 tags: []
 servers:
-  - url: http://example.com
+  - url: https://example.com
 "
 `;
 
@@ -3251,7 +3251,7 @@ components:
   callbacks: {}
 tags: []
 servers:
-  - url: http://example.com
+  - url: https://example.com
 "
 `;
 
@@ -3309,7 +3309,7 @@ components:
   callbacks: {}
 tags: []
 servers:
-  - url: http://example.com
+  - url: https://example.com
 "
 `;
 
@@ -3463,7 +3463,7 @@ components:
   callbacks: {}
 tags: []
 servers:
-  - url: http://example.com
+  - url: https://example.com
 "
 `;
 
@@ -3605,7 +3605,7 @@ components:
   callbacks: {}
 tags: []
 servers:
-  - url: http://example.com
+  - url: https://example.com
 "
 `;
 
@@ -3696,7 +3696,7 @@ components:
   callbacks: {}
 tags: []
 servers:
-  - url: http://example.com
+  - url: https://example.com
 "
 `;
 
@@ -3824,7 +3824,7 @@ components:
   callbacks: {}
 tags: []
 servers:
-  - url: http://example.com
+  - url: https://example.com
 "
 `;
 
@@ -3917,7 +3917,7 @@ components:
   callbacks: {}
 tags: []
 servers:
-  - url: http://example.com
+  - url: https://example.com
 "
 `;
 
@@ -4043,7 +4043,7 @@ components:
   callbacks: {}
 tags: []
 servers:
-  - url: http://example.com
+  - url: https://example.com
 "
 `;
 
@@ -4122,7 +4122,7 @@ components:
   callbacks: {}
 tags: []
 servers:
-  - url: http://example.com
+  - url: https://example.com
 "
 `;
 
@@ -4212,6 +4212,6 @@ components:
   callbacks: {}
 tags: []
 servers:
-  - url: http://example.com
+  - url: https://example.com
 "
 `;

@@ -9,13 +9,14 @@ const packageJson = `
   "name": "express-zod-api-integration-test",
   "version": "1.0.0",
   "scripts": {
+    "postinstall": "ts-node fix-package.ts",
     "start": "ts-node quick-start.ts"
   },
   "dependencies": {
     "@tsconfig/node${tsconfigBase}": "latest",
     "express-zod-api": "../../dist",
     "ts-node": "10.9.1",
-    "typescript": "5.1.5",
+    "typescript": "5.2.2",
     "@types/node": "*"
   }
 }
@@ -23,7 +24,7 @@ const packageJson = `
 
 const tsConfigJson = `
 {
-  "extends": "@tsconfig/node${tsconfigBase}/tsconfig.json",
+  "extends": "@tsconfig/node${tsconfigBase}/tsconfig.json"
 }
 `;
 

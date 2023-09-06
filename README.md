@@ -108,9 +108,9 @@ Typescript is an optional dependency, however, it's required if you're going to
 [generate a frontend client](#generating-a-frontend-client) for your API.
 
 ```shell
-yarn add express-zod-api express zod typescript
+yarn add express-zod-api express zod winston typescript
 # or
-npm install express-zod-api express zod typescript
+npm install express-zod-api express zod winston typescript
 ```
 
 Add the following option to your `tsconfig.json` file in order to make it work as expected:
@@ -755,7 +755,7 @@ createConfig({
 
 ## Enabling compression
 
-According to [Express JS best practices guide](http://expressjs.com/en/advanced/best-practice-performance.html)
+According to [Express.js best practices guide](http://expressjs.com/en/advanced/best-practice-performance.html)
 it might be a good idea to enable GZIP compression of your API responses. You can achieve and customize it by using the
 corresponding configuration option when using the `createServer()` method.
 
@@ -972,7 +972,7 @@ Despite being supported by the library, `z.coerce.*` schema
 Please be aware that `z.coerce.number()` and `z.number({ coerce: true })` (being typed not well) still will NOT allow
 you to assign anything but number. Moreover, coercive schemas are not fail-safe and their methods `.isOptional()` and
 `.isNullable()` [are buggy](https://github.com/colinhacks/zod/issues/1911). If possible, try to avoid using this type
-of schemas. This issue [will NOT be fixed](https://github.com/colinhacks/zod/issues/1760#issuecomment-1407816838) in
+of schema. This issue [will NOT be fixed](https://github.com/colinhacks/zod/issues/1760#issuecomment-1407816838) in
 Zod version 3.x.
 
 ## Excessive properties in endpoint output

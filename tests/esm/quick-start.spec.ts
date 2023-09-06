@@ -1,5 +1,4 @@
 import { ChildProcessWithoutNullStreams, spawn } from "node:child_process";
-import fetch from "node-fetch";
 import { esmTestPort, waitFor } from "../helpers";
 
 describe("ESM Test", () => {
