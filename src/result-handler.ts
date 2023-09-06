@@ -115,12 +115,15 @@ export const arrayResultHandler = createResultHandler({
       "shape" in output &&
         "items" in output.shape &&
         output.shape.items instanceof z.ZodArray
-        ? output.shape.items
+        ? (output.shape.items as z.ZodArray<any>)
         : z.array(z.any()),
     );
     return examples.reduce<typeof responseSchema>(
       (acc, example) =>
-        typeof example === "object" && example !== null && "items" in example
+        typeof example === "object" &&
+        example !== null &&
+        "items" in example &&
+        Array.isArray(example.items)
           ? acc.example(example.items)
           : acc,
       responseSchema,
