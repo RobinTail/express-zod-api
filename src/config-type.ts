@@ -4,6 +4,7 @@ import { Express, Request } from "express";
 import fileUpload from "express-fileupload";
 import { ServerOptions } from "node:https";
 import { Logger } from "winston";
+import { z } from "zod";
 import { AbstractEndpoint } from "./endpoint";
 import { Method } from "./method";
 import { ResultHandlerDefinition } from "./result-handler";
@@ -81,7 +82,7 @@ export interface CommonConfig<TAG extends string = string> {
   cors: boolean | HeadersProvider;
   // custom ResultHandlerDefinition for common errors,
   // default: defaultResultHandler()
-  errorHandler?: ResultHandlerDefinition<any, any>;
+  errorHandler?: ResultHandlerDefinition<z.ZodTypeAny, z.ZodTypeAny>;
   // logger configuration or your custom winston logger
   logger: LoggerConfig | Logger;
   // you can disable the startup logo, default: true
