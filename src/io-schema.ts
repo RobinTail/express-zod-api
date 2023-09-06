@@ -1,4 +1,4 @@
-import { UnknownKeysParam, z } from "zod";
+import { z } from "zod";
 import { copyMeta } from "./metadata";
 import { AnyMiddlewareDef } from "./middleware";
 
@@ -12,7 +12,7 @@ type Refined<T extends z.ZodTypeAny> = T extends z.ZodType<infer O>
  * @param S — the shape of the object which IOSchema is based on
  * */
 export type IOSchema<
-  U extends UnknownKeysParam = any,
+  U extends z.UnknownKeysParam = any,
   S extends z.ZodRawShape = any,
 > =
   | z.ZodObject<S, U>
