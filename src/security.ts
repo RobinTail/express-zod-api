@@ -81,8 +81,9 @@ interface OAuth2Security<S extends string> {
 }
 
 /**
- * @desc K is an optional input field used by InputSecurity
- * @desc S is an optional union of scopes used by OAuth2Security
+ * @desc Middleware security schema descriptor
+ * @param K is an optional input field used by InputSecurity
+ * @param S is an optional union of scopes used by OAuth2Security
  * */
 export type Security<K extends string = string, S extends string = string> =
   | BasicSecurity
