@@ -38,14 +38,15 @@ export const getFinalEndpointInputSchema = <
 >(
   middlewares: AnyMiddlewareDef[],
   input: IN,
-): ProbableIntersection<MIN, IN> => {
+) => {
   const allSchemas = middlewares
     .map(({ input: schema }) => schema)
     .concat(input);
 
-  const finalSchema = allSchemas.reduce((acc, schema) =>
-    acc.and(schema),
-  ) as ProbableIntersection<MIN, IN>;
+  const finalSchema = allSchemas.reduce((acc, schema) => acc.and(schema));
 
-  return allSchemas.reduce((acc, schema) => copyMeta(schema, acc), finalSchema);
+  return allSchemas.reduce(
+    (acc, schema) => copyMeta(schema, acc),
+    finalSchema,
+  ) as ProbableIntersection<MIN, IN>;
 };

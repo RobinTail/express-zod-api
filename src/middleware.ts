@@ -40,7 +40,12 @@ export interface MiddlewareDefinition<
   type: "proprietary" | "express";
 }
 
-export type AnyMiddlewareDef = MiddlewareDefinition<any, any, any, any>;
+export type AnyMiddlewareDef = MiddlewareDefinition<
+  IOSchema<"strip">,
+  unknown,
+  FlatObject,
+  string
+>;
 
 export const createMiddleware = <
   IN extends IOSchema<"strip">,
@@ -64,7 +69,7 @@ export const createMiddleware = <
 export type ExpressMiddleware<R extends Request, S extends Response> = (
   request: R,
   response: S,
-  next: (error?: any) => void,
+  next: (error?: unknown) => void,
 ) => void | Promise<void>;
 
 export interface ExpressMiddlewareFeatures<

@@ -99,7 +99,7 @@ export class EndpointsFactory<
       OUT & AOUT,
       SCO & ASCO,
       TAG
-    >(this.middlewares.concat(subject), this.resultHandler);
+    >(this.middlewares.concat(subject as AnyMiddlewareDef), this.resultHandler);
   }
 
   public use = this.addExpressMiddleware;
@@ -140,7 +140,7 @@ export class EndpointsFactory<
         createMiddleware({
           input: z.object({}),
           middleware: async () => options,
-        }),
+        }) as AnyMiddlewareDef,
       ),
       this.resultHandler,
     );
