@@ -9,7 +9,10 @@ export type LogicalContainer<T> =
   | T;
 
 const isObject = <
-  T extends LogicalContainer<any> | LogicalAnd<any> | LogicalOr<any>,
+  T extends
+    | LogicalContainer<unknown>
+    | LogicalAnd<unknown>
+    | LogicalOr<unknown>,
 >(
   subject: T,
 ): subject is Exclude<T & {}, null> =>
