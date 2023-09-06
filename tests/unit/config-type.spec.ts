@@ -1,5 +1,5 @@
 import { Express } from "express";
-import { createConfig } from "../../src";
+import { createConfig, defaultResultHandler } from "../../src";
 
 describe("ConfigType", () => {
   describe("createConfig()", () => {
@@ -29,6 +29,18 @@ describe("ConfigType", () => {
       };
       const config = createConfig(argument);
       expect(config).toEqual(argument);
+    });
+
+    test("should accept error handler", () => {
+      createConfig({
+        server: { listen: 3333 },
+        cors: true,
+        logger: {
+          level: "debug" as const,
+          color: false,
+        },
+        errorHandler: defaultResultHandler,
+      });
     });
   });
 });
