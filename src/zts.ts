@@ -38,7 +38,7 @@ import {
 
 const { factory: f } = ts;
 
-const samples: Partial<Record<ts.KeywordTypeSyntaxKind, any>> = {
+const samples = {
   [ts.SyntaxKind.AnyKeyword]: "",
   [ts.SyntaxKind.BigIntKeyword]: BigInt(0),
   [ts.SyntaxKind.BooleanKeyword]: false,
@@ -46,7 +46,7 @@ const samples: Partial<Record<ts.KeywordTypeSyntaxKind, any>> = {
   [ts.SyntaxKind.ObjectKeyword]: {},
   [ts.SyntaxKind.StringKeyword]: "",
   [ts.SyntaxKind.UndefinedKeyword]: undefined,
-};
+} satisfies Partial<Record<ts.KeywordTypeSyntaxKind, unknown>>;
 
 const onLiteral: Producer<z.ZodLiteral<LiteralType>> = ({
   schema: { value },
@@ -197,12 +197,11 @@ const onPrimitive =
   () =>
     f.createKeywordTypeNode(syntaxKind);
 
-const onBranded: Producer<z.ZodBranded<z.ZodTypeAny, any>> = ({
-  next,
-  schema,
-}) => next({ schema: schema.unwrap() });
+const onBranded: Producer<
+  z.ZodBranded<z.ZodTypeAny, string | number | symbol>
+> = ({ next, schema }) => next({ schema: schema.unwrap() });
 
-const onReadonly: Producer<z.ZodReadonly<any>> = ({ next, schema }) =>
+const onReadonly: Producer<z.ZodReadonly<z.ZodTypeAny>> = ({ next, schema }) =>
   next({ schema: schema._def.innerType });
 
 const onCatch: Producer<z.ZodCatch<z.ZodTypeAny>> = ({ next, schema }) =>
