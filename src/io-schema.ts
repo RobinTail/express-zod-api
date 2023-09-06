@@ -2,9 +2,6 @@ import { z } from "zod";
 import { copyMeta } from "./metadata";
 import { AnyMiddlewareDef } from "./middleware";
 
-// the copy of the private Zod utility type of ZodObject
-type UnknownKeysParam = "passthrough" | "strict" | "strip";
-
 type Refined<T extends z.ZodTypeAny> = T extends z.ZodType<infer O>
   ? z.ZodEffects<T | Refined<T>, O, O>
   : never;
@@ -13,7 +10,7 @@ type Refined<T extends z.ZodTypeAny> = T extends z.ZodType<infer O>
  * @desc The type allowed on the top level of Middlewares and Endpoints
  * @param U — only "strip" is allowed for Middlewares due to intersection issue (Zod) #600
  * */
-export type IOSchema<U extends UnknownKeysParam = any> =
+export type IOSchema<U extends z.UnknownKeysParam = any> =
   | z.ZodObject<any, U>
   | z.ZodUnion<[IOSchema<U>, ...IOSchema<U>[]]>
   | z.ZodIntersection<IOSchema<U>, IOSchema<U>>
