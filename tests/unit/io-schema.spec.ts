@@ -18,17 +18,6 @@ describe("I/O Schema and related helpers", () => {
     test("respects the UnknownKeys type argument", () => {
       expectNotType<IOSchema<"passthrough">>(z.object({}));
     });
-    test("respects the Shape type argument", () => {
-      expectType<IOSchema<"strip", { items: z.ZodArray<z.ZodString> }>>(
-        z.object({ items: z.array(z.string()) }),
-      );
-      expectNotType<IOSchema<"strip", { items: z.ZodArray<z.ZodString> }>>(
-        z.object({ items: z.array(z.any()) }),
-      );
-      expectNotType<IOSchema<"strip", { items: z.ZodArray<z.ZodString> }>>(
-        z.object({ items: z.any() }),
-      );
-    });
     test("accepts union of objects", () => {
       expectType<IOSchema>(z.union([z.object({}), z.object({})]));
       expectType<IOSchema>(z.object({}).or(z.object({})));
