@@ -20,8 +20,8 @@ interface LastResortHandlerParams {
 
 interface ResultHandlerParams<RES> {
   error: Error | null;
-  input: any;
-  output: any;
+  input: unknown;
+  output: object | null;
   request: Request;
   response: Response<RES>;
   logger: Logger;
@@ -115,7 +115,7 @@ export const arrayResultHandler = createResultHandler({
       "shape" in output &&
         "items" in output.shape &&
         output.shape.items instanceof z.ZodArray
-        ? (output.shape.items as z.ZodArray<any>)
+        ? (output.shape.items as z.ZodArray<z.ZodTypeAny>)
         : z.array(z.any()),
     );
     return examples.reduce<typeof responseSchema>(
@@ -140,7 +140,7 @@ export const arrayResultHandler = createResultHandler({
       response.status(statusCode).send(error.message);
       return;
     }
-    if ("items" in output && Array.isArray(output.items)) {
+    if (output && "items" in output && Array.isArray(output.items)) {
       response.status(200).json(output.items);
     } else {
       response
