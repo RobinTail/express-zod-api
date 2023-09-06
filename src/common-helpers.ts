@@ -17,7 +17,7 @@ import { AuxMethod, Method } from "./method";
 import { mimeMultipart } from "./mime";
 import { ZodUpload } from "./upload-schema";
 
-export type FlatObject = Record<string, any>;
+export type FlatObject = Record<string, unknown>;
 
 /** @see https://expressjs.com/en/guide/routing.html */
 export const routePathParamsRegex = /:([A-Za-z0-9_]+)/g;
@@ -44,7 +44,7 @@ export const getActualMethod = (request: Request) =>
 export function getInput(
   request: Request,
   inputAssignment: CommonConfig["inputSources"],
-): any {
+): Readonly<unknown> {
   const method = getActualMethod(request);
   if (method === "options") {
     return {};
@@ -67,11 +67,13 @@ export function getInput(
     );
 }
 
-export function isLoggerConfig(logger: any): logger is LoggerConfig {
+export function isLoggerConfig(logger: unknown): logger is LoggerConfig {
   return (
     typeof logger === "object" &&
+    logger !== null &&
     "level" in logger &&
     "color" in logger &&
+    typeof logger.level === "string" &&
     Object.keys(loggerLevels).includes(logger.level) &&
     typeof logger.color === "boolean"
   );
@@ -81,7 +83,7 @@ export function isValidDate(date: Date): boolean {
   return !isNaN(date.getTime());
 }
 
-export function makeErrorFromAnything(subject: any): Error {
+export function makeErrorFromAnything(subject: unknown): Error {
   return subject instanceof Error
     ? subject
     : new Error(
@@ -123,7 +125,7 @@ export const logInternalError = ({
 }: {
   logger: Logger;
   request: Request;
-  input: any;
+  input: unknown;
   error: Error;
   statusCode: number;
 }) => {
@@ -171,7 +173,7 @@ export const getExamples = <
   return result;
 };
 
-export const combinations = <T extends any>(
+export const combinations = <T extends unknown>(
   a: T[],
   b: T[],
 ): { type: "single"; value: T[] } | { type: "tuple"; value: [T, T][] } => {
@@ -272,12 +274,12 @@ export const makeCleanId = (path: string, method: string, suffix?: string) => {
 export const defaultSerializer = (schema: z.ZodTypeAny): string =>
   createHash("sha1").update(JSON.stringify(schema), "utf8").digest("hex");
 
-export const tryToTransform = ({
+export const tryToTransform = <T>({
   effect,
   sample,
 }: {
-  effect: z.TransformEffect<any>;
-  sample: any;
+  effect: z.TransformEffect<T>;
+  sample: T;
 }) => {
   try {
     return typeof effect.transform(sample, {

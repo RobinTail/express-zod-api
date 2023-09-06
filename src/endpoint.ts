@@ -278,12 +278,12 @@ export class Endpoint<
     logger,
   }: {
     method: Method | AuxMethod;
-    input: Readonly<any>; // Issue #673: input is immutable, since this.inputSchema is combined with ones of middlewares
+    input: Readonly<unknown>; // Issue #673: input is immutable, since this.inputSchema is combined with ones of middlewares
     request: Request;
     response: Response;
     logger: Logger;
   }) {
-    const options: any = {};
+    const options = {} as OPT;
     let isStreamClosed = false;
     for (const def of this.middlewares) {
       if (method === "options" && def.type === "proprietary") {
@@ -325,8 +325,8 @@ export class Endpoint<
     options,
     logger,
   }: {
-    input: Readonly<any>;
-    options: any;
+    input: Readonly<unknown>;
+    options: OPT;
     logger: Logger;
   }) {
     let finalInput: z.output<IN>; // final input types transformations for handler
