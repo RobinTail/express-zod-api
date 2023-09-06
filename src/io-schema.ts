@@ -9,17 +9,13 @@ type Refined<T extends z.ZodTypeAny> = T extends z.ZodType<infer O>
 /**
  * @desc The type allowed on the top level of Middlewares and Endpoints
  * @param U — only "strip" is allowed for Middlewares due to intersection issue (Zod) #600
- * @param S — the shape of the object which IOSchema is based on
  * */
-export type IOSchema<
-  U extends z.UnknownKeysParam = any,
-  S extends z.ZodRawShape = any,
-> =
-  | z.ZodObject<S, U>
-  | z.ZodUnion<[IOSchema<U, S>, ...IOSchema<U, S>[]]>
-  | z.ZodIntersection<IOSchema<U, S>, IOSchema<U, S>>
-  | z.ZodDiscriminatedUnion<string, z.ZodObject<S, U>[]>
-  | Refined<z.ZodObject<S, U>>;
+export type IOSchema<U extends z.UnknownKeysParam = any> =
+  | z.ZodObject<any, U>
+  | z.ZodUnion<[IOSchema<U>, ...IOSchema<U>[]]>
+  | z.ZodIntersection<IOSchema<U>, IOSchema<U>>
+  | z.ZodDiscriminatedUnion<string, z.ZodObject<any, U>[]>
+  | Refined<z.ZodObject<any, U>>;
 
 export type ProbableIntersection<
   A extends IOSchema<"strip"> | null,
