@@ -1,5 +1,6 @@
 import jestConfig from "../jest.config";
 import { z } from "zod";
+import { FlatObject } from "../src";
 import { SchemaHandler, walkSchema } from "../src/schema-walker";
 
 export const esmTestPort = 8070;
@@ -19,20 +20,19 @@ export const waitFor = async (cb: () => boolean) =>
     }, 100);
   });
 
-export const serializeSchemaForTest = (
-  schema: z.ZodTypeAny,
-): Record<string, any> => {
+export const serializeSchemaForTest = (schema: z.ZodTypeAny): FlatObject => {
   const onSomeUnion: SchemaHandler<
-    z.ZodUnion<any> | z.ZodDiscriminatedUnion<any, any>,
-    object
+    | z.ZodUnion<z.ZodUnionOptions>
+    | z.ZodDiscriminatedUnion<string, z.ZodDiscriminatedUnionOption<string>[]>,
+    FlatObject
   > = ({ schema: subject, next }) => ({
     options: Array.from(subject.options.values()).map((option) =>
       next({ schema: option as z.ZodTypeAny }),
     ),
   });
   const onOptionalOrNullable: SchemaHandler<
-    z.ZodOptional<any> | z.ZodNullable<any>,
-    object
+    z.ZodOptional<z.ZodTypeAny> | z.ZodNullable<z.ZodTypeAny>,
+    FlatObject
   > = ({ schema: subject, next }) => ({
     value: next({ schema: subject.unwrap() }),
   });
