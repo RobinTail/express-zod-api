@@ -3,6 +3,7 @@ import { Logger } from "winston";
 import { z } from "zod";
 import { ApiResponse } from "./api-response";
 import {
+  FlatObject,
   getExamples,
   getMessageFromError,
   getStatusCodeFromError,
@@ -21,7 +22,7 @@ interface LastResortHandlerParams {
 interface ResultHandlerParams<RES> {
   error: Error | null;
   input: unknown;
-  output: object | null;
+  output: FlatObject | null;
   request: Request;
   response: Response<RES>;
   logger: Logger;
