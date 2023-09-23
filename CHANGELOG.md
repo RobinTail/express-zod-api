@@ -2,6 +2,11 @@
 
 ## Version 12
 
+### v12.0.1
+
+- Minor fixes: JSDoc for `Security` type, `arrayResultHandler` type.
+- Minor technical update: all `@types/*` packages have been recently reformatted.
+
 ### v12.0.0
 
 - **Breaking changes**:
