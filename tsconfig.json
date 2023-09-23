@@ -8,6 +8,6 @@
   },
   "exclude": ["tests/integration", "tests/esm"],
   "ts-node": {
-    "swc": true
+    "swc": false
   }
 }
