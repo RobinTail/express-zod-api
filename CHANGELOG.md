@@ -2,6 +2,10 @@
 
 ## Version 12
 
+### v12.0.2
+
+- `express-fileupload` version is 1.4.1.
+
 ### v12.0.1
 
 - Minor fixes: JSDoc for `Security` type, `arrayResultHandler` type.
