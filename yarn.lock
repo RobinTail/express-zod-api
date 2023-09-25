@@ -2531,10 +2531,10 @@ expect@^29.0.0, expect@^29.7.0:
     jest-message-util "^29.7.0"
     jest-util "^29.7.0"
 
-express-fileupload@1.4.0:
-  version "1.4.0"
-  resolved "https://registry.yarnpkg.com/express-fileupload/-/express-fileupload-1.4.0.tgz#be9d70a881d6c2b1ce668df86e4f89ddbf238ec7"
-  integrity sha512-RjzLCHxkv3umDeZKeFeMg8w7qe0V09w3B7oGZprr/oO2H/ISCgNzuqzn7gV3HRWb37GjRk429CCpSLS2KNTqMQ==
+express-fileupload@1.4.1:
+  version "1.4.1"
+  resolved "https://registry.yarnpkg.com/express-fileupload/-/express-fileupload-1.4.1.tgz#b14b9678a8c445bd5b3d1ba253567243472e7741"
+  integrity sha512-9F6SkbxbEOA9cYOBZ8tnn238jL+bGfacQuUO/JqPWp5t+piUcoDcESvKwAXsQV7IHGxmI5bMj3QxMWOKOIsMCg==
   dependencies:
     busboy "^1.6.0"
 

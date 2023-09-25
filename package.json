@@ -49,7 +49,7 @@
     "@types/http-errors": "^2.0.1",
     "@types/node": "*",
     "compression": "1.7.4",
-    "express-fileupload": "1.4.0",
+    "express-fileupload": "1.4.1",
     "http-errors": "2.0.0",
     "mime": "3.0.0",
     "openapi3-ts": "^4.1.2",
