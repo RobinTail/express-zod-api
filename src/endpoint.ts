@@ -2,13 +2,6 @@ import { Request, Response } from "express";
 import { Logger } from "winston";
 import { z } from "zod";
 import { ApiResponse } from "./api-response";
-import { CommonConfig } from "./config-type";
-import {
-  IOSchemaError,
-  InputValidationError,
-  OutputValidationError,
-  ResultHandlerError,
-} from "./errors";
 import {
   FlatObject,
   getActualMethod,
@@ -17,6 +10,13 @@ import {
   hasUpload,
   makeErrorFromAnything,
 } from "./common-helpers";
+import { CommonConfig } from "./config-type";
+import {
+  IOSchemaError,
+  InputValidationError,
+  OutputValidationError,
+  ResultHandlerError,
+} from "./errors";
 import { IOSchema } from "./io-schema";
 import { LogicalContainer, combineContainers } from "./logical-container";
 import { AuxMethod, Method, MethodsDefinition } from "./method";
@@ -70,6 +70,7 @@ export abstract class AbstractEndpoint {
   public abstract getScopes(): string[];
   public abstract getTags(): string[];
   public abstract _setSiblingMethods(methods: Method[]): void;
+  public abstract getOperationId(): string | undefined;
 }
 
 type EndpointProps<
@@ -89,6 +90,7 @@ type EndpointProps<
   resultHandler: ResultHandlerDefinition<POS, NEG>;
   description?: string;
   shortDescription?: string;
+  operationId?: string;
 } & ({ scopes?: SCO[] } | { scope?: SCO }) &
   ({ tags?: TAG[] } | { tag?: TAG }) &
   MethodsDefinition<M>;
@@ -122,6 +124,7 @@ export class Endpoint<
   };
   protected readonly scopes: SCO[] = [];
   protected readonly tags: TAG[] = [];
+  protected readonly operationId?: string;
 
   constructor({
     middlewares,
@@ -144,6 +147,7 @@ export class Endpoint<
         );
       }
     });
+    this.operationId = rest.operationId;
     this.middlewares = middlewares;
     const apiResponse = {
       positive: resultHandler.getPositiveResponse(outputSchema),
@@ -244,6 +248,10 @@ export class Endpoint<
 
   public override getTags(): TAG[] {
     return this.tags;
+  }
+
+  public override getOperationId(): string | undefined {
+    return this.operationId;
   }
 
   #getDefaultCorsHeaders(): Record<string, string> {

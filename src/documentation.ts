@@ -13,8 +13,6 @@ import {
   makeCleanId,
 } from "./common-helpers";
 import { CommonConfig } from "./config-type";
-import { mapLogicalContainer } from "./logical-container";
-import { Method } from "./method";
 import {
   depictRequest,
   depictRequestParams,
@@ -25,6 +23,8 @@ import {
   ensureShortDescription,
   reformatParamsInPath,
 } from "./documentation-helpers";
+import { mapLogicalContainer } from "./logical-container";
+import { Method } from "./method";
 import { Routing } from "./routing";
 import { RoutingWalkerParams, walkRouting } from "./routing-walker";
 
@@ -68,8 +68,19 @@ export class Documentation extends OpenApiBuilder {
       : undefined;
   }
 
-  protected ensureUniqOperationId(path: string, method: Method) {
-    const operationId = makeCleanId(path, method);
+  protected ensureUniqOperationId(
+    path: string,
+    method: Method,
+    endpointOperationId?: string,
+  ) {
+    if (
+      endpointOperationId &&
+      endpointOperationId in this.lastOperationIdSuffixes
+    ) {
+      throw new Error(`Duplicated operationId: "${endpointOperationId}"`);
+    }
+
+    const operationId = endpointOperationId ?? makeCleanId(path, method);
     if (operationId in this.lastOperationIdSuffixes) {
       this.lastOperationIdSuffixes[operationId]++;
       return `${operationId}${this.lastOperationIdSuffixes[operationId]}`;
@@ -115,6 +126,11 @@ export class Documentation extends OpenApiBuilder {
       _method,
     ) => {
       const method = _method as Method;
+      const operationId = this.ensureUniqOperationId(
+        path,
+        method,
+        endpoint.getOperationId(),
+      );
       const commonParams = {
         path,
         method,
@@ -134,7 +150,7 @@ export class Documentation extends OpenApiBuilder {
         inputSources,
       });
       const operation: OperationObject = {
-        operationId: this.ensureUniqOperationId(path, method),
+        operationId,
         responses: {
           [endpoint.getStatusCode("positive")]: depictResponse({
             ...commonParams,
