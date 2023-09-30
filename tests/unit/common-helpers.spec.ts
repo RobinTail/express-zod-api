@@ -11,6 +11,7 @@ import {
   hasCoercion,
   hasTopLevelTransformingEffect,
   hasUpload,
+  isCustomHeader,
   isLoggerConfig,
   isValidDate,
   makeErrorFromAnything,
@@ -23,6 +24,15 @@ describe("Common Helpers", () => {
   describe("defaultInputSources", () => {
     test("should be declared in a certain way", () => {
       expect(defaultInputSources).toMatchSnapshot();
+    });
+  });
+
+  describe("isCustomHeader()", () => {
+    test.each([
+      { name: "x-request-id", expected: true },
+      { name: "authorization", expected: false },
+    ])("should validate those starting with x- %#", ({ name, expected }) => {
+      expect(isCustomHeader(name)).toBe(expected);
     });
   });
 
