@@ -57,7 +57,7 @@ export interface AppConfig {
 
 export type InputSource = keyof Pick<
   Request,
-  "query" | "body" | "files" | "params"
+  "query" | "body" | "files" | "params" | "headers"
 >;
 export type InputSources = Record<Method, InputSource[]>;
 
