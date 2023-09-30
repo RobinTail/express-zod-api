@@ -664,9 +664,12 @@ export const depictRequestParams = ({
   }).shape;
   const pathParams = getRoutePathParams(path);
   const isQueryEnabled = inputSources.includes("query");
-  const isParamsEnabled = inputSources.includes("params");
+  const areParamsEnabled = inputSources.includes("params");
+  const areHeadersEnabled = inputSources.includes("headers");
   const isPathParam = (name: string) =>
-    isParamsEnabled && pathParams.includes(name);
+    areParamsEnabled && pathParams.includes(name);
+  const isHeaderParam = (name: string) =>
+    areHeadersEnabled && name.startsWith("x-");
   return Object.keys(shape)
     .filter((name) => isQueryEnabled || isPathParam(name))
     .map((name) => {
@@ -688,7 +691,11 @@ export const depictRequestParams = ({
           : depicted;
       return {
         name,
-        in: isPathParam(name) ? "path" : "query",
+        in: isPathParam(name)
+          ? "path"
+          : isHeaderParam(name)
+          ? "header"
+          : "query",
         required: !shape[name].isOptional(),
         description:
           (isSchemaObject(depicted) && depicted.description) ||
