@@ -688,6 +688,38 @@ exports[`Documentation helpers depictRecord() should set properties+required or 
 }
 `;
 
+exports[`Documentation helpers depictRequestParams() Feature 1180: should depict header params when enabled 1`] = `
+[
+  {
+    "description": "GET /v1/user/:id parameter",
+    "in": "header",
+    "name": "x-request-id",
+    "required": true,
+    "schema": {
+      "type": "string",
+    },
+  },
+  {
+    "description": "GET /v1/user/:id parameter",
+    "in": "path",
+    "name": "id",
+    "required": true,
+    "schema": {
+      "type": "string",
+    },
+  },
+  {
+    "description": "GET /v1/user/:id parameter",
+    "in": "query",
+    "name": "test",
+    "required": true,
+    "schema": {
+      "type": "boolean",
+    },
+  },
+]
+`;
+
 exports[`Documentation helpers depictRequestParams() should depict none if both query and params are disabled 1`] = `[]`;
 
 exports[`Documentation helpers depictRequestParams() should depict only path params if query is disabled 1`] = `
