@@ -45,7 +45,7 @@ export const isCustomHeader = (name: string): name is `x-${string}` =>
   name.startsWith("x-");
 
 /** @see https://nodejs.org/api/http.html#messageheaders */
-const getCustomHeaders = (request: Request) =>
+export const getCustomHeaders = (request: Request) =>
   Object.entries(request.headers).reduce<Record<string, unknown>>(
     (agg, [key, value]) =>
       isCustomHeader(key) ? { ...agg, [key]: value } : agg,

@@ -3,6 +3,7 @@ import { expectType } from "tsd";
 import {
   combinations,
   defaultInputSources,
+  getCustomHeaders,
   getExamples,
   getInput,
   getMessageFromError,
@@ -33,6 +34,20 @@ describe("Common Helpers", () => {
       { name: "authorization", expected: false },
     ])("should validate those starting with x- %#", ({ name, expected }) => {
       expect(isCustomHeader(name)).toBe(expected);
+    });
+  });
+
+  describe("getCustomHeaders()", () => {
+    test("should reduce the object to the custom headers only", () => {
+      expect(
+        getCustomHeaders({
+          headers: {
+            authorization: "Bearer ***",
+            "x-request-id": "test",
+            "x-another": "header",
+          },
+        } as unknown as Request),
+      ).toEqual({ "x-request-id": "test", "x-another": "header" });
     });
   });
 
