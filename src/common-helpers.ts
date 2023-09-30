@@ -41,11 +41,14 @@ const fallbackInputSource: InputSource[] = ["body", "query", "params"];
 export const getActualMethod = (request: Request) =>
   request.method.toLowerCase() as Method | AuxMethod;
 
+export const isCustomHeader = (name: string): name is `x-${string}` =>
+  name.startsWith("x-");
+
 /** @see https://nodejs.org/api/http.html#messageheaders */
 const getCustomHeaders = (request: Request) =>
   Object.entries(request.headers).reduce<Record<string, unknown>>(
     (agg, [key, value]) => {
-      if (key.startsWith("x-")) {
+      if (isCustomHeader(key)) {
         agg[key] = value;
       }
       return agg;

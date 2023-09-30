@@ -23,6 +23,7 @@ import {
   getRoutePathParams,
   hasCoercion,
   hasTopLevelTransformingEffect,
+  isCustomHeader,
   makeCleanId,
   routePathParamsRegex,
   tryToTransform,
@@ -669,7 +670,7 @@ export const depictRequestParams = ({
   const isPathParam = (name: string) =>
     areParamsEnabled && pathParams.includes(name);
   const isHeaderParam = (name: string) =>
-    areHeadersEnabled && name.startsWith("x-");
+    areHeadersEnabled && isCustomHeader(name);
   return Object.keys(shape)
     .filter((name) => isQueryEnabled || isPathParam(name))
     .map((name) => {
