@@ -610,10 +610,10 @@ export const depictParamExamples = (
   };
 };
 
-export function extractObjectSchema(
+export const extractObjectSchema = (
   subject: IOSchema,
   ctx: Pick<OpenAPIContext, "path" | "method" | "isResponse">,
-) {
+) => {
   if (subject instanceof z.ZodObject) {
     return subject;
   }
@@ -642,7 +642,7 @@ export function extractObjectSchema(
     );
   }
   return copyMeta(subject, objectSchema);
-}
+};
 
 export const depictRequestParams = ({
   path,

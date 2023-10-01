@@ -57,16 +57,16 @@ export const hasMeta = <T extends z.ZodTypeAny>(
   );
 };
 
-export function getMeta<T extends z.ZodTypeAny, K extends MetaKey>(
+export const getMeta = <T extends z.ZodTypeAny, K extends MetaKey>(
   schema: T,
   meta: K,
-): MetaValue<T, K> | undefined {
+): MetaValue<T, K> | undefined => {
   if (!hasMeta(schema)) {
     return undefined;
   }
   const def = schema._def as MetaDef<T>;
   return meta in def[metaProp] ? def[metaProp][meta] : undefined;
-}
+};
 
 export const copyMeta = <A extends z.ZodTypeAny, B extends z.ZodTypeAny>(
   src: A,

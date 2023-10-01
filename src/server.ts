@@ -54,10 +54,10 @@ export const createNotFoundHandler =
     }
   };
 
-export function attachRouting(
+export const attachRouting = (
   config: AppConfig & CommonConfig,
   routing: Routing,
-) {
+) => {
   const logger = isLoggerConfig(config.logger)
     ? createLogger(config.logger)
     : config.logger;
@@ -65,12 +65,12 @@ export function attachRouting(
   const errorHandler = config.errorHandler || defaultResultHandler;
   const notFoundHandler = createNotFoundHandler(errorHandler, logger);
   return { notFoundHandler, logger };
-}
+};
 
-export function createServer(
+export const createServer = (
   config: ServerConfig & CommonConfig,
   routing: Routing,
-) {
+) => {
   const logger = isLoggerConfig(config.logger)
     ? createLogger(config.logger)
     : config.logger;
@@ -118,4 +118,4 @@ export function createServer(
   }
 
   return { app, httpServer, httpsServer, logger };
-}
+};
