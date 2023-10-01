@@ -808,6 +808,26 @@ describe("Documentation helpers", () => {
         }),
       ).toMatchSnapshot();
     });
+
+    test("Feature 1180: should depict header params when enabled", () => {
+      expect(
+        depictRequestParams({
+          endpoint: defaultEndpointsFactory.build({
+            method: "get",
+            input: z.object({
+              "x-request-id": z.string(),
+              id: z.string(),
+              test: z.boolean(),
+            }),
+            output: z.object({}),
+            handler: jest.fn(),
+          }),
+          inputSources: ["query", "headers", "params"],
+          composition: "inline",
+          ...requestContext,
+        }),
+      ).toMatchSnapshot();
+    });
   });
 
   describe("excludeExampleFromDepiction()", () => {

@@ -41,10 +41,21 @@ const fallbackInputSource: InputSource[] = ["body", "query", "params"];
 export const getActualMethod = (request: Request) =>
   request.method.toLowerCase() as Method | AuxMethod;
 
+export const isCustomHeader = (name: string): name is `x-${string}` =>
+  name.startsWith("x-");
+
+/** @see https://nodejs.org/api/http.html#messageheaders */
+export const getCustomHeaders = (request: Request) =>
+  Object.entries(request.headers).reduce<Record<string, unknown>>(
+    (agg, [key, value]) =>
+      isCustomHeader(key) ? { ...agg, [key]: value } : agg,
+    {},
+  );
+
 export function getInput(
   request: Request,
   inputAssignment: CommonConfig["inputSources"],
-): any {
+) {
   const method = getActualMethod(request);
   if (method === "options") {
     return {};
@@ -58,10 +69,10 @@ export function getInput(
   }
   return props
     .filter((prop) => (prop === "files" ? areFilesAvailable(request) : true))
-    .reduce(
+    .reduce<Record<string, unknown>>(
       (carry, prop) => ({
         ...carry,
-        ...request[prop],
+        ...(prop === "headers" ? getCustomHeaders(request) : request[prop]),
       }),
       {},
     );
