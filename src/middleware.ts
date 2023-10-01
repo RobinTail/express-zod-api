@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { HttpError } from "http-errors";
 import { Logger } from "winston";
 import { z } from "zod";
@@ -64,7 +64,7 @@ export const createMiddleware = <
 export type ExpressMiddleware<R extends Request, S extends Response> = (
   request: R,
   response: S,
-  next: (error?: unknown) => unknown,
+  next: NextFunction,
 ) => void | Promise<void>;
 
 export interface ExpressMiddlewareFeatures<
