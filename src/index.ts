@@ -1,4 +1,4 @@
-export { createConfig, LoggerConfig } from "./config-type";
+export { createConfig, CommonConfig, LoggerConfig } from "./config-type";
 export { AbstractEndpoint } from "./endpoint";
 export { Method } from "./method";
 export {
@@ -14,11 +14,12 @@ export {
   getStatusCodeFromError,
 } from "./common-helpers";
 export { createLogger } from "./logger";
-export { createMiddleware } from "./middleware";
+export { createMiddleware, MiddlewareDefinition } from "./middleware";
 export {
   createResultHandler,
   defaultResultHandler,
   arrayResultHandler,
+  ResultHandlerDefinition,
 } from "./result-handler";
 export { DependsOnMethod } from "./depends-on-method";
 export { ServeStatic } from "./serve-static";
@@ -35,6 +36,15 @@ export {
 export { withMeta } from "./metadata";
 export { testEndpoint } from "./mock";
 export { Integration } from "./integration";
+export {
+  BasicSecurity,
+  BearerSecurity,
+  CookieSecurity,
+  CustomHeaderSecurity,
+  InputSecurity,
+  OAuth2Security,
+  OpenIdSecurity,
+} from "./security";
 
 export * as ez from "./proprietary-schemas";
 export type { ZodDateInDef } from "./date-in-schema";

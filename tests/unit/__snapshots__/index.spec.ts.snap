@@ -94,6 +94,7 @@ exports[`Index Entrypoint exports getStatusCodeFromError should have certain val
 exports[`Index Entrypoint exports should have certain entities exposed 1`] = `
 [
   "createConfig",
+  "CommonConfig",
   "LoggerConfig",
   "AbstractEndpoint",
   "Method",
@@ -107,9 +108,11 @@ exports[`Index Entrypoint exports should have certain entities exposed 1`] = `
   "getStatusCodeFromError",
   "createLogger",
   "createMiddleware",
+  "MiddlewareDefinition",
   "createResultHandler",
   "defaultResultHandler",
   "arrayResultHandler",
+  "ResultHandlerDefinition",
   "DependsOnMethod",
   "ServeStatic",
   "Routing",
@@ -124,6 +127,13 @@ exports[`Index Entrypoint exports should have certain entities exposed 1`] = `
   "withMeta",
   "testEndpoint",
   "Integration",
+  "BasicSecurity",
+  "BearerSecurity",
+  "CookieSecurity",
+  "CustomHeaderSecurity",
+  "InputSecurity",
+  "OAuth2Security",
+  "OpenIdSecurity",
   "ez",
   "createHttpError",
 ]
