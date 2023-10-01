@@ -6,7 +6,7 @@
 
 - This version fixes the issue 1182 introduced in version 10.0.0-beta1, manifesting as Typescript errors `TS4023` and
   `TS4094` only when `declarations` feature is enabled in cosumer's `tsconfig.json`.
-  - Several protected properties of `Endpoint` are made entirely hash-private.
+  - Several protected properties of `Endpoint` are made entirely private.
   - Several types are exposed: `CommonConfig`, `MiddlewareDefinition`, `ResultHandlerDefinition`, `BasicSecurity`,
     `BearerSecurity`, `CookieSecurity`, `CustomHeaderSecurity`, `InputSecurity`, `OAuth2Security`, `OpenIdSecurity`.
     - They are not meant to be used in your implementation and only needed to prevent the error in particular case.
