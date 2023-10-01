@@ -38,7 +38,7 @@ import {
 
 const { factory: f } = ts;
 
-const samples: Partial<Record<ts.KeywordTypeSyntaxKind, any>> = {
+const samples: Partial<Record<ts.KeywordTypeSyntaxKind, unknown>> = {
   [ts.SyntaxKind.AnyKeyword]: "",
   [ts.SyntaxKind.BigIntKeyword]: BigInt(0),
   [ts.SyntaxKind.BooleanKeyword]: false,
