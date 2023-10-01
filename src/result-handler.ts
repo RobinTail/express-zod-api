@@ -40,6 +40,11 @@ export interface ResultHandlerDefinition<
   handler: ResultHandler<z.output<POS> | z.output<NEG>>;
 }
 
+export type AnyResultHandler = ResultHandlerDefinition<
+  z.ZodTypeAny,
+  z.ZodTypeAny
+>;
+
 export const defaultStatusCodes = {
   positive: 200,
   negative: 400,

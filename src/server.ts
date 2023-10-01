@@ -7,11 +7,13 @@ import { AppConfig, CommonConfig, ServerConfig } from "./config-type";
 import { ResultHandlerError } from "./errors";
 import { isLoggerConfig, makeErrorFromAnything } from "./common-helpers";
 import { createLogger } from "./logger";
-import { defaultResultHandler, lastResortHandler } from "./result-handler";
+import {
+  AnyResultHandler,
+  defaultResultHandler,
+  lastResortHandler,
+} from "./result-handler";
 import { Routing, initRouting } from "./routing";
 import createHttpError from "http-errors";
-
-type AnyResultHandler = NonNullable<CommonConfig["errorHandler"]>;
 
 export const createParserFailureHandler =
   (errorHandler: AnyResultHandler, logger: Logger): ErrorRequestHandler =>
