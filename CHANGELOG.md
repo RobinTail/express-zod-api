@@ -5,7 +5,7 @@
 ### v12.1.0
 
 - This version fixes the issue 1182 introduced in version 10.0.0-beta1, manifesting as Typescript errors `TS4023` and
-  `TS4094` only when `declarations` feature is enabled in cosumer's `tsconfig.json`.
+  `TS4094` only when `declaration` feature is enabled in your `tsconfig.json`.
   - Several protected properties of `Endpoint` are made entirely private.
   - Several types are exposed: `CommonConfig`, `MiddlewareDefinition`, `ResultHandlerDefinition`, `BasicSecurity`,
     `BearerSecurity`, `CookieSecurity`, `CustomHeaderSecurity`, `InputSecurity`, `OAuth2Security`, `OpenIdSecurity`.
@@ -15,6 +15,7 @@
     - Instead of `ResultHandlerDefinition` type use `createResultHandler()` method.
     - Instead of the mentioned security types use the `security` property of the `createMiddleware()` argument.
   - The issue 1182 is the continuation of the issue 952 "Infussicient exports" (for consumer's declaration).
+    - Found and reported by [@bobgubko](https://github.com/bobgubko)
 
 ### v12.0.2
 
