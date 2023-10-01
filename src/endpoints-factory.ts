@@ -120,7 +120,7 @@ export class EndpointsFactory<
       input: z.object({}),
       middleware: async ({ request, response }) =>
         new Promise<AOUT>((resolve, reject) => {
-          const next = (err?: any) => {
+          const next = (err?: unknown) => {
             if (err && err instanceof Error) {
               return reject(transformer(err));
             }

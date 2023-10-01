@@ -64,7 +64,7 @@ export const createMiddleware = <
 export type ExpressMiddleware<R extends Request, S extends Response> = (
   request: R,
   response: S,
-  next: (error?: any) => void,
+  next: (error?: unknown) => unknown,
 ) => void | Promise<void>;
 
 export interface ExpressMiddlewareFeatures<
