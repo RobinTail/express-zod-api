@@ -2,6 +2,20 @@
 
 ## Version 12
 
+### v12.1.0
+
+- This version fixes the issue 1182 introduced in version 10.0.0-beta1, manifesting as Typescript errors `TS4023` and
+  `TS4094` only when `declarations` feature is enabled in cosumer's `tsconfig.json`.
+  - Several protected properties of `Endpoint` are made entirely private.
+  - Several types are exposed: `CommonConfig`, `MiddlewareDefinition`, `ResultHandlerDefinition`, `BasicSecurity`,
+    `BearerSecurity`, `CookieSecurity`, `CustomHeaderSecurity`, `InputSecurity`, `OAuth2Security`, `OpenIdSecurity`.
+    - They are not meant to be used in your implementation and only needed to prevent the error in particular case.
+    - Instead of `CommonConfig` type use `createConfig()` method.
+    - Instead of `MiddlewareDefinition` type use `createMiddleware()` method.
+    - Instead of `ResultHandlerDefinition` type use `createResultHandler()` method.
+    - Instead of the mentioned security types use the `security` property of the `createMiddleware()` argument.
+  - The issue 1182 is the continuation of the issue 952 "Infussicient exports" (for consumer's declaration).
+
 ### v12.0.2
 
 - `express-fileupload` version is 1.4.1.
