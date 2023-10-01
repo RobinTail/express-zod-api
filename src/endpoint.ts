@@ -40,7 +40,7 @@ const getMimeTypesFromApiResponse = <S extends z.ZodTypeAny>(
   return mimeType ? [mimeType] : mimeTypes || fallback;
 };
 
-export type Handler<IN, OUT, OPT> = (params: {
+export type Handler<IN, OUT, OPT extends FlatObject> = (params: {
   input: IN;
   options: OPT;
   logger: Logger;
@@ -288,7 +288,7 @@ export class Endpoint<
     response: Response;
     logger: Logger;
   }) {
-    const options: any = {};
+    const options = {} as OPT;
     let isStreamClosed = false;
     for (const def of this.#middlewares) {
       if (method === "options" && def.type === "proprietary") {
@@ -331,7 +331,7 @@ export class Endpoint<
     logger,
   }: {
     input: Readonly<any>;
-    options: any;
+    options: OPT;
     logger: Logger;
   }) {
     let finalInput: z.output<IN>; // final input types transformations for handler
