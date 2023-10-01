@@ -43,12 +43,13 @@ Start your API server with I/O schema validation and custom middlewares in minut
    15. [Multiple schemas for one route](#multiple-schemas-for-one-route)
    16. [Serving static files](#serving-static-files)
    17. [Customizing input sources](#customizing-input-sources)
-   18. [Enabling compression](#enabling-compression)
-   19. [Enabling HTTPS](#enabling-https)
-   20. [Generating a Frontend Client](#generating-a-frontend-client)
-   21. [Creating a documentation](#creating-a-documentation)
-   22. [Tagging the endpoints](#tagging-the-endpoints)
-   23. [How to test endpoints](#how-to-test-endpoints)
+   18. [Opt-in: Headers as input source](#opt-in-headers-as-input-source)
+   19. [Enabling compression](#enabling-compression)
+   20. [Enabling HTTPS](#enabling-https)
+   21. [Generating a Frontend Client](#generating-a-frontend-client)
+   22. [Creating a documentation](#creating-a-documentation)
+   23. [Tagging the endpoints](#tagging-the-endpoints)
+   24. [How to test endpoints](#how-to-test-endpoints)
 5. [Caveats](#caveats)
    1. [Coercive schema of Zod](#coercive-schema-of-zod)
    2. [Excessive properties in endpoint output](#excessive-properties-in-endpoint-output)
@@ -722,13 +723,13 @@ const routing: Routing = {
 ## Customizing input sources
 
 You can customize the list of `request` properties that are combined into `input` that is being validated and available
-to your endpoints and middlewares.
+to your endpoints and middlewares. The order here matters: each next item in the array has a higher priority than its
+previous sibling.
 
 ```typescript
 import { createConfig } from "express-zod-api";
 
 createConfig({
-  // ...,
   inputSources: {
     // the defaults are:
     get: ["query", "params"],
@@ -736,7 +737,32 @@ createConfig({
     put: ["body", "params"],
     patch: ["body", "params"],
     delete: ["query", "params"],
-  },
+  }, // ...
+});
+```
+
+## Opt-in: Headers as input source
+
+Similar way you can activate the inclusion of request headers into the input sources. However, only the custom
+headers (the ones having `x-` prefix) will be combined into the `input`. Please note that request headers acquired
+that way are lowercase when describing their validation schemas.
+
+```typescript
+import { createConfig, defaultEndpointsFactory } from "express-zod-api";
+import { z } from "zod";
+
+createConfig({
+  inputSources: {
+    get: ["query", "headers"],
+  }, // ...
+});
+
+defaultEndpointsFactory.build({
+  method: "get",
+  input: z.object({
+    "x-request-id": z.string(), // this one is from request.headers
+    id: z.string(), // this one is from request.query
+  }), // ...
 });
 ```
 
