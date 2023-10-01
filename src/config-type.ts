@@ -6,7 +6,7 @@ import { ServerOptions } from "node:https";
 import { Logger } from "winston";
 import { AbstractEndpoint } from "./endpoint";
 import { Method } from "./method";
-import { AnyResultHandler } from "./result-handler";
+import { AnyResultHandlerDefinition } from "./result-handler";
 
 export const loggerLevels = {
   silent: true,
@@ -103,7 +103,7 @@ export interface CommonConfig<TAG extends string = string> {
    * @default defaultResultHandler
    * @see defaultResultHandler
    */
-  errorHandler?: AnyResultHandler;
+  errorHandler?: AnyResultHandlerDefinition;
   /** @desc Logger configuration or your custom winston logger. */
   logger: LoggerConfig | Logger;
   /**

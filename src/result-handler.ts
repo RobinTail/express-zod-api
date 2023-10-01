@@ -40,7 +40,7 @@ export interface ResultHandlerDefinition<
   handler: ResultHandler<z.output<POS> | z.output<NEG>>;
 }
 
-export type AnyResultHandler = ResultHandlerDefinition<
+export type AnyResultHandlerDefinition = ResultHandlerDefinition<
   z.ZodTypeAny,
   z.ZodTypeAny
 >;

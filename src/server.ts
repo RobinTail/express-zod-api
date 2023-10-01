@@ -8,7 +8,7 @@ import { ResultHandlerError } from "./errors";
 import { isLoggerConfig, makeErrorFromAnything } from "./common-helpers";
 import { createLogger } from "./logger";
 import {
-  AnyResultHandler,
+  AnyResultHandlerDefinition,
   defaultResultHandler,
   lastResortHandler,
 } from "./result-handler";
@@ -16,7 +16,10 @@ import { Routing, initRouting } from "./routing";
 import createHttpError from "http-errors";
 
 export const createParserFailureHandler =
-  (errorHandler: AnyResultHandler, logger: Logger): ErrorRequestHandler =>
+  (
+    errorHandler: AnyResultHandlerDefinition,
+    logger: Logger,
+  ): ErrorRequestHandler =>
   (error, request, response, next) => {
     if (!error) {
       return next();
@@ -32,7 +35,7 @@ export const createParserFailureHandler =
   };
 
 export const createNotFoundHandler =
-  (errorHandler: AnyResultHandler, logger: Logger): RequestHandler =>
+  (errorHandler: AnyResultHandlerDefinition, logger: Logger): RequestHandler =>
   (request, response) => {
     const error = createHttpError(
       404,
