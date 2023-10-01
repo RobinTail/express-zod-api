@@ -1,5 +1,88 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`Documentation generator Feature 1180: Headers opt-in params should describe x- inputs as header params 1`] = `
+"openapi: 3.0.0
+info:
+  title: Testing headers params
+  version: 3.4.5
+paths:
+  /v1/test:
+    get:
+      operationId: GetV1Test
+      responses:
+        "200":
+          description: GET /v1/test Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - success
+                  data:
+                    type: object
+                    properties: {}
+                required:
+                  - status
+                  - data
+        "400":
+          description: GET /v1/test Error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                required:
+                  - status
+                  - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
+      parameters:
+        - name: id
+          in: query
+          required: true
+          description: GET /v1/test parameter
+          schema:
+            type: string
+        - name: x-request-id
+          in: header
+          required: true
+          description: GET /v1/test parameter
+          schema:
+            type: string
+components:
+  schemas: {}
+  responses: {}
+  parameters: {}
+  examples: {}
+  requestBodies: {}
+  headers: {}
+  securitySchemes: {}
+  links: {}
+  callbacks: {}
+tags: []
+servers:
+  - url: https://example.com
+"
+`;
+
 exports[`Documentation generator Issue #98 Should describe non-empty array 1`] = `
 "openapi: 3.0.0
 info:
