@@ -78,11 +78,13 @@ export const getInput = (
     );
 };
 
-export const isLoggerConfig = (logger: any): logger is LoggerConfig =>
+export const isLoggerConfig = (logger: unknown): logger is LoggerConfig =>
   typeof logger === "object" &&
+  logger !== null &&
   "level" in logger &&
-  "color" in logger &&
+  typeof logger.level === "string" &&
   Object.keys(loggerLevels).includes(logger.level) &&
+  "color" in logger &&
   typeof logger.color === "boolean";
 
 export const isValidDate = (date: Date): boolean => !isNaN(date.getTime());
