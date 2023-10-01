@@ -20,10 +20,10 @@
   resolved "https://registry.yarnpkg.com/@andrewbranch/untar.js/-/untar.js-1.0.2.tgz#27ad421530e4609480d99180b9a5e9d0a0b3f132"
   integrity sha512-hL80MHK3b++pEp6K23+Nl5r5D1F19DRagp2ruCBIv4McyCiLKq67vUNvEQY1aGCAKNZ8GxV23n5MhOm7RwO8Pg==
 
-"@arethetypeswrong/cli@^0.10.1":
-  version "0.10.2"
-  resolved "https://registry.yarnpkg.com/@arethetypeswrong/cli/-/cli-0.10.2.tgz#f01fbfebe18de367bf7bf4c2e838d2826af78b72"
-  integrity sha512-20JLHXCsBCMeZfMqlbAFa5QTFpyyJJk8pEt4MwUhUadpPnBQC7QnqAhJcDv0uxLFrueK3SQbYPlGaqX0921LjA==
+"@arethetypeswrong/cli@^0.11.0":
+  version "0.11.0"
+  resolved "https://registry.yarnpkg.com/@arethetypeswrong/cli/-/cli-0.11.0.tgz#a46a2d39824ee251b1510feda4c34302cb1cf6f0"
+  integrity sha512-0GxlV58x8DaiWRUx0JWc3glr8iGsjK+KATuubH8qRqjw4aIGB8BBQ8Bv2Bvs9DfGuojBgbVWhOTe8+3BepYZ6Q==
   dependencies:
     "@arethetypeswrong/core" "0.10.2"
     chalk "^4.1.2"
@@ -32,6 +32,7 @@
     marked "^5.1.0"
     marked-terminal "^5.2.0"
     node-fetch "^2.6.4"
+    semver "^7.5.4"
 
 "@arethetypeswrong/core@0.10.2":
   version "0.10.2"

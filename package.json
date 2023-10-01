@@ -80,7 +80,7 @@
     }
   },
   "devDependencies": {
-    "@arethetypeswrong/cli": "^0.10.1",
+    "@arethetypeswrong/cli": "^0.11.0",
     "@swc/core": "^1.3.82",
     "@swc/jest": "^0.2.29",
     "@tsconfig/node18": "^18.2.1",
