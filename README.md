@@ -43,7 +43,7 @@ Start your API server with I/O schema validation and custom middlewares in minut
    15. [Multiple schemas for one route](#multiple-schemas-for-one-route)
    16. [Serving static files](#serving-static-files)
    17. [Customizing input sources](#customizing-input-sources)
-   18. [Opt-in: Headers as input source](#opt-in-headers-as-input-source)
+   18. [Headers as input source](#headers-as-input-source)
    19. [Enabling compression](#enabling-compression)
    20. [Enabling HTTPS](#enabling-https)
    21. [Generating a Frontend Client](#generating-a-frontend-client)
@@ -741,11 +741,13 @@ createConfig({
 });
 ```
 
-## Opt-in: Headers as input source
+## Headers as input source
 
-Similar way you can activate the inclusion of request headers into the input sources. However, only the custom
-headers (the ones having `x-` prefix) will be combined into the `input`. Please note that request headers acquired
-that way are lowercase when describing their validation schemas.
+In a similar way you can enable the inclusion of request headers into the input sources. This is an opt-in feature.
+Please note:
+
+- only the custom headers (the ones having `x-` prefix) will be combined into the `input`,
+- the request headers acquired that way are lowercase when describing their validation schemas.
 
 ```typescript
 import { createConfig, defaultEndpointsFactory } from "express-zod-api";
