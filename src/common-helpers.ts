@@ -89,7 +89,7 @@ export const isLoggerConfig = (logger: unknown): logger is LoggerConfig =>
 
 export const isValidDate = (date: Date): boolean => !isNaN(date.getTime());
 
-export const makeErrorFromAnything = (subject: any): Error =>
+export const makeErrorFromAnything = (subject: unknown): Error =>
   subject instanceof Error
     ? subject
     : new Error(
