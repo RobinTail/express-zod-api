@@ -37,22 +37,38 @@ type CompressionOptions = Pick<
 >;
 
 export interface ServerConfig {
+  /** @desc Server configuration. */
   server: {
-    // server configuration
-    listen: number | string; // port or socket
-    jsonParser?: NextHandleFunction; // custom JSON parser, default: express.json()
-    upload?: boolean | UploadOptions; // enable or configure uploads handling
-    compression?: boolean | CompressionOptions; // enable or configure response compression
+    /** @desc Port or socket. */
+    listen: number | string;
+    /**
+     * @desc Custom JSON parser.
+     * @default express.json()
+     * */
+    jsonParser?: NextHandleFunction;
+    /**
+     * @desc Enable or configure uploads handling.
+     * @default false
+     * */
+    upload?: boolean | UploadOptions;
+    /**
+     * @desc Enable or configure response compression.
+     * @default false
+     */
+    compression?: boolean | CompressionOptions;
   };
+  /** @desc Enables HTTPS server as well. */
   https?: {
-    // enables HTTPS server as well
-    options: ServerOptions; // at least "cert" and "key" options required
-    listen: number | string; // port or socket
+    /** @desc At least "cert" and "key" options required. */
+    options: ServerOptions;
+    /** @desc Port or socket. */
+    listen: number | string;
   };
 }
 
 export interface AppConfig {
-  app: Express; // or your custom express app
+  /** @desc Your custom express app instead. */
+  app: Express;
 }
 
 export type InputSource = keyof Pick<
@@ -63,7 +79,8 @@ export type InputSources = Record<Method, InputSource[]>;
 
 type Headers = Record<string, string>;
 type HeadersProvider = (params: {
-  defaultHeaders: Headers; // the default headers to be overridden
+  /** @desc The default headers to be overridden. */
+  defaultHeaders: Headers;
   request: Request;
   endpoint: AbstractEndpoint;
   logger: Logger;
@@ -75,23 +92,36 @@ export type TagsConfig<TAG extends string> = Record<
 >;
 
 export interface CommonConfig<TAG extends string = string> {
-  // enable cross-origin resource sharing
-  // https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
-  // you can override the default CORS headers by setting up a provider function here
+  /**
+   * @desc Enables cross-origin resource sharing.
+   * @link https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
+   * @desc You can override the default CORS headers by setting up a provider function here.
+   */
   cors: boolean | HeadersProvider;
-  // custom ResultHandlerDefinition for common errors,
-  // default: defaultResultHandler()
+  /**
+   * @desc Custom ResultHandlerDefinition for common errors.
+   * @default defaultResultHandler
+   * @see defaultResultHandler
+   */
   errorHandler?: ResultHandlerDefinition<any, any>;
-  // logger configuration or your custom winston logger
+  /** @desc Logger configuration or your custom winston logger. */
   logger: LoggerConfig | Logger;
-  // you can disable the startup logo, default: true
+  /**
+   * @desc You can disable the startup logo.
+   * @default true
+   */
   startupLogo?: boolean;
-  // what request properties are combined into input for endpoints and middlewares
-  // the order matters: priority from lowest to highest
-  // default: { get: [query, params], post: [body, params, files],
-  // put: [body, params], patch: [body, params], delete: [query, params] }
+  /**
+   * @desc Which properties of request are combined into the input for endpoints and middlewares.
+   * @desc The order matters: priority from lowest to highest
+   * @default defaultInputSources
+   * @see defaultInputSources
+   */
   inputSources?: Partial<InputSources>;
-  // optional endpoints tagging configuration, example: { users: "Everything about the users" }
+  /**
+   * @desc Optional endpoints tagging configuration.
+   * @example: { users: "Everything about the users" }
+   */
   tags?: TagsConfig<TAG>;
 }
 
