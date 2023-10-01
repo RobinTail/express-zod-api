@@ -178,7 +178,7 @@ export const getExamples = <
   return result;
 };
 
-export const combinations = <T extends any>(
+export const combinations = <T>(
   a: T[],
   b: T[],
 ): { type: "single"; value: T[] } | { type: "tuple"; value: [T, T][] } => {
