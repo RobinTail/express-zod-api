@@ -46,7 +46,7 @@ export const isCustomHeader = (name: string): name is `x-${string}` =>
 
 /** @see https://nodejs.org/api/http.html#messageheaders */
 export const getCustomHeaders = (request: Request) =>
-  Object.entries(request.headers).reduce<Record<string, unknown>>(
+  Object.entries(request.headers).reduce<FlatObject>(
     (agg, [key, value]) =>
       isCustomHeader(key) ? { ...agg, [key]: value } : agg,
     {},
@@ -69,7 +69,7 @@ export const getInput = (
   }
   return props
     .filter((prop) => (prop === "files" ? areFilesAvailable(request) : true))
-    .reduce<Record<string, unknown>>(
+    .reduce<FlatObject>(
       (carry, prop) => ({
         ...carry,
         ...(prop === "headers" ? getCustomHeaders(request) : request[prop]),
