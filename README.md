@@ -224,8 +224,8 @@ It's _not optional_ to draw your attention to making the appropriate decision, h
 [Quick start example](#set-up-config) above, assuming that in most cases you will want to enable this feature.
 See [MDN article](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) for more information.
 
-In addition to being a boolean, `cors` can also be assigned a function that provides custom headers. That function
-has several parameters and can be asynchronous.
+In addition to being a boolean, `cors` can also be assigned a function that overrides default CORS headers.
+That function has several parameters and can be asynchronous.
 
 ```typescript
 import { createConfig } from "express-zod-api";
@@ -246,32 +246,6 @@ Please note: If you only want to send specific headers on requests to a specific
 
 Middleware can authenticate using input or `request` headers, and can provide endpoint handlers with `options`.
 Inputs of middlewares are also available to endpoint handlers within `input`.
-
-Here is an example on how to provide headers of the request.
-
-```typescript
-import { createMiddleware } from "express-zod-api";
-
-const headersProviderMiddleware = createMiddleware({
-  input: z.object({}), // means no inputs
-  middleware: async ({ request }) => ({
-    headers: request.headers,
-  }),
-});
-```
-
-By using `.addMiddleware()` method before `.build()` you can connect it to the endpoint:
-
-```typescript
-const yourEndpoint = defaultEndpointsFactory
-  .addMiddleware(headersProviderMiddleware)
-  .build({
-    // ...,
-    handler: async ({ options }) => {
-      // options.headers === request.headers
-    },
-  });
-```
 
 Here is an example of the authentication middleware, that checks a `key` from input and `token` from headers:
 
@@ -302,6 +276,19 @@ const authMiddleware = createMiddleware({
     return { user }; // provides endpoints with options.user
   },
 });
+```
+
+By using `.addMiddleware()` method before `.build()` you can connect it to the endpoint:
+
+```typescript
+const yourEndpoint = defaultEndpointsFactory
+  .addMiddleware(authMiddleware)
+  .build({
+    // ...,
+    handler: async ({ options }) => {
+      // options.user is the user returned by authMiddleware
+    },
+  });
 ```
 
 You can connect the middleware to endpoints factory right away, making it kind of global:
