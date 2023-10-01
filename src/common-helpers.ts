@@ -17,7 +17,7 @@ import { AuxMethod, Method } from "./method";
 import { mimeMultipart } from "./mime";
 import { ZodUpload } from "./upload-schema";
 
-export type FlatObject = Record<string, any>;
+export type FlatObject = Record<string, unknown>;
 
 /** @see https://expressjs.com/en/guide/routing.html */
 export const routePathParamsRegex = /:([A-Za-z0-9_]+)/g;
