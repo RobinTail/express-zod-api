@@ -1,7 +1,7 @@
 import { Endpoint } from "./endpoint";
 import { Method } from "./method";
 
-type EndpointHaving<S, K extends Method> = S extends Endpoint<
+type EndpointSupportingMethod<S, K extends Method> = S extends Endpoint<
   any,
   any,
   any,
@@ -18,7 +18,7 @@ type EndpointHaving<S, K extends Method> = S extends Endpoint<
 
 export class DependsOnMethod<
   T extends {
-    [K in Method]?: EndpointHaving<T[K], K>;
+    [K in Method]?: EndpointSupportingMethod<T[K], K>;
   },
 > {
   constructor(public readonly endpoints: T) {}
