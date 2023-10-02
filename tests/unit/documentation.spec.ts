@@ -713,6 +713,33 @@ describe("Documentation generator", () => {
       expect(spec).toMatchSnapshot();
     });
 
+    test("should be able to specify the operationId provider depending on method", () => {
+      const operationId = "CoolOperationId";
+      const spec = new Documentation({
+        config: sampleConfig,
+        routing: {
+          v1: {
+            getSome: {
+              thing: defaultEndpointsFactory.build({
+                description: "thing is the path segment",
+                methods: ["get", "post"],
+                operationId: (method) => `${method}${operationId}`,
+                input: z.object({}),
+                output: z.object({}),
+                handler: async () => ({}),
+              }),
+            },
+          },
+        },
+        version: "3.4.5",
+        title: "Testing Operation IDs",
+        serverUrl: "https://example.com",
+      }).getSpecAsYaml();
+
+      expect(spec).toContain(operationId);
+      expect(spec).toMatchSnapshot();
+    });
+
     test("should not be able to specify duplicated operation", () => {
       const operationId = "coolOperationId";
       const expectedError = new DocumentationError({

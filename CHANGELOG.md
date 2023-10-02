@@ -2,6 +2,21 @@
 
 ## Version 12
 
+### v12.4.0
+
+- Feature: ability to assign a function to the `operationId` property of the `EndpointsFactory::build()` argument.
+  - This can help to customize the Operation ID for the endpoints serving multiple methods.
+
+```typescript
+import { defaultEndpointsFactory } from "express-zod-api";
+
+defaultEndpointsFactory.build({
+  methods: ["get", "post"],
+  operationId: (method) => `${method}Something`,
+  // ...
+});
+```
+
 ### v12.3.0
 
 - Featuring the ability to customize the `operationId` in the generated documentation.
