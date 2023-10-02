@@ -310,6 +310,20 @@ describe("Endpoint", () => {
     });
   });
 
+  describe(".getOperationId()", () => {
+    test("should return undefined if its not defined upon creaton", () => {
+      expect(
+        new Endpoint({
+          methods: ["get"],
+          inputSchema: z.object({}),
+          outputSchema: z.object({}),
+          handler: async () => ({}),
+          resultHandler: defaultResultHandler,
+        }).getOperationId("get"),
+      ).toBeUndefined();
+    });
+  });
+
   describe(".outputSchema", () => {
     test("should be the output schema", () => {
       const outputSchema = z.object({
