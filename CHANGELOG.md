@@ -2,6 +2,22 @@
 
 ## Version 12
 
+### v12.3.0
+
+- Featuring the ability to customize the `operationId` in the generated documentation.
+  - Using the new property of `EndpointsFactory::build()` method you can now override the value of the
+    corresponding `operationId` of the endpoint in generated documentation.
+  - The feature is implemented by [@john-schmitz](https://github.com/john-schmitz).
+
+```typescript
+import { defaultEndpointsFactory } from "express-zod-api";
+
+defaultEndpointsFactory.build({
+  operationId: "SampleOperation",
+  // ...
+});
+```
+
 ### v12.2.0
 
 - Featuring a new input source: `headers`.
