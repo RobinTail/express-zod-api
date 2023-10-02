@@ -84,7 +84,6 @@ export class Endpoint<
 > extends AbstractEndpoint {
   readonly #descriptions: Record<DescriptionVariant, string | undefined>;
   readonly #methods: Method[] = [];
-  #siblingMethods: Method[] = [];
   readonly #middlewares: AnyMiddlewareDef[] = [];
   readonly #mimeTypes: Record<MimeVariant, string[]>;
   readonly #statusCodes: Record<ResponseVariant, number>;
@@ -99,6 +98,7 @@ export class Endpoint<
   readonly #scopes: SCO[] = [];
   readonly #tags: TAG[] = [];
   readonly #getOperationId: (method: Method) => string | undefined;
+  #siblingMethods: Method[] = [];
 
   constructor({
     middlewares,
