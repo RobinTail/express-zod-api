@@ -274,15 +274,12 @@ describe("EndpointsFactory", () => {
       });
       expect(endpoint).toBeInstanceOf(Endpoint);
       expect(endpoint.getMethods()).toStrictEqual(["get"]);
-      expect(endpoint["middlewares"]).toStrictEqual([middleware]);
       expect(
         serializeSchemaForTest(endpoint.getSchema("input")),
       ).toMatchSnapshot();
       expect(
         serializeSchemaForTest(endpoint.getSchema("output")),
       ).toMatchSnapshot();
-      expect(endpoint["handler"]).toStrictEqual(handlerMock);
-      expect(endpoint["resultHandler"]).toStrictEqual(resultHandlerMock);
       expectType<
         z.ZodIntersection<
           z.ZodObject<{ n: z.ZodNumber }>,
@@ -374,15 +371,12 @@ describe("EndpointsFactory", () => {
       });
       expect(endpoint).toBeInstanceOf(Endpoint);
       expect(endpoint.getMethods()).toStrictEqual(["get"]);
-      expect(endpoint["middlewares"]).toStrictEqual([middleware]);
       expect(
         serializeSchemaForTest(endpoint.getSchema("input")),
       ).toMatchSnapshot();
       expect(
         serializeSchemaForTest(endpoint.getSchema("output")),
       ).toMatchSnapshot();
-      expect(endpoint["handler"]).toStrictEqual(handlerMock);
-      expect(endpoint["resultHandler"]).toStrictEqual(resultHandlerMock);
       expectType<
         z.ZodIntersection<
           z.ZodIntersection<
@@ -431,15 +425,12 @@ describe("EndpointsFactory", () => {
       });
       expect(endpoint).toBeInstanceOf(Endpoint);
       expect(endpoint.getMethods()).toStrictEqual(["get"]);
-      expect(endpoint["middlewares"]).toStrictEqual([middleware]);
       expect(
         serializeSchemaForTest(endpoint.getSchema("input")),
       ).toMatchSnapshot();
       expect(
         serializeSchemaForTest(endpoint.getSchema("output")),
       ).toMatchSnapshot();
-      expect(endpoint["handler"]).toStrictEqual(handlerMock);
-      expect(endpoint["resultHandler"]).toStrictEqual(resultHandlerMock);
       expectType<
         z.ZodIntersection<
           z.ZodUnion<

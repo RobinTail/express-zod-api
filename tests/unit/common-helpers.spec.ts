@@ -3,6 +3,7 @@ import { expectType } from "tsd";
 import {
   combinations,
   defaultInputSources,
+  getCustomHeaders,
   getExamples,
   getInput,
   getMessageFromError,
@@ -11,6 +12,7 @@ import {
   hasCoercion,
   hasTopLevelTransformingEffect,
   hasUpload,
+  isCustomHeader,
   isLoggerConfig,
   isValidDate,
   makeErrorFromAnything,
@@ -26,63 +28,70 @@ describe("Common Helpers", () => {
     });
   });
 
+  describe("isCustomHeader()", () => {
+    test.each([
+      { name: "x-request-id", expected: true },
+      { name: "authorization", expected: false },
+    ])("should validate those starting with x- %#", ({ name, expected }) => {
+      expect(isCustomHeader(name)).toBe(expected);
+    });
+  });
+
+  describe("getCustomHeaders()", () => {
+    test("should reduce the object to the custom headers only", () => {
+      expect(
+        getCustomHeaders({
+          headers: {
+            authorization: "Bearer ***",
+            "x-request-id": "test",
+            "x-another": "header",
+          },
+        } as unknown as Request),
+      ).toEqual({ "x-request-id": "test", "x-another": "header" });
+    });
+  });
+
   describe("getInput()", () => {
     test("should return body for POST, PUT and PATCH requests by default", () => {
       expect(
         getInput(
           {
-            body: {
-              param: 123,
-            },
+            body: { param: 123 },
             method: "POST",
             header: () => "application/json",
           } as unknown as Request,
           undefined,
         ),
-      ).toEqual({
-        param: 123,
-      });
+      ).toEqual({ param: 123 });
       expect(
         getInput(
           {
-            body: {
-              param: 123,
-            },
+            body: { param: 123 },
             method: "PUT",
           } as Request,
           {},
         ),
-      ).toEqual({
-        param: 123,
-      });
+      ).toEqual({ param: 123 });
       expect(
         getInput(
           {
-            body: {
-              param: 123,
-            },
+            body: { param: 123 },
             method: "PATCH",
           } as Request,
           undefined,
         ),
-      ).toEqual({
-        param: 123,
-      });
+      ).toEqual({ param: 123 });
     });
     test("should return query for GET requests by default", () => {
       expect(
         getInput(
           {
-            query: {
-              param: 123,
-            },
+            query: { param: 123 },
             method: "GET",
           } as unknown as Request,
           {},
         ),
-      ).toEqual({
-        param: 123,
-      });
+      ).toEqual({ param: 123 });
     });
     test("should return only query for DELETE requests by default", () => {
       expect(
@@ -94,9 +103,7 @@ describe("Common Helpers", () => {
           } as unknown as Request,
           undefined,
         ),
-      ).toEqual({
-        a: "query",
-      });
+      ).toEqual({ a: "query" });
     });
     test("should return body and query for unknown requests by default", () => {
       expect(
@@ -108,81 +115,64 @@ describe("Common Helpers", () => {
           } as unknown as Request,
           undefined,
         ),
-      ).toEqual({
-        a: "query",
-        b: "body",
-      });
+      ).toEqual({ a: "query", b: "body" });
     });
     test("should return body and files on demand for POST by default", () => {
       expect(
         getInput(
           {
-            body: {
-              param: 123,
-            },
-            files: {
-              file: "456",
-            },
+            body: { param: 123 },
+            files: { file: "456" },
             method: "POST",
             header: () => "multipart/form-data; charset=utf-8",
           } as unknown as Request,
           {},
         ),
-      ).toEqual({
-        param: 123,
-        file: "456",
-      });
+      ).toEqual({ param: 123, file: "456" });
     });
     test("Issue 158: should return query and body for POST on demand", () => {
       expect(
         getInput(
           {
-            body: {
-              a: "body",
-            },
-            query: {
-              b: "query",
-            },
+            body: { a: "body" },
+            query: { b: "query" },
             method: "POST",
             header: () => "application/json",
           } as unknown as Request,
-          {
-            post: ["query", "body"],
-          },
+          { post: ["query", "body"] },
         ),
-      ).toEqual({
-        a: "body",
-        b: "query",
-      });
+      ).toEqual({ a: "body", b: "query" });
     });
     test("URL params: should also be taken, with a higher priority by default", () => {
       expect(
         getInput(
           {
-            body: {
-              a: "body",
-            },
-            query: {
-              b: "query",
-            },
-            params: {
-              a: "url param",
-              b: "url param",
-            },
+            body: { a: "body" },
+            query: { b: "query" },
+            params: { a: "url param", b: "url param" },
             method: "POST",
             header: () => "application/json",
           } as unknown as Request,
           undefined,
         ),
-      ).toEqual({
-        a: "url param",
-        b: "url param",
-      });
+      ).toEqual({ a: "url param", b: "url param" });
     });
     test("Issue 514: should return empty object for OPTIONS", () => {
       expect(
         getInput({ method: "OPTIONS" } as unknown as Request, undefined),
       ).toEqual({});
+    });
+    test("Feature 1180: should include custom headers when enabled", () => {
+      expect(
+        getInput(
+          {
+            method: "POST",
+            body: { a: "body" },
+            headers: { authorization: "Bearer ***", "x-request-id": "test" },
+          } as unknown as Request,
+          { post: ["body", "headers"] },
+        ),
+      ).toEqual({ a: "body", "x-request-id": "test" });
     });
   });
 

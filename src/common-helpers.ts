@@ -22,12 +22,12 @@ export type FlatObject = Record<string, any>;
 /** @see https://expressjs.com/en/guide/routing.html */
 export const routePathParamsRegex = /:([A-Za-z0-9_]+)/g;
 
-function areFilesAvailable(request: Request) {
+const areFilesAvailable = (request: Request): boolean => {
   const contentType = request.header("content-type") || "";
   const isMultipart =
     contentType.slice(0, mimeMultipart.length).toLowerCase() === mimeMultipart;
   return "files" in request && isMultipart;
-}
+};
 
 export const defaultInputSources: InputSources = {
   get: ["query", "params"],
@@ -41,10 +41,21 @@ const fallbackInputSource: InputSource[] = ["body", "query", "params"];
 export const getActualMethod = (request: Request) =>
   request.method.toLowerCase() as Method | AuxMethod;
 
-export function getInput(
+export const isCustomHeader = (name: string): name is `x-${string}` =>
+  name.startsWith("x-");
+
+/** @see https://nodejs.org/api/http.html#messageheaders */
+export const getCustomHeaders = (request: Request) =>
+  Object.entries(request.headers).reduce<Record<string, unknown>>(
+    (agg, [key, value]) =>
+      isCustomHeader(key) ? { ...agg, [key]: value } : agg,
+    {},
+  );
+
+export const getInput = (
   request: Request,
   inputAssignment: CommonConfig["inputSources"],
-): any {
+) => {
   const method = getActualMethod(request);
   if (method === "options") {
     return {};
@@ -58,38 +69,32 @@ export function getInput(
   }
   return props
     .filter((prop) => (prop === "files" ? areFilesAvailable(request) : true))
-    .reduce(
+    .reduce<Record<string, unknown>>(
       (carry, prop) => ({
         ...carry,
-        ...request[prop],
+        ...(prop === "headers" ? getCustomHeaders(request) : request[prop]),
       }),
       {},
     );
-}
+};
 
-export function isLoggerConfig(logger: any): logger is LoggerConfig {
-  return (
-    typeof logger === "object" &&
-    "level" in logger &&
-    "color" in logger &&
-    Object.keys(loggerLevels).includes(logger.level) &&
-    typeof logger.color === "boolean"
-  );
-}
+export const isLoggerConfig = (logger: any): logger is LoggerConfig =>
+  typeof logger === "object" &&
+  "level" in logger &&
+  "color" in logger &&
+  Object.keys(loggerLevels).includes(logger.level) &&
+  typeof logger.color === "boolean";
 
-export function isValidDate(date: Date): boolean {
-  return !isNaN(date.getTime());
-}
+export const isValidDate = (date: Date): boolean => !isNaN(date.getTime());
 
-export function makeErrorFromAnything(subject: any): Error {
-  return subject instanceof Error
+export const makeErrorFromAnything = (subject: any): Error =>
+  subject instanceof Error
     ? subject
     : new Error(
         typeof subject === "symbol" ? subject.toString() : `${subject}`,
       );
-}
 
-export function getMessageFromError(error: Error): string {
+export const getMessageFromError = (error: Error): string => {
   if (error instanceof z.ZodError) {
     return error.issues
       .map(({ path, message }) =>
@@ -102,9 +107,9 @@ export function getMessageFromError(error: Error): string {
     return `output${hasFirstField ? "/" : ": "}${error.message}`;
   }
   return error.message;
-}
+};
 
-export function getStatusCodeFromError(error: Error): number {
+export const getStatusCodeFromError = (error: Error): number => {
   if (error instanceof HttpError) {
     return error.statusCode;
   }
@@ -112,7 +117,7 @@ export function getStatusCodeFromError(error: Error): number {
     return 400;
   }
   return 500;
-}
+};
 
 export const logInternalError = ({
   logger,
@@ -190,18 +195,18 @@ export const combinations = <T extends any>(
   return { type: "tuple", value: result };
 };
 
-export function getRoutePathParams(path: string): string[] {
+export const getRoutePathParams = (path: string): string[] => {
   const match = path.match(routePathParamsRegex);
   if (!match) {
     return [];
   }
   return match.map((param) => param.slice(1));
-}
+};
 
 const reduceBool = (arr: boolean[]) =>
   arr.reduce((carry, bool) => carry || bool, false);
 
-export function hasTopLevelTransformingEffect(schema: IOSchema): boolean {
+export const hasTopLevelTransformingEffect = (schema: IOSchema): boolean => {
   if (schema instanceof z.ZodEffects) {
     if (schema._def.effect.type !== "refinement") {
       return true;
@@ -216,9 +221,9 @@ export function hasTopLevelTransformingEffect(schema: IOSchema): boolean {
     );
   }
   return false; // ZodObject left
-}
+};
 
-export function hasUpload(schema: z.ZodTypeAny): boolean {
+export const hasUpload = (schema: z.ZodTypeAny): boolean => {
   if (schema instanceof ZodUpload) {
     return true;
   }
@@ -247,7 +252,7 @@ export function hasUpload(schema: z.ZodTypeAny): boolean {
     return hasUpload(schema._def.innerType);
   }
   return false;
-}
+};
 
 /**
  * @desc isNullable() and isOptional() validate the schema's input

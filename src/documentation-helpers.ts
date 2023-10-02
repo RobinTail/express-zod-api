@@ -23,6 +23,7 @@ import {
   getRoutePathParams,
   hasCoercion,
   hasTopLevelTransformingEffect,
+  isCustomHeader,
   makeCleanId,
   routePathParamsRegex,
   tryToTransform,
@@ -609,10 +610,10 @@ export const depictParamExamples = (
   };
 };
 
-export function extractObjectSchema(
+export const extractObjectSchema = (
   subject: IOSchema,
   ctx: Pick<OpenAPIContext, "path" | "method" | "isResponse">,
-) {
+) => {
   if (subject instanceof z.ZodObject) {
     return subject;
   }
@@ -641,7 +642,7 @@ export function extractObjectSchema(
     );
   }
   return copyMeta(subject, objectSchema);
-}
+};
 
 export const depictRequestParams = ({
   path,
@@ -664,9 +665,12 @@ export const depictRequestParams = ({
   }).shape;
   const pathParams = getRoutePathParams(path);
   const isQueryEnabled = inputSources.includes("query");
-  const isParamsEnabled = inputSources.includes("params");
+  const areParamsEnabled = inputSources.includes("params");
+  const areHeadersEnabled = inputSources.includes("headers");
   const isPathParam = (name: string) =>
-    isParamsEnabled && pathParams.includes(name);
+    areParamsEnabled && pathParams.includes(name);
+  const isHeaderParam = (name: string) =>
+    areHeadersEnabled && isCustomHeader(name);
   return Object.keys(shape)
     .filter((name) => isQueryEnabled || isPathParam(name))
     .map((name) => {
@@ -688,7 +692,11 @@ export const depictRequestParams = ({
           : depicted;
       return {
         name,
-        in: isPathParam(name) ? "path" : "query",
+        in: isPathParam(name)
+          ? "path"
+          : isHeaderParam(name)
+          ? "header"
+          : "query",
         required: !shape[name].isOptional(),
         description:
           (isSchemaObject(depicted) && depicted.description) ||

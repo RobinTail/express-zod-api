@@ -103,25 +103,22 @@ export class Endpoint<
   SCO extends string,
   TAG extends string,
 > extends AbstractEndpoint {
-  protected readonly descriptions: Record<
-    DescriptionVariant,
-    string | undefined
-  >;
-  protected readonly methods: M[] = [];
-  protected siblingMethods: Method[] = [];
-  protected readonly middlewares: AnyMiddlewareDef[] = [];
-  protected readonly mimeTypes: Record<MimeVariant, string[]>;
-  protected readonly statusCodes: Record<ResponseVariant, number>;
-  protected readonly handler: Handler<z.output<IN>, z.input<OUT>, OPT>;
-  protected readonly resultHandler: ResultHandlerDefinition<POS, NEG>;
-  protected readonly schemas: {
+  readonly #descriptions: Record<DescriptionVariant, string | undefined>;
+  readonly #methods: M[] = [];
+  #siblingMethods: Method[] = [];
+  readonly #middlewares: AnyMiddlewareDef[] = [];
+  readonly #mimeTypes: Record<MimeVariant, string[]>;
+  readonly #statusCodes: Record<ResponseVariant, number>;
+  readonly #handler: Handler<z.output<IN>, z.input<OUT>, OPT>;
+  readonly #resultHandler: ResultHandlerDefinition<POS, NEG>;
+  readonly #schemas: {
     input: IN;
     output: OUT;
     positive: POS;
     negative: NEG;
   };
-  protected readonly scopes: SCO[] = [];
-  protected readonly tags: TAG[] = [];
+  readonly #scopes: SCO[] = [];
+  readonly #tags: TAG[] = [];
 
   constructor({
     middlewares,
@@ -144,17 +141,17 @@ export class Endpoint<
         );
       }
     });
-    this.middlewares = middlewares;
+    this.#middlewares = middlewares;
     const apiResponse = {
       positive: resultHandler.getPositiveResponse(outputSchema),
       negative: resultHandler.getNegativeResponse(),
     };
-    this.mimeTypes = {
+    this.#mimeTypes = {
       input: hasUpload(inputSchema) ? [mimeMultipart] : [mimeJson],
       positive: getMimeTypesFromApiResponse(apiResponse.positive),
       negative: getMimeTypesFromApiResponse(apiResponse.negative),
     };
-    this.schemas = {
+    this.#schemas = {
       input: inputSchema,
       output: outputSchema,
       positive:
@@ -166,7 +163,7 @@ export class Endpoint<
           ? apiResponse.negative
           : apiResponse.negative.schema,
     };
-    this.statusCodes = {
+    this.#statusCodes = {
       positive:
         apiResponse.positive instanceof z.ZodType
           ? defaultStatusCodes.positive
@@ -176,25 +173,25 @@ export class Endpoint<
           ? defaultStatusCodes.negative
           : apiResponse.negative.statusCode || defaultStatusCodes.negative,
     };
-    this.handler = handler;
-    this.resultHandler = resultHandler;
-    this.descriptions = { long: description, short: shortDescription };
+    this.#handler = handler;
+    this.#resultHandler = resultHandler;
+    this.#descriptions = { long: description, short: shortDescription };
     if ("scopes" in rest && rest.scopes) {
-      this.scopes.push(...rest.scopes);
+      this.#scopes.push(...rest.scopes);
     }
     if ("scope" in rest && rest.scope) {
-      this.scopes.push(rest.scope);
+      this.#scopes.push(rest.scope);
     }
     if ("tags" in rest && rest.tags) {
-      this.tags.push(...rest.tags);
+      this.#tags.push(...rest.tags);
     }
     if ("tag" in rest && rest.tag) {
-      this.tags.push(rest.tag);
+      this.#tags.push(rest.tag);
     }
     if ("methods" in rest) {
-      this.methods = rest.methods;
+      this.#methods = rest.methods;
     } else {
-      this.methods = [rest.method];
+      this.#methods = [rest.method];
     }
   }
 
@@ -203,15 +200,15 @@ export class Endpoint<
    * @deprecated This method is for internal needs of the library, please avoid using it.
    * */
   public override _setSiblingMethods(methods: Method[]): void {
-    this.siblingMethods = methods;
+    this.#siblingMethods = methods;
   }
 
   public override getDescription(variant: DescriptionVariant) {
-    return this.descriptions[variant];
+    return this.#descriptions[variant];
   }
 
   public override getMethods(): M[] {
-    return this.methods;
+    return this.#methods;
   }
 
   public override getSchema(variant: "input"): IN;
@@ -219,19 +216,19 @@ export class Endpoint<
   public override getSchema(variant: "positive"): POS;
   public override getSchema(variant: "negative"): NEG;
   public override getSchema(variant: IOVariant | ResponseVariant) {
-    return this.schemas[variant];
+    return this.#schemas[variant];
   }
 
   public override getMimeTypes(variant: MimeVariant) {
-    return this.mimeTypes[variant];
+    return this.#mimeTypes[variant];
   }
 
   public override getStatusCode(variant: ResponseVariant) {
-    return this.statusCodes[variant];
+    return this.#statusCodes[variant];
   }
 
   public override getSecurity() {
-    return this.middlewares.reduce<LogicalContainer<Security>>(
+    return this.#middlewares.reduce<LogicalContainer<Security>>(
       (acc, middleware) =>
         middleware.security ? combineContainers(acc, middleware.security) : acc,
       { and: [] },
@@ -239,16 +236,16 @@ export class Endpoint<
   }
 
   public override getScopes(): SCO[] {
-    return this.scopes;
+    return this.#scopes;
   }
 
   public override getTags(): TAG[] {
-    return this.tags;
+    return this.#tags;
   }
 
   #getDefaultCorsHeaders(): Record<string, string> {
-    const accessMethods = (this.methods as Array<Method | AuxMethod>)
-      .concat(this.siblingMethods)
+    const accessMethods = (this.#methods as Array<Method | AuxMethod>)
+      .concat(this.#siblingMethods)
       .concat("options")
       .join(", ")
       .toUpperCase();
@@ -261,7 +258,7 @@ export class Endpoint<
 
   async #parseOutput(output: any) {
     try {
-      return await this.schemas.output.parseAsync(output);
+      return await this.#schemas.output.parseAsync(output);
     } catch (e) {
       if (e instanceof z.ZodError) {
         throw new OutputValidationError(e);
@@ -285,7 +282,7 @@ export class Endpoint<
   }) {
     const options: any = {};
     let isStreamClosed = false;
-    for (const def of this.middlewares) {
+    for (const def of this.#middlewares) {
       if (method === "options" && def.type === "proprietary") {
         continue;
       }
@@ -331,14 +328,16 @@ export class Endpoint<
   }) {
     let finalInput: z.output<IN>; // final input types transformations for handler
     try {
-      finalInput = (await this.schemas.input.parseAsync(input)) as z.output<IN>;
+      finalInput = (await this.#schemas.input.parseAsync(
+        input,
+      )) as z.output<IN>;
     } catch (e) {
       if (e instanceof z.ZodError) {
         throw new InputValidationError(e);
       }
       throw e;
     }
-    return this.handler({
+    return this.#handler({
       input: finalInput,
       options,
       logger,
@@ -361,7 +360,7 @@ export class Endpoint<
     output: any;
   }) {
     try {
-      await this.resultHandler.handler({
+      await this.#resultHandler.handler({
         error,
         output,
         request,
