@@ -29,6 +29,7 @@ describe("Endpoint", () => {
         scopes: [],
         tags: [],
         descriptions: { long: undefined, short: undefined },
+        getOperationId: () => undefined,
       });
       expect(endpointMock.getMethods()).toEqual([
         "get",
@@ -54,6 +55,7 @@ describe("Endpoint", () => {
         scopes: [],
         tags: [],
         descriptions: { long: undefined, short: undefined },
+        getOperationId: () => undefined,
       });
       expect(endpointMock.getMethods()).toEqual(["patch"]);
     });
@@ -333,6 +335,7 @@ describe("Endpoint", () => {
         handler: jest.fn(),
         resultHandler: defaultResultHandler,
         descriptions: { long: undefined, short: undefined },
+        getOperationId: () => undefined,
       });
       expect(endpoint.getSchema("output")).toEqual(outputSchema);
     });
@@ -736,6 +739,7 @@ describe("Endpoint", () => {
             scopes: [],
             tags: [],
             descriptions: { long: undefined, short: undefined },
+            getOperationId: () => undefined,
           }),
       ).toThrowError(
         new IOSchemaError(
@@ -758,6 +762,7 @@ describe("Endpoint", () => {
             scopes: [],
             tags: [],
             descriptions: { long: undefined, short: undefined },
+            getOperationId: () => undefined,
           }),
       ).toThrowError(
         new IOSchemaError(

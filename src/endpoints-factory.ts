@@ -165,6 +165,8 @@ export class EndpointsFactory<
   > {
     const { middlewares, resultHandler } = this;
     const methods = "methods" in rest ? rest.methods : [rest.method];
+    const getOperationId =
+      typeof operationId === "function" ? operationId : () => operationId;
     const scopes =
       "scopes" in rest && rest.scopes
         ? rest.scopes
@@ -185,7 +187,7 @@ export class EndpointsFactory<
       scopes,
       tags,
       methods,
-      operationId,
+      getOperationId,
       descriptions: { long, short },
       inputSchema: getFinalEndpointInputSchema<IN, BIN>(middlewares, input),
     });

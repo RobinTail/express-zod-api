@@ -88,7 +88,7 @@ type EndpointProps<
   handler: Handler<z.output<IN>, z.input<OUT>, OPT>;
   resultHandler: ResultHandlerDefinition<POS, NEG>;
   descriptions: Record<DescriptionVariant, string | undefined>;
-  operationId?: string | ((method: Method) => string);
+  getOperationId: (method: Method) => string | undefined;
   methods: Method[];
   scopes: SCO[];
   tags: TAG[];
@@ -119,7 +119,7 @@ export class Endpoint<
   };
   readonly #scopes: SCO[] = [];
   readonly #tags: TAG[] = [];
-  readonly #operationId?: string | ((method: Method) => string);
+  readonly #getOperationId: (method: Method) => string | undefined;
 
   constructor({
     middlewares,
@@ -128,7 +128,7 @@ export class Endpoint<
     handler,
     resultHandler,
     descriptions,
-    operationId,
+    getOperationId,
     scopes,
     methods,
     tags,
@@ -148,7 +148,7 @@ export class Endpoint<
     this.#resultHandler = resultHandler;
     this.#descriptions = descriptions;
     this.#middlewares = middlewares;
-    this.#operationId = operationId;
+    this.#getOperationId = getOperationId;
     this.#methods = methods;
     this.#scopes = scopes;
     this.#tags = tags;
@@ -234,9 +234,7 @@ export class Endpoint<
   }
 
   public override getOperationId(method: Method): string | undefined {
-    return typeof this.#operationId === "function"
-      ? this.#operationId(method)
-      : this.#operationId;
+    return this.#getOperationId(method);
   }
 
   #getDefaultCorsHeaders(): Record<string, string> {
