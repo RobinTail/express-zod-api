@@ -50,16 +50,18 @@ export const walkRouting = ({
         element.apply(path, onStatic);
       }
     } else if (element instanceof DependsOnMethod) {
-      Object.entries<AbstractEndpoint>(element.methods).forEach(
+      Object.entries<AbstractEndpoint>(element.endpoints).forEach(
         ([method, endpoint]) => {
-          onEndpoint(endpoint, path, method as Method);
+          if (endpoint.getMethods().includes(method as Method)) {
+            onEndpoint(endpoint, path, method as Method);
+          }
         },
       );
-      if (hasCors && Object.keys(element.methods).length > 0) {
+      if (hasCors && Object.keys(element.endpoints).length > 0) {
         const [firstMethod, ...siblingMethods] = Object.keys(
-          element.methods,
+          element.endpoints,
         ) as Method[];
-        const firstEndpoint = element.methods[firstMethod]!;
+        const firstEndpoint = element.endpoints[firstMethod]!;
         firstEndpoint._setSiblingMethods(siblingMethods);
         onEndpoint(firstEndpoint, path, "options");
       }

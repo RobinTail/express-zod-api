@@ -8,7 +8,11 @@ import { ServeStatic } from "./serve-static";
 import { getStartupLogo } from "./startup-logo";
 
 export interface Routing {
-  [SEGMENT: string]: Routing | DependsOnMethod | AbstractEndpoint | ServeStatic;
+  [SEGMENT: string]:
+    | Routing
+    | DependsOnMethod<any>
+    | AbstractEndpoint
+    | ServeStatic;
 }
 
 export const initRouting = ({

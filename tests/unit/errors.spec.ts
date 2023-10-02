@@ -1,9 +1,5 @@
 import { ZodError } from "zod";
-import {
-  DependsOnMethodError,
-  DocumentationError,
-  RoutingError,
-} from "../../src";
+import { DocumentationError, RoutingError } from "../../src";
 import {
   IOSchemaError,
   InputValidationError,
@@ -50,19 +46,6 @@ describe("Errors", () => {
 
     test("should have the name matching its class", () => {
       expect(new IOSchemaError("test").name).toBe("IOSchemaError");
-    });
-  });
-
-  describe("DependsOnMethodError", () => {
-    test("should be an instance of RoutingError and Error", () => {
-      expect(new DependsOnMethodError("test")).toBeInstanceOf(RoutingError);
-      expect(new DependsOnMethodError("test")).toBeInstanceOf(Error);
-    });
-
-    test("should have the name matching its class", () => {
-      expect(new DependsOnMethodError("test").name).toBe(
-        "DependsOnMethodError",
-      );
     });
   });
 

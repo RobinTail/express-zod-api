@@ -1,37 +1,25 @@
 import { Endpoint } from "./endpoint";
-import { DependsOnMethodError } from "./errors";
 import { Method } from "./method";
 
-export class DependsOnMethod {
-  constructor(
-    public readonly methods: {
-      [K in Method]?:
-        | Endpoint<any, any, any, K, any, any, any, any>
-        | Endpoint<any, any, any, Method, any, any, any, any>;
-    },
-  ) {
-    (Object.keys(methods) as (keyof typeof methods)[]).forEach((key) => {
-      if (key in methods) {
-        const endpointMethods = methods[key]?.getMethods() || [];
-        if (!endpointMethods.includes(key)) {
-          throw new DependsOnMethodError(
-            `The endpoint assigned to the '${key}' parameter must have at least this method in its specification.\n` +
-              "This error should prevent mistakes during the development process.\n" +
-              "Example:\n\n" +
-              `new ${this.constructor.name}({\n` +
-              `  ${key}: endpointsFactory.build({\n` +
-              `    methods: ['${key}', ` +
-              ((methods[key]?.getMethods() || [])
-                .map((m) => `'${m}'`)
-                .join(", ") || "...") +
-              "]\n" +
-              `    // or method: '${key}'\n` +
-              "    ...\n" +
-              "  })\n" +
-              "});\n",
-          );
-        }
-      }
-    });
-  }
+type EndpointHaving<S, K extends Method> = S extends Endpoint<
+  any,
+  any,
+  any,
+  infer M,
+  any,
+  any,
+  any,
+  any
+>
+  ? K extends M
+    ? S
+    : never
+  : never;
+
+export class DependsOnMethod<
+  T extends {
+    [K in Method]?: EndpointHaving<T[K], K>;
+  },
+> {
+  constructor(public readonly endpoints: T) {}
 }
