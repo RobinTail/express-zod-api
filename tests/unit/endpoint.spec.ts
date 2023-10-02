@@ -28,6 +28,7 @@ describe("Endpoint", () => {
         middlewares: [],
         scopes: [],
         tags: [],
+        descriptions: { long: undefined, short: undefined },
       });
       expect(endpointMock.getMethods()).toEqual([
         "get",
@@ -52,6 +53,7 @@ describe("Endpoint", () => {
         middlewares: [],
         scopes: [],
         tags: [],
+        descriptions: { long: undefined, short: undefined },
       });
       expect(endpointMock.getMethods()).toEqual(["patch"]);
     });
@@ -330,6 +332,7 @@ describe("Endpoint", () => {
         outputSchema,
         handler: jest.fn(),
         resultHandler: defaultResultHandler,
+        descriptions: { long: undefined, short: undefined },
       });
       expect(endpoint.getSchema("output")).toEqual(outputSchema);
     });
@@ -732,6 +735,7 @@ describe("Endpoint", () => {
             middlewares: [],
             scopes: [],
             tags: [],
+            descriptions: { long: undefined, short: undefined },
           }),
       ).toThrowError(
         new IOSchemaError(
@@ -753,6 +757,7 @@ describe("Endpoint", () => {
             middlewares: [],
             scopes: [],
             tags: [],
+            descriptions: { long: undefined, short: undefined },
           }),
       ).toThrowError(
         new IOSchemaError(

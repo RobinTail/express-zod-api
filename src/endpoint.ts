@@ -87,8 +87,7 @@ type EndpointProps<
   outputSchema: OUT;
   handler: Handler<z.output<IN>, z.input<OUT>, OPT>;
   resultHandler: ResultHandlerDefinition<POS, NEG>;
-  description?: string;
-  shortDescription?: string;
+  descriptions: Record<DescriptionVariant, string | undefined>;
   operationId?: string | ((method: Method) => string);
   methods: Method[];
   scopes: SCO[];
@@ -128,8 +127,7 @@ export class Endpoint<
     outputSchema,
     handler,
     resultHandler,
-    description,
-    shortDescription,
+    descriptions,
     operationId,
     scopes,
     methods,
@@ -184,7 +182,7 @@ export class Endpoint<
     };
     this.#handler = handler;
     this.#resultHandler = resultHandler;
-    this.#descriptions = { long: description, short: shortDescription };
+    this.#descriptions = descriptions;
   }
 
   /**

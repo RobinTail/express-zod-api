@@ -150,6 +150,9 @@ export class EndpointsFactory<
     input,
     handler,
     output: outputSchema,
+    description: long,
+    shortDescription: short,
+    operationId,
     ...rest
   }: BuildProps<BIN, BOUT, IN, OUT, SCO, TAG>): Endpoint<
     ProbableIntersection<IN, BIN>,
@@ -182,8 +185,9 @@ export class EndpointsFactory<
       scopes,
       tags,
       methods,
+      operationId,
+      descriptions: { long, short },
       inputSchema: getFinalEndpointInputSchema<IN, BIN>(middlewares, input),
-      ...rest,
     });
   }
 }
