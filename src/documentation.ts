@@ -132,11 +132,6 @@ export class Documentation extends OpenApiBuilder {
       _method,
     ) => {
       const method = _method as Method;
-      const operationId = this.ensureUniqOperationId(
-        path,
-        method,
-        endpoint.getOperationId(),
-      );
       const commonParams = {
         path,
         method,
@@ -155,6 +150,11 @@ export class Documentation extends OpenApiBuilder {
         ...commonParams,
         inputSources,
       });
+      const operationId = this.ensureUniqOperationId(
+        path,
+        method,
+        endpoint.getOperationId(),
+      );
       const operation: OperationObject = {
         operationId,
         responses: {
