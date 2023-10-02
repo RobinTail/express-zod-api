@@ -1200,6 +1200,78 @@ servers:
 "
 `;
 
+exports[`Documentation generator getSpecAsYaml() should be able to specify operation 1`] = `
+"openapi: 3.0.0
+info:
+  title: Testing Operation IDs
+  version: 3.4.5
+paths:
+  /v1/getSome/thing:
+    get:
+      operationId: coolOperationId
+      responses:
+        "200":
+          description: GET /v1/getSome/thing Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - success
+                  data:
+                    type: object
+                    properties: {}
+                required:
+                  - status
+                  - data
+        "400":
+          description: GET /v1/getSome/thing Error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                required:
+                  - status
+                  - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
+      description: thing is the path segment
+      summary: thing is the path segment
+components:
+  schemas: {}
+  responses: {}
+  parameters: {}
+  examples: {}
+  requestBodies: {}
+  headers: {}
+  securitySchemes: {}
+  links: {}
+  callbacks: {}
+tags: []
+servers:
+  - url: https://example.com
+"
+`;
+
 exports[`Documentation generator getSpecAsYaml() should ensure the uniq operation ids 1`] = `
 "openapi: 3.0.0
 info:

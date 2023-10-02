@@ -2,6 +2,7 @@ import { config as exampleConfig } from "../../example/config";
 import { routing } from "../../example/routing";
 import {
   Documentation,
+  DocumentationError,
   EndpointsFactory,
   createConfig,
   createMiddleware,
@@ -683,6 +684,75 @@ describe("Documentation generator", () => {
         serverUrl: "https://example.com",
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
+    });
+
+    test("should be able to specify operation", () => {
+      const operationId = "coolOperationId";
+      const spec = new Documentation({
+        config: sampleConfig,
+        routing: {
+          v1: {
+            getSome: {
+              thing: defaultEndpointsFactory.build({
+                description: "thing is the path segment",
+                method: "get",
+                operationId,
+                input: z.object({}),
+                output: z.object({}),
+                handler: async () => ({}),
+              }),
+            },
+          },
+        },
+        version: "3.4.5",
+        title: "Testing Operation IDs",
+        serverUrl: "https://example.com",
+      }).getSpecAsYaml();
+
+      expect(spec).toContain(operationId);
+      expect(spec).toMatchSnapshot();
+    });
+
+    test("should not be able to specify duplicated operation", () => {
+      const operationId = "coolOperationId";
+      const expectedError = new DocumentationError({
+        message: 'Duplicated operationId: "coolOperationId"',
+        isResponse: false,
+        method: "get",
+        path: "/v1/getSomeTwo/thing",
+      });
+      expect(() => {
+        new Documentation({
+          config: sampleConfig,
+          routing: {
+            v1: {
+              getSome: {
+                thing: defaultEndpointsFactory.build({
+                  description: "thing is the path segment",
+                  method: "get",
+                  operationId,
+                  input: z.object({}),
+                  output: z.object({}),
+                  handler: async () => ({}),
+                }),
+              },
+              getSomeTwo: {
+                thing: defaultEndpointsFactory.build({
+                  description: "thing is the path segment",
+                  method: "get",
+                  operationId,
+                  input: z.object({}),
+                  output: z.object({}),
+                  handler: async () => ({}),
+                }),
+              },
+            },
+          },
+          version: "3.4.5",
+          title: "Testing Operation IDs",
+          serverUrl: "https://example.com",
+        }).getSpecAsYaml();
+      }).toThrow(expectedError);
     });
 
     test("should handle custom mime types and status codes", () => {
