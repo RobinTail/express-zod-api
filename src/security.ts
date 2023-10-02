@@ -1,23 +1,23 @@
-interface BasicSecurity {
+export interface BasicSecurity {
   type: "basic";
 }
 
-interface BearerSecurity {
+export interface BearerSecurity {
   type: "bearer";
   format?: "JWT" | string;
 }
 
-interface InputSecurity<K extends string> {
+export interface InputSecurity<K extends string> {
   type: "input";
   name: K;
 }
 
-interface CustomHeaderSecurity {
+export interface CustomHeaderSecurity {
   type: "header";
   name: string;
 }
 
-interface CookieSecurity {
+export interface CookieSecurity {
   type: "cookie";
   name: string;
 }
@@ -26,7 +26,7 @@ interface CookieSecurity {
  * @see https://swagger.io/docs/specification/authentication/openid-connect-discovery/
  * @desc available scopes has to be provided via the specified URL
  */
-interface OpenIdSecurity {
+export interface OpenIdSecurity {
   type: "openid";
   url: string;
 }
@@ -66,7 +66,7 @@ type ClientCredFlow<S extends string> = TokenUrl & RefreshUrl & Scopes<S>;
 /**
  * @see https://swagger.io/docs/specification/authentication/oauth2/
  */
-interface OAuth2Security<S extends string> {
+export interface OAuth2Security<S extends string> {
   type: "oauth2";
   flows?: {
     /** @desc Authorization Code flow (previously called accessCode in OpenAPI 2.0) */

@@ -19,9 +19,7 @@ describe("Documentation generator", () => {
   const sampleConfig = createConfig({
     cors: true,
     logger: { level: "debug", color: true },
-    server: {
-      listen: 8090,
-    },
+    server: { listen: 8090 },
   });
 
   describe("getSpecAsYaml()", () => {
@@ -905,6 +903,36 @@ describe("Documentation generator", () => {
         },
         version: "3.4.5",
         title: "Testing route path params",
+        serverUrl: "https://example.com",
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
+    });
+  });
+
+  describe("Feature 1180: Headers opt-in params", () => {
+    const specificConfig = createConfig({
+      ...sampleConfig,
+      inputSources: { get: ["query", "params", "headers"] },
+    });
+
+    test("should describe x- inputs as header params", () => {
+      const spec = new Documentation({
+        config: specificConfig,
+        routing: {
+          v1: {
+            test: defaultEndpointsFactory.build({
+              method: "get",
+              input: z.object({
+                id: z.string(),
+                "x-request-id": z.string(),
+              }),
+              output: z.object({}),
+              handler: jest.fn(),
+            }),
+          },
+        },
+        version: "3.4.5",
+        title: "Testing headers params",
         serverUrl: "https://example.com",
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();

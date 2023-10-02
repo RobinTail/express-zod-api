@@ -2,6 +2,48 @@
 
 ## Version 12
 
+### v12.2.0
+
+- Featuring a new input source: `headers`.
+  - This is an opt-in feature requiring you to specify `headers` entry in the `inputSources` of your configuration.
+  - The feature is limited to custom headers only (the ones starting with `x-` prefix).
+  - The headers are lowercase when describing their validation schema.
+  - Parameters in request headers described the following way are supported by the documentation generator.
+
+```typescript
+import { createConfig, defaultEndpointsFactory } from "express-zod-api";
+import { z } from "zod";
+
+createConfig({
+  inputSources: {
+    get: ["query", "headers"],
+  }, // ...
+});
+
+defaultEndpointsFactory.build({
+  method: "get",
+  input: z.object({
+    "x-request-id": z.string(), // this one is from request.headers
+    id: z.string(), // this one is from request.query
+  }), // ...
+});
+```
+
+### v12.1.0
+
+- This version fixes the issue 1182 introduced in version 10.0.0-beta1, manifesting as Typescript errors `TS4023` and
+  `TS4094` only when `declaration` feature is enabled in your `tsconfig.json`.
+  - Several protected properties of `Endpoint` are made entirely private.
+  - Several types are exposed: `CommonConfig`, `MiddlewareDefinition`, `ResultHandlerDefinition`, `BasicSecurity`,
+    `BearerSecurity`, `CookieSecurity`, `CustomHeaderSecurity`, `InputSecurity`, `OAuth2Security`, `OpenIdSecurity`.
+    - They are not meant to be used in your implementation and only needed to prevent the error in particular case.
+    - Instead of `CommonConfig` type use `createConfig()` method.
+    - Instead of `MiddlewareDefinition` type use `createMiddleware()` method.
+    - Instead of `ResultHandlerDefinition` type use `createResultHandler()` method.
+    - Instead of the mentioned security types use the `security` property of the `createMiddleware()` argument.
+  - The issue 1182 is the continuation of the issue 952 "Infussicient exports" (for consumer's declaration).
+    - Found and reported by [@bobgubko](https://github.com/bobgubko)
+
 ### v12.0.2
 
 - `express-fileupload` version is 1.4.1.

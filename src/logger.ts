@@ -7,7 +7,7 @@ import { LoggerConfig } from "./config-type";
 
 const { combine, colorize, timestamp: useTimestamp, printf } = winston.format;
 
-export function createLogger(loggerConfig: LoggerConfig): winston.Logger {
+export const createLogger = (loggerConfig: LoggerConfig): winston.Logger => {
   const prettyPrint = (meta: any) => {
     const {
       [LEVEL]: noLevel,
@@ -63,4 +63,4 @@ export function createLogger(loggerConfig: LoggerConfig): winston.Logger {
     transports: [new winston.transports.Console(consoleOutputOptions)],
     exitOnError: false,
   });
-}
+};
