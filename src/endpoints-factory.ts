@@ -8,7 +8,7 @@ import {
   ProbableIntersection,
   getFinalEndpointInputSchema,
 } from "./io-schema";
-import { Method, MethodsDefinition } from "./method";
+import { Method } from "./method";
 import {
   AnyMiddlewareDef,
   ExpressMiddleware,
@@ -27,7 +27,6 @@ type BuildProps<
   OUT extends IOSchema,
   MIN extends IOSchema<"strip"> | null,
   OPT extends FlatObject,
-  M extends Method,
   SCO extends string,
   TAG extends string,
 > = {
@@ -37,9 +36,9 @@ type BuildProps<
   description?: string;
   shortDescription?: string;
   operationId?: string;
-} & ({ scopes?: SCO[] } | { scope?: SCO }) &
-  ({ tags?: TAG[] } | { tag?: TAG }) &
-  MethodsDefinition<M>;
+} & ({ method: Method } | { methods: Method[] }) &
+  ({ scopes?: SCO[] } | { scope?: SCO }) &
+  ({ tags?: TAG[] } | { tag?: TAG });
 
 export class EndpointsFactory<
   POS extends z.ZodTypeAny,
@@ -147,16 +146,15 @@ export class EndpointsFactory<
     );
   }
 
-  public build<BIN extends IOSchema, BOUT extends IOSchema, M extends Method>({
+  public build<BIN extends IOSchema, BOUT extends IOSchema>({
     input,
     handler,
     output: outputSchema,
     ...rest
-  }: BuildProps<BIN, BOUT, IN, OUT, M, SCO, TAG>): Endpoint<
+  }: BuildProps<BIN, BOUT, IN, OUT, SCO, TAG>): Endpoint<
     ProbableIntersection<IN, BIN>,
     BOUT,
     OUT,
-    M,
     POS,
     NEG,
     SCO,
