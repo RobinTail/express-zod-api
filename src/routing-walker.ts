@@ -28,12 +28,7 @@ export const walkRouting = ({
     segment = segment.trim();
     if (segment.match(/\//)) {
       throw new RoutingError(
-        "Routing elements should not contain '/' character.\n" +
-          `The error caused by ${
-            parentPath
-              ? `'${parentPath}' route that has a '${segment}'`
-              : `'${segment}'`
-          } entry.`,
+        `The entry '${segment}' must avoid having slashes — use nesting instead.`,
       );
     }
     const path = `${parentPath || ""}${segment ? `/${segment}` : ""}`;
@@ -53,9 +48,7 @@ export const walkRouting = ({
       Object.entries(element.endpoints).forEach(([method, endpoint]) => {
         if (!endpoint.getMethods().includes(method as Method)) {
           throw new RoutingError(
-            `Endpoint assigned to ${method} method of ${
-              parentPath || ""
-            }/${segment} must support ${method} method`,
+            `Endpoint assigned to ${method} method of ${path} must support ${method} method.`,
           );
         }
         onEndpoint(endpoint, path, method as Method);
