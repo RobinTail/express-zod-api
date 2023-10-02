@@ -145,6 +145,7 @@ export class Endpoint<
       }
     });
     this.#middlewares = middlewares;
+    this.#operationId = rest.operationId;
     const apiResponse = {
       positive: resultHandler.getPositiveResponse(outputSchema),
       negative: resultHandler.getNegativeResponse(),
