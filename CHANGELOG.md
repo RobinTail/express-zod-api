@@ -7,6 +7,7 @@
 - Featuring the ability to customize the `operationId` in the generated documentation.
   - Using the new property of `EndpointsFactory::build()` method you can now override the value of the
     corresponding `operationId` of the endpoint in generated documentation.
+  - When using this feature, you must ensure the uniqness of the IDs you specified across your API endpoints.
   - The feature is implemented by [@john-schmitz](https://github.com/john-schmitz).
 
 ```typescript
