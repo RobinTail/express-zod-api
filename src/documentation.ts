@@ -14,6 +14,8 @@ import {
   makeCleanId,
 } from "./common-helpers";
 import { CommonConfig } from "./config-type";
+import { mapLogicalContainer } from "./logical-container";
+import { Method } from "./method";
 import {
   depictRequest,
   depictRequestParams,
@@ -24,8 +26,6 @@ import {
   ensureShortDescription,
   reformatParamsInPath,
 } from "./documentation-helpers";
-import { mapLogicalContainer } from "./logical-container";
-import { Method } from "./method";
 import { Routing } from "./routing";
 import { RoutingWalkerParams, walkRouting } from "./routing-walker";
 

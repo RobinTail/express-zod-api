@@ -1,5 +1,3 @@
-import { expectType } from "tsd";
-import { z } from "zod";
 import { config as exampleConfig } from "../../example/config";
 import { routing } from "../../example/routing";
 import {
@@ -13,7 +11,9 @@ import {
   ez,
   withMeta,
 } from "../../src";
+import { expectType } from "tsd";
 import { mimeJson } from "../../src/mime";
+import { z } from "zod";
 
 describe("Documentation generator", () => {
   const sampleConfig = createConfig({
