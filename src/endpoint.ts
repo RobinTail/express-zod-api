@@ -70,7 +70,7 @@ export abstract class AbstractEndpoint {
   public abstract getScopes(): string[];
   public abstract getTags(): string[];
   public abstract _setSiblingMethods(methods: Method[]): void;
-  public abstract getOperationId(): string | undefined;
+  public abstract getOperationId(method: Method): string | undefined;
 }
 
 type EndpointProps<
@@ -90,7 +90,7 @@ type EndpointProps<
   resultHandler: ResultHandlerDefinition<POS, NEG>;
   description?: string;
   shortDescription?: string;
-  operationId?: string;
+  operationId?: string | ((method: Method) => string);
 } & ({ scopes?: SCO[] } | { scope?: SCO }) &
   ({ tags?: TAG[] } | { tag?: TAG }) &
   MethodsDefinition<M>;
@@ -121,7 +121,7 @@ export class Endpoint<
   };
   readonly #scopes: SCO[] = [];
   readonly #tags: TAG[] = [];
-  readonly #operationId?: string;
+  readonly #operationId?: string | ((method: Method) => string);
 
   constructor({
     middlewares,
@@ -247,8 +247,10 @@ export class Endpoint<
     return this.#tags;
   }
 
-  public override getOperationId(): string | undefined {
-    return this.#operationId;
+  public override getOperationId(method: Method): string | undefined {
+    return typeof this.#operationId === "function"
+      ? this.#operationId(method)
+      : this.#operationId;
   }
 
   #getDefaultCorsHeaders(): Record<string, string> {
