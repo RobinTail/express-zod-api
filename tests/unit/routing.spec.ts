@@ -166,6 +166,34 @@ describe("Routing", () => {
       expect(appMock.options.mock.calls[0][0]).toBe("/v1/user");
     });
 
+    test("Should check if endpoint supports the method it's assigned to within DependsOnMethod", () => {
+      const configMock = { cors: true, startupLogo: false };
+      const factory = new EndpointsFactory(defaultResultHandler);
+      const putAndPatchEndpoint = factory.build({
+        methods: ["put", "patch"],
+        input: z.object({}),
+        output: z.object({}),
+        handler: jest.fn(),
+      });
+      const routing: Routing = {
+        v1: {
+          user: new DependsOnMethod({
+            put: putAndPatchEndpoint,
+            patch: putAndPatchEndpoint,
+            post: putAndPatchEndpoint as any, // intentional
+          }),
+        },
+      };
+      expect(() =>
+        initRouting({
+          app: appMock as Express,
+          logger: loggerMock as Logger,
+          config: configMock as CommonConfig,
+          routing,
+        }),
+      ).toThrowErrorMatchingSnapshot();
+    });
+
     test("Issue 705: should set all DependsOnMethod' methods for CORS", async () => {
       const handler = jest.fn(async () => ({}));
       const configMock = {
