@@ -130,7 +130,10 @@ export class Endpoint<
     resultHandler,
     description,
     shortDescription,
-    ...rest
+    operationId,
+    scopes,
+    methods,
+    tags,
   }: EndpointProps<IN, OUT, OPT, POS, NEG, SCO, TAG>) {
     super();
     [
@@ -144,10 +147,10 @@ export class Endpoint<
       }
     });
     this.#middlewares = middlewares;
-    this.#operationId = rest.operationId;
-    this.#methods = rest.methods;
-    this.#scopes = rest.scopes;
-    this.#tags = rest.tags;
+    this.#operationId = operationId;
+    this.#methods = methods;
+    this.#scopes = scopes;
+    this.#tags = tags;
     const apiResponse = {
       positive: resultHandler.getPositiveResponse(outputSchema),
       negative: resultHandler.getNegativeResponse(),
