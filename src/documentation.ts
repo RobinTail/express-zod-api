@@ -7,7 +7,7 @@ import {
   SecuritySchemeType,
 } from "openapi3-ts/oas30";
 import { z } from "zod";
-import { DocumentationError } from ".";
+import { DocumentationError } from "./errors";
 import {
   defaultInputSources,
   defaultSerializer,
@@ -83,11 +83,9 @@ export class Documentation extends OpenApiBuilder {
           path,
         });
       }
-
       this.lastOperationIdSuffixes[userDefinedOperationId] = 1;
       return userDefinedOperationId;
     }
-
     const operationId = makeCleanId(path, method);
     if (operationId in this.lastOperationIdSuffixes) {
       this.lastOperationIdSuffixes[operationId]++;
