@@ -72,21 +72,23 @@ export class Documentation extends OpenApiBuilder {
   protected ensureUniqOperationId(
     path: string,
     method: Method,
-    endpointOperationId?: string,
+    userDefinedOperationId?: string,
   ) {
-    if (
-      endpointOperationId &&
-      endpointOperationId in this.lastOperationIdSuffixes
-    ) {
-      throw new DocumentationError({
-        message: `Duplicated operationId: "${endpointOperationId}"`,
-        method,
-        isResponse: false,
-        path,
-      });
+    if (userDefinedOperationId) {
+      if (userDefinedOperationId in this.lastOperationIdSuffixes) {
+        throw new DocumentationError({
+          message: `Duplicated operationId: "${userDefinedOperationId}"`,
+          method,
+          isResponse: false,
+          path,
+        });
+      }
+
+      this.lastOperationIdSuffixes[userDefinedOperationId] = 1;
+      return userDefinedOperationId;
     }
 
-    const operationId = endpointOperationId ?? makeCleanId(path, method);
+    const operationId = makeCleanId(path, method);
     if (operationId in this.lastOperationIdSuffixes) {
       this.lastOperationIdSuffixes[operationId]++;
       return `${operationId}${this.lastOperationIdSuffixes[operationId]}`;
