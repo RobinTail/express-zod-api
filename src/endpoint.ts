@@ -144,6 +144,9 @@ export class Endpoint<
         );
       }
     });
+    this.#handler = handler;
+    this.#resultHandler = resultHandler;
+    this.#descriptions = descriptions;
     this.#middlewares = middlewares;
     this.#operationId = operationId;
     this.#methods = methods;
@@ -180,9 +183,6 @@ export class Endpoint<
           ? defaultStatusCodes.negative
           : apiResponse.negative.statusCode || defaultStatusCodes.negative,
     };
-    this.#handler = handler;
-    this.#resultHandler = resultHandler;
-    this.#descriptions = descriptions;
   }
 
   /**
