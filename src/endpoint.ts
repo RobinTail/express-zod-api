@@ -73,27 +73,6 @@ export abstract class AbstractEndpoint {
   public abstract getOperationId(method: Method): string | undefined;
 }
 
-type EndpointProps<
-  IN extends IOSchema,
-  OUT extends IOSchema,
-  OPT extends FlatObject,
-  POS extends z.ZodTypeAny,
-  NEG extends z.ZodTypeAny,
-  SCO extends string,
-  TAG extends string,
-> = {
-  middlewares: AnyMiddlewareDef[];
-  inputSchema: IN;
-  outputSchema: OUT;
-  handler: Handler<z.output<IN>, z.input<OUT>, OPT>;
-  resultHandler: ResultHandlerDefinition<POS, NEG>;
-  descriptions: Record<DescriptionVariant, string | undefined>;
-  getOperationId: (method: Method) => string | undefined;
-  methods: Method[];
-  scopes: SCO[];
-  tags: TAG[];
-};
-
 export class Endpoint<
   IN extends IOSchema,
   OUT extends IOSchema,
@@ -132,7 +111,18 @@ export class Endpoint<
     scopes,
     methods,
     tags,
-  }: EndpointProps<IN, OUT, OPT, POS, NEG, SCO, TAG>) {
+  }: {
+    middlewares: AnyMiddlewareDef[];
+    inputSchema: IN;
+    outputSchema: OUT;
+    handler: Handler<z.output<IN>, z.input<OUT>, OPT>;
+    resultHandler: ResultHandlerDefinition<POS, NEG>;
+    descriptions: Record<DescriptionVariant, string | undefined>;
+    getOperationId: (method: Method) => string | undefined;
+    methods: Method[];
+    scopes: SCO[];
+    tags: TAG[];
+  }) {
     super();
     [
       { name: "input schema", schema: inputSchema },
