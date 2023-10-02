@@ -4,6 +4,7 @@ import { config as exampleConfig } from "../../example/config";
 import { routing } from "../../example/routing";
 import {
   Documentation,
+  DocumentationError,
   EndpointsFactory,
   createConfig,
   createMiddleware,
@@ -39,7 +40,7 @@ describe("Documentation generator", () => {
           composition,
         }).getSpecAsYaml();
         expect(spec).toMatchSnapshot();
-      },
+      }
     );
 
     test("should generate the correct schema for DELETE request without body", () => {
@@ -140,7 +141,7 @@ describe("Documentation generator", () => {
                   }),
                   z.object({
                     two: z.string(),
-                  }),
+                  })
                 ),
               }),
               output: z.object({
@@ -151,7 +152,7 @@ describe("Documentation generator", () => {
                   .and(
                     z.object({
                       six: z.string(),
-                    }),
+                    })
                   ),
               }),
               handler: async () => ({
@@ -309,7 +310,7 @@ describe("Documentation generator", () => {
                 literal: z.record(z.literal("only"), z.boolean()),
                 union: z.record(
                   z.literal("option1").or(z.literal("option2")),
-                  z.boolean(),
+                  z.boolean()
                 ),
                 enum: z.record(z.enum(["option1", "option2"]), z.boolean()),
               }),
@@ -482,7 +483,7 @@ describe("Documentation generator", () => {
       const string = z.preprocess((arg) => String(arg), z.string());
       const number = z.preprocess(
         (arg) => parseInt(String(arg), 16),
-        z.number().int().nonnegative(),
+        z.number().int().nonnegative()
       );
       const boolean = z.preprocess((arg) => !!arg, z.boolean());
       const spec = new Documentation({
@@ -581,7 +582,7 @@ describe("Documentation generator", () => {
               version: "3.4.5",
               title: "Testing unsupported types",
               serverUrl: "https://example.com",
-            }),
+            })
         ).toThrowError(/Zod type Zod\w+ is unsupported/);
       });
     });
@@ -716,6 +717,12 @@ describe("Documentation generator", () => {
 
     test("should not be able to specify duplicated operation", () => {
       const operationId = "coolOperationId";
+      const expectedError = new DocumentationError({
+        message: 'Duplicated operationId: "coolOperationId"',
+        isResponse: false,
+        method: "get",
+        path: "/v1/getSomeTwo/thing",
+      });
       expect(() => {
         new Documentation({
           config: sampleConfig,
@@ -747,7 +754,7 @@ describe("Documentation generator", () => {
           title: "Testing Operation IDs",
           serverUrl: "https://example.com",
         }).getSpecAsYaml();
-      }).toThrow('Duplicated operationId: "coolOperationId"');
+      }).toThrow(expectedError);
     });
 
     test("should handle custom mime types and status codes", () => {
@@ -947,7 +954,7 @@ describe("Documentation generator", () => {
                   .optional()
                   .describe(
                     "An optional cursor string used for pagination." +
-                      " This can be retrieved from the `next` property of the previous page response.",
+                      " This can be retrieved from the `next` property of the previous page response."
                   ),
               }),
               output: z.object({}),
@@ -971,12 +978,12 @@ describe("Documentation generator", () => {
               method: "get",
               input: z.object({
                 strNum: withMeta(
-                  z.string().transform((v) => parseInt(v, 10)),
+                  z.string().transform((v) => parseInt(v, 10))
                 ).example("123"), // example is for input side of the transformation
               }),
               output: z.object({
                 numericStr: withMeta(
-                  z.number().transform((v) => `${v}`),
+                  z.number().transform((v) => `${v}`)
                 ).example(123), // example is for input side of the transformation
               }),
               handler: async () => ({ numericStr: 123 }),
@@ -1000,14 +1007,14 @@ describe("Documentation generator", () => {
               input: withMeta(
                 z.object({
                   strNum: z.string().transform((v) => parseInt(v, 10)),
-                }),
+                })
               ).example({
                 strNum: "123", // example is for input side of the transformation
               }),
               output: withMeta(
                 z.object({
                   numericStr: z.number().transform((v) => `${v}`),
-                }),
+                })
               ).example({
                 numericStr: 123, // example is for input side of the transformation
               }),
@@ -1032,14 +1039,14 @@ describe("Documentation generator", () => {
               input: withMeta(
                 z.object({
                   strNum: z.string().transform((v) => parseInt(v, 10)),
-                }),
+                })
               ).example({
                 strNum: "123", // example is for input side of the transformation
               }),
               output: withMeta(
                 z.object({
                   numericStr: z.number().transform((v) => `${v}`),
-                }),
+                })
               ).example({
                 numericStr: 123, // example is for input side of the transformation
               }),
@@ -1065,26 +1072,26 @@ describe("Documentation generator", () => {
                   input: withMeta(
                     z.object({
                       key: z.string(),
-                    }),
+                    })
                   ).example({
                     key: "1234-56789-01",
                   }),
                   middleware: jest.fn(),
-                }),
+                })
               )
               .build({
                 method: "post",
                 input: withMeta(
                   z.object({
                     str: z.string(),
-                  }),
+                  })
                 ).example({
                   str: "test",
                 }),
                 output: withMeta(
                   z.object({
                     num: z.number(),
-                  }),
+                  })
                 ).example({
                   num: 123,
                 }),
