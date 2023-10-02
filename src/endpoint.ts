@@ -101,15 +101,15 @@ export class Endpoint<
   #siblingMethods: Method[] = [];
 
   constructor({
-    middlewares,
+    methods,
     inputSchema,
     outputSchema,
     handler,
     resultHandler,
-    getOperationId,
-    scopes,
-    methods,
-    tags,
+    getOperationId = () => undefined,
+    scopes = [],
+    middlewares = [],
+    tags = [],
     description: long,
     shortDescription: short,
   }: {
@@ -138,12 +138,12 @@ export class Endpoint<
     });
     this.#handler = handler;
     this.#resultHandler = resultHandler;
-    this.#descriptions = { long, short };
-    this.#middlewares = middlewares || [];
-    this.#getOperationId = getOperationId || (() => undefined);
+    this.#middlewares = middlewares;
+    this.#getOperationId = getOperationId;
     this.#methods = methods;
-    this.#scopes = scopes || [];
-    this.#tags = tags || [];
+    this.#scopes = scopes;
+    this.#tags = tags;
+    this.#descriptions = { long, short };
     const apiResponse = {
       positive: resultHandler.getPositiveResponse(outputSchema),
       negative: resultHandler.getNegativeResponse(),
