@@ -168,17 +168,13 @@ export class EndpointsFactory<
     const getOperationId =
       typeof operationId === "function" ? operationId : () => operationId;
     const scopes =
-      "scopes" in rest && rest.scopes
+      "scopes" in rest
         ? rest.scopes
         : "scope" in rest && rest.scope
         ? [rest.scope]
         : [];
     const tags =
-      "tags" in rest && rest.tags
-        ? rest.tags
-        : "tag" in rest && rest.tag
-        ? [rest.tag]
-        : [];
+      "tags" in rest ? rest.tags : "tag" in rest && rest.tag ? [rest.tag] : [];
     return new Endpoint({
       handler,
       middlewares,

@@ -25,11 +25,6 @@ describe("Endpoint", () => {
           getNegativeResponse: () => z.string(),
           handler: jest.fn(),
         }),
-        middlewares: [],
-        scopes: [],
-        tags: [],
-        descriptions: { long: undefined, short: undefined },
-        getOperationId: () => undefined,
       });
       expect(endpointMock.getMethods()).toEqual([
         "get",
@@ -51,11 +46,6 @@ describe("Endpoint", () => {
           getNegativeResponse: () => z.string(),
           handler: jest.fn(),
         }),
-        middlewares: [],
-        scopes: [],
-        tags: [],
-        descriptions: { long: undefined, short: undefined },
-        getOperationId: () => undefined,
       });
       expect(endpointMock.getMethods()).toEqual(["patch"]);
     });
@@ -327,15 +317,10 @@ describe("Endpoint", () => {
       });
       const endpoint = new Endpoint({
         methods: ["get"],
-        middlewares: [],
-        scopes: [],
-        tags: [],
         inputSchema: z.object({}),
         outputSchema,
         handler: jest.fn(),
         resultHandler: defaultResultHandler,
-        descriptions: { long: undefined, short: undefined },
-        getOperationId: () => undefined,
       });
       expect(endpoint.getSchema("output")).toEqual(outputSchema);
     });
@@ -735,11 +720,6 @@ describe("Endpoint", () => {
               getNegativeResponse: jest.fn(),
               handler: jest.fn(),
             },
-            middlewares: [],
-            scopes: [],
-            tags: [],
-            descriptions: { long: undefined, short: undefined },
-            getOperationId: () => undefined,
           }),
       ).toThrowError(
         new IOSchemaError(
@@ -758,11 +738,6 @@ describe("Endpoint", () => {
               getNegativeResponse: jest.fn(),
               handler: jest.fn(),
             },
-            middlewares: [],
-            scopes: [],
-            tags: [],
-            descriptions: { long: undefined, short: undefined },
-            getOperationId: () => undefined,
           }),
       ).toThrowError(
         new IOSchemaError(

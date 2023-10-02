@@ -83,8 +83,8 @@ export class Endpoint<
   TAG extends string,
 > extends AbstractEndpoint {
   readonly #descriptions: Record<DescriptionVariant, string | undefined>;
-  readonly #methods: Method[] = [];
-  readonly #middlewares: AnyMiddlewareDef[] = [];
+  readonly #methods: Method[];
+  readonly #middlewares: AnyMiddlewareDef[];
   readonly #mimeTypes: Record<MimeVariant, string[]>;
   readonly #statusCodes: Record<ResponseVariant, number>;
   readonly #handler: Handler<z.output<IN>, z.input<OUT>, OPT>;
@@ -95,8 +95,8 @@ export class Endpoint<
     positive: POS;
     negative: NEG;
   };
-  readonly #scopes: SCO[] = [];
-  readonly #tags: TAG[] = [];
+  readonly #scopes: SCO[];
+  readonly #tags: TAG[];
   readonly #getOperationId: (method: Method) => string | undefined;
   #siblingMethods: Method[] = [];
 
@@ -112,16 +112,16 @@ export class Endpoint<
     methods,
     tags,
   }: {
-    middlewares: AnyMiddlewareDef[];
+    middlewares?: AnyMiddlewareDef[];
     inputSchema: IN;
     outputSchema: OUT;
     handler: Handler<z.output<IN>, z.input<OUT>, OPT>;
     resultHandler: ResultHandlerDefinition<POS, NEG>;
-    descriptions: Record<DescriptionVariant, string | undefined>;
-    getOperationId: (method: Method) => string | undefined;
+    descriptions?: Record<DescriptionVariant, string | undefined>;
+    getOperationId?: (method: Method) => string | undefined;
     methods: Method[];
-    scopes: SCO[];
-    tags: TAG[];
+    scopes?: SCO[];
+    tags?: TAG[];
   }) {
     super();
     [
@@ -136,12 +136,12 @@ export class Endpoint<
     });
     this.#handler = handler;
     this.#resultHandler = resultHandler;
-    this.#descriptions = descriptions;
-    this.#middlewares = middlewares;
-    this.#getOperationId = getOperationId;
+    this.#descriptions = descriptions || { long: undefined, short: undefined };
+    this.#middlewares = middlewares || [];
+    this.#getOperationId = getOperationId || (() => undefined);
     this.#methods = methods;
-    this.#scopes = scopes;
-    this.#tags = tags;
+    this.#scopes = scopes || [];
+    this.#tags = tags || [];
     const apiResponse = {
       positive: resultHandler.getPositiveResponse(outputSchema),
       negative: resultHandler.getNegativeResponse(),
