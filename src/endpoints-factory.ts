@@ -167,6 +167,7 @@ export class EndpointsFactory<
       outputSchema,
       resultHandler,
       inputSchema: getFinalEndpointInputSchema<IN, BIN>(middlewares, input),
+      methods: "methods" in rest ? rest.methods : [rest.method],
       ...rest,
     });
   }

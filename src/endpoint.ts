@@ -90,8 +90,8 @@ type EndpointProps<
   description?: string;
   shortDescription?: string;
   operationId?: string | ((method: Method) => string);
-} & ({ method: Method } | { methods: Method[] }) &
-  ({ scopes?: SCO[] } | { scope?: SCO }) &
+  methods: Method[];
+} & ({ scopes?: SCO[] } | { scope?: SCO }) &
   ({ tags?: TAG[] } | { tag?: TAG });
 
 export class Endpoint<
@@ -144,6 +144,7 @@ export class Endpoint<
     });
     this.#middlewares = middlewares;
     this.#operationId = rest.operationId;
+    this.#methods = rest.methods;
     const apiResponse = {
       positive: resultHandler.getPositiveResponse(outputSchema),
       negative: resultHandler.getNegativeResponse(),
@@ -189,11 +190,6 @@ export class Endpoint<
     }
     if ("tag" in rest && rest.tag) {
       this.#tags.push(rest.tag);
-    }
-    if ("methods" in rest) {
-      this.#methods = rest.methods;
-    } else {
-      this.#methods = [rest.method];
     }
   }
 

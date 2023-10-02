@@ -38,7 +38,7 @@ describe("Endpoint", () => {
 
     test("Should return the array for a single method also", () => {
       const endpointMock = new Endpoint({
-        method: "patch",
+        methods: ["patch"],
         inputSchema: z.object({}),
         outputSchema: z.object({}),
         handler: jest.fn(),
@@ -318,7 +318,7 @@ describe("Endpoint", () => {
         something: z.number(),
       });
       const endpoint = new Endpoint({
-        method: "get",
+        methods: ["get"],
         middlewares: [],
         inputSchema: z.object({}),
         outputSchema,
@@ -714,7 +714,7 @@ describe("Endpoint", () => {
       expect(
         () =>
           new Endpoint({
-            method: "get",
+            methods: ["get"],
             inputSchema: z.object({}).transform(() => []),
             outputSchema: z.object({}),
             handler: jest.fn(),
@@ -733,7 +733,7 @@ describe("Endpoint", () => {
       expect(
         () =>
           new Endpoint({
-            method: "get",
+            methods: ["get"],
             inputSchema: z.object({}),
             outputSchema: z.object({}).transform(() => []),
             handler: jest.fn(),
