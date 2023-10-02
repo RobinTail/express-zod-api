@@ -92,7 +92,8 @@ type EndpointProps<
   operationId?: string | ((method: Method) => string);
   methods: Method[];
   scopes: SCO[];
-} & ({ tags?: TAG[] } | { tag?: TAG });
+  tags: TAG[];
+};
 
 export class Endpoint<
   IN extends IOSchema,
@@ -146,6 +147,7 @@ export class Endpoint<
     this.#operationId = rest.operationId;
     this.#methods = rest.methods;
     this.#scopes = rest.scopes;
+    this.#tags = rest.tags;
     const apiResponse = {
       positive: resultHandler.getPositiveResponse(outputSchema),
       negative: resultHandler.getNegativeResponse(),
@@ -180,12 +182,6 @@ export class Endpoint<
     this.#handler = handler;
     this.#resultHandler = resultHandler;
     this.#descriptions = { long: description, short: shortDescription };
-    if ("tags" in rest && rest.tags) {
-      this.#tags.push(...rest.tags);
-    }
-    if ("tag" in rest && rest.tag) {
-      this.#tags.push(rest.tag);
-    }
   }
 
   /**

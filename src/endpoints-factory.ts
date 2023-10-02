@@ -174,6 +174,12 @@ export class EndpointsFactory<
           : "scope" in rest && rest.scope
           ? [rest.scope]
           : [],
+      tags:
+        "tags" in rest && rest.tags
+          ? rest.tags
+          : "tag" in rest && rest.tag
+          ? [rest.tag]
+          : [],
       ...rest,
     });
   }
