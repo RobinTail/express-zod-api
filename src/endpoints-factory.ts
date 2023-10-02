@@ -150,8 +150,8 @@ export class EndpointsFactory<
     input,
     handler,
     output: outputSchema,
-    description: long,
-    shortDescription: short,
+    description,
+    shortDescription,
     operationId,
     ...rest
   }: BuildProps<BIN, BOUT, IN, OUT, SCO, TAG>): Endpoint<
@@ -184,7 +184,8 @@ export class EndpointsFactory<
       tags,
       methods,
       getOperationId,
-      descriptions: { long, short },
+      description,
+      shortDescription,
       inputSchema: getFinalEndpointInputSchema<IN, BIN>(middlewares, input),
     });
   }

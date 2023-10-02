@@ -106,18 +106,20 @@ export class Endpoint<
     outputSchema,
     handler,
     resultHandler,
-    descriptions,
     getOperationId,
     scopes,
     methods,
     tags,
+    description: long,
+    shortDescription: short,
   }: {
     middlewares?: AnyMiddlewareDef[];
     inputSchema: IN;
     outputSchema: OUT;
     handler: Handler<z.output<IN>, z.input<OUT>, OPT>;
     resultHandler: ResultHandlerDefinition<POS, NEG>;
-    descriptions?: Record<DescriptionVariant, string | undefined>;
+    description?: string;
+    shortDescription?: string;
     getOperationId?: (method: Method) => string | undefined;
     methods: Method[];
     scopes?: SCO[];
@@ -136,7 +138,7 @@ export class Endpoint<
     });
     this.#handler = handler;
     this.#resultHandler = resultHandler;
-    this.#descriptions = descriptions || { long: undefined, short: undefined };
+    this.#descriptions = { long, short };
     this.#middlewares = middlewares || [];
     this.#getOperationId = getOperationId || (() => undefined);
     this.#methods = methods;
