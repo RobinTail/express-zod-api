@@ -54,6 +54,10 @@ export const walkRouting = ({
         ([method, endpoint]) => {
           if (endpoint.getMethods().includes(method as Method)) {
             onEndpoint(endpoint, path, method as Method);
+          } else {
+            throw new RoutingError(
+              `Endpoint assigned to ${method} method of ${parentPath}/${segment} must support ${method} method`,
+            );
           }
         },
       );
