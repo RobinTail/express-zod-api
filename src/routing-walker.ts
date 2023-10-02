@@ -50,17 +50,14 @@ export const walkRouting = ({
         element.apply(path, onStatic);
       }
     } else if (element instanceof DependsOnMethod) {
-      Object.entries<AbstractEndpoint>(element.endpoints).forEach(
-        ([method, endpoint]) => {
-          if (endpoint.getMethods().includes(method as Method)) {
-            onEndpoint(endpoint, path, method as Method);
-          } else {
-            throw new RoutingError(
-              `Endpoint assigned to ${method} method of ${parentPath}/${segment} must support ${method} method`,
-            );
-          }
-        },
-      );
+      Object.entries(element.endpoints).forEach(([method, endpoint]) => {
+        if (!endpoint.getMethods().includes(method as Method)) {
+          throw new RoutingError(
+            `Endpoint assigned to ${method} method of ${parentPath}/${segment} must support ${method} method`,
+          );
+        }
+        onEndpoint(endpoint, path, method as Method);
+      });
       if (hasCors && Object.keys(element.endpoints).length > 0) {
         const [firstMethod, ...siblingMethods] = Object.keys(
           element.endpoints,
