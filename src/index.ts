@@ -27,7 +27,6 @@ export { createServer, attachRouting } from "./server";
 export { Documentation } from "./documentation";
 export {
   DocumentationError,
-  DependsOnMethodError,
   RoutingError,
   OutputValidationError,
   InputValidationError,
