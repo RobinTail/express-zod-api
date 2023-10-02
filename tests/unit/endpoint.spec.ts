@@ -26,6 +26,7 @@ describe("Endpoint", () => {
           handler: jest.fn(),
         }),
         middlewares: [],
+        scopes: [],
       });
       expect(endpointMock.getMethods()).toEqual([
         "get",
@@ -48,6 +49,7 @@ describe("Endpoint", () => {
           handler: jest.fn(),
         }),
         middlewares: [],
+        scopes: [],
       });
       expect(endpointMock.getMethods()).toEqual(["patch"]);
     });
@@ -320,6 +322,7 @@ describe("Endpoint", () => {
       const endpoint = new Endpoint({
         methods: ["get"],
         middlewares: [],
+        scopes: [],
         inputSchema: z.object({}),
         outputSchema,
         handler: jest.fn(),
@@ -724,6 +727,7 @@ describe("Endpoint", () => {
               handler: jest.fn(),
             },
             middlewares: [],
+            scopes: [],
           }),
       ).toThrowError(
         new IOSchemaError(
@@ -743,6 +747,7 @@ describe("Endpoint", () => {
               handler: jest.fn(),
             },
             middlewares: [],
+            scopes: [],
           }),
       ).toThrowError(
         new IOSchemaError(

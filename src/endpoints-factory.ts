@@ -168,6 +168,12 @@ export class EndpointsFactory<
       resultHandler,
       inputSchema: getFinalEndpointInputSchema<IN, BIN>(middlewares, input),
       methods: "methods" in rest ? rest.methods : [rest.method],
+      scopes:
+        "scopes" in rest && rest.scopes
+          ? rest.scopes
+          : "scope" in rest && rest.scope
+          ? [rest.scope]
+          : [],
       ...rest,
     });
   }
