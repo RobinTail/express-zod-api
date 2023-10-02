@@ -36,9 +36,9 @@ type BuildProps<
   description?: string;
   shortDescription?: string;
   operationId?: string;
-} & ({ scopes?: SCO[] } | { scope?: SCO }) &
-  ({ tags?: TAG[] } | { tag?: TAG }) &
-  ({ method: Method } | { methods: Method[] });
+} & ({ method: Method } | { methods: Method[] }) &
+  ({ scopes?: SCO[] } | { scope?: SCO }) &
+  ({ tags?: TAG[] } | { tag?: TAG });
 
 export class EndpointsFactory<
   POS extends z.ZodTypeAny,

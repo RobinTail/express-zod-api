@@ -81,7 +81,7 @@ type EndpointProps<
   NEG extends z.ZodTypeAny,
   SCO extends string,
   TAG extends string,
-> = ({
+> = {
   middlewares: AnyMiddlewareDef[];
   inputSchema: IN;
   outputSchema: OUT;
@@ -90,9 +90,9 @@ type EndpointProps<
   description?: string;
   shortDescription?: string;
   operationId?: string;
-} & ({ scopes?: SCO[] } | { scope?: SCO }) &
-  ({ tags?: TAG[] } | { tag?: TAG })) &
-  ({ method: Method } | { methods: Method[] });
+} & ({ method: Method } | { methods: Method[] }) &
+  ({ scopes?: SCO[] } | { scope?: SCO }) &
+  ({ tags?: TAG[] } | { tag?: TAG });
 
 export class Endpoint<
   IN extends IOSchema,
