@@ -19,7 +19,7 @@ import {
 } from "./common-helpers";
 import { IOSchema } from "./io-schema";
 import { LogicalContainer, combineContainers } from "./logical-container";
-import { AuxMethod, Method, MethodsDefinition } from "./method";
+import { AuxMethod, Method } from "./method";
 import { AnyMiddlewareDef } from "./middleware";
 import { mimeJson, mimeMultipart } from "./mime";
 import {
@@ -77,7 +77,6 @@ type EndpointProps<
   IN extends IOSchema,
   OUT extends IOSchema,
   OPT extends FlatObject,
-  M extends Method,
   POS extends z.ZodTypeAny,
   NEG extends z.ZodTypeAny,
   SCO extends string,
@@ -91,22 +90,21 @@ type EndpointProps<
   description?: string;
   shortDescription?: string;
   operationId?: string;
-} & ({ scopes?: SCO[] } | { scope?: SCO }) &
-  ({ tags?: TAG[] } | { tag?: TAG }) &
-  MethodsDefinition<M>;
+} & ({ method: Method } | { methods: Method[] }) &
+  ({ scopes?: SCO[] } | { scope?: SCO }) &
+  ({ tags?: TAG[] } | { tag?: TAG });
 
 export class Endpoint<
   IN extends IOSchema,
   OUT extends IOSchema,
   OPT extends FlatObject,
-  M extends Method,
   POS extends z.ZodTypeAny,
   NEG extends z.ZodTypeAny,
   SCO extends string,
   TAG extends string,
 > extends AbstractEndpoint {
   readonly #descriptions: Record<DescriptionVariant, string | undefined>;
-  readonly #methods: M[] = [];
+  readonly #methods: Method[] = [];
   #siblingMethods: Method[] = [];
   readonly #middlewares: AnyMiddlewareDef[] = [];
   readonly #mimeTypes: Record<MimeVariant, string[]>;
@@ -132,7 +130,7 @@ export class Endpoint<
     description,
     shortDescription,
     ...rest
-  }: EndpointProps<IN, OUT, OPT, M, POS, NEG, SCO, TAG>) {
+  }: EndpointProps<IN, OUT, OPT, POS, NEG, SCO, TAG>) {
     super();
     [
       { name: "input schema", schema: inputSchema },
@@ -211,7 +209,7 @@ export class Endpoint<
     return this.#descriptions[variant];
   }
 
-  public override getMethods(): M[] {
+  public override getMethods(): Method[] {
     return this.#methods;
   }
 
