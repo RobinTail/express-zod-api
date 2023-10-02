@@ -161,25 +161,28 @@ export class EndpointsFactory<
     TAG
   > {
     const { middlewares, resultHandler } = this;
+    const methods = "methods" in rest ? rest.methods : [rest.method];
+    const scopes =
+      "scopes" in rest && rest.scopes
+        ? rest.scopes
+        : "scope" in rest && rest.scope
+        ? [rest.scope]
+        : [];
+    const tags =
+      "tags" in rest && rest.tags
+        ? rest.tags
+        : "tag" in rest && rest.tag
+        ? [rest.tag]
+        : [];
     return new Endpoint({
       handler,
       middlewares,
       outputSchema,
       resultHandler,
+      scopes,
+      tags,
+      methods,
       inputSchema: getFinalEndpointInputSchema<IN, BIN>(middlewares, input),
-      methods: "methods" in rest ? rest.methods : [rest.method],
-      scopes:
-        "scopes" in rest && rest.scopes
-          ? rest.scopes
-          : "scope" in rest && rest.scope
-          ? [rest.scope]
-          : [],
-      tags:
-        "tags" in rest && rest.tags
-          ? rest.tags
-          : "tag" in rest && rest.tag
-          ? [rest.tag]
-          : [],
       ...rest,
     });
   }
