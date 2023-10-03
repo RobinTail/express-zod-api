@@ -126,7 +126,7 @@ export class Documentation extends OpenApiBuilder {
   }: DocumentationParams) {
     super();
     this.addInfo({ title, version });
-    for (const url of Array.isArray(serverUrl) ? serverUrl : [serverUrl]) {
+    for (const url of typeof serverUrl === "string" ? [serverUrl] : serverUrl) {
       this.addServer({ url });
     }
     const onEndpoint: RoutingWalkerParams["onEndpoint"] = (
