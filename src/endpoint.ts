@@ -40,7 +40,7 @@ const getMimeTypesFromApiResponse = <S extends z.ZodTypeAny>(
   return mimeType ? [mimeType] : mimeTypes || fallback;
 };
 
-export type Handler<IN, OUT, OPT extends FlatObject> = (params: {
+export type Handler<IN, OUT, OPT> = (params: {
   input: IN;
   options: OPT;
   logger: Logger;
