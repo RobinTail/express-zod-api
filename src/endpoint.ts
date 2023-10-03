@@ -242,7 +242,7 @@ export class Endpoint<
     };
   }
 
-  async #parseOutput(output: any) {
+  async #parseOutput(output: z.input<OUT>) {
     try {
       return await this.#schemas.output.parseAsync(output);
     } catch (e) {
@@ -343,12 +343,12 @@ export class Endpoint<
     response: Response;
     logger: Logger;
     input: FlatObject;
-    output: any;
+    output: z.output<OUT> | null;
   }) {
     try {
       await this.#resultHandler.handler({
         error,
-        output,
+        output: output as FlatObject | null, // @todo consider checking this
         request,
         response,
         logger,
@@ -375,7 +375,7 @@ export class Endpoint<
     config: CommonConfig;
   }) {
     const method = getActualMethod(request);
-    let output: any;
+    let output: z.output<OUT> | null = null;
     let error: Error | null = null;
     if (config.cors) {
       let headers = this.#getDefaultCorsHeaders();

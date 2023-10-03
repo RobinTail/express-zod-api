@@ -22,7 +22,7 @@ interface LastResortHandlerParams {
 interface ResultHandlerParams<RES> {
   error: Error | null;
   input: FlatObject | null; // null in case of failure to parse or to find the matching endpoint (error: not found)
-  output: any;
+  output: FlatObject | null; // null in case of errors and failures
   request: Request;
   response: Response<RES>;
   logger: Logger;
@@ -146,7 +146,7 @@ export const arrayResultHandler = createResultHandler({
       response.status(statusCode).send(error.message);
       return;
     }
-    if ("items" in output && Array.isArray(output.items)) {
+    if (output && "items" in output && Array.isArray(output.items)) {
       response.status(200).json(output.items);
     } else {
       response
