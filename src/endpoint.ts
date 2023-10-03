@@ -40,12 +40,6 @@ const getMimeTypesFromApiResponse = <S extends z.ZodTypeAny>(
   return mimeType ? [mimeType] : mimeTypes || fallback;
 };
 
-const outputViolationMsg =
-  "The actual output of the endpoint does not comply the FlatObject constraints.";
-const outputValidationSchema = z
-  .object({}, { invalid_type_error: outputViolationMsg })
-  .passthrough();
-
 export type Handler<IN, OUT, OPT> = (params: {
   input: IN;
   options: OPT;
@@ -251,7 +245,7 @@ export class Endpoint<
   async #parseOutput(output: z.input<OUT>): Promise<FlatObject> {
     try {
       const parsedOutput = await this.#schemas.output.parseAsync(output);
-      return outputValidationSchema.parse(parsedOutput);
+      return Object.assign({}, parsedOutput); // ensure FlatObject
     } catch (e) {
       if (e instanceof z.ZodError) {
         throw new OutputValidationError(e);
