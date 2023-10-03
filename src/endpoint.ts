@@ -242,10 +242,9 @@ export class Endpoint<
     };
   }
 
-  async #parseOutput(output: z.input<OUT>): Promise<FlatObject> {
+  async #parseOutput(output: z.input<OUT>) {
     try {
-      const parsedOutput = await this.#schemas.output.parseAsync(output);
-      return Object.assign({}, parsedOutput); // ensure FlatObject
+      return (await this.#schemas.output.parseAsync(output)) as FlatObject;
     } catch (e) {
       if (e instanceof z.ZodError) {
         throw new OutputValidationError(e);
