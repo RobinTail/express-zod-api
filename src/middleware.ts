@@ -16,13 +16,13 @@ interface MiddlewareParams<IN, OPT> {
   logger: Logger;
 }
 
-type Middleware<IN, OPT extends FlatObject, OUT extends FlatObject> = (
+type Middleware<IN, OPT, OUT> = (
   params: MiddlewareParams<IN, OPT>,
 ) => Promise<OUT>;
 
 interface MiddlewareCreationProps<
   IN extends IOSchema<"strip">,
-  OPT extends FlatObject,
+  OPT,
   OUT extends FlatObject,
   SCO extends string,
 > {
@@ -33,7 +33,7 @@ interface MiddlewareCreationProps<
 
 export interface MiddlewareDefinition<
   IN extends IOSchema<"strip">,
-  OPT extends FlatObject,
+  OPT,
   OUT extends FlatObject,
   SCO extends string,
 > extends MiddlewareCreationProps<IN, OPT, OUT, SCO> {
@@ -44,7 +44,7 @@ export type AnyMiddlewareDef = MiddlewareDefinition<any, any, any, any>;
 
 export const createMiddleware = <
   IN extends IOSchema<"strip">,
-  OPT extends FlatObject,
+  OPT,
   OUT extends FlatObject,
   SCO extends string,
 >(
