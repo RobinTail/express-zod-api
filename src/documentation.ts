@@ -153,7 +153,7 @@ export class Documentation extends OpenApiBuilder {
       const operationId = this.ensureUniqOperationId(
         path,
         method,
-        endpoint.getOperationId(),
+        endpoint.getOperationId(method),
       );
       const operation: OperationObject = {
         operationId,

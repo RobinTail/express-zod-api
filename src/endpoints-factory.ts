@@ -35,7 +35,7 @@ type BuildProps<
   handler: Handler<z.output<ProbableIntersection<MIN, IN>>, z.input<OUT>, OPT>;
   description?: string;
   shortDescription?: string;
-  operationId?: string;
+  operationId?: string | ((method: Method) => string);
 } & ({ method: Method } | { methods: Method[] }) &
   ({ scopes?: SCO[] } | { scope?: SCO }) &
   ({ tags?: TAG[] } | { tag?: TAG });
@@ -150,6 +150,9 @@ export class EndpointsFactory<
     input,
     handler,
     output: outputSchema,
+    description,
+    shortDescription,
+    operationId,
     ...rest
   }: BuildProps<BIN, BOUT, IN, OUT, SCO, TAG>): Endpoint<
     ProbableIntersection<IN, BIN>,
@@ -161,13 +164,29 @@ export class EndpointsFactory<
     TAG
   > {
     const { middlewares, resultHandler } = this;
+    const methods = "methods" in rest ? rest.methods : [rest.method];
+    const getOperationId =
+      typeof operationId === "function" ? operationId : () => operationId;
+    const scopes =
+      "scopes" in rest
+        ? rest.scopes
+        : "scope" in rest && rest.scope
+        ? [rest.scope]
+        : [];
+    const tags =
+      "tags" in rest ? rest.tags : "tag" in rest && rest.tag ? [rest.tag] : [];
     return new Endpoint({
       handler,
       middlewares,
       outputSchema,
       resultHandler,
+      scopes,
+      tags,
+      methods,
+      getOperationId,
+      description,
+      shortDescription,
       inputSchema: getFinalEndpointInputSchema<IN, BIN>(middlewares, input),
-      ...rest,
     });
   }
 }
