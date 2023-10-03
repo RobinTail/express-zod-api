@@ -130,7 +130,7 @@ export const logInternalError = ({
 }: {
   logger: Logger;
   request: Request;
-  input: unknown;
+  input: FlatObject | null;
   error: Error;
   statusCode: number;
 }) => {
