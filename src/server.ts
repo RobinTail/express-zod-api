@@ -29,7 +29,7 @@ export const createParserFailureHandler =
       request,
       response,
       logger,
-      input: request.body,
+      input: null,
       output: null,
     });
   };

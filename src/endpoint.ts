@@ -261,7 +261,7 @@ export class Endpoint<
     logger,
   }: {
     method: Method | AuxMethod;
-    input: Readonly<any>; // Issue #673: input is immutable, since this.inputSchema is combined with ones of middlewares
+    input: Readonly<FlatObject>; // Issue #673: input is immutable, since this.inputSchema is combined with ones of middlewares
     request: Request;
     response: Response;
     logger: Logger;
@@ -272,7 +272,7 @@ export class Endpoint<
       if (method === "options" && def.type === "proprietary") {
         continue;
       }
-      let finalInput: any;
+      let finalInput: unknown;
       try {
         finalInput = await def.input.parseAsync(input);
       } catch (e) {
@@ -308,7 +308,7 @@ export class Endpoint<
     options,
     logger,
   }: {
-    input: Readonly<any>;
+    input: Readonly<FlatObject>;
     options: OPT;
     logger: Logger;
   }) {
@@ -342,7 +342,7 @@ export class Endpoint<
     request: Request;
     response: Response;
     logger: Logger;
-    input: any;
+    input: FlatObject;
     output: any;
   }) {
     try {
