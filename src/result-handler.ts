@@ -20,9 +20,11 @@ interface LastResortHandlerParams {
 }
 
 interface ResultHandlerParams<RES> {
+  /** null in case of failure to parse or to find the matching endpoint (error: not found) */
+  input: FlatObject | null;
+  /** null in case of errors or failures */
+  output: FlatObject | null;
   error: Error | null;
-  input: FlatObject | null; // null in case of failure to parse or to find the matching endpoint (error: not found)
-  output: FlatObject | null; // null in case of errors and failures
   request: Request;
   response: Response<RES>;
   logger: Logger;
