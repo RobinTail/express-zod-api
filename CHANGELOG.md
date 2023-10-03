@@ -2,6 +2,18 @@
 
 ## Version 12
 
+### v12.5.0
+
+- Featuring an ability to specify multiple server URLs when generating documentation.
+  - This feature is a shorthand for `new Documentation().addServer()`
+
+```typescript
+new Documentation({
+  serverUrl: ["https://example1.com", "https://example2.com"],
+  // ...
+});
+```
+
 ### v12.4.0
 
 - Feature: ability to assign a function to the `operationId` property of the `EndpointsFactory::build()` argument.
