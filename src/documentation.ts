@@ -32,7 +32,7 @@ import { RoutingWalkerParams, walkRouting } from "./routing-walker";
 interface DocumentationParams {
   title: string;
   version: string;
-  serverUrl: string;
+  serverUrl: string | string[];
   routing: Routing;
   config: CommonConfig;
   /** @default Successful response */
@@ -125,7 +125,10 @@ export class Documentation extends OpenApiBuilder {
     serializer = defaultSerializer,
   }: DocumentationParams) {
     super();
-    this.addInfo({ title, version }).addServer({ url: serverUrl });
+    this.addInfo({ title, version });
+    for (const url of typeof serverUrl === "string" ? [serverUrl] : serverUrl) {
+      this.addServer({ url });
+    }
     const onEndpoint: RoutingWalkerParams["onEndpoint"] = (
       endpoint,
       path,
