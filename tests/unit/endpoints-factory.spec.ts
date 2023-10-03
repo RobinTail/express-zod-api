@@ -5,6 +5,7 @@ import {
   EndpointsFactory,
   createMiddleware,
   createResultHandler,
+  defaultEndpointsFactory,
 } from "../../src";
 import { Endpoint } from "../../src/endpoint";
 import { expectType } from "tsd";
@@ -66,6 +67,25 @@ describe("EndpointsFactory", () => {
       expect(factory["resultHandler"]).toStrictEqual(resultHandlerMock);
       expect(newFactory["middlewares"]).toStrictEqual([middleware]);
       expect(newFactory["resultHandler"]).toStrictEqual(resultHandlerMock);
+    });
+
+    test("Should maintain the chain of options", () => {
+      defaultEndpointsFactory
+        .addMiddleware(
+          createMiddleware({
+            input: z.object({}),
+            middleware: async () => ({ test: "fist option" }),
+          }),
+        )
+        .addMiddleware(
+          createMiddleware({
+            input: z.object({}),
+            middleware: async ({ options: { test } }) => ({
+              second: `another option, ${test}`,
+            }),
+          }),
+        );
+      expect(true).toBeTruthy();
     });
   });
 
