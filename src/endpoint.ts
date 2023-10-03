@@ -242,9 +242,10 @@ export class Endpoint<
     };
   }
 
-  async #parseOutput(output: any) {
+  async #parseOutput(output: z.input<OUT>): Promise<FlatObject> {
     try {
-      return await this.#schemas.output.parseAsync(output);
+      const parsedOutput = await this.#schemas.output.parseAsync(output);
+      return Object.assign({}, parsedOutput); // ensure FlatObject
     } catch (e) {
       if (e instanceof z.ZodError) {
         throw new OutputValidationError(e);
@@ -261,18 +262,18 @@ export class Endpoint<
     logger,
   }: {
     method: Method | AuxMethod;
-    input: Readonly<any>; // Issue #673: input is immutable, since this.inputSchema is combined with ones of middlewares
+    input: Readonly<FlatObject>; // Issue #673: input is immutable, since this.inputSchema is combined with ones of middlewares
     request: Request;
     response: Response;
     logger: Logger;
   }) {
-    const options: any = {};
+    const options = {} as OPT;
     let isStreamClosed = false;
     for (const def of this.#middlewares) {
       if (method === "options" && def.type === "proprietary") {
         continue;
       }
-      let finalInput: any;
+      let finalInput: unknown;
       try {
         finalInput = await def.input.parseAsync(input);
       } catch (e) {
@@ -308,8 +309,8 @@ export class Endpoint<
     options,
     logger,
   }: {
-    input: Readonly<any>;
-    options: any;
+    input: Readonly<FlatObject>;
+    options: OPT;
     logger: Logger;
   }) {
     let finalInput: z.output<IN>; // final input types transformations for handler
@@ -342,8 +343,8 @@ export class Endpoint<
     request: Request;
     response: Response;
     logger: Logger;
-    input: any;
-    output: any;
+    input: FlatObject;
+    output: FlatObject | null;
   }) {
     try {
       await this.#resultHandler.handler({
@@ -375,7 +376,7 @@ export class Endpoint<
     config: CommonConfig;
   }) {
     const method = getActualMethod(request);
-    let output: any;
+    let output: FlatObject | null = null;
     let error: Error | null = null;
     if (config.cors) {
       let headers = this.#getDefaultCorsHeaders();

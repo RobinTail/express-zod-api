@@ -17,7 +17,7 @@ export interface ZodUploadDef extends ZodTypeDef {
   typeName: typeof zodUploadKind;
 }
 
-const isUploadedFile = (data: any): data is UploadedFile =>
+const isUploadedFile = (data: unknown): data is UploadedFile =>
   typeof data === "object" &&
   data !== null &&
   "name" in data &&

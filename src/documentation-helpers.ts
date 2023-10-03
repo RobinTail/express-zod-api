@@ -84,10 +84,7 @@ const shortDescriptionLimit = 50;
 const isoDateDocumentationUrl =
   "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString";
 
-const samples: Record<
-  Exclude<NonNullable<SchemaObjectType>, Array<any>>,
-  any
-> = {
+const samples = {
   integer: 0,
   number: 0,
   string: "",
@@ -95,7 +92,7 @@ const samples: Record<
   object: {},
   null: null,
   array: [],
-};
+} satisfies Record<NonNullable<SchemaObjectType>, unknown>;
 
 /* eslint-disable @typescript-eslint/no-use-before-define */
 

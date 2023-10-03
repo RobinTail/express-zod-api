@@ -17,7 +17,7 @@ import { AuxMethod, Method } from "./method";
 import { mimeMultipart } from "./mime";
 import { ZodUpload } from "./upload-schema";
 
-export type FlatObject = Record<string, any>;
+export type FlatObject = Record<string, unknown>;
 
 /** @see https://expressjs.com/en/guide/routing.html */
 export const routePathParamsRegex = /:([A-Za-z0-9_]+)/g;
@@ -46,7 +46,7 @@ export const isCustomHeader = (name: string): name is `x-${string}` =>
 
 /** @see https://nodejs.org/api/http.html#messageheaders */
 export const getCustomHeaders = (request: Request) =>
-  Object.entries(request.headers).reduce<Record<string, unknown>>(
+  Object.entries(request.headers).reduce<FlatObject>(
     (agg, [key, value]) =>
       isCustomHeader(key) ? { ...agg, [key]: value } : agg,
     {},
@@ -69,7 +69,7 @@ export const getInput = (
   }
   return props
     .filter((prop) => (prop === "files" ? areFilesAvailable(request) : true))
-    .reduce<Record<string, unknown>>(
+    .reduce<FlatObject>(
       (carry, prop) => ({
         ...carry,
         ...(prop === "headers" ? getCustomHeaders(request) : request[prop]),
@@ -78,16 +78,18 @@ export const getInput = (
     );
 };
 
-export const isLoggerConfig = (logger: any): logger is LoggerConfig =>
+export const isLoggerConfig = (logger: unknown): logger is LoggerConfig =>
   typeof logger === "object" &&
+  logger !== null &&
   "level" in logger &&
-  "color" in logger &&
+  typeof logger.level === "string" &&
   Object.keys(loggerLevels).includes(logger.level) &&
+  "color" in logger &&
   typeof logger.color === "boolean";
 
 export const isValidDate = (date: Date): boolean => !isNaN(date.getTime());
 
-export const makeErrorFromAnything = (subject: any): Error =>
+export const makeErrorFromAnything = (subject: unknown): Error =>
   subject instanceof Error
     ? subject
     : new Error(
@@ -128,7 +130,7 @@ export const logInternalError = ({
 }: {
   logger: Logger;
   request: Request;
-  input: any;
+  input: FlatObject | null;
   error: Error;
   statusCode: number;
 }) => {
@@ -176,7 +178,7 @@ export const getExamples = <
   return result;
 };
 
-export const combinations = <T extends any>(
+export const combinations = <T>(
   a: T[],
   b: T[],
 ): { type: "single"; value: T[] } | { type: "tuple"; value: [T, T][] } => {
@@ -277,12 +279,12 @@ export const makeCleanId = (path: string, method: string, suffix?: string) => {
 export const defaultSerializer = (schema: z.ZodTypeAny): string =>
   createHash("sha1").update(JSON.stringify(schema), "utf8").digest("hex");
 
-export const tryToTransform = ({
+export const tryToTransform = <T>({
   effect,
   sample,
 }: {
-  effect: z.TransformEffect<any>;
-  sample: any;
+  effect: z.TransformEffect<T>;
+  sample: T;
 }) => {
   try {
     return typeof effect.transform(sample, {

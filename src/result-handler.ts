@@ -3,6 +3,7 @@ import { Logger } from "winston";
 import { z } from "zod";
 import { ApiResponse } from "./api-response";
 import {
+  FlatObject,
   getExamples,
   getMessageFromError,
   getStatusCodeFromError,
@@ -19,9 +20,11 @@ interface LastResortHandlerParams {
 }
 
 interface ResultHandlerParams<RES> {
+  /** null in case of failure to parse or to find the matching endpoint (error: not found) */
+  input: FlatObject | null;
+  /** null in case of errors or failures */
+  output: FlatObject | null;
   error: Error | null;
-  input: any;
-  output: any;
   request: Request;
   response: Response<RES>;
   logger: Logger;
@@ -39,6 +42,11 @@ export interface ResultHandlerDefinition<
   getNegativeResponse: () => NEG | ApiResponse<NEG>;
   handler: ResultHandler<z.output<POS> | z.output<NEG>>;
 }
+
+export type AnyResultHandlerDefinition = ResultHandlerDefinition<
+  z.ZodTypeAny,
+  z.ZodTypeAny
+>;
 
 export const defaultStatusCodes = {
   positive: 200,
@@ -140,7 +148,7 @@ export const arrayResultHandler = createResultHandler({
       response.status(statusCode).send(error.message);
       return;
     }
-    if ("items" in output && Array.isArray(output.items)) {
+    if (output && "items" in output && Array.isArray(output.items)) {
       response.status(200).json(output.items);
     } else {
       response

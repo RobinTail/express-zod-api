@@ -38,7 +38,7 @@ import {
 
 const { factory: f } = ts;
 
-const samples: Partial<Record<ts.KeywordTypeSyntaxKind, any>> = {
+const samples = {
   [ts.SyntaxKind.AnyKeyword]: "",
   [ts.SyntaxKind.BigIntKeyword]: BigInt(0),
   [ts.SyntaxKind.BooleanKeyword]: false,
@@ -46,7 +46,7 @@ const samples: Partial<Record<ts.KeywordTypeSyntaxKind, any>> = {
   [ts.SyntaxKind.ObjectKeyword]: {},
   [ts.SyntaxKind.StringKeyword]: "",
   [ts.SyntaxKind.UndefinedKeyword]: undefined,
-};
+} satisfies Partial<Record<ts.KeywordTypeSyntaxKind, unknown>>;
 
 const onLiteral: Producer<z.ZodLiteral<LiteralType>> = ({
   schema: { value },
