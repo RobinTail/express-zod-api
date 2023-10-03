@@ -242,9 +242,18 @@ export class Endpoint<
     };
   }
 
-  async #parseOutput(output: z.input<OUT>) {
+  async #parseOutput(output: z.input<OUT>): Promise<FlatObject> {
     try {
-      return await this.#schemas.output.parseAsync(output);
+      return z
+        .object(
+          {},
+          {
+            invalid_type_error:
+              "The actual output of the endpoint does not comply the FlatObject constraints.",
+          },
+        )
+        .passthrough()
+        .parse(await this.#schemas.output.parseAsync(output));
     } catch (e) {
       if (e instanceof z.ZodError) {
         throw new OutputValidationError(e);
@@ -343,12 +352,12 @@ export class Endpoint<
     response: Response;
     logger: Logger;
     input: FlatObject;
-    output: z.output<OUT> | null;
+    output: FlatObject | null;
   }) {
     try {
       await this.#resultHandler.handler({
         error,
-        output: output as FlatObject | null, // @todo consider checking this
+        output,
         request,
         response,
         logger,
@@ -375,7 +384,7 @@ export class Endpoint<
     config: CommonConfig;
   }) {
     const method = getActualMethod(request);
-    let output: z.output<OUT> | null = null;
+    let output: FlatObject | null = null;
     let error: Error | null = null;
     if (config.cors) {
       let headers = this.#getDefaultCorsHeaders();
