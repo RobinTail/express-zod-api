@@ -73,27 +73,6 @@ export abstract class AbstractEndpoint {
   public abstract getOperationId(method: Method): string | undefined;
 }
 
-type EndpointProps<
-  IN extends IOSchema,
-  OUT extends IOSchema,
-  OPT extends FlatObject,
-  POS extends z.ZodTypeAny,
-  NEG extends z.ZodTypeAny,
-  SCO extends string,
-  TAG extends string,
-> = {
-  middlewares: AnyMiddlewareDef[];
-  inputSchema: IN;
-  outputSchema: OUT;
-  handler: Handler<z.output<IN>, z.input<OUT>, OPT>;
-  resultHandler: ResultHandlerDefinition<POS, NEG>;
-  description?: string;
-  shortDescription?: string;
-  operationId?: string | ((method: Method) => string);
-} & ({ method: Method } | { methods: Method[] }) &
-  ({ scopes?: SCO[] } | { scope?: SCO }) &
-  ({ tags?: TAG[] } | { tag?: TAG });
-
 export class Endpoint<
   IN extends IOSchema,
   OUT extends IOSchema,
@@ -104,9 +83,8 @@ export class Endpoint<
   TAG extends string,
 > extends AbstractEndpoint {
   readonly #descriptions: Record<DescriptionVariant, string | undefined>;
-  readonly #methods: Method[] = [];
-  #siblingMethods: Method[] = [];
-  readonly #middlewares: AnyMiddlewareDef[] = [];
+  readonly #methods: Method[];
+  readonly #middlewares: AnyMiddlewareDef[];
   readonly #mimeTypes: Record<MimeVariant, string[]>;
   readonly #statusCodes: Record<ResponseVariant, number>;
   readonly #handler: Handler<z.output<IN>, z.input<OUT>, OPT>;
@@ -117,20 +95,36 @@ export class Endpoint<
     positive: POS;
     negative: NEG;
   };
-  readonly #scopes: SCO[] = [];
-  readonly #tags: TAG[] = [];
-  readonly #operationId?: string | ((method: Method) => string);
+  readonly #scopes: SCO[];
+  readonly #tags: TAG[];
+  readonly #getOperationId: (method: Method) => string | undefined;
+  #siblingMethods: Method[] = [];
 
   constructor({
-    middlewares,
+    methods,
     inputSchema,
     outputSchema,
     handler,
     resultHandler,
-    description,
-    shortDescription,
-    ...rest
-  }: EndpointProps<IN, OUT, OPT, POS, NEG, SCO, TAG>) {
+    getOperationId = () => undefined,
+    scopes = [],
+    middlewares = [],
+    tags = [],
+    description: long,
+    shortDescription: short,
+  }: {
+    middlewares?: AnyMiddlewareDef[];
+    inputSchema: IN;
+    outputSchema: OUT;
+    handler: Handler<z.output<IN>, z.input<OUT>, OPT>;
+    resultHandler: ResultHandlerDefinition<POS, NEG>;
+    description?: string;
+    shortDescription?: string;
+    getOperationId?: (method: Method) => string | undefined;
+    methods: Method[];
+    scopes?: SCO[];
+    tags?: TAG[];
+  }) {
     super();
     [
       { name: "input schema", schema: inputSchema },
@@ -142,8 +136,14 @@ export class Endpoint<
         );
       }
     });
+    this.#handler = handler;
+    this.#resultHandler = resultHandler;
     this.#middlewares = middlewares;
-    this.#operationId = rest.operationId;
+    this.#getOperationId = getOperationId;
+    this.#methods = methods;
+    this.#scopes = scopes;
+    this.#tags = tags;
+    this.#descriptions = { long, short };
     const apiResponse = {
       positive: resultHandler.getPositiveResponse(outputSchema),
       negative: resultHandler.getNegativeResponse(),
@@ -175,26 +175,6 @@ export class Endpoint<
           ? defaultStatusCodes.negative
           : apiResponse.negative.statusCode || defaultStatusCodes.negative,
     };
-    this.#handler = handler;
-    this.#resultHandler = resultHandler;
-    this.#descriptions = { long: description, short: shortDescription };
-    if ("scopes" in rest && rest.scopes) {
-      this.#scopes.push(...rest.scopes);
-    }
-    if ("scope" in rest && rest.scope) {
-      this.#scopes.push(rest.scope);
-    }
-    if ("tags" in rest && rest.tags) {
-      this.#tags.push(...rest.tags);
-    }
-    if ("tag" in rest && rest.tag) {
-      this.#tags.push(rest.tag);
-    }
-    if ("methods" in rest) {
-      this.#methods = rest.methods;
-    } else {
-      this.#methods = [rest.method];
-    }
   }
 
   /**
@@ -246,9 +226,7 @@ export class Endpoint<
   }
 
   public override getOperationId(method: Method): string | undefined {
-    return typeof this.#operationId === "function"
-      ? this.#operationId(method)
-      : this.#operationId;
+    return this.#getOperationId(method);
   }
 
   #getDefaultCorsHeaders(): Record<string, string> {

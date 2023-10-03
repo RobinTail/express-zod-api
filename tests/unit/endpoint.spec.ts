@@ -25,7 +25,6 @@ describe("Endpoint", () => {
           getNegativeResponse: () => z.string(),
           handler: jest.fn(),
         }),
-        middlewares: [],
       });
       expect(endpointMock.getMethods()).toEqual([
         "get",
@@ -38,7 +37,7 @@ describe("Endpoint", () => {
 
     test("Should return the array for a single method also", () => {
       const endpointMock = new Endpoint({
-        method: "patch",
+        methods: ["patch"],
         inputSchema: z.object({}),
         outputSchema: z.object({}),
         handler: jest.fn(),
@@ -47,7 +46,6 @@ describe("Endpoint", () => {
           getNegativeResponse: () => z.string(),
           handler: jest.fn(),
         }),
-        middlewares: [],
       });
       expect(endpointMock.getMethods()).toEqual(["patch"]);
     });
@@ -312,14 +310,27 @@ describe("Endpoint", () => {
     });
   });
 
+  describe(".getOperationId()", () => {
+    test("should return undefined if its not defined upon creaton", () => {
+      expect(
+        new Endpoint({
+          methods: ["get"],
+          inputSchema: z.object({}),
+          outputSchema: z.object({}),
+          handler: async () => ({}),
+          resultHandler: defaultResultHandler,
+        }).getOperationId("get"),
+      ).toBeUndefined();
+    });
+  });
+
   describe(".outputSchema", () => {
     test("should be the output schema", () => {
       const outputSchema = z.object({
         something: z.number(),
       });
       const endpoint = new Endpoint({
-        method: "get",
-        middlewares: [],
+        methods: ["get"],
         inputSchema: z.object({}),
         outputSchema,
         handler: jest.fn(),
@@ -714,7 +725,7 @@ describe("Endpoint", () => {
       expect(
         () =>
           new Endpoint({
-            method: "get",
+            methods: ["get"],
             inputSchema: z.object({}).transform(() => []),
             outputSchema: z.object({}),
             handler: jest.fn(),
@@ -723,7 +734,6 @@ describe("Endpoint", () => {
               getNegativeResponse: jest.fn(),
               handler: jest.fn(),
             },
-            middlewares: [],
           }),
       ).toThrowError(
         new IOSchemaError(
@@ -733,7 +743,7 @@ describe("Endpoint", () => {
       expect(
         () =>
           new Endpoint({
-            method: "get",
+            methods: ["get"],
             inputSchema: z.object({}),
             outputSchema: z.object({}).transform(() => []),
             handler: jest.fn(),
@@ -742,7 +752,6 @@ describe("Endpoint", () => {
               getNegativeResponse: jest.fn(),
               handler: jest.fn(),
             },
-            middlewares: [],
           }),
       ).toThrowError(
         new IOSchemaError(
