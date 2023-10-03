@@ -32,7 +32,7 @@ import { RoutingWalkerParams, walkRouting } from "./routing-walker";
 interface DocumentationParams {
   title: string;
   version: string;
-  serverUrl: string | string[];
+  serverUrl: string | [string, ...string[]];
   routing: Routing;
   config: CommonConfig;
   /** @default Successful response */
