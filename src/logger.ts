@@ -1,6 +1,5 @@
 import { inspect } from "node:util";
 import type { Format, TransformableInfo } from "logform";
-import { LEVEL, MESSAGE, SPLAT } from "triple-beam";
 import winston from "winston";
 import type Transport from "winston-transport";
 import { LoggerConfig } from "./config-type";
@@ -10,9 +9,9 @@ const { combine, colorize, timestamp: useTimestamp, printf } = winston.format;
 export const createLogger = (loggerConfig: LoggerConfig): winston.Logger => {
   const prettyPrint = (meta: Omit<TransformableInfo, "level" | "message">) => {
     const {
-      [LEVEL]: noLevel,
-      [MESSAGE]: noMessage,
-      [SPLAT]: noSplat,
+      [Symbol.for("level")]: noLevel,
+      [Symbol.for("message")]: noMessage,
+      [Symbol.for("splat")]: noSplat,
       ...rest
     } = meta;
     return inspect(rest, false, 1, loggerConfig.color);
