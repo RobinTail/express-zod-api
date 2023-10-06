@@ -12,7 +12,7 @@
     "build:esm": "yarn tsnode tools/esm-test.ts && yarn install --cwd ./tests/esm",
     "build:assets": "yarn build:swagger && yarn build:client && yarn build:license",
     "build:swagger": "yarn tsnode example/generate-open-api-schema.ts > example/example.swagger.yaml",
-    "build:client": "yarn tsnode example/generate-client.ts > example/example.client.ts && yarn prettier example/example.client.ts --write",
+    "build:client": "yarn tsnode example/generate-client.ts && yarn prettier example/example.client.ts --write",
     "build:license": "yarn tsnode tools/license.ts",
     "test": "yarn test:types && yarn test:jest && yarn test:badge",
     "test:int": "jest ./tests/integration",
