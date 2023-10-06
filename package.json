@@ -14,6 +14,7 @@
     "build:swagger": "yarn tsnode example/generate-open-api-schema.ts",
     "build:client": "yarn tsnode example/generate-client.ts && yarn prettier example/example.client.ts --write",
     "build:license": "yarn tsnode tools/license.ts",
+    "build:logo": "yarn tsnode tools/startup-logo.ts",
     "test": "yarn test:types && yarn test:jest && yarn test:badge",
     "test:int": "jest ./tests/integration",
     "test:esm": "jest ./tests/esm",
