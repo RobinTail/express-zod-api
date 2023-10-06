@@ -4,7 +4,7 @@ tsconfig.build.json
 tsconfig.esm.json
 example
 .husky
-jest.config.ts
+jest.config.json
 tests
 .idea
 yarn-error.log
