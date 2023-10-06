@@ -12,7 +12,6 @@ describe("Example", () => {
   let example: ChildProcessWithoutNullStreams;
   let out = "";
   const listener = (chunk: Buffer) => {
-    console.log(chunk.toString()); // @todo remove
     out += chunk.toString();
   };
 
