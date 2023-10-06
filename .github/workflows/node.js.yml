@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [18.6.0, 18.x, 20.1.0, 20.x]
+        node-version: [18.0.0, 18.6.0, 18.x, 20.1.0, 20.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
     steps:
     - name: Get yarn cache dir
@@ -51,6 +51,8 @@ jobs:
     - name: Integration test
       run: yarn test:int
     - name: ESM test
+      # see https://github.com/RobinTail/express-zod-api/pull/1210#issuecomment-1751489201
+      if: matrix.node-version != '18.0.0'
       run: yarn test:esm
   finish:
     needs: build
