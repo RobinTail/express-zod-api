@@ -1,9 +1,11 @@
+import { writeFileSync } from "node:fs";
 import { Documentation } from "../src";
 import { config } from "./config";
 import { routing } from "./routing";
 import manifest from "../package.json";
 
-console.log(
+writeFileSync(
+  "example/example.swagger.yaml",
   new Documentation({
     routing,
     config,
@@ -11,4 +13,5 @@ console.log(
     title: "Example API",
     serverUrl: "https://example.com",
   }).getSpecAsYaml(),
+  "utf-8",
 );

@@ -1,3 +1,4 @@
+import { writeFileSync } from "node:fs";
 import manifest from "../package.json";
 
 const ownLicense = `
@@ -24,4 +25,4 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 `;
 
-console.log(ownLicense.trim());
+writeFileSync("LICENSE", ownLicense.trimStart(), "utf-8");
