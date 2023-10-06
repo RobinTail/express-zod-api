@@ -5,22 +5,21 @@ import { getTSConfigBase } from "./tsconfig-base";
 
 const tsconfigBase = getTSConfigBase();
 
-// @todo revert "start" to "ts-node-esm quick-start.ts" when the ts-node issue fixed
-// @link https://github.com/TypeStrong/ts-node/issues/1997
 const packageJson = `
 {
   "name": "express-zod-api-esm-test",
   "version": "1.0.0",
   "scripts": {
-    "launch": "node --no-warnings=ExperimentalWarning --loader ts-node/esm",
-    "postinstall": "yarn launch fix-package.ts",
-    "start": "yarn launch quick-start.ts"
+    "tsnode": "node --loader @swc-node/register/esm",
+    "postinstall": "yarn tsnode fix-package.ts",
+    "start": "yarn tsnode quick-start.ts"
   },
   "type": "module",
   "dependencies": {
     "@tsconfig/node${tsconfigBase}": "latest",
     "express-zod-api": "../../dist",
-    "ts-node": "10.9.1",
+    "@swc/core": "1.3.92",
+    "@swc-node/register": "1.6.8",
     "typescript": "5.2.2",
     "@types/node": "*"
   }
