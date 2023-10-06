@@ -13,7 +13,7 @@ describe("Example", () => {
   };
 
   beforeAll(() => {
-    example = spawn("ts-node", ["example/index.ts"]);
+    example = spawn("yarn", ["tsnode", "example/index.ts"]);
     example.stdout.on("data", listener);
   });
 
