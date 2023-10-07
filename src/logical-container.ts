@@ -62,41 +62,39 @@ export const andToOr = <T>(
       }
       return acc;
     },
-    {
-      or: [],
-    },
+    { or: [] },
   );
 };
 
 /** @desc reducer, combines two LogicalContainers */
 export const combineContainers = <T>(
-  a: LogicalContainer<T>,
-  b: LogicalContainer<T>,
+  left: LogicalContainer<T>,
+  right: LogicalContainer<T>,
 ): LogicalContainer<T> => {
-  if (isLogicalAnd(a)) {
-    if (isLogicalAnd(b)) {
-      return flattenAnds([a, b]);
+  if (isLogicalAnd(left)) {
+    if (isLogicalAnd(right)) {
+      return flattenAnds([left, right]);
     }
-    if (isLogicalOr(b)) {
-      return combineContainers(andToOr(a), b);
+    if (isLogicalOr(right)) {
+      return combineContainers(andToOr(left), right);
     }
-    return flattenAnds([a, b]);
+    return flattenAnds([left, right]);
   }
 
-  if (isLogicalOr(a)) {
-    if (isLogicalAnd(b)) {
-      return combineContainers(b, a);
+  if (isLogicalOr(left)) {
+    if (isLogicalAnd(right)) {
+      return combineContainers(right, left);
     }
-    if (isLogicalOr(b)) {
-      const { type, value } = combinations(a.or, b.or);
+    if (isLogicalOr(right)) {
+      const { type, value } = combinations(left.or, right.or);
       return { or: type === "single" ? value : value.map(flattenAnds) };
     }
-    return combineContainers(a, { and: [b] });
+    return combineContainers(left, { and: [right] });
   }
 
-  if (isLogicalAnd(b) || isLogicalOr(b)) {
-    return combineContainers(b, a);
+  if (isLogicalAnd(right) || isLogicalOr(right)) {
+    return combineContainers(right, left);
   }
 
-  return { and: [a, b] };
+  return { and: [left, right] };
 };
