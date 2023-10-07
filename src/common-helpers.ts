@@ -19,9 +19,6 @@ import { ZodUpload } from "./upload-schema";
 
 export type FlatObject = Record<string, unknown>;
 
-/** @see https://expressjs.com/en/guide/routing.html */
-export const routePathParamsRegex = /:([A-Za-z0-9_]+)/g;
-
 const areFilesAvailable = (request: Request): boolean => {
   const contentType = request.header("content-type") || "";
   const isMultipart =
@@ -195,14 +192,6 @@ export const combinations = <T>(
     }
   }
   return { type: "tuple", value: result };
-};
-
-export const getRoutePathParams = (path: string): string[] => {
-  const match = path.match(routePathParamsRegex);
-  if (!match) {
-    return [];
-  }
-  return match.map((param) => param.slice(1));
 };
 
 const reduceBool = (arr: boolean[]) =>
