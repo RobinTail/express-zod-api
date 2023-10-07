@@ -5,7 +5,7 @@
 ### v14.0.0
 
 - **Breaking changes**:
-  - Minimum version of `zod`: 3.22.3.
+  - Minimum version of `zod` is 3.22.3.
   - The class `DependsOnMethodError` is removed — catch `RoutingError` instead if needed.
   - The property `DependsOnMethod::method` is renamed to `endpoints`.
   - The type `FlatObject` changed from `Record<string, any>` to `Record<string, unknown>`.
