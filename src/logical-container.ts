@@ -44,15 +44,14 @@ export const mapLogicalContainer = <T, S>(
       ),
     };
   }
-
   return fn(container);
 };
 
 /** @desc converts LogicalAnd into LogicalOr */
 export const andToOr = <T>(
   subject: LogicalAnd<T | LogicalOr<T>>,
-): LogicalOr<T | LogicalAnd<T>> => {
-  return subject.and.reduce<LogicalOr<T | LogicalAnd<T>>>(
+): LogicalOr<T | LogicalAnd<T>> =>
+  subject.and.reduce<LogicalOr<T | LogicalAnd<T>>>(
     (acc, item) => {
       const combs = combinations(acc.or, isLogicalOr(item) ? item.or : [item]);
       if (combs.type === "single") {
@@ -64,7 +63,6 @@ export const andToOr = <T>(
     },
     { or: [] },
   );
-};
 
 /** @desc reducer, combines two LogicalContainers */
 export const combineContainers = <T>(
