@@ -20,12 +20,10 @@ import { omit } from "ramda";
 import { z } from "zod";
 import {
   getExamples,
-  getRoutePathParams,
   hasCoercion,
   hasTopLevelTransformingEffect,
   isCustomHeader,
   makeCleanId,
-  routePathParamsRegex,
   tryToTransform,
 } from "./common-helpers";
 import { InputSource, TagsConfig } from "./config-type";
@@ -50,6 +48,8 @@ import {
 } from "./schema-walker";
 import { Security } from "./security";
 import { ZodUpload } from "./upload-schema";
+
+/* eslint-disable @typescript-eslint/no-use-before-define */
 
 type MediaExamples = Pick<MediaTypeObject, "examples">;
 
@@ -94,7 +94,16 @@ const samples = {
   array: [],
 } satisfies Record<NonNullable<SchemaObjectType>, unknown>;
 
-/* eslint-disable @typescript-eslint/no-use-before-define */
+/** @see https://expressjs.com/en/guide/routing.html */
+const routePathParamsRegex = /:([A-Za-z0-9_]+)/g;
+
+export const getRoutePathParams = (path: string): string[] => {
+  const match = path.match(routePathParamsRegex);
+  if (!match) {
+    return [];
+  }
+  return match.map((param) => param.slice(1));
+};
 
 export const reformatParamsInPath = (path: string) =>
   path.replace(routePathParamsRegex, (param) => `{${param.slice(1)}}`);

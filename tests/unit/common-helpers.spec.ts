@@ -7,7 +7,6 @@ import {
   getExamples,
   getInput,
   getMessageFromError,
-  getRoutePathParams,
   getStatusCodeFromError,
   hasCoercion,
   hasTopLevelTransformingEffect,
@@ -393,34 +392,6 @@ describe("Common Helpers", () => {
         value: [1, 2, 3],
       });
       expect(combinations([], [])).toEqual({ type: "single", value: [] });
-    });
-  });
-
-  describe("getRoutePathParams()", () => {
-    test("should return an array of param names", () => {
-      expect(getRoutePathParams("/users/:userId/books/:bookId")).toEqual([
-        "userId",
-        "bookId",
-      ]);
-      expect(getRoutePathParams("/flights/:from-:to")).toEqual(["from", "to"]);
-      expect(getRoutePathParams("/something")).toEqual([]);
-      expect(getRoutePathParams("")).toEqual([]);
-      expect(getRoutePathParams("\n")).toEqual([]);
-    });
-
-    test("should return an array of param names", () => {
-      expect(getRoutePathParams("/users/:userId/books/:bookId")).toEqual([
-        "userId",
-        "bookId",
-      ]);
-      expect(getRoutePathParams("/flights/:from-:to")).toEqual(["from", "to"]);
-      expect(getRoutePathParams("/test/:genus.:species")).toEqual([
-        "genus",
-        "species",
-      ]);
-      expect(getRoutePathParams("/something")).toEqual([]);
-      expect(getRoutePathParams("")).toEqual([]);
-      expect(getRoutePathParams("\n")).toEqual([]);
     });
   });
 
