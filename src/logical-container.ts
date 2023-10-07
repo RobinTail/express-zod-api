@@ -8,11 +8,7 @@ export type LogicalContainer<T> =
   | LogicalAnd<T | LogicalOr<T>>
   | T;
 
-const isObject = <
-  T extends LogicalContainer<any> | LogicalAnd<any> | LogicalOr<any>,
->(
-  subject: T,
-): subject is Exclude<T & {}, null> =>
+const isObject = (subject: unknown): subject is object =>
   typeof subject === "object" && subject !== null;
 
 /** @desc combines several LogicalAnds into a one */
@@ -115,5 +111,5 @@ export const combineContainers = <T>(
     return combineContainers(b, a);
   }
 
-  return { and: [a as T, b as T] };
+  return { and: [a, b] };
 };
