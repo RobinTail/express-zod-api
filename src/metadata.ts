@@ -2,9 +2,6 @@ import { combinations } from "./common-helpers";
 import { z } from "zod";
 import { clone, mergeDeepRight } from "ramda";
 
-export const metaProp = "expressZodApiMeta";
-type MetaProp = typeof metaProp;
-
 interface Metadata<T extends z.ZodTypeAny> {
   examples: z.input<T>[];
 }
@@ -14,6 +11,8 @@ type MetaValue<T extends z.ZodTypeAny, K extends MetaKey> = Readonly<
   Metadata<T>[K]
 >;
 
+export const metaProp = "expressZodApiMeta";
+type MetaProp = typeof metaProp;
 export type MetaDef<T extends z.ZodTypeAny> = Record<MetaProp, Metadata<T>>;
 
 type ExampleSetter<T extends z.ZodTypeAny> = (
