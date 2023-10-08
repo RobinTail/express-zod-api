@@ -10,7 +10,7 @@ export type MetaDef<T extends z.ZodTypeAny> = {
     examples: z.input<T>[];
   };
 };
-type MetaKey = keyof MetaDef<any>[MetaProp];
+type MetaKey = keyof MetaDef<z.ZodTypeAny>[MetaProp];
 type MetaValue<T extends z.ZodTypeAny, K extends MetaKey> = Readonly<
   MetaDef<T>[MetaProp][K]
 >;
