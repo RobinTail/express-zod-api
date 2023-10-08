@@ -5,15 +5,16 @@ import { clone, mergeDeepRight } from "ramda";
 export const metaProp = "expressZodApiMeta";
 type MetaProp = typeof metaProp;
 
-export type MetaDef<T extends z.ZodTypeAny> = {
-  [K in MetaProp]: {
-    examples: z.input<T>[];
-  };
-};
-type MetaKey = keyof MetaDef<z.ZodTypeAny>[MetaProp];
+interface Metadata<T extends z.ZodTypeAny> {
+  examples: z.input<T>[];
+}
+
+type MetaKey = keyof Metadata<z.ZodTypeAny>;
 type MetaValue<T extends z.ZodTypeAny, K extends MetaKey> = Readonly<
-  MetaDef<T>[MetaProp][K]
+  Metadata<T>[K]
 >;
+
+export type MetaDef<T extends z.ZodTypeAny> = Record<MetaProp, Metadata<T>>;
 
 type ExampleSetter<T extends z.ZodTypeAny> = (
   example: z.input<T>,
