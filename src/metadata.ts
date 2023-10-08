@@ -28,7 +28,7 @@ type WithMeta<T extends z.ZodTypeAny> = T & {
 const cloneSchemaForMeta = <T extends z.ZodTypeAny>(schema: T): WithMeta<T> => {
   const This = (schema as any).constructor;
   const def = clone(schema._def) as MetaDef<T>;
-  def[metaProp] = def[metaProp] || { examples: [] };
+  def[metaProp] = def[metaProp] || ({ examples: [] } satisfies Metadata<T>);
   return new This(def) as WithMeta<T>;
 };
 
@@ -38,7 +38,7 @@ export const withMeta = <T extends z.ZodTypeAny>(schema: T): WithMeta<T> => {
     example: {
       get: (): ExampleSetter<T> => (value) => {
         const localCopy = withMeta<T>(copy);
-        localCopy._def[metaProp].examples.push(value);
+        (localCopy._def[metaProp] as Metadata<T>).examples.push(value);
         return localCopy;
       },
     },
