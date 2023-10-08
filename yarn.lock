@@ -20,12 +20,12 @@
   resolved "https://registry.yarnpkg.com/@andrewbranch/untar.js/-/untar.js-1.0.2.tgz#27ad421530e4609480d99180b9a5e9d0a0b3f132"
   integrity sha512-hL80MHK3b++pEp6K23+Nl5r5D1F19DRagp2ruCBIv4McyCiLKq67vUNvEQY1aGCAKNZ8GxV23n5MhOm7RwO8Pg==
 
-"@arethetypeswrong/cli@^0.11.0":
-  version "0.11.0"
-  resolved "https://registry.yarnpkg.com/@arethetypeswrong/cli/-/cli-0.11.0.tgz#a46a2d39824ee251b1510feda4c34302cb1cf6f0"
-  integrity sha512-0GxlV58x8DaiWRUx0JWc3glr8iGsjK+KATuubH8qRqjw4aIGB8BBQ8Bv2Bvs9DfGuojBgbVWhOTe8+3BepYZ6Q==
+"@arethetypeswrong/cli@^0.12.1":
+  version "0.12.1"
+  resolved "https://registry.yarnpkg.com/@arethetypeswrong/cli/-/cli-0.12.1.tgz#4e86a47e5ee2a673ee39e2dc2210d257995fd866"
+  integrity sha512-5nA91oqi8GPv9NkxgcjdpyKSMJ0WCcX8YYcxlZS5XBqY6cau0pMt5S0CXU3QGgl9qDryrok1QaM1xtUUhBKTAA==
   dependencies:
-    "@arethetypeswrong/core" "0.10.2"
+    "@arethetypeswrong/core" "0.12.1"
     chalk "^4.1.2"
     cli-table3 "^0.6.3"
     commander "^10.0.1"
@@ -34,10 +34,10 @@
     node-fetch "^2.6.4"
     semver "^7.5.4"
 
-"@arethetypeswrong/core@0.10.2":
-  version "0.10.2"
-  resolved "https://registry.yarnpkg.com/@arethetypeswrong/core/-/core-0.10.2.tgz#58b68354f3e78469859da09d1a0620e32895a051"
-  integrity sha512-jL1MPpZKuMkm0EbZn1OLgdTO5hci7g79EUSELEnATdFyTgbPUxJwTXi1Kdont/BG05BZCcxZnOQgYO/whVmwdA==
+"@arethetypeswrong/core@0.12.1":
+  version "0.12.1"
+  resolved "https://registry.yarnpkg.com/@arethetypeswrong/core/-/core-0.12.1.tgz#d02c10b0d5db3a74cecba49712a838d5c4b075d4"
+  integrity sha512-1XCwz+IRSptRu1Y48D462vu3de8sLFrtXaXkgthIZ8+iRhEBIZtu+q7MwrfR3hWbYIgUsBj2WugtIgaPAdX9FA==
   dependencies:
     "@andrewbranch/untar.js" "^1.0.0"
     fetch-ponyfill "^7.1.0"
@@ -337,6 +337,11 @@
   version "1.5.0"
   resolved "https://registry.yarnpkg.com/@colors/colors/-/colors-1.5.0.tgz#bb504579c1cae923e6576a4f5da43d25f97bdbd9"
   integrity sha512-ooWCrlZP11i8GImSjTHYHLkvFDP48nS4+204nGb1RiX/WXYHmJA2III9/e2DWVabCESdW7hBAEzHRqUn9OUVvQ==
+
+"@colors/colors@^1.6.0":
+  version "1.6.0"
+  resolved "https://registry.yarnpkg.com/@colors/colors/-/colors-1.6.0.tgz#ec6cd237440700bc23ca23087f513c75508958b0"
+  integrity sha512-Ir+AOibqzrIsL6ajt3Rz3LskB7OiMVHqltZmspbW/TJuTVuyOMirVqAkjfY6JISiLHgyNqicAC8AyHHGzNd/dA==
 
 "@dabh/diagnostics@^2.0.2":
   version "2.0.3"
@@ -5368,11 +5373,11 @@ winston-transport@^4.5.0:
     triple-beam "^1.3.0"
 
 winston@^3.10.0:
-  version "3.10.0"
-  resolved "https://registry.yarnpkg.com/winston/-/winston-3.10.0.tgz#d033cb7bd3ced026fed13bf9d92c55b903116803"
-  integrity sha512-nT6SIDaE9B7ZRO0u3UvdrimG0HkB7dSTAgInQnNR2SOPJ4bvq5q79+pXLftKmP52lJGW15+H5MCK0nM9D3KB/g==
+  version "3.11.0"
+  resolved "https://registry.yarnpkg.com/winston/-/winston-3.11.0.tgz#2d50b0a695a2758bb1c95279f0a88e858163ed91"
+  integrity sha512-L3yR6/MzZAOl0DsysUXHVjOwv8mKZ71TrA/41EIduGpOOV5LQVodqN+QdQ6BS6PJ/RdIshZhq84P/fStEZkk7g==
   dependencies:
-    "@colors/colors" "1.5.0"
+    "@colors/colors" "^1.6.0"
     "@dabh/diagnostics" "^2.0.2"
     async "^3.2.3"
     is-stream "^2.0.0"
