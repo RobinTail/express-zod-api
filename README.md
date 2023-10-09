@@ -252,7 +252,8 @@ Here is an example of the authentication middleware, that checks a `key` from in
 
 ```typescript
 import { z } from "zod";
-import { createMiddleware, createHttpError } from "express-zod-api";
+import createHttpError from "http-errors";
+import { createMiddleware } from "express-zod-api";
 
 const authMiddleware = createMiddleware({
   security: {
@@ -589,8 +590,9 @@ There are also two optional features available: a provider of options and an err
 In case the error in middleware is not a `HttpError`, the `ResultHandler` will send the status `500`.
 
 ```typescript
-import { defaultEndpointsFactory, createHttpError } from "express-zod-api";
+import { defaultEndpointsFactory } from "express-zod-api";
 import cors from "cors";
+import createHttpError from "http-errors";
 import { auth } from "express-oauth2-jwt-bearer";
 
 const simpleUsage = defaultEndpointsFactory.addExpressMiddleware(
