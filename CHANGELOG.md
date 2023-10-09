@@ -9,7 +9,7 @@
     - You might also need to install `@types/http-errors` if you're using `createHttpError` in your implementation.
   - Minimum version of `zod` is 3.22.3.
   - The class `DependsOnMethodError` is removed — catch `RoutingError` instead if needed.
-  - The property `DependsOnMethod::method` is renamed to `endpoints`.
+  - The property `DependsOnMethod::methods` is renamed to `endpoints`.
   - The type `FlatObject` changed from `Record<string, any>` to `Record<string, unknown>`.
     - Custom `ResultHandler` might need to ensure the actual type of the `output` properties they operate.
   - In case of body parsing failure the `ResultHandler` recieves `null` into its `input` argument instead of raw `body`.
