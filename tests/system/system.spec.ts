@@ -246,8 +246,7 @@ describe("App", () => {
       console.log(response.headers);
       expect(response.headers.get("Content-Encoding")).toBe("gzip");
       const json = await response.json();
-      expect("status" in json).toBeTruthy();
-      expect(json.status).toBe("success");
+      expect(json).toMatchSnapshot();
     });
 
     test("Should execute native express middleware", async () => {
