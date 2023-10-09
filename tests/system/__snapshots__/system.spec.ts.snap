@@ -1,5 +1,20 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`App Positive Should compress the response in case it is supported by client 1`] = `
+{
+  "data": {
+    "anything": 300,
+    "doubleKey": "123123",
+    "method": "get",
+    "permissions": [
+      "any",
+    ],
+    "userId": 354,
+  },
+  "status": "success",
+}
+`;
+
 exports[`App Protocol Should fail on invalid method 1`] = `
 {
   "error": {
