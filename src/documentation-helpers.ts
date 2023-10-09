@@ -159,14 +159,15 @@ export const depictFile: Depicter<ZodFile> = ({
   };
 };
 
-export const depictUnion: Depicter<
-  z.ZodUnion<[z.ZodTypeAny, ...z.ZodTypeAny[]]>
-> = ({ schema: { options }, next }) => ({
+export const depictUnion: Depicter<z.ZodUnion<z.ZodUnionOptions>> = ({
+  schema: { options },
+  next,
+}) => ({
   oneOf: options.map((option) => next({ schema: option })),
 });
 
 export const depictDiscriminatedUnion: Depicter<
-  z.ZodDiscriminatedUnion<string, z.ZodObject<z.ZodRawShape>[]>
+  z.ZodDiscriminatedUnion<string, z.ZodDiscriminatedUnionOption<string>[]>
 > = ({ schema: { options, discriminator }, next }) => {
   return {
     discriminator: { propertyName: discriminator },
