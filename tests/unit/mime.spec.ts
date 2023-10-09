@@ -1,13 +1,8 @@
-import { mimeJson } from "../../src/mime";
-
-jest.mock("mime", () => ({
-  getType: jest.fn(() => null),
-}));
+import { mimeJson, mimeMultipart } from "../../src/mime";
 
 describe("Mime", () => {
-  describe("mimeJson", () => {
-    test("Is valid even when mime module is not operational", () => {
-      expect(mimeJson).toEqual("application/json");
-    });
+  test("should export predefined types", () => {
+    expect(mimeJson).toEqual("application/json");
+    expect(mimeMultipart).toEqual("multipart/form-data");
   });
 });
