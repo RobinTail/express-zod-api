@@ -66,7 +66,7 @@ export const walkSchema = <U, Context extends FlatObject = {}>({
   const next: SchemaHandler<z.ZodTypeAny, U, {}, "last"> = (params) =>
     walkSchema({
       ...params,
-      ...(context as Context),
+      ...context,
       onEach,
       rules: rules,
       onMissing,
@@ -74,11 +74,10 @@ export const walkSchema = <U, Context extends FlatObject = {}>({
   const result = handler
     ? handler({
         schema,
-        ...(context as Context),
+        ...context,
         next,
       })
-    : onMissing({ schema, ...(context as Context) });
-  const overrides =
-    onEach && onEach({ schema, prev: result, ...(context as Context) });
+    : onMissing({ schema, ...context });
+  const overrides = onEach && onEach({ schema, prev: result, ...context });
   return overrides ? { ...result, ...overrides } : result;
 };
