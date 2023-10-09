@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { FlatObject } from "./common-helpers";
+import type { FlatObject } from "./common-helpers";
 import type { ZodDateInDef } from "./date-in-schema";
 import type { ZodDateOutDef } from "./date-out-schema";
 import type { ZodFileDef } from "./file-schema";
