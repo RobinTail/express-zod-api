@@ -112,6 +112,12 @@ yarn add express-zod-api express zod winston typescript http-errors
 npm install express-zod-api express zod winston typescript http-errors
 ```
 
+Optionally also install the following packages for assistance:
+
+- For configuring the [HTTPS feture](#enabling-https): `@types/node`,
+- For configuring the [uploads feature](#file-uploads): `@types/express-fileupload`,
+- For configuring the [compression feature](#enabling-compression): `@types/compression`.
+
 Add the following option to your `tsconfig.json` file in order to make it work as expected:
 
 ```json
@@ -635,6 +641,8 @@ const fileUploadEndpoint = defaultEndpointsFactory.build({
 });
 ```
 
+In order to configure `upload` more precisely, install the `@types/express-fileupload` package for assistance.
+
 _You can still send other data and specify additional `input` parameters, including arrays and objects._
 
 ## Customizing logger
@@ -794,6 +802,8 @@ const config = createConfig({
 });
 ```
 
+In order to configure `compression` more precisely, install the `@types/compression` package for assistance.
+
 ## Enabling HTTPS
 
 The modern API standard often assumes the use of a secure data transfer protocol, confirmed by a TLS certificate, also
@@ -820,9 +830,9 @@ const config = createConfig({
 const { app, httpServer, httpsServer, logger } = createServer(config, routing);
 ```
 
-At least you need to specify the port or socket (usually it is 443), certificate and the key, issued by the
-certifying authority. For example, you can acquire a free TLS certificate for your API at
-[Let's Encrypt](https://letsencrypt.org/).
+Make sure to install the `@types/node` package for assistance. At least you need to specify the port or socket
+(usually it is 443), certificate and the key, issued by the certifying authority. For example, you can acquire a free
+TLS certificate for your API at [Let's Encrypt](https://letsencrypt.org/).
 
 ## Generating a Frontend Client
 
