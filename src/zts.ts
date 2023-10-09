@@ -266,7 +266,7 @@ const producers: HandlingRules<ts.TypeNode, ZTSContext> = {
 
 export const zodToTs = ({
   schema,
-  ...context
+  ...ctx
 }: {
   schema: z.ZodTypeAny;
 } & ZTSContext) =>
@@ -274,5 +274,5 @@ export const zodToTs = ({
     schema,
     rules: producers,
     onMissing: () => f.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword),
-    ...context,
+    ...ctx,
   });
