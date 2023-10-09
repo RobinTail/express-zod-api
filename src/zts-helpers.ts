@@ -26,19 +26,20 @@
 
 import ts from "typescript";
 import { z } from "zod";
+import { FlatObject } from "./common-helpers";
 import { SchemaHandler } from "./schema-walker";
 
 const { factory: f } = ts;
 
 export type LiteralType = string | number | boolean;
 
-export type ZTSContext = {
+export interface ZTSContext extends FlatObject {
   isResponse: boolean;
   getAlias: (name: string) => ts.TypeReferenceNode | undefined;
   makeAlias: (name: string, type: ts.TypeNode) => ts.TypeReferenceNode;
   serializer: (schema: z.ZodTypeAny) => string;
   optionalPropStyle: { withQuestionMark?: boolean; withUndefined?: boolean };
-};
+}
 
 export type Producer<T extends z.ZodTypeAny> = SchemaHandler<
   T,

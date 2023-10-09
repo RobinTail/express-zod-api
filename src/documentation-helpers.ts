@@ -19,6 +19,7 @@ import {
 import { omit } from "ramda";
 import { z } from "zod";
 import {
+  FlatObject,
   getExamples,
   hasCoercion,
   hasTopLevelTransformingEffect,
@@ -53,7 +54,7 @@ import { ZodUpload } from "./upload-schema";
 
 type MediaExamples = Pick<MediaTypeObject, "examples">;
 
-export interface OpenAPIContext {
+export interface OpenAPIContext extends FlatObject {
   isResponse: boolean;
   serializer: (schema: z.ZodTypeAny) => string;
   getRef: (name: string) => ReferenceObject | undefined;
