@@ -11,12 +11,14 @@
   - Minimum version of `zod` is 3.22.3.
   - The following ones are optional peer dependencies: `@types/compression`, `@types/express-fileupload`, `@types/node`.
   - The class `DependsOnMethodError` is removed — catch `RoutingError` instead if needed.
-  - The property `DependsOnMethod::methods` is renamed to `endpoints`.
+- **Potentially breaking changes**:
   - The type `FlatObject` changed from `Record<string, any>` to `Record<string, unknown>`.
     - If a custom `ResultHandler` handles properties of the `output`, it might need to ensure its actual type.
   - In case of body parsing failure the `ResultHandler` recieves `null` into its `input` argument instead of raw body.
     - Utilize the `request.body` within a custom `ResultHandler` in that case if needed.
   - The type of `ResultHandler`'s arguments `input` and `output` are changed from `any` to `FlatObject | null`.
+- Unlikely breaking changes:
+  - The property `DependsOnMethod::methods` is renamed to `endpoints`.
 
 ```typescript
 // before
