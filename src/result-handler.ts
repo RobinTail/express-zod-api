@@ -123,7 +123,7 @@ export const arrayResultHandler = createResultHandler({
       "shape" in output &&
         "items" in output.shape &&
         output.shape.items instanceof z.ZodArray
-        ? (output.shape.items as z.ZodArray<any>)
+        ? (output.shape.items as z.ZodArray<z.ZodTypeAny>)
         : z.array(z.any()),
     );
     return examples.reduce<typeof responseSchema>(
