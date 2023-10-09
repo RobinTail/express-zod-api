@@ -1,4 +1,3 @@
-import mime from "mime";
 import {
   EndpointsFactory,
   arrayResultHandler,
@@ -24,11 +23,11 @@ export const fileSendingEndpointsFactory = new EndpointsFactory({
   resultHandler: createResultHandler({
     getPositiveResponse: () => ({
       schema: z.string(),
-      mimeType: mime.getType("svg") || "image/svg+xml",
+      mimeType: "image/svg+xml",
     }),
     getNegativeResponse: () => ({
       schema: z.string(),
-      mimeType: mime.getType("txt") || "text/plain",
+      mimeType: "text/plain",
     }),
     handler: ({ response, error, output }) => {
       if (error) {
@@ -53,7 +52,7 @@ export const fileStreamingEndpointsFactory = new EndpointsFactory({
     }),
     getNegativeResponse: () => ({
       schema: z.string(),
-      mimeType: mime.getType("txt") || "text/plain",
+      mimeType: "text/plain",
     }),
     handler: ({ response, error, output }) => {
       if (error) {

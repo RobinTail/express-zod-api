@@ -48,7 +48,6 @@
   "dependencies": {
     "compression": "1.7.4",
     "express-fileupload": "1.4.1",
-    "mime": "3.0.0",
     "openapi3-ts": "^4.1.2",
     "ramda": "0.29.1"
   },
