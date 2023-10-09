@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { FlatObject } from "./common-helpers";
 import type { ZodDateInDef } from "./date-in-schema";
 import type { ZodDateOutDef } from "./date-out-schema";
 import type { ZodFileDef } from "./file-schema";
@@ -18,7 +19,7 @@ type VariantDependingProps<
 type SchemaHandlingProps<
   T extends z.ZodTypeAny,
   U,
-  Context extends object,
+  Context extends FlatObject,
   Variant extends HandlingVariant,
 > = {
   schema: T;
@@ -28,7 +29,7 @@ type SchemaHandlingProps<
 export type SchemaHandler<
   T extends z.ZodTypeAny,
   U,
-  Context extends object = {},
+  Context extends FlatObject = {},
   Variant extends HandlingVariant = "regular",
 > = (params: SchemaHandlingProps<T, U, Context, Variant>) => U;
 
@@ -38,19 +39,19 @@ export type ProprietaryKinds =
   | ZodDateInDef["typeName"]
   | ZodDateOutDef["typeName"];
 
-export type HandlingRules<U, Context extends object = {}> = Partial<
+export type HandlingRules<U, Context extends FlatObject = {}> = Partial<
   Record<
     z.ZodFirstPartyTypeKind | ProprietaryKinds,
     SchemaHandler<any, U, Context>
   >
 >;
 
-export const walkSchema = <U, Context extends object = {}>({
+export const walkSchema = <U, Context extends FlatObject = {}>({
   schema,
   onEach,
   rules,
   onMissing,
-  ...context
+  ...rest
 }: SchemaHandlingProps<z.ZodTypeAny, U, Context, "last"> & {
   /** @since 10.1.1 calling onEach _after_ handler and giving it its result */
   onEach?: SchemaHandler<z.ZodTypeAny, U, Context, "each">;
@@ -61,6 +62,7 @@ export const walkSchema = <U, Context extends object = {}>({
     "typeName" in schema._def
       ? rules[schema._def.typeName as keyof typeof rules]
       : undefined;
+  const context = rest as unknown as Context;
   const next: SchemaHandler<z.ZodTypeAny, U, {}, "last"> = (params) =>
     walkSchema({
       ...params,
