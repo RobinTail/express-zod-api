@@ -166,7 +166,7 @@ export const depictUnion: Depicter<
 });
 
 export const depictDiscriminatedUnion: Depicter<
-  z.ZodDiscriminatedUnion<string, z.ZodObject<any>[]>
+  z.ZodDiscriminatedUnion<string, z.ZodObject<z.ZodRawShape>[]>
 > = ({ schema: { options, discriminator }, next }) => {
   return {
     discriminator: { propertyName: discriminator },
@@ -187,17 +187,17 @@ export const depictIntersection: Depicter<
   allOf: [left, right].map((entry) => next({ schema: entry })),
 });
 
-export const depictOptional: Depicter<z.ZodOptional<any>> = ({
+export const depictOptional: Depicter<z.ZodOptional<z.ZodTypeAny>> = ({
   schema,
   next,
 }) => next({ schema: schema.unwrap() });
 
-export const depictReadonly: Depicter<z.ZodReadonly<any>> = ({
+export const depictReadonly: Depicter<z.ZodReadonly<z.ZodTypeAny>> = ({
   schema,
   next,
 }) => next({ schema: schema._def.innerType });
 
-export const depictNullable: Depicter<z.ZodNullable<any>> = ({
+export const depictNullable: Depicter<z.ZodNullable<z.ZodTypeAny>> = ({
   schema,
   next,
 }) => ({
@@ -205,14 +205,14 @@ export const depictNullable: Depicter<z.ZodNullable<any>> = ({
   ...next({ schema: schema.unwrap() }),
 });
 
-export const depictEnum: Depicter<z.ZodEnum<any> | z.ZodNativeEnum<any>> = ({
-  schema,
-}) => ({
+export const depictEnum: Depicter<
+  z.ZodEnum<[string, ...string[]]> | z.ZodNativeEnum<any> // keeping "any" for ZodNativeEnum as compatibility fix
+> = ({ schema }) => ({
   type: typeof Object.values(schema.enum)[0] as "string" | "number",
   enum: Object.values(schema.enum),
 });
 
-export const depictLiteral: Depicter<z.ZodLiteral<any>> = ({
+export const depictLiteral: Depicter<z.ZodLiteral<unknown>> = ({
   schema: { value },
 }) => ({
   type: typeof value as "string" | "number" | "boolean",
@@ -305,6 +305,14 @@ export const depictBigInt: Depicter<z.ZodBigInt> = () => ({
   format: "bigint",
 });
 
+const areOptionsLiteral = (
+  subject: z.ZodTypeAny[],
+): subject is z.ZodLiteral<unknown>[] =>
+  subject.reduce(
+    (carry, option) => carry && option instanceof z.ZodLiteral,
+    true,
+  );
+
 export const depictRecord: Depicter<z.ZodRecord<z.ZodTypeAny>> = ({
   schema: { keySchema, valueSchema },
   ...rest
@@ -340,18 +348,13 @@ export const depictRecord: Depicter<z.ZodRecord<z.ZodTypeAny>> = ({
     };
   }
   if (keySchema instanceof z.ZodUnion) {
-    const areOptionsLiteral = keySchema.options.reduce(
-      (carry: boolean, option: z.ZodTypeAny) =>
-        carry && option instanceof z.ZodLiteral,
-      true,
-    );
-    if (areOptionsLiteral) {
-      const shape = keySchema.options.reduce(
-        (carry: z.ZodRawShape, option: z.ZodLiteral<any>) => ({
+    if (areOptionsLiteral(keySchema.options)) {
+      const shape = keySchema.options.reduce<z.ZodRawShape>(
+        (carry, option) => ({
           ...carry,
-          [option.value]: valueSchema,
+          [`${option.value}`]: valueSchema,
         }),
-        {} as z.ZodRawShape,
+        {},
       );
       return {
         type: "object",
@@ -359,9 +362,7 @@ export const depictRecord: Depicter<z.ZodRecord<z.ZodTypeAny>> = ({
           schema: z.object(shape),
           ...rest,
         }),
-        required: keySchema.options.map(
-          (option: z.ZodLiteral<any>) => option.value,
-        ),
+        required: keySchema.options.map((option) => option.value),
       };
     }
   }
@@ -531,16 +532,14 @@ export const depictEffect: Depicter<z.ZodEffects<z.ZodTypeAny>> = ({
   return input;
 };
 
-export const depictPipeline: Depicter<z.ZodPipeline<any, any>> = ({
-  schema,
-  isResponse,
-  next,
-}) => next({ schema: schema._def[isResponse ? "out" : "in"] });
+export const depictPipeline: Depicter<
+  z.ZodPipeline<z.ZodTypeAny, z.ZodTypeAny>
+> = ({ schema, isResponse, next }) =>
+  next({ schema: schema._def[isResponse ? "out" : "in"] });
 
-export const depictBranded: Depicter<z.ZodBranded<z.ZodTypeAny, any>> = ({
-  schema,
-  next,
-}) => next({ schema: schema.unwrap() });
+export const depictBranded: Depicter<
+  z.ZodBranded<z.ZodTypeAny, string | number | symbol>
+> = ({ schema, next }) => next({ schema: schema.unwrap() });
 
 export const depictLazy: Depicter<z.ZodLazy<z.ZodTypeAny>> = ({
   next,
