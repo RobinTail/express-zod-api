@@ -1027,7 +1027,7 @@
   resolved "https://registry.yarnpkg.com/@types/estree/-/estree-1.0.2.tgz#ff02bc3dc8317cd668dfec247b750ba1f1d62453"
   integrity sha512-VeiPZ9MMwXjO32/Xu7+OwflfmeoRwkE/qzndw42gGtgJwZopBnzy2gD//NN1+go1mADzkDcqf/KnFRSjTJ8xJA==
 
-"@types/express-fileupload@^1.4.1":
+"@types/express-fileupload@^1.4.2":
   version "1.4.2"
   resolved "https://registry.yarnpkg.com/@types/express-fileupload/-/express-fileupload-1.4.2.tgz#42ff388e71facfbd348c220f917803db3088abf3"
   integrity sha512-m7j9veuCI02m0eyMfmZI7jrVU2CzH43U6EbAuzvCoBdhliXdIndb32cukcRTG4AOQONbe0MBmEcWvXAmQh9IMg==
@@ -1124,7 +1124,7 @@
   resolved "https://registry.yarnpkg.com/@types/minimist/-/minimist-1.2.3.tgz#dd249cef80c6fff2ba6a0d4e5beca913e04e25f8"
   integrity sha512-ZYFzrvyWUNhaPomn80dsMNgMeXxNWZBdkuG/hWlUvXvbdUH8ZERNBGXnU87McuGcWDsyzX2aChCv/SVN348k3A==
 
-"@types/node@*":
+"@types/node@*", "@types/node@^20.8.4":
   version "20.8.4"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-20.8.4.tgz#0e9ebb2ff29d5c3302fc84477d066fa7c6b441aa"
   integrity sha512-ZVPnqU58giiCjSxjVUESDtdPk4QR5WQhhINbc9UBrKLU68MX5BF6kbQzTrkwbolyr0X8ChBpXfavr5mZFKZQ5A==
