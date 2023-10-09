@@ -109,9 +109,9 @@ Typescript is an optional dependency, however, it's required if you're going to
 [generate a frontend client](#generating-a-frontend-client) for your API.
 
 ```shell
-yarn add express-zod-api express zod winston typescript
+yarn add express-zod-api express zod winston typescript http-errors
 # or
-npm install express-zod-api express zod winston typescript
+npm install express-zod-api express zod winston typescript http-errors
 ```
 
 Add the following option to your `tsconfig.json` file in order to make it work as expected:
