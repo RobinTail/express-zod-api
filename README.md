@@ -105,8 +105,6 @@ Much can be customized to fit your needs.
 ## Installation
 
 Run one of the following commands to install the library and its peer dependencies.
-Typescript is an optional dependency, however, it's required if you're going to
-[generate a frontend client](#generating-a-frontend-client) for your API.
 
 ```shell
 yarn add express-zod-api express zod winston typescript http-errors
