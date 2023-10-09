@@ -1,4 +1,5 @@
 import { UploadedFile } from "express-fileupload";
+import createHttpError from "http-errors";
 import { expectType } from "tsd";
 import {
   combinations,
@@ -16,7 +17,7 @@ import {
   isValidDate,
   makeErrorFromAnything,
 } from "../../src/common-helpers";
-import { InputValidationError, createHttpError, ez, withMeta } from "../../src";
+import { InputValidationError, ez, withMeta } from "../../src";
 import { Request } from "express";
 import { z } from "zod";
 

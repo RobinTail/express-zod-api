@@ -1,5 +1,6 @@
+import createHttpError from "http-errors";
 import { z } from "zod";
-import { createHttpError, ez, withMeta } from "../../src";
+import { ez, withMeta } from "../../src";
 import { keyAndTokenAuthenticatedEndpointsFactory } from "../factories";
 
 export const updateUserEndpoint =

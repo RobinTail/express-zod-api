@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
+import createHttpError from "http-errors";
 import { z } from "zod";
 import {
   InputValidationError,
   arrayResultHandler,
-  createHttpError,
   defaultResultHandler,
   withMeta,
 } from "../../src";

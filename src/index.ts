@@ -37,9 +37,6 @@ export { Integration } from "./integration";
 
 export * as ez from "./proprietary-schemas";
 
-import createHttpError from "http-errors";
-export { createHttpError };
-
 // Issues 952 and 1182: Insufficient exports for consumer's declaration
 export type { ZodDateInDef } from "./date-in-schema";
 export type { ZodDateOutDef } from "./date-out-schema";
