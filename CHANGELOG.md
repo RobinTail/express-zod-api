@@ -13,8 +13,8 @@
   - The class `DependsOnMethodError` is removed — catch `RoutingError` instead if needed.
   - The property `DependsOnMethod::methods` is renamed to `endpoints`.
   - The type `FlatObject` changed from `Record<string, any>` to `Record<string, unknown>`.
-    - Custom `ResultHandler` might need to ensure the actual type of the `output` properties they operate.
-  - In case of body parsing failure the `ResultHandler` recieves `null` into its `input` argument instead of raw `body`.
+    - If a custom `ResultHandler` handles properties of the `output`, it might need to ensure its actual type.
+  - In case of body parsing failure the `ResultHandler` recieves `null` into its `input` argument instead of raw body.
     - Utilize the `request.body` within a custom `ResultHandler` in that case if needed.
   - The type of `ResultHandler`'s arguments `input` and `output` are changed from `any` to `FlatObject | null`.
 
