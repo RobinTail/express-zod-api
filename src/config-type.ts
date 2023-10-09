@@ -1,6 +1,5 @@
 import compression from "compression";
-import { NextHandleFunction } from "connect";
-import { Express, Request } from "express";
+import { Express, Request, RequestHandler } from "express";
 import fileUpload from "express-fileupload";
 import { ServerOptions } from "node:https";
 import { Logger } from "winston";
@@ -45,7 +44,7 @@ export interface ServerConfig {
      * @desc Custom JSON parser.
      * @default express.json()
      * */
-    jsonParser?: NextHandleFunction;
+    jsonParser?: RequestHandler;
     /**
      * @desc Enable or configure uploads handling.
      * @default false
