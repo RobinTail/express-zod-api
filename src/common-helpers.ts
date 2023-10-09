@@ -1,5 +1,5 @@
 import { Request } from "express";
-import { HttpError } from "http-errors";
+import { isHttpError } from "http-errors";
 import { createHash } from "node:crypto";
 import { Logger } from "winston";
 import { z } from "zod";
@@ -109,7 +109,7 @@ export const getMessageFromError = (error: Error): string => {
 };
 
 export const getStatusCodeFromError = (error: Error): number => {
-  if (error instanceof HttpError) {
+  if (isHttpError(error)) {
     return error.statusCode;
   }
   if (error instanceof InputValidationError) {

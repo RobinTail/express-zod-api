@@ -1,5 +1,5 @@
+import createHttpError from "http-errors";
 import { z } from "zod";
-import { createHttpError } from "../../src";
 import { taggedEndpointsFactory } from "../factories";
 import { methodProviderMiddleware } from "../middlewares";
 

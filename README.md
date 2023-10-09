@@ -109,9 +109,9 @@ Typescript is an optional dependency, however, it's required if you're going to
 [generate a frontend client](#generating-a-frontend-client) for your API.
 
 ```shell
-yarn add express-zod-api express zod winston typescript
+yarn add express-zod-api express zod winston typescript http-errors
 # or
-npm install express-zod-api express zod winston typescript
+npm install express-zod-api express zod winston typescript http-errors
 ```
 
 Add the following option to your `tsconfig.json` file in order to make it work as expected:
@@ -252,7 +252,8 @@ Here is an example of the authentication middleware, that checks a `key` from in
 
 ```typescript
 import { z } from "zod";
-import { createMiddleware, createHttpError } from "express-zod-api";
+import createHttpError from "http-errors";
+import { createMiddleware } from "express-zod-api";
 
 const authMiddleware = createMiddleware({
   security: {
@@ -589,8 +590,9 @@ There are also two optional features available: a provider of options and an err
 In case the error in middleware is not a `HttpError`, the `ResultHandler` will send the status `500`.
 
 ```typescript
-import { defaultEndpointsFactory, createHttpError } from "express-zod-api";
+import { defaultEndpointsFactory } from "express-zod-api";
 import cors from "cors";
+import createHttpError from "http-errors";
 import { auth } from "express-oauth2-jwt-bearer";
 
 const simpleUsage = defaultEndpointsFactory.addExpressMiddleware(

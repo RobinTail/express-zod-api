@@ -5,6 +5,8 @@
 ### v14.0.0
 
 - **Breaking changes**:
+  - `http-errors` becomes a peer dependency — you have to install it manually.
+    - You might also need to install `@types/http-errors` if you're using `createHttpError` in your implementation.
   - Minimum version of `zod` is 3.22.3.
   - The class `DependsOnMethodError` is removed — catch `RoutingError` instead if needed.
   - The property `DependsOnMethod::method` is renamed to `endpoints`.
@@ -13,6 +15,13 @@
   - In case of body parsing failure the `ResultHandler` recieves `null` into its `input` argument instead of raw `body`.
     - Utilize the `request.body` within a custom `ResultHandler` in that case if needed.
   - The type of `ResultHandler`'s arguments `input` and `output` are changed from `any` to `FlatObject | null`.
+
+```typescript
+// before
+import { createHttpError } from "express-zod-api";
+// after
+import createHttpError from "http-errors";
+```
 
 ## Version 12
 
