@@ -7,6 +7,7 @@
 - **Breaking changes**:
   - `http-errors` becomes a peer dependency — you have to install it manually.
     - You might also need to install `@types/http-errors` if you're using `createHttpError` in your implementation.
+  - `typescript` is a required peer dependency.
   - Minimum version of `zod` is 3.22.3.
   - The class `DependsOnMethodError` is removed — catch `RoutingError` instead if needed.
   - The property `DependsOnMethod::method` is renamed to `endpoints`.
