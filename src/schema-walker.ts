@@ -42,7 +42,7 @@ export type ProprietaryKinds =
 export type HandlingRules<U, Context extends FlatObject = {}> = Partial<
   Record<
     z.ZodFirstPartyTypeKind | ProprietaryKinds,
-    SchemaHandler<any, U, Context>
+    SchemaHandler<any, U, Context> // keeping "any" here in order to avoid excessive complexity
   >
 >;
 
