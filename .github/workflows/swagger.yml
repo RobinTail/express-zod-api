@@ -13,6 +13,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Validate example specification
-        uses: char0n/swagger-editor-validate@v1.3.1
+        uses: char0n/swagger-editor-validate@v1
         with:
           definition-file: example/example.swagger.yaml
