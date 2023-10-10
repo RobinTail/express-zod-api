@@ -16,10 +16,10 @@
   - In case of body parsing failure the `ResultHandler` recieves `null` into its `input` argument instead of raw body.
     - Utilize the `request.body` within a custom `ResultHandler` in that case if needed.
   - The type of `ResultHandler`'s arguments `input` and `output` are changed from `any` to `FlatObject | null`.
-- Unlikely breaking changes:
+- Other changes:
   - Ensure having the following packages installed for the types assistance:
-    - `yarn add --dev @types/express @types/compression @types/express-fileupload @types/node`
-    - or `npm install -D @types/express @types/compression @types/express-fileupload @types/node`
+    - `yarn add --dev @types/express @types/node @types/http-errors`
+    - or `npm install -D @types/express @types/node @types/http-errors`
   - The property `DependsOnMethod::methods` is renamed to `endpoints`.
 
 ```typescript

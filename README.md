@@ -108,14 +108,14 @@ Run one of the following commands to install the library, its peer dependencies 
 
 ```shell
 yarn add express-zod-api express zod winston typescript http-errors
-yarn add --dev @types/express @types/node @types/compression @types/express-fileupload
+yarn add --dev @types/express @types/node @types/http-errors
 ```
 
 or
 
 ```shell
 npm install express-zod-api express zod winston typescript http-errors
-npm install -D @types/express @types/node @types/compression @types/express-fileupload
+npm install -D @types/express @types/node @types/http-errors
 ```
 
 Add the following option to your `tsconfig.json` file in order to make it work as expected:
@@ -641,8 +641,6 @@ const fileUploadEndpoint = defaultEndpointsFactory.build({
 });
 ```
 
-In order to configure `upload` more precisely, ensure having `@types/express-fileupload` installed.
-
 _You can still send other data and specify additional `input` parameters, including arrays and objects._
 
 ## Customizing logger
@@ -801,8 +799,6 @@ const config = createConfig({
   // ... other options
 });
 ```
-
-In order to configure `compression` more precisely, ensure having `@types/compression` installed.
 
 ## Enabling HTTPS
 
