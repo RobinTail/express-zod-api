@@ -104,19 +104,17 @@ Much can be customized to fit your needs.
 
 ## Installation
 
-Run one of the following commands to install the library and its peer dependencies.
+Run one of the following commands to install the library, its peer dependencies and packages for types assistance.
 
 ```shell
 yarn add express-zod-api express zod winston typescript http-errors
-# or
-npm install express-zod-api express zod winston typescript http-errors
+yarn add --dev @types/express @types/node @types/compression @types/express-fileupload
 ```
 
-Also install the following packages for types assistance:
+or
 
 ```shell
-yarn add --dev @types/express @types/node @types/compression @types/express-fileupload
-# or
+npm install express-zod-api express zod winston typescript http-errors
 npm install -D @types/express @types/node @types/compression @types/express-fileupload
 ```
 
