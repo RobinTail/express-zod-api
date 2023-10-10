@@ -38,7 +38,7 @@ import {
 
 const { factory: f } = ts;
 
-const samples: Partial<Record<ts.KeywordTypeSyntaxKind, any>> = {
+const samples = {
   [ts.SyntaxKind.AnyKeyword]: "",
   [ts.SyntaxKind.BigIntKeyword]: BigInt(0),
   [ts.SyntaxKind.BooleanKeyword]: false,
@@ -46,7 +46,7 @@ const samples: Partial<Record<ts.KeywordTypeSyntaxKind, any>> = {
   [ts.SyntaxKind.ObjectKeyword]: {},
   [ts.SyntaxKind.StringKeyword]: "",
   [ts.SyntaxKind.UndefinedKeyword]: undefined,
-};
+} satisfies Partial<Record<ts.KeywordTypeSyntaxKind, unknown>>;
 
 const onLiteral: Producer<z.ZodLiteral<LiteralType>> = ({
   schema: { value },
@@ -103,8 +103,8 @@ const onEnum: Producer<z.ZodEnum<[string, ...string[]]>> = ({
   );
 
 const onSomeUnion: Producer<
-  | z.ZodUnion<[z.ZodTypeAny, ...z.ZodTypeAny[]]>
-  | z.ZodDiscriminatedUnion<string, z.ZodObject<z.ZodRawShape>[]>
+  | z.ZodUnion<z.ZodUnionOptions>
+  | z.ZodDiscriminatedUnion<string, z.ZodDiscriminatedUnionOption<string>[]>
 > = ({ schema: { options }, next }) =>
   f.createUnionTypeNode(options.map((option) => next({ schema: option })));
 
@@ -197,12 +197,11 @@ const onPrimitive =
   () =>
     f.createKeywordTypeNode(syntaxKind);
 
-const onBranded: Producer<z.ZodBranded<z.ZodTypeAny, any>> = ({
-  next,
-  schema,
-}) => next({ schema: schema.unwrap() });
+const onBranded: Producer<
+  z.ZodBranded<z.ZodTypeAny, string | number | symbol>
+> = ({ next, schema }) => next({ schema: schema.unwrap() });
 
-const onReadonly: Producer<z.ZodReadonly<any>> = ({ next, schema }) =>
+const onReadonly: Producer<z.ZodReadonly<z.ZodTypeAny>> = ({ next, schema }) =>
   next({ schema: schema._def.innerType });
 
 const onCatch: Producer<z.ZodCatch<z.ZodTypeAny>> = ({ next, schema }) =>
@@ -250,7 +249,6 @@ const producers: HandlingRules<ts.TypeNode, ZTSContext> = {
   ZodIntersection: onIntersection,
   ZodUnion: onSomeUnion,
   ZodFile: onPrimitive(ts.SyntaxKind.StringKeyword),
-  // ZodUpload:
   ZodAny: onPrimitive(ts.SyntaxKind.AnyKeyword),
   ZodDefault: onDefault,
   ZodEnum: onEnum,
@@ -268,7 +266,7 @@ const producers: HandlingRules<ts.TypeNode, ZTSContext> = {
 
 export const zodToTs = ({
   schema,
-  ...context
+  ...ctx
 }: {
   schema: z.ZodTypeAny;
 } & ZTSContext) =>
@@ -276,5 +274,5 @@ export const zodToTs = ({
     schema,
     rules: producers,
     onMissing: () => f.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword),
-    ...context,
+    ...ctx,
   });

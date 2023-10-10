@@ -4,8 +4,6 @@ exports[`Index Entrypoint exports AbstractEndpoint should have certain value 1`]
 
 exports[`Index Entrypoint exports DependsOnMethod should have certain value 1`] = `[Function]`;
 
-exports[`Index Entrypoint exports DependsOnMethodError should have certain value 1`] = `[Function]`;
-
 exports[`Index Entrypoint exports Documentation should have certain value 1`] = `[Function]`;
 
 exports[`Index Entrypoint exports DocumentationError should have certain value 1`] = `[Function]`;
@@ -45,8 +43,6 @@ exports[`Index Entrypoint exports arrayResultHandler should have certain value 1
 exports[`Index Entrypoint exports attachRouting should have certain value 1`] = `[Function]`;
 
 exports[`Index Entrypoint exports createConfig should have certain value 1`] = `[Function]`;
-
-exports[`Index Entrypoint exports createHttpError should have certain value 1`] = `[Function]`;
 
 exports[`Index Entrypoint exports createLogger should have certain value 1`] = `[Function]`;
 
@@ -95,7 +91,6 @@ exports[`Index Entrypoint exports should have certain entities exposed 1`] = `
 [
   "AbstractEndpoint",
   "DependsOnMethod",
-  "DependsOnMethodError",
   "Documentation",
   "DocumentationError",
   "EndpointsFactory",
@@ -113,7 +108,6 @@ exports[`Index Entrypoint exports should have certain entities exposed 1`] = `
   "arrayResultHandler",
   "attachRouting",
   "createConfig",
-  "createHttpError",
   "createLogger",
   "createMiddleware",
   "createResultHandler",

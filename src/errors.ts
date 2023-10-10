@@ -7,11 +7,6 @@ export class RoutingError extends Error {
   public override name = "RoutingError";
 }
 
-/** @desc An error related to the issues of using DependsOnMethod class */
-export class DependsOnMethodError extends RoutingError {
-  public override name = "DependsOnMethodError";
-}
-
 /**
  * @desc An error related to the generating of the documentation
  * */

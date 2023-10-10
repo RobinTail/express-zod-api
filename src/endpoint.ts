@@ -19,7 +19,7 @@ import {
 } from "./common-helpers";
 import { IOSchema } from "./io-schema";
 import { LogicalContainer, combineContainers } from "./logical-container";
-import { AuxMethod, Method, MethodsDefinition } from "./method";
+import { AuxMethod, Method } from "./method";
 import { AnyMiddlewareDef } from "./middleware";
 import { mimeJson, mimeMultipart } from "./mime";
 import {
@@ -73,42 +73,18 @@ export abstract class AbstractEndpoint {
   public abstract getOperationId(method: Method): string | undefined;
 }
 
-type EndpointProps<
-  IN extends IOSchema,
-  OUT extends IOSchema,
-  OPT extends FlatObject,
-  M extends Method,
-  POS extends z.ZodTypeAny,
-  NEG extends z.ZodTypeAny,
-  SCO extends string,
-  TAG extends string,
-> = {
-  middlewares: AnyMiddlewareDef[];
-  inputSchema: IN;
-  outputSchema: OUT;
-  handler: Handler<z.output<IN>, z.input<OUT>, OPT>;
-  resultHandler: ResultHandlerDefinition<POS, NEG>;
-  description?: string;
-  shortDescription?: string;
-  operationId?: string | ((method: Method) => string);
-} & ({ scopes?: SCO[] } | { scope?: SCO }) &
-  ({ tags?: TAG[] } | { tag?: TAG }) &
-  MethodsDefinition<M>;
-
 export class Endpoint<
   IN extends IOSchema,
   OUT extends IOSchema,
   OPT extends FlatObject,
-  M extends Method,
   POS extends z.ZodTypeAny,
   NEG extends z.ZodTypeAny,
   SCO extends string,
   TAG extends string,
 > extends AbstractEndpoint {
   readonly #descriptions: Record<DescriptionVariant, string | undefined>;
-  readonly #methods: M[] = [];
-  #siblingMethods: Method[] = [];
-  readonly #middlewares: AnyMiddlewareDef[] = [];
+  readonly #methods: Method[];
+  readonly #middlewares: AnyMiddlewareDef[];
   readonly #mimeTypes: Record<MimeVariant, string[]>;
   readonly #statusCodes: Record<ResponseVariant, number>;
   readonly #handler: Handler<z.output<IN>, z.input<OUT>, OPT>;
@@ -119,20 +95,36 @@ export class Endpoint<
     positive: POS;
     negative: NEG;
   };
-  readonly #scopes: SCO[] = [];
-  readonly #tags: TAG[] = [];
-  readonly #operationId?: string | ((method: Method) => string);
+  readonly #scopes: SCO[];
+  readonly #tags: TAG[];
+  readonly #getOperationId: (method: Method) => string | undefined;
+  #siblingMethods: Method[] = [];
 
   constructor({
-    middlewares,
+    methods,
     inputSchema,
     outputSchema,
     handler,
     resultHandler,
-    description,
-    shortDescription,
-    ...rest
-  }: EndpointProps<IN, OUT, OPT, M, POS, NEG, SCO, TAG>) {
+    getOperationId = () => undefined,
+    scopes = [],
+    middlewares = [],
+    tags = [],
+    description: long,
+    shortDescription: short,
+  }: {
+    middlewares?: AnyMiddlewareDef[];
+    inputSchema: IN;
+    outputSchema: OUT;
+    handler: Handler<z.output<IN>, z.input<OUT>, OPT>;
+    resultHandler: ResultHandlerDefinition<POS, NEG>;
+    description?: string;
+    shortDescription?: string;
+    getOperationId?: (method: Method) => string | undefined;
+    methods: Method[];
+    scopes?: SCO[];
+    tags?: TAG[];
+  }) {
     super();
     [
       { name: "input schema", schema: inputSchema },
@@ -144,8 +136,14 @@ export class Endpoint<
         );
       }
     });
+    this.#handler = handler;
+    this.#resultHandler = resultHandler;
     this.#middlewares = middlewares;
-    this.#operationId = rest.operationId;
+    this.#getOperationId = getOperationId;
+    this.#methods = methods;
+    this.#scopes = scopes;
+    this.#tags = tags;
+    this.#descriptions = { long, short };
     const apiResponse = {
       positive: resultHandler.getPositiveResponse(outputSchema),
       negative: resultHandler.getNegativeResponse(),
@@ -177,26 +175,6 @@ export class Endpoint<
           ? defaultStatusCodes.negative
           : apiResponse.negative.statusCode || defaultStatusCodes.negative,
     };
-    this.#handler = handler;
-    this.#resultHandler = resultHandler;
-    this.#descriptions = { long: description, short: shortDescription };
-    if ("scopes" in rest && rest.scopes) {
-      this.#scopes.push(...rest.scopes);
-    }
-    if ("scope" in rest && rest.scope) {
-      this.#scopes.push(rest.scope);
-    }
-    if ("tags" in rest && rest.tags) {
-      this.#tags.push(...rest.tags);
-    }
-    if ("tag" in rest && rest.tag) {
-      this.#tags.push(rest.tag);
-    }
-    if ("methods" in rest) {
-      this.#methods = rest.methods;
-    } else {
-      this.#methods = [rest.method];
-    }
   }
 
   /**
@@ -211,7 +189,7 @@ export class Endpoint<
     return this.#descriptions[variant];
   }
 
-  public override getMethods(): M[] {
+  public override getMethods(): Method[] {
     return this.#methods;
   }
 
@@ -248,9 +226,7 @@ export class Endpoint<
   }
 
   public override getOperationId(method: Method): string | undefined {
-    return typeof this.#operationId === "function"
-      ? this.#operationId(method)
-      : this.#operationId;
+    return this.#getOperationId(method);
   }
 
   #getDefaultCorsHeaders(): Record<string, string> {
@@ -266,9 +242,9 @@ export class Endpoint<
     };
   }
 
-  async #parseOutput(output: any) {
+  async #parseOutput(output: z.input<OUT>) {
     try {
-      return await this.#schemas.output.parseAsync(output);
+      return (await this.#schemas.output.parseAsync(output)) as FlatObject;
     } catch (e) {
       if (e instanceof z.ZodError) {
         throw new OutputValidationError(e);
@@ -285,18 +261,18 @@ export class Endpoint<
     logger,
   }: {
     method: Method | AuxMethod;
-    input: Readonly<any>; // Issue #673: input is immutable, since this.inputSchema is combined with ones of middlewares
+    input: Readonly<FlatObject>; // Issue #673: input is immutable, since this.inputSchema is combined with ones of middlewares
     request: Request;
     response: Response;
     logger: Logger;
   }) {
-    const options: any = {};
+    const options = {} as OPT;
     let isStreamClosed = false;
     for (const def of this.#middlewares) {
       if (method === "options" && def.type === "proprietary") {
         continue;
       }
-      let finalInput: any;
+      let finalInput: unknown;
       try {
         finalInput = await def.input.parseAsync(input);
       } catch (e) {
@@ -332,8 +308,8 @@ export class Endpoint<
     options,
     logger,
   }: {
-    input: Readonly<any>;
-    options: any;
+    input: Readonly<FlatObject>;
+    options: OPT;
     logger: Logger;
   }) {
     let finalInput: z.output<IN>; // final input types transformations for handler
@@ -366,8 +342,8 @@ export class Endpoint<
     request: Request;
     response: Response;
     logger: Logger;
-    input: any;
-    output: any;
+    input: FlatObject;
+    output: FlatObject | null;
   }) {
     try {
       await this.#resultHandler.handler({
@@ -399,7 +375,7 @@ export class Endpoint<
     config: CommonConfig;
   }) {
     const method = getActualMethod(request);
-    let output: any;
+    let output: FlatObject | null = null;
     let error: Error | null = null;
     if (config.cors) {
       let headers = this.#getDefaultCorsHeaders();

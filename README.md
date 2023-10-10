@@ -104,14 +104,18 @@ Much can be customized to fit your needs.
 
 ## Installation
 
-Run one of the following commands to install the library and its peer dependencies.
-Typescript is an optional dependency, however, it's required if you're going to
-[generate a frontend client](#generating-a-frontend-client) for your API.
+Run one of the following commands to install the library, its peer dependencies and packages for types assistance.
 
 ```shell
-yarn add express-zod-api express zod winston typescript
-# or
-npm install express-zod-api express zod winston typescript
+yarn add express-zod-api express zod winston typescript http-errors
+yarn add --dev @types/express @types/node @types/http-errors
+```
+
+or
+
+```shell
+npm install express-zod-api express zod winston typescript http-errors
+npm install -D @types/express @types/node @types/http-errors
 ```
 
 Add the following option to your `tsconfig.json` file in order to make it work as expected:
@@ -252,7 +256,8 @@ Here is an example of the authentication middleware, that checks a `key` from in
 
 ```typescript
 import { z } from "zod";
-import { createMiddleware, createHttpError } from "express-zod-api";
+import createHttpError from "http-errors";
+import { createMiddleware } from "express-zod-api";
 
 const authMiddleware = createMiddleware({
   security: {
@@ -589,8 +594,9 @@ There are also two optional features available: a provider of options and an err
 In case the error in middleware is not a `HttpError`, the `ResultHandler` will send the status `500`.
 
 ```typescript
-import { defaultEndpointsFactory, createHttpError } from "express-zod-api";
+import { defaultEndpointsFactory } from "express-zod-api";
 import cors from "cors";
+import createHttpError from "http-errors";
 import { auth } from "express-oauth2-jwt-bearer";
 
 const simpleUsage = defaultEndpointsFactory.addExpressMiddleware(
@@ -820,9 +826,9 @@ const config = createConfig({
 const { app, httpServer, httpsServer, logger } = createServer(config, routing);
 ```
 
-At least you need to specify the port or socket (usually it is 443), certificate and the key, issued by the
-certifying authority. For example, you can acquire a free TLS certificate for your API at
-[Let's Encrypt](https://letsencrypt.org/).
+Ensure having `@types/node` package installed. At least you need to specify the port or socket (usually it is 443),
+certificate and the key, issued by the certifying authority. For example, you can acquire a free TLS certificate for
+your API at [Let's Encrypt](https://letsencrypt.org/).
 
 ## Generating a Frontend Client
 

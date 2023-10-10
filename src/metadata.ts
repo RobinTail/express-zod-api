@@ -2,18 +2,18 @@ import { combinations } from "./common-helpers";
 import { z } from "zod";
 import { clone, mergeDeepRight } from "ramda";
 
+interface Metadata<T extends z.ZodTypeAny> {
+  examples: z.input<T>[];
+}
+
+type MetaKey = keyof Metadata<z.ZodTypeAny>;
+type MetaValue<T extends z.ZodTypeAny, K extends MetaKey> = Readonly<
+  Metadata<T>[K]
+>;
+
 export const metaProp = "expressZodApiMeta";
 type MetaProp = typeof metaProp;
-
-export type MetaDef<T extends z.ZodTypeAny> = {
-  [K in MetaProp]: {
-    examples: z.input<T>[];
-  };
-};
-type MetaKey = keyof MetaDef<any>[MetaProp];
-type MetaValue<T extends z.ZodTypeAny, K extends MetaKey> = Readonly<
-  MetaDef<T>[MetaProp][K]
->;
+export type MetaDef<T extends z.ZodTypeAny> = Record<MetaProp, Metadata<T>>;
 
 type ExampleSetter<T extends z.ZodTypeAny> = (
   example: z.input<T>,
@@ -28,7 +28,7 @@ type WithMeta<T extends z.ZodTypeAny> = T & {
 const cloneSchemaForMeta = <T extends z.ZodTypeAny>(schema: T): WithMeta<T> => {
   const This = (schema as any).constructor;
   const def = clone(schema._def) as MetaDef<T>;
-  def[metaProp] = def[metaProp] || { examples: [] };
+  def[metaProp] = def[metaProp] || ({ examples: [] } satisfies Metadata<T>);
   return new This(def) as WithMeta<T>;
 };
 
@@ -38,7 +38,7 @@ export const withMeta = <T extends z.ZodTypeAny>(schema: T): WithMeta<T> => {
     example: {
       get: (): ExampleSetter<T> => (value) => {
         const localCopy = withMeta<T>(copy);
-        localCopy._def[metaProp].examples.push(value);
+        (localCopy._def[metaProp] as Metadata<T>).examples.push(value);
         return localCopy;
       },
     },

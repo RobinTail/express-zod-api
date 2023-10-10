@@ -8,7 +8,7 @@ import {
   ProbableIntersection,
   getFinalEndpointInputSchema,
 } from "./io-schema";
-import { Method, MethodsDefinition } from "./method";
+import { Method } from "./method";
 import {
   AnyMiddlewareDef,
   ExpressMiddleware,
@@ -27,7 +27,6 @@ type BuildProps<
   OUT extends IOSchema,
   MIN extends IOSchema<"strip"> | null,
   OPT extends FlatObject,
-  M extends Method,
   SCO extends string,
   TAG extends string,
 > = {
@@ -37,9 +36,9 @@ type BuildProps<
   description?: string;
   shortDescription?: string;
   operationId?: string | ((method: Method) => string);
-} & ({ scopes?: SCO[] } | { scope?: SCO }) &
-  ({ tags?: TAG[] } | { tag?: TAG }) &
-  MethodsDefinition<M>;
+} & ({ method: Method } | { methods: Method[] }) &
+  ({ scopes?: SCO[] } | { scope?: SCO }) &
+  ({ tags?: TAG[] } | { tag?: TAG });
 
 export class EndpointsFactory<
   POS extends z.ZodTypeAny,
@@ -120,7 +119,7 @@ export class EndpointsFactory<
       input: z.object({}),
       middleware: async ({ request, response }) =>
         new Promise<AOUT>((resolve, reject) => {
-          const next = (err?: any) => {
+          const next = (err?: unknown) => {
             if (err && err instanceof Error) {
               return reject(transformer(err));
             }
@@ -147,29 +146,47 @@ export class EndpointsFactory<
     );
   }
 
-  public build<BIN extends IOSchema, BOUT extends IOSchema, M extends Method>({
+  public build<BIN extends IOSchema, BOUT extends IOSchema>({
     input,
     handler,
     output: outputSchema,
+    description,
+    shortDescription,
+    operationId,
     ...rest
-  }: BuildProps<BIN, BOUT, IN, OUT, M, SCO, TAG>): Endpoint<
+  }: BuildProps<BIN, BOUT, IN, OUT, SCO, TAG>): Endpoint<
     ProbableIntersection<IN, BIN>,
     BOUT,
     OUT,
-    M,
     POS,
     NEG,
     SCO,
     TAG
   > {
     const { middlewares, resultHandler } = this;
+    const methods = "methods" in rest ? rest.methods : [rest.method];
+    const getOperationId =
+      typeof operationId === "function" ? operationId : () => operationId;
+    const scopes =
+      "scopes" in rest
+        ? rest.scopes
+        : "scope" in rest && rest.scope
+        ? [rest.scope]
+        : [];
+    const tags =
+      "tags" in rest ? rest.tags : "tag" in rest && rest.tag ? [rest.tag] : [];
     return new Endpoint({
       handler,
       middlewares,
       outputSchema,
       resultHandler,
+      scopes,
+      tags,
+      methods,
+      getOperationId,
+      description,
+      shortDescription,
       inputSchema: getFinalEndpointInputSchema<IN, BIN>(middlewares, input),
-      ...rest,
     });
   }
 }

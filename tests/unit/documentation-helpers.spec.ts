@@ -52,6 +52,7 @@ import {
   excludeExampleFromDepiction,
   excludeParamsFromDepiction,
   extractObjectSchema,
+  getRoutePathParams,
   onEach,
   onMissing,
   reformatParamsInPath,
@@ -66,7 +67,7 @@ describe("Documentation helpers", () => {
       $ref: `#/components/schemas/${name}`,
     }),
   );
-  const requestContext: OpenAPIContext = {
+  const requestCtx: OpenAPIContext = {
     path: "/v1/user/:id",
     method: "get",
     isResponse: false,
@@ -74,7 +75,7 @@ describe("Documentation helpers", () => {
     makeRef: makeRefMock,
     serializer: defaultSerializer,
   };
-  const responseContext: OpenAPIContext = {
+  const responseCtx: OpenAPIContext = {
     path: "/v1/user/:id",
     method: "get",
     isResponse: true,
@@ -84,7 +85,7 @@ describe("Documentation helpers", () => {
   };
   const makeNext =
     (
-      context: OpenAPIContext,
+      ctx: OpenAPIContext,
     ): SchemaHandler<
       z.ZodTypeAny,
       SchemaObject | ReferenceObject,
@@ -95,7 +96,7 @@ describe("Documentation helpers", () => {
       walkSchema({
         schema,
         rules: depicters,
-        ...context,
+        ...ctx,
         onEach,
         onMissing,
       });
@@ -105,11 +106,39 @@ describe("Documentation helpers", () => {
     makeRefMock.mockClear();
   });
 
+  describe("getRoutePathParams()", () => {
+    test("should return an array of param names", () => {
+      expect(getRoutePathParams("/users/:userId/books/:bookId")).toEqual([
+        "userId",
+        "bookId",
+      ]);
+      expect(getRoutePathParams("/flights/:from-:to")).toEqual(["from", "to"]);
+      expect(getRoutePathParams("/something")).toEqual([]);
+      expect(getRoutePathParams("")).toEqual([]);
+      expect(getRoutePathParams("\n")).toEqual([]);
+    });
+
+    test("should return an array of param names", () => {
+      expect(getRoutePathParams("/users/:userId/books/:bookId")).toEqual([
+        "userId",
+        "bookId",
+      ]);
+      expect(getRoutePathParams("/flights/:from-:to")).toEqual(["from", "to"]);
+      expect(getRoutePathParams("/test/:genus.:species")).toEqual([
+        "genus",
+        "species",
+      ]);
+      expect(getRoutePathParams("/something")).toEqual([]);
+      expect(getRoutePathParams("")).toEqual([]);
+      expect(getRoutePathParams("\n")).toEqual([]);
+    });
+  });
+
   describe("extractObjectSchema()", () => {
     test("should pass the object schema through", () => {
       const subject = extractObjectSchema(
         z.object({ one: z.string() }),
-        requestContext,
+        requestCtx,
       );
       expect(subject).toBeInstanceOf(z.ZodObject);
       expect(serializeSchemaForTest(subject)).toMatchSnapshot();
@@ -118,7 +147,7 @@ describe("Documentation helpers", () => {
     test("should return object schema for the union of object schemas", () => {
       const subject = extractObjectSchema(
         z.object({ one: z.string() }).or(z.object({ two: z.number() })),
-        requestContext,
+        requestCtx,
       );
       expect(subject).toBeInstanceOf(z.ZodObject);
       expect(serializeSchemaForTest(subject)).toMatchSnapshot();
@@ -127,7 +156,7 @@ describe("Documentation helpers", () => {
     test("should return object schema for the intersection of object schemas", () => {
       const subject = extractObjectSchema(
         z.object({ one: z.string() }).and(z.object({ two: z.number() })),
-        requestContext,
+        requestCtx,
       );
       expect(subject).toBeInstanceOf(z.ZodObject);
       expect(serializeSchemaForTest(subject)).toMatchSnapshot();
@@ -138,17 +167,14 @@ describe("Documentation helpers", () => {
         one: "test",
       });
       expect(
-        getMeta(extractObjectSchema(objectSchema, requestContext), "examples"),
+        getMeta(extractObjectSchema(objectSchema, requestCtx), "examples"),
       ).toEqual([{ one: "test" }]);
 
       const refinedObjSchema = withMeta(
         z.object({ one: z.string() }).refine(() => true),
       ).example({ one: "test" });
       expect(
-        getMeta(
-          extractObjectSchema(refinedObjSchema, requestContext),
-          "examples",
-        ),
+        getMeta(extractObjectSchema(refinedObjSchema, requestCtx), "examples"),
       ).toEqual([{ one: "test" }]);
 
       const unionSchema = withMeta(
@@ -157,7 +183,7 @@ describe("Documentation helpers", () => {
         .example({ one: "test1" })
         .example({ two: 123 });
       expect(
-        getMeta(extractObjectSchema(unionSchema, requestContext), "examples"),
+        getMeta(extractObjectSchema(unionSchema, requestCtx), "examples"),
       ).toEqual([{ one: "test1" }, { two: 123 }]);
 
       const intersectionSchema = withMeta(
@@ -165,7 +191,7 @@ describe("Documentation helpers", () => {
       ).example({ one: "test1", two: 123 });
       expect(
         getMeta(
-          extractObjectSchema(intersectionSchema, requestContext),
+          extractObjectSchema(intersectionSchema, requestCtx),
           "examples",
         ),
       ).toEqual([{ one: "test1", two: 123 }]);
@@ -175,7 +201,7 @@ describe("Documentation helpers", () => {
       test("should handle refined object schema", () => {
         const subject = extractObjectSchema(
           z.object({ one: z.string() }).refine(() => true),
-          requestContext,
+          requestCtx,
         );
         expect(subject).toBeInstanceOf(z.ZodObject);
         expect(serializeSchemaForTest(subject)).toMatchSnapshot();
@@ -185,7 +211,7 @@ describe("Documentation helpers", () => {
         expect(() =>
           extractObjectSchema(
             z.object({ one: z.string() }).transform(() => []),
-            requestContext,
+            requestCtx,
           ),
         ).toThrowError(
           new IOSchemaError(
@@ -205,7 +231,7 @@ describe("Documentation helpers", () => {
     ])("should omit specified path params %#", (schema) => {
       const depicted = walkSchema({
         schema,
-        ...requestContext,
+        ...requestCtx,
         onEach,
         rules: depicters,
         onMissing,
@@ -238,8 +264,8 @@ describe("Documentation helpers", () => {
       expect(
         depictDefault({
           schema: z.boolean().default(true),
-          ...requestContext,
-          next: makeNext(requestContext),
+          ...requestCtx,
+          next: makeNext(requestCtx),
         }),
       ).toMatchSnapshot();
     });
@@ -250,8 +276,8 @@ describe("Documentation helpers", () => {
       expect(
         depictCatch({
           schema: z.boolean().catch(true),
-          ...requestContext,
-          next: makeNext(requestContext),
+          ...requestCtx,
+          next: makeNext(requestCtx),
         }),
       ).toMatchSnapshot();
     });
@@ -262,8 +288,8 @@ describe("Documentation helpers", () => {
       expect(
         depictAny({
           schema: z.any(),
-          ...requestContext,
-          next: makeNext(requestContext),
+          ...requestCtx,
+          next: makeNext(requestCtx),
         }),
       ).toMatchSnapshot();
     });
@@ -274,8 +300,8 @@ describe("Documentation helpers", () => {
       expect(
         depictUpload({
           schema: ez.upload(),
-          ...requestContext,
-          next: makeNext(requestContext),
+          ...requestCtx,
+          next: makeNext(requestCtx),
         }),
       ).toMatchSnapshot();
     });
@@ -283,8 +309,8 @@ describe("Documentation helpers", () => {
       try {
         depictUpload({
           schema: ez.upload(),
-          ...responseContext,
-          next: makeNext(responseContext),
+          ...responseCtx,
+          next: makeNext(responseCtx),
         });
         fail("Should not be here");
       } catch (e) {
@@ -301,8 +327,8 @@ describe("Documentation helpers", () => {
         expect(
           depictFile({
             schema,
-            ...responseContext,
-            next: makeNext(responseContext),
+            ...responseCtx,
+            next: makeNext(responseCtx),
           }),
         ).toMatchSnapshot();
       },
@@ -311,8 +337,8 @@ describe("Documentation helpers", () => {
       try {
         depictFile({
           schema: ez.file().binary(),
-          ...requestContext,
-          next: makeNext(requestContext),
+          ...requestCtx,
+          next: makeNext(requestCtx),
         });
         fail("Should not be here");
       } catch (e) {
@@ -327,8 +353,8 @@ describe("Documentation helpers", () => {
       expect(
         depictUnion({
           schema: z.string().or(z.number()),
-          ...requestContext,
-          next: makeNext(requestContext),
+          ...requestCtx,
+          next: makeNext(requestCtx),
         }),
       ).toMatchSnapshot();
     });
@@ -345,8 +371,8 @@ describe("Documentation helpers", () => {
               error: z.object({ message: z.string() }),
             }),
           ]),
-          ...requestContext,
-          next: makeNext(requestContext),
+          ...requestCtx,
+          next: makeNext(requestCtx),
         }),
       ).toMatchSnapshot();
     });
@@ -359,22 +385,22 @@ describe("Documentation helpers", () => {
           schema: z
             .object({ one: z.number() })
             .and(z.object({ two: z.number() })),
-          ...requestContext,
-          next: makeNext(requestContext),
+          ...requestCtx,
+          next: makeNext(requestCtx),
         }),
       ).toMatchSnapshot();
     });
   });
 
   describe("depictOptional()", () => {
-    test.each<OpenAPIContext>([requestContext, responseContext])(
+    test.each<OpenAPIContext>([requestCtx, responseCtx])(
       "should pass the next depicter %#",
-      (context) => {
+      (ctx) => {
         expect(
           depictOptional({
             schema: z.string().optional(),
-            ...context,
-            next: makeNext(context),
+            ...ctx,
+            next: makeNext(ctx),
           }),
         ).toMatchSnapshot();
       },
@@ -382,14 +408,14 @@ describe("Documentation helpers", () => {
   });
 
   describe("depictNullable()", () => {
-    test.each<OpenAPIContext>([requestContext, responseContext])(
+    test.each<OpenAPIContext>([requestCtx, responseCtx])(
       "should set nullable:true %#",
-      (context) => {
+      (ctx) => {
         expect(
           depictNullable({
             schema: z.string().nullable(),
-            ...context,
-            next: makeNext(context),
+            ...ctx,
+            next: makeNext(ctx),
           }),
         ).toMatchSnapshot();
       },
@@ -407,8 +433,8 @@ describe("Documentation helpers", () => {
         expect(
           depictEnum({
             schema,
-            ...requestContext,
-            next: makeNext(requestContext),
+            ...requestCtx,
+            next: makeNext(requestCtx),
           }),
         ).toMatchSnapshot();
       },
@@ -420,43 +446,34 @@ describe("Documentation helpers", () => {
       expect(
         depictLiteral({
           schema: z.literal("testing"),
-          ...requestContext,
-          next: makeNext(requestContext),
+          ...requestCtx,
+          next: makeNext(requestCtx),
         }),
       ).toMatchSnapshot();
     });
   });
 
   describe("depictObject()", () => {
-    test.each<{ context: OpenAPIContext; shape: z.ZodRawShape }>([
+    test.each<{ ctx: OpenAPIContext; shape: z.ZodRawShape }>([
+      { ctx: requestCtx, shape: { a: z.number(), b: z.string() } },
+      { ctx: responseCtx, shape: { a: z.number(), b: z.string() } },
       {
-        context: requestContext,
-        shape: { a: z.number(), b: z.string() },
-      },
-      {
-        context: responseContext,
-        shape: { a: z.number(), b: z.string() },
-      },
-      {
-        context: responseContext,
+        ctx: responseCtx,
         shape: { a: z.coerce.number(), b: z.string({ coerce: true }) },
       },
+      { ctx: responseCtx, shape: { a: z.number(), b: z.string().optional() } },
       {
-        context: responseContext,
-        shape: { a: z.number(), b: z.string().optional() },
-      },
-      {
-        context: requestContext,
+        ctx: requestCtx,
         shape: { a: z.number().optional(), b: z.coerce.string() },
       },
     ])(
       "should type:object, properties and required props %#",
-      ({ shape, context }) => {
+      ({ shape, ctx }) => {
         expect(
           depictObject({
             schema: z.object(shape),
-            ...context,
-            next: makeNext(context),
+            ...ctx,
+            next: makeNext(ctx),
           }),
         ).toMatchSnapshot();
       },
@@ -471,8 +488,8 @@ describe("Documentation helpers", () => {
       expect(
         depictObject({
           schema,
-          ...responseContext,
-          next: makeNext(responseContext),
+          ...responseCtx,
+          next: makeNext(responseCtx),
         }),
       ).toMatchSnapshot();
     });
@@ -483,8 +500,8 @@ describe("Documentation helpers", () => {
       expect(
         depictNull({
           schema: z.null(),
-          ...requestContext,
-          next: makeNext(requestContext),
+          ...requestCtx,
+          next: makeNext(requestCtx),
         }),
       ).toMatchSnapshot();
     });
@@ -495,8 +512,8 @@ describe("Documentation helpers", () => {
       expect(
         depictBoolean({
           schema: z.boolean(),
-          ...requestContext,
-          next: makeNext(requestContext),
+          ...requestCtx,
+          next: makeNext(requestCtx),
         }),
       ).toMatchSnapshot();
     });
@@ -507,8 +524,8 @@ describe("Documentation helpers", () => {
       expect(
         depictBigInt({
           schema: z.bigint(),
-          ...requestContext,
-          next: makeNext(requestContext),
+          ...requestCtx,
+          next: makeNext(requestCtx),
         }),
       ).toMatchSnapshot();
     });
@@ -528,8 +545,8 @@ describe("Documentation helpers", () => {
         expect(
           depictRecord({
             schema,
-            ...requestContext,
-            next: makeNext(requestContext),
+            ...requestCtx,
+            next: makeNext(requestCtx),
           }),
         ).toMatchSnapshot();
       },
@@ -541,8 +558,8 @@ describe("Documentation helpers", () => {
       expect(
         depictArray({
           schema: z.array(z.boolean()),
-          ...requestContext,
-          next: makeNext(requestContext),
+          ...requestCtx,
+          next: makeNext(requestCtx),
         }),
       ).toMatchSnapshot();
     });
@@ -553,8 +570,8 @@ describe("Documentation helpers", () => {
       expect(
         depictTuple({
           schema: z.tuple([z.boolean(), z.string(), z.literal("test")]),
-          ...requestContext,
-          next: makeNext(requestContext),
+          ...requestCtx,
+          next: makeNext(requestCtx),
         }),
       ).toMatchSnapshot();
     });
@@ -565,8 +582,8 @@ describe("Documentation helpers", () => {
       expect(
         depictString({
           schema: z.string(),
-          ...requestContext,
-          next: makeNext(requestContext),
+          ...requestCtx,
+          next: makeNext(requestCtx),
         }),
       ).toMatchSnapshot();
     });
@@ -583,8 +600,8 @@ describe("Documentation helpers", () => {
       expect(
         depictString({
           schema,
-          ...requestContext,
-          next: makeNext(requestContext),
+          ...requestCtx,
+          next: makeNext(requestCtx),
         }),
       ).toMatchSnapshot();
     });
@@ -597,8 +614,8 @@ describe("Documentation helpers", () => {
         expect(
           depictNumber({
             schema,
-            ...requestContext,
-            next: makeNext(requestContext),
+            ...requestCtx,
+            next: makeNext(requestCtx),
           }),
         ).toMatchSnapshot();
       },
@@ -613,8 +630,8 @@ describe("Documentation helpers", () => {
             one: z.string(),
             two: z.boolean(),
           }),
-          ...requestContext,
-          next: makeNext(requestContext),
+          ...requestCtx,
+          next: makeNext(requestCtx),
         }),
       ).toMatchSnapshot();
     });
@@ -622,38 +639,38 @@ describe("Documentation helpers", () => {
 
   describe("depictEffect()", () => {
     test.each<{
-      context: OpenAPIContext;
+      ctx: OpenAPIContext;
       schema: z.ZodEffects<any>;
       expected: string;
     }>([
       {
         schema: z.string().transform((v) => parseInt(v, 10)),
-        context: responseContext,
+        ctx: responseCtx,
         expected: "number (out)",
       },
       {
         schema: z.string().transform((v) => parseInt(v, 10)),
-        context: requestContext,
+        ctx: requestCtx,
         expected: "string (in)",
       },
       {
         schema: z.preprocess((v) => parseInt(`${v}`, 10), z.string()),
-        context: requestContext,
+        ctx: requestCtx,
         expected: "string (preprocess)",
       },
       {
         schema: z
           .object({ s: z.string() })
           .refine(() => false, { message: "test" }),
-        context: requestContext,
+        ctx: requestCtx,
         expected: "object (refinement)",
       },
-    ])("should depict as $expected", ({ schema, context }) => {
+    ])("should depict as $expected", ({ schema, ctx }) => {
       expect(
         depictEffect({
           schema,
-          ...context,
-          next: makeNext(context),
+          ...ctx,
+          next: makeNext(ctx),
         }),
       ).toMatchSnapshot();
     });
@@ -667,23 +684,23 @@ describe("Documentation helpers", () => {
       expect(
         depictEffect({
           schema,
-          ...responseContext,
-          next: makeNext(responseContext),
+          ...responseCtx,
+          next: makeNext(responseCtx),
         }),
       ).toMatchSnapshot();
     });
   });
 
   describe("depictPipeline", () => {
-    test.each<{ context: OpenAPIContext; expected: string }>([
-      { context: responseContext, expected: "boolean (out)" },
-      { context: requestContext, expected: "string (in)" },
-    ])("should depict as $expected", ({ context }) => {
+    test.each<{ ctx: OpenAPIContext; expected: string }>([
+      { ctx: responseCtx, expected: "boolean (out)" },
+      { ctx: requestCtx, expected: "string (in)" },
+    ])("should depict as $expected", ({ ctx }) => {
       expect(
         depictPipeline({
           schema: z.string().pipe(z.coerce.boolean()),
-          ...context,
-          next: makeNext(context),
+          ...ctx,
+          next: makeNext(ctx),
         }),
       ).toMatchSnapshot();
     });
@@ -766,7 +783,7 @@ describe("Documentation helpers", () => {
           }),
           inputSources: ["query", "params"],
           composition: "inline",
-          ...requestContext,
+          ...requestCtx,
         }),
       ).toMatchSnapshot();
     });
@@ -785,7 +802,7 @@ describe("Documentation helpers", () => {
           }),
           inputSources: ["body", "params"],
           composition: "inline",
-          ...requestContext,
+          ...requestCtx,
         }),
       ).toMatchSnapshot();
     });
@@ -804,7 +821,7 @@ describe("Documentation helpers", () => {
           }),
           inputSources: ["body"],
           composition: "inline",
-          ...requestContext,
+          ...requestCtx,
         }),
       ).toMatchSnapshot();
     });
@@ -824,7 +841,7 @@ describe("Documentation helpers", () => {
           }),
           inputSources: ["query", "headers", "params"],
           composition: "inline",
-          ...requestContext,
+          ...requestCtx,
         }),
       ).toMatchSnapshot();
     });
@@ -847,8 +864,8 @@ describe("Documentation helpers", () => {
       expect(
         depictDateIn({
           schema: ez.dateIn(),
-          ...requestContext,
-          next: makeNext(requestContext),
+          ...requestCtx,
+          next: makeNext(requestCtx),
         }),
       ).toMatchSnapshot();
     });
@@ -856,8 +873,8 @@ describe("Documentation helpers", () => {
       try {
         depictDateIn({
           schema: ez.dateIn(),
-          ...responseContext,
-          next: makeNext(responseContext),
+          ...responseCtx,
+          next: makeNext(responseCtx),
         });
         fail("should not be here");
       } catch (e) {
@@ -872,8 +889,8 @@ describe("Documentation helpers", () => {
       expect(
         depictDateOut({
           schema: ez.dateOut(),
-          ...responseContext,
-          next: makeNext(responseContext),
+          ...responseCtx,
+          next: makeNext(responseCtx),
         }),
       ).toMatchSnapshot();
     });
@@ -881,8 +898,8 @@ describe("Documentation helpers", () => {
       try {
         depictDateOut({
           schema: ez.dateOut(),
-          ...requestContext,
-          next: makeNext(requestContext),
+          ...requestCtx,
+          next: makeNext(requestCtx),
         });
         fail("should not be here");
       } catch (e) {
@@ -893,14 +910,14 @@ describe("Documentation helpers", () => {
   });
 
   describe("depictDate", () => {
-    test.each<OpenAPIContext>([responseContext, requestContext])(
+    test.each<OpenAPIContext>([responseCtx, requestCtx])(
       "should throw clear error %#",
-      (context) => {
+      (ctx) => {
         try {
           depictDate({
             schema: z.date(),
-            ...context,
-            next: makeNext(context),
+            ...ctx,
+            next: makeNext(ctx),
           });
           fail("should not be here");
         } catch (e) {
@@ -916,8 +933,8 @@ describe("Documentation helpers", () => {
       expect(
         depictBranded({
           schema: z.string().min(2).brand<"Test">(),
-          ...responseContext,
-          next: makeNext(responseContext),
+          ...responseCtx,
+          next: makeNext(responseCtx),
         }),
       ).toMatchSnapshot();
     });
@@ -928,8 +945,8 @@ describe("Documentation helpers", () => {
       expect(
         depictReadonly({
           schema: z.string().readonly(),
-          ...responseContext,
-          next: makeNext(responseContext),
+          ...responseCtx,
+          next: makeNext(responseCtx),
         }),
       ).toMatchSnapshot();
     });
@@ -969,8 +986,8 @@ describe("Documentation helpers", () => {
       expect(
         depictLazy({
           schema,
-          ...responseContext,
-          next: makeNext(responseContext),
+          ...responseCtx,
+          next: makeNext(responseCtx),
         }),
       ).toMatchSnapshot();
       expect(getRefMock).toHaveBeenCalledTimes(2);

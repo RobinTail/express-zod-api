@@ -1,12 +1,11 @@
 import compression from "compression";
-import { NextHandleFunction } from "connect";
-import { Express, Request } from "express";
+import { Express, Request, RequestHandler } from "express";
 import fileUpload from "express-fileupload";
 import { ServerOptions } from "node:https";
 import { Logger } from "winston";
 import { AbstractEndpoint } from "./endpoint";
 import { Method } from "./method";
-import { ResultHandlerDefinition } from "./result-handler";
+import { AnyResultHandlerDefinition } from "./result-handler";
 
 export const loggerLevels = {
   silent: true,
@@ -45,7 +44,7 @@ export interface ServerConfig {
      * @desc Custom JSON parser.
      * @default express.json()
      * */
-    jsonParser?: NextHandleFunction;
+    jsonParser?: RequestHandler;
     /**
      * @desc Enable or configure uploads handling.
      * @default false
@@ -103,7 +102,7 @@ export interface CommonConfig<TAG extends string = string> {
    * @default defaultResultHandler
    * @see defaultResultHandler
    */
-  errorHandler?: ResultHandlerDefinition<any, any>;
+  errorHandler?: AnyResultHandlerDefinition;
   /** @desc Logger configuration or your custom winston logger. */
   logger: LoggerConfig | Logger;
   /**

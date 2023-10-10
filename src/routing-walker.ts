@@ -28,12 +28,7 @@ export const walkRouting = ({
     segment = segment.trim();
     if (segment.match(/\//)) {
       throw new RoutingError(
-        "Routing elements should not contain '/' character.\n" +
-          `The error caused by ${
-            parentPath
-              ? `'${parentPath}' route that has a '${segment}'`
-              : `'${segment}'`
-          } entry.`,
+        `The entry '${segment}' must avoid having slashes — use nesting instead.`,
       );
     }
     const path = `${parentPath || ""}${segment ? `/${segment}` : ""}`;
@@ -50,16 +45,19 @@ export const walkRouting = ({
         element.apply(path, onStatic);
       }
     } else if (element instanceof DependsOnMethod) {
-      Object.entries<AbstractEndpoint>(element.methods).forEach(
-        ([method, endpoint]) => {
-          onEndpoint(endpoint, path, method as Method);
-        },
-      );
-      if (hasCors && Object.keys(element.methods).length > 0) {
+      Object.entries(element.endpoints).forEach(([method, endpoint]) => {
+        if (!endpoint.getMethods().includes(method as Method)) {
+          throw new RoutingError(
+            `Endpoint assigned to ${method} method of ${path} must support ${method} method.`,
+          );
+        }
+        onEndpoint(endpoint, path, method as Method);
+      });
+      if (hasCors && Object.keys(element.endpoints).length > 0) {
         const [firstMethod, ...siblingMethods] = Object.keys(
-          element.methods,
+          element.endpoints,
         ) as Method[];
-        const firstEndpoint = element.methods[firstMethod]!;
+        const firstEndpoint = element.endpoints[firstMethod]!;
         firstEndpoint._setSiblingMethods(siblingMethods);
         onEndpoint(firstEndpoint, path, "options");
       }

@@ -1,5 +1,34 @@
 # Changelog
 
+## Version 14
+
+### v14.0.0
+
+- **Breaking changes**:
+  - `http-errors` becomes a peer dependency — you have to install it manually.
+    - You might also need to install `@types/http-errors` if you're using `createHttpError` in your implementation.
+  - `typescript` is a required peer dependency.
+  - Minimum version of `zod` is 3.22.3.
+  - The class `DependsOnMethodError` is removed — catch `RoutingError` instead if needed.
+- **Potentially breaking changes**:
+  - The type `FlatObject` changed from `Record<string, any>` to `Record<string, unknown>`.
+    - If a custom `ResultHandler` handles properties of the `output`, it might need to ensure its actual type.
+  - In case of body parsing failure the `ResultHandler` receives `null` into its `input` argument instead of raw body.
+    - Utilize the `request.body` within a custom `ResultHandler` in that case if needed.
+  - The type of `ResultHandler`'s arguments `input` and `output` is changed from `any` to `FlatObject | null`.
+- Other changes:
+  - Ensure having the following packages installed for the types assistance:
+    - `yarn add --dev @types/express @types/node @types/http-errors`
+    - or `npm install -D @types/express @types/node @types/http-errors`
+  - The property `DependsOnMethod::methods` is renamed to `endpoints`.
+
+```typescript
+// before
+import { createHttpError } from "express-zod-api";
+// after
+import createHttpError from "http-errors";
+```
+
 ## Version 12
 
 ### v12.5.1

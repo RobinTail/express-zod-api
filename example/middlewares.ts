@@ -1,5 +1,6 @@
+import createHttpError from "http-errors";
 import { z } from "zod";
-import { Method, createHttpError, createMiddleware, withMeta } from "../src";
+import { Method, createMiddleware, withMeta } from "../src";
 
 export const authMiddleware = createMiddleware({
   security: {
