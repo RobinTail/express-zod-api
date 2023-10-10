@@ -13,9 +13,9 @@
 - **Potentially breaking changes**:
   - The type `FlatObject` changed from `Record<string, any>` to `Record<string, unknown>`.
     - If a custom `ResultHandler` handles properties of the `output`, it might need to ensure its actual type.
-  - In case of body parsing failure the `ResultHandler` recieves `null` into its `input` argument instead of raw body.
+  - In case of body parsing failure the `ResultHandler` receives `null` into its `input` argument instead of raw body.
     - Utilize the `request.body` within a custom `ResultHandler` in that case if needed.
-  - The type of `ResultHandler`'s arguments `input` and `output` are changed from `any` to `FlatObject | null`.
+  - The type of `ResultHandler`'s arguments `input` and `output` is changed from `any` to `FlatObject | null`.
 - Other changes:
   - Ensure having the following packages installed for the types assistance:
     - `yarn add --dev @types/express @types/node @types/http-errors`
