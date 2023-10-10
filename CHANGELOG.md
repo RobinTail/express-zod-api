@@ -17,11 +17,9 @@
     - Utilize the `request.body` within a custom `ResultHandler` in that case if needed.
   - The type of `ResultHandler`'s arguments `input` and `output` are changed from `any` to `FlatObject | null`.
 - Unlikely breaking changes:
-  - The following ones are optional peer dependencies for assistance in configuring particular features:
-    - `@types/compression` — for configuring compression feature,
-    - `@types/express-fileupload` — for configuring uploads feature,
-    - `@types/node` — for configuring HTTPS feature.
-    - Install them manually if you're using those features.
+  - Ensure having the following packages installed for the types assistance:
+    - `yarn add --dev @types/express @types/compression @types/express-fileupload @types/node`
+    - or `npm install -D @types/express @types/compression @types/express-fileupload @types/node`
   - The property `DependsOnMethod::methods` is renamed to `endpoints`.
 
 ```typescript
