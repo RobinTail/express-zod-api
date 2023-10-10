@@ -112,11 +112,13 @@ yarn add express-zod-api express zod winston typescript http-errors
 npm install express-zod-api express zod winston typescript http-errors
 ```
 
-Optionally also install the following packages for assistance:
+Also install the following packages for types assistance:
 
-- For configuring the [HTTPS feture](#enabling-https): `@types/node`,
-- For configuring the [uploads feature](#file-uploads): `@types/express-fileupload`,
-- For configuring the [compression feature](#enabling-compression): `@types/compression`.
+```shell
+yarn add --dev @types/express @types/node @types/compression @types/express-fileupload
+# or
+npm install -D @types/express @types/node @types/compression @types/express-fileupload
+```
 
 Add the following option to your `tsconfig.json` file in order to make it work as expected:
 
@@ -641,7 +643,7 @@ const fileUploadEndpoint = defaultEndpointsFactory.build({
 });
 ```
 
-In order to configure `upload` more precisely, install the `@types/express-fileupload` package for assistance.
+In order to configure `upload` more precisely, ensure having `@types/express-fileupload` installed.
 
 _You can still send other data and specify additional `input` parameters, including arrays and objects._
 
@@ -802,7 +804,7 @@ const config = createConfig({
 });
 ```
 
-In order to configure `compression` more precisely, install the `@types/compression` package for assistance.
+In order to configure `compression` more precisely, ensure having `@types/compression` installed.
 
 ## Enabling HTTPS
 
@@ -830,9 +832,9 @@ const config = createConfig({
 const { app, httpServer, httpsServer, logger } = createServer(config, routing);
 ```
 
-Make sure to install the `@types/node` package for assistance. At least you need to specify the port or socket
-(usually it is 443), certificate and the key, issued by the certifying authority. For example, you can acquire a free
-TLS certificate for your API at [Let's Encrypt](https://letsencrypt.org/).
+Ensure having `@types/node` package installed. At least you need to specify the port or socket (usually it is 443),
+certificate and the key, issued by the certifying authority. For example, you can acquire a free TLS certificate for
+your API at [Let's Encrypt](https://letsencrypt.org/).
 
 ## Generating a Frontend Client
 
