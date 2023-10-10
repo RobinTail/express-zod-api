@@ -2,6 +2,12 @@
 
 ## Version 12
 
+### v12.5.1
+
+- Technical update before releasing next major version.
+- I also would like to remind you to upgrade your `zod` (peer dependency) to at least 3.22.3.
+  - Check out [the security advice](https://github.com/advisories/GHSA-m95q-7qp3-xv42) to find out why.
+
 ### v12.5.0
 
 - Featuring an ability to specify multiple server URLs when generating documentation.
