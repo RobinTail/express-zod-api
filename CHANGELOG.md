@@ -9,7 +9,6 @@
     - You might also need to install `@types/http-errors` if you're using `createHttpError` in your implementation.
   - `typescript` is a required peer dependency.
   - Minimum version of `zod` is 3.22.3.
-  - The following ones are optional peer dependencies: `@types/compression`, `@types/express-fileupload`, `@types/node`.
   - The class `DependsOnMethodError` is removed — catch `RoutingError` instead if needed.
 - **Potentially breaking changes**:
   - The type `FlatObject` changed from `Record<string, any>` to `Record<string, unknown>`.
@@ -18,6 +17,11 @@
     - Utilize the `request.body` within a custom `ResultHandler` in that case if needed.
   - The type of `ResultHandler`'s arguments `input` and `output` are changed from `any` to `FlatObject | null`.
 - Unlikely breaking changes:
+  - The following ones are optional peer dependencies for assistance in configuring particular features:
+    - `@types/compression` — for configuring compression feature,
+    - `@types/express-fileupload` — for configuring uploads feature,
+    - `@types/node` — for configuring HTTPS feature.
+    - Install them manually if you're using those features.
   - The property `DependsOnMethod::methods` is renamed to `endpoints`.
 
 ```typescript
