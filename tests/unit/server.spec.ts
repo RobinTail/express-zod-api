@@ -218,7 +218,7 @@ describe("Server", () => {
       );
       expect(appMock.use).toHaveBeenCalledTimes(4);
       expect(compressionMock).toHaveBeenCalledTimes(1);
-      expect(compressionMock).toHaveBeenCalledWith({});
+      expect(compressionMock).toHaveBeenCalledWith(undefined);
     });
 
     test("should enable uploads on request", () => {

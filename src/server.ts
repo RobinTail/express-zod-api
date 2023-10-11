@@ -86,7 +86,7 @@ export const createServer = (
       compression(
         typeof config.server.compression === "object"
           ? config.server.compression
-          : {},
+          : undefined,
       ),
     );
   }
