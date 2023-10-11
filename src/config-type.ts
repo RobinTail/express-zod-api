@@ -7,14 +7,8 @@ import { AbstractEndpoint } from "./endpoint";
 import { Method } from "./method";
 import { AnyResultHandlerDefinition } from "./result-handler";
 
-export const loggerLevels = {
-  silent: true,
-  warn: true,
-  debug: true,
-};
-
 export interface LoggerConfig {
-  level: keyof typeof loggerLevels;
+  level: "silent" | "warn" | "debug";
   color: boolean;
 }
 

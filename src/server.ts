@@ -5,7 +5,7 @@ import https from "node:https";
 import { Logger } from "winston";
 import { AppConfig, CommonConfig, ServerConfig } from "./config-type";
 import { ResultHandlerError } from "./errors";
-import { isLoggerConfig, makeErrorFromAnything } from "./common-helpers";
+import { makeErrorFromAnything } from "./common-helpers";
 import { createLogger } from "./logger";
 import {
   AnyResultHandlerDefinition,
@@ -60,9 +60,10 @@ export const createNotFoundHandler =
   };
 
 const makeCommonEntities = (config: CommonConfig) => {
-  const logger = isLoggerConfig(config.logger)
-    ? createLogger(config.logger)
-    : config.logger;
+  const logger =
+    config.logger instanceof Logger
+      ? config.logger
+      : createLogger(config.logger);
   const errorHandler = config.errorHandler || defaultResultHandler;
   const notFoundHandler = createNotFoundHandler(errorHandler, logger);
   return { logger, errorHandler, notFoundHandler };

@@ -3,13 +3,7 @@ import { isHttpError } from "http-errors";
 import { createHash } from "node:crypto";
 import { Logger } from "winston";
 import { z } from "zod";
-import {
-  CommonConfig,
-  InputSource,
-  InputSources,
-  LoggerConfig,
-  loggerLevels,
-} from "./config-type";
+import { CommonConfig, InputSource, InputSources } from "./config-type";
 import { InputValidationError, OutputValidationError } from "./errors";
 import { IOSchema } from "./io-schema";
 import { getMeta } from "./metadata";
@@ -74,15 +68,6 @@ export const getInput = (
       {},
     );
 };
-
-export const isLoggerConfig = (logger: unknown): logger is LoggerConfig =>
-  typeof logger === "object" &&
-  logger !== null &&
-  "level" in logger &&
-  typeof logger.level === "string" &&
-  Object.keys(loggerLevels).includes(logger.level) &&
-  "color" in logger &&
-  typeof logger.color === "boolean";
 
 export const isValidDate = (date: Date): boolean => !isNaN(date.getTime());
 
