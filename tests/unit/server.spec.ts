@@ -5,6 +5,7 @@ import {
   compressionMock,
   expressJsonMock,
   expressMock,
+  fileUploadMock,
 } from "../express-mock";
 import { Logger } from "winston";
 import { z } from "zod";
@@ -62,8 +63,7 @@ describe("Server", () => {
       expect(appMock).toBeTruthy();
       expect(appMock.disable).toHaveBeenCalledWith("x-powered-by");
       expect(appMock.use).toBeCalledTimes(3);
-      expect(Array.isArray(appMock.use.mock.calls[0][0])).toBeTruthy();
-      expect(appMock.use.mock.calls[0][0][0]).toBe(expressJsonMock);
+      expect(appMock.use.mock.calls[0][0]).toBe(expressJsonMock);
       expect(appMock.get).toBeCalledTimes(1);
       expect(appMock.get.mock.calls[0][0]).toBe("/v1/test");
       expect(appMock.post).toBeCalledTimes(1);
@@ -112,10 +112,7 @@ describe("Server", () => {
       expect(app).toEqual(appMock);
       expect(appMock).toBeTruthy();
       expect(appMock.use).toBeCalledTimes(3);
-      expect(Array.isArray(appMock.use.mock.calls[0][0])).toBeTruthy();
-      expect(appMock.use.mock.calls[0][0][0]).toBe(
-        configMock.server.jsonParser,
-      );
+      expect(appMock.use.mock.calls[0][0]).toBe(configMock.server.jsonParser);
       expect(configMock.errorHandler.handler).toBeCalledTimes(0);
       expect(configMock.logger.info).toBeCalledTimes(1);
       expect(configMock.logger.info).toBeCalledWith("Listening 8054");
@@ -219,8 +216,47 @@ describe("Server", () => {
         configMock as unknown as ServerConfig & CommonConfig,
         routingMock,
       );
+      expect(appMock.use).toHaveBeenCalledTimes(4);
       expect(compressionMock).toHaveBeenCalledTimes(1);
       expect(compressionMock).toHaveBeenCalledWith({});
+    });
+
+    test("should enable uploads on request", () => {
+      const configMock = {
+        server: {
+          listen: 8054,
+          jsonParser: jest.fn(),
+          upload: true,
+        },
+        cors: true,
+        startupLogo: false,
+        errorHandler: {
+          handler: jest.fn(),
+        },
+        logger: {
+          info: jest.fn(),
+        },
+      };
+      const routingMock = {
+        v1: {
+          test: new EndpointsFactory(defaultResultHandler).build({
+            method: "get",
+            input: z.object({}),
+            output: z.object({}),
+            handler: jest.fn(),
+          }),
+        },
+      };
+      createServer(
+        configMock as unknown as ServerConfig & CommonConfig,
+        routingMock,
+      );
+      expect(appMock.use).toHaveBeenCalledTimes(4);
+      expect(fileUploadMock).toHaveBeenCalledTimes(1);
+      expect(fileUploadMock).toHaveBeenCalledWith({
+        abortOnLimit: false,
+        parseNested: true,
+      });
     });
   });
 

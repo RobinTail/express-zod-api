@@ -1,4 +1,4 @@
-import express, { ErrorRequestHandler, RequestHandler, json } from "express";
+import express, { ErrorRequestHandler, RequestHandler } from "express";
 import compression from "compression";
 import fileUpload from "express-fileupload";
 import https from "node:https";
@@ -81,30 +81,30 @@ export const createServer = (
     : config.logger;
   const app = express();
   app.disable("x-powered-by");
-  const errorHandler = config.errorHandler || defaultResultHandler;
-  const compressor = config.server.compression
-    ? compression({
-        ...(typeof config.server.compression === "object"
+
+  if (config.server.compression) {
+    app.use(
+      compression(
+        typeof config.server.compression === "object"
           ? config.server.compression
-          : {}),
-      })
-    : undefined;
-  const jsonParser = config.server.jsonParser || json();
-  const multipartParser = config.server.upload
-    ? fileUpload({
+          : {},
+      ),
+    );
+  }
+  app.use(config.server.jsonParser || express.json());
+  if (config.server.upload) {
+    app.use(
+      fileUpload({
         ...(typeof config.server.upload === "object"
           ? config.server.upload
           : {}),
         abortOnLimit: false,
         parseNested: true,
-      })
-    : undefined;
+      }),
+    );
+  }
 
-  const middlewares = ([] as RequestHandler[])
-    .concat(compressor || [])
-    .concat(jsonParser)
-    .concat(multipartParser || []);
-  app.use(middlewares);
+  const errorHandler = config.errorHandler || defaultResultHandler;
   app.use(createParserFailureHandler(errorHandler, logger));
   initRouting({ app, routing, logger, config });
   app.use(createNotFoundHandler(errorHandler, logger));
