@@ -76,11 +76,7 @@ export const createServer = (
   config: ServerConfig & CommonConfig,
   routing: Routing,
 ) => {
-  const logger = isLoggerConfig(config.logger)
-    ? createLogger(config.logger)
-    : config.logger;
   const app = express().disable("x-powered-by");
-
   if (config.server.compression) {
     app.use(
       compression(
@@ -103,6 +99,9 @@ export const createServer = (
     );
   }
 
+  const logger = isLoggerConfig(config.logger)
+    ? createLogger(config.logger)
+    : config.logger;
   const errorHandler = config.errorHandler || defaultResultHandler;
   app.use(createParserFailureHandler(errorHandler, logger));
   initRouting({ app, routing, logger, config });
@@ -111,7 +110,6 @@ export const createServer = (
   const httpServer = app.listen(config.server.listen, () => {
     logger.info(`Listening ${config.server.listen}`);
   });
-
   let httpsServer: https.Server | undefined;
   if (config.https) {
     httpsServer = https
