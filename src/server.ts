@@ -79,8 +79,7 @@ export const createServer = (
   const logger = isLoggerConfig(config.logger)
     ? createLogger(config.logger)
     : config.logger;
-  const app = express();
-  app.disable("x-powered-by");
+  const app = express().disable("x-powered-by");
 
   if (config.server.compression) {
     app.use(

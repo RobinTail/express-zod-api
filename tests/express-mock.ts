@@ -17,8 +17,8 @@ let appMock: Record<
 
 const appCreatorMock = () => {
   appMock = {
-    disable: jest.fn(),
-    use: jest.fn(),
+    disable: jest.fn(() => appMock),
+    use: jest.fn(() => appMock),
     listen: jest.fn((port, cb) => {
       if (cb) {
         cb();
