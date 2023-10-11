@@ -3,7 +3,9 @@ import http from "node:http";
 
 const expressJsonMock = jest.fn();
 const compressionMock = jest.fn();
+const fileUploadMock = jest.fn();
 jest.mock("compression", () => compressionMock);
+jest.mock("express-fileupload", () => fileUploadMock);
 
 const staticHandler = jest.fn();
 const staticMock = jest.fn(() => staticHandler);
@@ -15,8 +17,8 @@ let appMock: Record<
 
 const appCreatorMock = () => {
   appMock = {
-    disable: jest.fn(),
-    use: jest.fn(),
+    disable: jest.fn(() => appMock),
+    use: jest.fn(() => appMock),
     listen: jest.fn((port, cb) => {
       if (cb) {
         cb();
@@ -36,6 +38,7 @@ const expressMock = jest.mock("express", () => appCreatorMock);
 
 export {
   compressionMock,
+  fileUploadMock,
   expressMock,
   appMock,
   expressJsonMock,
