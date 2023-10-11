@@ -59,16 +59,21 @@ export const createNotFoundHandler =
     }
   };
 
+const makeCommonEntities = (config: CommonConfig) => {
+  const logger = isLoggerConfig(config.logger)
+    ? createLogger(config.logger)
+    : config.logger;
+  const errorHandler = config.errorHandler || defaultResultHandler;
+  const notFoundHandler = createNotFoundHandler(errorHandler, logger);
+  return { logger, errorHandler, notFoundHandler };
+};
+
 export const attachRouting = (
   config: AppConfig & CommonConfig,
   routing: Routing,
 ) => {
-  const logger = isLoggerConfig(config.logger)
-    ? createLogger(config.logger)
-    : config.logger;
+  const { logger, notFoundHandler } = makeCommonEntities(config);
   initRouting({ app: config.app, routing, logger, config });
-  const errorHandler = config.errorHandler || defaultResultHandler;
-  const notFoundHandler = createNotFoundHandler(errorHandler, logger);
   return { notFoundHandler, logger };
 };
 
@@ -99,13 +104,10 @@ export const createServer = (
     );
   }
 
-  const logger = isLoggerConfig(config.logger)
-    ? createLogger(config.logger)
-    : config.logger;
-  const errorHandler = config.errorHandler || defaultResultHandler;
+  const { logger, errorHandler, notFoundHandler } = makeCommonEntities(config);
   app.use(createParserFailureHandler(errorHandler, logger));
   initRouting({ app, routing, logger, config });
-  app.use(createNotFoundHandler(errorHandler, logger));
+  app.use(notFoundHandler);
 
   const httpServer = app.listen(config.server.listen, () => {
     logger.info(`Listening ${config.server.listen}`);
