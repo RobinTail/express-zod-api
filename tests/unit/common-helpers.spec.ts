@@ -13,7 +13,6 @@ import {
   hasTopLevelTransformingEffect,
   hasUpload,
   isCustomHeader,
-  isLoggerConfig,
   isValidDate,
   makeErrorFromAnything,
 } from "../../src/common-helpers";
@@ -173,47 +172,6 @@ describe("Common Helpers", () => {
           { post: ["body", "headers"] },
         ),
       ).toEqual({ a: "body", "x-request-id": "test" });
-    });
-  });
-
-  describe("isLoggerConfig()", () => {
-    test("Should identify the valid logger config", () => {
-      expect(
-        isLoggerConfig({
-          level: "debug",
-          color: true,
-        }),
-      ).toBeTruthy();
-    });
-    test("Should reject the object with invalid properties", () => {
-      expect(
-        isLoggerConfig({
-          level: "something",
-          color: true,
-        }),
-      ).toBeFalsy();
-      expect(
-        isLoggerConfig({
-          level: "debug",
-          color: null,
-        }),
-      ).toBeFalsy();
-    });
-    test("Should reject the object with missing properties", () => {
-      expect(
-        isLoggerConfig({
-          level: "something",
-        }),
-      ).toBeFalsy();
-      expect(
-        isLoggerConfig({
-          color: null,
-        }),
-      ).toBeFalsy();
-    });
-    test("Should reject non-objects", () => {
-      expect(isLoggerConfig([1, 2, 3])).toBeFalsy();
-      expect(isLoggerConfig("something")).toBeFalsy();
     });
   });
 
