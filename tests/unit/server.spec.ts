@@ -1,5 +1,6 @@
 import http from "node:http";
 import https from "node:https";
+import { omit } from "ramda";
 import {
   appMock,
   compressionMock,
@@ -7,7 +8,7 @@ import {
   expressMock,
   fileUploadMock,
 } from "../express-mock";
-import winston, { Logger } from "winston";
+import winston from "winston";
 import { z } from "zod";
 import {
   EndpointsFactory,
@@ -262,16 +263,8 @@ describe("Server", () => {
 
   describe("createParserFailureHandler()", () => {
     test("the handler should call next if there is no error", () => {
-      const loggerMock = {
-        info: jest.fn(),
-        warn: jest.fn(),
-        error: jest.fn(),
-        debug: jest.fn(),
-      };
-      const handler = createParserFailureHandler(
-        defaultResultHandler,
-        loggerMock as unknown as Logger,
-      );
+      const logger = winston.createLogger({ silent: true });
+      const handler = createParserFailureHandler(defaultResultHandler, logger);
       const next = jest.fn();
       handler(
         undefined,
@@ -285,20 +278,12 @@ describe("Server", () => {
 
   describe("createNotFoundHandler()", () => {
     test("the handler should call ResultHandler with 404 error", () => {
-      const loggerMock = {
-        info: jest.fn(),
-        warn: jest.fn(),
-        error: jest.fn(),
-        debug: jest.fn(),
-      };
+      const logger = winston.createLogger({ silent: true });
       const resultHandler = {
         ...defaultResultHandler,
         handler: jest.fn(),
       };
-      const handler = createNotFoundHandler(
-        resultHandler,
-        loggerMock as unknown as Logger,
-      );
+      const handler = createNotFoundHandler(resultHandler, logger);
       const next = jest.fn();
       const requestMock = {
         method: "POST",
@@ -321,26 +306,23 @@ describe("Server", () => {
       );
       expect(next).toHaveBeenCalledTimes(0);
       expect(resultHandler.handler).toHaveBeenCalledTimes(1);
-      expect(resultHandler.handler.mock.calls[0]).toMatchSnapshot();
+      expect(resultHandler.handler.mock.calls[0]).toHaveLength(1);
+      expect(resultHandler.handler.mock.calls[0][0]).toHaveProperty("logger");
+      expect(resultHandler.handler.mock.calls[0][0].logger).toEqual(logger);
+      expect(
+        omit(["logger"], resultHandler.handler.mock.calls[0][0]),
+      ).toMatchSnapshot();
     });
 
     test("should call Last Resort Handler in case of ResultHandler is faulty", () => {
-      const loggerMock = {
-        info: jest.fn(),
-        warn: jest.fn(),
-        error: jest.fn(),
-        debug: jest.fn(),
-      };
+      const logger = winston.createLogger({ silent: true });
       const resultHandler = {
         ...defaultResultHandler,
         handler: jest.fn().mockImplementation(() => {
           throw new Error("I am faulty");
         }),
       };
-      const handler = createNotFoundHandler(
-        resultHandler,
-        loggerMock as unknown as Logger,
-      );
+      const handler = createNotFoundHandler(resultHandler, logger);
       const next = jest.fn();
       const requestMock = {
         method: "POST",
