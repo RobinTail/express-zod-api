@@ -994,9 +994,9 @@
     "@types/node" "*"
 
 "@types/compression@^1.7.3":
-  version "1.7.3"
-  resolved "https://registry.yarnpkg.com/@types/compression/-/compression-1.7.3.tgz#2dd34648fc3b71c95aacd63b3098b2192da33929"
-  integrity sha512-rKquEGjebqizyHNMOpaE/4FdYR5VQiWFeesqYfvJU0seSEyB4625UGhNOO/qIkH10S3wftiV7oefc8WdLZ/gCQ==
+  version "1.7.4"
+  resolved "https://registry.yarnpkg.com/@types/compression/-/compression-1.7.4.tgz#c1af4a0f2d72ea6c96300ae58b9842aa87d77b6e"
+  integrity sha512-sdFVnQJRkQBX83ydsLCBm4A39p45y0QkxdAR689yOtAFNbbS9Acrp86RZWJj6BHRXyZH9tX4t1dU7XDiGdY3nA==
   dependencies:
     "@types/express" "*"
 
