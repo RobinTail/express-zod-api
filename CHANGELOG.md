@@ -2,6 +2,10 @@
 
 ## Version 14
 
+### v14.0.1
+
+- Technical update: no new features, a bit of cleanup and refactoring.
+
 ### v14.0.0
 
 - **Breaking changes**:
