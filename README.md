@@ -612,7 +612,7 @@ const advancedUsage = defaultEndpointsFactory.use(auth(), {
 ## File uploads
 
 Install the following additional packages: `express-fileupload` and `@types/express-fileupload` and complete your
-configuration with the file uploader:
+configuration with a file uploader:
 
 ```typescript
 import fileUpload from "express-fileupload";
