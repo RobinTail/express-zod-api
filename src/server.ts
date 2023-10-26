@@ -14,6 +14,7 @@ import {
 } from "./result-handler";
 import { Routing, initRouting } from "./routing";
 import createHttpError from "http-errors";
+import process from "node:process";
 
 export const createParserFailureHandler =
   (
@@ -113,13 +114,24 @@ export const createServer = (
   const httpServer = app.listen(config.server.listen, () => {
     logger.info(`Listening ${config.server.listen}`);
   });
-  let httpsServer: https.Server | undefined;
-  if (config.https) {
-    httpsServer = https
-      .createServer(config.https.options, app)
-      .listen(config.https.listen, () => {
-        logger.info(`Listening ${config.https!.listen}`);
-      });
+  const httpsServer = config.https
+    ? https
+        .createServer(config.https.options, app)
+        .listen(config.https.listen, () => {
+          logger.info(`Listening ${config.https!.listen}`);
+        })
+    : undefined;
+
+  const terminator = (signal: NodeJS.Signals) => {
+    logger.info(`Closing by ${signal}...`);
+    const shutdowns = [new Promise((resolve) => httpServer.close(resolve))];
+    if (httpsServer) {
+      shutdowns.push(new Promise((resolve) => httpsServer.close(resolve)));
+    }
+    Promise.all(shutdowns).then(() => logger.info("Shutdown complete."));
+  };
+  for (const singal of ["SIGTERM", "SIGINT"] satisfies NodeJS.Signals[]) {
+    process.on(singal, terminator);
   }
 
   return { app, httpServer, httpsServer, logger };
