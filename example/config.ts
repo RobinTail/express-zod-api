@@ -1,10 +1,12 @@
+import compression from "compression";
+import fileUpload from "express-fileupload";
 import { createConfig } from "../src";
 
 export const config = createConfig({
   server: {
     listen: 8090,
-    upload: true,
-    compression: true, // affects sendAvatarEndpoint
+    uploader: fileUpload({ abortOnLimit: false, parseNested: true }),
+    compressor: compression(), // affects sendAvatarEndpoint
   },
   cors: true,
   logger: {

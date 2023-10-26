@@ -1,6 +1,4 @@
 import express, { ErrorRequestHandler, RequestHandler } from "express";
-import compression from "compression";
-import fileUpload from "express-fileupload";
 import https from "node:https";
 import { Logger } from "winston";
 import { AppConfig, CommonConfig, ServerConfig } from "./config-type";
@@ -83,26 +81,12 @@ export const createServer = (
   routing: Routing,
 ) => {
   const app = express().disable("x-powered-by");
-  if (config.server.compression) {
-    app.use(
-      compression(
-        typeof config.server.compression === "object"
-          ? config.server.compression
-          : undefined,
-      ),
-    );
+  if (config.server.compressor) {
+    app.use(config.server.compressor);
   }
   app.use(config.server.jsonParser || express.json());
-  if (config.server.upload) {
-    app.use(
-      fileUpload({
-        ...(typeof config.server.upload === "object"
-          ? config.server.upload
-          : {}),
-        abortOnLimit: false,
-        parseNested: true,
-      }),
-    );
+  if (config.server.uploader) {
+    app.use(config.server.uploader);
   }
 
   const { logger, errorHandler, notFoundHandler } = makeCommonEntities(config);
