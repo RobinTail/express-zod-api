@@ -620,12 +620,16 @@ import { createConfig } from "express-zod-api";
 
 const config = createConfig({
   server: {
-    uploader: fileUpload({ abortOnLimit: false, parseNested: true }),
-    // ...,
+    uploader: fileUpload({
+      // These options are required to operate normally:
+      abortOnLimit: false,
+      parseNested: true,
+    }),
   },
 });
 ```
 
+Refer to [documentation](https://www.npmjs.com/package/express-fileupload#available-options) on available options.
 Then you can switch the `Endpoint` to handle requests with the `multipart/form-data` content type instead of JSON by
 using `ez.upload()` schema. Together with a corresponding configuration option, this makes it possible to handle file
 uploads. Here is a simplified example:
