@@ -49,6 +49,12 @@ export interface ServerConfig {
      * @default false
      */
     compression?: boolean | CompressionOptions;
+    /**
+     * @desc Configure graceful shutdown signals
+     * @default ["SIGTERM", "SIGINT"]
+     * @example [] — empty array to disable
+     */
+    gracefulShutdownSignals?: NodeJS.Signals[];
   };
   /** @desc Enables HTTPS server as well. */
   https?: {

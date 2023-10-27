@@ -130,7 +130,8 @@ export const createServer = (
     }
     Promise.all(shutdowns).then(() => logger.info("Shutdown complete."));
   };
-  for (const singal of ["SIGTERM", "SIGINT"] satisfies NodeJS.Signals[]) {
+  for (const singal of config.server.gracefulShutdownSignals ||
+    (["SIGTERM", "SIGINT"] satisfies NodeJS.Signals[])) {
     process.on(singal, terminator);
   }
 
