@@ -1,5 +1,44 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`Example Client Should perform the request with a positive response 1`] = `
+{
+  "data": {
+    "features": [
+      {
+        "features": [
+          {
+            "features": [],
+            "title": "Above 180cm",
+          },
+        ],
+        "title": "Tall",
+      },
+      {
+        "features": [],
+        "title": "Young",
+      },
+      {
+        "features": [
+          {
+            "features": [
+              {
+                "features": [],
+                "title": "About Typescript",
+              },
+            ],
+            "title": "Tells funny jokes",
+          },
+        ],
+        "title": "Cute",
+      },
+    ],
+    "id": 10,
+    "name": "John Doe",
+  },
+  "status": "success",
+}
+`;
+
 exports[`Example Negative GET request should fail on missing input param 1`] = `
 {
   "error": {
