@@ -18,6 +18,7 @@ describe("ESM Test", () => {
     quickStart.stdout.removeListener("data", listener);
     quickStart.stderr.removeListener("data", listener);
     quickStart.kill();
+    await waitFor(() => quickStart.killed);
   });
 
   afterEach(() => {
