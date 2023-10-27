@@ -27,7 +27,7 @@ describe("Example", () => {
   afterAll(async () => {
     example.stdout.removeListener("data", listener);
     example.kill();
-    await waitFor(() => example.killed);
+    await waitFor(() => example.exitCode !== null);
   });
 
   afterEach(() => {
