@@ -9,7 +9,11 @@ describe("ESM Test", () => {
   };
 
   beforeAll(() => {
-    quickStart = spawn("yarn", ["start"], { cwd: "./tests/esm" });
+    quickStart = spawn(
+      "node",
+      ["--loader", "@swc-node/register/esm", "quick-start.ts"],
+      { cwd: "./tests/esm" },
+    );
     quickStart.stdout.on("data", listener);
     quickStart.stderr.on("data", listener);
   });
