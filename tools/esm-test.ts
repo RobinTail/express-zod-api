@@ -10,7 +10,7 @@ const packageJson = `
   "name": "express-zod-api-esm-test",
   "version": "1.0.0",
   "scripts": {
-    "postinstall": "node --loader @swc-node/register/esm fix-package.ts"
+    "postinstall": "cp dist.package.json node_modules/express-zod-api/package.json"
   },
   "type": "module",
   "dependencies": {
