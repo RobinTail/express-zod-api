@@ -23,6 +23,8 @@ import {
   createParserFailureHandler,
 } from "../../src/server";
 import express, { Request, Response } from "express"; // express is mocked in express-mock.ts
+import process from "node:process";
+import { waitFor } from "../helpers";
 
 describe("Server", () => {
   afterAll(() => {
@@ -73,6 +75,34 @@ describe("Server", () => {
       expect(appMock.options.mock.calls[0][0]).toBe("/v1/test");
       expect(appMock.listen).toBeCalledTimes(1);
       expect(appMock.listen.mock.calls[0][0]).toBe(8054);
+    });
+
+    test("Should set up a graceful shutdown", async () => {
+      const processSpy = jest.spyOn(process, "on");
+      const { logger: customLogger, httpServer } = createServer(
+        {
+          server: { listen: 8033 },
+          cors: true,
+          startupLogo: false,
+          logger: winston.createLogger({ silent: true }),
+        },
+        {},
+      );
+      const closeSpy = jest.spyOn(httpServer, "close");
+      const infoMock = jest.spyOn(customLogger, "info");
+      expect(processSpy).toHaveBeenCalledWith("SIGTERM", expect.any(Function));
+      expect(processSpy).toHaveBeenCalledWith("SIGINT", expect.any(Function));
+      const call = processSpy.mock.calls.find(
+        ([signal]) => signal === "SIGINT",
+      );
+      if (!call) {
+        fail(new Error("Should not be here"));
+      }
+      expect(typeof call[1]).toBe("function"); // terminator
+      call[1]("SIGINT");
+      expect(closeSpy).toHaveBeenCalledWith(expect.any(Function));
+      await waitFor(() => infoMock.mock.calls.length === 2);
+      expect(infoMock).toHaveBeenCalledWith("Shutdown complete.");
     });
 
     test("Should create server with custom JSON parser, logger and error handler", () => {
