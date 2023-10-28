@@ -9,7 +9,9 @@ describe("Integration Test", () => {
   };
 
   beforeAll(() => {
-    quickStart = spawn("yarn", ["start"], { cwd: "./tests/integration" });
+    quickStart = spawn("node", ["-r", "@swc-node/register", "quick-start.ts"], {
+      cwd: "./tests/integration",
+    });
     quickStart.stdout.on("data", listener);
     quickStart.stderr.on("data", listener);
   });

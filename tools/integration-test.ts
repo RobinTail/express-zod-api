@@ -9,9 +9,7 @@ const packageJson = `
   "name": "express-zod-api-integration-test",
   "version": "1.0.0",
   "scripts": {
-    "tsnode": "node -r @swc-node/register",
-    "postinstall": "yarn tsnode fix-package.ts",
-    "start": "yarn tsnode quick-start.ts"
+    "postinstall": "cp dist.package.json node_modules/express-zod-api/package.json"
   },
   "dependencies": {
     "@tsconfig/node${tsconfigBase}": "latest",
