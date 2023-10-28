@@ -4,7 +4,7 @@
   },
   "testEnvironment": "node",
   "verbose": true,
-  "forceExit": true,
+  "forceExit": false,
   "collectCoverage": true,
   "collectCoverageFrom": ["src/**"],
   "coverageReporters": ["json-summary", "text", "html", "lcov"],
