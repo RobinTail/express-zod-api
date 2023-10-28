@@ -1,6 +1,5 @@
 import { ChildProcessWithoutNullStreams, spawn } from "node:child_process";
 import { expectType } from "tsd";
-import { config } from "../../example/config";
 import {
   ExpressZodAPIClient,
   Implementation,
@@ -347,7 +346,7 @@ describe("Example", () => {
       };
 
     const client = new ExpressZodAPIClient(
-      createDefaultImplementation(`http://localhost:${config.server.listen}`),
+      createDefaultImplementation(`http://localhost:8090`),
     );
 
     test("Should perform the request with a positive response", async () => {
