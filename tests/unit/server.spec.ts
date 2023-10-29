@@ -1,12 +1,13 @@
-import http from "node:http";
-import https from "node:https";
 import { omit } from "ramda";
 import {
   appMock,
   compressionMock,
+  createHttpsServerSpy,
   expressJsonMock,
   expressMock,
   fileUploadMock,
+  httpServerListenSpy,
+  httpsServerListenSpy,
 } from "../express-mock";
 import winston from "winston";
 import { z } from "zod";
@@ -22,7 +23,8 @@ import {
   createNotFoundHandler,
   createParserFailureHandler,
 } from "../../src/server";
-import express, { Request, Response } from "express"; // express is mocked in express-mock.ts
+import express, { Request, Response } from "express";
+import { waitFor } from "../helpers";
 
 describe("Server", () => {
   afterAll(() => {
@@ -60,7 +62,7 @@ describe("Server", () => {
           }),
         },
       };
-      createServer(configMock, routingMock);
+      const { httpServer } = createServer(configMock, routingMock);
       expect(appMock).toBeTruthy();
       expect(appMock.disable).toHaveBeenCalledWith("x-powered-by");
       expect(appMock.use).toBeCalledTimes(3);
@@ -71,16 +73,20 @@ describe("Server", () => {
       expect(appMock.post.mock.calls[0][0]).toBe("/v1/test");
       expect(appMock.options).toBeCalledTimes(1);
       expect(appMock.options.mock.calls[0][0]).toBe("/v1/test");
-      expect(appMock.listen).toBeCalledTimes(1);
-      expect(appMock.listen.mock.calls[0][0]).toBe(8054);
+      expect(httpServerListenSpy).toBeCalledTimes(1);
+      expect(httpServerListenSpy).toHaveBeenCalledWith(
+        8054,
+        expect.any(Function),
+      );
+      httpServer.close();
     });
 
-    test("Should create server with custom JSON parser, logger and error handler", () => {
+    test("Should create server with custom JSON parser, logger and error handler", async () => {
       const customLogger = winston.createLogger({ silent: true });
       const infoMethod = jest.spyOn(customLogger, "info");
       const configMock = {
         server: {
-          listen: 8054,
+          listen: 8011,
           jsonParser: jest.fn(),
         },
         cors: true,
@@ -104,33 +110,37 @@ describe("Server", () => {
           }),
         },
       };
-      const { httpServer, logger, app } = createServer(
+      const { logger, app, httpServer } = createServer(
         configMock as unknown as ServerConfig & CommonConfig,
         routingMock,
       );
-      expect(httpServer).toBeInstanceOf(http.Server);
       expect(logger).toEqual(customLogger);
       expect(app).toEqual(appMock);
       expect(appMock).toBeTruthy();
       expect(appMock.use).toBeCalledTimes(3);
       expect(appMock.use.mock.calls[0][0]).toBe(configMock.server.jsonParser);
       expect(configMock.errorHandler.handler).toBeCalledTimes(0);
-      expect(infoMethod).toBeCalledTimes(1);
-      expect(infoMethod).toBeCalledWith("Listening 8054");
       expect(appMock.get).toBeCalledTimes(1);
       expect(appMock.get.mock.calls[0][0]).toBe("/v1/test");
       expect(appMock.post).toBeCalledTimes(1);
       expect(appMock.post.mock.calls[0][0]).toBe("/v1/test");
       expect(appMock.options).toBeCalledTimes(1);
       expect(appMock.options.mock.calls[0][0]).toBe("/v1/test");
-      expect(appMock.listen).toBeCalledTimes(1);
-      expect(appMock.listen.mock.calls[0][0]).toBe(8054);
+      expect(httpServerListenSpy).toBeCalledTimes(1);
+      expect(httpServerListenSpy).toHaveBeenCalledWith(
+        8011,
+        expect.any(Function),
+      );
+      await waitFor(() => infoMethod.mock.calls.length > 0);
+      expect(infoMethod).toBeCalledTimes(1);
+      expect(infoMethod).toBeCalledWith("Listening 8011");
+      httpServer.close();
     });
 
     test("should create a HTTPS server on request", () => {
       const configMock = {
         server: {
-          listen: 8054,
+          listen: 8056,
           jsonParser: jest.fn(),
         },
         https: {
@@ -159,38 +169,29 @@ describe("Server", () => {
           }),
         },
       };
-      let httpsServerMock: { listen: jest.Mock } | undefined = undefined;
-      jest.spyOn(https, "createServer").mockImplementation(() => {
-        httpsServerMock = {
-          listen: jest.fn((port, cb) => {
-            cb();
-            return httpsServerMock;
-          }),
-        };
-        return httpsServerMock as unknown as https.Server;
-      });
 
-      const { httpServer, httpsServer } = createServer(
+      const { httpsServer, httpServer } = createServer(
         configMock as unknown as ServerConfig & CommonConfig,
         routingMock,
       );
-      expect(httpServer).toBeInstanceOf(http.Server);
-      expect(httpsServer).toEqual(httpsServerMock);
-      expect(httpsServerMock).toBeTruthy();
-      expect(https.createServer).toHaveBeenCalledWith(
+      expect(httpsServer).toBeTruthy();
+      expect(createHttpsServerSpy).toHaveBeenCalledWith(
         configMock.https.options,
         appMock,
       );
-      expect(httpsServerMock!.listen).toBeCalledTimes(1);
-      expect(httpsServerMock!.listen.mock.calls[0][0]).toBe(
+      expect(httpsServerListenSpy).toBeCalledTimes(1);
+      expect(httpsServerListenSpy).toHaveBeenCalledWith(
         configMock.https.listen,
+        expect.any(Function),
       );
+      httpServer.close();
+      httpsServer!.close();
     });
 
     test("should enable compression on request", () => {
       const configMock = {
         server: {
-          listen: 8054,
+          listen: 8057,
           jsonParser: jest.fn(),
           compression: true,
         },
@@ -213,19 +214,20 @@ describe("Server", () => {
           }),
         },
       };
-      createServer(
+      const { httpServer } = createServer(
         configMock as unknown as ServerConfig & CommonConfig,
         routingMock,
       );
       expect(appMock.use).toHaveBeenCalledTimes(4);
       expect(compressionMock).toHaveBeenCalledTimes(1);
       expect(compressionMock).toHaveBeenCalledWith(undefined);
+      httpServer.close();
     });
 
     test("should enable uploads on request", () => {
       const configMock = {
         server: {
-          listen: 8054,
+          listen: 8058,
           jsonParser: jest.fn(),
           upload: true,
         },
@@ -248,7 +250,7 @@ describe("Server", () => {
           }),
         },
       };
-      createServer(
+      const { httpServer } = createServer(
         configMock as unknown as ServerConfig & CommonConfig,
         routingMock,
       );
@@ -258,6 +260,7 @@ describe("Server", () => {
         abortOnLimit: false,
         parseNested: true,
       });
+      httpServer.close();
     });
   });
 
@@ -393,16 +396,12 @@ describe("Server", () => {
       expect(appMock.use).toBeCalledTimes(0);
       expect(configMock.errorHandler.handler).toBeCalledTimes(0);
       expect(infoMethod).toBeCalledTimes(0);
-      expect(appMock.listen).toBeCalledTimes(0);
       expect(appMock.get).toBeCalledTimes(1);
       expect(appMock.get.mock.calls[0][0]).toBe("/v1/test");
       expect(appMock.post).toBeCalledTimes(1);
       expect(appMock.post.mock.calls[0][0]).toBe("/v1/test");
       expect(appMock.options).toBeCalledTimes(1);
       expect(appMock.options.mock.calls[0][0]).toBe("/v1/test");
-      app.listen(8054);
-      expect(appMock.listen).toBeCalledTimes(1);
-      expect(appMock.listen.mock.calls[0][0]).toBe(8054);
     });
   });
 });
