@@ -62,7 +62,7 @@ describe("Server", () => {
           }),
         },
       };
-      const { httpServer } = createServer(configMock, routingMock);
+      createServer(configMock, routingMock);
       expect(appMock).toBeTruthy();
       expect(appMock.disable).toHaveBeenCalledWith("x-powered-by");
       expect(appMock.use).toBeCalledTimes(3);
@@ -78,7 +78,6 @@ describe("Server", () => {
         8054,
         expect.any(Function),
       );
-      httpServer.close();
     });
 
     test("Should create server with custom JSON parser, logger and error handler", async () => {
@@ -110,7 +109,7 @@ describe("Server", () => {
           }),
         },
       };
-      const { logger, app, httpServer } = createServer(
+      const { logger, app } = createServer(
         configMock as unknown as ServerConfig & CommonConfig,
         routingMock,
       );
@@ -134,7 +133,6 @@ describe("Server", () => {
       await waitFor(() => infoMethod.mock.calls.length > 0);
       expect(infoMethod).toBeCalledTimes(1);
       expect(infoMethod).toBeCalledWith("Listening 8011");
-      httpServer.close();
     });
 
     test("should create a HTTPS server on request", () => {
@@ -170,7 +168,7 @@ describe("Server", () => {
         },
       };
 
-      const { httpsServer, httpServer } = createServer(
+      const { httpsServer } = createServer(
         configMock as unknown as ServerConfig & CommonConfig,
         routingMock,
       );
@@ -184,8 +182,6 @@ describe("Server", () => {
         configMock.https.listen,
         expect.any(Function),
       );
-      httpServer.close();
-      httpsServer!.close();
     });
 
     test("should enable compression on request", () => {
@@ -214,14 +210,13 @@ describe("Server", () => {
           }),
         },
       };
-      const { httpServer } = createServer(
+      createServer(
         configMock as unknown as ServerConfig & CommonConfig,
         routingMock,
       );
       expect(appMock.use).toHaveBeenCalledTimes(4);
       expect(compressionMock).toHaveBeenCalledTimes(1);
       expect(compressionMock).toHaveBeenCalledWith(undefined);
-      httpServer.close();
     });
 
     test("should enable uploads on request", () => {
@@ -250,7 +245,7 @@ describe("Server", () => {
           }),
         },
       };
-      const { httpServer } = createServer(
+      createServer(
         configMock as unknown as ServerConfig & CommonConfig,
         routingMock,
       );
@@ -260,7 +255,6 @@ describe("Server", () => {
         abortOnLimit: false,
         parseNested: true,
       });
-      httpServer.close();
     });
   });
 
