@@ -162,8 +162,7 @@ describe("App", () => {
   });
 
   describe("Positive", () => {
-    test("Is listening", async () => {
-      await waitFor(() => server.listening);
+    test("Is listening", () => {
       expect(server.listening).toBeTruthy();
     });
 
