@@ -14,12 +14,13 @@ import {
 import { expectType } from "tsd";
 import { mimeJson } from "../../src/mime";
 import { z } from "zod";
+import { givePort } from "../helpers";
 
 describe("Documentation generator", () => {
   const sampleConfig = createConfig({
     cors: true,
     logger: { level: "debug", color: true },
-    server: { listen: 8090 },
+    server: { listen: givePort() },
   });
 
   describe("getSpecAsYaml()", () => {

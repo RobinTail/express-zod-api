@@ -1,6 +1,7 @@
 import express, { ErrorRequestHandler, RequestHandler } from "express";
 import compression from "compression";
 import fileUpload from "express-fileupload";
+import http from "node:http";
 import https from "node:https";
 import { Logger } from "winston";
 import { AppConfig, CommonConfig, ServerConfig } from "./config-type";
@@ -110,17 +111,22 @@ export const createServer = (
   initRouting({ app, routing, logger, config });
   app.use(notFoundHandler);
 
-  const httpServer = app.listen(config.server.listen, () => {
-    logger.info(`Listening ${config.server.listen}`);
-  });
-  let httpsServer: https.Server | undefined;
-  if (config.https) {
-    httpsServer = https
-      .createServer(config.https.options, app)
-      .listen(config.https.listen, () => {
-        logger.info(`Listening ${config.https!.listen}`);
-      });
+  const servers = {
+    httpServer: http.createServer(app),
+    httpsServer: config.https
+      ? https.createServer(config.https.options, app)
+      : undefined,
+  } satisfies Record<string, http.Server | https.Server | undefined>;
+
+  for (const server of Object.values(servers)) {
+    const port =
+      server instanceof https.Server
+        ? config.https!.listen
+        : config.server.listen;
+    server?.listen(port, () => {
+      logger.info(`Listening ${port}`);
+    });
   }
 
-  return { app, httpServer, httpsServer, logger };
+  return { app, ...servers, logger };
 };

@@ -1,5 +1,5 @@
 import { readFileSync, writeFileSync } from "node:fs";
-import { esmTestPort } from "../tests/helpers";
+import { givePort } from "../tests/helpers";
 import { extractReadmeQuickStart } from "./extract-quick-start";
 import { getTSConfigBase } from "./tsconfig-base";
 
@@ -47,7 +47,10 @@ if (!tsParts) {
   throw new Error("Can not find typescript code samples");
 }
 
-const quickStart = extractReadmeQuickStart().replace(/8090/g, `${esmTestPort}`);
+const quickStart = extractReadmeQuickStart().replace(
+  /8090/g,
+  `${givePort("esm")}`,
+);
 
 const dir = "./tests/esm";
 writeFileSync(`${dir}/package.json`, packageJson.trim());
