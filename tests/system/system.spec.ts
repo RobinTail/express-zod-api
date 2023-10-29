@@ -9,9 +9,10 @@ import {
   createServer,
   defaultResultHandler,
 } from "../../src";
-import { waitFor } from "../helpers";
+import { givePort, waitFor } from "../helpers";
 
 describe("App", () => {
+  const port = givePort();
   let server: Server;
 
   beforeAll(() => {
@@ -137,7 +138,7 @@ describe("App", () => {
     server = createServer(
       {
         server: {
-          listen: 8099,
+          listen: port,
           compression: { threshold: 1 },
         },
         cors: false,
@@ -168,7 +169,7 @@ describe("App", () => {
 
     test("Should handle valid GET request", async () => {
       const response = await fetch(
-        "http://127.0.0.1:8099/v1/test?key=123&something=joke",
+        `http://127.0.0.1:${port}/v1/test?key=123&something=joke`,
       );
       expect(response.status).toBe(200);
       const json = await response.json();
@@ -185,7 +186,7 @@ describe("App", () => {
     });
 
     test("Should handle valid POST request", async () => {
-      const response = await fetch("http://127.0.0.1:8099/v1/test", {
+      const response = await fetch(`http://127.0.0.1:${port}/v1/test`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -211,7 +212,7 @@ describe("App", () => {
 
     test("Issue 158: should use query for POST on demand", async () => {
       const response = await fetch(
-        "http://127.0.0.1:8099/v1/test?key=123&something=joke",
+        `http://127.0.0.1:${port}/v1/test?key=123&something=joke`,
         {
           method: "POST",
           headers: {
@@ -235,7 +236,7 @@ describe("App", () => {
 
     test("Should compress the response in case it is supported by client", async () => {
       const response = await fetch(
-        "http://127.0.0.1:8099/v1/test?key=123&something=joke",
+        `http://127.0.0.1:${port}/v1/test?key=123&something=joke`,
         {
           headers: {
             "Accept-Encoding": "gzip, deflate",
@@ -250,7 +251,7 @@ describe("App", () => {
     });
 
     test("Should execute native express middleware", async () => {
-      const response = await fetch("http://127.0.0.1:8099/v1/corsed", {
+      const response = await fetch(`http://127.0.0.1:${port}/v1/corsed`, {
         method: "GET",
       });
       expect(response.status).toBe(200);
@@ -270,7 +271,7 @@ describe("App", () => {
 
   describe("Negative", () => {
     test("Should call Last Resort Handler in case of faulty ResultHandler", async () => {
-      const response = await fetch("http://127.0.0.1:8099/v1/faulty", {
+      const response = await fetch(`http://127.0.0.1:${port}/v1/faulty`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -285,7 +286,7 @@ describe("App", () => {
 
     test("Should treat custom errors in middleware input validations as they are", async () => {
       const response = await fetch(
-        "http://127.0.0.1:8099/v1/faulty?mwError=1",
+        `http://127.0.0.1:${port}/v1/faulty?mwError=1`,
         {
           method: "GET",
           headers: {
@@ -303,7 +304,7 @@ describe("App", () => {
 
     test("Should treat custom errors in middleware input validations as they are", async () => {
       const response = await fetch(
-        "http://127.0.0.1:8099/v1/faulty?epError=1",
+        `http://127.0.0.1:${port}/v1/faulty?epError=1`,
         {
           method: "GET",
           headers: {
@@ -322,7 +323,7 @@ describe("App", () => {
 
   describe("Protocol", () => {
     test("Should fail on invalid method", async () => {
-      const response = await fetch("http://127.0.0.1:8099/v1/test", {
+      const response = await fetch(`http://127.0.0.1:${port}/v1/test`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -338,7 +339,7 @@ describe("App", () => {
     });
 
     test("Should fail on malformed body", async () => {
-      const response = await fetch("http://127.0.0.1:8099/v1/test", {
+      const response = await fetch(`http://127.0.0.1:${port}/v1/test`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -358,7 +359,7 @@ describe("App", () => {
     });
 
     test("Should fail when missing content type header", async () => {
-      const response = await fetch("http://127.0.0.1:8099/v1/test", {
+      const response = await fetch(`http://127.0.0.1:${port}/v1/test`, {
         method: "POST",
         body: JSON.stringify({
           key: "123",
@@ -373,7 +374,7 @@ describe("App", () => {
 
   describe("Validation", () => {
     test("Should fail on middleware input type mismatch", async () => {
-      const response = await fetch("http://127.0.0.1:8099/v1/test", {
+      const response = await fetch(`http://127.0.0.1:${port}/v1/test`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -389,7 +390,7 @@ describe("App", () => {
     });
 
     test("Should fail on middleware refinement mismatch", async () => {
-      const response = await fetch("http://127.0.0.1:8099/v1/test", {
+      const response = await fetch(`http://127.0.0.1:${port}/v1/test`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -405,7 +406,7 @@ describe("App", () => {
     });
 
     test("Should fail on handler input type mismatch", async () => {
-      const response = await fetch("http://127.0.0.1:8099/v1/test", {
+      const response = await fetch(`http://127.0.0.1:${port}/v1/test`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -421,7 +422,7 @@ describe("App", () => {
     });
 
     test("Should fail on handler output type mismatch", async () => {
-      const response = await fetch("http://127.0.0.1:8099/v1/test", {
+      const response = await fetch(`http://127.0.0.1:${port}/v1/test`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -437,7 +438,7 @@ describe("App", () => {
     });
 
     test("Problem 787: Should NOT treat ZodError thrown from within the handler as IOSchema validation error", async () => {
-      const response = await fetch("http://127.0.0.1:8099/v1/test", {
+      const response = await fetch(`http://127.0.0.1:${port}/v1/test`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

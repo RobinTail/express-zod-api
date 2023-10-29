@@ -2,7 +2,20 @@ import jestConfig from "../jest.config.json";
 import { z } from "zod";
 import { SchemaHandler, walkSchema } from "../src/schema-walker";
 
-export const esmTestPort = 8070;
+let lastGivenPort = 8010;
+const reservedPorts = {
+  esm: 8070,
+  example: 8090,
+};
+export const givePort = (test?: keyof typeof reservedPorts) => {
+  if (test && reservedPorts[test]) {
+    return reservedPorts[test];
+  }
+  do {
+    lastGivenPort++;
+  } while (Object.values(reservedPorts).includes(lastGivenPort));
+  return lastGivenPort;
+};
 
 export const waitFor = async (cb: () => boolean) =>
   new Promise((resolve, reject) => {

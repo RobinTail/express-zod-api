@@ -1,4 +1,5 @@
 import { omit } from "ramda";
+import { givePort } from "../helpers";
 import {
   createHttpsServerSpy,
   httpListenSpy,
@@ -38,9 +39,10 @@ describe("Server", () => {
 
   describe("createServer()", () => {
     test("Should create server with minimal config", () => {
+      const port = givePort();
       const configMock: ServerConfig & CommonConfig = {
         server: {
-          listen: 8054,
+          listen: port,
         },
         cors: true,
         startupLogo: false,
@@ -75,15 +77,16 @@ describe("Server", () => {
       expect(appMock.options).toBeCalledTimes(1);
       expect(appMock.options.mock.calls[0][0]).toBe("/v1/test");
       expect(httpListenSpy).toBeCalledTimes(1);
-      expect(httpListenSpy).toHaveBeenCalledWith(8054, expect.any(Function));
+      expect(httpListenSpy).toHaveBeenCalledWith(port, expect.any(Function));
     });
 
     test("Should create server with custom JSON parser, logger and error handler", () => {
       const customLogger = winston.createLogger({ silent: true });
       const infoMethod = jest.spyOn(customLogger, "info");
+      const port = givePort();
       const configMock = {
         server: {
-          listen: 8011,
+          listen: port,
           jsonParser: jest.fn(),
         },
         cors: true,
@@ -118,7 +121,7 @@ describe("Server", () => {
       expect(appMock.use.mock.calls[0][0]).toBe(configMock.server.jsonParser);
       expect(configMock.errorHandler.handler).toBeCalledTimes(0);
       expect(infoMethod).toBeCalledTimes(1);
-      expect(infoMethod).toBeCalledWith("Listening 8011");
+      expect(infoMethod).toBeCalledWith(`Listening ${port}`);
       expect(appMock.get).toBeCalledTimes(1);
       expect(appMock.get.mock.calls[0][0]).toBe("/v1/test");
       expect(appMock.post).toBeCalledTimes(1);
@@ -126,17 +129,17 @@ describe("Server", () => {
       expect(appMock.options).toBeCalledTimes(1);
       expect(appMock.options.mock.calls[0][0]).toBe("/v1/test");
       expect(httpListenSpy).toBeCalledTimes(1);
-      expect(httpListenSpy).toHaveBeenCalledWith(8011, expect.any(Function));
+      expect(httpListenSpy).toHaveBeenCalledWith(port, expect.any(Function));
     });
 
     test("should create a HTTPS server on request", () => {
       const configMock = {
         server: {
-          listen: 8056,
+          listen: givePort(),
           jsonParser: jest.fn(),
         },
         https: {
-          listen: 8443,
+          listen: givePort(),
           options: {
             cert: "cert",
             key: "key",
@@ -181,7 +184,7 @@ describe("Server", () => {
     test("should enable compression on request", () => {
       const configMock = {
         server: {
-          listen: 8057,
+          listen: givePort(),
           jsonParser: jest.fn(),
           compression: true,
         },
@@ -216,7 +219,7 @@ describe("Server", () => {
     test("should enable uploads on request", () => {
       const configMock = {
         server: {
-          listen: 8058,
+          listen: givePort(),
           jsonParser: jest.fn(),
           upload: true,
         },
