@@ -26,7 +26,6 @@ import {
   createParserFailureHandler,
 } from "../../src/server";
 import express, { Request, Response } from "express";
-import { waitFor } from "../helpers";
 
 describe("Server", () => {
   afterAll(() => {
@@ -79,7 +78,7 @@ describe("Server", () => {
       expect(httpListenSpy).toHaveBeenCalledWith(8054, expect.any(Function));
     });
 
-    test("Should create server with custom JSON parser, logger and error handler", async () => {
+    test("Should create server with custom JSON parser, logger and error handler", () => {
       const customLogger = winston.createLogger({ silent: true });
       const infoMethod = jest.spyOn(customLogger, "info");
       const configMock = {
@@ -118,6 +117,8 @@ describe("Server", () => {
       expect(appMock.use).toBeCalledTimes(3);
       expect(appMock.use.mock.calls[0][0]).toBe(configMock.server.jsonParser);
       expect(configMock.errorHandler.handler).toBeCalledTimes(0);
+      expect(infoMethod).toBeCalledTimes(1);
+      expect(infoMethod).toBeCalledWith("Listening 8011");
       expect(appMock.get).toBeCalledTimes(1);
       expect(appMock.get.mock.calls[0][0]).toBe("/v1/test");
       expect(appMock.post).toBeCalledTimes(1);
@@ -126,9 +127,6 @@ describe("Server", () => {
       expect(appMock.options.mock.calls[0][0]).toBe("/v1/test");
       expect(httpListenSpy).toBeCalledTimes(1);
       expect(httpListenSpy).toHaveBeenCalledWith(8011, expect.any(Function));
-      await waitFor(() => infoMethod.mock.calls.length > 0);
-      expect(infoMethod).toBeCalledTimes(1);
-      expect(infoMethod).toBeCalledWith("Listening 8011");
     });
 
     test("should create a HTTPS server on request", () => {
