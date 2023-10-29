@@ -1,5 +1,5 @@
 import cors from "cors";
-import http from "node:http";
+import type { Server } from "node:http";
 import { z } from "zod";
 import {
   EndpointsFactory,
@@ -12,7 +12,7 @@ import {
 import { waitFor } from "../helpers";
 
 describe("App", () => {
-  let server: http.Server;
+  let server: Server;
 
   beforeAll(() => {
     const routing = {

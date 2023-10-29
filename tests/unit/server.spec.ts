@@ -1,13 +1,15 @@
 import { omit } from "ramda";
 import {
+  createHttpsServerSpy,
+  httpListenSpy,
+  httpsListenSpy,
+} from "../http-mock";
+import {
   appMock,
   compressionMock,
-  createHttpsServerSpy,
   expressJsonMock,
   expressMock,
   fileUploadMock,
-  httpServerListenSpy,
-  httpsServerListenSpy,
 } from "../express-mock";
 import winston from "winston";
 import { z } from "zod";
@@ -73,11 +75,8 @@ describe("Server", () => {
       expect(appMock.post.mock.calls[0][0]).toBe("/v1/test");
       expect(appMock.options).toBeCalledTimes(1);
       expect(appMock.options.mock.calls[0][0]).toBe("/v1/test");
-      expect(httpServerListenSpy).toBeCalledTimes(1);
-      expect(httpServerListenSpy).toHaveBeenCalledWith(
-        8054,
-        expect.any(Function),
-      );
+      expect(httpListenSpy).toBeCalledTimes(1);
+      expect(httpListenSpy).toHaveBeenCalledWith(8054, expect.any(Function));
     });
 
     test("Should create server with custom JSON parser, logger and error handler", async () => {
@@ -125,11 +124,8 @@ describe("Server", () => {
       expect(appMock.post.mock.calls[0][0]).toBe("/v1/test");
       expect(appMock.options).toBeCalledTimes(1);
       expect(appMock.options.mock.calls[0][0]).toBe("/v1/test");
-      expect(httpServerListenSpy).toBeCalledTimes(1);
-      expect(httpServerListenSpy).toHaveBeenCalledWith(
-        8011,
-        expect.any(Function),
-      );
+      expect(httpListenSpy).toBeCalledTimes(1);
+      expect(httpListenSpy).toHaveBeenCalledWith(8011, expect.any(Function));
       await waitFor(() => infoMethod.mock.calls.length > 0);
       expect(infoMethod).toBeCalledTimes(1);
       expect(infoMethod).toBeCalledWith("Listening 8011");
@@ -177,8 +173,8 @@ describe("Server", () => {
         configMock.https.options,
         appMock,
       );
-      expect(httpsServerListenSpy).toBeCalledTimes(1);
-      expect(httpsServerListenSpy).toHaveBeenCalledWith(
+      expect(httpsListenSpy).toBeCalledTimes(1);
+      expect(httpsListenSpy).toHaveBeenCalledWith(
         configMock.https.listen,
         expect.any(Function),
       );

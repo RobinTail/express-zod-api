@@ -1,6 +1,4 @@
 // @see https://github.com/swc-project/jest/issues/14#issuecomment-970189585
-import http from "node:http";
-import https from "node:https";
 
 const expressJsonMock = jest.fn();
 const compressionMock = jest.fn();
@@ -28,34 +26,6 @@ appCreatorMock.static = staticMock;
 
 const expressMock = jest.mock("express", () => appCreatorMock);
 
-const actualCreateHttpServer = http.createServer;
-const actualCreateHttpsServer = https.createServer;
-
-let httpServerListenSpy: jest.SpyInstance;
-let httpsServerListenSpy: jest.SpyInstance;
-jest.spyOn(http, "createServer").mockImplementation((app) => {
-  const server = actualCreateHttpServer(app);
-  httpServerListenSpy = jest
-    .spyOn(server, "listen")
-    .mockImplementation((port, cb) => {
-      cb?.call(null);
-      return server;
-    });
-  return server;
-});
-const createHttpsServerSpy = jest
-  .spyOn(https, "createServer")
-  .mockImplementation((options, app) => {
-    const server = actualCreateHttpsServer(app);
-    httpsServerListenSpy = jest
-      .spyOn(server, "listen")
-      .mockImplementation((port, cb) => {
-        cb?.call(null);
-        return server;
-      });
-    return server;
-  });
-
 export {
   compressionMock,
   fileUploadMock,
@@ -64,7 +34,4 @@ export {
   expressJsonMock,
   staticMock,
   staticHandler,
-  httpServerListenSpy,
-  createHttpsServerSpy,
-  httpsServerListenSpy,
 };
