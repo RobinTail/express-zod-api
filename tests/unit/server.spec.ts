@@ -21,7 +21,7 @@ import {
   createServer,
   defaultResultHandler,
 } from "../../src";
-import { AppConfig, CommonConfig, ServerConfig } from "../../src/config-type";
+import { AppConfig, ServerConfig } from "../../src/config-type";
 import { mimeJson } from "../../src/mime";
 import {
   createNotFoundHandler,
@@ -41,7 +41,7 @@ describe("Server", () => {
   describe("createServer()", () => {
     test("Should create server with minimal config", () => {
       const port = givePort();
-      const configMock: ServerConfig & CommonConfig = {
+      const configMock: ServerConfig = {
         server: {
           listen: port,
         },
@@ -112,7 +112,7 @@ describe("Server", () => {
         },
       };
       const { logger, app } = createServer(
-        configMock as unknown as ServerConfig & CommonConfig,
+        configMock as unknown as ServerConfig,
         routingMock,
       );
       expect(logger).toEqual(customLogger);
@@ -161,10 +161,7 @@ describe("Server", () => {
         },
       };
 
-      const { httpsServer } = createServer(
-        configMock as unknown as ServerConfig & CommonConfig,
-        routingMock,
-      );
+      const { httpsServer } = createServer(configMock, routingMock);
       expect(httpsServer).toBeTruthy();
       expect(createHttpsServerSpy).toHaveBeenCalledWith(
         configMock.https.options,
@@ -197,10 +194,7 @@ describe("Server", () => {
           }),
         },
       };
-      createServer(
-        configMock as unknown as ServerConfig & CommonConfig,
-        routingMock,
-      );
+      createServer(configMock, routingMock);
       expect(appMock.use).toHaveBeenCalledTimes(4);
       expect(compressionMock).toHaveBeenCalledTimes(1);
       expect(compressionMock).toHaveBeenCalledWith(undefined);
@@ -226,10 +220,7 @@ describe("Server", () => {
           }),
         },
       };
-      createServer(
-        configMock as unknown as ServerConfig & CommonConfig,
-        routingMock,
-      );
+      createServer(configMock, routingMock);
       expect(appMock.use).toHaveBeenCalledTimes(4);
       expect(fileUploadMock).toHaveBeenCalledTimes(1);
       expect(fileUploadMock).toHaveBeenCalledWith({
@@ -259,10 +250,7 @@ describe("Server", () => {
           }),
         },
       };
-      createServer(
-        configMock as unknown as ServerConfig & CommonConfig,
-        routingMock,
-      );
+      createServer(configMock, routingMock);
       expect(appMock.use).toHaveBeenCalledTimes(5);
       const rawPropMw = appMock.use.mock.calls[2][0]; // custom middleware for raw
       expect(typeof rawPropMw).toBe("function");
@@ -400,7 +388,7 @@ describe("Server", () => {
         },
       };
       const { logger, notFoundHandler } = attachRouting(
-        configMock as unknown as AppConfig & CommonConfig,
+        configMock as unknown as AppConfig,
         routingMock,
       );
       expect(logger).toEqual(customLogger);

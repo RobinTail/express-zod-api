@@ -70,19 +70,13 @@ const makeCommonEntities = (config: CommonConfig) => {
   return { logger, errorHandler, notFoundHandler };
 };
 
-export const attachRouting = (
-  config: AppConfig & CommonConfig,
-  routing: Routing,
-) => {
+export const attachRouting = (config: AppConfig, routing: Routing) => {
   const { logger, notFoundHandler } = makeCommonEntities(config);
   initRouting({ app: config.app, routing, logger, config });
   return { notFoundHandler, logger };
 };
 
-export const createServer = (
-  config: ServerConfig & CommonConfig,
-  routing: Routing,
-) => {
+export const createServer = (config: ServerConfig, routing: Routing) => {
   const app = express().disable("x-powered-by");
   if (config.server.compression) {
     app.use(
