@@ -1,7 +1,11 @@
-import http from "node:http";
-import https from "node:https";
 import { omit } from "ramda";
+import { givePort } from "../helpers";
 import { appMock, expressJsonMock, expressMock } from "../express-mock";
+import {
+  createHttpsServerSpy,
+  httpListenSpy,
+  httpsListenSpy,
+} from "../http-mock";
 import winston from "winston";
 import { z } from "zod";
 import {
@@ -16,7 +20,7 @@ import {
   createNotFoundHandler,
   createParserFailureHandler,
 } from "../../src/server";
-import express, { Request, Response } from "express"; // express is mocked in express-mock.ts
+import express, { Request, Response } from "express";
 
 describe("Server", () => {
   afterAll(() => {
@@ -29,9 +33,10 @@ describe("Server", () => {
 
   describe("createServer()", () => {
     test("Should create server with minimal config", () => {
+      const port = givePort();
       const configMock: ServerConfig & CommonConfig = {
         server: {
-          listen: 8054,
+          listen: port,
         },
         cors: true,
         startupLogo: false,
@@ -65,16 +70,17 @@ describe("Server", () => {
       expect(appMock.post.mock.calls[0][0]).toBe("/v1/test");
       expect(appMock.options).toBeCalledTimes(1);
       expect(appMock.options.mock.calls[0][0]).toBe("/v1/test");
-      expect(appMock.listen).toBeCalledTimes(1);
-      expect(appMock.listen.mock.calls[0][0]).toBe(8054);
+      expect(httpListenSpy).toBeCalledTimes(1);
+      expect(httpListenSpy).toHaveBeenCalledWith(port, expect.any(Function));
     });
 
     test("Should create server with custom JSON parser, logger and error handler", () => {
       const customLogger = winston.createLogger({ silent: true });
       const infoMethod = jest.spyOn(customLogger, "info");
+      const port = givePort();
       const configMock = {
         server: {
-          listen: 8054,
+          listen: port,
           jsonParser: jest.fn(),
         },
         cors: true,
@@ -98,11 +104,10 @@ describe("Server", () => {
           }),
         },
       };
-      const { httpServer, logger, app } = createServer(
+      const { logger, app } = createServer(
         configMock as unknown as ServerConfig & CommonConfig,
         routingMock,
       );
-      expect(httpServer).toBeInstanceOf(http.Server);
       expect(logger).toEqual(customLogger);
       expect(app).toEqual(appMock);
       expect(appMock).toBeTruthy();
@@ -110,25 +115,25 @@ describe("Server", () => {
       expect(appMock.use.mock.calls[0][0]).toBe(configMock.server.jsonParser);
       expect(configMock.errorHandler.handler).toBeCalledTimes(0);
       expect(infoMethod).toBeCalledTimes(1);
-      expect(infoMethod).toBeCalledWith("Listening 8054");
+      expect(infoMethod).toBeCalledWith(`Listening ${port}`);
       expect(appMock.get).toBeCalledTimes(1);
       expect(appMock.get.mock.calls[0][0]).toBe("/v1/test");
       expect(appMock.post).toBeCalledTimes(1);
       expect(appMock.post.mock.calls[0][0]).toBe("/v1/test");
       expect(appMock.options).toBeCalledTimes(1);
       expect(appMock.options.mock.calls[0][0]).toBe("/v1/test");
-      expect(appMock.listen).toBeCalledTimes(1);
-      expect(appMock.listen.mock.calls[0][0]).toBe(8054);
+      expect(httpListenSpy).toBeCalledTimes(1);
+      expect(httpListenSpy).toHaveBeenCalledWith(port, expect.any(Function));
     });
 
     test("should create a HTTPS server on request", () => {
       const configMock = {
         server: {
-          listen: 8054,
+          listen: givePort(),
           jsonParser: jest.fn(),
         },
         https: {
-          listen: 8443,
+          listen: givePort(),
           options: {
             cert: "cert",
             key: "key",
@@ -153,31 +158,20 @@ describe("Server", () => {
           }),
         },
       };
-      let httpsServerMock: { listen: jest.Mock } | undefined = undefined;
-      jest.spyOn(https, "createServer").mockImplementation(() => {
-        httpsServerMock = {
-          listen: jest.fn((port, cb) => {
-            cb();
-            return httpsServerMock;
-          }),
-        };
-        return httpsServerMock as unknown as https.Server;
-      });
 
-      const { httpServer, httpsServer } = createServer(
+      const { httpsServer } = createServer(
         configMock as unknown as ServerConfig & CommonConfig,
         routingMock,
       );
-      expect(httpServer).toBeInstanceOf(http.Server);
-      expect(httpsServer).toEqual(httpsServerMock);
-      expect(httpsServerMock).toBeTruthy();
-      expect(https.createServer).toHaveBeenCalledWith(
+      expect(httpsServer).toBeTruthy();
+      expect(createHttpsServerSpy).toHaveBeenCalledWith(
         configMock.https.options,
         appMock,
       );
-      expect(httpsServerMock!.listen).toBeCalledTimes(1);
-      expect(httpsServerMock!.listen.mock.calls[0][0]).toBe(
+      expect(httpsListenSpy).toBeCalledTimes(1);
+      expect(httpsListenSpy).toHaveBeenCalledWith(
         configMock.https.listen,
+        expect.any(Function),
       );
     });
 
@@ -185,7 +179,7 @@ describe("Server", () => {
       const compressionMock = jest.fn();
       const configMock = {
         server: {
-          listen: 8054,
+          listen: givePort(),
           jsonParser: jest.fn(),
           compressor: compressionMock,
         },
@@ -220,7 +214,7 @@ describe("Server", () => {
       const fileUploadMock = jest.fn();
       const configMock = {
         server: {
-          listen: 8054,
+          listen: givePort(),
           jsonParser: jest.fn(),
           uploader: fileUploadMock,
         },
@@ -384,16 +378,12 @@ describe("Server", () => {
       expect(appMock.use).toBeCalledTimes(0);
       expect(configMock.errorHandler.handler).toBeCalledTimes(0);
       expect(infoMethod).toBeCalledTimes(0);
-      expect(appMock.listen).toBeCalledTimes(0);
       expect(appMock.get).toBeCalledTimes(1);
       expect(appMock.get.mock.calls[0][0]).toBe("/v1/test");
       expect(appMock.post).toBeCalledTimes(1);
       expect(appMock.post.mock.calls[0][0]).toBe("/v1/test");
       expect(appMock.options).toBeCalledTimes(1);
       expect(appMock.options.mock.calls[0][0]).toBe("/v1/test");
-      app.listen(8054);
-      expect(appMock.listen).toBeCalledTimes(1);
-      expect(appMock.listen.mock.calls[0][0]).toBe(8054);
     });
   });
 });

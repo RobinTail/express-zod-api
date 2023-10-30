@@ -34,6 +34,10 @@ export const config = createConfig({
 
 ## Version 14
 
+### v14.0.2
+
+- Refactoring: consistent implementation for creating and starting HTTP and HTTPS servers in `createServer()` method.
+
 ### v14.0.1
 
 - Technical update: no new features, a bit of cleanup and refactoring.

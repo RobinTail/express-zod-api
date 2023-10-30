@@ -1,5 +1,5 @@
 import { ChildProcessWithoutNullStreams, spawn } from "node:child_process";
-import { esmTestPort, waitFor } from "../helpers";
+import { givePort, waitFor } from "../helpers";
 
 describe("ESM Test", () => {
   let quickStart: ChildProcessWithoutNullStreams;
@@ -7,9 +7,14 @@ describe("ESM Test", () => {
   const listener = (chunk: Buffer) => {
     out += chunk.toString();
   };
+  const port = givePort("esm");
 
   beforeAll(() => {
-    quickStart = spawn("yarn", ["start"], { cwd: "./tests/esm" });
+    quickStart = spawn(
+      "node",
+      ["--loader", "@swc-node/register/esm", "quick-start.ts"],
+      { cwd: "./tests/esm" },
+    );
     quickStart.stdout.on("data", listener);
     quickStart.stderr.on("data", listener);
   });
@@ -28,13 +33,13 @@ describe("ESM Test", () => {
 
   describe("Quick Start from Readme", () => {
     test("Should listen", async () => {
-      await waitFor(() => out.indexOf(`Listening ${esmTestPort}`) > -1);
+      await waitFor(() => out.indexOf(`Listening ${port}`) > -1);
       expect(true).toBeTruthy();
     });
 
     test("Should handle valid GET request", async () => {
       const response = await fetch(
-        `http://localhost:${esmTestPort}/v1/hello?name=Rick`,
+        `http://localhost:${port}/v1/hello?name=Rick`,
       );
       expect(response.status).toBe(200);
       const json = await response.json();

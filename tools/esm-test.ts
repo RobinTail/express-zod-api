@@ -1,5 +1,5 @@
 import { readFileSync, writeFileSync } from "node:fs";
-import { esmTestPort } from "../tests/helpers";
+import { givePort } from "../tests/helpers";
 import { extractReadmeQuickStart } from "./extract-quick-start";
 import { getTSConfigBase } from "./tsconfig-base";
 
@@ -10,9 +10,7 @@ const packageJson = `
   "name": "express-zod-api-esm-test",
   "version": "1.0.0",
   "scripts": {
-    "tsnode": "node --loader @swc-node/register/esm",
-    "postinstall": "yarn tsnode fix-package.ts",
-    "start": "yarn tsnode quick-start.ts"
+    "postinstall": "cp dist.package.json node_modules/express-zod-api/package.json"
   },
   "type": "module",
   "dependencies": {
@@ -49,7 +47,10 @@ if (!tsParts) {
   throw new Error("Can not find typescript code samples");
 }
 
-const quickStart = extractReadmeQuickStart().replace(/8090/g, `${esmTestPort}`);
+const quickStart = extractReadmeQuickStart().replace(
+  /8090/g,
+  `${givePort("esm")}`,
+);
 
 const dir = "./tests/esm";
 writeFileSync(`${dir}/package.json`, packageJson.trim());

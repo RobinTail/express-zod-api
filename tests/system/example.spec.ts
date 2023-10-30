@@ -1,6 +1,12 @@
 import { ChildProcessWithoutNullStreams, spawn } from "node:child_process";
+import { expectType } from "tsd";
+import {
+  ExpressZodAPIClient,
+  Implementation,
+  jsonEndpoints,
+} from "../../example/example.client";
 import { mimeMultipart } from "../../src/mime";
-import { waitFor } from "../helpers";
+import { givePort, waitFor } from "../helpers";
 import { createHash } from "node:crypto";
 import FormData from "form-data";
 import { readFile } from "node:fs/promises";
@@ -11,6 +17,7 @@ describe("Example", () => {
   const listener = (chunk: Buffer) => {
     out += chunk.toString();
   };
+  const port = givePort("example");
 
   beforeAll(() => {
     example = spawn("node", ["-r", "@swc-node/register", "example/index.ts"]);
@@ -29,12 +36,12 @@ describe("Example", () => {
 
   describe("Positive", () => {
     test("Should listen", async () => {
-      await waitFor(() => /Listening 8090/.test(out));
+      await waitFor(() => out.indexOf(`Listening ${port}`) > -1);
       expect(true).toBeTruthy();
     });
 
     test("Should handle OPTIONS request", async () => {
-      const response = await fetch("http://localhost:8090/v1/user/100", {
+      const response = await fetch(`http://localhost:${port}/v1/user/100`, {
         method: "OPTIONS",
       });
       expect(response.status).toBe(200);
@@ -54,7 +61,7 @@ describe("Example", () => {
     });
 
     test("Should handle valid POST request", async () => {
-      const response = await fetch("http://localhost:8090/v1/user/50", {
+      const response = await fetch(`http://localhost:${port}/v1/user/50`, {
         method: "POST",
         headers: {
           token: "456",
@@ -82,7 +89,7 @@ describe("Example", () => {
 
     test("Should handle valid GET request", async () => {
       const response = await fetch(
-        "http://localhost:8090/v1/user/retrieve?test=123&id=50",
+        `http://localhost:${port}/v1/user/retrieve?test=123&id=50`,
       );
       expect(response.status).toBe(200);
       const json = await response.json();
@@ -115,7 +122,7 @@ describe("Example", () => {
     });
 
     test("Should respond with array (legacy API ResultHandler)", async () => {
-      const response = await fetch("http://localhost:8090/v1/user/list");
+      const response = await fetch(`http://localhost:${port}/v1/user/list`);
       expect(response.status).toBe(200);
       const json = await response.json();
       expect(json).toEqual([
@@ -132,7 +139,7 @@ describe("Example", () => {
 
     test("Should send an image with a correct header", async () => {
       const response = await fetch(
-        "http://localhost:8090/v1/avatar/send?userId=123",
+        `http://localhost:${port}/v1/avatar/send?userId=123`,
       );
       expect(response.status).toBe(200);
       expect(response.headers.has("Content-type")).toBeTruthy();
@@ -151,7 +158,7 @@ describe("Example", () => {
 
     test("Should stream an image with a correct header", async () => {
       const response = await fetch(
-        "http://localhost:8090/v1/avatar/stream?userId=123",
+        `http://localhost:${port}/v1/avatar/stream?userId=123`,
       );
       expect(response.status).toBe(200);
       expect(response.headers.has("Content-type")).toBeTruthy();
@@ -165,7 +172,7 @@ describe("Example", () => {
     });
 
     test("Should serve static files", async () => {
-      const response = await fetch("http://localhost:8090/public/logo.svg");
+      const response = await fetch(`http://localhost:${port}/public/logo.svg`);
       expect(response.status).toBe(200);
       expect(response.headers.get("Content-type")).toBe("image/svg+xml");
       const hash = createHash("sha1")
@@ -184,13 +191,16 @@ describe("Example", () => {
       data.append("arr[0]", 456);
       data.append("arr[1]", 789);
       data.append("obj[some]", "thing");
-      const response = await fetch("http://localhost:8090/v1/avatar/upload", {
-        method: "POST",
-        headers: {
-          "Content-Type": `${mimeMultipart}; boundary=${data.getBoundary()}`,
+      const response = await fetch(
+        `http://localhost:${port}/v1/avatar/upload`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": `${mimeMultipart}; boundary=${data.getBoundary()}`,
+          },
+          body: data.getBuffer().toString("utf8"),
         },
-        body: data.getBuffer().toString("utf8"),
-      });
+      );
       const json = await response.json();
       expect(json).toMatchSnapshot();
     });
@@ -199,7 +209,7 @@ describe("Example", () => {
   describe("Negative", () => {
     test("GET request should fail on missing input param", async () => {
       const response = await fetch(
-        "http://localhost:8090/v1/user/retrieve?test=123",
+        `http://localhost:${port}/v1/user/retrieve?test=123`,
       );
       expect(response.status).toBe(400);
       const json = await response.json();
@@ -208,7 +218,7 @@ describe("Example", () => {
 
     test("GET request should fail on specific value in handler implementation", async () => {
       const response = await fetch(
-        "http://localhost:8090/v1/user/retrieve?test=123&id=101",
+        `http://localhost:${port}/v1/user/retrieve?test=123&id=101`,
       );
       expect(response.status).toBe(404);
       const json = await response.json();
@@ -223,7 +233,7 @@ describe("Example", () => {
     });
 
     test("POST request should fail on auth middleware key check", async () => {
-      const response = await fetch("http://localhost:8090/v1/user/50", {
+      const response = await fetch(`http://localhost:${port}/v1/user/50`, {
         method: "POST",
         headers: {
           token: "456",
@@ -246,7 +256,7 @@ describe("Example", () => {
     });
 
     test("POST request should fail on auth middleware token check", async () => {
-      const response = await fetch("http://localhost:8090/v1/user/50", {
+      const response = await fetch(`http://localhost:${port}/v1/user/50`, {
         method: "POST",
         headers: {
           token: "123",
@@ -269,7 +279,7 @@ describe("Example", () => {
     });
 
     test("POST request should fail on schema validation", async () => {
-      const response = await fetch("http://localhost:8090/v1/user/-50", {
+      const response = await fetch(`http://localhost:${port}/v1/user/-50`, {
         method: "POST",
         headers: {
           token: "456",
@@ -287,7 +297,7 @@ describe("Example", () => {
     });
 
     test("POST request should fail on specific value in handler implementation", async () => {
-      const response = await fetch("http://localhost:8090/v1/user/101", {
+      const response = await fetch(`http://localhost:${port}/v1/user/101`, {
         method: "POST",
         headers: {
           token: "456",
@@ -310,12 +320,50 @@ describe("Example", () => {
     });
 
     test("Should respond with error to the missing static file request", async () => {
-      const response = await fetch("http://localhost:8090/public/missing.svg");
+      const response = await fetch(
+        `http://localhost:${port}/public/missing.svg`,
+      );
       expect(response.status).toBe(404);
       expect(response.headers.get("Content-type")).toBe(
         "application/json; charset=utf-8",
       );
       expect(await response.json()).toMatchSnapshot();
+    });
+  });
+
+  describe("Client", () => {
+    const createDefaultImplementation =
+      (host: string): Implementation =>
+      async (method, path, params) => {
+        const searchParams =
+          method === "get" ? `?${new URLSearchParams(params)}` : "";
+        const response = await fetch(`${host}${path}${searchParams}`, {
+          method: method.toUpperCase(),
+          headers:
+            method === "get"
+              ? undefined
+              : { "Content-Type": "application/json" },
+          body: method === "get" ? undefined : JSON.stringify(params),
+        });
+        if (`${method} ${path}` in jsonEndpoints) {
+          return response.json();
+        }
+        return response.text();
+      };
+
+    const client = new ExpressZodAPIClient(
+      createDefaultImplementation(`http://localhost:${port}`),
+    );
+
+    test("Should perform the request with a positive response", async () => {
+      const response = await client.provide("get", "/v1/user/retrieve", {
+        id: "10",
+      });
+      expect(response).toMatchSnapshot();
+      expectType<
+        | { status: "success"; data: { id: number; name: string } }
+        | { status: "error"; error: { message: string } }
+      >(response);
     });
   });
 });

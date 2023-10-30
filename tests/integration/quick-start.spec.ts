@@ -1,5 +1,5 @@
 import { ChildProcessWithoutNullStreams, spawn } from "node:child_process";
-import { waitFor } from "../helpers";
+import { givePort, waitFor } from "../helpers";
 
 describe("Integration Test", () => {
   let quickStart: ChildProcessWithoutNullStreams;
@@ -7,9 +7,12 @@ describe("Integration Test", () => {
   const listener = (chunk: Buffer) => {
     out += chunk.toString();
   };
+  const port = givePort("example");
 
   beforeAll(() => {
-    quickStart = spawn("yarn", ["start"], { cwd: "./tests/integration" });
+    quickStart = spawn("node", ["-r", "@swc-node/register", "quick-start.ts"], {
+      cwd: "./tests/integration",
+    });
     quickStart.stdout.on("data", listener);
     quickStart.stderr.on("data", listener);
   });
@@ -28,12 +31,14 @@ describe("Integration Test", () => {
 
   describe("Quick Start from Readme", () => {
     test("Should listen", async () => {
-      await waitFor(() => /Listening 8090/.test(out));
+      await waitFor(() => out.indexOf(`Listening ${port}`) > -1);
       expect(true).toBeTruthy();
     });
 
     test("Should handle valid GET request", async () => {
-      const response = await fetch("http://localhost:8090/v1/hello?name=Rick");
+      const response = await fetch(
+        `http://localhost:${port}/v1/hello?name=Rick`,
+      );
       expect(response.status).toBe(200);
       const json = await response.json();
       expect(json).toEqual({

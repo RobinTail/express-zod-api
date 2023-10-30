@@ -1,6 +1,6 @@
 {
   "name": "express-zod-api",
-  "version": "14.0.1",
+  "version": "14.0.2",
   "description": "A Typescript library to help you get an API server up and running with I/O schema validation and custom middlewares in minutes.",
   "license": "MIT",
   "scripts": {
@@ -20,7 +20,7 @@
     "test:esm": "jest ./tests/esm",
     "test:u": "yarn test:jest -u && yarn test:badge",
     "test:types": "tsc --noEmit",
-    "test:jest": "jest --detectOpenHandles ./tests/unit ./tests/system",
+    "test:jest": "jest ./tests/unit ./tests/system",
     "test:badge": "make-coverage-badge --output-path ./coverage.svg",
     "lint": "eslint src example tests tools && yarn prettier *.md --check",
     "mdfix": "prettier *.md --write",
@@ -103,7 +103,7 @@
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-import": "^2.28.1",
     "eslint-plugin-prettier": "^5.0.0",
-    "eslint-plugin-unicorn": "^48.0.1",
+    "eslint-plugin-unicorn": "^49.0.0",
     "express": "^4.18.2",
     "express-fileupload": "^1.4.1",
     "form-data": "^4.0.0",
