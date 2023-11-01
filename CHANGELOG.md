@@ -2,6 +2,31 @@
 
 ## Version 14
 
+### v14.1.0
+
+- Featuring an ability to configure `host` and other listening options when using `createServer()` method.
+  - The `listen` property now supports object of type `ListenOptions`.
+  - Ensure having `@types/node` installed for assistance.
+  - Find out more about those options
+    [in Node.js documentation](https://nodejs.org/dist/latest-v20.x/docs/api/net.html#serverlistenoptions-callback).
+  - Thanks to [@huyhoang160593](https://github.com/huyhoang160593) for noticing the lack of configurability.
+
+```typescript
+import { createConfig } from "express-zod-api";
+
+createConfig({
+  server: {
+    // example usage:
+    listen: {
+      port: 8080,
+      host: "custom",
+      backlog: 200,
+      ipv6Only: true,
+    },
+  },
+});
+```
+
 ### v14.0.3
 
 - Fixed issue #1269 reported by [@alindsay55661](https://github.com/alindsay55661):
