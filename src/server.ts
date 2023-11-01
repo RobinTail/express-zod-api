@@ -119,12 +119,16 @@ export const createServer = (
   } satisfies Record<string, http.Server | https.Server | undefined>;
 
   for (const server of Object.values(servers)) {
-    const port =
+    const listeningSubject =
       server instanceof https.Server
         ? config.https!.listen
         : config.server.listen;
-    server?.listen(port, () => {
-      logger.info(`Listening ${port}`);
+    server?.listen(listeningSubject, () => {
+      if (typeof listeningSubject === "object") {
+        logger.info("Listening", listeningSubject);
+      } else {
+        logger.info(`Listening ${listeningSubject}`);
+      }
     });
   }
 
