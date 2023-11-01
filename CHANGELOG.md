@@ -2,6 +2,11 @@
 
 ## Version 14
 
+### v14.0.3
+
+- Fixed issue #1269 reported by [@alindsay55661](https://github.com/alindsay55661):
+  - `TS4023: Exported variable ... has or is using name Metadata from external module ... but cannot be named.`
+
 ### v14.0.2
 
 - Refactoring: consistent implementation for creating and starting HTTP and HTTPS servers in `createServer()` method.
