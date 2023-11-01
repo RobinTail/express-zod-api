@@ -124,7 +124,11 @@ export const createServer = (
         ? config.https!.listen
         : config.server.listen;
     server?.listen(listeningSubject, () => {
-      logger.info(`Listening ${listeningSubject}`);
+      if (typeof listeningSubject === "object") {
+        logger.info("Listening", listeningSubject);
+      } else {
+        logger.info(`Listening ${listeningSubject}`);
+      }
     });
   }
 
