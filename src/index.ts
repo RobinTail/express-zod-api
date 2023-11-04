@@ -37,7 +37,8 @@ export { Integration } from "./integration";
 
 export * as ez from "./proprietary-schemas";
 
-// Issues 952 and 1182: Insufficient exports for consumer's declaration
+// Issues 952, 1182, 1269: Insufficient exports for consumer's declaration
+export type { Metadata } from "./metadata";
 export type { ZodDateInDef } from "./date-in-schema";
 export type { ZodDateOutDef } from "./date-out-schema";
 export type { ZodFileDef } from "./file-schema";

@@ -4,6 +4,7 @@ import { Logger } from "winston";
 import { AbstractEndpoint } from "./endpoint";
 import { Method } from "./method";
 import { AnyResultHandlerDefinition } from "./result-handler";
+import { ListenOptions } from "node:net";
 
 export interface LoggerConfig {
   level: "silent" | "warn" | "debug";
@@ -13,8 +14,8 @@ export interface LoggerConfig {
 export interface ServerConfig {
   /** @desc Server configuration. */
   server: {
-    /** @desc Port or socket. */
-    listen: number | string;
+    /** @desc Port, UNIX socket or custom options. */
+    listen: number | string | ListenOptions;
     /**
      * @desc Custom JSON parser.
      * @default express.json()
@@ -39,8 +40,8 @@ export interface ServerConfig {
   https?: {
     /** @desc At least "cert" and "key" options required. */
     options: ServerOptions;
-    /** @desc Port or socket. */
-    listen: number | string;
+    /** @desc Port, UNIX socket or custom options. */
+    listen: number | string | ListenOptions;
   };
 }
 

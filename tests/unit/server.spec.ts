@@ -80,7 +80,7 @@ describe("Server", () => {
       const port = givePort();
       const configMock = {
         server: {
-          listen: port,
+          listen: { port }, // testing Net::ListenOptions
           jsonParser: jest.fn(),
         },
         cors: true,
@@ -115,7 +115,7 @@ describe("Server", () => {
       expect(appMock.use.mock.calls[0][0]).toBe(configMock.server.jsonParser);
       expect(configMock.errorHandler.handler).toBeCalledTimes(0);
       expect(infoMethod).toBeCalledTimes(1);
-      expect(infoMethod).toBeCalledWith(`Listening ${port}`);
+      expect(infoMethod).toBeCalledWith(`Listening`, { port });
       expect(appMock.get).toBeCalledTimes(1);
       expect(appMock.get.mock.calls[0][0]).toBe("/v1/test");
       expect(appMock.post).toBeCalledTimes(1);
@@ -123,7 +123,10 @@ describe("Server", () => {
       expect(appMock.options).toBeCalledTimes(1);
       expect(appMock.options.mock.calls[0][0]).toBe("/v1/test");
       expect(httpListenSpy).toBeCalledTimes(1);
-      expect(httpListenSpy).toHaveBeenCalledWith(port, expect.any(Function));
+      expect(httpListenSpy).toHaveBeenCalledWith(
+        { port },
+        expect.any(Function),
+      );
     });
 
     test("should create a HTTPS server on request", () => {

@@ -135,7 +135,7 @@ import { createConfig } from "express-zod-api";
 
 const config = createConfig({
   server: {
-    listen: 8090, // port or socket
+    listen: 8090, // port, UNIX socket or options
   },
   cors: true,
   logger: {
@@ -827,7 +827,7 @@ const config = createConfig({
       cert: fs.readFileSync("fullchain.pem", "utf-8"),
       key: fs.readFileSync("privkey.pem", "utf-8"),
     },
-    listen: 443, // port or socket
+    listen: 443, // port, UNIX socket or options
   },
   // ... cors, logger, etc
 });
@@ -835,7 +835,7 @@ const config = createConfig({
 const { app, httpServer, httpsServer, logger } = createServer(config, routing);
 ```
 
-Ensure having `@types/node` package installed. At least you need to specify the port or socket (usually it is 443),
+Ensure having `@types/node` package installed. At least you need to specify the port (usually it is 443) or UNIX socket,
 certificate and the key, issued by the certifying authority. For example, you can acquire a free TLS certificate for
 your API at [Let's Encrypt](https://letsencrypt.org/).
 
