@@ -5,27 +5,40 @@ import { CommonConfig } from "./config-type";
 import { AbstractEndpoint } from "./endpoint";
 import { mimeJson } from "./mime";
 
-interface TestEndpointProps<REQ, RES, LOG> {
+type MockFunction = <S>(implementation?: (...args: unknown[]) => unknown) => S;
+
+interface TestEndpointProps<REQ, RES, LOG, FN extends MockFunction> {
   endpoint: AbstractEndpoint;
   requestProps?: REQ;
   responseProps?: RES;
   configProps?: Partial<CommonConfig>;
   loggerProps?: LOG;
-  /** @deprecated for testing purposes only */
-  __noJest?: boolean;
+  mockFn: FN; // jest.fn or vi.fn
 }
 
-export const makeRequestMock = <REQ>(requestProps?: REQ) =>
+export const makeRequestMock = <REQ, FN extends MockFunction>({
+  mockFn,
+  requestProps,
+}: {
+  mockFn: FN;
+  requestProps?: REQ;
+}) =>
   <
-    { method: string } & Record<"header", jest.Mock> &
+    { method: string } & Record<"header", ReturnType<FN>> &
       (REQ extends undefined ? {} : REQ)
   >{
     method: "GET",
-    header: jest.fn(() => mimeJson),
+    header: mockFn(() => mimeJson),
     ...requestProps,
   };
 
-export const makeResponseMock = <RES>(responseProps?: RES) => {
+export const makeResponseMock = <RES, FN extends MockFunction>({
+  mockFn,
+  responseProps,
+}: {
+  mockFn: FN;
+  responseProps?: RES;
+}) => {
   const responseMock = <
     {
       writableEnded: boolean;
@@ -33,24 +46,26 @@ export const makeResponseMock = <RES>(responseProps?: RES) => {
       statusMessage: string;
     } & Record<
       "set" | "setHeader" | "header" | "status" | "json" | "send" | "end",
-      jest.Mock
+      ReturnType<FN>
     > &
       (RES extends undefined ? {} : RES)
   >{
     writableEnded: false,
     statusCode: 200,
     statusMessage: http.STATUS_CODES[200],
-    set: jest.fn(() => responseMock),
-    setHeader: jest.fn(() => responseMock),
-    header: jest.fn(() => responseMock),
-    status: jest.fn((code: number) => {
-      responseMock.statusCode = code;
-      responseMock.statusMessage = http.STATUS_CODES[code]!;
+    set: mockFn(() => responseMock),
+    setHeader: mockFn(() => responseMock),
+    header: mockFn(() => responseMock),
+    status: mockFn((code) => {
+      if (typeof code === "number") {
+        responseMock.statusCode = code;
+        responseMock.statusMessage = http.STATUS_CODES[code]!;
+      }
       return responseMock;
     }),
-    json: jest.fn(() => responseMock),
-    send: jest.fn(() => responseMock),
-    end: jest.fn(() => {
+    json: mockFn(() => responseMock),
+    send: mockFn(() => responseMock),
+    end: mockFn(() => {
       responseMock.writableEnded = true;
       return responseMock;
     }),
@@ -60,9 +75,10 @@ export const makeResponseMock = <RES>(responseProps?: RES) => {
 };
 
 /**
- * @description You need to install Jest and probably @types/jest to use this method
+ * @description You need to install Jest or Vitest to use this feature
  */
 export const testEndpoint = async <
+  FN extends MockFunction,
   REQ extends Partial<Record<keyof Request, any>> | undefined = undefined,
   RES extends Partial<Record<keyof Response, any>> | undefined = undefined,
   LOG extends Partial<Record<keyof Logger, any>> | undefined = undefined,
@@ -72,21 +88,18 @@ export const testEndpoint = async <
   responseProps,
   configProps,
   loggerProps,
-  __noJest,
-}: TestEndpointProps<REQ, RES, LOG>) => {
-  if (!jest || __noJest) {
-    throw new Error("You need to install Jest in order to use testEndpoint().");
-  }
-  const requestMock = makeRequestMock(requestProps);
-  const responseMock = makeResponseMock(responseProps);
+  mockFn,
+}: TestEndpointProps<REQ, RES, LOG, FN>) => {
+  const requestMock = makeRequestMock({ mockFn, requestProps });
+  const responseMock = makeResponseMock({ mockFn, responseProps });
   const loggerMock = <
-    Record<"info" | "warn" | "error" | "debug", jest.Mock> &
+    Record<"info" | "warn" | "error" | "debug", ReturnType<FN>> &
       (LOG extends undefined ? {} : LOG)
   >{
-    info: jest.fn(),
-    warn: jest.fn(),
-    error: jest.fn(),
-    debug: jest.fn(),
+    info: mockFn(),
+    warn: mockFn(),
+    error: mockFn(),
+    debug: mockFn(),
     ...loggerProps,
   };
   const configMock = {
