@@ -68,7 +68,7 @@ type GetV1AvatarStreamInput = {
   userId: string;
 };
 
-type GetV1AvatarStreamResponse = string | string;
+type GetV1AvatarStreamResponse = Buffer | string;
 
 type PostV1AvatarUploadInput = {
   avatar: any;
@@ -92,7 +92,7 @@ type PostV1AvatarUploadResponse =
       };
     };
 
-type PostV1AvatarRawInput = string;
+type PostV1AvatarRawInput = Buffer;
 
 type PostV1AvatarRawResponse =
   | {
