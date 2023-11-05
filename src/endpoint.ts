@@ -13,21 +13,23 @@ import {
   FlatObject,
   getActualMethod,
   getInput,
+  hasNestedSchema,
   hasTopLevelTransformingEffect,
-  hasUpload,
   makeErrorFromAnything,
 } from "./common-helpers";
 import { IOSchema } from "./io-schema";
 import { LogicalContainer, combineContainers } from "./logical-container";
 import { AuxMethod, Method } from "./method";
 import { AnyMiddlewareDef } from "./middleware";
-import { mimeJson, mimeMultipart } from "./mime";
+import { mimeJson, mimeMultipart, mimeRaw } from "./mime";
+import { ZodRaw } from "./raw-schema";
 import {
   ResultHandlerDefinition,
   defaultStatusCodes,
   lastResortHandler,
 } from "./result-handler";
 import { Security } from "./security";
+import { ZodUpload } from "./upload-schema";
 
 const getMimeTypesFromApiResponse = <S extends z.ZodTypeAny>(
   subject: S | ApiResponse<S>,
@@ -148,8 +150,16 @@ export class Endpoint<
       positive: resultHandler.getPositiveResponse(outputSchema),
       negative: resultHandler.getNegativeResponse(),
     };
+    // @todo simplify
     this.#mimeTypes = {
-      input: hasUpload(inputSchema) ? [mimeMultipart] : [mimeJson],
+      input: hasNestedSchema(
+        inputSchema,
+        (subject) => subject instanceof ZodUpload,
+      )
+        ? [mimeMultipart]
+        : hasNestedSchema(inputSchema, (subject) => subject instanceof ZodRaw)
+        ? [mimeRaw]
+        : [mimeJson],
       positive: getMimeTypesFromApiResponse(apiResponse.positive),
       negative: getMimeTypesFromApiResponse(apiResponse.negative),
     };

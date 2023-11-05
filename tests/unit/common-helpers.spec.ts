@@ -10,8 +10,8 @@ import {
   getMessageFromError,
   getStatusCodeFromError,
   hasCoercion,
+  hasNestedSchema,
   hasTopLevelTransformingEffect,
-  hasUpload,
   isCustomHeader,
   isValidDate,
   makeErrorFromAnything,
@@ -19,6 +19,7 @@ import {
 import { InputValidationError, ez, withMeta } from "../../src";
 import { Request } from "express";
 import { z } from "zod";
+import { ZodUpload } from "../../src/upload-schema";
 
 describe("Common Helpers", () => {
   describe("defaultInputSources", () => {
@@ -388,9 +389,11 @@ describe("Common Helpers", () => {
     });
   });
 
-  describe("hasUpload()", () => {
-    test("should return true for z.upload()", () => {
-      expect(hasUpload(ez.upload())).toBeTruthy();
+  describe("hasNestedSchema()", () => {
+    test("should return true for given argument satisfying condition", () => {
+      expect(
+        hasNestedSchema(ez.upload(), (subject) => subject instanceof ZodUpload),
+      ).toBeTruthy();
     });
     test.each([
       z.object({ test: ez.upload() }),
@@ -402,8 +405,10 @@ describe("Common Helpers", () => {
       z.record(ez.upload()),
       ez.upload().refine(() => true),
       z.array(ez.upload()),
-    ])("should return true for wrapped z.upload() %#", (subject) => {
-      expect(hasUpload(subject)).toBeTruthy();
+    ])("should return true for wrapped needle %#", (subject) => {
+      expect(
+        hasNestedSchema(subject, (entry) => entry instanceof ZodUpload),
+      ).toBeTruthy();
     });
     test.each([
       z.object({}),
@@ -412,7 +417,9 @@ describe("Common Helpers", () => {
       z.boolean().and(z.literal(true)),
       z.number().or(z.string()),
     ])("should return false in other cases %#", (subject) => {
-      expect(hasUpload(subject)).toBeFalsy();
+      expect(
+        hasNestedSchema(subject, (entry) => entry instanceof ZodUpload),
+      ).toBeFalsy();
     });
   });
 

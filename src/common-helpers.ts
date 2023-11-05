@@ -9,7 +9,6 @@ import { IOSchema } from "./io-schema";
 import { getMeta } from "./metadata";
 import { AuxMethod, Method } from "./method";
 import { mimeMultipart } from "./mime";
-import { ZodUpload } from "./upload-schema";
 
 export type FlatObject = Record<string, unknown>;
 
@@ -199,33 +198,48 @@ export const hasTopLevelTransformingEffect = (schema: IOSchema): boolean => {
   return false; // ZodObject left
 };
 
-export const hasUpload = (schema: z.ZodTypeAny): boolean => {
-  if (schema instanceof ZodUpload) {
+export const hasNestedSchema = (
+  subject: z.ZodTypeAny,
+  condition: (subject: z.ZodTypeAny) => boolean,
+): boolean => {
+  if (condition(subject)) {
     return true;
   }
-  if (schema instanceof z.ZodObject) {
-    return reduceBool(Object.values<z.ZodTypeAny>(schema.shape).map(hasUpload));
+  if (subject instanceof z.ZodObject) {
+    return reduceBool(
+      Object.values<z.ZodTypeAny>(subject.shape).map((entry) =>
+        hasNestedSchema(entry, condition),
+      ),
+    );
   }
-  if (schema instanceof z.ZodUnion) {
-    return reduceBool(schema.options.map(hasUpload));
+  if (subject instanceof z.ZodUnion) {
+    return reduceBool(
+      subject.options.map((entry: z.ZodTypeAny) =>
+        hasNestedSchema(entry, condition),
+      ),
+    );
   }
-  if (schema instanceof z.ZodIntersection) {
-    return reduceBool([schema._def.left, schema._def.right].map(hasUpload));
+  if (subject instanceof z.ZodIntersection) {
+    return reduceBool(
+      [subject._def.left, subject._def.right].map((entry) =>
+        hasNestedSchema(entry, condition),
+      ),
+    );
   }
-  if (schema instanceof z.ZodOptional || schema instanceof z.ZodNullable) {
-    return hasUpload(schema.unwrap());
+  if (subject instanceof z.ZodOptional || subject instanceof z.ZodNullable) {
+    return hasNestedSchema(subject.unwrap(), condition);
   }
-  if (schema instanceof z.ZodEffects || schema instanceof z.ZodTransformer) {
-    return hasUpload(schema._def.schema);
+  if (subject instanceof z.ZodEffects || subject instanceof z.ZodTransformer) {
+    return hasNestedSchema(subject._def.schema, condition);
   }
-  if (schema instanceof z.ZodRecord) {
-    return hasUpload(schema._def.valueType);
+  if (subject instanceof z.ZodRecord) {
+    return hasNestedSchema(subject._def.valueType, condition);
   }
-  if (schema instanceof z.ZodArray) {
-    return hasUpload(schema._def.type);
+  if (subject instanceof z.ZodArray) {
+    return hasNestedSchema(subject._def.type, condition);
   }
-  if (schema instanceof z.ZodDefault) {
-    return hasUpload(schema._def.innerType);
+  if (subject instanceof z.ZodDefault) {
+    return hasNestedSchema(subject._def.innerType, condition);
   }
   return false;
 };
