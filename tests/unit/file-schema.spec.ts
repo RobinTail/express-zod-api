@@ -56,22 +56,39 @@ describe("ZodFile", () => {
   });
 
   describe("_parse()", () => {
-    test("should handle wrong parsed type", () => {
-      const schema = ZodFile.create();
-      const result = schema.safeParse(123);
-      expect(result.success).toBeFalsy();
-      if (!result.success) {
-        expect(result.error.issues).toEqual([
-          {
-            code: "invalid_type",
-            expected: "string",
-            message: "Expected string, received number",
-            path: [],
-            received: "number",
-          },
-        ]);
-      }
-    });
+    test.each([
+      {
+        schema: ZodFile.create(),
+        subject: 123,
+        expected: "string",
+        received: "number",
+        message: "Expected string, received number",
+      },
+      {
+        schema: ZodFile.create().buffer(),
+        subject: "123",
+        expected: "object",
+        received: "string",
+        message: "Expected Buffer",
+      },
+    ])(
+      "should invalidate wrong types",
+      ({ schema, subject, expected, received, message }) => {
+        const result = schema.safeParse(subject);
+        expect(result.success).toBeFalsy();
+        if (!result.success) {
+          expect(result.error.issues).toEqual([
+            {
+              code: "invalid_type",
+              expected,
+              message,
+              path: [],
+              received,
+            },
+          ]);
+        }
+      },
+    );
 
     test("should perform additional check for base64 file", () => {
       const schema = ZodFile.create().base64();
@@ -94,6 +111,16 @@ describe("ZodFile", () => {
       expect(result).toEqual({
         success: true,
         data: "some string",
+      });
+    });
+
+    test("should accept Buffer", () => {
+      const schema = ZodFile.create().buffer();
+      const subject = Buffer.from("test", "utf-8");
+      const result = schema.safeParse(subject);
+      expect(result).toEqual({
+        success: true,
+        data: subject,
       });
     });
 
