@@ -52,14 +52,14 @@ describe("ZodFile", () => {
     });
 
     test("should perform additional check for base64 file", () => {
-      const schema = ZodFile.create().base64("this is not base64");
+      const schema = ZodFile.create().base64();
       const result = schema.safeParse("~~~~");
       expect(result.success).toBeFalsy();
       if (!result.success) {
         expect(result.error.issues).toEqual([
           {
             code: "custom",
-            message: "this is not base64",
+            message: "Does not match base64 encoding",
             path: [],
           },
         ]);
