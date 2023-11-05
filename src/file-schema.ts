@@ -12,19 +12,10 @@ import { ErrMessage, errToObj } from "./common-helpers";
 
 const zodFileKind = "ZodFile";
 
-declare type ZodFileCheck =
-  | {
-      kind: "binary";
-      message?: string;
-    }
-  | {
-      kind: "base64";
-      message?: string;
-    };
-
 export interface ZodFileDef extends ZodTypeDef {
-  checks: ZodFileCheck[];
   typeName: typeof zodFileKind;
+  encoding?: "binary" | "base64";
+  message?: string;
 }
 
 const base64Regex =
@@ -42,15 +33,13 @@ export class ZodFile extends ZodType<string, ZodFileDef> {
       return INVALID;
     }
 
-    for (const check of this._def.checks) {
-      if (check.kind === "base64") {
-        if (!base64Regex.test(ctx.data)) {
-          addIssueToContext(ctx, {
-            code: ZodIssueCode.custom,
-            message: check.message,
-          });
-          status.dirty();
-        }
+    if (this._def.encoding === "base64") {
+      if (!base64Regex.test(ctx.data)) {
+        addIssueToContext(ctx, {
+          code: ZodIssueCode.custom,
+          message: this._def.message,
+        });
+        status.dirty();
       }
     }
 
@@ -60,26 +49,24 @@ export class ZodFile extends ZodType<string, ZodFileDef> {
   binary = (message?: ErrMessage) =>
     new ZodFile({
       ...this._def,
-      checks: [...this._def.checks, { kind: "binary", ...errToObj(message) }],
+      ...errToObj(message),
+      encoding: "binary",
     });
 
   base64 = (message?: ErrMessage) =>
     new ZodFile({
       ...this._def,
-      checks: [...this._def.checks, { kind: "base64", ...errToObj(message) }],
+      ...errToObj(message),
+      encoding: "base64",
     });
 
   get isBinary() {
-    return !!this._def.checks.find((check) => check.kind === "binary");
+    return this._def.encoding === "binary";
   }
 
   get isBase64() {
-    return !!this._def.checks.find((check) => check.kind === "base64");
+    return this._def.encoding === "base64";
   }
 
-  static create = () =>
-    new ZodFile({
-      checks: [],
-      typeName: zodFileKind,
-    });
+  static create = () => new ZodFile({ typeName: zodFileKind });
 }

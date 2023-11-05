@@ -6,7 +6,7 @@ describe("ZodFile", () => {
     test("should create an instance", () => {
       const schema = ZodFile.create();
       expect(schema).toBeInstanceOf(ZodFile);
-      expect(schema._def.checks).toEqual([]);
+      expect(schema._def.encoding).toBeUndefined();
       expect(schema._def.typeName).toEqual("ZodFile");
       expect(schema.isBinary).toBeFalsy();
       expect(schema.isBase64).toBeFalsy();
@@ -18,12 +18,8 @@ describe("ZodFile", () => {
       const schema = ZodFile.create().binary("test message");
       expect(schema).toBeInstanceOf(ZodFile);
       expect(schema.isBinary).toBeTruthy();
-      expect(schema._def.checks).toEqual([
-        {
-          kind: "binary",
-          message: "test message",
-        },
-      ]);
+      expect(schema._def.encoding).toBe("binary");
+      expect(schema._def.message).toBe("test message");
     });
   });
 
@@ -32,12 +28,8 @@ describe("ZodFile", () => {
       const schema = ZodFile.create().base64("test message");
       expect(schema).toBeInstanceOf(ZodFile);
       expect(schema.isBase64).toBeTruthy();
-      expect(schema._def.checks).toEqual([
-        {
-          kind: "base64",
-          message: "test message",
-        },
-      ]);
+      expect(schema._def.encoding).toBe("base64");
+      expect(schema._def.message).toBe("test message");
     });
   });
 
