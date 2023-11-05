@@ -93,7 +93,7 @@ type PostV1AvatarUploadResponse =
     };
 
 type PostV1AvatarRawInput = {
-  raw: any;
+  raw: string;
 };
 
 type PostV1AvatarRawResponse =

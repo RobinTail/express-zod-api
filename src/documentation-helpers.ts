@@ -42,7 +42,6 @@ import {
 } from "./logical-container";
 import { copyMeta } from "./metadata";
 import { Method } from "./method";
-import { ZodRaw } from "./raw-schema";
 import {
   HandlingRules,
   HandlingVariant,
@@ -147,19 +146,10 @@ export const depictUpload: Depicter<ZodUpload> = (ctx) => {
 
 export const depictFile: Depicter<ZodFile> = ({
   schema: { isBinary, isBase64 },
-  ...ctx
-}) => {
-  if (!ctx.isResponse) {
-    throw new DocumentationError({
-      message: "Please use z.file() only within ResultHandler.",
-      ...ctx,
-    });
-  }
-  return {
-    type: "string",
-    format: isBinary ? "binary" : isBase64 ? "byte" : "file",
-  };
-};
+}) => ({
+  type: "string",
+  format: isBinary ? "binary" : isBase64 ? "byte" : "file",
+});
 
 export const depictUnion: Depicter<z.ZodUnion<z.ZodUnionOptions>> = ({
   schema: { options },
@@ -992,14 +982,23 @@ export const depictRequest = ({
 }: ReqResDepictHelperCommonProps): RequestBodyObject => {
   const pathParams = getRoutePathParams(path);
   const inputSchema = endpoint.getSchema("input");
-  // @todo consider doing that only when enabled in config
   const hasRaw = hasNestedSchema({
     subject: inputSchema,
-    condition: (subject) => subject instanceof ZodRaw,
+    condition: (subject) => subject instanceof ZodFile,
     maxDepth: 3,
   });
+  // @todo simplify
   const bodyDepiction = hasRaw
-    ? ({ type: "string", format: "binary" } satisfies SchemaObject) // @todo consider z.file instead
+    ? depictFile({
+        schema: ZodFile.create().buffer().binary(),
+        isResponse: false,
+        serializer,
+        getRef,
+        makeRef,
+        path,
+        method,
+        next: () => ({}), // stub
+      })
     : excludeExampleFromDepiction(
         excludeParamsFromDepiction(
           walkSchema({

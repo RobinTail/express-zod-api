@@ -77,7 +77,6 @@ exports[`Index Entrypoint exports ez should have certain value 1`] = `
   "dateIn": [Function],
   "dateOut": [Function],
   "file": [Function],
-  "raw": [Function],
   "upload": [Function],
 }
 `;

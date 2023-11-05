@@ -17,6 +17,7 @@ import {
   hasTopLevelTransformingEffect,
   makeErrorFromAnything,
 } from "./common-helpers";
+import { ZodFile } from "./file-schema";
 import { IOSchema } from "./io-schema";
 import { LogicalContainer, combineContainers } from "./logical-container";
 import { AuxMethod, Method } from "./method";
@@ -29,7 +30,6 @@ import {
 } from "./result-handler";
 import { Security } from "./security";
 import { ZodUpload } from "./upload-schema";
-import { ZodRaw } from "./raw-schema";
 
 const getMimeTypesFromApiResponse = <S extends z.ZodTypeAny>(
   subject: S | ApiResponse<S>,
@@ -157,7 +157,7 @@ export class Endpoint<
     });
     const hasRaw = hasNestedSchema({
       subject: inputSchema,
-      condition: (subject) => subject instanceof ZodRaw,
+      condition: (subject) => subject instanceof ZodFile,
       maxDepth: 3,
     });
     this.#mimeTypes = {
