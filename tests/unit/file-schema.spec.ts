@@ -3,13 +3,35 @@ import { readFile } from "node:fs/promises";
 
 describe("ZodFile", () => {
   describe("static::create()", () => {
-    test("should create an instance", () => {
+    test("should create an instance being string by default", () => {
       const schema = ZodFile.create();
       expect(schema).toBeInstanceOf(ZodFile);
       expect(schema._def.encoding).toBeUndefined();
       expect(schema._def.typeName).toEqual("ZodFile");
       expect(schema.isBinary).toBeFalsy();
       expect(schema.isBase64).toBeFalsy();
+      expect(schema.isString).toBeTruthy();
+      expect(schema.isBuffer).toBeFalsy();
+    });
+  });
+
+  describe(".string()", () => {
+    test("should create a string file", () => {
+      const schema = ZodFile.create().string();
+      expect(schema).toBeInstanceOf(ZodFile);
+      expect(schema._def.encoding).toBeUndefined();
+      expect(schema.isString).toBeTruthy();
+      expect(schema.isBuffer).toBeFalsy();
+    });
+  });
+
+  describe(".buffer()", () => {
+    test("should create a buffer file", () => {
+      const schema = ZodFile.create().buffer();
+      expect(schema).toBeInstanceOf(ZodFile);
+      expect(schema._def.encoding).toBeUndefined();
+      expect(schema.isBuffer).toBeTruthy();
+      expect(schema.isString).toBeFalsy();
     });
   });
 

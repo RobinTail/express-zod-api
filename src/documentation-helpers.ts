@@ -990,7 +990,7 @@ export const depictRequest = ({
   // @todo simplify
   const bodyDepiction = hasRaw
     ? depictFile({
-        schema: ZodFile.create().buffer().binary(),
+        schema: ZodFile.create().buffer(),
         isResponse: false,
         serializer,
         getRef,

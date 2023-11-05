@@ -112,5 +112,5 @@ export class ZodFile<
   }
 
   static create = () =>
-    new ZodFile<string | Buffer>({ typeName: zodFileKind, type: "" });
+    new ZodFile<string>({ typeName: zodFileKind, type: "" });
 }
