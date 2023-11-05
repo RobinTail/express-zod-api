@@ -37,7 +37,7 @@ export class ZodFile extends ZodType<string, ZodFileDef> {
       if (!base64Regex.test(ctx.data)) {
         addIssueToContext(ctx, {
           code: ZodIssueCode.custom,
-          message: this._def.message,
+          message: this._def.message || "Does not match base64 encoding",
         });
         status.dirty();
       }
