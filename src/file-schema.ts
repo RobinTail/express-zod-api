@@ -63,16 +63,9 @@ export class ZodFile<
       return INVALID;
     }
 
-    if (this._def.encoding) {
-      const hasValidEncoding = isParsedBuffer
-        ? Buffer.isEncoding(this._def.encoding)
-        : isParsedString && this.isBase64
-        ? base64Regex.test(ctx.data)
-        : true;
-      if (!hasValidEncoding) {
-        addIssueToContext(ctx, this.#makeEncodingIssue());
-        status.dirty();
-      }
+    if (isParsedString && this.isBase64 && !base64Regex.test(ctx.data)) {
+      addIssueToContext(ctx, this.#makeEncodingIssue());
+      status.dirty();
     }
 
     return { status: status.value, value: ctx.data as T };
