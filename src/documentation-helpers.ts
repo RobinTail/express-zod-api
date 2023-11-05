@@ -987,35 +987,23 @@ export const depictRequest = ({
     condition: (subject) => subject instanceof ZodFile,
     maxDepth: 3,
   });
-  // @todo simplify
-  const bodyDepiction = hasRaw
-    ? depictFile({
-        schema: ZodFile.create().buffer(),
+  const bodyDepiction = excludeExampleFromDepiction(
+    excludeParamsFromDepiction(
+      walkSchema({
+        schema: hasRaw ? ZodFile.create().buffer() : inputSchema,
         isResponse: false,
+        rules: depicters,
+        onEach,
+        onMissing,
         serializer,
         getRef,
         makeRef,
         path,
         method,
-        next: () => ({}), // stub
-      })
-    : excludeExampleFromDepiction(
-        excludeParamsFromDepiction(
-          walkSchema({
-            schema: inputSchema,
-            isResponse: false,
-            rules: depicters,
-            onEach,
-            onMissing,
-            serializer,
-            getRef,
-            makeRef,
-            path,
-            method,
-          }),
-          pathParams,
-        ),
-      );
+      }),
+      pathParams,
+    ),
+  );
   const bodyExamples = depictExamples(
     endpoint.getSchema("input"),
     false,
