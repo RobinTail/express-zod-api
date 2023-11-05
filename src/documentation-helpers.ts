@@ -145,10 +145,10 @@ export const depictUpload: Depicter<ZodUpload> = (ctx) => {
 };
 
 export const depictFile: Depicter<ZodFile> = ({
-  schema: { isBinary, isBase64 },
+  schema: { isBinary, isBase64, isBuffer },
 }) => ({
   type: "string",
-  format: isBinary ? "binary" : isBase64 ? "byte" : "file",
+  format: isBuffer || isBinary ? "binary" : isBase64 ? "byte" : "file",
 });
 
 export const depictUnion: Depicter<z.ZodUnion<z.ZodUnionOptions>> = ({
