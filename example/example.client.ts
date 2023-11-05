@@ -158,7 +158,7 @@ export const endpointTags = {
   "get /v1/avatar/send": ["files", "users"],
   "get /v1/avatar/stream": ["users", "files"],
   "post /v1/avatar/upload": ["files"],
-  "post /v1/avatar/raw": [],
+  "post /v1/avatar/raw": ["files"],
 };
 
 export type Provider = <M extends Method, P extends Path>(

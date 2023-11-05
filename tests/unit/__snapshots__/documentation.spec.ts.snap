@@ -2873,6 +2873,8 @@ paths:
                     status: error
                     error:
                       message: Sample error message
+      tags:
+        - files
       requestBody:
         description: POST /v1/avatar/raw request body
         content:
@@ -3152,6 +3154,8 @@ paths:
                     status: error
                     error:
                       message: Sample error message
+      tags:
+        - files
       requestBody:
         description: POST /v1/avatar/raw request body
         content:
