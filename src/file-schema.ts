@@ -37,33 +37,45 @@ export class ZodFile<
 
   _parse(input: ParseInput): ParseReturnType<T> {
     const { status, ctx } = this._processInputParams(input);
-    if (
-      ctx.parsedType === ZodParsedType.string &&
-      typeof ctx.data === "string"
-    ) {
-      if (this._def.encoding === "base64") {
-        if (!base64Regex.test(ctx.data)) {
-          addIssueToContext(ctx, this.#makeEncodingIssue());
-          status.dirty();
-        }
-      }
-      return { status: status.value, value: ctx.data as T };
+
+    const isParsedString =
+      ctx.parsedType === ZodParsedType.string && typeof ctx.data === "string";
+
+    if (this.isString && !isParsedString) {
+      addIssueToContext(ctx, {
+        code: ZodIssueCode.invalid_type,
+        expected: ZodParsedType.string,
+        received: ctx.parsedType,
+      });
+      return INVALID;
     }
 
-    if (ctx.parsedType === ZodParsedType.object && Buffer.isBuffer(ctx.data)) {
-      if (this._def.encoding && !Buffer.isEncoding(this._def.encoding)) {
+    const isParsedBuffer =
+      ctx.parsedType === ZodParsedType.object && Buffer.isBuffer(ctx.data);
+
+    if (this.isBuffer && !isParsedBuffer) {
+      addIssueToContext(ctx, {
+        code: ZodIssueCode.invalid_type,
+        expected: ZodParsedType.object,
+        received: ctx.parsedType,
+        message: "Expected Buffer",
+      });
+      return INVALID;
+    }
+
+    if (this._def.encoding) {
+      const hasValidEncoding = isParsedBuffer
+        ? Buffer.isEncoding(this._def.encoding)
+        : isParsedString && this.isBase64
+        ? base64Regex.test(ctx.data)
+        : true;
+      if (!hasValidEncoding) {
         addIssueToContext(ctx, this.#makeEncodingIssue());
         status.dirty();
       }
-      return { status: status.value, value: ctx.data as T };
     }
 
-    addIssueToContext(ctx, {
-      code: ZodIssueCode.invalid_type,
-      expected: ZodParsedType.string,
-      received: ctx.parsedType,
-    });
-    return INVALID;
+    return { status: status.value, value: ctx.data as T };
   }
 
   string = (message?: ErrMessage) =>
