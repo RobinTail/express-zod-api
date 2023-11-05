@@ -5,6 +5,7 @@ export const config = createConfig({
     listen: 8090,
     upload: true,
     compression: true, // affects sendAvatarEndpoint
+    raw: true, // required for rawAcceptingEndpoint
   },
   cors: true,
   logger: {
