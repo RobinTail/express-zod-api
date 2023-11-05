@@ -8,6 +8,7 @@ import { AppConfig, CommonConfig, ServerConfig } from "./config-type";
 import { ResultHandlerError } from "./errors";
 import { makeErrorFromAnything } from "./common-helpers";
 import { createLogger } from "./logger";
+import { mimeRaw } from "./mime";
 import {
   AnyResultHandlerDefinition,
   defaultResultHandler,
@@ -104,6 +105,24 @@ export const createServer = (
         parseNested: true,
       }),
     );
+  }
+  if (config.server.raw) {
+    app.use(
+      express.raw(
+        typeof config.server.raw === "object" ? config.server.raw : undefined,
+      ),
+    );
+    app.use((req, res, next) => {
+      const mimeType =
+        (typeof config.server.raw == "object" && config.server.raw?.type) ||
+        mimeRaw;
+      const isMatching =
+        typeof mimeType === "function" ? mimeType(req) : req.is(mimeType);
+      if (isMatching) {
+        req.body = { raw: req.body };
+      }
+      next();
+    });
   }
 
   const { logger, errorHandler, notFoundHandler } = makeCommonEntities(config);
