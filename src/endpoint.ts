@@ -22,7 +22,6 @@ import { LogicalContainer, combineContainers } from "./logical-container";
 import { AuxMethod, Method } from "./method";
 import { AnyMiddlewareDef } from "./middleware";
 import { mimeJson, mimeMultipart, mimeRaw } from "./mime";
-import { ZodRaw } from "./raw-schema";
 import {
   ResultHandlerDefinition,
   defaultStatusCodes,
@@ -30,6 +29,7 @@ import {
 } from "./result-handler";
 import { Security } from "./security";
 import { ZodUpload } from "./upload-schema";
+import { ZodRaw } from "./raw-schema";
 
 const getMimeTypesFromApiResponse = <S extends z.ZodTypeAny>(
   subject: S | ApiResponse<S>,
@@ -150,17 +150,18 @@ export class Endpoint<
       positive: resultHandler.getPositiveResponse(outputSchema),
       negative: resultHandler.getNegativeResponse(),
     };
-    // @todo simplify
-    // @todo consider doing that only when enabled in config
+    // @todo consider doing that only when enabled in config - this will require always having config in Factory
+    const hasUpload = hasNestedSchema({
+      subject: inputSchema,
+      condition: (subject) => subject instanceof ZodUpload,
+    });
+    const hasRaw = hasNestedSchema({
+      subject: inputSchema,
+      condition: (subject) => subject instanceof ZodRaw,
+      maxDepth: 3,
+    });
     this.#mimeTypes = {
-      input: hasNestedSchema(
-        inputSchema,
-        (subject) => subject instanceof ZodUpload,
-      )
-        ? [mimeMultipart]
-        : hasNestedSchema(inputSchema, (subject) => subject instanceof ZodRaw)
-        ? [mimeRaw]
-        : [mimeJson],
+      input: hasUpload ? [mimeMultipart] : hasRaw ? [mimeRaw] : [mimeJson],
       positive: getMimeTypesFromApiResponse(apiResponse.positive),
       negative: getMimeTypesFromApiResponse(apiResponse.negative),
     };

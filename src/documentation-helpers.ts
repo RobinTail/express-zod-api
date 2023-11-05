@@ -993,10 +993,11 @@ export const depictRequest = ({
   const pathParams = getRoutePathParams(path);
   const inputSchema = endpoint.getSchema("input");
   // @todo consider doing that only when enabled in config
-  const hasRaw = hasNestedSchema(
-    inputSchema,
-    (subject) => subject instanceof ZodRaw,
-  );
+  const hasRaw = hasNestedSchema({
+    subject: inputSchema,
+    condition: (subject) => subject instanceof ZodRaw,
+    maxDepth: 3,
+  });
   const bodyDepiction = hasRaw
     ? ({ type: "string", format: "binary" } satisfies SchemaObject) // @todo consider z.file instead
     : excludeExampleFromDepiction(
