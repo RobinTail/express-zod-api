@@ -2816,6 +2816,70 @@ paths:
                   format: binary
               required:
                 - avatar
+  /v1/avatar/raw:
+    post:
+      operationId: PostV1AvatarRaw
+      responses:
+        "200":
+          description: POST /v1/avatar/raw Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - success
+                  data:
+                    type: object
+                    properties:
+                      length:
+                        type: number
+                        format: double
+                        minimum: 5e-324
+                        exclusiveMinimum: false
+                        maximum: 1.7976931348623157e+308
+                        exclusiveMaximum: false
+                    required:
+                      - length
+                required:
+                  - status
+                  - data
+        "400":
+          description: POST /v1/avatar/raw Error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                required:
+                  - status
+                  - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
+      requestBody:
+        description: POST /v1/avatar/raw request body
+        content:
+          application/octet-stream:
+            schema:
+              type: string
+              format: binary
 components:
   schemas:
     2048581c137c5b2130eb860e3ae37da196dfc25b:
@@ -3066,6 +3130,34 @@ paths:
           multipart/form-data:
             schema:
               $ref: "#/components/schemas/PostV1AvatarUploadRequestBody"
+  /v1/avatar/raw:
+    post:
+      operationId: PostV1AvatarRaw
+      responses:
+        "200":
+          description: POST /v1/avatar/raw Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PostV1AvatarRawSuccessfulResponse"
+        "400":
+          description: POST /v1/avatar/raw Error response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PostV1AvatarRawErrorResponse"
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
+      requestBody:
+        description: POST /v1/avatar/raw request body
+        content:
+          application/octet-stream:
+            schema:
+              $ref: "#/components/schemas/PostV1AvatarRawRequestBody"
 components:
   schemas:
     GetV1UserRetrieveParameterId:
@@ -3301,6 +3393,48 @@ components:
           format: binary
       required:
         - avatar
+    PostV1AvatarRawSuccessfulResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+            - success
+        data:
+          type: object
+          properties:
+            length:
+              type: number
+              format: double
+              minimum: 5e-324
+              exclusiveMinimum: false
+              maximum: 1.7976931348623157e+308
+              exclusiveMaximum: false
+          required:
+            - length
+      required:
+        - status
+        - data
+    PostV1AvatarRawErrorResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+            - error
+        error:
+          type: object
+          properties:
+            message:
+              type: string
+          required:
+            - message
+      required:
+        - status
+        - error
+    PostV1AvatarRawRequestBody:
+      type: string
+      format: binary
   responses: {}
   parameters: {}
   examples: {}

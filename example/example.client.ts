@@ -92,13 +92,32 @@ type PostV1AvatarUploadResponse =
       };
     };
 
+type PostV1AvatarRawInput = {
+  raw: any;
+};
+
+type PostV1AvatarRawResponse =
+  | {
+      status: "success";
+      data: {
+        length: number;
+      };
+    }
+  | {
+      status: "error";
+      error: {
+        message: string;
+      };
+    };
+
 export type Path =
   | "/v1/user/retrieve"
   | "/v1/user/:id"
   | "/v1/user/list"
   | "/v1/avatar/send"
   | "/v1/avatar/stream"
-  | "/v1/avatar/upload";
+  | "/v1/avatar/upload"
+  | "/v1/avatar/raw";
 
 export type Method = "get" | "post" | "put" | "delete" | "patch";
 
@@ -111,6 +130,7 @@ export interface Input extends Record<MethodPath, any> {
   "get /v1/avatar/send": GetV1AvatarSendInput;
   "get /v1/avatar/stream": GetV1AvatarStreamInput;
   "post /v1/avatar/upload": PostV1AvatarUploadInput;
+  "post /v1/avatar/raw": PostV1AvatarRawInput;
 }
 
 export interface Response extends Record<MethodPath, any> {
@@ -120,6 +140,7 @@ export interface Response extends Record<MethodPath, any> {
   "get /v1/avatar/send": GetV1AvatarSendResponse;
   "get /v1/avatar/stream": GetV1AvatarStreamResponse;
   "post /v1/avatar/upload": PostV1AvatarUploadResponse;
+  "post /v1/avatar/raw": PostV1AvatarRawResponse;
 }
 
 export const jsonEndpoints = {
@@ -127,6 +148,7 @@ export const jsonEndpoints = {
   "post /v1/user/:id": true,
   "get /v1/user/list": true,
   "post /v1/avatar/upload": true,
+  "post /v1/avatar/raw": true,
 };
 
 export const endpointTags = {
@@ -136,6 +158,7 @@ export const endpointTags = {
   "get /v1/avatar/send": ["files", "users"],
   "get /v1/avatar/stream": ["users", "files"],
   "post /v1/avatar/upload": ["files"],
+  "post /v1/avatar/raw": [],
 };
 
 export type Provider = <M extends Method, P extends Path>(

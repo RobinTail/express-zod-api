@@ -151,6 +151,7 @@ export class Endpoint<
       negative: resultHandler.getNegativeResponse(),
     };
     // @todo simplify
+    // @todo consider doing that only when enabled in config
     this.#mimeTypes = {
       input: hasNestedSchema(
         inputSchema,

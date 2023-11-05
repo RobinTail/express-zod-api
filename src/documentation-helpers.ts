@@ -22,6 +22,7 @@ import {
   FlatObject,
   getExamples,
   hasCoercion,
+  hasNestedSchema,
   hasTopLevelTransformingEffect,
   isCustomHeader,
   makeCleanId,
@@ -41,6 +42,7 @@ import {
 } from "./logical-container";
 import { copyMeta } from "./metadata";
 import { Method } from "./method";
+import { ZodRaw } from "./raw-schema";
 import {
   HandlingRules,
   HandlingVariant,
@@ -989,23 +991,31 @@ export const depictRequest = ({
   clue = "request body",
 }: ReqResDepictHelperCommonProps): RequestBodyObject => {
   const pathParams = getRoutePathParams(path);
-  const bodyDepiction = excludeExampleFromDepiction(
-    excludeParamsFromDepiction(
-      walkSchema({
-        schema: endpoint.getSchema("input"),
-        isResponse: false,
-        rules: depicters,
-        onEach,
-        onMissing,
-        serializer,
-        getRef,
-        makeRef,
-        path,
-        method,
-      }),
-      pathParams,
-    ),
+  const inputSchema = endpoint.getSchema("input");
+  // @todo consider doing that only when enabled in config
+  const hasRaw = hasNestedSchema(
+    inputSchema,
+    (subject) => subject instanceof ZodRaw,
   );
+  const bodyDepiction = hasRaw
+    ? ({ type: "string", format: "binary" } satisfies SchemaObject) // @todo consider z.file instead
+    : excludeExampleFromDepiction(
+        excludeParamsFromDepiction(
+          walkSchema({
+            schema: inputSchema,
+            isResponse: false,
+            rules: depicters,
+            onEach,
+            onMissing,
+            serializer,
+            getRef,
+            makeRef,
+            path,
+            method,
+          }),
+          pathParams,
+        ),
+      );
   const bodyExamples = depictExamples(
     endpoint.getSchema("input"),
     false,

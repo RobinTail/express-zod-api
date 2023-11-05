@@ -17,8 +17,9 @@ export interface ZodRawDef extends ZodTypeDef {
 }
 
 const isBuffer = (subject: unknown): subject is Buffer =>
-  typeof subject === "object" && subject !== null;
+  Buffer.isBuffer(subject);
 
+// @todo consider reusing existing ZodFile schema instead
 export class ZodRaw extends ZodType<Buffer, ZodRawDef> {
   _parse(input: ParseInput): ParseReturnType<Buffer> {
     const { ctx } = this._processInputParams(input);
