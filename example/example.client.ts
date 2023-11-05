@@ -92,9 +92,7 @@ type PostV1AvatarUploadResponse =
       };
     };
 
-type PostV1AvatarRawInput = {
-  raw: string;
-};
+type PostV1AvatarRawInput = string;
 
 type PostV1AvatarRawResponse =
   | {
