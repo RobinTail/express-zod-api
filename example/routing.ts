@@ -1,5 +1,5 @@
 import { DependsOnMethod, Routing, ServeStatic } from "../src";
-import { acceptRawEndpoint } from "./endpoints/accept-raw";
+import { rawAcceptingEndpoint } from "./endpoints/accept-raw";
 import { listUsersEndpoint } from "./endpoints/list-users";
 import { uploadAvatarEndpoint } from "./endpoints/upload-avatar";
 import { retrieveUserEndpoint } from "./endpoints/retrieve-user";
@@ -27,7 +27,7 @@ export const routing: Routing = {
       // file upload example
       upload: uploadAvatarEndpoint,
       // raw body acceptance example
-      raw: acceptRawEndpoint,
+      raw: rawAcceptingEndpoint,
     },
   },
   // path /public serves static files from /example/assets
