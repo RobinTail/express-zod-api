@@ -1,6 +1,5 @@
 import {
   INVALID,
-  IssueData,
   ParseInput,
   ParseReturnType,
   ZodIssueCode,
@@ -27,14 +26,6 @@ const base64Regex =
 export class ZodFile<
   T extends string | Buffer = string | Buffer,
 > extends ZodType<T, ZodFileDef<T>, T> {
-  #makeEncodingIssue(): IssueData {
-    return {
-      code: ZodIssueCode.custom,
-      message:
-        this._def.message || `Does not match ${this._def.encoding} encoding`,
-    };
-  }
-
   _parse(input: ParseInput): ParseReturnType<T> {
     const { status, ctx } = this._processInputParams(input);
 
@@ -64,7 +55,10 @@ export class ZodFile<
     }
 
     if (isParsedString && this.isBase64 && !base64Regex.test(ctx.data)) {
-      addIssueToContext(ctx, this.#makeEncodingIssue());
+      addIssueToContext(ctx, {
+        code: ZodIssueCode.custom,
+        message: this._def.message || "Does not match base64 encoding",
+      });
       status.dirty();
     }
 
