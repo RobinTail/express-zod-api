@@ -52,8 +52,8 @@ export interface ServerConfig {
      */
     compression?: boolean | CompressionOptions;
     /**
-     * @desc Enables parsing certain request types as raw binary data.
-     * @desc When enabled, use z.raw() as input schema and input.raw in Endpoint's handler
+     * @desc Enables parsing certain request payloads into raw Buffers (application/octet-stream by default)
+     * @desc When enabled, use ez.raw() as input schema to get input.raw in Endpoint's handler
      * @default undefined
      * @example express.raw()
      * @link https://expressjs.com/en/4x/api.html#express.raw
