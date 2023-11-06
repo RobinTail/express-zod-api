@@ -14,7 +14,7 @@ import {
   expressRawMock,
   fileUploadMock,
 } from "../express-mock";
-import winston, { createLogger } from "winston";
+import winston from "winston";
 import { z } from "zod";
 import {
   EndpointsFactory,
@@ -149,7 +149,7 @@ describe("Server", () => {
         },
         cors: true,
         startupLogo: false,
-        logger: createLogger({ silent: true }),
+        logger: winston.createLogger({ silent: true }),
       };
       const routingMock = {
         v1: {
@@ -186,7 +186,7 @@ describe("Server", () => {
         },
         cors: true,
         startupLogo: false,
-        logger: createLogger({ silent: true }),
+        logger: winston.createLogger({ silent: true }),
       };
       const routingMock = {
         v1: {
@@ -215,7 +215,7 @@ describe("Server", () => {
         },
         cors: true,
         startupLogo: false,
-        logger: createLogger({ silent: true }),
+        logger: winston.createLogger({ silent: true }),
       };
       const routingMock = {
         v1: {
@@ -247,7 +247,7 @@ describe("Server", () => {
         },
         cors: true,
         startupLogo: false,
-        logger: createLogger({ silent: true }),
+        logger: winston.createLogger({ silent: true }),
       };
       const routingMock = {
         v1: {
