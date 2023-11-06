@@ -21,9 +21,9 @@
   integrity sha512-Jh15/qVmrLGhkKJBdXlK1+9tY4lZruYjsgkDFj08ZmDiWVBLJcqkok7Z0/R0In+i1rScBpJlSvrTS2Lm41Pbnw==
 
 "@arethetypeswrong/cli@^0.13.0":
-  version "0.13.0"
-  resolved "https://registry.yarnpkg.com/@arethetypeswrong/cli/-/cli-0.13.0.tgz#28cd0c27e0d70f156ecbd3a83a5e70fa520057c9"
-  integrity sha512-e//5sfUssKZLep6GoFqhgeoW9kndXGAREAY7yZxKBm6kLlAa/4gpvWoqKubnUCEFNbekNKEpWnR2zn3Bc5r6aA==
+  version "0.13.1"
+  resolved "https://registry.yarnpkg.com/@arethetypeswrong/cli/-/cli-0.13.1.tgz#a3053e8fbef3c6f6461954a03c2f2b51c90e152e"
+  integrity sha512-nmaSMnVb1iHvJIJ4UmrNMRwtxxjnuOL2IELTuYLP4QatnebrGmqeRWOzbsuwh9OT48LX4fxp+wnJMGdrUf/nvw==
   dependencies:
     "@arethetypeswrong/core" "0.13.0"
     chalk "^4.1.2"
