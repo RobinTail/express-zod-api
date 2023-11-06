@@ -1,7 +1,6 @@
 // @see https://github.com/swc-project/jest/issues/14#issuecomment-970189585
 
 const expressJsonMock = jest.fn();
-const expressRawMock = jest.fn();
 const compressionMock = jest.fn();
 const fileUploadMock = jest.fn();
 
@@ -24,7 +23,6 @@ const appCreatorMock = () => {
   return appMock;
 };
 appCreatorMock.json = () => expressJsonMock;
-appCreatorMock.raw = expressRawMock;
 appCreatorMock.static = staticMock;
 
 const expressMock = jest.mock("express", () => appCreatorMock);
@@ -35,7 +33,6 @@ export {
   expressMock,
   appMock,
   expressJsonMock,
-  expressRawMock,
   staticMock,
   staticHandler,
 };

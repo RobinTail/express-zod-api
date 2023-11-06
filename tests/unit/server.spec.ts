@@ -11,7 +11,6 @@ import {
   compressionMock,
   expressJsonMock,
   expressMock,
-  expressRawMock,
   fileUploadMock,
 } from "../express-mock";
 import winston from "winston";
@@ -23,7 +22,7 @@ import {
   defaultResultHandler,
 } from "../../src";
 import { AppConfig, CommonConfig, ServerConfig } from "../../src/config-type";
-import { mimeJson, mimeRaw } from "../../src/mime";
+import { mimeJson } from "../../src/mime";
 import {
   createNotFoundHandler,
   createParserFailureHandler,
@@ -240,10 +239,11 @@ describe("Server", () => {
     });
 
     test("should enable raw on request", () => {
+      const rawParserMock = jest.fn();
       const configMock = {
         server: {
           listen: givePort(),
-          raw: true,
+          rawParser: rawParserMock,
         },
         cors: true,
         startupLogo: false,
@@ -264,19 +264,14 @@ describe("Server", () => {
         routingMock,
       );
       expect(appMock.use).toHaveBeenCalledTimes(5);
-      expect(expressRawMock).toHaveBeenCalledTimes(1);
-      expect(expressRawMock).toHaveBeenCalledWith(undefined);
       const rawPropMw = appMock.use.mock.calls[2][0]; // custom middleware for raw
       expect(typeof rawPropMw).toBe("function");
       const buffer = Buffer.from([]);
       const requestMock = makeRequestMock({
         method: "POST",
-        is: jest.fn(() => true),
         body: buffer,
       });
       rawPropMw(requestMock, {}, jest.fn());
-      expect(requestMock.is).toHaveBeenCalledTimes(1);
-      expect(requestMock.is).toHaveBeenCalledWith(mimeRaw);
       expect(requestMock.body).toEqual({ raw: buffer });
     });
   });

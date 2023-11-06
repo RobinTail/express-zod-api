@@ -8,7 +8,6 @@ import { AppConfig, CommonConfig, ServerConfig } from "./config-type";
 import { ResultHandlerError } from "./errors";
 import { makeErrorFromAnything } from "./common-helpers";
 import { createLogger } from "./logger";
-import { mimeRaw } from "./mime";
 import {
   AnyResultHandlerDefinition,
   defaultResultHandler,
@@ -106,19 +105,10 @@ export const createServer = (
       }),
     );
   }
-  if (config.server.raw) {
-    app.use(
-      express.raw(
-        typeof config.server.raw === "object" ? config.server.raw : undefined,
-      ),
-    );
-    app.use((req, res, next) => {
-      const mimeType =
-        (typeof config.server.raw == "object" && config.server.raw?.type) ||
-        mimeRaw;
-      const isMatching =
-        typeof mimeType === "function" ? mimeType(req) : req.is(mimeType);
-      if (isMatching) {
+  if (config.server.rawParser) {
+    app.use(config.server.rawParser);
+    app.use((req, {}, next) => {
+      if (Buffer.isBuffer(req.body)) {
         req.body = { raw: req.body };
       }
       next();

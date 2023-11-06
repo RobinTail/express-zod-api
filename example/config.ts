@@ -1,3 +1,4 @@
+import express from "express";
 import { createConfig } from "../src";
 
 export const config = createConfig({
@@ -5,7 +6,7 @@ export const config = createConfig({
     listen: 8090,
     upload: true,
     compression: true, // affects sendAvatarEndpoint
-    raw: true, // required for rawAcceptingEndpoint
+    rawParser: express.raw(), // required for rawAcceptingEndpoint
   },
   cors: true,
   logger: {

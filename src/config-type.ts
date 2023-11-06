@@ -1,6 +1,5 @@
 import compression from "compression";
 import { Express, Request, RequestHandler } from "express";
-import type { Options as RawOptions } from "body-parser";
 import fileUpload from "express-fileupload";
 import { ServerOptions } from "node:https";
 import { Logger } from "winston";
@@ -39,6 +38,7 @@ export interface ServerConfig {
     /**
      * @desc Custom JSON parser.
      * @default express.json()
+     * @link https://expressjs.com/en/4x/api.html#express.json
      * */
     jsonParser?: RequestHandler;
     /**
@@ -51,8 +51,14 @@ export interface ServerConfig {
      * @default false
      */
     compression?: boolean | CompressionOptions;
-    /** @desc Enables parsing certain request types as raw binary data and placing it into request.body.raw property */
-    raw?: boolean | RawOptions;
+    /**
+     * @desc Enables parsing certain request types as raw binary data.
+     * @desc When enabled, use z.raw() as input schema and input.raw in Endpoint's handler
+     * @default undefined
+     * @example express.raw()
+     * @link https://expressjs.com/en/4x/api.html#express.raw
+     * */
+    rawParser?: RequestHandler;
   };
   /** @desc Enables HTTPS server as well. */
   https?: {
