@@ -555,7 +555,7 @@ The response schema generally may be just `z.string()`, but I made more specific
 const fileStreamingEndpointsFactory = new EndpointsFactory(
   createResultHandler({
     getPositiveResponse: () => ({
-      schema: ez.file().binary(),
+      schema: ez.file().buffer(),
       mimeType: "image/*",
     }),
     getNegativeResponse: () => ({ schema: z.string(), mimeType: "text/plain" }),
