@@ -3,7 +3,6 @@
 const expressJsonMock = jest.fn();
 const compressionMock = jest.fn();
 const fileUploadMock = jest.fn();
-
 jest.mock("compression", () => compressionMock);
 jest.mock("express-fileupload", () => fileUploadMock);
 
