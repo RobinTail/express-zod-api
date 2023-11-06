@@ -2835,11 +2835,11 @@ paths:
                     type: object
                     properties:
                       length:
-                        type: number
-                        format: double
-                        minimum: 5e-324
+                        type: integer
+                        format: int64
+                        minimum: 0
                         exclusiveMinimum: false
-                        maximum: 1.7976931348623157e+308
+                        maximum: 9007199254740991
                         exclusiveMaximum: false
                     required:
                       - length
@@ -3408,11 +3408,11 @@ components:
           type: object
           properties:
             length:
-              type: number
-              format: double
-              minimum: 5e-324
+              type: integer
+              format: int64
+              minimum: 0
               exclusiveMinimum: false
-              maximum: 1.7976931348623157e+308
+              maximum: 9007199254740991
               exclusiveMaximum: false
           required:
             - length
