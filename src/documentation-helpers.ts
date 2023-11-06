@@ -22,7 +22,7 @@ import {
   FlatObject,
   getExamples,
   hasCoercion,
-  hasNestedSchema,
+  hasRaw,
   hasTopLevelTransformingEffect,
   isCustomHeader,
   makeCleanId,
@@ -982,15 +982,10 @@ export const depictRequest = ({
 }: ReqResDepictHelperCommonProps): RequestBodyObject => {
   const pathParams = getRoutePathParams(path);
   const inputSchema = endpoint.getSchema("input");
-  const hasRaw = hasNestedSchema({
-    subject: inputSchema,
-    condition: (subject) => subject instanceof ZodFile,
-    maxDepth: 3,
-  });
   const bodyDepiction = excludeExampleFromDepiction(
     excludeParamsFromDepiction(
       walkSchema({
-        schema: hasRaw ? ZodFile.create().buffer() : inputSchema,
+        schema: hasRaw(inputSchema) ? ZodFile.create().buffer() : inputSchema,
         isResponse: false,
         rules: depicters,
         onEach,

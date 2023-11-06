@@ -5,10 +5,12 @@ import { Logger } from "winston";
 import { z } from "zod";
 import { CommonConfig, InputSource, InputSources } from "./config-type";
 import { InputValidationError, OutputValidationError } from "./errors";
+import { ZodFile } from "./file-schema";
 import { IOSchema } from "./io-schema";
 import { getMeta } from "./metadata";
 import { AuxMethod, Method } from "./method";
 import { mimeMultipart } from "./mime";
+import { ZodUpload } from "./upload-schema";
 
 export type FlatObject = Record<string, unknown>;
 
@@ -205,7 +207,7 @@ export const hasNestedSchema = ({
   depth = 1,
 }: {
   subject: z.ZodTypeAny;
-  condition: (entry: z.ZodTypeAny) => boolean;
+  condition: (schema: z.ZodTypeAny) => boolean;
   maxDepth?: number;
   depth?: number;
 }): boolean => {
@@ -254,6 +256,19 @@ export const hasNestedSchema = ({
   }
   return false;
 };
+
+export const hasUpload = (subject: IOSchema) =>
+  hasNestedSchema({
+    subject,
+    condition: (schema) => schema instanceof ZodUpload,
+  });
+
+export const hasRaw = (subject: IOSchema) =>
+  hasNestedSchema({
+    subject,
+    condition: (schema) => schema instanceof ZodFile,
+    maxDepth: 3,
+  });
 
 /**
  * @desc isNullable() and isOptional() validate the schema's input

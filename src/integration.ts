@@ -24,11 +24,7 @@ import {
   parametricIndexNode,
   protectedReadonlyModifier,
 } from "./integration-helpers";
-import {
-  defaultSerializer,
-  hasNestedSchema,
-  makeCleanId,
-} from "./common-helpers";
+import { defaultSerializer, hasRaw, makeCleanId } from "./common-helpers";
 import { methods } from "./method";
 import { mimeJson } from "./mime";
 import { Routing } from "./routing";
@@ -108,14 +104,9 @@ export class Integration {
           optionalPropStyle,
         };
         const inputSchema = endpoint.getSchema("input");
-        const hasRaw = hasNestedSchema({
-          subject: inputSchema,
-          condition: (subject) => subject instanceof ZodFile,
-          maxDepth: 3,
-        });
         const input = zodToTs({
           ...commons,
-          schema: hasRaw ? ZodFile.create().buffer() : inputSchema,
+          schema: hasRaw(inputSchema) ? ZodFile.create().buffer() : inputSchema,
           isResponse: false,
         });
         const response = zodToTs({
