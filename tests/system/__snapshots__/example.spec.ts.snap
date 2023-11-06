@@ -66,7 +66,16 @@ exports[`Example Negative Should respond with error to the missing static file r
 }
 `;
 
-exports[`Example Positive Should accept raw data 1`] = `
+exports[`Example Positive Should accept raw data 0 1`] = `
+{
+  "data": {
+    "length": 48687,
+  },
+  "status": "success",
+}
+`;
+
+exports[`Example Positive Should accept raw data 1 1`] = `
 {
   "data": {
     "length": 48687,

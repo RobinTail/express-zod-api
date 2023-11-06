@@ -1,4 +1,5 @@
 import { ChildProcessWithoutNullStreams, spawn } from "node:child_process";
+import { createReadStream, readFileSync } from "node:fs";
 import { expectType } from "tsd";
 import {
   ExpressZodAPIClient,
@@ -208,17 +209,19 @@ describe("Example", () => {
       expect(json).toMatchSnapshot();
     });
 
-    test("Should accept raw data", async () => {
-      const filename = "logo.svg";
-      const buffer = await readFile(filename);
-      const response = await fetch(`http://localhost:${port}/v1/avatar/raw`, {
-        method: "POST",
-        body: buffer,
-        headers: { "Content-Type": "application/octet-stream" },
-      });
-      const json = await response.json();
-      expect(json).toMatchSnapshot();
-    });
+    test.each([readFileSync("logo.svg"), createReadStream("logo.svg")])(
+      "Should accept raw data %#",
+      async (subject) => {
+        const response = await fetch(`http://localhost:${port}/v1/avatar/raw`, {
+          method: "POST",
+          body: subject,
+          headers: { "Content-Type": "application/octet-stream" },
+          duplex: Buffer.isBuffer(subject) ? undefined : "half",
+        });
+        const json = await response.json();
+        expect(json).toMatchSnapshot();
+      },
+    );
   });
 
   describe("Negative", () => {
