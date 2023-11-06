@@ -250,7 +250,7 @@ export const hasNestedSchema = ({
     return hasNestedSchema({ subject: subject.element, ...common });
   }
   if (subject instanceof z.ZodDefault) {
-    return hasNestedSchema({ subject: subject.removeDefault(), ...common });
+    return hasNestedSchema({ subject: subject._def.innerType, ...common });
   }
   return false;
 };
