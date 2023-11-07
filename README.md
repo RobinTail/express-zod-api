@@ -23,7 +23,7 @@ Start your API server with I/O schema validation and custom middlewares in minut
    3. [Create an endpoints factory](#create-an-endpoints-factory)
    4. [Create your first endpoint](#create-your-first-endpoint)
    5. [Set up routing](#set-up-routing)
-   6. [Start your server](#start-your-server)
+   6. [Create your server](#create-your-server)
    7. [Try it](#try-it)
 4. [Basic features](#basic-features)
    1. [Middlewares](#middlewares)
@@ -134,6 +134,9 @@ Add the following option to your `tsconfig.json` file in order to make it work a
 
 ## Set up config
 
+Create a minimal configuration. _See all available options
+[in sources](https://github.com/RobinTail/express-zod-api/blob/master/src/config-type.ts)._
+
 ```typescript
 import { createConfig } from "express-zod-api";
 
@@ -142,33 +145,28 @@ const config = createConfig({
     listen: 8090, // port, UNIX socket or options
   },
   cors: true,
-  logger: {
-    level: "debug",
-    color: true,
-  },
+  logger: { level: "debug", color: true },
 });
 ```
 
-_See all available options [here](https://github.com/RobinTail/express-zod-api/blob/master/src/config-type.ts)._
-
 ## Create an endpoints factory
 
-In the basic case, you can just import and use the default factory:
+In the basic case, you can just import and use the default factory.
+_See also [Middlewares](#middlewares) and [Response customization](#response-customization)._
 
 ```typescript
 import { defaultEndpointsFactory } from "express-zod-api";
 ```
 
-_In case you need a global middleware, see [Middlewares](#middlewares)._
-_In case you need to customize the response, see [Response customization](#response-customization)._
-
 ## Create your first endpoint
+
+The endpoint responds with "Hello, World" or "Hello, {name}" if the name is supplied within `GET` request payload.
 
 ```typescript
 import { z } from "zod";
 
 const helloWorldEndpoint = defaultEndpointsFactory.build({
-  method: "get",
+  method: "get", // or methods: ["get", "post", ...]
   input: z.object({
     // for empty input use z.object({})
     name: z.string().optional(),
@@ -182,8 +180,6 @@ const helloWorldEndpoint = defaultEndpointsFactory.build({
   },
 });
 ```
-
-_In case you want it to handle multiple methods use `methods` property instead of `method`._
 
 ## Set up routing
 
@@ -199,7 +195,9 @@ const routing: Routing = {
 };
 ```
 
-## Start your server
+## Create your server
+
+See the [complete implementation example](https://github.com/RobinTail/express-zod-api/tree/master/example).
 
 ```typescript
 import { createServer } from "express-zod-api";
@@ -207,12 +205,9 @@ import { createServer } from "express-zod-api";
 createServer(config, routing);
 ```
 
-You can disable startup logo using `startupLogo` entry of your config.
-See the [full implementation example here](https://github.com/RobinTail/express-zod-api/tree/master/example).
-
 ## Try it
 
-Execute the following command:
+Start your application and execute the following command:
 
 ```shell
 curl -L -X GET 'localhost:8090/v1/hello?name=Rick'
