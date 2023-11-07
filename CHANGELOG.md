@@ -4,6 +4,7 @@
 
 ### v14.2.0
 
+- `express-fileupload` version is 1.4.2.
 - Featuring raw data handling in requests: you can now accept `application/octet-stream` typed requests and similar.
   - Including the mentioned MIME type of the request in the generated documentation.
 - In order to enable this feature you need to set the `rawParser` config option to `express.raw()`.
