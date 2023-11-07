@@ -1,4 +1,5 @@
 import { omit } from "ramda";
+import { makeRequestMock } from "../../src/mock";
 import { givePort } from "../helpers";
 import {
   createHttpsServerSpy,
@@ -137,10 +138,7 @@ describe("Server", () => {
 
     test("should create a HTTPS server on request", () => {
       const configMock = {
-        server: {
-          listen: givePort(),
-          jsonParser: jest.fn(),
-        },
+        server: { listen: givePort() },
         https: {
           listen: givePort(),
           options: {
@@ -150,12 +148,7 @@ describe("Server", () => {
         },
         cors: true,
         startupLogo: false,
-        errorHandler: {
-          handler: jest.fn(),
-        },
-        logger: {
-          info: jest.fn(),
-        },
+        logger: winston.createLogger({ silent: true }),
       };
       const routingMock = {
         v1: {
@@ -188,17 +181,11 @@ describe("Server", () => {
       const configMock = {
         server: {
           listen: givePort(),
-          jsonParser: jest.fn(),
           compression: true,
         },
         cors: true,
         startupLogo: false,
-        errorHandler: {
-          handler: jest.fn(),
-        },
-        logger: {
-          info: jest.fn(),
-        },
+        logger: winston.createLogger({ silent: true }),
       };
       const routingMock = {
         v1: {
@@ -223,17 +210,11 @@ describe("Server", () => {
       const configMock = {
         server: {
           listen: givePort(),
-          jsonParser: jest.fn(),
           upload: true,
         },
         cors: true,
         startupLogo: false,
-        errorHandler: {
-          handler: jest.fn(),
-        },
-        logger: {
-          info: jest.fn(),
-        },
+        logger: winston.createLogger({ silent: true }),
       };
       const routingMock = {
         v1: {
@@ -255,6 +236,43 @@ describe("Server", () => {
         abortOnLimit: false,
         parseNested: true,
       });
+    });
+
+    test("should enable raw on request", () => {
+      const rawParserMock = jest.fn();
+      const configMock = {
+        server: {
+          listen: givePort(),
+          rawParser: rawParserMock,
+        },
+        cors: true,
+        startupLogo: false,
+        logger: winston.createLogger({ silent: true }),
+      };
+      const routingMock = {
+        v1: {
+          test: new EndpointsFactory(defaultResultHandler).build({
+            method: "get",
+            input: z.object({}),
+            output: z.object({}),
+            handler: jest.fn(),
+          }),
+        },
+      };
+      createServer(
+        configMock as unknown as ServerConfig & CommonConfig,
+        routingMock,
+      );
+      expect(appMock.use).toHaveBeenCalledTimes(5);
+      const rawPropMw = appMock.use.mock.calls[2][0]; // custom middleware for raw
+      expect(typeof rawPropMw).toBe("function");
+      const buffer = Buffer.from([]);
+      const requestMock = makeRequestMock({
+        method: "POST",
+        body: buffer,
+      });
+      rawPropMw(requestMock, {}, jest.fn());
+      expect(requestMock.body).toEqual({ raw: buffer });
     });
   });
 

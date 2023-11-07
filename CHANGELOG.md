@@ -2,6 +2,42 @@
 
 ## Version 14
 
+### v14.2.0
+
+- Featuring raw data handling in requests: you can now accept `application/octet-stream` typed requests and similar.
+  - Including the mentioned MIME type of the request in the generated documentation.
+- In order to enable this feature you need to set the `rawParser` config option to `express.raw()`.
+  - Explore its additional options [in Exress.js documentation](https://expressjs.com/en/4x/api.html#express.raw).
+- When the feature is enabled, the raw data is placed into `request.body.raw` property, being `Buffer`.
+- The proprietary schema `ez.file()` is now equipped with two additional refinements:
+  - `.string()` — for parsing string data, default for backward compatibility.
+  - `.buffer()` — for parsing `Buffer` and to accept the incoming raw data.
+- In order to define an input schemas of endpoints and middlewares, a new shorthand schema exposed for your convenience:
+  - `ez.raw()` — which is the same as `z.object({ raw: ez.file().buffer() })`.
+  - Thus, the raw data becomes available to a handler as `input.raw` property.
+
+```typescript
+import express from "express";
+import { createConfig, defaultEndpointsFactory, ez } from "express-zod-api";
+
+const config = createConfig({
+  server: {
+    rawParser: express.raw(), // enables the feature
+  },
+});
+
+const rawAcceptingEndpoint = defaultEndpointsFactory.build({
+  method: "post",
+  input: ez
+    .raw() // accepts the featured { raw: Buffer }
+    .extend({}), // for additional inputs, like route params, if needed
+  output: z.object({ length: z.number().int().nonnegative() }),
+  handler: async ({ input: { raw } }) => ({
+    length: raw.length, // raw is Buffer
+  }),
+});
+```
+
 ### v14.1.0
 
 - Featuring an ability to configure `host` and other listening options when using `createServer()` method.

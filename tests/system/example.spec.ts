@@ -1,4 +1,5 @@
 import { ChildProcessWithoutNullStreams, spawn } from "node:child_process";
+import { createReadStream, readFileSync } from "node:fs";
 import { expectType } from "tsd";
 import {
   ExpressZodAPIClient,
@@ -159,12 +160,15 @@ describe("Example", () => {
     test("Should stream an image with a correct header", async () => {
       const response = await fetch(
         `http://localhost:${port}/v1/avatar/stream?userId=123`,
+        { headers: { "Accept-Encoding": "gzip, deflate" } },
       );
       expect(response.status).toBe(200);
       expect(response.headers.has("Content-type")).toBeTruthy();
       expect(response.headers.get("Content-type")).toBe("image/svg+xml");
       expect(response.headers.has("Transfer-encoding")).toBeTruthy();
       expect(response.headers.get("Transfer-encoding")).toBe("chunked");
+      expect(response.headers.has("Content-Encoding")).toBeTruthy();
+      expect(response.headers.get("Content-Encoding")).toBe("gzip");
       const hash = createHash("sha1")
         .update(await response.text())
         .digest("hex");
@@ -204,6 +208,20 @@ describe("Example", () => {
       const json = await response.json();
       expect(json).toMatchSnapshot();
     });
+
+    test.each([readFileSync("logo.svg"), createReadStream("logo.svg")])(
+      "Should accept raw data %#",
+      async (subject) => {
+        const response = await fetch(`http://localhost:${port}/v1/avatar/raw`, {
+          method: "POST",
+          body: subject,
+          headers: { "Content-Type": "application/octet-stream" },
+          duplex: Buffer.isBuffer(subject) ? undefined : "half",
+        });
+        const json = await response.json();
+        expect(json).toMatchSnapshot();
+      },
+    );
   });
 
   describe("Negative", () => {

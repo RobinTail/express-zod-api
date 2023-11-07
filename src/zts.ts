@@ -27,6 +27,7 @@
 import ts from "typescript";
 import { z } from "zod";
 import { hasCoercion, tryToTransform } from "./common-helpers";
+import { ZodFile } from "./file-schema";
 import { HandlingRules, walkSchema } from "./schema-walker";
 import {
   LiteralType,
@@ -233,6 +234,11 @@ const onLazy: Producer<z.ZodLazy<z.ZodTypeAny>> = ({
   );
 };
 
+const onFile: Producer<ZodFile> = ({ schema: { isBuffer } }) =>
+  isBuffer
+    ? f.createTypeReferenceNode("Buffer")
+    : f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword);
+
 const producers: HandlingRules<ts.TypeNode, ZTSContext> = {
   ZodString: onPrimitive(ts.SyntaxKind.StringKeyword),
   ZodNumber: onPrimitive(ts.SyntaxKind.NumberKeyword),
@@ -248,7 +254,7 @@ const producers: HandlingRules<ts.TypeNode, ZTSContext> = {
   ZodLiteral: onLiteral,
   ZodIntersection: onIntersection,
   ZodUnion: onSomeUnion,
-  ZodFile: onPrimitive(ts.SyntaxKind.StringKeyword),
+  ZodFile: onFile,
   ZodAny: onPrimitive(ts.SyntaxKind.AnyKeyword),
   ZodDefault: onDefault,
   ZodEnum: onEnum,

@@ -5,6 +5,7 @@ import { Logger } from "winston";
 import { z } from "zod";
 import { CommonConfig, InputSource, InputSources } from "./config-type";
 import { InputValidationError, OutputValidationError } from "./errors";
+import { ZodFile } from "./file-schema";
 import { IOSchema } from "./io-schema";
 import { getMeta } from "./metadata";
 import { AuxMethod, Method } from "./method";
@@ -199,36 +200,75 @@ export const hasTopLevelTransformingEffect = (schema: IOSchema): boolean => {
   return false; // ZodObject left
 };
 
-export const hasUpload = (schema: z.ZodTypeAny): boolean => {
-  if (schema instanceof ZodUpload) {
+export const hasNestedSchema = ({
+  subject,
+  condition,
+  maxDepth,
+  depth = 1,
+}: {
+  subject: z.ZodTypeAny;
+  condition: (schema: z.ZodTypeAny) => boolean;
+  maxDepth?: number;
+  depth?: number;
+}): boolean => {
+  if (condition(subject)) {
     return true;
   }
-  if (schema instanceof z.ZodObject) {
-    return reduceBool(Object.values<z.ZodTypeAny>(schema.shape).map(hasUpload));
+  if (maxDepth !== undefined && depth >= maxDepth) {
+    return false;
   }
-  if (schema instanceof z.ZodUnion) {
-    return reduceBool(schema.options.map(hasUpload));
+  const common = { condition, maxDepth, depth: depth + 1 };
+  if (subject instanceof z.ZodObject) {
+    return reduceBool(
+      Object.values<z.ZodTypeAny>(subject.shape).map((entry) =>
+        hasNestedSchema({ subject: entry, ...common }),
+      ),
+    );
   }
-  if (schema instanceof z.ZodIntersection) {
-    return reduceBool([schema._def.left, schema._def.right].map(hasUpload));
+  if (subject instanceof z.ZodUnion) {
+    return reduceBool(
+      subject.options.map((entry: z.ZodTypeAny) =>
+        hasNestedSchema({ subject: entry, ...common }),
+      ),
+    );
   }
-  if (schema instanceof z.ZodOptional || schema instanceof z.ZodNullable) {
-    return hasUpload(schema.unwrap());
+  if (subject instanceof z.ZodIntersection) {
+    return reduceBool(
+      [subject._def.left, subject._def.right].map((entry) =>
+        hasNestedSchema({ subject: entry, ...common }),
+      ),
+    );
   }
-  if (schema instanceof z.ZodEffects || schema instanceof z.ZodTransformer) {
-    return hasUpload(schema._def.schema);
+  if (subject instanceof z.ZodOptional || subject instanceof z.ZodNullable) {
+    return hasNestedSchema({ subject: subject.unwrap(), ...common });
   }
-  if (schema instanceof z.ZodRecord) {
-    return hasUpload(schema._def.valueType);
+  if (subject instanceof z.ZodEffects || subject instanceof z.ZodTransformer) {
+    return hasNestedSchema({ subject: subject.innerType(), ...common });
   }
-  if (schema instanceof z.ZodArray) {
-    return hasUpload(schema._def.type);
+  if (subject instanceof z.ZodRecord) {
+    return hasNestedSchema({ subject: subject.valueSchema, ...common });
   }
-  if (schema instanceof z.ZodDefault) {
-    return hasUpload(schema._def.innerType);
+  if (subject instanceof z.ZodArray) {
+    return hasNestedSchema({ subject: subject.element, ...common });
+  }
+  if (subject instanceof z.ZodDefault) {
+    return hasNestedSchema({ subject: subject._def.innerType, ...common });
   }
   return false;
 };
+
+export const hasUpload = (subject: IOSchema) =>
+  hasNestedSchema({
+    subject,
+    condition: (schema) => schema instanceof ZodUpload,
+  });
+
+export const hasRaw = (subject: IOSchema) =>
+  hasNestedSchema({
+    subject,
+    condition: (schema) => schema instanceof ZodFile,
+    maxDepth: 3,
+  });
 
 /**
  * @desc isNullable() and isOptional() validate the schema's input
