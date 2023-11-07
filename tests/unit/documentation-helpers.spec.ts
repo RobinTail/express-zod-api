@@ -333,19 +333,6 @@ describe("Documentation helpers", () => {
         ).toMatchSnapshot();
       },
     );
-    test("should throw when using in input", () => {
-      try {
-        depictFile({
-          schema: ez.file().binary(),
-          ...requestCtx,
-          next: makeNext(requestCtx),
-        });
-        fail("Should not be here");
-      } catch (e) {
-        expect(e).toBeInstanceOf(DocumentationError);
-        expect(e).toMatchSnapshot();
-      }
-    });
   });
 
   describe("depictUnion()", () => {

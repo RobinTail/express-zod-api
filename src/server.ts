@@ -89,6 +89,15 @@ export const createServer = (
   if (config.server.uploader) {
     app.use(config.server.uploader);
   }
+  if (config.server.rawParser) {
+    app.use(config.server.rawParser);
+    app.use((req, {}, next) => {
+      if (Buffer.isBuffer(req.body)) {
+        req.body = { raw: req.body };
+      }
+      next();
+    });
+  }
 
   const { logger, errorHandler, notFoundHandler } = makeCommonEntities(config);
   app.use(createParserFailureHandler(errorHandler, logger));

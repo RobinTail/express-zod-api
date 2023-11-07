@@ -392,6 +392,72 @@ paths:
                   format: binary
               required:
                 - avatar
+  /v1/avatar/raw:
+    post:
+      operationId: PostV1AvatarRaw
+      responses:
+        "200":
+          description: POST /v1/avatar/raw Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - success
+                  data:
+                    type: object
+                    properties:
+                      length:
+                        type: integer
+                        format: int64
+                        minimum: 0
+                        exclusiveMinimum: false
+                        maximum: 9007199254740991
+                        exclusiveMaximum: false
+                    required:
+                      - length
+                required:
+                  - status
+                  - data
+        "400":
+          description: POST /v1/avatar/raw Error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                required:
+                  - status
+                  - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
+      tags:
+        - files
+      requestBody:
+        description: POST /v1/avatar/raw request body
+        content:
+          application/octet-stream:
+            schema:
+              type: string
+              format: binary
 components:
   schemas:
     2048581c137c5b2130eb860e3ae37da196dfc25b:

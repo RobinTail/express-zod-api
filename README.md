@@ -38,18 +38,19 @@ Start your API server with I/O schema validation and custom middlewares in minut
    10. [Array response](#array-response) for migrating legacy APIs
    11. [Using native express middlewares](#using-native-express-middlewares)
    12. [File uploads](#file-uploads)
-   13. [Customizing logger](#customizing-logger)
-   14. [Connect to your own express app](#connect-to-your-own-express-app)
-   15. [Multiple schemas for one route](#multiple-schemas-for-one-route)
-   16. [Serving static files](#serving-static-files)
-   17. [Customizing input sources](#customizing-input-sources)
-   18. [Headers as input source](#headers-as-input-source)
-   19. [Enabling compression](#enabling-compression)
-   20. [Enabling HTTPS](#enabling-https)
-   21. [Generating a Frontend Client](#generating-a-frontend-client)
-   22. [Creating a documentation](#creating-a-documentation)
-   23. [Tagging the endpoints](#tagging-the-endpoints)
-   24. [How to test endpoints](#how-to-test-endpoints)
+   13. [Accepting raw data](#accepting-raw-data)
+   14. [Customizing logger](#customizing-logger)
+   15. [Connect to your own express app](#connect-to-your-own-express-app)
+   16. [Multiple schemas for one route](#multiple-schemas-for-one-route)
+   17. [Serving static files](#serving-static-files)
+   18. [Customizing input sources](#customizing-input-sources)
+   19. [Headers as input source](#headers-as-input-source)
+   20. [Enabling compression](#enabling-compression)
+   21. [Enabling HTTPS](#enabling-https)
+   22. [Generating a Frontend Client](#generating-a-frontend-client)
+   23. [Creating a documentation](#creating-a-documentation)
+   24. [Tagging the endpoints](#tagging-the-endpoints)
+   25. [How to test endpoints](#how-to-test-endpoints)
 5. [Caveats](#caveats)
    1. [Coercive schema of Zod](#coercive-schema-of-zod)
    2. [Excessive properties in endpoint output](#excessive-properties-in-endpoint-output)
@@ -555,7 +556,7 @@ The response schema generally may be just `z.string()`, but I made more specific
 const fileStreamingEndpointsFactory = new EndpointsFactory(
   createResultHandler({
     getPositiveResponse: () => ({
-      schema: ez.file().binary(),
+      schema: ez.file().buffer(),
       mimeType: "image/*",
     }),
     getNegativeResponse: () => ({ schema: z.string(), mimeType: "text/plain" }),
@@ -654,6 +655,36 @@ const fileUploadEndpoint = defaultEndpointsFactory.build({
 ```
 
 _You can still send other data and specify additional `input` parameters, including arrays and objects._
+
+## Accepting raw data
+
+Some APIs may require an endpoint to be able to accept and process raw data, such as streaming or uploading a binary
+file as an entire body of request. In order to enable this feature you need to set the `rawParser` config feature to
+`express.raw()`. See also its options [in Exress.js documentation](https://expressjs.com/en/4x/api.html#express.raw).
+The raw data is placed into `request.body.raw` property, having type `Buffer`. Then use the proprietary `ez.raw()`
+schema (which is an alias for `z.object({ raw: ez.file().buffer() })`) as the input schema of your endpoint.
+
+```typescript
+import express from "express";
+import { createConfig, defaultEndpointsFactory, ez } from "express-zod-api";
+
+const config = createConfig({
+  server: {
+    rawParser: express.raw(), // enables the feature
+  },
+});
+
+const rawAcceptingEndpoint = defaultEndpointsFactory.build({
+  method: "post",
+  input: ez
+    .raw() // accepts the featured { raw: Buffer }
+    .extend({}), // for additional inputs, like route params, if needed
+  output: z.object({ length: z.number().int().nonnegative() }),
+  handler: async ({ input: { raw } }) => ({
+    length: raw.length, // raw is Buffer
+  }),
+});
+```
 
 ## Customizing logger
 
