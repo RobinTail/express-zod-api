@@ -582,7 +582,14 @@ describe("Documentation generator", () => {
               title: "Testing unsupported types",
               serverUrl: "https://example.com",
             }),
-        ).toThrowError(/Zod type Zod\w+ is unsupported/);
+        ).toThrow(
+          new DocumentationError({
+            method: "post",
+            path: "/v1/getSomething",
+            isResponse: false,
+            message: `Zod type ${zodType._def.typeName} is unsupported.`,
+          }),
+        );
       });
     });
 

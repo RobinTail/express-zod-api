@@ -93,8 +93,8 @@ describe("Endpoint", () => {
           body: { n: 453 },
         },
       });
-      expect(middlewareMock).toBeCalledTimes(1);
-      expect(middlewareMock).toBeCalledWith({
+      expect(middlewareMock).toHaveBeenCalledTimes(1);
+      expect(middlewareMock).toHaveBeenCalledWith({
         input: { n: 453 },
         options: {
           inc: 454, // due to reassignment of options
@@ -103,15 +103,15 @@ describe("Endpoint", () => {
         response: responseMock,
         logger: loggerMock,
       });
-      expect(handlerMock).toBeCalledTimes(1);
-      expect(handlerMock).toBeCalledWith({
+      expect(handlerMock).toHaveBeenCalledTimes(1);
+      expect(handlerMock).toHaveBeenCalledWith({
         input: { n: 453 },
         options: { inc: 454 },
         logger: loggerMock,
       });
-      expect(loggerMock.error).toBeCalledTimes(0);
-      expect(responseMock.status).toBeCalledWith(200);
-      expect(responseMock.json).toBeCalledWith({
+      expect(loggerMock.error).toHaveBeenCalledTimes(0);
+      expect(responseMock.status).toHaveBeenCalledWith(200);
+      expect(responseMock.json).toHaveBeenCalledWith({
         status: "success",
         data: {
           inc2: 455,
@@ -141,12 +141,12 @@ describe("Endpoint", () => {
           }),
         },
       });
-      expect(loggerMock.error).toBeCalledTimes(0);
-      expect(responseMock.status).toBeCalledWith(200);
-      expect(responseMock.json).toBeCalledTimes(0);
-      expect(handlerMock).toBeCalledTimes(0);
-      expect(responseMock.set).toBeCalledTimes(4);
-      expect(responseMock.end).toBeCalledTimes(1);
+      expect(loggerMock.error).toHaveBeenCalledTimes(0);
+      expect(responseMock.status).toHaveBeenCalledWith(200);
+      expect(responseMock.json).toHaveBeenCalledTimes(0);
+      expect(handlerMock).toHaveBeenCalledTimes(0);
+      expect(responseMock.set).toHaveBeenCalledTimes(4);
+      expect(responseMock.end).toHaveBeenCalledTimes(1);
       expect(responseMock.set.mock.calls[0]).toEqual([
         "Access-Control-Allow-Origin",
         "*",
@@ -177,8 +177,8 @@ describe("Endpoint", () => {
       const { responseMock } = await testEndpoint({
         endpoint,
       });
-      expect(responseMock.status).toBeCalledWith(500);
-      expect(responseMock.json).toBeCalledWith({
+      expect(responseMock.status).toHaveBeenCalledWith(500);
+      expect(responseMock.json).toHaveBeenCalledWith({
         status: "error",
         error: {
           message: "output/email: Invalid email",
@@ -203,9 +203,9 @@ describe("Endpoint", () => {
       const { responseMock, loggerMock } = await testEndpoint({
         endpoint,
       });
-      expect(loggerMock.error).toBeCalledTimes(1);
-      expect(responseMock.status).toBeCalledWith(500);
-      expect(responseMock.json).toBeCalledWith({
+      expect(loggerMock.error).toHaveBeenCalledTimes(1);
+      expect(responseMock.status).toHaveBeenCalledWith(500);
+      expect(responseMock.json).toHaveBeenCalledWith({
         status: "error",
         error: {
           message: "Something unexpected",
@@ -247,14 +247,14 @@ describe("Endpoint", () => {
       });
       expect(handlerMock).toHaveBeenCalledTimes(0);
       expect(middlewareMock).toHaveBeenCalledTimes(1);
-      expect(loggerMock.error).toBeCalledTimes(0);
-      expect(loggerMock.warn).toBeCalledTimes(1);
+      expect(loggerMock.error).toHaveBeenCalledTimes(0);
+      expect(loggerMock.warn).toHaveBeenCalledTimes(1);
       expect(loggerMock.warn.mock.calls[0][0]).toBe(
         "The middleware mockConstructor has closed the stream. Accumulated options:",
       );
       expect(loggerMock.warn.mock.calls[0][1]).toEqual({ inc: 454 });
-      expect(responseMock.status).toBeCalledTimes(0);
-      expect(responseMock.json).toBeCalledTimes(0);
+      expect(responseMock.status).toHaveBeenCalledTimes(0);
+      expect(responseMock.json).toHaveBeenCalledTimes(0);
       expect(responseMock.statusCode).toBe(200);
       expect(responseMock.statusMessage).toBe("OK");
     });
@@ -280,14 +280,14 @@ describe("Endpoint", () => {
         handler: async () => ({ test: "OK" }),
       });
       const { loggerMock, responseMock } = await testEndpoint({ endpoint });
-      expect(loggerMock.error).toBeCalledTimes(1);
+      expect(loggerMock.error).toHaveBeenCalledTimes(1);
       expect(loggerMock.error.mock.calls[0][0]).toBe(
         "Result handler failure: Something unexpected happened.",
       );
-      expect(responseMock.status).toBeCalledTimes(1);
+      expect(responseMock.status).toHaveBeenCalledTimes(1);
       expect(responseMock.status.mock.calls[0][0]).toBe(500);
-      expect(responseMock.json).toBeCalledTimes(0);
-      expect(responseMock.end).toBeCalledTimes(1);
+      expect(responseMock.json).toHaveBeenCalledTimes(0);
+      expect(responseMock.end).toHaveBeenCalledTimes(1);
       expect(responseMock.end.mock.calls[0][0]).toBe(
         "An error occurred while serving the result: Something unexpected happened.",
       );
@@ -499,9 +499,9 @@ describe("Endpoint", () => {
       const { responseMock, loggerMock } = await testEndpoint({
         endpoint,
       });
-      expect(loggerMock.error).toBeCalledTimes(1);
-      expect(responseMock.status).toBeCalledWith(500);
-      expect(responseMock.json).toBeCalledWith({
+      expect(loggerMock.error).toHaveBeenCalledTimes(1);
+      expect(responseMock.status).toHaveBeenCalledWith(500);
+      expect(responseMock.json).toHaveBeenCalledWith({
         status: "error",
         error: {
           message: "Something unexpected",
@@ -529,14 +529,14 @@ describe("Endpoint", () => {
         handler: async () => ({ test: "OK" }),
       });
       const { loggerMock, responseMock } = await testEndpoint({ endpoint });
-      expect(loggerMock.error).toBeCalledTimes(1);
+      expect(loggerMock.error).toHaveBeenCalledTimes(1);
       expect(loggerMock.error.mock.calls[0][0]).toBe(
         "Result handler failure: Something unexpected happened.",
       );
-      expect(responseMock.status).toBeCalledTimes(1);
+      expect(responseMock.status).toHaveBeenCalledTimes(1);
       expect(responseMock.status.mock.calls[0][0]).toBe(500);
-      expect(responseMock.json).toBeCalledTimes(0);
-      expect(responseMock.end).toBeCalledTimes(1);
+      expect(responseMock.json).toHaveBeenCalledTimes(0);
+      expect(responseMock.end).toHaveBeenCalledTimes(1);
       expect(responseMock.end.mock.calls[0][0]).toBe(
         "An error occurred while serving the result: Something unexpected happened.",
       );
@@ -565,9 +565,9 @@ describe("Endpoint", () => {
           body: {},
         },
       });
-      expect(loggerMock.error).toBeCalledTimes(1);
-      expect(responseMock.status).toBeCalledWith(500);
-      expect(responseMock.json).toBeCalledWith({
+      expect(loggerMock.error).toHaveBeenCalledTimes(1);
+      expect(responseMock.status).toHaveBeenCalledWith(500);
+      expect(responseMock.json).toHaveBeenCalledWith({
         status: "error",
         error: { message: "Something went wrong" },
       });
@@ -735,7 +735,7 @@ describe("Endpoint", () => {
               handler: jest.fn(),
             },
           }),
-      ).toThrowError(
+      ).toThrow(
         new IOSchemaError(
           "Using transformations on the top level of endpoint input schema is not allowed.",
         ),
@@ -753,7 +753,7 @@ describe("Endpoint", () => {
               handler: jest.fn(),
             },
           }),
-      ).toThrowError(
+      ).toThrow(
         new IOSchemaError(
           "Using transformations on the top level of endpoint output schema is not allowed.",
         ),

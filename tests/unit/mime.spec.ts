@@ -1,8 +1,9 @@
-import { mimeJson, mimeMultipart } from "../../src/mime";
+import { mimeJson, mimeMultipart, mimeRaw } from "../../src/mime";
 
 describe("Mime", () => {
   test("should export predefined types", () => {
-    expect(mimeJson).toEqual("application/json");
-    expect(mimeMultipart).toEqual("multipart/form-data");
+    expect(mimeJson).toBe("application/json");
+    expect(mimeMultipart).toBe("multipart/form-data");
+    expect(mimeRaw).toBe("application/octet-stream");
   });
 });
