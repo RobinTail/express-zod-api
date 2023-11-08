@@ -36,10 +36,11 @@ export const config = createConfig({
 
 ### v14.2.0
 
+- `express-fileupload` version is 1.4.2.
 - Featuring raw data handling in requests: you can now accept `application/octet-stream` typed requests and similar.
   - Including the mentioned MIME type of the request in the generated documentation.
 - In order to enable this feature you need to set the `rawParser` config option to `express.raw()`.
-  - Explore its additional options [in Exress.js documentation](https://expressjs.com/en/4x/api.html#express.raw).
+  - Explore its additional options [in Express.js documentation](https://expressjs.com/en/4x/api.html#express.raw).
 - When the feature is enabled, the raw data is placed into `request.body.raw` property, being `Buffer`.
 - The proprietary schema `ez.file()` is now equipped with two additional refinements:
   - `.string()` — for parsing string data, default for backward compatibility.
