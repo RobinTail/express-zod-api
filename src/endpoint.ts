@@ -13,6 +13,7 @@ import {
   FlatObject,
   getActualMethod,
   getInput,
+  hasRaw,
   hasTopLevelTransformingEffect,
   hasUpload,
   makeErrorFromAnything,
@@ -21,7 +22,7 @@ import { IOSchema } from "./io-schema";
 import { LogicalContainer, combineContainers } from "./logical-container";
 import { AuxMethod, Method } from "./method";
 import { AnyMiddlewareDef } from "./middleware";
-import { mimeJson, mimeMultipart } from "./mime";
+import { mimeJson, mimeMultipart, mimeRaw } from "./mime";
 import {
   ResultHandlerDefinition,
   defaultStatusCodes,
@@ -149,7 +150,11 @@ export class Endpoint<
       negative: resultHandler.getNegativeResponse(),
     };
     this.#mimeTypes = {
-      input: hasUpload(inputSchema) ? [mimeMultipart] : [mimeJson],
+      input: hasUpload(inputSchema)
+        ? [mimeMultipart]
+        : hasRaw(inputSchema)
+        ? [mimeRaw]
+        : [mimeJson],
       positive: getMimeTypesFromApiResponse(apiResponse.positive),
       negative: getMimeTypesFromApiResponse(apiResponse.negative),
     };

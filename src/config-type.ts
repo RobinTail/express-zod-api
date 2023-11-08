@@ -38,6 +38,7 @@ export interface ServerConfig {
     /**
      * @desc Custom JSON parser.
      * @default express.json()
+     * @link https://expressjs.com/en/4x/api.html#express.json
      * */
     jsonParser?: RequestHandler;
     /**
@@ -50,6 +51,14 @@ export interface ServerConfig {
      * @default false
      */
     compression?: boolean | CompressionOptions;
+    /**
+     * @desc Enables parsing certain request payloads into raw Buffers (application/octet-stream by default)
+     * @desc When enabled, use ez.raw() as input schema to get input.raw in Endpoint's handler
+     * @default undefined
+     * @example express.raw()
+     * @link https://expressjs.com/en/4x/api.html#express.raw
+     * */
+    rawParser?: RequestHandler;
   };
   /** @desc Enables HTTPS server as well. */
   https?: {

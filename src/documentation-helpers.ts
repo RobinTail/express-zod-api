@@ -22,6 +22,7 @@ import {
   FlatObject,
   getExamples,
   hasCoercion,
+  hasRaw,
   hasTopLevelTransformingEffect,
   isCustomHeader,
   makeCleanId,
@@ -144,20 +145,11 @@ export const depictUpload: Depicter<ZodUpload> = (ctx) => {
 };
 
 export const depictFile: Depicter<ZodFile> = ({
-  schema: { isBinary, isBase64 },
-  ...ctx
-}) => {
-  if (!ctx.isResponse) {
-    throw new DocumentationError({
-      message: "Please use z.file() only within ResultHandler.",
-      ...ctx,
-    });
-  }
-  return {
-    type: "string",
-    format: isBinary ? "binary" : isBase64 ? "byte" : "file",
-  };
-};
+  schema: { isBinary, isBase64, isBuffer },
+}) => ({
+  type: "string",
+  format: isBuffer || isBinary ? "binary" : isBase64 ? "byte" : "file",
+});
 
 export const depictUnion: Depicter<z.ZodUnion<z.ZodUnionOptions>> = ({
   schema: { options },
@@ -989,10 +981,11 @@ export const depictRequest = ({
   clue = "request body",
 }: ReqResDepictHelperCommonProps): RequestBodyObject => {
   const pathParams = getRoutePathParams(path);
+  const inputSchema = endpoint.getSchema("input");
   const bodyDepiction = excludeExampleFromDepiction(
     excludeParamsFromDepiction(
       walkSchema({
-        schema: endpoint.getSchema("input"),
+        schema: hasRaw(inputSchema) ? ZodFile.create().buffer() : inputSchema,
         isResponse: false,
         rules: depicters,
         onEach,

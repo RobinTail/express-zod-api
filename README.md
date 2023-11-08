@@ -23,37 +23,41 @@ Start your API server with I/O schema validation and custom middlewares in minut
    3. [Create an endpoints factory](#create-an-endpoints-factory)
    4. [Create your first endpoint](#create-your-first-endpoint)
    5. [Set up routing](#set-up-routing)
-   6. [Start your server](#start-your-server)
+   6. [Create your server](#create-your-server)
    7. [Try it](#try-it)
-4. [Charming features](#charming-features)
-   1. [Cross-Origin Resource Sharing](#cross-origin-resource-sharing) (CORS)
-   2. [Middlewares](#middlewares)
-   3. [Options](#options)
+4. [Basic features](#basic-features)
+   1. [Middlewares](#middlewares)
+   2. [Options](#options)
+   3. [Using native express middlewares](#using-native-express-middlewares)
    4. [Refinements](#refinements)
    5. [Transformations](#transformations)
    6. [Dealing with dates](#dealing-with-dates)
-   7. [Route path params](#route-path-params)
-   8. [Response customization](#response-customization)
-   9. [Non-object response](#non-object-response) including file downloads
-   10. [Array response](#array-response) for migrating legacy APIs
-   11. [Using native express middlewares](#using-native-express-middlewares)
-   12. [File uploads](#file-uploads)
-   13. [Customizing logger](#customizing-logger)
-   14. [Connect to your own express app](#connect-to-your-own-express-app)
-   15. [Multiple schemas for one route](#multiple-schemas-for-one-route)
-   16. [Serving static files](#serving-static-files)
-   17. [Customizing input sources](#customizing-input-sources)
-   18. [Headers as input source](#headers-as-input-source)
-   19. [Enabling compression](#enabling-compression)
-   20. [Enabling HTTPS](#enabling-https)
-   21. [Generating a Frontend Client](#generating-a-frontend-client)
-   22. [Creating a documentation](#creating-a-documentation)
-   23. [Tagging the endpoints](#tagging-the-endpoints)
-   24. [How to test endpoints](#how-to-test-endpoints)
-5. [Caveats](#caveats)
+   7. [Cross-Origin Resource Sharing](#cross-origin-resource-sharing) (CORS)
+   8. [Enabling HTTPS](#enabling-https)
+   9. [Customizing logger](#customizing-logger)
+   10. [Enabling compression](#enabling-compression)
+5. [Advances features](#advances-features)
+   1. [Customizing input sources](#customizing-input-sources)
+   2. [Route path params](#route-path-params)
+   3. [Multiple schemas for one route](#multiple-schemas-for-one-route)
+   4. [Response customization](#response-customization)
+   5. [Non-object response](#non-object-response) including file downloads
+   6. [File uploads](#file-uploads)
+   7. [Serving static files](#serving-static-files)
+   8. [Connect to your own express app](#connect-to-your-own-express-app)
+6. [Special needs](#special-needs)
+   1. [Array response](#array-response) for migrating legacy APIs
+   2. [Headers as input source](#headers-as-input-source)
+   3. [Accepting raw data](#accepting-raw-data)
+7. [Integration and Documentation](#integration-and-documentation)
+   1. [Generating a Frontend Client](#generating-a-frontend-client)
+   2. [Creating a documentation](#creating-a-documentation)
+   3. [Tagging the endpoints](#tagging-the-endpoints)
+   4. [How to test endpoints](#how-to-test-endpoints)
+8. [Caveats](#caveats)
    1. [Coercive schema of Zod](#coercive-schema-of-zod)
    2. [Excessive properties in endpoint output](#excessive-properties-in-endpoint-output)
-6. [Your input to my output](#your-input-to-my-output)
+9. [Your input to my output](#your-input-to-my-output)
 
 You can find the release notes and migration guides in [Changelog](CHANGELOG.md).
 
@@ -130,6 +134,9 @@ Add the following option to your `tsconfig.json` file in order to make it work a
 
 ## Set up config
 
+Create a minimal configuration. _See all available options
+[in sources](https://github.com/RobinTail/express-zod-api/blob/master/src/config-type.ts)._
+
 ```typescript
 import { createConfig } from "express-zod-api";
 
@@ -138,33 +145,28 @@ const config = createConfig({
     listen: 8090, // port, UNIX socket or options
   },
   cors: true,
-  logger: {
-    level: "debug",
-    color: true,
-  },
+  logger: { level: "debug", color: true },
 });
 ```
 
-_See all available options [here](https://github.com/RobinTail/express-zod-api/blob/master/src/config-type.ts)._
-
 ## Create an endpoints factory
 
-In the basic case, you can just import and use the default factory:
+In the basic case, you can just import and use the default factory.
+_See also [Middlewares](#middlewares) and [Response customization](#response-customization)._
 
 ```typescript
 import { defaultEndpointsFactory } from "express-zod-api";
 ```
 
-_In case you need a global middleware, see [Middlewares](#middlewares)._
-_In case you need to customize the response, see [Response customization](#response-customization)._
-
 ## Create your first endpoint
+
+The endpoint responds with "Hello, World" or "Hello, {name}" if the name is supplied within `GET` request payload.
 
 ```typescript
 import { z } from "zod";
 
 const helloWorldEndpoint = defaultEndpointsFactory.build({
-  method: "get",
+  method: "get", // or methods: ["get", "post", ...]
   input: z.object({
     // for empty input use z.object({})
     name: z.string().optional(),
@@ -178,8 +180,6 @@ const helloWorldEndpoint = defaultEndpointsFactory.build({
   },
 });
 ```
-
-_In case you want it to handle multiple methods use `methods` property instead of `method`._
 
 ## Set up routing
 
@@ -195,7 +195,9 @@ const routing: Routing = {
 };
 ```
 
-## Start your server
+## Create your server
+
+See the [complete implementation example](https://github.com/RobinTail/express-zod-api/tree/master/example).
 
 ```typescript
 import { createServer } from "express-zod-api";
@@ -203,12 +205,9 @@ import { createServer } from "express-zod-api";
 createServer(config, routing);
 ```
 
-You can disable startup logo using `startupLogo` entry of your config.
-See the [full implementation example here](https://github.com/RobinTail/express-zod-api/tree/master/example).
-
 ## Try it
 
-Execute the following command:
+Start your application and execute the following command:
 
 ```shell
 curl -L -X GET 'localhost:8090/v1/hello?name=Rick'
@@ -220,32 +219,7 @@ You should receive the following response:
 { "status": "success", "data": { "greetings": "Hello, Rick. Happy coding!" } }
 ```
 
-# Charming features
-
-## Cross-Origin Resource Sharing
-
-You can enable your API for other domains using the corresponding configuration option `cors`.
-It's _not optional_ to draw your attention to making the appropriate decision, however, it's enabled in the
-[Quick start example](#set-up-config) above, assuming that in most cases you will want to enable this feature.
-See [MDN article](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) for more information.
-
-In addition to being a boolean, `cors` can also be assigned a function that overrides default CORS headers.
-That function has several parameters and can be asynchronous.
-
-```typescript
-import { createConfig } from "express-zod-api";
-
-const config = createConfig({
-  // ... other options
-  cors: ({ defaultHeaders, request, endpoint, logger }) => ({
-    ...defaultHeaders,
-    "Access-Control-Max-Age": "5000",
-  }),
-});
-```
-
-Please note: If you only want to send specific headers on requests to a specific endpoint, consider the
-[Middlewares](#middlewares) or [response customization approach](#response-customization).
+# Basic features
 
 ## Middlewares
 
@@ -318,6 +292,29 @@ import { defaultEndpointsFactory } from "express-zod-api";
 const endpointsFactory = defaultEndpointsFactory.addOptions({
   db: mongoose.connect("mongodb://connection.string"),
   privateKey: fs.readFileSync("private-key.pem", "utf-8"),
+});
+```
+
+## Using native express middlewares
+
+You can connect any native `express` middleware that can be supplied to `express` method `app.use()`.
+For this purpose the `EndpointsFactory` provides method `addExpressMiddleware()` and its alias `use()`.
+There are also two optional features available: a provider of options and an error transformer for `ResultHandler`.
+In case the error in middleware is not a `HttpError`, the `ResultHandler` will send the status `500`.
+
+```typescript
+import { defaultEndpointsFactory } from "express-zod-api";
+import cors from "cors";
+import createHttpError from "http-errors";
+import { auth } from "express-oauth2-jwt-bearer";
+
+const simpleUsage = defaultEndpointsFactory.addExpressMiddleware(
+  cors({ credentials: true }),
+);
+
+const advancedUsage = defaultEndpointsFactory.use(auth(), {
+  provider: (req) => ({ auth: req.auth }), // optional, can be async
+  transformer: (err) => createHttpError(401, err.message), // optional
 });
 ```
 
@@ -438,6 +435,124 @@ const updateUserEndpoint = defaultEndpointsFactory.build({
 });
 ```
 
+## Cross-Origin Resource Sharing
+
+You can enable your API for other domains using the corresponding configuration option `cors`.
+It's _not optional_ to draw your attention to making the appropriate decision, however, it's enabled in the
+[Quick start example](#set-up-config) above, assuming that in most cases you will want to enable this feature.
+See [MDN article](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) for more information.
+
+In addition to being a boolean, `cors` can also be assigned a function that overrides default CORS headers.
+That function has several parameters and can be asynchronous.
+
+```typescript
+import { createConfig } from "express-zod-api";
+
+const config = createConfig({
+  // ... other options
+  cors: ({ defaultHeaders, request, endpoint, logger }) => ({
+    ...defaultHeaders,
+    "Access-Control-Max-Age": "5000",
+  }),
+});
+```
+
+Please note: If you only want to send specific headers on requests to a specific endpoint, consider the
+[Middlewares](#middlewares) or [response customization approach](#response-customization).
+
+## Enabling HTTPS
+
+The modern API standard often assumes the use of a secure data transfer protocol, confirmed by a TLS certificate, also
+often called an SSL certificate in habit. When using the `createServer()` method, you can additionally configure and
+run the HTTPS server.
+
+```typescript
+import { createConfig, createServer } from "express-zod-api";
+
+const config = createConfig({
+  server: {
+    listen: 80,
+  },
+  https: {
+    options: {
+      cert: fs.readFileSync("fullchain.pem", "utf-8"),
+      key: fs.readFileSync("privkey.pem", "utf-8"),
+    },
+    listen: 443, // port, UNIX socket or options
+  },
+  // ... cors, logger, etc
+});
+
+const { app, httpServer, httpsServer, logger } = createServer(config, routing);
+```
+
+Ensure having `@types/node` package installed. At least you need to specify the port (usually it is 443) or UNIX socket,
+certificate and the key, issued by the certifying authority. For example, you can acquire a free TLS certificate for
+your API at [Let's Encrypt](https://letsencrypt.org/).
+
+## Customizing logger
+
+You can specify your custom Winston logger in config:
+
+```typescript
+import winston from "winston";
+import { createConfig } from "express-zod-api";
+
+const logger = winston.createLogger({
+  /* ... */
+});
+const config = createConfig({ logger /* ..., */ });
+```
+
+## Enabling compression
+
+According to [Express.js best practices guide](http://expressjs.com/en/advanced/best-practice-performance.html)
+it might be a good idea to enable GZIP compression of your API responses. You can achieve and customize it by using the
+corresponding configuration option when using the `createServer()` method.
+
+In order to receive the compressed response the client should include the following header in the request:
+`Accept-Encoding: gzip, deflate`. Only responses with compressible content types are subject to compression. There is
+also a default threshold of 1KB that can be configured.
+
+```typescript
+import { createConfig } from "express-zod-api";
+
+const config = createConfig({
+  server: {
+    // compression: true, or:
+    compression: {
+      // @see https://www.npmjs.com/package/compression#options
+      threshold: "100b",
+    },
+    // ... other options
+  },
+  // ... other options
+});
+```
+
+# Advances features
+
+## Customizing input sources
+
+You can customize the list of `request` properties that are combined into `input` that is being validated and available
+to your endpoints and middlewares. The order here matters: each next item in the array has a higher priority than its
+previous sibling.
+
+```typescript
+import { createConfig } from "express-zod-api";
+
+createConfig({
+  inputSources: {
+    // the defaults are:
+    get: ["query", "params"],
+    post: ["body", "params", "files"],
+    put: ["body", "params"],
+    patch: ["body", "params"],
+    delete: ["query", "params"],
+  }, // ...
+});
+```
+
 ## Route path params
 
 You can describe the route of the endpoint using parameters:
@@ -475,6 +590,28 @@ const getUserEndpoint = endpointsFactory.build({
     // id is the route path param, number
   },
 });
+```
+
+## Multiple schemas for one route
+
+Thanks to the `DependsOnMethod` class a route may have multiple Endpoints attached depending on different methods.
+It can also be the same Endpoint that handles multiple methods as well.
+
+```typescript
+import { DependsOnMethod } from "express-zod-api";
+
+// the route /v1/user has two Endpoints
+// which handle a couple of methods each
+const routing: Routing = {
+  v1: {
+    user: new DependsOnMethod({
+      get: yourEndpointA,
+      delete: yourEndpointA,
+      post: yourEndpointB,
+      patch: yourEndpointB,
+    }),
+  },
+};
 ```
 
 ## Response customization
@@ -555,7 +692,7 @@ The response schema generally may be just `z.string()`, but I made more specific
 const fileStreamingEndpointsFactory = new EndpointsFactory(
   createResultHandler({
     getPositiveResponse: () => ({
-      schema: ez.file().binary(),
+      schema: ez.file().buffer(),
       mimeType: "image/*",
     }),
     getNegativeResponse: () => ({ schema: z.string(), mimeType: "text/plain" }),
@@ -574,39 +711,6 @@ const fileStreamingEndpointsFactory = new EndpointsFactory(
     },
   }),
 );
-```
-
-## Array response
-
-Please avoid doing this in new projects: responding with array is a bad practice keeping your endpoints from evolving
-in backward compatible way (without making breaking changes). Nevertheless, for the purpose of easier migration of
-legacy APIs to this library consider using `arrayResultHandler` or `arrayEndpointsFactory` instead of default ones,
-or implement your own ones in a similar way.
-The `arrayResultHandler` expects your endpoint to have `items` property in the `output` object schema. The array
-assigned to that property is used as the response. This approach also supports examples, as well as documentation and
-client generation. Check out [the example endpoint](/example/endpoints/list-users.ts) for more details.
-
-## Using native express middlewares
-
-You can connect any native `express` middleware that can be supplied to `express` method `app.use()`.
-For this purpose the `EndpointsFactory` provides method `addExpressMiddleware()` and its alias `use()`.
-There are also two optional features available: a provider of options and an error transformer for `ResultHandler`.
-In case the error in middleware is not a `HttpError`, the `ResultHandler` will send the status `500`.
-
-```typescript
-import { defaultEndpointsFactory } from "express-zod-api";
-import cors from "cors";
-import createHttpError from "http-errors";
-import { auth } from "express-oauth2-jwt-bearer";
-
-const simpleUsage = defaultEndpointsFactory.addExpressMiddleware(
-  cors({ credentials: true }),
-);
-
-const advancedUsage = defaultEndpointsFactory.use(auth(), {
-  provider: (req) => ({ auth: req.auth }), // optional, can be async
-  transformer: (err) => createHttpError(401, err.message), // optional
-});
 ```
 
 ## File uploads
@@ -643,18 +747,24 @@ const fileUploadEndpoint = defaultEndpointsFactory.build({
 
 _You can still send other data and specify additional `input` parameters, including arrays and objects._
 
-## Customizing logger
+## Serving static files
 
-You can specify your custom Winston logger in config:
+In case you want your server to serve static files, you can use `new ServeStatic()` in `Routing` using the arguments
+similar to `express.static()`.
+The documentation on these arguments you may find [here](http://expressjs.com/en/4x/api.html#express.static).
 
 ```typescript
-import winston from "winston";
-import { createConfig } from "express-zod-api";
+import { Routing, ServeStatic } from "express-zod-api";
+import { join } from "node:path";
 
-const logger = winston.createLogger({
-  /* ... */
-});
-const config = createConfig({ logger /* ..., */ });
+const routing: Routing = {
+  // path /public serves static files from ./assets
+  public: new ServeStatic(join(__dirname, "assets"), {
+    dotfiles: "deny",
+    index: false,
+    redirect: false,
+  }),
+};
 ```
 
 ## Connect to your own express app
@@ -684,68 +794,17 @@ logger.info("Glory to science!");
 errors yourself. In this regard `attachRouting()` provides you with `notFoundHandler` which you can optionally connect
 to your custom express app.
 
-## Multiple schemas for one route
+# Special needs
 
-Thanks to the `DependsOnMethod` class a route may have multiple Endpoints attached depending on different methods.
-It can also be the same Endpoint that handles multiple methods as well.
+## Array response
 
-```typescript
-import { DependsOnMethod } from "express-zod-api";
-
-// the route /v1/user has two Endpoints
-// which handle a couple of methods each
-const routing: Routing = {
-  v1: {
-    user: new DependsOnMethod({
-      get: yourEndpointA,
-      delete: yourEndpointA,
-      post: yourEndpointB,
-      patch: yourEndpointB,
-    }),
-  },
-};
-```
-
-## Serving static files
-
-In case you want your server to serve static files, you can use `new ServeStatic()` in `Routing` using the arguments
-similar to `express.static()`.
-The documentation on these arguments you may find [here](http://expressjs.com/en/4x/api.html#express.static).
-
-```typescript
-import { Routing, ServeStatic } from "express-zod-api";
-import { join } from "node:path";
-
-const routing: Routing = {
-  // path /public serves static files from ./assets
-  public: new ServeStatic(join(__dirname, "assets"), {
-    dotfiles: "deny",
-    index: false,
-    redirect: false,
-  }),
-};
-```
-
-## Customizing input sources
-
-You can customize the list of `request` properties that are combined into `input` that is being validated and available
-to your endpoints and middlewares. The order here matters: each next item in the array has a higher priority than its
-previous sibling.
-
-```typescript
-import { createConfig } from "express-zod-api";
-
-createConfig({
-  inputSources: {
-    // the defaults are:
-    get: ["query", "params"],
-    post: ["body", "params", "files"],
-    put: ["body", "params"],
-    patch: ["body", "params"],
-    delete: ["query", "params"],
-  }, // ...
-});
-```
+Please avoid doing this in new projects: responding with array is a bad practice keeping your endpoints from evolving
+in backward compatible way (without making breaking changes). Nevertheless, for the purpose of easier migration of
+legacy APIs to this library consider using `arrayResultHandler` or `arrayEndpointsFactory` instead of default ones,
+or implement your own ones in a similar way.
+The `arrayResultHandler` expects your endpoint to have `items` property in the `output` object schema. The array
+assigned to that property is used as the response. This approach also supports examples, as well as documentation and
+client generation. Check out [the example endpoint](/example/endpoints/list-users.ts) for more details.
 
 ## Headers as input source
 
@@ -774,61 +833,37 @@ defaultEndpointsFactory.build({
 });
 ```
 
-## Enabling compression
+## Accepting raw data
 
-According to [Express.js best practices guide](http://expressjs.com/en/advanced/best-practice-performance.html)
-it might be a good idea to enable GZIP compression of your API responses. You can achieve and customize it by using the
-corresponding configuration option when using the `createServer()` method.
-
-In order to receive the compressed response the client should include the following header in the request:
-`Accept-Encoding: gzip, deflate`. Only responses with compressible content types are subject to compression. There is
-also a default threshold of 1KB that can be configured.
+Some APIs may require an endpoint to be able to accept and process raw data, such as streaming or uploading a binary
+file as an entire body of request. In order to enable this feature you need to set the `rawParser` config feature to
+`express.raw()`. See also its options [in Express.js documentation](https://expressjs.com/en/4x/api.html#express.raw).
+The raw data is placed into `request.body.raw` property, having type `Buffer`. Then use the proprietary `ez.raw()`
+schema (which is an alias for `z.object({ raw: ez.file().buffer() })`) as the input schema of your endpoint.
 
 ```typescript
-import { createConfig } from "express-zod-api";
+import express from "express";
+import { createConfig, defaultEndpointsFactory, ez } from "express-zod-api";
 
 const config = createConfig({
   server: {
-    // compression: true, or:
-    compression: {
-      // @see https://www.npmjs.com/package/compression#options
-      threshold: "100b",
-    },
-    // ... other options
+    rawParser: express.raw(), // enables the feature
   },
-  // ... other options
+});
+
+const rawAcceptingEndpoint = defaultEndpointsFactory.build({
+  method: "post",
+  input: ez
+    .raw() // accepts the featured { raw: Buffer }
+    .extend({}), // for additional inputs, like route params, if needed
+  output: z.object({ length: z.number().int().nonnegative() }),
+  handler: async ({ input: { raw } }) => ({
+    length: raw.length, // raw is Buffer
+  }),
 });
 ```
 
-## Enabling HTTPS
-
-The modern API standard often assumes the use of a secure data transfer protocol, confirmed by a TLS certificate, also
-often called an SSL certificate in habit. When using the `createServer()` method, you can additionally configure and
-run the HTTPS server.
-
-```typescript
-import { createConfig, createServer } from "express-zod-api";
-
-const config = createConfig({
-  server: {
-    listen: 80,
-  },
-  https: {
-    options: {
-      cert: fs.readFileSync("fullchain.pem", "utf-8"),
-      key: fs.readFileSync("privkey.pem", "utf-8"),
-    },
-    listen: 443, // port, UNIX socket or options
-  },
-  // ... cors, logger, etc
-});
-
-const { app, httpServer, httpsServer, logger } = createServer(config, routing);
-```
-
-Ensure having `@types/node` package installed. At least you need to specify the port (usually it is 443) or UNIX socket,
-certificate and the key, issued by the certifying authority. For example, you can acquire a free TLS certificate for
-your API at [Let's Encrypt](https://letsencrypt.org/).
+# Integration and Documentation
 
 ## Generating a Frontend Client
 

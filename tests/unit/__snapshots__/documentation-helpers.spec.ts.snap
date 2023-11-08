@@ -267,11 +267,6 @@ exports[`Documentation helpers depictFile() should set type:string and format ac
 }
 `;
 
-exports[`Documentation helpers depictFile() should throw when using in input 1`] = `
-[DocumentationError: Please use z.file() only within ResultHandler.
-Caused by input schema of an Endpoint assigned to GET method of /v1/user/:id path.]
-`;
-
 exports[`Documentation helpers depictIntersection() should wrap next depicters in allOf property 1`] = `
 {
   "allOf": [

@@ -3,13 +3,35 @@ import { readFile } from "node:fs/promises";
 
 describe("ZodFile", () => {
   describe("static::create()", () => {
-    test("should create an instance", () => {
+    test("should create an instance being string by default", () => {
       const schema = ZodFile.create();
       expect(schema).toBeInstanceOf(ZodFile);
-      expect(schema._def.checks).toEqual([]);
+      expect(schema._def.encoding).toBeUndefined();
       expect(schema._def.typeName).toEqual("ZodFile");
       expect(schema.isBinary).toBeFalsy();
       expect(schema.isBase64).toBeFalsy();
+      expect(schema.isString).toBeTruthy();
+      expect(schema.isBuffer).toBeFalsy();
+    });
+  });
+
+  describe(".string()", () => {
+    test("should create a string file", () => {
+      const schema = ZodFile.create().string();
+      expect(schema).toBeInstanceOf(ZodFile);
+      expect(schema._def.encoding).toBeUndefined();
+      expect(schema.isString).toBeTruthy();
+      expect(schema.isBuffer).toBeFalsy();
+    });
+  });
+
+  describe(".buffer()", () => {
+    test("should create a buffer file", () => {
+      const schema = ZodFile.create().buffer();
+      expect(schema).toBeInstanceOf(ZodFile);
+      expect(schema._def.encoding).toBeUndefined();
+      expect(schema.isBuffer).toBeTruthy();
+      expect(schema.isString).toBeFalsy();
     });
   });
 
@@ -18,12 +40,8 @@ describe("ZodFile", () => {
       const schema = ZodFile.create().binary("test message");
       expect(schema).toBeInstanceOf(ZodFile);
       expect(schema.isBinary).toBeTruthy();
-      expect(schema._def.checks).toEqual([
-        {
-          kind: "binary",
-          message: "test message",
-        },
-      ]);
+      expect(schema._def.encoding).toBe("binary");
+      expect(schema._def.message).toBe("test message");
     });
   });
 
@@ -32,42 +50,55 @@ describe("ZodFile", () => {
       const schema = ZodFile.create().base64("test message");
       expect(schema).toBeInstanceOf(ZodFile);
       expect(schema.isBase64).toBeTruthy();
-      expect(schema._def.checks).toEqual([
-        {
-          kind: "base64",
-          message: "test message",
-        },
-      ]);
+      expect(schema._def.encoding).toBe("base64");
+      expect(schema._def.message).toBe("test message");
     });
   });
 
   describe("_parse()", () => {
-    test("should handle wrong parsed type", () => {
-      const schema = ZodFile.create();
-      const result = schema.safeParse(123);
-      expect(result.success).toBeFalsy();
-      if (!result.success) {
-        expect(result.error.issues).toEqual([
-          {
-            code: "invalid_type",
-            expected: "string",
-            message: "Expected string, received number",
-            path: [],
-            received: "number",
-          },
-        ]);
-      }
-    });
+    test.each([
+      {
+        schema: ZodFile.create(),
+        subject: 123,
+        expected: "string",
+        received: "number",
+        message: "Expected string, received number",
+      },
+      {
+        schema: ZodFile.create().buffer(),
+        subject: "123",
+        expected: "object",
+        received: "string",
+        message: "Expected Buffer",
+      },
+    ])(
+      "should invalidate wrong types",
+      ({ schema, subject, expected, received, message }) => {
+        const result = schema.safeParse(subject);
+        expect(result.success).toBeFalsy();
+        if (!result.success) {
+          expect(result.error.issues).toEqual([
+            {
+              code: "invalid_type",
+              expected,
+              message,
+              path: [],
+              received,
+            },
+          ]);
+        }
+      },
+    );
 
     test("should perform additional check for base64 file", () => {
-      const schema = ZodFile.create().base64("this is not base64");
+      const schema = ZodFile.create().base64();
       const result = schema.safeParse("~~~~");
       expect(result.success).toBeFalsy();
       if (!result.success) {
         expect(result.error.issues).toEqual([
           {
             code: "custom",
-            message: "this is not base64",
+            message: "Does not match base64 encoding",
             path: [],
           },
         ]);
@@ -80,6 +111,16 @@ describe("ZodFile", () => {
       expect(result).toEqual({
         success: true,
         data: "some string",
+      });
+    });
+
+    test("should accept Buffer", () => {
+      const schema = ZodFile.create().buffer();
+      const subject = Buffer.from("test", "utf-8");
+      const result = schema.safeParse(subject);
+      expect(result).toEqual({
+        success: true,
+        data: subject,
       });
     });
 

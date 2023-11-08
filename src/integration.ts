@@ -1,5 +1,6 @@
 import ts from "typescript";
 import { z } from "zod";
+import { ZodFile } from "./file-schema";
 import {
   exportModifier,
   f,
@@ -23,7 +24,7 @@ import {
   parametricIndexNode,
   protectedReadonlyModifier,
 } from "./integration-helpers";
-import { defaultSerializer, makeCleanId } from "./common-helpers";
+import { defaultSerializer, hasRaw, makeCleanId } from "./common-helpers";
 import { methods } from "./method";
 import { mimeJson } from "./mime";
 import { Routing } from "./routing";
@@ -102,9 +103,10 @@ export class Integration {
           makeAlias: this.makeAlias.bind(this),
           optionalPropStyle,
         };
+        const inputSchema = endpoint.getSchema("input");
         const input = zodToTs({
           ...commons,
-          schema: endpoint.getSchema("input"),
+          schema: hasRaw(inputSchema) ? ZodFile.create().buffer() : inputSchema,
           isResponse: false,
         });
         const response = zodToTs({

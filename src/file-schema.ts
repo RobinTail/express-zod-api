@@ -12,28 +12,27 @@ import { ErrMessage, errToObj } from "./common-helpers";
 
 const zodFileKind = "ZodFile";
 
-declare type ZodFileCheck =
-  | {
-      kind: "binary";
-      message?: string;
-    }
-  | {
-      kind: "base64";
-      message?: string;
-    };
-
-export interface ZodFileDef extends ZodTypeDef {
-  checks: ZodFileCheck[];
+export interface ZodFileDef<T extends string | Buffer = string | Buffer>
+  extends ZodTypeDef {
   typeName: typeof zodFileKind;
+  type: T;
+  encoding?: "binary" | "base64";
+  message?: string;
 }
 
 const base64Regex =
   /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/;
 
-export class ZodFile extends ZodType<string, ZodFileDef> {
-  _parse(input: ParseInput): ParseReturnType<string> {
+export class ZodFile<
+  T extends string | Buffer = string | Buffer,
+> extends ZodType<T, ZodFileDef<T>, T> {
+  _parse(input: ParseInput): ParseReturnType<T> {
     const { status, ctx } = this._processInputParams(input);
-    if (ctx.parsedType !== ZodParsedType.string) {
+
+    const isParsedString =
+      ctx.parsedType === ZodParsedType.string && typeof ctx.data === "string";
+
+    if (this.isString && !isParsedString) {
       addIssueToContext(ctx, {
         code: ZodIssueCode.invalid_type,
         expected: ZodParsedType.string,
@@ -42,44 +41,70 @@ export class ZodFile extends ZodType<string, ZodFileDef> {
       return INVALID;
     }
 
-    for (const check of this._def.checks) {
-      if (check.kind === "base64") {
-        if (!base64Regex.test(ctx.data)) {
-          addIssueToContext(ctx, {
-            code: ZodIssueCode.custom,
-            message: check.message,
-          });
-          status.dirty();
-        }
-      }
+    const isParsedBuffer =
+      ctx.parsedType === ZodParsedType.object && Buffer.isBuffer(ctx.data);
+
+    if (this.isBuffer && !isParsedBuffer) {
+      addIssueToContext(ctx, {
+        code: ZodIssueCode.invalid_type,
+        expected: ZodParsedType.object,
+        received: ctx.parsedType,
+        message: "Expected Buffer",
+      });
+      return INVALID;
     }
 
-    return { status: status.value, value: ctx.data };
+    if (isParsedString && this.isBase64 && !base64Regex.test(ctx.data)) {
+      addIssueToContext(ctx, {
+        code: ZodIssueCode.custom,
+        message: this._def.message || "Does not match base64 encoding",
+      });
+      status.dirty();
+    }
+
+    return { status: status.value, value: ctx.data as T };
   }
 
-  binary = (message?: ErrMessage) =>
+  string = (message?: ErrMessage) =>
+    new ZodFile<string>({ ...this._def, ...errToObj(message), type: "" });
+
+  buffer = (message?: ErrMessage) =>
     new ZodFile({
       ...this._def,
-      checks: [...this._def.checks, { kind: "binary", ...errToObj(message) }],
+      ...errToObj(message),
+      type: Buffer.from([]),
+    });
+
+  binary = (message?: ErrMessage) =>
+    new ZodFile<T>({
+      ...this._def,
+      ...errToObj(message),
+      encoding: "binary",
     });
 
   base64 = (message?: ErrMessage) =>
-    new ZodFile({
+    new ZodFile<T>({
       ...this._def,
-      checks: [...this._def.checks, { kind: "base64", ...errToObj(message) }],
+      ...errToObj(message),
+      encoding: "base64",
     });
 
   get isBinary() {
-    return !!this._def.checks.find((check) => check.kind === "binary");
+    return this._def.encoding === "binary";
   }
 
   get isBase64() {
-    return !!this._def.checks.find((check) => check.kind === "base64");
+    return this._def.encoding === "base64";
+  }
+
+  get isString() {
+    return typeof this._def.type === "string";
+  }
+
+  get isBuffer() {
+    return Buffer.isBuffer(this._def.type);
   }
 
   static create = () =>
-    new ZodFile({
-      checks: [],
-      typeName: zodFileKind,
-    });
+    new ZodFile<string>({ typeName: zodFileKind, type: "" });
 }
