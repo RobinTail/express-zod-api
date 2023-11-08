@@ -41,7 +41,7 @@ describe("Middleware", () => {
             .transform(() => []),
           middleware: jest.fn(),
         };
-        expect(() => createMiddleware(definition)).toThrowError(
+        expect(() => createMiddleware(definition)).toThrow(
           new IOSchemaError(
             "Using transformations on the top level of middleware input schema is not allowed.",
           ),
