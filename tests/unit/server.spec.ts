@@ -69,15 +69,15 @@ describe("Server", () => {
       createServer(configMock, routingMock);
       expect(appMock).toBeTruthy();
       expect(appMock.disable).toHaveBeenCalledWith("x-powered-by");
-      expect(appMock.use).toBeCalledTimes(3);
+      expect(appMock.use).toHaveBeenCalledTimes(3);
       expect(appMock.use.mock.calls[0][0]).toBe(expressJsonMock);
-      expect(appMock.get).toBeCalledTimes(1);
+      expect(appMock.get).toHaveBeenCalledTimes(1);
       expect(appMock.get.mock.calls[0][0]).toBe("/v1/test");
-      expect(appMock.post).toBeCalledTimes(1);
+      expect(appMock.post).toHaveBeenCalledTimes(1);
       expect(appMock.post.mock.calls[0][0]).toBe("/v1/test");
-      expect(appMock.options).toBeCalledTimes(1);
+      expect(appMock.options).toHaveBeenCalledTimes(1);
       expect(appMock.options.mock.calls[0][0]).toBe("/v1/test");
-      expect(httpListenSpy).toBeCalledTimes(1);
+      expect(httpListenSpy).toHaveBeenCalledTimes(1);
       expect(httpListenSpy).toHaveBeenCalledWith(port, expect.any(Function));
     });
 
@@ -118,18 +118,18 @@ describe("Server", () => {
       expect(logger).toEqual(customLogger);
       expect(app).toEqual(appMock);
       expect(appMock).toBeTruthy();
-      expect(appMock.use).toBeCalledTimes(3);
+      expect(appMock.use).toHaveBeenCalledTimes(3);
       expect(appMock.use.mock.calls[0][0]).toBe(configMock.server.jsonParser);
-      expect(configMock.errorHandler.handler).toBeCalledTimes(0);
-      expect(infoMethod).toBeCalledTimes(1);
-      expect(infoMethod).toBeCalledWith(`Listening`, { port });
-      expect(appMock.get).toBeCalledTimes(1);
+      expect(configMock.errorHandler.handler).toHaveBeenCalledTimes(0);
+      expect(infoMethod).toHaveBeenCalledTimes(1);
+      expect(infoMethod).toHaveBeenCalledWith(`Listening`, { port });
+      expect(appMock.get).toHaveBeenCalledTimes(1);
       expect(appMock.get.mock.calls[0][0]).toBe("/v1/test");
-      expect(appMock.post).toBeCalledTimes(1);
+      expect(appMock.post).toHaveBeenCalledTimes(1);
       expect(appMock.post.mock.calls[0][0]).toBe("/v1/test");
-      expect(appMock.options).toBeCalledTimes(1);
+      expect(appMock.options).toHaveBeenCalledTimes(1);
       expect(appMock.options.mock.calls[0][0]).toBe("/v1/test");
-      expect(httpListenSpy).toBeCalledTimes(1);
+      expect(httpListenSpy).toHaveBeenCalledTimes(1);
       expect(httpListenSpy).toHaveBeenCalledWith(
         { port },
         expect.any(Function),
@@ -167,7 +167,7 @@ describe("Server", () => {
         configMock.https.options,
         appMock,
       );
-      expect(httpsListenSpy).toBeCalledTimes(1);
+      expect(httpsListenSpy).toHaveBeenCalledTimes(1);
       expect(httpsListenSpy).toHaveBeenCalledWith(
         configMock.https.listen,
         expect.any(Function),
@@ -393,14 +393,14 @@ describe("Server", () => {
       );
       expect(logger).toEqual(customLogger);
       expect(typeof notFoundHandler).toBe("function");
-      expect(appMock.use).toBeCalledTimes(0);
-      expect(configMock.errorHandler.handler).toBeCalledTimes(0);
-      expect(infoMethod).toBeCalledTimes(0);
-      expect(appMock.get).toBeCalledTimes(1);
+      expect(appMock.use).toHaveBeenCalledTimes(0);
+      expect(configMock.errorHandler.handler).toHaveBeenCalledTimes(0);
+      expect(infoMethod).toHaveBeenCalledTimes(0);
+      expect(appMock.get).toHaveBeenCalledTimes(1);
       expect(appMock.get.mock.calls[0][0]).toBe("/v1/test");
-      expect(appMock.post).toBeCalledTimes(1);
+      expect(appMock.post).toHaveBeenCalledTimes(1);
       expect(appMock.post.mock.calls[0][0]).toBe("/v1/test");
-      expect(appMock.options).toBeCalledTimes(1);
+      expect(appMock.options).toHaveBeenCalledTimes(1);
       expect(appMock.options.mock.calls[0][0]).toBe("/v1/test");
     });
   });

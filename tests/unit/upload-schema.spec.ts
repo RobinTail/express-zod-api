@@ -30,7 +30,7 @@ describe("ZodUpload", () => {
       const buffer = Buffer.from("something");
       const result = schema.safeParse({
         name: "avatar.jpg",
-        mv: async () => Promise.resolve(),
+        mv: jest.fn(async () => Promise.resolve()),
         encoding: "utf-8",
         mimetype: "image/jpeg",
         data: buffer,

@@ -58,7 +58,7 @@ describe("ResultHandler", () => {
           response: responseMock as Response,
           logger: loggerMock,
         });
-        expect(loggerMock.error).toBeCalledTimes(1);
+        expect(loggerMock.error).toHaveBeenCalledTimes(1);
         expect(loggerMock.error.mock.calls[0][0]).toMatch(
           /^Internal server error\nError: Some error/,
         );
@@ -70,7 +70,7 @@ describe("ResultHandler", () => {
         expect(loggerMock.error.mock.calls[0][1].payload).toEqual({
           something: 453,
         });
-        expect(responseMock.status).toBeCalledWith(500);
+        expect(responseMock.status).toHaveBeenCalledWith(500);
         expect(responseMock[errorMethod]).toHaveBeenCalledTimes(1);
         expect(responseMock[errorMethod].mock.calls[0]).toMatchSnapshot();
       });
@@ -98,8 +98,8 @@ describe("ResultHandler", () => {
           response: responseMock as Response,
           logger: loggerMock,
         });
-        expect(loggerMock.error).toBeCalledTimes(0);
-        expect(responseMock.status).toBeCalledWith(400);
+        expect(loggerMock.error).toHaveBeenCalledTimes(0);
+        expect(responseMock.status).toHaveBeenCalledWith(400);
         expect(responseMock[errorMethod]).toHaveBeenCalledTimes(1);
         expect(responseMock[errorMethod].mock.calls[0]).toMatchSnapshot();
       });
@@ -117,8 +117,8 @@ describe("ResultHandler", () => {
           response: responseMock as Response,
           logger: loggerMock,
         });
-        expect(loggerMock.error).toBeCalledTimes(0);
-        expect(responseMock.status).toBeCalledWith(404);
+        expect(loggerMock.error).toHaveBeenCalledTimes(0);
+        expect(responseMock.status).toHaveBeenCalledWith(404);
         expect(responseMock[errorMethod]).toHaveBeenCalledTimes(1);
         expect(responseMock[errorMethod].mock.calls[0]).toMatchSnapshot();
       });
@@ -136,8 +136,8 @@ describe("ResultHandler", () => {
           response: responseMock as Response,
           logger: loggerMock,
         });
-        expect(loggerMock.error).toBeCalledTimes(0);
-        expect(responseMock.status).toBeCalledWith(200);
+        expect(loggerMock.error).toHaveBeenCalledTimes(0);
+        expect(responseMock.status).toHaveBeenCalledWith(200);
         expect(responseMock.json).toHaveBeenCalledTimes(1);
         expect(responseMock.json.mock.calls[0]).toMatchSnapshot();
       });
@@ -183,8 +183,8 @@ describe("ResultHandler", () => {
       response: responseMock as Response,
       logger: loggerMock,
     });
-    expect(loggerMock.error).toBeCalledTimes(0);
-    expect(responseMock.status).toBeCalledWith(500);
+    expect(loggerMock.error).toHaveBeenCalledTimes(0);
+    expect(responseMock.status).toHaveBeenCalledWith(500);
     expect(responseMock.send).toHaveBeenCalledTimes(1);
     expect(responseMock.send.mock.calls[0]).toMatchSnapshot();
   });
