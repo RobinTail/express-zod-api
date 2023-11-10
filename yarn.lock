@@ -996,10 +996,10 @@
   dependencies:
     "@types/node" "*"
 
-"@types/compression@^1.7.4":
-  version "1.7.4"
-  resolved "https://registry.yarnpkg.com/@types/compression/-/compression-1.7.4.tgz#c1af4a0f2d72ea6c96300ae58b9842aa87d77b6e"
-  integrity sha512-sdFVnQJRkQBX83ydsLCBm4A39p45y0QkxdAR689yOtAFNbbS9Acrp86RZWJj6BHRXyZH9tX4t1dU7XDiGdY3nA==
+"@types/compression@^1.7.5":
+  version "1.7.5"
+  resolved "https://registry.yarnpkg.com/@types/compression/-/compression-1.7.5.tgz#0f80efef6eb031be57b12221c4ba6bc3577808f7"
+  integrity sha512-AAQvK5pxMpaT+nDvhHrsBhLSYG5yQdtkaJE1WYieSNY2mVFKAgmU4ks65rkZD5oqnGCFLyQpUr1CqI4DmUMyDg==
   dependencies:
     "@types/express" "*"
 
@@ -1030,10 +1030,10 @@
   resolved "https://registry.yarnpkg.com/@types/estree/-/estree-1.0.5.tgz#a6ce3e556e00fd9895dd872dd172ad0d4bd687f4"
   integrity sha512-/kYRxGDLWzHOB7q+wtSUQlFrtcdUccpfy+X+9iMBpHK8QLLhx2wIPYuS5DYtR9Wa/YlZAbIovy7qVdB1Aq6Lyw==
 
-"@types/express-fileupload@^1.4.3":
-  version "1.4.3"
-  resolved "https://registry.yarnpkg.com/@types/express-fileupload/-/express-fileupload-1.4.3.tgz#0736cdba39f02089ec0f42f29d6913377b301175"
-  integrity sha512-DvSXoec9+IcfXJ7qG48yCUKpbyEV5CQAZlGzsh2B8FTvb/MrMq/y2YpuAtnWYyjfqRaooKJL7TxgWIkiPehyqQ==
+"@types/express-fileupload@^1.4.4":
+  version "1.4.4"
+  resolved "https://registry.yarnpkg.com/@types/express-fileupload/-/express-fileupload-1.4.4.tgz#14d302687f41fab48a4ef0362ce83958a3a4790c"
+  integrity sha512-kxCs5oJ40JPhvh3LpxCeGfuSZIl8/6bk85u1YqNcIbfQCmUm3u+Ao1oOiSt/VdbEPs+V3JQg8giqxAyqXlpbWg==
   dependencies:
     "@types/busboy" "*"
     "@types/express" "*"
@@ -2521,10 +2521,10 @@ expect@^29.0.0, expect@^29.7.0:
     jest-message-util "^29.7.0"
     jest-util "^29.7.0"
 
-express-fileupload@^1.4.1:
-  version "1.4.1"
-  resolved "https://registry.yarnpkg.com/express-fileupload/-/express-fileupload-1.4.1.tgz#b14b9678a8c445bd5b3d1ba253567243472e7741"
-  integrity sha512-9F6SkbxbEOA9cYOBZ8tnn238jL+bGfacQuUO/JqPWp5t+piUcoDcESvKwAXsQV7IHGxmI5bMj3QxMWOKOIsMCg==
+express-fileupload@^1.4.2:
+  version "1.4.2"
+  resolved "https://registry.yarnpkg.com/express-fileupload/-/express-fileupload-1.4.2.tgz#59f8ab14f9d12c4b53dfc29e56face4313ca0b59"
+  integrity sha512-vk+9cK595jP03T+YgoYPAebynVCZuUBtW1JkyJnitQnWzlONHdxdAIm9yo99V4viTEftq7MUfzuqmWyqWGzMIg==
   dependencies:
     busboy "^1.6.0"
 
