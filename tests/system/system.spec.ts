@@ -1,3 +1,4 @@
+import compression from "compression";
 import cors from "cors";
 import type { Server } from "node:http";
 import { z } from "zod";
@@ -139,7 +140,7 @@ describe("App", () => {
       {
         server: {
           listen: port,
-          compression: { threshold: 1 },
+          compressor: compression({ threshold: 1 }),
         },
         cors: false,
         startupLogo: true,

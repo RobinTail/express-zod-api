@@ -1,18 +1,12 @@
 import { omit } from "ramda";
 import { makeRequestMock } from "../../src/mock";
 import { givePort } from "../helpers";
+import { appMock, expressJsonMock, expressMock } from "../express-mock";
 import {
   createHttpsServerSpy,
   httpListenSpy,
   httpsListenSpy,
 } from "../http-mock";
-import {
-  appMock,
-  compressionMock,
-  expressJsonMock,
-  expressMock,
-  fileUploadMock,
-} from "../express-mock";
 import winston from "winston";
 import { z } from "zod";
 import {
@@ -175,10 +169,11 @@ describe("Server", () => {
     });
 
     test("should enable compression on request", () => {
+      const compressionMock = jest.fn();
       const configMock = {
         server: {
           listen: givePort(),
-          compression: true,
+          compressor: compressionMock,
         },
         cors: true,
         startupLogo: false,
@@ -196,15 +191,15 @@ describe("Server", () => {
       };
       createServer(configMock, routingMock);
       expect(appMock.use).toHaveBeenCalledTimes(4);
-      expect(compressionMock).toHaveBeenCalledTimes(1);
-      expect(compressionMock).toHaveBeenCalledWith(undefined);
+      expect(appMock.use).toHaveBeenCalledWith(compressionMock);
     });
 
     test("should enable uploads on request", () => {
+      const fileUploadMock = jest.fn();
       const configMock = {
         server: {
           listen: givePort(),
-          upload: true,
+          uploader: fileUploadMock,
         },
         cors: true,
         startupLogo: false,
@@ -222,11 +217,7 @@ describe("Server", () => {
       };
       createServer(configMock, routingMock);
       expect(appMock.use).toHaveBeenCalledTimes(4);
-      expect(fileUploadMock).toHaveBeenCalledTimes(1);
-      expect(fileUploadMock).toHaveBeenCalledWith({
-        abortOnLimit: false,
-        parseNested: true,
-      });
+      expect(appMock.use).toHaveBeenCalledWith(fileUploadMock);
     });
 
     test("should enable raw on request", () => {

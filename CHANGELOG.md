@@ -1,5 +1,37 @@
 # Changelog
 
+## Version 15
+
+### 15.0.0
+
+- **Breaking changes**:
+  - `express-fileupload` and `compression` become optional peer dependencies.
+    - You will need to install them if you're using file uploads and compression features in your configuration.
+    - You might also need to install `@types/express-fileupload` and `@types/compression` in that case.
+  - The following changes to the configuration are required:
+    - `upload` property is renamed to `uploader`,
+    - `compression` property is renamed to `compressor`.
+    - The values also have to be changed as described below.
+
+```typescript
+import compression from "compression";
+import fileUpload from "express-fileupload";
+import { createConfig } from "../src";
+
+export const config = createConfig({
+  server: {
+    // before:
+    /* upload: true | UploadOptions, */
+    // after, the following two options are required to operate normally:
+    uploader: fileUpload({ abortOnLimit: false, parseNested: true }),
+    // before:
+    /* compression: true | CompressionOptions, */
+    // after:
+    compressor: compression(),
+  },
+});
+```
+
 ## Version 14
 
 ### v14.2.0

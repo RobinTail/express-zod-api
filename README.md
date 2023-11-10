@@ -507,28 +507,25 @@ const config = createConfig({ logger /* ..., */ });
 ## Enabling compression
 
 According to [Express.js best practices guide](http://expressjs.com/en/advanced/best-practice-performance.html)
-it might be a good idea to enable GZIP compression of your API responses. You can achieve and customize it by using the
-corresponding configuration option when using the `createServer()` method.
+it might be a good idea to enable GZIP compression of your API responses.
 
-In order to receive the compressed response the client should include the following header in the request:
-`Accept-Encoding: gzip, deflate`. Only responses with compressible content types are subject to compression. There is
-also a default threshold of 1KB that can be configured.
+Install the following additional packages: `compression` and `@types/compression`, and complete your configuration with
+a compressor:
 
 ```typescript
+import compression from "compression";
 import { createConfig } from "express-zod-api";
 
 const config = createConfig({
   server: {
-    // compression: true, or:
-    compression: {
-      // @see https://www.npmjs.com/package/compression#options
-      threshold: "100b",
-    },
-    // ... other options
+    /** @link https://www.npmjs.com/package/compression#options */
+    compressor: compression({ threshold: "1kb" }),
   },
-  // ... other options
 });
 ```
+
+In order to receive a compressed response the client should include the following header in the request:
+`Accept-Encoding: gzip, deflate`. Only responses with compressible content types are subject to compression.
 
 # Advances features
 
@@ -715,29 +712,39 @@ const fileStreamingEndpointsFactory = new EndpointsFactory(
 
 ## File uploads
 
-You can switch the `Endpoint` to handle requests with the `multipart/form-data` content type instead of JSON by using
-`ez.upload()` schema. Together with a corresponding configuration option, this makes it possible to handle file uploads.
-Here is a simplified example:
+Install the following additional packages: `express-fileupload` and `@types/express-fileupload`, and complete your
+configuration with a file uploader:
 
 ```typescript
-import { z } from "zod";
-import { createConfig, ez, defaultEndpointsFactory } from "express-zod-api";
+import fileUpload from "express-fileupload";
+import { createConfig } from "express-zod-api";
 
 const config = createConfig({
   server: {
-    upload: true, // <- required
-    // ...,
+    uploader: fileUpload({
+      // These options are required to operate normally:
+      abortOnLimit: false,
+      parseNested: true,
+    }),
   },
 });
+```
+
+Refer to [documentation](https://www.npmjs.com/package/express-fileupload#available-options) on available options.
+Then you can change the `Endpoint` to handle requests having the `multipart/form-data` content type instead of JSON by
+using `ez.upload()` schema. Together with a corresponding configuration option, this makes it possible to handle file
+uploads. Here is a simplified example:
+
+```typescript
+import { z } from "zod";
+import { ez, defaultEndpointsFactory } from "express-zod-api";
 
 const fileUploadEndpoint = defaultEndpointsFactory.build({
   method: "post",
   input: z.object({
     avatar: ez.upload(), // <--
   }),
-  output: z.object({
-    /* ... */
-  }),
+  output: z.object({}),
   handler: async ({ input: { avatar } }) => {
     // avatar: {name, mv(), mimetype, data, size, etc}
     // avatar.truncated is true on failure
