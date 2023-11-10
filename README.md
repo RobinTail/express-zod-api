@@ -731,7 +731,7 @@ const config = createConfig({
 ```
 
 Refer to [documentation](https://www.npmjs.com/package/express-fileupload#available-options) on available options.
-Then you can switch the `Endpoint` to handle requests with the `multipart/form-data` content type instead of JSON by
+Then you can change the `Endpoint` to handle requests having the `multipart/form-data` content type instead of JSON by
 using `ez.upload()` schema. Together with a corresponding configuration option, this makes it possible to handle file
 uploads. Here is a simplified example:
 
@@ -744,9 +744,7 @@ const fileUploadEndpoint = defaultEndpointsFactory.build({
   input: z.object({
     avatar: ez.upload(), // <--
   }),
-  output: z.object({
-    /* ... */
-  }),
+  output: z.object({}),
   handler: async ({ input: { avatar } }) => {
     // avatar: {name, mv(), mimetype, data, size, etc}
     // avatar.truncated is true on failure
