@@ -518,15 +518,14 @@ import { createConfig } from "express-zod-api";
 
 const config = createConfig({
   server: {
-    // @see https://www.npmjs.com/package/compression#options
-    compressor: compression({ threshold: "100b" }),
+    /** @link https://www.npmjs.com/package/compression#options */
+    compressor: compression({ threshold: "1kb" }),
   },
 });
 ```
 
 In order to receive a compressed response the client should include the following header in the request:
-`Accept-Encoding: gzip, deflate`. Only responses with compressible content types are subject to compression. There is
-also a default threshold of 1KB that [can be configured](https://www.npmjs.com/package/compression#options).
+`Accept-Encoding: gzip, deflate`. Only responses with compressible content types are subject to compression.
 
 # Advances features
 
