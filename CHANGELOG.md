@@ -22,7 +22,7 @@ export const config = createConfig({
   server: {
     // before:
     /* upload: true | UploadOptions, */
-    // after, the following two options below are required to operate normally:
+    // after, the following two options are required to operate normally:
     uploader: fileUpload({ abortOnLimit: false, parseNested: true }),
     // before:
     /* compression: true | CompressionOptions, */
