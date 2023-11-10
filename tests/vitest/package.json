@@ -1,0 +1,10 @@
+{
+  "name": "express-zod-api-vitest-test",
+  "version": "1.0.0",
+  "scripts": {
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "vitest": "^0.34.6"
+  }
+}
