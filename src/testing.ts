@@ -7,15 +7,6 @@ import { mimeJson } from "./mime";
 
 type MockFunction = <S>(implementation?: (...args: any[]) => any) => S; // kept "any" for easier compatibility
 
-interface TestEndpointProps<REQ, RES, LOG, FN extends MockFunction> {
-  endpoint: AbstractEndpoint;
-  requestProps?: REQ;
-  responseProps?: RES;
-  configProps?: Partial<CommonConfig>;
-  loggerProps?: LOG;
-  mockFn: FN; // jest.fn or vi.fn
-}
-
 export const makeRequestMock = <REQ, FN extends MockFunction>({
   mockFn,
   requestProps,
@@ -72,9 +63,41 @@ export const makeResponseMock = <RES, FN extends MockFunction>({
   return responseMock;
 };
 
+interface TestEndpointProps<REQ, RES, LOG, FN extends MockFunction> {
+  /** @desc The endpoint to test */
+  endpoint: AbstractEndpoint;
+  /**
+   * @desc Additional properties to set on Request mock
+   * @default { method: "GET", header: () => "application/json" }
+   * */
+  requestProps?: REQ;
+  /**
+   * @desc Additional properties to set on Response mock
+   * @default { writableEnded, statusCode, statusMessage, set, setHeader, header, status, json, send, end }
+   * */
+  responseProps?: RES;
+  /**
+   * @desc Additional properties to set on config mock
+   * @default { cors: false, logger }
+   * */
+  configProps?: Partial<CommonConfig>;
+  /**
+   * @desc Additional properties to set on logger mock
+   * @default { info, warn, error, debug }
+   * */
+  loggerProps?: LOG;
+  /**
+   * @example jest.fn
+   * @example vi.fn
+   * */
+  mockFn: FN;
+}
+
 /**
- * @description You need to install Jest or Vitest to use this feature
- */
+ * @desc You need to install either jest (with @types/jest) or vitest in otder to use this method
+ * @requires jest
+ * @requires vitest
+ * */
 export const testEndpoint = async <
   FN extends MockFunction,
   REQ extends Partial<Record<keyof Request, any>> | undefined = undefined,
