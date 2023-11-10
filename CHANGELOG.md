@@ -14,6 +14,7 @@
     - The values also have to be changed as described below.
   - The `testEndpoint()` method now requires to provide `mockFn` option which can be either `jest.fn` or `vi.fn`.
     - Yes, it does now support both `jest` and `vitest` testing frameworks.
+    - Compatibility with `vitest` was tested against versions `0.34.6` and `1.0.0-beta.4`.
 
 ```typescript
 import compression from "compression";
