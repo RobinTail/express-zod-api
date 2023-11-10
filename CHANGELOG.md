@@ -12,7 +12,7 @@
     - `upload` property is renamed to `uploader`,
     - `compression` property is renamed to `compressor`.
     - The values also have to be changed as described below.
-  - The `testEndpoint()` method now requires to provide `mockFn` option which can be either `jest.fn` or `vi.fn`.
+  - The `testEndpoint()` method now requires to specify either `jest.fn` or `vi.fn` through `mockFn` option.
     - Yes, it does now support both `jest` and `vitest` testing frameworks.
     - Compatibility with `vitest` was tested against versions `0.34.6` and `1.0.0-beta.4`.
 
@@ -20,7 +20,6 @@
 import compression from "compression";
 import fileUpload from "express-fileupload";
 import { createConfig, testEndpoint } from "express-zod-api";
-import { vi } from "vitest";
 
 const config = createConfig({
   server: {
@@ -37,7 +36,7 @@ const config = createConfig({
 
 const { responseMock } = testEndpoint({
   endpoint,
-  mockFn: vi.fn, // or jest.fn, required
+  mockFn: jest.fn, // or vi.fn from vitest, required
 });
 ```
 
