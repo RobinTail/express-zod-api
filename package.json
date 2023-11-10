@@ -7,9 +7,10 @@
     "start": "yarn tsnode example/index.ts",
     "build": "yarn build:compile && yarn build:tests && yarn build:assets",
     "build:compile": "tsup && attw --pack",
-    "build:tests": "yarn build:int && yarn build:esm",
+    "build:tests": "yarn build:int && yarn build:esm && yarn build:vi",
     "build:int": "yarn tsnode tools/integration-test.ts && yarn install --cwd ./tests/integration",
     "build:esm": "yarn tsnode tools/esm-test.ts && yarn install --cwd ./tests/esm",
+    "build:vi": "yarn install --cwd ./tests/vitest",
     "build:assets": "yarn build:swagger && yarn build:client && yarn build:license",
     "build:swagger": "yarn tsnode example/generate-open-api-schema.ts",
     "build:client": "yarn tsnode example/generate-client.ts && yarn prettier example/example.client.ts --write",
@@ -18,6 +19,7 @@
     "test": "yarn test:types && yarn test:jest && yarn test:badge",
     "test:int": "jest ./tests/integration",
     "test:esm": "jest ./tests/esm",
+    "test:vi": "yarn --cwd ./tests/vitest test",
     "test:u": "yarn test:jest -u && yarn test:badge",
     "test:types": "tsc --noEmit",
     "test:jest": "jest ./tests/unit ./tests/system",
@@ -62,6 +64,7 @@
     "http-errors": "^2.0.0",
     "jest": ">=28 <30",
     "typescript": "^5.1.3",
+    "vitest": "^0.34.6 || ^1.0.0-beta.4",
     "winston": "^3.10.0",
     "zod": "^3.22.3"
   },
@@ -74,7 +77,8 @@
     "@types/jest": { "optional": true },
     "compression": { "optional": true },
     "express-fileupload": { "optional": true },
-    "jest": { "optional": true }
+    "jest": { "optional": true },
+    "vitest": { "optional": true }
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.13.0",

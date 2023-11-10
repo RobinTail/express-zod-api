@@ -32,7 +32,7 @@ export {
   InputValidationError,
 } from "./errors";
 export { withMeta } from "./metadata";
-export { testEndpoint } from "./mock";
+export { testEndpoint } from "./testing";
 export { Integration } from "./integration";
 
 export * as ez from "./proprietary-schemas";
