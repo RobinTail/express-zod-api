@@ -8,7 +8,7 @@ import {
   ServeStatic,
   defaultResultHandler,
 } from "../../src";
-import { CommonConfig } from "../../src/config-type";
+import { CommonConfig } from "../../src";
 import { mimeJson } from "../../src/mime";
 import { makeRequestMock, makeResponseMock } from "../../src/mock";
 import { initRouting } from "../../src/routing";
@@ -78,12 +78,12 @@ describe("Routing", () => {
         config: configMock as CommonConfig,
         routing,
       });
-      expect(appMock.get).toBeCalledTimes(2);
-      expect(appMock.post).toBeCalledTimes(2);
-      expect(appMock.put).toBeCalledTimes(0);
-      expect(appMock.delete).toBeCalledTimes(0);
-      expect(appMock.patch).toBeCalledTimes(0);
-      expect(appMock.options).toBeCalledTimes(3);
+      expect(appMock.get).toHaveBeenCalledTimes(2);
+      expect(appMock.post).toHaveBeenCalledTimes(2);
+      expect(appMock.put).toHaveBeenCalledTimes(0);
+      expect(appMock.delete).toHaveBeenCalledTimes(0);
+      expect(appMock.patch).toHaveBeenCalledTimes(0);
+      expect(appMock.options).toHaveBeenCalledTimes(3);
       expect(appMock.get.mock.calls[0][0]).toBe("/v1/user/get");
       expect(appMock.get.mock.calls[1][0]).toBe("/v1/user/universal");
       expect(appMock.post.mock.calls[0][0]).toBe("/v1/user/set");
@@ -153,12 +153,12 @@ describe("Routing", () => {
         config: configMock as CommonConfig,
         routing,
       });
-      expect(appMock.get).toBeCalledTimes(1);
-      expect(appMock.post).toBeCalledTimes(1);
-      expect(appMock.put).toBeCalledTimes(1);
-      expect(appMock.patch).toBeCalledTimes(1);
-      expect(appMock.delete).toBeCalledTimes(0);
-      expect(appMock.options).toBeCalledTimes(1);
+      expect(appMock.get).toHaveBeenCalledTimes(1);
+      expect(appMock.post).toHaveBeenCalledTimes(1);
+      expect(appMock.put).toHaveBeenCalledTimes(1);
+      expect(appMock.patch).toHaveBeenCalledTimes(1);
+      expect(appMock.delete).toHaveBeenCalledTimes(0);
+      expect(appMock.options).toHaveBeenCalledTimes(1);
       expect(appMock.get.mock.calls[0][0]).toBe("/v1/user");
       expect(appMock.post.mock.calls[0][0]).toBe("/v1/user");
       expect(appMock.put.mock.calls[0][0]).toBe("/v1/user");
@@ -235,7 +235,7 @@ describe("Routing", () => {
         config: configMock as CommonConfig,
         routing,
       });
-      expect(appMock.options).toBeCalledTimes(1);
+      expect(appMock.options).toHaveBeenCalledTimes(1);
       expect(appMock.options.mock.calls[0][0]).toBe("/hello");
       const fn = appMock.options.mock.calls[0][1];
       expect(typeof fn).toBe("function"); // async (req, res) => void
@@ -272,7 +272,7 @@ describe("Routing", () => {
         config: configMock as CommonConfig,
         routing,
       });
-      expect(appMock.get).toBeCalledTimes(1);
+      expect(appMock.get).toHaveBeenCalledTimes(1);
       expect(appMock.get.mock.calls[0][0]).toBe("/v1/user/:id");
     });
 
@@ -301,7 +301,7 @@ describe("Routing", () => {
         config: configMock as CommonConfig,
         routing,
       });
-      expect(appMock.get).toBeCalledTimes(2);
+      expect(appMock.get).toHaveBeenCalledTimes(2);
       expect(appMock.get.mock.calls[0][0]).toBe("/v1/user/:id");
       expect(appMock.get.mock.calls[1][0]).toBe("/v1/user/:id/download");
     });
@@ -367,7 +367,7 @@ describe("Routing", () => {
         config: configMock as CommonConfig,
         routing,
       });
-      expect(appMock.post).toBeCalledTimes(1);
+      expect(appMock.post).toHaveBeenCalledTimes(1);
       const routeHandler = appMock.post.mock.calls[0][1] as RequestHandler;
       const requestMock = {
         method: "POST",
@@ -387,19 +387,19 @@ describe("Routing", () => {
         responseMock as unknown as Response,
         nextMock,
       );
-      expect(nextMock).toBeCalledTimes(0);
-      expect(handlerMock).toBeCalledTimes(1);
-      expect(loggerMock.info).toBeCalledWith("POST: /v1/user/set");
-      expect(loggerMock.error).toBeCalledTimes(0);
-      expect(handlerMock).toBeCalledWith({
+      expect(nextMock).toHaveBeenCalledTimes(0);
+      expect(handlerMock).toHaveBeenCalledTimes(1);
+      expect(loggerMock.info).toHaveBeenCalledWith("POST: /v1/user/set");
+      expect(loggerMock.error).toHaveBeenCalledTimes(0);
+      expect(handlerMock).toHaveBeenCalledWith({
         input: {
           test: 123,
         },
         options: {},
         logger: loggerMock,
       });
-      expect(responseMock.status).toBeCalledWith(200);
-      expect(responseMock.json).toBeCalledWith({
+      expect(responseMock.status).toHaveBeenCalledWith(200);
+      expect(responseMock.json).toHaveBeenCalledWith({
         status: "success",
         data: {
           result: true,

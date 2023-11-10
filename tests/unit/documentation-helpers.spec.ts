@@ -213,7 +213,7 @@ describe("Documentation helpers", () => {
             z.object({ one: z.string() }).transform(() => []),
             requestCtx,
           ),
-        ).toThrowError(
+        ).toThrow(
           new IOSchemaError(
             "Using transformations on the top level of input schema is not allowed.\n" +
               "Caused by input schema of an Endpoint assigned to GET method of /v1/user/:id path.",

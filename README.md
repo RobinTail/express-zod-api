@@ -1014,9 +1014,9 @@ test("should respond successfully", async () => {
     },
     // responseProps, configProps, loggerProps
   });
-  expect(loggerMock.error).toBeCalledTimes(0);
-  expect(responseMock.status).toBeCalledWith(200);
-  expect(responseMock.json).toBeCalledWith({
+  expect(loggerMock.error).toHaveBeenCalledTimes(0);
+  expect(responseMock.status).toHaveBeenCalledWith(200);
+  expect(responseMock.json).toHaveBeenCalledWith({
     status: "success",
     data: { ... },
   });

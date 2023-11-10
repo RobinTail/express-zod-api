@@ -41,7 +41,7 @@ describe("Logger", () => {
       expect(logger.isDebugEnabled()).toBeFalsy();
       expect(logger.isSillyEnabled()).toBeFalsy();
       logger.error("test");
-      expect(transform).toBeCalledTimes(0);
+      expect(transform).toHaveBeenCalledTimes(0);
     });
 
     test("Should create warn logger", () => {
@@ -58,7 +58,7 @@ describe("Logger", () => {
       expect(logger.isDebugEnabled()).toBeFalsy();
       expect(logger.isSillyEnabled()).toBeFalsy();
       logger.warn("testing warn message", { withMeta: true });
-      expect(transform).toBeCalled();
+      expect(transform).toHaveBeenCalled();
       const params = transform.mock.calls[0][0];
       expect(params).toEqual({
         level: "warn",
@@ -87,7 +87,7 @@ describe("Logger", () => {
       expect(logger.isDebugEnabled()).toBeTruthy();
       expect(logger.isSillyEnabled()).toBeFalsy();
       logger.debug("testing debug message", { withColorful: "output" });
-      expect(transform).toBeCalled();
+      expect(transform).toHaveBeenCalled();
       const params = transform.mock.calls[0][0];
       expect(dropColorInObjectProps(params)).toEqual({
         level: "debug",
@@ -111,7 +111,7 @@ describe("Logger", () => {
       logger.profile("long-test");
       MockDate.set("2022-01-01T00:00:00.554Z");
       logger.profile("long-test");
-      expect(transform).toBeCalled();
+      expect(transform).toHaveBeenCalled();
       const params = transform.mock.calls[0][0];
       expect(dropColorInObjectProps(params)).toEqual({
         durationMs: 554,
@@ -138,7 +138,7 @@ describe("Logger", () => {
       expect(logger.isDebugEnabled()).toBeTruthy();
       expect(logger.isSillyEnabled()).toBeFalsy();
       logger.error({ someData: "test" });
-      expect(transform).toBeCalled();
+      expect(transform).toHaveBeenCalled();
       const params = transform.mock.calls[0][0];
       expect(dropColorInObjectProps(params)).toEqual({
         level: "error",

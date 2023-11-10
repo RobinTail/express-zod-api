@@ -134,7 +134,7 @@ describe("EndpointsFactory", () => {
           handler: jest.fn(),
         });
         const factory = new EndpointsFactory(resultHandlerMock);
-        const middleware: RequestHandler = jest.fn((req, res, next) => {
+        const middleware: RequestHandler = jest.fn((req, {}, next) => {
           req.body.test = "Here is the test";
           next();
         });
@@ -175,7 +175,7 @@ describe("EndpointsFactory", () => {
           handler: jest.fn(),
         });
         const factory = new EndpointsFactory(resultHandlerMock);
-        const middleware: RequestHandler = jest.fn((req, res, next) => {
+        const middleware: RequestHandler = jest.fn((req, {}, next) => {
           req.body.test = "Here is the test";
           next();
         });
@@ -209,7 +209,7 @@ describe("EndpointsFactory", () => {
           handler: jest.fn(),
         });
         const factory = new EndpointsFactory(resultHandlerMock);
-        const middleware: RequestHandler = jest.fn((req, res, next) => {
+        const middleware: RequestHandler = jest.fn(({}, {}, next) => {
           next(new Error("This one has failed"));
         });
         const newFactory = factory[method](middleware);
@@ -238,7 +238,7 @@ describe("EndpointsFactory", () => {
           handler: jest.fn(),
         });
         const factory = new EndpointsFactory(resultHandlerMock);
-        const middleware: RequestHandler = jest.fn((req, res, next) => {
+        const middleware: RequestHandler = jest.fn(({}, {}, next) => {
           next(new Error("This one has failed"));
         });
         const newFactory = factory[method](middleware, {

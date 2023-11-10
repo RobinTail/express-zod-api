@@ -11,54 +11,6 @@ export interface LoggerConfig {
   color: boolean;
 }
 
-export interface ServerConfig {
-  /** @desc Server configuration. */
-  server: {
-    /** @desc Port, UNIX socket or custom options. */
-    listen: number | string | ListenOptions;
-    /**
-     * @desc Custom JSON parser.
-     * @default express.json()
-     * @link https://expressjs.com/en/4x/api.html#express.json
-     * */
-    jsonParser?: RequestHandler;
-    /**
-     * @desc Enable and configure file uploads
-     * @default undefined
-     * @example import fileUpload from "express-fileupload"
-     * @example uploader: fileUpload({ abortOnLimit: false, parseNested: true })
-     * */
-    uploader?: RequestHandler;
-    /**
-     * @desc Enable and configure compression
-     * @default undefined
-     * @example import compression from "compression"
-     * @example compressor: compression()
-     */
-    compressor?: RequestHandler;
-    /**
-     * @desc Enables parsing certain request payloads into raw Buffers (application/octet-stream by default)
-     * @desc When enabled, use ez.raw() as input schema to get input.raw in Endpoint's handler
-     * @default undefined
-     * @example express.raw()
-     * @link https://expressjs.com/en/4x/api.html#express.raw
-     * */
-    rawParser?: RequestHandler;
-  };
-  /** @desc Enables HTTPS server as well. */
-  https?: {
-    /** @desc At least "cert" and "key" options required. */
-    options: ServerOptions;
-    /** @desc Port, UNIX socket or custom options. */
-    listen: number | string | ListenOptions;
-  };
-}
-
-export interface AppConfig {
-  /** @desc Your custom express app instead. */
-  app: Express;
-}
-
 export type InputSource = keyof Pick<
   Request,
   "query" | "body" | "files" | "params" | "headers"
@@ -113,9 +65,59 @@ export interface CommonConfig<TAG extends string = string> {
   tags?: TagsConfig<TAG>;
 }
 
+export interface ServerConfig<TAG extends string = string>
+  extends CommonConfig<TAG> {
+  /** @desc Server configuration. */
+  server: {
+    /** @desc Port, UNIX socket or custom options. */
+    listen: number | string | ListenOptions;
+    /**
+     * @desc Custom JSON parser.
+     * @default express.json()
+     * @link https://expressjs.com/en/4x/api.html#express.json
+     * */
+    jsonParser?: RequestHandler;
+    /**
+     * @desc Enable and configure file uploads
+     * @default undefined
+     * @example import fileUpload from "express-fileupload"
+     * @example uploader: fileUpload({ abortOnLimit: false, parseNested: true })
+     * */
+    uploader?: RequestHandler;
+    /**
+     * @desc Enable and configure compression
+     * @default undefined
+     * @example import compression from "compression"
+     * @example compressor: compression()
+     */
+    compressor?: RequestHandler;
+    /**
+     * @desc Enables parsing certain request payloads into raw Buffers (application/octet-stream by default)
+     * @desc When enabled, use ez.raw() as input schema to get input.raw in Endpoint's handler
+     * @default undefined
+     * @example express.raw()
+     * @link https://expressjs.com/en/4x/api.html#express.raw
+     * */
+    rawParser?: RequestHandler;
+  };
+  /** @desc Enables HTTPS server as well. */
+  https?: {
+    /** @desc At least "cert" and "key" options required. */
+    options: ServerOptions;
+    /** @desc Port, UNIX socket or custom options. */
+    listen: number | string | ListenOptions;
+  };
+}
+
+export interface AppConfig<TAG extends string = string>
+  extends CommonConfig<TAG> {
+  /** @desc Your custom express app instead. */
+  app: Express;
+}
+
 export const createConfig = <
   TAG extends string,
-  T extends (ServerConfig | AppConfig) & CommonConfig<TAG>,
+  T extends ServerConfig<TAG> | AppConfig<TAG>,
 >(
   config: T,
 ): T => config;
