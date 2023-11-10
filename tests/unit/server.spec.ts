@@ -1,5 +1,5 @@
 import { omit } from "ramda";
-import { makeRequestMock } from "../../src/mock";
+import { makeRequestMock } from "../../src/testing";
 import { givePort } from "../helpers";
 import { appMock, expressJsonMock, expressMock } from "../express-mock";
 import {

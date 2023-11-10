@@ -5,7 +5,7 @@ import { CommonConfig } from "./config-type";
 import { AbstractEndpoint } from "./endpoint";
 import { mimeJson } from "./mime";
 
-type MockFunction = <S>(implementation?: (...args: unknown[]) => unknown) => S;
+type MockFunction = <S>(implementation?: (...args: any[]) => any) => S; // kept "any" for easier compatibility
 
 interface TestEndpointProps<REQ, RES, LOG, FN extends MockFunction> {
   endpoint: AbstractEndpoint;
@@ -57,10 +57,8 @@ export const makeResponseMock = <RES, FN extends MockFunction>({
     setHeader: mockFn(() => responseMock),
     header: mockFn(() => responseMock),
     status: mockFn((code) => {
-      if (typeof code === "number") {
-        responseMock.statusCode = code;
-        responseMock.statusMessage = http.STATUS_CODES[code]!;
-      }
+      responseMock.statusCode = code;
+      responseMock.statusMessage = http.STATUS_CODES[code]!;
       return responseMock;
     }),
     json: mockFn(() => responseMock),

@@ -10,7 +10,7 @@ import {
 } from "../../src";
 import { CommonConfig } from "../../src";
 import { mimeJson } from "../../src/mime";
-import { makeRequestMock, makeResponseMock } from "../../src/mock";
+import { makeRequestMock, makeResponseMock } from "../../src/testing";
 import { initRouting } from "../../src/routing";
 import type { Express, Request, RequestHandler, Response } from "express";
 
