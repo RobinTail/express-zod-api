@@ -13,8 +13,8 @@ type VariantDependingProps<
 > = Variant extends "regular"
   ? { next: SchemaHandler<z.ZodTypeAny, U, {}, "last"> }
   : Variant extends "each"
-  ? { prev: U }
-  : {};
+    ? { prev: U }
+    : {};
 
 type SchemaHandlingProps<
   T extends z.ZodTypeAny,
