@@ -171,8 +171,8 @@ export class EndpointsFactory<
       "scopes" in rest
         ? rest.scopes
         : "scope" in rest && rest.scope
-        ? [rest.scope]
-        : [];
+          ? [rest.scope]
+          : [];
     const tags =
       "tags" in rest ? rest.tags : "tag" in rest && rest.tag ? [rest.tag] : [];
     return new Endpoint({
