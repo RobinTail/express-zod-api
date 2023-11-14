@@ -88,6 +88,7 @@ describe("Endpoint", () => {
       });
       const { requestMock, responseMock, loggerMock } = await testEndpoint({
         endpoint,
+        mockFn: jest.fn,
         requestProps: {
           method: "POST",
           body: { n: 453 },
@@ -130,6 +131,7 @@ describe("Endpoint", () => {
         handler: handlerMock,
       });
       const { responseMock, loggerMock } = await testEndpoint({
+        mockFn: jest.fn,
         endpoint,
         requestProps: {
           method: "OPTIONS",
@@ -176,6 +178,7 @@ describe("Endpoint", () => {
       });
       const { responseMock } = await testEndpoint({
         endpoint,
+        mockFn: jest.fn,
       });
       expect(responseMock.status).toHaveBeenCalledWith(500);
       expect(responseMock.json).toHaveBeenCalledWith({
@@ -202,6 +205,7 @@ describe("Endpoint", () => {
       });
       const { responseMock, loggerMock } = await testEndpoint({
         endpoint,
+        mockFn: jest.fn,
       });
       expect(loggerMock.error).toHaveBeenCalledTimes(1);
       expect(responseMock.status).toHaveBeenCalledWith(500);
@@ -239,6 +243,7 @@ describe("Endpoint", () => {
         handler: handlerMock,
       });
       const { responseMock, loggerMock } = await testEndpoint({
+        mockFn: jest.fn,
         endpoint,
         requestProps: {
           method: "POST",
@@ -279,7 +284,10 @@ describe("Endpoint", () => {
         }),
         handler: async () => ({ test: "OK" }),
       });
-      const { loggerMock, responseMock } = await testEndpoint({ endpoint });
+      const { loggerMock, responseMock } = await testEndpoint({
+        endpoint,
+        mockFn: jest.fn,
+      });
       expect(loggerMock.error).toHaveBeenCalledTimes(1);
       expect(loggerMock.error.mock.calls[0][0]).toBe(
         "Result handler failure: Something unexpected happened.",
@@ -427,6 +435,7 @@ describe("Endpoint", () => {
         });
       const { responseMock } = await testEndpoint({
         endpoint,
+        mockFn: jest.fn,
         requestProps: {
           method: "POST",
           body: { n: 123, m: 5 },
@@ -470,6 +479,7 @@ describe("Endpoint", () => {
         });
       const { responseMock } = await testEndpoint({
         endpoint,
+        mockFn: jest.fn,
         requestProps: {
           method: "OPTIONS",
         },
@@ -498,6 +508,7 @@ describe("Endpoint", () => {
       });
       const { responseMock, loggerMock } = await testEndpoint({
         endpoint,
+        mockFn: jest.fn,
       });
       expect(loggerMock.error).toHaveBeenCalledTimes(1);
       expect(responseMock.status).toHaveBeenCalledWith(500);
@@ -528,7 +539,10 @@ describe("Endpoint", () => {
         }),
         handler: async () => ({ test: "OK" }),
       });
-      const { loggerMock, responseMock } = await testEndpoint({ endpoint });
+      const { loggerMock, responseMock } = await testEndpoint({
+        endpoint,
+        mockFn: jest.fn,
+      });
       expect(loggerMock.error).toHaveBeenCalledTimes(1);
       expect(loggerMock.error.mock.calls[0][0]).toBe(
         "Result handler failure: Something unexpected happened.",
@@ -560,6 +574,7 @@ describe("Endpoint", () => {
       });
       const { responseMock, loggerMock } = await testEndpoint({
         endpoint,
+        mockFn: jest.fn,
         requestProps: {
           method: "POST",
           body: {},
@@ -613,6 +628,7 @@ describe("Endpoint", () => {
     test("should accept valid inputs", async () => {
       const { responseMock } = await testEndpoint({
         endpoint,
+        mockFn: jest.fn,
         requestProps: {
           method: "POST",
           body: {
@@ -631,6 +647,7 @@ describe("Endpoint", () => {
     test("should fail during the refinement of invalid inputs", async () => {
       const { responseMock } = await testEndpoint({
         endpoint,
+        mockFn: jest.fn,
         requestProps: {
           method: "POST",
           body: {
@@ -651,6 +668,7 @@ describe("Endpoint", () => {
     test("should refine the output schema as well", async () => {
       const { responseMock } = await testEndpoint({
         endpoint,
+        mockFn: jest.fn,
         requestProps: {
           method: "POST",
           body: {
@@ -690,6 +708,7 @@ describe("Endpoint", () => {
     test("should accept valid inputs", async () => {
       const { responseMock } = await testEndpoint({
         endpoint,
+        mockFn: jest.fn,
         requestProps: {
           method: "POST",
           body: {
@@ -707,6 +726,7 @@ describe("Endpoint", () => {
     test("should fail during the refinement of invalid inputs", async () => {
       const { responseMock } = await testEndpoint({
         endpoint,
+        mockFn: jest.fn,
         requestProps: {
           method: "POST",
           body: {},
@@ -790,6 +810,7 @@ describe("Endpoint", () => {
 
       const { loggerMock, responseMock } = await testEndpoint({
         endpoint,
+        mockFn: jest.fn,
         requestProps: {
           query: {
             middleware_date_input: "2022-09-28",

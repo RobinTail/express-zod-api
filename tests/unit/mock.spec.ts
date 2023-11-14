@@ -27,7 +27,10 @@ describe("Mock", () => {
           output: z.object({}),
           handler: async () => ({}),
         });
-      const { responseMock } = await testEndpoint({ endpoint });
+      const { responseMock } = await testEndpoint({
+        endpoint,
+        mockFn: jest.fn,
+      });
       expect(responseMock.setHeader).toHaveBeenCalledWith("X-Some", "header");
       expect(responseMock.header).toHaveBeenCalledWith(
         "X-Another",
@@ -36,26 +39,6 @@ describe("Mock", () => {
       expect(responseMock.send).toHaveBeenCalledWith(
         "this is just for testing mocked methods",
       );
-    });
-
-    test("Should throw an error in case Jest is not installed", async () => {
-      const endpoint = defaultEndpointsFactory.build({
-        method: "get",
-        input: z.object({}),
-        output: z.object({}),
-        handler: async () => ({}),
-      });
-      try {
-        await testEndpoint({ endpoint, __noJest: true });
-        fail("Should not be here");
-      } catch (e) {
-        expect(e).toBeInstanceOf(Error);
-        if (e instanceof Error) {
-          expect(e.message).toBe(
-            "You need to install Jest in order to use testEndpoint().",
-          );
-        }
-      }
     });
   });
 });

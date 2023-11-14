@@ -1,5 +1,45 @@
 # Changelog
 
+## Version 15
+
+### 15.0.0
+
+- **Breaking changes**:
+  - `express-fileupload` and `compression` become optional peer dependencies.
+    - You will need to install them if you're using file uploads and compression features in your configuration.
+    - You might also need to install `@types/express-fileupload` and `@types/compression` in that case.
+  - The following changes to the configuration are required:
+    - `upload` property is renamed to `uploader`,
+    - `compression` property is renamed to `compressor`.
+    - The values also have to be changed as described below.
+  - The `testEndpoint()` method now requires to specify either `jest.fn` or `vi.fn` through `mockFn` option.
+    - Yes, it does now support both `jest` and `vitest` testing frameworks.
+    - Compatibility with `vitest` was tested against versions `0.34.6` and `1.0.0-beta.4`.
+
+```typescript
+import compression from "compression";
+import fileUpload from "express-fileupload";
+import { createConfig, testEndpoint } from "express-zod-api";
+
+const config = createConfig({
+  server: {
+    // before:
+    /* upload: true | UploadOptions, */
+    // after, the following two options are required to operate normally:
+    uploader: fileUpload({ abortOnLimit: false, parseNested: true }),
+    // before:
+    /* compression: true | CompressionOptions, */
+    // after:
+    compressor: compression(),
+  },
+});
+
+const { responseMock } = testEndpoint({
+  endpoint,
+  mockFn: jest.fn, // or vi.fn from vitest, required
+});
+```
+
 ## Version 14
 
 ### v14.2.0
