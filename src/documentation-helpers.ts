@@ -1,4 +1,4 @@
-import {
+import type {
   ContentObject,
   ExampleObject,
   ExamplesObject,
@@ -13,8 +13,6 @@ import {
   SecurityRequirementObject,
   SecuritySchemeObject,
   TagObject,
-  isReferenceObject,
-  isSchemaObject,
 } from "openapi3-ts/oas30";
 import { omit } from "ramda";
 import { z } from "zod";
@@ -55,6 +53,10 @@ import { ZodUpload } from "./upload-schema";
 
 type MediaExamples = Pick<MediaTypeObject, "examples">;
 
+type SchemaObjectNarrower = (
+  subject: SchemaObject | ReferenceObject,
+) => subject is SchemaObject;
+
 export interface OpenAPIContext extends FlatObject {
   isResponse: boolean;
   serializer: (schema: z.ZodTypeAny) => string;
@@ -65,6 +67,7 @@ export interface OpenAPIContext extends FlatObject {
   ) => ReferenceObject;
   path: string;
   method: Method;
+  isSchemaObject: SchemaObjectNarrower;
 }
 
 type Depicter<
@@ -75,7 +78,7 @@ type Depicter<
 interface ReqResDepictHelperCommonProps
   extends Pick<
     OpenAPIContext,
-    "serializer" | "getRef" | "makeRef" | "path" | "method"
+    "serializer" | "getRef" | "makeRef" | "path" | "method" | "isSchemaObject"
   > {
   endpoint: AbstractEndpoint;
   composition: "inline" | "components";
@@ -378,6 +381,7 @@ export const depictArray: Depicter<z.ZodArray<z.ZodTypeAny>> = ({
 /** @todo improve it when OpenAPI 3.1.0 will be released */
 export const depictTuple: Depicter<z.ZodTuple> = ({
   schema: { items },
+  isSchemaObject,
   next,
 }) => {
   const types = items.map((item) => next({ schema: item }));
@@ -503,6 +507,7 @@ const makeSample = (depicted: SchemaObject) => {
 export const depictEffect: Depicter<z.ZodEffects<z.ZodTypeAny>> = ({
   schema,
   isResponse,
+  isSchemaObject,
   next,
 }) => {
   const input = next({ schema: schema.innerType() });
@@ -652,6 +657,7 @@ export const depictRequestParams = ({
   getRef,
   makeRef,
   composition,
+  isSchemaObject,
   clue = "parameter",
 }: ReqResDepictHelperCommonProps & {
   inputSources: InputSource[];
@@ -676,6 +682,7 @@ export const depictRequestParams = ({
       const depicted = walkSchema({
         schema: shape[name],
         isResponse: false,
+        isSchemaObject,
         rules: depicters,
         onEach,
         onMissing,
@@ -745,9 +752,10 @@ export const depicters: HandlingRules<
 export const onEach: Depicter<z.ZodTypeAny, "each"> = ({
   schema,
   isResponse,
+  isSchemaObject,
   prev,
 }) => {
-  if (isReferenceObject(prev)) {
+  if (!isSchemaObject(prev)) {
     return {};
   }
   const { description } = schema;
@@ -784,12 +792,9 @@ export const onMissing: Depicter<z.ZodTypeAny, "last"> = ({
 };
 
 export const excludeParamsFromDepiction = (
-  depicted: SchemaObject | ReferenceObject,
+  depicted: SchemaObject,
   pathParams: string[],
-): SchemaObject | ReferenceObject => {
-  if (isReferenceObject(depicted)) {
-    return depicted;
-  }
+): SchemaObject => {
   const properties = depicted.properties
     ? omit(pathParams, depicted.properties)
     : undefined;
@@ -826,9 +831,8 @@ export const excludeParamsFromDepiction = (
 };
 
 export const excludeExampleFromDepiction = (
-  depicted: SchemaObject | ReferenceObject,
-): SchemaObject | ReferenceObject =>
-  isSchemaObject(depicted) ? omit(["example"], depicted) : depicted;
+  depicted: SchemaObject,
+): SchemaObject => omit(["example"], depicted);
 
 export const depictResponse = ({
   method,
@@ -839,31 +843,34 @@ export const depictResponse = ({
   getRef,
   makeRef,
   composition,
+  isSchemaObject,
   clue = "response",
 }: ReqResDepictHelperCommonProps & {
   isPositive: boolean;
 }): ResponseObject => {
   const schema = endpoint.getSchema(isPositive ? "positive" : "negative");
   const mimeTypes = endpoint.getMimeTypes(isPositive ? "positive" : "negative");
-  const depictedSchema = excludeExampleFromDepiction(
-    walkSchema({
-      schema,
-      isResponse: true,
-      rules: depicters,
-      onEach,
-      onMissing,
-      serializer,
-      getRef,
-      makeRef,
-      path,
-      method,
-    }),
-  );
+  const depicted = walkSchema({
+    schema,
+    isResponse: true,
+    isSchemaObject,
+    rules: depicters,
+    onEach,
+    onMissing,
+    serializer,
+    getRef,
+    makeRef,
+    path,
+    method,
+  });
+  const clean = isSchemaObject(depicted)
+    ? excludeExampleFromDepiction(depicted)
+    : depicted;
   const examples = depictExamples(schema, true);
   const result =
     composition === "components"
-      ? makeRef(makeCleanId(path, method, clue), depictedSchema)
-      : depictedSchema;
+      ? makeRef(makeCleanId(path, method, clue), clean)
+      : clean;
 
   return {
     description: `${method.toUpperCase()} ${path} ${clue}`,
@@ -978,27 +985,29 @@ export const depictRequest = ({
   getRef,
   makeRef,
   composition,
+  isSchemaObject,
   clue = "request body",
 }: ReqResDepictHelperCommonProps): RequestBodyObject => {
   const pathParams = getRoutePathParams(path);
   const inputSchema = endpoint.getSchema("input");
-  const bodyDepiction = excludeExampleFromDepiction(
-    excludeParamsFromDepiction(
-      walkSchema({
-        schema: hasRaw(inputSchema) ? ZodFile.create().buffer() : inputSchema,
-        isResponse: false,
-        rules: depicters,
-        onEach,
-        onMissing,
-        serializer,
-        getRef,
-        makeRef,
-        path,
-        method,
-      }),
-      pathParams,
-    ),
-  );
+  const depicted = walkSchema({
+    schema: hasRaw(inputSchema) ? ZodFile.create().buffer() : inputSchema,
+    isResponse: false,
+    isSchemaObject,
+    rules: depicters,
+    onEach,
+    onMissing,
+    serializer,
+    getRef,
+    makeRef,
+    path,
+    method,
+  });
+  const clean = isSchemaObject(depicted)
+    ? excludeExampleFromDepiction(
+        excludeParamsFromDepiction(depicted, pathParams),
+      )
+    : depicted;
   const bodyExamples = depictExamples(
     endpoint.getSchema("input"),
     false,
@@ -1006,8 +1015,8 @@ export const depictRequest = ({
   );
   const result =
     composition === "components"
-      ? makeRef(makeCleanId(path, method, clue), bodyDepiction)
-      : bodyDepiction;
+      ? makeRef(makeCleanId(path, method, clue), clean)
+      : clean;
 
   return {
     description: `${method.toUpperCase()} ${path} ${clue}`,

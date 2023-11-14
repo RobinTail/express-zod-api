@@ -1,3 +1,4 @@
+import type { oas30 } from "openapi3-ts";
 import type {
   OpenApiBuilder,
   OperationObject,
@@ -30,7 +31,7 @@ import { Routing } from "./routing";
 import { RoutingWalkerParams, walkRouting } from "./routing-walker";
 
 interface DocumentationParams {
-  OpenApiBuilder: { create: () => OpenApiBuilder };
+  oas: typeof oas30;
   title: string;
   version: string;
   serverUrl: string | [string, ...string[]];
@@ -115,7 +116,7 @@ export class Documentation {
   }
 
   public constructor({
-    OpenApiBuilder: OASClass,
+    oas,
     routing,
     config,
     title,
@@ -127,7 +128,7 @@ export class Documentation {
     composition = "inline",
     serializer = defaultSerializer,
   }: DocumentationParams) {
-    this.builder = OASClass.create().addInfo({ title, version });
+    this.builder = oas.OpenApiBuilder.create().addInfo({ title, version });
     for (const url of typeof serverUrl === "string" ? [serverUrl] : serverUrl) {
       this.builder.addServer({ url });
     }
@@ -145,6 +146,7 @@ export class Documentation {
         serializer,
         getRef: this.getRef.bind(this),
         makeRef: this.makeRef.bind(this),
+        isSchemaObject: oas.isSchemaObject,
       };
       const [shortDesc, longDesc] = (["short", "long"] as const).map(
         endpoint.getDescription.bind(endpoint),

@@ -1,4 +1,8 @@
-import { ReferenceObject, SchemaObject } from "openapi3-ts/oas30";
+import {
+  ReferenceObject,
+  SchemaObject,
+  isSchemaObject,
+} from "openapi3-ts/oas30";
 import { z } from "zod";
 import { defaultSerializer } from "../../src/common-helpers";
 import { IOSchemaError } from "../../src/errors";
@@ -74,6 +78,7 @@ describe("Documentation helpers", () => {
     getRef: getRefMock,
     makeRef: makeRefMock,
     serializer: defaultSerializer,
+    isSchemaObject,
   };
   const responseCtx: OpenAPIContext = {
     path: "/v1/user/:id",
@@ -82,6 +87,7 @@ describe("Documentation helpers", () => {
     getRef: getRefMock,
     makeRef: makeRefMock,
     serializer: defaultSerializer,
+    isSchemaObject,
   };
   const makeNext =
     (
@@ -236,12 +242,8 @@ describe("Documentation helpers", () => {
         rules: depicters,
         onMissing,
       });
-      expect(excludeParamsFromDepiction(depicted, ["a"])).toMatchSnapshot();
-    });
-
-    test("should handle the ReferenceObject", () => {
       expect(
-        excludeParamsFromDepiction({ $ref: "test" }, ["a"]),
+        excludeParamsFromDepiction(depicted as SchemaObject, ["a"]),
       ).toMatchSnapshot();
     });
   });
