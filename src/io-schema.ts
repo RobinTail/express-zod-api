@@ -23,8 +23,8 @@ export type ProbableIntersection<
 > = A extends null
   ? B
   : A extends IOSchema<"strip">
-  ? z.ZodIntersection<A, B>
-  : never;
+    ? z.ZodIntersection<A, B>
+    : never;
 
 /**
  * @description intersects input schemas of middlewares and the endpoint

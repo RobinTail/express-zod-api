@@ -427,12 +427,12 @@ export const depictString: Depicter<z.ZodString> = ({
   const regex = regexCheck
     ? regexCheck.regex
     : datetimeCheck
-    ? datetimeCheck.offset
-      ? new RegExp(
-          `^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?(([+-]\\d{2}:\\d{2})|Z)$`,
-        )
-      : new RegExp(`^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?Z$`)
-    : undefined;
+      ? datetimeCheck.offset
+        ? new RegExp(
+            `^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?(([+-]\\d{2}:\\d{2})|Z)$`,
+          )
+        : new RegExp(`^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?Z$`)
+      : undefined;
   return {
     type: "string" as const,
     ...(isDatetime && { format: "date-time" }),
@@ -694,8 +694,8 @@ export const depictRequestParams = ({
         in: isPathParam(name)
           ? "path"
           : isHeaderParam(name)
-          ? "header"
-          : "query",
+            ? "header"
+            : "query",
         required: !shape[name].isOptional(),
         description:
           (isSchemaObject(depicted) && depicted.description) ||
