@@ -1,4 +1,4 @@
-import {
+import type {
   OpenApiBuilder,
   OperationObject,
   ReferenceObject,
@@ -30,6 +30,7 @@ import { Routing } from "./routing";
 import { RoutingWalkerParams, walkRouting } from "./routing-walker";
 
 interface DocumentationParams {
+  OpenApiBuilder: { create: () => OpenApiBuilder };
   title: string;
   version: string;
   serverUrl: string | [string, ...string[]];
@@ -114,6 +115,7 @@ export class Documentation {
   }
 
   public constructor({
+    OpenApiBuilder: OASClass,
     routing,
     config,
     title,
@@ -125,8 +127,7 @@ export class Documentation {
     composition = "inline",
     serializer = defaultSerializer,
   }: DocumentationParams) {
-    this.builder = new OpenApiBuilder();
-    this.builder.addInfo({ title, version });
+    this.builder = OASClass.create().addInfo({ title, version });
     for (const url of typeof serverUrl === "string" ? [serverUrl] : serverUrl) {
       this.builder.addServer({ url });
     }

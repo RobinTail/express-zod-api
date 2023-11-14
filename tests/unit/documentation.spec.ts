@@ -1,3 +1,4 @@
+import { OpenApiBuilder } from "openapi3-ts/oas30";
 import { config as exampleConfig } from "../../example/config";
 import { routing } from "../../example/routing";
 import {
@@ -31,6 +32,7 @@ describe("Documentation generator", () => {
       "should generate the correct schema of example routing %#",
       ({ composition }) => {
         const spec = new Documentation({
+          OpenApiBuilder,
           routing,
           config: exampleConfig,
           version: "1.2.3",
@@ -58,6 +60,7 @@ describe("Documentation generator", () => {
             }),
           },
         },
+        OpenApiBuilder,
         config: sampleConfig,
         version: "3.4.5",
         title: "Testing DELETE request without body",
@@ -69,6 +72,7 @@ describe("Documentation generator", () => {
     test("should generate the correct schema for complex types", () => {
       const literalValue = "something" as const;
       const spec = new Documentation({
+        OpenApiBuilder,
         config: sampleConfig,
         routing: {
           v1: {
@@ -100,6 +104,7 @@ describe("Documentation generator", () => {
     test("should generate the correct schema for nullable and optional types", () => {
       const spec = new Documentation({
         config: sampleConfig,
+        OpenApiBuilder,
         routing: {
           v1: {
             getSomething: defaultEndpointsFactory.build({
@@ -129,6 +134,7 @@ describe("Documentation generator", () => {
     test("should generate the correct schema for intersection type", () => {
       const spec = new Documentation({
         config: sampleConfig,
+        OpenApiBuilder,
         routing: {
           v1: {
             getSomething: defaultEndpointsFactory.build({
@@ -173,6 +179,7 @@ describe("Documentation generator", () => {
     test("should generate the correct schema for union type", () => {
       const spec = new Documentation({
         config: sampleConfig,
+        OpenApiBuilder,
         routing: {
           v1: {
             getSomething: defaultEndpointsFactory.build({
@@ -208,6 +215,7 @@ describe("Documentation generator", () => {
     test("should generate the correct schema for discriminated union type", () => {
       const spec = new Documentation({
         config: sampleConfig,
+        OpenApiBuilder,
         routing: {
           v1: {
             getSomething: defaultEndpointsFactory.build({
@@ -240,6 +248,7 @@ describe("Documentation generator", () => {
     test("should handle transformation schema in output", () => {
       const spec = new Documentation({
         config: sampleConfig,
+        OpenApiBuilder,
         routing: {
           v1: {
             getSomething: defaultEndpointsFactory.build({
@@ -267,6 +276,7 @@ describe("Documentation generator", () => {
     test("should handle bigint, boolean, date, null and readonly", () => {
       const spec = new Documentation({
         config: sampleConfig,
+        OpenApiBuilder,
         routing: {
           v1: {
             getSomething: defaultEndpointsFactory.build({
@@ -297,6 +307,7 @@ describe("Documentation generator", () => {
     test("should handle record", () => {
       const spec = new Documentation({
         config: sampleConfig,
+        OpenApiBuilder,
         routing: {
           v1: {
             getSomething: defaultEndpointsFactory.build({
@@ -327,6 +338,7 @@ describe("Documentation generator", () => {
     test("should handle type any", () => {
       const spec = new Documentation({
         config: sampleConfig,
+        OpenApiBuilder,
         routing: {
           v1: {
             getSomething: defaultEndpointsFactory.build({
@@ -351,6 +363,7 @@ describe("Documentation generator", () => {
     test("should handle different number types", () => {
       const spec = new Documentation({
         config: sampleConfig,
+        OpenApiBuilder,
         routing: {
           v1: {
             getSomething: defaultEndpointsFactory.build({
@@ -383,6 +396,7 @@ describe("Documentation generator", () => {
     test("should handle different string types", () => {
       const spec = new Documentation({
         config: sampleConfig,
+        OpenApiBuilder,
         routing: {
           v1: {
             getSomething: defaultEndpointsFactory.build({
@@ -425,6 +439,7 @@ describe("Documentation generator", () => {
     test("should handle tuples", () => {
       const spec = new Documentation({
         config: sampleConfig,
+        OpenApiBuilder,
         routing: {
           v1: {
             getSomething: defaultEndpointsFactory.build({
@@ -455,6 +470,7 @@ describe("Documentation generator", () => {
     test("should handle enum types", () => {
       const spec = new Documentation({
         config: sampleConfig,
+        OpenApiBuilder,
         routing: {
           v1: {
             getSomething: defaultEndpointsFactory.build({
@@ -487,6 +503,7 @@ describe("Documentation generator", () => {
       const boolean = z.preprocess((arg) => !!arg, z.boolean());
       const spec = new Documentation({
         config: sampleConfig,
+        OpenApiBuilder,
         routing: {
           v1: {
             getSomething: defaultEndpointsFactory.build({
@@ -521,6 +538,7 @@ describe("Documentation generator", () => {
       });
       const spec = new Documentation({
         config: sampleConfig,
+        OpenApiBuilder,
         routing: {
           v1: {
             getSomething: defaultEndpointsFactory.build({
@@ -566,6 +584,7 @@ describe("Documentation generator", () => {
           () =>
             new Documentation({
               config: sampleConfig,
+              OpenApiBuilder,
               routing: {
                 v1: {
                   getSomething: defaultEndpointsFactory.build({
@@ -628,6 +647,7 @@ describe("Documentation generator", () => {
       });
       const spec = new Documentation({
         config: sampleConfig,
+        OpenApiBuilder,
         routing: {
           v1: {
             getSomething: defaultEndpointsFactory.addMiddleware(mw1).build({
@@ -667,6 +687,7 @@ describe("Documentation generator", () => {
     test("should ensure the uniq operation ids", () => {
       const spec = new Documentation({
         config: sampleConfig,
+        OpenApiBuilder,
         routing: {
           v1: {
             getSome: {
@@ -698,6 +719,7 @@ describe("Documentation generator", () => {
       const operationId = "coolOperationId";
       const spec = new Documentation({
         config: sampleConfig,
+        OpenApiBuilder,
         routing: {
           v1: {
             getSome: {
@@ -725,6 +747,7 @@ describe("Documentation generator", () => {
       const operationId = "CoolOperationId";
       const spec = new Documentation({
         config: sampleConfig,
+        OpenApiBuilder,
         routing: {
           v1: {
             getSome: {
@@ -759,6 +782,7 @@ describe("Documentation generator", () => {
       expect(() => {
         new Documentation({
           config: sampleConfig,
+          OpenApiBuilder,
           routing: {
             v1: {
               getSome: {
@@ -807,6 +831,7 @@ describe("Documentation generator", () => {
       const factory = new EndpointsFactory(resultHandler);
       const spec = new Documentation({
         config: sampleConfig,
+        OpenApiBuilder,
         routing: {
           v1: {
             getSomething: factory.build({
@@ -832,6 +857,7 @@ describe("Documentation generator", () => {
       // @see https://github.com/colinhacks/zod/blob/v3.6.1/src/types.ts#L1204
       const spec = new Documentation({
         config: sampleConfig,
+        OpenApiBuilder,
         routing: {
           v1: {
             getSomething: defaultEndpointsFactory.build({
@@ -867,6 +893,7 @@ describe("Documentation generator", () => {
 
       const spec = new Documentation({
         config: sampleConfig,
+        OpenApiBuilder,
         routing: {
           v1: {
             getSomething: defaultEndpointsFactory.build({
@@ -900,6 +927,7 @@ describe("Documentation generator", () => {
     test("should handle route path params for POST request", () => {
       const spec = new Documentation({
         config: sampleConfig,
+        OpenApiBuilder,
         routing: {
           v1: {
             ":name": defaultEndpointsFactory.build({
@@ -923,6 +951,7 @@ describe("Documentation generator", () => {
     test("should handle route path params for GET request", () => {
       const spec = new Documentation({
         config: sampleConfig,
+        OpenApiBuilder,
         routing: {
           v1: {
             ":name": defaultEndpointsFactory.build({
@@ -953,6 +982,7 @@ describe("Documentation generator", () => {
     test("should describe x- inputs as header params", () => {
       const spec = new Documentation({
         config: specificConfig,
+        OpenApiBuilder,
         routing: {
           v1: {
             test: defaultEndpointsFactory.build({
@@ -978,6 +1008,7 @@ describe("Documentation generator", () => {
     test("should pass over the schema description", () => {
       const spec = new Documentation({
         config: sampleConfig,
+        OpenApiBuilder,
         routing: {
           v1: {
             getSomething: defaultEndpointsFactory.build({
@@ -1007,6 +1038,7 @@ describe("Documentation generator", () => {
       const spec = new Documentation({
         composition: "components",
         config: sampleConfig,
+        OpenApiBuilder,
         routing: {
           hris: {
             employees: defaultEndpointsFactory.build({
@@ -1035,6 +1067,7 @@ describe("Documentation generator", () => {
     test("should pass over the example of an individual parameter", () => {
       const spec = new Documentation({
         config: sampleConfig,
+        OpenApiBuilder,
         routing: {
           v1: {
             getSomething: defaultEndpointsFactory.build({
@@ -1063,6 +1096,7 @@ describe("Documentation generator", () => {
     test("should pass over examples of each param from the whole IO schema examples (GET)", () => {
       const spec = new Documentation({
         config: sampleConfig,
+        OpenApiBuilder,
         routing: {
           v1: {
             getSomething: defaultEndpointsFactory.build({
@@ -1095,6 +1129,7 @@ describe("Documentation generator", () => {
     test("should pass over examples of the whole IO schema (POST)", () => {
       const spec = new Documentation({
         config: sampleConfig,
+        OpenApiBuilder,
         routing: {
           v1: {
             getSomething: defaultEndpointsFactory.build({
@@ -1127,6 +1162,7 @@ describe("Documentation generator", () => {
     test("should merge endpoint handler examples with its middleware examples", () => {
       const spec = new Documentation({
         config: sampleConfig,
+        OpenApiBuilder,
         routing: {
           v1: {
             getSomething: defaultEndpointsFactory
@@ -1173,6 +1209,7 @@ describe("Documentation generator", () => {
       const zodSchema = z.object({ a: z.string() });
       const spec = new Documentation({
         config: sampleConfig,
+        OpenApiBuilder,
         routing: {
           v1: {
             addSomething: defaultEndpointsFactory.build({
