@@ -56,10 +56,10 @@ const onLiteral: Producer<z.ZodLiteral<LiteralType>> = ({
     typeof value === "number"
       ? f.createNumericLiteral(value)
       : typeof value === "boolean"
-      ? value
-        ? f.createTrue()
-        : f.createFalse()
-      : f.createStringLiteral(value),
+        ? value
+          ? f.createTrue()
+          : f.createFalse()
+        : f.createStringLiteral(value),
   );
 
 const onObject: Producer<z.ZodObject<z.ZodRawShape>> = ({

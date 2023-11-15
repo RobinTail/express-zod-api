@@ -153,8 +153,8 @@ export class Endpoint<
       input: hasUpload(inputSchema)
         ? [mimeMultipart]
         : hasRaw(inputSchema)
-        ? [mimeRaw]
-        : [mimeJson],
+          ? [mimeRaw]
+          : [mimeJson],
       positive: getMimeTypesFromApiResponse(apiResponse.positive),
       negative: getMimeTypesFromApiResponse(apiResponse.negative),
     };
