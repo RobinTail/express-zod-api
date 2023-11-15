@@ -1145,11 +1145,11 @@
   integrity sha512-3Gnx08Ns1sEoCrWssEgTSJs/rsT2vhGP+Ja9cnnk9k4ALxinORlQneLXFeFKOTJMOeZUFD1s7w+w2AphTpvzZw==
 
 "@types/ramda@^0.29.3":
-  version "0.29.8"
-  resolved "https://registry.yarnpkg.com/@types/ramda/-/ramda-0.29.8.tgz#bcd691003dd7b9d493a1e8529bfbead66fd78a30"
-  integrity sha512-CmEF76RSSj4NkgFnuQ4ZK3xeq8wMnE9zQH7sr54Yy/a61WbE1qIzWYVfd7XupLbTJY9jCjgEPbv6fqMlsW8Mvw==
+  version "0.29.9"
+  resolved "https://registry.yarnpkg.com/@types/ramda/-/ramda-0.29.9.tgz#a4c1a9d056249268ffe16c2f6d198e42c2fc994a"
+  integrity sha512-X3yEG6tQCWBcUAql+RPC/O1Hm9BSU+MXu2wJnCETuAgUlrEDwTA1kIOdEEE4YXDtf0zfQLHa9CCE7WYp9kqPIQ==
   dependencies:
-    types-ramda "^0.29.5"
+    types-ramda "^0.29.6"
 
 "@types/range-parser@*":
   version "1.2.7"
@@ -5216,10 +5216,10 @@ typed-array-length@^1.0.4:
     for-each "^0.3.3"
     is-typed-array "^1.1.9"
 
-types-ramda@^0.29.5:
-  version "0.29.5"
-  resolved "https://registry.yarnpkg.com/types-ramda/-/types-ramda-0.29.5.tgz#1cb0488d39eb72723a8f95af9b6dfe483e4f34a7"
-  integrity sha512-u+bAYXHDPJR+amB0qMrMU/NXRB2PG8QqpO2v6j7yK/0mPZhlaaZj++ynYjnVpkPEpCkZEGxNpWY3X7qyLCGE3w==
+types-ramda@^0.29.6:
+  version "0.29.6"
+  resolved "https://registry.yarnpkg.com/types-ramda/-/types-ramda-0.29.6.tgz#a1d2a3c15a48e27d35832d7194d93369975f1427"
+  integrity sha512-VJoOk1uYNh9ZguGd3eZvqkdhD4hTGtnjRBUx5Zc0U9ftmnCgiWcSj/lsahzKunbiwRje1MxxNkEy1UdcXRCpYw==
   dependencies:
     ts-toolbelt "^9.6.0"
 
