@@ -16,9 +16,9 @@ const packageJson = `
   "dependencies": {
     "@tsconfig/node${tsconfigBase}": "latest",
     "express-zod-api": "../../dist",
-    "@swc/core": "1.3.92",
-    "@swc-node/register": "1.6.8",
-    "typescript": "5.2.2",
+    "@swc/core": "^1.3.92",
+    "@swc-node/register": "^1.6.8",
+    "typescript": "^5.2.2",
     "@types/node": "*"
   }
 }
