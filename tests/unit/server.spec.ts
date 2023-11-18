@@ -138,7 +138,6 @@ describe("Server", () => {
         },
         cors: true,
         startupLogo: false,
-        logger: winston.createLogger({ silent: true }),
       };
       const routingMock = {
         v1: {
@@ -173,7 +172,6 @@ describe("Server", () => {
         },
         cors: true,
         startupLogo: false,
-        logger: winston.createLogger({ silent: true }),
       };
       const routingMock = {
         v1: {
@@ -199,7 +197,6 @@ describe("Server", () => {
         },
         cors: true,
         startupLogo: false,
-        logger: winston.createLogger({ silent: true }),
       };
       const routingMock = {
         v1: {
@@ -225,7 +222,6 @@ describe("Server", () => {
         },
         cors: true,
         startupLogo: false,
-        logger: winston.createLogger({ silent: true }),
       };
       const routingMock = {
         v1: {
