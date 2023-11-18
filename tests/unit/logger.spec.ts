@@ -26,7 +26,7 @@ describe("Logger", () => {
     );
   };
 
-  describe("createWinstonLogger()", () => {
+  describe("createLogger()", () => {
     test("Should create silent logger", () => {
       const logger = createLogger({ winston, level: "silent", color: false });
       const transform = jest.spyOn(logger.transports[0].format!, "transform");
