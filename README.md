@@ -455,6 +455,7 @@ Here is an example on using another `pino` logger with `pino-pretty` extension:
 
 ```typescript
 import pino from "pino";
+import { createConfig } from "express-zod-api";
 
 const logger = pino({
   transport: {
@@ -469,6 +470,8 @@ All handlers provide `logger` having `AbstractLogger` type, which is limited to 
 In order to make Endpoint's handler aware of the actual logger type, provide the config to `EndpointsFactory`:
 
 ```typescript
+import { EndpointsFactory, defaultResultHandler } from "express-zod-api";
+
 const myFactory = new EndpointsFactory({
   resultHandler: defaultResultHandler,
   config, // <—— supply your config here
