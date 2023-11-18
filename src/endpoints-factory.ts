@@ -29,10 +29,16 @@ type BuildProps<
   OPT extends FlatObject,
   SCO extends string,
   TAG extends string,
+  LOG extends AbstractLogger,
 > = {
   input: IN;
   output: OUT;
-  handler: Handler<z.output<ProbableIntersection<MIN, IN>>, z.input<OUT>, OPT>;
+  handler: Handler<
+    z.output<ProbableIntersection<MIN, IN>>,
+    z.input<OUT>,
+    OPT,
+    LOG
+  >;
   description?: string;
   shortDescription?: string;
   operationId?: string | ((method: Method) => string);
@@ -166,14 +172,15 @@ export class EndpointsFactory<
     shortDescription,
     operationId,
     ...rest
-  }: BuildProps<BIN, BOUT, IN, OUT, SCO, TAG>): Endpoint<
+  }: BuildProps<BIN, BOUT, IN, OUT, SCO, TAG, LOG>): Endpoint<
     ProbableIntersection<IN, BIN>,
     BOUT,
     OUT,
     POS,
     NEG,
     SCO,
-    TAG
+    TAG,
+    LOG
   > {
     const { middlewares, resultHandler } = this;
     const methods = "methods" in rest ? rest.methods : [rest.method];
