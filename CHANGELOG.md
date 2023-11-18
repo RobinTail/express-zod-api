@@ -35,11 +35,11 @@ const config = createConfig({
     /* compression: true | CompressionOptions, */
     // after:
     compressor: compression(),
-    // before:
-    // logger: { level: "debug", color: true },
-    // after (optional, any compatible logger):
-    logger: createLogger({ winston, level: "debug", color: true }),
   },
+  // before:
+  // logger: { level: "debug", color: true },
+  // after (optional, any compatible logger):
+  logger: createLogger({ winston, level: "debug", color: true }),
 });
 
 const { responseMock } = testEndpoint({
