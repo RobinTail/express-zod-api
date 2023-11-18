@@ -464,7 +464,7 @@ const logger = pino({
 const config = createConfig({ logger });
 ```
 
-All entities handlers provide `logger` having `AbstractLogger` type, which is limited to the four mentioned methods.
+All handlers provide `logger` having `AbstractLogger` type, which is limited to the four mentioned methods.
 In order to make Endpoint's handler aware of the actual logger type, provide the config to `EndpointsFactory`:
 
 ```typescript
