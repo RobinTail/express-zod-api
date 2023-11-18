@@ -86,8 +86,8 @@ Therefore, many basic tasks can be accomplished faster and easier, in particular
 - Web server — [Express.js](https://expressjs.com/).
 - Schema validation — [Zod 3.x](https://github.com/colinhacks/zod).
 - Logger — any having `info()`, `debug()`, `error()` and `warn()` methods:
-  - `console` is default when not specified,
-  - [Winston](https://github.com/winstonjs/winston) is recommended.
+  - [Winston](https://github.com/winstonjs/winston) is recommended (helper included),
+  - `console` is used by default (unless specified).
 - Generators:
   - Documentation — [OpenAPI 3.x](https://github.com/metadevpro/openapi3-ts) (Swagger Specification).
   - Client side types — inspired by [zod-to-ts](https://github.com/sachinraja/zod-to-ts).
