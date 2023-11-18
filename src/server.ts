@@ -1,12 +1,8 @@
 import express, { ErrorRequestHandler, RequestHandler } from "express";
 import http from "node:http";
 import https from "node:https";
-import {
-  AbstractLogger,
-  AppConfig,
-  CommonConfig,
-  ServerConfig,
-} from "./config-type";
+import { AppConfig, CommonConfig, ServerConfig } from "./config-type";
+import { AbstractLogger } from "./logger";
 import { ResultHandlerError } from "./errors";
 import { makeErrorFromAnything } from "./common-helpers";
 import {

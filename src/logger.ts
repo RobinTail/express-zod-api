@@ -3,6 +3,12 @@ import type { Format, TransformableInfo } from "logform";
 import type * as Winston from "winston";
 import type Transport from "winston-transport";
 
+/** @desc You can use any logger compatible with this type. */
+export type AbstractLogger = Record<
+  "info" | "debug" | "warn" | "error",
+  (message: string, meta?: any) => any
+>;
+
 /**
  * @desc a helper to for creating a winston logger
  * @requires winston

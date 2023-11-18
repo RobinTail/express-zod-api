@@ -6,7 +6,7 @@ import { IOSchemaError } from "./errors";
 import { IOSchema } from "./io-schema";
 import { LogicalContainer } from "./logical-container";
 import { Security } from "./security";
-import { AbstractLogger } from "./config-type";
+import { AbstractLogger } from "./logger";
 
 interface MiddlewareParams<IN, OPT> {
   input: IN;

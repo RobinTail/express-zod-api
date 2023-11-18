@@ -1,7 +1,8 @@
 import { Express } from "express";
-import { AbstractLogger, CommonConfig } from "./config-type";
+import { CommonConfig } from "./config-type";
 import { DependsOnMethod } from "./depends-on-method";
 import { AbstractEndpoint } from "./endpoint";
+import { AbstractLogger } from "./logger";
 import { walkRouting } from "./routing-walker";
 import { ServeStatic } from "./serve-static";
 import { getStartupLogo } from "./startup-logo";

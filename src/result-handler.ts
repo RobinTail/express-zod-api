@@ -11,7 +11,7 @@ import {
 import { ResultHandlerError } from "./errors";
 import { IOSchema } from "./io-schema";
 import { withMeta } from "./metadata";
-import { AbstractLogger } from "./config-type";
+import { AbstractLogger } from "./logger";
 
 interface LastResortHandlerParams {
   error: ResultHandlerError;

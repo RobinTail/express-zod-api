@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { z } from "zod";
 import { FlatObject } from "./common-helpers";
-import { AbstractLogger, CommonConfig } from "./config-type";
+import { CommonConfig } from "./config-type";
 import { Endpoint, Handler } from "./endpoint";
 import {
   IOSchema,
@@ -21,6 +21,7 @@ import {
   arrayResultHandler,
   defaultResultHandler,
 } from "./result-handler";
+import { AbstractLogger } from "./logger";
 
 type BuildProps<
   IN extends IOSchema,

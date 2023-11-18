@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { z } from "zod";
 import { ApiResponse } from "./api-response";
-import { AbstractLogger, CommonConfig } from "./config-type";
+import { CommonConfig } from "./config-type";
 import {
   IOSchemaError,
   InputValidationError,
@@ -28,6 +28,7 @@ import {
   lastResortHandler,
 } from "./result-handler";
 import { Security } from "./security";
+import { AbstractLogger } from "./logger";
 
 const getMimeTypesFromApiResponse = <S extends z.ZodTypeAny>(
   subject: S | ApiResponse<S>,

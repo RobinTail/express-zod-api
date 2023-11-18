@@ -1,14 +1,10 @@
 import { Express, Request, RequestHandler } from "express";
 import { ServerOptions } from "node:https";
 import { AbstractEndpoint } from "./endpoint";
+import { AbstractLogger } from "./logger";
 import { Method } from "./method";
 import { AnyResultHandlerDefinition } from "./result-handler";
 import { ListenOptions } from "node:net";
-
-export type AbstractLogger = Record<
-  "info" | "debug" | "warn" | "error",
-  (message: string, meta?: any) => any
->;
 
 export type InputSource = keyof Pick<
   Request,

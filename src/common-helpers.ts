@@ -2,12 +2,7 @@ import { Request } from "express";
 import { isHttpError } from "http-errors";
 import { createHash } from "node:crypto";
 import { z } from "zod";
-import {
-  AbstractLogger,
-  CommonConfig,
-  InputSource,
-  InputSources,
-} from "./config-type";
+import { CommonConfig, InputSource, InputSources } from "./config-type";
 import { InputValidationError, OutputValidationError } from "./errors";
 import { ZodFile } from "./file-schema";
 import { IOSchema } from "./io-schema";
@@ -15,6 +10,7 @@ import { getMeta } from "./metadata";
 import { AuxMethod, Method } from "./method";
 import { mimeMultipart } from "./mime";
 import { ZodUpload } from "./upload-schema";
+import { AbstractLogger } from "./logger";
 
 export type FlatObject = Record<string, unknown>;
 

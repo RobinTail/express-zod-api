@@ -1,7 +1,8 @@
 import { Request, Response } from "express";
 import http from "node:http";
-import { AbstractLogger, CommonConfig } from "./config-type";
+import { CommonConfig } from "./config-type";
 import { AbstractEndpoint } from "./endpoint";
+import { AbstractLogger } from "./logger";
 import { mimeJson } from "./mime";
 
 type MockFunction = <S>(implementation?: (...args: any[]) => any) => S; // kept "any" for easier compatibility
