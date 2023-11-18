@@ -440,7 +440,7 @@ const updateUserEndpoint = defaultEndpointsFactory.build({
 
 By default, your API writes logs into `console` when `logger` is not specified in the config.
 You can configure your API with any compatible logger having `info()`, `debug()`, `error()` and `warn()` methods.
-In case you like Winston, install the corresponding `winston` package and use provided helper to configure it easily:
+In case you like Winston, install the `winston` package and use the provided helper to configure it easily:
 
 ```typescript
 import winston from "winston";
