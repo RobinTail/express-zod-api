@@ -8,9 +8,12 @@
   - `express-fileupload` and `compression` become optional peer dependencies.
     - You will need to install them if you're using file uploads and compression features in your configuration.
     - You might also need to install `@types/express-fileupload` and `@types/compression` in that case.
-  - The following changes to the configuration are required:
+  - `winston` becomes an optional peer dependency, and you can now use any compatible logger instead of it.
+    - Any logging solution providing the following methods: `debug()`, `warn()`, `info()` and `error()`.
+  - The following changes to the configuration might be required:
     - `upload` property is renamed to `uploader`,
-    - `compression` property is renamed to `compressor`.
+    - `compression` property is renamed to `compressor`,
+    - `logger` property become optional (`console` by default), use the `createLogger()` method to keep `winston`.
     - The values also have to be changed as described below.
   - The `testEndpoint()` method now requires to specify either `jest.fn` or `vi.fn` through `mockFn` option.
     - Yes, it does now support both `jest` and `vitest` testing frameworks.
@@ -19,7 +22,8 @@
 ```typescript
 import compression from "compression";
 import fileUpload from "express-fileupload";
-import { createConfig, testEndpoint } from "express-zod-api";
+import winston from "winston";
+import { createConfig, testEndpoint, createLogger } from "express-zod-api";
 
 const config = createConfig({
   server: {
@@ -31,6 +35,10 @@ const config = createConfig({
     /* compression: true | CompressionOptions, */
     // after:
     compressor: compression(),
+    // before:
+    // logger: { level: "debug", color: true },
+    // after (optional, any compatible logger):
+    logger: createLogger({ winston, level: "debug", color: true }),
   },
 });
 
