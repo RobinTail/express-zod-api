@@ -59,10 +59,7 @@ export class EndpointsFactory<
   protected resultHandler: ResultHandlerDefinition<POS, NEG>;
   protected middlewares: AnyMiddlewareDef[] = [];
 
-  /**
-   * @desc Consider supplying "config" prop having "logger" and "tags" for better typing
-   * @todo Consider removing this overload to reduce confusion
-   * */
+  /** @desc Consider supplying "config" prop having "logger" and "tags" for better typing */
   constructor(resultHandler: ResultHandlerDefinition<POS, NEG>);
   constructor(params: {
     resultHandler: ResultHandlerDefinition<POS, NEG>;
