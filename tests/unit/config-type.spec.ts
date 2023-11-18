@@ -1,5 +1,5 @@
 import { Express } from "express";
-import { createConfig, createWinstonLogger } from "../../src";
+import { createConfig, createLogger } from "../../src";
 import winston from "winston";
 
 describe("ConfigType", () => {
@@ -10,13 +10,7 @@ describe("ConfigType", () => {
           listen: 3333,
         },
         cors: true,
-        logger: createWinstonLogger({
-          winston,
-          config: {
-            level: "debug",
-            color: false,
-          },
-        }),
+        logger: createLogger({ winston, level: "debug", color: false }),
       };
       const config = createConfig(argument);
       expect(config).toEqual(argument);

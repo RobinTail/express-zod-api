@@ -3,17 +3,13 @@ import type { Format, TransformableInfo } from "logform";
 import type * as Winston from "winston";
 import type Transport from "winston-transport";
 
-export interface LoggerConfig {
+export const createLogger = ({
+  winston,
+  ...config
+}: {
+  winston: typeof Winston;
   level: "silent" | "warn" | "debug";
   color: boolean;
-}
-
-export const createWinstonLogger = ({
-  config,
-  winston,
-}: {
-  config: LoggerConfig;
-  winston: typeof Winston;
 }): Winston.Logger => {
   const prettyPrint = (meta: Omit<TransformableInfo, "level" | "message">) => {
     const {

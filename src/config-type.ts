@@ -46,7 +46,7 @@ export interface CommonConfig<TAG extends string = string> {
   /**
    * @desc Logger instance.
    * @default console
-   * @example createWinstonLogger({ winston, config: { level: "debug", color: true } })
+   * @example createLogger({ winston, level: "debug", color: true })
    * */
   logger?: AbstractLogger;
   /**
