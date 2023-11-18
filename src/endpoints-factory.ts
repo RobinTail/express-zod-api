@@ -108,8 +108,7 @@ export class EndpointsFactory<
     AIN extends IOSchema<"strip">,
     AOUT extends FlatObject,
     ASCO extends string,
-    ALOG extends AbstractLogger,
-  >(subject: MiddlewareDefinition<AIN, OUT, AOUT, ASCO, ALOG>) {
+  >(subject: MiddlewareDefinition<AIN, OUT, AOUT, ASCO>) {
     return EndpointsFactory.#create<
       POS,
       NEG,

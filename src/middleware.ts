@@ -6,18 +6,18 @@ import { IOSchemaError } from "./errors";
 import { IOSchema } from "./io-schema";
 import { LogicalContainer } from "./logical-container";
 import { Security } from "./security";
-import { AbstractLogger, CommonConfig } from "./config-type";
+import { AbstractLogger } from "./config-type";
 
-interface MiddlewareParams<IN, OPT, LOG> {
+interface MiddlewareParams<IN, OPT> {
   input: IN;
   options: OPT;
   request: Request;
   response: Response;
-  logger: LOG;
+  logger: AbstractLogger;
 }
 
-type Middleware<IN, OPT, OUT, LOG> = (
-  params: MiddlewareParams<IN, OPT, LOG>,
+type Middleware<IN, OPT, OUT> = (
+  params: MiddlewareParams<IN, OPT>,
 ) => Promise<OUT>;
 
 interface MiddlewareCreationProps<
@@ -25,12 +25,10 @@ interface MiddlewareCreationProps<
   OPT,
   OUT extends FlatObject,
   SCO extends string,
-  LOG extends AbstractLogger,
 > {
   input: IN;
   security?: LogicalContainer<Security<keyof z.input<IN> & string, SCO>>;
-  config?: CommonConfig<any, LOG>;
-  middleware: Middleware<z.output<IN>, OPT, OUT, LOG>;
+  middleware: Middleware<z.output<IN>, OPT, OUT>;
 }
 
 export interface MiddlewareDefinition<
@@ -38,22 +36,20 @@ export interface MiddlewareDefinition<
   OPT,
   OUT extends FlatObject,
   SCO extends string,
-  LOG extends AbstractLogger,
-> extends MiddlewareCreationProps<IN, OPT, OUT, SCO, LOG> {
+> extends MiddlewareCreationProps<IN, OPT, OUT, SCO> {
   type: "proprietary" | "express";
 }
 
-export type AnyMiddlewareDef = MiddlewareDefinition<any, any, any, any, any>;
+export type AnyMiddlewareDef = MiddlewareDefinition<any, any, any, any>;
 
 export const createMiddleware = <
   IN extends IOSchema<"strip">,
   OPT,
   OUT extends FlatObject,
   SCO extends string,
-  LOG extends AbstractLogger,
 >(
-  props: MiddlewareCreationProps<IN, OPT, OUT, SCO, LOG>,
-): MiddlewareDefinition<IN, OPT, OUT, SCO, LOG> => {
+  props: MiddlewareCreationProps<IN, OPT, OUT, SCO>,
+): MiddlewareDefinition<IN, OPT, OUT, SCO> => {
   if (hasTopLevelTransformingEffect(props.input)) {
     throw new IOSchemaError(
       "Using transformations on the top level of middleware input schema is not allowed.",
