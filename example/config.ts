@@ -1,8 +1,8 @@
 import express from "express";
 import compression from "compression";
 import fileUpload from "express-fileupload";
-import { createConfig, createLogger } from "../src";
 import winston from "winston";
+import { createConfig, createLogger } from "../src";
 
 export const config = createConfig({
   server: {
