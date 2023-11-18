@@ -30,7 +30,10 @@ export type AbstractLogger = Record<
   (message: string, meta?: any) => any
 >;
 
-export interface CommonConfig<TAG extends string = string> {
+export interface CommonConfig<
+  TAG extends string = string,
+  LOG extends AbstractLogger = AbstractLogger,
+> {
   /**
    * @desc Enables cross-origin resource sharing.
    * @link https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
@@ -48,7 +51,7 @@ export interface CommonConfig<TAG extends string = string> {
    * @default console
    * @example createLogger({ winston, level: "debug", color: true })
    * */
-  logger?: AbstractLogger;
+  logger?: LOG;
   /**
    * @desc You can disable the startup logo.
    * @default true
@@ -68,8 +71,10 @@ export interface CommonConfig<TAG extends string = string> {
   tags?: TagsConfig<TAG>;
 }
 
-export interface ServerConfig<TAG extends string = string>
-  extends CommonConfig<TAG> {
+export interface ServerConfig<
+  TAG extends string = string,
+  LOG extends AbstractLogger = AbstractLogger,
+> extends CommonConfig<TAG, LOG> {
   /** @desc Server configuration. */
   server: {
     /** @desc Port, UNIX socket or custom options. */
@@ -112,15 +117,18 @@ export interface ServerConfig<TAG extends string = string>
   };
 }
 
-export interface AppConfig<TAG extends string = string>
-  extends CommonConfig<TAG> {
+export interface AppConfig<
+  TAG extends string = string,
+  LOG extends AbstractLogger = AbstractLogger,
+> extends CommonConfig<TAG, LOG> {
   /** @desc Your custom express app instead. */
   app: Express;
 }
 
 export const createConfig = <
   TAG extends string,
-  T extends ServerConfig<TAG> | AppConfig<TAG>,
+  LOG extends AbstractLogger,
+  T extends ServerConfig<TAG, LOG> | AppConfig<TAG, LOG>,
 >(
   config: T,
 ): T => config;
