@@ -438,15 +438,16 @@ const updateUserEndpoint = defaultEndpointsFactory.build({
 
 ## Customizing logger
 
-You can configure your API with any logger having `info()`, `debug()`, `error()` and `warn()` methods.
-In case you like Winston, install the corresponding `winston` package. The library provides a helper to configure it:
+By default, your API writes logs into `console` when `logger` is not specified in the config.
+You can configure your API with any compatible logger having `info()`, `debug()`, `error()` and `warn()` methods.
+In case you like Winston, install the corresponding `winston` package and use provided helper to configure it easily:
 
 ```typescript
 import winston from "winston";
 import { createConfig, createLogger } from "express-zod-api";
 
 const logger = createLogger({ winston, level: "debug", color: true });
-// or logger = winston.createLogger({ ... })
+// or without helper: winston.createLogger({ ... })
 const config = createConfig({ logger });
 ```
 

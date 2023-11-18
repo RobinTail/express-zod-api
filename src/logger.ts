@@ -3,6 +3,11 @@ import type { Format, TransformableInfo } from "logform";
 import type * as Winston from "winston";
 import type Transport from "winston-transport";
 
+/**
+ * @desc a helper to for creating a winston logger
+ * @requires winston
+ * @example createLogger({ winston, level: "debug", color: true })
+ * */
 export const createLogger = ({
   winston,
   ...config
