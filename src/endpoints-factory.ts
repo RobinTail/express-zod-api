@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { z } from "zod";
 import { FlatObject } from "./common-helpers";
-import { CommonConfig } from "./config-type";
+import { AbstractLogger, CommonConfig } from "./config-type";
 import { Endpoint, Handler } from "./endpoint";
 import {
   IOSchema,
@@ -47,22 +47,26 @@ export class EndpointsFactory<
   OUT extends FlatObject = {},
   SCO extends string = string,
   TAG extends string = string,
+  LOG extends AbstractLogger = AbstractLogger,
 > {
   protected resultHandler: ResultHandlerDefinition<POS, NEG>;
   protected middlewares: AnyMiddlewareDef[] = [];
 
-  /** @desc Consider using the "config" prop with the "tags" option to enforce constraints on tagging the endpoints */
+  /**
+   * @desc Consider supplying "config" prop having "logger" and "tags" for better typing
+   * @todo Consider removing this overload to reduce confusion
+   * */
   constructor(resultHandler: ResultHandlerDefinition<POS, NEG>);
   constructor(params: {
     resultHandler: ResultHandlerDefinition<POS, NEG>;
-    config?: CommonConfig<TAG>;
+    config?: CommonConfig<TAG, LOG>;
   });
   constructor(
     subject:
       | ResultHandlerDefinition<POS, NEG>
       | {
           resultHandler: ResultHandlerDefinition<POS, NEG>;
-          config?: CommonConfig<TAG>;
+          config?: CommonConfig<TAG, LOG>;
         },
   ) {
     this.resultHandler =
@@ -76,13 +80,20 @@ export class EndpointsFactory<
     COUT extends FlatObject,
     CSCO extends string,
     CTAG extends string,
+    CLOG extends AbstractLogger,
   >(
     middlewares: AnyMiddlewareDef[],
     resultHandler: ResultHandlerDefinition<CPOS, CNEG>,
   ) {
-    const factory = new EndpointsFactory<CPOS, CNEG, CIN, COUT, CSCO, CTAG>(
-      resultHandler,
-    );
+    const factory = new EndpointsFactory<
+      CPOS,
+      CNEG,
+      CIN,
+      COUT,
+      CSCO,
+      CTAG,
+      CLOG
+    >(resultHandler);
     factory.middlewares = middlewares;
     return factory;
   }
@@ -98,7 +109,8 @@ export class EndpointsFactory<
       ProbableIntersection<IN, AIN>,
       OUT & AOUT,
       SCO & ASCO,
-      TAG
+      TAG,
+      LOG
     >(this.middlewares.concat(subject), this.resultHandler);
   }
 
@@ -128,14 +140,14 @@ export class EndpointsFactory<
           middleware(request as R, response as S, next);
         }),
     };
-    return EndpointsFactory.#create<POS, NEG, IN, OUT & AOUT, SCO, TAG>(
+    return EndpointsFactory.#create<POS, NEG, IN, OUT & AOUT, SCO, TAG, LOG>(
       this.middlewares.concat(definition),
       this.resultHandler,
     );
   }
 
   public addOptions<AOUT extends FlatObject>(options: AOUT) {
-    return EndpointsFactory.#create<POS, NEG, IN, OUT & AOUT, SCO, TAG>(
+    return EndpointsFactory.#create<POS, NEG, IN, OUT & AOUT, SCO, TAG, LOG>(
       this.middlewares.concat(
         createMiddleware({
           input: z.object({}),
