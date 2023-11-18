@@ -1,8 +1,10 @@
 import createHttpError from "http-errors";
 import { z } from "zod";
 import { Method, createMiddleware, withMeta } from "../src";
+import { config } from "./config";
 
 export const authMiddleware = createMiddleware({
+  config, // optional, it provides the type of actual logger below
   security: {
     and: [
       { type: "input", name: "key" },
