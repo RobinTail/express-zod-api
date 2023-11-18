@@ -5,41 +5,58 @@
 ### 15.0.0
 
 - **Breaking changes**:
-  - `express-fileupload` and `compression` become optional peer dependencies.
-    - You will need to install them if you're using file uploads and compression features in your configuration.
-    - You might also need to install `@types/express-fileupload` and `@types/compression` in that case.
-  - `winston` becomes an optional peer dependency, and you can now use any compatible logger instead of it.
-    - Any logging solution providing the following methods: `debug()`, `warn()`, `info()` and `error()`.
-  - The following changes to the configuration might be required:
-    - `upload` property is renamed to `uploader`,
-    - `compression` property is renamed to `compressor`,
-    - `logger` property become optional (`console` by default), use the `createLogger()` method to keep `winston`.
-    - The values also have to be changed as described below.
-  - The `testEndpoint()` method now requires to specify either `jest.fn` or `vi.fn` through `mockFn` option.
-    - Yes, it does now support both `jest` and `vitest` testing frameworks.
-    - Compatibility with `vitest` was tested against versions `0.34.6` and `1.0.0-beta.4`.
+  - `express-fileupload` and `compression` become optional peer dependencies;
+  - `winston` becomes an optional (peer dependency), and you can now use any compatible logger besides it;
+  - Methods `createConfig`, `createLogger` and `testEndpoint()` are changed (read the migration guide below).
+- Features:
+  - Supporting any logger having `debug()`, `warn()`, `info()` and `error()` methods;
+    - If no logger is specified, it will use `console` instead.
+  - Supporting both `jest` and `vitest` frameworks for `testEndpoint()`.
+- How to migrate while maintaining previous functionality and behavior:
+  - If you have `upload` option enabled in your config:
+    - Install `express-fileupload` and `@types/express-fileupload` packages;
+    - Replace `upload` property with `uploader: fileUpload({ abortOnLimit: false, parseNested: true })` in config.
+  - If you have `compression` option enabled in your config:
+    - Install `compression` and `@types/compression` packages;
+    - Replace `compression` property with `compressor: compression()` in config.
+  - For the `logger` option in your config:
+    - If it's assigned with an object like `{ level: "debug", color: true }`:
+      - Replace it with `logger: createLogger({ winston, level: "debug", color: true })`.
+    - If it's assigned with an instance of a custom Winston logger:
+      - No action required.
+    - If you don't like Winston:
+      - Uninstall `winston`, install another compatible logger and assign its instance to the `logger` property.
+  - If you're using extra methods of `logger` in Endpoint's handler (beyond the four ones mentioned above):
+    - Specify the `config` within the object argument of the `new EndpointsFactory()`;
+    - This will make it aware of the type of actual logger you're using.
+    - It does not affect custom ResultHandlers and Middlewares — use `logger as ParticularLogger` syntax if needed.
+  - If you're using `testEndpoint()` method:
+    - Specify either `mockFn: jest.fn` or `mockFn: vi.fn` within its object argument.
 
 ```typescript
 import compression from "compression";
 import fileUpload from "express-fileupload";
 import winston from "winston";
-import { createConfig, testEndpoint, createLogger } from "express-zod-api";
+import {
+  createConfig,
+  testEndpoint,
+  createLogger,
+  EndpointsFactory,
+  defaultResultHandler,
+} from "express-zod-api";
 
 const config = createConfig({
   server: {
-    // before:
-    /* upload: true | UploadOptions, */
-    // after, the following two options are required to operate normally:
+    // The following two options are required to operate normally:
     uploader: fileUpload({ abortOnLimit: false, parseNested: true }),
-    // before:
-    /* compression: true | CompressionOptions, */
-    // after:
     compressor: compression(),
   },
-  // before:
-  // logger: { level: "debug", color: true },
-  // after (optional, any compatible logger):
   logger: createLogger({ winston, level: "debug", color: true }),
+});
+
+const myFactory = new EndpointsFactory({
+  config, // this makes Endpoint's handler aware of the actual logger
+  resultHandler: defaultResultHandler,
 });
 
 const { responseMock } = testEndpoint({
