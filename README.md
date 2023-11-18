@@ -64,7 +64,7 @@ You can find the release notes and migration guides in [Changelog](CHANGELOG.md)
 # Why and what is it for
 
 I made this library because of the often repetitive tasks of starting a web server APIs with the need to validate input
-data. It integrates and provides the capabilities of popular web server, logger, validation and documenting solutions.
+data. It integrates and provides the capabilities of popular web server, logging, validation and documenting solutions.
 Therefore, many basic tasks can be accomplished faster and easier, in particular:
 
 - You can describe web server routes as a hierarchical object.
@@ -462,6 +462,16 @@ const logger = pino({
   },
 });
 const config = createConfig({ logger });
+```
+
+All entities handlers provide `logger` having `AbstractLogger` type, which is limited to the four mentioned methods.
+In order to make Endpoint's handler aware of the actual logger type, provide the config to `EndpointsFactory`:
+
+```typescript
+const myFactory = new EndpointsFactory({
+  resultHandler: defaultResultHandler,
+  config, // <—— supply your config here
+});
 ```
 
 ## Cross-Origin Resource Sharing
