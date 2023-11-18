@@ -5,6 +5,11 @@ import { Method } from "./method";
 import { AnyResultHandlerDefinition } from "./result-handler";
 import { ListenOptions } from "node:net";
 
+export type AbstractLogger = Record<
+  "info" | "debug" | "warn" | "error",
+  (message: string, meta?: any) => any
+>;
+
 export type InputSource = keyof Pick<
   Request,
   "query" | "body" | "files" | "params" | "headers"
@@ -23,11 +28,6 @@ type HeadersProvider = (params: {
 export type TagsConfig<TAG extends string> = Record<
   TAG,
   string | { description: string; url?: string }
->;
-
-export type AbstractLogger = Record<
-  "info" | "debug" | "warn" | "error",
-  (message: string, meta?: any) => any
 >;
 
 export interface CommonConfig<
