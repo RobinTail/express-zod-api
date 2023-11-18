@@ -78,7 +78,8 @@
     "compression": { "optional": true },
     "express-fileupload": { "optional": true },
     "jest": { "optional": true },
-    "vitest": { "optional": true }
+    "vitest": { "optional": true },
+    "winston": { "optional": true }
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.13.0",

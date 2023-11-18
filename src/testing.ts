@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import http from "node:http";
-import { Logger } from "winston";
-import { CommonConfig } from "./config-type";
+import { AbstractLogger, CommonConfig } from "./config-type";
 import { AbstractEndpoint } from "./endpoint";
 import { mimeJson } from "./mime";
 
@@ -102,7 +101,9 @@ export const testEndpoint = async <
   FN extends MockFunction,
   REQ extends Partial<Record<keyof Request, any>> | undefined = undefined,
   RES extends Partial<Record<keyof Response, any>> | undefined = undefined,
-  LOG extends Partial<Record<keyof Logger, any>> | undefined = undefined,
+  LOG extends
+    | Partial<Record<keyof AbstractLogger, any>>
+    | undefined = undefined,
 >({
   endpoint,
   requestProps,
@@ -132,7 +133,7 @@ export const testEndpoint = async <
     request: requestMock as unknown as Request,
     response: responseMock as unknown as Response,
     config: configMock as CommonConfig,
-    logger: loggerMock as unknown as Logger,
+    logger: loggerMock as AbstractLogger,
   });
   return { requestMock, responseMock, loggerMock };
 };

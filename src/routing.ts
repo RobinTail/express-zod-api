@@ -1,6 +1,5 @@
 import { Express } from "express";
-import { Logger } from "winston";
-import { CommonConfig } from "./config-type";
+import { AbstractLogger, CommonConfig } from "./config-type";
 import { DependsOnMethod } from "./depends-on-method";
 import { AbstractEndpoint } from "./endpoint";
 import { walkRouting } from "./routing-walker";
@@ -18,7 +17,7 @@ export const initRouting = ({
   routing,
 }: {
   app: Express;
-  logger: Logger;
+  logger: AbstractLogger;
   config: CommonConfig;
   routing: Routing;
 }) => {

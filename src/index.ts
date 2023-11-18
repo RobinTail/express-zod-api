@@ -1,4 +1,4 @@
-export { createConfig, LoggerConfig } from "./config-type";
+export { createConfig } from "./config-type";
 export { AbstractEndpoint } from "./endpoint";
 export { Method } from "./method";
 export {
@@ -13,7 +13,7 @@ export {
   getMessageFromError,
   getStatusCodeFromError,
 } from "./common-helpers";
-export { createLogger } from "./logger";
+export { createWinstonLogger, LoggerConfig } from "./logger";
 export { createMiddleware } from "./middleware";
 export {
   createResultHandler,

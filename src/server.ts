@@ -1,11 +1,14 @@
 import express, { ErrorRequestHandler, RequestHandler } from "express";
 import http from "node:http";
 import https from "node:https";
-import { Logger } from "winston";
-import { AppConfig, CommonConfig, ServerConfig } from "./config-type";
+import {
+  AbstractLogger,
+  AppConfig,
+  CommonConfig,
+  ServerConfig,
+} from "./config-type";
 import { ResultHandlerError } from "./errors";
 import { makeErrorFromAnything } from "./common-helpers";
-import { createLogger } from "./logger";
 import {
   AnyResultHandlerDefinition,
   defaultResultHandler,
@@ -17,7 +20,7 @@ import createHttpError from "http-errors";
 export const createParserFailureHandler =
   (
     errorHandler: AnyResultHandlerDefinition,
-    logger: Logger,
+    logger: AbstractLogger,
   ): ErrorRequestHandler =>
   (error, request, response, next) => {
     if (!error) {
@@ -34,7 +37,10 @@ export const createParserFailureHandler =
   };
 
 export const createNotFoundHandler =
-  (errorHandler: AnyResultHandlerDefinition, logger: Logger): RequestHandler =>
+  (
+    errorHandler: AnyResultHandlerDefinition,
+    logger: AbstractLogger,
+  ): RequestHandler =>
   (request, response) => {
     const error = createHttpError(
       404,
@@ -59,10 +65,7 @@ export const createNotFoundHandler =
   };
 
 const makeCommonEntities = (config: CommonConfig) => {
-  const logger =
-    config.logger instanceof Logger
-      ? config.logger
-      : createLogger(config.logger);
+  const logger: AbstractLogger = config.logger || console;
   const errorHandler = config.errorHandler || defaultResultHandler;
   const notFoundHandler = createNotFoundHandler(errorHandler, logger);
   return { logger, errorHandler, notFoundHandler };

@@ -11,6 +11,7 @@ import {
   defaultResultHandler,
 } from "../../src";
 import { givePort, waitFor } from "../helpers";
+import { createLogger } from "winston";
 
 describe("App", () => {
   const port = givePort();
@@ -144,10 +145,7 @@ describe("App", () => {
         },
         cors: false,
         startupLogo: true,
-        logger: {
-          level: "silent",
-          color: false,
-        },
+        logger: createLogger({ silent: true }),
         inputSources: {
           post: ["query", "body", "files"],
         },

@@ -1,15 +1,9 @@
 import { Express, Request, RequestHandler } from "express";
 import { ServerOptions } from "node:https";
-import { Logger } from "winston";
 import { AbstractEndpoint } from "./endpoint";
 import { Method } from "./method";
 import { AnyResultHandlerDefinition } from "./result-handler";
 import { ListenOptions } from "node:net";
-
-export interface LoggerConfig {
-  level: "silent" | "warn" | "debug";
-  color: boolean;
-}
 
 export type InputSource = keyof Pick<
   Request,
@@ -23,12 +17,17 @@ type HeadersProvider = (params: {
   defaultHeaders: Headers;
   request: Request;
   endpoint: AbstractEndpoint;
-  logger: Logger;
+  logger: AbstractLogger;
 }) => Headers | Promise<Headers>;
 
 export type TagsConfig<TAG extends string> = Record<
   TAG,
   string | { description: string; url?: string }
+>;
+
+export type AbstractLogger = Record<
+  "info" | "debug" | "warn" | "error",
+  (message: string, meta?: any) => any
 >;
 
 export interface CommonConfig<TAG extends string = string> {
@@ -44,8 +43,12 @@ export interface CommonConfig<TAG extends string = string> {
    * @see defaultResultHandler
    */
   errorHandler?: AnyResultHandlerDefinition;
-  /** @desc Logger configuration or your custom winston logger. */
-  logger: LoggerConfig | Logger;
+  /**
+   * @desc Logger instance.
+   * @default console
+   * @example createWinstonLogger({ winston, config: { level: "debug", color: true } })
+   * */
+  logger?: AbstractLogger;
   /**
    * @desc You can disable the startup logo.
    * @default true

@@ -1,7 +1,8 @@
 import express from "express";
 import compression from "compression";
 import fileUpload from "express-fileupload";
-import { createConfig } from "../src";
+import { createConfig, createWinstonLogger } from "../src";
+import winston from "winston";
 
 export const config = createConfig({
   server: {
@@ -11,10 +12,10 @@ export const config = createConfig({
     rawParser: express.raw(), // required for rawAcceptingEndpoint
   },
   cors: true,
-  logger: {
-    level: "debug",
-    color: true,
-  },
+  logger: createWinstonLogger({
+    winston,
+    config: { level: "debug", color: true },
+  }),
   tags: {
     users: "Everything about the users",
     files: "Everything about the files processing",

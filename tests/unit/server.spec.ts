@@ -41,10 +41,7 @@ describe("Server", () => {
         },
         cors: true,
         startupLogo: false,
-        logger: {
-          level: "warn",
-          color: false,
-        },
+        logger: winston.createLogger({ silent: true }),
       };
       const routingMock = {
         v1: {

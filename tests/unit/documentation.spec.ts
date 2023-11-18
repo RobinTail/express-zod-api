@@ -15,11 +15,12 @@ import { expectType } from "tsd";
 import { mimeJson } from "../../src/mime";
 import { z } from "zod";
 import { givePort } from "../helpers";
+import { createLogger } from "winston";
 
 describe("Documentation generator", () => {
   const sampleConfig = createConfig({
     cors: true,
-    logger: { level: "debug", color: true },
+    logger: createLogger({ silent: true }),
     server: { listen: givePort() },
   });
 
