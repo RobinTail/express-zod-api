@@ -32,9 +32,9 @@ Start your API server with I/O schema validation and custom middlewares in minut
    4. [Refinements](#refinements)
    5. [Transformations](#transformations)
    6. [Dealing with dates](#dealing-with-dates)
-   7. [Cross-Origin Resource Sharing](#cross-origin-resource-sharing) (CORS)
-   8. [Enabling HTTPS](#enabling-https)
-   9. [Customizing logger](#customizing-logger)
+   7. [Customizing logger](#customizing-logger)
+   8. [Cross-Origin Resource Sharing](#cross-origin-resource-sharing) (CORS)
+   9. [Enabling HTTPS](#enabling-https)
    10. [Enabling compression](#enabling-compression)
 5. [Advances features](#advances-features)
    1. [Customizing input sources](#customizing-input-sources)
@@ -436,6 +436,34 @@ const updateUserEndpoint = defaultEndpointsFactory.build({
 });
 ```
 
+## Customizing logger
+
+You can configure your API with any logger having `info()`, `debug()`, `error()` and `warn()` methods.
+In case you like Winston, install the corresponding `winston` package. The library provides a helper to configure it:
+
+```typescript
+import winston from "winston";
+import { createConfig, createLogger } from "express-zod-api";
+
+const logger = createLogger({ winston, level: "debug", color: true });
+// or logger = winston.createLogger({ ... })
+const config = createConfig({ logger });
+```
+
+Here is an example on using another `pino` logger with `pino-pretty` extension:
+
+```typescript
+import pino from "pino";
+
+const logger = pino({
+  transport: {
+    target: "pino-pretty",
+    options: { colorize: true },
+  },
+});
+const config = createConfig({ logger });
+```
+
 ## Cross-Origin Resource Sharing
 
 You can enable your API for other domains using the corresponding configuration option `cors`.
@@ -490,20 +518,6 @@ const { app, httpServer, httpsServer, logger } = createServer(config, routing);
 Ensure having `@types/node` package installed. At least you need to specify the port (usually it is 443) or UNIX socket,
 certificate and the key, issued by the certifying authority. For example, you can acquire a free TLS certificate for
 your API at [Let's Encrypt](https://letsencrypt.org/).
-
-## Customizing logger
-
-You can specify your custom Winston logger in config:
-
-```typescript
-import winston from "winston";
-import { createConfig } from "express-zod-api";
-
-const logger = winston.createLogger({
-  /* ... */
-});
-const config = createConfig({ logger /* ..., */ });
-```
 
 ## Enabling compression
 
