@@ -269,7 +269,7 @@ export class Endpoint<
     input: Readonly<FlatObject>; // Issue #673: input is immutable, since this.inputSchema is combined with ones of middlewares
     request: Request;
     response: Response;
-    logger: AbstractLogger;
+    logger: LOG;
   }) {
     const options = {} as OPT;
     let isStreamClosed = false;
@@ -346,7 +346,7 @@ export class Endpoint<
     error: Error | null;
     request: Request;
     response: Response;
-    logger: AbstractLogger;
+    logger: LOG;
     input: FlatObject;
     output: FlatObject | null;
   }) {
