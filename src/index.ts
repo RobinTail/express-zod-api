@@ -43,7 +43,7 @@ export type { ZodDateInDef } from "./date-in-schema";
 export type { ZodDateOutDef } from "./date-out-schema";
 export type { ZodFileDef } from "./file-schema";
 export type { ZodUploadDef } from "./upload-schema";
-export type { CommonConfig } from "./config-type";
+export type { CommonConfig, AppConfig, ServerConfig } from "./config-type";
 export type { MiddlewareDefinition } from "./middleware";
 export type { ResultHandlerDefinition } from "./result-handler";
 export type {
