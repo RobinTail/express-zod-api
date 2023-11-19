@@ -2,6 +2,10 @@
 
 ## Version 14
 
+### v14.2.2
+
+- Hotfix: exporting `AppConfig` and `ServerConfig` types to in order to prevent the issue #952.
+
 ### v14.2.1
 
 - Improving the type of `createConfig()` method by using overloads.
