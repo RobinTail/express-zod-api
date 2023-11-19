@@ -11,6 +11,7 @@ tests/integration/yarn.lock
 tests/integration/quick-start.ts
 tests/integration/package.json
 tests/integration/tsconfig.json
+tests/integration/issue952.*
 tests/esm/node_modules
 tests/esm/yarn-error.log
 tests/esm/yarn.lock
