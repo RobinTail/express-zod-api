@@ -1,6 +1,6 @@
 {
   "name": "express-zod-api",
-  "version": "14.2.0",
+  "version": "14.2.2",
   "description": "A Typescript library to help you get an API server up and running with I/O schema validation and custom middlewares in minutes.",
   "license": "MIT",
   "scripts": {
@@ -17,6 +17,7 @@
     "build:logo": "yarn tsnode tools/startup-logo.ts",
     "test": "yarn test:types && yarn test:jest && yarn test:badge",
     "test:int": "jest ./tests/integration",
+    "test:952": "yarn --cwd tests/integration tsc -p tsconfig.issue952.json && rm tests/integration/issue952.d.ts",
     "test:esm": "jest ./tests/esm",
     "test:u": "yarn test:jest -u && yarn test:badge",
     "test:types": "tsc --noEmit",

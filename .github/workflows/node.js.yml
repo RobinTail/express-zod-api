@@ -50,6 +50,9 @@ jobs:
         parallel: true
     - name: Integration test
       run: yarn test:int
+    - name: Issue 952
+      # see https://github.com/RobinTail/express-zod-api/issues/952
+      run: yarn test:952
     - name: ESM test
       # see https://github.com/RobinTail/express-zod-api/pull/1210#issuecomment-1751489201
       if: matrix.node-version != '18.0.0'
