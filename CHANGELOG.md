@@ -67,6 +67,18 @@ const { responseMock } = testEndpoint({
 
 ## Version 14
 
+### v14.2.2
+
+- Hotfix: exporting `AppConfig` and `ServerConfig` types to in order to prevent the issue #952.
+
+### v14.2.1
+
+- Improving the type of `createConfig()` method by using overloads.
+  - This should resolve the confusion on two different types of configuration that this method accepts.
+  - The object argument has either to have `server` OR `app` property, it can not have them both.
+  - The config having `server` is for using with `createServer()`, while the one having `app` is for `attachRouting()`.
+- Upgraded `tsup` and `esbuild` involved in building the distribution.
+
 ### v14.2.0
 
 - `express-fileupload` version is 1.4.2.
