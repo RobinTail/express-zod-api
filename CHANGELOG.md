@@ -5,16 +5,19 @@
 ### 15.0.0
 
 - **Breaking changes**:
-  - `express-fileupload` and `compression` become optional peer dependencies.
-    - You will need to install them if you're using file uploads and compression features in your configuration.
-    - You might also need to install `@types/express-fileupload` and `@types/compression` in that case.
-  - The following changes to the configuration are required:
-    - `upload` property is renamed to `uploader`,
-    - `compression` property is renamed to `compressor`.
-    - The values also have to be changed as described below.
-  - The `testEndpoint()` method now requires to specify either `jest.fn` or `vi.fn` through `mockFn` option.
-    - Yes, it does now support both `jest` and `vitest` testing frameworks.
-    - Compatibility with `vitest` was tested against versions `0.34.6` and `1.0.0-beta.4`.
+  - `express-fileupload` and `compression` become optional peer dependencies;
+  - Methods `createConfig` and `testEndpoint()` are changed (read the migration guide below).
+- Features:
+  - Supporting both `jest` and `vitest` frameworks for `testEndpoint()`.
+- How to migrate while maintaining previous functionality and behavior:
+  - If you have `upload` option enabled in your config:
+    - Install `express-fileupload` and `@types/express-fileupload` packages;
+    - Replace `upload` property with `uploader: fileUpload({ abortOnLimit: false, parseNested: true })` in config.
+  - If you have `compression` option enabled in your config:
+    - Install `compression` and `@types/compression` packages;
+    - Replace `compression` property with `compressor: compression()` in config.
+  - If you're using `testEndpoint()` method:
+    - Specify either `mockFn: jest.fn` or `mockFn: vi.fn` within its object argument.
 
 ```typescript
 import compression from "compression";
@@ -23,13 +26,8 @@ import { createConfig, testEndpoint } from "express-zod-api";
 
 const config = createConfig({
   server: {
-    // before:
-    /* upload: true | UploadOptions, */
-    // after, the following two options are required to operate normally:
+    // The following two options are required to operate normally:
     uploader: fileUpload({ abortOnLimit: false, parseNested: true }),
-    // before:
-    /* compression: true | CompressionOptions, */
-    // after:
     compressor: compression(),
   },
 });
