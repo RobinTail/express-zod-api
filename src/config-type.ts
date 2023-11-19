@@ -115,9 +115,12 @@ export interface AppConfig<TAG extends string = string>
   app: Express;
 }
 
-export const createConfig = <
-  TAG extends string,
-  T extends ServerConfig<TAG> | AppConfig<TAG>,
->(
-  config: T,
-): T => config;
+export function createConfig<TAG extends string>(
+  config: ServerConfig<TAG>,
+): ServerConfig<TAG>;
+export function createConfig<TAG extends string>(
+  config: AppConfig<TAG>,
+): AppConfig<TAG>;
+export function createConfig(config: AppConfig | ServerConfig) {
+  return config;
+}
