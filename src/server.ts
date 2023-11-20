@@ -3,7 +3,7 @@ import http from "node:http";
 import https from "node:https";
 import { Logger } from "winston";
 import { AppConfig, CommonConfig, ServerConfig } from "./config-type";
-import { ResultHandlerError } from "./errors";
+import { MissingPeerError, ResultHandlerError } from "./errors";
 import { makeErrorFromAnything } from "./common-helpers";
 import { createLogger } from "./logger";
 import {
@@ -74,14 +74,40 @@ export const attachRouting = (config: AppConfig, routing: Routing) => {
   return { notFoundHandler, logger };
 };
 
-export const createServer = (config: ServerConfig, routing: Routing) => {
+export const createServer = async (config: ServerConfig, routing: Routing) => {
   const app = express().disable("x-powered-by");
-  if (config.server.compressor) {
-    app.use(config.server.compressor);
+  if (config.server.compression) {
+    let compression;
+    try {
+      compression = (await import("compression")).default;
+    } catch {
+      throw new MissingPeerError("compression");
+    }
+    app.use(
+      compression(
+        typeof config.server.compression === "object"
+          ? config.server.compression
+          : undefined,
+      ),
+    );
   }
   app.use(config.server.jsonParser || express.json());
-  if (config.server.uploader) {
-    app.use(config.server.uploader);
+  if (config.server.upload) {
+    let fileUpload;
+    try {
+      fileUpload = (await import("express-fileupload")).default;
+    } catch {
+      throw new MissingPeerError("express-fileupload");
+    }
+    app.use(
+      fileUpload({
+        ...(typeof config.server.upload === "object"
+          ? config.server.upload
+          : {}),
+        abortOnLimit: false,
+        parseNested: true,
+      }),
+    );
   }
   if (config.server.rawParser) {
     app.use(config.server.rawParser);
