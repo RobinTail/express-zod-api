@@ -514,17 +514,15 @@ const config = createConfig({ logger /* ..., */ });
 According to [Express.js best practices guide](http://expressjs.com/en/advanced/best-practice-performance.html)
 it might be a good idea to enable GZIP compression of your API responses.
 
-Install the following additional packages: `compression` and `@types/compression`, and complete your configuration with
-a compressor:
+Install the following additional packages: `compression` and `@types/compression`, and enable or configure compression:
 
 ```typescript
-import compression from "compression";
 import { createConfig } from "express-zod-api";
 
 const config = createConfig({
   server: {
     /** @link https://www.npmjs.com/package/compression#options */
-    compressor: compression({ threshold: "1kb" }),
+    compression: { threshold: "1kb" }, // or true
   },
 });
 ```
