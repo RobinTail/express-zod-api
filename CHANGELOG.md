@@ -6,31 +6,32 @@
 
 - **Breaking changes**:
   - `express-fileupload` and `compression` become optional peer dependencies;
-  - Methods `createConfig` and `testEndpoint()` are changed (read the migration guide below).
+  - Method `createServer()` becomes async;
+  - Method `testEndpoint()` requires an additional argument;
+  - Read the migration guide below.
 - Features:
   - Supporting both `jest` and `vitest` frameworks for `testEndpoint()`.
 - How to migrate while maintaining previous functionality and behavior:
   - If you have `upload` option enabled in your config:
     - Install `express-fileupload` and `@types/express-fileupload` packages;
-    - Replace `upload` property with `uploader: fileUpload({ abortOnLimit: false, parseNested: true })` in config.
   - If you have `compression` option enabled in your config:
     - Install `compression` and `@types/compression` packages;
-    - Replace `compression` property with `compressor: compression()` in config.
+  - If you're using the entities returned from `createServer()` method:
+    - Add `await` before calling it: `const {...} = await createServer(...)`.
+    - If you can not use `await` (on the top level of CommonJS):
+      - Wrap your code with async IIFE: `(async () => { ... })()`, which will allow you to use `await`;
+      - Or use `.then()` syntax of `Promise`.
   - If you're using `testEndpoint()` method:
     - Specify either `mockFn: jest.fn` or `mockFn: vi.fn` within its object argument.
 
 ```typescript
-import compression from "compression";
-import fileUpload from "express-fileupload";
-import { createConfig, testEndpoint } from "express-zod-api";
+import { createServer, testEndpoint } from "express-zod-api";
 
-const config = createConfig({
-  server: {
-    // The following two options are required to operate normally:
-    uploader: fileUpload({ abortOnLimit: false, parseNested: true }),
-    compressor: compression(),
-  },
-});
+// This async IIFE wrapper is only needed when using await on the top level CJS
+(async () => {
+  // await is only needed when you're using the returns of createServer()
+  const { app, httpServer } = await createServer(config, routing);
+})();
 
 const { responseMock } = testEndpoint({
   endpoint,

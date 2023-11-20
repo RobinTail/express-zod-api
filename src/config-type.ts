@@ -1,4 +1,6 @@
+import type compression from "compression";
 import { Express, Request, RequestHandler } from "express";
+import type fileUpload from "express-fileupload";
 import { ServerOptions } from "node:https";
 import { Logger } from "winston";
 import { AbstractEndpoint } from "./endpoint";
@@ -65,6 +67,23 @@ export interface CommonConfig<TAG extends string = string> {
   tags?: TagsConfig<TAG>;
 }
 
+type UploadOptions = Pick<
+  fileUpload.Options,
+  | "createParentPath"
+  | "uriDecodeFileNames"
+  | "safeFileNames"
+  | "preserveExtension"
+  | "useTempFiles"
+  | "tempFileDir"
+  | "debug"
+  | "uploadTimeout"
+>;
+
+type CompressionOptions = Pick<
+  compression.CompressionOptions,
+  "threshold" | "level" | "strategy" | "chunkSize" | "memLevel"
+>;
+
 export interface ServerConfig<TAG extends string = string>
   extends CommonConfig<TAG> {
   /** @desc Server configuration. */
@@ -78,19 +97,17 @@ export interface ServerConfig<TAG extends string = string>
      * */
     jsonParser?: RequestHandler;
     /**
-     * @desc Enable and configure file uploads
-     * @default undefined
-     * @example import fileUpload from "express-fileupload"
-     * @example uploader: fileUpload({ abortOnLimit: false, parseNested: true })
+     * @desc Enable or configure uploads handling.
+     * @default false
+     * @requires express-fileupload
      * */
-    uploader?: RequestHandler;
+    upload?: boolean | UploadOptions;
     /**
-     * @desc Enable and configure compression
-     * @default undefined
-     * @example import compression from "compression"
-     * @example compressor: compression()
+     * @desc Enable or configure response compression.
+     * @default false
+     * @requires compression
      */
-    compressor?: RequestHandler;
+    compression?: boolean | CompressionOptions;
     /**
      * @desc Enables parsing certain request payloads into raw Buffers (application/octet-stream by default)
      * @desc When enabled, use ez.raw() as input schema to get input.raw in Endpoint's handler

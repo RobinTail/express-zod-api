@@ -483,7 +483,12 @@ const config = createConfig({
   // ... cors, logger, etc
 });
 
-const { app, httpServer, httpsServer, logger } = createServer(config, routing);
+// 'await' is only needed if you're going to use the returned entities.
+// For CJS in that case you can wrap you code with (async () => { ... })()
+const { app, httpServer, httpsServer, logger } = await createServer(
+  config,
+  routing,
+);
 ```
 
 Ensure having `@types/node` package installed. At least you need to specify the port (usually it is 443) or UNIX socket,
@@ -509,17 +514,15 @@ const config = createConfig({ logger /* ..., */ });
 According to [Express.js best practices guide](http://expressjs.com/en/advanced/best-practice-performance.html)
 it might be a good idea to enable GZIP compression of your API responses.
 
-Install the following additional packages: `compression` and `@types/compression`, and complete your configuration with
-a compressor:
+Install the following additional packages: `compression` and `@types/compression`, and enable or configure compression:
 
 ```typescript
-import compression from "compression";
 import { createConfig } from "express-zod-api";
 
 const config = createConfig({
   server: {
     /** @link https://www.npmjs.com/package/compression#options */
-    compressor: compression({ threshold: "1kb" }),
+    compression: { threshold: "1kb" }, // or true
   },
 });
 ```
@@ -712,20 +715,15 @@ const fileStreamingEndpointsFactory = new EndpointsFactory(
 
 ## File uploads
 
-Install the following additional packages: `express-fileupload` and `@types/express-fileupload`, and complete your
-configuration with a file uploader:
+Install the following additional packages: `express-fileupload` and `@types/express-fileupload`, and enable or
+configure file uploads:
 
 ```typescript
-import fileUpload from "express-fileupload";
 import { createConfig } from "express-zod-api";
 
 const config = createConfig({
   server: {
-    uploader: fileUpload({
-      // These options are required to operate normally:
-      abortOnLimit: false,
-      parseNested: true,
-    }),
+    upload: true, // or options
   },
 });
 ```

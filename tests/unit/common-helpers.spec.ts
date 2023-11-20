@@ -14,9 +14,15 @@ import {
   hasTopLevelTransformingEffect,
   isCustomHeader,
   isValidDate,
+  loadPeer,
   makeErrorFromAnything,
 } from "../../src/common-helpers";
-import { InputValidationError, ez, withMeta } from "../../src";
+import {
+  InputValidationError,
+  MissingPeerError,
+  ez,
+  withMeta,
+} from "../../src";
 import { Request } from "express";
 import { z } from "zod";
 import { ZodUpload } from "../../src/upload-schema";
@@ -493,7 +499,7 @@ describe("Common Helpers", () => {
     });
   });
 
-  describe("hasCoercion", () => {
+  describe("hasCoercion()", () => {
     test.each([
       { schema: z.string(), coercion: false },
       { schema: z.coerce.string(), coercion: true },
@@ -505,5 +511,16 @@ describe("Common Helpers", () => {
         expect(hasCoercion(schema)).toBe(coercion);
       },
     );
+  });
+
+  describe("loadPeer()", () => {
+    test("should load the module", async () => {
+      expect(await loadPeer("compression")).toBeTruthy();
+    });
+    test("should throw when module not found", async () => {
+      await expect(async () => loadPeer("missing")).rejects.toThrow(
+        new MissingPeerError("missing"),
+      );
+    });
   });
 });

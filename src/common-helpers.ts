@@ -4,7 +4,11 @@ import { createHash } from "node:crypto";
 import { Logger } from "winston";
 import { z } from "zod";
 import { CommonConfig, InputSource, InputSources } from "./config-type";
-import { InputValidationError, OutputValidationError } from "./errors";
+import {
+  InputValidationError,
+  MissingPeerError,
+  OutputValidationError,
+} from "./errors";
 import { ZodFile } from "./file-schema";
 import { IOSchema } from "./io-schema";
 import { getMeta } from "./metadata";
@@ -319,3 +323,14 @@ export type ErrMessage = Exclude<
 // the copy of the private Zod errorUtil.errToObj
 export const errToObj = (message: ErrMessage | undefined) =>
   typeof message === "string" ? { message } : message || {};
+
+export const loadPeer = async <T>(
+  moduleName: string,
+  moduleExport: string = "default",
+): Promise<T> => {
+  try {
+    return (await import(moduleName))[moduleExport];
+  } catch {
+    throw new MissingPeerError(moduleName);
+  }
+};

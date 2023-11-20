@@ -14,6 +14,8 @@ exports[`Index Entrypoint exports InputValidationError should have certain value
 
 exports[`Index Entrypoint exports Integration should have certain value 1`] = `[Function]`;
 
+exports[`Index Entrypoint exports MissingPeerError should have certain value 1`] = `[Function]`;
+
 exports[`Index Entrypoint exports OutputValidationError should have certain value 1`] = `[Function]`;
 
 exports[`Index Entrypoint exports RoutingError should have certain value 1`] = `[Function]`;
@@ -101,6 +103,7 @@ exports[`Index Entrypoint exports should have certain entities exposed 1`] = `
   "Integration",
   "LoggerConfig",
   "Method",
+  "MissingPeerError",
   "OutputValidationError",
   "Routing",
   "RoutingError",
