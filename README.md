@@ -715,20 +715,15 @@ const fileStreamingEndpointsFactory = new EndpointsFactory(
 
 ## File uploads
 
-Install the following additional packages: `express-fileupload` and `@types/express-fileupload`, and complete your
-configuration with a file uploader:
+Install the following additional packages: `express-fileupload` and `@types/express-fileupload`, and enable or
+configure file uploads:
 
 ```typescript
-import fileUpload from "express-fileupload";
 import { createConfig } from "express-zod-api";
 
 const config = createConfig({
   server: {
-    uploader: fileUpload({
-      // These options are required to operate normally:
-      abortOnLimit: false,
-      parseNested: true,
-    }),
+    upload: true, // or options
   },
 });
 ```
