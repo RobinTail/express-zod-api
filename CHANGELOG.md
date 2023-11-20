@@ -27,8 +27,9 @@
 ```typescript
 import { createServer, testEndpoint } from "express-zod-api";
 
-// async-await is only needed when you're using the returns of createServer()
+// This async IIFE wrapper is only needed when using await on the top level CJS
 (async () => {
+  // await is only needed when you're using the returns of createServer()
   const { app, httpServer } = await createServer(config, routing);
 })();
 
