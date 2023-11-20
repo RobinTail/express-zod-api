@@ -1,10 +1,12 @@
 import express, { ErrorRequestHandler, RequestHandler } from "express";
+import type compression from "compression";
+import type fileUpload from "express-fileupload";
 import http from "node:http";
 import https from "node:https";
 import { Logger } from "winston";
 import { AppConfig, CommonConfig, ServerConfig } from "./config-type";
-import { MissingPeerError, ResultHandlerError } from "./errors";
-import { makeErrorFromAnything } from "./common-helpers";
+import { ResultHandlerError } from "./errors";
+import { loadPeer, makeErrorFromAnything } from "./common-helpers";
 import { createLogger } from "./logger";
 import {
   AnyResultHandlerDefinition,
@@ -77,14 +79,9 @@ export const attachRouting = (config: AppConfig, routing: Routing) => {
 export const createServer = async (config: ServerConfig, routing: Routing) => {
   const app = express().disable("x-powered-by");
   if (config.server.compression) {
-    let compression;
-    try {
-      compression = (await import("compression")).default;
-    } catch {
-      throw new MissingPeerError("compression");
-    }
+    const compressor = await loadPeer<typeof compression>("compression");
     app.use(
-      compression(
+      compressor(
         typeof config.server.compression === "object"
           ? config.server.compression
           : undefined,
@@ -93,14 +90,9 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
   }
   app.use(config.server.jsonParser || express.json());
   if (config.server.upload) {
-    let fileUpload;
-    try {
-      fileUpload = (await import("express-fileupload")).default;
-    } catch {
-      throw new MissingPeerError("express-fileupload");
-    }
+    const uploader = await loadPeer<typeof fileUpload>("express-fileupload");
     app.use(
-      fileUpload({
+      uploader({
         ...(typeof config.server.upload === "object"
           ? config.server.upload
           : {}),
