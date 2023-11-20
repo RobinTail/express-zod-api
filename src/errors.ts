@@ -68,6 +68,7 @@ export class ResultHandlerError extends Error {
 }
 
 export class MissingPeerError extends Error {
+  public override name = "MissingPeerError";
   constructor(module: string) {
     super(
       `Missing peer dependency: '${module}'. Please install it to use the feature activated in config.`,

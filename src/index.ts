@@ -30,6 +30,7 @@ export {
   RoutingError,
   OutputValidationError,
   InputValidationError,
+  MissingPeerError,
 } from "./errors";
 export { withMeta } from "./metadata";
 export { testEndpoint } from "./testing";
