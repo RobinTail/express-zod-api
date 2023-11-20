@@ -97,17 +97,15 @@ export interface ServerConfig<TAG extends string = string>
      * */
     jsonParser?: RequestHandler;
     /**
-     * @desc Enable and configure file uploads
-     * @default undefined
-     * @example import fileUpload from "express-fileupload"
-     * @example uploader: fileUpload({ abortOnLimit: false, parseNested: true })
+     * @desc Enable or configure uploads handling.
+     * @default false
+     * @requires express-fileupload
      * */
     upload?: boolean | UploadOptions;
     /**
-     * @desc Enable and configure compression
-     * @default undefined
-     * @example import compression from "compression"
-     * @example compressor: compression()
+     * @desc Enable or configure response compression.
+     * @default false
+     * @requires compression
      */
     compression?: boolean | CompressionOptions;
     /**
