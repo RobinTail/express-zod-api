@@ -1,4 +1,4 @@
-import { UploadedFile } from "express-fileupload";
+import type { UploadedFile } from "express-fileupload";
 import {
   INVALID,
   OK,
