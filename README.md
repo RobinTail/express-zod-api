@@ -32,9 +32,9 @@ Start your API server with I/O schema validation and custom middlewares in minut
    4. [Refinements](#refinements)
    5. [Transformations](#transformations)
    6. [Dealing with dates](#dealing-with-dates)
-   7. [Customizing logger](#customizing-logger)
-   8. [Cross-Origin Resource Sharing](#cross-origin-resource-sharing) (CORS)
-   9. [Enabling HTTPS](#enabling-https)
+   7. [Cross-Origin Resource Sharing](#cross-origin-resource-sharing) (CORS)
+   8. [Enabling HTTPS](#enabling-https)
+   9. [Customizing logger](#customizing-logger)
    10. [Enabling compression](#enabling-compression)
 5. [Advances features](#advances-features)
    1. [Customizing input sources](#customizing-input-sources)
@@ -436,48 +436,6 @@ const updateUserEndpoint = defaultEndpointsFactory.build({
 });
 ```
 
-## Customizing logger
-
-By default, your API writes logs into `console` when `logger` is not specified in the config.
-You can configure your API with any compatible logger having `info()`, `debug()`, `error()` and `warn()` methods.
-In case you like Winston, install the `winston` package and use the provided helper to configure it easily:
-
-```typescript
-import winston from "winston";
-import { createConfig, createLogger } from "express-zod-api";
-
-const logger = createLogger({ winston, level: "debug", color: true });
-// or without helper: winston.createLogger({ ... })
-const config = createConfig({ logger });
-```
-
-Here is an example on using another `pino` logger with `pino-pretty` extension:
-
-```typescript
-import pino from "pino";
-import { createConfig } from "express-zod-api";
-
-const logger = pino({
-  transport: {
-    target: "pino-pretty",
-    options: { colorize: true },
-  },
-});
-const config = createConfig({ logger });
-```
-
-All handlers provide `logger` having `AbstractLogger` type, which is limited to the four mentioned methods.
-In order to make Endpoint's handler aware of the actual logger type, provide the config to `EndpointsFactory`:
-
-```typescript
-import { EndpointsFactory, defaultResultHandler } from "express-zod-api";
-
-const myFactory = new EndpointsFactory({
-  resultHandler: defaultResultHandler,
-  config, // <—— supply your config here
-});
-```
-
 ## Cross-Origin Resource Sharing
 
 You can enable your API for other domains using the corresponding configuration option `cors`.
@@ -537,6 +495,48 @@ const { app, httpServer, httpsServer, logger } = await createServer(
 Ensure having `@types/node` package installed. At least you need to specify the port (usually it is 443) or UNIX socket,
 certificate and the key, issued by the certifying authority. For example, you can acquire a free TLS certificate for
 your API at [Let's Encrypt](https://letsencrypt.org/).
+
+## Customizing logger
+
+By default, your API writes logs into `console` when `logger` is not specified in the config.
+You can configure your API with any compatible logger having `info()`, `debug()`, `error()` and `warn()` methods.
+In case you like Winston, install the `winston` package and use the provided helper to configure it easily:
+
+```typescript
+import winston from "winston";
+import { createConfig, createLogger } from "express-zod-api";
+
+const logger = createLogger({ winston, level: "debug", color: true });
+// or without helper: winston.createLogger({ ... })
+const config = createConfig({ logger });
+```
+
+Here is an example on using another `pino` logger with `pino-pretty` extension:
+
+```typescript
+import pino from "pino";
+import { createConfig } from "express-zod-api";
+
+const logger = pino({
+  transport: {
+    target: "pino-pretty",
+    options: { colorize: true },
+  },
+});
+const config = createConfig({ logger });
+```
+
+All handlers provide `logger` having `AbstractLogger` type, which is limited to the four mentioned methods.
+In order to make Endpoint's handler aware of the actual logger type, provide the config to `EndpointsFactory`:
+
+```typescript
+import { EndpointsFactory, defaultResultHandler } from "express-zod-api";
+
+const myFactory = new EndpointsFactory({
+  resultHandler: defaultResultHandler,
+  config, // <—— supply your config here
+});
+```
 
 ## Enabling compression
 
