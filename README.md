@@ -86,8 +86,7 @@ Therefore, many basic tasks can be accomplished faster and easier, in particular
 - Web server — [Express.js](https://expressjs.com/).
 - Schema validation — [Zod 3.x](https://github.com/colinhacks/zod).
 - Logger — any having `info()`, `debug()`, `error()` and `warn()` methods:
-  - [Winston](https://github.com/winstonjs/winston) is recommended (helper included),
-  - `console` is used by default (unless specified).
+  - [Winston](https://github.com/winstonjs/winston) is the default one.
 - Generators:
   - Documentation — [OpenAPI 3.x](https://github.com/metadevpro/openapi3-ts) (Swagger Specification).
   - Client side types — inspired by [zod-to-ts](https://github.com/sachinraja/zod-to-ts).
@@ -113,14 +112,14 @@ Much can be customized to fit your needs.
 Run one of the following commands to install the library, its peer dependencies and packages for types assistance.
 
 ```shell
-yarn add express-zod-api express zod typescript http-errors
+yarn add express-zod-api express zod winston typescript http-errors
 yarn add --dev @types/express @types/node @types/http-errors
 ```
 
 or
 
 ```shell
-npm install express-zod-api express zod typescript http-errors
+npm install express-zod-api express zod winston typescript http-errors
 npm install -D @types/express @types/node @types/http-errors
 ```
 
@@ -147,6 +146,7 @@ const config = createConfig({
     listen: 8090, // port, UNIX socket or options
   },
   cors: true,
+  logger: { level: "debug", color: true },
 });
 ```
 
