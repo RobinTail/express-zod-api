@@ -4,6 +4,11 @@ import type Winston from "winston";
 import type Transport from "winston-transport";
 import { loadPeer } from "./common-helpers";
 
+/**
+ * @desc Using module augmentation approach you can set the type of the actual logger used
+ * @example declare module "express-zod-api" { interface LoggerOverrides extends winston.Logger {} }
+ * @link https://www.typescriptlang.org/docs/handbook/declaration-merging.html#module-augmentation
+ * */
 export interface LoggerOverrides {}
 
 /** @desc You can use any logger compatible with this type. */
