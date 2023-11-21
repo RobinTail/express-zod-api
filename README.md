@@ -491,7 +491,7 @@ const config = createConfig({
 });
 
 // 'await' is only needed if you're going to use the returned entities.
-// For CJS in that case you can wrap you code with (async () => { ... })()
+// For top level CJS you can wrap you code with (async () => { ... })()
 const { app, httpServer, httpsServer, logger } = await createServer(
   config,
   routing,
@@ -803,12 +803,15 @@ const routing = {
   /* ... */
 };
 
-const { notFoundHandler, logger } = attachRouting(config, routing);
+// This async IIFE is only required for the top level CommonJS
+(async () => {
+  const { notFoundHandler, logger } = await attachRouting(config, routing);
 
-app.use(notFoundHandler); // optional
-app.listen();
+  app.use(notFoundHandler); // optional
+  app.listen();
 
-logger.info("Glory to science!");
+  logger.info("Glory to science!");
+})();
 ```
 
 **Please note** that in this case you probably need to parse `request.body`, call `app.listen()` and handle `404`

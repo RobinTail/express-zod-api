@@ -27,8 +27,7 @@
   - If you're using the entities returned from `createServer()` or `attachRouting()` methods:
     - Add `await` before calling them: `const {...} = await createServer(...)`.
     - If you can not use `await` (on the top level of CommonJS):
-      - Wrap your code with async IIFE: `(async () => { ... })()`, which will allow you to use `await`;
-      - Or use `.then()` syntax of `Promise`.
+      - Wrap your code with async IIFE or use `.then()` (see example below).
   - If you're using `testEndpoint()` method:
     - Specify either `mockFn: jest.fn` or `mockFn: vi.fn` within its object argument.
 
@@ -46,14 +45,13 @@ declare module "express-zod-api" {
   interface LoggerOverrides extends Logger {}
 }
 
-// This async IIFE wrapper is only needed when using await on the top level CJS
-(async () => {
-  // await is only needed when you're using the returns of createServer() or attachRouting()
-  const { app, httpServer } = await createServer(config, routing);
-})();
+// await is only needed when you're using the returns of createServer() or attachRouting()
+// For using await on the top level CJS, wrap it in async IIFE:
+// (async () => { ... })();
+const { app, httpServer } = await createServer(config, routing);
 
 // Adjust your tests:
-const { responseMock } = testEndpoint({
+const { responseMock } = await testEndpoint({
   endpoint,
   mockFn: jest.fn, // or vi.fn from vitest, required
 });
