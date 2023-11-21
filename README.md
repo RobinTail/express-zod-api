@@ -498,20 +498,8 @@ your API at [Let's Encrypt](https://letsencrypt.org/).
 
 ## Customizing logger
 
-By default, your API writes logs into `console` when `logger` is not specified in the config.
-You can configure your API with any compatible logger having `info()`, `debug()`, `error()` and `warn()` methods.
-In case you like Winston, install the `winston` package and use the provided helper to configure it easily:
-
-```typescript
-import winston from "winston";
-import { createConfig, createLogger } from "express-zod-api";
-
-const logger = createLogger({ winston, level: "debug", color: true });
-// or without helper: winston.createLogger({ ... })
-const config = createConfig({ logger });
-```
-
-Here is an example on using another `pino` logger with `pino-pretty` extension:
+You can uninstall `winston` (which is the default and recommended logger) and use another compatible one, having
+`info()`, `debug()`, `error()` and `warn()` methods. For example, `pino` logger with `pino-pretty` extension:
 
 ```typescript
 import pino from "pino";
@@ -524,18 +512,6 @@ const logger = pino({
   },
 });
 const config = createConfig({ logger });
-```
-
-All handlers provide `logger` having `AbstractLogger` type, which is limited to the four mentioned methods.
-In order to make Endpoint's handler aware of the actual logger type, provide the config to `EndpointsFactory`:
-
-```typescript
-import { EndpointsFactory, defaultResultHandler } from "express-zod-api";
-
-const myFactory = new EndpointsFactory({
-  resultHandler: defaultResultHandler,
-  config, // <—— supply your config here
-});
 ```
 
 ## Enabling compression
