@@ -37,7 +37,12 @@ export const isSimplifiedWinstonConfig = (
 export const createWinstonLogger = async (
   config: SimplifiedWinstonConfig,
 ): Promise<Winston.Logger> => {
-  const winston = await loadPeer<typeof Winston>("winston");
+  const {
+    createLogger,
+    transports,
+    format: { printf, timestamp: useTimestamp, colorize, combine },
+    config: { npm },
+  } = await loadPeer<typeof Winston>("winston");
 
   const prettyPrint = (meta: Omit<TransformableInfo, "level" | "message">) => {
     const {
@@ -50,30 +55,28 @@ export const createWinstonLogger = async (
   };
 
   const getOutputFormat = (isPretty?: boolean) =>
-    winston.format.printf(
-      ({ timestamp, message, level, durationMs, ...meta }) => {
-        if (typeof message === "object") {
-          meta = { ...meta, ...(message as object) };
-          message = "[No message]";
-        }
-        return (
-          `${timestamp} ${level}: ${message}` +
-          (durationMs === undefined ? "" : ` duration: ${durationMs}ms`) +
-          (Object.keys(meta).length === 0
-            ? ""
-            : " " + (isPretty ? prettyPrint(meta) : JSON.stringify(meta)))
-        );
-      },
-    );
+    printf(({ timestamp, message, level, durationMs, ...meta }) => {
+      if (typeof message === "object") {
+        meta = { ...meta, ...(message as object) };
+        message = "[No message]";
+      }
+      return (
+        `${timestamp} ${level}: ${message}` +
+        (durationMs === undefined ? "" : ` duration: ${durationMs}ms`) +
+        (Object.keys(meta).length === 0
+          ? ""
+          : " " + (isPretty ? prettyPrint(meta) : JSON.stringify(meta)))
+      );
+    });
 
-  const formats: Format[] = [winston.format.timestamp()];
+  const formats: Format[] = [useTimestamp()];
 
   const consoleOutputOptions: Transport.TransportStreamOptions = {
     handleExceptions: true,
   };
 
   if (config.color) {
-    formats.push(winston.format.colorize());
+    formats.push(colorize());
   }
 
   switch (config.level) {
@@ -88,12 +91,12 @@ export const createWinstonLogger = async (
       formats.push(getOutputFormat());
   }
 
-  consoleOutputOptions.format = winston.format.combine(...formats);
+  consoleOutputOptions.format = combine(...formats);
 
-  return winston.createLogger({
+  return createLogger({
     silent: config.level === "silent",
-    levels: winston.config.npm.levels,
-    transports: [new winston.transports.Console(consoleOutputOptions)],
+    levels: npm.levels,
+    transports: [new transports.Console(consoleOutputOptions)],
     exitOnError: false,
   });
 };
