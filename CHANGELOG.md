@@ -6,34 +6,52 @@
 
 - **Breaking changes**:
   - `express-fileupload` and `compression` become optional peer dependencies;
-  - Method `createServer()` becomes async;
+  - `winston` becomes optional (peer dependency), and you can now use any compatible logger besides it;
+  - Methods `createServer()` and `attachRouting()` become async;
   - Method `testEndpoint()` requires an additional argument;
+  - Method `createLogger()` removed;
   - Read the migration guide below.
 - Features:
+  - Supporting any logger having `debug()`, `warn()`, `info()` and `error()` methods;
+  - Introducing module augmentation approach for setting the type of chosen logger;
   - Supporting both `jest` and `vitest` frameworks for `testEndpoint()`.
 - How to migrate while maintaining previous functionality and behavior:
+  - If you're going to continue using `winston`:
+    - Near your `const config = createConfig(...)` add the module augmentation statement (see example below).
   - If you have `upload` option enabled in your config:
     - Install `express-fileupload` and `@types/express-fileupload` packages;
   - If you have `compression` option enabled in your config:
     - Install `compression` and `@types/compression` packages;
-  - If you're using the entities returned from `createServer()` method:
-    - Add `await` before calling it: `const {...} = await createServer(...)`.
+  - If you're using `createLogger()` method:
+    - Place its argument as a value of `logger` property supplied to `createConfig()`.
+  - If you're using the entities returned from `createServer()` or `attachRouting()` methods:
+    - Add `await` before calling them: `const {...} = await createServer(...)`.
     - If you can not use `await` (on the top level of CommonJS):
-      - Wrap your code with async IIFE: `(async () => { ... })()`, which will allow you to use `await`;
-      - Or use `.then()` syntax of `Promise`.
+      - Wrap your code with async IIFE or use `.then()` (see example below).
   - If you're using `testEndpoint()` method:
     - Specify either `mockFn: jest.fn` or `mockFn: vi.fn` within its object argument.
 
 ```typescript
-import { createServer, testEndpoint } from "express-zod-api";
+import type { Logger } from "winston";
+import { createConfig, createServer, testEndpoint } from "express-zod-api";
 
-// This async IIFE wrapper is only needed when using await on the top level CJS
-(async () => {
-  // await is only needed when you're using the returns of createServer()
-  const { app, httpServer } = await createServer(config, routing);
-})();
+// The configuration remains the same
+const config = createConfig({
+  logger: { level: "debug", color: true },
+});
 
-const { responseMock } = testEndpoint({
+// Set the type of logger used near your configuration
+declare module "express-zod-api" {
+  interface LoggerOverrides extends Logger {}
+}
+
+// await is only needed when you're using the returns of createServer() or attachRouting()
+// For using await on the top level CJS, wrap it in async IIFE:
+// (async () => { ... })();
+const { app, httpServer } = await createServer(config, routing);
+
+// Adjust your tests:
+const { responseMock } = await testEndpoint({
   endpoint,
   mockFn: jest.fn, // or vi.fn from vitest, required
 });

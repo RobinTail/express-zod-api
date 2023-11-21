@@ -47,10 +47,7 @@ describe("Server", () => {
         },
         cors: true,
         startupLogo: false,
-        logger: {
-          level: "warn",
-          color: false,
-        },
+        logger: { level: "warn", color: false },
       };
       const routingMock = {
         v1: {
@@ -148,8 +145,8 @@ describe("Server", () => {
         },
         cors: true,
         startupLogo: false,
-        logger: winston.createLogger({ silent: true }),
-      };
+        logger: { level: "warn", color: false },
+      } satisfies ServerConfig;
       const routingMock = {
         v1: {
           test: new EndpointsFactory(defaultResultHandler).build({
@@ -182,8 +179,8 @@ describe("Server", () => {
         },
         cors: true,
         startupLogo: false,
-        logger: winston.createLogger({ silent: true }),
-      };
+        logger: { level: "warn", color: false },
+      } satisfies ServerConfig;
       const routingMock = {
         v1: {
           test: new EndpointsFactory(defaultResultHandler).build({
@@ -208,8 +205,8 @@ describe("Server", () => {
         },
         cors: true,
         startupLogo: false,
-        logger: winston.createLogger({ silent: true }),
-      };
+        logger: { level: "warn", color: false },
+      } satisfies ServerConfig;
       const routingMock = {
         v1: {
           test: new EndpointsFactory(defaultResultHandler).build({
@@ -238,8 +235,8 @@ describe("Server", () => {
         },
         cors: true,
         startupLogo: false,
-        logger: winston.createLogger({ silent: true }),
-      };
+        logger: { level: "warn", color: false },
+      } satisfies ServerConfig;
       const routingMock = {
         v1: {
           test: new EndpointsFactory(defaultResultHandler).build({
@@ -362,7 +359,7 @@ describe("Server", () => {
   });
 
   describe("attachRouting()", () => {
-    test("should attach routing to the custom express app", () => {
+    test("should attach routing to the custom express app", async () => {
       const app = express();
       expect(appMock).toBeTruthy();
       const customLogger = winston.createLogger({ silent: true });
@@ -390,7 +387,7 @@ describe("Server", () => {
           }),
         },
       };
-      const { logger, notFoundHandler } = attachRouting(
+      const { logger, notFoundHandler } = await attachRouting(
         configMock as unknown as AppConfig,
         routingMock,
       );

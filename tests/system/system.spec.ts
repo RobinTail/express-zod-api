@@ -144,10 +144,7 @@ describe("App", () => {
           },
           cors: false,
           startupLogo: true,
-          logger: {
-            level: "silent",
-            color: false,
-          },
+          logger: { level: "silent", color: false },
           inputSources: {
             post: ["query", "body", "files"],
           },

@@ -64,7 +64,7 @@ You can find the release notes and migration guides in [Changelog](CHANGELOG.md)
 # Why and what is it for
 
 I made this library because of the often repetitive tasks of starting a web server APIs with the need to validate input
-data. It integrates and provides the capabilities of popular web server, logger, validation and documenting solutions.
+data. It integrates and provides the capabilities of popular web server, logging, validation and documenting solutions.
 Therefore, many basic tasks can be accomplished faster and easier, in particular:
 
 - You can describe web server routes as a hierarchical object.
@@ -85,7 +85,8 @@ Therefore, many basic tasks can be accomplished faster and easier, in particular
 - [Typescript](https://www.typescriptlang.org/) first.
 - Web server — [Express.js](https://expressjs.com/).
 - Schema validation — [Zod 3.x](https://github.com/colinhacks/zod).
-- Logger — [Winston](https://github.com/winstonjs/winston).
+- Logger — [Winston](https://github.com/winstonjs/winston) by default,
+  - Supports any logger having `info()`, `debug()`, `error()` and `warn()` methods.
 - Generators:
   - Documentation — [OpenAPI 3.x](https://github.com/metadevpro/openapi3-ts) (Swagger Specification).
   - Client side types — inspired by [zod-to-ts](https://github.com/sachinraja/zod-to-ts).
@@ -138,6 +139,7 @@ Create a minimal configuration. _See all available options
 [in sources](https://github.com/RobinTail/express-zod-api/blob/master/src/config-type.ts)._
 
 ```typescript
+import type { Logger } from "winston";
 import { createConfig } from "express-zod-api";
 
 const config = createConfig({
@@ -147,6 +149,11 @@ const config = createConfig({
   cors: true,
   logger: { level: "debug", color: true },
 });
+
+// Setting the type of logger used
+declare module "express-zod-api" {
+  interface LoggerOverrides extends Logger {}
+}
 ```
 
 ## Create an endpoints factory
@@ -484,7 +491,7 @@ const config = createConfig({
 });
 
 // 'await' is only needed if you're going to use the returned entities.
-// For CJS in that case you can wrap you code with (async () => { ... })()
+// For top level CJS you can wrap you code with (async () => { ... })()
 const { app, httpServer, httpsServer, logger } = await createServer(
   config,
   routing,
@@ -497,16 +504,25 @@ your API at [Let's Encrypt](https://letsencrypt.org/).
 
 ## Customizing logger
 
-You can specify your custom Winston logger in config:
+You can uninstall `winston` (which is the default and recommended logger) and use another compatible one, having
+`info()`, `debug()`, `error()` and `warn()` methods. For example, `pino` logger with `pino-pretty` extension:
 
 ```typescript
-import winston from "winston";
+import pino, { Logger } from "pino";
 import { createConfig } from "express-zod-api";
 
-const logger = winston.createLogger({
-  /* ... */
+const logger = pino({
+  transport: {
+    target: "pino-pretty",
+    options: { colorize: true },
+  },
 });
-const config = createConfig({ logger /* ..., */ });
+const config = createConfig({ logger });
+
+// Setting the type of logger used
+declare module "express-zod-api" {
+  interface LoggerOverrides extends Logger {}
+}
 ```
 
 ## Enabling compression
@@ -787,12 +803,15 @@ const routing = {
   /* ... */
 };
 
-const { notFoundHandler, logger } = attachRouting(config, routing);
+// This async IIFE is only required for the top level CommonJS
+(async () => {
+  const { notFoundHandler, logger } = await attachRouting(config, routing);
 
-app.use(notFoundHandler); // optional
-app.listen();
+  app.use(notFoundHandler); // optional
+  app.listen();
 
-logger.info("Glory to science!");
+  logger.info("Glory to science!");
+})();
 ```
 
 **Please note** that in this case you probably need to parse `request.body`, call `app.listen()` and handle `404`

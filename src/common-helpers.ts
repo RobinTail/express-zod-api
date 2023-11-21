@@ -1,7 +1,6 @@
 import { Request } from "express";
 import { isHttpError } from "http-errors";
 import { createHash } from "node:crypto";
-import { Logger } from "winston";
 import { z } from "zod";
 import { CommonConfig, InputSource, InputSources } from "./config-type";
 import {
@@ -15,6 +14,7 @@ import { getMeta } from "./metadata";
 import { AuxMethod, Method } from "./method";
 import { mimeMultipart } from "./mime";
 import { ZodUpload } from "./upload-schema";
+import { AbstractLogger } from "./logger";
 
 export type FlatObject = Record<string, unknown>;
 
@@ -115,7 +115,7 @@ export const logInternalError = ({
   error,
   statusCode,
 }: {
-  logger: Logger;
+  logger: AbstractLogger;
   request: Request;
   input: FlatObject | null;
   error: Error;

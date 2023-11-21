@@ -1,5 +1,4 @@
 import { Request, Response } from "express";
-import { Logger } from "winston";
 import { z } from "zod";
 import { ApiResponse } from "./api-response";
 import {
@@ -12,10 +11,11 @@ import {
 import { ResultHandlerError } from "./errors";
 import { IOSchema } from "./io-schema";
 import { withMeta } from "./metadata";
+import { AbstractLogger } from "./logger";
 
 interface LastResortHandlerParams {
   error: ResultHandlerError;
-  logger: Logger;
+  logger: AbstractLogger;
   response: Response;
 }
 
@@ -27,7 +27,7 @@ interface ResultHandlerParams<RES> {
   error: Error | null;
   request: Request;
   response: Response<RES>;
-  logger: Logger;
+  logger: AbstractLogger;
 }
 
 type ResultHandler<RES> = (
