@@ -21,7 +21,6 @@ import {
   arrayResultHandler,
   defaultResultHandler,
 } from "./result-handler";
-import { AbstractLogger } from "./logger";
 
 type BuildProps<
   IN extends IOSchema,
@@ -48,23 +47,22 @@ export class EndpointsFactory<
   OUT extends FlatObject = {},
   SCO extends string = string,
   TAG extends string = string,
-  LOG extends AbstractLogger = AbstractLogger,
 > {
   protected resultHandler: ResultHandlerDefinition<POS, NEG>;
   protected middlewares: AnyMiddlewareDef[] = [];
 
-  /** @desc Consider supplying "config" prop having "logger" and "tags" for better typing */
+  /** @desc Consider supplying "config" prop having "tags" for better typing */
   constructor(resultHandler: ResultHandlerDefinition<POS, NEG>);
   constructor(params: {
     resultHandler: ResultHandlerDefinition<POS, NEG>;
-    config?: CommonConfig<TAG, LOG>;
+    config?: CommonConfig<TAG>;
   });
   constructor(
     subject:
       | ResultHandlerDefinition<POS, NEG>
       | {
           resultHandler: ResultHandlerDefinition<POS, NEG>;
-          config?: CommonConfig<TAG, LOG>;
+          config?: CommonConfig<TAG>;
         },
   ) {
     this.resultHandler =
@@ -78,20 +76,13 @@ export class EndpointsFactory<
     COUT extends FlatObject,
     CSCO extends string,
     CTAG extends string,
-    CLOG extends AbstractLogger,
   >(
     middlewares: AnyMiddlewareDef[],
     resultHandler: ResultHandlerDefinition<CPOS, CNEG>,
   ) {
-    const factory = new EndpointsFactory<
-      CPOS,
-      CNEG,
-      CIN,
-      COUT,
-      CSCO,
-      CTAG,
-      CLOG
-    >(resultHandler);
+    const factory = new EndpointsFactory<CPOS, CNEG, CIN, COUT, CSCO, CTAG>(
+      resultHandler,
+    );
     factory.middlewares = middlewares;
     return factory;
   }
@@ -107,8 +98,7 @@ export class EndpointsFactory<
       ProbableIntersection<IN, AIN>,
       OUT & AOUT,
       SCO & ASCO,
-      TAG,
-      LOG
+      TAG
     >(this.middlewares.concat(subject), this.resultHandler);
   }
 
@@ -138,14 +128,14 @@ export class EndpointsFactory<
           middleware(request as R, response as S, next);
         }),
     };
-    return EndpointsFactory.#create<POS, NEG, IN, OUT & AOUT, SCO, TAG, LOG>(
+    return EndpointsFactory.#create<POS, NEG, IN, OUT & AOUT, SCO, TAG>(
       this.middlewares.concat(definition),
       this.resultHandler,
     );
   }
 
   public addOptions<AOUT extends FlatObject>(options: AOUT) {
-    return EndpointsFactory.#create<POS, NEG, IN, OUT & AOUT, SCO, TAG, LOG>(
+    return EndpointsFactory.#create<POS, NEG, IN, OUT & AOUT, SCO, TAG>(
       this.middlewares.concat(
         createMiddleware({
           input: z.object({}),

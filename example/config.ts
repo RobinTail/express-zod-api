@@ -1,6 +1,5 @@
 import express from "express";
-import winston from "winston";
-import { createConfig, createLogger } from "../src";
+import { createConfig } from "../src";
 
 export const config = createConfig({
   server: {
@@ -10,7 +9,7 @@ export const config = createConfig({
     rawParser: express.raw(), // required for rawAcceptingEndpoint
   },
   cors: true,
-  logger: createLogger({ winston, level: "debug", color: true }),
+  logger: { level: "debug", color: true },
   tags: {
     users: "Everything about the users",
     files: "Everything about the files processing",

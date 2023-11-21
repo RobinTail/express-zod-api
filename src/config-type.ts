@@ -3,7 +3,7 @@ import { Express, Request, RequestHandler } from "express";
 import type fileUpload from "express-fileupload";
 import { ServerOptions } from "node:https";
 import { AbstractEndpoint } from "./endpoint";
-import { AbstractLogger } from "./logger";
+import { AbstractLogger, SimplifiedWinstonConfig } from "./logger";
 import { Method } from "./method";
 import { AnyResultHandlerDefinition } from "./result-handler";
 import { ListenOptions } from "node:net";
@@ -28,10 +28,7 @@ export type TagsConfig<TAG extends string> = Record<
   string | { description: string; url?: string }
 >;
 
-export interface CommonConfig<
-  TAG extends string = string,
-  LOG extends AbstractLogger = AbstractLogger,
-> {
+export interface CommonConfig<TAG extends string = string> {
   /**
    * @desc Enables cross-origin resource sharing.
    * @link https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
@@ -45,11 +42,11 @@ export interface CommonConfig<
    */
   errorHandler?: AnyResultHandlerDefinition;
   /**
-   * @desc Logger instance.
+   * @desc Logger configuration (winston) or instance of any other logger.
    * @default console
-   * @example createLogger({ winston, level: "debug", color: true })
+   * @example { level: "debug", color: true }
    * */
-  logger?: LOG;
+  logger?: SimplifiedWinstonConfig | AbstractLogger;
   /**
    * @desc You can disable the startup logo.
    * @default true
@@ -86,10 +83,8 @@ type CompressionOptions = Pick<
   "threshold" | "level" | "strategy" | "chunkSize" | "memLevel"
 >;
 
-export interface ServerConfig<
-  TAG extends string = string,
-  LOG extends AbstractLogger = AbstractLogger,
-> extends CommonConfig<TAG, LOG> {
+export interface ServerConfig<TAG extends string = string>
+  extends CommonConfig<TAG> {
   /** @desc Server configuration. */
   server: {
     /** @desc Port, UNIX socket or custom options. */
@@ -130,20 +125,18 @@ export interface ServerConfig<
   };
 }
 
-export interface AppConfig<
-  TAG extends string = string,
-  LOG extends AbstractLogger = AbstractLogger,
-> extends CommonConfig<TAG, LOG> {
+export interface AppConfig<TAG extends string = string>
+  extends CommonConfig<TAG> {
   /** @desc Your custom express app instead. */
   app: Express;
 }
 
-export function createConfig<TAG extends string, LOG extends AbstractLogger>(
-  config: ServerConfig<TAG, LOG>,
-): ServerConfig<TAG, LOG>;
-export function createConfig<TAG extends string, LOG extends AbstractLogger>(
-  config: AppConfig<TAG, LOG>,
-): AppConfig<TAG, LOG>;
+export function createConfig<TAG extends string>(
+  config: ServerConfig<TAG>,
+): ServerConfig<TAG>;
+export function createConfig<TAG extends string>(
+  config: AppConfig<TAG>,
+): AppConfig<TAG>;
 export function createConfig(config: AppConfig | ServerConfig) {
   return config;
 }

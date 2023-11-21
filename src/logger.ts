@@ -1,7 +1,8 @@
 import { inspect } from "node:util";
 import type { Format, TransformableInfo } from "logform";
-import type * as Winston from "winston";
+import type Winston from "winston";
 import type Transport from "winston-transport";
+import { loadPeer } from "./common-helpers";
 
 /** @desc You can use any logger compatible with this type. */
 export type AbstractLogger = Record<
@@ -9,19 +10,32 @@ export type AbstractLogger = Record<
   (message: string, meta?: any) => any
 >;
 
-/**
- * @desc a helper to for creating a winston logger
- * @requires winston
- * @example createLogger({ winston, level: "debug", color: true })
- * */
-export const createLogger = ({
-  winston,
-  ...config
-}: {
-  winston: typeof Winston;
+export interface SimplifiedWinstonConfig {
   level: "silent" | "warn" | "debug";
   color: boolean;
-}): Winston.Logger => {
+}
+
+export const isSimplifiedWinstonConfig = (
+  subject: unknown,
+): subject is SimplifiedWinstonConfig =>
+  typeof subject === "object" &&
+  subject !== null &&
+  "level" in subject &&
+  "color" in subject &&
+  typeof subject.color === "boolean" &&
+  typeof subject.level === "string" &&
+  ["silent", "warn", "debug"].includes(subject.level);
+
+/**
+ * @desc an internal helper for creating a winston logger easier
+ * @requires winston
+ * @example await createLogger({ level: "debug", color: true })
+ * */
+export const createWinstonLogger = async (
+  config: SimplifiedWinstonConfig,
+): Promise<Winston.Logger> => {
+  const winston = await loadPeer<typeof Winston>("winston");
+
   const prettyPrint = (meta: Omit<TransformableInfo, "level" | "message">) => {
     const {
       [Symbol.for("level")]: noLevel,
