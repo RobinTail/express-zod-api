@@ -6,13 +6,12 @@
 
 - **Breaking changes**:
   - `express-fileupload` and `compression` become optional peer dependencies;
-  - `winston` becomes optional (peer dependency), and you can now use any compatible logger besides it;
   - Methods `createServer()` and `attachRouting()` become async;
   - Method `testEndpoint()` requires an additional argument;
-  - Method `createLogger()` removed;
+  - Method `createLogger()` removed as redundant;
   - Read the migration guide below.
 - Features:
-  - Supporting any logger having `debug()`, `warn()`, `info()` and `error()` methods;
+  - `winston` is now optional: supporting any logger having `debug()`, `warn()`, `info()` and `error()` methods;
   - Introducing module augmentation approach for setting the type of chosen logger;
   - Supporting both `jest` and `vitest` frameworks for `testEndpoint()`.
 - How to migrate while maintaining previous functionality and behavior:
