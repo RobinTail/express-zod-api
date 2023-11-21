@@ -7,7 +7,10 @@
 - **Breaking changes**:
   - `express-fileupload` and `compression` become optional peer dependencies;
   - `winston` becomes an optional (peer dependency), and you can now use any compatible logger besides it;
-  - Methods `createConfig`, `createLogger` and `testEndpoint()` are changed (read the migration guide below).
+  - Method `createServer()` becomes async;
+  - Method `testEndpoint()` requires an additional argument;
+  - Methods `createConfig()`, and `createLogger()` are changed;
+  - Read the migration guide below.
 - Features:
   - Supporting any logger having `debug()`, `warn()`, `info()` and `error()` methods;
     - If no logger is specified, it will use `console` instead.
@@ -15,10 +18,8 @@
 - How to migrate while maintaining previous functionality and behavior:
   - If you have `upload` option enabled in your config:
     - Install `express-fileupload` and `@types/express-fileupload` packages;
-    - Replace `upload` property with `uploader: fileUpload({ abortOnLimit: false, parseNested: true })` in config.
   - If you have `compression` option enabled in your config:
     - Install `compression` and `@types/compression` packages;
-    - Replace `compression` property with `compressor: compression()` in config.
   - For the `logger` option in your config:
     - If it's assigned with an object like `{ level: "debug", color: true }`:
       - Replace it with `logger: createLogger({ winston, level: "debug", color: true })`.
@@ -30,12 +31,15 @@
     - Specify the `config` within the object argument of the `new EndpointsFactory()`;
     - This will make it aware of the type of actual logger you're using.
     - It does not affect custom ResultHandlers and Middlewares — use `logger as ParticularLogger` syntax if needed.
+  - If you're using the entities returned from `createServer()` method:
+    - Add `await` before calling it: `const {...} = await createServer(...)`.
+    - If you can not use `await` (on the top level of CommonJS):
+      - Wrap your code with async IIFE: `(async () => { ... })()`, which will allow you to use `await`;
+      - Or use `.then()` syntax of `Promise`.
   - If you're using `testEndpoint()` method:
     - Specify either `mockFn: jest.fn` or `mockFn: vi.fn` within its object argument.
 
 ```typescript
-import compression from "compression";
-import fileUpload from "express-fileupload";
 import winston from "winston";
 import {
   createConfig,
@@ -46,11 +50,6 @@ import {
 } from "express-zod-api";
 
 const config = createConfig({
-  server: {
-    // The following two options are required to operate normally:
-    uploader: fileUpload({ abortOnLimit: false, parseNested: true }),
-    compressor: compression(),
-  },
   logger: createLogger({ winston, level: "debug", color: true }),
 });
 
@@ -58,6 +57,12 @@ const myFactory = new EndpointsFactory({
   config, // this makes Endpoint's handler aware of the actual logger
   resultHandler: defaultResultHandler,
 });
+
+// This async IIFE wrapper is only needed when using await on the top level CJS
+(async () => {
+  // await is only needed when you're using the returns of createServer()
+  const { app, httpServer } = await createServer(config, routing);
+})();
 
 const { responseMock } = testEndpoint({
   endpoint,

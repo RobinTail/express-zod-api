@@ -1,4 +1,3 @@
-import compression from "compression";
 import cors from "cors";
 import type { Server } from "node:http";
 import { z } from "zod";
@@ -17,7 +16,7 @@ describe("App", () => {
   const port = givePort();
   let server: Server;
 
-  beforeAll(() => {
+  beforeAll(async () => {
     const routing = {
       v1: {
         corsed: new EndpointsFactory(defaultResultHandler)
@@ -137,20 +136,22 @@ describe("App", () => {
       },
     };
     jest.spyOn(global.console, "log").mockImplementation(jest.fn());
-    server = createServer(
-      {
-        server: {
-          listen: port,
-          compressor: compression({ threshold: 1 }),
+    server = (
+      await createServer(
+        {
+          server: {
+            listen: port,
+            compression: { threshold: 1 },
+          },
+          cors: false,
+          startupLogo: true,
+          logger: createLogger({ silent: true }),
+          inputSources: {
+            post: ["query", "body", "files"],
+          },
         },
-        cors: false,
-        startupLogo: true,
-        logger: createLogger({ silent: true }),
-        inputSources: {
-          post: ["query", "body", "files"],
-        },
-      },
-      routing,
+        routing,
+      )
     ).httpServer;
   });
 

@@ -1,7 +1,13 @@
 import { omit } from "ramda";
 import { makeRequestMock } from "../../src/testing";
 import { givePort } from "../helpers";
-import { appMock, expressJsonMock, expressMock } from "../express-mock";
+import {
+  appMock,
+  compressionMock,
+  expressJsonMock,
+  expressMock,
+  fileUploadMock,
+} from "../express-mock";
 import {
   createHttpsServerSpy,
   httpListenSpy,
@@ -33,7 +39,7 @@ describe("Server", () => {
   });
 
   describe("createServer()", () => {
-    test("Should create server with minimal config", () => {
+    test("Should create server with minimal config", async () => {
       const port = givePort();
       const configMock: ServerConfig = {
         server: {
@@ -56,7 +62,7 @@ describe("Server", () => {
           }),
         },
       };
-      createServer(configMock, routingMock);
+      await createServer(configMock, routingMock);
       expect(appMock).toBeTruthy();
       expect(appMock.disable).toHaveBeenCalledWith("x-powered-by");
       expect(appMock.use).toHaveBeenCalledTimes(3);
@@ -71,7 +77,7 @@ describe("Server", () => {
       expect(httpListenSpy).toHaveBeenCalledWith(port, expect.any(Function));
     });
 
-    test("Should create server with custom JSON parser, logger and error handler", () => {
+    test("Should create server with custom JSON parser, logger and error handler", async () => {
       const customLogger = winston.createLogger({ silent: true });
       const infoMethod = jest.spyOn(customLogger, "info");
       const port = givePort();
@@ -101,7 +107,7 @@ describe("Server", () => {
           }),
         },
       };
-      const { logger, app } = createServer(
+      const { logger, app } = await createServer(
         configMock as unknown as ServerConfig,
         routingMock,
       );
@@ -126,7 +132,7 @@ describe("Server", () => {
       );
     });
 
-    test("should create a HTTPS server on request", () => {
+    test("should create a HTTPS server on request", async () => {
       const configMock = {
         server: { listen: givePort() },
         https: {
@@ -150,7 +156,7 @@ describe("Server", () => {
         },
       };
 
-      const { httpsServer } = createServer(configMock, routingMock);
+      const { httpsServer } = await createServer(configMock, routingMock);
       expect(httpsServer).toBeTruthy();
       expect(createHttpsServerSpy).toHaveBeenCalledWith(
         configMock.https.options,
@@ -163,12 +169,11 @@ describe("Server", () => {
       );
     });
 
-    test("should enable compression on request", () => {
-      const compressionMock = jest.fn();
+    test("should enable compression on request", async () => {
       const configMock = {
         server: {
           listen: givePort(),
-          compressor: compressionMock,
+          compression: true,
         },
         cors: true,
         startupLogo: false,
@@ -183,17 +188,17 @@ describe("Server", () => {
           }),
         },
       };
-      createServer(configMock, routingMock);
+      await createServer(configMock, routingMock);
       expect(appMock.use).toHaveBeenCalledTimes(4);
-      expect(appMock.use).toHaveBeenCalledWith(compressionMock);
+      expect(compressionMock).toHaveBeenCalledTimes(1);
+      expect(compressionMock).toHaveBeenCalledWith(undefined);
     });
 
-    test("should enable uploads on request", () => {
-      const fileUploadMock = jest.fn();
+    test("should enable uploads on request", async () => {
       const configMock = {
         server: {
           listen: givePort(),
-          uploader: fileUploadMock,
+          upload: true,
         },
         cors: true,
         startupLogo: false,
@@ -208,12 +213,16 @@ describe("Server", () => {
           }),
         },
       };
-      createServer(configMock, routingMock);
+      await createServer(configMock, routingMock);
       expect(appMock.use).toHaveBeenCalledTimes(4);
-      expect(appMock.use).toHaveBeenCalledWith(fileUploadMock);
+      expect(fileUploadMock).toHaveBeenCalledTimes(1);
+      expect(fileUploadMock).toHaveBeenCalledWith({
+        abortOnLimit: false,
+        parseNested: true,
+      });
     });
 
-    test("should enable raw on request", () => {
+    test("should enable raw on request", async () => {
       const rawParserMock = jest.fn();
       const configMock = {
         server: {
@@ -233,7 +242,7 @@ describe("Server", () => {
           }),
         },
       };
-      createServer(configMock, routingMock);
+      await createServer(configMock, routingMock);
       expect(appMock.use).toHaveBeenCalledTimes(5);
       const rawPropMw = appMock.use.mock.calls[2][0]; // custom middleware for raw
       expect(typeof rawPropMw).toBe("function");

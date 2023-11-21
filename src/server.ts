@@ -1,10 +1,12 @@
 import express, { ErrorRequestHandler, RequestHandler } from "express";
+import type compression from "compression";
+import type fileUpload from "express-fileupload";
 import http from "node:http";
 import https from "node:https";
 import { AppConfig, CommonConfig, ServerConfig } from "./config-type";
 import { AbstractLogger } from "./logger";
 import { ResultHandlerError } from "./errors";
-import { makeErrorFromAnything } from "./common-helpers";
+import { loadPeer, makeErrorFromAnything } from "./common-helpers";
 import {
   AnyResultHandlerDefinition,
   defaultResultHandler,
@@ -73,14 +75,30 @@ export const attachRouting = (config: AppConfig, routing: Routing) => {
   return { notFoundHandler, logger };
 };
 
-export const createServer = (config: ServerConfig, routing: Routing) => {
+export const createServer = async (config: ServerConfig, routing: Routing) => {
   const app = express().disable("x-powered-by");
-  if (config.server.compressor) {
-    app.use(config.server.compressor);
+  if (config.server.compression) {
+    const compressor = await loadPeer<typeof compression>("compression");
+    app.use(
+      compressor(
+        typeof config.server.compression === "object"
+          ? config.server.compression
+          : undefined,
+      ),
+    );
   }
   app.use(config.server.jsonParser || express.json());
-  if (config.server.uploader) {
-    app.use(config.server.uploader);
+  if (config.server.upload) {
+    const uploader = await loadPeer<typeof fileUpload>("express-fileupload");
+    app.use(
+      uploader({
+        ...(typeof config.server.upload === "object"
+          ? config.server.upload
+          : {}),
+        abortOnLimit: false,
+        parseNested: true,
+      }),
+    );
   }
   if (config.server.rawParser) {
     app.use(config.server.rawParser);
