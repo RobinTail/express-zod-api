@@ -41,10 +41,10 @@ const getMimeTypesFromApiResponse = <S extends z.ZodTypeAny>(
   return mimeType ? [mimeType] : mimeTypes || fallback;
 };
 
-export type Handler<IN, OUT, OPT, LOG> = (params: {
+export type Handler<IN, OUT, OPT> = (params: {
   input: IN;
   options: OPT;
-  logger: LOG;
+  logger: AbstractLogger;
 }) => Promise<OUT>;
 
 type DescriptionVariant = "short" | "long";
@@ -82,14 +82,13 @@ export class Endpoint<
   NEG extends z.ZodTypeAny,
   SCO extends string,
   TAG extends string,
-  LOG extends AbstractLogger,
 > extends AbstractEndpoint {
   readonly #descriptions: Record<DescriptionVariant, string | undefined>;
   readonly #methods: Method[];
   readonly #middlewares: AnyMiddlewareDef[];
   readonly #mimeTypes: Record<MimeVariant, string[]>;
   readonly #statusCodes: Record<ResponseVariant, number>;
-  readonly #handler: Handler<z.output<IN>, z.input<OUT>, OPT, LOG>;
+  readonly #handler: Handler<z.output<IN>, z.input<OUT>, OPT>;
   readonly #resultHandler: ResultHandlerDefinition<POS, NEG>;
   readonly #schemas: {
     input: IN;
@@ -118,7 +117,7 @@ export class Endpoint<
     middlewares?: AnyMiddlewareDef[];
     inputSchema: IN;
     outputSchema: OUT;
-    handler: Handler<z.output<IN>, z.input<OUT>, OPT, LOG>;
+    handler: Handler<z.output<IN>, z.input<OUT>, OPT>;
     resultHandler: ResultHandlerDefinition<POS, NEG>;
     description?: string;
     shortDescription?: string;
@@ -316,7 +315,7 @@ export class Endpoint<
   }: {
     input: Readonly<FlatObject>;
     options: OPT;
-    logger: LOG;
+    logger: AbstractLogger;
   }) {
     let finalInput: z.output<IN>; // final input types transformations for handler
     try {
@@ -377,7 +376,7 @@ export class Endpoint<
   }: {
     request: Request;
     response: Response;
-    logger: LOG;
+    logger: AbstractLogger;
     config: CommonConfig;
   }) {
     const method = getActualMethod(request);
