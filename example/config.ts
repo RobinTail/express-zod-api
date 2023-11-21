@@ -9,7 +9,10 @@ export const config = createConfig({
     rawParser: express.raw(), // required for rawAcceptingEndpoint
   },
   cors: true,
-  logger: { level: "debug", color: true },
+  logger: {
+    level: "debug",
+    color: true,
+  },
   tags: {
     users: "Everything about the users",
     files: "Everything about the files processing",
