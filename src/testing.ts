@@ -100,9 +100,9 @@ interface TestEndpointProps<REQ, RES, LOG, FN extends MockFunction> {
  * */
 export const testEndpoint = async <
   FN extends MockFunction,
+  LOG,
   REQ extends Partial<Record<keyof Request, any>> | undefined = undefined,
   RES extends Partial<Record<keyof Response, any>> | undefined = undefined,
-  LOG extends Record<string, any> | undefined = undefined,
 >({
   endpoint,
   requestProps,
@@ -113,10 +113,7 @@ export const testEndpoint = async <
 }: TestEndpointProps<REQ, RES, LOG, FN>) => {
   const requestMock = makeRequestMock({ mockFn, requestProps });
   const responseMock = makeResponseMock({ mockFn, responseProps });
-  const loggerMock = <
-    Record<keyof AbstractLogger, ReturnType<FN>> &
-      (LOG extends undefined ? {} : LOG)
-  >{
+  const loggerMock = <Record<keyof AbstractLogger, ReturnType<FN>> & LOG>{
     info: mockFn(),
     warn: mockFn(),
     error: mockFn(),
