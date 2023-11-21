@@ -13,6 +13,7 @@ export {
   getMessageFromError,
   getStatusCodeFromError,
 } from "./common-helpers";
+export { LoggerOverrides } from "./logger";
 export { createMiddleware } from "./middleware";
 export {
   createResultHandler,

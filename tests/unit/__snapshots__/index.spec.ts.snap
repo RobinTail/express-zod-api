@@ -99,6 +99,7 @@ exports[`Index Entrypoint exports should have certain entities exposed 1`] = `
   "IOSchema",
   "InputValidationError",
   "Integration",
+  "LoggerOverrides",
   "Method",
   "MissingPeerError",
   "OutputValidationError",

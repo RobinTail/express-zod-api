@@ -139,6 +139,7 @@ Create a minimal configuration. _See all available options
 [in sources](https://github.com/RobinTail/express-zod-api/blob/master/src/config-type.ts)._
 
 ```typescript
+import type { Logger } from "winston";
 import { createConfig } from "express-zod-api";
 
 const config = createConfig({
@@ -148,6 +149,11 @@ const config = createConfig({
   cors: true,
   logger: { level: "debug", color: true },
 });
+
+// Setting the type of logger used
+declare module "express-zod-api" {
+  interface LoggerOverrides extends Logger {}
+}
 ```
 
 ## Create an endpoints factory
@@ -502,7 +508,7 @@ You can uninstall `winston` (which is the default and recommended logger) and us
 `info()`, `debug()`, `error()` and `warn()` methods. For example, `pino` logger with `pino-pretty` extension:
 
 ```typescript
-import pino from "pino";
+import pino, { Logger } from "pino";
 import { createConfig } from "express-zod-api";
 
 const logger = pino({
@@ -512,6 +518,11 @@ const logger = pino({
   },
 });
 const config = createConfig({ logger });
+
+// Setting the type of logger used
+declare module "express-zod-api" {
+  interface LoggerOverrides extends Logger {}
+}
 ```
 
 ## Enabling compression

@@ -4,11 +4,14 @@ import type Winston from "winston";
 import type Transport from "winston-transport";
 import { loadPeer } from "./common-helpers";
 
+export interface LoggerOverrides {}
+
 /** @desc You can use any logger compatible with this type. */
 export type AbstractLogger = Record<
   "info" | "debug" | "warn" | "error",
   (message: string, meta?: any) => any
->;
+> &
+  LoggerOverrides;
 
 export interface SimplifiedWinstonConfig {
   level: "silent" | "warn" | "debug";
