@@ -47,6 +47,7 @@ describe("Server", () => {
         },
         cors: true,
         startupLogo: false,
+        logger: { level: "warn", color: false },
       };
       const routingMock = {
         v1: {
@@ -144,7 +145,8 @@ describe("Server", () => {
         },
         cors: true,
         startupLogo: false,
-      };
+        logger: { level: "warn", color: false },
+      } satisfies ServerConfig;
       const routingMock = {
         v1: {
           test: new EndpointsFactory(defaultResultHandler).build({
@@ -177,7 +179,8 @@ describe("Server", () => {
         },
         cors: true,
         startupLogo: false,
-      };
+        logger: { level: "warn", color: false },
+      } satisfies ServerConfig;
       const routingMock = {
         v1: {
           test: new EndpointsFactory(defaultResultHandler).build({
@@ -202,7 +205,8 @@ describe("Server", () => {
         },
         cors: true,
         startupLogo: false,
-      };
+        logger: { level: "warn", color: false },
+      } satisfies ServerConfig;
       const routingMock = {
         v1: {
           test: new EndpointsFactory(defaultResultHandler).build({
@@ -231,7 +235,8 @@ describe("Server", () => {
         },
         cors: true,
         startupLogo: false,
-      };
+        logger: { level: "warn", color: false },
+      } satisfies ServerConfig;
       const routingMock = {
         v1: {
           test: new EndpointsFactory(defaultResultHandler).build({

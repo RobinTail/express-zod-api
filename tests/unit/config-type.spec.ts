@@ -10,6 +10,10 @@ describe("ConfigType", () => {
           listen: 3333,
         },
         cors: true,
+        logger: {
+          level: "debug" as const,
+          color: false,
+        },
       };
       const config = createConfig(argument);
       expect(config).toEqual(argument);

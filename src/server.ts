@@ -67,11 +67,9 @@ export const createNotFoundHandler =
   };
 
 const makeCommonEntities = async (config: CommonConfig) => {
-  const logger: AbstractLogger = config.logger
-    ? isSimplifiedWinstonConfig(config.logger)
-      ? await createWinstonLogger(config.logger)
-      : config.logger
-    : console;
+  const logger: AbstractLogger = isSimplifiedWinstonConfig(config.logger)
+    ? await createWinstonLogger(config.logger)
+    : config.logger;
   const errorHandler = config.errorHandler || defaultResultHandler;
   const notFoundHandler = createNotFoundHandler(errorHandler, logger);
   return { logger, errorHandler, notFoundHandler };

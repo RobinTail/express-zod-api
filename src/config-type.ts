@@ -43,10 +43,9 @@ export interface CommonConfig<TAG extends string = string> {
   errorHandler?: AnyResultHandlerDefinition;
   /**
    * @desc Logger configuration (winston) or instance of any other logger.
-   * @default console
    * @example { level: "debug", color: true }
    * */
-  logger?: SimplifiedWinstonConfig | AbstractLogger;
+  logger: SimplifiedWinstonConfig | AbstractLogger;
   /**
    * @desc You can disable the startup logo.
    * @default true
