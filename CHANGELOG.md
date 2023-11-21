@@ -7,32 +7,20 @@
 - **Breaking changes**:
   - `express-fileupload` and `compression` become optional peer dependencies;
   - `winston` becomes an optional (peer dependency), and you can now use any compatible logger besides it;
-  - Method `createServer()` becomes async;
+  - Methods `createServer()` and `attachRouting()` become async;
   - Method `testEndpoint()` requires an additional argument;
-  - Methods `createConfig()`, and `createLogger()` are changed;
+  - Method `createLogger()` removed;
   - Read the migration guide below.
 - Features:
   - Supporting any logger having `debug()`, `warn()`, `info()` and `error()` methods;
-    - If no logger is specified, it will use `console` instead.
   - Supporting both `jest` and `vitest` frameworks for `testEndpoint()`.
 - How to migrate while maintaining previous functionality and behavior:
   - If you have `upload` option enabled in your config:
     - Install `express-fileupload` and `@types/express-fileupload` packages;
   - If you have `compression` option enabled in your config:
     - Install `compression` and `@types/compression` packages;
-  - For the `logger` option in your config:
-    - If it's assigned with an object like `{ level: "debug", color: true }`:
-      - Replace it with `logger: createLogger({ winston, level: "debug", color: true })`.
-    - If it's assigned with an instance of a custom Winston logger:
-      - No action required.
-    - If you don't like Winston:
-      - Uninstall `winston`, install another compatible logger and assign its instance to the `logger` property.
-  - If you're using extra methods of `logger` in Endpoint's handler (beyond the four ones mentioned above):
-    - Specify the `config` within the object argument of the `new EndpointsFactory()`;
-    - This will make it aware of the type of actual logger you're using.
-    - It does not affect custom ResultHandlers and Middlewares — use `logger as ParticularLogger` syntax if needed.
-  - If you're using the entities returned from `createServer()` method:
-    - Add `await` before calling it: `const {...} = await createServer(...)`.
+  - If you're using the entities returned from `createServer()` or `attachRouting()` methods:
+    - Add `await` before calling them: `const {...} = await createServer(...)`.
     - If you can not use `await` (on the top level of CommonJS):
       - Wrap your code with async IIFE: `(async () => { ... })()`, which will allow you to use `await`;
       - Or use `.then()` syntax of `Promise`.
@@ -40,27 +28,11 @@
     - Specify either `mockFn: jest.fn` or `mockFn: vi.fn` within its object argument.
 
 ```typescript
-import winston from "winston";
-import {
-  createConfig,
-  testEndpoint,
-  createLogger,
-  EndpointsFactory,
-  defaultResultHandler,
-} from "express-zod-api";
-
-const config = createConfig({
-  logger: createLogger({ winston, level: "debug", color: true }),
-});
-
-const myFactory = new EndpointsFactory({
-  config, // this makes Endpoint's handler aware of the actual logger
-  resultHandler: defaultResultHandler,
-});
+import { createServer, testEndpoint } from "express-zod-api";
 
 // This async IIFE wrapper is only needed when using await on the top level CJS
 (async () => {
-  // await is only needed when you're using the returns of createServer()
+  // await is only needed when you're using the returns of createServer() or attachRouting()
   const { app, httpServer } = await createServer(config, routing);
 })();
 
