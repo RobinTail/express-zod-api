@@ -100,7 +100,7 @@ interface TestEndpointProps<REQ, RES, LOG, FN extends MockFunction> {
  * */
 export const testEndpoint = async <
   FN extends MockFunction,
-  LOG,
+  LOG extends Record<string, any>,
   REQ extends Partial<Record<keyof Request, any>> | undefined = undefined,
   RES extends Partial<Record<keyof Response, any>> | undefined = undefined,
 >({
