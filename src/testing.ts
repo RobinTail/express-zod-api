@@ -95,7 +95,7 @@ interface TestEndpointProps<REQ, RES, LOG, FN> {
 }
 
 /**
- * @desc You need to install either jest (with @types/jest) or vitest in otder to use this method
+ * @desc You need to install either jest (with @types/jest) or vitest in order to use this method
  * @requires jest
  * @requires vitest
  * */
