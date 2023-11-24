@@ -27,9 +27,12 @@ describe("Testing", () => {
           output: z.object({}),
           handler: async () => ({}),
         });
-      const { responseMock } = await testEndpoint({
+      const { responseMock, requestMock, loggerMock } = await testEndpoint({
         endpoint,
         fnMethod: jest.fn,
+        responseProps: { prop1: jest.fn(), prop2: 123 },
+        requestProps: { test1: jest.fn(), test2: 456 },
+        loggerProps: { feat1: jest.fn(), feat2: 789 },
       });
       expect(responseMock.setHeader).toHaveBeenCalledWith("X-Some", "header");
       expect(responseMock.header).toHaveBeenCalledWith(
@@ -39,6 +42,12 @@ describe("Testing", () => {
       expect(responseMock.send).toHaveBeenCalledWith(
         "this is just for testing mocked methods",
       );
+      expect(responseMock.prop1).toEqual(expect.any(Function));
+      expect(responseMock.prop2).toBe(123);
+      expect(requestMock.test1).toEqual(expect.any(Function));
+      expect(requestMock.test2).toBe(456);
+      expect(loggerMock.feat1).toEqual(expect.any(Function));
+      expect(loggerMock.feat2).toBe(789);
     });
   });
 });

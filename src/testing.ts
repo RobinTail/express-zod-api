@@ -7,40 +7,33 @@ import { mimeJson } from "./mime";
 
 type MockFunction = <S>(implementation?: (...args: any[]) => any) => S; // kept "any" for easier compatibility
 
-export const makeRequestMock = <REQ, FN extends MockFunction>({
+export const makeRequestMock = <
+  REQ extends Record<string, any>,
+  FN extends MockFunction,
+>({
   fnMethod,
   requestProps,
 }: {
   fnMethod: FN;
   requestProps?: REQ;
 }) =>
-  <
-    { method: string } & Record<"header", ReturnType<FN>> &
-      (REQ extends undefined ? {} : REQ)
-  >{
+  ({
     method: "GET",
     header: fnMethod(() => mimeJson),
     ...requestProps,
-  };
+  }) as { method: string } & Record<"header", ReturnType<FN>> & REQ;
 
-export const makeResponseMock = <RES, FN extends MockFunction>({
+export const makeResponseMock = <
+  RES extends Record<string, any>,
+  FN extends MockFunction,
+>({
   fnMethod,
   responseProps,
 }: {
   fnMethod: FN;
   responseProps?: RES;
 }) => {
-  const responseMock = <
-    {
-      writableEnded: boolean;
-      statusCode: number;
-      statusMessage: string;
-    } & Record<
-      "set" | "setHeader" | "header" | "status" | "json" | "send" | "end",
-      ReturnType<FN>
-    > &
-      (RES extends undefined ? {} : RES)
-  >{
+  const responseMock = {
     writableEnded: false,
     statusCode: 200,
     statusMessage: http.STATUS_CODES[200],
@@ -59,11 +52,19 @@ export const makeResponseMock = <RES, FN extends MockFunction>({
       return responseMock;
     }),
     ...responseProps,
-  };
+  } as {
+    writableEnded: boolean;
+    statusCode: number;
+    statusMessage: string;
+  } & Record<
+    "set" | "setHeader" | "header" | "status" | "json" | "send" | "end",
+    ReturnType<FN>
+  > &
+    RES;
   return responseMock;
 };
 
-interface TestEndpointProps<REQ, RES, LOG, FN extends MockFunction> {
+interface TestEndpointProps<REQ, RES, LOG, FN> {
   /** @desc The endpoint to test */
   endpoint: AbstractEndpoint;
   /**
@@ -101,8 +102,8 @@ interface TestEndpointProps<REQ, RES, LOG, FN extends MockFunction> {
 export const testEndpoint = async <
   FN extends MockFunction,
   LOG extends Record<string, any>,
-  REQ extends Partial<Record<keyof Request, any>> | undefined = undefined,
-  RES extends Partial<Record<keyof Response, any>> | undefined = undefined,
+  REQ extends Record<string, any>,
+  RES extends Record<string, any>,
 >({
   endpoint,
   requestProps,
@@ -113,13 +114,13 @@ export const testEndpoint = async <
 }: TestEndpointProps<REQ, RES, LOG, FN>) => {
   const requestMock = makeRequestMock({ fnMethod: fnMethod, requestProps });
   const responseMock = makeResponseMock({ fnMethod: fnMethod, responseProps });
-  const loggerMock = <Record<keyof AbstractLogger, ReturnType<FN>> & LOG>{
+  const loggerMock = {
     info: fnMethod(),
     warn: fnMethod(),
     error: fnMethod(),
     debug: fnMethod(),
     ...loggerProps,
-  };
+  } as Record<keyof AbstractLogger, ReturnType<FN>> & LOG;
   const configMock = {
     cors: false,
     logger: loggerMock,
