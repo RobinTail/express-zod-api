@@ -46,7 +46,7 @@ declare module "express-zod-api" {
 
 // await is only needed when you're using the returns of createServer() or attachRouting()
 // For using await on the top level CJS, wrap it in async IIFE:
-// (async () => { ... })();
+// (async () => { await ... })();
 const { app, httpServer } = await createServer(config, routing);
 
 // Adjust your tests: place it once anywhere
