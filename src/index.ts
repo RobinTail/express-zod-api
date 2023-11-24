@@ -33,7 +33,7 @@ export {
   MissingPeerError,
 } from "./errors";
 export { withMeta } from "./metadata";
-export { testEndpoint } from "./testing";
+export { testEndpoint, MockOverrides } from "./testing";
 export { Integration } from "./integration";
 
 export * as ez from "./proprietary-schemas";

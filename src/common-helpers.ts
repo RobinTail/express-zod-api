@@ -334,3 +334,14 @@ export const loadPeer = async <T>(
     throw new MissingPeerError(moduleName);
   }
 };
+
+export const loadAltPeer = async <T>(
+  alternatives: { moduleName: string; moduleExport?: string }[],
+) => {
+  for (const { moduleName, moduleExport } of alternatives) {
+    try {
+      return await loadPeer<T>(moduleName, moduleExport);
+    } catch {}
+  }
+  throw new MissingPeerError(alternatives.map(({ moduleName }) => moduleName));
+};

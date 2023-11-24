@@ -5,6 +5,10 @@ import {
   testEndpoint,
 } from "../../src";
 
+declare module "../../src" {
+  interface MockOverrides extends jest.Mock {}
+}
+
 describe("Testing", () => {
   describe("testEndpoint()", () => {
     test("Should test the endpoint", async () => {
@@ -29,7 +33,6 @@ describe("Testing", () => {
         });
       const { responseMock, requestMock, loggerMock } = await testEndpoint({
         endpoint,
-        fnMethod: jest.fn,
         responseProps: { prop1: jest.fn(), prop2: 123 },
         requestProps: { test1: jest.fn(), test2: 456 },
         loggerProps: { feat1: jest.fn(), feat2: 789 },
