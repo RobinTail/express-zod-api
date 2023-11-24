@@ -1014,14 +1014,20 @@ const exampleEndpoint = taggedEndpointsFactory.build({
 
 The way to test endpoints is to mock the request, response, and logger objects, invoke the `execute()` method, and
 assert the expectations for calls of certain mocked methods. The library provides a special method that makes mocking
-easier, it requires either `jest` (with `@types/jest`) or `vitest` to be installed, so the test might look this way:
+easier, it requires either `jest` (with `@types/jest`) or `vitest` to be installed. It automatically detects which
+of those testing libraries is installed and uses its mocking functions. However, in order to have proper mocking types
+in your own tests, you need to specify it once in your tests excplicitly, so the test might look this way:
 
 ```typescript
 import { testEndpoint } from "express-zod-api";
 
+// place it once anywhere in your tests
+declare module "express-zod-api" {
+  interface MockOverrides extends jest.Mock {} // or Mock from vitest
+}
+
 test("should respond successfully", async () => {
   const { responseMock, loggerMock } = await testEndpoint({
-    fnMethod: jest.fn, // or vi.fn from vitest
     endpoint: yourEndpoint,
     requestProps: {
       method: "POST", // default: GET

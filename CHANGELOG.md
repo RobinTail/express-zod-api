@@ -28,7 +28,7 @@
     - If you can not use `await` (on the top level of CommonJS):
       - Wrap your code with async IIFE or use `.then()` (see example below).
   - If you're using `testEndpoint()` method:
-    - Specify either `fnMethod: jest.fn` or `fnMethod: vi.fn` within its object argument.
+    - Add module augmentation statement once anywhere in your tests (see below).
 
 ```typescript
 import type { Logger } from "winston";
@@ -49,11 +49,12 @@ declare module "express-zod-api" {
 // (async () => { ... })();
 const { app, httpServer } = await createServer(config, routing);
 
-// Adjust your tests:
-const { responseMock } = await testEndpoint({
-  endpoint,
-  fnMethod: jest.fn, // or vi.fn from vitest, required
-});
+// Adjust your tests: place it once anywhere
+declare module "express-zod-api" {
+  interface MockOverrides extends jest.Mock {} // or Mock from vitest
+}
+
+const { responseMock } = await testEndpoint({ endpoint });
 ```
 
 ## Version 14
