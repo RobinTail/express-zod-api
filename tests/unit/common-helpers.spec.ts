@@ -533,6 +533,12 @@ describe("Common Helpers", () => {
           { moduleName: "@jest/globals", moduleExport: "jest" },
         ]),
       ).toBeTruthy();
+      expect(
+        await loadAltPeer([{ moduleName: "vitest", moduleExport: "vi" }], {
+          moduleName: "jest",
+          provider: () => jest,
+        }),
+      ).toEqual(jest);
     });
     test("should load an alternative module", async () => {
       await expect(async () =>

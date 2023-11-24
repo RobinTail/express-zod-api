@@ -105,10 +105,10 @@ export const testEndpoint = async <
   loggerProps,
 }: TestEndpointProps<REQ, RES, LOG>) => {
   const fnMethod = (
-    await loadAltPeer<{ fn: MockFunction }>([
-      { moduleName: "vitest", moduleExport: "vi" },
-      { moduleName: "@jest/globals", moduleExport: "jest" },
-    ])
+    await loadAltPeer<{ fn: MockFunction }>(
+      [{ moduleName: "vitest", moduleExport: "vi" }],
+      { moduleName: "jest", provider: () => jest },
+    )
   ).fn;
   const requestMock = makeRequestMock({ fnMethod: fnMethod, requestProps });
   const responseMock = makeResponseMock({ fnMethod: fnMethod, responseProps });

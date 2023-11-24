@@ -337,11 +337,22 @@ export const loadPeer = async <T>(
 
 export const loadAltPeer = async <T>(
   alternatives: { moduleName: string; moduleExport?: string }[],
+  fallback?: { moduleName: string; provider: () => T },
 ) => {
   for (const { moduleName, moduleExport } of alternatives) {
     try {
       return await loadPeer<T>(moduleName, moduleExport);
     } catch {}
   }
-  throw new MissingPeerError(alternatives.map(({ moduleName }) => moduleName));
+  try {
+    const result = fallback?.provider();
+    if (result) {
+      return result;
+    }
+  } catch {}
+  throw new MissingPeerError(
+    alternatives
+      .concat(fallback ? [fallback] : [])
+      .map(({ moduleName }) => moduleName),
+  );
 };
