@@ -28,7 +28,7 @@
     - If you can not use `await` (on the top level of CommonJS):
       - Wrap your code with async IIFE or use `.then()` (see example below).
   - If you're using `testEndpoint()` method:
-    - Specify either `mockFn: jest.fn` or `mockFn: vi.fn` within its object argument.
+    - Specify either `fnMethod: jest.fn` or `fnMethod: vi.fn` within its object argument.
 
 ```typescript
 import type { Logger } from "winston";
@@ -52,7 +52,7 @@ const { app, httpServer } = await createServer(config, routing);
 // Adjust your tests:
 const { responseMock } = await testEndpoint({
   endpoint,
-  mockFn: jest.fn, // or vi.fn from vitest, required
+  fnMethod: jest.fn, // or vi.fn from vitest, required
 });
 ```
 

@@ -240,10 +240,10 @@ describe("Routing", () => {
       const fn = appMock.options.mock.calls[0][1];
       expect(typeof fn).toBe("function"); // async (req, res) => void
       const requestMock = makeRequestMock({
-        mockFn: jest.fn,
+        fnMethod: jest.fn,
         requestProps: { method: "PUT" },
       });
-      const responseMock = makeResponseMock({ mockFn: jest.fn });
+      const responseMock = makeResponseMock({ fnMethod: jest.fn });
       await fn(requestMock, responseMock);
       expect(responseMock.status).toHaveBeenCalledWith(200);
       expect(responseMock.set).toHaveBeenCalledTimes(3);

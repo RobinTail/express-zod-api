@@ -14,7 +14,7 @@ describe("Vitest compatibility test", () => {
       });
       const { responseMock } = await testEndpoint({
         endpoint,
-        mockFn: vi.fn,
+        fnMethod: vi.fn,
         requestProps: { method: "POST", body: { n: 123 } },
       });
       expect(responseMock.status).toHaveBeenCalledWith(200);

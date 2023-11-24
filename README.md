@@ -1021,7 +1021,7 @@ import { testEndpoint } from "express-zod-api";
 
 test("should respond successfully", async () => {
   const { responseMock, loggerMock } = await testEndpoint({
-    mockFn: jest.fn, // or vi.fn from vitest
+    fnMethod: jest.fn, // or vi.fn from vitest
     endpoint: yourEndpoint,
     requestProps: {
       method: "POST", // default: GET

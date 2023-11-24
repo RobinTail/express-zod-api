@@ -253,7 +253,7 @@ describe("Server", () => {
       expect(typeof rawPropMw).toBe("function");
       const buffer = Buffer.from([]);
       const requestMock = makeRequestMock({
-        mockFn: jest.fn,
+        fnMethod: jest.fn,
         requestProps: {
           method: "POST",
           body: buffer,

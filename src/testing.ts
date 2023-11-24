@@ -8,10 +8,10 @@ import { mimeJson } from "./mime";
 type MockFunction = <S>(implementation?: (...args: any[]) => any) => S; // kept "any" for easier compatibility
 
 export const makeRequestMock = <REQ, FN extends MockFunction>({
-  mockFn,
+  fnMethod,
   requestProps,
 }: {
-  mockFn: FN;
+  fnMethod: FN;
   requestProps?: REQ;
 }) =>
   <
@@ -19,15 +19,15 @@ export const makeRequestMock = <REQ, FN extends MockFunction>({
       (REQ extends undefined ? {} : REQ)
   >{
     method: "GET",
-    header: mockFn(() => mimeJson),
+    header: fnMethod(() => mimeJson),
     ...requestProps,
   };
 
 export const makeResponseMock = <RES, FN extends MockFunction>({
-  mockFn,
+  fnMethod,
   responseProps,
 }: {
-  mockFn: FN;
+  fnMethod: FN;
   responseProps?: RES;
 }) => {
   const responseMock = <
@@ -44,17 +44,17 @@ export const makeResponseMock = <RES, FN extends MockFunction>({
     writableEnded: false,
     statusCode: 200,
     statusMessage: http.STATUS_CODES[200],
-    set: mockFn(() => responseMock),
-    setHeader: mockFn(() => responseMock),
-    header: mockFn(() => responseMock),
-    status: mockFn((code) => {
+    set: fnMethod(() => responseMock),
+    setHeader: fnMethod(() => responseMock),
+    header: fnMethod(() => responseMock),
+    status: fnMethod((code) => {
       responseMock.statusCode = code;
       responseMock.statusMessage = http.STATUS_CODES[code]!;
       return responseMock;
     }),
-    json: mockFn(() => responseMock),
-    send: mockFn(() => responseMock),
-    end: mockFn(() => {
+    json: fnMethod(() => responseMock),
+    send: fnMethod(() => responseMock),
+    end: fnMethod(() => {
       responseMock.writableEnded = true;
       return responseMock;
     }),
@@ -90,7 +90,7 @@ interface TestEndpointProps<REQ, RES, LOG, FN extends MockFunction> {
    * @example jest.fn
    * @example vi.fn
    * */
-  mockFn: FN;
+  fnMethod: FN;
 }
 
 /**
@@ -109,15 +109,15 @@ export const testEndpoint = async <
   responseProps,
   configProps,
   loggerProps,
-  mockFn,
+  fnMethod,
 }: TestEndpointProps<REQ, RES, LOG, FN>) => {
-  const requestMock = makeRequestMock({ mockFn, requestProps });
-  const responseMock = makeResponseMock({ mockFn, responseProps });
+  const requestMock = makeRequestMock({ fnMethod: fnMethod, requestProps });
+  const responseMock = makeResponseMock({ fnMethod: fnMethod, responseProps });
   const loggerMock = <Record<keyof AbstractLogger, ReturnType<FN>> & LOG>{
-    info: mockFn(),
-    warn: mockFn(),
-    error: mockFn(),
-    debug: mockFn(),
+    info: fnMethod(),
+    warn: fnMethod(),
+    error: fnMethod(),
+    debug: fnMethod(),
     ...loggerProps,
   };
   const configMock = {

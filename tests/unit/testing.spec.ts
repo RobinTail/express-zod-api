@@ -29,7 +29,7 @@ describe("Testing", () => {
         });
       const { responseMock } = await testEndpoint({
         endpoint,
-        mockFn: jest.fn,
+        fnMethod: jest.fn,
       });
       expect(responseMock.setHeader).toHaveBeenCalledWith("X-Some", "header");
       expect(responseMock.header).toHaveBeenCalledWith(
