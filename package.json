@@ -1,6 +1,6 @@
 {
   "name": "express-zod-api",
-  "version": "14.2.3",
+  "version": "15.0.0-beta1",
   "description": "A Typescript library to help you get an API server up and running with I/O schema validation and custom middlewares in minutes.",
   "license": "MIT",
   "scripts": {
@@ -70,17 +70,39 @@
     "zod": "^3.22.3"
   },
   "peerDependenciesMeta": {
-    "@types/compression": { "optional": true },
-    "@types/express": { "optional": true },
-    "@types/express-fileupload": { "optional": true },
-    "@types/http-errors": { "optional": true },
-    "@types/node": { "optional": true },
-    "@types/jest": { "optional": true },
-    "compression": { "optional": true },
-    "express-fileupload": { "optional": true },
-    "jest": { "optional": true },
-    "vitest": { "optional": true },
-    "winston": { "optional": true }
+    "@types/compression": {
+      "optional": true
+    },
+    "@types/express": {
+      "optional": true
+    },
+    "@types/express-fileupload": {
+      "optional": true
+    },
+    "@types/http-errors": {
+      "optional": true
+    },
+    "@types/node": {
+      "optional": true
+    },
+    "@types/jest": {
+      "optional": true
+    },
+    "compression": {
+      "optional": true
+    },
+    "express-fileupload": {
+      "optional": true
+    },
+    "jest": {
+      "optional": true
+    },
+    "vitest": {
+      "optional": true
+    },
+    "winston": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.13.0",
