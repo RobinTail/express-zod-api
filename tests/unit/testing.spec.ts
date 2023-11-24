@@ -5,7 +5,7 @@ import {
   testEndpoint,
 } from "../../src";
 
-describe("Mock", () => {
+describe("Testing", () => {
   describe("testEndpoint()", () => {
     test("Should test the endpoint", async () => {
       const endpoint = defaultEndpointsFactory
