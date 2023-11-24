@@ -14,6 +14,7 @@ import {
   hasTopLevelTransformingEffect,
   isCustomHeader,
   isValidDate,
+  loadAltPeer,
   loadPeer,
   makeErrorFromAnything,
 } from "../../src/common-helpers";
@@ -521,6 +522,25 @@ describe("Common Helpers", () => {
       await expect(async () => loadPeer("missing")).rejects.toThrow(
         new MissingPeerError("missing"),
       );
+    });
+  });
+
+  describe("loadAltPeer()", () => {
+    test("should load an alternative module", async () => {
+      expect(
+        await loadAltPeer([
+          { moduleName: "vitest", moduleExport: "vi" },
+          { moduleName: "@jest/globals", moduleExport: "jest" },
+        ]),
+      ).toBeTruthy();
+    });
+    test("should load an alternative module", async () => {
+      await expect(async () =>
+        loadAltPeer([
+          { moduleName: "vitest" },
+          { moduleName: "@also/missing" },
+        ]),
+      ).rejects.toThrow(new MissingPeerError(["vitest", "@also/missing"]));
     });
   });
 });
