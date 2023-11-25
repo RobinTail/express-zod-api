@@ -28,7 +28,7 @@ describe("Peer loading helpers", () => {
         }),
       ).toEqual(jest);
     });
-    test("should load an alternative module", async () => {
+    test("should throw when no alternatives found", async () => {
       await expect(async () =>
         loadAltPeer([
           { moduleName: "vitest" },
