@@ -330,9 +330,18 @@ export const loadPeer = async <T>(
 ): Promise<T> => {
   try {
     return (await import(moduleName))[moduleExport];
-  } catch {
-    throw new MissingPeerError(moduleName);
-  }
+  } catch {}
+  try {
+    return await Promise.resolve().then(
+      /**
+       * alternative way for environments that do not support dynamic imports even it's CJS compatible
+       * @example jest with ts-jest
+       * @link https://github.com/evanw/esbuild/issues/2651
+       */
+      () => require(moduleName)[moduleExport],
+    );
+  } catch {}
+  throw new MissingPeerError(moduleName);
 };
 
 export const loadAltPeer = async <T>(
