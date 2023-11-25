@@ -30,8 +30,7 @@
     - If you can not use `await` (on the top level of CommonJS):
       - Wrap your code with async IIFE or use `.then()` (see example below).
   - If you're using `testEndpoint()` method:
-    - Add module augmentation statement once anywhere in your tests (see below);
-    - When using testing framework other than `jest` or `vitest`, specify `fnMethod` property to `testEndpoint()`.
+    - Add module augmentation statement once anywhere in your tests (see below).
 
 ```typescript
 import type { Logger } from "winston";
