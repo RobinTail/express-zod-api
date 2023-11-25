@@ -21,15 +21,6 @@ describe("Peer loading helpers", () => {
           { moduleName: "@jest/globals", moduleExport: "jest" },
         ]),
       ).toBeTruthy();
-      expect(
-        await loadAlternativePeer([
-          { moduleName: "vitest", moduleExport: "vi" },
-          {
-            moduleName: "jest",
-            fallback: () => jest,
-          },
-        ]),
-      ).toEqual(jest);
     });
     test("should throw when no alternatives found", async () => {
       await expect(async () =>

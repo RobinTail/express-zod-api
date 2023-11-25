@@ -108,7 +108,6 @@ export const testEndpoint = async <
     await loadAlternativePeer<{ fn: MockFunction }>([
       { moduleName: "vitest", moduleExport: "vi" },
       { moduleName: "@jest/globals", moduleExport: "jest" },
-      { moduleName: "jest", fallback: () => jest },
     ])
   ).fn;
   const requestMock = makeRequestMock({ fnMethod: fnMethod, requestProps });
