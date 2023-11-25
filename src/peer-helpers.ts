@@ -20,24 +20,24 @@ export const loadPeer = async <T>(
   throw new MissingPeerError(moduleName);
 };
 
-export const loadAltPeer = async <T>(
-  alternatives: { moduleName: string; moduleExport?: string }[],
-  fallback?: { moduleName: string; provider: () => T },
+export const loadAlternativePeer = async <T>(
+  options: {
+    moduleName: string;
+    moduleExport?: string;
+    fallback?: () => T;
+  }[],
 ) => {
-  for (const { moduleName, moduleExport } of alternatives) {
+  for (const { moduleName, moduleExport, fallback } of options) {
     try {
-      return await loadPeer<T>(moduleName, moduleExport);
+      if (fallback) {
+        const result = fallback();
+        if (result) {
+          return result;
+        }
+      } else {
+        return await loadPeer<T>(moduleName, moduleExport);
+      }
     } catch {}
   }
-  try {
-    const result = fallback?.provider();
-    if (result) {
-      return result;
-    }
-  } catch {}
-  throw new MissingPeerError(
-    alternatives
-      .concat(fallback ? [fallback] : [])
-      .map(({ moduleName }) => moduleName),
-  );
+  throw new MissingPeerError(options.map(({ moduleName }) => moduleName));
 };

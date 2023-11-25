@@ -4,7 +4,7 @@ import { CommonConfig } from "./config-type";
 import { AbstractEndpoint } from "./endpoint";
 import { AbstractLogger } from "./logger";
 import { mimeJson } from "./mime";
-import { loadAltPeer } from "./peer-helpers";
+import { loadAlternativePeer } from "./peer-helpers";
 
 export interface MockOverrides {}
 
@@ -105,13 +105,11 @@ export const testEndpoint = async <
   loggerProps,
 }: TestEndpointProps<REQ, RES, LOG>) => {
   const fnMethod = (
-    await loadAltPeer<{ fn: MockFunction }>(
-      [
-        { moduleName: "vitest", moduleExport: "vi" },
-        { moduleName: "@jest/globals", moduleExport: "jest" },
-      ],
-      { moduleName: "jest", provider: () => jest },
-    )
+    await loadAlternativePeer<{ fn: MockFunction }>([
+      { moduleName: "vitest", moduleExport: "vi" },
+      { moduleName: "@jest/globals", moduleExport: "jest" },
+      { moduleName: "jest", fallback: () => jest },
+    ])
   ).fn;
   const requestMock = makeRequestMock({ fnMethod: fnMethod, requestProps });
   const responseMock = makeResponseMock({ fnMethod: fnMethod, responseProps });

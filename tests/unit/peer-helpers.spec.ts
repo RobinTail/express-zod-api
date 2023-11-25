@@ -1,5 +1,5 @@
 import { MissingPeerError } from "../../src";
-import { loadAltPeer, loadPeer } from "../../src/peer-helpers";
+import { loadAlternativePeer, loadPeer } from "../../src/peer-helpers";
 
 describe("Peer loading helpers", () => {
   describe("loadPeer()", () => {
@@ -16,21 +16,24 @@ describe("Peer loading helpers", () => {
   describe("loadAltPeer()", () => {
     test("should load an alternative module", async () => {
       expect(
-        await loadAltPeer([
+        await loadAlternativePeer([
           { moduleName: "vitest", moduleExport: "vi" },
           { moduleName: "@jest/globals", moduleExport: "jest" },
         ]),
       ).toBeTruthy();
       expect(
-        await loadAltPeer([{ moduleName: "vitest", moduleExport: "vi" }], {
-          moduleName: "jest",
-          provider: () => jest,
-        }),
+        await loadAlternativePeer([
+          { moduleName: "vitest", moduleExport: "vi" },
+          {
+            moduleName: "jest",
+            fallback: () => jest,
+          },
+        ]),
       ).toEqual(jest);
     });
     test("should throw when no alternatives found", async () => {
       await expect(async () =>
-        loadAltPeer([
+        loadAlternativePeer([
           { moduleName: "vitest" },
           { moduleName: "@also/missing" },
         ]),
