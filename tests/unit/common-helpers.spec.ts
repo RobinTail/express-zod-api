@@ -14,16 +14,9 @@ import {
   hasTopLevelTransformingEffect,
   isCustomHeader,
   isValidDate,
-  loadAltPeer,
-  loadPeer,
   makeErrorFromAnything,
 } from "../../src/common-helpers";
-import {
-  InputValidationError,
-  MissingPeerError,
-  ez,
-  withMeta,
-} from "../../src";
+import { InputValidationError, ez, withMeta } from "../../src";
 import { Request } from "express";
 import { z } from "zod";
 import { ZodUpload } from "../../src/upload-schema";
@@ -512,41 +505,5 @@ describe("Common Helpers", () => {
         expect(hasCoercion(schema)).toBe(coercion);
       },
     );
-  });
-
-  describe("loadPeer()", () => {
-    test("should load the module", async () => {
-      expect(await loadPeer("compression")).toBeTruthy();
-    });
-    test("should throw when module not found", async () => {
-      await expect(async () => loadPeer("missing")).rejects.toThrow(
-        new MissingPeerError("missing"),
-      );
-    });
-  });
-
-  describe("loadAltPeer()", () => {
-    test("should load an alternative module", async () => {
-      expect(
-        await loadAltPeer([
-          { moduleName: "vitest", moduleExport: "vi" },
-          { moduleName: "@jest/globals", moduleExport: "jest" },
-        ]),
-      ).toBeTruthy();
-      expect(
-        await loadAltPeer([{ moduleName: "vitest", moduleExport: "vi" }], {
-          moduleName: "jest",
-          provider: () => jest,
-        }),
-      ).toEqual(jest);
-    });
-    test("should load an alternative module", async () => {
-      await expect(async () =>
-        loadAltPeer([
-          { moduleName: "vitest" },
-          { moduleName: "@also/missing" },
-        ]),
-      ).rejects.toThrow(new MissingPeerError(["vitest", "@also/missing"]));
-    });
   });
 });

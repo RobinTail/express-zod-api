@@ -10,7 +10,8 @@ import {
   isSimplifiedWinstonConfig,
 } from "./logger";
 import { ResultHandlerError } from "./errors";
-import { loadPeer, makeErrorFromAnything } from "./common-helpers";
+import { makeErrorFromAnything } from "./common-helpers";
+import { loadPeer } from "./peer-helpers";
 import {
   AnyResultHandlerDefinition,
   defaultResultHandler,

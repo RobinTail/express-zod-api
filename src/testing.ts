@@ -1,10 +1,10 @@
 import { Request, Response } from "express";
 import http from "node:http";
-import { loadAltPeer } from "./common-helpers";
 import { CommonConfig } from "./config-type";
 import { AbstractEndpoint } from "./endpoint";
 import { AbstractLogger } from "./logger";
 import { mimeJson } from "./mime";
+import { loadAltPeer } from "./peer-helpers";
 
 export interface MockOverrides {}
 
