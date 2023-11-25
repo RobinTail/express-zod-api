@@ -1014,7 +1014,7 @@ const exampleEndpoint = taggedEndpointsFactory.build({
 
 The way to test endpoints is to mock the request, response, and logger objects, invoke the `execute()` method, and
 assert the expectations for calls of certain mocked methods. The library provides a special method `testEndpoint` that
-makes mocking easier. It requires your either to install `jest` (with `@types/jest`) or `vitest`
+makes mocking easier. It requires you either to install `jest` (with `@types/jest`) or `vitest`
 (detects automatically), or to specify the `fnMethod` property assigned with a function mocking method of your testing
 framework, which can also be `node:test` module of most modern Node.js versions.
 However, in order to have proper mocking types in your own tests, you also need to specify `MockOverrides` once in your
