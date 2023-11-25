@@ -13,7 +13,9 @@
 - Features:
   - `winston` is now optional: supporting any logger having `debug()`, `warn()`, `info()` and `error()` methods;
   - Introducing module augmentation approach for setting the type of chosen logger;
-  - Supporting both `jest` and `vitest` frameworks for `testEndpoint()`.
+  - Supporting different testing frameworks for `testEndpoint()`:
+    - Both `jest` and `vitest` are supported automatically;
+    - With most modern Node.js you can also use the integrated `node:test` module.
 - How to migrate while maintaining previous functionality and behavior:
   - If you're going to continue using `winston`:
     - Near your `const config = createConfig(...)` add the module augmentation statement (see example below).
@@ -28,7 +30,8 @@
     - If you can not use `await` (on the top level of CommonJS):
       - Wrap your code with async IIFE or use `.then()` (see example below).
   - If you're using `testEndpoint()` method:
-    - Add module augmentation statement once anywhere in your tests (see below).
+    - Add module augmentation statement once anywhere in your tests (see below);
+    - When using testing framework other than `jest` or `vitest`, specify `fnMethod` property to `testEndpoint()`.
 
 ```typescript
 import type { Logger } from "winston";
@@ -54,7 +57,15 @@ declare module "express-zod-api" {
   interface MockOverrides extends jest.Mock {} // or Mock from vitest
 }
 
+// Both jest and vitest are supported automatically
 const { responseMock } = await testEndpoint({ endpoint });
+
+// For other testing frameworks: specify fnMethod property
+import { mock } from "node:test";
+await testEndpoint({
+  endpoint,
+  fnMethod: mock.fn.bind(mock), // https://nodejs.org/docs/latest-v20.x/api/test.html#mocking
+});
 ```
 
 ## Version 14

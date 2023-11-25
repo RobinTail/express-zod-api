@@ -86,13 +86,15 @@ interface TestEndpointProps<REQ, RES, LOG> {
    * @default { info, warn, error, debug }
    * */
   loggerProps?: LOG;
+  /**
+   * @desc Optionally specify the function mocking method of your testing framework
+   * @default jest.fn || vi.fn // from vitest
+   * @example mock.fn.bind(mock) // from node:test, binding might be necessary
+   * */
+  fnMethod?: MockFunction;
 }
 
-/**
- * @desc You need to install either jest (with @types/jest) or vitest in order to use this method
- * @requires jest
- * @requires vitest
- * */
+/** @desc Requires either jest (with @types/jest) or vitest or to specify the fnMethod option */
 export const testEndpoint = async <
   LOG extends Record<string, any>,
   REQ extends Record<string, any>,
@@ -103,13 +105,16 @@ export const testEndpoint = async <
   responseProps,
   configProps,
   loggerProps,
+  fnMethod: userDefined,
 }: TestEndpointProps<REQ, RES, LOG>) => {
-  const fnMethod = (
-    await loadAlternativePeer<{ fn: MockFunction }>([
-      { moduleName: "vitest", moduleExport: "vi" },
-      { moduleName: "@jest/globals", moduleExport: "jest" },
-    ])
-  ).fn;
+  const fnMethod =
+    userDefined ||
+    (
+      await loadAlternativePeer<{ fn: MockFunction }>([
+        { moduleName: "vitest", moduleExport: "vi" },
+        { moduleName: "@jest/globals", moduleExport: "jest" },
+      ])
+    ).fn;
   const requestMock = makeRequestMock({ fnMethod: fnMethod, requestProps });
   const responseMock = makeResponseMock({ fnMethod: fnMethod, responseProps });
   const loggerMock = {
