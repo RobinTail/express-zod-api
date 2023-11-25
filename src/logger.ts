@@ -2,7 +2,7 @@ import { inspect } from "node:util";
 import type { Format, TransformableInfo } from "logform";
 import type Winston from "winston";
 import type Transport from "winston-transport";
-import { loadPeer } from "./common-helpers";
+import { loadPeer } from "./peer-helpers";
 
 /**
  * @desc Using module augmentation approach you can set the type of the actual logger used

@@ -4,33 +4,32 @@ import { CommonConfig } from "./config-type";
 import { AbstractEndpoint } from "./endpoint";
 import { AbstractLogger } from "./logger";
 import { mimeJson } from "./mime";
+import { loadAlternativePeer } from "./peer-helpers";
 
-type MockFunction = <S>(implementation?: (...args: any[]) => any) => S; // kept "any" for easier compatibility
+export interface MockOverrides {}
 
-export const makeRequestMock = <
-  REQ extends Record<string, any>,
-  FN extends MockFunction,
->({
+interface MockFunction {
+  (implementation?: (...args: any[]) => any): MockOverrides;
+}
+
+export const makeRequestMock = <REQ extends Record<string, any>>({
   fnMethod,
   requestProps,
 }: {
-  fnMethod: FN;
+  fnMethod: MockFunction;
   requestProps?: REQ;
 }) =>
   ({
     method: "GET",
     header: fnMethod(() => mimeJson),
     ...requestProps,
-  }) as { method: string } & Record<"header", ReturnType<FN>> & REQ;
+  }) as { method: string } & Record<"header", MockOverrides> & REQ;
 
-export const makeResponseMock = <
-  RES extends Record<string, any>,
-  FN extends MockFunction,
->({
+export const makeResponseMock = <RES extends Record<string, any>>({
   fnMethod,
   responseProps,
 }: {
-  fnMethod: FN;
+  fnMethod: MockFunction;
   responseProps?: RES;
 }) => {
   const responseMock = {
@@ -58,13 +57,13 @@ export const makeResponseMock = <
     statusMessage: string;
   } & Record<
     "set" | "setHeader" | "header" | "status" | "json" | "send" | "end",
-    ReturnType<FN>
+    MockOverrides
   > &
     RES;
   return responseMock;
 };
 
-interface TestEndpointProps<REQ, RES, LOG, FN> {
+interface TestEndpointProps<REQ, RES, LOG> {
   /** @desc The endpoint to test */
   endpoint: AbstractEndpoint;
   /**
@@ -88,19 +87,15 @@ interface TestEndpointProps<REQ, RES, LOG, FN> {
    * */
   loggerProps?: LOG;
   /**
-   * @example jest.fn
-   * @example vi.fn
+   * @desc Optionally specify the function mocking method of your testing framework
+   * @default jest.fn || vi.fn // from vitest
+   * @example mock.fn.bind(mock) // from node:test, binding might be necessary
    * */
-  fnMethod: FN;
+  fnMethod?: MockFunction;
 }
 
-/**
- * @desc You need to install either jest (with @types/jest) or vitest in order to use this method
- * @requires jest
- * @requires vitest
- * */
+/** @desc Requires either jest (with @types/jest) or vitest or to specify the fnMethod option */
 export const testEndpoint = async <
-  FN extends MockFunction,
   LOG extends Record<string, any>,
   REQ extends Record<string, any>,
   RES extends Record<string, any>,
@@ -110,8 +105,16 @@ export const testEndpoint = async <
   responseProps,
   configProps,
   loggerProps,
-  fnMethod,
-}: TestEndpointProps<REQ, RES, LOG, FN>) => {
+  fnMethod: userDefined,
+}: TestEndpointProps<REQ, RES, LOG>) => {
+  const fnMethod =
+    userDefined ||
+    (
+      await loadAlternativePeer<{ fn: MockFunction }>([
+        { moduleName: "vitest", moduleExport: "vi" },
+        { moduleName: "@jest/globals", moduleExport: "jest" },
+      ])
+    ).fn;
   const requestMock = makeRequestMock({ fnMethod: fnMethod, requestProps });
   const responseMock = makeResponseMock({ fnMethod: fnMethod, responseProps });
   const loggerMock = {
@@ -120,7 +123,7 @@ export const testEndpoint = async <
     error: fnMethod(),
     debug: fnMethod(),
     ...loggerProps,
-  } as Record<keyof AbstractLogger, ReturnType<FN>> & LOG;
+  } as Record<keyof AbstractLogger, MockOverrides> & LOG;
   const configMock = {
     cors: false,
     logger: loggerMock,
@@ -130,7 +133,7 @@ export const testEndpoint = async <
     request: requestMock as unknown as Request,
     response: responseMock as unknown as Response,
     config: configMock as CommonConfig,
-    logger: loggerMock as AbstractLogger,
+    logger: loggerMock as unknown as AbstractLogger,
   });
   return { requestMock, responseMock, loggerMock };
 };

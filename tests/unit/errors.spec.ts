@@ -120,7 +120,10 @@ describe("Errors", () => {
 
     test("should have a human readable message", () => {
       expect(new MissingPeerError("compression").message).toBe(
-        "Missing peer dependency: 'compression'. Please install it to use the feature activated in config.",
+        "Missing peer dependency: compression. Please install it to use the feature.",
+      );
+      expect(new MissingPeerError(["jest", "vitest"]).message).toBe(
+        "Missing one of the following peer dependencies: jest | vitest. Please install it to use the feature.",
       );
     });
   });

@@ -1,7 +1,11 @@
 import { defaultEndpointsFactory } from "../../src";
-import { describe, expect, test, vi } from "vitest";
+import { Mock, describe, expect, test } from "vitest";
 import { z } from "zod";
 import { testEndpoint } from "../../src";
+
+declare module "../../src" {
+  interface MockOverrides extends Mock {}
+}
 
 describe("Vitest compatibility test", () => {
   describe("testEndpoint()", () => {
@@ -14,7 +18,6 @@ describe("Vitest compatibility test", () => {
       });
       const { responseMock } = await testEndpoint({
         endpoint,
-        fnMethod: vi.fn,
         requestProps: { method: "POST", body: { n: 123 } },
       });
       expect(responseMock.status).toHaveBeenCalledWith(200);
