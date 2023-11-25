@@ -1,3 +1,4 @@
+import { expectType } from "tsd";
 import { z } from "zod";
 import {
   createMiddleware,
@@ -54,6 +55,9 @@ describe("Testing", () => {
         expect(requestMock.test2).toBe(456);
         expect(loggerMock.feat1).toEqual(expect.any(Function));
         expect(loggerMock.feat2).toBe(789);
+        expectType<jest.Mock>(responseMock.prop1);
+        expectType<jest.Mock>(requestMock.test1);
+        expectType<jest.Mock>(loggerMock.feat1);
       },
     );
   });
