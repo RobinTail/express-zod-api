@@ -6,8 +6,14 @@ import { AbstractLogger } from "./logger";
 import { mimeJson } from "./mime";
 import { loadAlternativePeer } from "./peer-helpers";
 
+/**
+ * @desc Using module augmentation approach you can set the Mock type of your actual testing framework.
+ * @example declare module "express-zod-api" { interface MockOverrides extends Mock {} }
+ * @link https://www.typescriptlang.org/docs/handbook/declaration-merging.html#module-augmentation
+ * */
 export interface MockOverrides {}
 
+/** @desc Compatibility constraints for a function mocking method of a testing framework. */
 type MockFunction = (implementation?: (...args: any[]) => any) => MockOverrides;
 
 export const makeRequestMock = <REQ extends Record<string, any>>({
