@@ -8,9 +8,7 @@ import { loadAlternativePeer } from "./peer-helpers";
 
 export interface MockOverrides {}
 
-interface MockFunction {
-  (implementation?: (...args: any[]) => any): MockOverrides;
-}
+type MockFunction = (implementation?: (...args: any[]) => any) => MockOverrides;
 
 export const makeRequestMock = <REQ extends Record<string, any>>({
   fnMethod,
