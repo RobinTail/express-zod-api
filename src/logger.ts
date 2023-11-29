@@ -35,7 +35,7 @@ export const isSimplifiedWinstonConfig = (
   ["silent", "warn", "debug"].includes(subject.level);
 
 /**
- * @desc a helper for creating a winston logger easier
+ * @desc an internal helper for creating a winston logger easier
  * @requires winston
  * @example await createLogger({ level: "debug", color: true })
  * */

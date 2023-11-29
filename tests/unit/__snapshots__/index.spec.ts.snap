@@ -52,8 +52,6 @@ exports[`Index Entrypoint exports createResultHandler should have certain value 
 
 exports[`Index Entrypoint exports createServer should have certain value 1`] = `[Function]`;
 
-exports[`Index Entrypoint exports createWinstonLogger should have certain value 1`] = `[Function]`;
-
 exports[`Index Entrypoint exports defaultEndpointsFactory should have certain value 1`] = `
 EndpointsFactory {
   "middlewares": [],
@@ -116,7 +114,6 @@ exports[`Index Entrypoint exports should have certain entities exposed 1`] = `
   "createMiddleware",
   "createResultHandler",
   "createServer",
-  "createWinstonLogger",
   "defaultEndpointsFactory",
   "defaultResultHandler",
   "ez",
