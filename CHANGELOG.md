@@ -7,7 +7,6 @@
 - **Breaking changes**:
   - `express-fileupload` and `compression` become optional peer dependencies;
   - Methods `createServer()` and `attachRouting()` become async;
-  - Method `testEndpoint()` requires an additional argument;
   - Method `createLogger()` removed as redundant;
   - Read the migration guide below.
 - Features:
