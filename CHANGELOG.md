@@ -48,12 +48,12 @@ declare module "express-zod-api" {
   interface LoggerOverrides extends Logger {}
 }
 
-// await is only needed when you're using the returns of createServer() or attachRouting()
+// if using entities returned from createServer() or attachRouting(): add "await" before it.
 // For using await on the top level CJS, wrap it in async IIFE:
 // (async () => { await ... })();
 const { app, httpServer } = await createServer(config, routing);
 
-// Adjust your tests: place it once anywhere
+// Adjust your tests: set the MockOverrides type once anywhere
 declare module "express-zod-api" {
   interface MockOverrides extends jest.Mock {} // or Mock from vitest
 }
@@ -61,12 +61,18 @@ declare module "express-zod-api" {
 // Both jest and vitest are supported automatically
 const { responseMock } = await testEndpoint({ endpoint });
 
-// For other testing frameworks: specify fnMethod property
-import { mock } from "node:test";
+// For other testing frameworks:
+
+// 1. specify fnMethod property
+import { mock, Mock } from "node:test";
 await testEndpoint({
   endpoint,
   fnMethod: mock.fn.bind(mock), // https://nodejs.org/docs/latest-v20.x/api/test.html#mocking
 });
+// 2. and set the MockOverrides type once
+declare module "express-zod-api" {
+  interface MockOverrides extends Mock {} // Mock of your testing framework
+}
 ```
 
 ## Version 14
