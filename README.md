@@ -85,13 +85,16 @@ Therefore, many basic tasks can be accomplished faster and easier, in particular
 - [Typescript](https://www.typescriptlang.org/) first.
 - Web server — [Express.js](https://expressjs.com/).
 - Schema validation — [Zod 3.x](https://github.com/colinhacks/zod).
-- Logger — [Winston](https://github.com/winstonjs/winston) by default,
-  - Supports any logger having `info()`, `debug()`, `error()` and `warn()` methods.
+- Supports any logger having `info()`, `debug()`, `error()` and `warn()` methods;
+  - [Winston](https://github.com/winstonjs/winston) is default, helper included.
 - Generators:
-  - Documentation — [OpenAPI 3.x](https://github.com/metadevpro/openapi3-ts) (Swagger Specification).
+  - Documentation — [OpenAPI 3.x](https://github.com/metadevpro/openapi3-ts) (Swagger Specification);
   - Client side types — inspired by [zod-to-ts](https://github.com/sachinraja/zod-to-ts).
 - File uploads — [Express-FileUpload](https://github.com/richardgirges/express-fileupload)
   (based on [Busboy](https://github.com/mscdex/busboy)).
+- Supports any testing framework having a function mocking method;
+  - [Jest](https://github.com/jestjs/jest) and [Vitest](https://github.com/vitest-dev/vitest)
+    are both supported automatically.
 
 ## Concept
 
