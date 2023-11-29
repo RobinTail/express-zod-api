@@ -7,7 +7,7 @@
 - **Breaking changes**:
   - `express-fileupload` and `compression` become optional peer dependencies (must be installed using those features);
   - Methods `createServer()` and `attachRouting()` become async;
-  - Method `createLogger()` removed as redundant;
+  - Method `createLogger()` is renamed to async `createWinstonLogger`;
   - Read the migration guide below.
 - Features:
   - Supporting any logger having `debug()`, `warn()`, `info()` and `error()` methods;
@@ -24,7 +24,9 @@
   - If you have `compression` option enabled in your config:
     - Install `compression` and `@types/compression` packages;
   - If you're using `createLogger()` method:
-    - Place its argument as a value of `logger` property supplied to `createConfig()`.
+    - Place its argument as a value of `logger` property supplied to `createConfig()` instead;
+    - In case you still need that logger instance for other non-API related purposes:
+      - Use `await createWinstonLogger()` with the same arguments (wrap with async IIFE if needed).
   - If you're using the entities returned from `createServer()` or `attachRouting()` methods:
     - Add `await` before calling them: `const {...} = await createServer(...)`.
     - If you can not use `await` (on the top level of CommonJS):
