@@ -17,20 +17,19 @@
     - With most modern Node.js you can also use the integrated `node:test` module.
   - Introducing module augmentation approach for integrating chosen logger and testing framework.
 - How to migrate while maintaining previous functionality and behavior:
-  - If you're going to continue using `winston`:
-    - Near your `const config = createConfig(...)` add the module augmentation statement (see example below).
+  - Near your `const config` add a module augmentation statement based on `winston.Logger` type (see example below).
+  - If you've been using `createLogger()` method:
+    - Instead, place its argument as a value of the `logger` property supplied to `createConfig()`.
   - If you have `upload` option enabled in your config:
     - Install `express-fileupload` and `@types/express-fileupload` packages;
   - If you have `compression` option enabled in your config:
     - Install `compression` and `@types/compression` packages;
-  - If you're using `createLogger()` method:
-    - Place its argument as a value of `logger` property supplied to `createConfig()`.
   - If you're using the entities returned from `createServer()` or `attachRouting()` methods:
-    - Add `await` before calling them: `const {...} = await createServer(...)`.
+    - Add `await` before calling those methods.
     - If you can not use `await` (on the top level of CommonJS):
       - Wrap your code with async IIFE or use `.then()` (see example below).
   - If you're using `testEndpoint()` method:
-    - Add module augmentation statement once anywhere in your tests (see below).
+    - Add module augmentation statement once anywhere within your tests based on `jest.Mock` type (see example below).
 
 ```typescript
 import type { Logger } from "winston";
