@@ -5,13 +5,13 @@
 ### 15.0.0
 
 - **Breaking changes**:
-  - `express-fileupload` and `compression` become optional peer dependencies (must be installed using those features);
+  - Packages `express-fileupload` and `compression` become optional peer dependencies;
   - Methods `createServer()` and `attachRouting()` become async;
   - Method `createLogger()` is removed;
   - Read the migration guide below.
 - Features:
   - Supporting any logger having `debug()`, `warn()`, `info()` and `error()` methods;
-    - `winston` is now optional.
+    - Package `winston` is now optional.
   - Supporting any testing framework having a function mocking method for `testEndpoint()`:
     - Both `jest` and `vitest` are supported automatically;
     - With most modern Node.js you can also use the integrated `node:test` module.
