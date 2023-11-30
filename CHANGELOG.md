@@ -35,12 +35,12 @@
 import type { Logger } from "winston";
 import { createConfig, createServer, testEndpoint } from "express-zod-api";
 
-// The configuration remains the same
+// Use logger property instead of the removed createLogger method
 const config = createConfig({
   logger: { level: "debug", color: true },
 });
 
-// Set the type of logger used near your configuration
+// Set the type of the logger used near your configuration
 declare module "express-zod-api" {
   interface LoggerOverrides extends Logger {}
 }
