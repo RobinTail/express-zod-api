@@ -27,10 +27,7 @@ describe("Logger", () => {
 
   describe("createWinstonLogger()", () => {
     test("Should create silent logger", async () => {
-      const logger = await createWinstonLogger({
-        level: "silent",
-        color: false,
-      });
+      const logger = await createWinstonLogger({ level: "silent" });
       const transform = jest.spyOn(logger.transports[0].format!, "transform");
       expect(logger.silent).toBeTruthy();
       expect(logger.isErrorEnabled()).toBeTruthy();
@@ -44,7 +41,7 @@ describe("Logger", () => {
     });
 
     test("Should create warn logger", async () => {
-      const logger = await createWinstonLogger({ level: "warn", color: false });
+      const logger = await createWinstonLogger({ level: "warn" });
       const transform = jest.spyOn(logger.transports[0].format!, "transform");
       expect(logger.isErrorEnabled()).toBeTruthy();
       expect(logger.isWarnEnabled()).toBeTruthy();

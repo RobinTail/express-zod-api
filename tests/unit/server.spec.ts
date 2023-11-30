@@ -47,7 +47,7 @@ describe("Server", () => {
         },
         cors: true,
         startupLogo: false,
-        logger: { level: "warn", color: false },
+        logger: { level: "warn" },
       };
       const routingMock = {
         v1: {
@@ -145,7 +145,7 @@ describe("Server", () => {
         },
         cors: true,
         startupLogo: false,
-        logger: { level: "warn", color: false },
+        logger: { level: "warn" },
       } satisfies ServerConfig;
       const routingMock = {
         v1: {
@@ -179,7 +179,7 @@ describe("Server", () => {
         },
         cors: true,
         startupLogo: false,
-        logger: { level: "warn", color: false },
+        logger: { level: "warn" },
       } satisfies ServerConfig;
       const routingMock = {
         v1: {
@@ -205,7 +205,7 @@ describe("Server", () => {
         },
         cors: true,
         startupLogo: false,
-        logger: { level: "warn", color: false },
+        logger: { level: "warn" },
       } satisfies ServerConfig;
       const routingMock = {
         v1: {
@@ -235,7 +235,7 @@ describe("Server", () => {
         },
         cors: true,
         startupLogo: false,
-        logger: { level: "warn", color: false },
+        logger: { level: "warn" },
       } satisfies ServerConfig;
       const routingMock = {
         v1: {

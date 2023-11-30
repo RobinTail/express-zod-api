@@ -20,7 +20,7 @@ export type AbstractLogger = Record<
 
 export interface SimplifiedWinstonConfig {
   level: "silent" | "warn" | "debug";
-  color: boolean;
+  color?: boolean;
 }
 
 export const isSimplifiedWinstonConfig = (
@@ -29,8 +29,7 @@ export const isSimplifiedWinstonConfig = (
   typeof subject === "object" &&
   subject !== null &&
   "level" in subject &&
-  "color" in subject &&
-  typeof subject.color === "boolean" &&
+  ("color" in subject ? typeof subject.color === "boolean" : true) &&
   typeof subject.level === "string" &&
   ["silent", "warn", "debug"].includes(subject.level);
 
