@@ -3,6 +3,19 @@
   "version": "15.0.0-beta4",
   "description": "A Typescript library to help you get an API server up and running with I/O schema validation and custom middlewares in minutes.",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RobinTail/express-zod-api.git"
+  },
+  "homepage": "https://ez.robintail.cz",
+  "author": {
+    "name": "Anna Bocharova",
+    "url": "https://robintail.cz",
+    "email": "me@robintail.cz"
+  },
+  "bugs": {
+    "url": "https://github.com/RobinTail/express-zod-api/issues"
+  },
   "scripts": {
     "start": "yarn tsnode example/index.ts",
     "build": "yarn build:compile && yarn build:tests && yarn build:assets",
@@ -47,6 +60,9 @@
         "default": "./dist/index.js"
       }
     }
+  },
+  "engines": {
+    "node": "^18.0.0 || ^20.1.0"
   },
   "dependencies": {
     "openapi3-ts": "^4.1.2",
@@ -148,22 +164,6 @@
     "typescript": "^5.2.2",
     "winston": "^3.10.0",
     "zod": "^3.22.3"
-  },
-  "engines": {
-    "node": "^18.0.0 || ^20.1.0"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/RobinTail/express-zod-api.git"
-  },
-  "homepage": "https://ez.robintail.cz",
-  "author": {
-    "name": "Anna Bocharova",
-    "url": "https://robintail.cz",
-    "email": "me@robintail.cz"
-  },
-  "bugs": {
-    "url": "https://github.com/RobinTail/express-zod-api/issues"
   },
   "keywords": [
     "nodejs",
