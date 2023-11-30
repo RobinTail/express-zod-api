@@ -142,8 +142,8 @@ Create a minimal configuration. _See all available options
 [in sources](https://github.com/RobinTail/express-zod-api/blob/master/src/config-type.ts)._
 
 ```typescript
-import type { Logger } from "winston";
 import { createConfig } from "express-zod-api";
+import type { Logger } from "winston";
 
 const config = createConfig({
   server: {
@@ -153,7 +153,7 @@ const config = createConfig({
   logger: { level: "debug", color: true },
 });
 
-// Setting the type of logger used
+// Setting the type of the logger used
 declare module "express-zod-api" {
   interface LoggerOverrides extends Logger {}
 }
@@ -798,13 +798,11 @@ you can connect your routing to the app instead of using `createServer()`.
 
 ```typescript
 import express from "express";
-import { createConfig, attachRouting } from "express-zod-api";
+import { createConfig, attachRouting, Routing } from "express-zod-api";
 
 const app = express();
 const config = createConfig({ app /* cors, logger, ... */ });
-const routing = {
-  /* ... */
-};
+const routing: Routing = {};
 
 // This async IIFE is only required for the top level CommonJS
 (async () => {
