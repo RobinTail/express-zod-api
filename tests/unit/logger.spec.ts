@@ -2,7 +2,10 @@ import { LEVEL, MESSAGE, SPLAT } from "triple-beam";
 import MockDate from "mockdate";
 import stripAnsi from "strip-ansi";
 import hasAnsi from "has-ansi";
-import { createWinstonLogger } from "../../src/logger";
+import {
+  createWinstonLogger,
+  isSimplifiedWinstonConfig,
+} from "../../src/logger";
 
 describe("Logger", () => {
   beforeEach(() => {
@@ -128,6 +131,28 @@ describe("Logger", () => {
         [MESSAGE]: `2022-01-01T00:00:00.000Z error: [No message] { someData: 'test' }`,
       });
       expect(hasAnsi(params.level)).toBeTruthy();
+    });
+  });
+
+  describe("isSimplifiedLoggerConfig()", () => {
+    test.each([
+      { level: "silent" },
+      { level: "debug", color: false },
+      { level: "warn", color: true },
+    ])("should validate config %#", (sample) => {
+      expect(isSimplifiedWinstonConfig(sample)).toBeTruthy();
+    });
+
+    test.each([
+      null,
+      undefined,
+      {},
+      { level: null },
+      { level: "wrong" },
+      { level: "debug", color: null },
+      createWinstonLogger({ level: "debug" }),
+    ])("should invalidate config %#", (sample) => {
+      expect(isSimplifiedWinstonConfig(sample)).toBeFalsy();
     });
   });
 });
