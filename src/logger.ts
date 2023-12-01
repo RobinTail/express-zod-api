@@ -35,7 +35,7 @@ export const isSimplifiedWinstonConfig = (
 /**
  * @desc a helper for creating a winston logger easier
  * @requires winston
- * @example createWinstonLogger({ winston, level: "debug", color: true })
+ * @example createLogger({ winston, level: "debug", color: true })
  * */
 export const createLogger = ({
   winston: {
