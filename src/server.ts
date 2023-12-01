@@ -128,12 +128,13 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
     subject: typeof config.server.listen,
   ) =>
     new Promise<T>((resolve) => {
+      const event = "Listening";
       server.listen(subject, () => {
         logger.info.apply(
           logger,
           typeof subject === "object"
-            ? ["Listening", subject]
-            : [`Listening ${subject}`],
+            ? [event, subject]
+            : [`${event} ${subject}`],
         );
         resolve(server);
       });
