@@ -2,10 +2,8 @@ import { LEVEL, MESSAGE, SPLAT } from "triple-beam";
 import MockDate from "mockdate";
 import stripAnsi from "strip-ansi";
 import hasAnsi from "has-ansi";
-import {
-  createWinstonLogger,
-  isSimplifiedWinstonConfig,
-} from "../../src/logger";
+import { createLogger, isSimplifiedWinstonConfig } from "../../src/logger";
+import winston from "winston";
 
 describe("Logger", () => {
   beforeEach(() => {
@@ -29,8 +27,8 @@ describe("Logger", () => {
   };
 
   describe("createWinstonLogger()", () => {
-    test("Should create silent logger", async () => {
-      const logger = await createWinstonLogger({ level: "silent" });
+    test("Should create silent logger", () => {
+      const logger = createLogger({ winston, level: "silent" });
       const transform = jest.spyOn(logger.transports[0].format!, "transform");
       expect(logger.silent).toBeTruthy();
       expect(logger.isErrorEnabled()).toBeTruthy();
@@ -43,8 +41,8 @@ describe("Logger", () => {
       expect(transform).toHaveBeenCalledTimes(0);
     });
 
-    test("Should create warn logger", async () => {
-      const logger = await createWinstonLogger({ level: "warn" });
+    test("Should create warn logger", () => {
+      const logger = createLogger({ winston, level: "warn" });
       const transform = jest.spyOn(logger.transports[0].format!, "transform");
       expect(logger.isErrorEnabled()).toBeTruthy();
       expect(logger.isWarnEnabled()).toBeTruthy();
@@ -68,8 +66,8 @@ describe("Logger", () => {
       expect(hasAnsi(params.level)).toBeFalsy();
     });
 
-    test("Should create debug logger", async () => {
-      const logger = await createWinstonLogger({ level: "debug", color: true });
+    test("Should create debug logger", () => {
+      const logger = createLogger({ winston, level: "debug", color: true });
       const transform = jest.spyOn(logger.transports[0].format!, "transform");
       expect(logger.isErrorEnabled()).toBeTruthy();
       expect(logger.isWarnEnabled()).toBeTruthy();
@@ -92,8 +90,8 @@ describe("Logger", () => {
       expect(hasAnsi(params.level)).toBeTruthy();
     });
 
-    test("Should manage profiling", async () => {
-      const logger = await createWinstonLogger({ level: "debug", color: true });
+    test("Should manage profiling", () => {
+      const logger = createLogger({ winston, level: "debug", color: true });
       const transform = jest.spyOn(logger.transports[0].format!, "transform");
       logger.profile("long-test");
       MockDate.set("2022-01-01T00:00:00.554Z");
@@ -111,8 +109,8 @@ describe("Logger", () => {
       expect(hasAnsi(params.level)).toBeTruthy();
     });
 
-    test("Should handle empty message", async () => {
-      const logger = await createWinstonLogger({ level: "debug", color: true });
+    test("Should handle empty message", () => {
+      const logger = createLogger({ winston, level: "debug", color: true });
       const transform = jest.spyOn(logger.transports[0].format!, "transform");
       expect(logger.isErrorEnabled()).toBeTruthy();
       expect(logger.isWarnEnabled()).toBeTruthy();
@@ -135,8 +133,8 @@ describe("Logger", () => {
 
     test.each(["debug", "warn"] as const)(
       "Should handle non-object meta %#",
-      async (level) => {
-        const logger = await createWinstonLogger({ level, color: true });
+      (level) => {
+        const logger = createLogger({ winston, level, color: true });
         const transform = jest.spyOn(logger.transports[0].format!, "transform");
         logger.error("Code", 8090);
         expect(transform).toHaveBeenCalled();
@@ -169,7 +167,6 @@ describe("Logger", () => {
       { level: null },
       { level: "wrong" },
       { level: "debug", color: null },
-      createWinstonLogger({ level: "debug" }),
     ])("should invalidate config %#", (sample) => {
       expect(isSimplifiedWinstonConfig(sample)).toBeFalsy();
     });
