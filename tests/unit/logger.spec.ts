@@ -132,6 +132,25 @@ describe("Logger", () => {
       });
       expect(hasAnsi(params.level)).toBeTruthy();
     });
+
+    test.each(["debug", "warn"] as const)(
+      "Should handle non-object meta %#",
+      async (level) => {
+        const logger = await createWinstonLogger({ level, color: true });
+        const transform = jest.spyOn(logger.transports[0].format!, "transform");
+        logger.error("Code", 8090);
+        expect(transform).toHaveBeenCalled();
+        const params = transform.mock.calls[0][0];
+        expect(dropColorInObjectProps(params)).toEqual({
+          level: "error",
+          [LEVEL]: "error",
+          timestamp: "2022-01-01T00:00:00.000Z",
+          [SPLAT]: [8090],
+          message: "Code",
+          [MESSAGE]: `2022-01-01T00:00:00.000Z error: Code 8090`,
+        });
+      },
+    );
   });
 
   describe("isSimplifiedLoggerConfig()", () => {
