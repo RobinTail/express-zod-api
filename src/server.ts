@@ -127,11 +127,7 @@ export const createServer = (config: ServerConfig, routing: Routing) => {
         ? config.https!.listen
         : config.server.listen;
     server?.listen(listeningSubject, () => {
-      if (typeof listeningSubject === "object") {
-        logger.info("Listening", listeningSubject);
-      } else {
-        logger.info(`Listening ${listeningSubject}`);
-      }
+      logger.info("Listening", listeningSubject);
     });
   }
 
