@@ -123,22 +123,23 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
   initRouting({ app, routing, logger, config });
   app.use(notFoundHandler);
 
+  const starter = <T extends http.Server | https.Server>(
+    server: T,
+    subject: typeof config.server.listen,
+  ) =>
+    server.listen(subject, () => {
+      logger.info("Listening", subject);
+    }) as T;
+
   const servers = {
-    httpServer: http.createServer(app),
+    httpServer: starter(http.createServer(app), config.server.listen),
     httpsServer: config.https
-      ? https.createServer(config.https.options, app)
+      ? starter(
+          https.createServer(config.https.options, app),
+          config.https.listen,
+        )
       : undefined,
   } satisfies Record<string, http.Server | https.Server | undefined>;
-
-  for (const server of Object.values(servers)) {
-    const listeningSubject =
-      server instanceof https.Server
-        ? config.https!.listen
-        : config.server.listen;
-    server?.listen(listeningSubject, () => {
-      logger.info("Listening", listeningSubject);
-    });
-  }
 
   return { app, ...servers, logger };
 };
