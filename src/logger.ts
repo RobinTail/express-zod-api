@@ -64,13 +64,17 @@ export const createWinstonLogger = async (
         meta = { ...meta, ...(message as object) };
         message = "[No message]";
       }
-      return (
-        `${timestamp} ${level}: ${message}` +
-        (durationMs === undefined ? "" : ` duration: ${durationMs}ms`) +
-        (Object.keys(meta).length === 0
-          ? ""
-          : " " + (isPretty ? prettyPrint(meta) : JSON.stringify(meta)))
-      );
+      const hasMetaProps = Object.keys(meta).length > 0;
+      const details = [];
+      if (durationMs) {
+        details.push("duration:", `${durationMs}ms`);
+      }
+      if (hasMetaProps) {
+        details.push(isPretty ? prettyPrint(meta) : JSON.stringify(meta));
+      } else {
+        details.push(...(meta?.[Symbol.for("splat")] || []));
+      }
+      return [timestamp, `${level}:`, message, ...details].join(" ");
     });
 
   const formats: Format[] = [useTimestamp()];
