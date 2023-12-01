@@ -2,7 +2,6 @@ import { inspect } from "node:util";
 import type { Format, TransformableInfo } from "logform";
 import type Winston from "winston";
 import type Transport from "winston-transport";
-import { loadPeer } from "./peer-helpers";
 
 /**
  * @desc Using module augmentation approach you can set the type of the actual logger used
@@ -34,20 +33,21 @@ export const isSimplifiedWinstonConfig = (
   ["silent", "warn", "debug"].includes(subject.level);
 
 /**
- * @desc an internal helper for creating a winston logger easier
+ * @desc a helper for creating a winston logger easier
  * @requires winston
- * @example await createLogger({ level: "debug", color: true })
+ * @example createWinstonLogger({ winston, level: "debug", color: true })
  * */
-export const createWinstonLogger = async (
-  config: SimplifiedWinstonConfig,
-): Promise<Winston.Logger> => {
-  const {
-    createLogger,
+export const createLogger = ({
+  winston: {
+    createLogger: create,
     transports,
     format: { printf, timestamp: useTimestamp, colorize, combine },
     config: { npm },
-  } = await loadPeer<typeof Winston>("winston");
-
+  },
+  ...config
+}: SimplifiedWinstonConfig & {
+  winston: typeof Winston;
+}): Winston.Logger => {
   const prettyPrint = (meta: Omit<TransformableInfo, "level" | "message">) => {
     const {
       [Symbol.for("level")]: noLevel,
@@ -101,7 +101,7 @@ export const createWinstonLogger = async (
 
   consoleOutputOptions.format = combine(...formats);
 
-  return createLogger({
+  return create({
     silent: config.level === "silent",
     levels: npm.levels,
     transports: [new transports.Console(consoleOutputOptions)],

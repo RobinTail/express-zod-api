@@ -6,7 +6,7 @@ import https from "node:https";
 import { AppConfig, CommonConfig, ServerConfig } from "./config-type";
 import {
   AbstractLogger,
-  createWinstonLogger,
+  createLogger,
   isSimplifiedWinstonConfig,
 } from "./logger";
 import { ResultHandlerError } from "./errors";
@@ -69,7 +69,10 @@ export const createNotFoundHandler =
 
 const makeCommonEntities = async (config: CommonConfig) => {
   const logger: AbstractLogger = isSimplifiedWinstonConfig(config.logger)
-    ? await createWinstonLogger(config.logger)
+    ? createLogger({
+        ...config.logger,
+        winston: await loadPeer("winston"),
+      })
     : config.logger;
   const errorHandler = config.errorHandler || defaultResultHandler;
   const notFoundHandler = createNotFoundHandler(errorHandler, logger);
