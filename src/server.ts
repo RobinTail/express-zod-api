@@ -123,26 +123,31 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
   initRouting({ app, routing, logger, config });
   app.use(notFoundHandler);
 
+  const starter = async <T extends http.Server | https.Server>(
+    server: T,
+    subject: typeof config.server.listen,
+  ) =>
+    new Promise<T>((resolve) => {
+      server.listen(subject, () => {
+        logger.info.apply(
+          logger,
+          typeof subject === "object"
+            ? ["Listening", subject]
+            : [`Listening ${subject}`],
+        );
+        resolve(server);
+      });
+    });
+
   const servers = {
-    httpServer: http.createServer(app),
+    httpServer: await starter(http.createServer(app), config.server.listen),
     httpsServer: config.https
-      ? https.createServer(config.https.options, app)
+      ? await starter(
+          https.createServer(config.https.options, app),
+          config.https.listen,
+        )
       : undefined,
   } satisfies Record<string, http.Server | https.Server | undefined>;
-
-  for (const server of Object.values(servers)) {
-    const listeningSubject =
-      server instanceof https.Server
-        ? config.https!.listen
-        : config.server.listen;
-    server?.listen(listeningSubject, () => {
-      if (typeof listeningSubject === "object") {
-        logger.info("Listening", listeningSubject);
-      } else {
-        logger.info(`Listening ${listeningSubject}`);
-      }
-    });
-  }
 
   return { app, ...servers, logger };
 };
