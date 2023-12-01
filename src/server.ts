@@ -123,21 +123,18 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
   initRouting({ app, routing, logger, config });
   app.use(notFoundHandler);
 
-  const starter = async <T extends http.Server | https.Server>(
+  const starter = <T extends http.Server | https.Server>(
     server: T,
     subject: typeof config.server.listen,
   ) =>
-    new Promise<T>((resolve) => {
-      server.listen(subject, () => {
-        logger.info("Listening", subject);
-        resolve(server);
-      });
-    });
+    server.listen(subject, () => {
+      logger.info("Listening", subject);
+    }) as T;
 
   const servers = {
-    httpServer: await starter(http.createServer(app), config.server.listen),
+    httpServer: starter(http.createServer(app), config.server.listen),
     httpsServer: config.https
-      ? await starter(
+      ? starter(
           https.createServer(config.https.options, app),
           config.https.listen,
         )
