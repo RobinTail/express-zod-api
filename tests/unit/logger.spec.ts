@@ -168,5 +168,24 @@ describe("Logger", () => {
         });
       },
     );
+
+    test.each(["debug", "warn"] as const)(
+      "Should handle empty object meta",
+      (level) => {
+        const logger = createLogger({ level, color: true });
+        const transform = jest.spyOn(logger.transports[0].format!, "transform");
+        logger.error("Payload", {});
+        expect(transform).toHaveBeenCalled();
+        const params = transform.mock.calls[0][0];
+        expect(dropColorInObjectProps(params)).toEqual({
+          level: "error",
+          [LEVEL]: "error",
+          timestamp: "2022-01-01T00:00:00.000Z",
+          [SPLAT]: [{}],
+          message: "Payload",
+          [MESSAGE]: `2022-01-01T00:00:00.000Z error: Payload {}`,
+        });
+      },
+    );
   });
 });
