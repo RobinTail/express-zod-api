@@ -23,13 +23,25 @@ export const createLogger = (loggerConfig: LoggerConfig): winston.Logger => {
         meta = { ...meta, ...(message as object) };
         message = "[No message]";
       }
-      return (
-        `${timestamp} ${level}: ${message}` +
-        (durationMs === undefined ? "" : ` duration: ${durationMs}ms`) +
-        (Object.keys(meta).length === 0
-          ? ""
-          : " " + (isPretty ? prettyPrint(meta) : JSON.stringify(meta)))
-      );
+      const hasMetaProps = Object.keys(meta).length > 0;
+      const details = [];
+      if (durationMs) {
+        details.push("duration:", `${durationMs}ms`);
+      }
+      const objectHandler = isPretty ? prettyPrint : JSON.stringify;
+      if (hasMetaProps) {
+        details.push(objectHandler(meta));
+      } else {
+        const splat = meta?.[Symbol.for("splat")];
+        if (Array.isArray(splat)) {
+          details.push(
+            ...splat.map((entry) =>
+              typeof entry === "object" ? objectHandler(entry) : entry,
+            ),
+          );
+        }
+      }
+      return [timestamp, `${level}:`, message, ...details].join(" ");
     });
 
   const formats: Format[] = [useTimestamp()];

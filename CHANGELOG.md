@@ -2,6 +2,22 @@
 
 ## Version 14
 
+### v14.2.5
+
+- Hotfix for 14.2.4: handling the case of empty object supplied as a second argument to the logger methods.
+
+```typescript
+logger.info("Payload", {});
+```
+
+### v14.2.4
+
+- Fixed internal logging format when primivite are supplied as a second argument to the logger methods.
+
+```typescript
+logger.info("Listening", 8090);
+```
+
 ### v14.2.3
 
 - `express-fileupload` version is 1.4.3.
