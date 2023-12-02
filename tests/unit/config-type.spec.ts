@@ -1,5 +1,6 @@
 import { Express } from "express";
 import { createConfig } from "../../src";
+import winston from "winston";
 
 describe("ConfigType", () => {
   describe("createConfig()", () => {
@@ -9,10 +10,7 @@ describe("ConfigType", () => {
           listen: 3333,
         },
         cors: true,
-        logger: {
-          level: "debug" as const,
-          color: false,
-        },
+        logger: { level: "debug" as const },
       };
       const config = createConfig(argument);
       expect(config).toEqual(argument);
@@ -22,10 +20,7 @@ describe("ConfigType", () => {
       const argument = {
         app: jest.fn() as unknown as Express,
         cors: true,
-        logger: {
-          level: "debug" as const,
-          color: false,
-        },
+        logger: winston.createLogger({ silent: true }),
       };
       const config = createConfig(argument);
       expect(config).toEqual(argument);

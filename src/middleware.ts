@@ -1,19 +1,19 @@
 import { NextFunction, Request, Response } from "express";
 import { HttpError } from "http-errors";
-import { Logger } from "winston";
 import { z } from "zod";
 import { FlatObject, hasTopLevelTransformingEffect } from "./common-helpers";
 import { IOSchemaError } from "./errors";
 import { IOSchema } from "./io-schema";
 import { LogicalContainer } from "./logical-container";
 import { Security } from "./security";
+import { AbstractLogger } from "./logger";
 
 interface MiddlewareParams<IN, OPT> {
   input: IN;
   options: OPT;
   request: Request;
   response: Response;
-  logger: Logger;
+  logger: AbstractLogger;
 }
 
 type Middleware<IN, OPT, OUT> = (

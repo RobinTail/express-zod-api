@@ -1,11 +1,6 @@
 import { omit } from "ramda";
-import { makeRequestMock } from "../../src/mock";
+import { makeRequestMock } from "../../src/testing";
 import { givePort } from "../helpers";
-import {
-  createHttpsServerSpy,
-  httpListenSpy,
-  httpsListenSpy,
-} from "../http-mock";
 import {
   appMock,
   compressionMock,
@@ -13,6 +8,11 @@ import {
   expressMock,
   fileUploadMock,
 } from "../express-mock";
+import {
+  createHttpsServerSpy,
+  httpListenSpy,
+  httpsListenSpy,
+} from "../http-mock";
 import winston from "winston";
 import { z } from "zod";
 import {
@@ -39,7 +39,7 @@ describe("Server", () => {
   });
 
   describe("createServer()", () => {
-    test("Should create server with minimal config", () => {
+    test("Should create server with minimal config", async () => {
       const port = givePort();
       const configMock: ServerConfig = {
         server: {
@@ -47,10 +47,7 @@ describe("Server", () => {
         },
         cors: true,
         startupLogo: false,
-        logger: {
-          level: "warn",
-          color: false,
-        },
+        logger: { level: "warn" },
       };
       const routingMock = {
         v1: {
@@ -66,7 +63,7 @@ describe("Server", () => {
           }),
         },
       };
-      createServer(configMock, routingMock);
+      await createServer(configMock, routingMock);
       expect(appMock).toBeTruthy();
       expect(appMock.disable).toHaveBeenCalledWith("x-powered-by");
       expect(appMock.use).toHaveBeenCalledTimes(3);
@@ -81,7 +78,7 @@ describe("Server", () => {
       expect(httpListenSpy).toHaveBeenCalledWith(port, expect.any(Function));
     });
 
-    test("Should create server with custom JSON parser, logger and error handler", () => {
+    test("Should create server with custom JSON parser, logger and error handler", async () => {
       const customLogger = winston.createLogger({ silent: true });
       const infoMethod = jest.spyOn(customLogger, "info");
       const port = givePort();
@@ -111,7 +108,7 @@ describe("Server", () => {
           }),
         },
       };
-      const { logger, app } = createServer(
+      const { logger, app } = await createServer(
         configMock as unknown as ServerConfig,
         routingMock,
       );
@@ -136,7 +133,7 @@ describe("Server", () => {
       );
     });
 
-    test("should create a HTTPS server on request", () => {
+    test("should create a HTTPS server on request", async () => {
       const configMock = {
         server: { listen: givePort() },
         https: {
@@ -148,8 +145,8 @@ describe("Server", () => {
         },
         cors: true,
         startupLogo: false,
-        logger: winston.createLogger({ silent: true }),
-      };
+        logger: { level: "warn" },
+      } satisfies ServerConfig;
       const routingMock = {
         v1: {
           test: new EndpointsFactory(defaultResultHandler).build({
@@ -161,7 +158,7 @@ describe("Server", () => {
         },
       };
 
-      const { httpsServer } = createServer(configMock, routingMock);
+      const { httpsServer } = await createServer(configMock, routingMock);
       expect(httpsServer).toBeTruthy();
       expect(createHttpsServerSpy).toHaveBeenCalledWith(
         configMock.https.options,
@@ -174,7 +171,7 @@ describe("Server", () => {
       );
     });
 
-    test("should enable compression on request", () => {
+    test("should enable compression on request", async () => {
       const configMock = {
         server: {
           listen: givePort(),
@@ -182,8 +179,8 @@ describe("Server", () => {
         },
         cors: true,
         startupLogo: false,
-        logger: winston.createLogger({ silent: true }),
-      };
+        logger: { level: "warn" },
+      } satisfies ServerConfig;
       const routingMock = {
         v1: {
           test: new EndpointsFactory(defaultResultHandler).build({
@@ -194,13 +191,13 @@ describe("Server", () => {
           }),
         },
       };
-      createServer(configMock, routingMock);
+      await createServer(configMock, routingMock);
       expect(appMock.use).toHaveBeenCalledTimes(4);
       expect(compressionMock).toHaveBeenCalledTimes(1);
       expect(compressionMock).toHaveBeenCalledWith(undefined);
     });
 
-    test("should enable uploads on request", () => {
+    test("should enable uploads on request", async () => {
       const configMock = {
         server: {
           listen: givePort(),
@@ -208,8 +205,8 @@ describe("Server", () => {
         },
         cors: true,
         startupLogo: false,
-        logger: winston.createLogger({ silent: true }),
-      };
+        logger: { level: "warn" },
+      } satisfies ServerConfig;
       const routingMock = {
         v1: {
           test: new EndpointsFactory(defaultResultHandler).build({
@@ -220,7 +217,7 @@ describe("Server", () => {
           }),
         },
       };
-      createServer(configMock, routingMock);
+      await createServer(configMock, routingMock);
       expect(appMock.use).toHaveBeenCalledTimes(4);
       expect(fileUploadMock).toHaveBeenCalledTimes(1);
       expect(fileUploadMock).toHaveBeenCalledWith({
@@ -229,7 +226,7 @@ describe("Server", () => {
       });
     });
 
-    test("should enable raw on request", () => {
+    test("should enable raw on request", async () => {
       const rawParserMock = jest.fn();
       const configMock = {
         server: {
@@ -238,8 +235,8 @@ describe("Server", () => {
         },
         cors: true,
         startupLogo: false,
-        logger: winston.createLogger({ silent: true }),
-      };
+        logger: { level: "warn" },
+      } satisfies ServerConfig;
       const routingMock = {
         v1: {
           test: new EndpointsFactory(defaultResultHandler).build({
@@ -250,14 +247,17 @@ describe("Server", () => {
           }),
         },
       };
-      createServer(configMock, routingMock);
+      await createServer(configMock, routingMock);
       expect(appMock.use).toHaveBeenCalledTimes(5);
       const rawPropMw = appMock.use.mock.calls[2][0]; // custom middleware for raw
       expect(typeof rawPropMw).toBe("function");
       const buffer = Buffer.from([]);
       const requestMock = makeRequestMock({
-        method: "POST",
-        body: buffer,
+        fnMethod: jest.fn,
+        requestProps: {
+          method: "POST",
+          body: buffer,
+        },
       });
       rawPropMw(requestMock, {}, jest.fn());
       expect(requestMock.body).toEqual({ raw: buffer });
@@ -359,7 +359,7 @@ describe("Server", () => {
   });
 
   describe("attachRouting()", () => {
-    test("should attach routing to the custom express app", () => {
+    test("should attach routing to the custom express app", async () => {
       const app = express();
       expect(appMock).toBeTruthy();
       const customLogger = winston.createLogger({ silent: true });
@@ -387,7 +387,7 @@ describe("Server", () => {
           }),
         },
       };
-      const { logger, notFoundHandler } = attachRouting(
+      const { logger, notFoundHandler } = await attachRouting(
         configMock as unknown as AppConfig,
         routingMock,
       );

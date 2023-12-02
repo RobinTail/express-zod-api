@@ -6,5 +6,5 @@
     "strictNullChecks": true,
     "resolveJsonModule": true
   },
-  "exclude": ["tests/integration", "tests/esm"]
+  "exclude": ["tests/integration", "tests/esm", "tests/vitest"]
 }

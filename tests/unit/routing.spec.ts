@@ -10,7 +10,7 @@ import {
 } from "../../src";
 import { CommonConfig } from "../../src";
 import { mimeJson } from "../../src/mime";
-import { makeRequestMock, makeResponseMock } from "../../src/mock";
+import { makeRequestMock, makeResponseMock } from "../../src/testing";
 import { initRouting } from "../../src/routing";
 import type { Express, Request, RequestHandler, Response } from "express";
 
@@ -239,8 +239,11 @@ describe("Routing", () => {
       expect(appMock.options.mock.calls[0][0]).toBe("/hello");
       const fn = appMock.options.mock.calls[0][1];
       expect(typeof fn).toBe("function"); // async (req, res) => void
-      const requestMock = makeRequestMock({ method: "PUT" });
-      const responseMock = makeResponseMock();
+      const requestMock = makeRequestMock({
+        fnMethod: jest.fn,
+        requestProps: { method: "PUT" },
+      });
+      const responseMock = makeResponseMock({ fnMethod: jest.fn });
       await fn(requestMock, responseMock);
       expect(responseMock.status).toHaveBeenCalledWith(200);
       expect(responseMock.set).toHaveBeenCalledTimes(3);

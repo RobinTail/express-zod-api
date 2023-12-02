@@ -1,8 +1,9 @@
-import { LoggerConfig, createLogger } from "../../src";
 import { LEVEL, MESSAGE, SPLAT } from "triple-beam";
 import MockDate from "mockdate";
 import stripAnsi from "strip-ansi";
 import hasAnsi from "has-ansi";
+import { createLogger, isSimplifiedWinstonConfig } from "../../src/logger";
+import winston from "winston";
 
 describe("Logger", () => {
   beforeEach(() => {
@@ -25,13 +26,9 @@ describe("Logger", () => {
     );
   };
 
-  describe("createLogger()", () => {
+  describe("createWinstonLogger()", () => {
     test("Should create silent logger", () => {
-      const loggerConfig: LoggerConfig = {
-        level: "silent",
-        color: false,
-      };
-      const logger = createLogger(loggerConfig);
+      const logger = createLogger({ winston, level: "silent" });
       const transform = jest.spyOn(logger.transports[0].format!, "transform");
       expect(logger.silent).toBeTruthy();
       expect(logger.isErrorEnabled()).toBeTruthy();
@@ -45,11 +42,7 @@ describe("Logger", () => {
     });
 
     test("Should create warn logger", () => {
-      const loggerConfig: LoggerConfig = {
-        level: "warn",
-        color: false,
-      };
-      const logger = createLogger(loggerConfig);
+      const logger = createLogger({ winston, level: "warn" });
       const transform = jest.spyOn(logger.transports[0].format!, "transform");
       expect(logger.isErrorEnabled()).toBeTruthy();
       expect(logger.isWarnEnabled()).toBeTruthy();
@@ -74,11 +67,7 @@ describe("Logger", () => {
     });
 
     test("Should create debug logger", () => {
-      const loggerConfig: LoggerConfig = {
-        level: "debug",
-        color: true,
-      };
-      const logger = createLogger(loggerConfig);
+      const logger = createLogger({ winston, level: "debug", color: true });
       const transform = jest.spyOn(logger.transports[0].format!, "transform");
       expect(logger.isErrorEnabled()).toBeTruthy();
       expect(logger.isWarnEnabled()).toBeTruthy();
@@ -102,11 +91,7 @@ describe("Logger", () => {
     });
 
     test("Should manage profiling", () => {
-      const loggerConfig: LoggerConfig = {
-        level: "debug",
-        color: true,
-      };
-      const logger = createLogger(loggerConfig);
+      const logger = createLogger({ winston, level: "debug", color: true });
       const transform = jest.spyOn(logger.transports[0].format!, "transform");
       logger.profile("long-test");
       MockDate.set("2022-01-01T00:00:00.554Z");
@@ -125,11 +110,7 @@ describe("Logger", () => {
     });
 
     test("Should handle empty message", () => {
-      const loggerConfig: LoggerConfig = {
-        level: "debug",
-        color: true,
-      };
-      const logger = createLogger(loggerConfig);
+      const logger = createLogger({ winston, level: "debug", color: true });
       const transform = jest.spyOn(logger.transports[0].format!, "transform");
       expect(logger.isErrorEnabled()).toBeTruthy();
       expect(logger.isWarnEnabled()).toBeTruthy();
@@ -153,7 +134,7 @@ describe("Logger", () => {
     test.each(["debug", "warn"] as const)(
       "Should handle non-object meta %#",
       (level) => {
-        const logger = createLogger({ level, color: true });
+        const logger = createLogger({ winston, level, color: true });
         const transform = jest.spyOn(logger.transports[0].format!, "transform");
         logger.error("Code", 8090);
         expect(transform).toHaveBeenCalled();
@@ -172,7 +153,7 @@ describe("Logger", () => {
     test.each(["debug", "warn"] as const)(
       "Should handle empty object meta",
       (level) => {
-        const logger = createLogger({ level, color: true });
+        const logger = createLogger({ winston, level, color: true });
         const transform = jest.spyOn(logger.transports[0].format!, "transform");
         logger.error("Payload", {});
         expect(transform).toHaveBeenCalled();
@@ -187,5 +168,26 @@ describe("Logger", () => {
         });
       },
     );
+  });
+
+  describe("isSimplifiedLoggerConfig()", () => {
+    test.each([
+      { level: "silent" },
+      { level: "debug", color: false },
+      { level: "warn", color: true },
+    ])("should validate config %#", (sample) => {
+      expect(isSimplifiedWinstonConfig(sample)).toBeTruthy();
+    });
+
+    test.each([
+      null,
+      undefined,
+      {},
+      { level: null },
+      { level: "wrong" },
+      { level: "debug", color: null },
+    ])("should invalidate config %#", (sample) => {
+      expect(isSimplifiedWinstonConfig(sample)).toBeFalsy();
+    });
   });
 });

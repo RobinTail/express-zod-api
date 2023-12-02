@@ -1,15 +1,29 @@
 {
   "name": "express-zod-api",
-  "version": "14.2.5",
+  "version": "15.0.0",
   "description": "A Typescript library to help you get an API server up and running with I/O schema validation and custom middlewares in minutes.",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RobinTail/express-zod-api.git"
+  },
+  "homepage": "https://ez.robintail.cz",
+  "author": {
+    "name": "Anna Bocharova",
+    "url": "https://robintail.cz",
+    "email": "me@robintail.cz"
+  },
+  "bugs": {
+    "url": "https://github.com/RobinTail/express-zod-api/issues"
+  },
   "scripts": {
     "start": "yarn tsnode example/index.ts",
     "build": "yarn build:compile && yarn build:tests && yarn build:assets",
     "build:compile": "tsup && attw --pack",
-    "build:tests": "yarn build:int && yarn build:esm",
+    "build:tests": "yarn build:int && yarn build:esm && yarn build:vi",
     "build:int": "yarn tsnode tools/integration-test.ts && yarn install --cwd ./tests/integration",
     "build:esm": "yarn tsnode tools/esm-test.ts && yarn install --cwd ./tests/esm",
+    "build:vi": "yarn install --cwd ./tests/vitest",
     "build:assets": "yarn build:swagger && yarn build:client && yarn build:license",
     "build:swagger": "yarn tsnode example/generate-open-api-schema.ts",
     "build:client": "yarn tsnode example/generate-client.ts && yarn prettier example/example.client.ts --write",
@@ -19,6 +33,7 @@
     "test:int": "jest ./tests/integration",
     "test:952": "yarn --cwd tests/integration tsc -p tsconfig.issue952.json && rm tests/integration/issue952.d.ts",
     "test:esm": "jest ./tests/esm",
+    "test:vi": "yarn --cwd ./tests/vitest test",
     "test:u": "yarn test:jest -u && yarn test:badge",
     "test:types": "tsc --noEmit",
     "test:jest": "jest ./tests/unit ./tests/system",
@@ -46,28 +61,38 @@
       }
     }
   },
+  "engines": {
+    "node": "^18.0.0 || ^20.1.0 || ^21"
+  },
   "dependencies": {
-    "@types/compression": "^1.7.5",
-    "@types/express-fileupload": "^1.4.4",
-    "compression": "~1.7.4",
-    "express-fileupload": "~1.4.3",
     "openapi3-ts": "^4.1.2",
-    "ramda": "~0.29.1"
+    "ramda": "^0.29.1"
   },
   "peerDependencies": {
+    "@types/compression": "^1.7.5",
     "@types/express": "^4.17.13",
+    "@types/express-fileupload": "^1.4.4",
     "@types/http-errors": "^2.0.2",
     "@types/jest": "*",
     "@types/node": "*",
+    "compression": "^1.7.4",
     "express": "^4.18.2",
+    "express-fileupload": "^1.4.3",
     "http-errors": "^2.0.0",
     "jest": ">=28 <30",
     "typescript": "^5.1.3",
+    "vitest": ">=0.34.6 <2",
     "winston": "^3.10.0",
     "zod": "^3.22.3"
   },
   "peerDependenciesMeta": {
+    "@types/compression": {
+      "optional": true
+    },
     "@types/express": {
+      "optional": true
+    },
+    "@types/express-fileupload": {
       "optional": true
     },
     "@types/http-errors": {
@@ -79,7 +104,19 @@
     "@types/jest": {
       "optional": true
     },
+    "compression": {
+      "optional": true
+    },
+    "express-fileupload": {
+      "optional": true
+    },
     "jest": {
+      "optional": true
+    },
+    "vitest": {
+      "optional": true
+    },
+    "winston": {
       "optional": true
     }
   },
@@ -89,8 +126,10 @@
     "@swc/core": "^1.3.92",
     "@swc/jest": "^0.2.29",
     "@tsconfig/node18": "^18.2.1",
+    "@types/compression": "^1.7.5",
     "@types/cors": "^2.8.14",
     "@types/express": "^4.17.17",
+    "@types/express-fileupload": "^1.4.4",
     "@types/has-ansi": "^5.0.0",
     "@types/http-errors": "^2.0.2",
     "@types/jest": "^29.5.4",
@@ -100,6 +139,7 @@
     "@typescript-eslint/eslint-plugin": "^6.6.0",
     "@typescript-eslint/parser": "^6.6.0",
     "chalk": "^4.1.2",
+    "compression": "^1.7.4",
     "cors": "^2.8.5",
     "eslint": "^8.48.0",
     "eslint-config-airbnb-base": "^15.0.0",
@@ -109,6 +149,7 @@
     "eslint-plugin-prettier": "^5.0.0",
     "eslint-plugin-unicorn": "^49.0.0",
     "express": "^4.18.2",
+    "express-fileupload": "^1.4.3",
     "form-data": "^4.0.0",
     "has-ansi": "^4.0.1",
     "http-errors": "^2.0.0",
@@ -123,22 +164,6 @@
     "typescript": "^5.2.2",
     "winston": "^3.10.0",
     "zod": "^3.22.3"
-  },
-  "engines": {
-    "node": "^18.0.0 || ^20.1.0 || ^21"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/RobinTail/express-zod-api.git"
-  },
-  "homepage": "https://ez.robintail.cz",
-  "author": {
-    "name": "Anna Bocharova",
-    "url": "https://robintail.cz",
-    "email": "me@robintail.cz"
-  },
-  "bugs": {
-    "url": "https://github.com/RobinTail/express-zod-api/issues"
   },
   "keywords": [
     "nodejs",

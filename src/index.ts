@@ -1,4 +1,4 @@
-export { createConfig, LoggerConfig } from "./config-type";
+export { createConfig } from "./config-type";
 export { AbstractEndpoint } from "./endpoint";
 export { Method } from "./method";
 export {
@@ -13,7 +13,7 @@ export {
   getMessageFromError,
   getStatusCodeFromError,
 } from "./common-helpers";
-export { createLogger } from "./logger";
+export { createLogger, LoggerOverrides } from "./logger";
 export { createMiddleware } from "./middleware";
 export {
   createResultHandler,
@@ -30,9 +30,10 @@ export {
   RoutingError,
   OutputValidationError,
   InputValidationError,
+  MissingPeerError,
 } from "./errors";
 export { withMeta } from "./metadata";
-export { testEndpoint } from "./mock";
+export { testEndpoint, MockOverrides } from "./testing";
 export { Integration } from "./integration";
 
 export * as ez from "./proprietary-schemas";
