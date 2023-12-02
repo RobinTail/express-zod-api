@@ -18,3 +18,10 @@ export const config = createConfig({
     files: "Everything about the files processing",
   },
 });
+
+// Uncomment these lines to set the type of logger used:
+/*
+declare module "express-zod-api" {
+  interface LoggerOverrides extends winston.Logger {}
+}
+*/

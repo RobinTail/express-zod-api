@@ -19,7 +19,7 @@ import { givePort } from "../helpers";
 describe("Documentation generator", () => {
   const sampleConfig = createConfig({
     cors: true,
-    logger: { level: "debug", color: true },
+    logger: { level: "silent" },
     server: { listen: givePort() },
   });
 

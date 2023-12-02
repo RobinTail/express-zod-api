@@ -4,9 +4,10 @@
 
 | Version | Release |     Supported      |
 | ------: | :------ | :----------------: |
+|  15.x.x | 12.2023 | :white_check_mark: |
 |  14.x.x | 10.2023 | :white_check_mark: |
 |  12.x.x | 09.2023 | :white_check_mark: |
-|  11.x.x | 06.2023 | :white_check_mark: |
+|  11.x.x | 06.2023 |        :x:         |
 |  10.x.x | 03.2023 |        :x:         |
 |   9.x.x | 03.2023 |        :x:         |
 |   8.x.x | 09.2022 |        :x:         |
@@ -24,6 +25,6 @@
 Found a vulnerability or other security issue?
 
 Please urgently inform me privately by
-[email](https://github.com/RobinTail/express-zod-api/blob/master/package.json#L137).
+[email](https://github.com/RobinTail/express-zod-api/blob/master/package.json#L14).
 
 I will try to fix it as soon as possible.

@@ -174,9 +174,7 @@ describe("Endpoint", () => {
         output: z.object({ email: z.string().email() }),
         handler: async () => ({ email: "not email" }),
       });
-      const { responseMock } = await testEndpoint({
-        endpoint,
-      });
+      const { responseMock } = await testEndpoint({ endpoint });
       expect(responseMock.status).toHaveBeenCalledWith(500);
       expect(responseMock.json).toHaveBeenCalledWith({
         status: "error",
@@ -200,9 +198,7 @@ describe("Endpoint", () => {
           test: 123,
         }),
       });
-      const { responseMock, loggerMock } = await testEndpoint({
-        endpoint,
-      });
+      const { responseMock, loggerMock } = await testEndpoint({ endpoint });
       expect(loggerMock.error).toHaveBeenCalledTimes(1);
       expect(responseMock.status).toHaveBeenCalledWith(500);
       expect(responseMock.json).toHaveBeenCalledWith({
@@ -496,9 +492,7 @@ describe("Endpoint", () => {
           test: 123,
         }),
       });
-      const { responseMock, loggerMock } = await testEndpoint({
-        endpoint,
-      });
+      const { responseMock, loggerMock } = await testEndpoint({ endpoint });
       expect(loggerMock.error).toHaveBeenCalledTimes(1);
       expect(responseMock.status).toHaveBeenCalledWith(500);
       expect(responseMock.json).toHaveBeenCalledWith({

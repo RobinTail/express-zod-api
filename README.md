@@ -64,7 +64,7 @@ You can find the release notes and migration guides in [Changelog](CHANGELOG.md)
 # Why and what is it for
 
 I made this library because of the often repetitive tasks of starting a web server APIs with the need to validate input
-data. It integrates and provides the capabilities of popular web server, logger, validation and documenting solutions.
+data. It integrates and provides the capabilities of popular web server, logging, validation and documenting solutions.
 Therefore, many basic tasks can be accomplished faster and easier, in particular:
 
 - You can describe web server routes as a hierarchical object.
@@ -85,12 +85,16 @@ Therefore, many basic tasks can be accomplished faster and easier, in particular
 - [Typescript](https://www.typescriptlang.org/) first.
 - Web server — [Express.js](https://expressjs.com/).
 - Schema validation — [Zod 3.x](https://github.com/colinhacks/zod).
-- Logger — [Winston](https://github.com/winstonjs/winston).
+- Supports any logger having `info()`, `debug()`, `error()` and `warn()` methods;
+  - [Winston](https://github.com/winstonjs/winston) is default.
 - Generators:
-  - Documentation — [OpenAPI 3.x](https://github.com/metadevpro/openapi3-ts) (Swagger Specification).
+  - Documentation — [OpenAPI 3.x](https://github.com/metadevpro/openapi3-ts) (Swagger Specification);
   - Client side types — inspired by [zod-to-ts](https://github.com/sachinraja/zod-to-ts).
 - File uploads — [Express-FileUpload](https://github.com/richardgirges/express-fileupload)
   (based on [Busboy](https://github.com/mscdex/busboy)).
+- Supports any testing framework having a function mocking method;
+  - [Jest](https://github.com/jestjs/jest) and [Vitest](https://github.com/vitest-dev/vitest)
+    are both supported automatically.
 
 ## Concept
 
@@ -139,6 +143,7 @@ Create a minimal configuration. _See all available options
 
 ```typescript
 import { createConfig } from "express-zod-api";
+import type { Logger } from "winston";
 
 const config = createConfig({
   server: {
@@ -147,6 +152,11 @@ const config = createConfig({
   cors: true,
   logger: { level: "debug", color: true },
 });
+
+// Setting the type of the logger used
+declare module "express-zod-api" {
+  interface LoggerOverrides extends Logger {}
+}
 ```
 
 ## Create an endpoints factory
@@ -483,7 +493,12 @@ const config = createConfig({
   // ... cors, logger, etc
 });
 
-const { app, httpServer, httpsServer, logger } = createServer(config, routing);
+// 'await' is only needed if you're going to use the returned entities.
+// For top level CJS you can wrap you code with (async () => { ... })()
+const { app, httpServer, httpsServer, logger } = await createServer(
+  config,
+  routing,
+);
 ```
 
 Ensure having `@types/node` package installed. At least you need to specify the port (usually it is 443) or UNIX socket,
@@ -492,43 +507,47 @@ your API at [Let's Encrypt](https://letsencrypt.org/).
 
 ## Customizing logger
 
-You can specify your custom Winston logger in config:
+You can uninstall `winston` (which is the default and recommended logger) and use another compatible one, having
+`info()`, `debug()`, `error()` and `warn()` methods. For example, `pino` logger with `pino-pretty` extension:
 
 ```typescript
-import winston from "winston";
+import pino, { Logger } from "pino";
 import { createConfig } from "express-zod-api";
 
-const logger = winston.createLogger({
-  /* ... */
+const logger = pino({
+  transport: {
+    target: "pino-pretty",
+    options: { colorize: true },
+  },
 });
-const config = createConfig({ logger /* ..., */ });
+const config = createConfig({ logger });
+
+// Setting the type of logger used
+declare module "express-zod-api" {
+  interface LoggerOverrides extends Logger {}
+}
 ```
 
 ## Enabling compression
 
 According to [Express.js best practices guide](http://expressjs.com/en/advanced/best-practice-performance.html)
-it might be a good idea to enable GZIP compression of your API responses. You can achieve and customize it by using the
-corresponding configuration option when using the `createServer()` method.
+it might be a good idea to enable GZIP compression of your API responses.
 
-In order to receive the compressed response the client should include the following header in the request:
-`Accept-Encoding: gzip, deflate`. Only responses with compressible content types are subject to compression. There is
-also a default threshold of 1KB that can be configured.
+Install the following additional packages: `compression` and `@types/compression`, and enable or configure compression:
 
 ```typescript
 import { createConfig } from "express-zod-api";
 
 const config = createConfig({
   server: {
-    // compression: true, or:
-    compression: {
-      // @see https://www.npmjs.com/package/compression#options
-      threshold: "100b",
-    },
-    // ... other options
+    /** @link https://www.npmjs.com/package/compression#options */
+    compression: { threshold: "1kb" }, // or true
   },
-  // ... other options
 });
 ```
+
+In order to receive a compressed response the client should include the following header in the request:
+`Accept-Encoding: gzip, deflate`. Only responses with compressible content types are subject to compression.
 
 # Advances features
 
@@ -715,29 +734,34 @@ const fileStreamingEndpointsFactory = new EndpointsFactory(
 
 ## File uploads
 
-You can switch the `Endpoint` to handle requests with the `multipart/form-data` content type instead of JSON by using
-`ez.upload()` schema. Together with a corresponding configuration option, this makes it possible to handle file uploads.
-Here is a simplified example:
+Install the following additional packages: `express-fileupload` and `@types/express-fileupload`, and enable or
+configure file uploads:
 
 ```typescript
-import { z } from "zod";
-import { createConfig, ez, defaultEndpointsFactory } from "express-zod-api";
+import { createConfig } from "express-zod-api";
 
 const config = createConfig({
   server: {
-    upload: true, // <- required
-    // ...,
+    upload: true, // or options
   },
 });
+```
+
+Refer to [documentation](https://www.npmjs.com/package/express-fileupload#available-options) on available options.
+Then you can change the `Endpoint` to handle requests having the `multipart/form-data` content type instead of JSON by
+using `ez.upload()` schema. Together with a corresponding configuration option, this makes it possible to handle file
+uploads. Here is a simplified example:
+
+```typescript
+import { z } from "zod";
+import { ez, defaultEndpointsFactory } from "express-zod-api";
 
 const fileUploadEndpoint = defaultEndpointsFactory.build({
   method: "post",
   input: z.object({
     avatar: ez.upload(), // <--
   }),
-  output: z.object({
-    /* ... */
-  }),
+  output: z.object({}),
   handler: async ({ input: { avatar } }) => {
     // avatar: {name, mv(), mimetype, data, size, etc}
     // avatar.truncated is true on failure
@@ -774,20 +798,21 @@ you can connect your routing to the app instead of using `createServer()`.
 
 ```typescript
 import express from "express";
-import { createConfig, attachRouting } from "express-zod-api";
+import { createConfig, attachRouting, Routing } from "express-zod-api";
 
 const app = express();
 const config = createConfig({ app /* cors, logger, ... */ });
-const routing = {
-  /* ... */
-};
+const routing: Routing = {};
 
-const { notFoundHandler, logger } = attachRouting(config, routing);
+// This async IIFE is only required for the top level CommonJS
+(async () => {
+  const { notFoundHandler, logger } = await attachRouting(config, routing);
 
-app.use(notFoundHandler); // optional
-app.listen();
+  app.use(notFoundHandler); // optional
+  app.listen();
 
-logger.info("Glory to science!");
+  logger.info("Glory to science!");
+})();
 ```
 
 **Please note** that in this case you probably need to parse `request.body`, call `app.listen()` and handle `404`
@@ -989,26 +1014,36 @@ const exampleEndpoint = taggedEndpointsFactory.build({
 ## How to test endpoints
 
 The way to test endpoints is to mock the request, response, and logger objects, invoke the `execute()` method, and
-assert the expectations for calls of certain mocked methods. The library provides a special method that makes mocking
-easier, it requires `jest` (and optionally `@types/jest`) to be installed, so the test might look the following way:
+assert the expectations for calls of certain mocked methods. The library provides a special method `testEndpoint` that
+makes mocking easier. It requires you either to install `jest` (with `@types/jest`) or `vitest`
+(detects automatically), or to specify the `fnMethod` property assigned with a function mocking method of your testing
+framework, which can also be `node:test` module of most modern Node.js versions.
+However, in order to have proper mocking types in your own tests, you also need to specify `MockOverrides` once in your
+tests excplicitly, so the tests should look this way:
 
 ```typescript
 import { testEndpoint } from "express-zod-api";
+
+// place it once anywhere in your tests
+declare module "express-zod-api" {
+  interface MockOverrides extends jest.Mock {} // or Mock from vitest
+}
 
 test("should respond successfully", async () => {
   const { responseMock, loggerMock } = await testEndpoint({
     endpoint: yourEndpoint,
     requestProps: {
       method: "POST", // default: GET
-      body: { /* parsed JSON */ },
+      body: {}, // incoming data as if after parsing (JSON)
     },
+    // fnMethod — for testing frameworks other than jest or vitest
     // responseProps, configProps, loggerProps
   });
   expect(loggerMock.error).toHaveBeenCalledTimes(0);
   expect(responseMock.status).toHaveBeenCalledWith(200);
   expect(responseMock.json).toHaveBeenCalledWith({
     status: "success",
-    data: { ... },
+    data: {},
   });
 });
 ```

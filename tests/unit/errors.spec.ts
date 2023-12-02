@@ -3,6 +3,7 @@ import { DocumentationError, RoutingError } from "../../src";
 import {
   IOSchemaError,
   InputValidationError,
+  MissingPeerError,
   OutputValidationError,
   ResultHandlerError,
 } from "../../src/errors";
@@ -105,6 +106,25 @@ describe("Errors", () => {
       expect(error.originalError).toEqual(new Error("test2"));
       const error2 = new ResultHandlerError("test");
       expect(error2.originalError).toBeUndefined();
+    });
+  });
+
+  describe("MissingPeerError", () => {
+    test("should be an instance of Error", () => {
+      expect(new MissingPeerError("compression")).toBeInstanceOf(Error);
+    });
+
+    test("should have the name matching its class", () => {
+      expect(new MissingPeerError("compression").name).toBe("MissingPeerError");
+    });
+
+    test("should have a human readable message", () => {
+      expect(new MissingPeerError("compression").message).toBe(
+        "Missing peer dependency: compression. Please install it to use the feature.",
+      );
+      expect(new MissingPeerError(["jest", "vitest"]).message).toBe(
+        "Missing one of the following peer dependencies: jest | vitest. Please install it to use the feature.",
+      );
     });
   });
 });

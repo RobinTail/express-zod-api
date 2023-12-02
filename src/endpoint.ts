@@ -1,5 +1,4 @@
 import { Request, Response } from "express";
-import { Logger } from "winston";
 import { z } from "zod";
 import { ApiResponse } from "./api-response";
 import { CommonConfig } from "./config-type";
@@ -29,6 +28,7 @@ import {
   lastResortHandler,
 } from "./result-handler";
 import { Security } from "./security";
+import { AbstractLogger } from "./logger";
 
 const getMimeTypesFromApiResponse = <S extends z.ZodTypeAny>(
   subject: S | ApiResponse<S>,
@@ -44,7 +44,7 @@ const getMimeTypesFromApiResponse = <S extends z.ZodTypeAny>(
 export type Handler<IN, OUT, OPT> = (params: {
   input: IN;
   options: OPT;
-  logger: Logger;
+  logger: AbstractLogger;
 }) => Promise<OUT>;
 
 type DescriptionVariant = "short" | "long";
@@ -56,7 +56,7 @@ export abstract class AbstractEndpoint {
   public abstract execute(params: {
     request: Request;
     response: Response;
-    logger: Logger;
+    logger: AbstractLogger;
     config: CommonConfig;
   }): Promise<void>;
   public abstract getDescription(
@@ -269,7 +269,7 @@ export class Endpoint<
     input: Readonly<FlatObject>; // Issue #673: input is immutable, since this.inputSchema is combined with ones of middlewares
     request: Request;
     response: Response;
-    logger: Logger;
+    logger: AbstractLogger;
   }) {
     const options = {} as OPT;
     let isStreamClosed = false;
@@ -315,7 +315,7 @@ export class Endpoint<
   }: {
     input: Readonly<FlatObject>;
     options: OPT;
-    logger: Logger;
+    logger: AbstractLogger;
   }) {
     let finalInput: z.output<IN>; // final input types transformations for handler
     try {
@@ -346,7 +346,7 @@ export class Endpoint<
     error: Error | null;
     request: Request;
     response: Response;
-    logger: Logger;
+    logger: AbstractLogger;
     input: FlatObject;
     output: FlatObject | null;
   }) {
@@ -376,7 +376,7 @@ export class Endpoint<
   }: {
     request: Request;
     response: Response;
-    logger: Logger;
+    logger: AbstractLogger;
     config: CommonConfig;
   }) {
     const method = getActualMethod(request);

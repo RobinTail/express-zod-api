@@ -1,17 +1,12 @@
-import compression from "compression";
+import type compression from "compression";
 import { Express, Request, RequestHandler } from "express";
-import fileUpload from "express-fileupload";
+import type fileUpload from "express-fileupload";
 import { ServerOptions } from "node:https";
-import { Logger } from "winston";
 import { AbstractEndpoint } from "./endpoint";
+import { AbstractLogger, SimplifiedWinstonConfig } from "./logger";
 import { Method } from "./method";
 import { AnyResultHandlerDefinition } from "./result-handler";
 import { ListenOptions } from "node:net";
-
-export interface LoggerConfig {
-  level: "silent" | "warn" | "debug";
-  color: boolean;
-}
 
 export type InputSource = keyof Pick<
   Request,
@@ -25,7 +20,7 @@ type HeadersProvider = (params: {
   defaultHeaders: Headers;
   request: Request;
   endpoint: AbstractEndpoint;
-  logger: Logger;
+  logger: AbstractLogger;
 }) => Headers | Promise<Headers>;
 
 export type TagsConfig<TAG extends string> = Record<
@@ -46,8 +41,11 @@ export interface CommonConfig<TAG extends string = string> {
    * @see defaultResultHandler
    */
   errorHandler?: AnyResultHandlerDefinition;
-  /** @desc Logger configuration or your custom winston logger. */
-  logger: LoggerConfig | Logger;
+  /**
+   * @desc Logger configuration (winston) or instance of any other logger.
+   * @example { level: "debug", color: true }
+   * */
+  logger: SimplifiedWinstonConfig | AbstractLogger;
   /**
    * @desc You can disable the startup logo.
    * @default true
@@ -99,11 +97,13 @@ export interface ServerConfig<TAG extends string = string>
     /**
      * @desc Enable or configure uploads handling.
      * @default false
+     * @requires express-fileupload
      * */
     upload?: boolean | UploadOptions;
     /**
      * @desc Enable or configure response compression.
      * @default false
+     * @requires compression
      */
     compression?: boolean | CompressionOptions;
     /**

@@ -493,7 +493,7 @@ describe("Common Helpers", () => {
     });
   });
 
-  describe("hasCoercion", () => {
+  describe("hasCoercion()", () => {
     test.each([
       { schema: z.string(), coercion: false },
       { schema: z.coerce.string(), coercion: true },

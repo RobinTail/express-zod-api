@@ -1,5 +1,84 @@
 # Changelog
 
+## Version 15
+
+### 15.0.0
+
+- **Breaking changes**:
+  - Packages `express-fileupload` and `compression` become optional peer dependencies;
+  - Methods `createServer()` and `attachRouting()` become async;
+  - Method `createLogger()` requires an additional argument;
+  - Read the migration guide below.
+- Features:
+  - Supporting any logger having `debug()`, `warn()`, `info()` and `error()` methods;
+    - Package `winston` is now optional.
+  - Supporting any testing framework having a function mocking method for `testEndpoint()`:
+    - Both `jest` and `vitest` are supported automatically;
+    - With most modern Node.js you can also use the integrated `node:test` module.
+  - Introducing module augmentation approach for integrating chosen logger and testing framework.
+- How to migrate while maintaining previous functionality and behavior:
+  - Near your `const config` add a module augmentation statement based on `winston.Logger` type (see example below).
+  - If you have `upload` option enabled in your config:
+    - Install `express-fileupload` and `@types/express-fileupload` packages;
+  - If you have `compression` option enabled in your config:
+    - Install `compression` and `@types/compression` packages;
+  - If you're using the entities returned from `createServer()` or `attachRouting()` methods:
+    - Add `await` before calling those methods.
+    - If you can not use `await` (on the top level of CommonJS):
+      - Wrap your code with async IIFE or use `.then()` (see example below).
+  - If you're using `testEndpoint()` method:
+    - Add module augmentation statement once anywhere within your tests based on `jest.Mock` type (see example below).
+  - If you're using `createLogger()` helper:
+    - Consider using `logger` property supplied to `createConfig()` instead;
+    - Otherwise, supply also the `winston` argument to the helper (`import winston from "winston"`).
+
+```typescript
+import winston from "winston";
+import { createConfig, createLogger, createServer } from "express-zod-api";
+
+// Use the logger property of config to use Winston logger
+const config = createConfig({
+  logger: { level: "debug", color: true }, // or instance of any compatible logger
+});
+
+// If you need that pretty logger outside the API, use the existing helper instead:
+const logger = createLogger({ winston, level: "debug", color: true });
+
+// Set the type of the logger used near your configuration
+declare module "express-zod-api" {
+  interface LoggerOverrides extends winston.Logger {}
+}
+
+// if using entities returned from createServer() or attachRouting(): add "await" before it.
+// For using await on the top level CJS, wrap it in async IIFE:
+// (async () => { await ... })();
+const { app, httpServer } = await createServer(config, routing);
+```
+
+```typescript
+// Adjust your tests: set the MockOverrides type once anywhere
+declare module "express-zod-api" {
+  interface MockOverrides extends jest.Mock {} // or Mock from vitest
+}
+
+// Both jest and vitest are supported automatically
+import { testEndpoint } from "express-zod-api";
+const { responseMock } = await testEndpoint({ endpoint });
+
+// For other testing frameworks:
+
+// 1. specify fnMethod property
+import { mock, Mock } from "node:test";
+await testEndpoint({
+  endpoint,
+  fnMethod: mock.fn.bind(mock), // https://nodejs.org/docs/latest-v20.x/api/test.html#mocking
+});
+// 2. and set the MockOverrides type once
+declare module "express-zod-api" {
+  interface MockOverrides extends Mock {} // Mock of your testing framework
+}
+```
+
 ## Version 14
 
 ### v14.2.5

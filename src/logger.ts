@@ -1,12 +1,53 @@
 import { inspect } from "node:util";
 import type { Format, TransformableInfo } from "logform";
-import winston from "winston";
+import type Winston from "winston";
 import type Transport from "winston-transport";
-import { LoggerConfig } from "./config-type";
 
-const { combine, colorize, timestamp: useTimestamp, printf } = winston.format;
+/**
+ * @desc Using module augmentation approach you can set the type of the actual logger used
+ * @example declare module "express-zod-api" { interface LoggerOverrides extends winston.Logger {} }
+ * @link https://www.typescriptlang.org/docs/handbook/declaration-merging.html#module-augmentation
+ * */
+export interface LoggerOverrides {}
 
-export const createLogger = (loggerConfig: LoggerConfig): winston.Logger => {
+/** @desc You can use any logger compatible with this type. */
+export type AbstractLogger = Record<
+  "info" | "debug" | "warn" | "error",
+  (message: string, meta?: any) => any
+> &
+  LoggerOverrides;
+
+export interface SimplifiedWinstonConfig {
+  level: "silent" | "warn" | "debug";
+  color?: boolean;
+}
+
+export const isSimplifiedWinstonConfig = (
+  subject: unknown,
+): subject is SimplifiedWinstonConfig =>
+  typeof subject === "object" &&
+  subject !== null &&
+  "level" in subject &&
+  ("color" in subject ? typeof subject.color === "boolean" : true) &&
+  typeof subject.level === "string" &&
+  ["silent", "warn", "debug"].includes(subject.level);
+
+/**
+ * @desc a helper for creating a winston logger easier
+ * @requires winston
+ * @example createLogger({ winston, level: "debug", color: true })
+ * */
+export const createLogger = ({
+  winston: {
+    createLogger: create,
+    transports,
+    format: { printf, timestamp: useTimestamp, colorize, combine },
+    config: { npm },
+  },
+  ...config
+}: SimplifiedWinstonConfig & {
+  winston: typeof Winston;
+}): Winston.Logger => {
   const prettyPrint = (meta: Omit<TransformableInfo, "level" | "message">) => {
     const {
       [Symbol.for("level")]: noLevel,
@@ -14,7 +55,7 @@ export const createLogger = (loggerConfig: LoggerConfig): winston.Logger => {
       [Symbol.for("splat")]: noSplat,
       ...rest
     } = meta;
-    return inspect(rest, false, 1, loggerConfig.color);
+    return inspect(rest, false, 1, config.color);
   };
 
   const getOutputFormat = (isPretty?: boolean) =>
@@ -50,11 +91,11 @@ export const createLogger = (loggerConfig: LoggerConfig): winston.Logger => {
     handleExceptions: true,
   };
 
-  if (loggerConfig.color) {
+  if (config.color) {
     formats.push(colorize());
   }
 
-  switch (loggerConfig.level) {
+  switch (config.level) {
     case "debug":
       consoleOutputOptions.level = "debug";
       formats.push(getOutputFormat(true));
@@ -68,10 +109,10 @@ export const createLogger = (loggerConfig: LoggerConfig): winston.Logger => {
 
   consoleOutputOptions.format = combine(...formats);
 
-  return winston.createLogger({
-    silent: loggerConfig.level === "silent",
-    levels: winston.config.npm.levels,
-    transports: [new winston.transports.Console(consoleOutputOptions)],
+  return create({
+    silent: config.level === "silent",
+    levels: npm.levels,
+    transports: [new transports.Console(consoleOutputOptions)],
     exitOnError: false,
   });
 };
