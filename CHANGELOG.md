@@ -38,7 +38,7 @@ import { createConfig, createLogger, createServer } from "express-zod-api";
 
 // Use the logger property of config to use Winston logger
 const config = createConfig({
-  logger: { level: "debug", color: true },
+  logger: { level: "debug", color: true }, // or instance of any compatible logger
 });
 
 // If you need that pretty logger outside the API, use the existing helper instead:
