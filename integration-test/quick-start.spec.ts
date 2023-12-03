@@ -1,5 +1,5 @@
 import { ChildProcessWithoutNullStreams, spawn } from "node:child_process";
-import { givePort, waitFor } from "../helpers";
+import { givePort, waitFor } from "../tests/helpers";
 
 describe("Integration Test", () => {
   let quickStart: ChildProcessWithoutNullStreams;
@@ -10,9 +10,7 @@ describe("Integration Test", () => {
   const port = givePort("example");
 
   beforeAll(() => {
-    quickStart = spawn("node", ["-r", "@swc-node/register", "quick-start.ts"], {
-      cwd: "./tests/integration",
-    });
+    quickStart = spawn("node", ["-r", "@swc-node/register", "quick-start.ts"]);
     quickStart.stdout.on("data", listener);
     quickStart.stderr.on("data", listener);
   });
