@@ -8,8 +8,8 @@ import {
   createResultHandler,
   createServer,
   defaultResultHandler,
-} from "../../express-zod-api/src";
-import { givePort, waitFor } from "../helpers";
+} from "./index";
+import { givePort, waitFor } from "../../tests/helpers";
 
 describe("App", () => {
   const port = givePort();
