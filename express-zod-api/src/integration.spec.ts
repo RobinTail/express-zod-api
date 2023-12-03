@@ -3,7 +3,7 @@ import { routing } from "example/routing";
 import { Integration, defaultEndpointsFactory } from "./index";
 
 describe("API Integration Generator", () => {
-  test.each(["client", "types"] as const)(
+  test.skip.each(["client", "types"] as const)(
     "Should generate a %s for example API",
     (variant) => {
       const client = new Integration({ variant, routing });

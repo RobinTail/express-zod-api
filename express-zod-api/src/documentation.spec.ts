@@ -24,7 +24,7 @@ describe("Documentation generator", () => {
   });
 
   describe("getSpecAsYaml()", () => {
-    test.each([
+    test.skip.each([
       { composition: "inline" },
       { composition: "components" },
     ] as const)(

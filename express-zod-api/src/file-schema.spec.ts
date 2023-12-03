@@ -126,7 +126,7 @@ describe("ZodFile", () => {
 
     test("should accept binary read string", async () => {
       const schema = ZodFile.create().binary();
-      const data = await readFile("logo.svg", "binary");
+      const data = await readFile("../logo.svg", "binary");
       const result = schema.safeParse(data);
       expect(result).toEqual({
         success: true,
@@ -136,7 +136,7 @@ describe("ZodFile", () => {
 
     test("should accept base64 read string", async () => {
       const schema = ZodFile.create().base64();
-      const data = await readFile("logo.svg", "base64");
+      const data = await readFile("../logo.svg", "base64");
       const result = schema.safeParse(data);
       expect(result).toEqual({
         success: true,
