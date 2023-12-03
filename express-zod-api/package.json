@@ -25,7 +25,6 @@
     "test:jest": "jest",
     "test:badge": "make-coverage-badge --output-path ./coverage.svg",
     "tsnode": "node -r @swc-node/register",
-    "precommit": "yarn build && yarn lint && yarn test && git add example/example.swagger.yaml example/example.client.ts ./LICENSE ./coverage.svg",
     "prepublishOnly": "yarn build && yarn lint && yarn test",
     "postversion": "git push && git push --tags",
     "install_hooks": "husky install"
