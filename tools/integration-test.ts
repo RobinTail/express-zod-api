@@ -8,12 +8,9 @@ const packageJson = `
 {
   "name": "integration-test",
   "version": "1.0.0",
+  "private": true,
   "dependencies": {
-    "@tsconfig/node${tsconfigBase}": "latest",
-    "@swc/core": "^1.3.92",
-    "@swc-node/register": "^1.6.8",
-    "typescript": "^5.2.2",
-    "@types/node": "*"
+    "@tsconfig/node${tsconfigBase}": "latest"
   }
 }
 `;
