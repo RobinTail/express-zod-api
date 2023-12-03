@@ -8,7 +8,7 @@ import {
   createResultHandler,
   createServer,
   defaultResultHandler,
-} from "../../src";
+} from "../../express-zod-api/src";
 import { givePort, waitFor } from "../helpers";
 
 describe("App", () => {

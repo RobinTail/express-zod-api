@@ -6,7 +6,7 @@ import {
   Implementation,
   jsonEndpoints,
 } from "../../example/example.client";
-import { mimeMultipart } from "../../src/mime";
+import { mimeMultipart } from "../../express-zod-api/src/mime";
 import { givePort, waitFor } from "../helpers";
 import { createHash } from "node:crypto";
 import FormData from "form-data";

@@ -4,7 +4,7 @@ import {
   createResultHandler,
   defaultResultHandler,
   ez,
-} from "../src";
+} from "express-zod-api";
 import { config } from "./config";
 import { authMiddleware } from "./middlewares";
 import { createReadStream } from "node:fs";

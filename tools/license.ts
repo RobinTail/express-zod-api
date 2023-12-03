@@ -1,5 +1,5 @@
 import { writeFileSync } from "node:fs";
-import manifest from "../package.json";
+import manifest from "../express-zod-api/package.json";
 
 const ownLicense = `
 MIT License

@@ -1,6 +1,6 @@
 import jestConfig from "../jest.config.json";
 import { z } from "zod";
-import { SchemaHandler, walkSchema } from "../src/schema-walker";
+import { SchemaHandler, walkSchema } from "../express-zod-api/src/schema-walker";
 
 let lastGivenPort = 8010;
 const reservedPorts = {

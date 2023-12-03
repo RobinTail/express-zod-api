@@ -1,5 +1,5 @@
 import { writeFileSync } from "node:fs";
-import { Integration } from "../src";
+import { Integration } from "express-zod-api";
 import { routing } from "./routing";
 
 writeFileSync(

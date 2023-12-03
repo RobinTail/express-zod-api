@@ -1,6 +1,6 @@
 import createHttpError from "http-errors";
 import { z } from "zod";
-import { ez, withMeta } from "../../src";
+import { ez, withMeta } from "express-zod-api";
 import { keyAndTokenAuthenticatedEndpointsFactory } from "../factories";
 
 export const updateUserEndpoint =

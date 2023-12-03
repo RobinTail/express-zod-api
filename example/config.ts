@@ -1,5 +1,5 @@
 import express from "express";
-import { createConfig } from "../src";
+import { createConfig } from "express-zod-api";
 
 export const config = createConfig({
   server: {

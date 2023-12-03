@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { ez } from "../../src";
+import { ez } from "express-zod-api";
 import { taggedEndpointsFactory } from "../factories";
 
 export const rawAcceptingEndpoint = taggedEndpointsFactory.build({

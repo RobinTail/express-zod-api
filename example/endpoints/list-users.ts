@@ -1,5 +1,5 @@
 import z from "zod";
-import { withMeta } from "../../src";
+import { withMeta } from "express-zod-api";
 import { arrayRespondingFactory } from "../factories";
 
 /**

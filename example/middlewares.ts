@@ -1,6 +1,6 @@
 import createHttpError from "http-errors";
 import { z } from "zod";
-import { Method, createMiddleware, withMeta } from "../src";
+import { Method, createMiddleware, withMeta } from "express-zod-api";
 
 export const authMiddleware = createMiddleware({
   security: {
