@@ -17,10 +17,7 @@
     "url": "https://github.com/RobinTail/express-zod-api/issues"
   },
   "scripts": {
-    "build": "yarn build:compile && yarn build:assets",
-    "build:compile": "tsup && attw --pack",
-    "build:assets": "yarn build:license",
-    "build:license": "yarn tsnode tools/license.ts",
+    "build": "tsup && attw --pack",
     "build:logo": "yarn tsnode tools/startup-logo.ts",
     "test": "yarn test:types && yarn test:jest && yarn test:badge",
     "test:u": "yarn test:jest -u && yarn test:badge",
