@@ -9,7 +9,6 @@ integration-test/node_modules
 integration-test/yarn-error.log
 integration-test/yarn.lock
 integration-test/quick-start.ts
-integration-test/tsconfig.json
 integration-test/issue952.*
 tests/esm/node_modules
 tests/esm/yarn-error.log

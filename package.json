@@ -8,6 +8,7 @@
   "scripts": {
     "start": "yarn workspace example start",
     "build": "yarn workspace express-zod-api build",
+    "build:int": "node -r @swc-node/register tools/integration-test.ts",
     "test": "yarn workspace express-zod-api test",
     "test:int": "yarn workspace integration-test test",
     "test:952": "yarn workspace integration-test issue952"
