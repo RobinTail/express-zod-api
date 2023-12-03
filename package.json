@@ -4,7 +4,8 @@
     "express-zod-api",
     "example",
     "integration-test",
-    "esm-test"
+    "esm-test",
+    "compatibility-test"
   ],
   "scripts": {
     "start": "yarn workspace example start",
@@ -14,7 +15,8 @@
     "test": "yarn workspace express-zod-api test",
     "test:int": "yarn workspace integration-test test",
     "test:952": "yarn workspace integration-test issue952",
-    "test:esm": "yarn workspace esm-test test"
+    "test:esm": "yarn workspace esm-test test",
+    "test:compat": "yarn workspace compatibility-test test"
   },
   "devDependencies": {
     "@swc-node/register": "^1.6.8",

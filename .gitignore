@@ -12,3 +12,4 @@ integration-test/issue952.*
 esm-test/yarn-error.log
 esm-test/yarn.lock
 esm-test/quick-start.ts
+compatibility-test/yarn.lock

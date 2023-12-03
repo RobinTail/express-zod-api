@@ -1,9 +1,8 @@
-import { defaultEndpointsFactory } from "../../express-zod-api/src";
+import { defaultEndpointsFactory, testEndpoint } from "express-zod-api";
 import { Mock, describe, expect, test } from "vitest";
 import { z } from "zod";
-import { testEndpoint } from "../../express-zod-api/src";
 
-declare module "../../express-zod-api/src" {
+declare module "express-zod-api" {
   interface MockOverrides extends Mock {}
 }
 

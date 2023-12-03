@@ -17,17 +17,14 @@
     "url": "https://github.com/RobinTail/express-zod-api/issues"
   },
   "scripts": {
-    "build": "yarn build:compile && yarn build:tests && yarn build:assets",
+    "build": "yarn build:compile && yarn build:assets",
     "build:compile": "tsup && attw --pack",
-    "build:tests": "yarn build:vi",
-    "build:vi": "yarn install --cwd ./tests/vitest",
     "build:assets": "yarn build:swagger && yarn build:client && yarn build:license",
     "build:swagger": "yarn tsnode example/generate-open-api-schema.ts",
     "build:client": "yarn tsnode example/generate-client.ts && yarn prettier example/example.client.ts --write",
     "build:license": "yarn tsnode tools/license.ts",
     "build:logo": "yarn tsnode tools/startup-logo.ts",
     "test": "yarn test:types && yarn test:jest && yarn test:badge",
-    "test:vi": "yarn --cwd ./tests/vitest test",
     "test:u": "yarn test:jest -u && yarn test:badge",
     "test:types": "tsc --noEmit",
     "test:jest": "jest",
