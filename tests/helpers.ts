@@ -1,4 +1,4 @@
-import jestConfig from "../jest.config.json";
+import jestConfig from "../express-zod-api/jest.config.json";
 import { z } from "zod";
 import { SchemaHandler, walkSchema } from "../express-zod-api/src/schema-walker";
 
