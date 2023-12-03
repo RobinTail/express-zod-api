@@ -5,7 +5,7 @@ import { routing } from "./routing";
 import manifest from "./package.json";
 
 writeFileSync(
-  "example/example.swagger.yaml",
+  "example.swagger.yaml",
   new Documentation({
     routing,
     config,

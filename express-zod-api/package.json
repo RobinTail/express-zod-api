@@ -19,9 +19,7 @@
   "scripts": {
     "build": "yarn build:compile && yarn build:assets",
     "build:compile": "tsup && attw --pack",
-    "build:assets": "yarn build:swagger && yarn build:client && yarn build:license",
-    "build:swagger": "yarn tsnode example/generate-open-api-schema.ts",
-    "build:client": "yarn tsnode example/generate-client.ts && yarn prettier example/example.client.ts --write",
+    "build:assets": "yarn build:license",
     "build:license": "yarn tsnode tools/license.ts",
     "build:logo": "yarn tsnode tools/startup-logo.ts",
     "test": "yarn test:types && yarn test:jest && yarn test:badge",

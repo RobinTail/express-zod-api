@@ -10,6 +10,7 @@
   "scripts": {
     "start": "yarn workspace example start",
     "build": "yarn workspace express-zod-api build",
+    "build:assets": "yarn workspace example build",
     "build:int": "node -r @swc-node/register tools/integration-test.ts",
     "build:esm": "node -r @swc-node/register tools/esm-test.ts",
     "test": "yarn workspace express-zod-api test",
