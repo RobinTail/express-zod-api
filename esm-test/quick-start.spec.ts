@@ -1,5 +1,5 @@
 import { ChildProcessWithoutNullStreams, spawn } from "node:child_process";
-import { givePort, waitFor } from "../helpers";
+import { givePort, waitFor } from "../tests/helpers";
 
 describe("ESM Test", () => {
   let quickStart: ChildProcessWithoutNullStreams;
@@ -10,11 +10,11 @@ describe("ESM Test", () => {
   const port = givePort("esm");
 
   beforeAll(() => {
-    quickStart = spawn(
-      "node",
-      ["--loader", "@swc-node/register/esm", "quick-start.ts"],
-      { cwd: "./tests/esm" },
-    );
+    quickStart = spawn("node", [
+      "--loader",
+      "@swc-node/register/esm",
+      "quick-start.ts",
+    ]);
     quickStart.stdout.on("data", listener);
     quickStart.stderr.on("data", listener);
   });

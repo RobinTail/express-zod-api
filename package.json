@@ -3,15 +3,18 @@
   "workspaces": [
     "express-zod-api",
     "example",
-    "integration-test"
+    "integration-test",
+    "esm-test"
   ],
   "scripts": {
     "start": "yarn workspace example start",
     "build": "yarn workspace express-zod-api build",
     "build:int": "node -r @swc-node/register tools/integration-test.ts",
+    "build:esm": "node -r @swc-node/register tools/esm-test.ts",
     "test": "yarn workspace express-zod-api test",
     "test:int": "yarn workspace integration-test test",
-    "test:952": "yarn workspace integration-test issue952"
+    "test:952": "yarn workspace integration-test issue952",
+    "test:esm": "yarn workspace esm-test test"
   },
   "devDependencies": {
     "@swc-node/register": "^1.6.8",
