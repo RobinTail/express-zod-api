@@ -4,17 +4,6 @@ import { getTSConfigBase } from "./tsconfig-base";
 
 const tsconfigBase = getTSConfigBase();
 
-const packageJson = `
-{
-  "name": "integration-test",
-  "version": "1.0.0",
-  "private": true,
-  "dependencies": {
-    "@tsconfig/node${tsconfigBase}": "latest"
-  }
-}
-`;
-
 const tsConfigJson = `
 {
   "extends": "@tsconfig/node${tsconfigBase}/tsconfig.json"
@@ -27,7 +16,6 @@ const quickStart = extractReadmeQuickStart();
 const issue952 = quickStart.replace(/const/g, "export const");
 
 const dir = "./integration-test";
-writeFileSync(`${dir}/package.json`, packageJson.trim());
 writeFileSync(`${dir}/tsconfig.json`, tsConfigJson.trim());
 writeFileSync(`${dir}/quick-start.ts`, quickStart.trim());
 writeFileSync(`${dir}/issue952.ts`, issue952.trim());

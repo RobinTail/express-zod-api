@@ -8,10 +8,9 @@
   "scripts": {
     "start": "yarn workspace example start",
     "build": "yarn workspace express-zod-api build",
-    "build:int": "node -r @swc-node/register tools/integration-test.ts && yarn workspace integration-test install",
     "test": "yarn workspace express-zod-api test",
-    "test:int": "yarn workspace integration-test jest",
-    "test:952": "yarn workspace integration-test tsc -p tsconfig.issue952.json && rm integration-test/issue952.d.ts"
+    "test:int": "yarn workspace integration-test test",
+    "test:952": "yarn workspace integration-test issue952"
   },
   "devDependencies": {
     "@swc-node/register": "^1.6.8",
