@@ -26,8 +26,7 @@
     "test:badge": "make-coverage-badge --output-path ./coverage.svg",
     "tsnode": "node -r @swc-node/register",
     "prepublishOnly": "yarn build && yarn lint && yarn test",
-    "postversion": "git push && git push --tags",
-    "install_hooks": "husky install"
+    "postversion": "git push && git push --tags"
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

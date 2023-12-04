@@ -22,6 +22,7 @@
     "test:compat": "yarn workspace compatibility-test test",
     "lint": "eslint express-zod-api/src example *test && yarn prettier *.md --check",
     "mdfix": "prettier *.md --write",
+    "install_hooks": "husky install",
     "precommit": "yarn build && yarn lint && yarn test && git add example/example.swagger.yaml example/example.client.ts ./LICENSE express-zod-api/coverage.svg"
   },
   "devDependencies": {
