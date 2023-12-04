@@ -34,6 +34,7 @@
         "./example/**/*.ts",
         "./tools/*.ts",
         "./*-test/*.ts",
+        "./**/*.spec.ts",
         "./tsup.config.ts"
       ],
       "rules": {
