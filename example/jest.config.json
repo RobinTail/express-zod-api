@@ -1,8 +1,0 @@
-{
-  "transform": {
-    "^.+\\.ts$": "@swc/jest"
-  },
-  "testEnvironment": "node",
-  "verbose": true,
-  "testTimeout": 10000
-}
