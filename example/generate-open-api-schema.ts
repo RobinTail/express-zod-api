@@ -2,7 +2,7 @@ import { writeFileSync } from "node:fs";
 import { Documentation } from "express-zod-api";
 import { config } from "./config";
 import { routing } from "./routing";
-import manifest from "./package.json";
+import manifest from "../express-zod-api/package.json";
 
 writeFileSync(
   "example.swagger.yaml",
