@@ -35,11 +35,9 @@ jobs:
         key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ matrix.node-version }}-${{ hashFiles('**/yarn.lock') }}
     - name: Install dependencies
       run: yarn install
-    - name: Build
-      run: yarn build
     - name: Lint
       run: yarn lint
-    - name: Unit and system tests
+    - name: Unit tests
       run: yarn test
     - name: Coveralls
       uses: coverallsapp/github-action@v2
@@ -48,6 +46,10 @@ jobs:
         github-token: ${{ secrets.github_token }}
         flag-name: run-${{ matrix.node-version }}
         parallel: true
+    - name: Build
+      run: yarn build
+    - name: System test
+      run: yarn test:system
     - name: Compatibility test
       run: yarn test:compat
     - name: Integration test
