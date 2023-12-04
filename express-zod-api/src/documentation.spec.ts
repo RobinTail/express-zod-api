@@ -28,6 +28,7 @@ describe("Documentation generator", () => {
           v1: {
             deleteSomething: defaultEndpointsFactory.build({
               methods: ["delete"],
+              tags: ["one", "two"],
               input: z.object({}),
               output: z.object({
                 whatever: z.number(),
@@ -683,6 +684,7 @@ describe("Documentation generator", () => {
             getSome: {
               thing: defaultEndpointsFactory.build({
                 description: "thing is the path segment",
+                shortDescription: "operationIdEndpoint",
                 method: "get",
                 operationId,
                 input: z.object({}),

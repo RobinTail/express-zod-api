@@ -1255,7 +1255,7 @@ paths:
                     error:
                       message: Sample error message
       description: thing is the path segment
-      summary: thing is the path segment
+      summary: operationIdEndpoint
 components:
   schemas: {}
   responses: {}
@@ -1821,6 +1821,9 @@ paths:
                     status: error
                     error:
                       message: Sample error message
+      tags:
+        - one
+        - two
 components:
   schemas: {}
   responses: {}
