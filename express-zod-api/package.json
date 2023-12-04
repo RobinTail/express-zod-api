@@ -20,7 +20,7 @@
     "build": "tsup && attw --pack",
     "test": "yarn test:types && yarn test:jest",
     "test:types": "tsc --noEmit",
-    "test:jest": "jest",
+    "test:jest": "jest -c ../jest.config.json express-zod-api",
     "posttest": "make-coverage-badge --output-path ./coverage.svg",
     "prepublishOnly": "yarn build && yarn lint && yarn test",
     "postversion": "git push && git push --tags"

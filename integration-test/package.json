@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "test": "jest",
+    "test": "jest -c ../jest.config.json integration-test",
     "issue952": "tsc -p tsconfig.issue952.json && rm issue952.d.ts"
   }
 }

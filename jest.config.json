@@ -5,7 +5,7 @@
   "testEnvironment": "node",
   "verbose": true,
   "collectCoverage": true,
-  "collectCoverageFrom": ["src/*"],
+  "collectCoverageFrom": ["express-zod-api/src/*.ts"],
   "coverageReporters": ["json-summary", "text", "html", "lcov"],
   "testTimeout": 10000
 }
