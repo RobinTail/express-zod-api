@@ -5,14 +5,13 @@ import {
   ExpressZodAPIClient,
   Implementation,
   jsonEndpoints,
-} from "../../example/example.client";
-import { mimeMultipart } from "../../express-zod-api/src/mime";
-import { givePort, waitFor } from "../helpers";
+} from "./example.client";
+import { givePort, waitFor } from "../tests/helpers";
 import { createHash } from "node:crypto";
 import FormData from "form-data";
 import { readFile } from "node:fs/promises";
 
-describe("Example", () => {
+describe("System test for Example", () => {
   let example: ChildProcessWithoutNullStreams;
   let out = "";
   const listener = (chunk: Buffer) => {
@@ -21,7 +20,7 @@ describe("Example", () => {
   const port = givePort("example");
 
   beforeAll(() => {
-    example = spawn("node", ["-r", "@swc-node/register", "example/index.ts"]);
+    example = spawn("node", ["-r", "@swc-node/register", "index.ts"]);
     example.stdout.on("data", listener);
   });
 
@@ -186,7 +185,7 @@ describe("Example", () => {
     });
 
     test("Should upload the file", async () => {
-      const filename = "logo.svg";
+      const filename = "assets/logo.svg";
       const logo = await readFile(filename, "utf-8");
       const data = new FormData();
       data.append("avatar", logo, { filename });
@@ -200,7 +199,7 @@ describe("Example", () => {
         {
           method: "POST",
           headers: {
-            "Content-Type": `${mimeMultipart}; boundary=${data.getBoundary()}`,
+            "Content-Type": `multipart/form-data; boundary=${data.getBoundary()}`,
           },
           body: data.getBuffer().toString("utf8"),
         },
@@ -209,19 +208,19 @@ describe("Example", () => {
       expect(json).toMatchSnapshot();
     });
 
-    test.each([readFileSync("logo.svg"), createReadStream("logo.svg")])(
-      "Should accept raw data %#",
-      async (subject) => {
-        const response = await fetch(`http://localhost:${port}/v1/avatar/raw`, {
-          method: "POST",
-          body: subject,
-          headers: { "Content-Type": "application/octet-stream" },
-          duplex: Buffer.isBuffer(subject) ? undefined : "half",
-        });
-        const json = await response.json();
-        expect(json).toMatchSnapshot();
-      },
-    );
+    test.each([
+      readFileSync("assets/logo.svg"),
+      createReadStream("assets/logo.svg"),
+    ])("Should accept raw data %#", async (subject) => {
+      const response = await fetch(`http://localhost:${port}/v1/avatar/raw`, {
+        method: "POST",
+        body: subject,
+        headers: { "Content-Type": "application/octet-stream" },
+        duplex: Buffer.isBuffer(subject) ? undefined : "half",
+      });
+      const json = await response.json();
+      expect(json).toMatchSnapshot();
+    });
   });
 
   describe("Negative", () => {

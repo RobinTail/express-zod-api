@@ -18,11 +18,10 @@
   },
   "scripts": {
     "build": "tsup && attw --pack",
-    "test": "yarn test:types && yarn test:jest && yarn test:badge",
-    "test:u": "yarn test:jest -u && yarn test:badge",
+    "test": "yarn test:types && yarn test:jest",
     "test:types": "tsc --noEmit",
     "test:jest": "jest",
-    "test:badge": "make-coverage-badge --output-path ./coverage.svg",
+    "posttest": "make-coverage-badge --output-path ./coverage.svg",
     "prepublishOnly": "yarn build && yarn lint && yarn test",
     "postversion": "git push && git push --tags"
   },

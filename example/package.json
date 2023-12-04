@@ -6,6 +6,7 @@
     "start": "node -r @swc-node/register index.ts",
     "build": "yarn build:swagger && yarn build:client",
     "build:swagger": "node -r @swc-node/register generate-open-api-schema.ts",
-    "build:client": "node -r @swc-node/register generate-client.ts && yarn prettier example.client.ts --write"
+    "build:client": "node -r @swc-node/register generate-client.ts && yarn prettier example.client.ts --write",
+    "test": "jest"
   }
 }
