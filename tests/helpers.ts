@@ -1,5 +1,3 @@
-import jestConfig from "../express-zod-api/jest.config.json";
-
 let lastGivenPort = 8010;
 const reservedPorts = {
   esm: 8070,
@@ -20,7 +18,7 @@ export const waitFor = async (cb: () => boolean) =>
     const timeout = setTimeout(() => {
       clearInterval(timer); // eslint-disable-line @typescript-eslint/no-use-before-define
       reject();
-    }, jestConfig.testTimeout);
+    }, 10000);
     const timer = setInterval(() => {
       if (cb()) {
         clearInterval(timer);
