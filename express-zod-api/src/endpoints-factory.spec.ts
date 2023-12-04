@@ -1,6 +1,7 @@
 import { Request, RequestHandler, Response } from "express";
 import createHttpError, { HttpError } from "http-errors";
 import { Logger } from "winston";
+import { serializeSchema } from "../helpers/serializer";
 import {
   EndpointsFactory,
   createMiddleware,
@@ -9,7 +10,6 @@ import {
 } from "./index";
 import { Endpoint } from "./endpoint";
 import { expectType } from "tsd";
-import { serializeSchemaForTest } from "../../tests/helpers";
 import { z } from "zod";
 
 describe("EndpointsFactory", () => {
@@ -294,12 +294,8 @@ describe("EndpointsFactory", () => {
       });
       expect(endpoint).toBeInstanceOf(Endpoint);
       expect(endpoint.getMethods()).toStrictEqual(["get"]);
-      expect(
-        serializeSchemaForTest(endpoint.getSchema("input")),
-      ).toMatchSnapshot();
-      expect(
-        serializeSchemaForTest(endpoint.getSchema("output")),
-      ).toMatchSnapshot();
+      expect(serializeSchema(endpoint.getSchema("input"))).toMatchSnapshot();
+      expect(serializeSchema(endpoint.getSchema("output"))).toMatchSnapshot();
       expectType<
         z.ZodIntersection<
           z.ZodObject<{ n: z.ZodNumber }>,
@@ -338,12 +334,8 @@ describe("EndpointsFactory", () => {
         }),
         handler: jest.fn(),
       });
-      expect(
-        serializeSchemaForTest(endpoint.getSchema("input")),
-      ).toMatchSnapshot();
-      expect(
-        serializeSchemaForTest(endpoint.getSchema("output")),
-      ).toMatchSnapshot();
+      expect(serializeSchema(endpoint.getSchema("input"))).toMatchSnapshot();
+      expect(serializeSchema(endpoint.getSchema("output"))).toMatchSnapshot();
       expectType<
         z.ZodIntersection<
           z.ZodEffects<
@@ -391,12 +383,8 @@ describe("EndpointsFactory", () => {
       });
       expect(endpoint).toBeInstanceOf(Endpoint);
       expect(endpoint.getMethods()).toStrictEqual(["get"]);
-      expect(
-        serializeSchemaForTest(endpoint.getSchema("input")),
-      ).toMatchSnapshot();
-      expect(
-        serializeSchemaForTest(endpoint.getSchema("output")),
-      ).toMatchSnapshot();
+      expect(serializeSchema(endpoint.getSchema("input"))).toMatchSnapshot();
+      expect(serializeSchema(endpoint.getSchema("output"))).toMatchSnapshot();
       expectType<
         z.ZodIntersection<
           z.ZodIntersection<
@@ -445,12 +433,8 @@ describe("EndpointsFactory", () => {
       });
       expect(endpoint).toBeInstanceOf(Endpoint);
       expect(endpoint.getMethods()).toStrictEqual(["get"]);
-      expect(
-        serializeSchemaForTest(endpoint.getSchema("input")),
-      ).toMatchSnapshot();
-      expect(
-        serializeSchemaForTest(endpoint.getSchema("output")),
-      ).toMatchSnapshot();
+      expect(serializeSchema(endpoint.getSchema("input"))).toMatchSnapshot();
+      expect(serializeSchema(endpoint.getSchema("output"))).toMatchSnapshot();
       expectType<
         z.ZodIntersection<
           z.ZodUnion<

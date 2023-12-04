@@ -7,12 +7,12 @@ import {
   expressJsonMock,
   expressMock,
   fileUploadMock,
-} from "../mocks/express-mock";
+} from "../helpers/express-mock";
 import {
   createHttpsServerSpy,
   httpListenSpy,
   httpsListenSpy,
-} from "../mocks/http-mock";
+} from "../helpers/http-mock";
 import winston from "winston";
 import { z } from "zod";
 import {

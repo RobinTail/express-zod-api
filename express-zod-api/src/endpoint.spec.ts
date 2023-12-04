@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { serializeSchema } from "../helpers/serializer";
 import {
   EndpointsFactory,
   createMiddleware,
@@ -10,7 +11,6 @@ import {
 } from "./index";
 import { Endpoint } from "./endpoint";
 import { IOSchemaError } from "./errors";
-import { serializeSchemaForTest } from "../../tests/helpers";
 
 describe("Endpoint", () => {
   describe(".getMethods()", () => {
@@ -348,9 +348,7 @@ describe("Endpoint", () => {
         output,
         handler: jest.fn(),
       });
-      expect(
-        serializeSchemaForTest(endpoint.getSchema("positive")),
-      ).toMatchSnapshot();
+      expect(serializeSchema(endpoint.getSchema("positive"))).toMatchSnapshot();
     });
   });
 
@@ -366,9 +364,7 @@ describe("Endpoint", () => {
         output,
         handler: jest.fn(),
       });
-      expect(
-        serializeSchemaForTest(endpoint.getSchema("negative")),
-      ).toMatchSnapshot();
+      expect(serializeSchema(endpoint.getSchema("negative"))).toMatchSnapshot();
     });
   });
 

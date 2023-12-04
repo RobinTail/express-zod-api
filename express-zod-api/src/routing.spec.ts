@@ -1,4 +1,4 @@
-import { staticHandler, staticMock } from "../mocks/express-mock";
+import { staticHandler, staticMock } from "../helpers/express-mock";
 import { Logger } from "winston";
 import { z } from "zod";
 import {

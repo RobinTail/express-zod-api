@@ -1,5 +1,6 @@
 import { ReferenceObject, SchemaObject } from "openapi3-ts/oas30";
 import { z } from "zod";
+import { serializeSchema } from "../helpers/serializer";
 import { defaultSerializer } from "./common-helpers";
 import { IOSchemaError } from "./errors";
 import {
@@ -58,7 +59,6 @@ import {
   reformatParamsInPath,
 } from "./documentation-helpers";
 import { SchemaHandler, walkSchema } from "./schema-walker";
-import { serializeSchemaForTest } from "../../tests/helpers";
 
 describe("Documentation helpers", () => {
   const getRefMock = jest.fn();
@@ -141,7 +141,7 @@ describe("Documentation helpers", () => {
         requestCtx,
       );
       expect(subject).toBeInstanceOf(z.ZodObject);
-      expect(serializeSchemaForTest(subject)).toMatchSnapshot();
+      expect(serializeSchema(subject)).toMatchSnapshot();
     });
 
     test("should return object schema for the union of object schemas", () => {
@@ -150,7 +150,7 @@ describe("Documentation helpers", () => {
         requestCtx,
       );
       expect(subject).toBeInstanceOf(z.ZodObject);
-      expect(serializeSchemaForTest(subject)).toMatchSnapshot();
+      expect(serializeSchema(subject)).toMatchSnapshot();
     });
 
     test("should return object schema for the intersection of object schemas", () => {
@@ -159,7 +159,7 @@ describe("Documentation helpers", () => {
         requestCtx,
       );
       expect(subject).toBeInstanceOf(z.ZodObject);
-      expect(serializeSchemaForTest(subject)).toMatchSnapshot();
+      expect(serializeSchema(subject)).toMatchSnapshot();
     });
 
     test("should preserve examples", () => {
@@ -204,7 +204,7 @@ describe("Documentation helpers", () => {
           requestCtx,
         );
         expect(subject).toBeInstanceOf(z.ZodObject);
-        expect(serializeSchemaForTest(subject)).toMatchSnapshot();
+        expect(serializeSchema(subject)).toMatchSnapshot();
       });
 
       test("should throw when using transformation", () => {
