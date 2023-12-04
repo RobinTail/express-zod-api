@@ -31,9 +31,9 @@
   "overrides": [
     {
       "files": [
+        "./example/**/*.ts",
         "./tools/*.ts",
-        "./tests/**/*.ts",
-        "./eslint-local-rules/*.*s",
+        "./*-test/*.ts",
         "./tsup.config.ts"
       ],
       "rules": {
