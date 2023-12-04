@@ -1,16 +1,7 @@
 import { z } from "zod";
-import { routing } from "example/routing";
 import { Integration, defaultEndpointsFactory } from "./index";
 
 describe("API Integration Generator", () => {
-  test.skip.each(["client", "types"] as const)(
-    "Should generate a %s for example API",
-    (variant) => {
-      const client = new Integration({ variant, routing });
-      expect(client.print()).toMatchSnapshot();
-    },
-  );
-
   test("Should treat optionals the same way as z.infer() by default", () => {
     const client = new Integration({
       routing: {

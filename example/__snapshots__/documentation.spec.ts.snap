@@ -1,0 +1,1045 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`System test for Documentation should generate the correct schema of example routing 0 1`] = `
+"openapi: 3.0.0
+info:
+  title: Example API
+  version: 1.2.3
+paths:
+  /v1/user/retrieve:
+    get:
+      operationId: GetV1UserRetrieve
+      responses:
+        "200":
+          description: GET /v1/user/retrieve Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - success
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        format: int64
+                        minimum: 0
+                        exclusiveMinimum: false
+                        maximum: 9007199254740991
+                        exclusiveMaximum: false
+                      name:
+                        type: string
+                      features:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            title:
+                              type: string
+                            features:
+                              $ref: "#/components/schemas/2048581c137c5b2130eb860e3ae37da196dfc25b"
+                          required:
+                            - title
+                            - features
+                    required:
+                      - id
+                      - name
+                      - features
+                required:
+                  - status
+                  - data
+        "400":
+          description: GET /v1/user/retrieve Error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                required:
+                  - status
+                  - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
+      description: Example user retrieval endpoint.
+      summary: Retrieves the user.
+      tags:
+        - users
+      parameters:
+        - name: id
+          in: query
+          required: true
+          description: a numeric string containing the id of the user
+          schema:
+            type: string
+            pattern: /\\d+/
+            description: a numeric string containing the id of the user
+  /v1/user/{id}:
+    post:
+      operationId: PostV1UserId
+      responses:
+        "200":
+          description: POST /v1/user/:id Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - success
+                  data:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                      createdAt:
+                        description: YYYY-MM-DDTHH:mm:ss.sssZ
+                        type: string
+                        format: date-time
+                        externalDocs:
+                          url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
+                    required:
+                      - name
+                      - createdAt
+                    example:
+                      name: John Doe
+                      createdAt: 2021-12-31T00:00:00.000Z
+                required:
+                  - status
+                  - data
+              examples:
+                example1:
+                  value:
+                    status: success
+                    data:
+                      name: John Doe
+                      createdAt: 2021-12-31T00:00:00.000Z
+        "400":
+          description: POST /v1/user/:id Error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                required:
+                  - status
+                  - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
+      description: Changes the user record. Example user update endpoint.
+      summary: Changes the user record. Example user update endp…
+      tags:
+        - users
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: POST /v1/user/:id parameter
+          schema:
+            type: string
+          examples:
+            example1:
+              value: "12"
+      requestBody:
+        description: POST /v1/user/:id request body
+        content:
+          application/json:
+            schema:
+              allOf:
+                - type: object
+                  properties:
+                    key:
+                      type: string
+                      minLength: 1
+                  required:
+                    - key
+                  example:
+                    key: 1234-5678-90
+                - type: object
+                  properties:
+                    name:
+                      type: string
+                      minLength: 1
+                    birthday:
+                      description: YYYY-MM-DDTHH:mm:ss.sssZ
+                      type: string
+                      format: date-time
+                      pattern: ^\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?)?Z?$
+                      externalDocs:
+                        url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
+                  required:
+                    - name
+                    - birthday
+                  example:
+                    name: John Doe
+                    birthday: 1963-04-21
+            examples:
+              example1:
+                value:
+                  key: 1234-5678-90
+                  name: John Doe
+                  birthday: 1963-04-21
+      security:
+        - APIKEY_1: []
+          APIKEY_2: []
+  /v1/user/list:
+    get:
+      operationId: GetV1UserList
+      responses:
+        "200":
+          description: GET /v1/user/list Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                  required:
+                    - name
+              examples:
+                example1:
+                  value:
+                    - name: Hunter Schafer
+                    - name: Laverne Cox
+                    - name: Patti Harrison
+        "400":
+          description: GET /v1/user/list Error response
+          content:
+            application/json:
+              schema:
+                type: string
+              examples:
+                example1:
+                  value: Sample error message
+      tags:
+        - users
+  /v1/avatar/send:
+    get:
+      operationId: GetV1AvatarSend
+      responses:
+        "200":
+          description: GET /v1/avatar/send Successful response
+          content:
+            image/svg+xml:
+              schema:
+                type: string
+        "400":
+          description: GET /v1/avatar/send Error response
+          content:
+            text/plain:
+              schema:
+                type: string
+      summary: Sends a file content.
+      tags:
+        - files
+        - users
+      parameters:
+        - name: userId
+          in: query
+          required: true
+          description: GET /v1/avatar/send parameter
+          schema:
+            type: string
+            pattern: /\\d+/
+  /v1/avatar/stream:
+    get:
+      operationId: GetV1AvatarStream
+      responses:
+        "200":
+          description: GET /v1/avatar/stream Successful response
+          content:
+            image/*:
+              schema:
+                type: string
+                format: binary
+        "400":
+          description: GET /v1/avatar/stream Error response
+          content:
+            text/plain:
+              schema:
+                type: string
+      summary: Streams a file content.
+      tags:
+        - users
+        - files
+      parameters:
+        - name: userId
+          in: query
+          required: true
+          description: GET /v1/avatar/stream parameter
+          schema:
+            type: string
+            pattern: /\\d+/
+  /v1/avatar/upload:
+    post:
+      operationId: PostV1AvatarUpload
+      responses:
+        "200":
+          description: POST /v1/avatar/upload Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - success
+                  data:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                      size:
+                        type: integer
+                        format: int64
+                        minimum: 0
+                        exclusiveMinimum: false
+                        maximum: 9007199254740991
+                        exclusiveMaximum: false
+                      mime:
+                        type: string
+                      hash:
+                        type: string
+                      otherInputs:
+                        type: object
+                        additionalProperties:
+                          format: any
+                    required:
+                      - name
+                      - size
+                      - mime
+                      - hash
+                      - otherInputs
+                required:
+                  - status
+                  - data
+        "400":
+          description: POST /v1/avatar/upload Error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                required:
+                  - status
+                  - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
+      description: Handles a file upload.
+      summary: Handles a file upload.
+      tags:
+        - files
+      requestBody:
+        description: POST /v1/avatar/upload request body
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                avatar:
+                  type: string
+                  format: binary
+              required:
+                - avatar
+  /v1/avatar/raw:
+    post:
+      operationId: PostV1AvatarRaw
+      responses:
+        "200":
+          description: POST /v1/avatar/raw Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - success
+                  data:
+                    type: object
+                    properties:
+                      length:
+                        type: integer
+                        format: int64
+                        minimum: 0
+                        exclusiveMinimum: false
+                        maximum: 9007199254740991
+                        exclusiveMaximum: false
+                    required:
+                      - length
+                required:
+                  - status
+                  - data
+        "400":
+          description: POST /v1/avatar/raw Error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                required:
+                  - status
+                  - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
+      tags:
+        - files
+      requestBody:
+        description: POST /v1/avatar/raw request body
+        content:
+          application/octet-stream:
+            schema:
+              type: string
+              format: binary
+components:
+  schemas:
+    2048581c137c5b2130eb860e3ae37da196dfc25b:
+      type: array
+      items:
+        type: object
+        properties:
+          title:
+            type: string
+          features:
+            $ref: "#/components/schemas/2048581c137c5b2130eb860e3ae37da196dfc25b"
+        required:
+          - title
+          - features
+  responses: {}
+  parameters: {}
+  examples: {}
+  requestBodies: {}
+  headers: {}
+  securitySchemes:
+    APIKEY_1:
+      type: apiKey
+      in: query
+      name: key
+    APIKEY_2:
+      type: apiKey
+      in: header
+      name: token
+  links: {}
+  callbacks: {}
+tags:
+  - name: users
+    description: Everything about the users
+  - name: files
+    description: Everything about the files processing
+servers:
+  - url: https://example.com
+"
+`;
+
+exports[`System test for Documentation should generate the correct schema of example routing 1 1`] = `
+"openapi: 3.0.0
+info:
+  title: Example API
+  version: 1.2.3
+paths:
+  /v1/user/retrieve:
+    get:
+      operationId: GetV1UserRetrieve
+      responses:
+        "200":
+          description: GET /v1/user/retrieve Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetV1UserRetrieveSuccessfulResponse"
+        "400":
+          description: GET /v1/user/retrieve Error response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetV1UserRetrieveErrorResponse"
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
+      description: Example user retrieval endpoint.
+      summary: Retrieves the user.
+      tags:
+        - users
+      parameters:
+        - name: id
+          in: query
+          required: true
+          description: a numeric string containing the id of the user
+          schema:
+            $ref: "#/components/schemas/GetV1UserRetrieveParameterId"
+  /v1/user/{id}:
+    post:
+      operationId: PostV1UserId
+      responses:
+        "200":
+          description: POST /v1/user/:id Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PostV1UserIdSuccessfulResponse"
+              examples:
+                example1:
+                  value:
+                    status: success
+                    data:
+                      name: John Doe
+                      createdAt: 2021-12-31T00:00:00.000Z
+        "400":
+          description: POST /v1/user/:id Error response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PostV1UserIdErrorResponse"
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
+      description: Changes the user record. Example user update endpoint.
+      summary: Changes the user record. Example user update endp…
+      tags:
+        - users
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: POST /v1/user/:id parameter
+          schema:
+            $ref: "#/components/schemas/PostV1UserIdParameterId"
+          examples:
+            example1:
+              value: "12"
+      requestBody:
+        description: POST /v1/user/:id request body
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PostV1UserIdRequestBody"
+            examples:
+              example1:
+                value:
+                  key: 1234-5678-90
+                  name: John Doe
+                  birthday: 1963-04-21
+      security:
+        - APIKEY_1: []
+          APIKEY_2: []
+  /v1/user/list:
+    get:
+      operationId: GetV1UserList
+      responses:
+        "200":
+          description: GET /v1/user/list Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetV1UserListSuccessfulResponse"
+              examples:
+                example1:
+                  value:
+                    - name: Hunter Schafer
+                    - name: Laverne Cox
+                    - name: Patti Harrison
+        "400":
+          description: GET /v1/user/list Error response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetV1UserListErrorResponse"
+              examples:
+                example1:
+                  value: Sample error message
+      tags:
+        - users
+  /v1/avatar/send:
+    get:
+      operationId: GetV1AvatarSend
+      responses:
+        "200":
+          description: GET /v1/avatar/send Successful response
+          content:
+            image/svg+xml:
+              schema:
+                $ref: "#/components/schemas/GetV1AvatarSendSuccessfulResponse"
+        "400":
+          description: GET /v1/avatar/send Error response
+          content:
+            text/plain:
+              schema:
+                $ref: "#/components/schemas/GetV1AvatarSendErrorResponse"
+      summary: Sends a file content.
+      tags:
+        - files
+        - users
+      parameters:
+        - name: userId
+          in: query
+          required: true
+          description: GET /v1/avatar/send parameter
+          schema:
+            $ref: "#/components/schemas/GetV1AvatarSendParameterUserid"
+  /v1/avatar/stream:
+    get:
+      operationId: GetV1AvatarStream
+      responses:
+        "200":
+          description: GET /v1/avatar/stream Successful response
+          content:
+            image/*:
+              schema:
+                $ref: "#/components/schemas/GetV1AvatarStreamSuccessfulResponse"
+        "400":
+          description: GET /v1/avatar/stream Error response
+          content:
+            text/plain:
+              schema:
+                $ref: "#/components/schemas/GetV1AvatarStreamErrorResponse"
+      summary: Streams a file content.
+      tags:
+        - users
+        - files
+      parameters:
+        - name: userId
+          in: query
+          required: true
+          description: GET /v1/avatar/stream parameter
+          schema:
+            $ref: "#/components/schemas/GetV1AvatarStreamParameterUserid"
+  /v1/avatar/upload:
+    post:
+      operationId: PostV1AvatarUpload
+      responses:
+        "200":
+          description: POST /v1/avatar/upload Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PostV1AvatarUploadSuccessfulResponse"
+        "400":
+          description: POST /v1/avatar/upload Error response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PostV1AvatarUploadErrorResponse"
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
+      description: Handles a file upload.
+      summary: Handles a file upload.
+      tags:
+        - files
+      requestBody:
+        description: POST /v1/avatar/upload request body
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/PostV1AvatarUploadRequestBody"
+  /v1/avatar/raw:
+    post:
+      operationId: PostV1AvatarRaw
+      responses:
+        "200":
+          description: POST /v1/avatar/raw Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PostV1AvatarRawSuccessfulResponse"
+        "400":
+          description: POST /v1/avatar/raw Error response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PostV1AvatarRawErrorResponse"
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
+      tags:
+        - files
+      requestBody:
+        description: POST /v1/avatar/raw request body
+        content:
+          application/octet-stream:
+            schema:
+              $ref: "#/components/schemas/PostV1AvatarRawRequestBody"
+components:
+  schemas:
+    GetV1UserRetrieveParameterId:
+      type: string
+      pattern: /\\d+/
+      description: a numeric string containing the id of the user
+    2048581c137c5b2130eb860e3ae37da196dfc25b:
+      type: array
+      items:
+        type: object
+        properties:
+          title:
+            type: string
+          features:
+            $ref: "#/components/schemas/2048581c137c5b2130eb860e3ae37da196dfc25b"
+        required:
+          - title
+          - features
+    GetV1UserRetrieveSuccessfulResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+            - success
+        data:
+          type: object
+          properties:
+            id:
+              type: integer
+              format: int64
+              minimum: 0
+              exclusiveMinimum: false
+              maximum: 9007199254740991
+              exclusiveMaximum: false
+            name:
+              type: string
+            features:
+              type: array
+              items:
+                type: object
+                properties:
+                  title:
+                    type: string
+                  features:
+                    $ref: "#/components/schemas/2048581c137c5b2130eb860e3ae37da196dfc25b"
+                required:
+                  - title
+                  - features
+          required:
+            - id
+            - name
+            - features
+      required:
+        - status
+        - data
+    GetV1UserRetrieveErrorResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+            - error
+        error:
+          type: object
+          properties:
+            message:
+              type: string
+          required:
+            - message
+      required:
+        - status
+        - error
+    PostV1UserIdParameterId:
+      type: string
+    PostV1UserIdSuccessfulResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+            - success
+        data:
+          type: object
+          properties:
+            name:
+              type: string
+            createdAt:
+              description: YYYY-MM-DDTHH:mm:ss.sssZ
+              type: string
+              format: date-time
+              externalDocs:
+                url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
+          required:
+            - name
+            - createdAt
+          example:
+            name: John Doe
+            createdAt: 2021-12-31T00:00:00.000Z
+      required:
+        - status
+        - data
+    PostV1UserIdErrorResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+            - error
+        error:
+          type: object
+          properties:
+            message:
+              type: string
+          required:
+            - message
+      required:
+        - status
+        - error
+    PostV1UserIdRequestBody:
+      allOf:
+        - type: object
+          properties:
+            key:
+              type: string
+              minLength: 1
+          required:
+            - key
+          example:
+            key: 1234-5678-90
+        - type: object
+          properties:
+            name:
+              type: string
+              minLength: 1
+            birthday:
+              description: YYYY-MM-DDTHH:mm:ss.sssZ
+              type: string
+              format: date-time
+              pattern: ^\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?)?Z?$
+              externalDocs:
+                url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
+          required:
+            - name
+            - birthday
+          example:
+            name: John Doe
+            birthday: 1963-04-21
+    GetV1UserListSuccessfulResponse:
+      type: array
+      items:
+        type: object
+        properties:
+          name:
+            type: string
+        required:
+          - name
+    GetV1UserListErrorResponse:
+      type: string
+    GetV1AvatarSendParameterUserid:
+      type: string
+      pattern: /\\d+/
+    GetV1AvatarSendSuccessfulResponse:
+      type: string
+    GetV1AvatarSendErrorResponse:
+      type: string
+    GetV1AvatarStreamParameterUserid:
+      type: string
+      pattern: /\\d+/
+    GetV1AvatarStreamSuccessfulResponse:
+      type: string
+      format: binary
+    GetV1AvatarStreamErrorResponse:
+      type: string
+    PostV1AvatarUploadSuccessfulResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+            - success
+        data:
+          type: object
+          properties:
+            name:
+              type: string
+            size:
+              type: integer
+              format: int64
+              minimum: 0
+              exclusiveMinimum: false
+              maximum: 9007199254740991
+              exclusiveMaximum: false
+            mime:
+              type: string
+            hash:
+              type: string
+            otherInputs:
+              type: object
+              additionalProperties:
+                format: any
+          required:
+            - name
+            - size
+            - mime
+            - hash
+            - otherInputs
+      required:
+        - status
+        - data
+    PostV1AvatarUploadErrorResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+            - error
+        error:
+          type: object
+          properties:
+            message:
+              type: string
+          required:
+            - message
+      required:
+        - status
+        - error
+    PostV1AvatarUploadRequestBody:
+      type: object
+      properties:
+        avatar:
+          type: string
+          format: binary
+      required:
+        - avatar
+    PostV1AvatarRawSuccessfulResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+            - success
+        data:
+          type: object
+          properties:
+            length:
+              type: integer
+              format: int64
+              minimum: 0
+              exclusiveMinimum: false
+              maximum: 9007199254740991
+              exclusiveMaximum: false
+          required:
+            - length
+      required:
+        - status
+        - data
+    PostV1AvatarRawErrorResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+            - error
+        error:
+          type: object
+          properties:
+            message:
+              type: string
+          required:
+            - message
+      required:
+        - status
+        - error
+    PostV1AvatarRawRequestBody:
+      type: string
+      format: binary
+  responses: {}
+  parameters: {}
+  examples: {}
+  requestBodies: {}
+  headers: {}
+  securitySchemes:
+    APIKEY_1:
+      type: apiKey
+      in: query
+      name: key
+    APIKEY_2:
+      type: apiKey
+      in: header
+      name: token
+  links: {}
+  callbacks: {}
+tags:
+  - name: users
+    description: Everything about the users
+  - name: files
+    description: Everything about the files processing
+servers:
+  - url: https://example.com
+"
+`;
