@@ -9,7 +9,7 @@ import {
   createServer,
   defaultResultHandler,
 } from "./index";
-import { givePort, waitFor } from "../../tests/helpers";
+import { givePort, waitFor } from "tools/testing";
 
 describe("App", () => {
   const port = givePort();

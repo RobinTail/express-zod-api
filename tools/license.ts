@@ -25,4 +25,4 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 `;
 
-writeFileSync("LICENSE", ownLicense.trimStart(), "utf-8");
+writeFileSync("../LICENSE", ownLicense.trimStart(), "utf-8");

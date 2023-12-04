@@ -6,7 +6,7 @@ import {
   Implementation,
   jsonEndpoints,
 } from "./example.client";
-import { givePort, waitFor } from "../tests/helpers";
+import { givePort, waitFor } from "tools/testing";
 import { createHash } from "node:crypto";
 import FormData from "form-data";
 import { readFile } from "node:fs/promises";

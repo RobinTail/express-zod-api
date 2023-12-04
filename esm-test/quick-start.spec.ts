@@ -1,5 +1,5 @@
 import { ChildProcessWithoutNullStreams, spawn } from "node:child_process";
-import { givePort, waitFor } from "../tests/helpers";
+import { givePort, waitFor } from "tools/testing";
 
 describe("ESM Test", () => {
   let quickStart: ChildProcessWithoutNullStreams;

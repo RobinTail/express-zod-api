@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 
 export const extractReadmeQuickStart = () => {
-  const readme = readFileSync("README.md", "utf-8");
+  const readme = readFileSync("../README.md", "utf-8");
   const quickStartSection = readme.match(/# Quick start(.+?)\n#\s[A-Z]+/s);
 
   if (!quickStartSection) {

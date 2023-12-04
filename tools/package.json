@@ -1,0 +1,12 @@
+{
+  "name": "tools",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "build:tests": "yarn build:int && yarn build:esm",
+    "build:int": "node -r @swc-node/register integration-test.ts",
+    "build:esm": "node -r @swc-node/register esm-test.ts",
+    "build:logo": "node -r @swc-node/register startup-logo.ts",
+    "build:license": "node -r @swc-node/register license.ts"
+  }
+}

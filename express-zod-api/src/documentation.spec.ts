@@ -12,7 +12,7 @@ import {
 import { expectType } from "tsd";
 import { mimeJson } from "./mime";
 import { z } from "zod";
-import { givePort } from "../../tests/helpers";
+import { givePort } from "tools/testing";
 
 describe("Documentation generator", () => {
   const sampleConfig = createConfig({

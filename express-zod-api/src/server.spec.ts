@@ -1,6 +1,6 @@
 import { omit } from "ramda";
 import { makeRequestMock } from "./testing";
-import { givePort } from "../../tests/helpers";
+import { givePort } from "tools/testing";
 import {
   appMock,
   compressionMock,

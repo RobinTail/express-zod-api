@@ -3,6 +3,7 @@ const reservedPorts = {
   esm: 8070,
   example: 8090,
 };
+
 export const givePort = (test?: keyof typeof reservedPorts) => {
   if (test && reservedPorts[test]) {
     return reservedPorts[test];
@@ -27,4 +28,3 @@ export const waitFor = async (cb: () => boolean) =>
       }
     }, 100);
   });
-
