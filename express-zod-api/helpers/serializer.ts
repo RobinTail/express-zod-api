@@ -66,6 +66,10 @@ export const serializeSchema = (schema: z.ZodTypeAny): Record<string, any> => {
         from: next({ schema: subject._def.in }),
         to: next({ schema: subject._def.out }),
       }),
+      ZodFile: ({ schema: subject }) => ({
+        encoding: subject._def.encoding,
+        type: subject.isBuffer ? "buffer" : "string",
+      }),
     },
     onEach: ({ schema: subject }) => ({ _type: subject._def.typeName }),
     onMissing: ({ schema: subject }) => {

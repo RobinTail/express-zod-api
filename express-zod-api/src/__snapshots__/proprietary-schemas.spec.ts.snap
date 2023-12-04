@@ -1,0 +1,14 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Proprietary schemas ez.raw() Should an alias to ZodObject with raw:file 1`] = `
+{
+  "_type": "ZodObject",
+  "shape": {
+    "raw": {
+      "_type": "ZodFile",
+      "encoding": undefined,
+      "type": "buffer",
+    },
+  },
+}
+`;
