@@ -1,6 +1,21 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`zod-to-ts Example should produce the expected results 1`] = `
+exports[`zod-to-ts PrimitiveSchema outputs correct typescript 1`] = `
+"{
+    string: string;
+    number: number;
+    boolean: boolean;
+    date: any;
+    undefined?: any;
+    null: null;
+    void?: any;
+    any?: any;
+    unknown?: any;
+    never: any;
+}"
+`;
+
+exports[`zod-to-ts Varieties should produce the expected results 1`] = `
 "{
     string: string;
     number: number;
@@ -71,21 +86,8 @@ exports[`zod-to-ts Example should produce the expected results 1`] = `
     catch?: number;
     pipeline: string;
     readonly: string;
-}"
-`;
-
-exports[`zod-to-ts PrimitiveSchema outputs correct typescript 1`] = `
-"{
-    string: string;
-    number: number;
-    boolean: boolean;
-    date: any;
-    undefined?: any;
-    null: null;
-    void?: any;
-    any?: any;
-    unknown?: any;
-    never: any;
+    binaryFile: string;
+    buffer: Buffer;
 }"
 `;
 

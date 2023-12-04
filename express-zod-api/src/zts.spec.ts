@@ -30,6 +30,7 @@ import { f } from "./integration-helpers";
 import { defaultSerializer } from "./common-helpers";
 import { zodToTs } from "./zts";
 import { ZTSContext, createTypeAlias, printNode } from "./zts-helpers";
+import { file } from "./proprietary-schemas";
 
 describe("zod-to-ts", () => {
   const printNodeTest = (node: ts.Node) =>
@@ -103,7 +104,7 @@ describe("zod-to-ts", () => {
     });
   });
 
-  describe("Example", () => {
+  describe("Varieties", () => {
     // noinspection JSUnusedGlobalSymbols
     enum Fruits {
       Apple = "apple",
@@ -130,7 +131,7 @@ describe("zod-to-ts", () => {
       }),
     );
 
-    const example = z.object({
+    const varieties = z.object({
       string: z.string(),
       number: z.number(),
       arrayOfObjects: z.array(
@@ -198,11 +199,13 @@ describe("zod-to-ts", () => {
       catch: z.number().catch(123),
       pipeline: z.string().regex(/\d+/).pipe(z.coerce.number()),
       readonly: z.string().readonly(),
+      binaryFile: file().binary(),
+      buffer: file().buffer(),
     });
 
     it("should produce the expected results", () => {
       const node = zodToTs({
-        schema: example,
+        schema: varieties,
         ...defaultCtx,
       });
       expect(printNode(node)).toMatchSnapshot();
