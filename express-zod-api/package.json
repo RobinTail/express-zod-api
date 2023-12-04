@@ -18,13 +18,11 @@
   },
   "scripts": {
     "build": "tsup && attw --pack",
-    "build:logo": "yarn tsnode tools/startup-logo.ts",
     "test": "yarn test:types && yarn test:jest && yarn test:badge",
     "test:u": "yarn test:jest -u && yarn test:badge",
     "test:types": "tsc --noEmit",
     "test:jest": "jest",
     "test:badge": "make-coverage-badge --output-path ./coverage.svg",
-    "tsnode": "node -r @swc-node/register",
     "prepublishOnly": "yarn build && yarn lint && yarn test",
     "postversion": "git push && git push --tags"
   },

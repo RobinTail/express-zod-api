@@ -11,6 +11,7 @@
     "start": "yarn workspace example start",
     "build": "yarn build:package && yarn build:assets && yarn build:tests",
     "build:package": "yarn workspace express-zod-api build",
+    "build:logo": "node -r @swc-node/register tools/startup-logo.ts",
     "build:assets": "yarn build:example && yarn build:license",
     "build:example": "yarn workspace example build",
     "build:license": "node -r @swc-node/register tools/license.ts",

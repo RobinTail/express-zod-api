@@ -53,4 +53,4 @@ ${serialized}
 };
 `;
 
-writeFileSync("./src/startup-logo.ts", output);
+writeFileSync("./express-zod-api/src/startup-logo.ts", output);
