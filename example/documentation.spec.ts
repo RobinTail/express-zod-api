@@ -1,5 +1,5 @@
 import { Documentation } from "express-zod-api";
-import { config as exampleConfig } from "./config";
+import { config } from "./config";
 import { routing } from "./routing";
 
 describe("System test for Documentation", () => {
@@ -11,7 +11,7 @@ describe("System test for Documentation", () => {
     ({ composition }) => {
       const spec = new Documentation({
         routing,
-        config: exampleConfig,
+        config,
         version: "1.2.3",
         title: "Example API",
         serverUrl: "https://example.com",
