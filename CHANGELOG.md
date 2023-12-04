@@ -1505,7 +1505,7 @@ createMiddleware({
       `createMiddleware()` does, however this is deprecated and will be removed later.
   - Only native express middlewares are executed for `OPTIONS` request.
   - It makes it possible to use `cors` package (express middleware), which is described in the
-    [Documentation](express-zod-api/README.md#using-native-express-middlewares).
+    [Documentation](README.md#using-native-express-middlewares).
     - **Please note:** If using both `cors` package (express middleware) and `cors` configuration option, the
       configuration option sets CORS headers first, so the middleware can override them if needed.
 
