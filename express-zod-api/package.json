@@ -21,7 +21,7 @@
     "test": "yarn test:types && yarn test:jest",
     "test:types": "tsc --noEmit",
     "test:jest": "jest",
-    "posttest": "make-coverage-badge --output-path ./coverage.svg",
+    "posttest": "make-coverage-badge --output-path ../coverage.svg",
     "prepublishOnly": "yarn build && yarn lint && yarn test",
     "postversion": "git push && git push --tags"
   },
