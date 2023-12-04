@@ -9,10 +9,12 @@
   ],
   "scripts": {
     "start": "yarn workspace example start",
-    "build": "yarn build:package && yarn build:example && yarn build:license",
+    "build": "yarn build:package && yarn build:assets && yarn build:tests",
     "build:package": "yarn workspace express-zod-api build",
+    "build:assets": "yarn build:example && yarn build:license",
     "build:example": "yarn workspace example build",
     "build:license": "node -r @swc-node/register tools/license.ts",
+    "build:tests": "yarn build:int && yarn build:esm",
     "build:int": "node -r @swc-node/register tools/integration-test.ts",
     "build:esm": "node -r @swc-node/register tools/esm-test.ts",
     "test": "yarn workspace express-zod-api test",
