@@ -5,11 +5,9 @@ yarn-error.log
 .idea
 .npmrc
 coverage
-integration-test/yarn-error.log
 integration-test/yarn.lock
 integration-test/quick-start.ts
 integration-test/issue952.*
-esm-test/yarn-error.log
 esm-test/yarn.lock
 esm-test/quick-start.ts
 compatibility-test/yarn.lock
