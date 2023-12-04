@@ -201,6 +201,41 @@ export class ExpressZodAPIClient {
 }"
 `;
 
+exports[`API Integration Generator Should support types variant and handle recirsive schemas 1`] = `
+"type Type118cb3b11b8a1f3b6b1e60a89f96a8be9da32a0f = {
+    name: string;
+    features: Type118cb3b11b8a1f3b6b1e60a89f96a8be9da32a0f;
+};
+
+type PostV1TestInput = {
+    features: Type118cb3b11b8a1f3b6b1e60a89f96a8be9da32a0f;
+};
+
+type PostV1TestResponse = {
+    status: "success";
+    data: {};
+} | {
+    status: "error";
+    error: {
+        message: string;
+    };
+};
+
+export type Path = "/v1/test";
+
+export type Method = "get" | "post" | "put" | "delete" | "patch";
+
+export type MethodPath = \`\${Method} \${Path}\`;
+
+export interface Input extends Record<MethodPath, any> {
+    "post /v1/test": PostV1TestInput;
+}
+
+export interface Response extends Record<MethodPath, any> {
+    "post /v1/test": PostV1TestResponse;
+}"
+`;
+
 exports[`API Integration Generator Should treat optionals the same way as z.infer() by default 1`] = `
 "type PostV1TestWithDashesInput = {
     opt?: string | undefined;
@@ -234,7 +269,7 @@ export interface Response extends Record<MethodPath, any> {
 
 export const jsonEndpoints = { "post /v1/test-with-dashes": true };
 
-export const endpointTags = { "post /v1/test-with-dashes": [] };
+export const endpointTags = { "post /v1/test-with-dashes": ["one", "two"] };
 
 export type Provider = <M extends Method, P extends Path>(method: M, path: P, params: Input[\`\${M} \${P}\`]) => Promise<Response[\`\${M} \${P}\`]>;
 
