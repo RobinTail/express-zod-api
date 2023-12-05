@@ -24,16 +24,6 @@ const packageJson = `
 }
 `;
 
-const tsConfigJson = `
-{
-  "extends": "@tsconfig/node${tsconfigBase}/tsconfig.json",
-  "compilerOptions": {
-    "module": "ES2022",
-    "moduleResolution": "Bundler"
-  }
-}
-`;
-
 const quickStart = extractReadmeQuickStart().replace(
   `${givePort("example")}`,
   `${givePort("esm")}`,
@@ -41,5 +31,4 @@ const quickStart = extractReadmeQuickStart().replace(
 
 const dir = "./tests/esm";
 writeFileSync(`${dir}/package.json`, packageJson.trim());
-writeFileSync(`${dir}/tsconfig.json`, tsConfigJson.trim());
 writeFileSync(`${dir}/quick-start.ts`, quickStart.trim());
