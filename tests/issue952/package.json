@@ -1,9 +1,10 @@
 {
-  "name": "express-zod-api-vitest-test",
+  "name": "express-zod-api-issue-952-test",
   "private": true,
   "version": "0.0.0",
   "scripts": {
-    "test": "vitest run"
+    "test": "tsc -p tsconfig.json",
+    "posttest": "rm quick-start.d.ts"
   },
   "dependencies": {
     "express-zod-api": "link:../..",
@@ -13,6 +14,6 @@
     "zod": "^3"
   },
   "devDependencies": {
-    "vitest": "^1.0.0-beta.4"
+    "@types/express": "^4"
   }
 }

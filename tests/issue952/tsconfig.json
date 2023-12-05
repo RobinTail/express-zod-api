@@ -1,8 +1,8 @@
 {
-  "extends": "./tsconfig.json",
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
     "declaration": true,
     "emitDeclarationOnly": true
   },
-  "include": ["issue952.ts"]
+  "include": ["*.ts"]
 }

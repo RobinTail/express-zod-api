@@ -1,18 +1,13 @@
 {
-  "name": "express-zod-api-vitest-test",
+  "name": "express-zod-api-esm-test",
   "private": true,
   "version": "0.0.0",
-  "scripts": {
-    "test": "vitest run"
-  },
+  "type": "module",
   "dependencies": {
     "express-zod-api": "link:../..",
     "express": "^4",
     "http-errors": "^2",
     "typescript": "^5",
     "zod": "^3"
-  },
-  "devDependencies": {
-    "vitest": "^1.0.0-beta.4"
   }
 }
