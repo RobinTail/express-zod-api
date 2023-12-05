@@ -2,6 +2,10 @@
   "name": "express-zod-api-issue-952-test",
   "private": true,
   "version": "0.0.0",
+  "scripts": {
+    "test": "tsc -p tsconfig.json",
+    "posttest": "rm quick-start.d.ts"
+  },
   "dependencies": {
     "express-zod-api": "link:../..",
     "express": "^4",

@@ -32,7 +32,7 @@
     "build:logo": "yarn tsnode tools/startup-logo.ts",
     "test": "yarn test:types && yarn test:jest && yarn test:badge",
     "test:int": "jest ./tests/integration",
-    "test:952": "yarn --cwd tests/issue952 tsc -p tsconfig.json && rm tests/issue952/quick-start.d.ts",
+    "test:952": "yarn --cwd ./tests/issue952 test",
     "test:esm": "jest ./tests/esm",
     "test:vi": "yarn --cwd ./tests/vitest test",
     "test:u": "yarn test:jest -u && yarn test:badge",
