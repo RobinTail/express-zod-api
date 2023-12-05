@@ -6,5 +6,5 @@
     "strictNullChecks": true,
     "resolveJsonModule": true
   },
-  "include": ["src", "example", "tests/unit", "tests/system", "tests/*.ts", "tools"]
+  "include": ["src", "example", "tests/unit", "tests/system", "tests/*.ts", "tools", "tsup.config.ts"]
 }
