@@ -21,11 +21,11 @@
   integrity sha512-Jh15/qVmrLGhkKJBdXlK1+9tY4lZruYjsgkDFj08ZmDiWVBLJcqkok7Z0/R0In+i1rScBpJlSvrTS2Lm41Pbnw==
 
 "@arethetypeswrong/cli@^0.13.0":
-  version "0.13.2"
-  resolved "https://registry.yarnpkg.com/@arethetypeswrong/cli/-/cli-0.13.2.tgz#910c2a48697208859d61ffa51fd2d180a8cef10f"
-  integrity sha512-eqRWeFFiI58xwsiUfZSdZsmNCaqqtxmSPP9554ajiCDrB/aNzq5VktVK7dNiT9PamunNeoej4KbDBnkNwVacvg==
+  version "0.13.3"
+  resolved "https://registry.yarnpkg.com/@arethetypeswrong/cli/-/cli-0.13.3.tgz#edb5b91822509d15094b5300e6097b3a5dbc1385"
+  integrity sha512-lA29j9fkRGq+hNE3zQGxD/d8WmjhimSaPU2887CBe0Yv3C1UbIWvy51mYerp3/NoevjBLKSWhHmP5oY/eavtjQ==
   dependencies:
-    "@arethetypeswrong/core" "0.13.2"
+    "@arethetypeswrong/core" "0.13.3"
     chalk "^4.1.2"
     cli-table3 "^0.6.3"
     commander "^10.0.1"
@@ -33,10 +33,10 @@
     marked-terminal "^6.0.0"
     semver "^7.5.4"
 
-"@arethetypeswrong/core@0.13.2":
-  version "0.13.2"
-  resolved "https://registry.yarnpkg.com/@arethetypeswrong/core/-/core-0.13.2.tgz#ae7309aef7460e427e0afac6cd9fc10d6de33ea8"
-  integrity sha512-1l6ygar+6TH4o1JipWWGCEZlOhAwEShm1yKx+CgIByNjCzufbu6k9DNbDmBjdouusNRhBIOYQe1UHnJig+GtAw==
+"@arethetypeswrong/core@0.13.3":
+  version "0.13.3"
+  resolved "https://registry.yarnpkg.com/@arethetypeswrong/core/-/core-0.13.3.tgz#8afdab9396973204aad673bfaa7a8c6d1ec97535"
+  integrity sha512-oxa26D3z5DEv9LGzfJWV/6PhQd170dFfDOXl9J3cGRNLo2B68zj6/YOD1RJaYF/kmxechdXT1XyGUPOtkXv8Lg==
   dependencies:
     "@andrewbranch/untar.js" "^1.0.3"
     fflate "^0.7.4"
