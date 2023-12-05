@@ -4,9 +4,6 @@ yarn-error.log
 .idea
 .npmrc
 coverage
-tests/integration/yarn.lock
-tests/integration/quick-start.ts
-tests/integration/issue952.*
-tests/esm/yarn.lock
-tests/esm/quick-start.ts
-tests/vitest/yarn.lock
+tests/**/yarn.lock
+tests/**/quick-start.ts
+tests/**/issue952.*
