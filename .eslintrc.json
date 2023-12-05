@@ -33,7 +33,6 @@
       "files": [
         "./tools/*.ts",
         "./tests/**/*.ts",
-        "./eslint-local-rules/*.*s",
         "./tsup.config.ts"
       ],
       "rules": {
