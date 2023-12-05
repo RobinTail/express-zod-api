@@ -4,6 +4,5 @@
     "declaration": true,
     "emitDeclarationOnly": true
   },
-  "include": ["issue952.ts"],
-  "exclude": ["quick*.ts"]
+  "include": ["*.ts"]
 }

@@ -2,4 +2,3 @@ node_modules
 dist
 coverage
 tests/**/quick-start.ts
-tests/**/issue952.*
