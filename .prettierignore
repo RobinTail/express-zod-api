@@ -1,6 +1,5 @@
 node_modules
 dist
 coverage
-tests/integration/quick-start.ts
-tests/integration/issue952.*
-tests/esm/quick-start.ts
+tests/**/quick-start.ts
+tests/**/issue952.*

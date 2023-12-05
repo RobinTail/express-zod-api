@@ -1,5 +1,0 @@
-{
-  "type": "module",
-  "main": "index.mjs",
-  "types": "index.d.mts"
-}

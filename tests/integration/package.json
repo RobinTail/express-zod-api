@@ -1,0 +1,15 @@
+{
+  "name": "express-zod-api-integration-test",
+  "private": true,
+  "version": "0.0.0",
+  "dependencies": {
+    "express-zod-api": "../..",
+    "express": "^4",
+    "http-errors": "^2",
+    "typescript": "^5",
+    "zod": "^3"
+  },
+  "devDependencies": {
+    "@types/express": "^4"
+  }
+}
