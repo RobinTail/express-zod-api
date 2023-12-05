@@ -1,8 +1,5 @@
 import { writeFileSync } from "node:fs";
 import { extractReadmeQuickStart } from "./extract-quick-start";
-import { getTSConfigBase } from "./tsconfig-base";
-
-const tsconfigBase = getTSConfigBase();
 
 const packageJson = `
 {
@@ -12,7 +9,6 @@ const packageJson = `
     "postinstall": "cp dist.package.json node_modules/express-zod-api/package.json"
   },
   "dependencies": {
-    "@tsconfig/node${tsconfigBase}": "latest",
     "express-zod-api": "../../dist",
     "@swc/core": "^1.3.92",
     "@swc-node/register": "^1.6.8",
