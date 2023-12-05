@@ -6,7 +6,6 @@ yarn-error.log
 coverage
 tests/integration/yarn.lock
 tests/integration/quick-start.ts
-tests/integration/package.json
 tests/integration/issue952.*
 tests/esm/yarn.lock
 tests/esm/quick-start.ts
