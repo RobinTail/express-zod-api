@@ -8,5 +8,8 @@
     "http-errors": "^2",
     "typescript": "^5",
     "zod": "^3"
+  },
+  "devDependencies": {
+    "@types/express": "^4"
   }
 }
