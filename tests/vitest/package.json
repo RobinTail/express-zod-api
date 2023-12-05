@@ -6,6 +6,13 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "express-zod-api": "link:../..",
+    "express": "^4",
+    "http-errors": "^2",
+    "typescript": "^5",
+    "zod": "^3"
+  },
+  "devDependencies": {
     "vitest": "^1.0.0-beta.4"
   }
 }
