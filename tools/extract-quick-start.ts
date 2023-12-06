@@ -16,5 +16,6 @@ export const extractReadmeQuickStart = () => {
 
   return tsParts
     .map((part) => part.split("\n").slice(1, -1).join("\n"))
-    .join("\n\n");
+    .join("\n\n")
+    .trim();
 };
