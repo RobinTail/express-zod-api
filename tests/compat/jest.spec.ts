@@ -1,14 +1,13 @@
 import { defaultEndpointsFactory, testEndpoint } from "express-zod-api";
-import { Mock, describe, expect, test } from "vitest";
 import { z } from "zod";
 
 declare module "express-zod-api" {
-  interface MockOverrides extends Mock {}
+  interface MockOverrides extends jest.Mock {}
 }
 
-describe("Vitest compatibility test", () => {
+describe("Jest compatibility test", () => {
   describe("testEndpoint()", () => {
-    test("should support vi.fn", async () => {
+    test.each([undefined, jest.fn])("should support jest.fn %#", async () => {
       const endpoint = defaultEndpointsFactory.build({
         method: "post",
         input: z.object({ n: z.number() }),
@@ -18,6 +17,7 @@ describe("Vitest compatibility test", () => {
       const { responseMock } = await testEndpoint({
         endpoint,
         requestProps: { method: "POST", body: { n: 123 } },
+        fnMethod: undefined,
       });
       expect(responseMock.status).toHaveBeenCalledWith(200);
       expect(responseMock.json).toHaveBeenCalledWith({

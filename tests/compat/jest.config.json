@@ -1,0 +1,7 @@
+{
+  "transform": {
+    "^.+\\.ts$": "@swc/jest"
+  },
+  "testEnvironment": "node",
+  "verbose": true
+}

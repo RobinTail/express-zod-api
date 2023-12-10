@@ -30,7 +30,7 @@
     "test:int": "yarn --cwd tests/integration && vitest run tests/integration",
     "test:952": "yarn --cwd tests/issue952 && yarn --cwd tests/issue952 test",
     "test:esm": "yarn --cwd tests/esm && vitest run tests/esm",
-    "test:vi": "yarn --cwd tests/vitest && yarn --cwd tests/vitest test",
+    "test:compat": "yarn --cwd tests/compat && yarn --cwd tests/compat test",
     "test:u": "yarn test:unit -u && yarn test:badge",
     "test:types": "tsc --noEmit",
     "test:unit": "vitest run tests/unit tests/system",
