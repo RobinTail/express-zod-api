@@ -1,5 +1,5 @@
 import { staticHandler, staticMock } from "../express-mock";
-import { Logger } from "winston";
+import winston from "winston";
 import { z } from "zod";
 import {
   DependsOnMethod,
@@ -10,13 +10,16 @@ import {
 } from "../../src";
 import { CommonConfig } from "../../src";
 import { mimeJson } from "../../src/mime";
-import { makeRequestMock, makeResponseMock } from "../../src/testing";
+import {
+  makeLoggerMock,
+  makeRequestMock,
+  makeResponseMock,
+} from "../../src/testing";
 import { initRouting } from "../../src/routing";
 import type { Express, Request, RequestHandler, Response } from "express";
 import { Mock, beforeEach, describe, expect, test, vi } from "vitest";
 
 let appMock: any;
-let loggerMock: any;
 
 describe("Routing", () => {
   describe("initRouting()", () => {
@@ -29,13 +32,6 @@ describe("Routing", () => {
         patch: vi.fn(),
         options: vi.fn(),
         use: vi.fn(),
-      };
-
-      loggerMock = {
-        info: vi.fn(),
-        warn: vi.fn(),
-        error: vi.fn(),
-        debug: vi.fn(),
       };
     });
 
@@ -75,7 +71,7 @@ describe("Routing", () => {
       };
       initRouting({
         app: appMock as Express,
-        logger: loggerMock as Logger,
+        logger: winston.createLogger({ silent: true }),
         config: configMock as CommonConfig,
         routing,
       });
@@ -104,7 +100,7 @@ describe("Routing", () => {
       };
       initRouting({
         app: appMock,
-        logger: loggerMock,
+        logger: winston.createLogger({ silent: true }),
         config: configMock as CommonConfig,
         routing,
       });
@@ -150,7 +146,7 @@ describe("Routing", () => {
       };
       initRouting({
         app: appMock as Express,
-        logger: loggerMock as Logger,
+        logger: winston.createLogger({ silent: true }),
         config: configMock as CommonConfig,
         routing,
       });
@@ -188,7 +184,7 @@ describe("Routing", () => {
       expect(() =>
         initRouting({
           app: appMock as Express,
-          logger: loggerMock as Logger,
+          logger: winston.createLogger({ silent: true }),
           config: configMock as CommonConfig,
           routing,
         }),
@@ -232,7 +228,7 @@ describe("Routing", () => {
       };
       initRouting({
         app: appMock as Express,
-        logger: loggerMock as Logger,
+        logger: winston.createLogger({ silent: true }),
         config: configMock as CommonConfig,
         routing,
       });
@@ -272,7 +268,7 @@ describe("Routing", () => {
       };
       initRouting({
         app: appMock as Express,
-        logger: loggerMock as Logger,
+        logger: winston.createLogger({ silent: true }),
         config: configMock as CommonConfig,
         routing,
       });
@@ -301,7 +297,7 @@ describe("Routing", () => {
       };
       initRouting({
         app: appMock as Express,
-        logger: loggerMock as Logger,
+        logger: winston.createLogger({ silent: true }),
         config: configMock as CommonConfig,
         routing,
       });
@@ -322,7 +318,7 @@ describe("Routing", () => {
       expect(() =>
         initRouting({
           app: appMock as Express,
-          logger: loggerMock as Logger,
+          logger: winston.createLogger({ silent: true }),
           config: configMock as CommonConfig,
           routing: {
             v1: {
@@ -334,7 +330,7 @@ describe("Routing", () => {
       expect(() =>
         initRouting({
           app: appMock as Express,
-          logger: loggerMock as Logger,
+          logger: winston.createLogger({ silent: true }),
           config: configMock as CommonConfig,
           routing: {
             "v1/user/retrieve": endpointMock,
@@ -365,9 +361,10 @@ describe("Routing", () => {
           },
         },
       };
+      const loggerMock = makeLoggerMock({ fnMethod: vi.fn });
       initRouting({
         app: appMock as Express,
-        logger: loggerMock as Logger,
+        logger: loggerMock,
         config: configMock as CommonConfig,
         routing,
       });
