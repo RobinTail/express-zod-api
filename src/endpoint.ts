@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import assert from "node:assert/strict";
 import { z } from "zod";
 import { ApiResponse } from "./api-response";
 import { CommonConfig } from "./config-type";
@@ -131,11 +132,13 @@ export class Endpoint<
       { name: "input schema", schema: inputSchema },
       { name: "output schema", schema: outputSchema },
     ].forEach(({ name, schema }) => {
-      if (hasTopLevelTransformingEffect(schema)) {
-        throw new IOSchemaError(
+      assert.equal(
+        hasTopLevelTransformingEffect(schema),
+        false,
+        new IOSchemaError(
           `Using transformations on the top level of endpoint ${name} is not allowed.`,
-        );
-      }
+        ),
+      );
     });
     this.#handler = handler;
     this.#resultHandler = resultHandler;

@@ -1,3 +1,4 @@
+import assert from "node:assert/strict";
 import {
   OpenApiBuilder,
   OperationObject,
@@ -75,14 +76,16 @@ export class Documentation extends OpenApiBuilder {
     userDefinedOperationId?: string,
   ) {
     if (userDefinedOperationId) {
-      if (userDefinedOperationId in this.lastOperationIdSuffixes) {
-        throw new DocumentationError({
+      assert.equal(
+        userDefinedOperationId in this.lastOperationIdSuffixes,
+        false,
+        new DocumentationError({
           message: `Duplicated operationId: "${userDefinedOperationId}"`,
           method,
           isResponse: false,
           path,
-        });
-      }
+        }),
+      );
       this.lastOperationIdSuffixes[userDefinedOperationId] = 1;
       return userDefinedOperationId;
     }

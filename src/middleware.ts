@@ -7,6 +7,7 @@ import { IOSchema } from "./io-schema";
 import { LogicalContainer } from "./logical-container";
 import { Security } from "./security";
 import { AbstractLogger } from "./logger";
+import assert from "node:assert/strict";
 
 interface MiddlewareParams<IN, OPT> {
   input: IN;
@@ -50,11 +51,13 @@ export const createMiddleware = <
 >(
   props: MiddlewareCreationProps<IN, OPT, OUT, SCO>,
 ): MiddlewareDefinition<IN, OPT, OUT, SCO> => {
-  if (hasTopLevelTransformingEffect(props.input)) {
-    throw new IOSchemaError(
+  assert.equal(
+    hasTopLevelTransformingEffect(props.input),
+    false,
+    new IOSchemaError(
       "Using transformations on the top level of middleware input schema is not allowed.",
-    );
-  }
+    ),
+  );
   return {
     ...props,
     type: "proprietary",

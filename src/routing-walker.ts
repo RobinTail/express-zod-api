@@ -1,3 +1,4 @@
+import assert from "node:assert/strict";
 import { DependsOnMethod } from "./depends-on-method";
 import { AbstractEndpoint } from "./endpoint";
 import { RoutingError } from "./errors";
@@ -26,11 +27,13 @@ export const walkRouting = ({
 }: RoutingWalkerParams) => {
   Object.entries(routing).forEach(([segment, element]) => {
     segment = segment.trim();
-    if (segment.match(/\//)) {
-      throw new RoutingError(
+    assert.doesNotMatch(
+      segment,
+      /\//,
+      new RoutingError(
         `The entry '${segment}' must avoid having slashes — use nesting instead.`,
-      );
-    }
+      ),
+    );
     const path = `${parentPath || ""}${segment ? `/${segment}` : ""}`;
     if (element instanceof AbstractEndpoint) {
       const methods: (Method | AuxMethod)[] = element.getMethods().slice();
@@ -46,11 +49,13 @@ export const walkRouting = ({
       }
     } else if (element instanceof DependsOnMethod) {
       Object.entries(element.endpoints).forEach(([method, endpoint]) => {
-        if (!endpoint.getMethods().includes(method as Method)) {
-          throw new RoutingError(
+        assert.equal(
+          endpoint.getMethods().includes(method as Method),
+          true,
+          new RoutingError(
             `Endpoint assigned to ${method} method of ${path} must support ${method} method.`,
-          );
-        }
+          ),
+        );
         onEndpoint(endpoint, path, method as Method);
       });
       if (hasCors && Object.keys(element.endpoints).length > 0) {
