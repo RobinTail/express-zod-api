@@ -1,5 +1,4 @@
 import cors from "cors";
-import type { Server } from "node:http";
 import { z } from "zod";
 import {
   EndpointsFactory,
@@ -10,150 +9,147 @@ import {
   defaultResultHandler,
 } from "../../src";
 import { givePort, waitFor } from "../helpers";
-import { afterAll, beforeAll, describe, expect, test, vi } from "vitest";
+import { afterAll, describe, expect, test, vi } from "vitest";
 
-describe("App", () => {
+describe("App", async () => {
   const port = givePort();
-  let server: Server;
 
-  beforeAll(async () => {
-    const routing = {
-      v1: {
-        corsed: new EndpointsFactory(defaultResultHandler)
-          .use(
-            cors({
-              credentials: true,
-              exposedHeaders: ["Content-Range", "X-Content-Range"],
-            }),
-            {
-              provider: () => ({ corsDone: true }),
-            },
-          )
-          .build({
-            method: "get",
-            input: z.object({}),
-            output: z.object({ corsDone: z.boolean() }),
-            handler: async ({ options }) => ({
-              corsDone: options.corsDone,
-            }),
+  const routing = {
+    v1: {
+      corsed: new EndpointsFactory(defaultResultHandler)
+        .use(
+          cors({
+            credentials: true,
+            exposedHeaders: ["Content-Range", "X-Content-Range"],
           }),
-        faulty: new EndpointsFactory(
-          createResultHandler({
-            getPositiveResponse: () => z.object({}),
-            getNegativeResponse: () => z.object({}),
-            handler: () => {
-              throw new Error("I am faulty");
-            },
-          }),
+          {
+            provider: () => ({ corsDone: true }),
+          },
         )
-          .addMiddleware(
-            createMiddleware({
-              input: z.object({
-                mwError: z
-                  .any()
-                  .optional()
-                  .transform((value) => {
-                    if (value) {
-                      throw new Error(
-                        "Custom error in the Middleware input validation",
-                      );
-                    }
-                  }),
-              }),
-              middleware: async () => ({}),
-            }),
-          )
-          .build({
-            method: "get",
+        .build({
+          method: "get",
+          input: z.object({}),
+          output: z.object({ corsDone: z.boolean() }),
+          handler: async ({ options }) => ({
+            corsDone: options.corsDone,
+          }),
+        }),
+      faulty: new EndpointsFactory(
+        createResultHandler({
+          getPositiveResponse: () => z.object({}),
+          getNegativeResponse: () => z.object({}),
+          handler: () => {
+            throw new Error("I am faulty");
+          },
+        }),
+      )
+        .addMiddleware(
+          createMiddleware({
             input: z.object({
-              epError: z
+              mwError: z
                 .any()
                 .optional()
                 .transform((value) => {
                   if (value) {
                     throw new Error(
-                      "Custom error in the Endpoint input validation",
+                      "Custom error in the Middleware input validation",
                     );
                   }
                 }),
             }),
-            output: z.object({
-              test: z.string(),
-            }),
-            handler: async () => ({
-              test: "Should not work",
-            }),
+            middleware: async () => ({}),
           }),
-        test: new EndpointsFactory(defaultResultHandler)
-          .addMiddleware(
-            createMiddleware({
-              input: z.object({
-                key: z.string().refine((v) => v === "123", "Invalid key"),
+        )
+        .build({
+          method: "get",
+          input: z.object({
+            epError: z
+              .any()
+              .optional()
+              .transform((value) => {
+                if (value) {
+                  throw new Error(
+                    "Custom error in the Endpoint input validation",
+                  );
+                }
               }),
-              middleware: async () => ({
-                user: {
-                  id: 354,
-                },
-              }),
-            }),
-          )
-          .addMiddleware(
-            createMiddleware({
-              input: z.object({}),
-              middleware: async ({ request, options: { user } }) => ({
-                method: request.method.toLowerCase() as Method,
-                permissions: user.id === 354 ? ["any"] : [],
-              }),
-            }),
-          )
-          .build({
-            methods: ["get", "post"],
+          }),
+          output: z.object({
+            test: z.string(),
+          }),
+          handler: async () => ({
+            test: "Should not work",
+          }),
+        }),
+      test: new EndpointsFactory(defaultResultHandler)
+        .addMiddleware(
+          createMiddleware({
             input: z.object({
-              something: z.string(),
+              key: z.string().refine((v) => v === "123", "Invalid key"),
             }),
-            output: z
-              .object({
-                anything: z.number().positive(),
-              })
-              .passthrough(), // allow excessive keys
-            handler: async ({
-              input: { key, something },
-              options: { user, permissions, method },
-            }) => {
-              // Problem 787: should lead to ZodError that is NOT considered as the IOSchema validation error
-              if (something === "internal_zod_error") {
-                z.number().parse("");
-              }
-              return {
-                anything: something === "joke" ? 300 : -100500,
-                doubleKey: key.repeat(2),
-                userId: user.id,
-                permissions,
-                method,
-              };
-            },
+            middleware: async () => ({
+              user: {
+                id: 354,
+              },
+            }),
           }),
-      },
-    };
-    vi.spyOn(global.console, "log").mockImplementation(vi.fn<any>());
-    server = (
-      await createServer(
-        {
-          server: {
-            listen: port,
-            compression: { threshold: 1 },
+        )
+        .addMiddleware(
+          createMiddleware({
+            input: z.object({}),
+            middleware: async ({ request, options: { user } }) => ({
+              method: request.method.toLowerCase() as Method,
+              permissions: user.id === 354 ? ["any"] : [],
+            }),
+          }),
+        )
+        .build({
+          methods: ["get", "post"],
+          input: z.object({
+            something: z.string(),
+          }),
+          output: z
+            .object({
+              anything: z.number().positive(),
+            })
+            .passthrough(), // allow excessive keys
+          handler: async ({
+            input: { key, something },
+            options: { user, permissions, method },
+          }) => {
+            // Problem 787: should lead to ZodError that is NOT considered as the IOSchema validation error
+            if (something === "internal_zod_error") {
+              z.number().parse("");
+            }
+            return {
+              anything: something === "joke" ? 300 : -100500,
+              doubleKey: key.repeat(2),
+              userId: user.id,
+              permissions,
+              method,
+            };
           },
-          cors: false,
-          startupLogo: true,
-          logger: { level: "silent" },
-          inputSources: {
-            post: ["query", "body", "files"],
-          },
+        }),
+    },
+  };
+  vi.spyOn(global.console, "log").mockImplementation(vi.fn<any>());
+  const server = (
+    await createServer(
+      {
+        server: {
+          listen: port,
+          compression: { threshold: 1 },
         },
-        routing,
-      )
-    ).httpServer;
-  });
+        cors: false,
+        startupLogo: true,
+        logger: { level: "silent" },
+        inputSources: {
+          post: ["query", "body", "files"],
+        },
+      },
+      routing,
+    )
+  ).httpServer;
 
   afterAll(async () => {
     server.close();
