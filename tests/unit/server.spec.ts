@@ -30,6 +30,7 @@ import {
 } from "../../src/server";
 import express, { Request, Response } from "express";
 import { Mock, afterAll, describe, expect, test, vi } from "vitest";
+import assert from "node:assert/strict";
 
 describe("Server", () => {
   afterAll(() => {
@@ -323,9 +324,9 @@ describe("Server", () => {
       const logger = winston.createLogger({ silent: true });
       const resultHandler = {
         ...defaultResultHandler,
-        handler: vi.fn().mockImplementation(() => {
-          throw new Error("I am faulty");
-        }),
+        handler: vi
+          .fn()
+          .mockImplementation(() => assert.fail(Error("I am faulty"))),
       };
       const handler = createNotFoundHandler(resultHandler, logger);
       const next = vi.fn();

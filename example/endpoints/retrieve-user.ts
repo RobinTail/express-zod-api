@@ -1,4 +1,5 @@
 import createHttpError from "http-errors";
+import assert from "node:assert/strict";
 import { z } from "zod";
 import { taggedEndpointsFactory } from "../factories";
 import { methodProviderMiddleware } from "../middlewares";
@@ -37,9 +38,7 @@ export const retrieveUserEndpoint = taggedEndpointsFactory
     handler: async ({ input: { id }, options: { method }, logger }) => {
       logger.debug(`Requested id: ${id}, method ${method}`);
       const name = "John Doe";
-      if (id > 100) {
-        throw createHttpError(404, "User not found");
-      }
+      assert.equal(id <= 100, true, createHttpError(404, "User not found"));
       return {
         id,
         name,

@@ -24,6 +24,7 @@
  * SOFTWARE.
  */
 
+import assert from "node:assert/strict";
 import ts from "typescript";
 import { z } from "zod";
 import { f } from "../../src/integration-helpers";
@@ -366,9 +367,9 @@ describe("zod-to-ts", () => {
       });
 
       test("should handle an error within the transformation", () => {
-        const schema = z.number().transform(() => {
-          throw new Error("this should be handled");
-        });
+        const schema = z
+          .number()
+          .transform(() => assert.fail(Error("this should be handled")));
         expect(
           printNodeTest(zodToTs({ schema, ...defaultCtx, isResponse: true })),
         ).toMatchSnapshot();

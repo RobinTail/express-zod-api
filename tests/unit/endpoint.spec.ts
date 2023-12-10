@@ -1,3 +1,4 @@
+import assert from "node:assert/strict";
 import { z } from "zod";
 import {
   EndpointsFactory,
@@ -191,9 +192,9 @@ describe("Endpoint", () => {
         method: "post",
         input: z.object({}),
         output: z.object({
-          test: z.number().transform(() => {
-            throw new Error("Something unexpected");
-          }),
+          test: z
+            .number()
+            .transform(() => assert.fail(new Error("Something unexpected"))),
         }),
         handler: async () => ({
           test: 123,
@@ -263,9 +264,8 @@ describe("Endpoint", () => {
         createResultHandler({
           getPositiveResponse: () => z.object({}),
           getNegativeResponse: () => z.object({}),
-          handler: () => {
-            throw new Error("Something unexpected happened");
-          },
+          handler: () =>
+            assert.fail(new Error("Something unexpected happened")),
         }),
       );
       const endpoint = factory.build({
@@ -446,9 +446,8 @@ describe("Endpoint", () => {
             input: z.object({
               shouldNotBeHere: z.boolean(),
             }),
-            middleware: async () => {
-              throw new Error("Should not be here");
-            },
+            middleware: async () =>
+              assert.fail(new Error("Should not be here")),
           }),
         )
         .addExpressMiddleware((req, res, next) => {
@@ -484,10 +483,7 @@ describe("Endpoint", () => {
         method: "post",
         input: z.object({}),
         output: z.object({
-          test: z.number().transform(() => {
-            // eslint-disable-next-line @typescript-eslint/no-throw-literal
-            throw "Something unexpected";
-          }),
+          test: z.number().transform(() => assert.fail("Something unexpected")),
         }),
         handler: async () => ({
           test: 123,
@@ -509,10 +505,7 @@ describe("Endpoint", () => {
         createResultHandler({
           getPositiveResponse: () => z.object({}),
           getNegativeResponse: () => z.object({}),
-          handler: () => {
-            // eslint-disable-next-line @typescript-eslint/no-throw-literal
-            throw "Something unexpected happened";
-          },
+          handler: () => assert.fail("Something unexpected happened"),
         }),
       );
       const endpoint = factory.build({
@@ -541,10 +534,7 @@ describe("Endpoint", () => {
       const factory = new EndpointsFactory(defaultResultHandler).addMiddleware(
         createMiddleware({
           input: z.object({}),
-          middleware: async () => {
-            // eslint-disable-next-line @typescript-eslint/no-throw-literal
-            throw "Something went wrong";
-          },
+          middleware: async () => assert.fail("Something went wrong"),
         }),
       );
       const endpoint = factory.build({
