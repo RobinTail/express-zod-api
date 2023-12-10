@@ -1,31 +1,30 @@
 import http from "node:http";
 import https from "node:https";
+import { MockInstance, vi } from "vitest";
 
 const realHttpCreator = http.createServer;
 const realHttpsCreator = https.createServer;
 
-let httpListenSpy: jest.SpyInstance;
-let httpsListenSpy: jest.SpyInstance;
+let httpListenSpy: MockInstance;
+let httpsListenSpy: MockInstance;
 
-jest.spyOn(http, "createServer").mockImplementation((app) => {
+vi.spyOn(http, "createServer").mockImplementation((app) => {
   const server = realHttpCreator(app);
-  httpListenSpy = jest.spyOn(server, "listen").mockImplementation(({}, cb) => {
+  httpListenSpy = vi.spyOn(server, "listen").mockImplementation(({}, cb) => {
     cb?.call(null);
     return server;
   });
   return server;
 });
 
-const createHttpsServerSpy = jest
+const createHttpsServerSpy = vi
   .spyOn(https, "createServer")
   .mockImplementation(({}, app) => {
     const server = realHttpsCreator(app);
-    httpsListenSpy = jest
-      .spyOn(server, "listen")
-      .mockImplementation(({}, cb) => {
-        cb?.call(null);
-        return server;
-      });
+    httpsListenSpy = vi.spyOn(server, "listen").mockImplementation(({}, cb) => {
+      cb?.call(null);
+      return server;
+    });
     return server;
   });
 

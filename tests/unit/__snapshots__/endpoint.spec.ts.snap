@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`Endpoint .getNegativeResponseSchema() should return the negative schema of the result handler 1`] = `
+exports[`Endpoint > .getNegativeResponseSchema() > should return the negative schema of the result handler 1`] = `
 {
   "_type": "ZodObject",
   "shape": {
@@ -20,7 +20,7 @@ exports[`Endpoint .getNegativeResponseSchema() should return the negative schema
 }
 `;
 
-exports[`Endpoint .getPositiveResponseSchema() should return schema according to the result handler 1`] = `
+exports[`Endpoint > .getPositiveResponseSchema() > should return schema according to the result handler 1`] = `
 {
   "_type": "ZodObject",
   "shape": {

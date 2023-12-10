@@ -11,6 +11,7 @@ import {
 import { Endpoint } from "../../src/endpoint";
 import { IOSchemaError } from "../../src/errors";
 import { serializeSchemaForTest } from "../helpers";
+import { describe, expect, test, vi } from "vitest";
 
 describe("Endpoint", () => {
   describe(".getMethods()", () => {
@@ -19,11 +20,11 @@ describe("Endpoint", () => {
         methods: ["get", "post", "put", "delete", "patch"],
         inputSchema: z.object({}),
         outputSchema: z.object({}),
-        handler: jest.fn(),
+        handler: vi.fn<any>(),
         resultHandler: createResultHandler({
           getPositiveResponse: () => z.string(),
           getNegativeResponse: () => z.string(),
-          handler: jest.fn(),
+          handler: vi.fn(),
         }),
       });
       expect(endpointMock.getMethods()).toEqual([
@@ -40,11 +41,11 @@ describe("Endpoint", () => {
         methods: ["patch"],
         inputSchema: z.object({}),
         outputSchema: z.object({}),
-        handler: jest.fn(),
+        handler: vi.fn<any>(),
         resultHandler: createResultHandler({
           getPositiveResponse: () => z.string(),
           getNegativeResponse: () => z.string(),
-          handler: jest.fn(),
+          handler: vi.fn(),
         }),
       });
       expect(endpointMock.getMethods()).toEqual(["patch"]);
@@ -53,7 +54,7 @@ describe("Endpoint", () => {
 
   describe(".execute()", () => {
     test("Should call middlewares, handler and resultHandler with correct arguments", async () => {
-      const middlewareMock = jest
+      const middlewareMock = vi
         .fn()
         .mockImplementationOnce(async ({ input }) => ({
           inc: input.n + 1,
@@ -67,7 +68,7 @@ describe("Endpoint", () => {
       const factory = new EndpointsFactory(defaultResultHandler).addMiddleware(
         middlewareDefinitionMock,
       );
-      const handlerMock = jest
+      const handlerMock = vi
         .fn()
         .mockImplementationOnce(async ({ input, options }) => ({
           inc2: (options as { inc: number }).inc + 1,
@@ -122,7 +123,7 @@ describe("Endpoint", () => {
     });
 
     test("should close the stream on OPTIONS request", async () => {
-      const handlerMock = jest.fn();
+      const handlerMock = vi.fn();
       const endpoint = defaultEndpointsFactory.build({
         method: "get",
         input: z.object({}),
@@ -212,7 +213,7 @@ describe("Endpoint", () => {
 
   describe("#runMiddlewares", () => {
     test("Should handle middleware closing the response stream", async () => {
-      const middlewareMock = jest
+      const middlewareMock = vi
         .fn()
         .mockImplementationOnce(async ({ input, response }) => {
           response.end("to hell with all that!");
@@ -227,7 +228,7 @@ describe("Endpoint", () => {
       const factory = defaultEndpointsFactory.addMiddleware(
         middlewareDefinitionMock,
       );
-      const handlerMock = jest.fn();
+      const handlerMock = vi.fn();
       const endpoint = factory.build({
         method: "post",
         input: z.object({}),
@@ -246,7 +247,7 @@ describe("Endpoint", () => {
       expect(loggerMock.error).toHaveBeenCalledTimes(0);
       expect(loggerMock.warn).toHaveBeenCalledTimes(1);
       expect(loggerMock.warn.mock.calls[0][0]).toBe(
-        "The middleware mockConstructor has closed the stream. Accumulated options:",
+        "The middleware spy has closed the stream. Accumulated options:",
       );
       expect(loggerMock.warn.mock.calls[0][1]).toEqual({ inc: 454 });
       expect(responseMock.status).toHaveBeenCalledTimes(0);
@@ -300,7 +301,7 @@ describe("Endpoint", () => {
         method: "get",
         input,
         output: z.object({}),
-        handler: jest.fn(),
+        handler: vi.fn(),
       });
       expect(endpoint.getSchema("input")).toEqual(input);
     });
@@ -329,7 +330,7 @@ describe("Endpoint", () => {
         methods: ["get"],
         inputSchema: z.object({}),
         outputSchema,
-        handler: jest.fn(),
+        handler: vi.fn<any>(),
         resultHandler: defaultResultHandler,
       });
       expect(endpoint.getSchema("output")).toEqual(outputSchema);
@@ -346,7 +347,7 @@ describe("Endpoint", () => {
         method: "get",
         input: z.object({}),
         output,
-        handler: jest.fn(),
+        handler: vi.fn(),
       });
       expect(
         serializeSchemaForTest(endpoint.getSchema("positive")),
@@ -364,7 +365,7 @@ describe("Endpoint", () => {
         method: "get",
         input: z.object({}),
         output,
-        handler: jest.fn(),
+        handler: vi.fn(),
       });
       expect(
         serializeSchemaForTest(endpoint.getSchema("negative")),
@@ -379,7 +380,7 @@ describe("Endpoint", () => {
         method: "get",
         input: z.object({}),
         output: z.object({}),
-        handler: jest.fn(),
+        handler: vi.fn(),
       });
       expect(endpoint.getMimeTypes("positive")).toEqual(["application/json"]);
     });
@@ -392,7 +393,7 @@ describe("Endpoint", () => {
         method: "get",
         input: z.object({}),
         output: z.object({}),
-        handler: jest.fn(),
+        handler: vi.fn(),
       });
       expect(endpoint.getMimeTypes("negative")).toEqual(["application/json"]);
     });
@@ -722,11 +723,11 @@ describe("Endpoint", () => {
             methods: ["get"],
             inputSchema: z.object({}).transform(() => []),
             outputSchema: z.object({}),
-            handler: jest.fn(),
+            handler: vi.fn<any>(),
             resultHandler: {
-              getPositiveResponse: jest.fn(),
-              getNegativeResponse: jest.fn(),
-              handler: jest.fn(),
+              getPositiveResponse: vi.fn(),
+              getNegativeResponse: vi.fn(),
+              handler: vi.fn(),
             },
           }),
       ).toThrow(
@@ -740,11 +741,11 @@ describe("Endpoint", () => {
             methods: ["get"],
             inputSchema: z.object({}),
             outputSchema: z.object({}).transform(() => []),
-            handler: jest.fn(),
+            handler: vi.fn<any>(),
             resultHandler: {
-              getPositiveResponse: jest.fn(),
-              getNegativeResponse: jest.fn(),
-              handler: jest.fn(),
+              getPositiveResponse: vi.fn(),
+              getNegativeResponse: vi.fn(),
+              handler: vi.fn(),
             },
           }),
       ).toThrow(

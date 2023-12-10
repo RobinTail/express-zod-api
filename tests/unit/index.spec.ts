@@ -1,4 +1,5 @@
 import * as entrypoint from "../../src";
+import { describe, expect, test } from "vitest";
 
 describe("Index Entrypoint", () => {
   describe("exports", () => {

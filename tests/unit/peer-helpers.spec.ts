@@ -1,5 +1,6 @@
 import { MissingPeerError } from "../../src";
 import { loadAlternativePeer, loadPeer } from "../../src/peer-helpers";
+import { describe, expect, test } from "vitest";
 
 describe("Peer loading helpers", () => {
   describe("loadPeer()", () => {
@@ -25,10 +26,12 @@ describe("Peer loading helpers", () => {
     test("should throw when no alternatives found", async () => {
       await expect(async () =>
         loadAlternativePeer([
-          { moduleName: "vitest" },
+          { moduleName: "@jest/globals" },
           { moduleName: "@also/missing" },
         ]),
-      ).rejects.toThrow(new MissingPeerError(["vitest", "@also/missing"]));
+      ).rejects.toThrow(
+        new MissingPeerError(["@jest/globals", "@also/missing"]),
+      );
     });
   });
 });

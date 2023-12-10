@@ -11,6 +11,7 @@ import { givePort, waitFor } from "../helpers";
 import { createHash } from "node:crypto";
 import FormData from "form-data";
 import { readFile } from "node:fs/promises";
+import { afterAll, afterEach, beforeAll, describe, expect, test } from "vitest";
 
 describe("Example", () => {
   let example: ChildProcessWithoutNullStreams;

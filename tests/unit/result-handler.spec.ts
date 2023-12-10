@@ -8,6 +8,7 @@ import {
   withMeta,
 } from "../../src";
 import { metaProp } from "../../src/metadata";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
 let loggerMock: any;
 let responseMock: any;
@@ -15,16 +16,16 @@ let responseMock: any;
 describe("ResultHandler", () => {
   beforeEach(() => {
     loggerMock = {
-      info: jest.fn(),
-      warn: jest.fn(),
-      error: jest.fn(),
-      debug: jest.fn(),
+      info: vi.fn(),
+      warn: vi.fn(),
+      error: vi.fn(),
+      debug: vi.fn(),
     };
     responseMock = {
-      set: jest.fn(() => responseMock),
-      status: jest.fn(() => responseMock),
-      json: jest.fn(() => responseMock),
-      send: jest.fn(() => responseMock),
+      set: vi.fn(() => responseMock),
+      status: vi.fn(() => responseMock),
+      json: vi.fn(() => responseMock),
+      send: vi.fn(() => responseMock),
     };
   });
 
@@ -155,7 +156,7 @@ describe("ResultHandler", () => {
           }),
         );
         if (!(apiResponse instanceof z.ZodType)) {
-          fail(new Error("should not be here"));
+          expect.fail("should not be here");
         }
         expect(apiResponse._def[metaProp]).toMatchSnapshot();
       });
@@ -163,7 +164,7 @@ describe("ResultHandler", () => {
       test("should generate negative response example", () => {
         const apiResponse = getNegativeResponse();
         if (!(apiResponse instanceof z.ZodType)) {
-          fail(new Error("should not be here"));
+          expect.fail("should not be here");
         }
         expect(apiResponse._def[metaProp]).toMatchSnapshot();
       });

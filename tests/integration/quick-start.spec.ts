@@ -1,5 +1,6 @@
 import { ChildProcessWithoutNullStreams, spawn } from "node:child_process";
 import { givePort, waitFor } from "../helpers";
+import { afterAll, afterEach, beforeAll, describe, expect, test } from "vitest";
 
 describe("Integration Test", () => {
   let quickStart: ChildProcessWithoutNullStreams;

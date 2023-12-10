@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`API Integration Generator Feature #945: should have configurable treatment of optionals 0 1`] = `
+exports[`API Integration Generator > Feature #945: should have configurable treatment of optionals 0 1`] = `
 "type PostV1TestWithDashesInput = {
     opt?: string;
 };
@@ -67,7 +67,7 @@ export class ExpressZodAPIClient {
 }"
 `;
 
-exports[`API Integration Generator Feature #945: should have configurable treatment of optionals 1 1`] = `
+exports[`API Integration Generator > Feature #945: should have configurable treatment of optionals 1 1`] = `
 "type PostV1TestWithDashesInput = {
     opt: string | undefined;
 };
@@ -134,7 +134,7 @@ export class ExpressZodAPIClient {
 }"
 `;
 
-exports[`API Integration Generator Feature #945: should have configurable treatment of optionals 2 1`] = `
+exports[`API Integration Generator > Feature #945: should have configurable treatment of optionals 2 1`] = `
 "type PostV1TestWithDashesInput = {
     opt: string;
 };
@@ -201,7 +201,7 @@ export class ExpressZodAPIClient {
 }"
 `;
 
-exports[`API Integration Generator Should generate a client for example API 1`] = `
+exports[`API Integration Generator > Should generate a client for example API 1`] = `
 "type Type2048581c137c5b2130eb860e3ae37da196dfc25b = {
     title: string;
     features: Type2048581c137c5b2130eb860e3ae37da196dfc25b;
@@ -364,7 +364,7 @@ export class ExpressZodAPIClient {
 }"
 `;
 
-exports[`API Integration Generator Should generate a types for example API 1`] = `
+exports[`API Integration Generator > Should generate a types for example API 1`] = `
 "type Type2048581c137c5b2130eb860e3ae37da196dfc25b = {
     title: string;
     features: Type2048581c137c5b2130eb860e3ae37da196dfc25b;
@@ -492,7 +492,7 @@ export interface Response extends Record<MethodPath, any> {
 }"
 `;
 
-exports[`API Integration Generator Should treat optionals the same way as z.infer() by default 1`] = `
+exports[`API Integration Generator > Should treat optionals the same way as z.infer() by default 1`] = `
 "type PostV1TestWithDashesInput = {
     opt?: string | undefined;
 };

@@ -13,6 +13,7 @@ import { mimeJson } from "../../src/mime";
 import { makeRequestMock, makeResponseMock } from "../../src/testing";
 import { initRouting } from "../../src/routing";
 import type { Express, Request, RequestHandler, Response } from "express";
+import { Mock, beforeEach, describe, expect, test, vi } from "vitest";
 
 let appMock: any;
 let loggerMock: any;
@@ -21,25 +22,25 @@ describe("Routing", () => {
   describe("initRouting()", () => {
     beforeEach(() => {
       appMock = {
-        get: jest.fn(),
-        post: jest.fn(),
-        put: jest.fn(),
-        delete: jest.fn(),
-        patch: jest.fn(),
-        options: jest.fn(),
-        use: jest.fn(),
+        get: vi.fn(),
+        post: vi.fn(),
+        put: vi.fn(),
+        delete: vi.fn(),
+        patch: vi.fn(),
+        options: vi.fn(),
+        use: vi.fn(),
       };
 
       loggerMock = {
-        info: jest.fn(),
-        warn: jest.fn(),
-        error: jest.fn(),
-        debug: jest.fn(),
+        info: vi.fn(),
+        warn: vi.fn(),
+        error: vi.fn(),
+        debug: vi.fn(),
       };
     });
 
     test("Should set right methods", () => {
-      const handlerMock = jest.fn();
+      const handlerMock = vi.fn();
       const configMock = {
         cors: true,
         startupLogo: false,
@@ -113,7 +114,7 @@ describe("Routing", () => {
     });
 
     test("Should accept DependsOnMethod", () => {
-      const handlerMock = jest.fn();
+      const handlerMock = vi.fn();
       const configMock = {
         cors: true,
         startupLogo: false,
@@ -173,7 +174,7 @@ describe("Routing", () => {
         methods: ["put", "patch"],
         input: z.object({}),
         output: z.object({}),
-        handler: jest.fn(),
+        handler: vi.fn(),
       });
       const routing: Routing = {
         v1: {
@@ -195,7 +196,7 @@ describe("Routing", () => {
     });
 
     test("Issue 705: should set all DependsOnMethod' methods for CORS", async () => {
-      const handler = jest.fn(async () => ({}));
+      const handler = vi.fn(async () => ({}));
       const configMock = {
         cors: true,
         startupLogo: false,
@@ -240,10 +241,10 @@ describe("Routing", () => {
       const fn = appMock.options.mock.calls[0][1];
       expect(typeof fn).toBe("function"); // async (req, res) => void
       const requestMock = makeRequestMock({
-        fnMethod: jest.fn,
+        fnMethod: vi.fn,
         requestProps: { method: "PUT" },
       });
-      const responseMock = makeResponseMock({ fnMethod: jest.fn });
+      const responseMock = makeResponseMock({ fnMethod: vi.fn });
       await fn(requestMock, responseMock);
       expect(responseMock.status).toHaveBeenCalledWith(200);
       expect(responseMock.set).toHaveBeenCalledTimes(3);
@@ -254,7 +255,7 @@ describe("Routing", () => {
     });
 
     test("Should accept parameters", () => {
-      const handlerMock = jest.fn();
+      const handlerMock = vi.fn();
       const configMock = { startupLogo: false };
       const endpointMock = new EndpointsFactory(defaultResultHandler).build({
         methods: ["get"],
@@ -280,7 +281,7 @@ describe("Routing", () => {
     });
 
     test("Should handle empty paths and trim spaces", () => {
-      const handlerMock = jest.fn();
+      const handlerMock = vi.fn();
       const configMock = { startupLogo: false };
       const endpointMock = new EndpointsFactory(defaultResultHandler).build({
         methods: ["get"],
@@ -310,7 +311,7 @@ describe("Routing", () => {
     });
 
     test("Should throw an error in case of slashes in route", () => {
-      const handlerMock = jest.fn();
+      const handlerMock = vi.fn();
       const configMock = { startupLogo: false };
       const endpointMock = new EndpointsFactory(defaultResultHandler).build({
         methods: ["get"],
@@ -343,7 +344,7 @@ describe("Routing", () => {
     });
 
     test("Should execute endpoints with right arguments", async () => {
-      const handlerMock = jest
+      const handlerMock = vi
         .fn()
         .mockImplementationOnce(() => ({ result: true }));
       const configMock = { cors: true, startupLogo: false };
@@ -374,17 +375,17 @@ describe("Routing", () => {
       const routeHandler = appMock.post.mock.calls[0][1] as RequestHandler;
       const requestMock = {
         method: "POST",
-        header: jest.fn(() => mimeJson),
+        header: vi.fn(() => mimeJson),
         body: {
           test: 123,
         },
       };
-      const responseMock: Record<string, jest.Mock> = {
-        set: jest.fn().mockImplementation(() => responseMock),
-        status: jest.fn().mockImplementation(() => responseMock),
-        json: jest.fn().mockImplementation(() => responseMock),
+      const responseMock: Record<string, Mock> = {
+        set: vi.fn().mockImplementation(() => responseMock),
+        status: vi.fn().mockImplementation(() => responseMock),
+        json: vi.fn().mockImplementation(() => responseMock),
       };
-      const nextMock = jest.fn();
+      const nextMock = vi.fn();
       await routeHandler(
         requestMock as unknown as Request,
         responseMock as unknown as Response,

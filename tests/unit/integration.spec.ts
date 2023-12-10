@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { routing } from "../../example/routing";
 import { Integration, defaultEndpointsFactory } from "../../src";
+import { describe, expect, test } from "vitest";
 
 describe("API Integration Generator", () => {
   test.each(["client", "types"] as const)(

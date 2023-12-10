@@ -10,6 +10,7 @@ import {
   defaultResultHandler,
 } from "../../src";
 import { givePort, waitFor } from "../helpers";
+import { afterAll, beforeAll, describe, expect, test, vi } from "vitest";
 
 describe("App", () => {
   const port = givePort();
@@ -134,7 +135,7 @@ describe("App", () => {
           }),
       },
     };
-    jest.spyOn(global.console, "log").mockImplementation(jest.fn());
+    vi.spyOn(global.console, "log").mockImplementation(vi.fn<any>());
     server = (
       await createServer(
         {
@@ -158,7 +159,7 @@ describe("App", () => {
     server.close();
     // this approach works better than .close() callback
     await waitFor(() => !server.listening);
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   describe("Positive", () => {

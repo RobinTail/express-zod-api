@@ -59,10 +59,11 @@ import {
 } from "../../src/documentation-helpers";
 import { SchemaHandler, walkSchema } from "../../src/schema-walker";
 import { serializeSchemaForTest } from "../helpers";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
 describe("Documentation helpers", () => {
-  const getRefMock = jest.fn();
-  const makeRefMock = jest.fn(
+  const getRefMock = vi.fn();
+  const makeRefMock = vi.fn(
     (name: string, {}: SchemaObject | ReferenceObject): ReferenceObject => ({
       $ref: `#/components/schemas/${name}`,
     }),
@@ -312,7 +313,7 @@ describe("Documentation helpers", () => {
           ...responseCtx,
           next: makeNext(responseCtx),
         });
-        fail("Should not be here");
+        expect.fail("Should not be here");
       } catch (e) {
         expect(e).toBeInstanceOf(DocumentationError);
         expect(e).toMatchSnapshot();
@@ -766,7 +767,7 @@ describe("Documentation helpers", () => {
               test: z.boolean(),
             }),
             output: z.object({}),
-            handler: jest.fn(),
+            handler: vi.fn(),
           }),
           inputSources: ["query", "params"],
           composition: "inline",
@@ -785,7 +786,7 @@ describe("Documentation helpers", () => {
               test: z.boolean(),
             }),
             output: z.object({}),
-            handler: jest.fn(),
+            handler: vi.fn(),
           }),
           inputSources: ["body", "params"],
           composition: "inline",
@@ -804,7 +805,7 @@ describe("Documentation helpers", () => {
               test: z.boolean(),
             }),
             output: z.object({}),
-            handler: jest.fn(),
+            handler: vi.fn(),
           }),
           inputSources: ["body"],
           composition: "inline",
@@ -824,7 +825,7 @@ describe("Documentation helpers", () => {
               test: z.boolean(),
             }),
             output: z.object({}),
-            handler: jest.fn(),
+            handler: vi.fn(),
           }),
           inputSources: ["query", "headers", "params"],
           composition: "inline",
@@ -863,7 +864,7 @@ describe("Documentation helpers", () => {
           ...responseCtx,
           next: makeNext(responseCtx),
         });
-        fail("should not be here");
+        expect.fail("should not be here");
       } catch (e) {
         expect(e).toBeInstanceOf(DocumentationError);
         expect(e).toMatchSnapshot();
@@ -888,7 +889,7 @@ describe("Documentation helpers", () => {
           ...requestCtx,
           next: makeNext(requestCtx),
         });
-        fail("should not be here");
+        expect.fail("should not be here");
       } catch (e) {
         expect(e).toBeInstanceOf(DocumentationError);
         expect(e).toMatchSnapshot();
@@ -906,7 +907,7 @@ describe("Documentation helpers", () => {
             ...ctx,
             next: makeNext(ctx),
           });
-          fail("should not be here");
+          expect.fail("should not be here");
         } catch (e) {
           expect(e).toBeInstanceOf(DocumentationError);
           expect(e).toMatchSnapshot();

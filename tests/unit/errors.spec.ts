@@ -7,6 +7,7 @@ import {
   OutputValidationError,
   ResultHandlerError,
 } from "../../src/errors";
+import { describe, expect, test } from "vitest";
 
 describe("Errors", () => {
   describe("RoutingError", () => {
