@@ -1,12 +1,18 @@
 import { LEVEL, MESSAGE, SPLAT } from "triple-beam";
 import MockDate from "mockdate";
-import stripAnsi from "strip-ansi";
+/**
+ * @todo Upgrade @types/has-ansi when fixed for ESM
+ * @see https://github.com/DefinitelyTyped/DefinitelyTyped/issues/66678
+ * */
 import hasAnsi from "has-ansi";
-import { createLogger, isSimplifiedWinstonConfig } from "../../src/logger";
+import { createLogger, isSimplifiedWinstonConfig } from "../../src/logger.js";
 import winston from "winston";
 import { afterAll, beforeEach, describe, expect, test, vi } from "vitest";
 
-describe("Logger", () => {
+describe("Logger", async () => {
+  /** @todo use regular import if/when switched to ESM first */
+  const stripAnsi = (await import("strip-ansi")).default;
+
   beforeEach(() => {
     MockDate.set("2022-01-01T00:00:00Z");
   });
