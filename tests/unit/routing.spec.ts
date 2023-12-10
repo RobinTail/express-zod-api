@@ -1,4 +1,9 @@
-import { staticHandler, staticMock } from "../express-mock";
+import {
+  appMock,
+  expressMock,
+  staticHandler,
+  staticMock,
+} from "../express-mock";
 import winston from "winston";
 import { z } from "zod";
 import {
@@ -17,22 +22,24 @@ import {
 } from "../../src/testing";
 import { initRouting } from "../../src/routing";
 import type { Express, Request, RequestHandler, Response } from "express";
-import { Mock, beforeEach, describe, expect, test, vi } from "vitest";
-
-let appMock: any;
+import {
+  Mock,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  test,
+  vi,
+} from "vitest";
 
 describe("Routing", () => {
   describe("initRouting()", () => {
+    beforeAll(() => {
+      expressMock();
+    });
+
     beforeEach(() => {
-      appMock = {
-        get: vi.fn(),
-        post: vi.fn(),
-        put: vi.fn(),
-        delete: vi.fn(),
-        patch: vi.fn(),
-        options: vi.fn(),
-        use: vi.fn(),
-      };
+      vi.clearAllMocks(); // resets call counters on mocked methods
     });
 
     test("Should set right methods", () => {
@@ -70,7 +77,7 @@ describe("Routing", () => {
         },
       };
       initRouting({
-        app: appMock as Express,
+        app: appMock as unknown as Express,
         logger: winston.createLogger({ silent: true }),
         config: configMock as CommonConfig,
         routing,
@@ -99,7 +106,7 @@ describe("Routing", () => {
         startupLogo: false,
       };
       initRouting({
-        app: appMock,
+        app: appMock as unknown as Express,
         logger: winston.createLogger({ silent: true }),
         config: configMock as CommonConfig,
         routing,
@@ -145,7 +152,7 @@ describe("Routing", () => {
         },
       };
       initRouting({
-        app: appMock as Express,
+        app: appMock as unknown as Express,
         logger: winston.createLogger({ silent: true }),
         config: configMock as CommonConfig,
         routing,
@@ -183,7 +190,7 @@ describe("Routing", () => {
       };
       expect(() =>
         initRouting({
-          app: appMock as Express,
+          app: appMock as unknown as Express,
           logger: winston.createLogger({ silent: true }),
           config: configMock as CommonConfig,
           routing,
@@ -227,7 +234,7 @@ describe("Routing", () => {
         }),
       };
       initRouting({
-        app: appMock as Express,
+        app: appMock as unknown as Express,
         logger: winston.createLogger({ silent: true }),
         config: configMock as CommonConfig,
         routing,
@@ -267,7 +274,7 @@ describe("Routing", () => {
         },
       };
       initRouting({
-        app: appMock as Express,
+        app: appMock as unknown as Express,
         logger: winston.createLogger({ silent: true }),
         config: configMock as CommonConfig,
         routing,
@@ -296,7 +303,7 @@ describe("Routing", () => {
         },
       };
       initRouting({
-        app: appMock as Express,
+        app: appMock as unknown as Express,
         logger: winston.createLogger({ silent: true }),
         config: configMock as CommonConfig,
         routing,
@@ -317,7 +324,7 @@ describe("Routing", () => {
       });
       expect(() =>
         initRouting({
-          app: appMock as Express,
+          app: appMock as unknown as Express,
           logger: winston.createLogger({ silent: true }),
           config: configMock as CommonConfig,
           routing: {
@@ -329,7 +336,7 @@ describe("Routing", () => {
       ).toThrowErrorMatchingSnapshot();
       expect(() =>
         initRouting({
-          app: appMock as Express,
+          app: appMock as unknown as Express,
           logger: winston.createLogger({ silent: true }),
           config: configMock as CommonConfig,
           routing: {
@@ -363,7 +370,7 @@ describe("Routing", () => {
       };
       const loggerMock = makeLoggerMock({ fnMethod: vi.fn });
       initRouting({
-        app: appMock as Express,
+        app: appMock as unknown as Express,
         logger: loggerMock,
         config: configMock as CommonConfig,
         routing,

@@ -11,7 +11,10 @@ vi.mock("express-fileupload", () => ({ default: fileUploadMock }));
 const staticHandler = vi.fn();
 const staticMock = vi.fn(() => staticHandler);
 
-let appMock: Record<"disable" | "use" | "get" | "post" | "options", Mock>;
+let appMock: Record<
+  "disable" | "use" | "get" | "post" | "put" | "patch" | "delete" | "options",
+  Mock
+>;
 
 const expressMock = () => {
   appMock = {
@@ -19,6 +22,9 @@ const expressMock = () => {
     use: vi.fn(() => appMock),
     get: vi.fn(),
     post: vi.fn(),
+    put: vi.fn(),
+    patch: vi.fn(),
+    delete: vi.fn(),
     options: vi.fn(),
   };
   return appMock;
