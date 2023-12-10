@@ -16,12 +16,13 @@ import {
 import winston from "winston";
 import { z } from "zod";
 import {
+  AppConfig,
   EndpointsFactory,
+  ServerConfig,
   attachRouting,
   createServer,
   defaultResultHandler,
 } from "../../src";
-import { AppConfig, ServerConfig } from "../../src";
 import { mimeJson } from "../../src/mime";
 import {
   createNotFoundHandler,
