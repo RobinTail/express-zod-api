@@ -1,4 +1,4 @@
-import { ChildProcessWithoutNullStreams, spawn } from "node:child_process";
+import { spawn } from "node:child_process";
 import { createReadStream, readFileSync } from "node:fs";
 import { expectType } from "tsd";
 import {
@@ -11,20 +11,21 @@ import { givePort, waitFor } from "../helpers";
 import { createHash } from "node:crypto";
 import FormData from "form-data";
 import { readFile } from "node:fs/promises";
-import { afterAll, afterEach, beforeAll, describe, expect, test } from "vitest";
+import { afterAll, afterEach, describe, expect, test } from "vitest";
 
-describe("Example", () => {
-  let example: ChildProcessWithoutNullStreams;
+describe("Example", async () => {
   let out = "";
   const listener = (chunk: Buffer) => {
     out += chunk.toString();
   };
+  const example = spawn("node", [
+    "-r",
+    "@swc-node/register",
+    "example/index.ts",
+  ]);
+  example.stdout.on("data", listener);
   const port = givePort("example");
-
-  beforeAll(() => {
-    example = spawn("node", ["-r", "@swc-node/register", "example/index.ts"]);
-    example.stdout.on("data", listener);
-  });
+  await waitFor(() => out.indexOf(`Listening ${port}`) > -1);
 
   afterAll(async () => {
     example.stdout.removeListener("data", listener);
@@ -37,11 +38,6 @@ describe("Example", () => {
   });
 
   describe("Positive", () => {
-    test("Should listen", async () => {
-      await waitFor(() => out.indexOf(`Listening ${port}`) > -1);
-      expect(true).toBeTruthy();
-    });
-
     test("Should handle OPTIONS request", async () => {
       const response = await fetch(`http://localhost:${port}/v1/user/100`, {
         method: "OPTIONS",

@@ -37,7 +37,7 @@
     "test:badge": "make-coverage-badge --output-path coverage.svg",
     "lint": "eslint src example tests tools && yarn prettier *.md --check",
     "mdfix": "prettier *.md --write",
-    "cleanup": "rm -rf tests/**/node_modules",
+    "cleanup": "rm -rf tests/**/node_modules coverage tests/**/coverage",
     "tsnode": "node -r @swc-node/register",
     "precommit": "yarn lint && yarn test && yarn build && git add example/example.* LICENSE coverage.svg",
     "prepublishOnly": "yarn lint && yarn test && yarn build",

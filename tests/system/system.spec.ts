@@ -150,6 +150,7 @@ describe("App", async () => {
       routing,
     )
   ).httpServer;
+  await waitFor(() => server.listening);
 
   afterAll(async () => {
     server.close();
@@ -159,10 +160,6 @@ describe("App", async () => {
   });
 
   describe("Positive", () => {
-    test("Is listening", () => {
-      expect(server.listening).toBeTruthy();
-    });
-
     test("Should handle valid GET request", async () => {
       const response = await fetch(
         `http://127.0.0.1:${port}/v1/test?key=123&something=joke`,

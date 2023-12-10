@@ -1,22 +1,21 @@
-import { ChildProcessWithoutNullStreams, spawn } from "node:child_process";
+import { spawn } from "node:child_process";
 import { givePort, waitFor } from "../helpers";
-import { afterAll, afterEach, beforeAll, describe, expect, test } from "vitest";
+import { afterAll, afterEach, describe, expect, test } from "vitest";
 
-describe("Integration Test", () => {
-  let quickStart: ChildProcessWithoutNullStreams;
+describe("Integration Test", async () => {
   let out = "";
   const listener = (chunk: Buffer) => {
     out += chunk.toString();
   };
+  const quickStart = spawn(
+    "node",
+    ["-r", "@swc-node/register", "quick-start.ts"],
+    { cwd: "./tests/integration" },
+  );
+  quickStart.stdout.on("data", listener);
+  quickStart.stderr.on("data", listener);
   const port = givePort("example");
-
-  beforeAll(() => {
-    quickStart = spawn("node", ["-r", "@swc-node/register", "quick-start.ts"], {
-      cwd: "./tests/integration",
-    });
-    quickStart.stdout.on("data", listener);
-    quickStart.stderr.on("data", listener);
-  });
+  await waitFor(() => out.indexOf(`Listening ${port}`) > -1);
 
   afterAll(async () => {
     quickStart.stdout.removeListener("data", listener);
@@ -31,11 +30,6 @@ describe("Integration Test", () => {
   });
 
   describe("Quick Start from Readme", () => {
-    test("Should listen", async () => {
-      await waitFor(() => out.indexOf(`Listening ${port}`) > -1);
-      expect(true).toBeTruthy();
-    });
-
     test("Should handle valid GET request", async () => {
       const response = await fetch(
         `http://localhost:${port}/v1/hello?name=Rick`,
