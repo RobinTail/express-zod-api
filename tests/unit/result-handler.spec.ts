@@ -8,25 +8,17 @@ import {
   withMeta,
 } from "../../src";
 import { metaProp } from "../../src/metadata";
-import { beforeEach, describe, expect, test, vi } from "vitest";
-
-let loggerMock: any;
-let responseMock: any;
+import { describe, expect, test, vi } from "vitest";
+import {
+  makeLoggerMock,
+  makeRequestMock,
+  makeResponseMock,
+} from "../../src/testing";
 
 describe("ResultHandler", () => {
-  beforeEach(() => {
-    loggerMock = {
-      info: vi.fn(),
-      warn: vi.fn(),
-      error: vi.fn(),
-      debug: vi.fn(),
-    };
-    responseMock = {
-      set: vi.fn(() => responseMock),
-      status: vi.fn(() => responseMock),
-      json: vi.fn(() => responseMock),
-      send: vi.fn(() => responseMock),
-    };
+  const requestMock = makeRequestMock({
+    fnMethod: vi.fn,
+    requestProps: { method: "POST", url: "http://something/v1/anything" },
   });
 
   describe.each([
@@ -47,16 +39,14 @@ describe("ResultHandler", () => {
       errorMethod,
     }) => {
       test("Should handle generic error", () => {
-        const requestMock = {
-          method: "POST",
-          url: "http://something/v1/anything",
-        };
+        const responseMock = makeResponseMock({ fnMethod: vi.fn });
+        const loggerMock = makeLoggerMock({ fnMethod: vi.fn });
         handler({
           error: new Error("Some error"),
           input: { something: 453 },
           output: { anything: 118 },
-          request: requestMock as Request,
-          response: responseMock as Response,
+          request: requestMock as unknown as Request,
+          response: responseMock as unknown as Response,
           logger: loggerMock,
         });
         expect(loggerMock.error).toHaveBeenCalledTimes(1);
@@ -77,10 +67,8 @@ describe("ResultHandler", () => {
       });
 
       test("Should handle schema error", () => {
-        const requestMock = {
-          method: "POST",
-          url: "http://something/v1/anything",
-        };
+        const responseMock = makeResponseMock({ fnMethod: vi.fn });
+        const loggerMock = makeLoggerMock({ fnMethod: vi.fn });
         handler({
           error: new InputValidationError(
             new z.ZodError([
@@ -95,8 +83,8 @@ describe("ResultHandler", () => {
           ),
           input: { something: 453 },
           output: { anything: 118 },
-          request: requestMock as Request,
-          response: responseMock as Response,
+          request: requestMock as unknown as Request,
+          response: responseMock as unknown as Response,
           logger: loggerMock,
         });
         expect(loggerMock.error).toHaveBeenCalledTimes(0);
@@ -106,16 +94,14 @@ describe("ResultHandler", () => {
       });
 
       test("Should handle HTTP error", () => {
-        const requestMock = {
-          method: "POST",
-          url: "http://something/v1/anything",
-        };
+        const responseMock = makeResponseMock({ fnMethod: vi.fn });
+        const loggerMock = makeLoggerMock({ fnMethod: vi.fn });
         handler({
           error: createHttpError(404, "Something not found"),
           input: { something: 453 },
           output: { anything: 118 },
-          request: requestMock as Request,
-          response: responseMock as Response,
+          request: requestMock as unknown as Request,
+          response: responseMock as unknown as Response,
           logger: loggerMock,
         });
         expect(loggerMock.error).toHaveBeenCalledTimes(0);
@@ -125,16 +111,14 @@ describe("ResultHandler", () => {
       });
 
       test("Should handle regular response", () => {
-        const requestMock = {
-          method: "POST",
-          url: "http://something/v1/anything",
-        };
+        const responseMock = makeResponseMock({ fnMethod: vi.fn });
+        const loggerMock = makeLoggerMock({ fnMethod: vi.fn });
         handler({
           error: null,
           input: { something: 453 },
           output: { anything: 118, items: ["One", "Two", "Three"] },
-          request: requestMock as Request,
-          response: responseMock as Response,
+          request: requestMock as unknown as Request,
+          response: responseMock as unknown as Response,
           logger: loggerMock,
         });
         expect(loggerMock.error).toHaveBeenCalledTimes(0);
@@ -172,16 +156,14 @@ describe("ResultHandler", () => {
   );
 
   test("arrayResultHandler should fail when there is no items prop in the output", () => {
-    const requestMock = {
-      method: "POST",
-      url: "http://something/v1/anything",
-    };
+    const responseMock = makeResponseMock({ fnMethod: vi.fn });
+    const loggerMock = makeLoggerMock({ fnMethod: vi.fn });
     arrayResultHandler.handler({
       error: null,
       input: { something: 453 },
       output: { anything: 118 },
-      request: requestMock as Request,
-      response: responseMock as Response,
+      request: requestMock as unknown as Request,
+      response: responseMock as unknown as Response,
       logger: loggerMock,
     });
     expect(loggerMock.error).toHaveBeenCalledTimes(0);
