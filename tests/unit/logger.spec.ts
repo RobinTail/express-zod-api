@@ -5,7 +5,7 @@ import MockDate from "mockdate";
  * @see https://github.com/DefinitelyTyped/DefinitelyTyped/issues/66678
  * */
 import hasAnsi from "has-ansi";
-import { createLogger, isSimplifiedWinstonConfig } from "../../src/logger.js";
+import { createLogger, isSimplifiedWinstonConfig } from "../../src/logger";
 import winston from "winston";
 import { afterAll, beforeEach, describe, expect, test, vi } from "vitest";
 
