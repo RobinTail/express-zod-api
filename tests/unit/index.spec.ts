@@ -27,8 +27,7 @@ import {
   ZodFileDef,
   ZodUploadDef,
 } from "../../src";
-import { describe, expect, test } from "vitest";
-import { vi } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 
 describe("Index Entrypoint", () => {
   describe("exports", () => {
