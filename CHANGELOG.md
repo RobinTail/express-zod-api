@@ -2,6 +2,17 @@
 
 ## Version 15
 
+### 15.0.1
+
+- Development environment improvements:
+  - Transitioned from an exclusive approach to the inclusive one:
+    - Introducing the list of `files` included into the distribution (instead of ignoring redundant ones).
+  - Stable testing environment:
+    - Inclusive, stable and extendible `tsconfig.json` files;
+    - Stable `package.json` for integration, ESM and compatibility tests;
+    - Dedicated environment for Issue #952 test.
+  - Simplified development commands.
+
 ### 15.0.0
 
 - **Breaking changes**:
