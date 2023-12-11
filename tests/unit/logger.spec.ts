@@ -1,8 +1,9 @@
-import { LEVEL, MESSAGE, SPLAT } from "triple-beam";
 import MockDate from "mockdate";
-import stripAnsi from "strip-ansi";
-import hasAnsi from "has-ansi";
-import { createLogger, isSimplifiedWinstonConfig } from "../../src/logger";
+import {
+  SimplifiedWinstonConfig,
+  createLogger,
+  isSimplifiedWinstonConfig,
+} from "../../src/logger";
 import winston from "winston";
 import { afterAll, beforeEach, describe, expect, test, vi } from "vitest";
 
@@ -15,22 +16,17 @@ describe("Logger", () => {
     MockDate.reset();
   });
 
-  const dropColorInObjectProps = <T extends Record<string | symbol, any>>(
-    obj: T,
-  ) => {
-    return Reflect.ownKeys(obj).reduce(
-      (acc, key) => ({
-        ...acc,
-        [key]: typeof obj[key] === "string" ? stripAnsi(obj[key]) : obj[key],
-      }),
-      {} as typeof obj,
-    );
+  const makeLogger = (props: SimplifiedWinstonConfig) => {
+    const logger = createLogger({ winston, ...props });
+    const logSpy = vi
+      .spyOn(logger.transports[0], "log")
+      .mockImplementation(({}, next) => next());
+    return { logger, logSpy };
   };
 
   describe("createWinstonLogger()", () => {
     test("Should create silent logger", () => {
-      const logger = createLogger({ winston, level: "silent" });
-      const transform = vi.spyOn(logger.transports[0].format!, "transform");
+      const { logger, logSpy } = makeLogger({ level: "silent" });
       expect(logger.silent).toBeTruthy();
       expect(logger.isErrorEnabled()).toBeTruthy();
       expect(logger.isWarnEnabled()).toBeTruthy();
@@ -39,12 +35,11 @@ describe("Logger", () => {
       expect(logger.isDebugEnabled()).toBeFalsy();
       expect(logger.isSillyEnabled()).toBeFalsy();
       logger.error("test");
-      expect(transform).toHaveBeenCalledTimes(0);
+      expect(logSpy).toHaveBeenCalledTimes(0);
     });
 
     test("Should create warn logger", () => {
-      const logger = createLogger({ winston, level: "warn" });
-      const transform = vi.spyOn(logger.transports[0].format!, "transform");
+      const { logger, logSpy } = makeLogger({ level: "warn" });
       expect(logger.isErrorEnabled()).toBeTruthy();
       expect(logger.isWarnEnabled()).toBeTruthy();
       expect(logger.isInfoEnabled()).toBeFalsy();
@@ -52,24 +47,11 @@ describe("Logger", () => {
       expect(logger.isDebugEnabled()).toBeFalsy();
       expect(logger.isSillyEnabled()).toBeFalsy();
       logger.warn("testing warn message", { withMeta: true });
-      expect(transform).toHaveBeenCalled();
-      const params = transform.mock.calls[0][0];
-      expect(params).toEqual({
-        level: "warn",
-        [LEVEL]: "warn",
-        timestamp: "2022-01-01T00:00:00.000Z",
-        [SPLAT]: [{ withMeta: true }],
-        withMeta: true,
-        message: "testing warn message",
-        [MESSAGE]:
-          '2022-01-01T00:00:00.000Z warn: testing warn message {"withMeta":true}',
-      });
-      expect(hasAnsi(params.level)).toBeFalsy();
+      expect(logSpy.mock.calls).toMatchSnapshot();
     });
 
     test("Should create debug logger", () => {
-      const logger = createLogger({ winston, level: "debug", color: true });
-      const transform = vi.spyOn(logger.transports[0].format!, "transform");
+      const { logger, logSpy } = makeLogger({ level: "debug", color: true });
       expect(logger.isErrorEnabled()).toBeTruthy();
       expect(logger.isWarnEnabled()).toBeTruthy();
       expect(logger.isInfoEnabled()).toBeTruthy();
@@ -77,42 +59,19 @@ describe("Logger", () => {
       expect(logger.isDebugEnabled()).toBeTruthy();
       expect(logger.isSillyEnabled()).toBeFalsy();
       logger.debug("testing debug message", { withColorful: "output" });
-      expect(transform).toHaveBeenCalled();
-      const params = transform.mock.calls[0][0];
-      expect(dropColorInObjectProps(params)).toEqual({
-        level: "debug",
-        [LEVEL]: "debug",
-        timestamp: "2022-01-01T00:00:00.000Z",
-        [SPLAT]: [{ withColorful: "output" }],
-        withColorful: "output",
-        message: "testing debug message",
-        [MESSAGE]: `2022-01-01T00:00:00.000Z debug: testing debug message { withColorful: 'output' }`,
-      });
-      expect(hasAnsi(params.level)).toBeTruthy();
+      expect(logSpy.mock.calls).toMatchSnapshot();
     });
 
     test("Should manage profiling", () => {
-      const logger = createLogger({ winston, level: "debug", color: true });
-      const transform = vi.spyOn(logger.transports[0].format!, "transform");
+      const { logger, logSpy } = makeLogger({ level: "debug", color: true });
       logger.profile("long-test");
       MockDate.set("2022-01-01T00:00:00.554Z");
       logger.profile("long-test");
-      expect(transform).toHaveBeenCalled();
-      const params = transform.mock.calls[0][0];
-      expect(dropColorInObjectProps(params)).toEqual({
-        durationMs: 554,
-        level: "info",
-        [LEVEL]: "info",
-        timestamp: "2022-01-01T00:00:00.554Z",
-        message: "long-test",
-        [MESSAGE]: `2022-01-01T00:00:00.554Z info: long-test duration: 554ms`,
-      });
-      expect(hasAnsi(params.level)).toBeTruthy();
+      expect(logSpy.mock.calls).toMatchSnapshot();
     });
 
     test("Should handle empty message", () => {
-      const logger = createLogger({ winston, level: "debug", color: true });
-      const transform = vi.spyOn(logger.transports[0].format!, "transform");
+      const { logger, logSpy } = makeLogger({ level: "debug", color: true });
       expect(logger.isErrorEnabled()).toBeTruthy();
       expect(logger.isWarnEnabled()).toBeTruthy();
       expect(logger.isInfoEnabled()).toBeTruthy();
@@ -120,53 +79,24 @@ describe("Logger", () => {
       expect(logger.isDebugEnabled()).toBeTruthy();
       expect(logger.isSillyEnabled()).toBeFalsy();
       logger.error({ someData: "test" });
-      expect(transform).toHaveBeenCalled();
-      const params = transform.mock.calls[0][0];
-      expect(dropColorInObjectProps(params)).toEqual({
-        level: "error",
-        [LEVEL]: "error",
-        timestamp: "2022-01-01T00:00:00.000Z",
-        message: { someData: "test" },
-        [MESSAGE]: `2022-01-01T00:00:00.000Z error: [No message] { someData: 'test' }`,
-      });
-      expect(hasAnsi(params.level)).toBeTruthy();
+      expect(logSpy.mock.calls).toMatchSnapshot();
     });
 
     test.each(["debug", "warn"] as const)(
       "Should handle non-object meta %#",
       (level) => {
-        const logger = createLogger({ winston, level, color: true });
-        const transform = vi.spyOn(logger.transports[0].format!, "transform");
+        const { logger, logSpy } = makeLogger({ level, color: true });
         logger.error("Code", 8090);
-        expect(transform).toHaveBeenCalled();
-        const params = transform.mock.calls[0][0];
-        expect(dropColorInObjectProps(params)).toEqual({
-          level: "error",
-          [LEVEL]: "error",
-          timestamp: "2022-01-01T00:00:00.000Z",
-          [SPLAT]: [8090],
-          message: "Code",
-          [MESSAGE]: `2022-01-01T00:00:00.000Z error: Code 8090`,
-        });
+        expect(logSpy.mock.calls).toMatchSnapshot();
       },
     );
 
     test.each(["debug", "warn"] as const)(
-      "Should handle empty object meta",
+      "Should handle empty object meta %#",
       (level) => {
-        const logger = createLogger({ winston, level, color: true });
-        const transform = vi.spyOn(logger.transports[0].format!, "transform");
+        const { logger, logSpy } = makeLogger({ level, color: true });
         logger.error("Payload", {});
-        expect(transform).toHaveBeenCalled();
-        const params = transform.mock.calls[0][0];
-        expect(dropColorInObjectProps(params)).toEqual({
-          level: "error",
-          [LEVEL]: "error",
-          timestamp: "2022-01-01T00:00:00.000Z",
-          [SPLAT]: [{}],
-          message: "Payload",
-          [MESSAGE]: `2022-01-01T00:00:00.000Z error: Payload {}`,
-        });
+        expect(logSpy.mock.calls).toMatchSnapshot();
       },
     );
   });

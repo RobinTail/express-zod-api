@@ -740,11 +740,6 @@
     "@types/qs" "*"
     "@types/serve-static" "*"
 
-"@types/has-ansi@^5.0.0":
-  version "5.0.2"
-  resolved "https://registry.yarnpkg.com/@types/has-ansi/-/has-ansi-5.0.2.tgz#21d874bfb4a9534db0d279645a3af0964650965e"
-  integrity sha512-umJQ393eDf2R9eBdRxZTyXlRDq82ZVT9/tNfF3H3d2GDIBQILq/LZXHSvwXaH2OSvaSHVe2BX3s+IdoFHQ8zmg==
-
 "@types/http-errors@*", "@types/http-errors@^2.0.2":
   version "2.0.4"
   resolved "https://registry.yarnpkg.com/@types/http-errors/-/http-errors-2.0.4.tgz#7eb47726c391b7345a6ec35ad7f4de469cf5ba4f"
@@ -1025,11 +1020,6 @@ ansi-escapes@^6.2.0:
   integrity sha512-kzRaCqXnpzWs+3z5ABPQiVke+iq0KXkHo8xiWV4RPTi5Yli0l97BEQuhXV1s7+aSU/fu1kUuxgS4MsQ0fRuygw==
   dependencies:
     type-fest "^3.0.0"
-
-ansi-regex@^4.1.0:
-  version "4.1.1"
-  resolved "https://registry.yarnpkg.com/ansi-regex/-/ansi-regex-4.1.1.tgz#164daac87ab2d6f6db3a29875e2d1766582dabed"
-  integrity sha512-ILlv4k/3f6vfQ4OoP2AGvirOktlQ98ZEL1k9FaQjxa3L1abBgbuTDAdPOpvbGncC0BTVQrl+OM8xZGK6tWXt7g==
 
 ansi-regex@^5.0.1:
   version "5.0.1"
@@ -2431,13 +2421,6 @@ hard-rejection@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/hard-rejection/-/hard-rejection-2.1.0.tgz#1c6eda5c1685c63942766d79bb40ae773cecd883"
   integrity sha512-VIZB+ibDhx7ObhAe7OVtoEbuP4h/MuOTHJ+J8h/eBXotJYl0fBgR72xDFCKgIh22OJZIOVNxBMWuhAr10r8HdA==
-
-has-ansi@^4.0.1:
-  version "4.0.1"
-  resolved "https://registry.yarnpkg.com/has-ansi/-/has-ansi-4.0.1.tgz#f216a8c8d7b129e490dc15f4a62cc1cdb9603ce8"
-  integrity sha512-Qr4RtTm30xvEdqUXbSBVWDu+PrTokJOwe/FU+VdfJPk+MXAPoeOzKpRyrDTnZIJwAkQ4oBLTU53nu0HrkF/Z2A==
-  dependencies:
-    ansi-regex "^4.1.0"
 
 has-bigints@^1.0.1, has-bigints@^1.0.2:
   version "1.0.2"

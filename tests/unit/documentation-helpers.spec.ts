@@ -1,3 +1,4 @@
+import assert from "node:assert/strict";
 import { ReferenceObject, SchemaObject } from "openapi3-ts/oas30";
 import { z } from "zod";
 import { defaultSerializer } from "../../src/common-helpers";
@@ -665,9 +666,7 @@ describe("Documentation helpers", () => {
 
     test.each([
       z.number().transform((num) => () => num),
-      z.number().transform(() => {
-        throw new Error("this should be handled");
-      }),
+      z.number().transform(() => assert.fail("this should be handled")),
     ])("should handle edge cases", (schema) => {
       expect(
         depictEffect({

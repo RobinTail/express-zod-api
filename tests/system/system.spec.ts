@@ -1,4 +1,5 @@
 import cors from "cors";
+import assert from "node:assert/strict";
 import { z } from "zod";
 import {
   EndpointsFactory,
@@ -38,9 +39,7 @@ describe("App", async () => {
         createResultHandler({
           getPositiveResponse: () => z.object({}),
           getNegativeResponse: () => z.object({}),
-          handler: () => {
-            throw new Error("I am faulty");
-          },
+          handler: () => assert.fail("I am faulty"),
         }),
       )
         .addMiddleware(
@@ -49,13 +48,12 @@ describe("App", async () => {
               mwError: z
                 .any()
                 .optional()
-                .transform((value) => {
-                  if (value) {
-                    throw new Error(
-                      "Custom error in the Middleware input validation",
-                    );
-                  }
-                }),
+                .transform((value) =>
+                  assert(
+                    !value,
+                    "Custom error in the Middleware input validation",
+                  ),
+                ),
             }),
             middleware: async () => ({}),
           }),
@@ -66,13 +64,9 @@ describe("App", async () => {
             epError: z
               .any()
               .optional()
-              .transform((value) => {
-                if (value) {
-                  throw new Error(
-                    "Custom error in the Endpoint input validation",
-                  );
-                }
-              }),
+              .transform((value) =>
+                assert(!value, "Custom error in the Endpoint input validation"),
+              ),
           }),
           output: z.object({
             test: z.string(),
