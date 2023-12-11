@@ -740,11 +740,6 @@
     "@types/qs" "*"
     "@types/serve-static" "*"
 
-"@types/has-ansi@^5.0.2":
-  version "5.0.2"
-  resolved "https://registry.yarnpkg.com/@types/has-ansi/-/has-ansi-5.0.2.tgz#21d874bfb4a9534db0d279645a3af0964650965e"
-  integrity sha512-umJQ393eDf2R9eBdRxZTyXlRDq82ZVT9/tNfF3H3d2GDIBQILq/LZXHSvwXaH2OSvaSHVe2BX3s+IdoFHQ8zmg==
-
 "@types/http-errors@*", "@types/http-errors@^2.0.2":
   version "2.0.4"
   resolved "https://registry.yarnpkg.com/@types/http-errors/-/http-errors-2.0.4.tgz#7eb47726c391b7345a6ec35ad7f4de469cf5ba4f"
@@ -1030,11 +1025,6 @@ ansi-regex@^5.0.1:
   version "5.0.1"
   resolved "https://registry.yarnpkg.com/ansi-regex/-/ansi-regex-5.0.1.tgz#082cb2c89c9fe8659a311a53bd6a4dc5301db304"
   integrity sha512-quJQXlTSUGL2LH9SUXo8VwsY4soanhgo6LNSm84E1LBcE8s3O0wpdiRzyR9z/ZZJMlMWv37qOOb9pdJlMUEKFQ==
-
-ansi-regex@^6.0.1:
-  version "6.0.1"
-  resolved "https://registry.yarnpkg.com/ansi-regex/-/ansi-regex-6.0.1.tgz#3183e38fae9a65d7cb5e53945cd5897d0260a06a"
-  integrity sha512-n5M855fKb2SsfMIiFFoVrABHJC8QtHwVx+mHWP3QcEqBHYienj5dHSgjbxtC0WEZXYt4wcD6zrQElDPhFuZgfA==
 
 ansi-styles@^3.2.1:
   version "3.2.1"
@@ -2431,13 +2421,6 @@ hard-rejection@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/hard-rejection/-/hard-rejection-2.1.0.tgz#1c6eda5c1685c63942766d79bb40ae773cecd883"
   integrity sha512-VIZB+ibDhx7ObhAe7OVtoEbuP4h/MuOTHJ+J8h/eBXotJYl0fBgR72xDFCKgIh22OJZIOVNxBMWuhAr10r8HdA==
-
-has-ansi@^5.0.1:
-  version "5.0.1"
-  resolved "https://registry.yarnpkg.com/has-ansi/-/has-ansi-5.0.1.tgz#eb5ce8db3465c66e0b83c7f01fd0c1ea87687071"
-  integrity sha512-Fp2IsZDnnyoJkKg22ZyQFvD7QRCcMTsLAtloKXyXWJ1joGLtItRU9Bv/k1o0tELL2NF3ZZBcycSKryZUM+Yl3g==
-  dependencies:
-    ansi-regex "^6.0.1"
 
 has-bigints@^1.0.1, has-bigints@^1.0.2:
   version "1.0.2"
@@ -4108,13 +4091,6 @@ strip-ansi@^6.0.1:
   integrity sha512-Y38VPSHcqkFrCpFnQ9vuSXmquuv5oXOKpGeT6aGrr3o3Gc9AlVa6JBfUSOCnbxGGZF+/0ooI7KrPuUSztUdU5A==
   dependencies:
     ansi-regex "^5.0.1"
-
-strip-ansi@^7.1.0:
-  version "7.1.0"
-  resolved "https://registry.yarnpkg.com/strip-ansi/-/strip-ansi-7.1.0.tgz#d5b6568ca689d8561370b0707685d22434faff45"
-  integrity sha512-iq6eVVI64nQQTRYq2KtEg2d2uU7LElhTJwsH4YzIHZshxlgZms/wIc4VoDQTlG/IvVIrBKG06CrZnp0qv7hkcQ==
-  dependencies:
-    ansi-regex "^6.0.1"
 
 strip-bom@^3.0.0:
   version "3.0.0"

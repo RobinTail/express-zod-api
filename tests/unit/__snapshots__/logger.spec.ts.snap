@@ -1,0 +1,148 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Logger > createWinstonLogger() > Should create debug logger 1`] = `
+[
+  [
+    {
+      "level": "[34mdebug[39m",
+      "message": "testing debug message",
+      "timestamp": "2022-01-01T00:00:00.000Z",
+      "withColorful": "output",
+      Symbol(level): "debug",
+      Symbol(splat): [
+        {
+          "withColorful": "output",
+        },
+      ],
+      Symbol(message): "2022-01-01T00:00:00.000Z [34mdebug[39m: testing debug message { withColorful: [32m'output'[39m }",
+    },
+    [Function],
+  ],
+]
+`;
+
+exports[`Logger > createWinstonLogger() > Should create warn logger 1`] = `
+[
+  [
+    {
+      "level": "warn",
+      "message": "testing warn message",
+      "timestamp": "2022-01-01T00:00:00.000Z",
+      "withMeta": true,
+      Symbol(level): "warn",
+      Symbol(splat): [
+        {
+          "withMeta": true,
+        },
+      ],
+      Symbol(message): "2022-01-01T00:00:00.000Z warn: testing warn message {"withMeta":true}",
+    },
+    [Function],
+  ],
+]
+`;
+
+exports[`Logger > createWinstonLogger() > Should handle empty message 1`] = `
+[
+  [
+    {
+      "level": "[31merror[39m",
+      "message": {
+        "someData": "test",
+      },
+      "timestamp": "2022-01-01T00:00:00.000Z",
+      Symbol(level): "error",
+      Symbol(message): "2022-01-01T00:00:00.000Z [31merror[39m: [No message] { someData: [32m'test'[39m }",
+    },
+    [Function],
+  ],
+]
+`;
+
+exports[`Logger > createWinstonLogger() > Should handle empty object meta 0 1`] = `
+[
+  [
+    {
+      "level": "[31merror[39m",
+      "message": "Payload",
+      "timestamp": "2022-01-01T00:00:00.000Z",
+      Symbol(level): "error",
+      Symbol(splat): [
+        {},
+      ],
+      Symbol(message): "2022-01-01T00:00:00.000Z [31merror[39m: Payload {}",
+    },
+    [Function],
+  ],
+]
+`;
+
+exports[`Logger > createWinstonLogger() > Should handle empty object meta 1 1`] = `
+[
+  [
+    {
+      "level": "[31merror[39m",
+      "message": "Payload",
+      "timestamp": "2022-01-01T00:00:00.000Z",
+      Symbol(level): "error",
+      Symbol(splat): [
+        {},
+      ],
+      Symbol(message): "2022-01-01T00:00:00.000Z [31merror[39m: Payload {}",
+    },
+    [Function],
+  ],
+]
+`;
+
+exports[`Logger > createWinstonLogger() > Should handle non-object meta 0 1`] = `
+[
+  [
+    {
+      "level": "[31merror[39m",
+      "message": "Code",
+      "timestamp": "2022-01-01T00:00:00.000Z",
+      Symbol(level): "error",
+      Symbol(splat): [
+        8090,
+      ],
+      Symbol(message): "2022-01-01T00:00:00.000Z [31merror[39m: Code 8090",
+    },
+    [Function],
+  ],
+]
+`;
+
+exports[`Logger > createWinstonLogger() > Should handle non-object meta 1 1`] = `
+[
+  [
+    {
+      "level": "[31merror[39m",
+      "message": "Code",
+      "timestamp": "2022-01-01T00:00:00.000Z",
+      Symbol(level): "error",
+      Symbol(splat): [
+        8090,
+      ],
+      Symbol(message): "2022-01-01T00:00:00.000Z [31merror[39m: Code 8090",
+    },
+    [Function],
+  ],
+]
+`;
+
+exports[`Logger > createWinstonLogger() > Should manage profiling 1`] = `
+[
+  [
+    {
+      "durationMs": 554,
+      "level": "[32minfo[39m",
+      "message": "long-test",
+      "timestamp": "2022-01-01T00:00:00.554Z",
+      Symbol(level): "info",
+      Symbol(message): "2022-01-01T00:00:00.554Z [32minfo[39m: long-test duration: 554ms",
+    },
+    [Function],
+  ],
+]
+`;
