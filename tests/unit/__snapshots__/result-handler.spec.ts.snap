@@ -1,18 +1,18 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`ResultHandler arrayResultHandler Should handle HTTP error 1`] = `
+exports[`ResultHandler > 'arrayResultHandler' > Should handle HTTP error 1`] = `
 [
   "Something not found",
 ]
 `;
 
-exports[`ResultHandler arrayResultHandler Should handle generic error 1`] = `
+exports[`ResultHandler > 'arrayResultHandler' > Should handle generic error 1`] = `
 [
   "Some error",
 ]
 `;
 
-exports[`ResultHandler arrayResultHandler Should handle regular response 1`] = `
+exports[`ResultHandler > 'arrayResultHandler' > Should handle regular response 1`] = `
 [
   [
     "One",
@@ -22,19 +22,13 @@ exports[`ResultHandler arrayResultHandler Should handle regular response 1`] = `
 ]
 `;
 
-exports[`ResultHandler arrayResultHandler Should handle schema error 1`] = `
+exports[`ResultHandler > 'arrayResultHandler' > Should handle schema error 1`] = `
 [
   "something: Expected string, got number",
 ]
 `;
 
-exports[`ResultHandler arrayResultHandler should fail when there is no items prop in the output 1`] = `
-[
-  "Property 'items' is missing in the endpoint output",
-]
-`;
-
-exports[`ResultHandler arrayResultHandler should forward output schema examples 1`] = `
+exports[`ResultHandler > 'arrayResultHandler' > should forward output schema examples 1`] = `
 {
   "examples": [
     [
@@ -46,7 +40,7 @@ exports[`ResultHandler arrayResultHandler should forward output schema examples 
 }
 `;
 
-exports[`ResultHandler arrayResultHandler should generate negative response example 1`] = `
+exports[`ResultHandler > 'arrayResultHandler' > should generate negative response example 1`] = `
 {
   "examples": [
     "Sample error message",
@@ -54,7 +48,7 @@ exports[`ResultHandler arrayResultHandler should generate negative response exam
 }
 `;
 
-exports[`ResultHandler defaultResultHandler Should handle HTTP error 1`] = `
+exports[`ResultHandler > 'defaultResultHandler' > Should handle HTTP error 1`] = `
 [
   {
     "error": {
@@ -65,7 +59,7 @@ exports[`ResultHandler defaultResultHandler Should handle HTTP error 1`] = `
 ]
 `;
 
-exports[`ResultHandler defaultResultHandler Should handle generic error 1`] = `
+exports[`ResultHandler > 'defaultResultHandler' > Should handle generic error 1`] = `
 [
   {
     "error": {
@@ -76,7 +70,7 @@ exports[`ResultHandler defaultResultHandler Should handle generic error 1`] = `
 ]
 `;
 
-exports[`ResultHandler defaultResultHandler Should handle regular response 1`] = `
+exports[`ResultHandler > 'defaultResultHandler' > Should handle regular response 1`] = `
 [
   {
     "data": {
@@ -92,7 +86,7 @@ exports[`ResultHandler defaultResultHandler Should handle regular response 1`] =
 ]
 `;
 
-exports[`ResultHandler defaultResultHandler Should handle schema error 1`] = `
+exports[`ResultHandler > 'defaultResultHandler' > Should handle schema error 1`] = `
 [
   {
     "error": {
@@ -103,7 +97,7 @@ exports[`ResultHandler defaultResultHandler Should handle schema error 1`] = `
 ]
 `;
 
-exports[`ResultHandler defaultResultHandler should forward output schema examples 1`] = `
+exports[`ResultHandler > 'defaultResultHandler' > should forward output schema examples 1`] = `
 {
   "examples": [
     {
@@ -121,7 +115,7 @@ exports[`ResultHandler defaultResultHandler should forward output schema example
 }
 `;
 
-exports[`ResultHandler defaultResultHandler should generate negative response example 1`] = `
+exports[`ResultHandler > 'defaultResultHandler' > should generate negative response example 1`] = `
 {
   "examples": [
     {
@@ -132,4 +126,10 @@ exports[`ResultHandler defaultResultHandler should generate negative response ex
     },
   ],
 }
+`;
+
+exports[`ResultHandler > arrayResultHandler should fail when there is no items prop in the output 1`] = `
+[
+  "Property 'items' is missing in the endpoint output",
+]
 `;

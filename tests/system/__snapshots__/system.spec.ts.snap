@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`App Positive Should compress the response in case it is supported by client 1`] = `
+exports[`App > Positive > Should compress the response in case it is supported by client 1`] = `
 {
   "data": {
     "anything": 300,
@@ -15,7 +15,7 @@ exports[`App Positive Should compress the response in case it is supported by cl
 }
 `;
 
-exports[`App Protocol Should fail on invalid method 1`] = `
+exports[`App > Protocol > Should fail on invalid method 1`] = `
 {
   "error": {
     "message": "Can not PUT /v1/test",
@@ -24,7 +24,7 @@ exports[`App Protocol Should fail on invalid method 1`] = `
 }
 `;
 
-exports[`App Protocol Should fail on malformed body 1`] = `
+exports[`App > Protocol > Should fail on malformed body 1`] = `
 {
   "error": {
     "message": StringMatching /\\(Unexpected end of JSON input\\|Unterminated string in JSON at position 25\\)/,
@@ -33,7 +33,7 @@ exports[`App Protocol Should fail on malformed body 1`] = `
 }
 `;
 
-exports[`App Protocol Should fail when missing content type header 1`] = `
+exports[`App > Protocol > Should fail when missing content type header 1`] = `
 {
   "error": {
     "message": "key: Required",
@@ -42,7 +42,7 @@ exports[`App Protocol Should fail when missing content type header 1`] = `
 }
 `;
 
-exports[`App Validation Problem 787: Should NOT treat ZodError thrown from within the handler as IOSchema validation error 1`] = `
+exports[`App > Validation > Problem 787: Should NOT treat ZodError thrown from within the handler as IOSchema validation error 1`] = `
 {
   "error": {
     "message": "Expected number, received string",
@@ -51,7 +51,7 @@ exports[`App Validation Problem 787: Should NOT treat ZodError thrown from withi
 }
 `;
 
-exports[`App Validation Should fail on handler input type mismatch 1`] = `
+exports[`App > Validation > Should fail on handler input type mismatch 1`] = `
 {
   "error": {
     "message": "something: Expected string, received number",
@@ -60,7 +60,7 @@ exports[`App Validation Should fail on handler input type mismatch 1`] = `
 }
 `;
 
-exports[`App Validation Should fail on handler output type mismatch 1`] = `
+exports[`App > Validation > Should fail on handler output type mismatch 1`] = `
 {
   "error": {
     "message": "output/anything: Number must be greater than 0",
@@ -69,7 +69,7 @@ exports[`App Validation Should fail on handler output type mismatch 1`] = `
 }
 `;
 
-exports[`App Validation Should fail on middleware input type mismatch 1`] = `
+exports[`App > Validation > Should fail on middleware input type mismatch 1`] = `
 {
   "error": {
     "message": "key: Expected string, received number",
@@ -78,7 +78,7 @@ exports[`App Validation Should fail on middleware input type mismatch 1`] = `
 }
 `;
 
-exports[`App Validation Should fail on middleware refinement mismatch 1`] = `
+exports[`App > Validation > Should fail on middleware refinement mismatch 1`] = `
 {
   "error": {
     "message": "key: Invalid key",

@@ -1,4 +1,5 @@
 import { ZodUpload } from "../../src/upload-schema";
+import { describe, expect, test, vi } from "vitest";
 
 describe("ZodUpload", () => {
   describe("static::create()", () => {
@@ -30,7 +31,7 @@ describe("ZodUpload", () => {
       const buffer = Buffer.from("something");
       const result = schema.safeParse({
         name: "avatar.jpg",
-        mv: jest.fn(async () => Promise.resolve()),
+        mv: vi.fn(async () => Promise.resolve()),
         encoding: "utf-8",
         mimetype: "image/jpeg",
         data: buffer,

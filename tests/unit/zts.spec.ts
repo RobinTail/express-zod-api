@@ -30,20 +30,21 @@ import { f } from "../../src/integration-helpers";
 import { defaultSerializer } from "../../src/common-helpers";
 import { zodToTs } from "../../src/zts";
 import { ZTSContext, createTypeAlias, printNode } from "../../src/zts-helpers";
+import { describe, expect, test, vi } from "vitest";
 
 describe("zod-to-ts", () => {
   const printNodeTest = (node: ts.Node) =>
     printNode(node, { newLine: ts.NewLineKind.LineFeed });
   const defaultCtx: ZTSContext = {
     isResponse: false,
-    getAlias: jest.fn((name: string) => f.createTypeReferenceNode(name)),
-    makeAlias: jest.fn(),
+    getAlias: vi.fn((name: string) => f.createTypeReferenceNode(name)),
+    makeAlias: vi.fn(),
     serializer: defaultSerializer,
     optionalPropStyle: { withQuestionMark: true, withUndefined: true },
   };
 
   describe("z.array()", () => {
-    it("outputs correct typescript", () => {
+    test("outputs correct typescript", () => {
       const node = zodToTs({
         schema: z.object({ id: z.number(), value: z.string() }).array(),
         ...defaultCtx,
@@ -59,12 +60,12 @@ describe("zod-to-ts", () => {
       ...defaultCtx,
     });
 
-    it("outputs correct typescript", () => {
+    test("outputs correct typescript", () => {
       const typeAlias = createTypeAlias(node, identifier);
       expect(printNodeTest(typeAlias)).toMatchSnapshot();
     });
 
-    it("optionally takes a comment", () => {
+    test("optionally takes a comment", () => {
       const typeAlias = createTypeAlias(node, identifier, "A basic user");
       expect(printNodeTest(typeAlias)).toMatchSnapshot();
     });
@@ -92,7 +93,7 @@ describe("zod-to-ts", () => {
       '\\"Escaped\\"',
     }
 
-    it.each([
+    test.each([
       { schema: z.nativeEnum(Color), feature: "numeric" },
       { schema: z.nativeEnum(Fruit), feature: "string" },
       { schema: z.nativeEnum(StringLiteral), feature: "quoted string" },
@@ -200,7 +201,7 @@ describe("zod-to-ts", () => {
       readonly: z.string().readonly(),
     });
 
-    it("should produce the expected results", () => {
+    test("should produce the expected results", () => {
       const node = zodToTs({
         schema: example,
         ...defaultCtx,
@@ -231,12 +232,12 @@ describe("zod-to-ts", () => {
         .optional(),
     });
 
-    it("outputs correct typescript", () => {
+    test("outputs correct typescript", () => {
       const node = zodToTs({ schema: optionalStringSchema, ...defaultCtx });
       expect(printNodeTest(node)).toMatchSnapshot();
     });
 
-    it("should output `?:` and undefined union for optional properties", () => {
+    test("should output `?:` and undefined union for optional properties", () => {
       const node = zodToTs({ schema: objectWithOptionals, ...defaultCtx });
       expect(printNodeTest(node)).toMatchSnapshot();
     });
@@ -248,13 +249,13 @@ describe("zod-to-ts", () => {
     });
     const node = zodToTs({ schema: nullableUsernameSchema, ...defaultCtx });
 
-    it("outputs correct typescript", () => {
+    test("outputs correct typescript", () => {
       expect(printNodeTest(node)).toMatchSnapshot();
     });
   });
 
   describe("z.object()", () => {
-    it("supports string literal properties", () => {
+    test("supports string literal properties", () => {
       const schema = z.object({
         "string-literal": z.string(),
         5: z.number(),
@@ -263,7 +264,7 @@ describe("zod-to-ts", () => {
       expect(printNodeTest(node)).toMatchSnapshot();
     });
 
-    it("does not unnecessary quote identifiers", () => {
+    test("does not unnecessary quote identifiers", () => {
       const schema = z.object({
         id: z.string(),
         name: z.string(),
@@ -273,7 +274,7 @@ describe("zod-to-ts", () => {
       expect(printNodeTest(node)).toMatchSnapshot();
     });
 
-    it("escapes correctly", () => {
+    test("escapes correctly", () => {
       const schema = z.object({
         "\\": z.string(),
         '"': z.string(),
@@ -289,7 +290,7 @@ describe("zod-to-ts", () => {
       expect(printNodeTest(node)).toMatchSnapshot();
     });
 
-    it("supports zod.describe()", () => {
+    test("supports zod.describe()", () => {
       const schema = z.object({
         name: z.string().describe("The name of the item"),
         price: z.number().describe("The price of the item"),
@@ -314,7 +315,7 @@ describe("zod-to-ts", () => {
     });
     const node = zodToTs({ schema: primitiveSchema, ...defaultCtx });
 
-    it("outputs correct typescript", () => {
+    test("outputs correct typescript", () => {
       expect(printNodeTest(node)).toMatchSnapshot();
     });
   });
@@ -327,7 +328,7 @@ describe("zod-to-ts", () => {
     ]);
     const node = zodToTs({ schema: shapeSchema, ...defaultCtx });
 
-    it("outputs correct typescript", () => {
+    test("outputs correct typescript", () => {
       expect(printNodeTest(node)).toMatchSnapshot();
     });
   });

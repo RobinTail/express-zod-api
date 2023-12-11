@@ -1,4 +1,5 @@
 import { mimeJson, mimeMultipart, mimeRaw } from "../../src/mime";
+import { describe, expect, test } from "vitest";
 
 describe("Mime", () => {
   test("should export predefined types", () => {

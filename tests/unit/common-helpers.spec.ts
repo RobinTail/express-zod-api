@@ -20,6 +20,7 @@ import { InputValidationError, ez, withMeta } from "../../src";
 import { Request } from "express";
 import { z } from "zod";
 import { ZodUpload } from "../../src/upload-schema";
+import { describe, expect, test } from "vitest";
 
 describe("Common Helpers", () => {
   describe("defaultInputSources", () => {
@@ -480,7 +481,7 @@ describe("Common Helpers", () => {
       [Symbol("symbol"), "Symbol(symbol)"],
       [true, "true"],
       [false, "false"],
-      [() => {}, "()=>{}"],
+      [() => {}, "() => {\n      }"],
       [/regexp/is, "/regexp/is"],
       [[1, 2, 3], "1,2,3"],
     ])("should accept %#", (argument, expected) => {

@@ -4,6 +4,7 @@ import {
   EndpointsFactory,
   defaultResultHandler,
 } from "../../src";
+import { describe, expect, test } from "vitest";
 
 describe("DependsOnMethod", () => {
   test("should accept empty object", () => {

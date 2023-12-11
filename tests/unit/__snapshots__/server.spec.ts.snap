@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`Server createNotFoundHandler() the handler should call ResultHandler with 404 error 1`] = `
+exports[`Server > createNotFoundHandler() > the handler should call ResultHandler with 404 error 1`] = `
 {
   "error": [NotFoundError: Can not POST /v1/test],
   "input": null,
@@ -9,15 +9,15 @@ exports[`Server createNotFoundHandler() the handler should call ResultHandler wi
     "body": {
       "n": 453,
     },
-    "header": [MockFunction],
+    "header": [MockFunction spy],
     "method": "POST",
     "path": "/v1/test",
   },
   "response": {
-    "end": [MockFunction],
-    "json": [MockFunction],
-    "set": [MockFunction],
-    "status": [MockFunction],
+    "end": [MockFunction spy],
+    "json": [MockFunction spy],
+    "set": [MockFunction spy],
+    "status": [MockFunction spy],
   },
 }
 `;

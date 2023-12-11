@@ -67,6 +67,21 @@ export const makeResponseMock = <RES extends Record<string, any>>({
   return responseMock;
 };
 
+export const makeLoggerMock = <LOG extends Record<string, any>>({
+  fnMethod,
+  loggerProps,
+}: {
+  fnMethod: MockFunction;
+  loggerProps?: LOG;
+}) =>
+  ({
+    info: fnMethod(),
+    warn: fnMethod(),
+    error: fnMethod(),
+    debug: fnMethod(),
+    ...loggerProps,
+  }) as Record<keyof AbstractLogger, MockOverrides> & LOG;
+
 interface TestEndpointProps<REQ, RES, LOG> {
   /** @desc The endpoint to test */
   endpoint: AbstractEndpoint;
@@ -121,13 +136,7 @@ export const testEndpoint = async <
     ).fn;
   const requestMock = makeRequestMock({ fnMethod: fnMethod, requestProps });
   const responseMock = makeResponseMock({ fnMethod: fnMethod, responseProps });
-  const loggerMock = {
-    info: fnMethod(),
-    warn: fnMethod(),
-    error: fnMethod(),
-    debug: fnMethod(),
-    ...loggerProps,
-  } as Record<keyof AbstractLogger, MockOverrides> & LOG;
+  const loggerMock = makeLoggerMock({ fnMethod, loggerProps });
   const configMock = {
     cors: false,
     logger: loggerMock,

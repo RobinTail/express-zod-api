@@ -1,5 +1,10 @@
-import { staticHandler, staticMock } from "../express-mock";
-import { Logger } from "winston";
+import {
+  appMock,
+  expressMock,
+  staticHandler,
+  staticMock,
+} from "../express-mock";
+import winston from "winston";
 import { z } from "zod";
 import {
   DependsOnMethod,
@@ -10,36 +15,35 @@ import {
 } from "../../src";
 import { CommonConfig } from "../../src";
 import { mimeJson } from "../../src/mime";
-import { makeRequestMock, makeResponseMock } from "../../src/testing";
+import {
+  makeLoggerMock,
+  makeRequestMock,
+  makeResponseMock,
+} from "../../src/testing";
 import { initRouting } from "../../src/routing";
 import type { Express, Request, RequestHandler, Response } from "express";
-
-let appMock: any;
-let loggerMock: any;
+import {
+  Mock,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  test,
+  vi,
+} from "vitest";
 
 describe("Routing", () => {
   describe("initRouting()", () => {
-    beforeEach(() => {
-      appMock = {
-        get: jest.fn(),
-        post: jest.fn(),
-        put: jest.fn(),
-        delete: jest.fn(),
-        patch: jest.fn(),
-        options: jest.fn(),
-        use: jest.fn(),
-      };
+    beforeAll(() => {
+      expressMock();
+    });
 
-      loggerMock = {
-        info: jest.fn(),
-        warn: jest.fn(),
-        error: jest.fn(),
-        debug: jest.fn(),
-      };
+    beforeEach(() => {
+      vi.clearAllMocks(); // resets call counters on mocked methods
     });
 
     test("Should set right methods", () => {
-      const handlerMock = jest.fn();
+      const handlerMock = vi.fn();
       const configMock = {
         cors: true,
         startupLogo: false,
@@ -73,8 +77,8 @@ describe("Routing", () => {
         },
       };
       initRouting({
-        app: appMock as Express,
-        logger: loggerMock as Logger,
+        app: appMock as unknown as Express,
+        logger: winston.createLogger({ silent: true }),
         config: configMock as CommonConfig,
         routing,
       });
@@ -102,8 +106,8 @@ describe("Routing", () => {
         startupLogo: false,
       };
       initRouting({
-        app: appMock,
-        logger: loggerMock,
+        app: appMock as unknown as Express,
+        logger: winston.createLogger({ silent: true }),
         config: configMock as CommonConfig,
         routing,
       });
@@ -113,7 +117,7 @@ describe("Routing", () => {
     });
 
     test("Should accept DependsOnMethod", () => {
-      const handlerMock = jest.fn();
+      const handlerMock = vi.fn();
       const configMock = {
         cors: true,
         startupLogo: false,
@@ -148,8 +152,8 @@ describe("Routing", () => {
         },
       };
       initRouting({
-        app: appMock as Express,
-        logger: loggerMock as Logger,
+        app: appMock as unknown as Express,
+        logger: winston.createLogger({ silent: true }),
         config: configMock as CommonConfig,
         routing,
       });
@@ -173,7 +177,7 @@ describe("Routing", () => {
         methods: ["put", "patch"],
         input: z.object({}),
         output: z.object({}),
-        handler: jest.fn(),
+        handler: vi.fn(),
       });
       const routing: Routing = {
         v1: {
@@ -186,8 +190,8 @@ describe("Routing", () => {
       };
       expect(() =>
         initRouting({
-          app: appMock as Express,
-          logger: loggerMock as Logger,
+          app: appMock as unknown as Express,
+          logger: winston.createLogger({ silent: true }),
           config: configMock as CommonConfig,
           routing,
         }),
@@ -195,7 +199,7 @@ describe("Routing", () => {
     });
 
     test("Issue 705: should set all DependsOnMethod' methods for CORS", async () => {
-      const handler = jest.fn(async () => ({}));
+      const handler = vi.fn(async () => ({}));
       const configMock = {
         cors: true,
         startupLogo: false,
@@ -230,8 +234,8 @@ describe("Routing", () => {
         }),
       };
       initRouting({
-        app: appMock as Express,
-        logger: loggerMock as Logger,
+        app: appMock as unknown as Express,
+        logger: winston.createLogger({ silent: true }),
         config: configMock as CommonConfig,
         routing,
       });
@@ -240,10 +244,10 @@ describe("Routing", () => {
       const fn = appMock.options.mock.calls[0][1];
       expect(typeof fn).toBe("function"); // async (req, res) => void
       const requestMock = makeRequestMock({
-        fnMethod: jest.fn,
+        fnMethod: vi.fn,
         requestProps: { method: "PUT" },
       });
-      const responseMock = makeResponseMock({ fnMethod: jest.fn });
+      const responseMock = makeResponseMock({ fnMethod: vi.fn });
       await fn(requestMock, responseMock);
       expect(responseMock.status).toHaveBeenCalledWith(200);
       expect(responseMock.set).toHaveBeenCalledTimes(3);
@@ -254,7 +258,7 @@ describe("Routing", () => {
     });
 
     test("Should accept parameters", () => {
-      const handlerMock = jest.fn();
+      const handlerMock = vi.fn();
       const configMock = { startupLogo: false };
       const endpointMock = new EndpointsFactory(defaultResultHandler).build({
         methods: ["get"],
@@ -270,8 +274,8 @@ describe("Routing", () => {
         },
       };
       initRouting({
-        app: appMock as Express,
-        logger: loggerMock as Logger,
+        app: appMock as unknown as Express,
+        logger: winston.createLogger({ silent: true }),
         config: configMock as CommonConfig,
         routing,
       });
@@ -280,7 +284,7 @@ describe("Routing", () => {
     });
 
     test("Should handle empty paths and trim spaces", () => {
-      const handlerMock = jest.fn();
+      const handlerMock = vi.fn();
       const configMock = { startupLogo: false };
       const endpointMock = new EndpointsFactory(defaultResultHandler).build({
         methods: ["get"],
@@ -299,8 +303,8 @@ describe("Routing", () => {
         },
       };
       initRouting({
-        app: appMock as Express,
-        logger: loggerMock as Logger,
+        app: appMock as unknown as Express,
+        logger: winston.createLogger({ silent: true }),
         config: configMock as CommonConfig,
         routing,
       });
@@ -310,7 +314,7 @@ describe("Routing", () => {
     });
 
     test("Should throw an error in case of slashes in route", () => {
-      const handlerMock = jest.fn();
+      const handlerMock = vi.fn();
       const configMock = { startupLogo: false };
       const endpointMock = new EndpointsFactory(defaultResultHandler).build({
         methods: ["get"],
@@ -320,8 +324,8 @@ describe("Routing", () => {
       });
       expect(() =>
         initRouting({
-          app: appMock as Express,
-          logger: loggerMock as Logger,
+          app: appMock as unknown as Express,
+          logger: winston.createLogger({ silent: true }),
           config: configMock as CommonConfig,
           routing: {
             v1: {
@@ -332,8 +336,8 @@ describe("Routing", () => {
       ).toThrowErrorMatchingSnapshot();
       expect(() =>
         initRouting({
-          app: appMock as Express,
-          logger: loggerMock as Logger,
+          app: appMock as unknown as Express,
+          logger: winston.createLogger({ silent: true }),
           config: configMock as CommonConfig,
           routing: {
             "v1/user/retrieve": endpointMock,
@@ -343,7 +347,7 @@ describe("Routing", () => {
     });
 
     test("Should execute endpoints with right arguments", async () => {
-      const handlerMock = jest
+      const handlerMock = vi
         .fn()
         .mockImplementationOnce(() => ({ result: true }));
       const configMock = { cors: true, startupLogo: false };
@@ -364,9 +368,10 @@ describe("Routing", () => {
           },
         },
       };
+      const loggerMock = makeLoggerMock({ fnMethod: vi.fn });
       initRouting({
-        app: appMock as Express,
-        logger: loggerMock as Logger,
+        app: appMock as unknown as Express,
+        logger: loggerMock,
         config: configMock as CommonConfig,
         routing,
       });
@@ -374,17 +379,17 @@ describe("Routing", () => {
       const routeHandler = appMock.post.mock.calls[0][1] as RequestHandler;
       const requestMock = {
         method: "POST",
-        header: jest.fn(() => mimeJson),
+        header: vi.fn(() => mimeJson),
         body: {
           test: 123,
         },
       };
-      const responseMock: Record<string, jest.Mock> = {
-        set: jest.fn().mockImplementation(() => responseMock),
-        status: jest.fn().mockImplementation(() => responseMock),
-        json: jest.fn().mockImplementation(() => responseMock),
+      const responseMock: Record<string, Mock> = {
+        set: vi.fn().mockImplementation(() => responseMock),
+        status: vi.fn().mockImplementation(() => responseMock),
+        json: vi.fn().mockImplementation(() => responseMock),
       };
-      const nextMock = jest.fn();
+      const nextMock = vi.fn();
       await routeHandler(
         requestMock as unknown as Request,
         responseMock as unknown as Response,
