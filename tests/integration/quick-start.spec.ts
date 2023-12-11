@@ -7,11 +7,9 @@ describe("Integration Test", async () => {
   const listener = (chunk: Buffer) => {
     out += chunk.toString();
   };
-  const quickStart = spawn(
-    "node",
-    ["-r", "@swc-node/register", "quick-start.ts"],
-    { cwd: "./tests/integration" },
-  );
+  const quickStart = spawn("tsx", ["quick-start.ts"], {
+    cwd: "./tests/integration",
+  });
   quickStart.stdout.on("data", listener);
   quickStart.stderr.on("data", listener);
   const port = givePort("example");

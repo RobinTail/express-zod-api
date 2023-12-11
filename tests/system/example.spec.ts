@@ -18,11 +18,7 @@ describe("Example", async () => {
   const listener = (chunk: Buffer) => {
     out += chunk.toString();
   };
-  const example = spawn("node", [
-    "--loader",
-    "@swc-node/register/esm",
-    "example/index.ts",
-  ]);
+  const example = spawn("tsx", ["example/index.ts"]);
   example.stdout.on("data", listener);
   const port = givePort("example");
   await waitFor(() => out.indexOf(`Listening ${port}`) > -1);
