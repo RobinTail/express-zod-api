@@ -1,4 +1,4 @@
-import { writeFileSync } from "node:fs";
+import { writeFile } from "node:fs/promises";
 import { Documentation } from "../src";
 import { config } from "./config";
 import { routing } from "./routing";
@@ -6,7 +6,7 @@ import { routing } from "./routing";
 const manifest = (await import("../package.json", { assert: { type: "json" } }))
   .default;
 
-writeFileSync(
+await writeFile(
   "example/example.swagger.yaml",
   new Documentation({
     routing,

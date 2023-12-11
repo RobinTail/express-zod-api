@@ -1,4 +1,4 @@
-import { writeFileSync } from "node:fs";
+import { writeFile } from "node:fs/promises";
 
 const manifest = (await import("../package.json", { assert: { type: "json" } }))
   .default;
@@ -27,4 +27,4 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 `;
 
-writeFileSync("LICENSE", ownLicense.trimStart(), "utf-8");
+await writeFile("LICENSE", ownLicense.trimStart(), "utf-8");
