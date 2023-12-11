@@ -7,7 +7,7 @@ import {
 import winston from "winston";
 import { afterAll, beforeEach, describe, expect, test, vi } from "vitest";
 
-describe("Logger", async () => {
+describe("Logger", () => {
   beforeEach(() => {
     MockDate.set("2022-01-01T00:00:00Z");
   });
