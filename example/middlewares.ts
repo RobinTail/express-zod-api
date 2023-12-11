@@ -1,4 +1,5 @@
 import createHttpError from "http-errors";
+import assert from "node:assert/strict";
 import { z } from "zod";
 import { Method, createMiddleware, withMeta } from "../src";
 
@@ -18,12 +19,12 @@ export const authMiddleware = createMiddleware({
   }),
   middleware: async ({ input: { key }, request, logger }) => {
     logger.debug("Checking the key and token...");
-    if (key !== "123") {
-      throw createHttpError(401, "Invalid key");
-    }
-    if (request.headers.token !== "456") {
-      throw createHttpError(401, "Invalid token");
-    }
+    assert.equal(key, "123", createHttpError(401, "Invalid key"));
+    assert.equal(
+      request.headers.token,
+      "456",
+      createHttpError(401, "Invalid token"),
+    );
     return { token: request.headers.token };
   },
 });
