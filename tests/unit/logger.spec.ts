@@ -23,15 +23,14 @@ describe("Logger", async () => {
 
   const dropColorInObjectProps = <T extends Record<string | symbol, any>>(
     obj: T,
-  ) => {
-    return Reflect.ownKeys(obj).reduce(
+  ) =>
+    Reflect.ownKeys(obj).reduce(
       (acc, key) => ({
         ...acc,
         [key]: typeof obj[key] === "string" ? stripAnsi(obj[key]) : obj[key],
       }),
       {} as typeof obj,
     );
-  };
 
   describe("createWinstonLogger()", () => {
     test("Should create silent logger", () => {
