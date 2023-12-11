@@ -38,7 +38,7 @@ export const retrieveUserEndpoint = taggedEndpointsFactory
     handler: async ({ input: { id }, options: { method }, logger }) => {
       logger.debug(`Requested id: ${id}, method ${method}`);
       const name = "John Doe";
-      assert.equal(id <= 100, true, createHttpError(404, "User not found"));
+      assert.ok(id <= 100, createHttpError(404, "User not found"));
       return {
         id,
         name,
