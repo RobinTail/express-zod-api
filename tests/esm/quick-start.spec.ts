@@ -7,11 +7,7 @@ describe("ESM Test", async () => {
   const listener = (chunk: Buffer) => {
     out += chunk.toString();
   };
-  const quickStart = spawn(
-    "node",
-    ["--loader", "@swc-node/register/esm", "quick-start.ts"],
-    { cwd: "./tests/esm" },
-  );
+  const quickStart = spawn("tsx", ["quick-start.ts"], { cwd: "./tests/esm" });
   quickStart.stdout.on("data", listener);
   quickStart.stderr.on("data", listener);
   const port = givePort("esm");
