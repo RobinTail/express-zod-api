@@ -133,7 +133,8 @@ export const depictAny: Depicter<z.ZodAny> = () => ({
 });
 
 export const depictUpload: Depicter<ZodUpload> = (ctx) => {
-  assert(ctx.isResponse === false,
+  assert(
+    ctx.isResponse === false,
     new DocumentationError({
       message: "Please use z.upload() only for input.",
       ...ctx,
@@ -244,7 +245,8 @@ export const depictNull: Depicter<z.ZodNull> = () => ({
 });
 
 export const depictDateIn: Depicter<ZodDateIn> = (ctx) => {
-  assert(ctx.isResponse === false,
+  assert(
+    ctx.isResponse === false,
     new DocumentationError({
       message: "Please use z.dateOut() for output.",
       ...ctx,
@@ -262,7 +264,8 @@ export const depictDateIn: Depicter<ZodDateIn> = (ctx) => {
 };
 
 export const depictDateOut: Depicter<ZodDateOut> = (ctx) => {
-  assert(ctx.isResponse,
+  assert(
+    ctx.isResponse,
     new DocumentationError({
       message: "Please use z.dateIn() for input.",
       ...ctx,
@@ -627,7 +630,8 @@ export const extractObjectSchema = (
       .map((option) => extractObjectSchema(option, ctx))
       .reduce((acc, option) => acc.merge(option.partial()), z.object({}));
   } else if (subject instanceof z.ZodEffects) {
-    assert(!hasTopLevelTransformingEffect(subject),
+    assert(
+      !hasTopLevelTransformingEffect(subject),
       new DocumentationError({
         message: `Using transformations on the top level of ${
           ctx.isResponse ? "response" : "input"
