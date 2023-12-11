@@ -1,4 +1,5 @@
 import createHttpError from "http-errors";
+import assert from "node:assert/strict";
 import { z } from "zod";
 import { ez, withMeta } from "../../src";
 import { keyAndTokenAuthenticatedEndpointsFactory } from "../factories";
@@ -41,9 +42,7 @@ export const updateUserEndpoint =
       logger,
     }) => {
       logger.debug(`id, key and token: ${id}, ${key}, ${token}`);
-      if (id > 100) {
-        throw createHttpError(404, "User not found");
-      }
+      assert(id <= 100, createHttpError(404, "User not found"));
       return {
         createdAt: new Date("2022-01-22"),
         name,

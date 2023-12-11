@@ -1,3 +1,4 @@
+import assert from "node:assert/strict";
 import {
   ContentObject,
   ExampleObject,
@@ -132,12 +133,13 @@ export const depictAny: Depicter<z.ZodAny> = () => ({
 });
 
 export const depictUpload: Depicter<ZodUpload> = (ctx) => {
-  if (ctx.isResponse) {
-    throw new DocumentationError({
+  assert(
+    !ctx.isResponse,
+    new DocumentationError({
       message: "Please use z.upload() only for input.",
       ...ctx,
-    });
-  }
+    }),
+  );
   return {
     type: "string",
     format: "binary",
@@ -243,12 +245,13 @@ export const depictNull: Depicter<z.ZodNull> = () => ({
 });
 
 export const depictDateIn: Depicter<ZodDateIn> = (ctx) => {
-  if (ctx.isResponse) {
-    throw new DocumentationError({
+  assert(
+    !ctx.isResponse,
+    new DocumentationError({
       message: "Please use z.dateOut() for output.",
       ...ctx,
-    });
-  }
+    }),
+  );
   return {
     description: "YYYY-MM-DDTHH:mm:ss.sssZ",
     type: "string",
@@ -261,12 +264,13 @@ export const depictDateIn: Depicter<ZodDateIn> = (ctx) => {
 };
 
 export const depictDateOut: Depicter<ZodDateOut> = (ctx) => {
-  if (!ctx.isResponse) {
-    throw new DocumentationError({
+  assert(
+    ctx.isResponse,
+    new DocumentationError({
       message: "Please use z.dateIn() for input.",
       ...ctx,
-    });
-  }
+    }),
+  );
   return {
     description: "YYYY-MM-DDTHH:mm:ss.sssZ",
     type: "string",
@@ -278,16 +282,17 @@ export const depictDateOut: Depicter<ZodDateOut> = (ctx) => {
 };
 
 /** @throws DocumentationError */
-export const depictDate: Depicter<z.ZodDate> = (ctx) => {
-  throw new DocumentationError({
-    message: `Using z.date() within ${
-      ctx.isResponse ? "output" : "input"
-    } schema is forbidden. Please use z.date${
-      ctx.isResponse ? "Out" : "In"
-    }() instead. Check out the documentation for details.`,
-    ...ctx,
-  });
-};
+export const depictDate: Depicter<z.ZodDate> = (ctx) =>
+  assert.fail(
+    new DocumentationError({
+      message: `Using z.date() within ${
+        ctx.isResponse ? "output" : "input"
+      } schema is forbidden. Please use z.date${
+        ctx.isResponse ? "Out" : "In"
+      }() instead. Check out the documentation for details.`,
+      ...ctx,
+    }),
+  );
 
 export const depictBoolean: Depicter<z.ZodBoolean> = () => ({
   type: "boolean",
@@ -625,14 +630,15 @@ export const extractObjectSchema = (
       .map((option) => extractObjectSchema(option, ctx))
       .reduce((acc, option) => acc.merge(option.partial()), z.object({}));
   } else if (subject instanceof z.ZodEffects) {
-    if (hasTopLevelTransformingEffect(subject)) {
-      throw new DocumentationError({
+    assert(
+      !hasTopLevelTransformingEffect(subject),
+      new DocumentationError({
         message: `Using transformations on the top level of ${
           ctx.isResponse ? "response" : "input"
         } schema is not allowed.`,
         ...ctx,
-      });
-    }
+      }),
+    );
     objectSchema = extractObjectSchema(subject._def.schema, ctx); // object refinement
   } else {
     // intersection
@@ -773,15 +779,13 @@ export const onEach: Depicter<z.ZodTypeAny, "each"> = ({
   };
 };
 
-export const onMissing: Depicter<z.ZodTypeAny, "last"> = ({
-  schema,
-  ...ctx
-}) => {
-  throw new DocumentationError({
-    message: `Zod type ${schema.constructor.name} is unsupported.`,
-    ...ctx,
-  });
-};
+export const onMissing: Depicter<z.ZodTypeAny, "last"> = ({ schema, ...ctx }) =>
+  assert.fail(
+    new DocumentationError({
+      message: `Zod type ${schema.constructor.name} is unsupported.`,
+      ...ctx,
+    }),
+  );
 
 export const excludeParamsFromDepiction = (
   depicted: SchemaObject | ReferenceObject,
