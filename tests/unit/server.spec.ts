@@ -326,7 +326,7 @@ describe("Server", () => {
         ...defaultResultHandler,
         handler: vi
           .fn()
-          .mockImplementation(() => assert.fail(Error("I am faulty"))),
+          .mockImplementation(() => assert.fail(new Error("I am faulty"))),
       };
       const handler = createNotFoundHandler(resultHandler, logger);
       const next = vi.fn();
