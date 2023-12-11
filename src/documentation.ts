@@ -76,9 +76,7 @@ export class Documentation extends OpenApiBuilder {
     userDefinedOperationId?: string,
   ) {
     if (userDefinedOperationId) {
-      assert.equal(
-        userDefinedOperationId in this.lastOperationIdSuffixes,
-        false,
+      assert(!(userDefinedOperationId in this.lastOperationIdSuffixes),
         new DocumentationError({
           message: `Duplicated operationId: "${userDefinedOperationId}"`,
           method,

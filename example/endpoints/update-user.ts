@@ -42,7 +42,7 @@ export const updateUserEndpoint =
       logger,
     }) => {
       logger.debug(`id, key and token: ${id}, ${key}, ${token}`);
-      assert.ok(id <= 100, createHttpError(404, "User not found"));
+      assert(id <= 100, createHttpError(404, "User not found"));
       return {
         createdAt: new Date("2022-01-22"),
         name,

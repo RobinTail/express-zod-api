@@ -132,9 +132,7 @@ export class Endpoint<
       { name: "input schema", schema: inputSchema },
       { name: "output schema", schema: outputSchema },
     ].forEach(({ name, schema }) => {
-      assert.equal(
-        hasTopLevelTransformingEffect(schema),
-        false,
+      assert(!hasTopLevelTransformingEffect(schema),
         new IOSchemaError(
           `Using transformations on the top level of endpoint ${name} is not allowed.`,
         ),

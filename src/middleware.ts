@@ -51,9 +51,7 @@ export const createMiddleware = <
 >(
   props: MiddlewareCreationProps<IN, OPT, OUT, SCO>,
 ): MiddlewareDefinition<IN, OPT, OUT, SCO> => {
-  assert.equal(
-    hasTopLevelTransformingEffect(props.input),
-    false,
+  assert(!hasTopLevelTransformingEffect(props.input),
     new IOSchemaError(
       "Using transformations on the top level of middleware input schema is not allowed.",
     ),

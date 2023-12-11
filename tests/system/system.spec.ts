@@ -49,7 +49,7 @@ describe("App", async () => {
                 .any()
                 .optional()
                 .transform((value) =>
-                  assert.ok(
+                  assert(
                     !value,
                     new Error(
                       "Custom error in the Middleware input validation",
@@ -67,7 +67,7 @@ describe("App", async () => {
               .any()
               .optional()
               .transform((value) =>
-                assert.ok(
+                assert(
                   !value,
                   new Error("Custom error in the Endpoint input validation"),
                 ),

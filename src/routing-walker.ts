@@ -49,9 +49,8 @@ export const walkRouting = ({
       }
     } else if (element instanceof DependsOnMethod) {
       Object.entries(element.endpoints).forEach(([method, endpoint]) => {
-        assert.equal(
+        assert(
           endpoint.getMethods().includes(method as Method),
-          true,
           new RoutingError(
             `Endpoint assigned to ${method} method of ${path} must support ${method} method.`,
           ),
