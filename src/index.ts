@@ -1,19 +1,19 @@
 export { createConfig } from "./config-type";
 export { AbstractEndpoint } from "./endpoint";
-export { Method } from "./method";
+export type { Method } from "./method";
 export {
   EndpointsFactory,
   defaultEndpointsFactory,
   arrayEndpointsFactory,
 } from "./endpoints-factory";
-export { IOSchema } from "./io-schema";
+export type { IOSchema } from "./io-schema";
 export {
-  FlatObject,
+  type FlatObject,
   getExamples,
   getMessageFromError,
   getStatusCodeFromError,
 } from "./common-helpers";
-export { createLogger, LoggerOverrides } from "./logger";
+export { createLogger, type LoggerOverrides } from "./logger";
 export { createMiddleware } from "./middleware";
 export {
   createResultHandler,
@@ -22,7 +22,7 @@ export {
 } from "./result-handler";
 export { DependsOnMethod } from "./depends-on-method";
 export { ServeStatic } from "./serve-static";
-export { Routing } from "./routing";
+export type { Routing } from "./routing";
 export { createServer, attachRouting } from "./server";
 export { Documentation } from "./documentation";
 export {
@@ -33,7 +33,7 @@ export {
   MissingPeerError,
 } from "./errors";
 export { withMeta } from "./metadata";
-export { testEndpoint, MockOverrides } from "./testing";
+export { testEndpoint, type MockOverrides } from "./testing";
 export { Integration } from "./integration";
 
 export * as ez from "./proprietary-schemas";

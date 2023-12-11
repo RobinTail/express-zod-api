@@ -2,7 +2,9 @@ import { writeFileSync } from "node:fs";
 import { Documentation } from "../src";
 import { config } from "./config";
 import { routing } from "./routing";
-import manifest from "../package.json";
+
+const manifest = (await import("../package.json", { assert: { type: "json" } }))
+  .default;
 
 writeFileSync(
   "example/example.swagger.yaml",

@@ -1,4 +1,3 @@
-/** @todo rename to .ts if/when moved to ESM first */
 import chalk from "chalk";
 import { format } from "pretty-format";
 import { writeFileSync } from "node:fs";

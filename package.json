@@ -17,15 +17,15 @@
     "url": "https://github.com/RobinTail/express-zod-api/issues"
   },
   "scripts": {
-    "start": "yarn tsnode example/index.ts",
+    "start": "yarn esm example/index.ts",
     "build": "yarn build:compile && yarn build:tests && yarn build:assets",
     "build:compile": "tsup && attw --pack",
-    "build:tests": "yarn cleanup && yarn tsnode tools/make-tests.ts",
+    "build:tests": "yarn cleanup && yarn esm tools/make-tests.ts",
     "build:assets": "yarn build:swagger && yarn build:client && yarn build:license",
-    "build:swagger": "yarn tsnode example/generate-open-api-schema.ts",
-    "build:client": "yarn tsnode example/generate-client.ts && yarn prettier example/example.client.ts --write",
-    "build:license": "yarn tsnode tools/license.ts",
-    "build:logo": "yarn esm tools/startup-logo.mts",
+    "build:swagger": "yarn esm example/generate-open-api-schema.ts",
+    "build:client": "yarn esm example/generate-client.ts && yarn prettier example/example.client.ts --write",
+    "build:license": "yarn esm tools/license.ts",
+    "build:logo": "yarn esm tools/startup-logo.ts",
     "test": "yarn test:types && yarn test:unit && yarn test:badge",
     "test:int": "yarn --cwd tests/integration && vitest run tests/integration",
     "test:952": "yarn --cwd tests/issue952 && yarn --cwd tests/issue952 test",
@@ -38,25 +38,25 @@
     "lint": "eslint src example tests tools && yarn prettier *.md --check",
     "mdfix": "prettier *.md --write",
     "cleanup": "rm -rf tests/**/node_modules coverage tests/**/coverage",
-    "tsnode": "node -r @swc-node/register",
     "esm": "node --loader @swc-node/register/esm",
     "precommit": "yarn lint && yarn test && yarn build && git add example/example.* LICENSE coverage.svg",
     "prepublishOnly": "yarn lint && yarn test && yarn build",
     "postversion": "git push && git push --tags",
     "install_hooks": "husky install"
   },
-  "main": "dist/index.js",
+  "type": "module",
+  "main": "dist/index.cjs",
   "types": "dist/index.d.ts",
-  "module": "dist/index.mjs",
+  "module": "dist/index.js",
   "exports": {
     ".": {
       "import": {
-        "types": "./dist/index.d.mts",
-        "default": "./dist/index.mjs"
-      },
-      "require": {
         "types": "./dist/index.d.ts",
         "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
       }
     }
   },

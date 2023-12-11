@@ -19,8 +19,8 @@ describe("Example", async () => {
     out += chunk.toString();
   };
   const example = spawn("node", [
-    "-r",
-    "@swc-node/register",
+    "--loader",
+    "@swc-node/register/esm",
     "example/index.ts",
   ]);
   example.stdout.on("data", listener);

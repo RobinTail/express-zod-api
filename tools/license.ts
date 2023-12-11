@@ -1,5 +1,7 @@
 import { writeFileSync } from "node:fs";
-import manifest from "../package.json";
+
+const manifest = (await import("../package.json", { assert: { type: "json" } }))
+  .default;
 
 const ownLicense = `
 MIT License
