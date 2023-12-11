@@ -5,14 +5,15 @@ import {
   defaultEndpointsFactory,
   testEndpoint,
 } from "../../src";
+import { Mock, describe, expect, test, vi } from "vitest";
 
 declare module "../../src" {
-  interface MockOverrides extends jest.Mock {}
+  interface MockOverrides extends Mock {}
 }
 
 describe("Testing", () => {
   describe("testEndpoint()", () => {
-    test.each([undefined, jest.fn])(
+    test.each([undefined, vi.fn])(
       "Should test the endpoint %#",
       async (fnMethod) => {
         const endpoint = defaultEndpointsFactory
@@ -36,9 +37,9 @@ describe("Testing", () => {
           });
         const { responseMock, requestMock, loggerMock } = await testEndpoint({
           endpoint,
-          responseProps: { prop1: jest.fn(), prop2: 123 },
-          requestProps: { test1: jest.fn(), test2: 456 },
-          loggerProps: { feat1: jest.fn(), feat2: 789 },
+          responseProps: { prop1: vi.fn(), prop2: 123 },
+          requestProps: { test1: vi.fn(), test2: 456 },
+          loggerProps: { feat1: vi.fn(), feat2: 789 },
           fnMethod,
         });
         expect(responseMock.setHeader).toHaveBeenCalledWith("X-Some", "header");
@@ -55,9 +56,9 @@ describe("Testing", () => {
         expect(requestMock.test2).toBe(456);
         expect(loggerMock.feat1).toEqual(expect.any(Function));
         expect(loggerMock.feat2).toBe(789);
-        expectType<jest.Mock>(responseMock.prop1);
-        expectType<jest.Mock>(requestMock.test1);
-        expectType<jest.Mock>(loggerMock.feat1);
+        expectType<Mock>(responseMock.prop1);
+        expectType<Mock>(requestMock.test1);
+        expectType<Mock>(loggerMock.feat1);
       },
     );
   });

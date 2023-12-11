@@ -5,6 +5,7 @@ import { getFinalEndpointInputSchema } from "../../src/io-schema";
 import { getMeta } from "../../src/metadata";
 import { AnyMiddlewareDef } from "../../src/middleware";
 import { serializeSchemaForTest } from "../helpers";
+import { describe, expect, test, vi } from "vitest";
 
 describe("I/O Schema and related helpers", () => {
   describe("IOSchema", () => {
@@ -101,19 +102,19 @@ describe("I/O Schema and related helpers", () => {
           input: z.object({
             one: z.string(),
           }),
-          middleware: jest.fn(),
+          middleware: vi.fn(),
         }),
         createMiddleware({
           input: z.object({
             two: z.number(),
           }),
-          middleware: jest.fn(),
+          middleware: vi.fn(),
         }),
         createMiddleware({
           input: z.object({
             three: z.null(),
           }),
-          middleware: jest.fn(),
+          middleware: vi.fn(),
         }),
       ];
       const endpointInput = z.object({
@@ -136,7 +137,7 @@ describe("I/O Schema and related helpers", () => {
                 two: z.number(),
               }),
             ),
-          middleware: jest.fn(),
+          middleware: vi.fn(),
         }),
         createMiddleware({
           input: z
@@ -148,7 +149,7 @@ describe("I/O Schema and related helpers", () => {
                 four: z.boolean(),
               }),
             ),
-          middleware: jest.fn(),
+          middleware: vi.fn(),
         }),
       ];
       const endpointInput = z
@@ -177,7 +178,7 @@ describe("I/O Schema and related helpers", () => {
                 two: z.number(),
               }),
             ),
-          middleware: jest.fn(),
+          middleware: vi.fn(),
         }),
         createMiddleware({
           input: z
@@ -189,7 +190,7 @@ describe("I/O Schema and related helpers", () => {
                 four: z.boolean(),
               }),
             ),
-          middleware: jest.fn(),
+          middleware: vi.fn(),
         }),
       ];
       const endpointInput = z
@@ -233,7 +234,7 @@ describe("I/O Schema and related helpers", () => {
                 two: z.number(),
               }),
             ),
-          middleware: jest.fn(),
+          middleware: vi.fn(),
         }),
         createMiddleware({
           input: z
@@ -245,7 +246,7 @@ describe("I/O Schema and related helpers", () => {
                 four: z.boolean(),
               }),
             ),
-          middleware: jest.fn(),
+          middleware: vi.fn(),
         }),
       ];
       const endpointInput = z.object({
@@ -273,7 +274,7 @@ describe("I/O Schema and related helpers", () => {
             one: "test",
             two: 123,
           }),
-          middleware: jest.fn(),
+          middleware: vi.fn(),
         }),
         createMiddleware({
           input: withMeta(
@@ -290,7 +291,7 @@ describe("I/O Schema and related helpers", () => {
             three: null,
             four: true,
           }),
-          middleware: jest.fn(),
+          middleware: vi.fn(),
         }),
       ];
       const endpointInput = withMeta(

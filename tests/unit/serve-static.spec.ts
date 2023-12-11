@@ -1,4 +1,5 @@
 import { ServeStatic } from "../../src";
+import { describe, expect, test } from "vitest";
 
 describe("ServeStatic", () => {
   describe("constructor()", () => {

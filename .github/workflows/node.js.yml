@@ -48,8 +48,8 @@ jobs:
         parallel: true
     - name: Build
       run: yarn build
-    - name: Vitest compatibility
-      run: yarn test:vi
+    - name: Compatibility test
+      run: yarn test:compat
     - name: Integration test
       run: yarn test:int
     - name: Issue 952

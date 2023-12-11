@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`ZodUpload _parse() should accept UploadedFile 1`] = `
+exports[`ZodUpload > _parse() > should accept UploadedFile 1`] = `
 {
   "data": {
     "data": {
@@ -20,7 +20,7 @@ exports[`ZodUpload _parse() should accept UploadedFile 1`] = `
     "encoding": "utf-8",
     "md5": "",
     "mimetype": "image/jpeg",
-    "mv": [MockFunction],
+    "mv": [MockFunction spy],
     "name": "avatar.jpg",
     "size": 100500,
     "tempFilePath": "",

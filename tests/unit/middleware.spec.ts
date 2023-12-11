@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { createMiddleware } from "../../src";
 import { IOSchemaError } from "../../src/errors";
+import { describe, expect, test, vi } from "vitest";
 
 describe("Middleware", () => {
   describe("createMiddleware()", () => {
@@ -9,7 +10,7 @@ describe("Middleware", () => {
         input: z.object({
           something: z.number(),
         }),
-        middleware: jest.fn(),
+        middleware: vi.fn(),
       };
       const middleware = createMiddleware(definition);
       expect(middleware).toStrictEqual({ ...definition, type: "proprietary" });
@@ -23,7 +24,7 @@ describe("Middleware", () => {
               something: z.number(),
             })
             .refine(() => true),
-          middleware: jest.fn(),
+          middleware: vi.fn(),
         };
         const middleware = createMiddleware(definition);
         expect(middleware).toStrictEqual({
@@ -39,7 +40,7 @@ describe("Middleware", () => {
               something: z.number(),
             })
             .transform(() => []),
-          middleware: jest.fn(),
+          middleware: vi.fn(),
         };
         expect(() => createMiddleware(definition)).toThrow(
           new IOSchemaError(

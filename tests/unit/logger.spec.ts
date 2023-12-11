@@ -4,6 +4,7 @@ import stripAnsi from "strip-ansi";
 import hasAnsi from "has-ansi";
 import { createLogger, isSimplifiedWinstonConfig } from "../../src/logger";
 import winston from "winston";
+import { afterAll, beforeEach, describe, expect, test, vi } from "vitest";
 
 describe("Logger", () => {
   beforeEach(() => {
@@ -29,7 +30,7 @@ describe("Logger", () => {
   describe("createWinstonLogger()", () => {
     test("Should create silent logger", () => {
       const logger = createLogger({ winston, level: "silent" });
-      const transform = jest.spyOn(logger.transports[0].format!, "transform");
+      const transform = vi.spyOn(logger.transports[0].format!, "transform");
       expect(logger.silent).toBeTruthy();
       expect(logger.isErrorEnabled()).toBeTruthy();
       expect(logger.isWarnEnabled()).toBeTruthy();
@@ -43,7 +44,7 @@ describe("Logger", () => {
 
     test("Should create warn logger", () => {
       const logger = createLogger({ winston, level: "warn" });
-      const transform = jest.spyOn(logger.transports[0].format!, "transform");
+      const transform = vi.spyOn(logger.transports[0].format!, "transform");
       expect(logger.isErrorEnabled()).toBeTruthy();
       expect(logger.isWarnEnabled()).toBeTruthy();
       expect(logger.isInfoEnabled()).toBeFalsy();
@@ -68,7 +69,7 @@ describe("Logger", () => {
 
     test("Should create debug logger", () => {
       const logger = createLogger({ winston, level: "debug", color: true });
-      const transform = jest.spyOn(logger.transports[0].format!, "transform");
+      const transform = vi.spyOn(logger.transports[0].format!, "transform");
       expect(logger.isErrorEnabled()).toBeTruthy();
       expect(logger.isWarnEnabled()).toBeTruthy();
       expect(logger.isInfoEnabled()).toBeTruthy();
@@ -92,7 +93,7 @@ describe("Logger", () => {
 
     test("Should manage profiling", () => {
       const logger = createLogger({ winston, level: "debug", color: true });
-      const transform = jest.spyOn(logger.transports[0].format!, "transform");
+      const transform = vi.spyOn(logger.transports[0].format!, "transform");
       logger.profile("long-test");
       MockDate.set("2022-01-01T00:00:00.554Z");
       logger.profile("long-test");
@@ -111,7 +112,7 @@ describe("Logger", () => {
 
     test("Should handle empty message", () => {
       const logger = createLogger({ winston, level: "debug", color: true });
-      const transform = jest.spyOn(logger.transports[0].format!, "transform");
+      const transform = vi.spyOn(logger.transports[0].format!, "transform");
       expect(logger.isErrorEnabled()).toBeTruthy();
       expect(logger.isWarnEnabled()).toBeTruthy();
       expect(logger.isInfoEnabled()).toBeTruthy();
@@ -135,7 +136,7 @@ describe("Logger", () => {
       "Should handle non-object meta %#",
       (level) => {
         const logger = createLogger({ winston, level, color: true });
-        const transform = jest.spyOn(logger.transports[0].format!, "transform");
+        const transform = vi.spyOn(logger.transports[0].format!, "transform");
         logger.error("Code", 8090);
         expect(transform).toHaveBeenCalled();
         const params = transform.mock.calls[0][0];
@@ -154,7 +155,7 @@ describe("Logger", () => {
       "Should handle empty object meta",
       (level) => {
         const logger = createLogger({ winston, level, color: true });
-        const transform = jest.spyOn(logger.transports[0].format!, "transform");
+        const transform = vi.spyOn(logger.transports[0].format!, "transform");
         logger.error("Payload", {});
         expect(transform).toHaveBeenCalled();
         const params = transform.mock.calls[0][0];

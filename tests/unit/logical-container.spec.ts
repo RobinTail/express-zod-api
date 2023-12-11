@@ -4,6 +4,7 @@ import {
   combineContainers,
   mapLogicalContainer,
 } from "../../src/logical-container";
+import { describe, expect, test } from "vitest";
 
 describe("LogicalContainer", () => {
   describe("mapLogicalContainer()", () => {

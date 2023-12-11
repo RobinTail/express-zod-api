@@ -15,6 +15,7 @@ import { expectType } from "tsd";
 import { mimeJson } from "../../src/mime";
 import { z } from "zod";
 import { givePort } from "../helpers";
+import { describe, expect, test, vi } from "vitest";
 
 describe("Documentation generator", () => {
   const sampleConfig = createConfig({
@@ -313,7 +314,7 @@ describe("Documentation generator", () => {
                 ),
                 enum: z.record(z.enum(["option1", "option2"]), z.boolean()),
               }),
-              handler: jest.fn(),
+              handler: vi.fn(),
             }),
           },
         },
@@ -337,7 +338,7 @@ describe("Documentation generator", () => {
               output: z.object({
                 any: z.any(),
               }),
-              handler: jest.fn(),
+              handler: vi.fn(),
             }),
           },
         },
@@ -369,7 +370,7 @@ describe("Documentation generator", () => {
               output: z.object({
                 bigint: z.bigint(),
               }),
-              handler: jest.fn(),
+              handler: vi.fn(),
             }),
           },
         },
@@ -411,7 +412,7 @@ describe("Documentation generator", () => {
               output: z.object({
                 nonempty: z.string().min(1),
               }),
-              handler: jest.fn(),
+              handler: vi.fn(),
             }),
           },
         },
@@ -441,7 +442,7 @@ describe("Documentation generator", () => {
               output: z.object({
                 empty: z.tuple([]),
               }),
-              handler: jest.fn(),
+              handler: vi.fn(),
             }),
           },
         },
@@ -601,7 +602,7 @@ describe("Documentation generator", () => {
         input: z.object({
           key: z.string(),
         }),
-        middleware: jest.fn(),
+        middleware: vi.fn(),
       });
       const mw2 = createMiddleware({
         security: {
@@ -619,12 +620,12 @@ describe("Documentation generator", () => {
           ],
         },
         input: z.object({}),
-        middleware: jest.fn(),
+        middleware: vi.fn(),
       });
       const mw3 = createMiddleware({
         security: { type: "bearer", format: "JWT" },
         input: z.object({}),
-        middleware: jest.fn(),
+        middleware: vi.fn(),
       });
       const spec = new Documentation({
         config: sampleConfig,
@@ -909,7 +910,7 @@ describe("Documentation generator", () => {
                 other: z.boolean(),
               }),
               output: z.object({}),
-              handler: jest.fn(),
+              handler: vi.fn(),
             }),
           },
         },
@@ -932,7 +933,7 @@ describe("Documentation generator", () => {
                 other: z.boolean(),
               }),
               output: z.object({}),
-              handler: jest.fn(),
+              handler: vi.fn(),
             }),
           },
         },
@@ -962,7 +963,7 @@ describe("Documentation generator", () => {
                 "x-request-id": z.string(),
               }),
               output: z.object({}),
-              handler: jest.fn(),
+              handler: vi.fn(),
             }),
           },
         },
@@ -1139,7 +1140,7 @@ describe("Documentation generator", () => {
                   ).example({
                     key: "1234-56789-01",
                   }),
-                  middleware: jest.fn(),
+                  middleware: vi.fn(),
                 }),
               )
               .build({

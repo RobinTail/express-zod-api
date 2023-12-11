@@ -1,30 +1,38 @@
-// @see https://github.com/swc-project/jest/issues/14#issuecomment-970189585
+// @see https://github.com/swc-project/vi/issues/14#issuecomment-970189585
+import { Mock, vi } from "vitest";
 
-const expressJsonMock = jest.fn();
-const compressionMock = jest.fn();
-const fileUploadMock = jest.fn();
-jest.mock("compression", () => compressionMock);
-jest.mock("express-fileupload", () => fileUploadMock);
+const expressJsonMock = vi.fn();
+const compressionMock = vi.fn();
+const fileUploadMock = vi.fn();
 
-const staticHandler = jest.fn();
-const staticMock = jest.fn(() => staticHandler);
+vi.mock("compression", () => ({ default: compressionMock }));
+vi.mock("express-fileupload", () => ({ default: fileUploadMock }));
 
-let appMock: Record<"disable" | "use" | "get" | "post" | "options", jest.Mock>;
+const staticHandler = vi.fn();
+const staticMock = vi.fn(() => staticHandler);
 
-const appCreatorMock = () => {
+let appMock: Record<
+  "disable" | "use" | "get" | "post" | "put" | "patch" | "delete" | "options",
+  Mock
+>;
+
+const expressMock = () => {
   appMock = {
-    disable: jest.fn(() => appMock),
-    use: jest.fn(() => appMock),
-    get: jest.fn(),
-    post: jest.fn(),
-    options: jest.fn(),
+    disable: vi.fn(() => appMock),
+    use: vi.fn(() => appMock),
+    get: vi.fn(),
+    post: vi.fn(),
+    put: vi.fn(),
+    patch: vi.fn(),
+    delete: vi.fn(),
+    options: vi.fn(),
   };
   return appMock;
 };
-appCreatorMock.json = () => expressJsonMock;
-appCreatorMock.static = staticMock;
+expressMock.json = () => expressJsonMock;
+expressMock.static = staticMock;
 
-const expressMock = jest.mock("express", () => appCreatorMock);
+vi.mock("express", () => ({ default: expressMock }));
 
 export {
   compressionMock,

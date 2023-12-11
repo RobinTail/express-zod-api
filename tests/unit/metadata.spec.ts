@@ -7,6 +7,7 @@ import {
   hasMeta,
   metaProp,
 } from "../../src/metadata";
+import { describe, expect, test } from "vitest";
 
 describe("Metadata", () => {
   describe("withMeta()", () => {

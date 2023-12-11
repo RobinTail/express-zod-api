@@ -1,6 +1,7 @@
 import { Express } from "express";
 import { createConfig } from "../../src";
 import winston from "winston";
+import { describe, expect, test, vi } from "vitest";
 
 describe("ConfigType", () => {
   describe("createConfig()", () => {
@@ -18,7 +19,7 @@ describe("ConfigType", () => {
 
     test("should create a config with app", () => {
       const argument = {
-        app: jest.fn() as unknown as Express,
+        app: vi.fn() as unknown as Express,
         cors: true,
         logger: winston.createLogger({ silent: true }),
       };

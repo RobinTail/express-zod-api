@@ -16,22 +16,24 @@ import {
 import winston from "winston";
 import { z } from "zod";
 import {
+  AppConfig,
   EndpointsFactory,
+  ServerConfig,
   attachRouting,
   createServer,
   defaultResultHandler,
 } from "../../src";
-import { AppConfig, ServerConfig } from "../../src/config-type";
 import { mimeJson } from "../../src/mime";
 import {
   createNotFoundHandler,
   createParserFailureHandler,
 } from "../../src/server";
 import express, { Request, Response } from "express";
+import { Mock, afterAll, describe, expect, test, vi } from "vitest";
 
 describe("Server", () => {
   afterAll(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   test("Express is mocked", () => {
@@ -59,7 +61,7 @@ describe("Server", () => {
             output: z.object({
               b: z.boolean(),
             }),
-            handler: jest.fn(),
+            handler: vi.fn(),
           }),
         },
       };
@@ -80,17 +82,17 @@ describe("Server", () => {
 
     test("Should create server with custom JSON parser, logger and error handler", async () => {
       const customLogger = winston.createLogger({ silent: true });
-      const infoMethod = jest.spyOn(customLogger, "info");
+      const infoMethod = vi.spyOn(customLogger, "info");
       const port = givePort();
       const configMock = {
         server: {
           listen: { port }, // testing Net::ListenOptions
-          jsonParser: jest.fn(),
+          jsonParser: vi.fn(),
         },
         cors: true,
         startupLogo: false,
         errorHandler: {
-          handler: jest.fn(),
+          handler: vi.fn(),
         },
         logger: customLogger,
       };
@@ -104,7 +106,7 @@ describe("Server", () => {
             output: z.object({
               b: z.boolean(),
             }),
-            handler: jest.fn(),
+            handler: vi.fn(),
           }),
         },
       };
@@ -153,7 +155,7 @@ describe("Server", () => {
             method: "get",
             input: z.object({}),
             output: z.object({}),
-            handler: jest.fn(),
+            handler: vi.fn(),
           }),
         },
       };
@@ -187,7 +189,7 @@ describe("Server", () => {
             method: "get",
             input: z.object({}),
             output: z.object({}),
-            handler: jest.fn(),
+            handler: vi.fn(),
           }),
         },
       };
@@ -213,7 +215,7 @@ describe("Server", () => {
             method: "get",
             input: z.object({}),
             output: z.object({}),
-            handler: jest.fn(),
+            handler: vi.fn(),
           }),
         },
       };
@@ -227,7 +229,7 @@ describe("Server", () => {
     });
 
     test("should enable raw on request", async () => {
-      const rawParserMock = jest.fn();
+      const rawParserMock = vi.fn();
       const configMock = {
         server: {
           listen: givePort(),
@@ -243,7 +245,7 @@ describe("Server", () => {
             method: "get",
             input: z.object({}),
             output: z.object({}),
-            handler: jest.fn(),
+            handler: vi.fn(),
           }),
         },
       };
@@ -253,13 +255,13 @@ describe("Server", () => {
       expect(typeof rawPropMw).toBe("function");
       const buffer = Buffer.from([]);
       const requestMock = makeRequestMock({
-        fnMethod: jest.fn,
+        fnMethod: vi.fn,
         requestProps: {
           method: "POST",
           body: buffer,
         },
       });
-      rawPropMw(requestMock, {}, jest.fn());
+      rawPropMw(requestMock, {}, vi.fn());
       expect(requestMock.body).toEqual({ raw: buffer });
     });
   });
@@ -268,7 +270,7 @@ describe("Server", () => {
     test("the handler should call next if there is no error", () => {
       const logger = winston.createLogger({ silent: true });
       const handler = createParserFailureHandler(defaultResultHandler, logger);
-      const next = jest.fn();
+      const next = vi.fn();
       handler(
         undefined,
         null as unknown as Request,
@@ -284,23 +286,23 @@ describe("Server", () => {
       const logger = winston.createLogger({ silent: true });
       const resultHandler = {
         ...defaultResultHandler,
-        handler: jest.fn(),
+        handler: vi.fn(),
       };
       const handler = createNotFoundHandler(resultHandler, logger);
-      const next = jest.fn();
+      const next = vi.fn();
       const requestMock = {
         method: "POST",
         path: "/v1/test",
-        header: jest.fn(() => mimeJson),
+        header: vi.fn(() => mimeJson),
         body: {
           n: 453,
         },
       };
-      const responseMock: Record<string, jest.Mock> = {
-        end: jest.fn(),
-        set: jest.fn().mockImplementation(() => responseMock),
-        status: jest.fn().mockImplementation(() => responseMock),
-        json: jest.fn().mockImplementation(() => responseMock),
+      const responseMock: Record<string, Mock> = {
+        end: vi.fn(),
+        set: vi.fn().mockImplementation(() => responseMock),
+        status: vi.fn().mockImplementation(() => responseMock),
+        json: vi.fn().mockImplementation(() => responseMock),
       };
       handler(
         requestMock as unknown as Request,
@@ -321,25 +323,25 @@ describe("Server", () => {
       const logger = winston.createLogger({ silent: true });
       const resultHandler = {
         ...defaultResultHandler,
-        handler: jest.fn().mockImplementation(() => {
+        handler: vi.fn().mockImplementation(() => {
           throw new Error("I am faulty");
         }),
       };
       const handler = createNotFoundHandler(resultHandler, logger);
-      const next = jest.fn();
+      const next = vi.fn();
       const requestMock = {
         method: "POST",
         path: "/v1/test",
-        header: jest.fn(() => mimeJson),
+        header: vi.fn(() => mimeJson),
         body: {
           n: 453,
         },
       };
-      const responseMock: Record<string, jest.Mock> = {
-        end: jest.fn(),
-        set: jest.fn().mockImplementation(() => responseMock),
-        status: jest.fn().mockImplementation(() => responseMock),
-        json: jest.fn().mockImplementation(() => responseMock),
+      const responseMock: Record<string, Mock> = {
+        end: vi.fn(),
+        set: vi.fn().mockImplementation(() => responseMock),
+        status: vi.fn().mockImplementation(() => responseMock),
+        json: vi.fn().mockImplementation(() => responseMock),
       };
       handler(
         requestMock as unknown as Request,
@@ -363,13 +365,13 @@ describe("Server", () => {
       const app = express();
       expect(appMock).toBeTruthy();
       const customLogger = winston.createLogger({ silent: true });
-      const infoMethod = jest.spyOn(customLogger, "info");
+      const infoMethod = vi.spyOn(customLogger, "info");
       const configMock = {
         app,
         cors: true,
         startupLogo: false,
         errorHandler: {
-          handler: jest.fn(),
+          handler: vi.fn(),
         },
         logger: customLogger,
       };
@@ -383,7 +385,7 @@ describe("Server", () => {
             output: z.object({
               b: z.boolean(),
             }),
-            handler: jest.fn(),
+            handler: vi.fn(),
           }),
         },
       };
