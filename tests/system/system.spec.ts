@@ -39,7 +39,7 @@ describe("App", async () => {
         createResultHandler({
           getPositiveResponse: () => z.object({}),
           getNegativeResponse: () => z.object({}),
-          handler: () => assert.fail(new Error("I am faulty")),
+          handler: () => assert.fail("I am faulty"),
         }),
       )
         .addMiddleware(
@@ -51,9 +51,7 @@ describe("App", async () => {
                 .transform((value) =>
                   assert(
                     !value,
-                    new Error(
-                      "Custom error in the Middleware input validation",
-                    ),
+                    "Custom error in the Middleware input validation",
                   ),
                 ),
             }),
@@ -67,10 +65,7 @@ describe("App", async () => {
               .any()
               .optional()
               .transform((value) =>
-                assert(
-                  !value,
-                  new Error("Custom error in the Endpoint input validation"),
-                ),
+                assert(!value, "Custom error in the Endpoint input validation"),
               ),
           }),
           output: z.object({

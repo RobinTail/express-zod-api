@@ -369,7 +369,7 @@ describe("zod-to-ts", () => {
       test("should handle an error within the transformation", () => {
         const schema = z
           .number()
-          .transform(() => assert.fail(new Error("this should be handled")));
+          .transform(() => assert.fail("this should be handled"));
         expect(
           printNodeTest(zodToTs({ schema, ...defaultCtx, isResponse: true })),
         ).toMatchSnapshot();

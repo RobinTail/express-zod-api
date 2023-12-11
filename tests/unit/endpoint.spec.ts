@@ -192,9 +192,7 @@ describe("Endpoint", () => {
         method: "post",
         input: z.object({}),
         output: z.object({
-          test: z
-            .number()
-            .transform(() => assert.fail(new Error("Something unexpected"))),
+          test: z.number().transform(() => assert.fail("Something unexpected")),
         }),
         handler: async () => ({
           test: 123,
@@ -264,8 +262,7 @@ describe("Endpoint", () => {
         createResultHandler({
           getPositiveResponse: () => z.object({}),
           getNegativeResponse: () => z.object({}),
-          handler: () =>
-            assert.fail(new Error("Something unexpected happened")),
+          handler: () => assert.fail("Something unexpected happened"),
         }),
       );
       const endpoint = factory.build({
@@ -446,8 +443,7 @@ describe("Endpoint", () => {
             input: z.object({
               shouldNotBeHere: z.boolean(),
             }),
-            middleware: async () =>
-              assert.fail(new Error("Should not be here")),
+            middleware: async () => assert.fail("Should not be here"),
           }),
         )
         .addExpressMiddleware((req, res, next) => {

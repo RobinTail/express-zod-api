@@ -324,9 +324,7 @@ describe("Server", () => {
       const logger = winston.createLogger({ silent: true });
       const resultHandler = {
         ...defaultResultHandler,
-        handler: vi
-          .fn()
-          .mockImplementation(() => assert.fail(new Error("I am faulty"))),
+        handler: vi.fn().mockImplementation(() => assert.fail("I am faulty")),
       };
       const handler = createNotFoundHandler(resultHandler, logger);
       const next = vi.fn();

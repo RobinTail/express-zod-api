@@ -666,9 +666,7 @@ describe("Documentation helpers", () => {
 
     test.each([
       z.number().transform((num) => () => num),
-      z
-        .number()
-        .transform(() => assert.fail(new Error("this should be handled"))),
+      z.number().transform(() => assert.fail("this should be handled")),
     ])("should handle edge cases", (schema) => {
       expect(
         depictEffect({
