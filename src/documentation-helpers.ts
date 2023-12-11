@@ -134,7 +134,7 @@ export const depictAny: Depicter<z.ZodAny> = () => ({
 
 export const depictUpload: Depicter<ZodUpload> = (ctx) => {
   assert(
-    ctx.isResponse === false,
+    !ctx.isResponse,
     new DocumentationError({
       message: "Please use z.upload() only for input.",
       ...ctx,
@@ -246,7 +246,7 @@ export const depictNull: Depicter<z.ZodNull> = () => ({
 
 export const depictDateIn: Depicter<ZodDateIn> = (ctx) => {
   assert(
-    ctx.isResponse === false,
+    !ctx.isResponse,
     new DocumentationError({
       message: "Please use z.dateOut() for output.",
       ...ctx,
