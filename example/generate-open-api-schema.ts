@@ -2,9 +2,7 @@ import { writeFile } from "node:fs/promises";
 import { Documentation } from "../src";
 import { config } from "./config";
 import { routing } from "./routing";
-
-const manifest = (await import("../package.json", { assert: { type: "json" } }))
-  .default;
+import manifest from "../package.json";
 
 await writeFile(
   "example/example.swagger.yaml",

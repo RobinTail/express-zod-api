@@ -1,7 +1,5 @@
 import { writeFile } from "node:fs/promises";
-
-const manifest = (await import("../package.json", { assert: { type: "json" } }))
-  .default;
+import manifest from "../package.json";
 
 const ownLicense = `
 MIT License
