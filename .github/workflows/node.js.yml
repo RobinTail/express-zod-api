@@ -50,8 +50,8 @@ jobs:
       run: yarn build
     - name: Compatibility test
       run: yarn test:compat
-    - name: Integration test
-      run: yarn test:int
+    - name: CJS test
+      run: yarn test:cjs
     - name: Issue 952
       # see https://github.com/RobinTail/express-zod-api/issues/952
       run: yarn test:952
