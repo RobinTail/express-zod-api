@@ -12,6 +12,6 @@ const esmQuickStart = quickStart.replace(
   `${givePort("esm")}`,
 );
 
-await writeFile("./tests/integration/quick-start.ts", quickStart);
+await writeFile("./tests/cjs/quick-start.ts", quickStart);
 await writeFile("./tests/issue952/quick-start.ts", issue952QuickStart);
 await writeFile("./tests/esm/quick-start.ts", esmQuickStart);

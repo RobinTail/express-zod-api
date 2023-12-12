@@ -1,12 +1,8 @@
 {
-  "extends": "@tsconfig/node18/tsconfig.json",
+  "extends": "./tsconfig.base.json",
   "compilerOptions": {
     "module": "ESNext",
     "moduleResolution": "Bundler",
-    "noImplicitAny": true,
-    "noImplicitOverride": true,
-    "strictNullChecks": true,
-    "resolveJsonModule": true
   },
   "include": ["src", "example", "tests/unit", "tests/system", "tests/*.ts", "tools", "tsup.config.ts", "vitest.config.ts"]
 }
