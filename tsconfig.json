@@ -4,5 +4,5 @@
     "module": "ESNext",
     "moduleResolution": "Bundler",
   },
-  "include": ["src", "example", "tests/unit", "tests/system", "tests/*.ts", "tools", "tsup.config.ts", "vitest.config.ts"]
+  "include": ["src", "example", "tests/unit", "tests/system", "tests/*.ts", "tools", "*.config.ts"]
 }
