@@ -14,6 +14,7 @@ import {
   hasTopLevelTransformingEffect,
   isCustomHeader,
   isValidDate,
+  makeCleanId,
   makeErrorFromAnything,
 } from "../../src/common-helpers";
 import { InputValidationError, ez, withMeta } from "../../src";
@@ -504,6 +505,23 @@ describe("Common Helpers", () => {
       "should check the presence and value of coerce prop %#",
       ({ schema, coercion }) => {
         expect(hasCoercion(schema)).toBe(coercion);
+      },
+    );
+  });
+
+  describe("makeCleanId()", () => {
+    test.each([
+      { method: "get", path: "" },
+      { method: "post", path: "/", suffix: "something" },
+      { method: "delete", path: "/user", suffix: "permanently" },
+      { method: "patch", path: "/user/affiliated/account" },
+      { method: "put", path: "/assets/into/:storageIdentifier" },
+      { method: "get", path: "/flightDetails/:from-:to/:seatID" },
+      { method: "get", path: "/companys/:companyId/users/:userId" },
+    ])(
+      "should generate valid identifier from method, path and suffix %#",
+      ({ method, path, suffix }) => {
+        expect(makeCleanId(path, method, suffix)).toMatchSnapshot();
       },
     );
   });

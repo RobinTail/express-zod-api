@@ -33,3 +33,17 @@ exports[`Common Helpers > getMessageFromError() > should handle empty path in Zo
 exports[`Common Helpers > getMessageFromError() > should pass message from other error types 1`] = `"something went wrong"`;
 
 exports[`Common Helpers > getMessageFromError() > should pass message from other error types 2`] = `"something went wrong"`;
+
+exports[`Common Helpers > makeCleanId() > should generate valid identifier from method, path and suffix 0 1`] = `"Get"`;
+
+exports[`Common Helpers > makeCleanId() > should generate valid identifier from method, path and suffix 1 1`] = `"PostSomething"`;
+
+exports[`Common Helpers > makeCleanId() > should generate valid identifier from method, path and suffix 2 1`] = `"DeleteUserPermanently"`;
+
+exports[`Common Helpers > makeCleanId() > should generate valid identifier from method, path and suffix 3 1`] = `"PatchUserAffiliatedAccount"`;
+
+exports[`Common Helpers > makeCleanId() > should generate valid identifier from method, path and suffix 4 1`] = `"PutAssetsIntoStorageidentifier"`;
+
+exports[`Common Helpers > makeCleanId() > should generate valid identifier from method, path and suffix 5 1`] = `"GetFlightdetailsFromToSeatid"`;
+
+exports[`Common Helpers > makeCleanId() > should generate valid identifier from method, path and suffix 6 1`] = `"GetCompanysCompanyidUsersUserid"`;
