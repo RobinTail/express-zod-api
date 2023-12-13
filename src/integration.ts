@@ -320,6 +320,18 @@ export class Integration {
       ],
     );
 
+    const clientInstanceStatement = f.createVariableStatement(
+      undefined,
+      makeConst(
+        "client",
+        f.createNewExpression(
+          f.createIdentifier(clientNode.name!.text),
+          undefined,
+          [f.createIdentifier("exampleImplementation")],
+        ),
+      ),
+    );
+
     const provideCallingStatement = f.createExpressionStatement(
       f.createCallExpression(
         f.createPropertyAccessExpression(
@@ -359,7 +371,8 @@ export class Integration {
         "  return response.text();\n" +
         "};\n" +
         "\n" +
-        "const client = new ExpressZodAPIClient(exampleImplementation);\n" +
+        printNode(clientInstanceStatement) +
+        "\n" +
         printNode(provideCallingStatement) +
         "\n",
       true,
