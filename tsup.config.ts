@@ -1,5 +1,5 @@
 import { defineConfig } from "tsup";
-import manifest from "./package.json";
+import { version } from "./package.json";
 
 export default defineConfig({
   entry: ["src/index.ts"],
@@ -11,9 +11,7 @@ export default defineConfig({
   minify: true,
   esbuildOptions: (options, { format }) => {
     options.define = {
-      "process.env.TSUP_BUILD": `"v${
-        manifest.version
-      } (${format.toUpperCase()})"`,
+      "process.env.TSUP_BUILD": `"v${version} (${format.toUpperCase()})"`,
     };
   },
 });
