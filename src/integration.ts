@@ -320,6 +320,23 @@ export class Integration {
       ],
     );
 
+    const provideCallingStatement = f.createExpressionStatement(
+      f.createCallExpression(
+        f.createPropertyAccessExpression(
+          f.createIdentifier("client"),
+          "provide",
+        ),
+        undefined,
+        [
+          f.createStringLiteral("get"),
+          f.createStringLiteral("/v1/user/retrieve"),
+          f.createObjectLiteralExpression([
+            f.createPropertyAssignment("id", f.createStringLiteral("10")),
+          ]),
+        ],
+      ),
+    );
+
     ts.addSyntheticLeadingComment(
       clientNode,
       ts.SyntaxKind.MultiLineCommentTrivia,
@@ -343,7 +360,8 @@ export class Integration {
         "};\n" +
         "\n" +
         "const client = new ExpressZodAPIClient(exampleImplementation);\n" +
-        'client.provide("get", "/v1/user/retrieve", { id: "10" });\n',
+        printNode(provideCallingStatement) +
+        "\n",
       true,
     );
 
