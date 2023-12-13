@@ -25,6 +25,7 @@ export const initRouting = ({
   if (config.startupLogo !== false) {
     console.log(getStartupLogo());
   }
+  logger.debug("Running", process.env.TSUP_BUILD || "from sources");
   walkRouting({
     routing,
     hasCors: !!config.cors,
