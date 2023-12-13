@@ -251,6 +251,54 @@ export class Integration {
       ],
     );
 
+    const pathArgument = makeObjectKeysReducer(
+      "params",
+      f.createCallExpression(
+        f.createPropertyAccessExpression(f.createIdentifier("acc"), "replace"),
+        undefined,
+        [
+          keyParamExpression,
+          f.createElementAccessExpression(
+            f.createIdentifier("params"),
+            f.createIdentifier("key"),
+          ),
+        ],
+      ),
+      f.createIdentifier("path"),
+    );
+
+    const paramsArgument = makeObjectKeysReducer(
+      "params",
+      f.createConditionalExpression(
+        f.createBinaryExpression(
+          f.createCallExpression(
+            f.createPropertyAccessExpression(
+              f.createIdentifier("path"),
+              "indexOf",
+            ),
+            undefined,
+            [keyParamExpression],
+          ),
+          ts.SyntaxKind.GreaterThanEqualsToken,
+          f.createNumericLiteral(0),
+        ),
+        undefined,
+        f.createIdentifier("acc"),
+        undefined,
+        f.createObjectLiteralExpression([
+          f.createSpreadAssignment(f.createIdentifier("acc")),
+          f.createPropertyAssignment(
+            f.createComputedPropertyName(f.createIdentifier("key")),
+            f.createElementAccessExpression(
+              f.createIdentifier("params"),
+              f.createIdentifier("key"),
+            ),
+          ),
+        ]),
+      ),
+      f.createObjectLiteralExpression(),
+    );
+
     const clientNode = makePublicClass(
       "ExpressZodAPIClient",
       makeEmptyInitializingConstructor([
@@ -266,58 +314,7 @@ export class Integration {
           f.createTypeReferenceNode(providerNode.name),
           makeImplementationCallFn(
             ["method", "path", "params"],
-            [
-              f.createIdentifier("method"),
-              makeObjectKeysReducer(
-                "params",
-                f.createCallExpression(
-                  f.createPropertyAccessExpression(
-                    f.createIdentifier("acc"),
-                    "replace",
-                  ),
-                  undefined,
-                  [
-                    keyParamExpression,
-                    f.createElementAccessExpression(
-                      f.createIdentifier("params"),
-                      f.createIdentifier("key"),
-                    ),
-                  ],
-                ),
-                f.createIdentifier("path"),
-              ),
-              makeObjectKeysReducer(
-                "params",
-                f.createConditionalExpression(
-                  f.createBinaryExpression(
-                    f.createCallExpression(
-                      f.createPropertyAccessExpression(
-                        f.createIdentifier("path"),
-                        "indexOf",
-                      ),
-                      undefined,
-                      [keyParamExpression],
-                    ),
-                    ts.SyntaxKind.GreaterThanEqualsToken,
-                    f.createNumericLiteral(0),
-                  ),
-                  undefined,
-                  f.createIdentifier("acc"),
-                  undefined,
-                  f.createObjectLiteralExpression([
-                    f.createSpreadAssignment(f.createIdentifier("acc")),
-                    f.createPropertyAssignment(
-                      f.createComputedPropertyName(f.createIdentifier("key")),
-                      f.createElementAccessExpression(
-                        f.createIdentifier("params"),
-                        f.createIdentifier("key"),
-                      ),
-                    ),
-                  ]),
-                ),
-                f.createObjectLiteralExpression(),
-              ),
-            ],
+            [f.createIdentifier("method"), pathArgument, paramsArgument],
           ),
         ),
       ],
