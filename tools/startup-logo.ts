@@ -1,7 +1,6 @@
-/** @todo rename to .ts if/when moved to ESM first */
 import chalk from "chalk";
 import { format } from "pretty-format";
-import { writeFileSync } from "node:fs";
+import { writeFile } from "node:fs/promises";
 
 const attribution = `
 // ANSI font attribution
@@ -54,4 +53,4 @@ ${serialized}
 };
 `;
 
-writeFileSync("./src/startup-logo.ts", output);
+await writeFile("./src/startup-logo.ts", output);

@@ -1,7 +1,7 @@
-import { readFileSync } from "node:fs";
+import { readFile } from "node:fs/promises";
 
-export const extractReadmeQuickStart = () => {
-  const readme = readFileSync("README.md", "utf-8");
+export const extractReadmeQuickStart = async () => {
+  const readme = await readFile("README.md", "utf-8");
   const quickStartSection = readme.match(/# Quick start(.+?)\n#\s[A-Z]+/s);
 
   if (!quickStartSection) {

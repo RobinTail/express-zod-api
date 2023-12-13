@@ -31,7 +31,7 @@ export const routing: Routing = {
     },
   },
   // path /public serves static files from /example/assets
-  public: new ServeStatic(join(__dirname, "assets"), {
+  public: new ServeStatic(join("example", "assets"), {
     dotfiles: "deny",
     index: false,
     redirect: false,
