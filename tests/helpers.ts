@@ -3,7 +3,6 @@ import { SchemaHandler, walkSchema } from "../src/schema-walker";
 
 let lastGivenPort = 8010;
 const reservedPorts = {
-  esm: 8070,
   example: 8090,
 };
 export const givePort = (test?: keyof typeof reservedPorts) => {

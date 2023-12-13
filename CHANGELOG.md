@@ -2,6 +2,14 @@
 
 ## Version 15
 
+### 15.1.0
+
+- The distribution becomes ESM first, while remaining dual (CJS support remains).
+  - This should not be a breaking change: the right files should be chosen automatically.
+  - However, the filenames in `dist` folder are renamed:
+    - for ESM: `index.js` and `index.d.ts`,
+    - for CJS: `index.cjs` and `index.d.cts`.
+
 ### 15.0.1
 
 - Development environment improvements:

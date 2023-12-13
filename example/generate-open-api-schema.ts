@@ -1,10 +1,10 @@
-import { writeFileSync } from "node:fs";
+import { writeFile } from "node:fs/promises";
 import { Documentation } from "../src";
 import { config } from "./config";
 import { routing } from "./routing";
 import manifest from "../package.json";
 
-writeFileSync(
+await writeFile(
   "example/example.swagger.yaml",
   new Documentation({
     routing,

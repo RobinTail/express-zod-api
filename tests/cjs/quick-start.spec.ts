@@ -2,16 +2,14 @@ import { spawn } from "node:child_process";
 import { givePort, waitFor } from "../helpers";
 import { afterAll, afterEach, describe, expect, test } from "vitest";
 
-describe("Integration Test", async () => {
+describe("CJS Test", async () => {
   let out = "";
   const listener = (chunk: Buffer) => {
     out += chunk.toString();
   };
-  const quickStart = spawn(
-    "node",
-    ["-r", "@swc-node/register", "quick-start.ts"],
-    { cwd: "./tests/integration" },
-  );
+  const quickStart = spawn("tsx", ["quick-start.ts"], {
+    cwd: "./tests/cjs",
+  });
   quickStart.stdout.on("data", listener);
   quickStart.stderr.on("data", listener);
   const port = givePort("example");
