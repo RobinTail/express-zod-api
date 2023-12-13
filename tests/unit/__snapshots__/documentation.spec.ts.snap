@@ -91,7 +91,7 @@ info:
 paths:
   /v1/getSomething:
     get:
-      operationId: GetV1Getsomething
+      operationId: GetV1GetSomething
       responses:
         "200":
           description: GET /v1/getSomething Successful response
@@ -155,7 +155,7 @@ paths:
               type: string
             minItems: 1
     post:
-      operationId: PostV1Getsomething
+      operationId: PostV1GetSomething
       responses:
         "200":
           description: POST /v1/getSomething Successful response
@@ -246,7 +246,7 @@ info:
 paths:
   /v1/getSomething:
     post:
-      operationId: PostV1Getsomething
+      operationId: PostV1GetSomething
       responses:
         "200":
           description: POST /v1/getSomething Successful response
@@ -357,7 +357,7 @@ info:
 paths:
   /v1/addSomething:
     post:
-      operationId: PostV1Addsomething
+      operationId: PostV1AddSomething
       responses:
         "200":
           description: POST /v1/addSomething Successful response
@@ -551,7 +551,7 @@ info:
 paths:
   /v1/getSomething:
     post:
-      operationId: PostV1Getsomething
+      operationId: PostV1GetSomething
       responses:
         "200":
           description: POST /v1/getSomething Successful response
@@ -665,7 +665,7 @@ info:
 paths:
   /v1/getSomething:
     get:
-      operationId: GetV1Getsomething
+      operationId: GetV1GetSomething
       responses:
         "200":
           description: GET /v1/getSomething Successful response
@@ -757,7 +757,7 @@ info:
 paths:
   /v1/getSomething:
     post:
-      operationId: PostV1Getsomething
+      operationId: PostV1GetSomething
       responses:
         "200":
           description: POST /v1/getSomething Successful response
@@ -854,7 +854,7 @@ info:
 paths:
   /v1/getSomething:
     get:
-      operationId: GetV1Getsomething
+      operationId: GetV1GetSomething
       responses:
         "200":
           description: GET /v1/getSomething Successful response
@@ -937,7 +937,7 @@ info:
 paths:
   /v1/getSomething:
     get:
-      operationId: GetV1Getsomething
+      operationId: GetV1GetSomething
       responses:
         "200":
           description: GET /v1/getSomething Successful response
@@ -1408,7 +1408,7 @@ info:
 paths:
   /v1/getSome/thing:
     get:
-      operationId: GetV1GetsomeThing
+      operationId: GetV1GetSomeThing
       responses:
         "200":
           description: GET /v1/getSome/thing Successful response
@@ -1458,7 +1458,7 @@ paths:
       summary: thing is the path segment
   /v1/getSome/{thing}:
     get:
-      operationId: GetV1GetsomeThing2
+      operationId: GetV1GetSomeThing2
       responses:
         "200":
           description: GET /v1/getSome/:thing Successful response
@@ -1530,7 +1530,7 @@ info:
 paths:
   /v1/getSomething:
     get:
-      operationId: GetV1Getsomething
+      operationId: GetV1GetSomething
       responses:
         "200":
           description: GET /v1/getSomething Successful response
@@ -1603,7 +1603,7 @@ paths:
         - HTTP_1: []
   /v1/setSomething:
     post:
-      operationId: PostV1Setsomething
+      operationId: PostV1SetSomething
       responses:
         "200":
           description: POST /v1/setSomething Successful response
@@ -1665,7 +1665,7 @@ paths:
             - write
   /v1/updateSomething:
     put:
-      operationId: PutV1Updatesomething
+      operationId: PutV1UpdateSomething
       responses:
         "200":
           description: PUT /v1/updateSomething Successful response
@@ -1766,7 +1766,7 @@ info:
 paths:
   /v1/deleteSomething:
     delete:
-      operationId: DeleteV1Deletesomething
+      operationId: DeleteV1DeleteSomething
       responses:
         "200":
           description: DELETE /v1/deleteSomething Successful response
@@ -1845,7 +1845,7 @@ info:
 paths:
   /v1/getSomething:
     get:
-      operationId: GetV1Getsomething
+      operationId: GetV1GetSomething
       responses:
         "200":
           description: GET /v1/getSomething Successful response
@@ -1959,7 +1959,7 @@ info:
 paths:
   /v1/getSomething:
     post:
-      operationId: PostV1Getsomething
+      operationId: PostV1GetSomething
       responses:
         "200":
           description: POST /v1/getSomething Successful response
@@ -2086,7 +2086,7 @@ info:
 paths:
   /v1/getSomething:
     post:
-      operationId: PostV1Getsomething
+      operationId: PostV1GetSomething
       responses:
         "200":
           description: POST /v1/getSomething Successful response
@@ -2200,7 +2200,7 @@ info:
 paths:
   /v1/getSomething:
     get:
-      operationId: GetV1Getsomething
+      operationId: GetV1GetSomething
       responses:
         "200":
           description: GET /v1/getSomething Successful response
@@ -2309,7 +2309,7 @@ info:
 paths:
   /v1/getSomething:
     post:
-      operationId: PostV1Getsomething
+      operationId: PostV1GetSomething
       responses:
         "200":
           description: POST /v1/getSomething Successful response
@@ -3072,7 +3072,7 @@ paths:
           required: true
           description: GET /v1/avatar/send parameter
           schema:
-            $ref: "#/components/schemas/GetV1AvatarSendParameterUserid"
+            $ref: "#/components/schemas/GetV1AvatarSendParameterUserId"
   /v1/avatar/stream:
     get:
       operationId: GetV1AvatarStream
@@ -3099,7 +3099,7 @@ paths:
           required: true
           description: GET /v1/avatar/stream parameter
           schema:
-            $ref: "#/components/schemas/GetV1AvatarStreamParameterUserid"
+            $ref: "#/components/schemas/GetV1AvatarStreamParameterUserId"
   /v1/avatar/upload:
     post:
       operationId: PostV1AvatarUpload
@@ -3321,14 +3321,14 @@ components:
           - name
     GetV1UserListErrorResponse:
       type: string
-    GetV1AvatarSendParameterUserid:
+    GetV1AvatarSendParameterUserId:
       type: string
       pattern: /\\d+/
     GetV1AvatarSendSuccessfulResponse:
       type: string
     GetV1AvatarSendErrorResponse:
       type: string
-    GetV1AvatarStreamParameterUserid:
+    GetV1AvatarStreamParameterUserId:
       type: string
       pattern: /\\d+/
     GetV1AvatarStreamSuccessfulResponse:
@@ -3473,7 +3473,7 @@ info:
 paths:
   /v1/getSomething:
     post:
-      operationId: PostV1Getsomething
+      operationId: PostV1GetSomething
       responses:
         "200":
           description: POST /v1/getSomething Successful response
@@ -3579,7 +3579,7 @@ info:
 paths:
   /v1/getSomething:
     post:
-      operationId: PostV1Getsomething
+      operationId: PostV1GetSomething
       responses:
         "200":
           description: POST /v1/getSomething Successful response
@@ -3684,7 +3684,7 @@ info:
 paths:
   /v1/getSomething:
     get:
-      operationId: GetV1Getsomething
+      operationId: GetV1GetSomething
       responses:
         "201":
           description: GET /v1/getSomething Successful response
@@ -3742,7 +3742,7 @@ info:
 paths:
   /v1/getSomething:
     post:
-      operationId: PostV1Getsomething
+      operationId: PostV1GetSomething
       responses:
         "200":
           description: POST /v1/getSomething Successful response
@@ -3896,7 +3896,7 @@ info:
 paths:
   /v1/getSomething:
     post:
-      operationId: PostV1Getsomething
+      operationId: PostV1GetSomething
       responses:
         "200":
           description: POST /v1/getSomething Successful response
@@ -4038,7 +4038,7 @@ info:
 paths:
   /v1/getSomething:
     post:
-      operationId: PostV1Getsomething
+      operationId: PostV1GetSomething
       responses:
         "200":
           description: POST /v1/getSomething Successful response
@@ -4129,7 +4129,7 @@ info:
 paths:
   /v1/getSomething:
     post:
-      operationId: PostV1Getsomething
+      operationId: PostV1GetSomething
       responses:
         "200":
           description: POST /v1/getSomething Successful response
@@ -4257,7 +4257,7 @@ info:
 paths:
   /v1/getSomething:
     post:
-      operationId: PostV1Getsomething
+      operationId: PostV1GetSomething
       responses:
         "200":
           description: POST /v1/getSomething Successful response
@@ -4350,7 +4350,7 @@ info:
 paths:
   /v1/getSomething:
     post:
-      operationId: PostV1Getsomething
+      operationId: PostV1GetSomething
       responses:
         "200":
           description: POST /v1/getSomething Successful response
@@ -4476,7 +4476,7 @@ info:
 paths:
   /v1/getSomething:
     get:
-      operationId: GetV1Getsomething
+      operationId: GetV1GetSomething
       responses:
         "200":
           description: GET /v1/getSomething Successful response
@@ -4555,7 +4555,7 @@ info:
 paths:
   /v1/getSomething:
     get:
-      operationId: GetV1Getsomething
+      operationId: GetV1GetSomething
       responses:
         "200":
           description: GET /v1/getSomething Successful response
