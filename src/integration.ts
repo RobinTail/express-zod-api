@@ -134,20 +134,26 @@ export class Integration {
 
     this.agg = Object.values<ts.Node>(this.aliases).concat(this.agg);
 
+    // export type Path = "/v1/user/retrieve" | ___;
     const pathNode = makePublicLiteralType("Path", this.paths);
+
+    // export type Method = "get" | "post" | "put" | "delete" | "patch";
     const methodNode = makePublicLiteralType("Method", methods);
 
+    // export type MethodPath = `${Method} ${Path}`;
     const methodPathNode = makePublicType(
       "MethodPath",
       makeTemplate([methodNode.name, pathNode.name]),
     );
 
+    // extends Record<MethodPath, any>
     const extenderClause = [
       f.createHeritageClause(ts.SyntaxKind.ExtendsKeyword, [
         makeRecord(methodPathNode.name, ts.SyntaxKind.AnyKeyword),
       ]),
     ];
 
+    // export interface Input ___ { "get /v1/user/retrieve": GetV1UserRetrieveInput; }
     const inputNode = makePublicExtendedInterface(
       "Input",
       extenderClause,
@@ -156,6 +162,7 @@ export class Integration {
       ),
     );
 
+    // export interface Response ___ { "get /v1/user/retrieve": GetV1UserRetrieveResponse; }
     const responseNode = makePublicExtendedInterface(
       "Response",
       extenderClause,
@@ -176,6 +183,7 @@ export class Integration {
       return;
     }
 
+    // export const jsonEndpoints = { "get /v1/user/retrieve": true }
     const jsonEndpointsNode = f.createVariableStatement(
       exportModifier,
       makeConst(
@@ -190,6 +198,7 @@ export class Integration {
       ),
     );
 
+    // export const endpointTags = { "get /v1/user/retrieve": ["users"] }
     const endpointTagsNode = f.createVariableStatement(
       exportModifier,
       makeConst(
@@ -209,6 +218,8 @@ export class Integration {
       ),
     );
 
+    // export type Provider = <M extends Method, P extends Path>(method: M, path: P, params: Input[`${M} ${P}`]) =>
+    // Promise<Response[`${M} ${P}`]>;
     const providerNode = makePublicType(
       "Provider",
       f.createFunctionTypeNode(
@@ -225,6 +236,7 @@ export class Integration {
       ),
     );
 
+    // export type Implementation = (method: Method, path: string, params: Record<string, any>) => Promise<any>;
     const implementationNode = makePublicType(
       "Implementation",
       f.createFunctionTypeNode(
@@ -241,6 +253,7 @@ export class Integration {
       ),
     );
 
+    // `:${key}`
     const keyParamExpression = f.createTemplateExpression(
       f.createTemplateHead(":"),
       [
@@ -251,6 +264,7 @@ export class Integration {
       ],
     );
 
+    // Object.keys(params).reduce((acc, key) => acc.replace(___, params[key]), path)
     const pathArgument = makeObjectKeysReducer(
       "params",
       f.createCallExpression(
@@ -267,6 +281,7 @@ export class Integration {
       f.createIdentifier("path"),
     );
 
+    // Object.keys(params).reduce((acc, key) => path.indexOf(___) >= 0 ? acc : { ...acc, [key]: params[key] }, {})
     const paramsArgument = makeObjectKeysReducer(
       "params",
       f.createConditionalExpression(
@@ -299,8 +314,10 @@ export class Integration {
       f.createObjectLiteralExpression(),
     );
 
+    // export class ExpressZodAPIClient { ___ }
     const clientNode = makePublicClass(
       "ExpressZodAPIClient",
+      // constructor(protected readonly implementation: Implementation) {}
       makeEmptyInitializingConstructor([
         makeParam(
           "implementation",
@@ -309,9 +326,11 @@ export class Integration {
         ),
       ]),
       [
+        // public readonly provide: Provider
         makePublicReadonlyProp(
           "provide",
           f.createTypeReferenceNode(providerNode.name),
+          // = async (method, path, params) => this.implementation(___)
           makeImplementationCallFn(
             ["method", "path", "params"],
             [f.createIdentifier("method"), pathArgument, paramsArgument],
@@ -320,6 +339,7 @@ export class Integration {
       ],
     );
 
+    // const client = new ExpressZodAPIClient(exampleImplementation);
     const clientInstanceStatement = f.createVariableStatement(
       undefined,
       makeConst(
@@ -332,6 +352,7 @@ export class Integration {
       ),
     );
 
+    // client.provide("get", "/v1/user/retrieve", { id: "10" });
     const provideCallingStatement = f.createExpressionStatement(
       f.createCallExpression(
         f.createPropertyAccessExpression(
