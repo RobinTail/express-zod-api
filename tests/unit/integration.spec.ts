@@ -6,13 +6,13 @@ import { describe, expect, test } from "vitest";
 describe("API Integration Generator", () => {
   test.each(["client", "types"] as const)(
     "Should generate a %s for example API",
-    (variant) => {
+    async (variant) => {
       const client = new Integration({ variant, routing });
-      expect(client.print()).toMatchSnapshot();
+      expect(await client.print()).toMatchSnapshot();
     },
   );
 
-  test("Should treat optionals the same way as z.infer() by default", () => {
+  test("Should treat optionals the same way as z.infer() by default", async () => {
     const client = new Integration({
       routing: {
         v1: {
@@ -29,12 +29,12 @@ describe("API Integration Generator", () => {
         },
       },
     });
-    expect(client.print()).toMatchSnapshot();
+    expect(await client.print()).toMatchSnapshot();
   });
 
   test.each([{ withQuestionMark: true }, { withUndefined: true }, {}])(
     "Feature #945: should have configurable treatment of optionals %#",
-    (optionalPropStyle) => {
+    async (optionalPropStyle) => {
       const client = new Integration({
         optionalPropStyle,
         routing: {
@@ -52,7 +52,7 @@ describe("API Integration Generator", () => {
           },
         },
       });
-      expect(client.print()).toMatchSnapshot();
+      expect(await client.print()).toMatchSnapshot();
     },
   );
 });

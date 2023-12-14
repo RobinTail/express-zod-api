@@ -32,6 +32,7 @@ import { Routing } from "./routing";
 import { walkRouting } from "./routing-walker";
 import { zodToTs } from "./zts";
 import { createTypeAlias, printNode } from "./zts-helpers";
+import prettier from "prettier";
 
 interface Registry {
   [METHOD_PATH: string]: Record<"in" | "out", string> & {
@@ -349,7 +350,7 @@ export class Integration {
     );
   }
 
-  public print(printerOptions?: ts.PrinterOptions) {
+  public async print(printerOptions?: ts.PrinterOptions) {
     // method: method.toUpperCase()
     const methodProperty = f.createPropertyAssignment(
       "method",
@@ -569,15 +570,26 @@ export class Integration {
     const exampleComment = ts.addSyntheticLeadingComment(
       f.createEmptyStatement(),
       ts.SyntaxKind.MultiLineCommentTrivia,
-      [exampleImplStatement, clientInstanceStatement, provideCallingStatement]
-        .map((node) => printNode(node, printerOptions))
-        .join("\n") + "\n",
-      true,
+      "\n" + // @todo this requires either to depend or to load async peer
+        (await prettier.format(
+          [
+            exampleImplStatement,
+            clientInstanceStatement,
+            provideCallingStatement,
+          ]
+            .map((node) => printNode(node, printerOptions))
+            .join("\n") + "\n",
+          { parser: "typescript" },
+        )),
     );
 
-    return this.agg
-      .concat(exampleComment)
-      .map((node) => printNode(node, printerOptions))
-      .join("\n\n");
+    // @todo this requires either to depend or to load async peer
+    return prettier.format(
+      this.agg
+        .concat(exampleComment)
+        .map((node) => printNode(node, printerOptions))
+        .join("\n\n"),
+      { parser: "typescript" },
+    );
   }
 }

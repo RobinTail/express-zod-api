@@ -23,7 +23,7 @@
     "build:tests": "yarn cleanup && tsx tools/make-tests.ts",
     "build:assets": "yarn build:swagger && yarn build:client && yarn build:license",
     "build:swagger": "tsx example/generate-open-api-schema.ts",
-    "build:client": "tsx example/generate-client.ts && yarn prettier example/example.client.ts --write",
+    "build:client": "tsx example/generate-client.ts",
     "build:license": "tsx tools/license.ts",
     "build:logo": "tsx tools/startup-logo.ts",
     "test": "yarn test:types && yarn test:unit && yarn test:badge",
