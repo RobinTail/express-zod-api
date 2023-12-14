@@ -404,6 +404,27 @@ export class Integration {
       ),
     );
 
+    // const hasBody = !["get", "delete"].includes(method);
+    const hasBodyStatement = f.createVariableStatement(
+      undefined,
+      makeConst(
+        "hasBody",
+        f.createLogicalNot(
+          f.createCallExpression(
+            f.createPropertyAccessExpression(
+              f.createArrayLiteralExpression([
+                f.createStringLiteral("get"),
+                f.createStringLiteral("delete"),
+              ]),
+              "includes",
+            ),
+            undefined,
+            [f.createIdentifier("method")],
+          ),
+        ),
+      ),
+    );
+
     ts.addSyntheticLeadingComment(
       clientNode,
       ts.SyntaxKind.MultiLineCommentTrivia,
@@ -413,7 +434,7 @@ export class Integration {
         "  path,\n" +
         "  params\n" +
         ") => {\n" +
-        '  const hasBody = !["get", "delete"].includes(method);\n' +
+        `  ${printNode(hasBodyStatement)}\n` +
         '  const searchParams = hasBody ? "" : `?${new URLSearchParams(params)}`;\n' +
         "  const response = await fetch(`https://example.com${path}${searchParams}`, {\n" +
         "    method: method.toUpperCase(),\n" +
