@@ -498,6 +498,36 @@ export class Integration {
       ),
     );
 
+    // const response = await fetch(`https://example.com${path}${searchParams}`, { ___ });
+    const responseStatement = f.createVariableStatement(
+      undefined,
+      makeConst(
+        "response",
+        f.createAwaitExpression(
+          f.createCallExpression(f.createIdentifier("fetch"), undefined, [
+            f.createTemplateExpression(
+              f.createTemplateHead("https://example.com"),
+              [
+                f.createTemplateSpan(
+                  f.createIdentifier("path"),
+                  f.createTemplateMiddle(""),
+                ),
+                f.createTemplateSpan(
+                  f.createIdentifier("searchParams"),
+                  f.createTemplateTail(""),
+                ),
+              ],
+            ),
+            f.createObjectLiteralExpression([
+              methodProperty,
+              headersProperty,
+              bodyProperty,
+            ]),
+          ]),
+        ),
+      ),
+    );
+
     ts.addSyntheticLeadingComment(
       clientNode,
       ts.SyntaxKind.MultiLineCommentTrivia,
@@ -509,11 +539,7 @@ export class Integration {
         ") => {\n" +
         `  ${printNode(hasBodyStatement)}\n` +
         `  ${printNode(searchParamsStatement)}\n` +
-        "  const response = await fetch(`https://example.com${path}${searchParams}`, {\n" +
-        `    ${printNode(methodProperty)},\n` +
-        `    ${printNode(headersProperty)},\n` +
-        `    ${printNode(bodyProperty)},\n` +
-        "  });\n" +
+        `  ${printNode(responseStatement)}\n` +
         `  ${printNode(ifJsonStatement)}\n` +
         `  ${printNode(returnTextStatement)}\n` +
         "};\n" +
