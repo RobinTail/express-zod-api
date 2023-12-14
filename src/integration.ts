@@ -425,6 +425,30 @@ export class Integration {
       ),
     );
 
+    // const searchParams = hasBody ? "" : `?${new URLSearchParams(params)}`;
+    const searchParamsStatement = f.createVariableStatement(
+      undefined,
+      makeConst(
+        "searchParams",
+        f.createConditionalExpression(
+          f.createIdentifier("hasBody"),
+          undefined,
+          f.createStringLiteral(""),
+          undefined,
+          f.createTemplateExpression(f.createTemplateHead("?"), [
+            f.createTemplateSpan(
+              f.createNewExpression(
+                f.createIdentifier("URLSearchParams"),
+                undefined,
+                [f.createIdentifier("params")],
+              ),
+              f.createTemplateTail(""),
+            ),
+          ]),
+        ),
+      ),
+    );
+
     ts.addSyntheticLeadingComment(
       clientNode,
       ts.SyntaxKind.MultiLineCommentTrivia,
@@ -435,7 +459,7 @@ export class Integration {
         "  params\n" +
         ") => {\n" +
         `  ${printNode(hasBodyStatement)}\n` +
-        '  const searchParams = hasBody ? "" : `?${new URLSearchParams(params)}`;\n' +
+        `  ${printNode(searchParamsStatement)}\n` +
         "  const response = await fetch(`https://example.com${path}${searchParams}`, {\n" +
         "    method: method.toUpperCase(),\n" +
         '    headers: hasBody ? { "Content-Type": "application/json" } : undefined,\n' +
