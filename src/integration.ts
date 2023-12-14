@@ -556,8 +556,8 @@ export class Integration {
       ),
     );
 
-    ts.addSyntheticLeadingComment(
-      clientNode,
+    const exampleComment = ts.addSyntheticLeadingComment(
+      f.createEmptyStatement(),
       ts.SyntaxKind.MultiLineCommentTrivia,
       [exampleImplStatement, clientInstanceStatement, provideCallingStatement]
         .map((node) => printNode(node))
@@ -571,6 +571,7 @@ export class Integration {
       providerNode,
       implementationNode,
       clientNode,
+      exampleComment,
     );
   }
 
