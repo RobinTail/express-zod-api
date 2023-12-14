@@ -186,7 +186,7 @@ export const exampleImplementation: Implementation = async (
   });
   if (`${method} ${path}` in jsonEndpoints) {
     return response.json();
-  }
+}
   return response.text();
 };
 

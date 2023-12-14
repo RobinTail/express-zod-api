@@ -354,6 +354,25 @@ export class Integration {
         ),
     );
 
+    // if (`${method} ${path}` in jsonEndpoints) { ___ }
+    const ifJsonStatement = f.createIfStatement(
+      f.createBinaryExpression(
+        f.createTemplateExpression(f.createTemplateHead(""), [
+          f.createTemplateSpan(
+            f.createIdentifier("method"),
+            f.createTemplateMiddle(" "),
+          ),
+          f.createTemplateSpan(
+            f.createIdentifier("path"),
+            f.createTemplateTail(""),
+          ),
+        ]),
+        ts.SyntaxKind.InKeyword,
+        f.createIdentifier("jsonEndpoints"),
+      ),
+      f.createBlock([returnJsonStatement]),
+    );
+
     // const client = new ExpressZodAPIClient(exampleImplementation);
     const clientInstanceStatement = f.createVariableStatement(
       undefined,
@@ -401,14 +420,14 @@ export class Integration {
         '    headers: hasBody ? { "Content-Type": "application/json" } : undefined,\n' +
         "    body: hasBody ? JSON.stringify(params) : undefined,\n" +
         "  });\n" +
-        "  if (`${method} ${path}` in jsonEndpoints) {\n" +
-        `    ${printNode(returnJsonStatement)}\n` +
-        "  }\n" +
+        `  ${printNode(ifJsonStatement)}\n` +
         `  ${printNode(returnTextStatement)}\n` +
         "};\n" +
         "\n" +
-        `${printNode(clientInstanceStatement)}\n` +
-        `${printNode(provideCallingStatement)}\n`,
+        [clientInstanceStatement, provideCallingStatement]
+          .map((node) => printNode(node))
+          .join("\n") +
+        "\n",
       true,
     );
 
