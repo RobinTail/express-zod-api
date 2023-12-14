@@ -12,7 +12,7 @@
 
 ```yaml
 method: GET
-path: /companys/:companyId/users/:userId
+path: /companies/:companyId/users/:userId
 operationId:
   before: GetCompaniesCompanyidUsersUserid
   after: GetCompaniesCompanyIdUsersUserId
