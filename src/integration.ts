@@ -462,6 +462,23 @@ export class Integration {
       ),
     );
 
+    // headers: hasBody ? { "Content-Type": "application/json" } : undefined
+    const headersProperty = f.createPropertyAssignment(
+      "headers",
+      f.createConditionalExpression(
+        f.createIdentifier("hasBody"),
+        undefined,
+        f.createObjectLiteralExpression([
+          f.createPropertyAssignment(
+            f.createStringLiteral("Content-Type"),
+            f.createStringLiteral(mimeJson),
+          ),
+        ]),
+        undefined,
+        f.createIdentifier("undefined"),
+      ),
+    );
+
     ts.addSyntheticLeadingComment(
       clientNode,
       ts.SyntaxKind.MultiLineCommentTrivia,
@@ -475,7 +492,7 @@ export class Integration {
         `  ${printNode(searchParamsStatement)}\n` +
         "  const response = await fetch(`https://example.com${path}${searchParams}`, {\n" +
         `    ${printNode(methodProperty)},\n` +
-        '    headers: hasBody ? { "Content-Type": "application/json" } : undefined,\n' +
+        `    ${printNode(headersProperty)},\n` +
         "    body: hasBody ? JSON.stringify(params) : undefined,\n" +
         "  });\n" +
         `  ${printNode(ifJsonStatement)}\n` +
