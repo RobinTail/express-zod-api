@@ -449,6 +449,19 @@ export class Integration {
       ),
     );
 
+    // method: method.toUpperCase()
+    const methodProperty = f.createPropertyAssignment(
+      "method",
+      f.createCallExpression(
+        f.createPropertyAccessExpression(
+          f.createIdentifier("method"),
+          "toUpperCase",
+        ),
+        undefined,
+        undefined,
+      ),
+    );
+
     ts.addSyntheticLeadingComment(
       clientNode,
       ts.SyntaxKind.MultiLineCommentTrivia,
@@ -461,7 +474,7 @@ export class Integration {
         `  ${printNode(hasBodyStatement)}\n` +
         `  ${printNode(searchParamsStatement)}\n` +
         "  const response = await fetch(`https://example.com${path}${searchParams}`, {\n" +
-        "    method: method.toUpperCase(),\n" +
+        `    ${printNode(methodProperty)},\n` +
         '    headers: hasBody ? { "Content-Type": "application/json" } : undefined,\n' +
         "    body: hasBody ? JSON.stringify(params) : undefined,\n" +
         "  });\n" +
