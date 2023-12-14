@@ -340,116 +340,16 @@ export class Integration {
       ],
     );
 
-    // return response.json(); return response.text();
-    const [returnJsonStatement, returnTextStatement] = ["json", "text"].map(
-      (method) =>
-        f.createReturnStatement(
-          f.createCallExpression(
-            f.createPropertyAccessExpression(
-              f.createIdentifier("response"),
-              method,
-            ),
-            undefined,
-            undefined,
-          ),
-        ),
+    this.agg.push(
+      jsonEndpointsNode,
+      endpointTagsNode,
+      providerNode,
+      implementationNode,
+      clientNode,
     );
+  }
 
-    // if (`${method} ${path}` in jsonEndpoints) { ___ }
-    const ifJsonStatement = f.createIfStatement(
-      f.createBinaryExpression(
-        f.createTemplateExpression(f.createTemplateHead(""), [
-          f.createTemplateSpan(
-            f.createIdentifier("method"),
-            f.createTemplateMiddle(" "),
-          ),
-          f.createTemplateSpan(
-            f.createIdentifier("path"),
-            f.createTemplateTail(""),
-          ),
-        ]),
-        ts.SyntaxKind.InKeyword,
-        f.createIdentifier("jsonEndpoints"),
-      ),
-      f.createBlock([returnJsonStatement]),
-    );
-
-    // const client = new ExpressZodAPIClient(exampleImplementation);
-    const clientInstanceStatement = f.createVariableStatement(
-      undefined,
-      makeConst(
-        "client",
-        f.createNewExpression(
-          f.createIdentifier(clientNode.name!.text),
-          undefined,
-          [f.createIdentifier("exampleImplementation")],
-        ),
-      ),
-    );
-
-    // client.provide("get", "/v1/user/retrieve", { id: "10" });
-    const provideCallingStatement = f.createExpressionStatement(
-      f.createCallExpression(
-        f.createPropertyAccessExpression(
-          f.createIdentifier("client"),
-          "provide",
-        ),
-        undefined,
-        [
-          f.createStringLiteral("get"),
-          f.createStringLiteral("/v1/user/retrieve"),
-          f.createObjectLiteralExpression([
-            f.createPropertyAssignment("id", f.createStringLiteral("10")),
-          ]),
-        ],
-      ),
-    );
-
-    // const hasBody = !["get", "delete"].includes(method);
-    const hasBodyStatement = f.createVariableStatement(
-      undefined,
-      makeConst(
-        "hasBody",
-        f.createLogicalNot(
-          f.createCallExpression(
-            f.createPropertyAccessExpression(
-              f.createArrayLiteralExpression([
-                f.createStringLiteral("get"),
-                f.createStringLiteral("delete"),
-              ]),
-              "includes",
-            ),
-            undefined,
-            [f.createIdentifier("method")],
-          ),
-        ),
-      ),
-    );
-
-    // const searchParams = hasBody ? "" : `?${new URLSearchParams(params)}`;
-    const searchParamsStatement = f.createVariableStatement(
-      undefined,
-      makeConst(
-        "searchParams",
-        f.createConditionalExpression(
-          f.createIdentifier("hasBody"),
-          undefined,
-          f.createStringLiteral(""),
-          undefined,
-          f.createTemplateExpression(f.createTemplateHead("?"), [
-            f.createTemplateSpan(
-              f.createNewExpression(
-                f.createIdentifier("URLSearchParams"),
-                undefined,
-                [f.createIdentifier("params")],
-              ),
-              f.createTemplateTail(""),
-            ),
-          ]),
-        ),
-      ),
-    );
-
+  public print(printerOptions?: ts.PrinterOptions) {
     // method: method.toUpperCase()
     const methodProperty = f.createPropertyAssignment(
       "method",
@@ -529,6 +429,85 @@ export class Integration {
       ),
     );
 
+    // const hasBody = !["get", "delete"].includes(method);
+    const hasBodyStatement = f.createVariableStatement(
+      undefined,
+      makeConst(
+        "hasBody",
+        f.createLogicalNot(
+          f.createCallExpression(
+            f.createPropertyAccessExpression(
+              f.createArrayLiteralExpression([
+                f.createStringLiteral("get"),
+                f.createStringLiteral("delete"),
+              ]),
+              "includes",
+            ),
+            undefined,
+            [f.createIdentifier("method")],
+          ),
+        ),
+      ),
+    );
+
+    // const searchParams = hasBody ? "" : `?${new URLSearchParams(params)}`;
+    const searchParamsStatement = f.createVariableStatement(
+      undefined,
+      makeConst(
+        "searchParams",
+        f.createConditionalExpression(
+          f.createIdentifier("hasBody"),
+          undefined,
+          f.createStringLiteral(""),
+          undefined,
+          f.createTemplateExpression(f.createTemplateHead("?"), [
+            f.createTemplateSpan(
+              f.createNewExpression(
+                f.createIdentifier("URLSearchParams"),
+                undefined,
+                [f.createIdentifier("params")],
+              ),
+              f.createTemplateTail(""),
+            ),
+          ]),
+        ),
+      ),
+    );
+
+    // return response.json(); return response.text();
+    const [returnJsonStatement, returnTextStatement] = ["json", "text"].map(
+      (method) =>
+        f.createReturnStatement(
+          f.createCallExpression(
+            f.createPropertyAccessExpression(
+              f.createIdentifier("response"),
+              method,
+            ),
+            undefined,
+            undefined,
+          ),
+        ),
+    );
+
+    // if (`${method} ${path}` in jsonEndpoints) { ___ }
+    const ifJsonStatement = f.createIfStatement(
+      f.createBinaryExpression(
+        f.createTemplateExpression(f.createTemplateHead(""), [
+          f.createTemplateSpan(
+            f.createIdentifier("method"),
+            f.createTemplateMiddle(" "),
+          ),
+          f.createTemplateSpan(
+            f.createIdentifier("path"),
+            f.createTemplateTail(""),
+          ),
+        ]),
+        ts.SyntaxKind.InKeyword,
+        f.createIdentifier("jsonEndpoints"),
+      ),
+      f.createBlock([returnJsonStatement]),
+    );
+
     // export const exampleImplementation: Implementation = async (method,path,params) => { ___ };
     const exampleImplStatement = f.createVariableStatement(
       exportModifier,
@@ -552,7 +531,38 @@ export class Integration {
             returnTextStatement,
           ]),
         ),
-        f.createTypeReferenceNode(implementationNode.name),
+        f.createTypeReferenceNode("Implementation"), // @todo refer
+      ),
+    );
+
+    // client.provide("get", "/v1/user/retrieve", { id: "10" });
+    const provideCallingStatement = f.createExpressionStatement(
+      f.createCallExpression(
+        f.createPropertyAccessExpression(
+          f.createIdentifier("client"),
+          "provide",
+        ),
+        undefined,
+        [
+          f.createStringLiteral("get"),
+          f.createStringLiteral("/v1/user/retrieve"),
+          f.createObjectLiteralExpression([
+            f.createPropertyAssignment("id", f.createStringLiteral("10")),
+          ]),
+        ],
+      ),
+    );
+
+    // const client = new ExpressZodAPIClient(exampleImplementation);
+    const clientInstanceStatement = f.createVariableStatement(
+      undefined,
+      makeConst(
+        "client",
+        f.createNewExpression(
+          f.createIdentifier("ExpressZodAPIClient"), // @todo refer
+          undefined,
+          [f.createIdentifier("exampleImplementation")],
+        ),
       ),
     );
 
@@ -560,22 +570,14 @@ export class Integration {
       f.createEmptyStatement(),
       ts.SyntaxKind.MultiLineCommentTrivia,
       [exampleImplStatement, clientInstanceStatement, provideCallingStatement]
-        .map((node) => printNode(node))
+        .map((node) => printNode(node, printerOptions))
         .join("\n") + "\n",
       true,
     );
 
-    this.agg.push(
-      jsonEndpointsNode,
-      endpointTagsNode,
-      providerNode,
-      implementationNode,
-      clientNode,
-      exampleComment,
-    );
-  }
-
-  public print(printerOptions?: ts.PrinterOptions) {
-    return this.agg.map((node) => printNode(node, printerOptions)).join("\n\n");
+    return this.agg
+      .concat(exampleComment)
+      .map((node) => printNode(node, printerOptions))
+      .join("\n\n");
   }
 }
