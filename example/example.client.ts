@@ -171,21 +171,9 @@ export type Implementation = (
   params: Record<string, any>,
 ) => Promise<any>;
 
-/*
-export const exampleImplementation: Implementation = async (
-  method,
-  path,
-  params
-) => {
-  const hasBody = !["get", "delete"].includes(method);
-  const searchParams = hasBody ? "" : `?${new URLSearchParams(params)}`;
-  const response = await fetch(`https://example.com${path}${searchParams}`, { method: method.toUpperCase(), headers: hasBody ? { "Content-Type": "application/json" } : undefined, body: hasBody ? JSON.stringify(params) : undefined });
-  if (`${method} ${path}` in jsonEndpoints) {
+/*export const exampleImplementation: Implementation = async (method, path, params) => { const hasBody = !["get", "delete"].includes(method); const searchParams = hasBody ? "" : `?${new URLSearchParams(params)}`; const response = await fetch(`https://example.com${path}${searchParams}`, { method: method.toUpperCase(), headers: hasBody ? { "Content-Type": "application/json" } : undefined, body: hasBody ? JSON.stringify(params) : undefined }); if (`${method} ${path}` in jsonEndpoints) {
     return response.json();
-}
-  return response.text();
-};
-
+} return response.text(); };
 const client = new ExpressZodAPIClient(exampleImplementation);
 client.provide("get", "/v1/user/retrieve", { id: "10" });
 */

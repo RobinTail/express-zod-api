@@ -4,7 +4,7 @@ export const f = ts.factory;
 
 export const exportModifier = [f.createModifier(ts.SyntaxKind.ExportKeyword)];
 
-const asyncModifier = [f.createModifier(ts.SyntaxKind.AsyncKeyword)];
+export const asyncModifier = [f.createModifier(ts.SyntaxKind.AsyncKeyword)];
 
 const publicReadonlyModifier = [
   f.createModifier(ts.SyntaxKind.PublicKeyword),
@@ -81,9 +81,13 @@ export const makeQuotedProp = (name: string, ref: string) =>
     f.createTypeReferenceNode(ref),
   );
 
-export const makeConst = (name: string, value: ts.Expression) =>
+export const makeConst = (
+  name: string,
+  value: ts.Expression,
+  type?: ts.TypeNode,
+) =>
   f.createVariableDeclarationList(
-    [f.createVariableDeclaration(name, undefined, undefined, value)],
+    [f.createVariableDeclaration(name, undefined, type, value)],
     ts.NodeFlags.Const,
   );
 

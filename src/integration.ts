@@ -2,6 +2,7 @@ import ts from "typescript";
 import { z } from "zod";
 import { ZodFile } from "./file-schema";
 import {
+  asyncModifier,
   exportModifier,
   f,
   makeAnyPromise,
@@ -528,26 +529,39 @@ export class Integration {
       ),
     );
 
+    // export const exampleImplementation: Implementation = async (method,path,params) => { ___ };
+    const exampleImplStatement = f.createVariableStatement(
+      exportModifier,
+      makeConst(
+        "exampleImplementation",
+        f.createArrowFunction(
+          asyncModifier,
+          undefined,
+          [
+            f.createParameterDeclaration(undefined, undefined, "method"),
+            f.createParameterDeclaration(undefined, undefined, "path"),
+            f.createParameterDeclaration(undefined, undefined, "params"),
+          ],
+          undefined,
+          undefined,
+          f.createBlock([
+            hasBodyStatement,
+            searchParamsStatement,
+            responseStatement,
+            ifJsonStatement,
+            returnTextStatement,
+          ]),
+        ),
+        f.createTypeReferenceNode(implementationNode.name),
+      ),
+    );
+
     ts.addSyntheticLeadingComment(
       clientNode,
       ts.SyntaxKind.MultiLineCommentTrivia,
-      "\n" +
-        "export const exampleImplementation: Implementation = async (\n" +
-        "  method,\n" +
-        "  path,\n" +
-        "  params\n" +
-        ") => {\n" +
-        `  ${printNode(hasBodyStatement)}\n` +
-        `  ${printNode(searchParamsStatement)}\n` +
-        `  ${printNode(responseStatement)}\n` +
-        `  ${printNode(ifJsonStatement)}\n` +
-        `  ${printNode(returnTextStatement)}\n` +
-        "};\n" +
-        "\n" +
-        [clientInstanceStatement, provideCallingStatement]
-          .map((node) => printNode(node))
-          .join("\n") +
-        "\n",
+      [exampleImplStatement, clientInstanceStatement, provideCallingStatement]
+        .map((node) => printNode(node))
+        .join("\n") + "\n",
       true,
     );
 
