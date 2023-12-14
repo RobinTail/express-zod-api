@@ -479,6 +479,25 @@ export class Integration {
       ),
     );
 
+    // body: hasBody ? JSON.stringify(params) : undefined
+    const bodyProperty = f.createPropertyAssignment(
+      "body",
+      f.createConditionalExpression(
+        f.createIdentifier("hasBody"),
+        undefined,
+        f.createCallExpression(
+          f.createPropertyAccessExpression(
+            f.createIdentifier("JSON"),
+            "stringify",
+          ),
+          undefined,
+          [f.createIdentifier("params")],
+        ),
+        undefined,
+        f.createIdentifier("undefined"),
+      ),
+    );
+
     ts.addSyntheticLeadingComment(
       clientNode,
       ts.SyntaxKind.MultiLineCommentTrivia,
@@ -493,7 +512,7 @@ export class Integration {
         "  const response = await fetch(`https://example.com${path}${searchParams}`, {\n" +
         `    ${printNode(methodProperty)},\n` +
         `    ${printNode(headersProperty)},\n` +
-        "    body: hasBody ? JSON.stringify(params) : undefined,\n" +
+        `    ${printNode(bodyProperty)},\n` +
         "  });\n" +
         `  ${printNode(ifJsonStatement)}\n` +
         `  ${printNode(returnTextStatement)}\n` +
