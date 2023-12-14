@@ -339,6 +339,21 @@ export class Integration {
       ],
     );
 
+    // return response.json(); return response.text();
+    const [returnJsonStatement, returnTextStatement] = ["json", "text"].map(
+      (method) =>
+        f.createReturnStatement(
+          f.createCallExpression(
+            f.createPropertyAccessExpression(
+              f.createIdentifier("response"),
+              method,
+            ),
+            undefined,
+            undefined,
+          ),
+        ),
+    );
+
     // const client = new ExpressZodAPIClient(exampleImplementation);
     const clientInstanceStatement = f.createVariableStatement(
       undefined,
@@ -387,15 +402,13 @@ export class Integration {
         "    body: hasBody ? JSON.stringify(params) : undefined,\n" +
         "  });\n" +
         "  if (`${method} ${path}` in jsonEndpoints) {\n" +
-        "    return response.json();\n" +
+        `    ${printNode(returnJsonStatement)}\n` +
         "  }\n" +
-        "  return response.text();\n" +
+        `  ${printNode(returnTextStatement)}\n` +
         "};\n" +
         "\n" +
-        printNode(clientInstanceStatement) +
-        "\n" +
-        printNode(provideCallingStatement) +
-        "\n",
+        `${printNode(clientInstanceStatement)}\n` +
+        `${printNode(provideCallingStatement)}\n`,
       true,
     );
 
