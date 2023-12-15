@@ -280,12 +280,16 @@ export const hasCoercion = (schema: z.ZodTypeAny): boolean =>
     : false;
 
 export const makeCleanId = (path: string, method: string, suffix?: string) => {
-  return [method]
+  return [method] // collect the assets in the specified order
     .concat(path.split("/"))
     .concat(suffix || [])
-    .flatMap((entry) => entry.split(/[^A-Z0-9]/gi))
+    .flatMap((entry) => entry.split(/[^A-Z0-9]/gi)) // split by non-alphanumeric characters
+    .flatMap((entry) =>
+      // split by sequences of capitalized letters
+      entry.replaceAll(/[A-Z]+/g, (beginning) => `/${beginning}`).split("/"),
+    )
     .map(
-      (entry) => entry.slice(0, 1).toUpperCase() + entry.slice(1).toLowerCase(),
+      (entry) => entry.charAt(0).toUpperCase() + entry.slice(1).toLowerCase(),
     )
     .join("");
 };
