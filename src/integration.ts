@@ -28,11 +28,12 @@ import {
 import { defaultSerializer, hasRaw, makeCleanId } from "./common-helpers";
 import { methods } from "./method";
 import { mimeJson } from "./mime";
+import { loadPeer } from "./peer-helpers";
 import { Routing } from "./routing";
 import { walkRouting } from "./routing-walker";
 import { zodToTs } from "./zts";
 import { createTypeAlias, printNode } from "./zts-helpers";
-import prettier from "prettier";
+import type Prettier from "prettier";
 
 interface Registry {
   [METHOD_PATH: string]: Record<"in" | "out", string> & {
@@ -351,6 +352,11 @@ export class Integration {
   }
 
   public async print(printerOptions?: ts.PrinterOptions) {
+    let format: (typeof Prettier)["format"] = async (statements) => statements;
+    try {
+      format = (await loadPeer<typeof Prettier>("prettier")).format;
+    } catch {}
+
     // method: method.toUpperCase()
     const methodProperty = f.createPropertyAssignment(
       "method",
@@ -570,8 +576,8 @@ export class Integration {
     const exampleComment = ts.addSyntheticLeadingComment(
       f.createEmptyStatement(),
       ts.SyntaxKind.MultiLineCommentTrivia,
-      "\n" + // @todo this requires either to depend or to load async peer
-        (await prettier.format(
+      "\n" +
+        (await format(
           [
             exampleImplStatement,
             clientInstanceStatement,
@@ -583,13 +589,12 @@ export class Integration {
         )),
     );
 
-    // @todo this requires either to depend or to load async peer
-    return prettier.format(
+    return format(
       this.agg
         .concat(exampleComment)
         .map((node) => printNode(node, printerOptions))
         .join("\n\n"),
-      { parser: "typescript" },
+      { parser: "typescript" }, // or babel-ts
     );
   }
 }
