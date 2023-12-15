@@ -352,7 +352,7 @@ export class Integration {
   }
 
   public async print(printerOptions?: ts.PrinterOptions) {
-    let format: (typeof Prettier)["format"] = async (statements) => statements;
+    let format: (typeof Prettier)["format"] | undefined;
     try {
       format = (await loadPeer<typeof Prettier>("prettier")).format;
     } catch {}
@@ -573,28 +573,28 @@ export class Integration {
       ),
     );
 
+    const usageExample = [
+      exampleImplStatement,
+      clientInstanceStatement,
+      provideCallingStatement,
+    ]
+      .map((node) => printNode(node, printerOptions))
+      .join("\n");
+
     const exampleComment = ts.addSyntheticLeadingComment(
       f.createEmptyStatement(),
       ts.SyntaxKind.MultiLineCommentTrivia,
       "\n" +
-        (await format(
-          [
-            exampleImplStatement,
-            clientInstanceStatement,
-            provideCallingStatement,
-          ]
-            .map((node) => printNode(node, printerOptions))
-            .join("\n") + "\n",
-          { parser: "typescript" },
-        )),
+        (format
+          ? await format(usageExample, { parser: "typescript" })
+          : usageExample),
     );
 
-    return format(
-      this.agg
-        .concat(exampleComment)
-        .map((node) => printNode(node, printerOptions))
-        .join("\n\n"),
-      { parser: "typescript" }, // or babel-ts
-    );
+    const output = this.agg
+      .concat(exampleComment)
+      .map((node) => printNode(node, printerOptions))
+      .join("\n\n");
+
+    return format ? format(output, { parser: "typescript" }) : output;
   }
 }
