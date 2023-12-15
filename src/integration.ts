@@ -77,7 +77,8 @@ interface IntegrationParams {
 }
 
 export class Integration {
-  protected agg: ts.Node[] = [];
+  protected program: ts.Node[] = [];
+  protected usage: ts.Node[] = [];
   protected registry: Registry = {};
   protected paths: string[] = [];
   protected aliases: Record<string, ts.TypeAliasDeclaration> = {};
@@ -148,7 +149,7 @@ export class Integration {
             .getSchema("positive")
             .or(endpoint.getSchema("negative")),
         });
-        this.agg.push(
+        this.program.push(
           createTypeAlias(input, inputId),
           createTypeAlias(response, responseId),
         );
@@ -164,7 +165,7 @@ export class Integration {
       },
     });
 
-    this.agg = Object.values<ts.Node>(this.aliases).concat(this.agg);
+    this.program = Object.values<ts.Node>(this.aliases).concat(this.program);
 
     // export type Path = "/v1/user/retrieve" | ___;
     const pathType = makePublicLiteralType(
@@ -209,7 +210,7 @@ export class Integration {
       ),
     );
 
-    this.agg.push(
+    this.program.push(
       pathType,
       methodType,
       methodPathType,
@@ -392,33 +393,13 @@ export class Integration {
       ],
     );
 
-    this.agg.push(
+    this.program.push(
       jsonEndpointsConst,
       endpointTagsConst,
       providerType,
       implementationType,
       clientClass,
     );
-  }
-
-  public async print({
-    printerOptions,
-    format: userDefined,
-  }: {
-    /** @desc Typescript printer options */
-    printerOptions?: ts.PrinterOptions;
-    /**
-     * @desc Typescript code formatter
-     * @default prettier.format
-     * */
-    format?: (program: string) => Promise<string>;
-  } = {}) {
-    let format = userDefined;
-    try {
-      const prettierFormat = (await loadPeer<typeof Prettier>("prettier"))
-        .format;
-      format = (text) => prettierFormat(text, { filepath: "client.ts" });
-    } catch {}
 
     // method: method.toUpperCase()
     const methodProperty = f.createPropertyAssignment(
@@ -624,25 +605,49 @@ export class Integration {
       ),
     );
 
-    const usageExample = [
+    this.usage.push(
       exampleImplStatement,
       clientInstanceStatement,
       provideCallingStatement,
-    ]
-      .map((node) => printNode(node, printerOptions))
-      .join("\n");
-
-    const exampleComment = ts.addSyntheticLeadingComment(
-      ts.addSyntheticLeadingComment(
-        f.createEmptyStatement(),
-        ts.SyntaxKind.SingleLineCommentTrivia,
-        " Usage example:",
-      ),
-      ts.SyntaxKind.MultiLineCommentTrivia,
-      "\n" + (format ? await format(usageExample) : usageExample),
     );
+  }
 
-    const output = this.agg
+  public async print({
+    printerOptions,
+    format: userDefined,
+  }: {
+    /** @desc Typescript printer options */
+    printerOptions?: ts.PrinterOptions;
+    /**
+     * @desc Typescript code formatter
+     * @default prettier.format
+     * */
+    format?: (program: string) => Promise<string>;
+  } = {}) {
+    let format = userDefined;
+    try {
+      const prettierFormat = (await loadPeer<typeof Prettier>("prettier"))
+        .format;
+      format = (text) => prettierFormat(text, { filepath: "client.ts" });
+    } catch {}
+
+    const usageExample = this.usage.length
+      ? this.usage.map((node) => printNode(node, printerOptions)).join("\n")
+      : undefined;
+
+    const exampleComment = usageExample
+      ? ts.addSyntheticLeadingComment(
+          ts.addSyntheticLeadingComment(
+            f.createEmptyStatement(),
+            ts.SyntaxKind.SingleLineCommentTrivia,
+            " Usage example:",
+          ),
+          ts.SyntaxKind.MultiLineCommentTrivia,
+          "\n" + (format ? await format(usageExample) : usageExample),
+        )
+      : [];
+
+    const output = this.program
       .concat(exampleComment)
       .map((node) => printNode(node, printerOptions))
       .join("\n\n");
