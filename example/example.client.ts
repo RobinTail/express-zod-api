@@ -188,6 +188,7 @@ export class ExpressZodAPIClient {
     );
 }
 
+// Usage example:
 /*
 export const exampleImplementation: Implementation = async (
   method,

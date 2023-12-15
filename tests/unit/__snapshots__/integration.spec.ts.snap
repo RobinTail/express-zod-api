@@ -66,6 +66,7 @@ export class ExpressZodAPIClient {
     );
 }
 
+// Usage example:
 /*
 export const exampleImplementation: Implementation = async (
   method,
@@ -156,6 +157,7 @@ export class ExpressZodAPIClient {
     );
 }
 
+// Usage example:
 /*
 export const exampleImplementation: Implementation = async (
   method,
@@ -246,6 +248,7 @@ export class ExpressZodAPIClient {
     );
 }
 
+// Usage example:
 /*
 export const exampleImplementation: Implementation = async (
   method,
@@ -461,6 +464,7 @@ export class ExpressZodAPIClient {
     );
 }
 
+// Usage example:
 /*
 export const exampleImplementation: Implementation = async (
   method,
@@ -629,6 +633,7 @@ export interface Response extends Record<MethodPath, any> {
   "post /v1/avatar/raw": PostV1AvatarRawResponse;
 }
 
+// Usage example:
 /*
 export const exampleImplementation: Implementation = async (
   method,
@@ -719,6 +724,7 @@ export class ExpressZodAPIClient {
     );
 }
 
+// Usage example:
 /*
 export const exampleImplementation: Implementation = async (
   method,

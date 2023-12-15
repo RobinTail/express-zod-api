@@ -617,7 +617,11 @@ export class Integration {
       .join("\n");
 
     const exampleComment = ts.addSyntheticLeadingComment(
-      f.createEmptyStatement(),
+      ts.addSyntheticLeadingComment(
+        f.createEmptyStatement(),
+        ts.SyntaxKind.SingleLineCommentTrivia,
+        " Usage example:",
+      ),
       ts.SyntaxKind.MultiLineCommentTrivia,
       "\n" + (format ? await format(usageExample) : usageExample),
     );
