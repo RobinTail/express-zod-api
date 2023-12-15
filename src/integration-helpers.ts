@@ -16,19 +16,19 @@ export const protectedReadonlyModifier = [
   f.createModifier(ts.SyntaxKind.ReadonlyKeyword),
 ];
 
-const emptyPrefix = f.createTemplateHead("");
+export const emptyHeading = f.createTemplateHead("");
 
-const emptyEnding = f.createTemplateTail("");
+export const emptyTail = f.createTemplateTail("");
 
-const spacingSuffix = f.createTemplateMiddle(" ");
+export const spacingMiddle = f.createTemplateMiddle(" ");
 
 export const makeTemplate = (names: (ts.Identifier | string)[]) =>
   f.createTemplateLiteralType(
-    emptyPrefix,
+    emptyHeading,
     names.map((name, index) =>
       f.createTemplateLiteralTypeSpan(
         f.createTypeReferenceNode(name),
-        index === names.length - 1 ? emptyEnding : spacingSuffix,
+        index === names.length - 1 ? emptyTail : spacingMiddle,
       ),
     ),
   );
@@ -36,7 +36,7 @@ export const makeTemplate = (names: (ts.Identifier | string)[]) =>
 export const parametricIndexNode = makeTemplate(["M", "P"]);
 
 export const makeParam = (
-  name: string,
+  name: string | ts.Identifier,
   type?: ts.TypeNode,
   mod?: ts.Modifier[],
 ) =>
@@ -112,7 +112,7 @@ export const makePublicType = (
 ) => f.createTypeAliasDeclaration(exportModifier, name, undefined, value);
 
 export const makePublicReadonlyProp = (
-  name: string,
+  name: string | ts.Identifier,
   type: ts.TypeNode,
   exp: ts.Expression,
 ) =>
@@ -170,9 +170,9 @@ export const makeTypeParams = (params: Record<string, ts.Identifier>) =>
     [] as ts.TypeParameterDeclaration[],
   );
 
-export const makeImplementationCallFn = (
-  params: string[],
-  args: ts.Expression[],
+export const makeAsyncArrowFn = (
+  params: (string | ts.Identifier)[],
+  body: ts.ConciseBody,
 ) =>
   f.createArrowFunction(
     asyncModifier,
@@ -180,15 +180,11 @@ export const makeImplementationCallFn = (
     params.map((key) => makeParam(key)),
     undefined,
     undefined,
-    f.createCallExpression(
-      f.createPropertyAccessExpression(f.createThis(), "implementation"),
-      undefined,
-      args,
-    ),
+    body,
   );
 
 export const makeObjectKeysReducer = (
-  obj: string,
+  obj: ts.Identifier,
   exp: ts.Expression,
   initial: ts.Expression,
 ) =>
@@ -197,7 +193,7 @@ export const makeObjectKeysReducer = (
       f.createCallExpression(
         f.createPropertyAccessExpression(f.createIdentifier("Object"), "keys"),
         undefined,
-        [f.createIdentifier(obj)],
+        [obj],
       ),
       "reduce",
     ),

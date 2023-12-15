@@ -2,13 +2,14 @@ import ts from "typescript";
 import { z } from "zod";
 import { ZodFile } from "./file-schema";
 import {
-  asyncModifier,
+  emptyHeading,
+  emptyTail,
   exportModifier,
   f,
   makeAnyPromise,
+  makeAsyncArrowFn,
   makeConst,
   makeEmptyInitializingConstructor,
-  makeImplementationCallFn,
   makeIndexedPromise,
   makeObjectKeysReducer,
   makeParam,
@@ -24,9 +25,10 @@ import {
   makeTypeParams,
   parametricIndexNode,
   protectedReadonlyModifier,
+  spacingMiddle,
 } from "./integration-helpers";
 import { defaultSerializer, hasRaw, makeCleanId } from "./common-helpers";
-import { methods } from "./method";
+import { Method, methods } from "./method";
 import { mimeJson } from "./mime";
 import { loadPeer } from "./peer-helpers";
 import { Routing } from "./routing";
@@ -90,6 +92,21 @@ export class Integration {
     providerType: f.createIdentifier("Provider"),
     implementationType: f.createIdentifier("Implementation"),
     clientClass: f.createIdentifier("ExpressZodAPIClient"),
+    keyParameter: f.createIdentifier("key"),
+    pathParameter: f.createIdentifier("path"),
+    paramsArgument: f.createIdentifier("params"),
+    methodParameter: f.createIdentifier("method"),
+    accumulator: f.createIdentifier("acc"),
+    provideMethod: f.createIdentifier("provide"),
+    implementationArgument: f.createIdentifier("implementation"),
+    headersProperty: f.createIdentifier("headers"),
+    hasBodyConst: f.createIdentifier("hasBody"),
+    undefinedValue: f.createIdentifier("undefined"),
+    bodyProperty: f.createIdentifier("body"),
+    responseConst: f.createIdentifier("response"),
+    searchParamsConst: f.createIdentifier("searchParams"),
+    exampleImplementationConst: f.createIdentifier("exampleImplementation"),
+    clientConst: f.createIdentifier("client"),
   } satisfies Record<string, ts.Identifier>;
 
   protected getAlias(name: string): ts.TypeReferenceNode | undefined {
@@ -283,39 +300,37 @@ export class Integration {
     // `:${key}`
     const keyParamExpression = f.createTemplateExpression(
       f.createTemplateHead(":"),
-      [
-        f.createTemplateSpan(
-          f.createIdentifier("key"),
-          f.createTemplateTail(""),
-        ),
-      ],
+      [f.createTemplateSpan(this.identifiers.keyParameter, emptyTail)],
     );
 
     // Object.keys(params).reduce((acc, key) => acc.replace(___, params[key]), path)
     const pathArgument = makeObjectKeysReducer(
-      "params",
+      this.identifiers.paramsArgument,
       f.createCallExpression(
-        f.createPropertyAccessExpression(f.createIdentifier("acc"), "replace"),
+        f.createPropertyAccessExpression(
+          this.identifiers.accumulator,
+          "replace",
+        ),
         undefined,
         [
           keyParamExpression,
           f.createElementAccessExpression(
-            f.createIdentifier("params"),
-            f.createIdentifier("key"),
+            this.identifiers.paramsArgument,
+            this.identifiers.keyParameter,
           ),
         ],
       ),
-      f.createIdentifier("path"),
+      this.identifiers.pathParameter,
     );
 
     // Object.keys(params).reduce((acc, key) => path.indexOf(___) >= 0 ? acc : { ...acc, [key]: params[key] }, {})
     const paramsArgument = makeObjectKeysReducer(
-      "params",
+      this.identifiers.paramsArgument,
       f.createConditionalExpression(
         f.createBinaryExpression(
           f.createCallExpression(
             f.createPropertyAccessExpression(
-              f.createIdentifier("path"),
+              this.identifiers.pathParameter,
               "indexOf",
             ),
             undefined,
@@ -325,15 +340,15 @@ export class Integration {
           f.createNumericLiteral(0),
         ),
         undefined,
-        f.createIdentifier("acc"),
+        this.identifiers.accumulator,
         undefined,
         f.createObjectLiteralExpression([
-          f.createSpreadAssignment(f.createIdentifier("acc")),
+          f.createSpreadAssignment(this.identifiers.accumulator),
           f.createPropertyAssignment(
-            f.createComputedPropertyName(f.createIdentifier("key")),
+            f.createComputedPropertyName(this.identifiers.keyParameter),
             f.createElementAccessExpression(
-              f.createIdentifier("params"),
-              f.createIdentifier("key"),
+              this.identifiers.paramsArgument,
+              this.identifiers.keyParameter,
             ),
           ),
         ]),
@@ -347,7 +362,7 @@ export class Integration {
       // constructor(protected readonly implementation: Implementation) {}
       makeEmptyInitializingConstructor([
         makeParam(
-          "implementation",
+          this.identifiers.implementationArgument,
           f.createTypeReferenceNode(this.identifiers.implementationType),
           protectedReadonlyModifier,
         ),
@@ -355,12 +370,23 @@ export class Integration {
       [
         // public readonly provide: Provider
         makePublicReadonlyProp(
-          "provide",
+          this.identifiers.provideMethod,
           f.createTypeReferenceNode(this.identifiers.providerType),
           // = async (method, path, params) => this.implementation(___)
-          makeImplementationCallFn(
-            ["method", "path", "params"],
-            [f.createIdentifier("method"), pathArgument, paramsArgument],
+          makeAsyncArrowFn(
+            [
+              this.identifiers.methodParameter,
+              this.identifiers.pathParameter,
+              this.identifiers.paramsArgument,
+            ],
+            f.createCallExpression(
+              f.createPropertyAccessExpression(
+                f.createThis(),
+                this.identifiers.implementationArgument,
+              ),
+              undefined,
+              [this.identifiers.methodParameter, pathArgument, paramsArgument],
+            ),
           ),
         ),
       ],
@@ -396,10 +422,10 @@ export class Integration {
 
     // method: method.toUpperCase()
     const methodProperty = f.createPropertyAssignment(
-      "method",
+      this.identifiers.methodParameter,
       f.createCallExpression(
         f.createPropertyAccessExpression(
-          f.createIdentifier("method"),
+          this.identifiers.methodParameter,
           "toUpperCase",
         ),
         undefined,
@@ -409,9 +435,9 @@ export class Integration {
 
     // headers: hasBody ? { "Content-Type": "application/json" } : undefined
     const headersProperty = f.createPropertyAssignment(
-      "headers",
+      this.identifiers.headersProperty,
       f.createConditionalExpression(
-        f.createIdentifier("hasBody"),
+        this.identifiers.hasBodyConst,
         undefined,
         f.createObjectLiteralExpression([
           f.createPropertyAssignment(
@@ -420,15 +446,15 @@ export class Integration {
           ),
         ]),
         undefined,
-        f.createIdentifier("undefined"),
+        this.identifiers.undefinedValue,
       ),
     );
 
     // body: hasBody ? JSON.stringify(params) : undefined
     const bodyProperty = f.createPropertyAssignment(
-      "body",
+      this.identifiers.bodyProperty,
       f.createConditionalExpression(
-        f.createIdentifier("hasBody"),
+        this.identifiers.hasBodyConst,
         undefined,
         f.createCallExpression(
           f.createPropertyAccessExpression(
@@ -436,10 +462,10 @@ export class Integration {
             "stringify",
           ),
           undefined,
-          [f.createIdentifier("params")],
+          [this.identifiers.paramsArgument],
         ),
         undefined,
-        f.createIdentifier("undefined"),
+        this.identifiers.undefinedValue,
       ),
     );
 
@@ -447,19 +473,19 @@ export class Integration {
     const responseStatement = f.createVariableStatement(
       undefined,
       makeConst(
-        "response",
+        this.identifiers.responseConst,
         f.createAwaitExpression(
           f.createCallExpression(f.createIdentifier("fetch"), undefined, [
             f.createTemplateExpression(
               f.createTemplateHead("https://example.com"),
               [
                 f.createTemplateSpan(
-                  f.createIdentifier("path"),
+                  this.identifiers.pathParameter,
                   f.createTemplateMiddle(""),
                 ),
                 f.createTemplateSpan(
-                  f.createIdentifier("searchParams"),
-                  f.createTemplateTail(""),
+                  this.identifiers.searchParamsConst,
+                  emptyTail,
                 ),
               ],
             ),
@@ -477,18 +503,18 @@ export class Integration {
     const hasBodyStatement = f.createVariableStatement(
       undefined,
       makeConst(
-        "hasBody",
+        this.identifiers.hasBodyConst,
         f.createLogicalNot(
           f.createCallExpression(
             f.createPropertyAccessExpression(
               f.createArrayLiteralExpression([
-                f.createStringLiteral("get"),
-                f.createStringLiteral("delete"),
+                f.createStringLiteral("get" satisfies Method),
+                f.createStringLiteral("delete" satisfies Method),
               ]),
               "includes",
             ),
             undefined,
-            [f.createIdentifier("method")],
+            [this.identifiers.methodParameter],
           ),
         ),
       ),
@@ -498,9 +524,9 @@ export class Integration {
     const searchParamsStatement = f.createVariableStatement(
       undefined,
       makeConst(
-        "searchParams",
+        this.identifiers.searchParamsConst,
         f.createConditionalExpression(
-          f.createIdentifier("hasBody"),
+          this.identifiers.hasBodyConst,
           undefined,
           f.createStringLiteral(""),
           undefined,
@@ -509,9 +535,9 @@ export class Integration {
               f.createNewExpression(
                 f.createIdentifier("URLSearchParams"),
                 undefined,
-                [f.createIdentifier("params")],
+                [this.identifiers.paramsArgument],
               ),
-              f.createTemplateTail(""),
+              emptyTail,
             ),
           ]),
         ),
@@ -524,7 +550,7 @@ export class Integration {
         f.createReturnStatement(
           f.createCallExpression(
             f.createPropertyAccessExpression(
-              f.createIdentifier("response"),
+              this.identifiers.responseConst,
               method,
             ),
             undefined,
@@ -536,15 +562,9 @@ export class Integration {
     // if (`${method} ${path}` in jsonEndpoints) { ___ }
     const ifJsonStatement = f.createIfStatement(
       f.createBinaryExpression(
-        f.createTemplateExpression(f.createTemplateHead(""), [
-          f.createTemplateSpan(
-            f.createIdentifier("method"),
-            f.createTemplateMiddle(" "),
-          ),
-          f.createTemplateSpan(
-            f.createIdentifier("path"),
-            f.createTemplateTail(""),
-          ),
+        f.createTemplateExpression(emptyHeading, [
+          f.createTemplateSpan(this.identifiers.methodParameter, spacingMiddle),
+          f.createTemplateSpan(this.identifiers.pathParameter, emptyTail),
         ]),
         ts.SyntaxKind.InKeyword,
         this.identifiers.jsonEndpointsConst,
@@ -556,17 +576,13 @@ export class Integration {
     const exampleImplStatement = f.createVariableStatement(
       exportModifier,
       makeConst(
-        "exampleImplementation",
-        f.createArrowFunction(
-          asyncModifier,
-          undefined,
+        this.identifiers.exampleImplementationConst,
+        makeAsyncArrowFn(
           [
-            f.createParameterDeclaration(undefined, undefined, "method"),
-            f.createParameterDeclaration(undefined, undefined, "path"),
-            f.createParameterDeclaration(undefined, undefined, "params"),
+            this.identifiers.methodParameter,
+            this.identifiers.pathParameter,
+            this.identifiers.paramsArgument,
           ],
-          undefined,
-          undefined,
           f.createBlock([
             hasBodyStatement,
             searchParamsStatement,
@@ -583,12 +599,12 @@ export class Integration {
     const provideCallingStatement = f.createExpressionStatement(
       f.createCallExpression(
         f.createPropertyAccessExpression(
-          f.createIdentifier("client"),
-          "provide",
+          this.identifiers.clientConst,
+          this.identifiers.provideMethod,
         ),
         undefined,
         [
-          f.createStringLiteral("get"),
+          f.createStringLiteral("get" satisfies Method),
           f.createStringLiteral("/v1/user/retrieve"),
           f.createObjectLiteralExpression([
             f.createPropertyAssignment("id", f.createStringLiteral("10")),
@@ -601,9 +617,9 @@ export class Integration {
     const clientInstanceStatement = f.createVariableStatement(
       undefined,
       makeConst(
-        "client",
+        this.identifiers.clientConst,
         f.createNewExpression(this.identifiers.clientClass, undefined, [
-          f.createIdentifier("exampleImplementation"),
+          this.identifiers.exampleImplementationConst,
         ]),
       ),
     );
