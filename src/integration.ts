@@ -351,10 +351,23 @@ export class Integration {
     );
   }
 
-  public async print(printerOptions?: ts.PrinterOptions) {
-    let format: (typeof Prettier)["format"] | undefined;
+  public async print({
+    printerOptions,
+    format: userDefined,
+  }: {
+    /** @desc Typescript printer options */
+    printerOptions?: ts.PrinterOptions;
+    /**
+     * @desc Typescript code formatter
+     * @default prettier.format
+     * */
+    format?: (program: string) => Promise<string>;
+  } = {}) {
+    let format = userDefined;
     try {
-      format = (await loadPeer<typeof Prettier>("prettier")).format;
+      const prettierFormat = (await loadPeer<typeof Prettier>("prettier"))
+        .format;
+      format = (text) => prettierFormat(text, { filepath: "client.ts" });
     } catch {}
 
     // method: method.toUpperCase()
@@ -584,10 +597,7 @@ export class Integration {
     const exampleComment = ts.addSyntheticLeadingComment(
       f.createEmptyStatement(),
       ts.SyntaxKind.MultiLineCommentTrivia,
-      "\n" +
-        (format
-          ? await format(usageExample, { parser: "typescript" })
-          : usageExample),
+      "\n" + (format ? await format(usageExample) : usageExample),
     );
 
     const output = this.agg
@@ -595,6 +605,6 @@ export class Integration {
       .map((node) => printNode(node, printerOptions))
       .join("\n\n");
 
-    return format ? format(output, { parser: "typescript" }) : output;
+    return format ? format(output) : output;
   }
 }
