@@ -79,6 +79,18 @@ export class Integration {
   protected registry: Registry = {};
   protected paths: string[] = [];
   protected aliases: Record<string, ts.TypeAliasDeclaration> = {};
+  protected identifiers = {
+    pathType: f.createIdentifier("Path"),
+    methodType: f.createIdentifier("Method"),
+    methodPathType: f.createIdentifier("MethodPath"),
+    inputInterface: f.createIdentifier("Input"),
+    responseInterface: f.createIdentifier("Response"),
+    jsonEndpointsConst: f.createIdentifier("jsonEndpoints"),
+    endpointTagsConst: f.createIdentifier("endpointTags"),
+    providerType: f.createIdentifier("Provider"),
+    implementationType: f.createIdentifier("Implementation"),
+    clientClass: f.createIdentifier("ExpressZodAPIClient"),
+  } satisfies Record<string, ts.Identifier>;
 
   protected getAlias(name: string): ts.TypeReferenceNode | undefined {
     return name in this.aliases ? f.createTypeReferenceNode(name) : undefined;
@@ -138,27 +150,33 @@ export class Integration {
     this.agg = Object.values<ts.Node>(this.aliases).concat(this.agg);
 
     // export type Path = "/v1/user/retrieve" | ___;
-    const pathNode = makePublicLiteralType("Path", this.paths);
+    const pathType = makePublicLiteralType(
+      this.identifiers.pathType,
+      this.paths,
+    );
 
     // export type Method = "get" | "post" | "put" | "delete" | "patch";
-    const methodNode = makePublicLiteralType("Method", methods);
+    const methodType = makePublicLiteralType(
+      this.identifiers.methodType,
+      methods,
+    );
 
     // export type MethodPath = `${Method} ${Path}`;
-    const methodPathNode = makePublicType(
-      "MethodPath",
-      makeTemplate([methodNode.name, pathNode.name]),
+    const methodPathType = makePublicType(
+      this.identifiers.methodPathType,
+      makeTemplate([this.identifiers.methodType, this.identifiers.pathType]),
     );
 
     // extends Record<MethodPath, any>
     const extenderClause = [
       f.createHeritageClause(ts.SyntaxKind.ExtendsKeyword, [
-        makeRecord(methodPathNode.name, ts.SyntaxKind.AnyKeyword),
+        makeRecord(this.identifiers.methodPathType, ts.SyntaxKind.AnyKeyword),
       ]),
     ];
 
     // export interface Input ___ { "get /v1/user/retrieve": GetV1UserRetrieveInput; }
-    const inputNode = makePublicExtendedInterface(
-      "Input",
+    const inputInterface = makePublicExtendedInterface(
+      this.identifiers.inputInterface,
       extenderClause,
       Object.keys(this.registry).map((methodPath) =>
         makeQuotedProp(methodPath, this.registry[methodPath].in),
@@ -166,8 +184,8 @@ export class Integration {
     );
 
     // export interface Response ___ { "get /v1/user/retrieve": GetV1UserRetrieveResponse; }
-    const responseNode = makePublicExtendedInterface(
-      "Response",
+    const responseInterface = makePublicExtendedInterface(
+      this.identifiers.responseInterface,
       extenderClause,
       Object.keys(this.registry).map((methodPath) =>
         makeQuotedProp(methodPath, this.registry[methodPath].out),
@@ -175,11 +193,11 @@ export class Integration {
     );
 
     this.agg.push(
-      pathNode,
-      methodNode,
-      methodPathNode,
-      inputNode,
-      responseNode,
+      pathType,
+      methodType,
+      methodPathType,
+      inputInterface,
+      responseInterface,
     );
 
     if (variant === "types") {
@@ -187,10 +205,10 @@ export class Integration {
     }
 
     // export const jsonEndpoints = { "get /v1/user/retrieve": true }
-    const jsonEndpointsNode = f.createVariableStatement(
+    const jsonEndpointsConst = f.createVariableStatement(
       exportModifier,
       makeConst(
-        "jsonEndpoints",
+        this.identifiers.jsonEndpointsConst,
         f.createObjectLiteralExpression(
           Object.keys(this.registry)
             .filter((methodPath) => this.registry[methodPath].isJson)
@@ -202,10 +220,10 @@ export class Integration {
     );
 
     // export const endpointTags = { "get /v1/user/retrieve": ["users"] }
-    const endpointTagsNode = f.createVariableStatement(
+    const endpointTagsConst = f.createVariableStatement(
       exportModifier,
       makeConst(
-        "endpointTags",
+        this.identifiers.endpointTagsConst,
         f.createObjectLiteralExpression(
           Object.keys(this.registry).map((methodPath) =>
             f.createPropertyAssignment(
@@ -223,29 +241,35 @@ export class Integration {
 
     // export type Provider = <M extends Method, P extends Path>(method: M, path: P, params: Input[`${M} ${P}`]) =>
     // Promise<Response[`${M} ${P}`]>;
-    const providerNode = makePublicType(
-      "Provider",
+    const providerType = makePublicType(
+      this.identifiers.providerType,
       f.createFunctionTypeNode(
-        makeTypeParams({ M: methodNode.name, P: pathNode.name }),
+        makeTypeParams({
+          M: this.identifiers.methodType,
+          P: this.identifiers.pathType,
+        }),
         makeParams({
           method: f.createTypeReferenceNode("M"),
           path: f.createTypeReferenceNode("P"),
           params: f.createIndexedAccessTypeNode(
-            f.createTypeReferenceNode(inputNode.name),
+            f.createTypeReferenceNode(this.identifiers.inputInterface),
             parametricIndexNode,
           ),
         }),
-        makeIndexedPromise(responseNode.name, parametricIndexNode),
+        makeIndexedPromise(
+          this.identifiers.responseInterface,
+          parametricIndexNode,
+        ),
       ),
     );
 
     // export type Implementation = (method: Method, path: string, params: Record<string, any>) => Promise<any>;
-    const implementationNode = makePublicType(
-      "Implementation",
+    const implementationType = makePublicType(
+      this.identifiers.implementationType,
       f.createFunctionTypeNode(
         undefined,
         makeParams({
-          method: f.createTypeReferenceNode(methodNode.name),
+          method: f.createTypeReferenceNode(this.identifiers.methodType),
           path: f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
           params: makeRecord(
             ts.SyntaxKind.StringKeyword,
@@ -318,13 +342,13 @@ export class Integration {
     );
 
     // export class ExpressZodAPIClient { ___ }
-    const clientNode = makePublicClass(
-      "ExpressZodAPIClient",
+    const clientClass = makePublicClass(
+      this.identifiers.clientClass,
       // constructor(protected readonly implementation: Implementation) {}
       makeEmptyInitializingConstructor([
         makeParam(
           "implementation",
-          f.createTypeReferenceNode(implementationNode.name),
+          f.createTypeReferenceNode(this.identifiers.implementationType),
           protectedReadonlyModifier,
         ),
       ]),
@@ -332,7 +356,7 @@ export class Integration {
         // public readonly provide: Provider
         makePublicReadonlyProp(
           "provide",
-          f.createTypeReferenceNode(providerNode.name),
+          f.createTypeReferenceNode(this.identifiers.providerType),
           // = async (method, path, params) => this.implementation(___)
           makeImplementationCallFn(
             ["method", "path", "params"],
@@ -343,11 +367,11 @@ export class Integration {
     );
 
     this.agg.push(
-      jsonEndpointsNode,
-      endpointTagsNode,
-      providerNode,
-      implementationNode,
-      clientNode,
+      jsonEndpointsConst,
+      endpointTagsConst,
+      providerType,
+      implementationType,
+      clientClass,
     );
   }
 
@@ -523,7 +547,7 @@ export class Integration {
           ),
         ]),
         ts.SyntaxKind.InKeyword,
-        f.createIdentifier("jsonEndpoints"),
+        this.identifiers.jsonEndpointsConst,
       ),
       f.createBlock([returnJsonStatement]),
     );
@@ -551,7 +575,7 @@ export class Integration {
             returnTextStatement,
           ]),
         ),
-        f.createTypeReferenceNode("Implementation"), // @todo refer
+        f.createTypeReferenceNode(this.identifiers.implementationType),
       ),
     );
 
@@ -578,11 +602,9 @@ export class Integration {
       undefined,
       makeConst(
         "client",
-        f.createNewExpression(
-          f.createIdentifier("ExpressZodAPIClient"), // @todo refer
-          undefined,
-          [f.createIdentifier("exampleImplementation")],
-        ),
+        f.createNewExpression(this.identifiers.clientClass, undefined, [
+          f.createIdentifier("exampleImplementation"),
+        ]),
       ),
     );
 

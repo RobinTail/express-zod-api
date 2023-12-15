@@ -82,7 +82,7 @@ export const makeQuotedProp = (name: string, ref: string) =>
   );
 
 export const makeConst = (
-  name: string,
+  name: string | ts.Identifier,
   value: ts.Expression,
   type?: ts.TypeNode,
 ) =>
@@ -91,7 +91,10 @@ export const makeConst = (
     ts.NodeFlags.Const,
   );
 
-export const makePublicLiteralType = (name: string, literals: string[]) =>
+export const makePublicLiteralType = (
+  name: string | ts.Identifier,
+  literals: string[],
+) =>
   f.createTypeAliasDeclaration(
     exportModifier,
     name,
@@ -103,8 +106,10 @@ export const makePublicLiteralType = (name: string, literals: string[]) =>
     ),
   );
 
-export const makePublicType = (name: string, value: ts.TypeNode) =>
-  f.createTypeAliasDeclaration(exportModifier, name, undefined, value);
+export const makePublicType = (
+  name: string | ts.Identifier,
+  value: ts.TypeNode,
+) => f.createTypeAliasDeclaration(exportModifier, name, undefined, value);
 
 export const makePublicReadonlyProp = (
   name: string,
@@ -120,7 +125,7 @@ export const makePublicReadonlyProp = (
   );
 
 export const makePublicClass = (
-  name: string,
+  name: string | ts.Identifier,
   constructor: ts.ConstructorDeclaration,
   props: ts.PropertyDeclaration[] = [],
 ) =>
@@ -140,7 +145,7 @@ export const makeAnyPromise = () =>
   ]);
 
 export const makePublicExtendedInterface = (
-  name: string,
+  name: string | ts.Identifier,
   extender: ts.HeritageClause[],
   props: ts.PropertySignature[],
 ) =>
