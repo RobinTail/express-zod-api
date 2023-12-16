@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import {
+import type {
   OpenApiBuilder,
   OperationObject,
   ReferenceObject,
@@ -31,6 +31,7 @@ import { Routing } from "./routing";
 import { RoutingWalkerParams, walkRouting } from "./routing-walker";
 
 interface DocumentationParams {
+  builder: OpenApiBuilder;
   title: string;
   version: string;
   serverUrl: string | [string, ...string[]];
@@ -116,6 +117,7 @@ export class Documentation {
   }
 
   public constructor({
+    builder,
     routing,
     config,
     title,
@@ -127,7 +129,7 @@ export class Documentation {
     composition = "inline",
     serializer = defaultSerializer,
   }: DocumentationParams) {
-    this.builder = new OpenApiBuilder().addInfo({ title, version });
+    this.builder = builder.addInfo({ title, version });
     for (const url of typeof serverUrl === "string" ? [serverUrl] : serverUrl) {
       this.builder.addServer({ url });
     }
