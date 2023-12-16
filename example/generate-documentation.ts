@@ -5,13 +5,13 @@ import { routing } from "./routing";
 import manifest from "../package.json";
 
 await writeFile(
-  "example/example.swagger.yaml",
+  "example/example.documentation.yaml",
   new Documentation({
     routing,
     config,
     version: manifest.version,
     title: "Example API",
     serverUrl: "https://example.com",
-  }).getSpecAsYaml(),
+  }).print(),
   "utf-8",
 );

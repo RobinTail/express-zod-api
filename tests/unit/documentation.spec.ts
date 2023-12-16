@@ -24,7 +24,7 @@ describe("Documentation generator", () => {
     server: { listen: givePort() },
   });
 
-  describe("getSpecAsYaml()", () => {
+  describe("print()", () => {
     test.each([
       { composition: "inline" },
       { composition: "components" },
@@ -38,7 +38,7 @@ describe("Documentation generator", () => {
           title: "Example API",
           serverUrl: "https://example.com",
           composition,
-        }).getSpecAsYaml();
+        }).print();
         expect(spec).toMatchSnapshot();
       },
     );
@@ -63,7 +63,7 @@ describe("Documentation generator", () => {
         version: "3.4.5",
         title: "Testing DELETE request without body",
         serverUrl: "https://example.com",
-      }).getSpecAsYaml();
+      }).print();
       expect(spec).toMatchSnapshot();
     });
 
@@ -94,7 +94,7 @@ describe("Documentation generator", () => {
         version: "3.4.5",
         title: "Testing Complex Types",
         serverUrl: "https://example.com",
-      }).getSpecAsYaml();
+      }).print();
       expect(spec).toMatchSnapshot();
     });
 
@@ -123,7 +123,7 @@ describe("Documentation generator", () => {
         version: "3.4.5",
         title: "Testing Nullable and Optional Types",
         serverUrl: "https://example.com",
-      }).getSpecAsYaml();
+      }).print();
       expect(spec).toMatchSnapshot();
     });
 
@@ -167,7 +167,7 @@ describe("Documentation generator", () => {
         version: "3.4.5",
         title: "Testing Intersection and And types",
         serverUrl: "https://example.com",
-      }).getSpecAsYaml();
+      }).print();
       expect(spec).toMatchSnapshot();
     });
 
@@ -202,7 +202,7 @@ describe("Documentation generator", () => {
         version: "3.4.5",
         title: "Testing Union and Or Types",
         serverUrl: "https://example.com",
-      }).getSpecAsYaml();
+      }).print();
       expect(spec).toMatchSnapshot();
     });
 
@@ -234,7 +234,7 @@ describe("Documentation generator", () => {
         version: "3.4.5",
         title: "Testing Discriminated Union Type",
         serverUrl: "https://example.com",
-      }).getSpecAsYaml();
+      }).print();
       expect(spec).toMatchSnapshot();
     });
 
@@ -261,7 +261,7 @@ describe("Documentation generator", () => {
         version: "3.4.5",
         title: "Testing Transformation in response schema",
         serverUrl: "https://example.com",
-      }).getSpecAsYaml();
+      }).print();
       expect(spec).toMatchSnapshot();
     });
 
@@ -291,7 +291,7 @@ describe("Documentation generator", () => {
         version: "3.4.5",
         title: "Testing additional types",
         serverUrl: "https://example.com",
-      }).getSpecAsYaml();
+      }).print();
       expect(spec).toMatchSnapshot();
     });
 
@@ -321,7 +321,7 @@ describe("Documentation generator", () => {
         version: "3.4.5",
         title: "Testing record",
         serverUrl: "https://example.com",
-      }).getSpecAsYaml();
+      }).print();
       expect(spec).toMatchSnapshot();
     });
 
@@ -345,7 +345,7 @@ describe("Documentation generator", () => {
         version: "3.4.5",
         title: "Testing type any",
         serverUrl: "https://example.com",
-      }).getSpecAsYaml();
+      }).print();
       expect(spec).toMatchSnapshot();
     });
 
@@ -377,7 +377,7 @@ describe("Documentation generator", () => {
         version: "3.4.5",
         title: "Testing numbers",
         serverUrl: "https://example.com",
-      }).getSpecAsYaml();
+      }).print();
       expect(spec).toMatchSnapshot();
     });
 
@@ -419,7 +419,7 @@ describe("Documentation generator", () => {
         version: "3.4.5",
         title: "Testing strings",
         serverUrl: "https://example.com",
-      }).getSpecAsYaml();
+      }).print();
       expect(spec).toMatchSnapshot();
     });
 
@@ -449,7 +449,7 @@ describe("Documentation generator", () => {
         version: "3.4.5",
         title: "Testing tuples",
         serverUrl: "https://example.com",
-      }).getSpecAsYaml();
+      }).print();
       expect(spec).toMatchSnapshot();
     });
 
@@ -475,7 +475,7 @@ describe("Documentation generator", () => {
         version: "3.4.5",
         title: "Testing enums",
         serverUrl: "https://example.com",
-      }).getSpecAsYaml();
+      }).print();
       expect(spec).toMatchSnapshot();
     });
 
@@ -501,7 +501,7 @@ describe("Documentation generator", () => {
         version: "3.4.5",
         title: "Testing z.preprocess()",
         serverUrl: "https://example.com",
-      }).getSpecAsYaml();
+      }).print();
       expect(spec).toMatchSnapshot();
       expect(string.parse(123)).toBe("123");
       expect(number.parse("0xFF")).toBe(255);
@@ -549,7 +549,7 @@ describe("Documentation generator", () => {
         version: "3.4.5",
         title: "Testing Lazy",
         serverUrl: "https://example.com",
-      }).getSpecAsYaml();
+      }).print();
       expect(spec).toMatchSnapshot();
     });
 
@@ -661,7 +661,7 @@ describe("Documentation generator", () => {
         version: "3.4.5",
         title: "Testing Security",
         serverUrl: "https://example.com",
-      }).getSpecAsYaml();
+      }).print();
       expect(spec).toMatchSnapshot();
     });
 
@@ -691,7 +691,7 @@ describe("Documentation generator", () => {
         version: "3.4.5",
         title: "Testing Operation IDs",
         serverUrl: "https://example.com",
-      }).getSpecAsYaml();
+      }).print();
       expect(spec).toMatchSnapshot();
     });
 
@@ -716,7 +716,7 @@ describe("Documentation generator", () => {
         version: "3.4.5",
         title: "Testing Operation IDs",
         serverUrl: "https://example.com",
-      }).getSpecAsYaml();
+      }).print();
 
       expect(spec).toContain(operationId);
       expect(spec).toMatchSnapshot();
@@ -743,7 +743,7 @@ describe("Documentation generator", () => {
         version: "3.4.5",
         title: "Testing Operation IDs",
         serverUrl: "https://example.com",
-      }).getSpecAsYaml();
+      }).print();
 
       expect(spec).toContain(operationId);
       expect(spec).toMatchSnapshot();
@@ -787,7 +787,7 @@ describe("Documentation generator", () => {
           version: "3.4.5",
           title: "Testing Operation IDs",
           serverUrl: "https://example.com",
-        }).getSpecAsYaml();
+        }).print();
       }).toThrow(expectedError);
     });
 
@@ -821,7 +821,7 @@ describe("Documentation generator", () => {
         version: "3.4.5",
         title: "Testing MIME types and status codes",
         serverUrl: "https://example.com",
-      }).getSpecAsYaml();
+      }).print();
       expect(spec).toMatchSnapshot();
     });
   });
@@ -852,7 +852,7 @@ describe("Documentation generator", () => {
         version: "3.4.5",
         title: "Testing issue #98",
         serverUrl: "https://example.com",
-      }).getSpecAsYaml();
+      }).print();
       expect(spec).toMatchSnapshot();
     });
 
@@ -892,7 +892,7 @@ describe("Documentation generator", () => {
         version: "3.4.5",
         title: "Testing issue #98",
         serverUrl: "https://example.com",
-      }).getSpecAsYaml();
+      }).print();
       expect(spec).toMatchSnapshot();
     });
   });
@@ -917,7 +917,7 @@ describe("Documentation generator", () => {
         version: "3.4.5",
         title: "Testing route path params",
         serverUrl: "https://example.com",
-      }).getSpecAsYaml();
+      }).print();
       expect(spec).toMatchSnapshot();
     });
 
@@ -940,7 +940,7 @@ describe("Documentation generator", () => {
         version: "3.4.5",
         title: "Testing route path params",
         serverUrl: "https://example.com",
-      }).getSpecAsYaml();
+      }).print();
       expect(spec).toMatchSnapshot();
     });
   });
@@ -970,7 +970,7 @@ describe("Documentation generator", () => {
         version: "3.4.5",
         title: "Testing headers params",
         serverUrl: "https://example.com",
-      }).getSpecAsYaml();
+      }).print();
       expect(spec).toMatchSnapshot();
     });
   });
@@ -1000,7 +1000,7 @@ describe("Documentation generator", () => {
         version: "3.4.5",
         title: "Testing Metadata:description",
         serverUrl: "https://example.com",
-      }).getSpecAsYaml();
+      }).print();
       expect(spec).toMatchSnapshot();
     });
 
@@ -1029,7 +1029,7 @@ describe("Documentation generator", () => {
         version: "3.4.5",
         title: "Testing Metadata:description",
         serverUrl: "https://example.com",
-      }).getSpecAsYaml();
+      }).print();
       expect(spec).toMatchSnapshot();
     });
 
@@ -1057,7 +1057,7 @@ describe("Documentation generator", () => {
         version: "3.4.5",
         title: "Testing Metadata:example on IO parameter",
         serverUrl: "https://example.com",
-      }).getSpecAsYaml();
+      }).print();
       expect(spec).toMatchSnapshot();
     });
 
@@ -1089,7 +1089,7 @@ describe("Documentation generator", () => {
         version: "3.4.5",
         title: "Testing Metadata:example on IO schema",
         serverUrl: "https://example.com",
-      }).getSpecAsYaml();
+      }).print();
       expect(spec).toMatchSnapshot();
     });
 
@@ -1121,7 +1121,7 @@ describe("Documentation generator", () => {
         version: "3.4.5",
         title: "Testing Metadata:example on IO schema",
         serverUrl: "https://example.com",
-      }).getSpecAsYaml();
+      }).print();
       expect(spec).toMatchSnapshot();
     });
 
@@ -1166,7 +1166,7 @@ describe("Documentation generator", () => {
         version: "3.4.5",
         title: "Testing Metadata:example on IO schema + middleware",
         serverUrl: "https://example.com",
-      }).getSpecAsYaml();
+      }).print();
       expect(spec).toMatchSnapshot();
     });
 
@@ -1189,7 +1189,7 @@ describe("Documentation generator", () => {
         version: "3.4.5",
         title: "Testing Metadata:example on IO parameter",
         serverUrl: "https://example.com",
-      }).getSpecAsYaml();
+      }).print();
       expect(spec).toMatchSnapshot();
     });
   });

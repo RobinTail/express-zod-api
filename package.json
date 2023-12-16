@@ -22,7 +22,7 @@
     "build:compile": "tsup && attw --pack",
     "build:tests": "yarn cleanup && tsx tools/make-tests.ts",
     "build:assets": "yarn build:swagger && yarn build:client && yarn build:license",
-    "build:swagger": "tsx example/generate-open-api-schema.ts",
+    "build:swagger": "tsx example/generate-documentation.ts",
     "build:client": "tsx example/generate-client.ts && yarn prettier example/example.client.ts --write",
     "build:license": "tsx tools/license.ts",
     "build:logo": "tsx tools/startup-logo.ts",
