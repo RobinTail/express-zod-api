@@ -1,6 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`API Integration Generator > Feature #945: should have configurable treatment of optionals 0 1`] = `
+exports[`createIntegration() > Feature #945: should have configurable treatment of optionals 0 1`] = `
 "type PostV1TestWithDashesInput = {
   opt?: string;
 };
@@ -91,7 +91,7 @@ client.provide("get", "/v1/user/retrieve", { id: "10" });
 "
 `;
 
-exports[`API Integration Generator > Feature #945: should have configurable treatment of optionals 1 1`] = `
+exports[`createIntegration() > Feature #945: should have configurable treatment of optionals 1 1`] = `
 "type PostV1TestWithDashesInput = {
   opt: string | undefined;
 };
@@ -182,7 +182,7 @@ client.provide("get", "/v1/user/retrieve", { id: "10" });
 "
 `;
 
-exports[`API Integration Generator > Feature #945: should have configurable treatment of optionals 2 1`] = `
+exports[`createIntegration() > Feature #945: should have configurable treatment of optionals 2 1`] = `
 "type PostV1TestWithDashesInput = {
   opt: string;
 };
@@ -273,7 +273,7 @@ client.provide("get", "/v1/user/retrieve", { id: "10" });
 "
 `;
 
-exports[`API Integration Generator > Should generate a client for example API 1`] = `
+exports[`createIntegration() > Should generate a client for example API 1`] = `
 "type Type2048581c137c5b2130eb860e3ae37da196dfc25b = {
   title: string;
   features: Type2048581c137c5b2130eb860e3ae37da196dfc25b;
@@ -489,7 +489,7 @@ client.provide("get", "/v1/user/retrieve", { id: "10" });
 "
 `;
 
-exports[`API Integration Generator > Should generate a types for example API 1`] = `
+exports[`createIntegration() > Should generate a types for example API 1`] = `
 "type Type2048581c137c5b2130eb860e3ae37da196dfc25b = {
   title: string;
   features: Type2048581c137c5b2130eb860e3ae37da196dfc25b;
@@ -635,7 +635,7 @@ export interface Response extends Record<MethodPath, any> {
 "
 `;
 
-exports[`API Integration Generator > Should treat optionals the same way as z.infer() by default 1`] = `
+exports[`createIntegration() > Should treat optionals the same way as z.infer() by default 1`] = `
 "type PostV1TestWithDashesInput = {
   opt?: string | undefined;
 };

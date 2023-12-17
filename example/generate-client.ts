@@ -1,9 +1,9 @@
 import { writeFile } from "node:fs/promises";
-import { Integration } from "../src";
+import { createIntegration } from "../src";
 import { routing } from "./routing";
 
 await writeFile(
   "example/example.client.ts",
-  await new Integration({ routing }).print(),
+  await createIntegration({ routing }).print(),
   "utf-8",
 );

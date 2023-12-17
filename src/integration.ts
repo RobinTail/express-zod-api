@@ -76,13 +76,18 @@ interface IntegrationParams {
   };
 }
 
-export class Integration {
-  protected program: ts.Node[] = [];
-  protected usage: ts.Node[] = [];
-  protected registry: Registry = {};
-  protected paths: string[] = [];
-  protected aliases: Record<string, ts.TypeAliasDeclaration> = {};
-  protected identifiers = {
+export const createIntegration = ({
+  routing,
+  variant = "client",
+  serializer = defaultSerializer,
+  optionalPropStyle = { withQuestionMark: true, withUndefined: true },
+}: IntegrationParams) => {
+  const program: ts.Node[] = [];
+  const usage: ts.Node[] = [];
+  const registry: Registry = {};
+  const paths: string[] = [];
+  const aliases: Record<string, ts.TypeAliasDeclaration> = {};
+  const identifiers = {
     pathType: f.createIdentifier("Path"),
     methodType: f.createIdentifier("Method"),
     methodPathType: f.createIdentifier("MethodPath"),
@@ -110,126 +115,111 @@ export class Integration {
     clientConst: f.createIdentifier("client"),
   } satisfies Record<string, ts.Identifier>;
 
-  protected getAlias(name: string): ts.TypeReferenceNode | undefined {
-    return name in this.aliases ? f.createTypeReferenceNode(name) : undefined;
-  }
+  const getAlias = (name: string): ts.TypeReferenceNode | undefined => {
+    return name in aliases ? f.createTypeReferenceNode(name) : undefined;
+  };
 
-  protected makeAlias(name: string, type: ts.TypeNode): ts.TypeReferenceNode {
-    this.aliases[name] = createTypeAlias(type, name);
-    return this.getAlias(name)!;
-  }
+  const makeAlias = (name: string, type: ts.TypeNode): ts.TypeReferenceNode => {
+    aliases[name] = createTypeAlias(type, name);
+    return getAlias(name)!;
+  };
 
-  constructor({
+  walkRouting({
     routing,
-    variant = "client",
-    serializer = defaultSerializer,
-    optionalPropStyle = { withQuestionMark: true, withUndefined: true },
-  }: IntegrationParams) {
-    walkRouting({
-      routing,
-      onEndpoint: (endpoint, path, method) => {
-        const inputId = makeCleanId(path, method, "input");
-        const responseId = makeCleanId(path, method, "response");
-        const commons = {
-          serializer,
-          getAlias: this.getAlias.bind(this),
-          makeAlias: this.makeAlias.bind(this),
-          optionalPropStyle,
+    onEndpoint: (endpoint, path, method) => {
+      const inputId = makeCleanId(path, method, "input");
+      const responseId = makeCleanId(path, method, "response");
+      const commons = {
+        serializer,
+        getAlias,
+        makeAlias,
+        optionalPropStyle,
+      };
+      const inputSchema = endpoint.getSchema("input");
+      const input = zodToTs({
+        ...commons,
+        schema: hasRaw(inputSchema) ? ZodFile.create().buffer() : inputSchema,
+        isResponse: false,
+      });
+      const response = zodToTs({
+        ...commons,
+        isResponse: true,
+        schema: endpoint
+          .getSchema("positive")
+          .or(endpoint.getSchema("negative")),
+      });
+      program.push(
+        createTypeAlias(input, inputId),
+        createTypeAlias(response, responseId),
+      );
+      if (method !== "options") {
+        paths.push(path);
+        registry[`${method} ${path}`] = {
+          in: inputId,
+          out: responseId,
+          isJson: endpoint.getMimeTypes("positive").includes(mimeJson),
+          tags: endpoint.getTags(),
         };
-        const inputSchema = endpoint.getSchema("input");
-        const input = zodToTs({
-          ...commons,
-          schema: hasRaw(inputSchema) ? ZodFile.create().buffer() : inputSchema,
-          isResponse: false,
-        });
-        const response = zodToTs({
-          ...commons,
-          isResponse: true,
-          schema: endpoint
-            .getSchema("positive")
-            .or(endpoint.getSchema("negative")),
-        });
-        this.program.push(
-          createTypeAlias(input, inputId),
-          createTypeAlias(response, responseId),
-        );
-        if (method !== "options") {
-          this.paths.push(path);
-          this.registry[`${method} ${path}`] = {
-            in: inputId,
-            out: responseId,
-            isJson: endpoint.getMimeTypes("positive").includes(mimeJson),
-            tags: endpoint.getTags(),
-          };
-        }
-      },
-    });
+      }
+    },
+  });
 
-    this.program = Object.values<ts.Node>(this.aliases).concat(this.program);
+  program.unshift(...Object.values<ts.Node>(aliases));
 
-    // export type Path = "/v1/user/retrieve" | ___;
-    const pathType = makePublicLiteralType(
-      this.identifiers.pathType,
-      this.paths,
-    );
+  // export type Path = "/v1/user/retrieve" | ___;
+  const pathType = makePublicLiteralType(identifiers.pathType, paths);
 
-    // export type Method = "get" | "post" | "put" | "delete" | "patch";
-    const methodType = makePublicLiteralType(
-      this.identifiers.methodType,
-      methods,
-    );
+  // export type Method = "get" | "post" | "put" | "delete" | "patch";
+  const methodType = makePublicLiteralType(identifiers.methodType, methods);
 
-    // export type MethodPath = `${Method} ${Path}`;
-    const methodPathType = makePublicType(
-      this.identifiers.methodPathType,
-      makeTemplate([this.identifiers.methodType, this.identifiers.pathType]),
-    );
+  // export type MethodPath = `${Method} ${Path}`;
+  const methodPathType = makePublicType(
+    identifiers.methodPathType,
+    makeTemplate([identifiers.methodType, identifiers.pathType]),
+  );
 
-    // extends Record<MethodPath, any>
-    const extenderClause = [
-      f.createHeritageClause(ts.SyntaxKind.ExtendsKeyword, [
-        makeRecord(this.identifiers.methodPathType, ts.SyntaxKind.AnyKeyword),
-      ]),
-    ];
+  // extends Record<MethodPath, any>
+  const extenderClause = [
+    f.createHeritageClause(ts.SyntaxKind.ExtendsKeyword, [
+      makeRecord(identifiers.methodPathType, ts.SyntaxKind.AnyKeyword),
+    ]),
+  ];
 
-    // export interface Input ___ { "get /v1/user/retrieve": GetV1UserRetrieveInput; }
-    const inputInterface = makePublicExtendedInterface(
-      this.identifiers.inputInterface,
-      extenderClause,
-      Object.keys(this.registry).map((methodPath) =>
-        makeQuotedProp(methodPath, this.registry[methodPath].in),
-      ),
-    );
+  // export interface Input ___ { "get /v1/user/retrieve": GetV1UserRetrieveInput; }
+  const inputInterface = makePublicExtendedInterface(
+    identifiers.inputInterface,
+    extenderClause,
+    Object.keys(registry).map((methodPath) =>
+      makeQuotedProp(methodPath, registry[methodPath].in),
+    ),
+  );
 
-    // export interface Response ___ { "get /v1/user/retrieve": GetV1UserRetrieveResponse; }
-    const responseInterface = makePublicExtendedInterface(
-      this.identifiers.responseInterface,
-      extenderClause,
-      Object.keys(this.registry).map((methodPath) =>
-        makeQuotedProp(methodPath, this.registry[methodPath].out),
-      ),
-    );
+  // export interface Response ___ { "get /v1/user/retrieve": GetV1UserRetrieveResponse; }
+  const responseInterface = makePublicExtendedInterface(
+    identifiers.responseInterface,
+    extenderClause,
+    Object.keys(registry).map((methodPath) =>
+      makeQuotedProp(methodPath, registry[methodPath].out),
+    ),
+  );
 
-    this.program.push(
-      pathType,
-      methodType,
-      methodPathType,
-      inputInterface,
-      responseInterface,
-    );
+  program.push(
+    pathType,
+    methodType,
+    methodPathType,
+    inputInterface,
+    responseInterface,
+  );
 
-    if (variant === "types") {
-      return;
-    }
-
+  if (variant === "client") {
     // export const jsonEndpoints = { "get /v1/user/retrieve": true }
     const jsonEndpointsConst = f.createVariableStatement(
       exportModifier,
       makeConst(
-        this.identifiers.jsonEndpointsConst,
+        identifiers.jsonEndpointsConst,
         f.createObjectLiteralExpression(
-          Object.keys(this.registry)
-            .filter((methodPath) => this.registry[methodPath].isJson)
+          Object.keys(registry)
+            .filter((methodPath) => registry[methodPath].isJson)
             .map((methodPath) =>
               f.createPropertyAssignment(`"${methodPath}"`, f.createTrue()),
             ),
@@ -241,13 +231,13 @@ export class Integration {
     const endpointTagsConst = f.createVariableStatement(
       exportModifier,
       makeConst(
-        this.identifiers.endpointTagsConst,
+        identifiers.endpointTagsConst,
         f.createObjectLiteralExpression(
-          Object.keys(this.registry).map((methodPath) =>
+          Object.keys(registry).map((methodPath) =>
             f.createPropertyAssignment(
               `"${methodPath}"`,
               f.createArrayLiteralExpression(
-                this.registry[methodPath].tags.map((tag) =>
+                registry[methodPath].tags.map((tag) =>
                   f.createStringLiteral(tag),
                 ),
               ),
@@ -260,34 +250,31 @@ export class Integration {
     // export type Provider = <M extends Method, P extends Path>(method: M, path: P, params: Input[`${M} ${P}`]) =>
     // Promise<Response[`${M} ${P}`]>;
     const providerType = makePublicType(
-      this.identifiers.providerType,
+      identifiers.providerType,
       f.createFunctionTypeNode(
         makeTypeParams({
-          M: this.identifiers.methodType,
-          P: this.identifiers.pathType,
+          M: identifiers.methodType,
+          P: identifiers.pathType,
         }),
         makeParams({
           method: f.createTypeReferenceNode("M"),
           path: f.createTypeReferenceNode("P"),
           params: f.createIndexedAccessTypeNode(
-            f.createTypeReferenceNode(this.identifiers.inputInterface),
+            f.createTypeReferenceNode(identifiers.inputInterface),
             parametricIndexNode,
           ),
         }),
-        makeIndexedPromise(
-          this.identifiers.responseInterface,
-          parametricIndexNode,
-        ),
+        makeIndexedPromise(identifiers.responseInterface, parametricIndexNode),
       ),
     );
 
     // export type Implementation = (method: Method, path: string, params: Record<string, any>) => Promise<any>;
     const implementationType = makePublicType(
-      this.identifiers.implementationType,
+      identifiers.implementationType,
       f.createFunctionTypeNode(
         undefined,
         makeParams({
-          method: f.createTypeReferenceNode(this.identifiers.methodType),
+          method: f.createTypeReferenceNode(identifiers.methodType),
           path: f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
           params: makeRecord(
             ts.SyntaxKind.StringKeyword,
@@ -301,37 +288,34 @@ export class Integration {
     // `:${key}`
     const keyParamExpression = f.createTemplateExpression(
       f.createTemplateHead(":"),
-      [f.createTemplateSpan(this.identifiers.keyParameter, emptyTail)],
+      [f.createTemplateSpan(identifiers.keyParameter, emptyTail)],
     );
 
     // Object.keys(params).reduce((acc, key) => acc.replace(___, params[key]), path)
     const pathArgument = makeObjectKeysReducer(
-      this.identifiers.paramsArgument,
+      identifiers.paramsArgument,
       f.createCallExpression(
-        f.createPropertyAccessExpression(
-          this.identifiers.accumulator,
-          "replace",
-        ),
+        f.createPropertyAccessExpression(identifiers.accumulator, "replace"),
         undefined,
         [
           keyParamExpression,
           f.createElementAccessExpression(
-            this.identifiers.paramsArgument,
-            this.identifiers.keyParameter,
+            identifiers.paramsArgument,
+            identifiers.keyParameter,
           ),
         ],
       ),
-      this.identifiers.pathParameter,
+      identifiers.pathParameter,
     );
 
     // Object.keys(params).reduce((acc, key) => path.indexOf(___) >= 0 ? acc : { ...acc, [key]: params[key] }, {})
     const paramsArgument = makeObjectKeysReducer(
-      this.identifiers.paramsArgument,
+      identifiers.paramsArgument,
       f.createConditionalExpression(
         f.createBinaryExpression(
           f.createCallExpression(
             f.createPropertyAccessExpression(
-              this.identifiers.pathParameter,
+              identifiers.pathParameter,
               "indexOf",
             ),
             undefined,
@@ -341,15 +325,15 @@ export class Integration {
           f.createNumericLiteral(0),
         ),
         undefined,
-        this.identifiers.accumulator,
+        identifiers.accumulator,
         undefined,
         f.createObjectLiteralExpression([
-          f.createSpreadAssignment(this.identifiers.accumulator),
+          f.createSpreadAssignment(identifiers.accumulator),
           f.createPropertyAssignment(
-            f.createComputedPropertyName(this.identifiers.keyParameter),
+            f.createComputedPropertyName(identifiers.keyParameter),
             f.createElementAccessExpression(
-              this.identifiers.paramsArgument,
-              this.identifiers.keyParameter,
+              identifiers.paramsArgument,
+              identifiers.keyParameter,
             ),
           ),
         ]),
@@ -359,41 +343,41 @@ export class Integration {
 
     // export class ExpressZodAPIClient { ___ }
     const clientClass = makePublicClass(
-      this.identifiers.clientClass,
+      identifiers.clientClass,
       // constructor(protected readonly implementation: Implementation) {}
       makeEmptyInitializingConstructor([
         makeParam(
-          this.identifiers.implementationArgument,
-          f.createTypeReferenceNode(this.identifiers.implementationType),
+          identifiers.implementationArgument,
+          f.createTypeReferenceNode(identifiers.implementationType),
           protectedReadonlyModifier,
         ),
       ]),
       [
         // public readonly provide: Provider
         makePublicReadonlyProp(
-          this.identifiers.provideMethod,
-          f.createTypeReferenceNode(this.identifiers.providerType),
+          identifiers.provideMethod,
+          f.createTypeReferenceNode(identifiers.providerType),
           // = async (method, path, params) => this.implementation(___)
           makeAsyncArrowFn(
             [
-              this.identifiers.methodParameter,
-              this.identifiers.pathParameter,
-              this.identifiers.paramsArgument,
+              identifiers.methodParameter,
+              identifiers.pathParameter,
+              identifiers.paramsArgument,
             ],
             f.createCallExpression(
               f.createPropertyAccessExpression(
                 f.createThis(),
-                this.identifiers.implementationArgument,
+                identifiers.implementationArgument,
               ),
               undefined,
-              [this.identifiers.methodParameter, pathArgument, paramsArgument],
+              [identifiers.methodParameter, pathArgument, paramsArgument],
             ),
           ),
         ),
       ],
     );
 
-    this.program.push(
+    program.push(
       jsonEndpointsConst,
       endpointTagsConst,
       providerType,
@@ -403,10 +387,10 @@ export class Integration {
 
     // method: method.toUpperCase()
     const methodProperty = f.createPropertyAssignment(
-      this.identifiers.methodParameter,
+      identifiers.methodParameter,
       f.createCallExpression(
         f.createPropertyAccessExpression(
-          this.identifiers.methodParameter,
+          identifiers.methodParameter,
           "toUpperCase",
         ),
         undefined,
@@ -416,9 +400,9 @@ export class Integration {
 
     // headers: hasBody ? { "Content-Type": "application/json" } : undefined
     const headersProperty = f.createPropertyAssignment(
-      this.identifiers.headersProperty,
+      identifiers.headersProperty,
       f.createConditionalExpression(
-        this.identifiers.hasBodyConst,
+        identifiers.hasBodyConst,
         undefined,
         f.createObjectLiteralExpression([
           f.createPropertyAssignment(
@@ -427,15 +411,15 @@ export class Integration {
           ),
         ]),
         undefined,
-        this.identifiers.undefinedValue,
+        identifiers.undefinedValue,
       ),
     );
 
     // body: hasBody ? JSON.stringify(params) : undefined
     const bodyProperty = f.createPropertyAssignment(
-      this.identifiers.bodyProperty,
+      identifiers.bodyProperty,
       f.createConditionalExpression(
-        this.identifiers.hasBodyConst,
+        identifiers.hasBodyConst,
         undefined,
         f.createCallExpression(
           f.createPropertyAccessExpression(
@@ -443,10 +427,10 @@ export class Integration {
             "stringify",
           ),
           undefined,
-          [this.identifiers.paramsArgument],
+          [identifiers.paramsArgument],
         ),
         undefined,
-        this.identifiers.undefinedValue,
+        identifiers.undefinedValue,
       ),
     );
 
@@ -454,20 +438,17 @@ export class Integration {
     const responseStatement = f.createVariableStatement(
       undefined,
       makeConst(
-        this.identifiers.responseConst,
+        identifiers.responseConst,
         f.createAwaitExpression(
           f.createCallExpression(f.createIdentifier("fetch"), undefined, [
             f.createTemplateExpression(
               f.createTemplateHead("https://example.com"),
               [
                 f.createTemplateSpan(
-                  this.identifiers.pathParameter,
+                  identifiers.pathParameter,
                   f.createTemplateMiddle(""),
                 ),
-                f.createTemplateSpan(
-                  this.identifiers.searchParamsConst,
-                  emptyTail,
-                ),
+                f.createTemplateSpan(identifiers.searchParamsConst, emptyTail),
               ],
             ),
             f.createObjectLiteralExpression([
@@ -484,7 +465,7 @@ export class Integration {
     const hasBodyStatement = f.createVariableStatement(
       undefined,
       makeConst(
-        this.identifiers.hasBodyConst,
+        identifiers.hasBodyConst,
         f.createLogicalNot(
           f.createCallExpression(
             f.createPropertyAccessExpression(
@@ -495,7 +476,7 @@ export class Integration {
               "includes",
             ),
             undefined,
-            [this.identifiers.methodParameter],
+            [identifiers.methodParameter],
           ),
         ),
       ),
@@ -505,9 +486,9 @@ export class Integration {
     const searchParamsStatement = f.createVariableStatement(
       undefined,
       makeConst(
-        this.identifiers.searchParamsConst,
+        identifiers.searchParamsConst,
         f.createConditionalExpression(
-          this.identifiers.hasBodyConst,
+          identifiers.hasBodyConst,
           undefined,
           f.createStringLiteral(""),
           undefined,
@@ -516,7 +497,7 @@ export class Integration {
               f.createNewExpression(
                 f.createIdentifier("URLSearchParams"),
                 undefined,
-                [this.identifiers.paramsArgument],
+                [identifiers.paramsArgument],
               ),
               emptyTail,
             ),
@@ -530,10 +511,7 @@ export class Integration {
       (method) =>
         f.createReturnStatement(
           f.createCallExpression(
-            f.createPropertyAccessExpression(
-              this.identifiers.responseConst,
-              method,
-            ),
+            f.createPropertyAccessExpression(identifiers.responseConst, method),
             undefined,
             undefined,
           ),
@@ -544,11 +522,11 @@ export class Integration {
     const ifJsonStatement = f.createIfStatement(
       f.createBinaryExpression(
         f.createTemplateExpression(emptyHeading, [
-          f.createTemplateSpan(this.identifiers.methodParameter, spacingMiddle),
-          f.createTemplateSpan(this.identifiers.pathParameter, emptyTail),
+          f.createTemplateSpan(identifiers.methodParameter, spacingMiddle),
+          f.createTemplateSpan(identifiers.pathParameter, emptyTail),
         ]),
         ts.SyntaxKind.InKeyword,
-        this.identifiers.jsonEndpointsConst,
+        identifiers.jsonEndpointsConst,
       ),
       f.createBlock([returnJsonStatement]),
     );
@@ -557,12 +535,12 @@ export class Integration {
     const exampleImplStatement = f.createVariableStatement(
       exportModifier,
       makeConst(
-        this.identifiers.exampleImplementationConst,
+        identifiers.exampleImplementationConst,
         makeAsyncArrowFn(
           [
-            this.identifiers.methodParameter,
-            this.identifiers.pathParameter,
-            this.identifiers.paramsArgument,
+            identifiers.methodParameter,
+            identifiers.pathParameter,
+            identifiers.paramsArgument,
           ],
           f.createBlock([
             hasBodyStatement,
@@ -572,7 +550,7 @@ export class Integration {
             returnTextStatement,
           ]),
         ),
-        f.createTypeReferenceNode(this.identifiers.implementationType),
+        f.createTypeReferenceNode(identifiers.implementationType),
       ),
     );
 
@@ -580,8 +558,8 @@ export class Integration {
     const provideCallingStatement = f.createExpressionStatement(
       f.createCallExpression(
         f.createPropertyAccessExpression(
-          this.identifiers.clientConst,
-          this.identifiers.provideMethod,
+          identifiers.clientConst,
+          identifiers.provideMethod,
         ),
         undefined,
         [
@@ -598,21 +576,21 @@ export class Integration {
     const clientInstanceStatement = f.createVariableStatement(
       undefined,
       makeConst(
-        this.identifiers.clientConst,
-        f.createNewExpression(this.identifiers.clientClass, undefined, [
-          this.identifiers.exampleImplementationConst,
+        identifiers.clientConst,
+        f.createNewExpression(identifiers.clientClass, undefined, [
+          identifiers.exampleImplementationConst,
         ]),
       ),
     );
 
-    this.usage.push(
+    usage.push(
       exampleImplStatement,
       clientInstanceStatement,
       provideCallingStatement,
     );
   }
 
-  public async print({
+  const print = async ({
     printerOptions,
     format: userDefined,
   }: {
@@ -623,7 +601,7 @@ export class Integration {
      * @default prettier.format
      * */
     format?: (program: string) => Promise<string>;
-  } = {}) {
+  } = {}) => {
     let format = userDefined;
     try {
       const prettierFormat = (await loadPeer<typeof Prettier>("prettier"))
@@ -631,8 +609,8 @@ export class Integration {
       format = (text) => prettierFormat(text, { filepath: "client.ts" });
     } catch {}
 
-    const usageExample = this.usage.length
-      ? this.usage.map((node) => printNode(node, printerOptions)).join("\n")
+    const usageExample = usage.length
+      ? usage.map((node) => printNode(node, printerOptions)).join("\n")
       : undefined;
 
     const exampleComment = usageExample
@@ -647,11 +625,13 @@ export class Integration {
         )
       : [];
 
-    const output = this.program
+    const output = program
       .concat(exampleComment)
       .map((node) => printNode(node, printerOptions))
       .join("\n\n");
 
     return format ? format(output) : output;
-  }
-}
+  };
+
+  return { program, print };
+};

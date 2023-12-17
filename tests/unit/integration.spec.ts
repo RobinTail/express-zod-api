@@ -1,19 +1,20 @@
 import { z } from "zod";
 import { routing } from "../../example/routing";
-import { Integration, defaultEndpointsFactory } from "../../src";
+import { createIntegration, defaultEndpointsFactory } from "../../src";
 import { describe, expect, test } from "vitest";
 
-describe("API Integration Generator", () => {
+describe("createIntegration()", () => {
   test.each(["client", "types"] as const)(
     "Should generate a %s for example API",
     async (variant) => {
-      const client = new Integration({ variant, routing });
+      const client = createIntegration({ variant, routing });
+      expect(client).toHaveProperty("program");
       expect(await client.print()).toMatchSnapshot();
     },
   );
 
   test("Should treat optionals the same way as z.infer() by default", async () => {
-    const client = new Integration({
+    const client = createIntegration({
       routing: {
         v1: {
           "test-with-dashes": defaultEndpointsFactory.build({
@@ -35,7 +36,7 @@ describe("API Integration Generator", () => {
   test.each([{ withQuestionMark: true }, { withUndefined: true }, {}])(
     "Feature #945: should have configurable treatment of optionals %#",
     async (optionalPropStyle) => {
-      const client = new Integration({
+      const client = createIntegration({
         optionalPropStyle,
         routing: {
           v1: {
