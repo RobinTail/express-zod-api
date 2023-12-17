@@ -104,6 +104,16 @@ interface IntegrationParams {
   };
 }
 
+interface PrintParams {
+  /** @desc Typescript printer options */
+  printerOptions?: ts.PrinterOptions;
+  /**
+   * @desc Typescript code formatter
+   * @default prettier.format
+   * */
+  format?: (program: string) => Promise<string>;
+}
+
 export const createIntegration = ({
   routing,
   variant = "client",
@@ -574,15 +584,7 @@ export const createIntegration = ({
   const print = async ({
     printerOptions,
     format: userDefined,
-  }: {
-    /** @desc Typescript printer options */
-    printerOptions?: ts.PrinterOptions;
-    /**
-     * @desc Typescript code formatter
-     * @default prettier.format
-     * */
-    format?: (program: string) => Promise<string>;
-  } = {}) => {
+  }: PrintParams = {}) => {
     let format = userDefined;
     if (!format) {
       try {
