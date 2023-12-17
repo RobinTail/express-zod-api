@@ -6,6 +6,13 @@ import type {
   SchemaObject as Schema30,
   SecuritySchemeObject as Security30,
 } from "openapi3-ts/oas30";
+import type {
+  OpenApiBuilder as Builder31,
+  OperationObject as Operation31,
+  ReferenceObject as Ref31,
+  SchemaObject as Schema31,
+  SecuritySchemeObject as Security31,
+} from "openapi3-ts/oas31";
 import { z } from "zod";
 import { DocumentationError } from "./errors";
 import {
@@ -30,7 +37,10 @@ import { loadPeer } from "./peer-helpers";
 import { Routing } from "./routing";
 import { RoutingWalkerParams, walkRouting } from "./routing-walker";
 
-interface DocumentationParams {
+type OAS = "3.0" | "3.1";
+
+interface DocumentationParams<V extends OAS> {
+  oas?: V;
   title: string;
   version: string;
   serverUrl: string | [string, ...string[]];
@@ -51,7 +61,20 @@ interface DocumentationParams {
   serializer?: (schema: z.ZodTypeAny) => string;
 }
 
-export const createDocumentation = async ({
+export async function createDocumentation(
+  props: DocumentationParams<"3.0">,
+): Promise<{
+  builder: Builder30;
+  print: () => string;
+}>;
+export async function createDocumentation(
+  props: DocumentationParams<"3.1">,
+): Promise<{
+  builder: Builder31;
+  print: () => string;
+}>;
+export async function createDocumentation<V extends OAS>({
+  oas,
   routing,
   config,
   title,
@@ -62,7 +85,7 @@ export const createDocumentation = async ({
   hasSummaryFromDescription = true,
   composition = "inline",
   serializer = defaultSerializer,
-}: DocumentationParams) => {
+}: DocumentationParams<V>) {
   const lastSecuritySchemaIds: Partial<Record<string, number>> = {};
   const lastOperationIdSuffixes: Record<string, number> = {};
 
@@ -93,26 +116,34 @@ export const createDocumentation = async ({
     return operationId;
   };
 
-  const BuilderClass = await loadPeer<{ new (): Builder30 }>(
-    "openapi3-ts/oas30",
+  const BuilderClass = await loadPeer<{ new (): Builder31 | Builder30 }>(
+    `openapi3-ts/${oas === "3.1" ? "oas31" : "oas30"}`,
     "OpenApiBuilder",
   );
+
   const builder = new BuilderClass().addInfo({ title, version });
   for (const url of typeof serverUrl === "string" ? [serverUrl] : serverUrl) {
     builder.addServer({ url });
   }
 
-  const getRef = (name: string): Ref30 | undefined =>
+  const getRef = (name: string): Ref30 | Ref31 | undefined =>
     name in (builder.rootDoc.components?.schemas || {})
       ? { $ref: `#/components/schemas/${name}` }
       : undefined;
 
-  const makeRef = (name: string, schema: Schema30 | Ref30): Ref30 => {
-    builder.addSchema(name, schema);
+  const makeRef = (
+    name: string,
+    schema: Schema30 | Ref30 | Schema31 | Ref31,
+  ): Ref30 | Ref31 => {
+    if (oas === "3.1") {
+      (builder as Builder31).addSchema(name, schema as Schema31 | Ref31);
+    } else {
+      (builder as Builder30).addSchema(name, schema as Schema30 | Ref30);
+    }
     return getRef(name)!;
   };
 
-  const ensureUniqSecuritySchemaName = (subject: Security30) => {
+  const ensureUniqSecuritySchemaName = (subject: Security30 | Security31) => {
     const serializedSubject = JSON.stringify(subject);
     for (const name in builder.rootDoc.components?.securitySchemes || {}) {
       if (
@@ -158,7 +189,7 @@ export const createDocumentation = async ({
       method,
       endpoint.getOperationId(method),
     );
-    const operation: Operation30 = {
+    const operation: Operation30 | Operation31 = {
       operationId,
       responses: {
         [endpoint.getStatusCode("positive")]: depictResponse({
@@ -218,4 +249,4 @@ export const createDocumentation = async ({
   builder.rootDoc.tags = config.tags ? depictTags(config.tags) : [];
 
   return { builder, print: () => builder.getSpecAsYaml() };
-};
+}
