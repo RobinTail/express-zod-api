@@ -457,6 +457,7 @@ export const depictString: Depicter<z.ZodString> = ({
   };
 };
 
+/** @since OAS 3.1: exclusive min/max are numbers */
 export const depictNumber: Depicter<z.ZodNumber> = ({ schema, oas }) => {
   const minCheck = schema._def.checks.find(({ kind }) => kind === "min") as
     | Extract<z.ZodNumberCheck, { kind: "min" }>
