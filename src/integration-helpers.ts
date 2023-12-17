@@ -4,7 +4,7 @@ export const f = ts.factory;
 
 export const exportModifier = [f.createModifier(ts.SyntaxKind.ExportKeyword)];
 
-export const asyncModifier = [f.createModifier(ts.SyntaxKind.AsyncKeyword)];
+const asyncModifier = [f.createModifier(ts.SyntaxKind.AsyncKeyword)];
 
 const publicReadonlyModifier = [
   f.createModifier(ts.SyntaxKind.PublicKeyword),
