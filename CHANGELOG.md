@@ -1,5 +1,33 @@
 # Changelog
 
+## Version 16
+
+- **Breaking changes**:
+  - Class `Documentation` transformed into async function `createDocumentation`;
+    - Its method `getSpecAsYaml()` renamed to `print()`.
+  - Class `Integration` transformed into function `createIntegration`;
+    - Its method `print()` became async and its argument changed.
+- Features:
+  - Ability to generate formatted typescript client when `prettier` is installed (supported automatically).
+  - Ability to supply you own typescript formatting function for generating the client.
+- How to migrate while preserving the previous behaviour:
+  - Replace `new Documentation()` with `await createDocumentation()`,
+  - Replace `getSpecAsYaml()` with `print()`,
+  - Replace `new Integration()` with `createIntegration()`,
+  - Add `await` before calling its method `print()`.
+
+```ts
+// before
+import { Documentation, Integration } from "express-zod-api";
+new Documentation(/*...*/).getSpecAsYaml();
+new Integration(/*...*/).print();
+
+// after
+import { createDocumentation, createIntegration } from "express-zod-api";
+(await createDocumentation(/*...*/)).print();
+await createIntegration(/*...*/).print();
+```
+
 ## Version 15
 
 ### 15.2.0
