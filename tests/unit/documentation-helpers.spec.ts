@@ -395,7 +395,7 @@ describe.each<OAS>(["3.0", "3.1"])("Documentation helpers %s", (oas) => {
 
   describe("depictNullable()", () => {
     test.each<OpenAPIContext>([requestCtx, responseCtx])(
-      "should set nullable:true %#",
+      "should set type or nullable according to OAS version %#",
       (ctx) => {
         expect(
           depictNullable({

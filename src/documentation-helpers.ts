@@ -194,14 +194,24 @@ export const depictReadonly: Depicter<z.ZodReadonly<z.ZodTypeAny>> = ({
   next,
 }) => next({ schema: schema._def.innerType });
 
-/** @todo use type arrays instead of nullable in 3.1 */
+/** @since OAS 3.1 nullable replaced with type arrays */
 export const depictNullable: Depicter<z.ZodNullable<z.ZodTypeAny>> = ({
   schema,
   next,
-}) => ({
-  nullable: true,
-  ...next({ schema: schema.unwrap() }),
-});
+  oas,
+}) => {
+  const nested = next({ schema: schema.unwrap() });
+  return Object.assign(
+    nested,
+    oas === "3.1"
+      ? ({
+          type: (
+            ["null"] as Exclude<SchemaObject31["type"], string | undefined>
+          ).concat("$ref" in nested ? [] : nested.type || []),
+        } satisfies SchemaObject31)
+      : ({ nullable: true } satisfies SchemaObject30),
+  );
+};
 
 export const depictEnum: Depicter<
   z.ZodEnum<[string, ...string[]]> | z.ZodNativeEnum<any> // keeping "any" for ZodNativeEnum as compatibility fix

@@ -370,14 +370,14 @@ exports[`Documentation helpers 3.0 > depictNull() > should set the type accordin
 }
 `;
 
-exports[`Documentation helpers 3.0 > depictNullable() > should set nullable:true 0 1`] = `
+exports[`Documentation helpers 3.0 > depictNullable() > should set type or nullable according to OAS version 0 1`] = `
 {
   "nullable": true,
   "type": "string",
 }
 `;
 
-exports[`Documentation helpers 3.0 > depictNullable() > should set nullable:true 1 1`] = `
+exports[`Documentation helpers 3.0 > depictNullable() > should set type or nullable according to OAS version 1 1`] = `
 {
   "nullable": true,
   "type": "string",
@@ -1577,17 +1577,21 @@ exports[`Documentation helpers 3.1 > depictNull() > should set the type accordin
 }
 `;
 
-exports[`Documentation helpers 3.1 > depictNullable() > should set nullable:true 0 1`] = `
+exports[`Documentation helpers 3.1 > depictNullable() > should set type or nullable according to OAS version 0 1`] = `
 {
-  "nullable": true,
-  "type": "string",
+  "type": [
+    "null",
+    "string",
+  ],
 }
 `;
 
-exports[`Documentation helpers 3.1 > depictNullable() > should set nullable:true 1 1`] = `
+exports[`Documentation helpers 3.1 > depictNullable() > should set type or nullable according to OAS version 1 1`] = `
 {
-  "nullable": true,
-  "type": "string",
+  "type": [
+    "null",
+    "string",
+  ],
 }
 `;
 

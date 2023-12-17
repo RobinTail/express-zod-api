@@ -1017,8 +1017,8 @@ paths:
                     type: object
                     properties:
                       nullable:
-                        nullable: true
                         type: string
+                        nullable: true
                     required:
                       - nullable
                 required:
@@ -1070,20 +1070,20 @@ paths:
           required: false
           description: GET /v1/getSomething parameter
           schema:
-            nullable: true
             type: boolean
+            nullable: true
         - name: nuDefault
           in: query
           required: false
           description: GET /v1/getSomething parameter
           schema:
-            nullable: true
             type: integer
             format: int64
             minimum: 0
             maximum: 9007199254740991
             exclusiveMinimum: true
             exclusiveMaximum: false
+            nullable: true
             default: 123
 components:
   schemas: {}
@@ -3228,8 +3228,8 @@ paths:
                   items:
                     oneOf:
                       - type: string
-                      - nullable: true
-                        type: string
+                      - type: string
+                        nullable: true
                     format: tuple
                     description: "0: string, 1: string"
                 complex:
