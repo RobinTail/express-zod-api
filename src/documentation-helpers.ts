@@ -194,6 +194,7 @@ export const depictReadonly: Depicter<z.ZodReadonly<z.ZodTypeAny>> = ({
   next,
 }) => next({ schema: schema._def.innerType });
 
+/** @todo use type arrays instead of nullable in 3.1 */
 export const depictNullable: Depicter<z.ZodNullable<z.ZodTypeAny>> = ({
   schema,
   next,
@@ -388,7 +389,7 @@ export const depictArray: Depicter<z.ZodArray<z.ZodTypeAny>> = ({
   ...(def.maxLength !== null && { maxItems: def.maxLength.value }),
 });
 
-/** @todo improve it when OpenAPI 3.1.0 will be released */
+/** @todo use prefixItems in 3.1 */
 export const depictTuple: Depicter<z.ZodTuple> = ({
   schema: { items },
   next,
