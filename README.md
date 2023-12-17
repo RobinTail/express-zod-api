@@ -892,7 +892,7 @@ const rawAcceptingEndpoint = defaultEndpointsFactory.build({
 
 ## Generating a Frontend Client
 
-You can generate a Typescript file containing types and its client.
+You can generate a Typescript file containing the IO types of your API and a client for it.
 
 ```typescript
 // example client-generator.ts
