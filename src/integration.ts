@@ -126,9 +126,8 @@ export const createIntegration = ({
   const paths: string[] = [];
   const aliases: Record<string, ts.TypeAliasDeclaration> = {};
 
-  const getAlias = (name: string): ts.TypeReferenceNode | undefined => {
-    return name in aliases ? f.createTypeReferenceNode(name) : undefined;
-  };
+  const getAlias = (name: string): ts.TypeReferenceNode | undefined =>
+    name in aliases ? f.createTypeReferenceNode(name) : undefined;
 
   const makeAlias = (name: string, type: ts.TypeNode): ts.TypeReferenceNode => {
     aliases[name] = createTypeAlias(type, name);

@@ -103,11 +103,10 @@ export const createDocumentation = async ({
     builder.addServer({ url });
   }
 
-  const getRef = (name: string): ReferenceObject | undefined => {
-    return name in (builder.rootDoc.components?.schemas || {})
+  const getRef = (name: string): ReferenceObject | undefined =>
+    name in (builder.rootDoc.components?.schemas || {})
       ? { $ref: `#/components/schemas/${name}` }
       : undefined;
-  };
 
   const makeRef = (
     name: string,
