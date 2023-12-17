@@ -1,11 +1,10 @@
 import assert from "node:assert/strict";
 import type {
-  OpenApiBuilder,
-  OperationObject,
-  ReferenceObject,
-  SchemaObject,
-  SecuritySchemeObject,
-  SecuritySchemeType,
+  OpenApiBuilder as Builder30,
+  OperationObject as Operation30,
+  ReferenceObject as Ref30,
+  SchemaObject as Schema30,
+  SecuritySchemeObject as Security30,
 } from "openapi3-ts/oas30";
 import { z } from "zod";
 import { DocumentationError } from "./errors";
@@ -64,7 +63,7 @@ export const createDocumentation = async ({
   composition = "inline",
   serializer = defaultSerializer,
 }: DocumentationParams) => {
-  const lastSecuritySchemaIds: Partial<Record<SecuritySchemeType, number>> = {};
+  const lastSecuritySchemaIds: Partial<Record<string, number>> = {};
   const lastOperationIdSuffixes: Record<string, number> = {};
 
   const ensureUniqOperationId = (
@@ -94,7 +93,7 @@ export const createDocumentation = async ({
     return operationId;
   };
 
-  const BuilderClass = await loadPeer<{ new (): OpenApiBuilder }>(
+  const BuilderClass = await loadPeer<{ new (): Builder30 }>(
     "openapi3-ts/oas30",
     "OpenApiBuilder",
   );
@@ -103,20 +102,17 @@ export const createDocumentation = async ({
     builder.addServer({ url });
   }
 
-  const getRef = (name: string): ReferenceObject | undefined =>
+  const getRef = (name: string): Ref30 | undefined =>
     name in (builder.rootDoc.components?.schemas || {})
       ? { $ref: `#/components/schemas/${name}` }
       : undefined;
 
-  const makeRef = (
-    name: string,
-    schema: SchemaObject | ReferenceObject,
-  ): ReferenceObject => {
+  const makeRef = (name: string, schema: Schema30 | Ref30): Ref30 => {
     builder.addSchema(name, schema);
     return getRef(name)!;
   };
 
-  const ensureUniqSecuritySchemaName = (subject: SecuritySchemeObject) => {
+  const ensureUniqSecuritySchemaName = (subject: Security30) => {
     const serializedSubject = JSON.stringify(subject);
     for (const name in builder.rootDoc.components?.securitySchemes || {}) {
       if (
@@ -162,7 +158,7 @@ export const createDocumentation = async ({
       method,
       endpoint.getOperationId(method),
     );
-    const operation: OperationObject = {
+    const operation: Operation30 = {
       operationId,
       responses: {
         [endpoint.getStatusCode("positive")]: depictResponse({
