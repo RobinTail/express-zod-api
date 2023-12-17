@@ -1,18 +1,6 @@
 import assert from "node:assert/strict";
-import type {
-  OpenApiBuilder as Builder30,
-  OperationObject as Operation30,
-  ReferenceObject as Ref30,
-  SchemaObject as Schema30,
-  SecuritySchemeObject as Security30,
-} from "openapi3-ts/oas30";
-import type {
-  OpenApiBuilder as Builder31,
-  OperationObject as Operation31,
-  ReferenceObject as Ref31,
-  SchemaObject as Schema31,
-  SecuritySchemeObject as Security31,
-} from "openapi3-ts/oas31";
+import type { OpenApiBuilder as Builder30 } from "openapi3-ts/oas30";
+import type { OpenApiBuilder as Builder31 } from "openapi3-ts/oas31";
 import { z } from "zod";
 import { DocumentationError } from "./errors";
 import {
@@ -33,11 +21,16 @@ import {
   ensureShortDescription,
   reformatParamsInPath,
 } from "./documentation-helpers";
+import {
+  CommonRef,
+  CommonSchemaOrRef,
+  CommonSecurity,
+  OAS,
+  SomeOperation,
+} from "./oas-types";
 import { loadPeer } from "./peer-helpers";
 import { Routing } from "./routing";
 import { RoutingWalkerParams, walkRouting } from "./routing-walker";
-
-type OAS = "3.0" | "3.1";
 
 interface DocumentationParams<V extends OAS> {
   oas?: V;
@@ -74,7 +67,7 @@ export async function createDocumentation(
   print: () => string;
 }>;
 export async function createDocumentation<V extends OAS>({
-  oas,
+  oas = "3.0" as V,
   routing,
   config,
   title,
@@ -126,20 +119,17 @@ export async function createDocumentation<V extends OAS>({
     builder.addServer({ url });
   }
 
-  const getRef = (name: string): Ref30 | Ref31 | undefined =>
+  const getRef = (name: string): CommonRef | undefined =>
     name in (builder.rootDoc.components?.schemas || {})
       ? { $ref: `#/components/schemas/${name}` }
       : undefined;
 
-  const makeRef = (
-    name: string,
-    schema: Schema30 | Ref30 | Schema31 | Ref31,
-  ) => {
-    builder.addSchema(name, schema as (Schema31 & Schema30) | (Ref31 & Ref30));
+  const makeRef = (name: string, schema: CommonSchemaOrRef) => {
+    builder.addSchema(name, schema);
     return getRef(name)!;
   };
 
-  const ensureUniqSecuritySchemaName = (subject: Security30 | Security31) => {
+  const ensureUniqSecuritySchemaName = (subject: CommonSecurity) => {
     const serializedSubject = JSON.stringify(subject);
     for (const name in builder.rootDoc.components?.securitySchemes || {}) {
       if (
@@ -163,6 +153,7 @@ export async function createDocumentation<V extends OAS>({
   ) => {
     const method = _method as Method;
     const commonParams = {
+      oas,
       path,
       method,
       endpoint,
@@ -185,7 +176,7 @@ export async function createDocumentation<V extends OAS>({
       method,
       endpoint.getOperationId(method),
     );
-    const operation: Operation30 | Operation31 = {
+    const operation: SomeOperation = {
       operationId,
       responses: {
         [endpoint.getStatusCode("positive")]: depictResponse({

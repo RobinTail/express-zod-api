@@ -25,8 +25,8 @@ paths:
                         type: integer
                         format: int64
                         minimum: 0
-                        exclusiveMinimum: false
                         maximum: 9007199254740991
+                        exclusiveMinimum: false
                         exclusiveMaximum: false
                       name:
                         type: string
@@ -329,8 +329,8 @@ paths:
                         type: integer
                         format: int64
                         minimum: 0
-                        exclusiveMinimum: false
                         maximum: 9007199254740991
+                        exclusiveMinimum: false
                         exclusiveMaximum: false
                       mime:
                         type: string
@@ -414,8 +414,8 @@ paths:
                         type: integer
                         format: int64
                         minimum: 0
-                        exclusiveMinimum: false
                         maximum: 9007199254740991
+                        exclusiveMinimum: false
                         exclusiveMaximum: false
                     required:
                       - length

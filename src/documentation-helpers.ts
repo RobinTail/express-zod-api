@@ -6,10 +6,8 @@ import type {
   MediaTypeObject,
   OAuthFlowsObject,
   ParameterObject,
-  ReferenceObject,
   RequestBodyObject,
   ResponseObject,
-  SchemaObject,
   SchemaObjectType,
   SecurityRequirementObject,
   SecuritySchemeObject,
@@ -41,6 +39,7 @@ import {
 } from "./logical-container";
 import { copyMeta } from "./metadata";
 import { Method } from "./method";
+import { CommonRef, CommonSchema, CommonSchemaOrRef, OAS } from "./oas-types";
 import {
   HandlingRules,
   HandlingVariant,
@@ -55,13 +54,11 @@ import { ZodUpload } from "./upload-schema";
 type MediaExamples = Pick<MediaTypeObject, "examples">;
 
 export interface OpenAPIContext extends FlatObject {
+  oas: OAS;
   isResponse: boolean;
   serializer: (schema: z.ZodTypeAny) => string;
-  getRef: (name: string) => ReferenceObject | undefined;
-  makeRef: (
-    name: string,
-    schema: SchemaObject | ReferenceObject,
-  ) => ReferenceObject;
+  getRef: (name: string) => CommonRef | undefined;
+  makeRef: (name: string, schema: CommonSchemaOrRef) => CommonRef;
   path: string;
   method: Method;
 }
@@ -69,12 +66,12 @@ export interface OpenAPIContext extends FlatObject {
 type Depicter<
   T extends z.ZodTypeAny,
   Variant extends HandlingVariant = "regular",
-> = SchemaHandler<T, SchemaObject | ReferenceObject, OpenAPIContext, Variant>;
+> = SchemaHandler<T, CommonSchemaOrRef, OpenAPIContext, Variant>;
 
 interface ReqResDepictHelperCommonProps
   extends Pick<
     OpenAPIContext,
-    "serializer" | "getRef" | "makeRef" | "path" | "method"
+    "serializer" | "getRef" | "makeRef" | "path" | "method" | "oas"
   > {
   endpoint: AbstractEndpoint;
   composition: "inline" | "components";
@@ -453,34 +450,47 @@ export const depictString: Depicter<z.ZodString> = ({
   };
 };
 
-/** @todo support exclusive min/max as numbers in case of OpenAPI v3.1.x */
-export const depictNumber: Depicter<z.ZodNumber> = ({ schema }) => {
+export const depictNumber: Depicter<z.ZodNumber> = ({ schema, oas }) => {
   const minCheck = schema._def.checks.find(({ kind }) => kind === "min") as
     | Extract<z.ZodNumberCheck, { kind: "min" }>
     | undefined;
+  const minimum =
+    schema.minValue === null
+      ? schema.isInt
+        ? Number.MIN_SAFE_INTEGER
+        : Number.MIN_VALUE
+      : schema.minValue;
   const isMinInclusive = minCheck ? minCheck.inclusive : true;
   const maxCheck = schema._def.checks.find(({ kind }) => kind === "max") as
     | Extract<z.ZodNumberCheck, { kind: "max" }>
     | undefined;
+  const maximum =
+    schema.maxValue === null
+      ? schema.isInt
+        ? Number.MAX_SAFE_INTEGER
+        : Number.MAX_VALUE
+      : schema.maxValue;
   const isMaxInclusive = maxCheck ? maxCheck.inclusive : true;
-  return {
+  const common: CommonSchema = {
     type: schema.isInt ? ("integer" as const) : ("number" as const),
     format: schema.isInt ? ("int64" as const) : ("double" as const),
-    minimum:
-      schema.minValue === null
-        ? schema.isInt
-          ? Number.MIN_SAFE_INTEGER
-          : Number.MIN_VALUE
-        : schema.minValue,
-    exclusiveMinimum: !isMinInclusive,
-    maximum:
-      schema.maxValue === null
-        ? schema.isInt
-          ? Number.MAX_SAFE_INTEGER
-          : Number.MAX_VALUE
-        : schema.maxValue,
-    exclusiveMaximum: !isMaxInclusive,
   };
+  // @todo satisfies
+  Object.assign(
+    common,
+    oas === "3.1"
+      ? {
+          ...(isMinInclusive ? { minimum } : { exclusiveMinimum: minimum }),
+          ...(isMinInclusive ? { maximum } : { exclusiveMaximum: maximum }),
+        }
+      : {
+          minimum,
+          maximum,
+          exclusiveMinimum: !isMinInclusive,
+          exclusiveMaximum: !isMaxInclusive,
+        },
+  );
+  return common;
 };
 
 export const depictObjectProperties = ({
@@ -492,11 +502,11 @@ export const depictObjectProperties = ({
       ...carry,
       [key]: next({ schema: shape[key] }),
     }),
-    {} as Record<string, SchemaObject | ReferenceObject>,
+    {} as Record<string, CommonSchemaOrRef>,
   );
 };
 
-const makeSample = (depicted: SchemaObject) => {
+const makeSample = (depicted: CommonSchema) => {
   const type = (
     Array.isArray(depicted.type) ? depicted.type[0] : depicted.type
   ) as keyof typeof samples;
@@ -543,7 +553,7 @@ export const depictLazy: Depicter<z.ZodLazy<z.ZodTypeAny>> = ({
   serializer: serialize,
   getRef,
   makeRef,
-}): ReferenceObject => {
+}): CommonRef => {
   const hash = serialize(lazy.schema);
   return (
     getRef(hash) ||
@@ -656,6 +666,7 @@ export const depictRequestParams = ({
   getRef,
   makeRef,
   composition,
+  oas,
   clue = "parameter",
 }: ReqResDepictHelperCommonProps & {
   inputSources: InputSource[];
@@ -688,6 +699,7 @@ export const depictRequestParams = ({
         makeRef,
         path,
         method,
+        oas,
       });
       const result =
         composition === "components"
@@ -710,10 +722,7 @@ export const depictRequestParams = ({
     });
 };
 
-export const depicters: HandlingRules<
-  SchemaObject | ReferenceObject,
-  OpenAPIContext
-> = {
+export const depicters: HandlingRules<CommonSchemaOrRef, OpenAPIContext> = {
   ZodString: depictString,
   ZodNumber: depictNumber,
   ZodBigInt: depictBigInt,
@@ -786,9 +795,9 @@ export const onMissing: Depicter<z.ZodTypeAny, "last"> = ({ schema, ...ctx }) =>
   );
 
 export const excludeParamsFromDepiction = (
-  depicted: SchemaObject | ReferenceObject,
+  depicted: CommonSchemaOrRef,
   pathParams: string[],
-): SchemaObject | ReferenceObject => {
+): CommonSchemaOrRef => {
   if ("$ref" in depicted) {
     return depicted;
   }
@@ -802,12 +811,12 @@ export const excludeParamsFromDepiction = (
     ? depicted.required.filter((name) => !pathParams.includes(name))
     : undefined;
   const allOf = depicted.allOf
-    ? (depicted.allOf as SchemaObject[]).map((entry) =>
+    ? (depicted.allOf as CommonSchema[]).map((entry) =>
         excludeParamsFromDepiction(entry, pathParams),
       )
     : undefined;
   const oneOf = depicted.oneOf
-    ? (depicted.oneOf as SchemaObject[]).map((entry) =>
+    ? (depicted.oneOf as CommonSchema[]).map((entry) =>
         excludeParamsFromDepiction(entry, pathParams),
       )
     : undefined;
@@ -828,8 +837,8 @@ export const excludeParamsFromDepiction = (
 };
 
 export const excludeExampleFromDepiction = (
-  depicted: SchemaObject | ReferenceObject,
-): SchemaObject | ReferenceObject =>
+  depicted: CommonSchemaOrRef,
+): CommonSchemaOrRef =>
   "$ref" in depicted ? depicted : omit(["example"], depicted);
 
 export const depictResponse = ({
@@ -841,6 +850,7 @@ export const depictResponse = ({
   getRef,
   makeRef,
   composition,
+  oas,
   clue = "response",
 }: ReqResDepictHelperCommonProps & {
   isPositive: boolean;
@@ -859,6 +869,7 @@ export const depictResponse = ({
       makeRef,
       path,
       method,
+      oas,
     }),
   );
   const examples = depictExamples(schema, true);
@@ -980,6 +991,7 @@ export const depictRequest = ({
   getRef,
   makeRef,
   composition,
+  oas,
   clue = "request body",
 }: ReqResDepictHelperCommonProps): RequestBodyObject => {
   const pathParams = getRoutePathParams(path);
@@ -997,6 +1009,7 @@ export const depictRequest = ({
         makeRef,
         path,
         method,
+        oas,
       }),
       pathParams,
     ),
