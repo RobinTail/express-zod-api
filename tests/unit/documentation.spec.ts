@@ -17,14 +17,14 @@ import { z } from "zod";
 import { givePort } from "../helpers";
 import { describe, expect, test, vi } from "vitest";
 
-describe("Documentation generator", () => {
+describe("createDocumentation()", () => {
   const sampleConfig = createConfig({
     cors: true,
     logger: { level: "silent" },
     server: { listen: givePort() },
   });
 
-  describe("print()", () => {
+  describe("Basic cases", () => {
     test.each([
       { composition: "inline" },
       { composition: "components" },

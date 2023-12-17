@@ -1,1206 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`Documentation generator > Feature 1180: Headers opt-in params > should describe x- inputs as header params 1`] = `
-"openapi: 3.0.0
-info:
-  title: Testing headers params
-  version: 3.4.5
-paths:
-  /v1/test:
-    get:
-      operationId: GetV1Test
-      responses:
-        "200":
-          description: GET /v1/test Successful response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    enum:
-                      - success
-                  data:
-                    type: object
-                    properties: {}
-                required:
-                  - status
-                  - data
-        "400":
-          description: GET /v1/test Error response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    enum:
-                      - error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                required:
-                  - status
-                  - error
-              examples:
-                example1:
-                  value:
-                    status: error
-                    error:
-                      message: Sample error message
-      parameters:
-        - name: id
-          in: query
-          required: true
-          description: GET /v1/test parameter
-          schema:
-            type: string
-        - name: x-request-id
-          in: header
-          required: true
-          description: GET /v1/test parameter
-          schema:
-            type: string
-components:
-  schemas: {}
-  responses: {}
-  parameters: {}
-  examples: {}
-  requestBodies: {}
-  headers: {}
-  securitySchemes: {}
-  links: {}
-  callbacks: {}
-tags: []
-servers:
-  - url: https://example.com
-"
-`;
-
-exports[`Documentation generator > Issue #98 > Should describe non-empty array 1`] = `
-"openapi: 3.0.0
-info:
-  title: "Testing issue #98"
-  version: 3.4.5
-paths:
-  /v1/getSomething:
-    get:
-      operationId: GetV1GetSomething
-      responses:
-        "200":
-          description: GET /v1/getSomething Successful response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    enum:
-                      - success
-                  data:
-                    type: object
-                    properties:
-                      arr:
-                        type: array
-                        items:
-                          type: string
-                        minItems: 1
-                    required:
-                      - arr
-                required:
-                  - status
-                  - data
-        "400":
-          description: GET /v1/getSomething Error response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    enum:
-                      - error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                required:
-                  - status
-                  - error
-              examples:
-                example1:
-                  value:
-                    status: error
-                    error:
-                      message: Sample error message
-      parameters:
-        - name: arr
-          in: query
-          required: true
-          description: GET /v1/getSomething parameter
-          schema:
-            type: array
-            items:
-              type: string
-            minItems: 1
-    post:
-      operationId: PostV1GetSomething
-      responses:
-        "200":
-          description: POST /v1/getSomething Successful response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    enum:
-                      - success
-                  data:
-                    type: object
-                    properties:
-                      arr:
-                        type: array
-                        items:
-                          type: string
-                        minItems: 1
-                    required:
-                      - arr
-                required:
-                  - status
-                  - data
-        "400":
-          description: POST /v1/getSomething Error response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    enum:
-                      - error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                required:
-                  - status
-                  - error
-              examples:
-                example1:
-                  value:
-                    status: error
-                    error:
-                      message: Sample error message
-      requestBody:
-        description: POST /v1/getSomething request body
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                arr:
-                  type: array
-                  items:
-                    type: string
-                  minItems: 1
-              required:
-                - arr
-components:
-  schemas: {}
-  responses: {}
-  parameters: {}
-  examples: {}
-  requestBodies: {}
-  headers: {}
-  securitySchemes: {}
-  links: {}
-  callbacks: {}
-tags: []
-servers:
-  - url: https://example.com
-"
-`;
-
-exports[`Documentation generator > Issue #98 > should union schemas 1`] = `
-"openapi: 3.0.0
-info:
-  title: "Testing issue #98"
-  version: 3.4.5
-paths:
-  /v1/getSomething:
-    post:
-      operationId: PostV1GetSomething
-      responses:
-        "200":
-          description: POST /v1/getSomething Successful response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    enum:
-                      - success
-                  data:
-                    oneOf:
-                      - type: object
-                        properties:
-                          id:
-                            type: string
-                          field1:
-                            type: string
-                        required:
-                          - id
-                          - field1
-                      - type: object
-                        properties:
-                          id:
-                            type: string
-                          field2:
-                            type: string
-                        required:
-                          - id
-                          - field2
-                required:
-                  - status
-                  - data
-        "400":
-          description: POST /v1/getSomething Error response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    enum:
-                      - error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                required:
-                  - status
-                  - error
-              examples:
-                example1:
-                  value:
-                    status: error
-                    error:
-                      message: Sample error message
-      requestBody:
-        description: POST /v1/getSomething request body
-        content:
-          application/json:
-            schema:
-              oneOf:
-                - type: object
-                  properties:
-                    id:
-                      type: string
-                    field1:
-                      type: string
-                  required:
-                    - id
-                    - field1
-                - type: object
-                  properties:
-                    id:
-                      type: string
-                    field2:
-                      type: string
-                  required:
-                    - id
-                    - field2
-components:
-  schemas: {}
-  responses: {}
-  parameters: {}
-  examples: {}
-  requestBodies: {}
-  headers: {}
-  securitySchemes: {}
-  links: {}
-  callbacks: {}
-tags: []
-servers:
-  - url: https://example.com
-"
-`;
-
-exports[`Documentation generator > Metadata > Issue #827: withMeta() should be immutable 1`] = `
-"openapi: 3.0.0
-info:
-  title: Testing Metadata:example on IO parameter
-  version: 3.4.5
-paths:
-  /v1/addSomething:
-    post:
-      operationId: PostV1AddSomething
-      responses:
-        "200":
-          description: POST /v1/addSomething Successful response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    enum:
-                      - success
-                  data:
-                    type: object
-                    properties:
-                      a:
-                        type: string
-                      b:
-                        type: string
-                    required:
-                      - a
-                      - b
-                    example:
-                      a: first
-                      b: prefix_first
-                required:
-                  - status
-                  - data
-              examples:
-                example1:
-                  value:
-                    status: success
-                    data:
-                      a: first
-                      b: prefix_first
-                example2:
-                  value:
-                    status: success
-                    data:
-                      a: second
-                      b: prefix_second
-        "400":
-          description: POST /v1/addSomething Error response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    enum:
-                      - error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                required:
-                  - status
-                  - error
-              examples:
-                example1:
-                  value:
-                    status: error
-                    error:
-                      message: Sample error message
-      requestBody:
-        description: POST /v1/addSomething request body
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                a:
-                  type: string
-              required:
-                - a
-            examples:
-              example1:
-                value:
-                  a: first
-components:
-  schemas: {}
-  responses: {}
-  parameters: {}
-  examples: {}
-  requestBodies: {}
-  headers: {}
-  securitySchemes: {}
-  links: {}
-  callbacks: {}
-tags: []
-servers:
-  - url: https://example.com
-"
-`;
-
-exports[`Documentation generator > Metadata > Issue #929: the location of the custom description should be on the param level 1`] = `
-"openapi: 3.0.0
-info:
-  title: Testing Metadata:description
-  version: 3.4.5
-paths:
-  /hris/employees:
-    get:
-      operationId: GetHrisEmployees
-      responses:
-        "200":
-          description: GET /hris/employees Successful response
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/GetHrisEmployeesSuccessfulResponse"
-        "400":
-          description: GET /hris/employees Error response
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/GetHrisEmployeesErrorResponse"
-              examples:
-                example1:
-                  value:
-                    status: error
-                    error:
-                      message: Sample error message
-      parameters:
-        - name: cursor
-          in: query
-          required: false
-          description: An optional cursor string used for pagination. This can be
-            retrieved from the \`next\` property of the previous page response.
-          schema:
-            $ref: "#/components/schemas/GetHrisEmployeesParameterCursor"
-components:
-  schemas:
-    GetHrisEmployeesParameterCursor:
-      type: string
-      description: An optional cursor string used for pagination. This can be
-        retrieved from the \`next\` property of the previous page response.
-    GetHrisEmployeesSuccessfulResponse:
-      type: object
-      properties:
-        status:
-          type: string
-          enum:
-            - success
-        data:
-          type: object
-          properties: {}
-      required:
-        - status
-        - data
-    GetHrisEmployeesErrorResponse:
-      type: object
-      properties:
-        status:
-          type: string
-          enum:
-            - error
-        error:
-          type: object
-          properties:
-            message:
-              type: string
-          required:
-            - message
-      required:
-        - status
-        - error
-  responses: {}
-  parameters: {}
-  examples: {}
-  requestBodies: {}
-  headers: {}
-  securitySchemes: {}
-  links: {}
-  callbacks: {}
-tags: []
-servers:
-  - url: https://example.com
-"
-`;
-
-exports[`Documentation generator > Metadata > should merge endpoint handler examples with its middleware examples 1`] = `
-"openapi: 3.0.0
-info:
-  title: Testing Metadata:example on IO schema + middleware
-  version: 3.4.5
-paths:
-  /v1/getSomething:
-    post:
-      operationId: PostV1GetSomething
-      responses:
-        "200":
-          description: POST /v1/getSomething Successful response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    enum:
-                      - success
-                  data:
-                    type: object
-                    properties:
-                      num:
-                        type: number
-                        format: double
-                        minimum: 5e-324
-                        exclusiveMinimum: false
-                        maximum: 1.7976931348623157e+308
-                        exclusiveMaximum: false
-                    required:
-                      - num
-                    example:
-                      num: 123
-                required:
-                  - status
-                  - data
-              examples:
-                example1:
-                  value:
-                    status: success
-                    data:
-                      num: 123
-        "400":
-          description: POST /v1/getSomething Error response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    enum:
-                      - error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                required:
-                  - status
-                  - error
-              examples:
-                example1:
-                  value:
-                    status: error
-                    error:
-                      message: Sample error message
-      requestBody:
-        description: POST /v1/getSomething request body
-        content:
-          application/json:
-            schema:
-              allOf:
-                - type: object
-                  properties:
-                    key:
-                      type: string
-                  required:
-                    - key
-                  example:
-                    key: 1234-56789-01
-                - type: object
-                  properties:
-                    str:
-                      type: string
-                  required:
-                    - str
-                  example:
-                    str: test
-            examples:
-              example1:
-                value:
-                  key: 1234-56789-01
-                  str: test
-components:
-  schemas: {}
-  responses: {}
-  parameters: {}
-  examples: {}
-  requestBodies: {}
-  headers: {}
-  securitySchemes: {}
-  links: {}
-  callbacks: {}
-tags: []
-servers:
-  - url: https://example.com
-"
-`;
-
-exports[`Documentation generator > Metadata > should pass over examples of each param from the whole IO schema examples (GET) 1`] = `
-"openapi: 3.0.0
-info:
-  title: Testing Metadata:example on IO schema
-  version: 3.4.5
-paths:
-  /v1/getSomething:
-    get:
-      operationId: GetV1GetSomething
-      responses:
-        "200":
-          description: GET /v1/getSomething Successful response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    enum:
-                      - success
-                  data:
-                    type: object
-                    properties:
-                      numericStr:
-                        type: string
-                    required:
-                      - numericStr
-                    example:
-                      numericStr: "123"
-                required:
-                  - status
-                  - data
-              examples:
-                example1:
-                  value:
-                    status: success
-                    data:
-                      numericStr: "123"
-        "400":
-          description: GET /v1/getSomething Error response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    enum:
-                      - error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                required:
-                  - status
-                  - error
-              examples:
-                example1:
-                  value:
-                    status: error
-                    error:
-                      message: Sample error message
-      parameters:
-        - name: strNum
-          in: query
-          required: true
-          description: GET /v1/getSomething parameter
-          schema:
-            type: string
-          examples:
-            example1:
-              value: "123"
-components:
-  schemas: {}
-  responses: {}
-  parameters: {}
-  examples: {}
-  requestBodies: {}
-  headers: {}
-  securitySchemes: {}
-  links: {}
-  callbacks: {}
-tags: []
-servers:
-  - url: https://example.com
-"
-`;
-
-exports[`Documentation generator > Metadata > should pass over examples of the whole IO schema (POST) 1`] = `
-"openapi: 3.0.0
-info:
-  title: Testing Metadata:example on IO schema
-  version: 3.4.5
-paths:
-  /v1/getSomething:
-    post:
-      operationId: PostV1GetSomething
-      responses:
-        "200":
-          description: POST /v1/getSomething Successful response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    enum:
-                      - success
-                  data:
-                    type: object
-                    properties:
-                      numericStr:
-                        type: string
-                    required:
-                      - numericStr
-                    example:
-                      numericStr: "123"
-                required:
-                  - status
-                  - data
-              examples:
-                example1:
-                  value:
-                    status: success
-                    data:
-                      numericStr: "123"
-        "400":
-          description: POST /v1/getSomething Error response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    enum:
-                      - error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                required:
-                  - status
-                  - error
-              examples:
-                example1:
-                  value:
-                    status: error
-                    error:
-                      message: Sample error message
-      requestBody:
-        description: POST /v1/getSomething request body
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                strNum:
-                  type: string
-              required:
-                - strNum
-            examples:
-              example1:
-                value:
-                  strNum: "123"
-components:
-  schemas: {}
-  responses: {}
-  parameters: {}
-  examples: {}
-  requestBodies: {}
-  headers: {}
-  securitySchemes: {}
-  links: {}
-  callbacks: {}
-tags: []
-servers:
-  - url: https://example.com
-"
-`;
-
-exports[`Documentation generator > Metadata > should pass over the example of an individual parameter 1`] = `
-"openapi: 3.0.0
-info:
-  title: Testing Metadata:example on IO parameter
-  version: 3.4.5
-paths:
-  /v1/getSomething:
-    get:
-      operationId: GetV1GetSomething
-      responses:
-        "200":
-          description: GET /v1/getSomething Successful response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    enum:
-                      - success
-                  data:
-                    type: object
-                    properties:
-                      numericStr:
-                        type: string
-                        example: "123"
-                    required:
-                      - numericStr
-                required:
-                  - status
-                  - data
-        "400":
-          description: GET /v1/getSomething Error response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    enum:
-                      - error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                required:
-                  - status
-                  - error
-              examples:
-                example1:
-                  value:
-                    status: error
-                    error:
-                      message: Sample error message
-      parameters:
-        - name: strNum
-          in: query
-          required: true
-          description: GET /v1/getSomething parameter
-          schema:
-            type: string
-            example: "123"
-components:
-  schemas: {}
-  responses: {}
-  parameters: {}
-  examples: {}
-  requestBodies: {}
-  headers: {}
-  securitySchemes: {}
-  links: {}
-  callbacks: {}
-tags: []
-servers:
-  - url: https://example.com
-"
-`;
-
-exports[`Documentation generator > Metadata > should pass over the schema description 1`] = `
-"openapi: 3.0.0
-info:
-  title: Testing Metadata:description
-  version: 3.4.5
-paths:
-  /v1/getSomething:
-    get:
-      operationId: GetV1GetSomething
-      responses:
-        "200":
-          description: GET /v1/getSomething Successful response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    enum:
-                      - success
-                  data:
-                    type: object
-                    properties:
-                      result:
-                        type: integer
-                        format: int64
-                        minimum: 0
-                        exclusiveMinimum: true
-                        maximum: 9007199254740991
-                        exclusiveMaximum: false
-                        description: some positive integer
-                    required:
-                      - result
-                required:
-                  - status
-                  - data
-        "400":
-          description: GET /v1/getSomething Error response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    enum:
-                      - error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                required:
-                  - status
-                  - error
-              examples:
-                example1:
-                  value:
-                    status: error
-                    error:
-                      message: Sample error message
-      parameters:
-        - name: str
-          in: query
-          required: true
-          description: here is the test
-          schema:
-            type: string
-            description: here is the test
-components:
-  schemas: {}
-  responses: {}
-  parameters: {}
-  examples: {}
-  requestBodies: {}
-  headers: {}
-  securitySchemes: {}
-  links: {}
-  callbacks: {}
-tags: []
-servers:
-  - url: https://example.com
-"
-`;
-
-exports[`Documentation generator > Route Path Params > should handle route path params for GET request 1`] = `
-"openapi: 3.0.0
-info:
-  title: Testing route path params
-  version: 3.4.5
-paths:
-  /v1/{name}:
-    get:
-      operationId: GetV1Name
-      responses:
-        "200":
-          description: GET /v1/:name Successful response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    enum:
-                      - success
-                  data:
-                    type: object
-                    properties: {}
-                required:
-                  - status
-                  - data
-        "400":
-          description: GET /v1/:name Error response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    enum:
-                      - error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                required:
-                  - status
-                  - error
-              examples:
-                example1:
-                  value:
-                    status: error
-                    error:
-                      message: Sample error message
-      parameters:
-        - name: name
-          in: path
-          required: true
-          description: GET /v1/:name parameter
-          schema:
-            oneOf:
-              - type: string
-                enum:
-                  - John
-              - type: string
-                enum:
-                  - Jane
-        - name: other
-          in: query
-          required: true
-          description: GET /v1/:name parameter
-          schema:
-            type: boolean
-components:
-  schemas: {}
-  responses: {}
-  parameters: {}
-  examples: {}
-  requestBodies: {}
-  headers: {}
-  securitySchemes: {}
-  links: {}
-  callbacks: {}
-tags: []
-servers:
-  - url: https://example.com
-"
-`;
-
-exports[`Documentation generator > Route Path Params > should handle route path params for POST request 1`] = `
-"openapi: 3.0.0
-info:
-  title: Testing route path params
-  version: 3.4.5
-paths:
-  /v1/{name}:
-    post:
-      operationId: PostV1Name
-      responses:
-        "200":
-          description: POST /v1/:name Successful response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    enum:
-                      - success
-                  data:
-                    type: object
-                    properties: {}
-                required:
-                  - status
-                  - data
-        "400":
-          description: POST /v1/:name Error response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    enum:
-                      - error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                required:
-                  - status
-                  - error
-              examples:
-                example1:
-                  value:
-                    status: error
-                    error:
-                      message: Sample error message
-      parameters:
-        - name: name
-          in: path
-          required: true
-          description: POST /v1/:name parameter
-          schema:
-            oneOf:
-              - type: string
-                enum:
-                  - John
-              - type: string
-                enum:
-                  - Jane
-      requestBody:
-        description: POST /v1/:name request body
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                other:
-                  type: boolean
-              required:
-                - other
-components:
-  schemas: {}
-  responses: {}
-  parameters: {}
-  examples: {}
-  requestBodies: {}
-  headers: {}
-  securitySchemes: {}
-  links: {}
-  callbacks: {}
-tags: []
-servers:
-  - url: https://example.com
-"
-`;
-
-exports[`Documentation generator > print() > should be able to specify operation 1`] = `
+exports[`createDocumentation() > Basic cases > should be able to specify operation 1`] = `
 "openapi: 3.0.0
 info:
   title: Testing Operation IDs
@@ -1272,7 +72,7 @@ servers:
 "
 `;
 
-exports[`Documentation generator > print() > should be able to specify the operationId provider depending on method 1`] = `
+exports[`createDocumentation() > Basic cases > should be able to specify the operationId provider depending on method 1`] = `
 "openapi: 3.0.0
 info:
   title: Testing Operation IDs
@@ -1400,7 +200,7 @@ servers:
 "
 `;
 
-exports[`Documentation generator > print() > should ensure the uniq operation ids 1`] = `
+exports[`createDocumentation() > Basic cases > should ensure the uniq operation ids 1`] = `
 "openapi: 3.0.0
 info:
   title: Testing Operation IDs
@@ -1522,7 +322,7 @@ servers:
 "
 `;
 
-exports[`Documentation generator > print() > should ensure uniq security schema names 1`] = `
+exports[`createDocumentation() > Basic cases > should ensure uniq security schema names 1`] = `
 "openapi: 3.0.0
 info:
   title: Testing Security
@@ -1758,7 +558,7 @@ servers:
 "
 `;
 
-exports[`Documentation generator > print() > should generate the correct schema for DELETE request without body 1`] = `
+exports[`createDocumentation() > Basic cases > should generate the correct schema for DELETE request without body 1`] = `
 "openapi: 3.0.0
 info:
   title: Testing DELETE request without body
@@ -1837,7 +637,7 @@ servers:
 "
 `;
 
-exports[`Documentation generator > print() > should generate the correct schema for complex types 1`] = `
+exports[`createDocumentation() > Basic cases > should generate the correct schema for complex types 1`] = `
 "openapi: 3.0.0
 info:
   title: Testing Complex Types
@@ -1951,7 +751,7 @@ servers:
 "
 `;
 
-exports[`Documentation generator > print() > should generate the correct schema for discriminated union type 1`] = `
+exports[`createDocumentation() > Basic cases > should generate the correct schema for discriminated union type 1`] = `
 "openapi: 3.0.0
 info:
   title: Testing Discriminated Union Type
@@ -2078,7 +878,7 @@ servers:
 "
 `;
 
-exports[`Documentation generator > print() > should generate the correct schema for intersection type 1`] = `
+exports[`createDocumentation() > Basic cases > should generate the correct schema for intersection type 1`] = `
 "openapi: 3.0.0
 info:
   title: Testing Intersection and And types
@@ -2192,7 +992,7 @@ servers:
 "
 `;
 
-exports[`Documentation generator > print() > should generate the correct schema for nullable and optional types 1`] = `
+exports[`createDocumentation() > Basic cases > should generate the correct schema for nullable and optional types 1`] = `
 "openapi: 3.0.0
 info:
   title: Testing Nullable and Optional Types
@@ -2301,7 +1101,7 @@ servers:
 "
 `;
 
-exports[`Documentation generator > print() > should generate the correct schema for union type 1`] = `
+exports[`createDocumentation() > Basic cases > should generate the correct schema for union type 1`] = `
 "openapi: 3.0.0
 info:
   title: Testing Union and Or Types
@@ -2421,7 +1221,7 @@ servers:
 "
 `;
 
-exports[`Documentation generator > print() > should generate the correct schema of example routing 0 1`] = `
+exports[`createDocumentation() > Basic cases > should generate the correct schema of example routing 0 1`] = `
 "openapi: 3.0.0
 info:
   title: Example API
@@ -2922,7 +1722,7 @@ servers:
 "
 `;
 
-exports[`Documentation generator > print() > should generate the correct schema of example routing 1 1`] = `
+exports[`createDocumentation() > Basic cases > should generate the correct schema of example routing 1 1`] = `
 "openapi: 3.0.0
 info:
   title: Example API
@@ -3465,7 +2265,7 @@ servers:
 "
 `;
 
-exports[`Documentation generator > print() > should handle bigint, boolean, date, null and readonly 1`] = `
+exports[`createDocumentation() > Basic cases > should handle bigint, boolean, date, null and readonly 1`] = `
 "openapi: 3.0.0
 info:
   title: Testing additional types
@@ -3571,7 +2371,7 @@ servers:
 "
 `;
 
-exports[`Documentation generator > print() > should handle circular schemas via z.lazy() 1`] = `
+exports[`createDocumentation() > Basic cases > should handle circular schemas via z.lazy() 1`] = `
 "openapi: 3.0.0
 info:
   title: Testing Lazy
@@ -3676,7 +2476,7 @@ servers:
 "
 `;
 
-exports[`Documentation generator > print() > should handle custom mime types and status codes 1`] = `
+exports[`createDocumentation() > Basic cases > should handle custom mime types and status codes 1`] = `
 "openapi: 3.0.0
 info:
   title: Testing MIME types and status codes
@@ -3734,7 +2534,7 @@ servers:
 "
 `;
 
-exports[`Documentation generator > print() > should handle different number types 1`] = `
+exports[`createDocumentation() > Basic cases > should handle different number types 1`] = `
 "openapi: 3.0.0
 info:
   title: Testing numbers
@@ -3888,7 +2688,7 @@ servers:
 "
 `;
 
-exports[`Documentation generator > print() > should handle different string types 1`] = `
+exports[`createDocumentation() > Basic cases > should handle different string types 1`] = `
 "openapi: 3.0.0
 info:
   title: Testing strings
@@ -4030,7 +2830,7 @@ servers:
 "
 `;
 
-exports[`Documentation generator > print() > should handle enum types 1`] = `
+exports[`createDocumentation() > Basic cases > should handle enum types 1`] = `
 "openapi: 3.0.0
 info:
   title: Testing enums
@@ -4121,7 +2921,7 @@ servers:
 "
 `;
 
-exports[`Documentation generator > print() > should handle record 1`] = `
+exports[`createDocumentation() > Basic cases > should handle record 1`] = `
 "openapi: 3.0.0
 info:
   title: Testing record
@@ -4249,7 +3049,7 @@ servers:
 "
 `;
 
-exports[`Documentation generator > print() > should handle transformation schema in output 1`] = `
+exports[`createDocumentation() > Basic cases > should handle transformation schema in output 1`] = `
 "openapi: 3.0.0
 info:
   title: Testing Transformation in response schema
@@ -4342,7 +3142,7 @@ servers:
 "
 `;
 
-exports[`Documentation generator > print() > should handle tuples 1`] = `
+exports[`createDocumentation() > Basic cases > should handle tuples 1`] = `
 "openapi: 3.0.0
 info:
   title: Testing tuples
@@ -4468,7 +3268,7 @@ servers:
 "
 `;
 
-exports[`Documentation generator > print() > should handle type any 1`] = `
+exports[`createDocumentation() > Basic cases > should handle type any 1`] = `
 "openapi: 3.0.0
 info:
   title: Testing type any
@@ -4547,7 +3347,7 @@ servers:
 "
 `;
 
-exports[`Documentation generator > print() > should handle z.preprocess() 1`] = `
+exports[`createDocumentation() > Basic cases > should handle z.preprocess() 1`] = `
 "openapi: 3.0.0
 info:
   title: Testing z.preprocess()
@@ -4621,6 +3421,1206 @@ paths:
             exclusiveMinimum: false
             maximum: 9007199254740991
             exclusiveMaximum: false
+components:
+  schemas: {}
+  responses: {}
+  parameters: {}
+  examples: {}
+  requestBodies: {}
+  headers: {}
+  securitySchemes: {}
+  links: {}
+  callbacks: {}
+tags: []
+servers:
+  - url: https://example.com
+"
+`;
+
+exports[`createDocumentation() > Feature 1180: Headers opt-in params > should describe x- inputs as header params 1`] = `
+"openapi: 3.0.0
+info:
+  title: Testing headers params
+  version: 3.4.5
+paths:
+  /v1/test:
+    get:
+      operationId: GetV1Test
+      responses:
+        "200":
+          description: GET /v1/test Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - success
+                  data:
+                    type: object
+                    properties: {}
+                required:
+                  - status
+                  - data
+        "400":
+          description: GET /v1/test Error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                required:
+                  - status
+                  - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
+      parameters:
+        - name: id
+          in: query
+          required: true
+          description: GET /v1/test parameter
+          schema:
+            type: string
+        - name: x-request-id
+          in: header
+          required: true
+          description: GET /v1/test parameter
+          schema:
+            type: string
+components:
+  schemas: {}
+  responses: {}
+  parameters: {}
+  examples: {}
+  requestBodies: {}
+  headers: {}
+  securitySchemes: {}
+  links: {}
+  callbacks: {}
+tags: []
+servers:
+  - url: https://example.com
+"
+`;
+
+exports[`createDocumentation() > Issue #98 > Should describe non-empty array 1`] = `
+"openapi: 3.0.0
+info:
+  title: "Testing issue #98"
+  version: 3.4.5
+paths:
+  /v1/getSomething:
+    get:
+      operationId: GetV1GetSomething
+      responses:
+        "200":
+          description: GET /v1/getSomething Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - success
+                  data:
+                    type: object
+                    properties:
+                      arr:
+                        type: array
+                        items:
+                          type: string
+                        minItems: 1
+                    required:
+                      - arr
+                required:
+                  - status
+                  - data
+        "400":
+          description: GET /v1/getSomething Error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                required:
+                  - status
+                  - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
+      parameters:
+        - name: arr
+          in: query
+          required: true
+          description: GET /v1/getSomething parameter
+          schema:
+            type: array
+            items:
+              type: string
+            minItems: 1
+    post:
+      operationId: PostV1GetSomething
+      responses:
+        "200":
+          description: POST /v1/getSomething Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - success
+                  data:
+                    type: object
+                    properties:
+                      arr:
+                        type: array
+                        items:
+                          type: string
+                        minItems: 1
+                    required:
+                      - arr
+                required:
+                  - status
+                  - data
+        "400":
+          description: POST /v1/getSomething Error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                required:
+                  - status
+                  - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
+      requestBody:
+        description: POST /v1/getSomething request body
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                arr:
+                  type: array
+                  items:
+                    type: string
+                  minItems: 1
+              required:
+                - arr
+components:
+  schemas: {}
+  responses: {}
+  parameters: {}
+  examples: {}
+  requestBodies: {}
+  headers: {}
+  securitySchemes: {}
+  links: {}
+  callbacks: {}
+tags: []
+servers:
+  - url: https://example.com
+"
+`;
+
+exports[`createDocumentation() > Issue #98 > should union schemas 1`] = `
+"openapi: 3.0.0
+info:
+  title: "Testing issue #98"
+  version: 3.4.5
+paths:
+  /v1/getSomething:
+    post:
+      operationId: PostV1GetSomething
+      responses:
+        "200":
+          description: POST /v1/getSomething Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - success
+                  data:
+                    oneOf:
+                      - type: object
+                        properties:
+                          id:
+                            type: string
+                          field1:
+                            type: string
+                        required:
+                          - id
+                          - field1
+                      - type: object
+                        properties:
+                          id:
+                            type: string
+                          field2:
+                            type: string
+                        required:
+                          - id
+                          - field2
+                required:
+                  - status
+                  - data
+        "400":
+          description: POST /v1/getSomething Error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                required:
+                  - status
+                  - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
+      requestBody:
+        description: POST /v1/getSomething request body
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - type: object
+                  properties:
+                    id:
+                      type: string
+                    field1:
+                      type: string
+                  required:
+                    - id
+                    - field1
+                - type: object
+                  properties:
+                    id:
+                      type: string
+                    field2:
+                      type: string
+                  required:
+                    - id
+                    - field2
+components:
+  schemas: {}
+  responses: {}
+  parameters: {}
+  examples: {}
+  requestBodies: {}
+  headers: {}
+  securitySchemes: {}
+  links: {}
+  callbacks: {}
+tags: []
+servers:
+  - url: https://example.com
+"
+`;
+
+exports[`createDocumentation() > Metadata > Issue #827: withMeta() should be immutable 1`] = `
+"openapi: 3.0.0
+info:
+  title: Testing Metadata:example on IO parameter
+  version: 3.4.5
+paths:
+  /v1/addSomething:
+    post:
+      operationId: PostV1AddSomething
+      responses:
+        "200":
+          description: POST /v1/addSomething Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - success
+                  data:
+                    type: object
+                    properties:
+                      a:
+                        type: string
+                      b:
+                        type: string
+                    required:
+                      - a
+                      - b
+                    example:
+                      a: first
+                      b: prefix_first
+                required:
+                  - status
+                  - data
+              examples:
+                example1:
+                  value:
+                    status: success
+                    data:
+                      a: first
+                      b: prefix_first
+                example2:
+                  value:
+                    status: success
+                    data:
+                      a: second
+                      b: prefix_second
+        "400":
+          description: POST /v1/addSomething Error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                required:
+                  - status
+                  - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
+      requestBody:
+        description: POST /v1/addSomething request body
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                a:
+                  type: string
+              required:
+                - a
+            examples:
+              example1:
+                value:
+                  a: first
+components:
+  schemas: {}
+  responses: {}
+  parameters: {}
+  examples: {}
+  requestBodies: {}
+  headers: {}
+  securitySchemes: {}
+  links: {}
+  callbacks: {}
+tags: []
+servers:
+  - url: https://example.com
+"
+`;
+
+exports[`createDocumentation() > Metadata > Issue #929: the location of the custom description should be on the param level 1`] = `
+"openapi: 3.0.0
+info:
+  title: Testing Metadata:description
+  version: 3.4.5
+paths:
+  /hris/employees:
+    get:
+      operationId: GetHrisEmployees
+      responses:
+        "200":
+          description: GET /hris/employees Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetHrisEmployeesSuccessfulResponse"
+        "400":
+          description: GET /hris/employees Error response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetHrisEmployeesErrorResponse"
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
+      parameters:
+        - name: cursor
+          in: query
+          required: false
+          description: An optional cursor string used for pagination. This can be
+            retrieved from the \`next\` property of the previous page response.
+          schema:
+            $ref: "#/components/schemas/GetHrisEmployeesParameterCursor"
+components:
+  schemas:
+    GetHrisEmployeesParameterCursor:
+      type: string
+      description: An optional cursor string used for pagination. This can be
+        retrieved from the \`next\` property of the previous page response.
+    GetHrisEmployeesSuccessfulResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+            - success
+        data:
+          type: object
+          properties: {}
+      required:
+        - status
+        - data
+    GetHrisEmployeesErrorResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+            - error
+        error:
+          type: object
+          properties:
+            message:
+              type: string
+          required:
+            - message
+      required:
+        - status
+        - error
+  responses: {}
+  parameters: {}
+  examples: {}
+  requestBodies: {}
+  headers: {}
+  securitySchemes: {}
+  links: {}
+  callbacks: {}
+tags: []
+servers:
+  - url: https://example.com
+"
+`;
+
+exports[`createDocumentation() > Metadata > should merge endpoint handler examples with its middleware examples 1`] = `
+"openapi: 3.0.0
+info:
+  title: Testing Metadata:example on IO schema + middleware
+  version: 3.4.5
+paths:
+  /v1/getSomething:
+    post:
+      operationId: PostV1GetSomething
+      responses:
+        "200":
+          description: POST /v1/getSomething Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - success
+                  data:
+                    type: object
+                    properties:
+                      num:
+                        type: number
+                        format: double
+                        minimum: 5e-324
+                        exclusiveMinimum: false
+                        maximum: 1.7976931348623157e+308
+                        exclusiveMaximum: false
+                    required:
+                      - num
+                    example:
+                      num: 123
+                required:
+                  - status
+                  - data
+              examples:
+                example1:
+                  value:
+                    status: success
+                    data:
+                      num: 123
+        "400":
+          description: POST /v1/getSomething Error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                required:
+                  - status
+                  - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
+      requestBody:
+        description: POST /v1/getSomething request body
+        content:
+          application/json:
+            schema:
+              allOf:
+                - type: object
+                  properties:
+                    key:
+                      type: string
+                  required:
+                    - key
+                  example:
+                    key: 1234-56789-01
+                - type: object
+                  properties:
+                    str:
+                      type: string
+                  required:
+                    - str
+                  example:
+                    str: test
+            examples:
+              example1:
+                value:
+                  key: 1234-56789-01
+                  str: test
+components:
+  schemas: {}
+  responses: {}
+  parameters: {}
+  examples: {}
+  requestBodies: {}
+  headers: {}
+  securitySchemes: {}
+  links: {}
+  callbacks: {}
+tags: []
+servers:
+  - url: https://example.com
+"
+`;
+
+exports[`createDocumentation() > Metadata > should pass over examples of each param from the whole IO schema examples (GET) 1`] = `
+"openapi: 3.0.0
+info:
+  title: Testing Metadata:example on IO schema
+  version: 3.4.5
+paths:
+  /v1/getSomething:
+    get:
+      operationId: GetV1GetSomething
+      responses:
+        "200":
+          description: GET /v1/getSomething Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - success
+                  data:
+                    type: object
+                    properties:
+                      numericStr:
+                        type: string
+                    required:
+                      - numericStr
+                    example:
+                      numericStr: "123"
+                required:
+                  - status
+                  - data
+              examples:
+                example1:
+                  value:
+                    status: success
+                    data:
+                      numericStr: "123"
+        "400":
+          description: GET /v1/getSomething Error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                required:
+                  - status
+                  - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
+      parameters:
+        - name: strNum
+          in: query
+          required: true
+          description: GET /v1/getSomething parameter
+          schema:
+            type: string
+          examples:
+            example1:
+              value: "123"
+components:
+  schemas: {}
+  responses: {}
+  parameters: {}
+  examples: {}
+  requestBodies: {}
+  headers: {}
+  securitySchemes: {}
+  links: {}
+  callbacks: {}
+tags: []
+servers:
+  - url: https://example.com
+"
+`;
+
+exports[`createDocumentation() > Metadata > should pass over examples of the whole IO schema (POST) 1`] = `
+"openapi: 3.0.0
+info:
+  title: Testing Metadata:example on IO schema
+  version: 3.4.5
+paths:
+  /v1/getSomething:
+    post:
+      operationId: PostV1GetSomething
+      responses:
+        "200":
+          description: POST /v1/getSomething Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - success
+                  data:
+                    type: object
+                    properties:
+                      numericStr:
+                        type: string
+                    required:
+                      - numericStr
+                    example:
+                      numericStr: "123"
+                required:
+                  - status
+                  - data
+              examples:
+                example1:
+                  value:
+                    status: success
+                    data:
+                      numericStr: "123"
+        "400":
+          description: POST /v1/getSomething Error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                required:
+                  - status
+                  - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
+      requestBody:
+        description: POST /v1/getSomething request body
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                strNum:
+                  type: string
+              required:
+                - strNum
+            examples:
+              example1:
+                value:
+                  strNum: "123"
+components:
+  schemas: {}
+  responses: {}
+  parameters: {}
+  examples: {}
+  requestBodies: {}
+  headers: {}
+  securitySchemes: {}
+  links: {}
+  callbacks: {}
+tags: []
+servers:
+  - url: https://example.com
+"
+`;
+
+exports[`createDocumentation() > Metadata > should pass over the example of an individual parameter 1`] = `
+"openapi: 3.0.0
+info:
+  title: Testing Metadata:example on IO parameter
+  version: 3.4.5
+paths:
+  /v1/getSomething:
+    get:
+      operationId: GetV1GetSomething
+      responses:
+        "200":
+          description: GET /v1/getSomething Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - success
+                  data:
+                    type: object
+                    properties:
+                      numericStr:
+                        type: string
+                        example: "123"
+                    required:
+                      - numericStr
+                required:
+                  - status
+                  - data
+        "400":
+          description: GET /v1/getSomething Error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                required:
+                  - status
+                  - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
+      parameters:
+        - name: strNum
+          in: query
+          required: true
+          description: GET /v1/getSomething parameter
+          schema:
+            type: string
+            example: "123"
+components:
+  schemas: {}
+  responses: {}
+  parameters: {}
+  examples: {}
+  requestBodies: {}
+  headers: {}
+  securitySchemes: {}
+  links: {}
+  callbacks: {}
+tags: []
+servers:
+  - url: https://example.com
+"
+`;
+
+exports[`createDocumentation() > Metadata > should pass over the schema description 1`] = `
+"openapi: 3.0.0
+info:
+  title: Testing Metadata:description
+  version: 3.4.5
+paths:
+  /v1/getSomething:
+    get:
+      operationId: GetV1GetSomething
+      responses:
+        "200":
+          description: GET /v1/getSomething Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - success
+                  data:
+                    type: object
+                    properties:
+                      result:
+                        type: integer
+                        format: int64
+                        minimum: 0
+                        exclusiveMinimum: true
+                        maximum: 9007199254740991
+                        exclusiveMaximum: false
+                        description: some positive integer
+                    required:
+                      - result
+                required:
+                  - status
+                  - data
+        "400":
+          description: GET /v1/getSomething Error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                required:
+                  - status
+                  - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
+      parameters:
+        - name: str
+          in: query
+          required: true
+          description: here is the test
+          schema:
+            type: string
+            description: here is the test
+components:
+  schemas: {}
+  responses: {}
+  parameters: {}
+  examples: {}
+  requestBodies: {}
+  headers: {}
+  securitySchemes: {}
+  links: {}
+  callbacks: {}
+tags: []
+servers:
+  - url: https://example.com
+"
+`;
+
+exports[`createDocumentation() > Route Path Params > should handle route path params for GET request 1`] = `
+"openapi: 3.0.0
+info:
+  title: Testing route path params
+  version: 3.4.5
+paths:
+  /v1/{name}:
+    get:
+      operationId: GetV1Name
+      responses:
+        "200":
+          description: GET /v1/:name Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - success
+                  data:
+                    type: object
+                    properties: {}
+                required:
+                  - status
+                  - data
+        "400":
+          description: GET /v1/:name Error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                required:
+                  - status
+                  - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
+      parameters:
+        - name: name
+          in: path
+          required: true
+          description: GET /v1/:name parameter
+          schema:
+            oneOf:
+              - type: string
+                enum:
+                  - John
+              - type: string
+                enum:
+                  - Jane
+        - name: other
+          in: query
+          required: true
+          description: GET /v1/:name parameter
+          schema:
+            type: boolean
+components:
+  schemas: {}
+  responses: {}
+  parameters: {}
+  examples: {}
+  requestBodies: {}
+  headers: {}
+  securitySchemes: {}
+  links: {}
+  callbacks: {}
+tags: []
+servers:
+  - url: https://example.com
+"
+`;
+
+exports[`createDocumentation() > Route Path Params > should handle route path params for POST request 1`] = `
+"openapi: 3.0.0
+info:
+  title: Testing route path params
+  version: 3.4.5
+paths:
+  /v1/{name}:
+    post:
+      operationId: PostV1Name
+      responses:
+        "200":
+          description: POST /v1/:name Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - success
+                  data:
+                    type: object
+                    properties: {}
+                required:
+                  - status
+                  - data
+        "400":
+          description: POST /v1/:name Error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                required:
+                  - status
+                  - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
+      parameters:
+        - name: name
+          in: path
+          required: true
+          description: POST /v1/:name parameter
+          schema:
+            oneOf:
+              - type: string
+                enum:
+                  - John
+              - type: string
+                enum:
+                  - Jane
+      requestBody:
+        description: POST /v1/:name request body
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                other:
+                  type: boolean
+              required:
+                - other
 components:
   schemas: {}
   responses: {}
