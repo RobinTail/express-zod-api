@@ -134,12 +134,8 @@ export async function createDocumentation<V extends OAS>({
   const makeRef = (
     name: string,
     schema: Schema30 | Ref30 | Schema31 | Ref31,
-  ): Ref30 | Ref31 => {
-    if (oas === "3.1") {
-      (builder as Builder31).addSchema(name, schema as Schema31 | Ref31);
-    } else {
-      (builder as Builder30).addSchema(name, schema as Schema30 | Ref30);
-    }
+  ) => {
+    builder.addSchema(name, schema as (Schema31 & Schema30) | (Ref31 & Ref30));
     return getRef(name)!;
   };
 
