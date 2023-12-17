@@ -13,10 +13,18 @@ import type {
 
 export type OAS = "3.0" | "3.1";
 
+// intersecions
 export type CommonSchema = Schema30 & Schema31;
 export type CommonRef = Ref30 & Ref31;
-export type CommonSchemaOrRef = CommonSchema | CommonRef;
 export type CommonSecurity = Security30 & Security31;
 
+// shortening
+export type CommonSchemaOrRef = CommonSchema | CommonRef;
+
+// unions
 // @todo clarify
 export type SomeOperation = Operation30 | Operation31;
+
+// re-export
+export type SchemaObject30 = Schema30;
+export type SchemaObject31 = Schema31;

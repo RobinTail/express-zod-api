@@ -39,7 +39,14 @@ import {
 } from "./logical-container";
 import { copyMeta } from "./metadata";
 import { Method } from "./method";
-import { CommonRef, CommonSchema, CommonSchemaOrRef, OAS } from "./oas-types";
+import {
+  CommonRef,
+  CommonSchema,
+  CommonSchemaOrRef,
+  OAS,
+  SchemaObject30,
+  SchemaObject31,
+} from "./oas-types";
 import {
   HandlingRules,
   HandlingVariant,
@@ -472,25 +479,23 @@ export const depictNumber: Depicter<z.ZodNumber> = ({ schema, oas }) => {
       : schema.maxValue;
   const isMaxInclusive = maxCheck ? maxCheck.inclusive : true;
   const common: CommonSchema = {
-    type: schema.isInt ? ("integer" as const) : ("number" as const),
-    format: schema.isInt ? ("int64" as const) : ("double" as const),
+    type: schema.isInt ? "integer" : "number",
+    format: schema.isInt ? "int64" : "double",
   };
-  // @todo satisfies
-  Object.assign(
+  return Object.assign(
     common,
     oas === "3.1"
-      ? {
+      ? ({
           ...(isMinInclusive ? { minimum } : { exclusiveMinimum: minimum }),
-          ...(isMinInclusive ? { maximum } : { exclusiveMaximum: maximum }),
-        }
-      : {
+          ...(isMaxInclusive ? { maximum } : { exclusiveMaximum: maximum }),
+        } satisfies SchemaObject31)
+      : ({
           minimum,
           maximum,
           exclusiveMinimum: !isMinInclusive,
           exclusiveMaximum: !isMaxInclusive,
-        },
+        } satisfies SchemaObject30),
   );
-  return common;
 };
 
 export const depictObjectProperties = ({
