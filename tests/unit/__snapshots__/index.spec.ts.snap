@@ -10,8 +10,6 @@ exports[`Index Entrypoint > exports > EndpointsFactory should have certain value
 
 exports[`Index Entrypoint > exports > InputValidationError should have certain value 1`] = `[Function]`;
 
-exports[`Index Entrypoint > exports > Integration should have certain value 1`] = `[Function]`;
-
 exports[`Index Entrypoint > exports > MissingPeerError should have certain value 1`] = `[Function]`;
 
 exports[`Index Entrypoint > exports > OutputValidationError should have certain value 1`] = `[Function]`;
@@ -45,6 +43,8 @@ exports[`Index Entrypoint > exports > attachRouting should have certain value 1`
 exports[`Index Entrypoint > exports > createConfig should have certain value 1`] = `[Function]`;
 
 exports[`Index Entrypoint > exports > createDocumentation should have certain value 1`] = `[Function]`;
+
+exports[`Index Entrypoint > exports > createIntegration should have certain value 1`] = `[Function]`;
 
 exports[`Index Entrypoint > exports > createLogger should have certain value 1`] = `[Function]`;
 
@@ -117,7 +117,7 @@ exports[`Index Entrypoint > exports > should have certain entities exposed 1`] =
   "MissingPeerError",
   "withMeta",
   "testEndpoint",
-  "Integration",
+  "createIntegration",
   "ez",
 ]
 `;

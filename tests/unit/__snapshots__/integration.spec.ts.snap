@@ -1,21 +1,23 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`API Integration Generator > Feature #945: should have configurable treatment of optionals 0 1`] = `
+exports[`createIntegration() > Feature #945: should have configurable treatment of optionals 0 1`] = `
 "type PostV1TestWithDashesInput = {
-    opt?: string;
+  opt?: string;
 };
 
-type PostV1TestWithDashesResponse = {
-    status: "success";
-    data: {
+type PostV1TestWithDashesResponse =
+  | {
+      status: "success";
+      data: {
         similar?: number;
-    };
-} | {
-    status: "error";
-    error: {
+      };
+    }
+  | {
+      status: "error";
+      error: {
         message: string;
+      };
     };
-};
 
 export type Path = "/v1/test-with-dashes";
 
@@ -24,26 +26,52 @@ export type Method = "get" | "post" | "put" | "delete" | "patch";
 export type MethodPath = \`\${Method} \${Path}\`;
 
 export interface Input extends Record<MethodPath, any> {
-    "post /v1/test-with-dashes": PostV1TestWithDashesInput;
+  "post /v1/test-with-dashes": PostV1TestWithDashesInput;
 }
 
 export interface Response extends Record<MethodPath, any> {
-    "post /v1/test-with-dashes": PostV1TestWithDashesResponse;
+  "post /v1/test-with-dashes": PostV1TestWithDashesResponse;
 }
 
 export const jsonEndpoints = { "post /v1/test-with-dashes": true };
 
 export const endpointTags = { "post /v1/test-with-dashes": [] };
 
-export type Provider = <M extends Method, P extends Path>(method: M, path: P, params: Input[\`\${M} \${P}\`]) => Promise<Response[\`\${M} \${P}\`]>;
+export type Provider = <M extends Method, P extends Path>(
+  method: M,
+  path: P,
+  params: Input[\`\${M} \${P}\`],
+) => Promise<Response[\`\${M} \${P}\`]>;
 
-export type Implementation = (method: Method, path: string, params: Record<string, any>) => Promise<any>;
+export type Implementation = (
+  method: Method,
+  path: string,
+  params: Record<string, any>,
+) => Promise<any>;
 
+export class ExpressZodAPIClient {
+  constructor(protected readonly implementation: Implementation) {}
+  public readonly provide: Provider = async (method, path, params) =>
+    this.implementation(
+      method,
+      Object.keys(params).reduce(
+        (acc, key) => acc.replace(\`:\${key}\`, params[key]),
+        path,
+      ),
+      Object.keys(params).reduce(
+        (acc, key) =>
+          path.indexOf(\`:\${key}\`) >= 0 ? acc : { ...acc, [key]: params[key] },
+        {},
+      ),
+    );
+}
+
+// Usage example:
 /*
 export const exampleImplementation: Implementation = async (
   method,
   path,
-  params
+  params,
 ) => {
   const hasBody = !["get", "delete"].includes(method);
   const searchParams = hasBody ? "" : \`?\${new URLSearchParams(params)}\`;
@@ -57,32 +85,30 @@ export const exampleImplementation: Implementation = async (
   }
   return response.text();
 };
-
 const client = new ExpressZodAPIClient(exampleImplementation);
 client.provide("get", "/v1/user/retrieve", { id: "10" });
 */
-export class ExpressZodAPIClient {
-    constructor(protected readonly implementation: Implementation) { }
-    public readonly provide: Provider = async (method, path, params) => this.implementation(method, Object.keys(params).reduce((acc, key) => acc.replace(\`:\${key}\`, params[key]), path), Object.keys(params).reduce((acc, key) => path.indexOf(\`:\${key}\`) >= 0 ? acc : { ...acc, [key]: params[key] }, {}));
-}"
+"
 `;
 
-exports[`API Integration Generator > Feature #945: should have configurable treatment of optionals 1 1`] = `
+exports[`createIntegration() > Feature #945: should have configurable treatment of optionals 1 1`] = `
 "type PostV1TestWithDashesInput = {
-    opt: string | undefined;
+  opt: string | undefined;
 };
 
-type PostV1TestWithDashesResponse = {
-    status: "success";
-    data: {
+type PostV1TestWithDashesResponse =
+  | {
+      status: "success";
+      data: {
         similar: number | undefined;
-    };
-} | {
-    status: "error";
-    error: {
+      };
+    }
+  | {
+      status: "error";
+      error: {
         message: string;
+      };
     };
-};
 
 export type Path = "/v1/test-with-dashes";
 
@@ -91,26 +117,52 @@ export type Method = "get" | "post" | "put" | "delete" | "patch";
 export type MethodPath = \`\${Method} \${Path}\`;
 
 export interface Input extends Record<MethodPath, any> {
-    "post /v1/test-with-dashes": PostV1TestWithDashesInput;
+  "post /v1/test-with-dashes": PostV1TestWithDashesInput;
 }
 
 export interface Response extends Record<MethodPath, any> {
-    "post /v1/test-with-dashes": PostV1TestWithDashesResponse;
+  "post /v1/test-with-dashes": PostV1TestWithDashesResponse;
 }
 
 export const jsonEndpoints = { "post /v1/test-with-dashes": true };
 
 export const endpointTags = { "post /v1/test-with-dashes": [] };
 
-export type Provider = <M extends Method, P extends Path>(method: M, path: P, params: Input[\`\${M} \${P}\`]) => Promise<Response[\`\${M} \${P}\`]>;
+export type Provider = <M extends Method, P extends Path>(
+  method: M,
+  path: P,
+  params: Input[\`\${M} \${P}\`],
+) => Promise<Response[\`\${M} \${P}\`]>;
 
-export type Implementation = (method: Method, path: string, params: Record<string, any>) => Promise<any>;
+export type Implementation = (
+  method: Method,
+  path: string,
+  params: Record<string, any>,
+) => Promise<any>;
 
+export class ExpressZodAPIClient {
+  constructor(protected readonly implementation: Implementation) {}
+  public readonly provide: Provider = async (method, path, params) =>
+    this.implementation(
+      method,
+      Object.keys(params).reduce(
+        (acc, key) => acc.replace(\`:\${key}\`, params[key]),
+        path,
+      ),
+      Object.keys(params).reduce(
+        (acc, key) =>
+          path.indexOf(\`:\${key}\`) >= 0 ? acc : { ...acc, [key]: params[key] },
+        {},
+      ),
+    );
+}
+
+// Usage example:
 /*
 export const exampleImplementation: Implementation = async (
   method,
   path,
-  params
+  params,
 ) => {
   const hasBody = !["get", "delete"].includes(method);
   const searchParams = hasBody ? "" : \`?\${new URLSearchParams(params)}\`;
@@ -124,32 +176,30 @@ export const exampleImplementation: Implementation = async (
   }
   return response.text();
 };
-
 const client = new ExpressZodAPIClient(exampleImplementation);
 client.provide("get", "/v1/user/retrieve", { id: "10" });
 */
-export class ExpressZodAPIClient {
-    constructor(protected readonly implementation: Implementation) { }
-    public readonly provide: Provider = async (method, path, params) => this.implementation(method, Object.keys(params).reduce((acc, key) => acc.replace(\`:\${key}\`, params[key]), path), Object.keys(params).reduce((acc, key) => path.indexOf(\`:\${key}\`) >= 0 ? acc : { ...acc, [key]: params[key] }, {}));
-}"
+"
 `;
 
-exports[`API Integration Generator > Feature #945: should have configurable treatment of optionals 2 1`] = `
+exports[`createIntegration() > Feature #945: should have configurable treatment of optionals 2 1`] = `
 "type PostV1TestWithDashesInput = {
-    opt: string;
+  opt: string;
 };
 
-type PostV1TestWithDashesResponse = {
-    status: "success";
-    data: {
+type PostV1TestWithDashesResponse =
+  | {
+      status: "success";
+      data: {
         similar: number;
-    };
-} | {
-    status: "error";
-    error: {
+      };
+    }
+  | {
+      status: "error";
+      error: {
         message: string;
+      };
     };
-};
 
 export type Path = "/v1/test-with-dashes";
 
@@ -158,26 +208,52 @@ export type Method = "get" | "post" | "put" | "delete" | "patch";
 export type MethodPath = \`\${Method} \${Path}\`;
 
 export interface Input extends Record<MethodPath, any> {
-    "post /v1/test-with-dashes": PostV1TestWithDashesInput;
+  "post /v1/test-with-dashes": PostV1TestWithDashesInput;
 }
 
 export interface Response extends Record<MethodPath, any> {
-    "post /v1/test-with-dashes": PostV1TestWithDashesResponse;
+  "post /v1/test-with-dashes": PostV1TestWithDashesResponse;
 }
 
 export const jsonEndpoints = { "post /v1/test-with-dashes": true };
 
 export const endpointTags = { "post /v1/test-with-dashes": [] };
 
-export type Provider = <M extends Method, P extends Path>(method: M, path: P, params: Input[\`\${M} \${P}\`]) => Promise<Response[\`\${M} \${P}\`]>;
+export type Provider = <M extends Method, P extends Path>(
+  method: M,
+  path: P,
+  params: Input[\`\${M} \${P}\`],
+) => Promise<Response[\`\${M} \${P}\`]>;
 
-export type Implementation = (method: Method, path: string, params: Record<string, any>) => Promise<any>;
+export type Implementation = (
+  method: Method,
+  path: string,
+  params: Record<string, any>,
+) => Promise<any>;
 
+export class ExpressZodAPIClient {
+  constructor(protected readonly implementation: Implementation) {}
+  public readonly provide: Provider = async (method, path, params) =>
+    this.implementation(
+      method,
+      Object.keys(params).reduce(
+        (acc, key) => acc.replace(\`:\${key}\`, params[key]),
+        path,
+      ),
+      Object.keys(params).reduce(
+        (acc, key) =>
+          path.indexOf(\`:\${key}\`) >= 0 ? acc : { ...acc, [key]: params[key] },
+        {},
+      ),
+    );
+}
+
+// Usage example:
 /*
 export const exampleImplementation: Implementation = async (
   method,
   path,
-  params
+  params,
 ) => {
   const hasBody = !["get", "delete"].includes(method);
   const searchParams = hasBody ? "" : \`?\${new URLSearchParams(params)}\`;
@@ -191,156 +267,209 @@ export const exampleImplementation: Implementation = async (
   }
   return response.text();
 };
-
 const client = new ExpressZodAPIClient(exampleImplementation);
 client.provide("get", "/v1/user/retrieve", { id: "10" });
 */
-export class ExpressZodAPIClient {
-    constructor(protected readonly implementation: Implementation) { }
-    public readonly provide: Provider = async (method, path, params) => this.implementation(method, Object.keys(params).reduce((acc, key) => acc.replace(\`:\${key}\`, params[key]), path), Object.keys(params).reduce((acc, key) => path.indexOf(\`:\${key}\`) >= 0 ? acc : { ...acc, [key]: params[key] }, {}));
-}"
+"
 `;
 
-exports[`API Integration Generator > Should generate a client for example API 1`] = `
+exports[`createIntegration() > Should generate a client for example API 1`] = `
 "type Type2048581c137c5b2130eb860e3ae37da196dfc25b = {
-    title: string;
-    features: Type2048581c137c5b2130eb860e3ae37da196dfc25b;
+  title: string;
+  features: Type2048581c137c5b2130eb860e3ae37da196dfc25b;
 }[];
 
 type GetV1UserRetrieveInput = {} & {
-    /** a numeric string containing the id of the user */
-    id: string;
+  /** a numeric string containing the id of the user */
+  id: string;
 };
 
-type GetV1UserRetrieveResponse = {
-    status: "success";
-    data: {
+type GetV1UserRetrieveResponse =
+  | {
+      status: "success";
+      data: {
         id: number;
         name: string;
         features: {
-            title: string;
-            features: Type2048581c137c5b2130eb860e3ae37da196dfc25b;
+          title: string;
+          features: Type2048581c137c5b2130eb860e3ae37da196dfc25b;
         }[];
-    };
-} | {
-    status: "error";
-    error: {
+      };
+    }
+  | {
+      status: "error";
+      error: {
         message: string;
+      };
     };
-};
 
 type PostV1UserIdInput = {
-    key: string;
+  key: string;
 } & {
-    id: string;
-    name: string;
-    birthday: string;
+  id: string;
+  name: string;
+  birthday: string;
 };
 
-type PostV1UserIdResponse = {
-    status: "success";
-    data: {
+type PostV1UserIdResponse =
+  | {
+      status: "success";
+      data: {
         name: string;
         createdAt: string;
-    };
-} | {
-    status: "error";
-    error: {
+      };
+    }
+  | {
+      status: "error";
+      error: {
         message: string;
+      };
     };
-};
 
 type GetV1UserListInput = {};
 
-type GetV1UserListResponse = {
-    name: string;
-}[] | string;
+type GetV1UserListResponse =
+  | {
+      name: string;
+    }[]
+  | string;
 
 type GetV1AvatarSendInput = {
-    userId: string;
+  userId: string;
 };
 
 type GetV1AvatarSendResponse = string | string;
 
 type GetV1AvatarStreamInput = {
-    userId: string;
+  userId: string;
 };
 
 type GetV1AvatarStreamResponse = Buffer | string;
 
 type PostV1AvatarUploadInput = {
-    avatar: any;
+  avatar: any;
 };
 
-type PostV1AvatarUploadResponse = {
-    status: "success";
-    data: {
+type PostV1AvatarUploadResponse =
+  | {
+      status: "success";
+      data: {
         name: string;
         size: number;
         mime: string;
         hash: string;
         otherInputs: Record<string, any>;
-    };
-} | {
-    status: "error";
-    error: {
+      };
+    }
+  | {
+      status: "error";
+      error: {
         message: string;
+      };
     };
-};
 
 type PostV1AvatarRawInput = Buffer;
 
-type PostV1AvatarRawResponse = {
-    status: "success";
-    data: {
+type PostV1AvatarRawResponse =
+  | {
+      status: "success";
+      data: {
         length: number;
-    };
-} | {
-    status: "error";
-    error: {
+      };
+    }
+  | {
+      status: "error";
+      error: {
         message: string;
+      };
     };
-};
 
-export type Path = "/v1/user/retrieve" | "/v1/user/:id" | "/v1/user/list" | "/v1/avatar/send" | "/v1/avatar/stream" | "/v1/avatar/upload" | "/v1/avatar/raw";
+export type Path =
+  | "/v1/user/retrieve"
+  | "/v1/user/:id"
+  | "/v1/user/list"
+  | "/v1/avatar/send"
+  | "/v1/avatar/stream"
+  | "/v1/avatar/upload"
+  | "/v1/avatar/raw";
 
 export type Method = "get" | "post" | "put" | "delete" | "patch";
 
 export type MethodPath = \`\${Method} \${Path}\`;
 
 export interface Input extends Record<MethodPath, any> {
-    "get /v1/user/retrieve": GetV1UserRetrieveInput;
-    "post /v1/user/:id": PostV1UserIdInput;
-    "get /v1/user/list": GetV1UserListInput;
-    "get /v1/avatar/send": GetV1AvatarSendInput;
-    "get /v1/avatar/stream": GetV1AvatarStreamInput;
-    "post /v1/avatar/upload": PostV1AvatarUploadInput;
-    "post /v1/avatar/raw": PostV1AvatarRawInput;
+  "get /v1/user/retrieve": GetV1UserRetrieveInput;
+  "post /v1/user/:id": PostV1UserIdInput;
+  "get /v1/user/list": GetV1UserListInput;
+  "get /v1/avatar/send": GetV1AvatarSendInput;
+  "get /v1/avatar/stream": GetV1AvatarStreamInput;
+  "post /v1/avatar/upload": PostV1AvatarUploadInput;
+  "post /v1/avatar/raw": PostV1AvatarRawInput;
 }
 
 export interface Response extends Record<MethodPath, any> {
-    "get /v1/user/retrieve": GetV1UserRetrieveResponse;
-    "post /v1/user/:id": PostV1UserIdResponse;
-    "get /v1/user/list": GetV1UserListResponse;
-    "get /v1/avatar/send": GetV1AvatarSendResponse;
-    "get /v1/avatar/stream": GetV1AvatarStreamResponse;
-    "post /v1/avatar/upload": PostV1AvatarUploadResponse;
-    "post /v1/avatar/raw": PostV1AvatarRawResponse;
+  "get /v1/user/retrieve": GetV1UserRetrieveResponse;
+  "post /v1/user/:id": PostV1UserIdResponse;
+  "get /v1/user/list": GetV1UserListResponse;
+  "get /v1/avatar/send": GetV1AvatarSendResponse;
+  "get /v1/avatar/stream": GetV1AvatarStreamResponse;
+  "post /v1/avatar/upload": PostV1AvatarUploadResponse;
+  "post /v1/avatar/raw": PostV1AvatarRawResponse;
 }
 
-export const jsonEndpoints = { "get /v1/user/retrieve": true, "post /v1/user/:id": true, "get /v1/user/list": true, "post /v1/avatar/upload": true, "post /v1/avatar/raw": true };
+export const jsonEndpoints = {
+  "get /v1/user/retrieve": true,
+  "post /v1/user/:id": true,
+  "get /v1/user/list": true,
+  "post /v1/avatar/upload": true,
+  "post /v1/avatar/raw": true,
+};
 
-export const endpointTags = { "get /v1/user/retrieve": ["users"], "post /v1/user/:id": ["users"], "get /v1/user/list": ["users"], "get /v1/avatar/send": ["files", "users"], "get /v1/avatar/stream": ["users", "files"], "post /v1/avatar/upload": ["files"], "post /v1/avatar/raw": ["files"] };
+export const endpointTags = {
+  "get /v1/user/retrieve": ["users"],
+  "post /v1/user/:id": ["users"],
+  "get /v1/user/list": ["users"],
+  "get /v1/avatar/send": ["files", "users"],
+  "get /v1/avatar/stream": ["users", "files"],
+  "post /v1/avatar/upload": ["files"],
+  "post /v1/avatar/raw": ["files"],
+};
 
-export type Provider = <M extends Method, P extends Path>(method: M, path: P, params: Input[\`\${M} \${P}\`]) => Promise<Response[\`\${M} \${P}\`]>;
+export type Provider = <M extends Method, P extends Path>(
+  method: M,
+  path: P,
+  params: Input[\`\${M} \${P}\`],
+) => Promise<Response[\`\${M} \${P}\`]>;
 
-export type Implementation = (method: Method, path: string, params: Record<string, any>) => Promise<any>;
+export type Implementation = (
+  method: Method,
+  path: string,
+  params: Record<string, any>,
+) => Promise<any>;
 
+export class ExpressZodAPIClient {
+  constructor(protected readonly implementation: Implementation) {}
+  public readonly provide: Provider = async (method, path, params) =>
+    this.implementation(
+      method,
+      Object.keys(params).reduce(
+        (acc, key) => acc.replace(\`:\${key}\`, params[key]),
+        path,
+      ),
+      Object.keys(params).reduce(
+        (acc, key) =>
+          path.indexOf(\`:\${key}\`) >= 0 ? acc : { ...acc, [key]: params[key] },
+        {},
+      ),
+    );
+}
+
+// Usage example:
 /*
 export const exampleImplementation: Implementation = async (
   method,
   path,
-  params
+  params,
 ) => {
   const hasBody = !["get", "delete"].includes(method);
   const searchParams = hasBody ? "" : \`?\${new URLSearchParams(params)}\`;
@@ -354,160 +483,176 @@ export const exampleImplementation: Implementation = async (
   }
   return response.text();
 };
-
 const client = new ExpressZodAPIClient(exampleImplementation);
 client.provide("get", "/v1/user/retrieve", { id: "10" });
 */
-export class ExpressZodAPIClient {
-    constructor(protected readonly implementation: Implementation) { }
-    public readonly provide: Provider = async (method, path, params) => this.implementation(method, Object.keys(params).reduce((acc, key) => acc.replace(\`:\${key}\`, params[key]), path), Object.keys(params).reduce((acc, key) => path.indexOf(\`:\${key}\`) >= 0 ? acc : { ...acc, [key]: params[key] }, {}));
-}"
+"
 `;
 
-exports[`API Integration Generator > Should generate a types for example API 1`] = `
+exports[`createIntegration() > Should generate a types for example API 1`] = `
 "type Type2048581c137c5b2130eb860e3ae37da196dfc25b = {
-    title: string;
-    features: Type2048581c137c5b2130eb860e3ae37da196dfc25b;
+  title: string;
+  features: Type2048581c137c5b2130eb860e3ae37da196dfc25b;
 }[];
 
 type GetV1UserRetrieveInput = {} & {
-    /** a numeric string containing the id of the user */
-    id: string;
+  /** a numeric string containing the id of the user */
+  id: string;
 };
 
-type GetV1UserRetrieveResponse = {
-    status: "success";
-    data: {
+type GetV1UserRetrieveResponse =
+  | {
+      status: "success";
+      data: {
         id: number;
         name: string;
         features: {
-            title: string;
-            features: Type2048581c137c5b2130eb860e3ae37da196dfc25b;
+          title: string;
+          features: Type2048581c137c5b2130eb860e3ae37da196dfc25b;
         }[];
-    };
-} | {
-    status: "error";
-    error: {
+      };
+    }
+  | {
+      status: "error";
+      error: {
         message: string;
+      };
     };
-};
 
 type PostV1UserIdInput = {
-    key: string;
+  key: string;
 } & {
-    id: string;
-    name: string;
-    birthday: string;
+  id: string;
+  name: string;
+  birthday: string;
 };
 
-type PostV1UserIdResponse = {
-    status: "success";
-    data: {
+type PostV1UserIdResponse =
+  | {
+      status: "success";
+      data: {
         name: string;
         createdAt: string;
-    };
-} | {
-    status: "error";
-    error: {
+      };
+    }
+  | {
+      status: "error";
+      error: {
         message: string;
+      };
     };
-};
 
 type GetV1UserListInput = {};
 
-type GetV1UserListResponse = {
-    name: string;
-}[] | string;
+type GetV1UserListResponse =
+  | {
+      name: string;
+    }[]
+  | string;
 
 type GetV1AvatarSendInput = {
-    userId: string;
+  userId: string;
 };
 
 type GetV1AvatarSendResponse = string | string;
 
 type GetV1AvatarStreamInput = {
-    userId: string;
+  userId: string;
 };
 
 type GetV1AvatarStreamResponse = Buffer | string;
 
 type PostV1AvatarUploadInput = {
-    avatar: any;
+  avatar: any;
 };
 
-type PostV1AvatarUploadResponse = {
-    status: "success";
-    data: {
+type PostV1AvatarUploadResponse =
+  | {
+      status: "success";
+      data: {
         name: string;
         size: number;
         mime: string;
         hash: string;
         otherInputs: Record<string, any>;
-    };
-} | {
-    status: "error";
-    error: {
+      };
+    }
+  | {
+      status: "error";
+      error: {
         message: string;
+      };
     };
-};
 
 type PostV1AvatarRawInput = Buffer;
 
-type PostV1AvatarRawResponse = {
-    status: "success";
-    data: {
+type PostV1AvatarRawResponse =
+  | {
+      status: "success";
+      data: {
         length: number;
-    };
-} | {
-    status: "error";
-    error: {
+      };
+    }
+  | {
+      status: "error";
+      error: {
         message: string;
+      };
     };
-};
 
-export type Path = "/v1/user/retrieve" | "/v1/user/:id" | "/v1/user/list" | "/v1/avatar/send" | "/v1/avatar/stream" | "/v1/avatar/upload" | "/v1/avatar/raw";
+export type Path =
+  | "/v1/user/retrieve"
+  | "/v1/user/:id"
+  | "/v1/user/list"
+  | "/v1/avatar/send"
+  | "/v1/avatar/stream"
+  | "/v1/avatar/upload"
+  | "/v1/avatar/raw";
 
 export type Method = "get" | "post" | "put" | "delete" | "patch";
 
 export type MethodPath = \`\${Method} \${Path}\`;
 
 export interface Input extends Record<MethodPath, any> {
-    "get /v1/user/retrieve": GetV1UserRetrieveInput;
-    "post /v1/user/:id": PostV1UserIdInput;
-    "get /v1/user/list": GetV1UserListInput;
-    "get /v1/avatar/send": GetV1AvatarSendInput;
-    "get /v1/avatar/stream": GetV1AvatarStreamInput;
-    "post /v1/avatar/upload": PostV1AvatarUploadInput;
-    "post /v1/avatar/raw": PostV1AvatarRawInput;
+  "get /v1/user/retrieve": GetV1UserRetrieveInput;
+  "post /v1/user/:id": PostV1UserIdInput;
+  "get /v1/user/list": GetV1UserListInput;
+  "get /v1/avatar/send": GetV1AvatarSendInput;
+  "get /v1/avatar/stream": GetV1AvatarStreamInput;
+  "post /v1/avatar/upload": PostV1AvatarUploadInput;
+  "post /v1/avatar/raw": PostV1AvatarRawInput;
 }
 
 export interface Response extends Record<MethodPath, any> {
-    "get /v1/user/retrieve": GetV1UserRetrieveResponse;
-    "post /v1/user/:id": PostV1UserIdResponse;
-    "get /v1/user/list": GetV1UserListResponse;
-    "get /v1/avatar/send": GetV1AvatarSendResponse;
-    "get /v1/avatar/stream": GetV1AvatarStreamResponse;
-    "post /v1/avatar/upload": PostV1AvatarUploadResponse;
-    "post /v1/avatar/raw": PostV1AvatarRawResponse;
-}"
+  "get /v1/user/retrieve": GetV1UserRetrieveResponse;
+  "post /v1/user/:id": PostV1UserIdResponse;
+  "get /v1/user/list": GetV1UserListResponse;
+  "get /v1/avatar/send": GetV1AvatarSendResponse;
+  "get /v1/avatar/stream": GetV1AvatarStreamResponse;
+  "post /v1/avatar/upload": PostV1AvatarUploadResponse;
+  "post /v1/avatar/raw": PostV1AvatarRawResponse;
+}
+"
 `;
 
-exports[`API Integration Generator > Should treat optionals the same way as z.infer() by default 1`] = `
+exports[`createIntegration() > Should treat optionals the same way as z.infer() by default 1`] = `
 "type PostV1TestWithDashesInput = {
-    opt?: string | undefined;
+  opt?: string | undefined;
 };
 
-type PostV1TestWithDashesResponse = {
-    status: "success";
-    data: {
+type PostV1TestWithDashesResponse =
+  | {
+      status: "success";
+      data: {
         similar?: number | undefined;
-    };
-} | {
-    status: "error";
-    error: {
+      };
+    }
+  | {
+      status: "error";
+      error: {
         message: string;
+      };
     };
-};
 
 export type Path = "/v1/test-with-dashes";
 
@@ -516,26 +661,52 @@ export type Method = "get" | "post" | "put" | "delete" | "patch";
 export type MethodPath = \`\${Method} \${Path}\`;
 
 export interface Input extends Record<MethodPath, any> {
-    "post /v1/test-with-dashes": PostV1TestWithDashesInput;
+  "post /v1/test-with-dashes": PostV1TestWithDashesInput;
 }
 
 export interface Response extends Record<MethodPath, any> {
-    "post /v1/test-with-dashes": PostV1TestWithDashesResponse;
+  "post /v1/test-with-dashes": PostV1TestWithDashesResponse;
 }
 
 export const jsonEndpoints = { "post /v1/test-with-dashes": true };
 
 export const endpointTags = { "post /v1/test-with-dashes": [] };
 
-export type Provider = <M extends Method, P extends Path>(method: M, path: P, params: Input[\`\${M} \${P}\`]) => Promise<Response[\`\${M} \${P}\`]>;
+export type Provider = <M extends Method, P extends Path>(
+  method: M,
+  path: P,
+  params: Input[\`\${M} \${P}\`],
+) => Promise<Response[\`\${M} \${P}\`]>;
 
-export type Implementation = (method: Method, path: string, params: Record<string, any>) => Promise<any>;
+export type Implementation = (
+  method: Method,
+  path: string,
+  params: Record<string, any>,
+) => Promise<any>;
 
+export class ExpressZodAPIClient {
+  constructor(protected readonly implementation: Implementation) {}
+  public readonly provide: Provider = async (method, path, params) =>
+    this.implementation(
+      method,
+      Object.keys(params).reduce(
+        (acc, key) => acc.replace(\`:\${key}\`, params[key]),
+        path,
+      ),
+      Object.keys(params).reduce(
+        (acc, key) =>
+          path.indexOf(\`:\${key}\`) >= 0 ? acc : { ...acc, [key]: params[key] },
+        {},
+      ),
+    );
+}
+
+// Usage example:
 /*
 export const exampleImplementation: Implementation = async (
   method,
   path,
-  params
+  params,
 ) => {
   const hasBody = !["get", "delete"].includes(method);
   const searchParams = hasBody ? "" : \`?\${new URLSearchParams(params)}\`;
@@ -549,12 +720,8 @@ export const exampleImplementation: Implementation = async (
   }
   return response.text();
 };
-
 const client = new ExpressZodAPIClient(exampleImplementation);
 client.provide("get", "/v1/user/retrieve", { id: "10" });
 */
-export class ExpressZodAPIClient {
-    constructor(protected readonly implementation: Implementation) { }
-    public readonly provide: Provider = async (method, path, params) => this.implementation(method, Object.keys(params).reduce((acc, key) => acc.replace(\`:\${key}\`, params[key]), path), Object.keys(params).reduce((acc, key) => path.indexOf(\`:\${key}\`) >= 0 ? acc : { ...acc, [key]: params[key] }, {}));
-}"
+"
 `;

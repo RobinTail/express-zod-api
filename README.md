@@ -892,21 +892,16 @@ const rawAcceptingEndpoint = defaultEndpointsFactory.build({
 
 ## Generating a Frontend Client
 
-There is a new way of informing the frontend about the I/O types of your endpoints starting the version 6.1.0.
-The new approach offers automatic generation of a client based on routing to a typescript file.
-The generated client is flexibly configurable on the frontend side using an implementation function that
-directly makes requests to an endpoint using the libraries and methods of your choice.
-The client asserts the type of request parameters and response.
-Consuming the generated client requires Typescript version 4.1 or higher.
+You can generate a Typescript file containing the IO types of your API and a client for it.
 
 ```typescript
 // example client-generator.ts
 import { writeFileSync } from "node:fs";
-import { Integration } from "express-zod-api";
+import { createIntegration } from "express-zod-api";
 
 writeFileSync(
   "./frontend/client.ts",
-  new Integration({
+  await createIntegration({
     routing,
     variant: "client", // <— optional, see also "types" for a DIY solution
     optionalPropStyle: { withQuestionMark: true, withUndefined: true }, // optional
@@ -914,6 +909,13 @@ writeFileSync(
   "utf-8",
 );
 ```
+
+If you want the generated code to look prettier, install `prettier` package (works automatically), or provide your own
+custom `format` property into `print()` method.
+The generated client is flexibly configurable on the frontend side using an implementation function that
+directly makes requests to an endpoint using the libraries and methods of your choice.
+The client asserts the type of request parameters and response.
+Consuming the generated client requires Typescript version 4.1 or higher.
 
 ```typescript
 // example frontend, simple implementation based on fetch()
