@@ -15,4 +15,4 @@ jobs:
       - name: Validate example specification
         uses: char0n/swagger-editor-validate@v1
         with:
-          definition-file: example/example.swagger.yaml
+          definition-file: example/example.documentation.yaml

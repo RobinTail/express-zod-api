@@ -20,7 +20,7 @@ export {
 export { DependsOnMethod } from "./depends-on-method";
 export { ServeStatic } from "./serve-static";
 export { createServer, attachRouting } from "./server";
-export { Documentation } from "./documentation";
+export { createDocumentation } from "./documentation";
 export {
   DocumentationError,
   RoutingError,
