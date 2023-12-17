@@ -362,7 +362,7 @@ exports[`Documentation helpers 3.0 > depictLiteral() > should set type and invol
 }
 `;
 
-exports[`Documentation helpers 3.0 > depictNull() > should set type:string format:null and nullable:true props 1`] = `
+exports[`Documentation helpers 3.0 > depictNull() > should set the type according to OAS version 1`] = `
 {
   "format": "null",
   "nullable": true,
@@ -1571,11 +1571,9 @@ exports[`Documentation helpers 3.1 > depictLiteral() > should set type and invol
 }
 `;
 
-exports[`Documentation helpers 3.1 > depictNull() > should set type:string format:null and nullable:true props 1`] = `
+exports[`Documentation helpers 3.1 > depictNull() > should set the type according to OAS version 1`] = `
 {
-  "format": "null",
-  "nullable": true,
-  "type": "string",
+  "type": "null",
 }
 `;
 

@@ -482,7 +482,7 @@ describe.each<OAS>(["3.0", "3.1"])("Documentation helpers %s", (oas) => {
   });
 
   describe("depictNull()", () => {
-    test("should set type:string format:null and nullable:true props", () => {
+    test("should set the type according to OAS version", () => {
       expect(
         depictNull({
           schema: z.null(),

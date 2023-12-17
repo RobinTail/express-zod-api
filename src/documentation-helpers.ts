@@ -238,13 +238,19 @@ export const depictObject: Depicter<z.AnyZodObject> = ({
 
 /**
  * @see https://swagger.io/docs/specification/data-models/data-types/
- * @todo use type:"null" for OpenAPI 3.1
+ * @since OAS 3.1: using type: "null"s
  * */
-export const depictNull: Depicter<z.ZodNull> = () => ({
-  type: "string",
-  nullable: true,
-  format: "null",
-});
+export const depictNull: Depicter<z.ZodNull> = ({ oas }) =>
+  Object.assign(
+    {},
+    oas === "3.1"
+      ? ({ type: "null" } satisfies SchemaObject31)
+      : ({
+          type: "string",
+          nullable: true,
+          format: "null",
+        } satisfies SchemaObject30),
+  );
 
 export const depictDateIn: Depicter<ZodDateIn> = (ctx) => {
   assert(
