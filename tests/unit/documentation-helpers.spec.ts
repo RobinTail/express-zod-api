@@ -57,12 +57,12 @@ import {
   onMissing,
   reformatParamsInPath,
 } from "../../src/documentation-helpers";
-import { CommonRef, CommonSchemaOrRef } from "../../src/oas-types";
+import { CommonRef, CommonSchemaOrRef, OAS } from "../../src/oas-types";
 import { SchemaHandler, walkSchema } from "../../src/schema-walker";
 import { serializeSchemaForTest } from "../helpers";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-describe("Documentation helpers", () => {
+describe.each<OAS>(["3.0", "3.1"])("Documentation helpers %s", (oas) => {
   const getRefMock = vi.fn();
   const makeRefMock = vi.fn(
     (name: string, {}: CommonSchemaOrRef): CommonRef => ({
@@ -70,7 +70,7 @@ describe("Documentation helpers", () => {
     }),
   );
   const requestCtx: OpenAPIContext = {
-    oas: "3.0",
+    oas,
     path: "/v1/user/:id",
     method: "get",
     isResponse: false,
@@ -79,7 +79,7 @@ describe("Documentation helpers", () => {
     serializer: defaultSerializer,
   };
   const responseCtx: OpenAPIContext = {
-    oas: "3.0",
+    oas,
     path: "/v1/user/:id",
     method: "get",
     isResponse: true,
