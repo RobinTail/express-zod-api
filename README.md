@@ -936,19 +936,22 @@ client.provide("post", "/v1/user/:id", { id: "10" }); // it also substitues path
 
 ## Creating a documentation
 
+Install the `openapi3-ts` package.
 You can generate the specification of your API and write it to a `.yaml` file, that can be used as the documentation:
 
 ```typescript
-import { Documentation } from "express-zod-api";
+import { createDocumentation } from "express-zod-api";
 
-const yamlString = new Documentation({
+const documentation = await createDocumentation({
   routing, // the same routing and config that you use to start the server
   config,
   version: "1.2.3",
   title: "Example API",
   serverUrl: "https://example.com",
   composition: "inline", // optional, or "components" for keeping schemas in a separate dedicated section using refs
-}).getSpecAsYaml();
+});
+
+const yamlString = documentation.print(); // or use documentation.builder for other features
 ```
 
 You can add descriptions and examples to your endpoints, their I/O schemas and their properties. It will be included
