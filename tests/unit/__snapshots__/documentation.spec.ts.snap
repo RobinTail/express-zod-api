@@ -350,8 +350,8 @@ paths:
                         type: number
                         format: double
                         minimum: 5e-324
-                        exclusiveMinimum: false
                         maximum: 1.7976931348623157e+308
+                        exclusiveMinimum: false
                         exclusiveMaximum: false
                     required:
                       - num
@@ -586,8 +586,8 @@ paths:
                         type: number
                         format: double
                         minimum: 5e-324
-                        exclusiveMinimum: false
                         maximum: 1.7976931348623157e+308
+                        exclusiveMinimum: false
                         exclusiveMaximum: false
                     required:
                       - whatever
@@ -669,8 +669,8 @@ paths:
                         type: number
                         format: double
                         minimum: 5e-324
-                        exclusiveMinimum: false
                         maximum: 1.7976931348623157e+308
+                        exclusiveMinimum: false
                         exclusiveMaximum: false
                     required:
                       - literal
@@ -716,8 +716,8 @@ paths:
               type: integer
               format: int64
               minimum: 0
-              exclusiveMinimum: true
               maximum: 9007199254740991
+              exclusiveMinimum: true
               exclusiveMaximum: false
             minItems: 1
             maxItems: 3
@@ -910,8 +910,8 @@ paths:
                                 type: integer
                                 format: int64
                                 minimum: 0
-                                exclusiveMinimum: false
                                 maximum: 9007199254740991
+                                exclusiveMinimum: false
                                 exclusiveMaximum: false
                             required:
                               - five
@@ -1081,8 +1081,8 @@ paths:
             type: integer
             format: int64
             minimum: 0
-            exclusiveMinimum: true
             maximum: 9007199254740991
+            exclusiveMinimum: true
             exclusiveMaximum: false
             default: 123
 components:
@@ -1131,8 +1131,8 @@ paths:
                           - type: integer
                             format: int64
                             minimum: 0
-                            exclusiveMinimum: true
                             maximum: 9007199254740991
+                            exclusiveMinimum: true
                             exclusiveMaximum: false
                     required:
                       - or
@@ -1183,8 +1183,8 @@ paths:
                           type: integer
                           format: int64
                           minimum: 0
-                          exclusiveMinimum: true
                           maximum: 9007199254740991
+                          exclusiveMinimum: true
                           exclusiveMaximum: false
                       required:
                         - one
@@ -1195,8 +1195,8 @@ paths:
                           type: integer
                           format: int64
                           minimum: -9007199254740991
-                          exclusiveMinimum: false
                           maximum: 0
+                          exclusiveMinimum: false
                           exclusiveMaximum: true
                         three:
                           type: string
@@ -1249,8 +1249,8 @@ paths:
                         type: integer
                         format: int64
                         minimum: 0
-                        exclusiveMinimum: false
                         maximum: 9007199254740991
+                        exclusiveMinimum: false
                         exclusiveMaximum: false
                       name:
                         type: string
@@ -1553,8 +1553,8 @@ paths:
                         type: integer
                         format: int64
                         minimum: 0
-                        exclusiveMinimum: false
                         maximum: 9007199254740991
+                        exclusiveMinimum: false
                         exclusiveMaximum: false
                       mime:
                         type: string
@@ -1638,8 +1638,8 @@ paths:
                         type: integer
                         format: int64
                         minimum: 0
-                        exclusiveMinimum: false
                         maximum: 9007199254740991
+                        exclusiveMinimum: false
                         exclusiveMaximum: false
                     required:
                       - length
@@ -1994,8 +1994,8 @@ components:
               type: integer
               format: int64
               minimum: 0
-              exclusiveMinimum: false
               maximum: 9007199254740991
+              exclusiveMinimum: false
               exclusiveMaximum: false
             name:
               type: string
@@ -2152,8 +2152,8 @@ components:
               type: integer
               format: int64
               minimum: 0
-              exclusiveMinimum: false
               maximum: 9007199254740991
+              exclusiveMinimum: false
               exclusiveMaximum: false
             mime:
               type: string
@@ -2211,8 +2211,8 @@ components:
               type: integer
               format: int64
               minimum: 0
-              exclusiveMinimum: false
               maximum: 9007199254740991
+              exclusiveMinimum: false
               exclusiveMaximum: false
           required:
             - length
@@ -2604,64 +2604,64 @@ paths:
                   type: number
                   format: double
                   minimum: 5e-324
-                  exclusiveMinimum: false
                   maximum: 1.7976931348623157e+308
+                  exclusiveMinimum: false
                   exclusiveMaximum: false
                 doublePositive:
                   type: number
                   format: double
                   minimum: 0
-                  exclusiveMinimum: true
                   maximum: 1.7976931348623157e+308
+                  exclusiveMinimum: true
                   exclusiveMaximum: false
                 doubleNegative:
                   type: number
                   format: double
                   minimum: 5e-324
-                  exclusiveMinimum: false
                   maximum: 0
+                  exclusiveMinimum: false
                   exclusiveMaximum: true
                 doubleLimited:
                   type: number
                   format: double
                   minimum: -0.5
-                  exclusiveMinimum: false
                   maximum: 0.5
+                  exclusiveMinimum: false
                   exclusiveMaximum: false
                 int:
                   type: integer
                   format: int64
                   minimum: -9007199254740991
-                  exclusiveMinimum: false
                   maximum: 9007199254740991
+                  exclusiveMinimum: false
                   exclusiveMaximum: false
                 intPositive:
                   type: integer
                   format: int64
                   minimum: 0
-                  exclusiveMinimum: true
                   maximum: 9007199254740991
+                  exclusiveMinimum: true
                   exclusiveMaximum: false
                 intNegative:
                   type: integer
                   format: int64
                   minimum: -9007199254740991
-                  exclusiveMinimum: false
                   maximum: 0
+                  exclusiveMinimum: false
                   exclusiveMaximum: true
                 intLimited:
                   type: integer
                   format: int64
                   minimum: -100
-                  exclusiveMinimum: false
                   maximum: 100
+                  exclusiveMinimum: false
                   exclusiveMaximum: false
                 zero:
                   type: integer
                   format: int64
                   minimum: 0
-                  exclusiveMinimum: false
                   maximum: 0
+                  exclusiveMinimum: false
                   exclusiveMaximum: false
               required:
                 - double
@@ -2951,8 +2951,8 @@ paths:
                           type: integer
                           format: int64
                           minimum: -9007199254740991
-                          exclusiveMinimum: false
                           maximum: 9007199254740991
+                          exclusiveMinimum: false
                           exclusiveMaximum: false
                       stringy:
                         type: object
@@ -3120,8 +3120,8 @@ paths:
                   type: integer
                   format: int64
                   minimum: 0
-                  exclusiveMinimum: true
                   maximum: 9007199254740991
+                  exclusiveMinimum: true
                   exclusiveMaximum: false
               required:
                 - one
@@ -3243,8 +3243,8 @@ paths:
                       - type: integer
                         format: int64
                         minimum: 0
-                        exclusiveMinimum: true
                         maximum: 9007199254740991
+                        exclusiveMinimum: true
                         exclusiveMaximum: false
                     format: tuple
                     description: "0: boolean, 1: string, 2: integer"
@@ -3418,8 +3418,8 @@ paths:
           schema:
             format: int64 (preprocessed)
             minimum: 0
-            exclusiveMinimum: false
             maximum: 9007199254740991
+            exclusiveMinimum: false
             exclusiveMaximum: false
 components:
   schemas: {}
@@ -4008,8 +4008,8 @@ paths:
                         type: number
                         format: double
                         minimum: 5e-324
-                        exclusiveMinimum: false
                         maximum: 1.7976931348623157e+308
+                        exclusiveMinimum: false
                         exclusiveMaximum: false
                     required:
                       - num
@@ -4394,8 +4394,8 @@ paths:
                         type: integer
                         format: int64
                         minimum: 0
-                        exclusiveMinimum: true
                         maximum: 9007199254740991
+                        exclusiveMinimum: true
                         exclusiveMaximum: false
                         description: some positive integer
                     required:

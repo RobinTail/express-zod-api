@@ -1,5 +1,4 @@
 import assert from "node:assert/strict";
-import { ReferenceObject, SchemaObject } from "openapi3-ts/oas30";
 import { z } from "zod";
 import { defaultSerializer } from "../../src/common-helpers";
 import { IOSchemaError } from "../../src/errors";
@@ -58,6 +57,7 @@ import {
   onMissing,
   reformatParamsInPath,
 } from "../../src/documentation-helpers";
+import { CommonRef, CommonSchemaOrRef } from "../../src/oas-types";
 import { SchemaHandler, walkSchema } from "../../src/schema-walker";
 import { serializeSchemaForTest } from "../helpers";
 import { beforeEach, describe, expect, test, vi } from "vitest";
@@ -65,11 +65,12 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 describe("Documentation helpers", () => {
   const getRefMock = vi.fn();
   const makeRefMock = vi.fn(
-    (name: string, {}: SchemaObject | ReferenceObject): ReferenceObject => ({
+    (name: string, {}: CommonSchemaOrRef): CommonRef => ({
       $ref: `#/components/schemas/${name}`,
     }),
   );
   const requestCtx: OpenAPIContext = {
+    oas: "3.0",
     path: "/v1/user/:id",
     method: "get",
     isResponse: false,
@@ -78,6 +79,7 @@ describe("Documentation helpers", () => {
     serializer: defaultSerializer,
   };
   const responseCtx: OpenAPIContext = {
+    oas: "3.0",
     path: "/v1/user/:id",
     method: "get",
     isResponse: true,
@@ -88,12 +90,7 @@ describe("Documentation helpers", () => {
   const makeNext =
     (
       ctx: OpenAPIContext,
-    ): SchemaHandler<
-      z.ZodTypeAny,
-      SchemaObject | ReferenceObject,
-      {},
-      "last"
-    > =>
+    ): SchemaHandler<z.ZodTypeAny, CommonSchemaOrRef, {}, "last"> =>
     ({ schema }) =>
       walkSchema({
         schema,
@@ -965,7 +962,7 @@ describe("Documentation helpers", () => {
       getRefMock
         .mockImplementationOnce(() => undefined)
         .mockImplementationOnce(
-          (name: string): ReferenceObject => ({
+          (name: string): CommonRef => ({
             $ref: `#/components/schemas/${name}`,
           }),
         );
