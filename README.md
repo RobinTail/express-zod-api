@@ -938,7 +938,7 @@ client.provide("post", "/v1/user/:id", { id: "10" }); // it also substitues path
 
 ## Creating a documentation
 
-Install the `openapi3-ts` package.
+Install the `openapi3-ts` package in order to enable this feature.
 You can generate the specification of your API and write it to a `.yaml` file, that can be used as the documentation:
 
 ```typescript
