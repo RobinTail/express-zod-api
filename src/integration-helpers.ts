@@ -22,7 +22,7 @@ export const emptyTail = f.createTemplateTail("");
 
 export const spacingMiddle = f.createTemplateMiddle(" ");
 
-export const makeTemplate = (names: (ts.Identifier | string)[]) =>
+export const makeTemplateType = (names: Array<ts.Identifier | string>) =>
   f.createTemplateLiteralType(
     emptyHeading,
     names.map((name, index) =>
@@ -33,7 +33,7 @@ export const makeTemplate = (names: (ts.Identifier | string)[]) =>
     ),
   );
 
-export const parametricIndexNode = makeTemplate(["M", "P"]);
+export const parametricIndexNode = makeTemplateType(["M", "P"]);
 
 export const makeParam = (
   name: string | ts.Identifier,

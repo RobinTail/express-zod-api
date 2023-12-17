@@ -21,7 +21,7 @@ import {
   makePublicType,
   makeQuotedProp,
   makeRecord,
-  makeTemplate,
+  makeTemplateType,
   makeTypeParams,
   parametricIndexNode,
   protectedReadonlyModifier,
@@ -186,7 +186,7 @@ export const createIntegration = ({
   // export type MethodPath = `${Method} ${Path}`;
   const methodPathType = makePublicType(
     ids.methodPathType,
-    makeTemplate([ids.methodType, ids.pathType]),
+    makeTemplateType([ids.methodType, ids.pathType]),
   );
 
   // extends Record<MethodPath, any>
