@@ -94,9 +94,10 @@ export const createDocumentation = async ({
     return operationId;
   };
 
-  const BuilderClass = await loadPeer<{
-    new (): OpenApiBuilder;
-  }>("openapi3-ts/oas30", "OpenApiBuilder");
+  const BuilderClass = await loadPeer<{ new (): OpenApiBuilder }>(
+    "openapi3-ts/oas30",
+    "OpenApiBuilder",
+  );
   const builder = new BuilderClass().addInfo({ title, version });
   for (const url of typeof serverUrl === "string" ? [serverUrl] : serverUrl) {
     builder.addServer({ url });
