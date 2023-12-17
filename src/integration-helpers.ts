@@ -36,7 +36,7 @@ export const makeTemplateType = (names: Array<ts.Identifier | string>) =>
 export const parametricIndexNode = makeTemplateType(["M", "P"]);
 
 export const makeParam = (
-  name: string | ts.Identifier,
+  name: ts.Identifier,
   type?: ts.TypeNode,
   mod?: ts.Modifier[],
 ) =>
@@ -54,7 +54,8 @@ export const makeParams = (
   mod?: ts.Modifier[],
 ) =>
   Object.keys(params).reduce(
-    (acc, name) => acc.concat(makeParam(name, params[name], mod)),
+    (acc, name) =>
+      acc.concat(makeParam(f.createIdentifier(name), params[name], mod)),
     [] as ts.ParameterDeclaration[],
   );
 
@@ -82,7 +83,7 @@ export const makeQuotedProp = (name: string, ref: string) =>
   );
 
 export const makeConst = (
-  name: string | ts.Identifier,
+  name: ts.Identifier,
   value: ts.Expression,
   type?: ts.TypeNode,
 ) =>
@@ -92,7 +93,7 @@ export const makeConst = (
   );
 
 export const makePublicLiteralType = (
-  name: string | ts.Identifier,
+  name: ts.Identifier,
   literals: string[],
 ) =>
   f.createTypeAliasDeclaration(
@@ -106,13 +107,11 @@ export const makePublicLiteralType = (
     ),
   );
 
-export const makePublicType = (
-  name: string | ts.Identifier,
-  value: ts.TypeNode,
-) => f.createTypeAliasDeclaration(exportModifier, name, undefined, value);
+export const makePublicType = (name: ts.Identifier, value: ts.TypeNode) =>
+  f.createTypeAliasDeclaration(exportModifier, name, undefined, value);
 
 export const makePublicReadonlyProp = (
-  name: string | ts.Identifier,
+  name: ts.Identifier,
   type: ts.TypeNode,
   exp: ts.Expression,
 ) =>
@@ -125,7 +124,7 @@ export const makePublicReadonlyProp = (
   );
 
 export const makePublicClass = (
-  name: string | ts.Identifier,
+  name: ts.Identifier,
   constructor: ts.ConstructorDeclaration,
   props: ts.PropertyDeclaration[] = [],
 ) =>
@@ -145,7 +144,7 @@ export const makeAnyPromise = () =>
   ]);
 
 export const makePublicExtendedInterface = (
-  name: string | ts.Identifier,
+  name: ts.Identifier,
   extender: ts.HeritageClause[],
   props: ts.PropertySignature[],
 ) =>
@@ -171,7 +170,7 @@ export const makeTypeParams = (params: Record<string, ts.Identifier>) =>
   );
 
 export const makeAsyncArrowFn = (
-  params: (string | ts.Identifier)[],
+  params: ts.Identifier[],
   body: ts.ConciseBody,
 ) =>
   f.createArrowFunction(
