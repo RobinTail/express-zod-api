@@ -39,6 +39,7 @@ describe("createDocumentation()", () => {
           serverUrl: "https://example.com",
           composition,
         });
+        expect(documentation).toHaveProperty("builder");
         expect(documentation.print()).toMatchSnapshot();
       },
     );
