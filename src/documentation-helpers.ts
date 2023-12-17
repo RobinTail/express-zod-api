@@ -242,16 +242,13 @@ export const depictObject: Depicter<z.AnyZodObject> = ({
  * @since OAS 3.1: using type: "null"s
  * */
 export const depictNull: Depicter<z.ZodNull> = ({ oas }) =>
-  Object.assign(
-    {},
-    oas === "3.1"
-      ? ({ type: "null" } satisfies SchemaObject31)
-      : ({
-          type: "string",
-          nullable: true,
-          format: "null",
-        } satisfies SchemaObject30),
-  );
+  oas === "3.1"
+    ? ({ type: "null" } satisfies SchemaObject31)
+    : ({
+        type: "string",
+        nullable: true,
+        format: "null",
+      } satisfies SchemaObject30);
 
 export const depictDateIn: Depicter<ZodDateIn> = (ctx) => {
   assert(
