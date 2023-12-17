@@ -584,11 +584,13 @@ export const createIntegration = ({
     format?: (program: string) => Promise<string>;
   } = {}) => {
     let format = userDefined;
-    try {
-      const prettierFormat = (await loadPeer<typeof Prettier>("prettier"))
-        .format;
-      format = (text) => prettierFormat(text, { filepath: "client.ts" });
-    } catch {}
+    if (!format) {
+      try {
+        const prettierFormat = (await loadPeer<typeof Prettier>("prettier"))
+          .format;
+        format = (text) => prettierFormat(text, { filepath: "client.ts" });
+      } catch {}
+    }
 
     const usageExample = usage.length
       ? usage.map((node) => printNode(node, printerOptions)).join("\n")
