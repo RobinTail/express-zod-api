@@ -445,7 +445,7 @@ export const depictString: Depicter<z.ZodString> = ({
         : new RegExp(`^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?Z$`)
       : undefined;
   return {
-    type: "string" as const,
+    type: "string",
     ...(isDatetime && { format: "date-time" }),
     ...(isEmail && { format: "email" }),
     ...(isURL && { format: "url" }),
@@ -458,7 +458,7 @@ export const depictString: Depicter<z.ZodString> = ({
     ...(minLength !== null && { minLength }),
     ...(maxLength !== null && { maxLength }),
     ...(regex && { pattern: `/${regex.source}/${regex.flags}` }),
-  };
+  } satisfies CommonSchema;
 };
 
 /** @since OAS 3.1: exclusive min/max are numbers */
