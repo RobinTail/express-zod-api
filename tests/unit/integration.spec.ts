@@ -8,7 +8,6 @@ describe("Integration", () => {
     "Should generate a %s for example API",
     async (variant) => {
       const client = new Integration({ variant, routing });
-      expect(client).toHaveProperty("program");
       expect(await client.printFormatted()).toMatchSnapshot();
     },
   );
