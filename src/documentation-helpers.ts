@@ -472,17 +472,14 @@ export const depictNumber: Depicter<z.ZodNumber> = ({ schema }) => {
 export const depictObjectProperties = ({
   schema: { shape },
   next,
-}: Parameters<Depicter<z.AnyZodObject>>[0]) => {
-  return Object.keys(shape).reduce<
-    Record<string, SchemaObject | ReferenceObject>
-  >(
+}: Parameters<Depicter<z.AnyZodObject>>[0]) =>
+  Object.keys(shape).reduce<Record<string, SchemaObject | ReferenceObject>>(
     (carry, key) => ({
       ...carry,
       [key]: next({ schema: shape[key] }),
     }),
     {},
   );
-};
 
 const makeSample = (depicted: SchemaObject) => {
   const type = (
