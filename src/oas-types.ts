@@ -1,4 +1,5 @@
 import type {
+  RequestBodyObject as Body30,
   ContentObject as Content30,
   ExampleObject as Example30,
   ExamplesObject as Examples30,
@@ -11,6 +12,7 @@ import type {
   TagObject as Tag30,
 } from "openapi3-ts/oas30";
 import type {
+  RequestBodyObject as Body31,
   ContentObject as Content31,
   ExampleObject as Example31,
   ExamplesObject as Examples31,
@@ -35,6 +37,7 @@ export type CommonResponse = Response30 & Response31;
 export type CommonContent = Content30 & Content31;
 export type CommonExample = Example30 & Example31;
 export type CommonExamples = Examples30 & Examples31;
+export type CommonBody = Body30 & Body31;
 
 // shortening
 export type CommonSchemaOrRef = CommonSchema | CommonRef;

@@ -4,7 +4,6 @@ import type {
   MediaTypeObject,
   OAuthFlowsObject,
   ParameterObject,
-  RequestBodyObject,
   SchemaObjectType,
 } from "openapi3-ts/oas30";
 import { omit } from "ramda";
@@ -34,6 +33,7 @@ import {
 import { copyMeta } from "./metadata";
 import { Method } from "./method";
 import {
+  CommonBody,
   CommonContent,
   CommonExample,
   CommonExamples,
@@ -1018,7 +1018,7 @@ export const depictRequest = ({
   composition,
   oas,
   clue = "request body",
-}: ReqResDepictHelperCommonProps): RequestBodyObject => {
+}: ReqResDepictHelperCommonProps): CommonBody => {
   const pathParams = getRoutePathParams(path);
   const inputSchema = endpoint.getSchema("input");
   const bodyDepiction = excludeExampleFromDepiction(
