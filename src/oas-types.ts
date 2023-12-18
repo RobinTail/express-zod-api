@@ -2,6 +2,7 @@ import type {
   OperationObject as Operation30,
   ReferenceObject as Ref30,
   SchemaObject as Schema30,
+  SecurityRequirementObject as SecReq30,
   SecuritySchemeObject as Security30,
   TagObject as Tag30,
 } from "openapi3-ts/oas30";
@@ -10,6 +11,7 @@ import type {
   ReferenceObject as Ref31,
   SchemaObject as Schema31,
   SecuritySchemeObject as Security31,
+  SecurityRequirementObject as SeqReq31,
   TagObject as Tag31,
 } from "openapi3-ts/oas31";
 
@@ -19,6 +21,7 @@ export type OAS = "3.0" | "3.1";
 export type CommonSchema = Schema30 & Schema31;
 export type CommonRef = Ref30 & Ref31;
 export type CommonSecurity = Security30 & Security31;
+export type CommonSecReq = SecReq30 & SeqReq31;
 export type CommonTag = Tag30 & Tag31;
 
 // shortening

@@ -10,7 +10,6 @@ import type {
   RequestBodyObject,
   ResponseObject,
   SchemaObjectType,
-  SecurityRequirementObject,
 } from "openapi3-ts/oas30";
 import { omit } from "ramda";
 import { z } from "zod";
@@ -42,6 +41,7 @@ import {
   CommonRef,
   CommonSchema,
   CommonSchemaOrRef,
+  CommonSecReq,
   CommonSecurity,
   CommonTag,
   OAS,
@@ -988,14 +988,11 @@ export const depictSecurity = (
 
 export const depictSecurityRefs = (
   container: LogicalContainer<{ name: string; scopes: string[] }>,
-): SecurityRequirementObject[] => {
+): CommonSecReq[] => {
   if (typeof container === "object") {
     if ("or" in container) {
       return container.or.map((entry) =>
-        ("and" in entry
-          ? entry.and
-          : [entry]
-        ).reduce<SecurityRequirementObject>(
+        ("and" in entry ? entry.and : [entry]).reduce<CommonSecReq>(
           (agg, { name, scopes }) => ({
             ...agg,
             [name]: scopes,
