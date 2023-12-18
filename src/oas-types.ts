@@ -44,13 +44,10 @@ export type CommonExamples = Examples30 & Examples31;
 export type CommonBody = Body30 & Body31;
 export type CommonParam = Param30 & Param31;
 export type CommonFlows = Flows30 & Flows31;
+export type CommonOperation = Operation30 & Operation31;
 
 // shortening
 export type CommonSchemaOrRef = CommonSchema | CommonRef;
-
-// unions
-// @todo clarify
-export type SomeOperation = Operation30 | Operation31;
 
 // re-export
 export type SchemaObject30 = Schema30;

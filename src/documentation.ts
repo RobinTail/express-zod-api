@@ -22,11 +22,11 @@ import {
   reformatParamsInPath,
 } from "./documentation-helpers";
 import {
+  CommonOperation,
   CommonRef,
   CommonSchemaOrRef,
   CommonSecurity,
   OAS,
-  SomeOperation,
 } from "./oas-types";
 import { loadPeer } from "./peer-helpers";
 import { Routing } from "./routing";
@@ -176,7 +176,7 @@ export async function createDocumentation<V extends OAS>({
       method,
       endpoint.getOperationId(method),
     );
-    const operation: SomeOperation = {
+    const operation: CommonOperation = {
       operationId,
       responses: {
         [endpoint.getStatusCode("positive")]: depictResponse({
