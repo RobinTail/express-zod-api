@@ -12,7 +12,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Validate example specification
+      - name: Validate against OpenAPI 3.1
         uses: char0n/swagger-editor-validate@v1
         with:
-          definition-file: example/example.documentation.yaml
+          definition-file: example/example.documentation-3.0.yaml
+      - name: Validate against OpenAPI 3.1
+        uses: char0n/apidom-validate@v1
+        with:
+          definition-file: example/example.documentation-3.1.yaml
