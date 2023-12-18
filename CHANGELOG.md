@@ -13,7 +13,9 @@
     class when the `prettier` package is installed (detects automatically).
   - Ability to supply your own typescript formatting function into that new method.
 - How to migrate:
-  - If you are any properties or methods of `Documentation` class besides `getSpec*`:
+  - If you do not modify the generated documentation and only using its `getSpecAsYaml` or `getSpecAsJson` methods:
+    - No action required.
+  - If you're using any properties or other methods of the `Documentation` class:
     - Please refer to the [specification](https://swagger.io/specification/) and the
       [OpenAPI migration guide](https://www.openapis.org/blog/2021/02/16/migrating-from-openapi-3-0-to-3-1-0) in order
       to adjust your implementation accordingly.
