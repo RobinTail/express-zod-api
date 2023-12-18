@@ -950,7 +950,7 @@ const yamlString = new Documentation({
   title: "Example API",
   serverUrl: "https://example.com",
   composition: "inline", // optional, or "components" for keeping schemas in a separate dedicated section using refs
-}).print(); // or use documentation.builder for other features
+}).getSpecAsYaml();
 ```
 
 You can add descriptions and examples to your endpoints, their I/O schemas and their properties. It will be included
