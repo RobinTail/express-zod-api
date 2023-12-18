@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import type {
+import {
   ContentObject,
   ExampleObject,
   ExamplesObject,
@@ -13,6 +13,7 @@ import type {
   SecurityRequirementObject,
   SecuritySchemeObject,
   TagObject,
+  isReferenceObject,
 } from "openapi3-ts/oas31";
 import { omit } from "ramda";
 import { z } from "zod";
@@ -193,7 +194,7 @@ export const depictNullable: Depicter<z.ZodNullable<z.ZodTypeAny>> = ({
   next,
 }) => {
   const nested = next({ schema: schema.unwrap() });
-  if (!("$ref" in nested)) {
+  if (!isReferenceObject(nested)) {
     nested.type = makeNullableType(nested);
   }
   return nested;
@@ -531,7 +532,7 @@ export const depictEffect: Depicter<z.ZodEffects<z.ZodTypeAny>> = ({
 }) => {
   const input = next({ schema: schema.innerType() });
   const { effect } = schema._def;
-  if (isResponse && effect.type === "transform" && !("$ref" in input)) {
+  if (isResponse && effect.type === "transform" && !isReferenceObject(input)) {
     const outputType = tryToTransform({ effect, sample: makeSample(input) });
     if (outputType && ["number", "string", "boolean"].includes(outputType)) {
       return { type: outputType as "number" | "string" | "boolean" };
@@ -539,7 +540,11 @@ export const depictEffect: Depicter<z.ZodEffects<z.ZodTypeAny>> = ({
       return next({ schema: z.any() });
     }
   }
-  if (!isResponse && effect.type === "preprocess" && !("$ref" in input)) {
+  if (
+    !isResponse &&
+    effect.type === "preprocess" &&
+    !isReferenceObject(input)
+  ) {
     const { type: inputType, ...rest } = input;
     return {
       ...rest,
@@ -723,7 +728,7 @@ export const depictRequestParams = ({
             : "query",
         required: !shape[name].isOptional(),
         description:
-          (!("$ref" in depicted) && depicted.description) ||
+          (!isReferenceObject(depicted) && depicted.description) ||
           `${method.toUpperCase()} ${path} ${clue}`,
         schema: result,
         ...depictParamExamples(schema, false, name),
@@ -772,7 +777,7 @@ export const onEach: Depicter<z.ZodTypeAny, "each"> = ({
   isResponse,
   prev,
 }) => {
-  if ("$ref" in prev) {
+  if (isReferenceObject(prev)) {
     return {};
   }
   const { description } = schema;
@@ -816,7 +821,7 @@ export const excludeParamsFromDepiction = (
   depicted: SchemaObject | ReferenceObject,
   pathParams: string[],
 ): SchemaObject | ReferenceObject => {
-  if ("$ref" in depicted) {
+  if (isReferenceObject(depicted)) {
     return depicted;
   }
   const properties = depicted.properties
@@ -857,7 +862,7 @@ export const excludeParamsFromDepiction = (
 export const excludeExampleFromDepiction = (
   depicted: SchemaObject | ReferenceObject,
 ): SchemaObject | ReferenceObject =>
-  "$ref" in depicted ? depicted : omit(["example"], depicted);
+  isReferenceObject(depicted) ? depicted : omit(["example"], depicted);
 
 export const depictResponse = ({
   method,
