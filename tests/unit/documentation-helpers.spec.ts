@@ -62,7 +62,7 @@ import { SchemaHandler, walkSchema } from "../../src/schema-walker";
 import { serializeSchemaForTest } from "../helpers";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-describe("Documentation helpers", (oas) => {
+describe("Documentation helpers", () => {
   const getRefMock = vi.fn();
   const makeRefMock = vi.fn(
     (name: string, {}: SchemaObject | ReferenceObject): ReferenceObject => ({
@@ -70,7 +70,6 @@ describe("Documentation helpers", (oas) => {
     }),
   );
   const requestCtx: OpenAPIContext = {
-    oas,
     path: "/v1/user/:id",
     method: "get",
     isResponse: false,
@@ -79,7 +78,6 @@ describe("Documentation helpers", (oas) => {
     serializer: defaultSerializer,
   };
   const responseCtx: OpenAPIContext = {
-    oas,
     path: "/v1/user/:id",
     method: "get",
     isResponse: true,
@@ -400,7 +398,7 @@ describe("Documentation helpers", (oas) => {
 
   describe("depictNullable()", () => {
     test.each<OpenAPIContext>([requestCtx, responseCtx])(
-      "should set type or nullable according to OAS version %#",
+      "should add null to the type %#",
       (ctx) => {
         expect(
           depictNullable({
@@ -487,7 +485,7 @@ describe("Documentation helpers", (oas) => {
   });
 
   describe("depictNull()", () => {
-    test("should set the type according to OAS version", () => {
+    test("should give type:null", () => {
       expect(
         depictNull({
           schema: z.null(),
@@ -557,7 +555,7 @@ describe("Documentation helpers", (oas) => {
   });
 
   describe("depictTuple()", () => {
-    test("should depict according to OAS version", () => {
+    test("should utilize prefixItems", () => {
       expect(
         depictTuple({
           schema: z.tuple([z.boolean(), z.string(), z.literal("test")]),

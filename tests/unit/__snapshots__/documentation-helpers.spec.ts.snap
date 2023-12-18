@@ -358,13 +358,13 @@ exports[`Documentation helpers > depictLiteral() > should set type and involve e
 }
 `;
 
-exports[`Documentation helpers > depictNull() > should set the type according to OAS version 1`] = `
+exports[`Documentation helpers > depictNull() > should give type:null 1`] = `
 {
   "type": "null",
 }
 `;
 
-exports[`Documentation helpers > depictNullable() > should set type or nullable according to OAS version 0 1`] = `
+exports[`Documentation helpers > depictNullable() > should add null to the type 0 1`] = `
 {
   "type": [
     "null",
@@ -373,7 +373,7 @@ exports[`Documentation helpers > depictNullable() > should set type or nullable 
 }
 `;
 
-exports[`Documentation helpers > depictNullable() > should set type or nullable according to OAS version 1 1`] = `
+exports[`Documentation helpers > depictNullable() > should add null to the type 1 1`] = `
 {
   "type": [
     "null",
@@ -1016,7 +1016,7 @@ exports[`Documentation helpers > depictTags() > should accept plain descriptions
 ]
 `;
 
-exports[`Documentation helpers > depictTuple() > should depict according to OAS version 1`] = `
+exports[`Documentation helpers > depictTuple() > should utilize prefixItems 1`] = `
 {
   "prefixItems": [
     {
