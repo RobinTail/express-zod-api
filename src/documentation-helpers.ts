@@ -420,6 +420,7 @@ export const depictString: Depicter<z.ZodString> = ({
           )
         : new RegExp(`^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?Z$`)
       : undefined;
+  // @todo constraints do not work well for such syntax
   return {
     type: "string",
     ...(isDatetime && { format: "date-time" }),
