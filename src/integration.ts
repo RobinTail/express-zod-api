@@ -615,20 +615,19 @@ export class Integration {
 
   public print(printerOptions?: ts.PrinterOptions) {
     const usageExampleText = this.printUsage(printerOptions);
+    const commentNode =
+      usageExampleText &&
+      ts.addSyntheticLeadingComment(
+        ts.addSyntheticLeadingComment(
+          f.createEmptyStatement(),
+          ts.SyntaxKind.SingleLineCommentTrivia,
+          " Usage example:",
+        ),
+        ts.SyntaxKind.MultiLineCommentTrivia,
+        `\n${usageExampleText}`,
+      );
     return this.program
-      .concat(
-        usageExampleText
-          ? ts.addSyntheticLeadingComment(
-              ts.addSyntheticLeadingComment(
-                f.createEmptyStatement(),
-                ts.SyntaxKind.SingleLineCommentTrivia,
-                " Usage example:",
-              ),
-              ts.SyntaxKind.MultiLineCommentTrivia,
-              `\n${usageExampleText}`,
-            )
-          : [],
-      )
+      .concat(commentNode || [])
       .map((node, index) =>
         printNode(
           node,
