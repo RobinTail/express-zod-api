@@ -56,7 +56,10 @@ export class Documentation extends OpenApiBuilder {
     {};
   protected lastOperationIdSuffixes: Record<string, number> = {};
 
-  protected makeRef(name: string, schema: SchemaObject | ReferenceObject) {
+  protected makeRef(
+    name: string,
+    schema: SchemaObject | ReferenceObject,
+  ): ReferenceObject {
     this.addSchema(name, schema);
     return this.getRef(name)!;
   }
@@ -111,7 +114,7 @@ export class Documentation extends OpenApiBuilder {
     }`;
   }
 
-  constructor({
+  public constructor({
     routing,
     config,
     title,
