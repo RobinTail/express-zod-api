@@ -12,6 +12,6 @@ await writeFile(
     version: manifest.version,
     title: "Example API",
     serverUrl: "https://example.com",
-  }).getSpecAsJson(),
+  }).getSpecAsYaml(),
   "utf-8",
 );

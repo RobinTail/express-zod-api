@@ -3,7 +3,7 @@
 ![logo](https://raw.githubusercontent.com/RobinTail/express-zod-api/master/logo.svg)
 
 ![CI](https://github.com/RobinTail/express-zod-api/actions/workflows/node.js.yml/badge.svg)
-![Swagger Validator](https://img.shields.io/swagger/valid/3.0?specUrl=https%3A%2F%2Fraw.githubusercontent.com%2FRobinTail%2Fexpress-zod-api%2Fmaster%2Fexample%2Fexample.swagger.yaml)
+![OpenAPI](https://img.shields.io/swagger/valid/3.0?specUrl=https%3A%2F%2Fraw.githubusercontent.com%2FRobinTail%2Fexpress-zod-api%2Fmaster%2Fexample%2Fexample.documentation.yaml)
 [![coverage](https://coveralls.io/repos/github/RobinTail/express-zod-api/badge.svg)](https://coveralls.io/github/RobinTail/express-zod-api)
 
 ![downloads](https://img.shields.io/npm/dw/express-zod-api.svg)
@@ -76,7 +76,7 @@ Therefore, many basic tasks can be accomplished faster and easier, in particular
 - All of your endpoints can respond in a consistent way.
 - The expected endpoint input and response types can be exported to the frontend, so you don't get confused about the
   field names when you implement the client for your API.
-- You can generate your API documentation in a Swagger / OpenAPI compatible format.
+- You can generate your API documentation in OpenAPI 3.1 and JSON Schema compatible format.
 
 # How it works
 
@@ -88,7 +88,7 @@ Therefore, many basic tasks can be accomplished faster and easier, in particular
 - Supports any logger having `info()`, `debug()`, `error()` and `warn()` methods;
   - [Winston](https://github.com/winstonjs/winston) is default.
 - Generators:
-  - Documentation — [OpenAPI 3.x](https://github.com/metadevpro/openapi3-ts) (Swagger Specification);
+  - Documentation — [OpenAPI 3.1](https://github.com/metadevpro/openapi3-ts) (former Swagger);
   - Client side types — inspired by [zod-to-ts](https://github.com/sachinraja/zod-to-ts).
 - File uploads — [Express-FileUpload](https://github.com/richardgirges/express-fileupload)
   (based on [Busboy](https://github.com/mscdex/busboy)).
@@ -974,7 +974,7 @@ const exampleEndpoint = defaultEndpointsFactory.build({
 ```
 
 _See the example of the generated documentation
-[here](https://github.com/RobinTail/express-zod-api/blob/master/example/example.swagger.yaml)_
+[here](https://github.com/RobinTail/express-zod-api/blob/master/example/example.documentation.yaml)_
 
 ## Tagging the endpoints
 
