@@ -1,6 +1,11 @@
 import assert from "node:assert/strict";
-import type { OpenApiBuilder as Builder30 } from "openapi3-ts/oas30";
-import type { OpenApiBuilder as Builder31 } from "openapi3-ts/oas31";
+import type {
+  OpenApiBuilder,
+  OperationObject,
+  ReferenceObject,
+  SchemaObject,
+  SecuritySchemeObject,
+} from "openapi3-ts/oas31";
 import { z } from "zod";
 import { DocumentationError } from "./errors";
 import {
@@ -21,19 +26,11 @@ import {
   ensureShortDescription,
   reformatParamsInPath,
 } from "./documentation-helpers";
-import {
-  CommonOperation,
-  CommonRef,
-  CommonSchemaOrRef,
-  CommonSecurity,
-  OAS,
-} from "./oas-types";
 import { loadPeer } from "./peer-helpers";
 import { Routing } from "./routing";
 import { RoutingWalkerParams, walkRouting } from "./routing-walker";
 
-interface DocumentationParams<V extends OAS> {
-  oas?: V;
+interface DocumentationParams {
   title: string;
   version: string;
   serverUrl: string | [string, ...string[]];
@@ -54,20 +51,7 @@ interface DocumentationParams<V extends OAS> {
   serializer?: (schema: z.ZodTypeAny) => string;
 }
 
-export async function createDocumentation(
-  props: DocumentationParams<"3.0">,
-): Promise<{
-  builder: Builder30;
-  print: () => string;
-}>;
-export async function createDocumentation(
-  props: DocumentationParams<"3.1">,
-): Promise<{
-  builder: Builder31;
-  print: () => string;
-}>;
-export async function createDocumentation<V extends OAS>({
-  oas = "3.0" as V,
+export const createDocumentation = async ({
   routing,
   config,
   title,
@@ -78,7 +62,7 @@ export async function createDocumentation<V extends OAS>({
   hasSummaryFromDescription = true,
   composition = "inline",
   serializer = defaultSerializer,
-}: DocumentationParams<V>) {
+}: DocumentationParams) => {
   const lastSecuritySchemaIds: Partial<Record<string, number>> = {};
   const lastOperationIdSuffixes: Record<string, number> = {};
 
@@ -109,8 +93,8 @@ export async function createDocumentation<V extends OAS>({
     return operationId;
   };
 
-  const BuilderClass = await loadPeer<{ new (): Builder31 | Builder30 }>(
-    `openapi3-ts/${oas === "3.1" ? "oas31" : "oas30"}`,
+  const BuilderClass = await loadPeer<{ new (): OpenApiBuilder }>(
+    `openapi3-ts/oas31`,
     "OpenApiBuilder",
   );
 
@@ -119,17 +103,17 @@ export async function createDocumentation<V extends OAS>({
     builder.addServer({ url });
   }
 
-  const getRef = (name: string): CommonRef | undefined =>
+  const getRef = (name: string): ReferenceObject | undefined =>
     name in (builder.rootDoc.components?.schemas || {})
       ? { $ref: `#/components/schemas/${name}` }
       : undefined;
 
-  const makeRef = (name: string, schema: CommonSchemaOrRef) => {
+  const makeRef = (name: string, schema: SchemaObject | ReferenceObject) => {
     builder.addSchema(name, schema);
     return getRef(name)!;
   };
 
-  const ensureUniqSecuritySchemaName = (subject: CommonSecurity) => {
+  const ensureUniqSecuritySchemaName = (subject: SecuritySchemeObject) => {
     const serializedSubject = JSON.stringify(subject);
     for (const name in builder.rootDoc.components?.securitySchemes || {}) {
       if (
@@ -153,7 +137,6 @@ export async function createDocumentation<V extends OAS>({
   ) => {
     const method = _method as Method;
     const commonParams = {
-      oas,
       path,
       method,
       endpoint,
@@ -176,7 +159,7 @@ export async function createDocumentation<V extends OAS>({
       method,
       endpoint.getOperationId(method),
     );
-    const operation: CommonOperation = {
+    const operation: OperationObject = {
       operationId,
       responses: {
         [endpoint.getStatusCode("positive")]: depictResponse({
@@ -236,4 +219,4 @@ export async function createDocumentation<V extends OAS>({
   builder.rootDoc.tags = config.tags ? depictTags(config.tags) : [];
 
   return { builder, print: () => builder.getSpecAsYaml() };
-}
+};

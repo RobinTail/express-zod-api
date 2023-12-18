@@ -1,12 +1,12 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`Documentation helpers 3.0 > depictAny() > should set format:any 1`] = `
+exports[`Documentation helpers > depictAny() > should set format:any 1`] = `
 {
   "format": "any",
 }
 `;
 
-exports[`Documentation helpers 3.0 > depictArray() > should set type:array and pass items depiction 1`] = `
+exports[`Documentation helpers > depictArray() > should set type:array and pass items depiction 1`] = `
 {
   "items": {
     "type": "boolean",
@@ -15,43 +15,43 @@ exports[`Documentation helpers 3.0 > depictArray() > should set type:array and p
 }
 `;
 
-exports[`Documentation helpers 3.0 > depictBigInt() > should set type:integer and format:bigint 1`] = `
+exports[`Documentation helpers > depictBigInt() > should set type:integer and format:bigint 1`] = `
 {
   "format": "bigint",
   "type": "integer",
 }
 `;
 
-exports[`Documentation helpers 3.0 > depictBoolean() > should set type:boolean 1`] = `
+exports[`Documentation helpers > depictBoolean() > should set type:boolean 1`] = `
 {
   "type": "boolean",
 }
 `;
 
-exports[`Documentation helpers 3.0 > depictBranded > should pass the next depicter 1`] = `
+exports[`Documentation helpers > depictBranded > should pass the next depicter 1`] = `
 {
   "minLength": 2,
   "type": "string",
 }
 `;
 
-exports[`Documentation helpers 3.0 > depictCatch() > should pass next depicter 1`] = `
+exports[`Documentation helpers > depictCatch() > should pass next depicter 1`] = `
 {
   "type": "boolean",
 }
 `;
 
-exports[`Documentation helpers 3.0 > depictDate > should throw clear error 0 1`] = `
+exports[`Documentation helpers > depictDate > should throw clear error 0 1`] = `
 [DocumentationError: Using z.date() within output schema is forbidden. Please use z.dateOut() instead. Check out the documentation for details.
 Caused by response schema of an Endpoint assigned to GET method of /v1/user/:id path.]
 `;
 
-exports[`Documentation helpers 3.0 > depictDate > should throw clear error 1 1`] = `
+exports[`Documentation helpers > depictDate > should throw clear error 1 1`] = `
 [DocumentationError: Using z.date() within input schema is forbidden. Please use z.dateIn() instead. Check out the documentation for details.
 Caused by input schema of an Endpoint assigned to GET method of /v1/user/:id path.]
 `;
 
-exports[`Documentation helpers 3.0 > depictDateIn > should set type:string, pattern and format 1`] = `
+exports[`Documentation helpers > depictDateIn > should set type:string, pattern and format 1`] = `
 {
   "description": "YYYY-MM-DDTHH:mm:ss.sssZ",
   "externalDocs": {
@@ -63,12 +63,12 @@ exports[`Documentation helpers 3.0 > depictDateIn > should set type:string, patt
 }
 `;
 
-exports[`Documentation helpers 3.0 > depictDateIn > should throw when ZodDateIn in response 1`] = `
+exports[`Documentation helpers > depictDateIn > should throw when ZodDateIn in response 1`] = `
 [DocumentationError: Please use z.dateOut() for output.
 Caused by response schema of an Endpoint assigned to GET method of /v1/user/:id path.]
 `;
 
-exports[`Documentation helpers 3.0 > depictDateOut > should set type:string, description and format 1`] = `
+exports[`Documentation helpers > depictDateOut > should set type:string, description and format 1`] = `
 {
   "description": "YYYY-MM-DDTHH:mm:ss.sssZ",
   "externalDocs": {
@@ -79,19 +79,19 @@ exports[`Documentation helpers 3.0 > depictDateOut > should set type:string, des
 }
 `;
 
-exports[`Documentation helpers 3.0 > depictDateOut > should throw when ZodDateOut in request 1`] = `
+exports[`Documentation helpers > depictDateOut > should throw when ZodDateOut in request 1`] = `
 [DocumentationError: Please use z.dateIn() for input.
 Caused by input schema of an Endpoint assigned to GET method of /v1/user/:id path.]
 `;
 
-exports[`Documentation helpers 3.0 > depictDefault() > should set default property 1`] = `
+exports[`Documentation helpers > depictDefault() > should set default property 1`] = `
 {
   "default": true,
   "type": "boolean",
 }
 `;
 
-exports[`Documentation helpers 3.0 > depictDiscriminatedUnion() > should wrap next depicters in oneOf prop and set discriminator prop 1`] = `
+exports[`Documentation helpers > depictDiscriminatedUnion() > should wrap next depicters in oneOf prop and set discriminator prop 1`] = `
 {
   "discriminator": {
     "propertyName": "status",
@@ -144,13 +144,13 @@ exports[`Documentation helpers 3.0 > depictDiscriminatedUnion() > should wrap ne
 }
 `;
 
-exports[`Documentation helpers 3.0 > depictEffect() > should depict as 'number (out)' 1`] = `
+exports[`Documentation helpers > depictEffect() > should depict as 'number (out)' 1`] = `
 {
   "type": "number",
 }
 `;
 
-exports[`Documentation helpers 3.0 > depictEffect() > should depict as 'object (refinement)' 1`] = `
+exports[`Documentation helpers > depictEffect() > should depict as 'object (refinement)' 1`] = `
 {
   "properties": {
     "s": {
@@ -164,31 +164,31 @@ exports[`Documentation helpers 3.0 > depictEffect() > should depict as 'object (
 }
 `;
 
-exports[`Documentation helpers 3.0 > depictEffect() > should depict as 'string (in)' 1`] = `
+exports[`Documentation helpers > depictEffect() > should depict as 'string (in)' 1`] = `
 {
   "type": "string",
 }
 `;
 
-exports[`Documentation helpers 3.0 > depictEffect() > should depict as 'string (preprocess)' 1`] = `
+exports[`Documentation helpers > depictEffect() > should depict as 'string (preprocess)' 1`] = `
 {
   "format": "string (preprocessed)",
 }
 `;
 
-exports[`Documentation helpers 3.0 > depictEffect() > should handle edge cases 1`] = `
+exports[`Documentation helpers > depictEffect() > should handle edge cases 1`] = `
 {
   "format": "any",
 }
 `;
 
-exports[`Documentation helpers 3.0 > depictEffect() > should handle edge cases 2`] = `
+exports[`Documentation helpers > depictEffect() > should handle edge cases 2`] = `
 {
   "format": "any",
 }
 `;
 
-exports[`Documentation helpers 3.0 > depictEnum() > should set type and enum properties 1`] = `
+exports[`Documentation helpers > depictEnum() > should set type and enum properties 1`] = `
 {
   "enum": [
     "one",
@@ -198,7 +198,7 @@ exports[`Documentation helpers 3.0 > depictEnum() > should set type and enum pro
 }
 `;
 
-exports[`Documentation helpers 3.0 > depictEnum() > should set type and enum properties 2`] = `
+exports[`Documentation helpers > depictEnum() > should set type and enum properties 2`] = `
 {
   "enum": [
     "ONE",
@@ -208,7 +208,7 @@ exports[`Documentation helpers 3.0 > depictEnum() > should set type and enum pro
 }
 `;
 
-exports[`Documentation helpers 3.0 > depictExamples() > should 'pass' examples in case of 'request' 1`] = `
+exports[`Documentation helpers > depictExamples() > should 'pass' examples in case of 'request' 1`] = `
 {
   "examples": {
     "example1": {
@@ -227,7 +227,7 @@ exports[`Documentation helpers 3.0 > depictExamples() > should 'pass' examples i
 }
 `;
 
-exports[`Documentation helpers 3.0 > depictExamples() > should 'transform' examples in case of 'response' 1`] = `
+exports[`Documentation helpers > depictExamples() > should 'transform' examples in case of 'response' 1`] = `
 {
   "examples": {
     "example1": {
@@ -246,1241 +246,28 @@ exports[`Documentation helpers 3.0 > depictExamples() > should 'transform' examp
 }
 `;
 
-exports[`Documentation helpers 3.0 > depictFile() > should set type:string and format accordingly 0 1`] = `
+exports[`Documentation helpers > depictFile() > should set type:string and format accordingly 0 1`] = `
 {
   "format": "file",
   "type": "string",
 }
 `;
 
-exports[`Documentation helpers 3.0 > depictFile() > should set type:string and format accordingly 1 1`] = `
+exports[`Documentation helpers > depictFile() > should set type:string and format accordingly 1 1`] = `
 {
   "format": "binary",
   "type": "string",
 }
 `;
 
-exports[`Documentation helpers 3.0 > depictFile() > should set type:string and format accordingly 2 1`] = `
+exports[`Documentation helpers > depictFile() > should set type:string and format accordingly 2 1`] = `
 {
   "format": "byte",
   "type": "string",
 }
 `;
 
-exports[`Documentation helpers 3.0 > depictIntersection() > should wrap next depicters in allOf property 1`] = `
-{
-  "allOf": [
-    {
-      "properties": {
-        "one": {
-          "exclusiveMaximum": false,
-          "exclusiveMinimum": false,
-          "format": "double",
-          "maximum": 1.7976931348623157e+308,
-          "minimum": 5e-324,
-          "type": "number",
-        },
-      },
-      "required": [
-        "one",
-      ],
-      "type": "object",
-    },
-    {
-      "properties": {
-        "two": {
-          "exclusiveMaximum": false,
-          "exclusiveMinimum": false,
-          "format": "double",
-          "maximum": 1.7976931348623157e+308,
-          "minimum": 5e-324,
-          "type": "number",
-        },
-      },
-      "required": [
-        "two",
-      ],
-      "type": "object",
-    },
-  ],
-}
-`;
-
-exports[`Documentation helpers 3.0 > depictLazy > should handle circular references 0 1`] = `
-{
-  "$ref": "#/components/schemas/6cbbd837811754902ea1e68d3e5c75e36250b880",
-}
-`;
-
-exports[`Documentation helpers 3.0 > depictLazy > should handle circular references 0 2`] = `
-{
-  "items": {
-    "$ref": "#/components/schemas/6cbbd837811754902ea1e68d3e5c75e36250b880",
-  },
-  "type": "array",
-}
-`;
-
-exports[`Documentation helpers 3.0 > depictLazy > should handle circular references 1 1`] = `
-{
-  "$ref": "#/components/schemas/7a225c55e65ab4a2fd3ce390265b255ee6747049",
-}
-`;
-
-exports[`Documentation helpers 3.0 > depictLazy > should handle circular references 1 2`] = `
-{
-  "$ref": "#/components/schemas/7a225c55e65ab4a2fd3ce390265b255ee6747049",
-}
-`;
-
-exports[`Documentation helpers 3.0 > depictLazy > should handle circular references 2 1`] = `
-{
-  "$ref": "#/components/schemas/118cb3b11b8a1f3b6b1e60a89f96a8be9da32a0f",
-}
-`;
-
-exports[`Documentation helpers 3.0 > depictLazy > should handle circular references 2 2`] = `
-{
-  "properties": {
-    "prop": {
-      "$ref": "#/components/schemas/118cb3b11b8a1f3b6b1e60a89f96a8be9da32a0f",
-    },
-  },
-  "required": [
-    "prop",
-  ],
-  "type": "object",
-}
-`;
-
-exports[`Documentation helpers 3.0 > depictLiteral() > should set type and involve enum property 1`] = `
-{
-  "enum": [
-    "testing",
-  ],
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers 3.0 > depictNull() > should set the type according to OAS version 1`] = `
-{
-  "format": "null",
-  "nullable": true,
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers 3.0 > depictNullable() > should set type or nullable according to OAS version 0 1`] = `
-{
-  "nullable": true,
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers 3.0 > depictNullable() > should set type or nullable according to OAS version 1 1`] = `
-{
-  "nullable": true,
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers 3.0 > depictNumber() > should type:number, min/max, format and exclusiveness props 1`] = `
-{
-  "exclusiveMaximum": false,
-  "exclusiveMinimum": false,
-  "format": "double",
-  "maximum": 1.7976931348623157e+308,
-  "minimum": 5e-324,
-  "type": "number",
-}
-`;
-
-exports[`Documentation helpers 3.0 > depictNumber() > should type:number, min/max, format and exclusiveness props 2`] = `
-{
-  "exclusiveMaximum": false,
-  "exclusiveMinimum": false,
-  "format": "int64",
-  "maximum": 20,
-  "minimum": 10,
-  "type": "integer",
-}
-`;
-
-exports[`Documentation helpers 3.0 > depictObject() > Bug #758 1`] = `
-{
-  "properties": {
-    "a": {
-      "type": "string",
-    },
-    "b": {
-      "type": "string",
-    },
-    "c": {
-      "nullable": true,
-      "type": "string",
-    },
-  },
-  "required": [
-    "a",
-    "b",
-  ],
-  "type": "object",
-}
-`;
-
-exports[`Documentation helpers 3.0 > depictObject() > should type:object, properties and required props 0 1`] = `
-{
-  "properties": {
-    "a": {
-      "exclusiveMaximum": false,
-      "exclusiveMinimum": false,
-      "format": "double",
-      "maximum": 1.7976931348623157e+308,
-      "minimum": 5e-324,
-      "type": "number",
-    },
-    "b": {
-      "type": "string",
-    },
-  },
-  "required": [
-    "a",
-    "b",
-  ],
-  "type": "object",
-}
-`;
-
-exports[`Documentation helpers 3.0 > depictObject() > should type:object, properties and required props 1 1`] = `
-{
-  "properties": {
-    "a": {
-      "exclusiveMaximum": false,
-      "exclusiveMinimum": false,
-      "format": "double",
-      "maximum": 1.7976931348623157e+308,
-      "minimum": 5e-324,
-      "type": "number",
-    },
-    "b": {
-      "type": "string",
-    },
-  },
-  "required": [
-    "a",
-    "b",
-  ],
-  "type": "object",
-}
-`;
-
-exports[`Documentation helpers 3.0 > depictObject() > should type:object, properties and required props 2 1`] = `
-{
-  "properties": {
-    "a": {
-      "exclusiveMaximum": false,
-      "exclusiveMinimum": false,
-      "format": "double",
-      "maximum": 1.7976931348623157e+308,
-      "minimum": 5e-324,
-      "type": "number",
-    },
-    "b": {
-      "type": "string",
-    },
-  },
-  "required": [
-    "a",
-    "b",
-  ],
-  "type": "object",
-}
-`;
-
-exports[`Documentation helpers 3.0 > depictObject() > should type:object, properties and required props 3 1`] = `
-{
-  "properties": {
-    "a": {
-      "exclusiveMaximum": false,
-      "exclusiveMinimum": false,
-      "format": "double",
-      "maximum": 1.7976931348623157e+308,
-      "minimum": 5e-324,
-      "type": "number",
-    },
-    "b": {
-      "type": "string",
-    },
-  },
-  "required": [
-    "a",
-  ],
-  "type": "object",
-}
-`;
-
-exports[`Documentation helpers 3.0 > depictObject() > should type:object, properties and required props 4 1`] = `
-{
-  "properties": {
-    "a": {
-      "exclusiveMaximum": false,
-      "exclusiveMinimum": false,
-      "format": "double",
-      "maximum": 1.7976931348623157e+308,
-      "minimum": 5e-324,
-      "type": "number",
-    },
-    "b": {
-      "nullable": true,
-      "type": "string",
-    },
-  },
-  "type": "object",
-}
-`;
-
-exports[`Documentation helpers 3.0 > depictObjectProperties() > should wrap next depicters in a shape of object 1`] = `
-{
-  "one": {
-    "type": "string",
-  },
-  "two": {
-    "type": "boolean",
-  },
-}
-`;
-
-exports[`Documentation helpers 3.0 > depictOptional() > should pass the next depicter 0 1`] = `
-{
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers 3.0 > depictOptional() > should pass the next depicter 1 1`] = `
-{
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers 3.0 > depictParamExamples() > should 'pass' examples in case of 'request' 1`] = `
-{
-  "examples": {
-    "example1": {
-      "value": 123,
-    },
-    "example2": {
-      "value": 456,
-    },
-  },
-}
-`;
-
-exports[`Documentation helpers 3.0 > depictParamExamples() > should 'transform' examples in case of 'response' 1`] = `
-{
-  "examples": {
-    "example1": {
-      "value": "123",
-    },
-    "example2": {
-      "value": "456",
-    },
-  },
-}
-`;
-
-exports[`Documentation helpers 3.0 > depictPipeline > should depict as 'boolean (out)' 1`] = `
-{
-  "type": "boolean",
-}
-`;
-
-exports[`Documentation helpers 3.0 > depictPipeline > should depict as 'string (in)' 1`] = `
-{
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers 3.0 > depictReadonly > should pass the next depicter 1`] = `
-{
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers 3.0 > depictRecord() > should set properties+required or additionalProperties props 0 1`] = `
-{
-  "additionalProperties": {
-    "type": "boolean",
-  },
-  "type": "object",
-}
-`;
-
-exports[`Documentation helpers 3.0 > depictRecord() > should set properties+required or additionalProperties props 1 1`] = `
-{
-  "additionalProperties": {
-    "type": "boolean",
-  },
-  "type": "object",
-}
-`;
-
-exports[`Documentation helpers 3.0 > depictRecord() > should set properties+required or additionalProperties props 2 1`] = `
-{
-  "properties": {
-    "one": {
-      "type": "boolean",
-    },
-    "two": {
-      "type": "boolean",
-    },
-  },
-  "required": [
-    "one",
-    "two",
-  ],
-  "type": "object",
-}
-`;
-
-exports[`Documentation helpers 3.0 > depictRecord() > should set properties+required or additionalProperties props 3 1`] = `
-{
-  "properties": {
-    "testing": {
-      "type": "boolean",
-    },
-  },
-  "required": [
-    "testing",
-  ],
-  "type": "object",
-}
-`;
-
-exports[`Documentation helpers 3.0 > depictRecord() > should set properties+required or additionalProperties props 4 1`] = `
-{
-  "properties": {
-    "one": {
-      "type": "boolean",
-    },
-    "two": {
-      "type": "boolean",
-    },
-  },
-  "required": [
-    "one",
-    "two",
-  ],
-  "type": "object",
-}
-`;
-
-exports[`Documentation helpers 3.0 > depictRecord() > should set properties+required or additionalProperties props 5 1`] = `
-{
-  "additionalProperties": {
-    "format": "any",
-  },
-  "type": "object",
-}
-`;
-
-exports[`Documentation helpers 3.0 > depictRequestParams() > Feature 1180: should depict header params when enabled 1`] = `
-[
-  {
-    "description": "GET /v1/user/:id parameter",
-    "in": "header",
-    "name": "x-request-id",
-    "required": true,
-    "schema": {
-      "type": "string",
-    },
-  },
-  {
-    "description": "GET /v1/user/:id parameter",
-    "in": "path",
-    "name": "id",
-    "required": true,
-    "schema": {
-      "type": "string",
-    },
-  },
-  {
-    "description": "GET /v1/user/:id parameter",
-    "in": "query",
-    "name": "test",
-    "required": true,
-    "schema": {
-      "type": "boolean",
-    },
-  },
-]
-`;
-
-exports[`Documentation helpers 3.0 > depictRequestParams() > should depict none if both query and params are disabled 1`] = `[]`;
-
-exports[`Documentation helpers 3.0 > depictRequestParams() > should depict only path params if query is disabled 1`] = `
-[
-  {
-    "description": "GET /v1/user/:id parameter",
-    "in": "path",
-    "name": "id",
-    "required": true,
-    "schema": {
-      "type": "string",
-    },
-  },
-]
-`;
-
-exports[`Documentation helpers 3.0 > depictRequestParams() > should depict query and path params 1`] = `
-[
-  {
-    "description": "GET /v1/user/:id parameter",
-    "in": "path",
-    "name": "id",
-    "required": true,
-    "schema": {
-      "type": "string",
-    },
-  },
-  {
-    "description": "GET /v1/user/:id parameter",
-    "in": "query",
-    "name": "test",
-    "required": true,
-    "schema": {
-      "type": "boolean",
-    },
-  },
-]
-`;
-
-exports[`Documentation helpers 3.0 > depictSecurity() > should depict OAuth2 Security with flows 1`] = `
-{
-  "flows": {
-    "authorizationCode": {
-      "authorizationUrl": "https://test.url",
-      "refreshUrl": "https://test2.url",
-      "scopes": {
-        "read": "read something",
-        "write": "write something",
-      },
-      "tokenUrl": "https://test3.url",
-    },
-    "clientCredentials": {
-      "refreshUrl": "https://test2.url",
-      "scopes": {
-        "read": "read something",
-        "write": "write something",
-      },
-      "tokenUrl": "https://test3.url",
-    },
-    "implicit": {
-      "authorizationUrl": "https://test.url",
-      "refreshUrl": "https://test2.url",
-      "scopes": {
-        "read": "read something",
-        "write": "write something",
-      },
-    },
-    "password": {
-      "refreshUrl": "https://test2.url",
-      "scopes": {
-        "read": "read something",
-        "write": "write something",
-      },
-      "tokenUrl": "https://test3.url",
-    },
-  },
-  "type": "oauth2",
-}
-`;
-
-exports[`Documentation helpers 3.0 > depictSecurity() > should handle Basic, Bearer and CustomHeader Securities 1`] = `
-{
-  "or": [
-    {
-      "and": [
-        {
-          "scheme": "basic",
-          "type": "http",
-        },
-        {
-          "scheme": "bearer",
-          "type": "http",
-        },
-      ],
-    },
-    {
-      "in": "header",
-      "name": "X-Key",
-      "type": "apiKey",
-    },
-  ],
-}
-`;
-
-exports[`Documentation helpers 3.0 > depictSecurity() > should handle Input and Cookie Securities 1`] = `
-{
-  "and": [
-    {
-      "or": [
-        {
-          "in": "query",
-          "name": "apiKey",
-          "type": "apiKey",
-        },
-        {
-          "in": "cookie",
-          "name": "hash",
-          "type": "apiKey",
-        },
-      ],
-    },
-  ],
-}
-`;
-
-exports[`Documentation helpers 3.0 > depictSecurity() > should handle OpenID and OAuth2 Securities 1`] = `
-{
-  "or": [
-    {
-      "openIdConnectUrl": "https://test.url",
-      "type": "openIdConnect",
-    },
-    {
-      "flows": {},
-      "type": "oauth2",
-    },
-  ],
-}
-`;
-
-exports[`Documentation helpers 3.0 > depictSecurity() > should handle undefined flows 1`] = `
-{
-  "flows": {},
-  "type": "oauth2",
-}
-`;
-
-exports[`Documentation helpers 3.0 > depictSecurityRefs() > should handle LogicalAnd 1`] = `
-[
-  {
-    "A": [],
-    "B": [],
-    "C": [],
-  },
-]
-`;
-
-exports[`Documentation helpers 3.0 > depictSecurityRefs() > should handle LogicalAnd 2`] = `
-[
-  {
-    "A": [],
-    "B": [],
-  },
-  {
-    "A": [],
-    "C": [],
-  },
-]
-`;
-
-exports[`Documentation helpers 3.0 > depictSecurityRefs() > should handle LogicalOr 1`] = `
-[
-  {
-    "A": [],
-  },
-  {
-    "B": [],
-  },
-  {
-    "C": [],
-  },
-]
-`;
-
-exports[`Documentation helpers 3.0 > depictSecurityRefs() > should handle LogicalOr 2`] = `
-[
-  {
-    "A": [],
-  },
-  {
-    "B": [],
-    "C": [],
-  },
-]
-`;
-
-exports[`Documentation helpers 3.0 > depictSecurityRefs() > should handle the plain value 1`] = `
-[
-  {
-    "A": [],
-  },
-]
-`;
-
-exports[`Documentation helpers 3.0 > depictSecurityRefs() > should populate the scopes 1`] = `
-[
-  {
-    "A": [
-      "write",
-    ],
-  },
-  {
-    "B": [
-      "read",
-    ],
-  },
-  {
-    "C": [
-      "read",
-      "write",
-    ],
-  },
-]
-`;
-
-exports[`Documentation helpers 3.0 > depictString() > should set format, pattern and min/maxLength props 0 1`] = `
-{
-  "format": "email",
-  "maxLength": 20,
-  "minLength": 10,
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers 3.0 > depictString() > should set format, pattern and min/maxLength props 1 1`] = `
-{
-  "format": "url",
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers 3.0 > depictString() > should set format, pattern and min/maxLength props 2 1`] = `
-{
-  "format": "uuid",
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers 3.0 > depictString() > should set format, pattern and min/maxLength props 3 1`] = `
-{
-  "format": "cuid",
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers 3.0 > depictString() > should set format, pattern and min/maxLength props 4 1`] = `
-{
-  "format": "date-time",
-  "pattern": "/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?Z$/",
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers 3.0 > depictString() > should set format, pattern and min/maxLength props 5 1`] = `
-{
-  "format": "date-time",
-  "pattern": "/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?(([+-]\\d{2}:\\d{2})|Z)$/",
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers 3.0 > depictString() > should set format, pattern and min/maxLength props 6 1`] = `
-{
-  "pattern": "/^\\d+.\\d+.\\d+$/",
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers 3.0 > depictString() > should set type:string 1`] = `
-{
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers 3.0 > depictTags() > should accept objects with URLs 1`] = `
-[
-  {
-    "description": "Everything about users",
-    "name": "users",
-  },
-  {
-    "description": "Everything about files processing",
-    "externalDocs": {
-      "url": "https://example.com",
-    },
-    "name": "files",
-  },
-]
-`;
-
-exports[`Documentation helpers 3.0 > depictTags() > should accept plain descriptions 1`] = `
-[
-  {
-    "description": "Everything about users",
-    "name": "users",
-  },
-  {
-    "description": "Everything about files processing",
-    "name": "files",
-  },
-]
-`;
-
-exports[`Documentation helpers 3.0 > depictTuple() > should depict according to OAS version 1`] = `
-{
-  "items": {
-    "description": "0: boolean, 1: string, 2: string",
-    "format": "tuple",
-    "oneOf": [
-      {
-        "type": "boolean",
-      },
-      {
-        "type": "string",
-      },
-      {
-        "enum": [
-          "test",
-        ],
-        "type": "string",
-      },
-    ],
-  },
-  "maxItems": 3,
-  "minItems": 3,
-  "type": "array",
-}
-`;
-
-exports[`Documentation helpers 3.0 > depictUnion() > should wrap next depicters into oneOf property 1`] = `
-{
-  "oneOf": [
-    {
-      "type": "string",
-    },
-    {
-      "exclusiveMaximum": false,
-      "exclusiveMinimum": false,
-      "format": "double",
-      "maximum": 1.7976931348623157e+308,
-      "minimum": 5e-324,
-      "type": "number",
-    },
-  ],
-}
-`;
-
-exports[`Documentation helpers 3.0 > depictUpload() > should set format:binary and type:string 1`] = `
-{
-  "format": "binary",
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers 3.0 > depictUpload() > should throw when using in response 1`] = `
-[DocumentationError: Please use z.upload() only for input.
-Caused by response schema of an Endpoint assigned to GET method of /v1/user/:id path.]
-`;
-
-exports[`Documentation helpers 3.0 > excludeExampleFromDepiction() > should remove example property of supplied object 1`] = `
-{
-  "description": "test",
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers 3.0 > excludeParamsFromDepiction() > should handle the ReferenceObject 1`] = `
-{
-  "$ref": "test",
-}
-`;
-
-exports[`Documentation helpers 3.0 > excludeParamsFromDepiction() > should omit specified path params 0 1`] = `
-{
-  "properties": {
-    "b": {
-      "type": "string",
-    },
-  },
-  "required": [
-    "b",
-  ],
-  "type": "object",
-}
-`;
-
-exports[`Documentation helpers 3.0 > excludeParamsFromDepiction() > should omit specified path params 1 1`] = `
-{
-  "oneOf": [
-    {
-      "properties": {},
-      "required": [],
-      "type": "object",
-    },
-    {
-      "properties": {
-        "b": {
-          "type": "string",
-        },
-      },
-      "required": [
-        "b",
-      ],
-      "type": "object",
-    },
-  ],
-}
-`;
-
-exports[`Documentation helpers 3.0 > excludeParamsFromDepiction() > should omit specified path params 2 1`] = `
-{
-  "allOf": [
-    {
-      "properties": {},
-      "required": [],
-      "type": "object",
-    },
-    {
-      "properties": {
-        "b": {
-          "type": "string",
-        },
-      },
-      "required": [
-        "b",
-      ],
-      "type": "object",
-    },
-  ],
-}
-`;
-
-exports[`Documentation helpers 3.0 > extractObjectSchema() > Feature #600: Top level refinements > should handle refined object schema 1`] = `
-{
-  "_type": "ZodObject",
-  "shape": {
-    "one": {
-      "_type": "ZodString",
-    },
-  },
-}
-`;
-
-exports[`Documentation helpers 3.0 > extractObjectSchema() > should pass the object schema through 1`] = `
-{
-  "_type": "ZodObject",
-  "shape": {
-    "one": {
-      "_type": "ZodString",
-    },
-  },
-}
-`;
-
-exports[`Documentation helpers 3.0 > extractObjectSchema() > should return object schema for the intersection of object schemas 1`] = `
-{
-  "_type": "ZodObject",
-  "shape": {
-    "one": {
-      "_type": "ZodString",
-    },
-    "two": {
-      "_type": "ZodNumber",
-    },
-  },
-}
-`;
-
-exports[`Documentation helpers 3.0 > extractObjectSchema() > should return object schema for the union of object schemas 1`] = `
-{
-  "_type": "ZodObject",
-  "shape": {
-    "one": {
-      "_type": "ZodOptional",
-      "value": {
-        "_type": "ZodString",
-      },
-    },
-    "two": {
-      "_type": "ZodOptional",
-      "value": {
-        "_type": "ZodNumber",
-      },
-    },
-  },
-}
-`;
-
-exports[`Documentation helpers 3.1 > depictAny() > should set format:any 1`] = `
-{
-  "format": "any",
-}
-`;
-
-exports[`Documentation helpers 3.1 > depictArray() > should set type:array and pass items depiction 1`] = `
-{
-  "items": {
-    "type": "boolean",
-  },
-  "type": "array",
-}
-`;
-
-exports[`Documentation helpers 3.1 > depictBigInt() > should set type:integer and format:bigint 1`] = `
-{
-  "format": "bigint",
-  "type": "integer",
-}
-`;
-
-exports[`Documentation helpers 3.1 > depictBoolean() > should set type:boolean 1`] = `
-{
-  "type": "boolean",
-}
-`;
-
-exports[`Documentation helpers 3.1 > depictBranded > should pass the next depicter 1`] = `
-{
-  "minLength": 2,
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers 3.1 > depictCatch() > should pass next depicter 1`] = `
-{
-  "type": "boolean",
-}
-`;
-
-exports[`Documentation helpers 3.1 > depictDate > should throw clear error 0 1`] = `
-[DocumentationError: Using z.date() within output schema is forbidden. Please use z.dateOut() instead. Check out the documentation for details.
-Caused by response schema of an Endpoint assigned to GET method of /v1/user/:id path.]
-`;
-
-exports[`Documentation helpers 3.1 > depictDate > should throw clear error 1 1`] = `
-[DocumentationError: Using z.date() within input schema is forbidden. Please use z.dateIn() instead. Check out the documentation for details.
-Caused by input schema of an Endpoint assigned to GET method of /v1/user/:id path.]
-`;
-
-exports[`Documentation helpers 3.1 > depictDateIn > should set type:string, pattern and format 1`] = `
-{
-  "description": "YYYY-MM-DDTHH:mm:ss.sssZ",
-  "externalDocs": {
-    "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString",
-  },
-  "format": "date-time",
-  "pattern": "^\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?)?Z?$",
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers 3.1 > depictDateIn > should throw when ZodDateIn in response 1`] = `
-[DocumentationError: Please use z.dateOut() for output.
-Caused by response schema of an Endpoint assigned to GET method of /v1/user/:id path.]
-`;
-
-exports[`Documentation helpers 3.1 > depictDateOut > should set type:string, description and format 1`] = `
-{
-  "description": "YYYY-MM-DDTHH:mm:ss.sssZ",
-  "externalDocs": {
-    "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString",
-  },
-  "format": "date-time",
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers 3.1 > depictDateOut > should throw when ZodDateOut in request 1`] = `
-[DocumentationError: Please use z.dateIn() for input.
-Caused by input schema of an Endpoint assigned to GET method of /v1/user/:id path.]
-`;
-
-exports[`Documentation helpers 3.1 > depictDefault() > should set default property 1`] = `
-{
-  "default": true,
-  "type": "boolean",
-}
-`;
-
-exports[`Documentation helpers 3.1 > depictDiscriminatedUnion() > should wrap next depicters in oneOf prop and set discriminator prop 1`] = `
-{
-  "discriminator": {
-    "propertyName": "status",
-  },
-  "oneOf": [
-    {
-      "properties": {
-        "data": {
-          "format": "any",
-        },
-        "status": {
-          "enum": [
-            "success",
-          ],
-          "type": "string",
-        },
-      },
-      "required": [
-        "status",
-      ],
-      "type": "object",
-    },
-    {
-      "properties": {
-        "error": {
-          "properties": {
-            "message": {
-              "type": "string",
-            },
-          },
-          "required": [
-            "message",
-          ],
-          "type": "object",
-        },
-        "status": {
-          "enum": [
-            "error",
-          ],
-          "type": "string",
-        },
-      },
-      "required": [
-        "status",
-        "error",
-      ],
-      "type": "object",
-    },
-  ],
-}
-`;
-
-exports[`Documentation helpers 3.1 > depictEffect() > should depict as 'number (out)' 1`] = `
-{
-  "type": "number",
-}
-`;
-
-exports[`Documentation helpers 3.1 > depictEffect() > should depict as 'object (refinement)' 1`] = `
-{
-  "properties": {
-    "s": {
-      "type": "string",
-    },
-  },
-  "required": [
-    "s",
-  ],
-  "type": "object",
-}
-`;
-
-exports[`Documentation helpers 3.1 > depictEffect() > should depict as 'string (in)' 1`] = `
-{
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers 3.1 > depictEffect() > should depict as 'string (preprocess)' 1`] = `
-{
-  "format": "string (preprocessed)",
-}
-`;
-
-exports[`Documentation helpers 3.1 > depictEffect() > should handle edge cases 1`] = `
-{
-  "format": "any",
-}
-`;
-
-exports[`Documentation helpers 3.1 > depictEffect() > should handle edge cases 2`] = `
-{
-  "format": "any",
-}
-`;
-
-exports[`Documentation helpers 3.1 > depictEnum() > should set type and enum properties 1`] = `
-{
-  "enum": [
-    "one",
-    "two",
-  ],
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers 3.1 > depictEnum() > should set type and enum properties 2`] = `
-{
-  "enum": [
-    "ONE",
-    "TWO",
-  ],
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers 3.1 > depictExamples() > should 'pass' examples in case of 'request' 1`] = `
-{
-  "examples": {
-    "example1": {
-      "value": {
-        "one": "test",
-        "two": 123,
-      },
-    },
-    "example2": {
-      "value": {
-        "one": "test2",
-        "two": 456,
-      },
-    },
-  },
-}
-`;
-
-exports[`Documentation helpers 3.1 > depictExamples() > should 'transform' examples in case of 'response' 1`] = `
-{
-  "examples": {
-    "example1": {
-      "value": {
-        "one": 4,
-        "two": "123",
-      },
-    },
-    "example2": {
-      "value": {
-        "one": 5,
-        "two": "456",
-      },
-    },
-  },
-}
-`;
-
-exports[`Documentation helpers 3.1 > depictFile() > should set type:string and format accordingly 0 1`] = `
-{
-  "format": "file",
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers 3.1 > depictFile() > should set type:string and format accordingly 1 1`] = `
-{
-  "format": "binary",
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers 3.1 > depictFile() > should set type:string and format accordingly 2 1`] = `
-{
-  "format": "byte",
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers 3.1 > depictIntersection() > should wrap next depicters in allOf property 1`] = `
+exports[`Documentation helpers > depictIntersection() > should wrap next depicters in allOf property 1`] = `
 {
   "allOf": [
     {
@@ -1515,13 +302,13 @@ exports[`Documentation helpers 3.1 > depictIntersection() > should wrap next dep
 }
 `;
 
-exports[`Documentation helpers 3.1 > depictLazy > should handle circular references 0 1`] = `
+exports[`Documentation helpers > depictLazy > should handle circular references 0 1`] = `
 {
   "$ref": "#/components/schemas/6cbbd837811754902ea1e68d3e5c75e36250b880",
 }
 `;
 
-exports[`Documentation helpers 3.1 > depictLazy > should handle circular references 0 2`] = `
+exports[`Documentation helpers > depictLazy > should handle circular references 0 2`] = `
 {
   "items": {
     "$ref": "#/components/schemas/6cbbd837811754902ea1e68d3e5c75e36250b880",
@@ -1530,25 +317,25 @@ exports[`Documentation helpers 3.1 > depictLazy > should handle circular referen
 }
 `;
 
-exports[`Documentation helpers 3.1 > depictLazy > should handle circular references 1 1`] = `
+exports[`Documentation helpers > depictLazy > should handle circular references 1 1`] = `
 {
   "$ref": "#/components/schemas/7a225c55e65ab4a2fd3ce390265b255ee6747049",
 }
 `;
 
-exports[`Documentation helpers 3.1 > depictLazy > should handle circular references 1 2`] = `
+exports[`Documentation helpers > depictLazy > should handle circular references 1 2`] = `
 {
   "$ref": "#/components/schemas/7a225c55e65ab4a2fd3ce390265b255ee6747049",
 }
 `;
 
-exports[`Documentation helpers 3.1 > depictLazy > should handle circular references 2 1`] = `
+exports[`Documentation helpers > depictLazy > should handle circular references 2 1`] = `
 {
   "$ref": "#/components/schemas/118cb3b11b8a1f3b6b1e60a89f96a8be9da32a0f",
 }
 `;
 
-exports[`Documentation helpers 3.1 > depictLazy > should handle circular references 2 2`] = `
+exports[`Documentation helpers > depictLazy > should handle circular references 2 2`] = `
 {
   "properties": {
     "prop": {
@@ -1562,7 +349,7 @@ exports[`Documentation helpers 3.1 > depictLazy > should handle circular referen
 }
 `;
 
-exports[`Documentation helpers 3.1 > depictLiteral() > should set type and involve enum property 1`] = `
+exports[`Documentation helpers > depictLiteral() > should set type and involve enum property 1`] = `
 {
   "enum": [
     "testing",
@@ -1571,13 +358,13 @@ exports[`Documentation helpers 3.1 > depictLiteral() > should set type and invol
 }
 `;
 
-exports[`Documentation helpers 3.1 > depictNull() > should set the type according to OAS version 1`] = `
+exports[`Documentation helpers > depictNull() > should set the type according to OAS version 1`] = `
 {
   "type": "null",
 }
 `;
 
-exports[`Documentation helpers 3.1 > depictNullable() > should set type or nullable according to OAS version 0 1`] = `
+exports[`Documentation helpers > depictNullable() > should set type or nullable according to OAS version 0 1`] = `
 {
   "type": [
     "null",
@@ -1586,7 +373,7 @@ exports[`Documentation helpers 3.1 > depictNullable() > should set type or nulla
 }
 `;
 
-exports[`Documentation helpers 3.1 > depictNullable() > should set type or nullable according to OAS version 1 1`] = `
+exports[`Documentation helpers > depictNullable() > should set type or nullable according to OAS version 1 1`] = `
 {
   "type": [
     "null",
@@ -1595,7 +382,7 @@ exports[`Documentation helpers 3.1 > depictNullable() > should set type or nulla
 }
 `;
 
-exports[`Documentation helpers 3.1 > depictNumber() > should type:number, min/max, format and exclusiveness props 1`] = `
+exports[`Documentation helpers > depictNumber() > should type:number, min/max, format and exclusiveness props 1`] = `
 {
   "format": "double",
   "maximum": 1.7976931348623157e+308,
@@ -1604,7 +391,7 @@ exports[`Documentation helpers 3.1 > depictNumber() > should type:number, min/ma
 }
 `;
 
-exports[`Documentation helpers 3.1 > depictNumber() > should type:number, min/max, format and exclusiveness props 2`] = `
+exports[`Documentation helpers > depictNumber() > should type:number, min/max, format and exclusiveness props 2`] = `
 {
   "format": "int64",
   "maximum": 20,
@@ -1613,7 +400,7 @@ exports[`Documentation helpers 3.1 > depictNumber() > should type:number, min/ma
 }
 `;
 
-exports[`Documentation helpers 3.1 > depictObject() > Bug #758 1`] = `
+exports[`Documentation helpers > depictObject() > Bug #758 1`] = `
 {
   "properties": {
     "a": {
@@ -1637,7 +424,7 @@ exports[`Documentation helpers 3.1 > depictObject() > Bug #758 1`] = `
 }
 `;
 
-exports[`Documentation helpers 3.1 > depictObject() > should type:object, properties and required props 0 1`] = `
+exports[`Documentation helpers > depictObject() > should type:object, properties and required props 0 1`] = `
 {
   "properties": {
     "a": {
@@ -1658,7 +445,7 @@ exports[`Documentation helpers 3.1 > depictObject() > should type:object, proper
 }
 `;
 
-exports[`Documentation helpers 3.1 > depictObject() > should type:object, properties and required props 1 1`] = `
+exports[`Documentation helpers > depictObject() > should type:object, properties and required props 1 1`] = `
 {
   "properties": {
     "a": {
@@ -1679,7 +466,7 @@ exports[`Documentation helpers 3.1 > depictObject() > should type:object, proper
 }
 `;
 
-exports[`Documentation helpers 3.1 > depictObject() > should type:object, properties and required props 2 1`] = `
+exports[`Documentation helpers > depictObject() > should type:object, properties and required props 2 1`] = `
 {
   "properties": {
     "a": {
@@ -1700,7 +487,7 @@ exports[`Documentation helpers 3.1 > depictObject() > should type:object, proper
 }
 `;
 
-exports[`Documentation helpers 3.1 > depictObject() > should type:object, properties and required props 3 1`] = `
+exports[`Documentation helpers > depictObject() > should type:object, properties and required props 3 1`] = `
 {
   "properties": {
     "a": {
@@ -1720,7 +507,7 @@ exports[`Documentation helpers 3.1 > depictObject() > should type:object, proper
 }
 `;
 
-exports[`Documentation helpers 3.1 > depictObject() > should type:object, properties and required props 4 1`] = `
+exports[`Documentation helpers > depictObject() > should type:object, properties and required props 4 1`] = `
 {
   "properties": {
     "a": {
@@ -1740,7 +527,7 @@ exports[`Documentation helpers 3.1 > depictObject() > should type:object, proper
 }
 `;
 
-exports[`Documentation helpers 3.1 > depictObjectProperties() > should wrap next depicters in a shape of object 1`] = `
+exports[`Documentation helpers > depictObjectProperties() > should wrap next depicters in a shape of object 1`] = `
 {
   "one": {
     "type": "string",
@@ -1751,19 +538,19 @@ exports[`Documentation helpers 3.1 > depictObjectProperties() > should wrap next
 }
 `;
 
-exports[`Documentation helpers 3.1 > depictOptional() > should pass the next depicter 0 1`] = `
+exports[`Documentation helpers > depictOptional() > should pass the next depicter 0 1`] = `
 {
   "type": "string",
 }
 `;
 
-exports[`Documentation helpers 3.1 > depictOptional() > should pass the next depicter 1 1`] = `
+exports[`Documentation helpers > depictOptional() > should pass the next depicter 1 1`] = `
 {
   "type": "string",
 }
 `;
 
-exports[`Documentation helpers 3.1 > depictParamExamples() > should 'pass' examples in case of 'request' 1`] = `
+exports[`Documentation helpers > depictParamExamples() > should 'pass' examples in case of 'request' 1`] = `
 {
   "examples": {
     "example1": {
@@ -1776,7 +563,7 @@ exports[`Documentation helpers 3.1 > depictParamExamples() > should 'pass' examp
 }
 `;
 
-exports[`Documentation helpers 3.1 > depictParamExamples() > should 'transform' examples in case of 'response' 1`] = `
+exports[`Documentation helpers > depictParamExamples() > should 'transform' examples in case of 'response' 1`] = `
 {
   "examples": {
     "example1": {
@@ -1789,25 +576,25 @@ exports[`Documentation helpers 3.1 > depictParamExamples() > should 'transform' 
 }
 `;
 
-exports[`Documentation helpers 3.1 > depictPipeline > should depict as 'boolean (out)' 1`] = `
+exports[`Documentation helpers > depictPipeline > should depict as 'boolean (out)' 1`] = `
 {
   "type": "boolean",
 }
 `;
 
-exports[`Documentation helpers 3.1 > depictPipeline > should depict as 'string (in)' 1`] = `
+exports[`Documentation helpers > depictPipeline > should depict as 'string (in)' 1`] = `
 {
   "type": "string",
 }
 `;
 
-exports[`Documentation helpers 3.1 > depictReadonly > should pass the next depicter 1`] = `
+exports[`Documentation helpers > depictReadonly > should pass the next depicter 1`] = `
 {
   "type": "string",
 }
 `;
 
-exports[`Documentation helpers 3.1 > depictRecord() > should set properties+required or additionalProperties props 0 1`] = `
+exports[`Documentation helpers > depictRecord() > should set properties+required or additionalProperties props 0 1`] = `
 {
   "additionalProperties": {
     "type": "boolean",
@@ -1816,7 +603,7 @@ exports[`Documentation helpers 3.1 > depictRecord() > should set properties+requ
 }
 `;
 
-exports[`Documentation helpers 3.1 > depictRecord() > should set properties+required or additionalProperties props 1 1`] = `
+exports[`Documentation helpers > depictRecord() > should set properties+required or additionalProperties props 1 1`] = `
 {
   "additionalProperties": {
     "type": "boolean",
@@ -1825,7 +612,7 @@ exports[`Documentation helpers 3.1 > depictRecord() > should set properties+requ
 }
 `;
 
-exports[`Documentation helpers 3.1 > depictRecord() > should set properties+required or additionalProperties props 2 1`] = `
+exports[`Documentation helpers > depictRecord() > should set properties+required or additionalProperties props 2 1`] = `
 {
   "properties": {
     "one": {
@@ -1843,7 +630,7 @@ exports[`Documentation helpers 3.1 > depictRecord() > should set properties+requ
 }
 `;
 
-exports[`Documentation helpers 3.1 > depictRecord() > should set properties+required or additionalProperties props 3 1`] = `
+exports[`Documentation helpers > depictRecord() > should set properties+required or additionalProperties props 3 1`] = `
 {
   "properties": {
     "testing": {
@@ -1857,7 +644,7 @@ exports[`Documentation helpers 3.1 > depictRecord() > should set properties+requ
 }
 `;
 
-exports[`Documentation helpers 3.1 > depictRecord() > should set properties+required or additionalProperties props 4 1`] = `
+exports[`Documentation helpers > depictRecord() > should set properties+required or additionalProperties props 4 1`] = `
 {
   "properties": {
     "one": {
@@ -1875,7 +662,7 @@ exports[`Documentation helpers 3.1 > depictRecord() > should set properties+requ
 }
 `;
 
-exports[`Documentation helpers 3.1 > depictRecord() > should set properties+required or additionalProperties props 5 1`] = `
+exports[`Documentation helpers > depictRecord() > should set properties+required or additionalProperties props 5 1`] = `
 {
   "additionalProperties": {
     "format": "any",
@@ -1884,7 +671,7 @@ exports[`Documentation helpers 3.1 > depictRecord() > should set properties+requ
 }
 `;
 
-exports[`Documentation helpers 3.1 > depictRequestParams() > Feature 1180: should depict header params when enabled 1`] = `
+exports[`Documentation helpers > depictRequestParams() > Feature 1180: should depict header params when enabled 1`] = `
 [
   {
     "description": "GET /v1/user/:id parameter",
@@ -1916,9 +703,9 @@ exports[`Documentation helpers 3.1 > depictRequestParams() > Feature 1180: shoul
 ]
 `;
 
-exports[`Documentation helpers 3.1 > depictRequestParams() > should depict none if both query and params are disabled 1`] = `[]`;
+exports[`Documentation helpers > depictRequestParams() > should depict none if both query and params are disabled 1`] = `[]`;
 
-exports[`Documentation helpers 3.1 > depictRequestParams() > should depict only path params if query is disabled 1`] = `
+exports[`Documentation helpers > depictRequestParams() > should depict only path params if query is disabled 1`] = `
 [
   {
     "description": "GET /v1/user/:id parameter",
@@ -1932,7 +719,7 @@ exports[`Documentation helpers 3.1 > depictRequestParams() > should depict only 
 ]
 `;
 
-exports[`Documentation helpers 3.1 > depictRequestParams() > should depict query and path params 1`] = `
+exports[`Documentation helpers > depictRequestParams() > should depict query and path params 1`] = `
 [
   {
     "description": "GET /v1/user/:id parameter",
@@ -1955,7 +742,7 @@ exports[`Documentation helpers 3.1 > depictRequestParams() > should depict query
 ]
 `;
 
-exports[`Documentation helpers 3.1 > depictSecurity() > should depict OAuth2 Security with flows 1`] = `
+exports[`Documentation helpers > depictSecurity() > should depict OAuth2 Security with flows 1`] = `
 {
   "flows": {
     "authorizationCode": {
@@ -1996,7 +783,7 @@ exports[`Documentation helpers 3.1 > depictSecurity() > should depict OAuth2 Sec
 }
 `;
 
-exports[`Documentation helpers 3.1 > depictSecurity() > should handle Basic, Bearer and CustomHeader Securities 1`] = `
+exports[`Documentation helpers > depictSecurity() > should handle Basic, Bearer and CustomHeader Securities 1`] = `
 {
   "or": [
     {
@@ -2020,7 +807,7 @@ exports[`Documentation helpers 3.1 > depictSecurity() > should handle Basic, Bea
 }
 `;
 
-exports[`Documentation helpers 3.1 > depictSecurity() > should handle Input and Cookie Securities 1`] = `
+exports[`Documentation helpers > depictSecurity() > should handle Input and Cookie Securities 1`] = `
 {
   "and": [
     {
@@ -2041,7 +828,7 @@ exports[`Documentation helpers 3.1 > depictSecurity() > should handle Input and 
 }
 `;
 
-exports[`Documentation helpers 3.1 > depictSecurity() > should handle OpenID and OAuth2 Securities 1`] = `
+exports[`Documentation helpers > depictSecurity() > should handle OpenID and OAuth2 Securities 1`] = `
 {
   "or": [
     {
@@ -2056,14 +843,14 @@ exports[`Documentation helpers 3.1 > depictSecurity() > should handle OpenID and
 }
 `;
 
-exports[`Documentation helpers 3.1 > depictSecurity() > should handle undefined flows 1`] = `
+exports[`Documentation helpers > depictSecurity() > should handle undefined flows 1`] = `
 {
   "flows": {},
   "type": "oauth2",
 }
 `;
 
-exports[`Documentation helpers 3.1 > depictSecurityRefs() > should handle LogicalAnd 1`] = `
+exports[`Documentation helpers > depictSecurityRefs() > should handle LogicalAnd 1`] = `
 [
   {
     "A": [],
@@ -2073,7 +860,7 @@ exports[`Documentation helpers 3.1 > depictSecurityRefs() > should handle Logica
 ]
 `;
 
-exports[`Documentation helpers 3.1 > depictSecurityRefs() > should handle LogicalAnd 2`] = `
+exports[`Documentation helpers > depictSecurityRefs() > should handle LogicalAnd 2`] = `
 [
   {
     "A": [],
@@ -2086,7 +873,7 @@ exports[`Documentation helpers 3.1 > depictSecurityRefs() > should handle Logica
 ]
 `;
 
-exports[`Documentation helpers 3.1 > depictSecurityRefs() > should handle LogicalOr 1`] = `
+exports[`Documentation helpers > depictSecurityRefs() > should handle LogicalOr 1`] = `
 [
   {
     "A": [],
@@ -2100,7 +887,7 @@ exports[`Documentation helpers 3.1 > depictSecurityRefs() > should handle Logica
 ]
 `;
 
-exports[`Documentation helpers 3.1 > depictSecurityRefs() > should handle LogicalOr 2`] = `
+exports[`Documentation helpers > depictSecurityRefs() > should handle LogicalOr 2`] = `
 [
   {
     "A": [],
@@ -2112,7 +899,7 @@ exports[`Documentation helpers 3.1 > depictSecurityRefs() > should handle Logica
 ]
 `;
 
-exports[`Documentation helpers 3.1 > depictSecurityRefs() > should handle the plain value 1`] = `
+exports[`Documentation helpers > depictSecurityRefs() > should handle the plain value 1`] = `
 [
   {
     "A": [],
@@ -2120,7 +907,7 @@ exports[`Documentation helpers 3.1 > depictSecurityRefs() > should handle the pl
 ]
 `;
 
-exports[`Documentation helpers 3.1 > depictSecurityRefs() > should populate the scopes 1`] = `
+exports[`Documentation helpers > depictSecurityRefs() > should populate the scopes 1`] = `
 [
   {
     "A": [
@@ -2141,7 +928,7 @@ exports[`Documentation helpers 3.1 > depictSecurityRefs() > should populate the 
 ]
 `;
 
-exports[`Documentation helpers 3.1 > depictString() > should set format, pattern and min/maxLength props 0 1`] = `
+exports[`Documentation helpers > depictString() > should set format, pattern and min/maxLength props 0 1`] = `
 {
   "format": "email",
   "maxLength": 20,
@@ -2150,28 +937,28 @@ exports[`Documentation helpers 3.1 > depictString() > should set format, pattern
 }
 `;
 
-exports[`Documentation helpers 3.1 > depictString() > should set format, pattern and min/maxLength props 1 1`] = `
+exports[`Documentation helpers > depictString() > should set format, pattern and min/maxLength props 1 1`] = `
 {
   "format": "url",
   "type": "string",
 }
 `;
 
-exports[`Documentation helpers 3.1 > depictString() > should set format, pattern and min/maxLength props 2 1`] = `
+exports[`Documentation helpers > depictString() > should set format, pattern and min/maxLength props 2 1`] = `
 {
   "format": "uuid",
   "type": "string",
 }
 `;
 
-exports[`Documentation helpers 3.1 > depictString() > should set format, pattern and min/maxLength props 3 1`] = `
+exports[`Documentation helpers > depictString() > should set format, pattern and min/maxLength props 3 1`] = `
 {
   "format": "cuid",
   "type": "string",
 }
 `;
 
-exports[`Documentation helpers 3.1 > depictString() > should set format, pattern and min/maxLength props 4 1`] = `
+exports[`Documentation helpers > depictString() > should set format, pattern and min/maxLength props 4 1`] = `
 {
   "format": "date-time",
   "pattern": "/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?Z$/",
@@ -2179,7 +966,7 @@ exports[`Documentation helpers 3.1 > depictString() > should set format, pattern
 }
 `;
 
-exports[`Documentation helpers 3.1 > depictString() > should set format, pattern and min/maxLength props 5 1`] = `
+exports[`Documentation helpers > depictString() > should set format, pattern and min/maxLength props 5 1`] = `
 {
   "format": "date-time",
   "pattern": "/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?(([+-]\\d{2}:\\d{2})|Z)$/",
@@ -2187,20 +974,20 @@ exports[`Documentation helpers 3.1 > depictString() > should set format, pattern
 }
 `;
 
-exports[`Documentation helpers 3.1 > depictString() > should set format, pattern and min/maxLength props 6 1`] = `
+exports[`Documentation helpers > depictString() > should set format, pattern and min/maxLength props 6 1`] = `
 {
   "pattern": "/^\\d+.\\d+.\\d+$/",
   "type": "string",
 }
 `;
 
-exports[`Documentation helpers 3.1 > depictString() > should set type:string 1`] = `
+exports[`Documentation helpers > depictString() > should set type:string 1`] = `
 {
   "type": "string",
 }
 `;
 
-exports[`Documentation helpers 3.1 > depictTags() > should accept objects with URLs 1`] = `
+exports[`Documentation helpers > depictTags() > should accept objects with URLs 1`] = `
 [
   {
     "description": "Everything about users",
@@ -2216,7 +1003,7 @@ exports[`Documentation helpers 3.1 > depictTags() > should accept objects with U
 ]
 `;
 
-exports[`Documentation helpers 3.1 > depictTags() > should accept plain descriptions 1`] = `
+exports[`Documentation helpers > depictTags() > should accept plain descriptions 1`] = `
 [
   {
     "description": "Everything about users",
@@ -2229,7 +1016,7 @@ exports[`Documentation helpers 3.1 > depictTags() > should accept plain descript
 ]
 `;
 
-exports[`Documentation helpers 3.1 > depictTuple() > should depict according to OAS version 1`] = `
+exports[`Documentation helpers > depictTuple() > should depict according to OAS version 1`] = `
 {
   "prefixItems": [
     {
@@ -2249,7 +1036,7 @@ exports[`Documentation helpers 3.1 > depictTuple() > should depict according to 
 }
 `;
 
-exports[`Documentation helpers 3.1 > depictUnion() > should wrap next depicters into oneOf property 1`] = `
+exports[`Documentation helpers > depictUnion() > should wrap next depicters into oneOf property 1`] = `
 {
   "oneOf": [
     {
@@ -2265,32 +1052,32 @@ exports[`Documentation helpers 3.1 > depictUnion() > should wrap next depicters 
 }
 `;
 
-exports[`Documentation helpers 3.1 > depictUpload() > should set format:binary and type:string 1`] = `
+exports[`Documentation helpers > depictUpload() > should set format:binary and type:string 1`] = `
 {
   "format": "binary",
   "type": "string",
 }
 `;
 
-exports[`Documentation helpers 3.1 > depictUpload() > should throw when using in response 1`] = `
+exports[`Documentation helpers > depictUpload() > should throw when using in response 1`] = `
 [DocumentationError: Please use z.upload() only for input.
 Caused by response schema of an Endpoint assigned to GET method of /v1/user/:id path.]
 `;
 
-exports[`Documentation helpers 3.1 > excludeExampleFromDepiction() > should remove example property of supplied object 1`] = `
+exports[`Documentation helpers > excludeExampleFromDepiction() > should remove example property of supplied object 1`] = `
 {
   "description": "test",
   "type": "string",
 }
 `;
 
-exports[`Documentation helpers 3.1 > excludeParamsFromDepiction() > should handle the ReferenceObject 1`] = `
+exports[`Documentation helpers > excludeParamsFromDepiction() > should handle the ReferenceObject 1`] = `
 {
   "$ref": "test",
 }
 `;
 
-exports[`Documentation helpers 3.1 > excludeParamsFromDepiction() > should omit specified path params 0 1`] = `
+exports[`Documentation helpers > excludeParamsFromDepiction() > should omit specified path params 0 1`] = `
 {
   "properties": {
     "b": {
@@ -2304,7 +1091,7 @@ exports[`Documentation helpers 3.1 > excludeParamsFromDepiction() > should omit 
 }
 `;
 
-exports[`Documentation helpers 3.1 > excludeParamsFromDepiction() > should omit specified path params 1 1`] = `
+exports[`Documentation helpers > excludeParamsFromDepiction() > should omit specified path params 1 1`] = `
 {
   "oneOf": [
     {
@@ -2327,7 +1114,7 @@ exports[`Documentation helpers 3.1 > excludeParamsFromDepiction() > should omit 
 }
 `;
 
-exports[`Documentation helpers 3.1 > excludeParamsFromDepiction() > should omit specified path params 2 1`] = `
+exports[`Documentation helpers > excludeParamsFromDepiction() > should omit specified path params 2 1`] = `
 {
   "allOf": [
     {
@@ -2350,7 +1137,7 @@ exports[`Documentation helpers 3.1 > excludeParamsFromDepiction() > should omit 
 }
 `;
 
-exports[`Documentation helpers 3.1 > extractObjectSchema() > Feature #600: Top level refinements > should handle refined object schema 1`] = `
+exports[`Documentation helpers > extractObjectSchema() > Feature #600: Top level refinements > should handle refined object schema 1`] = `
 {
   "_type": "ZodObject",
   "shape": {
@@ -2361,7 +1148,7 @@ exports[`Documentation helpers 3.1 > extractObjectSchema() > Feature #600: Top l
 }
 `;
 
-exports[`Documentation helpers 3.1 > extractObjectSchema() > should pass the object schema through 1`] = `
+exports[`Documentation helpers > extractObjectSchema() > should pass the object schema through 1`] = `
 {
   "_type": "ZodObject",
   "shape": {
@@ -2372,7 +1159,7 @@ exports[`Documentation helpers 3.1 > extractObjectSchema() > should pass the obj
 }
 `;
 
-exports[`Documentation helpers 3.1 > extractObjectSchema() > should return object schema for the intersection of object schemas 1`] = `
+exports[`Documentation helpers > extractObjectSchema() > should return object schema for the intersection of object schemas 1`] = `
 {
   "_type": "ZodObject",
   "shape": {
@@ -2386,7 +1173,7 @@ exports[`Documentation helpers 3.1 > extractObjectSchema() > should return objec
 }
 `;
 
-exports[`Documentation helpers 3.1 > extractObjectSchema() > should return object schema for the union of object schemas 1`] = `
+exports[`Documentation helpers > extractObjectSchema() > should return object schema for the union of object schemas 1`] = `
 {
   "_type": "ZodObject",
   "shape": {

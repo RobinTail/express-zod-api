@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { ReferenceObject, SchemaObject } from "openapi3-ts/oas31";
 import { z } from "zod";
 import { defaultSerializer } from "../../src/common-helpers";
 import { IOSchemaError } from "../../src/errors";
@@ -57,15 +58,14 @@ import {
   onMissing,
   reformatParamsInPath,
 } from "../../src/documentation-helpers";
-import { CommonRef, CommonSchemaOrRef, OAS } from "../../src/oas-types";
 import { SchemaHandler, walkSchema } from "../../src/schema-walker";
 import { serializeSchemaForTest } from "../helpers";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-describe.each<OAS>(["3.0", "3.1"])("Documentation helpers %s", (oas) => {
+describe("Documentation helpers", (oas) => {
   const getRefMock = vi.fn();
   const makeRefMock = vi.fn(
-    (name: string, {}: CommonSchemaOrRef): CommonRef => ({
+    (name: string, {}: SchemaObject | ReferenceObject): ReferenceObject => ({
       $ref: `#/components/schemas/${name}`,
     }),
   );
@@ -90,7 +90,12 @@ describe.each<OAS>(["3.0", "3.1"])("Documentation helpers %s", (oas) => {
   const makeNext =
     (
       ctx: OpenAPIContext,
-    ): SchemaHandler<z.ZodTypeAny, CommonSchemaOrRef, {}, "last"> =>
+    ): SchemaHandler<
+      z.ZodTypeAny,
+      SchemaObject | ReferenceObject,
+      {},
+      "last"
+    > =>
     ({ schema }) =>
       walkSchema({
         schema,
@@ -962,7 +967,7 @@ describe.each<OAS>(["3.0", "3.1"])("Documentation helpers %s", (oas) => {
       getRefMock
         .mockImplementationOnce(() => undefined)
         .mockImplementationOnce(
-          (name: string): CommonRef => ({
+          (name: string): ReferenceObject => ({
             $ref: `#/components/schemas/${name}`,
           }),
         );

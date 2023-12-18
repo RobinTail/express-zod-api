@@ -1,7 +1,7 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`createDocumentation() > Basic cases > should be able to specify operation 1`] = `
-"openapi: 3.0.0
+"openapi: 3.1.0
 info:
   title: Testing Operation IDs
   version: 3.4.5
@@ -48,6 +48,10 @@ paths:
                 required:
                   - status
                   - error
+                examples:
+                  - status: error
+                    error:
+                      message: Sample error message
               examples:
                 example1:
                   value:
@@ -73,7 +77,7 @@ servers:
 `;
 
 exports[`createDocumentation() > Basic cases > should be able to specify the operationId provider depending on method 1`] = `
-"openapi: 3.0.0
+"openapi: 3.1.0
 info:
   title: Testing Operation IDs
   version: 3.4.5
@@ -120,6 +124,10 @@ paths:
                 required:
                   - status
                   - error
+                examples:
+                  - status: error
+                    error:
+                      message: Sample error message
               examples:
                 example1:
                   value:
@@ -169,6 +177,10 @@ paths:
                 required:
                   - status
                   - error
+                examples:
+                  - status: error
+                    error:
+                      message: Sample error message
               examples:
                 example1:
                   value:
@@ -201,7 +213,7 @@ servers:
 `;
 
 exports[`createDocumentation() > Basic cases > should ensure the uniq operation ids 1`] = `
-"openapi: 3.0.0
+"openapi: 3.1.0
 info:
   title: Testing Operation IDs
   version: 3.4.5
@@ -248,6 +260,10 @@ paths:
                 required:
                   - status
                   - error
+                examples:
+                  - status: error
+                    error:
+                      message: Sample error message
               examples:
                 example1:
                   value:
@@ -298,6 +314,10 @@ paths:
                 required:
                   - status
                   - error
+                examples:
+                  - status: error
+                    error:
+                      message: Sample error message
               examples:
                 example1:
                   value:
@@ -323,7 +343,7 @@ servers:
 `;
 
 exports[`createDocumentation() > Basic cases > should ensure uniq security schema names 1`] = `
-"openapi: 3.0.0
+"openapi: 3.1.0
 info:
   title: Testing Security
   version: 3.4.5
@@ -351,8 +371,6 @@ paths:
                         format: double
                         minimum: 5e-324
                         maximum: 1.7976931348623157e+308
-                        exclusiveMinimum: false
-                        exclusiveMaximum: false
                     required:
                       - num
                 required:
@@ -379,6 +397,10 @@ paths:
                 required:
                   - status
                   - error
+                examples:
+                  - status: error
+                    error:
+                      message: Sample error message
               examples:
                 example1:
                   value:
@@ -443,6 +465,10 @@ paths:
                 required:
                   - status
                   - error
+                examples:
+                  - status: error
+                    error:
+                      message: Sample error message
               examples:
                 example1:
                   value:
@@ -505,6 +531,10 @@ paths:
                 required:
                   - status
                   - error
+                examples:
+                  - status: error
+                    error:
+                      message: Sample error message
               examples:
                 example1:
                   value:
@@ -559,7 +589,7 @@ servers:
 `;
 
 exports[`createDocumentation() > Basic cases > should generate the correct schema for DELETE request without body 1`] = `
-"openapi: 3.0.0
+"openapi: 3.1.0
 info:
   title: Testing DELETE request without body
   version: 3.4.5
@@ -587,8 +617,6 @@ paths:
                         format: double
                         minimum: 5e-324
                         maximum: 1.7976931348623157e+308
-                        exclusiveMinimum: false
-                        exclusiveMaximum: false
                     required:
                       - whatever
                 required:
@@ -615,6 +643,10 @@ paths:
                 required:
                   - status
                   - error
+                examples:
+                  - status: error
+                    error:
+                      message: Sample error message
               examples:
                 example1:
                   value:
@@ -638,7 +670,7 @@ servers:
 `;
 
 exports[`createDocumentation() > Basic cases > should generate the correct schema for complex types 1`] = `
-"openapi: 3.0.0
+"openapi: 3.1.0
 info:
   title: Testing Complex Types
   version: 3.4.5
@@ -670,8 +702,6 @@ paths:
                         format: double
                         minimum: 5e-324
                         maximum: 1.7976931348623157e+308
-                        exclusiveMinimum: false
-                        exclusiveMaximum: false
                     required:
                       - literal
                       - transformation
@@ -699,6 +729,10 @@ paths:
                 required:
                   - status
                   - error
+                examples:
+                  - status: error
+                    error:
+                      message: Sample error message
               examples:
                 example1:
                   value:
@@ -715,10 +749,8 @@ paths:
             items:
               type: integer
               format: int64
-              minimum: 0
+              exclusiveMinimum: 0
               maximum: 9007199254740991
-              exclusiveMinimum: true
-              exclusiveMaximum: false
             minItems: 1
             maxItems: 3
         - name: unlimited
@@ -752,7 +784,7 @@ servers:
 `;
 
 exports[`createDocumentation() > Basic cases > should generate the correct schema for discriminated union type 1`] = `
-"openapi: 3.0.0
+"openapi: 3.1.0
 info:
   title: Testing Discriminated Union Type
   version: 3.4.5
@@ -826,6 +858,10 @@ paths:
                 required:
                   - status
                   - error
+                examples:
+                  - status: error
+                    error:
+                      message: Sample error message
               examples:
                 example1:
                   value:
@@ -879,7 +915,7 @@ servers:
 `;
 
 exports[`createDocumentation() > Basic cases > should generate the correct schema for intersection type 1`] = `
-"openapi: 3.0.0
+"openapi: 3.1.0
 info:
   title: Testing Intersection and And types
   version: 3.4.5
@@ -911,8 +947,6 @@ paths:
                                 format: int64
                                 minimum: 0
                                 maximum: 9007199254740991
-                                exclusiveMinimum: false
-                                exclusiveMaximum: false
                             required:
                               - five
                           - type: object
@@ -947,6 +981,10 @@ paths:
                 required:
                   - status
                   - error
+                examples:
+                  - status: error
+                    error:
+                      message: Sample error message
               examples:
                 example1:
                   value:
@@ -993,7 +1031,7 @@ servers:
 `;
 
 exports[`createDocumentation() > Basic cases > should generate the correct schema for nullable and optional types 1`] = `
-"openapi: 3.0.0
+"openapi: 3.1.0
 info:
   title: Testing Nullable and Optional Types
   version: 3.4.5
@@ -1017,8 +1055,10 @@ paths:
                     type: object
                     properties:
                       nullable:
-                        type: string
-                        nullable: true
+                        type:
+                          - "null"
+                          - "null"
+                          - string
                     required:
                       - nullable
                 required:
@@ -1045,6 +1085,10 @@ paths:
                 required:
                   - status
                   - error
+                examples:
+                  - status: error
+                    error:
+                      message: Sample error message
               examples:
                 example1:
                   value:
@@ -1070,20 +1114,25 @@ paths:
           required: false
           description: GET /v1/getSomething parameter
           schema:
-            type: boolean
-            nullable: true
+            type:
+              - "null"
+              - "null"
+              - "null"
+              - boolean
         - name: nuDefault
           in: query
           required: false
           description: GET /v1/getSomething parameter
           schema:
-            type: integer
+            type:
+              - "null"
+              - "null"
+              - "null"
+              - "null"
+              - integer
             format: int64
-            minimum: 0
+            exclusiveMinimum: 0
             maximum: 9007199254740991
-            exclusiveMinimum: true
-            exclusiveMaximum: false
-            nullable: true
             default: 123
 components:
   schemas: {}
@@ -1102,7 +1151,7 @@ servers:
 `;
 
 exports[`createDocumentation() > Basic cases > should generate the correct schema for union type 1`] = `
-"openapi: 3.0.0
+"openapi: 3.1.0
 info:
   title: Testing Union and Or Types
   version: 3.4.5
@@ -1130,10 +1179,8 @@ paths:
                           - type: string
                           - type: integer
                             format: int64
-                            minimum: 0
+                            exclusiveMinimum: 0
                             maximum: 9007199254740991
-                            exclusiveMinimum: true
-                            exclusiveMaximum: false
                     required:
                       - or
                 required:
@@ -1160,6 +1207,10 @@ paths:
                 required:
                   - status
                   - error
+                examples:
+                  - status: error
+                    error:
+                      message: Sample error message
               examples:
                 example1:
                   value:
@@ -1182,10 +1233,8 @@ paths:
                         two:
                           type: integer
                           format: int64
-                          minimum: 0
+                          exclusiveMinimum: 0
                           maximum: 9007199254740991
-                          exclusiveMinimum: true
-                          exclusiveMaximum: false
                       required:
                         - one
                         - two
@@ -1195,9 +1244,7 @@ paths:
                           type: integer
                           format: int64
                           minimum: -9007199254740991
-                          maximum: 0
-                          exclusiveMinimum: false
-                          exclusiveMaximum: true
+                          exclusiveMaximum: 0
                         three:
                           type: string
                       required:
@@ -1222,7 +1269,7 @@ servers:
 `;
 
 exports[`createDocumentation() > Basic cases > should generate the correct schema of example routing 0 1`] = `
-"openapi: 3.0.0
+"openapi: 3.1.0
 info:
   title: Example API
   version: 1.2.3
@@ -1250,8 +1297,6 @@ paths:
                         format: int64
                         minimum: 0
                         maximum: 9007199254740991
-                        exclusiveMinimum: false
-                        exclusiveMaximum: false
                       name:
                         type: string
                       features:
@@ -1294,6 +1339,10 @@ paths:
                 required:
                   - status
                   - error
+                examples:
+                  - status: error
+                    error:
+                      message: Sample error message
               examples:
                 example1:
                   value:
@@ -1342,12 +1391,17 @@ paths:
                     required:
                       - name
                       - createdAt
-                    example:
-                      name: John Doe
-                      createdAt: 2021-12-31T00:00:00.000Z
+                    examples:
+                      - name: John Doe
+                        createdAt: 2021-12-31T00:00:00.000Z
                 required:
                   - status
                   - data
+                examples:
+                  - status: success
+                    data:
+                      name: John Doe
+                      createdAt: 2021-12-31T00:00:00.000Z
               examples:
                 example1:
                   value:
@@ -1376,6 +1430,10 @@ paths:
                 required:
                   - status
                   - error
+                examples:
+                  - status: error
+                    error:
+                      message: Sample error message
               examples:
                 example1:
                   value:
@@ -1409,8 +1467,8 @@ paths:
                       minLength: 1
                   required:
                     - key
-                  example:
-                    key: 1234-5678-90
+                  examples:
+                    - key: 1234-5678-90
                 - type: object
                   properties:
                     name:
@@ -1426,9 +1484,15 @@ paths:
                   required:
                     - name
                     - birthday
-                  example:
-                    name: John Doe
-                    birthday: 1963-04-21
+                  examples:
+                    - id: "12"
+                      name: John Doe
+                      birthday: 1963-04-21
+              examples:
+                - key: 1234-5678-90
+                  id: "12"
+                  name: John Doe
+                  birthday: 1963-04-21
             examples:
               example1:
                 value:
@@ -1455,6 +1519,10 @@ paths:
                       type: string
                   required:
                     - name
+                examples:
+                  - - name: Hunter Schafer
+                    - name: Laverne Cox
+                    - name: Patti Harrison
               examples:
                 example1:
                   value:
@@ -1467,6 +1535,8 @@ paths:
             application/json:
               schema:
                 type: string
+                examples:
+                  - Sample error message
               examples:
                 example1:
                   value: Sample error message
@@ -1554,8 +1624,6 @@ paths:
                         format: int64
                         minimum: 0
                         maximum: 9007199254740991
-                        exclusiveMinimum: false
-                        exclusiveMaximum: false
                       mime:
                         type: string
                       hash:
@@ -1594,6 +1662,10 @@ paths:
                 required:
                   - status
                   - error
+                examples:
+                  - status: error
+                    error:
+                      message: Sample error message
               examples:
                 example1:
                   value:
@@ -1639,8 +1711,6 @@ paths:
                         format: int64
                         minimum: 0
                         maximum: 9007199254740991
-                        exclusiveMinimum: false
-                        exclusiveMaximum: false
                     required:
                       - length
                 required:
@@ -1667,6 +1737,10 @@ paths:
                 required:
                   - status
                   - error
+                examples:
+                  - status: error
+                    error:
+                      message: Sample error message
               examples:
                 example1:
                   value:
@@ -1723,7 +1797,7 @@ servers:
 `;
 
 exports[`createDocumentation() > Basic cases > should generate the correct schema of example routing 1 1`] = `
-"openapi: 3.0.0
+"openapi: 3.1.0
 info:
   title: Example API
   version: 1.2.3
@@ -1995,8 +2069,6 @@ components:
               format: int64
               minimum: 0
               maximum: 9007199254740991
-              exclusiveMinimum: false
-              exclusiveMaximum: false
             name:
               type: string
             features:
@@ -2035,6 +2107,10 @@ components:
       required:
         - status
         - error
+      examples:
+        - status: error
+          error:
+            message: Sample error message
     PostV1UserIdParameterId:
       type: string
     PostV1UserIdSuccessfulResponse:
@@ -2058,12 +2134,17 @@ components:
           required:
             - name
             - createdAt
-          example:
-            name: John Doe
-            createdAt: 2021-12-31T00:00:00.000Z
+          examples:
+            - name: John Doe
+              createdAt: 2021-12-31T00:00:00.000Z
       required:
         - status
         - data
+      examples:
+        - status: success
+          data:
+            name: John Doe
+            createdAt: 2021-12-31T00:00:00.000Z
     PostV1UserIdErrorResponse:
       type: object
       properties:
@@ -2081,6 +2162,10 @@ components:
       required:
         - status
         - error
+      examples:
+        - status: error
+          error:
+            message: Sample error message
     PostV1UserIdRequestBody:
       allOf:
         - type: object
@@ -2090,8 +2175,8 @@ components:
               minLength: 1
           required:
             - key
-          example:
-            key: 1234-5678-90
+          examples:
+            - key: 1234-5678-90
         - type: object
           properties:
             name:
@@ -2107,9 +2192,15 @@ components:
           required:
             - name
             - birthday
-          example:
-            name: John Doe
-            birthday: 1963-04-21
+          examples:
+            - id: "12"
+              name: John Doe
+              birthday: 1963-04-21
+      examples:
+        - key: 1234-5678-90
+          id: "12"
+          name: John Doe
+          birthday: 1963-04-21
     GetV1UserListSuccessfulResponse:
       type: array
       items:
@@ -2119,8 +2210,14 @@ components:
             type: string
         required:
           - name
+      examples:
+        - - name: Hunter Schafer
+          - name: Laverne Cox
+          - name: Patti Harrison
     GetV1UserListErrorResponse:
       type: string
+      examples:
+        - Sample error message
     GetV1AvatarSendParameterUserId:
       type: string
       pattern: /\\d+/
@@ -2153,8 +2250,6 @@ components:
               format: int64
               minimum: 0
               maximum: 9007199254740991
-              exclusiveMinimum: false
-              exclusiveMaximum: false
             mime:
               type: string
             hash:
@@ -2189,6 +2284,10 @@ components:
       required:
         - status
         - error
+      examples:
+        - status: error
+          error:
+            message: Sample error message
     PostV1AvatarUploadRequestBody:
       type: object
       properties:
@@ -2212,8 +2311,6 @@ components:
               format: int64
               minimum: 0
               maximum: 9007199254740991
-              exclusiveMinimum: false
-              exclusiveMaximum: false
           required:
             - length
       required:
@@ -2236,6 +2333,10 @@ components:
       required:
         - status
         - error
+      examples:
+        - status: error
+          error:
+            message: Sample error message
     PostV1AvatarRawRequestBody:
       type: string
       format: binary
@@ -2266,7 +2367,7 @@ servers:
 `;
 
 exports[`createDocumentation() > Basic cases > should handle bigint, boolean, date, null and readonly 1`] = `
-"openapi: 3.0.0
+"openapi: 3.1.0
 info:
   title: Testing additional types
   version: 3.4.5
@@ -2290,9 +2391,9 @@ paths:
                     type: object
                     properties:
                       "null":
-                        type: string
-                        nullable: true
-                        format: "null"
+                        type:
+                          - "null"
+                          - "null"
                       dateOut:
                         description: YYYY-MM-DDTHH:mm:ss.sssZ
                         type: string
@@ -2326,6 +2427,10 @@ paths:
                 required:
                   - status
                   - error
+                examples:
+                  - status: error
+                    error:
+                      message: Sample error message
               examples:
                 example1:
                   value:
@@ -2372,7 +2477,7 @@ servers:
 `;
 
 exports[`createDocumentation() > Basic cases > should handle circular schemas via z.lazy() 1`] = `
-"openapi: 3.0.0
+"openapi: 3.1.0
 info:
   title: Testing Lazy
   version: 3.4.5
@@ -2431,6 +2536,10 @@ paths:
                 required:
                   - status
                   - error
+                examples:
+                  - status: error
+                    error:
+                      message: Sample error message
               examples:
                 example1:
                   value:
@@ -2477,7 +2586,7 @@ servers:
 `;
 
 exports[`createDocumentation() > Basic cases > should handle custom mime types and status codes 1`] = `
-"openapi: 3.0.0
+"openapi: 3.1.0
 info:
   title: Testing MIME types and status codes
   version: 3.4.5
@@ -2535,7 +2644,7 @@ servers:
 `;
 
 exports[`createDocumentation() > Basic cases > should handle different number types 1`] = `
-"openapi: 3.0.0
+"openapi: 3.1.0
 info:
   title: Testing numbers
   version: 3.4.5
@@ -2587,6 +2696,10 @@ paths:
                 required:
                   - status
                   - error
+                examples:
+                  - status: error
+                    error:
+                      message: Sample error message
               examples:
                 example1:
                   value:
@@ -2605,64 +2718,46 @@ paths:
                   format: double
                   minimum: 5e-324
                   maximum: 1.7976931348623157e+308
-                  exclusiveMinimum: false
-                  exclusiveMaximum: false
                 doublePositive:
                   type: number
                   format: double
-                  minimum: 0
+                  exclusiveMinimum: 0
                   maximum: 1.7976931348623157e+308
-                  exclusiveMinimum: true
-                  exclusiveMaximum: false
                 doubleNegative:
                   type: number
                   format: double
                   minimum: 5e-324
-                  maximum: 0
-                  exclusiveMinimum: false
-                  exclusiveMaximum: true
+                  exclusiveMaximum: 0
                 doubleLimited:
                   type: number
                   format: double
                   minimum: -0.5
                   maximum: 0.5
-                  exclusiveMinimum: false
-                  exclusiveMaximum: false
                 int:
                   type: integer
                   format: int64
                   minimum: -9007199254740991
                   maximum: 9007199254740991
-                  exclusiveMinimum: false
-                  exclusiveMaximum: false
                 intPositive:
                   type: integer
                   format: int64
-                  minimum: 0
+                  exclusiveMinimum: 0
                   maximum: 9007199254740991
-                  exclusiveMinimum: true
-                  exclusiveMaximum: false
                 intNegative:
                   type: integer
                   format: int64
                   minimum: -9007199254740991
-                  maximum: 0
-                  exclusiveMinimum: false
-                  exclusiveMaximum: true
+                  exclusiveMaximum: 0
                 intLimited:
                   type: integer
                   format: int64
                   minimum: -100
                   maximum: 100
-                  exclusiveMinimum: false
-                  exclusiveMaximum: false
                 zero:
                   type: integer
                   format: int64
                   minimum: 0
                   maximum: 0
-                  exclusiveMinimum: false
-                  exclusiveMaximum: false
               required:
                 - double
                 - doublePositive
@@ -2689,7 +2784,7 @@ servers:
 `;
 
 exports[`createDocumentation() > Basic cases > should handle different string types 1`] = `
-"openapi: 3.0.0
+"openapi: 3.1.0
 info:
   title: Testing strings
   version: 3.4.5
@@ -2741,6 +2836,10 @@ paths:
                 required:
                   - status
                   - error
+                examples:
+                  - status: error
+                    error:
+                      message: Sample error message
               examples:
                 example1:
                   value:
@@ -2831,7 +2930,7 @@ servers:
 `;
 
 exports[`createDocumentation() > Basic cases > should handle enum types 1`] = `
-"openapi: 3.0.0
+"openapi: 3.1.0
 info:
   title: Testing enums
   version: 3.4.5
@@ -2885,6 +2984,10 @@ paths:
                 required:
                   - status
                   - error
+                examples:
+                  - status: error
+                    error:
+                      message: Sample error message
               examples:
                 example1:
                   value:
@@ -2922,7 +3025,7 @@ servers:
 `;
 
 exports[`createDocumentation() > Basic cases > should handle record 1`] = `
-"openapi: 3.0.0
+"openapi: 3.1.0
 info:
   title: Testing record
   version: 3.4.5
@@ -2952,8 +3055,6 @@ paths:
                           format: int64
                           minimum: -9007199254740991
                           maximum: 9007199254740991
-                          exclusiveMinimum: false
-                          exclusiveMaximum: false
                       stringy:
                         type: object
                         additionalProperties:
@@ -3020,6 +3121,10 @@ paths:
                 required:
                   - status
                   - error
+                examples:
+                  - status: error
+                    error:
+                      message: Sample error message
               examples:
                 example1:
                   value:
@@ -3050,7 +3155,7 @@ servers:
 `;
 
 exports[`createDocumentation() > Basic cases > should handle transformation schema in output 1`] = `
-"openapi: 3.0.0
+"openapi: 3.1.0
 info:
   title: Testing Transformation in response schema
   version: 3.4.5
@@ -3101,6 +3206,10 @@ paths:
                 required:
                   - status
                   - error
+                examples:
+                  - status: error
+                    error:
+                      message: Sample error message
               examples:
                 example1:
                   value:
@@ -3119,10 +3228,8 @@ paths:
                 two:
                   type: integer
                   format: int64
-                  minimum: 0
+                  exclusiveMinimum: 0
                   maximum: 9007199254740991
-                  exclusiveMinimum: true
-                  exclusiveMaximum: false
               required:
                 - one
                 - two
@@ -3143,7 +3250,7 @@ servers:
 `;
 
 exports[`createDocumentation() > Basic cases > should handle tuples 1`] = `
-"openapi: 3.0.0
+"openapi: 3.1.0
 info:
   title: Testing tuples
   version: 3.4.5
@@ -3168,11 +3275,7 @@ paths:
                     properties:
                       empty:
                         type: array
-                        minItems: 0
-                        maxItems: 0
-                        items:
-                          oneOf: []
-                          format: tuple
+                        prefixItems: []
                     required:
                       - empty
                 required:
@@ -3199,6 +3302,10 @@ paths:
                 required:
                   - status
                   - error
+                examples:
+                  - status: error
+                    error:
+                      message: Sample error message
               examples:
                 example1:
                   value:
@@ -3214,40 +3321,25 @@ paths:
               properties:
                 ofOne:
                   type: array
-                  minItems: 1
-                  maxItems: 1
-                  items:
-                    oneOf:
-                      - type: boolean
-                    format: tuple
-                    description: "0: boolean"
+                  prefixItems:
+                    - type: boolean
                 ofStrings:
                   type: array
-                  minItems: 2
-                  maxItems: 2
-                  items:
-                    oneOf:
-                      - type: string
-                      - type: string
-                        nullable: true
-                    format: tuple
-                    description: "0: string, 1: string"
+                  prefixItems:
+                    - type: string
+                    - type:
+                        - "null"
+                        - "null"
+                        - string
                 complex:
                   type: array
-                  minItems: 3
-                  maxItems: 3
-                  items:
-                    oneOf:
-                      - type: boolean
-                      - type: string
-                      - type: integer
-                        format: int64
-                        minimum: 0
-                        maximum: 9007199254740991
-                        exclusiveMinimum: true
-                        exclusiveMaximum: false
-                    format: tuple
-                    description: "0: boolean, 1: string, 2: integer"
+                  prefixItems:
+                    - type: boolean
+                    - type: string
+                    - type: integer
+                      format: int64
+                      exclusiveMinimum: 0
+                      maximum: 9007199254740991
               required:
                 - ofOne
                 - ofStrings
@@ -3269,7 +3361,7 @@ servers:
 `;
 
 exports[`createDocumentation() > Basic cases > should handle type any 1`] = `
-"openapi: 3.0.0
+"openapi: 3.1.0
 info:
   title: Testing type any
   version: 3.4.5
@@ -3318,6 +3410,10 @@ paths:
                 required:
                   - status
                   - error
+                examples:
+                  - status: error
+                    error:
+                      message: Sample error message
               examples:
                 example1:
                   value:
@@ -3348,7 +3444,7 @@ servers:
 `;
 
 exports[`createDocumentation() > Basic cases > should handle z.preprocess() 1`] = `
-"openapi: 3.0.0
+"openapi: 3.1.0
 info:
   title: Testing z.preprocess()
   version: 3.4.5
@@ -3372,8 +3468,9 @@ paths:
                     type: object
                     properties:
                       boolean:
-                        type: boolean
-                        nullable: true
+                        type:
+                          - "null"
+                          - boolean
                 required:
                   - status
                   - data
@@ -3398,6 +3495,10 @@ paths:
                 required:
                   - status
                   - error
+                examples:
+                  - status: error
+                    error:
+                      message: Sample error message
               examples:
                 example1:
                   value:
@@ -3419,8 +3520,6 @@ paths:
             format: int64 (preprocessed)
             minimum: 0
             maximum: 9007199254740991
-            exclusiveMinimum: false
-            exclusiveMaximum: false
 components:
   schemas: {}
   responses: {}
@@ -3438,7 +3537,7 @@ servers:
 `;
 
 exports[`createDocumentation() > Feature 1180: Headers opt-in params > should describe x- inputs as header params 1`] = `
-"openapi: 3.0.0
+"openapi: 3.1.0
 info:
   title: Testing headers params
   version: 3.4.5
@@ -3485,6 +3584,10 @@ paths:
                 required:
                   - status
                   - error
+                examples:
+                  - status: error
+                    error:
+                      message: Sample error message
               examples:
                 example1:
                   value:
@@ -3521,7 +3624,7 @@ servers:
 `;
 
 exports[`createDocumentation() > Issue #98 > Should describe non-empty array 1`] = `
-"openapi: 3.0.0
+"openapi: 3.1.0
 info:
   title: "Testing issue #98"
   version: 3.4.5
@@ -3575,6 +3678,10 @@ paths:
                 required:
                   - status
                   - error
+                examples:
+                  - status: error
+                    error:
+                      message: Sample error message
               examples:
                 example1:
                   value:
@@ -3639,6 +3746,10 @@ paths:
                 required:
                   - status
                   - error
+                examples:
+                  - status: error
+                    error:
+                      message: Sample error message
               examples:
                 example1:
                   value:
@@ -3676,7 +3787,7 @@ servers:
 `;
 
 exports[`createDocumentation() > Issue #98 > should union schemas 1`] = `
-"openapi: 3.0.0
+"openapi: 3.1.0
 info:
   title: "Testing issue #98"
   version: 3.4.5
@@ -3740,6 +3851,10 @@ paths:
                 required:
                   - status
                   - error
+                examples:
+                  - status: error
+                    error:
+                      message: Sample error message
               examples:
                 example1:
                   value:
@@ -3787,7 +3902,7 @@ servers:
 `;
 
 exports[`createDocumentation() > Metadata > Issue #827: withMeta() should be immutable 1`] = `
-"openapi: 3.0.0
+"openapi: 3.1.0
 info:
   title: Testing Metadata:example on IO parameter
   version: 3.4.5
@@ -3817,12 +3932,23 @@ paths:
                     required:
                       - a
                       - b
-                    example:
-                      a: first
-                      b: prefix_first
+                    examples:
+                      - a: first
+                        b: prefix_first
+                      - a: second
+                        b: prefix_second
                 required:
                   - status
                   - data
+                examples:
+                  - status: success
+                    data:
+                      a: first
+                      b: prefix_first
+                  - status: success
+                    data:
+                      a: second
+                      b: prefix_second
               examples:
                 example1:
                   value:
@@ -3857,6 +3983,10 @@ paths:
                 required:
                   - status
                   - error
+                examples:
+                  - status: error
+                    error:
+                      message: Sample error message
               examples:
                 example1:
                   value:
@@ -3874,6 +4004,8 @@ paths:
                   type: string
               required:
                 - a
+              examples:
+                - a: first
             examples:
               example1:
                 value:
@@ -3895,7 +4027,7 @@ servers:
 `;
 
 exports[`createDocumentation() > Metadata > Issue #929: the location of the custom description should be on the param level 1`] = `
-"openapi: 3.0.0
+"openapi: 3.1.0
 info:
   title: Testing Metadata:description
   version: 3.4.5
@@ -3966,6 +4098,10 @@ components:
       required:
         - status
         - error
+      examples:
+        - status: error
+          error:
+            message: Sample error message
   responses: {}
   parameters: {}
   examples: {}
@@ -3981,7 +4117,7 @@ servers:
 `;
 
 exports[`createDocumentation() > Metadata > should merge endpoint handler examples with its middleware examples 1`] = `
-"openapi: 3.0.0
+"openapi: 3.1.0
 info:
   title: Testing Metadata:example on IO schema + middleware
   version: 3.4.5
@@ -4009,15 +4145,17 @@ paths:
                         format: double
                         minimum: 5e-324
                         maximum: 1.7976931348623157e+308
-                        exclusiveMinimum: false
-                        exclusiveMaximum: false
                     required:
                       - num
-                    example:
-                      num: 123
+                    examples:
+                      - num: 123
                 required:
                   - status
                   - data
+                examples:
+                  - status: success
+                    data:
+                      num: 123
               examples:
                 example1:
                   value:
@@ -4045,6 +4183,10 @@ paths:
                 required:
                   - status
                   - error
+                examples:
+                  - status: error
+                    error:
+                      message: Sample error message
               examples:
                 example1:
                   value:
@@ -4063,16 +4205,19 @@ paths:
                       type: string
                   required:
                     - key
-                  example:
-                    key: 1234-56789-01
+                  examples:
+                    - key: 1234-56789-01
                 - type: object
                   properties:
                     str:
                       type: string
                   required:
                     - str
-                  example:
-                    str: test
+                  examples:
+                    - str: test
+              examples:
+                - key: 1234-56789-01
+                  str: test
             examples:
               example1:
                 value:
@@ -4095,7 +4240,7 @@ servers:
 `;
 
 exports[`createDocumentation() > Metadata > should pass over examples of each param from the whole IO schema examples (GET) 1`] = `
-"openapi: 3.0.0
+"openapi: 3.1.0
 info:
   title: Testing Metadata:example on IO schema
   version: 3.4.5
@@ -4122,11 +4267,15 @@ paths:
                         type: string
                     required:
                       - numericStr
-                    example:
-                      numericStr: "123"
+                    examples:
+                      - numericStr: "123"
                 required:
                   - status
                   - data
+                examples:
+                  - status: success
+                    data:
+                      numericStr: "123"
               examples:
                 example1:
                   value:
@@ -4154,6 +4303,10 @@ paths:
                 required:
                   - status
                   - error
+                examples:
+                  - status: error
+                    error:
+                      message: Sample error message
               examples:
                 example1:
                   value:
@@ -4187,7 +4340,7 @@ servers:
 `;
 
 exports[`createDocumentation() > Metadata > should pass over examples of the whole IO schema (POST) 1`] = `
-"openapi: 3.0.0
+"openapi: 3.1.0
 info:
   title: Testing Metadata:example on IO schema
   version: 3.4.5
@@ -4214,11 +4367,15 @@ paths:
                         type: string
                     required:
                       - numericStr
-                    example:
-                      numericStr: "123"
+                    examples:
+                      - numericStr: "123"
                 required:
                   - status
                   - data
+                examples:
+                  - status: success
+                    data:
+                      numericStr: "123"
               examples:
                 example1:
                   value:
@@ -4246,6 +4403,10 @@ paths:
                 required:
                   - status
                   - error
+                examples:
+                  - status: error
+                    error:
+                      message: Sample error message
               examples:
                 example1:
                   value:
@@ -4263,6 +4424,8 @@ paths:
                   type: string
               required:
                 - strNum
+              examples:
+                - strNum: "123"
             examples:
               example1:
                 value:
@@ -4284,7 +4447,7 @@ servers:
 `;
 
 exports[`createDocumentation() > Metadata > should pass over the example of an individual parameter 1`] = `
-"openapi: 3.0.0
+"openapi: 3.1.0
 info:
   title: Testing Metadata:example on IO parameter
   version: 3.4.5
@@ -4309,7 +4472,8 @@ paths:
                     properties:
                       numericStr:
                         type: string
-                        example: "123"
+                        examples:
+                          - "123"
                     required:
                       - numericStr
                 required:
@@ -4336,6 +4500,10 @@ paths:
                 required:
                   - status
                   - error
+                examples:
+                  - status: error
+                    error:
+                      message: Sample error message
               examples:
                 example1:
                   value:
@@ -4349,7 +4517,8 @@ paths:
           description: GET /v1/getSomething parameter
           schema:
             type: string
-            example: "123"
+            examples:
+              - "123"
 components:
   schemas: {}
   responses: {}
@@ -4367,7 +4536,7 @@ servers:
 `;
 
 exports[`createDocumentation() > Metadata > should pass over the schema description 1`] = `
-"openapi: 3.0.0
+"openapi: 3.1.0
 info:
   title: Testing Metadata:description
   version: 3.4.5
@@ -4393,10 +4562,8 @@ paths:
                       result:
                         type: integer
                         format: int64
-                        minimum: 0
+                        exclusiveMinimum: 0
                         maximum: 9007199254740991
-                        exclusiveMinimum: true
-                        exclusiveMaximum: false
                         description: some positive integer
                     required:
                       - result
@@ -4424,6 +4591,10 @@ paths:
                 required:
                   - status
                   - error
+                examples:
+                  - status: error
+                    error:
+                      message: Sample error message
               examples:
                 example1:
                   value:
@@ -4455,7 +4626,7 @@ servers:
 `;
 
 exports[`createDocumentation() > Route Path Params > should handle route path params for GET request 1`] = `
-"openapi: 3.0.0
+"openapi: 3.1.0
 info:
   title: Testing route path params
   version: 3.4.5
@@ -4502,6 +4673,10 @@ paths:
                 required:
                   - status
                   - error
+                examples:
+                  - status: error
+                    error:
+                      message: Sample error message
               examples:
                 example1:
                   value:
@@ -4544,7 +4719,7 @@ servers:
 `;
 
 exports[`createDocumentation() > Route Path Params > should handle route path params for POST request 1`] = `
-"openapi: 3.0.0
+"openapi: 3.1.0
 info:
   title: Testing route path params
   version: 3.4.5
@@ -4591,6 +4766,10 @@ paths:
                 required:
                   - status
                   - error
+                examples:
+                  - status: error
+                    error:
+                      message: Sample error message
               examples:
                 example1:
                   value:

@@ -1,4 +1,19 @@
 import assert from "node:assert/strict";
+import type {
+  ContentObject,
+  ExampleObject,
+  ExamplesObject,
+  OAuthFlowsObject,
+  ParameterObject,
+  ReferenceObject,
+  RequestBodyObject,
+  ResponseObject,
+  SchemaObject,
+  SchemaObjectType,
+  SecurityRequirementObject,
+  SecuritySchemeObject,
+  TagObject,
+} from "openapi3-ts/oas31";
 import { omit } from "ramda";
 import { z } from "zod";
 import {
@@ -26,24 +41,6 @@ import {
 import { copyMeta } from "./metadata";
 import { Method } from "./method";
 import {
-  CommonBody,
-  CommonContent,
-  CommonExample,
-  CommonExamples,
-  CommonFlows,
-  CommonParam,
-  CommonRef,
-  CommonResponse,
-  CommonSchema,
-  CommonSchemaOrRef,
-  CommonSecReq,
-  CommonSecurity,
-  CommonTag,
-  OAS,
-  SchemaObject30,
-  SchemaObject31,
-} from "./oas-types";
-import {
   HandlingRules,
   HandlingVariant,
   SchemaHandler,
@@ -55,11 +52,13 @@ import { ZodUpload } from "./upload-schema";
 /* eslint-disable @typescript-eslint/no-use-before-define */
 
 export interface OpenAPIContext extends FlatObject {
-  oas: OAS;
   isResponse: boolean;
   serializer: (schema: z.ZodTypeAny) => string;
-  getRef: (name: string) => CommonRef | undefined;
-  makeRef: (name: string, schema: CommonSchemaOrRef) => CommonRef;
+  getRef: (name: string) => ReferenceObject | undefined;
+  makeRef: (
+    name: string,
+    schema: SchemaObject | ReferenceObject,
+  ) => ReferenceObject;
   path: string;
   method: Method;
 }
@@ -67,12 +66,12 @@ export interface OpenAPIContext extends FlatObject {
 type Depicter<
   T extends z.ZodTypeAny,
   Variant extends HandlingVariant = "regular",
-> = SchemaHandler<T, CommonSchemaOrRef, OpenAPIContext, Variant>;
+> = SchemaHandler<T, SchemaObject | ReferenceObject, OpenAPIContext, Variant>;
 
 interface ReqResDepictHelperCommonProps
   extends Pick<
     OpenAPIContext,
-    "serializer" | "getRef" | "makeRef" | "path" | "method" | "oas"
+    "serializer" | "getRef" | "makeRef" | "path" | "method"
   > {
   endpoint: AbstractEndpoint;
   composition: "inline" | "components";
@@ -91,7 +90,7 @@ const samples = {
   object: {},
   null: null,
   array: [],
-} satisfies Record<Extract<CommonSchema["type"], string>, unknown>;
+} satisfies Record<Extract<SchemaObjectType, string>, unknown>;
 
 /** @see https://expressjs.com/en/guide/routing.html */
 const routePathParamsRegex = /:([A-Za-z0-9_]+)/g;
@@ -192,19 +191,14 @@ export const depictReadonly: Depicter<z.ZodReadonly<z.ZodTypeAny>> = ({
 export const depictNullable: Depicter<z.ZodNullable<z.ZodTypeAny>> = ({
   schema,
   next,
-  oas,
 }) => {
   const nested = next({ schema: schema.unwrap() });
-  return Object.assign(
-    nested,
-    oas === "3.1"
-      ? ({
-          type: ["null" as Extract<SchemaObject31["type"], string>].concat(
-            "$ref" in nested ? [] : nested.type || [],
-          ),
-        } satisfies SchemaObject31)
-      : ({ nullable: true } satisfies SchemaObject30),
-  );
+  return {
+    ...nested,
+    type: ["null" as Extract<SchemaObjectType, string>].concat(
+      "$ref" in nested ? [] : nested.type || [],
+    ),
+  };
 };
 
 export const depictEnum: Depicter<
@@ -243,16 +237,9 @@ export const depictObject: Depicter<z.AnyZodObject> = ({
 
 /**
  * @see https://swagger.io/docs/specification/data-models/data-types/
- * @since OAS 3.1: using type: "null"s
+ * @since OAS 3.1: using type: "null"
  * */
-export const depictNull: Depicter<z.ZodNull> = ({ oas }) =>
-  oas === "3.1"
-    ? ({ type: "null" } satisfies SchemaObject31)
-    : ({
-        type: "string",
-        nullable: true,
-        format: "null",
-      } satisfies SchemaObject30);
+export const depictNull: Depicter<z.ZodNull> = () => ({ type: "null" });
 
 export const depictDateIn: Depicter<ZodDateIn> = (ctx) => {
   assert(
@@ -394,32 +381,12 @@ export const depictArray: Depicter<z.ZodArray<z.ZodTypeAny>> = ({
 export const depictTuple: Depicter<z.ZodTuple> = ({
   schema: { items },
   next,
-  oas,
 }) => {
   const types = items.map((item) => next({ schema: item }));
-  return Object.assign(
-    {
-      type: "array",
-    } satisfies CommonSchema,
-    oas === "3.1"
-      ? ({ prefixItems: types } satisfies SchemaObject31)
-      : ({
-          minItems: types.length,
-          maxItems: types.length,
-          items: {
-            oneOf: types,
-            format: "tuple",
-            ...(types.length > 0 && {
-              description: types
-                .map(
-                  (item, index) =>
-                    `${index}: ${"$ref" in item ? item.$ref : item.type}`,
-                )
-                .join(", "),
-            }),
-          },
-        } satisfies SchemaObject30),
-  );
+  return {
+    type: "array",
+    prefixItems: types,
+  };
 };
 
 export const depictString: Depicter<z.ZodString> = ({
@@ -469,11 +436,11 @@ export const depictString: Depicter<z.ZodString> = ({
     ...(minLength !== null && { minLength }),
     ...(maxLength !== null && { maxLength }),
     ...(regex && { pattern: `/${regex.source}/${regex.flags}` }),
-  } satisfies CommonSchema;
+  } satisfies SchemaObject;
 };
 
 /** @since OAS 3.1: exclusive min/max are numbers */
-export const depictNumber: Depicter<z.ZodNumber> = ({ schema, oas }) => {
+export const depictNumber: Depicter<z.ZodNumber> = ({ schema }) => {
   const minCheck = schema._def.checks.find(({ kind }) => kind === "min") as
     | Extract<z.ZodNumberCheck, { kind: "min" }>
     | undefined;
@@ -494,31 +461,21 @@ export const depictNumber: Depicter<z.ZodNumber> = ({ schema, oas }) => {
         : Number.MAX_VALUE
       : schema.maxValue;
   const isMaxInclusive = maxCheck ? maxCheck.inclusive : true;
-  const common: CommonSchema = {
+  return {
     type: schema.isInt ? "integer" : "number",
     format: schema.isInt ? "int64" : "double",
+    ...(isMinInclusive ? { minimum } : { exclusiveMinimum: minimum }),
+    ...(isMaxInclusive ? { maximum } : { exclusiveMaximum: maximum }),
   };
-  return Object.assign(
-    common,
-    oas === "3.1"
-      ? ({
-          ...(isMinInclusive ? { minimum } : { exclusiveMinimum: minimum }),
-          ...(isMaxInclusive ? { maximum } : { exclusiveMaximum: maximum }),
-        } satisfies SchemaObject31)
-      : ({
-          minimum,
-          maximum,
-          exclusiveMinimum: !isMinInclusive,
-          exclusiveMaximum: !isMaxInclusive,
-        } satisfies SchemaObject30),
-  );
 };
 
 export const depictObjectProperties = ({
   schema: { shape },
   next,
 }: Parameters<Depicter<z.AnyZodObject>>[0]) => {
-  return Object.keys(shape).reduce<Record<string, CommonSchemaOrRef>>(
+  return Object.keys(shape).reduce<
+    Record<string, SchemaObject | ReferenceObject>
+  >(
     (carry, key) => ({
       ...carry,
       [key]: next({ schema: shape[key] }),
@@ -527,7 +484,7 @@ export const depictObjectProperties = ({
   );
 };
 
-const makeSample = (depicted: CommonSchema) => {
+const makeSample = (depicted: SchemaObject) => {
   const type = (
     Array.isArray(depicted.type) ? depicted.type[0] : depicted.type
   ) as keyof typeof samples;
@@ -574,7 +531,7 @@ export const depictLazy: Depicter<z.ZodLazy<z.ZodTypeAny>> = ({
   serializer: serialize,
   getRef,
   makeRef,
-}): CommonRef => {
+}): ReferenceObject => {
   const hash = serialize(lazy.schema);
   return (
     getRef(hash) ||
@@ -589,7 +546,7 @@ export const depictExamples = (
   schema: z.ZodTypeAny,
   isResponse: boolean,
   omitProps: string[] = [],
-): CommonExamples => {
+): ExamplesObject => {
   const examples = getExamples({
     schema,
     variant: isResponse ? "parsed" : "original",
@@ -599,7 +556,7 @@ export const depictExamples = (
     return {};
   }
   return {
-    examples: examples.reduce<CommonExamples>(
+    examples: examples.reduce<ExamplesObject>(
       (carry, example, index) => ({
         ...carry,
         [`example${index + 1}`]: {
@@ -607,7 +564,7 @@ export const depictExamples = (
             typeof example === "object" && !Array.isArray(example)
               ? omit(omitProps, example)
               : example,
-        } satisfies CommonExample,
+        } satisfies ExampleObject,
       }),
       {},
     ),
@@ -618,7 +575,7 @@ export const depictParamExamples = (
   schema: z.ZodTypeAny,
   isResponse: boolean,
   param: string,
-): CommonExamples => {
+): ExamplesObject => {
   const examples = getExamples({
     schema,
     variant: isResponse ? "parsed" : "original",
@@ -628,14 +585,14 @@ export const depictParamExamples = (
     return {};
   }
   return {
-    examples: examples.reduce<CommonExamples>(
+    examples: examples.reduce<ExamplesObject>(
       (carry, example, index) =>
         param in example
           ? {
               ...carry,
               [`example${index + 1}`]: {
                 value: example[param],
-              } satisfies CommonExample,
+              } satisfies ExampleObject,
             }
           : carry,
       {},
@@ -687,11 +644,10 @@ export const depictRequestParams = ({
   getRef,
   makeRef,
   composition,
-  oas,
   clue = "parameter",
 }: ReqResDepictHelperCommonProps & {
   inputSources: InputSource[];
-}): CommonParam[] => {
+}): ParameterObject[] => {
   const schema = endpoint.getSchema("input");
   const shape = extractObjectSchema(schema, {
     path,
@@ -720,7 +676,6 @@ export const depictRequestParams = ({
         makeRef,
         path,
         method,
-        oas,
       });
       const result =
         composition === "components"
@@ -743,7 +698,10 @@ export const depictRequestParams = ({
     });
 };
 
-export const depicters: HandlingRules<CommonSchemaOrRef, OpenAPIContext> = {
+export const depicters: HandlingRules<
+  SchemaObject | ReferenceObject,
+  OpenAPIContext
+> = {
   ZodString: depictString,
   ZodNumber: depictNumber,
   ZodBigInt: depictBigInt,
@@ -780,7 +738,6 @@ export const onEach: Depicter<z.ZodTypeAny, "each"> = ({
   schema,
   isResponse,
   prev,
-  oas,
 }) => {
   if ("$ref" in prev) {
     return {};
@@ -803,20 +760,12 @@ export const onEach: Depicter<z.ZodTypeAny, "each"> = ({
       });
   return {
     ...(description && { description }),
-    ...(isActuallyNullable
-      ? oas === "3.1"
-        ? ({
-            type: ["null" as Extract<SchemaObject31["type"], string>].concat(
-              prev.type || [],
-            ),
-          } satisfies SchemaObject31)
-        : ({ nullable: true } satisfies SchemaObject30)
-      : {}),
-    ...(examples.length > 0
-      ? oas === "3.1"
-        ? ({ examples: Array.from(examples) } satisfies SchemaObject31)
-        : ({ example: examples[0] } satisfies SchemaObject30)
-      : {}),
+    ...(isActuallyNullable && {
+      type: ["null" as Extract<SchemaObjectType, string>].concat(
+        prev.type || [],
+      ),
+    }),
+    ...(examples.length > 0 && { examples: Array.from(examples) }),
   };
 };
 
@@ -829,9 +778,9 @@ export const onMissing: Depicter<z.ZodTypeAny, "last"> = ({ schema, ...ctx }) =>
   );
 
 export const excludeParamsFromDepiction = (
-  depicted: CommonSchemaOrRef,
+  depicted: SchemaObject | ReferenceObject,
   pathParams: string[],
-): CommonSchemaOrRef => {
+): SchemaObject | ReferenceObject => {
   if ("$ref" in depicted) {
     return depicted;
   }
@@ -845,12 +794,12 @@ export const excludeParamsFromDepiction = (
     ? depicted.required.filter((name) => !pathParams.includes(name))
     : undefined;
   const allOf = depicted.allOf
-    ? (depicted.allOf as CommonSchema[]).map((entry) =>
+    ? (depicted.allOf as SchemaObject[]).map((entry) =>
         excludeParamsFromDepiction(entry, pathParams),
       )
     : undefined;
   const oneOf = depicted.oneOf
-    ? (depicted.oneOf as CommonSchema[]).map((entry) =>
+    ? (depicted.oneOf as SchemaObject[]).map((entry) =>
         excludeParamsFromDepiction(entry, pathParams),
       )
     : undefined;
@@ -871,8 +820,8 @@ export const excludeParamsFromDepiction = (
 };
 
 export const excludeExampleFromDepiction = (
-  depicted: CommonSchemaOrRef,
-): CommonSchemaOrRef =>
+  depicted: SchemaObject | ReferenceObject,
+): SchemaObject | ReferenceObject =>
   "$ref" in depicted ? depicted : omit(["example"], depicted);
 
 export const depictResponse = ({
@@ -884,11 +833,10 @@ export const depictResponse = ({
   getRef,
   makeRef,
   composition,
-  oas,
   clue = "response",
 }: ReqResDepictHelperCommonProps & {
   isPositive: boolean;
-}): CommonResponse => {
+}): ResponseObject => {
   const schema = endpoint.getSchema(isPositive ? "positive" : "negative");
   const mimeTypes = endpoint.getMimeTypes(isPositive ? "positive" : "negative");
   const depictedSchema = excludeExampleFromDepiction(
@@ -903,7 +851,6 @@ export const depictResponse = ({
       makeRef,
       path,
       method,
-      oas,
     }),
   );
   const examples = depictExamples(schema, true);
@@ -914,7 +861,7 @@ export const depictResponse = ({
 
   return {
     description: `${method.toUpperCase()} ${path} ${clue}`,
-    content: mimeTypes.reduce<CommonContent>(
+    content: mimeTypes.reduce<ContentObject>(
       (carry, mimeType) => ({
         ...carry,
         [mimeType]: { schema: result, ...examples },
@@ -926,7 +873,7 @@ export const depictResponse = ({
 
 type SecurityHelper<K extends Security["type"]> = (
   security: Security & { type: K },
-) => CommonSecurity;
+) => SecuritySchemeObject;
 
 const depictBasicSecurity: SecurityHelper<"basic"> = () => ({
   type: "http",
@@ -963,22 +910,21 @@ const depictOpenIdSecurity: SecurityHelper<"openid"> = ({
 });
 const depictOAuth2Security: SecurityHelper<"oauth2"> = ({ flows = {} }) => ({
   type: "oauth2",
-  flows: (Object.keys(flows) as (keyof typeof flows)[]).reduce<CommonFlows>(
-    (acc, key) => {
-      const flow = flows[key];
-      if (!flow) {
-        return acc;
-      }
-      const { scopes = {}, ...rest } = flow;
-      return { ...acc, [key]: { ...rest, scopes } };
-    },
-    {},
-  ),
+  flows: (
+    Object.keys(flows) as (keyof typeof flows)[]
+  ).reduce<OAuthFlowsObject>((acc, key) => {
+    const flow = flows[key];
+    if (!flow) {
+      return acc;
+    }
+    const { scopes = {}, ...rest } = flow;
+    return { ...acc, [key]: { ...rest, scopes } };
+  }, {}),
 });
 
 export const depictSecurity = (
   container: LogicalContainer<Security>,
-): LogicalContainer<CommonSecurity> => {
+): LogicalContainer<SecuritySchemeObject> => {
   const methods: { [K in Security["type"]]: SecurityHelper<K> } = {
     basic: depictBasicSecurity,
     bearer: depictBearerSecurity,
@@ -995,11 +941,14 @@ export const depictSecurity = (
 
 export const depictSecurityRefs = (
   container: LogicalContainer<{ name: string; scopes: string[] }>,
-): CommonSecReq[] => {
+): SecurityRequirementObject[] => {
   if (typeof container === "object") {
     if ("or" in container) {
       return container.or.map((entry) =>
-        ("and" in entry ? entry.and : [entry]).reduce<CommonSecReq>(
+        ("and" in entry
+          ? entry.and
+          : [entry]
+        ).reduce<SecurityRequirementObject>(
           (agg, { name, scopes }) => ({
             ...agg,
             [name]: scopes,
@@ -1023,9 +972,8 @@ export const depictRequest = ({
   getRef,
   makeRef,
   composition,
-  oas,
   clue = "request body",
-}: ReqResDepictHelperCommonProps): CommonBody => {
+}: ReqResDepictHelperCommonProps): RequestBodyObject => {
   const pathParams = getRoutePathParams(path);
   const inputSchema = endpoint.getSchema("input");
   const bodyDepiction = excludeExampleFromDepiction(
@@ -1041,7 +989,6 @@ export const depictRequest = ({
         makeRef,
         path,
         method,
-        oas,
       }),
       pathParams,
     ),
@@ -1058,7 +1005,7 @@ export const depictRequest = ({
 
   return {
     description: `${method.toUpperCase()} ${path} ${clue}`,
-    content: endpoint.getMimeTypes("input").reduce<CommonContent>(
+    content: endpoint.getMimeTypes("input").reduce<ContentObject>(
       (carry, mimeType) => ({
         ...carry,
         [mimeType]: { schema: result, ...bodyExamples },
@@ -1070,7 +1017,7 @@ export const depictRequest = ({
 
 export const depictTags = <TAG extends string>(
   tags: TagsConfig<TAG>,
-): CommonTag[] =>
+): TagObject[] =>
   (Object.keys(tags) as TAG[]).map((tag) => {
     const def = tags[tag];
     return {
