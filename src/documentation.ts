@@ -54,6 +54,17 @@ export class Documentation extends OpenApiBuilder {
   protected lastSecuritySchemaIds: Partial<Record<string, number>> = {};
   protected lastOperationIdSuffixes: Record<string, number> = {};
 
+  protected getRef(name: string): ReferenceObject | undefined {
+    return name in (this.rootDoc.components?.schemas || {})
+      ? { $ref: `#/components/schemas/${name}` }
+      : undefined;
+  }
+
+  protected makeRef(name: string, schema: SchemaObject | ReferenceObject) {
+    this.addSchema(name, schema);
+    return this.getRef(name)!;
+  }
+
   protected ensureUniqOperationId = (
     path: string,
     method: Method,
@@ -80,17 +91,6 @@ export class Documentation extends OpenApiBuilder {
     this.lastOperationIdSuffixes[operationId] = 1;
     return operationId;
   };
-
-  protected getRef(name: string): ReferenceObject | undefined {
-    return name in (this.rootDoc.components?.schemas || {})
-      ? { $ref: `#/components/schemas/${name}` }
-      : undefined;
-  }
-
-  protected makeRef(name: string, schema: SchemaObject | ReferenceObject) {
-    this.addSchema(name, schema);
-    return this.getRef(name)!;
-  }
 
   protected ensureUniqSecuritySchemaName(subject: SecuritySchemeObject) {
     const serializedSubject = JSON.stringify(subject);
