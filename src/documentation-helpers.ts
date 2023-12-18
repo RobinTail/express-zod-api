@@ -803,13 +803,21 @@ export const onEach: Depicter<z.ZodTypeAny, "each"> = ({
       });
   return {
     ...(description && { description }),
-    ...(isActuallyNullable && { nullable: true }),
+    ...(isActuallyNullable
+      ? oas === "3.1"
+        ? ({
+            type: ["null" as Extract<SchemaObject31["type"], string>].concat(
+              prev.type || [],
+            ),
+          } satisfies SchemaObject31)
+        : ({ nullable: true } satisfies SchemaObject30)
+      : {}),
     ...(examples.length > 0
       ? oas === "3.1"
-        ? { examples: Array.from(examples) }
-        : { example: examples[0] }
+        ? ({ examples: Array.from(examples) } satisfies SchemaObject31)
+        : ({ example: examples[0] } satisfies SchemaObject30)
       : {}),
-  } satisfies SchemaObject31;
+  };
 };
 
 export const onMissing: Depicter<z.ZodTypeAny, "last"> = ({ schema, ...ctx }) =>

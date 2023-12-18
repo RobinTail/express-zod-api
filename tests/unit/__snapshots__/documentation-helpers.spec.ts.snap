@@ -1623,8 +1623,10 @@ exports[`Documentation helpers 3.1 > depictObject() > Bug #758 1`] = `
       "type": "string",
     },
     "c": {
-      "nullable": true,
-      "type": "string",
+      "type": [
+        "null",
+        "string",
+      ],
     },
   },
   "required": [
@@ -1728,8 +1730,10 @@ exports[`Documentation helpers 3.1 > depictObject() > should type:object, proper
       "type": "number",
     },
     "b": {
-      "nullable": true,
-      "type": "string",
+      "type": [
+        "null",
+        "string",
+      ],
     },
   },
   "type": "object",
