@@ -195,9 +195,7 @@ export const depictNullable: Depicter<z.ZodNullable<z.ZodTypeAny>> = ({
   const nested = next({ schema: schema.unwrap() });
   return {
     ...nested,
-    type: ["null" as Extract<SchemaObjectType, string>].concat(
-      "$ref" in nested ? [] : nested.type || [],
-    ),
+    ...("$ref" in nested ? {} : makeNullableType(nested)),
   };
 };
 
@@ -488,6 +486,10 @@ const makeSample = (depicted: SchemaObject) => {
   return samples?.[type];
 };
 
+const makeNullableType = (prev: SchemaObject): Pick<SchemaObject, "type"> => ({
+  type: ["null" as Extract<SchemaObjectType, string>].concat(prev.type || []),
+});
+
 export const depictEffect: Depicter<z.ZodEffects<z.ZodTypeAny>> = ({
   schema,
   isResponse,
@@ -757,11 +759,7 @@ export const onEach: Depicter<z.ZodTypeAny, "each"> = ({
       });
   return {
     ...(description && { description }),
-    ...(isActuallyNullable && {
-      type: ["null" as Extract<SchemaObjectType, string>].concat(
-        prev.type || [],
-      ),
-    }),
+    ...(isActuallyNullable && makeNullableType(prev)),
     ...(examples.length > 0 && { examples: Array.from(examples) }),
   };
 };
