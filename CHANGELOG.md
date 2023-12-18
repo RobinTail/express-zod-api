@@ -2,24 +2,19 @@
 
 ## Version 16
 
-- **Breaking changes**:
-  - Method `print` of class `Integration` became async and its argument changed.
-- Features:
+- Potentially breaking changes:
   - Using [OpenAPI 3.1](https://swagger.io/specification/) for generating documentation.
-  - Ability to generate formatted typescript client when `prettier` is installed (supported automatically).
-  - Ability to supply you own typescript formatting function for generating the client.
-- How to migrate while preserving the previous behaviour:
-  - Replace `new Documentation()` with `await createDocumentation()`,
-  - Replace `getSpecAsYaml()` with `print()`,
-  - Replace `new Integration()` with `createIntegration()`,
-  - Add `await` before calling its method `print()`.
+- Features:
+  - Introducing the async `printFormatted` method of the `Integration` class.
+    - Ability to generate formatted typescript client when `prettier` is installed (supported automatically).
+    - Ability to supply you own typescript formatting function for generating the client.
 
 ```ts
 import { Integration } from "express-zod-api";
-// before
+// unformatted:
 new Integration(/*...*/).print();
-// after
-await new Integration(/*...*/).print();
+// featuring, detects prettier automatically:
+await new Integration(/*...*/).printFormatted();
 ```
 
 ## Version 15

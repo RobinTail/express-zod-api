@@ -4,6 +4,7 @@ import { routing } from "./routing";
 
 await writeFile(
   "example/example.client.ts",
-  await new Integration({ routing }).print(),
+  // or just: new Integration({ routing }).print(),
+  await new Integration({ routing }).printFormatted(),
   "utf-8",
 );

@@ -9,7 +9,7 @@ describe("Integration", () => {
     async (variant) => {
       const client = new Integration({ variant, routing });
       expect(client).toHaveProperty("program");
-      expect(await client.print()).toMatchSnapshot();
+      expect(await client.printFormatted()).toMatchSnapshot();
     },
   );
 
@@ -30,7 +30,7 @@ describe("Integration", () => {
         },
       },
     });
-    expect(await client.print()).toMatchSnapshot();
+    expect(await client.printFormatted()).toMatchSnapshot();
   });
 
   test.each([{ withQuestionMark: true }, { withUndefined: true }, {}])(
@@ -53,7 +53,7 @@ describe("Integration", () => {
           },
         },
       });
-      expect(await client.print()).toMatchSnapshot();
+      expect(await client.printFormatted()).toMatchSnapshot();
     },
   );
 });

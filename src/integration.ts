@@ -76,7 +76,7 @@ interface IntegrationParams {
   };
 }
 
-interface PrintParams {
+interface FormattedPrintingOptions {
   /** @desc Typescript printer options */
   printerOptions?: ts.PrinterOptions;
   /**
@@ -88,7 +88,7 @@ interface PrintParams {
 
 export class Integration {
   protected program: ts.Node[] = [];
-  protected usage: ts.Node[] = [];
+  protected usage: Array<ts.Node | string> = [];
   protected registry: Registry = {};
   protected paths: string[] = [];
   protected aliases: Record<string, ts.TypeAliasDeclaration> = {};
@@ -601,10 +601,49 @@ export class Integration {
     );
   }
 
-  public async print({
+  protected printUsage(printerOptions?: ts.PrinterOptions) {
+    return this.usage.length
+      ? this.usage
+          .map((entry) =>
+            typeof entry === "string"
+              ? entry
+              : printNode(entry, printerOptions),
+          )
+          .join("\n")
+      : undefined;
+  }
+
+  public print(printerOptions?: ts.PrinterOptions) {
+    const usageExampleText = this.printUsage(printerOptions);
+    return this.program
+      .concat(
+        usageExampleText
+          ? ts.addSyntheticLeadingComment(
+              ts.addSyntheticLeadingComment(
+                f.createEmptyStatement(),
+                ts.SyntaxKind.SingleLineCommentTrivia,
+                " Usage example:",
+              ),
+              ts.SyntaxKind.MultiLineCommentTrivia,
+              `\n${usageExampleText}`,
+            )
+          : [],
+      )
+      .map((node, index) =>
+        printNode(
+          node,
+          index < this.program.length
+            ? printerOptions
+            : { ...printerOptions, omitTrailingSemicolon: true },
+        ),
+      )
+      .join("\n\n");
+  }
+
+  public async printFormatted({
     printerOptions,
     format: userDefined,
-  }: PrintParams = {}) {
+  }: FormattedPrintingOptions = {}) {
     let format = userDefined;
     if (!format) {
       try {
@@ -614,27 +653,11 @@ export class Integration {
       } catch {}
     }
 
-    const usageExample = this.usage.length
-      ? this.usage.map((node) => printNode(node, printerOptions)).join("\n")
-      : undefined;
+    const usageExample = this.printUsage(printerOptions);
+    this.usage =
+      usageExample && format ? [await format(usageExample)] : this.usage;
 
-    const exampleComment = usageExample
-      ? ts.addSyntheticLeadingComment(
-          ts.addSyntheticLeadingComment(
-            f.createEmptyStatement(),
-            ts.SyntaxKind.SingleLineCommentTrivia,
-            " Usage example:",
-          ),
-          ts.SyntaxKind.MultiLineCommentTrivia,
-          "\n" + (format ? await format(usageExample) : usageExample),
-        )
-      : [];
-
-    const output = this.program
-      .concat(exampleComment)
-      .map((node) => printNode(node, printerOptions))
-      .join("\n\n");
-
+    const output = this.print(printerOptions);
     return format ? format(output) : output;
   }
 }
