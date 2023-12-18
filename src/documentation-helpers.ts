@@ -3,7 +3,6 @@ import assert from "node:assert/strict";
 import type {
   MediaTypeObject,
   OAuthFlowsObject,
-  ParameterObject,
   SchemaObjectType,
 } from "openapi3-ts/oas30";
 import { omit } from "ramda";
@@ -37,6 +36,7 @@ import {
   CommonContent,
   CommonExample,
   CommonExamples,
+  CommonParam,
   CommonRef,
   CommonResponse,
   CommonSchema,
@@ -698,7 +698,7 @@ export const depictRequestParams = ({
   clue = "parameter",
 }: ReqResDepictHelperCommonProps & {
   inputSources: InputSource[];
-}): ParameterObject[] => {
+}): CommonParam[] => {
   const schema = endpoint.getSchema("input");
   const shape = extractObjectSchema(schema, {
     path,
