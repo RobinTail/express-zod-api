@@ -30,7 +30,7 @@ export {
 } from "./errors";
 export { withMeta } from "./metadata";
 export { testEndpoint } from "./testing";
-export { createIntegration } from "./integration";
+export { Integration } from "./integration";
 
 export * as ez from "./proprietary-schemas";
 

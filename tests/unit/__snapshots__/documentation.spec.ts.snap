@@ -1,6 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`Documentation() > Basic cases > should be able to specify operation 1`] = `
+exports[`Documentation > Basic cases > should be able to specify operation 1`] = `
 "openapi: 3.1.0
 info:
   title: Testing Operation IDs
@@ -76,7 +76,7 @@ servers:
 "
 `;
 
-exports[`Documentation() > Basic cases > should be able to specify the operationId provider depending on method 1`] = `
+exports[`Documentation > Basic cases > should be able to specify the operationId provider depending on method 1`] = `
 "openapi: 3.1.0
 info:
   title: Testing Operation IDs
@@ -212,7 +212,7 @@ servers:
 "
 `;
 
-exports[`Documentation() > Basic cases > should ensure the uniq operation ids 1`] = `
+exports[`Documentation > Basic cases > should ensure the uniq operation ids 1`] = `
 "openapi: 3.1.0
 info:
   title: Testing Operation IDs
@@ -342,7 +342,7 @@ servers:
 "
 `;
 
-exports[`Documentation() > Basic cases > should ensure uniq security schema names 1`] = `
+exports[`Documentation > Basic cases > should ensure uniq security schema names 1`] = `
 "openapi: 3.1.0
 info:
   title: Testing Security
@@ -588,7 +588,7 @@ servers:
 "
 `;
 
-exports[`Documentation() > Basic cases > should generate the correct schema for DELETE request without body 1`] = `
+exports[`Documentation > Basic cases > should generate the correct schema for DELETE request without body 1`] = `
 "openapi: 3.1.0
 info:
   title: Testing DELETE request without body
@@ -669,7 +669,7 @@ servers:
 "
 `;
 
-exports[`Documentation() > Basic cases > should generate the correct schema for complex types 1`] = `
+exports[`Documentation > Basic cases > should generate the correct schema for complex types 1`] = `
 "openapi: 3.1.0
 info:
   title: Testing Complex Types
@@ -783,7 +783,7 @@ servers:
 "
 `;
 
-exports[`Documentation() > Basic cases > should generate the correct schema for discriminated union type 1`] = `
+exports[`Documentation > Basic cases > should generate the correct schema for discriminated union type 1`] = `
 "openapi: 3.1.0
 info:
   title: Testing Discriminated Union Type
@@ -914,7 +914,7 @@ servers:
 "
 `;
 
-exports[`Documentation() > Basic cases > should generate the correct schema for intersection type 1`] = `
+exports[`Documentation > Basic cases > should generate the correct schema for intersection type 1`] = `
 "openapi: 3.1.0
 info:
   title: Testing Intersection and And types
@@ -1030,7 +1030,7 @@ servers:
 "
 `;
 
-exports[`Documentation() > Basic cases > should generate the correct schema for nullable and optional types 1`] = `
+exports[`Documentation > Basic cases > should generate the correct schema for nullable and optional types 1`] = `
 "openapi: 3.1.0
 info:
   title: Testing Nullable and Optional Types
@@ -1150,7 +1150,7 @@ servers:
 "
 `;
 
-exports[`Documentation() > Basic cases > should generate the correct schema for union type 1`] = `
+exports[`Documentation > Basic cases > should generate the correct schema for union type 1`] = `
 "openapi: 3.1.0
 info:
   title: Testing Union and Or Types
@@ -1268,7 +1268,7 @@ servers:
 "
 `;
 
-exports[`Documentation() > Basic cases > should generate the correct schema of example routing 0 1`] = `
+exports[`Documentation > Basic cases > should generate the correct schema of example routing 0 1`] = `
 "openapi: 3.1.0
 info:
   title: Example API
@@ -1796,7 +1796,7 @@ servers:
 "
 `;
 
-exports[`Documentation() > Basic cases > should generate the correct schema of example routing 1 1`] = `
+exports[`Documentation > Basic cases > should generate the correct schema of example routing 1 1`] = `
 "openapi: 3.1.0
 info:
   title: Example API
@@ -2366,7 +2366,7 @@ servers:
 "
 `;
 
-exports[`Documentation() > Basic cases > should handle bigint, boolean, date, null and readonly 1`] = `
+exports[`Documentation > Basic cases > should handle bigint, boolean, date, null and readonly 1`] = `
 "openapi: 3.1.0
 info:
   title: Testing additional types
@@ -2476,7 +2476,7 @@ servers:
 "
 `;
 
-exports[`Documentation() > Basic cases > should handle circular schemas via z.lazy() 1`] = `
+exports[`Documentation > Basic cases > should handle circular schemas via z.lazy() 1`] = `
 "openapi: 3.1.0
 info:
   title: Testing Lazy
@@ -2585,7 +2585,7 @@ servers:
 "
 `;
 
-exports[`Documentation() > Basic cases > should handle custom mime types and status codes 1`] = `
+exports[`Documentation > Basic cases > should handle custom mime types and status codes 1`] = `
 "openapi: 3.1.0
 info:
   title: Testing MIME types and status codes
@@ -2643,7 +2643,7 @@ servers:
 "
 `;
 
-exports[`Documentation() > Basic cases > should handle different number types 1`] = `
+exports[`Documentation > Basic cases > should handle different number types 1`] = `
 "openapi: 3.1.0
 info:
   title: Testing numbers
@@ -2783,7 +2783,7 @@ servers:
 "
 `;
 
-exports[`Documentation() > Basic cases > should handle different string types 1`] = `
+exports[`Documentation > Basic cases > should handle different string types 1`] = `
 "openapi: 3.1.0
 info:
   title: Testing strings
@@ -2929,7 +2929,7 @@ servers:
 "
 `;
 
-exports[`Documentation() > Basic cases > should handle enum types 1`] = `
+exports[`Documentation > Basic cases > should handle enum types 1`] = `
 "openapi: 3.1.0
 info:
   title: Testing enums
@@ -3024,7 +3024,7 @@ servers:
 "
 `;
 
-exports[`Documentation() > Basic cases > should handle record 1`] = `
+exports[`Documentation > Basic cases > should handle record 1`] = `
 "openapi: 3.1.0
 info:
   title: Testing record
@@ -3154,7 +3154,7 @@ servers:
 "
 `;
 
-exports[`Documentation() > Basic cases > should handle transformation schema in output 1`] = `
+exports[`Documentation > Basic cases > should handle transformation schema in output 1`] = `
 "openapi: 3.1.0
 info:
   title: Testing Transformation in response schema
@@ -3249,7 +3249,7 @@ servers:
 "
 `;
 
-exports[`Documentation() > Basic cases > should handle tuples 1`] = `
+exports[`Documentation > Basic cases > should handle tuples 1`] = `
 "openapi: 3.1.0
 info:
   title: Testing tuples
@@ -3360,7 +3360,7 @@ servers:
 "
 `;
 
-exports[`Documentation() > Basic cases > should handle type any 1`] = `
+exports[`Documentation > Basic cases > should handle type any 1`] = `
 "openapi: 3.1.0
 info:
   title: Testing type any
@@ -3443,7 +3443,7 @@ servers:
 "
 `;
 
-exports[`Documentation() > Basic cases > should handle z.preprocess() 1`] = `
+exports[`Documentation > Basic cases > should handle z.preprocess() 1`] = `
 "openapi: 3.1.0
 info:
   title: Testing z.preprocess()
@@ -3536,7 +3536,7 @@ servers:
 "
 `;
 
-exports[`Documentation() > Feature 1180: Headers opt-in params > should describe x- inputs as header params 1`] = `
+exports[`Documentation > Feature 1180: Headers opt-in params > should describe x- inputs as header params 1`] = `
 "openapi: 3.1.0
 info:
   title: Testing headers params
@@ -3623,7 +3623,7 @@ servers:
 "
 `;
 
-exports[`Documentation() > Issue #98 > Should describe non-empty array 1`] = `
+exports[`Documentation > Issue #98 > Should describe non-empty array 1`] = `
 "openapi: 3.1.0
 info:
   title: "Testing issue #98"
@@ -3786,7 +3786,7 @@ servers:
 "
 `;
 
-exports[`Documentation() > Issue #98 > should union schemas 1`] = `
+exports[`Documentation > Issue #98 > should union schemas 1`] = `
 "openapi: 3.1.0
 info:
   title: "Testing issue #98"
@@ -3901,7 +3901,7 @@ servers:
 "
 `;
 
-exports[`Documentation() > Metadata > Issue #827: withMeta() should be immutable 1`] = `
+exports[`Documentation > Metadata > Issue #827: withMeta() should be immutable 1`] = `
 "openapi: 3.1.0
 info:
   title: Testing Metadata:example on IO parameter
@@ -4026,7 +4026,7 @@ servers:
 "
 `;
 
-exports[`Documentation() > Metadata > Issue #929: the location of the custom description should be on the param level 1`] = `
+exports[`Documentation > Metadata > Issue #929: the location of the custom description should be on the param level 1`] = `
 "openapi: 3.1.0
 info:
   title: Testing Metadata:description
@@ -4116,7 +4116,7 @@ servers:
 "
 `;
 
-exports[`Documentation() > Metadata > should merge endpoint handler examples with its middleware examples 1`] = `
+exports[`Documentation > Metadata > should merge endpoint handler examples with its middleware examples 1`] = `
 "openapi: 3.1.0
 info:
   title: Testing Metadata:example on IO schema + middleware
@@ -4239,7 +4239,7 @@ servers:
 "
 `;
 
-exports[`Documentation() > Metadata > should pass over examples of each param from the whole IO schema examples (GET) 1`] = `
+exports[`Documentation > Metadata > should pass over examples of each param from the whole IO schema examples (GET) 1`] = `
 "openapi: 3.1.0
 info:
   title: Testing Metadata:example on IO schema
@@ -4339,7 +4339,7 @@ servers:
 "
 `;
 
-exports[`Documentation() > Metadata > should pass over examples of the whole IO schema (POST) 1`] = `
+exports[`Documentation > Metadata > should pass over examples of the whole IO schema (POST) 1`] = `
 "openapi: 3.1.0
 info:
   title: Testing Metadata:example on IO schema
@@ -4446,7 +4446,7 @@ servers:
 "
 `;
 
-exports[`Documentation() > Metadata > should pass over the example of an individual parameter 1`] = `
+exports[`Documentation > Metadata > should pass over the example of an individual parameter 1`] = `
 "openapi: 3.1.0
 info:
   title: Testing Metadata:example on IO parameter
@@ -4535,7 +4535,7 @@ servers:
 "
 `;
 
-exports[`Documentation() > Metadata > should pass over the schema description 1`] = `
+exports[`Documentation > Metadata > should pass over the schema description 1`] = `
 "openapi: 3.1.0
 info:
   title: Testing Metadata:description
@@ -4625,7 +4625,7 @@ servers:
 "
 `;
 
-exports[`Documentation() > Route Path Params > should handle route path params for GET request 1`] = `
+exports[`Documentation > Route Path Params > should handle route path params for GET request 1`] = `
 "openapi: 3.1.0
 info:
   title: Testing route path params
@@ -4718,7 +4718,7 @@ servers:
 "
 `;
 
-exports[`Documentation() > Route Path Params > should handle route path params for POST request 1`] = `
+exports[`Documentation > Route Path Params > should handle route path params for POST request 1`] = `
 "openapi: 3.1.0
 info:
   title: Testing route path params

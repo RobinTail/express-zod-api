@@ -17,7 +17,7 @@ import { z } from "zod";
 import { givePort } from "../helpers";
 import { describe, expect, test, vi } from "vitest";
 
-describe("Documentation()", () => {
+describe("Documentation", () => {
   const sampleConfig = createConfig({
     cors: true,
     logger: { level: "silent" },

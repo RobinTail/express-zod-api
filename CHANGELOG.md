@@ -3,8 +3,7 @@
 ## Version 16
 
 - **Breaking changes**:
-  - Class `Integration` transformed into function `createIntegration`;
-    - Its method `print()` became async and its argument changed.
+  - Method `print` of class `Integration` became async and its argument changed.
 - Features:
   - Using [OpenAPI 3.1](https://swagger.io/specification/) for generating documentation.
   - Ability to generate formatted typescript client when `prettier` is installed (supported automatically).
@@ -16,13 +15,11 @@
   - Add `await` before calling its method `print()`.
 
 ```ts
-// before
 import { Integration } from "express-zod-api";
+// before
 new Integration(/*...*/).print();
-
 // after
-import { createIntegration } from "express-zod-api";
-await createIntegration(/*...*/).print();
+await new Integration(/*...*/).print();
 ```
 
 ## Version 15

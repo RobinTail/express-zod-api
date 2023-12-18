@@ -114,122 +114,127 @@ interface PrintParams {
   format?: (program: string) => Promise<string>;
 }
 
-export const createIntegration = ({
-  routing,
-  variant = "client",
-  serializer = defaultSerializer,
-  optionalPropStyle = { withQuestionMark: true, withUndefined: true },
-}: IntegrationParams) => {
-  const program: ts.Node[] = [];
-  const usage: ts.Node[] = [];
-  const registry: Registry = {};
-  const paths: string[] = [];
-  const aliases: Record<string, ts.TypeAliasDeclaration> = {};
+export class Integration {
+  protected program: ts.Node[] = [];
+  protected usage: ts.Node[] = [];
+  protected registry: Registry = {};
+  protected paths: string[] = [];
+  protected aliases: Record<string, ts.TypeAliasDeclaration> = {};
 
-  const getAlias = (name: string): ts.TypeReferenceNode | undefined =>
-    name in aliases ? f.createTypeReferenceNode(name) : undefined;
+  protected getAlias(name: string): ts.TypeReferenceNode | undefined {
+    return name in this.aliases ? f.createTypeReferenceNode(name) : undefined;
+  }
 
-  const makeAlias = (name: string, type: ts.TypeNode): ts.TypeReferenceNode => {
-    aliases[name] = createTypeAlias(type, name);
-    return getAlias(name)!;
-  };
+  protected makeAlias(name: string, type: ts.TypeNode): ts.TypeReferenceNode {
+    this.aliases[name] = createTypeAlias(type, name);
+    return this.getAlias(name)!;
+  }
 
-  walkRouting({
+  public constructor({
     routing,
-    onEndpoint: (endpoint, path, method) => {
-      const inputId = makeCleanId(path, method, "input");
-      const responseId = makeCleanId(path, method, "response");
-      const commons = {
-        serializer,
-        getAlias,
-        makeAlias,
-        optionalPropStyle,
-      };
-      const inputSchema = endpoint.getSchema("input");
-      const input = zodToTs({
-        ...commons,
-        schema: hasRaw(inputSchema) ? ZodFile.create().buffer() : inputSchema,
-        isResponse: false,
-      });
-      const response = zodToTs({
-        ...commons,
-        isResponse: true,
-        schema: endpoint
-          .getSchema("positive")
-          .or(endpoint.getSchema("negative")),
-      });
-      program.push(
-        createTypeAlias(input, inputId),
-        createTypeAlias(response, responseId),
-      );
-      if (method !== "options") {
-        paths.push(path);
-        registry[`${method} ${path}`] = {
-          in: inputId,
-          out: responseId,
-          isJson: endpoint.getMimeTypes("positive").includes(mimeJson),
-          tags: endpoint.getTags(),
+    variant = "client",
+    serializer = defaultSerializer,
+    optionalPropStyle = { withQuestionMark: true, withUndefined: true },
+  }: IntegrationParams) {
+    walkRouting({
+      routing,
+      onEndpoint: (endpoint, path, method) => {
+        const inputId = makeCleanId(path, method, "input");
+        const responseId = makeCleanId(path, method, "response");
+        const commons = {
+          serializer,
+          getAlias: this.getAlias.bind(this),
+          makeAlias: this.makeAlias.bind(this),
+          optionalPropStyle,
         };
-      }
-    },
-  });
+        const inputSchema = endpoint.getSchema("input");
+        const input = zodToTs({
+          ...commons,
+          schema: hasRaw(inputSchema) ? ZodFile.create().buffer() : inputSchema,
+          isResponse: false,
+        });
+        const response = zodToTs({
+          ...commons,
+          isResponse: true,
+          schema: endpoint
+            .getSchema("positive")
+            .or(endpoint.getSchema("negative")),
+        });
+        this.program.push(
+          createTypeAlias(input, inputId),
+          createTypeAlias(response, responseId),
+        );
+        if (method !== "options") {
+          this.paths.push(path);
+          this.registry[`${method} ${path}`] = {
+            in: inputId,
+            out: responseId,
+            isJson: endpoint.getMimeTypes("positive").includes(mimeJson),
+            tags: endpoint.getTags(),
+          };
+        }
+      },
+    });
 
-  program.unshift(...Object.values<ts.Node>(aliases));
+    this.program.unshift(...Object.values<ts.Node>(this.aliases));
 
-  // export type Path = "/v1/user/retrieve" | ___;
-  const pathType = makePublicLiteralType(ids.pathType, paths);
+    // export type Path = "/v1/user/retrieve" | ___;
+    const pathType = makePublicLiteralType(ids.pathType, this.paths);
 
-  // export type Method = "get" | "post" | "put" | "delete" | "patch";
-  const methodType = makePublicLiteralType(ids.methodType, methods);
+    // export type Method = "get" | "post" | "put" | "delete" | "patch";
+    const methodType = makePublicLiteralType(ids.methodType, methods);
 
-  // export type MethodPath = `${Method} ${Path}`;
-  const methodPathType = makePublicType(
-    ids.methodPathType,
-    makeTemplateType([ids.methodType, ids.pathType]),
-  );
+    // export type MethodPath = `${Method} ${Path}`;
+    const methodPathType = makePublicType(
+      ids.methodPathType,
+      makeTemplateType([ids.methodType, ids.pathType]),
+    );
 
-  // extends Record<MethodPath, any>
-  const extenderClause = [
-    f.createHeritageClause(ts.SyntaxKind.ExtendsKeyword, [
-      makeRecord(ids.methodPathType, ts.SyntaxKind.AnyKeyword),
-    ]),
-  ];
+    // extends Record<MethodPath, any>
+    const extenderClause = [
+      f.createHeritageClause(ts.SyntaxKind.ExtendsKeyword, [
+        makeRecord(ids.methodPathType, ts.SyntaxKind.AnyKeyword),
+      ]),
+    ];
 
-  // export interface Input ___ { "get /v1/user/retrieve": GetV1UserRetrieveInput; }
-  const inputInterface = makePublicExtendedInterface(
-    ids.inputInterface,
-    extenderClause,
-    Object.keys(registry).map((methodPath) =>
-      makeQuotedProp(methodPath, registry[methodPath].in),
-    ),
-  );
+    // export interface Input ___ { "get /v1/user/retrieve": GetV1UserRetrieveInput; }
+    const inputInterface = makePublicExtendedInterface(
+      ids.inputInterface,
+      extenderClause,
+      Object.keys(this.registry).map((methodPath) =>
+        makeQuotedProp(methodPath, this.registry[methodPath].in),
+      ),
+    );
 
-  // export interface Response ___ { "get /v1/user/retrieve": GetV1UserRetrieveResponse; }
-  const responseInterface = makePublicExtendedInterface(
-    ids.responseInterface,
-    extenderClause,
-    Object.keys(registry).map((methodPath) =>
-      makeQuotedProp(methodPath, registry[methodPath].out),
-    ),
-  );
+    // export interface Response ___ { "get /v1/user/retrieve": GetV1UserRetrieveResponse; }
+    const responseInterface = makePublicExtendedInterface(
+      ids.responseInterface,
+      extenderClause,
+      Object.keys(this.registry).map((methodPath) =>
+        makeQuotedProp(methodPath, this.registry[methodPath].out),
+      ),
+    );
 
-  program.push(
-    pathType,
-    methodType,
-    methodPathType,
-    inputInterface,
-    responseInterface,
-  );
+    this.program.push(
+      pathType,
+      methodType,
+      methodPathType,
+      inputInterface,
+      responseInterface,
+    );
 
-  if (variant === "client") {
+    if (variant === "types") {
+      return;
+    }
+
     // export const jsonEndpoints = { "get /v1/user/retrieve": true }
     const jsonEndpointsConst = f.createVariableStatement(
       exportModifier,
       makeConst(
         ids.jsonEndpointsConst,
         f.createObjectLiteralExpression(
-          Object.keys(registry)
-            .filter((methodPath) => registry[methodPath].isJson)
+          Object.keys(this.registry)
+            .filter((methodPath) => this.registry[methodPath].isJson)
             .map((methodPath) =>
               f.createPropertyAssignment(`"${methodPath}"`, f.createTrue()),
             ),
@@ -243,11 +248,11 @@ export const createIntegration = ({
       makeConst(
         ids.endpointTagsConst,
         f.createObjectLiteralExpression(
-          Object.keys(registry).map((methodPath) =>
+          Object.keys(this.registry).map((methodPath) =>
             f.createPropertyAssignment(
               `"${methodPath}"`,
               f.createArrayLiteralExpression(
-                registry[methodPath].tags.map((tag) =>
+                this.registry[methodPath].tags.map((tag) =>
                   f.createStringLiteral(tag),
                 ),
               ),
@@ -377,7 +382,7 @@ export const createIntegration = ({
       ],
     );
 
-    program.push(
+    this.program.push(
       jsonEndpointsConst,
       endpointTagsConst,
       providerType,
@@ -573,17 +578,17 @@ export const createIntegration = ({
       ),
     );
 
-    usage.push(
+    this.usage.push(
       exampleImplStatement,
       clientInstanceStatement,
       provideCallingStatement,
     );
   }
 
-  const print = async ({
+  public async print({
     printerOptions,
     format: userDefined,
-  }: PrintParams = {}) => {
+  }: PrintParams = {}) {
     let format = userDefined;
     if (!format) {
       try {
@@ -593,8 +598,8 @@ export const createIntegration = ({
       } catch {}
     }
 
-    const usageExample = usage.length
-      ? usage.map((node) => printNode(node, printerOptions)).join("\n")
+    const usageExample = this.usage.length
+      ? this.usage.map((node) => printNode(node, printerOptions)).join("\n")
       : undefined;
 
     const exampleComment = usageExample
@@ -609,13 +614,11 @@ export const createIntegration = ({
         )
       : [];
 
-    const output = program
+    const output = this.program
       .concat(exampleComment)
       .map((node) => printNode(node, printerOptions))
       .join("\n\n");
 
     return format ? format(output) : output;
-  };
-
-  return { program, print };
-};
+  }
+}
