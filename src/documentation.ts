@@ -56,15 +56,15 @@ export class Documentation extends OpenApiBuilder {
     {};
   protected lastOperationIdSuffixes: Record<string, number> = {};
 
+  protected makeRef(name: string, schema: SchemaObject | ReferenceObject) {
+    this.addSchema(name, schema);
+    return this.getRef(name)!;
+  }
+
   protected getRef(name: string): ReferenceObject | undefined {
     return name in (this.rootDoc.components?.schemas || {})
       ? { $ref: `#/components/schemas/${name}` }
       : undefined;
-  }
-
-  protected makeRef(name: string, schema: SchemaObject | ReferenceObject) {
-    this.addSchema(name, schema);
-    return this.getRef(name)!;
   }
 
   protected ensureUniqOperationId(
