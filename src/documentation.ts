@@ -5,6 +5,7 @@ import {
   ReferenceObject,
   SchemaObject,
   SecuritySchemeObject,
+  SecuritySchemeType,
 } from "openapi3-ts/oas31";
 import { z } from "zod";
 import { DocumentationError } from "./errors";
@@ -51,7 +52,8 @@ interface DocumentationParams {
 }
 
 export class Documentation extends OpenApiBuilder {
-  protected lastSecuritySchemaIds: Partial<Record<string, number>> = {};
+  protected lastSecuritySchemaIds: Partial<Record<SecuritySchemeType, number>> =
+    {};
   protected lastOperationIdSuffixes: Record<string, number> = {};
 
   protected getRef(name: string): ReferenceObject | undefined {
@@ -65,11 +67,11 @@ export class Documentation extends OpenApiBuilder {
     return this.getRef(name)!;
   }
 
-  protected ensureUniqOperationId = (
+  protected ensureUniqOperationId(
     path: string,
     method: Method,
     userDefinedOperationId?: string,
-  ) => {
+  ) {
     if (userDefinedOperationId) {
       assert(
         !(userDefinedOperationId in this.lastOperationIdSuffixes),
@@ -90,7 +92,7 @@ export class Documentation extends OpenApiBuilder {
     }
     this.lastOperationIdSuffixes[operationId] = 1;
     return operationId;
-  };
+  }
 
   protected ensureUniqSecuritySchemaName(subject: SecuritySchemeObject) {
     const serializedSubject = JSON.stringify(subject);
@@ -126,7 +128,6 @@ export class Documentation extends OpenApiBuilder {
     for (const url of typeof serverUrl === "string" ? [serverUrl] : serverUrl) {
       this.addServer({ url });
     }
-
     const onEndpoint: RoutingWalkerParams["onEndpoint"] = (
       endpoint,
       path,
