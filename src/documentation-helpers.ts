@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+// @todo use commons instead
 import type {
   ContentObject,
   ExampleObject,
