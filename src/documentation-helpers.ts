@@ -193,10 +193,10 @@ export const depictNullable: Depicter<z.ZodNullable<z.ZodTypeAny>> = ({
   next,
 }) => {
   const nested = next({ schema: schema.unwrap() });
-  return {
-    ...nested,
-    ...("$ref" in nested ? {} : makeNullableType(nested)),
-  };
+  if (!("$ref" in nested)) {
+    nested.type = makeNullableType(nested);
+  }
+  return nested;
 };
 
 export const depictEnum: Depicter<
@@ -226,11 +226,14 @@ export const depictObject: Depicter<z.AnyZodObject> = ({
         : prop.isOptional();
     return !isOptional;
   });
-  return {
+  const result: SchemaObject = {
     type: "object",
     properties: depictObjectProperties({ schema, isResponse, ...rest }),
-    ...(required.length ? { required } : {}),
   };
+  if (required.length) {
+    result.required = required;
+  }
+  return result;
 };
 
 /**
@@ -319,14 +322,17 @@ export const depictRecord: Depicter<z.ZodRecord<z.ZodTypeAny>> = ({
       }),
       {},
     );
-    return {
+    const result: SchemaObject = {
       type: "object",
       properties: depictObjectProperties({
         schema: z.object(shape),
         ...rest,
       }),
-      ...(keys.length ? { required: keys } : {}),
     };
+    if (keys.length) {
+      result.required = keys;
+    }
+    return result;
   }
   if (keySchema instanceof z.ZodLiteral) {
     return {
@@ -368,12 +374,19 @@ export const depictRecord: Depicter<z.ZodRecord<z.ZodTypeAny>> = ({
 export const depictArray: Depicter<z.ZodArray<z.ZodTypeAny>> = ({
   schema: { _def: def, element },
   next,
-}) => ({
-  type: "array",
-  items: next({ schema: element }),
-  ...(def.minLength !== null && { minItems: def.minLength.value }),
-  ...(def.maxLength !== null && { maxItems: def.maxLength.value }),
-});
+}) => {
+  const result: SchemaObject = {
+    type: "array",
+    items: next({ schema: element }),
+  };
+  if (def.minLength) {
+    result.minItems = def.minLength.value;
+  }
+  if (def.maxLength) {
+    result.maxItems = def.maxLength.value;
+  }
+  return result;
+};
 
 /** @since OAS 3.1 using prefixItems for depicting tuples */
 export const depictTuple: Depicter<z.ZodTuple> = ({
@@ -420,22 +433,34 @@ export const depictString: Depicter<z.ZodString> = ({
           )
         : new RegExp(`^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?Z$`)
       : undefined;
-  // @todo constraints do not work well for such syntax
-  return {
-    type: "string",
-    ...(isDatetime && { format: "date-time" }),
-    ...(isEmail && { format: "email" }),
-    ...(isURL && { format: "url" }),
-    ...(isUUID && { format: "uuid" }),
-    ...(isCUID && { format: "cuid" }),
-    ...(isCUID2 && { format: "cuid2" }),
-    ...(isULID && { format: "ulid" }),
-    ...(isIP && { format: "ip" }),
-    ...(isEmoji && { format: "emoji" }),
-    ...(minLength !== null && { minLength }),
-    ...(maxLength !== null && { maxLength }),
-    ...(regex && { pattern: `/${regex.source}/${regex.flags}` }),
-  } satisfies SchemaObject;
+  const result: SchemaObject = { type: "string" };
+  const formats: Record<NonNullable<SchemaObject["format"]>, boolean> = {
+    "date-time": isDatetime,
+    email: isEmail,
+    url: isURL,
+    uuid: isUUID,
+    cuid: isCUID,
+    cuid2: isCUID2,
+    ulid: isULID,
+    ip: isIP,
+    emoji: isEmoji,
+  };
+  for (const format in formats) {
+    if (formats[format]) {
+      result.format = format;
+      break;
+    }
+  }
+  if (minLength !== null) {
+    result.minLength = minLength;
+  }
+  if (maxLength !== null) {
+    result.maxLength = maxLength;
+  }
+  if (regex) {
+    result.pattern = `/${regex.source}/${regex.flags}`;
+  }
+  return result;
 };
 
 /** @since OAS 3.1: exclusive min/max are numbers */
@@ -460,12 +485,21 @@ export const depictNumber: Depicter<z.ZodNumber> = ({ schema }) => {
         : Number.MAX_VALUE
       : schema.maxValue;
   const isMaxInclusive = maxCheck ? maxCheck.inclusive : true;
-  return {
+  const result: SchemaObject = {
     type: schema.isInt ? "integer" : "number",
     format: schema.isInt ? "int64" : "double",
-    ...(isMinInclusive ? { minimum } : { exclusiveMinimum: minimum }),
-    ...(isMaxInclusive ? { maximum } : { exclusiveMaximum: maximum }),
   };
+  if (isMinInclusive) {
+    result.minimum = minimum;
+  } else {
+    result.exclusiveMinimum = minimum;
+  }
+  if (isMaxInclusive) {
+    result.maximum = maximum;
+  } else {
+    result.exclusiveMaximum = maximum;
+  }
+  return result;
 };
 
 export const depictObjectProperties = ({
@@ -487,9 +521,8 @@ const makeSample = (depicted: SchemaObject) => {
   return samples?.[type];
 };
 
-const makeNullableType = (prev: SchemaObject): Pick<SchemaObject, "type"> => ({
-  type: ["null" as Extract<SchemaObjectType, string>].concat(prev.type || []),
-});
+const makeNullableType = (prev: SchemaObject) =>
+  ["null" as Extract<SchemaObjectType, string>].concat(prev.type || []);
 
 export const depictEffect: Depicter<z.ZodEffects<z.ZodTypeAny>> = ({
   schema,
@@ -758,11 +791,17 @@ export const onEach: Depicter<z.ZodTypeAny, "each"> = ({
         variant: isResponse ? "parsed" : "original",
         validate: true,
       });
-  return {
-    ...(description && { description }),
-    ...(isActuallyNullable && makeNullableType(prev)),
-    ...(examples.length > 0 && { examples: Array.from(examples) }),
-  };
+  const result: SchemaObject = {};
+  if (description) {
+    result.description = description;
+  }
+  if (isActuallyNullable) {
+    result.type = makeNullableType(prev);
+  }
+  if (examples.length) {
+    result.examples = Array.from(examples);
+  }
+  return result;
 };
 
 export const onMissing: Depicter<z.ZodTypeAny, "last"> = ({ schema, ...ctx }) =>
@@ -877,11 +916,16 @@ const depictBasicSecurity: SecurityHelper<"basic"> = () => ({
 });
 const depictBearerSecurity: SecurityHelper<"bearer"> = ({
   format: bearerFormat,
-}) => ({
-  type: "http",
-  scheme: "bearer",
-  ...(bearerFormat && { bearerFormat }),
-});
+}) => {
+  const result: SecuritySchemeObject = {
+    type: "http",
+    scheme: "bearer",
+  };
+  if (bearerFormat) {
+    result.bearerFormat = bearerFormat;
+  }
+  return result;
+};
 // @todo add description on actual input placement
 const depictInputSecurity: SecurityHelper<"input"> = ({ name }) => ({
   type: "apiKey",
@@ -1016,12 +1060,14 @@ export const depictTags = <TAG extends string>(
 ): TagObject[] =>
   (Object.keys(tags) as TAG[]).map((tag) => {
     const def = tags[tag];
-    return {
+    const result: TagObject = {
       name: tag,
       description: typeof def === "string" ? def : def.description,
-      ...(typeof def === "object" &&
-        def.url && { externalDocs: { url: def.url } }),
     };
+    if (typeof def === "object" && def.url) {
+      result.externalDocs = { url: def.url };
+    }
+    return result;
   });
 
 export const ensureShortDescription = (description: string) => {
