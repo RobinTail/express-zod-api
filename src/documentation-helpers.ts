@@ -11,7 +11,6 @@ import type {
   ResponseObject,
   SchemaObjectType,
   SecurityRequirementObject,
-  SecuritySchemeObject,
 } from "openapi3-ts/oas30";
 import { omit } from "ramda";
 import { z } from "zod";
@@ -43,6 +42,7 @@ import {
   CommonRef,
   CommonSchema,
   CommonSchemaOrRef,
+  CommonSecurity,
   CommonTag,
   OAS,
   SchemaObject30,
@@ -920,7 +920,7 @@ export const depictResponse = ({
 
 type SecurityHelper<K extends Security["type"]> = (
   security: Security & { type: K },
-) => SecuritySchemeObject;
+) => CommonSecurity;
 
 const depictBasicSecurity: SecurityHelper<"basic"> = () => ({
   type: "http",
@@ -971,7 +971,7 @@ const depictOAuth2Security: SecurityHelper<"oauth2"> = ({ flows = {} }) => ({
 
 export const depictSecurity = (
   container: LogicalContainer<Security>,
-): LogicalContainer<SecuritySchemeObject> => {
+): LogicalContainer<CommonSecurity> => {
   const methods: { [K in Security["type"]]: SecurityHelper<K> } = {
     basic: depictBasicSecurity,
     bearer: depictBearerSecurity,
