@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 // @todo use commons instead
-import type { OAuthFlowsObject, SchemaObjectType } from "openapi3-ts/oas30";
+import type { SchemaObjectType } from "openapi3-ts/oas30";
 import { omit } from "ramda";
 import { z } from "zod";
 import {
@@ -32,6 +32,7 @@ import {
   CommonContent,
   CommonExample,
   CommonExamples,
+  CommonFlows,
   CommonParam,
   CommonRef,
   CommonResponse,
@@ -951,16 +952,17 @@ const depictOpenIdSecurity: SecurityHelper<"openid"> = ({
 });
 const depictOAuth2Security: SecurityHelper<"oauth2"> = ({ flows = {} }) => ({
   type: "oauth2",
-  flows: (
-    Object.keys(flows) as (keyof typeof flows)[]
-  ).reduce<OAuthFlowsObject>((acc, key) => {
-    const flow = flows[key];
-    if (!flow) {
-      return acc;
-    }
-    const { scopes = {}, ...rest } = flow;
-    return { ...acc, [key]: { ...rest, scopes } };
-  }, {}),
+  flows: (Object.keys(flows) as (keyof typeof flows)[]).reduce<CommonFlows>(
+    (acc, key) => {
+      const flow = flows[key];
+      if (!flow) {
+        return acc;
+      }
+      const { scopes = {}, ...rest } = flow;
+      return { ...acc, [key]: { ...rest, scopes } };
+    },
+    {},
+  ),
 });
 
 export const depictSecurity = (

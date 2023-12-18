@@ -3,6 +3,7 @@ import type {
   ContentObject as Content30,
   ExampleObject as Example30,
   ExamplesObject as Examples30,
+  OAuthFlowsObject as Flows30,
   OperationObject as Operation30,
   ParameterObject as Param30,
   ReferenceObject as Ref30,
@@ -17,6 +18,7 @@ import type {
   ContentObject as Content31,
   ExampleObject as Example31,
   ExamplesObject as Examples31,
+  OAuthFlowsObject as Flows31,
   OperationObject as Operation31,
   ParameterObject as Param31,
   ReferenceObject as Ref31,
@@ -41,6 +43,7 @@ export type CommonExample = Example30 & Example31;
 export type CommonExamples = Examples30 & Examples31;
 export type CommonBody = Body30 & Body31;
 export type CommonParam = Param30 & Param31;
+export type CommonFlows = Flows30 & Flows31;
 
 // shortening
 export type CommonSchemaOrRef = CommonSchema | CommonRef;
