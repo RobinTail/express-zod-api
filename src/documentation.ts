@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import type {
+import {
   OpenApiBuilder,
   OperationObject,
   ReferenceObject,
@@ -26,7 +26,6 @@ import {
   ensureShortDescription,
   reformatParamsInPath,
 } from "./documentation-helpers";
-import { loadPeer } from "./peer-helpers";
 import { Routing } from "./routing";
 import { RoutingWalkerParams, walkRouting } from "./routing-walker";
 
@@ -51,29 +50,18 @@ interface DocumentationParams {
   serializer?: (schema: z.ZodTypeAny) => string;
 }
 
-export const createDocumentation = async ({
-  routing,
-  config,
-  title,
-  version,
-  serverUrl,
-  successfulResponseDescription = "Successful response",
-  errorResponseDescription = "Error response",
-  hasSummaryFromDescription = true,
-  composition = "inline",
-  serializer = defaultSerializer,
-}: DocumentationParams) => {
-  const lastSecuritySchemaIds: Partial<Record<string, number>> = {};
-  const lastOperationIdSuffixes: Record<string, number> = {};
+export class Documentation extends OpenApiBuilder {
+  protected lastSecuritySchemaIds: Partial<Record<string, number>> = {};
+  protected lastOperationIdSuffixes: Record<string, number> = {};
 
-  const ensureUniqOperationId = (
+  protected ensureUniqOperationId = (
     path: string,
     method: Method,
     userDefinedOperationId?: string,
   ) => {
     if (userDefinedOperationId) {
       assert(
-        !(userDefinedOperationId in lastOperationIdSuffixes),
+        !(userDefinedOperationId in this.lastOperationIdSuffixes),
         new DocumentationError({
           message: `Duplicated operationId: "${userDefinedOperationId}"`,
           method,
@@ -81,142 +69,150 @@ export const createDocumentation = async ({
           path,
         }),
       );
-      lastOperationIdSuffixes[userDefinedOperationId] = 1;
+      this.lastOperationIdSuffixes[userDefinedOperationId] = 1;
       return userDefinedOperationId;
     }
     const operationId = makeCleanId(path, method);
-    if (operationId in lastOperationIdSuffixes) {
-      lastOperationIdSuffixes[operationId]++;
-      return `${operationId}${lastOperationIdSuffixes[operationId]}`;
+    if (operationId in this.lastOperationIdSuffixes) {
+      this.lastOperationIdSuffixes[operationId]++;
+      return `${operationId}${this.lastOperationIdSuffixes[operationId]}`;
     }
-    lastOperationIdSuffixes[operationId] = 1;
+    this.lastOperationIdSuffixes[operationId] = 1;
     return operationId;
   };
 
-  const BuilderClass = await loadPeer<{ new (): OpenApiBuilder }>(
-    `openapi3-ts/oas31`,
-    "OpenApiBuilder",
-  );
-
-  const builder = new BuilderClass().addInfo({ title, version });
-  for (const url of typeof serverUrl === "string" ? [serverUrl] : serverUrl) {
-    builder.addServer({ url });
-  }
-
-  const getRef = (name: string): ReferenceObject | undefined =>
-    name in (builder.rootDoc.components?.schemas || {})
+  protected getRef(name: string): ReferenceObject | undefined {
+    return name in (this.rootDoc.components?.schemas || {})
       ? { $ref: `#/components/schemas/${name}` }
       : undefined;
+  }
 
-  const makeRef = (name: string, schema: SchemaObject | ReferenceObject) => {
-    builder.addSchema(name, schema);
-    return getRef(name)!;
-  };
+  protected makeRef(name: string, schema: SchemaObject | ReferenceObject) {
+    this.addSchema(name, schema);
+    return this.getRef(name)!;
+  }
 
-  const ensureUniqSecuritySchemaName = (subject: SecuritySchemeObject) => {
+  protected ensureUniqSecuritySchemaName(subject: SecuritySchemeObject) {
     const serializedSubject = JSON.stringify(subject);
-    for (const name in builder.rootDoc.components?.securitySchemes || {}) {
+    for (const name in this.rootDoc.components?.securitySchemes || {}) {
       if (
         serializedSubject ===
-        JSON.stringify(builder.rootDoc.components?.securitySchemes?.[name])
+        JSON.stringify(this.rootDoc.components?.securitySchemes?.[name])
       ) {
         return name;
       }
     }
-    lastSecuritySchemaIds[subject.type] =
-      (lastSecuritySchemaIds?.[subject.type] || 0) + 1;
+    this.lastSecuritySchemaIds[subject.type] =
+      (this.lastSecuritySchemaIds?.[subject.type] || 0) + 1;
     return `${subject.type.toUpperCase()}_${
-      lastSecuritySchemaIds[subject.type]
+      this.lastSecuritySchemaIds[subject.type]
     }`;
-  };
+  }
 
-  const onEndpoint: RoutingWalkerParams["onEndpoint"] = (
-    endpoint,
-    path,
-    _method,
-  ) => {
-    const method = _method as Method;
-    const commonParams = {
-      path,
-      method,
+  constructor({
+    routing,
+    config,
+    title,
+    version,
+    serverUrl,
+    successfulResponseDescription = "Successful response",
+    errorResponseDescription = "Error response",
+    hasSummaryFromDescription = true,
+    composition = "inline",
+    serializer = defaultSerializer,
+  }: DocumentationParams) {
+    super();
+    this.addInfo({ title, version });
+    for (const url of typeof serverUrl === "string" ? [serverUrl] : serverUrl) {
+      this.addServer({ url });
+    }
+
+    const onEndpoint: RoutingWalkerParams["onEndpoint"] = (
       endpoint,
-      composition,
-      serializer,
-      getRef,
-      makeRef,
-    };
-    const [shortDesc, longDesc] = (["short", "long"] as const).map(
-      endpoint.getDescription.bind(endpoint),
-    );
-    const inputSources =
-      config.inputSources?.[method] || defaultInputSources[method];
-    const depictedParams = depictRequestParams({
-      ...commonParams,
-      inputSources,
-    });
-    const operationId = ensureUniqOperationId(
       path,
-      method,
-      endpoint.getOperationId(method),
-    );
-    const operation: OperationObject = {
-      operationId,
-      responses: {
-        [endpoint.getStatusCode("positive")]: depictResponse({
-          ...commonParams,
-          clue: successfulResponseDescription,
-          isPositive: true,
-        }),
-        [endpoint.getStatusCode("negative")]: depictResponse({
-          ...commonParams,
-          clue: errorResponseDescription,
-          isPositive: false,
-        }),
-      },
-    };
-    if (longDesc) {
-      operation.description = longDesc;
-      if (hasSummaryFromDescription && shortDesc === undefined) {
-        operation.summary = ensureShortDescription(longDesc);
-      }
-    }
-    if (shortDesc) {
-      operation.summary = ensureShortDescription(shortDesc);
-    }
-    if (endpoint.getTags().length > 0) {
-      operation.tags = endpoint.getTags();
-    }
-    if (depictedParams.length > 0) {
-      operation.parameters = depictedParams;
-    }
-    if (inputSources.includes("body")) {
-      operation.requestBody = depictRequest(commonParams);
-    }
-    const securityRefs = depictSecurityRefs(
-      mapLogicalContainer(
-        depictSecurity(endpoint.getSecurity()),
-        (securitySchema) => {
-          const name = ensureUniqSecuritySchemaName(securitySchema);
-          const scopes = ["oauth2", "openIdConnect"].includes(
-            securitySchema.type,
-          )
-            ? endpoint.getScopes()
-            : [];
-          builder.addSecurityScheme(name, securitySchema);
-          return { name, scopes };
+      _method,
+    ) => {
+      const method = _method as Method;
+      const commonParams = {
+        path,
+        method,
+        endpoint,
+        composition,
+        serializer,
+        getRef: this.getRef.bind(this),
+        makeRef: this.makeRef.bind(this),
+      };
+      const [shortDesc, longDesc] = (["short", "long"] as const).map(
+        endpoint.getDescription.bind(endpoint),
+      );
+      const inputSources =
+        config.inputSources?.[method] || defaultInputSources[method];
+      const depictedParams = depictRequestParams({
+        ...commonParams,
+        inputSources,
+      });
+      const operationId = this.ensureUniqOperationId(
+        path,
+        method,
+        endpoint.getOperationId(method),
+      );
+      const operation: OperationObject = {
+        operationId,
+        responses: {
+          [endpoint.getStatusCode("positive")]: depictResponse({
+            ...commonParams,
+            clue: successfulResponseDescription,
+            isPositive: true,
+          }),
+          [endpoint.getStatusCode("negative")]: depictResponse({
+            ...commonParams,
+            clue: errorResponseDescription,
+            isPositive: false,
+          }),
         },
-      ),
-    );
-    if (securityRefs.length > 0) {
-      operation.security = securityRefs;
-    }
-    const swaggerCompatiblePath = reformatParamsInPath(path);
-    builder.addPath(swaggerCompatiblePath, {
-      [method]: operation,
-    });
-  };
-  walkRouting({ routing, onEndpoint });
-  builder.rootDoc.tags = config.tags ? depictTags(config.tags) : [];
-
-  return { builder, print: () => builder.getSpecAsYaml() };
-};
+      };
+      if (longDesc) {
+        operation.description = longDesc;
+        if (hasSummaryFromDescription && shortDesc === undefined) {
+          operation.summary = ensureShortDescription(longDesc);
+        }
+      }
+      if (shortDesc) {
+        operation.summary = ensureShortDescription(shortDesc);
+      }
+      if (endpoint.getTags().length > 0) {
+        operation.tags = endpoint.getTags();
+      }
+      if (depictedParams.length > 0) {
+        operation.parameters = depictedParams;
+      }
+      if (inputSources.includes("body")) {
+        operation.requestBody = depictRequest(commonParams);
+      }
+      const securityRefs = depictSecurityRefs(
+        mapLogicalContainer(
+          depictSecurity(endpoint.getSecurity()),
+          (securitySchema) => {
+            const name = this.ensureUniqSecuritySchemaName(securitySchema);
+            const scopes = ["oauth2", "openIdConnect"].includes(
+              securitySchema.type,
+            )
+              ? endpoint.getScopes()
+              : [];
+            this.addSecurityScheme(name, securitySchema);
+            return { name, scopes };
+          },
+        ),
+      );
+      if (securityRefs.length > 0) {
+        operation.security = securityRefs;
+      }
+      const swaggerCompatiblePath = reformatParamsInPath(path);
+      this.addPath(swaggerCompatiblePath, {
+        [method]: operation,
+      });
+    };
+    walkRouting({ routing, onEndpoint });
+    this.rootDoc.tags = config.tags ? depictTags(config.tags) : [];
+  }
+}

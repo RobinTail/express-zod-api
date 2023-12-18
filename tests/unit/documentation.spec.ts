@@ -1,10 +1,10 @@
 import { config as exampleConfig } from "../../example/config";
 import { routing } from "../../example/routing";
 import {
+  Documentation,
   DocumentationError,
   EndpointsFactory,
   createConfig,
-  createDocumentation,
   createMiddleware,
   createResultHandler,
   defaultEndpointsFactory,
@@ -17,7 +17,7 @@ import { z } from "zod";
 import { givePort } from "../helpers";
 import { describe, expect, test, vi } from "vitest";
 
-describe("createDocumentation()", () => {
+describe("Documentation()", () => {
   const sampleConfig = createConfig({
     cors: true,
     logger: { level: "silent" },
@@ -30,22 +30,21 @@ describe("createDocumentation()", () => {
       { composition: "components" },
     ] as const)(
       "should generate the correct schema of example routing %#",
-      async ({ composition }) => {
-        const documentation = await createDocumentation({
+      ({ composition }) => {
+        const spec = new Documentation({
           routing,
           config: exampleConfig,
           version: "1.2.3",
           title: "Example API",
           serverUrl: "https://example.com",
           composition,
-        });
-        expect(documentation).toHaveProperty("builder");
-        expect(documentation.print()).toMatchSnapshot();
+        }).getSpecAsYaml();
+        expect(spec).toMatchSnapshot();
       },
     );
 
-    test("should generate the correct schema for DELETE request without body", async () => {
-      const documentation = await createDocumentation({
+    test("should generate the correct schema for DELETE request without body", () => {
+      const spec = new Documentation({
         routing: {
           v1: {
             deleteSomething: defaultEndpointsFactory.build({
@@ -64,13 +63,13 @@ describe("createDocumentation()", () => {
         version: "3.4.5",
         title: "Testing DELETE request without body",
         serverUrl: "https://example.com",
-      });
-      expect(documentation.print()).toMatchSnapshot();
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
     });
 
-    test("should generate the correct schema for complex types", async () => {
+    test("should generate the correct schema for complex types", () => {
       const literalValue = "something" as const;
-      const documentation = await createDocumentation({
+      const spec = new Documentation({
         config: sampleConfig,
         routing: {
           v1: {
@@ -95,12 +94,12 @@ describe("createDocumentation()", () => {
         version: "3.4.5",
         title: "Testing Complex Types",
         serverUrl: "https://example.com",
-      });
-      expect(documentation.print()).toMatchSnapshot();
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
     });
 
-    test("should generate the correct schema for nullable and optional types", async () => {
-      const documentation = await createDocumentation({
+    test("should generate the correct schema for nullable and optional types", () => {
+      const spec = new Documentation({
         config: sampleConfig,
         routing: {
           v1: {
@@ -124,12 +123,12 @@ describe("createDocumentation()", () => {
         version: "3.4.5",
         title: "Testing Nullable and Optional Types",
         serverUrl: "https://example.com",
-      });
-      expect(documentation.print()).toMatchSnapshot();
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
     });
 
-    test("should generate the correct schema for intersection type", async () => {
-      const documentation = await createDocumentation({
+    test("should generate the correct schema for intersection type", () => {
+      const spec = new Documentation({
         config: sampleConfig,
         routing: {
           v1: {
@@ -168,12 +167,12 @@ describe("createDocumentation()", () => {
         version: "3.4.5",
         title: "Testing Intersection and And types",
         serverUrl: "https://example.com",
-      });
-      expect(documentation.print()).toMatchSnapshot();
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
     });
 
-    test("should generate the correct schema for union type", async () => {
-      const documentation = await createDocumentation({
+    test("should generate the correct schema for union type", () => {
+      const spec = new Documentation({
         config: sampleConfig,
         routing: {
           v1: {
@@ -203,12 +202,12 @@ describe("createDocumentation()", () => {
         version: "3.4.5",
         title: "Testing Union and Or Types",
         serverUrl: "https://example.com",
-      });
-      expect(documentation.print()).toMatchSnapshot();
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
     });
 
-    test("should generate the correct schema for discriminated union type", async () => {
-      const documentation = await createDocumentation({
+    test("should generate the correct schema for discriminated union type", () => {
+      const spec = new Documentation({
         config: sampleConfig,
         routing: {
           v1: {
@@ -235,12 +234,12 @@ describe("createDocumentation()", () => {
         version: "3.4.5",
         title: "Testing Discriminated Union Type",
         serverUrl: "https://example.com",
-      });
-      expect(documentation.print()).toMatchSnapshot();
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
     });
 
-    test("should handle transformation schema in output", async () => {
-      const documentation = await createDocumentation({
+    test("should handle transformation schema in output", () => {
+      const spec = new Documentation({
         config: sampleConfig,
         routing: {
           v1: {
@@ -262,12 +261,12 @@ describe("createDocumentation()", () => {
         version: "3.4.5",
         title: "Testing Transformation in response schema",
         serverUrl: "https://example.com",
-      });
-      expect(documentation.print()).toMatchSnapshot();
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
     });
 
-    test("should handle bigint, boolean, date, null and readonly", async () => {
-      const documentation = await createDocumentation({
+    test("should handle bigint, boolean, date, null and readonly", () => {
+      const spec = new Documentation({
         config: sampleConfig,
         routing: {
           v1: {
@@ -292,12 +291,12 @@ describe("createDocumentation()", () => {
         version: "3.4.5",
         title: "Testing additional types",
         serverUrl: "https://example.com",
-      });
-      expect(documentation.print()).toMatchSnapshot();
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
     });
 
-    test("should handle record", async () => {
-      const documentation = await createDocumentation({
+    test("should handle record", () => {
+      const spec = new Documentation({
         config: sampleConfig,
         routing: {
           v1: {
@@ -322,12 +321,12 @@ describe("createDocumentation()", () => {
         version: "3.4.5",
         title: "Testing record",
         serverUrl: "https://example.com",
-      });
-      expect(documentation.print()).toMatchSnapshot();
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
     });
 
-    test("should handle type any", async () => {
-      const documentation = await createDocumentation({
+    test("should handle type any", () => {
+      const spec = new Documentation({
         config: sampleConfig,
         routing: {
           v1: {
@@ -346,12 +345,12 @@ describe("createDocumentation()", () => {
         version: "3.4.5",
         title: "Testing type any",
         serverUrl: "https://example.com",
-      });
-      expect(documentation.print()).toMatchSnapshot();
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
     });
 
-    test("should handle different number types", async () => {
-      const documentation = await createDocumentation({
+    test("should handle different number types", () => {
+      const spec = new Documentation({
         config: sampleConfig,
         routing: {
           v1: {
@@ -378,12 +377,12 @@ describe("createDocumentation()", () => {
         version: "3.4.5",
         title: "Testing numbers",
         serverUrl: "https://example.com",
-      });
-      expect(documentation.print()).toMatchSnapshot();
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
     });
 
-    test("should handle different string types", async () => {
-      const documentation = await createDocumentation({
+    test("should handle different string types", () => {
+      const spec = new Documentation({
         config: sampleConfig,
         routing: {
           v1: {
@@ -420,12 +419,12 @@ describe("createDocumentation()", () => {
         version: "3.4.5",
         title: "Testing strings",
         serverUrl: "https://example.com",
-      });
-      expect(documentation.print()).toMatchSnapshot();
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
     });
 
-    test("should handle tuples", async () => {
-      const documentation = await createDocumentation({
+    test("should handle tuples", () => {
+      const spec = new Documentation({
         config: sampleConfig,
         routing: {
           v1: {
@@ -450,12 +449,12 @@ describe("createDocumentation()", () => {
         version: "3.4.5",
         title: "Testing tuples",
         serverUrl: "https://example.com",
-      });
-      expect(documentation.print()).toMatchSnapshot();
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
     });
 
-    test("should handle enum types", async () => {
-      const documentation = await createDocumentation({
+    test("should handle enum types", () => {
+      const spec = new Documentation({
         config: sampleConfig,
         routing: {
           v1: {
@@ -476,18 +475,18 @@ describe("createDocumentation()", () => {
         version: "3.4.5",
         title: "Testing enums",
         serverUrl: "https://example.com",
-      });
-      expect(documentation.print()).toMatchSnapshot();
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
     });
 
-    test("should handle z.preprocess()", async () => {
+    test("should handle z.preprocess()", () => {
       const string = z.preprocess((arg) => String(arg), z.string());
       const number = z.preprocess(
         (arg) => parseInt(String(arg), 16),
         z.number().int().nonnegative(),
       );
       const boolean = z.preprocess((arg) => !!arg, z.boolean());
-      const documentation = await createDocumentation({
+      const spec = new Documentation({
         config: sampleConfig,
         routing: {
           v1: {
@@ -502,8 +501,8 @@ describe("createDocumentation()", () => {
         version: "3.4.5",
         title: "Testing z.preprocess()",
         serverUrl: "https://example.com",
-      });
-      expect(documentation.print()).toMatchSnapshot();
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
       expect(string.parse(123)).toBe("123");
       expect(number.parse("0xFF")).toBe(255);
       expect(boolean.parse([])).toBe(true);
@@ -511,7 +510,7 @@ describe("createDocumentation()", () => {
       expect(boolean.parse(null)).toBe(false);
     });
 
-    test("should handle circular schemas via z.lazy()", async () => {
+    test("should handle circular schemas via z.lazy()", () => {
       const baseCategorySchema = z.object({
         name: z.string(),
       });
@@ -521,7 +520,7 @@ describe("createDocumentation()", () => {
       const categorySchema: z.ZodType<Category> = baseCategorySchema.extend({
         subcategories: z.lazy(() => categorySchema.array()),
       });
-      const documentation = await createDocumentation({
+      const spec = new Documentation({
         config: sampleConfig,
         routing: {
           v1: {
@@ -550,8 +549,8 @@ describe("createDocumentation()", () => {
         version: "3.4.5",
         title: "Testing Lazy",
         serverUrl: "https://example.com",
-      });
-      expect(documentation.print()).toMatchSnapshot();
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
     });
 
     test.each([
@@ -562,27 +561,28 @@ describe("createDocumentation()", () => {
       z.unknown(),
       z.never(),
       z.void(),
-    ])("should throw on unsupported types", async (zodType) => {
-      await expect(async () =>
-        createDocumentation({
-          config: sampleConfig,
-          routing: {
-            v1: {
-              getSomething: defaultEndpointsFactory.build({
-                method: "post",
-                input: z.object({
-                  property: zodType,
+    ])("should throw on unsupported types", (zodType) => {
+      expect(
+        () =>
+          new Documentation({
+            config: sampleConfig,
+            routing: {
+              v1: {
+                getSomething: defaultEndpointsFactory.build({
+                  method: "post",
+                  input: z.object({
+                    property: zodType,
+                  }),
+                  output: z.object({}),
+                  handler: async () => ({}),
                 }),
-                output: z.object({}),
-                handler: async () => ({}),
-              }),
+              },
             },
-          },
-          version: "3.4.5",
-          title: "Testing unsupported types",
-          serverUrl: "https://example.com",
-        }),
-      ).rejects.toThrow(
+            version: "3.4.5",
+            title: "Testing unsupported types",
+            serverUrl: "https://example.com",
+          }),
+      ).toThrow(
         new DocumentationError({
           method: "post",
           path: "/v1/getSomething",
@@ -592,7 +592,7 @@ describe("createDocumentation()", () => {
       );
     });
 
-    test("should ensure uniq security schema names", async () => {
+    test("should ensure uniq security schema names", () => {
       const mw1 = createMiddleware({
         security: {
           or: [{ type: "input", name: "key" }, { type: "bearer" }],
@@ -625,7 +625,7 @@ describe("createDocumentation()", () => {
         input: z.object({}),
         middleware: vi.fn(),
       });
-      const documentation = await createDocumentation({
+      const spec = new Documentation({
         config: sampleConfig,
         routing: {
           v1: {
@@ -659,12 +659,12 @@ describe("createDocumentation()", () => {
         version: "3.4.5",
         title: "Testing Security",
         serverUrl: "https://example.com",
-      });
-      expect(documentation.print()).toMatchSnapshot();
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
     });
 
-    test("should ensure the uniq operation ids", async () => {
-      const documentation = await createDocumentation({
+    test("should ensure the uniq operation ids", () => {
+      const spec = new Documentation({
         config: sampleConfig,
         routing: {
           v1: {
@@ -689,13 +689,13 @@ describe("createDocumentation()", () => {
         version: "3.4.5",
         title: "Testing Operation IDs",
         serverUrl: "https://example.com",
-      });
-      expect(documentation.print()).toMatchSnapshot();
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
     });
 
-    test("should be able to specify operation", async () => {
+    test("should be able to specify operation", () => {
       const operationId = "coolOperationId";
-      const documentation = await createDocumentation({
+      const spec = new Documentation({
         config: sampleConfig,
         routing: {
           v1: {
@@ -714,15 +714,14 @@ describe("createDocumentation()", () => {
         version: "3.4.5",
         title: "Testing Operation IDs",
         serverUrl: "https://example.com",
-      });
-      const spec = documentation.print();
+      }).getSpecAsYaml();
       expect(spec).toContain(operationId);
       expect(spec).toMatchSnapshot();
     });
 
-    test("should be able to specify the operationId provider depending on method", async () => {
+    test("should be able to specify the operationId provider depending on method", () => {
       const operationId = "CoolOperationId";
-      const documentation = await createDocumentation({
+      const spec = new Documentation({
         config: sampleConfig,
         routing: {
           v1: {
@@ -741,13 +740,12 @@ describe("createDocumentation()", () => {
         version: "3.4.5",
         title: "Testing Operation IDs",
         serverUrl: "https://example.com",
-      });
-      const spec = documentation.print();
+      }).getSpecAsYaml();
       expect(spec).toContain(operationId);
       expect(spec).toMatchSnapshot();
     });
 
-    test("should not be able to specify duplicated operation", async () => {
+    test("should not be able to specify duplicated operation", () => {
       const operationId = "coolOperationId";
       const expectedError = new DocumentationError({
         message: 'Duplicated operationId: "coolOperationId"',
@@ -755,41 +753,42 @@ describe("createDocumentation()", () => {
         method: "get",
         path: "/v1/getSomeTwo/thing",
       });
-      await expect(async () =>
-        createDocumentation({
-          config: sampleConfig,
-          routing: {
-            v1: {
-              getSome: {
-                thing: defaultEndpointsFactory.build({
-                  description: "thing is the path segment",
-                  method: "get",
-                  operationId,
-                  input: z.object({}),
-                  output: z.object({}),
-                  handler: async () => ({}),
-                }),
-              },
-              getSomeTwo: {
-                thing: defaultEndpointsFactory.build({
-                  description: "thing is the path segment",
-                  method: "get",
-                  operationId,
-                  input: z.object({}),
-                  output: z.object({}),
-                  handler: async () => ({}),
-                }),
+      expect(
+        () =>
+          new Documentation({
+            config: sampleConfig,
+            routing: {
+              v1: {
+                getSome: {
+                  thing: defaultEndpointsFactory.build({
+                    description: "thing is the path segment",
+                    method: "get",
+                    operationId,
+                    input: z.object({}),
+                    output: z.object({}),
+                    handler: async () => ({}),
+                  }),
+                },
+                getSomeTwo: {
+                  thing: defaultEndpointsFactory.build({
+                    description: "thing is the path segment",
+                    method: "get",
+                    operationId,
+                    input: z.object({}),
+                    output: z.object({}),
+                    handler: async () => ({}),
+                  }),
+                },
               },
             },
-          },
-          version: "3.4.5",
-          title: "Testing Operation IDs",
-          serverUrl: "https://example.com",
-        }),
-      ).rejects.toThrow(expectedError);
+            version: "3.4.5",
+            title: "Testing Operation IDs",
+            serverUrl: "https://example.com",
+          }),
+      ).toThrow(expectedError);
     });
 
-    test("should handle custom mime types and status codes", async () => {
+    test("should handle custom mime types and status codes", () => {
       const resultHandler = createResultHandler({
         getPositiveResponse: (output) => ({
           schema: z.object({ status: z.literal("OK"), result: output }),
@@ -804,7 +803,7 @@ describe("createDocumentation()", () => {
         handler: () => {},
       });
       const factory = new EndpointsFactory(resultHandler);
-      const documentation = await createDocumentation({
+      const spec = new Documentation({
         config: sampleConfig,
         routing: {
           v1: {
@@ -819,17 +818,17 @@ describe("createDocumentation()", () => {
         version: "3.4.5",
         title: "Testing MIME types and status codes",
         serverUrl: "https://example.com",
-      });
-      expect(documentation.print()).toMatchSnapshot();
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
     });
   });
 
   describe("Issue #98", () => {
-    test("Should describe non-empty array", async () => {
+    test("Should describe non-empty array", () => {
       // There is no such class as ZodNonEmptyArray in Zod v3.7.0+
       // It existed though in Zod v3.6.x:
       // @see https://github.com/colinhacks/zod/blob/v3.6.1/src/types.ts#L1204
-      const documentation = await createDocumentation({
+      const spec = new Documentation({
         config: sampleConfig,
         routing: {
           v1: {
@@ -850,11 +849,11 @@ describe("createDocumentation()", () => {
         version: "3.4.5",
         title: "Testing issue #98",
         serverUrl: "https://example.com",
-      });
-      expect(documentation.print()).toMatchSnapshot();
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
     });
 
-    test("should union schemas", async () => {
+    test("should union schemas", () => {
       const baseSchema = z.object({ id: z.string() });
       const subType1 = baseSchema.extend({ field1: z.string() });
       const subType2 = baseSchema.extend({ field2: z.string() });
@@ -864,7 +863,7 @@ describe("createDocumentation()", () => {
       expectType<TestingType>({ id: "string", field1: "string" });
       expectType<TestingType>({ id: "string", field2: "string" });
 
-      const documentation = await createDocumentation({
+      const spec = new Documentation({
         config: sampleConfig,
         routing: {
           v1: {
@@ -890,14 +889,14 @@ describe("createDocumentation()", () => {
         version: "3.4.5",
         title: "Testing issue #98",
         serverUrl: "https://example.com",
-      });
-      expect(documentation.print()).toMatchSnapshot();
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
     });
   });
 
   describe("Route Path Params", () => {
-    test("should handle route path params for POST request", async () => {
-      const documentation = await createDocumentation({
+    test("should handle route path params for POST request", () => {
+      const spec = new Documentation({
         config: sampleConfig,
         routing: {
           v1: {
@@ -915,12 +914,12 @@ describe("createDocumentation()", () => {
         version: "3.4.5",
         title: "Testing route path params",
         serverUrl: "https://example.com",
-      });
-      expect(documentation.print()).toMatchSnapshot();
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
     });
 
-    test("should handle route path params for GET request", async () => {
-      const documentation = await createDocumentation({
+    test("should handle route path params for GET request", () => {
+      const spec = new Documentation({
         config: sampleConfig,
         routing: {
           v1: {
@@ -938,8 +937,8 @@ describe("createDocumentation()", () => {
         version: "3.4.5",
         title: "Testing route path params",
         serverUrl: "https://example.com",
-      });
-      expect(documentation.print()).toMatchSnapshot();
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
     });
   });
 
@@ -949,8 +948,8 @@ describe("createDocumentation()", () => {
       inputSources: { get: ["query", "params", "headers"] },
     });
 
-    test("should describe x- inputs as header params", async () => {
-      const documentation = await createDocumentation({
+    test("should describe x- inputs as header params", () => {
+      const spec = new Documentation({
         config: specificConfig,
         routing: {
           v1: {
@@ -968,14 +967,14 @@ describe("createDocumentation()", () => {
         version: "3.4.5",
         title: "Testing headers params",
         serverUrl: "https://example.com",
-      });
-      expect(documentation.print()).toMatchSnapshot();
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
     });
   });
 
   describe("Metadata", () => {
-    test("should pass over the schema description", async () => {
-      const documentation = await createDocumentation({
+    test("should pass over the schema description", () => {
+      const spec = new Documentation({
         config: sampleConfig,
         routing: {
           v1: {
@@ -998,12 +997,12 @@ describe("createDocumentation()", () => {
         version: "3.4.5",
         title: "Testing Metadata:description",
         serverUrl: "https://example.com",
-      });
-      expect(documentation.print()).toMatchSnapshot();
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
     });
 
-    test("Issue #929: the location of the custom description should be on the param level", async () => {
-      const documentation = await createDocumentation({
+    test("Issue #929: the location of the custom description should be on the param level", () => {
+      const spec = new Documentation({
         composition: "components",
         config: sampleConfig,
         routing: {
@@ -1027,12 +1026,12 @@ describe("createDocumentation()", () => {
         version: "3.4.5",
         title: "Testing Metadata:description",
         serverUrl: "https://example.com",
-      });
-      expect(documentation.print()).toMatchSnapshot();
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
     });
 
-    test("should pass over the example of an individual parameter", async () => {
-      const documentation = await createDocumentation({
+    test("should pass over the example of an individual parameter", () => {
+      const spec = new Documentation({
         config: sampleConfig,
         routing: {
           v1: {
@@ -1055,12 +1054,12 @@ describe("createDocumentation()", () => {
         version: "3.4.5",
         title: "Testing Metadata:example on IO parameter",
         serverUrl: "https://example.com",
-      });
-      expect(documentation.print()).toMatchSnapshot();
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
     });
 
-    test("should pass over examples of each param from the whole IO schema examples (GET)", async () => {
-      const documentation = await createDocumentation({
+    test("should pass over examples of each param from the whole IO schema examples (GET)", () => {
+      const spec = new Documentation({
         config: sampleConfig,
         routing: {
           v1: {
@@ -1087,12 +1086,12 @@ describe("createDocumentation()", () => {
         version: "3.4.5",
         title: "Testing Metadata:example on IO schema",
         serverUrl: "https://example.com",
-      });
-      expect(documentation.print()).toMatchSnapshot();
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
     });
 
-    test("should pass over examples of the whole IO schema (POST)", async () => {
-      const documentation = await createDocumentation({
+    test("should pass over examples of the whole IO schema (POST)", () => {
+      const spec = new Documentation({
         config: sampleConfig,
         routing: {
           v1: {
@@ -1119,12 +1118,12 @@ describe("createDocumentation()", () => {
         version: "3.4.5",
         title: "Testing Metadata:example on IO schema",
         serverUrl: "https://example.com",
-      });
-      expect(documentation.print()).toMatchSnapshot();
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
     });
 
-    test("should merge endpoint handler examples with its middleware examples", async () => {
-      const documentation = await createDocumentation({
+    test("should merge endpoint handler examples with its middleware examples", () => {
+      const spec = new Documentation({
         config: sampleConfig,
         routing: {
           v1: {
@@ -1164,13 +1163,13 @@ describe("createDocumentation()", () => {
         version: "3.4.5",
         title: "Testing Metadata:example on IO schema + middleware",
         serverUrl: "https://example.com",
-      });
-      expect(documentation.print()).toMatchSnapshot();
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
     });
 
-    test("Issue #827: withMeta() should be immutable", async () => {
+    test("Issue #827: withMeta() should be immutable", () => {
       const zodSchema = z.object({ a: z.string() });
-      const documentation = await createDocumentation({
+      const spec = new Documentation({
         config: sampleConfig,
         routing: {
           v1: {
@@ -1187,8 +1186,8 @@ describe("createDocumentation()", () => {
         version: "3.4.5",
         title: "Testing Metadata:example on IO parameter",
         serverUrl: "https://example.com",
-      });
-      expect(documentation.print()).toMatchSnapshot();
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
     });
   });
 });

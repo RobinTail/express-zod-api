@@ -3,8 +3,6 @@
 ## Version 16
 
 - **Breaking changes**:
-  - Class `Documentation` transformed into async function `createDocumentation`;
-    - Its method `getSpecAsYaml()` renamed to `print()`.
   - Class `Integration` transformed into function `createIntegration`;
     - Its method `print()` became async and its argument changed.
 - Features:
@@ -19,13 +17,11 @@
 
 ```ts
 // before
-import { Documentation, Integration } from "express-zod-api";
-new Documentation(/*...*/).getSpecAsYaml();
+import { Integration } from "express-zod-api";
 new Integration(/*...*/).print();
 
 // after
-import { createDocumentation, createIntegration } from "express-zod-api";
-(await createDocumentation(/*...*/)).print();
+import { createIntegration } from "express-zod-api";
 await createIntegration(/*...*/).print();
 ```
 
