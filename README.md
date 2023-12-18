@@ -910,7 +910,7 @@ writeFileSync(
 );
 ```
 
-If you want the generated code to look prettier, install `prettier` package (detected automatically) and use
+If you want the generated code to look prettier, install `prettier` package (detected automatically) and use async
 `printFormatted()` method instead. Alternatively, you can supply your own `format` function into that method.
 The generated client is flexibly configurable on the frontend side using an implementation function that
 directly makes requests to an endpoint using the libraries and methods of your choice.
