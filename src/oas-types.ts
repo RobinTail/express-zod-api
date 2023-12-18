@@ -1,6 +1,7 @@
 import type {
   ContentObject as Content30,
   ExampleObject as Example30,
+  ExamplesObject as Examples30,
   OperationObject as Operation30,
   ReferenceObject as Ref30,
   ResponseObject as Response30,
@@ -12,6 +13,7 @@ import type {
 import type {
   ContentObject as Content31,
   ExampleObject as Example31,
+  ExamplesObject as Examples31,
   OperationObject as Operation31,
   ReferenceObject as Ref31,
   ResponseObject as Response31,
@@ -32,6 +34,7 @@ export type CommonTag = Tag30 & Tag31;
 export type CommonResponse = Response30 & Response31;
 export type CommonContent = Content30 & Content31;
 export type CommonExample = Example30 & Example31;
+export type CommonExamples = Examples30 & Examples31;
 
 // shortening
 export type CommonSchemaOrRef = CommonSchema | CommonRef;
