@@ -897,21 +897,21 @@ You can generate a Typescript file containing the IO types of your API and a cli
 ```typescript
 // example client-generator.ts
 import { writeFileSync } from "node:fs";
-import { createIntegration } from "express-zod-api";
+import { Integration } from "express-zod-api";
 
 writeFileSync(
   "./frontend/client.ts",
-  await createIntegration({
+  new Integration({
     routing,
     variant: "client", // <— optional, see also "types" for a DIY solution
     optionalPropStyle: { withQuestionMark: true, withUndefined: true }, // optional
-  }).print(),
+  }).print(), // or await .printFormatted()
   "utf-8",
 );
 ```
 
-If you want the generated code to look prettier, install `prettier` package (works automatically), or provide your own
-custom `format` property into `print()` method.
+If you want the generated code to look prettier, install `prettier` package (detected automatically) and use
+`printFormatted()` method instead. Alternatively, you can supply your own `format` function into that method.
 The generated client is flexibly configurable on the frontend side using an implementation function that
 directly makes requests to an endpoint using the libraries and methods of your choice.
 The client asserts the type of request parameters and response.
@@ -938,22 +938,19 @@ client.provide("post", "/v1/user/:id", { id: "10" }); // it also substitues path
 
 ## Creating a documentation
 
-Install the `openapi3-ts` package in order to enable this feature.
 You can generate the specification of your API and write it to a `.yaml` file, that can be used as the documentation:
 
 ```typescript
-import { createDocumentation } from "express-zod-api";
+import { Documentation } from "express-zod-api";
 
-const documentation = await createDocumentation({
+const yamlString = new Documentation({
   routing, // the same routing and config that you use to start the server
   config,
   version: "1.2.3",
   title: "Example API",
   serverUrl: "https://example.com",
   composition: "inline", // optional, or "components" for keeping schemas in a separate dedicated section using refs
-});
-
-const yamlString = documentation.print(); // or use documentation.builder for other features
+}).print(); // or use documentation.builder for other features
 ```
 
 You can add descriptions and examples to your endpoints, their I/O schemas and their properties. It will be included
