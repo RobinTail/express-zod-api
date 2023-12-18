@@ -1,10 +1,6 @@
 import assert from "node:assert/strict";
 // @todo use commons instead
-import type {
-  MediaTypeObject,
-  OAuthFlowsObject,
-  SchemaObjectType,
-} from "openapi3-ts/oas30";
+import type { OAuthFlowsObject, SchemaObjectType } from "openapi3-ts/oas30";
 import { omit } from "ramda";
 import { z } from "zod";
 import {
@@ -58,8 +54,6 @@ import { Security } from "./security";
 import { ZodUpload } from "./upload-schema";
 
 /* eslint-disable @typescript-eslint/no-use-before-define */
-
-type MediaExamples = Pick<MediaTypeObject, "examples">;
 
 export interface OpenAPIContext extends FlatObject {
   oas: OAS;
@@ -596,7 +590,7 @@ export const depictExamples = (
   schema: z.ZodTypeAny,
   isResponse: boolean,
   omitProps: string[] = [],
-): MediaExamples => {
+): CommonExamples => {
   const examples = getExamples({
     schema,
     variant: isResponse ? "parsed" : "original",
@@ -625,7 +619,7 @@ export const depictParamExamples = (
   schema: z.ZodTypeAny,
   isResponse: boolean,
   param: string,
-): MediaExamples => {
+): CommonExamples => {
   const examples = getExamples({
     schema,
     variant: isResponse ? "parsed" : "original",
