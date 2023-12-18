@@ -273,8 +273,6 @@ exports[`Documentation helpers > depictIntersection() > should wrap next depicte
     {
       "properties": {
         "one": {
-          "exclusiveMaximum": false,
-          "exclusiveMinimum": false,
           "format": "double",
           "maximum": 1.7976931348623157e+308,
           "minimum": 5e-324,
@@ -289,8 +287,6 @@ exports[`Documentation helpers > depictIntersection() > should wrap next depicte
     {
       "properties": {
         "two": {
-          "exclusiveMaximum": false,
-          "exclusiveMinimum": false,
           "format": "double",
           "maximum": 1.7976931348623157e+308,
           "minimum": 5e-324,
@@ -362,32 +358,32 @@ exports[`Documentation helpers > depictLiteral() > should set type and involve e
 }
 `;
 
-exports[`Documentation helpers > depictNull() > should set type:string format:null and nullable:true props 1`] = `
+exports[`Documentation helpers > depictNull() > should give type:null 1`] = `
 {
-  "format": "null",
-  "nullable": true,
-  "type": "string",
+  "type": "null",
 }
 `;
 
-exports[`Documentation helpers > depictNullable() > should set nullable:true 0 1`] = `
+exports[`Documentation helpers > depictNullable() > should add null to the type 0 1`] = `
 {
-  "nullable": true,
-  "type": "string",
+  "type": [
+    "null",
+    "string",
+  ],
 }
 `;
 
-exports[`Documentation helpers > depictNullable() > should set nullable:true 1 1`] = `
+exports[`Documentation helpers > depictNullable() > should add null to the type 1 1`] = `
 {
-  "nullable": true,
-  "type": "string",
+  "type": [
+    "null",
+    "string",
+  ],
 }
 `;
 
 exports[`Documentation helpers > depictNumber() > should type:number, min/max, format and exclusiveness props 1`] = `
 {
-  "exclusiveMaximum": false,
-  "exclusiveMinimum": false,
   "format": "double",
   "maximum": 1.7976931348623157e+308,
   "minimum": 5e-324,
@@ -397,8 +393,6 @@ exports[`Documentation helpers > depictNumber() > should type:number, min/max, f
 
 exports[`Documentation helpers > depictNumber() > should type:number, min/max, format and exclusiveness props 2`] = `
 {
-  "exclusiveMaximum": false,
-  "exclusiveMinimum": false,
   "format": "int64",
   "maximum": 20,
   "minimum": 10,
@@ -416,8 +410,10 @@ exports[`Documentation helpers > depictObject() > Bug #758 1`] = `
       "type": "string",
     },
     "c": {
-      "nullable": true,
-      "type": "string",
+      "type": [
+        "null",
+        "string",
+      ],
     },
   },
   "required": [
@@ -432,8 +428,6 @@ exports[`Documentation helpers > depictObject() > should type:object, properties
 {
   "properties": {
     "a": {
-      "exclusiveMaximum": false,
-      "exclusiveMinimum": false,
       "format": "double",
       "maximum": 1.7976931348623157e+308,
       "minimum": 5e-324,
@@ -455,8 +449,6 @@ exports[`Documentation helpers > depictObject() > should type:object, properties
 {
   "properties": {
     "a": {
-      "exclusiveMaximum": false,
-      "exclusiveMinimum": false,
       "format": "double",
       "maximum": 1.7976931348623157e+308,
       "minimum": 5e-324,
@@ -478,8 +470,6 @@ exports[`Documentation helpers > depictObject() > should type:object, properties
 {
   "properties": {
     "a": {
-      "exclusiveMaximum": false,
-      "exclusiveMinimum": false,
       "format": "double",
       "maximum": 1.7976931348623157e+308,
       "minimum": 5e-324,
@@ -501,8 +491,6 @@ exports[`Documentation helpers > depictObject() > should type:object, properties
 {
   "properties": {
     "a": {
-      "exclusiveMaximum": false,
-      "exclusiveMinimum": false,
       "format": "double",
       "maximum": 1.7976931348623157e+308,
       "minimum": 5e-324,
@@ -523,16 +511,16 @@ exports[`Documentation helpers > depictObject() > should type:object, properties
 {
   "properties": {
     "a": {
-      "exclusiveMaximum": false,
-      "exclusiveMinimum": false,
       "format": "double",
       "maximum": 1.7976931348623157e+308,
       "minimum": 5e-324,
       "type": "number",
     },
     "b": {
-      "nullable": true,
-      "type": "string",
+      "type": [
+        "null",
+        "string",
+      ],
     },
   },
   "type": "object",
@@ -1028,28 +1016,22 @@ exports[`Documentation helpers > depictTags() > should accept plain descriptions
 ]
 `;
 
-exports[`Documentation helpers > depictTuple() > should set type:array, max- and minLength, oneOf, format:tuple and description 1`] = `
+exports[`Documentation helpers > depictTuple() > should utilize prefixItems 1`] = `
 {
-  "items": {
-    "description": "0: boolean, 1: string, 2: string",
-    "format": "tuple",
-    "oneOf": [
-      {
-        "type": "boolean",
-      },
-      {
-        "type": "string",
-      },
-      {
-        "enum": [
-          "test",
-        ],
-        "type": "string",
-      },
-    ],
-  },
-  "maxItems": 3,
-  "minItems": 3,
+  "prefixItems": [
+    {
+      "type": "boolean",
+    },
+    {
+      "type": "string",
+    },
+    {
+      "enum": [
+        "test",
+      ],
+      "type": "string",
+    },
+  ],
   "type": "array",
 }
 `;
@@ -1061,8 +1043,6 @@ exports[`Documentation helpers > depictUnion() > should wrap next depicters into
       "type": "string",
     },
     {
-      "exclusiveMaximum": false,
-      "exclusiveMinimum": false,
       "format": "double",
       "maximum": 1.7976931348623157e+308,
       "minimum": 5e-324,

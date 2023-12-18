@@ -8,6 +8,7 @@
   - Class `Integration` transformed into function `createIntegration`;
     - Its method `print()` became async and its argument changed.
 - Features:
+  - Using [OpenAPI 3.1](https://swagger.io/specification/) for generating documentation.
   - Ability to generate formatted typescript client when `prettier` is installed (supported automatically).
   - Ability to supply you own typescript formatting function for generating the client.
 - How to migrate while preserving the previous behaviour:

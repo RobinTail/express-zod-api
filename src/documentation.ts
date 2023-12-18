@@ -5,8 +5,7 @@ import type {
   ReferenceObject,
   SchemaObject,
   SecuritySchemeObject,
-  SecuritySchemeType,
-} from "openapi3-ts/oas30";
+} from "openapi3-ts/oas31";
 import { z } from "zod";
 import { DocumentationError } from "./errors";
 import {
@@ -64,7 +63,7 @@ export const createDocumentation = async ({
   composition = "inline",
   serializer = defaultSerializer,
 }: DocumentationParams) => {
-  const lastSecuritySchemaIds: Partial<Record<SecuritySchemeType, number>> = {};
+  const lastSecuritySchemaIds: Partial<Record<string, number>> = {};
   const lastOperationIdSuffixes: Record<string, number> = {};
 
   const ensureUniqOperationId = (
@@ -95,9 +94,10 @@ export const createDocumentation = async ({
   };
 
   const BuilderClass = await loadPeer<{ new (): OpenApiBuilder }>(
-    "openapi3-ts/oas30",
+    `openapi3-ts/oas31`,
     "OpenApiBuilder",
   );
+
   const builder = new BuilderClass().addInfo({ title, version });
   for (const url of typeof serverUrl === "string" ? [serverUrl] : serverUrl) {
     builder.addServer({ url });
@@ -108,10 +108,7 @@ export const createDocumentation = async ({
       ? { $ref: `#/components/schemas/${name}` }
       : undefined;
 
-  const makeRef = (
-    name: string,
-    schema: SchemaObject | ReferenceObject,
-  ): ReferenceObject => {
+  const makeRef = (name: string, schema: SchemaObject | ReferenceObject) => {
     builder.addSchema(name, schema);
     return getRef(name)!;
   };

@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { ReferenceObject, SchemaObject } from "openapi3-ts/oas30";
+import { ReferenceObject, SchemaObject } from "openapi3-ts/oas31";
 import { z } from "zod";
 import { defaultSerializer } from "../../src/common-helpers";
 import { IOSchemaError } from "../../src/errors";
@@ -398,7 +398,7 @@ describe("Documentation helpers", () => {
 
   describe("depictNullable()", () => {
     test.each<OpenAPIContext>([requestCtx, responseCtx])(
-      "should set nullable:true %#",
+      "should add null to the type %#",
       (ctx) => {
         expect(
           depictNullable({
@@ -485,7 +485,7 @@ describe("Documentation helpers", () => {
   });
 
   describe("depictNull()", () => {
-    test("should set type:string format:null and nullable:true props", () => {
+    test("should give type:null", () => {
       expect(
         depictNull({
           schema: z.null(),
@@ -555,7 +555,7 @@ describe("Documentation helpers", () => {
   });
 
   describe("depictTuple()", () => {
-    test("should set type:array, max- and minLength, oneOf, format:tuple and description", () => {
+    test("should utilize prefixItems", () => {
       expect(
         depictTuple({
           schema: z.tuple([z.boolean(), z.string(), z.literal("test")]),

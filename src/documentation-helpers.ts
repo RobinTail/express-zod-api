@@ -3,7 +3,6 @@ import type {
   ContentObject,
   ExampleObject,
   ExamplesObject,
-  MediaTypeObject,
   OAuthFlowsObject,
   ParameterObject,
   ReferenceObject,
@@ -14,7 +13,7 @@ import type {
   SecurityRequirementObject,
   SecuritySchemeObject,
   TagObject,
-} from "openapi3-ts/oas30";
+} from "openapi3-ts/oas31";
 import { omit } from "ramda";
 import { z } from "zod";
 import {
@@ -51,8 +50,6 @@ import { Security } from "./security";
 import { ZodUpload } from "./upload-schema";
 
 /* eslint-disable @typescript-eslint/no-use-before-define */
-
-type MediaExamples = Pick<MediaTypeObject, "examples">;
 
 export interface OpenAPIContext extends FlatObject {
   isResponse: boolean;
@@ -93,7 +90,7 @@ const samples = {
   object: {},
   null: null,
   array: [],
-} satisfies Record<NonNullable<SchemaObjectType>, unknown>;
+} satisfies Record<Extract<SchemaObjectType, string>, unknown>;
 
 /** @see https://expressjs.com/en/guide/routing.html */
 const routePathParamsRegex = /:([A-Za-z0-9_]+)/g;
@@ -190,13 +187,17 @@ export const depictReadonly: Depicter<z.ZodReadonly<z.ZodTypeAny>> = ({
   next,
 }) => next({ schema: schema._def.innerType });
 
+/** @since OAS 3.1 nullable replaced with type arrays */
 export const depictNullable: Depicter<z.ZodNullable<z.ZodTypeAny>> = ({
   schema,
   next,
-}) => ({
-  nullable: true,
-  ...next({ schema: schema.unwrap() }),
-});
+}) => {
+  const nested = next({ schema: schema.unwrap() });
+  return {
+    ...nested,
+    ...("$ref" in nested ? {} : makeNullableType(nested)),
+  };
+};
 
 export const depictEnum: Depicter<
   z.ZodEnum<[string, ...string[]]> | z.ZodNativeEnum<any> // keeping "any" for ZodNativeEnum as compatibility fix
@@ -234,13 +235,9 @@ export const depictObject: Depicter<z.AnyZodObject> = ({
 
 /**
  * @see https://swagger.io/docs/specification/data-models/data-types/
- * @todo use type:"null" for OpenAPI 3.1
+ * @since OAS 3.1: using type: "null"
  * */
-export const depictNull: Depicter<z.ZodNull> = () => ({
-  type: "string",
-  nullable: true,
-  format: "null",
-});
+export const depictNull: Depicter<z.ZodNull> = () => ({ type: "null" });
 
 export const depictDateIn: Depicter<ZodDateIn> = (ctx) => {
   assert(
@@ -315,12 +312,12 @@ export const depictRecord: Depicter<z.ZodRecord<z.ZodTypeAny>> = ({
 }) => {
   if (keySchema instanceof z.ZodEnum || keySchema instanceof z.ZodNativeEnum) {
     const keys = Object.values(keySchema.enum) as string[];
-    const shape = keys.reduce(
+    const shape = keys.reduce<z.ZodRawShape>(
       (carry, key) => ({
         ...carry,
         [key]: valueSchema,
       }),
-      {} as z.ZodRawShape,
+      {},
     );
     return {
       type: "object",
@@ -378,7 +375,7 @@ export const depictArray: Depicter<z.ZodArray<z.ZodTypeAny>> = ({
   ...(def.maxLength !== null && { maxItems: def.maxLength.value }),
 });
 
-/** @todo improve it when OpenAPI 3.1.0 will be released */
+/** @since OAS 3.1 using prefixItems for depicting tuples */
 export const depictTuple: Depicter<z.ZodTuple> = ({
   schema: { items },
   next,
@@ -386,20 +383,7 @@ export const depictTuple: Depicter<z.ZodTuple> = ({
   const types = items.map((item) => next({ schema: item }));
   return {
     type: "array",
-    minItems: types.length,
-    maxItems: types.length,
-    items: {
-      oneOf: types,
-      format: "tuple",
-      ...(types.length > 0 && {
-        description: types
-          .map(
-            (item, index) =>
-              `${index}: ${"$ref" in item ? item.$ref : item.type}`,
-          )
-          .join(", "),
-      }),
-    },
+    prefixItems: types,
   };
 };
 
@@ -436,8 +420,9 @@ export const depictString: Depicter<z.ZodString> = ({
           )
         : new RegExp(`^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?Z$`)
       : undefined;
+  // @todo constraints do not work well for such syntax
   return {
-    type: "string" as const,
+    type: "string",
     ...(isDatetime && { format: "date-time" }),
     ...(isEmail && { format: "email" }),
     ...(isURL && { format: "url" }),
@@ -450,51 +435,50 @@ export const depictString: Depicter<z.ZodString> = ({
     ...(minLength !== null && { minLength }),
     ...(maxLength !== null && { maxLength }),
     ...(regex && { pattern: `/${regex.source}/${regex.flags}` }),
-  };
+  } satisfies SchemaObject;
 };
 
-/** @todo support exclusive min/max as numbers in case of OpenAPI v3.1.x */
+/** @since OAS 3.1: exclusive min/max are numbers */
 export const depictNumber: Depicter<z.ZodNumber> = ({ schema }) => {
   const minCheck = schema._def.checks.find(({ kind }) => kind === "min") as
     | Extract<z.ZodNumberCheck, { kind: "min" }>
     | undefined;
+  const minimum =
+    schema.minValue === null
+      ? schema.isInt
+        ? Number.MIN_SAFE_INTEGER
+        : Number.MIN_VALUE
+      : schema.minValue;
   const isMinInclusive = minCheck ? minCheck.inclusive : true;
   const maxCheck = schema._def.checks.find(({ kind }) => kind === "max") as
     | Extract<z.ZodNumberCheck, { kind: "max" }>
     | undefined;
+  const maximum =
+    schema.maxValue === null
+      ? schema.isInt
+        ? Number.MAX_SAFE_INTEGER
+        : Number.MAX_VALUE
+      : schema.maxValue;
   const isMaxInclusive = maxCheck ? maxCheck.inclusive : true;
   return {
-    type: schema.isInt ? ("integer" as const) : ("number" as const),
-    format: schema.isInt ? ("int64" as const) : ("double" as const),
-    minimum:
-      schema.minValue === null
-        ? schema.isInt
-          ? Number.MIN_SAFE_INTEGER
-          : Number.MIN_VALUE
-        : schema.minValue,
-    exclusiveMinimum: !isMinInclusive,
-    maximum:
-      schema.maxValue === null
-        ? schema.isInt
-          ? Number.MAX_SAFE_INTEGER
-          : Number.MAX_VALUE
-        : schema.maxValue,
-    exclusiveMaximum: !isMaxInclusive,
+    type: schema.isInt ? "integer" : "number",
+    format: schema.isInt ? "int64" : "double",
+    ...(isMinInclusive ? { minimum } : { exclusiveMinimum: minimum }),
+    ...(isMaxInclusive ? { maximum } : { exclusiveMaximum: maximum }),
   };
 };
 
 export const depictObjectProperties = ({
   schema: { shape },
   next,
-}: Parameters<Depicter<z.AnyZodObject>>[0]) => {
-  return Object.keys(shape).reduce(
+}: Parameters<Depicter<z.AnyZodObject>>[0]) =>
+  Object.keys(shape).reduce<Record<string, SchemaObject | ReferenceObject>>(
     (carry, key) => ({
       ...carry,
       [key]: next({ schema: shape[key] }),
     }),
-    {} as Record<string, SchemaObject | ReferenceObject>,
+    {},
   );
-};
 
 const makeSample = (depicted: SchemaObject) => {
   const type = (
@@ -502,6 +486,10 @@ const makeSample = (depicted: SchemaObject) => {
   ) as keyof typeof samples;
   return samples?.[type];
 };
+
+const makeNullableType = (prev: SchemaObject): Pick<SchemaObject, "type"> => ({
+  type: ["null" as Extract<SchemaObjectType, string>].concat(prev.type || []),
+});
 
 export const depictEffect: Depicter<z.ZodEffects<z.ZodTypeAny>> = ({
   schema,
@@ -558,7 +546,7 @@ export const depictExamples = (
   schema: z.ZodTypeAny,
   isResponse: boolean,
   omitProps: string[] = [],
-): MediaExamples => {
+): ExamplesObject => {
   const examples = getExamples({
     schema,
     variant: isResponse ? "parsed" : "original",
@@ -571,12 +559,12 @@ export const depictExamples = (
     examples: examples.reduce<ExamplesObject>(
       (carry, example, index) => ({
         ...carry,
-        [`example${index + 1}`]: <ExampleObject>{
+        [`example${index + 1}`]: {
           value:
             typeof example === "object" && !Array.isArray(example)
               ? omit(omitProps, example)
               : example,
-        },
+        } satisfies ExampleObject,
       }),
       {},
     ),
@@ -587,7 +575,7 @@ export const depictParamExamples = (
   schema: z.ZodTypeAny,
   isResponse: boolean,
   param: string,
-): MediaExamples => {
+): ExamplesObject => {
   const examples = getExamples({
     schema,
     variant: isResponse ? "parsed" : "original",
@@ -602,9 +590,9 @@ export const depictParamExamples = (
         param in example
           ? {
               ...carry,
-              [`example${index + 1}`]: <ExampleObject>{
+              [`example${index + 1}`]: {
                 value: example[param],
-              },
+              } satisfies ExampleObject,
             }
           : carry,
       {},
@@ -772,8 +760,8 @@ export const onEach: Depicter<z.ZodTypeAny, "each"> = ({
       });
   return {
     ...(description && { description }),
-    ...(isActuallyNullable && { nullable: true }),
-    ...(examples.length > 0 && { example: examples[0] }),
+    ...(isActuallyNullable && makeNullableType(prev)),
+    ...(examples.length > 0 && { examples: Array.from(examples) }),
   };
 };
 
@@ -869,12 +857,12 @@ export const depictResponse = ({
 
   return {
     description: `${method.toUpperCase()} ${path} ${clue}`,
-    content: mimeTypes.reduce(
+    content: mimeTypes.reduce<ContentObject>(
       (carry, mimeType) => ({
         ...carry,
         [mimeType]: { schema: result, ...examples },
       }),
-      {} as ContentObject,
+      {},
     ),
   };
 };
@@ -1013,12 +1001,12 @@ export const depictRequest = ({
 
   return {
     description: `${method.toUpperCase()} ${path} ${clue}`,
-    content: endpoint.getMimeTypes("input").reduce(
+    content: endpoint.getMimeTypes("input").reduce<ContentObject>(
       (carry, mimeType) => ({
         ...carry,
         [mimeType]: { schema: result, ...bodyExamples },
       }),
-      {} as ContentObject,
+      {},
     ),
   };
 };
