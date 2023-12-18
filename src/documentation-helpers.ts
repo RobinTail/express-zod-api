@@ -1,14 +1,12 @@
 import assert from "node:assert/strict";
 // @todo use commons instead
 import type {
-  ContentObject,
   ExampleObject,
   ExamplesObject,
   MediaTypeObject,
   OAuthFlowsObject,
   ParameterObject,
   RequestBodyObject,
-  ResponseObject,
   SchemaObjectType,
 } from "openapi3-ts/oas30";
 import { omit } from "ramda";
@@ -38,7 +36,9 @@ import {
 import { copyMeta } from "./metadata";
 import { Method } from "./method";
 import {
+  CommonContent,
   CommonRef,
+  CommonResponse,
   CommonSchema,
   CommonSchemaOrRef,
   CommonSecReq,
@@ -334,12 +334,12 @@ export const depictRecord: Depicter<z.ZodRecord<z.ZodTypeAny>> = ({
 }) => {
   if (keySchema instanceof z.ZodEnum || keySchema instanceof z.ZodNativeEnum) {
     const keys = Object.values(keySchema.enum) as string[];
-    const shape = keys.reduce(
+    const shape = keys.reduce<z.ZodRawShape>(
       (carry, key) => ({
         ...carry,
         [key]: valueSchema,
       }),
-      {} as z.ZodRawShape,
+      {},
     );
     return {
       type: "object",
@@ -525,12 +525,12 @@ export const depictObjectProperties = ({
   schema: { shape },
   next,
 }: Parameters<Depicter<z.AnyZodObject>>[0]) => {
-  return Object.keys(shape).reduce(
+  return Object.keys(shape).reduce<Record<string, CommonSchemaOrRef>>(
     (carry, key) => ({
       ...carry,
       [key]: next({ schema: shape[key] }),
     }),
-    {} as Record<string, CommonSchemaOrRef>,
+    {},
   );
 };
 
@@ -882,7 +882,7 @@ export const depictResponse = ({
   clue = "response",
 }: ReqResDepictHelperCommonProps & {
   isPositive: boolean;
-}): ResponseObject => {
+}): CommonResponse => {
   const schema = endpoint.getSchema(isPositive ? "positive" : "negative");
   const mimeTypes = endpoint.getMimeTypes(isPositive ? "positive" : "negative");
   const depictedSchema = excludeExampleFromDepiction(
@@ -908,12 +908,12 @@ export const depictResponse = ({
 
   return {
     description: `${method.toUpperCase()} ${path} ${clue}`,
-    content: mimeTypes.reduce(
+    content: mimeTypes.reduce<CommonContent>(
       (carry, mimeType) => ({
         ...carry,
         [mimeType]: { schema: result, ...examples },
       }),
-      {} as ContentObject,
+      {},
     ),
   };
 };
@@ -1051,12 +1051,12 @@ export const depictRequest = ({
 
   return {
     description: `${method.toUpperCase()} ${path} ${clue}`,
-    content: endpoint.getMimeTypes("input").reduce(
+    content: endpoint.getMimeTypes("input").reduce<CommonContent>(
       (carry, mimeType) => ({
         ...carry,
         [mimeType]: { schema: result, ...bodyExamples },
       }),
-      {} as ContentObject,
+      {},
     ),
   };
 };
