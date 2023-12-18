@@ -552,7 +552,7 @@ describe.each<OAS>(["3.0", "3.1"])("Documentation helpers %s", (oas) => {
   });
 
   describe("depictTuple()", () => {
-    test("should set type:array, max- and minLength, oneOf, format:tuple and description", () => {
+    test("should depict according to OAS version", () => {
       expect(
         depictTuple({
           schema: z.tuple([z.boolean(), z.string(), z.literal("test")]),

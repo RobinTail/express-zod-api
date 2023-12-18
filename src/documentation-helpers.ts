@@ -396,29 +396,36 @@ export const depictArray: Depicter<z.ZodArray<z.ZodTypeAny>> = ({
   ...(def.maxLength !== null && { maxItems: def.maxLength.value }),
 });
 
-/** @todo use prefixItems in 3.1 */
+/** @since OAS 3.1 using prefixItems for depicting tuples */
 export const depictTuple: Depicter<z.ZodTuple> = ({
   schema: { items },
   next,
+  oas,
 }) => {
   const types = items.map((item) => next({ schema: item }));
-  return {
-    type: "array",
-    minItems: types.length,
-    maxItems: types.length,
-    items: {
-      oneOf: types,
-      format: "tuple",
-      ...(types.length > 0 && {
-        description: types
-          .map(
-            (item, index) =>
-              `${index}: ${"$ref" in item ? item.$ref : item.type}`,
-          )
-          .join(", "),
-      }),
-    },
-  };
+  return Object.assign(
+    {
+      type: "array",
+    } satisfies CommonSchema,
+    oas === "3.1"
+      ? ({ prefixItems: types } satisfies SchemaObject31)
+      : ({
+          minItems: types.length,
+          maxItems: types.length,
+          items: {
+            oneOf: types,
+            format: "tuple",
+            ...(types.length > 0 && {
+              description: types
+                .map(
+                  (item, index) =>
+                    `${index}: ${"$ref" in item ? item.$ref : item.type}`,
+                )
+                .join(", "),
+            }),
+          },
+        } satisfies SchemaObject30),
+  );
 };
 
 export const depictString: Depicter<z.ZodString> = ({

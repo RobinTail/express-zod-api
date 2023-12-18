@@ -1028,7 +1028,7 @@ exports[`Documentation helpers 3.0 > depictTags() > should accept plain descript
 ]
 `;
 
-exports[`Documentation helpers 3.0 > depictTuple() > should set type:array, max- and minLength, oneOf, format:tuple and description 1`] = `
+exports[`Documentation helpers 3.0 > depictTuple() > should depict according to OAS version 1`] = `
 {
   "items": {
     "description": "0: boolean, 1: string, 2: string",
@@ -2225,28 +2225,22 @@ exports[`Documentation helpers 3.1 > depictTags() > should accept plain descript
 ]
 `;
 
-exports[`Documentation helpers 3.1 > depictTuple() > should set type:array, max- and minLength, oneOf, format:tuple and description 1`] = `
+exports[`Documentation helpers 3.1 > depictTuple() > should depict according to OAS version 1`] = `
 {
-  "items": {
-    "description": "0: boolean, 1: string, 2: string",
-    "format": "tuple",
-    "oneOf": [
-      {
-        "type": "boolean",
-      },
-      {
-        "type": "string",
-      },
-      {
-        "enum": [
-          "test",
-        ],
-        "type": "string",
-      },
-    ],
-  },
-  "maxItems": 3,
-  "minItems": 3,
+  "prefixItems": [
+    {
+      "type": "boolean",
+    },
+    {
+      "type": "string",
+    },
+    {
+      "enum": [
+        "test",
+      ],
+      "type": "string",
+    },
+  ],
   "type": "array",
 }
 `;
