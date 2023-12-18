@@ -187,7 +187,7 @@ export const depictReadonly: Depicter<z.ZodReadonly<z.ZodTypeAny>> = ({
   next,
 }) => next({ schema: schema._def.innerType });
 
-/** @since OAS 3.1 nullable replaced with type arrays */
+/** @since OAS 3.1 nullable replaced with type array having null */
 export const depictNullable: Depicter<z.ZodNullable<z.ZodTypeAny>> = ({
   schema,
   next,
