@@ -1,7 +1,6 @@
 import assert from "node:assert/strict";
 // @todo use commons instead
 import type {
-  ExampleObject,
   ExamplesObject,
   MediaTypeObject,
   OAuthFlowsObject,
@@ -37,6 +36,7 @@ import { copyMeta } from "./metadata";
 import { Method } from "./method";
 import {
   CommonContent,
+  CommonExample,
   CommonRef,
   CommonResponse,
   CommonSchema,
@@ -609,12 +609,12 @@ export const depictExamples = (
     examples: examples.reduce<ExamplesObject>(
       (carry, example, index) => ({
         ...carry,
-        [`example${index + 1}`]: <ExampleObject>{
+        [`example${index + 1}`]: {
           value:
             typeof example === "object" && !Array.isArray(example)
               ? omit(omitProps, example)
               : example,
-        },
+        } satisfies CommonExample,
       }),
       {},
     ),
@@ -640,9 +640,9 @@ export const depictParamExamples = (
         param in example
           ? {
               ...carry,
-              [`example${index + 1}`]: <ExampleObject>{
+              [`example${index + 1}`]: {
                 value: example[param],
-              },
+              } satisfies CommonExample,
             }
           : carry,
       {},
