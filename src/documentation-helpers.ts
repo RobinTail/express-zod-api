@@ -12,7 +12,6 @@ import type {
   SchemaObjectType,
   SecurityRequirementObject,
   SecuritySchemeObject,
-  TagObject,
 } from "openapi3-ts/oas30";
 import { omit } from "ramda";
 import { z } from "zod";
@@ -44,6 +43,7 @@ import {
   CommonRef,
   CommonSchema,
   CommonSchemaOrRef,
+  CommonTag,
   OAS,
   SchemaObject30,
   SchemaObject31,
@@ -1066,7 +1066,7 @@ export const depictRequest = ({
 
 export const depictTags = <TAG extends string>(
   tags: TagsConfig<TAG>,
-): TagObject[] =>
+): CommonTag[] =>
   (Object.keys(tags) as TAG[]).map((tag) => {
     const def = tags[tag];
     return {
