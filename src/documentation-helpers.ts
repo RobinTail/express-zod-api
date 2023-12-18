@@ -1,6 +1,4 @@
 import assert from "node:assert/strict";
-// @todo use commons instead
-import type { SchemaObjectType } from "openapi3-ts/oas30";
 import { omit } from "ramda";
 import { z } from "zod";
 import {
@@ -93,7 +91,7 @@ const samples = {
   object: {},
   null: null,
   array: [],
-} satisfies Record<NonNullable<SchemaObjectType>, unknown>;
+} satisfies Record<Extract<CommonSchema["type"], string>, unknown>;
 
 /** @see https://expressjs.com/en/guide/routing.html */
 const routePathParamsRegex = /:([A-Za-z0-9_]+)/g;
@@ -201,9 +199,9 @@ export const depictNullable: Depicter<z.ZodNullable<z.ZodTypeAny>> = ({
     nested,
     oas === "3.1"
       ? ({
-          type: (
-            ["null"] as Exclude<SchemaObject31["type"], string | undefined>
-          ).concat("$ref" in nested ? [] : nested.type || []),
+          type: ["null" as Extract<SchemaObject31["type"], string>].concat(
+            "$ref" in nested ? [] : nested.type || [],
+          ),
         } satisfies SchemaObject31)
       : ({ nullable: true } satisfies SchemaObject30),
   );
