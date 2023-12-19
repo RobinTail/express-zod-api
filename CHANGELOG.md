@@ -5,14 +5,13 @@
 ### 16.0.0
 
 - Potentially breaking changes:
-  - Switching to [OpenAPI 3.1](https://swagger.io/specification/) for generating documentation.
-    - Some methods and properties of the `Documentation` class (which extends the OpenAPI builder) might be changed.
+  - Some methods and properties of the `Documentation` class (which extends the OpenAPI builder) might be changed.
 - Features:
-  - OpenAPI 3.1 provides better documentation for your API.
-  - Consider [the new UI](https://editor-next.swagger.io/) for exploring the produced documentation.
+  - Switching to [OpenAPI 3.1](https://swagger.io/specification/) for generating better Documentation for your API.
+    - Consider [the new UI](https://editor-next.swagger.io/) for exploring the produced documentation.
   - Ability to generate formatted typescript client using the new async method `printFormatted` of the `Integration`
     class when the `prettier` package is installed (detects automatically).
-  - Ability to supply your own typescript formatting function into that new method.
+    - Ability to supply your own typescript formatting function into that new method.
 - How to migrate:
   - If you do not modify the generated documentation and only using its `getSpecAsYaml` or `getSpecAsJson` methods:
     - No action required.
