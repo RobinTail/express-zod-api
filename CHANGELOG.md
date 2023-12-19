@@ -2,6 +2,22 @@
 
 ## Version 15
 
+### 15.2.0
+
+- Supporting Node 20 starting from version 20.0.0 (previously it was 20.1.0).
+- Debug message informing on the package build version on startup.
+  - It will also tell you whether a CJS or ESM build is running.
+- Improved words recognition for automatically generated identifiers in `Integration` and `Documentation`.
+  - Thanks to [@shawncarr](https://github.com/shawncarr) for the contribution.
+
+```yaml
+method: GET
+path: /companies/:companyId/users/:userId
+operationId:
+  before: GetCompaniesCompanyidUsersUserid
+  after: GetCompaniesCompanyIdUsersUserId
+```
+
 ### 15.1.0
 
 - The distribution becomes ESM first, while remaining dual (CJS support remains).
