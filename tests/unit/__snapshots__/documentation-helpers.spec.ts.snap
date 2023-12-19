@@ -367,8 +367,8 @@ exports[`Documentation helpers > depictNull() > should give type:null 1`] = `
 exports[`Documentation helpers > depictNullable() > should add null to the type 0 1`] = `
 {
   "type": [
-    "null",
     "string",
+    "null",
   ],
 }
 `;
@@ -376,8 +376,34 @@ exports[`Documentation helpers > depictNullable() > should add null to the type 
 exports[`Documentation helpers > depictNullable() > should add null to the type 1 1`] = `
 {
   "type": [
-    "null",
     "string",
+    "null",
+  ],
+}
+`;
+
+exports[`Documentation helpers > depictNullable() > should only add null type once 0 1`] = `
+{
+  "type": [
+    "string",
+    "null",
+  ],
+}
+`;
+
+exports[`Documentation helpers > depictNullable() > should only add null type once 1 1`] = `
+{
+  "type": [
+    "null",
+  ],
+}
+`;
+
+exports[`Documentation helpers > depictNullable() > should only add null type once 2 1`] = `
+{
+  "type": [
+    "string",
+    "null",
   ],
 }
 `;
@@ -411,8 +437,8 @@ exports[`Documentation helpers > depictObject() > Bug #758 1`] = `
     },
     "c": {
       "type": [
-        "null",
         "string",
+        "null",
       ],
     },
   },
@@ -518,8 +544,8 @@ exports[`Documentation helpers > depictObject() > should type:object, properties
     },
     "b": {
       "type": [
-        "null",
         "string",
+        "null",
       ],
     },
   },

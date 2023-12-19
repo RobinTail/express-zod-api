@@ -522,8 +522,13 @@ const makeSample = (depicted: SchemaObject) => {
   return samples?.[type];
 };
 
-const makeNullableType = (prev: SchemaObject) =>
-  ["null" as Extract<SchemaObjectType, string>].concat(prev.type || []);
+const makeNullableType = (prev: SchemaObject): SchemaObjectType[] => {
+  const current = typeof prev.type === "string" ? [prev.type] : prev.type || [];
+  if (current.includes("null")) {
+    return current;
+  }
+  return current.concat("null");
+};
 
 export const depictEffect: Depicter<z.ZodEffects<z.ZodTypeAny>> = ({
   schema,

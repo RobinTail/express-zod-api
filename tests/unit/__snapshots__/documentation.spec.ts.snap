@@ -1056,9 +1056,8 @@ paths:
                     properties:
                       nullable:
                         type:
-                          - "null"
-                          - "null"
                           - string
+                          - "null"
                     required:
                       - nullable
                 required:
@@ -1115,21 +1114,16 @@ paths:
           description: GET /v1/getSomething parameter
           schema:
             type:
-              - "null"
-              - "null"
-              - "null"
               - boolean
+              - "null"
         - name: nuDefault
           in: query
           required: false
           description: GET /v1/getSomething parameter
           schema:
             type:
-              - "null"
-              - "null"
-              - "null"
-              - "null"
               - integer
+              - "null"
             format: int64
             exclusiveMinimum: 0
             maximum: 9007199254740991
@@ -2393,7 +2387,6 @@ paths:
                       "null":
                         type:
                           - "null"
-                          - "null"
                       dateOut:
                         description: YYYY-MM-DDTHH:mm:ss.sssZ
                         type: string
@@ -3328,9 +3321,8 @@ paths:
                   prefixItems:
                     - type: string
                     - type:
-                        - "null"
-                        - "null"
                         - string
+                        - "null"
                 complex:
                   type: array
                   prefixItems:
@@ -3469,8 +3461,8 @@ paths:
                     properties:
                       boolean:
                         type:
-                          - "null"
                           - boolean
+                          - "null"
                 required:
                   - status
                   - data

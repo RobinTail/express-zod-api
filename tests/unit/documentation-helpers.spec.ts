@@ -409,6 +409,20 @@ describe("Documentation helpers", () => {
         ).toMatchSnapshot();
       },
     );
+
+    test.each([
+      z.string().nullable(),
+      z.null().nullable(),
+      z.string().nullable().nullable(),
+    ])("should only add null type once %#", (schema) => {
+      expect(
+        depictNullable({
+          schema,
+          ...requestCtx,
+          next: makeNext(requestCtx),
+        }),
+      ).toMatchSnapshot();
+    });
   });
 
   describe("depictEnum()", () => {
