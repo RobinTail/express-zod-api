@@ -1093,11 +1093,5 @@ endpointsFactory.build({
 
 # Your input to my output
 
-Do you have a question or idea?
-Your feedback is highly appreciated in [Discussions section](https://github.com/RobinTail/express-zod-api/discussions).
-
-Found a bug?
-Please let me know in [Issues section](https://github.com/RobinTail/express-zod-api/issues).
-
-Found a vulnerability or other security issue?
-Please refer to [Security policy](https://github.com/RobinTail/express-zod-api/blob/master/SECURITY.md).
+If you have a question or idea, or you found a bug, or vulnerability, or security issue, or want to make a PR:
+please refer to [Contributing Guidelines](CONTRIBUTING.md).
