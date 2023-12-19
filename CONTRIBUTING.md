@@ -10,7 +10,7 @@ Please let me know in [Issues section](https://github.com/RobinTail/express-zod-
 
 ### You found a vulnerability or other security issue
 
-Please refer to [Security policy](https://github.com/RobinTail/express-zod-api/blob/master/SECURITY.md).
+Please refer to [Security policy](SECURITY.md).
 
 ### You wanna make it yourself
 
