@@ -893,25 +893,21 @@ const rawAcceptingEndpoint = defaultEndpointsFactory.build({
 ## Generating a Frontend Client
 
 You can generate a Typescript file containing the IO types of your API and a client for it.
+Consider installing `prettier` and using the async `printFormatted()` method.
 
 ```typescript
-// example client-generator.ts
-import { writeFileSync } from "node:fs";
 import { Integration } from "express-zod-api";
 
-writeFileSync(
-  "./frontend/client.ts",
-  new Integration({
-    routing,
-    variant: "client", // <— optional, see also "types" for a DIY solution
-    optionalPropStyle: { withQuestionMark: true, withUndefined: true }, // optional
-  }).print(), // or await .printFormatted()
-  "utf-8",
-);
+const client = new Integration({
+  routing,
+  variant: "client", // <— optional, see also "types" for a DIY solution
+  optionalPropStyle: { withQuestionMark: true, withUndefined: true }, // optional
+});
+
+const prettierFormattedTypescriptCode = await client.printFormatted(); // or just .print() for unformatted
 ```
 
-If you want the generated code to look prettier, install `prettier` package (detected automatically) and use async
-`printFormatted()` method instead. Alternatively, you can supply your own `format` function into that method.
+Alternatively, you can supply your own `format` function into that method or use a regular `print()` method instead.
 The generated client is flexibly configurable on the frontend side using an implementation function that
 directly makes requests to an endpoint using the libraries and methods of your choice.
 The client asserts the type of request parameters and response.
@@ -919,7 +915,7 @@ Consuming the generated client requires Typescript version 4.1 or higher.
 
 ```typescript
 // example frontend, simple implementation based on fetch()
-import { ExpressZodAPIClient } from "./client.ts";
+import { ExpressZodAPIClient } from "./client.ts"; // the generated file
 
 const client = new ExpressZodAPIClient(async (method, path, params) => {
   const hasBody = !["get", "delete"].includes(method);
