@@ -1,5 +1,7 @@
 ## Contributing guidelines
 
+Please be aware of the [Code of conduct](CODE_OF_CONDUCT.md).
+
 ### You have a question or idea
 
 Your feedback is highly appreciated in [Discussions section](https://github.com/RobinTail/express-zod-api/discussions).
