@@ -8,7 +8,7 @@ Your feedback is highly appreciated in [Discussions section](https://github.com/
 
 ### You found a bug
 
-Please let me know in [Issues section](https://github.com/RobinTail/express-zod-api/issues).
+Please [create a bug issue](https://github.com/RobinTail/express-zod-api/issues/new/choose).
 
 ### You found a vulnerability or other security issue
 
