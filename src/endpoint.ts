@@ -31,7 +31,7 @@ import {
 import { Security } from "./security";
 import { AbstractLogger } from "./logger";
 
-interface ProcessedResponse<S> {
+export interface ProcessedResponse<S> {
   schema: S;
   statusCodes: number[];
   mimeTypes: string[];
