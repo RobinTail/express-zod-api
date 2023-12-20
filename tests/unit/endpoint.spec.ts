@@ -334,8 +334,8 @@ describe("Endpoint", () => {
     });
   });
 
-  describe(".getPositiveResponseSchema()", () => {
-    test("should return schema according to the result handler", () => {
+  describe(".getResponses()", () => {
+    test("should return positive schema and mime types according to the result handler", () => {
       const factory = new EndpointsFactory(defaultResultHandler);
       const output = z.object({
         something: z.number(),
@@ -347,12 +347,15 @@ describe("Endpoint", () => {
         handler: vi.fn(),
       });
       expect(
-        serializeSchemaForTest(endpoint.getSchema("positive")),
+        endpoint
+          .getResponses("positive")
+          .map(({ schema }) => serializeSchemaForTest(schema)),
       ).toMatchSnapshot();
+      expect(
+        endpoint.getResponses("positive").map(({ mimeTypes }) => mimeTypes),
+      ).toEqual([["application/json"]]);
     });
-  });
 
-  describe(".getNegativeResponseSchema()", () => {
     test("should return the negative schema of the result handler", () => {
       const factory = new EndpointsFactory(defaultResultHandler);
       const output = z.object({
@@ -365,34 +368,13 @@ describe("Endpoint", () => {
         handler: vi.fn(),
       });
       expect(
-        serializeSchemaForTest(endpoint.getSchema("negative")),
+        endpoint
+          .getResponses("negative")
+          .map(({ schema }) => serializeSchemaForTest(schema)),
       ).toMatchSnapshot();
-    });
-  });
-
-  describe(".getPositiveMimeTypes()", () => {
-    test("should return an array according to the result handler", () => {
-      const factory = new EndpointsFactory(defaultResultHandler);
-      const endpoint = factory.build({
-        method: "get",
-        input: z.object({}),
-        output: z.object({}),
-        handler: vi.fn(),
-      });
-      expect(endpoint.getMimeTypes("positive")).toEqual(["application/json"]);
-    });
-  });
-
-  describe(".getNegativeMimeTypes()", () => {
-    test("should return an array according to the result handler", () => {
-      const factory = new EndpointsFactory(defaultResultHandler);
-      const endpoint = factory.build({
-        method: "get",
-        input: z.object({}),
-        output: z.object({}),
-        handler: vi.fn(),
-      });
-      expect(endpoint.getMimeTypes("negative")).toEqual(["application/json"]);
+      expect(
+        endpoint.getResponses("negative").map(({ mimeTypes }) => mimeTypes),
+      ).toEqual([["application/json"]]);
     });
   });
 
