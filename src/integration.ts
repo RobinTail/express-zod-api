@@ -152,12 +152,20 @@ export class Integration {
           schema: hasRaw(inputSchema) ? ZodFile.create().buffer() : inputSchema,
           isResponse: false,
         });
+        const positiveResponses = endpoint.getResponses("positive");
+        const negativeResponses = endpoint.getResponses("negative");
         const response = zodToTs({
           ...commons,
           isResponse: true,
-          schema: endpoint
-            .getSchema("positive")
-            .or(endpoint.getSchema("negative")),
+          schema: z.union(
+            positiveResponses
+              .concat(negativeResponses)
+              .map(({ schema }) => schema) as [
+              z.ZodTypeAny,
+              z.ZodTypeAny,
+              ...z.ZodTypeAny[],
+            ],
+          ),
         });
         this.program.push(
           createTypeAlias(input, inputId),
@@ -168,7 +176,9 @@ export class Integration {
           this.registry[`${method} ${path}`] = {
             in: inputId,
             out: responseId,
-            isJson: endpoint.getMimeTypes("positive").includes(mimeJson),
+            isJson: positiveResponses
+              .flatMap(({ mimeTypes }) => mimeTypes)
+              .includes(mimeJson),
             tags: endpoint.getTags(),
           };
         }
