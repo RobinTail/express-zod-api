@@ -1,45 +1,5 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`Endpoint > .getNegativeResponseSchema() > should return the negative schema of the result handler 1`] = `
-{
-  "_type": "ZodObject",
-  "shape": {
-    "error": {
-      "_type": "ZodObject",
-      "shape": {
-        "message": {
-          "_type": "ZodString",
-        },
-      },
-    },
-    "status": {
-      "_type": "ZodLiteral",
-      "value": "error",
-    },
-  },
-}
-`;
-
-exports[`Endpoint > .getPositiveResponseSchema() > should return schema according to the result handler 1`] = `
-{
-  "_type": "ZodObject",
-  "shape": {
-    "data": {
-      "_type": "ZodObject",
-      "shape": {
-        "something": {
-          "_type": "ZodNumber",
-        },
-      },
-    },
-    "status": {
-      "_type": "ZodLiteral",
-      "value": "success",
-    },
-  },
-}
-`;
-
 exports[`Endpoint > .getResponses() > should return positive schema and mime types according to the result handler 1`] = `
 [
   {
