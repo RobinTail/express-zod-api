@@ -3,12 +3,7 @@ import { ReferenceObject, SchemaObject } from "openapi3-ts/oas31";
 import { z } from "zod";
 import { defaultSerializer } from "../../src/common-helpers";
 import { IOSchemaError } from "../../src/errors";
-import {
-  DocumentationError,
-  defaultEndpointsFactory,
-  ez,
-  withMeta,
-} from "../../src";
+import { DocumentationError, ez, withMeta } from "../../src";
 import { getMeta } from "../../src/metadata";
 import {
   OpenAPIContext,

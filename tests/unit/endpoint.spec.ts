@@ -288,24 +288,8 @@ describe("Endpoint", () => {
     });
   });
 
-  describe(".getInputSchema()", () => {
-    test("should return input schema", () => {
-      const factory = new EndpointsFactory(defaultResultHandler);
-      const input = z.object({
-        something: z.number(),
-      });
-      const endpoint = factory.build({
-        method: "get",
-        input,
-        output: z.object({}),
-        handler: vi.fn(),
-      });
-      expect(endpoint.getSchema("input")).toEqual(input);
-    });
-  });
-
   describe(".getOperationId()", () => {
-    test("should return undefined if its not defined upon creaton", () => {
+    test("should return undefined if its not defined upon creation", () => {
       expect(
         new Endpoint({
           methods: ["get"],
@@ -318,8 +302,22 @@ describe("Endpoint", () => {
     });
   });
 
-  describe(".outputSchema", () => {
-    test("should be the output schema", () => {
+  describe(".getSchema()", () => {
+    test("should return the input schema", () => {
+      const factory = new EndpointsFactory(defaultResultHandler);
+      const input = z.object({
+        something: z.number(),
+      });
+      const endpoint = factory.build({
+        method: "get",
+        input,
+        output: z.object({}),
+        handler: vi.fn(),
+      });
+      expect(endpoint.getSchema("input")).toEqual(input);
+    });
+
+    test("should return the output schema", () => {
       const outputSchema = z.object({
         something: z.number(),
       });
