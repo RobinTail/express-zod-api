@@ -31,15 +31,28 @@ import {
 import { Security } from "./security";
 import { AbstractLogger } from "./logger";
 
-const getMimeTypesFromApiResponse = <S extends z.ZodTypeAny>(
-  subject: S | ApiResponse<S>,
-  fallback = [mimeJson],
-) => {
+interface ProcessedResponse<S> {
+  schema: S;
+  statusCodes: number[];
+  mimeTypes: string[];
+}
+
+const processApiResponse = <S extends z.ZodTypeAny>(
+  subject: S | ApiResponse<S> | ApiResponse<S>[],
+  fallback: Omit<ProcessedResponse<S>, "schema">,
+): Array<ProcessedResponse<S>> => {
   if (subject instanceof z.ZodType) {
-    return fallback;
+    return [{ ...fallback, schema: subject }];
   }
-  const { mimeTypes, mimeType } = subject;
-  return mimeType ? [mimeType] : mimeTypes || fallback;
+  return (Array.isArray(subject) ? subject : [subject]).map(
+    ({ schema, statusCodes, statusCode, mimeTypes, mimeType }) => ({
+      schema,
+      statusCodes: statusCode
+        ? [statusCode]
+        : statusCodes || fallback.statusCodes,
+      mimeTypes: mimeType ? [mimeType] : mimeTypes || fallback.mimeTypes,
+    }),
+  );
 };
 
 export type Handler<IN, OUT, OPT> = (params: {
@@ -51,7 +64,6 @@ export type Handler<IN, OUT, OPT> = (params: {
 type DescriptionVariant = "short" | "long";
 type IOVariant = "input" | "output";
 type ResponseVariant = "positive" | "negative";
-type MimeVariant = Extract<IOVariant, "input"> | ResponseVariant;
 
 export abstract class AbstractEndpoint {
   public abstract execute(params: {
@@ -65,9 +77,10 @@ export abstract class AbstractEndpoint {
   ): string | undefined;
   public abstract getMethods(): Method[];
   public abstract getSchema(variant: IOVariant): IOSchema;
-  public abstract getSchema(variant: ResponseVariant): z.ZodTypeAny;
-  public abstract getMimeTypes(variant: MimeVariant): string[];
-  public abstract getStatusCode(variant: ResponseVariant): number;
+  public abstract getInputMimeTypes(): string[];
+  public abstract getResponses(
+    variant: ResponseVariant,
+  ): ProcessedResponse<z.ZodTypeAny>[];
   public abstract getSecurity(): LogicalContainer<Security>;
   public abstract getScopes(): string[];
   public abstract getTags(): string[];
@@ -87,16 +100,11 @@ export class Endpoint<
   readonly #descriptions: Record<DescriptionVariant, string | undefined>;
   readonly #methods: Method[];
   readonly #middlewares: AnyMiddlewareDef[];
-  readonly #mimeTypes: Record<MimeVariant, string[]>;
-  readonly #statusCodes: Record<ResponseVariant, number>;
+  readonly #inputMimeTypes: string[];
+  readonly #responses: Record<ResponseVariant, ProcessedResponse<POS | NEG>[]>;
   readonly #handler: Handler<z.output<IN>, z.input<OUT>, OPT>;
   readonly #resultHandler: ResultHandlerDefinition<POS, NEG>;
-  readonly #schemas: {
-    input: IN;
-    output: OUT;
-    positive: POS;
-    negative: NEG;
-  };
+  readonly #schemas: { input: IN; output: OUT };
   readonly #scopes: SCO[];
   readonly #tags: TAG[];
   readonly #getOperationId: (method: Method) => string | undefined;
@@ -147,40 +155,24 @@ export class Endpoint<
     this.#scopes = scopes;
     this.#tags = tags;
     this.#descriptions = { long, short };
-    const apiResponse = {
-      positive: resultHandler.getPositiveResponse(outputSchema),
-      negative: resultHandler.getNegativeResponse(),
+    this.#responses = {
+      positive: processApiResponse(
+        resultHandler.getPositiveResponse(outputSchema),
+        { mimeTypes: [mimeJson], statusCodes: [defaultStatusCodes.positive] },
+      ),
+      negative: processApiResponse(resultHandler.getNegativeResponse(), {
+        mimeTypes: [mimeJson],
+        statusCodes: [defaultStatusCodes.negative],
+      }),
     };
-    this.#mimeTypes = {
-      input: hasUpload(inputSchema)
-        ? [mimeMultipart]
-        : hasRaw(inputSchema)
-          ? [mimeRaw]
-          : [mimeJson],
-      positive: getMimeTypesFromApiResponse(apiResponse.positive),
-      negative: getMimeTypesFromApiResponse(apiResponse.negative),
-    };
+    this.#inputMimeTypes = hasUpload(inputSchema)
+      ? [mimeMultipart]
+      : hasRaw(inputSchema)
+        ? [mimeRaw]
+        : [mimeJson];
     this.#schemas = {
       input: inputSchema,
       output: outputSchema,
-      positive:
-        apiResponse.positive instanceof z.ZodType
-          ? apiResponse.positive
-          : apiResponse.positive.schema,
-      negative:
-        apiResponse.negative instanceof z.ZodType
-          ? apiResponse.negative
-          : apiResponse.negative.schema,
-    };
-    this.#statusCodes = {
-      positive:
-        apiResponse.positive instanceof z.ZodType
-          ? defaultStatusCodes.positive
-          : apiResponse.positive.statusCode || defaultStatusCodes.positive,
-      negative:
-        apiResponse.negative instanceof z.ZodType
-          ? defaultStatusCodes.negative
-          : apiResponse.negative.statusCode || defaultStatusCodes.negative,
     };
   }
 
@@ -202,18 +194,18 @@ export class Endpoint<
 
   public override getSchema(variant: "input"): IN;
   public override getSchema(variant: "output"): OUT;
-  public override getSchema(variant: "positive"): POS;
-  public override getSchema(variant: "negative"): NEG;
-  public override getSchema(variant: IOVariant | ResponseVariant) {
+  public override getSchema(variant: IOVariant) {
     return this.#schemas[variant];
   }
 
-  public override getMimeTypes(variant: MimeVariant) {
-    return this.#mimeTypes[variant];
+  public override getInputMimeTypes() {
+    return this.#inputMimeTypes;
   }
 
-  public override getStatusCode(variant: ResponseVariant) {
-    return this.#statusCodes[variant];
+  public override getResponses(variant: "positive"): ProcessedResponse<POS>[];
+  public override getResponses(variant: "negative"): ProcessedResponse<NEG>[];
+  public override getResponses(variant: ResponseVariant) {
+    return this.#responses[variant];
   }
 
   public override getSecurity() {

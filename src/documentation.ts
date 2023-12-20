@@ -154,27 +154,32 @@ export class Documentation extends OpenApiBuilder {
       const depictedParams = depictRequestParams({
         ...commonParams,
         inputSources,
+        schema: endpoint.getSchema("input"),
       });
       const operationId = this.ensureUniqOperationId(
         path,
         method,
         endpoint.getOperationId(method),
       );
-      const operation: OperationObject = {
-        operationId,
-        responses: {
-          [endpoint.getStatusCode("positive")]: depictResponse({
-            ...commonParams,
-            clue: successfulResponseDescription,
-            isPositive: true,
-          }),
-          [endpoint.getStatusCode("negative")]: depictResponse({
-            ...commonParams,
-            clue: errorResponseDescription,
-            isPositive: false,
-          }),
-        },
-      };
+      const operation: OperationObject = { operationId, responses: {} };
+      for (const [clue, variant] of Object.entries({
+        [successfulResponseDescription]: "positive",
+        [errorResponseDescription]: "negative",
+      } as const)) {
+        for (const { mimeTypes, schema, statusCodes } of endpoint.getResponses(
+          variant,
+        )) {
+          for (const statusCode of statusCodes) {
+            operation.responses[statusCode] = depictResponse({
+              ...commonParams,
+              clue,
+              schema,
+              mimeTypes,
+            });
+          }
+        }
+      }
+
       if (longDesc) {
         operation.description = longDesc;
         if (hasSummaryFromDescription && shortDesc === undefined) {
@@ -191,7 +196,11 @@ export class Documentation extends OpenApiBuilder {
         operation.parameters = depictedParams;
       }
       if (inputSources.includes("body")) {
-        operation.requestBody = depictRequest(commonParams);
+        operation.requestBody = depictRequest({
+          ...commonParams,
+          schema: endpoint.getSchema("input"),
+          mimeTypes: endpoint.getInputMimeTypes(),
+        });
       }
       const securityRefs = depictSecurityRefs(
         mapLogicalContainer(

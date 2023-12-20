@@ -38,8 +38,10 @@ export interface ResultHandlerDefinition<
   POS extends z.ZodTypeAny,
   NEG extends z.ZodTypeAny,
 > {
-  getPositiveResponse: (output: IOSchema) => POS | ApiResponse<POS>;
-  getNegativeResponse: () => NEG | ApiResponse<NEG>;
+  getPositiveResponse: (
+    output: IOSchema,
+  ) => POS | ApiResponse<POS> | ApiResponse<POS>[];
+  getNegativeResponse: () => NEG | ApiResponse<NEG> | ApiResponse<NEG>[];
   handler: ResultHandler<z.output<POS> | z.output<NEG>>;
 }
 

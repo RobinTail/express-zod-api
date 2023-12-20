@@ -30,7 +30,6 @@ import {
 import { InputSource, TagsConfig } from "./config-type";
 import { ZodDateIn, isoDateRegex } from "./date-in-schema";
 import { ZodDateOut } from "./date-out-schema";
-import { AbstractEndpoint } from "./endpoint";
 import { DocumentationError } from "./errors";
 import { ZodFile } from "./file-schema";
 import { IOSchema } from "./io-schema";
@@ -74,9 +73,10 @@ interface ReqResDepictHelperCommonProps
     OpenAPIContext,
     "serializer" | "getRef" | "makeRef" | "path" | "method"
   > {
-  endpoint: AbstractEndpoint;
   composition: "inline" | "components";
   clue?: string;
+  schema: z.ZodTypeAny;
+  mimeTypes: string[];
 }
 
 const shortDescriptionLimit = 50;
@@ -681,17 +681,16 @@ export const extractObjectSchema = (
 export const depictRequestParams = ({
   path,
   method,
-  endpoint,
   inputSources,
   serializer,
   getRef,
   makeRef,
   composition,
+  schema,
   clue = "parameter",
-}: ReqResDepictHelperCommonProps & {
+}: Omit<ReqResDepictHelperCommonProps, "mimeTypes"> & {
   inputSources: InputSource[];
 }): ParameterObject[] => {
-  const schema = endpoint.getSchema("input");
   const shape = extractObjectSchema(schema, {
     path,
     method,
@@ -872,18 +871,14 @@ export const excludeExampleFromDepiction = (
 export const depictResponse = ({
   method,
   path,
-  endpoint,
-  isPositive,
   serializer,
   getRef,
   makeRef,
   composition,
+  schema,
+  mimeTypes,
   clue = "response",
-}: ReqResDepictHelperCommonProps & {
-  isPositive: boolean;
-}): ResponseObject => {
-  const schema = endpoint.getSchema(isPositive ? "positive" : "negative");
-  const mimeTypes = endpoint.getMimeTypes(isPositive ? "positive" : "negative");
+}: ReqResDepictHelperCommonProps): ResponseObject => {
   const depictedSchema = excludeExampleFromDepiction(
     walkSchema({
       schema,
@@ -1017,19 +1012,19 @@ export const depictSecurityRefs = (
 export const depictRequest = ({
   method,
   path,
-  endpoint,
   serializer,
   getRef,
   makeRef,
   composition,
+  schema,
+  mimeTypes,
   clue = "request body",
 }: ReqResDepictHelperCommonProps): RequestBodyObject => {
   const pathParams = getRoutePathParams(path);
-  const inputSchema = endpoint.getSchema("input");
   const bodyDepiction = excludeExampleFromDepiction(
     excludeParamsFromDepiction(
       walkSchema({
-        schema: hasRaw(inputSchema) ? ZodFile.create().buffer() : inputSchema,
+        schema: hasRaw(schema) ? ZodFile.create().buffer() : schema,
         isResponse: false,
         rules: depicters,
         onEach,
@@ -1043,11 +1038,7 @@ export const depictRequest = ({
       pathParams,
     ),
   );
-  const bodyExamples = depictExamples(
-    endpoint.getSchema("input"),
-    false,
-    pathParams,
-  );
+  const bodyExamples = depictExamples(schema, false, pathParams);
   const result =
     composition === "components"
       ? makeRef(makeCleanId(path, method, clue), bodyDepiction)
@@ -1055,7 +1046,7 @@ export const depictRequest = ({
 
   return {
     description: `${method.toUpperCase()} ${path} ${clue}`,
-    content: endpoint.getMimeTypes("input").reduce<ContentObject>(
+    content: mimeTypes.reduce<ContentObject>(
       (carry, mimeType) => ({
         ...carry,
         [mimeType]: { schema: result, ...bodyExamples },
