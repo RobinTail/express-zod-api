@@ -3444,11 +3444,11 @@ open@^9.1.0:
     is-wsl "^2.2.0"
 
 openapi3-ts@^4.1.2:
-  version "4.1.2"
-  resolved "https://registry.yarnpkg.com/openapi3-ts/-/openapi3-ts-4.1.2.tgz#f15cd4794e3a7c9b388fd45dfbefc78501f7043e"
-  integrity sha512-B7gOkwsYMZO7BZXwJzXCuVagym2xhqsrilVvV0dnq2Di4+iLUXKVX9gOK23ZqaAHZOwABXN0QTdW8QnkUTX6DA==
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/openapi3-ts/-/openapi3-ts-4.2.0.tgz#302f94d8f4efa2d0d0115a8d6bbb9bdb72fb3662"
+  integrity sha512-TeqkZQ44Blw/8SrNhZFMxQVuYWKGktfpEbYWxpvAubhwyYvsuAVUkOlFDI8i5AyuWsQaFWXuttS6bRUKfNtE9g==
   dependencies:
-    yaml "^2.2.2"
+    yaml "^2.3.4"
 
 optionator@^0.9.3:
   version "0.9.3"
@@ -4708,7 +4708,7 @@ yallist@^4.0.0:
   resolved "https://registry.yarnpkg.com/yallist/-/yallist-4.0.0.tgz#9bb92790d9c0effec63be73519e11a35019a3a72"
   integrity sha512-3wdGidZyq5PB084XLES5TpOSRA3wjXAlIWMhum2kRcv/41Sn2emQ0dycQW4uZXLejwKvg6EsvbdlVL+FYEct7A==
 
-yaml@^2.2.2, yaml@^2.3.4:
+yaml@^2.3.4:
   version "2.3.4"
   resolved "https://registry.yarnpkg.com/yaml/-/yaml-2.3.4.tgz#53fc1d514be80aabf386dc6001eb29bf3b7523b2"
   integrity sha512-8aAvwVUSHpfEqTQ4w/KMlf3HcRdt50E5ODIQJBw1fQ5RL34xabzxtUlzTXVqc4rkZsPbvrXKWnABCD7kWSmocA==
