@@ -797,9 +797,12 @@ export const onEach: Depicter<z.ZodTypeAny, "each"> = ({
   if (isActuallyNullable) {
     result.type = makeNullableType(prev);
   }
+  // @todo third party issue: swagger's validator thinks that examples of SchemaObject must be an array
+  /*
   if (!shouldAvoidParsing) {
     result.examples = depictExamples(schema, isResponse);
   }
+  */
   return result;
 };
 
