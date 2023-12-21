@@ -9,6 +9,7 @@ exports[`Documentation helpers > depictAny() > should set format:any 1`] = `
 exports[`Documentation helpers > depictArray() > should set type:array and pass items depiction 1`] = `
 {
   "items": {
+    "examples": undefined,
     "type": "boolean",
   },
   "type": "array",
@@ -30,6 +31,7 @@ exports[`Documentation helpers > depictBoolean() > should set type:boolean 1`] =
 
 exports[`Documentation helpers > depictBranded > should pass the next depicter 1`] = `
 {
+  "examples": undefined,
   "minLength": 2,
   "type": "string",
 }
@@ -37,6 +39,7 @@ exports[`Documentation helpers > depictBranded > should pass the next depicter 1
 
 exports[`Documentation helpers > depictCatch() > should pass next depicter 1`] = `
 {
+  "examples": undefined,
   "type": "boolean",
 }
 `;
@@ -87,6 +90,7 @@ Caused by input schema of an Endpoint assigned to GET method of /v1/user/:id pat
 exports[`Documentation helpers > depictDefault() > should set default property 1`] = `
 {
   "default": true,
+  "examples": undefined,
   "type": "boolean",
 }
 `;
@@ -98,14 +102,17 @@ exports[`Documentation helpers > depictDiscriminatedUnion() > should wrap next d
   },
   "oneOf": [
     {
+      "examples": undefined,
       "properties": {
         "data": {
+          "examples": undefined,
           "format": "any",
         },
         "status": {
           "enum": [
             "success",
           ],
+          "examples": undefined,
           "type": "string",
         },
       },
@@ -115,10 +122,13 @@ exports[`Documentation helpers > depictDiscriminatedUnion() > should wrap next d
       "type": "object",
     },
     {
+      "examples": undefined,
       "properties": {
         "error": {
+          "examples": undefined,
           "properties": {
             "message": {
+              "examples": undefined,
               "type": "string",
             },
           },
@@ -131,6 +141,7 @@ exports[`Documentation helpers > depictDiscriminatedUnion() > should wrap next d
           "enum": [
             "error",
           ],
+          "examples": undefined,
           "type": "string",
         },
       },
@@ -152,8 +163,10 @@ exports[`Documentation helpers > depictEffect() > should depict as 'number (out)
 
 exports[`Documentation helpers > depictEffect() > should depict as 'object (refinement)' 1`] = `
 {
+  "examples": undefined,
   "properties": {
     "s": {
+      "examples": undefined,
       "type": "string",
     },
   },
@@ -166,24 +179,28 @@ exports[`Documentation helpers > depictEffect() > should depict as 'object (refi
 
 exports[`Documentation helpers > depictEffect() > should depict as 'string (in)' 1`] = `
 {
+  "examples": undefined,
   "type": "string",
 }
 `;
 
 exports[`Documentation helpers > depictEffect() > should depict as 'string (preprocess)' 1`] = `
 {
+  "examples": undefined,
   "format": "string (preprocessed)",
 }
 `;
 
 exports[`Documentation helpers > depictEffect() > should handle edge cases 1`] = `
 {
+  "examples": undefined,
   "format": "any",
 }
 `;
 
 exports[`Documentation helpers > depictEffect() > should handle edge cases 2`] = `
 {
+  "examples": undefined,
   "format": "any",
 }
 `;
@@ -210,18 +227,16 @@ exports[`Documentation helpers > depictEnum() > should set type and enum propert
 
 exports[`Documentation helpers > depictExamples() > should 'pass' examples in case of 'request' 1`] = `
 {
-  "examples": {
-    "example1": {
-      "value": {
-        "one": "test",
-        "two": 123,
-      },
+  "example1": {
+    "value": {
+      "one": "test",
+      "two": 123,
     },
-    "example2": {
-      "value": {
-        "one": "test2",
-        "two": 456,
-      },
+  },
+  "example2": {
+    "value": {
+      "one": "test2",
+      "two": 456,
     },
   },
 }
@@ -229,18 +244,16 @@ exports[`Documentation helpers > depictExamples() > should 'pass' examples in ca
 
 exports[`Documentation helpers > depictExamples() > should 'transform' examples in case of 'response' 1`] = `
 {
-  "examples": {
-    "example1": {
-      "value": {
-        "one": 4,
-        "two": "123",
-      },
+  "example1": {
+    "value": {
+      "one": 4,
+      "two": "123",
     },
-    "example2": {
-      "value": {
-        "one": 5,
-        "two": "456",
-      },
+  },
+  "example2": {
+    "value": {
+      "one": 5,
+      "two": "456",
     },
   },
 }
@@ -271,8 +284,10 @@ exports[`Documentation helpers > depictIntersection() > should wrap next depicte
 {
   "allOf": [
     {
+      "examples": undefined,
       "properties": {
         "one": {
+          "examples": undefined,
           "format": "double",
           "maximum": 1.7976931348623157e+308,
           "minimum": 5e-324,
@@ -285,8 +300,10 @@ exports[`Documentation helpers > depictIntersection() > should wrap next depicte
       "type": "object",
     },
     {
+      "examples": undefined,
       "properties": {
         "two": {
+          "examples": undefined,
           "format": "double",
           "maximum": 1.7976931348623157e+308,
           "minimum": 5e-324,
@@ -310,6 +327,7 @@ exports[`Documentation helpers > depictLazy > should handle circular references 
 
 exports[`Documentation helpers > depictLazy > should handle circular references 0 2`] = `
 {
+  "examples": undefined,
   "items": {
     "$ref": "#/components/schemas/6cbbd837811754902ea1e68d3e5c75e36250b880",
   },
@@ -337,6 +355,7 @@ exports[`Documentation helpers > depictLazy > should handle circular references 
 
 exports[`Documentation helpers > depictLazy > should handle circular references 2 2`] = `
 {
+  "examples": undefined,
   "properties": {
     "prop": {
       "$ref": "#/components/schemas/118cb3b11b8a1f3b6b1e60a89f96a8be9da32a0f",
@@ -366,6 +385,7 @@ exports[`Documentation helpers > depictNull() > should give type:null 1`] = `
 
 exports[`Documentation helpers > depictNullable() > should add null to the type 0 1`] = `
 {
+  "examples": undefined,
   "type": [
     "string",
     "null",
@@ -375,6 +395,7 @@ exports[`Documentation helpers > depictNullable() > should add null to the type 
 
 exports[`Documentation helpers > depictNullable() > should add null to the type 1 1`] = `
 {
+  "examples": undefined,
   "type": [
     "string",
     "null",
@@ -384,6 +405,7 @@ exports[`Documentation helpers > depictNullable() > should add null to the type 
 
 exports[`Documentation helpers > depictNullable() > should only add null type once 0 1`] = `
 {
+  "examples": undefined,
   "type": [
     "string",
     "null",
@@ -393,6 +415,7 @@ exports[`Documentation helpers > depictNullable() > should only add null type on
 
 exports[`Documentation helpers > depictNullable() > should only add null type once 1 1`] = `
 {
+  "examples": undefined,
   "type": [
     "null",
   ],
@@ -401,6 +424,7 @@ exports[`Documentation helpers > depictNullable() > should only add null type on
 
 exports[`Documentation helpers > depictNullable() > should only add null type once 2 1`] = `
 {
+  "examples": undefined,
   "type": [
     "string",
     "null",
@@ -430,12 +454,15 @@ exports[`Documentation helpers > depictObject() > Bug #758 1`] = `
 {
   "properties": {
     "a": {
+      "examples": undefined,
       "type": "string",
     },
     "b": {
+      "examples": undefined,
       "type": "string",
     },
     "c": {
+      "examples": undefined,
       "type": [
         "string",
         "null",
@@ -454,12 +481,14 @@ exports[`Documentation helpers > depictObject() > should type:object, properties
 {
   "properties": {
     "a": {
+      "examples": undefined,
       "format": "double",
       "maximum": 1.7976931348623157e+308,
       "minimum": 5e-324,
       "type": "number",
     },
     "b": {
+      "examples": undefined,
       "type": "string",
     },
   },
@@ -475,12 +504,14 @@ exports[`Documentation helpers > depictObject() > should type:object, properties
 {
   "properties": {
     "a": {
+      "examples": undefined,
       "format": "double",
       "maximum": 1.7976931348623157e+308,
       "minimum": 5e-324,
       "type": "number",
     },
     "b": {
+      "examples": undefined,
       "type": "string",
     },
   },
@@ -496,12 +527,14 @@ exports[`Documentation helpers > depictObject() > should type:object, properties
 {
   "properties": {
     "a": {
+      "examples": undefined,
       "format": "double",
       "maximum": 1.7976931348623157e+308,
       "minimum": 5e-324,
       "type": "number",
     },
     "b": {
+      "examples": undefined,
       "type": "string",
     },
   },
@@ -517,12 +550,14 @@ exports[`Documentation helpers > depictObject() > should type:object, properties
 {
   "properties": {
     "a": {
+      "examples": undefined,
       "format": "double",
       "maximum": 1.7976931348623157e+308,
       "minimum": 5e-324,
       "type": "number",
     },
     "b": {
+      "examples": undefined,
       "type": "string",
     },
   },
@@ -537,12 +572,14 @@ exports[`Documentation helpers > depictObject() > should type:object, properties
 {
   "properties": {
     "a": {
+      "examples": undefined,
       "format": "double",
       "maximum": 1.7976931348623157e+308,
       "minimum": 5e-324,
       "type": "number",
     },
     "b": {
+      "examples": undefined,
       "type": [
         "string",
         "null",
@@ -556,9 +593,11 @@ exports[`Documentation helpers > depictObject() > should type:object, properties
 exports[`Documentation helpers > depictObjectProperties() > should wrap next depicters in a shape of object 1`] = `
 {
   "one": {
+    "examples": undefined,
     "type": "string",
   },
   "two": {
+    "examples": undefined,
     "type": "boolean",
   },
 }
@@ -566,56 +605,57 @@ exports[`Documentation helpers > depictObjectProperties() > should wrap next dep
 
 exports[`Documentation helpers > depictOptional() > should pass the next depicter 0 1`] = `
 {
+  "examples": undefined,
   "type": "string",
 }
 `;
 
 exports[`Documentation helpers > depictOptional() > should pass the next depicter 1 1`] = `
 {
+  "examples": undefined,
   "type": "string",
 }
 `;
 
 exports[`Documentation helpers > depictParamExamples() > should 'pass' examples in case of 'request' 1`] = `
 {
-  "examples": {
-    "example1": {
-      "value": 123,
-    },
-    "example2": {
-      "value": 456,
-    },
+  "example1": {
+    "value": 123,
+  },
+  "example2": {
+    "value": 456,
   },
 }
 `;
 
 exports[`Documentation helpers > depictParamExamples() > should 'transform' examples in case of 'response' 1`] = `
 {
-  "examples": {
-    "example1": {
-      "value": "123",
-    },
-    "example2": {
-      "value": "456",
-    },
+  "example1": {
+    "value": "123",
+  },
+  "example2": {
+    "value": "456",
   },
 }
 `;
 
 exports[`Documentation helpers > depictPipeline > should depict as 'boolean (out)' 1`] = `
 {
+  "examples": undefined,
   "type": "boolean",
 }
 `;
 
 exports[`Documentation helpers > depictPipeline > should depict as 'string (in)' 1`] = `
 {
+  "examples": undefined,
   "type": "string",
 }
 `;
 
 exports[`Documentation helpers > depictReadonly > should pass the next depicter 1`] = `
 {
+  "examples": undefined,
   "type": "string",
 }
 `;
@@ -623,6 +663,7 @@ exports[`Documentation helpers > depictReadonly > should pass the next depicter 
 exports[`Documentation helpers > depictRecord() > should set properties+required or additionalProperties props 0 1`] = `
 {
   "additionalProperties": {
+    "examples": undefined,
     "type": "boolean",
   },
   "type": "object",
@@ -632,6 +673,7 @@ exports[`Documentation helpers > depictRecord() > should set properties+required
 exports[`Documentation helpers > depictRecord() > should set properties+required or additionalProperties props 1 1`] = `
 {
   "additionalProperties": {
+    "examples": undefined,
     "type": "boolean",
   },
   "type": "object",
@@ -642,9 +684,11 @@ exports[`Documentation helpers > depictRecord() > should set properties+required
 {
   "properties": {
     "one": {
+      "examples": undefined,
       "type": "boolean",
     },
     "two": {
+      "examples": undefined,
       "type": "boolean",
     },
   },
@@ -660,6 +704,7 @@ exports[`Documentation helpers > depictRecord() > should set properties+required
 {
   "properties": {
     "testing": {
+      "examples": undefined,
       "type": "boolean",
     },
   },
@@ -674,9 +719,11 @@ exports[`Documentation helpers > depictRecord() > should set properties+required
 {
   "properties": {
     "one": {
+      "examples": undefined,
       "type": "boolean",
     },
     "two": {
+      "examples": undefined,
       "type": "boolean",
     },
   },
@@ -691,6 +738,7 @@ exports[`Documentation helpers > depictRecord() > should set properties+required
 exports[`Documentation helpers > depictRecord() > should set properties+required or additionalProperties props 5 1`] = `
 {
   "additionalProperties": {
+    "examples": undefined,
     "format": "any",
   },
   "type": "object",
@@ -701,28 +749,34 @@ exports[`Documentation helpers > depictRequestParams() > Feature 1180: should de
 [
   {
     "description": "GET /v1/user/:id parameter",
+    "examples": undefined,
     "in": "header",
     "name": "x-request-id",
     "required": true,
     "schema": {
+      "examples": undefined,
       "type": "string",
     },
   },
   {
     "description": "GET /v1/user/:id parameter",
+    "examples": undefined,
     "in": "path",
     "name": "id",
     "required": true,
     "schema": {
+      "examples": undefined,
       "type": "string",
     },
   },
   {
     "description": "GET /v1/user/:id parameter",
+    "examples": undefined,
     "in": "query",
     "name": "test",
     "required": true,
     "schema": {
+      "examples": undefined,
       "type": "boolean",
     },
   },
@@ -735,10 +789,12 @@ exports[`Documentation helpers > depictRequestParams() > should depict only path
 [
   {
     "description": "GET /v1/user/:id parameter",
+    "examples": undefined,
     "in": "path",
     "name": "id",
     "required": true,
     "schema": {
+      "examples": undefined,
       "type": "string",
     },
   },
@@ -749,19 +805,23 @@ exports[`Documentation helpers > depictRequestParams() > should depict query and
 [
   {
     "description": "GET /v1/user/:id parameter",
+    "examples": undefined,
     "in": "path",
     "name": "id",
     "required": true,
     "schema": {
+      "examples": undefined,
       "type": "string",
     },
   },
   {
     "description": "GET /v1/user/:id parameter",
+    "examples": undefined,
     "in": "query",
     "name": "test",
     "required": true,
     "schema": {
+      "examples": undefined,
       "type": "boolean",
     },
   },
@@ -1046,15 +1106,18 @@ exports[`Documentation helpers > depictTuple() > should utilize prefixItems 1`] 
 {
   "prefixItems": [
     {
+      "examples": undefined,
       "type": "boolean",
     },
     {
+      "examples": undefined,
       "type": "string",
     },
     {
       "enum": [
         "test",
       ],
+      "examples": undefined,
       "type": "string",
     },
   ],
@@ -1066,9 +1129,11 @@ exports[`Documentation helpers > depictUnion() > should wrap next depicters into
 {
   "oneOf": [
     {
+      "examples": undefined,
       "type": "string",
     },
     {
+      "examples": undefined,
       "format": "double",
       "maximum": 1.7976931348623157e+308,
       "minimum": 5e-324,
@@ -1105,8 +1170,10 @@ exports[`Documentation helpers > excludeParamsFromDepiction() > should handle th
 
 exports[`Documentation helpers > excludeParamsFromDepiction() > should omit specified path params 0 1`] = `
 {
+  "examples": undefined,
   "properties": {
     "b": {
+      "examples": undefined,
       "type": "string",
     },
   },
@@ -1119,15 +1186,19 @@ exports[`Documentation helpers > excludeParamsFromDepiction() > should omit spec
 
 exports[`Documentation helpers > excludeParamsFromDepiction() > should omit specified path params 1 1`] = `
 {
+  "examples": undefined,
   "oneOf": [
     {
+      "examples": undefined,
       "properties": {},
       "required": [],
       "type": "object",
     },
     {
+      "examples": undefined,
       "properties": {
         "b": {
+          "examples": undefined,
           "type": "string",
         },
       },
@@ -1144,13 +1215,16 @@ exports[`Documentation helpers > excludeParamsFromDepiction() > should omit spec
 {
   "allOf": [
     {
+      "examples": undefined,
       "properties": {},
       "required": [],
       "type": "object",
     },
     {
+      "examples": undefined,
       "properties": {
         "b": {
+          "examples": undefined,
           "type": "string",
         },
       },
@@ -1160,6 +1234,7 @@ exports[`Documentation helpers > excludeParamsFromDepiction() > should omit spec
       "type": "object",
     },
   ],
+  "examples": undefined,
 }
 `;
 

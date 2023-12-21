@@ -589,58 +589,54 @@ export const depictExamples = (
   schema: z.ZodTypeAny,
   isResponse: boolean,
   omitProps: string[] = [],
-): ExamplesObject => {
+): ExamplesObject | undefined => {
   const examples = getExamples({
     schema,
     variant: isResponse ? "parsed" : "original",
     validate: true,
   });
   if (examples.length === 0) {
-    return {};
+    return undefined;
   }
-  return {
-    examples: examples.reduce<ExamplesObject>(
-      (carry, example, index) => ({
-        ...carry,
-        [`example${index + 1}`]: {
-          value:
-            typeof example === "object" && !Array.isArray(example)
-              ? omit(omitProps, example)
-              : example,
-        } satisfies ExampleObject,
-      }),
-      {},
-    ),
-  };
+  return examples.reduce<ExamplesObject>(
+    (carry, example, index) => ({
+      ...carry,
+      [`example${index + 1}`]: {
+        value:
+          typeof example === "object" && !Array.isArray(example)
+            ? omit(omitProps, example)
+            : example,
+      } satisfies ExampleObject,
+    }),
+    {},
+  );
 };
 
 export const depictParamExamples = (
   schema: z.ZodTypeAny,
   isResponse: boolean,
   param: string,
-): ExamplesObject => {
+): ExamplesObject | undefined => {
   const examples = getExamples({
     schema,
     variant: isResponse ? "parsed" : "original",
     validate: true,
   });
   if (examples.length === 0) {
-    return {};
+    return undefined;
   }
-  return {
-    examples: examples.reduce<ExamplesObject>(
-      (carry, example, index) =>
-        param in example
-          ? {
-              ...carry,
-              [`example${index + 1}`]: {
-                value: example[param],
-              } satisfies ExampleObject,
-            }
-          : carry,
-      {},
-    ),
-  };
+  return examples.reduce<ExamplesObject>(
+    (carry, example, index) =>
+      param in example
+        ? {
+            ...carry,
+            [`example${index + 1}`]: {
+              value: example[param],
+            } satisfies ExampleObject,
+          }
+        : carry,
+    {},
+  );
 };
 
 export const extractObjectSchema = (
@@ -736,7 +732,7 @@ export const depictRequestParams = ({
           (!isReferenceObject(depicted) && depicted.description) ||
           `${method.toUpperCase()} ${path} ${clue}`,
         schema: result,
-        ...depictParamExamples(schema, false, name),
+        examples: depictParamExamples(schema, false, name),
       };
     });
 };
@@ -794,13 +790,6 @@ export const onEach: Depicter<z.ZodTypeAny, "each"> = ({
     hasTypePropertyInDepiction &&
     !isResponseHavingCoercion &&
     schema.isNullable();
-  const examples = shouldAvoidParsing
-    ? []
-    : getExamples({
-        schema,
-        variant: isResponse ? "parsed" : "original",
-        validate: true,
-      });
   const result: SchemaObject = {};
   if (description) {
     result.description = description;
@@ -808,8 +797,8 @@ export const onEach: Depicter<z.ZodTypeAny, "each"> = ({
   if (isActuallyNullable) {
     result.type = makeNullableType(prev);
   }
-  if (examples.length) {
-    result.examples = Array.from(examples);
+  if (!shouldAvoidParsing) {
+    result.examples = depictExamples(schema, isResponse);
   }
   return result;
 };
@@ -909,7 +898,7 @@ export const depictResponse = ({
     content: mimeTypes.reduce<ContentObject>(
       (carry, mimeType) => ({
         ...carry,
-        [mimeType]: { schema: result, ...examples },
+        [mimeType]: { schema: result, examples },
       }),
       {},
     ),
@@ -1058,7 +1047,7 @@ export const depictRequest = ({
     content: endpoint.getMimeTypes("input").reduce<ContentObject>(
       (carry, mimeType) => ({
         ...carry,
-        [mimeType]: { schema: result, ...bodyExamples },
+        [mimeType]: { schema: result, examples: bodyExamples },
       }),
       {},
     ),
