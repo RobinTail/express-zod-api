@@ -3,6 +3,7 @@ import {
   ContentObject,
   ExampleObject,
   ExamplesObject,
+  OAuthFlowObject,
   OAuthFlowsObject,
   ParameterObject,
   ReferenceObject,
@@ -964,7 +965,7 @@ const depictOAuth2Security: SecurityHelper<"oauth2"> = ({ flows = {} }) => ({
       return acc;
     }
     const { scopes = {}, ...rest } = flow;
-    return { ...acc, [key]: { ...rest, scopes } };
+    return { ...acc, [key]: { ...rest, scopes } satisfies OAuthFlowObject };
   }, {}),
 });
 
