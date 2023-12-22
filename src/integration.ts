@@ -204,15 +204,17 @@ export class Integration {
     this.program.unshift(...Object.values<ts.Node>(this.aliases));
 
     // export type Path = "/v1/user/retrieve" | ___;
-    const pathType = makePublicLiteralType(this.ids.pathType, this.paths);
+    this.program.push(makePublicLiteralType(this.ids.pathType, this.paths));
 
     // export type Method = "get" | "post" | "put" | "delete" | "patch";
-    const methodType = makePublicLiteralType(this.ids.methodType, methods);
+    this.program.push(makePublicLiteralType(this.ids.methodType, methods));
 
     // export type MethodPath = `${Method} ${Path}`;
-    const methodPathType = makePublicType(
-      this.ids.methodPathType,
-      makeTemplateType([this.ids.methodType, this.ids.pathType]),
+    this.program.push(
+      makePublicType(
+        this.ids.methodPathType,
+        makeTemplateType([this.ids.methodType, this.ids.pathType]),
+      ),
     );
 
     // extends Record<MethodPath, any>
@@ -222,49 +224,28 @@ export class Integration {
       ]),
     ];
 
-    // export interface Input ___ { "get /v1/user/retrieve": GetV1UserRetrieveInput; }
-    const inputInterface = makePublicExtendedInterface(
-      this.ids.inputInterface,
-      extenderClause,
-      Object.keys(this.registry).map((methodPath) =>
-        makeQuotedProp(methodPath, this.registry[methodPath].input),
-      ),
-    );
+    const interfaces = {
+      input: this.ids.inputInterface,
+      positive: this.ids.posResponseInterface,
+      negative: this.ids.negResponseInterface,
+      response: this.ids.responseInterface,
+    } satisfies Partial<Record<keyof Registry[string], ts.Identifier>>;
 
-    const posResponseInterface = makePublicExtendedInterface(
-      this.ids.posResponseInterface,
-      extenderClause,
-      Object.keys(this.registry).map((methodPath) =>
-        makeQuotedProp(methodPath, this.registry[methodPath].positive),
-      ),
-    );
-
-    const negResponseInterface = makePublicExtendedInterface(
-      this.ids.negResponseInterface,
-      extenderClause,
-      Object.keys(this.registry).map((methodPath) =>
-        makeQuotedProp(methodPath, this.registry[methodPath].negative),
-      ),
-    );
-
-    // export interface Response ___ { "get /v1/user/retrieve": GetV1UserRetrieveResponse; }
-    const responseInterface = makePublicExtendedInterface(
-      this.ids.responseInterface,
-      extenderClause,
-      Object.keys(this.registry).map((methodPath) =>
-        makeQuotedProp(methodPath, this.registry[methodPath].response),
-      ),
-    );
-
-    this.program.push(
-      pathType,
-      methodType,
-      methodPathType,
-      inputInterface,
-      posResponseInterface,
-      negResponseInterface,
-      responseInterface,
-    );
+    for (const prop in interfaces) {
+      // export interface Input ___ { "get /v1/user/retrieve": GetV1UserRetrieveInput; }
+      this.program.push(
+        makePublicExtendedInterface(
+          interfaces[prop as keyof typeof interfaces],
+          extenderClause,
+          Object.keys(this.registry).map((methodPath) =>
+            makeQuotedProp(
+              methodPath,
+              this.registry[methodPath][prop as keyof typeof interfaces],
+            ),
+          ),
+        ),
+      );
+    }
 
     if (variant === "types") {
       return;
