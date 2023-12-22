@@ -3,6 +3,7 @@ import {
   ContentObject,
   ExampleObject,
   ExamplesObject,
+  MediaTypeObject,
   OAuthFlowsObject,
   ParameterObject,
   ReferenceObject,
@@ -589,7 +590,7 @@ export const depictExamples = (
   schema: z.ZodTypeAny,
   isResponse: boolean,
   omitProps: string[] = [],
-): ExamplesObject => {
+): Pick<MediaTypeObject, "examples"> => {
   const examples = getExamples({
     schema,
     variant: isResponse ? "parsed" : "original",
@@ -618,7 +619,7 @@ export const depictParamExamples = (
   schema: z.ZodTypeAny,
   isResponse: boolean,
   param: string,
-): ExamplesObject => {
+): Pick<MediaTypeObject, "examples"> => {
   const examples = getExamples({
     schema,
     variant: isResponse ? "parsed" : "original",
