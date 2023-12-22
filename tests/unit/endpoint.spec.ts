@@ -288,8 +288,8 @@ describe("Endpoint", () => {
     });
   });
 
-  describe(".getInputSchema()", () => {
-    test("should return input schema", () => {
+  describe(".getSchema()", () => {
+    test("should return the input schema", () => {
       const factory = new EndpointsFactory(defaultResultHandler);
       const input = z.object({
         something: z.number(),
@@ -302,23 +302,7 @@ describe("Endpoint", () => {
       });
       expect(endpoint.getSchema("input")).toEqual(input);
     });
-  });
 
-  describe(".getOperationId()", () => {
-    test("should return undefined if its not defined upon creaton", () => {
-      expect(
-        new Endpoint({
-          methods: ["get"],
-          inputSchema: z.object({}),
-          outputSchema: z.object({}),
-          handler: async () => ({}),
-          resultHandler: defaultResultHandler,
-        }).getOperationId("get"),
-      ).toBeUndefined();
-    });
-  });
-
-  describe(".outputSchema", () => {
     test("should be the output schema", () => {
       const outputSchema = z.object({
         something: z.number(),
@@ -332,10 +316,8 @@ describe("Endpoint", () => {
       });
       expect(endpoint.getSchema("output")).toEqual(outputSchema);
     });
-  });
 
-  describe(".getPositiveResponseSchema()", () => {
-    test("should return schema according to the result handler", () => {
+    test("should return the positive schema according to the result handler", () => {
       const factory = new EndpointsFactory(defaultResultHandler);
       const output = z.object({
         something: z.number(),
@@ -350,9 +332,7 @@ describe("Endpoint", () => {
         serializeSchemaForTest(endpoint.getSchema("positive")),
       ).toMatchSnapshot();
     });
-  });
 
-  describe(".getNegativeResponseSchema()", () => {
     test("should return the negative schema of the result handler", () => {
       const factory = new EndpointsFactory(defaultResultHandler);
       const output = z.object({
@@ -370,30 +350,34 @@ describe("Endpoint", () => {
     });
   });
 
-  describe(".getPositiveMimeTypes()", () => {
-    test("should return an array according to the result handler", () => {
-      const factory = new EndpointsFactory(defaultResultHandler);
-      const endpoint = factory.build({
-        method: "get",
-        input: z.object({}),
-        output: z.object({}),
-        handler: vi.fn(),
-      });
-      expect(endpoint.getMimeTypes("positive")).toEqual(["application/json"]);
+  describe(".getOperationId()", () => {
+    test("should return undefined if its not defined upon creaton", () => {
+      expect(
+        new Endpoint({
+          methods: ["get"],
+          inputSchema: z.object({}),
+          outputSchema: z.object({}),
+          handler: async () => ({}),
+          resultHandler: defaultResultHandler,
+        }).getOperationId("get"),
+      ).toBeUndefined();
     });
   });
 
-  describe(".getNegativeMimeTypes()", () => {
-    test("should return an array according to the result handler", () => {
-      const factory = new EndpointsFactory(defaultResultHandler);
-      const endpoint = factory.build({
-        method: "get",
-        input: z.object({}),
-        output: z.object({}),
-        handler: vi.fn(),
-      });
-      expect(endpoint.getMimeTypes("negative")).toEqual(["application/json"]);
-    });
+  describe(".getMimeTypes()", () => {
+    test.each(["positive", "negative"] as const)(
+      "should return an array according to the result handler (%s)",
+      (variant) => {
+        const factory = new EndpointsFactory(defaultResultHandler);
+        const endpoint = factory.build({
+          method: "get",
+          input: z.object({}),
+          output: z.object({}),
+          handler: vi.fn(),
+        });
+        expect(endpoint.getMimeTypes(variant)).toEqual(["application/json"]);
+      },
+    );
   });
 
   describe("Issue #269: Async refinements", () => {
