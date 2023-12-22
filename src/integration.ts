@@ -124,6 +124,12 @@ export class Integration {
     exampleImplementationConst: f.createIdentifier("exampleImplementation"),
     clientConst: f.createIdentifier("client"),
   } satisfies Record<string, ts.Identifier>;
+  protected interfaces = {
+    input: this.ids.inputInterface,
+    positive: this.ids.posResponseInterface,
+    negative: this.ids.negResponseInterface,
+    response: this.ids.responseInterface,
+  } satisfies Partial<Record<keyof Registry[string], ts.Identifier>>;
 
   protected getAlias(name: string): ts.TypeReferenceNode | undefined {
     return name in this.aliases ? f.createTypeReferenceNode(name) : undefined;
@@ -224,23 +230,16 @@ export class Integration {
       ]),
     ];
 
-    const interfaces = {
-      input: this.ids.inputInterface,
-      positive: this.ids.posResponseInterface,
-      negative: this.ids.negResponseInterface,
-      response: this.ids.responseInterface,
-    } satisfies Partial<Record<keyof Registry[string], ts.Identifier>>;
-
-    for (const prop in interfaces) {
+    for (const prop in this.interfaces) {
       // export interface Input ___ { "get /v1/user/retrieve": GetV1UserRetrieveInput; }
       this.program.push(
         makePublicExtendedInterface(
-          interfaces[prop as keyof typeof interfaces],
+          this.interfaces[prop as keyof typeof this.interfaces],
           extenderClause,
           Object.keys(this.registry).map((methodPath) =>
             makeQuotedProp(
               methodPath,
-              this.registry[methodPath][prop as keyof typeof interfaces],
+              this.registry[methodPath][prop as keyof typeof this.interfaces],
             ),
           ),
         ),
