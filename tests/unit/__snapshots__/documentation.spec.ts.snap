@@ -48,6 +48,11 @@ paths:
                 required:
                   - status
                   - error
+                examples:
+                  - value:
+                      status: error
+                      error:
+                        message: Sample error message
               examples:
                 example1:
                   value:
@@ -120,6 +125,11 @@ paths:
                 required:
                   - status
                   - error
+                examples:
+                  - value:
+                      status: error
+                      error:
+                        message: Sample error message
               examples:
                 example1:
                   value:
@@ -169,6 +179,11 @@ paths:
                 required:
                   - status
                   - error
+                examples:
+                  - value:
+                      status: error
+                      error:
+                        message: Sample error message
               examples:
                 example1:
                   value:
@@ -248,6 +263,11 @@ paths:
                 required:
                   - status
                   - error
+                examples:
+                  - value:
+                      status: error
+                      error:
+                        message: Sample error message
               examples:
                 example1:
                   value:
@@ -298,6 +318,11 @@ paths:
                 required:
                   - status
                   - error
+                examples:
+                  - value:
+                      status: error
+                      error:
+                        message: Sample error message
               examples:
                 example1:
                   value:
@@ -377,6 +402,11 @@ paths:
                 required:
                   - status
                   - error
+                examples:
+                  - value:
+                      status: error
+                      error:
+                        message: Sample error message
               examples:
                 example1:
                   value:
@@ -441,6 +471,11 @@ paths:
                 required:
                   - status
                   - error
+                examples:
+                  - value:
+                      status: error
+                      error:
+                        message: Sample error message
               examples:
                 example1:
                   value:
@@ -503,6 +538,11 @@ paths:
                 required:
                   - status
                   - error
+                examples:
+                  - value:
+                      status: error
+                      error:
+                        message: Sample error message
               examples:
                 example1:
                   value:
@@ -611,6 +651,11 @@ paths:
                 required:
                   - status
                   - error
+                examples:
+                  - value:
+                      status: error
+                      error:
+                        message: Sample error message
               examples:
                 example1:
                   value:
@@ -693,6 +738,11 @@ paths:
                 required:
                   - status
                   - error
+                examples:
+                  - value:
+                      status: error
+                      error:
+                        message: Sample error message
               examples:
                 example1:
                   value:
@@ -818,6 +868,11 @@ paths:
                 required:
                   - status
                   - error
+                examples:
+                  - value:
+                      status: error
+                      error:
+                        message: Sample error message
               examples:
                 example1:
                   value:
@@ -937,6 +992,11 @@ paths:
                 required:
                   - status
                   - error
+                examples:
+                  - value:
+                      status: error
+                      error:
+                        message: Sample error message
               examples:
                 example1:
                   value:
@@ -1036,6 +1096,11 @@ paths:
                 required:
                   - status
                   - error
+                examples:
+                  - value:
+                      status: error
+                      error:
+                        message: Sample error message
               examples:
                 example1:
                   value:
@@ -1149,6 +1214,11 @@ paths:
                 required:
                   - status
                   - error
+                examples:
+                  - value:
+                      status: error
+                      error:
+                        message: Sample error message
               examples:
                 example1:
                   value:
@@ -1277,6 +1347,11 @@ paths:
                 required:
                   - status
                   - error
+                examples:
+                  - value:
+                      status: error
+                      error:
+                        message: Sample error message
               examples:
                 example1:
                   value:
@@ -1325,9 +1400,19 @@ paths:
                     required:
                       - name
                       - createdAt
+                    examples:
+                      - value:
+                          name: John Doe
+                          createdAt: 2021-12-31T00:00:00.000Z
                 required:
                   - status
                   - data
+                examples:
+                  - value:
+                      status: success
+                      data:
+                        name: John Doe
+                        createdAt: 2021-12-31T00:00:00.000Z
               examples:
                 example1:
                   value:
@@ -1356,6 +1441,11 @@ paths:
                 required:
                   - status
                   - error
+                examples:
+                  - value:
+                      status: error
+                      error:
+                        message: Sample error message
               examples:
                 example1:
                   value:
@@ -1389,6 +1479,9 @@ paths:
                       minLength: 1
                   required:
                     - key
+                  examples:
+                    - value:
+                        key: 1234-5678-90
                 - type: object
                   properties:
                     name:
@@ -1404,6 +1497,17 @@ paths:
                   required:
                     - name
                     - birthday
+                  examples:
+                    - value:
+                        id: "12"
+                        name: John Doe
+                        birthday: 1963-04-21
+              examples:
+                - value:
+                    key: 1234-5678-90
+                    id: "12"
+                    name: John Doe
+                    birthday: 1963-04-21
             examples:
               example1:
                 value:
@@ -1430,6 +1534,11 @@ paths:
                       type: string
                   required:
                     - name
+                examples:
+                  - value:
+                      - name: Hunter Schafer
+                      - name: Laverne Cox
+                      - name: Patti Harrison
               examples:
                 example1:
                   value:
@@ -1442,6 +1551,8 @@ paths:
             application/json:
               schema:
                 type: string
+                examples:
+                  - value: Sample error message
               examples:
                 example1:
                   value: Sample error message
@@ -1567,6 +1678,11 @@ paths:
                 required:
                   - status
                   - error
+                examples:
+                  - value:
+                      status: error
+                      error:
+                        message: Sample error message
               examples:
                 example1:
                   value:
@@ -1638,6 +1754,11 @@ paths:
                 required:
                   - status
                   - error
+                examples:
+                  - value:
+                      status: error
+                      error:
+                        message: Sample error message
               examples:
                 example1:
                   value:
@@ -2004,6 +2125,11 @@ components:
       required:
         - status
         - error
+      examples:
+        - value:
+            status: error
+            error:
+              message: Sample error message
     PostV1UserIdParameterId:
       type: string
     PostV1UserIdSuccessfulResponse:
@@ -2027,9 +2153,19 @@ components:
           required:
             - name
             - createdAt
+          examples:
+            - value:
+                name: John Doe
+                createdAt: 2021-12-31T00:00:00.000Z
       required:
         - status
         - data
+      examples:
+        - value:
+            status: success
+            data:
+              name: John Doe
+              createdAt: 2021-12-31T00:00:00.000Z
     PostV1UserIdErrorResponse:
       type: object
       properties:
@@ -2047,6 +2183,11 @@ components:
       required:
         - status
         - error
+      examples:
+        - value:
+            status: error
+            error:
+              message: Sample error message
     PostV1UserIdRequestBody:
       allOf:
         - type: object
@@ -2056,6 +2197,9 @@ components:
               minLength: 1
           required:
             - key
+          examples:
+            - value:
+                key: 1234-5678-90
         - type: object
           properties:
             name:
@@ -2071,6 +2215,17 @@ components:
           required:
             - name
             - birthday
+          examples:
+            - value:
+                id: "12"
+                name: John Doe
+                birthday: 1963-04-21
+      examples:
+        - value:
+            key: 1234-5678-90
+            id: "12"
+            name: John Doe
+            birthday: 1963-04-21
     GetV1UserListSuccessfulResponse:
       type: array
       items:
@@ -2080,8 +2235,15 @@ components:
             type: string
         required:
           - name
+      examples:
+        - value:
+            - name: Hunter Schafer
+            - name: Laverne Cox
+            - name: Patti Harrison
     GetV1UserListErrorResponse:
       type: string
+      examples:
+        - value: Sample error message
     GetV1AvatarSendParameterUserId:
       type: string
       pattern: /\\d+/
@@ -2148,6 +2310,11 @@ components:
       required:
         - status
         - error
+      examples:
+        - value:
+            status: error
+            error:
+              message: Sample error message
     PostV1AvatarUploadRequestBody:
       type: object
       properties:
@@ -2193,6 +2360,11 @@ components:
       required:
         - status
         - error
+      examples:
+        - value:
+            status: error
+            error:
+              message: Sample error message
     PostV1AvatarRawRequestBody:
       type: string
       format: binary
@@ -2282,6 +2454,11 @@ paths:
                 required:
                   - status
                   - error
+                examples:
+                  - value:
+                      status: error
+                      error:
+                        message: Sample error message
               examples:
                 example1:
                   value:
@@ -2387,6 +2564,11 @@ paths:
                 required:
                   - status
                   - error
+                examples:
+                  - value:
+                      status: error
+                      error:
+                        message: Sample error message
               examples:
                 example1:
                   value:
@@ -2543,6 +2725,11 @@ paths:
                 required:
                   - status
                   - error
+                examples:
+                  - value:
+                      status: error
+                      error:
+                        message: Sample error message
               examples:
                 example1:
                   value:
@@ -2679,6 +2866,11 @@ paths:
                 required:
                   - status
                   - error
+                examples:
+                  - value:
+                      status: error
+                      error:
+                        message: Sample error message
               examples:
                 example1:
                   value:
@@ -2823,6 +3015,11 @@ paths:
                 required:
                   - status
                   - error
+                examples:
+                  - value:
+                      status: error
+                      error:
+                        message: Sample error message
               examples:
                 example1:
                   value:
@@ -2956,6 +3153,11 @@ paths:
                 required:
                   - status
                   - error
+                examples:
+                  - value:
+                      status: error
+                      error:
+                        message: Sample error message
               examples:
                 example1:
                   value:
@@ -3037,6 +3239,11 @@ paths:
                 required:
                   - status
                   - error
+                examples:
+                  - value:
+                      status: error
+                      error:
+                        message: Sample error message
               examples:
                 example1:
                   value:
@@ -3129,6 +3336,11 @@ paths:
                 required:
                   - status
                   - error
+                examples:
+                  - value:
+                      status: error
+                      error:
+                        message: Sample error message
               examples:
                 example1:
                   value:
@@ -3232,6 +3444,11 @@ paths:
                 required:
                   - status
                   - error
+                examples:
+                  - value:
+                      status: error
+                      error:
+                        message: Sample error message
               examples:
                 example1:
                   value:
@@ -3313,6 +3530,11 @@ paths:
                 required:
                   - status
                   - error
+                examples:
+                  - value:
+                      status: error
+                      error:
+                        message: Sample error message
               examples:
                 example1:
                   value:
@@ -3398,6 +3620,11 @@ paths:
                 required:
                   - status
                   - error
+                examples:
+                  - value:
+                      status: error
+                      error:
+                        message: Sample error message
               examples:
                 example1:
                   value:
@@ -3488,6 +3715,11 @@ paths:
                 required:
                   - status
                   - error
+                examples:
+                  - value:
+                      status: error
+                      error:
+                        message: Sample error message
               examples:
                 example1:
                   value:
@@ -3552,6 +3784,11 @@ paths:
                 required:
                   - status
                   - error
+                examples:
+                  - value:
+                      status: error
+                      error:
+                        message: Sample error message
               examples:
                 example1:
                   value:
@@ -3653,6 +3890,11 @@ paths:
                 required:
                   - status
                   - error
+                examples:
+                  - value:
+                      status: error
+                      error:
+                        message: Sample error message
               examples:
                 example1:
                   value:
@@ -3730,9 +3972,27 @@ paths:
                     required:
                       - a
                       - b
+                    examples:
+                      - value:
+                          a: first
+                          b: prefix_first
+                      - value:
+                          a: second
+                          b: prefix_second
                 required:
                   - status
                   - data
+                examples:
+                  - value:
+                      status: success
+                      data:
+                        a: first
+                        b: prefix_first
+                  - value:
+                      status: success
+                      data:
+                        a: second
+                        b: prefix_second
               examples:
                 example1:
                   value:
@@ -3767,6 +4027,11 @@ paths:
                 required:
                   - status
                   - error
+                examples:
+                  - value:
+                      status: error
+                      error:
+                        message: Sample error message
               examples:
                 example1:
                   value:
@@ -3784,6 +4049,9 @@ paths:
                   type: string
               required:
                 - a
+              examples:
+                - value:
+                    a: first
             examples:
               example1:
                 value:
@@ -3876,6 +4144,11 @@ components:
       required:
         - status
         - error
+      examples:
+        - value:
+            status: error
+            error:
+              message: Sample error message
   responses: {}
   parameters: {}
   examples: {}
@@ -3921,9 +4194,17 @@ paths:
                         maximum: 1.7976931348623157e+308
                     required:
                       - num
+                    examples:
+                      - value:
+                          num: 123
                 required:
                   - status
                   - data
+                examples:
+                  - value:
+                      status: success
+                      data:
+                        num: 123
               examples:
                 example1:
                   value:
@@ -3951,6 +4232,11 @@ paths:
                 required:
                   - status
                   - error
+                examples:
+                  - value:
+                      status: error
+                      error:
+                        message: Sample error message
               examples:
                 example1:
                   value:
@@ -3969,12 +4255,22 @@ paths:
                       type: string
                   required:
                     - key
+                  examples:
+                    - value:
+                        key: 1234-56789-01
                 - type: object
                   properties:
                     str:
                       type: string
                   required:
                     - str
+                  examples:
+                    - value:
+                        str: test
+              examples:
+                - value:
+                    key: 1234-56789-01
+                    str: test
             examples:
               example1:
                 value:
@@ -4024,9 +4320,17 @@ paths:
                         type: string
                     required:
                       - numericStr
+                    examples:
+                      - value:
+                          numericStr: "123"
                 required:
                   - status
                   - data
+                examples:
+                  - value:
+                      status: success
+                      data:
+                        numericStr: "123"
               examples:
                 example1:
                   value:
@@ -4054,6 +4358,11 @@ paths:
                 required:
                   - status
                   - error
+                examples:
+                  - value:
+                      status: error
+                      error:
+                        message: Sample error message
               examples:
                 example1:
                   value:
@@ -4114,9 +4423,17 @@ paths:
                         type: string
                     required:
                       - numericStr
+                    examples:
+                      - value:
+                          numericStr: "123"
                 required:
                   - status
                   - data
+                examples:
+                  - value:
+                      status: success
+                      data:
+                        numericStr: "123"
               examples:
                 example1:
                   value:
@@ -4144,6 +4461,11 @@ paths:
                 required:
                   - status
                   - error
+                examples:
+                  - value:
+                      status: error
+                      error:
+                        message: Sample error message
               examples:
                 example1:
                   value:
@@ -4161,6 +4483,9 @@ paths:
                   type: string
               required:
                 - strNum
+              examples:
+                - value:
+                    strNum: "123"
             examples:
               example1:
                 value:
@@ -4207,6 +4532,8 @@ paths:
                     properties:
                       numericStr:
                         type: string
+                        examples:
+                          - value: "123"
                     required:
                       - numericStr
                 required:
@@ -4233,6 +4560,11 @@ paths:
                 required:
                   - status
                   - error
+                examples:
+                  - value:
+                      status: error
+                      error:
+                        message: Sample error message
               examples:
                 example1:
                   value:
@@ -4246,6 +4578,8 @@ paths:
           description: GET /v1/getSomething parameter
           schema:
             type: string
+            examples:
+              - value: "123"
 components:
   schemas: {}
   responses: {}
@@ -4318,6 +4652,11 @@ paths:
                 required:
                   - status
                   - error
+                examples:
+                  - value:
+                      status: error
+                      error:
+                        message: Sample error message
               examples:
                 example1:
                   value:
@@ -4396,6 +4735,11 @@ paths:
                 required:
                   - status
                   - error
+                examples:
+                  - value:
+                      status: error
+                      error:
+                        message: Sample error message
               examples:
                 example1:
                   value:
@@ -4485,6 +4829,11 @@ paths:
                 required:
                   - status
                   - error
+                examples:
+                  - value:
+                      status: error
+                      error:
+                        message: Sample error message
               examples:
                 example1:
                   value:
