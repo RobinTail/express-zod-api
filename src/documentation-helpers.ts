@@ -833,8 +833,8 @@ export const excludeParamsFromDepiction = (
   const properties = depicted.properties
     ? omit(pathParams, depicted.properties)
     : undefined;
-  const example = depicted.example
-    ? omit(pathParams, depicted.example)
+  const examples = depicted.examples
+    ? depicted.examples.map((entry) => omit(pathParams, entry))
     : undefined;
   const required = depicted.required
     ? depicted.required.filter((name) => !pathParams.includes(name))
@@ -851,14 +851,14 @@ export const excludeParamsFromDepiction = (
     : undefined;
 
   return omit(
-    Object.entries({ properties, required, example, allOf, oneOf })
+    Object.entries({ properties, required, examples, allOf, oneOf })
       .filter(([{}, value]) => value === undefined)
       .map(([key]) => key),
     {
       ...depicted,
       properties,
       required,
-      example,
+      examples,
       allOf,
       oneOf,
     },

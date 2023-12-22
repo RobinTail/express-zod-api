@@ -1410,8 +1410,7 @@ paths:
                     - name
                     - birthday
                   examples:
-                    - id: "12"
-                      name: John Doe
+                    - name: John Doe
                       birthday: 1963-04-21
             examples:
               example1:
@@ -2086,8 +2085,7 @@ components:
             - name
             - birthday
           examples:
-            - id: "12"
-              name: John Doe
+            - name: John Doe
               birthday: 1963-04-21
     GetV1UserListSuccessfulResponse:
       type: array
