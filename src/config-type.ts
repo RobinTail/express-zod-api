@@ -1,5 +1,5 @@
 import type compression from "compression";
-import { Express, Request, RequestHandler } from "express";
+import { IRouter, Request, RequestHandler } from "express";
 import type fileUpload from "express-fileupload";
 import { ServerOptions } from "node:https";
 import { AbstractEndpoint } from "./endpoint";
@@ -127,7 +127,7 @@ export interface ServerConfig<TAG extends string = string>
 export interface AppConfig<TAG extends string = string>
   extends CommonConfig<TAG> {
   /** @desc Your custom express app instead. */
-  app: Express;
+  app: IRouter;
 }
 
 export function createConfig<TAG extends string>(
