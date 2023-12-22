@@ -1090,7 +1090,7 @@ exports[`Documentation helpers > depictUpload() > should throw when using in res
 Caused by response schema of an Endpoint assigned to GET method of /v1/user/:id path.]
 `;
 
-exports[`Documentation helpers > excludeExampleFromDepiction() > should remove example property of supplied object 1`] = `
+exports[`Documentation helpers > excludeExamplesFromDepiction() > should remove example property of supplied object 1`] = `
 {
   "description": "test",
   "type": "string",

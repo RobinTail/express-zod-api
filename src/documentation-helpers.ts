@@ -865,10 +865,10 @@ export const excludeParamsFromDepiction = (
   );
 };
 
-export const excludeExampleFromDepiction = (
+export const excludeExamplesFromDepiction = (
   depicted: SchemaObject | ReferenceObject,
 ): SchemaObject | ReferenceObject =>
-  isReferenceObject(depicted) ? depicted : omit(["example"], depicted);
+  isReferenceObject(depicted) ? depicted : omit(["examples"], depicted);
 
 export const depictResponse = ({
   method,
@@ -885,7 +885,7 @@ export const depictResponse = ({
 }): ResponseObject => {
   const schema = endpoint.getSchema(isPositive ? "positive" : "negative");
   const mimeTypes = endpoint.getMimeTypes(isPositive ? "positive" : "negative");
-  const depictedSchema = excludeExampleFromDepiction(
+  const depictedSchema = excludeExamplesFromDepiction(
     walkSchema({
       schema,
       isResponse: true,
@@ -1027,7 +1027,7 @@ export const depictRequest = ({
 }: ReqResDepictHelperCommonProps): RequestBodyObject => {
   const pathParams = getRoutePathParams(path);
   const inputSchema = endpoint.getSchema("input");
-  const bodyDepiction = excludeExampleFromDepiction(
+  const bodyDepiction = excludeExamplesFromDepiction(
     excludeParamsFromDepiction(
       walkSchema({
         schema: hasRaw(inputSchema) ? ZodFile.create().buffer() : inputSchema,

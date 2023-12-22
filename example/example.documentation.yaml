@@ -68,10 +68,6 @@ paths:
                 required:
                   - status
                   - error
-                examples:
-                  - status: error
-                    error:
-                      message: Sample error message
               examples:
                 example1:
                   value:
@@ -126,11 +122,6 @@ paths:
                 required:
                   - status
                   - data
-                examples:
-                  - status: success
-                    data:
-                      name: John Doe
-                      createdAt: 2021-12-31T00:00:00.000Z
               examples:
                 example1:
                   value:
@@ -159,10 +150,6 @@ paths:
                 required:
                   - status
                   - error
-                examples:
-                  - status: error
-                    error:
-                      message: Sample error message
               examples:
                 example1:
                   value:
@@ -217,11 +204,6 @@ paths:
                     - id: "12"
                       name: John Doe
                       birthday: 1963-04-21
-              examples:
-                - key: 1234-5678-90
-                  id: "12"
-                  name: John Doe
-                  birthday: 1963-04-21
             examples:
               example1:
                 value:
@@ -248,10 +230,6 @@ paths:
                       type: string
                   required:
                     - name
-                examples:
-                  - - name: Hunter Schafer
-                    - name: Laverne Cox
-                    - name: Patti Harrison
               examples:
                 example1:
                   value:
@@ -264,8 +242,6 @@ paths:
             application/json:
               schema:
                 type: string
-                examples:
-                  - Sample error message
               examples:
                 example1:
                   value: Sample error message
@@ -391,10 +367,6 @@ paths:
                 required:
                   - status
                   - error
-                examples:
-                  - status: error
-                    error:
-                      message: Sample error message
               examples:
                 example1:
                   value:
@@ -466,10 +438,6 @@ paths:
                 required:
                   - status
                   - error
-                examples:
-                  - status: error
-                    error:
-                      message: Sample error message
               examples:
                 example1:
                   value:

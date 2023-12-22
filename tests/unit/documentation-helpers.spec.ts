@@ -50,7 +50,7 @@ import {
   depictUpload,
   depicters,
   ensureShortDescription,
-  excludeExampleFromDepiction,
+  excludeExamplesFromDepiction,
   excludeParamsFromDepiction,
   extractObjectSchema,
   getRoutePathParams,
@@ -848,13 +848,13 @@ describe("Documentation helpers", () => {
     });
   });
 
-  describe("excludeExampleFromDepiction()", () => {
+  describe("excludeExamplesFromDepiction()", () => {
     test("should remove example property of supplied object", () => {
       expect(
-        excludeExampleFromDepiction({
+        excludeExamplesFromDepiction({
           type: "string",
           description: "test",
-          example: "test",
+          examples: ["test"],
         }),
       ).toMatchSnapshot();
     });
