@@ -8,24 +8,28 @@ type GetV1UserRetrieveInput = {} & {
   id: string;
 };
 
+type GetV1UserRetrievePositiveResponse = {
+  status: "success";
+  data: {
+    id: number;
+    name: string;
+    features: {
+      title: string;
+      features: Type2048581c137c5b2130eb860e3ae37da196dfc25b;
+    }[];
+  };
+};
+
+type GetV1UserRetrieveNegativeResponse = {
+  status: "error";
+  error: {
+    message: string;
+  };
+};
+
 type GetV1UserRetrieveResponse =
-  | {
-      status: "success";
-      data: {
-        id: number;
-        name: string;
-        features: {
-          title: string;
-          features: Type2048581c137c5b2130eb860e3ae37da196dfc25b;
-        }[];
-      };
-    }
-  | {
-      status: "error";
-      error: {
-        message: string;
-      };
-    };
+  | GetV1UserRetrievePositiveResponse
+  | GetV1UserRetrieveNegativeResponse;
 
 type PostV1UserIdInput = {
   key: string;
@@ -35,78 +39,106 @@ type PostV1UserIdInput = {
   birthday: string;
 };
 
+type PostV1UserIdPositiveResponse = {
+  status: "success";
+  data: {
+    name: string;
+    createdAt: string;
+  };
+};
+
+type PostV1UserIdNegativeResponse = {
+  status: "error";
+  error: {
+    message: string;
+  };
+};
+
 type PostV1UserIdResponse =
-  | {
-      status: "success";
-      data: {
-        name: string;
-        createdAt: string;
-      };
-    }
-  | {
-      status: "error";
-      error: {
-        message: string;
-      };
-    };
+  | PostV1UserIdPositiveResponse
+  | PostV1UserIdNegativeResponse;
 
 type GetV1UserListInput = {};
 
+type GetV1UserListPositiveResponse = {
+  name: string;
+}[];
+
+type GetV1UserListNegativeResponse = string;
+
 type GetV1UserListResponse =
-  | {
-      name: string;
-    }[]
-  | string;
+  | GetV1UserListPositiveResponse
+  | GetV1UserListNegativeResponse;
 
 type GetV1AvatarSendInput = {
   userId: string;
 };
 
-type GetV1AvatarSendResponse = string | string;
+type GetV1AvatarSendPositiveResponse = string;
+
+type GetV1AvatarSendNegativeResponse = string;
+
+type GetV1AvatarSendResponse =
+  | GetV1AvatarSendPositiveResponse
+  | GetV1AvatarSendNegativeResponse;
 
 type GetV1AvatarStreamInput = {
   userId: string;
 };
 
-type GetV1AvatarStreamResponse = Buffer | string;
+type GetV1AvatarStreamPositiveResponse = Buffer;
+
+type GetV1AvatarStreamNegativeResponse = string;
+
+type GetV1AvatarStreamResponse =
+  | GetV1AvatarStreamPositiveResponse
+  | GetV1AvatarStreamNegativeResponse;
 
 type PostV1AvatarUploadInput = {
   avatar: any;
 };
 
+type PostV1AvatarUploadPositiveResponse = {
+  status: "success";
+  data: {
+    name: string;
+    size: number;
+    mime: string;
+    hash: string;
+    otherInputs: Record<string, any>;
+  };
+};
+
+type PostV1AvatarUploadNegativeResponse = {
+  status: "error";
+  error: {
+    message: string;
+  };
+};
+
 type PostV1AvatarUploadResponse =
-  | {
-      status: "success";
-      data: {
-        name: string;
-        size: number;
-        mime: string;
-        hash: string;
-        otherInputs: Record<string, any>;
-      };
-    }
-  | {
-      status: "error";
-      error: {
-        message: string;
-      };
-    };
+  | PostV1AvatarUploadPositiveResponse
+  | PostV1AvatarUploadNegativeResponse;
 
 type PostV1AvatarRawInput = Buffer;
 
+type PostV1AvatarRawPositiveResponse = {
+  status: "success";
+  data: {
+    length: number;
+  };
+};
+
+type PostV1AvatarRawNegativeResponse = {
+  status: "error";
+  error: {
+    message: string;
+  };
+};
+
 type PostV1AvatarRawResponse =
-  | {
-      status: "success";
-      data: {
-        length: number;
-      };
-    }
-  | {
-      status: "error";
-      error: {
-        message: string;
-      };
-    };
+  | PostV1AvatarRawPositiveResponse
+  | PostV1AvatarRawNegativeResponse;
 
 export type Path =
   | "/v1/user/retrieve"

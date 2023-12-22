@@ -138,8 +138,6 @@ export class Integration {
     walkRouting({
       routing,
       onEndpoint: (endpoint, path, method) => {
-        const inputId = makeCleanId(path, method, "input");
-        const responseId = makeCleanId(path, method, "response");
         const commons = {
           serializer,
           getAlias: this.getAlias.bind(this),
@@ -147,27 +145,48 @@ export class Integration {
           optionalPropStyle,
         };
         const inputSchema = endpoint.getSchema("input");
+        const inputId = makeCleanId(path, method, "input");
         const input = zodToTs({
           ...commons,
           schema: hasRaw(inputSchema) ? ZodFile.create().buffer() : inputSchema,
           isResponse: false,
         });
-        const response = zodToTs({
+        const positiveResponseId = makeCleanId(
+          path,
+          method,
+          "positive.response",
+        );
+        const positiveResponse = zodToTs({
           ...commons,
           isResponse: true,
-          schema: endpoint
-            .getSchema("positive")
-            .or(endpoint.getSchema("negative")),
+          schema: endpoint.getSchema("positive"),
         });
+        const negativeResponseId = makeCleanId(
+          path,
+          method,
+          "negative.response",
+        );
+        const negativeResponse = zodToTs({
+          ...commons,
+          isResponse: true,
+          schema: endpoint.getSchema("negative"),
+        });
+        const genericResponseId = makeCleanId(path, method, "response");
+        const genericResponse = f.createUnionTypeNode([
+          f.createTypeReferenceNode(positiveResponseId),
+          f.createTypeReferenceNode(negativeResponseId),
+        ]);
         this.program.push(
           createTypeAlias(input, inputId),
-          createTypeAlias(response, responseId),
+          createTypeAlias(positiveResponse, positiveResponseId),
+          createTypeAlias(negativeResponse, negativeResponseId),
+          createTypeAlias(genericResponse, genericResponseId),
         );
         if (method !== "options") {
           this.paths.push(path);
           this.registry[`${method} ${path}`] = {
             in: inputId,
-            out: responseId,
+            out: genericResponseId,
             isJson: endpoint.getMimeTypes("positive").includes(mimeJson),
             tags: endpoint.getTags(),
           };
