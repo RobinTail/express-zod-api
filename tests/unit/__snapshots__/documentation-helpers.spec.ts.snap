@@ -210,18 +210,16 @@ exports[`Documentation helpers > depictEnum() > should set type and enum propert
 
 exports[`Documentation helpers > depictExamples() > should 'pass' examples in case of 'request' 1`] = `
 {
-  "examples": {
-    "example1": {
-      "value": {
-        "one": "test",
-        "two": 123,
-      },
+  "example1": {
+    "value": {
+      "one": "test",
+      "two": 123,
     },
-    "example2": {
-      "value": {
-        "one": "test2",
-        "two": 456,
-      },
+  },
+  "example2": {
+    "value": {
+      "one": "test2",
+      "two": 456,
     },
   },
 }
@@ -229,18 +227,16 @@ exports[`Documentation helpers > depictExamples() > should 'pass' examples in ca
 
 exports[`Documentation helpers > depictExamples() > should 'transform' examples in case of 'response' 1`] = `
 {
-  "examples": {
-    "example1": {
-      "value": {
-        "one": 4,
-        "two": "123",
-      },
+  "example1": {
+    "value": {
+      "one": 4,
+      "two": "123",
     },
-    "example2": {
-      "value": {
-        "one": 5,
-        "two": "456",
-      },
+  },
+  "example2": {
+    "value": {
+      "one": 5,
+      "two": "456",
     },
   },
 }
@@ -578,26 +574,22 @@ exports[`Documentation helpers > depictOptional() > should pass the next depicte
 
 exports[`Documentation helpers > depictParamExamples() > should 'pass' examples in case of 'request' 1`] = `
 {
-  "examples": {
-    "example1": {
-      "value": 123,
-    },
-    "example2": {
-      "value": 456,
-    },
+  "example1": {
+    "value": 123,
+  },
+  "example2": {
+    "value": 456,
   },
 }
 `;
 
 exports[`Documentation helpers > depictParamExamples() > should 'transform' examples in case of 'response' 1`] = `
 {
-  "examples": {
-    "example1": {
-      "value": "123",
-    },
-    "example2": {
-      "value": "456",
-    },
+  "example1": {
+    "value": "123",
+  },
+  "example2": {
+    "value": "456",
   },
 }
 `;
@@ -701,6 +693,7 @@ exports[`Documentation helpers > depictRequestParams() > Feature 1180: should de
 [
   {
     "description": "GET /v1/user/:id parameter",
+    "examples": undefined,
     "in": "header",
     "name": "x-request-id",
     "required": true,
@@ -710,6 +703,7 @@ exports[`Documentation helpers > depictRequestParams() > Feature 1180: should de
   },
   {
     "description": "GET /v1/user/:id parameter",
+    "examples": undefined,
     "in": "path",
     "name": "id",
     "required": true,
@@ -719,6 +713,7 @@ exports[`Documentation helpers > depictRequestParams() > Feature 1180: should de
   },
   {
     "description": "GET /v1/user/:id parameter",
+    "examples": undefined,
     "in": "query",
     "name": "test",
     "required": true,
@@ -735,6 +730,7 @@ exports[`Documentation helpers > depictRequestParams() > should depict only path
 [
   {
     "description": "GET /v1/user/:id parameter",
+    "examples": undefined,
     "in": "path",
     "name": "id",
     "required": true,
@@ -749,6 +745,7 @@ exports[`Documentation helpers > depictRequestParams() > should depict query and
 [
   {
     "description": "GET /v1/user/:id parameter",
+    "examples": undefined,
     "in": "path",
     "name": "id",
     "required": true,
@@ -758,6 +755,7 @@ exports[`Documentation helpers > depictRequestParams() > should depict query and
   },
   {
     "description": "GET /v1/user/:id parameter",
+    "examples": undefined,
     "in": "query",
     "name": "test",
     "required": true,
