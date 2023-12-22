@@ -163,6 +163,26 @@ export interface Input extends Record<MethodPath, any> {
   "post /v1/avatar/raw": PostV1AvatarRawInput;
 }
 
+export interface PositiveResponse extends Record<MethodPath, any> {
+  "get /v1/user/retrieve": GetV1UserRetrievePositiveResponse;
+  "post /v1/user/:id": PostV1UserIdPositiveResponse;
+  "get /v1/user/list": GetV1UserListPositiveResponse;
+  "get /v1/avatar/send": GetV1AvatarSendPositiveResponse;
+  "get /v1/avatar/stream": GetV1AvatarStreamPositiveResponse;
+  "post /v1/avatar/upload": PostV1AvatarUploadPositiveResponse;
+  "post /v1/avatar/raw": PostV1AvatarRawPositiveResponse;
+}
+
+export interface NegativeResponse extends Record<MethodPath, any> {
+  "get /v1/user/retrieve": GetV1UserRetrieveNegativeResponse;
+  "post /v1/user/:id": PostV1UserIdNegativeResponse;
+  "get /v1/user/list": GetV1UserListNegativeResponse;
+  "get /v1/avatar/send": GetV1AvatarSendNegativeResponse;
+  "get /v1/avatar/stream": GetV1AvatarStreamNegativeResponse;
+  "post /v1/avatar/upload": PostV1AvatarUploadNegativeResponse;
+  "post /v1/avatar/raw": PostV1AvatarRawNegativeResponse;
+}
+
 export interface Response extends Record<MethodPath, any> {
   "get /v1/user/retrieve": GetV1UserRetrieveResponse;
   "post /v1/user/:id": PostV1UserIdResponse;

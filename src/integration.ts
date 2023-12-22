@@ -38,7 +38,10 @@ import { createTypeAlias, printNode } from "./zts-helpers";
 import type Prettier from "prettier";
 
 interface Registry {
-  [METHOD_PATH: string]: Record<"in" | "out", string> & {
+  [METHOD_PATH: string]: Record<
+    "input" | "positive" | "negative" | "response",
+    string
+  > & {
     isJson: boolean;
     tags: string[];
   };
@@ -97,6 +100,8 @@ export class Integration {
     methodType: f.createIdentifier("Method"),
     methodPathType: f.createIdentifier("MethodPath"),
     inputInterface: f.createIdentifier("Input"),
+    posResponseInterface: f.createIdentifier("PositiveResponse"),
+    negResponseInterface: f.createIdentifier("NegativeResponse"),
     responseInterface: f.createIdentifier("Response"),
     jsonEndpointsConst: f.createIdentifier("jsonEndpoints"),
     endpointTagsConst: f.createIdentifier("endpointTags"),
@@ -185,8 +190,10 @@ export class Integration {
         if (method !== "options") {
           this.paths.push(path);
           this.registry[`${method} ${path}`] = {
-            in: inputId,
-            out: genericResponseId,
+            input: inputId,
+            positive: positiveResponseId,
+            negative: negativeResponseId,
+            response: genericResponseId,
             isJson: endpoint.getMimeTypes("positive").includes(mimeJson),
             tags: endpoint.getTags(),
           };
@@ -220,7 +227,23 @@ export class Integration {
       this.ids.inputInterface,
       extenderClause,
       Object.keys(this.registry).map((methodPath) =>
-        makeQuotedProp(methodPath, this.registry[methodPath].in),
+        makeQuotedProp(methodPath, this.registry[methodPath].input),
+      ),
+    );
+
+    const posResponseInterface = makePublicExtendedInterface(
+      this.ids.posResponseInterface,
+      extenderClause,
+      Object.keys(this.registry).map((methodPath) =>
+        makeQuotedProp(methodPath, this.registry[methodPath].positive),
+      ),
+    );
+
+    const negResponseInterface = makePublicExtendedInterface(
+      this.ids.negResponseInterface,
+      extenderClause,
+      Object.keys(this.registry).map((methodPath) =>
+        makeQuotedProp(methodPath, this.registry[methodPath].negative),
       ),
     );
 
@@ -229,7 +252,7 @@ export class Integration {
       this.ids.responseInterface,
       extenderClause,
       Object.keys(this.registry).map((methodPath) =>
-        makeQuotedProp(methodPath, this.registry[methodPath].out),
+        makeQuotedProp(methodPath, this.registry[methodPath].response),
       ),
     );
 
@@ -238,6 +261,8 @@ export class Integration {
       methodType,
       methodPathType,
       inputInterface,
+      posResponseInterface,
+      negResponseInterface,
       responseInterface,
     );
 
