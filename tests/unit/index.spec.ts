@@ -1,4 +1,4 @@
-import { Express } from "express";
+import { IRouter } from "express";
 import { expectType } from "tsd";
 import { z } from "zod";
 import * as entrypoint from "../../src";
@@ -60,7 +60,7 @@ describe("Index Entrypoint", () => {
       expectType<ZodUploadDef>({ typeName: "ZodUpload" });
       expectType<CommonConfig>({ cors: true, logger: { level: "silent" } });
       expectType<AppConfig>({
-        app: {} as Express,
+        app: {} as IRouter,
         cors: true,
         logger: { level: "silent" },
       });

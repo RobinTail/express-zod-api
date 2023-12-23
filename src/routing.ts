@@ -1,4 +1,4 @@
-import { Express } from "express";
+import { IRouter } from "express";
 import { CommonConfig } from "./config-type";
 import { DependsOnMethod } from "./depends-on-method";
 import { AbstractEndpoint } from "./endpoint";
@@ -17,7 +17,7 @@ export const initRouting = ({
   config,
   routing,
 }: {
-  app: Express;
+  app: IRouter;
   logger: AbstractLogger;
   config: CommonConfig;
   routing: Routing;
