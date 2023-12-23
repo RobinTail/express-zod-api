@@ -12,6 +12,8 @@
   - Ability to generate formatted typescript client using the new async method `printFormatted` of the `Integration`
     class when the `prettier` package is installed (detects automatically).
     - Ability to supply your own typescript formatting function into that new method.
+  - Ability to split the response types (to positive and negative ones) when generating the client or API types.
+    - Featuring the `splitResponse` option of the `Integration` class constructor.
 - How to migrate:
   - If you do not modify the generated documentation and only using its `getSpecAsYaml` or `getSpecAsJson` methods:
     - No action required.
@@ -26,6 +28,8 @@ import { Integration } from "express-zod-api";
 new Integration(/*...*/).print();
 // featuring, detects prettier automatically:
 await new Integration(/*...*/).printFormatted();
+// featuring, splitted response types:
+new Integration({ splitResponse: true });
 ```
 
 ## Version 15
