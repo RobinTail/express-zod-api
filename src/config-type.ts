@@ -126,7 +126,7 @@ export interface ServerConfig<TAG extends string = string>
 
 export interface AppConfig<TAG extends string = string>
   extends CommonConfig<TAG> {
-  /** @desc Your custom express app instead. */
+  /** @desc Your custom express app or express router instead. */
   app: IRouter;
 }
 
