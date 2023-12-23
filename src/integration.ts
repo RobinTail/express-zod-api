@@ -40,7 +40,7 @@ import type Prettier from "prettier";
 type IOInterface = "input" | "response" | "positive" | "negative";
 
 interface Registry {
-  [METHOD_PATH: string]: Record<IOInterface, string> & {
+  [METHOD_PATH: string]: Partial<Record<IOInterface, string>> & {
     isJson: boolean;
     tags: string[];
   };
@@ -211,8 +211,8 @@ export class Integration {
           this.paths.push(path);
           this.registry[`${method} ${path}`] = {
             input: inputId,
-            positive: positiveResponseId || "",
-            negative: negativeResponseId || "",
+            positive: positiveResponseId,
+            negative: negativeResponseId,
             response: genericResponseId,
             isJson: endpoint.getMimeTypes("positive").includes(mimeJson),
             tags: endpoint.getTags(),
@@ -263,9 +263,16 @@ export class Integration {
         makePublicExtendedInterface(
           id,
           extenderClause,
-          Object.keys(this.registry).map((methodPath) =>
-            makeQuotedProp(methodPath, this.registry[methodPath][kind]),
-          ),
+          Object.keys(this.registry)
+            .map((methodPath) => {
+              const reference = this.registry[methodPath][kind];
+              return reference
+                ? makeQuotedProp(methodPath, reference)
+                : undefined;
+            })
+            .filter(
+              (entry): entry is ts.PropertySignature => entry !== undefined,
+            ),
         ),
       );
     }
