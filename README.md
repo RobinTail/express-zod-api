@@ -794,15 +794,15 @@ const routing: Routing = {
 ## Connect to your own express app
 
 If you already have your own configured express application, or you find the library settings not enough,
-you can connect your routing to the app instead of using `createServer()`.
+you can connect the endpoints to your app or any express router, using `attachRouting()` method:
 
 ```typescript
 import express from "express";
 import { createConfig, attachRouting, Routing } from "express-zod-api";
 
-const app = express();
+const app = express(); // or express.Router()
 const config = createConfig({ app /* cors, logger, ... */ });
-const routing: Routing = {};
+const routing: Routing = {}; // your endpoints go here
 
 // This async IIFE is only required for the top level CommonJS
 (async () => {

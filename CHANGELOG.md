@@ -34,6 +34,19 @@ new Integration({ splitResponse: true });
 
 ## Version 15
 
+### 15.3.0
+
+- Method `createConfig()` now supports express router as an `app` for using with `attachRouting()` method.
+  - Thanks to [@sarahssharkey](https://github.com/sarahssharkey)'s contribution.
+
+```ts
+import express from "express";
+import { createConfig } from "express-zod-api";
+
+const router = express.Router();
+const config = createConfig({ app: router });
+```
+
 ### 15.2.0
 
 - Supporting Node 20 starting from version 20.0.0 (previously it was 20.1.0).
