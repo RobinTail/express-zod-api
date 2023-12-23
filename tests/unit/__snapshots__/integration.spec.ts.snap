@@ -5,23 +5,19 @@ exports[`Integration > Feature #945: should have configurable treatment of optio
   opt?: string;
 };
 
-type PostV1TestWithDashesPositiveResponse = {
-  status: "success";
-  data: {
-    similar?: number;
-  };
-};
-
-type PostV1TestWithDashesNegativeResponse = {
-  status: "error";
-  error: {
-    message: string;
-  };
-};
-
 type PostV1TestWithDashesResponse =
-  | PostV1TestWithDashesPositiveResponse
-  | PostV1TestWithDashesNegativeResponse;
+  | {
+      status: "success";
+      data: {
+        similar?: number;
+      };
+    }
+  | {
+      status: "error";
+      error: {
+        message: string;
+      };
+    };
 
 export type Path = "/v1/test-with-dashes";
 
@@ -31,14 +27,6 @@ export type MethodPath = \`\${Method} \${Path}\`;
 
 export interface Input extends Record<MethodPath, any> {
   "post /v1/test-with-dashes": PostV1TestWithDashesInput;
-}
-
-export interface PositiveResponse extends Record<MethodPath, any> {
-  "post /v1/test-with-dashes": PostV1TestWithDashesPositiveResponse;
-}
-
-export interface NegativeResponse extends Record<MethodPath, any> {
-  "post /v1/test-with-dashes": PostV1TestWithDashesNegativeResponse;
 }
 
 export interface Response extends Record<MethodPath, any> {
@@ -108,23 +96,19 @@ exports[`Integration > Feature #945: should have configurable treatment of optio
   opt: string | undefined;
 };
 
-type PostV1TestWithDashesPositiveResponse = {
-  status: "success";
-  data: {
-    similar: number | undefined;
-  };
-};
-
-type PostV1TestWithDashesNegativeResponse = {
-  status: "error";
-  error: {
-    message: string;
-  };
-};
-
 type PostV1TestWithDashesResponse =
-  | PostV1TestWithDashesPositiveResponse
-  | PostV1TestWithDashesNegativeResponse;
+  | {
+      status: "success";
+      data: {
+        similar: number | undefined;
+      };
+    }
+  | {
+      status: "error";
+      error: {
+        message: string;
+      };
+    };
 
 export type Path = "/v1/test-with-dashes";
 
@@ -134,14 +118,6 @@ export type MethodPath = \`\${Method} \${Path}\`;
 
 export interface Input extends Record<MethodPath, any> {
   "post /v1/test-with-dashes": PostV1TestWithDashesInput;
-}
-
-export interface PositiveResponse extends Record<MethodPath, any> {
-  "post /v1/test-with-dashes": PostV1TestWithDashesPositiveResponse;
-}
-
-export interface NegativeResponse extends Record<MethodPath, any> {
-  "post /v1/test-with-dashes": PostV1TestWithDashesNegativeResponse;
 }
 
 export interface Response extends Record<MethodPath, any> {
@@ -211,23 +187,19 @@ exports[`Integration > Feature #945: should have configurable treatment of optio
   opt: string;
 };
 
-type PostV1TestWithDashesPositiveResponse = {
-  status: "success";
-  data: {
-    similar: number;
-  };
-};
-
-type PostV1TestWithDashesNegativeResponse = {
-  status: "error";
-  error: {
-    message: string;
-  };
-};
-
 type PostV1TestWithDashesResponse =
-  | PostV1TestWithDashesPositiveResponse
-  | PostV1TestWithDashesNegativeResponse;
+  | {
+      status: "success";
+      data: {
+        similar: number;
+      };
+    }
+  | {
+      status: "error";
+      error: {
+        message: string;
+      };
+    };
 
 export type Path = "/v1/test-with-dashes";
 
@@ -239,14 +211,6 @@ export interface Input extends Record<MethodPath, any> {
   "post /v1/test-with-dashes": PostV1TestWithDashesInput;
 }
 
-export interface PositiveResponse extends Record<MethodPath, any> {
-  "post /v1/test-with-dashes": PostV1TestWithDashesPositiveResponse;
-}
-
-export interface NegativeResponse extends Record<MethodPath, any> {
-  "post /v1/test-with-dashes": PostV1TestWithDashesNegativeResponse;
-}
-
 export interface Response extends Record<MethodPath, any> {
   "post /v1/test-with-dashes": PostV1TestWithDashesResponse;
 }
@@ -254,6 +218,109 @@ export interface Response extends Record<MethodPath, any> {
 export const jsonEndpoints = { "post /v1/test-with-dashes": true };
 
 export const endpointTags = { "post /v1/test-with-dashes": [] };
+
+export type Provider = <M extends Method, P extends Path>(
+  method: M,
+  path: P,
+  params: Input[\`\${M} \${P}\`],
+) => Promise<Response[\`\${M} \${P}\`]>;
+
+export type Implementation = (
+  method: Method,
+  path: string,
+  params: Record<string, any>,
+) => Promise<any>;
+
+export class ExpressZodAPIClient {
+  constructor(protected readonly implementation: Implementation) {}
+  public readonly provide: Provider = async (method, path, params) =>
+    this.implementation(
+      method,
+      Object.keys(params).reduce(
+        (acc, key) => acc.replace(\`:\${key}\`, params[key]),
+        path,
+      ),
+      Object.keys(params).reduce(
+        (acc, key) =>
+          path.indexOf(\`:\${key}\`) >= 0 ? acc : { ...acc, [key]: params[key] },
+        {},
+      ),
+    );
+}
+
+// Usage example:
+/*
+export const exampleImplementation: Implementation = async (
+  method,
+  path,
+  params,
+) => {
+  const hasBody = !["get", "delete"].includes(method);
+  const searchParams = hasBody ? "" : \`?\${new URLSearchParams(params)}\`;
+  const response = await fetch(\`https://example.com\${path}\${searchParams}\`, {
+    method: method.toUpperCase(),
+    headers: hasBody ? { "Content-Type": "application/json" } : undefined,
+    body: hasBody ? JSON.stringify(params) : undefined,
+  });
+  if (\`\${method} \${path}\` in jsonEndpoints) {
+    return response.json();
+  }
+  return response.text();
+};
+const client = new ExpressZodAPIClient(exampleImplementation);
+client.provide("get", "/v1/user/retrieve", { id: "10" });
+*/
+"
+`;
+
+exports[`Integration > Feature #1411: Should split response type on demand 1`] = `
+"type PostV1TestInput = {
+  opt?: string | undefined;
+};
+
+type PostV1TestPositiveResponse = {
+  status: "success";
+  data: {
+    similar?: number | undefined;
+  };
+};
+
+type PostV1TestNegativeResponse = {
+  status: "error";
+  error: {
+    message: string;
+  };
+};
+
+type PostV1TestResponse =
+  | PostV1TestPositiveResponse
+  | PostV1TestNegativeResponse;
+
+export type Path = "/v1/test";
+
+export type Method = "get" | "post" | "put" | "delete" | "patch";
+
+export type MethodPath = \`\${Method} \${Path}\`;
+
+export interface Input extends Record<MethodPath, any> {
+  "post /v1/test": PostV1TestInput;
+}
+
+export interface PositiveResponse extends Record<MethodPath, any> {
+  "post /v1/test": PostV1TestPositiveResponse;
+}
+
+export interface NegativeResponse extends Record<MethodPath, any> {
+  "post /v1/test": PostV1TestNegativeResponse;
+}
+
+export interface Response extends Record<MethodPath, any> {
+  "post /v1/test": PostV1TestResponse;
+}
+
+export const jsonEndpoints = { "post /v1/test": true };
+
+export const endpointTags = { "post /v1/test": [] };
 
 export type Provider = <M extends Method, P extends Path>(
   method: M,
@@ -320,28 +387,24 @@ type GetV1UserRetrieveInput = {} & {
   id: string;
 };
 
-type GetV1UserRetrievePositiveResponse = {
-  status: "success";
-  data: {
-    id: number;
-    name: string;
-    features: {
-      title: string;
-      features: Type2048581c137c5b2130eb860e3ae37da196dfc25b;
-    }[];
-  };
-};
-
-type GetV1UserRetrieveNegativeResponse = {
-  status: "error";
-  error: {
-    message: string;
-  };
-};
-
 type GetV1UserRetrieveResponse =
-  | GetV1UserRetrievePositiveResponse
-  | GetV1UserRetrieveNegativeResponse;
+  | {
+      status: "success";
+      data: {
+        id: number;
+        name: string;
+        features: {
+          title: string;
+          features: Type2048581c137c5b2130eb860e3ae37da196dfc25b;
+        }[];
+      };
+    }
+  | {
+      status: "error";
+      error: {
+        message: string;
+      };
+    };
 
 type PostV1UserIdInput = {
   key: string;
@@ -351,106 +414,78 @@ type PostV1UserIdInput = {
   birthday: string;
 };
 
-type PostV1UserIdPositiveResponse = {
-  status: "success";
-  data: {
-    name: string;
-    createdAt: string;
-  };
-};
-
-type PostV1UserIdNegativeResponse = {
-  status: "error";
-  error: {
-    message: string;
-  };
-};
-
 type PostV1UserIdResponse =
-  | PostV1UserIdPositiveResponse
-  | PostV1UserIdNegativeResponse;
+  | {
+      status: "success";
+      data: {
+        name: string;
+        createdAt: string;
+      };
+    }
+  | {
+      status: "error";
+      error: {
+        message: string;
+      };
+    };
 
 type GetV1UserListInput = {};
 
-type GetV1UserListPositiveResponse = {
-  name: string;
-}[];
-
-type GetV1UserListNegativeResponse = string;
-
 type GetV1UserListResponse =
-  | GetV1UserListPositiveResponse
-  | GetV1UserListNegativeResponse;
+  | {
+      name: string;
+    }[]
+  | string;
 
 type GetV1AvatarSendInput = {
   userId: string;
 };
 
-type GetV1AvatarSendPositiveResponse = string;
-
-type GetV1AvatarSendNegativeResponse = string;
-
-type GetV1AvatarSendResponse =
-  | GetV1AvatarSendPositiveResponse
-  | GetV1AvatarSendNegativeResponse;
+type GetV1AvatarSendResponse = string | string;
 
 type GetV1AvatarStreamInput = {
   userId: string;
 };
 
-type GetV1AvatarStreamPositiveResponse = Buffer;
-
-type GetV1AvatarStreamNegativeResponse = string;
-
-type GetV1AvatarStreamResponse =
-  | GetV1AvatarStreamPositiveResponse
-  | GetV1AvatarStreamNegativeResponse;
+type GetV1AvatarStreamResponse = Buffer | string;
 
 type PostV1AvatarUploadInput = {
   avatar: any;
 };
 
-type PostV1AvatarUploadPositiveResponse = {
-  status: "success";
-  data: {
-    name: string;
-    size: number;
-    mime: string;
-    hash: string;
-    otherInputs: Record<string, any>;
-  };
-};
-
-type PostV1AvatarUploadNegativeResponse = {
-  status: "error";
-  error: {
-    message: string;
-  };
-};
-
 type PostV1AvatarUploadResponse =
-  | PostV1AvatarUploadPositiveResponse
-  | PostV1AvatarUploadNegativeResponse;
+  | {
+      status: "success";
+      data: {
+        name: string;
+        size: number;
+        mime: string;
+        hash: string;
+        otherInputs: Record<string, any>;
+      };
+    }
+  | {
+      status: "error";
+      error: {
+        message: string;
+      };
+    };
 
 type PostV1AvatarRawInput = Buffer;
 
-type PostV1AvatarRawPositiveResponse = {
-  status: "success";
-  data: {
-    length: number;
-  };
-};
-
-type PostV1AvatarRawNegativeResponse = {
-  status: "error";
-  error: {
-    message: string;
-  };
-};
-
 type PostV1AvatarRawResponse =
-  | PostV1AvatarRawPositiveResponse
-  | PostV1AvatarRawNegativeResponse;
+  | {
+      status: "success";
+      data: {
+        length: number;
+      };
+    }
+  | {
+      status: "error";
+      error: {
+        message: string;
+      };
+    };
 
 export type Path =
   | "/v1/user/retrieve"
@@ -473,26 +508,6 @@ export interface Input extends Record<MethodPath, any> {
   "get /v1/avatar/stream": GetV1AvatarStreamInput;
   "post /v1/avatar/upload": PostV1AvatarUploadInput;
   "post /v1/avatar/raw": PostV1AvatarRawInput;
-}
-
-export interface PositiveResponse extends Record<MethodPath, any> {
-  "get /v1/user/retrieve": GetV1UserRetrievePositiveResponse;
-  "post /v1/user/:id": PostV1UserIdPositiveResponse;
-  "get /v1/user/list": GetV1UserListPositiveResponse;
-  "get /v1/avatar/send": GetV1AvatarSendPositiveResponse;
-  "get /v1/avatar/stream": GetV1AvatarStreamPositiveResponse;
-  "post /v1/avatar/upload": PostV1AvatarUploadPositiveResponse;
-  "post /v1/avatar/raw": PostV1AvatarRawPositiveResponse;
-}
-
-export interface NegativeResponse extends Record<MethodPath, any> {
-  "get /v1/user/retrieve": GetV1UserRetrieveNegativeResponse;
-  "post /v1/user/:id": PostV1UserIdNegativeResponse;
-  "get /v1/user/list": GetV1UserListNegativeResponse;
-  "get /v1/avatar/send": GetV1AvatarSendNegativeResponse;
-  "get /v1/avatar/stream": GetV1AvatarStreamNegativeResponse;
-  "post /v1/avatar/upload": PostV1AvatarUploadNegativeResponse;
-  "post /v1/avatar/raw": PostV1AvatarRawNegativeResponse;
 }
 
 export interface Response extends Record<MethodPath, any> {
@@ -588,28 +603,24 @@ type GetV1UserRetrieveInput = {} & {
   id: string;
 };
 
-type GetV1UserRetrievePositiveResponse = {
-  status: "success";
-  data: {
-    id: number;
-    name: string;
-    features: {
-      title: string;
-      features: Type2048581c137c5b2130eb860e3ae37da196dfc25b;
-    }[];
-  };
-};
-
-type GetV1UserRetrieveNegativeResponse = {
-  status: "error";
-  error: {
-    message: string;
-  };
-};
-
 type GetV1UserRetrieveResponse =
-  | GetV1UserRetrievePositiveResponse
-  | GetV1UserRetrieveNegativeResponse;
+  | {
+      status: "success";
+      data: {
+        id: number;
+        name: string;
+        features: {
+          title: string;
+          features: Type2048581c137c5b2130eb860e3ae37da196dfc25b;
+        }[];
+      };
+    }
+  | {
+      status: "error";
+      error: {
+        message: string;
+      };
+    };
 
 type PostV1UserIdInput = {
   key: string;
@@ -619,106 +630,78 @@ type PostV1UserIdInput = {
   birthday: string;
 };
 
-type PostV1UserIdPositiveResponse = {
-  status: "success";
-  data: {
-    name: string;
-    createdAt: string;
-  };
-};
-
-type PostV1UserIdNegativeResponse = {
-  status: "error";
-  error: {
-    message: string;
-  };
-};
-
 type PostV1UserIdResponse =
-  | PostV1UserIdPositiveResponse
-  | PostV1UserIdNegativeResponse;
+  | {
+      status: "success";
+      data: {
+        name: string;
+        createdAt: string;
+      };
+    }
+  | {
+      status: "error";
+      error: {
+        message: string;
+      };
+    };
 
 type GetV1UserListInput = {};
 
-type GetV1UserListPositiveResponse = {
-  name: string;
-}[];
-
-type GetV1UserListNegativeResponse = string;
-
 type GetV1UserListResponse =
-  | GetV1UserListPositiveResponse
-  | GetV1UserListNegativeResponse;
+  | {
+      name: string;
+    }[]
+  | string;
 
 type GetV1AvatarSendInput = {
   userId: string;
 };
 
-type GetV1AvatarSendPositiveResponse = string;
-
-type GetV1AvatarSendNegativeResponse = string;
-
-type GetV1AvatarSendResponse =
-  | GetV1AvatarSendPositiveResponse
-  | GetV1AvatarSendNegativeResponse;
+type GetV1AvatarSendResponse = string | string;
 
 type GetV1AvatarStreamInput = {
   userId: string;
 };
 
-type GetV1AvatarStreamPositiveResponse = Buffer;
-
-type GetV1AvatarStreamNegativeResponse = string;
-
-type GetV1AvatarStreamResponse =
-  | GetV1AvatarStreamPositiveResponse
-  | GetV1AvatarStreamNegativeResponse;
+type GetV1AvatarStreamResponse = Buffer | string;
 
 type PostV1AvatarUploadInput = {
   avatar: any;
 };
 
-type PostV1AvatarUploadPositiveResponse = {
-  status: "success";
-  data: {
-    name: string;
-    size: number;
-    mime: string;
-    hash: string;
-    otherInputs: Record<string, any>;
-  };
-};
-
-type PostV1AvatarUploadNegativeResponse = {
-  status: "error";
-  error: {
-    message: string;
-  };
-};
-
 type PostV1AvatarUploadResponse =
-  | PostV1AvatarUploadPositiveResponse
-  | PostV1AvatarUploadNegativeResponse;
+  | {
+      status: "success";
+      data: {
+        name: string;
+        size: number;
+        mime: string;
+        hash: string;
+        otherInputs: Record<string, any>;
+      };
+    }
+  | {
+      status: "error";
+      error: {
+        message: string;
+      };
+    };
 
 type PostV1AvatarRawInput = Buffer;
 
-type PostV1AvatarRawPositiveResponse = {
-  status: "success";
-  data: {
-    length: number;
-  };
-};
-
-type PostV1AvatarRawNegativeResponse = {
-  status: "error";
-  error: {
-    message: string;
-  };
-};
-
 type PostV1AvatarRawResponse =
-  | PostV1AvatarRawPositiveResponse
-  | PostV1AvatarRawNegativeResponse;
+  | {
+      status: "success";
+      data: {
+        length: number;
+      };
+    }
+  | {
+      status: "error";
+      error: {
+        message: string;
+      };
+    };
 
 export type Path =
   | "/v1/user/retrieve"
@@ -743,26 +726,6 @@ export interface Input extends Record<MethodPath, any> {
   "post /v1/avatar/raw": PostV1AvatarRawInput;
 }
 
-export interface PositiveResponse extends Record<MethodPath, any> {
-  "get /v1/user/retrieve": GetV1UserRetrievePositiveResponse;
-  "post /v1/user/:id": PostV1UserIdPositiveResponse;
-  "get /v1/user/list": GetV1UserListPositiveResponse;
-  "get /v1/avatar/send": GetV1AvatarSendPositiveResponse;
-  "get /v1/avatar/stream": GetV1AvatarStreamPositiveResponse;
-  "post /v1/avatar/upload": PostV1AvatarUploadPositiveResponse;
-  "post /v1/avatar/raw": PostV1AvatarRawPositiveResponse;
-}
-
-export interface NegativeResponse extends Record<MethodPath, any> {
-  "get /v1/user/retrieve": GetV1UserRetrieveNegativeResponse;
-  "post /v1/user/:id": PostV1UserIdNegativeResponse;
-  "get /v1/user/list": GetV1UserListNegativeResponse;
-  "get /v1/avatar/send": GetV1AvatarSendNegativeResponse;
-  "get /v1/avatar/stream": GetV1AvatarStreamNegativeResponse;
-  "post /v1/avatar/upload": PostV1AvatarUploadNegativeResponse;
-  "post /v1/avatar/raw": PostV1AvatarRawNegativeResponse;
-}
-
 export interface Response extends Record<MethodPath, any> {
   "get /v1/user/retrieve": GetV1UserRetrieveResponse;
   "post /v1/user/:id": PostV1UserIdResponse;
@@ -780,23 +743,19 @@ exports[`Integration > Should treat optionals the same way as z.infer() by defau
   opt?: string | undefined;
 };
 
-type PostV1TestWithDashesPositiveResponse = {
-  status: "success";
-  data: {
-    similar?: number | undefined;
-  };
-};
-
-type PostV1TestWithDashesNegativeResponse = {
-  status: "error";
-  error: {
-    message: string;
-  };
-};
-
 type PostV1TestWithDashesResponse =
-  | PostV1TestWithDashesPositiveResponse
-  | PostV1TestWithDashesNegativeResponse;
+  | {
+      status: "success";
+      data: {
+        similar?: number | undefined;
+      };
+    }
+  | {
+      status: "error";
+      error: {
+        message: string;
+      };
+    };
 
 export type Path = "/v1/test-with-dashes";
 
@@ -806,14 +765,6 @@ export type MethodPath = \`\${Method} \${Path}\`;
 
 export interface Input extends Record<MethodPath, any> {
   "post /v1/test-with-dashes": PostV1TestWithDashesInput;
-}
-
-export interface PositiveResponse extends Record<MethodPath, any> {
-  "post /v1/test-with-dashes": PostV1TestWithDashesPositiveResponse;
-}
-
-export interface NegativeResponse extends Record<MethodPath, any> {
-  "post /v1/test-with-dashes": PostV1TestWithDashesNegativeResponse;
 }
 
 export interface Response extends Record<MethodPath, any> {

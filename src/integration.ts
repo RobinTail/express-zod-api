@@ -37,11 +37,10 @@ import { zodToTs } from "./zts";
 import { createTypeAlias, printNode } from "./zts-helpers";
 import type Prettier from "prettier";
 
+type IOInterface = "input" | "response" | "positive" | "negative";
+
 interface Registry {
-  [METHOD_PATH: string]: Record<
-    "input" | "positive" | "negative" | "response",
-    string
-  > & {
+  [METHOD_PATH: string]: Record<IOInterface, string> & {
     isJson: boolean;
     tags: string[];
   };
@@ -56,6 +55,11 @@ interface IntegrationParams {
    * @default "client"
    * */
   variant?: "types" | "client";
+  /**
+   * @desc Declares positive and negative response types separately and provides them within additional dictoinaries
+   * @default false
+   * */
+  splitResponse?: boolean;
   /**
    * @desc Used for comparing schemas wrapped into z.lazy() to limit the recursion
    * @default JSON.stringify() + SHA1 hash as a hex digest
@@ -124,12 +128,6 @@ export class Integration {
     exampleImplementationConst: f.createIdentifier("exampleImplementation"),
     clientConst: f.createIdentifier("client"),
   } satisfies Record<string, ts.Identifier>;
-  protected interfaces = {
-    input: this.ids.inputInterface,
-    positive: this.ids.posResponseInterface,
-    negative: this.ids.negResponseInterface,
-    response: this.ids.responseInterface,
-  } satisfies Partial<Record<keyof Registry[string], ts.Identifier>>;
 
   protected getAlias(name: string): ts.TypeReferenceNode | undefined {
     return name in this.aliases ? f.createTypeReferenceNode(name) : undefined;
@@ -144,6 +142,7 @@ export class Integration {
     routing,
     variant = "client",
     serializer = defaultSerializer,
+    splitResponse = false,
     optionalPropStyle = { withQuestionMark: true, withUndefined: true },
   }: IntegrationParams) {
     walkRouting({
@@ -162,43 +161,58 @@ export class Integration {
           schema: hasRaw(inputSchema) ? ZodFile.create().buffer() : inputSchema,
           isResponse: false,
         });
-        const positiveResponseId = makeCleanId(
-          path,
-          method,
-          "positive.response",
-        );
-        const positiveResponse = zodToTs({
-          ...commons,
-          isResponse: true,
-          schema: endpoint.getSchema("positive"),
-        });
-        const negativeResponseId = makeCleanId(
-          path,
-          method,
-          "negative.response",
-        );
-        const negativeResponse = zodToTs({
-          ...commons,
-          isResponse: true,
-          schema: endpoint.getSchema("negative"),
-        });
+        const positiveResponseId = splitResponse
+          ? makeCleanId(path, method, "positive.response")
+          : undefined;
+        const positiveSchema = endpoint.getSchema("positive");
+        const positiveResponse = splitResponse
+          ? zodToTs({
+              ...commons,
+              isResponse: true,
+              schema: positiveSchema,
+            })
+          : undefined;
+        const negativeResponseId = splitResponse
+          ? makeCleanId(path, method, "negative.response")
+          : undefined;
+        const negativeSchema = endpoint.getSchema("negative");
+        const negativeResponse = splitResponse
+          ? zodToTs({
+              ...commons,
+              isResponse: true,
+              schema: negativeSchema,
+            })
+          : undefined;
         const genericResponseId = makeCleanId(path, method, "response");
-        const genericResponse = f.createUnionTypeNode([
-          f.createTypeReferenceNode(positiveResponseId),
-          f.createTypeReferenceNode(negativeResponseId),
-        ]);
-        this.program.push(
-          createTypeAlias(input, inputId),
-          createTypeAlias(positiveResponse, positiveResponseId),
-          createTypeAlias(negativeResponse, negativeResponseId),
-          createTypeAlias(genericResponse, genericResponseId),
-        );
+        const genericResponse =
+          positiveResponseId && negativeResponseId
+            ? f.createUnionTypeNode([
+                f.createTypeReferenceNode(positiveResponseId),
+                f.createTypeReferenceNode(negativeResponseId),
+              ])
+            : zodToTs({
+                ...commons,
+                isResponse: true,
+                schema: positiveSchema.or(negativeSchema),
+              });
+        this.program.push(createTypeAlias(input, inputId));
+        if (positiveResponse && positiveResponseId) {
+          this.program.push(
+            createTypeAlias(positiveResponse, positiveResponseId),
+          );
+        }
+        if (negativeResponse && negativeResponseId) {
+          this.program.push(
+            createTypeAlias(negativeResponse, negativeResponseId),
+          );
+        }
+        this.program.push(createTypeAlias(genericResponse, genericResponseId));
         if (method !== "options") {
           this.paths.push(path);
           this.registry[`${method} ${path}`] = {
             input: inputId,
-            positive: positiveResponseId,
-            negative: negativeResponseId,
+            positive: positiveResponseId || "",
+            negative: negativeResponseId || "",
             response: genericResponseId,
             isJson: endpoint.getMimeTypes("positive").includes(mimeJson),
             tags: endpoint.getTags(),
@@ -230,17 +244,27 @@ export class Integration {
       ]),
     ];
 
-    for (const prop in this.interfaces) {
-      // export interface Input ___ { "get /v1/user/retrieve": GetV1UserRetrieveInput; }
+    const interfaces: { id: ts.Identifier; kind: IOInterface }[] = [];
+    interfaces.push({
+      id: this.ids.inputInterface,
+      kind: "input",
+    });
+    if (splitResponse) {
+      interfaces.push(
+        { id: this.ids.posResponseInterface, kind: "positive" },
+        { id: this.ids.negResponseInterface, kind: "negative" },
+      );
+    }
+    interfaces.push({ id: this.ids.responseInterface, kind: "response" });
+
+    // export interface Input ___ { "get /v1/user/retrieve": GetV1UserRetrieveInput; }
+    for (const { id, kind } of interfaces) {
       this.program.push(
         makePublicExtendedInterface(
-          this.interfaces[prop as keyof typeof this.interfaces],
+          id,
           extenderClause,
           Object.keys(this.registry).map((methodPath) =>
-            makeQuotedProp(
-              methodPath,
-              this.registry[methodPath][prop as keyof typeof this.interfaces],
-            ),
+            makeQuotedProp(methodPath, this.registry[methodPath][kind]),
           ),
         ),
       );

@@ -55,4 +55,25 @@ describe("Integration", () => {
       expect(await client.printFormatted()).toMatchSnapshot();
     },
   );
+
+  test("Feature #1411: Should split response type on demand", async () => {
+    const client = new Integration({
+      splitResponse: true,
+      routing: {
+        v1: {
+          test: defaultEndpointsFactory.build({
+            method: "post",
+            input: z.object({
+              opt: z.string().optional(),
+            }),
+            output: z.object({
+              similar: z.number().optional(),
+            }),
+            handler: async () => ({}),
+          }),
+        },
+      },
+    });
+    expect(await client.printFormatted()).toMatchSnapshot();
+  });
 });
