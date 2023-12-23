@@ -128,6 +128,7 @@ export class Integration {
     exampleImplementationConst: f.createIdentifier("exampleImplementation"),
     clientConst: f.createIdentifier("client"),
   } satisfies Record<string, ts.Identifier>;
+  protected interfaces: { id: ts.Identifier; kind: IOInterface }[] = [];
 
   protected getAlias(name: string): ts.TypeReferenceNode | undefined {
     return name in this.aliases ? f.createTypeReferenceNode(name) : undefined;
@@ -244,21 +245,20 @@ export class Integration {
       ]),
     ];
 
-    const interfaces: { id: ts.Identifier; kind: IOInterface }[] = [];
-    interfaces.push({
+    this.interfaces.push({
       id: this.ids.inputInterface,
       kind: "input",
     });
     if (splitResponse) {
-      interfaces.push(
+      this.interfaces.push(
         { id: this.ids.posResponseInterface, kind: "positive" },
         { id: this.ids.negResponseInterface, kind: "negative" },
       );
     }
-    interfaces.push({ id: this.ids.responseInterface, kind: "response" });
+    this.interfaces.push({ id: this.ids.responseInterface, kind: "response" });
 
     // export interface Input ___ { "get /v1/user/retrieve": GetV1UserRetrieveInput; }
-    for (const { id, kind } of interfaces) {
+    for (const { id, kind } of this.interfaces) {
       this.program.push(
         makePublicExtendedInterface(
           id,
