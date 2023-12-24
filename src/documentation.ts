@@ -36,19 +36,18 @@ type Component =
   | "requestParameter"
   | "requestBody";
 
+/** @desc user defined function that creates a component description from its properties */
+type Descriptor = (
+  props: Record<"method" | "path" | "operationId", string>,
+) => string;
+
 interface DocumentationParams {
   title: string;
   version: string;
   serverUrl: string | [string, ...string[]];
   routing: Routing;
   config: CommonConfig;
-  descriptions?: Partial<
-    Record<
-      Component,
-      | string
-      | ((params: Record<"method" | "path" | "operationId", string>) => string)
-    >
-  >;
+  descriptions?: Partial<Record<Component, string | Descriptor>>;
   /** @default true */
   hasSummaryFromDescription?: boolean;
   /** @default inline */
