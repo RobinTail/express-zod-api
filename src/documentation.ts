@@ -91,7 +91,7 @@ export class Documentation extends OpenApiBuilder {
       this.lastOperationIdSuffixes[userDefinedOperationId] = 1;
       return userDefinedOperationId;
     }
-    const operationId = makeCleanId(path, method);
+    const operationId = makeCleanId(method, path);
     if (operationId in this.lastOperationIdSuffixes) {
       this.lastOperationIdSuffixes[operationId]++;
       return `${operationId}${this.lastOperationIdSuffixes[operationId]}`;

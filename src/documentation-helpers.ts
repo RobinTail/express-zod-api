@@ -720,7 +720,7 @@ export const depictRequestParams = ({
       const result =
         composition === "components"
           ? makeRef(
-              makeCleanId(path, method, `${description} ${name}`),
+              makeCleanId(method, path, `${description} ${name}`),
               depicted,
             )
           : depicted;
@@ -901,7 +901,7 @@ export const depictResponse = ({
   const examples = depictExamples(schema, true);
   const result =
     composition === "components"
-      ? makeRef(makeCleanId(path, method, description), depictedSchema)
+      ? makeRef(makeCleanId(method, path, description), depictedSchema)
       : depictedSchema;
 
   return {
@@ -1050,7 +1050,7 @@ export const depictRequest = ({
   );
   const result =
     composition === "components"
-      ? makeRef(makeCleanId(path, method, description), bodyDepiction)
+      ? makeRef(makeCleanId(method, path, description), bodyDepiction)
       : bodyDepiction;
 
   return {
