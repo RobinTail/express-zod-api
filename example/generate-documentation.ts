@@ -5,7 +5,7 @@ import { routing } from "./routing";
 import manifest from "../package.json";
 
 await writeFile(
-  "example/example.swagger.yaml",
+  "example/example.documentation.yaml",
   new Documentation({
     routing,
     config,

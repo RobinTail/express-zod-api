@@ -279,20 +279,18 @@ export const hasCoercion = (schema: z.ZodTypeAny): boolean =>
     ? schema._def.coerce
     : false;
 
-export const makeCleanId = (path: string, method: string, suffix?: string) => {
-  return [method] // collect the assets in the specified order
-    .concat(path.split("/"))
-    .concat(suffix || [])
+export const ucFirst = (subject: string) =>
+  subject.charAt(0).toUpperCase() + subject.slice(1).toLowerCase();
+
+export const makeCleanId = (...args: string[]) =>
+  args
     .flatMap((entry) => entry.split(/[^A-Z0-9]/gi)) // split by non-alphanumeric characters
     .flatMap((entry) =>
       // split by sequences of capitalized letters
       entry.replaceAll(/[A-Z]+/g, (beginning) => `/${beginning}`).split("/"),
     )
-    .map(
-      (entry) => entry.charAt(0).toUpperCase() + entry.slice(1).toLowerCase(),
-    )
+    .map(ucFirst)
     .join("");
-};
 
 export const defaultSerializer = (schema: z.ZodTypeAny): string =>
   createHash("sha1").update(JSON.stringify(schema), "utf8").digest("hex");

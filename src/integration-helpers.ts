@@ -16,27 +16,27 @@ export const protectedReadonlyModifier = [
   f.createModifier(ts.SyntaxKind.ReadonlyKeyword),
 ];
 
-const emptyPrefix = f.createTemplateHead("");
+export const emptyHeading = f.createTemplateHead("");
 
-const emptyEnding = f.createTemplateTail("");
+export const emptyTail = f.createTemplateTail("");
 
-const spacingSuffix = f.createTemplateMiddle(" ");
+export const spacingMiddle = f.createTemplateMiddle(" ");
 
-export const makeTemplate = (names: (ts.Identifier | string)[]) =>
+export const makeTemplateType = (names: Array<ts.Identifier | string>) =>
   f.createTemplateLiteralType(
-    emptyPrefix,
+    emptyHeading,
     names.map((name, index) =>
       f.createTemplateLiteralTypeSpan(
         f.createTypeReferenceNode(name),
-        index === names.length - 1 ? emptyEnding : spacingSuffix,
+        index === names.length - 1 ? emptyTail : spacingMiddle,
       ),
     ),
   );
 
-export const parametricIndexNode = makeTemplate(["M", "P"]);
+export const parametricIndexNode = makeTemplateType(["M", "P"]);
 
 export const makeParam = (
-  name: string,
+  name: ts.Identifier,
   type?: ts.TypeNode,
   mod?: ts.Modifier[],
 ) =>
@@ -54,7 +54,8 @@ export const makeParams = (
   mod?: ts.Modifier[],
 ) =>
   Object.keys(params).reduce(
-    (acc, name) => acc.concat(makeParam(name, params[name], mod)),
+    (acc, name) =>
+      acc.concat(makeParam(f.createIdentifier(name), params[name], mod)),
     [] as ts.ParameterDeclaration[],
   );
 
@@ -81,13 +82,20 @@ export const makeQuotedProp = (name: string, ref: string) =>
     f.createTypeReferenceNode(ref),
   );
 
-export const makeConst = (name: string, value: ts.Expression) =>
+export const makeConst = (
+  name: ts.Identifier,
+  value: ts.Expression,
+  type?: ts.TypeNode,
+) =>
   f.createVariableDeclarationList(
-    [f.createVariableDeclaration(name, undefined, undefined, value)],
+    [f.createVariableDeclaration(name, undefined, type, value)],
     ts.NodeFlags.Const,
   );
 
-export const makePublicLiteralType = (name: string, literals: string[]) =>
+export const makePublicLiteralType = (
+  name: ts.Identifier,
+  literals: string[],
+) =>
   f.createTypeAliasDeclaration(
     exportModifier,
     name,
@@ -99,11 +107,11 @@ export const makePublicLiteralType = (name: string, literals: string[]) =>
     ),
   );
 
-export const makePublicType = (name: string, value: ts.TypeNode) =>
+export const makePublicType = (name: ts.Identifier, value: ts.TypeNode) =>
   f.createTypeAliasDeclaration(exportModifier, name, undefined, value);
 
 export const makePublicReadonlyProp = (
-  name: string,
+  name: ts.Identifier,
   type: ts.TypeNode,
   exp: ts.Expression,
 ) =>
@@ -116,7 +124,7 @@ export const makePublicReadonlyProp = (
   );
 
 export const makePublicClass = (
-  name: string,
+  name: ts.Identifier,
   constructor: ts.ConstructorDeclaration,
   props: ts.PropertyDeclaration[] = [],
 ) =>
@@ -136,7 +144,7 @@ export const makeAnyPromise = () =>
   ]);
 
 export const makePublicExtendedInterface = (
-  name: string,
+  name: ts.Identifier,
   extender: ts.HeritageClause[],
   props: ts.PropertySignature[],
 ) =>
@@ -161,9 +169,9 @@ export const makeTypeParams = (params: Record<string, ts.Identifier>) =>
     [] as ts.TypeParameterDeclaration[],
   );
 
-export const makeImplementationCallFn = (
-  params: string[],
-  args: ts.Expression[],
+export const makeAsyncArrowFn = (
+  params: ts.Identifier[],
+  body: ts.ConciseBody,
 ) =>
   f.createArrowFunction(
     asyncModifier,
@@ -171,15 +179,11 @@ export const makeImplementationCallFn = (
     params.map((key) => makeParam(key)),
     undefined,
     undefined,
-    f.createCallExpression(
-      f.createPropertyAccessExpression(f.createThis(), "implementation"),
-      undefined,
-      args,
-    ),
+    body,
   );
 
 export const makeObjectKeysReducer = (
-  obj: string,
+  obj: ts.Identifier,
   exp: ts.Expression,
   initial: ts.Expression,
 ) =>
@@ -188,7 +192,7 @@ export const makeObjectKeysReducer = (
       f.createCallExpression(
         f.createPropertyAccessExpression(f.createIdentifier("Object"), "keys"),
         undefined,
-        [f.createIdentifier(obj)],
+        [obj],
       ),
       "reduce",
     ),

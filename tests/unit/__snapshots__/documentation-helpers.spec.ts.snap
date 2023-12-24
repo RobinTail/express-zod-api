@@ -210,18 +210,16 @@ exports[`Documentation helpers > depictEnum() > should set type and enum propert
 
 exports[`Documentation helpers > depictExamples() > should 'pass' examples in case of 'request' 1`] = `
 {
-  "examples": {
-    "example1": {
-      "value": {
-        "one": "test",
-        "two": 123,
-      },
+  "example1": {
+    "value": {
+      "one": "test",
+      "two": 123,
     },
-    "example2": {
-      "value": {
-        "one": "test2",
-        "two": 456,
-      },
+  },
+  "example2": {
+    "value": {
+      "one": "test2",
+      "two": 456,
     },
   },
 }
@@ -229,18 +227,16 @@ exports[`Documentation helpers > depictExamples() > should 'pass' examples in ca
 
 exports[`Documentation helpers > depictExamples() > should 'transform' examples in case of 'response' 1`] = `
 {
-  "examples": {
-    "example1": {
-      "value": {
-        "one": 4,
-        "two": "123",
-      },
+  "example1": {
+    "value": {
+      "one": 4,
+      "two": "123",
     },
-    "example2": {
-      "value": {
-        "one": 5,
-        "two": "456",
-      },
+  },
+  "example2": {
+    "value": {
+      "one": 5,
+      "two": "456",
     },
   },
 }
@@ -273,8 +269,6 @@ exports[`Documentation helpers > depictIntersection() > should wrap next depicte
     {
       "properties": {
         "one": {
-          "exclusiveMaximum": false,
-          "exclusiveMinimum": false,
           "format": "double",
           "maximum": 1.7976931348623157e+308,
           "minimum": 5e-324,
@@ -289,8 +283,6 @@ exports[`Documentation helpers > depictIntersection() > should wrap next depicte
     {
       "properties": {
         "two": {
-          "exclusiveMaximum": false,
-          "exclusiveMinimum": false,
           "format": "double",
           "maximum": 1.7976931348623157e+308,
           "minimum": 5e-324,
@@ -362,32 +354,58 @@ exports[`Documentation helpers > depictLiteral() > should set type and involve e
 }
 `;
 
-exports[`Documentation helpers > depictNull() > should set type:string format:null and nullable:true props 1`] = `
+exports[`Documentation helpers > depictNull() > should give type:null 1`] = `
 {
-  "format": "null",
-  "nullable": true,
-  "type": "string",
+  "type": "null",
 }
 `;
 
-exports[`Documentation helpers > depictNullable() > should set nullable:true 0 1`] = `
+exports[`Documentation helpers > depictNullable() > should add null to the type 0 1`] = `
 {
-  "nullable": true,
-  "type": "string",
+  "type": [
+    "string",
+    "null",
+  ],
 }
 `;
 
-exports[`Documentation helpers > depictNullable() > should set nullable:true 1 1`] = `
+exports[`Documentation helpers > depictNullable() > should add null to the type 1 1`] = `
 {
-  "nullable": true,
-  "type": "string",
+  "type": [
+    "string",
+    "null",
+  ],
+}
+`;
+
+exports[`Documentation helpers > depictNullable() > should only add null type once 0 1`] = `
+{
+  "type": [
+    "string",
+    "null",
+  ],
+}
+`;
+
+exports[`Documentation helpers > depictNullable() > should only add null type once 1 1`] = `
+{
+  "type": [
+    "null",
+  ],
+}
+`;
+
+exports[`Documentation helpers > depictNullable() > should only add null type once 2 1`] = `
+{
+  "type": [
+    "string",
+    "null",
+  ],
 }
 `;
 
 exports[`Documentation helpers > depictNumber() > should type:number, min/max, format and exclusiveness props 1`] = `
 {
-  "exclusiveMaximum": false,
-  "exclusiveMinimum": false,
   "format": "double",
   "maximum": 1.7976931348623157e+308,
   "minimum": 5e-324,
@@ -397,8 +415,6 @@ exports[`Documentation helpers > depictNumber() > should type:number, min/max, f
 
 exports[`Documentation helpers > depictNumber() > should type:number, min/max, format and exclusiveness props 2`] = `
 {
-  "exclusiveMaximum": false,
-  "exclusiveMinimum": false,
   "format": "int64",
   "maximum": 20,
   "minimum": 10,
@@ -416,8 +432,10 @@ exports[`Documentation helpers > depictObject() > Bug #758 1`] = `
       "type": "string",
     },
     "c": {
-      "nullable": true,
-      "type": "string",
+      "type": [
+        "string",
+        "null",
+      ],
     },
   },
   "required": [
@@ -432,8 +450,6 @@ exports[`Documentation helpers > depictObject() > should type:object, properties
 {
   "properties": {
     "a": {
-      "exclusiveMaximum": false,
-      "exclusiveMinimum": false,
       "format": "double",
       "maximum": 1.7976931348623157e+308,
       "minimum": 5e-324,
@@ -455,8 +471,6 @@ exports[`Documentation helpers > depictObject() > should type:object, properties
 {
   "properties": {
     "a": {
-      "exclusiveMaximum": false,
-      "exclusiveMinimum": false,
       "format": "double",
       "maximum": 1.7976931348623157e+308,
       "minimum": 5e-324,
@@ -478,8 +492,6 @@ exports[`Documentation helpers > depictObject() > should type:object, properties
 {
   "properties": {
     "a": {
-      "exclusiveMaximum": false,
-      "exclusiveMinimum": false,
       "format": "double",
       "maximum": 1.7976931348623157e+308,
       "minimum": 5e-324,
@@ -501,8 +513,6 @@ exports[`Documentation helpers > depictObject() > should type:object, properties
 {
   "properties": {
     "a": {
-      "exclusiveMaximum": false,
-      "exclusiveMinimum": false,
       "format": "double",
       "maximum": 1.7976931348623157e+308,
       "minimum": 5e-324,
@@ -523,16 +533,16 @@ exports[`Documentation helpers > depictObject() > should type:object, properties
 {
   "properties": {
     "a": {
-      "exclusiveMaximum": false,
-      "exclusiveMinimum": false,
       "format": "double",
       "maximum": 1.7976931348623157e+308,
       "minimum": 5e-324,
       "type": "number",
     },
     "b": {
-      "nullable": true,
-      "type": "string",
+      "type": [
+        "string",
+        "null",
+      ],
     },
   },
   "type": "object",
@@ -564,26 +574,22 @@ exports[`Documentation helpers > depictOptional() > should pass the next depicte
 
 exports[`Documentation helpers > depictParamExamples() > should 'pass' examples in case of 'request' 1`] = `
 {
-  "examples": {
-    "example1": {
-      "value": 123,
-    },
-    "example2": {
-      "value": 456,
-    },
+  "example1": {
+    "value": 123,
+  },
+  "example2": {
+    "value": 456,
   },
 }
 `;
 
 exports[`Documentation helpers > depictParamExamples() > should 'transform' examples in case of 'response' 1`] = `
 {
-  "examples": {
-    "example1": {
-      "value": "123",
-    },
-    "example2": {
-      "value": "456",
-    },
+  "example1": {
+    "value": "123",
+  },
+  "example2": {
+    "value": "456",
   },
 }
 `;
@@ -686,7 +692,8 @@ exports[`Documentation helpers > depictRecord() > should set properties+required
 exports[`Documentation helpers > depictRequestParams() > Feature 1180: should depict header params when enabled 1`] = `
 [
   {
-    "description": "GET /v1/user/:id parameter",
+    "description": "GET /v1/user/:id Parameter",
+    "examples": undefined,
     "in": "header",
     "name": "x-request-id",
     "required": true,
@@ -695,7 +702,8 @@ exports[`Documentation helpers > depictRequestParams() > Feature 1180: should de
     },
   },
   {
-    "description": "GET /v1/user/:id parameter",
+    "description": "GET /v1/user/:id Parameter",
+    "examples": undefined,
     "in": "path",
     "name": "id",
     "required": true,
@@ -704,7 +712,8 @@ exports[`Documentation helpers > depictRequestParams() > Feature 1180: should de
     },
   },
   {
-    "description": "GET /v1/user/:id parameter",
+    "description": "GET /v1/user/:id Parameter",
+    "examples": undefined,
     "in": "query",
     "name": "test",
     "required": true,
@@ -720,7 +729,8 @@ exports[`Documentation helpers > depictRequestParams() > should depict none if b
 exports[`Documentation helpers > depictRequestParams() > should depict only path params if query is disabled 1`] = `
 [
   {
-    "description": "GET /v1/user/:id parameter",
+    "description": "GET /v1/user/:id Parameter",
+    "examples": undefined,
     "in": "path",
     "name": "id",
     "required": true,
@@ -734,7 +744,8 @@ exports[`Documentation helpers > depictRequestParams() > should depict only path
 exports[`Documentation helpers > depictRequestParams() > should depict query and path params 1`] = `
 [
   {
-    "description": "GET /v1/user/:id parameter",
+    "description": "GET /v1/user/:id Parameter",
+    "examples": undefined,
     "in": "path",
     "name": "id",
     "required": true,
@@ -743,7 +754,8 @@ exports[`Documentation helpers > depictRequestParams() > should depict query and
     },
   },
   {
-    "description": "GET /v1/user/:id parameter",
+    "description": "GET /v1/user/:id Parameter",
+    "examples": undefined,
     "in": "query",
     "name": "test",
     "required": true,
@@ -1028,28 +1040,22 @@ exports[`Documentation helpers > depictTags() > should accept plain descriptions
 ]
 `;
 
-exports[`Documentation helpers > depictTuple() > should set type:array, max- and minLength, oneOf, format:tuple and description 1`] = `
+exports[`Documentation helpers > depictTuple() > should utilize prefixItems 1`] = `
 {
-  "items": {
-    "description": "0: boolean, 1: string, 2: string",
-    "format": "tuple",
-    "oneOf": [
-      {
-        "type": "boolean",
-      },
-      {
-        "type": "string",
-      },
-      {
-        "enum": [
-          "test",
-        ],
-        "type": "string",
-      },
-    ],
-  },
-  "maxItems": 3,
-  "minItems": 3,
+  "prefixItems": [
+    {
+      "type": "boolean",
+    },
+    {
+      "type": "string",
+    },
+    {
+      "enum": [
+        "test",
+      ],
+      "type": "string",
+    },
+  ],
   "type": "array",
 }
 `;
@@ -1061,8 +1067,6 @@ exports[`Documentation helpers > depictUnion() > should wrap next depicters into
       "type": "string",
     },
     {
-      "exclusiveMaximum": false,
-      "exclusiveMinimum": false,
       "format": "double",
       "maximum": 1.7976931348623157e+308,
       "minimum": 5e-324,
@@ -1084,7 +1088,7 @@ exports[`Documentation helpers > depictUpload() > should throw when using in res
 Caused by response schema of an Endpoint assigned to GET method of /v1/user/:id path.]
 `;
 
-exports[`Documentation helpers > excludeExampleFromDepiction() > should remove example property of supplied object 1`] = `
+exports[`Documentation helpers > excludeExamplesFromDepiction() > should remove example property of supplied object 1`] = `
 {
   "description": "test",
   "type": "string",

@@ -18,7 +18,7 @@ const slogan = chalk.italic(
 const thanks = chalk.italic(
   "Thank you for choosing Express Zod API for your project.".padStart(132),
 );
-const dedicationMessage = chalk.italic("for Vika".padEnd(20));
+const dedicationMessage = chalk.italic("for Nina".padEnd(20));
 
 const colors = new Array<ChalkInstance>(12)
   .fill(chalk.blueBright, 0, 2)
