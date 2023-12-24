@@ -868,19 +868,19 @@ export const depictResponse = ({
   method,
   path,
   endpoint,
-  isPositive,
+  variant,
   serializer,
   getRef,
   makeRef,
   composition,
-  description = `${method.toUpperCase()} ${path} ${
-    isPositive ? "Successful" : "Error"
-  } response`,
+  description = `${method.toUpperCase()} ${path} ${makeCleanId(
+    variant,
+  )} response`,
 }: ReqResDepictHelperCommonProps & {
-  isPositive: boolean;
+  variant: "positive" | "negative";
 }): ResponseObject => {
-  const schema = endpoint.getSchema(isPositive ? "positive" : "negative");
-  const mimeTypes = endpoint.getMimeTypes(isPositive ? "positive" : "negative");
+  const schema = endpoint.getSchema(variant);
+  const mimeTypes = endpoint.getMimeTypes(variant);
   const depictedSchema = excludeExamplesFromDepiction(
     walkSchema({
       schema,

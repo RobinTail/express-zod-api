@@ -177,7 +177,7 @@ export class Documentation extends OpenApiBuilder {
         responses: {
           [endpoint.getStatusCode("positive")]: depictResponse({
             ...commonParams,
-            isPositive: true,
+            variant: "positive",
             description:
               typeof descriptions?.positiveResponse === "function"
                 ? descriptions.positiveResponse({ method, path, operationId })
@@ -185,7 +185,7 @@ export class Documentation extends OpenApiBuilder {
           }),
           [endpoint.getStatusCode("negative")]: depictResponse({
             ...commonParams,
-            isPositive: false,
+            variant: "negative",
             description:
               typeof descriptions?.negativeResponse === "function"
                 ? descriptions.negativeResponse({ method, path, operationId })
