@@ -37,10 +37,10 @@ import { zodToTs } from "./zts";
 import { createTypeAlias, printNode } from "./zts-helpers";
 import type Prettier from "prettier";
 
-type IOInterface = "input" | "response" | "positive" | "negative";
+type IOKind = "input" | "response" | "positive" | "negative";
 
 interface Registry {
-  [METHOD_PATH: string]: Partial<Record<IOInterface, string>> & {
+  [METHOD_PATH: string]: Partial<Record<IOKind, string>> & {
     isJson: boolean;
     tags: string[];
   };
@@ -128,7 +128,7 @@ export class Integration {
     exampleImplementationConst: f.createIdentifier("exampleImplementation"),
     clientConst: f.createIdentifier("client"),
   } satisfies Record<string, ts.Identifier>;
-  protected interfaces: { id: ts.Identifier; kind: IOInterface }[] = [];
+  protected interfaces: { id: ts.Identifier; kind: IOKind }[] = [];
 
   protected getAlias(name: string): ts.TypeReferenceNode | undefined {
     return name in this.aliases ? f.createTypeReferenceNode(name) : undefined;
