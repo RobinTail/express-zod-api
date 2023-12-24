@@ -521,7 +521,7 @@ describe("Common Helpers", () => {
     ])(
       "should generate valid identifier from method, path and suffix %#",
       ({ method, path, suffix }) => {
-        expect(makeCleanId(path, method, suffix)).toMatchSnapshot();
+        expect(makeCleanId(method, path, suffix)).toMatchSnapshot();
       },
     );
   });
