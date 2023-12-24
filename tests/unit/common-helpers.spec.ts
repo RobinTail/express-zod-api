@@ -511,17 +511,17 @@ describe("Common Helpers", () => {
 
   describe("makeCleanId()", () => {
     test.each([
-      { method: "get", path: "" },
-      { method: "post", path: "/", suffix: "something" },
-      { method: "delete", path: "/user", suffix: "permanently" },
-      { method: "patch", path: "/user/affiliated/account" },
-      { method: "put", path: "/assets/into/:storageIdentifier" },
-      { method: "get", path: "/flightDetails/:from-:to/:seatID" },
-      { method: "get", path: "/companys/:companyId/users/:userId" },
+      ["get"],
+      ["post", "/", "something"],
+      ["delete", "/user", "permanently"],
+      ["patch", "/user/affiliated/account"],
+      ["put", "/assets/into/:storageIdentifier"],
+      ["get", "/flightDetails/:from-:to/:seatID"],
+      ["get", "/companys/:companyId/users/:userId"],
     ])(
-      "should generate valid identifier from method, path and suffix %#",
-      ({ method, path, suffix }) => {
-        expect(makeCleanId(method, path, suffix)).toMatchSnapshot();
+      "should generate valid identifier from the supplied strings %#",
+      (...args) => {
+        expect(makeCleanId(...args)).toMatchSnapshot();
       },
     );
   });

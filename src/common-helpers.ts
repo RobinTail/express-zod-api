@@ -279,10 +279,8 @@ export const hasCoercion = (schema: z.ZodTypeAny): boolean =>
     ? schema._def.coerce
     : false;
 
-export const makeCleanId = (method: string, path: string, suffix?: string) => {
-  return [method] // collect the assets in the specified order
-    .concat(path.split("/"))
-    .concat(suffix || [])
+export const makeCleanId = (...args: string[]) => {
+  return args
     .flatMap((entry) => entry.split(/[^A-Z0-9]/gi)) // split by non-alphanumeric characters
     .flatMap((entry) =>
       // split by sequences of capitalized letters
