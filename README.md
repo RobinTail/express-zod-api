@@ -3,7 +3,7 @@
 ![logo](https://raw.githubusercontent.com/RobinTail/express-zod-api/master/logo.svg)
 
 ![CI](https://github.com/RobinTail/express-zod-api/actions/workflows/node.js.yml/badge.svg)
-![Swagger Validator](https://img.shields.io/swagger/valid/3.0?specUrl=https%3A%2F%2Fraw.githubusercontent.com%2FRobinTail%2Fexpress-zod-api%2Fmaster%2Fexample%2Fexample.swagger.yaml)
+![OpenAPI](https://img.shields.io/swagger/valid/3.0?specUrl=https%3A%2F%2Fraw.githubusercontent.com%2FRobinTail%2Fexpress-zod-api%2Fmaster%2Fexample%2Fexample.documentation.yaml)
 [![coverage](https://coveralls.io/repos/github/RobinTail/express-zod-api/badge.svg)](https://coveralls.io/github/RobinTail/express-zod-api)
 
 ![downloads](https://img.shields.io/npm/dw/express-zod-api.svg)
@@ -76,7 +76,7 @@ Therefore, many basic tasks can be accomplished faster and easier, in particular
 - All of your endpoints can respond in a consistent way.
 - The expected endpoint input and response types can be exported to the frontend, so you don't get confused about the
   field names when you implement the client for your API.
-- You can generate your API documentation in a Swagger / OpenAPI compatible format.
+- You can generate your API documentation in OpenAPI 3.1 and JSON Schema compatible format.
 
 # How it works
 
@@ -88,7 +88,7 @@ Therefore, many basic tasks can be accomplished faster and easier, in particular
 - Supports any logger having `info()`, `debug()`, `error()` and `warn()` methods;
   - [Winston](https://github.com/winstonjs/winston) is default.
 - Generators:
-  - Documentation — [OpenAPI 3.x](https://github.com/metadevpro/openapi3-ts) (Swagger Specification);
+  - Documentation — [OpenAPI 3.1](https://github.com/metadevpro/openapi3-ts) (former Swagger);
   - Client side types — inspired by [zod-to-ts](https://github.com/sachinraja/zod-to-ts).
 - File uploads — [Express-FileUpload](https://github.com/richardgirges/express-fileupload)
   (based on [Busboy](https://github.com/mscdex/busboy)).
@@ -892,32 +892,31 @@ const rawAcceptingEndpoint = defaultEndpointsFactory.build({
 
 ## Generating a Frontend Client
 
-There is a new way of informing the frontend about the I/O types of your endpoints starting the version 6.1.0.
-The new approach offers automatic generation of a client based on routing to a typescript file.
+You can generate a Typescript file containing the IO types of your API and a client for it.
+Consider installing `prettier` and using the async `printFormatted()` method.
+
+```typescript
+import { Integration } from "express-zod-api";
+
+const client = new Integration({
+  routing,
+  variant: "client", // <— optional, see also "types" for a DIY solution
+  optionalPropStyle: { withQuestionMark: true, withUndefined: true }, // optional
+  splitResponse: false, // optional, prints the positive and negative response types separately
+});
+
+const prettierFormattedTypescriptCode = await client.printFormatted(); // or just .print() for unformatted
+```
+
+Alternatively, you can supply your own `format` function into that method or use a regular `print()` method instead.
 The generated client is flexibly configurable on the frontend side using an implementation function that
 directly makes requests to an endpoint using the libraries and methods of your choice.
 The client asserts the type of request parameters and response.
 Consuming the generated client requires Typescript version 4.1 or higher.
 
 ```typescript
-// example client-generator.ts
-import { writeFileSync } from "node:fs";
-import { Integration } from "express-zod-api";
-
-writeFileSync(
-  "./frontend/client.ts",
-  new Integration({
-    routing,
-    variant: "client", // <— optional, see also "types" for a DIY solution
-    optionalPropStyle: { withQuestionMark: true, withUndefined: true }, // optional
-  }).print(),
-  "utf-8",
-);
-```
-
-```typescript
 // example frontend, simple implementation based on fetch()
-import { ExpressZodAPIClient } from "./client.ts";
+import { ExpressZodAPIClient } from "./client.ts"; // the generated file
 
 const client = new ExpressZodAPIClient(async (method, path, params) => {
   const hasBody = !["get", "delete"].includes(method);
@@ -948,6 +947,7 @@ const yamlString = new Documentation({
   title: "Example API",
   serverUrl: "https://example.com",
   composition: "inline", // optional, or "components" for keeping schemas in a separate dedicated section using refs
+  // descriptions: { positiveResponse, negativeResponse, requestParameter, requestBody } // check out these features
 }).getSpecAsYaml();
 ```
 
@@ -972,7 +972,7 @@ const exampleEndpoint = defaultEndpointsFactory.build({
 ```
 
 _See the example of the generated documentation
-[here](https://github.com/RobinTail/express-zod-api/blob/master/example/example.swagger.yaml)_
+[here](https://github.com/RobinTail/express-zod-api/blob/master/example/example.documentation.yaml)_
 
 ## Tagging the endpoints
 

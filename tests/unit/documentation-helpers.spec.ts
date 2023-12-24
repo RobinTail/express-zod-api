@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { ReferenceObject, SchemaObject } from "openapi3-ts/oas30";
+import { ReferenceObject, SchemaObject } from "openapi3-ts/oas31";
 import { z } from "zod";
 import { defaultSerializer } from "../../src/common-helpers";
 import { IOSchemaError } from "../../src/errors";
@@ -50,7 +50,7 @@ import {
   depictUpload,
   depicters,
   ensureShortDescription,
-  excludeExampleFromDepiction,
+  excludeExamplesFromDepiction,
   excludeParamsFromDepiction,
   extractObjectSchema,
   getRoutePathParams,
@@ -398,7 +398,7 @@ describe("Documentation helpers", () => {
 
   describe("depictNullable()", () => {
     test.each<OpenAPIContext>([requestCtx, responseCtx])(
-      "should set nullable:true %#",
+      "should add null to the type %#",
       (ctx) => {
         expect(
           depictNullable({
@@ -409,6 +409,20 @@ describe("Documentation helpers", () => {
         ).toMatchSnapshot();
       },
     );
+
+    test.each([
+      z.string().nullable(),
+      z.null().nullable(),
+      z.string().nullable().nullable(),
+    ])("should only add null type once %#", (schema) => {
+      expect(
+        depictNullable({
+          schema,
+          ...requestCtx,
+          next: makeNext(requestCtx),
+        }),
+      ).toMatchSnapshot();
+    });
   });
 
   describe("depictEnum()", () => {
@@ -485,7 +499,7 @@ describe("Documentation helpers", () => {
   });
 
   describe("depictNull()", () => {
-    test("should set type:string format:null and nullable:true props", () => {
+    test("should give type:null", () => {
       expect(
         depictNull({
           schema: z.null(),
@@ -555,7 +569,7 @@ describe("Documentation helpers", () => {
   });
 
   describe("depictTuple()", () => {
-    test("should set type:array, max- and minLength, oneOf, format:tuple and description", () => {
+    test("should utilize prefixItems", () => {
       expect(
         depictTuple({
           schema: z.tuple([z.boolean(), z.string(), z.literal("test")]),
@@ -834,13 +848,13 @@ describe("Documentation helpers", () => {
     });
   });
 
-  describe("excludeExampleFromDepiction()", () => {
+  describe("excludeExamplesFromDepiction()", () => {
     test("should remove example property of supplied object", () => {
       expect(
-        excludeExampleFromDepiction({
+        excludeExamplesFromDepiction({
           type: "string",
           description: "test",
-          example: "test",
+          examples: ["test"],
         }),
       ).toMatchSnapshot();
     });

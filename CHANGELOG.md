@@ -1,5 +1,54 @@
 # Changelog
 
+## Version 16
+
+### 16.0.0
+
+- Potentially breaking changes:
+  - Some methods and properties of the `Documentation` class (which extends the OpenAPI builder) might be changed.
+  - Options `successfulResponseDescription` and `errorResponseDescription` of `Documentation` constructor are renamed.
+- Features:
+  - Switching to [OpenAPI 3.1](https://swagger.io/specification/) for generating better Documentation for your API.
+    - Consider [the new UI](https://editor-next.swagger.io/) for exploring the produced documentation.
+  - Improved way of configuring descriptions and naming of the generated documentation components:
+    - Intoroducing the new option `descriptions` holding several formatting functions.
+  - Ability to generate formatted typescript client using the new async method `printFormatted` of the `Integration`
+    class when the `prettier` package is installed (detects automatically).
+    - Ability to supply your own typescript formatting function into that new method.
+  - Ability to split the response types (to positive and negative ones) when generating the client or API types.
+    - Featuring the `splitResponse` option of the `Integration` class constructor.
+- How to migrate:
+  - If you are using `successfulResponseDescription` option of `Documentation` constructor:
+    - Replace it with `descriptions/positiveResponse` assigned with the string returning function;
+  - If you are using `errorResponseDescription` option of `Documentation` constructor:
+    - Replace it with `descriptions/negativeResponse` assigned with the string returning function;
+  - If you do not modify the generated documentation and only using its `getSpecAsYaml` or `getSpecAsJson` methods:
+    - No further action required.
+  - If you're using any properties or other methods of the `Documentation` class:
+    - Please refer to the [specification](https://swagger.io/specification/) and the
+      [OpenAPI migration guide](https://www.openapis.org/blog/2021/02/16/migrating-from-openapi-3-0-to-3-1-0) in order
+      to adjust your implementation accordingly.
+
+```ts
+import { Documentation, Integration } from "express-zod-api";
+
+// featuring new way of configuring component descriptions and naming:
+new Documentation({
+  positiveResponse: ({ method, path }) =>
+    `${method} ${path} successful response`, // replaces successfulResponseDescription
+  negativeResponse: ({ method, path }) => `${method} ${path} error response`, // replaces errorResponseDescription
+  requestBody: ({ operationId }) => `${operationId} request body`, // featuring
+  requestParameter: () => "Parameter", // featuring
+});
+
+// regular unformatted integration remains:
+new Integration(/*...*/).print();
+// featuring the formatted one, detects prettier automatically:
+await new Integration(/*...*/).printFormatted();
+// featuring, splitted response types:
+new Integration({ splitResponse: true });
+```
+
 ## Version 15
 
 ### 15.3.0

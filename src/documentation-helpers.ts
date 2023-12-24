@@ -3,7 +3,7 @@ import {
   ContentObject,
   ExampleObject,
   ExamplesObject,
-  MediaTypeObject,
+  OAuthFlowObject,
   OAuthFlowsObject,
   ParameterObject,
   ReferenceObject,
@@ -15,8 +15,7 @@ import {
   SecuritySchemeObject,
   TagObject,
   isReferenceObject,
-  isSchemaObject,
-} from "openapi3-ts/oas30";
+} from "openapi3-ts/oas31";
 import { omit } from "ramda";
 import { z } from "zod";
 import {
@@ -28,6 +27,7 @@ import {
   isCustomHeader,
   makeCleanId,
   tryToTransform,
+  ucFirst,
 } from "./common-helpers";
 import { InputSource, TagsConfig } from "./config-type";
 import { ZodDateIn, isoDateRegex } from "./date-in-schema";
@@ -54,8 +54,6 @@ import { ZodUpload } from "./upload-schema";
 
 /* eslint-disable @typescript-eslint/no-use-before-define */
 
-type MediaExamples = Pick<MediaTypeObject, "examples">;
-
 export interface OpenAPIContext extends FlatObject {
   isResponse: boolean;
   serializer: (schema: z.ZodTypeAny) => string;
@@ -80,7 +78,7 @@ interface ReqResDepictHelperCommonProps
   > {
   endpoint: AbstractEndpoint;
   composition: "inline" | "components";
-  clue?: string;
+  description?: string;
 }
 
 const shortDescriptionLimit = 50;
@@ -95,7 +93,7 @@ const samples = {
   object: {},
   null: null,
   array: [],
-} satisfies Record<NonNullable<SchemaObjectType>, unknown>;
+} satisfies Record<Extract<SchemaObjectType, string>, unknown>;
 
 /** @see https://expressjs.com/en/guide/routing.html */
 const routePathParamsRegex = /:([A-Za-z0-9_]+)/g;
@@ -192,13 +190,17 @@ export const depictReadonly: Depicter<z.ZodReadonly<z.ZodTypeAny>> = ({
   next,
 }) => next({ schema: schema._def.innerType });
 
+/** @since OAS 3.1 nullable replaced with type array having null */
 export const depictNullable: Depicter<z.ZodNullable<z.ZodTypeAny>> = ({
   schema,
   next,
-}) => ({
-  nullable: true,
-  ...next({ schema: schema.unwrap() }),
-});
+}) => {
+  const nested = next({ schema: schema.unwrap() });
+  if (!isReferenceObject(nested)) {
+    nested.type = makeNullableType(nested);
+  }
+  return nested;
+};
 
 export const depictEnum: Depicter<
   z.ZodEnum<[string, ...string[]]> | z.ZodNativeEnum<any> // keeping "any" for ZodNativeEnum as compatibility fix
@@ -227,22 +229,21 @@ export const depictObject: Depicter<z.AnyZodObject> = ({
         : prop.isOptional();
     return !isOptional;
   });
-  return {
+  const result: SchemaObject = {
     type: "object",
     properties: depictObjectProperties({ schema, isResponse, ...rest }),
-    ...(required.length ? { required } : {}),
   };
+  if (required.length) {
+    result.required = required;
+  }
+  return result;
 };
 
 /**
  * @see https://swagger.io/docs/specification/data-models/data-types/
- * @todo use type:"null" for OpenAPI 3.1
+ * @since OAS 3.1: using type: "null"
  * */
-export const depictNull: Depicter<z.ZodNull> = () => ({
-  type: "string",
-  nullable: true,
-  format: "null",
-});
+export const depictNull: Depicter<z.ZodNull> = () => ({ type: "null" });
 
 export const depictDateIn: Depicter<ZodDateIn> = (ctx) => {
   assert(
@@ -317,21 +318,24 @@ export const depictRecord: Depicter<z.ZodRecord<z.ZodTypeAny>> = ({
 }) => {
   if (keySchema instanceof z.ZodEnum || keySchema instanceof z.ZodNativeEnum) {
     const keys = Object.values(keySchema.enum) as string[];
-    const shape = keys.reduce(
+    const shape = keys.reduce<z.ZodRawShape>(
       (carry, key) => ({
         ...carry,
         [key]: valueSchema,
       }),
-      {} as z.ZodRawShape,
+      {},
     );
-    return {
+    const result: SchemaObject = {
       type: "object",
       properties: depictObjectProperties({
         schema: z.object(shape),
         ...rest,
       }),
-      ...(keys.length ? { required: keys } : {}),
     };
+    if (keys.length) {
+      result.required = keys;
+    }
+    return result;
   }
   if (keySchema instanceof z.ZodLiteral) {
     return {
@@ -373,14 +377,21 @@ export const depictRecord: Depicter<z.ZodRecord<z.ZodTypeAny>> = ({
 export const depictArray: Depicter<z.ZodArray<z.ZodTypeAny>> = ({
   schema: { _def: def, element },
   next,
-}) => ({
-  type: "array",
-  items: next({ schema: element }),
-  ...(def.minLength !== null && { minItems: def.minLength.value }),
-  ...(def.maxLength !== null && { maxItems: def.maxLength.value }),
-});
+}) => {
+  const result: SchemaObject = {
+    type: "array",
+    items: next({ schema: element }),
+  };
+  if (def.minLength) {
+    result.minItems = def.minLength.value;
+  }
+  if (def.maxLength) {
+    result.maxItems = def.maxLength.value;
+  }
+  return result;
+};
 
-/** @todo improve it when OpenAPI 3.1.0 will be released */
+/** @since OAS 3.1 using prefixItems for depicting tuples */
 export const depictTuple: Depicter<z.ZodTuple> = ({
   schema: { items },
   next,
@@ -388,20 +399,7 @@ export const depictTuple: Depicter<z.ZodTuple> = ({
   const types = items.map((item) => next({ schema: item }));
   return {
     type: "array",
-    minItems: types.length,
-    maxItems: types.length,
-    items: {
-      oneOf: types,
-      format: "tuple",
-      ...(types.length > 0 && {
-        description: types
-          .map(
-            (item, index) =>
-              `${index}: ${isSchemaObject(item) ? item.type : item.$ref}`,
-          )
-          .join(", "),
-      }),
-    },
+    prefixItems: types,
   };
 };
 
@@ -438,71 +436,100 @@ export const depictString: Depicter<z.ZodString> = ({
           )
         : new RegExp(`^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?Z$`)
       : undefined;
-  return {
-    type: "string" as const,
-    ...(isDatetime && { format: "date-time" }),
-    ...(isEmail && { format: "email" }),
-    ...(isURL && { format: "url" }),
-    ...(isUUID && { format: "uuid" }),
-    ...(isCUID && { format: "cuid" }),
-    ...(isCUID2 && { format: "cuid2" }),
-    ...(isULID && { format: "ulid" }),
-    ...(isIP && { format: "ip" }),
-    ...(isEmoji && { format: "emoji" }),
-    ...(minLength !== null && { minLength }),
-    ...(maxLength !== null && { maxLength }),
-    ...(regex && { pattern: `/${regex.source}/${regex.flags}` }),
+  const result: SchemaObject = { type: "string" };
+  const formats: Record<NonNullable<SchemaObject["format"]>, boolean> = {
+    "date-time": isDatetime,
+    email: isEmail,
+    url: isURL,
+    uuid: isUUID,
+    cuid: isCUID,
+    cuid2: isCUID2,
+    ulid: isULID,
+    ip: isIP,
+    emoji: isEmoji,
   };
+  for (const format in formats) {
+    if (formats[format]) {
+      result.format = format;
+      break;
+    }
+  }
+  if (minLength !== null) {
+    result.minLength = minLength;
+  }
+  if (maxLength !== null) {
+    result.maxLength = maxLength;
+  }
+  if (regex) {
+    result.pattern = `/${regex.source}/${regex.flags}`;
+  }
+  return result;
 };
 
-/** @todo support exclusive min/max as numbers in case of OpenAPI v3.1.x */
+/** @since OAS 3.1: exclusive min/max are numbers */
 export const depictNumber: Depicter<z.ZodNumber> = ({ schema }) => {
   const minCheck = schema._def.checks.find(({ kind }) => kind === "min") as
     | Extract<z.ZodNumberCheck, { kind: "min" }>
     | undefined;
+  const minimum =
+    schema.minValue === null
+      ? schema.isInt
+        ? Number.MIN_SAFE_INTEGER
+        : Number.MIN_VALUE
+      : schema.minValue;
   const isMinInclusive = minCheck ? minCheck.inclusive : true;
   const maxCheck = schema._def.checks.find(({ kind }) => kind === "max") as
     | Extract<z.ZodNumberCheck, { kind: "max" }>
     | undefined;
+  const maximum =
+    schema.maxValue === null
+      ? schema.isInt
+        ? Number.MAX_SAFE_INTEGER
+        : Number.MAX_VALUE
+      : schema.maxValue;
   const isMaxInclusive = maxCheck ? maxCheck.inclusive : true;
-  return {
-    type: schema.isInt ? ("integer" as const) : ("number" as const),
-    format: schema.isInt ? ("int64" as const) : ("double" as const),
-    minimum:
-      schema.minValue === null
-        ? schema.isInt
-          ? Number.MIN_SAFE_INTEGER
-          : Number.MIN_VALUE
-        : schema.minValue,
-    exclusiveMinimum: !isMinInclusive,
-    maximum:
-      schema.maxValue === null
-        ? schema.isInt
-          ? Number.MAX_SAFE_INTEGER
-          : Number.MAX_VALUE
-        : schema.maxValue,
-    exclusiveMaximum: !isMaxInclusive,
+  const result: SchemaObject = {
+    type: schema.isInt ? "integer" : "number",
+    format: schema.isInt ? "int64" : "double",
   };
+  if (isMinInclusive) {
+    result.minimum = minimum;
+  } else {
+    result.exclusiveMinimum = minimum;
+  }
+  if (isMaxInclusive) {
+    result.maximum = maximum;
+  } else {
+    result.exclusiveMaximum = maximum;
+  }
+  return result;
 };
 
 export const depictObjectProperties = ({
   schema: { shape },
   next,
-}: Parameters<Depicter<z.AnyZodObject>>[0]) => {
-  return Object.keys(shape).reduce(
+}: Parameters<Depicter<z.AnyZodObject>>[0]) =>
+  Object.keys(shape).reduce<Record<string, SchemaObject | ReferenceObject>>(
     (carry, key) => ({
       ...carry,
       [key]: next({ schema: shape[key] }),
     }),
-    {} as Record<string, SchemaObject | ReferenceObject>,
+    {},
   );
-};
 
 const makeSample = (depicted: SchemaObject) => {
   const type = (
     Array.isArray(depicted.type) ? depicted.type[0] : depicted.type
   ) as keyof typeof samples;
   return samples?.[type];
+};
+
+const makeNullableType = (prev: SchemaObject): SchemaObjectType[] => {
+  const current = typeof prev.type === "string" ? [prev.type] : prev.type || [];
+  if (current.includes("null")) {
+    return current;
+  }
+  return current.concat("null");
 };
 
 export const depictEffect: Depicter<z.ZodEffects<z.ZodTypeAny>> = ({
@@ -512,7 +539,7 @@ export const depictEffect: Depicter<z.ZodEffects<z.ZodTypeAny>> = ({
 }) => {
   const input = next({ schema: schema.innerType() });
   const { effect } = schema._def;
-  if (isResponse && effect.type === "transform" && isSchemaObject(input)) {
+  if (isResponse && effect.type === "transform" && !isReferenceObject(input)) {
     const outputType = tryToTransform({ effect, sample: makeSample(input) });
     if (outputType && ["number", "string", "boolean"].includes(outputType)) {
       return { type: outputType as "number" | "string" | "boolean" };
@@ -520,7 +547,11 @@ export const depictEffect: Depicter<z.ZodEffects<z.ZodTypeAny>> = ({
       return next({ schema: z.any() });
     }
   }
-  if (!isResponse && effect.type === "preprocess" && isSchemaObject(input)) {
+  if (
+    !isResponse &&
+    effect.type === "preprocess" &&
+    !isReferenceObject(input)
+  ) {
     const { type: inputType, ...rest } = input;
     return {
       ...rest,
@@ -560,58 +591,54 @@ export const depictExamples = (
   schema: z.ZodTypeAny,
   isResponse: boolean,
   omitProps: string[] = [],
-): MediaExamples => {
+): ExamplesObject | undefined => {
   const examples = getExamples({
     schema,
     variant: isResponse ? "parsed" : "original",
     validate: true,
   });
   if (examples.length === 0) {
-    return {};
+    return undefined;
   }
-  return {
-    examples: examples.reduce<ExamplesObject>(
-      (carry, example, index) => ({
-        ...carry,
-        [`example${index + 1}`]: <ExampleObject>{
-          value:
-            typeof example === "object" && !Array.isArray(example)
-              ? omit(omitProps, example)
-              : example,
-        },
-      }),
-      {},
-    ),
-  };
+  return examples.reduce<ExamplesObject>(
+    (carry, example, index) => ({
+      ...carry,
+      [`example${index + 1}`]: {
+        value:
+          typeof example === "object" && !Array.isArray(example)
+            ? omit(omitProps, example)
+            : example,
+      } satisfies ExampleObject,
+    }),
+    {},
+  );
 };
 
 export const depictParamExamples = (
   schema: z.ZodTypeAny,
   isResponse: boolean,
   param: string,
-): MediaExamples => {
+): ExamplesObject | undefined => {
   const examples = getExamples({
     schema,
     variant: isResponse ? "parsed" : "original",
     validate: true,
   });
   if (examples.length === 0) {
-    return {};
+    return undefined;
   }
-  return {
-    examples: examples.reduce<ExamplesObject>(
-      (carry, example, index) =>
-        param in example
-          ? {
-              ...carry,
-              [`example${index + 1}`]: <ExampleObject>{
-                value: example[param],
-              },
-            }
-          : carry,
-      {},
-    ),
-  };
+  return examples.reduce<ExamplesObject>(
+    (carry, example, index) =>
+      param in example
+        ? {
+            ...carry,
+            [`example${index + 1}`]: {
+              value: example[param],
+            } satisfies ExampleObject,
+          }
+        : carry,
+    {},
+  );
 };
 
 export const extractObjectSchema = (
@@ -658,7 +685,7 @@ export const depictRequestParams = ({
   getRef,
   makeRef,
   composition,
-  clue = "parameter",
+  description = `${method.toUpperCase()} ${path} Parameter`,
 }: ReqResDepictHelperCommonProps & {
   inputSources: InputSource[];
 }): ParameterObject[] => {
@@ -693,7 +720,7 @@ export const depictRequestParams = ({
       });
       const result =
         composition === "components"
-          ? makeRef(makeCleanId(path, method, `${clue} ${name}`), depicted)
+          ? makeRef(makeCleanId(description, name), depicted)
           : depicted;
       return {
         name,
@@ -703,11 +730,9 @@ export const depictRequestParams = ({
             ? "header"
             : "query",
         required: !shape[name].isOptional(),
-        description:
-          (isSchemaObject(depicted) && depicted.description) ||
-          `${method.toUpperCase()} ${path} ${clue}`,
+        description: depicted.description || description,
         schema: result,
-        ...depictParamExamples(schema, false, name),
+        examples: depictParamExamples(schema, false, name),
       };
     });
 };
@@ -772,11 +797,17 @@ export const onEach: Depicter<z.ZodTypeAny, "each"> = ({
         variant: isResponse ? "parsed" : "original",
         validate: true,
       });
-  return {
-    ...(description && { description }),
-    ...(isActuallyNullable && { nullable: true }),
-    ...(examples.length > 0 && { example: examples[0] }),
-  };
+  const result: SchemaObject = {};
+  if (description) {
+    result.description = description;
+  }
+  if (isActuallyNullable) {
+    result.type = makeNullableType(prev);
+  }
+  if (examples.length) {
+    result.examples = Array.from(examples);
+  }
+  return result;
 };
 
 export const onMissing: Depicter<z.ZodTypeAny, "last"> = ({ schema, ...ctx }) =>
@@ -797,8 +828,8 @@ export const excludeParamsFromDepiction = (
   const properties = depicted.properties
     ? omit(pathParams, depicted.properties)
     : undefined;
-  const example = depicted.example
-    ? omit(pathParams, depicted.example)
+  const examples = depicted.examples
+    ? depicted.examples.map((entry) => omit(pathParams, entry))
     : undefined;
   const required = depicted.required
     ? depicted.required.filter((name) => !pathParams.includes(name))
@@ -815,41 +846,41 @@ export const excludeParamsFromDepiction = (
     : undefined;
 
   return omit(
-    Object.entries({ properties, required, example, allOf, oneOf })
+    Object.entries({ properties, required, examples, allOf, oneOf })
       .filter(([{}, value]) => value === undefined)
       .map(([key]) => key),
     {
       ...depicted,
       properties,
       required,
-      example,
+      examples,
       allOf,
       oneOf,
     },
   );
 };
 
-export const excludeExampleFromDepiction = (
+export const excludeExamplesFromDepiction = (
   depicted: SchemaObject | ReferenceObject,
 ): SchemaObject | ReferenceObject =>
-  isSchemaObject(depicted) ? omit(["example"], depicted) : depicted;
+  isReferenceObject(depicted) ? depicted : omit(["examples"], depicted);
 
 export const depictResponse = ({
   method,
   path,
   endpoint,
-  isPositive,
+  variant,
   serializer,
   getRef,
   makeRef,
   composition,
-  clue = "response",
+  description = `${method.toUpperCase()} ${path} ${ucFirst(variant)} response`,
 }: ReqResDepictHelperCommonProps & {
-  isPositive: boolean;
+  variant: "positive" | "negative";
 }): ResponseObject => {
-  const schema = endpoint.getSchema(isPositive ? "positive" : "negative");
-  const mimeTypes = endpoint.getMimeTypes(isPositive ? "positive" : "negative");
-  const depictedSchema = excludeExampleFromDepiction(
+  const schema = endpoint.getSchema(variant);
+  const mimeTypes = endpoint.getMimeTypes(variant);
+  const depictedSchema = excludeExamplesFromDepiction(
     walkSchema({
       schema,
       isResponse: true,
@@ -866,17 +897,17 @@ export const depictResponse = ({
   const examples = depictExamples(schema, true);
   const result =
     composition === "components"
-      ? makeRef(makeCleanId(path, method, clue), depictedSchema)
+      ? makeRef(makeCleanId(description), depictedSchema)
       : depictedSchema;
 
   return {
-    description: `${method.toUpperCase()} ${path} ${clue}`,
-    content: mimeTypes.reduce(
+    description,
+    content: mimeTypes.reduce<ContentObject>(
       (carry, mimeType) => ({
         ...carry,
-        [mimeType]: { schema: result, ...examples },
+        [mimeType]: { schema: result, examples },
       }),
-      {} as ContentObject,
+      {},
     ),
   };
 };
@@ -891,11 +922,16 @@ const depictBasicSecurity: SecurityHelper<"basic"> = () => ({
 });
 const depictBearerSecurity: SecurityHelper<"bearer"> = ({
   format: bearerFormat,
-}) => ({
-  type: "http",
-  scheme: "bearer",
-  ...(bearerFormat && { bearerFormat }),
-});
+}) => {
+  const result: SecuritySchemeObject = {
+    type: "http",
+    scheme: "bearer",
+  };
+  if (bearerFormat) {
+    result.bearerFormat = bearerFormat;
+  }
+  return result;
+};
 // @todo add description on actual input placement
 const depictInputSecurity: SecurityHelper<"input"> = ({ name }) => ({
   type: "apiKey",
@@ -928,7 +964,7 @@ const depictOAuth2Security: SecurityHelper<"oauth2"> = ({ flows = {} }) => ({
       return acc;
     }
     const { scopes = {}, ...rest } = flow;
-    return { ...acc, [key]: { ...rest, scopes } };
+    return { ...acc, [key]: { ...rest, scopes } satisfies OAuthFlowObject };
   }, {}),
 });
 
@@ -982,11 +1018,11 @@ export const depictRequest = ({
   getRef,
   makeRef,
   composition,
-  clue = "request body",
+  description = `${method.toUpperCase()} ${path} Request body`,
 }: ReqResDepictHelperCommonProps): RequestBodyObject => {
   const pathParams = getRoutePathParams(path);
   const inputSchema = endpoint.getSchema("input");
-  const bodyDepiction = excludeExampleFromDepiction(
+  const bodyDepiction = excludeExamplesFromDepiction(
     excludeParamsFromDepiction(
       walkSchema({
         schema: hasRaw(inputSchema) ? ZodFile.create().buffer() : inputSchema,
@@ -1010,17 +1046,17 @@ export const depictRequest = ({
   );
   const result =
     composition === "components"
-      ? makeRef(makeCleanId(path, method, clue), bodyDepiction)
+      ? makeRef(makeCleanId(description), bodyDepiction)
       : bodyDepiction;
 
   return {
-    description: `${method.toUpperCase()} ${path} ${clue}`,
-    content: endpoint.getMimeTypes("input").reduce(
+    description,
+    content: endpoint.getMimeTypes("input").reduce<ContentObject>(
       (carry, mimeType) => ({
         ...carry,
-        [mimeType]: { schema: result, ...bodyExamples },
+        [mimeType]: { schema: result, examples: bodyExamples },
       }),
-      {} as ContentObject,
+      {},
     ),
   };
 };
@@ -1030,12 +1066,14 @@ export const depictTags = <TAG extends string>(
 ): TagObject[] =>
   (Object.keys(tags) as TAG[]).map((tag) => {
     const def = tags[tag];
-    return {
+    const result: TagObject = {
       name: tag,
       description: typeof def === "string" ? def : def.description,
-      ...(typeof def === "object" &&
-        def.url && { externalDocs: { url: def.url } }),
     };
+    if (typeof def === "object" && def.url) {
+      result.externalDocs = { url: def.url };
+    }
+    return result;
   });
 
 export const ensureShortDescription = (description: string) => {

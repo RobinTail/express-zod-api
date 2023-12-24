@@ -553,45 +553,43 @@ describe("Documentation", () => {
       expect(spec).toMatchSnapshot();
     });
 
-    test("should throw on unsupported types", () => {
-      [
-        z.undefined(),
-        z.map(z.any(), z.any()),
-        z.function(),
-        z.promise(z.any()),
-        z.unknown(),
-        z.never(),
-        z.void(),
-      ].forEach((zodType) => {
-        expect(
-          () =>
-            new Documentation({
-              config: sampleConfig,
-              routing: {
-                v1: {
-                  getSomething: defaultEndpointsFactory.build({
-                    method: "post",
-                    input: z.object({
-                      property: zodType,
-                    }),
-                    output: z.object({}),
-                    handler: async () => ({}),
+    test.each([
+      z.undefined(),
+      z.map(z.any(), z.any()),
+      z.function(),
+      z.promise(z.any()),
+      z.unknown(),
+      z.never(),
+      z.void(),
+    ])("should throw on unsupported types", (zodType) => {
+      expect(
+        () =>
+          new Documentation({
+            config: sampleConfig,
+            routing: {
+              v1: {
+                getSomething: defaultEndpointsFactory.build({
+                  method: "post",
+                  input: z.object({
+                    property: zodType,
                   }),
-                },
+                  output: z.object({}),
+                  handler: async () => ({}),
+                }),
               },
-              version: "3.4.5",
-              title: "Testing unsupported types",
-              serverUrl: "https://example.com",
-            }),
-        ).toThrow(
-          new DocumentationError({
-            method: "post",
-            path: "/v1/getSomething",
-            isResponse: false,
-            message: `Zod type ${zodType._def.typeName} is unsupported.`,
+            },
+            version: "3.4.5",
+            title: "Testing unsupported types",
+            serverUrl: "https://example.com",
           }),
-        );
-      });
+      ).toThrow(
+        new DocumentationError({
+          method: "post",
+          path: "/v1/getSomething",
+          isResponse: false,
+          message: `Zod type ${zodType._def.typeName} is unsupported.`,
+        }),
+      );
     });
 
     test("should ensure uniq security schema names", () => {
@@ -717,7 +715,6 @@ describe("Documentation", () => {
         title: "Testing Operation IDs",
         serverUrl: "https://example.com",
       }).getSpecAsYaml();
-
       expect(spec).toContain(operationId);
       expect(spec).toMatchSnapshot();
     });
@@ -744,7 +741,6 @@ describe("Documentation", () => {
         title: "Testing Operation IDs",
         serverUrl: "https://example.com",
       }).getSpecAsYaml();
-
       expect(spec).toContain(operationId);
       expect(spec).toMatchSnapshot();
     });
@@ -757,38 +753,39 @@ describe("Documentation", () => {
         method: "get",
         path: "/v1/getSomeTwo/thing",
       });
-      expect(() => {
-        new Documentation({
-          config: sampleConfig,
-          routing: {
-            v1: {
-              getSome: {
-                thing: defaultEndpointsFactory.build({
-                  description: "thing is the path segment",
-                  method: "get",
-                  operationId,
-                  input: z.object({}),
-                  output: z.object({}),
-                  handler: async () => ({}),
-                }),
-              },
-              getSomeTwo: {
-                thing: defaultEndpointsFactory.build({
-                  description: "thing is the path segment",
-                  method: "get",
-                  operationId,
-                  input: z.object({}),
-                  output: z.object({}),
-                  handler: async () => ({}),
-                }),
+      expect(
+        () =>
+          new Documentation({
+            config: sampleConfig,
+            routing: {
+              v1: {
+                getSome: {
+                  thing: defaultEndpointsFactory.build({
+                    description: "thing is the path segment",
+                    method: "get",
+                    operationId,
+                    input: z.object({}),
+                    output: z.object({}),
+                    handler: async () => ({}),
+                  }),
+                },
+                getSomeTwo: {
+                  thing: defaultEndpointsFactory.build({
+                    description: "thing is the path segment",
+                    method: "get",
+                    operationId,
+                    input: z.object({}),
+                    output: z.object({}),
+                    handler: async () => ({}),
+                  }),
+                },
               },
             },
-          },
-          version: "3.4.5",
-          title: "Testing Operation IDs",
-          serverUrl: "https://example.com",
-        }).getSpecAsYaml();
-      }).toThrow(expectedError);
+            version: "3.4.5",
+            title: "Testing Operation IDs",
+            serverUrl: "https://example.com",
+          }),
+      ).toThrow(expectedError);
     });
 
     test("should handle custom mime types and status codes", () => {
@@ -920,6 +917,42 @@ describe("Documentation", () => {
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
     });
+
+    test.each(["inline", "components"] as const)(
+      "should handle custom descriptions and descriptors %#",
+      (composition) => {
+        const spec = new Documentation({
+          composition,
+          config: sampleConfig,
+          descriptions: {
+            requestBody: () => "the body of request",
+            requestParameter: ({ method, path }) =>
+              `parameter of ${method} ${path}`,
+            negativeResponse: ({ operationId }) =>
+              `very negative response of ${operationId}`,
+            positiveResponse: ({ path }) =>
+              `Super positive response of ${path}`,
+          },
+          routing: {
+            v1: {
+              ":name": defaultEndpointsFactory.build({
+                method: "post",
+                input: z.object({
+                  name: z.literal("John").or(z.literal("Jane")),
+                  other: z.boolean(),
+                }),
+                output: z.object({}),
+                handler: vi.fn(),
+              }),
+            },
+          },
+          version: "3.4.5",
+          title: "Testing route path params",
+          serverUrl: "https://example.com",
+        }).getSpecAsYaml();
+        expect(spec).toMatchSnapshot();
+      },
+    );
 
     test("should handle route path params for GET request", () => {
       const spec = new Documentation({
