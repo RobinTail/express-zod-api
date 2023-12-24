@@ -156,14 +156,14 @@ export class Integration {
           optionalPropStyle,
         };
         const inputSchema = endpoint.getSchema("input");
-        const inputId = makeCleanId(path, method, "input");
+        const inputId = makeCleanId(method, path, "input");
         const input = zodToTs({
           ...commons,
           schema: hasRaw(inputSchema) ? ZodFile.create().buffer() : inputSchema,
           isResponse: false,
         });
         const positiveResponseId = splitResponse
-          ? makeCleanId(path, method, "positive.response")
+          ? makeCleanId(method, path, "positive.response")
           : undefined;
         const positiveSchema = endpoint.getSchema("positive");
         const positiveResponse = splitResponse
@@ -174,7 +174,7 @@ export class Integration {
             })
           : undefined;
         const negativeResponseId = splitResponse
-          ? makeCleanId(path, method, "negative.response")
+          ? makeCleanId(method, path, "negative.response")
           : undefined;
         const negativeSchema = endpoint.getSchema("negative");
         const negativeResponse = splitResponse
@@ -184,7 +184,7 @@ export class Integration {
               schema: negativeSchema,
             })
           : undefined;
-        const genericResponseId = makeCleanId(path, method, "response");
+        const genericResponseId = makeCleanId(method, path, "response");
         const genericResponse =
           positiveResponseId && negativeResponseId
             ? f.createUnionTypeNode([
