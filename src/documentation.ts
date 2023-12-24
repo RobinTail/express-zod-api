@@ -42,12 +42,7 @@ interface DocumentationParams {
   serverUrl: string | [string, ...string[]];
   routing: Routing;
   config: CommonConfig;
-  descriptions?: Partial<
-    Record<
-      Component,
-      string | ((method: string, path: string, subject?: string) => string)
-    >
-  >;
+  descriptions?: Partial<Record<Component, string>>;
   /** @default true */
   hasSummaryFromDescription?: boolean;
   /** @default inline */

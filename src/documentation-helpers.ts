@@ -77,9 +77,7 @@ interface ReqResDepictHelperCommonProps
   > {
   endpoint: AbstractEndpoint;
   composition: "inline" | "components";
-  description?:
-    | string
-    | ((method: string, path: string, subject?: string) => string);
+  description?: string;
 }
 
 const shortDescriptionLimit = 50;
@@ -722,9 +720,7 @@ export const depictRequestParams = ({
       const result =
         composition === "components"
           ? makeRef(
-              typeof description === "function"
-                ? makeCleanId(description(method, path, name))
-                : makeCleanId(method, path, `${description} ${name}`),
+              makeCleanId(method, path, `${description} ${name}`),
               depicted,
             )
           : depicted;
@@ -738,9 +734,7 @@ export const depictRequestParams = ({
         required: !shape[name].isOptional(),
         description:
           (!isReferenceObject(depicted) && depicted.description) ||
-          (typeof description === "function"
-            ? description(method, path, name)
-            : `${method.toUpperCase()} ${path} ${description}`),
+          `${method.toUpperCase()} ${path} ${description}`,
         schema: result,
         examples: depictParamExamples(schema, false, name),
       };
@@ -907,19 +901,11 @@ export const depictResponse = ({
   const examples = depictExamples(schema, true);
   const result =
     composition === "components"
-      ? makeRef(
-          typeof description === "function"
-            ? makeCleanId(description(method, path))
-            : makeCleanId(method, path, description),
-          depictedSchema,
-        )
+      ? makeRef(makeCleanId(method, path, description), depictedSchema)
       : depictedSchema;
 
   return {
-    description:
-      typeof description === "function"
-        ? description(method, path)
-        : `${method.toUpperCase()} ${path} ${description}`,
+    description: `${method.toUpperCase()} ${path} ${description}`,
     content: mimeTypes.reduce<ContentObject>(
       (carry, mimeType) => ({
         ...carry,
@@ -1064,19 +1050,11 @@ export const depictRequest = ({
   );
   const result =
     composition === "components"
-      ? makeRef(
-          typeof description === "function"
-            ? makeCleanId(description(method, path))
-            : makeCleanId(method, path, description),
-          bodyDepiction,
-        )
+      ? makeRef(makeCleanId(method, path, description), bodyDepiction)
       : bodyDepiction;
 
   return {
-    description:
-      typeof description === "function"
-        ? description(method, path)
-        : `${method.toUpperCase()} ${path} ${description}`,
+    description: `${method.toUpperCase()} ${path} ${description}`,
     content: endpoint.getMimeTypes("input").reduce<ContentObject>(
       (carry, mimeType) => ({
         ...carry,
