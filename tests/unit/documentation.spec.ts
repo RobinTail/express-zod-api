@@ -918,6 +918,42 @@ describe("Documentation", () => {
       expect(spec).toMatchSnapshot();
     });
 
+    test.each(["inline", "components"] as const)(
+      "should handle custom descriptions and descriptors %#",
+      (composition) => {
+        const spec = new Documentation({
+          composition,
+          config: sampleConfig,
+          descriptions: {
+            requestBody: () => "the body of request",
+            requestParameter: ({ method, path }) =>
+              `parameter of ${method} ${path}`,
+            negativeResponse: ({ operationId }) =>
+              `very negative response of ${operationId}`,
+            positiveResponse: ({ path }) =>
+              `Super positive response of ${path}`,
+          },
+          routing: {
+            v1: {
+              ":name": defaultEndpointsFactory.build({
+                method: "post",
+                input: z.object({
+                  name: z.literal("John").or(z.literal("Jane")),
+                  other: z.boolean(),
+                }),
+                output: z.object({}),
+                handler: vi.fn(),
+              }),
+            },
+          },
+          version: "3.4.5",
+          title: "Testing route path params",
+          serverUrl: "https://example.com",
+        }).getSpecAsYaml();
+        expect(spec).toMatchSnapshot();
+      },
+    );
+
     test("should handle route path params for GET request", () => {
       const spec = new Documentation({
         config: sampleConfig,

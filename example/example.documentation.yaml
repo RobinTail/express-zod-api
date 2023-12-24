@@ -8,7 +8,7 @@ paths:
       operationId: GetV1UserRetrieve
       responses:
         "200":
-          description: GET /v1/user/retrieve Successful response
+          description: GET /v1/user/retrieve Positive response
           content:
             application/json:
               schema:
@@ -48,7 +48,7 @@ paths:
                   - status
                   - data
         "400":
-          description: GET /v1/user/retrieve Error response
+          description: GET /v1/user/retrieve Negative response
           content:
             application/json:
               schema:
@@ -92,7 +92,7 @@ paths:
       operationId: PostV1UserId
       responses:
         "200":
-          description: POST /v1/user/:id Successful response
+          description: POST /v1/user/:id Positive response
           content:
             application/json:
               schema:
@@ -130,7 +130,7 @@ paths:
                       name: John Doe
                       createdAt: 2021-12-31T00:00:00.000Z
         "400":
-          description: POST /v1/user/:id Error response
+          description: POST /v1/user/:id Negative response
           content:
             application/json:
               schema:
@@ -164,14 +164,14 @@ paths:
         - name: id
           in: path
           required: true
-          description: POST /v1/user/:id parameter
+          description: POST /v1/user/:id Parameter
           schema:
             type: string
           examples:
             example1:
               value: "12"
       requestBody:
-        description: POST /v1/user/:id request body
+        description: POST /v1/user/:id Request body
         content:
           application/json:
             schema:
@@ -217,7 +217,7 @@ paths:
       operationId: GetV1UserList
       responses:
         "200":
-          description: GET /v1/user/list Successful response
+          description: GET /v1/user/list Positive response
           content:
             application/json:
               schema:
@@ -236,7 +236,7 @@ paths:
                     - name: Laverne Cox
                     - name: Patti Harrison
         "400":
-          description: GET /v1/user/list Error response
+          description: GET /v1/user/list Negative response
           content:
             application/json:
               schema:
@@ -251,13 +251,13 @@ paths:
       operationId: GetV1AvatarSend
       responses:
         "200":
-          description: GET /v1/avatar/send Successful response
+          description: GET /v1/avatar/send Positive response
           content:
             image/svg+xml:
               schema:
                 type: string
         "400":
-          description: GET /v1/avatar/send Error response
+          description: GET /v1/avatar/send Negative response
           content:
             text/plain:
               schema:
@@ -270,7 +270,7 @@ paths:
         - name: userId
           in: query
           required: true
-          description: GET /v1/avatar/send parameter
+          description: GET /v1/avatar/send Parameter
           schema:
             type: string
             pattern: /\d+/
@@ -279,14 +279,14 @@ paths:
       operationId: GetV1AvatarStream
       responses:
         "200":
-          description: GET /v1/avatar/stream Successful response
+          description: GET /v1/avatar/stream Positive response
           content:
             image/*:
               schema:
                 type: string
                 format: binary
         "400":
-          description: GET /v1/avatar/stream Error response
+          description: GET /v1/avatar/stream Negative response
           content:
             text/plain:
               schema:
@@ -299,7 +299,7 @@ paths:
         - name: userId
           in: query
           required: true
-          description: GET /v1/avatar/stream parameter
+          description: GET /v1/avatar/stream Parameter
           schema:
             type: string
             pattern: /\d+/
@@ -308,7 +308,7 @@ paths:
       operationId: PostV1AvatarUpload
       responses:
         "200":
-          description: POST /v1/avatar/upload Successful response
+          description: POST /v1/avatar/upload Positive response
           content:
             application/json:
               schema:
@@ -346,7 +346,7 @@ paths:
                   - status
                   - data
         "400":
-          description: POST /v1/avatar/upload Error response
+          description: POST /v1/avatar/upload Negative response
           content:
             application/json:
               schema:
@@ -377,7 +377,7 @@ paths:
       tags:
         - files
       requestBody:
-        description: POST /v1/avatar/upload request body
+        description: POST /v1/avatar/upload Request body
         content:
           multipart/form-data:
             schema:
@@ -393,7 +393,7 @@ paths:
       operationId: PostV1AvatarRaw
       responses:
         "200":
-          description: POST /v1/avatar/raw Successful response
+          description: POST /v1/avatar/raw Positive response
           content:
             application/json:
               schema:
@@ -417,7 +417,7 @@ paths:
                   - status
                   - data
         "400":
-          description: POST /v1/avatar/raw Error response
+          description: POST /v1/avatar/raw Negative response
           content:
             application/json:
               schema:
@@ -446,7 +446,7 @@ paths:
       tags:
         - files
       requestBody:
-        description: POST /v1/avatar/raw request body
+        description: POST /v1/avatar/raw Request body
         content:
           application/octet-stream:
             schema:

@@ -3,6 +3,7 @@ import {
   OpenApiBuilder,
   OperationObject,
   ReferenceObject,
+  ResponsesObject,
   SchemaObject,
   SecuritySchemeObject,
   SecuritySchemeType,
@@ -30,16 +31,29 @@ import {
 import { Routing } from "./routing";
 import { RoutingWalkerParams, walkRouting } from "./routing-walker";
 
+type Component =
+  | "positiveResponse"
+  | "negativeResponse"
+  | "requestParameter"
+  | "requestBody";
+
+/** @desc user defined function that creates a component description from its properties */
+type Descriptor = (
+  props: Record<"method" | "path" | "operationId", string>,
+) => string;
+
 interface DocumentationParams {
   title: string;
   version: string;
   serverUrl: string | [string, ...string[]];
   routing: Routing;
   config: CommonConfig;
-  /** @default Successful response */
-  successfulResponseDescription?: string;
-  /** @default Error response */
-  errorResponseDescription?: string;
+  /**
+   * @desc Descriptions of various components based on their properties (method, path, operationId).
+   * @desc When composition set to "components", component name is generated from this description
+   * @default () => `${method} ${path} ${component}`
+   * */
+  descriptions?: Partial<Record<Component, Descriptor>>;
   /** @default true */
   hasSummaryFromDescription?: boolean;
   /** @default inline */
@@ -120,8 +134,7 @@ export class Documentation extends OpenApiBuilder {
     title,
     version,
     serverUrl,
-    successfulResponseDescription = "Successful response",
-    errorResponseDescription = "Error response",
+    descriptions,
     hasSummaryFromDescription = true,
     composition = "inline",
     serializer = defaultSerializer,
@@ -159,22 +172,30 @@ export class Documentation extends OpenApiBuilder {
       const depictedParams = depictRequestParams({
         ...commonParams,
         inputSources,
+        description: descriptions?.requestParameter?.call(null, {
+          method,
+          path,
+          operationId,
+        }),
       });
-      const operation: OperationObject = {
-        operationId,
-        responses: {
-          [endpoint.getStatusCode("positive")]: depictResponse({
+      const responses = (
+        ["positive", "negative"] as const
+      ).reduce<ResponsesObject>(
+        (agg, variant) => ({
+          ...agg,
+          [endpoint.getStatusCode(variant)]: depictResponse({
             ...commonParams,
-            clue: successfulResponseDescription,
-            isPositive: true,
+            variant,
+            description: descriptions?.[`${variant}Response`]?.call(null, {
+              method,
+              path,
+              operationId,
+            }),
           }),
-          [endpoint.getStatusCode("negative")]: depictResponse({
-            ...commonParams,
-            clue: errorResponseDescription,
-            isPositive: false,
-          }),
-        },
-      };
+        }),
+        {},
+      );
+      const operation: OperationObject = { operationId, responses };
       if (longDesc) {
         operation.description = longDesc;
         if (hasSummaryFromDescription && shortDesc === undefined) {
@@ -191,7 +212,14 @@ export class Documentation extends OpenApiBuilder {
         operation.parameters = depictedParams;
       }
       if (inputSources.includes("body")) {
-        operation.requestBody = depictRequest(commonParams);
+        operation.requestBody = depictRequest({
+          ...commonParams,
+          description: descriptions?.requestBody?.call(null, {
+            method,
+            path,
+            operationId,
+          }),
+        });
       }
       const securityRefs = depictSecurityRefs(
         mapLogicalContainer(

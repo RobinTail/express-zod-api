@@ -27,6 +27,7 @@ import {
   isCustomHeader,
   makeCleanId,
   tryToTransform,
+  ucFirst,
 } from "./common-helpers";
 import { InputSource, TagsConfig } from "./config-type";
 import { ZodDateIn, isoDateRegex } from "./date-in-schema";
@@ -77,7 +78,7 @@ interface ReqResDepictHelperCommonProps
   > {
   endpoint: AbstractEndpoint;
   composition: "inline" | "components";
-  clue?: string;
+  description?: string;
 }
 
 const shortDescriptionLimit = 50;
@@ -684,7 +685,7 @@ export const depictRequestParams = ({
   getRef,
   makeRef,
   composition,
-  clue = "parameter",
+  description = `${method.toUpperCase()} ${path} Parameter`,
 }: ReqResDepictHelperCommonProps & {
   inputSources: InputSource[];
 }): ParameterObject[] => {
@@ -719,7 +720,7 @@ export const depictRequestParams = ({
       });
       const result =
         composition === "components"
-          ? makeRef(makeCleanId(method, path, `${clue} ${name}`), depicted)
+          ? makeRef(makeCleanId(description, name), depicted)
           : depicted;
       return {
         name,
@@ -729,9 +730,7 @@ export const depictRequestParams = ({
             ? "header"
             : "query",
         required: !shape[name].isOptional(),
-        description:
-          (!isReferenceObject(depicted) && depicted.description) ||
-          `${method.toUpperCase()} ${path} ${clue}`,
+        description: depicted.description || description,
         schema: result,
         examples: depictParamExamples(schema, false, name),
       };
@@ -870,17 +869,17 @@ export const depictResponse = ({
   method,
   path,
   endpoint,
-  isPositive,
+  variant,
   serializer,
   getRef,
   makeRef,
   composition,
-  clue = "response",
+  description = `${method.toUpperCase()} ${path} ${ucFirst(variant)} response`,
 }: ReqResDepictHelperCommonProps & {
-  isPositive: boolean;
+  variant: "positive" | "negative";
 }): ResponseObject => {
-  const schema = endpoint.getSchema(isPositive ? "positive" : "negative");
-  const mimeTypes = endpoint.getMimeTypes(isPositive ? "positive" : "negative");
+  const schema = endpoint.getSchema(variant);
+  const mimeTypes = endpoint.getMimeTypes(variant);
   const depictedSchema = excludeExamplesFromDepiction(
     walkSchema({
       schema,
@@ -898,11 +897,11 @@ export const depictResponse = ({
   const examples = depictExamples(schema, true);
   const result =
     composition === "components"
-      ? makeRef(makeCleanId(method, path, clue), depictedSchema)
+      ? makeRef(makeCleanId(description), depictedSchema)
       : depictedSchema;
 
   return {
-    description: `${method.toUpperCase()} ${path} ${clue}`,
+    description,
     content: mimeTypes.reduce<ContentObject>(
       (carry, mimeType) => ({
         ...carry,
@@ -1019,7 +1018,7 @@ export const depictRequest = ({
   getRef,
   makeRef,
   composition,
-  clue = "request body",
+  description = `${method.toUpperCase()} ${path} Request body`,
 }: ReqResDepictHelperCommonProps): RequestBodyObject => {
   const pathParams = getRoutePathParams(path);
   const inputSchema = endpoint.getSchema("input");
@@ -1047,11 +1046,11 @@ export const depictRequest = ({
   );
   const result =
     composition === "components"
-      ? makeRef(makeCleanId(method, path, clue), bodyDepiction)
+      ? makeRef(makeCleanId(description), bodyDepiction)
       : bodyDepiction;
 
   return {
-    description: `${method.toUpperCase()} ${path} ${clue}`,
+    description,
     content: endpoint.getMimeTypes("input").reduce<ContentObject>(
       (carry, mimeType) => ({
         ...carry,

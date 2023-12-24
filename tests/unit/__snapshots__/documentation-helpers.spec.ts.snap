@@ -692,7 +692,7 @@ exports[`Documentation helpers > depictRecord() > should set properties+required
 exports[`Documentation helpers > depictRequestParams() > Feature 1180: should depict header params when enabled 1`] = `
 [
   {
-    "description": "GET /v1/user/:id parameter",
+    "description": "GET /v1/user/:id Parameter",
     "examples": undefined,
     "in": "header",
     "name": "x-request-id",
@@ -702,7 +702,7 @@ exports[`Documentation helpers > depictRequestParams() > Feature 1180: should de
     },
   },
   {
-    "description": "GET /v1/user/:id parameter",
+    "description": "GET /v1/user/:id Parameter",
     "examples": undefined,
     "in": "path",
     "name": "id",
@@ -712,7 +712,7 @@ exports[`Documentation helpers > depictRequestParams() > Feature 1180: should de
     },
   },
   {
-    "description": "GET /v1/user/:id parameter",
+    "description": "GET /v1/user/:id Parameter",
     "examples": undefined,
     "in": "query",
     "name": "test",
@@ -729,7 +729,7 @@ exports[`Documentation helpers > depictRequestParams() > should depict none if b
 exports[`Documentation helpers > depictRequestParams() > should depict only path params if query is disabled 1`] = `
 [
   {
-    "description": "GET /v1/user/:id parameter",
+    "description": "GET /v1/user/:id Parameter",
     "examples": undefined,
     "in": "path",
     "name": "id",
@@ -744,7 +744,7 @@ exports[`Documentation helpers > depictRequestParams() > should depict only path
 exports[`Documentation helpers > depictRequestParams() > should depict query and path params 1`] = `
 [
   {
-    "description": "GET /v1/user/:id parameter",
+    "description": "GET /v1/user/:id Parameter",
     "examples": undefined,
     "in": "path",
     "name": "id",
@@ -754,7 +754,7 @@ exports[`Documentation helpers > depictRequestParams() > should depict query and
     },
   },
   {
-    "description": "GET /v1/user/:id parameter",
+    "description": "GET /v1/user/:id Parameter",
     "examples": undefined,
     "in": "query",
     "name": "test",
