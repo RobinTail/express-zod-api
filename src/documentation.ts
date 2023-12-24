@@ -168,13 +168,12 @@ export class Documentation extends OpenApiBuilder {
         responses: {
           [endpoint.getStatusCode("positive")]: depictResponse({
             ...commonParams,
-            description:
-              descriptions?.positiveResponse || "Successful response",
+            description: descriptions?.positiveResponse,
             isPositive: true,
           }),
           [endpoint.getStatusCode("negative")]: depictResponse({
             ...commonParams,
-            description: descriptions?.negativeResponse || "Error response",
+            description: descriptions?.negativeResponse,
             isPositive: false,
           }),
         },

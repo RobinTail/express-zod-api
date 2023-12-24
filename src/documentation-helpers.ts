@@ -684,7 +684,7 @@ export const depictRequestParams = ({
   getRef,
   makeRef,
   composition,
-  description = "parameter",
+  description = `${method.toUpperCase()} ${path} parameter`,
 }: ReqResDepictHelperCommonProps & {
   inputSources: InputSource[];
 }): ParameterObject[] => {
@@ -719,10 +719,7 @@ export const depictRequestParams = ({
       });
       const result =
         composition === "components"
-          ? makeRef(
-              makeCleanId(method, path, `${description} ${name}`),
-              depicted,
-            )
+          ? makeRef(makeCleanId(description, name), depicted)
           : depicted;
       return {
         name,
@@ -733,8 +730,7 @@ export const depictRequestParams = ({
             : "query",
         required: !shape[name].isOptional(),
         description:
-          (!isReferenceObject(depicted) && depicted.description) ||
-          `${method.toUpperCase()} ${path} ${description}`,
+          (!isReferenceObject(depicted) && depicted.description) || description,
         schema: result,
         examples: depictParamExamples(schema, false, name),
       };
@@ -878,7 +874,9 @@ export const depictResponse = ({
   getRef,
   makeRef,
   composition,
-  description = "response",
+  description = `${method.toUpperCase()} ${path} ${
+    isPositive ? "Successful" : "Error"
+  } response`,
 }: ReqResDepictHelperCommonProps & {
   isPositive: boolean;
 }): ResponseObject => {
@@ -901,11 +899,11 @@ export const depictResponse = ({
   const examples = depictExamples(schema, true);
   const result =
     composition === "components"
-      ? makeRef(makeCleanId(method, path, description), depictedSchema)
+      ? makeRef(makeCleanId(description), depictedSchema)
       : depictedSchema;
 
   return {
-    description: `${method.toUpperCase()} ${path} ${description}`,
+    description,
     content: mimeTypes.reduce<ContentObject>(
       (carry, mimeType) => ({
         ...carry,
@@ -1022,7 +1020,7 @@ export const depictRequest = ({
   getRef,
   makeRef,
   composition,
-  description = "request body",
+  description = `${method.toUpperCase()} ${path} request body`,
 }: ReqResDepictHelperCommonProps): RequestBodyObject => {
   const pathParams = getRoutePathParams(path);
   const inputSchema = endpoint.getSchema("input");
@@ -1050,11 +1048,11 @@ export const depictRequest = ({
   );
   const result =
     composition === "components"
-      ? makeRef(makeCleanId(method, path, description), bodyDepiction)
+      ? makeRef(makeCleanId(description), bodyDepiction)
       : bodyDepiction;
 
   return {
-    description: `${method.toUpperCase()} ${path} ${description}`,
+    description,
     content: endpoint.getMimeTypes("input").reduce<ContentObject>(
       (carry, mimeType) => ({
         ...carry,
