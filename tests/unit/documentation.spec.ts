@@ -925,7 +925,7 @@ describe("Documentation", () => {
           composition,
           config: sampleConfig,
           descriptions: {
-            requestBody: "the body of request",
+            requestBody: () => "the body of request",
             requestParameter: ({ method, path }) =>
               `parameter of ${method} ${path}`,
             negativeResponse: ({ operationId }) =>

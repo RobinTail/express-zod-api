@@ -47,7 +47,7 @@ interface DocumentationParams {
   serverUrl: string | [string, ...string[]];
   routing: Routing;
   config: CommonConfig;
-  descriptions?: Partial<Record<Component, string | Descriptor>>;
+  descriptions?: Partial<Record<Component, Descriptor>>;
   /** @default true */
   hasSummaryFromDescription?: boolean;
   /** @default inline */
@@ -166,10 +166,11 @@ export class Documentation extends OpenApiBuilder {
       const depictedParams = depictRequestParams({
         ...commonParams,
         inputSources,
-        description:
-          typeof descriptions?.requestParameter === "function"
-            ? descriptions.requestParameter({ method, path, operationId })
-            : descriptions?.requestParameter,
+        description: descriptions?.requestParameter?.call(null, {
+          method,
+          path,
+          operationId,
+        }),
       });
       const operation: OperationObject = {
         operationId,
@@ -177,18 +178,20 @@ export class Documentation extends OpenApiBuilder {
           [endpoint.getStatusCode("positive")]: depictResponse({
             ...commonParams,
             variant: "positive",
-            description:
-              typeof descriptions?.positiveResponse === "function"
-                ? descriptions.positiveResponse({ method, path, operationId })
-                : descriptions?.positiveResponse,
+            description: descriptions?.positiveResponse?.call(null, {
+              method,
+              path,
+              operationId,
+            }),
           }),
           [endpoint.getStatusCode("negative")]: depictResponse({
             ...commonParams,
             variant: "negative",
-            description:
-              typeof descriptions?.negativeResponse === "function"
-                ? descriptions.negativeResponse({ method, path, operationId })
-                : descriptions?.negativeResponse,
+            description: descriptions?.negativeResponse?.call(null, {
+              method,
+              path,
+              operationId,
+            }),
           }),
         },
       };
@@ -210,10 +213,11 @@ export class Documentation extends OpenApiBuilder {
       if (inputSources.includes("body")) {
         operation.requestBody = depictRequest({
           ...commonParams,
-          description:
-            typeof descriptions?.requestBody === "function"
-              ? descriptions.requestBody({ method, path, operationId })
-              : descriptions?.requestBody,
+          description: descriptions?.requestBody?.call(null, {
+            method,
+            path,
+            operationId,
+          }),
         });
       }
       const securityRefs = depictSecurityRefs(
