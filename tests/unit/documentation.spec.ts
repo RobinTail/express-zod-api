@@ -926,10 +926,11 @@ describe("Documentation", () => {
           config: sampleConfig,
           descriptions: {
             requestBody: "the body of request",
-            requestParameter: (method, path) =>
+            requestParameter: ({ method, path }) =>
               `parameter of ${method} ${path}`,
-            negativeResponse: () => "very negative response",
-            positiveResponse: ({}, path) =>
+            negativeResponse: ({ operationId }) =>
+              `very negative response of ${operationId}`,
+            positiveResponse: ({ path }) =>
               `Super positive response of ${path}`,
           },
           routing: {

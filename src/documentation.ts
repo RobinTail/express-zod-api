@@ -43,7 +43,11 @@ interface DocumentationParams {
   routing: Routing;
   config: CommonConfig;
   descriptions?: Partial<
-    Record<Component, string | ((method: string, path: string) => string)>
+    Record<
+      Component,
+      | string
+      | ((params: Record<"method" | "path" | "operationId", string>) => string)
+    >
   >;
   /** @default true */
   hasSummaryFromDescription?: boolean;
@@ -165,7 +169,7 @@ export class Documentation extends OpenApiBuilder {
         inputSources,
         description:
           typeof descriptions?.requestParameter === "function"
-            ? descriptions.requestParameter(method, path)
+            ? descriptions.requestParameter({ method, path, operationId })
             : descriptions?.requestParameter,
       });
       const operation: OperationObject = {
@@ -176,7 +180,7 @@ export class Documentation extends OpenApiBuilder {
             isPositive: true,
             description:
               typeof descriptions?.positiveResponse === "function"
-                ? descriptions.positiveResponse(method, path)
+                ? descriptions.positiveResponse({ method, path, operationId })
                 : descriptions?.positiveResponse,
           }),
           [endpoint.getStatusCode("negative")]: depictResponse({
@@ -184,7 +188,7 @@ export class Documentation extends OpenApiBuilder {
             isPositive: false,
             description:
               typeof descriptions?.negativeResponse === "function"
-                ? descriptions.negativeResponse(method, path)
+                ? descriptions.negativeResponse({ method, path, operationId })
                 : descriptions?.negativeResponse,
           }),
         },
@@ -209,7 +213,7 @@ export class Documentation extends OpenApiBuilder {
           ...commonParams,
           description:
             typeof descriptions?.requestBody === "function"
-              ? descriptions.requestBody(method, path)
+              ? descriptions.requestBody({ method, path, operationId })
               : descriptions?.requestBody,
         });
       }
