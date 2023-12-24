@@ -4383,6 +4383,202 @@ servers:
 "
 `;
 
+exports[`Documentation > Route Path Params > should handle custom descriptions and descriptors 0 1`] = `
+"openapi: 3.1.0
+info:
+  title: Testing route path params
+  version: 3.4.5
+paths:
+  /v1/{name}:
+    post:
+      operationId: PostV1Name
+      responses:
+        "200":
+          description: Super positive response of /v1/:name
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - success
+                  data:
+                    type: object
+                    properties: {}
+                required:
+                  - status
+                  - data
+        "400":
+          description: very negative response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                required:
+                  - status
+                  - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
+      parameters:
+        - name: name
+          in: path
+          required: true
+          description: parameter of post /v1/:name
+          schema:
+            oneOf:
+              - type: string
+                enum:
+                  - John
+              - type: string
+                enum:
+                  - Jane
+      requestBody:
+        description: the body of request
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                other:
+                  type: boolean
+              required:
+                - other
+components:
+  schemas: {}
+  responses: {}
+  parameters: {}
+  examples: {}
+  requestBodies: {}
+  headers: {}
+  securitySchemes: {}
+  links: {}
+  callbacks: {}
+tags: []
+servers:
+  - url: https://example.com
+"
+`;
+
+exports[`Documentation > Route Path Params > should handle custom descriptions and descriptors 1 1`] = `
+"openapi: 3.1.0
+info:
+  title: Testing route path params
+  version: 3.4.5
+paths:
+  /v1/{name}:
+    post:
+      operationId: PostV1Name
+      responses:
+        "200":
+          description: Super positive response of /v1/:name
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuperPositiveResponseOfV1Name"
+        "400":
+          description: very negative response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VeryNegativeResponse"
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
+      parameters:
+        - name: name
+          in: path
+          required: true
+          description: parameter of post /v1/:name
+          schema:
+            $ref: "#/components/schemas/ParameterOfPostV1NameName"
+      requestBody:
+        description: the body of request
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TheBodyOfRequest"
+components:
+  schemas:
+    ParameterOfPostV1NameName:
+      oneOf:
+        - type: string
+          enum:
+            - John
+        - type: string
+          enum:
+            - Jane
+    SuperPositiveResponseOfV1Name:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+            - success
+        data:
+          type: object
+          properties: {}
+      required:
+        - status
+        - data
+    VeryNegativeResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+            - error
+        error:
+          type: object
+          properties:
+            message:
+              type: string
+          required:
+            - message
+      required:
+        - status
+        - error
+    TheBodyOfRequest:
+      type: object
+      properties:
+        other:
+          type: boolean
+      required:
+        - other
+  responses: {}
+  parameters: {}
+  examples: {}
+  requestBodies: {}
+  headers: {}
+  securitySchemes: {}
+  links: {}
+  callbacks: {}
+tags: []
+servers:
+  - url: https://example.com
+"
+`;
+
 exports[`Documentation > Route Path Params > should handle route path params for GET request 1`] = `
 "openapi: 3.1.0
 info:
