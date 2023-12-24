@@ -7,6 +7,7 @@
 - Potentially breaking changes:
   - Some methods and properties of the `Documentation` class (which extends the OpenAPI builder) might be changed.
   - Options `successfulResponseDescription` and `errorResponseDescription` of `Documentation` constructor are renamed.
+  - Interface `Input` of the generated client is renamed to `Request` for consistency reasons.
 - Features:
   - Switching to [OpenAPI 3.1](https://swagger.io/specification/) for generating better Documentation for your API.
     - Consider [the new UI](https://editor-next.swagger.io/) for exploring the produced documentation.
@@ -22,6 +23,8 @@
     - Replace it with `descriptions/positiveResponse` assigned with the string returning function;
   - If you are using `errorResponseDescription` option of `Documentation` constructor:
     - Replace it with `descriptions/negativeResponse` assigned with the string returning function;
+  - If you are importing `Input` interface from the generated client:
+    - Replace it with importing the `Request` interface;
   - If you do not modify the generated documentation and only using its `getSpecAsYaml` or `getSpecAsJson` methods:
     - No further action required.
   - If you're using any properties or other methods of the `Documentation` class:
