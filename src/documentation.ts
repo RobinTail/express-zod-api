@@ -47,6 +47,11 @@ interface DocumentationParams {
   serverUrl: string | [string, ...string[]];
   routing: Routing;
   config: CommonConfig;
+  /**
+   * @desc Descriptions of various components based on their properties (method, path, operationId).
+   * @desc When composition set to "components", component name is generated from this description
+   * @default () => `${method} ${path} ${component}`
+   * */
   descriptions?: Partial<Record<Component, Descriptor>>;
   /** @default true */
   hasSummaryFromDescription?: boolean;
