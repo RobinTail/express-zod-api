@@ -164,14 +164,14 @@ paths:
         - name: id
           in: path
           required: true
-          description: POST /v1/user/:id parameter
+          description: POST /v1/user/:id Parameter
           schema:
             type: string
           examples:
             example1:
               value: "12"
       requestBody:
-        description: POST /v1/user/:id request body
+        description: POST /v1/user/:id Request body
         content:
           application/json:
             schema:
@@ -270,7 +270,7 @@ paths:
         - name: userId
           in: query
           required: true
-          description: GET /v1/avatar/send parameter
+          description: GET /v1/avatar/send Parameter
           schema:
             type: string
             pattern: /\d+/
@@ -299,7 +299,7 @@ paths:
         - name: userId
           in: query
           required: true
-          description: GET /v1/avatar/stream parameter
+          description: GET /v1/avatar/stream Parameter
           schema:
             type: string
             pattern: /\d+/
@@ -377,7 +377,7 @@ paths:
       tags:
         - files
       requestBody:
-        description: POST /v1/avatar/upload request body
+        description: POST /v1/avatar/upload Request body
         content:
           multipart/form-data:
             schema:
@@ -446,7 +446,7 @@ paths:
       tags:
         - files
       requestBody:
-        description: POST /v1/avatar/raw request body
+        description: POST /v1/avatar/raw Request body
         content:
           application/octet-stream:
             schema:

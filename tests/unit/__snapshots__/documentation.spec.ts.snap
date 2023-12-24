@@ -178,7 +178,7 @@ paths:
       description: thing is the path segment
       summary: thing is the path segment
       requestBody:
-        description: POST /v1/getSome/thing request body
+        description: POST /v1/getSome/thing Request body
         content:
           application/json:
             schema:
@@ -387,13 +387,13 @@ paths:
         - name: key
           in: query
           required: true
-          description: GET /v1/getSomething parameter
+          description: GET /v1/getSomething Parameter
           schema:
             type: string
         - name: str
           in: query
           required: true
-          description: GET /v1/getSomething parameter
+          description: GET /v1/getSomething Parameter
           schema:
             type: string
       security:
@@ -448,7 +448,7 @@ paths:
                     error:
                       message: Sample error message
       requestBody:
-        description: POST /v1/setSomething request body
+        description: POST /v1/setSomething Request body
         content:
           application/json:
             schema:
@@ -510,7 +510,7 @@ paths:
                     error:
                       message: Sample error message
       requestBody:
-        description: PUT /v1/updateSomething request body
+        description: PUT /v1/updateSomething Request body
         content:
           application/json:
             schema:
@@ -703,7 +703,7 @@ paths:
         - name: array
           in: query
           required: true
-          description: GET /v1/getSomething parameter
+          description: GET /v1/getSomething Parameter
           schema:
             type: array
             items:
@@ -716,7 +716,7 @@ paths:
         - name: unlimited
           in: query
           required: true
-          description: GET /v1/getSomething parameter
+          description: GET /v1/getSomething Parameter
           schema:
             type: array
             items:
@@ -724,7 +724,7 @@ paths:
         - name: transformer
           in: query
           required: true
-          description: GET /v1/getSomething parameter
+          description: GET /v1/getSomething Parameter
           schema:
             type: string
 components:
@@ -825,7 +825,7 @@ paths:
                     error:
                       message: Sample error message
       requestBody:
-        description: POST /v1/getSomething request body
+        description: POST /v1/getSomething Request body
         content:
           application/json:
             schema:
@@ -944,7 +944,7 @@ paths:
                     error:
                       message: Sample error message
       requestBody:
-        description: POST /v1/getSomething request body
+        description: POST /v1/getSomething Request body
         content:
           application/json:
             schema:
@@ -1046,20 +1046,20 @@ paths:
         - name: optional
           in: query
           required: false
-          description: GET /v1/getSomething parameter
+          description: GET /v1/getSomething Parameter
           schema:
             type: string
         - name: optDefault
           in: query
           required: false
-          description: GET /v1/getSomething parameter
+          description: GET /v1/getSomething Parameter
           schema:
             type: string
             default: test
         - name: nullish
           in: query
           required: false
-          description: GET /v1/getSomething parameter
+          description: GET /v1/getSomething Parameter
           schema:
             type:
               - boolean
@@ -1067,7 +1067,7 @@ paths:
         - name: nuDefault
           in: query
           required: false
-          description: GET /v1/getSomething parameter
+          description: GET /v1/getSomething Parameter
           schema:
             type:
               - integer
@@ -1156,7 +1156,7 @@ paths:
                     error:
                       message: Sample error message
       requestBody:
-        description: POST /v1/getSomething request body
+        description: POST /v1/getSomething Request body
         content:
           application/json:
             schema:
@@ -1373,14 +1373,14 @@ paths:
         - name: id
           in: path
           required: true
-          description: POST /v1/user/:id parameter
+          description: POST /v1/user/:id Parameter
           schema:
             type: string
           examples:
             example1:
               value: "12"
       requestBody:
-        description: POST /v1/user/:id request body
+        description: POST /v1/user/:id Request body
         content:
           application/json:
             schema:
@@ -1479,7 +1479,7 @@ paths:
         - name: userId
           in: query
           required: true
-          description: GET /v1/avatar/send parameter
+          description: GET /v1/avatar/send Parameter
           schema:
             type: string
             pattern: /\\d+/
@@ -1508,7 +1508,7 @@ paths:
         - name: userId
           in: query
           required: true
-          description: GET /v1/avatar/stream parameter
+          description: GET /v1/avatar/stream Parameter
           schema:
             type: string
             pattern: /\\d+/
@@ -1586,7 +1586,7 @@ paths:
       tags:
         - files
       requestBody:
-        description: POST /v1/avatar/upload request body
+        description: POST /v1/avatar/upload Request body
         content:
           multipart/form-data:
             schema:
@@ -1655,7 +1655,7 @@ paths:
       tags:
         - files
       requestBody:
-        description: POST /v1/avatar/raw request body
+        description: POST /v1/avatar/raw Request body
         content:
           application/octet-stream:
             schema:
@@ -1777,14 +1777,14 @@ paths:
         - name: id
           in: path
           required: true
-          description: POST /v1/user/:id parameter
+          description: POST /v1/user/:id Parameter
           schema:
             $ref: "#/components/schemas/PostV1UserIdParameterId"
           examples:
             example1:
               value: "12"
       requestBody:
-        description: POST /v1/user/:id request body
+        description: POST /v1/user/:id Request body
         content:
           application/json:
             schema:
@@ -1849,7 +1849,7 @@ paths:
         - name: userId
           in: query
           required: true
-          description: GET /v1/avatar/send parameter
+          description: GET /v1/avatar/send Parameter
           schema:
             $ref: "#/components/schemas/GetV1AvatarSendParameterUserId"
   /v1/avatar/stream:
@@ -1876,7 +1876,7 @@ paths:
         - name: userId
           in: query
           required: true
-          description: GET /v1/avatar/stream parameter
+          description: GET /v1/avatar/stream Parameter
           schema:
             $ref: "#/components/schemas/GetV1AvatarStreamParameterUserId"
   /v1/avatar/upload:
@@ -1906,7 +1906,7 @@ paths:
       tags:
         - files
       requestBody:
-        description: POST /v1/avatar/upload request body
+        description: POST /v1/avatar/upload Request body
         content:
           multipart/form-data:
             schema:
@@ -1936,7 +1936,7 @@ paths:
       tags:
         - files
       requestBody:
-        description: POST /v1/avatar/raw request body
+        description: POST /v1/avatar/raw Request body
         content:
           application/octet-stream:
             schema:
@@ -2305,7 +2305,7 @@ paths:
                     error:
                       message: Sample error message
       requestBody:
-        description: POST /v1/getSomething request body
+        description: POST /v1/getSomething Request body
         content:
           application/json:
             schema:
@@ -2410,7 +2410,7 @@ paths:
                     error:
                       message: Sample error message
       requestBody:
-        description: POST /v1/getSomething request body
+        description: POST /v1/getSomething Request body
         content:
           application/json:
             schema:
@@ -2566,7 +2566,7 @@ paths:
                     error:
                       message: Sample error message
       requestBody:
-        description: POST /v1/getSomething request body
+        description: POST /v1/getSomething Request body
         content:
           application/json:
             schema:
@@ -2702,7 +2702,7 @@ paths:
                     error:
                       message: Sample error message
       requestBody:
-        description: POST /v1/getSomething request body
+        description: POST /v1/getSomething Request body
         content:
           application/json:
             schema:
@@ -2846,7 +2846,7 @@ paths:
                     error:
                       message: Sample error message
       requestBody:
-        description: POST /v1/getSomething request body
+        description: POST /v1/getSomething Request body
         content:
           application/json:
             schema:
@@ -2979,7 +2979,7 @@ paths:
                     error:
                       message: Sample error message
       requestBody:
-        description: POST /v1/getSomething request body
+        description: POST /v1/getSomething Request body
         content:
           application/json:
             schema:
@@ -3060,7 +3060,7 @@ paths:
                     error:
                       message: Sample error message
       requestBody:
-        description: POST /v1/getSomething request body
+        description: POST /v1/getSomething Request body
         content:
           application/json:
             schema:
@@ -3152,7 +3152,7 @@ paths:
                     error:
                       message: Sample error message
       requestBody:
-        description: POST /v1/getSomething request body
+        description: POST /v1/getSomething Request body
         content:
           application/json:
             schema:
@@ -3258,7 +3258,7 @@ paths:
         - name: any
           in: query
           required: false
-          description: GET /v1/getSomething parameter
+          description: GET /v1/getSomething Parameter
           schema:
             format: any
 components:
@@ -3339,13 +3339,13 @@ paths:
         - name: string
           in: query
           required: false
-          description: GET /v1/getSomething parameter
+          description: GET /v1/getSomething Parameter
           schema:
             format: string (preprocessed)
         - name: number
           in: query
           required: true
-          description: GET /v1/getSomething parameter
+          description: GET /v1/getSomething Parameter
           schema:
             format: int64 (preprocessed)
             minimum: 0
@@ -3424,13 +3424,13 @@ paths:
         - name: id
           in: query
           required: true
-          description: GET /v1/test parameter
+          description: GET /v1/test Parameter
           schema:
             type: string
         - name: x-request-id
           in: header
           required: true
-          description: GET /v1/test parameter
+          description: GET /v1/test Parameter
           schema:
             type: string
 components:
@@ -3514,7 +3514,7 @@ paths:
         - name: arr
           in: query
           required: true
-          description: GET /v1/getSomething parameter
+          description: GET /v1/getSomething Parameter
           schema:
             type: array
             items:
@@ -3575,7 +3575,7 @@ paths:
                     error:
                       message: Sample error message
       requestBody:
-        description: POST /v1/getSomething request body
+        description: POST /v1/getSomething Request body
         content:
           application/json:
             schema:
@@ -3676,7 +3676,7 @@ paths:
                     error:
                       message: Sample error message
       requestBody:
-        description: POST /v1/getSomething request body
+        description: POST /v1/getSomething Request body
         content:
           application/json:
             schema:
@@ -3795,7 +3795,7 @@ paths:
                     error:
                       message: Sample error message
       requestBody:
-        description: POST /v1/addSomething request body
+        description: POST /v1/addSomething Request body
         content:
           application/json:
             schema:
@@ -3981,7 +3981,7 @@ paths:
                     error:
                       message: Sample error message
       requestBody:
-        description: POST /v1/getSomething request body
+        description: POST /v1/getSomething Request body
         content:
           application/json:
             schema:
@@ -4093,7 +4093,7 @@ paths:
         - name: strNum
           in: query
           required: true
-          description: GET /v1/getSomething parameter
+          description: GET /v1/getSomething Parameter
           schema:
             type: string
           examples:
@@ -4182,7 +4182,7 @@ paths:
                     error:
                       message: Sample error message
       requestBody:
-        description: POST /v1/getSomething request body
+        description: POST /v1/getSomething Request body
         content:
           application/json:
             schema:
@@ -4276,7 +4276,7 @@ paths:
         - name: strNum
           in: query
           required: true
-          description: GET /v1/getSomething parameter
+          description: GET /v1/getSomething Parameter
           schema:
             type: string
             examples:
@@ -4441,7 +4441,7 @@ paths:
         - name: name
           in: path
           required: true
-          description: GET /v1/:name parameter
+          description: GET /v1/:name Parameter
           schema:
             oneOf:
               - type: string
@@ -4453,7 +4453,7 @@ paths:
         - name: other
           in: query
           required: true
-          description: GET /v1/:name parameter
+          description: GET /v1/:name Parameter
           schema:
             type: boolean
 components:
@@ -4530,7 +4530,7 @@ paths:
         - name: name
           in: path
           required: true
-          description: POST /v1/:name parameter
+          description: POST /v1/:name Parameter
           schema:
             oneOf:
               - type: string
@@ -4540,7 +4540,7 @@ paths:
                 enum:
                   - Jane
       requestBody:
-        description: POST /v1/:name request body
+        description: POST /v1/:name Request body
         content:
           application/json:
             schema:

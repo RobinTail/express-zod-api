@@ -684,7 +684,7 @@ export const depictRequestParams = ({
   getRef,
   makeRef,
   composition,
-  description = `${method.toUpperCase()} ${path} parameter`,
+  description = `${method.toUpperCase()} ${path} Parameter`,
 }: ReqResDepictHelperCommonProps & {
   inputSources: InputSource[];
 }): ParameterObject[] => {
@@ -1020,7 +1020,7 @@ export const depictRequest = ({
   getRef,
   makeRef,
   composition,
-  description = `${method.toUpperCase()} ${path} request body`,
+  description = `${method.toUpperCase()} ${path} Request body`,
 }: ReqResDepictHelperCommonProps): RequestBodyObject => {
   const pathParams = getRoutePathParams(path);
   const inputSchema = endpoint.getSchema("input");
