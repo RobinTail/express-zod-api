@@ -37,10 +37,10 @@ import { zodToTs } from "./zts";
 import { createTypeAlias, printNode } from "./zts-helpers";
 import type Prettier from "prettier";
 
-type IOInterface = "input" | "response" | "positive" | "negative";
+type IOKind = "request" | "response" | "positive" | "negative";
 
 interface Registry {
-  [METHOD_PATH: string]: Partial<Record<IOInterface, string>> & {
+  [METHOD_PATH: string]: Partial<Record<IOKind, string>> & {
     isJson: boolean;
     tags: string[];
   };
@@ -103,7 +103,7 @@ export class Integration {
     pathType: f.createIdentifier("Path"),
     methodType: f.createIdentifier("Method"),
     methodPathType: f.createIdentifier("MethodPath"),
-    inputInterface: f.createIdentifier("Input"),
+    requestInterface: f.createIdentifier("Request"),
     posResponseInterface: f.createIdentifier("PositiveResponse"),
     negResponseInterface: f.createIdentifier("NegativeResponse"),
     responseInterface: f.createIdentifier("Response"),
@@ -128,7 +128,7 @@ export class Integration {
     exampleImplementationConst: f.createIdentifier("exampleImplementation"),
     clientConst: f.createIdentifier("client"),
   } satisfies Record<string, ts.Identifier>;
-  protected interfaces: { id: ts.Identifier; kind: IOInterface }[] = [];
+  protected interfaces: { id: ts.Identifier; kind: IOKind }[] = [];
 
   protected getAlias(name: string): ts.TypeReferenceNode | undefined {
     return name in this.aliases ? f.createTypeReferenceNode(name) : undefined;
@@ -155,11 +155,13 @@ export class Integration {
           makeAlias: this.makeAlias.bind(this),
           optionalPropStyle,
         };
-        const inputSchema = endpoint.getSchema("input");
-        const inputId = makeCleanId(method, path, "input");
-        const input = zodToTs({
+        const requestSchema = endpoint.getSchema("input");
+        const requestId = makeCleanId(method, path, "request");
+        const request = zodToTs({
           ...commons,
-          schema: hasRaw(inputSchema) ? ZodFile.create().buffer() : inputSchema,
+          schema: hasRaw(requestSchema)
+            ? ZodFile.create().buffer()
+            : requestSchema,
           isResponse: false,
         });
         const positiveResponseId = splitResponse
@@ -196,7 +198,7 @@ export class Integration {
                 isResponse: true,
                 schema: positiveSchema.or(negativeSchema),
               });
-        this.program.push(createTypeAlias(input, inputId));
+        this.program.push(createTypeAlias(request, requestId));
         if (positiveResponse && positiveResponseId) {
           this.program.push(
             createTypeAlias(positiveResponse, positiveResponseId),
@@ -211,7 +213,7 @@ export class Integration {
         if (method !== "options") {
           this.paths.push(path);
           this.registry[`${method} ${path}`] = {
-            input: inputId,
+            request: requestId,
             positive: positiveResponseId,
             negative: negativeResponseId,
             response: genericResponseId,
@@ -246,8 +248,8 @@ export class Integration {
     ];
 
     this.interfaces.push({
-      id: this.ids.inputInterface,
-      kind: "input",
+      id: this.ids.requestInterface,
+      kind: "request",
     });
     if (splitResponse) {
       this.interfaces.push(
@@ -257,7 +259,7 @@ export class Integration {
     }
     this.interfaces.push({ id: this.ids.responseInterface, kind: "response" });
 
-    // export interface Input ___ { "get /v1/user/retrieve": GetV1UserRetrieveInput; }
+    // export interface Request ___ { "get /v1/user/retrieve": GetV1UserRetrieveRequest; }
     for (const { id, kind } of this.interfaces) {
       this.program.push(
         makePublicExtendedInterface(
@@ -316,7 +318,7 @@ export class Integration {
       ),
     );
 
-    // export type Provider = <M extends Method, P extends Path>(method: M, path: P, params: Input[`${M} ${P}`]) =>
+    // export type Provider = <M extends Method, P extends Path>(method: M, path: P, params: Request[`${M} ${P}`]) =>
     // Promise<Response[`${M} ${P}`]>;
     const providerType = makePublicType(
       this.ids.providerType,
@@ -329,7 +331,7 @@ export class Integration {
           method: f.createTypeReferenceNode("M"),
           path: f.createTypeReferenceNode("P"),
           params: f.createIndexedAccessTypeNode(
-            f.createTypeReferenceNode(this.ids.inputInterface),
+            f.createTypeReferenceNode(this.ids.requestInterface),
             parametricIndexNode,
           ),
         }),

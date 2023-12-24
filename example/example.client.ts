@@ -3,7 +3,7 @@ type Type2048581c137c5b2130eb860e3ae37da196dfc25b = {
   features: Type2048581c137c5b2130eb860e3ae37da196dfc25b;
 }[];
 
-type GetV1UserRetrieveInput = {} & {
+type GetV1UserRetrieveRequest = {} & {
   /** a numeric string containing the id of the user */
   id: string;
 };
@@ -27,7 +27,7 @@ type GetV1UserRetrieveResponse =
       };
     };
 
-type PostV1UserIdInput = {
+type PostV1UserIdRequest = {
   key: string;
 } & {
   id: string;
@@ -50,7 +50,7 @@ type PostV1UserIdResponse =
       };
     };
 
-type GetV1UserListInput = {};
+type GetV1UserListRequest = {};
 
 type GetV1UserListResponse =
   | {
@@ -58,19 +58,19 @@ type GetV1UserListResponse =
     }[]
   | string;
 
-type GetV1AvatarSendInput = {
+type GetV1AvatarSendRequest = {
   userId: string;
 };
 
 type GetV1AvatarSendResponse = string | string;
 
-type GetV1AvatarStreamInput = {
+type GetV1AvatarStreamRequest = {
   userId: string;
 };
 
 type GetV1AvatarStreamResponse = Buffer | string;
 
-type PostV1AvatarUploadInput = {
+type PostV1AvatarUploadRequest = {
   avatar: any;
 };
 
@@ -92,7 +92,7 @@ type PostV1AvatarUploadResponse =
       };
     };
 
-type PostV1AvatarRawInput = Buffer;
+type PostV1AvatarRawRequest = Buffer;
 
 type PostV1AvatarRawResponse =
   | {
@@ -121,14 +121,14 @@ export type Method = "get" | "post" | "put" | "delete" | "patch";
 
 export type MethodPath = `${Method} ${Path}`;
 
-export interface Input extends Record<MethodPath, any> {
-  "get /v1/user/retrieve": GetV1UserRetrieveInput;
-  "post /v1/user/:id": PostV1UserIdInput;
-  "get /v1/user/list": GetV1UserListInput;
-  "get /v1/avatar/send": GetV1AvatarSendInput;
-  "get /v1/avatar/stream": GetV1AvatarStreamInput;
-  "post /v1/avatar/upload": PostV1AvatarUploadInput;
-  "post /v1/avatar/raw": PostV1AvatarRawInput;
+export interface Request extends Record<MethodPath, any> {
+  "get /v1/user/retrieve": GetV1UserRetrieveRequest;
+  "post /v1/user/:id": PostV1UserIdRequest;
+  "get /v1/user/list": GetV1UserListRequest;
+  "get /v1/avatar/send": GetV1AvatarSendRequest;
+  "get /v1/avatar/stream": GetV1AvatarStreamRequest;
+  "post /v1/avatar/upload": PostV1AvatarUploadRequest;
+  "post /v1/avatar/raw": PostV1AvatarRawRequest;
 }
 
 export interface Response extends Record<MethodPath, any> {
@@ -162,7 +162,7 @@ export const endpointTags = {
 export type Provider = <M extends Method, P extends Path>(
   method: M,
   path: P,
-  params: Input[`${M} ${P}`],
+  params: Request[`${M} ${P}`],
 ) => Promise<Response[`${M} ${P}`]>;
 
 export type Implementation = (
