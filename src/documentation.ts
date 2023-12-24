@@ -3,6 +3,7 @@ import {
   OpenApiBuilder,
   OperationObject,
   ReferenceObject,
+  ResponsesObject,
   SchemaObject,
   SecuritySchemeObject,
   SecuritySchemeType,
@@ -177,29 +178,24 @@ export class Documentation extends OpenApiBuilder {
           operationId,
         }),
       });
-      const operation: OperationObject = {
-        operationId,
-        responses: {
-          [endpoint.getStatusCode("positive")]: depictResponse({
+      const responses = (
+        ["positive", "negative"] as const
+      ).reduce<ResponsesObject>(
+        (agg, variant) => ({
+          ...agg,
+          [endpoint.getStatusCode(variant)]: depictResponse({
             ...commonParams,
-            variant: "positive",
-            description: descriptions?.positiveResponse?.call(null, {
+            variant,
+            description: descriptions?.[`${variant}Response`]?.call(null, {
               method,
               path,
               operationId,
             }),
           }),
-          [endpoint.getStatusCode("negative")]: depictResponse({
-            ...commonParams,
-            variant: "negative",
-            description: descriptions?.negativeResponse?.call(null, {
-              method,
-              path,
-              operationId,
-            }),
-          }),
-        },
-      };
+        }),
+        {},
+      );
+      const operation: OperationObject = { operationId, responses };
       if (longDesc) {
         operation.description = longDesc;
         if (hasSummaryFromDescription && shortDesc === undefined) {
