@@ -77,7 +77,7 @@ interface ReqResDepictHelperCommonProps
   > {
   endpoint: AbstractEndpoint;
   composition: "inline" | "components";
-  clue?: string;
+  description?: string;
 }
 
 const shortDescriptionLimit = 50;
@@ -684,7 +684,7 @@ export const depictRequestParams = ({
   getRef,
   makeRef,
   composition,
-  clue = "parameter",
+  description = "parameter",
 }: ReqResDepictHelperCommonProps & {
   inputSources: InputSource[];
 }): ParameterObject[] => {
@@ -719,7 +719,10 @@ export const depictRequestParams = ({
       });
       const result =
         composition === "components"
-          ? makeRef(makeCleanId(path, method, `${clue} ${name}`), depicted)
+          ? makeRef(
+              makeCleanId(path, method, `${description} ${name}`),
+              depicted,
+            )
           : depicted;
       return {
         name,
@@ -731,7 +734,7 @@ export const depictRequestParams = ({
         required: !shape[name].isOptional(),
         description:
           (!isReferenceObject(depicted) && depicted.description) ||
-          `${method.toUpperCase()} ${path} ${clue}`,
+          `${method.toUpperCase()} ${path} ${description}`,
         schema: result,
         examples: depictParamExamples(schema, false, name),
       };
@@ -875,7 +878,7 @@ export const depictResponse = ({
   getRef,
   makeRef,
   composition,
-  clue = "response",
+  description = "response",
 }: ReqResDepictHelperCommonProps & {
   isPositive: boolean;
 }): ResponseObject => {
@@ -898,11 +901,11 @@ export const depictResponse = ({
   const examples = depictExamples(schema, true);
   const result =
     composition === "components"
-      ? makeRef(makeCleanId(path, method, clue), depictedSchema)
+      ? makeRef(makeCleanId(path, method, description), depictedSchema)
       : depictedSchema;
 
   return {
-    description: `${method.toUpperCase()} ${path} ${clue}`,
+    description: `${method.toUpperCase()} ${path} ${description}`,
     content: mimeTypes.reduce<ContentObject>(
       (carry, mimeType) => ({
         ...carry,
@@ -1019,7 +1022,7 @@ export const depictRequest = ({
   getRef,
   makeRef,
   composition,
-  clue = "request body",
+  description = "request body",
 }: ReqResDepictHelperCommonProps): RequestBodyObject => {
   const pathParams = getRoutePathParams(path);
   const inputSchema = endpoint.getSchema("input");
@@ -1047,11 +1050,11 @@ export const depictRequest = ({
   );
   const result =
     composition === "components"
-      ? makeRef(makeCleanId(path, method, clue), bodyDepiction)
+      ? makeRef(makeCleanId(path, method, description), bodyDepiction)
       : bodyDepiction;
 
   return {
-    description: `${method.toUpperCase()} ${path} ${clue}`,
+    description: `${method.toUpperCase()} ${path} ${description}`,
     content: endpoint.getMimeTypes("input").reduce<ContentObject>(
       (carry, mimeType) => ({
         ...carry,

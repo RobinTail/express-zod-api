@@ -30,16 +30,19 @@ import {
 import { Routing } from "./routing";
 import { RoutingWalkerParams, walkRouting } from "./routing-walker";
 
+type Component =
+  | "positiveResponse"
+  | "negativeResponse"
+  | "requestParameter"
+  | "requestBody";
+
 interface DocumentationParams {
   title: string;
   version: string;
   serverUrl: string | [string, ...string[]];
   routing: Routing;
   config: CommonConfig;
-  /** @default Successful response */
-  successfulResponseDescription?: string;
-  /** @default Error response */
-  errorResponseDescription?: string;
+  descriptions?: Partial<Record<Component, string>>;
   /** @default true */
   hasSummaryFromDescription?: boolean;
   /** @default inline */
@@ -120,8 +123,7 @@ export class Documentation extends OpenApiBuilder {
     title,
     version,
     serverUrl,
-    successfulResponseDescription = "Successful response",
-    errorResponseDescription = "Error response",
+    descriptions,
     hasSummaryFromDescription = true,
     composition = "inline",
     serializer = defaultSerializer,
@@ -159,18 +161,20 @@ export class Documentation extends OpenApiBuilder {
       const depictedParams = depictRequestParams({
         ...commonParams,
         inputSources,
+        description: descriptions?.requestParameter,
       });
       const operation: OperationObject = {
         operationId,
         responses: {
           [endpoint.getStatusCode("positive")]: depictResponse({
             ...commonParams,
-            clue: successfulResponseDescription,
+            description:
+              descriptions?.positiveResponse || "Successful response",
             isPositive: true,
           }),
           [endpoint.getStatusCode("negative")]: depictResponse({
             ...commonParams,
-            clue: errorResponseDescription,
+            description: descriptions?.negativeResponse || "Error response",
             isPositive: false,
           }),
         },
@@ -191,7 +195,10 @@ export class Documentation extends OpenApiBuilder {
         operation.parameters = depictedParams;
       }
       if (inputSources.includes("body")) {
-        operation.requestBody = depictRequest(commonParams);
+        operation.requestBody = depictRequest({
+          ...commonParams,
+          description: descriptions?.requestBody,
+        });
       }
       const securityRefs = depictSecurityRefs(
         mapLogicalContainer(
