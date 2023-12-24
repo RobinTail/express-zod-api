@@ -729,8 +729,7 @@ export const depictRequestParams = ({
             ? "header"
             : "query",
         required: !shape[name].isOptional(),
-        description:
-          (!isReferenceObject(depicted) && depicted.description) || description,
+        description: depicted.description || description,
         schema: result,
         examples: depictParamExamples(schema, false, name),
       };
