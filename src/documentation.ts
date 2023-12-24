@@ -42,7 +42,9 @@ interface DocumentationParams {
   serverUrl: string | [string, ...string[]];
   routing: Routing;
   config: CommonConfig;
-  descriptions?: Partial<Record<Component, string>>;
+  descriptions?: Partial<
+    Record<Component, string | ((method: string, path: string) => string)>
+  >;
   /** @default true */
   hasSummaryFromDescription?: boolean;
   /** @default inline */
@@ -161,20 +163,29 @@ export class Documentation extends OpenApiBuilder {
       const depictedParams = depictRequestParams({
         ...commonParams,
         inputSources,
-        description: descriptions?.requestParameter,
+        description:
+          typeof descriptions?.requestParameter === "function"
+            ? descriptions.requestParameter(method, path)
+            : descriptions?.requestParameter,
       });
       const operation: OperationObject = {
         operationId,
         responses: {
           [endpoint.getStatusCode("positive")]: depictResponse({
             ...commonParams,
-            description: descriptions?.positiveResponse,
             isPositive: true,
+            description:
+              typeof descriptions?.positiveResponse === "function"
+                ? descriptions.positiveResponse(method, path)
+                : descriptions?.positiveResponse,
           }),
           [endpoint.getStatusCode("negative")]: depictResponse({
             ...commonParams,
-            description: descriptions?.negativeResponse,
             isPositive: false,
+            description:
+              typeof descriptions?.negativeResponse === "function"
+                ? descriptions.negativeResponse(method, path)
+                : descriptions?.negativeResponse,
           }),
         },
       };
@@ -196,7 +207,10 @@ export class Documentation extends OpenApiBuilder {
       if (inputSources.includes("body")) {
         operation.requestBody = depictRequest({
           ...commonParams,
-          description: descriptions?.requestBody,
+          description:
+            typeof descriptions?.requestBody === "function"
+              ? descriptions.requestBody(method, path)
+              : descriptions?.requestBody,
         });
       }
       const securityRefs = depictSecurityRefs(
