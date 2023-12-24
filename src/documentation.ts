@@ -151,15 +151,15 @@ export class Documentation extends OpenApiBuilder {
       );
       const inputSources =
         config.inputSources?.[method] || defaultInputSources[method];
-      const depictedParams = depictRequestParams({
-        ...commonParams,
-        inputSources,
-      });
       const operationId = this.ensureUniqOperationId(
         path,
         method,
         endpoint.getOperationId(method),
       );
+      const depictedParams = depictRequestParams({
+        ...commonParams,
+        inputSources,
+      });
       const operation: OperationObject = {
         operationId,
         responses: {
@@ -211,10 +211,7 @@ export class Documentation extends OpenApiBuilder {
       if (securityRefs.length > 0) {
         operation.security = securityRefs;
       }
-      const swaggerCompatiblePath = reformatParamsInPath(path);
-      this.addPath(swaggerCompatiblePath, {
-        [method]: operation,
-      });
+      this.addPath(reformatParamsInPath(path), { [method]: operation });
     };
     walkRouting({ routing, onEndpoint });
     this.rootDoc.tags = config.tags ? depictTags(config.tags) : [];
