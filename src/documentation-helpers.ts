@@ -27,6 +27,7 @@ import {
   isCustomHeader,
   makeCleanId,
   tryToTransform,
+  ucFirst,
 } from "./common-helpers";
 import { InputSource, TagsConfig } from "./config-type";
 import { ZodDateIn, isoDateRegex } from "./date-in-schema";
@@ -873,9 +874,7 @@ export const depictResponse = ({
   getRef,
   makeRef,
   composition,
-  description = `${method.toUpperCase()} ${path} ${makeCleanId(
-    variant,
-  )} response`,
+  description = `${method.toUpperCase()} ${path} ${ucFirst(variant)} response`,
 }: ReqResDepictHelperCommonProps & {
   variant: "positive" | "negative";
 }): ResponseObject => {

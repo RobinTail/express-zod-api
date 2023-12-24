@@ -279,6 +279,9 @@ export const hasCoercion = (schema: z.ZodTypeAny): boolean =>
     ? schema._def.coerce
     : false;
 
+export const ucFirst = (subject: string) =>
+  subject.charAt(0).toUpperCase() + subject.slice(1).toLowerCase();
+
 export const makeCleanId = (...args: string[]) =>
   args
     .flatMap((entry) => entry.split(/[^A-Z0-9]/gi)) // split by non-alphanumeric characters
@@ -286,9 +289,7 @@ export const makeCleanId = (...args: string[]) =>
       // split by sequences of capitalized letters
       entry.replaceAll(/[A-Z]+/g, (beginning) => `/${beginning}`).split("/"),
     )
-    .map(
-      (entry) => entry.charAt(0).toUpperCase() + entry.slice(1).toLowerCase(),
-    )
+    .map(ucFirst)
     .join("");
 
 export const defaultSerializer = (schema: z.ZodTypeAny): string =>
