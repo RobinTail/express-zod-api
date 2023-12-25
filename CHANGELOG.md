@@ -34,11 +34,13 @@ import { Documentation, Integration } from "express-zod-api";
 
 // featuring new way of configuring component descriptions and naming:
 new Documentation({
-  positiveResponse: ({ method, path }) =>
-    `${method} ${path} successful response`, // replaces successfulResponseDescription
-  negativeResponse: ({ method, path }) => `${method} ${path} error response`, // replaces errorResponseDescription
-  requestBody: ({ operationId }) => `${operationId} request body`, // featuring
-  requestParameter: () => "Parameter", // featuring
+  descriptions: {
+    positiveResponse: ({ method, path }) =>
+      `${method} ${path} successful response`, // replaces successfulResponseDescription
+    negativeResponse: ({ method, path }) => `${method} ${path} error response`, // replaces errorResponseDescription
+    requestBody: ({ operationId }) => `${operationId} request body`, // featuring
+    requestParameter: () => "Parameter", // featuring
+  },
 });
 
 // regular unformatted integration remains:
