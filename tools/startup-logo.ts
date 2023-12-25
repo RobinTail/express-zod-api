@@ -1,7 +1,12 @@
 import chalk, { ChalkInstance } from "chalk";
 import { writeFile } from "node:fs/promises";
 import ts from "typescript";
-import { exportModifier, f, makeConst } from "../src/integration-helpers";
+import {
+  exportModifier,
+  f,
+  makeArrowFn,
+  makeConst,
+} from "../src/integration-helpers";
 import { printNode } from "../src/zts-helpers";
 import { format } from "prettier";
 
@@ -53,14 +58,7 @@ const program = f.createVariableStatement(
   exportModifier,
   makeConst(
     f.createIdentifier("getStartupLogo"),
-    f.createArrowFunction(
-      undefined,
-      undefined,
-      [],
-      undefined,
-      undefined,
-      f.createNoSubstitutionTemplateLiteral(logo),
-    ),
+    makeArrowFn([], f.createNoSubstitutionTemplateLiteral(logo)),
   ),
 );
 
