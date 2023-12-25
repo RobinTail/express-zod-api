@@ -3,7 +3,7 @@ import { writeFile } from "node:fs/promises";
 import ts from "typescript";
 import { exportModifier, f, makeConst } from "../src/integration-helpers";
 import { printNode } from "../src/zts-helpers";
-import prettier from "prettier";
+import { format } from "prettier";
 
 const attribution = `
 ANSI font attribution
@@ -72,5 +72,5 @@ ts.addSyntheticLeadingComment(
 );
 
 const filepath = "./src/startup-logo.ts";
-const formatted = await prettier.format(printNode(program), { filepath });
+const formatted = await format(printNode(program), { filepath });
 await writeFile(filepath, formatted);
