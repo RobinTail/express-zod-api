@@ -1,6 +1,5 @@
 import chalk, { ChalkInstance } from "chalk";
 import { writeFile } from "node:fs/promises";
-import ts from "typescript";
 import {
   exportModifier,
   f,
@@ -9,11 +8,6 @@ import {
 } from "../src/integration-helpers";
 import { printNode } from "../src/zts-helpers";
 import { format } from "prettier";
-
-const attribution = `
-ANSI font attribution
-Colossal.flf (Jonathon - jon@mq.edu.au), 8 June 1994
-`;
 
 const proud = chalk.italic(
   "Proudly supports transgender community.".padStart(109),
@@ -60,13 +54,6 @@ const program = f.createVariableStatement(
     f.createIdentifier("getStartupLogo"),
     makeArrowFn([], f.createNoSubstitutionTemplateLiteral(logo)),
   ),
-);
-
-ts.addSyntheticLeadingComment(
-  program,
-  ts.SyntaxKind.MultiLineCommentTrivia,
-  attribution,
-  true,
 );
 
 const filepath = "./src/startup-logo.ts";
