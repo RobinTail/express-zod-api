@@ -1,11 +1,19 @@
 import chalk, { ChalkInstance } from "chalk";
-import { format } from "pretty-format";
 import { writeFile } from "node:fs/promises";
+import ts from "typescript";
+import {
+  exportModifier,
+  f,
+  makeArrowFn,
+  makeConst,
+} from "../src/integration-helpers";
+import { printNode } from "../src/zts-helpers";
+import { format } from "prettier";
 
 const attribution = `
-// ANSI font attribution
-// Colossal.flf (Jonathon - jon@mq.edu.au), 8 June 1994
-`.trim();
+ANSI font attribution
+Colossal.flf (Jonathon - jon@mq.edu.au), 8 June 1994
+`;
 
 const proud = chalk.italic(
   "Proudly supports transgender community.".padStart(109),
@@ -20,13 +28,13 @@ const thanks = chalk.italic(
 );
 const dedicationMessage = chalk.italic("for Nina".padEnd(20));
 
-const colors = new Array<ChalkInstance>(12)
-  .fill(chalk.blueBright, 0, 2)
-  .fill(chalk.magentaBright, 2, 4)
-  .fill(chalk.whiteBright, 4, 6)
-  .fill(chalk.magentaBright, 6, 8)
-  .fill(chalk.blueBright, 8, 11)
-  .fill(chalk.grey, 11, 12);
+const colors = new Array<ChalkInstance>(14)
+  .fill(chalk.blueBright, 1, 3)
+  .fill(chalk.magentaBright, 3, 5)
+  .fill(chalk.whiteBright, 5, 7)
+  .fill(chalk.magentaBright, 7, 9)
+  .fill(chalk.blueBright, 9, 12)
+  .fill(chalk.grey, 12, 13);
 
 const logo = `
 8888888888                                                          8888888888P              888             d8888 8888888b. 8888888 
@@ -42,19 +50,25 @@ const logo = `
 ${dedicationMessage}888${slogan}
 ${thanks}
 `
-  .trim()
   .split("\n")
   .map((line, index) => (colors[index] ? colors[index](line) : line))
   .join("\n");
 
-const serialized = format(logo, { escapeString: false }).slice(1, -1);
+const program = f.createVariableStatement(
+  exportModifier,
+  makeConst(
+    f.createIdentifier("getStartupLogo"),
+    makeArrowFn([], f.createNoSubstitutionTemplateLiteral(logo)),
+  ),
+);
 
-const output = `${attribution}\n
-export const getStartupLogo = () => {
-  return \`
-${serialized}
-\`;
-};
-`;
+ts.addSyntheticLeadingComment(
+  program,
+  ts.SyntaxKind.MultiLineCommentTrivia,
+  attribution,
+  true,
+);
 
-await writeFile("./src/startup-logo.ts", output);
+const filepath = "./src/startup-logo.ts";
+const formatted = await format(printNode(program), { filepath });
+await writeFile(filepath, formatted);
