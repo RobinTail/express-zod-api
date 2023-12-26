@@ -295,6 +295,23 @@ export const makeCleanId = (...args: string[]) =>
 export const defaultSerializer = (schema: z.ZodTypeAny): string =>
   createHash("sha1").update(JSON.stringify(schema), "utf8").digest("hex");
 
+export const tryToTransform = <T>({
+  effect,
+  sample,
+}: {
+  effect: z.TransformEffect<T>;
+  sample: T;
+}) => {
+  try {
+    return typeof effect.transform(sample, {
+      addIssue: () => {},
+      path: [],
+    });
+  } catch (e) {
+    return undefined;
+  }
+};
+
 // obtaining the private helper type from Zod
 export type ErrMessage = Exclude<
   Parameters<typeof z.ZodString.prototype.email>[0],
