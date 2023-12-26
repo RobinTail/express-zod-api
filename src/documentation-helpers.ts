@@ -540,7 +540,7 @@ export const depictEffect: Depicter<z.ZodEffects<z.ZodTypeAny>> = ({
   const input = next({ schema: schema.innerType() });
   const { effect } = schema._def;
   if (isResponse && effect.type === "transform" && !isReferenceObject(input)) {
-    const outputType = tryToTransform({ effect, sample: makeSample(input) });
+    const outputType = tryToTransform(schema, makeSample(input));
     if (outputType && ["number", "string", "boolean"].includes(outputType)) {
       return { type: outputType as "number" | "string" | "boolean" };
     } else {

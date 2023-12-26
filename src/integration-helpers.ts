@@ -169,12 +169,13 @@ export const makeTypeParams = (params: Record<string, ts.Identifier>) =>
     [] as ts.TypeParameterDeclaration[],
   );
 
-export const makeAsyncArrowFn = (
+export const makeArrowFn = (
   params: ts.Identifier[],
   body: ts.ConciseBody,
+  isAsync?: boolean,
 ) =>
   f.createArrowFunction(
-    asyncModifier,
+    isAsync ? asyncModifier : undefined,
     undefined,
     params.map((key) => makeParam(key)),
     undefined,

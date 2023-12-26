@@ -7,7 +7,7 @@ import {
   exportModifier,
   f,
   makeAnyPromise,
-  makeAsyncArrowFn,
+  makeArrowFn,
   makeConst,
   makeEmptyInitializingConstructor,
   makeIndexedPromise,
@@ -424,7 +424,7 @@ export class Integration {
           this.ids.provideMethod,
           f.createTypeReferenceNode(this.ids.providerType),
           // = async (method, path, params) => this.implementation(___)
-          makeAsyncArrowFn(
+          makeArrowFn(
             [
               this.ids.methodParameter,
               this.ids.pathParameter,
@@ -438,6 +438,7 @@ export class Integration {
               undefined,
               [this.ids.methodParameter, pathArgument, paramsArgument],
             ),
+            true,
           ),
         ),
       ],
@@ -602,7 +603,7 @@ export class Integration {
       exportModifier,
       makeConst(
         this.ids.exampleImplementationConst,
-        makeAsyncArrowFn(
+        makeArrowFn(
           [
             this.ids.methodParameter,
             this.ids.pathParameter,
@@ -615,6 +616,7 @@ export class Integration {
             ifJsonStatement,
             returnTextStatement,
           ]),
+          true,
         ),
         f.createTypeReferenceNode(this.ids.implementationType),
       ),
