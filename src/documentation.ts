@@ -223,7 +223,7 @@ export class Documentation extends OpenApiBuilder {
       }
       const securityRefs = depictSecurityRefs(
         mapLogicalContainer(
-          depictSecurity(endpoint.getSecurity()),
+          depictSecurity(endpoint.getSecurity(), inputSources),
           (securitySchema) => {
             const name = this.ensureUniqSecuritySchemaName(securitySchema);
             const scopes = ["oauth2", "openIdConnect"].includes(

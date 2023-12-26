@@ -1685,6 +1685,8 @@ components:
       type: apiKey
       in: query
       name: key
+      x-in-actual: body
+      description: key MUST be supplied within the request body instead of query
     APIKEY_2:
       type: apiKey
       in: header
@@ -2222,6 +2224,8 @@ components:
       type: apiKey
       in: query
       name: key
+      x-in-actual: body
+      description: key MUST be supplied within the request body instead of query
     APIKEY_2:
       type: apiKey
       in: header
