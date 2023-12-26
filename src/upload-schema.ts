@@ -5,10 +5,10 @@ import {
   ParseInput,
   ParseReturnType,
   ZodIssueCode,
-  ZodParsedType,
   ZodType,
   ZodTypeDef,
   addIssueToContext,
+  z,
 } from "zod";
 
 const zodUploadKind = "ZodUpload";
@@ -17,39 +17,32 @@ export interface ZodUploadDef extends ZodTypeDef {
   typeName: typeof zodUploadKind;
 }
 
+const uploadedFileSchema = z.object({
+  name: z.string(),
+  encoding: z.string(),
+  mimetype: z.string(),
+  data: z.any().refine((subject) => Buffer.isBuffer(subject)),
+  tempFilePath: z.string(),
+  truncated: z.boolean(),
+  size: z.number(),
+  md5: z.string(),
+  mv: z.function(),
+});
+
 const isUploadedFile = (data: unknown): data is UploadedFile =>
-  typeof data === "object" &&
-  data !== null &&
-  "name" in data &&
-  "encoding" in data &&
-  "mimetype" in data &&
-  "data" in data &&
-  "tempFilePath" in data &&
-  "truncated" in data &&
-  "size" in data &&
-  "md5" in data &&
-  "mv" in data &&
-  typeof data.name === "string" &&
-  typeof data.mimetype === "string" &&
-  typeof data.data === "object" &&
-  typeof data.tempFilePath === "string" &&
-  typeof data.truncated === "boolean" &&
-  typeof data.size === "number" &&
-  typeof data.md5 === "string" &&
-  typeof data.mv === "function";
+  uploadedFileSchema.safeParse(data).success;
 
 export class ZodUpload extends ZodType<UploadedFile, ZodUploadDef> {
-  _parse(input: ParseInput): ParseReturnType<UploadedFile> {
-    const { ctx } = this._processInputParams(input);
-    if (ctx.parsedType !== ZodParsedType.object || !isUploadedFile(ctx.data)) {
-      addIssueToContext(ctx, {
-        code: ZodIssueCode.custom,
-        message: `Expected file upload, received ${ctx.parsedType}`,
-      });
-      return INVALID;
+  override _parse(input: ParseInput): ParseReturnType<UploadedFile> {
+    if (isUploadedFile(input.data)) {
+      return OK(input.data);
     }
-
-    return OK(ctx.data);
+    const { ctx } = this._processInputParams(input);
+    addIssueToContext(ctx, {
+      code: ZodIssueCode.custom,
+      message: `Expected file upload, received ${ctx.parsedType}`,
+    });
+    return INVALID;
   }
 
   static create = () =>
