@@ -476,6 +476,8 @@ components:
       type: apiKey
       in: query
       name: key
+      x-in: body
+      description: key should be supplied within the request body
     APIKEY_2:
       type: apiKey
       in: header

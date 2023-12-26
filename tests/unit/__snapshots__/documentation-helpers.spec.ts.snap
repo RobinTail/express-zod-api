@@ -874,6 +874,26 @@ exports[`Documentation helpers > depictSecurity() > should handle undefined flow
 }
 `;
 
+exports[`Documentation helpers > depictSecurity() > should inform on 'actual' placement of the input security parameter 1`] = `
+{
+  "description": "key should be supplied within the request body",
+  "in": "query",
+  "name": "key",
+  "type": "apiKey",
+  "x-in": "body",
+}
+`;
+
+exports[`Documentation helpers > depictSecurity() > should inform on 'alternative' placement of the input security parameter 1`] = `
+{
+  "description": "key can also be supplied within the request body",
+  "in": "query",
+  "name": "key",
+  "type": "apiKey",
+  "x-in": "body",
+}
+`;
+
 exports[`Documentation helpers > depictSecurityRefs() > should handle LogicalAnd 1`] = `
 [
   {

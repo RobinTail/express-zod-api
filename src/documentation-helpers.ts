@@ -914,6 +914,7 @@ export const depictResponse = ({
 
 type SecurityHelper<K extends Security["type"]> = (
   security: Security & { type: K },
+  inputSources: InputSource[],
 ) => SecuritySchemeObject;
 
 const depictBasicSecurity: SecurityHelper<"basic"> = () => ({
@@ -932,12 +933,23 @@ const depictBearerSecurity: SecurityHelper<"bearer"> = ({
   }
   return result;
 };
-// @todo add description on actual input placement
-const depictInputSecurity: SecurityHelper<"input"> = ({ name }) => ({
-  type: "apiKey",
-  in: "query", // body is not supported yet, https://swagger.io/docs/specification/authentication/api-keys/
-  name,
-});
+const depictInputSecurity: SecurityHelper<"input"> = (
+  { name },
+  inputSources,
+) => {
+  const result: SecuritySchemeObject = {
+    type: "apiKey",
+    in: "query",
+    name,
+  };
+  if (inputSources.includes("body")) {
+    result["x-in"] = "body";
+    result.description = `${name} ${
+      inputSources.includes("query") ? "can also" : "should"
+    } be supplied within the request body`;
+  }
+  return result;
+};
 const depictHeaderSecurity: SecurityHelper<"header"> = ({ name }) => ({
   type: "apiKey",
   in: "header",
@@ -970,6 +982,7 @@ const depictOAuth2Security: SecurityHelper<"oauth2"> = ({ flows = {} }) => ({
 
 export const depictSecurity = (
   container: LogicalContainer<Security>,
+  inputSources: InputSource[],
 ): LogicalContainer<SecuritySchemeObject> => {
   const methods: { [K in Security["type"]]: SecurityHelper<K> } = {
     basic: depictBasicSecurity,
@@ -981,7 +994,10 @@ export const depictSecurity = (
     oauth2: depictOAuth2Security,
   };
   return mapLogicalContainer(container, (security) =>
-    (methods[security.type] as SecurityHelper<typeof security.type>)(security),
+    (methods[security.type] as SecurityHelper<typeof security.type>)(
+      security,
+      inputSources,
+    ),
   );
 };
 
