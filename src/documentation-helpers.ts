@@ -943,10 +943,13 @@ const depictInputSecurity: SecurityHelper<"input"> = (
     name,
   };
   if (inputSources?.includes("body")) {
-    result["x-in"] = "body";
-    result.description = `${name} ${
-      inputSources.includes("query") ? "can also" : "should"
-    } be supplied within the request body`;
+    if (inputSources?.includes("query")) {
+      result["x-in-alternative"] = "body";
+      result.description = `${name} CAN also be supplied within the request body`;
+    } else {
+      result["x-in-actual"] = "body";
+      result.description = `${name} MUST be supplied within the request body instead of query`;
+    }
   }
   return result;
 };
