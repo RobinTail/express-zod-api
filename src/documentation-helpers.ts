@@ -26,7 +26,6 @@ import {
   hasTopLevelTransformingEffect,
   isCustomHeader,
   makeCleanId,
-  tryToTransform,
   ucFirst,
 } from "./common-helpers";
 import { InputSource, TagsConfig } from "./config-type";
@@ -540,12 +539,13 @@ export const depictEffect: Depicter<z.ZodEffects<z.ZodTypeAny>> = ({
   const input = next({ schema: schema.innerType() });
   const { effect } = schema._def;
   if (isResponse && effect.type === "transform" && !isReferenceObject(input)) {
-    const outputType = tryToTransform({ effect, sample: makeSample(input) });
-    if (outputType && ["number", "string", "boolean"].includes(outputType)) {
-      return { type: outputType as "number" | "string" | "boolean" };
-    } else {
-      return next({ schema: z.any() });
-    }
+    try {
+      const outputType = typeof schema.parse(makeSample(input));
+      if (["number", "string", "boolean"].includes(outputType)) {
+        return { type: outputType as "number" | "string" | "boolean" };
+      }
+    } catch {}
+    return next({ schema: z.any() });
   }
   if (
     !isResponse &&

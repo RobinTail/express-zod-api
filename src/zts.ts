@@ -1,6 +1,6 @@
 import ts from "typescript";
 import { z } from "zod";
-import { hasCoercion, tryToTransform } from "./common-helpers";
+import { hasCoercion } from "./common-helpers";
 import { ZodFile } from "./file-schema";
 import { HandlingRules, walkSchema } from "./schema-walker";
 import {
@@ -94,20 +94,23 @@ const onEffects: Producer<z.ZodEffects<z.ZodTypeAny>> = ({
   const input = next({ schema: schema.innerType() });
   const effect = schema._def.effect;
   if (isResponse && effect.type === "transform") {
-    const outputType = tryToTransform({ effect, sample: makeSample(input) });
-    const resolutions: Partial<
-      Record<NonNullable<typeof outputType>, ts.KeywordTypeSyntaxKind>
-    > = {
-      number: ts.SyntaxKind.NumberKeyword,
-      bigint: ts.SyntaxKind.BigIntKeyword,
-      boolean: ts.SyntaxKind.BooleanKeyword,
-      string: ts.SyntaxKind.StringKeyword,
-      undefined: ts.SyntaxKind.UndefinedKeyword,
-      object: ts.SyntaxKind.ObjectKeyword,
-    };
-    return f.createKeywordTypeNode(
-      (outputType && resolutions[outputType]) || ts.SyntaxKind.AnyKeyword,
-    );
+    try {
+      const outputType = typeof schema.parse(makeSample(input));
+      const resolutions: Partial<
+        Record<NonNullable<typeof outputType>, ts.KeywordTypeSyntaxKind>
+      > = {
+        number: ts.SyntaxKind.NumberKeyword,
+        bigint: ts.SyntaxKind.BigIntKeyword,
+        boolean: ts.SyntaxKind.BooleanKeyword,
+        string: ts.SyntaxKind.StringKeyword,
+        undefined: ts.SyntaxKind.UndefinedKeyword,
+        object: ts.SyntaxKind.ObjectKeyword,
+      };
+      if (outputType in resolutions) {
+        return f.createKeywordTypeNode(resolutions[outputType]!);
+      }
+    } catch {}
+    return f.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword);
   }
   return input;
 };
