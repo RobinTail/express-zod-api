@@ -914,7 +914,7 @@ export const depictResponse = ({
 
 type SecurityHelper<K extends Security["type"]> = (
   security: Security & { type: K },
-  inputSources: InputSource[],
+  inputSources?: InputSource[],
 ) => SecuritySchemeObject;
 
 const depictBasicSecurity: SecurityHelper<"basic"> = () => ({
@@ -942,7 +942,7 @@ const depictInputSecurity: SecurityHelper<"input"> = (
     in: "query",
     name,
   };
-  if (inputSources.includes("body")) {
+  if (inputSources?.includes("body")) {
     result["x-in"] = "body";
     result.description = `${name} ${
       inputSources.includes("query") ? "can also" : "should"
@@ -982,7 +982,7 @@ const depictOAuth2Security: SecurityHelper<"oauth2"> = ({ flows = {} }) => ({
 
 export const depictSecurity = (
   container: LogicalContainer<Security>,
-  inputSources: InputSource[],
+  inputSources?: InputSource[],
 ): LogicalContainer<SecuritySchemeObject> => {
   const methods: { [K in Security["type"]]: SecurityHelper<K> } = {
     basic: depictBasicSecurity,
