@@ -5,7 +5,6 @@ import {
   ParseInput,
   ParseReturnType,
   ZodIssueCode,
-  ZodParsedType,
   ZodType,
   ZodTypeDef,
   addIssueToContext,
@@ -34,11 +33,11 @@ const isUploadedFile = (data: unknown): data is UploadedFile =>
   uploadedFileSchema.safeParse(data).success;
 
 export class ZodUpload extends ZodType<UploadedFile, ZodUploadDef> {
-  _parse(input: ParseInput): ParseReturnType<UploadedFile> {
-    const { ctx } = this._processInputParams(input);
-    if (ctx.parsedType === ZodParsedType.object && isUploadedFile(ctx.data)) {
-      return OK(ctx.data);
+  override _parse(input: ParseInput): ParseReturnType<UploadedFile> {
+    if (isUploadedFile(input.data)) {
+      return OK(input.data);
     }
+    const { ctx } = this._processInputParams(input);
     addIssueToContext(ctx, {
       code: ZodIssueCode.custom,
       message: `Expected file upload, received ${ctx.parsedType}`,
