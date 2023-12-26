@@ -295,18 +295,12 @@ export const makeCleanId = (...args: string[]) =>
 export const defaultSerializer = (schema: z.ZodTypeAny): string =>
   createHash("sha1").update(JSON.stringify(schema), "utf8").digest("hex");
 
-export const tryToTransform = <T>({
-  effect,
-  sample,
-}: {
-  effect: z.TransformEffect<T>;
-  sample: T;
-}) => {
+export const tryToTransform = <T>(
+  schema: z.ZodEffects<z.ZodTypeAny, T>,
+  sample: T,
+) => {
   try {
-    return typeof effect.transform(sample, {
-      addIssue: () => {},
-      path: [],
-    });
+    return typeof schema.parse(sample);
   } catch (e) {
     return undefined;
   }
