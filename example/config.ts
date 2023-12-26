@@ -2,6 +2,10 @@ import express from "express";
 import { createConfig } from "../src";
 
 export const config = createConfig({
+  inputSources: {
+    patch: ["body", "query"],
+    put: ["body"],
+  },
   server: {
     listen: 8090,
     upload: true,
