@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: Example API
-  version: 16.0.0
+  version: 16.1.0
 paths:
   /v1/user/retrieve:
     get:
@@ -476,6 +476,8 @@ components:
       type: apiKey
       in: query
       name: key
+      x-in-actual: body
+      description: key MUST be supplied within the request body instead of query
     APIKEY_2:
       type: apiKey
       in: header

@@ -1027,6 +1027,20 @@ describe("Documentation helpers", () => {
         }),
       ).toMatchSnapshot();
     });
+    test.each([
+      { variant: "alternative", inputSources: ["query", "body"] as const },
+      { variant: "actual", inputSources: ["body", "files"] as const },
+    ])(
+      `should inform on $variant placement of the input security parameter`,
+      ({ inputSources }) => {
+        expect(
+          depictSecurity(
+            { type: "input", name: "key" },
+            Array.from(inputSources),
+          ),
+        ).toMatchSnapshot();
+      },
+    );
     test("should handle OpenID and OAuth2 Securities", () => {
       expect(
         depictSecurity({

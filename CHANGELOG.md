@@ -2,6 +2,49 @@
 
 ## Version 16
 
+### 16.1.0
+
+- Improving the documentation of endpoints based on middlewares having `security` schema with `type: "input"`.
+  - According to the OpenAPI specification, endpoints designed to accept some authentication key are expected to
+    receive it as the request query parameter,
+  - However `express-zod-api` is designed to combine multiple properties of the `Request` into a single `input` object.
+  - Those properties are configurable for each method via the `inputSources` config option.
+  - Therefore, the authentication key for the such middleware can alternatively OR must actually be supplied within
+    the request body, depending on the API configuration.
+  - The depiction of security schema as a one expecting the query parameter (due to the limitation of the OpenAPI)
+    could lead to discrepancies or confusion, so this version offers a solution for that problem.
+  - Depending on the case, along with the `in` property, either the `x-in-alternative` or `x-in-actual` extension is
+    added to the security schema depiction, as well as the `description` property explaining the case.
+
+```ts
+const authMiddleware = createMiddleware({
+  security: { type: "input", name: "key" },
+});
+
+export const config = createConfig({
+  inputSources: {
+    patch: ["body", "query"], // has request body as alternative input source
+    put: ["body"], // does not have the request query as input source
+  },
+});
+```
+
+```yaml
+securitySchemes:
+  FOR_PATCH_REQUEST:
+    type: apiKey
+    in: query
+    name: key
+    x-in-alternative: body # added
+    description: key CAN also be supplied within the request body
+  FOR_PUT_REQUEST:
+    type: apiKey
+    in: query # can not be set to "body"
+    name: key
+    x-in-actual: body # added
+    description: key MUST be supplied within the request body instead of query
+```
+
 ### 16.0.0
 
 - Potentially breaking changes:
