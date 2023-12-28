@@ -17,11 +17,12 @@ export interface ZodUploadDef extends ZodTypeDef {
   typeName: typeof zodUploadKind;
 }
 
+const bufferSchema = z.custom<Buffer>((subject) => Buffer.isBuffer(subject));
 const uploadedFileSchema = z.object({
   name: z.string(),
   encoding: z.string(),
   mimetype: z.string(),
-  data: z.any().refine((subject) => Buffer.isBuffer(subject)),
+  data: bufferSchema,
   tempFilePath: z.string(),
   truncated: z.boolean(),
   size: z.number(),
