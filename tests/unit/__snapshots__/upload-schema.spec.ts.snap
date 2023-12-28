@@ -1,6 +1,36 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`ZodUpload > _parse() > should accept UploadedFile 1`] = `
+exports[`ZodUpload > _parse() > should accept UploadedFile 0 1`] = `
+{
+  "data": {
+    "data": {
+      "data": [
+        115,
+        111,
+        109,
+        101,
+        116,
+        104,
+        105,
+        110,
+        103,
+      ],
+      "type": "Buffer",
+    },
+    "encoding": "utf-8",
+    "md5": "",
+    "mimetype": "image/jpeg",
+    "mv": [MockFunction spy],
+    "name": "avatar.jpg",
+    "size": 100500,
+    "tempFilePath": "",
+    "truncated": false,
+  },
+  "success": true,
+}
+`;
+
+exports[`ZodUpload > _parse() > should accept UploadedFile 1 1`] = `
 {
   "data": {
     "data": {

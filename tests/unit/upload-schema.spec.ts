@@ -26,21 +26,24 @@ describe("ZodUpload", () => {
       }
     });
 
-    test("should accept UploadedFile", () => {
-      const schema = ZodUpload.create();
-      const buffer = Buffer.from("something");
-      const result = schema.safeParse({
-        name: "avatar.jpg",
-        mv: vi.fn(async () => Promise.resolve()),
-        encoding: "utf-8",
-        mimetype: "image/jpeg",
-        data: buffer,
-        tempFilePath: "",
-        truncated: false,
-        size: 100500,
-        md5: "",
-      });
-      expect(result).toMatchSnapshot();
-    });
+    test.each([vi.fn(async () => {}), vi.fn(() => {})])(
+      "should accept UploadedFile %#",
+      (mv) => {
+        const schema = ZodUpload.create();
+        const buffer = Buffer.from("something");
+        const result = schema.safeParse({
+          name: "avatar.jpg",
+          mv,
+          encoding: "utf-8",
+          mimetype: "image/jpeg",
+          data: buffer,
+          tempFilePath: "",
+          truncated: false,
+          size: 100500,
+          md5: "",
+        });
+        expect(result).toMatchSnapshot();
+      },
+    );
   });
 });
