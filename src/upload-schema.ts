@@ -35,7 +35,7 @@ export class ZodUpload extends ZodType<UploadedFile, ZodUploadDef> {
     if (uploadedFileSchema.safeParse(input.data).success) {
       return OK(input.data);
     }
-    const { ctx } = this._processInputParams(input);
+    const ctx = this._getOrReturnCtx(input);
     addIssueToContext(ctx, {
       code: ZodIssueCode.custom,
       message: `Expected file upload, received ${ctx.parsedType}`,
