@@ -30,12 +30,9 @@ const uploadedFileSchema = z.object({
   mv: z.function(),
 });
 
-const isUploadedFile = (data: unknown): data is UploadedFile =>
-  uploadedFileSchema.safeParse(data).success;
-
 export class ZodUpload extends ZodType<UploadedFile, ZodUploadDef> {
   override _parse(input: ParseInput): ParseReturnType<UploadedFile> {
-    if (isUploadedFile(input.data)) {
+    if (uploadedFileSchema.safeParse(input.data).success) {
       return OK(input.data);
     }
     const { ctx } = this._processInputParams(input);
