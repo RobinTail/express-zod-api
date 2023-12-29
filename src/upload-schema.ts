@@ -17,11 +17,12 @@ export interface ZodUploadDef extends ZodTypeDef {
   typeName: typeof zodUploadKind;
 }
 
+const bufferSchema = z.custom<Buffer>((subject) => Buffer.isBuffer(subject));
 const uploadedFileSchema = z.object({
   name: z.string(),
   encoding: z.string(),
   mimetype: z.string(),
-  data: z.any().refine((subject) => Buffer.isBuffer(subject)),
+  data: bufferSchema,
   tempFilePath: z.string(),
   truncated: z.boolean(),
   size: z.number(),
@@ -29,15 +30,12 @@ const uploadedFileSchema = z.object({
   mv: z.function(),
 });
 
-const isUploadedFile = (data: unknown): data is UploadedFile =>
-  uploadedFileSchema.safeParse(data).success;
-
 export class ZodUpload extends ZodType<UploadedFile, ZodUploadDef> {
   override _parse(input: ParseInput): ParseReturnType<UploadedFile> {
-    if (isUploadedFile(input.data)) {
+    if (uploadedFileSchema.safeParse(input.data).success) {
       return OK(input.data);
     }
-    const { ctx } = this._processInputParams(input);
+    const ctx = this._getOrReturnCtx(input);
     addIssueToContext(ctx, {
       code: ZodIssueCode.custom,
       message: `Expected file upload, received ${ctx.parsedType}`,
