@@ -23,7 +23,7 @@ interface ResultHandlerParams<RES> {
   logger: AbstractLogger;
 }
 
-type ResultHandler<RES> = (
+export type ResultHandler<RES> = (
   params: ResultHandlerParams<RES>,
 ) => void | Promise<void>;
 
