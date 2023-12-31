@@ -149,7 +149,7 @@ export const arrayResultHandler = createResultHandler({
       return;
     }
     if (output && "items" in output && Array.isArray(output.items)) {
-      response.status(200).json(output.items);
+      response.status(defaultStatusCodes.positive).json(output.items);
     } else {
       response
         .status(500)
