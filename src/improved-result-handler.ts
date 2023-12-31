@@ -1,11 +1,9 @@
 import { z } from "zod";
 import { ApiResponse } from "./api-response";
 import { IOSchema } from "./io-schema";
-import { ResultHandler } from "./result-handler";
+import { ResultHandler, ResultHandlerDefinition } from "./result-handler";
 
-type Setup = Readonly<
-  [ApiResponse<z.ZodTypeAny>, ...ApiResponse<z.ZodTypeAny>[]]
->;
+type Setup = [ApiResponse<z.ZodTypeAny>, ...ApiResponse<z.ZodTypeAny>[]];
 
 type SetupUnion<T extends Setup> = z.output<T[number]["schema"]>;
 
@@ -15,12 +13,21 @@ interface SpecialDefinition<POS extends Setup, NEG extends Setup> {
   handler: ResultHandler<SetupUnion<POS> | SetupUnion<NEG>>;
 }
 
-export const createSpecialResultHandler = <
+export function createSpecialResultHandler<
   POS extends Setup,
   NEG extends Setup,
->(
-  definition: SpecialDefinition<POS, NEG>,
-) => definition;
+>(definition: SpecialDefinition<POS, NEG>): typeof definition;
+
+export function createSpecialResultHandler<
+  POS extends z.ZodTypeAny,
+  NEG extends z.ZodTypeAny,
+>(definition: ResultHandlerDefinition<POS, NEG>): typeof definition;
+
+export function createSpecialResultHandler(
+  definition: SpecialDefinition<any, any> | ResultHandlerDefinition<any, any>,
+) {
+  return definition;
+}
 
 createSpecialResultHandler({
   getPositiveResponse: () => [
@@ -33,5 +40,27 @@ createSpecialResultHandler({
   ],
   handler: ({ response }) => {
     response.status(200).send("error");
+  },
+});
+
+createSpecialResultHandler({
+  getPositiveResponse: (output: IOSchema) =>
+    z.object({
+      status: z.literal("success"),
+      data: output,
+    }),
+  getNegativeResponse: () => ({
+    schema: z.object({
+      status: z.literal("error"),
+      error: z.object({
+        message: z.string(),
+      }),
+    }),
+  }),
+  handler: ({ response }) => {
+    response.status(500).json({
+      status: "error",
+      error: { message: "test" },
+    });
   },
 });
