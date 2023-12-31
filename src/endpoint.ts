@@ -19,15 +19,12 @@ import {
   makeErrorFromAnything,
 } from "./common-helpers";
 import { IOSchema } from "./io-schema";
+import { lastResortHandler } from "./last-resort";
 import { LogicalContainer, combineContainers } from "./logical-container";
 import { AuxMethod, Method } from "./method";
 import { AnyMiddlewareDef } from "./middleware";
 import { mimeJson, mimeMultipart, mimeRaw } from "./mime";
-import {
-  ResultHandlerDefinition,
-  defaultStatusCodes,
-  lastResortHandler,
-} from "./result-handler";
+import { ResultHandlerDefinition, defaultStatusCodes } from "./result-handler";
 import { Security } from "./security";
 import { AbstractLogger } from "./logger";
 
