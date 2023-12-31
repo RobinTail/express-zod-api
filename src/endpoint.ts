@@ -64,6 +64,7 @@ export type Handler<IN, OUT, OPT> = (params: {
 type DescriptionVariant = "short" | "long";
 type IOVariant = "input" | "output";
 type ResponseVariant = "positive" | "negative";
+type MimeVariant = Extract<IOVariant, "input"> | ResponseVariant;
 
 export abstract class AbstractEndpoint {
   public abstract execute(params: {
@@ -77,7 +78,7 @@ export abstract class AbstractEndpoint {
   ): string | undefined;
   public abstract getMethods(): Method[];
   public abstract getSchema(variant: IOVariant): IOSchema;
-  public abstract getInputMimeTypes(): string[];
+  public abstract getMimeTypes(variant: MimeVariant): string[];
   public abstract getResponses(variant: ResponseVariant): ProcessedResponse[];
   public abstract getSecurity(): LogicalContainer<Security>;
   public abstract getScopes(): string[];
@@ -191,8 +192,11 @@ export class Endpoint<
     return this.#schemas[variant];
   }
 
-  public override getInputMimeTypes() {
-    return this.#inputMimeTypes;
+  public override getMimeTypes(variant: MimeVariant) {
+    if (variant === "input") {
+      return this.#inputMimeTypes;
+    }
+    return this.getResponses(variant).flatMap(({ mimeTypes }) => mimeTypes);
   }
 
   public override getResponses(variant: ResponseVariant) {

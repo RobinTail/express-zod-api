@@ -318,17 +318,20 @@ describe("Endpoint", () => {
     });
   });
 
-  describe("getInputMimeTypes()", () => {
-    test("should return the input mime types", () => {
-      const factory = new EndpointsFactory(defaultResultHandler);
-      const endpoint = factory.build({
-        method: "get",
-        input: z.object({}),
-        output: z.object({ something: z.number() }),
-        handler: vi.fn(),
-      });
-      expect(endpoint.getInputMimeTypes()).toEqual(["application/json"]);
-    });
+  describe("getMimeTypes()", () => {
+    test.each(["input", "positive", "negative"] as const)(
+      "should return the %s mime types",
+      (variant) => {
+        const factory = new EndpointsFactory(defaultResultHandler);
+        const endpoint = factory.build({
+          method: "get",
+          input: z.object({}),
+          output: z.object({ something: z.number() }),
+          handler: vi.fn(),
+        });
+        expect(endpoint.getMimeTypes(variant)).toEqual(["application/json"]);
+      },
+    );
   });
 
   describe("getResponses()", () => {
