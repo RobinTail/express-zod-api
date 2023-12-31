@@ -3,7 +3,7 @@ import { MultipleApiResponses } from "./api-response";
 import { IOSchema } from "./io-schema";
 import { ResultHandler, ResultHandlerDefinition } from "./result-handler";
 
-interface SpecialDefinition<
+interface StatusDependingDefinition<
   POS extends MultipleApiResponses,
   NEG extends MultipleApiResponses,
 > {
@@ -14,23 +14,21 @@ interface SpecialDefinition<
   >;
 }
 
-export function createSpecialResultHandler<
+export function createResultHandler<
   POS extends MultipleApiResponses,
   NEG extends MultipleApiResponses,
->(definition: SpecialDefinition<POS, NEG>): typeof definition;
+>(definition: StatusDependingDefinition<POS, NEG>): typeof definition;
 
-export function createSpecialResultHandler<
+export function createResultHandler<
   POS extends z.ZodTypeAny,
   NEG extends z.ZodTypeAny,
 >(definition: ResultHandlerDefinition<POS, NEG>): typeof definition;
 
-export function createSpecialResultHandler(
-  definition: SpecialDefinition<any, any> | ResultHandlerDefinition<any, any>,
-) {
+export function createResultHandler(definition: unknown) {
   return definition;
 }
 
-createSpecialResultHandler({
+createResultHandler({
   getPositiveResponse: () => [
     { statusCode: 200, schema: z.literal("ok") },
     { statusCode: 201, schema: z.literal("kinda") },
@@ -44,7 +42,7 @@ createSpecialResultHandler({
   },
 });
 
-createSpecialResultHandler({
+createResultHandler({
   getPositiveResponse: (output: IOSchema) =>
     z.object({
       status: z.literal("success"),
