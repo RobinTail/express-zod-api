@@ -21,7 +21,7 @@ const authMiddleware = createMiddleware({
   security: { type: "input", name: "key" },
 });
 
-export const config = createConfig({
+const config = createConfig({
   inputSources: {
     patch: ["body", "query"], // has request body as alternative input source
     put: ["body"], // does not have the request query as input source
