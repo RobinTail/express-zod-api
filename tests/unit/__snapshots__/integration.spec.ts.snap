@@ -738,6 +738,41 @@ export interface Response extends Record<MethodPath, any> {
 "
 `;
 
+exports[`Integration > Should support multiple response schemas depending on status code 1`] = `
+"type PostV1MtplInput = {};
+
+type PostV1MtplPositiveResponse = "ok" | "kinda";
+
+type PostV1MtplNegativeResponse = "error" | "failure";
+
+type PostV1MtplResponse =
+  | PostV1MtplPositiveResponse
+  | PostV1MtplNegativeResponse;
+
+export type Path = "/v1/mtpl";
+
+export type Method = "get" | "post" | "put" | "delete" | "patch";
+
+export type MethodPath = \`\${Method} \${Path}\`;
+
+export interface Input extends Record<MethodPath, any> {
+  "post /v1/mtpl": PostV1MtplInput;
+}
+
+export interface PositiveResponse extends Record<MethodPath, any> {
+  "post /v1/mtpl": PostV1MtplPositiveResponse;
+}
+
+export interface NegativeResponse extends Record<MethodPath, any> {
+  "post /v1/mtpl": PostV1MtplNegativeResponse;
+}
+
+export interface Response extends Record<MethodPath, any> {
+  "post /v1/mtpl": PostV1MtplResponse;
+}
+"
+`;
+
 exports[`Integration > Should treat optionals the same way as z.infer() by default 1`] = `
 "type PostV1TestWithDashesInput = {
   opt?: string | undefined;
