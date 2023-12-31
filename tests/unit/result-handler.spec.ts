@@ -1,12 +1,15 @@
 import { Request, Response } from "express";
 import createHttpError from "http-errors";
+import { expectType } from "tsd";
 import { z } from "zod";
 import {
   InputValidationError,
   arrayResultHandler,
+  createResultHandler,
   defaultResultHandler,
   withMeta,
 } from "../../src";
+import { ApiResponse } from "../../src/api-response";
 import { metaProp } from "../../src/metadata";
 import { describe, expect, test, vi } from "vitest";
 import {
@@ -170,5 +173,27 @@ describe("ResultHandler", () => {
     expect(responseMock.status).toHaveBeenCalledWith(500);
     expect(responseMock.send).toHaveBeenCalledTimes(1);
     expect(responseMock.send.mock.calls[0]).toMatchSnapshot();
+  });
+
+  test("createResultHandler() should support multiple response schemas depending on status codes", () => {
+    const subject = createResultHandler({
+      getPositiveResponse: () => [
+        { statusCode: 200, schema: z.literal("ok") },
+        { statusCode: 201, schema: z.literal("kinda") },
+      ],
+      getNegativeResponse: () => [
+        { statusCode: 400, schema: z.literal("error") },
+        { statusCode: 500, schema: z.literal("failure") },
+      ],
+      handler: ({ response }) => {
+        response.status(200).send("error");
+      },
+    });
+    expectType<
+      [ApiResponse<z.ZodLiteral<"ok">>, ApiResponse<z.ZodLiteral<"kinda">>]
+    >(subject.getPositiveResponse(z.object({})));
+    expectType<
+      [ApiResponse<z.ZodLiteral<"error">>, ApiResponse<z.ZodLiteral<"failure">>]
+    >(subject.getNegativeResponse());
   });
 });

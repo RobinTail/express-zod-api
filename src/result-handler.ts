@@ -70,21 +70,6 @@ export function createResultHandler(definition: unknown) {
   return definition;
 }
 
-/** @todo remove */
-createResultHandler({
-  getPositiveResponse: () => [
-    { statusCode: 200, schema: z.literal("ok") },
-    { statusCode: 201, schema: z.literal("kinda") },
-  ],
-  getNegativeResponse: () => [
-    { statusCode: 400, schema: z.literal("error") },
-    { statusCode: 500, schema: z.literal("failure") },
-  ],
-  handler: ({ response }) => {
-    response.status(200).send("error");
-  },
-});
-
 export const defaultResultHandler = createResultHandler({
   getPositiveResponse: (output: IOSchema) => {
     // Examples are taken for proxying: no validation needed for this
