@@ -8,16 +8,9 @@ import {
   getStatusCodeFromError,
   logInternalError,
 } from "./common-helpers";
-import { ResultHandlerError } from "./errors";
 import { IOSchema } from "./io-schema";
-import { withMeta } from "./metadata";
 import { AbstractLogger } from "./logger";
-
-interface LastResortHandlerParams {
-  error: ResultHandlerError;
-  logger: AbstractLogger;
-  response: Response;
-}
+import { withMeta } from "./metadata";
 
 interface ResultHandlerParams<RES> {
   /** null in case of failure to parse or to find the matching endpoint (error: not found) */
@@ -157,19 +150,3 @@ export const arrayResultHandler = createResultHandler({
     }
   },
 });
-
-export const lastResortHandler = ({
-  error,
-  logger,
-  response,
-}: LastResortHandlerParams) => {
-  logger.error(`Result handler failure: ${error.message}.`);
-  response
-    .status(500)
-    .end(
-      `An error occurred while serving the result: ${error.message}.` +
-        (error.originalError
-          ? `\nOriginal error: ${error.originalError.message}.`
-          : ""),
-    );
-};
