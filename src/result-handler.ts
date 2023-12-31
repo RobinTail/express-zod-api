@@ -89,7 +89,7 @@ export const defaultResultHandler = createResultHandler({
   handler: ({ error, input, output, request, response, logger }) => {
     if (!error) {
       response.status(defaultStatusCodes.positive).json({
-        status: "success" as const,
+        status: "success",
         data: output,
       });
       return;
@@ -97,7 +97,7 @@ export const defaultResultHandler = createResultHandler({
     const statusCode = getStatusCodeFromError(error);
     logInternalError({ logger, statusCode, request, error, input });
     response.status(statusCode).json({
-      status: "error" as const,
+      status: "error",
       error: { message: getMessageFromError(error) },
     });
   },
