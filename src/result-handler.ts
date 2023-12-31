@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { z } from "zod";
-import { ApiResponse } from "./api-response";
+import { ApiResponse, MultipleApiResponses } from "./api-response";
 import {
   FlatObject,
   getExamples,
@@ -36,22 +36,54 @@ export interface ResultHandlerDefinition<
   handler: ResultHandler<z.output<POS> | z.output<NEG>>;
 }
 
-export type AnyResultHandlerDefinition = ResultHandlerDefinition<
-  z.ZodTypeAny,
-  z.ZodTypeAny
->;
+interface StatusDependingDefinition<
+  POS extends MultipleApiResponses,
+  NEG extends MultipleApiResponses,
+> {
+  getPositiveResponse: (output: IOSchema) => POS;
+  getNegativeResponse: () => NEG;
+  handler: ResultHandler<
+    z.output<POS[number]["schema"]> | z.output<NEG[number]["schema"]>
+  >;
+}
+
+export type AnyResultHandlerDefinition =
+  | ResultHandlerDefinition<z.ZodTypeAny, z.ZodTypeAny>
+  | StatusDependingDefinition<MultipleApiResponses, MultipleApiResponses>;
 
 export const defaultStatusCodes = {
   positive: 200,
   negative: 400,
 };
 
-export const createResultHandler = <
+export function createResultHandler<
+  POS extends MultipleApiResponses,
+  NEG extends MultipleApiResponses,
+>(definition: StatusDependingDefinition<POS, NEG>): typeof definition;
+
+export function createResultHandler<
   POS extends z.ZodTypeAny,
   NEG extends z.ZodTypeAny,
->(
-  definition: ResultHandlerDefinition<POS, NEG>,
-) => definition;
+>(definition: ResultHandlerDefinition<POS, NEG>): typeof definition;
+
+export function createResultHandler(definition: unknown) {
+  return definition;
+}
+
+/** @todo remove */
+createResultHandler({
+  getPositiveResponse: () => [
+    { statusCode: 200, schema: z.literal("ok") },
+    { statusCode: 201, schema: z.literal("kinda") },
+  ],
+  getNegativeResponse: () => [
+    { statusCode: 400, schema: z.literal("error") },
+    { statusCode: 500, schema: z.literal("failure") },
+  ],
+  handler: ({ response }) => {
+    response.status(200).send("error");
+  },
+});
 
 export const defaultResultHandler = createResultHandler({
   getPositiveResponse: (output: IOSchema) => {
