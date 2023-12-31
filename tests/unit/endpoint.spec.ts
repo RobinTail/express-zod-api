@@ -316,38 +316,42 @@ describe("Endpoint", () => {
       });
       expect(endpoint.getSchema("output")).toEqual(outputSchema);
     });
+  });
 
-    test("should return the positive schema according to the result handler", () => {
+  describe("getInputMimeTypes()", () => {
+    test("should return the input mime types", () => {
       const factory = new EndpointsFactory(defaultResultHandler);
-      const output = z.object({
-        something: z.number(),
-      });
       const endpoint = factory.build({
         method: "get",
         input: z.object({}),
-        output,
+        output: z.object({ something: z.number() }),
         handler: vi.fn(),
       });
-      expect(
-        serializeSchemaForTest(endpoint.getSchema("positive")),
-      ).toMatchSnapshot();
+      expect(endpoint.getInputMimeTypes()).toEqual(["application/json"]);
     });
+  });
 
-    test("should return the negative schema of the result handler", () => {
-      const factory = new EndpointsFactory(defaultResultHandler);
-      const output = z.object({
-        something: z.number(),
-      });
-      const endpoint = factory.build({
-        method: "get",
-        input: z.object({}),
-        output,
-        handler: vi.fn(),
-      });
-      expect(
-        serializeSchemaForTest(endpoint.getSchema("negative")),
-      ).toMatchSnapshot();
-    });
+  describe("getResponses()", () => {
+    test.each(["positive", "negative"] as const)(
+      "should return schemas and mime types the result handler %#",
+      (variant) => {
+        const factory = new EndpointsFactory(defaultResultHandler);
+        const endpoint = factory.build({
+          method: "get",
+          input: z.object({}),
+          output: z.object({ something: z.number() }),
+          handler: vi.fn(),
+        });
+        expect(
+          endpoint
+            .getResponses(variant)
+            .map(({ schema }) => serializeSchemaForTest(schema)),
+        ).toMatchSnapshot();
+        expect(
+          endpoint.getResponses(variant).map(({ mimeTypes }) => mimeTypes),
+        ).toEqual([["application/json"]]);
+      },
+    );
   });
 
   describe(".getOperationId()", () => {
@@ -362,22 +366,6 @@ describe("Endpoint", () => {
         }).getOperationId("get"),
       ).toBeUndefined();
     });
-  });
-
-  describe(".getMimeTypes()", () => {
-    test.each(["positive", "negative"] as const)(
-      "should return an array according to the result handler (%s)",
-      (variant) => {
-        const factory = new EndpointsFactory(defaultResultHandler);
-        const endpoint = factory.build({
-          method: "get",
-          input: z.object({}),
-          output: z.object({}),
-          handler: vi.fn(),
-        });
-        expect(endpoint.getMimeTypes(variant)).toEqual(["application/json"]);
-      },
-    );
   });
 
   describe("Issue #269: Async refinements", () => {
@@ -695,8 +683,8 @@ describe("Endpoint", () => {
             outputSchema: z.object({}),
             handler: vi.fn<any>(),
             resultHandler: {
-              getPositiveResponse: vi.fn(),
-              getNegativeResponse: vi.fn(),
+              getPositiveResponse: vi.fn<any>(),
+              getNegativeResponse: vi.fn<any>(),
               handler: vi.fn(),
             },
           }),
@@ -713,8 +701,8 @@ describe("Endpoint", () => {
             outputSchema: z.object({}).transform(() => []),
             handler: vi.fn<any>(),
             resultHandler: {
-              getPositiveResponse: vi.fn(),
-              getNegativeResponse: vi.fn(),
+              getPositiveResponse: vi.fn<any>(),
+              getNegativeResponse: vi.fn<any>(),
               handler: vi.fn(),
             },
           }),

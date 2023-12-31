@@ -39,3 +39,47 @@ exports[`Endpoint > .getSchema() > should return the positive schema according t
   },
 }
 `;
+
+exports[`Endpoint > getResponses() > should return schemas and mime types the result handler 0 1`] = `
+[
+  {
+    "_type": "ZodObject",
+    "shape": {
+      "data": {
+        "_type": "ZodObject",
+        "shape": {
+          "something": {
+            "_type": "ZodNumber",
+          },
+        },
+      },
+      "status": {
+        "_type": "ZodLiteral",
+        "value": "success",
+      },
+    },
+  },
+]
+`;
+
+exports[`Endpoint > getResponses() > should return schemas and mime types the result handler 1 1`] = `
+[
+  {
+    "_type": "ZodObject",
+    "shape": {
+      "error": {
+        "_type": "ZodObject",
+        "shape": {
+          "message": {
+            "_type": "ZodString",
+          },
+        },
+      },
+      "status": {
+        "_type": "ZodLiteral",
+        "value": "error",
+      },
+    },
+  },
+]
+`;

@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import assert from "node:assert/strict";
 import { z } from "zod";
-import { ApiResponse } from "./api-response";
+import { ApiResponse, MultipleApiResponses } from "./api-response";
 import { CommonConfig } from "./config-type";
 import {
   IOSchemaError,
@@ -24,19 +24,35 @@ import { LogicalContainer, combineContainers } from "./logical-container";
 import { AuxMethod, Method } from "./method";
 import { AnyMiddlewareDef } from "./middleware";
 import { mimeJson, mimeMultipart, mimeRaw } from "./mime";
-import { ResultHandlerDefinition, defaultStatusCodes } from "./result-handler";
+import {
+  AnyResultHandlerDefinition,
+  defaultStatusCodes,
+} from "./result-handler";
 import { Security } from "./security";
 import { AbstractLogger } from "./logger";
 
-const getMimeTypesFromApiResponse = <S extends z.ZodTypeAny>(
-  subject: S | ApiResponse<S>,
-  fallback = [mimeJson],
-) => {
+interface ProcessedResponse {
+  schema: z.ZodTypeAny;
+  statusCodes: number[];
+  mimeTypes: string[];
+}
+
+const processApiResponse = (
+  subject: z.ZodTypeAny | ApiResponse<z.ZodTypeAny> | MultipleApiResponses,
+  fallback: Omit<ProcessedResponse, "schema">,
+): Array<ProcessedResponse> => {
   if (subject instanceof z.ZodType) {
-    return fallback;
+    return [{ ...fallback, schema: subject }];
   }
-  const { mimeTypes, mimeType } = subject;
-  return mimeType ? [mimeType] : mimeTypes || fallback;
+  return (Array.isArray(subject) ? subject : [subject]).map(
+    ({ schema, statusCodes, statusCode, mimeTypes, mimeType }) => ({
+      schema,
+      statusCodes: statusCode
+        ? [statusCode]
+        : statusCodes || fallback.statusCodes,
+      mimeTypes: mimeType ? [mimeType] : mimeTypes || fallback.mimeTypes,
+    }),
+  );
 };
 
 export type Handler<IN, OUT, OPT> = (params: {
@@ -48,7 +64,6 @@ export type Handler<IN, OUT, OPT> = (params: {
 type DescriptionVariant = "short" | "long";
 type IOVariant = "input" | "output";
 type ResponseVariant = "positive" | "negative";
-type MimeVariant = Extract<IOVariant, "input"> | ResponseVariant;
 
 export abstract class AbstractEndpoint {
   public abstract execute(params: {
@@ -62,9 +77,8 @@ export abstract class AbstractEndpoint {
   ): string | undefined;
   public abstract getMethods(): Method[];
   public abstract getSchema(variant: IOVariant): IOSchema;
-  public abstract getSchema(variant: ResponseVariant): z.ZodTypeAny;
-  public abstract getMimeTypes(variant: MimeVariant): string[];
-  public abstract getStatusCode(variant: ResponseVariant): number;
+  public abstract getInputMimeTypes(): string[];
+  public abstract getResponses(variant: ResponseVariant): ProcessedResponse[];
   public abstract getSecurity(): LogicalContainer<Security>;
   public abstract getScopes(): string[];
   public abstract getTags(): string[];
@@ -76,24 +90,17 @@ export class Endpoint<
   IN extends IOSchema,
   OUT extends IOSchema,
   OPT extends FlatObject,
-  POS extends z.ZodTypeAny,
-  NEG extends z.ZodTypeAny,
   SCO extends string,
   TAG extends string,
 > extends AbstractEndpoint {
   readonly #descriptions: Record<DescriptionVariant, string | undefined>;
   readonly #methods: Method[];
   readonly #middlewares: AnyMiddlewareDef[];
-  readonly #mimeTypes: Record<MimeVariant, string[]>;
-  readonly #statusCodes: Record<ResponseVariant, number>;
+  readonly #inputMimeTypes: string[];
+  readonly #responses: Record<ResponseVariant, ProcessedResponse[]>;
   readonly #handler: Handler<z.output<IN>, z.input<OUT>, OPT>;
-  readonly #resultHandler: ResultHandlerDefinition<POS, NEG>;
-  readonly #schemas: {
-    input: IN;
-    output: OUT;
-    positive: POS;
-    negative: NEG;
-  };
+  readonly #resultHandler: AnyResultHandlerDefinition;
+  readonly #schemas: { input: IN; output: OUT };
   readonly #scopes: SCO[];
   readonly #tags: TAG[];
   readonly #getOperationId: (method: Method) => string | undefined;
@@ -116,7 +123,7 @@ export class Endpoint<
     inputSchema: IN;
     outputSchema: OUT;
     handler: Handler<z.output<IN>, z.input<OUT>, OPT>;
-    resultHandler: ResultHandlerDefinition<POS, NEG>;
+    resultHandler: AnyResultHandlerDefinition;
     description?: string;
     shortDescription?: string;
     getOperationId?: (method: Method) => string | undefined;
@@ -144,41 +151,22 @@ export class Endpoint<
     this.#scopes = scopes;
     this.#tags = tags;
     this.#descriptions = { long, short };
-    const apiResponse = {
-      positive: resultHandler.getPositiveResponse(outputSchema),
-      negative: resultHandler.getNegativeResponse(),
+    this.#inputMimeTypes = hasUpload(inputSchema)
+      ? [mimeMultipart]
+      : hasRaw(inputSchema)
+        ? [mimeRaw]
+        : [mimeJson];
+    this.#responses = {
+      positive: processApiResponse(
+        resultHandler.getPositiveResponse(outputSchema),
+        { mimeTypes: [mimeJson], statusCodes: [defaultStatusCodes.positive] },
+      ),
+      negative: processApiResponse(resultHandler.getNegativeResponse(), {
+        mimeTypes: [mimeJson],
+        statusCodes: [defaultStatusCodes.negative],
+      }),
     };
-    this.#mimeTypes = {
-      input: hasUpload(inputSchema)
-        ? [mimeMultipart]
-        : hasRaw(inputSchema)
-          ? [mimeRaw]
-          : [mimeJson],
-      positive: getMimeTypesFromApiResponse(apiResponse.positive),
-      negative: getMimeTypesFromApiResponse(apiResponse.negative),
-    };
-    this.#schemas = {
-      input: inputSchema,
-      output: outputSchema,
-      positive:
-        apiResponse.positive instanceof z.ZodType
-          ? apiResponse.positive
-          : apiResponse.positive.schema,
-      negative:
-        apiResponse.negative instanceof z.ZodType
-          ? apiResponse.negative
-          : apiResponse.negative.schema,
-    };
-    this.#statusCodes = {
-      positive:
-        apiResponse.positive instanceof z.ZodType
-          ? defaultStatusCodes.positive
-          : apiResponse.positive.statusCode || defaultStatusCodes.positive,
-      negative:
-        apiResponse.negative instanceof z.ZodType
-          ? defaultStatusCodes.negative
-          : apiResponse.negative.statusCode || defaultStatusCodes.negative,
-    };
+    this.#schemas = { input: inputSchema, output: outputSchema };
   }
 
   /**
@@ -199,18 +187,16 @@ export class Endpoint<
 
   public override getSchema(variant: "input"): IN;
   public override getSchema(variant: "output"): OUT;
-  public override getSchema(variant: "positive"): POS;
-  public override getSchema(variant: "negative"): NEG;
-  public override getSchema(variant: IOVariant | ResponseVariant) {
+  public override getSchema(variant: IOVariant) {
     return this.#schemas[variant];
   }
 
-  public override getMimeTypes(variant: MimeVariant) {
-    return this.#mimeTypes[variant];
+  public override getInputMimeTypes() {
+    return this.#inputMimeTypes;
   }
 
-  public override getStatusCode(variant: ResponseVariant) {
-    return this.#statusCodes[variant];
+  public override getResponses(variant: ResponseVariant) {
+    return this.#responses[variant];
   }
 
   public override getSecurity() {

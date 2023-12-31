@@ -8,6 +8,11 @@ export interface ApiResponse<S extends z.ZodTypeAny> {
    * */
   statusCode?: number;
   /**
+   * @default [200] for positive response
+   * @default [400] for negative response
+   * */
+  statusCodes?: [number, ...number[]];
+  /**
    * @default "application/json"
    * @override mimeTypes
    * */
