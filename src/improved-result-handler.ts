@@ -1,21 +1,22 @@
 import { z } from "zod";
-import { ApiResponse } from "./api-response";
+import { MultipleApiResponses } from "./api-response";
 import { IOSchema } from "./io-schema";
 import { ResultHandler, ResultHandlerDefinition } from "./result-handler";
 
-type Setup = [ApiResponse<z.ZodTypeAny>, ...ApiResponse<z.ZodTypeAny>[]];
-
-type SetupUnion<T extends Setup> = z.output<T[number]["schema"]>;
-
-interface SpecialDefinition<POS extends Setup, NEG extends Setup> {
+interface SpecialDefinition<
+  POS extends MultipleApiResponses,
+  NEG extends MultipleApiResponses,
+> {
   getPositiveResponse: (output: IOSchema) => POS;
   getNegativeResponse: () => NEG;
-  handler: ResultHandler<SetupUnion<POS> | SetupUnion<NEG>>;
+  handler: ResultHandler<
+    z.output<POS[number]["schema"]> | z.output<NEG[number]["schema"]>
+  >;
 }
 
 export function createSpecialResultHandler<
-  POS extends Setup,
-  NEG extends Setup,
+  POS extends MultipleApiResponses,
+  NEG extends MultipleApiResponses,
 >(definition: SpecialDefinition<POS, NEG>): typeof definition;
 
 export function createSpecialResultHandler<

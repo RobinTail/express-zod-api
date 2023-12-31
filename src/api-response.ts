@@ -15,3 +15,8 @@ export interface ApiResponse<S extends z.ZodTypeAny> {
   /** @default [ "application/json" ] */
   mimeTypes?: [string, ...string[]];
 }
+
+export type MultipleApiResponses = [
+  ApiResponse<z.ZodTypeAny>,
+  ...ApiResponse<z.ZodTypeAny>[],
+];
