@@ -31,7 +31,7 @@ import {
 import { Security } from "./security";
 import { AbstractLogger } from "./logger";
 
-interface ProcessedResponse {
+export interface ProcessedResponse {
   schema: z.ZodTypeAny;
   statusCodes: number[];
   mimeTypes: string[];
