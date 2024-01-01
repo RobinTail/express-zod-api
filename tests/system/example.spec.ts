@@ -54,6 +54,20 @@ describe("Example", async () => {
       );
     });
 
+    test("Should handle valid POST request", async () => {
+      const response = await fetch(`http://localhost:${port}/v1/user/create`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: "John Doe" }),
+      });
+      expect(response.status).toBe(201);
+      const json = await response.json();
+      expect(json).toMatchObject({
+        status: "created",
+        data: { id: 16 },
+      });
+    });
+
     test("Should handle valid PATCH request", async () => {
       const response = await fetch(`http://localhost:${port}/v1/user/50`, {
         method: "PATCH",
@@ -76,7 +90,7 @@ describe("Example", async () => {
           createdAt: "2022-01-22T00:00:00.000Z",
         },
       });
-      await waitFor(() => /v1\/user/.test(out));
+      await waitFor(() => /v1\/user\/:id/.test(out));
       await waitFor(() => /50, 123, 456/.test(out));
       expect(true).toBeTruthy();
     });
