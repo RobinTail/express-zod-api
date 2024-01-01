@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { z } from "zod";
 import { statusDependingFactory } from "../factories";
 
+/** @desc depending on the thrown error, the custom result handler of the factory responds slightly differently */
 export const createUserEndpoint = statusDependingFactory.build({
   method: "post",
   tag: "users",
