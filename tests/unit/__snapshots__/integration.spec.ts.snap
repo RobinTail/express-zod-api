@@ -739,9 +739,23 @@ export interface Response extends Record<MethodPath, any> {
 `;
 
 exports[`Integration > Should support multiple response schemas depending on status code 1`] = `
-"type PostV1MtplInput = {};
+"type PostV1MtplInput = {
+  test: number;
+};
 
-type PostV1MtplPositiveResponse = "ok" | "kinda";
+type PostV1MtplPositiveResponse =
+  | {
+      status: "ok";
+      data: {
+        payload: string;
+      };
+    }
+  | {
+      status: "kinda";
+      data: {
+        payload: string;
+      };
+    };
 
 type PostV1MtplNegativeResponse = "error" | "failure";
 

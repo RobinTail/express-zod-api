@@ -85,9 +85,15 @@ describe("Integration", () => {
   test("Should support multiple response schemas depending on status code", async () => {
     const factory = new EndpointsFactory(
       createResultHandler({
-        getPositiveResponse: () => [
-          { statusCode: 200, schema: z.literal("ok") },
-          { statusCode: 201, schema: z.literal("kinda") },
+        getPositiveResponse: (output) => [
+          {
+            statusCode: 200,
+            schema: z.object({ status: z.literal("ok"), data: output }),
+          },
+          {
+            statusCode: 201,
+            schema: z.object({ status: z.literal("kinda"), data: output }),
+          },
         ],
         getNegativeResponse: () => [
           { statusCode: 400, schema: z.literal("error") },
@@ -103,9 +109,9 @@ describe("Integration", () => {
         v1: {
           mtpl: factory.build({
             method: "post",
-            input: z.object({}),
-            output: z.object({}),
-            handler: async () => ({}),
+            input: z.object({ test: z.number() }),
+            output: z.object({ payload: z.string() }),
+            handler: async () => ({ payload: "test" }),
           }),
         },
       },
