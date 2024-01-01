@@ -1,14 +1,11 @@
 import { Request, Response } from "express";
 import assert from "node:assert/strict";
 import { z } from "zod";
-import { ApiResponse, MultipleApiResponses } from "./api-response";
-import { CommonConfig } from "./config-type";
 import {
-  IOSchemaError,
-  InputValidationError,
-  OutputValidationError,
-  ResultHandlerError,
-} from "./errors";
+  NormalizedResponse,
+  defaultStatusCodes,
+  normalizeApiResponse,
+} from "./api-response";
 import {
   FlatObject,
   getActualMethod,
@@ -18,42 +15,22 @@ import {
   hasUpload,
   makeErrorFromAnything,
 } from "./common-helpers";
+import { CommonConfig } from "./config-type";
+import {
+  IOSchemaError,
+  InputValidationError,
+  OutputValidationError,
+  ResultHandlerError,
+} from "./errors";
 import { IOSchema } from "./io-schema";
 import { lastResortHandler } from "./last-resort";
+import { AbstractLogger } from "./logger";
 import { LogicalContainer, combineContainers } from "./logical-container";
 import { AuxMethod, Method } from "./method";
 import { AnyMiddlewareDef } from "./middleware";
 import { mimeJson, mimeMultipart, mimeRaw } from "./mime";
-import {
-  AnyResultHandlerDefinition,
-  defaultStatusCodes,
-} from "./result-handler";
+import { AnyResultHandlerDefinition } from "./result-handler";
 import { Security } from "./security";
-import { AbstractLogger } from "./logger";
-
-export interface ProcessedResponse {
-  schema: z.ZodTypeAny;
-  statusCodes: number[];
-  mimeTypes: string[];
-}
-
-const processApiResponse = (
-  subject: z.ZodTypeAny | ApiResponse<z.ZodTypeAny> | MultipleApiResponses,
-  fallback: Omit<ProcessedResponse, "schema">,
-): Array<ProcessedResponse> => {
-  if (subject instanceof z.ZodType) {
-    return [{ ...fallback, schema: subject }];
-  }
-  return (Array.isArray(subject) ? subject : [subject]).map(
-    ({ schema, statusCodes, statusCode, mimeTypes, mimeType }) => ({
-      schema,
-      statusCodes: statusCode
-        ? [statusCode]
-        : statusCodes || fallback.statusCodes,
-      mimeTypes: mimeType ? [mimeType] : mimeTypes || fallback.mimeTypes,
-    }),
-  );
-};
 
 export type Handler<IN, OUT, OPT> = (params: {
   input: IN;
@@ -80,7 +57,7 @@ export abstract class AbstractEndpoint {
   public abstract getSchema(variant: IOVariant): IOSchema;
   public abstract getSchema(variant: ResponseVariant): z.ZodTypeAny;
   public abstract getMimeTypes(variant: MimeVariant): string[];
-  public abstract getResponses(variant: ResponseVariant): ProcessedResponse[];
+  public abstract getResponses(variant: ResponseVariant): NormalizedResponse[];
   public abstract getSecurity(): LogicalContainer<Security>;
   public abstract getScopes(): string[];
   public abstract getTags(): string[];
@@ -99,7 +76,7 @@ export class Endpoint<
   readonly #methods: Method[];
   readonly #middlewares: AnyMiddlewareDef[];
   readonly #inputMimeTypes: string[];
-  readonly #responses: Record<ResponseVariant, ProcessedResponse[]>;
+  readonly #responses: Record<ResponseVariant, NormalizedResponse[]>;
   readonly #handler: Handler<z.output<IN>, z.input<OUT>, OPT>;
   readonly #resultHandler: AnyResultHandlerDefinition;
   readonly #schemas: { input: IN; output: OUT };
@@ -159,11 +136,11 @@ export class Endpoint<
         ? [mimeRaw]
         : [mimeJson];
     this.#responses = {
-      positive: processApiResponse(
+      positive: normalizeApiResponse(
         resultHandler.getPositiveResponse(outputSchema),
         { mimeTypes: [mimeJson], statusCodes: [defaultStatusCodes.positive] },
       ),
-      negative: processApiResponse(resultHandler.getNegativeResponse(), {
+      negative: normalizeApiResponse(resultHandler.getNegativeResponse(), {
         mimeTypes: [mimeJson],
         statusCodes: [defaultStatusCodes.negative],
       }),

@@ -1,6 +1,10 @@
 import { Request, Response } from "express";
 import { z } from "zod";
-import { ApiResponse, MultipleApiResponses } from "./api-response";
+import {
+  ApiResponse,
+  MultipleApiResponses,
+  defaultStatusCodes,
+} from "./api-response";
 import {
   FlatObject,
   getExamples,
@@ -50,11 +54,6 @@ export interface StatusDependingDefinition<
 export type AnyResultHandlerDefinition =
   | ResultHandlerDefinition<z.ZodTypeAny, z.ZodTypeAny>
   | StatusDependingDefinition<MultipleApiResponses, MultipleApiResponses>;
-
-export const defaultStatusCodes = {
-  positive: 200,
-  negative: 400,
-};
 
 export function createResultHandler<
   POS extends MultipleApiResponses,

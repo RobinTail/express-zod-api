@@ -52,7 +52,7 @@ export type {
   ResultHandlerDefinition,
   StatusDependingDefinition,
 } from "./result-handler";
-export type { ProcessedResponse } from "./endpoint";
+export type { NormalizedResponse } from "./api-response";
 export type {
   BasicSecurity,
   BearerSecurity,
