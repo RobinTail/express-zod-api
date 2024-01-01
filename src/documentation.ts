@@ -38,7 +38,9 @@ type Component =
 
 /** @desc user defined function that creates a component description from its properties */
 type Descriptor = (
-  props: Record<"method" | "path" | "operationId", string>,
+  props: Record<"method" | "path" | "operationId", string> & {
+    statusCode?: number; // for response only
+  },
 ) => string;
 
 interface DocumentationParams {
@@ -181,19 +183,22 @@ export class Documentation extends OpenApiBuilder {
 
       const operation: OperationObject = { operationId, responses: {} };
       for (const variant of ["positive", "negative"] as const) {
-        for (const { mimeTypes, schema, statusCodes } of endpoint.getResponses(
-          variant,
-        )) {
+        const responses = endpoint.getResponses(variant);
+        for (const { mimeTypes, schema, statusCodes } of responses) {
           for (const statusCode of statusCodes) {
             operation.responses[statusCode] = depictResponse({
               ...commonParams,
               variant,
               schema,
               mimeTypes,
+              statusCode,
+              hasMultipleStatusCodes:
+                responses.length > 1 || statusCodes.length > 1,
               description: descriptions?.[`${variant}Response`]?.call(null, {
                 method,
                 path,
                 operationId,
+                statusCode,
               }),
             });
           }

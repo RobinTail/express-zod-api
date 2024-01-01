@@ -874,9 +874,15 @@ export const depictResponse = ({
   getRef,
   makeRef,
   composition,
-  description = `${method.toUpperCase()} ${path} ${ucFirst(variant)} response`,
+  hasMultipleStatusCodes,
+  statusCode,
+  description = `${method.toUpperCase()} ${path} ${ucFirst(variant)} response ${
+    hasMultipleStatusCodes ? statusCode : ""
+  }`.trim(),
 }: ReqResDepictHelperCommonProps & {
   variant: "positive" | "negative";
+  statusCode: number;
+  hasMultipleStatusCodes: boolean;
 }): ResponseObject => {
   const depictedSchema = excludeExamplesFromDepiction(
     walkSchema({

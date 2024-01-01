@@ -48,7 +48,7 @@ exports[`Example > Negative > GET request should fail on missing input param 1`]
 }
 `;
 
-exports[`Example > Negative > POST request should fail on schema validation 1`] = `
+exports[`Example > Negative > PATCH request should fail on schema validation 1`] = `
 {
   "error": {
     "message": "id: should be greater than or equal to 0",

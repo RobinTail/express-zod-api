@@ -1,5 +1,6 @@
 import { DependsOnMethod, Routing, ServeStatic } from "../src";
 import { rawAcceptingEndpoint } from "./endpoints/accept-raw";
+import { createUserEndpoint } from "./endpoints/create-user";
 import { listUsersEndpoint } from "./endpoints/list-users";
 import { uploadAvatarEndpoint } from "./endpoints/upload-avatar";
 import { retrieveUserEndpoint } from "./endpoints/retrieve-user";
@@ -15,8 +16,11 @@ export const routing: Routing = {
       retrieve: retrieveUserEndpoint, // path: /v1/user/retrieve
       // syntax 2: methods are defined within the route (id is the route path param by the way)
       ":id": new DependsOnMethod({
-        post: updateUserEndpoint, // the Endpoint should have at least the same method specified in .build()
+        // endpoints assigned here must support at least the same method specified in .build()
+        patch: updateUserEndpoint, // demonstrates authentication
       }),
+      // demonstrates different response schemas depending on status code
+      create: createUserEndpoint,
       // this one demonstrates the legacy array based response
       list: listUsersEndpoint,
     },
