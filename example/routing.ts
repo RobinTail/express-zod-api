@@ -15,7 +15,7 @@ export const routing: Routing = {
       retrieve: retrieveUserEndpoint, // path: /v1/user/retrieve
       // syntax 2: methods are defined within the route (id is the route path param by the way)
       ":id": new DependsOnMethod({
-        post: updateUserEndpoint, // the Endpoint should have at least the same method specified in .build()
+        patch: updateUserEndpoint, // the Endpoint should have at least the same method specified in .build()
       }),
       // this one demonstrates the legacy array based response
       list: listUsersEndpoint,

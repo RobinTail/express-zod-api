@@ -88,11 +88,11 @@ paths:
             pattern: /\d+/
             description: a numeric string containing the id of the user
   /v1/user/{id}:
-    post:
-      operationId: PostV1UserId
+    patch:
+      operationId: PatchV1UserId
       responses:
         "200":
-          description: POST /v1/user/:id Positive response
+          description: PATCH /v1/user/:id Positive response
           content:
             application/json:
               schema:
@@ -130,7 +130,7 @@ paths:
                       name: John Doe
                       createdAt: 2021-12-31T00:00:00.000Z
         "400":
-          description: POST /v1/user/:id Negative response
+          description: PATCH /v1/user/:id Negative response
           content:
             application/json:
               schema:
@@ -164,14 +164,14 @@ paths:
         - name: id
           in: path
           required: true
-          description: POST /v1/user/:id Parameter
+          description: PATCH /v1/user/:id Parameter
           schema:
             type: string
           examples:
             example1:
               value: "12"
       requestBody:
-        description: POST /v1/user/:id Request body
+        description: PATCH /v1/user/:id Request body
         content:
           application/json:
             schema:

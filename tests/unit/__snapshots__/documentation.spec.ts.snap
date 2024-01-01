@@ -1297,11 +1297,11 @@ paths:
             pattern: /\\d+/
             description: a numeric string containing the id of the user
   /v1/user/{id}:
-    post:
-      operationId: PostV1UserId
+    patch:
+      operationId: PatchV1UserId
       responses:
         "200":
-          description: POST /v1/user/:id Positive response
+          description: PATCH /v1/user/:id Positive response
           content:
             application/json:
               schema:
@@ -1339,7 +1339,7 @@ paths:
                       name: John Doe
                       createdAt: 2021-12-31T00:00:00.000Z
         "400":
-          description: POST /v1/user/:id Negative response
+          description: PATCH /v1/user/:id Negative response
           content:
             application/json:
               schema:
@@ -1373,14 +1373,14 @@ paths:
         - name: id
           in: path
           required: true
-          description: POST /v1/user/:id Parameter
+          description: PATCH /v1/user/:id Parameter
           schema:
             type: string
           examples:
             example1:
               value: "12"
       requestBody:
-        description: POST /v1/user/:id Request body
+        description: PATCH /v1/user/:id Request body
         content:
           application/json:
             schema:
@@ -1743,15 +1743,15 @@ paths:
           schema:
             $ref: "#/components/schemas/GetV1UserRetrieveParameterId"
   /v1/user/{id}:
-    post:
-      operationId: PostV1UserId
+    patch:
+      operationId: PatchV1UserId
       responses:
         "200":
-          description: POST /v1/user/:id Positive response
+          description: PATCH /v1/user/:id Positive response
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PostV1UserIdPositiveResponse"
+                $ref: "#/components/schemas/PatchV1UserIdPositiveResponse"
               examples:
                 example1:
                   value:
@@ -1760,11 +1760,11 @@ paths:
                       name: John Doe
                       createdAt: 2021-12-31T00:00:00.000Z
         "400":
-          description: POST /v1/user/:id Negative response
+          description: PATCH /v1/user/:id Negative response
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PostV1UserIdNegativeResponse"
+                $ref: "#/components/schemas/PatchV1UserIdNegativeResponse"
               examples:
                 example1:
                   value:
@@ -1779,18 +1779,18 @@ paths:
         - name: id
           in: path
           required: true
-          description: POST /v1/user/:id Parameter
+          description: PATCH /v1/user/:id Parameter
           schema:
-            $ref: "#/components/schemas/PostV1UserIdParameterId"
+            $ref: "#/components/schemas/PatchV1UserIdParameterId"
           examples:
             example1:
               value: "12"
       requestBody:
-        description: POST /v1/user/:id Request body
+        description: PATCH /v1/user/:id Request body
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/PostV1UserIdRequestBody"
+              $ref: "#/components/schemas/PatchV1UserIdRequestBody"
             examples:
               example1:
                 value:
@@ -2014,9 +2014,9 @@ components:
       required:
         - status
         - error
-    PostV1UserIdParameterId:
+    PatchV1UserIdParameterId:
       type: string
-    PostV1UserIdPositiveResponse:
+    PatchV1UserIdPositiveResponse:
       type: object
       properties:
         status:
@@ -2043,7 +2043,7 @@ components:
       required:
         - status
         - data
-    PostV1UserIdNegativeResponse:
+    PatchV1UserIdNegativeResponse:
       type: object
       properties:
         status:
@@ -2060,7 +2060,7 @@ components:
       required:
         - status
         - error
-    PostV1UserIdRequestBody:
+    PatchV1UserIdRequestBody:
       allOf:
         - type: object
           properties:

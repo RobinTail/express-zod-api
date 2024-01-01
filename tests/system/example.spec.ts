@@ -47,16 +47,16 @@ describe("Example", async () => {
       expect(response.headers.has("access-control-allow-headers")).toBeTruthy();
       expect(response.headers.get("access-control-allow-origin")).toBe("*");
       expect(response.headers.get("access-control-allow-methods")).toBe(
-        "POST, OPTIONS",
+        "PATCH, OPTIONS",
       );
       expect(response.headers.get("access-control-allow-headers")).toBe(
         "content-type",
       );
     });
 
-    test("Should handle valid POST request", async () => {
+    test("Should handle valid PATCH request", async () => {
       const response = await fetch(`http://localhost:${port}/v1/user/50`, {
-        method: "POST",
+        method: "PATCH",
         headers: {
           token: "456",
           "Content-Type": "application/json",
@@ -243,9 +243,9 @@ describe("Example", async () => {
       expect(true).toBeTruthy();
     });
 
-    test("POST request should fail on auth middleware key check", async () => {
+    test("PATCH request should fail on auth middleware key check", async () => {
       const response = await fetch(`http://localhost:${port}/v1/user/50`, {
-        method: "POST",
+        method: "PATCH",
         headers: {
           token: "456",
           "Content-Type": "application/json",
@@ -266,9 +266,9 @@ describe("Example", async () => {
       });
     });
 
-    test("POST request should fail on auth middleware token check", async () => {
+    test("PATCH request should fail on auth middleware token check", async () => {
       const response = await fetch(`http://localhost:${port}/v1/user/50`, {
-        method: "POST",
+        method: "PATCH",
         headers: {
           token: "123",
           "Content-Type": "application/json",
@@ -289,9 +289,9 @@ describe("Example", async () => {
       });
     });
 
-    test("POST request should fail on schema validation", async () => {
+    test("PATCH request should fail on schema validation", async () => {
       const response = await fetch(`http://localhost:${port}/v1/user/-50`, {
-        method: "POST",
+        method: "PATCH",
         headers: {
           token: "456",
           "Content-Type": "application/json",
@@ -307,9 +307,9 @@ describe("Example", async () => {
       expect(json).toMatchSnapshot();
     });
 
-    test("POST request should fail on specific value in handler implementation", async () => {
+    test("PATCH request should fail on specific value in handler implementation", async () => {
       const response = await fetch(`http://localhost:${port}/v1/user/101`, {
-        method: "POST",
+        method: "PATCH",
         headers: {
           token: "456",
           "Content-Type": "application/json",
