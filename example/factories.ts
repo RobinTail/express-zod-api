@@ -87,42 +87,40 @@ export const arrayRespondingFactory = new EndpointsFactory({
   resultHandler: arrayResultHandler,
 });
 
-/** @desc The factory having slightly different response schemas depending on the status code */
-export const statusDependingFactory = new EndpointsFactory(
-  createResultHandler({
+/** @desc The factory demonstrates slightly different response schemas depending on the status code */
+export const statusDependingFactory = new EndpointsFactory({
+  config,
+  resultHandler: createResultHandler({
     getPositiveResponse: (output) => [
       {
-        statusCode: 200,
-        schema: z.object({ status: z.literal("ok"), data: output }),
-      },
-      {
-        statusCode: 201,
+        statusCodes: [201, 202],
         schema: z.object({ status: z.literal("created"), data: output }),
       },
     ],
     getNegativeResponse: () => [
       {
-        statusCode: 400,
-        schema: z.object({ status: z.literal("error"), message: z.string() }),
+        statusCode: 409,
+        schema: z.object({ status: z.literal("exists"), id: z.number() }),
       },
       {
-        statusCode: 500,
-        schema: z.object({ status: z.literal("failure"), reason: z.string() }),
+        statusCodes: [400, 500],
+        schema: z.object({ status: z.literal("error"), reason: z.string() }),
       },
     ],
     handler: ({ error, response, output }) => {
       if (error) {
         const code = getStatusCodeFromError(error);
-        response
-          .status(code)
-          .json(
-            code >= 500
-              ? { status: "failure", reason: error.message }
-              : { status: "error", message: error.message },
-          );
+        response.status(code).json(
+          code === 409 && "id" in error && typeof error.id === "number"
+            ? {
+                status: "exists",
+                id: error.id,
+              }
+            : { status: "error", reason: error.message },
+        );
         return;
       }
       response.status(201).json({ status: "created", data: output });
     },
   }),
-);
+});

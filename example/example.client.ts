@@ -50,6 +50,28 @@ type PatchV1UserIdResponse =
       };
     };
 
+type PostV1UserCreateInput = {
+  name: string;
+};
+
+type PostV1UserCreateResponse =
+  | {
+      status: "created";
+      data: {
+        id: number;
+      };
+    }
+  | (
+      | {
+          status: "exists";
+          id: number;
+        }
+      | {
+          status: "error";
+          reason: string;
+        }
+    );
+
 type GetV1UserListInput = {};
 
 type GetV1UserListResponse =
@@ -111,6 +133,7 @@ type PostV1AvatarRawResponse =
 export type Path =
   | "/v1/user/retrieve"
   | "/v1/user/:id"
+  | "/v1/user/create"
   | "/v1/user/list"
   | "/v1/avatar/send"
   | "/v1/avatar/stream"
@@ -124,6 +147,7 @@ export type MethodPath = `${Method} ${Path}`;
 export interface Input extends Record<MethodPath, any> {
   "get /v1/user/retrieve": GetV1UserRetrieveInput;
   "patch /v1/user/:id": PatchV1UserIdInput;
+  "post /v1/user/create": PostV1UserCreateInput;
   "get /v1/user/list": GetV1UserListInput;
   "get /v1/avatar/send": GetV1AvatarSendInput;
   "get /v1/avatar/stream": GetV1AvatarStreamInput;
@@ -134,6 +158,7 @@ export interface Input extends Record<MethodPath, any> {
 export interface Response extends Record<MethodPath, any> {
   "get /v1/user/retrieve": GetV1UserRetrieveResponse;
   "patch /v1/user/:id": PatchV1UserIdResponse;
+  "post /v1/user/create": PostV1UserCreateResponse;
   "get /v1/user/list": GetV1UserListResponse;
   "get /v1/avatar/send": GetV1AvatarSendResponse;
   "get /v1/avatar/stream": GetV1AvatarStreamResponse;
@@ -144,6 +169,7 @@ export interface Response extends Record<MethodPath, any> {
 export const jsonEndpoints = {
   "get /v1/user/retrieve": true,
   "patch /v1/user/:id": true,
+  "post /v1/user/create": true,
   "get /v1/user/list": true,
   "post /v1/avatar/upload": true,
   "post /v1/avatar/raw": true,
@@ -152,6 +178,7 @@ export const jsonEndpoints = {
 export const endpointTags = {
   "get /v1/user/retrieve": ["users"],
   "patch /v1/user/:id": ["users"],
+  "post /v1/user/create": ["users"],
   "get /v1/user/list": ["users"],
   "get /v1/avatar/send": ["files", "users"],
   "get /v1/avatar/stream": ["users", "files"],
