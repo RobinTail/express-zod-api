@@ -75,7 +75,7 @@ export class Endpoint<
   readonly #descriptions: Record<DescriptionVariant, string | undefined>;
   readonly #methods: Method[];
   readonly #middlewares: AnyMiddlewareDef[];
-  readonly #inputMimeTypes: string[];
+  readonly #mimeTypes: Record<MimeVariant, string[]>;
   readonly #responses: Record<ResponseVariant, NormalizedResponse[]>;
   readonly #handler: Handler<z.output<IN>, z.input<OUT>, OPT>;
   readonly #resultHandler: AnyResultHandlerDefinition;
@@ -130,20 +130,23 @@ export class Endpoint<
     this.#scopes = scopes;
     this.#tags = tags;
     this.#descriptions = { long, short };
-    this.#inputMimeTypes = hasUpload(inputSchema)
-      ? [mimeMultipart]
-      : hasRaw(inputSchema)
-        ? [mimeRaw]
-        : [mimeJson];
-    this.#responses = {
-      positive: normalizeApiResponse(
-        resultHandler.getPositiveResponse(outputSchema),
-        { mimeTypes: [mimeJson], statusCodes: [defaultStatusCodes.positive] },
-      ),
-      negative: normalizeApiResponse(resultHandler.getNegativeResponse(), {
-        mimeTypes: [mimeJson],
-        statusCodes: [defaultStatusCodes.negative],
-      }),
+    const positive = normalizeApiResponse(
+      resultHandler.getPositiveResponse(outputSchema),
+      { mimeTypes: [mimeJson], statusCodes: [defaultStatusCodes.positive] },
+    );
+    const negative = normalizeApiResponse(resultHandler.getNegativeResponse(), {
+      mimeTypes: [mimeJson],
+      statusCodes: [defaultStatusCodes.negative],
+    });
+    this.#responses = { positive, negative };
+    this.#mimeTypes = {
+      input: hasUpload(inputSchema)
+        ? [mimeMultipart]
+        : hasRaw(inputSchema)
+          ? [mimeRaw]
+          : [mimeJson],
+      positive: positive.flatMap(({ mimeTypes }) => mimeTypes),
+      negative: negative.flatMap(({ mimeTypes }) => mimeTypes),
     };
     this.#schemas = { input: inputSchema, output: outputSchema };
   }
@@ -177,10 +180,7 @@ export class Endpoint<
   }
 
   public override getMimeTypes(variant: MimeVariant) {
-    if (variant === "input") {
-      return this.#inputMimeTypes;
-    }
-    return this.getResponses(variant).flatMap(({ mimeTypes }) => mimeTypes);
+    return this.#mimeTypes[variant];
   }
 
   public override getResponses(variant: ResponseVariant) {
