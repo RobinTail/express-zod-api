@@ -3370,6 +3370,104 @@ servers:
 "
 `;
 
+exports[`Documentation > Feature #1431: Multiple schemas for different status codes > should depict accordingly 1`] = `
+"openapi: 3.1.0
+info:
+  title: Testing multiple schemas for different status codes
+  version: 3.4.5
+paths:
+  /v1/mtpl:
+    post:
+      operationId: PostV1Mtpl
+      responses:
+        "200":
+          description: POST /v1/mtpl Positive response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - ok
+                  data:
+                    type: object
+                    properties:
+                      payload:
+                        type: string
+                    required:
+                      - payload
+                required:
+                  - status
+                  - data
+        "201":
+          description: POST /v1/mtpl Positive response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - kinda
+                  data:
+                    type: object
+                    properties:
+                      payload:
+                        type: string
+                    required:
+                      - payload
+                required:
+                  - status
+                  - data
+        "400":
+          description: POST /v1/mtpl Negative response
+          content:
+            application/json:
+              schema:
+                type: string
+                enum:
+                  - error
+        "500":
+          description: POST /v1/mtpl Negative response
+          content:
+            application/json:
+              schema:
+                type: string
+                enum:
+                  - failure
+      requestBody:
+        description: POST /v1/mtpl Request body
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                test:
+                  type: number
+                  format: double
+                  minimum: 5e-324
+                  maximum: 1.7976931348623157e+308
+              required:
+                - test
+components:
+  schemas: {}
+  responses: {}
+  parameters: {}
+  examples: {}
+  requestBodies: {}
+  headers: {}
+  securitySchemes: {}
+  links: {}
+  callbacks: {}
+tags: []
+servers:
+  - url: https://example.com
+"
+`;
+
 exports[`Documentation > Feature 1180: Headers opt-in params > should describe x- inputs as header params 1`] = `
 "openapi: 3.1.0
 info:
