@@ -217,7 +217,7 @@ paths:
       operationId: PostV1UserCreate
       responses:
         "201":
-          description: POST /v1/user/create Positive response
+          description: POST /v1/user/create Positive response 201
           content:
             application/json:
               schema:
@@ -241,7 +241,7 @@ paths:
                   - status
                   - data
         "202":
-          description: POST /v1/user/create Positive response
+          description: POST /v1/user/create Positive response 202
           content:
             application/json:
               schema:
@@ -265,7 +265,7 @@ paths:
                   - status
                   - data
         "400":
-          description: POST /v1/user/create Negative response
+          description: POST /v1/user/create Negative response 400
           content:
             application/json:
               schema:
@@ -281,7 +281,7 @@ paths:
                   - status
                   - reason
         "409":
-          description: POST /v1/user/create Negative response
+          description: POST /v1/user/create Negative response 409
           content:
             application/json:
               schema:
@@ -300,7 +300,7 @@ paths:
                   - status
                   - id
         "500":
-          description: POST /v1/user/create Negative response
+          description: POST /v1/user/create Negative response 500
           content:
             application/json:
               schema:

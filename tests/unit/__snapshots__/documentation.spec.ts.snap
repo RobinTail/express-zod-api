@@ -1426,7 +1426,7 @@ paths:
       operationId: PostV1UserCreate
       responses:
         "201":
-          description: POST /v1/user/create Positive response
+          description: POST /v1/user/create Positive response 201
           content:
             application/json:
               schema:
@@ -1450,7 +1450,7 @@ paths:
                   - status
                   - data
         "202":
-          description: POST /v1/user/create Positive response
+          description: POST /v1/user/create Positive response 202
           content:
             application/json:
               schema:
@@ -1474,7 +1474,7 @@ paths:
                   - status
                   - data
         "400":
-          description: POST /v1/user/create Negative response
+          description: POST /v1/user/create Negative response 400
           content:
             application/json:
               schema:
@@ -1490,7 +1490,7 @@ paths:
                   - status
                   - reason
         "409":
-          description: POST /v1/user/create Negative response
+          description: POST /v1/user/create Negative response 409
           content:
             application/json:
               schema:
@@ -1509,7 +1509,7 @@ paths:
                   - status
                   - id
         "500":
-          description: POST /v1/user/create Negative response
+          description: POST /v1/user/create Negative response 500
           content:
             application/json:
               schema:
@@ -1922,35 +1922,35 @@ paths:
       operationId: PostV1UserCreate
       responses:
         "201":
-          description: POST /v1/user/create Positive response
+          description: POST /v1/user/create Positive response 201
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PostV1UserCreatePositiveResponse"
+                $ref: "#/components/schemas/PostV1UserCreatePositiveResponse201"
         "202":
-          description: POST /v1/user/create Positive response
+          description: POST /v1/user/create Positive response 202
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PostV1UserCreatePositiveResponse"
+                $ref: "#/components/schemas/PostV1UserCreatePositiveResponse202"
         "400":
-          description: POST /v1/user/create Negative response
+          description: POST /v1/user/create Negative response 400
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PostV1UserCreateNegativeResponse"
+                $ref: "#/components/schemas/PostV1UserCreateNegativeResponse400"
         "409":
-          description: POST /v1/user/create Negative response
+          description: POST /v1/user/create Negative response 409
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PostV1UserCreateNegativeResponse"
+                $ref: "#/components/schemas/PostV1UserCreateNegativeResponse409"
         "500":
-          description: POST /v1/user/create Negative response
+          description: POST /v1/user/create Negative response 500
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PostV1UserCreateNegativeResponse"
+                $ref: "#/components/schemas/PostV1UserCreateNegativeResponse500"
       tags:
         - users
       requestBody:
@@ -2248,7 +2248,7 @@ components:
           examples:
             - name: John Doe
               birthday: 1963-04-21
-    PostV1UserCreatePositiveResponse:
+    PostV1UserCreatePositiveResponse201:
       type: object
       properties:
         status:
@@ -2268,7 +2268,54 @@ components:
       required:
         - status
         - data
-    PostV1UserCreateNegativeResponse:
+    PostV1UserCreatePositiveResponse202:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+            - created
+        data:
+          type: object
+          properties:
+            id:
+              type: integer
+              format: int64
+              exclusiveMinimum: 0
+              maximum: 9007199254740991
+          required:
+            - id
+      required:
+        - status
+        - data
+    PostV1UserCreateNegativeResponse409:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+            - exists
+        id:
+          type: number
+          format: double
+          minimum: 5e-324
+          maximum: 1.7976931348623157e+308
+      required:
+        - status
+        - id
+    PostV1UserCreateNegativeResponse400:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+            - error
+        reason:
+          type: string
+      required:
+        - status
+        - reason
+    PostV1UserCreateNegativeResponse500:
       type: object
       properties:
         status:
@@ -3580,7 +3627,7 @@ paths:
       operationId: PostV1Mtpl
       responses:
         "200":
-          description: POST /v1/mtpl Positive response
+          description: POST /v1/mtpl Positive response 200
           content:
             application/json:
               schema:
@@ -3601,7 +3648,7 @@ paths:
                   - status
                   - data
         "201":
-          description: POST /v1/mtpl Positive response
+          description: POST /v1/mtpl Positive response 201
           content:
             application/json:
               schema:
@@ -3622,7 +3669,7 @@ paths:
                   - status
                   - data
         "400":
-          description: POST /v1/mtpl Negative response
+          description: POST /v1/mtpl Negative response 400
           content:
             application/json:
               schema:
@@ -3630,7 +3677,7 @@ paths:
                 enum:
                   - error
         "500":
-          description: POST /v1/mtpl Negative response
+          description: POST /v1/mtpl Negative response 500
           content:
             application/json:
               schema:
