@@ -48,7 +48,10 @@ export type { ZodFileDef } from "./file-schema";
 export type { ZodUploadDef } from "./upload-schema";
 export type { CommonConfig, AppConfig, ServerConfig } from "./config-type";
 export type { MiddlewareDefinition } from "./middleware";
-export type { ResultHandlerDefinition } from "./result-handler";
+export type {
+  ResultHandlerDefinition,
+  StatusDependingDefinition,
+} from "./result-handler";
 export type { ProcessedResponse } from "./endpoint";
 export type {
   BasicSecurity,

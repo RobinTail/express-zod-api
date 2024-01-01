@@ -36,7 +36,7 @@ export interface ResultHandlerDefinition<
   handler: ResultHandler<z.output<POS> | z.output<NEG>>;
 }
 
-interface StatusDependingDefinition<
+export interface StatusDependingDefinition<
   POS extends MultipleApiResponses,
   NEG extends MultipleApiResponses,
 > {

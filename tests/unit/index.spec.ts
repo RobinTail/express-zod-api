@@ -23,12 +23,14 @@ import {
   ResultHandlerDefinition,
   Routing,
   ServerConfig,
+  StatusDependingDefinition,
   ZodDateInDef,
   ZodDateOutDef,
   ZodFileDef,
   ZodUploadDef,
 } from "../../src";
 import { describe, expect, test, vi } from "vitest";
+import { ApiResponse } from "../../src/api-response";
 
 describe("Index Entrypoint", () => {
   describe("exports", () => {
@@ -76,6 +78,16 @@ describe("Index Entrypoint", () => {
         middleware: vi.fn(),
       });
       expectType<ResultHandlerDefinition<z.ZodTypeAny, z.ZodTypeAny>>({
+        getPositiveResponse: vi.fn(),
+        getNegativeResponse: vi.fn(),
+        handler: vi.fn(),
+      });
+      expectType<
+        StatusDependingDefinition<
+          [ApiResponse<z.ZodTypeAny>],
+          [ApiResponse<z.ZodTypeAny>]
+        >
+      >({
         getPositiveResponse: vi.fn(),
         getNegativeResponse: vi.fn(),
         handler: vi.fn(),
