@@ -1,6 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`Endpoint > .getSchema() > should return schemas negative response schema 1`] = `
+exports[`Endpoint > .getSchema() > should return the negative response schema 1`] = `
 {
   "_type": "ZodObject",
   "shape": {
@@ -20,7 +20,7 @@ exports[`Endpoint > .getSchema() > should return schemas negative response schem
 }
 `;
 
-exports[`Endpoint > .getSchema() > should return schemas positive response schema 1`] = `
+exports[`Endpoint > .getSchema() > should return the positive response schema 1`] = `
 {
   "_type": "ZodObject",
   "shape": {

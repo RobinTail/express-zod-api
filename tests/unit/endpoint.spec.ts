@@ -313,7 +313,7 @@ describe("Endpoint", () => {
     );
 
     test.each(["positive", "negative"] as const)(
-      "should return schemas %s response schema",
+      "should return the %s response schema",
       (variant) => {
         const factory = new EndpointsFactory(defaultResultHandler);
         const endpoint = factory.build({
