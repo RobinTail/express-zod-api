@@ -99,6 +99,7 @@ describe("Index Entrypoint", () => {
       expectType<InputSecurity<string>>({ type: "input", name: "" });
       expectType<OAuth2Security<string>>({ type: "oauth2" });
       expectType<OpenIdSecurity>({ type: "openid", url: "" });
+      expectType<ApiResponse<z.ZodTypeAny>>({ schema: z.string() });
       expectType<NormalizedResponse>({
         schema: z.string(),
         mimeTypes: ["test"],
