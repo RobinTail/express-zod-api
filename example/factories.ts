@@ -100,7 +100,7 @@ export const statusDependingFactory = new EndpointsFactory({
     getNegativeResponse: () => [
       {
         statusCode: 409,
-        schema: z.object({ status: z.literal("exists"), id: z.number() }),
+        schema: z.object({ status: z.literal("exists"), id: z.number().int() }),
       },
       {
         statusCodes: [400, 500],

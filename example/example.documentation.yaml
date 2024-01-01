@@ -292,10 +292,10 @@ paths:
                     enum:
                       - exists
                   id:
-                    type: number
-                    format: double
-                    minimum: 5e-324
-                    maximum: 1.7976931348623157e+308
+                    type: integer
+                    format: int64
+                    minimum: -9007199254740991
+                    maximum: 9007199254740991
                 required:
                   - status
                   - id
