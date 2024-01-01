@@ -130,23 +130,24 @@ export class Endpoint<
     this.#scopes = scopes;
     this.#tags = tags;
     this.#descriptions = { long, short };
-    const positive = normalizeApiResponse(
-      resultHandler.getPositiveResponse(outputSchema),
-      { mimeTypes: [mimeJson], statusCodes: [defaultStatusCodes.positive] },
-    );
-    const negative = normalizeApiResponse(resultHandler.getNegativeResponse(), {
-      mimeTypes: [mimeJson],
-      statusCodes: [defaultStatusCodes.negative],
-    });
-    this.#responses = { positive, negative };
+    this.#responses = {
+      positive: normalizeApiResponse(
+        resultHandler.getPositiveResponse(outputSchema),
+        { mimeTypes: [mimeJson], statusCodes: [defaultStatusCodes.positive] },
+      ),
+      negative: normalizeApiResponse(resultHandler.getNegativeResponse(), {
+        mimeTypes: [mimeJson],
+        statusCodes: [defaultStatusCodes.negative],
+      }),
+    };
     this.#mimeTypes = {
       input: hasUpload(inputSchema)
         ? [mimeMultipart]
         : hasRaw(inputSchema)
           ? [mimeRaw]
           : [mimeJson],
-      positive: positive.flatMap(({ mimeTypes }) => mimeTypes),
-      negative: negative.flatMap(({ mimeTypes }) => mimeTypes),
+      positive: this.#responses.positive.flatMap(({ mimeTypes }) => mimeTypes),
+      negative: this.#responses.negative.flatMap(({ mimeTypes }) => mimeTypes),
     };
     this.#schemas = { input: inputSchema, output: outputSchema };
   }
