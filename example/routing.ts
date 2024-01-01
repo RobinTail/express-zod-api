@@ -16,7 +16,7 @@ export const routing: Routing = {
       retrieve: retrieveUserEndpoint, // path: /v1/user/retrieve
       // syntax 2: methods are defined within the route (id is the route path param by the way)
       ":id": new DependsOnMethod({
-        // endpoints assigned here must support at least the same method specified in .build()
+        // the endpoints listed here must support at least the same method they are assigned to
         patch: updateUserEndpoint, // demonstrates authentication
       }),
       // demonstrates different response schemas depending on status code
