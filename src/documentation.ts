@@ -67,7 +67,6 @@ interface DocumentationParams {
 }
 
 export class Documentation extends OpenApiBuilder {
-  protected lastReferenceIds: Record<string, number> = {};
   protected lastSecuritySchemaIds: Partial<Record<SecuritySchemeType, number>> =
     {};
   protected lastOperationIdSuffixes: Record<string, number> = {};
