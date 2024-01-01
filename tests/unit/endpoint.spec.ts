@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { z } from "zod";
 import {
+  AbstractEndpoint,
   EndpointsFactory,
   createMiddleware,
   createResultHandler,
@@ -289,33 +290,43 @@ describe("Endpoint", () => {
   });
 
   describe(".getSchema()", () => {
-    test("should return the input schema", () => {
-      const factory = new EndpointsFactory(defaultResultHandler);
-      const input = z.object({
-        something: z.number(),
-      });
-      const endpoint = factory.build({
-        method: "get",
-        input,
-        output: z.object({}),
-        handler: vi.fn(),
-      });
-      expect(endpoint.getSchema("input")).toEqual(input);
-    });
+    test.each(["input", "output"] as const)(
+      "should return the %s schema",
+      (variant) => {
+        const factory = new EndpointsFactory(defaultResultHandler);
+        const input = z.object({
+          something: z.number(),
+        });
+        const output = z.object({
+          something: z.number(),
+        });
+        const endpoint = factory.build({
+          method: "get",
+          input,
+          output,
+          handler: vi.fn(),
+        });
+        expect((endpoint as AbstractEndpoint).getSchema(variant)).toEqual(
+          variant === "input" ? input : output,
+        );
+      },
+    );
 
-    test("should be the output schema", () => {
-      const outputSchema = z.object({
-        something: z.number(),
-      });
-      const endpoint = new Endpoint({
-        methods: ["get"],
-        inputSchema: z.object({}),
-        outputSchema,
-        handler: vi.fn<any>(),
-        resultHandler: defaultResultHandler,
-      });
-      expect(endpoint.getSchema("output")).toEqual(outputSchema);
-    });
+    test.each(["positive", "negative"] as const)(
+      "should return schemas %s response schema",
+      (variant) => {
+        const factory = new EndpointsFactory(defaultResultHandler);
+        const endpoint = factory.build({
+          method: "get",
+          input: z.object({}),
+          output: z.object({ something: z.number() }),
+          handler: vi.fn(),
+        });
+        expect(
+          serializeSchemaForTest(endpoint.getSchema(variant)),
+        ).toMatchSnapshot();
+      },
+    );
   });
 
   describe("getMimeTypes()", () => {
@@ -330,29 +341,6 @@ describe("Endpoint", () => {
           handler: vi.fn(),
         });
         expect(endpoint.getMimeTypes(variant)).toEqual(["application/json"]);
-      },
-    );
-  });
-
-  describe("getResponses()", () => {
-    test.each(["positive", "negative"] as const)(
-      "should return schemas and mime types the result handler %#",
-      (variant) => {
-        const factory = new EndpointsFactory(defaultResultHandler);
-        const endpoint = factory.build({
-          method: "get",
-          input: z.object({}),
-          output: z.object({ something: z.number() }),
-          handler: vi.fn(),
-        });
-        expect(
-          endpoint
-            .getResponses(variant)
-            .map(({ schema }) => serializeSchemaForTest(schema)),
-        ).toMatchSnapshot();
-        expect(
-          endpoint.getResponses(variant).map(({ mimeTypes }) => mimeTypes),
-        ).toEqual([["application/json"]]);
       },
     );
   });

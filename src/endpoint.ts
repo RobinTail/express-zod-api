@@ -78,6 +78,7 @@ export abstract class AbstractEndpoint {
   ): string | undefined;
   public abstract getMethods(): Method[];
   public abstract getSchema(variant: IOVariant): IOSchema;
+  public abstract getSchema(variant: ResponseVariant): z.ZodTypeAny;
   public abstract getMimeTypes(variant: MimeVariant): string[];
   public abstract getResponses(variant: ResponseVariant): ProcessedResponse[];
   public abstract getSecurity(): LogicalContainer<Security>;
@@ -188,8 +189,14 @@ export class Endpoint<
 
   public override getSchema(variant: "input"): IN;
   public override getSchema(variant: "output"): OUT;
-  public override getSchema(variant: IOVariant) {
-    return this.#schemas[variant];
+  public override getSchema(variant: ResponseVariant): z.ZodTypeAny;
+  public override getSchema(variant: IOVariant | ResponseVariant) {
+    if (variant === "input" || variant === "output") {
+      return this.#schemas[variant];
+    }
+    return this.getResponses(variant)
+      .map(({ schema }) => schema)
+      .reduce((agg, schema) => agg.or(schema));
   }
 
   public override getMimeTypes(variant: MimeVariant) {

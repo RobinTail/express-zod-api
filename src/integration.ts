@@ -165,10 +165,7 @@ export class Integration {
         const positiveResponseId = splitResponse
           ? makeCleanId(method, path, "positive.response")
           : undefined;
-        const positiveSchema = endpoint
-          .getResponses("positive")
-          .map(({ schema }) => schema)
-          .reduce((agg, entry) => agg.or(entry));
+        const positiveSchema = endpoint.getSchema("positive");
         const positiveResponse = splitResponse
           ? zodToTs({
               ...commons,
@@ -179,10 +176,7 @@ export class Integration {
         const negativeResponseId = splitResponse
           ? makeCleanId(method, path, "negative.response")
           : undefined;
-        const negativeSchema = endpoint
-          .getResponses("negative")
-          .map(({ schema }) => schema)
-          .reduce((agg, entry) => agg.or(entry));
+        const negativeSchema = endpoint.getSchema("negative");
         const negativeResponse = splitResponse
           ? zodToTs({
               ...commons,
@@ -221,10 +215,7 @@ export class Integration {
             positive: positiveResponseId,
             negative: negativeResponseId,
             response: genericResponseId,
-            isJson: endpoint
-              .getResponses("positive")
-              .flatMap(({ mimeTypes }) => mimeTypes)
-              .includes(mimeJson),
+            isJson: endpoint.getMimeTypes("positive").includes(mimeJson),
             tags: endpoint.getTags(),
           };
         }
