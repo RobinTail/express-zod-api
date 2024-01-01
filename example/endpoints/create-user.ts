@@ -13,18 +13,11 @@ export const createUserEndpoint = statusDependingFactory.build({
     id: z.number().int().positive(),
   }),
   handler: async ({ input: { name } }) => {
-    assert.notEqual(
-      name,
-      "Gimme Jimmy",
-      createHttpError(500, "That went wrong"),
-    );
-    assert.notEqual(
-      name,
-      "James McGill",
+    assert(name !== "Gimme Jimmy", createHttpError(500, "That went wrong"));
+    assert(
+      name !== "James McGill",
       createHttpError(409, "That one already exists", { id: 16 }),
     );
-    return {
-      id: 16,
-    };
+    return { id: 16 };
   },
 });
