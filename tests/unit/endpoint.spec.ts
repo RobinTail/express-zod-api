@@ -674,8 +674,8 @@ describe("Endpoint", () => {
             outputSchema: z.object({}),
             handler: vi.fn<any>(),
             resultHandler: {
-              getPositiveResponse: vi.fn<any>(),
-              getNegativeResponse: vi.fn<any>(),
+              getPositiveResponse: vi.fn(),
+              getNegativeResponse: vi.fn(),
               handler: vi.fn(),
             },
           }),
@@ -692,8 +692,8 @@ describe("Endpoint", () => {
             outputSchema: z.object({}).transform(() => []),
             handler: vi.fn<any>(),
             resultHandler: {
-              getPositiveResponse: vi.fn<any>(),
-              getNegativeResponse: vi.fn<any>(),
+              getPositiveResponse: vi.fn(),
+              getNegativeResponse: vi.fn(),
               handler: vi.fn(),
             },
           }),
