@@ -49,7 +49,7 @@ export type { ZodUploadDef } from "./upload-schema";
 export type { CommonConfig, AppConfig, ServerConfig } from "./config-type";
 export type { MiddlewareDefinition } from "./middleware";
 export type { ResultHandlerDefinition } from "./result-handler";
-export type { NormalizedResponse, ApiResponse } from "./api-response";
+export type { ApiResponse } from "./api-response";
 export type {
   BasicSecurity,
   BearerSecurity,

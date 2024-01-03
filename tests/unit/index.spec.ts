@@ -17,7 +17,6 @@ import {
   Method,
   MiddlewareDefinition,
   MockOverrides,
-  NormalizedResponse,
   OAuth2Security,
   OpenIdSecurity,
   ResultHandlerDefinition,
@@ -109,11 +108,6 @@ describe("Index Entrypoint", () => {
       expectType<OAuth2Security<string>>({ type: "oauth2" });
       expectType<OpenIdSecurity>({ type: "openid", url: "" });
       expectType<ApiResponse<z.ZodTypeAny>>({ schema: z.string() });
-      expectType<NormalizedResponse>({
-        schema: z.string(),
-        mimeTypes: ["test"],
-        statusCodes: [200],
-      });
     });
   });
 });
