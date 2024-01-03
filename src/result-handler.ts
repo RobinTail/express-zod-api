@@ -57,12 +57,12 @@ export type AnyResultHandlerDefinition = ResultHandlerDefinition<
   AnyResponseDefinition
 >;
 
-export function createResultHandler<
+export const createResultHandler = <
   POS extends AnyResponseDefinition,
   NEG extends AnyResponseDefinition,
->(definition: ResultHandlerDefinition<POS, NEG>) {
-  return definition;
-}
+>(
+  definition: ResultHandlerDefinition<POS, NEG>,
+) => definition;
 
 export const defaultResultHandler = createResultHandler({
   getPositiveResponse: (output: IOSchema) => {
