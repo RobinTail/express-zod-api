@@ -31,11 +31,13 @@ export type NormalizedResponse = Required<
   Pick<ApiResponse<z.ZodTypeAny>, "schema" | "statusCodes" | "mimeTypes">
 >;
 
+export type AnyResponseDefinition =
+  | z.ZodTypeAny // plain schema, default status codes applied
+  | ApiResponse<z.ZodTypeAny> // single response definition, status code(s) customizable
+  | ApiResponse<z.ZodTypeAny>[]; // Feature #1431: different responses for different status codes
+
 export const normalizeApiResponse = (
-  subject:
-    | z.ZodTypeAny
-    | ApiResponse<z.ZodTypeAny>
-    | ApiResponse<z.ZodTypeAny>[],
+  subject: AnyResponseDefinition,
   fallback: Omit<NormalizedResponse, "schema">,
 ): NormalizedResponse[] => {
   if (subject instanceof z.ZodType) {

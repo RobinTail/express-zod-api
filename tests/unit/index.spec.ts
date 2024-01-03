@@ -83,8 +83,8 @@ describe("Index Entrypoint", () => {
       });
       expectType<
         ResultHandlerDefinition<
-          [ApiResponse<z.ZodTypeAny>],
-          [ApiResponse<z.ZodTypeAny>]
+          ApiResponse<z.ZodTypeAny>[],
+          ApiResponse<z.ZodTypeAny>[]
         >
       >({
         getPositiveResponse: vi.fn(),
