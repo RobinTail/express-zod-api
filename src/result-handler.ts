@@ -63,7 +63,6 @@ export interface ResultHandlerDefinition<
 
 export type AnyResultHandlerDefinition = ResultHandlerDefinition<any, any>;
 
-/** @todo check if array is not empty */
 export function createResultHandler<
   POS extends
     | ApiResponse<z.ZodTypeAny>[]

@@ -111,17 +111,6 @@ export class Endpoint<
     tags?: TAG[];
   }) {
     super();
-    [
-      { name: "input schema", schema: inputSchema },
-      { name: "output schema", schema: outputSchema },
-    ].forEach(({ name, schema }) => {
-      assert(
-        !hasTopLevelTransformingEffect(schema),
-        new IOSchemaError(
-          `Using transformations on the top level of endpoint ${name} is not allowed.`,
-        ),
-      );
-    });
     this.#handler = handler;
     this.#resultHandler = resultHandler;
     this.#middlewares = middlewares;
@@ -130,6 +119,15 @@ export class Endpoint<
     this.#scopes = scopes;
     this.#tags = tags;
     this.#descriptions = { long, short };
+    this.#schemas = { input: inputSchema, output: outputSchema };
+    for (const [variant, schema] of Object.entries(this.#schemas)) {
+      assert(
+        !hasTopLevelTransformingEffect(schema),
+        new IOSchemaError(
+          `Using transformations on the top level of endpoint ${variant} schema is not allowed.`,
+        ),
+      );
+    }
     this.#responses = {
       positive: normalizeApiResponse(
         resultHandler.getPositiveResponse(outputSchema),
@@ -140,6 +138,14 @@ export class Endpoint<
         statusCodes: [defaultStatusCodes.negative],
       }),
     };
+    for (const [variant, responses] of Object.entries(this.#responses)) {
+      assert(
+        responses.length,
+        new ResultHandlerError(
+          `ResultHandler must have at least one ${variant} response specified.`,
+        ),
+      );
+    }
     this.#mimeTypes = {
       input: hasUpload(inputSchema)
         ? [mimeMultipart]
@@ -149,7 +155,6 @@ export class Endpoint<
       positive: this.#responses.positive.flatMap(({ mimeTypes }) => mimeTypes),
       negative: this.#responses.negative.flatMap(({ mimeTypes }) => mimeTypes),
     };
-    this.#schemas = { input: inputSchema, output: outputSchema };
   }
 
   /**
