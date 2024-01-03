@@ -31,6 +31,16 @@ type ResultHandler<RES> = (
   params: ResultHandlerParams<RES>,
 ) => void | Promise<void>;
 
+type ExtractSchema<T extends AnyResponseDefinition> = T extends ApiResponse<
+  infer S
+>[]
+  ? S
+  : T extends ApiResponse<infer S>
+    ? S
+    : T extends z.ZodTypeAny
+      ? T
+      : never;
+
 export interface ResultHandlerDefinition<
   POS extends AnyResponseDefinition,
   NEG extends AnyResponseDefinition,
@@ -38,24 +48,7 @@ export interface ResultHandlerDefinition<
   getPositiveResponse: (output: IOSchema) => POS;
   getNegativeResponse: () => NEG;
   handler: ResultHandler<
-    | z.output<
-        POS extends ApiResponse<infer S>[]
-          ? S
-          : POS extends ApiResponse<infer S>
-            ? S
-            : POS extends z.ZodTypeAny
-              ? POS
-              : never
-      >
-    | z.output<
-        NEG extends ApiResponse<infer S>[]
-          ? S
-          : NEG extends ApiResponse<infer S>
-            ? S
-            : NEG extends z.ZodTypeAny
-              ? NEG
-              : never
-      >
+    z.output<ExtractSchema<POS>> | z.output<ExtractSchema<NEG>>
   >;
 }
 
