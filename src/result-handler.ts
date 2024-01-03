@@ -61,7 +61,10 @@ export interface ResultHandlerDefinition<
   >;
 }
 
-export type AnyResultHandlerDefinition = ResultHandlerDefinition<any, any>;
+export type AnyResultHandlerDefinition = ResultHandlerDefinition<
+  ApiResponse<z.ZodTypeAny>[] | ApiResponse<z.ZodTypeAny> | z.ZodTypeAny,
+  ApiResponse<z.ZodTypeAny>[] | ApiResponse<z.ZodTypeAny> | z.ZodTypeAny
+>;
 
 export function createResultHandler<
   POS extends
