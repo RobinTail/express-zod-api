@@ -11,7 +11,7 @@ import {
   testEndpoint,
 } from "../../src";
 import { Endpoint } from "../../src/endpoint";
-import { IOSchemaError } from "../../src/errors";
+import { IOSchemaError, ResultHandlerError } from "../../src/errors";
 import { serializeSchemaForTest } from "../helpers";
 import { describe, expect, test, vi } from "vitest";
 
@@ -700,6 +700,47 @@ describe("Endpoint", () => {
       ).toThrow(
         new IOSchemaError(
           "Using transformations on the top level of endpoint output schema is not allowed.",
+        ),
+      );
+    });
+  });
+
+  describe("Feature #1431: Multiple responses and status codes", () => {
+    test("Should throw in constructor when ResultHandler has no response schema specified", () => {
+      expect(
+        () =>
+          new Endpoint({
+            methods: ["get"],
+            inputSchema: z.object({}),
+            outputSchema: z.object({}),
+            handler: vi.fn<any>(),
+            resultHandler: {
+              getPositiveResponse: () => [],
+              getNegativeResponse: () => z.any(),
+              handler: vi.fn(),
+            },
+          }),
+      ).toThrow(
+        new ResultHandlerError(
+          "ResultHandler must have at least one positive response schema specified.",
+        ),
+      );
+      expect(
+        () =>
+          new Endpoint({
+            methods: ["get"],
+            inputSchema: z.object({}),
+            outputSchema: z.object({}),
+            handler: vi.fn<any>(),
+            resultHandler: {
+              getPositiveResponse: () => z.any(),
+              getNegativeResponse: () => [],
+              handler: vi.fn(),
+            },
+          }),
+      ).toThrow(
+        new ResultHandlerError(
+          "ResultHandler must have at least one negative response schema specified.",
         ),
       );
     });

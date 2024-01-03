@@ -142,7 +142,7 @@ export class Endpoint<
       assert(
         responses.length,
         new ResultHandlerError(
-          `ResultHandler must have at least one ${variant} response specified.`,
+          `ResultHandler must have at least one ${variant} response schema specified.`,
         ),
       );
     }
