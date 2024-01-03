@@ -25,19 +25,17 @@ import createHttpError from "http-errors";
 
 const statusDependingFactory = new EndpointsFactory(
   createResultHandler({
-    getPositiveResponse: (output) => [
-      {
-        statusCodes: [201, 202], // multiple status codes for one positive response schema
-        schema: z.object({ status: z.literal("created"), data: output }),
-      },
-    ],
+    getPositiveResponse: (output) => ({
+      statusCodes: [201, 202], // multiple status codes for one positive response schema
+      schema: z.object({ status: z.literal("created"), data: output }),
+    }),
     getNegativeResponse: () => [
       {
         statusCode: 409, // special response schema for the status code
         schema: z.object({ status: z.literal("exists"), id: z.number().int() }),
       },
       {
-        statusCodes: [400, 500], // additional status codes for the negative response
+        statusCodes: [400, 500], // additional response schema for multiple status codes
         schema: z.object({ status: z.literal("error"), reason: z.string() }),
       },
     ],
