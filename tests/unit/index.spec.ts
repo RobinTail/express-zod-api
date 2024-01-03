@@ -23,7 +23,6 @@ import {
   ResultHandlerDefinition,
   Routing,
   ServerConfig,
-  StatusDependingDefinition,
   ZodDateInDef,
   ZodDateOutDef,
   ZodFileDef,
@@ -83,9 +82,19 @@ describe("Index Entrypoint", () => {
         handler: vi.fn(),
       });
       expectType<
-        StatusDependingDefinition<
+        ResultHandlerDefinition<
           [ApiResponse<z.ZodTypeAny>],
           [ApiResponse<z.ZodTypeAny>]
+        >
+      >({
+        getPositiveResponse: vi.fn(),
+        getNegativeResponse: vi.fn(),
+        handler: vi.fn(),
+      });
+      expectType<
+        ResultHandlerDefinition<
+          ApiResponse<z.ZodTypeAny>,
+          ApiResponse<z.ZodTypeAny>
         >
       >({
         getPositiveResponse: vi.fn(),

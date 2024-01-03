@@ -190,10 +190,15 @@ describe("ResultHandler", () => {
       },
     });
     expectType<
-      [ApiResponse<z.ZodLiteral<"ok">>, ApiResponse<z.ZodLiteral<"kinda">>]
+      Array<
+        ApiResponse<z.ZodLiteral<"ok">> | ApiResponse<z.ZodLiteral<"kinda">>
+      >
     >(subject.getPositiveResponse(z.object({})));
     expectType<
-      [ApiResponse<z.ZodLiteral<"error">>, ApiResponse<z.ZodLiteral<"failure">>]
+      Array<
+        | ApiResponse<z.ZodLiteral<"error">>
+        | ApiResponse<z.ZodLiteral<"failure">>
+      >
     >(subject.getNegativeResponse());
   });
 });

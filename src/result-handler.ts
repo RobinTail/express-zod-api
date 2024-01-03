@@ -1,10 +1,6 @@
 import { Request, Response } from "express";
 import { z } from "zod";
-import {
-  ApiResponse,
-  MultipleApiResponses,
-  defaultStatusCodes,
-} from "./api-response";
+import { ApiResponse, defaultStatusCodes } from "./api-response";
 import {
   FlatObject,
   getExamples,
@@ -32,40 +28,52 @@ type ResultHandler<RES> = (
 ) => void | Promise<void>;
 
 export interface ResultHandlerDefinition<
-  POS extends z.ZodTypeAny,
-  NEG extends z.ZodTypeAny,
-> {
-  getPositiveResponse: (output: IOSchema) => POS | ApiResponse<POS>;
-  getNegativeResponse: () => NEG | ApiResponse<NEG>;
-  handler: ResultHandler<z.output<POS> | z.output<NEG>>;
-}
-
-export interface StatusDependingDefinition<
-  POS extends MultipleApiResponses,
-  NEG extends MultipleApiResponses,
+  POS extends
+    | ApiResponse<z.ZodTypeAny>[]
+    | ApiResponse<z.ZodTypeAny>
+    | z.ZodTypeAny,
+  NEG extends
+    | ApiResponse<z.ZodTypeAny>[]
+    | ApiResponse<z.ZodTypeAny>
+    | z.ZodTypeAny,
 > {
   getPositiveResponse: (output: IOSchema) => POS;
   getNegativeResponse: () => NEG;
   handler: ResultHandler<
-    z.output<POS[number]["schema"]> | z.output<NEG[number]["schema"]>
+    | z.output<
+        POS extends ApiResponse<infer S>[]
+          ? S
+          : POS extends ApiResponse<infer S>
+            ? S
+            : POS extends z.ZodTypeAny
+              ? POS
+              : never
+      >
+    | z.output<
+        NEG extends ApiResponse<infer S>[]
+          ? S
+          : NEG extends ApiResponse<infer S>
+            ? S
+            : NEG extends z.ZodTypeAny
+              ? NEG
+              : never
+      >
   >;
 }
 
-export type AnyResultHandlerDefinition =
-  | ResultHandlerDefinition<z.ZodTypeAny, z.ZodTypeAny>
-  | StatusDependingDefinition<MultipleApiResponses, MultipleApiResponses>;
+export type AnyResultHandlerDefinition = ResultHandlerDefinition<any, any>;
 
+/** @todo check if array is not empty */
 export function createResultHandler<
-  POS extends MultipleApiResponses,
-  NEG extends MultipleApiResponses,
->(definition: StatusDependingDefinition<POS, NEG>): typeof definition;
-
-export function createResultHandler<
-  POS extends z.ZodTypeAny,
-  NEG extends z.ZodTypeAny,
->(definition: ResultHandlerDefinition<POS, NEG>): typeof definition;
-
-export function createResultHandler(definition: unknown) {
+  POS extends
+    | ApiResponse<z.ZodTypeAny>[]
+    | ApiResponse<z.ZodTypeAny>
+    | z.ZodTypeAny,
+  NEG extends
+    | ApiResponse<z.ZodTypeAny>[]
+    | ApiResponse<z.ZodTypeAny>
+    | z.ZodTypeAny,
+>(definition: ResultHandlerDefinition<POS, NEG>) {
   return definition;
 }
 

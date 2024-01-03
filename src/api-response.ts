@@ -27,17 +27,15 @@ export interface ApiResponse<S extends z.ZodTypeAny> {
   mimeTypes?: [string, ...string[]];
 }
 
-export type MultipleApiResponses = [
-  ApiResponse<z.ZodTypeAny>,
-  ...ApiResponse<z.ZodTypeAny>[],
-];
-
 export type NormalizedResponse = Required<
   Pick<ApiResponse<z.ZodTypeAny>, "schema" | "statusCodes" | "mimeTypes">
 >;
 
 export const normalizeApiResponse = (
-  subject: z.ZodTypeAny | ApiResponse<z.ZodTypeAny> | MultipleApiResponses,
+  subject:
+    | z.ZodTypeAny
+    | ApiResponse<z.ZodTypeAny>
+    | ApiResponse<z.ZodTypeAny>[],
   fallback: Omit<NormalizedResponse, "schema">,
 ): NormalizedResponse[] => {
   if (subject instanceof z.ZodType) {

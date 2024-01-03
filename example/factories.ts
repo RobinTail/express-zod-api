@@ -87,16 +87,14 @@ export const arrayRespondingFactory = new EndpointsFactory({
   resultHandler: arrayResultHandler,
 });
 
-/** @desc The factory demonstrates slightly different response schemas depending on the status code */
+/** @desc The factory demonstrates slightly different response schemas depending on the negative status code */
 export const statusDependingFactory = new EndpointsFactory({
   config,
   resultHandler: createResultHandler({
-    getPositiveResponse: (output) => [
-      {
-        statusCodes: [201, 202],
-        schema: z.object({ status: z.literal("created"), data: output }),
-      },
-    ],
+    getPositiveResponse: (output) => ({
+      statusCodes: [201, 202],
+      schema: z.object({ status: z.literal("created"), data: output }),
+    }),
     getNegativeResponse: () => [
       {
         statusCode: 409,
