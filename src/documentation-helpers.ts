@@ -25,6 +25,7 @@ import {
   hasRaw,
   hasTopLevelTransformingEffect,
   isCustomHeader,
+  isProprietary,
   makeCleanId,
   tryToTransform,
   ucFirst,
@@ -40,7 +41,7 @@ import {
   andToOr,
   mapLogicalContainer,
 } from "./logical-container";
-import { copyMeta, getMeta, hasMeta } from "./metadata";
+import { copyMeta } from "./metadata";
 import { Method } from "./method";
 import {
   HandlingRules,
@@ -538,8 +539,8 @@ export const depictEffect: Depicter<z.ZodEffects<z.ZodTypeAny>> = ({
   next,
   ...ctx
 }) => {
-  // @todo reconsider
-  if (hasMeta(schema) && getMeta(schema, "proprietaryKind") === zodUploadKind) {
+  // @todo can move to walker?
+  if (isProprietary(schema, zodUploadKind)) {
     return depictUpload({ schema, isResponse, next, ...ctx });
   }
   const input = next({ schema: schema.innerType() });

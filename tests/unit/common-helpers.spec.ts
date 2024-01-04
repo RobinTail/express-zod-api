@@ -13,13 +13,13 @@ import {
   hasNestedSchema,
   hasTopLevelTransformingEffect,
   isCustomHeader,
+  isProprietary,
   makeCleanId,
   makeErrorFromAnything,
 } from "../../src/common-helpers";
 import { InputValidationError, ez, withMeta } from "../../src";
 import { Request } from "express";
 import { z } from "zod";
-import { getMeta, hasMeta } from "../../src/metadata";
 import { zodUploadKind } from "../../src/upload-schema";
 import { describe, expect, test } from "vitest";
 
@@ -396,9 +396,7 @@ describe("Common Helpers", () => {
       expect(
         hasNestedSchema({
           subject: ez.upload(),
-          condition: (subject) =>
-            hasMeta(subject) &&
-            getMeta(subject, "proprietaryKind") === zodUploadKind,
+          condition: (subject) => isProprietary(subject, zodUploadKind),
         }),
       ).toBeTruthy();
     });
@@ -416,9 +414,7 @@ describe("Common Helpers", () => {
       expect(
         hasNestedSchema({
           subject,
-          condition: (entry) =>
-            hasMeta(entry) &&
-            getMeta(entry, "proprietaryKind") === zodUploadKind,
+          condition: (entry) => isProprietary(entry, zodUploadKind),
         }),
       ).toBeTruthy();
     });
@@ -432,9 +428,7 @@ describe("Common Helpers", () => {
       expect(
         hasNestedSchema({
           subject,
-          condition: (entry) =>
-            hasMeta(entry) &&
-            getMeta(entry, "proprietaryKind") === zodUploadKind,
+          condition: (entry) => isProprietary(entry, zodUploadKind),
         }),
       ).toBeFalsy();
     });

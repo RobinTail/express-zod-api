@@ -255,11 +255,13 @@ export const hasNestedSchema = ({
   return false;
 };
 
+export const isProprietary = (schema: z.ZodTypeAny, kind: string) =>
+  hasMeta(schema) && getMeta(schema, "proprietaryKind") === kind;
+
 export const hasUpload = (subject: IOSchema) =>
   hasNestedSchema({
     subject,
-    condition: (schema) =>
-      hasMeta(schema) && getMeta(schema, "proprietaryKind") === zodUploadKind, // @todo extract into a helper
+    condition: (schema) => isProprietary(schema, zodUploadKind),
   });
 
 export const hasRaw = (subject: IOSchema) =>
