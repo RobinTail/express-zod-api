@@ -11,3 +11,7 @@ export const errToObj = (message: ErrMessage | undefined) =>
   typeof message === "string" ? { message } : message || {};
 
 export const isValidDate = (date: Date): boolean => !isNaN(date.getTime());
+
+export const bufferSchema = z.custom<Buffer>((subject) =>
+  Buffer.isBuffer(subject),
+);

@@ -10,6 +10,7 @@ import {
   addIssueToContext,
   z,
 } from "zod";
+import { bufferSchema } from "./schema-helpers";
 
 const zodUploadKind = "ZodUpload";
 
@@ -17,7 +18,6 @@ export interface ZodUploadDef extends ZodTypeDef {
   typeName: typeof zodUploadKind;
 }
 
-const bufferSchema = z.custom<Buffer>((subject) => Buffer.isBuffer(subject));
 const uploadedFileSchema = z.object({
   name: z.string(),
   encoding: z.string(),
