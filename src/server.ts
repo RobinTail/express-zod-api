@@ -4,6 +4,7 @@ import type fileUpload from "express-fileupload";
 import http from "node:http";
 import https from "node:https";
 import { AppConfig, CommonConfig, ServerConfig } from "./config-type";
+import { lastResortHandler } from "./last-resort";
 import {
   AbstractLogger,
   createLogger,
@@ -15,7 +16,6 @@ import { loadPeer } from "./peer-helpers";
 import {
   AnyResultHandlerDefinition,
   defaultResultHandler,
-  lastResortHandler,
 } from "./result-handler";
 import { Routing, initRouting } from "./routing";
 import createHttpError from "http-errors";

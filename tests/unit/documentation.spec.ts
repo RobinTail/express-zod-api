@@ -1008,6 +1008,48 @@ describe("Documentation", () => {
     });
   });
 
+  describe("Feature #1431: Multiple schemas for different status codes", () => {
+    test("should depict accordingly", () => {
+      const factory = new EndpointsFactory(
+        createResultHandler({
+          getPositiveResponse: (output) => [
+            {
+              statusCode: 200,
+              schema: z.object({ status: z.literal("ok"), data: output }),
+            },
+            {
+              statusCode: 201,
+              schema: z.object({ status: z.literal("kinda"), data: output }),
+            },
+          ],
+          getNegativeResponse: () => [
+            { statusCode: 400, schema: z.literal("error") },
+            { statusCode: 500, schema: z.literal("failure") },
+          ],
+          handler: vi.fn(),
+        }),
+      );
+      expect(
+        new Documentation({
+          version: "3.4.5",
+          title: "Testing multiple schemas for different status codes",
+          serverUrl: "https://example.com",
+          config: sampleConfig,
+          routing: {
+            v1: {
+              mtpl: factory.build({
+                method: "post",
+                input: z.object({ test: z.number() }),
+                output: z.object({ payload: z.string() }),
+                handler: async () => ({ payload: "test" }),
+              }),
+            },
+          },
+        }).getSpecAsYaml(),
+      ).toMatchSnapshot();
+    });
+  });
+
   describe("Metadata", () => {
     test("should pass over the schema description", () => {
       const spec = new Documentation({

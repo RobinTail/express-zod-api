@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { z } from "zod";
 import {
+  AbstractEndpoint,
   EndpointsFactory,
   createMiddleware,
   createResultHandler,
@@ -10,7 +11,7 @@ import {
   testEndpoint,
 } from "../../src";
 import { Endpoint } from "../../src/endpoint";
-import { IOSchemaError } from "../../src/errors";
+import { IOSchemaError, ResultHandlerError } from "../../src/errors";
 import { serializeSchemaForTest } from "../helpers";
 import { describe, expect, test, vi } from "vitest";
 
@@ -289,65 +290,59 @@ describe("Endpoint", () => {
   });
 
   describe(".getSchema()", () => {
-    test("should return the input schema", () => {
-      const factory = new EndpointsFactory(defaultResultHandler);
-      const input = z.object({
-        something: z.number(),
-      });
-      const endpoint = factory.build({
-        method: "get",
-        input,
-        output: z.object({}),
-        handler: vi.fn(),
-      });
-      expect(endpoint.getSchema("input")).toEqual(input);
-    });
+    test.each(["input", "output"] as const)(
+      "should return the %s schema",
+      (variant) => {
+        const factory = new EndpointsFactory(defaultResultHandler);
+        const input = z.object({
+          something: z.number(),
+        });
+        const output = z.object({
+          something: z.number(),
+        });
+        const endpoint = factory.build({
+          method: "get",
+          input,
+          output,
+          handler: vi.fn(),
+        });
+        expect((endpoint as AbstractEndpoint).getSchema(variant)).toEqual(
+          variant === "input" ? input : output,
+        );
+      },
+    );
 
-    test("should be the output schema", () => {
-      const outputSchema = z.object({
-        something: z.number(),
-      });
-      const endpoint = new Endpoint({
-        methods: ["get"],
-        inputSchema: z.object({}),
-        outputSchema,
-        handler: vi.fn<any>(),
-        resultHandler: defaultResultHandler,
-      });
-      expect(endpoint.getSchema("output")).toEqual(outputSchema);
-    });
+    test.each(["positive", "negative"] as const)(
+      "should return the %s response schema",
+      (variant) => {
+        const factory = new EndpointsFactory(defaultResultHandler);
+        const endpoint = factory.build({
+          method: "get",
+          input: z.object({}),
+          output: z.object({ something: z.number() }),
+          handler: vi.fn(),
+        });
+        expect(
+          serializeSchemaForTest(endpoint.getSchema(variant)),
+        ).toMatchSnapshot();
+      },
+    );
+  });
 
-    test("should return the positive schema according to the result handler", () => {
-      const factory = new EndpointsFactory(defaultResultHandler);
-      const output = z.object({
-        something: z.number(),
-      });
-      const endpoint = factory.build({
-        method: "get",
-        input: z.object({}),
-        output,
-        handler: vi.fn(),
-      });
-      expect(
-        serializeSchemaForTest(endpoint.getSchema("positive")),
-      ).toMatchSnapshot();
-    });
-
-    test("should return the negative schema of the result handler", () => {
-      const factory = new EndpointsFactory(defaultResultHandler);
-      const output = z.object({
-        something: z.number(),
-      });
-      const endpoint = factory.build({
-        method: "get",
-        input: z.object({}),
-        output,
-        handler: vi.fn(),
-      });
-      expect(
-        serializeSchemaForTest(endpoint.getSchema("negative")),
-      ).toMatchSnapshot();
-    });
+  describe("getMimeTypes()", () => {
+    test.each(["input", "positive", "negative"] as const)(
+      "should return the %s mime types",
+      (variant) => {
+        const factory = new EndpointsFactory(defaultResultHandler);
+        const endpoint = factory.build({
+          method: "get",
+          input: z.object({}),
+          output: z.object({ something: z.number() }),
+          handler: vi.fn(),
+        });
+        expect(endpoint.getMimeTypes(variant)).toEqual(["application/json"]);
+      },
+    );
   });
 
   describe(".getOperationId()", () => {
@@ -362,22 +357,6 @@ describe("Endpoint", () => {
         }).getOperationId("get"),
       ).toBeUndefined();
     });
-  });
-
-  describe(".getMimeTypes()", () => {
-    test.each(["positive", "negative"] as const)(
-      "should return an array according to the result handler (%s)",
-      (variant) => {
-        const factory = new EndpointsFactory(defaultResultHandler);
-        const endpoint = factory.build({
-          method: "get",
-          input: z.object({}),
-          output: z.object({}),
-          handler: vi.fn(),
-        });
-        expect(endpoint.getMimeTypes(variant)).toEqual(["application/json"]);
-      },
-    );
   });
 
   describe("Issue #269: Async refinements", () => {
@@ -721,6 +700,47 @@ describe("Endpoint", () => {
       ).toThrow(
         new IOSchemaError(
           "Using transformations on the top level of endpoint output schema is not allowed.",
+        ),
+      );
+    });
+  });
+
+  describe("Feature #1431: Multiple responses and status codes", () => {
+    test("Should throw in constructor when ResultHandler has no response schema specified", () => {
+      expect(
+        () =>
+          new Endpoint({
+            methods: ["get"],
+            inputSchema: z.object({}),
+            outputSchema: z.object({}),
+            handler: vi.fn<any>(),
+            resultHandler: {
+              getPositiveResponse: () => [],
+              getNegativeResponse: () => z.any(),
+              handler: vi.fn(),
+            },
+          }),
+      ).toThrow(
+        new ResultHandlerError(
+          "ResultHandler must have at least one positive response schema specified.",
+        ),
+      );
+      expect(
+        () =>
+          new Endpoint({
+            methods: ["get"],
+            inputSchema: z.object({}),
+            outputSchema: z.object({}),
+            handler: vi.fn<any>(),
+            resultHandler: {
+              getPositiveResponse: () => z.any(),
+              getNegativeResponse: () => [],
+              handler: vi.fn(),
+            },
+          }),
+      ).toThrow(
+        new ResultHandlerError(
+          "ResultHandler must have at least one negative response schema specified.",
         ),
       );
     });

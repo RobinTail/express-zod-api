@@ -8,7 +8,7 @@
 
 ![downloads](https://img.shields.io/npm/dw/express-zod-api.svg)
 ![npm release](https://img.shields.io/npm/v/express-zod-api.svg?color=green25&label=latest)
-![GitHub Repo stars](https://img.shields.io/github/stars/RobinTail/express-zod-api.svg)
+![GitHub Repo stars](https://img.shields.io/github/stars/RobinTail/express-zod-api.svg?style=flat)
 ![License](https://img.shields.io/npm/l/express-zod-api.svg?color=green25)
 
 Start your API server with I/O schema validation and custom middlewares in minutes.
@@ -46,9 +46,10 @@ Start your API server with I/O schema validation and custom middlewares in minut
    7. [Serving static files](#serving-static-files)
    8. [Connect to your own express app](#connect-to-your-own-express-app)
 6. [Special needs](#special-needs)
-   1. [Array response](#array-response) for migrating legacy APIs
-   2. [Headers as input source](#headers-as-input-source)
-   3. [Accepting raw data](#accepting-raw-data)
+   1. [Different responses for different status codes](#different-responses-for-different-status-codes)
+   2. [Array response](#array-response) for migrating legacy APIs
+   3. [Headers as input source](#headers-as-input-source)
+   4. [Accepting raw data](#accepting-raw-data)
 7. [Integration and Documentation](#integration-and-documentation)
    1. [Generating a Frontend Client](#generating-a-frontend-client)
    2. [Creating a documentation](#creating-a-documentation)
@@ -633,6 +634,8 @@ const routing: Routing = {
 };
 ```
 
+_See also [Different responses for different status codes](#different-responses-for-different-status-codes)_.
+
 ## Response customization
 
 `ResultHandler` is responsible for transmitting consistent responses containing the endpoint output or an error.
@@ -684,6 +687,7 @@ export const yourResultHandler = createResultHandler({
 ```
 
 Note: `OutputValidationError` and `InputValidationError` are also available for your custom error handling.
+_See also [Different responses for different status codes](#different-responses-for-different-status-codes)_.
 
 After creating your custom `ResultHandler` you can use it as an argument for `EndpointsFactory` instance creation:
 
@@ -820,6 +824,37 @@ errors yourself. In this regard `attachRouting()` provides you with `notFoundHan
 to your custom express app.
 
 # Special needs
+
+## Different responses for different status codes
+
+In some special cases you may want the ResultHandler to respond slightly differently depending on the status code,
+for example if your API strictly follows REST standards. It may also be necessary to reflect this difference in the
+generated Documentation. To implement this functionality, the `createResultHandler` method supports a flexible
+declaration of possible response schemas and their corresponding status codes.
+
+```typescript
+import { createResultHandler } from "express-zod-api";
+
+createResultHandler({
+  getPositiveResponse: (output) => ({
+    statusCodes: [201, 202], // created or will be created
+    schema: z.object({ status: z.literal("created"), data: output }),
+  }),
+  getNegativeResponse: () => [
+    {
+      statusCode: 409, // conflict: entity already exists
+      schema: z.object({ status: z.literal("exists"), id: z.number().int() }),
+    },
+    {
+      statusCodes: [400, 500], // validation or internal error
+      schema: z.object({ status: z.literal("error"), reason: z.string() }),
+    },
+  ],
+  handler: ({ error, response, output }) => {
+    // your implementation here
+  },
+});
+```
 
 ## Array response
 

@@ -1,7 +1,12 @@
 import { z } from "zod";
 import { routing } from "../../example/routing";
-import { Integration, defaultEndpointsFactory } from "../../src";
-import { describe, expect, test } from "vitest";
+import {
+  EndpointsFactory,
+  Integration,
+  createResultHandler,
+  defaultEndpointsFactory,
+} from "../../src";
+import { describe, expect, test, vi } from "vitest";
 
 describe("Integration", () => {
   test.each(["client", "types"] as const)(
@@ -70,6 +75,43 @@ describe("Integration", () => {
               similar: z.number().optional(),
             }),
             handler: async () => ({}),
+          }),
+        },
+      },
+    });
+    expect(await client.printFormatted()).toMatchSnapshot();
+  });
+
+  test("Should support multiple response schemas depending on status code", async () => {
+    const factory = new EndpointsFactory(
+      createResultHandler({
+        getPositiveResponse: (output) => [
+          {
+            statusCode: 200,
+            schema: z.object({ status: z.literal("ok"), data: output }),
+          },
+          {
+            statusCode: 201,
+            schema: z.object({ status: z.literal("kinda"), data: output }),
+          },
+        ],
+        getNegativeResponse: () => [
+          { statusCode: 400, schema: z.literal("error") },
+          { statusCode: 500, schema: z.literal("failure") },
+        ],
+        handler: vi.fn(),
+      }),
+    );
+    const client = new Integration({
+      splitResponse: true,
+      variant: "types",
+      routing: {
+        v1: {
+          mtpl: factory.build({
+            method: "post",
+            input: z.object({ test: z.number() }),
+            output: z.object({ payload: z.string() }),
+            handler: async () => ({ payload: "test" }),
           }),
         },
       },

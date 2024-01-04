@@ -2,6 +2,72 @@
 
 ## Version 16
 
+### 16.2.0
+
+- Feature #1431: Ability to declare different response schemas for different HTTP status codes.
+  - Previously, `ResultHandler` could only have one schema and one status code for its positive and negative responses.
+  - Assuming the purposes of consistent responses, one pair was enough, giving decisive importance to their payload.
+  - However, based on discussions #1193 and #1332, and thanks to [@danclaytondev](https://github.com/danclaytondev)
+    and [@huyhoang160593](https://github.com/huyhoang160593) this version brings an ability for `ResultHandler` to
+    respond slightly differently for different status codes, as well as defining several codes per response variant.
+  - All that is taken into account when generating the Documentation or a frontend client (Integration).
+  - Consider the following example of a REST API's entity creation endpoint as a guideline:
+
+```ts
+import { z } from "zod";
+import {
+  EndpointsFactory,
+  createResultHandler,
+  getStatusCodeFromError,
+} from "express-zod-api";
+import assert from "node:assert/strict";
+import createHttpError from "http-errors";
+
+const statusDependingFactory = new EndpointsFactory(
+  createResultHandler({
+    getPositiveResponse: (output) => ({
+      statusCodes: [201, 202], // multiple status codes for one positive response schema
+      schema: z.object({ status: z.literal("created"), data: output }),
+    }),
+    getNegativeResponse: () => [
+      {
+        statusCode: 409, // special response schema for the status code
+        schema: z.object({ status: z.literal("exists"), id: z.number().int() }),
+      },
+      {
+        statusCodes: [400, 500], // additional response schema for multiple status codes
+        schema: z.object({ status: z.literal("error"), reason: z.string() }),
+      },
+    ],
+    handler: ({ error, response, output }) => {
+      if (error) {
+        const code = getStatusCodeFromError(error);
+        const payload =
+          code === 409 && "id" in error && typeof error.id === "number"
+            ? { status: "exists", id: error.id }
+            : { status: "error", reason: error.message };
+        response.status(code).json(payload);
+        return;
+      }
+      response.status(201).json({ status: "created", data: output });
+    },
+  }),
+);
+
+const entityCreationEndpoint = statusDependingFactory.build({
+  method: "post",
+  input: z.object({ name: z.string().min(1) }),
+  output: z.object({ id: z.number().int().positive() }),
+  handler: async ({ input: { name } }) => {
+    assert(
+      isNewName, // sample condition
+      createHttpError(409, "That one already exists", { id: 16 }),
+    );
+    return { id: 16 }; // sample id
+  },
+});
+```
+
 ### 16.1.0
 
 - Improving the documentation of endpoints based on middlewares having `security` schema with `type: "input"`.
@@ -21,7 +87,7 @@ const authMiddleware = createMiddleware({
   security: { type: "input", name: "key" },
 });
 
-export const config = createConfig({
+const config = createConfig({
   inputSources: {
     patch: ["body", "query"], // has request body as alternative input source
     put: ["body"], // does not have the request query as input source

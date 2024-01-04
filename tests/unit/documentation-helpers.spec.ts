@@ -3,12 +3,7 @@ import { ReferenceObject, SchemaObject } from "openapi3-ts/oas31";
 import { z } from "zod";
 import { defaultSerializer } from "../../src/common-helpers";
 import { IOSchemaError } from "../../src/errors";
-import {
-  DocumentationError,
-  defaultEndpointsFactory,
-  ez,
-  withMeta,
-} from "../../src";
+import { DocumentationError, ez, withMeta } from "../../src";
 import { getMeta } from "../../src/metadata";
 import {
   OpenAPIContext,
@@ -773,14 +768,9 @@ describe("Documentation helpers", () => {
     test("should depict query and path params", () => {
       expect(
         depictRequestParams({
-          endpoint: defaultEndpointsFactory.build({
-            methods: ["get", "put", "delete"],
-            input: z.object({
-              id: z.string(),
-              test: z.boolean(),
-            }),
-            output: z.object({}),
-            handler: vi.fn(),
+          schema: z.object({
+            id: z.string(),
+            test: z.boolean(),
           }),
           inputSources: ["query", "params"],
           composition: "inline",
@@ -792,14 +782,9 @@ describe("Documentation helpers", () => {
     test("should depict only path params if query is disabled", () => {
       expect(
         depictRequestParams({
-          endpoint: defaultEndpointsFactory.build({
-            methods: ["get", "put", "delete"],
-            input: z.object({
-              id: z.string(),
-              test: z.boolean(),
-            }),
-            output: z.object({}),
-            handler: vi.fn(),
+          schema: z.object({
+            id: z.string(),
+            test: z.boolean(),
           }),
           inputSources: ["body", "params"],
           composition: "inline",
@@ -811,14 +796,9 @@ describe("Documentation helpers", () => {
     test("should depict none if both query and params are disabled", () => {
       expect(
         depictRequestParams({
-          endpoint: defaultEndpointsFactory.build({
-            methods: ["get", "put", "delete"],
-            input: z.object({
-              id: z.string(),
-              test: z.boolean(),
-            }),
-            output: z.object({}),
-            handler: vi.fn(),
+          schema: z.object({
+            id: z.string(),
+            test: z.boolean(),
           }),
           inputSources: ["body"],
           composition: "inline",
@@ -830,15 +810,10 @@ describe("Documentation helpers", () => {
     test("Feature 1180: should depict header params when enabled", () => {
       expect(
         depictRequestParams({
-          endpoint: defaultEndpointsFactory.build({
-            method: "get",
-            input: z.object({
-              "x-request-id": z.string(),
-              id: z.string(),
-              test: z.boolean(),
-            }),
-            output: z.object({}),
-            handler: vi.fn(),
+          schema: z.object({
+            "x-request-id": z.string(),
+            id: z.string(),
+            test: z.boolean(),
           }),
           inputSources: ["query", "headers", "params"],
           composition: "inline",

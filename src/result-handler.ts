@@ -1,6 +1,10 @@
 import { Request, Response } from "express";
 import { z } from "zod";
-import { ApiResponse } from "./api-response";
+import {
+  AnyResponseDefinition,
+  ApiResponse,
+  defaultStatusCodes,
+} from "./api-response";
 import {
   FlatObject,
   getExamples,
@@ -8,16 +12,9 @@ import {
   getStatusCodeFromError,
   logInternalError,
 } from "./common-helpers";
-import { ResultHandlerError } from "./errors";
 import { IOSchema } from "./io-schema";
-import { withMeta } from "./metadata";
 import { AbstractLogger } from "./logger";
-
-interface LastResortHandlerParams {
-  error: ResultHandlerError;
-  logger: AbstractLogger;
-  response: Response;
-}
+import { withMeta } from "./metadata";
 
 interface ResultHandlerParams<RES> {
   /** null in case of failure to parse or to find the matching endpoint (error: not found) */
@@ -34,28 +31,35 @@ type ResultHandler<RES> = (
   params: ResultHandlerParams<RES>,
 ) => void | Promise<void>;
 
+type ExtractSchema<T extends AnyResponseDefinition> = T extends ApiResponse<
+  infer S
+>[]
+  ? S
+  : T extends ApiResponse<infer S>
+    ? S
+    : T extends z.ZodTypeAny
+      ? T
+      : never;
+
 export interface ResultHandlerDefinition<
-  POS extends z.ZodTypeAny,
-  NEG extends z.ZodTypeAny,
+  POS extends AnyResponseDefinition,
+  NEG extends AnyResponseDefinition,
 > {
-  getPositiveResponse: (output: IOSchema) => POS | ApiResponse<POS>;
-  getNegativeResponse: () => NEG | ApiResponse<NEG>;
-  handler: ResultHandler<z.output<POS> | z.output<NEG>>;
+  getPositiveResponse: (output: IOSchema) => POS;
+  getNegativeResponse: () => NEG;
+  handler: ResultHandler<
+    z.output<ExtractSchema<POS>> | z.output<ExtractSchema<NEG>>
+  >;
 }
 
 export type AnyResultHandlerDefinition = ResultHandlerDefinition<
-  z.ZodTypeAny,
-  z.ZodTypeAny
+  AnyResponseDefinition,
+  AnyResponseDefinition
 >;
 
-export const defaultStatusCodes = {
-  positive: 200,
-  negative: 400,
-};
-
 export const createResultHandler = <
-  POS extends z.ZodTypeAny,
-  NEG extends z.ZodTypeAny,
+  POS extends AnyResponseDefinition,
+  NEG extends AnyResponseDefinition,
 >(
   definition: ResultHandlerDefinition<POS, NEG>,
 ) => definition;
@@ -96,7 +100,7 @@ export const defaultResultHandler = createResultHandler({
   handler: ({ error, input, output, request, response, logger }) => {
     if (!error) {
       response.status(defaultStatusCodes.positive).json({
-        status: "success" as const,
+        status: "success",
         data: output,
       });
       return;
@@ -104,7 +108,7 @@ export const defaultResultHandler = createResultHandler({
     const statusCode = getStatusCodeFromError(error);
     logInternalError({ logger, statusCode, request, error, input });
     response.status(statusCode).json({
-      status: "error" as const,
+      status: "error",
       error: { message: getMessageFromError(error) },
     });
   },
@@ -149,7 +153,7 @@ export const arrayResultHandler = createResultHandler({
       return;
     }
     if (output && "items" in output && Array.isArray(output.items)) {
-      response.status(200).json(output.items);
+      response.status(defaultStatusCodes.positive).json(output.items);
     } else {
       response
         .status(500)
@@ -157,19 +161,3 @@ export const arrayResultHandler = createResultHandler({
     }
   },
 });
-
-export const lastResortHandler = ({
-  error,
-  logger,
-  response,
-}: LastResortHandlerParams) => {
-  logger.error(`Result handler failure: ${error.message}.`);
-  response
-    .status(500)
-    .end(
-      `An error occurred while serving the result: ${error.message}.` +
-        (error.originalError
-          ? `\nOriginal error: ${error.originalError.message}.`
-          : ""),
-    );
-};

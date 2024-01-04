@@ -17,7 +17,7 @@ import {
   createMiddleware,
 } from "./middleware";
 import {
-  ResultHandlerDefinition,
+  AnyResultHandlerDefinition,
   arrayResultHandler,
   defaultResultHandler,
 } from "./result-handler";
@@ -41,27 +41,25 @@ type BuildProps<
   ({ tags?: TAG[] } | { tag?: TAG });
 
 export class EndpointsFactory<
-  POS extends z.ZodTypeAny,
-  NEG extends z.ZodTypeAny,
   IN extends IOSchema<"strip"> | null = null,
   OUT extends FlatObject = {},
   SCO extends string = string,
   TAG extends string = string,
 > {
-  protected resultHandler: ResultHandlerDefinition<POS, NEG>;
+  protected resultHandler: AnyResultHandlerDefinition;
   protected middlewares: AnyMiddlewareDef[] = [];
 
   /** @desc Consider using the "config" prop with the "tags" option to enforce constraints on tagging the endpoints */
-  constructor(resultHandler: ResultHandlerDefinition<POS, NEG>);
+  constructor(resultHandler: AnyResultHandlerDefinition);
   constructor(params: {
-    resultHandler: ResultHandlerDefinition<POS, NEG>;
+    resultHandler: AnyResultHandlerDefinition;
     config?: CommonConfig<TAG>;
   });
   constructor(
     subject:
-      | ResultHandlerDefinition<POS, NEG>
+      | AnyResultHandlerDefinition
       | {
-          resultHandler: ResultHandlerDefinition<POS, NEG>;
+          resultHandler: AnyResultHandlerDefinition;
           config?: CommonConfig<TAG>;
         },
   ) {
@@ -70,19 +68,15 @@ export class EndpointsFactory<
   }
 
   static #create<
-    CPOS extends z.ZodTypeAny,
-    CNEG extends z.ZodTypeAny,
     CIN extends IOSchema<"strip"> | null,
     COUT extends FlatObject,
     CSCO extends string,
     CTAG extends string,
   >(
     middlewares: AnyMiddlewareDef[],
-    resultHandler: ResultHandlerDefinition<CPOS, CNEG>,
+    resultHandler: AnyResultHandlerDefinition,
   ) {
-    const factory = new EndpointsFactory<CPOS, CNEG, CIN, COUT, CSCO, CTAG>(
-      resultHandler,
-    );
+    const factory = new EndpointsFactory<CIN, COUT, CSCO, CTAG>(resultHandler);
     factory.middlewares = middlewares;
     return factory;
   }
@@ -93,8 +87,6 @@ export class EndpointsFactory<
     ASCO extends string,
   >(subject: MiddlewareDefinition<AIN, OUT, AOUT, ASCO>) {
     return EndpointsFactory.#create<
-      POS,
-      NEG,
       ProbableIntersection<IN, AIN>,
       OUT & AOUT,
       SCO & ASCO,
@@ -128,14 +120,14 @@ export class EndpointsFactory<
           middleware(request as R, response as S, next);
         }),
     };
-    return EndpointsFactory.#create<POS, NEG, IN, OUT & AOUT, SCO, TAG>(
+    return EndpointsFactory.#create<IN, OUT & AOUT, SCO, TAG>(
       this.middlewares.concat(definition),
       this.resultHandler,
     );
   }
 
   public addOptions<AOUT extends FlatObject>(options: AOUT) {
-    return EndpointsFactory.#create<POS, NEG, IN, OUT & AOUT, SCO, TAG>(
+    return EndpointsFactory.#create<IN, OUT & AOUT, SCO, TAG>(
       this.middlewares.concat(
         createMiddleware({
           input: z.object({}),
@@ -158,8 +150,6 @@ export class EndpointsFactory<
     ProbableIntersection<IN, BIN>,
     BOUT,
     OUT,
-    POS,
-    NEG,
     SCO,
     TAG
   > {
