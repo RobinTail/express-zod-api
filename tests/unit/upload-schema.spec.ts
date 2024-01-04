@@ -3,9 +3,8 @@ import { z } from "zod";
 import * as ez from "../../src/proprietary-schemas";
 import { describe, expect, test, vi } from "vitest";
 
-// @todo naming
-describe("ZodUpload", () => {
-  describe("static::create()", () => {
+describe("ez.upload()", () => {
+  describe("creation", () => {
     test("should create an instance", () => {
       const schema = ez.upload();
       expect(schema).toBeInstanceOf(z.ZodEffects);
@@ -13,7 +12,7 @@ describe("ZodUpload", () => {
     });
   });
 
-  describe("_parse()", () => {
+  describe("parsing", () => {
     test("should handle wrong parsed type", () => {
       const schema = ez.upload();
       const result = schema.safeParse(123);
