@@ -249,7 +249,7 @@ export const depictDateIn: Depicter<ZodDateIn> = (ctx) => {
   assert(
     !ctx.isResponse,
     new DocumentationError({
-      message: "Please use z.dateOut() for output.",
+      message: "Please use ez.dateOut() for output.",
       ...ctx,
     }),
   );
@@ -268,7 +268,7 @@ export const depictDateOut: Depicter<ZodDateOut> = (ctx) => {
   assert(
     ctx.isResponse,
     new DocumentationError({
-      message: "Please use z.dateIn() for input.",
+      message: "Please use ez.dateIn() for input.",
       ...ctx,
     }),
   );
@@ -288,7 +288,7 @@ export const depictDate: Depicter<z.ZodDate> = (ctx) =>
     new DocumentationError({
       message: `Using z.date() within ${
         ctx.isResponse ? "output" : "input"
-      } schema is forbidden. Please use z.date${
+      } schema is forbidden. Please use ez.date${
         ctx.isResponse ? "Out" : "In"
       }() instead. Check out the documentation for details.`,
       ...ctx,
