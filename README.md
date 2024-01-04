@@ -836,12 +836,10 @@ declaration of possible response schemas and their corresponding status codes.
 import { createResultHandler } from "express-zod-api";
 
 createResultHandler({
-  getPositiveResponse: (output) => [
-    {
-      statusCodes: [201, 202], // created or will be created
-      schema: z.object({ status: z.literal("created"), data: output }),
-    },
-  ],
+  getPositiveResponse: (output) => ({
+    statusCodes: [201, 202], // created or will be created
+    schema: z.object({ status: z.literal("created"), data: output }),
+  }),
   getNegativeResponse: () => [
     {
       statusCode: 409, // conflict: entity already exists
