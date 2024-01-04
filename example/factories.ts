@@ -4,20 +4,24 @@ import {
   createResultHandler,
   defaultResultHandler,
   ez,
+  getStatusCodeFromError,
 } from "../src";
 import { config } from "./config";
 import { authMiddleware } from "./middlewares";
 import { createReadStream } from "node:fs";
 import { z } from "zod";
 
+/** @desc The factory assures the endpoints tagging constraints from config */
 export const taggedEndpointsFactory = new EndpointsFactory({
   resultHandler: defaultResultHandler,
   config,
 });
 
+/** @desc This one extends the previois one by enforcing the authentication using the specified middleware */
 export const keyAndTokenAuthenticatedEndpointsFactory =
   taggedEndpointsFactory.addMiddleware(authMiddleware);
 
+/** @desc This factory sends the file as string located in the "data" property of the endpoint's output */
 export const fileSendingEndpointsFactory = new EndpointsFactory({
   config,
   resultHandler: createResultHandler({
@@ -43,6 +47,7 @@ export const fileSendingEndpointsFactory = new EndpointsFactory({
   }),
 });
 
+/** @desc This one streams the file using the "filename" property of the endpoint's output */
 export const fileStreamingEndpointsFactory = new EndpointsFactory({
   config,
   resultHandler: createResultHandler({
@@ -72,7 +77,48 @@ export const fileStreamingEndpointsFactory = new EndpointsFactory({
   }),
 });
 
+/**
+ * @desc This endpoint demonstrates the ability to respond with array.
+ * @deprecated Avoid doing this in new projects. This feature is only for easier migration of legacy APIs.
+ * @alias arrayEndpointsFactory
+ */
 export const arrayRespondingFactory = new EndpointsFactory({
   config,
   resultHandler: arrayResultHandler,
+});
+
+/** @desc The factory demonstrates slightly different response schemas depending on the negative status code */
+export const statusDependingFactory = new EndpointsFactory({
+  config,
+  resultHandler: createResultHandler({
+    getPositiveResponse: (output) => ({
+      statusCodes: [201, 202],
+      schema: z.object({ status: z.literal("created"), data: output }),
+    }),
+    getNegativeResponse: () => [
+      {
+        statusCode: 409,
+        schema: z.object({ status: z.literal("exists"), id: z.number().int() }),
+      },
+      {
+        statusCodes: [400, 500],
+        schema: z.object({ status: z.literal("error"), reason: z.string() }),
+      },
+    ],
+    handler: ({ error, response, output }) => {
+      if (error) {
+        const code = getStatusCodeFromError(error);
+        response.status(code).json(
+          code === 409 && "id" in error && typeof error.id === "number"
+            ? {
+                status: "exists",
+                id: error.id,
+              }
+            : { status: "error", reason: error.message },
+        );
+        return;
+      }
+      response.status(201).json({ status: "created", data: output });
+    },
+  }),
 });

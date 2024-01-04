@@ -27,7 +27,7 @@ type GetV1UserRetrieveResponse =
       };
     };
 
-type PostV1UserIdInput = {
+type PatchV1UserIdInput = {
   key: string;
 } & {
   id: string;
@@ -35,7 +35,7 @@ type PostV1UserIdInput = {
   birthday: string;
 };
 
-type PostV1UserIdResponse =
+type PatchV1UserIdResponse =
   | {
       status: "success";
       data: {
@@ -49,6 +49,28 @@ type PostV1UserIdResponse =
         message: string;
       };
     };
+
+type PostV1UserCreateInput = {
+  name: string;
+};
+
+type PostV1UserCreateResponse =
+  | {
+      status: "created";
+      data: {
+        id: number;
+      };
+    }
+  | (
+      | {
+          status: "exists";
+          id: number;
+        }
+      | {
+          status: "error";
+          reason: string;
+        }
+    );
 
 type GetV1UserListInput = {};
 
@@ -111,6 +133,7 @@ type PostV1AvatarRawResponse =
 export type Path =
   | "/v1/user/retrieve"
   | "/v1/user/:id"
+  | "/v1/user/create"
   | "/v1/user/list"
   | "/v1/avatar/send"
   | "/v1/avatar/stream"
@@ -123,7 +146,8 @@ export type MethodPath = `${Method} ${Path}`;
 
 export interface Input extends Record<MethodPath, any> {
   "get /v1/user/retrieve": GetV1UserRetrieveInput;
-  "post /v1/user/:id": PostV1UserIdInput;
+  "patch /v1/user/:id": PatchV1UserIdInput;
+  "post /v1/user/create": PostV1UserCreateInput;
   "get /v1/user/list": GetV1UserListInput;
   "get /v1/avatar/send": GetV1AvatarSendInput;
   "get /v1/avatar/stream": GetV1AvatarStreamInput;
@@ -133,7 +157,8 @@ export interface Input extends Record<MethodPath, any> {
 
 export interface Response extends Record<MethodPath, any> {
   "get /v1/user/retrieve": GetV1UserRetrieveResponse;
-  "post /v1/user/:id": PostV1UserIdResponse;
+  "patch /v1/user/:id": PatchV1UserIdResponse;
+  "post /v1/user/create": PostV1UserCreateResponse;
   "get /v1/user/list": GetV1UserListResponse;
   "get /v1/avatar/send": GetV1AvatarSendResponse;
   "get /v1/avatar/stream": GetV1AvatarStreamResponse;
@@ -143,7 +168,8 @@ export interface Response extends Record<MethodPath, any> {
 
 export const jsonEndpoints = {
   "get /v1/user/retrieve": true,
-  "post /v1/user/:id": true,
+  "patch /v1/user/:id": true,
+  "post /v1/user/create": true,
   "get /v1/user/list": true,
   "post /v1/avatar/upload": true,
   "post /v1/avatar/raw": true,
@@ -151,7 +177,8 @@ export const jsonEndpoints = {
 
 export const endpointTags = {
   "get /v1/user/retrieve": ["users"],
-  "post /v1/user/:id": ["users"],
+  "patch /v1/user/:id": ["users"],
+  "post /v1/user/create": ["users"],
   "get /v1/user/list": ["users"],
   "get /v1/avatar/send": ["files", "users"],
   "get /v1/avatar/stream": ["users", "files"],

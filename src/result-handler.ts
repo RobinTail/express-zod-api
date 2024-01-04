@@ -1,6 +1,10 @@
 import { Request, Response } from "express";
 import { z } from "zod";
-import { ApiResponse } from "./api-response";
+import {
+  AnyResponseDefinition,
+  ApiResponse,
+  defaultStatusCodes,
+} from "./api-response";
 import {
   FlatObject,
   getExamples,
@@ -27,28 +31,35 @@ type ResultHandler<RES> = (
   params: ResultHandlerParams<RES>,
 ) => void | Promise<void>;
 
+type ExtractSchema<T extends AnyResponseDefinition> = T extends ApiResponse<
+  infer S
+>[]
+  ? S
+  : T extends ApiResponse<infer S>
+    ? S
+    : T extends z.ZodTypeAny
+      ? T
+      : never;
+
 export interface ResultHandlerDefinition<
-  POS extends z.ZodTypeAny,
-  NEG extends z.ZodTypeAny,
+  POS extends AnyResponseDefinition,
+  NEG extends AnyResponseDefinition,
 > {
-  getPositiveResponse: (output: IOSchema) => POS | ApiResponse<POS>;
-  getNegativeResponse: () => NEG | ApiResponse<NEG>;
-  handler: ResultHandler<z.output<POS> | z.output<NEG>>;
+  getPositiveResponse: (output: IOSchema) => POS;
+  getNegativeResponse: () => NEG;
+  handler: ResultHandler<
+    z.output<ExtractSchema<POS>> | z.output<ExtractSchema<NEG>>
+  >;
 }
 
 export type AnyResultHandlerDefinition = ResultHandlerDefinition<
-  z.ZodTypeAny,
-  z.ZodTypeAny
+  AnyResponseDefinition,
+  AnyResponseDefinition
 >;
 
-export const defaultStatusCodes = {
-  positive: 200,
-  negative: 400,
-};
-
 export const createResultHandler = <
-  POS extends z.ZodTypeAny,
-  NEG extends z.ZodTypeAny,
+  POS extends AnyResponseDefinition,
+  NEG extends AnyResponseDefinition,
 >(
   definition: ResultHandlerDefinition<POS, NEG>,
 ) => definition;

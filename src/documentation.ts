@@ -3,7 +3,6 @@ import {
   OpenApiBuilder,
   OperationObject,
   ReferenceObject,
-  ResponsesObject,
   SchemaObject,
   SecuritySchemeObject,
   SecuritySchemeType,
@@ -39,7 +38,9 @@ type Component =
 
 /** @desc user defined function that creates a component description from its properties */
 type Descriptor = (
-  props: Record<"method" | "path" | "operationId", string>,
+  props: Record<"method" | "path" | "operationId", string> & {
+    statusCode?: number; // for response only
+  },
 ) => string;
 
 interface DocumentationParams {
@@ -172,30 +173,38 @@ export class Documentation extends OpenApiBuilder {
       const depictedParams = depictRequestParams({
         ...commonParams,
         inputSources,
+        schema: endpoint.getSchema("input"),
         description: descriptions?.requestParameter?.call(null, {
           method,
           path,
           operationId,
         }),
       });
-      const responses = (
-        ["positive", "negative"] as const
-      ).reduce<ResponsesObject>(
-        (agg, variant) => ({
-          ...agg,
-          [endpoint.getStatusCode(variant)]: depictResponse({
-            ...commonParams,
-            variant,
-            description: descriptions?.[`${variant}Response`]?.call(null, {
-              method,
-              path,
-              operationId,
-            }),
-          }),
-        }),
-        {},
-      );
-      const operation: OperationObject = { operationId, responses };
+
+      const operation: OperationObject = { operationId, responses: {} };
+      for (const variant of ["positive", "negative"] as const) {
+        const responses = endpoint.getResponses(variant);
+        for (const { mimeTypes, schema, statusCodes } of responses) {
+          for (const statusCode of statusCodes) {
+            operation.responses[statusCode] = depictResponse({
+              ...commonParams,
+              variant,
+              schema,
+              mimeTypes,
+              statusCode,
+              hasMultipleStatusCodes:
+                responses.length > 1 || statusCodes.length > 1,
+              description: descriptions?.[`${variant}Response`]?.call(null, {
+                method,
+                path,
+                operationId,
+                statusCode,
+              }),
+            });
+          }
+        }
+      }
+
       if (longDesc) {
         operation.description = longDesc;
         if (hasSummaryFromDescription && shortDesc === undefined) {
@@ -214,6 +223,8 @@ export class Documentation extends OpenApiBuilder {
       if (inputSources.includes("body")) {
         operation.requestBody = depictRequest({
           ...commonParams,
+          schema: endpoint.getSchema("input"),
+          mimeTypes: endpoint.getMimeTypes("input"),
           description: descriptions?.requestBody?.call(null, {
             method,
             path,

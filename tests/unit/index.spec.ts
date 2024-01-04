@@ -28,6 +28,7 @@ import {
   ZodUploadDef,
 } from "../../src";
 import { describe, expect, test, vi } from "vitest";
+import { ApiResponse } from "../../src/api-response";
 
 describe("Index Entrypoint", () => {
   describe("exports", () => {
@@ -79,6 +80,26 @@ describe("Index Entrypoint", () => {
         getNegativeResponse: vi.fn(),
         handler: vi.fn(),
       });
+      expectType<
+        ResultHandlerDefinition<
+          ApiResponse<z.ZodTypeAny>[],
+          ApiResponse<z.ZodTypeAny>[]
+        >
+      >({
+        getPositiveResponse: vi.fn(),
+        getNegativeResponse: vi.fn(),
+        handler: vi.fn(),
+      });
+      expectType<
+        ResultHandlerDefinition<
+          ApiResponse<z.ZodTypeAny>,
+          ApiResponse<z.ZodTypeAny>
+        >
+      >({
+        getPositiveResponse: vi.fn(),
+        getNegativeResponse: vi.fn(),
+        handler: vi.fn(),
+      });
       expectType<BasicSecurity>({ type: "basic" });
       expectType<BearerSecurity>({ type: "bearer" });
       expectType<CookieSecurity>({ type: "cookie", name: "" });
@@ -86,6 +107,7 @@ describe("Index Entrypoint", () => {
       expectType<InputSecurity<string>>({ type: "input", name: "" });
       expectType<OAuth2Security<string>>({ type: "oauth2" });
       expectType<OpenIdSecurity>({ type: "openid", url: "" });
+      expectType<ApiResponse<z.ZodTypeAny>>({ schema: z.string() });
     });
   });
 });

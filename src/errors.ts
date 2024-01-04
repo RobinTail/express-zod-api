@@ -56,7 +56,7 @@ export class InputValidationError extends IOSchemaError {
   }
 }
 
-/** @desc An error related to the execution of ResultHandler */
+/** @desc An error related to the execution or the response schema definition of ResultHandler */
 export class ResultHandlerError extends Error {
   public override name = "ResultHandlerError";
   public readonly originalError: Error | undefined;
