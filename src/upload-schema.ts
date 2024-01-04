@@ -5,8 +5,7 @@ import { bufferSchema } from "./schema-helpers";
 
 export const zodUploadKind = "ZodUpload";
 
-// @todo naming?
-export const getUploadSchema = () => {
+export const upload = () => {
   const schema = withMeta(
     z.custom<UploadedFile>(
       (subject) =>
