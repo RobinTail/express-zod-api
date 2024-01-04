@@ -3,6 +3,7 @@ import { expectType } from "tsd";
 import { z } from "zod";
 import * as entrypoint from "../../src";
 import {
+  ApiResponse,
   AppConfig,
   BasicSecurity,
   BearerSecurity,
@@ -25,10 +26,8 @@ import {
   ZodDateInDef,
   ZodDateOutDef,
   ZodFileDef,
-  ZodUploadDef,
 } from "../../src";
 import { describe, expect, test, vi } from "vitest";
-import { ApiResponse } from "../../src/api-response";
 
 describe("Index Entrypoint", () => {
   describe("exports", () => {
@@ -58,7 +57,6 @@ describe("Index Entrypoint", () => {
       expectType<ZodDateInDef>({ typeName: "ZodDateIn" });
       expectType<ZodDateOutDef>({ typeName: "ZodDateOut" });
       expectType<ZodFileDef>({ typeName: "ZodFile", type: "" });
-      expectType<ZodUploadDef>({ typeName: "ZodUpload" });
       expectType<CommonConfig>({ cors: true, logger: { level: "silent" } });
       expectType<AppConfig>({
         app: {} as IRouter,

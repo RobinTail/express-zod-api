@@ -4,6 +4,7 @@ import { clone, mergeDeepRight } from "ramda";
 
 export interface Metadata<T extends z.ZodTypeAny> {
   examples: z.input<T>[];
+  proprietaryKind?: string;
 }
 
 type MetaKey = keyof Metadata<z.ZodTypeAny>;

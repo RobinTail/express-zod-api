@@ -40,7 +40,7 @@ import {
   andToOr,
   mapLogicalContainer,
 } from "./logical-container";
-import { copyMeta } from "./metadata";
+import { copyMeta, getMeta, hasMeta } from "./metadata";
 import { Method } from "./method";
 import {
   HandlingRules,
@@ -49,7 +49,7 @@ import {
   walkSchema,
 } from "./schema-walker";
 import { Security } from "./security";
-import { ZodUpload } from "./upload-schema";
+import { zodUploadKind } from "./upload-schema";
 
 /* eslint-disable @typescript-eslint/no-use-before-define */
 
@@ -130,11 +130,11 @@ export const depictAny: Depicter<z.ZodAny> = () => ({
   format: "any",
 });
 
-export const depictUpload: Depicter<ZodUpload> = (ctx) => {
+export const depictUpload: Depicter<z.ZodType> = (ctx) => {
   assert(
     !ctx.isResponse,
     new DocumentationError({
-      message: "Please use z.upload() only for input.",
+      message: "Please use ez.upload() only for input.",
       ...ctx,
     }),
   );
@@ -536,7 +536,12 @@ export const depictEffect: Depicter<z.ZodEffects<z.ZodTypeAny>> = ({
   schema,
   isResponse,
   next,
+  ...ctx
 }) => {
+  // @todo reconsider
+  if (hasMeta(schema) && getMeta(schema, "proprietaryKind") === zodUploadKind) {
+    return depictUpload({ schema, isResponse, next, ...ctx });
+  }
   const input = next({ schema: schema.innerType() });
   const { effect } = schema._def;
   if (isResponse && effect.type === "transform" && !isReferenceObject(input)) {
@@ -755,7 +760,6 @@ export const depicters: HandlingRules<
   ZodIntersection: depictIntersection,
   ZodUnion: depictUnion,
   ZodFile: depictFile,
-  ZodUpload: depictUpload,
   ZodAny: depictAny,
   ZodDefault: depictDefault,
   ZodEnum: depictEnum,

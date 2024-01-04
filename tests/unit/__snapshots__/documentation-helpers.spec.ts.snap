@@ -1104,7 +1104,7 @@ exports[`Documentation helpers > depictUpload() > should set format:binary and t
 `;
 
 exports[`Documentation helpers > depictUpload() > should throw when using in response 1`] = `
-[DocumentationError: Please use z.upload() only for input.
+[DocumentationError: Please use ez.upload() only for input.
 Caused by response schema of an Endpoint assigned to GET method of /v1/user/:id path.]
 `;
 

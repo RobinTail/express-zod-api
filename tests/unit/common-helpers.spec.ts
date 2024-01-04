@@ -19,7 +19,8 @@ import {
 import { InputValidationError, ez, withMeta } from "../../src";
 import { Request } from "express";
 import { z } from "zod";
-import { ZodUpload } from "../../src/upload-schema";
+import { getMeta, hasMeta } from "../../src/metadata";
+import { zodUploadKind } from "../../src/upload-schema";
 import { describe, expect, test } from "vitest";
 
 describe("Common Helpers", () => {
@@ -395,7 +396,9 @@ describe("Common Helpers", () => {
       expect(
         hasNestedSchema({
           subject: ez.upload(),
-          condition: (subject) => subject instanceof ZodUpload,
+          condition: (subject) =>
+            hasMeta(subject) &&
+            getMeta(subject, "proprietaryKind") === zodUploadKind,
         }),
       ).toBeTruthy();
     });
@@ -413,7 +416,9 @@ describe("Common Helpers", () => {
       expect(
         hasNestedSchema({
           subject,
-          condition: (entry) => entry instanceof ZodUpload,
+          condition: (entry) =>
+            hasMeta(entry) &&
+            getMeta(entry, "proprietaryKind") === zodUploadKind,
         }),
       ).toBeTruthy();
     });
@@ -427,7 +432,9 @@ describe("Common Helpers", () => {
       expect(
         hasNestedSchema({
           subject,
-          condition: (entry) => entry instanceof ZodUpload,
+          condition: (entry) =>
+            hasMeta(entry) &&
+            getMeta(entry, "proprietaryKind") === zodUploadKind,
         }),
       ).toBeFalsy();
     });

@@ -2,10 +2,16 @@ import { z } from "zod";
 import { ZodDateIn } from "./date-in-schema";
 import { ZodDateOut } from "./date-out-schema";
 import { ZodFile } from "./file-schema";
-import { ZodUpload } from "./upload-schema";
+import { metaProp, withMeta } from "./metadata";
+import { getUploadSchema, zodUploadKind } from "./upload-schema";
 
 export const file = ZodFile.create;
-export const upload = ZodUpload.create;
+// @todo reconsider location
+export const upload = () => {
+  const schema = withMeta(getUploadSchema());
+  schema._def[metaProp].proprietaryKind = zodUploadKind;
+  return schema;
+};
 export const dateIn = ZodDateIn.create;
 export const dateOut = ZodDateOut.create;
 

@@ -3,7 +3,6 @@ import type { FlatObject } from "./common-helpers";
 import type { ZodDateInDef } from "./date-in-schema";
 import type { ZodDateOutDef } from "./date-out-schema";
 import type { ZodFileDef } from "./file-schema";
-import type { ZodUploadDef } from "./upload-schema";
 
 export type HandlingVariant = "last" | "regular" | "each";
 
@@ -35,7 +34,6 @@ export type SchemaHandler<
 
 export type ProprietaryKinds =
   | ZodFileDef["typeName"]
-  | ZodUploadDef["typeName"]
   | ZodDateInDef["typeName"]
   | ZodDateOutDef["typeName"];
 

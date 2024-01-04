@@ -7,10 +7,10 @@ import { InputValidationError, OutputValidationError } from "./errors";
 import { ZodFile } from "./file-schema";
 import { IOSchema } from "./io-schema";
 import { AbstractLogger } from "./logger";
-import { getMeta } from "./metadata";
+import { getMeta, hasMeta } from "./metadata";
 import { AuxMethod, Method } from "./method";
 import { mimeMultipart } from "./mime";
-import { ZodUpload } from "./upload-schema";
+import { zodUploadKind } from "./upload-schema";
 
 export type FlatObject = Record<string, unknown>;
 
@@ -258,7 +258,8 @@ export const hasNestedSchema = ({
 export const hasUpload = (subject: IOSchema) =>
   hasNestedSchema({
     subject,
-    condition: (schema) => schema instanceof ZodUpload,
+    condition: (schema) =>
+      hasMeta(schema) && getMeta(schema, "proprietaryKind") === zodUploadKind, // @todo extract into a helper
   });
 
 export const hasRaw = (subject: IOSchema) =>
