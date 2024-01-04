@@ -1,6 +1,6 @@
-// obtaining the private helper type from Zod
 import { z } from "zod";
 
+// obtaining the private helper type from Zod
 export type ErrMessage = Exclude<
   Parameters<typeof z.ZodString.prototype.email>[0],
   undefined
