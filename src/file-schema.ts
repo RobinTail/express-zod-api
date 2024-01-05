@@ -18,7 +18,7 @@ interface DeprecatedMethods extends Record<Narrowing, () => z.ZodType> {
   /** @deprecated use ez.file("base64") instead */
   base64: () => z.ZodString;
   /** @deprecated use ez.file("binary") instead */
-  binary: () => z.ZodString | z.ZodType<Buffer>;
+  binary: () => z.ZodUnion<[z.ZodType<Buffer>, z.ZodString]>;
 }
 
 export const file = (type?: Narrowing) => {
