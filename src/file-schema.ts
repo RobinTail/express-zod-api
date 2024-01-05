@@ -1,11 +1,8 @@
 import { z } from "zod";
 import { proprietary } from "./metadata";
-import { bufferSchema } from "./schema-helpers";
+import { base64Regex, bufferSchema } from "./schema-helpers";
 
 export const zodFileKind = "ZodFile";
-
-const base64Regex =
-  /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/;
 
 type Narrowing = "string" | "buffer" | "base64" | "binary";
 

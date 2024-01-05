@@ -30,7 +30,6 @@ import {
   ucFirst,
 } from "./common-helpers";
 import { InputSource, TagsConfig } from "./config-type";
-import { isoDateRegex } from "./date-in-schema";
 import { DocumentationError } from "./errors";
 import { IOSchema } from "./io-schema";
 import {
@@ -41,6 +40,7 @@ import {
 import { copyMeta } from "./metadata";
 import { Method } from "./method";
 import * as ez from "./proprietary-schemas";
+import { isoDateRegex } from "./schema-helpers";
 import {
   HandlingRules,
   HandlingVariant,
