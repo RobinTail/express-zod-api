@@ -164,13 +164,10 @@ export const combinations = <T>(
   a: T[],
   b: T[],
 ): { type: "single"; value: T[] } | { type: "tuple"; value: [T, T][] } => {
-  if (a.length === 0) {
-    return { type: "single", value: b };
-  }
-  if (b.length === 0) {
-    return { type: "single", value: a };
-  }
-  return { type: "tuple", value: xprod(a, b) };
+  const nonEmpties = [a, b].filter(({ length }) => length);
+  return nonEmpties.length === 2
+    ? { type: "tuple", value: xprod(a, b) }
+    : { type: "single", value: nonEmpties[0] || [] };
 };
 
 const reduceBool = (arr: boolean[]) =>
