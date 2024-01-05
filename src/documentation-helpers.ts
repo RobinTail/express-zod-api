@@ -25,14 +25,12 @@ import {
   hasRaw,
   hasTopLevelTransformingEffect,
   isCustomHeader,
-  isProprietary,
   makeCleanId,
   tryToTransform,
   ucFirst,
 } from "./common-helpers";
 import { InputSource, TagsConfig } from "./config-type";
-import { isoDateRegex, zodDateInKind } from "./date-in-schema";
-import { zodDateOutKind } from "./date-out-schema";
+import { isoDateRegex } from "./date-in-schema";
 import { DocumentationError } from "./errors";
 import { IOSchema } from "./io-schema";
 import {
@@ -50,7 +48,6 @@ import {
   walkSchema,
 } from "./schema-walker";
 import { Security } from "./security";
-import { zodUploadKind } from "./upload-schema";
 
 /* eslint-disable @typescript-eslint/no-use-before-define */
 
@@ -540,15 +537,7 @@ export const depictEffect: Depicter<z.ZodEffects<z.ZodTypeAny>> = ({
   schema,
   isResponse,
   next,
-  ...ctx
 }) => {
-  // @todo can move to walker?
-  if (isProprietary(schema, zodUploadKind)) {
-    return depictUpload({ schema, isResponse, next, ...ctx });
-  }
-  if (isProprietary(schema, zodDateOutKind)) {
-    return depictDateOut({ schema, isResponse, next, ...ctx });
-  }
   const input = next({ schema: schema.innerType() });
   const { effect } = schema._def;
   if (isResponse && effect.type === "transform" && !isReferenceObject(input)) {
@@ -575,13 +564,8 @@ export const depictEffect: Depicter<z.ZodEffects<z.ZodTypeAny>> = ({
 
 export const depictPipeline: Depicter<
   z.ZodPipeline<z.ZodTypeAny, z.ZodTypeAny>
-> = ({ schema, isResponse, next, ...ctx }) => {
-  // @todo do I really need it now?
-  if (isProprietary(schema, zodDateInKind)) {
-    return depictDateIn({ schema, isResponse, next, ...ctx });
-  }
-  return next({ schema: schema._def[isResponse ? "out" : "in"] });
-};
+> = ({ schema, isResponse, next }) =>
+  next({ schema: schema._def[isResponse ? "out" : "in"] });
 
 export const depictBranded: Depicter<
   z.ZodBranded<z.ZodTypeAny, string | number | symbol>
@@ -784,6 +768,9 @@ export const depicters: HandlingRules<
   ZodLazy: depictLazy,
   ZodReadonly: depictReadonly,
   ZodFile: depictFile,
+  ZodUpload: depictUpload,
+  ZodDateOut: depictDateOut,
+  ZodDateIn: depictDateIn,
 };
 
 export const onEach: Depicter<z.ZodTypeAny, "each"> = ({

@@ -1,7 +1,6 @@
 import ts from "typescript";
 import { z } from "zod";
-import { hasCoercion, isProprietary, tryToTransform } from "./common-helpers";
-import { zodDateOutKind } from "./date-out-schema";
+import { hasCoercion, tryToTransform } from "./common-helpers";
 import { HandlingRules, walkSchema } from "./schema-walker";
 import {
   LiteralType,
@@ -95,17 +94,7 @@ const onEffects: Producer<z.ZodEffects<z.ZodTypeAny>> = ({
   schema,
   next,
   isResponse,
-  ...ctx
 }) => {
-  // @todo move to walker somehow
-  if (isProprietary(schema, zodDateOutKind)) {
-    return onPrimitive(ts.SyntaxKind.StringKeyword)({
-      schema,
-      next,
-      isResponse,
-      ...ctx,
-    });
-  }
   const input = next({ schema: schema.innerType() });
   const effect = schema._def.effect;
   if (isResponse && effect.type === "transform") {
@@ -228,6 +217,8 @@ const producers: HandlingRules<ts.TypeNode, ZTSContext> = {
   ZodNumber: onPrimitive(ts.SyntaxKind.NumberKeyword),
   ZodBigInt: onPrimitive(ts.SyntaxKind.BigIntKeyword),
   ZodBoolean: onPrimitive(ts.SyntaxKind.BooleanKeyword),
+  ZodDateIn: onPrimitive(ts.SyntaxKind.StringKeyword),
+  ZodDateOut: onPrimitive(ts.SyntaxKind.StringKeyword),
   ZodNull: onNull,
   ZodArray: onArray,
   ZodTuple: onTuple,
