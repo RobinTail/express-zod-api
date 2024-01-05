@@ -3,9 +3,8 @@ import { getMeta } from "../../src/metadata";
 import * as ez from "../../src/proprietary-schemas";
 import { describe, expect, test } from "vitest";
 
-// @todo naming
-describe("ZodDateOut", () => {
-  describe("static::create()", () => {
+describe("ez.dateOut()", () => {
+  describe("creation", () => {
     test("should create an instance", () => {
       const schema = ez.dateOut();
       expect(schema).toBeInstanceOf(z.ZodEffects);
@@ -13,7 +12,7 @@ describe("ZodDateOut", () => {
     });
   });
 
-  describe("_parse()", () => {
+  describe("parsing", () => {
     test("should handle wrong parsed type", () => {
       const schema = ez.dateOut();
       const result = schema.safeParse("12.01.2022");

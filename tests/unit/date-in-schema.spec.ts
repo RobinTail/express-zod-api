@@ -3,9 +3,8 @@ import { getMeta } from "../../src/metadata";
 import * as ez from "../../src/proprietary-schemas";
 import { describe, expect, test } from "vitest";
 
-// @todo naming
-describe("ZodDateIn", () => {
-  describe("static::create()", () => {
+describe("ez.dateIn()", () => {
+  describe("creation", () => {
     test("should create an instance", () => {
       const schema = ez.dateIn();
       expect(schema).toBeInstanceOf(z.ZodPipeline);
@@ -13,7 +12,7 @@ describe("ZodDateIn", () => {
     });
   });
 
-  describe("_parse()", () => {
+  describe("parsing", () => {
     test("should handle wrong parsed type", () => {
       const schema = ez.dateIn();
       const result = schema.safeParse(123);
