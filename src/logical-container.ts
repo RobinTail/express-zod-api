@@ -52,14 +52,13 @@ export const andToOr = <T>(
   subject: LogicalAnd<T | LogicalOr<T>>,
 ): LogicalOr<T | LogicalAnd<T>> =>
   subject.and.reduce<LogicalOr<T | LogicalAnd<T>>>(
-    (acc, item) => {
-      acc.or = combinations(
+    (acc, item) => ({
+      or: combinations(
         acc.or,
         isLogicalOr(item) ? item.or : [item],
         flattenAnds,
-      );
-      return acc;
-    },
+      ),
+    }),
     { or: [] },
   );
 
