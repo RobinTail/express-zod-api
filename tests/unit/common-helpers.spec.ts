@@ -13,13 +13,13 @@ import {
   hasNestedSchema,
   hasTopLevelTransformingEffect,
   isCustomHeader,
-  isProprietary,
   makeCleanId,
   makeErrorFromAnything,
 } from "../../src/common-helpers";
 import { InputValidationError, ez, withMeta } from "../../src";
 import { Request } from "express";
 import { z } from "zod";
+import { isProprietary } from "../../src/metadata";
 import { zodUploadKind } from "../../src/upload-schema";
 import { describe, expect, test } from "vitest";
 

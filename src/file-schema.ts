@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { metaProp, withMeta } from "./metadata";
+import { proprietary } from "./metadata";
 import { bufferSchema } from "./schema-helpers";
 
 export const zodFileKind = "ZodFile";
@@ -44,7 +44,8 @@ export function file(
   const base64String = justString.regex(base64Regex, {
     message: "Does not match base64 encoding",
   });
-  const schema = withMeta(
+  const schema = proprietary(
+    zodFileKind,
     type === "buffer"
       ? bufferSchema
       : type === "base64"
@@ -53,7 +54,6 @@ export function file(
           ? bufferSchema.or(justString)
           : justString,
   );
-  schema._def[metaProp].proprietaryKind = zodFileKind;
   /** @todo remove this hack in v17 */
   (schema as any).buffer = () => file("buffer");
   (schema as any).string = () => file("string");

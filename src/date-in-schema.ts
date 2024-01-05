@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { metaProp, withMeta } from "./metadata";
+import { proprietary } from "./metadata";
 import { isValidDate } from "./schema-helpers";
 
 // simple regex for ISO date, supports the following formats:
@@ -13,14 +13,12 @@ export const isoDateRegex =
 
 export const zodDateInKind = "ZodDateIn";
 
-export const dateIn = () => {
-  const schema = withMeta(
+export const dateIn = () =>
+  proprietary(
+    zodDateInKind,
     z
       .string()
       .regex(isoDateRegex)
       .transform((str) => new Date(str))
       .pipe(z.date().refine(isValidDate)),
   );
-  schema._def[metaProp].proprietaryKind = zodDateInKind;
-  return schema;
-};

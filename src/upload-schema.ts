@@ -1,12 +1,13 @@
 import type { UploadedFile } from "express-fileupload";
 import { z } from "zod";
-import { metaProp, withMeta } from "./metadata";
+import { proprietary } from "./metadata";
 import { bufferSchema } from "./schema-helpers";
 
 export const zodUploadKind = "ZodUpload";
 
-export const upload = () => {
-  const schema = withMeta(
+export const upload = () =>
+  proprietary(
+    zodUploadKind,
     z.custom<UploadedFile>(
       (subject) =>
         z
@@ -27,6 +28,3 @@ export const upload = () => {
       }),
     ),
   );
-  schema._def[metaProp].proprietaryKind = zodUploadKind;
-  return schema;
-};

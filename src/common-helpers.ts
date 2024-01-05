@@ -8,7 +8,7 @@ import { InputValidationError, OutputValidationError } from "./errors";
 import { zodFileKind } from "./file-schema";
 import { IOSchema } from "./io-schema";
 import { AbstractLogger } from "./logger";
-import { getMeta } from "./metadata";
+import { getMeta, isProprietary } from "./metadata";
 import { AuxMethod, Method } from "./method";
 import { mimeMultipart } from "./mime";
 import { zodUploadKind } from "./upload-schema";
@@ -225,9 +225,6 @@ export const hasNestedSchema = ({
   }
   return false;
 };
-
-export const isProprietary = (schema: z.ZodTypeAny, kind: string) =>
-  getMeta(schema, "proprietaryKind") === kind;
 
 export const hasUpload = (subject: IOSchema) =>
   hasNestedSchema({

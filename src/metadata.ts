@@ -1,6 +1,6 @@
-import { combinations } from "./common-helpers";
-import { z } from "zod";
 import { clone, mergeDeepRight } from "ramda";
+import { z } from "zod";
+import { combinations } from "./common-helpers";
 
 export interface Metadata<T extends z.ZodTypeAny> {
   examples: z.input<T>[];
@@ -78,3 +78,15 @@ export const copyMeta = <A extends z.ZodTypeAny, B extends z.ZodTypeAny>(
   );
   return result;
 };
+
+export const proprietary = <T extends z.ZodTypeAny>(
+  kind: string,
+  subject: T,
+) => {
+  const schema = withMeta(subject);
+  schema._def[metaProp].proprietaryKind = kind;
+  return schema;
+};
+
+export const isProprietary = (schema: z.ZodTypeAny, kind: string) =>
+  getMeta(schema, "proprietaryKind") === kind;
