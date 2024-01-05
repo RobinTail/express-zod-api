@@ -4,6 +4,10 @@
 
 ### 16.2.0
 
+- Notice: upgrading to this version, make sure you are NOT supplying type parameters to the `EndpointsFactory`:
+  - `new EndpointsFactory(...)` — correct,
+  - ~~`new EndpointsFactory<...>(...)`~~ — incorrect,
+  - See [issue #1444](https://github.com/RobinTail/express-zod-api/issues/1444) for details.
 - Feature #1431: Ability to declare different response schemas for different HTTP status codes.
   - Previously, `ResultHandler` could only have one schema and one status code for its positive and negative responses.
   - Assuming the purposes of consistent responses, one pair was enough, giving decisive importance to their payload.
