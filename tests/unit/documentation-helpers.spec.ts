@@ -318,18 +318,21 @@ describe("Documentation helpers", () => {
   });
 
   describe("depictFile()", () => {
-    test.each([ez.file(), ez.file("buffer"), ez.file("base64")])(
-      "should set type:string and format accordingly %#",
-      (schema) => {
-        expect(
-          depictFile({
-            schema,
-            ...responseCtx,
-            next: makeNext(responseCtx),
-          }),
-        ).toMatchSnapshot();
-      },
-    );
+    test.each([
+      ez.file(),
+      ez.file("binary"),
+      ez.file("base64"),
+      ez.file("string"),
+      ez.file("buffer"),
+    ])("should set type:string and format accordingly %#", (schema) => {
+      expect(
+        depictFile({
+          schema,
+          ...responseCtx,
+          next: makeNext(responseCtx),
+        }),
+      ).toMatchSnapshot();
+    });
   });
 
   describe("depictUnion()", () => {
