@@ -35,15 +35,12 @@ export function file(
   | z.ZodUnion<[z.ZodType<Buffer>, z.ZodString]>
 ) &
   typeof deprecatedMethods {
-  const base64String = z.string().regex(base64Regex, {
-    message: "Does not match base64 encoding",
-  });
   const schema = proprietary(
     zodFileKind,
     type === "buffer"
       ? bufferSchema
       : type === "base64"
-        ? base64String
+        ? z.string().regex(base64Regex, "Does not match base64 encoding")
         : type === "binary"
           ? bufferSchema.or(z.string())
           : z.string(),
