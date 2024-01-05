@@ -48,25 +48,18 @@ export const withMeta = <T extends z.ZodTypeAny>(schema: T): WithMeta<T> => {
 
 export const hasMeta = <T extends z.ZodTypeAny>(
   schema: T,
-): schema is WithMeta<T> => {
-  if (!(metaProp in schema._def)) {
-    return false;
-  }
-  return (
-    typeof schema._def[metaProp] === "object" && schema._def[metaProp] !== null
-  );
-};
+): schema is WithMeta<T> =>
+  metaProp in schema._def &&
+  typeof schema._def[metaProp] === "object" &&
+  schema._def[metaProp] !== null;
 
 export const getMeta = <T extends z.ZodTypeAny, K extends MetaKey>(
   schema: T,
   meta: K,
-): MetaValue<T, K> | undefined => {
-  if (!hasMeta(schema)) {
-    return undefined;
-  }
-  const def = schema._def as MetaDef<T>;
-  return meta in def[metaProp] ? def[metaProp][meta] : undefined;
-};
+): MetaValue<T, K> | undefined =>
+  hasMeta(schema) && meta in schema._def[metaProp]
+    ? schema._def[metaProp][meta]
+    : undefined;
 
 export const copyMeta = <A extends z.ZodTypeAny, B extends z.ZodTypeAny>(
   src: A,
