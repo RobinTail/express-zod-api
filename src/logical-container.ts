@@ -53,12 +53,11 @@ export const andToOr = <T>(
 ): LogicalOr<T | LogicalAnd<T>> =>
   subject.and.reduce<LogicalOr<T | LogicalAnd<T>>>(
     (acc, item) => {
-      const combs = combinations(acc.or, isLogicalOr(item) ? item.or : [item]);
-      if (combs.type === "single") {
-        acc.or.push(...combs.value);
-      } else {
-        acc.or = combs.value.map(flattenAnds);
-      }
+      acc.or = combinations(
+        acc.or,
+        isLogicalOr(item) ? item.or : [item],
+        flattenAnds,
+      );
       return acc;
     },
     { or: [] },
@@ -84,8 +83,7 @@ export const combineContainers = <T>(
       return combineContainers(right, left);
     }
     if (isLogicalOr(right)) {
-      const { type, value } = combinations(left.or, right.or);
-      return { or: type === "single" ? value : value.map(flattenAnds) };
+      return { or: combinations(left.or, right.or, flattenAnds) };
     }
     return combineContainers(left, { and: [right] });
   }

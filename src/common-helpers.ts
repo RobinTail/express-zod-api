@@ -163,10 +163,8 @@ export const getExamples = <
 export const combinations = <T>(
   a: T[],
   b: T[],
-): { type: "single"; value: T[] } | { type: "tuple"; value: [T, T][] } =>
-  a.length && b.length
-    ? { type: "tuple", value: xprod(a, b) }
-    : { type: "single", value: a.concat(b) };
+  reducer: (pair: [T, T]) => T,
+): T[] => (a.length && b.length ? xprod(a, b).map(reducer) : a.concat(b));
 
 const reduceBool = (arr: boolean[]) =>
   arr.reduce((carry, bool) => carry || bool, false);
