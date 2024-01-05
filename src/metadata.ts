@@ -57,9 +57,7 @@ export const getMeta = <T extends z.ZodTypeAny, K extends MetaKey>(
   schema: T,
   meta: K,
 ): MetaValue<T, K> | undefined =>
-  hasMeta(schema) && meta in schema._def[metaProp]
-    ? schema._def[metaProp][meta]
-    : undefined;
+  hasMeta(schema) ? schema._def[metaProp][meta] : undefined;
 
 export const copyMeta = <A extends z.ZodTypeAny, B extends z.ZodTypeAny>(
   src: A,
