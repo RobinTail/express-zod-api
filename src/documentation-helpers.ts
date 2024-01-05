@@ -34,7 +34,6 @@ import { InputSource, TagsConfig } from "./config-type";
 import { isoDateRegex, zodDateInKind } from "./date-in-schema";
 import { zodDateOutKind } from "./date-out-schema";
 import { DocumentationError } from "./errors";
-import { ZodFile } from "./file-schema";
 import { IOSchema } from "./io-schema";
 import {
   LogicalContainer,
@@ -43,6 +42,7 @@ import {
 } from "./logical-container";
 import { copyMeta } from "./metadata";
 import { Method } from "./method";
+import * as ez from "./proprietary-schemas";
 import {
   HandlingRules,
   HandlingVariant,
@@ -145,11 +145,14 @@ export const depictUpload: Depicter<z.ZodType> = (ctx) => {
   };
 };
 
-export const depictFile: Depicter<ZodFile> = ({
-  schema: { isBinary, isBase64, isBuffer },
-}) => ({
+export const depictFile: Depicter<z.ZodType> = ({ schema }) => ({
   type: "string",
-  format: isBuffer || isBinary ? "binary" : isBase64 ? "byte" : "file",
+  format:
+    schema instanceof z.ZodString
+      ? schema._def.checks.find((check) => check.kind === "regex")
+        ? "byte"
+        : "file"
+      : "binary",
 });
 
 export const depictUnion: Depicter<z.ZodUnion<z.ZodUnionOptions>> = ({
@@ -766,7 +769,6 @@ export const depicters: HandlingRules<
   ZodLiteral: depictLiteral,
   ZodIntersection: depictIntersection,
   ZodUnion: depictUnion,
-  ZodFile: depictFile,
   ZodAny: depictAny,
   ZodDefault: depictDefault,
   ZodEnum: depictEnum,
@@ -781,6 +783,7 @@ export const depicters: HandlingRules<
   ZodPipeline: depictPipeline,
   ZodLazy: depictLazy,
   ZodReadonly: depictReadonly,
+  ZodFile: depictFile,
 };
 
 export const onEach: Depicter<z.ZodTypeAny, "each"> = ({
@@ -1059,7 +1062,7 @@ export const depictRequest = ({
   const bodyDepiction = excludeExamplesFromDepiction(
     excludeParamsFromDepiction(
       walkSchema({
-        schema: hasRaw(schema) ? ZodFile.create().buffer() : schema,
+        schema: hasRaw(schema) ? ez.file("buffer") : schema,
         isResponse: false,
         rules: depicters,
         onEach,

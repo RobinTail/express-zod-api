@@ -318,7 +318,7 @@ describe("Documentation helpers", () => {
   });
 
   describe("depictFile()", () => {
-    test.each([ez.file(), ez.file().binary(), ez.file().base64()])(
+    test.each([ez.file(), ez.file("buffer"), ez.file("base64")])(
       "should set type:string and format accordingly %#",
       (schema) => {
         expect(

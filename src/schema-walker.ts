@@ -1,6 +1,10 @@
 import { z } from "zod";
 import type { FlatObject } from "./common-helpers";
-import type { ZodFileDef } from "./file-schema";
+import { zodDateInKind } from "./date-in-schema";
+import { zodDateOutKind } from "./date-out-schema";
+import { zodFileKind } from "./file-schema";
+import { getMeta } from "./metadata";
+import { zodUploadKind } from "./upload-schema";
 
 export type HandlingVariant = "last" | "regular" | "each";
 
@@ -30,7 +34,11 @@ export type SchemaHandler<
   Variant extends HandlingVariant = "regular",
 > = (params: SchemaHandlingProps<T, U, Context, Variant>) => U;
 
-export type ProprietaryKinds = ZodFileDef["typeName"];
+type ProprietaryKinds =
+  | typeof zodFileKind
+  | typeof zodDateInKind
+  | typeof zodDateOutKind
+  | typeof zodUploadKind;
 
 export type HandlingRules<U, Context extends FlatObject = {}> = Partial<
   Record<
@@ -52,9 +60,10 @@ export const walkSchema = <U, Context extends FlatObject = {}>({
   onMissing: SchemaHandler<z.ZodTypeAny, U, Context, "last">;
 }): U => {
   const handler =
-    "typeName" in schema._def
+    rules[getMeta(schema, "proprietaryKind") as keyof typeof rules] ||
+    ("typeName" in schema._def
       ? rules[schema._def.typeName as keyof typeof rules]
-      : undefined;
+      : undefined);
   const ctx = rest as unknown as Context;
   const next: SchemaHandler<z.ZodTypeAny, U, {}, "last"> = (params) =>
     walkSchema({ ...params, ...ctx, onEach, rules: rules, onMissing });

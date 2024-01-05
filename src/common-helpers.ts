@@ -4,7 +4,7 @@ import { createHash } from "node:crypto";
 import { z } from "zod";
 import { CommonConfig, InputSource, InputSources } from "./config-type";
 import { InputValidationError, OutputValidationError } from "./errors";
-import { ZodFile } from "./file-schema";
+import { zodFileKind } from "./file-schema";
 import { IOSchema } from "./io-schema";
 import { AbstractLogger } from "./logger";
 import { getMeta, hasMeta } from "./metadata";
@@ -267,7 +267,8 @@ export const hasUpload = (subject: IOSchema) =>
 export const hasRaw = (subject: IOSchema) =>
   hasNestedSchema({
     subject,
-    condition: (schema) => schema instanceof ZodFile,
+    condition: (schema) =>
+      isProprietary(schema, zodFileKind) && !(schema instanceof z.ZodString), // @todo can simplify?
     maxDepth: 3,
   });
 

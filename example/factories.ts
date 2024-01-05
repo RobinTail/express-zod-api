@@ -52,7 +52,7 @@ export const fileStreamingEndpointsFactory = new EndpointsFactory({
   config,
   resultHandler: createResultHandler({
     getPositiveResponse: () => ({
-      schema: ez.file().buffer(),
+      schema: ez.file("buffer"), // .buffer(),
       mimeType: "image/*",
     }),
     getNegativeResponse: () => ({

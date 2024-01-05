@@ -1,6 +1,5 @@
 import ts from "typescript";
 import { z } from "zod";
-import { ZodFile } from "./file-schema";
 import {
   emptyHeading,
   emptyTail,
@@ -33,6 +32,7 @@ import { mimeJson } from "./mime";
 import { loadPeer } from "./peer-helpers";
 import { Routing } from "./routing";
 import { walkRouting } from "./routing-walker";
+import * as ez from "./proprietary-schemas";
 import { zodToTs } from "./zts";
 import { createTypeAlias, printNode } from "./zts-helpers";
 import type Prettier from "prettier";
@@ -159,7 +159,7 @@ export class Integration {
         const inputId = makeCleanId(method, path, "input");
         const input = zodToTs({
           ...commons,
-          schema: hasRaw(inputSchema) ? ZodFile.create().buffer() : inputSchema,
+          schema: hasRaw(inputSchema) ? ez.file("buffer") : inputSchema,
           isResponse: false,
         });
         const positiveResponseId = splitResponse

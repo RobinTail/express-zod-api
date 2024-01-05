@@ -2,7 +2,6 @@ import ts from "typescript";
 import { z } from "zod";
 import { hasCoercion, isProprietary, tryToTransform } from "./common-helpers";
 import { zodDateOutKind } from "./date-out-schema";
-import { ZodFile } from "./file-schema";
 import { HandlingRules, walkSchema } from "./schema-walker";
 import {
   LiteralType,
@@ -219,10 +218,10 @@ const onLazy: Producer<z.ZodLazy<z.ZodTypeAny>> = ({
   );
 };
 
-const onFile: Producer<ZodFile> = ({ schema: { isBuffer } }) =>
-  isBuffer
-    ? f.createTypeReferenceNode("Buffer")
-    : f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword);
+const onFile: Producer<z.ZodType> = ({ schema }) =>
+  schema instanceof z.ZodString
+    ? f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword)
+    : f.createTypeReferenceNode("Buffer");
 
 const producers: HandlingRules<ts.TypeNode, ZTSContext> = {
   ZodString: onPrimitive(ts.SyntaxKind.StringKeyword),
@@ -237,7 +236,6 @@ const producers: HandlingRules<ts.TypeNode, ZTSContext> = {
   ZodLiteral: onLiteral,
   ZodIntersection: onIntersection,
   ZodUnion: onSomeUnion,
-  ZodFile: onFile,
   ZodAny: onPrimitive(ts.SyntaxKind.AnyKeyword),
   ZodDefault: onDefault,
   ZodEnum: onEnum,
@@ -251,6 +249,7 @@ const producers: HandlingRules<ts.TypeNode, ZTSContext> = {
   ZodPipeline: onPipeline,
   ZodLazy: onLazy,
   ZodReadonly: onReadonly,
+  ZodFile: onFile,
 };
 
 export const zodToTs = ({
