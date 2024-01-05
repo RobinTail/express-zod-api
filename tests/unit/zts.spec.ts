@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import ts from "typescript";
 import { z } from "zod";
+import * as ez from "../../src/proprietary-schemas";
 import { f } from "../../src/integration-helpers";
 import { defaultSerializer } from "../../src/common-helpers";
 import { zodToTs } from "../../src/zts";
@@ -348,6 +349,23 @@ describe("zod-to-ts", () => {
           printNodeTest(zodToTs({ schema, ...defaultCtx, isResponse: true })),
         ).toMatchSnapshot();
       });
+    });
+  });
+
+  describe("dates", () => {
+    test("ez.dateIn()", () => {
+      expect(
+        printNodeTest(
+          zodToTs({ schema: ez.dateIn(), ...defaultCtx, isResponse: false }),
+        ),
+      ).toMatchSnapshot();
+    });
+    test("ez.dateOut()", () => {
+      expect(
+        printNodeTest(
+          zodToTs({ schema: ez.dateOut(), ...defaultCtx, isResponse: true }),
+        ),
+      ).toMatchSnapshot();
     });
   });
 });

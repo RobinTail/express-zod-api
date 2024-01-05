@@ -32,7 +32,7 @@ type PatchV1UserIdInput = {
 } & {
   id: string;
   name: string;
-  birthday: string;
+  birthday: string | string;
 };
 
 type PatchV1UserIdResponse =

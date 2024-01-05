@@ -104,6 +104,10 @@ exports[`zod-to-ts > createTypeAlias() > outputs correct typescript 1`] = `
 };"
 `;
 
+exports[`zod-to-ts > dates > ez.dateIn() 1`] = `"string | string"`;
+
+exports[`zod-to-ts > dates > ez.dateOut() 1`] = `"string"`;
+
 exports[`zod-to-ts > enums > handles 'numeric' literals 1`] = `""Red" | "Green" | "Blue" | 0 | 1 | 2"`;
 
 exports[`zod-to-ts > enums > handles 'quoted string' literals 1`] = `""Two Words" | "'Quotes\\"" | "\\\\\\"Escaped\\\\\\"" | 0 | 1 | 2"`;
