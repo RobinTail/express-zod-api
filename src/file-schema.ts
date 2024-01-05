@@ -7,27 +7,25 @@ export const zodFileKind = "ZodFile";
 type Narrowing = "string" | "buffer" | "base64" | "binary";
 
 /** @todo remove in v17 */
-interface DeprecatedMethods extends Record<Narrowing, () => z.ZodType> {
-  /** @deprecated use ez.file("buffer") instead */
-  buffer: () => z.ZodType<Buffer> & DeprecatedMethods;
-  /** @deprecated use ez.file("string") instead */
-  string: () => z.ZodString & DeprecatedMethods;
-  /** @deprecated use ez.file("base64") instead */
-  base64: () => z.ZodString & DeprecatedMethods;
-  /** @deprecated use ez.file("binary") instead */
-  binary: () => z.ZodUnion<[z.ZodType<Buffer>, z.ZodString]> &
-    DeprecatedMethods;
-}
+const deprecatedMethods = {
+  /* eslint-disable @typescript-eslint/no-use-before-define */
+  buffer: () => file("buffer"),
+  string: () => file("string"),
+  base64: () => file("base64"),
+  binary: () => file("binary"),
+};
 
 export function file(
   type?: "string" | "base64",
-): z.ZodString & DeprecatedMethods;
+): z.ZodString & typeof deprecatedMethods;
 
 export function file(
   type: "binary",
-): z.ZodUnion<[z.ZodType<Buffer>, z.ZodString]> & DeprecatedMethods;
+): z.ZodUnion<[z.ZodType<Buffer>, z.ZodString]> & typeof deprecatedMethods;
 
-export function file(type: "buffer"): z.ZodType<Buffer> & DeprecatedMethods;
+export function file(
+  type: "buffer",
+): z.ZodType<Buffer> & typeof deprecatedMethods;
 
 export function file(
   type?: Narrowing,
@@ -36,7 +34,7 @@ export function file(
   | z.ZodType<Buffer>
   | z.ZodUnion<[z.ZodType<Buffer>, z.ZodString]>
 ) &
-  DeprecatedMethods {
+  typeof deprecatedMethods {
   const justString = z.string();
   const base64String = justString.regex(base64Regex, {
     message: "Does not match base64 encoding",
@@ -52,11 +50,10 @@ export function file(
           : justString,
   );
   /** @todo remove this hack in v17 */
-  (schema as any).buffer = () => file("buffer");
-  (schema as any).string = () => file("string");
-  (schema as any).base64 = () => file("base64");
-  (schema as any).binary = () => file("binary");
-  return schema as typeof schema & DeprecatedMethods;
+  for (const [method, handler] of Object.entries(deprecatedMethods)) {
+    (schema as any)[method] = handler;
+  }
+  return schema as typeof schema & typeof deprecatedMethods;
 }
 
 /** Shorthand for z.object({ raw: ez.file("buffer") }) */
