@@ -378,13 +378,10 @@ describe("Common Helpers", () => {
   });
 
   describe("hasNestedSchema()", () => {
+    const condition = (subject: z.ZodTypeAny) =>
+      isProprietary(subject, zodUploadKind);
     test("should return true for given argument satisfying condition", () => {
-      expect(
-        hasNestedSchema({
-          subject: ez.upload(),
-          condition: (subject) => isProprietary(subject, zodUploadKind),
-        }),
-      ).toBeTruthy();
+      expect(hasNestedSchema({ subject: ez.upload(), condition })).toBeTruthy();
     });
     test.each([
       z.object({ test: ez.upload() }),
@@ -397,12 +394,7 @@ describe("Common Helpers", () => {
       ez.upload().refine(() => true),
       z.array(ez.upload()),
     ])("should return true for wrapped needle %#", (subject) => {
-      expect(
-        hasNestedSchema({
-          subject,
-          condition: (entry) => isProprietary(entry, zodUploadKind),
-        }),
-      ).toBeTruthy();
+      expect(hasNestedSchema({ subject, condition })).toBeTruthy();
     });
     test.each([
       z.object({}),
@@ -411,12 +403,7 @@ describe("Common Helpers", () => {
       z.boolean().and(z.literal(true)),
       z.number().or(z.string()),
     ])("should return false in other cases %#", (subject) => {
-      expect(
-        hasNestedSchema({
-          subject,
-          condition: (entry) => isProprietary(entry, zodUploadKind),
-        }),
-      ).toBeFalsy();
+      expect(hasNestedSchema({ subject, condition })).toBeFalsy();
     });
   });
 
