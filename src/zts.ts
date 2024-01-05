@@ -218,7 +218,6 @@ const producers: HandlingRules<ts.TypeNode, ZTSContext> = {
   ZodNumber: onPrimitive(ts.SyntaxKind.NumberKeyword),
   ZodBigInt: onPrimitive(ts.SyntaxKind.BigIntKeyword),
   ZodBoolean: onPrimitive(ts.SyntaxKind.BooleanKeyword),
-  ZodDateIn: onPrimitive(ts.SyntaxKind.StringKeyword),
   ZodDateOut: onPrimitive(ts.SyntaxKind.StringKeyword),
   ZodNull: onNull,
   ZodArray: onArray,

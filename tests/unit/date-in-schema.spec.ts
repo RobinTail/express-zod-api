@@ -1,18 +1,21 @@
-import { ZodDateIn } from "../../src/date-in-schema";
+import { z } from "zod";
+import { getMeta } from "../../src/metadata";
+import * as ez from "../../src/proprietary-schemas";
 import { describe, expect, test } from "vitest";
 
+// @todo naming
 describe("ZodDateIn", () => {
   describe("static::create()", () => {
     test("should create an instance", () => {
-      const schema = ZodDateIn.create();
-      expect(schema).toBeInstanceOf(ZodDateIn);
-      expect(schema._def.typeName).toEqual("ZodDateIn");
+      const schema = ez.dateIn();
+      expect(schema).toBeInstanceOf(z.ZodPipeline);
+      expect(getMeta(schema, "proprietaryKind")).toEqual("ZodDateIn");
     });
   });
 
   describe("_parse()", () => {
     test("should handle wrong parsed type", () => {
-      const schema = ZodDateIn.create();
+      const schema = ez.dateIn();
       const result = schema.safeParse(123);
       expect(result.success).toBeFalsy();
       if (!result.success) {
@@ -29,7 +32,7 @@ describe("ZodDateIn", () => {
     });
 
     test("should accept valid date string", () => {
-      const schema = ZodDateIn.create();
+      const schema = ez.dateIn();
       const result = schema.safeParse("2022-12-31");
       expect(result).toEqual({
         success: true,
@@ -38,7 +41,7 @@ describe("ZodDateIn", () => {
     });
 
     test("should handle invalid date", () => {
-      const schema = ZodDateIn.create();
+      const schema = ez.dateIn();
       const result = schema.safeParse("2022-01-32");
       expect(result.success).toBeFalsy();
       if (!result.success) {
@@ -53,7 +56,7 @@ describe("ZodDateIn", () => {
     });
 
     test("should handle invalid format", () => {
-      const schema = ZodDateIn.create();
+      const schema = ez.dateIn();
       const result = schema.safeParse("12.01.2021");
       expect(result.success).toBeFalsy();
       if (!result.success) {

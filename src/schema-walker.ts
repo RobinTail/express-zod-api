@@ -1,6 +1,5 @@
 import { z } from "zod";
 import type { FlatObject } from "./common-helpers";
-import type { ZodDateInDef } from "./date-in-schema";
 import type { ZodDateOutDef } from "./date-out-schema";
 import type { ZodFileDef } from "./file-schema";
 
@@ -34,7 +33,6 @@ export type SchemaHandler<
 
 export type ProprietaryKinds =
   | ZodFileDef["typeName"]
-  | ZodDateInDef["typeName"]
   | ZodDateOutDef["typeName"];
 
 export type HandlingRules<U, Context extends FlatObject = {}> = Partial<

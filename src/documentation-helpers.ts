@@ -31,7 +31,7 @@ import {
   ucFirst,
 } from "./common-helpers";
 import { InputSource, TagsConfig } from "./config-type";
-import { ZodDateIn, isoDateRegex } from "./date-in-schema";
+import { isoDateRegex, zodDateInKind } from "./date-in-schema";
 import { ZodDateOut } from "./date-out-schema";
 import { DocumentationError } from "./errors";
 import { ZodFile } from "./file-schema";
@@ -246,7 +246,7 @@ export const depictObject: Depicter<z.AnyZodObject> = ({
  * */
 export const depictNull: Depicter<z.ZodNull> = () => ({ type: "null" });
 
-export const depictDateIn: Depicter<ZodDateIn> = (ctx) => {
+export const depictDateIn: Depicter<z.ZodType> = (ctx) => {
   assert(
     !ctx.isResponse,
     new DocumentationError({
@@ -569,8 +569,13 @@ export const depictEffect: Depicter<z.ZodEffects<z.ZodTypeAny>> = ({
 
 export const depictPipeline: Depicter<
   z.ZodPipeline<z.ZodTypeAny, z.ZodTypeAny>
-> = ({ schema, isResponse, next }) =>
-  next({ schema: schema._def[isResponse ? "out" : "in"] });
+> = ({ schema, isResponse, next, ...ctx }) => {
+  // @todo do I really need it now?
+  if (isProprietary(schema, zodDateInKind)) {
+    return depictDateIn({ schema, isResponse, next, ...ctx });
+  }
+  return next({ schema: schema._def[isResponse ? "out" : "in"] });
+};
 
 export const depictBranded: Depicter<
   z.ZodBranded<z.ZodTypeAny, string | number | symbol>
@@ -750,7 +755,6 @@ export const depicters: HandlingRules<
   ZodNumber: depictNumber,
   ZodBigInt: depictBigInt,
   ZodBoolean: depictBoolean,
-  ZodDateIn: depictDateIn,
   ZodDateOut: depictDateOut,
   ZodNull: depictNull,
   ZodArray: depictArray,
