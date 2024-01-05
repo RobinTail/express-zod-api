@@ -4,8 +4,8 @@ import * as ez from "../../src/proprietary-schemas";
 import { readFile } from "node:fs/promises";
 import { describe, expect, test } from "vitest";
 
-describe("ZodFile", () => {
-  describe("static::create()", () => {
+describe("ez.file()", () => {
+  describe("creation", () => {
     test("should create an instance being string by default", () => {
       const schema = ez.file();
       expect(schema).toBeInstanceOf(z.ZodString);
@@ -63,7 +63,7 @@ describe("ZodFile", () => {
     });
   });
 
-  describe("_parse()", () => {
+  describe("parsing", () => {
     test.each([
       {
         schema: ez.file(),
