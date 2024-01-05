@@ -1,18 +1,21 @@
-import { ZodDateOut } from "../../src/date-out-schema";
+import { z } from "zod";
+import { getMeta } from "../../src/metadata";
+import * as ez from "../../src/proprietary-schemas";
 import { describe, expect, test } from "vitest";
 
+// @todo naming
 describe("ZodDateOut", () => {
   describe("static::create()", () => {
     test("should create an instance", () => {
-      const schema = ZodDateOut.create();
-      expect(schema).toBeInstanceOf(ZodDateOut);
-      expect(schema._def.typeName).toEqual("ZodDateOut");
+      const schema = ez.dateOut();
+      expect(schema).toBeInstanceOf(z.ZodEffects);
+      expect(getMeta(schema, "proprietaryKind")).toEqual("ZodDateOut");
     });
   });
 
   describe("_parse()", () => {
     test("should handle wrong parsed type", () => {
-      const schema = ZodDateOut.create();
+      const schema = ez.dateOut();
       const result = schema.safeParse("12.01.2022");
       expect(result.success).toBeFalsy();
       if (!result.success) {
@@ -29,7 +32,7 @@ describe("ZodDateOut", () => {
     });
 
     test("should accept valid date", () => {
-      const schema = ZodDateOut.create();
+      const schema = ez.dateOut();
       const result = schema.safeParse(new Date("2022-12-31"));
       expect(result).toEqual({
         success: true,
@@ -38,7 +41,7 @@ describe("ZodDateOut", () => {
     });
 
     test("should handle invalid date", () => {
-      const schema = ZodDateOut.create();
+      const schema = ez.dateOut();
       const result = schema.safeParse(new Date("2022-01-32"));
       expect(result.success).toBeFalsy();
       if (!result.success) {

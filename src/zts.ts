@@ -1,6 +1,7 @@
 import ts from "typescript";
 import { z } from "zod";
-import { hasCoercion, tryToTransform } from "./common-helpers";
+import { hasCoercion, isProprietary, tryToTransform } from "./common-helpers";
+import { zodDateOutKind } from "./date-out-schema";
 import { ZodFile } from "./file-schema";
 import { HandlingRules, walkSchema } from "./schema-walker";
 import {
@@ -83,6 +84,11 @@ const onSomeUnion: Producer<
 > = ({ schema: { options }, next }) =>
   f.createUnionTypeNode(options.map((option) => next({ schema: option })));
 
+const onPrimitive =
+  (syntaxKind: ts.KeywordTypeSyntaxKind): Producer<z.ZodTypeAny> =>
+  () =>
+    f.createKeywordTypeNode(syntaxKind);
+
 const makeSample = (produced: ts.TypeNode) =>
   samples?.[produced.kind as keyof typeof samples];
 
@@ -90,7 +96,17 @@ const onEffects: Producer<z.ZodEffects<z.ZodTypeAny>> = ({
   schema,
   next,
   isResponse,
+  ...ctx
 }) => {
+  // @todo why effects depicter does not work well here?
+  if (isProprietary(schema, zodDateOutKind)) {
+    return onPrimitive(ts.SyntaxKind.StringKeyword)({
+      schema,
+      next,
+      isResponse,
+      ...ctx,
+    });
+  }
   const input = next({ schema: schema.innerType() });
   const effect = schema._def.effect;
   if (isResponse && effect.type === "transform") {
@@ -167,11 +183,6 @@ const onIntersection: Producer<
 const onDefault: Producer<z.ZodDefault<z.ZodTypeAny>> = ({ next, schema }) =>
   next({ schema: schema._def.innerType });
 
-const onPrimitive =
-  (syntaxKind: ts.KeywordTypeSyntaxKind): Producer<z.ZodTypeAny> =>
-  () =>
-    f.createKeywordTypeNode(syntaxKind);
-
 const onBranded: Producer<
   z.ZodBranded<z.ZodTypeAny, string | number | symbol>
 > = ({ next, schema }) => next({ schema: schema.unwrap() });
@@ -218,7 +229,6 @@ const producers: HandlingRules<ts.TypeNode, ZTSContext> = {
   ZodNumber: onPrimitive(ts.SyntaxKind.NumberKeyword),
   ZodBigInt: onPrimitive(ts.SyntaxKind.BigIntKeyword),
   ZodBoolean: onPrimitive(ts.SyntaxKind.BooleanKeyword),
-  ZodDateOut: onPrimitive(ts.SyntaxKind.StringKeyword),
   ZodNull: onNull,
   ZodArray: onArray,
   ZodTuple: onTuple,

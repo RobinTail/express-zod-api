@@ -23,7 +23,6 @@ import {
   ResultHandlerDefinition,
   Routing,
   ServerConfig,
-  ZodDateOutDef,
   ZodFileDef,
 } from "../../src";
 import { describe, expect, test, vi } from "vitest";
@@ -53,7 +52,6 @@ describe("Index Entrypoint", () => {
       expectType<LoggerOverrides>({});
       expectType<Routing>({});
       expectType<Metadata<z.ZodTypeAny>>({ examples: [] });
-      expectType<ZodDateOutDef>({ typeName: "ZodDateOut" });
       expectType<ZodFileDef>({ typeName: "ZodFile", type: "" });
       expectType<CommonConfig>({ cors: true, logger: { level: "silent" } });
       expectType<AppConfig>({

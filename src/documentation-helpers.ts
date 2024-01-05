@@ -32,7 +32,7 @@ import {
 } from "./common-helpers";
 import { InputSource, TagsConfig } from "./config-type";
 import { isoDateRegex, zodDateInKind } from "./date-in-schema";
-import { ZodDateOut } from "./date-out-schema";
+import { zodDateOutKind } from "./date-out-schema";
 import { DocumentationError } from "./errors";
 import { ZodFile } from "./file-schema";
 import { IOSchema } from "./io-schema";
@@ -265,7 +265,7 @@ export const depictDateIn: Depicter<z.ZodType> = (ctx) => {
   };
 };
 
-export const depictDateOut: Depicter<ZodDateOut> = (ctx) => {
+export const depictDateOut: Depicter<z.ZodType> = (ctx) => {
   assert(
     ctx.isResponse,
     new DocumentationError({
@@ -543,6 +543,9 @@ export const depictEffect: Depicter<z.ZodEffects<z.ZodTypeAny>> = ({
   if (isProprietary(schema, zodUploadKind)) {
     return depictUpload({ schema, isResponse, next, ...ctx });
   }
+  if (isProprietary(schema, zodDateOutKind)) {
+    return depictDateOut({ schema, isResponse, next, ...ctx });
+  }
   const input = next({ schema: schema.innerType() });
   const { effect } = schema._def;
   if (isResponse && effect.type === "transform" && !isReferenceObject(input)) {
@@ -755,7 +758,6 @@ export const depicters: HandlingRules<
   ZodNumber: depictNumber,
   ZodBigInt: depictBigInt,
   ZodBoolean: depictBoolean,
-  ZodDateOut: depictDateOut,
   ZodNull: depictNull,
   ZodArray: depictArray,
   ZodTuple: depictTuple,
