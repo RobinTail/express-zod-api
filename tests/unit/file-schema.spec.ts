@@ -9,57 +9,27 @@ describe("ez.file()", () => {
     test("should create an instance being string by default", () => {
       const schema = ez.file();
       expect(schema).toBeInstanceOf(z.ZodString);
-      // expect(schema._def.encoding).toBeUndefined();
       expect(getMeta(schema, "proprietaryKind")).toBe("ZodFile");
-      /*
-      expect(schema.isBinary).toBeFalsy();
-      expect(schema.isBase64).toBeFalsy();
-      expect(schema.isString).toBeTruthy();
-      expect(schema.isBuffer).toBeFalsy();*/
     });
-  });
 
-  describe(".string()", () => {
     test("should create a string file", () => {
-      const schema = ez.file("string"); //.string();
+      const schema = ez.file("string");
       expect(schema).toBeInstanceOf(z.ZodString);
-      /*
-      expect(schema._def.encoding).toBeUndefined();
-      expect(schema.isString).toBeTruthy();
-      expect(schema.isBuffer).toBeFalsy();*/
     });
-  });
 
-  describe(".buffer()", () => {
     test("should create a buffer file", () => {
-      const schema = ez.file("buffer"); //.buffer();
+      const schema = ez.file("buffer");
       expect(schema).toBeInstanceOf(z.ZodEffects);
-      /*
-      expect(schema._def.encoding).toBeUndefined();
-      expect(schema.isBuffer).toBeTruthy();
-      expect(schema.isString).toBeFalsy();*/
     });
-  });
 
-  describe(".binary()", () => {
     test("should create a binary file", () => {
-      const schema = ez.file("binary"); //.binary("test message");
+      const schema = ez.file("binary");
       expect(schema).toBeInstanceOf(z.ZodString);
-      /*
-      expect(schema.isBinary).toBeTruthy();
-      expect(schema._def.encoding).toBe("binary");
-      expect(schema._def.message).toBe("test message");*/
     });
-  });
 
-  describe(".base64()", () => {
     test("should create a base64 file", () => {
-      const schema = ez.file("base64"); // .base64("test message");
+      const schema = ez.file("base64");
       expect(schema).toBeInstanceOf(z.ZodString);
-      /*
-      expect(schema.isBase64).toBeTruthy();
-      expect(schema._def.encoding).toBe("base64");
-      expect(schema._def.message).toBe("test message");*/
     });
   });
 
@@ -74,7 +44,7 @@ describe("ez.file()", () => {
         message: "Expected string, received number",
       },
       {
-        schema: ez.file("buffer"), // .buffer(),
+        schema: ez.file("buffer"),
         subject: "123",
         code: "custom",
         message: "Expected Buffer",
@@ -142,7 +112,7 @@ describe("ez.file()", () => {
     });
 
     test("should accept base64 read string", async () => {
-      const schema = ez.file("base64"); // .base64();
+      const schema = ez.file("base64");
       const data = await readFile("logo.svg", "base64");
       const result = schema.safeParse(data);
       expect(result).toEqual({
