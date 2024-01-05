@@ -1398,12 +1398,12 @@ paths:
                       type: string
                       minLength: 1
                     birthday:
-                      description: YYYY-MM-DDTHH:mm:ss.sssZ
-                      type: string
-                      format: date-time
-                      pattern: ^\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?)?Z?$
-                      externalDocs:
-                        url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
+                      oneOf:
+                        - type: string
+                          format: date-time
+                          pattern: /^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?Z$/
+                        - type: string
+                          pattern: /^\\d{4}-\\d{2}-\\d{2}$/
                   required:
                     - name
                     - birthday
@@ -2232,12 +2232,12 @@ components:
               type: string
               minLength: 1
             birthday:
-              description: YYYY-MM-DDTHH:mm:ss.sssZ
-              type: string
-              format: date-time
-              pattern: ^\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?)?Z?$
-              externalDocs:
-                url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
+              oneOf:
+                - type: string
+                  format: date-time
+                  pattern: /^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?Z$/
+                - type: string
+                  pattern: /^\\d{4}-\\d{2}-\\d{2}$/
           required:
             - name
             - birthday
@@ -2561,12 +2561,12 @@ paths:
                 boolean:
                   type: boolean
                 dateIn:
-                  description: YYYY-MM-DDTHH:mm:ss.sssZ
-                  type: string
-                  format: date-time
-                  pattern: ^\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?)?Z?$
-                  externalDocs:
-                    url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
+                  oneOf:
+                    - type: string
+                      format: date-time
+                      pattern: /^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?Z$/
+                    - type: string
+                      pattern: /^\\d{4}-\\d{2}-\\d{2}$/
               required:
                 - bigint
                 - boolean

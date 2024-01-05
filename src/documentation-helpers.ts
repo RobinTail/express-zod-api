@@ -30,7 +30,6 @@ import {
   ucFirst,
 } from "./common-helpers";
 import { InputSource, TagsConfig } from "./config-type";
-import { isoDateRegex } from "./date-in-schema";
 import { DocumentationError } from "./errors";
 import { IOSchema } from "./io-schema";
 import {
@@ -80,8 +79,6 @@ interface ReqResDepictHelperCommonProps
 }
 
 const shortDescriptionLimit = 50;
-const isoDateDocumentationUrl =
-  "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString";
 
 type InternalType = "date";
 
@@ -248,25 +245,6 @@ export const depictObject: Depicter<z.AnyZodObject> = ({
  * @since OAS 3.1: using type: "null"
  * */
 export const depictNull: Depicter<z.ZodNull> = () => ({ type: "null" });
-
-export const depictDateIn: Depicter<z.ZodType> = (ctx) => {
-  assert(
-    !ctx.isResponse,
-    new DocumentationError({
-      message: "Please use ez.dateOut() for output.",
-      ...ctx,
-    }),
-  );
-  return {
-    description: "YYYY-MM-DDTHH:mm:ss.sssZ",
-    type: "string",
-    format: "date-time",
-    pattern: isoDateRegex.source,
-    externalDocs: {
-      url: isoDateDocumentationUrl,
-    },
-  };
-};
 
 export const depictDate: Depicter<z.ZodDate> = () => ({
   "x-type-internal": "date" satisfies InternalType,
@@ -745,7 +723,6 @@ export const depicters: HandlingRules<
   ZodReadonly: depictReadonly,
   ZodFile: depictFile,
   ZodUpload: depictUpload,
-  ZodDateIn: depictDateIn,
 };
 
 export const onEach: Depicter<z.ZodTypeAny, "each"> = ({

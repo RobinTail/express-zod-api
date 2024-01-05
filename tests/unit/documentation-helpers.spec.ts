@@ -14,7 +14,6 @@ import {
   depictBranded,
   depictCatch,
   depictDate,
-  depictDateIn,
   depictDefault,
   depictDiscriminatedUnion,
   depictEffect,
@@ -834,31 +833,6 @@ describe("Documentation helpers", () => {
           examples: ["test"],
         }),
       ).toMatchSnapshot();
-    });
-  });
-
-  describe("depictDateIn", () => {
-    test("should set type:string, pattern and format", () => {
-      expect(
-        depictDateIn({
-          schema: ez.dateIn(),
-          ...requestCtx,
-          next: makeNext(requestCtx),
-        }),
-      ).toMatchSnapshot();
-    });
-    test("should throw when ZodDateIn in response", () => {
-      try {
-        depictDateIn({
-          schema: ez.dateIn(),
-          ...responseCtx,
-          next: makeNext(responseCtx),
-        });
-        expect.fail("should not be here");
-      } catch (e) {
-        expect(e).toBeInstanceOf(DocumentationError);
-        expect(e).toMatchSnapshot();
-      }
     });
   });
 

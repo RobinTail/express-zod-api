@@ -53,23 +53,6 @@ exports[`Documentation helpers > depictDate > should set internal type for sampl
 }
 `;
 
-exports[`Documentation helpers > depictDateIn > should set type:string, pattern and format 1`] = `
-{
-  "description": "YYYY-MM-DDTHH:mm:ss.sssZ",
-  "externalDocs": {
-    "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString",
-  },
-  "format": "date-time",
-  "pattern": "^\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?)?Z?$",
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers > depictDateIn > should throw when ZodDateIn in response 1`] = `
-[DocumentationError: Please use ez.dateOut() for output.
-Caused by response schema of an Endpoint assigned to GET method of /v1/user/:id path.]
-`;
-
 exports[`Documentation helpers > depictDefault() > should set default property 1`] = `
 {
   "default": true,

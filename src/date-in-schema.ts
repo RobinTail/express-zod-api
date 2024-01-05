@@ -2,14 +2,7 @@ import { z } from "zod";
 import { metaProp, withMeta } from "./metadata";
 import { isValidDate } from "./schema-helpers";
 
-// simple regex for ISO date, supports the following formats:
-// 2021-01-01T00:00:00.000Z
-// 2021-01-01T00:00:00.0Z
-// 2021-01-01T00:00:00Z
-// 2021-01-01T00:00:00
-// 2021-01-01
-export const isoDateRegex =
-  /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d+)?)?Z?$/;
+export const shortDateRegex = /^\d{4}-\d{2}-\d{2}$/;
 
 export const zodDateInKind = "ZodDateIn";
 
@@ -17,7 +10,8 @@ export const dateIn = () => {
   const schema = withMeta(
     z
       .string()
-      .regex(isoDateRegex)
+      .datetime()
+      .or(z.string().regex(shortDateRegex))
       .transform((str) => new Date(str))
       .pipe(z.date().refine(isValidDate)),
   );

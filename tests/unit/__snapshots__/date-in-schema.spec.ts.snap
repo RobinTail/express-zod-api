@@ -1,0 +1,31 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`ez.dateIn() > parsing > should handle wrong parsed type 1`] = `
+[
+  {
+    "code": "invalid_union",
+    "message": "Invalid input",
+    "path": [],
+    "unionErrors": [
+      [ZodError: [
+  {
+    "code": "invalid_type",
+    "expected": "string",
+    "received": "number",
+    "path": [],
+    "message": "Expected string, received number"
+  }
+]],
+      [ZodError: [
+  {
+    "code": "invalid_type",
+    "expected": "string",
+    "received": "number",
+    "path": [],
+    "message": "Expected string, received number"
+  }
+]],
+    ],
+  },
+]
+`;
