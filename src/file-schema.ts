@@ -35,8 +35,7 @@ export function file(
   | z.ZodUnion<[z.ZodType<Buffer>, z.ZodString]>
 ) &
   typeof deprecatedMethods {
-  const justString = z.string();
-  const base64String = justString.regex(base64Regex, {
+  const base64String = z.string().regex(base64Regex, {
     message: "Does not match base64 encoding",
   });
   const schema = proprietary(
@@ -46,8 +45,8 @@ export function file(
       : type === "base64"
         ? base64String
         : type === "binary"
-          ? bufferSchema.or(justString)
-          : justString,
+          ? bufferSchema.or(z.string())
+          : z.string(),
   );
   /** @todo remove this hack in v17 */
   for (const [method, handler] of Object.entries(deprecatedMethods)) {
