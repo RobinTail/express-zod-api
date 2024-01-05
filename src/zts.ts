@@ -98,7 +98,7 @@ const onEffects: Producer<z.ZodEffects<z.ZodTypeAny>> = ({
   isResponse,
   ...ctx
 }) => {
-  // @todo why effects depicter does not work well here?
+  // @todo move to walker somehow
   if (isProprietary(schema, zodDateOutKind)) {
     return onPrimitive(ts.SyntaxKind.StringKeyword)({
       schema,
