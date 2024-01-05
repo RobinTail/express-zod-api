@@ -10,14 +10,15 @@ const base64Regex =
 export const file = (
   ...features: Array<"string" | "buffer" | "base64" | "binary">
 ) => {
+  const justString = z.string();
   const schema = withMeta(
     features.includes("buffer")
       ? bufferSchema
       : features.includes("base64")
-        ? z
-            .string()
-            .regex(base64Regex, { message: "Does not match base64 encoding" })
-        : z.string(),
+        ? justString.regex(base64Regex, {
+            message: "Does not match base64 encoding",
+          })
+        : justString,
   );
   schema._def[metaProp].proprietaryKind = zodFileKind;
   return schema;
