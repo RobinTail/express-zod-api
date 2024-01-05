@@ -80,8 +80,6 @@ interface ReqResDepictHelperCommonProps
 
 const shortDescriptionLimit = 50;
 
-type InternalType = "date";
-
 const samples = {
   integer: 0,
   number: 0,
@@ -91,7 +89,7 @@ const samples = {
   null: null,
   array: [],
   date: new Date(),
-} satisfies Record<Extract<SchemaObjectType | InternalType, string>, unknown>;
+} satisfies Record<Extract<SchemaObjectType | "date", string>, unknown>;
 
 /** @see https://expressjs.com/en/guide/routing.html */
 const routePathParamsRegex = /:([A-Za-z0-9_]+)/g;
@@ -247,7 +245,7 @@ export const depictObject: Depicter<z.AnyZodObject> = ({
 export const depictNull: Depicter<z.ZodNull> = () => ({ type: "null" });
 
 export const depictDate: Depicter<z.ZodDate> = () => ({
-  "x-type-internal": "date" satisfies InternalType,
+  "x-type-internal": "date" satisfies keyof typeof samples,
 });
 
 export const depictBoolean: Depicter<z.ZodBoolean> = () => ({
@@ -721,7 +719,6 @@ export const depicters: HandlingRules<
   ZodPipeline: depictPipeline,
   ZodLazy: depictLazy,
   ZodReadonly: depictReadonly,
-  ZodFile: depictFile,
   ZodUpload: depictUpload,
 };
 
