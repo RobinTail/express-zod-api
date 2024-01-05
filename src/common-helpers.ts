@@ -166,9 +166,6 @@ export const combinations = <T>(
   merge: (pair: [T, T]) => T,
 ): T[] => (a.length && b.length ? xprod(a, b).map(merge) : a.concat(b));
 
-const reduceBool = (arr: boolean[]) =>
-  arr.reduce((carry, bool) => carry || bool, false);
-
 export const hasTopLevelTransformingEffect = (schema: IOSchema): boolean => {
   if (schema instanceof z.ZodEffects) {
     if (schema._def.effect.type !== "refinement") {
@@ -176,11 +173,11 @@ export const hasTopLevelTransformingEffect = (schema: IOSchema): boolean => {
     }
   }
   if (schema instanceof z.ZodUnion) {
-    return reduceBool(schema.options.map(hasTopLevelTransformingEffect));
+    return schema.options.some(hasTopLevelTransformingEffect);
   }
   if (schema instanceof z.ZodIntersection) {
-    return reduceBool(
-      [schema._def.left, schema._def.right].map(hasTopLevelTransformingEffect),
+    return [schema._def.left, schema._def.right].some(
+      hasTopLevelTransformingEffect,
     );
   }
   return false; // ZodObject left
@@ -205,24 +202,18 @@ export const hasNestedSchema = ({
   }
   const common = { condition, maxDepth, depth: depth + 1 };
   if (subject instanceof z.ZodObject) {
-    return reduceBool(
-      Object.values<z.ZodTypeAny>(subject.shape).map((entry) =>
-        hasNestedSchema({ subject: entry, ...common }),
-      ),
+    return Object.values<z.ZodTypeAny>(subject.shape).some((entry) =>
+      hasNestedSchema({ subject: entry, ...common }),
     );
   }
   if (subject instanceof z.ZodUnion) {
-    return reduceBool(
-      subject.options.map((entry: z.ZodTypeAny) =>
-        hasNestedSchema({ subject: entry, ...common }),
-      ),
+    return subject.options.some((entry: z.ZodTypeAny) =>
+      hasNestedSchema({ subject: entry, ...common }),
     );
   }
   if (subject instanceof z.ZodIntersection) {
-    return reduceBool(
-      [subject._def.left, subject._def.right].map((entry) =>
-        hasNestedSchema({ subject: entry, ...common }),
-      ),
+    return [subject._def.left, subject._def.right].some((entry) =>
+      hasNestedSchema({ subject: entry, ...common }),
     );
   }
   if (subject instanceof z.ZodOptional || subject instanceof z.ZodNullable) {
