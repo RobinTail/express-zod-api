@@ -9,7 +9,8 @@ export const dateOut = () => {
     z
       .date()
       .refine(isValidDate)
-      .transform((date) => date.toISOString()),
+      .transform((date) => date.toISOString())
+      .pipe(z.string().datetime()),
   );
   schema._def[metaProp].proprietaryKind = zodDateOutKind;
   return schema;

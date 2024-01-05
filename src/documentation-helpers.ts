@@ -83,6 +83,8 @@ const shortDescriptionLimit = 50;
 const isoDateDocumentationUrl =
   "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString";
 
+type InternalType = "date";
+
 const samples = {
   integer: 0,
   number: 0,
@@ -91,7 +93,8 @@ const samples = {
   object: {},
   null: null,
   array: [],
-} satisfies Record<Extract<SchemaObjectType, string>, unknown>;
+  date: new Date(),
+} satisfies Record<Extract<SchemaObjectType | InternalType, string>, unknown>;
 
 /** @see https://expressjs.com/en/guide/routing.html */
 const routePathParamsRegex = /:([A-Za-z0-9_]+)/g;
@@ -265,36 +268,9 @@ export const depictDateIn: Depicter<z.ZodType> = (ctx) => {
   };
 };
 
-export const depictDateOut: Depicter<z.ZodType> = (ctx) => {
-  assert(
-    ctx.isResponse,
-    new DocumentationError({
-      message: "Please use ez.dateIn() for input.",
-      ...ctx,
-    }),
-  );
-  return {
-    description: "YYYY-MM-DDTHH:mm:ss.sssZ",
-    type: "string",
-    format: "date-time",
-    externalDocs: {
-      url: isoDateDocumentationUrl,
-    },
-  };
-};
-
-/** @throws DocumentationError */
-export const depictDate: Depicter<z.ZodDate> = (ctx) =>
-  assert.fail(
-    new DocumentationError({
-      message: `Using z.date() within ${
-        ctx.isResponse ? "output" : "input"
-      } schema is forbidden. Please use ez.date${
-        ctx.isResponse ? "Out" : "In"
-      }() instead. Check out the documentation for details.`,
-      ...ctx,
-    }),
-  );
+export const depictDate: Depicter<z.ZodDate> = () => ({
+  "x-type-internal": "date" satisfies InternalType,
+});
 
 export const depictBoolean: Depicter<z.ZodBoolean> = () => ({
   type: "boolean",
@@ -519,9 +495,9 @@ export const depictObjectProperties = ({
   );
 
 const makeSample = (depicted: SchemaObject) => {
-  const type = (
-    Array.isArray(depicted.type) ? depicted.type[0] : depicted.type
-  ) as keyof typeof samples;
+  const type: keyof typeof samples = Array.isArray(depicted.type)
+    ? depicted.type[0]
+    : depicted.type || depicted["x-type-internal"];
   return samples?.[type];
 };
 
@@ -769,7 +745,6 @@ export const depicters: HandlingRules<
   ZodReadonly: depictReadonly,
   ZodFile: depictFile,
   ZodUpload: depictUpload,
-  ZodDateOut: depictDateOut,
   ZodDateIn: depictDateIn,
 };
 

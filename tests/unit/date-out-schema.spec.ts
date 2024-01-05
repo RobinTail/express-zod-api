@@ -7,7 +7,7 @@ describe("ez.dateOut()", () => {
   describe("creation", () => {
     test("should create an instance", () => {
       const schema = ez.dateOut();
-      expect(schema).toBeInstanceOf(z.ZodEffects);
+      expect(schema).toBeInstanceOf(z.ZodPipeline);
       expect(getMeta(schema, "proprietaryKind")).toEqual("ZodDateOut");
     });
   });

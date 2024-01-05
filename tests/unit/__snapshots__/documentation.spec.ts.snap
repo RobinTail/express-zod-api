@@ -1317,11 +1317,9 @@ paths:
                       name:
                         type: string
                       createdAt:
-                        description: YYYY-MM-DDTHH:mm:ss.sssZ
                         type: string
                         format: date-time
-                        externalDocs:
-                          url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
+                        pattern: /^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?Z$/
                     required:
                       - name
                       - createdAt
@@ -2188,11 +2186,9 @@ components:
             name:
               type: string
             createdAt:
-              description: YYYY-MM-DDTHH:mm:ss.sssZ
               type: string
               format: date-time
-              externalDocs:
-                url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
+              pattern: /^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?Z$/
           required:
             - name
             - createdAt
@@ -2516,11 +2512,9 @@ paths:
                         type:
                           - "null"
                       dateOut:
-                        description: YYYY-MM-DDTHH:mm:ss.sssZ
                         type: string
                         format: date-time
-                        externalDocs:
-                          url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
+                        pattern: /^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?Z$/
                     required:
                       - "null"
                       - dateOut

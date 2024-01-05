@@ -15,7 +15,6 @@ import {
   depictCatch,
   depictDate,
   depictDateIn,
-  depictDateOut,
   depictDefault,
   depictDiscriminatedUnion,
   depictEffect,
@@ -863,46 +862,17 @@ describe("Documentation helpers", () => {
     });
   });
 
-  describe("depictDateOut", () => {
-    test("should set type:string, description and format", () => {
-      expect(
-        depictDateOut({
-          schema: ez.dateOut(),
-          ...responseCtx,
-          next: makeNext(responseCtx),
-        }),
-      ).toMatchSnapshot();
-    });
-    test("should throw when ZodDateOut in request", () => {
-      try {
-        depictDateOut({
-          schema: ez.dateOut(),
-          ...requestCtx,
-          next: makeNext(requestCtx),
-        });
-        expect.fail("should not be here");
-      } catch (e) {
-        expect(e).toBeInstanceOf(DocumentationError);
-        expect(e).toMatchSnapshot();
-      }
-    });
-  });
-
   describe("depictDate", () => {
     test.each<OpenAPIContext>([responseCtx, requestCtx])(
-      "should throw clear error %#",
+      "should set internal type for samples of further transformations %#",
       (ctx) => {
-        try {
+        expect(
           depictDate({
             schema: z.date(),
             ...ctx,
             next: makeNext(ctx),
-          });
-          expect.fail("should not be here");
-        } catch (e) {
-          expect(e).toBeInstanceOf(DocumentationError);
-          expect(e).toMatchSnapshot();
-        }
+          }),
+        ).toMatchSnapshot();
       },
     );
   });
