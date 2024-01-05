@@ -1,6 +1,7 @@
 import { Request } from "express";
 import { isHttpError } from "http-errors";
 import { createHash } from "node:crypto";
+import { xprod } from "ramda";
 import { z } from "zod";
 import { CommonConfig, InputSource, InputSources } from "./config-type";
 import { InputValidationError, OutputValidationError } from "./errors";
@@ -169,13 +170,7 @@ export const combinations = <T>(
   if (b.length === 0) {
     return { type: "single", value: a };
   }
-  const result: [T, T][] = [];
-  for (const itemA of a) {
-    for (const itemB of b) {
-      result.push([itemA, itemB]);
-    }
-  }
-  return { type: "tuple", value: result };
+  return { type: "tuple", value: xprod(a, b) };
 };
 
 const reduceBool = (arr: boolean[]) =>
