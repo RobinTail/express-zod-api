@@ -201,56 +201,48 @@ export const hasTopLevelTransformingEffect = (schema: IOSchema): boolean => {
 export const hasNestedSchema = ({
   subject,
   condition,
-  maxDepth,
-  depth = 1,
 }: {
   subject: z.ZodTypeAny;
   condition: (schema: z.ZodTypeAny) => boolean;
-  maxDepth?: number;
-  depth?: number;
 }): boolean => {
   if (condition(subject)) {
     return true;
   }
-  if (maxDepth !== undefined && depth >= maxDepth) {
-    return false;
-  }
-  const common = { condition, maxDepth, depth: depth + 1 };
   if (subject instanceof z.ZodObject) {
     return reduceBool(
       Object.values<z.ZodTypeAny>(subject.shape).map((entry) =>
-        hasNestedSchema({ subject: entry, ...common }),
+        hasNestedSchema({ subject: entry, condition }),
       ),
     );
   }
   if (subject instanceof z.ZodUnion) {
     return reduceBool(
       subject.options.map((entry: z.ZodTypeAny) =>
-        hasNestedSchema({ subject: entry, ...common }),
+        hasNestedSchema({ subject: entry, condition }),
       ),
     );
   }
   if (subject instanceof z.ZodIntersection) {
     return reduceBool(
       [subject._def.left, subject._def.right].map((entry) =>
-        hasNestedSchema({ subject: entry, ...common }),
+        hasNestedSchema({ subject: entry, condition }),
       ),
     );
   }
   if (subject instanceof z.ZodOptional || subject instanceof z.ZodNullable) {
-    return hasNestedSchema({ subject: subject.unwrap(), ...common });
+    return hasNestedSchema({ subject: subject.unwrap(), condition });
   }
   if (subject instanceof z.ZodEffects || subject instanceof z.ZodTransformer) {
-    return hasNestedSchema({ subject: subject.innerType(), ...common });
+    return hasNestedSchema({ subject: subject.innerType(), condition });
   }
   if (subject instanceof z.ZodRecord) {
-    return hasNestedSchema({ subject: subject.valueSchema, ...common });
+    return hasNestedSchema({ subject: subject.valueSchema, condition });
   }
   if (subject instanceof z.ZodArray) {
-    return hasNestedSchema({ subject: subject.element, ...common });
+    return hasNestedSchema({ subject: subject.element, condition });
   }
   if (subject instanceof z.ZodDefault) {
-    return hasNestedSchema({ subject: subject._def.innerType, ...common });
+    return hasNestedSchema({ subject: subject._def.innerType, condition });
   }
   return false;
 };
@@ -268,8 +260,10 @@ export const hasRaw = (subject: IOSchema) =>
   hasNestedSchema({
     subject,
     condition: (schema) =>
-      isProprietary(schema, zodFileKind) && !(schema instanceof z.ZodString), // @todo can simplify?
-    maxDepth: 3,
+      schema instanceof z.ZodObject &&
+      "raw" in schema.shape &&
+      isProprietary(schema.shape.raw, zodFileKind) &&
+      !(schema.shape.raw instanceof z.ZodString),
   });
 
 /**
