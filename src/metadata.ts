@@ -68,8 +68,7 @@ const internal = <T extends z.ZodTypeAny>(subject: T): WithMeta<T> =>
           data.examples.push(value); // instead of concat, for handling array examples
           return internal(pack(target, data));
         }) satisfies ExampleSetter<T>;
-      }
-      if (prop === "describe") {
+      } else if (prop === "describe") {
         return ((description: string) => {
           const fallback = { ...unpack(target), description };
           return internal(pack(target, validate(description, fallback)));
