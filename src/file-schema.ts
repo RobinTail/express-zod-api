@@ -47,7 +47,7 @@ export function file(
   );
   /** @todo remove this hack in v17 */
   for (const [method, handler] of Object.entries(deprecatedMethods)) {
-    (schema as any)[method] = handler;
+    Object.defineProperty(schema, method, { get: () => handler });
   }
   return schema as typeof schema & typeof deprecatedMethods;
 }
