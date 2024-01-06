@@ -20,10 +20,22 @@ const validate = <T extends z.ZodTypeAny>(
 ): Metadata<T> =>
   metaSchema.safeParse(meta).success ? (meta as Metadata<T>) : fallback;
 
+const reviver = ({}: string, value: string) => {
+  const parsed = z
+    .string()
+    .datetime()
+    .transform((str) => new Date(str))
+    .safeParse(value);
+  if (parsed.success) {
+    return parsed.data;
+  }
+  return value;
+};
+
 const unpack = <T extends z.ZodTypeAny>(subject: T): Metadata<T> => {
   try {
     return subject.description
-      ? validate(JSON.parse(subject.description), initialData)
+      ? validate(JSON.parse(subject.description, reviver), initialData)
       : initialData;
   } catch {
     return { ...initialData, description: subject.description };
