@@ -6,11 +6,6 @@ export interface Metadata<T extends z.ZodTypeAny> {
   examples: z.input<T>[];
 }
 
-type MetaKey = keyof Metadata<z.ZodTypeAny>;
-type MetaValue<T extends z.ZodTypeAny, K extends MetaKey> = Readonly<
-  Metadata<T>[K]
->;
-
 export const metaProp = "expressZodApiMeta";
 type MetaProp = typeof metaProp;
 export type MetaDef<T extends z.ZodTypeAny> = Record<MetaProp, Metadata<T>>;
@@ -50,10 +45,10 @@ export const hasMeta = <T extends z.ZodTypeAny>(
   typeof schema._def[metaProp] === "object" &&
   schema._def[metaProp] !== null;
 
-export const getMeta = <T extends z.ZodTypeAny, K extends MetaKey>(
+export const getMeta = <T extends z.ZodTypeAny, K extends keyof Metadata<T>>(
   schema: T,
   meta: K,
-): MetaValue<T, K> | undefined =>
+): Readonly<Metadata<T>[K]> | undefined =>
   hasMeta(schema) ? schema._def[metaProp][meta] : undefined;
 
 export const copyMeta = <A extends z.ZodTypeAny, B extends z.ZodTypeAny>(
