@@ -117,31 +117,13 @@ describe("Metadata", () => {
     });
 
     test("should merge the meta from src to dest (deep merge)", () => {
-      const src = withMeta(
-        z.object({
-          a: z.string(),
-        }),
-      )
-        .example({
-          a: "some",
-        })
-        .example({
-          a: "another",
-        });
-      const dest = withMeta(
-        z.object({
-          b: z.number(),
-        }),
-      )
-        .example({
-          b: 123,
-        })
-        .example({
-          b: 456,
-        })
-        .example({
-          b: 789,
-        });
+      const src = withMeta(z.object({ a: z.string() }))
+        .example({ a: "some" })
+        .example({ a: "another" });
+      const dest = withMeta(z.object({ b: z.number() }))
+        .example({ b: 123 })
+        .example({ b: 456 })
+        .example({ b: 789 });
       const result = copyMeta(src, dest);
       expect(getMeta(result, "examples")).toEqual([
         { a: "some", b: 123 },
