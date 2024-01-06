@@ -59,22 +59,21 @@ type WithMeta<T extends z.ZodTypeAny> = T & {
   example: ExampleSetter<T>;
 };
 
-const internal = <T extends z.ZodTypeAny>(subject: T) =>
+const internal = <T extends z.ZodTypeAny>(subject: T): WithMeta<T> =>
   new Proxy(subject as WithMeta<T>, {
     get: (target, prop) => {
       if (prop === "example") {
-        const setter: ExampleSetter<T> = (value) => {
+        return ((value) => {
           const data = unpack(target);
           data.examples.push(value); // instead of concat, for handling array examples
           return internal(pack(target, data));
-        };
-        return setter;
+        }) satisfies ExampleSetter<T>;
       }
       if (prop === "describe") {
-        return (description: string) => {
+        return ((description: string) => {
           const fallback = { ...unpack(target), description };
           return internal(pack(target, validate(description, fallback)));
-        };
+        }) satisfies T["describe"];
       }
       return Reflect.get(target, prop, target);
     },
