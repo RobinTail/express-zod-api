@@ -31,13 +31,12 @@ const validate = <T extends z.ZodTypeAny>(
   fallback: Metadata<T>,
 ): Metadata<T> => {
   if (!description) {
-    return fallback;
+    return initialData;
   }
   try {
     const json = JSON.parse(description, reviver);
-    return metaSchema.safeParse(json).success
-      ? (json as Metadata<T>)
-      : fallback;
+    metaSchema.parse(json);
+    return json as Metadata<T>;
   } catch {
     return fallback;
   }
