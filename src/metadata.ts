@@ -91,12 +91,12 @@ export const copyMeta = <A extends z.ZodTypeAny, B extends z.ZodTypeAny>(
   src: A,
   dest: B,
 ): WithMeta<B> => {
-  const destExamples = getMeta(dest, "examples");
+  const { examples: destExamples, ...restMeta } = unpack(dest);
   const srcExamples = getMeta(src, "examples");
   const merge = ([destExample, srcExample]: [unknown, unknown]) =>
     typeof destExample === "object" && typeof srcExample === "object"
       ? mergeDeepRight({ ...destExample }, { ...srcExample })
       : srcExample; // not supposed to be called on non-object schemas
   const examples = combinations(destExamples, srcExamples, merge);
-  return withMeta(pack(dest, { ...unpack(dest), examples }));
+  return withMeta(pack(dest, { ...restMeta, examples }));
 };
