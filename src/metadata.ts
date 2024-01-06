@@ -25,14 +25,16 @@ export const withMeta = <T extends z.ZodTypeAny>(schema: T): WithMeta<T> => {
   const copy = cloneSchema(schema) as WithMeta<T>;
   copy._def[metaProp] = // clone for deep copy, issue #827
     clone(copy._def[metaProp]) || ({ examples: [] } satisfies Metadata<T>);
-  return Object.defineProperties(copy, {
-    example: {
-      get: (): ExampleSetter<T> => (value) => {
-        const localCopy = withMeta<T>(copy);
-        (localCopy._def[metaProp] as Metadata<T>).examples.push(value);
-        return localCopy;
-      },
-    },
+  return new Proxy(copy, {
+    get: (target, prop) =>
+      prop === "example"
+        ? (value: z.input<T>) => {
+            const copy2 = withMeta(target);
+            copy2._def[metaProp].examples.push(value);
+            return copy2;
+          }
+        : Reflect.get(target, prop, target),
+    has: (target, prop) => prop === "example" || Reflect.has(target, prop),
   });
 };
 
