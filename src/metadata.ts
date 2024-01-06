@@ -59,21 +59,21 @@ type WithMeta<T extends z.ZodTypeAny> = T & {
   example: ExampleSetter<T>;
 };
 
-export const withMeta = <T extends z.ZodTypeAny>(subject: T) =>
-  new Proxy(pack(subject, unpack(subject)) as WithMeta<T>, {
+const internal = <T extends z.ZodTypeAny>(subject: T) =>
+  new Proxy(subject as WithMeta<T>, {
     get: (target, prop) => {
       if (prop === "example") {
         const setter: ExampleSetter<T> = (value) => {
           const data = unpack(target);
           data.examples.push(value); // instead of concat, for handling array examples
-          return withMeta(pack(target, data));
+          return internal(pack(target, data));
         };
         return setter;
       }
       if (prop === "describe") {
         return (description: string) => {
           const fallback = { ...unpack(target), description };
-          return withMeta(pack(target, validate(description, fallback)));
+          return internal(pack(target, validate(description, fallback)));
         };
       }
       return Reflect.get(target, prop, target);
@@ -81,6 +81,9 @@ export const withMeta = <T extends z.ZodTypeAny>(subject: T) =>
     has: (target, prop: string) =>
       prop === "example" ? true : Reflect.has(target, prop),
   });
+
+export const withMeta = <T extends z.ZodTypeAny>(subject: T) =>
+  internal(pack(subject, unpack(subject)));
 
 export const getMeta = <T extends z.ZodTypeAny, K extends keyof Metadata<T>>(
   subject: T,
@@ -98,5 +101,5 @@ export const copyMeta = <A extends z.ZodTypeAny, B extends z.ZodTypeAny>(
       ? mergeDeepRight({ ...destExample }, { ...srcExample })
       : srcExample; // not supposed to be called on non-object schemas
   const examples = combinations(destExamples, srcExamples, merge);
-  return withMeta(pack(dest, { ...restMeta, examples }));
+  return internal(pack(dest, { ...restMeta, examples }));
 };
