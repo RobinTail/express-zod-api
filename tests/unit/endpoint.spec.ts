@@ -298,7 +298,7 @@ describe("Endpoint", () => {
           something: z.number(),
         });
         const output = z.object({
-          something: z.number(),
+          anything: z.number(),
         });
         const endpoint = factory.build({
           method: "get",
@@ -306,9 +306,11 @@ describe("Endpoint", () => {
           output,
           handler: vi.fn(),
         });
-        expect((endpoint as AbstractEndpoint).getSchema(variant)).toEqual(
-          variant === "input" ? input : output,
-        );
+        expect(
+          serializeSchemaForTest(
+            (endpoint as AbstractEndpoint).getSchema(variant),
+          ),
+        ).toEqual(serializeSchemaForTest(variant === "input" ? input : output));
       },
     );
 
