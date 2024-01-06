@@ -14,12 +14,6 @@ export interface Metadata<T extends z.ZodTypeAny> {
 
 const initialData = { examples: [] } satisfies Metadata<z.ZodTypeAny>;
 
-const validate = <T extends z.ZodTypeAny>(
-  meta: unknown,
-  fallback: Metadata<T>,
-): Metadata<T> =>
-  metaSchema.safeParse(meta).success ? (meta as Metadata<T>) : fallback;
-
 const reviver = ({}: string, value: string) => {
   const parsed = z
     .string()
@@ -32,15 +26,28 @@ const reviver = ({}: string, value: string) => {
   return value;
 };
 
-const unpack = <T extends z.ZodTypeAny>(subject: T): Metadata<T> => {
+const validate = <T extends z.ZodTypeAny>(
+  description: string | undefined,
+  fallback: Metadata<T>,
+): Metadata<T> => {
+  if (!description) {
+    return fallback;
+  }
   try {
-    return subject.description
-      ? validate(JSON.parse(subject.description, reviver), initialData)
-      : initialData;
+    const json = JSON.parse(description, reviver);
+    return metaSchema.safeParse(json).success
+      ? (json as Metadata<T>)
+      : fallback;
   } catch {
-    return { ...initialData, description: subject.description };
+    return fallback;
   }
 };
+
+const unpack = <T extends z.ZodTypeAny>(subject: T): Metadata<T> =>
+  validate(subject.description, {
+    ...initialData,
+    description: subject.description,
+  });
 
 const pack = <T extends z.ZodTypeAny>(subject: T, data: Metadata<T>) =>
   subject.describe(JSON.stringify(data)); // also makes a copy
@@ -63,6 +70,12 @@ export const withMeta = <T extends z.ZodTypeAny>(subject: T) =>
           return withMeta(pack(target, data));
         };
         return setter;
+      }
+      if (prop === "describe") {
+        return (description: string) => {
+          const fallback = { ...unpack(target), description };
+          return withMeta(pack(target, validate(description, fallback)));
+        };
       }
       return Reflect.get(target, prop, target);
     },

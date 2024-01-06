@@ -67,6 +67,7 @@ describe("Metadata", () => {
       expect(describedSchema.description).toBe(
         '{"examples":["test"],"description":"some string"}',
       );
+      expect(describedSchema).toHaveProperty("example"); // and also remain being proxy
     });
   });
 
