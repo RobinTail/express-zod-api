@@ -1,6 +1,6 @@
-import { clone, mergeDeepRight } from "ramda";
-import { z } from "zod";
 import { combinations } from "./common-helpers";
+import { z } from "zod";
+import { clone, mergeDeepRight } from "ramda";
 
 export interface Metadata<T extends z.ZodTypeAny> {
   examples: z.input<T>[];
