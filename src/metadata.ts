@@ -46,10 +46,9 @@ export const withMeta = <T extends z.ZodTypeAny>(subject: T) =>
     get: (target, prop) => {
       if (prop === "example") {
         const setter: ExampleSetter<T> = (value) => {
-          const current = unpack(target);
-          const { examples } = current;
-          examples.push(value); // instead of concat, for handling array examples
-          return withMeta(pack(target, { ...current, examples }));
+          const data = unpack(target);
+          data.examples.push(value); // instead of concat, for handling array examples
+          return withMeta(pack(target, data));
         };
         return setter;
       }
