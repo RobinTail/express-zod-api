@@ -1,79 +1,82 @@
-import { combinations } from "./common-helpers";
+import { mergeDeepRight } from "ramda";
 import { z } from "zod";
-import { clone, mergeDeepRight } from "ramda";
+import { combinations } from "./common-helpers";
+
+const metaSchema = z.object({
+  description: z.string().optional(),
+  examples: z.any().array(),
+});
 
 export interface Metadata<T extends z.ZodTypeAny> {
+  description?: string;
   examples: z.input<T>[];
 }
 
-type MetaKey = keyof Metadata<z.ZodTypeAny>;
-type MetaValue<T extends z.ZodTypeAny, K extends MetaKey> = Readonly<
-  Metadata<T>[K]
->;
+const initialData = { examples: [] } satisfies Metadata<z.ZodTypeAny>;
 
-export const metaProp = "expressZodApiMeta";
-type MetaProp = typeof metaProp;
-export type MetaDef<T extends z.ZodTypeAny> = Record<MetaProp, Metadata<T>>;
+const validate = <T extends z.ZodTypeAny>(
+  meta: unknown,
+  fallback: Metadata<T>,
+): Metadata<T> =>
+  metaSchema.safeParse(meta).success ? (meta as Metadata<T>) : fallback;
+
+const unpack = <T extends z.ZodTypeAny>(subject: T): Metadata<T> => {
+  try {
+    return subject.description
+      ? validate(JSON.parse(subject.description), initialData)
+      : initialData;
+  } catch {
+    return { ...initialData, description: subject.description };
+  }
+};
+
+const pack = <T extends z.ZodTypeAny>(subject: T, data: Metadata<T>) =>
+  subject.describe(JSON.stringify(data)); // also makes a copy
 
 type ExampleSetter<T extends z.ZodTypeAny> = (
   example: z.input<T>,
 ) => WithMeta<T>;
 
 type WithMeta<T extends z.ZodTypeAny> = T & {
-  _def: T["_def"] & MetaDef<T>;
   example: ExampleSetter<T>;
 };
 
-/** @desc it's the same approach as in zod's .describe() */
-const cloneSchemaForMeta = <T extends z.ZodTypeAny>(schema: T): WithMeta<T> => {
-  const This = (schema as any).constructor;
-  const def = clone(schema._def) as MetaDef<T>;
-  def[metaProp] = def[metaProp] || ({ examples: [] } satisfies Metadata<T>);
-  return new This(def) as WithMeta<T>;
-};
-
-export const withMeta = <T extends z.ZodTypeAny>(schema: T): WithMeta<T> => {
-  const copy = cloneSchemaForMeta(schema);
-  Object.defineProperties(copy, {
-    example: {
-      get: (): ExampleSetter<T> => (value) => {
-        const localCopy = withMeta<T>(copy);
-        (localCopy._def[metaProp] as Metadata<T>).examples.push(value);
-        return localCopy;
-      },
+export const withMeta = <T extends z.ZodTypeAny>(subject: T) =>
+  new Proxy(pack(subject, unpack(subject)) as WithMeta<T>, {
+    get: (target, prop) => {
+      if (prop === "example") {
+        const setter: ExampleSetter<T> = (value) => {
+          const current = unpack(target);
+          return withMeta(
+            pack(target, {
+              ...current,
+              examples: current.examples.concat(value),
+            }),
+          );
+        };
+        return setter;
+      }
+      return Reflect.get(target, prop, target);
     },
+    has: (target, prop: string) =>
+      prop === "example" ? true : Reflect.has(target, prop),
   });
-  return copy;
-};
 
-export const hasMeta = <T extends z.ZodTypeAny>(
-  schema: T,
-): schema is WithMeta<T> =>
-  metaProp in schema._def &&
-  typeof schema._def[metaProp] === "object" &&
-  schema._def[metaProp] !== null;
-
-export const getMeta = <T extends z.ZodTypeAny, K extends MetaKey>(
-  schema: T,
+export const getMeta = <T extends z.ZodTypeAny, K extends keyof Metadata<T>>(
+  subject: T,
   meta: K,
-): MetaValue<T, K> | undefined =>
-  hasMeta(schema) ? schema._def[metaProp][meta] : undefined;
+): Metadata<T>[K] => unpack(subject)[meta];
 
 export const copyMeta = <A extends z.ZodTypeAny, B extends z.ZodTypeAny>(
   src: A,
   dest: B,
-): B | WithMeta<B> => {
-  if (!hasMeta(src)) {
-    return dest;
-  }
-  const result = withMeta(dest);
-  result._def[metaProp].examples = combinations(
-    result._def[metaProp].examples,
-    src._def[metaProp].examples,
-    ([destExample, srcExample]) =>
-      typeof destExample === "object" && typeof srcExample === "object"
-        ? mergeDeepRight({ ...destExample }, { ...srcExample })
-        : srcExample, // not supposed to be called on non-object schemas
-  );
-  return result;
+): WithMeta<B> => {
+  const destExamples = getMeta(dest, "examples");
+  const srcExamples = getMeta(src, "examples");
+  const merge = ([destExample, srcExample]: [unknown, unknown]) =>
+    typeof destExample === "object" && typeof srcExample === "object"
+      ? mergeDeepRight({ ...destExample }, { ...srcExample })
+      : srcExample; // not supposed to be called on non-object schemas
+  const examples = combinations(destExamples, srcExamples, merge);
+  return withMeta(pack(dest, { ...unpack(dest), examples }));
 };

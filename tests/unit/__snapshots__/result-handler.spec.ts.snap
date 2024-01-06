@@ -29,23 +29,17 @@ exports[`ResultHandler > 'arrayResultHandler' > Should handle schema error 1`] =
 `;
 
 exports[`ResultHandler > 'arrayResultHandler' > should forward output schema examples 1`] = `
-{
-  "examples": [
-    [
-      "One",
-      "Two",
-      "Three",
-    ],
-  ],
-}
+[
+  "One",
+  "Two",
+  "Three",
+]
 `;
 
 exports[`ResultHandler > 'arrayResultHandler' > should generate negative response example 1`] = `
-{
-  "examples": [
-    "Sample error message",
-  ],
-}
+[
+  "Sample error message",
+]
 `;
 
 exports[`ResultHandler > 'defaultResultHandler' > Should handle HTTP error 1`] = `
@@ -98,34 +92,30 @@ exports[`ResultHandler > 'defaultResultHandler' > Should handle schema error 1`]
 `;
 
 exports[`ResultHandler > 'defaultResultHandler' > should forward output schema examples 1`] = `
-{
-  "examples": [
-    {
-      "data": {
-        "items": [
-          "One",
-          "Two",
-          "Three",
-        ],
-        "str": "test",
-      },
-      "status": "success",
+[
+  {
+    "data": {
+      "items": [
+        "One",
+        "Two",
+        "Three",
+      ],
+      "str": "test",
     },
-  ],
-}
+    "status": "success",
+  },
+]
 `;
 
 exports[`ResultHandler > 'defaultResultHandler' > should generate negative response example 1`] = `
-{
-  "examples": [
-    {
-      "error": {
-        "message": "Sample error message",
-      },
-      "status": "error",
+[
+  {
+    "error": {
+      "message": "Sample error message",
     },
-  ],
-}
+    "status": "error",
+  },
+]
 `;
 
 exports[`ResultHandler > arrayResultHandler should fail when there is no items prop in the output 1`] = `

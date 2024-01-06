@@ -1,12 +1,5 @@
 import { z } from "zod";
-import { withMeta } from "../../src";
-import {
-  MetaDef,
-  copyMeta,
-  getMeta,
-  hasMeta,
-  metaProp,
-} from "../../src/metadata";
+import { copyMeta, getMeta, withMeta } from "../../src/metadata";
 import { describe, expect, test } from "vitest";
 
 describe("Metadata", () => {
@@ -15,11 +8,7 @@ describe("Metadata", () => {
       const schema = z.string();
       const schemaWithMeta = withMeta(schema);
       expect(schemaWithMeta).toBeInstanceOf(z.ZodString);
-      expect(metaProp).toBe("expressZodApiMeta");
-      expect(schemaWithMeta._def).toHaveProperty(metaProp);
-      const { expressZodApiMeta, ...rest } = schemaWithMeta._def;
-      expect(rest).toEqual(schema._def);
-      expect(expressZodApiMeta).toEqual({ examples: [] });
+      expect(schemaWithMeta.description).toBe('{"examples":[]}');
     });
 
     test("should provide example() method", () => {
@@ -32,17 +21,14 @@ describe("Metadata", () => {
     test("example() should set the corresponding metadata in the schema definition", () => {
       const schema = z.string();
       const schemaWithMeta = withMeta(schema).example("test");
-      expect(schemaWithMeta._def.expressZodApiMeta).toHaveProperty("examples");
-      expect(schemaWithMeta._def.expressZodApiMeta.examples).toEqual(["test"]);
+      expect(schemaWithMeta.description).toBe('{"examples":["test"]}');
     });
 
     test("Issue 827: example() should be immutable", () => {
       const schemaWithMeta = withMeta(z.string());
       const schemaWithExample = schemaWithMeta.example("test");
-      expect(schemaWithExample._def.expressZodApiMeta.examples).toEqual([
-        "test",
-      ]);
-      expect(schemaWithMeta._def.expressZodApiMeta.examples).toEqual([]);
+      expect(schemaWithExample.description).toBe('{"examples":["test"]}');
+      expect(schemaWithMeta.description).toBe('{"examples":[]}');
     });
 
     test("example() can set multiple examples", () => {
@@ -51,67 +37,39 @@ describe("Metadata", () => {
         .example("test1")
         .example("test2")
         .example("test3");
-      expect(schemaWithMeta._def.expressZodApiMeta.examples).toEqual([
-        "test1",
-        "test2",
-        "test3",
-      ]);
+      expect(schemaWithMeta.description).toBe(
+        '{"examples":["test1","test2","test3"]}',
+      );
     });
 
     test("metadata should withstand refinements", () => {
       const schema = z.string();
       const schemaWithMeta = withMeta(schema).example("test");
-      expect(schemaWithMeta._def.expressZodApiMeta.examples).toEqual(["test"]);
-      expect(
-        (
-          schemaWithMeta.email()._def as unknown as MetaDef<
-            typeof schemaWithMeta
-          >
-        ).expressZodApiMeta.examples,
-      ).toEqual(["test"]);
+      expect(schemaWithMeta.description).toBe('{"examples":["test"]}');
+      expect(schemaWithMeta.email().description).toBe('{"examples":["test"]}');
     });
 
     test("metadata should withstand double withMeta()", () => {
       const schema = z.string();
       const schemaWithMeta = withMeta(schema).example("test");
-      expect(withMeta(schemaWithMeta)._def.expressZodApiMeta.examples).toEqual([
-        "test",
-      ]);
-      expect(
-        withMeta(schemaWithMeta).example("another")._def.expressZodApiMeta
-          .examples,
-      ).toEqual(["test", "another"]);
-    });
-  });
-
-  describe("hasMeta()", () => {
-    test("should return false if the schema definition has no meta prop", () => {
-      expect(hasMeta(z.string())).toBeFalsy();
-    });
-    test("should return false if the meta prop has invalid type", () => {
-      const schema1 = z.string();
-      const schema2 = z.string();
-      Object.defineProperty(schema1._def, metaProp, { value: null });
-      expect(hasMeta(schema1)).toBeFalsy();
-      Object.defineProperty(schema2._def, metaProp, { value: 123 });
-      expect(hasMeta(schema2)).toBeFalsy();
-    });
-    test("should return true if withMeta() has been used", () => {
-      expect(hasMeta(withMeta(z.string()))).toBeTruthy();
+      expect(withMeta(schemaWithMeta).description).toBe(
+        '{"examples":["test"]}',
+      );
+      expect(withMeta(schemaWithMeta).example("another").description).toBe(
+        '{"examples":["test","another"]}',
+      );
     });
   });
 
   describe("getMeta()", () => {
-    test("should return undefined on a regular Zod schema or the malformed one", () => {
-      expect(getMeta(z.string(), "examples")).toBeUndefined();
+    test("should return initial value on a regular Zod schema", () => {
+      expect(getMeta(z.string(), "examples")).toEqual([]);
     });
-    test("should return undefined on malformed schema", () => {
-      const schema1 = z.string();
-      const schema2 = z.string();
-      Object.defineProperty(schema1._def, metaProp, { value: null });
-      expect(getMeta(schema1, "examples")).toBeUndefined();
-      Object.defineProperty(schema2._def, metaProp, { value: 123 });
-      expect(getMeta(schema2, "examples")).toBeUndefined();
+    test("should return initial value on malformed schema", () => {
+      const schema1 = z.string().describe(JSON.stringify(null));
+      const schema2 = z.string().describe(JSON.stringify(123));
+      expect(getMeta(schema1, "examples")).toEqual([]);
+      expect(getMeta(schema2, "examples")).toEqual([]);
     });
     test("should return initial value if the value not set", () => {
       expect(getMeta(withMeta(z.string()), "examples")).toEqual([]);
@@ -133,19 +91,18 @@ describe("Metadata", () => {
   });
 
   describe("copyMeta()", () => {
-    test("should return the same dest schema in case src one has no meta", () => {
+    test("should return cloned dest schema with initial meta in case src one has no meta", () => {
       const src = z.string();
       const dest = z.number();
       const result = copyMeta(src, dest);
-      expect(result).toEqual(dest);
-      expect(hasMeta(result)).toBeFalsy();
-      expect(hasMeta(dest)).toBeFalsy();
+      expect(result._def.typeName).toBe(dest._def.typeName);
+      expect(result.description).toBe('{"examples":[]}');
+      expect(dest.description).toBeUndefined();
     });
     test("should copy meta from src to dest in case meta is defined", () => {
       const src = withMeta(z.string()).example("some");
       const dest = z.number();
       const result = copyMeta(src, dest);
-      expect(hasMeta(result)).toBeTruthy();
       expect(getMeta(result, "examples")).toEqual(getMeta(src, "examples"));
     });
 
@@ -176,7 +133,6 @@ describe("Metadata", () => {
           b: 789,
         });
       const result = copyMeta(src, dest);
-      expect(hasMeta(result)).toBeTruthy();
       expect(getMeta(result, "examples")).toEqual([
         { a: "some", b: 123 },
         { a: "another", b: 123 },
