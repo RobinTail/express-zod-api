@@ -74,10 +74,10 @@ const internal = <T extends z.ZodTypeAny>(subject: T): WithMeta<T> =>
           return internal(pack(target, validate(description, fallback)));
         }) satisfies T["describe"];
       }
-      return Reflect.get(target, prop, target);
+      return Reflect.get(target, prop);
     },
     has: (target, prop: string) =>
-      prop === "example" ? true : Reflect.has(target, prop),
+      prop === "example" || Reflect.has(target, prop),
   });
 
 export const withMeta = <T extends z.ZodTypeAny>(subject: T) =>
