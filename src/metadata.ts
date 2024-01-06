@@ -7,15 +7,13 @@ export interface Metadata<T extends z.ZodTypeAny> {
 }
 
 export const metaProp = "expressZodApiMeta";
-type MetaProp = typeof metaProp;
-export type MetaDef<T extends z.ZodTypeAny> = Record<MetaProp, Metadata<T>>;
 
 type ExampleSetter<T extends z.ZodTypeAny> = (
   example: z.input<T>,
 ) => WithMeta<T>;
 
 type WithMeta<T extends z.ZodTypeAny> = T & {
-  _def: T["_def"] & MetaDef<T>;
+  _def: T["_def"] & Record<typeof metaProp, Metadata<T>>;
   example: ExampleSetter<T>;
 };
 
