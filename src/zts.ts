@@ -2,6 +2,7 @@ import ts from "typescript";
 import { z } from "zod";
 import { hasCoercion, tryToTransform } from "./common-helpers";
 import { ZodFile } from "./file-schema";
+import { getMeta } from "./metadata";
 import { HandlingRules, walkSchema } from "./schema-walker";
 import {
   LiteralType,
@@ -55,8 +56,9 @@ const onObject: Producer<z.ZodObject<z.ZodRawShape>> = ({
         : undefined,
       next({ schema: value }),
     );
-    if (value.description) {
-      addJsDocComment(propertySignature, value.description);
+    const description = getMeta(value, "description");
+    if (description) {
+      addJsDocComment(propertySignature, description);
     }
     return propertySignature;
   });
