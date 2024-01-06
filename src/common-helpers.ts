@@ -146,7 +146,7 @@ export const getExamples = <
    * */
   validate?: boolean;
 }): ReadonlyArray<V extends "parsed" ? z.output<T> : z.input<T>> => {
-  const examples = getMeta(schema, "examples") || [];
+  const examples = getMeta(schema, "examples");
   if (!validate && variant === "original") {
     return examples;
   }
