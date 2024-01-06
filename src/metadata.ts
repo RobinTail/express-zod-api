@@ -24,16 +24,14 @@ type WithMeta<T extends z.ZodTypeAny> = T & {
   example: ExampleSetter<T>;
 };
 
-/** @desc it's the same approach as in zod's .describe() */
-const cloneSchemaForMeta = <T extends z.ZodTypeAny>(schema: T): WithMeta<T> => {
-  const This = (schema as any).constructor;
-  const def = clone(schema._def) as MetaDef<T>;
-  def[metaProp] = def[metaProp] || ({ examples: [] } satisfies Metadata<T>);
-  return new This(def) as WithMeta<T>;
-};
+/** @link https://github.com/colinhacks/zod/blob/3e4f71e857e75da722bd7e735b6d657a70682df2/src/types.ts#L485 */
+const cloneSchema = <T extends z.ZodTypeAny>(schema: T) =>
+  schema.describe(schema.description as string);
 
 export const withMeta = <T extends z.ZodTypeAny>(schema: T): WithMeta<T> => {
-  const copy = cloneSchemaForMeta(schema);
+  const copy = cloneSchema(schema) as WithMeta<T>;
+  copy._def[metaProp] = // clone for deep copy, issue #827
+    clone(copy._def[metaProp]) || ({ examples: [] } satisfies Metadata<T>);
   Object.defineProperties(copy, {
     example: {
       get: (): ExampleSetter<T> => (value) => {
