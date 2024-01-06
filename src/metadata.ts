@@ -30,11 +30,8 @@ const validate = <T extends z.ZodTypeAny>(
   description: string | undefined,
   fallback: Metadata<T>,
 ): Metadata<T> => {
-  if (!description) {
-    return initialData;
-  }
   try {
-    const json = JSON.parse(description, reviver);
+    const json = JSON.parse(description || "", reviver);
     metaSchema.parse(json);
     return json as Metadata<T>;
   } catch {
