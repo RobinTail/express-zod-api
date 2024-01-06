@@ -59,6 +59,15 @@ describe("Metadata", () => {
         '{"examples":["test","another"]}',
       );
     });
+
+    test("metadata should withstand calling describe() by consumer", () => {
+      const schema = withMeta(z.string()).example("test");
+      const describedSchema = schema.describe("some string");
+      expect(schema.description).toBe('{"examples":["test"]}');
+      expect(describedSchema.description).toBe(
+        '{"examples":["test"],"description":"some string"}',
+      );
+    });
   });
 
   describe("getMeta()", () => {
