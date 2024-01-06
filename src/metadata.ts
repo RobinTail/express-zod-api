@@ -32,19 +32,19 @@ const cloneSchemaForMeta = <T extends z.ZodTypeAny>(schema: T): WithMeta<T> => {
   return new This(def) as WithMeta<T>;
 };
 
-export const withMeta = <T extends z.ZodTypeAny>(schema: T): WithMeta<T> => {
-  const copy = cloneSchemaForMeta(schema);
-  Object.defineProperties(copy, {
-    example: {
-      get: (): ExampleSetter<T> => (value) => {
-        const localCopy = withMeta<T>(copy);
-        (localCopy._def[metaProp] as Metadata<T>).examples.push(value);
-        return localCopy;
-      },
-    },
+export const withMeta = <T extends z.ZodTypeAny>(schema: T): WithMeta<T> =>
+  new Proxy(cloneSchemaForMeta(schema), {
+    get: (target, prop) =>
+      prop === "example"
+        ? (value: z.input<T>) => {
+            const copy = withMeta(target);
+            copy._def[metaProp].examples.push(value);
+            return copy;
+          }
+        : Reflect.get(target, prop, target),
+    has: (target, prop) =>
+      prop === "example" ? true : Reflect.has(target, prop),
   });
-  return copy;
-};
 
 export const hasMeta = <T extends z.ZodTypeAny>(
   schema: T,
