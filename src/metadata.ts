@@ -32,7 +32,7 @@ export const withMeta = <T extends z.ZodTypeAny>(schema: T): WithMeta<T> => {
   const copy = cloneSchema(schema) as WithMeta<T>;
   copy._def[metaProp] = // clone for deep copy, issue #827
     clone(copy._def[metaProp]) || ({ examples: [] } satisfies Metadata<T>);
-  Object.defineProperties(copy, {
+  return Object.defineProperties(copy, {
     example: {
       get: (): ExampleSetter<T> => (value) => {
         const localCopy = withMeta<T>(copy);
@@ -41,7 +41,6 @@ export const withMeta = <T extends z.ZodTypeAny>(schema: T): WithMeta<T> => {
       },
     },
   });
-  return copy;
 };
 
 export const hasMeta = <T extends z.ZodTypeAny>(
