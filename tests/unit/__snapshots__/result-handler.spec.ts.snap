@@ -30,9 +30,11 @@ exports[`ResultHandler > 'arrayResultHandler' > Should handle schema error 1`] =
 
 exports[`ResultHandler > 'arrayResultHandler' > should forward output schema examples 1`] = `
 [
-  "One",
-  "Two",
-  "Three",
+  [
+    "One",
+    "Two",
+    "Three",
+  ],
 ]
 `;
 
