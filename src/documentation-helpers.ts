@@ -40,7 +40,7 @@ import {
   andToOr,
   mapLogicalContainer,
 } from "./logical-container";
-import { copyMeta } from "./metadata";
+import { copyMeta, getMeta } from "./metadata";
 import { Method } from "./method";
 import {
   HandlingRules,
@@ -780,7 +780,7 @@ export const onEach: Depicter<z.ZodTypeAny, "each"> = ({
   if (isReferenceObject(prev)) {
     return {};
   }
-  const { description } = schema;
+  const description = getMeta(schema, "description");
   const shouldAvoidParsing = schema instanceof z.ZodLazy;
   const hasTypePropertyInDepiction = prev.type !== undefined;
   const isResponseHavingCoercion = isResponse && hasCoercion(schema);
