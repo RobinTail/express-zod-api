@@ -20,7 +20,7 @@ import { InputValidationError, ez, withMeta } from "../../src";
 import { Request } from "express";
 import { z } from "zod";
 import { isProprietary } from "../../src/metadata";
-import { zodUploadKind } from "../../src/upload-schema";
+import { ezUploadKind } from "../../src/upload-schema";
 import { describe, expect, test } from "vitest";
 
 describe("Common Helpers", () => {
@@ -379,7 +379,7 @@ describe("Common Helpers", () => {
 
   describe("hasNestedSchema()", () => {
     const condition = (subject: z.ZodTypeAny) =>
-      isProprietary(subject, zodUploadKind);
+      isProprietary(subject, ezUploadKind);
     test("should return true for given argument satisfying condition", () => {
       expect(hasNestedSchema({ subject: ez.upload(), condition })).toBeTruthy();
     });

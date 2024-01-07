@@ -217,8 +217,9 @@ const producers: HandlingRules<ts.TypeNode, ZTSContext> = {
   ZodNumber: onPrimitive(ts.SyntaxKind.NumberKeyword),
   ZodBigInt: onPrimitive(ts.SyntaxKind.BigIntKeyword),
   ZodBoolean: onPrimitive(ts.SyntaxKind.BooleanKeyword),
-  ZodDateIn: onPrimitive(ts.SyntaxKind.StringKeyword),
-  ZodDateOut: onPrimitive(ts.SyntaxKind.StringKeyword),
+  ZodAny: onPrimitive(ts.SyntaxKind.AnyKeyword),
+  DateIn: onPrimitive(ts.SyntaxKind.StringKeyword),
+  DateOut: onPrimitive(ts.SyntaxKind.StringKeyword),
   ZodNull: onNull,
   ZodArray: onArray,
   ZodTuple: onTuple,
@@ -227,7 +228,6 @@ const producers: HandlingRules<ts.TypeNode, ZTSContext> = {
   ZodLiteral: onLiteral,
   ZodIntersection: onIntersection,
   ZodUnion: onSomeUnion,
-  ZodAny: onPrimitive(ts.SyntaxKind.AnyKeyword),
   ZodDefault: onDefault,
   ZodEnum: onEnum,
   ZodNativeEnum: onNativeEnum,
@@ -240,7 +240,7 @@ const producers: HandlingRules<ts.TypeNode, ZTSContext> = {
   ZodPipeline: onPipeline,
   ZodLazy: onLazy,
   ZodReadonly: onReadonly,
-  ZodFile: onFile,
+  File: onFile,
 };
 
 export const zodToTs = ({

@@ -3,11 +3,11 @@ import { z } from "zod";
 import { proprietary } from "./metadata";
 import { bufferSchema } from "./schema-helpers";
 
-export const zodUploadKind = "ZodUpload";
+export const ezUploadKind = "Upload";
 
 export const upload = () =>
   proprietary(
-    zodUploadKind,
+    ezUploadKind,
     z.custom<UploadedFile>(
       (subject) =>
         z

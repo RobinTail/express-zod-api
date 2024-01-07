@@ -1,10 +1,10 @@
 import { z } from "zod";
 import type { FlatObject } from "./common-helpers";
-import { zodDateInKind } from "./date-in-schema";
-import { zodDateOutKind } from "./date-out-schema";
-import { zodFileKind } from "./file-schema";
+import { ezDateInKind } from "./date-in-schema";
+import { ezDateOutKind } from "./date-out-schema";
+import { ezFileKind } from "./file-schema";
 import { getMeta } from "./metadata";
-import { zodUploadKind } from "./upload-schema";
+import { ezUploadKind } from "./upload-schema";
 
 export type HandlingVariant = "last" | "regular" | "each";
 
@@ -35,10 +35,10 @@ export type SchemaHandler<
 > = (params: SchemaHandlingProps<T, U, Context, Variant>) => U;
 
 type ProprietaryKinds =
-  | typeof zodFileKind
-  | typeof zodDateInKind
-  | typeof zodDateOutKind
-  | typeof zodUploadKind;
+  | typeof ezFileKind
+  | typeof ezDateInKind
+  | typeof ezDateOutKind
+  | typeof ezUploadKind;
 
 export type HandlingRules<U, Context extends FlatObject = {}> = Partial<
   Record<

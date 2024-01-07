@@ -10,8 +10,8 @@ import { AbstractLogger } from "./logger";
 import { getMeta, isProprietary } from "./metadata";
 import { AuxMethod, Method } from "./method";
 import { mimeMultipart } from "./mime";
-import { zodRawKind } from "./raw-schema";
-import { zodUploadKind } from "./upload-schema";
+import { ezRawKind } from "./raw-schema";
+import { ezUploadKind } from "./upload-schema";
 
 export type FlatObject = Record<string, unknown>;
 
@@ -229,13 +229,13 @@ export const hasNestedSchema = ({
 export const hasUpload = (subject: IOSchema) =>
   hasNestedSchema({
     subject,
-    condition: (schema) => isProprietary(schema, zodUploadKind),
+    condition: (schema) => isProprietary(schema, ezUploadKind),
   });
 
 export const hasRaw = (subject: IOSchema) =>
   hasNestedSchema({
     subject,
-    condition: (schema) => isProprietary(schema, zodRawKind),
+    condition: (schema) => isProprietary(schema, ezRawKind),
   });
 
 /**

@@ -2,7 +2,7 @@ import { z } from "zod";
 import { proprietary } from "./metadata";
 import { base64Regex, bufferSchema } from "./schema-helpers";
 
-export const zodFileKind = "ZodFile";
+export const ezFileKind = "File";
 
 type Narrowing = "string" | "buffer" | "base64" | "binary";
 
@@ -36,7 +36,7 @@ export function file(
 ) &
   typeof deprecatedMethods {
   const schema = proprietary(
-    zodFileKind,
+    ezFileKind,
     type === "buffer"
       ? bufferSchema
       : type === "base64"

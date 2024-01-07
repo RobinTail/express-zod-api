@@ -2,11 +2,11 @@ import { z } from "zod";
 import { proprietary } from "./metadata";
 import { isValidDate, isoDateRegex } from "./schema-helpers";
 
-export const zodDateInKind = "ZodDateIn";
+export const ezDateInKind = "DateIn";
 
 export const dateIn = () =>
   proprietary(
-    zodDateInKind,
+    ezDateInKind,
     z
       .string()
       .regex(isoDateRegex)

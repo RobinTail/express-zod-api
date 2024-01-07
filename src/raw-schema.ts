@@ -2,8 +2,8 @@ import { z } from "zod";
 import { file } from "./file-schema";
 import { proprietary } from "./metadata";
 
-export const zodRawKind = "ZodRaw";
+export const ezRawKind = "Raw";
 
 /** Shorthand for z.object({ raw: ez.file("buffer") }) */
 export const raw = () =>
-  proprietary(zodRawKind, z.object({ raw: file("buffer") }));
+  proprietary(ezRawKind, z.object({ raw: file("buffer") }));

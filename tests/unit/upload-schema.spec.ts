@@ -8,7 +8,7 @@ describe("ez.upload()", () => {
     test("should create an instance", () => {
       const schema = ez.upload();
       expect(schema).toBeInstanceOf(z.ZodEffects);
-      expect(getMeta(schema, "proprietaryKind")).toBe("ZodUpload");
+      expect(getMeta(schema, "proprietaryKind")).toBe("Upload");
     });
   });
 

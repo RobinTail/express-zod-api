@@ -2,11 +2,11 @@ import { z } from "zod";
 import { proprietary } from "./metadata";
 import { isValidDate } from "./schema-helpers";
 
-export const zodDateOutKind = "ZodDateOut";
+export const ezDateOutKind = "DateOut";
 
 export const dateOut = () =>
   proprietary(
-    zodDateOutKind,
+    ezDateOutKind,
     z
       .date()
       .refine(isValidDate)

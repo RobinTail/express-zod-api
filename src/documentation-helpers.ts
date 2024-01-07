@@ -767,10 +767,10 @@ export const depicters: HandlingRules<
   ZodPipeline: depictPipeline,
   ZodLazy: depictLazy,
   ZodReadonly: depictReadonly,
-  ZodFile: depictFile,
-  ZodUpload: depictUpload,
-  ZodDateOut: depictDateOut,
-  ZodDateIn: depictDateIn,
+  File: depictFile,
+  Upload: depictUpload,
+  DateOut: depictDateOut,
+  DateIn: depictDateIn,
 };
 
 export const onEach: Depicter<z.ZodTypeAny, "each"> = ({
