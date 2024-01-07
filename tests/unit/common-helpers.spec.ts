@@ -13,7 +13,6 @@ import {
   hasNestedSchema,
   hasTopLevelTransformingEffect,
   isCustomHeader,
-  isValidDate,
   makeCleanId,
   makeErrorFromAnything,
 } from "../../src/common-helpers";
@@ -331,29 +330,15 @@ describe("Common Helpers", () => {
 
   describe("combinations()", () => {
     test("should run callback on each combination of items from two arrays", () => {
-      expect(combinations([1, 2], [4, 5, 6])).toEqual({
-        type: "tuple",
-        value: [
-          [1, 4],
-          [1, 5],
-          [1, 6],
-          [2, 4],
-          [2, 5],
-          [2, 6],
-        ],
-      });
+      expect(combinations([1, 2], [4, 5, 6], ([a, b]) => a + b)).toEqual([
+        5, 6, 7, 6, 7, 8,
+      ]);
     });
 
     test("should handle one or two arrays are empty", () => {
-      expect(combinations([], [4, 5, 6])).toEqual({
-        type: "single",
-        value: [4, 5, 6],
-      });
-      expect(combinations([1, 2, 3], [])).toEqual({
-        type: "single",
-        value: [1, 2, 3],
-      });
-      expect(combinations([], [])).toEqual({ type: "single", value: [] });
+      expect(combinations([], [4, 5, 6], ([a, b]) => a + b)).toEqual([4, 5, 6]);
+      expect(combinations([1, 2, 3], [], ([a, b]) => a + b)).toEqual([1, 2, 3]);
+      expect(combinations<number>([], [], ([a, b]) => a + b)).toEqual([]);
     });
   });
 
@@ -431,21 +416,6 @@ describe("Common Helpers", () => {
           condition: (entry) => entry instanceof ZodUpload,
         }),
       ).toBeFalsy();
-    });
-  });
-
-  describe("isValidDate()", () => {
-    test("should accept valid date", () => {
-      expect(isValidDate(new Date())).toBeTruthy();
-      expect(isValidDate(new Date("2021-01-31"))).toBeTruthy();
-      expect(isValidDate(new Date("12.01.2022"))).toBeTruthy();
-      expect(isValidDate(new Date("01/22/2022"))).toBeTruthy();
-    });
-
-    test("should handle invalid date", () => {
-      expect(isValidDate(new Date("2021-01-32"))).toBeFalsy();
-      expect(isValidDate(new Date("22/01/2022"))).toBeFalsy();
-      expect(isValidDate(new Date("2021-01-31T25:00:00.000Z"))).toBeFalsy();
     });
   });
 

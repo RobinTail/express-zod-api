@@ -3,6 +3,7 @@ import { expectType } from "tsd";
 import { z } from "zod";
 import * as entrypoint from "../../src";
 import {
+  ApiResponse,
   AppConfig,
   BasicSecurity,
   BearerSecurity,
@@ -28,7 +29,6 @@ import {
   ZodUploadDef,
 } from "../../src";
 import { describe, expect, test, vi } from "vitest";
-import { ApiResponse } from "../../src/api-response";
 
 describe("Index Entrypoint", () => {
   describe("exports", () => {

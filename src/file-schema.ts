@@ -8,7 +8,7 @@ import {
   ZodTypeDef,
   addIssueToContext,
 } from "zod";
-import { ErrMessage, errToObj } from "./common-helpers";
+import { ErrMessage, errToObj } from "./schema-helpers";
 
 const zodFileKind = "ZodFile";
 

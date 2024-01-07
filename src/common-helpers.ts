@@ -1,6 +1,7 @@
 import { Request } from "express";
 import { isHttpError } from "http-errors";
 import { createHash } from "node:crypto";
+import { xprod } from "ramda";
 import { z } from "zod";
 import { CommonConfig, InputSource, InputSources } from "./config-type";
 import { InputValidationError, OutputValidationError } from "./errors";
@@ -69,8 +70,6 @@ export const getInput = (
       {},
     );
 };
-
-export const isValidDate = (date: Date): boolean => !isNaN(date.getTime());
 
 export const makeErrorFromAnything = (subject: unknown): Error =>
   subject instanceof Error
@@ -164,24 +163,8 @@ export const getExamples = <
 export const combinations = <T>(
   a: T[],
   b: T[],
-): { type: "single"; value: T[] } | { type: "tuple"; value: [T, T][] } => {
-  if (a.length === 0) {
-    return { type: "single", value: b };
-  }
-  if (b.length === 0) {
-    return { type: "single", value: a };
-  }
-  const result: [T, T][] = [];
-  for (const itemA of a) {
-    for (const itemB of b) {
-      result.push([itemA, itemB]);
-    }
-  }
-  return { type: "tuple", value: result };
-};
-
-const reduceBool = (arr: boolean[]) =>
-  arr.reduce((carry, bool) => carry || bool, false);
+  merge: (pair: [T, T]) => T,
+): T[] => (a.length && b.length ? xprod(a, b).map(merge) : a.concat(b));
 
 export const hasTopLevelTransformingEffect = (schema: IOSchema): boolean => {
   if (schema instanceof z.ZodEffects) {
@@ -190,11 +173,11 @@ export const hasTopLevelTransformingEffect = (schema: IOSchema): boolean => {
     }
   }
   if (schema instanceof z.ZodUnion) {
-    return reduceBool(schema.options.map(hasTopLevelTransformingEffect));
+    return schema.options.some(hasTopLevelTransformingEffect);
   }
   if (schema instanceof z.ZodIntersection) {
-    return reduceBool(
-      [schema._def.left, schema._def.right].map(hasTopLevelTransformingEffect),
+    return [schema._def.left, schema._def.right].some(
+      hasTopLevelTransformingEffect,
     );
   }
   return false; // ZodObject left
@@ -219,24 +202,18 @@ export const hasNestedSchema = ({
   }
   const common = { condition, maxDepth, depth: depth + 1 };
   if (subject instanceof z.ZodObject) {
-    return reduceBool(
-      Object.values<z.ZodTypeAny>(subject.shape).map((entry) =>
-        hasNestedSchema({ subject: entry, ...common }),
-      ),
+    return Object.values<z.ZodTypeAny>(subject.shape).some((entry) =>
+      hasNestedSchema({ subject: entry, ...common }),
     );
   }
   if (subject instanceof z.ZodUnion) {
-    return reduceBool(
-      subject.options.map((entry: z.ZodTypeAny) =>
-        hasNestedSchema({ subject: entry, ...common }),
-      ),
+    return subject.options.some((entry: z.ZodTypeAny) =>
+      hasNestedSchema({ subject: entry, ...common }),
     );
   }
   if (subject instanceof z.ZodIntersection) {
-    return reduceBool(
-      [subject._def.left, subject._def.right].map((entry) =>
-        hasNestedSchema({ subject: entry, ...common }),
-      ),
+    return [subject._def.left, subject._def.right].some((entry) =>
+      hasNestedSchema({ subject: entry, ...common }),
     );
   }
   if (subject instanceof z.ZodOptional || subject instanceof z.ZodNullable) {
@@ -305,13 +282,3 @@ export const tryToTransform = <T>(
     return undefined;
   }
 };
-
-// obtaining the private helper type from Zod
-export type ErrMessage = Exclude<
-  Parameters<typeof z.ZodString.prototype.email>[0],
-  undefined
->;
-
-// the copy of the private Zod errorUtil.errToObj
-export const errToObj = (message: ErrMessage | undefined) =>
-  typeof message === "string" ? { message } : message || {};

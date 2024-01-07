@@ -9,5 +9,5 @@ export const upload = ZodUpload.create;
 export const dateIn = ZodDateIn.create;
 export const dateOut = ZodDateOut.create;
 
-/** Shorthand for z.object({ raw: z.file().buffer() }) */
+/** Shorthand for z.object({ raw: ez.file().buffer() }) */
 export const raw = () => z.object({ raw: ZodFile.create().buffer() });

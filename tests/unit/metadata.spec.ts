@@ -1,12 +1,6 @@
 import { z } from "zod";
 import { withMeta } from "../../src";
-import {
-  MetaDef,
-  copyMeta,
-  getMeta,
-  hasMeta,
-  metaProp,
-} from "../../src/metadata";
+import { copyMeta, getMeta, hasMeta, metaProp } from "../../src/metadata";
 import { describe, expect, test } from "vitest";
 
 describe("Metadata", () => {
@@ -62,13 +56,9 @@ describe("Metadata", () => {
       const schema = z.string();
       const schemaWithMeta = withMeta(schema).example("test");
       expect(schemaWithMeta._def.expressZodApiMeta.examples).toEqual(["test"]);
-      expect(
-        (
-          schemaWithMeta.email()._def as unknown as MetaDef<
-            typeof schemaWithMeta
-          >
-        ).expressZodApiMeta.examples,
-      ).toEqual(["test"]);
+      expect(schemaWithMeta.email()._def).toHaveProperty(metaProp, {
+        examples: ["test"],
+      });
     });
 
     test("metadata should withstand double withMeta()", () => {
@@ -150,31 +140,13 @@ describe("Metadata", () => {
     });
 
     test("should merge the meta from src to dest (deep merge)", () => {
-      const src = withMeta(
-        z.object({
-          a: z.string(),
-        }),
-      )
-        .example({
-          a: "some",
-        })
-        .example({
-          a: "another",
-        });
-      const dest = withMeta(
-        z.object({
-          b: z.number(),
-        }),
-      )
-        .example({
-          b: 123,
-        })
-        .example({
-          b: 456,
-        })
-        .example({
-          b: 789,
-        });
+      const src = withMeta(z.object({ a: z.string() }))
+        .example({ a: "some" })
+        .example({ a: "another" });
+      const dest = withMeta(z.object({ b: z.number() }))
+        .example({ b: 123 })
+        .example({ b: 456 })
+        .example({ b: 789 });
       const result = copyMeta(src, dest);
       expect(hasMeta(result)).toBeTruthy();
       expect(getMeta(result, "examples")).toEqual([

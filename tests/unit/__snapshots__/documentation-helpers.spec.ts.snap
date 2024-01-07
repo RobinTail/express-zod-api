@@ -42,12 +42,12 @@ exports[`Documentation helpers > depictCatch() > should pass next depicter 1`] =
 `;
 
 exports[`Documentation helpers > depictDate > should throw clear error 0 1`] = `
-[DocumentationError: Using z.date() within output schema is forbidden. Please use z.dateOut() instead. Check out the documentation for details.
+[DocumentationError: Using z.date() within output schema is forbidden. Please use ez.dateOut() instead. Check out the documentation for details.
 Caused by response schema of an Endpoint assigned to GET method of /v1/user/:id path.]
 `;
 
 exports[`Documentation helpers > depictDate > should throw clear error 1 1`] = `
-[DocumentationError: Using z.date() within input schema is forbidden. Please use z.dateIn() instead. Check out the documentation for details.
+[DocumentationError: Using z.date() within input schema is forbidden. Please use ez.dateIn() instead. Check out the documentation for details.
 Caused by input schema of an Endpoint assigned to GET method of /v1/user/:id path.]
 `;
 
@@ -64,7 +64,7 @@ exports[`Documentation helpers > depictDateIn > should set type:string, pattern 
 `;
 
 exports[`Documentation helpers > depictDateIn > should throw when ZodDateIn in response 1`] = `
-[DocumentationError: Please use z.dateOut() for output.
+[DocumentationError: Please use ez.dateOut() for output.
 Caused by response schema of an Endpoint assigned to GET method of /v1/user/:id path.]
 `;
 
@@ -80,7 +80,7 @@ exports[`Documentation helpers > depictDateOut > should set type:string, descrip
 `;
 
 exports[`Documentation helpers > depictDateOut > should throw when ZodDateOut in request 1`] = `
-[DocumentationError: Please use z.dateIn() for input.
+[DocumentationError: Please use ez.dateIn() for input.
 Caused by input schema of an Endpoint assigned to GET method of /v1/user/:id path.]
 `;
 
@@ -1104,7 +1104,7 @@ exports[`Documentation helpers > depictUpload() > should set format:binary and t
 `;
 
 exports[`Documentation helpers > depictUpload() > should throw when using in response 1`] = `
-[DocumentationError: Please use z.upload() only for input.
+[DocumentationError: Please use ez.upload() only for input.
 Caused by response schema of an Endpoint assigned to GET method of /v1/user/:id path.]
 `;
 
