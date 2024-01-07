@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { getMeta } from "../../src/metadata";
-import * as ez from "../../src/proprietary-schemas";
+import { ez } from "../../src";
 import { readFile } from "node:fs/promises";
 import { describe, expect, test } from "vitest";
 

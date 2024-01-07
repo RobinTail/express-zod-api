@@ -39,7 +39,7 @@ import {
 } from "./logical-container";
 import { copyMeta } from "./metadata";
 import { Method } from "./method";
-import * as ez from "./proprietary-schemas";
+import { ez } from "./proprietary-schemas";
 import { isoDateRegex } from "./schema-helpers";
 import {
   HandlingRules,

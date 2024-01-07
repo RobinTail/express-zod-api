@@ -32,7 +32,7 @@ import { mimeJson } from "./mime";
 import { loadPeer } from "./peer-helpers";
 import { Routing } from "./routing";
 import { walkRouting } from "./routing-walker";
-import * as ez from "./proprietary-schemas";
+import { ez } from "./proprietary-schemas";
 import { zodToTs } from "./zts";
 import { createTypeAlias, printNode } from "./zts-helpers";
 import type Prettier from "prettier";

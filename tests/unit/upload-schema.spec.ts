@@ -1,6 +1,6 @@
 import { getMeta } from "../../src/metadata";
 import { z } from "zod";
-import * as ez from "../../src/proprietary-schemas";
+import { ez } from "../../src";
 import { describe, expect, test, vi } from "vitest";
 
 describe("ez.upload()", () => {

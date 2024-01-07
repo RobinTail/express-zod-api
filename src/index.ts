@@ -32,7 +32,7 @@ export { withMeta } from "./metadata";
 export { testEndpoint } from "./testing";
 export { Integration } from "./integration";
 
-export * as ez from "./proprietary-schemas";
+export { ez } from "./proprietary-schemas";
 
 // Issues 952, 1182, 1269: Insufficient exports for consumer's declaration
 export type { MockOverrides } from "./testing";
