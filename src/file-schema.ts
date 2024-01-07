@@ -4,50 +4,28 @@ import { base64Regex, bufferSchema } from "./schema-helpers";
 
 export const ezFileKind = "File";
 
-type Narrowing = "string" | "buffer" | "base64" | "binary";
+// @todo remove this in v17
+const wrap = <T extends z.ZodTypeAny>(schema: T): T & Narrowings =>
+  // eslint-disable-next-line @typescript-eslint/no-use-before-define
+  Object.entries(narrowings).reduce(
+    (agg, [method, handler]) =>
+      Object.defineProperty(agg, method, { get: () => handler }),
+    proprietary(ezFileKind, schema),
+  ) as unknown as T & Narrowings;
 
-/** @todo remove in v17 */
-const deprecatedMethods = {
-  /* eslint-disable @typescript-eslint/no-use-before-define */
-  buffer: () => file("buffer"),
-  string: () => file("string"),
-  base64: () => file("base64"),
-  binary: () => file("binary"),
+const narrowings = {
+  buffer: () => wrap(bufferSchema),
+  string: () => wrap(z.string()),
+  binary: () => wrap(bufferSchema.or(z.string())),
+  base64: () =>
+    wrap(z.string().regex(base64Regex, "Does not match base64 encoding")),
 };
 
-export function file(
-  type?: "string" | "base64",
-): z.ZodString & typeof deprecatedMethods;
+type Narrowings = typeof narrowings;
+type Narrowing = keyof Narrowings;
 
-export function file(
-  type: "binary",
-): z.ZodUnion<[z.ZodType<Buffer>, z.ZodString]> & typeof deprecatedMethods;
-
-export function file(
-  type: "buffer",
-): z.ZodType<Buffer> & typeof deprecatedMethods;
-
-export function file(
-  type?: Narrowing,
-): (
-  | z.ZodString
-  | z.ZodType<Buffer>
-  | z.ZodUnion<[z.ZodType<Buffer>, z.ZodString]>
-) &
-  typeof deprecatedMethods {
-  const schema = proprietary(
-    ezFileKind,
-    type === "buffer"
-      ? bufferSchema
-      : type === "base64"
-        ? z.string().regex(base64Regex, "Does not match base64 encoding")
-        : type === "binary"
-          ? bufferSchema.or(z.string())
-          : z.string(),
-  );
-  /** @todo remove this hack in v17 */
-  for (const [method, handler] of Object.entries(deprecatedMethods)) {
-    Object.defineProperty(schema, method, { get: () => handler });
-  }
-  return schema as typeof schema & typeof deprecatedMethods;
+export function file(): ReturnType<Narrowings["string"]>;
+export function file<K extends Narrowing>(type: K): ReturnType<Narrowings[K]>;
+export function file<K extends Narrowing>(type?: K) {
+  return narrowings[type || "string"]();
 }
