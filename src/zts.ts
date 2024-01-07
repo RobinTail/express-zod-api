@@ -1,6 +1,7 @@
 import ts from "typescript";
 import { z } from "zod";
 import { hasCoercion, tryToTransform } from "./common-helpers";
+import { ez } from "./proprietary-schemas";
 import { HandlingRules, walkSchema } from "./schema-walker";
 import {
   LiteralType,
@@ -212,6 +213,9 @@ const onFile: Producer<z.ZodType> = ({ schema }) =>
     ? f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword)
     : f.createTypeReferenceNode("Buffer");
 
+const onRaw: Producer<z.ZodType> = ({ next }) =>
+  next({ schema: ez.file("buffer") });
+
 const producers: HandlingRules<ts.TypeNode, ZTSContext> = {
   ZodString: onPrimitive(ts.SyntaxKind.StringKeyword),
   ZodNumber: onPrimitive(ts.SyntaxKind.NumberKeyword),
@@ -241,6 +245,7 @@ const producers: HandlingRules<ts.TypeNode, ZTSContext> = {
   ZodLazy: onLazy,
   ZodReadonly: onReadonly,
   File: onFile,
+  Raw: onRaw,
 };
 
 export const zodToTs = ({

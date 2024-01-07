@@ -26,13 +26,12 @@ import {
   protectedReadonlyModifier,
   spacingMiddle,
 } from "./integration-helpers";
-import { defaultSerializer, hasRaw, makeCleanId } from "./common-helpers";
+import { defaultSerializer, makeCleanId } from "./common-helpers";
 import { Method, methods } from "./method";
 import { mimeJson } from "./mime";
 import { loadPeer } from "./peer-helpers";
 import { Routing } from "./routing";
 import { walkRouting } from "./routing-walker";
-import { ez } from "./proprietary-schemas";
 import { zodToTs } from "./zts";
 import { createTypeAlias, printNode } from "./zts-helpers";
 import type Prettier from "prettier";
@@ -159,7 +158,7 @@ export class Integration {
         const inputId = makeCleanId(method, path, "input");
         const input = zodToTs({
           ...commons,
-          schema: hasRaw(inputSchema) ? ez.file("buffer") : inputSchema,
+          schema: inputSchema,
           isResponse: false,
         });
         const positiveResponseId = splitResponse

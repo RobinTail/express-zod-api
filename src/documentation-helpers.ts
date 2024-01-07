@@ -22,7 +22,6 @@ import {
   FlatObject,
   getExamples,
   hasCoercion,
-  hasRaw,
   hasTopLevelTransformingEffect,
   isCustomHeader,
   makeCleanId,
@@ -588,6 +587,9 @@ export const depictLazy: Depicter<z.ZodLazy<z.ZodTypeAny>> = ({
   );
 };
 
+export const depictRaw: Depicter<z.ZodType> = ({ next }) =>
+  next({ schema: ez.file("buffer") });
+
 export const depictExamples = (
   schema: z.ZodTypeAny,
   isResponse: boolean,
@@ -771,6 +773,7 @@ export const depicters: HandlingRules<
   Upload: depictUpload,
   DateOut: depictDateOut,
   DateIn: depictDateIn,
+  Raw: depictRaw,
 };
 
 export const onEach: Depicter<z.ZodTypeAny, "each"> = ({
@@ -1049,7 +1052,7 @@ export const depictRequest = ({
   const bodyDepiction = excludeExamplesFromDepiction(
     excludeParamsFromDepiction(
       walkSchema({
-        schema: hasRaw(schema) ? ez.file("buffer") : schema,
+        schema,
         isResponse: false,
         rules: depicters,
         onEach,
