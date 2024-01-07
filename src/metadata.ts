@@ -4,8 +4,12 @@ import { clone, mergeDeepRight } from "ramda";
 import { ProprietaryKind } from "./proprietary-schemas";
 
 export interface Metadata<T extends z.ZodTypeAny> {
-  examples: z.input<T>[];
+  /**
+   * @todo if the following PR merged, use native branding instead:
+   * @link https://github.com/colinhacks/zod/pull/2860
+   * */
   proprietaryKind?: ProprietaryKind;
+  examples: z.input<T>[];
 }
 
 export const metaProp = "expressZodApiMeta";
