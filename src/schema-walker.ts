@@ -1,7 +1,7 @@
 import { z } from "zod";
 import type { FlatObject } from "./common-helpers";
 import { getMeta } from "./metadata";
-import { ProprietaryKinds } from "./proprietary-schemas";
+import { ProprietaryKind } from "./proprietary-schemas";
 
 export type HandlingVariant = "last" | "regular" | "each";
 
@@ -33,7 +33,7 @@ export type SchemaHandler<
 
 export type HandlingRules<U, Context extends FlatObject = {}> = Partial<
   Record<
-    z.ZodFirstPartyTypeKind | ProprietaryKinds,
+    z.ZodFirstPartyTypeKind | ProprietaryKind,
     SchemaHandler<any, U, Context> // keeping "any" here in order to avoid excessive complexity
   >
 >;

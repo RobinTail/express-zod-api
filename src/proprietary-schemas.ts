@@ -6,7 +6,7 @@ import { ezUploadKind, upload } from "./upload-schema";
 
 export const ez = { dateIn, dateOut, file, upload, raw };
 
-export type ProprietaryKinds =
+export type ProprietaryKind =
   | typeof ezFileKind
   | typeof ezDateInKind
   | typeof ezDateOutKind
