@@ -5,12 +5,12 @@ import { xprod } from "ramda";
 import { z } from "zod";
 import { CommonConfig, InputSource, InputSources } from "./config-type";
 import { InputValidationError, OutputValidationError } from "./errors";
-import { zodFileKind } from "./file-schema";
 import { IOSchema } from "./io-schema";
 import { AbstractLogger } from "./logger";
 import { getMeta, isProprietary } from "./metadata";
 import { AuxMethod, Method } from "./method";
 import { mimeMultipart } from "./mime";
+import { zodRawKind } from "./raw-schema";
 import { zodUploadKind } from "./upload-schema";
 
 export type FlatObject = Record<string, unknown>;
@@ -235,11 +235,7 @@ export const hasUpload = (subject: IOSchema) =>
 export const hasRaw = (subject: IOSchema) =>
   hasNestedSchema({
     subject,
-    condition: (schema) =>
-      schema instanceof z.ZodObject &&
-      "raw" in schema.shape &&
-      isProprietary(schema.shape.raw, zodFileKind) &&
-      !(schema.shape.raw instanceof z.ZodString),
+    condition: (schema) => isProprietary(schema, zodRawKind),
   });
 
 /**

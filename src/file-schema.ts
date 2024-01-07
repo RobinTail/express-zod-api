@@ -51,6 +51,3 @@ export function file(
   }
   return schema as typeof schema & typeof deprecatedMethods;
 }
-
-/** Shorthand for z.object({ raw: ez.file("buffer") }) */
-export const raw = () => z.object({ raw: file("buffer") });
