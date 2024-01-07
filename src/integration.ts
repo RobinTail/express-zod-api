@@ -154,11 +154,10 @@ export class Integration {
           makeAlias: this.makeAlias.bind(this),
           optionalPropStyle,
         };
-        const inputSchema = endpoint.getSchema("input");
         const inputId = makeCleanId(method, path, "input");
         const input = zodToTs({
           ...commons,
-          schema: inputSchema,
+          schema: endpoint.getSchema("input"),
           isResponse: false,
         });
         const positiveResponseId = splitResponse
