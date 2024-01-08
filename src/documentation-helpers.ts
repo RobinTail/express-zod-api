@@ -29,7 +29,10 @@ import {
   ucFirst,
 } from "./common-helpers";
 import { InputSource, TagsConfig } from "./config-type";
+import { ezDateInKind } from "./date-in-schema";
+import { ezDateOutKind } from "./date-out-schema";
 import { DocumentationError } from "./errors";
+import { ezFileKind } from "./file-schema";
 import { IOSchema } from "./io-schema";
 import {
   LogicalContainer,
@@ -39,6 +42,7 @@ import {
 import { copyMeta } from "./metadata";
 import { Method } from "./method";
 import { ez } from "./proprietary-schemas";
+import { ezRawKind } from "./raw-schema";
 import { isoDateRegex } from "./schema-helpers";
 import {
   HandlingRules,
@@ -47,6 +51,7 @@ import {
   walkSchema,
 } from "./schema-walker";
 import { Security } from "./security";
+import { ezUploadKind } from "./upload-schema";
 
 /* eslint-disable @typescript-eslint/no-use-before-define */
 
@@ -769,11 +774,11 @@ export const depicters: HandlingRules<
   ZodPipeline: depictPipeline,
   ZodLazy: depictLazy,
   ZodReadonly: depictReadonly,
-  File: depictFile,
-  Upload: depictUpload,
-  DateOut: depictDateOut,
-  DateIn: depictDateIn,
-  Raw: depictRaw,
+  [ezFileKind]: depictFile,
+  [ezUploadKind]: depictUpload,
+  [ezDateOutKind]: depictDateOut,
+  [ezDateInKind]: depictDateIn,
+  [ezRawKind]: depictRaw,
 };
 
 export const onEach: Depicter<z.ZodTypeAny, "each"> = ({
