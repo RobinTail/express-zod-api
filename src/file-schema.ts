@@ -5,13 +5,15 @@ import { base64Regex, bufferSchema } from "./schema-helpers";
 export const ezFileKind = "File";
 
 // @todo remove this in v17
-const wrap = <T extends z.ZodTypeAny>(schema: T): T & Narrowings =>
+const wrap = <T extends z.ZodTypeAny>(
+  schema: T,
+): ReturnType<typeof proprietary<T>> & Narrowings =>
   // eslint-disable-next-line @typescript-eslint/no-use-before-define
   Object.entries(narrowings).reduce(
     (agg, [method, handler]) =>
       Object.defineProperty(agg, method, { get: () => handler }),
     proprietary(ezFileKind, schema),
-  ) as unknown as T & Narrowings;
+  ) as ReturnType<typeof proprietary<T>> & Narrowings;
 
 const narrowings = {
   buffer: () => wrap(bufferSchema),
