@@ -2,6 +2,11 @@
 
 ## Version 15
 
+### 15.3.1
+
+- Cherry-picked fix from 16.2.2 for issue #1458 reported by [@elee1766](https://github.com/elee1766):
+  - `z.string()` having RegExp based refinements were incorrectly described by `Documentation` (`pattern` property).
+
 ### 15.3.0
 
 - Method `createConfig()` now supports express router as an `app` for using with `attachRouting()` method.
