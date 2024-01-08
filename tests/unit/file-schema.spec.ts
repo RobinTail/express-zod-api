@@ -1,3 +1,4 @@
+import { expectType } from "tsd";
 import { z } from "zod";
 import { getMeta } from "../../src/metadata";
 import { ez } from "../../src";
@@ -16,6 +17,7 @@ describe("ez.file()", () => {
       "should create a string file",
       (schema) => {
         expect(schema).toBeInstanceOf(z.ZodString);
+        expectType<string>(schema._output);
       },
     );
 
@@ -23,6 +25,7 @@ describe("ez.file()", () => {
       "should create a buffer file",
       (schema) => {
         expect(schema).toBeInstanceOf(z.ZodEffects);
+        expectType<Buffer>(schema._output);
       },
     );
 
@@ -30,6 +33,7 @@ describe("ez.file()", () => {
       "should create a binary file",
       (schema) => {
         expect(schema).toBeInstanceOf(z.ZodUnion);
+        expectType<Buffer | string>(schema._output);
       },
     );
 
@@ -37,6 +41,7 @@ describe("ez.file()", () => {
       "should create a base64 file",
       (schema) => {
         expect(schema).toBeInstanceOf(z.ZodString);
+        expectType<string>(schema._output);
       },
     );
   });
