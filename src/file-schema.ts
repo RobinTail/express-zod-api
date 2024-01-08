@@ -16,9 +16,13 @@ const wrap = <T extends z.ZodTypeAny>(
   ) as ReturnType<typeof proprietary<T>> & Narrowings;
 
 const narrowings = {
+  /** @deprecated use ez.file("buffer") instead */
   buffer: () => wrap(bufferSchema),
+  /** @deprecated use ez.file("string") instead */
   string: () => wrap(z.string()),
+  /** @deprecated use ez.file("binary") instead */
   binary: () => wrap(bufferSchema.or(z.string())),
+  /** @deprecated use ez.file("base64") instead */
   base64: () =>
     wrap(z.string().regex(base64Regex, "Does not match base64 encoding")),
 };
