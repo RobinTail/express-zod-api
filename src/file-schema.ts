@@ -7,15 +7,15 @@ export const ezFileKind = "File";
 // @todo remove this in v17
 const wrap = <T extends z.ZodTypeAny>(
   schema: T,
-): ReturnType<typeof proprietary<T>> & Narrowings =>
+): ReturnType<typeof proprietary<T>> & Variants =>
   // eslint-disable-next-line @typescript-eslint/no-use-before-define
-  Object.entries(narrowings).reduce(
+  Object.entries(variants).reduce(
     (agg, [method, handler]) =>
       Object.defineProperty(agg, method, { get: () => handler }),
     proprietary(ezFileKind, schema),
-  ) as ReturnType<typeof proprietary<T>> & Narrowings;
+  ) as ReturnType<typeof proprietary<T>> & Variants;
 
-const narrowings = {
+const variants = {
   /** @deprecated use ez.file("buffer") instead */
   buffer: () => wrap(bufferSchema),
   /** @deprecated use ez.file("string") instead */
@@ -27,11 +27,11 @@ const narrowings = {
     wrap(z.string().regex(base64Regex, "Does not match base64 encoding")),
 };
 
-type Narrowings = typeof narrowings;
-type Narrowing = keyof Narrowings;
+type Variants = typeof variants;
+type Variant = keyof Variants;
 
-export function file(): ReturnType<Narrowings["string"]>;
-export function file<K extends Narrowing>(type: K): ReturnType<Narrowings[K]>;
-export function file<K extends Narrowing>(type?: K) {
-  return narrowings[type || "string"]();
+export function file(): ReturnType<Variants["string"]>;
+export function file<K extends Variant>(variant: K): ReturnType<Variants[K]>;
+export function file<K extends Variant>(variant?: K) {
+  return variants[variant || "string"]();
 }
