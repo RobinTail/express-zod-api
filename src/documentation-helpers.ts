@@ -461,7 +461,7 @@ export const depictString: Depicter<z.ZodString> = ({
     result.maxLength = maxLength;
   }
   if (regex) {
-    result.pattern = `/${regex.source}/${regex.flags}`;
+    result.pattern = regex.source;
   }
   return result;
 };

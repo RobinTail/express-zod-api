@@ -1294,7 +1294,7 @@ paths:
           description: a numeric string containing the id of the user
           schema:
             type: string
-            pattern: /\\d+/
+            pattern: \\d+
             description: a numeric string containing the id of the user
   /v1/user/{id}:
     patch:
@@ -1599,7 +1599,7 @@ paths:
           description: GET /v1/avatar/send Parameter
           schema:
             type: string
-            pattern: /\\d+/
+            pattern: \\d+
   /v1/avatar/stream:
     get:
       operationId: GetV1AvatarStream
@@ -1628,7 +1628,7 @@ paths:
           description: GET /v1/avatar/stream Parameter
           schema:
             type: string
-            pattern: /\\d+/
+            pattern: \\d+
   /v1/avatar/upload:
     post:
       operationId: PostV1AvatarUpload
@@ -2106,7 +2106,7 @@ components:
   schemas:
     GetV1UserRetrieveParameterId:
       type: string
-      pattern: /\\d+/
+      pattern: \\d+
       description: a numeric string containing the id of the user
     2048581c137c5b2130eb860e3ae37da196dfc25b:
       type: array
@@ -2348,14 +2348,14 @@ components:
       type: string
     GetV1AvatarSendParameterUserId:
       type: string
-      pattern: /\\d+/
+      pattern: \\d+
     GetV1AvatarSendPositiveResponse:
       type: string
     GetV1AvatarSendNegativeResponse:
       type: string
     GetV1AvatarStreamParameterUserId:
       type: string
-      pattern: /\\d+/
+      pattern: \\d+
     GetV1AvatarStreamPositiveResponse:
       type: string
       format: binary
@@ -2996,13 +2996,13 @@ paths:
                   format: url
                 numeric:
                   type: string
-                  pattern: /\\d+/
+                  pattern: \\d+
                 combined:
                   type: string
                   format: email
                   minLength: 1
                   maxLength: 90
-                  pattern: /.*@example\\.com/is
+                  pattern: .*@example\\.com
               required:
                 - regular
                 - min
