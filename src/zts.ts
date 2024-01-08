@@ -4,8 +4,7 @@ import { hasCoercion, tryToTransform } from "./common-helpers";
 import { ezDateInKind } from "./date-in-schema";
 import { ezDateOutKind } from "./date-out-schema";
 import { ezFileKind } from "./file-schema";
-import { ez } from "./proprietary-schemas";
-import { ezRawKind } from "./raw-schema";
+import { RawSchema, ezRawKind } from "./raw-schema";
 import { HandlingRules, walkSchema } from "./schema-walker";
 import {
   LiteralType,
@@ -217,8 +216,8 @@ const onFile: Producer<z.ZodType> = ({ schema }) =>
     ? f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword)
     : f.createTypeReferenceNode("Buffer");
 
-const onRaw: Producer<z.ZodType> = ({ next }) =>
-  next({ schema: ez.file("buffer") });
+const onRaw: Producer<RawSchema> = ({ next, schema }) =>
+  next({ schema: schema.shape.raw });
 
 const producers: HandlingRules<ts.TypeNode, ZTSContext> = {
   ZodString: onPrimitive(ts.SyntaxKind.StringKeyword),

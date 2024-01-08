@@ -41,8 +41,7 @@ import {
 } from "./logical-container";
 import { copyMeta } from "./metadata";
 import { Method } from "./method";
-import { ez } from "./proprietary-schemas";
-import { ezRawKind } from "./raw-schema";
+import { RawSchema, ezRawKind } from "./raw-schema";
 import { isoDateRegex } from "./schema-helpers";
 import {
   HandlingRules,
@@ -592,8 +591,8 @@ export const depictLazy: Depicter<z.ZodLazy<z.ZodTypeAny>> = ({
   );
 };
 
-export const depictRaw: Depicter<z.ZodType> = ({ next }) =>
-  next({ schema: ez.file("buffer") });
+export const depictRaw: Depicter<RawSchema> = ({ next, schema }) =>
+  next({ schema: schema.shape.raw });
 
 export const depictExamples = (
   schema: z.ZodTypeAny,
