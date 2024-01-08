@@ -451,7 +451,7 @@ export const depictString: Depicter<z.ZodString> = ({
     ...(isEmoji && { format: "emoji" }),
     ...(minLength !== null && { minLength }),
     ...(maxLength !== null && { maxLength }),
-    ...(regex && { pattern: `/${regex.source}/${regex.flags}` }),
+    ...(regex && { pattern: regex.source }),
   };
 };
 
