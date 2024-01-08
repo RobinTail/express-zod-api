@@ -2,6 +2,11 @@
 
 ## Version 16
 
+### 16.2.1
+
+- Refactoring some methods involved in metadata and schema processing.
+- Fixed several messages of errors related to documenting proprietary schemas.
+
 ### 16.2.0
 
 - Notice: upgrading to this version, make sure you are NOT supplying type parameters to the `EndpointsFactory`:
