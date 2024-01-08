@@ -85,7 +85,7 @@ paths:
           description: a numeric string containing the id of the user
           schema:
             type: string
-            pattern: /\d+/
+            pattern: \d+
             description: a numeric string containing the id of the user
   /v1/user/{id}:
     patch:
@@ -390,7 +390,7 @@ paths:
           description: GET /v1/avatar/send Parameter
           schema:
             type: string
-            pattern: /\d+/
+            pattern: \d+
   /v1/avatar/stream:
     get:
       operationId: GetV1AvatarStream
@@ -419,7 +419,7 @@ paths:
           description: GET /v1/avatar/stream Parameter
           schema:
             type: string
-            pattern: /\d+/
+            pattern: \d+
   /v1/avatar/upload:
     post:
       operationId: PostV1AvatarUpload
