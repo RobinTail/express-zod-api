@@ -2,6 +2,11 @@
 
 ## Version 16
 
+### 16.2.2
+
+- Fixed issue #1458 reported by [@elee1766](https://github.com/elee1766):
+  - `z.string()` having RegExp based refinements were incorrectly described by `Documentation` (`pattern` property).
+
 ### 16.2.1
 
 - Refactoring some methods involved in metadata and schema processing.
