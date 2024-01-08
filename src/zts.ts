@@ -83,11 +83,6 @@ const onSomeUnion: Producer<
 > = ({ schema: { options }, next }) =>
   f.createUnionTypeNode(options.map((option) => next({ schema: option })));
 
-const onPrimitive =
-  (syntaxKind: ts.KeywordTypeSyntaxKind): Producer<z.ZodTypeAny> =>
-  () =>
-    f.createKeywordTypeNode(syntaxKind);
-
 const makeSample = (produced: ts.TypeNode) =>
   samples?.[produced.kind as keyof typeof samples];
 
@@ -171,6 +166,11 @@ const onIntersection: Producer<
 
 const onDefault: Producer<z.ZodDefault<z.ZodTypeAny>> = ({ next, schema }) =>
   next({ schema: schema._def.innerType });
+
+const onPrimitive =
+  (syntaxKind: ts.KeywordTypeSyntaxKind): Producer<z.ZodTypeAny> =>
+  () =>
+    f.createKeywordTypeNode(syntaxKind);
 
 const onBranded: Producer<
   z.ZodBranded<z.ZodTypeAny, string | number | symbol>
