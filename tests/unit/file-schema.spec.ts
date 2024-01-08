@@ -80,7 +80,7 @@ describe("ez.file()", () => {
     );
 
     test("should perform additional check for base64 file", () => {
-      const schema = ez.file("base64"); //.base64();
+      const schema = ez.file("base64");
       const result = schema.safeParse("~~~~");
       expect(result.success).toBeFalsy();
       if (!result.success) {
@@ -105,7 +105,7 @@ describe("ez.file()", () => {
     });
 
     test("should accept Buffer", () => {
-      const schema = ez.file("buffer"); //.buffer();
+      const schema = ez.file("buffer");
       const subject = Buffer.from("test", "utf-8");
       const result = schema.safeParse(subject);
       expect(result).toEqual({
@@ -115,7 +115,7 @@ describe("ez.file()", () => {
     });
 
     test("should accept binary read string", async () => {
-      const schema = ez.file("binary"); //.binary();
+      const schema = ez.file("binary");
       const data = await readFile("logo.svg", "binary");
       const result = schema.safeParse(data);
       expect(result).toEqual({
