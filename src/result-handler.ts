@@ -21,6 +21,8 @@ interface ResultHandlerParams<RES> {
   input: FlatObject | null;
   /** null in case of errors or failures */
   output: FlatObject | null;
+  /** null in case of errors or failures */
+  options: FlatObject | null;
   error: Error | null;
   request: Request;
   response: Response<RES>;

@@ -321,6 +321,7 @@ export class Endpoint<
     logger,
     input,
     output,
+    options,
   }: {
     error: Error | null;
     request: Request;
@@ -328,6 +329,7 @@ export class Endpoint<
     logger: AbstractLogger;
     input: FlatObject;
     output: FlatObject | null;
+    options: OPT | null;
   }) {
     try {
       await this.#resultHandler.handler({
@@ -337,6 +339,7 @@ export class Endpoint<
         response,
         logger,
         input,
+        options,
       });
     } catch (e) {
       lastResortHandler({
@@ -361,6 +364,7 @@ export class Endpoint<
     const method = getActualMethod(request);
     let output: FlatObject | null = null;
     let error: Error | null = null;
+    let options: OPT | null = null;
     if (config.cors) {
       let headers = this.#getDefaultCorsHeaders();
       if (typeof config.cors === "function") {
@@ -377,20 +381,21 @@ export class Endpoint<
     }
     const input = getInput(request, config.inputSources);
     try {
-      const { options, isStreamClosed } = await this.#runMiddlewares({
+      const outcome = await this.#runMiddlewares({
         method,
         input,
         request,
         response,
         logger,
       });
-      if (isStreamClosed) {
+      if (outcome.isStreamClosed) {
         return;
       }
       if (method === "options") {
         response.status(200).end();
         return;
       }
+      options = outcome.options;
       output = await this.#parseOutput(
         await this.#parseAndRunHandler({ input, options, logger }),
       );
@@ -404,6 +409,7 @@ export class Endpoint<
       response,
       error,
       logger,
+      options,
     });
   }
 }
