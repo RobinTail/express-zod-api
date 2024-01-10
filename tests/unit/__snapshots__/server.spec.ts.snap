@@ -4,6 +4,7 @@ exports[`Server > createNotFoundHandler() > the handler should call ResultHandle
 {
   "error": [NotFoundError: Can not POST /v1/test],
   "input": null,
+  "options": null,
   "output": null,
   "request": {
     "body": {

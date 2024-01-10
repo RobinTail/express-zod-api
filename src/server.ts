@@ -36,6 +36,7 @@ export const createParserFailureHandler =
       logger,
       input: null,
       output: null,
+      options: null,
     });
   };
 
@@ -57,6 +58,7 @@ export const createNotFoundHandler =
         error,
         input: null,
         output: null,
+        options: null,
       });
     } catch (e) {
       lastResortHandler({

@@ -51,6 +51,7 @@ describe("ResultHandler", () => {
           request: requestMock as unknown as Request,
           response: responseMock as unknown as Response,
           logger: loggerMock,
+          options: null,
         });
         expect(loggerMock.error).toHaveBeenCalledTimes(1);
         expect(loggerMock.error.mock.calls[0][0]).toMatch(
@@ -89,6 +90,7 @@ describe("ResultHandler", () => {
           request: requestMock as unknown as Request,
           response: responseMock as unknown as Response,
           logger: loggerMock,
+          options: null,
         });
         expect(loggerMock.error).toHaveBeenCalledTimes(0);
         expect(responseMock.status).toHaveBeenCalledWith(400);
@@ -106,6 +108,7 @@ describe("ResultHandler", () => {
           request: requestMock as unknown as Request,
           response: responseMock as unknown as Response,
           logger: loggerMock,
+          options: null,
         });
         expect(loggerMock.error).toHaveBeenCalledTimes(0);
         expect(responseMock.status).toHaveBeenCalledWith(404);
@@ -123,6 +126,7 @@ describe("ResultHandler", () => {
           request: requestMock as unknown as Request,
           response: responseMock as unknown as Response,
           logger: loggerMock,
+          options: {},
         });
         expect(loggerMock.error).toHaveBeenCalledTimes(0);
         expect(responseMock.status).toHaveBeenCalledWith(200);
@@ -168,6 +172,7 @@ describe("ResultHandler", () => {
       request: requestMock as unknown as Request,
       response: responseMock as unknown as Response,
       logger: loggerMock,
+      options: {},
     });
     expect(loggerMock.error).toHaveBeenCalledTimes(0);
     expect(responseMock.status).toHaveBeenCalledWith(500);
