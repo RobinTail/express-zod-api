@@ -372,6 +372,7 @@ describe("Routing", () => {
       initRouting({
         app: appMock as unknown as IRouter,
         logger: loggerMock,
+        getChildLogger: ({ logger }) => ({ ...logger, isChild: true }),
         config: configMock as CommonConfig,
         routing,
       });
@@ -404,7 +405,7 @@ describe("Routing", () => {
           test: 123,
         },
         options: {},
-        logger: loggerMock,
+        logger: { ...loggerMock, isChild: true },
       });
       expect(responseMock.status).toHaveBeenCalledWith(200);
       expect(responseMock.json).toHaveBeenCalledWith({
