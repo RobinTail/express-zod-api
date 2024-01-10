@@ -8,7 +8,7 @@ describe("ez.dateIn()", () => {
     test("should create an instance", () => {
       const schema = ez.dateIn();
       expect(schema).toBeInstanceOf(z.ZodPipeline);
-      expect(getMeta(schema, "proprietaryKind")).toEqual("DateIn");
+      expect(getMeta(schema, "kind")).toEqual("DateIn");
     });
   });
 

@@ -8,7 +8,7 @@ export interface Metadata<T extends z.ZodTypeAny> {
    * @todo if the following PR merged, use native branding instead:
    * @link https://github.com/colinhacks/zod/pull/2860
    * */
-  proprietaryKind?: ProprietaryKind;
+  kind?: ProprietaryKind;
   examples: z.input<T>[];
 }
 
@@ -77,9 +77,9 @@ export const proprietary = <T extends z.ZodTypeAny>(
   subject: T,
 ) => {
   const schema = withMeta(subject);
-  schema._def[metaProp].proprietaryKind = kind;
+  schema._def[metaProp].kind = kind;
   return schema;
 };
 
 export const isProprietary = (schema: z.ZodTypeAny, kind: ProprietaryKind) =>
-  getMeta(schema, "proprietaryKind") === kind;
+  getMeta(schema, "kind") === kind;

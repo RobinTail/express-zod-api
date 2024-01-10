@@ -10,7 +10,7 @@ describe("ez.file()", () => {
     test("should create an instance being string by default", () => {
       const schema = ez.file();
       expect(schema).toBeInstanceOf(z.ZodString);
-      expect(getMeta(schema, "proprietaryKind")).toBe("File");
+      expect(getMeta(schema, "kind")).toBe("File");
     });
 
     test.each([ez.file("string"), ez.file().string()])(
