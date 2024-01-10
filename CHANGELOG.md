@@ -2,6 +2,17 @@
 
 ## Version 16
 
+### 16.3.0
+
+- Switching to using native `zod` methods for proprietary schemas instead of custom classes (`ez` namespace):
+  - Each proprietary schema now relies on internal Metadata;
+  - Validation errors for `ez.file()` are changed slightly;
+  - The following refinements of `ez.file()` are deprecated and will be removed later:
+    - ~~`ez.file().string()`~~ — use `ez.file("string")` instead,
+    - ~~`ez.file().buffer()`~~ — use `ez.file("buffer")` instead,
+    - ~~`ez.file().base64()`~~ — use `ez.file("base64")` instead,
+    - ~~`ez.file().binary()`~~ — use `ez.file("binary")` instead.
+
 ### 16.2.2
 
 - Fixed issue #1458 reported by [@elee1766](https://github.com/elee1766):

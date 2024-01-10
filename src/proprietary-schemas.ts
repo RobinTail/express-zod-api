@@ -1,13 +1,14 @@
-import { z } from "zod";
-import { ZodDateIn } from "./date-in-schema";
-import { ZodDateOut } from "./date-out-schema";
-import { ZodFile } from "./file-schema";
-import { ZodUpload } from "./upload-schema";
+import { dateIn, ezDateInKind } from "./date-in-schema";
+import { dateOut, ezDateOutKind } from "./date-out-schema";
+import { ezFileKind, file } from "./file-schema";
+import { ezRawKind, raw } from "./raw-schema";
+import { ezUploadKind, upload } from "./upload-schema";
 
-export const file = ZodFile.create;
-export const upload = ZodUpload.create;
-export const dateIn = ZodDateIn.create;
-export const dateOut = ZodDateOut.create;
+export const ez = { dateIn, dateOut, file, upload, raw };
 
-/** Shorthand for z.object({ raw: ez.file().buffer() }) */
-export const raw = () => z.object({ raw: ZodFile.create().buffer() });
+export type ProprietaryKind =
+  | typeof ezFileKind
+  | typeof ezDateInKind
+  | typeof ezDateOutKind
+  | typeof ezUploadKind
+  | typeof ezRawKind;

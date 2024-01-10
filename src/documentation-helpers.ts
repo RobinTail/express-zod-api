@@ -22,7 +22,6 @@ import {
   FlatObject,
   getExamples,
   hasCoercion,
-  hasRaw,
   hasTopLevelTransformingEffect,
   isCustomHeader,
   makeCleanId,
@@ -30,10 +29,10 @@ import {
   ucFirst,
 } from "./common-helpers";
 import { InputSource, TagsConfig } from "./config-type";
-import { ZodDateIn, isoDateRegex } from "./date-in-schema";
-import { ZodDateOut } from "./date-out-schema";
+import { ezDateInKind } from "./date-in-schema";
+import { ezDateOutKind } from "./date-out-schema";
 import { DocumentationError } from "./errors";
-import { ZodFile } from "./file-schema";
+import { ezFileKind } from "./file-schema";
 import { IOSchema } from "./io-schema";
 import {
   LogicalContainer,
@@ -42,6 +41,8 @@ import {
 } from "./logical-container";
 import { copyMeta } from "./metadata";
 import { Method } from "./method";
+import { RawSchema, ezRawKind } from "./raw-schema";
+import { isoDateRegex } from "./schema-helpers";
 import {
   HandlingRules,
   HandlingVariant,
@@ -49,7 +50,7 @@ import {
   walkSchema,
 } from "./schema-walker";
 import { Security } from "./security";
-import { ZodUpload } from "./upload-schema";
+import { ezUploadKind } from "./upload-schema";
 
 /* eslint-disable @typescript-eslint/no-use-before-define */
 
@@ -130,7 +131,7 @@ export const depictAny: Depicter<z.ZodAny> = () => ({
   format: "any",
 });
 
-export const depictUpload: Depicter<ZodUpload> = (ctx) => {
+export const depictUpload: Depicter<z.ZodType> = (ctx) => {
   assert(
     !ctx.isResponse,
     new DocumentationError({
@@ -144,11 +145,14 @@ export const depictUpload: Depicter<ZodUpload> = (ctx) => {
   };
 };
 
-export const depictFile: Depicter<ZodFile> = ({
-  schema: { isBinary, isBase64, isBuffer },
-}) => ({
+export const depictFile: Depicter<z.ZodType> = ({ schema }) => ({
   type: "string",
-  format: isBuffer || isBinary ? "binary" : isBase64 ? "byte" : "file",
+  format:
+    schema instanceof z.ZodString
+      ? schema._def.checks.find((check) => check.kind === "regex")
+        ? "byte"
+        : "file"
+      : "binary",
 });
 
 export const depictUnion: Depicter<z.ZodUnion<z.ZodUnionOptions>> = ({
@@ -245,7 +249,7 @@ export const depictObject: Depicter<z.AnyZodObject> = ({
  * */
 export const depictNull: Depicter<z.ZodNull> = () => ({ type: "null" });
 
-export const depictDateIn: Depicter<ZodDateIn> = (ctx) => {
+export const depictDateIn: Depicter<z.ZodType> = (ctx) => {
   assert(
     !ctx.isResponse,
     new DocumentationError({
@@ -264,7 +268,7 @@ export const depictDateIn: Depicter<ZodDateIn> = (ctx) => {
   };
 };
 
-export const depictDateOut: Depicter<ZodDateOut> = (ctx) => {
+export const depictDateOut: Depicter<z.ZodType> = (ctx) => {
   assert(
     ctx.isResponse,
     new DocumentationError({
@@ -587,6 +591,9 @@ export const depictLazy: Depicter<z.ZodLazy<z.ZodTypeAny>> = ({
   );
 };
 
+export const depictRaw: Depicter<RawSchema> = ({ next, schema }) =>
+  next({ schema: schema.shape.raw });
+
 export const depictExamples = (
   schema: z.ZodTypeAny,
   isResponse: boolean,
@@ -744,8 +751,6 @@ export const depicters: HandlingRules<
   ZodNumber: depictNumber,
   ZodBigInt: depictBigInt,
   ZodBoolean: depictBoolean,
-  ZodDateIn: depictDateIn,
-  ZodDateOut: depictDateOut,
   ZodNull: depictNull,
   ZodArray: depictArray,
   ZodTuple: depictTuple,
@@ -754,8 +759,6 @@ export const depicters: HandlingRules<
   ZodLiteral: depictLiteral,
   ZodIntersection: depictIntersection,
   ZodUnion: depictUnion,
-  ZodFile: depictFile,
-  ZodUpload: depictUpload,
   ZodAny: depictAny,
   ZodDefault: depictDefault,
   ZodEnum: depictEnum,
@@ -770,6 +773,11 @@ export const depicters: HandlingRules<
   ZodPipeline: depictPipeline,
   ZodLazy: depictLazy,
   ZodReadonly: depictReadonly,
+  [ezFileKind]: depictFile,
+  [ezUploadKind]: depictUpload,
+  [ezDateOutKind]: depictDateOut,
+  [ezDateInKind]: depictDateIn,
+  [ezRawKind]: depictRaw,
 };
 
 export const onEach: Depicter<z.ZodTypeAny, "each"> = ({
@@ -1048,7 +1056,7 @@ export const depictRequest = ({
   const bodyDepiction = excludeExamplesFromDepiction(
     excludeParamsFromDepiction(
       walkSchema({
-        schema: hasRaw(schema) ? ZodFile.create().buffer() : schema,
+        schema,
         isResponse: false,
         rules: depicters,
         onEach,
