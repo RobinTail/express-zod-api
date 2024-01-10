@@ -211,10 +211,16 @@ const onLazy: Producer<z.ZodLazy<z.ZodTypeAny>> = ({
   );
 };
 
-const onFile: Producer<z.ZodType> = ({ schema }) =>
-  schema instanceof z.ZodString
-    ? f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword)
-    : f.createTypeReferenceNode("Buffer");
+const onFile: Producer<z.ZodType> = ({ schema }) => {
+  const stringType = f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword);
+  const bufferType = f.createTypeReferenceNode("Buffer");
+  const unionType = f.createUnionTypeNode([stringType, bufferType]);
+  return schema instanceof z.ZodString
+    ? stringType
+    : schema instanceof z.ZodUnion
+      ? unionType
+      : bufferType;
+};
 
 const onRaw: Producer<RawSchema> = ({ next, schema }) =>
   next({ schema: schema.shape.raw });
