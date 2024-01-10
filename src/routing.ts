@@ -1,5 +1,5 @@
 import { IRouter } from "express";
-import { CommonConfig } from "./config-type";
+import { ChildLoggerProvider, CommonConfig } from "./config-type";
 import { DependsOnMethod } from "./depends-on-method";
 import { AbstractEndpoint } from "./endpoint";
 import { AbstractLogger } from "./logger";
@@ -16,11 +16,13 @@ export const initRouting = ({
   logger,
   config,
   routing,
+  getChildLogger,
 }: {
   app: IRouter;
   logger: AbstractLogger;
   config: CommonConfig;
   routing: Routing;
+  getChildLogger?: ChildLoggerProvider;
 }) => {
   if (config.startupLogo !== false) {
     console.log(getStartupLogo());
@@ -31,8 +33,16 @@ export const initRouting = ({
     hasCors: !!config.cors,
     onEndpoint: (endpoint, path, method) => {
       app[method](path, async (request, response) => {
-        logger.info(`${request.method}: ${path}`);
-        await endpoint.execute({ request, response, logger, config });
+        const childLogger = getChildLogger
+          ? await getChildLogger({ request, logger })
+          : logger;
+        childLogger.info(`${request.method}: ${path}`);
+        await endpoint.execute({
+          request,
+          response,
+          logger: childLogger,
+          config,
+        });
       });
     },
     onStatic: (path, handler) => {
