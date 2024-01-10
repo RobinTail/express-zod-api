@@ -1,7 +1,10 @@
 import ts from "typescript";
 import { z } from "zod";
 import { hasCoercion, tryToTransform } from "./common-helpers";
-import { ZodFile } from "./file-schema";
+import { ezDateInKind } from "./date-in-schema";
+import { ezDateOutKind } from "./date-out-schema";
+import { ezFileKind } from "./file-schema";
+import { RawSchema, ezRawKind } from "./raw-schema";
 import { HandlingRules, walkSchema } from "./schema-walker";
 import {
   LiteralType,
@@ -208,18 +211,28 @@ const onLazy: Producer<z.ZodLazy<z.ZodTypeAny>> = ({
   );
 };
 
-const onFile: Producer<ZodFile> = ({ schema: { isBuffer } }) =>
-  isBuffer
-    ? f.createTypeReferenceNode("Buffer")
-    : f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword);
+const onFile: Producer<z.ZodType> = ({ schema }) => {
+  const stringType = f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword);
+  const bufferType = f.createTypeReferenceNode("Buffer");
+  const unionType = f.createUnionTypeNode([stringType, bufferType]);
+  return schema instanceof z.ZodString
+    ? stringType
+    : schema instanceof z.ZodUnion
+      ? unionType
+      : bufferType;
+};
+
+const onRaw: Producer<RawSchema> = ({ next, schema }) =>
+  next({ schema: schema.shape.raw });
 
 const producers: HandlingRules<ts.TypeNode, ZTSContext> = {
   ZodString: onPrimitive(ts.SyntaxKind.StringKeyword),
   ZodNumber: onPrimitive(ts.SyntaxKind.NumberKeyword),
   ZodBigInt: onPrimitive(ts.SyntaxKind.BigIntKeyword),
   ZodBoolean: onPrimitive(ts.SyntaxKind.BooleanKeyword),
-  ZodDateIn: onPrimitive(ts.SyntaxKind.StringKeyword),
-  ZodDateOut: onPrimitive(ts.SyntaxKind.StringKeyword),
+  ZodAny: onPrimitive(ts.SyntaxKind.AnyKeyword),
+  [ezDateInKind]: onPrimitive(ts.SyntaxKind.StringKeyword),
+  [ezDateOutKind]: onPrimitive(ts.SyntaxKind.StringKeyword),
   ZodNull: onNull,
   ZodArray: onArray,
   ZodTuple: onTuple,
@@ -228,8 +241,6 @@ const producers: HandlingRules<ts.TypeNode, ZTSContext> = {
   ZodLiteral: onLiteral,
   ZodIntersection: onIntersection,
   ZodUnion: onSomeUnion,
-  ZodFile: onFile,
-  ZodAny: onPrimitive(ts.SyntaxKind.AnyKeyword),
   ZodDefault: onDefault,
   ZodEnum: onEnum,
   ZodNativeEnum: onNativeEnum,
@@ -242,6 +253,8 @@ const producers: HandlingRules<ts.TypeNode, ZTSContext> = {
   ZodPipeline: onPipeline,
   ZodLazy: onLazy,
   ZodReadonly: onReadonly,
+  [ezFileKind]: onFile,
+  [ezRawKind]: onRaw,
 };
 
 export const zodToTs = ({

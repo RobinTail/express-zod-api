@@ -708,14 +708,14 @@ You can find two approaches to `EndpointsFactory` and `ResultHandler` implementa
 [in this example](https://github.com/RobinTail/express-zod-api/blob/master/example/factories.ts).
 One of them implements file streaming, in this case the endpoint just has to provide the filename.
 The response schema generally may be just `z.string()`, but I made more specific `ez.file()` that also supports
-`.binary()` and `.base64()` refinements which are reflected in the
+`ez.file("binary")` and `ez.file("base64")` variants which are reflected in the
 [generated documentation](#creating-a-documentation).
 
 ```typescript
 const fileStreamingEndpointsFactory = new EndpointsFactory(
   createResultHandler({
     getPositiveResponse: () => ({
-      schema: ez.file().buffer(),
+      schema: ez.file("buffer"),
       mimeType: "image/*",
     }),
     getNegativeResponse: () => ({ schema: z.string(), mimeType: "text/plain" }),
@@ -899,7 +899,7 @@ Some APIs may require an endpoint to be able to accept and process raw data, suc
 file as an entire body of request. In order to enable this feature you need to set the `rawParser` config feature to
 `express.raw()`. See also its options [in Express.js documentation](https://expressjs.com/en/4x/api.html#express.raw).
 The raw data is placed into `request.body.raw` property, having type `Buffer`. Then use the proprietary `ez.raw()`
-schema (which is an alias for `z.object({ raw: ez.file().buffer() })`) as the input schema of your endpoint.
+schema (which is an alias for `z.object({ raw: ez.file("buffer") })`) as the input schema of your endpoint.
 
 ```typescript
 import express from "express";

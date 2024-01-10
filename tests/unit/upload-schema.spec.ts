@@ -1,24 +1,27 @@
-import { ZodUpload } from "../../src/upload-schema";
+import { getMeta } from "../../src/metadata";
+import { z } from "zod";
+import { ez } from "../../src";
 import { describe, expect, test, vi } from "vitest";
 
-describe("ZodUpload", () => {
-  describe("static::create()", () => {
+describe("ez.upload()", () => {
+  describe("creation", () => {
     test("should create an instance", () => {
-      const schema = ZodUpload.create();
-      expect(schema).toBeInstanceOf(ZodUpload);
-      expect(schema._def.typeName).toEqual("ZodUpload");
+      const schema = ez.upload();
+      expect(schema).toBeInstanceOf(z.ZodEffects);
+      expect(getMeta(schema, "kind")).toBe("Upload");
     });
   });
 
-  describe("_parse()", () => {
+  describe("parsing", () => {
     test("should handle wrong parsed type", () => {
-      const schema = ZodUpload.create();
+      const schema = ez.upload();
       const result = schema.safeParse(123);
       expect(result.success).toBeFalsy();
       if (!result.success) {
         expect(result.error.issues).toEqual([
           {
             code: "custom",
+            fatal: true,
             message: "Expected file upload, received number",
             path: [],
           },
@@ -29,7 +32,7 @@ describe("ZodUpload", () => {
     test.each([vi.fn(async () => {}), vi.fn(() => {})])(
       "should accept UploadedFile %#",
       (mv) => {
-        const schema = ZodUpload.create();
+        const schema = ez.upload();
         const buffer = Buffer.from("something");
         const result = schema.safeParse({
           name: "avatar.jpg",

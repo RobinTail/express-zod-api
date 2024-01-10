@@ -19,7 +19,8 @@ import {
 import { InputValidationError, ez, withMeta } from "../../src";
 import { Request } from "express";
 import { z } from "zod";
-import { ZodUpload } from "../../src/upload-schema";
+import { isProprietary } from "../../src/metadata";
+import { ezUploadKind } from "../../src/upload-schema";
 import { describe, expect, test } from "vitest";
 
 describe("Common Helpers", () => {
@@ -377,13 +378,10 @@ describe("Common Helpers", () => {
   });
 
   describe("hasNestedSchema()", () => {
+    const condition = (subject: z.ZodTypeAny) =>
+      isProprietary(subject, ezUploadKind);
     test("should return true for given argument satisfying condition", () => {
-      expect(
-        hasNestedSchema({
-          subject: ez.upload(),
-          condition: (subject) => subject instanceof ZodUpload,
-        }),
-      ).toBeTruthy();
+      expect(hasNestedSchema({ subject: ez.upload(), condition })).toBeTruthy();
     });
     test.each([
       z.object({ test: ez.upload() }),
@@ -396,12 +394,7 @@ describe("Common Helpers", () => {
       ez.upload().refine(() => true),
       z.array(ez.upload()),
     ])("should return true for wrapped needle %#", (subject) => {
-      expect(
-        hasNestedSchema({
-          subject,
-          condition: (entry) => entry instanceof ZodUpload,
-        }),
-      ).toBeTruthy();
+      expect(hasNestedSchema({ subject, condition })).toBeTruthy();
     });
     test.each([
       z.object({}),
@@ -410,12 +403,7 @@ describe("Common Helpers", () => {
       z.boolean().and(z.literal(true)),
       z.number().or(z.string()),
     ])("should return false in other cases %#", (subject) => {
-      expect(
-        hasNestedSchema({
-          subject,
-          condition: (entry) => entry instanceof ZodUpload,
-        }),
-      ).toBeFalsy();
+      expect(hasNestedSchema({ subject, condition })).toBeFalsy();
     });
   });
 
