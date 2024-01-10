@@ -13,7 +13,7 @@ describe("ez.file()", () => {
       expect(getMeta(schema, "kind")).toBe("File");
     });
 
-    test.each([ez.file("string"), ez.file().string()])(
+    test.each([ez.file("string"), ez.file().string("deprecated message")])(
       "should create a string file",
       (schema) => {
         expect(schema).toBeInstanceOf(z.ZodString);
@@ -21,7 +21,7 @@ describe("ez.file()", () => {
       },
     );
 
-    test.each([ez.file("buffer"), ez.file().buffer()])(
+    test.each([ez.file("buffer"), ez.file().buffer("deprecated message")])(
       "should create a buffer file",
       (schema) => {
         expect(schema).toBeInstanceOf(z.ZodEffects);
@@ -29,7 +29,7 @@ describe("ez.file()", () => {
       },
     );
 
-    test.each([ez.file("binary"), ez.file().binary()])(
+    test.each([ez.file("binary"), ez.file().binary("deprecated message")])(
       "should create a binary file",
       (schema) => {
         expect(schema).toBeInstanceOf(z.ZodUnion);
@@ -37,7 +37,7 @@ describe("ez.file()", () => {
       },
     );
 
-    test.each([ez.file("base64"), ez.file().base64()])(
+    test.each([ez.file("base64"), ez.file().base64("deprecated message")])(
       "should create a base64 file",
       (schema) => {
         expect(schema).toBeInstanceOf(z.ZodString);

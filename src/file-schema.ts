@@ -15,15 +15,16 @@ const wrap = <T extends z.ZodTypeAny>(
     proprietary(ezFileKind, schema),
   ) as ReturnType<typeof proprietary<T>> & Variants;
 
+// @todo remove arguments from the methods in v17
 const variants = {
   /** @deprecated use ez.file("buffer") instead */
-  buffer: () => wrap(bufferSchema),
+  buffer: ({}: string | object = {}) => wrap(bufferSchema),
   /** @deprecated use ez.file("string") instead */
-  string: () => wrap(z.string()),
+  string: ({}: string | object = {}) => wrap(z.string()),
   /** @deprecated use ez.file("binary") instead */
-  binary: () => wrap(bufferSchema.or(z.string())),
+  binary: ({}: string | object = {}) => wrap(bufferSchema.or(z.string())),
   /** @deprecated use ez.file("base64") instead */
-  base64: () =>
+  base64: ({}: string | object = {}) =>
     wrap(z.string().regex(base64Regex, "Does not match base64 encoding")),
 };
 
