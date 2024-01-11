@@ -30,7 +30,7 @@ export const createParserFailureHandler =
       input: null,
       output: null,
       logger: getChildLogger
-        ? await getChildLogger({ request, logger: rootLogger })
+        ? await getChildLogger({ request, parent: rootLogger })
         : rootLogger,
     });
   };
@@ -47,7 +47,7 @@ export const createNotFoundHandler =
       `Can not ${request.method} ${request.path}`,
     );
     const logger = getChildLogger
-      ? await getChildLogger({ request, logger: rootLogger })
+      ? await getChildLogger({ request, parent: rootLogger })
       : rootLogger;
     try {
       errorHandler.handler({

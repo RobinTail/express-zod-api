@@ -30,12 +30,11 @@ describe("Server helpers", () => {
     });
 
     test("the handler should call error handler with a child logger", async () => {
-      const rootLogger = winston.createLogger({ silent: true });
       const errorHandler = { ...defaultResultHandler, handler: vi.fn() };
       const handler = createParserFailureHandler({
         errorHandler,
-        rootLogger,
-        getChildLogger: ({ logger }) => ({ ...logger, isChild: true }),
+        rootLogger: winston.createLogger({ silent: true }),
+        getChildLogger: ({ parent }) => ({ ...parent, isChild: true }),
       });
       await handler(
         new SyntaxError("Unexpected end of JSON input"),
@@ -56,15 +55,14 @@ describe("Server helpers", () => {
 
   describe("createNotFoundHandler()", () => {
     test("the handler should call ResultHandler with 404 error", async () => {
-      const rootLogger = winston.createLogger({ silent: true });
       const errorHandler = {
         ...defaultResultHandler,
         handler: vi.fn(),
       };
       const handler = createNotFoundHandler({
         errorHandler,
-        rootLogger,
-        getChildLogger: async ({ logger }) => ({ ...logger, isChild: true }),
+        rootLogger: winston.createLogger({ silent: true }),
+        getChildLogger: async ({ parent }) => ({ ...parent, isChild: true }),
       });
       const next = vi.fn();
       const requestMock = makeRequestMock({

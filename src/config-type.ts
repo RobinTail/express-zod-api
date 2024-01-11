@@ -30,7 +30,7 @@ export type TagsConfig<TAG extends string> = Record<
 
 type ChildLoggerProvider = (params: {
   request: Request;
-  logger: AbstractLogger;
+  parent: AbstractLogger;
 }) => AbstractLogger | Promise<AbstractLogger>;
 
 export interface CommonConfig<TAG extends string = string> {
@@ -53,7 +53,7 @@ export interface CommonConfig<TAG extends string = string> {
   logger: SimplifiedWinstonConfig | AbstractLogger;
   /**
    * @desc A child logger returned by this function can override the logger in all handlers for each request
-   * @example ({ logger }) => logger.child({ requestId: uuid() })
+   * @example ({ parent }) => parent.child({ requestId: uuid() })
    * */
   childLoggerProvider?: ChildLoggerProvider;
   /**

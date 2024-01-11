@@ -32,7 +32,7 @@ export const initRouting = ({
     onEndpoint: (endpoint, path, method) => {
       app[method](path, async (request, response) => {
         const logger = config.childLoggerProvider
-          ? await config.childLoggerProvider({ request, logger: rootLogger })
+          ? await config.childLoggerProvider({ request, parent: rootLogger })
           : rootLogger;
         logger.info(`${request.method}: ${path}`);
         await endpoint.execute({ request, response, logger, config });

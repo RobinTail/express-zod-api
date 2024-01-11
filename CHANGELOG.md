@@ -25,8 +25,8 @@ declare module "express-zod-api" {
 
 const config = createConfig({
   // logger: ...,
-  childLoggerProvider: ({ logger, request }) =>
-    logger.child({ requestId: randomUUID() }),
+  childLoggerProvider: ({ parent, request }) =>
+    parent.child({ requestId: randomUUID() }),
 });
 ```
 

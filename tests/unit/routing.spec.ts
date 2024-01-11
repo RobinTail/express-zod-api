@@ -23,7 +23,6 @@ import {
 import { initRouting } from "../../src/routing";
 import type { IRouter, Request, RequestHandler, Response } from "express";
 import { beforeAll, beforeEach, describe, expect, test, vi } from "vitest";
-import { AbstractLogger } from "../../src/logger";
 
 describe("Routing", () => {
   describe("initRouting()", () => {
@@ -407,10 +406,7 @@ describe("Routing", () => {
         cors: false,
         startupLogo: false,
         logger: loggerMock,
-        childLoggerProvider: ({ logger }: { logger: AbstractLogger }) => ({
-          ...logger,
-          isChild: true,
-        }),
+        childLoggerProvider: ({ parent }) => ({ ...parent, isChild: true }),
       };
       const handlerMock = vi.fn();
       const endpoint = defaultEndpointsFactory.build({
