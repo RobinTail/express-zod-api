@@ -68,7 +68,7 @@ describe("Server helpers", () => {
       const handler = createNotFoundHandler({
         errorHandler,
         logger,
-        childLoggerProvider: ({ logger: original }) => ({
+        childLoggerProvider: async ({ logger: original }) => ({
           ...original,
           isChild: true,
         }),
