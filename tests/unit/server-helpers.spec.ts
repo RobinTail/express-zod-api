@@ -2,13 +2,13 @@ import {
   createNotFoundHandler,
   createParserFailureHandler,
 } from "../../src/server-helpers";
-import { Mock, describe, expect, test, vi } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 import winston from "winston";
 import { defaultResultHandler } from "../../src";
 import { Request, Response } from "express";
-import { mimeJson } from "../../src/mime";
 import { omit } from "ramda";
 import assert from "node:assert/strict";
+import { makeRequestMock, makeResponseMock } from "../../src/testing";
 
 describe("Server helpers", () => {
   describe("createParserFailureHandler()", () => {
@@ -43,20 +43,15 @@ describe("Server helpers", () => {
         childLoggerProvider: undefined,
       });
       const next = vi.fn();
-      const requestMock = {
-        method: "POST",
-        path: "/v1/test",
-        header: vi.fn(() => mimeJson),
-        body: {
-          n: 453,
+      const requestMock = makeRequestMock({
+        fnMethod: vi.fn,
+        requestProps: {
+          method: "POST",
+          path: "/v1/test",
+          body: { n: 453 },
         },
-      };
-      const responseMock: Record<string, Mock> = {
-        end: vi.fn(),
-        set: vi.fn().mockImplementation(() => responseMock),
-        status: vi.fn().mockImplementation(() => responseMock),
-        json: vi.fn().mockImplementation(() => responseMock),
-      };
+      });
+      const responseMock = makeResponseMock({ fnMethod: vi.fn });
       handler(
         requestMock as unknown as Request,
         responseMock as unknown as Response,
@@ -84,20 +79,15 @@ describe("Server helpers", () => {
         childLoggerProvider: undefined,
       });
       const next = vi.fn();
-      const requestMock = {
-        method: "POST",
-        path: "/v1/test",
-        header: vi.fn(() => mimeJson),
-        body: {
-          n: 453,
+      const requestMock = makeRequestMock({
+        fnMethod: vi.fn,
+        requestProps: {
+          method: "POST",
+          path: "/v1/test",
+          body: { n: 453 },
         },
-      };
-      const responseMock: Record<string, Mock> = {
-        end: vi.fn(),
-        set: vi.fn().mockImplementation(() => responseMock),
-        status: vi.fn().mockImplementation(() => responseMock),
-        json: vi.fn().mockImplementation(() => responseMock),
-      };
+      });
+      const responseMock = makeResponseMock({ fnMethod: vi.fn });
       handler(
         requestMock as unknown as Request,
         responseMock as unknown as Response,

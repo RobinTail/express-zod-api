@@ -15,9 +15,15 @@ exports[`Server helpers > createNotFoundHandler() > the handler should call Resu
   },
   "response": {
     "end": [MockFunction spy],
+    "header": [MockFunction spy],
     "json": [MockFunction spy],
+    "send": [MockFunction spy],
     "set": [MockFunction spy],
+    "setHeader": [MockFunction spy],
     "status": [MockFunction spy],
+    "statusCode": 200,
+    "statusMessage": "OK",
+    "writableEnded": false,
   },
 }
 `;
