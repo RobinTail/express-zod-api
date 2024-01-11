@@ -1,85 +1,38 @@
-import express, { ErrorRequestHandler, RequestHandler } from "express";
+import express from "express";
 import type compression from "compression";
 import type fileUpload from "express-fileupload";
 import http from "node:http";
 import https from "node:https";
 import { AppConfig, CommonConfig, ServerConfig } from "./config-type";
-import { lastResortHandler } from "./last-resort";
 import {
   AbstractLogger,
   createLogger,
   isSimplifiedWinstonConfig,
 } from "./logger";
-import { ResultHandlerError } from "./errors";
-import { makeErrorFromAnything } from "./common-helpers";
 import { loadPeer } from "./peer-helpers";
-import {
-  AnyResultHandlerDefinition,
-  defaultResultHandler,
-} from "./result-handler";
+import { defaultResultHandler } from "./result-handler";
 import { Routing, initRouting } from "./routing";
-import createHttpError from "http-errors";
-
-export const createParserFailureHandler =
-  (
-    errorHandler: AnyResultHandlerDefinition,
-    logger: AbstractLogger,
-  ): ErrorRequestHandler =>
-  (error, request, response, next) => {
-    if (!error) {
-      return next();
-    }
-    errorHandler.handler({
-      error: createHttpError(400, makeErrorFromAnything(error).message),
-      request,
-      response,
-      logger,
-      input: null,
-      output: null,
-    });
-  };
-
-export const createNotFoundHandler =
-  (
-    errorHandler: AnyResultHandlerDefinition,
-    logger: AbstractLogger,
-  ): RequestHandler =>
-  (request, response) => {
-    const error = createHttpError(
-      404,
-      `Can not ${request.method} ${request.path}`,
-    );
-    try {
-      errorHandler.handler({
-        request,
-        response,
-        logger,
-        error,
-        input: null,
-        output: null,
-      });
-    } catch (e) {
-      lastResortHandler({
-        response,
-        logger,
-        error: new ResultHandlerError(makeErrorFromAnything(e).message, error),
-      });
-    }
-  };
+import {
+  createNotFoundHandler,
+  createParserFailureHandler,
+} from "./server-helpers";
 
 const makeCommonEntities = async (config: CommonConfig) => {
-  const logger: AbstractLogger = isSimplifiedWinstonConfig(config.logger)
+  const rootLogger: AbstractLogger = isSimplifiedWinstonConfig(config.logger)
     ? createLogger({ ...config.logger, winston: await loadPeer("winston") })
     : config.logger;
   const errorHandler = config.errorHandler || defaultResultHandler;
-  const notFoundHandler = createNotFoundHandler(errorHandler, logger);
-  return { logger, errorHandler, notFoundHandler };
+  const { childLoggerProvider: getChildLogger } = config;
+  const creatorParams = { errorHandler, rootLogger, getChildLogger };
+  const notFoundHandler = createNotFoundHandler(creatorParams);
+  const parserFailureHandler = createParserFailureHandler(creatorParams);
+  return { rootLogger, errorHandler, notFoundHandler, parserFailureHandler };
 };
 
 export const attachRouting = async (config: AppConfig, routing: Routing) => {
-  const { logger, notFoundHandler } = await makeCommonEntities(config);
-  initRouting({ app: config.app, routing, logger, config });
-  return { notFoundHandler, logger };
+  const { rootLogger, notFoundHandler } = await makeCommonEntities(config);
+  initRouting({ app: config.app, routing, rootLogger, config });
+  return { notFoundHandler, logger: rootLogger };
 };
 
 export const createServer = async (config: ServerConfig, routing: Routing) => {
@@ -117,10 +70,10 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
     });
   }
 
-  const { logger, errorHandler, notFoundHandler } =
+  const { rootLogger, notFoundHandler, parserFailureHandler } =
     await makeCommonEntities(config);
-  app.use(createParserFailureHandler(errorHandler, logger));
-  initRouting({ app, routing, logger, config });
+  app.use(parserFailureHandler);
+  initRouting({ app, routing, rootLogger, config });
   app.use(notFoundHandler);
 
   const starter = <T extends http.Server | https.Server>(
@@ -128,7 +81,7 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
     subject: typeof config.server.listen,
   ) =>
     server.listen(subject, () => {
-      logger.info("Listening", subject);
+      rootLogger.info("Listening", subject);
     }) as T;
 
   const servers = {
@@ -141,5 +94,5 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
       : undefined,
   } satisfies Record<string, http.Server | https.Server | undefined>;
 
-  return { app, ...servers, logger };
+  return { app, ...servers, logger: rootLogger };
 };

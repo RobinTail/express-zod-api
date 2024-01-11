@@ -11,10 +11,10 @@ import {
   EndpointsFactory,
   Routing,
   ServeStatic,
+  defaultEndpointsFactory,
   defaultResultHandler,
 } from "../../src";
 import { CommonConfig } from "../../src";
-import { mimeJson } from "../../src/mime";
 import {
   makeLoggerMock,
   makeRequestMock,
@@ -22,15 +22,7 @@ import {
 } from "../../src/testing";
 import { initRouting } from "../../src/routing";
 import type { IRouter, Request, RequestHandler, Response } from "express";
-import {
-  Mock,
-  beforeAll,
-  beforeEach,
-  describe,
-  expect,
-  test,
-  vi,
-} from "vitest";
+import { beforeAll, beforeEach, describe, expect, test, vi } from "vitest";
 
 describe("Routing", () => {
   describe("initRouting()", () => {
@@ -78,7 +70,7 @@ describe("Routing", () => {
       };
       initRouting({
         app: appMock as unknown as IRouter,
-        logger: winston.createLogger({ silent: true }),
+        rootLogger: winston.createLogger({ silent: true }),
         config: configMock as CommonConfig,
         routing,
       });
@@ -107,7 +99,7 @@ describe("Routing", () => {
       };
       initRouting({
         app: appMock as unknown as IRouter,
-        logger: winston.createLogger({ silent: true }),
+        rootLogger: winston.createLogger({ silent: true }),
         config: configMock as CommonConfig,
         routing,
       });
@@ -153,7 +145,7 @@ describe("Routing", () => {
       };
       initRouting({
         app: appMock as unknown as IRouter,
-        logger: winston.createLogger({ silent: true }),
+        rootLogger: winston.createLogger({ silent: true }),
         config: configMock as CommonConfig,
         routing,
       });
@@ -191,7 +183,7 @@ describe("Routing", () => {
       expect(() =>
         initRouting({
           app: appMock as unknown as IRouter,
-          logger: winston.createLogger({ silent: true }),
+          rootLogger: winston.createLogger({ silent: true }),
           config: configMock as CommonConfig,
           routing,
         }),
@@ -235,7 +227,7 @@ describe("Routing", () => {
       };
       initRouting({
         app: appMock as unknown as IRouter,
-        logger: winston.createLogger({ silent: true }),
+        rootLogger: winston.createLogger({ silent: true }),
         config: configMock as CommonConfig,
         routing,
       });
@@ -275,7 +267,7 @@ describe("Routing", () => {
       };
       initRouting({
         app: appMock as unknown as IRouter,
-        logger: winston.createLogger({ silent: true }),
+        rootLogger: winston.createLogger({ silent: true }),
         config: configMock as CommonConfig,
         routing,
       });
@@ -304,7 +296,7 @@ describe("Routing", () => {
       };
       initRouting({
         app: appMock as unknown as IRouter,
-        logger: winston.createLogger({ silent: true }),
+        rootLogger: winston.createLogger({ silent: true }),
         config: configMock as CommonConfig,
         routing,
       });
@@ -325,7 +317,7 @@ describe("Routing", () => {
       expect(() =>
         initRouting({
           app: appMock as unknown as IRouter,
-          logger: winston.createLogger({ silent: true }),
+          rootLogger: winston.createLogger({ silent: true }),
           config: configMock as CommonConfig,
           routing: {
             v1: {
@@ -337,7 +329,7 @@ describe("Routing", () => {
       expect(() =>
         initRouting({
           app: appMock as unknown as IRouter,
-          logger: winston.createLogger({ silent: true }),
+          rootLogger: winston.createLogger({ silent: true }),
           config: configMock as CommonConfig,
           routing: {
             "v1/user/retrieve": endpointMock,
@@ -371,24 +363,17 @@ describe("Routing", () => {
       const loggerMock = makeLoggerMock({ fnMethod: vi.fn });
       initRouting({
         app: appMock as unknown as IRouter,
-        logger: loggerMock,
+        rootLogger: loggerMock,
         config: configMock as CommonConfig,
         routing,
       });
       expect(appMock.post).toHaveBeenCalledTimes(1);
       const routeHandler = appMock.post.mock.calls[0][1] as RequestHandler;
-      const requestMock = {
-        method: "POST",
-        header: vi.fn(() => mimeJson),
-        body: {
-          test: 123,
-        },
-      };
-      const responseMock: Record<string, Mock> = {
-        set: vi.fn().mockImplementation(() => responseMock),
-        status: vi.fn().mockImplementation(() => responseMock),
-        json: vi.fn().mockImplementation(() => responseMock),
-      };
+      const requestMock = makeRequestMock({
+        fnMethod: vi.fn,
+        requestProps: { method: "POST", body: { test: 123 } },
+      });
+      const responseMock = makeResponseMock({ fnMethod: vi.fn });
       const nextMock = vi.fn();
       await routeHandler(
         requestMock as unknown as Request,
@@ -412,6 +397,44 @@ describe("Routing", () => {
         data: {
           result: true,
         },
+      });
+    });
+
+    test("should override the logger with a child logger if provider is specified in config", async () => {
+      const loggerMock = makeLoggerMock({ fnMethod: vi.fn });
+      const config: CommonConfig = {
+        cors: false,
+        startupLogo: false,
+        logger: loggerMock,
+        childLoggerProvider: ({ parent }) => ({ ...parent, isChild: true }),
+      };
+      const handlerMock = vi.fn();
+      const endpoint = defaultEndpointsFactory.build({
+        method: "get",
+        input: z.object({}),
+        output: z.object({}),
+        handler: handlerMock,
+      });
+      const routing: Routing = { v1: { user: { set: endpoint } } };
+      initRouting({
+        app: appMock as unknown as IRouter,
+        rootLogger: loggerMock,
+        config,
+        routing,
+      });
+      expect(appMock.get).toHaveBeenCalledTimes(1);
+      const routeHandler = appMock.get.mock.calls[0][1] as RequestHandler;
+      const requestMock = makeRequestMock({ fnMethod: vi.fn });
+      const responseMock = makeResponseMock({ fnMethod: vi.fn });
+      await routeHandler(
+        requestMock as unknown as Request,
+        responseMock as unknown as Response,
+        vi.fn<any>(),
+      );
+      expect(handlerMock).toHaveBeenCalledWith({
+        input: {},
+        options: {},
+        logger: { ...loggerMock, isChild: true },
       });
     });
   });
