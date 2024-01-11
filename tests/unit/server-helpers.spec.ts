@@ -9,6 +9,7 @@ import { Request, Response } from "express";
 import { omit } from "ramda";
 import assert from "node:assert/strict";
 import { makeRequestMock, makeResponseMock } from "../../src/testing";
+import createHttpError from "http-errors";
 
 describe("Server helpers", () => {
   describe("createParserFailureHandler()", () => {
@@ -27,6 +28,33 @@ describe("Server helpers", () => {
         next,
       );
       expect(next).toHaveBeenCalledTimes(1);
+    });
+
+    test("the handler should call error handler with a child logger", async () => {
+      const logger = winston.createLogger({ silent: true });
+      const errorHandler = { ...defaultResultHandler, handler: vi.fn() };
+      const handler = createParserFailureHandler({
+        errorHandler,
+        logger,
+        childLoggerProvider: ({ logger: original }) => ({
+          ...original,
+          isChild: true,
+        }),
+      });
+      await handler(
+        new SyntaxError("Unexpected end of JSON input"),
+        null as unknown as Request,
+        null as unknown as Response,
+        vi.fn<any>(),
+      );
+      expect(errorHandler.handler).toHaveBeenCalledTimes(1);
+      expect(errorHandler.handler.mock.calls[0][0].error).toEqual(
+        createHttpError(400, "Unexpected end of JSON input"),
+      );
+      expect(errorHandler.handler.mock.calls[0][0].logger).toHaveProperty(
+        "isChild",
+        true,
+      );
     });
   });
 
