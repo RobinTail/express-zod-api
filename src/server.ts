@@ -22,8 +22,8 @@ const makeCommonEntities = async (config: CommonConfig) => {
     ? createLogger({ ...config.logger, winston: await loadPeer("winston") })
     : config.logger;
   const errorHandler = config.errorHandler || defaultResultHandler;
-  const { childLoggerProvider } = config;
-  const creatorParams = { errorHandler, rootLogger, childLoggerProvider };
+  const { childLoggerProvider: getChildLogger } = config;
+  const creatorParams = { errorHandler, rootLogger, getChildLogger };
   const notFoundHandler = createNotFoundHandler(creatorParams);
   const parserFailureHandler = createParserFailureHandler(creatorParams);
   return { rootLogger, errorHandler, notFoundHandler, parserFailureHandler };

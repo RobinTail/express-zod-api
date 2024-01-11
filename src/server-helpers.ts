@@ -10,14 +10,14 @@ import { makeErrorFromAnything } from "./common-helpers";
 interface HandlerCreatorParams {
   errorHandler: AnyResultHandlerDefinition;
   rootLogger: AbstractLogger;
-  childLoggerProvider: CommonConfig["childLoggerProvider"];
+  getChildLogger: CommonConfig["childLoggerProvider"];
 }
 
 export const createParserFailureHandler =
   ({
     errorHandler,
     rootLogger,
-    childLoggerProvider,
+    getChildLogger,
   }: HandlerCreatorParams): ErrorRequestHandler =>
   async (error, request, response, next) => {
     if (!error) {
@@ -29,8 +29,8 @@ export const createParserFailureHandler =
       response,
       input: null,
       output: null,
-      logger: childLoggerProvider
-        ? await childLoggerProvider({ request, logger: rootLogger })
+      logger: getChildLogger
+        ? await getChildLogger({ request, logger: rootLogger })
         : rootLogger,
     });
   };
@@ -38,7 +38,7 @@ export const createParserFailureHandler =
 export const createNotFoundHandler =
   ({
     errorHandler,
-    childLoggerProvider,
+    getChildLogger,
     rootLogger,
   }: HandlerCreatorParams): RequestHandler =>
   async (request, response) => {
@@ -46,8 +46,8 @@ export const createNotFoundHandler =
       404,
       `Can not ${request.method} ${request.path}`,
     );
-    const logger = childLoggerProvider
-      ? await childLoggerProvider({ request, logger: rootLogger })
+    const logger = getChildLogger
+      ? await getChildLogger({ request, logger: rootLogger })
       : rootLogger;
     try {
       errorHandler.handler({
