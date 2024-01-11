@@ -366,7 +366,7 @@ describe("Documentation helpers", () => {
   });
 
   describe("depictIntersection()", () => {
-    test("should wrap next depicters in allOf property", () => {
+    test("should flatten two object schemas", () => {
       expect(
         depictIntersection({
           schema: z

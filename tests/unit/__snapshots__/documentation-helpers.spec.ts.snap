@@ -277,7 +277,7 @@ exports[`Documentation helpers > depictFile() > should set type:string and forma
 }
 `;
 
-exports[`Documentation helpers > depictIntersection() > should wrap next depicters in allOf property 1`] = `
+exports[`Documentation helpers > depictIntersection() > should flatten two object schemas 1`] = `
 {
   "properties": {
     "one": {
