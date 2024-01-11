@@ -16,7 +16,7 @@ import {
   TagObject,
   isReferenceObject,
 } from "openapi3-ts/oas31";
-import { omit } from "ramda";
+import { concat, mergeDeepWith, omit } from "ramda";
 import { z } from "zod";
 import {
   FlatObject,
@@ -180,12 +180,22 @@ export const depictIntersection: Depicter<
     _def: { left, right },
   },
   next,
-}) =>
-  left instanceof z.ZodObject && right instanceof z.ZodObject
-    ? next({ schema: left.extend(right.shape) })
-    : {
-        allOf: [left, right].map((entry) => next({ schema: entry })),
-      };
+}) => {
+  const children = [left, right].map((entry) => next({ schema: entry }));
+  const objects = children.filter(
+    (side): side is SchemaObject =>
+      !isReferenceObject(side) && side.type === "object",
+  );
+  if (objects.length === 2) {
+    return mergeDeepWith(
+      (a, b) =>
+        typeof a === "object" && typeof b === "object" ? concat(a, b) : a,
+      objects[0],
+      objects[1],
+    );
+  }
+  return { allOf: children };
+};
 
 export const depictOptional: Depicter<z.ZodOptional<z.ZodTypeAny>> = ({
   schema,

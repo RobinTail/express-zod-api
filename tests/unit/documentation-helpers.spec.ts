@@ -377,6 +377,19 @@ describe("Documentation helpers", () => {
         }),
       ).toMatchSnapshot();
     });
+
+    test("should flatten three object schemas", () => {
+      expect(
+        depictIntersection({
+          schema: z
+            .object({ one: z.number() })
+            .and(z.object({ two: z.number() }))
+            .and(z.object({ three: z.number() })),
+          ...requestCtx,
+          next: makeNext(requestCtx),
+        }),
+      ).toMatchSnapshot();
+    });
   });
 
   describe("depictOptional()", () => {
