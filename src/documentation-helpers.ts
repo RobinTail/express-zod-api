@@ -182,16 +182,15 @@ export const depictIntersection: Depicter<
   next,
 }) => {
   const children = [left, right].map((entry) => next({ schema: entry }));
-  const objects = children.filter(
-    (side): side is SchemaObject =>
-      !isReferenceObject(side) && side.type === "object",
+  const areObjects = children.every(
+    (side) => !isReferenceObject(side) && side.type === "object",
   );
-  if (objects.length === 2) {
+  if (areObjects) {
     return mergeDeepWith(
       (a, b) =>
         typeof a === "object" && typeof b === "object" ? concat(a, b) : a,
-      objects[0],
-      objects[1],
+      children[0],
+      children[1],
     );
   }
   return { allOf: children };
