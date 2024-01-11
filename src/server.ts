@@ -94,7 +94,7 @@ const makeCommonEntities = async (config: CommonConfig) => {
       logger,
       childLoggerProvider: config.childLoggerProvider,
     }),
-  );
+  ) as [RequestHandler, ErrorRequestHandler];
   return { logger, errorHandler, notFoundHandler, parserFailureHandler };
 };
 
