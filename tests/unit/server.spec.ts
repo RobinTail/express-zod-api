@@ -270,7 +270,10 @@ describe("Server", () => {
   describe("createParserFailureHandler()", () => {
     test("the handler should call next if there is no error", () => {
       const logger = winston.createLogger({ silent: true });
-      const handler = createParserFailureHandler(defaultResultHandler, logger);
+      const handler = createParserFailureHandler({
+        errorHandler: defaultResultHandler,
+        logger,
+      });
       const next = vi.fn();
       handler(
         undefined,
@@ -285,11 +288,11 @@ describe("Server", () => {
   describe("createNotFoundHandler()", () => {
     test("the handler should call ResultHandler with 404 error", () => {
       const logger = winston.createLogger({ silent: true });
-      const resultHandler = {
+      const errorHandler = {
         ...defaultResultHandler,
         handler: vi.fn(),
       };
-      const handler = createNotFoundHandler(resultHandler, logger);
+      const handler = createNotFoundHandler({ errorHandler, logger });
       const next = vi.fn();
       const requestMock = {
         method: "POST",
@@ -311,22 +314,22 @@ describe("Server", () => {
         next,
       );
       expect(next).toHaveBeenCalledTimes(0);
-      expect(resultHandler.handler).toHaveBeenCalledTimes(1);
-      expect(resultHandler.handler.mock.calls[0]).toHaveLength(1);
-      expect(resultHandler.handler.mock.calls[0][0]).toHaveProperty("logger");
-      expect(resultHandler.handler.mock.calls[0][0].logger).toEqual(logger);
+      expect(errorHandler.handler).toHaveBeenCalledTimes(1);
+      expect(errorHandler.handler.mock.calls[0]).toHaveLength(1);
+      expect(errorHandler.handler.mock.calls[0][0]).toHaveProperty("logger");
+      expect(errorHandler.handler.mock.calls[0][0].logger).toEqual(logger);
       expect(
-        omit(["logger"], resultHandler.handler.mock.calls[0][0]),
+        omit(["logger"], errorHandler.handler.mock.calls[0][0]),
       ).toMatchSnapshot();
     });
 
     test("should call Last Resort Handler in case of ResultHandler is faulty", () => {
       const logger = winston.createLogger({ silent: true });
-      const resultHandler = {
+      const errorHandler = {
         ...defaultResultHandler,
         handler: vi.fn().mockImplementation(() => assert.fail("I am faulty")),
       };
-      const handler = createNotFoundHandler(resultHandler, logger);
+      const handler = createNotFoundHandler({ errorHandler, logger });
       const next = vi.fn();
       const requestMock = {
         method: "POST",
@@ -348,7 +351,7 @@ describe("Server", () => {
         next,
       );
       expect(next).toHaveBeenCalledTimes(0);
-      expect(resultHandler.handler).toHaveBeenCalledTimes(1);
+      expect(errorHandler.handler).toHaveBeenCalledTimes(1);
       expect(responseMock.status).toHaveBeenCalledTimes(1);
       expect(responseMock.status.mock.calls[0][0]).toBe(500);
       expect(responseMock.end).toHaveBeenCalledTimes(1);

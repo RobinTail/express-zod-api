@@ -20,11 +20,13 @@ import {
 import { Routing, initRouting } from "./routing";
 import createHttpError from "http-errors";
 
+interface HandlerCreatorParams {
+  errorHandler: AnyResultHandlerDefinition;
+  logger: AbstractLogger;
+}
+
 export const createParserFailureHandler =
-  (
-    errorHandler: AnyResultHandlerDefinition,
-    logger: AbstractLogger,
-  ): ErrorRequestHandler =>
+  ({ errorHandler, logger }: HandlerCreatorParams): ErrorRequestHandler =>
   (error, request, response, next) => {
     if (!error) {
       return next();
@@ -40,10 +42,7 @@ export const createParserFailureHandler =
   };
 
 export const createNotFoundHandler =
-  (
-    errorHandler: AnyResultHandlerDefinition,
-    logger: AbstractLogger,
-  ): RequestHandler =>
+  ({ errorHandler, logger }: HandlerCreatorParams): RequestHandler =>
   (request, response) => {
     const error = createHttpError(
       404,
@@ -72,7 +71,7 @@ const makeCommonEntities = async (config: CommonConfig) => {
     ? createLogger({ ...config.logger, winston: await loadPeer("winston") })
     : config.logger;
   const errorHandler = config.errorHandler || defaultResultHandler;
-  const notFoundHandler = createNotFoundHandler(errorHandler, logger);
+  const notFoundHandler = createNotFoundHandler({ errorHandler, logger });
   return { logger, errorHandler, notFoundHandler };
 };
 
@@ -119,7 +118,7 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
 
   const { logger, errorHandler, notFoundHandler } =
     await makeCommonEntities(config);
-  app.use(createParserFailureHandler(errorHandler, logger));
+  app.use(createParserFailureHandler({ errorHandler, logger }));
   initRouting({ app, routing, logger, config });
   app.use(notFoundHandler);
 
