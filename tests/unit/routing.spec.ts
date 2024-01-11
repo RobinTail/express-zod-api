@@ -15,7 +15,6 @@ import {
   defaultResultHandler,
 } from "../../src";
 import { CommonConfig } from "../../src";
-import { mimeJson } from "../../src/mime";
 import {
   makeLoggerMock,
   makeRequestMock,
@@ -23,15 +22,7 @@ import {
 } from "../../src/testing";
 import { initRouting } from "../../src/routing";
 import type { IRouter, Request, RequestHandler, Response } from "express";
-import {
-  Mock,
-  beforeAll,
-  beforeEach,
-  describe,
-  expect,
-  test,
-  vi,
-} from "vitest";
+import { beforeAll, beforeEach, describe, expect, test, vi } from "vitest";
 import { AbstractLogger } from "../../src/logger";
 
 describe("Routing", () => {
