@@ -180,9 +180,12 @@ export const depictIntersection: Depicter<
     _def: { left, right },
   },
   next,
-}) => ({
-  allOf: [left, right].map((entry) => next({ schema: entry })),
-});
+}) =>
+  left instanceof z.ZodObject && right instanceof z.ZodObject
+    ? next({ schema: left.extend(right.shape) })
+    : {
+        allOf: [left, right].map((entry) => next({ schema: entry })),
+      };
 
 export const depictOptional: Depicter<z.ZodOptional<z.ZodTypeAny>> = ({
   schema,

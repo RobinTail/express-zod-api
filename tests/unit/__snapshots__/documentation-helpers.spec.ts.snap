@@ -279,36 +279,25 @@ exports[`Documentation helpers > depictFile() > should set type:string and forma
 
 exports[`Documentation helpers > depictIntersection() > should wrap next depicters in allOf property 1`] = `
 {
-  "allOf": [
-    {
-      "properties": {
-        "one": {
-          "format": "double",
-          "maximum": 1.7976931348623157e+308,
-          "minimum": 5e-324,
-          "type": "number",
-        },
-      },
-      "required": [
-        "one",
-      ],
-      "type": "object",
+  "properties": {
+    "one": {
+      "format": "double",
+      "maximum": 1.7976931348623157e+308,
+      "minimum": 5e-324,
+      "type": "number",
     },
-    {
-      "properties": {
-        "two": {
-          "format": "double",
-          "maximum": 1.7976931348623157e+308,
-          "minimum": 5e-324,
-          "type": "number",
-        },
-      },
-      "required": [
-        "two",
-      ],
-      "type": "object",
+    "two": {
+      "format": "double",
+      "maximum": 1.7976931348623157e+308,
+      "minimum": 5e-324,
+      "type": "number",
     },
+  },
+  "required": [
+    "one",
+    "two",
   ],
+  "type": "object",
 }
 `;
 
@@ -1174,24 +1163,15 @@ exports[`Documentation helpers > excludeParamsFromDepiction() > should omit spec
 
 exports[`Documentation helpers > excludeParamsFromDepiction() > should omit specified path params 2 1`] = `
 {
-  "allOf": [
-    {
-      "properties": {},
-      "required": [],
-      "type": "object",
+  "properties": {
+    "b": {
+      "type": "string",
     },
-    {
-      "properties": {
-        "b": {
-          "type": "string",
-        },
-      },
-      "required": [
-        "b",
-      ],
-      "type": "object",
-    },
+  },
+  "required": [
+    "b",
   ],
+  "type": "object",
 }
 `;
 
