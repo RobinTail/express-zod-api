@@ -90,9 +90,17 @@ describe("Server helpers", () => {
         "isChild",
         true,
       );
-      expect(
-        omit(["logger"], errorHandler.handler.mock.calls[0][0]),
-      ).toMatchSnapshot();
+      expect(errorHandler.handler.mock.calls[0][0].error).toEqual(
+        createHttpError(404, "Can not POST /v1/test"),
+      );
+      expect(errorHandler.handler.mock.calls[0][0].input).toBeNull();
+      expect(errorHandler.handler.mock.calls[0][0].output).toBeNull();
+      expect(errorHandler.handler.mock.calls[0][0].request).toEqual(
+        requestMock,
+      );
+      expect(errorHandler.handler.mock.calls[0][0].response).toEqual(
+        responseMock,
+      );
     });
 
     test("should call Last Resort Handler in case of ResultHandler is faulty", () => {
