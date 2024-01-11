@@ -16,13 +16,13 @@ export const initRouting = ({
   logger,
   config,
   routing,
-  getChildLogger,
+  childLoggerProvider,
 }: {
   app: IRouter;
   logger: AbstractLogger;
   config: CommonConfig;
   routing: Routing;
-  getChildLogger?: ChildLoggerProvider;
+  childLoggerProvider?: ChildLoggerProvider;
 }) => {
   if (config.startupLogo !== false) {
     console.log(getStartupLogo());
@@ -33,8 +33,8 @@ export const initRouting = ({
     hasCors: !!config.cors,
     onEndpoint: (endpoint, path, method) => {
       app[method](path, async (request, response) => {
-        const childLogger = getChildLogger
-          ? await getChildLogger({ request, logger })
+        const childLogger = childLoggerProvider
+          ? await childLoggerProvider({ request, logger })
           : logger;
         childLogger.info(`${request.method}: ${path}`);
         await endpoint.execute({

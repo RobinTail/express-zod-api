@@ -52,10 +52,10 @@ export interface CommonConfig<TAG extends string = string> {
    * */
   logger: SimplifiedWinstonConfig | AbstractLogger;
   /**
-   * @desc If specified, a child logger produced by this function will replace the initially defined logger
+   * @desc If specified, a child logger returned by this function will replace the logger for each request
    * @example ({ logger }) => logger.child({ requestId: uuid() })
    * */
-  childLogger?: ChildLoggerProvider;
+  childLoggerProvider?: ChildLoggerProvider;
   /**
    * @desc You can disable the startup logo.
    * @default true

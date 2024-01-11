@@ -372,7 +372,7 @@ describe("Routing", () => {
       initRouting({
         app: appMock as unknown as IRouter,
         logger: loggerMock,
-        getChildLogger: ({ logger }) => ({ ...logger, isChild: true }),
+        childLoggerProvider: ({ logger }) => ({ ...logger, isChild: true }),
         config: configMock as CommonConfig,
         routing,
       });

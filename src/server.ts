@@ -72,15 +72,21 @@ const makeCommonEntities = async (config: CommonConfig) => {
     ? createLogger({ ...config.logger, winston: await loadPeer("winston") })
     : config.logger;
   const errorHandler = config.errorHandler || defaultResultHandler;
-  const { childLogger: getChildLogger } = config;
+  const { childLoggerProvider } = config;
   const notFoundHandler = createNotFoundHandler(errorHandler, logger);
-  return { logger, errorHandler, notFoundHandler, getChildLogger };
+  return { logger, errorHandler, notFoundHandler, childLoggerProvider };
 };
 
 export const attachRouting = async (config: AppConfig, routing: Routing) => {
-  const { logger, notFoundHandler, getChildLogger } =
+  const { logger, notFoundHandler, childLoggerProvider } =
     await makeCommonEntities(config);
-  initRouting({ app: config.app, routing, logger, config, getChildLogger });
+  initRouting({
+    app: config.app,
+    routing,
+    logger,
+    config,
+    childLoggerProvider,
+  });
   return { notFoundHandler, logger };
 };
 
@@ -119,10 +125,10 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
     });
   }
 
-  const { logger, errorHandler, notFoundHandler, getChildLogger } =
+  const { logger, errorHandler, notFoundHandler, childLoggerProvider } =
     await makeCommonEntities(config);
   app.use(createParserFailureHandler(errorHandler, logger));
-  initRouting({ app, routing, logger, config, getChildLogger });
+  initRouting({ app, routing, logger, config, childLoggerProvider });
   app.use(notFoundHandler);
 
   const starter = <T extends http.Server | https.Server>(
