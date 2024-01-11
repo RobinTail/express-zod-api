@@ -6,7 +6,6 @@ import { describe, expect, test, vi } from "vitest";
 import winston from "winston";
 import { defaultResultHandler } from "../../src";
 import { Request, Response } from "express";
-import { omit } from "ramda";
 import assert from "node:assert/strict";
 import { makeRequestMock, makeResponseMock } from "../../src/testing";
 import createHttpError from "http-errors";
