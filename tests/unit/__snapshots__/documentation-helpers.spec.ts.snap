@@ -263,6 +263,20 @@ exports[`Documentation helpers > depictFile() > should set type:string and forma
 }
 `;
 
+exports[`Documentation helpers > depictFile() > should set type:string and format accordingly 3 1`] = `
+{
+  "format": "file",
+  "type": "string",
+}
+`;
+
+exports[`Documentation helpers > depictFile() > should set type:string and format accordingly 4 1`] = `
+{
+  "format": "binary",
+  "type": "string",
+}
+`;
+
 exports[`Documentation helpers > depictIntersection() > should wrap next depicters in allOf property 1`] = `
 {
   "allOf": [

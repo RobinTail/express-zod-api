@@ -1,110 +1,38 @@
-import {
-  INVALID,
-  ParseInput,
-  ParseReturnType,
-  ZodIssueCode,
-  ZodParsedType,
-  ZodType,
-  ZodTypeDef,
-  addIssueToContext,
-} from "zod";
-import { ErrMessage, errToObj } from "./schema-helpers";
+import { z } from "zod";
+import { proprietary } from "./metadata";
+import { base64Regex, bufferSchema } from "./schema-helpers";
 
-const zodFileKind = "ZodFile";
+export const ezFileKind = "File";
 
-export interface ZodFileDef<T extends string | Buffer = string | Buffer>
-  extends ZodTypeDef {
-  typeName: typeof zodFileKind;
-  type: T;
-  encoding?: "binary" | "base64";
-  message?: string;
-}
+// @todo remove this in v17
+const wrap = <T extends z.ZodTypeAny>(
+  schema: T,
+): ReturnType<typeof proprietary<T>> & Variants =>
+  // eslint-disable-next-line @typescript-eslint/no-use-before-define
+  Object.entries(variants).reduce(
+    (agg, [method, handler]) =>
+      Object.defineProperty(agg, method, { get: () => handler }),
+    proprietary(ezFileKind, schema),
+  ) as ReturnType<typeof proprietary<T>> & Variants;
 
-const base64Regex =
-  /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/;
+// @todo remove arguments from the methods in v17
+const variants = {
+  /** @deprecated use ez.file("buffer") instead */
+  buffer: ({}: string | object = {}) => wrap(bufferSchema),
+  /** @deprecated use ez.file("string") instead */
+  string: ({}: string | object = {}) => wrap(z.string()),
+  /** @deprecated use ez.file("binary") instead */
+  binary: ({}: string | object = {}) => wrap(bufferSchema.or(z.string())),
+  /** @deprecated use ez.file("base64") instead */
+  base64: ({}: string | object = {}) =>
+    wrap(z.string().regex(base64Regex, "Does not match base64 encoding")),
+};
 
-export class ZodFile<
-  T extends string | Buffer = string | Buffer,
-> extends ZodType<T, ZodFileDef<T>, T> {
-  _parse(input: ParseInput): ParseReturnType<T> {
-    const { status, ctx } = this._processInputParams(input);
+type Variants = typeof variants;
+type Variant = keyof Variants;
 
-    const isParsedString =
-      ctx.parsedType === ZodParsedType.string && typeof ctx.data === "string";
-
-    if (this.isString && !isParsedString) {
-      addIssueToContext(ctx, {
-        code: ZodIssueCode.invalid_type,
-        expected: ZodParsedType.string,
-        received: ctx.parsedType,
-      });
-      return INVALID;
-    }
-
-    const isParsedBuffer =
-      ctx.parsedType === ZodParsedType.object && Buffer.isBuffer(ctx.data);
-
-    if (this.isBuffer && !isParsedBuffer) {
-      addIssueToContext(ctx, {
-        code: ZodIssueCode.invalid_type,
-        expected: ZodParsedType.object,
-        received: ctx.parsedType,
-        message: "Expected Buffer",
-      });
-      return INVALID;
-    }
-
-    if (isParsedString && this.isBase64 && !base64Regex.test(ctx.data)) {
-      addIssueToContext(ctx, {
-        code: ZodIssueCode.custom,
-        message: this._def.message || "Does not match base64 encoding",
-      });
-      status.dirty();
-    }
-
-    return { status: status.value, value: ctx.data as T };
-  }
-
-  string = (message?: ErrMessage) =>
-    new ZodFile<string>({ ...this._def, ...errToObj(message), type: "" });
-
-  buffer = (message?: ErrMessage) =>
-    new ZodFile({
-      ...this._def,
-      ...errToObj(message),
-      type: Buffer.from([]),
-    });
-
-  binary = (message?: ErrMessage) =>
-    new ZodFile<T>({
-      ...this._def,
-      ...errToObj(message),
-      encoding: "binary",
-    });
-
-  base64 = (message?: ErrMessage) =>
-    new ZodFile<T>({
-      ...this._def,
-      ...errToObj(message),
-      encoding: "base64",
-    });
-
-  get isBinary() {
-    return this._def.encoding === "binary";
-  }
-
-  get isBase64() {
-    return this._def.encoding === "base64";
-  }
-
-  get isString() {
-    return typeof this._def.type === "string";
-  }
-
-  get isBuffer() {
-    return Buffer.isBuffer(this._def.type);
-  }
-
-  static create = () =>
-    new ZodFile<string>({ typeName: zodFileKind, type: "" });
+export function file(): ReturnType<Variants["string"]>;
+export function file<K extends Variant>(variant: K): ReturnType<Variants[K]>;
+export function file<K extends Variant>(variant?: K) {
+  return variants[variant || "string"]();
 }

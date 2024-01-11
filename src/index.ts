@@ -32,7 +32,7 @@ export { withMeta } from "./metadata";
 export { testEndpoint } from "./testing";
 export { Integration } from "./integration";
 
-export * as ez from "./proprietary-schemas";
+export { ez } from "./proprietary-schemas";
 
 // Issues 952, 1182, 1269: Insufficient exports for consumer's declaration
 export type { MockOverrides } from "./testing";
@@ -42,10 +42,6 @@ export type { FlatObject } from "./common-helpers";
 export type { Method } from "./method";
 export type { IOSchema } from "./io-schema";
 export type { Metadata } from "./metadata";
-export type { ZodDateInDef } from "./date-in-schema";
-export type { ZodDateOutDef } from "./date-out-schema";
-export type { ZodFileDef } from "./file-schema";
-export type { ZodUploadDef } from "./upload-schema";
 export type { CommonConfig, AppConfig, ServerConfig } from "./config-type";
 export type { MiddlewareDefinition } from "./middleware";
 export type { ResultHandlerDefinition } from "./result-handler";

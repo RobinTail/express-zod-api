@@ -1,8 +1,14 @@
 import { combinations } from "./common-helpers";
 import { z } from "zod";
 import { clone, mergeDeepRight } from "ramda";
+import { ProprietaryKind } from "./proprietary-schemas";
 
 export interface Metadata<T extends z.ZodTypeAny> {
+  /**
+   * @todo if the following PR merged, use native branding instead:
+   * @link https://github.com/colinhacks/zod/pull/2860
+   * */
+  kind?: ProprietaryKind;
   examples: z.input<T>[];
 }
 
@@ -65,3 +71,15 @@ export const copyMeta = <A extends z.ZodTypeAny, B extends z.ZodTypeAny>(
   );
   return result;
 };
+
+export const proprietary = <T extends z.ZodTypeAny>(
+  kind: ProprietaryKind,
+  subject: T,
+) => {
+  const schema = withMeta(subject);
+  schema._def[metaProp].kind = kind;
+  return schema;
+};
+
+export const isProprietary = (schema: z.ZodTypeAny, kind: ProprietaryKind) =>
+  getMeta(schema, "kind") === kind;
