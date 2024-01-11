@@ -173,16 +173,31 @@ export const depictDiscriminatedUnion: Depicter<
   };
 };
 
-export const depictIntersection: Depicter<
-  z.ZodIntersection<z.ZodTypeAny, z.ZodTypeAny>
-> = ({
-  schema: {
-    _def: { left, right },
-  },
+export const depictIntersection: Depicter<z.ZodIntersection<z.ZodTypeAny, z.ZodTypeAny>> = ({
+  schema,
   next,
-}) => ({
-  allOf: [left, right].map((entry) => next({ schema: entry })),
-});
+}) => {
+
+  const list = flattenIntersection(schema);
+
+  if (list.length === 0) {
+    return next({ schema: z.object({}) }); // lets not pick either item, but rather make an empty object
+  }
+
+  if (list.length === 1) {
+    return next({ schema: list[0] });
+  }
+
+  return {allOf: list.map((entry) => next({ schema: entry })),
+}};
+
+const flattenIntersection = (schema: z.ZodIntersection<z.ZodTypeAny, z.ZodTypeAny>): z.ZodTypeAny[] => {
+  return [schema._def.left, schema._def.right]
+    // collapse zod intersections
+    .flatMap(entry => entry instanceof z.ZodIntersection ? flattenIntersection(entry) : [entry])
+    // filter out empty objects
+    .filter((entry) => !(entry instanceof z.ZodObject) || Object.keys(entry.shape).length !== 0);
+}
 
 export const depictOptional: Depicter<z.ZodOptional<z.ZodTypeAny>> = ({
   schema,

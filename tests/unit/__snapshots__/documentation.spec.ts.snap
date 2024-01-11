@@ -452,11 +452,8 @@ paths:
         content:
           application/json:
             schema:
-              allOf:
-                - type: object
-                  properties: {}
-                - type: object
-                  properties: {}
+              type: object
+              properties: {}
       security:
         - HTTP_1: []
           OAUTH2_1:
@@ -514,11 +511,8 @@ paths:
         content:
           application/json:
             schema:
-              allOf:
-                - type: object
-                  properties: {}
-                - type: object
-                  properties: {}
+              type: object
+              properties: {}
       security:
         - HTTP_2: []
 components:

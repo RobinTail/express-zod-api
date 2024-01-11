@@ -377,6 +377,16 @@ describe("Documentation helpers", () => {
         }),
       ).toMatchSnapshot();
     });
+
+    test("should collapse empty schemas", () => {
+      expect(
+        depictIntersection({
+          schema: z.object({a: z.string()}).and(z.object({})),
+          ...requestCtx,
+          next: makeNext(requestCtx),
+        })
+      ).toMatchSnapshot();
+    })
   });
 
   describe("depictOptional()", () => {

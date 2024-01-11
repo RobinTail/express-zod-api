@@ -277,6 +277,20 @@ exports[`Documentation helpers > depictFile() > should set type:string and forma
 }
 `;
 
+exports[`Documentation helpers > depictIntersection() > should collapse empty schemas 1`] = `
+{
+  "properties": {
+    "a": {
+      "type": "string",
+    },
+  },
+  "required": [
+    "a",
+  ],
+  "type": "object",
+}
+`;
+
 exports[`Documentation helpers > depictIntersection() > should wrap next depicters in allOf property 1`] = `
 {
   "allOf": [
