@@ -6,9 +6,9 @@
 
 - Featuring the child logger support for your convenience:
   - In case you need a slightly different or preconfigured logger for each request, the new feature comes handy;
-  - The common use case is logging unique request ID;
+  - The common use case is logging a unique request ID;
   - Previously, for that purpose you most likely used middlewares, but there is a better way now;
-  - In your configuration you can now specify `childLoggerProvider` returning a logger instance;
+  - In the configuration you can now specify `childLoggerProvider` returning a logger instance;
   - When specified, the returned child logger will replace the `logger` in all handlers for each request;
   - The provider function receives the initially configured logger and the request, it can also be asynchronous;
   - Consider the following example in case of Winston logger:
