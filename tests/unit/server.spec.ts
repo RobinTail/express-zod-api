@@ -273,6 +273,7 @@ describe("Server", () => {
       const handler = createParserFailureHandler({
         errorHandler: defaultResultHandler,
         logger,
+        childLoggerProvider: undefined,
       });
       const next = vi.fn();
       handler(
@@ -292,7 +293,11 @@ describe("Server", () => {
         ...defaultResultHandler,
         handler: vi.fn(),
       };
-      const handler = createNotFoundHandler({ errorHandler, logger });
+      const handler = createNotFoundHandler({
+        errorHandler,
+        logger,
+        childLoggerProvider: undefined,
+      });
       const next = vi.fn();
       const requestMock = {
         method: "POST",
@@ -329,7 +334,11 @@ describe("Server", () => {
         ...defaultResultHandler,
         handler: vi.fn().mockImplementation(() => assert.fail("I am faulty")),
       };
-      const handler = createNotFoundHandler({ errorHandler, logger });
+      const handler = createNotFoundHandler({
+        errorHandler,
+        logger,
+        childLoggerProvider: undefined,
+      });
       const next = vi.fn();
       const requestMock = {
         method: "POST",
