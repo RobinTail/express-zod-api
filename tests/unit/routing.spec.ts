@@ -71,7 +71,7 @@ describe("Routing", () => {
       };
       initRouting({
         app: appMock as unknown as IRouter,
-        logger: winston.createLogger({ silent: true }),
+        rootLogger: winston.createLogger({ silent: true }),
         config: configMock as CommonConfig,
         routing,
       });
@@ -100,7 +100,7 @@ describe("Routing", () => {
       };
       initRouting({
         app: appMock as unknown as IRouter,
-        logger: winston.createLogger({ silent: true }),
+        rootLogger: winston.createLogger({ silent: true }),
         config: configMock as CommonConfig,
         routing,
       });
@@ -146,7 +146,7 @@ describe("Routing", () => {
       };
       initRouting({
         app: appMock as unknown as IRouter,
-        logger: winston.createLogger({ silent: true }),
+        rootLogger: winston.createLogger({ silent: true }),
         config: configMock as CommonConfig,
         routing,
       });
@@ -184,7 +184,7 @@ describe("Routing", () => {
       expect(() =>
         initRouting({
           app: appMock as unknown as IRouter,
-          logger: winston.createLogger({ silent: true }),
+          rootLogger: winston.createLogger({ silent: true }),
           config: configMock as CommonConfig,
           routing,
         }),
@@ -228,7 +228,7 @@ describe("Routing", () => {
       };
       initRouting({
         app: appMock as unknown as IRouter,
-        logger: winston.createLogger({ silent: true }),
+        rootLogger: winston.createLogger({ silent: true }),
         config: configMock as CommonConfig,
         routing,
       });
@@ -268,7 +268,7 @@ describe("Routing", () => {
       };
       initRouting({
         app: appMock as unknown as IRouter,
-        logger: winston.createLogger({ silent: true }),
+        rootLogger: winston.createLogger({ silent: true }),
         config: configMock as CommonConfig,
         routing,
       });
@@ -297,7 +297,7 @@ describe("Routing", () => {
       };
       initRouting({
         app: appMock as unknown as IRouter,
-        logger: winston.createLogger({ silent: true }),
+        rootLogger: winston.createLogger({ silent: true }),
         config: configMock as CommonConfig,
         routing,
       });
@@ -318,7 +318,7 @@ describe("Routing", () => {
       expect(() =>
         initRouting({
           app: appMock as unknown as IRouter,
-          logger: winston.createLogger({ silent: true }),
+          rootLogger: winston.createLogger({ silent: true }),
           config: configMock as CommonConfig,
           routing: {
             v1: {
@@ -330,7 +330,7 @@ describe("Routing", () => {
       expect(() =>
         initRouting({
           app: appMock as unknown as IRouter,
-          logger: winston.createLogger({ silent: true }),
+          rootLogger: winston.createLogger({ silent: true }),
           config: configMock as CommonConfig,
           routing: {
             "v1/user/retrieve": endpointMock,
@@ -364,7 +364,7 @@ describe("Routing", () => {
       const loggerMock = makeLoggerMock({ fnMethod: vi.fn });
       initRouting({
         app: appMock as unknown as IRouter,
-        logger: loggerMock,
+        rootLogger: loggerMock,
         config: configMock as CommonConfig,
         routing,
       });
@@ -422,7 +422,7 @@ describe("Routing", () => {
       const routing: Routing = { v1: { user: { set: endpoint } } };
       initRouting({
         app: appMock as unknown as IRouter,
-        logger: loggerMock,
+        rootLogger: loggerMock,
         config,
         routing,
       });

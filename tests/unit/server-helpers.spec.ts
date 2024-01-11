@@ -14,10 +14,10 @@ import createHttpError from "http-errors";
 describe("Server helpers", () => {
   describe("createParserFailureHandler()", () => {
     test("the handler should call next if there is no error", () => {
-      const logger = winston.createLogger({ silent: true });
+      const rootLogger = winston.createLogger({ silent: true });
       const handler = createParserFailureHandler({
         errorHandler: defaultResultHandler,
-        logger,
+        rootLogger,
         childLoggerProvider: undefined,
       });
       const next = vi.fn();
@@ -31,13 +31,13 @@ describe("Server helpers", () => {
     });
 
     test("the handler should call error handler with a child logger", async () => {
-      const logger = winston.createLogger({ silent: true });
+      const rootLogger = winston.createLogger({ silent: true });
       const errorHandler = { ...defaultResultHandler, handler: vi.fn() };
       const handler = createParserFailureHandler({
         errorHandler,
-        logger,
-        childLoggerProvider: ({ logger: original }) => ({
-          ...original,
+        rootLogger,
+        childLoggerProvider: ({ logger }) => ({
+          ...logger,
           isChild: true,
         }),
       });
@@ -60,16 +60,16 @@ describe("Server helpers", () => {
 
   describe("createNotFoundHandler()", () => {
     test("the handler should call ResultHandler with 404 error", async () => {
-      const logger = winston.createLogger({ silent: true });
+      const rootLogger = winston.createLogger({ silent: true });
       const errorHandler = {
         ...defaultResultHandler,
         handler: vi.fn(),
       };
       const handler = createNotFoundHandler({
         errorHandler,
-        logger,
-        childLoggerProvider: async ({ logger: original }) => ({
-          ...original,
+        rootLogger,
+        childLoggerProvider: async ({ logger }) => ({
+          ...logger,
           isChild: true,
         }),
       });
@@ -102,14 +102,14 @@ describe("Server helpers", () => {
     });
 
     test("should call Last Resort Handler in case of ResultHandler is faulty", () => {
-      const logger = winston.createLogger({ silent: true });
+      const rootLogger = winston.createLogger({ silent: true });
       const errorHandler = {
         ...defaultResultHandler,
         handler: vi.fn().mockImplementation(() => assert.fail("I am faulty")),
       };
       const handler = createNotFoundHandler({
         errorHandler,
-        logger,
+        rootLogger,
         childLoggerProvider: undefined,
       });
       const next = vi.fn();

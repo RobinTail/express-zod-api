@@ -18,21 +18,21 @@ import {
 } from "./server-helpers";
 
 const makeCommonEntities = async (config: CommonConfig) => {
-  const logger: AbstractLogger = isSimplifiedWinstonConfig(config.logger)
+  const rootLogger: AbstractLogger = isSimplifiedWinstonConfig(config.logger)
     ? createLogger({ ...config.logger, winston: await loadPeer("winston") })
     : config.logger;
   const errorHandler = config.errorHandler || defaultResultHandler;
   const { childLoggerProvider } = config;
-  const creatorParams = { errorHandler, logger, childLoggerProvider };
+  const creatorParams = { errorHandler, rootLogger, childLoggerProvider };
   const notFoundHandler = createNotFoundHandler(creatorParams);
   const parserFailureHandler = createParserFailureHandler(creatorParams);
-  return { logger, errorHandler, notFoundHandler, parserFailureHandler };
+  return { rootLogger, errorHandler, notFoundHandler, parserFailureHandler };
 };
 
 export const attachRouting = async (config: AppConfig, routing: Routing) => {
-  const { logger, notFoundHandler } = await makeCommonEntities(config);
-  initRouting({ app: config.app, routing, logger, config });
-  return { notFoundHandler, logger };
+  const { rootLogger, notFoundHandler } = await makeCommonEntities(config);
+  initRouting({ app: config.app, routing, rootLogger, config });
+  return { notFoundHandler, logger: rootLogger };
 };
 
 export const createServer = async (config: ServerConfig, routing: Routing) => {
@@ -70,10 +70,10 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
     });
   }
 
-  const { logger, notFoundHandler, parserFailureHandler } =
+  const { rootLogger, notFoundHandler, parserFailureHandler } =
     await makeCommonEntities(config);
   app.use(parserFailureHandler);
-  initRouting({ app, routing, logger, config });
+  initRouting({ app, routing, rootLogger, config });
   app.use(notFoundHandler);
 
   const starter = <T extends http.Server | https.Server>(
@@ -81,7 +81,7 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
     subject: typeof config.server.listen,
   ) =>
     server.listen(subject, () => {
-      logger.info("Listening", subject);
+      rootLogger.info("Listening", subject);
     }) as T;
 
   const servers = {
@@ -94,5 +94,5 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
       : undefined,
   } satisfies Record<string, http.Server | https.Server | undefined>;
 
-  return { app, ...servers, logger };
+  return { app, ...servers, logger: rootLogger };
 };

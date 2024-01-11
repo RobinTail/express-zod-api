@@ -13,12 +13,12 @@ export interface Routing {
 
 export const initRouting = ({
   app,
-  logger: rootLogger,
+  rootLogger,
   config,
   routing,
 }: {
   app: IRouter;
-  logger: AbstractLogger;
+  rootLogger: AbstractLogger;
   config: CommonConfig;
   routing: Routing;
 }) => {
