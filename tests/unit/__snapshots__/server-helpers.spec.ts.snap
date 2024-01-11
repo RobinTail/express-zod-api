@@ -1,0 +1,23 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Server helpers > createNotFoundHandler() > the handler should call ResultHandler with 404 error 1`] = `
+{
+  "error": [NotFoundError: Can not POST /v1/test],
+  "input": null,
+  "output": null,
+  "request": {
+    "body": {
+      "n": 453,
+    },
+    "header": [MockFunction spy],
+    "method": "POST",
+    "path": "/v1/test",
+  },
+  "response": {
+    "end": [MockFunction spy],
+    "json": [MockFunction spy],
+    "set": [MockFunction spy],
+    "status": [MockFunction spy],
+  },
+}
+`;

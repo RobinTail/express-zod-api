@@ -1,84 +1,21 @@
-import express, { ErrorRequestHandler, RequestHandler } from "express";
+import express from "express";
 import type compression from "compression";
 import type fileUpload from "express-fileupload";
 import http from "node:http";
 import https from "node:https";
 import { AppConfig, CommonConfig, ServerConfig } from "./config-type";
-import { lastResortHandler } from "./last-resort";
 import {
   AbstractLogger,
   createLogger,
   isSimplifiedWinstonConfig,
 } from "./logger";
-import { ResultHandlerError } from "./errors";
-import { makeErrorFromAnything } from "./common-helpers";
 import { loadPeer } from "./peer-helpers";
-import {
-  AnyResultHandlerDefinition,
-  defaultResultHandler,
-} from "./result-handler";
+import { defaultResultHandler } from "./result-handler";
 import { Routing, initRouting } from "./routing";
-import createHttpError from "http-errors";
-
-interface HandlerCreatorParams {
-  errorHandler: AnyResultHandlerDefinition;
-  logger: AbstractLogger;
-  childLoggerProvider: CommonConfig["childLoggerProvider"];
-}
-
-export const createParserFailureHandler =
-  ({
-    errorHandler,
-    logger,
-    childLoggerProvider,
-  }: HandlerCreatorParams): ErrorRequestHandler =>
-  async (error, request, response, next) => {
-    if (!error) {
-      return next();
-    }
-    errorHandler.handler({
-      error: createHttpError(400, makeErrorFromAnything(error).message),
-      request,
-      response,
-      input: null,
-      output: null,
-      logger: childLoggerProvider
-        ? await childLoggerProvider({ request, logger })
-        : logger,
-    });
-  };
-
-export const createNotFoundHandler =
-  ({
-    errorHandler,
-    childLoggerProvider,
-    logger: rootLogger,
-  }: HandlerCreatorParams): RequestHandler =>
-  async (request, response) => {
-    const error = createHttpError(
-      404,
-      `Can not ${request.method} ${request.path}`,
-    );
-    const logger = childLoggerProvider
-      ? await childLoggerProvider({ request, logger: rootLogger })
-      : rootLogger;
-    try {
-      errorHandler.handler({
-        request,
-        response,
-        logger,
-        error,
-        input: null,
-        output: null,
-      });
-    } catch (e) {
-      lastResortHandler({
-        response,
-        logger,
-        error: new ResultHandlerError(makeErrorFromAnything(e).message, error),
-      });
-    }
-  };
+import {
+  createNotFoundHandler,
+  createParserFailureHandler,
+} from "./server-helpers";
 
 const makeCommonEntities = async (config: CommonConfig) => {
   const logger: AbstractLogger = isSimplifiedWinstonConfig(config.logger)
