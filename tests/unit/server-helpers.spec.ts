@@ -59,7 +59,7 @@ describe("Server helpers", () => {
   });
 
   describe("createNotFoundHandler()", () => {
-    test("the handler should call ResultHandler with 404 error", () => {
+    test("the handler should call ResultHandler with 404 error", async () => {
       const logger = winston.createLogger({ silent: true });
       const errorHandler = {
         ...defaultResultHandler,
@@ -68,7 +68,10 @@ describe("Server helpers", () => {
       const handler = createNotFoundHandler({
         errorHandler,
         logger,
-        childLoggerProvider: undefined,
+        childLoggerProvider: ({ logger: original }) => ({
+          ...original,
+          isChild: true,
+        }),
       });
       const next = vi.fn();
       const requestMock = makeRequestMock({
@@ -80,7 +83,7 @@ describe("Server helpers", () => {
         },
       });
       const responseMock = makeResponseMock({ fnMethod: vi.fn });
-      handler(
+      await handler(
         requestMock as unknown as Request,
         responseMock as unknown as Response,
         next,
@@ -89,7 +92,10 @@ describe("Server helpers", () => {
       expect(errorHandler.handler).toHaveBeenCalledTimes(1);
       expect(errorHandler.handler.mock.calls[0]).toHaveLength(1);
       expect(errorHandler.handler.mock.calls[0][0]).toHaveProperty("logger");
-      expect(errorHandler.handler.mock.calls[0][0].logger).toEqual(logger);
+      expect(errorHandler.handler.mock.calls[0][0].logger).toHaveProperty(
+        "isChild",
+        true,
+      );
       expect(
         omit(["logger"], errorHandler.handler.mock.calls[0][0]),
       ).toMatchSnapshot();
