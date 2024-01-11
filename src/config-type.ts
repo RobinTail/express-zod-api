@@ -52,7 +52,7 @@ export interface CommonConfig<TAG extends string = string> {
    * */
   logger: SimplifiedWinstonConfig | AbstractLogger;
   /**
-   * @desc If specified, a child logger returned by this function will replace the logger for each request
+   * @desc A child logger returned by this function can override the logger for each request
    * @example ({ logger }) => logger.child({ requestId: uuid() })
    * */
   childLoggerProvider?: ChildLoggerProvider;
