@@ -1,4 +1,3 @@
-import { omit } from "ramda";
 import { makeRequestMock } from "../../src/testing";
 import { givePort } from "../helpers";
 import {
@@ -23,14 +22,8 @@ import {
   createServer,
   defaultResultHandler,
 } from "../../src";
-import { mimeJson } from "../../src/mime";
-import {
-  createNotFoundHandler,
-  createParserFailureHandler,
-} from "../../src/server";
-import express, { Request, Response } from "express";
-import { Mock, afterAll, describe, expect, test, vi } from "vitest";
-import assert from "node:assert/strict";
+import express from "express";
+import { afterAll, describe, expect, test, vi } from "vitest";
 
 describe("Server", () => {
   afterAll(() => {
@@ -264,98 +257,6 @@ describe("Server", () => {
       });
       rawPropMw(requestMock, {}, vi.fn());
       expect(requestMock.body).toEqual({ raw: buffer });
-    });
-  });
-
-  describe("createParserFailureHandler()", () => {
-    test("the handler should call next if there is no error", () => {
-      const logger = winston.createLogger({ silent: true });
-      const handler = createParserFailureHandler(defaultResultHandler, logger);
-      const next = vi.fn();
-      handler(
-        undefined,
-        null as unknown as Request,
-        null as unknown as Response,
-        next,
-      );
-      expect(next).toHaveBeenCalledTimes(1);
-    });
-  });
-
-  describe("createNotFoundHandler()", () => {
-    test("the handler should call ResultHandler with 404 error", () => {
-      const logger = winston.createLogger({ silent: true });
-      const resultHandler = {
-        ...defaultResultHandler,
-        handler: vi.fn(),
-      };
-      const handler = createNotFoundHandler(resultHandler, logger);
-      const next = vi.fn();
-      const requestMock = {
-        method: "POST",
-        path: "/v1/test",
-        header: vi.fn(() => mimeJson),
-        body: {
-          n: 453,
-        },
-      };
-      const responseMock: Record<string, Mock> = {
-        end: vi.fn(),
-        set: vi.fn().mockImplementation(() => responseMock),
-        status: vi.fn().mockImplementation(() => responseMock),
-        json: vi.fn().mockImplementation(() => responseMock),
-      };
-      handler(
-        requestMock as unknown as Request,
-        responseMock as unknown as Response,
-        next,
-      );
-      expect(next).toHaveBeenCalledTimes(0);
-      expect(resultHandler.handler).toHaveBeenCalledTimes(1);
-      expect(resultHandler.handler.mock.calls[0]).toHaveLength(1);
-      expect(resultHandler.handler.mock.calls[0][0]).toHaveProperty("logger");
-      expect(resultHandler.handler.mock.calls[0][0].logger).toEqual(logger);
-      expect(
-        omit(["logger"], resultHandler.handler.mock.calls[0][0]),
-      ).toMatchSnapshot();
-    });
-
-    test("should call Last Resort Handler in case of ResultHandler is faulty", () => {
-      const logger = winston.createLogger({ silent: true });
-      const resultHandler = {
-        ...defaultResultHandler,
-        handler: vi.fn().mockImplementation(() => assert.fail("I am faulty")),
-      };
-      const handler = createNotFoundHandler(resultHandler, logger);
-      const next = vi.fn();
-      const requestMock = {
-        method: "POST",
-        path: "/v1/test",
-        header: vi.fn(() => mimeJson),
-        body: {
-          n: 453,
-        },
-      };
-      const responseMock: Record<string, Mock> = {
-        end: vi.fn(),
-        set: vi.fn().mockImplementation(() => responseMock),
-        status: vi.fn().mockImplementation(() => responseMock),
-        json: vi.fn().mockImplementation(() => responseMock),
-      };
-      handler(
-        requestMock as unknown as Request,
-        responseMock as unknown as Response,
-        next,
-      );
-      expect(next).toHaveBeenCalledTimes(0);
-      expect(resultHandler.handler).toHaveBeenCalledTimes(1);
-      expect(responseMock.status).toHaveBeenCalledTimes(1);
-      expect(responseMock.status.mock.calls[0][0]).toBe(500);
-      expect(responseMock.end).toHaveBeenCalledTimes(1);
-      expect(responseMock.end.mock.calls[0][0]).toBe(
-        "An error occurred while serving the result: I am faulty.\n" +
-          "Original error: Can not POST /v1/test.",
-      );
     });
   });
 

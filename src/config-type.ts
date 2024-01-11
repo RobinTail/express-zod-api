@@ -28,6 +28,11 @@ export type TagsConfig<TAG extends string> = Record<
   string | { description: string; url?: string }
 >;
 
+type ChildLoggerProvider = (params: {
+  request: Request;
+  parent: AbstractLogger;
+}) => AbstractLogger | Promise<AbstractLogger>;
+
 export interface CommonConfig<TAG extends string = string> {
   /**
    * @desc Enables cross-origin resource sharing.
@@ -46,6 +51,11 @@ export interface CommonConfig<TAG extends string = string> {
    * @example { level: "debug", color: true }
    * */
   logger: SimplifiedWinstonConfig | AbstractLogger;
+  /**
+   * @desc A child logger returned by this function can override the logger in all handlers for each request
+   * @example ({ parent }) => parent.child({ requestId: uuid() })
+   * */
+  childLoggerProvider?: ChildLoggerProvider;
   /**
    * @desc You can disable the startup logo.
    * @default true

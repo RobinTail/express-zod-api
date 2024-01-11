@@ -2,6 +2,34 @@
 
 ## Version 16
 
+### 16.4.0
+
+- Featuring the child logger support for your convenience:
+  - In case you need a slightly different or preconfigured logger for each request, the new feature comes handy;
+  - The common use case is logging a unique request ID;
+  - Previously, for that purpose you most likely used middlewares, but there is a better way now;
+  - In the configuration you can now specify `childLoggerProvider` returning a logger instance;
+  - When specified, the returned child logger will replace the `logger` in all handlers for each request;
+  - The provider function receives the initially configured logger and the request, it can also be asynchronous;
+  - Consider the following example in case of Winston logger:
+
+```typescript
+import { createConfig } from "express-zod-api";
+import { Logger } from "winston"; // or another compatible logger
+import { randomUUID } from "node:crypto";
+
+declare module "express-zod-api" {
+  // this approach enables the .child() method availability
+  interface LoggerOverrides extends Logger {}
+}
+
+const config = createConfig({
+  // logger: ...,
+  childLoggerProvider: ({ parent, request }) =>
+    parent.child({ requestId: randomUUID() }),
+});
+```
+
 ### 16.3.0
 
 - Switching to using native `zod` methods for proprietary schemas instead of custom classes (`ez` namespace):

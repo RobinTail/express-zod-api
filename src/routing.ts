@@ -13,24 +13,27 @@ export interface Routing {
 
 export const initRouting = ({
   app,
-  logger,
+  rootLogger,
   config,
   routing,
 }: {
   app: IRouter;
-  logger: AbstractLogger;
+  rootLogger: AbstractLogger;
   config: CommonConfig;
   routing: Routing;
 }) => {
   if (config.startupLogo !== false) {
     console.log(getStartupLogo());
   }
-  logger.debug("Running", process.env.TSUP_BUILD || "from sources");
+  rootLogger.debug("Running", process.env.TSUP_BUILD || "from sources");
   walkRouting({
     routing,
     hasCors: !!config.cors,
     onEndpoint: (endpoint, path, method) => {
       app[method](path, async (request, response) => {
+        const logger = config.childLoggerProvider
+          ? await config.childLoggerProvider({ request, parent: rootLogger })
+          : rootLogger;
         logger.info(`${request.method}: ${path}`);
         await endpoint.execute({ request, response, logger, config });
       });
