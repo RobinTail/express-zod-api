@@ -35,7 +35,8 @@ Start your API server with I/O schema validation and custom middlewares in minut
    7. [Cross-Origin Resource Sharing](#cross-origin-resource-sharing) (CORS)
    8. [Enabling HTTPS](#enabling-https)
    9. [Customizing logger](#customizing-logger)
-   10. [Enabling compression](#enabling-compression)
+   10. [Child logger](#child-logger)
+   11. [Enabling compression](#enabling-compression)
 5. [Advances features](#advances-features)
    1. [Customizing input sources](#customizing-input-sources)
    2. [Route path params](#route-path-params)
@@ -527,6 +528,23 @@ const config = createConfig({ logger });
 declare module "express-zod-api" {
   interface LoggerOverrides extends Logger {}
 }
+```
+
+## Child logger
+
+In case you need a dedicated logger for each request (for example, equipped with a request ID), you can specify the
+`childLoggerProvider` option in your configuration. The function accepts the initially defined logger and the request,
+it can also be asynchronous. The child logger returned by that function will replace the `logger` in all handlers.
+
+```typescript
+import { createConfig } from "express-zod-api";
+import { randomUUID } from "node:crypto";
+
+const config = createConfig({
+  // logger: ...,
+  childLoggerProvider: ({ logger, request }) =>
+    logger.child({ requestId: randomUUID() }),
+});
 ```
 
 ## Enabling compression
