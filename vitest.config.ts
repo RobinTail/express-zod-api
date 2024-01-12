@@ -6,7 +6,7 @@ export default defineConfig({
     reporters: "basic",
     coverage: {
       provider: "istanbul",
-      reporter: ["json-summary", "text", "html", "lcov"],
+      reporter: [["text", { maxCols: 120 }], "json-summary", "html", "lcov"],
       include: ["src/**"],
     },
   },
