@@ -44,7 +44,6 @@ import {
   depicters,
   ensureShortDescription,
   excludeExamplesFromDepiction,
-  excludeParamsFromDepiction,
   extractObjectSchema,
   getRoutePathParams,
   onEach,
@@ -69,6 +68,7 @@ describe("Documentation helpers", () => {
     getRef: getRefMock,
     makeRef: makeRefMock,
     serializer: defaultSerializer,
+    excludeProps: [],
   };
   const responseCtx: OpenAPIContext = {
     path: "/v1/user/:id",
@@ -77,6 +77,7 @@ describe("Documentation helpers", () => {
     getRef: getRefMock,
     makeRef: makeRefMock,
     serializer: defaultSerializer,
+    excludeProps: [],
   };
   const makeNext =
     (
@@ -179,29 +180,6 @@ describe("Documentation helpers", () => {
           ),
         ).toThrow(tfError);
       });
-    });
-  });
-
-  describe("excludeParamsFromDepiction()", () => {
-    test.each<z.ZodTypeAny>([
-      z.object({ a: z.string(), b: z.string() }),
-      z.object({ a: z.string() }).or(z.object({ b: z.string() })),
-      z.object({ a: z.string() }).and(z.object({ b: z.string() })),
-    ])("should omit specified path params %#", (schema) => {
-      const depicted = walkSchema({
-        schema,
-        ...requestCtx,
-        onEach,
-        rules: depicters,
-        onMissing,
-      });
-      expect(excludeParamsFromDepiction(depicted, ["a"])).toMatchSnapshot();
-    });
-
-    test("should handle the ReferenceObject", () => {
-      expect(
-        excludeParamsFromDepiction({ $ref: "test" }, ["a"]),
-      ).toMatchSnapshot();
     });
   });
 

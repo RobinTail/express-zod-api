@@ -62,6 +62,7 @@ export interface OpenAPIContext extends FlatObject {
   ) => ReferenceObject;
   path: string;
   method: Method;
+  excludeProps: string[];
 }
 
 type Depicter<
@@ -221,19 +222,27 @@ export const depictLiteral: Depicter<z.ZodLiteral<unknown>> = ({
 export const depictObject: Depicter<z.AnyZodObject> = ({
   schema,
   isResponse,
+  excludeProps,
   ...rest
 }) => {
-  const required = Object.keys(schema.shape).filter((key) => {
-    const prop = schema.shape[key];
-    const isOptional =
-      isResponse && hasCoercion(prop)
-        ? prop instanceof z.ZodOptional
-        : prop.isOptional();
-    return !isOptional;
-  });
+  const required = Object.keys(schema.shape)
+    .filter((key) => !excludeProps.includes(key))
+    .filter((key) => {
+      const prop = schema.shape[key];
+      const isOptional =
+        isResponse && hasCoercion(prop)
+          ? prop instanceof z.ZodOptional
+          : prop.isOptional();
+      return !isOptional;
+    });
   const result: SchemaObject = {
     type: "object",
-    properties: depictObjectProperties({ schema, isResponse, ...rest }),
+    properties: depictObjectProperties({
+      schema,
+      isResponse,
+      excludeProps,
+      ...rest,
+    }),
   };
   if (required.length) {
     result.required = required;
@@ -509,15 +518,18 @@ export const depictNumber: Depicter<z.ZodNumber> = ({ schema }) => {
 
 export const depictObjectProperties = ({
   schema: { shape },
+  excludeProps,
   next,
 }: Parameters<Depicter<z.AnyZodObject>>[0]) =>
-  Object.keys(shape).reduce<Record<string, SchemaObject | ReferenceObject>>(
-    (carry, key) => ({
-      ...carry,
-      [key]: next({ schema: shape[key] }),
-    }),
-    {},
-  );
+  Object.keys(shape)
+    .filter((prop) => !excludeProps.includes(prop))
+    .reduce<Record<string, SchemaObject | ReferenceObject>>(
+      (carry, key) => ({
+        ...carry,
+        [key]: next({ schema: shape[key] }),
+      }),
+      {},
+    );
 
 const makeSample = (depicted: SchemaObject) => {
   const type = (
@@ -706,6 +718,7 @@ export const depictRequestParams = ({
         schema: shape[name],
         isResponse: false,
         rules: depicters,
+        excludeProps: [],
         onEach,
         onMissing,
         serializer,
@@ -774,6 +787,7 @@ export const onEach: Depicter<z.ZodTypeAny, "each"> = ({
   schema,
   isResponse,
   prev,
+  excludeProps,
 }) => {
   if (isReferenceObject(prev)) {
     return {};
@@ -793,7 +807,9 @@ export const onEach: Depicter<z.ZodTypeAny, "each"> = ({
         schema,
         variant: isResponse ? "parsed" : "original",
         validate: true,
-      });
+      }).map((example) =>
+        typeof example === "object" ? omit(excludeProps, example) : example,
+      );
   const result: SchemaObject = {};
   if (description) {
     result.description = description;
@@ -814,48 +830,6 @@ export const onMissing: Depicter<z.ZodTypeAny, "last"> = ({ schema, ...ctx }) =>
       ...ctx,
     }),
   );
-
-export const excludeParamsFromDepiction = (
-  depicted: SchemaObject | ReferenceObject,
-  pathParams: string[],
-): SchemaObject | ReferenceObject => {
-  if (isReferenceObject(depicted)) {
-    return depicted;
-  }
-  const properties = depicted.properties
-    ? omit(pathParams, depicted.properties)
-    : undefined;
-  const examples = depicted.examples
-    ? depicted.examples.map((entry) => omit(pathParams, entry))
-    : undefined;
-  const required = depicted.required
-    ? depicted.required.filter((name) => !pathParams.includes(name))
-    : undefined;
-  const allOf = depicted.allOf
-    ? (depicted.allOf as SchemaObject[]).map((entry) =>
-        excludeParamsFromDepiction(entry, pathParams),
-      )
-    : undefined;
-  const oneOf = depicted.oneOf
-    ? (depicted.oneOf as SchemaObject[]).map((entry) =>
-        excludeParamsFromDepiction(entry, pathParams),
-      )
-    : undefined;
-
-  return omit(
-    Object.entries({ properties, required, examples, allOf, oneOf })
-      .filter(([{}, value]) => value === undefined)
-      .map(([key]) => key),
-    {
-      ...depicted,
-      properties,
-      required,
-      examples,
-      allOf,
-      oneOf,
-    },
-  );
-};
 
 export const excludeExamplesFromDepiction = (
   depicted: SchemaObject | ReferenceObject,
@@ -887,6 +861,7 @@ export const depictResponse = ({
       schema,
       isResponse: true,
       rules: depicters,
+      excludeProps: [],
       onEach,
       onMissing,
       serializer,
@@ -1044,21 +1019,19 @@ export const depictRequest = ({
 }: ReqResDepictHelperCommonProps): RequestBodyObject => {
   const pathParams = getRoutePathParams(path);
   const bodyDepiction = excludeExamplesFromDepiction(
-    excludeParamsFromDepiction(
-      walkSchema({
-        schema,
-        isResponse: false,
-        rules: depicters,
-        onEach,
-        onMissing,
-        serializer,
-        getRef,
-        makeRef,
-        path,
-        method,
-      }),
-      pathParams,
-    ),
+    walkSchema({
+      schema,
+      isResponse: false,
+      rules: depicters,
+      onEach,
+      onMissing,
+      serializer,
+      getRef,
+      makeRef,
+      path,
+      method,
+      excludeProps: pathParams,
+    }),
   );
   const bodyExamples = depictExamples(schema, false, pathParams);
   const result =
