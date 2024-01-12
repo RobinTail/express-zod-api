@@ -4,7 +4,7 @@
 
 ### 16.4.1
 
-- Removed redundant duplication when documenting of the request parameters.
+- Removed redundant duplication when documenting the request parameters.
 
 ### 16.4.0
 
