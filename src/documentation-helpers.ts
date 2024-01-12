@@ -682,7 +682,7 @@ export const depictRequestParams = ({
 }: Omit<ReqResDepictHelperCommonProps, "mimeTypes"> & {
   inputSources: InputSource[];
 }): ParameterObject[] => {
-  const shape = extractObjectSchema(
+  const { shape } = extractObjectSchema(
     schema,
     new DocumentationError({
       message: `Using transformations on the top level schema is not allowed.`,
@@ -690,7 +690,7 @@ export const depictRequestParams = ({
       method,
       isResponse: false,
     }),
-  ).shape;
+  );
   const pathParams = getRoutePathParams(path);
   const isQueryEnabled = inputSources.includes("query");
   const areParamsEnabled = inputSources.includes("params");
