@@ -663,11 +663,9 @@ export const extractObjectSchema = (
       .reduce((acc, option) => acc.merge(option.partial()), z.object({}));
   } else if (subject instanceof z.ZodEffects) {
     assert(
-      !hasTopLevelTransformingEffect(subject),
+      subject._def.effect.type === "refinement",
       new DocumentationError({
-        message: `Using transformations on the top level of ${
-          ctx.isResponse ? "response" : "input"
-        } schema is not allowed.`,
+        message: `Using transformations on the top level schema is not allowed.`,
         ...ctx,
       }),
     );
