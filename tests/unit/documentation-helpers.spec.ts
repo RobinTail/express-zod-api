@@ -404,6 +404,19 @@ describe("Documentation helpers", () => {
         }),
       ).toMatchSnapshot();
     });
+
+    test.each([
+      z.record(z.string(), z.number()).and(z.object({ test: z.number() })), // has additionalProperties
+      z.number().and(z.literal(5)), // not objects
+    ])("should fall back to allOf in other cases %#", (schema) => {
+      expect(
+        depictIntersection({
+          schema,
+          ...requestCtx,
+          next: makeNext(requestCtx),
+        }),
+      ).toMatchSnapshot();
+    });
   });
 
   describe("depictOptional()", () => {
