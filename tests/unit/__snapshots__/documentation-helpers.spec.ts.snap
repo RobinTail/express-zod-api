@@ -1279,6 +1279,24 @@ exports[`Documentation helpers > excludeParamsFromDepiction() > should omit spec
 }
 `;
 
+exports[`Documentation helpers > excludeParamsFromDepiction() > should omit specified path params 3 1`] = `
+{
+  "allOf": [
+    {
+      "properties": {},
+      "required": [],
+      "type": "object",
+    },
+    {
+      "additionalProperties": {
+        "type": "string",
+      },
+      "type": "object",
+    },
+  ],
+}
+`;
+
 exports[`Documentation helpers > extractObjectSchema() > Feature #600: Top level refinements > should handle refined object schema 1`] = `
 {
   "_type": "ZodObject",
