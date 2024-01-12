@@ -130,12 +130,15 @@ describe("Documentation helpers", () => {
   });
 
   describe("extractObjectSchema()", () => {
-    const error = new Error(
+    const tfError = new Error(
       "Using transformations on the top level schema is not allowed.",
     );
 
     test("should pass the object schema through", () => {
-      const subject = extractObjectSchema(z.object({ one: z.string() }), error);
+      const subject = extractObjectSchema(
+        z.object({ one: z.string() }),
+        tfError,
+      );
       expect(subject).toBeInstanceOf(z.ZodObject);
       expect(serializeSchemaForTest(subject)).toMatchSnapshot();
     });
@@ -143,7 +146,7 @@ describe("Documentation helpers", () => {
     test("should return object schema for the union of object schemas", () => {
       const subject = extractObjectSchema(
         z.object({ one: z.string() }).or(z.object({ two: z.number() })),
-        error,
+        tfError,
       );
       expect(subject).toBeInstanceOf(z.ZodObject);
       expect(serializeSchemaForTest(subject)).toMatchSnapshot();
@@ -152,7 +155,7 @@ describe("Documentation helpers", () => {
     test("should return object schema for the intersection of object schemas", () => {
       const subject = extractObjectSchema(
         z.object({ one: z.string() }).and(z.object({ two: z.number() })),
-        error,
+        tfError,
       );
       expect(subject).toBeInstanceOf(z.ZodObject);
       expect(serializeSchemaForTest(subject)).toMatchSnapshot();
@@ -162,7 +165,7 @@ describe("Documentation helpers", () => {
       test("should handle refined object schema", () => {
         const subject = extractObjectSchema(
           z.object({ one: z.string() }).refine(() => true),
-          error,
+          tfError,
         );
         expect(subject).toBeInstanceOf(z.ZodObject);
         expect(serializeSchemaForTest(subject)).toMatchSnapshot();
@@ -172,9 +175,9 @@ describe("Documentation helpers", () => {
         expect(() =>
           extractObjectSchema(
             z.object({ one: z.string() }).transform(() => []),
-            error,
+            tfError,
           ),
-        ).toThrow(error);
+        ).toThrow(tfError);
       });
     });
   });

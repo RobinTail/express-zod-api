@@ -648,7 +648,7 @@ export const depictParamExamples = (
 
 export const extractObjectSchema = (
   subject: IOSchema,
-  error: DocumentationError, // in case of top level transformation
+  tfError: DocumentationError,
 ): z.ZodObject<z.ZodRawShape> => {
   if (subject instanceof z.ZodObject) {
     return subject;
@@ -658,14 +658,14 @@ export const extractObjectSchema = (
     subject instanceof z.ZodDiscriminatedUnion
   ) {
     return Array.from(subject.options.values())
-      .map((option) => extractObjectSchema(option, error))
+      .map((option) => extractObjectSchema(option, tfError))
       .reduce((acc, option) => acc.merge(option.partial()), z.object({}));
   } else if (subject instanceof z.ZodEffects) {
-    assert(subject._def.effect.type === "refinement", error);
-    return extractObjectSchema(subject._def.schema, error); // object refinement
+    assert(subject._def.effect.type === "refinement", tfError);
+    return extractObjectSchema(subject._def.schema, tfError); // object refinement
   } // intersection left
-  return extractObjectSchema(subject._def.left, error).merge(
-    extractObjectSchema(subject._def.right, error),
+  return extractObjectSchema(subject._def.left, tfError).merge(
+    extractObjectSchema(subject._def.right, tfError),
   );
 };
 
