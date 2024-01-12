@@ -22,7 +22,6 @@ import {
   FlatObject,
   getExamples,
   hasCoercion,
-  hasTopLevelTransformingEffect,
   isCustomHeader,
   makeCleanId,
   tryToTransform,
@@ -649,7 +648,7 @@ export const depictParamExamples = (
 
 export const extractObjectSchema = (
   subject: IOSchema,
-  ctx: Pick<OpenAPIContext, "path" | "method" | "isResponse">,
+  tfError: DocumentationError,
 ): z.ZodObject<z.ZodRawShape> => {
   if (subject instanceof z.ZodObject) {
     return subject;
@@ -659,22 +658,14 @@ export const extractObjectSchema = (
     subject instanceof z.ZodDiscriminatedUnion
   ) {
     return Array.from(subject.options.values())
-      .map((option) => extractObjectSchema(option, ctx))
+      .map((option) => extractObjectSchema(option, tfError))
       .reduce((acc, option) => acc.merge(option.partial()), z.object({}));
   } else if (subject instanceof z.ZodEffects) {
-    assert(
-      !hasTopLevelTransformingEffect(subject),
-      new DocumentationError({
-        message: `Using transformations on the top level of ${
-          ctx.isResponse ? "response" : "input"
-        } schema is not allowed.`,
-        ...ctx,
-      }),
-    );
-    return extractObjectSchema(subject._def.schema, ctx); // object refinement
+    assert(subject._def.effect.type === "refinement", tfError);
+    return extractObjectSchema(subject._def.schema, tfError); // object refinement
   } // intersection left
-  return extractObjectSchema(subject._def.left, ctx).merge(
-    extractObjectSchema(subject._def.right, ctx),
+  return extractObjectSchema(subject._def.left, tfError).merge(
+    extractObjectSchema(subject._def.right, tfError),
   );
 };
 
@@ -691,11 +682,15 @@ export const depictRequestParams = ({
 }: Omit<ReqResDepictHelperCommonProps, "mimeTypes"> & {
   inputSources: InputSource[];
 }): ParameterObject[] => {
-  const shape = extractObjectSchema(schema, {
-    path,
-    method,
-    isResponse: false,
-  }).shape;
+  const { shape } = extractObjectSchema(
+    schema,
+    new DocumentationError({
+      message: `Using transformations on the top level schema is not allowed.`,
+      path,
+      method,
+      isResponse: false,
+    }),
+  );
   const pathParams = getRoutePathParams(path);
   const isQueryEnabled = inputSources.includes("query");
   const areParamsEnabled = inputSources.includes("params");
