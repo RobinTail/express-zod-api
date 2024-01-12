@@ -2,7 +2,6 @@ import assert from "node:assert/strict";
 import { ReferenceObject, SchemaObject } from "openapi3-ts/oas31";
 import { z } from "zod";
 import { defaultSerializer } from "../../src/common-helpers";
-import { IOSchemaError } from "../../src/errors";
 import { DocumentationError, ez, withMeta } from "../../src";
 import {
   OpenAPIContext,
@@ -131,11 +130,12 @@ describe("Documentation helpers", () => {
   });
 
   describe("extractObjectSchema()", () => {
+    const error = new Error(
+      "Using transformations on the top level schema is not allowed.",
+    );
+
     test("should pass the object schema through", () => {
-      const subject = extractObjectSchema(
-        z.object({ one: z.string() }),
-        requestCtx,
-      );
+      const subject = extractObjectSchema(z.object({ one: z.string() }), error);
       expect(subject).toBeInstanceOf(z.ZodObject);
       expect(serializeSchemaForTest(subject)).toMatchSnapshot();
     });
@@ -143,7 +143,7 @@ describe("Documentation helpers", () => {
     test("should return object schema for the union of object schemas", () => {
       const subject = extractObjectSchema(
         z.object({ one: z.string() }).or(z.object({ two: z.number() })),
-        requestCtx,
+        error,
       );
       expect(subject).toBeInstanceOf(z.ZodObject);
       expect(serializeSchemaForTest(subject)).toMatchSnapshot();
@@ -152,7 +152,7 @@ describe("Documentation helpers", () => {
     test("should return object schema for the intersection of object schemas", () => {
       const subject = extractObjectSchema(
         z.object({ one: z.string() }).and(z.object({ two: z.number() })),
-        requestCtx,
+        error,
       );
       expect(subject).toBeInstanceOf(z.ZodObject);
       expect(serializeSchemaForTest(subject)).toMatchSnapshot();
@@ -162,7 +162,7 @@ describe("Documentation helpers", () => {
       test("should handle refined object schema", () => {
         const subject = extractObjectSchema(
           z.object({ one: z.string() }).refine(() => true),
-          requestCtx,
+          error,
         );
         expect(subject).toBeInstanceOf(z.ZodObject);
         expect(serializeSchemaForTest(subject)).toMatchSnapshot();
@@ -172,14 +172,9 @@ describe("Documentation helpers", () => {
         expect(() =>
           extractObjectSchema(
             z.object({ one: z.string() }).transform(() => []),
-            requestCtx,
+            error,
           ),
-        ).toThrow(
-          new IOSchemaError(
-            "Using transformations on the top level schema is not allowed.\n" +
-              "Caused by input schema of an Endpoint assigned to GET method of /v1/user/:id path.",
-          ),
-        );
+        ).toThrow(error);
       });
     });
   });
