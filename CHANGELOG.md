@@ -2,6 +2,10 @@
 
 ## Version 16
 
+### 16.4.1
+
+- Removed redundant duplication during the documenting of the request parameters.
+
 ### 16.4.0
 
 - Featuring the child logger support for your convenience:
