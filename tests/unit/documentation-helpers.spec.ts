@@ -378,13 +378,15 @@ describe("Documentation helpers", () => {
       ).toMatchSnapshot();
     });
 
-    test("should flatten three object schemas", () => {
+    test("should flatten three object schemas with examples", () => {
       expect(
         depictIntersection({
-          schema: z
-            .object({ one: z.number() })
-            .and(z.object({ two: z.number() }))
-            .and(z.object({ three: z.number() })),
+          schema: withMeta(z.object({ one: z.number() }))
+            .example({ one: 123 })
+            .and(withMeta(z.object({ two: z.number() })).example({ two: 456 }))
+            .and(
+              withMeta(z.object({ three: z.number() })).example({ three: 789 }),
+            ),
           ...requestCtx,
           next: makeNext(requestCtx),
         }),
