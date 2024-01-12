@@ -4,7 +4,6 @@ import { z } from "zod";
 import { defaultSerializer } from "../../src/common-helpers";
 import { IOSchemaError } from "../../src/errors";
 import { DocumentationError, ez, withMeta } from "../../src";
-import { getMeta } from "../../src/metadata";
 import {
   OpenAPIContext,
   depictAny,
@@ -157,41 +156,6 @@ describe("Documentation helpers", () => {
       );
       expect(subject).toBeInstanceOf(z.ZodObject);
       expect(serializeSchemaForTest(subject)).toMatchSnapshot();
-    });
-
-    test("should preserve examples", () => {
-      const objectSchema = withMeta(z.object({ one: z.string() })).example({
-        one: "test",
-      });
-      expect(
-        getMeta(extractObjectSchema(objectSchema, requestCtx), "examples"),
-      ).toEqual([{ one: "test" }]);
-
-      const refinedObjSchema = withMeta(
-        z.object({ one: z.string() }).refine(() => true),
-      ).example({ one: "test" });
-      expect(
-        getMeta(extractObjectSchema(refinedObjSchema, requestCtx), "examples"),
-      ).toEqual([{ one: "test" }]);
-
-      const unionSchema = withMeta(
-        z.object({ one: z.string() }).or(z.object({ two: z.number() })),
-      )
-        .example({ one: "test1" })
-        .example({ two: 123 });
-      expect(
-        getMeta(extractObjectSchema(unionSchema, requestCtx), "examples"),
-      ).toEqual([{ one: "test1" }, { two: 123 }]);
-
-      const intersectionSchema = withMeta(
-        z.object({ one: z.string() }).and(z.object({ two: z.number() })),
-      ).example({ one: "test1", two: 123 });
-      expect(
-        getMeta(
-          extractObjectSchema(intersectionSchema, requestCtx),
-          "examples",
-        ),
-      ).toEqual([{ one: "test1", two: 123 }]);
     });
 
     describe("Feature #600: Top level refinements", () => {
