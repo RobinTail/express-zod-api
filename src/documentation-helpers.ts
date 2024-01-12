@@ -16,10 +16,11 @@ import {
   TagObject,
   isReferenceObject,
 } from "openapi3-ts/oas31";
-import { concat, mergeDeepWith, omit } from "ramda";
+import { omit } from "ramda";
 import { z } from "zod";
 import {
   FlatObject,
+  combinations,
   getExamples,
   hasCoercion,
   hasTopLevelTransformingEffect,
@@ -182,15 +183,33 @@ export const depictIntersection: Depicter<
   next,
 }) => {
   const children = [left, right].map((entry) => next({ schema: entry }));
-  const areObjects = children.every(
-    (side) => !isReferenceObject(side) && side.type === "object",
+  const safeObjects = children.filter(
+    (side): side is SchemaObject =>
+      !isReferenceObject(side) &&
+      side.type === "object" &&
+      Object.keys(side).every((key) =>
+        ["type", "properties", "required", "examples"].includes(key),
+      ),
   );
-  if (areObjects) {
-    return mergeDeepWith(
-      (a, b) =>
-        typeof a === "object" && typeof b === "object" ? concat(a, b) : a,
-      children[0],
-      children[1],
+  if (safeObjects.length === 2) {
+    return safeObjects.reduce<SchemaObject>(
+      (agg, { properties, required = [], examples = [] }) => {
+        if (properties) {
+          agg.properties = { ...agg.properties, ...properties };
+        }
+        if (required.length) {
+          agg.required = [...(agg.required || []), ...required];
+        }
+        if (examples.length) {
+          agg.examples = combinations(
+            agg.examples || [],
+            examples,
+            ([a, b]) => ({ ...a, ...b }),
+          );
+        }
+        return agg;
+      },
+      { type: "object" },
     );
   }
   return { allOf: children };
