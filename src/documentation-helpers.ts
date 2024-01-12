@@ -650,16 +650,15 @@ export const depictParamExamples = (
 export const extractObjectSchema = (
   subject: IOSchema,
   ctx: Pick<OpenAPIContext, "path" | "method" | "isResponse">,
-) => {
+): z.ZodObject<z.ZodRawShape> => {
   if (subject instanceof z.ZodObject) {
     return subject;
   }
-  let objectSchema: z.AnyZodObject;
   if (
     subject instanceof z.ZodUnion ||
     subject instanceof z.ZodDiscriminatedUnion
   ) {
-    objectSchema = Array.from(subject.options.values())
+    return Array.from(subject.options.values())
       .map((option) => extractObjectSchema(option, ctx))
       .reduce((acc, option) => acc.merge(option.partial()), z.object({}));
   } else if (subject instanceof z.ZodEffects) {
@@ -672,14 +671,11 @@ export const extractObjectSchema = (
         ...ctx,
       }),
     );
-    objectSchema = extractObjectSchema(subject._def.schema, ctx); // object refinement
-  } else {
-    // intersection
-    objectSchema = extractObjectSchema(subject._def.left, ctx).merge(
-      extractObjectSchema(subject._def.right, ctx),
-    );
-  }
-  return objectSchema;
+    return extractObjectSchema(subject._def.schema, ctx); // object refinement
+  } // intersection left
+  return extractObjectSchema(subject._def.left, ctx).merge(
+    extractObjectSchema(subject._def.right, ctx),
+  );
 };
 
 export const depictRequestParams = ({
