@@ -39,7 +39,6 @@ import {
   andToOr,
   mapLogicalContainer,
 } from "./logical-container";
-import { copyMeta } from "./metadata";
 import { Method } from "./method";
 import { RawSchema, ezRawKind } from "./raw-schema";
 import { isoDateRegex } from "./schema-helpers";
@@ -680,7 +679,7 @@ export const extractObjectSchema = (
       extractObjectSchema(subject._def.right, ctx),
     );
   }
-  return copyMeta(subject, objectSchema);
+  return objectSchema;
 };
 
 export const depictRequestParams = ({
