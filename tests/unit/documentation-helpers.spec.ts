@@ -392,6 +392,18 @@ describe("Documentation helpers", () => {
         }),
       ).toMatchSnapshot();
     });
+
+    test("should maintain uniqueness in the array of required props", () => {
+      expect(
+        depictIntersection({
+          schema: z
+            .record(z.literal("test"), z.number())
+            .and(z.object({ test: z.literal(5) })),
+          ...requestCtx,
+          next: makeNext(requestCtx),
+        }),
+      ).toMatchSnapshot();
+    });
   });
 
   describe("depictOptional()", () => {

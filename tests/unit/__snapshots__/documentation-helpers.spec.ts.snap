@@ -339,6 +339,23 @@ exports[`Documentation helpers > depictIntersection() > should flatten two objec
 }
 `;
 
+exports[`Documentation helpers > depictIntersection() > should maintain uniqueness in the array of required props 1`] = `
+{
+  "properties": {
+    "test": {
+      "enum": [
+        5,
+      ],
+      "type": "number",
+    },
+  },
+  "required": [
+    "test",
+  ],
+  "type": "object",
+}
+`;
+
 exports[`Documentation helpers > depictLazy > should handle circular references 0 1`] = `
 {
   "$ref": "#/components/schemas/6cbbd837811754902ea1e68d3e5c75e36250b880",

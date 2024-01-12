@@ -198,7 +198,10 @@ export const depictIntersection: Depicter<
           agg.properties = { ...agg.properties, ...properties };
         }
         if (required.length) {
-          agg.required = [...(agg.required || []), ...required];
+          agg.required = [
+            ...(agg.required || []),
+            ...required.filter((prop) => !agg.required?.includes(prop)),
+          ];
         }
         if (examples.length) {
           agg.examples = combinations(
