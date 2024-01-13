@@ -22,7 +22,6 @@ import {
   FlatObject,
   getExamples,
   hasCoercion,
-  hasTopLevelTransformingEffect,
   isCustomHeader,
   makeCleanId,
   tryToTransform,
@@ -39,7 +38,6 @@ import {
   andToOr,
   mapLogicalContainer,
 } from "./logical-container";
-import { copyMeta } from "./metadata";
 import { Method } from "./method";
 import { RawSchema, ezRawKind } from "./raw-schema";
 import { isoDateRegex } from "./schema-helpers";
@@ -650,37 +648,25 @@ export const depictParamExamples = (
 
 export const extractObjectSchema = (
   subject: IOSchema,
-  ctx: Pick<OpenAPIContext, "path" | "method" | "isResponse">,
-) => {
+  tfError: DocumentationError,
+): z.ZodObject<z.ZodRawShape> => {
   if (subject instanceof z.ZodObject) {
     return subject;
   }
-  let objectSchema: z.AnyZodObject;
   if (
     subject instanceof z.ZodUnion ||
     subject instanceof z.ZodDiscriminatedUnion
   ) {
-    objectSchema = Array.from(subject.options.values())
-      .map((option) => extractObjectSchema(option, ctx))
+    return Array.from(subject.options.values())
+      .map((option) => extractObjectSchema(option, tfError))
       .reduce((acc, option) => acc.merge(option.partial()), z.object({}));
   } else if (subject instanceof z.ZodEffects) {
-    assert(
-      !hasTopLevelTransformingEffect(subject),
-      new DocumentationError({
-        message: `Using transformations on the top level of ${
-          ctx.isResponse ? "response" : "input"
-        } schema is not allowed.`,
-        ...ctx,
-      }),
-    );
-    objectSchema = extractObjectSchema(subject._def.schema, ctx); // object refinement
-  } else {
-    // intersection
-    objectSchema = extractObjectSchema(subject._def.left, ctx).merge(
-      extractObjectSchema(subject._def.right, ctx),
-    );
-  }
-  return copyMeta(subject, objectSchema);
+    assert(subject._def.effect.type === "refinement", tfError);
+    return extractObjectSchema(subject._def.schema, tfError); // object refinement
+  } // intersection left
+  return extractObjectSchema(subject._def.left, tfError).merge(
+    extractObjectSchema(subject._def.right, tfError),
+  );
 };
 
 export const depictRequestParams = ({
@@ -696,11 +682,15 @@ export const depictRequestParams = ({
 }: Omit<ReqResDepictHelperCommonProps, "mimeTypes"> & {
   inputSources: InputSource[];
 }): ParameterObject[] => {
-  const shape = extractObjectSchema(schema, {
-    path,
-    method,
-    isResponse: false,
-  }).shape;
+  const { shape } = extractObjectSchema(
+    schema,
+    new DocumentationError({
+      message: `Using transformations on the top level schema is not allowed.`,
+      path,
+      method,
+      isResponse: false,
+    }),
+  );
   const pathParams = getRoutePathParams(path);
   const isQueryEnabled = inputSources.includes("query");
   const areParamsEnabled = inputSources.includes("params");

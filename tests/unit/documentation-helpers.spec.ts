@@ -2,9 +2,7 @@ import assert from "node:assert/strict";
 import { ReferenceObject, SchemaObject } from "openapi3-ts/oas31";
 import { z } from "zod";
 import { defaultSerializer } from "../../src/common-helpers";
-import { IOSchemaError } from "../../src/errors";
 import { DocumentationError, ez, withMeta } from "../../src";
-import { getMeta } from "../../src/metadata";
 import {
   OpenAPIContext,
   depictAny,
@@ -132,10 +130,14 @@ describe("Documentation helpers", () => {
   });
 
   describe("extractObjectSchema()", () => {
+    const tfError = new Error(
+      "Using transformations on the top level schema is not allowed.",
+    );
+
     test("should pass the object schema through", () => {
       const subject = extractObjectSchema(
         z.object({ one: z.string() }),
-        requestCtx,
+        tfError,
       );
       expect(subject).toBeInstanceOf(z.ZodObject);
       expect(serializeSchemaForTest(subject)).toMatchSnapshot();
@@ -144,7 +146,7 @@ describe("Documentation helpers", () => {
     test("should return object schema for the union of object schemas", () => {
       const subject = extractObjectSchema(
         z.object({ one: z.string() }).or(z.object({ two: z.number() })),
-        requestCtx,
+        tfError,
       );
       expect(subject).toBeInstanceOf(z.ZodObject);
       expect(serializeSchemaForTest(subject)).toMatchSnapshot();
@@ -153,52 +155,17 @@ describe("Documentation helpers", () => {
     test("should return object schema for the intersection of object schemas", () => {
       const subject = extractObjectSchema(
         z.object({ one: z.string() }).and(z.object({ two: z.number() })),
-        requestCtx,
+        tfError,
       );
       expect(subject).toBeInstanceOf(z.ZodObject);
       expect(serializeSchemaForTest(subject)).toMatchSnapshot();
-    });
-
-    test("should preserve examples", () => {
-      const objectSchema = withMeta(z.object({ one: z.string() })).example({
-        one: "test",
-      });
-      expect(
-        getMeta(extractObjectSchema(objectSchema, requestCtx), "examples"),
-      ).toEqual([{ one: "test" }]);
-
-      const refinedObjSchema = withMeta(
-        z.object({ one: z.string() }).refine(() => true),
-      ).example({ one: "test" });
-      expect(
-        getMeta(extractObjectSchema(refinedObjSchema, requestCtx), "examples"),
-      ).toEqual([{ one: "test" }]);
-
-      const unionSchema = withMeta(
-        z.object({ one: z.string() }).or(z.object({ two: z.number() })),
-      )
-        .example({ one: "test1" })
-        .example({ two: 123 });
-      expect(
-        getMeta(extractObjectSchema(unionSchema, requestCtx), "examples"),
-      ).toEqual([{ one: "test1" }, { two: 123 }]);
-
-      const intersectionSchema = withMeta(
-        z.object({ one: z.string() }).and(z.object({ two: z.number() })),
-      ).example({ one: "test1", two: 123 });
-      expect(
-        getMeta(
-          extractObjectSchema(intersectionSchema, requestCtx),
-          "examples",
-        ),
-      ).toEqual([{ one: "test1", two: 123 }]);
     });
 
     describe("Feature #600: Top level refinements", () => {
       test("should handle refined object schema", () => {
         const subject = extractObjectSchema(
           z.object({ one: z.string() }).refine(() => true),
-          requestCtx,
+          tfError,
         );
         expect(subject).toBeInstanceOf(z.ZodObject);
         expect(serializeSchemaForTest(subject)).toMatchSnapshot();
@@ -208,14 +175,9 @@ describe("Documentation helpers", () => {
         expect(() =>
           extractObjectSchema(
             z.object({ one: z.string() }).transform(() => []),
-            requestCtx,
+            tfError,
           ),
-        ).toThrow(
-          new IOSchemaError(
-            "Using transformations on the top level of input schema is not allowed.\n" +
-              "Caused by input schema of an Endpoint assigned to GET method of /v1/user/:id path.",
-          ),
-        );
+        ).toThrow(tfError);
       });
     });
   });
