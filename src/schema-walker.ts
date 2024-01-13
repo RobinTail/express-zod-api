@@ -3,26 +3,23 @@ import type { FlatObject } from "./common-helpers";
 import { getMeta } from "./metadata";
 import { ProprietaryKind } from "./proprietary-schemas";
 
-export type HandlingVariant = "last" | "regular" | "each";
+interface VariantDependingProps<U> {
+  regular: { next: SchemaHandler<z.ZodTypeAny, U, {}, "last"> };
+  each: { prev: U };
+  last: {};
+}
 
-type VariantDependingProps<
-  Variant extends HandlingVariant,
-  U,
-> = Variant extends "regular"
-  ? { next: SchemaHandler<z.ZodTypeAny, U, {}, "last"> }
-  : Variant extends "each"
-    ? { prev: U }
-    : {};
+export type HandlingVariant = keyof VariantDependingProps<unknown>;
 
 type SchemaHandlingProps<
   T extends z.ZodTypeAny,
   U,
   Context extends FlatObject,
   Variant extends HandlingVariant,
-> = {
-  schema: T;
-} & Context &
-  VariantDependingProps<Variant, U>;
+> = Context &
+  VariantDependingProps<U>[Variant] & {
+    schema: T;
+  };
 
 export type SchemaHandler<
   T extends z.ZodTypeAny,
