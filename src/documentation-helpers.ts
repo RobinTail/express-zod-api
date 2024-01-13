@@ -62,7 +62,7 @@ export interface OpenAPIContext extends FlatObject {
   ) => ReferenceObject;
   path: string;
   method: Method;
-  excludeProps: string[];
+  excludeProps?: string[];
 }
 
 type Depicter<
@@ -226,7 +226,7 @@ export const depictObject: Depicter<z.AnyZodObject> = ({
   ...rest
 }) => {
   const required = Object.keys(schema.shape)
-    .filter((key) => !excludeProps.includes(key))
+    .filter((key) => !excludeProps?.includes(key))
     .filter((key) => {
       const prop = schema.shape[key];
       const isOptional =
@@ -522,7 +522,7 @@ export const depictObjectProperties = ({
   next,
 }: Parameters<Depicter<z.AnyZodObject>>[0]) =>
   Object.keys(shape)
-    .filter((prop) => !excludeProps.includes(prop))
+    .filter((prop) => !excludeProps?.includes(prop))
     .reduce<Record<string, SchemaObject | ReferenceObject>>(
       (carry, key) => ({
         ...carry,
@@ -718,7 +718,6 @@ export const depictRequestParams = ({
         schema: shape[name],
         isResponse: false,
         rules: depicters,
-        excludeProps: [],
         onEach,
         onMissing,
         serializer,
@@ -808,7 +807,9 @@ export const onEach: Depicter<z.ZodTypeAny, "each"> = ({
         variant: isResponse ? "parsed" : "original",
         validate: true,
       }).map((example) =>
-        typeof example === "object" ? omit(excludeProps, example) : example,
+        typeof example === "object"
+          ? omit(excludeProps || [], example)
+          : example,
       );
   const result: SchemaObject = {};
   if (description) {
@@ -861,7 +862,6 @@ export const depictResponse = ({
       schema,
       isResponse: true,
       rules: depicters,
-      excludeProps: [],
       onEach,
       onMissing,
       serializer,

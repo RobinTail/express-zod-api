@@ -68,7 +68,6 @@ describe("Documentation helpers", () => {
     getRef: getRefMock,
     makeRef: makeRefMock,
     serializer: defaultSerializer,
-    excludeProps: [],
   };
   const responseCtx: OpenAPIContext = {
     path: "/v1/user/:id",
@@ -77,7 +76,6 @@ describe("Documentation helpers", () => {
     getRef: getRefMock,
     makeRef: makeRefMock,
     serializer: defaultSerializer,
-    excludeProps: [],
   };
   const makeNext =
     (
