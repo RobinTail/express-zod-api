@@ -2,6 +2,7 @@ import { inspect } from "node:util";
 import type { Format, TransformableInfo } from "logform";
 import type Winston from "winston";
 import type Transport from "winston-transport";
+import { z } from "zod";
 
 /**
  * @desc Using module augmentation approach you can set the type of the actual logger used
@@ -17,20 +18,17 @@ export type AbstractLogger = Record<
 > &
   LoggerOverrides;
 
-export interface SimplifiedWinstonConfig {
-  level: "silent" | "warn" | "debug";
-  color?: boolean;
-}
+const configSchema = z.object({
+  level: z.union([z.literal("silent"), z.literal("warn"), z.literal("debug")]),
+  color: z.boolean().optional(),
+});
+
+export type SimplifiedWinstonConfig = z.input<typeof configSchema>;
 
 export const isSimplifiedWinstonConfig = (
   subject: unknown,
 ): subject is SimplifiedWinstonConfig =>
-  typeof subject === "object" &&
-  subject !== null &&
-  "level" in subject &&
-  ("color" in subject ? typeof subject.color === "boolean" : true) &&
-  typeof subject.level === "string" &&
-  ["silent", "warn", "debug"].includes(subject.level);
+  configSchema.safeParse(subject).success;
 
 /**
  * @desc a helper for creating a winston logger easier
