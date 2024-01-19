@@ -16,7 +16,7 @@ import {
   TagObject,
   isReferenceObject,
 } from "openapi3-ts/oas31";
-import { omit } from "ramda";
+import { omit, union } from "ramda";
 import { z } from "zod";
 import {
   FlatObject,
@@ -196,10 +196,7 @@ export const depictIntersection: Depicter<
           agg.properties = { ...agg.properties, ...properties };
         }
         if (required.length) {
-          agg.required = [
-            ...(agg.required || []),
-            ...required.filter((prop) => !agg.required?.includes(prop)),
-          ];
+          agg.required = union(agg.required || [], required); // without duplicates
         }
         if (examples.length) {
           agg.examples = combinations(
