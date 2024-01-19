@@ -395,11 +395,53 @@ exports[`Documentation helpers > depictIntersection() > should maintain uniquene
       "enum": [
         5,
       ],
+      "format": "double",
+      "maximum": 1.7976931348623157e+308,
+      "minimum": 5e-324,
       "type": "number",
     },
   },
   "required": [
     "test",
+  ],
+  "type": "object",
+}
+`;
+
+exports[`Documentation helpers > depictIntersection() > should merge examples deeply 1`] = `
+{
+  "examples": [
+    {
+      "one": {
+        "a": 123,
+        "b": 456,
+      },
+    },
+  ],
+  "properties": {
+    "one": {
+      "properties": {
+        "a": {
+          "format": "double",
+          "maximum": 1.7976931348623157e+308,
+          "minimum": 5e-324,
+          "type": "number",
+        },
+        "b": {
+          "format": "double",
+          "maximum": 1.7976931348623157e+308,
+          "minimum": 5e-324,
+          "type": "number",
+        },
+      },
+      "required": [
+        "b",
+      ],
+      "type": "object",
+    },
+  },
+  "required": [
+    "one",
   ],
   "type": "object",
 }

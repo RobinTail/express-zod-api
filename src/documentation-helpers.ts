@@ -16,7 +16,7 @@ import {
   TagObject,
   isReferenceObject,
 } from "openapi3-ts/oas31";
-import { mergeAll, omit, union } from "ramda";
+import { mergeDeepRight, omit, union } from "ramda";
 import { z } from "zod";
 import {
   FlatObject,
@@ -193,13 +193,15 @@ export const depictIntersection: Depicter<
     return safeObjects.reduce<SchemaObject>(
       (agg, { properties, required = [], examples = [] }) => {
         if (properties) {
-          agg.properties = { ...agg.properties, ...properties };
+          agg.properties = mergeDeepRight(agg.properties || {}, properties);
         }
         if (required.length) {
           agg.required = union(agg.required || [], required); // without duplicates
         }
         if (examples.length) {
-          agg.examples = combinations(agg.examples || [], examples, mergeAll);
+          agg.examples = combinations(agg.examples || [], examples, ([a, b]) =>
+            mergeDeepRight(a, b),
+          );
         }
         return agg;
       },

@@ -343,6 +343,22 @@ describe("Documentation helpers", () => {
       ).toMatchSnapshot();
     });
 
+    test("should merge examples deeply", () => {
+      expect(
+        depictIntersection({
+          schema: withMeta(z.object({ one: z.object({ a: z.number() }) }))
+            .example({ one: { a: 123 } })
+            .and(
+              withMeta(z.object({ one: z.object({ b: z.number() }) })).example({
+                one: { b: 456 },
+              }),
+            ),
+          ...requestCtx,
+          next: makeNext(requestCtx),
+        }),
+      ).toMatchSnapshot();
+    });
+
     test("should flatten three object schemas with examples", () => {
       expect(
         depictIntersection({
