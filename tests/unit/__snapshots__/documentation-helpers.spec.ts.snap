@@ -1310,20 +1310,6 @@ exports[`Documentation helpers > excludeParamsFromDepiction() > should omit spec
 
 exports[`Documentation helpers > excludeParamsFromDepiction() > should omit specified path params 2 1`] = `
 {
-  "properties": {
-    "b": {
-      "type": "string",
-    },
-  },
-  "required": [
-    "b",
-  ],
-  "type": "object",
-}
-`;
-
-exports[`Documentation helpers > excludeParamsFromDepiction() > should omit specified path params 3 1`] = `
-{
   "allOf": [
     {
       "properties": {},
@@ -1337,6 +1323,20 @@ exports[`Documentation helpers > excludeParamsFromDepiction() > should omit spec
       "type": "object",
     },
   ],
+}
+`;
+
+exports[`Documentation helpers > excludeParamsFromDepiction() > should omit specified path params 3 1`] = `
+{
+  "properties": {
+    "b": {
+      "type": "string",
+    },
+  },
+  "required": [
+    "b",
+  ],
+  "type": "object",
 }
 `;
 
