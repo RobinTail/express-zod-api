@@ -346,12 +346,12 @@ describe("Documentation helpers", () => {
     test("should merge examples deeply", () => {
       expect(
         depictIntersection({
-          schema: withMeta(z.object({ one: z.object({ a: z.number() }) }))
-            .example({ one: { a: 123 } })
+          schema: withMeta(z.object({ test: z.object({ a: z.number() }) }))
+            .example({ test: { a: 123 } })
             .and(
-              withMeta(z.object({ one: z.object({ b: z.number() }) })).example({
-                one: { b: 456 },
-              }),
+              withMeta(z.object({ test: z.object({ b: z.number() }) })).example(
+                { test: { b: 456 } },
+              ),
             ),
           ...requestCtx,
           next: makeNext(requestCtx),

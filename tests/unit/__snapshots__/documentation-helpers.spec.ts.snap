@@ -412,14 +412,14 @@ exports[`Documentation helpers > depictIntersection() > should merge examples de
 {
   "examples": [
     {
-      "one": {
+      "test": {
         "a": 123,
         "b": 456,
       },
     },
   ],
   "properties": {
-    "one": {
+    "test": {
       "properties": {
         "a": {
           "format": "double",
@@ -441,7 +441,7 @@ exports[`Documentation helpers > depictIntersection() > should merge examples de
     },
   },
   "required": [
-    "one",
+    "test",
   ],
   "type": "object",
 }
