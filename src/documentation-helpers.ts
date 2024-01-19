@@ -16,7 +16,7 @@ import {
   TagObject,
   isReferenceObject,
 } from "openapi3-ts/oas31";
-import { mergeDeepRight, omit, union } from "ramda";
+import { concat, mergeDeepRight, mergeDeepWith, omit, union } from "ramda";
 import { z } from "zod";
 import {
   FlatObject,
@@ -187,7 +187,8 @@ const canFlattenIntersection = (
 const flattenIntersection = ([left, right]: [SchemaObject, SchemaObject]) => {
   const flat: SchemaObject = { type: "object" };
   if (left.properties || right.properties) {
-    flat.properties = mergeDeepRight(
+    flat.properties = mergeDeepWith(
+      (a, b) => (Array.isArray(a) && Array.isArray(b) ? concat(a, b) : b),
       left.properties || {},
       right.properties || {},
     );

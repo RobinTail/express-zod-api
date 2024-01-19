@@ -435,6 +435,7 @@ exports[`Documentation helpers > depictIntersection() > should merge examples de
         },
       },
       "required": [
+        "a",
         "b",
       ],
       "type": "object",
