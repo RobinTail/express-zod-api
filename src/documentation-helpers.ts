@@ -184,24 +184,26 @@ const canFlattenIntersection = (
       ),
   ).length === 2;
 
-const flattenIntersection = (children: [SchemaObject, SchemaObject]) =>
-  children.reduce<SchemaObject>(
-    (agg, { properties, required = [], examples = [] }) => {
-      if (properties) {
-        agg.properties = mergeDeepRight(agg.properties || {}, properties);
-      }
-      if (required.length) {
-        agg.required = union(agg.required || [], required); // without duplicates
-      }
-      if (examples.length) {
-        agg.examples = combinations(agg.examples || [], examples, ([a, b]) =>
-          mergeDeepRight(a, b),
-        );
-      }
-      return agg;
-    },
-    { type: "object" },
-  );
+const flattenIntersection = ([left, right]: [SchemaObject, SchemaObject]) => {
+  const flat: SchemaObject = { type: "object" };
+  if (left.properties || right.properties) {
+    flat.properties = mergeDeepRight(
+      left.properties || {},
+      right.properties || {},
+    );
+  }
+  if (left.required || right.required) {
+    flat.required = union(left.required || [], right.required || []);
+  }
+  if (left.examples || right.examples) {
+    flat.examples = combinations(
+      left.examples || [],
+      right.examples || [],
+      ([a, b]) => mergeDeepRight(a, b),
+    );
+  }
+  return flat;
+};
 
 export const depictIntersection: Depicter<
   z.ZodIntersection<z.ZodTypeAny, z.ZodTypeAny>
