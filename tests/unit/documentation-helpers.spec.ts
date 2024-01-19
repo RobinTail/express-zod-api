@@ -186,10 +186,10 @@ describe("Documentation helpers", () => {
     test.each<z.ZodTypeAny>([
       z.object({ a: z.string(), b: z.string() }),
       z.object({ a: z.string() }).or(z.object({ b: z.string() })),
+      z.object({ a: z.string() }).and(z.object({ b: z.string() })), // flattened
       z
         .record(z.literal("a"), z.string())
         .and(z.record(z.string(), z.string())),
-      z.object({ a: z.string() }).and(z.object({ b: z.string() })), // flattened
     ])("should omit specified path params %#", (schema) => {
       const depicted = walkSchema({
         schema,
