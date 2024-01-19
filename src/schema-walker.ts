@@ -3,26 +3,23 @@ import type { FlatObject } from "./common-helpers";
 import { getMeta } from "./metadata";
 import { ProprietaryKind } from "./proprietary-schemas";
 
-export type HandlingVariant = "last" | "regular" | "each";
+interface VariantDependingProps<U> {
+  regular: { next: SchemaHandler<z.ZodTypeAny, U, {}, "last"> };
+  each: { prev: U };
+  last: {};
+}
 
-type VariantDependingProps<
-  Variant extends HandlingVariant,
-  U,
-> = Variant extends "regular"
-  ? { next: SchemaHandler<z.ZodTypeAny, U, {}, "last"> }
-  : Variant extends "each"
-    ? { prev: U }
-    : {};
+export type HandlingVariant = keyof VariantDependingProps<unknown>;
 
 type SchemaHandlingProps<
   T extends z.ZodTypeAny,
   U,
   Context extends FlatObject,
   Variant extends HandlingVariant,
-> = {
-  schema: T;
-} & Context &
-  VariantDependingProps<Variant, U>;
+> = Context &
+  VariantDependingProps<U>[Variant] & {
+    schema: T;
+  };
 
 export type SchemaHandler<
   T extends z.ZodTypeAny,
@@ -45,7 +42,7 @@ export const walkSchema = <U, Context extends FlatObject = {}>({
   onMissing,
   ...rest
 }: SchemaHandlingProps<z.ZodTypeAny, U, Context, "last"> & {
-  /** @since 10.1.1 calling onEach _after_ handler and giving it its result */
+  /** @since 10.1.1 calling onEach _after_ handler and giving it the previously achieved result */
   onEach?: SchemaHandler<z.ZodTypeAny, U, Context, "each">;
   rules: HandlingRules<U, Context>;
   onMissing: SchemaHandler<z.ZodTypeAny, U, Context, "last">;
@@ -54,7 +51,7 @@ export const walkSchema = <U, Context extends FlatObject = {}>({
   const handler = kind ? rules[kind as keyof typeof rules] : undefined;
   const ctx = rest as unknown as Context;
   const next: SchemaHandler<z.ZodTypeAny, U, {}, "last"> = (params) =>
-    walkSchema({ ...params, ...ctx, onEach, rules: rules, onMissing });
+    walkSchema({ ...params, ...ctx, onEach, rules, onMissing });
   const result = handler
     ? handler({ schema, ...ctx, next })
     : onMissing({ schema, ...ctx });
