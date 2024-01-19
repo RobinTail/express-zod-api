@@ -172,6 +172,37 @@ export const depictDiscriminatedUnion: Depicter<
   };
 };
 
+const canFlattenIntersection = (
+  children: Array<SchemaObject | ReferenceObject>,
+): children is [SchemaObject, SchemaObject] =>
+  children.filter(
+    (entry) =>
+      !isReferenceObject(entry) &&
+      entry.type === "object" &&
+      Object.keys(entry).every((key) =>
+        ["type", "properties", "required", "examples"].includes(key),
+      ),
+  ).length === 2;
+
+const flattenIntersection = (children: [SchemaObject, SchemaObject]) =>
+  children.reduce<SchemaObject>(
+    (agg, { properties, required = [], examples = [] }) => {
+      if (properties) {
+        agg.properties = mergeDeepRight(agg.properties || {}, properties);
+      }
+      if (required.length) {
+        agg.required = union(agg.required || [], required); // without duplicates
+      }
+      if (examples.length) {
+        agg.examples = combinations(agg.examples || [], examples, ([a, b]) =>
+          mergeDeepRight(a, b),
+        );
+      }
+      return agg;
+    },
+    { type: "object" },
+  );
+
 export const depictIntersection: Depicter<
   z.ZodIntersection<z.ZodTypeAny, z.ZodTypeAny>
 > = ({
@@ -181,32 +212,8 @@ export const depictIntersection: Depicter<
   next,
 }) => {
   const children = [left, right].map((entry) => next({ schema: entry }));
-  const safeObjects = children.filter(
-    (side): side is SchemaObject =>
-      !isReferenceObject(side) &&
-      side.type === "object" &&
-      Object.keys(side).every((key) =>
-        ["type", "properties", "required", "examples"].includes(key),
-      ),
-  );
-  if (safeObjects.length === 2) {
-    return safeObjects.reduce<SchemaObject>(
-      (agg, { properties, required = [], examples = [] }) => {
-        if (properties) {
-          agg.properties = mergeDeepRight(agg.properties || {}, properties);
-        }
-        if (required.length) {
-          agg.required = union(agg.required || [], required); // without duplicates
-        }
-        if (examples.length) {
-          agg.examples = combinations(agg.examples || [], examples, ([a, b]) =>
-            mergeDeepRight(a, b),
-          );
-        }
-        return agg;
-      },
-      { type: "object" },
-    );
+  if (canFlattenIntersection(children)) {
+    return flattenIntersection(children);
   }
   return { allOf: children };
 };
