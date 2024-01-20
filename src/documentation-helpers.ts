@@ -362,21 +362,16 @@ export const depictRecord: Depicter<z.ZodRecord<z.ZodTypeAny>> = ({
 }) => {
   if (keySchema instanceof z.ZodEnum || keySchema instanceof z.ZodNativeEnum) {
     const keys = Object.values(keySchema.enum) as string[];
-    const shape = keys.reduce<z.ZodRawShape>(
-      (carry, key) => ({
-        ...carry,
-        [key]: valueSchema,
-      }),
-      {},
-    );
-    const result: SchemaObject = {
-      type: "object",
-      properties: depictObjectProperties({
+    const result: SchemaObject = { type: "object" };
+    if (keys.length) {
+      const shape = keys.reduce<z.ZodRawShape>(
+        (carry, key) => ({ ...carry, [key]: valueSchema }),
+        {},
+      );
+      result.properties = depictObjectProperties({
         schema: z.object(shape),
         ...rest,
-      }),
-    };
-    if (keys.length) {
+      });
       result.required = keys;
     }
     return result;
