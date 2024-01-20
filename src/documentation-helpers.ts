@@ -384,9 +384,7 @@ export const depictRecord: Depicter<z.ZodRecord<z.ZodTypeAny>> = ({
     return {
       type: "object",
       properties: depictObjectProperties({
-        schema: z.object({
-          [keySchema.value]: valueSchema,
-        }),
+        schema: z.object({ [keySchema.value]: valueSchema }),
         ...rest,
       }),
       required: [keySchema.value],
