@@ -17,8 +17,7 @@ export type FlatObject = Record<string, unknown>;
 
 const areFilesAvailable = (request: Request): boolean => {
   const contentType = request.header("content-type") || "";
-  const isMultipart =
-    contentType.slice(0, mimeMultipart.length).toLowerCase() === mimeMultipart;
+  const isMultipart = contentType.toLowerCase().startsWith(mimeMultipart);
   return "files" in request && isMultipart;
 };
 
