@@ -139,7 +139,7 @@ describe("Metadata", () => {
       expect(getMeta(result, "examples")).toEqual(getMeta(src, "examples"));
     });
 
-    test("should merge the meta from src to dest (deep merge)", () => {
+    test("should merge the meta from src to dest", () => {
       const src = withMeta(z.object({ a: z.string() }))
         .example({ a: "some" })
         .example({ a: "another" });
@@ -156,6 +156,26 @@ describe("Metadata", () => {
         { a: "another", b: 456 },
         { a: "some", b: 789 },
         { a: "another", b: 789 },
+      ]);
+    });
+
+    test("should merge deeply", () => {
+      const src = withMeta(z.object({ a: z.object({ b: z.string() }) }))
+        .example({ a: { b: "some" } })
+        .example({ a: { b: "another" } });
+      const dest = withMeta(z.object({ a: z.object({ c: z.number() }) }))
+        .example({ a: { c: 123 } })
+        .example({ a: { c: 456 } })
+        .example({ a: { c: 789 } });
+      const result = copyMeta(src, dest);
+      expect(hasMeta(result)).toBeTruthy();
+      expect(getMeta(result, "examples")).toEqual([
+        { a: { b: "some", c: 123 } },
+        { a: { b: "another", c: 123 } },
+        { a: { b: "some", c: 456 } },
+        { a: { b: "another", c: 456 } },
+        { a: { b: "some", c: 789 } },
+        { a: { b: "another", c: 789 } },
       ]);
     });
   });

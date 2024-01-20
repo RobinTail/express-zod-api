@@ -186,7 +186,10 @@ describe("Documentation helpers", () => {
     test.each<z.ZodTypeAny>([
       z.object({ a: z.string(), b: z.string() }),
       z.object({ a: z.string() }).or(z.object({ b: z.string() })),
-      z.object({ a: z.string() }).and(z.object({ b: z.string() })),
+      z.object({ a: z.string() }).and(z.object({ b: z.string() })), // flattened
+      z
+        .record(z.literal("a"), z.string())
+        .and(z.record(z.string(), z.string())),
     ])("should omit specified path params %#", (schema) => {
       const depicted = walkSchema({
         schema,
@@ -328,12 +331,68 @@ describe("Documentation helpers", () => {
   });
 
   describe("depictIntersection()", () => {
-    test("should wrap next depicters in allOf property", () => {
+    test("should flatten two object schemas", () => {
       expect(
         depictIntersection({
           schema: z
             .object({ one: z.number() })
             .and(z.object({ two: z.number() })),
+          ...requestCtx,
+          next: makeNext(requestCtx),
+        }),
+      ).toMatchSnapshot();
+    });
+
+    test("should merge examples deeply", () => {
+      expect(
+        depictIntersection({
+          schema: withMeta(z.object({ test: z.object({ a: z.number() }) }))
+            .example({ test: { a: 123 } })
+            .and(
+              withMeta(z.object({ test: z.object({ b: z.number() }) })).example(
+                { test: { b: 456 } },
+              ),
+            ),
+          ...requestCtx,
+          next: makeNext(requestCtx),
+        }),
+      ).toMatchSnapshot();
+    });
+
+    test("should flatten three object schemas with examples", () => {
+      expect(
+        depictIntersection({
+          schema: withMeta(z.object({ one: z.number() }))
+            .example({ one: 123 })
+            .and(withMeta(z.object({ two: z.number() })).example({ two: 456 }))
+            .and(
+              withMeta(z.object({ three: z.number() })).example({ three: 789 }),
+            ),
+          ...requestCtx,
+          next: makeNext(requestCtx),
+        }),
+      ).toMatchSnapshot();
+    });
+
+    test("should maintain uniqueness in the array of required props", () => {
+      expect(
+        depictIntersection({
+          schema: z
+            .record(z.literal("test"), z.number())
+            .and(z.object({ test: z.literal(5) })),
+          ...requestCtx,
+          next: makeNext(requestCtx),
+        }),
+      ).toMatchSnapshot();
+    });
+
+    test.each([
+      z.record(z.string(), z.number()).and(z.object({ test: z.number() })), // has additionalProperties
+      z.number().and(z.literal(5)), // not objects
+    ])("should fall back to allOf in other cases %#", (schema) => {
+      expect(
+        depictIntersection({
+          schema,
           ...requestCtx,
           next: makeNext(requestCtx),
         }),

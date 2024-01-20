@@ -16,10 +16,11 @@ import {
   TagObject,
   isReferenceObject,
 } from "openapi3-ts/oas31";
-import { omit } from "ramda";
+import { concat, mergeDeepRight, mergeDeepWith, omit, union } from "ramda";
 import { z } from "zod";
 import {
   FlatObject,
+  combinations,
   getExamples,
   hasCoercion,
   isCustomHeader,
@@ -171,6 +172,45 @@ export const depictDiscriminatedUnion: Depicter<
   };
 };
 
+/** @throws AssertionError */
+const tryFlattenIntersection = (
+  children: Array<SchemaObject | ReferenceObject>,
+) => {
+  const [left, right] = children.filter(
+    (entry): entry is SchemaObject =>
+      !isReferenceObject(entry) &&
+      entry.type === "object" &&
+      Object.keys(entry).every((key) =>
+        ["type", "properties", "required", "examples"].includes(key),
+      ),
+  );
+  assert(left && right, "Can not flatten objects");
+  const flat: SchemaObject = { type: "object" };
+  if (left.properties || right.properties) {
+    flat.properties = mergeDeepWith(
+      (a, b) =>
+        Array.isArray(a) && Array.isArray(b)
+          ? concat(a, b)
+          : a === b
+            ? b
+            : assert.fail("Can not flatten properties"),
+      left.properties || {},
+      right.properties || {},
+    );
+  }
+  if (left.required || right.required) {
+    flat.required = union(left.required || [], right.required || []);
+  }
+  if (left.examples || right.examples) {
+    flat.examples = combinations(
+      left.examples || [],
+      right.examples || [],
+      ([a, b]) => mergeDeepRight(a, b),
+    );
+  }
+  return flat;
+};
+
 export const depictIntersection: Depicter<
   z.ZodIntersection<z.ZodTypeAny, z.ZodTypeAny>
 > = ({
@@ -178,9 +218,13 @@ export const depictIntersection: Depicter<
     _def: { left, right },
   },
   next,
-}) => ({
-  allOf: [left, right].map((entry) => next({ schema: entry })),
-});
+}) => {
+  const children = [left, right].map((entry) => next({ schema: entry }));
+  try {
+    return tryFlattenIntersection(children);
+  } catch {}
+  return { allOf: children };
+};
 
 export const depictOptional: Depicter<z.ZodOptional<z.ZodTypeAny>> = ({
   schema,
