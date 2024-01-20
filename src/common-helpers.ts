@@ -1,7 +1,7 @@
 import { Request } from "express";
 import { isHttpError } from "http-errors";
 import { createHash } from "node:crypto";
-import { pick, xprod } from "ramda";
+import { filter, pick, xprod } from "ramda";
 import { z } from "zod";
 import { CommonConfig, InputSource, InputSources } from "./config-type";
 import { InputValidationError, OutputValidationError } from "./errors";
@@ -48,19 +48,19 @@ export const getInput = (
   if (method === "options") {
     return {};
   }
-  const sources =
+  const sources = filter(
+    (src) => (src === "files" ? areFilesAvailable(request) : true),
     inputAssignment[method] ||
-    defaultInputSources[method] ||
-    fallbackInputSource;
-  return sources
-    .filter((src) => (src === "files" ? areFilesAvailable(request) : true))
-    .reduce<FlatObject>(
-      (carry, src) => ({
-        ...carry,
-        ...(src === "headers" ? getCustomHeaders(request) : request[src]),
-      }),
-      {},
-    );
+      defaultInputSources[method] ||
+      fallbackInputSource,
+  );
+  return sources.reduce<FlatObject>(
+    (carry, src) => ({
+      ...carry,
+      ...(src === "headers" ? getCustomHeaders(request) : request[src]),
+    }),
+    {},
+  );
 };
 
 export const makeErrorFromAnything = (subject: unknown): Error =>
