@@ -1,7 +1,7 @@
 import { Request } from "express";
 import { isHttpError } from "http-errors";
 import { createHash } from "node:crypto";
-import { map, mergeAll, pick, reject, xprod } from "ramda";
+import { map, mergeAll, pick, pipe, reject, xprod } from "ramda";
 import { z } from "zod";
 import { CommonConfig, InputSource, InputSources } from "./config-type";
 import { InputValidationError, OutputValidationError } from "./errors";
@@ -48,17 +48,16 @@ export const getInput = (
   if (method === "options") {
     return {};
   }
-  const sources = reject(
-    (src) => src === "files" && !areFilesAvailable(request),
+  return pipe<[InputSource[]], InputSource[], FlatObject[], FlatObject>(
+    reject((src) => src === "files" && !areFilesAvailable(request)),
+    map((src) =>
+      src === "headers" ? getCustomHeaders(request) : request[src],
+    ),
+    mergeAll,
+  )(
     inputAssignment[method] ||
       defaultInputSources[method] ||
       fallbackInputSource,
-  );
-  return mergeAll(
-    map(
-      (src) => (src === "headers" ? getCustomHeaders(request) : request[src]),
-      sources,
-    ),
   );
 };
 
