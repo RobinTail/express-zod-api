@@ -184,11 +184,17 @@ const canFlattenIntersection = (
       ),
   ).length === 2;
 
+/** @throws AssertionError */
 const flattenIntersection = ([left, right]: [SchemaObject, SchemaObject]) => {
   const flat: SchemaObject = { type: "object" };
   if (left.properties || right.properties) {
     flat.properties = mergeDeepWith(
-      (a, b) => (Array.isArray(a) && Array.isArray(b) ? concat(a, b) : b),
+      (a, b) =>
+        Array.isArray(a) && Array.isArray(b)
+          ? concat(a, b)
+          : a === b
+            ? b
+            : assert.fail("Can not flatten properties"),
       left.properties || {},
       right.properties || {},
     );
@@ -216,7 +222,9 @@ export const depictIntersection: Depicter<
 }) => {
   const children = [left, right].map((entry) => next({ schema: entry }));
   if (canFlattenIntersection(children)) {
-    return flattenIntersection(children);
+    try {
+      return flattenIntersection(children);
+    } catch {}
   }
   return { allOf: children };
 };
