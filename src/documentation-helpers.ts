@@ -359,10 +359,7 @@ export const depictBigInt: Depicter<z.ZodBigInt> = () => ({
 const areOptionsLiteral = (
   subject: z.ZodTypeAny[],
 ): subject is z.ZodLiteral<unknown>[] =>
-  subject.reduce(
-    (carry, option) => carry && option instanceof z.ZodLiteral,
-    true,
-  );
+  subject.every((option) => option instanceof z.ZodLiteral);
 
 export const depictRecord: Depicter<z.ZodRecord<z.ZodTypeAny>> = ({
   schema: { keySchema, valueSchema },
@@ -390,24 +387,22 @@ export const depictRecord: Depicter<z.ZodRecord<z.ZodTypeAny>> = ({
       required: [keySchema.value],
     };
   }
-  if (keySchema instanceof z.ZodUnion) {
-    if (areOptionsLiteral(keySchema.options)) {
-      const shape = keySchema.options.reduce<z.ZodRawShape>(
-        (carry, option) => ({
-          ...carry,
-          [`${option.value}`]: valueSchema,
-        }),
-        {},
-      );
-      return {
-        type: "object",
-        properties: depictObjectProperties({
-          schema: z.object(shape),
-          ...rest,
-        }),
-        required: keySchema.options.map((option) => option.value),
-      };
-    }
+  if (keySchema instanceof z.ZodUnion && areOptionsLiteral(keySchema.options)) {
+    const shape = keySchema.options.reduce<z.ZodRawShape>(
+      (carry, option) => ({
+        ...carry,
+        [`${option.value}`]: valueSchema,
+      }),
+      {},
+    );
+    return {
+      type: "object",
+      properties: depictObjectProperties({
+        schema: z.object(shape),
+        ...rest,
+      }),
+      required: keySchema.options.map((option) => option.value),
+    };
   }
   return {
     type: "object",
