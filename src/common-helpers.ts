@@ -37,13 +37,13 @@ export const isCustomHeader = (name: string): name is `x-${string}` =>
   name.startsWith("x-");
 
 /** @see https://nodejs.org/api/http.html#messageheaders */
-export const getCustomHeaders = (request: Request) =>
+export const getCustomHeaders = (request: Request): FlatObject =>
   pick(Object.keys(request.headers).filter(isCustomHeader), request.headers);
 
 export const getInput = (
   request: Request,
   inputAssignment: CommonConfig["inputSources"] = {},
-) => {
+): FlatObject => {
   const method = getActualMethod(request);
   if (method === "options") {
     return {};
