@@ -16,7 +16,15 @@ import {
   TagObject,
   isReferenceObject,
 } from "openapi3-ts/oas31";
-import { concat, mergeDeepRight, mergeDeepWith, omit, union } from "ramda";
+import {
+  concat,
+  fromPairs,
+  mergeDeepRight,
+  mergeDeepWith,
+  omit,
+  union,
+  xprod,
+} from "ramda";
 import { z } from "zod";
 import {
   FlatObject,
@@ -364,12 +372,8 @@ export const depictRecord: Depicter<z.ZodRecord<z.ZodTypeAny>> = ({
     const keys = Object.values(keySchema.enum) as string[];
     const result: SchemaObject = { type: "object" };
     if (keys.length) {
-      const shape = keys.reduce<z.ZodRawShape>(
-        (carry, key) => ({ ...carry, [key]: valueSchema }),
-        {},
-      );
       result.properties = depictObjectProperties({
-        schema: z.object(shape),
+        schema: z.object(fromPairs(xprod(keys, [valueSchema]))),
         ...rest,
       });
       result.required = keys;
