@@ -19,6 +19,7 @@ import {
 import {
   concat,
   fromPairs,
+  map,
   mergeDeepRight,
   mergeDeepWith,
   omit,
@@ -388,20 +389,12 @@ export const depictRecord: Depicter<z.ZodRecord<z.ZodTypeAny>> = ({
     };
   }
   if (keySchema instanceof z.ZodUnion && areOptionsLiteral(keySchema.options)) {
-    const shape = keySchema.options.reduce<z.ZodRawShape>(
-      (carry, option) => ({
-        ...carry,
-        [`${option.value}`]: valueSchema,
-      }),
-      {},
-    );
+    const required = map((opt) => `${opt.value}`, keySchema.options);
+    const shape = fromPairs(xprod(required, [valueSchema]));
     return {
       type: "object",
-      properties: depictObjectProperties({
-        schema: z.object(shape),
-        ...rest,
-      }),
-      required: keySchema.options.map((option) => option.value),
+      properties: depictObjectProperties({ schema: z.object(shape), ...rest }),
+      required,
     };
   }
   return {
