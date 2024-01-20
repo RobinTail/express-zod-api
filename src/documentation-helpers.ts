@@ -267,7 +267,8 @@ export const depictObject: Depicter<z.ZodObject<z.ZodRawShape>> = ({
   isResponse,
   ...rest
 }) => {
-  const required = Object.keys(schema.shape).filter((key) => {
+  const keys = Object.keys(schema.shape);
+  const required = keys.filter((key) => {
     const prop = schema.shape[key];
     const isOptional =
       isResponse && hasCoercion(prop)
@@ -275,10 +276,10 @@ export const depictObject: Depicter<z.ZodObject<z.ZodRawShape>> = ({
         : prop.isOptional();
     return !isOptional;
   });
-  const result: SchemaObject = {
-    type: "object",
-    properties: depictObjectProperties({ schema, isResponse, ...rest }),
-  };
+  const result: SchemaObject = { type: "object" };
+  if (keys.length) {
+    result.properties = depictObjectProperties({ schema, isResponse, ...rest });
+  }
   if (required.length) {
     result.required = required;
   }

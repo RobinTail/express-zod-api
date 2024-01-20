@@ -23,7 +23,6 @@ paths:
                       - success
                   data:
                     type: object
-                    properties: {}
                 required:
                   - status
                   - data
@@ -95,7 +94,6 @@ paths:
                       - success
                   data:
                     type: object
-                    properties: {}
                 required:
                   - status
                   - data
@@ -144,7 +142,6 @@ paths:
                       - success
                   data:
                     type: object
-                    properties: {}
                 required:
                   - status
                   - data
@@ -183,7 +180,6 @@ paths:
           application/json:
             schema:
               type: object
-              properties: {}
 components:
   schemas: {}
   responses: {}
@@ -223,7 +219,6 @@ paths:
                       - success
                   data:
                     type: object
-                    properties: {}
                 required:
                   - status
                   - data
@@ -273,7 +268,6 @@ paths:
                       - success
                   data:
                     type: object
-                    properties: {}
                 required:
                   - status
                   - data
@@ -416,7 +410,6 @@ paths:
                       - success
                   data:
                     type: object
-                    properties: {}
                 required:
                   - status
                   - data
@@ -453,7 +446,6 @@ paths:
           application/json:
             schema:
               type: object
-              properties: {}
       security:
         - HTTP_1: []
           OAUTH2_1:
@@ -475,7 +467,6 @@ paths:
                       - success
                   data:
                     type: object
-                    properties: {}
                 required:
                   - status
                   - data
@@ -512,7 +503,6 @@ paths:
           application/json:
             schema:
               type: object
-              properties: {}
       security:
         - HTTP_2: []
 components:
@@ -2689,7 +2679,6 @@ paths:
                       - OK
                   result:
                     type: object
-                    properties: {}
                 required:
                   - status
                   - result
@@ -3202,7 +3191,6 @@ paths:
           application/json:
             schema:
               type: object
-              properties: {}
 components:
   schemas: {}
   responses: {}
@@ -3705,7 +3693,6 @@ paths:
                       - success
                   data:
                     type: object
-                    properties: {}
                 required:
                   - status
                   - data
@@ -4192,7 +4179,6 @@ components:
             - success
         data:
           type: object
-          properties: {}
       required:
         - status
         - data
@@ -4714,7 +4700,6 @@ paths:
                       - success
                   data:
                     type: object
-                    properties: {}
                 required:
                   - status
                   - data
@@ -4845,7 +4830,6 @@ components:
             - success
         data:
           type: object
-          properties: {}
       required:
         - status
         - data
@@ -4910,7 +4894,6 @@ paths:
                       - success
                   data:
                     type: object
-                    properties: {}
                 required:
                   - status
                   - data
@@ -4999,7 +4982,6 @@ paths:
                       - success
                   data:
                     type: object
-                    properties: {}
                 required:
                   - status
                   - data
