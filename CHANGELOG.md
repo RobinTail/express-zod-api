@@ -2,6 +2,40 @@
 
 ## Version 16
 
+### 16.5.0
+
+- Flattening nested intersections of object schemas in the generated documentation:
+  - Intersections (`.and()`) help to combine input schemas of endpoints and middlewares into a single schema;
+  - When endpoint uses several middlewares it could lead to multiple nested `allOf` entries;
+  - This version tries to flatten them when possible, thanks to [@arlyon](https://github.com/arlyon)'s contribution.
+
+```yaml
+before:
+  allOf:
+    - type: object
+      properties:
+        a:
+          type: string
+      required:
+        - a
+    - type: object
+      properties:
+        b:
+          type: string
+      required:
+        - b
+after:
+  type: object
+  properties:
+    a:
+      type: string
+    b:
+      type: string
+  required:
+    - a
+    - b
+```
+
 ### 16.4.1
 
 - Removed redundant duplication when documenting the request parameters.
