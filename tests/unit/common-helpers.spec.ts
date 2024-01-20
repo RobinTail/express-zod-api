@@ -43,12 +43,10 @@ describe("Common Helpers", () => {
     test("should reduce the object to the custom headers only", () => {
       expect(
         getCustomHeaders({
-          headers: {
-            authorization: "Bearer ***",
-            "x-request-id": "test",
-            "x-another": "header",
-          },
-        } as unknown as Request),
+          authorization: "Bearer ***",
+          "x-request-id": "test",
+          "x-another": "header",
+        }),
       ).toEqual({ "x-request-id": "test", "x-another": "header" });
     });
   });

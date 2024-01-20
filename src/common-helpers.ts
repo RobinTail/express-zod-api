@@ -37,8 +37,8 @@ export const isCustomHeader = (name: string): name is `x-${string}` =>
   name.startsWith("x-");
 
 /** @see https://nodejs.org/api/http.html#messageheaders */
-export const getCustomHeaders = (request: Request): FlatObject =>
-  pick(Object.keys(request.headers).filter(isCustomHeader), request.headers);
+export const getCustomHeaders = (headers: FlatObject): FlatObject =>
+  pick(Object.keys(headers).filter(isCustomHeader), headers);
 
 export const getInput = (
   request: Request,
@@ -51,7 +51,7 @@ export const getInput = (
   return pipe<[InputSource[]], InputSource[], FlatObject[], FlatObject>(
     reject((src) => src === "files" && !areFilesAvailable(request)),
     map((src) =>
-      src === "headers" ? getCustomHeaders(request) : request[src],
+      src === "headers" ? getCustomHeaders(request[src]) : request[src],
     ),
     mergeAll,
   )(
