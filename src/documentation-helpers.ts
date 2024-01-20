@@ -172,20 +172,19 @@ export const depictDiscriminatedUnion: Depicter<
   };
 };
 
-const canFlattenIntersection = (
+/** @throws AssertionError */
+const tryFlattenIntersection = (
   children: Array<SchemaObject | ReferenceObject>,
-): children is [SchemaObject, SchemaObject] =>
-  children.filter(
-    (entry) =>
+) => {
+  const [left, right] = children.filter(
+    (entry): entry is SchemaObject =>
       !isReferenceObject(entry) &&
       entry.type === "object" &&
       Object.keys(entry).every((key) =>
         ["type", "properties", "required", "examples"].includes(key),
       ),
-  ).length === 2;
-
-/** @throws AssertionError */
-const flattenIntersection = ([left, right]: [SchemaObject, SchemaObject]) => {
+  );
+  assert(left && right, "Can not flatten objects");
   const flat: SchemaObject = { type: "object" };
   if (left.properties || right.properties) {
     flat.properties = mergeDeepWith(
@@ -221,11 +220,9 @@ export const depictIntersection: Depicter<
   next,
 }) => {
   const children = [left, right].map((entry) => next({ schema: entry }));
-  if (canFlattenIntersection(children)) {
-    try {
-      return flattenIntersection(children);
-    } catch {}
-  }
+  try {
+    return tryFlattenIntersection(children);
+  } catch {}
   return { allOf: children };
 };
 
