@@ -1,7 +1,7 @@
 import { Request } from "express";
 import { isHttpError } from "http-errors";
 import { createHash } from "node:crypto";
-import { pick, reject, xprod } from "ramda";
+import { map, mergeAll, pick, reject, xprod } from "ramda";
 import { z } from "zod";
 import { CommonConfig, InputSource, InputSources } from "./config-type";
 import { InputValidationError, OutputValidationError } from "./errors";
@@ -54,12 +54,11 @@ export const getInput = (
       defaultInputSources[method] ||
       fallbackInputSource,
   );
-  return sources.reduce<FlatObject>(
-    (carry, src) => ({
-      ...carry,
-      ...(src === "headers" ? getCustomHeaders(request) : request[src]),
-    }),
-    {},
+  return mergeAll(
+    map(
+      (src) => (src === "headers" ? getCustomHeaders(request) : request[src]),
+      sources,
+    ),
   );
 };
 
