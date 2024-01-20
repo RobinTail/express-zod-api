@@ -262,7 +262,7 @@ export const depictLiteral: Depicter<z.ZodLiteral<unknown>> = ({
   enum: [value],
 });
 
-export const depictObject: Depicter<z.AnyZodObject> = ({
+export const depictObject: Depicter<z.ZodObject<z.ZodRawShape>> = ({
   schema,
   isResponse,
   ...rest
@@ -554,7 +554,7 @@ export const depictNumber: Depicter<z.ZodNumber> = ({ schema }) => {
 export const depictObjectProperties = ({
   schema: { shape },
   next,
-}: Parameters<Depicter<z.AnyZodObject>>[0]) =>
+}: Parameters<Depicter<z.ZodObject<z.ZodRawShape>>>[0]) =>
   Object.keys(shape).reduce<Record<string, SchemaObject | ReferenceObject>>(
     (carry, key) => ({
       ...carry,
