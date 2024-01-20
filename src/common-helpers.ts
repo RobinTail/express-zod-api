@@ -1,7 +1,7 @@
 import { Request } from "express";
 import { isHttpError } from "http-errors";
 import { createHash } from "node:crypto";
-import { xprod } from "ramda";
+import { pick, xprod } from "ramda";
 import { z } from "zod";
 import { CommonConfig, InputSource, InputSources } from "./config-type";
 import { InputValidationError, OutputValidationError } from "./errors";
@@ -39,11 +39,7 @@ export const isCustomHeader = (name: string): name is `x-${string}` =>
 
 /** @see https://nodejs.org/api/http.html#messageheaders */
 export const getCustomHeaders = (request: Request) =>
-  Object.entries(request.headers).reduce<FlatObject>(
-    (agg, [key, value]) =>
-      isCustomHeader(key) ? { ...agg, [key]: value } : agg,
-    {},
-  );
+  pick(Object.keys(request.headers).filter(isCustomHeader), request.headers);
 
 export const getInput = (
   request: Request,
