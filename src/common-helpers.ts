@@ -1,7 +1,7 @@
 import { Request } from "express";
 import { isHttpError } from "http-errors";
 import { createHash } from "node:crypto";
-import { filter, pick, xprod } from "ramda";
+import { pick, reject, xprod } from "ramda";
 import { z } from "zod";
 import { CommonConfig, InputSource, InputSources } from "./config-type";
 import { InputValidationError, OutputValidationError } from "./errors";
@@ -48,8 +48,8 @@ export const getInput = (
   if (method === "options") {
     return {};
   }
-  const sources = filter(
-    (src) => (src === "files" ? areFilesAvailable(request) : true),
+  const sources = reject(
+    (src) => src === "files" && !areFilesAvailable(request),
     inputAssignment[method] ||
       defaultInputSources[method] ||
       fallbackInputSource,
