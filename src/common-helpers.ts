@@ -1,7 +1,7 @@
 import { Request } from "express";
 import { isHttpError } from "http-errors";
 import { createHash } from "node:crypto";
-import { pick, xprod } from "ramda";
+import { pick, prop, xprod } from "ramda";
 import { z } from "zod";
 import { CommonConfig, InputSource, InputSources } from "./config-type";
 import { InputValidationError, OutputValidationError } from "./errors";
@@ -42,25 +42,22 @@ export const getCustomHeaders = (request: Request) =>
 
 export const getInput = (
   request: Request,
-  inputAssignment: CommonConfig["inputSources"],
+  inputAssignment: CommonConfig["inputSources"] = {},
 ) => {
   const method = getActualMethod(request);
   if (method === "options") {
     return {};
   }
-  let props = fallbackInputSource;
-  if (method in defaultInputSources) {
-    props = defaultInputSources[method];
-  }
-  if (inputAssignment && method in inputAssignment) {
-    props = inputAssignment[method] || props;
-  }
-  return props
-    .filter((prop) => (prop === "files" ? areFilesAvailable(request) : true))
+  const sources =
+    prop(method, inputAssignment) ||
+    prop(method, defaultInputSources) ||
+    fallbackInputSource;
+  return sources
+    .filter((src) => (src === "files" ? areFilesAvailable(request) : true))
     .reduce<FlatObject>(
-      (carry, prop) => ({
+      (carry, src) => ({
         ...carry,
-        ...(prop === "headers" ? getCustomHeaders(request) : request[prop]),
+        ...(src === "headers" ? getCustomHeaders(request) : request[src]),
       }),
       {},
     );
