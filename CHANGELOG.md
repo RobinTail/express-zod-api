@@ -2,6 +2,11 @@
 
 ## Version 16
 
+### 16.5.1
+
+- Excluding empty `properties` in the generated documentation.
+  - Applies to both `z.object()` and `z.record()`.
+
 ### 16.5.0
 
 - Flattening nested intersections of object schemas in the generated documentation:
