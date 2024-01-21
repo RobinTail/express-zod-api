@@ -3,6 +3,7 @@ import {
   ContentObject,
   ExampleObject,
   ExamplesObject,
+  MediaTypeObject,
   OAuthFlowObject,
   OAuthFlowsObject,
   ParameterObject,
@@ -917,22 +918,14 @@ export const depictResponse = ({
       method,
     }),
   );
-  const examples = depictExamples(schema, true);
-  const result =
-    composition === "components"
-      ? makeRef(makeCleanId(description), depictedSchema)
-      : depictedSchema;
-
-  return {
-    description,
-    content: mimeTypes.reduce<ContentObject>(
-      (carry, mimeType) => ({
-        ...carry,
-        [mimeType]: { schema: result, examples },
-      }),
-      {},
-    ),
+  const media: MediaTypeObject = {
+    schema:
+      composition === "components"
+        ? makeRef(makeCleanId(description), depictedSchema)
+        : depictedSchema,
+    examples: depictExamples(schema, true),
   };
+  return { description, content: fromPairs(xprod(mimeTypes, [media])) };
 };
 
 type SecurityHelper<K extends Security["type"]> = (
