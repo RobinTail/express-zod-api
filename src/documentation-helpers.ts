@@ -1,6 +1,5 @@
 import assert from "node:assert/strict";
 import {
-  ContentObject,
   ExampleObject,
   ExamplesObject,
   MediaTypeObject,
@@ -1074,22 +1073,14 @@ export const depictRequest = ({
       pathParams,
     ),
   );
-  const bodyExamples = depictExamples(schema, false, pathParams);
-  const result =
-    composition === "components"
-      ? makeRef(makeCleanId(description), bodyDepiction)
-      : bodyDepiction;
-
-  return {
-    description,
-    content: mimeTypes.reduce<ContentObject>(
-      (carry, mimeType) => ({
-        ...carry,
-        [mimeType]: { schema: result, examples: bodyExamples },
-      }),
-      {},
-    ),
+  const media: MediaTypeObject = {
+    schema:
+      composition === "components"
+        ? makeRef(makeCleanId(description), bodyDepiction)
+        : bodyDepiction,
+    examples: depictExamples(schema, false, pathParams),
   };
+  return { description, content: fromPairs(xprod(mimeTypes, [media])) };
 };
 
 export const depictTags = <TAG extends string>(
