@@ -538,13 +538,7 @@ export const depictObjectProperties = ({
   schema: { shape },
   next,
 }: Parameters<Depicter<z.ZodObject<z.ZodRawShape>>>[0]) =>
-  Object.keys(shape).reduce<Record<string, SchemaObject | ReferenceObject>>(
-    (carry, key) => ({
-      ...carry,
-      [key]: next({ schema: shape[key] }),
-    }),
-    {},
-  );
+  map((schema) => next({ schema }), shape);
 
 const makeSample = (depicted: SchemaObject) => {
   const type = (
