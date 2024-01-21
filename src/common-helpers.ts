@@ -41,24 +41,18 @@ export const getCustomHeaders = (headers: FlatObject): FlatObject =>
   pickBy(/* v,k =>*/ flip(/* k,v =>*/ isCustomHeader), headers);
 
 export const getInput = (
-  request: Request,
-  inputAssignment: CommonConfig["inputSources"] = {},
+  req: Request,
+  userDefined: CommonConfig["inputSources"] = {},
 ): FlatObject => {
-  const method = getActualMethod(request);
+  const method = getActualMethod(req);
   if (method === "options") {
     return {};
   }
   return pipe<[InputSource[]], InputSource[], FlatObject[], FlatObject>(
-    reject((src) => src === "files" && !areFilesAvailable(request)),
-    map((src) =>
-      src === "headers" ? getCustomHeaders(request[src]) : request[src],
-    ),
+    reject((src) => src === "files" && !areFilesAvailable(req)),
+    map((src) => (src === "headers" ? getCustomHeaders(req[src]) : req[src])),
     mergeAll,
-  )(
-    inputAssignment[method] ||
-      defaultInputSources[method] ||
-      fallbackInputSource,
-  );
+  )(userDefined[method] || defaultInputSources[method] || fallbackInputSource);
 };
 
 export const makeErrorFromAnything = (subject: unknown): Error =>
