@@ -23,6 +23,7 @@ import {
   mergeDeepRight,
   mergeDeepWith,
   omit,
+  pair,
   union,
   xprod,
 } from "ramda";
@@ -1024,17 +1025,14 @@ export const depictSecurityRefs = (
 ): SecurityRequirementObject[] => {
   if (typeof container === "object") {
     if ("or" in container) {
-      return container.or.map((entry) =>
-        ("and" in entry
-          ? entry.and
-          : [entry]
-        ).reduce<SecurityRequirementObject>(
-          (agg, { name, scopes }) => ({
-            ...agg,
-            [name]: scopes,
-          }),
-          {},
-        ),
+      return container.or.map(
+        (entry): SecurityRequirementObject =>
+          fromPairs(
+            map(
+              ({ name, scopes }) => pair(name, scopes),
+              "and" in entry ? entry.and : [entry],
+            ),
+          ),
       );
     }
     if ("and" in container) {
