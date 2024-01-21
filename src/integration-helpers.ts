@@ -53,10 +53,10 @@ export const makeParams = (
   params: Record<string, ts.TypeNode | undefined>,
   mod?: ts.Modifier[],
 ) =>
-  Object.keys(params).reduce(
+  Object.keys(params).reduce<ts.ParameterDeclaration[]>(
     (acc, name) =>
       acc.concat(makeParam(f.createIdentifier(name), params[name], mod)),
-    [] as ts.ParameterDeclaration[],
+    [],
   );
 
 export const makeRecord = (
@@ -157,7 +157,7 @@ export const makePublicExtendedInterface = (
   );
 
 export const makeTypeParams = (params: Record<string, ts.Identifier>) =>
-  Object.keys(params).reduce(
+  Object.keys(params).reduce<ts.TypeParameterDeclaration[]>(
     (acc, name) =>
       acc.concat(
         f.createTypeParameterDeclaration(
@@ -166,7 +166,7 @@ export const makeTypeParams = (params: Record<string, ts.Identifier>) =>
           f.createTypeReferenceNode(params[name]),
         ),
       ),
-    [] as ts.TypeParameterDeclaration[],
+    [],
   );
 
 export const makeArrowFn = (
