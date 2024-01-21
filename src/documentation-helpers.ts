@@ -24,9 +24,11 @@ import {
   mergeDeepWith,
   omit,
   pair,
+  range,
   reject,
   union,
   xprod,
+  zipObj,
 } from "ramda";
 import { z } from "zod";
 import {
@@ -624,21 +626,18 @@ export const depictExamples = (
     schema,
     variant: isResponse ? "parsed" : "original",
     validate: true,
-  });
+  }).map<ExampleObject>((example) => ({
+    value:
+      typeof example === "object" && !Array.isArray(example)
+        ? omit(omitProps, example)
+        : example,
+  }));
   if (examples.length === 0) {
     return undefined;
   }
-  return examples.reduce<ExamplesObject>(
-    (carry, example, index) => ({
-      ...carry,
-      [`example${index + 1}`]: {
-        value:
-          typeof example === "object" && !Array.isArray(example)
-            ? omit(omitProps, example)
-            : example,
-      } satisfies ExampleObject,
-    }),
-    {},
+  return zipObj(
+    map((idx) => `example${idx}`, range(1, examples.length + 1)),
+    examples,
   );
 };
 
