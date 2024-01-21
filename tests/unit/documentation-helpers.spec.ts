@@ -1100,6 +1100,18 @@ describe("Documentation helpers", () => {
         }),
       ).toMatchSnapshot();
     });
+    test("should add scopes when missing", () => {
+      expect(
+        depictSecurity({
+          type: "oauth2",
+          flows: {
+            password: {
+              tokenUrl: "https://test.url",
+            },
+          },
+        }),
+      ).toMatchSnapshot();
+    });
   });
 
   describe("depictSecurityRefs()", () => {

@@ -4,7 +4,6 @@ import {
   ExamplesObject,
   MediaTypeObject,
   OAuthFlowObject,
-  OAuthFlowsObject,
   ParameterObject,
   ReferenceObject,
   RequestBodyObject,
@@ -19,11 +18,13 @@ import {
 import {
   concat,
   fromPairs,
+  isNil,
   map,
   mergeDeepRight,
   mergeDeepWith,
   omit,
   pair,
+  reject,
   union,
   xprod,
 } from "ramda";
@@ -987,16 +988,10 @@ const depictOpenIdSecurity: SecurityHelper<"openid"> = ({
 });
 const depictOAuth2Security: SecurityHelper<"oauth2"> = ({ flows = {} }) => ({
   type: "oauth2",
-  flows: (
-    Object.keys(flows) as (keyof typeof flows)[]
-  ).reduce<OAuthFlowsObject>((acc, key) => {
-    const flow = flows[key];
-    if (!flow) {
-      return acc;
-    }
-    const { scopes = {}, ...rest } = flow;
-    return { ...acc, [key]: { ...rest, scopes } satisfies OAuthFlowObject };
-  }, {}),
+  flows: map(
+    ({ scopes = {}, ...rest }): OAuthFlowObject => ({ ...rest, scopes }),
+    reject(isNil, flows) as Required<typeof flows>,
+  ),
 });
 
 export const depictSecurity = (
