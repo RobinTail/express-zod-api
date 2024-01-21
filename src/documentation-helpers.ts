@@ -636,7 +636,7 @@ export const depictExamples = (
     return undefined;
   }
   return zipObj(
-    map((idx) => `example${idx}`, range(1, examples.length + 1)),
+    range(1, examples.length + 1).map((idx) => `example${idx}`),
     examples,
   );
 };
@@ -650,21 +650,18 @@ export const depictParamExamples = (
     schema,
     variant: isResponse ? "parsed" : "original",
     validate: true,
-  });
+  })
+    .filter(
+      (example) =>
+        typeof example === "object" && example !== null && param in example,
+    )
+    .map((example): ExampleObject => ({ value: example[param] }));
   if (examples.length === 0) {
     return undefined;
   }
-  return examples.reduce<ExamplesObject>(
-    (carry, example, index) =>
-      param in example
-        ? {
-            ...carry,
-            [`example${index + 1}`]: {
-              value: example[param],
-            } satisfies ExampleObject,
-          }
-        : carry,
-    {},
+  return zipObj(
+    range(1, examples.length + 1).map((idx) => `example${idx}`),
+    examples,
   );
 };
 
