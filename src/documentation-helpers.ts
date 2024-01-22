@@ -27,6 +27,7 @@ import {
   range,
   reject,
   union,
+  when,
   xprod,
   zipObj,
 } from "ramda";
@@ -622,16 +623,14 @@ export const depictExamples = (
   isResponse: boolean,
   omitProps: string[] = [],
 ): ExamplesObject | undefined => {
+  const isObject = (subj: unknown) => z.object({}).safeParse(subj).success;
   const examples = getExamples({
     schema,
     variant: isResponse ? "parsed" : "original",
     validate: true,
-  }).map<ExampleObject>((example) => ({
-    value:
-      typeof example === "object" && !Array.isArray(example)
-        ? omit(omitProps, example)
-        : example,
-  }));
+  })
+    .map(when(isObject, omit(omitProps)))
+    .map<ExampleObject>((value) => ({ value }));
   if (examples.length === 0) {
     return undefined;
   }
