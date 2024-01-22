@@ -48,10 +48,10 @@ export const getInput = (
   if (method === "options") {
     return {};
   }
-  return pipe<[InputSource[]], InputSource[], FlatObject[], FlatObject>(
-    reject((src) => src === "files" && !areFilesAvailable(req)),
+  return pipe(
+    reject<InputSource>((src) => src === "files" && !areFilesAvailable(req)),
     map((src) => (src === "headers" ? getCustomHeaders(req[src]) : req[src])),
-    mergeAll,
+    mergeAll<FlatObject>,
   )(userDefined[method] || defaultInputSources[method] || fallbackInputSource);
 };
 
