@@ -38,7 +38,7 @@ export const isCustomHeader = (name: string): name is `x-${string}` =>
 
 /** @see https://nodejs.org/api/http.html#messageheaders */
 export const getCustomHeaders = (headers: FlatObject): FlatObject =>
-  pickBy(/* v,k =>*/ flip(/* k,v =>*/ isCustomHeader), headers);
+  pickBy(flip(isCustomHeader), headers); // needs flip to address the keys
 
 export const getInput = (
   req: Request,
