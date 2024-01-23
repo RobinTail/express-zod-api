@@ -16,10 +16,20 @@ import {
   TagObject,
   isReferenceObject,
 } from "openapi3-ts/oas31";
-import { omit } from "ramda";
+import {
+  concat,
+  fromPairs,
+  map,
+  mergeDeepRight,
+  mergeDeepWith,
+  omit,
+  union,
+  xprod,
+} from "ramda";
 import { z } from "zod";
 import {
   FlatObject,
+  combinations,
   getExamples,
   hasCoercion,
   isCustomHeader,
@@ -171,6 +181,45 @@ export const depictDiscriminatedUnion: Depicter<
   };
 };
 
+/** @throws AssertionError */
+const tryFlattenIntersection = (
+  children: Array<SchemaObject | ReferenceObject>,
+) => {
+  const [left, right] = children.filter(
+    (entry): entry is SchemaObject =>
+      !isReferenceObject(entry) &&
+      entry.type === "object" &&
+      Object.keys(entry).every((key) =>
+        ["type", "properties", "required", "examples"].includes(key),
+      ),
+  );
+  assert(left && right, "Can not flatten objects");
+  const flat: SchemaObject = { type: "object" };
+  if (left.properties || right.properties) {
+    flat.properties = mergeDeepWith(
+      (a, b) =>
+        Array.isArray(a) && Array.isArray(b)
+          ? concat(a, b)
+          : a === b
+            ? b
+            : assert.fail("Can not flatten properties"),
+      left.properties || {},
+      right.properties || {},
+    );
+  }
+  if (left.required || right.required) {
+    flat.required = union(left.required || [], right.required || []);
+  }
+  if (left.examples || right.examples) {
+    flat.examples = combinations(
+      left.examples || [],
+      right.examples || [],
+      ([a, b]) => mergeDeepRight(a, b),
+    );
+  }
+  return flat;
+};
+
 export const depictIntersection: Depicter<
   z.ZodIntersection<z.ZodTypeAny, z.ZodTypeAny>
 > = ({
@@ -178,9 +227,13 @@ export const depictIntersection: Depicter<
     _def: { left, right },
   },
   next,
-}) => ({
-  allOf: [left, right].map((entry) => next({ schema: entry })),
-});
+}) => {
+  const children = [left, right].map((entry) => next({ schema: entry }));
+  try {
+    return tryFlattenIntersection(children);
+  } catch {}
+  return { allOf: children };
+};
 
 export const depictOptional: Depicter<z.ZodOptional<z.ZodTypeAny>> = ({
   schema,
@@ -218,23 +271,21 @@ export const depictLiteral: Depicter<z.ZodLiteral<unknown>> = ({
   enum: [value],
 });
 
-export const depictObject: Depicter<z.AnyZodObject> = ({
+export const depictObject: Depicter<z.ZodObject<z.ZodRawShape>> = ({
   schema,
   isResponse,
   ...rest
 }) => {
-  const required = Object.keys(schema.shape).filter((key) => {
-    const prop = schema.shape[key];
-    const isOptional =
-      isResponse && hasCoercion(prop)
-        ? prop instanceof z.ZodOptional
-        : prop.isOptional();
-    return !isOptional;
-  });
-  const result: SchemaObject = {
-    type: "object",
-    properties: depictObjectProperties({ schema, isResponse, ...rest }),
-  };
+  const keys = Object.keys(schema.shape);
+  const isOptionalProp = (prop: z.ZodTypeAny) =>
+    isResponse && hasCoercion(prop)
+      ? prop instanceof z.ZodOptional
+      : prop.isOptional();
+  const required = keys.filter((key) => !isOptionalProp(schema.shape[key]));
+  const result: SchemaObject = { type: "object" };
+  if (keys.length) {
+    result.properties = depictObjectProperties({ schema, isResponse, ...rest });
+  }
   if (required.length) {
     result.required = required;
   }
@@ -309,10 +360,7 @@ export const depictBigInt: Depicter<z.ZodBigInt> = () => ({
 const areOptionsLiteral = (
   subject: z.ZodTypeAny[],
 ): subject is z.ZodLiteral<unknown>[] =>
-  subject.reduce(
-    (carry, option) => carry && option instanceof z.ZodLiteral,
-    true,
-  );
+  subject.every((option) => option instanceof z.ZodLiteral);
 
 export const depictRecord: Depicter<z.ZodRecord<z.ZodTypeAny>> = ({
   schema: { keySchema, valueSchema },
@@ -320,21 +368,12 @@ export const depictRecord: Depicter<z.ZodRecord<z.ZodTypeAny>> = ({
 }) => {
   if (keySchema instanceof z.ZodEnum || keySchema instanceof z.ZodNativeEnum) {
     const keys = Object.values(keySchema.enum) as string[];
-    const shape = keys.reduce<z.ZodRawShape>(
-      (carry, key) => ({
-        ...carry,
-        [key]: valueSchema,
-      }),
-      {},
-    );
-    const result: SchemaObject = {
-      type: "object",
-      properties: depictObjectProperties({
-        schema: z.object(shape),
-        ...rest,
-      }),
-    };
+    const result: SchemaObject = { type: "object" };
     if (keys.length) {
+      result.properties = depictObjectProperties({
+        schema: z.object(fromPairs(xprod(keys, [valueSchema]))),
+        ...rest,
+      });
       result.required = keys;
     }
     return result;
@@ -343,32 +382,20 @@ export const depictRecord: Depicter<z.ZodRecord<z.ZodTypeAny>> = ({
     return {
       type: "object",
       properties: depictObjectProperties({
-        schema: z.object({
-          [keySchema.value]: valueSchema,
-        }),
+        schema: z.object({ [keySchema.value]: valueSchema }),
         ...rest,
       }),
       required: [keySchema.value],
     };
   }
-  if (keySchema instanceof z.ZodUnion) {
-    if (areOptionsLiteral(keySchema.options)) {
-      const shape = keySchema.options.reduce<z.ZodRawShape>(
-        (carry, option) => ({
-          ...carry,
-          [`${option.value}`]: valueSchema,
-        }),
-        {},
-      );
-      return {
-        type: "object",
-        properties: depictObjectProperties({
-          schema: z.object(shape),
-          ...rest,
-        }),
-        required: keySchema.options.map((option) => option.value),
-      };
-    }
+  if (keySchema instanceof z.ZodUnion && areOptionsLiteral(keySchema.options)) {
+    const required = map((opt) => `${opt.value}`, keySchema.options);
+    const shape = fromPairs(xprod(required, [valueSchema]));
+    return {
+      type: "object",
+      properties: depictObjectProperties({ schema: z.object(shape), ...rest }),
+      required,
+    };
   }
   return {
     type: "object",
@@ -510,7 +537,7 @@ export const depictNumber: Depicter<z.ZodNumber> = ({ schema }) => {
 export const depictObjectProperties = ({
   schema: { shape },
   next,
-}: Parameters<Depicter<z.AnyZodObject>>[0]) =>
+}: Parameters<Depicter<z.ZodObject<z.ZodRawShape>>>[0]) =>
   Object.keys(shape).reduce<Record<string, SchemaObject | ReferenceObject>>(
     (carry, key) => ({
       ...carry,

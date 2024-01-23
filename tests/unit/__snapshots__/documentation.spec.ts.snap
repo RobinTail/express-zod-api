@@ -23,7 +23,6 @@ paths:
                       - success
                   data:
                     type: object
-                    properties: {}
                 required:
                   - status
                   - data
@@ -95,7 +94,6 @@ paths:
                       - success
                   data:
                     type: object
-                    properties: {}
                 required:
                   - status
                   - data
@@ -144,7 +142,6 @@ paths:
                       - success
                   data:
                     type: object
-                    properties: {}
                 required:
                   - status
                   - data
@@ -183,7 +180,6 @@ paths:
           application/json:
             schema:
               type: object
-              properties: {}
 components:
   schemas: {}
   responses: {}
@@ -223,7 +219,6 @@ paths:
                       - success
                   data:
                     type: object
-                    properties: {}
                 required:
                   - status
                   - data
@@ -273,7 +268,6 @@ paths:
                       - success
                   data:
                     type: object
-                    properties: {}
                 required:
                   - status
                   - data
@@ -416,7 +410,6 @@ paths:
                       - success
                   data:
                     type: object
-                    properties: {}
                 required:
                   - status
                   - data
@@ -452,11 +445,7 @@ paths:
         content:
           application/json:
             schema:
-              allOf:
-                - type: object
-                  properties: {}
-                - type: object
-                  properties: {}
+              type: object
       security:
         - HTTP_1: []
           OAUTH2_1:
@@ -478,7 +467,6 @@ paths:
                       - success
                   data:
                     type: object
-                    properties: {}
                 required:
                   - status
                   - data
@@ -514,11 +502,7 @@ paths:
         content:
           application/json:
             schema:
-              allOf:
-                - type: object
-                  properties: {}
-                - type: object
-                  properties: {}
+              type: object
       security:
         - HTTP_2: []
 components:
@@ -895,22 +879,18 @@ paths:
                     type: object
                     properties:
                       and:
-                        allOf:
-                          - type: object
-                            properties:
-                              five:
-                                type: integer
-                                format: int64
-                                minimum: 0
-                                maximum: 9007199254740991
-                            required:
-                              - five
-                          - type: object
-                            properties:
-                              six:
-                                type: string
-                            required:
-                              - six
+                        type: object
+                        properties:
+                          five:
+                            type: integer
+                            format: int64
+                            minimum: 0
+                            maximum: 9007199254740991
+                          six:
+                            type: string
+                        required:
+                          - five
+                          - six
                     required:
                       - and
                 required:
@@ -951,19 +931,15 @@ paths:
               type: object
               properties:
                 intersection:
-                  allOf:
-                    - type: object
-                      properties:
-                        one:
-                          type: string
-                      required:
-                        - one
-                    - type: object
-                      properties:
-                        two:
-                          type: string
-                      required:
-                        - two
+                  type: object
+                  properties:
+                    one:
+                      type: string
+                    two:
+                      type: string
+                  required:
+                    - one
+                    - two
               required:
                 - intersection
 components:
@@ -1384,34 +1360,25 @@ paths:
         content:
           application/json:
             schema:
-              allOf:
-                - type: object
-                  properties:
-                    key:
-                      type: string
-                      minLength: 1
-                  required:
-                    - key
-                  examples:
-                    - key: 1234-5678-90
-                - type: object
-                  properties:
-                    name:
-                      type: string
-                      minLength: 1
-                    birthday:
-                      description: YYYY-MM-DDTHH:mm:ss.sssZ
-                      type: string
-                      format: date-time
-                      pattern: ^\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?)?Z?$
-                      externalDocs:
-                        url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
-                  required:
-                    - name
-                    - birthday
-                  examples:
-                    - name: John Doe
-                      birthday: 1963-04-21
+              type: object
+              properties:
+                key:
+                  type: string
+                  minLength: 1
+                name:
+                  type: string
+                  minLength: 1
+                birthday:
+                  description: YYYY-MM-DDTHH:mm:ss.sssZ
+                  type: string
+                  format: date-time
+                  pattern: ^\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?)?Z?$
+                  externalDocs:
+                    url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
+              required:
+                - key
+                - name
+                - birthday
             examples:
               example1:
                 value:
@@ -2220,34 +2187,25 @@ components:
         - status
         - error
     PatchV1UserIdRequestBody:
-      allOf:
-        - type: object
-          properties:
-            key:
-              type: string
-              minLength: 1
-          required:
-            - key
-          examples:
-            - key: 1234-5678-90
-        - type: object
-          properties:
-            name:
-              type: string
-              minLength: 1
-            birthday:
-              description: YYYY-MM-DDTHH:mm:ss.sssZ
-              type: string
-              format: date-time
-              pattern: ^\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?)?Z?$
-              externalDocs:
-                url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
-          required:
-            - name
-            - birthday
-          examples:
-            - name: John Doe
-              birthday: 1963-04-21
+      type: object
+      properties:
+        key:
+          type: string
+          minLength: 1
+        name:
+          type: string
+          minLength: 1
+        birthday:
+          description: YYYY-MM-DDTHH:mm:ss.sssZ
+          type: string
+          format: date-time
+          pattern: ^\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?)?Z?$
+          externalDocs:
+            url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
+      required:
+        - key
+        - name
+        - birthday
     PostV1UserCreatePositiveResponse201:
       type: object
       properties:
@@ -2721,7 +2679,6 @@ paths:
                       - OK
                   result:
                     type: object
-                    properties: {}
                 required:
                   - status
                   - result
@@ -3234,7 +3191,6 @@ paths:
           application/json:
             schema:
               type: object
-              properties: {}
 components:
   schemas: {}
   responses: {}
@@ -3737,7 +3693,6 @@ paths:
                       - success
                   data:
                     type: object
-                    properties: {}
                 required:
                   - status
                   - data
@@ -4224,7 +4179,6 @@ components:
             - success
         data:
           type: object
-          properties: {}
       required:
         - status
         - data
@@ -4333,23 +4287,15 @@ paths:
         content:
           application/json:
             schema:
-              allOf:
-                - type: object
-                  properties:
-                    key:
-                      type: string
-                  required:
-                    - key
-                  examples:
-                    - key: 1234-56789-01
-                - type: object
-                  properties:
-                    str:
-                      type: string
-                  required:
-                    - str
-                  examples:
-                    - str: test
+              type: object
+              properties:
+                key:
+                  type: string
+                str:
+                  type: string
+              required:
+                - key
+                - str
             examples:
               example1:
                 value:
@@ -4754,7 +4700,6 @@ paths:
                       - success
                   data:
                     type: object
-                    properties: {}
                 required:
                   - status
                   - data
@@ -4885,7 +4830,6 @@ components:
             - success
         data:
           type: object
-          properties: {}
       required:
         - status
         - data
@@ -4950,7 +4894,6 @@ paths:
                       - success
                   data:
                     type: object
-                    properties: {}
                 required:
                   - status
                   - data
@@ -5039,7 +4982,6 @@ paths:
                       - success
                   data:
                     type: object
-                    properties: {}
                 required:
                   - status
                   - data

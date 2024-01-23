@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: Example API
-  version: 16.4.1
+  version: 16.5.1
 paths:
   /v1/user/retrieve:
     get:
@@ -175,34 +175,25 @@ paths:
         content:
           application/json:
             schema:
-              allOf:
-                - type: object
-                  properties:
-                    key:
-                      type: string
-                      minLength: 1
-                  required:
-                    - key
-                  examples:
-                    - key: 1234-5678-90
-                - type: object
-                  properties:
-                    name:
-                      type: string
-                      minLength: 1
-                    birthday:
-                      description: YYYY-MM-DDTHH:mm:ss.sssZ
-                      type: string
-                      format: date-time
-                      pattern: ^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d+)?)?Z?$
-                      externalDocs:
-                        url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
-                  required:
-                    - name
-                    - birthday
-                  examples:
-                    - name: John Doe
-                      birthday: 1963-04-21
+              type: object
+              properties:
+                key:
+                  type: string
+                  minLength: 1
+                name:
+                  type: string
+                  minLength: 1
+                birthday:
+                  description: YYYY-MM-DDTHH:mm:ss.sssZ
+                  type: string
+                  format: date-time
+                  pattern: ^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d+)?)?Z?$
+                  externalDocs:
+                    url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
+              required:
+                - key
+                - name
+                - birthday
             examples:
               example1:
                 value:
