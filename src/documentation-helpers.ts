@@ -21,11 +21,11 @@ import {
   has,
   isNil,
   map,
+  mergeAll,
   mergeDeepRight,
   mergeDeepWith,
   objOf,
   omit,
-  pair,
   pipe,
   pluck,
   range,
@@ -1014,9 +1014,9 @@ export const depictSecurityRefs = (
     if ("or" in container) {
       return container.or.map(
         (entry): SecurityRequirementObject =>
-          fromPairs(
+          mergeAll(
             map(
-              ({ name, scopes }) => pair(name, scopes),
+              ({ name, scopes }) => objOf(name, scopes),
               "and" in entry ? entry.and : [entry],
             ),
           ),
