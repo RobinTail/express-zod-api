@@ -18,6 +18,7 @@ import {
 import {
   concat,
   fromPairs,
+  has,
   isNil,
   map,
   mergeDeepRight,
@@ -650,11 +651,8 @@ export const depictParamExamples = (
     variant: isResponse ? "parsed" : "original",
     validate: true,
   })
-    .filter(
-      (example) =>
-        typeof example === "object" && example !== null && param in example,
-    )
-    .map((example): ExampleObject => ({ value: example[param] }));
+    .filter(has(param))
+    .map<ExampleObject>((example) => ({ value: example[param] }));
   if (examples.length === 0) {
     return undefined;
   }
