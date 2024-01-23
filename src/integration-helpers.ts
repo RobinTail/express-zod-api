@@ -1,4 +1,5 @@
 import ts from "typescript";
+import { chain, toPairs } from "ramda";
 
 export const f = ts.factory;
 
@@ -53,10 +54,9 @@ export const makeParams = (
   params: Record<string, ts.TypeNode | undefined>,
   mod?: ts.Modifier[],
 ) =>
-  Object.keys(params).reduce<ts.ParameterDeclaration[]>(
-    (acc, name) =>
-      acc.concat(makeParam(f.createIdentifier(name), params[name], mod)),
-    [],
+  chain(
+    ([name, node]) => [makeParam(f.createIdentifier(name), node, mod)],
+    toPairs(params),
   );
 
 export const makeRecord = (
