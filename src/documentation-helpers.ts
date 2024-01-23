@@ -1,6 +1,5 @@
 import assert from "node:assert/strict";
 import {
-  ExampleObject,
   ExamplesObject,
   MediaTypeObject,
   OAuthFlowObject,
@@ -17,14 +16,18 @@ import {
 } from "openapi3-ts/oas31";
 import {
   concat,
+  filter,
   fromPairs,
   has,
   isNil,
   map,
   mergeDeepRight,
   mergeDeepWith,
+  objOf,
   omit,
   pair,
+  pipe,
+  pluck,
   range,
   reject,
   union,
@@ -624,14 +627,11 @@ export const depictExamples = (
   isResponse: boolean,
   omitProps: string[] = [],
 ): ExamplesObject | undefined => {
-  const isObject = (subj: unknown) => z.object({}).safeParse(subj).success;
-  const examples = getExamples({
-    schema,
-    variant: isResponse ? "parsed" : "original",
-    validate: true,
-  })
-    .map(when(isObject, omit(omitProps)))
-    .map<ExampleObject>((value) => ({ value }));
+  const examples = pipe(
+    getExamples,
+    map(when((subj) => z.object({}).safeParse(subj).success, omit(omitProps))),
+    map(objOf("value")),
+  )({ schema, variant: isResponse ? "parsed" : "original", validate: true });
   if (examples.length === 0) {
     return undefined;
   }
@@ -646,13 +646,12 @@ export const depictParamExamples = (
   isResponse: boolean,
   param: string,
 ): ExamplesObject | undefined => {
-  const examples = getExamples({
-    schema,
-    variant: isResponse ? "parsed" : "original",
-    validate: true,
-  })
-    .filter(has(param))
-    .map<ExampleObject>((example) => ({ value: example[param] }));
+  const examples = pipe(
+    getExamples,
+    filter<FlatObject>(has(param)),
+    pluck(param),
+    map(objOf("value")),
+  )({ schema, variant: isResponse ? "parsed" : "original", validate: true });
   if (examples.length === 0) {
     return undefined;
   }
