@@ -157,16 +157,11 @@ export const makePublicExtendedInterface = (
   );
 
 export const makeTypeParams = (params: Record<string, ts.Identifier>) =>
-  Object.keys(params).reduce<ts.TypeParameterDeclaration[]>(
-    (acc, name) =>
-      acc.concat(
-        f.createTypeParameterDeclaration(
-          [],
-          name,
-          f.createTypeReferenceNode(params[name]),
-        ),
-      ),
-    [],
+  chain(
+    ([name, id]) => [
+      f.createTypeParameterDeclaration([], name, f.createTypeReferenceNode(id)),
+    ],
+    toPairs(params),
   );
 
 export const makeArrowFn = (
