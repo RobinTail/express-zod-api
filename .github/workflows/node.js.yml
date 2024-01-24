@@ -56,8 +56,6 @@ jobs:
       run: yarn test:compat
     - name: Issue 952 # see https://github.com/RobinTail/express-zod-api/issues/952
       run: yarn test:952
-    - name: Benchmark
-      run: yarn bench
   finish:
     needs: build
     runs-on: ubuntu-latest
