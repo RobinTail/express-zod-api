@@ -35,6 +35,7 @@
     "test:types": "tsc --noEmit",
     "test:unit": "vitest run --coverage tests/unit tests/system",
     "test:badge": "make-coverage-badge --output-path coverage.svg",
+    "bench": "vitest bench --run tests/bench",
     "lint": "eslint src example tests tools && yarn prettier *.md --check",
     "mdfix": "prettier *.md --write",
     "cleanup": "rm -rf tests/**/node_modules coverage",
