@@ -42,7 +42,7 @@
     "precommit": "yarn lint && yarn test && yarn build && git add example/example.* LICENSE coverage.svg",
     "prepublishOnly": "yarn lint && yarn test && yarn build",
     "postversion": "git push && git push --tags",
-    "install_hooks": "husky install"
+    "install_hooks": "husky"
   },
   "type": "module",
   "main": "dist/index.cjs",
