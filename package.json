@@ -155,7 +155,7 @@
     "express-fileupload": "^1.4.3",
     "form-data": "^4.0.0",
     "http-errors": "^2.0.0",
-    "husky": "^8.0.3",
+    "husky": "^9.0.5",
     "make-coverage-badge": "^1.2.0",
     "mockdate": "^3.0.5",
     "prettier": "3.2.4",
