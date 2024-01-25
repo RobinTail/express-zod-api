@@ -1013,12 +1013,9 @@ export const depictSecurityRefs = (
   if ("or" in container) {
     return container.or.map(
       (entry): SecurityRequirementObject =>
-        mergeAll(
-          map(
-            ({ name, scopes }) => objOf(name, scopes),
-            "and" in entry ? entry.and : [entry],
-          ),
-        ),
+        "and" in entry
+          ? mergeAll(map(({ name, scopes }) => objOf(name, scopes), entry.and))
+          : { [entry.name]: entry.scopes },
     );
   }
   if ("and" in container) {
