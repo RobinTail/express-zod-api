@@ -2,7 +2,7 @@ import { bench, describe } from "vitest";
 import { FlatObject } from "../../src";
 import { getCustomHeaders, isCustomHeader } from "../../src/common-helpers";
 
-describe("Experiment", () => {
+describe.skip("Experiment", () => {
   const originalFn = (request: Request) =>
     Object.entries(request.headers).reduce<FlatObject>(
       (agg, [key, value]) =>
