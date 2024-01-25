@@ -42,7 +42,7 @@
     "precommit": "yarn lint && yarn test && yarn build && git add example/example.* LICENSE coverage.svg",
     "prepublishOnly": "yarn lint && yarn test && yarn build",
     "postversion": "git push && git push --tags",
-    "install_hooks": "husky install"
+    "install_hooks": "husky"
   },
   "type": "module",
   "main": "dist/index.cjs",
@@ -155,7 +155,7 @@
     "express-fileupload": "^1.4.3",
     "form-data": "^4.0.0",
     "http-errors": "^2.0.0",
-    "husky": "^8.0.3",
+    "husky": "^9.0.5",
     "make-coverage-badge": "^1.2.0",
     "mockdate": "^3.0.5",
     "prettier": "3.2.4",
