@@ -1,4 +1,5 @@
 import ts from "typescript";
+import { chain, toPairs } from "ramda";
 
 export const f = ts.factory;
 
@@ -53,10 +54,9 @@ export const makeParams = (
   params: Record<string, ts.TypeNode | undefined>,
   mod?: ts.Modifier[],
 ) =>
-  Object.keys(params).reduce(
-    (acc, name) =>
-      acc.concat(makeParam(f.createIdentifier(name), params[name], mod)),
-    [] as ts.ParameterDeclaration[],
+  chain(
+    ([name, node]) => [makeParam(f.createIdentifier(name), node, mod)],
+    toPairs(params),
   );
 
 export const makeRecord = (
@@ -157,16 +157,11 @@ export const makePublicExtendedInterface = (
   );
 
 export const makeTypeParams = (params: Record<string, ts.Identifier>) =>
-  Object.keys(params).reduce(
-    (acc, name) =>
-      acc.concat(
-        f.createTypeParameterDeclaration(
-          [],
-          name,
-          f.createTypeReferenceNode(params[name]),
-        ),
-      ),
-    [] as ts.TypeParameterDeclaration[],
+  chain(
+    ([name, id]) => [
+      f.createTypeParameterDeclaration([], name, f.createTypeReferenceNode(id)),
+    ],
+    toPairs(params),
   );
 
 export const makeArrowFn = (

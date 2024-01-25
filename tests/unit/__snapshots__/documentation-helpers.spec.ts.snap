@@ -916,6 +916,18 @@ exports[`Documentation helpers > depictRequestParams() > should depict query and
 ]
 `;
 
+exports[`Documentation helpers > depictSecurity() > should add scopes when missing 1`] = `
+{
+  "flows": {
+    "password": {
+      "scopes": {},
+      "tokenUrl": "https://test.url",
+    },
+  },
+  "type": "oauth2",
+}
+`;
+
 exports[`Documentation helpers > depictSecurity() > should depict OAuth2 Security with flows 1`] = `
 {
   "flows": {
