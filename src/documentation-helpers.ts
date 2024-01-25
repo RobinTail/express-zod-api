@@ -981,7 +981,7 @@ const depictOpenIdSecurity: SecurityHelper<"openid"> = ({
 const depictOAuth2Security: SecurityHelper<"oauth2"> = ({ flows = {} }) => ({
   type: "oauth2",
   flows: map(
-    ({ scopes = {}, ...rest }): OAuthFlowObject => ({ ...rest, scopes }),
+    (flow): OAuthFlowObject => ({ ...flow, scopes: flow.scopes || {} }),
     reject(isNil, flows) as Required<typeof flows>,
   ),
 });
