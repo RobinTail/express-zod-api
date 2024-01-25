@@ -12,6 +12,6 @@ describe("Endpoint", () => {
       });
       expect(responseMock.status).toHaveBeenCalledWith(200);
     },
-    { time: 1000 },
+    { time: 15000 },
   );
 });

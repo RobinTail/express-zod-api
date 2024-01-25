@@ -16,6 +16,6 @@ describe("Documentation", () => {
       });
       expect(spec.rootDoc.info.version).toBe("1.0.0");
     },
-    { time: 1000 },
+    { time: 15000 },
   );
 });
