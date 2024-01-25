@@ -1,7 +1,7 @@
 import { Request } from "express";
 import { isHttpError } from "http-errors";
 import { createHash } from "node:crypto";
-import { flip, map, mergeAll, pickBy, pipe, reject, xprod } from "ramda";
+import { flip, pickBy, xprod } from "ramda";
 import { z } from "zod";
 import { CommonConfig, InputSource, InputSources } from "./config-type";
 import { InputValidationError, OutputValidationError } from "./errors";
@@ -48,11 +48,14 @@ export const getInput = (
   if (method === "options") {
     return {};
   }
-  return pipe(
-    reject<InputSource>((src) => src === "files" && !areFilesAvailable(req)),
-    map((src) => (src === "headers" ? getCustomHeaders(req[src]) : req[src])),
-    mergeAll<FlatObject>,
-  )(userDefined[method] || defaultInputSources[method] || fallbackInputSource);
+  return (
+    userDefined[method] ||
+    defaultInputSources[method] ||
+    fallbackInputSource
+  )
+    .filter((src) => (src === "files" ? areFilesAvailable(req) : true))
+    .map((src) => (src === "headers" ? getCustomHeaders(req[src]) : req[src]))
+    .reduce<FlatObject>((agg, obj) => ({ ...agg, ...obj }), {});
 };
 
 export const makeErrorFromAnything = (subject: unknown): Error =>
