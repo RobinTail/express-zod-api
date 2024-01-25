@@ -1010,21 +1010,19 @@ export const depictSecurity = (
 export const depictSecurityRefs = (
   container: LogicalContainer<{ name: string; scopes: string[] }>,
 ): SecurityRequirementObject[] => {
-  if (typeof container === "object") {
-    if ("or" in container) {
-      return container.or.map(
-        (entry): SecurityRequirementObject =>
-          mergeAll(
-            map(
-              ({ name, scopes }) => objOf(name, scopes),
-              "and" in entry ? entry.and : [entry],
-            ),
+  if ("or" in container) {
+    return container.or.map(
+      (entry): SecurityRequirementObject =>
+        mergeAll(
+          map(
+            ({ name, scopes }) => objOf(name, scopes),
+            "and" in entry ? entry.and : [entry],
           ),
-      );
-    }
-    if ("and" in container) {
-      return depictSecurityRefs(andToOr(container));
-    }
+        ),
+    );
+  }
+  if ("and" in container) {
+    return depictSecurityRefs(andToOr(container));
   }
   return depictSecurityRefs({ or: [container] });
 };
