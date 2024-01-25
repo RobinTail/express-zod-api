@@ -1,0 +1,21 @@
+import { bench, describe, expect } from "vitest";
+import { config } from "../../example/config";
+import { routing } from "../../example/routing";
+import { Documentation } from "../../src";
+
+describe("Documentation", () => {
+  bench(
+    "example",
+    () => {
+      const spec = new Documentation({
+        routing,
+        config,
+        version: "1.0.0",
+        title: "Example API",
+        serverUrl: "https://example.com",
+      });
+      expect(spec.rootDoc.info.version).toBe("1.0.0");
+    },
+    { time: 1000 },
+  );
+});
