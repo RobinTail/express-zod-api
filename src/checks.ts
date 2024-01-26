@@ -14,12 +14,9 @@ const onSomeUnion: Check<
   schema.options.some((entry) => next({ schema: entry }));
 
 const onIntersection: Check<z.ZodIntersection<z.ZodTypeAny, z.ZodTypeAny>> = ({
-  schema,
+  schema: { _def },
   next,
-}) =>
-  [schema._def.left, schema._def.right].some((entry) =>
-    next({ schema: entry }),
-  );
+}) => [_def.left, _def.right].some((schema) => next({ schema }));
 
 const onObject: Check<z.ZodObject<z.ZodRawShape>> = ({ schema, next }) =>
   Object.values(schema.shape).some((entry) => next({ schema: entry }));
