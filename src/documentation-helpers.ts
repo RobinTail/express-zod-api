@@ -15,13 +15,10 @@ import {
   isReferenceObject,
 } from "openapi3-ts/oas31";
 import {
-  always,
   concat,
   filter,
   fromPairs,
   has,
-  ifElse,
-  isEmpty,
   isNil,
   map,
   mergeAll,
@@ -625,15 +622,13 @@ export const depictLazy: Depicter<z.ZodLazy<z.ZodTypeAny>> = ({
 export const depictRaw: Depicter<RawSchema> = ({ next, schema }) =>
   next({ schema: schema.shape.raw });
 
-const enumerateExamples = ifElse(
-  isEmpty,
-  always(undefined),
-  (examples: unknown[]): ExamplesObject =>
-    zipObj(
-      range(1, examples.length + 1).map((idx) => `example${idx}`),
-      map(objOf("value"), examples),
-    ),
-);
+const enumerateExamples = (examples: unknown[]): ExamplesObject | undefined =>
+  examples.length
+    ? zipObj(
+        range(1, examples.length + 1).map((idx) => `example${idx}`),
+        map(objOf("value"), examples),
+      )
+    : undefined;
 
 export const depictExamples = (
   schema: z.ZodTypeAny,
