@@ -180,9 +180,11 @@ export const hasTopLevelTransformingEffect = (subject: IOSchema): boolean => {
 export const hasNestedSchema = ({
   subject,
   condition,
+  maxDepth,
 }: {
   subject: z.ZodTypeAny;
   condition: (schema: z.ZodTypeAny) => boolean;
+  maxDepth?: number;
 }): boolean => {
   const onObject: Check<z.ZodObject<z.ZodRawShape>> = ({ schema, next }) =>
     Object.values(schema.shape).some((entry) => next({ schema: entry }));
@@ -212,6 +214,7 @@ export const hasNestedSchema = ({
     schema: subject,
     onMissing: () => false,
     onEach: ({ schema }) => condition(schema),
+    maxDepth,
     rules: {
       ZodObject: onObject,
       ZodUnion: onUnion,
@@ -237,7 +240,7 @@ export const hasRaw = (subject: IOSchema) =>
   hasNestedSchema({
     subject,
     condition: (schema) => isProprietary(schema, ezRawKind),
-    // maxDepth: 3,
+    maxDepth: 3,
   });
 
 /**

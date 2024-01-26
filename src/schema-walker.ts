@@ -40,18 +40,31 @@ export const walkSchema = <U, Context extends FlatObject = {}>({
   onEach,
   rules,
   onMissing,
+  depth = 1,
+  maxDepth = Number.POSITIVE_INFINITY,
   ...rest
 }: SchemaHandlingProps<z.ZodTypeAny, U, Context, "last"> & {
   /** @since 10.1.1 calling onEach _after_ handler and giving it the previously achieved result */
   onEach?: SchemaHandler<z.ZodTypeAny, U, Context, "each">;
   rules: HandlingRules<U, Context>;
   onMissing: SchemaHandler<z.ZodTypeAny, U, Context, "last">;
+  maxDepth?: number;
+  depth?: number;
 }): U => {
   const kind = getMeta(schema, "kind") || schema._def.typeName;
-  const handler = kind ? rules[kind as keyof typeof rules] : undefined;
+  const handler =
+    kind && depth < maxDepth ? rules[kind as keyof typeof rules] : undefined;
   const ctx = rest as unknown as Context;
   const next: SchemaHandler<z.ZodTypeAny, U, {}, "last"> = (params) =>
-    walkSchema({ ...params, ...ctx, onEach, rules, onMissing });
+    walkSchema({
+      ...params,
+      ...ctx,
+      onEach,
+      rules,
+      onMissing,
+      maxDepth,
+      depth: depth++,
+    });
   const result = handler
     ? handler({ schema, ...ctx, next })
     : onMissing({ schema, ...ctx });
