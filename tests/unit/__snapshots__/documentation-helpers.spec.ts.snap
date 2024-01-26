@@ -722,24 +722,13 @@ exports[`Documentation helpers > depictOptional() > should pass the next depicte
 }
 `;
 
-exports[`Documentation helpers > depictParamExamples() > should 'pass' examples in case of 'request' 1`] = `
+exports[`Documentation helpers > depictParamExamples() > should pass examples for the given parameter 1`] = `
 {
   "example1": {
     "value": 123,
   },
   "example2": {
     "value": 456,
-  },
-}
-`;
-
-exports[`Documentation helpers > depictParamExamples() > should 'transform' examples in case of 'response' 1`] = `
-{
-  "example1": {
-    "value": "123",
-  },
-  "example2": {
-    "value": "456",
   },
 }
 `;
