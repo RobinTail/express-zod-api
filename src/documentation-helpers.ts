@@ -643,7 +643,6 @@ export const depictExamples = (
 
 export const depictParamExamples = (
   schema: z.ZodTypeAny,
-  isResponse: boolean,
   param: string,
 ): ExamplesObject | undefined => {
   const examples = pipe(
@@ -651,7 +650,7 @@ export const depictParamExamples = (
     filter<FlatObject>(has(param)),
     pluck(param),
     map(objOf("value")),
-  )({ schema, variant: isResponse ? "parsed" : "original", validate: true });
+  )({ schema, variant: "original", validate: true });
   if (examples.length === 0) {
     return undefined;
   }
@@ -743,7 +742,7 @@ export const depictRequestParams = ({
         required: !shape[name].isOptional(),
         description: depicted.description || description,
         schema: result,
-        examples: depictParamExamples(schema, false, name),
+        examples: depictParamExamples(schema, name),
       };
     });
 };

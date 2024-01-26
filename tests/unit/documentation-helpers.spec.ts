@@ -758,10 +758,7 @@ describe("Documentation helpers", () => {
   });
 
   describe("depictParamExamples()", () => {
-    test.each<{ isResponse: boolean } & Record<"case" | "action", string>>([
-      { isResponse: false, case: "request", action: "pass" },
-      { isResponse: true, case: "response", action: "transform" },
-    ])("should $action examples in case of $case", ({ isResponse }) => {
+    test("should pass examples for the given parameter", () => {
       expect(
         depictParamExamples(
           withMeta(
@@ -781,7 +778,6 @@ describe("Documentation helpers", () => {
               two: 456,
               three: false,
             }),
-          isResponse,
           "two",
         ),
       ).toMatchSnapshot();
