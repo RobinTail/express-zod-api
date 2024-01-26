@@ -1,8 +1,8 @@
-import { ZodEffects, z } from "zod";
+import { z } from "zod";
 import { IOSchema } from "./io-schema";
 import { isProprietary } from "./metadata";
 import { ezRawKind } from "./raw-schema";
-import { SchemaHandler, walkSchema } from "./schema-walker";
+import { HandlingRules, SchemaHandler, walkSchema } from "./schema-walker";
 import { ezUploadKind } from "./upload-schema";
 
 type Check<T extends z.ZodTypeAny> = SchemaHandler<T, boolean>;
@@ -35,45 +35,46 @@ const onArray: Check<z.ZodArray<z.ZodTypeAny>> = ({ schema, next }) =>
 const onDefault: Check<z.ZodDefault<z.ZodTypeAny>> = ({ schema, next }) =>
   next({ schema: schema._def.innerType });
 
-export const hasTopLevelTransformingEffect = (subject: IOSchema): boolean => {
-  return walkSchema({
-    schema: subject,
-    rules: {
-      ZodEffects: ({ schema }) =>
-        (schema as ZodEffects<z.ZodTypeAny>)._def.effect.type !== "refinement",
-      ZodUnion: onSomeUnion, // can not be discriminated union
-      ZodIntersection: onIntersection,
-    },
-    onMissing: () => false,
-  });
+const checks: HandlingRules<boolean> = {
+  ZodObject: onObject,
+  ZodUnion: onSomeUnion,
+  ZodDiscriminatedUnion: onSomeUnion,
+  ZodIntersection: onIntersection,
+  ZodEffects: onEffects,
+  ZodOptional: onOptional,
+  ZodNullable: onOptional,
+  ZodRecord: onRecord,
+  ZodArray: onArray,
+  ZodDefault: onDefault,
 };
 
 export const hasNestedSchema = ({
   subject,
   condition,
   maxDepth,
+  rules = checks,
 }: {
   subject: z.ZodTypeAny;
   condition: (schema: z.ZodTypeAny) => boolean;
   maxDepth?: number;
+  rules?: HandlingRules<boolean>;
 }): boolean =>
   walkSchema({
     schema: subject,
     onMissing: () => false,
     onEach: ({ schema }) => condition(schema),
     maxDepth,
-    rules: {
-      ZodObject: onObject,
-      ZodUnion: onSomeUnion,
-      ZodDiscriminatedUnion: onSomeUnion,
-      ZodIntersection: onIntersection,
-      ZodOptional: onOptional,
-      ZodNullable: onOptional,
-      ZodEffects: onEffects,
-      ZodRecord: onRecord,
-      ZodArray: onArray,
-      ZodDefault: onDefault,
-    },
+    rules,
+  });
+
+export const hasTopLevelTransformingEffect = (subject: IOSchema): boolean =>
+  hasNestedSchema({
+    subject,
+    maxDepth: 3,
+    rules: { ZodUnion: onSomeUnion, ZodIntersection: onIntersection },
+    condition: (schema) =>
+      schema instanceof z.ZodEffects &&
+      schema._def.effect.type !== "refinement",
   });
 
 export const hasUpload = (subject: IOSchema) =>
