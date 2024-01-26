@@ -154,8 +154,8 @@ export const combinations = <T>(
   merge: (pair: [T, T]) => T,
 ): T[] => (a.length && b.length ? xprod(a, b).map(merge) : a.concat(b));
 
+type Check<T extends z.ZodTypeAny> = SchemaHandler<T, boolean>;
 export const hasTopLevelTransformingEffect = (subject: IOSchema): boolean => {
-  type Check<T extends z.ZodTypeAny> = SchemaHandler<T, boolean>;
   const onEffects: Check<z.ZodEffects<z.ZodTypeAny>> = ({ schema }) =>
     schema._def.effect.type !== "refinement";
   const onUnion: Check<z.ZodUnion<z.ZodUnionOptions>> = ({ schema, next }) =>
@@ -180,52 +180,51 @@ export const hasTopLevelTransformingEffect = (subject: IOSchema): boolean => {
 export const hasNestedSchema = ({
   subject,
   condition,
-  maxDepth,
-  depth = 1,
 }: {
   subject: z.ZodTypeAny;
   condition: (schema: z.ZodTypeAny) => boolean;
-  maxDepth?: number;
-  depth?: number;
 }): boolean => {
-  if (condition(subject)) {
-    return true;
-  }
-  if (maxDepth !== undefined && depth >= maxDepth) {
-    return false;
-  }
-  const common = { condition, maxDepth, depth: depth + 1 };
-  if (subject instanceof z.ZodObject) {
-    return Object.values<z.ZodTypeAny>(subject.shape).some((entry) =>
-      hasNestedSchema({ subject: entry, ...common }),
+  const onObject: Check<z.ZodObject<z.ZodRawShape>> = ({ schema, next }) =>
+    Object.values(schema.shape).some((entry) => next({ schema: entry }));
+  const onUnion: Check<
+    | z.ZodUnion<z.ZodUnionOptions>
+    | z.ZodDiscriminatedUnion<string, z.ZodDiscriminatedUnionOption<string>[]>
+  > = ({ schema, next }) =>
+    schema.options.some((entry) => next({ schema: entry }));
+  const onIntersection: Check<
+    z.ZodIntersection<z.ZodTypeAny, z.ZodTypeAny>
+  > = ({ schema, next }) =>
+    [schema._def.left, schema._def.right].some((entry) =>
+      next({ schema: entry }),
     );
-  }
-  if (subject instanceof z.ZodUnion) {
-    return subject.options.some((entry: z.ZodTypeAny) =>
-      hasNestedSchema({ subject: entry, ...common }),
-    );
-  }
-  if (subject instanceof z.ZodIntersection) {
-    return [subject._def.left, subject._def.right].some((entry) =>
-      hasNestedSchema({ subject: entry, ...common }),
-    );
-  }
-  if (subject instanceof z.ZodOptional || subject instanceof z.ZodNullable) {
-    return hasNestedSchema({ subject: subject.unwrap(), ...common });
-  }
-  if (subject instanceof z.ZodEffects || subject instanceof z.ZodTransformer) {
-    return hasNestedSchema({ subject: subject.innerType(), ...common });
-  }
-  if (subject instanceof z.ZodRecord) {
-    return hasNestedSchema({ subject: subject.valueSchema, ...common });
-  }
-  if (subject instanceof z.ZodArray) {
-    return hasNestedSchema({ subject: subject.element, ...common });
-  }
-  if (subject instanceof z.ZodDefault) {
-    return hasNestedSchema({ subject: subject._def.innerType, ...common });
-  }
-  return false;
+  const onOptional: Check<
+    z.ZodOptional<z.ZodTypeAny> | z.ZodNullable<z.ZodTypeAny>
+  > = ({ schema, next }) => next({ schema: schema.unwrap() });
+  const onEffects: Check<z.ZodEffects<z.ZodTypeAny>> = ({ schema, next }) =>
+    next({ schema: schema.innerType() });
+  const onRecord: Check<z.ZodRecord> = ({ schema, next }) =>
+    next({ schema: schema.valueSchema });
+  const onArray: Check<z.ZodArray<z.ZodTypeAny>> = ({ schema, next }) =>
+    next({ schema: schema.element });
+  const onDefault: Check<z.ZodDefault<z.ZodTypeAny>> = ({ schema, next }) =>
+    next({ schema: schema._def.innerType });
+  return walkSchema({
+    schema: subject,
+    onMissing: () => false,
+    onEach: ({ schema }) => condition(schema),
+    rules: {
+      ZodObject: onObject,
+      ZodUnion: onUnion,
+      ZodDiscriminatedUnion: onUnion,
+      ZodIntersection: onIntersection,
+      ZodOptional: onOptional,
+      ZodNullable: onOptional,
+      ZodEffects: onEffects,
+      ZodRecord: onRecord,
+      ZodArray: onArray,
+      ZodDefault: onDefault,
+    },
+  });
 };
 
 export const hasUpload = (subject: IOSchema) =>
@@ -238,7 +237,7 @@ export const hasRaw = (subject: IOSchema) =>
   hasNestedSchema({
     subject,
     condition: (schema) => isProprietary(schema, ezRawKind),
-    maxDepth: 3,
+    // maxDepth: 3,
   });
 
 /**
