@@ -10,8 +10,8 @@ type Check<T extends z.ZodTypeAny> = SchemaHandler<T, boolean>;
 const onSomeUnion: Check<
   | z.ZodUnion<z.ZodUnionOptions>
   | z.ZodDiscriminatedUnion<string, z.ZodDiscriminatedUnionOption<string>[]>
-> = ({ schema, next }) =>
-  schema.options.some((entry) => next({ schema: entry }));
+> = ({ schema: { options }, next }) =>
+  options.some((schema) => next({ schema }));
 
 const onIntersection: Check<z.ZodIntersection<z.ZodTypeAny, z.ZodTypeAny>> = ({
   schema: { _def },
