@@ -11,6 +11,7 @@ import { getMeta, isProprietary } from "./metadata";
 import { AuxMethod, Method } from "./method";
 import { mimeMultipart } from "./mime";
 import { ezRawKind } from "./raw-schema";
+import { SchemaHandler, walkSchema } from "./schema-walker";
 import { ezUploadKind } from "./upload-schema";
 
 export type FlatObject = Record<string, unknown>;
@@ -153,21 +154,27 @@ export const combinations = <T>(
   merge: (pair: [T, T]) => T,
 ): T[] => (a.length && b.length ? xprod(a, b).map(merge) : a.concat(b));
 
-export const hasTopLevelTransformingEffect = (schema: IOSchema): boolean => {
-  if (schema instanceof z.ZodEffects) {
-    if (schema._def.effect.type !== "refinement") {
-      return true;
-    }
-  }
-  if (schema instanceof z.ZodUnion) {
-    return schema.options.some(hasTopLevelTransformingEffect);
-  }
-  if (schema instanceof z.ZodIntersection) {
-    return [schema._def.left, schema._def.right].some(
-      hasTopLevelTransformingEffect,
+export const hasTopLevelTransformingEffect = (subject: IOSchema): boolean => {
+  type Check<T extends z.ZodTypeAny> = SchemaHandler<T, boolean>;
+  const onEffects: Check<z.ZodEffects<z.ZodTypeAny>> = ({ schema }) =>
+    schema._def.effect.type !== "refinement";
+  const onUnion: Check<z.ZodUnion<z.ZodUnionOptions>> = ({ schema, next }) =>
+    schema.options.some((opt) => next({ schema: opt }));
+  const onIntersection: Check<
+    z.ZodIntersection<z.ZodTypeAny, z.ZodTypeAny>
+  > = ({ schema, next }) =>
+    [schema._def.left, schema._def.right].some((side) =>
+      next({ schema: side }),
     );
-  }
-  return false; // ZodObject left
+  return walkSchema({
+    schema: subject,
+    rules: {
+      ZodEffects: onEffects,
+      ZodUnion: onUnion,
+      ZodIntersection: onIntersection,
+    },
+    onMissing: () => false,
+  });
 };
 
 export const hasNestedSchema = ({
