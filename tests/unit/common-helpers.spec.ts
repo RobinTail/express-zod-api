@@ -2,6 +2,10 @@ import { UploadedFile } from "express-fileupload";
 import createHttpError from "http-errors";
 import { expectType } from "tsd";
 import {
+  hasNestedSchema,
+  hasTopLevelTransformingEffect,
+} from "../../src/checks";
+import {
   combinations,
   defaultInputSources,
   getCustomHeaders,
@@ -10,8 +14,6 @@ import {
   getMessageFromError,
   getStatusCodeFromError,
   hasCoercion,
-  hasNestedSchema,
-  hasTopLevelTransformingEffect,
   isCustomHeader,
   makeCleanId,
   makeErrorFromAnything,

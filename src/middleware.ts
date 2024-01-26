@@ -1,7 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import { HttpError } from "http-errors";
 import { z } from "zod";
-import { FlatObject, hasTopLevelTransformingEffect } from "./common-helpers";
+import { hasTopLevelTransformingEffect } from "./checks";
+import { FlatObject } from "./common-helpers";
 import { IOSchemaError } from "./errors";
 import { IOSchema } from "./io-schema";
 import { LogicalContainer } from "./logical-container";

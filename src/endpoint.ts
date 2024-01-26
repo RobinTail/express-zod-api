@@ -6,13 +6,11 @@ import {
   defaultStatusCodes,
   normalizeApiResponse,
 } from "./api-response";
+import { hasRaw, hasTopLevelTransformingEffect, hasUpload } from "./checks";
 import {
   FlatObject,
   getActualMethod,
   getInput,
-  hasRaw,
-  hasTopLevelTransformingEffect,
-  hasUpload,
   makeErrorFromAnything,
 } from "./common-helpers";
 import { CommonConfig } from "./config-type";

@@ -5,14 +5,10 @@ import { flip, pickBy, xprod } from "ramda";
 import { z } from "zod";
 import { CommonConfig, InputSource, InputSources } from "./config-type";
 import { InputValidationError, OutputValidationError } from "./errors";
-import { IOSchema } from "./io-schema";
 import { AbstractLogger } from "./logger";
-import { getMeta, isProprietary } from "./metadata";
+import { getMeta } from "./metadata";
 import { AuxMethod, Method } from "./method";
 import { mimeMultipart } from "./mime";
-import { ezRawKind } from "./raw-schema";
-import { SchemaHandler, walkSchema } from "./schema-walker";
-import { ezUploadKind } from "./upload-schema";
 
 export type FlatObject = Record<string, unknown>;
 
@@ -153,95 +149,6 @@ export const combinations = <T>(
   b: T[],
   merge: (pair: [T, T]) => T,
 ): T[] => (a.length && b.length ? xprod(a, b).map(merge) : a.concat(b));
-
-type Check<T extends z.ZodTypeAny> = SchemaHandler<T, boolean>;
-export const hasTopLevelTransformingEffect = (subject: IOSchema): boolean => {
-  const onEffects: Check<z.ZodEffects<z.ZodTypeAny>> = ({ schema }) =>
-    schema._def.effect.type !== "refinement";
-  const onUnion: Check<z.ZodUnion<z.ZodUnionOptions>> = ({ schema, next }) =>
-    schema.options.some((opt) => next({ schema: opt }));
-  const onIntersection: Check<
-    z.ZodIntersection<z.ZodTypeAny, z.ZodTypeAny>
-  > = ({ schema, next }) =>
-    [schema._def.left, schema._def.right].some((side) =>
-      next({ schema: side }),
-    );
-  return walkSchema({
-    schema: subject,
-    rules: {
-      ZodEffects: onEffects,
-      ZodUnion: onUnion,
-      ZodIntersection: onIntersection,
-    },
-    onMissing: () => false,
-  });
-};
-
-export const hasNestedSchema = ({
-  subject,
-  condition,
-  maxDepth,
-}: {
-  subject: z.ZodTypeAny;
-  condition: (schema: z.ZodTypeAny) => boolean;
-  maxDepth?: number;
-}): boolean => {
-  const onObject: Check<z.ZodObject<z.ZodRawShape>> = ({ schema, next }) =>
-    Object.values(schema.shape).some((entry) => next({ schema: entry }));
-  const onUnion: Check<
-    | z.ZodUnion<z.ZodUnionOptions>
-    | z.ZodDiscriminatedUnion<string, z.ZodDiscriminatedUnionOption<string>[]>
-  > = ({ schema, next }) =>
-    schema.options.some((entry) => next({ schema: entry }));
-  const onIntersection: Check<
-    z.ZodIntersection<z.ZodTypeAny, z.ZodTypeAny>
-  > = ({ schema, next }) =>
-    [schema._def.left, schema._def.right].some((entry) =>
-      next({ schema: entry }),
-    );
-  const onOptional: Check<
-    z.ZodOptional<z.ZodTypeAny> | z.ZodNullable<z.ZodTypeAny>
-  > = ({ schema, next }) => next({ schema: schema.unwrap() });
-  const onEffects: Check<z.ZodEffects<z.ZodTypeAny>> = ({ schema, next }) =>
-    next({ schema: schema.innerType() });
-  const onRecord: Check<z.ZodRecord> = ({ schema, next }) =>
-    next({ schema: schema.valueSchema });
-  const onArray: Check<z.ZodArray<z.ZodTypeAny>> = ({ schema, next }) =>
-    next({ schema: schema.element });
-  const onDefault: Check<z.ZodDefault<z.ZodTypeAny>> = ({ schema, next }) =>
-    next({ schema: schema._def.innerType });
-  return walkSchema({
-    schema: subject,
-    onMissing: () => false,
-    onEach: ({ schema }) => condition(schema),
-    maxDepth,
-    rules: {
-      ZodObject: onObject,
-      ZodUnion: onUnion,
-      ZodDiscriminatedUnion: onUnion,
-      ZodIntersection: onIntersection,
-      ZodOptional: onOptional,
-      ZodNullable: onOptional,
-      ZodEffects: onEffects,
-      ZodRecord: onRecord,
-      ZodArray: onArray,
-      ZodDefault: onDefault,
-    },
-  });
-};
-
-export const hasUpload = (subject: IOSchema) =>
-  hasNestedSchema({
-    subject,
-    condition: (schema) => isProprietary(schema, ezUploadKind),
-  });
-
-export const hasRaw = (subject: IOSchema) =>
-  hasNestedSchema({
-    subject,
-    condition: (schema) => isProprietary(schema, ezRawKind),
-    maxDepth: 3,
-  });
 
 /**
  * @desc isNullable() and isOptional() validate the schema's input
