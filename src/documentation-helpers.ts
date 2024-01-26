@@ -1,6 +1,5 @@
 import assert from "node:assert/strict";
 import {
-  ExampleObject,
   ExamplesObject,
   MediaTypeObject,
   OAuthFlowObject,
@@ -629,10 +628,10 @@ export const depictRaw: Depicter<RawSchema> = ({ next, schema }) =>
 const enumerateExamples = ifElse(
   isEmpty,
   always(undefined),
-  (examples: ExampleObject[]): ExamplesObject =>
+  (examples: unknown[]): ExamplesObject =>
     zipObj(
       range(1, examples.length + 1).map((idx) => `example${idx}`),
-      examples,
+      map(objOf("value"), examples),
     ),
 );
 
@@ -644,7 +643,6 @@ export const depictExamples = (
   pipe(
     getExamples,
     map(when((subj) => z.object({}).safeParse(subj).success, omit(omitProps))),
-    map(objOf("value")),
     enumerateExamples,
   )({ schema, variant: isResponse ? "parsed" : "original", validate: true });
 
@@ -656,7 +654,6 @@ export const depictParamExamples = (
     getExamples,
     filter<FlatObject>(has(param)),
     pluck(param),
-    map(objOf("value")),
     enumerateExamples,
   )({ schema, variant: "original", validate: true });
 
