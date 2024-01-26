@@ -2,6 +2,11 @@
 
 ## Version 16
 
+### 16.5.2
+
+- Refactoring: rewrote some reducers using declarative and functional approach.
+  - In certain cases it improved the performance slightly.
+
 ### 16.5.1
 
 - Excluding empty `properties` in the generated documentation.

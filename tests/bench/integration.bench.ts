@@ -9,6 +9,6 @@ describe("Integration", () => {
       const instance = new Integration({ routing });
       expect(instance).toBeInstanceOf(Integration);
     },
-    { time: 1000 },
+    { time: 15000 },
   );
 });

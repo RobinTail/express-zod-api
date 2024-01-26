@@ -1,10 +1,8 @@
 import assert from "node:assert/strict";
 import {
-  ContentObject,
-  ExampleObject,
   ExamplesObject,
+  MediaTypeObject,
   OAuthFlowObject,
-  OAuthFlowsObject,
   ParameterObject,
   ReferenceObject,
   RequestBodyObject,
@@ -18,13 +16,24 @@ import {
 } from "openapi3-ts/oas31";
 import {
   concat,
+  filter,
   fromPairs,
+  has,
+  isNil,
   map,
+  mergeAll,
   mergeDeepRight,
   mergeDeepWith,
+  objOf,
   omit,
+  pipe,
+  pluck,
+  range,
+  reject,
   union,
+  when,
   xprod,
+  zipObj,
 } from "ramda";
 import { z } from "zod";
 import {
@@ -538,13 +547,7 @@ export const depictObjectProperties = ({
   schema: { shape },
   next,
 }: Parameters<Depicter<z.ZodObject<z.ZodRawShape>>>[0]) =>
-  Object.keys(shape).reduce<Record<string, SchemaObject | ReferenceObject>>(
-    (carry, key) => ({
-      ...carry,
-      [key]: next({ schema: shape[key] }),
-    }),
-    {},
-  );
+  map((schema) => next({ schema }), shape);
 
 const makeSample = (depicted: SchemaObject) => {
   const type = (
@@ -624,25 +627,17 @@ export const depictExamples = (
   isResponse: boolean,
   omitProps: string[] = [],
 ): ExamplesObject | undefined => {
-  const examples = getExamples({
-    schema,
-    variant: isResponse ? "parsed" : "original",
-    validate: true,
-  });
+  const examples = pipe(
+    getExamples,
+    map(when((subj) => z.object({}).safeParse(subj).success, omit(omitProps))),
+    map(objOf("value")),
+  )({ schema, variant: isResponse ? "parsed" : "original", validate: true });
   if (examples.length === 0) {
     return undefined;
   }
-  return examples.reduce<ExamplesObject>(
-    (carry, example, index) => ({
-      ...carry,
-      [`example${index + 1}`]: {
-        value:
-          typeof example === "object" && !Array.isArray(example)
-            ? omit(omitProps, example)
-            : example,
-      } satisfies ExampleObject,
-    }),
-    {},
+  return zipObj(
+    range(1, examples.length + 1).map((idx) => `example${idx}`),
+    examples,
   );
 };
 
@@ -651,25 +646,18 @@ export const depictParamExamples = (
   isResponse: boolean,
   param: string,
 ): ExamplesObject | undefined => {
-  const examples = getExamples({
-    schema,
-    variant: isResponse ? "parsed" : "original",
-    validate: true,
-  });
+  const examples = pipe(
+    getExamples,
+    filter<FlatObject>(has(param)),
+    pluck(param),
+    map(objOf("value")),
+  )({ schema, variant: isResponse ? "parsed" : "original", validate: true });
   if (examples.length === 0) {
     return undefined;
   }
-  return examples.reduce<ExamplesObject>(
-    (carry, example, index) =>
-      param in example
-        ? {
-            ...carry,
-            [`example${index + 1}`]: {
-              value: example[param],
-            } satisfies ExampleObject,
-          }
-        : carry,
-    {},
+  return zipObj(
+    range(1, examples.length + 1).map((idx) => `example${idx}`),
+    examples,
   );
 };
 
@@ -923,22 +911,14 @@ export const depictResponse = ({
       method,
     }),
   );
-  const examples = depictExamples(schema, true);
-  const result =
-    composition === "components"
-      ? makeRef(makeCleanId(description), depictedSchema)
-      : depictedSchema;
-
-  return {
-    description,
-    content: mimeTypes.reduce<ContentObject>(
-      (carry, mimeType) => ({
-        ...carry,
-        [mimeType]: { schema: result, examples },
-      }),
-      {},
-    ),
+  const media: MediaTypeObject = {
+    schema:
+      composition === "components"
+        ? makeRef(makeCleanId(description), depictedSchema)
+        : depictedSchema,
+    examples: depictExamples(schema, true),
   };
+  return { description, content: fromPairs(xprod(mimeTypes, [media])) };
 };
 
 type SecurityHelper<K extends Security["type"]> = (
@@ -1000,16 +980,10 @@ const depictOpenIdSecurity: SecurityHelper<"openid"> = ({
 });
 const depictOAuth2Security: SecurityHelper<"oauth2"> = ({ flows = {} }) => ({
   type: "oauth2",
-  flows: (
-    Object.keys(flows) as (keyof typeof flows)[]
-  ).reduce<OAuthFlowsObject>((acc, key) => {
-    const flow = flows[key];
-    if (!flow) {
-      return acc;
-    }
-    const { scopes = {}, ...rest } = flow;
-    return { ...acc, [key]: { ...rest, scopes } satisfies OAuthFlowObject };
-  }, {}),
+  flows: map(
+    (flow): OAuthFlowObject => ({ ...flow, scopes: flow.scopes || {} }),
+    reject(isNil, flows) as Required<typeof flows>,
+  ),
 });
 
 export const depictSecurity = (
@@ -1036,24 +1010,16 @@ export const depictSecurity = (
 export const depictSecurityRefs = (
   container: LogicalContainer<{ name: string; scopes: string[] }>,
 ): SecurityRequirementObject[] => {
-  if (typeof container === "object") {
-    if ("or" in container) {
-      return container.or.map((entry) =>
-        ("and" in entry
-          ? entry.and
-          : [entry]
-        ).reduce<SecurityRequirementObject>(
-          (agg, { name, scopes }) => ({
-            ...agg,
-            [name]: scopes,
-          }),
-          {},
-        ),
-      );
-    }
-    if ("and" in container) {
-      return depictSecurityRefs(andToOr(container));
-    }
+  if ("or" in container) {
+    return container.or.map(
+      (entry): SecurityRequirementObject =>
+        "and" in entry
+          ? mergeAll(map(({ name, scopes }) => objOf(name, scopes), entry.and))
+          : { [entry.name]: entry.scopes },
+    );
+  }
+  if ("and" in container) {
+    return depictSecurityRefs(andToOr(container));
   }
   return depictSecurityRefs({ or: [container] });
 };
@@ -1087,22 +1053,14 @@ export const depictRequest = ({
       pathParams,
     ),
   );
-  const bodyExamples = depictExamples(schema, false, pathParams);
-  const result =
-    composition === "components"
-      ? makeRef(makeCleanId(description), bodyDepiction)
-      : bodyDepiction;
-
-  return {
-    description,
-    content: mimeTypes.reduce<ContentObject>(
-      (carry, mimeType) => ({
-        ...carry,
-        [mimeType]: { schema: result, examples: bodyExamples },
-      }),
-      {},
-    ),
+  const media: MediaTypeObject = {
+    schema:
+      composition === "components"
+        ? makeRef(makeCleanId(description), bodyDepiction)
+        : bodyDepiction,
+    examples: depictExamples(schema, false, pathParams),
   };
+  return { description, content: fromPairs(xprod(mimeTypes, [media])) };
 };
 
 export const depictTags = <TAG extends string>(

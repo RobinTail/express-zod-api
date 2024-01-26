@@ -1,7 +1,7 @@
 import { Request } from "express";
 import { isHttpError } from "http-errors";
 import { createHash } from "node:crypto";
-import { xprod } from "ramda";
+import { flip, pickBy, xprod } from "ramda";
 import { z } from "zod";
 import { CommonConfig, InputSource, InputSources } from "./config-type";
 import { InputValidationError, OutputValidationError } from "./errors";
@@ -17,8 +17,7 @@ export type FlatObject = Record<string, unknown>;
 
 const areFilesAvailable = (request: Request): boolean => {
   const contentType = request.header("content-type") || "";
-  const isMultipart =
-    contentType.slice(0, mimeMultipart.length).toLowerCase() === mimeMultipart;
+  const isMultipart = contentType.toLowerCase().startsWith(mimeMultipart);
   return "files" in request && isMultipart;
 };
 
@@ -38,37 +37,25 @@ export const isCustomHeader = (name: string): name is `x-${string}` =>
   name.startsWith("x-");
 
 /** @see https://nodejs.org/api/http.html#messageheaders */
-export const getCustomHeaders = (request: Request) =>
-  Object.entries(request.headers).reduce<FlatObject>(
-    (agg, [key, value]) =>
-      isCustomHeader(key) ? { ...agg, [key]: value } : agg,
-    {},
-  );
+export const getCustomHeaders = (headers: FlatObject): FlatObject =>
+  pickBy(flip(isCustomHeader), headers); // needs flip to address the keys
 
 export const getInput = (
-  request: Request,
-  inputAssignment: CommonConfig["inputSources"],
-) => {
-  const method = getActualMethod(request);
+  req: Request,
+  userDefined: CommonConfig["inputSources"] = {},
+): FlatObject => {
+  const method = getActualMethod(req);
   if (method === "options") {
     return {};
   }
-  let props = fallbackInputSource;
-  if (method in defaultInputSources) {
-    props = defaultInputSources[method];
-  }
-  if (inputAssignment && method in inputAssignment) {
-    props = inputAssignment[method] || props;
-  }
-  return props
-    .filter((prop) => (prop === "files" ? areFilesAvailable(request) : true))
-    .reduce<FlatObject>(
-      (carry, prop) => ({
-        ...carry,
-        ...(prop === "headers" ? getCustomHeaders(request) : request[prop]),
-      }),
-      {},
-    );
+  return (
+    userDefined[method] ||
+    defaultInputSources[method] ||
+    fallbackInputSource
+  )
+    .filter((src) => (src === "files" ? areFilesAvailable(req) : true))
+    .map((src) => (src === "headers" ? getCustomHeaders(req[src]) : req[src]))
+    .reduce<FlatObject>((agg, obj) => ({ ...agg, ...obj }), {});
 };
 
 export const makeErrorFromAnything = (subject: unknown): Error =>
