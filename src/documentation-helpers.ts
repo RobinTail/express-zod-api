@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import {
+  ExampleObject,
   ExamplesObject,
   MediaTypeObject,
   OAuthFlowObject,
@@ -15,10 +16,13 @@ import {
   isReferenceObject,
 } from "openapi3-ts/oas31";
 import {
+  always,
   concat,
   filter,
   fromPairs,
   has,
+  ifElse,
+  isEmpty,
   isNil,
   map,
   mergeAll,
@@ -622,43 +626,39 @@ export const depictLazy: Depicter<z.ZodLazy<z.ZodTypeAny>> = ({
 export const depictRaw: Depicter<RawSchema> = ({ next, schema }) =>
   next({ schema: schema.shape.raw });
 
+const enumerateExamples = ifElse(
+  isEmpty,
+  always(undefined),
+  (examples: ExampleObject[]): ExamplesObject =>
+    zipObj(
+      range(1, examples.length + 1).map((idx) => `example${idx}`),
+      examples,
+    ),
+);
+
 export const depictExamples = (
   schema: z.ZodTypeAny,
   isResponse: boolean,
   omitProps: string[] = [],
-): ExamplesObject | undefined => {
-  const examples = pipe(
+): ExamplesObject | undefined =>
+  pipe(
     getExamples,
     map(when((subj) => z.object({}).safeParse(subj).success, omit(omitProps))),
     map(objOf("value")),
+    enumerateExamples,
   )({ schema, variant: isResponse ? "parsed" : "original", validate: true });
-  if (examples.length === 0) {
-    return undefined;
-  }
-  return zipObj(
-    range(1, examples.length + 1).map((idx) => `example${idx}`),
-    examples,
-  );
-};
 
 export const depictParamExamples = (
   schema: z.ZodTypeAny,
   param: string,
-): ExamplesObject | undefined => {
-  const examples = pipe(
+): ExamplesObject | undefined =>
+  pipe(
     getExamples,
     filter<FlatObject>(has(param)),
     pluck(param),
     map(objOf("value")),
+    enumerateExamples,
   )({ schema, variant: "original", validate: true });
-  if (examples.length === 0) {
-    return undefined;
-  }
-  return zipObj(
-    range(1, examples.length + 1).map((idx) => `example${idx}`),
-    examples,
-  );
-};
 
 export const extractObjectSchema = (
   subject: IOSchema,
