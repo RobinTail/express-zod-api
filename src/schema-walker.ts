@@ -51,10 +51,10 @@ export const walkSchema = <U, Context extends FlatObject = {}>({
   maxDepth = Number.POSITIVE_INFINITY,
   ...rest
 }: SchemaHandlingProps<z.ZodTypeAny, U, Context, "last"> & {
-  check?: SchemaHandler<z.ZodTypeAny, U & boolean, Context, "last">;
   onEach?: SchemaHandler<z.ZodTypeAny, U, Context, "each">;
   rules: HandlingRules<U, Context>;
   onMissing: SchemaHandler<z.ZodTypeAny, U, Context, "last">;
+  check?: SchemaHandler<z.ZodTypeAny, U & boolean, Context, "last">;
   maxDepth?: number;
   depth?: number;
 }): U => {
