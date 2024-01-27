@@ -9,6 +9,25 @@
 - Refactoring: simplified `next` shorthand of the schema walker.
   - This improved the preformance slightly.
 
+### 16.5.3
+
+- Fixed the bug #1517 found reported by [@kotsmile](https://github.com/kotsmile):
+  - The minimum allowed float was incorrectly specified in the generated documentation;
+  - Applies only to `z.number()` having no `.min()` and no `.int()` refinements.
+
+```yaml
+before:
+  type: number
+  format: double
+  minimum: 5e-324 # <——— bug
+  maximum: 1.7976931348623157e+308
+after:
+  type: number
+  format: double
+  minimum: -1.7976931348623157e+308 # <——— correct
+  maximum: 1.7976931348623157e+308
+```
+
 ### 16.5.2
 
 - Refactoring: rewrote some reducers using declarative and functional approach.
