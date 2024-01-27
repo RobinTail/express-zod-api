@@ -1,5 +1,5 @@
 import { UploadedFile } from "express-fileupload";
-import { describe, expect, test } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 import { z } from "zod";
 import { ez } from "../../src";
 import {
@@ -50,15 +50,12 @@ describe("Checks", () => {
           }),
         }),
       });
-      let callCount = 0;
+      const check = vi.fn((schema) => schema instanceof z.ZodObject);
       hasNestedSchema({
         subject,
-        condition: (schema) => {
-          callCount++;
-          return schema instanceof z.ZodObject;
-        },
+        condition: check,
       });
-      expect(callCount).toBe(1);
+      expect(check.mock.calls.length).toBe(1);
     });
   });
 
