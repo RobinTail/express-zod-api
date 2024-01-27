@@ -5,6 +5,7 @@ import { defaultSerializer } from "../../src/common-helpers";
 import { DocumentationError, ez, withMeta } from "../../src";
 import {
   OpenAPIContext,
+  after,
   depictAny,
   depictArray,
   depictBigInt,
@@ -47,7 +48,6 @@ import {
   excludeParamsFromDepiction,
   extractObjectSchema,
   getRoutePathParams,
-  onEach,
   onMissing,
   reformatParamsInPath,
 } from "../../src/documentation-helpers";
@@ -92,7 +92,7 @@ describe("Documentation helpers", () => {
         schema,
         rules: depicters,
         ...ctx,
-        onEach,
+        after,
         onMissing,
       });
 
@@ -194,7 +194,7 @@ describe("Documentation helpers", () => {
       const depicted = walkSchema({
         schema,
         ...requestCtx,
-        onEach,
+        after,
         rules: depicters,
         onMissing,
       });

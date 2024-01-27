@@ -36,33 +36,27 @@ export type HandlingRules<U, Context extends FlatObject = {}> = Partial<
 >;
 
 /**
- * @since 10.1.1 calling onEach _after_ handler and giving it the previously achieved result
- * @since 16.6.0 added check - runs _before_ handler in order to terminate traversing early
- * @since 16.6.0 added maxDepth - controls the maintained depth
+ * @since 16.6.0 renamed onEach to after, added before and maxDepth
  * @see hasNestedSchema
  * */
 export const walkSchema = <U, Context extends FlatObject = {}>({
   schema,
-  onEach,
+  after,
   rules,
   onMissing,
-  check,
+  before,
   depth = 1,
   maxDepth = Number.POSITIVE_INFINITY,
   ...rest
 }: SchemaHandlingProps<z.ZodTypeAny, U, Context, "last"> & {
-  onEach?: SchemaHandler<z.ZodTypeAny, U, Context, "each">;
-  rules: HandlingRules<U, Context>;
+  before?: SchemaHandler<z.ZodTypeAny, U, Context, "last">;
+  after?: SchemaHandler<z.ZodTypeAny, U, Context, "each">;
   onMissing: SchemaHandler<z.ZodTypeAny, U, Context, "last">;
-  check?: SchemaHandler<z.ZodTypeAny, U & boolean, Context, "last">;
+  rules: HandlingRules<U, Context>;
   maxDepth?: number;
   depth?: number;
 }): U => {
   const ctx = rest as unknown as Context;
-  const checked = check && check({ schema, ...ctx });
-  if (checked === true) {
-    return checked;
-  }
   const kind = getMeta(schema, "kind") || schema._def.typeName;
   const handler =
     kind && depth < maxDepth ? rules[kind as keyof typeof rules] : undefined;
@@ -70,16 +64,20 @@ export const walkSchema = <U, Context extends FlatObject = {}>({
     walkSchema({
       ...params,
       ...ctx,
-      onEach,
+      before,
+      after,
       rules,
       onMissing,
       maxDepth,
-      check,
       depth: depth + 1,
     });
-  const result = handler
-    ? handler({ schema, ...ctx, next })
-    : onMissing({ schema, ...ctx });
-  const overrides = onEach && onEach({ schema, prev: result, ...ctx });
-  return overrides ? { ...result, ...overrides } : result;
+  const dive = () =>
+    handler ? handler({ schema, ...ctx, next }) : onMissing({ schema, ...ctx });
+  const early = before && before({ schema, ...ctx });
+  const result =
+    typeof early === "boolean" ? early || dive() : { ...early, ...dive() };
+  const overrides = after && after({ schema, prev: result, ...ctx });
+  return typeof result === "boolean"
+    ? overrides || result
+    : { ...result, ...overrides };
 };

@@ -60,7 +60,7 @@ export const hasNestedSchema = ({
   walkSchema({
     schema: subject,
     onMissing: () => false,
-    check: ({ schema }) => condition(schema),
+    before: ({ schema }) => condition(schema),
     maxDepth,
     rules,
   });

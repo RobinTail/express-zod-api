@@ -712,7 +712,7 @@ export const depictRequestParams = ({
         schema: shape[name],
         isResponse: false,
         rules: depicters,
-        onEach,
+        after,
         onMissing,
         serializer,
         getRef,
@@ -776,7 +776,7 @@ export const depicters: HandlingRules<
   [ezRawKind]: depictRaw,
 };
 
-export const onEach: Depicter<z.ZodTypeAny, "each"> = ({
+export const after: Depicter<z.ZodTypeAny, "each"> = ({
   schema,
   isResponse,
   prev,
@@ -893,7 +893,7 @@ export const depictResponse = ({
       schema,
       isResponse: true,
       rules: depicters,
-      onEach,
+      after,
       onMissing,
       serializer,
       getRef,
@@ -1033,7 +1033,7 @@ export const depictRequest = ({
         schema,
         isResponse: false,
         rules: depicters,
-        onEach,
+        after,
         onMissing,
         serializer,
         getRef,
