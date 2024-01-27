@@ -5,7 +5,7 @@ import { ProprietaryKind } from "./proprietary-schemas";
 
 interface VariantDependingProps<U> {
   regular: { next: SchemaHandler<z.ZodTypeAny, U, {}, "last"> };
-  each: { prev: U };
+  after: { prev: U };
   last: {};
 }
 
@@ -50,7 +50,7 @@ export const walkSchema = <U, Context extends FlatObject = {}>({
   ...rest
 }: SchemaHandlingProps<z.ZodTypeAny, U, Context, "last"> & {
   beforeEach?: SchemaHandler<z.ZodTypeAny, U, Context, "last">;
-  afterEach?: SchemaHandler<z.ZodTypeAny, U, Context, "each">;
+  afterEach?: SchemaHandler<z.ZodTypeAny, U, Context, "after">;
   onMissing: SchemaHandler<z.ZodTypeAny, U, Context, "last">;
   rules: HandlingRules<U, Context>;
   maxDepth?: number;

@@ -776,7 +776,7 @@ export const depicters: HandlingRules<
   [ezRawKind]: depictRaw,
 };
 
-export const afterEach: Depicter<z.ZodTypeAny, "each"> = ({
+export const afterEach: Depicter<z.ZodTypeAny, "after"> = ({
   schema,
   isResponse,
   prev,
