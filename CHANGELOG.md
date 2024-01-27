@@ -4,7 +4,7 @@
 
 ### 16.5.3
 
-- Fixed the bug #1517 found reported by [@kotsmile](https://github.com/kotsmile):
+- Fixed the bug #1517 found and reported by [@kotsmile](https://github.com/kotsmile):
   - The minimum allowed float was incorrectly specified in the generated documentation;
   - Applies only to `z.number()` having no `.min()` and no `.int()` refinements.
 
