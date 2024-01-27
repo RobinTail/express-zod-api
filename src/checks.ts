@@ -21,7 +21,7 @@ const onIntersection: Check<z.ZodIntersection<z.ZodTypeAny, z.ZodTypeAny>> = ({
 
 const onObject: Check<z.ZodObject<z.ZodRawShape>> = ({ schema, next }) =>
   Object.values(schema.shape).some((entry) => next({ schema: entry }));
-const onOptional: Check<
+const onElective: Check<
   z.ZodOptional<z.ZodTypeAny> | z.ZodNullable<z.ZodTypeAny>
 > = ({ schema, next }) => next({ schema: schema.unwrap() });
 const onEffects: Check<z.ZodEffects<z.ZodTypeAny>> = ({ schema, next }) =>
@@ -39,8 +39,8 @@ const checks: HandlingRules<boolean> = {
   ZodDiscriminatedUnion: onSomeUnion,
   ZodIntersection: onIntersection,
   ZodEffects: onEffects,
-  ZodOptional: onOptional,
-  ZodNullable: onOptional,
+  ZodOptional: onElective,
+  ZodNullable: onElective,
   ZodRecord: onRecord,
   ZodArray: onArray,
   ZodDefault: onDefault,
