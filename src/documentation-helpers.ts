@@ -622,44 +622,35 @@ export const depictLazy: Depicter<z.ZodLazy<z.ZodTypeAny>> = ({
 export const depictRaw: Depicter<RawSchema> = ({ next, schema }) =>
   next({ schema: schema.shape.raw });
 
+const enumerateExamples = (examples: unknown[]): ExamplesObject | undefined =>
+  examples.length
+    ? zipObj(
+        range(1, examples.length + 1).map((idx) => `example${idx}`),
+        map(objOf("value"), examples),
+      )
+    : undefined;
+
 export const depictExamples = (
   schema: z.ZodTypeAny,
   isResponse: boolean,
   omitProps: string[] = [],
-): ExamplesObject | undefined => {
-  const examples = pipe(
+): ExamplesObject | undefined =>
+  pipe(
     getExamples,
     map(when((subj) => z.object({}).safeParse(subj).success, omit(omitProps))),
-    map(objOf("value")),
+    enumerateExamples,
   )({ schema, variant: isResponse ? "parsed" : "original", validate: true });
-  if (examples.length === 0) {
-    return undefined;
-  }
-  return zipObj(
-    range(1, examples.length + 1).map((idx) => `example${idx}`),
-    examples,
-  );
-};
 
 export const depictParamExamples = (
   schema: z.ZodTypeAny,
-  isResponse: boolean,
   param: string,
-): ExamplesObject | undefined => {
-  const examples = pipe(
+): ExamplesObject | undefined =>
+  pipe(
     getExamples,
     filter<FlatObject>(has(param)),
     pluck(param),
-    map(objOf("value")),
-  )({ schema, variant: isResponse ? "parsed" : "original", validate: true });
-  if (examples.length === 0) {
-    return undefined;
-  }
-  return zipObj(
-    range(1, examples.length + 1).map((idx) => `example${idx}`),
-    examples,
-  );
-};
+    enumerateExamples,
+  )({ schema, variant: "original", validate: true });
 
 export const extractObjectSchema = (
   subject: IOSchema,
@@ -743,7 +734,7 @@ export const depictRequestParams = ({
         required: !shape[name].isOptional(),
         description: depicted.description || description,
         schema: result,
-        examples: depictParamExamples(schema, false, name),
+        examples: depictParamExamples(schema, name),
       };
     });
 };
