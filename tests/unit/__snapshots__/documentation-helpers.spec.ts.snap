@@ -284,7 +284,7 @@ exports[`Documentation helpers > depictIntersection() > should fall back to allO
       "additionalProperties": {
         "format": "double",
         "maximum": 1.7976931348623157e+308,
-        "minimum": 5e-324,
+        "minimum": -1.7976931348623157e+308,
         "type": "number",
       },
       "type": "object",
@@ -294,7 +294,7 @@ exports[`Documentation helpers > depictIntersection() > should fall back to allO
         "test": {
           "format": "double",
           "maximum": 1.7976931348623157e+308,
-          "minimum": 5e-324,
+          "minimum": -1.7976931348623157e+308,
           "type": "number",
         },
       },
@@ -313,7 +313,7 @@ exports[`Documentation helpers > depictIntersection() > should fall back to allO
     {
       "format": "double",
       "maximum": 1.7976931348623157e+308,
-      "minimum": 5e-324,
+      "minimum": -1.7976931348623157e+308,
       "type": "number",
     },
     {
@@ -339,19 +339,19 @@ exports[`Documentation helpers > depictIntersection() > should flatten three obj
     "one": {
       "format": "double",
       "maximum": 1.7976931348623157e+308,
-      "minimum": 5e-324,
+      "minimum": -1.7976931348623157e+308,
       "type": "number",
     },
     "three": {
       "format": "double",
       "maximum": 1.7976931348623157e+308,
-      "minimum": 5e-324,
+      "minimum": -1.7976931348623157e+308,
       "type": "number",
     },
     "two": {
       "format": "double",
       "maximum": 1.7976931348623157e+308,
-      "minimum": 5e-324,
+      "minimum": -1.7976931348623157e+308,
       "type": "number",
     },
   },
@@ -370,13 +370,13 @@ exports[`Documentation helpers > depictIntersection() > should flatten two objec
     "one": {
       "format": "double",
       "maximum": 1.7976931348623157e+308,
-      "minimum": 5e-324,
+      "minimum": -1.7976931348623157e+308,
       "type": "number",
     },
     "two": {
       "format": "double",
       "maximum": 1.7976931348623157e+308,
-      "minimum": 5e-324,
+      "minimum": -1.7976931348623157e+308,
       "type": "number",
     },
   },
@@ -397,7 +397,7 @@ exports[`Documentation helpers > depictIntersection() > should maintain uniquene
       ],
       "format": "double",
       "maximum": 1.7976931348623157e+308,
-      "minimum": 5e-324,
+      "minimum": -1.7976931348623157e+308,
       "type": "number",
     },
   },
@@ -424,13 +424,13 @@ exports[`Documentation helpers > depictIntersection() > should merge examples de
         "a": {
           "format": "double",
           "maximum": 1.7976931348623157e+308,
-          "minimum": 5e-324,
+          "minimum": -1.7976931348623157e+308,
           "type": "number",
         },
         "b": {
           "format": "double",
           "maximum": 1.7976931348623157e+308,
-          "minimum": 5e-324,
+          "minimum": -1.7976931348623157e+308,
           "type": "number",
         },
       },
@@ -558,7 +558,7 @@ exports[`Documentation helpers > depictNumber() > should type:number, min/max, f
 {
   "format": "double",
   "maximum": 1.7976931348623157e+308,
-  "minimum": 5e-324,
+  "minimum": -1.7976931348623157e+308,
   "type": "number",
 }
 `;
@@ -602,7 +602,7 @@ exports[`Documentation helpers > depictObject() > should type:object, properties
     "a": {
       "format": "double",
       "maximum": 1.7976931348623157e+308,
-      "minimum": 5e-324,
+      "minimum": -1.7976931348623157e+308,
       "type": "number",
     },
     "b": {
@@ -623,7 +623,7 @@ exports[`Documentation helpers > depictObject() > should type:object, properties
     "a": {
       "format": "double",
       "maximum": 1.7976931348623157e+308,
-      "minimum": 5e-324,
+      "minimum": -1.7976931348623157e+308,
       "type": "number",
     },
     "b": {
@@ -644,7 +644,7 @@ exports[`Documentation helpers > depictObject() > should type:object, properties
     "a": {
       "format": "double",
       "maximum": 1.7976931348623157e+308,
-      "minimum": 5e-324,
+      "minimum": -1.7976931348623157e+308,
       "type": "number",
     },
     "b": {
@@ -665,7 +665,7 @@ exports[`Documentation helpers > depictObject() > should type:object, properties
     "a": {
       "format": "double",
       "maximum": 1.7976931348623157e+308,
-      "minimum": 5e-324,
+      "minimum": -1.7976931348623157e+308,
       "type": "number",
     },
     "b": {
@@ -685,7 +685,7 @@ exports[`Documentation helpers > depictObject() > should type:object, properties
     "a": {
       "format": "double",
       "maximum": 1.7976931348623157e+308,
-      "minimum": 5e-324,
+      "minimum": -1.7976931348623157e+308,
       "type": "number",
     },
     "b": {
@@ -1240,7 +1240,7 @@ exports[`Documentation helpers > depictUnion() > should wrap next depicters into
     {
       "format": "double",
       "maximum": 1.7976931348623157e+308,
-      "minimum": 5e-324,
+      "minimum": -1.7976931348623157e+308,
       "type": "number",
     },
   ],

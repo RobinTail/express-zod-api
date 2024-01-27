@@ -513,7 +513,7 @@ export const depictNumber: Depicter<z.ZodNumber> = ({ schema }) => {
     schema.minValue === null
       ? schema.isInt
         ? Number.MIN_SAFE_INTEGER
-        : Number.MIN_VALUE
+        : -Number.MAX_VALUE
       : schema.minValue;
   const isMinInclusive = minCheck ? minCheck.inclusive : true;
   const maxCheck = schema._def.checks.find(({ kind }) => kind === "max") as
