@@ -56,7 +56,7 @@ const onObject: Producer<z.ZodObject<z.ZodRawShape>> = ({
       isOptional && hasQuestionMark
         ? f.createToken(ts.SyntaxKind.QuestionToken)
         : undefined,
-      next({ schema: value }),
+      next(value),
     );
     if (value.description) {
       addJsDocComment(propertySignature, value.description);
@@ -69,7 +69,7 @@ const onObject: Producer<z.ZodObject<z.ZodRawShape>> = ({
 const onArray: Producer<z.ZodArray<z.ZodTypeAny>> = ({
   schema: { element },
   next,
-}) => f.createArrayTypeNode(next({ schema: element }));
+}) => f.createArrayTypeNode(next(element));
 
 const onEnum: Producer<z.ZodEnum<[string, ...string[]]>> = ({
   schema: { options },
@@ -83,8 +83,7 @@ const onEnum: Producer<z.ZodEnum<[string, ...string[]]>> = ({
 const onSomeUnion: Producer<
   | z.ZodUnion<z.ZodUnionOptions>
   | z.ZodDiscriminatedUnion<string, z.ZodDiscriminatedUnionOption<string>[]>
-> = ({ schema: { options }, next }) =>
-  f.createUnionTypeNode(options.map((option) => next({ schema: option })));
+> = ({ schema: { options }, next }) => f.createUnionTypeNode(options.map(next));
 
 const makeSample = (produced: ts.TypeNode) =>
   samples?.[produced.kind as keyof typeof samples];
@@ -94,7 +93,7 @@ const onEffects: Producer<z.ZodEffects<z.ZodTypeAny>> = ({
   next,
   isResponse,
 }) => {
-  const input = next({ schema: schema.innerType() });
+  const input = next(schema.innerType());
   const effect = schema._def.effect;
   if (isResponse && effect.type === "transform") {
     const outputType = tryToTransform(schema, makeSample(input));
@@ -131,7 +130,7 @@ const onOptional: Producer<z.ZodOptional<z.ZodTypeAny>> = ({
   schema,
   optionalPropStyle: { withUndefined: hasUndefined },
 }) => {
-  const actualTypeNode = next({ schema: schema.unwrap() });
+  const actualTypeNode = next(schema.unwrap());
   return hasUndefined
     ? f.createUnionTypeNode([
         actualTypeNode,
@@ -142,33 +141,29 @@ const onOptional: Producer<z.ZodOptional<z.ZodTypeAny>> = ({
 
 const onNullable: Producer<z.ZodNullable<z.ZodTypeAny>> = ({ next, schema }) =>
   f.createUnionTypeNode([
-    next({ schema: schema.unwrap() }),
+    next(schema.unwrap()),
     f.createLiteralTypeNode(f.createNull()),
   ]);
 
 const onTuple: Producer<z.ZodTuple> = ({ next, schema: { items } }) =>
-  f.createTupleTypeNode(items.map((option) => next({ schema: option })));
+  f.createTupleTypeNode(items.map(next));
 
 const onRecord: Producer<z.ZodRecord> = ({
   next,
   schema: { keySchema, valueSchema },
 }) =>
   f.createExpressionWithTypeArguments(f.createIdentifier("Record"), [
-    next({ schema: keySchema }),
-    next({ schema: valueSchema }),
+    next(keySchema),
+    next(valueSchema),
   ]);
 
 const onIntersection: Producer<
   z.ZodIntersection<z.ZodTypeAny, z.ZodTypeAny>
 > = ({ next, schema }) =>
-  f.createIntersectionTypeNode(
-    [schema._def.left, schema._def.right].map((entry) =>
-      next({ schema: entry }),
-    ),
-  );
+  f.createIntersectionTypeNode([schema._def.left, schema._def.right].map(next));
 
 const onDefault: Producer<z.ZodDefault<z.ZodTypeAny>> = ({ next, schema }) =>
-  next({ schema: schema._def.innerType });
+  next(schema._def.innerType);
 
 const onPrimitive =
   (syntaxKind: ts.KeywordTypeSyntaxKind): Producer<z.ZodTypeAny> =>
@@ -177,19 +172,19 @@ const onPrimitive =
 
 const onBranded: Producer<
   z.ZodBranded<z.ZodTypeAny, string | number | symbol>
-> = ({ next, schema }) => next({ schema: schema.unwrap() });
+> = ({ next, schema }) => next(schema.unwrap());
 
 const onReadonly: Producer<z.ZodReadonly<z.ZodTypeAny>> = ({ next, schema }) =>
-  next({ schema: schema._def.innerType });
+  next(schema._def.innerType);
 
 const onCatch: Producer<z.ZodCatch<z.ZodTypeAny>> = ({ next, schema }) =>
-  next({ schema: schema._def.innerType });
+  next(schema._def.innerType);
 
 const onPipeline: Producer<z.ZodPipeline<z.ZodTypeAny, z.ZodTypeAny>> = ({
   schema,
   next,
   isResponse,
-}) => next({ schema: schema._def[isResponse ? "out" : "in"] });
+}) => next(schema._def[isResponse ? "out" : "in"]);
 
 const onNull: Producer<z.ZodNull> = () =>
   f.createLiteralTypeNode(f.createNull());
@@ -206,7 +201,7 @@ const onLazy: Producer<z.ZodLazy<z.ZodTypeAny>> = ({
     getAlias(name) ||
     (() => {
       makeAlias(name, f.createLiteralTypeNode(f.createNull())); // make empty type first
-      return makeAlias(name, next({ schema: lazy.schema })); // update
+      return makeAlias(name, next(lazy.schema)); // update
     })()
   );
 };
@@ -222,8 +217,7 @@ const onFile: Producer<z.ZodType> = ({ schema }) => {
       : bufferType;
 };
 
-const onRaw: Producer<RawSchema> = ({ next, schema }) =>
-  next({ schema: schema.shape.raw });
+const onRaw: Producer<RawSchema> = ({ next, schema }) => next(schema.shape.raw);
 
 const producers: HandlingRules<ts.TypeNode, ZTSContext> = {
   ZodString: onPrimitive(ts.SyntaxKind.StringKeyword),

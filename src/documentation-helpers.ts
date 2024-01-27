@@ -133,7 +133,7 @@ export const depictDefault: Depicter<z.ZodDefault<z.ZodTypeAny>> = ({
   },
   next,
 }) => ({
-  ...next({ schema: innerType }),
+  ...next(innerType),
   default: defaultValue(),
 });
 
@@ -142,7 +142,7 @@ export const depictCatch: Depicter<z.ZodCatch<z.ZodTypeAny>> = ({
     _def: { innerType },
   },
   next,
-}) => next({ schema: innerType });
+}) => next(innerType);
 
 export const depictAny: Depicter<z.ZodAny> = () => ({
   format: "any",
@@ -175,18 +175,14 @@ export const depictFile: Depicter<z.ZodType> = ({ schema }) => ({
 export const depictUnion: Depicter<z.ZodUnion<z.ZodUnionOptions>> = ({
   schema: { options },
   next,
-}) => ({
-  oneOf: options.map((option) => next({ schema: option })),
-});
+}) => ({ oneOf: options.map(next) });
 
 export const depictDiscriminatedUnion: Depicter<
   z.ZodDiscriminatedUnion<string, z.ZodDiscriminatedUnionOption<string>[]>
 > = ({ schema: { options, discriminator }, next }) => {
   return {
     discriminator: { propertyName: discriminator },
-    oneOf: Array.from(options.values()).map((option) =>
-      next({ schema: option }),
-    ),
+    oneOf: Array.from(options.values()).map(next),
   };
 };
 
@@ -237,7 +233,7 @@ export const depictIntersection: Depicter<
   },
   next,
 }) => {
-  const children = [left, right].map((entry) => next({ schema: entry }));
+  const children = [left, right].map(next);
   try {
     return tryFlattenIntersection(children);
   } catch {}
@@ -247,19 +243,19 @@ export const depictIntersection: Depicter<
 export const depictOptional: Depicter<z.ZodOptional<z.ZodTypeAny>> = ({
   schema,
   next,
-}) => next({ schema: schema.unwrap() });
+}) => next(schema.unwrap());
 
 export const depictReadonly: Depicter<z.ZodReadonly<z.ZodTypeAny>> = ({
   schema,
   next,
-}) => next({ schema: schema._def.innerType });
+}) => next(schema._def.innerType);
 
 /** @since OAS 3.1 nullable replaced with type array having null */
 export const depictNullable: Depicter<z.ZodNullable<z.ZodTypeAny>> = ({
   schema,
   next,
 }) => {
-  const nested = next({ schema: schema.unwrap() });
+  const nested = next(schema.unwrap());
   if (!isReferenceObject(nested)) {
     nested.type = makeNullableType(nested);
   }
@@ -406,20 +402,14 @@ export const depictRecord: Depicter<z.ZodRecord<z.ZodTypeAny>> = ({
       required,
     };
   }
-  return {
-    type: "object",
-    additionalProperties: rest.next({ schema: valueSchema }),
-  };
+  return { type: "object", additionalProperties: rest.next(valueSchema) };
 };
 
 export const depictArray: Depicter<z.ZodArray<z.ZodTypeAny>> = ({
   schema: { _def: def, element },
   next,
 }) => {
-  const result: SchemaObject = {
-    type: "array",
-    items: next({ schema: element }),
-  };
+  const result: SchemaObject = { type: "array", items: next(element) };
   if (def.minLength) {
     result.minItems = def.minLength.value;
   }
@@ -433,13 +423,7 @@ export const depictArray: Depicter<z.ZodArray<z.ZodTypeAny>> = ({
 export const depictTuple: Depicter<z.ZodTuple> = ({
   schema: { items },
   next,
-}) => {
-  const types = items.map((item) => next({ schema: item }));
-  return {
-    type: "array",
-    prefixItems: types,
-  };
-};
+}) => ({ type: "array", prefixItems: items.map(next) });
 
 export const depictString: Depicter<z.ZodString> = ({
   schema: {
@@ -546,8 +530,7 @@ export const depictNumber: Depicter<z.ZodNumber> = ({ schema }) => {
 export const depictObjectProperties = ({
   schema: { shape },
   next,
-}: Parameters<Depicter<z.ZodObject<z.ZodRawShape>>>[0]) =>
-  map((schema) => next({ schema }), shape);
+}: Parameters<Depicter<z.ZodObject<z.ZodRawShape>>>[0]) => map(next, shape);
 
 const makeSample = (depicted: SchemaObject) => {
   const type = (
@@ -569,14 +552,14 @@ export const depictEffect: Depicter<z.ZodEffects<z.ZodTypeAny>> = ({
   isResponse,
   next,
 }) => {
-  const input = next({ schema: schema.innerType() });
+  const input = next(schema.innerType());
   const { effect } = schema._def;
   if (isResponse && effect.type === "transform" && !isReferenceObject(input)) {
     const outputType = tryToTransform(schema, makeSample(input));
     if (outputType && ["number", "string", "boolean"].includes(outputType)) {
       return { type: outputType as "number" | "string" | "boolean" };
     } else {
-      return next({ schema: z.any() });
+      return next(z.any());
     }
   }
   if (
@@ -596,11 +579,11 @@ export const depictEffect: Depicter<z.ZodEffects<z.ZodTypeAny>> = ({
 export const depictPipeline: Depicter<
   z.ZodPipeline<z.ZodTypeAny, z.ZodTypeAny>
 > = ({ schema, isResponse, next }) =>
-  next({ schema: schema._def[isResponse ? "out" : "in"] });
+  next(schema._def[isResponse ? "out" : "in"]);
 
 export const depictBranded: Depicter<
   z.ZodBranded<z.ZodTypeAny, string | number | symbol>
-> = ({ schema, next }) => next({ schema: schema.unwrap() });
+> = ({ schema, next }) => next(schema.unwrap());
 
 export const depictLazy: Depicter<z.ZodLazy<z.ZodTypeAny>> = ({
   next,
@@ -614,13 +597,13 @@ export const depictLazy: Depicter<z.ZodLazy<z.ZodTypeAny>> = ({
     getRef(hash) ||
     (() => {
       makeRef(hash, {}); // make empty ref first
-      return makeRef(hash, next({ schema: lazy.schema })); // update
+      return makeRef(hash, next(lazy.schema)); // update
     })()
   );
 };
 
 export const depictRaw: Depicter<RawSchema> = ({ next, schema }) =>
-  next({ schema: schema.shape.raw });
+  next(schema.shape.raw);
 
 const enumerateExamples = (examples: unknown[]): ExamplesObject | undefined =>
   examples.length

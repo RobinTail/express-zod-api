@@ -11,27 +11,26 @@ type Check<T extends z.ZodTypeAny> = SchemaHandler<T, boolean>;
 const onSomeUnion: Check<
   | z.ZodUnion<z.ZodUnionOptions>
   | z.ZodDiscriminatedUnion<string, z.ZodDiscriminatedUnionOption<string>[]>
-> = ({ schema: { options }, next }) =>
-  options.some((schema) => next({ schema }));
+> = ({ schema: { options }, next }) => options.some(next);
 
 const onIntersection: Check<z.ZodIntersection<z.ZodTypeAny, z.ZodTypeAny>> = ({
   schema: { _def },
   next,
-}) => [_def.left, _def.right].some((schema) => next({ schema }));
+}) => [_def.left, _def.right].some(next);
 
 const onObject: Check<z.ZodObject<z.ZodRawShape>> = ({ schema, next }) =>
-  Object.values(schema.shape).some((entry) => next({ schema: entry }));
+  Object.values(schema.shape).some(next);
 const onElective: Check<
   z.ZodOptional<z.ZodTypeAny> | z.ZodNullable<z.ZodTypeAny>
-> = ({ schema, next }) => next({ schema: schema.unwrap() });
+> = ({ schema, next }) => next(schema.unwrap());
 const onEffects: Check<z.ZodEffects<z.ZodTypeAny>> = ({ schema, next }) =>
-  next({ schema: schema.innerType() });
+  next(schema.innerType());
 const onRecord: Check<z.ZodRecord> = ({ schema, next }) =>
-  next({ schema: schema.valueSchema });
+  next(schema.valueSchema);
 const onArray: Check<z.ZodArray<z.ZodTypeAny>> = ({ schema, next }) =>
-  next({ schema: schema.element });
+  next(schema.element);
 const onDefault: Check<z.ZodDefault<z.ZodTypeAny>> = ({ schema, next }) =>
-  next({ schema: schema._def.innerType });
+  next(schema._def.innerType);
 
 const checks: HandlingRules<boolean> = {
   ZodObject: onObject,
