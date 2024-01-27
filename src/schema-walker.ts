@@ -39,6 +39,7 @@ export type HandlingRules<U, Context extends FlatObject = {}> = Partial<
  * @since 10.1.1 calling onEach _after_ handler and giving it the previously achieved result
  * @since 16.6.0 maintains depth argument controllable by maxDepth option
  * @since 16.6.0 onEach can return boolean for performing various deep checks
+ * @see hasNestedSchema
  * */
 export const walkSchema = <U, Context extends FlatObject = {}>({
   schema,
@@ -76,6 +77,6 @@ export const walkSchema = <U, Context extends FlatObject = {}>({
   return overrides === undefined
     ? result
     : typeof overrides === "boolean"
-      ? result || overrides
+      ? overrides
       : { ...result, ...overrides };
 };
