@@ -35,6 +35,11 @@ export type HandlingRules<U, Context extends FlatObject = {}> = Partial<
   >
 >;
 
+/**
+ * @since 10.1.1 calling onEach _after_ handler and giving it the previously achieved result
+ * @since 16.6.0 maintains depth argument controllable by maxDepth option
+ * @since 16.6.0 onEach can return boolean for performing various deep checks
+ * */
 export const walkSchema = <U, Context extends FlatObject = {}>({
   schema,
   onEach,
@@ -44,7 +49,6 @@ export const walkSchema = <U, Context extends FlatObject = {}>({
   maxDepth = Number.POSITIVE_INFINITY,
   ...rest
 }: SchemaHandlingProps<z.ZodTypeAny, U, Context, "last"> & {
-  /** @since 10.1.1 calling onEach _after_ handler and giving it the previously achieved result */
   onEach?: SchemaHandler<z.ZodTypeAny, U, Context, "each">;
   rules: HandlingRules<U, Context>;
   onMissing: SchemaHandler<z.ZodTypeAny, U, Context, "last">;
