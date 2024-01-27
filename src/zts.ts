@@ -152,10 +152,10 @@ const onRecord: Producer<z.ZodRecord> = ({
   next,
   schema: { keySchema, valueSchema },
 }) =>
-  f.createExpressionWithTypeArguments(f.createIdentifier("Record"), [
-    next(keySchema),
-    next(valueSchema),
-  ]);
+  f.createExpressionWithTypeArguments(
+    f.createIdentifier("Record"),
+    [keySchema, valueSchema].map(next),
+  );
 
 const onIntersection: Producer<
   z.ZodIntersection<z.ZodTypeAny, z.ZodTypeAny>
