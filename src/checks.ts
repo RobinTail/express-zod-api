@@ -65,7 +65,7 @@ export const hasNestedSchema = ({
     rules,
   });
 
-export const hasTopLevelTransformingEffect = (subject: IOSchema): boolean =>
+export const hasTranformationOnTop = (subject: IOSchema): boolean =>
   hasNestedSchema({
     subject,
     maxDepth: 3,
