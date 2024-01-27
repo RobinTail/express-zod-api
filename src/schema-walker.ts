@@ -37,8 +37,8 @@ export type HandlingRules<U, Context extends FlatObject = {}> = Partial<
 
 /**
  * @since 10.1.1 calling onEach _after_ handler and giving it the previously achieved result
+ * @since 16.6.0 check runs before handler in order to terminate traversing early
  * @since 16.6.0 maintains depth argument controllable by maxDepth option
- * @since 16.6.0 onEach can return boolean for performing various deep checks
  * @see hasNestedSchema
  * */
 export const walkSchema = <U, Context extends FlatObject = {}>({
@@ -46,20 +46,26 @@ export const walkSchema = <U, Context extends FlatObject = {}>({
   onEach,
   rules,
   onMissing,
+  check,
   depth = 1,
   maxDepth = Number.POSITIVE_INFINITY,
   ...rest
 }: SchemaHandlingProps<z.ZodTypeAny, U, Context, "last"> & {
+  check?: SchemaHandler<z.ZodTypeAny, U & boolean, Context, "last">;
   onEach?: SchemaHandler<z.ZodTypeAny, U, Context, "each">;
   rules: HandlingRules<U, Context>;
   onMissing: SchemaHandler<z.ZodTypeAny, U, Context, "last">;
   maxDepth?: number;
   depth?: number;
 }): U => {
+  const ctx = rest as unknown as Context;
+  const checked = check && check({ schema, ...ctx });
+  if (checked === true) {
+    return checked;
+  }
   const kind = getMeta(schema, "kind") || schema._def.typeName;
   const handler =
     kind && depth < maxDepth ? rules[kind as keyof typeof rules] : undefined;
-  const ctx = rest as unknown as Context;
   const next: SchemaHandler<z.ZodTypeAny, U, {}, "last"> = (params) =>
     walkSchema({
       ...params,
@@ -68,15 +74,12 @@ export const walkSchema = <U, Context extends FlatObject = {}>({
       rules,
       onMissing,
       maxDepth,
+      check,
       depth: depth + 1,
     });
   const result = handler
     ? handler({ schema, ...ctx, next })
     : onMissing({ schema, ...ctx });
   const overrides = onEach && onEach({ schema, prev: result, ...ctx });
-  return overrides === undefined
-    ? result
-    : typeof overrides === "boolean"
-      ? overrides
-      : { ...result, ...overrides };
+  return overrides ? { ...result, ...overrides } : result;
 };

@@ -13,9 +13,11 @@ describe("Checks", () => {
   describe("hasNestedSchema()", () => {
     const condition = (subject: z.ZodTypeAny) =>
       isProprietary(subject, ezUploadKind);
+
     test("should return true for given argument satisfying condition", () => {
       expect(hasNestedSchema({ subject: ez.upload(), condition })).toBeTruthy();
     });
+
     test.each([
       z.object({ test: ez.upload() }),
       ez.upload().or(z.boolean()),
@@ -29,6 +31,7 @@ describe("Checks", () => {
     ])("should return true for wrapped needle %#", (subject) => {
       expect(hasNestedSchema({ subject, condition })).toBeTruthy();
     });
+
     test.each([
       z.object({}),
       z.any(),
@@ -38,6 +41,25 @@ describe("Checks", () => {
     ])("should return false in other cases %#", (subject) => {
       expect(hasNestedSchema({ subject, condition })).toBeFalsy();
     });
+
+    test("should finish early", () => {
+      const subject = z.object({
+        one: z.object({
+          two: z.object({
+            three: z.object({ four: z.number() }),
+          }),
+        }),
+      });
+      let callCount = 0;
+      hasNestedSchema({
+        subject,
+        condition: (schema) => {
+          callCount++;
+          return schema instanceof z.ZodObject;
+        },
+      });
+      expect(callCount).toBe(1);
+    });
   });
 
   describe("hasTopLevelTransformingEffect()", () => {
@@ -46,6 +68,7 @@ describe("Checks", () => {
         hasTopLevelTransformingEffect(z.object({}).transform(() => [])),
       ).toBeTruthy();
     });
+
     test("should detect transformation in intersection", () => {
       expect(
         hasTopLevelTransformingEffect(
@@ -53,6 +76,7 @@ describe("Checks", () => {
         ),
       ).toBeTruthy();
     });
+
     test("should detect transformation in union", () => {
       expect(
         hasTopLevelTransformingEffect(
@@ -60,6 +84,7 @@ describe("Checks", () => {
         ),
       ).toBeTruthy();
     });
+
     test("should return false for object fields using transformations", () => {
       expect(
         hasTopLevelTransformingEffect(
@@ -67,6 +92,7 @@ describe("Checks", () => {
         ),
       ).toBeFalsy();
     });
+
     test("should return false for refinement", () => {
       expect(
         hasTopLevelTransformingEffect(z.object({}).refine(() => true)),
