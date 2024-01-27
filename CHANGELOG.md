@@ -2,6 +2,13 @@
 
 ## Version 16
 
+### 16.6.0
+
+- Refactoring: using walker (traverse) for checking nested schemas.
+  - This makes it easier to scale and reuse.
+- Refactoring: simplified `next` shorthand of the schema walker.
+  - This improved the preformance slightly.
+
 ### 16.5.2
 
 - Refactoring: rewrote some reducers using declarative and functional approach.
