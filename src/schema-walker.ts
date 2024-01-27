@@ -36,21 +36,21 @@ export type HandlingRules<U, Context extends FlatObject = {}> = Partial<
 >;
 
 /**
- * @since 16.6.0 renamed onEach to after, added before and maxDepth
+ * @since 16.6.0 renamed onEach to afterEach, added beforeEach and maxDepth
  * @see hasNestedSchema
  * */
 export const walkSchema = <U, Context extends FlatObject = {}>({
   schema,
-  after,
+  beforeEach,
+  afterEach,
   rules,
   onMissing,
-  before,
   depth = 1,
   maxDepth = Number.POSITIVE_INFINITY,
   ...rest
 }: SchemaHandlingProps<z.ZodTypeAny, U, Context, "last"> & {
-  before?: SchemaHandler<z.ZodTypeAny, U, Context, "last">;
-  after?: SchemaHandler<z.ZodTypeAny, U, Context, "each">;
+  beforeEach?: SchemaHandler<z.ZodTypeAny, U, Context, "last">;
+  afterEach?: SchemaHandler<z.ZodTypeAny, U, Context, "each">;
   onMissing: SchemaHandler<z.ZodTypeAny, U, Context, "last">;
   rules: HandlingRules<U, Context>;
   maxDepth?: number;
@@ -64,8 +64,8 @@ export const walkSchema = <U, Context extends FlatObject = {}>({
     walkSchema({
       ...params,
       ...ctx,
-      before,
-      after,
+      beforeEach,
+      afterEach,
       rules,
       onMissing,
       maxDepth,
@@ -73,10 +73,10 @@ export const walkSchema = <U, Context extends FlatObject = {}>({
     });
   const dive = () =>
     handler ? handler({ schema, ...ctx, next }) : onMissing({ schema, ...ctx });
-  const early = before && before({ schema, ...ctx });
+  const early = beforeEach && beforeEach({ schema, ...ctx });
   const result =
     typeof early === "boolean" ? early || dive() : { ...early, ...dive() };
-  const overrides = after && after({ schema, prev: result, ...ctx });
+  const overrides = afterEach && afterEach({ schema, prev: result, ...ctx });
   return typeof result === "boolean"
     ? overrides || result
     : { ...result, ...overrides };
