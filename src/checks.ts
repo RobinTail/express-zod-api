@@ -5,6 +5,7 @@ import { ezRawKind } from "./raw-schema";
 import { HandlingRules, SchemaHandler, walkSchema } from "./schema-walker";
 import { ezUploadKind } from "./upload-schema";
 
+/** @desc Check is a schema walking rule returning boolean */
 type Check<T extends z.ZodTypeAny> = SchemaHandler<T, boolean>;
 
 const onSomeUnion: Check<
