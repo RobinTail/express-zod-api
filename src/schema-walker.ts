@@ -68,7 +68,7 @@ export const walkSchema = <U, Context extends FlatObject = {}>({
       rules,
       onMissing,
       maxDepth,
-      depth: depth++,
+      depth: depth + 1,
     });
   const result = handler
     ? handler({ schema, ...ctx, next })
