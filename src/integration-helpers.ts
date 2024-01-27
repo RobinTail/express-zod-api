@@ -126,7 +126,7 @@ export const makePublicReadonlyProp = (
 export const makePublicClass = (
   name: ts.Identifier,
   constructor: ts.ConstructorDeclaration,
-  props: ts.PropertyDeclaration[] = [],
+  props: ts.PropertyDeclaration[],
 ) =>
   f.createClassDeclaration(exportModifier, name, undefined, undefined, [
     constructor,
