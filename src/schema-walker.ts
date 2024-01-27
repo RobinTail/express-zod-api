@@ -69,9 +69,9 @@ export const walkSchema = <U, Context extends FlatObject = {}>({
     ? handler({ schema, ...ctx, next })
     : onMissing({ schema, ...ctx });
   const overrides = onEach && onEach({ schema, prev: result, ...ctx });
-  return overrides
-    ? typeof overrides === "boolean"
-      ? overrides
-      : { ...result, ...overrides }
-    : result;
+  return overrides === undefined
+    ? result
+    : typeof overrides === "boolean"
+      ? result || overrides
+      : { ...result, ...overrides };
 };
