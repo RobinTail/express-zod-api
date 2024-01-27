@@ -37,8 +37,8 @@ export type HandlingRules<U, Context extends FlatObject = {}> = Partial<
 
 /**
  * @since 10.1.1 calling onEach _after_ handler and giving it the previously achieved result
- * @since 16.6.0 check runs before handler in order to terminate traversing early
- * @since 16.6.0 maintains depth argument controllable by maxDepth option
+ * @since 16.6.0 added check - runs _before_ handler in order to terminate traversing early
+ * @since 16.6.0 added maxDepth - controls the maintained depth
  * @see hasNestedSchema
  * */
 export const walkSchema = <U, Context extends FlatObject = {}>({
