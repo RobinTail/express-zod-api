@@ -51,7 +51,7 @@ import {
   onMissing,
   reformatParamsInPath,
 } from "../../src/documentation-helpers";
-import { SchemaHandler, walkSchema } from "../../src/schema-walker";
+import { walkSchema } from "../../src/schema-walker";
 import { serializeSchemaForTest } from "../helpers";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
@@ -78,23 +78,14 @@ describe("Documentation helpers", () => {
     makeRef: makeRefMock,
     serializer: defaultSerializer,
   };
-  const makeNext =
-    (
-      ctx: OpenAPIContext,
-    ): SchemaHandler<
-      z.ZodTypeAny,
-      SchemaObject | ReferenceObject,
-      {},
-      "last"
-    > =>
-    ({ schema }) =>
-      walkSchema({
-        schema,
-        rules: depicters,
-        ...ctx,
-        onEach,
-        onMissing,
-      });
+  const makeNext = (ctx: OpenAPIContext) => (schema: z.ZodTypeAny) =>
+    walkSchema({
+      schema,
+      rules: depicters,
+      ...ctx,
+      onEach,
+      onMissing,
+    });
 
   beforeEach(() => {
     getRefMock.mockClear();
