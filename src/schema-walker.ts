@@ -36,7 +36,7 @@ export type HandlingRules<U, Context extends FlatObject = {}> = Partial<
 >;
 
 /** @since 10.1.1 calling onEach _after_ handler and giving it the previously achieved result */
-export const walkSchema = <U, Context extends FlatObject = {}>({
+export const walkSchema = <U extends object, Context extends FlatObject = {}>({
   schema,
   onEach,
   rules,
