@@ -617,12 +617,7 @@ export const depictExamples = (
 ): ExamplesObject | undefined =>
   pipe(
     getExamples,
-    map(
-      when(
-        (example) => typeof example === "object" && !Array.isArray(example),
-        omit(omitProps),
-      ),
-    ),
+    map(when((subj) => z.object({}).safeParse(subj).success, omit(omitProps))),
     enumerateExamples,
   )({ schema, variant: isResponse ? "parsed" : "original", validate: true });
 
