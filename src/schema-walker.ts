@@ -68,14 +68,14 @@ export const walkSchemaBool = <U extends boolean>({
   depth = 1,
   maxDepth = Number.POSITIVE_INFINITY,
 }: SchemaHandlingProps<z.ZodTypeAny, U, {}, "last"> & {
-  beforeEach?: SchemaHandler<z.ZodTypeAny, U, {}, "last">;
+  beforeEach: SchemaHandler<z.ZodTypeAny, U, {}, "last">;
   onMissing: SchemaHandler<z.ZodTypeAny, U, {}, "last">;
   rules: HandlingRules<U>;
   maxDepth?: number;
   depth?: number;
 }): U => {
-  const early = beforeEach && beforeEach({ schema });
-  if (early === true) {
+  const early = beforeEach({ schema });
+  if (early) {
     return early;
   }
   const handler =
@@ -91,6 +91,5 @@ export const walkSchemaBool = <U extends boolean>({
       maxDepth,
       depth: depth + 1,
     });
-  const result = handler ? handler({ schema, next }) : onMissing({ schema });
-  return early || result;
+  return handler ? handler({ schema, next }) : onMissing({ schema });
 };
