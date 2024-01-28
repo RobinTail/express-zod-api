@@ -59,7 +59,10 @@ export const walkSchema = <U, Context extends FlatObject = {}>({
   return overrides ? { ...result, ...overrides } : result;
 };
 
-/** @see hasNestedSchema */
+/**
+ * @desc The optimized version of the schema walker for boolean checks
+ * @see hasNestedSchema
+ * */
 export const walkSchemaBool = <U extends boolean>({
   schema,
   beforeEach,
@@ -82,14 +85,19 @@ export const walkSchemaBool = <U extends boolean>({
     depth < maxDepth
       ? rules[schema._def.typeName as keyof typeof rules]
       : undefined;
-  const next = (subject: z.ZodTypeAny) =>
-    walkSchemaBool({
-      schema: subject,
-      beforeEach,
-      rules,
-      onMissing,
-      maxDepth,
-      depth: depth + 1,
+  if (handler) {
+    return handler({
+      schema,
+      next: (subject) =>
+        walkSchemaBool({
+          schema: subject,
+          beforeEach,
+          rules,
+          onMissing,
+          maxDepth,
+          depth: depth + 1,
+        }),
     });
-  return handler ? handler({ schema, next }) : onMissing({ schema });
+  }
+  return onMissing({ schema });
 };
