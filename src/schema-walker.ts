@@ -35,14 +35,37 @@ export type HandlingRules<U, Context extends FlatObject = {}> = Partial<
   >
 >;
 
-/**
- * @since 16.6.0 renamed onEach to afterEach, added beforeEach and maxDepth
- * @see hasNestedSchema
- * */
+/** @since 16.6.0 renamed onEach to afterEach */
 export const walkSchema = <U, Context extends FlatObject = {}>({
   schema,
-  beforeEach,
   afterEach,
+  rules,
+  onMissing,
+  ...rest
+}: SchemaHandlingProps<z.ZodTypeAny, U, Context, "last"> & {
+  afterEach?: SchemaHandler<z.ZodTypeAny, U, Context, "after">;
+  onMissing: SchemaHandler<z.ZodTypeAny, U, Context, "last">;
+  rules: HandlingRules<U, Context>;
+}): U => {
+  const ctx = rest as unknown as Context;
+  const kind = getMeta(schema, "kind") || schema._def.typeName;
+  const handler = kind ? rules[kind as keyof typeof rules] : undefined;
+  const next = (subject: z.ZodTypeAny) =>
+    walkSchema({ schema: subject, ...ctx, afterEach, rules, onMissing });
+  const result = handler
+    ? handler({ schema, ...ctx, next })
+    : onMissing({ schema, ...ctx });
+  const overrides = afterEach && afterEach({ schema, prev: result, ...ctx });
+  return overrides ? { ...result, ...overrides } : result;
+};
+
+/** @see hasNestedSchema */
+export const walkSchemaBool = <
+  U extends boolean,
+  Context extends FlatObject = {},
+>({
+  schema,
+  beforeEach,
   rules,
   onMissing,
   depth = 1,
@@ -50,34 +73,31 @@ export const walkSchema = <U, Context extends FlatObject = {}>({
   ...rest
 }: SchemaHandlingProps<z.ZodTypeAny, U, Context, "last"> & {
   beforeEach?: SchemaHandler<z.ZodTypeAny, U, Context, "last">;
-  afterEach?: SchemaHandler<z.ZodTypeAny, U, Context, "after">;
   onMissing: SchemaHandler<z.ZodTypeAny, U, Context, "last">;
   rules: HandlingRules<U, Context>;
   maxDepth?: number;
   depth?: number;
 }): U => {
   const ctx = rest as unknown as Context;
+  const early = beforeEach && beforeEach({ schema, ...ctx });
+  if (early === true) {
+    return early;
+  }
   const kind = getMeta(schema, "kind") || schema._def.typeName;
   const handler =
     kind && depth < maxDepth ? rules[kind as keyof typeof rules] : undefined;
   const next = (subject: z.ZodTypeAny) =>
-    walkSchema({
+    walkSchemaBool({
       schema: subject,
       ...ctx,
       beforeEach,
-      afterEach,
       rules,
       onMissing,
       maxDepth,
       depth: depth + 1,
     });
-  const dive = () =>
-    handler ? handler({ schema, ...ctx, next }) : onMissing({ schema, ...ctx });
-  const early = beforeEach && beforeEach({ schema, ...ctx });
-  const result =
-    typeof early === "boolean" ? early || dive() : { ...early, ...dive() };
-  const overrides = afterEach && afterEach({ schema, prev: result, ...ctx });
-  return typeof result === "boolean"
-    ? overrides || result
-    : { ...result, ...overrides };
+  const result = handler
+    ? handler({ schema, ...ctx, next })
+    : onMissing({ schema, ...ctx });
+  return early || result;
 };

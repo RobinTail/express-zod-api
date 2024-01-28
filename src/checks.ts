@@ -2,7 +2,7 @@ import { z } from "zod";
 import { IOSchema } from "./io-schema";
 import { isProprietary } from "./metadata";
 import { ezRawKind } from "./raw-schema";
-import { HandlingRules, SchemaHandler, walkSchema } from "./schema-walker";
+import { HandlingRules, SchemaHandler, walkSchemaBool } from "./schema-walker";
 import { ezUploadKind } from "./upload-schema";
 
 /** @desc Check is a schema handling rule returning boolean */
@@ -56,7 +56,7 @@ export const hasNestedSchema = ({
   maxDepth?: number;
   rules?: HandlingRules<boolean>;
 }): boolean =>
-  walkSchema({
+  walkSchemaBool({
     schema: subject,
     onMissing: () => false,
     beforeEach: ({ schema }) => condition(schema),
