@@ -2,7 +2,7 @@ import { z } from "zod";
 import { IOSchema } from "./io-schema";
 import { isProprietary } from "./metadata";
 import { ezRawKind } from "./raw-schema";
-import { HandlingRules, SchemaHandler, walkSchemaBool } from "./schema-walker";
+import { HandlingRules, SchemaHandler } from "./schema-walker";
 import { ezUploadKind } from "./upload-schema";
 
 /** @desc Check is a schema handling rule returning boolean */
@@ -45,23 +45,43 @@ const checks: HandlingRules<boolean> = {
   ZodDefault: onDefault,
 };
 
+/** @desc The optimized version of the schema walker for boolean checks */
 export const hasNestedSchema = ({
   subject,
   condition,
-  maxDepth,
   rules = checks,
+  depth = 1,
+  maxDepth = Number.POSITIVE_INFINITY,
 }: {
   subject: z.ZodTypeAny;
   condition: (schema: z.ZodTypeAny) => boolean;
-  maxDepth?: number;
   rules?: HandlingRules<boolean>;
-}): boolean =>
-  walkSchemaBool({
-    schema: subject,
-    beforeEach: condition,
-    maxDepth,
-    rules,
-  });
+  maxDepth?: number;
+  depth?: number;
+}): boolean => {
+  const early = condition(subject);
+  if (early) {
+    return early;
+  }
+  const handler =
+    depth < maxDepth
+      ? rules[subject._def.typeName as keyof typeof rules]
+      : undefined;
+  if (handler) {
+    return handler({
+      schema: subject,
+      next: (schema) =>
+        hasNestedSchema({
+          subject: schema,
+          condition,
+          rules,
+          maxDepth,
+          depth: depth + 1,
+        }),
+    });
+  }
+  return false;
+};
 
 export const hasTranformationOnTop = (subject: IOSchema): boolean =>
   hasNestedSchema({
