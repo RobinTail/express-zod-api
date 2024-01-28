@@ -5,7 +5,7 @@ import { ProprietaryKind } from "./proprietary-schemas";
 
 interface VariantDependingProps<U> {
   regular: { next: (schema: z.ZodTypeAny) => U };
-  after: { prev: U };
+  each: { prev: U };
   last: {};
 }
 
@@ -35,26 +35,26 @@ export type HandlingRules<U, Context extends FlatObject = {}> = Partial<
   >
 >;
 
-/** @since 16.6.0 renamed onEach to afterEach */
+/** @since 10.1.1 calling onEach _after_ handler and giving it the previously achieved result */
 export const walkSchema = <U, Context extends FlatObject = {}>({
   schema,
-  afterEach,
+  onEach,
   rules,
   onMissing,
   ...rest
 }: SchemaHandlingProps<z.ZodTypeAny, U, Context, "last"> & {
-  afterEach?: SchemaHandler<z.ZodTypeAny, U, Context, "after">;
-  onMissing: SchemaHandler<z.ZodTypeAny, U, Context, "last">;
+  onEach?: SchemaHandler<z.ZodTypeAny, U, Context, "each">;
   rules: HandlingRules<U, Context>;
+  onMissing: SchemaHandler<z.ZodTypeAny, U, Context, "last">;
 }): U => {
-  const ctx = rest as unknown as Context;
   const kind = getMeta(schema, "kind") || schema._def.typeName;
   const handler = kind ? rules[kind as keyof typeof rules] : undefined;
+  const ctx = rest as unknown as Context;
   const next = (subject: z.ZodTypeAny) =>
-    walkSchema({ schema: subject, ...ctx, afterEach, rules, onMissing });
+    walkSchema({ schema: subject, ...ctx, onEach, rules, onMissing });
   const result = handler
     ? handler({ schema, ...ctx, next })
     : onMissing({ schema, ...ctx });
-  const overrides = afterEach && afterEach({ schema, prev: result, ...ctx });
+  const overrides = onEach && onEach({ schema, prev: result, ...ctx });
   return overrides ? { ...result, ...overrides } : result;
 };

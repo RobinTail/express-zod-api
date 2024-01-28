@@ -83,7 +83,7 @@ export const serializeSchemaForTest = (
         to: next(schema._def.out),
       }),
     },
-    afterEach: ({ schema }) => ({ _type: schema._def.typeName }),
+    onEach: ({ schema }) => ({ _type: schema._def.typeName }),
     onMissing: ({ schema }) => {
       console.warn(`There is no serializer for ${schema._def.typeName}`);
       return {};
