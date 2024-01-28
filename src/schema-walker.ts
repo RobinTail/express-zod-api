@@ -83,9 +83,10 @@ export const walkSchemaBool = <
   if (early === true) {
     return early;
   }
-  const kind = getMeta(schema, "kind") || schema._def.typeName;
   const handler =
-    kind && depth < maxDepth ? rules[kind as keyof typeof rules] : undefined;
+    depth < maxDepth
+      ? rules[schema._def.typeName as keyof typeof rules]
+      : undefined;
   const next = (subject: z.ZodTypeAny) =>
     walkSchemaBool({
       schema: subject,
