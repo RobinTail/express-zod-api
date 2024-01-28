@@ -2,6 +2,10 @@
 
 ## Version 16
 
+### v16.5.4
+
+- Refactoring: simplified the `next()` method of the schema walker (traverse).
+
 ### v16.5.3
 
 - Fixed the bug #1517 found and reported by [@kotsmile](https://github.com/kotsmile):
