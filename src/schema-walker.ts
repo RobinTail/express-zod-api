@@ -67,12 +67,10 @@ export const walkSchemaBool = ({
   schema,
   beforeEach,
   rules,
-  onMissing,
   depth = 1,
   maxDepth = Number.POSITIVE_INFINITY,
 }: SchemaHandlingProps<z.ZodTypeAny, boolean, {}, "last"> & {
   beforeEach: (schema: z.ZodTypeAny) => boolean;
-  onMissing: (schema: z.ZodTypeAny) => boolean;
   rules: HandlingRules<boolean>;
   maxDepth?: number;
   depth?: number;
@@ -93,11 +91,10 @@ export const walkSchemaBool = ({
           schema: subject,
           beforeEach,
           rules,
-          onMissing,
           maxDepth,
           depth: depth + 1,
         }),
     });
   }
-  return onMissing(schema);
+  return false;
 };
