@@ -4,7 +4,7 @@ import { getMeta } from "./metadata";
 import { ProprietaryKind } from "./proprietary-schemas";
 
 interface VariantDependingProps<U> {
-  regular: { next: SchemaHandler<z.ZodTypeAny, U, {}, "last"> };
+  regular: { next: (schema: z.ZodTypeAny) => U };
   each: { prev: U };
   last: {};
 }
@@ -50,8 +50,8 @@ export const walkSchema = <U, Context extends FlatObject = {}>({
   const kind = getMeta(schema, "kind") || schema._def.typeName;
   const handler = kind ? rules[kind as keyof typeof rules] : undefined;
   const ctx = rest as unknown as Context;
-  const next: SchemaHandler<z.ZodTypeAny, U, {}, "last"> = (params) =>
-    walkSchema({ ...params, ...ctx, onEach, rules, onMissing });
+  const next = (subject: z.ZodTypeAny) =>
+    walkSchema({ schema: subject, ...ctx, onEach, rules, onMissing });
   const result = handler
     ? handler({ schema, ...ctx, next })
     : onMissing({ schema, ...ctx });
