@@ -63,21 +63,21 @@ export const walkSchema = <U, Context extends FlatObject = {}>({
  * @desc The optimized version of the schema walker for boolean checks
  * @see hasNestedSchema
  * */
-export const walkSchemaBool = <U extends boolean>({
+export const walkSchemaBool = ({
   schema,
   beforeEach,
   rules,
   onMissing,
   depth = 1,
   maxDepth = Number.POSITIVE_INFINITY,
-}: SchemaHandlingProps<z.ZodTypeAny, U, {}, "last"> & {
-  beforeEach: SchemaHandler<z.ZodTypeAny, U, {}, "last">;
-  onMissing: SchemaHandler<z.ZodTypeAny, U, {}, "last">;
-  rules: HandlingRules<U>;
+}: SchemaHandlingProps<z.ZodTypeAny, boolean, {}, "last"> & {
+  beforeEach: (schema: z.ZodTypeAny) => boolean;
+  onMissing: (schema: z.ZodTypeAny) => boolean;
+  rules: HandlingRules<boolean>;
   maxDepth?: number;
   depth?: number;
-}): U => {
-  const early = beforeEach({ schema });
+}): boolean => {
+  const early = beforeEach(schema);
   if (early) {
     return early;
   }
@@ -99,5 +99,5 @@ export const walkSchemaBool = <U extends boolean>({
         }),
     });
   }
-  return onMissing({ schema });
+  return onMissing(schema);
 };
