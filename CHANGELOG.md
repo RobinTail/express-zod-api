@@ -5,9 +5,7 @@
 ### v16.6.0
 
 - Refactoring: using walker (traverse) for checking nested schemas.
-  - This makes it easier to scale and reuse.
-- Refactoring: simplified `next` shorthand of the schema walker.
-  - This improved the preformance slightly.
+  - This improved the performance and made it easier to scale and reuse.
 
 ### v16.5.4
 
