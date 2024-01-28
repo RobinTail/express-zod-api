@@ -60,26 +60,21 @@ export const walkSchema = <U, Context extends FlatObject = {}>({
 };
 
 /** @see hasNestedSchema */
-export const walkSchemaBool = <
-  U extends boolean,
-  Context extends FlatObject = {},
->({
+export const walkSchemaBool = <U extends boolean>({
   schema,
   beforeEach,
   rules,
   onMissing,
   depth = 1,
   maxDepth = Number.POSITIVE_INFINITY,
-  ...rest
-}: SchemaHandlingProps<z.ZodTypeAny, U, Context, "last"> & {
-  beforeEach?: SchemaHandler<z.ZodTypeAny, U, Context, "last">;
-  onMissing: SchemaHandler<z.ZodTypeAny, U, Context, "last">;
-  rules: HandlingRules<U, Context>;
+}: SchemaHandlingProps<z.ZodTypeAny, U, {}, "last"> & {
+  beforeEach?: SchemaHandler<z.ZodTypeAny, U, {}, "last">;
+  onMissing: SchemaHandler<z.ZodTypeAny, U, {}, "last">;
+  rules: HandlingRules<U>;
   maxDepth?: number;
   depth?: number;
 }): U => {
-  const ctx = rest as unknown as Context;
-  const early = beforeEach && beforeEach({ schema, ...ctx });
+  const early = beforeEach && beforeEach({ schema });
   if (early === true) {
     return early;
   }
@@ -90,15 +85,12 @@ export const walkSchemaBool = <
   const next = (subject: z.ZodTypeAny) =>
     walkSchemaBool({
       schema: subject,
-      ...ctx,
       beforeEach,
       rules,
       onMissing,
       maxDepth,
       depth: depth + 1,
     });
-  const result = handler
-    ? handler({ schema, ...ctx, next })
-    : onMissing({ schema, ...ctx });
+  const result = handler ? handler({ schema, next }) : onMissing({ schema });
   return early || result;
 };
