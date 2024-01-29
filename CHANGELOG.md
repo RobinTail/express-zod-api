@@ -2,11 +2,15 @@
 
 ## Version 16
 
+### v16.6.1
+
+- Performance fix for uploads processing (since v16.1.0).
+
 ### v16.6.0
 
 - Refactoring: using a walker (traverse) for checking nested schemas.
   - This improved the performance and made it easier to scale and reuse.
-- Reverted a validation involved in metadata processing that used to affect the performance since v16.2.1.
+- Performance fix for metadata processing (since v16.2.1).
 
 ### v16.5.4
 
