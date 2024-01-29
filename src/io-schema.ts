@@ -2,9 +2,8 @@ import { z } from "zod";
 import { copyMeta } from "./metadata";
 import { AnyMiddlewareDef } from "./middleware";
 
-type Refined<T extends z.ZodTypeAny> = T extends z.ZodType<infer O>
-  ? z.ZodEffects<T | Refined<T>, O, O>
-  : never;
+type Refined<T extends z.ZodTypeAny> =
+  T extends z.ZodType<infer O> ? z.ZodEffects<T | Refined<T>, O, O> : never;
 
 /**
  * @desc The type allowed on the top level of Middlewares and Endpoints

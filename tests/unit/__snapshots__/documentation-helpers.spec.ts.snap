@@ -277,38 +277,174 @@ exports[`Documentation helpers > depictFile() > should set type:string and forma
 }
 `;
 
-exports[`Documentation helpers > depictIntersection() > should wrap next depicters in allOf property 1`] = `
+exports[`Documentation helpers > depictIntersection() > should fall back to allOf in other cases 0 1`] = `
 {
   "allOf": [
     {
-      "properties": {
-        "one": {
-          "format": "double",
-          "maximum": 1.7976931348623157e+308,
-          "minimum": 5e-324,
-          "type": "number",
-        },
+      "additionalProperties": {
+        "format": "double",
+        "maximum": 1.7976931348623157e+308,
+        "minimum": -1.7976931348623157e+308,
+        "type": "number",
       },
-      "required": [
-        "one",
-      ],
       "type": "object",
     },
     {
       "properties": {
-        "two": {
+        "test": {
           "format": "double",
           "maximum": 1.7976931348623157e+308,
-          "minimum": 5e-324,
+          "minimum": -1.7976931348623157e+308,
           "type": "number",
         },
       },
       "required": [
-        "two",
+        "test",
       ],
       "type": "object",
     },
   ],
+}
+`;
+
+exports[`Documentation helpers > depictIntersection() > should fall back to allOf in other cases 1 1`] = `
+{
+  "allOf": [
+    {
+      "format": "double",
+      "maximum": 1.7976931348623157e+308,
+      "minimum": -1.7976931348623157e+308,
+      "type": "number",
+    },
+    {
+      "enum": [
+        5,
+      ],
+      "type": "number",
+    },
+  ],
+}
+`;
+
+exports[`Documentation helpers > depictIntersection() > should flatten three object schemas with examples 1`] = `
+{
+  "examples": [
+    {
+      "one": 123,
+      "three": 789,
+      "two": 456,
+    },
+  ],
+  "properties": {
+    "one": {
+      "format": "double",
+      "maximum": 1.7976931348623157e+308,
+      "minimum": -1.7976931348623157e+308,
+      "type": "number",
+    },
+    "three": {
+      "format": "double",
+      "maximum": 1.7976931348623157e+308,
+      "minimum": -1.7976931348623157e+308,
+      "type": "number",
+    },
+    "two": {
+      "format": "double",
+      "maximum": 1.7976931348623157e+308,
+      "minimum": -1.7976931348623157e+308,
+      "type": "number",
+    },
+  },
+  "required": [
+    "one",
+    "two",
+    "three",
+  ],
+  "type": "object",
+}
+`;
+
+exports[`Documentation helpers > depictIntersection() > should flatten two object schemas 1`] = `
+{
+  "properties": {
+    "one": {
+      "format": "double",
+      "maximum": 1.7976931348623157e+308,
+      "minimum": -1.7976931348623157e+308,
+      "type": "number",
+    },
+    "two": {
+      "format": "double",
+      "maximum": 1.7976931348623157e+308,
+      "minimum": -1.7976931348623157e+308,
+      "type": "number",
+    },
+  },
+  "required": [
+    "one",
+    "two",
+  ],
+  "type": "object",
+}
+`;
+
+exports[`Documentation helpers > depictIntersection() > should maintain uniqueness in the array of required props 1`] = `
+{
+  "properties": {
+    "test": {
+      "enum": [
+        5,
+      ],
+      "format": "double",
+      "maximum": 1.7976931348623157e+308,
+      "minimum": -1.7976931348623157e+308,
+      "type": "number",
+    },
+  },
+  "required": [
+    "test",
+  ],
+  "type": "object",
+}
+`;
+
+exports[`Documentation helpers > depictIntersection() > should merge examples deeply 1`] = `
+{
+  "examples": [
+    {
+      "test": {
+        "a": 123,
+        "b": 456,
+      },
+    },
+  ],
+  "properties": {
+    "test": {
+      "properties": {
+        "a": {
+          "format": "double",
+          "maximum": 1.7976931348623157e+308,
+          "minimum": -1.7976931348623157e+308,
+          "type": "number",
+        },
+        "b": {
+          "format": "double",
+          "maximum": 1.7976931348623157e+308,
+          "minimum": -1.7976931348623157e+308,
+          "type": "number",
+        },
+      },
+      "required": [
+        "a",
+        "b",
+      ],
+      "type": "object",
+    },
+  },
+  "required": [
+    "test",
+  ],
+  "type": "object",
 }
 `;
 
@@ -422,7 +558,7 @@ exports[`Documentation helpers > depictNumber() > should type:number, min/max, f
 {
   "format": "double",
   "maximum": 1.7976931348623157e+308,
-  "minimum": 5e-324,
+  "minimum": -1.7976931348623157e+308,
   "type": "number",
 }
 `;
@@ -466,7 +602,7 @@ exports[`Documentation helpers > depictObject() > should type:object, properties
     "a": {
       "format": "double",
       "maximum": 1.7976931348623157e+308,
-      "minimum": 5e-324,
+      "minimum": -1.7976931348623157e+308,
       "type": "number",
     },
     "b": {
@@ -487,7 +623,7 @@ exports[`Documentation helpers > depictObject() > should type:object, properties
     "a": {
       "format": "double",
       "maximum": 1.7976931348623157e+308,
-      "minimum": 5e-324,
+      "minimum": -1.7976931348623157e+308,
       "type": "number",
     },
     "b": {
@@ -508,7 +644,7 @@ exports[`Documentation helpers > depictObject() > should type:object, properties
     "a": {
       "format": "double",
       "maximum": 1.7976931348623157e+308,
-      "minimum": 5e-324,
+      "minimum": -1.7976931348623157e+308,
       "type": "number",
     },
     "b": {
@@ -529,7 +665,7 @@ exports[`Documentation helpers > depictObject() > should type:object, properties
     "a": {
       "format": "double",
       "maximum": 1.7976931348623157e+308,
-      "minimum": 5e-324,
+      "minimum": -1.7976931348623157e+308,
       "type": "number",
     },
     "b": {
@@ -549,7 +685,7 @@ exports[`Documentation helpers > depictObject() > should type:object, properties
     "a": {
       "format": "double",
       "maximum": 1.7976931348623157e+308,
-      "minimum": 5e-324,
+      "minimum": -1.7976931348623157e+308,
       "type": "number",
     },
     "b": {
@@ -586,24 +722,13 @@ exports[`Documentation helpers > depictOptional() > should pass the next depicte
 }
 `;
 
-exports[`Documentation helpers > depictParamExamples() > should 'pass' examples in case of 'request' 1`] = `
+exports[`Documentation helpers > depictParamExamples() > should pass examples for the given parameter 1`] = `
 {
   "example1": {
     "value": 123,
   },
   "example2": {
     "value": 456,
-  },
-}
-`;
-
-exports[`Documentation helpers > depictParamExamples() > should 'transform' examples in case of 'response' 1`] = `
-{
-  "example1": {
-    "value": "123",
-  },
-  "example2": {
-    "value": "456",
   },
 }
 `;
@@ -778,6 +903,18 @@ exports[`Documentation helpers > depictRequestParams() > should depict query and
     },
   },
 ]
+`;
+
+exports[`Documentation helpers > depictSecurity() > should add scopes when missing 1`] = `
+{
+  "flows": {
+    "password": {
+      "scopes": {},
+      "tokenUrl": "https://test.url",
+    },
+  },
+  "type": "oauth2",
+}
 `;
 
 exports[`Documentation helpers > depictSecurity() > should depict OAuth2 Security with flows 1`] = `
@@ -1103,7 +1240,7 @@ exports[`Documentation helpers > depictUnion() > should wrap next depicters into
     {
       "format": "double",
       "maximum": 1.7976931348623157e+308,
-      "minimum": 5e-324,
+      "minimum": -1.7976931348623157e+308,
       "type": "number",
     },
   ],
@@ -1174,6 +1311,20 @@ exports[`Documentation helpers > excludeParamsFromDepiction() > should omit spec
 
 exports[`Documentation helpers > excludeParamsFromDepiction() > should omit specified path params 2 1`] = `
 {
+  "properties": {
+    "b": {
+      "type": "string",
+    },
+  },
+  "required": [
+    "b",
+  ],
+  "type": "object",
+}
+`;
+
+exports[`Documentation helpers > excludeParamsFromDepiction() > should omit specified path params 3 1`] = `
+{
   "allOf": [
     {
       "properties": {},
@@ -1181,14 +1332,9 @@ exports[`Documentation helpers > excludeParamsFromDepiction() > should omit spec
       "type": "object",
     },
     {
-      "properties": {
-        "b": {
-          "type": "string",
-        },
+      "additionalProperties": {
+        "type": "string",
       },
-      "required": [
-        "b",
-      ],
       "type": "object",
     },
   ],

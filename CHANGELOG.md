@@ -2,7 +2,120 @@
 
 ## Version 16
 
-### 16.3.0
+### v16.6.0
+
+- Refactoring: using a walker (traverse) for checking nested schemas.
+  - This improved the performance and made it easier to scale and reuse.
+- Reverted a validation involved in metadata processing that used to affect the performance since v16.2.1.
+
+### v16.5.4
+
+- Refactoring: simplified the `next()` method of the schema walker (traverse).
+
+### v16.5.3
+
+- Fixed the bug #1517 found and reported by [@kotsmile](https://github.com/kotsmile):
+  - The minimum allowed float was incorrectly specified in the generated documentation;
+  - Applies only to `z.number()` having no `.min()` and no `.int()` refinements.
+
+```yaml
+before:
+  type: number
+  format: double
+  minimum: 5e-324 # <——— bug
+  maximum: 1.7976931348623157e+308
+after:
+  type: number
+  format: double
+  minimum: -1.7976931348623157e+308 # <——— correct
+  maximum: 1.7976931348623157e+308
+```
+
+### v16.5.2
+
+- Refactoring: rewrote some reducers using declarative and functional approach.
+  - In certain cases it improved the performance slightly.
+
+### v16.5.1
+
+- Excluding empty `properties` in the generated documentation.
+  - Applies to both `z.object()` and `z.record()`.
+
+```yaml
+before:
+  type: object
+  properties: {}
+after:
+  type: object
+```
+
+### v16.5.0
+
+- Flattening nested intersections of object schemas in the generated documentation:
+  - Intersections (`.and()`) help to combine input schemas of endpoints and middlewares into a single schema;
+  - When endpoint uses several middlewares it could lead to multiple nested `allOf` entries;
+  - This version tries to flatten them when possible, thanks to [@arlyon](https://github.com/arlyon)'s contribution.
+
+```yaml
+before:
+  allOf:
+    - type: object
+      properties:
+        a:
+          type: string
+      required:
+        - a
+    - type: object
+      properties:
+        b:
+          type: string
+      required:
+        - b
+after:
+  type: object
+  properties:
+    a:
+      type: string
+    b:
+      type: string
+  required:
+    - a
+    - b
+```
+
+### v16.4.1
+
+- Removed redundant duplication when documenting the request parameters.
+
+### v16.4.0
+
+- Featuring the child logger support for your convenience:
+  - In case you need a slightly different or preconfigured logger for each request, the new feature comes handy;
+  - The common use case is logging a unique request ID;
+  - Previously, for that purpose you most likely used middlewares, but there is a better way now;
+  - In the configuration you can now specify `childLoggerProvider` returning a logger instance;
+  - When specified, the returned child logger will replace the `logger` in all handlers for each request;
+  - The provider function receives the initially configured logger and the request, it can also be asynchronous;
+  - Consider the following example in case of Winston logger:
+
+```typescript
+import { createConfig } from "express-zod-api";
+import { Logger } from "winston"; // or another compatible logger
+import { randomUUID } from "node:crypto";
+
+declare module "express-zod-api" {
+  // this approach enables the .child() method availability
+  interface LoggerOverrides extends Logger {}
+}
+
+const config = createConfig({
+  // logger: ...,
+  childLoggerProvider: ({ parent, request }) =>
+    parent.child({ requestId: randomUUID() }),
+});
+```
+
+### v16.3.0
 
 - Switching to using native `zod` methods for proprietary schemas instead of custom classes (`ez` namespace):
   - Each proprietary schema now relies on internal Metadata;
@@ -13,17 +126,17 @@
     - ~~`ez.file().base64()`~~ — use `ez.file("base64")` instead,
     - ~~`ez.file().binary()`~~ — use `ez.file("binary")` instead.
 
-### 16.2.2
+### v16.2.2
 
 - Fixed issue #1458 reported by [@elee1766](https://github.com/elee1766):
   - `z.string()` having RegExp based refinements were incorrectly described by `Documentation` (`pattern` property).
 
-### 16.2.1
+### v16.2.1
 
 - Refactoring some methods involved in metadata and schema processing.
 - Fixed several messages of errors related to documenting proprietary schemas.
 
-### 16.2.0
+### v16.2.0
 
 - Notice: upgrading to this version, make sure you are NOT supplying type parameters to the `EndpointsFactory`:
   - `new EndpointsFactory(...)` — correct,
@@ -93,7 +206,7 @@ const entityCreationEndpoint = statusDependingFactory.build({
 });
 ```
 
-### 16.1.0
+### v16.1.0
 
 - Improving the documentation of endpoints based on middlewares having `security` schema with `type: "input"`.
   - According to the OpenAPI specification, endpoints designed to accept some authentication key are expected to
@@ -136,7 +249,7 @@ securitySchemes:
     description: key MUST be supplied within the request body instead of query
 ```
 
-### 16.0.0
+### v16.0.0
 
 - Potentially breaking changes:
   - Some methods and properties of the `Documentation` class (which extends the OpenAPI builder) might be changed.
@@ -187,7 +300,7 @@ new Integration({ splitResponse: true });
 
 ## Version 15
 
-### 15.3.0
+### v15.3.0
 
 - Method `createConfig()` now supports express router as an `app` for using with `attachRouting()` method.
   - Thanks to [@sarahssharkey](https://github.com/sarahssharkey)'s contribution.
@@ -200,7 +313,7 @@ const router = express.Router();
 const config = createConfig({ app: router });
 ```
 
-### 15.2.0
+### v15.2.0
 
 - Supporting Node 20 starting from version 20.0.0 (previously it was 20.1.0).
 - Debug message informing on the package build version on startup.
@@ -216,7 +329,7 @@ operationId:
   after: GetCompaniesCompanyIdUsersUserId
 ```
 
-### 15.1.0
+### v15.1.0
 
 - The distribution becomes ESM first, while remaining dual (CJS support remains).
   - This should not be a breaking change: the right files should be chosen automatically.
@@ -224,7 +337,7 @@ operationId:
     - for ESM: `index.js` and `index.d.ts`,
     - for CJS: `index.cjs` and `index.d.cts`.
 
-### 15.0.1
+### v15.0.1
 
 - Development environment improvements:
   - Transitioned from an exclusive approach to the inclusive one:
@@ -235,7 +348,7 @@ operationId:
     - Dedicated environment for Issue #952 test.
   - Simplified development commands.
 
-### 15.0.0
+### v15.0.0
 
 - **Breaking changes**:
   - Packages `express-fileupload` and `compression` become optional peer dependencies;

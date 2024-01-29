@@ -1,7 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import { HttpError } from "http-errors";
 import { z } from "zod";
-import { FlatObject, hasTopLevelTransformingEffect } from "./common-helpers";
+import { hasTransformationOnTop } from "./deep-checks";
+import { FlatObject } from "./common-helpers";
 import { IOSchemaError } from "./errors";
 import { IOSchema } from "./io-schema";
 import { LogicalContainer } from "./logical-container";
@@ -52,7 +53,7 @@ export const createMiddleware = <
   props: MiddlewareCreationProps<IN, OPT, OUT, SCO>,
 ): MiddlewareDefinition<IN, OPT, OUT, SCO> => {
   assert(
-    !hasTopLevelTransformingEffect(props.input),
+    !hasTransformationOnTop(props.input),
     new IOSchemaError(
       "Using transformations on the top level of middleware input schema is not allowed.",
     ),

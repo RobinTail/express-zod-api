@@ -2,9 +2,7 @@ import assert from "node:assert/strict";
 import { ReferenceObject, SchemaObject } from "openapi3-ts/oas31";
 import { z } from "zod";
 import { defaultSerializer } from "../../src/common-helpers";
-import { IOSchemaError } from "../../src/errors";
 import { DocumentationError, ez, withMeta } from "../../src";
-import { getMeta } from "../../src/metadata";
 import {
   OpenAPIContext,
   depictAny,
@@ -53,7 +51,7 @@ import {
   onMissing,
   reformatParamsInPath,
 } from "../../src/documentation-helpers";
-import { SchemaHandler, walkSchema } from "../../src/schema-walker";
+import { walkSchema } from "../../src/schema-walker";
 import { serializeSchemaForTest } from "../helpers";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
@@ -80,23 +78,14 @@ describe("Documentation helpers", () => {
     makeRef: makeRefMock,
     serializer: defaultSerializer,
   };
-  const makeNext =
-    (
-      ctx: OpenAPIContext,
-    ): SchemaHandler<
-      z.ZodTypeAny,
-      SchemaObject | ReferenceObject,
-      {},
-      "last"
-    > =>
-    ({ schema }) =>
-      walkSchema({
-        schema,
-        rules: depicters,
-        ...ctx,
-        onEach,
-        onMissing,
-      });
+  const makeNext = (ctx: OpenAPIContext) => (schema: z.ZodTypeAny) =>
+    walkSchema({
+      schema,
+      rules: depicters,
+      ...ctx,
+      onEach,
+      onMissing,
+    });
 
   beforeEach(() => {
     getRefMock.mockClear();
@@ -132,10 +121,14 @@ describe("Documentation helpers", () => {
   });
 
   describe("extractObjectSchema()", () => {
+    const tfError = new Error(
+      "Using transformations on the top level schema is not allowed.",
+    );
+
     test("should pass the object schema through", () => {
       const subject = extractObjectSchema(
         z.object({ one: z.string() }),
-        requestCtx,
+        tfError,
       );
       expect(subject).toBeInstanceOf(z.ZodObject);
       expect(serializeSchemaForTest(subject)).toMatchSnapshot();
@@ -144,7 +137,7 @@ describe("Documentation helpers", () => {
     test("should return object schema for the union of object schemas", () => {
       const subject = extractObjectSchema(
         z.object({ one: z.string() }).or(z.object({ two: z.number() })),
-        requestCtx,
+        tfError,
       );
       expect(subject).toBeInstanceOf(z.ZodObject);
       expect(serializeSchemaForTest(subject)).toMatchSnapshot();
@@ -153,52 +146,17 @@ describe("Documentation helpers", () => {
     test("should return object schema for the intersection of object schemas", () => {
       const subject = extractObjectSchema(
         z.object({ one: z.string() }).and(z.object({ two: z.number() })),
-        requestCtx,
+        tfError,
       );
       expect(subject).toBeInstanceOf(z.ZodObject);
       expect(serializeSchemaForTest(subject)).toMatchSnapshot();
-    });
-
-    test("should preserve examples", () => {
-      const objectSchema = withMeta(z.object({ one: z.string() })).example({
-        one: "test",
-      });
-      expect(
-        getMeta(extractObjectSchema(objectSchema, requestCtx), "examples"),
-      ).toEqual([{ one: "test" }]);
-
-      const refinedObjSchema = withMeta(
-        z.object({ one: z.string() }).refine(() => true),
-      ).example({ one: "test" });
-      expect(
-        getMeta(extractObjectSchema(refinedObjSchema, requestCtx), "examples"),
-      ).toEqual([{ one: "test" }]);
-
-      const unionSchema = withMeta(
-        z.object({ one: z.string() }).or(z.object({ two: z.number() })),
-      )
-        .example({ one: "test1" })
-        .example({ two: 123 });
-      expect(
-        getMeta(extractObjectSchema(unionSchema, requestCtx), "examples"),
-      ).toEqual([{ one: "test1" }, { two: 123 }]);
-
-      const intersectionSchema = withMeta(
-        z.object({ one: z.string() }).and(z.object({ two: z.number() })),
-      ).example({ one: "test1", two: 123 });
-      expect(
-        getMeta(
-          extractObjectSchema(intersectionSchema, requestCtx),
-          "examples",
-        ),
-      ).toEqual([{ one: "test1", two: 123 }]);
     });
 
     describe("Feature #600: Top level refinements", () => {
       test("should handle refined object schema", () => {
         const subject = extractObjectSchema(
           z.object({ one: z.string() }).refine(() => true),
-          requestCtx,
+          tfError,
         );
         expect(subject).toBeInstanceOf(z.ZodObject);
         expect(serializeSchemaForTest(subject)).toMatchSnapshot();
@@ -208,14 +166,9 @@ describe("Documentation helpers", () => {
         expect(() =>
           extractObjectSchema(
             z.object({ one: z.string() }).transform(() => []),
-            requestCtx,
+            tfError,
           ),
-        ).toThrow(
-          new IOSchemaError(
-            "Using transformations on the top level of input schema is not allowed.\n" +
-              "Caused by input schema of an Endpoint assigned to GET method of /v1/user/:id path.",
-          ),
-        );
+        ).toThrow(tfError);
       });
     });
   });
@@ -224,7 +177,10 @@ describe("Documentation helpers", () => {
     test.each<z.ZodTypeAny>([
       z.object({ a: z.string(), b: z.string() }),
       z.object({ a: z.string() }).or(z.object({ b: z.string() })),
-      z.object({ a: z.string() }).and(z.object({ b: z.string() })),
+      z.object({ a: z.string() }).and(z.object({ b: z.string() })), // flattened
+      z
+        .record(z.literal("a"), z.string())
+        .and(z.record(z.string(), z.string())),
     ])("should omit specified path params %#", (schema) => {
       const depicted = walkSchema({
         schema,
@@ -366,12 +322,68 @@ describe("Documentation helpers", () => {
   });
 
   describe("depictIntersection()", () => {
-    test("should wrap next depicters in allOf property", () => {
+    test("should flatten two object schemas", () => {
       expect(
         depictIntersection({
           schema: z
             .object({ one: z.number() })
             .and(z.object({ two: z.number() })),
+          ...requestCtx,
+          next: makeNext(requestCtx),
+        }),
+      ).toMatchSnapshot();
+    });
+
+    test("should merge examples deeply", () => {
+      expect(
+        depictIntersection({
+          schema: withMeta(z.object({ test: z.object({ a: z.number() }) }))
+            .example({ test: { a: 123 } })
+            .and(
+              withMeta(z.object({ test: z.object({ b: z.number() }) })).example(
+                { test: { b: 456 } },
+              ),
+            ),
+          ...requestCtx,
+          next: makeNext(requestCtx),
+        }),
+      ).toMatchSnapshot();
+    });
+
+    test("should flatten three object schemas with examples", () => {
+      expect(
+        depictIntersection({
+          schema: withMeta(z.object({ one: z.number() }))
+            .example({ one: 123 })
+            .and(withMeta(z.object({ two: z.number() })).example({ two: 456 }))
+            .and(
+              withMeta(z.object({ three: z.number() })).example({ three: 789 }),
+            ),
+          ...requestCtx,
+          next: makeNext(requestCtx),
+        }),
+      ).toMatchSnapshot();
+    });
+
+    test("should maintain uniqueness in the array of required props", () => {
+      expect(
+        depictIntersection({
+          schema: z
+            .record(z.literal("test"), z.number())
+            .and(z.object({ test: z.literal(5) })),
+          ...requestCtx,
+          next: makeNext(requestCtx),
+        }),
+      ).toMatchSnapshot();
+    });
+
+    test.each([
+      z.record(z.string(), z.number()).and(z.object({ test: z.number() })), // has additionalProperties
+      z.number().and(z.literal(5)), // not objects
+    ])("should fall back to allOf in other cases %#", (schema) => {
+      expect(
+        depictIntersection({
+          schema,
           ...requestCtx,
           next: makeNext(requestCtx),
         }),
@@ -737,10 +749,7 @@ describe("Documentation helpers", () => {
   });
 
   describe("depictParamExamples()", () => {
-    test.each<{ isResponse: boolean } & Record<"case" | "action", string>>([
-      { isResponse: false, case: "request", action: "pass" },
-      { isResponse: true, case: "response", action: "transform" },
-    ])("should $action examples in case of $case", ({ isResponse }) => {
+    test("should pass examples for the given parameter", () => {
       expect(
         depictParamExamples(
           withMeta(
@@ -760,7 +769,6 @@ describe("Documentation helpers", () => {
               two: 456,
               three: false,
             }),
-          isResponse,
           "two",
         ),
       ).toMatchSnapshot();
@@ -1075,6 +1083,18 @@ describe("Documentation helpers", () => {
           flows: {
             implicit: undefined,
             password: undefined,
+          },
+        }),
+      ).toMatchSnapshot();
+    });
+    test("should add scopes when missing", () => {
+      expect(
+        depictSecurity({
+          type: "oauth2",
+          flows: {
+            password: {
+              tokenUrl: "https://test.url",
+            },
           },
         }),
       ).toMatchSnapshot();

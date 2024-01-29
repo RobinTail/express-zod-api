@@ -1,24 +1,20 @@
 import { Request } from "express";
 import { isHttpError } from "http-errors";
 import { createHash } from "node:crypto";
-import { xprod } from "ramda";
+import { flip, pickBy, xprod } from "ramda";
 import { z } from "zod";
 import { CommonConfig, InputSource, InputSources } from "./config-type";
 import { InputValidationError, OutputValidationError } from "./errors";
-import { IOSchema } from "./io-schema";
 import { AbstractLogger } from "./logger";
-import { getMeta, isProprietary } from "./metadata";
+import { getMeta } from "./metadata";
 import { AuxMethod, Method } from "./method";
 import { mimeMultipart } from "./mime";
-import { ezRawKind } from "./raw-schema";
-import { ezUploadKind } from "./upload-schema";
 
 export type FlatObject = Record<string, unknown>;
 
 const areFilesAvailable = (request: Request): boolean => {
   const contentType = request.header("content-type") || "";
-  const isMultipart =
-    contentType.slice(0, mimeMultipart.length).toLowerCase() === mimeMultipart;
+  const isMultipart = contentType.toLowerCase().startsWith(mimeMultipart);
   return "files" in request && isMultipart;
 };
 
@@ -38,37 +34,25 @@ export const isCustomHeader = (name: string): name is `x-${string}` =>
   name.startsWith("x-");
 
 /** @see https://nodejs.org/api/http.html#messageheaders */
-export const getCustomHeaders = (request: Request) =>
-  Object.entries(request.headers).reduce<FlatObject>(
-    (agg, [key, value]) =>
-      isCustomHeader(key) ? { ...agg, [key]: value } : agg,
-    {},
-  );
+export const getCustomHeaders = (headers: FlatObject): FlatObject =>
+  pickBy(flip(isCustomHeader), headers); // needs flip to address the keys
 
 export const getInput = (
-  request: Request,
-  inputAssignment: CommonConfig["inputSources"],
-) => {
-  const method = getActualMethod(request);
+  req: Request,
+  userDefined: CommonConfig["inputSources"] = {},
+): FlatObject => {
+  const method = getActualMethod(req);
   if (method === "options") {
     return {};
   }
-  let props = fallbackInputSource;
-  if (method in defaultInputSources) {
-    props = defaultInputSources[method];
-  }
-  if (inputAssignment && method in inputAssignment) {
-    props = inputAssignment[method] || props;
-  }
-  return props
-    .filter((prop) => (prop === "files" ? areFilesAvailable(request) : true))
-    .reduce<FlatObject>(
-      (carry, prop) => ({
-        ...carry,
-        ...(prop === "headers" ? getCustomHeaders(request) : request[prop]),
-      }),
-      {},
-    );
+  return (
+    userDefined[method] ||
+    defaultInputSources[method] ||
+    fallbackInputSource
+  )
+    .filter((src) => (src === "files" ? areFilesAvailable(req) : true))
+    .map((src) => (src === "headers" ? getCustomHeaders(req[src]) : req[src]))
+    .reduce<FlatObject>((agg, obj) => ({ ...agg, ...obj }), {});
 };
 
 export const makeErrorFromAnything = (subject: unknown): Error =>
@@ -165,87 +149,6 @@ export const combinations = <T>(
   b: T[],
   merge: (pair: [T, T]) => T,
 ): T[] => (a.length && b.length ? xprod(a, b).map(merge) : a.concat(b));
-
-export const hasTopLevelTransformingEffect = (schema: IOSchema): boolean => {
-  if (schema instanceof z.ZodEffects) {
-    if (schema._def.effect.type !== "refinement") {
-      return true;
-    }
-  }
-  if (schema instanceof z.ZodUnion) {
-    return schema.options.some(hasTopLevelTransformingEffect);
-  }
-  if (schema instanceof z.ZodIntersection) {
-    return [schema._def.left, schema._def.right].some(
-      hasTopLevelTransformingEffect,
-    );
-  }
-  return false; // ZodObject left
-};
-
-export const hasNestedSchema = ({
-  subject,
-  condition,
-  maxDepth,
-  depth = 1,
-}: {
-  subject: z.ZodTypeAny;
-  condition: (schema: z.ZodTypeAny) => boolean;
-  maxDepth?: number;
-  depth?: number;
-}): boolean => {
-  if (condition(subject)) {
-    return true;
-  }
-  if (maxDepth !== undefined && depth >= maxDepth) {
-    return false;
-  }
-  const common = { condition, maxDepth, depth: depth + 1 };
-  if (subject instanceof z.ZodObject) {
-    return Object.values<z.ZodTypeAny>(subject.shape).some((entry) =>
-      hasNestedSchema({ subject: entry, ...common }),
-    );
-  }
-  if (subject instanceof z.ZodUnion) {
-    return subject.options.some((entry: z.ZodTypeAny) =>
-      hasNestedSchema({ subject: entry, ...common }),
-    );
-  }
-  if (subject instanceof z.ZodIntersection) {
-    return [subject._def.left, subject._def.right].some((entry) =>
-      hasNestedSchema({ subject: entry, ...common }),
-    );
-  }
-  if (subject instanceof z.ZodOptional || subject instanceof z.ZodNullable) {
-    return hasNestedSchema({ subject: subject.unwrap(), ...common });
-  }
-  if (subject instanceof z.ZodEffects || subject instanceof z.ZodTransformer) {
-    return hasNestedSchema({ subject: subject.innerType(), ...common });
-  }
-  if (subject instanceof z.ZodRecord) {
-    return hasNestedSchema({ subject: subject.valueSchema, ...common });
-  }
-  if (subject instanceof z.ZodArray) {
-    return hasNestedSchema({ subject: subject.element, ...common });
-  }
-  if (subject instanceof z.ZodDefault) {
-    return hasNestedSchema({ subject: subject._def.innerType, ...common });
-  }
-  return false;
-};
-
-export const hasUpload = (subject: IOSchema) =>
-  hasNestedSchema({
-    subject,
-    condition: (schema) => isProprietary(schema, ezUploadKind),
-  });
-
-export const hasRaw = (subject: IOSchema) =>
-  hasNestedSchema({
-    subject,
-    condition: (schema) => isProprietary(schema, ezRawKind),
-    maxDepth: 3,
-  });
 
 /**
  * @desc isNullable() and isOptional() validate the schema's input
