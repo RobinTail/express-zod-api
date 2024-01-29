@@ -1,84 +1,67 @@
+import type { UploadedFile } from "express-fileupload";
 import { bench, describe } from "vitest";
 import { z } from "zod";
 import { ez } from "../../src";
-import { hasNestedSchema } from "../../src/deep-checks";
-import { isProprietary } from "../../src/metadata";
+import { proprietary } from "../../src/metadata";
+import { bufferSchema } from "../../src/schema-helpers";
 import { ezUploadKind } from "../../src/upload-schema";
 
 describe("Experiment", () => {
-  const testedSchema = z
-    .object({ test: z.boolean() })
-    .and(z.object({ test2: ez.upload() }));
-  const testedCondition = (subject: z.ZodTypeAny) =>
-    isProprietary(subject, ezUploadKind);
-
-  const originalFn = ({
-    subject,
-    condition,
-    maxDepth,
-    depth = 1,
-  }: {
-    subject: z.ZodTypeAny;
-    condition: (schema: z.ZodTypeAny) => boolean;
-    maxDepth?: number;
-    depth?: number;
-  }): boolean => {
-    if (condition(subject)) {
-      return true;
-    }
-    if (maxDepth !== undefined && depth >= maxDepth) {
-      return false;
-    }
-    const common = { condition, maxDepth, depth: depth + 1 };
-    if (subject instanceof z.ZodObject) {
-      return Object.values<z.ZodTypeAny>(subject.shape).some((entry) =>
-        originalFn({ subject: entry, ...common }),
-      );
-    }
-    if (subject instanceof z.ZodUnion) {
-      return subject.options.some((entry: z.ZodTypeAny) =>
-        originalFn({ subject: entry, ...common }),
-      );
-    }
-    if (subject instanceof z.ZodIntersection) {
-      return [subject._def.left, subject._def.right].some((entry) =>
-        originalFn({ subject: entry, ...common }),
-      );
-    }
-    if (subject instanceof z.ZodOptional || subject instanceof z.ZodNullable) {
-      return originalFn({ subject: subject.unwrap(), ...common });
-    }
-    if (
-      subject instanceof z.ZodEffects ||
-      subject instanceof z.ZodTransformer
-    ) {
-      return originalFn({ subject: subject.innerType(), ...common });
-    }
-    if (subject instanceof z.ZodRecord) {
-      return originalFn({ subject: subject.valueSchema, ...common });
-    }
-    if (subject instanceof z.ZodArray) {
-      return originalFn({ subject: subject.element, ...common });
-    }
-    if (subject instanceof z.ZodDefault) {
-      return originalFn({ subject: subject._def.innerType, ...common });
-    }
-    return false;
-  };
+  const originalFn = () =>
+    proprietary(
+      ezUploadKind,
+      z.custom<UploadedFile>(
+        (subject) =>
+          z
+            .object({
+              name: z.string(),
+              encoding: z.string(),
+              mimetype: z.string(),
+              data: bufferSchema,
+              tempFilePath: z.string(),
+              truncated: z.boolean(),
+              size: z.number(),
+              md5: z.string(),
+              mv: z.function(),
+            })
+            .safeParse(subject).success,
+        (input) => ({
+          message: `Expected file upload, received ${typeof input}`,
+        }),
+      ),
+    );
 
   bench(
     "original",
     () => {
-      originalFn({ subject: testedSchema, condition: testedCondition });
+      originalFn().safeParse({
+        name: "test",
+        encoding: "test",
+        mimetype: "test",
+        data: "test",
+        tempFilePath: "test",
+        truncated: false,
+        size: 100,
+        md5: "test",
+      });
     },
-    { time: 15000 },
+    { time: 5000 },
   );
 
   bench(
     "featured",
     () => {
-      hasNestedSchema({ subject: testedSchema, condition: testedCondition });
+      ez.upload().safeParse({
+        name: "test",
+        encoding: "test",
+        mimetype: "test",
+        data: "test",
+        tempFilePath: "test",
+        truncated: false,
+        size: 100,
+        md5: "test",
+      });
     },
-    { time: 15000 },
+    { time: 5000 },
   );
 });
