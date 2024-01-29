@@ -5,13 +5,10 @@ import { flip, pickBy, xprod } from "ramda";
 import { z } from "zod";
 import { CommonConfig, InputSource, InputSources } from "./config-type";
 import { InputValidationError, OutputValidationError } from "./errors";
-import { IOSchema } from "./io-schema";
 import { AbstractLogger } from "./logger";
-import { getMeta, isProprietary } from "./metadata";
+import { getMeta } from "./metadata";
 import { AuxMethod, Method } from "./method";
 import { mimeMultipart } from "./mime";
-import { ezRawKind } from "./raw-schema";
-import { ezUploadKind } from "./upload-schema";
 
 export type FlatObject = Record<string, unknown>;
 
@@ -152,87 +149,6 @@ export const combinations = <T>(
   b: T[],
   merge: (pair: [T, T]) => T,
 ): T[] => (a.length && b.length ? xprod(a, b).map(merge) : a.concat(b));
-
-export const hasTopLevelTransformingEffect = (schema: IOSchema): boolean => {
-  if (schema instanceof z.ZodEffects) {
-    if (schema._def.effect.type !== "refinement") {
-      return true;
-    }
-  }
-  if (schema instanceof z.ZodUnion) {
-    return schema.options.some(hasTopLevelTransformingEffect);
-  }
-  if (schema instanceof z.ZodIntersection) {
-    return [schema._def.left, schema._def.right].some(
-      hasTopLevelTransformingEffect,
-    );
-  }
-  return false; // ZodObject left
-};
-
-export const hasNestedSchema = ({
-  subject,
-  condition,
-  maxDepth,
-  depth = 1,
-}: {
-  subject: z.ZodTypeAny;
-  condition: (schema: z.ZodTypeAny) => boolean;
-  maxDepth?: number;
-  depth?: number;
-}): boolean => {
-  if (condition(subject)) {
-    return true;
-  }
-  if (maxDepth !== undefined && depth >= maxDepth) {
-    return false;
-  }
-  const common = { condition, maxDepth, depth: depth + 1 };
-  if (subject instanceof z.ZodObject) {
-    return Object.values<z.ZodTypeAny>(subject.shape).some((entry) =>
-      hasNestedSchema({ subject: entry, ...common }),
-    );
-  }
-  if (subject instanceof z.ZodUnion) {
-    return subject.options.some((entry: z.ZodTypeAny) =>
-      hasNestedSchema({ subject: entry, ...common }),
-    );
-  }
-  if (subject instanceof z.ZodIntersection) {
-    return [subject._def.left, subject._def.right].some((entry) =>
-      hasNestedSchema({ subject: entry, ...common }),
-    );
-  }
-  if (subject instanceof z.ZodOptional || subject instanceof z.ZodNullable) {
-    return hasNestedSchema({ subject: subject.unwrap(), ...common });
-  }
-  if (subject instanceof z.ZodEffects || subject instanceof z.ZodTransformer) {
-    return hasNestedSchema({ subject: subject.innerType(), ...common });
-  }
-  if (subject instanceof z.ZodRecord) {
-    return hasNestedSchema({ subject: subject.valueSchema, ...common });
-  }
-  if (subject instanceof z.ZodArray) {
-    return hasNestedSchema({ subject: subject.element, ...common });
-  }
-  if (subject instanceof z.ZodDefault) {
-    return hasNestedSchema({ subject: subject._def.innerType, ...common });
-  }
-  return false;
-};
-
-export const hasUpload = (subject: IOSchema) =>
-  hasNestedSchema({
-    subject,
-    condition: (schema) => isProprietary(schema, ezUploadKind),
-  });
-
-export const hasRaw = (subject: IOSchema) =>
-  hasNestedSchema({
-    subject,
-    condition: (schema) => isProprietary(schema, ezRawKind),
-    maxDepth: 3,
-  });
 
 /**
  * @desc isNullable() and isOptional() validate the schema's input

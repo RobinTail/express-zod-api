@@ -35,14 +35,14 @@ export type HandlingRules<U, Context extends FlatObject = {}> = Partial<
   >
 >;
 
-export const walkSchema = <U, Context extends FlatObject = {}>({
+/** @since 10.1.1 calling onEach _after_ handler and giving it the previously achieved result */
+export const walkSchema = <U extends object, Context extends FlatObject = {}>({
   schema,
   onEach,
   rules,
   onMissing,
   ...rest
 }: SchemaHandlingProps<z.ZodTypeAny, U, Context, "last"> & {
-  /** @since 10.1.1 calling onEach _after_ handler and giving it the previously achieved result */
   onEach?: SchemaHandler<z.ZodTypeAny, U, Context, "each">;
   rules: HandlingRules<U, Context>;
   onMissing: SchemaHandler<z.ZodTypeAny, U, Context, "last">;
