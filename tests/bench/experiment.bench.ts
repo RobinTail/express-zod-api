@@ -1,84 +1,23 @@
 import { bench, describe } from "vitest";
-import { z } from "zod";
-import { ez } from "../../src";
-import { hasNestedSchema } from "../../src/deep-checks";
-import { isProprietary } from "../../src/metadata";
-import { ezUploadKind } from "../../src/upload-schema";
+import {
+  SimplifiedWinstonConfig,
+  isSimplifiedWinstonConfig,
+} from "../../src/logger";
 
 describe("Experiment", () => {
-  const testedSchema = z
-    .object({ test: z.boolean() })
-    .and(z.object({ test2: ez.upload() }));
-  const testedCondition = (subject: z.ZodTypeAny) =>
-    isProprietary(subject, ezUploadKind);
+  const originalFn = (subject: unknown): subject is SimplifiedWinstonConfig =>
+    typeof subject === "object" &&
+    subject !== null &&
+    "level" in subject &&
+    ("color" in subject ? typeof subject.color === "boolean" : true) &&
+    typeof subject.level === "string" &&
+    ["silent", "warn", "debug"].includes(subject.level);
 
-  const originalFn = ({
-    subject,
-    condition,
-    maxDepth,
-    depth = 1,
-  }: {
-    subject: z.ZodTypeAny;
-    condition: (schema: z.ZodTypeAny) => boolean;
-    maxDepth?: number;
-    depth?: number;
-  }): boolean => {
-    if (condition(subject)) {
-      return true;
-    }
-    if (maxDepth !== undefined && depth >= maxDepth) {
-      return false;
-    }
-    const common = { condition, maxDepth, depth: depth + 1 };
-    if (subject instanceof z.ZodObject) {
-      return Object.values<z.ZodTypeAny>(subject.shape).some((entry) =>
-        originalFn({ subject: entry, ...common }),
-      );
-    }
-    if (subject instanceof z.ZodUnion) {
-      return subject.options.some((entry: z.ZodTypeAny) =>
-        originalFn({ subject: entry, ...common }),
-      );
-    }
-    if (subject instanceof z.ZodIntersection) {
-      return [subject._def.left, subject._def.right].some((entry) =>
-        originalFn({ subject: entry, ...common }),
-      );
-    }
-    if (subject instanceof z.ZodOptional || subject instanceof z.ZodNullable) {
-      return originalFn({ subject: subject.unwrap(), ...common });
-    }
-    if (
-      subject instanceof z.ZodEffects ||
-      subject instanceof z.ZodTransformer
-    ) {
-      return originalFn({ subject: subject.innerType(), ...common });
-    }
-    if (subject instanceof z.ZodRecord) {
-      return originalFn({ subject: subject.valueSchema, ...common });
-    }
-    if (subject instanceof z.ZodArray) {
-      return originalFn({ subject: subject.element, ...common });
-    }
-    if (subject instanceof z.ZodDefault) {
-      return originalFn({ subject: subject._def.innerType, ...common });
-    }
-    return false;
-  };
+  bench("original", () => {
+    originalFn({ level: "debug" });
+  });
 
-  bench(
-    "original",
-    () => {
-      originalFn({ subject: testedSchema, condition: testedCondition });
-    },
-    { time: 15000 },
-  );
-
-  bench(
-    "featured",
-    () => {
-      hasNestedSchema({ subject: testedSchema, condition: testedCondition });
-    },
-    { time: 15000 },
-  );
+  bench("featured", () => {
+    isSimplifiedWinstonConfig({ level: "debug" });
+  });
 });
