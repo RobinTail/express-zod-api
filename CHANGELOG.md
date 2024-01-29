@@ -4,8 +4,9 @@
 
 ### v16.6.0
 
-- Refactoring: using walker (traverse) for checking nested schemas.
+- Refactoring: using a walker (traverse) for checking nested schemas.
   - This improved the performance and made it easier to scale and reuse.
+- Reverted a validation involved in metadata processing that used to affect the performance since v16.2.1.
 
 ### v16.5.4
 
