@@ -1,6 +1,6 @@
 {
   "name": "express-zod-api",
-  "version": "16.4.1",
+  "version": "16.6.0",
   "description": "A Typescript library to help you get an API server up and running with I/O schema validation and custom middlewares in minutes.",
   "license": "MIT",
   "repository": {
@@ -35,13 +35,14 @@
     "test:types": "tsc --noEmit",
     "test:unit": "vitest run --coverage tests/unit tests/system",
     "test:badge": "make-coverage-badge --output-path coverage.svg",
+    "bench": "vitest bench --run tests/bench",
     "lint": "eslint src example tests tools && yarn prettier *.md --check",
     "mdfix": "prettier *.md --write",
     "cleanup": "rm -rf tests/**/node_modules coverage",
     "precommit": "yarn lint && yarn test && yarn build && git add example/example.* LICENSE coverage.svg",
     "prepublishOnly": "yarn lint && yarn test && yarn build",
     "postversion": "git push && git push --tags",
-    "install_hooks": "husky install"
+    "install_hooks": "husky"
   },
   "type": "module",
   "main": "dist/index.cjs",
@@ -154,10 +155,10 @@
     "express-fileupload": "^1.4.3",
     "form-data": "^4.0.0",
     "http-errors": "^2.0.0",
-    "husky": "^8.0.3",
+    "husky": "^9.0.5",
     "make-coverage-badge": "^1.2.0",
     "mockdate": "^3.0.5",
-    "prettier": "3.2.2",
+    "prettier": "3.2.4",
     "tsd": "^0.30.0",
     "tsup": "^8.0.0",
     "tsx": "^4.6.2",

@@ -1,4 +1,3 @@
-import { UploadedFile } from "express-fileupload";
 import createHttpError from "http-errors";
 import { expectType } from "tsd";
 import {
@@ -10,17 +9,13 @@ import {
   getMessageFromError,
   getStatusCodeFromError,
   hasCoercion,
-  hasNestedSchema,
-  hasTopLevelTransformingEffect,
   isCustomHeader,
   makeCleanId,
   makeErrorFromAnything,
 } from "../../src/common-helpers";
-import { InputValidationError, ez, withMeta } from "../../src";
+import { InputValidationError, withMeta } from "../../src";
 import { Request } from "express";
 import { z } from "zod";
-import { isProprietary } from "../../src/metadata";
-import { ezUploadKind } from "../../src/upload-schema";
 import { describe, expect, test } from "vitest";
 
 describe("Common Helpers", () => {
@@ -43,12 +38,10 @@ describe("Common Helpers", () => {
     test("should reduce the object to the custom headers only", () => {
       expect(
         getCustomHeaders({
-          headers: {
-            authorization: "Bearer ***",
-            "x-request-id": "test",
-            "x-another": "header",
-          },
-        } as unknown as Request),
+          authorization: "Bearer ***",
+          "x-request-id": "test",
+          "x-another": "header",
+        }),
       ).toEqual({ "x-request-id": "test", "x-another": "header" });
     });
   });
@@ -340,70 +333,6 @@ describe("Common Helpers", () => {
       expect(combinations([], [4, 5, 6], ([a, b]) => a + b)).toEqual([4, 5, 6]);
       expect(combinations([1, 2, 3], [], ([a, b]) => a + b)).toEqual([1, 2, 3]);
       expect(combinations<number>([], [], ([a, b]) => a + b)).toEqual([]);
-    });
-  });
-
-  describe("hasTopLevelTransformingEffect()", () => {
-    test("should return true for transformation", () => {
-      expect(
-        hasTopLevelTransformingEffect(z.object({}).transform(() => [])),
-      ).toBeTruthy();
-    });
-    test("should detect transformation in intersection", () => {
-      expect(
-        hasTopLevelTransformingEffect(
-          z.object({}).and(z.object({}).transform(() => [])),
-        ),
-      ).toBeTruthy();
-    });
-    test("should detect transformation in union", () => {
-      expect(
-        hasTopLevelTransformingEffect(
-          z.object({}).or(z.object({}).transform(() => [])),
-        ),
-      ).toBeTruthy();
-    });
-    test("should return false for object fields using transformations", () => {
-      expect(
-        hasTopLevelTransformingEffect(
-          z.object({ s: z.string().transform(() => 123) }),
-        ),
-      ).toBeFalsy();
-    });
-    test("should return false for refinement", () => {
-      expect(
-        hasTopLevelTransformingEffect(z.object({}).refine(() => true)),
-      ).toBeFalsy();
-    });
-  });
-
-  describe("hasNestedSchema()", () => {
-    const condition = (subject: z.ZodTypeAny) =>
-      isProprietary(subject, ezUploadKind);
-    test("should return true for given argument satisfying condition", () => {
-      expect(hasNestedSchema({ subject: ez.upload(), condition })).toBeTruthy();
-    });
-    test.each([
-      z.object({ test: ez.upload() }),
-      ez.upload().or(z.boolean()),
-      z.object({ test: z.boolean() }).and(z.object({ test2: ez.upload() })),
-      z.optional(ez.upload()),
-      ez.upload().nullable(),
-      ez.upload().default({} as UploadedFile),
-      z.record(ez.upload()),
-      ez.upload().refine(() => true),
-      z.array(ez.upload()),
-    ])("should return true for wrapped needle %#", (subject) => {
-      expect(hasNestedSchema({ subject, condition })).toBeTruthy();
-    });
-    test.each([
-      z.object({}),
-      z.any(),
-      z.literal("test"),
-      z.boolean().and(z.literal(true)),
-      z.number().or(z.string()),
-    ])("should return false in other cases %#", (subject) => {
-      expect(hasNestedSchema({ subject, condition })).toBeFalsy();
     });
   });
 

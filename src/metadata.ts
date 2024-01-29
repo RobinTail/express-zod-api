@@ -45,7 +45,9 @@ export const withMeta = <T extends z.ZodTypeAny>(schema: T): WithMeta<T> => {
 export const hasMeta = <T extends z.ZodTypeAny>(
   schema: T,
 ): schema is WithMeta<T> =>
-  z.object({ [metaProp]: z.object({}) }).safeParse(schema._def).success;
+  metaProp in schema._def &&
+  typeof schema._def[metaProp] === "object" &&
+  schema._def[metaProp] !== null;
 
 export const getMeta = <T extends z.ZodTypeAny, K extends keyof Metadata<T>>(
   schema: T,
