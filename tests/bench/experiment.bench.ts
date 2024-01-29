@@ -1,38 +1,67 @@
+import type { UploadedFile } from "express-fileupload";
 import { bench, describe } from "vitest";
-import { FlatObject } from "../../src";
-import { getCustomHeaders, isCustomHeader } from "../../src/common-helpers";
+import { z } from "zod";
+import { ez } from "../../src";
+import { proprietary } from "../../src/metadata";
+import { bufferSchema } from "../../src/schema-helpers";
+import { ezUploadKind } from "../../src/upload-schema";
 
-describe.skip("Experiment", () => {
-  const originalFn = (request: Request) =>
-    Object.entries(request.headers).reduce<FlatObject>(
-      (agg, [key, value]) =>
-        isCustomHeader(key) ? { ...agg, [key]: value } : agg,
-      {},
+describe("Experiment", () => {
+  const originalFn = () =>
+    proprietary(
+      ezUploadKind,
+      z.custom<UploadedFile>(
+        (subject) =>
+          z
+            .object({
+              name: z.string(),
+              encoding: z.string(),
+              mimetype: z.string(),
+              data: bufferSchema,
+              tempFilePath: z.string(),
+              truncated: z.boolean(),
+              size: z.number(),
+              md5: z.string(),
+              mv: z.function(),
+            })
+            .safeParse(subject).success,
+        (input) => ({
+          message: `Expected file upload, received ${typeof input}`,
+        }),
+      ),
     );
 
   bench(
     "original",
     () => {
-      originalFn({
-        headers: {
-          authorization: "Bearer ***",
-          "x-request-id": "test",
-          "x-another": "header",
-        },
-      } as unknown as Request);
+      originalFn().safeParse({
+        name: "test",
+        encoding: "test",
+        mimetype: "test",
+        data: "test",
+        tempFilePath: "test",
+        truncated: false,
+        size: 100,
+        md5: "test",
+      });
     },
-    { time: 1000 },
+    { time: 5000 },
   );
 
   bench(
     "featured",
     () => {
-      getCustomHeaders({
-        authorization: "Bearer ***",
-        "x-request-id": "test",
-        "x-another": "header",
+      ez.upload().safeParse({
+        name: "test",
+        encoding: "test",
+        mimetype: "test",
+        data: "test",
+        tempFilePath: "test",
+        truncated: false,
+        size: 100,
+        md5: "test",
       });
     },
-    { time: 1000 },
+    { time: 5000 },
   );
 });

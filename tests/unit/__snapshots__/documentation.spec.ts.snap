@@ -343,7 +343,7 @@ paths:
                       num:
                         type: number
                         format: double
-                        minimum: 5e-324
+                        minimum: -1.7976931348623157e+308
                         maximum: 1.7976931348623157e+308
                     required:
                       - num
@@ -567,7 +567,7 @@ paths:
                       whatever:
                         type: number
                         format: double
-                        minimum: 5e-324
+                        minimum: -1.7976931348623157e+308
                         maximum: 1.7976931348623157e+308
                     required:
                       - whatever
@@ -648,7 +648,7 @@ paths:
                       transformation:
                         type: number
                         format: double
-                        minimum: 5e-324
+                        minimum: -1.7976931348623157e+308
                         maximum: 1.7976931348623157e+308
                     required:
                       - literal
@@ -2781,7 +2781,7 @@ paths:
                 double:
                   type: number
                   format: double
-                  minimum: 5e-324
+                  minimum: -1.7976931348623157e+308
                   maximum: 1.7976931348623157e+308
                 doublePositive:
                   type: number
@@ -2791,7 +2791,7 @@ paths:
                 doubleNegative:
                   type: number
                   format: double
-                  minimum: 5e-324
+                  minimum: -1.7976931348623157e+308
                   exclusiveMaximum: 0
                 doubleLimited:
                   type: number
@@ -3649,7 +3649,7 @@ paths:
                 test:
                   type: number
                   format: double
-                  minimum: 5e-324
+                  minimum: -1.7976931348623157e+308
                   maximum: 1.7976931348623157e+308
               required:
                 - test
@@ -4239,7 +4239,7 @@ paths:
                       num:
                         type: number
                         format: double
-                        minimum: 5e-324
+                        minimum: -1.7976931348623157e+308
                         maximum: 1.7976931348623157e+308
                     required:
                       - num

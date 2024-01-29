@@ -4,7 +4,7 @@ import { getMeta } from "./metadata";
 import { ProprietaryKind } from "./proprietary-schemas";
 
 interface VariantDependingProps<U> {
-  regular: { next: SchemaHandler<z.ZodTypeAny, U, {}, "last"> };
+  regular: { next: (schema: z.ZodTypeAny) => U };
   each: { prev: U };
   last: {};
 }
@@ -35,14 +35,14 @@ export type HandlingRules<U, Context extends FlatObject = {}> = Partial<
   >
 >;
 
-export const walkSchema = <U, Context extends FlatObject = {}>({
+/** @since 10.1.1 calling onEach _after_ handler and giving it the previously achieved result */
+export const walkSchema = <U extends object, Context extends FlatObject = {}>({
   schema,
   onEach,
   rules,
   onMissing,
   ...rest
 }: SchemaHandlingProps<z.ZodTypeAny, U, Context, "last"> & {
-  /** @since 10.1.1 calling onEach _after_ handler and giving it the previously achieved result */
   onEach?: SchemaHandler<z.ZodTypeAny, U, Context, "each">;
   rules: HandlingRules<U, Context>;
   onMissing: SchemaHandler<z.ZodTypeAny, U, Context, "last">;
@@ -50,8 +50,8 @@ export const walkSchema = <U, Context extends FlatObject = {}>({
   const kind = getMeta(schema, "kind") || schema._def.typeName;
   const handler = kind ? rules[kind as keyof typeof rules] : undefined;
   const ctx = rest as unknown as Context;
-  const next: SchemaHandler<z.ZodTypeAny, U, {}, "last"> = (params) =>
-    walkSchema({ ...params, ...ctx, onEach, rules, onMissing });
+  const next = (subject: z.ZodTypeAny) =>
+    walkSchema({ schema: subject, ...ctx, onEach, rules, onMissing });
   const result = handler
     ? handler({ schema, ...ctx, next })
     : onMissing({ schema, ...ctx });
