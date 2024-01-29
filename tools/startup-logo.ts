@@ -8,6 +8,7 @@ import {
 } from "../src/integration-helpers";
 import { printNode } from "../src/zts-helpers";
 import { format } from "prettier";
+import { brotliCompressSync } from "node:zlib";
 
 const proud = chalk.italic(
   "Proudly supports transgender community.".padStart(109),
@@ -48,14 +49,62 @@ ${thanks}
   .map((line, index) => (colors[index] ? colors[index](line) : line))
   .join("\n");
 
-const program = f.createVariableStatement(
-  exportModifier,
-  makeConst(
-    f.createIdentifier("getStartupLogo"),
-    makeArrowFn([], f.createNoSubstitutionTemplateLiteral(logo)),
+const program = [
+  f.createImportDeclaration(
+    undefined,
+    f.createImportClause(
+      false,
+      undefined,
+      f.createNamedImports([
+        f.createImportSpecifier(
+          false,
+          undefined,
+          f.createIdentifier("brotliDecompressSync"),
+        ),
+      ]),
+    ),
+    f.createStringLiteral("node:zlib"),
   ),
-);
+  f.createVariableStatement(
+    exportModifier,
+    makeConst(
+      f.createIdentifier("getStartupLogo"),
+      makeArrowFn(
+        [],
+        f.createCallExpression(
+          f.createPropertyAccessExpression(
+            f.createCallExpression(
+              f.createIdentifier("brotliDecompressSync"),
+              undefined,
+              [
+                f.createCallExpression(
+                  f.createPropertyAccessExpression(
+                    f.createIdentifier("Buffer"),
+                    f.createIdentifier("from"),
+                  ),
+                  undefined,
+                  [
+                    f.createNoSubstitutionTemplateLiteral(
+                      brotliCompressSync(logo).toString("base64"),
+                    ),
+                    f.createStringLiteral("base64"),
+                  ],
+                ),
+              ],
+            ),
+            f.createIdentifier("toString"),
+          ),
+          undefined,
+          [],
+        ),
+      ),
+    ),
+  ),
+];
 
 const filepath = "./src/startup-logo.ts";
-const formatted = await format(printNode(program), { filepath });
+const formatted = await format(
+  program.map((node) => printNode(node)).join("\n\n"),
+  { filepath },
+);
 await writeFile(filepath, formatted);
