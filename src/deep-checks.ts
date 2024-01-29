@@ -83,7 +83,7 @@ export const hasNestedSchema = ({
   return false;
 };
 
-export const hasTranformationOnTop = (subject: IOSchema): boolean =>
+export const hasTransformationOnTop = (subject: IOSchema): boolean =>
   hasNestedSchema({
     subject,
     maxDepth: 3,

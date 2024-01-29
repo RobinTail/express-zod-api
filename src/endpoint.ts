@@ -6,7 +6,7 @@ import {
   defaultStatusCodes,
   normalizeApiResponse,
 } from "./api-response";
-import { hasRaw, hasTranformationOnTop, hasUpload } from "./checks";
+import { hasRaw, hasTransformationOnTop, hasUpload } from "./deep-checks";
 import {
   FlatObject,
   getActualMethod,
@@ -120,7 +120,7 @@ export class Endpoint<
     this.#schemas = { input: inputSchema, output: outputSchema };
     for (const [variant, schema] of Object.entries(this.#schemas)) {
       assert(
-        !hasTranformationOnTop(schema),
+        !hasTransformationOnTop(schema),
         new IOSchemaError(
           `Using transformations on the top level of endpoint ${variant} schema is not allowed.`,
         ),

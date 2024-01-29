@@ -1,7 +1,7 @@
 import { bench, describe } from "vitest";
 import { z } from "zod";
 import { ez } from "../../src";
-import { hasNestedSchema } from "../../src/checks";
+import { hasNestedSchema } from "../../src/deep-checks";
 import { isProprietary } from "../../src/metadata";
 import { ezUploadKind } from "../../src/upload-schema";
 
