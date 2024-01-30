@@ -6,7 +6,7 @@ import { proprietary } from "../../src/metadata";
 import { bufferSchema } from "../../src/schema-helpers";
 import { ezUploadKind } from "../../src/upload-schema";
 
-describe("Experiment", () => {
+describe.skip("Experiment", () => {
   const originalFn = () =>
     proprietary(
       ezUploadKind,

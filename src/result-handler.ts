@@ -10,6 +10,7 @@ import {
   getExamples,
   getMessageFromError,
   getStatusCodeFromError,
+  isObject,
   logInternalError,
 } from "./common-helpers";
 import { IOSchema } from "./io-schema";
@@ -132,10 +133,7 @@ export const arrayResultHandler = createResultHandler({
     );
     return examples.reduce<typeof responseSchema>(
       (acc, example) =>
-        typeof example === "object" &&
-        example !== null &&
-        "items" in example &&
-        Array.isArray(example.items)
+        isObject(example) && "items" in example && Array.isArray(example.items)
           ? acc.example(example.items)
           : acc,
       responseSchema,
