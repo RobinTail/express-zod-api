@@ -185,3 +185,5 @@ export const tryToTransform = <T>(
     return undefined;
   }
 };
+export const isActualObject = (subject: unknown): subject is object =>
+  typeof subject === "object" && subject !== null && !Array.isArray(subject);
