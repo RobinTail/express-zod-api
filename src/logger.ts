@@ -2,6 +2,7 @@ import { inspect } from "node:util";
 import type { Format, TransformableInfo } from "logform";
 import type Winston from "winston";
 import type Transport from "winston-transport";
+import { isObject } from "./common-helpers";
 
 /**
  * @desc Using module augmentation approach you can set the type of the actual logger used
@@ -25,8 +26,7 @@ export interface SimplifiedWinstonConfig {
 export const isSimplifiedWinstonConfig = (
   subject: unknown,
 ): subject is SimplifiedWinstonConfig =>
-  typeof subject === "object" &&
-  subject !== null &&
+  isObject(subject) &&
   "level" in subject &&
   ("color" in subject ? typeof subject.color === "boolean" : true) &&
   typeof subject.level === "string" &&
