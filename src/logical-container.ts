@@ -1,5 +1,5 @@
 import { chain } from "ramda";
-import { combinations } from "./common-helpers";
+import { combinations, isObject } from "./common-helpers";
 
 type LogicalOr<T> = { or: T[] };
 type LogicalAnd<T> = { and: T[] };
@@ -8,9 +8,6 @@ export type LogicalContainer<T> =
   | LogicalOr<T | LogicalAnd<T>>
   | LogicalAnd<T | LogicalOr<T>>
   | T;
-
-const isObject = (subject: unknown): subject is object =>
-  typeof subject === "object" && subject !== null;
 
 const isLogicalOr = (subject: unknown): subject is LogicalOr<unknown> =>
   isObject(subject) && "or" in subject;

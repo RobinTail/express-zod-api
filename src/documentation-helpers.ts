@@ -15,6 +15,8 @@ import {
   isReferenceObject,
 } from "openapi3-ts/oas31";
 import {
+  both,
+  complement,
   concat,
   filter,
   fromPairs,
@@ -42,6 +44,7 @@ import {
   getExamples,
   hasCoercion,
   isCustomHeader,
+  isObject,
   makeCleanId,
   tryToTransform,
   ucFirst,
@@ -617,7 +620,7 @@ export const depictExamples = (
 ): ExamplesObject | undefined =>
   pipe(
     getExamples,
-    map(when((subj) => z.object({}).safeParse(subj).success, omit(omitProps))),
+    map(when(both(isObject, complement(Array.isArray)), omit(omitProps))),
     enumerateExamples,
   )({ schema, variant: isResponse ? "parsed" : "original", validate: true });
 

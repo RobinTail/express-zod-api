@@ -185,3 +185,7 @@ export const tryToTransform = <T>(
     return undefined;
   }
 };
+
+/** @desc can still be an array, use R.complement(Array.isArray) to exclude that case */
+export const isObject = (subject: unknown): subject is object =>
+  typeof subject === "object" && subject !== null;
