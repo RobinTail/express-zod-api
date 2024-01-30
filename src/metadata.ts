@@ -1,4 +1,4 @@
-import { combinations, isActualObject } from "./common-helpers";
+import { combinations, isObject } from "./common-helpers";
 import { z } from "zod";
 import { clone, mergeDeepRight } from "ramda";
 import { ProprietaryKind } from "./proprietary-schemas";
@@ -45,7 +45,7 @@ export const withMeta = <T extends z.ZodTypeAny>(schema: T): WithMeta<T> => {
 export const hasMeta = <T extends z.ZodTypeAny>(
   schema: T,
 ): schema is WithMeta<T> =>
-  metaProp in schema._def && isActualObject(schema._def[metaProp]);
+  metaProp in schema._def && isObject(schema._def[metaProp]);
 
 export const getMeta = <T extends z.ZodTypeAny, K extends keyof Metadata<T>>(
   schema: T,
