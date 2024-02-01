@@ -3,8 +3,8 @@ import { ez } from "../../src";
 import { taggedEndpointsFactory } from "../factories";
 
 export const rawAcceptingEndpoint = taggedEndpointsFactory.build({
-  method: "post",
-  tag: "files",
+  methods: "post",
+  tags: "files",
   input: ez
     .raw() // requires to enable rawParser option in server config
     .extend({}), // additional inputs, route params for example, if needed

@@ -5,8 +5,8 @@ import { statusDependingFactory } from "../factories";
 
 /** @desc depending on the thrown error, the custom result handler of the factory responds slightly differently */
 export const createUserEndpoint = statusDependingFactory.build({
-  method: "post",
-  tag: "users",
+  methods: "post",
+  tags: "users",
   input: z.object({
     name: z.string().min(1),
   }),

@@ -4,8 +4,8 @@ import { createHash } from "node:crypto";
 import { taggedEndpointsFactory } from "../factories";
 
 export const uploadAvatarEndpoint = taggedEndpointsFactory.build({
-  method: "post",
-  tag: "files",
+  methods: "post",
+  tags: "files",
   description: "Handles a file upload.",
   input: z
     .object({

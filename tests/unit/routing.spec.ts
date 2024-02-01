@@ -200,13 +200,13 @@ describe("Routing", () => {
       const input = z.object({});
       const output = z.object({});
       const getEndpoint = factory.build({
-        method: "get",
+        methods: "get",
         input,
         output,
         handler,
       });
       const postEndpoint = factory.build({
-        method: "post",
+        methods: "post",
         input,
         output,
         handler,
@@ -410,7 +410,7 @@ describe("Routing", () => {
       };
       const handlerMock = vi.fn();
       const endpoint = defaultEndpointsFactory.build({
-        method: "get",
+        methods: "get",
         input: z.object({}),
         output: z.object({}),
         handler: handlerMock,

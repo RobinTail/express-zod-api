@@ -284,7 +284,7 @@ describe("EndpointsFactory", () => {
       );
       const handlerMock = vi.fn();
       const endpoint = factory.build({
-        method: "get",
+        methods: "get",
         input: z.object({
           s: z.string(),
         }),
@@ -330,7 +330,7 @@ describe("EndpointsFactory", () => {
         middleware,
       );
       const endpoint = factory.build({
-        method: "get",
+        methods: "get",
         input: z.object({
           i: z.string(),
         }),

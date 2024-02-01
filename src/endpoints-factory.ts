@@ -36,9 +36,10 @@ type BuildProps<
   description?: string;
   shortDescription?: string;
   operationId?: string | ((method: Method) => string);
-} & ({ method: Method } | { methods: Method[] }) &
-  ({ scopes?: SCO[] } | { scope?: SCO }) &
-  ({ tags?: TAG[] } | { tag?: TAG });
+  methods: Method | Method[];
+  scopes?: SCO | SCO[];
+  tags?: TAG | TAG[];
+};
 
 export class EndpointsFactory<
   IN extends IOSchema<"strip"> | null = null,
@@ -145,7 +146,9 @@ export class EndpointsFactory<
     description,
     shortDescription,
     operationId,
-    ...rest
+    methods,
+    scopes,
+    tags,
   }: BuildProps<BIN, BOUT, IN, OUT, SCO, TAG>): Endpoint<
     ProbableIntersection<IN, BIN>,
     BOUT,
@@ -154,25 +157,16 @@ export class EndpointsFactory<
     TAG
   > {
     const { middlewares, resultHandler } = this;
-    const methods = "methods" in rest ? rest.methods : [rest.method];
     const getOperationId =
       typeof operationId === "function" ? operationId : () => operationId;
-    const scopes =
-      "scopes" in rest
-        ? rest.scopes
-        : "scope" in rest && rest.scope
-          ? [rest.scope]
-          : [];
-    const tags =
-      "tags" in rest ? rest.tags : "tag" in rest && rest.tag ? [rest.tag] : [];
     return new Endpoint({
       handler,
       middlewares,
       outputSchema,
       resultHandler,
-      scopes,
-      tags,
-      methods,
+      scopes: scopes ? (Array.isArray(scopes) ? scopes : [scopes]) : [],
+      tags: tags ? (Array.isArray(tags) ? tags : [tags]) : [],
+      methods: Array.isArray(methods) ? methods : [methods],
       getOperationId,
       description,
       shortDescription,

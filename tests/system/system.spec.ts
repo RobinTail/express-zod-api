@@ -28,7 +28,7 @@ describe("App", async () => {
           },
         )
         .build({
-          method: "get",
+          methods: "get",
           input: z.object({}),
           output: z.object({ corsDone: z.boolean() }),
           handler: async ({ options }) => ({
@@ -59,7 +59,7 @@ describe("App", async () => {
           }),
         )
         .build({
-          method: "get",
+          methods: "get",
           input: z.object({
             epError: z
               .any()

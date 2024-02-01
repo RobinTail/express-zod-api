@@ -127,7 +127,7 @@ describe("Endpoint", () => {
     test("should close the stream on OPTIONS request", async () => {
       const handlerMock = vi.fn();
       const endpoint = defaultEndpointsFactory.build({
-        method: "get",
+        methods: "get",
         input: z.object({}),
         output: z.object({}),
         handler: handlerMock,
@@ -172,7 +172,7 @@ describe("Endpoint", () => {
   describe("#parseOutput", () => {
     test("Should throw on output validation failure", async () => {
       const endpoint = defaultEndpointsFactory.build({
-        method: "post",
+        methods: "post",
         input: z.object({}),
         output: z.object({ email: z.string().email() }),
         handler: async () => ({ email: "not email" }),
@@ -190,7 +190,7 @@ describe("Endpoint", () => {
     test("Should throw on output parsing non-Zod error", async () => {
       const factory = new EndpointsFactory(defaultResultHandler);
       const endpoint = factory.build({
-        method: "post",
+        methods: "post",
         input: z.object({}),
         output: z.object({
           test: z.number().transform(() => assert.fail("Something unexpected")),
@@ -230,7 +230,7 @@ describe("Endpoint", () => {
       );
       const handlerMock = vi.fn();
       const endpoint = factory.build({
-        method: "post",
+        methods: "post",
         input: z.object({}),
         output: z.object({}),
         handler: handlerMock,
@@ -267,7 +267,7 @@ describe("Endpoint", () => {
         }),
       );
       const endpoint = factory.build({
-        method: "get",
+        methods: "get",
         input: z.object({}),
         output: z.object({
           test: z.string(),
@@ -301,7 +301,7 @@ describe("Endpoint", () => {
           something: z.number(),
         });
         const endpoint = factory.build({
-          method: "get",
+          methods: "get",
           input,
           output,
           handler: vi.fn(),
@@ -317,7 +317,7 @@ describe("Endpoint", () => {
       (variant) => {
         const factory = new EndpointsFactory(defaultResultHandler);
         const endpoint = factory.build({
-          method: "get",
+          methods: "get",
           input: z.object({}),
           output: z.object({ something: z.number() }),
           handler: vi.fn(),
@@ -335,7 +335,7 @@ describe("Endpoint", () => {
       (variant) => {
         const factory = new EndpointsFactory(defaultResultHandler);
         const endpoint = factory.build({
-          method: "get",
+          methods: "get",
           input: z.object({}),
           output: z.object({ something: z.number() }),
           handler: vi.fn(),
@@ -439,7 +439,7 @@ describe("Endpoint", () => {
     test("thrown in #parseOutput()", async () => {
       const factory = new EndpointsFactory(defaultResultHandler);
       const endpoint = factory.build({
-        method: "post",
+        methods: "post",
         input: z.object({}),
         output: z.object({
           test: z.number().transform(() => assert.fail("Something unexpected")),
@@ -468,7 +468,7 @@ describe("Endpoint", () => {
         }),
       );
       const endpoint = factory.build({
-        method: "get",
+        methods: "get",
         input: z.object({}),
         output: z.object({
           test: z.string(),
@@ -520,7 +520,7 @@ describe("Endpoint", () => {
 
   describe("Issue #654: Top level refinements", () => {
     const endpoint = defaultEndpointsFactory.build({
-      method: "post",
+      methods: "post",
       input: z
         .object({
           type: z.union([z.literal("type1"), z.literal("type2")]),
@@ -616,7 +616,7 @@ describe("Endpoint", () => {
 
   describe("Feature #600: Top level refinements", () => {
     const endpoint = defaultEndpointsFactory.build({
-      method: "post",
+      methods: "post",
       input: z
         .object({
           email: z.string().email().optional(),
@@ -761,7 +761,7 @@ describe("Endpoint", () => {
       const endpoint = defaultEndpointsFactory
         .addMiddleware(dateInputMiddleware)
         .build({
-          method: "get",
+          methods: "get",
           input: z.object({}),
           output: z.object({}),
           handler: async ({ input: { middleware_date_input }, logger }) => {

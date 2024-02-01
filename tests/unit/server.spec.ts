@@ -146,7 +146,7 @@ describe("Server", () => {
       const routingMock = {
         v1: {
           test: new EndpointsFactory(defaultResultHandler).build({
-            method: "get",
+            methods: "get",
             input: z.object({}),
             output: z.object({}),
             handler: vi.fn(),
@@ -180,7 +180,7 @@ describe("Server", () => {
       const routingMock = {
         v1: {
           test: new EndpointsFactory(defaultResultHandler).build({
-            method: "get",
+            methods: "get",
             input: z.object({}),
             output: z.object({}),
             handler: vi.fn(),
@@ -206,7 +206,7 @@ describe("Server", () => {
       const routingMock = {
         v1: {
           test: new EndpointsFactory(defaultResultHandler).build({
-            method: "get",
+            methods: "get",
             input: z.object({}),
             output: z.object({}),
             handler: vi.fn(),
@@ -236,7 +236,7 @@ describe("Server", () => {
       const routingMock = {
         v1: {
           test: new EndpointsFactory(defaultResultHandler).build({
-            method: "get",
+            methods: "get",
             input: z.object({}),
             output: z.object({}),
             handler: vi.fn(),

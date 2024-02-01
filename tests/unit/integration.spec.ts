@@ -22,7 +22,7 @@ describe("Integration", () => {
       routing: {
         v1: {
           "test-with-dashes": defaultEndpointsFactory.build({
-            method: "post",
+            methods: "post",
             input: z.object({
               opt: z.string().optional(),
             }),
@@ -45,7 +45,7 @@ describe("Integration", () => {
         routing: {
           v1: {
             "test-with-dashes": defaultEndpointsFactory.build({
-              method: "post",
+              methods: "post",
               input: z.object({
                 opt: z.string().optional(),
               }),
@@ -67,7 +67,7 @@ describe("Integration", () => {
       routing: {
         v1: {
           test: defaultEndpointsFactory.build({
-            method: "post",
+            methods: "post",
             input: z.object({
               opt: z.string().optional(),
             }),
@@ -108,7 +108,7 @@ describe("Integration", () => {
       routing: {
         v1: {
           mtpl: factory.build({
-            method: "post",
+            methods: "post",
             input: z.object({ test: z.number() }),
             output: z.object({ payload: z.string() }),
             handler: async () => ({ payload: "test" }),

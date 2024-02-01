@@ -16,7 +16,7 @@ describe("DependsOnMethod", () => {
   test("should accept an endpoint with a corresponding method", () => {
     const instance = new DependsOnMethod({
       post: new EndpointsFactory(defaultResultHandler).build({
-        method: "post",
+        methods: "post",
         input: z.object({}),
         output: z.object({}),
         handler: async () => ({}),

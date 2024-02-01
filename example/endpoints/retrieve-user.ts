@@ -18,8 +18,8 @@ const feature: z.ZodType<Feature> = baseFeature.extend({
 export const retrieveUserEndpoint = taggedEndpointsFactory
   .addMiddleware(methodProviderMiddleware)
   .build({
-    method: "get",
-    tag: "users",
+    methods: "get",
+    tags: "users",
     shortDescription: "Retrieves the user.",
     description: "Example user retrieval endpoint.",
     input: z.object({
