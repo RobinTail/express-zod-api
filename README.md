@@ -178,7 +178,7 @@ The endpoint responds with "Hello, World" or "Hello, {name}" if the name is supp
 import { z } from "zod";
 
 const helloWorldEndpoint = defaultEndpointsFactory.build({
-  method: "get", // or methods: ["get", "post", ...]
+  methods: "get", // or array: ["get", "post", ...]
   input: z.object({
     // for empty input use z.object({})
     name: z.string().optional(),
@@ -380,7 +380,7 @@ arrays of numbers.
 import { z } from "zod";
 
 const getUserEndpoint = endpointsFactory.build({
-  method: "get",
+  methods: "get",
   input: z.object({
     id: z.string().transform((id) => parseInt(id, 10)),
     ids: z
@@ -429,7 +429,7 @@ import { z } from "zod";
 import { ez, defaultEndpointsFactory } from "express-zod-api";
 
 const updateUserEndpoint = defaultEndpointsFactory.build({
-  method: "post",
+  methods: "post",
   input: z.object({
     userId: z.string(),
     birthday: ez.dateIn(), // string -> Date
@@ -614,7 +614,7 @@ You then need to specify these parameters in the endpoint input schema in the us
 
 ```typescript
 const getUserEndpoint = endpointsFactory.build({
-  method: "get",
+  methods: "get",
   input: z.object({
     // id is the route path param, always string
     id: z.string().transform((value) => parseInt(value, 10)),
@@ -689,7 +689,7 @@ import {
 export const yourResultHandler = createResultHandler({
   getPositiveResponse: (output: IOSchema) => ({
     schema: z.object({ data: output }),
-    mimeType: "application/json", // optinal, or mimeTypes for array
+    mimeTypes: "application/json", // optinal, or array
   }),
   getNegativeResponse: () => z.object({ error: z.string() }),
   handler: ({ error, input, output, request, response, logger }) => {
@@ -734,9 +734,12 @@ const fileStreamingEndpointsFactory = new EndpointsFactory(
   createResultHandler({
     getPositiveResponse: () => ({
       schema: ez.file("buffer"),
-      mimeType: "image/*",
+      mimeTypes: "image/*",
     }),
-    getNegativeResponse: () => ({ schema: z.string(), mimeType: "text/plain" }),
+    getNegativeResponse: () => ({
+      schema: z.string(),
+      mimeTypes: "text/plain",
+    }),
     handler: ({ response, error, output }) => {
       if (error) {
         response.status(400).send(error.message);
@@ -779,7 +782,7 @@ import { z } from "zod";
 import { ez, defaultEndpointsFactory } from "express-zod-api";
 
 const fileUploadEndpoint = defaultEndpointsFactory.build({
-  method: "post",
+  methods: "post",
   input: z.object({
     avatar: ez.upload(), // <--
   }),
@@ -860,7 +863,7 @@ createResultHandler({
   }),
   getNegativeResponse: () => [
     {
-      statusCode: 409, // conflict: entity already exists
+      statusCodes: 409, // conflict: entity already exists
       schema: z.object({ status: z.literal("exists"), id: z.number().int() }),
     },
     {
@@ -903,7 +906,7 @@ createConfig({
 });
 
 defaultEndpointsFactory.build({
-  method: "get",
+  methods: "get",
   input: z.object({
     "x-request-id": z.string(), // this one is from request.headers
     id: z.string(), // this one is from request.query
@@ -930,7 +933,7 @@ const config = createConfig({
 });
 
 const rawAcceptingEndpoint = defaultEndpointsFactory.build({
-  method: "post",
+  methods: "post",
   input: ez
     .raw() // accepts the featured { raw: Buffer }
     .extend({}), // for additional inputs, like route params, if needed
@@ -1060,7 +1063,7 @@ const taggedEndpointsFactory = new EndpointsFactory({
 
 const exampleEndpoint = taggedEndpointsFactory.build({
   // ...
-  tag: "users", // or tags: ["users", "files"]
+  tags: "users", // or array: ["users", "files"]
 });
 ```
 
