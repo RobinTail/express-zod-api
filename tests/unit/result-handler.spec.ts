@@ -178,12 +178,12 @@ describe("ResultHandler", () => {
   test("createResultHandler() should support multiple response schemas depending on status codes", () => {
     const subject = createResultHandler({
       getPositiveResponse: () => [
-        { statusCode: 200, schema: z.literal("ok") },
-        { statusCode: 201, schema: z.literal("kinda") },
+        { statusCodes: 200, schema: z.literal("ok") },
+        { statusCodes: 201, schema: z.literal("kinda") },
       ],
       getNegativeResponse: () => [
-        { statusCode: 400, schema: z.literal("error") },
-        { statusCode: 500, schema: z.literal("failure") },
+        { statusCodes: 400, schema: z.literal("error") },
+        { statusCodes: 500, schema: z.literal("failure") },
       ],
       handler: ({ response }) => {
         response.status(200).send("error");

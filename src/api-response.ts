@@ -14,6 +14,10 @@ export interface ApiResponse<S extends z.ZodTypeAny> {
   statusCodes?: number | [number, ...number[]];
   /** @default "application/json" */
   mimeTypes?: string | [string, ...string[]];
+  /** @deprecated use statusCodes instead */
+  statusCode?: never;
+  /** @deprecated use mimeTypes instead */
+  mimeType?: never;
 }
 
 export interface NormalizedResponse {

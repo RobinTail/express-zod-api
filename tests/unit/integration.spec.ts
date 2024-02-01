@@ -87,17 +87,17 @@ describe("Integration", () => {
       createResultHandler({
         getPositiveResponse: (output) => [
           {
-            statusCode: 200,
+            statusCodes: 200,
             schema: z.object({ status: z.literal("ok"), data: output }),
           },
           {
-            statusCode: 201,
+            statusCodes: 201,
             schema: z.object({ status: z.literal("kinda"), data: output }),
           },
         ],
         getNegativeResponse: () => [
-          { statusCode: 400, schema: z.literal("error") },
-          { statusCode: 500, schema: z.literal("failure") },
+          { statusCodes: 400, schema: z.literal("error") },
+          { statusCodes: 500, schema: z.literal("failure") },
         ],
         handler: vi.fn(),
       }),
