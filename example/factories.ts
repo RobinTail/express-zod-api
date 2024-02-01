@@ -27,11 +27,11 @@ export const fileSendingEndpointsFactory = new EndpointsFactory({
   resultHandler: createResultHandler({
     getPositiveResponse: () => ({
       schema: z.string(),
-      mimeType: "image/svg+xml",
+      mimeTypes: "image/svg+xml",
     }),
     getNegativeResponse: () => ({
       schema: z.string(),
-      mimeType: "text/plain",
+      mimeTypes: "text/plain",
     }),
     handler: ({ response, error, output }) => {
       if (error) {
@@ -53,11 +53,11 @@ export const fileStreamingEndpointsFactory = new EndpointsFactory({
   resultHandler: createResultHandler({
     getPositiveResponse: () => ({
       schema: ez.file("buffer"),
-      mimeType: "image/*",
+      mimeTypes: "image/*",
     }),
     getNegativeResponse: () => ({
       schema: z.string(),
-      mimeType: "text/plain",
+      mimeTypes: "text/plain",
     }),
     handler: ({ response, error, output }) => {
       if (error) {
@@ -97,7 +97,7 @@ export const statusDependingFactory = new EndpointsFactory({
     }),
     getNegativeResponse: () => [
       {
-        statusCode: 409,
+        statusCodes: 409,
         schema: z.object({ status: z.literal("exists"), id: z.number().int() }),
       },
       {

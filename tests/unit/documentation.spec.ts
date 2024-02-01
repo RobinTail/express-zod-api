@@ -793,12 +793,12 @@ describe("Documentation", () => {
         getPositiveResponse: (output) => ({
           schema: z.object({ status: z.literal("OK"), result: output }),
           mimeTypes: [mimeJson, "text/vnd.yaml"],
-          statusCode: 201,
+          statusCodes: 201,
         }),
         getNegativeResponse: () => ({
           schema: z.object({ status: z.literal("NOT OK") }),
-          mimeType: "text/vnd.yaml",
-          statusCode: 403,
+          mimeTypes: "text/vnd.yaml",
+          statusCodes: 403,
         }),
         handler: () => {},
       });
@@ -1014,17 +1014,17 @@ describe("Documentation", () => {
         createResultHandler({
           getPositiveResponse: (output) => [
             {
-              statusCode: 200,
+              statusCodes: 200,
               schema: z.object({ status: z.literal("ok"), data: output }),
             },
             {
-              statusCode: 201,
+              statusCodes: 201,
               schema: z.object({ status: z.literal("kinda"), data: output }),
             },
           ],
           getNegativeResponse: () => [
-            { statusCode: 400, schema: z.literal("error") },
-            { statusCode: 500, schema: z.literal("failure") },
+            { statusCodes: 400, schema: z.literal("error") },
+            { statusCodes: 500, schema: z.literal("failure") },
           ],
           handler: vi.fn(),
         }),
