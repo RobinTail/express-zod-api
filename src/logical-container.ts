@@ -63,9 +63,6 @@ export const combineContainers = <T>(
   right: LogicalContainer<T>,
 ): LogicalContainer<T> => {
   if (isLogicalAnd(left)) {
-    if (isLogicalAnd(right)) {
-      return flattenAnds([left, right]);
-    }
     if (isLogicalOr(right)) {
       return combineContainers(andToOr(left), right);
     }

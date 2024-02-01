@@ -59,9 +59,8 @@ export const hasNestedSchema = ({
   maxDepth?: number;
   depth?: number;
 }): boolean => {
-  const early = condition(subject);
-  if (early) {
-    return early;
+  if (condition(subject)) {
+    return true;
   }
   const handler =
     depth < maxDepth
