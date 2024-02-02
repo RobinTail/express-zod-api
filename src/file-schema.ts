@@ -1,8 +1,14 @@
 import { z } from "zod";
 import { proprietary } from "./metadata";
-import { base64Regex, bufferSchema } from "./schema-helpers";
 
 export const ezFileKind = "File";
+
+const bufferSchema = z.custom<Buffer>((subject) => Buffer.isBuffer(subject), {
+  message: "Expected Buffer",
+});
+
+const base64Regex =
+  /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/;
 
 const variants = {
   buffer: () => proprietary(ezFileKind, bufferSchema),

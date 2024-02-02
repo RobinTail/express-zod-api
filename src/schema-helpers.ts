@@ -1,16 +1,4 @@
-import { z } from "zod";
-
 export const isValidDate = (date: Date): boolean => !isNaN(date.getTime());
-
-/** @todo move to file schema in v17 */
-export const bufferSchema = z.custom<Buffer>(
-  (subject) => Buffer.isBuffer(subject),
-  { message: "Expected Buffer" },
-);
-
-/** @todo move to file schema in v17 */
-export const base64Regex =
-  /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/;
 
 /**
  * @example 2021-01-01T00:00:00.000Z
