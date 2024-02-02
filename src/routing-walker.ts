@@ -12,6 +12,7 @@ export interface RoutingWalkerParams {
     endpoint: AbstractEndpoint,
     path: string,
     method: Method | AuxMethod,
+    siblingMethods?: Method[],
   ) => void;
   onStatic?: (path: string, handler: StaticHandler) => void;
   parentPath?: string;
@@ -57,13 +58,10 @@ export const walkRouting = ({
         );
         onEndpoint(endpoint, path, method as Method);
       });
-      if (hasCors && Object.keys(element.endpoints).length > 0) {
-        const [firstMethod, ...siblingMethods] = Object.keys(
-          element.endpoints,
-        ) as Method[];
-        const firstEndpoint = element.endpoints[firstMethod]!;
-        firstEndpoint._setSiblingMethods(siblingMethods);
-        onEndpoint(firstEndpoint, path, "options");
+      if (hasCors && Object.keys(element.endpoints).length) {
+        const [firstMethod, ...siblingMethods] = Object.keys(element.endpoints);
+        const firstEndpoint = element.endpoints[firstMethod as Method]!;
+        onEndpoint(firstEndpoint, path, "options", siblingMethods as Method[]);
       }
     } else {
       walkRouting({
