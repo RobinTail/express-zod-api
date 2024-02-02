@@ -30,12 +30,18 @@ describe("ez.dateIn()", () => {
       }
     });
 
-    test("should accept valid date string", () => {
+    test.each([
+      "2022-12-31T00:00:00.000Z",
+      "2022-12-31T00:00:00.0Z",
+      "2022-12-31T00:00:00Z",
+      "2022-12-31T00:00:00",
+      "2022-12-31",
+    ])("should accept valid date string", (subject) => {
       const schema = ez.dateIn();
-      const result = schema.safeParse("2022-12-31");
+      const result = schema.safeParse(subject);
       expect(result).toEqual({
         success: true,
-        data: new Date("2022-12-31"),
+        data: new Date(subject),
       });
     });
 
