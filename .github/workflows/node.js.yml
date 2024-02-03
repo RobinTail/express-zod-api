@@ -53,7 +53,7 @@ jobs:
     - name: ESM test
       run: yarn test:esm
     - name: Check Jest 30 compatibility
-      uses: madhead/semver-utils@latest
+      uses: madhead/semver-utils@v4
       id: jest30compat
       with:
         version: ${{ matrix.node-version }}
