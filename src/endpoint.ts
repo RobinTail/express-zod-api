@@ -47,6 +47,7 @@ export abstract class AbstractEndpoint {
     response: Response;
     logger: AbstractLogger;
     config: CommonConfig;
+    siblingMethods?: Method[];
   }): Promise<void>;
   public abstract getDescription(
     variant: DescriptionVariant,
@@ -59,7 +60,6 @@ export abstract class AbstractEndpoint {
   public abstract getSecurity(): LogicalContainer<Security>;
   public abstract getScopes(): string[];
   public abstract getTags(): string[];
-  public abstract _setSiblingMethods(methods: Method[]): void;
   public abstract getOperationId(method: Method): string | undefined;
 }
 
@@ -81,7 +81,6 @@ export class Endpoint<
   readonly #scopes: SCO[];
   readonly #tags: TAG[];
   readonly #getOperationId: (method: Method) => string | undefined;
-  #siblingMethods: Method[] = [];
 
   constructor({
     methods,
@@ -155,14 +154,6 @@ export class Endpoint<
     };
   }
 
-  /**
-   * @desc Sets the other methods supported by the same path. Used by Routing in DependsOnMethod case, for options.
-   * @deprecated This method is for internal needs of the library, please avoid using it.
-   * */
-  public override _setSiblingMethods(methods: Method[]): void {
-    this.#siblingMethods = methods;
-  }
-
   public override getDescription(variant: DescriptionVariant) {
     return this.#descriptions[variant];
   }
@@ -211,9 +202,9 @@ export class Endpoint<
     return this.#getOperationId(method);
   }
 
-  #getDefaultCorsHeaders(): Record<string, string> {
+  #getDefaultCorsHeaders(siblingMethods: Method[]): Record<string, string> {
     const accessMethods = (this.#methods as Array<Method | AuxMethod>)
-      .concat(this.#siblingMethods)
+      .concat(siblingMethods)
       .concat("options")
       .join(", ")
       .toUpperCase();
@@ -350,17 +341,19 @@ export class Endpoint<
     response,
     logger,
     config,
+    siblingMethods = [],
   }: {
     request: Request;
     response: Response;
     logger: AbstractLogger;
     config: CommonConfig;
+    siblingMethods?: Method[];
   }) {
     const method = getActualMethod(request);
     let output: FlatObject | null = null;
     let error: Error | null = null;
     if (config.cors) {
-      let headers = this.#getDefaultCorsHeaders();
+      let headers = this.#getDefaultCorsHeaders(siblingMethods);
       if (typeof config.cors === "function") {
         headers = await config.cors({
           request,
