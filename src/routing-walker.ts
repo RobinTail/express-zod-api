@@ -26,9 +26,10 @@ export const walkRouting = ({
   parentPath,
   hasCors,
 }: RoutingWalkerParams) => {
-  for (const [segment, element] of Object.entries(routing).map(
+  const pairs = Object.entries(routing).map(
     ([key, value]) => [key.trim(), value] as const,
-  )) {
+  );
+  for (const [segment, element] of pairs) {
     assert.doesNotMatch(
       segment,
       /\//,
