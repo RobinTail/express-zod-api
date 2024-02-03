@@ -1,4 +1,4 @@
-import { head, isNil, tail, toPairs } from "ramda";
+import { head, tail, toPairs } from "ramda";
 import { AbstractEndpoint } from "./endpoint";
 import { Method } from "./method";
 
@@ -15,8 +15,8 @@ export class DependsOnMethod {
     public readonly endpoints: Partial<Record<Method, AbstractEndpoint>>,
   ) {
     this.pairs = toPairs(endpoints).filter(
-      (entry): entry is [Method, AbstractEndpoint] =>
-        !isNil(entry) && !isNil(entry[1]),
+      (pair): pair is [Method, AbstractEndpoint] =>
+        pair !== undefined && pair[1] !== undefined,
     );
     this.firstEndpoint = head(this.pairs)?.[1];
     this.siblingMethods = tail(this.pairs).map(([method]) => method);
