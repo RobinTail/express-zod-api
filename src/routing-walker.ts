@@ -49,7 +49,7 @@ export const walkRouting = ({
         element.apply(path, onStatic);
       }
     } else if (element instanceof DependsOnMethod) {
-      element.pairs.forEach(([method, endpoint]) => {
+      for (const [method, endpoint] of element.pairs) {
         assert(
           endpoint.getMethods().includes(method),
           new RoutingError(
@@ -57,7 +57,7 @@ export const walkRouting = ({
           ),
         );
         onEndpoint(endpoint, path, method);
-      });
+      }
       if (hasCors && element.firstEndpoint) {
         onEndpoint(
           element.firstEndpoint,
