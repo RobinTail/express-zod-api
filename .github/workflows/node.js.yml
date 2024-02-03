@@ -61,7 +61,7 @@ jobs:
         satisfies: '>=18.12.0'
         lenient: false # require to parse or fail
     - name: Compatibility test
-      if: steps.jest30compat.outputs.satisfies
+      if: steps.jest30compat.outputs.satisfies == 'true'
       run: yarn test:compat
     - name: Issue 952 # see https://github.com/RobinTail/express-zod-api/issues/952
       run: yarn test:952
