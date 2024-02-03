@@ -52,7 +52,15 @@ jobs:
       run: yarn test:cjs
     - name: ESM test
       run: yarn test:esm
+    - name: Check Jest 30 compatibility
+      uses: madhead/semver-utils@latest
+      id: jest30compat
+      with:
+        version: ${{ matrix.node-version }}
+        satisfies: '>=18.12.0'
+        lenient: false # require to parse or fail
     - name: Compatibility test
+      if: steps.jest30compat.output.satisfies
       run: yarn test:compat
     - name: Issue 952 # see https://github.com/RobinTail/express-zod-api/issues/952
       run: yarn test:952
