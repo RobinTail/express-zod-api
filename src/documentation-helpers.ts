@@ -1052,9 +1052,7 @@ export const depictTags = <TAG extends string>(
     return result;
   });
 
-export const ensureShortDescription = (description: string) => {
-  if (description.length <= shortDescriptionLimit) {
-    return description;
-  }
-  return description.slice(0, shortDescriptionLimit - 1) + "…";
-};
+export const ensureShortDescription = (description: string) =>
+  description.length <= shortDescriptionLimit
+    ? description
+    : description.slice(0, shortDescriptionLimit - 1) + "…";
