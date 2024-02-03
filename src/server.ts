@@ -16,6 +16,10 @@ import {
   createNotFoundHandler,
   createParserFailureHandler,
 } from "./server-helpers";
+import type {
+  Server as SocketServer,
+  ServerOptions as SocketServerOptions,
+} from "socket.io";
 
 const makeCommonEntities = async (config: CommonConfig) => {
   const rootLogger: AbstractLogger = isSimplifiedWinstonConfig(config.logger)
@@ -84,15 +88,17 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
       rootLogger.info("Listening", subject);
     }) as T;
 
-  const servers = {
-    httpServer: starter(http.createServer(app), config.server.listen),
-    httpsServer: config.https
-      ? starter(
-          https.createServer(config.https.options, app),
-          config.https.listen,
-        )
-      : undefined,
-  } satisfies Record<string, http.Server | https.Server | undefined>;
+  const httpServer = starter(http.createServer(app), config.server.listen);
+  const httpsServer =
+    config.https &&
+    starter(https.createServer(config.https.options, app), config.https.listen);
 
-  return { app, ...servers, logger: rootLogger };
+  if (config.sockets) {
+    const io = new (await loadPeer<{
+      new (opt?: SocketServerOptions): SocketServer;
+    }>("socket.io", "Server"))(config.sockets);
+    io.attach(httpsServer || httpServer);
+  }
+
+  return { app, httpServer, httpsServer, logger: rootLogger };
 };
