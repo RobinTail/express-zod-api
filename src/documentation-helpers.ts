@@ -119,13 +119,8 @@ const samples = {
 /** @see https://expressjs.com/en/guide/routing.html */
 const routePathParamsRegex = /:([A-Za-z0-9_]+)/g;
 
-export const getRoutePathParams = (path: string): string[] => {
-  const match = path.match(routePathParamsRegex);
-  if (!match) {
-    return [];
-  }
-  return match.map((param) => param.slice(1));
-};
+export const getRoutePathParams = (path: string): string[] =>
+  path.match(routePathParamsRegex)?.map((param) => param.slice(1)) || [];
 
 export const reformatParamsInPath = (path: string) =>
   path.replace(routePathParamsRegex, (param) => `{${param.slice(1)}}`);
