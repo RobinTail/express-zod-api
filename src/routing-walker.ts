@@ -49,19 +49,22 @@ export const walkRouting = ({
         element.apply(path, onStatic);
       }
     } else if (element instanceof DependsOnMethod) {
-      Object.entries(element.endpoints).forEach(([method, endpoint]) => {
+      element.pairs.forEach(([method, endpoint]) => {
         assert(
-          endpoint.getMethods().includes(method as Method),
+          endpoint.getMethods().includes(method),
           new RoutingError(
             `Endpoint assigned to ${method} method of ${path} must support ${method} method.`,
           ),
         );
-        onEndpoint(endpoint, path, method as Method);
+        onEndpoint(endpoint, path, method);
       });
-      if (hasCors && Object.keys(element.endpoints).length) {
-        const [firstMethod, ...siblingMethods] = Object.keys(element.endpoints);
-        const firstEndpoint = element.endpoints[firstMethod as Method]!;
-        onEndpoint(firstEndpoint, path, "options", siblingMethods as Method[]);
+      if (hasCors && element.firstEndpoint) {
+        onEndpoint(
+          element.firstEndpoint,
+          path,
+          "options",
+          element.siblingMethods,
+        );
       }
     } else {
       walkRouting({
