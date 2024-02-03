@@ -98,6 +98,12 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
       new (opt?: SocketServerOptions): SocketServer;
     }>("socket.io", "Server"))(config.sockets);
     io.attach(httpsServer || httpServer);
+    io.on("connection", (socket) => {
+      rootLogger.debug("User connected");
+      socket.on("disconnect", () => {
+        rootLogger.debug("User disconnected");
+      });
+    });
   }
 
   return { app, httpServer, httpsServer, logger: rootLogger };
