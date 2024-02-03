@@ -816,12 +816,12 @@ export const excludeParamsFromDepiction = (
     ? depicted.required.filter((name) => !pathParams.includes(name))
     : undefined;
   const allOf = depicted.allOf
-    ? (depicted.allOf as SchemaObject[]).map((entry) =>
+    ? depicted.allOf.map((entry) =>
         excludeParamsFromDepiction(entry, pathParams),
       )
     : undefined;
   const oneOf = depicted.oneOf
-    ? (depicted.oneOf as SchemaObject[]).map((entry) =>
+    ? depicted.oneOf.map((entry) =>
         excludeParamsFromDepiction(entry, pathParams),
       )
     : undefined;
