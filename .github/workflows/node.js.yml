@@ -23,6 +23,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
     - name: Install Node.js ${{ matrix.node-version }}
+      id: setup-node
       uses: actions/setup-node@v4
       with:
         node-version: ${{ matrix.node-version }}
@@ -56,7 +57,7 @@ jobs:
       uses: madhead/semver-utils@v4
       id: jest30compat
       with:
-        version: ${{ matrix.node-version }}
+        version: ${{ steps.setup-node.output.node-version }}
         satisfies: '>=18.12.0'
         lenient: false # require to parse or fail
     - name: Compatibility test
