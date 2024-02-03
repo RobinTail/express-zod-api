@@ -17,6 +17,7 @@ export const config = createConfig({
     users: "Everything about the users",
     files: "Everything about the files processing",
   },
+  sockets: {},
 });
 
 // Uncomment these lines to set the type of logger used:

@@ -133,7 +133,7 @@ export interface ServerConfig<TAG extends string = string>
     /** @desc Port, UNIX socket or custom options. */
     listen: number | string | ListenOptions;
   };
-  sockets?: SocketServerOptions;
+  sockets?: Partial<SocketServerOptions>;
 }
 
 export interface AppConfig<TAG extends string = string>
