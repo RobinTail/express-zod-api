@@ -41,9 +41,9 @@ export const walkRouting = ({
       if (hasCors) {
         methods.push("options");
       }
-      methods.forEach((method) => {
+      for (const method of methods) {
         onEndpoint(element, path, method);
-      });
+      }
     } else if (element instanceof ServeStatic) {
       if (onStatic) {
         element.apply(path, onStatic);
