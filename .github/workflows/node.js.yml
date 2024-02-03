@@ -57,11 +57,11 @@ jobs:
       uses: madhead/semver-utils@v4
       id: jest30compat
       with:
-        version: ${{ steps.setup-node.output.node-version }}
+        version: ${{ steps.setup-node.outputs.node-version }}
         satisfies: '>=18.12.0'
         lenient: false # require to parse or fail
     - name: Compatibility test
-      if: steps.jest30compat.output.satisfies
+      if: steps.jest30compat.outputs.satisfies
       run: yarn test:compat
     - name: Issue 952 # see https://github.com/RobinTail/express-zod-api/issues/952
       run: yarn test:952
