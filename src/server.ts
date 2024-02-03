@@ -95,7 +95,7 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
 
   if (config.sockets) {
     const io = new (await loadPeer<{
-      new (opt?: SocketServerOptions): SocketServer;
+      new (opt?: Partial<SocketServerOptions>): SocketServer;
     }>("socket.io", "Server"))(config.sockets);
     io.attach(httpsServer || httpServer);
     io.on("connection", (socket) => {
