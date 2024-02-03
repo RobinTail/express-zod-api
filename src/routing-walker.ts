@@ -12,6 +12,7 @@ export interface RoutingWalkerParams {
     endpoint: AbstractEndpoint,
     path: string,
     method: Method | AuxMethod,
+    siblingMethods?: Method[],
   ) => void;
   onStatic?: (path: string, handler: StaticHandler) => void;
   parentPath?: string;
@@ -48,22 +49,22 @@ export const walkRouting = ({
         element.apply(path, onStatic);
       }
     } else if (element instanceof DependsOnMethod) {
-      Object.entries(element.endpoints).forEach(([method, endpoint]) => {
+      for (const [method, endpoint] of element.pairs) {
         assert(
-          endpoint.getMethods().includes(method as Method),
+          endpoint.getMethods().includes(method),
           new RoutingError(
             `Endpoint assigned to ${method} method of ${path} must support ${method} method.`,
           ),
         );
-        onEndpoint(endpoint, path, method as Method);
-      });
-      if (hasCors && Object.keys(element.endpoints).length > 0) {
-        const [firstMethod, ...siblingMethods] = Object.keys(
-          element.endpoints,
-        ) as Method[];
-        const firstEndpoint = element.endpoints[firstMethod]!;
-        firstEndpoint._setSiblingMethods(siblingMethods);
-        onEndpoint(firstEndpoint, path, "options");
+        onEndpoint(endpoint, path, method);
+      }
+      if (hasCors && element.firstEndpoint) {
+        onEndpoint(
+          element.firstEndpoint,
+          path,
+          "options",
+          element.siblingMethods,
+        );
       }
     } else {
       walkRouting({

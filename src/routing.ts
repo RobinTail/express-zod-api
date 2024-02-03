@@ -29,13 +29,19 @@ export const initRouting = ({
   walkRouting({
     routing,
     hasCors: !!config.cors,
-    onEndpoint: (endpoint, path, method) => {
+    onEndpoint: (endpoint, path, method, siblingMethods) => {
       app[method](path, async (request, response) => {
         const logger = config.childLoggerProvider
           ? await config.childLoggerProvider({ request, parent: rootLogger })
           : rootLogger;
         logger.info(`${request.method}: ${path}`);
-        await endpoint.execute({ request, response, logger, config });
+        await endpoint.execute({
+          request,
+          response,
+          logger,
+          config,
+          siblingMethods,
+        });
       });
     },
     onStatic: (path, handler) => {

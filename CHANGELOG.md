@@ -2,6 +2,11 @@
 
 ## Version 16
 
+### v16.6.2
+
+- Internal method `Endpoint::_setSiblingMethods()` removed (since v8.4.1);
+- The public property `DependsOnMethod::endpoints` is deprecated and will be removed in v17.
+
 ### v16.6.1
 
 - Performance fix for uploads processing (since v16.1.0).
