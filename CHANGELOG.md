@@ -7,7 +7,7 @@
 - **Breaking changes**:
   - `DependsOnMethod::endpoints` removed;
   - Refinment methods of `ez.file()` removed;
-  - Minimum version of `vitest` supported is 1.2.2.
+  - Minimum version of `vitest` supported is 1.0.4.
 - How to migrate confidently:
   - If you're using refinment methods of `ez.file()`:
     - Replace ~~`ez.file().string()`~~ to `ez.file("string")`;
