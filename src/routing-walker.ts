@@ -26,8 +26,10 @@ export const walkRouting = ({
   parentPath,
   hasCors,
 }: RoutingWalkerParams) => {
-  Object.entries(routing).forEach(([segment, element]) => {
-    segment = segment.trim();
+  const pairs = Object.entries(routing).map(
+    ([key, value]) => [key.trim(), value] as const,
+  );
+  for (const [segment, element] of pairs) {
     assert.doesNotMatch(
       segment,
       /\//,
@@ -41,9 +43,9 @@ export const walkRouting = ({
       if (hasCors) {
         methods.push("options");
       }
-      methods.forEach((method) => {
+      for (const method of methods) {
         onEndpoint(element, path, method);
-      });
+      }
     } else if (element instanceof ServeStatic) {
       if (onStatic) {
         element.apply(path, onStatic);
@@ -75,5 +77,5 @@ export const walkRouting = ({
         parentPath: path,
       });
     }
-  });
+  }
 };
