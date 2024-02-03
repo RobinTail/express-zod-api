@@ -11,7 +11,6 @@ describe("DependsOnMethod", () => {
   test("should accept empty object", () => {
     const instance = new DependsOnMethod({});
     expect(instance).toBeInstanceOf(DependsOnMethod);
-    expect(instance.endpoints).toEqual({});
     expect(instance.firstEndpoint).toBeUndefined();
     expect(instance.siblingMethods).toEqual([]);
     expect(instance.pairs).toEqual([]);
@@ -27,7 +26,6 @@ describe("DependsOnMethod", () => {
       }),
     });
     expect(instance).toBeInstanceOf(DependsOnMethod);
-    expect(instance.endpoints).toHaveProperty("post");
     expect(instance.firstEndpoint).toBeInstanceOf(AbstractEndpoint);
     expect(instance.siblingMethods).toEqual([]);
     expect(instance.pairs).toHaveLength(1);
@@ -45,8 +43,6 @@ describe("DependsOnMethod", () => {
       post: endpoint,
     });
     expect(instance).toBeInstanceOf(DependsOnMethod);
-    expect(instance.endpoints).toHaveProperty("get");
-    expect(instance.endpoints).toHaveProperty("post");
     expect(instance.firstEndpoint).toBe(endpoint);
     expect(instance.siblingMethods).toEqual(["post"]);
     expect(instance.pairs).toHaveLength(2);
