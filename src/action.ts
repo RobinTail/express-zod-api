@@ -1,6 +1,6 @@
 import { init, last } from "ramda";
 import { z } from "zod";
-import { ActionDefinifion } from "./actions-factory";
+import { AckActionDef, SimpleActionDef } from "./actions-factory";
 import { InputValidationError, OutputValidationError } from "./errors";
 import { AbstractLogger } from "./logger";
 
@@ -19,20 +19,17 @@ export abstract class AbstractAction {
 
 export class Action<
   IN extends z.ZodTuple,
-  OUT extends z.ZodTuple | undefined,
+  OUT extends z.ZodTuple,
 > extends AbstractAction {
   readonly #inputSchema: IN;
-  readonly #outputSchema: OUT;
-  readonly #handler: Handler<
-    z.output<IN>,
-    OUT extends z.ZodTuple ? z.input<OUT> : void
-  >;
+  readonly #outputSchema: OUT | undefined;
+  readonly #handler: Handler<z.output<IN>, z.input<OUT> | void>;
 
-  public constructor({ input, output, handler }: ActionDefinifion<IN, OUT>) {
+  public constructor(action: AckActionDef<IN, OUT> | SimpleActionDef<IN>) {
     super();
-    this.#inputSchema = input;
-    this.#outputSchema = output as OUT;
-    this.#handler = handler;
+    this.#inputSchema = action.input;
+    this.#outputSchema = "output" in action ? action.output : undefined;
+    this.#handler = action.handler;
   }
 
   public override async execute({
