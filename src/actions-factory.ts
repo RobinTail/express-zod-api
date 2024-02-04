@@ -10,7 +10,7 @@ export interface ActionDefinifion<
   handler: Handler<z.output<IN>, OUT extends z.ZodTuple ? z.input<OUT> : void>;
 }
 
-export class ActionFactory {
+export class ActionsFactory {
   public build<IN extends z.ZodTuple, OUT extends z.ZodTuple | undefined>(
     def: ActionDefinifion<IN, OUT>,
   ) {

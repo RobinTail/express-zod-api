@@ -8,7 +8,7 @@ import {
   ez,
   getStatusCodeFromError,
 } from "../src";
-import { ActionFactory } from "../src/action-factory";
+import { ActionsFactory } from "../src/actions-factory";
 import { config } from "./config";
 import { authMiddleware } from "./middlewares";
 
@@ -125,4 +125,4 @@ export const statusDependingFactory = new EndpointsFactory({
 });
 
 /** @desc this factory is for producing actions - handlers of socket.io events */
-export const actionFactory = new ActionFactory();
+export const actionFactory = new ActionsFactory();

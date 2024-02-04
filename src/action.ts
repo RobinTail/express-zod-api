@@ -1,6 +1,6 @@
 import { init, last } from "ramda";
 import { z } from "zod";
-import { ActionDefinifion } from "./action-factory";
+import { ActionDefinifion } from "./actions-factory";
 import { InputValidationError, OutputValidationError } from "./errors";
 import { AbstractLogger } from "./logger";
 
