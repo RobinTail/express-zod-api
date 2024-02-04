@@ -1,3 +1,5 @@
+import { createReadStream } from "node:fs";
+import { z } from "zod";
 import {
   EndpointsFactory,
   arrayResultHandler,
@@ -6,10 +8,9 @@ import {
   ez,
   getStatusCodeFromError,
 } from "../src";
+import { CaseFactory } from "../src/case-factory";
 import { config } from "./config";
 import { authMiddleware } from "./middlewares";
-import { createReadStream } from "node:fs";
-import { z } from "zod";
 
 /** @desc The factory assures the endpoints tagging constraints from config */
 export const taggedEndpointsFactory = new EndpointsFactory({
@@ -122,3 +123,5 @@ export const statusDependingFactory = new EndpointsFactory({
     },
   }),
 });
+
+export const caseFactory = new CaseFactory();

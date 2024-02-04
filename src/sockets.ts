@@ -1,3 +1,4 @@
+import http from "node:http";
 import type {
   Server as SocketServer,
   ServerOptions as SocketServerOptions,
@@ -14,12 +15,17 @@ export const createSockets = ({
   options,
   clientEvents,
   logger,
+  server,
 }: {
   Class: { new (opt?: Partial<SocketServerOptions>): SocketServer };
-  options: Partial<SocketServerOptions>;
+  options?: Partial<SocketServerOptions>;
   clientEvents: CaseMap;
   logger: AbstractLogger;
+  server: http.Server;
 }): SocketServer => {
+  logger.warn(
+    "Sockets.IO support is an experimental feature. It can be changed or removed at any time regardless of SemVer.",
+  );
   const io = new Class(options);
   io.on("connection", (socket) => {
     logger.debug("User connected", socket.id);
@@ -35,5 +41,5 @@ export const createSockets = ({
       logger.debug("User disconnected", socket.id);
     });
   });
-  return io;
+  return io.attach(server);
 };

@@ -7,7 +7,6 @@ import { AbstractLogger, SimplifiedWinstonConfig } from "./logger";
 import { Method } from "./method";
 import { AnyResultHandlerDefinition } from "./result-handler";
 import { ListenOptions } from "node:net";
-import type { ServerOptions as SocketServerOptions } from "socket.io";
 
 export type InputSource = keyof Pick<
   Request,
@@ -133,7 +132,6 @@ export interface ServerConfig<TAG extends string = string>
     /** @desc Port, UNIX socket or custom options. */
     listen: number | string | ListenOptions;
   };
-  sockets?: Partial<SocketServerOptions>;
 }
 
 export interface AppConfig<TAG extends string = string>

@@ -3,9 +3,7 @@ import type compression from "compression";
 import type fileUpload from "express-fileupload";
 import http from "node:http";
 import https from "node:https";
-import { z } from "zod";
 import { AppConfig, CommonConfig, ServerConfig } from "./config-type";
-import { CaseFactory } from "./case-factory";
 import {
   AbstractLogger,
   createLogger,
@@ -18,7 +16,6 @@ import {
   createNotFoundHandler,
   createParserFailureHandler,
 } from "./server-helpers";
-import { CaseMap, createSockets } from "./sockets";
 
 const makeCommonEntities = async (config: CommonConfig) => {
   const rootLogger: AbstractLogger = isSimplifiedWinstonConfig(config.logger)
@@ -91,31 +88,6 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
   const httpsServer =
     config.https &&
     starter(https.createServer(config.https.options, app), config.https.listen);
-
-  if (config.sockets) {
-    rootLogger.warn(
-      "Sockets.IO support is an experimental feature. It can be changed or removed at any time regardless of SemVer.",
-    );
-    const factory = new CaseFactory();
-    const onPing = factory.build({
-      input: z.tuple([z.unknown()]),
-      output: z.tuple([z.literal("pong"), z.unknown()]),
-      handler: async ({ input: [msg] }) => ["pong" as const, msg],
-    });
-    const onLog = factory.build({
-      input: z.tuple([z.unknown()]),
-      handler: async ({ input, logger }) => {
-        logger.info("logged", input);
-      },
-    });
-    const clientEvents: CaseMap = { ping: onPing, log: onLog };
-    createSockets({
-      Class: await loadPeer("socket.io", "Server"),
-      options: config.sockets,
-      clientEvents,
-      logger: rootLogger,
-    }).attach(httpsServer || httpServer);
-  }
 
   return { app, httpServer, httpsServer, logger: rootLogger };
 };
