@@ -128,7 +128,7 @@ export const statusDependingFactory = new EndpointsFactory({
  * @desc this factory is for producing actions - handlers of the incoming socket.io events
  * @param emission - declares the schemas for the outgoing socket.io events
  * */
-export const actionFactory = new ActionsFactory({
+export const actionsFactory = new ActionsFactory({
   time: {
     schema: z.tuple([ez.dateOut()]),
   },
