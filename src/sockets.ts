@@ -36,13 +36,12 @@ export const createSockets = <
           logger.debug("parsed", validation.data);
           return def.handler(...validation.data);
         }
-        throw new InputValidationError(validation.error);
+        logger.error(
+          `${event} payload validation error`,
+          new InputValidationError(validation.error),
+        );
       });
     }
-    // @todo this does not work:
-    socket.on("error", (err) => {
-      logger.error("Event payload validation error", err);
-    });
     socket.on("disconnect", () => {
       logger.debug("User disconnected", socket.id);
     });
