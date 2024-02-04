@@ -9,12 +9,12 @@ export interface ActionMap {
 
 export const attachSockets = ({
   io,
-  clientEvents,
+  clientActions,
   logger,
   target,
 }: {
   io: Server;
-  clientEvents: ActionMap;
+  clientActions: ActionMap;
   logger: AbstractLogger;
   target: http.Server;
 }): Server => {
@@ -26,7 +26,7 @@ export const attachSockets = ({
     socket.onAny((event) => {
       logger.info(`${event} from ${socket.id}`);
     });
-    for (const [event, action] of Object.entries(clientEvents)) {
+    for (const [event, action] of Object.entries(clientActions)) {
       socket.on(event, async (...params) =>
         action.execute({ event, params, logger }),
       );

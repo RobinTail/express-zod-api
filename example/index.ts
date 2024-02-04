@@ -14,6 +14,6 @@ const { httpServer, logger } = await createServer(config, routing);
 attachSockets({
   io: new Server(),
   target: httpServer,
-  clientEvents: clientActions,
+  clientActions,
   logger,
 });
