@@ -9,7 +9,10 @@ import { EventDefinifion } from "./events-factory";
 import { AbstractLogger } from "./logger";
 
 export const createSockets = <
-  Client extends Record<string, EventDefinifion<z.ZodTuple, z.ZodTuple>>,
+  Client extends Record<
+    string,
+    EventDefinifion<z.ZodTuple, z.ZodTuple | undefined>
+  >,
 >({
   Class,
   options,
@@ -29,14 +32,16 @@ export const createSockets = <
     });
     for (const [event, def] of Object.entries(clientEvents)) {
       socket.on(event, async (...params) => {
-        const payload = init(params); // without last one (ack)
-        const ack = last(params); // @todo support no ack
+        const payload = def.output ? init(params) : params;
+        const ack = def.output ? last(params) : undefined;
         const inputValidation = def.input.safeParse(payload);
         if (inputValidation.success) {
           logger.debug("parsed input", inputValidation.data);
-          const outputValidation = def.output.safeParse(
-            await def.handler(...inputValidation.data),
-          );
+          const output = await def.handler(...inputValidation.data);
+          if (!def.output) {
+            return; // no ack
+          }
+          const outputValidation = def.output.safeParse(output);
           if (outputValidation.success) {
             logger.debug("parsed output", outputValidation.data);
             // @todo use z.function() validation

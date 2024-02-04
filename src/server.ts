@@ -106,6 +106,12 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
           output: z.tuple([z.literal("pong"), z.unknown()]),
           handler: async (msg) => ["pong" as const, msg],
         }),
+        log: factory.build({
+          input: z.tuple([z.unknown()]),
+          handler: async (msg) => {
+            rootLogger.info("logged", msg);
+          },
+        }),
       },
       logger: rootLogger,
     }).attach(httpsServer || httpServer);
