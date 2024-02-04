@@ -124,4 +124,5 @@ export const statusDependingFactory = new EndpointsFactory({
   }),
 });
 
+/** @desc this factory is for producing actions - handlers of socket.io events */
 export const actionFactory = new ActionFactory();

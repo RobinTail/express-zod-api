@@ -45,4 +45,5 @@ export const routing: Routing = {
   }),
 };
 
+/** @desc this objects assigns actions to socket.io events */
 export const clientActions: ActionMap = { ping: onPing, log: onLog };

@@ -1,8 +1,8 @@
 import { createServer } from "../src";
-import { loadPeer } from "../src/peer-helpers";
 import { createSockets } from "../src/sockets";
 import { config } from "./config";
 import { clientActions, routing } from "./routing";
+import { Server } from "socket.io";
 
 /**
  * "await" is only needed for using entities retuned from this method.
@@ -12,7 +12,7 @@ import { clientActions, routing } from "./routing";
 const { httpServer, logger } = await createServer(config, routing);
 
 createSockets({
-  Class: await loadPeer("socket.io", "Server"),
+  Class: Server,
   server: httpServer,
   clientEvents: clientActions,
   logger,
