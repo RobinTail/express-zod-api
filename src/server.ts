@@ -5,7 +5,7 @@ import http from "node:http";
 import https from "node:https";
 import { z } from "zod";
 import { AppConfig, CommonConfig, ServerConfig } from "./config-type";
-import { EventsFactory } from "./events-factory";
+import { CaseFactory } from "./case-factory";
 import {
   AbstractLogger,
   createLogger,
@@ -96,22 +96,24 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
     rootLogger.warn(
       "Sockets.IO support is an experimental feature. It can be changed or removed at any time regardless of SemVer.",
     );
-    const factory = new EventsFactory();
+    const factory = new CaseFactory();
+    const onPing = factory.build({
+      input: z.tuple([z.unknown()]),
+      output: z.tuple([z.literal("pong"), z.unknown()]),
+      handler: async (msg) => ["pong" as const, msg],
+    });
+    const onLog = factory.build({
+      input: z.tuple([z.unknown()]),
+      handler: async (msg) => {
+        rootLogger.info("logged", msg);
+      },
+    });
     createSockets({
       Class: await loadPeer("socket.io", "Server"),
       options: config.sockets,
       clientEvents: {
-        ping: factory.build({
-          input: z.tuple([z.unknown()]),
-          output: z.tuple([z.literal("pong"), z.unknown()]),
-          handler: async (msg) => ["pong" as const, msg],
-        }),
-        log: factory.build({
-          input: z.tuple([z.unknown()]),
-          handler: async (msg) => {
-            rootLogger.info("logged", msg);
-          },
-        }),
+        ping: onPing,
+        log: onLog,
       },
       logger: rootLogger,
     }).attach(httpsServer || httpServer);

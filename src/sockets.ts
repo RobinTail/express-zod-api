@@ -1,18 +1,13 @@
-import { init, last } from "ramda";
 import type {
   Server as SocketServer,
   ServerOptions as SocketServerOptions,
 } from "socket.io";
 import { z } from "zod";
-import { InputValidationError, OutputValidationError } from "./errors";
-import { EventDefinifion } from "./events-factory";
+import { Case } from "./case";
 import { AbstractLogger } from "./logger";
 
 export const createSockets = <
-  Client extends Record<
-    string,
-    EventDefinifion<z.ZodTuple, z.ZodTuple | undefined>
-  >,
+  Client extends Record<string, Case<z.ZodTuple, z.ZodTuple | undefined>>,
 >({
   Class,
   options,
@@ -30,46 +25,10 @@ export const createSockets = <
     socket.onAny((event, ...payload) => {
       logger.info(event, payload);
     });
-    for (const [event, def] of Object.entries(clientEvents)) {
-      socket.on(event, async (...params) => {
-        const payload = def.output ? init(params) : params;
-        const inputValidation = def.input.safeParse(payload);
-        if (!inputValidation.success) {
-          return logger.error(
-            `${event} payload validation error`,
-            new InputValidationError(inputValidation.error),
-          );
-        }
-        logger.debug(
-          `parsed input (${def.output ? "excl." : "no"} ack)`,
-          inputValidation.data,
-        );
-        const ackValidation = def.output
-          ? z.function(def.output, z.void()).safeParse(last(params))
-          : undefined;
-        if (ackValidation && !ackValidation.success) {
-          return logger.error(
-            `${event} acknowledgement validation error`,
-            new InputValidationError(ackValidation.error),
-          );
-        }
-        const ack = ackValidation?.data;
-        const output = await def.handler(...inputValidation.data);
-        if (!def.output) {
-          return; // no ack
-        }
-        const outputValidation = def.output.safeParse(output);
-        if (!outputValidation.success) {
-          return logger.error(
-            `${event} output validation error`,
-            new OutputValidationError(outputValidation.error),
-          );
-        }
-        logger.debug("parsed output", outputValidation.data);
-        if (ack) {
-          ack(...outputValidation.data);
-        }
-      });
+    for (const [event, handler] of Object.entries(clientEvents)) {
+      socket.on(event, async (...params) =>
+        handler.execute({ event, params, logger }),
+      );
     }
     socket.on("disconnect", () => {
       logger.debug("User disconnected", socket.id);
