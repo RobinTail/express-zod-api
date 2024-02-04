@@ -10,7 +10,7 @@ export interface ActionMap {
   [event: string]: AbstractAction;
 }
 
-export const createSockets = ({
+export const attachSockets = ({
   Class,
   options,
   clientEvents,

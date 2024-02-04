@@ -1,5 +1,5 @@
 import { createServer } from "../src";
-import { createSockets } from "../src/sockets";
+import { attachSockets } from "../src/sockets";
 import { config } from "./config";
 import { clientActions, routing } from "./routing";
 import { Server } from "socket.io";
@@ -11,7 +11,7 @@ import { Server } from "socket.io";
  * */
 const { httpServer, logger } = await createServer(config, routing);
 
-createSockets({
+attachSockets({
   Class: Server,
   server: httpServer,
   clientEvents: clientActions,
