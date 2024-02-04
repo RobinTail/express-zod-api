@@ -7,7 +7,7 @@ export const onSubscribe = actionsFactory.build({
   handler: async ({ logger, emit, isConnected }) => {
     logger.info("Subscribed");
     while (true) {
-      emit("time", new Date());
+      emit("time", new Date()); // <— payload type constraints
       try {
         await new Promise<void>((resolve, reject) => {
           const timer = setTimeout(() => {
