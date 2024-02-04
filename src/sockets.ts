@@ -1,4 +1,3 @@
-import http from "node:http";
 import type {
   Server as SocketServer,
   ServerOptions as SocketServerOptions,
@@ -15,14 +14,12 @@ export const createSockets = <
   options,
   clientEvents,
   logger,
-  server,
 }: {
   Class: { new (opt?: Partial<SocketServerOptions>): SocketServer };
   options: Partial<SocketServerOptions>;
   clientEvents: Client;
   logger: AbstractLogger;
-  server: http.Server;
-}) => {
+}): SocketServer => {
   const io = new Class(options);
   io.on("connection", (socket) => {
     logger.debug("User connected", socket.id);
@@ -46,5 +43,5 @@ export const createSockets = <
       logger.debug("User disconnected", socket.id);
     });
   });
-  io.attach(server);
+  return io;
 };

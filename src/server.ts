@@ -112,8 +112,7 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
         }),
       },
       logger: rootLogger,
-      server: httpsServer || httpServer,
-    });
+    }).attach(httpsServer || httpServer);
   }
 
   return { app, httpServer, httpsServer, logger: rootLogger };
