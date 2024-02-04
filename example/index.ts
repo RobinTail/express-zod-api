@@ -12,8 +12,8 @@ import { Server } from "socket.io";
 const { httpServer, logger } = await createServer(config, routing);
 
 attachSockets({
-  Class: Server,
-  server: httpServer,
+  io: new Server(),
+  target: httpServer,
   clientEvents: clientActions,
   logger,
 });

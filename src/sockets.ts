@@ -1,8 +1,5 @@
 import http from "node:http";
-import type {
-  Server as SocketServer,
-  ServerOptions as SocketServerOptions,
-} from "socket.io";
+import type { Server } from "socket.io";
 import { AbstractAction } from "./action";
 import { AbstractLogger } from "./logger";
 
@@ -11,22 +8,19 @@ export interface ActionMap {
 }
 
 export const attachSockets = ({
-  Class,
-  options,
+  io,
   clientEvents,
   logger,
-  server,
+  target,
 }: {
-  Class: { new (opt?: Partial<SocketServerOptions>): SocketServer };
-  options?: Partial<SocketServerOptions>;
+  io: Server;
   clientEvents: ActionMap;
   logger: AbstractLogger;
-  server: http.Server;
-}): SocketServer => {
+  target: http.Server;
+}): Server => {
   logger.warn(
     "Sockets.IO support is an experimental feature. It can be changed or removed at any time regardless of SemVer.",
   );
-  const io = new Class(options);
   io.on("connection", (socket) => {
     logger.debug("User connected", socket.id);
     socket.onAny((event) => {
@@ -41,5 +35,5 @@ export const attachSockets = ({
       logger.debug("User disconnected", socket.id);
     });
   });
-  return io.attach(server);
+  return io.attach(target);
 };
