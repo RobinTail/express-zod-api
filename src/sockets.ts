@@ -5,7 +5,11 @@ import type {
 import { AbstractCase } from "./case";
 import { AbstractLogger } from "./logger";
 
-export const createSockets = <Client extends Record<string, AbstractCase>>({
+export interface CaseMap {
+  [event: string]: AbstractCase;
+}
+
+export const createSockets = ({
   Class,
   options,
   clientEvents,
@@ -13,7 +17,7 @@ export const createSockets = <Client extends Record<string, AbstractCase>>({
 }: {
   Class: { new (opt?: Partial<SocketServerOptions>): SocketServer };
   options: Partial<SocketServerOptions>;
-  clientEvents: Client;
+  clientEvents: CaseMap;
   logger: AbstractLogger;
 }): SocketServer => {
   const io = new Class(options);

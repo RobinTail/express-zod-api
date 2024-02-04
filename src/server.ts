@@ -18,7 +18,7 @@ import {
   createNotFoundHandler,
   createParserFailureHandler,
 } from "./server-helpers";
-import { createSockets } from "./sockets";
+import { CaseMap, createSockets } from "./sockets";
 
 const makeCommonEntities = async (config: CommonConfig) => {
   const rootLogger: AbstractLogger = isSimplifiedWinstonConfig(config.logger)
@@ -108,13 +108,11 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
         rootLogger.info("logged", msg);
       },
     });
+    const clientEvents: CaseMap = { ping: onPing, log: onLog };
     createSockets({
       Class: await loadPeer("socket.io", "Server"),
       options: config.sockets,
-      clientEvents: {
-        ping: onPing,
-        log: onLog,
-      },
+      clientEvents,
       logger: rootLogger,
     }).attach(httpsServer || httpServer);
   }
