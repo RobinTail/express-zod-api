@@ -98,7 +98,9 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
       "Sockets.IO support is an experimental feature. It can be changed or removed at any time regardless of SemVer.",
     );
     const io = new (await loadPeer<{
-      new (opt?: Partial<SocketServerOptions>): SocketServer;
+      new (opt?: Partial<SocketServerOptions>): SocketServer<{
+        ping: (msg: any, ack: (reply: "pong", echo: any) => void) => void;
+      }>;
     }>("socket.io", "Server"))(config.sockets);
     io.attach(httpsServer || httpServer);
     io.on("connection", (socket) => {
