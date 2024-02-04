@@ -1,6 +1,6 @@
 import { init, last } from "ramda";
 import { z } from "zod";
-import { CaseDefinifion } from "./case-factory";
+import { ActionDefinifion } from "./action-factory";
 import { InputValidationError, OutputValidationError } from "./errors";
 import { AbstractLogger } from "./logger";
 
@@ -9,7 +9,7 @@ export type Handler<IN, OUT> = (params: {
   logger: AbstractLogger;
 }) => Promise<OUT>;
 
-export abstract class AbstractCase {
+export abstract class AbstractAction {
   public abstract execute(params: {
     event: string;
     params: unknown[];
@@ -17,10 +17,10 @@ export abstract class AbstractCase {
   }): Promise<void>;
 }
 
-export class Case<
+export class Action<
   IN extends z.ZodTuple,
   OUT extends z.ZodTuple | undefined,
-> extends AbstractCase {
+> extends AbstractAction {
   readonly #inputSchema: IN;
   readonly #outputSchema: OUT;
   readonly #handler: Handler<
@@ -28,7 +28,7 @@ export class Case<
     OUT extends z.ZodTuple ? z.input<OUT> : void
   >;
 
-  public constructor({ input, output, handler }: CaseDefinifion<IN, OUT>) {
+  public constructor({ input, output, handler }: ActionDefinifion<IN, OUT>) {
     super();
     this.#inputSchema = input;
     this.#outputSchema = output as OUT;

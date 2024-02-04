@@ -1,7 +1,7 @@
 import { z } from "zod";
-import { caseFactory } from "../factories";
+import { actionFactory } from "../factories";
 
-export const onPing = caseFactory.build({
+export const onPing = actionFactory.build({
   input: z.tuple([z.unknown()]),
   output: z.tuple([z.literal("pong"), z.unknown()]),
   handler: async ({ input: [msg] }) => ["pong" as const, msg],

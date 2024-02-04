@@ -3,11 +3,11 @@ import type {
   Server as SocketServer,
   ServerOptions as SocketServerOptions,
 } from "socket.io";
-import { AbstractCase } from "./case";
+import { AbstractAction } from "./action";
 import { AbstractLogger } from "./logger";
 
-export interface CaseMap {
-  [event: string]: AbstractCase;
+export interface ActionMap {
+  [event: string]: AbstractAction;
 }
 
 export const createSockets = ({
@@ -19,7 +19,7 @@ export const createSockets = ({
 }: {
   Class: { new (opt?: Partial<SocketServerOptions>): SocketServer };
   options?: Partial<SocketServerOptions>;
-  clientEvents: CaseMap;
+  clientEvents: ActionMap;
   logger: AbstractLogger;
   server: http.Server;
 }): SocketServer => {
@@ -32,9 +32,9 @@ export const createSockets = ({
     socket.onAny((event) => {
       logger.info(`${event} from ${socket.id}`);
     });
-    for (const [event, handler] of Object.entries(clientEvents)) {
+    for (const [event, action] of Object.entries(clientEvents)) {
       socket.on(event, async (...params) =>
-        handler.execute({ event, params, logger }),
+        action.execute({ event, params, logger }),
       );
     }
     socket.on("disconnect", () => {

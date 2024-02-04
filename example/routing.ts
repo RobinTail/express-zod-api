@@ -1,13 +1,16 @@
+import { join } from "node:path";
 import { DependsOnMethod, Routing, ServeStatic } from "../src";
+import { ActionMap } from "../src/sockets";
+import { onLog } from "./actions/log";
+import { onPing } from "./actions/ping";
 import { rawAcceptingEndpoint } from "./endpoints/accept-raw";
 import { createUserEndpoint } from "./endpoints/create-user";
 import { listUsersEndpoint } from "./endpoints/list-users";
-import { uploadAvatarEndpoint } from "./endpoints/upload-avatar";
 import { retrieveUserEndpoint } from "./endpoints/retrieve-user";
 import { sendAvatarEndpoint } from "./endpoints/send-avatar";
-import { updateUserEndpoint } from "./endpoints/update-user";
 import { streamAvatarEndpoint } from "./endpoints/stream-avatar";
-import { join } from "node:path";
+import { updateUserEndpoint } from "./endpoints/update-user";
+import { uploadAvatarEndpoint } from "./endpoints/upload-avatar";
 
 export const routing: Routing = {
   v1: {
@@ -41,3 +44,5 @@ export const routing: Routing = {
     redirect: false,
   }),
 };
+
+export const clientActions: ActionMap = { ping: onPing, log: onLog };

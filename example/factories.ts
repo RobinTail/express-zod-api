@@ -8,7 +8,7 @@ import {
   ez,
   getStatusCodeFromError,
 } from "../src";
-import { CaseFactory } from "../src/case-factory";
+import { ActionFactory } from "../src/action-factory";
 import { config } from "./config";
 import { authMiddleware } from "./middlewares";
 
@@ -124,4 +124,4 @@ export const statusDependingFactory = new EndpointsFactory({
   }),
 });
 
-export const caseFactory = new CaseFactory();
+export const actionFactory = new ActionFactory();

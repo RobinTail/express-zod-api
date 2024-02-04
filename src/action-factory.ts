@@ -1,7 +1,7 @@
 import { z } from "zod";
-import { Case, Handler } from "./case";
+import { Action, Handler } from "./action";
 
-export interface CaseDefinifion<
+export interface ActionDefinifion<
   IN extends z.ZodTuple,
   OUT extends z.ZodTuple | undefined,
 > {
@@ -10,10 +10,10 @@ export interface CaseDefinifion<
   handler: Handler<z.output<IN>, OUT extends z.ZodTuple ? z.input<OUT> : void>;
 }
 
-export class CaseFactory {
+export class ActionFactory {
   public build<IN extends z.ZodTuple, OUT extends z.ZodTuple | undefined>(
-    def: CaseDefinifion<IN, OUT>,
+    def: ActionDefinifion<IN, OUT>,
   ) {
-    return new Case(def);
+    return new Action(def);
   }
 }
