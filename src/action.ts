@@ -5,17 +5,16 @@ import { AckActionDef, EmissionMap, SimpleActionDef } from "./actions-factory";
 import { InputValidationError, OutputValidationError } from "./errors";
 import { AbstractLogger } from "./logger";
 
+type TupleOrTrue<T> = T extends z.AnyZodTuple ? T : z.ZodLiteral<true>;
+type Emitter<E extends EmissionMap, K extends keyof E = keyof E> = (
+  evt: K,
+  ...args: z.input<E[K]["schema"]>
+) => Promise<z.output<TupleOrTrue<E[K]["ack"]>>>;
+
 export type Handler<IN, OUT, E extends EmissionMap> = (params: {
   input: IN;
   logger: AbstractLogger;
-  emit: <K extends keyof E>(
-    evt: K,
-    ...args: z.input<E[K]["schema"]>
-  ) => Promise<
-    z.output<
-      E[K]["ack"] extends z.AnyZodTuple ? E[K]["ack"] : z.ZodLiteral<true>
-    >
-  >;
+  emit: Emitter<E>;
   isConnected: () => boolean;
 }) => Promise<OUT>;
 
@@ -59,11 +58,7 @@ export class Action<
     args: z.input<E[K]["schema"]>;
     logger: AbstractLogger;
     socket: Socket;
-  }): Promise<
-    z.output<
-      E[K]["ack"] extends z.AnyZodTuple ? E[K]["ack"] : z.ZodLiteral<true>
-    >
-  > {
+  }): ReturnType<Emitter<E, K>> {
     const { schema, ack: ackSchema } = this.#emission[event];
     const emitValidation = schema.safeParse(args);
     if (!emitValidation.success) {
