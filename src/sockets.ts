@@ -33,7 +33,6 @@ export const createSockets = <
     for (const [event, def] of Object.entries(clientEvents)) {
       socket.on(event, async (...params) => {
         const payload = def.output ? init(params) : params;
-        const ack = def.output ? last(params) : undefined;
         const inputValidation = def.input.safeParse(payload);
         if (!inputValidation.success) {
           return logger.error(
@@ -41,7 +40,20 @@ export const createSockets = <
             new InputValidationError(inputValidation.error),
           );
         }
-        logger.debug("parsed input", inputValidation.data);
+        logger.debug(
+          `parsed input (${def.output ? "excl." : "no"} ack)`,
+          inputValidation.data,
+        );
+        const ackValidation = def.output
+          ? z.function(def.output, z.void()).safeParse(last(params))
+          : undefined;
+        if (ackValidation && !ackValidation.success) {
+          return logger.error(
+            `${event} acknowledgement validation error`,
+            new InputValidationError(ackValidation.error),
+          );
+        }
+        const ack = ackValidation?.data;
         const output = await def.handler(...inputValidation.data);
         if (!def.output) {
           return; // no ack
@@ -54,9 +66,8 @@ export const createSockets = <
           );
         }
         logger.debug("parsed output", outputValidation.data);
-        // @todo use z.function() validation
-        if (typeof ack === "function") {
-          ack(outputValidation.data);
+        if (ack) {
+          ack(...outputValidation.data);
         }
       });
     }
