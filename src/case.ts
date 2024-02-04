@@ -7,9 +7,10 @@ import { AbstractLogger } from "./logger";
 export type Handler<
   IN extends z.ZodTuple,
   OUT extends z.ZodTuple | undefined,
-> = (
-  ...params: z.output<IN>
-) => Promise<OUT extends z.ZodTuple ? z.input<OUT> : void>;
+> = (params: {
+  input: z.output<IN>;
+  logger: AbstractLogger;
+}) => Promise<OUT extends z.ZodTuple ? z.input<OUT> : void>;
 
 export abstract class AbstractCase {
   public abstract execute(params: {
@@ -65,7 +66,7 @@ export class Case<
       );
     }
     const ack = ackValidation?.data;
-    const output = await this.#handler(...inputValidation.data);
+    const output = await this.#handler({ input: inputValidation.data, logger });
     if (!this.#outputSchema) {
       return; // no ack
     }

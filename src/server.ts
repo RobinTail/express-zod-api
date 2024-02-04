@@ -100,12 +100,12 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
     const onPing = factory.build({
       input: z.tuple([z.unknown()]),
       output: z.tuple([z.literal("pong"), z.unknown()]),
-      handler: async (msg) => ["pong" as const, msg],
+      handler: async ({ input: [msg] }) => ["pong" as const, msg],
     });
     const onLog = factory.build({
       input: z.tuple([z.unknown()]),
-      handler: async (msg) => {
-        rootLogger.info("logged", msg);
+      handler: async ({ input, logger }) => {
+        logger.info("logged", input);
       },
     });
     const clientEvents: CaseMap = { ping: onPing, log: onLog };
