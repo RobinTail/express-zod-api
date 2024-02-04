@@ -2,13 +2,10 @@ import type {
   Server as SocketServer,
   ServerOptions as SocketServerOptions,
 } from "socket.io";
-import { z } from "zod";
-import { Case } from "./case";
+import { AbstractCase } from "./case";
 import { AbstractLogger } from "./logger";
 
-export const createSockets = <
-  Client extends Record<string, Case<z.ZodTuple, z.ZodTuple | undefined>>,
->({
+export const createSockets = <Client extends Record<string, AbstractCase>>({
   Class,
   options,
   clientEvents,

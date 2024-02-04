@@ -11,18 +11,30 @@ export type Handler<
   ...params: z.output<IN>
 ) => Promise<OUT extends z.ZodTuple ? z.input<OUT> : void>;
 
-export class Case<IN extends z.ZodTuple, OUT extends z.ZodTuple | undefined> {
+export abstract class AbstractCase {
+  public abstract execute(params: {
+    event: string;
+    params: unknown[];
+    logger: AbstractLogger;
+  }): Promise<void>;
+}
+
+export class Case<
+  IN extends z.ZodTuple,
+  OUT extends z.ZodTuple | undefined,
+> extends AbstractCase {
   readonly #inputSchema: IN;
   readonly #outputSchema: OUT;
   readonly #handler: Handler<IN, OUT>;
 
   public constructor({ input, output, handler }: CaseDefinifion<IN, OUT>) {
+    super();
     this.#inputSchema = input;
     this.#outputSchema = output as OUT;
     this.#handler = handler;
   }
 
-  public async execute({
+  public override async execute({
     event,
     params,
     logger,
