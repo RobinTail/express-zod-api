@@ -5,6 +5,7 @@ import http from "node:http";
 import https from "node:https";
 import { z } from "zod";
 import { AppConfig, CommonConfig, ServerConfig } from "./config-type";
+import { EventsFactory } from "./events-factory";
 import {
   AbstractLogger,
   createLogger,
@@ -17,10 +18,7 @@ import {
   createNotFoundHandler,
   createParserFailureHandler,
 } from "./server-helpers";
-import type {
-  Server as SocketServer,
-  ServerOptions as SocketServerOptions,
-} from "socket.io";
+import { createSockets } from "./sockets";
 
 const makeCommonEntities = async (config: CommonConfig) => {
   const rootLogger: AbstractLogger = isSimplifiedWinstonConfig(config.logger)
@@ -98,32 +96,23 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
     rootLogger.warn(
       "Sockets.IO support is an experimental feature. It can be changed or removed at any time regardless of SemVer.",
     );
-    const clientEventsSchema = z.object({
-      ping: z.function(
-        z.tuple([
-          z.unknown(),
-          z.function(z.tuple([z.literal("pong"), z.unknown()]), z.void()),
-        ]),
-        z.void(),
-      ),
-    });
-    const io = new (await loadPeer<{
-      new (
-        opt?: Partial<SocketServerOptions>,
-      ): SocketServer<z.input<typeof clientEventsSchema>>;
-    }>("socket.io", "Server"))(config.sockets);
-    io.attach(httpsServer || httpServer);
-    io.on("connection", (socket) => {
-      rootLogger.debug("User connected");
-      socket.onAny((event, ...payload) => {
-        rootLogger.info(event, payload);
-      });
-      socket.on("ping", (msg, ack) => {
-        ack("pong", msg);
-      });
-      socket.on("disconnect", () => {
-        rootLogger.debug("User disconnected");
-      });
+    const factory = new EventsFactory();
+    createSockets({
+      Class: await loadPeer("socket.io", "Server"),
+      options: config.sockets,
+      clientEvents: {
+        ping: factory.build({
+          schema: z.tuple([
+            z.unknown(),
+            z.function(z.tuple([z.literal("pong"), z.unknown()]), z.void()),
+          ]),
+          handler: (msg, ack) => {
+            ack("pong", msg);
+          },
+        }),
+      },
+      logger: rootLogger,
+      server: httpsServer || httpServer,
     });
   }
 
