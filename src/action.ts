@@ -8,7 +8,14 @@ import { AbstractLogger } from "./logger";
 export type Handler<IN, OUT, E extends EmissionMap> = (params: {
   input: IN;
   logger: AbstractLogger;
-  emit: <K extends keyof E>(evt: K, ...args: z.input<E[K]["schema"]>) => void;
+  emit: <K extends keyof E>(
+    evt: K,
+    ...args: z.input<E[K]["schema"]>
+  ) => Promise<
+    z.output<
+      E[K]["ack"] extends z.AnyZodTuple ? E[K]["ack"] : z.ZodLiteral<true>
+    >
+  >;
   isConnected: () => boolean;
 }) => Promise<OUT>;
 
@@ -42,7 +49,7 @@ export class Action<
     this.#emission = emission;
   }
 
-  #emit<K extends keyof E>({
+  async #emit<K extends keyof E>({
     event,
     args,
     logger,
@@ -52,8 +59,13 @@ export class Action<
     args: z.input<E[K]["schema"]>;
     logger: AbstractLogger;
     socket: Socket;
-  }): void {
-    const emitValidation = this.#emission[event].schema.safeParse(args);
+  }): Promise<
+    z.output<
+      E[K]["ack"] extends z.AnyZodTuple ? E[K]["ack"] : z.ZodLiteral<true>
+    >
+  > {
+    const { schema, ack: ackSchema } = this.#emission[event];
+    const emitValidation = schema.safeParse(args);
     if (!emitValidation.success) {
       return logger.error(
         `${String(event)} emission validation error`,
@@ -61,8 +73,20 @@ export class Action<
       );
     }
     logger.debug(`Emitting ${String(event)}`, emitValidation.data);
-    socket.emit(String(event), ...emitValidation.data);
-    // @todo ack
+    if (!ackSchema) {
+      return socket.emit(String(event), ...emitValidation.data) || true;
+    }
+    try {
+      const ack = await socket
+        .timeout(2000) // @todo configurable?
+        .emitWithAck(String(event), ...emitValidation.data);
+      return ackSchema.parse(ack);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        throw new InputValidationError(error);
+      }
+      throw error;
+    }
   }
 
   public override async execute({
