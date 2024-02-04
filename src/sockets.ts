@@ -22,8 +22,8 @@ export const createSockets = <
   const io = new Class(options);
   io.on("connection", (socket) => {
     logger.debug("User connected", socket.id);
-    socket.onAny((event, ...payload) => {
-      logger.info(event, payload);
+    socket.onAny((event) => {
+      logger.info(`${event} from ${socket.id}`);
     });
     for (const [event, handler] of Object.entries(clientEvents)) {
       socket.on(event, async (...params) =>
