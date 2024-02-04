@@ -1,12 +1,18 @@
 import { z } from "zod";
 
-export interface EventDefinifion<T extends z.ZodTuple> {
-  schema: T;
-  handler: (...params: z.output<T>) => void | Promise<void>;
+export interface EventDefinifion<
+  IN extends z.ZodTuple,
+  OUT extends z.ZodTuple,
+> {
+  input: IN;
+  output: OUT;
+  handler: (...params: z.output<IN>) => Promise<z.input<OUT>>;
 }
 
 export class EventsFactory {
-  public build<T extends z.ZodTuple>(def: EventDefinifion<T>) {
+  public build<IN extends z.ZodTuple, OUT extends z.ZodTuple>(
+    def: EventDefinifion<IN, OUT>,
+  ) {
     return def;
   }
 }

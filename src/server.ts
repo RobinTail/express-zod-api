@@ -102,13 +102,9 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
       options: config.sockets,
       clientEvents: {
         ping: factory.build({
-          schema: z.tuple([
-            z.unknown(),
-            z.function(z.tuple([z.literal("pong"), z.unknown()]), z.void()),
-          ]),
-          handler: (msg, ack) => {
-            ack("pong", msg);
-          },
+          input: z.tuple([z.unknown()]),
+          output: z.tuple([z.literal("pong"), z.unknown()]),
+          handler: async (msg) => ["pong" as const, msg],
         }),
       },
       logger: rootLogger,
