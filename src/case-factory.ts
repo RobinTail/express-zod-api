@@ -7,7 +7,7 @@ export interface CaseDefinifion<
 > {
   input: IN;
   output?: OUT;
-  handler: Handler<IN, OUT>;
+  handler: Handler<z.output<IN>, OUT extends z.ZodTuple ? z.input<OUT> : void>;
 }
 
 export class CaseFactory {

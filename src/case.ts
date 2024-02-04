@@ -4,13 +4,10 @@ import { CaseDefinifion } from "./case-factory";
 import { InputValidationError, OutputValidationError } from "./errors";
 import { AbstractLogger } from "./logger";
 
-export type Handler<
-  IN extends z.ZodTuple,
-  OUT extends z.ZodTuple | undefined,
-> = (params: {
-  input: z.output<IN>;
+export type Handler<IN, OUT> = (params: {
+  input: IN;
   logger: AbstractLogger;
-}) => Promise<OUT extends z.ZodTuple ? z.input<OUT> : void>;
+}) => Promise<OUT>;
 
 export abstract class AbstractCase {
   public abstract execute(params: {
@@ -26,7 +23,10 @@ export class Case<
 > extends AbstractCase {
   readonly #inputSchema: IN;
   readonly #outputSchema: OUT;
-  readonly #handler: Handler<IN, OUT>;
+  readonly #handler: Handler<
+    z.output<IN>,
+    OUT extends z.ZodTuple ? z.input<OUT> : void
+  >;
 
   public constructor({ input, output, handler }: CaseDefinifion<IN, OUT>) {
     super();
