@@ -22,8 +22,8 @@ export abstract class AbstractAction {
 }
 
 export class Action<
-  IN extends z.ZodTuple,
-  OUT extends z.ZodTuple,
+  IN extends z.AnyZodTuple,
+  OUT extends z.AnyZodTuple,
   E extends EmissionMap,
 > extends AbstractAction {
   readonly #inputSchema: IN;

@@ -3,7 +3,7 @@ import { actionFactory } from "../factories";
 
 /** @desc The action demonstrates no acknowledgement and constraints on emission awareness */
 export const onSubscribe = actionFactory.build({
-  input: z.tuple([z.unknown()]),
+  input: z.tuple([]).rest(z.unknown()),
   handler: async ({ logger, emit, isConnected }) => {
     logger.info("Subscribed");
     while (true) {
