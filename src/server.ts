@@ -103,6 +103,12 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
     io.attach(httpsServer || httpServer);
     io.on("connection", (socket) => {
       rootLogger.debug("User connected");
+      socket.onAny((event, ...payload) => {
+        rootLogger.info(event, payload);
+      });
+      socket.on("ping", (msg, ack) => {
+        ack("pong", msg);
+      });
       socket.on("disconnect", () => {
         rootLogger.debug("User disconnected");
       });
