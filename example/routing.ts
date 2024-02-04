@@ -1,7 +1,7 @@
 import { join } from "node:path";
 import { DependsOnMethod, Routing, ServeStatic } from "../src";
 import { ActionMap } from "../src/sockets";
-import { onLog } from "./actions/log";
+import { onSubscribe } from "./actions/subscribe";
 import { onPing } from "./actions/ping";
 import { rawAcceptingEndpoint } from "./endpoints/accept-raw";
 import { createUserEndpoint } from "./endpoints/create-user";
@@ -45,5 +45,5 @@ export const routing: Routing = {
   }),
 };
 
-/** @desc this objects assigns actions to socket.io events */
-export const clientActions: ActionMap = { ping: onPing, log: onLog };
+/** @desc the object declares handling rules of the incoming socket.io events */
+export const actions: ActionMap = { ping: onPing, subscribe: onSubscribe };

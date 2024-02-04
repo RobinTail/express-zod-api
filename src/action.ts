@@ -1,12 +1,15 @@
 import { init, last } from "ramda";
+import type { Socket } from "socket.io";
 import { z } from "zod";
-import { AckActionDef, SimpleActionDef } from "./actions-factory";
+import { AckActionDef, EmissionMap, SimpleActionDef } from "./actions-factory";
 import { InputValidationError, OutputValidationError } from "./errors";
 import { AbstractLogger } from "./logger";
 
-export type Handler<IN, OUT> = (params: {
+export type Handler<IN, OUT, E extends EmissionMap> = (params: {
   input: IN;
   logger: AbstractLogger;
+  emit: <K extends keyof E>(evt: K, ...args: z.input<E[K]["schema"]>) => void;
+  isConnected: () => boolean;
 }) => Promise<OUT>;
 
 export abstract class AbstractAction {
@@ -14,32 +17,64 @@ export abstract class AbstractAction {
     event: string;
     params: unknown[];
     logger: AbstractLogger;
+    socket: Socket;
   }): Promise<void>;
 }
 
 export class Action<
   IN extends z.ZodTuple,
   OUT extends z.ZodTuple,
+  E extends EmissionMap,
 > extends AbstractAction {
   readonly #inputSchema: IN;
   readonly #outputSchema: OUT | undefined;
-  readonly #handler: Handler<z.output<IN>, z.input<OUT> | void>;
+  readonly #handler: Handler<z.output<IN>, z.input<OUT> | void, E>;
+  readonly #emission: E;
 
-  public constructor(action: AckActionDef<IN, OUT> | SimpleActionDef<IN>) {
+  public constructor(
+    action: AckActionDef<IN, OUT, E> | SimpleActionDef<IN, E>,
+    emission: E,
+  ) {
     super();
     this.#inputSchema = action.input;
     this.#outputSchema = "output" in action ? action.output : undefined;
     this.#handler = action.handler;
+    this.#emission = emission;
+  }
+
+  #emit<K extends keyof E>({
+    event,
+    args,
+    logger,
+    socket,
+  }: {
+    event: K;
+    args: z.input<E[K]["schema"]>;
+    logger: AbstractLogger;
+    socket: Socket;
+  }): void {
+    const emitValidation = this.#emission[event].schema.safeParse(args);
+    if (!emitValidation.success) {
+      return logger.error(
+        `${String(event)} emission validation error`,
+        new OutputValidationError(emitValidation.error),
+      );
+    }
+    logger.debug(`Emitting ${String(event)}`, emitValidation.data);
+    socket.emit(String(event), ...emitValidation.data);
+    // @todo ack
   }
 
   public override async execute({
     event,
     params,
     logger,
+    socket,
   }: {
     event: string;
     params: unknown[];
     logger: AbstractLogger;
+    socket: Socket;
   }): Promise<void> {
     const payload = this.#outputSchema ? init(params) : params;
     const inputValidation = this.#inputSchema.safeParse(payload);
@@ -63,7 +98,12 @@ export class Action<
       );
     }
     const ack = ackValidation?.data;
-    const output = await this.#handler({ input: inputValidation.data, logger });
+    const output = await this.#handler({
+      input: inputValidation.data,
+      logger,
+      emit: (evt, ...args) => this.#emit({ event: evt, args, logger, socket }),
+      isConnected: () => socket.connected,
+    });
     if (!this.#outputSchema) {
       return; // no ack
     }
