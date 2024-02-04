@@ -94,6 +94,9 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
     starter(https.createServer(config.https.options, app), config.https.listen);
 
   if (config.sockets) {
+    rootLogger.warn(
+      "Sockets.IO support is an experimental feature. It can be changed or removed at any time regardless of SemVer.",
+    );
     const io = new (await loadPeer<{
       new (opt?: Partial<SocketServerOptions>): SocketServer;
     }>("socket.io", "Server"))(config.sockets);
