@@ -1,6 +1,6 @@
 import { join } from "node:path";
 import { DependsOnMethod, Routing, ServeStatic } from "../src";
-import { ActionMap } from "../src/sockets";
+import { ActionMap } from "../src/action";
 import { onSubscribe } from "./actions/subscribe";
 import { onPing } from "./actions/ping";
 import { rawAcceptingEndpoint } from "./endpoints/accept-raw";

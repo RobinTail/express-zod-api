@@ -1,13 +1,9 @@
 import http from "node:http";
 import type { Server } from "socket.io";
-import { AbstractAction, Handler, SocketFeatures } from "./action";
+import { ActionMap, Handler, SocketFeatures } from "./action";
 import { CommonConfig } from "./config-type";
 import { EmissionMap, makeEmitter } from "./emission";
 import { AbstractLogger } from "./logger";
-
-export interface ActionMap {
-  [event: string]: AbstractAction;
-}
 
 export const attachSockets = <T extends Server, E extends EmissionMap>({
   io,
