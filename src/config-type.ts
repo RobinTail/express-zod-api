@@ -124,6 +124,15 @@ export interface ServerConfig<TAG extends string = string>
      * @link https://expressjs.com/en/4x/api.html#express.raw
      * */
     rawParser?: RequestHandler;
+    /**
+     * @desc A code to execute after parsing the request body but before processing the Routing of your API.
+     * @desc This can be a good place for express middlewares establishing their own routes.
+     * @example ({ app }) => { app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument)); }
+     * */
+    beforeRouting?: (params: {
+      app: IRouter;
+      logger: AbstractLogger;
+    }) => void | Promise<void>;
   };
   /** @desc Enables HTTPS server as well. */
   https?: {
