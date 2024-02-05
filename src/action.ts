@@ -85,6 +85,49 @@ export class Action<
     }
   }
 
+  /** @throws InputValidationError */
+  #parseInput(params: unknown[]) {
+    try {
+      const payload = this.#outputSchema ? init(params) : params;
+      return this.#inputSchema.parse(payload);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        throw new InputValidationError(error);
+      }
+      throw error;
+    }
+  }
+
+  /** @throws InputValidationError */
+  #parseAckCb(params: unknown[]) {
+    if (!this.#outputSchema) {
+      return undefined;
+    }
+    try {
+      return z.function(this.#outputSchema, z.void()).parse(last(params));
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        throw new InputValidationError(error);
+      }
+      throw error;
+    }
+  }
+
+  /** @throws OutputValidationError */
+  #parseOutput(output: z.input<OUT> | void) {
+    if (!this.#outputSchema) {
+      return;
+    }
+    try {
+      return this.#outputSchema.parse(output) as z.output<OUT>;
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        throw new OutputValidationError(error);
+      }
+      throw error;
+    }
+  }
+
   public override async execute({
     event,
     params,
@@ -96,48 +139,28 @@ export class Action<
     logger: AbstractLogger;
     socket: Socket;
   }): Promise<void> {
-    const payload = this.#outputSchema ? init(params) : params;
-    const inputValidation = this.#inputSchema.safeParse(payload);
-    if (!inputValidation.success) {
-      return logger.error(
-        `${event} payload validation error`,
-        new InputValidationError(inputValidation.error),
+    try {
+      const input = this.#parseInput(params);
+      logger.debug(
+        `parsed input (${this.#outputSchema ? "excl." : "no"} ack)`,
+        input,
       );
-    }
-    logger.debug(
-      `parsed input (${this.#outputSchema ? "excl." : "no"} ack)`,
-      inputValidation.data,
-    );
-    const ackValidation = this.#outputSchema
-      ? z.function(this.#outputSchema, z.void()).safeParse(last(params))
-      : undefined;
-    if (ackValidation && !ackValidation.success) {
-      return logger.error(
-        `${event} acknowledgement validation error`,
-        new InputValidationError(ackValidation.error),
-      );
-    }
-    const ack = ackValidation?.data;
-    const output = await this.#handler({
-      input: inputValidation.data,
-      logger,
-      emit: (evt, ...args) => this.#emit({ event: evt, args, logger, socket }),
-      isConnected: () => socket.connected,
-      socketId: socket.id,
-    });
-    if (!this.#outputSchema) {
-      return; // no ack
-    }
-    const outputValidation = this.#outputSchema.safeParse(output);
-    if (!outputValidation.success) {
-      return logger.error(
-        `${event} output validation error`,
-        new OutputValidationError(outputValidation.error),
-      );
-    }
-    logger.debug("parsed output", outputValidation.data);
-    if (ack) {
-      ack(...outputValidation.data);
+      const ack = this.#parseAckCb(params);
+      const output = await this.#handler({
+        input,
+        logger,
+        emit: (evt, ...args) =>
+          this.#emit({ event: evt, args, logger, socket }),
+        isConnected: () => socket.connected,
+        socketId: socket.id,
+      });
+      const response = this.#parseOutput(output);
+      logger.debug("parsed output", response);
+      if (ack && response) {
+        ack(...response);
+      }
+    } catch (error) {
+      logger.error(`${event} handling error`, error);
     }
   }
 }
