@@ -16,6 +16,8 @@ export const attachSockets = <E extends EmissionMap>({
   emission,
   onConnection = ({ socketId }) => logger.debug("User connected", socketId),
   onDisconnect = ({ socketId }) => logger.debug("User disconnected", socketId),
+  onAnyEvent = ({ input: [event], socketId }) =>
+    logger.debug(`${event} from ${socketId}`),
 }: {
   io: Server;
   actions: ActionMap;
@@ -24,6 +26,7 @@ export const attachSockets = <E extends EmissionMap>({
   emission: E;
   onConnection?: Handler<[], void, E>;
   onDisconnect?: Handler<[], void, E>;
+  onAnyEvent?: Handler<[string], void, E>;
 }): Server => {
   logger.warn(
     "Sockets.IO support is an experimental feature. It can be changed or removed at any time regardless of SemVer.",
@@ -35,7 +38,9 @@ export const attachSockets = <E extends EmissionMap>({
     };
     const emit = makeEmitter({ emission, socket, logger });
     await onConnection({ input: [], logger, emit, ...commons });
-    socket.onAny((event) => logger.debug(`${event} from ${socket.id}`));
+    socket.onAny((event) =>
+      onAnyEvent({ input: [event], logger, emit, ...commons }),
+    );
     for (const [event, action] of Object.entries(actions)) {
       socket.on(event, async (...params) =>
         action.execute({ event, params, logger, emit, ...commons }),
