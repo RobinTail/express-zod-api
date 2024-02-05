@@ -11,6 +11,7 @@
   - The option enables the configuration of the third-party middlewares serving their own routes or establishing their
     own routing besides your primary API when using the standard `createServer()` method.
   - The option helps to avoid making a custom express app, the DIY approach using `attachRouting()` method.
+  - The option can also be used to connect additional request parsers, like `cookie-parser`.
 
 ```ts
 import { createConfig } from "express-zod-api";

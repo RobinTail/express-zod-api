@@ -311,8 +311,9 @@ const endpointsFactory = defaultEndpointsFactory.addOptions({
 
 There are two ways of connecting the native express middlewares depending on their nature and your objective.
 
-In case it's a middleware establishing and serving its own routes, or somehow globally modify the behaviour, use the
-`beforeRouting` option. Except the `cors` — [there is a better option for that purpose](#cross-origin-resource-sharing).
+In case it's a middleware establishing and serving its own routes, or somehow globally modifying the behaviour, or
+being an additional request parser (like `cookie-parser`), use the `beforeRouting` option.
+However, it might be better to avoid `cors` here — [the library handles it on its own](#cross-origin-resource-sharing).
 
 ```typescript
 import { createConfig } from "express-zod-api";
