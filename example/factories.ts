@@ -9,8 +9,7 @@ import {
   getStatusCodeFromError,
 } from "../src";
 import { ActionsFactory } from "../src/actions-factory";
-import { createEmission } from "../src/emission";
-import { config } from "./config";
+import { config, emission } from "./config";
 import { authMiddleware } from "./middlewares";
 
 /** @desc The factory assures the endpoints tagging constraints from config */
@@ -123,14 +122,6 @@ export const statusDependingFactory = new EndpointsFactory({
       response.status(201).json({ status: "created", data: output });
     },
   }),
-});
-
-/**
- * @desc The declaration of the schemas for the outgoing socket.io events
- * @todo this is not a factory but rather a sort of config
- * */
-export const emission = createEmission({
-  time: { schema: z.tuple([ez.dateOut()]) },
 });
 
 /** @desc this factory is for producing actions - handlers of the incoming socket.io events */

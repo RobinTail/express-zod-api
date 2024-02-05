@@ -1,7 +1,6 @@
 import { createServer } from "../src";
 import { attachSockets } from "../src/sockets";
-import { config } from "./config";
-import { emission } from "./factories";
+import { config, emission } from "./config";
 import { actions, routing } from "./routing";
 import { Server } from "socket.io";
 
