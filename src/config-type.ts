@@ -92,6 +92,11 @@ type CompressionOptions = Pick<
   "threshold" | "level" | "strategy" | "chunkSize" | "memLevel"
 >;
 
+type AppExtension = (params: {
+  app: IRouter;
+  logger: AbstractLogger;
+}) => void | Promise<void>;
+
 export interface ServerConfig<TAG extends string = string>
   extends CommonConfig<TAG> {
   /** @desc Server configuration. */
@@ -127,12 +132,11 @@ export interface ServerConfig<TAG extends string = string>
     /**
      * @desc A code to execute after parsing the request body but before processing the Routing of your API.
      * @desc This can be a good place for express middlewares establishing their own routes.
+     * @desc It can help to avoid making a DIY solution based on the attachRouting() approach.
+     * @default undefined
      * @example ({ app }) => { app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument)); }
      * */
-    beforeRouting?: (params: {
-      app: IRouter;
-      logger: AbstractLogger;
-    }) => void | Promise<void>;
+    beforeRouting?: AppExtension;
   };
   /** @desc Enables HTTPS server as well. */
   https?: {
