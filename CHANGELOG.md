@@ -6,7 +6,7 @@
 
 - Introducing the `beforeRouting` feature for the `ServerConfig`:
   - The new option accepts a function that receives the express `app` and a `logger` instance.
-  - That function runs after the parsing the request but before processing the `Routing` of your API.
+  - That function runs after parsing the request but before processing the `Routing` of your API.
   - But most importantly, it runs before the "Not Found Handler".
   - The option enables the configuration of the third-party middlewares serving their own routes or establishing their
     own routing besides your primary API when using the standard `createServer()` method.
