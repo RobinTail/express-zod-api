@@ -830,8 +830,8 @@ const routing: Routing = {
 
 ## Connect to your own express app
 
-If you already have your own configured express application, or you find the library settings not enough,
-you can connect the endpoints to your app or any express router, using `attachRouting()` method:
+If you already have your own configured express application, or you find the library settings not enough, you can
+connect the endpoints to your app or any express router using the `attachRouting()` method:
 
 ```typescript
 import express from "express";
@@ -855,6 +855,9 @@ const routing: Routing = {}; // your endpoints go here
 **Please note** that in this case you probably need to parse `request.body`, call `app.listen()` and handle `404`
 errors yourself. In this regard `attachRouting()` provides you with `notFoundHandler` which you can optionally connect
 to your custom express app.
+
+Besides that, if you're looking to include additional request parsers, or a middleware that establishes its own routes,
+then consider using the `beforeRouting` [option in config instead](#using-native-express-middlewares).
 
 # Special needs
 
