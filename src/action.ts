@@ -114,8 +114,8 @@ export class Action<
         socketId: socket.id,
       });
       const response = this.#parseOutput(output);
-      logger.debug("parsed output", response);
       if (ack && response) {
+        logger.debug("parsed output", response);
         ack(...response);
       }
     } catch (error) {
