@@ -2,6 +2,31 @@
 
 ## Version 16
 
+### v16.7.0
+
+- Introducing the `beforeRouting` feature for the `ServerConfig`:
+  - The new option accepts a function that receives the express `app` and a `logger` instance.
+  - That function runs after the parsing the request but before processing the `Routing` of your API.
+  - But most importantly, it runs before the "Not Found Handler".
+  - The option enables the configuration of the third-party middlewares serving their own routes or establishing their
+    own routing besides your primary API when using the standard `createServer()` method.
+  - The option helps to avoid making a custom express app, the DIY approach using `attachRouting()` method.
+
+```ts
+import { createConfig } from "express-zod-api";
+import ui from "swagger-ui-express";
+
+const config = createConfig({
+  server: {
+    listen: 80,
+    beforeRouting: ({ app, logger }) => {
+      logger.info("Serving the API documentation at https://example.com/docs");
+      app.use("/docs", ui.serve, ui.setup(documentation));
+    },
+  },
+});
+```
+
 ### v16.6.2
 
 - Internal method `Endpoint::_setSiblingMethods()` removed (since v8.4.1);
