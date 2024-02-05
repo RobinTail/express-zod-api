@@ -1,6 +1,7 @@
 import express from "express";
 import { z } from "zod";
 import { createConfig, ez } from "../src";
+import { createSocketsConfig } from "../src/sockets";
 
 export const config = createConfig({
   server: {
@@ -18,11 +19,12 @@ export const config = createConfig({
     users: "Everything about the users",
     files: "Everything about the files processing",
   },
-  sockets: {
-    timeout: 2000,
-    emission: {
-      time: { schema: z.tuple([ez.dateOut()]) },
-    },
+});
+
+export const socketsConfig = createSocketsConfig({
+  timeout: 2000,
+  emission: {
+    time: { schema: z.tuple([ez.dateOut()]) },
   },
 });
 

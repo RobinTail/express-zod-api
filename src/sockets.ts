@@ -1,16 +1,24 @@
 import http from "node:http";
 import type { Server } from "socket.io";
 import { ActionMap, Handler, SocketFeatures } from "./action";
-import { CommonConfig } from "./config-type";
 import { EmissionMap, makeEmitter } from "./emission";
 import { AbstractLogger } from "./logger";
+
+export interface SocketsConfig<E extends EmissionMap> {
+  timeout: number;
+  emission: E;
+}
+
+export const createSocketsConfig = <E extends EmissionMap>(
+  config: SocketsConfig<E>,
+) => config;
 
 export const attachSockets = <T extends Server, E extends EmissionMap>({
   io,
   actions,
   logger,
   target,
-  config: { sockets: config },
+  config: { emission, timeout },
   onConnection = ({ socketId }) => logger.debug("User connected", socketId),
   onDisconnect = ({ socketId }) => logger.debug("User disconnected", socketId),
   onAnyEvent = ({ input: [event], socketId }) =>
@@ -20,7 +28,7 @@ export const attachSockets = <T extends Server, E extends EmissionMap>({
   actions: ActionMap;
   logger: AbstractLogger;
   target: http.Server;
-  config: Pick<CommonConfig<string, E>, "sockets">;
+  config: SocketsConfig<E>;
   onConnection?: Handler<[], void, E>;
   onDisconnect?: Handler<[], void, E>;
   onAnyEvent?: Handler<[string], void, E>;
@@ -28,7 +36,6 @@ export const attachSockets = <T extends Server, E extends EmissionMap>({
   logger.warn(
     "Sockets.IO support is an experimental feature. It can be changed or removed at any time regardless of SemVer.",
   );
-  const { emission, timeout } = config || { emission: {}, timeout: 2000 };
   io.on("connection", async (socket) => {
     const commons: SocketFeatures = {
       socketId: socket.id,

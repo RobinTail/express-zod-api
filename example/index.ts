@@ -1,6 +1,6 @@
 import { createServer } from "../src";
 import { attachSockets } from "../src/sockets";
-import { config } from "./config";
+import { config, socketsConfig } from "./config";
 import { actions, routing } from "./routing";
 import { Server } from "socket.io";
 
@@ -13,8 +13,8 @@ const { httpServer, logger } = await createServer(config, routing);
 
 attachSockets({
   io: new Server(),
+  config: socketsConfig,
   target: httpServer,
   actions,
   logger,
-  config,
 });
