@@ -6,22 +6,28 @@ import { EmissionMap, Emitter } from "./emission";
 import { InputValidationError, OutputValidationError } from "./errors";
 import { AbstractLogger } from "./logger";
 
-export type Handler<IN, OUT, E extends EmissionMap> = (params: {
-  input: IN;
-  logger: AbstractLogger;
-  emit: Emitter<E>;
+interface SocketFeatures {
   isConnected: () => boolean;
   socketId: Socket["id"];
-}) => Promise<OUT>;
+}
+
+export type Handler<IN, OUT, E extends EmissionMap> = (
+  params: {
+    input: IN;
+    logger: AbstractLogger;
+    emit: Emitter<E>;
+  } & SocketFeatures,
+) => Promise<OUT>;
 
 export abstract class AbstractAction {
-  public abstract execute(params: {
-    event: string;
-    params: unknown[];
-    logger: AbstractLogger;
-    socket: Socket;
-    emitter: Emitter<EmissionMap>;
-  }): Promise<void>;
+  public abstract execute(
+    params: {
+      event: string;
+      params: unknown[];
+      logger: AbstractLogger;
+      emit: Emitter<EmissionMap>;
+    } & SocketFeatures,
+  ): Promise<void>;
 }
 
 export class Action<
@@ -90,15 +96,14 @@ export class Action<
     event,
     params,
     logger,
-    socket,
-    emitter,
+    emit,
+    ...rest
   }: {
     event: string;
     params: unknown[];
     logger: AbstractLogger;
-    socket: Socket;
-    emitter: Emitter<EmissionMap>;
-  }): Promise<void> {
+    emit: Emitter<EmissionMap>;
+  } & SocketFeatures): Promise<void> {
     try {
       const input = this.#parseInput(params);
       logger.debug(
@@ -106,13 +111,7 @@ export class Action<
         input,
       );
       const ack = this.#parseAckCb(params);
-      const output = await this.#handler({
-        input,
-        logger,
-        emit: emitter,
-        isConnected: () => socket.connected,
-        socketId: socket.id,
-      });
+      const output = await this.#handler({ input, logger, emit, ...rest });
       const response = this.#parseOutput(output);
       if (ack && response) {
         logger.debug("parsed output", response);
