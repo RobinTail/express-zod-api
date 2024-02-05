@@ -15,6 +15,7 @@ export const config = createConfig({
     compression: true, // affects sendAvatarEndpoint
     rawParser: express.raw(), // required for rawAcceptingEndpoint
     beforeRouting: ({ app }) => {
+      // third-party middlewares serving their own routes or establishing their own routing besides the API
       app.use("/docs", ui.serve, ui.setup(documentation));
     },
   },
