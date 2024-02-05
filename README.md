@@ -336,15 +336,10 @@ of [options](#options) and an error transformer.
 
 ```typescript
 import { defaultEndpointsFactory } from "express-zod-api";
-import cors from "cors";
 import createHttpError from "http-errors";
 import { auth } from "express-oauth2-jwt-bearer";
 
-const simpleUsage = defaultEndpointsFactory.addExpressMiddleware(
-  cors({ credentials: true }), // allows cookies for endpoints produced later
-);
-
-const advancedUsage = defaultEndpointsFactory.use(auth(), {
+const factory = defaultEndpointsFactory.use(auth(), {
   provider: (req) => ({ auth: req.auth }), // optional, can be async
   transformer: (err) => createHttpError(401, err.message), // optional
 });
