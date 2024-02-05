@@ -309,10 +309,29 @@ const endpointsFactory = defaultEndpointsFactory.addOptions({
 
 ## Using native express middlewares
 
-You can connect any native `express` middleware that can be supplied to `express` method `app.use()`.
-For this purpose the `EndpointsFactory` provides method `addExpressMiddleware()` and its alias `use()`.
-There are also two optional features available: a provider of options and an error transformer for `ResultHandler`.
-In case the error in middleware is not a `HttpError`, the `ResultHandler` will send the status `500`.
+There are two ways of connecting the native express middlewares depending on their nature and your objective.
+
+In case it's a middleware establishing and serving its own routes, or somehow globally modify the behaviour, use the
+`beforeRouting` option. Except the `cors` — [there is a better option for that purpose](#cross-origin-resource-sharing).
+
+```typescript
+import { createConfig } from "express-zod-api";
+import ui from "swagger-ui-express";
+
+const config = createConfig({
+  server: {
+    listen: 80,
+    beforeRouting: ({ app, logger }) => {
+      logger.info("Serving the API documentation at https://example.com/docs");
+      app.use("/docs", ui.serve, ui.setup(documentation));
+    },
+  },
+});
+```
+
+In case you need a special processing of `request` or to modify the `response` for selected endpoints, use the method
+`addExpressMiddleware()` of `EndpointsFactory` (or its alias `use()`). The method has two optional features: a provider
+of [options](#options) and an error transformer.
 
 ```typescript
 import { defaultEndpointsFactory } from "express-zod-api";
@@ -321,7 +340,7 @@ import createHttpError from "http-errors";
 import { auth } from "express-oauth2-jwt-bearer";
 
 const simpleUsage = defaultEndpointsFactory.addExpressMiddleware(
-  cors({ credentials: true }),
+  cors({ credentials: true }), // allows cookies for endpoints produced later
 );
 
 const advancedUsage = defaultEndpointsFactory.use(auth(), {
