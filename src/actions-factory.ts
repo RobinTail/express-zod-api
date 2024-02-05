@@ -25,7 +25,7 @@ export class ActionsFactory<E extends EmissionMap> {
 
   public build<IN extends z.AnyZodTuple, OUT extends z.AnyZodTuple>(
     def: SimpleActionDef<IN, E> | AckActionDef<IN, OUT, E>,
-  ): Action<IN, OUT, E> {
-    return new Action(def, this.emission);
+  ): Action<IN, OUT> {
+    return new Action(def);
   }
 }

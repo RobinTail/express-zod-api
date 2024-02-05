@@ -125,8 +125,11 @@ export const statusDependingFactory = new EndpointsFactory({
   }),
 });
 
-/** @desc The declaration of the schemas for the outgoing socket.io events */
-const emission = createEmission({
+/**
+ * @desc The declaration of the schemas for the outgoing socket.io events
+ * @todo this is not a factory but rather a sort of config
+ * */
+export const emission = createEmission({
   time: { schema: z.tuple([ez.dateOut()]) },
 });
 

@@ -20,64 +20,27 @@ export abstract class AbstractAction {
     params: unknown[];
     logger: AbstractLogger;
     socket: Socket;
+    emitter: Emitter<EmissionMap>;
   }): Promise<void>;
 }
 
 export class Action<
   IN extends z.AnyZodTuple,
   OUT extends z.AnyZodTuple,
-  E extends EmissionMap,
 > extends AbstractAction {
   readonly #inputSchema: IN;
   readonly #outputSchema: OUT | undefined;
-  readonly #handler: Handler<z.output<IN>, z.input<OUT> | void, E>;
-  readonly #emission: E;
+  readonly #handler: Handler<z.output<IN>, z.input<OUT> | void, EmissionMap>;
 
   public constructor(
-    action: AckActionDef<IN, OUT, E> | SimpleActionDef<IN, E>,
-    emission: E,
+    action:
+      | AckActionDef<IN, OUT, EmissionMap>
+      | SimpleActionDef<IN, EmissionMap>,
   ) {
     super();
     this.#inputSchema = action.input;
     this.#outputSchema = "output" in action ? action.output : undefined;
     this.#handler = action.handler;
-    this.#emission = emission;
-  }
-
-  async #emit<K extends keyof E>({
-    event,
-    args,
-    logger,
-    socket,
-  }: {
-    event: K;
-    args: z.input<E[K]["schema"]>;
-    logger: AbstractLogger;
-    socket: Socket;
-  }): ReturnType<Emitter<E, K>> {
-    const { schema, ack: ackSchema } = this.#emission[event];
-    const emitValidation = schema.safeParse(args);
-    if (!emitValidation.success) {
-      return logger.error(
-        `${String(event)} emission validation error`,
-        new OutputValidationError(emitValidation.error),
-      );
-    }
-    logger.debug(`Emitting ${String(event)}`, emitValidation.data);
-    if (!ackSchema) {
-      return socket.emit(String(event), ...emitValidation.data) || true;
-    }
-    try {
-      const ack = await socket
-        .timeout(2000) // @todo configurable?
-        .emitWithAck(String(event), ...emitValidation.data);
-      return ackSchema.parse(ack);
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        throw new InputValidationError(error);
-      }
-      throw error;
-    }
   }
 
   /** @throws InputValidationError */
@@ -128,11 +91,13 @@ export class Action<
     params,
     logger,
     socket,
+    emitter,
   }: {
     event: string;
     params: unknown[];
     logger: AbstractLogger;
     socket: Socket;
+    emitter: Emitter<EmissionMap>;
   }): Promise<void> {
     try {
       const input = this.#parseInput(params);
@@ -144,8 +109,7 @@ export class Action<
       const output = await this.#handler({
         input,
         logger,
-        emit: (evt, ...args) =>
-          this.#emit({ event: evt, args, logger, socket }),
+        emit: emitter,
         isConnected: () => socket.connected,
         socketId: socket.id,
       });
