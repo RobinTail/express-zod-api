@@ -1,7 +1,8 @@
 import { init, last } from "ramda";
 import type { Socket } from "socket.io";
 import { z } from "zod";
-import { AckActionDef, EmissionMap, SimpleActionDef } from "./actions-factory";
+import { AckActionDef, SimpleActionDef } from "./actions-factory";
+import { EmissionMap } from "./emission";
 import { InputValidationError, OutputValidationError } from "./errors";
 import { AbstractLogger } from "./logger";
 

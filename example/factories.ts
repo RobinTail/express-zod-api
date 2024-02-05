@@ -9,6 +9,7 @@ import {
   getStatusCodeFromError,
 } from "../src";
 import { ActionsFactory } from "../src/actions-factory";
+import { createEmission } from "../src/emission";
 import { config } from "./config";
 import { authMiddleware } from "./middlewares";
 
@@ -124,12 +125,10 @@ export const statusDependingFactory = new EndpointsFactory({
   }),
 });
 
-/**
- * @desc this factory is for producing actions - handlers of the incoming socket.io events
- * @param emission - declares the schemas for the outgoing socket.io events
- * */
-export const actionsFactory = new ActionsFactory({
-  time: {
-    schema: z.tuple([ez.dateOut()]),
-  },
+/** @desc The declaration of the schemas for the outgoing socket.io events */
+const emission = createEmission({
+  time: { schema: z.tuple([ez.dateOut()]) },
 });
+
+/** @desc this factory is for producing actions - handlers of the incoming socket.io events */
+export const actionsFactory = new ActionsFactory(emission);

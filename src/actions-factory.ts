@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { Action, Handler } from "./action";
+import { EmissionMap } from "./emission";
 
 export interface SimpleActionDef<
   IN extends z.AnyZodTuple,
@@ -17,16 +18,6 @@ export interface AckActionDef<
   input: IN;
   output: OUT;
   handler: Handler<z.output<IN>, z.input<OUT>, E>;
-}
-
-// @todo make a creator fn
-export interface Emission {
-  schema: z.AnyZodTuple;
-  ack?: z.AnyZodTuple;
-}
-
-export interface EmissionMap {
-  [event: string]: Emission;
 }
 
 export class ActionsFactory<E extends EmissionMap> {
