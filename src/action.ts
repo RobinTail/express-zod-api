@@ -16,6 +16,7 @@ export type Handler<IN, OUT, E extends EmissionMap> = (params: {
   logger: AbstractLogger;
   emit: Emitter<E>;
   isConnected: () => boolean;
+  socketId: Socket["id"];
 }) => Promise<OUT>;
 
 export abstract class AbstractAction {
@@ -122,6 +123,7 @@ export class Action<
       logger,
       emit: (evt, ...args) => this.#emit({ event: evt, args, logger, socket }),
       isConnected: () => socket.connected,
+      socketId: socket.id,
     });
     if (!this.#outputSchema) {
       return; // no ack
