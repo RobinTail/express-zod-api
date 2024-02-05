@@ -55,3 +55,6 @@ export type {
   OAuth2Security,
   OpenIdSecurity,
 } from "./security";
+
+// Experimental features: unstable, not covered by tests
+export type { EmissionMap } from "./emission";
