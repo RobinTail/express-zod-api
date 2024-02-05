@@ -330,9 +330,9 @@ const config = createConfig({
 });
 ```
 
-In case you need a special processing of `request` or to modify the `response` for selected endpoints, use the method
+In case you need a special processing of `request`, or to modify the `response` for selected endpoints, use the method
 `addExpressMiddleware()` of `EndpointsFactory` (or its alias `use()`). The method has two optional features: a provider
-of [options](#options) and an error transformer.
+of [options](#options) and an error transformer for adjusting the response status code.
 
 ```typescript
 import { defaultEndpointsFactory } from "express-zod-api";
