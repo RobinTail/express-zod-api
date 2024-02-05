@@ -30,6 +30,7 @@ export type TagsConfig<TAG extends string> = Record<
 >;
 
 export interface SocketsConfig<E extends EmissionMap> {
+  timeout: number;
   emission: E;
 }
 

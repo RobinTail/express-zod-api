@@ -10,7 +10,7 @@ export const attachSockets = <T extends Server, E extends EmissionMap>({
   actions,
   logger,
   target,
-  config,
+  config: { sockets: config },
   onConnection = ({ socketId }) => logger.debug("User connected", socketId),
   onDisconnect = ({ socketId }) => logger.debug("User disconnected", socketId),
   onAnyEvent = ({ input: [event], socketId }) =>
@@ -20,7 +20,7 @@ export const attachSockets = <T extends Server, E extends EmissionMap>({
   actions: ActionMap;
   logger: AbstractLogger;
   target: http.Server;
-  config: CommonConfig<string, E>;
+  config: Pick<CommonConfig<string, E>, "sockets">;
   onConnection?: Handler<[], void, E>;
   onDisconnect?: Handler<[], void, E>;
   onAnyEvent?: Handler<[string], void, E>;
@@ -28,13 +28,13 @@ export const attachSockets = <T extends Server, E extends EmissionMap>({
   logger.warn(
     "Sockets.IO support is an experimental feature. It can be changed or removed at any time regardless of SemVer.",
   );
+  const { emission, timeout } = config || { emission: {}, timeout: 2000 };
   io.on("connection", async (socket) => {
     const commons: SocketFeatures = {
       socketId: socket.id,
       isConnected: () => socket.connected,
     };
-    const emission = (config.sockets?.emission || {}) as E;
-    const emit = makeEmitter({ emission, socket, logger });
+    const emit = makeEmitter({ emission, socket, logger, timeout });
     await onConnection({ input: [], logger, emit, ...commons });
     socket.onAny((event) =>
       onAnyEvent({ input: [event], logger, emit, ...commons }),

@@ -24,10 +24,12 @@ export const makeEmitter =
     emission,
     logger,
     socket,
+    timeout,
   }: {
     emission: E;
     logger: AbstractLogger;
     socket: Socket;
+    timeout: number;
   }): Emitter<E> =>
   async (event, ...args) => {
     const { schema, ack: ackSchema } = emission[event];
@@ -44,7 +46,7 @@ export const makeEmitter =
     }
     try {
       const ack = await socket
-        .timeout(2000) // @todo configurable?
+        .timeout(timeout)
         .emitWithAck(String(event), ...emitValidation.data);
       return ackSchema.parse(ack);
     } catch (error) {

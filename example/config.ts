@@ -19,6 +19,7 @@ export const config = createConfig({
     files: "Everything about the files processing",
   },
   sockets: {
+    timeout: 2000,
     emission: {
       time: { schema: z.tuple([ez.dateOut()]) },
     },
