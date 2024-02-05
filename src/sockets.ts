@@ -9,7 +9,7 @@ export interface ActionMap {
   [event: string]: AbstractAction;
 }
 
-export const attachSockets = <E extends EmissionMap>({
+export const attachSockets = <T extends Server, E extends EmissionMap>({
   io,
   actions,
   logger,
@@ -20,7 +20,7 @@ export const attachSockets = <E extends EmissionMap>({
   onAnyEvent = ({ input: [event], socketId }) =>
     logger.debug(`${event} from ${socketId}`),
 }: {
-  io: Server;
+  io: T;
   actions: ActionMap;
   logger: AbstractLogger;
   target: http.Server;
@@ -28,7 +28,7 @@ export const attachSockets = <E extends EmissionMap>({
   onConnection?: Handler<[], void, E>;
   onDisconnect?: Handler<[], void, E>;
   onAnyEvent?: Handler<[string], void, E>;
-}): Server => {
+}): T => {
   logger.warn(
     "Sockets.IO support is an experimental feature. It can be changed or removed at any time regardless of SemVer.",
   );
