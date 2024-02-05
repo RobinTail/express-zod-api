@@ -6,7 +6,7 @@ import { EmissionMap, Emitter } from "./emission";
 import { InputValidationError, OutputValidationError } from "./errors";
 import { AbstractLogger } from "./logger";
 
-interface SocketFeatures {
+export interface SocketFeatures {
   isConnected: () => boolean;
   socketId: Socket["id"];
 }

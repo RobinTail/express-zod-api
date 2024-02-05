@@ -1,6 +1,6 @@
 import http from "node:http";
 import type { Server } from "socket.io";
-import { AbstractAction, Handler } from "./action";
+import { AbstractAction, Handler, SocketFeatures } from "./action";
 import { EmissionMap, makeEmitter } from "./emission";
 import { AbstractLogger } from "./logger";
 
@@ -29,7 +29,7 @@ export const attachSockets = <E extends EmissionMap>({
     "Sockets.IO support is an experimental feature. It can be changed or removed at any time regardless of SemVer.",
   );
   io.on("connection", async (socket) => {
-    const commons = {
+    const commons: SocketFeatures = {
       socketId: socket.id,
       isConnected: () => socket.connected,
     };
