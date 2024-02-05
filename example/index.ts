@@ -1,6 +1,6 @@
 import { createServer } from "../src";
 import { attachSockets } from "../src/sockets";
-import { config, emission } from "./config";
+import { config } from "./config";
 import { actions, routing } from "./routing";
 import { Server } from "socket.io";
 
@@ -16,5 +16,5 @@ attachSockets({
   target: httpServer,
   actions,
   logger,
-  emission,
+  config,
 });

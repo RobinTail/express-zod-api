@@ -9,7 +9,7 @@ import {
   getStatusCodeFromError,
 } from "../src";
 import { ActionsFactory } from "../src/actions-factory";
-import { config, emission } from "./config";
+import { config } from "./config";
 import { authMiddleware } from "./middlewares";
 
 /** @desc The factory assures the endpoints tagging constraints from config */
@@ -125,4 +125,4 @@ export const statusDependingFactory = new EndpointsFactory({
 });
 
 /** @desc this factory is for producing actions - handlers of the incoming socket.io events */
-export const actionsFactory = new ActionsFactory(emission);
+export const actionsFactory = new ActionsFactory(config);

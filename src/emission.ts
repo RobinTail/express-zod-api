@@ -19,8 +19,6 @@ export type Emitter<E extends EmissionMap> = <K extends keyof E>(
   ...args: z.input<E[K]["schema"]>
 ) => Promise<z.output<TupleOrTrue<E[K]["ack"]>>>;
 
-export const createEmission = <T extends EmissionMap>(def: T) => def;
-
 export const makeEmitter =
   <E extends EmissionMap>({
     emission,

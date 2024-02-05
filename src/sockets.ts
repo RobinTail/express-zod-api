@@ -1,6 +1,7 @@
 import http from "node:http";
 import type { Server } from "socket.io";
 import { AbstractAction, Handler, SocketFeatures } from "./action";
+import { CommonConfig } from "./config-type";
 import { EmissionMap, makeEmitter } from "./emission";
 import { AbstractLogger } from "./logger";
 
@@ -13,7 +14,7 @@ export const attachSockets = <E extends EmissionMap>({
   actions,
   logger,
   target,
-  emission,
+  config,
   onConnection = ({ socketId }) => logger.debug("User connected", socketId),
   onDisconnect = ({ socketId }) => logger.debug("User disconnected", socketId),
   onAnyEvent = ({ input: [event], socketId }) =>
@@ -23,7 +24,7 @@ export const attachSockets = <E extends EmissionMap>({
   actions: ActionMap;
   logger: AbstractLogger;
   target: http.Server;
-  emission: E;
+  config: CommonConfig<string, E>;
   onConnection?: Handler<[], void, E>;
   onDisconnect?: Handler<[], void, E>;
   onAnyEvent?: Handler<[string], void, E>;
@@ -36,6 +37,7 @@ export const attachSockets = <E extends EmissionMap>({
       socketId: socket.id,
       isConnected: () => socket.connected,
     };
+    const emission = (config.sockets?.emission || {}) as E;
     const emit = makeEmitter({ emission, socket, logger });
     await onConnection({ input: [], logger, emit, ...commons });
     socket.onAny((event) =>

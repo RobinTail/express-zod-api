@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { Action, Handler } from "./action";
+import { CommonConfig } from "./config-type";
 import { EmissionMap } from "./emission";
 
 export interface SimpleActionDef<
@@ -21,7 +22,7 @@ export interface AckActionDef<
 }
 
 export class ActionsFactory<E extends EmissionMap> {
-  constructor(protected emission: E) {}
+  constructor(protected config: CommonConfig<string, E>) {}
 
   public build<IN extends z.AnyZodTuple, OUT extends z.AnyZodTuple>(
     def: SimpleActionDef<IN, E> | AckActionDef<IN, OUT, E>,
