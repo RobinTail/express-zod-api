@@ -2,15 +2,9 @@ import { init, last } from "ramda";
 import type { Socket } from "socket.io";
 import { z } from "zod";
 import { AckActionDef, SimpleActionDef } from "./actions-factory";
-import { EmissionMap } from "./emission";
+import { EmissionMap, Emitter } from "./emission";
 import { InputValidationError, OutputValidationError } from "./errors";
 import { AbstractLogger } from "./logger";
-
-type TupleOrTrue<T> = T extends z.AnyZodTuple ? T : z.ZodLiteral<true>;
-type Emitter<E extends EmissionMap, K extends keyof E = keyof E> = (
-  evt: K,
-  ...args: z.input<E[K]["schema"]>
-) => Promise<z.output<TupleOrTrue<E[K]["ack"]>>>;
 
 export type Handler<IN, OUT, E extends EmissionMap> = (params: {
   input: IN;
