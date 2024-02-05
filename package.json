@@ -162,7 +162,7 @@
     "husky": "^9.0.5",
     "make-coverage-badge": "^1.2.0",
     "mockdate": "^3.0.5",
-    "prettier": "3.2.4",
+    "prettier": "3.2.5",
     "socket.io": "^4.7.4",
     "tsd": "^0.30.0",
     "tsup": "^8.0.0",
