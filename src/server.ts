@@ -73,6 +73,9 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
   const { rootLogger, notFoundHandler, parserFailureHandler } =
     await makeCommonEntities(config);
   app.use(parserFailureHandler);
+  if (config.server.beforeRouting) {
+    await config.server.beforeRouting({ app, logger: rootLogger });
+  }
   initRouting({ app, routing, rootLogger, config });
   app.use(notFoundHandler);
 
