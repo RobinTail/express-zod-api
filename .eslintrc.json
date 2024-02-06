@@ -32,7 +32,8 @@
       "files": [
         "./tools/*.ts",
         "./tests/**/*.ts",
-        "./tsup.config.ts"
+        "./tsup.config.ts",
+        "./example/*.ts"
       ],
       "rules": {
         "import/no-extraneous-dependencies": "off"
