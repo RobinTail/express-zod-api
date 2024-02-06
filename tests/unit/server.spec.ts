@@ -74,7 +74,7 @@ describe("Server", () => {
       expect(httpListenSpy).toHaveBeenCalledWith(port, expect.any(Function));
     });
 
-    test("Should create server with custom JSON parser, logger and error handler", async () => {
+    test("Should create server with custom JSON parser, logger, error handler and beforeRouting", async () => {
       const customLogger = winston.createLogger({ silent: true });
       const infoMethod = vi.spyOn(customLogger, "info");
       const port = givePort();
@@ -82,6 +82,7 @@ describe("Server", () => {
         server: {
           listen: { port }, // testing Net::ListenOptions
           jsonParser: vi.fn(),
+          beforeRouting: vi.fn(),
         },
         cors: true,
         startupLogo: false,
@@ -114,6 +115,10 @@ describe("Server", () => {
       expect(appMock.use).toHaveBeenCalledTimes(3);
       expect(appMock.use.mock.calls[0][0]).toBe(configMock.server.jsonParser);
       expect(configMock.errorHandler.handler).toHaveBeenCalledTimes(0);
+      expect(configMock.server.beforeRouting).toHaveBeenCalledWith({
+        app: appMock,
+        logger: customLogger,
+      });
       expect(infoMethod).toHaveBeenCalledTimes(1);
       expect(infoMethod).toHaveBeenCalledWith(`Listening`, { port });
       expect(appMock.get).toHaveBeenCalledTimes(1);
