@@ -21,11 +21,11 @@
   integrity sha512-Jh15/qVmrLGhkKJBdXlK1+9tY4lZruYjsgkDFj08ZmDiWVBLJcqkok7Z0/R0In+i1rScBpJlSvrTS2Lm41Pbnw==
 
 "@arethetypeswrong/cli@^0.13.0":
-  version "0.13.8"
-  resolved "https://registry.yarnpkg.com/@arethetypeswrong/cli/-/cli-0.13.8.tgz#e54a15780f5c83f2ac50f2dfb5ddf502e1eba4f0"
-  integrity sha512-tQCXVBLuSfFlXdQLl17ZlBuHB1zo03H7uTLDFumoOl/dibXw1osYJ+Fd9Oju34buFDzI1DuFS2vba/Bsk95E5Q==
+  version "0.13.9"
+  resolved "https://registry.yarnpkg.com/@arethetypeswrong/cli/-/cli-0.13.9.tgz#7ca9747f31613d5aa2348db8377bd86c1204d80a"
+  integrity sha512-U4/0rpBy7/Y2DxcNtVbHH//dXcX1hek3IE0yeW++bWrArU8R9ZZbfdTjEj4FBLkEu+qYnDQUKDvl05S2uye/IQ==
   dependencies:
-    "@arethetypeswrong/core" "0.13.6"
+    "@arethetypeswrong/core" "0.13.9"
     chalk "^4.1.2"
     cli-table3 "^0.6.3"
     commander "^10.0.1"
@@ -33,13 +33,13 @@
     marked-terminal "^6.0.0"
     semver "^7.5.4"
 
-"@arethetypeswrong/core@0.13.6":
-  version "0.13.6"
-  resolved "https://registry.yarnpkg.com/@arethetypeswrong/core/-/core-0.13.6.tgz#17c30f9b07c3002bfda4b2938c6d9c3797a87ebc"
-  integrity sha512-e3CHQUK1aIIk8VOUavXPu3aVie3ZpxSGQHQoeBabzy81T4xWfQDrc68CqFmfGIEr8Apug47Yq+pYkCG2lsS10w==
+"@arethetypeswrong/core@0.13.9":
+  version "0.13.9"
+  resolved "https://registry.yarnpkg.com/@arethetypeswrong/core/-/core-0.13.9.tgz#8085f0e579b21dd0ed925e396d7938e613fa3876"
+  integrity sha512-JBvXC6fgHFWnTh0wrVsHbl+GPLdwD2IracDpHLvCLlnL4hx6fLCOdZL6Q4qdPAodcsehDL7M2fIrCMluk7kDeQ==
   dependencies:
     "@andrewbranch/untar.js" "^1.0.3"
-    fflate "^0.7.4"
+    fflate "^0.8.2"
     semver "^7.5.4"
     ts-expose-internals-conditionally "1.0.0-empty.0"
     typescript "5.3.3"
@@ -2107,10 +2107,10 @@ fecha@^4.2.0:
   resolved "https://registry.yarnpkg.com/fecha/-/fecha-4.2.3.tgz#4d9ccdbc61e8629b259fdca67e65891448d569fd"
   integrity sha512-OP2IUU6HeYKJi3i0z4A19kHMQoLVs4Hc+DPqqxI2h/DPZHTm/vjsfC6P0b4jCMy14XizLBqvndQ+UilD7707Jw==
 
-fflate@^0.7.4:
-  version "0.7.4"
-  resolved "https://registry.yarnpkg.com/fflate/-/fflate-0.7.4.tgz#61587e5d958fdabb5a9368a302c25363f4f69f50"
-  integrity sha512-5u2V/CDW15QM1XbbgS+0DfPxVB+jUKhWEKuuFuHncbk3tEEqzmoXL+2KyOFuKGqOnmdIy0/davWF1CkuwtibCw==
+fflate@^0.8.2:
+  version "0.8.2"
+  resolved "https://registry.yarnpkg.com/fflate/-/fflate-0.8.2.tgz#fc8631f5347812ad6028bbe4a2308b2792aa1dea"
+  integrity sha512-cPJU47OaAoCbg0pBvzsgpTPhmhqI5eJjh/JIu8tPj5q+T7iLvW/JAYUqmE7KOB4R1ZyEhzBaIQpQpardBF5z8A==
 
 file-entry-cache@^6.0.1:
   version "6.0.1"
@@ -4642,6 +4642,7 @@ winston@^3.10.0:
     winston-transport "^4.5.0"
 
 "wrap-ansi-cjs@npm:wrap-ansi@^7.0.0", wrap-ansi@^7.0.0:
+  name wrap-ansi-cjs
   version "7.0.0"
   resolved "https://registry.yarnpkg.com/wrap-ansi/-/wrap-ansi-7.0.0.tgz#67e145cff510a6a6984bdf1152911d69d2eb9e43"
   integrity sha512-YVGIj2kamLSTxw6NsZjoBxfSwsn0ycdesmc4p+Q21c5zPuZ1pl+NfxVdxPtdHvmNVOQ6XSYG4AUtyt/Fi7D16Q==
