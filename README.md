@@ -701,7 +701,7 @@ import {
   getMessageFromError,
 } from "express-zod-api";
 
-export const yourResultHandler = createResultHandler({
+const yourResultHandler = createResultHandler({
   getPositiveResponse: (output: IOSchema) => ({
     schema: z.object({ data: output }),
     mimeType: "application/json", // optinal, or mimeTypes for array
