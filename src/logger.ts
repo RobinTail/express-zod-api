@@ -61,14 +61,10 @@ export const createLogger = ({
       if (durationMs) {
         details.push("duration:", `${durationMs}ms`);
       }
-      const objectHandler = isPretty ? prettyPrint : JSON.stringify;
+      const serializer = isPretty ? prettyPrint : JSON.stringify;
       const splat = meta?.[Symbol.for("splat")];
       if (Array.isArray(splat)) {
-        details.push(
-          ...splat.map((entry) =>
-            typeof entry === "object" ? objectHandler(entry) : entry,
-          ),
-        );
+        details.push(...splat.map((entry) => serializer(entry)));
       }
       return [timestamp, `${level}:`, message, ...details].join(" ");
     });

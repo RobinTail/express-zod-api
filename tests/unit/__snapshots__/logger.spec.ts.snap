@@ -148,7 +148,7 @@ exports[`Logger > createWinstonLogger() > Should handle non-object meta 0 1`] = 
       Symbol(splat): [
         8090,
       ],
-      Symbol(message): "2022-01-01T00:00:00.000Z [31merror[39m: Code 8090",
+      Symbol(message): "2022-01-01T00:00:00.000Z [31merror[39m: Code [33m8090[39m",
     },
     [Function],
   ],
