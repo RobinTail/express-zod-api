@@ -1,5 +1,5 @@
 import { inspect } from "node:util";
-import type { Format, TransformableInfo } from "logform";
+import type { Format } from "logform";
 import type Winston from "winston";
 import type Transport from "winston-transport";
 import { isObject } from "./common-helpers";
@@ -48,39 +48,23 @@ export const createLogger = ({
 }: SimplifiedWinstonConfig & {
   winston: typeof Winston;
 }): Winston.Logger => {
-  const prettyPrint = (meta: Omit<TransformableInfo, "level" | "message">) => {
-    const {
-      [Symbol.for("level")]: noLevel,
-      [Symbol.for("message")]: noMessage,
-      [Symbol.for("splat")]: noSplat,
-      ...rest
-    } = meta;
-    return inspect(rest, false, 1, config.color);
-  };
+  const prettyPrint = (value: unknown) =>
+    inspect(value, false, 1, config.color);
 
   const getOutputFormat = (isPretty?: boolean) =>
-    printf(({ timestamp, message, level, durationMs, ...meta }) => {
+    printf(({ timestamp, message, level, durationMs, ...rest }) => {
       if (typeof message === "object") {
-        meta = { ...meta, ...(message as object) };
+        rest[Symbol.for("splat")] = [message];
         message = "[No message]";
       }
-      const hasMetaProps = Object.keys(meta).length > 0;
       const details = [];
       if (durationMs) {
         details.push("duration:", `${durationMs}ms`);
       }
-      const objectHandler = isPretty ? prettyPrint : JSON.stringify;
-      if (hasMetaProps) {
-        details.push(objectHandler(meta));
-      } else {
-        const splat = meta?.[Symbol.for("splat")];
-        if (Array.isArray(splat)) {
-          details.push(
-            ...splat.map((entry) =>
-              typeof entry === "object" ? objectHandler(entry) : entry,
-            ),
-          );
-        }
+      const serializer = isPretty ? prettyPrint : JSON.stringify;
+      const splat = rest?.[Symbol.for("splat")];
+      if (Array.isArray(splat)) {
+        details.push(...splat.map((entry) => serializer(entry)));
       }
       return [timestamp, `${level}:`, message, ...details].join(" ");
     });

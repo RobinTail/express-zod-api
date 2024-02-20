@@ -99,6 +99,18 @@ describe("Logger", () => {
         expect(logSpy.mock.calls).toMatchSnapshot();
       },
     );
+
+    test.each(["debug", "warn"] as const)("Should handle array %#", (level) => {
+      const { logger, logSpy } = makeLogger({ level, color: true });
+      logger.error("Array", ["test"]);
+      expect(logSpy.mock.calls).toMatchSnapshot();
+    });
+
+    test("Should handle excessive arguments", () => {
+      const { logger, logSpy } = makeLogger({ level: "debug", color: false });
+      logger.debug("Test", { some: "value" }, [123], 456);
+      expect(logSpy.mock.calls).toMatchSnapshot();
+    });
   });
 
   describe("isSimplifiedLoggerConfig()", () => {
