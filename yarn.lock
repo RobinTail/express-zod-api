@@ -844,9 +844,9 @@
   integrity sha512-zuVdFrMJiuCDQUMCzQaD6KL28MjnqqN8XnAqiEq9PNm/hCPTSGfrXCOfwj1ow4LFb/tNymJPwsNbVePc1xFqrQ==
 
 "@vitest/coverage-istanbul@^1.0.4":
-  version "1.3.0"
-  resolved "https://registry.yarnpkg.com/@vitest/coverage-istanbul/-/coverage-istanbul-1.3.0.tgz#3e3704ff19f23529fc9b6332948741d7473af27d"
-  integrity sha512-Kvj05eR2LJRmYgV+83I6WSHSS7JP3ayeon3c1YN1Tb2Z2U/VHMJNuq1hdC2lF/wC+WRA/MZ0BZUMVP8LfDClJQ==
+  version "1.3.1"
+  resolved "https://registry.yarnpkg.com/@vitest/coverage-istanbul/-/coverage-istanbul-1.3.1.tgz#28e98d1e202a3f66a5ce1a3c1cfd160089a37b48"
+  integrity sha512-aBVgQ2eY9gzrxBJjGKbWgatTU2w1CacEx0n8OMctPzl9836KqoM5X/WigJpjM7wZEtX2N0ZTE5KDGPmVM+o2Wg==
   dependencies:
     debug "^4.3.4"
     istanbul-lib-coverage "^3.2.2"
