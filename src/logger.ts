@@ -52,9 +52,9 @@ export const createLogger = ({
     inspect(value, false, 1, config.color);
 
   const getOutputFormat = (isPretty?: boolean) =>
-    printf(({ timestamp, message, level, durationMs, ...meta }) => {
+    printf(({ timestamp, message, level, durationMs, ...rest }) => {
       if (typeof message === "object") {
-        meta[Symbol.for("splat")] = [message];
+        rest[Symbol.for("splat")] = [message];
         message = "[No message]";
       }
       const details = [];
@@ -62,7 +62,7 @@ export const createLogger = ({
         details.push("duration:", `${durationMs}ms`);
       }
       const serializer = isPretty ? prettyPrint : JSON.stringify;
-      const splat = meta?.[Symbol.for("splat")];
+      const splat = rest?.[Symbol.for("splat")];
       if (Array.isArray(splat)) {
         details.push(...splat.map((entry) => serializer(entry)));
       }
