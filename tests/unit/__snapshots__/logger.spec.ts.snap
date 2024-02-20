@@ -137,6 +137,31 @@ exports[`Logger > createWinstonLogger() > Should handle empty object meta 1 1`] 
 ]
 `;
 
+exports[`Logger > createWinstonLogger() > Should handle excessive arguments 1`] = `
+[
+  [
+    {
+      "level": "debug",
+      "message": "Test",
+      "some": "value",
+      "timestamp": "2022-01-01T00:00:00.000Z",
+      Symbol(level): "debug",
+      Symbol(splat): [
+        {
+          "some": "value",
+        },
+        [
+          123,
+        ],
+        456,
+      ],
+      Symbol(message): "2022-01-01T00:00:00.000Z debug: Test { some: 'value' } [ 123 ] 456",
+    },
+    [Function],
+  ],
+]
+`;
+
 exports[`Logger > createWinstonLogger() > Should handle non-object meta 0 1`] = `
 [
   [
