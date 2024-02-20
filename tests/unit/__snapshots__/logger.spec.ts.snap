@@ -56,7 +56,7 @@ exports[`Logger > createWinstonLogger() > Should handle array 0 1`] = `
           "test",
         ],
       ],
-      Symbol(message): "2022-01-01T00:00:00.000Z [31merror[39m: Array { [32m'0'[39m: [32m'test'[39m }",
+      Symbol(message): "2022-01-01T00:00:00.000Z [31merror[39m: Array [ [32m'test'[39m ]",
     },
     [Function],
   ],

@@ -1,5 +1,5 @@
 import { inspect } from "node:util";
-import type { Format, TransformableInfo } from "logform";
+import type { Format } from "logform";
 import type Winston from "winston";
 import type Transport from "winston-transport";
 import { isObject } from "./common-helpers";
@@ -48,15 +48,8 @@ export const createLogger = ({
 }: SimplifiedWinstonConfig & {
   winston: typeof Winston;
 }): Winston.Logger => {
-  const prettyPrint = (meta: Omit<TransformableInfo, "level" | "message">) => {
-    const {
-      [Symbol.for("level")]: noLevel,
-      [Symbol.for("message")]: noMessage,
-      [Symbol.for("splat")]: noSplat,
-      ...rest
-    } = meta;
-    return inspect(rest, false, 1, config.color);
-  };
+  const prettyPrint = (value: unknown) =>
+    inspect(value, false, 1, config.color);
 
   const getOutputFormat = (isPretty?: boolean) =>
     printf(({ timestamp, message, level, durationMs, ...meta }) => {
