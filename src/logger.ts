@@ -61,26 +61,21 @@ export const createLogger = ({
   const getOutputFormat = (isPretty?: boolean) =>
     printf(({ timestamp, message, level, durationMs, ...meta }) => {
       if (typeof message === "object") {
-        meta = { ...meta, ...(message as object) };
+        meta[Symbol.for("splat")] = [message];
         message = "[No message]";
       }
-      const hasMetaProps = Object.keys(meta).length > 0;
       const details = [];
       if (durationMs) {
         details.push("duration:", `${durationMs}ms`);
       }
       const objectHandler = isPretty ? prettyPrint : JSON.stringify;
-      if (hasMetaProps) {
-        details.push(objectHandler(meta));
-      } else {
-        const splat = meta?.[Symbol.for("splat")];
-        if (Array.isArray(splat)) {
-          details.push(
-            ...splat.map((entry) =>
-              typeof entry === "object" ? objectHandler(entry) : entry,
-            ),
-          );
-        }
+      const splat = meta?.[Symbol.for("splat")];
+      if (Array.isArray(splat)) {
+        details.push(
+          ...splat.map((entry) =>
+            typeof entry === "object" ? objectHandler(entry) : entry,
+          ),
+        );
       }
       return [timestamp, `${level}:`, message, ...details].join(" ");
     });
