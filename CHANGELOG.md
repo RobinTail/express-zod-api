@@ -2,6 +2,16 @@
 
 ## Version 16
 
+### v16.7.1
+
+- Fixed logging arrays by the default `winston` logger.
+
+```typescript
+// before: Items { '0': 123 }
+// after:  Items [ 123 ]
+logger.debug("Items", [123]);
+```
+
 ### v16.7.0
 
 - Introducing the `beforeRouting` feature for the `ServerConfig`:
