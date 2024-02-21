@@ -198,7 +198,7 @@ exports[`Logger > createWinstonLogger() > Should handle non-object meta 1 1`] = 
 ]
 `;
 
-exports[`Logger > createWinstonLogger() > Should handle recursive references within subject 1`] = `
+exports[`Logger > createWinstonLogger() > Should handle recursive references within subject 0 1`] = `
 [
   [
     {
@@ -245,7 +245,7 @@ exports[`Logger > createWinstonLogger() > Should handle recursive references wit
 ]
 `;
 
-exports[`Logger > createWinstonLogger() > Should handle recursive references within subject 2`] = `
+exports[`Logger > createWinstonLogger() > Should handle recursive references within subject 1 1`] = `
 [
   [
     {
@@ -282,10 +282,7 @@ exports[`Logger > createWinstonLogger() > Should handle recursive references wit
           },
         },
       ],
-      Symbol(message): "2022-01-01T00:00:00.000Z error: Recursive <ref *1> {
-  a: [ [Circular *1] ],
-  b: <ref *2> { inner: [Circular *2], obj: [Circular *1] }
-}",
+      Symbol(message): "2022-01-01T00:00:00.000Z error: Recursive <ref *1> { a: [ [Circular *1] ], b: <ref *2> { inner: [Circular *2], obj: [Circular *1] } }",
     },
     [Function],
   ],

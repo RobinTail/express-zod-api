@@ -17,7 +17,10 @@ export type AbstractLogger = Record<
   LoggerOverrides;
 
 export interface SimplifiedWinstonConfig {
-  /** @desc The minimal severity to log or "silent" to disable logging */
+  /**
+   * @desc The minimal severity to log or "silent" to disable logging
+   * @example "debug" also enables pretty output for inspected entities
+   * */
   level: "silent" | "warn" | "debug";
   /**
    * @desc Enables colors on printed severity and inspected entities
@@ -64,7 +67,12 @@ export const createLogger = ({
   const isSilent = config.level === "silent";
 
   const prettyPrint = (value: unknown) =>
-    inspect(value, { colors: config.color, depth: config.depth });
+    inspect(value, {
+      colors: config.color,
+      depth: config.depth,
+      breakLength: config.level === "debug" ? 80 : Infinity,
+      compact: config.level === "debug" ? 3 : true,
+    });
 
   const customFormat = printf(
     ({ timestamp, message, level, durationMs, ...rest }) => {
