@@ -106,6 +106,20 @@ describe("Logger", () => {
       expect(logSpy.mock.calls).toMatchSnapshot();
     });
 
+    test.each(["debug", "warn"] as const)(
+      "Should handle recursive references within subject",
+      (level) => {
+        const { logger, logSpy } = makeLogger({ level, color: false });
+        const subject: any = {};
+        subject.a = [subject];
+        subject.b = {};
+        subject.b.inner = subject.b;
+        subject.b.obj = subject;
+        logger.error("Recursive", subject);
+        expect(logSpy.mock.calls).toMatchSnapshot();
+      },
+    );
+
     test("Should handle excessive arguments", () => {
       const { logger, logSpy } = makeLogger({ level: "debug", color: false });
       logger.debug("Test", { some: "value" }, [123], 456);

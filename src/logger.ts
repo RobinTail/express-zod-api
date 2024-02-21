@@ -51,7 +51,7 @@ export const createLogger = ({
   const prettyPrint = (value: unknown) =>
     inspect(value, { colors: config.color, depth: 1 });
 
-  const getOutputFormat = (isPretty?: boolean) =>
+  const getOutputFormat = () =>
     printf(({ timestamp, message, level, durationMs, ...rest }) => {
       if (typeof message === "object") {
         rest[Symbol.for("splat")] = [message];
@@ -61,10 +61,9 @@ export const createLogger = ({
       if (durationMs) {
         details.push("duration:", `${durationMs}ms`);
       }
-      const serializer = isPretty ? prettyPrint : JSON.stringify;
       const splat = rest?.[Symbol.for("splat")];
       if (Array.isArray(splat)) {
-        details.push(...splat.map((entry) => serializer(entry)));
+        details.push(...splat.map(prettyPrint));
       }
       return [timestamp, `${level}:`, message, ...details].join(" ");
     });
@@ -79,18 +78,18 @@ export const createLogger = ({
     formats.push(colorize());
   }
 
+  // @todo shorten
   switch (config.level) {
     case "debug":
       consoleOutputOptions.level = "debug";
-      formats.push(getOutputFormat(true));
       break;
     case "silent":
     case "warn":
     default:
       consoleOutputOptions.level = "warn";
-      formats.push(getOutputFormat());
   }
 
+  formats.push(getOutputFormat());
   consoleOutputOptions.format = combine(...formats);
 
   return create({
