@@ -49,7 +49,7 @@ export const createLogger = ({
   winston: typeof Winston;
 }): Winston.Logger => {
   const prettyPrint = (value: unknown) =>
-    inspect(value, false, 1, config.color);
+    inspect(value, { colors: config.color, depth: 1 });
 
   const getOutputFormat = (isPretty?: boolean) =>
     printf(({ timestamp, message, level, durationMs, ...rest }) => {
