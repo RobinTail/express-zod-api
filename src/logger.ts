@@ -51,8 +51,8 @@ export const createLogger = ({
   const prettyPrint = (value: unknown) =>
     inspect(value, { colors: config.color, depth: 1 });
 
-  const getOutputFormat = () =>
-    printf(({ timestamp, message, level, durationMs, ...rest }) => {
+  const customFormat = printf(
+    ({ timestamp, message, level, durationMs, ...rest }) => {
       if (typeof message === "object") {
         rest[Symbol.for("splat")] = [message];
         message = "[No message]";
@@ -66,20 +66,20 @@ export const createLogger = ({
         details.push(...splat.map(prettyPrint));
       }
       return [timestamp, `${level}:`, message, ...details].join(" ");
-    });
+    },
+  );
 
   const formats: Format[] = [useTimestamp()];
+  if (config.color) {
+    formats.push(colorize());
+  }
+  formats.push(customFormat);
 
   const consoleOutputOptions: Transport.TransportStreamOptions = {
     level: config.level === "silent" ? "warn" : config.level,
     handleExceptions: true,
   };
 
-  if (config.color) {
-    formats.push(colorize());
-  }
-
-  formats.push(getOutputFormat());
   consoleOutputOptions.format = combine(...formats);
 
   return create({
