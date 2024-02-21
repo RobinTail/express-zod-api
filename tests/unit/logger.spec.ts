@@ -132,6 +132,9 @@ describe("Logger", () => {
       { level: "silent" },
       { level: "debug", color: false },
       { level: "warn", color: true },
+      { level: "warn", depth: 5 },
+      { level: "warn", depth: null },
+      { level: "warn", depth: Infinity },
     ])("should validate config %#", (sample) => {
       expect(isSimplifiedWinstonConfig(sample)).toBeTruthy();
     });
@@ -143,6 +146,7 @@ describe("Logger", () => {
       { level: null },
       { level: "wrong" },
       { level: "debug", color: null },
+      { level: "debug", depth: "wrong" },
     ])("should invalidate config %#", (sample) => {
       expect(isSimplifiedWinstonConfig(sample)).toBeFalsy();
     });

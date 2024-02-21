@@ -17,8 +17,20 @@ export type AbstractLogger = Record<
   LoggerOverrides;
 
 export interface SimplifiedWinstonConfig {
+  /** @desc The minimal severity to log or "silent" to disable logging */
   level: "silent" | "warn" | "debug";
+  /**
+   * @desc Enables colors on printed severity and inspected entities
+   * @default false
+   * */
   color?: boolean;
+  /**
+   * @desc Control how deeply entities should be inspected
+   * @default 2
+   * @example null
+   * @example Infinity
+   * */
+  depth?: number | null;
 }
 
 export const isSimplifiedWinstonConfig = (
@@ -27,13 +39,16 @@ export const isSimplifiedWinstonConfig = (
   isObject(subject) &&
   "level" in subject &&
   ("color" in subject ? typeof subject.color === "boolean" : true) &&
+  ("depth" in subject
+    ? typeof subject.depth === "number" || subject.depth === null
+    : true) &&
   typeof subject.level === "string" &&
   ["silent", "warn", "debug"].includes(subject.level);
 
 /**
  * @desc a helper for creating a winston logger easier
  * @requires winston
- * @example createLogger({ winston, level: "debug", color: true })
+ * @example createLogger({ winston, level: "debug", color: true, depth: 4 })
  * */
 export const createLogger = ({
   winston: {
@@ -49,7 +64,7 @@ export const createLogger = ({
   const isSilent = config.level === "silent";
 
   const prettyPrint = (value: unknown) =>
-    inspect(value, { colors: config.color, depth: 1 });
+    inspect(value, { colors: config.color, depth: config.depth });
 
   const customFormat = printf(
     ({ timestamp, message, level, durationMs, ...rest }) => {
