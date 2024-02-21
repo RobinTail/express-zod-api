@@ -47,6 +47,8 @@ export const createLogger = ({
 }: SimplifiedWinstonConfig & {
   winston: typeof Winston;
 }): Winston.Logger => {
+  const isSilent = config.level === "silent";
+
   const prettyPrint = (value: unknown) =>
     inspect(value, { colors: config.color, depth: 1 });
 
@@ -69,7 +71,7 @@ export const createLogger = ({
   );
 
   const consoleOutputOptions: Transport.TransportStreamOptions = {
-    level: config.level === "silent" ? "warn" : config.level,
+    level: isSilent ? "warn" : config.level,
     handleExceptions: true,
     format: combine(
       useTimestamp(),
@@ -79,7 +81,7 @@ export const createLogger = ({
   };
 
   return create({
-    silent: config.level === "silent",
+    silent: isSilent,
     levels: npm.levels,
     transports: [new transports.Console(consoleOutputOptions)],
     exitOnError: false,
