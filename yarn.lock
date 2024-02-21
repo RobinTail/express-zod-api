@@ -20,12 +20,12 @@
   resolved "https://registry.yarnpkg.com/@andrewbranch/untar.js/-/untar.js-1.0.3.tgz#ba9494f85eb83017c5c855763969caf1d0adea00"
   integrity sha512-Jh15/qVmrLGhkKJBdXlK1+9tY4lZruYjsgkDFj08ZmDiWVBLJcqkok7Z0/R0In+i1rScBpJlSvrTS2Lm41Pbnw==
 
-"@arethetypeswrong/cli@^0.13.0":
-  version "0.13.10"
-  resolved "https://registry.yarnpkg.com/@arethetypeswrong/cli/-/cli-0.13.10.tgz#ca76a6926cb84a52772b968c6c2ee35ae0a38155"
-  integrity sha512-UV5Vk2ZaERQb0jS82rVWviKQieVpodiWKTOE/l8QN5fvG83AdhpI4QG8I5F1qSU/xq3K5RK44Bbgn6/JqwlT/A==
+"@arethetypeswrong/cli@^0.14.0":
+  version "0.14.0"
+  resolved "https://registry.yarnpkg.com/@arethetypeswrong/cli/-/cli-0.14.0.tgz#8e3e9418a4b7538c6bd45bb0a4cb5a5867a291d5"
+  integrity sha512-ARDdkLpIFuLiC/E6/MggG17KIWte9KAG+zMeNMtTp+1MJdN1glWu/O35pssO1QcclSrq7kY8WeQjQKqUjGA81g==
   dependencies:
-    "@arethetypeswrong/core" "0.13.9"
+    "@arethetypeswrong/core" "0.14.0"
     chalk "^4.1.2"
     cli-table3 "^0.6.3"
     commander "^10.0.1"
@@ -33,10 +33,10 @@
     marked-terminal "^6.0.0"
     semver "^7.5.4"
 
-"@arethetypeswrong/core@0.13.9":
-  version "0.13.9"
-  resolved "https://registry.yarnpkg.com/@arethetypeswrong/core/-/core-0.13.9.tgz#8085f0e579b21dd0ed925e396d7938e613fa3876"
-  integrity sha512-JBvXC6fgHFWnTh0wrVsHbl+GPLdwD2IracDpHLvCLlnL4hx6fLCOdZL6Q4qdPAodcsehDL7M2fIrCMluk7kDeQ==
+"@arethetypeswrong/core@0.14.0":
+  version "0.14.0"
+  resolved "https://registry.yarnpkg.com/@arethetypeswrong/core/-/core-0.14.0.tgz#5f2807958dd1a8a3b554bc6df9b756cd840dc39a"
+  integrity sha512-cBSK6bqCRNOtODj0BWoaJo7beAH3SEeDpXtNmBtFs34/oZhn1KISC7SBymx4fLSuj2wTueG3seyqLhvVBOouUQ==
   dependencies:
     "@andrewbranch/untar.js" "^1.0.3"
     fflate "^0.8.2"
@@ -4655,6 +4655,7 @@ winston@^3.10.0:
     winston-transport "^4.5.0"
 
 "wrap-ansi-cjs@npm:wrap-ansi@^7.0.0", wrap-ansi@^7.0.0:
+  name wrap-ansi-cjs
   version "7.0.0"
   resolved "https://registry.yarnpkg.com/wrap-ansi/-/wrap-ansi-7.0.0.tgz#67e145cff510a6a6984bdf1152911d69d2eb9e43"
   integrity sha512-YVGIj2kamLSTxw6NsZjoBxfSwsn0ycdesmc4p+Q21c5zPuZ1pl+NfxVdxPtdHvmNVOQ6XSYG4AUtyt/Fi7D16Q==
