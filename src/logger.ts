@@ -71,22 +71,12 @@ export const createLogger = ({
   const formats: Format[] = [useTimestamp()];
 
   const consoleOutputOptions: Transport.TransportStreamOptions = {
+    level: config.level === "silent" ? "warn" : config.level,
     handleExceptions: true,
   };
 
   if (config.color) {
     formats.push(colorize());
-  }
-
-  // @todo shorten
-  switch (config.level) {
-    case "debug":
-      consoleOutputOptions.level = "debug";
-      break;
-    case "silent":
-    case "warn":
-    default:
-      consoleOutputOptions.level = "warn";
   }
 
   formats.push(getOutputFormat());
