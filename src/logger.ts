@@ -1,7 +1,5 @@
 import { inspect } from "node:util";
-import type { Format } from "logform";
 import type Winston from "winston";
-import type Transport from "winston-transport";
 import { isObject } from "./common-helpers";
 
 /**
@@ -19,8 +17,23 @@ export type AbstractLogger = Record<
   LoggerOverrides;
 
 export interface SimplifiedWinstonConfig {
+  /**
+   * @desc The minimal severity to log or "silent" to disable logging
+   * @example "debug" also enables pretty output for inspected entities
+   * */
   level: "silent" | "warn" | "debug";
+  /**
+   * @desc Enables colors on printed severity and inspected entities
+   * @default false
+   * */
   color?: boolean;
+  /**
+   * @desc Control how deeply entities should be inspected
+   * @default 2
+   * @example null
+   * @example Infinity
+   * */
+  depth?: number | null;
 }
 
 export const isSimplifiedWinstonConfig = (
@@ -29,13 +42,16 @@ export const isSimplifiedWinstonConfig = (
   isObject(subject) &&
   "level" in subject &&
   ("color" in subject ? typeof subject.color === "boolean" : true) &&
+  ("depth" in subject
+    ? typeof subject.depth === "number" || subject.depth === null
+    : true) &&
   typeof subject.level === "string" &&
   ["silent", "warn", "debug"].includes(subject.level);
 
 /**
  * @desc a helper for creating a winston logger easier
  * @requires winston
- * @example createLogger({ winston, level: "debug", color: true })
+ * @example createLogger({ winston, level: "debug", color: true, depth: 4 })
  * */
 export const createLogger = ({
   winston: {
@@ -48,11 +64,19 @@ export const createLogger = ({
 }: SimplifiedWinstonConfig & {
   winston: typeof Winston;
 }): Winston.Logger => {
-  const prettyPrint = (value: unknown) =>
-    inspect(value, false, 1, config.color);
+  const isSilent = config.level === "silent";
+  const isDebug = config.level === "debug";
 
-  const getOutputFormat = (isPretty?: boolean) =>
-    printf(({ timestamp, message, level, durationMs, ...rest }) => {
+  const prettyPrint = (value: unknown) =>
+    inspect(value, {
+      colors: config.color,
+      depth: config.depth,
+      breakLength: isDebug ? 80 : Infinity,
+      compact: isDebug ? 3 : true,
+    });
+
+  const customFormat = printf(
+    ({ timestamp, message, level, durationMs, ...rest }) => {
       if (typeof message === "object") {
         rest[Symbol.for("splat")] = [message];
         message = "[No message]";
@@ -61,42 +85,28 @@ export const createLogger = ({
       if (durationMs) {
         details.push("duration:", `${durationMs}ms`);
       }
-      const serializer = isPretty ? prettyPrint : JSON.stringify;
       const splat = rest?.[Symbol.for("splat")];
       if (Array.isArray(splat)) {
-        details.push(...splat.map((entry) => serializer(entry)));
+        details.push(...splat.map(prettyPrint));
       }
       return [timestamp, `${level}:`, message, ...details].join(" ");
-    });
-
-  const formats: Format[] = [useTimestamp()];
-
-  const consoleOutputOptions: Transport.TransportStreamOptions = {
-    handleExceptions: true,
-  };
-
-  if (config.color) {
-    formats.push(colorize());
-  }
-
-  switch (config.level) {
-    case "debug":
-      consoleOutputOptions.level = "debug";
-      formats.push(getOutputFormat(true));
-      break;
-    case "silent":
-    case "warn":
-    default:
-      consoleOutputOptions.level = "warn";
-      formats.push(getOutputFormat());
-  }
-
-  consoleOutputOptions.format = combine(...formats);
+    },
+  );
 
   return create({
-    silent: config.level === "silent",
+    silent: isSilent,
     levels: npm.levels,
-    transports: [new transports.Console(consoleOutputOptions)],
     exitOnError: false,
+    transports: [
+      new transports.Console({
+        level: isSilent ? "warn" : config.level,
+        handleExceptions: true,
+        format: combine(
+          useTimestamp(),
+          ...(config.color ? [colorize()] : []),
+          customFormat,
+        ),
+      }),
+    ],
   });
 };
