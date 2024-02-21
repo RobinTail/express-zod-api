@@ -1,6 +1,5 @@
 import { inspect } from "node:util";
 import type Winston from "winston";
-import type Transport from "winston-transport";
 import { isObject } from "./common-helpers";
 
 /**
@@ -70,20 +69,20 @@ export const createLogger = ({
     },
   );
 
-  const consoleOutputOptions: Transport.TransportStreamOptions = {
-    level: isSilent ? "warn" : config.level,
-    handleExceptions: true,
-    format: combine(
-      useTimestamp(),
-      ...(config.color ? [colorize()] : []),
-      customFormat,
-    ),
-  };
-
   return create({
     silent: isSilent,
     levels: npm.levels,
-    transports: [new transports.Console(consoleOutputOptions)],
     exitOnError: false,
+    transports: [
+      new transports.Console({
+        level: isSilent ? "warn" : config.level,
+        handleExceptions: true,
+        format: combine(
+          useTimestamp(),
+          ...(config.color ? [colorize()] : []),
+          customFormat,
+        ),
+      }),
+    ],
   });
 };
