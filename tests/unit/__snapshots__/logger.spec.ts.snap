@@ -84,6 +84,97 @@ exports[`Logger > createWinstonLogger() > Should handle array 1 1`] = `
 ]
 `;
 
+exports[`Logger > createWinstonLogger() > Should handle circular references within subject 0 1`] = `
+[
+  [
+    {
+      "a": [
+        {
+          "a": [Circular],
+          "b": {
+            "inner": [Circular],
+            "obj": [Circular],
+          },
+        },
+      ],
+      "b": {
+        "inner": [Circular],
+        "obj": {
+          "a": [
+            [Circular],
+          ],
+          "b": [Circular],
+        },
+      },
+      "level": "error",
+      "message": "Recursive",
+      "timestamp": "2022-01-01T00:00:00.000Z",
+      Symbol(level): "error",
+      Symbol(splat): [
+        {
+          "a": [
+            [Circular],
+          ],
+          "b": {
+            "inner": [Circular],
+            "obj": [Circular],
+          },
+        },
+      ],
+      Symbol(message): "2022-01-01T00:00:00.000Z error: Recursive <ref *1> {
+  a: [ [Circular *1] ],
+  b: <ref *2> { inner: [Circular *2], obj: [Circular *1] }
+}",
+    },
+    [Function],
+  ],
+]
+`;
+
+exports[`Logger > createWinstonLogger() > Should handle circular references within subject 1 1`] = `
+[
+  [
+    {
+      "a": [
+        {
+          "a": [Circular],
+          "b": {
+            "inner": [Circular],
+            "obj": [Circular],
+          },
+        },
+      ],
+      "b": {
+        "inner": [Circular],
+        "obj": {
+          "a": [
+            [Circular],
+          ],
+          "b": [Circular],
+        },
+      },
+      "level": "error",
+      "message": "Recursive",
+      "timestamp": "2022-01-01T00:00:00.000Z",
+      Symbol(level): "error",
+      Symbol(splat): [
+        {
+          "a": [
+            [Circular],
+          ],
+          "b": {
+            "inner": [Circular],
+            "obj": [Circular],
+          },
+        },
+      ],
+      Symbol(message): "2022-01-01T00:00:00.000Z error: Recursive <ref *1> { a: [ [Circular *1] ], b: <ref *2> { inner: [Circular *2], obj: [Circular *1] } }",
+    },
+    [Function],
+  ],
+]
+`;
+
 exports[`Logger > createWinstonLogger() > Should handle empty message 1`] = `
 [
   [
@@ -192,97 +283,6 @@ exports[`Logger > createWinstonLogger() > Should handle non-object meta 1 1`] = 
         8090,
       ],
       Symbol(message): "2022-01-01T00:00:00.000Z [31merror[39m: Code [33m8090[39m",
-    },
-    [Function],
-  ],
-]
-`;
-
-exports[`Logger > createWinstonLogger() > Should handle recursive references within subject 0 1`] = `
-[
-  [
-    {
-      "a": [
-        {
-          "a": [Circular],
-          "b": {
-            "inner": [Circular],
-            "obj": [Circular],
-          },
-        },
-      ],
-      "b": {
-        "inner": [Circular],
-        "obj": {
-          "a": [
-            [Circular],
-          ],
-          "b": [Circular],
-        },
-      },
-      "level": "error",
-      "message": "Recursive",
-      "timestamp": "2022-01-01T00:00:00.000Z",
-      Symbol(level): "error",
-      Symbol(splat): [
-        {
-          "a": [
-            [Circular],
-          ],
-          "b": {
-            "inner": [Circular],
-            "obj": [Circular],
-          },
-        },
-      ],
-      Symbol(message): "2022-01-01T00:00:00.000Z error: Recursive <ref *1> {
-  a: [ [Circular *1] ],
-  b: <ref *2> { inner: [Circular *2], obj: [Circular *1] }
-}",
-    },
-    [Function],
-  ],
-]
-`;
-
-exports[`Logger > createWinstonLogger() > Should handle recursive references within subject 1 1`] = `
-[
-  [
-    {
-      "a": [
-        {
-          "a": [Circular],
-          "b": {
-            "inner": [Circular],
-            "obj": [Circular],
-          },
-        },
-      ],
-      "b": {
-        "inner": [Circular],
-        "obj": {
-          "a": [
-            [Circular],
-          ],
-          "b": [Circular],
-        },
-      },
-      "level": "error",
-      "message": "Recursive",
-      "timestamp": "2022-01-01T00:00:00.000Z",
-      Symbol(level): "error",
-      Symbol(splat): [
-        {
-          "a": [
-            [Circular],
-          ],
-          "b": {
-            "inner": [Circular],
-            "obj": [Circular],
-          },
-        },
-      ],
-      Symbol(message): "2022-01-01T00:00:00.000Z error: Recursive <ref *1> { a: [ [Circular *1] ], b: <ref *2> { inner: [Circular *2], obj: [Circular *1] } }",
     },
     [Function],
   ],

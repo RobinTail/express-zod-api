@@ -107,7 +107,7 @@ describe("Logger", () => {
     });
 
     test.each(["debug", "warn"] as const)(
-      "Should handle recursive references within subject %#",
+      "Should handle circular references within subject %#",
       (level) => {
         const { logger, logSpy } = makeLogger({ level, color: false });
         const subject: any = {};
