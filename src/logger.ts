@@ -65,13 +65,14 @@ export const createLogger = ({
   winston: typeof Winston;
 }): Winston.Logger => {
   const isSilent = config.level === "silent";
+  const isDebug = config.level === "debug";
 
   const prettyPrint = (value: unknown) =>
     inspect(value, {
       colors: config.color,
       depth: config.depth,
-      breakLength: config.level === "debug" ? 80 : Infinity,
-      compact: config.level === "debug" ? 3 : true,
+      breakLength: isDebug ? 80 : Infinity,
+      compact: isDebug ? 3 : true,
     });
 
   const customFormat = printf(
