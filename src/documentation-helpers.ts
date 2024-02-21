@@ -119,13 +119,8 @@ const samples = {
 /** @see https://expressjs.com/en/guide/routing.html */
 const routePathParamsRegex = /:([A-Za-z0-9_]+)/g;
 
-export const getRoutePathParams = (path: string): string[] => {
-  const match = path.match(routePathParamsRegex);
-  if (!match) {
-    return [];
-  }
-  return match.map((param) => param.slice(1));
-};
+export const getRoutePathParams = (path: string): string[] =>
+  path.match(routePathParamsRegex)?.map((param) => param.slice(1)) || [];
 
 export const reformatParamsInPath = (path: string) =>
   path.replace(routePathParamsRegex, (param) => `{${param.slice(1)}}`);
@@ -821,12 +816,12 @@ export const excludeParamsFromDepiction = (
     ? depicted.required.filter((name) => !pathParams.includes(name))
     : undefined;
   const allOf = depicted.allOf
-    ? (depicted.allOf as SchemaObject[]).map((entry) =>
+    ? depicted.allOf.map((entry) =>
         excludeParamsFromDepiction(entry, pathParams),
       )
     : undefined;
   const oneOf = depicted.oneOf
-    ? (depicted.oneOf as SchemaObject[]).map((entry) =>
+    ? depicted.oneOf.map((entry) =>
         excludeParamsFromDepiction(entry, pathParams),
       )
     : undefined;
@@ -1052,9 +1047,7 @@ export const depictTags = <TAG extends string>(
     return result;
   });
 
-export const ensureShortDescription = (description: string) => {
-  if (description.length <= shortDescriptionLimit) {
-    return description;
-  }
-  return description.slice(0, shortDescriptionLimit - 1) + "…";
-};
+export const ensureShortDescription = (description: string) =>
+  description.length <= shortDescriptionLimit
+    ? description
+    : description.slice(0, shortDescriptionLimit - 1) + "…";

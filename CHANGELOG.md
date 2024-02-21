@@ -21,6 +21,79 @@
 
 ## Version 16
 
+### v16.8.0
+
+- Fixed a bug on logging objects having circular references by the default `winston` logger.
+  - The issue only occurred if the `level` was set to `warn`.
+  - In that particular case objects were serialized using the `JSON.stringify()` method to reduce production logs.
+  - However, that method could not handle possible circular references within the object.
+  - This version relies on `inspect()` method of `node:util` instead, for serializing objects in all cases.
+  - When the `level` is set to `debug` the inspected objects will be pretty printed.
+  - When the `level` is set to `warn` the inspected objects will be serialized in one line.
+- Additionaly, new option `depth` added to `SimplifiedWinstonConfig` that can be `number | null` being `2` by default.
+  - The option controls how deeply the objects should be inspected, serialized and printed.
+  - It can be set to `null` or `Infinity` for unlimited depth.
+
+```typescript
+// Reproduction example
+import { createConfig, createServer } from "express-zod-api";
+
+const config = createConfig({ logger: { level: "warn" } });
+const { logger } = await createServer(config, {});
+
+const subject = {};
+subject.prop = subject;
+
+// before: TypeError: Converting circular structure to JSON
+// after:  Circular reference <ref *1> { prop: [Circular *1] }
+logger.error("Circular reference", subject);
+```
+
+```typescript
+// Feature example
+import { createConfig } from "express-zod-api";
+
+createConfig({ logger: { level: "debug", color: true, depth: 4 } });
+createConfig({ logger: { level: "debug", depth: Infinity } });
+createConfig({ logger: { level: "warn", depth: null } });
+```
+
+### v16.7.1
+
+- Fixed logging arrays by the default `winston` logger.
+
+```typescript
+// before: Items { '0': 123 }
+// after:  Items [ 123 ]
+logger.debug("Items", [123]);
+```
+
+### v16.7.0
+
+- Introducing the `beforeRouting` feature for the `ServerConfig`:
+  - The new option accepts a function that receives the express `app` and a `logger` instance.
+  - That function runs after parsing the request but before processing the `Routing` of your API.
+  - But most importantly, it runs before the "Not Found Handler".
+  - The option enables the configuration of the third-party middlewares serving their own routes or establishing their
+    own routing besides your primary API when using the standard `createServer()` method.
+  - The option helps to avoid making a custom express app, the DIY approach using `attachRouting()` method.
+  - The option can also be used to connect additional request parsers, like `cookie-parser`.
+
+```ts
+import { createConfig } from "express-zod-api";
+import ui from "swagger-ui-express";
+
+const config = createConfig({
+  server: {
+    listen: 80,
+    beforeRouting: ({ app, logger }) => {
+      logger.info("Serving the API documentation at https://example.com/docs");
+      app.use("/docs", ui.serve, ui.setup(documentation));
+    },
+  },
+});
+```
+
 ### v16.6.2
 
 - Internal method `Endpoint::_setSiblingMethods()` removed (since v8.4.1);

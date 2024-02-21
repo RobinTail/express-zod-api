@@ -309,22 +309,37 @@ const endpointsFactory = defaultEndpointsFactory.addOptions({
 
 ## Using native express middlewares
 
-You can connect any native `express` middleware that can be supplied to `express` method `app.use()`.
-For this purpose the `EndpointsFactory` provides method `addExpressMiddleware()` and its alias `use()`.
-There are also two optional features available: a provider of options and an error transformer for `ResultHandler`.
-In case the error in middleware is not a `HttpError`, the `ResultHandler` will send the status `500`.
+There are two ways of connecting the native express middlewares depending on their nature and your objective.
+
+In case it's a middleware establishing and serving its own routes, or somehow globally modifying the behaviour, or
+being an additional request parser (like `cookie-parser`), use the `beforeRouting` option.
+However, it might be better to avoid `cors` here — [the library handles it on its own](#cross-origin-resource-sharing).
+
+```typescript
+import { createConfig } from "express-zod-api";
+import ui from "swagger-ui-express";
+
+const config = createConfig({
+  server: {
+    listen: 80,
+    beforeRouting: ({ app, logger }) => {
+      logger.info("Serving the API documentation at https://example.com/docs");
+      app.use("/docs", ui.serve, ui.setup(documentation));
+    },
+  },
+});
+```
+
+In case you need a special processing of `request`, or to modify the `response` for selected endpoints, use the method
+`addExpressMiddleware()` of `EndpointsFactory` (or its alias `use()`). The method has two optional features: a provider
+of [options](#options) and an error transformer for adjusting the response status code.
 
 ```typescript
 import { defaultEndpointsFactory } from "express-zod-api";
-import cors from "cors";
 import createHttpError from "http-errors";
 import { auth } from "express-oauth2-jwt-bearer";
 
-const simpleUsage = defaultEndpointsFactory.addExpressMiddleware(
-  cors({ credentials: true }),
-);
-
-const advancedUsage = defaultEndpointsFactory.use(auth(), {
+const factory = defaultEndpointsFactory.use(auth(), {
   provider: (req) => ({ auth: req.auth }), // optional, can be async
   transformer: (err) => createHttpError(401, err.message), // optional
 });
@@ -686,7 +701,7 @@ import {
   getMessageFromError,
 } from "express-zod-api";
 
-export const yourResultHandler = createResultHandler({
+const yourResultHandler = createResultHandler({
   getPositiveResponse: (output: IOSchema) => ({
     schema: z.object({ data: output }),
     mimeType: "application/json", // optinal, or mimeTypes for array
@@ -815,8 +830,8 @@ const routing: Routing = {
 
 ## Connect to your own express app
 
-If you already have your own configured express application, or you find the library settings not enough,
-you can connect the endpoints to your app or any express router, using `attachRouting()` method:
+If you already have your own configured express application, or you find the library settings not enough, you can
+connect the endpoints to your app or any express router using the `attachRouting()` method:
 
 ```typescript
 import express from "express";
@@ -840,6 +855,9 @@ const routing: Routing = {}; // your endpoints go here
 **Please note** that in this case you probably need to parse `request.body`, call `app.listen()` and handle `404`
 errors yourself. In this regard `attachRouting()` provides you with `notFoundHandler` which you can optionally connect
 to your custom express app.
+
+Besides that, if you're looking to include additional request parsers, or a middleware that establishes its own routes,
+then consider using the `beforeRouting` [option in config instead](#using-native-express-middlewares).
 
 # Special needs
 
