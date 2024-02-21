@@ -1,5 +1,4 @@
 import { inspect } from "node:util";
-import type { Format } from "logform";
 import type Winston from "winston";
 import type Transport from "winston-transport";
 import { isObject } from "./common-helpers";
@@ -69,16 +68,14 @@ export const createLogger = ({
     },
   );
 
-  const formats: Format[] = [useTimestamp()];
-  if (config.color) {
-    formats.push(colorize());
-  }
-  formats.push(customFormat);
-
   const consoleOutputOptions: Transport.TransportStreamOptions = {
     level: config.level === "silent" ? "warn" : config.level,
     handleExceptions: true,
-    format: combine(...formats),
+    format: combine(
+      useTimestamp(),
+      ...(config.color ? [colorize()] : []),
+      customFormat,
+    ),
   };
 
   return create({
