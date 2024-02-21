@@ -78,9 +78,8 @@ export const createLogger = ({
   const consoleOutputOptions: Transport.TransportStreamOptions = {
     level: config.level === "silent" ? "warn" : config.level,
     handleExceptions: true,
+    format: combine(...formats),
   };
-
-  consoleOutputOptions.format = combine(...formats);
 
   return create({
     silent: config.level === "silent",
