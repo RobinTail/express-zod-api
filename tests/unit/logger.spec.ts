@@ -1,13 +1,27 @@
 import MockDate from "mockdate";
+import { EventEmitter } from "node:events";
 import {
   SimplifiedWinstonConfig,
   createLogger,
   isSimplifiedWinstonConfig,
 } from "../../src/logger";
 import winston from "winston";
-import { afterAll, beforeEach, describe, expect, test, vi } from "vitest";
+import {
+  afterAll,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  test,
+  vi,
+} from "vitest";
 
 describe("Logger", () => {
+  beforeAll(() => {
+    // fix (node:58829) MaxListenersExceededWarning: Possible EventEmitter memory leak
+    EventEmitter.setMaxListeners(15);
+  });
+
   beforeEach(() => {
     MockDate.set("2022-01-01T00:00:00Z");
   });
