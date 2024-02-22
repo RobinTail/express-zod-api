@@ -244,13 +244,13 @@ export class Documentation extends OpenApiBuilder {
       this.addPath(reformatParamsInPath(path), {
         [method]: {
           operationId,
-          responses,
-          description,
           summary,
+          description,
           tags: tags.length > 0 ? tags : undefined,
           parameters: depictedParams.length > 0 ? depictedParams : undefined,
           requestBody,
           security: securityRefs.length > 0 ? securityRefs : undefined,
+          responses,
         },
       });
     };
