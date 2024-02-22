@@ -226,16 +226,6 @@ export class Documentation extends OpenApiBuilder {
           })
         : undefined;
 
-      const operation: OperationObject = {
-        operationId,
-        responses,
-        description,
-        summary,
-        tags: tags.length > 0 ? tags : undefined,
-        parameters: depictedParams.length > 0 ? depictedParams : undefined,
-        requestBody,
-      };
-
       const securityRefs = depictSecurityRefs(
         mapLogicalContainer(
           depictSecurity(endpoint.getSecurity(), inputSources),
@@ -251,9 +241,18 @@ export class Documentation extends OpenApiBuilder {
           },
         ),
       );
-      if (securityRefs.length > 0) {
-        operation.security = securityRefs;
-      }
+
+      const operation: OperationObject = {
+        operationId,
+        responses,
+        description,
+        summary,
+        tags: tags.length > 0 ? tags : undefined,
+        parameters: depictedParams.length > 0 ? depictedParams : undefined,
+        requestBody,
+        security: securityRefs.length > 0 ? securityRefs : undefined,
+      };
+
       this.addPath(reformatParamsInPath(path), { [method]: operation });
     };
     walkRouting({ routing, onEndpoint });
