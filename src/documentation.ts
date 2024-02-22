@@ -3,6 +3,7 @@ import {
   OpenApiBuilder,
   OperationObject,
   ReferenceObject,
+  ResponsesObject,
   SchemaObject,
   SecuritySchemeObject,
   SecuritySchemeType,
@@ -171,6 +172,7 @@ export class Documentation extends OpenApiBuilder {
         method,
         endpoint.getOperationId(method),
       );
+
       const depictedParams = depictRequestParams({
         ...commonParams,
         inputSources,
@@ -182,31 +184,19 @@ export class Documentation extends OpenApiBuilder {
         }),
       });
 
-      const operation: OperationObject &
-        Required<Pick<OperationObject, "responses">> = {
-        operationId,
-        responses: {},
-        description: longDesc,
-        summary: shortDesc
-          ? ensureShortDescription(shortDesc)
-          : hasSummaryFromDescription && longDesc
-            ? ensureShortDescription(longDesc)
-            : undefined,
-        tags: tags.length > 0 ? tags : undefined,
-        parameters: depictedParams.length > 0 ? depictedParams : undefined,
-      };
+      const responses: ResponsesObject = {};
       for (const variant of ["positive", "negative"] as const) {
-        const responses = endpoint.getResponses(variant);
-        for (const { mimeTypes, schema, statusCodes } of responses) {
+        const apiResponses = endpoint.getResponses(variant);
+        for (const { mimeTypes, schema, statusCodes } of apiResponses) {
           for (const statusCode of statusCodes) {
-            operation.responses[statusCode] = depictResponse({
+            responses[statusCode] = depictResponse({
               ...commonParams,
               variant,
               schema,
               mimeTypes,
               statusCode,
               hasMultipleStatusCodes:
-                responses.length > 1 || statusCodes.length > 1,
+                apiResponses.length > 1 || statusCodes.length > 1,
               description: descriptions?.[`${variant}Response`]?.call(null, {
                 method,
                 path,
@@ -217,6 +207,19 @@ export class Documentation extends OpenApiBuilder {
           }
         }
       }
+
+      const operation: OperationObject = {
+        operationId,
+        responses,
+        description: longDesc,
+        summary: shortDesc
+          ? ensureShortDescription(shortDesc)
+          : hasSummaryFromDescription && longDesc
+            ? ensureShortDescription(longDesc)
+            : undefined,
+        tags: tags.length > 0 ? tags : undefined,
+        parameters: depictedParams.length > 0 ? depictedParams : undefined,
+      };
 
       if (inputSources.includes("body")) {
         operation.requestBody = depictRequest({
