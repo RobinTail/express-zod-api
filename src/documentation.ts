@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
 import {
   OpenApiBuilder,
-  OperationObject,
   ReferenceObject,
+  ResponsesObject,
   SchemaObject,
   SecuritySchemeObject,
   SecuritySchemeType,
@@ -160,9 +160,15 @@ export class Documentation extends OpenApiBuilder {
         getRef: this.getRef.bind(this),
         makeRef: this.makeRef.bind(this),
       };
-      const [shortDesc, longDesc] = (["short", "long"] as const).map(
+      const [shortDesc, description] = (["short", "long"] as const).map(
         endpoint.getDescription.bind(endpoint),
       );
+      const summary = shortDesc
+        ? ensureShortDescription(shortDesc)
+        : hasSummaryFromDescription && description
+          ? ensureShortDescription(description)
+          : undefined;
+      const tags = endpoint.getTags();
       const inputSources =
         config.inputSources?.[method] || defaultInputSources[method];
       const operationId = this.ensureUniqOperationId(
@@ -170,6 +176,7 @@ export class Documentation extends OpenApiBuilder {
         method,
         endpoint.getOperationId(method),
       );
+
       const depictedParams = depictRequestParams({
         ...commonParams,
         inputSources,
@@ -181,23 +188,19 @@ export class Documentation extends OpenApiBuilder {
         }),
       });
 
-      const operation: OperationObject &
-        Required<Pick<OperationObject, "responses">> = {
-        operationId,
-        responses: {},
-      };
+      const responses: ResponsesObject = {};
       for (const variant of ["positive", "negative"] as const) {
-        const responses = endpoint.getResponses(variant);
-        for (const { mimeTypes, schema, statusCodes } of responses) {
+        const apiResponses = endpoint.getResponses(variant);
+        for (const { mimeTypes, schema, statusCodes } of apiResponses) {
           for (const statusCode of statusCodes) {
-            operation.responses[statusCode] = depictResponse({
+            responses[statusCode] = depictResponse({
               ...commonParams,
               variant,
               schema,
               mimeTypes,
               statusCode,
               hasMultipleStatusCodes:
-                responses.length > 1 || statusCodes.length > 1,
+                apiResponses.length > 1 || statusCodes.length > 1,
               description: descriptions?.[`${variant}Response`]?.call(null, {
                 method,
                 path,
@@ -209,33 +212,19 @@ export class Documentation extends OpenApiBuilder {
         }
       }
 
-      if (longDesc) {
-        operation.description = longDesc;
-        if (hasSummaryFromDescription && shortDesc === undefined) {
-          operation.summary = ensureShortDescription(longDesc);
-        }
-      }
-      if (shortDesc) {
-        operation.summary = ensureShortDescription(shortDesc);
-      }
-      if (endpoint.getTags().length > 0) {
-        operation.tags = endpoint.getTags();
-      }
-      if (depictedParams.length > 0) {
-        operation.parameters = depictedParams;
-      }
-      if (inputSources.includes("body")) {
-        operation.requestBody = depictRequest({
-          ...commonParams,
-          schema: endpoint.getSchema("input"),
-          mimeTypes: endpoint.getMimeTypes("input"),
-          description: descriptions?.requestBody?.call(null, {
-            method,
-            path,
-            operationId,
-          }),
-        });
-      }
+      const requestBody = inputSources.includes("body")
+        ? depictRequest({
+            ...commonParams,
+            schema: endpoint.getSchema("input"),
+            mimeTypes: endpoint.getMimeTypes("input"),
+            description: descriptions?.requestBody?.call(null, {
+              method,
+              path,
+              operationId,
+            }),
+          })
+        : undefined;
+
       const securityRefs = depictSecurityRefs(
         mapLogicalContainer(
           depictSecurity(endpoint.getSecurity(), inputSources),
@@ -251,10 +240,19 @@ export class Documentation extends OpenApiBuilder {
           },
         ),
       );
-      if (securityRefs.length > 0) {
-        operation.security = securityRefs;
-      }
-      this.addPath(reformatParamsInPath(path), { [method]: operation });
+
+      this.addPath(reformatParamsInPath(path), {
+        [method]: {
+          operationId,
+          summary,
+          description,
+          tags: tags.length > 0 ? tags : undefined,
+          parameters: depictedParams.length > 0 ? depictedParams : undefined,
+          requestBody,
+          security: securityRefs.length > 0 ? securityRefs : undefined,
+          responses,
+        },
+      });
     };
     walkRouting({ routing, onEndpoint });
     this.rootDoc.tags = config.tags ? depictTags(config.tags) : [];
