@@ -181,7 +181,11 @@ export class Documentation extends OpenApiBuilder {
         }),
       });
 
-      const operation: OperationObject = { operationId, responses: {} };
+      const operation: OperationObject &
+        Required<Pick<OperationObject, "responses">> = {
+        operationId,
+        responses: {},
+      };
       for (const variant of ["positive", "negative"] as const) {
         const responses = endpoint.getResponses(variant);
         for (const { mimeTypes, schema, statusCodes } of responses) {
