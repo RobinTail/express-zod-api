@@ -161,9 +161,14 @@ export class Documentation extends OpenApiBuilder {
         getRef: this.getRef.bind(this),
         makeRef: this.makeRef.bind(this),
       };
-      const [shortDesc, longDesc] = (["short", "long"] as const).map(
+      const [shortDesc, description] = (["short", "long"] as const).map(
         endpoint.getDescription.bind(endpoint),
       );
+      const summary = shortDesc
+        ? ensureShortDescription(shortDesc)
+        : hasSummaryFromDescription && description
+          ? ensureShortDescription(description)
+          : undefined;
       const tags = endpoint.getTags();
       const inputSources =
         config.inputSources?.[method] || defaultInputSources[method];
@@ -208,31 +213,29 @@ export class Documentation extends OpenApiBuilder {
         }
       }
 
+      const requestBody = inputSources.includes("body")
+        ? depictRequest({
+            ...commonParams,
+            schema: endpoint.getSchema("input"),
+            mimeTypes: endpoint.getMimeTypes("input"),
+            description: descriptions?.requestBody?.call(null, {
+              method,
+              path,
+              operationId,
+            }),
+          })
+        : undefined;
+
       const operation: OperationObject = {
         operationId,
         responses,
-        description: longDesc,
-        summary: shortDesc
-          ? ensureShortDescription(shortDesc)
-          : hasSummaryFromDescription && longDesc
-            ? ensureShortDescription(longDesc)
-            : undefined,
+        description,
+        summary,
         tags: tags.length > 0 ? tags : undefined,
         parameters: depictedParams.length > 0 ? depictedParams : undefined,
+        requestBody,
       };
 
-      if (inputSources.includes("body")) {
-        operation.requestBody = depictRequest({
-          ...commonParams,
-          schema: endpoint.getSchema("input"),
-          mimeTypes: endpoint.getMimeTypes("input"),
-          description: descriptions?.requestBody?.call(null, {
-            method,
-            path,
-            operationId,
-          }),
-        });
-      }
       const securityRefs = depictSecurityRefs(
         mapLogicalContainer(
           depictSecurity(endpoint.getSecurity(), inputSources),
