@@ -1,7 +1,6 @@
 import assert from "node:assert/strict";
 import {
   OpenApiBuilder,
-  OperationObject,
   ReferenceObject,
   ResponsesObject,
   SchemaObject,
@@ -242,18 +241,18 @@ export class Documentation extends OpenApiBuilder {
         ),
       );
 
-      const operation: OperationObject = {
-        operationId,
-        responses,
-        description,
-        summary,
-        tags: tags.length > 0 ? tags : undefined,
-        parameters: depictedParams.length > 0 ? depictedParams : undefined,
-        requestBody,
-        security: securityRefs.length > 0 ? securityRefs : undefined,
-      };
-
-      this.addPath(reformatParamsInPath(path), { [method]: operation });
+      this.addPath(reformatParamsInPath(path), {
+        [method]: {
+          operationId,
+          responses,
+          description,
+          summary,
+          tags: tags.length > 0 ? tags : undefined,
+          parameters: depictedParams.length > 0 ? depictedParams : undefined,
+          requestBody,
+          security: securityRefs.length > 0 ? securityRefs : undefined,
+        },
+      });
     };
     walkRouting({ routing, onEndpoint });
     this.rootDoc.tags = config.tags ? depictTags(config.tags) : [];
