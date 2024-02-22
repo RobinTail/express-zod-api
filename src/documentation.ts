@@ -163,6 +163,7 @@ export class Documentation extends OpenApiBuilder {
       const [shortDesc, longDesc] = (["short", "long"] as const).map(
         endpoint.getDescription.bind(endpoint),
       );
+      const tags = endpoint.getTags();
       const inputSources =
         config.inputSources?.[method] || defaultInputSources[method];
       const operationId = this.ensureUniqOperationId(
@@ -185,6 +186,14 @@ export class Documentation extends OpenApiBuilder {
         Required<Pick<OperationObject, "responses">> = {
         operationId,
         responses: {},
+        description: longDesc,
+        summary: shortDesc
+          ? ensureShortDescription(shortDesc)
+          : hasSummaryFromDescription && longDesc
+            ? ensureShortDescription(longDesc)
+            : undefined,
+        tags: tags.length > 0 ? tags : undefined,
+        parameters: depictedParams.length > 0 ? depictedParams : undefined,
       };
       for (const variant of ["positive", "negative"] as const) {
         const responses = endpoint.getResponses(variant);
@@ -209,21 +218,6 @@ export class Documentation extends OpenApiBuilder {
         }
       }
 
-      if (longDesc) {
-        operation.description = longDesc;
-        if (hasSummaryFromDescription && shortDesc === undefined) {
-          operation.summary = ensureShortDescription(longDesc);
-        }
-      }
-      if (shortDesc) {
-        operation.summary = ensureShortDescription(shortDesc);
-      }
-      if (endpoint.getTags().length > 0) {
-        operation.tags = endpoint.getTags();
-      }
-      if (depictedParams.length > 0) {
-        operation.parameters = depictedParams;
-      }
       if (inputSources.includes("body")) {
         operation.requestBody = depictRequest({
           ...commonParams,
