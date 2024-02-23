@@ -1,4 +1,4 @@
-import chalk, { ChalkInstance } from "chalk";
+import { Chalk, ChalkInstance } from "chalk";
 import { writeFile } from "node:fs/promises";
 import {
   exportModifier,
@@ -8,6 +8,8 @@ import {
 } from "../src/integration-helpers";
 import { printNode } from "../src/zts-helpers";
 import { format } from "prettier";
+
+const chalk = new Chalk({ level: 2 }); // 256 colors
 
 const proud = chalk.italic(
   "Proudly supports transgender community.".padStart(109),
