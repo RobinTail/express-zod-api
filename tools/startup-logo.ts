@@ -20,14 +20,18 @@ const slogan = chalk.italic(
 const thanks = chalk.italic(
   "Thank you for choosing Express Zod API for your project.".padStart(132),
 );
-const dedicationMessage = chalk.italic("for Nina".padEnd(20));
+const dedicationMessage = chalk.italic("for Tonya".padEnd(20));
+
+const pink = chalk.hex("#F5A9B8");
+const blue = chalk.hex("#5BCEFA");
+const white = chalk.hex("#FFF");
 
 const colors = new Array<ChalkInstance>(14)
-  .fill(chalk.blueBright, 1, 3)
-  .fill(chalk.magentaBright, 3, 5)
-  .fill(chalk.whiteBright, 5, 7)
-  .fill(chalk.magentaBright, 7, 9)
-  .fill(chalk.blueBright, 9, 12)
+  .fill(blue, 1, 3)
+  .fill(pink, 3, 5)
+  .fill(white, 5, 7)
+  .fill(pink, 7, 9)
+  .fill(blue, 9, 12)
   .fill(chalk.grey, 12, 13);
 
 const logo = `
