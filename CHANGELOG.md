@@ -21,6 +21,33 @@
 
 ## Version 16
 
+### v16.8.1
+
+- Changed the order of an operation properties within generated Documentation.
+  - That should make it more human-readable even without using any UI.
+  - The new order briefly: explanation — first, request making — second, possible responses — last.
+
+```yaml
+before:
+  - operationId
+  - responses
+  - description
+  - summary
+  - tags
+  - parameters
+  - requestBody
+  - security
+after:
+  - operationId
+  - summary
+  - description
+  - tags
+  - parameters
+  - requestBody
+  - security
+  - responses
+```
+
 ### v16.8.0
 
 - Fixed a bug on logging objects having circular references by the default `winston` logger.

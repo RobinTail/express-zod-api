@@ -9,6 +9,8 @@ paths:
   /v1/getSome/thing:
     get:
       operationId: coolOperationId
+      summary: thing is the path segment
+      description: thing is the path segment
       responses:
         "200":
           description: GET /v1/getSome/thing Positive response
@@ -53,8 +55,6 @@ paths:
                     status: error
                     error:
                       message: Sample error message
-      description: thing is the path segment
-      summary: thing is the path segment
 components:
   schemas: {}
   responses: {}
@@ -80,6 +80,8 @@ paths:
   /v1/getSome/thing:
     get:
       operationId: getCoolOperationId
+      summary: thing is the path segment
+      description: thing is the path segment
       responses:
         "200":
           description: GET /v1/getSome/thing Positive response
@@ -124,10 +126,16 @@ paths:
                     status: error
                     error:
                       message: Sample error message
-      description: thing is the path segment
-      summary: thing is the path segment
     post:
       operationId: postCoolOperationId
+      summary: thing is the path segment
+      description: thing is the path segment
+      requestBody:
+        description: POST /v1/getSome/thing Request body
+        content:
+          application/json:
+            schema:
+              type: object
       responses:
         "200":
           description: POST /v1/getSome/thing Positive response
@@ -172,14 +180,6 @@ paths:
                     status: error
                     error:
                       message: Sample error message
-      description: thing is the path segment
-      summary: thing is the path segment
-      requestBody:
-        description: POST /v1/getSome/thing Request body
-        content:
-          application/json:
-            schema:
-              type: object
 components:
   schemas: {}
   responses: {}
@@ -205,6 +205,8 @@ paths:
   /v1/getSome/thing:
     get:
       operationId: GetV1GetSomeThing
+      summary: thing is the path segment
+      description: thing is the path segment
       responses:
         "200":
           description: GET /v1/getSome/thing Positive response
@@ -249,11 +251,11 @@ paths:
                     status: error
                     error:
                       message: Sample error message
-      description: thing is the path segment
-      summary: thing is the path segment
   /v1/getSome/{thing}:
     get:
       operationId: GetV1GetSomeThing2
+      summary: thing is the path parameter
+      description: thing is the path parameter
       responses:
         "200":
           description: GET /v1/getSome/:thing Positive response
@@ -298,8 +300,6 @@ paths:
                     status: error
                     error:
                       message: Sample error message
-      description: thing is the path parameter
-      summary: thing is the path parameter
 components:
   schemas: {}
   responses: {}
@@ -325,6 +325,22 @@ paths:
   /v1/getSomething:
     get:
       operationId: GetV1GetSomething
+      parameters:
+        - name: key
+          in: query
+          required: true
+          description: GET /v1/getSomething Parameter
+          schema:
+            type: string
+        - name: str
+          in: query
+          required: true
+          description: GET /v1/getSomething Parameter
+          schema:
+            type: string
+      security:
+        - APIKEY_1: []
+        - HTTP_1: []
       responses:
         "200":
           description: GET /v1/getSomething Positive response
@@ -377,25 +393,19 @@ paths:
                     status: error
                     error:
                       message: Sample error message
-      parameters:
-        - name: key
-          in: query
-          required: true
-          description: GET /v1/getSomething Parameter
-          schema:
-            type: string
-        - name: str
-          in: query
-          required: true
-          description: GET /v1/getSomething Parameter
-          schema:
-            type: string
-      security:
-        - APIKEY_1: []
-        - HTTP_1: []
   /v1/setSomething:
     post:
       operationId: PostV1SetSomething
+      requestBody:
+        description: POST /v1/setSomething Request body
+        content:
+          application/json:
+            schema:
+              type: object
+      security:
+        - HTTP_1: []
+          OAUTH2_1:
+            - write
       responses:
         "200":
           description: POST /v1/setSomething Positive response
@@ -440,19 +450,17 @@ paths:
                     status: error
                     error:
                       message: Sample error message
+  /v1/updateSomething:
+    put:
+      operationId: PutV1UpdateSomething
       requestBody:
-        description: POST /v1/setSomething Request body
+        description: PUT /v1/updateSomething Request body
         content:
           application/json:
             schema:
               type: object
       security:
-        - HTTP_1: []
-          OAUTH2_1:
-            - write
-  /v1/updateSomething:
-    put:
-      operationId: PutV1UpdateSomething
+        - HTTP_2: []
       responses:
         "200":
           description: PUT /v1/updateSomething Positive response
@@ -497,14 +505,6 @@ paths:
                     status: error
                     error:
                       message: Sample error message
-      requestBody:
-        description: PUT /v1/updateSomething Request body
-        content:
-          application/json:
-            schema:
-              type: object
-      security:
-        - HTTP_2: []
 components:
   schemas: {}
   responses: {}
@@ -626,6 +626,34 @@ paths:
   /v1/getSomething:
     get:
       operationId: GetV1GetSomething
+      parameters:
+        - name: array
+          in: query
+          required: true
+          description: GET /v1/getSomething Parameter
+          schema:
+            type: array
+            items:
+              type: integer
+              format: int64
+              exclusiveMinimum: 0
+              maximum: 9007199254740991
+            minItems: 1
+            maxItems: 3
+        - name: unlimited
+          in: query
+          required: true
+          description: GET /v1/getSomething Parameter
+          schema:
+            type: array
+            items:
+              type: boolean
+        - name: transformer
+          in: query
+          required: true
+          description: GET /v1/getSomething Parameter
+          schema:
+            type: string
       responses:
         "200":
           description: GET /v1/getSomething Positive response
@@ -683,34 +711,6 @@ paths:
                     status: error
                     error:
                       message: Sample error message
-      parameters:
-        - name: array
-          in: query
-          required: true
-          description: GET /v1/getSomething Parameter
-          schema:
-            type: array
-            items:
-              type: integer
-              format: int64
-              exclusiveMinimum: 0
-              maximum: 9007199254740991
-            minItems: 1
-            maxItems: 3
-        - name: unlimited
-          in: query
-          required: true
-          description: GET /v1/getSomething Parameter
-          schema:
-            type: array
-            items:
-              type: boolean
-        - name: transformer
-          in: query
-          required: true
-          description: GET /v1/getSomething Parameter
-          schema:
-            type: string
 components:
   schemas: {}
   responses: {}
@@ -736,6 +736,36 @@ paths:
   /v1/getSomething:
     post:
       operationId: PostV1GetSomething
+      requestBody:
+        description: POST /v1/getSomething Request body
+        content:
+          application/json:
+            schema:
+              discriminator:
+                propertyName: type
+              oneOf:
+                - type: object
+                  properties:
+                    type:
+                      type: string
+                      enum:
+                        - a
+                    a:
+                      type: string
+                  required:
+                    - type
+                    - a
+                - type: object
+                  properties:
+                    type:
+                      type: string
+                      enum:
+                        - b
+                    b:
+                      type: string
+                  required:
+                    - type
+                    - b
       responses:
         "200":
           description: POST /v1/getSomething Positive response
@@ -808,36 +838,6 @@ paths:
                     status: error
                     error:
                       message: Sample error message
-      requestBody:
-        description: POST /v1/getSomething Request body
-        content:
-          application/json:
-            schema:
-              discriminator:
-                propertyName: type
-              oneOf:
-                - type: object
-                  properties:
-                    type:
-                      type: string
-                      enum:
-                        - a
-                    a:
-                      type: string
-                  required:
-                    - type
-                    - a
-                - type: object
-                  properties:
-                    type:
-                      type: string
-                      enum:
-                        - b
-                    b:
-                      type: string
-                  required:
-                    - type
-                    - b
 components:
   schemas: {}
   responses: {}
@@ -863,6 +863,25 @@ paths:
   /v1/getSomething:
     post:
       operationId: PostV1GetSomething
+      requestBody:
+        description: POST /v1/getSomething Request body
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                intersection:
+                  type: object
+                  properties:
+                    one:
+                      type: string
+                    two:
+                      type: string
+                  required:
+                    - one
+                    - two
+              required:
+                - intersection
       responses:
         "200":
           description: POST /v1/getSomething Positive response
@@ -923,25 +942,6 @@ paths:
                     status: error
                     error:
                       message: Sample error message
-      requestBody:
-        description: POST /v1/getSomething Request body
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                intersection:
-                  type: object
-                  properties:
-                    one:
-                      type: string
-                    two:
-                      type: string
-                  required:
-                    - one
-                    - two
-              required:
-                - intersection
 components:
   schemas: {}
   responses: {}
@@ -967,6 +967,40 @@ paths:
   /v1/getSomething:
     get:
       operationId: GetV1GetSomething
+      parameters:
+        - name: optional
+          in: query
+          required: false
+          description: GET /v1/getSomething Parameter
+          schema:
+            type: string
+        - name: optDefault
+          in: query
+          required: false
+          description: GET /v1/getSomething Parameter
+          schema:
+            type: string
+            default: test
+        - name: nullish
+          in: query
+          required: false
+          description: GET /v1/getSomething Parameter
+          schema:
+            type:
+              - boolean
+              - "null"
+        - name: nuDefault
+          in: query
+          required: false
+          description: GET /v1/getSomething Parameter
+          schema:
+            type:
+              - integer
+              - "null"
+            format: int64
+            exclusiveMinimum: 0
+            maximum: 9007199254740991
+            default: 123
       responses:
         "200":
           description: GET /v1/getSomething Positive response
@@ -1018,40 +1052,6 @@ paths:
                     status: error
                     error:
                       message: Sample error message
-      parameters:
-        - name: optional
-          in: query
-          required: false
-          description: GET /v1/getSomething Parameter
-          schema:
-            type: string
-        - name: optDefault
-          in: query
-          required: false
-          description: GET /v1/getSomething Parameter
-          schema:
-            type: string
-            default: test
-        - name: nullish
-          in: query
-          required: false
-          description: GET /v1/getSomething Parameter
-          schema:
-            type:
-              - boolean
-              - "null"
-        - name: nuDefault
-          in: query
-          required: false
-          description: GET /v1/getSomething Parameter
-          schema:
-            type:
-              - integer
-              - "null"
-            format: int64
-            exclusiveMinimum: 0
-            maximum: 9007199254740991
-            default: 123
 components:
   schemas: {}
   responses: {}
@@ -1077,6 +1077,41 @@ paths:
   /v1/getSomething:
     post:
       operationId: PostV1GetSomething
+      requestBody:
+        description: POST /v1/getSomething Request body
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                union:
+                  oneOf:
+                    - type: object
+                      properties:
+                        one:
+                          type: string
+                        two:
+                          type: integer
+                          format: int64
+                          exclusiveMinimum: 0
+                          maximum: 9007199254740991
+                      required:
+                        - one
+                        - two
+                    - type: object
+                      properties:
+                        two:
+                          type: integer
+                          format: int64
+                          minimum: -9007199254740991
+                          exclusiveMaximum: 0
+                        three:
+                          type: string
+                      required:
+                        - two
+                        - three
+              required:
+                - union
       responses:
         "200":
           description: POST /v1/getSomething Positive response
@@ -1131,41 +1166,6 @@ paths:
                     status: error
                     error:
                       message: Sample error message
-      requestBody:
-        description: POST /v1/getSomething Request body
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                union:
-                  oneOf:
-                    - type: object
-                      properties:
-                        one:
-                          type: string
-                        two:
-                          type: integer
-                          format: int64
-                          exclusiveMinimum: 0
-                          maximum: 9007199254740991
-                      required:
-                        - one
-                        - two
-                    - type: object
-                      properties:
-                        two:
-                          type: integer
-                          format: int64
-                          minimum: -9007199254740991
-                          exclusiveMaximum: 0
-                        three:
-                          type: string
-                      required:
-                        - two
-                        - three
-              required:
-                - union
 components:
   schemas: {}
   responses: {}
@@ -1191,6 +1191,19 @@ paths:
   /v1/user/retrieve:
     get:
       operationId: GetV1UserRetrieve
+      summary: Retrieves the user.
+      description: Example user retrieval endpoint.
+      tags:
+        - users
+      parameters:
+        - name: id
+          in: query
+          required: true
+          description: a numeric string containing the id of the user
+          schema:
+            type: string
+            pattern: \\d+
+            description: a numeric string containing the id of the user
       responses:
         "200":
           description: GET /v1/user/retrieve Positive response
@@ -1259,22 +1272,56 @@ paths:
                     status: error
                     error:
                       message: Sample error message
-      description: Example user retrieval endpoint.
-      summary: Retrieves the user.
+  /v1/user/{id}:
+    patch:
+      operationId: PatchV1UserId
+      summary: Changes the user record. Example user update endp…
+      description: Changes the user record. Example user update endpoint.
       tags:
         - users
       parameters:
         - name: id
-          in: query
+          in: path
           required: true
-          description: a numeric string containing the id of the user
+          description: PATCH /v1/user/:id Parameter
           schema:
             type: string
-            pattern: \\d+
-            description: a numeric string containing the id of the user
-  /v1/user/{id}:
-    patch:
-      operationId: PatchV1UserId
+          examples:
+            example1:
+              value: "12"
+      requestBody:
+        description: PATCH /v1/user/:id Request body
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                key:
+                  type: string
+                  minLength: 1
+                name:
+                  type: string
+                  minLength: 1
+                birthday:
+                  description: YYYY-MM-DDTHH:mm:ss.sssZ
+                  type: string
+                  format: date-time
+                  pattern: ^\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?)?Z?$
+                  externalDocs:
+                    url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
+              required:
+                - key
+                - name
+                - birthday
+            examples:
+              example1:
+                value:
+                  key: 1234-5678-90
+                  name: John Doe
+                  birthday: 1963-04-21
+      security:
+        - APIKEY_1: []
+          APIKEY_2: []
       responses:
         "200":
           description: PATCH /v1/user/:id Positive response
@@ -1341,56 +1388,23 @@ paths:
                     status: error
                     error:
                       message: Sample error message
-      description: Changes the user record. Example user update endpoint.
-      summary: Changes the user record. Example user update endp…
+  /v1/user/create:
+    post:
+      operationId: PostV1UserCreate
       tags:
         - users
-      parameters:
-        - name: id
-          in: path
-          required: true
-          description: PATCH /v1/user/:id Parameter
-          schema:
-            type: string
-          examples:
-            example1:
-              value: "12"
       requestBody:
-        description: PATCH /v1/user/:id Request body
+        description: POST /v1/user/create Request body
         content:
           application/json:
             schema:
               type: object
               properties:
-                key:
-                  type: string
-                  minLength: 1
                 name:
                   type: string
                   minLength: 1
-                birthday:
-                  description: YYYY-MM-DDTHH:mm:ss.sssZ
-                  type: string
-                  format: date-time
-                  pattern: ^\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?)?Z?$
-                  externalDocs:
-                    url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
               required:
-                - key
                 - name
-                - birthday
-            examples:
-              example1:
-                value:
-                  key: 1234-5678-90
-                  name: John Doe
-                  birthday: 1963-04-21
-      security:
-        - APIKEY_1: []
-          APIKEY_2: []
-  /v1/user/create:
-    post:
-      operationId: PostV1UserCreate
       responses:
         "201":
           description: POST /v1/user/create Positive response 201
@@ -1491,23 +1505,11 @@ paths:
                 required:
                   - status
                   - reason
-      tags:
-        - users
-      requestBody:
-        description: POST /v1/user/create Request body
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                name:
-                  type: string
-                  minLength: 1
-              required:
-                - name
   /v1/user/list:
     get:
       operationId: GetV1UserList
+      tags:
+        - users
       responses:
         "200":
           description: GET /v1/user/list Positive response
@@ -1537,11 +1539,21 @@ paths:
               examples:
                 example1:
                   value: Sample error message
-      tags:
-        - users
   /v1/avatar/send:
     get:
       operationId: GetV1AvatarSend
+      summary: Sends a file content.
+      tags:
+        - files
+        - users
+      parameters:
+        - name: userId
+          in: query
+          required: true
+          description: GET /v1/avatar/send Parameter
+          schema:
+            type: string
+            pattern: \\d+
       responses:
         "200":
           description: GET /v1/avatar/send Positive response
@@ -1555,21 +1567,21 @@ paths:
             text/plain:
               schema:
                 type: string
-      summary: Sends a file content.
+  /v1/avatar/stream:
+    get:
+      operationId: GetV1AvatarStream
+      summary: Streams a file content.
       tags:
-        - files
         - users
+        - files
       parameters:
         - name: userId
           in: query
           required: true
-          description: GET /v1/avatar/send Parameter
+          description: GET /v1/avatar/stream Parameter
           schema:
             type: string
             pattern: \\d+
-  /v1/avatar/stream:
-    get:
-      operationId: GetV1AvatarStream
       responses:
         "200":
           description: GET /v1/avatar/stream Positive response
@@ -1584,21 +1596,25 @@ paths:
             text/plain:
               schema:
                 type: string
-      summary: Streams a file content.
-      tags:
-        - users
-        - files
-      parameters:
-        - name: userId
-          in: query
-          required: true
-          description: GET /v1/avatar/stream Parameter
-          schema:
-            type: string
-            pattern: \\d+
   /v1/avatar/upload:
     post:
       operationId: PostV1AvatarUpload
+      summary: Handles a file upload.
+      description: Handles a file upload.
+      tags:
+        - files
+      requestBody:
+        description: POST /v1/avatar/upload Request body
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                avatar:
+                  type: string
+                  format: binary
+              required:
+                - avatar
       responses:
         "200":
           description: POST /v1/avatar/upload Positive response
@@ -1665,25 +1681,18 @@ paths:
                     status: error
                     error:
                       message: Sample error message
-      description: Handles a file upload.
-      summary: Handles a file upload.
-      tags:
-        - files
-      requestBody:
-        description: POST /v1/avatar/upload Request body
-        content:
-          multipart/form-data:
-            schema:
-              type: object
-              properties:
-                avatar:
-                  type: string
-                  format: binary
-              required:
-                - avatar
   /v1/avatar/raw:
     post:
       operationId: PostV1AvatarRaw
+      tags:
+        - files
+      requestBody:
+        description: POST /v1/avatar/raw Request body
+        content:
+          application/octet-stream:
+            schema:
+              type: string
+              format: binary
       responses:
         "200":
           description: POST /v1/avatar/raw Positive response
@@ -1736,15 +1745,6 @@ paths:
                     status: error
                     error:
                       message: Sample error message
-      tags:
-        - files
-      requestBody:
-        description: POST /v1/avatar/raw Request body
-        content:
-          application/octet-stream:
-            schema:
-              type: string
-              format: binary
 components:
   schemas:
     2048581c137c5b2130eb860e3ae37da196dfc25b:
@@ -1796,6 +1796,17 @@ paths:
   /v1/user/retrieve:
     get:
       operationId: GetV1UserRetrieve
+      summary: Retrieves the user.
+      description: Example user retrieval endpoint.
+      tags:
+        - users
+      parameters:
+        - name: id
+          in: query
+          required: true
+          description: a numeric string containing the id of the user
+          schema:
+            $ref: "#/components/schemas/GetV1UserRetrieveParameterId"
       responses:
         "200":
           description: GET /v1/user/retrieve Positive response
@@ -1815,48 +1826,11 @@ paths:
                     status: error
                     error:
                       message: Sample error message
-      description: Example user retrieval endpoint.
-      summary: Retrieves the user.
-      tags:
-        - users
-      parameters:
-        - name: id
-          in: query
-          required: true
-          description: a numeric string containing the id of the user
-          schema:
-            $ref: "#/components/schemas/GetV1UserRetrieveParameterId"
   /v1/user/{id}:
     patch:
       operationId: PatchV1UserId
-      responses:
-        "200":
-          description: PATCH /v1/user/:id Positive response
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/PatchV1UserIdPositiveResponse"
-              examples:
-                example1:
-                  value:
-                    status: success
-                    data:
-                      name: John Doe
-                      createdAt: 2021-12-31T00:00:00.000Z
-        "400":
-          description: PATCH /v1/user/:id Negative response
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/PatchV1UserIdNegativeResponse"
-              examples:
-                example1:
-                  value:
-                    status: error
-                    error:
-                      message: Sample error message
-      description: Changes the user record. Example user update endpoint.
       summary: Changes the user record. Example user update endp…
+      description: Changes the user record. Example user update endpoint.
       tags:
         - users
       parameters:
@@ -1884,9 +1858,43 @@ paths:
       security:
         - APIKEY_1: []
           APIKEY_2: []
+      responses:
+        "200":
+          description: PATCH /v1/user/:id Positive response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PatchV1UserIdPositiveResponse"
+              examples:
+                example1:
+                  value:
+                    status: success
+                    data:
+                      name: John Doe
+                      createdAt: 2021-12-31T00:00:00.000Z
+        "400":
+          description: PATCH /v1/user/:id Negative response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PatchV1UserIdNegativeResponse"
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
   /v1/user/create:
     post:
       operationId: PostV1UserCreate
+      tags:
+        - users
+      requestBody:
+        description: POST /v1/user/create Request body
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PostV1UserCreateRequestBody"
       responses:
         "201":
           description: POST /v1/user/create Positive response 201
@@ -1918,17 +1926,11 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PostV1UserCreateNegativeResponse500"
-      tags:
-        - users
-      requestBody:
-        description: POST /v1/user/create Request body
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/PostV1UserCreateRequestBody"
   /v1/user/list:
     get:
       operationId: GetV1UserList
+      tags:
+        - users
       responses:
         "200":
           description: GET /v1/user/list Positive response
@@ -1951,11 +1953,20 @@ paths:
               examples:
                 example1:
                   value: Sample error message
-      tags:
-        - users
   /v1/avatar/send:
     get:
       operationId: GetV1AvatarSend
+      summary: Sends a file content.
+      tags:
+        - files
+        - users
+      parameters:
+        - name: userId
+          in: query
+          required: true
+          description: GET /v1/avatar/send Parameter
+          schema:
+            $ref: "#/components/schemas/GetV1AvatarSendParameterUserId"
       responses:
         "200":
           description: GET /v1/avatar/send Positive response
@@ -1969,20 +1980,20 @@ paths:
             text/plain:
               schema:
                 $ref: "#/components/schemas/GetV1AvatarSendNegativeResponse"
-      summary: Sends a file content.
+  /v1/avatar/stream:
+    get:
+      operationId: GetV1AvatarStream
+      summary: Streams a file content.
       tags:
-        - files
         - users
+        - files
       parameters:
         - name: userId
           in: query
           required: true
-          description: GET /v1/avatar/send Parameter
+          description: GET /v1/avatar/stream Parameter
           schema:
-            $ref: "#/components/schemas/GetV1AvatarSendParameterUserId"
-  /v1/avatar/stream:
-    get:
-      operationId: GetV1AvatarStream
+            $ref: "#/components/schemas/GetV1AvatarStreamParameterUserId"
       responses:
         "200":
           description: GET /v1/avatar/stream Positive response
@@ -1996,20 +2007,19 @@ paths:
             text/plain:
               schema:
                 $ref: "#/components/schemas/GetV1AvatarStreamNegativeResponse"
-      summary: Streams a file content.
-      tags:
-        - users
-        - files
-      parameters:
-        - name: userId
-          in: query
-          required: true
-          description: GET /v1/avatar/stream Parameter
-          schema:
-            $ref: "#/components/schemas/GetV1AvatarStreamParameterUserId"
   /v1/avatar/upload:
     post:
       operationId: PostV1AvatarUpload
+      summary: Handles a file upload.
+      description: Handles a file upload.
+      tags:
+        - files
+      requestBody:
+        description: POST /v1/avatar/upload Request body
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/PostV1AvatarUploadRequestBody"
       responses:
         "200":
           description: POST /v1/avatar/upload Positive response
@@ -2029,19 +2039,17 @@ paths:
                     status: error
                     error:
                       message: Sample error message
-      description: Handles a file upload.
-      summary: Handles a file upload.
-      tags:
-        - files
-      requestBody:
-        description: POST /v1/avatar/upload Request body
-        content:
-          multipart/form-data:
-            schema:
-              $ref: "#/components/schemas/PostV1AvatarUploadRequestBody"
   /v1/avatar/raw:
     post:
       operationId: PostV1AvatarRaw
+      tags:
+        - files
+      requestBody:
+        description: POST /v1/avatar/raw Request body
+        content:
+          application/octet-stream:
+            schema:
+              $ref: "#/components/schemas/PostV1AvatarRawRequestBody"
       responses:
         "200":
           description: POST /v1/avatar/raw Positive response
@@ -2061,14 +2069,6 @@ paths:
                     status: error
                     error:
                       message: Sample error message
-      tags:
-        - files
-      requestBody:
-        description: POST /v1/avatar/raw Request body
-        content:
-          application/octet-stream:
-            schema:
-              $ref: "#/components/schemas/PostV1AvatarRawRequestBody"
 components:
   schemas:
     GetV1UserRetrieveParameterId:
@@ -2455,6 +2455,29 @@ paths:
   /v1/getSomething:
     post:
       operationId: PostV1GetSomething
+      requestBody:
+        description: POST /v1/getSomething Request body
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                bigint:
+                  type: integer
+                  format: bigint
+                boolean:
+                  type: boolean
+                dateIn:
+                  description: YYYY-MM-DDTHH:mm:ss.sssZ
+                  type: string
+                  format: date-time
+                  pattern: ^\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?)?Z?$
+                  externalDocs:
+                    url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
+              required:
+                - bigint
+                - boolean
+                - dateIn
       responses:
         "200":
           description: POST /v1/getSomething Positive response
@@ -2512,29 +2535,6 @@ paths:
                     status: error
                     error:
                       message: Sample error message
-      requestBody:
-        description: POST /v1/getSomething Request body
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                bigint:
-                  type: integer
-                  format: bigint
-                boolean:
-                  type: boolean
-                dateIn:
-                  description: YYYY-MM-DDTHH:mm:ss.sssZ
-                  type: string
-                  format: date-time
-                  pattern: ^\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?)?Z?$
-                  externalDocs:
-                    url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
-              required:
-                - bigint
-                - boolean
-                - dateIn
 components:
   schemas: {}
   responses: {}
@@ -2560,6 +2560,17 @@ paths:
   /v1/getSomething:
     post:
       operationId: PostV1GetSomething
+      requestBody:
+        description: POST /v1/getSomething Request body
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+              required:
+                - name
       responses:
         "200":
           description: POST /v1/getSomething Positive response
@@ -2617,17 +2628,6 @@ paths:
                     status: error
                     error:
                       message: Sample error message
-      requestBody:
-        description: POST /v1/getSomething Request body
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                name:
-                  type: string
-              required:
-                - name
 components:
   schemas:
     2048581c137c5b2130eb860e3ae37da196dfc25b:
@@ -2721,56 +2721,6 @@ paths:
   /v1/getSomething:
     post:
       operationId: PostV1GetSomething
-      responses:
-        "200":
-          description: POST /v1/getSomething Positive response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    enum:
-                      - success
-                  data:
-                    type: object
-                    properties:
-                      bigint:
-                        type: integer
-                        format: bigint
-                    required:
-                      - bigint
-                required:
-                  - status
-                  - data
-        "400":
-          description: POST /v1/getSomething Negative response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    enum:
-                      - error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                required:
-                  - status
-                  - error
-              examples:
-                example1:
-                  value:
-                    status: error
-                    error:
-                      message: Sample error message
       requestBody:
         description: POST /v1/getSomething Request body
         content:
@@ -2832,31 +2782,6 @@ paths:
                 - intPositive
                 - intNegative
                 - intLimited
-components:
-  schemas: {}
-  responses: {}
-  parameters: {}
-  examples: {}
-  requestBodies: {}
-  headers: {}
-  securitySchemes: {}
-  links: {}
-  callbacks: {}
-tags: []
-servers:
-  - url: https://example.com
-"
-`;
-
-exports[`Documentation > Basic cases > should handle different string types 1`] = `
-"openapi: 3.1.0
-info:
-  title: Testing strings
-  version: 3.4.5
-paths:
-  /v1/getSomething:
-    post:
-      operationId: PostV1GetSomething
       responses:
         "200":
           description: POST /v1/getSomething Positive response
@@ -2872,11 +2797,11 @@ paths:
                   data:
                     type: object
                     properties:
-                      nonempty:
-                        type: string
-                        minLength: 1
+                      bigint:
+                        type: integer
+                        format: bigint
                     required:
-                      - nonempty
+                      - bigint
                 required:
                   - status
                   - data
@@ -2907,6 +2832,31 @@ paths:
                     status: error
                     error:
                       message: Sample error message
+components:
+  schemas: {}
+  responses: {}
+  parameters: {}
+  examples: {}
+  requestBodies: {}
+  headers: {}
+  securitySchemes: {}
+  links: {}
+  callbacks: {}
+tags: []
+servers:
+  - url: https://example.com
+"
+`;
+
+exports[`Documentation > Basic cases > should handle different string types 1`] = `
+"openapi: 3.1.0
+info:
+  title: Testing strings
+  version: 3.4.5
+paths:
+  /v1/getSomething:
+    post:
+      operationId: PostV1GetSomething
       requestBody:
         description: POST /v1/getSomething Request body
         content:
@@ -2974,6 +2924,56 @@ paths:
                 - url
                 - numeric
                 - combined
+      responses:
+        "200":
+          description: POST /v1/getSomething Positive response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - success
+                  data:
+                    type: object
+                    properties:
+                      nonempty:
+                        type: string
+                        minLength: 1
+                    required:
+                      - nonempty
+                required:
+                  - status
+                  - data
+        "400":
+          description: POST /v1/getSomething Negative response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                required:
+                  - status
+                  - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
 components:
   schemas: {}
   responses: {}
@@ -2999,6 +2999,20 @@ paths:
   /v1/getSomething:
     post:
       operationId: PostV1GetSomething
+      requestBody:
+        description: POST /v1/getSomething Request body
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                regularEnum:
+                  type: string
+                  enum:
+                    - ABC
+                    - DEF
+              required:
+                - regularEnum
       responses:
         "200":
           description: POST /v1/getSomething Positive response
@@ -3051,20 +3065,6 @@ paths:
                     status: error
                     error:
                       message: Sample error message
-      requestBody:
-        description: POST /v1/getSomething Request body
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                regularEnum:
-                  type: string
-                  enum:
-                    - ABC
-                    - DEF
-              required:
-                - regularEnum
 components:
   schemas: {}
   responses: {}
@@ -3090,6 +3090,12 @@ paths:
   /v1/getSomething:
     post:
       operationId: PostV1GetSomething
+      requestBody:
+        description: POST /v1/getSomething Request body
+        content:
+          application/json:
+            schema:
+              type: object
       responses:
         "200":
           description: POST /v1/getSomething Positive response
@@ -3184,12 +3190,6 @@ paths:
                     status: error
                     error:
                       message: Sample error message
-      requestBody:
-        description: POST /v1/getSomething Request body
-        content:
-          application/json:
-            schema:
-              type: object
 components:
   schemas: {}
   responses: {}
@@ -3215,6 +3215,23 @@ paths:
   /v1/getSomething:
     post:
       operationId: PostV1GetSomething
+      requestBody:
+        description: POST /v1/getSomething Request body
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                one:
+                  type: string
+                two:
+                  type: integer
+                  format: int64
+                  exclusiveMinimum: 0
+                  maximum: 9007199254740991
+              required:
+                - one
+                - two
       responses:
         "200":
           description: POST /v1/getSomething Positive response
@@ -3264,23 +3281,6 @@ paths:
                     status: error
                     error:
                       message: Sample error message
-      requestBody:
-        description: POST /v1/getSomething Request body
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                one:
-                  type: string
-                two:
-                  type: integer
-                  format: int64
-                  exclusiveMinimum: 0
-                  maximum: 9007199254740991
-              required:
-                - one
-                - two
 components:
   schemas: {}
   responses: {}
@@ -3306,6 +3306,37 @@ paths:
   /v1/getSomething:
     post:
       operationId: PostV1GetSomething
+      requestBody:
+        description: POST /v1/getSomething Request body
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ofOne:
+                  type: array
+                  prefixItems:
+                    - type: boolean
+                ofStrings:
+                  type: array
+                  prefixItems:
+                    - type: string
+                    - type:
+                        - string
+                        - "null"
+                complex:
+                  type: array
+                  prefixItems:
+                    - type: boolean
+                    - type: string
+                    - type: integer
+                      format: int64
+                      exclusiveMinimum: 0
+                      maximum: 9007199254740991
+              required:
+                - ofOne
+                - ofStrings
+                - complex
       responses:
         "200":
           description: POST /v1/getSomething Positive response
@@ -3356,37 +3387,6 @@ paths:
                     status: error
                     error:
                       message: Sample error message
-      requestBody:
-        description: POST /v1/getSomething Request body
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                ofOne:
-                  type: array
-                  prefixItems:
-                    - type: boolean
-                ofStrings:
-                  type: array
-                  prefixItems:
-                    - type: string
-                    - type:
-                        - string
-                        - "null"
-                complex:
-                  type: array
-                  prefixItems:
-                    - type: boolean
-                    - type: string
-                    - type: integer
-                      format: int64
-                      exclusiveMinimum: 0
-                      maximum: 9007199254740991
-              required:
-                - ofOne
-                - ofStrings
-                - complex
 components:
   schemas: {}
   responses: {}
@@ -3412,6 +3412,13 @@ paths:
   /v1/getSomething:
     get:
       operationId: GetV1GetSomething
+      parameters:
+        - name: any
+          in: query
+          required: false
+          description: GET /v1/getSomething Parameter
+          schema:
+            format: any
       responses:
         "200":
           description: GET /v1/getSomething Positive response
@@ -3459,13 +3466,6 @@ paths:
                     status: error
                     error:
                       message: Sample error message
-      parameters:
-        - name: any
-          in: query
-          required: false
-          description: GET /v1/getSomething Parameter
-          schema:
-            format: any
 components:
   schemas: {}
   responses: {}
@@ -3491,6 +3491,21 @@ paths:
   /v1/getSomething:
     get:
       operationId: GetV1GetSomething
+      parameters:
+        - name: string
+          in: query
+          required: false
+          description: GET /v1/getSomething Parameter
+          schema:
+            format: string (preprocessed)
+        - name: number
+          in: query
+          required: true
+          description: GET /v1/getSomething Parameter
+          schema:
+            format: int64 (preprocessed)
+            minimum: 0
+            maximum: 9007199254740991
       responses:
         "200":
           description: GET /v1/getSomething Positive response
@@ -3540,21 +3555,6 @@ paths:
                     status: error
                     error:
                       message: Sample error message
-      parameters:
-        - name: string
-          in: query
-          required: false
-          description: GET /v1/getSomething Parameter
-          schema:
-            format: string (preprocessed)
-        - name: number
-          in: query
-          required: true
-          description: GET /v1/getSomething Parameter
-          schema:
-            format: int64 (preprocessed)
-            minimum: 0
-            maximum: 9007199254740991
 components:
   schemas: {}
   responses: {}
@@ -3580,6 +3580,20 @@ paths:
   /v1/mtpl:
     post:
       operationId: PostV1Mtpl
+      requestBody:
+        description: POST /v1/mtpl Request body
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                test:
+                  type: number
+                  format: double
+                  minimum: -1.7976931348623157e+308
+                  maximum: 1.7976931348623157e+308
+              required:
+                - test
       responses:
         "200":
           description: POST /v1/mtpl Positive response 200
@@ -3639,20 +3653,6 @@ paths:
                 type: string
                 enum:
                   - failure
-      requestBody:
-        description: POST /v1/mtpl Request body
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                test:
-                  type: number
-                  format: double
-                  minimum: -1.7976931348623157e+308
-                  maximum: 1.7976931348623157e+308
-              required:
-                - test
 components:
   schemas: {}
   responses: {}
@@ -3678,6 +3678,19 @@ paths:
   /v1/test:
     get:
       operationId: GetV1Test
+      parameters:
+        - name: id
+          in: query
+          required: true
+          description: GET /v1/test Parameter
+          schema:
+            type: string
+        - name: x-request-id
+          in: header
+          required: true
+          description: GET /v1/test Parameter
+          schema:
+            type: string
       responses:
         "200":
           description: GET /v1/test Positive response
@@ -3722,19 +3735,6 @@ paths:
                     status: error
                     error:
                       message: Sample error message
-      parameters:
-        - name: id
-          in: query
-          required: true
-          description: GET /v1/test Parameter
-          schema:
-            type: string
-        - name: x-request-id
-          in: header
-          required: true
-          description: GET /v1/test Parameter
-          schema:
-            type: string
 components:
   schemas: {}
   responses: {}
@@ -3760,6 +3760,16 @@ paths:
   /v1/getSomething:
     get:
       operationId: GetV1GetSomething
+      parameters:
+        - name: arr
+          in: query
+          required: true
+          description: GET /v1/getSomething Parameter
+          schema:
+            type: array
+            items:
+              type: string
+            minItems: 1
       responses:
         "200":
           description: GET /v1/getSomething Positive response
@@ -3812,18 +3822,22 @@ paths:
                     status: error
                     error:
                       message: Sample error message
-      parameters:
-        - name: arr
-          in: query
-          required: true
-          description: GET /v1/getSomething Parameter
-          schema:
-            type: array
-            items:
-              type: string
-            minItems: 1
     post:
       operationId: PostV1GetSomething
+      requestBody:
+        description: POST /v1/getSomething Request body
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                arr:
+                  type: array
+                  items:
+                    type: string
+                  minItems: 1
+              required:
+                - arr
       responses:
         "200":
           description: POST /v1/getSomething Positive response
@@ -3876,20 +3890,6 @@ paths:
                     status: error
                     error:
                       message: Sample error message
-      requestBody:
-        description: POST /v1/getSomething Request body
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                arr:
-                  type: array
-                  items:
-                    type: string
-                  minItems: 1
-              required:
-                - arr
 components:
   schemas: {}
   responses: {}
@@ -3915,6 +3915,30 @@ paths:
   /v1/getSomething:
     post:
       operationId: PostV1GetSomething
+      requestBody:
+        description: POST /v1/getSomething Request body
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - type: object
+                  properties:
+                    id:
+                      type: string
+                    field1:
+                      type: string
+                  required:
+                    - id
+                    - field1
+                - type: object
+                  properties:
+                    id:
+                      type: string
+                    field2:
+                      type: string
+                  required:
+                    - id
+                    - field2
       responses:
         "200":
           description: POST /v1/getSomething Positive response
@@ -3977,30 +4001,6 @@ paths:
                     status: error
                     error:
                       message: Sample error message
-      requestBody:
-        description: POST /v1/getSomething Request body
-        content:
-          application/json:
-            schema:
-              oneOf:
-                - type: object
-                  properties:
-                    id:
-                      type: string
-                    field1:
-                      type: string
-                  required:
-                    - id
-                    - field1
-                - type: object
-                  properties:
-                    id:
-                      type: string
-                    field2:
-                      type: string
-                  required:
-                    - id
-                    - field2
 components:
   schemas: {}
   responses: {}
@@ -4026,6 +4026,21 @@ paths:
   /v1/addSomething:
     post:
       operationId: PostV1AddSomething
+      requestBody:
+        description: POST /v1/addSomething Request body
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                a:
+                  type: string
+              required:
+                - a
+            examples:
+              example1:
+                value:
+                  a: first
       responses:
         "200":
           description: POST /v1/addSomething Positive response
@@ -4096,21 +4111,6 @@ paths:
                     status: error
                     error:
                       message: Sample error message
-      requestBody:
-        description: POST /v1/addSomething Request body
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                a:
-                  type: string
-              required:
-                - a
-            examples:
-              example1:
-                value:
-                  a: first
 components:
   schemas: {}
   responses: {}
@@ -4136,6 +4136,14 @@ paths:
   /hris/employees:
     get:
       operationId: GetHrisEmployees
+      parameters:
+        - name: cursor
+          in: query
+          required: false
+          description: An optional cursor string used for pagination. This can be
+            retrieved from the \`next\` property of the previous page response.
+          schema:
+            $ref: "#/components/schemas/GetHrisEmployeesParameterCursor"
       responses:
         "200":
           description: GET /hris/employees Positive response
@@ -4155,14 +4163,6 @@ paths:
                     status: error
                     error:
                       message: Sample error message
-      parameters:
-        - name: cursor
-          in: query
-          required: false
-          description: An optional cursor string used for pagination. This can be
-            retrieved from the \`next\` property of the previous page response.
-          schema:
-            $ref: "#/components/schemas/GetHrisEmployeesParameterCursor"
 components:
   schemas:
     GetHrisEmployeesParameterCursor:
@@ -4221,6 +4221,25 @@ paths:
   /v1/getSomething:
     post:
       operationId: PostV1GetSomething
+      requestBody:
+        description: POST /v1/getSomething Request body
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                key:
+                  type: string
+                str:
+                  type: string
+              required:
+                - key
+                - str
+            examples:
+              example1:
+                value:
+                  key: 1234-56789-01
+                  str: test
       responses:
         "200":
           description: POST /v1/getSomething Positive response
@@ -4281,25 +4300,6 @@ paths:
                     status: error
                     error:
                       message: Sample error message
-      requestBody:
-        description: POST /v1/getSomething Request body
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                key:
-                  type: string
-                str:
-                  type: string
-              required:
-                - key
-                - str
-            examples:
-              example1:
-                value:
-                  key: 1234-56789-01
-                  str: test
 components:
   schemas: {}
   responses: {}
@@ -4325,6 +4325,16 @@ paths:
   /v1/getSomething:
     get:
       operationId: GetV1GetSomething
+      parameters:
+        - name: strNum
+          in: query
+          required: true
+          description: GET /v1/getSomething Parameter
+          schema:
+            type: string
+          examples:
+            example1:
+              value: "123"
       responses:
         "200":
           description: GET /v1/getSomething Positive response
@@ -4382,16 +4392,6 @@ paths:
                     status: error
                     error:
                       message: Sample error message
-      parameters:
-        - name: strNum
-          in: query
-          required: true
-          description: GET /v1/getSomething Parameter
-          schema:
-            type: string
-          examples:
-            example1:
-              value: "123"
 components:
   schemas: {}
   responses: {}
@@ -4417,6 +4417,21 @@ paths:
   /v1/getSomething:
     post:
       operationId: PostV1GetSomething
+      requestBody:
+        description: POST /v1/getSomething Request body
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                strNum:
+                  type: string
+              required:
+                - strNum
+            examples:
+              example1:
+                value:
+                  strNum: "123"
       responses:
         "200":
           description: POST /v1/getSomething Positive response
@@ -4474,21 +4489,6 @@ paths:
                     status: error
                     error:
                       message: Sample error message
-      requestBody:
-        description: POST /v1/getSomething Request body
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                strNum:
-                  type: string
-              required:
-                - strNum
-            examples:
-              example1:
-                value:
-                  strNum: "123"
 components:
   schemas: {}
   responses: {}
@@ -4514,6 +4514,15 @@ paths:
   /v1/getSomething:
     get:
       operationId: GetV1GetSomething
+      parameters:
+        - name: strNum
+          in: query
+          required: true
+          description: GET /v1/getSomething Parameter
+          schema:
+            type: string
+            examples:
+              - "123"
       responses:
         "200":
           description: GET /v1/getSomething Positive response
@@ -4565,15 +4574,6 @@ paths:
                     status: error
                     error:
                       message: Sample error message
-      parameters:
-        - name: strNum
-          in: query
-          required: true
-          description: GET /v1/getSomething Parameter
-          schema:
-            type: string
-            examples:
-              - "123"
 components:
   schemas: {}
   responses: {}
@@ -4599,6 +4599,14 @@ paths:
   /v1/getSomething:
     get:
       operationId: GetV1GetSomething
+      parameters:
+        - name: str
+          in: query
+          required: true
+          description: here is the test
+          schema:
+            type: string
+            description: here is the test
       responses:
         "200":
           description: GET /v1/getSomething Positive response
@@ -4652,14 +4660,6 @@ paths:
                     status: error
                     error:
                       message: Sample error message
-      parameters:
-        - name: str
-          in: query
-          required: true
-          description: here is the test
-          schema:
-            type: string
-            description: here is the test
 components:
   schemas: {}
   responses: {}
@@ -4685,6 +4685,30 @@ paths:
   /v1/{name}:
     post:
       operationId: PostV1Name
+      parameters:
+        - name: name
+          in: path
+          required: true
+          description: parameter of post /v1/:name
+          schema:
+            oneOf:
+              - type: string
+                enum:
+                  - John
+              - type: string
+                enum:
+                  - Jane
+      requestBody:
+        description: the body of request
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                other:
+                  type: boolean
+              required:
+                - other
       responses:
         "200":
           description: Super positive response of /v1/:name
@@ -4729,30 +4753,6 @@ paths:
                     status: error
                     error:
                       message: Sample error message
-      parameters:
-        - name: name
-          in: path
-          required: true
-          description: parameter of post /v1/:name
-          schema:
-            oneOf:
-              - type: string
-                enum:
-                  - John
-              - type: string
-                enum:
-                  - Jane
-      requestBody:
-        description: the body of request
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                other:
-                  type: boolean
-              required:
-                - other
 components:
   schemas: {}
   responses: {}
@@ -4778,6 +4778,19 @@ paths:
   /v1/{name}:
     post:
       operationId: PostV1Name
+      parameters:
+        - name: name
+          in: path
+          required: true
+          description: parameter of post /v1/:name
+          schema:
+            $ref: "#/components/schemas/ParameterOfPostV1NameName"
+      requestBody:
+        description: the body of request
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TheBodyOfRequest"
       responses:
         "200":
           description: Super positive response of /v1/:name
@@ -4797,19 +4810,6 @@ paths:
                     status: error
                     error:
                       message: Sample error message
-      parameters:
-        - name: name
-          in: path
-          required: true
-          description: parameter of post /v1/:name
-          schema:
-            $ref: "#/components/schemas/ParameterOfPostV1NameName"
-      requestBody:
-        description: the body of request
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/TheBodyOfRequest"
 components:
   schemas:
     ParameterOfPostV1NameName:
@@ -4879,6 +4879,25 @@ paths:
   /v1/{name}:
     get:
       operationId: GetV1Name
+      parameters:
+        - name: name
+          in: path
+          required: true
+          description: GET /v1/:name Parameter
+          schema:
+            oneOf:
+              - type: string
+                enum:
+                  - John
+              - type: string
+                enum:
+                  - Jane
+        - name: other
+          in: query
+          required: true
+          description: GET /v1/:name Parameter
+          schema:
+            type: boolean
       responses:
         "200":
           description: GET /v1/:name Positive response
@@ -4923,25 +4942,6 @@ paths:
                     status: error
                     error:
                       message: Sample error message
-      parameters:
-        - name: name
-          in: path
-          required: true
-          description: GET /v1/:name Parameter
-          schema:
-            oneOf:
-              - type: string
-                enum:
-                  - John
-              - type: string
-                enum:
-                  - Jane
-        - name: other
-          in: query
-          required: true
-          description: GET /v1/:name Parameter
-          schema:
-            type: boolean
 components:
   schemas: {}
   responses: {}
@@ -4967,6 +4967,30 @@ paths:
   /v1/{name}:
     post:
       operationId: PostV1Name
+      parameters:
+        - name: name
+          in: path
+          required: true
+          description: POST /v1/:name Parameter
+          schema:
+            oneOf:
+              - type: string
+                enum:
+                  - John
+              - type: string
+                enum:
+                  - Jane
+      requestBody:
+        description: POST /v1/:name Request body
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                other:
+                  type: boolean
+              required:
+                - other
       responses:
         "200":
           description: POST /v1/:name Positive response
@@ -5011,30 +5035,6 @@ paths:
                     status: error
                     error:
                       message: Sample error message
-      parameters:
-        - name: name
-          in: path
-          required: true
-          description: POST /v1/:name Parameter
-          schema:
-            oneOf:
-              - type: string
-                enum:
-                  - John
-              - type: string
-                enum:
-                  - Jane
-      requestBody:
-        description: POST /v1/:name Request body
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                other:
-                  type: boolean
-              required:
-                - other
 components:
   schemas: {}
   responses: {}
