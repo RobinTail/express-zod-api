@@ -13,7 +13,7 @@ describe("CJS Test", async () => {
   quickStart.stdout.on("data", listener);
   quickStart.stderr.on("data", listener);
   const port = givePort("example");
-  await waitFor(() => out.indexOf(`Listening ${port}`) > -1);
+  await waitFor(() => out.indexOf(`Listening`) > -1);
 
   afterAll(async () => {
     quickStart.stdout.removeListener("data", listener);

@@ -35,7 +35,140 @@ exports[`Logger > createWinstonLogger() > Should create warn logger 1`] = `
           "withMeta": true,
         },
       ],
-      Symbol(message): "2022-01-01T00:00:00.000Z warn: testing warn message {"withMeta":true}",
+      Symbol(message): "2022-01-01T00:00:00.000Z warn: testing warn message { withMeta: true }",
+    },
+    [Function],
+  ],
+]
+`;
+
+exports[`Logger > createWinstonLogger() > Should handle array 0 1`] = `
+[
+  [
+    {
+      "0": "test",
+      "level": "[31merror[39m",
+      "message": "Array",
+      "timestamp": "2022-01-01T00:00:00.000Z",
+      Symbol(level): "error",
+      Symbol(splat): [
+        [
+          "test",
+        ],
+      ],
+      Symbol(message): "2022-01-01T00:00:00.000Z [31merror[39m: Array [ [32m'test'[39m ]",
+    },
+    [Function],
+  ],
+]
+`;
+
+exports[`Logger > createWinstonLogger() > Should handle array 1 1`] = `
+[
+  [
+    {
+      "0": "test",
+      "level": "[31merror[39m",
+      "message": "Array",
+      "timestamp": "2022-01-01T00:00:00.000Z",
+      Symbol(level): "error",
+      Symbol(splat): [
+        [
+          "test",
+        ],
+      ],
+      Symbol(message): "2022-01-01T00:00:00.000Z [31merror[39m: Array [ [32m'test'[39m ]",
+    },
+    [Function],
+  ],
+]
+`;
+
+exports[`Logger > createWinstonLogger() > Should handle circular references within subject 0 1`] = `
+[
+  [
+    {
+      "a": [
+        {
+          "a": [Circular],
+          "b": {
+            "inner": [Circular],
+            "obj": [Circular],
+          },
+        },
+      ],
+      "b": {
+        "inner": [Circular],
+        "obj": {
+          "a": [
+            [Circular],
+          ],
+          "b": [Circular],
+        },
+      },
+      "level": "error",
+      "message": "Recursive",
+      "timestamp": "2022-01-01T00:00:00.000Z",
+      Symbol(level): "error",
+      Symbol(splat): [
+        {
+          "a": [
+            [Circular],
+          ],
+          "b": {
+            "inner": [Circular],
+            "obj": [Circular],
+          },
+        },
+      ],
+      Symbol(message): "2022-01-01T00:00:00.000Z error: Recursive <ref *1> {
+  a: [ [Circular *1] ],
+  b: <ref *2> { inner: [Circular *2], obj: [Circular *1] }
+}",
+    },
+    [Function],
+  ],
+]
+`;
+
+exports[`Logger > createWinstonLogger() > Should handle circular references within subject 1 1`] = `
+[
+  [
+    {
+      "a": [
+        {
+          "a": [Circular],
+          "b": {
+            "inner": [Circular],
+            "obj": [Circular],
+          },
+        },
+      ],
+      "b": {
+        "inner": [Circular],
+        "obj": {
+          "a": [
+            [Circular],
+          ],
+          "b": [Circular],
+        },
+      },
+      "level": "error",
+      "message": "Recursive",
+      "timestamp": "2022-01-01T00:00:00.000Z",
+      Symbol(level): "error",
+      Symbol(splat): [
+        {
+          "a": [
+            [Circular],
+          ],
+          "b": {
+            "inner": [Circular],
+            "obj": [Circular],
+          },
+        },
+      ],
+      Symbol(message): "2022-01-01T00:00:00.000Z error: Recursive <ref *1> { a: [ [Circular *1] ], b: <ref *2> { inner: [Circular *2], obj: [Circular *1] } }",
     },
     [Function],
   ],
@@ -95,6 +228,31 @@ exports[`Logger > createWinstonLogger() > Should handle empty object meta 1 1`] 
 ]
 `;
 
+exports[`Logger > createWinstonLogger() > Should handle excessive arguments 1`] = `
+[
+  [
+    {
+      "level": "debug",
+      "message": "Test",
+      "some": "value",
+      "timestamp": "2022-01-01T00:00:00.000Z",
+      Symbol(level): "debug",
+      Symbol(splat): [
+        {
+          "some": "value",
+        },
+        [
+          123,
+        ],
+        456,
+      ],
+      Symbol(message): "2022-01-01T00:00:00.000Z debug: Test { some: 'value' } [ 123 ] 456",
+    },
+    [Function],
+  ],
+]
+`;
+
 exports[`Logger > createWinstonLogger() > Should handle non-object meta 0 1`] = `
 [
   [
@@ -106,7 +264,7 @@ exports[`Logger > createWinstonLogger() > Should handle non-object meta 0 1`] = 
       Symbol(splat): [
         8090,
       ],
-      Symbol(message): "2022-01-01T00:00:00.000Z [31merror[39m: Code 8090",
+      Symbol(message): "2022-01-01T00:00:00.000Z [31merror[39m: Code [33m8090[39m",
     },
     [Function],
   ],
@@ -124,7 +282,7 @@ exports[`Logger > createWinstonLogger() > Should handle non-object meta 1 1`] = 
       Symbol(splat): [
         8090,
       ],
-      Symbol(message): "2022-01-01T00:00:00.000Z [31merror[39m: Code 8090",
+      Symbol(message): "2022-01-01T00:00:00.000Z [31merror[39m: Code [33m8090[39m",
     },
     [Function],
   ],

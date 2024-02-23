@@ -1,11 +1,24 @@
 openapi: 3.1.0
 info:
   title: Example API
-  version: 16.7.0
+  version: 16.8.1
 paths:
   /v1/user/retrieve:
     get:
       operationId: GetV1UserRetrieve
+      summary: Retrieves the user.
+      description: Example user retrieval endpoint.
+      tags:
+        - users
+      parameters:
+        - name: id
+          in: query
+          required: true
+          description: a numeric string containing the id of the user
+          schema:
+            type: string
+            pattern: \d+
+            description: a numeric string containing the id of the user
       responses:
         "200":
           description: GET /v1/user/retrieve Positive response
@@ -74,22 +87,56 @@ paths:
                     status: error
                     error:
                       message: Sample error message
-      description: Example user retrieval endpoint.
-      summary: Retrieves the user.
+  /v1/user/{id}:
+    patch:
+      operationId: PatchV1UserId
+      summary: Changes the user record. Example user update endp…
+      description: Changes the user record. Example user update endpoint.
       tags:
         - users
       parameters:
         - name: id
-          in: query
+          in: path
           required: true
-          description: a numeric string containing the id of the user
+          description: PATCH /v1/user/:id Parameter
           schema:
             type: string
-            pattern: \d+
-            description: a numeric string containing the id of the user
-  /v1/user/{id}:
-    patch:
-      operationId: PatchV1UserId
+          examples:
+            example1:
+              value: "12"
+      requestBody:
+        description: PATCH /v1/user/:id Request body
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                key:
+                  type: string
+                  minLength: 1
+                name:
+                  type: string
+                  minLength: 1
+                birthday:
+                  description: YYYY-MM-DDTHH:mm:ss.sssZ
+                  type: string
+                  format: date-time
+                  pattern: ^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d+)?)?Z?$
+                  externalDocs:
+                    url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
+              required:
+                - key
+                - name
+                - birthday
+            examples:
+              example1:
+                value:
+                  key: 1234-5678-90
+                  name: John Doe
+                  birthday: 1963-04-21
+      security:
+        - APIKEY_1: []
+          APIKEY_2: []
       responses:
         "200":
           description: PATCH /v1/user/:id Positive response
@@ -156,56 +203,23 @@ paths:
                     status: error
                     error:
                       message: Sample error message
-      description: Changes the user record. Example user update endpoint.
-      summary: Changes the user record. Example user update endp…
+  /v1/user/create:
+    post:
+      operationId: PostV1UserCreate
       tags:
         - users
-      parameters:
-        - name: id
-          in: path
-          required: true
-          description: PATCH /v1/user/:id Parameter
-          schema:
-            type: string
-          examples:
-            example1:
-              value: "12"
       requestBody:
-        description: PATCH /v1/user/:id Request body
+        description: POST /v1/user/create Request body
         content:
           application/json:
             schema:
               type: object
               properties:
-                key:
-                  type: string
-                  minLength: 1
                 name:
                   type: string
                   minLength: 1
-                birthday:
-                  description: YYYY-MM-DDTHH:mm:ss.sssZ
-                  type: string
-                  format: date-time
-                  pattern: ^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d+)?)?Z?$
-                  externalDocs:
-                    url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
               required:
-                - key
                 - name
-                - birthday
-            examples:
-              example1:
-                value:
-                  key: 1234-5678-90
-                  name: John Doe
-                  birthday: 1963-04-21
-      security:
-        - APIKEY_1: []
-          APIKEY_2: []
-  /v1/user/create:
-    post:
-      operationId: PostV1UserCreate
       responses:
         "201":
           description: POST /v1/user/create Positive response 201
@@ -306,23 +320,11 @@ paths:
                 required:
                   - status
                   - reason
-      tags:
-        - users
-      requestBody:
-        description: POST /v1/user/create Request body
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                name:
-                  type: string
-                  minLength: 1
-              required:
-                - name
   /v1/user/list:
     get:
       operationId: GetV1UserList
+      tags:
+        - users
       responses:
         "200":
           description: GET /v1/user/list Positive response
@@ -352,11 +354,21 @@ paths:
               examples:
                 example1:
                   value: Sample error message
-      tags:
-        - users
   /v1/avatar/send:
     get:
       operationId: GetV1AvatarSend
+      summary: Sends a file content.
+      tags:
+        - files
+        - users
+      parameters:
+        - name: userId
+          in: query
+          required: true
+          description: GET /v1/avatar/send Parameter
+          schema:
+            type: string
+            pattern: \d+
       responses:
         "200":
           description: GET /v1/avatar/send Positive response
@@ -370,21 +382,21 @@ paths:
             text/plain:
               schema:
                 type: string
-      summary: Sends a file content.
+  /v1/avatar/stream:
+    get:
+      operationId: GetV1AvatarStream
+      summary: Streams a file content.
       tags:
-        - files
         - users
+        - files
       parameters:
         - name: userId
           in: query
           required: true
-          description: GET /v1/avatar/send Parameter
+          description: GET /v1/avatar/stream Parameter
           schema:
             type: string
             pattern: \d+
-  /v1/avatar/stream:
-    get:
-      operationId: GetV1AvatarStream
       responses:
         "200":
           description: GET /v1/avatar/stream Positive response
@@ -399,21 +411,25 @@ paths:
             text/plain:
               schema:
                 type: string
-      summary: Streams a file content.
-      tags:
-        - users
-        - files
-      parameters:
-        - name: userId
-          in: query
-          required: true
-          description: GET /v1/avatar/stream Parameter
-          schema:
-            type: string
-            pattern: \d+
   /v1/avatar/upload:
     post:
       operationId: PostV1AvatarUpload
+      summary: Handles a file upload.
+      description: Handles a file upload.
+      tags:
+        - files
+      requestBody:
+        description: POST /v1/avatar/upload Request body
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                avatar:
+                  type: string
+                  format: binary
+              required:
+                - avatar
       responses:
         "200":
           description: POST /v1/avatar/upload Positive response
@@ -480,25 +496,18 @@ paths:
                     status: error
                     error:
                       message: Sample error message
-      description: Handles a file upload.
-      summary: Handles a file upload.
-      tags:
-        - files
-      requestBody:
-        description: POST /v1/avatar/upload Request body
-        content:
-          multipart/form-data:
-            schema:
-              type: object
-              properties:
-                avatar:
-                  type: string
-                  format: binary
-              required:
-                - avatar
   /v1/avatar/raw:
     post:
       operationId: PostV1AvatarRaw
+      tags:
+        - files
+      requestBody:
+        description: POST /v1/avatar/raw Request body
+        content:
+          application/octet-stream:
+            schema:
+              type: string
+              format: binary
       responses:
         "200":
           description: POST /v1/avatar/raw Positive response
@@ -551,15 +560,6 @@ paths:
                     status: error
                     error:
                       message: Sample error message
-      tags:
-        - files
-      requestBody:
-        description: POST /v1/avatar/raw Request body
-        content:
-          application/octet-stream:
-            schema:
-              type: string
-              format: binary
 components:
   schemas:
     2048581c137c5b2130eb860e3ae37da196dfc25b:

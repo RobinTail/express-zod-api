@@ -1,13 +1,27 @@
 import MockDate from "mockdate";
+import { EventEmitter } from "node:events";
 import {
   SimplifiedWinstonConfig,
   createLogger,
   isSimplifiedWinstonConfig,
 } from "../../src/logger";
 import winston from "winston";
-import { afterAll, beforeEach, describe, expect, test, vi } from "vitest";
+import {
+  afterAll,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  test,
+  vi,
+} from "vitest";
 
 describe("Logger", () => {
+  beforeAll(() => {
+    // fix (node:58829) MaxListenersExceededWarning: Possible EventEmitter memory leak
+    EventEmitter.setMaxListeners(15);
+  });
+
   beforeEach(() => {
     MockDate.set("2022-01-01T00:00:00Z");
   });
@@ -99,6 +113,32 @@ describe("Logger", () => {
         expect(logSpy.mock.calls).toMatchSnapshot();
       },
     );
+
+    test.each(["debug", "warn"] as const)("Should handle array %#", (level) => {
+      const { logger, logSpy } = makeLogger({ level, color: true });
+      logger.error("Array", ["test"]);
+      expect(logSpy.mock.calls).toMatchSnapshot();
+    });
+
+    test.each(["debug", "warn"] as const)(
+      "Should handle circular references within subject %#",
+      (level) => {
+        const { logger, logSpy } = makeLogger({ level, color: false });
+        const subject: any = {};
+        subject.a = [subject];
+        subject.b = {};
+        subject.b.inner = subject.b;
+        subject.b.obj = subject;
+        logger.error("Recursive", subject);
+        expect(logSpy.mock.calls).toMatchSnapshot();
+      },
+    );
+
+    test("Should handle excessive arguments", () => {
+      const { logger, logSpy } = makeLogger({ level: "debug", color: false });
+      logger.debug("Test", { some: "value" }, [123], 456);
+      expect(logSpy.mock.calls).toMatchSnapshot();
+    });
   });
 
   describe("isSimplifiedLoggerConfig()", () => {
@@ -106,6 +146,9 @@ describe("Logger", () => {
       { level: "silent" },
       { level: "debug", color: false },
       { level: "warn", color: true },
+      { level: "warn", depth: 5 },
+      { level: "warn", depth: null },
+      { level: "warn", depth: Infinity },
     ])("should validate config %#", (sample) => {
       expect(isSimplifiedWinstonConfig(sample)).toBeTruthy();
     });
@@ -117,6 +160,7 @@ describe("Logger", () => {
       { level: null },
       { level: "wrong" },
       { level: "debug", color: null },
+      { level: "debug", depth: "wrong" },
     ])("should invalidate config %#", (sample) => {
       expect(isSimplifiedWinstonConfig(sample)).toBeFalsy();
     });
