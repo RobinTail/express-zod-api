@@ -2,250 +2,372 @@
 
 exports[`I/O Schema and related helpers > getFinalEndpointInputSchema() > Should handle no middlewares 1`] = `
 {
-  "_type": "ZodObject",
-  "shape": {
-    "four": {
-      "_type": "ZodBoolean",
+  "_cached": null,
+  "_def": {
+    "catchall": {
+      "_def": {
+        "typeName": "ZodNever",
+      },
     },
+    "typeName": "ZodObject",
+    "unknownKeys": "strip",
   },
 }
 `;
 
 exports[`I/O Schema and related helpers > getFinalEndpointInputSchema() > Should merge input object schemas 1`] = `
 {
-  "_type": "ZodIntersection",
-  "left": {
-    "_type": "ZodIntersection",
+  "_def": {
     "left": {
-      "_type": "ZodIntersection",
-      "left": {
-        "_type": "ZodObject",
-        "shape": {
-          "one": {
-            "_type": "ZodString",
+      "_def": {
+        "left": {
+          "_def": {
+            "left": {
+              "_cached": null,
+              "_def": {
+                "catchall": {
+                  "_def": {
+                    "typeName": "ZodNever",
+                  },
+                },
+                "typeName": "ZodObject",
+                "unknownKeys": "strip",
+              },
+            },
+            "right": {
+              "_cached": null,
+              "_def": {
+                "catchall": {
+                  "_def": {
+                    "typeName": "ZodNever",
+                  },
+                },
+                "typeName": "ZodObject",
+                "unknownKeys": "strip",
+              },
+            },
+            "typeName": "ZodIntersection",
           },
         },
-      },
-      "right": {
-        "_type": "ZodObject",
-        "shape": {
-          "two": {
-            "_type": "ZodNumber",
+        "right": {
+          "_cached": null,
+          "_def": {
+            "catchall": {
+              "_def": {
+                "typeName": "ZodNever",
+              },
+            },
+            "typeName": "ZodObject",
+            "unknownKeys": "strip",
           },
         },
+        "typeName": "ZodIntersection",
       },
     },
     "right": {
-      "_type": "ZodObject",
-      "shape": {
-        "three": {
-          "_type": "ZodNull",
+      "_cached": null,
+      "_def": {
+        "catchall": {
+          "_def": {
+            "typeName": "ZodNever",
+          },
         },
+        "typeName": "ZodObject",
+        "unknownKeys": "strip",
       },
     },
-  },
-  "right": {
-    "_type": "ZodObject",
-    "shape": {
-      "four": {
-        "_type": "ZodBoolean",
-      },
-    },
+    "typeName": "ZodIntersection",
   },
 }
 `;
 
 exports[`I/O Schema and related helpers > getFinalEndpointInputSchema() > Should merge intersection object schemas 1`] = `
 {
-  "_type": "ZodIntersection",
-  "left": {
-    "_type": "ZodIntersection",
+  "_def": {
     "left": {
-      "_type": "ZodIntersection",
-      "left": {
-        "_type": "ZodObject",
-        "shape": {
-          "one": {
-            "_type": "ZodString",
+      "_def": {
+        "left": {
+          "_def": {
+            "left": {
+              "_cached": null,
+              "_def": {
+                "catchall": {
+                  "_def": {
+                    "typeName": "ZodNever",
+                  },
+                },
+                "typeName": "ZodObject",
+                "unknownKeys": "strip",
+              },
+            },
+            "right": {
+              "_cached": null,
+              "_def": {
+                "catchall": {
+                  "_def": {
+                    "typeName": "ZodNever",
+                  },
+                },
+                "typeName": "ZodObject",
+                "unknownKeys": "strip",
+              },
+            },
+            "typeName": "ZodIntersection",
           },
         },
-      },
-      "right": {
-        "_type": "ZodObject",
-        "shape": {
-          "two": {
-            "_type": "ZodNumber",
+        "right": {
+          "_def": {
+            "left": {
+              "_cached": null,
+              "_def": {
+                "catchall": {
+                  "_def": {
+                    "typeName": "ZodNever",
+                  },
+                },
+                "typeName": "ZodObject",
+                "unknownKeys": "strip",
+              },
+            },
+            "right": {
+              "_cached": null,
+              "_def": {
+                "catchall": {
+                  "_def": {
+                    "typeName": "ZodNever",
+                  },
+                },
+                "typeName": "ZodObject",
+                "unknownKeys": "strip",
+              },
+            },
+            "typeName": "ZodIntersection",
           },
         },
+        "typeName": "ZodIntersection",
       },
     },
     "right": {
-      "_type": "ZodIntersection",
-      "left": {
-        "_type": "ZodObject",
-        "shape": {
-          "three": {
-            "_type": "ZodNull",
+      "_def": {
+        "left": {
+          "_cached": null,
+          "_def": {
+            "catchall": {
+              "_def": {
+                "typeName": "ZodNever",
+              },
+            },
+            "typeName": "ZodObject",
+            "unknownKeys": "strip",
           },
         },
-      },
-      "right": {
-        "_type": "ZodObject",
-        "shape": {
-          "four": {
-            "_type": "ZodBoolean",
+        "right": {
+          "_cached": null,
+          "_def": {
+            "catchall": {
+              "_def": {
+                "typeName": "ZodNever",
+              },
+            },
+            "typeName": "ZodObject",
+            "unknownKeys": "strip",
           },
         },
+        "typeName": "ZodIntersection",
       },
     },
-  },
-  "right": {
-    "_type": "ZodIntersection",
-    "left": {
-      "_type": "ZodObject",
-      "shape": {
-        "five": {
-          "_type": "ZodString",
-        },
-      },
-    },
-    "right": {
-      "_type": "ZodObject",
-      "shape": {
-        "six": {
-          "_type": "ZodNumber",
-        },
-      },
-    },
+    "typeName": "ZodIntersection",
   },
 }
 `;
 
 exports[`I/O Schema and related helpers > getFinalEndpointInputSchema() > Should merge mixed object schemas 1`] = `
 {
-  "_type": "ZodIntersection",
-  "left": {
-    "_type": "ZodIntersection",
+  "_def": {
     "left": {
-      "_type": "ZodIntersection",
-      "left": {
-        "_type": "ZodObject",
-        "shape": {
-          "one": {
-            "_type": "ZodString",
+      "_def": {
+        "left": {
+          "_def": {
+            "left": {
+              "_cached": null,
+              "_def": {
+                "catchall": {
+                  "_def": {
+                    "typeName": "ZodNever",
+                  },
+                },
+                "typeName": "ZodObject",
+                "unknownKeys": "strip",
+              },
+            },
+            "right": {
+              "_cached": null,
+              "_def": {
+                "catchall": {
+                  "_def": {
+                    "typeName": "ZodNever",
+                  },
+                },
+                "typeName": "ZodObject",
+                "unknownKeys": "strip",
+              },
+            },
+            "typeName": "ZodIntersection",
           },
         },
-      },
-      "right": {
-        "_type": "ZodObject",
-        "shape": {
-          "two": {
-            "_type": "ZodNumber",
+        "right": {
+          "_def": {
+            "options": [
+              {
+                "_cached": null,
+                "_def": {
+                  "catchall": {
+                    "_def": {
+                      "typeName": "ZodNever",
+                    },
+                  },
+                  "typeName": "ZodObject",
+                  "unknownKeys": "strip",
+                },
+              },
+              {
+                "_cached": null,
+                "_def": {
+                  "catchall": {
+                    "_def": {
+                      "typeName": "ZodNever",
+                    },
+                  },
+                  "typeName": "ZodObject",
+                  "unknownKeys": "strip",
+                },
+              },
+            ],
+            "typeName": "ZodUnion",
           },
         },
+        "typeName": "ZodIntersection",
       },
     },
     "right": {
-      "_type": "ZodUnion",
-      "options": [
-        {
-          "_type": "ZodObject",
-          "shape": {
-            "three": {
-              "_type": "ZodNull",
-            },
+      "_cached": null,
+      "_def": {
+        "catchall": {
+          "_def": {
+            "typeName": "ZodNever",
           },
         },
-        {
-          "_type": "ZodObject",
-          "shape": {
-            "four": {
-              "_type": "ZodBoolean",
-            },
-          },
-        },
-      ],
-    },
-  },
-  "right": {
-    "_type": "ZodObject",
-    "shape": {
-      "five": {
-        "_type": "ZodString",
+        "typeName": "ZodObject",
+        "unknownKeys": "strip",
       },
     },
+    "typeName": "ZodIntersection",
   },
 }
 `;
 
 exports[`I/O Schema and related helpers > getFinalEndpointInputSchema() > Should merge union object schemas 1`] = `
 {
-  "_type": "ZodIntersection",
-  "left": {
-    "_type": "ZodIntersection",
+  "_def": {
     "left": {
-      "_type": "ZodUnion",
-      "options": [
-        {
-          "_type": "ZodObject",
-          "shape": {
-            "one": {
-              "_type": "ZodString",
-            },
+      "_def": {
+        "left": {
+          "_def": {
+            "options": [
+              {
+                "_cached": null,
+                "_def": {
+                  "catchall": {
+                    "_def": {
+                      "typeName": "ZodNever",
+                    },
+                  },
+                  "typeName": "ZodObject",
+                  "unknownKeys": "strip",
+                },
+              },
+              {
+                "_cached": null,
+                "_def": {
+                  "catchall": {
+                    "_def": {
+                      "typeName": "ZodNever",
+                    },
+                  },
+                  "typeName": "ZodObject",
+                  "unknownKeys": "strip",
+                },
+              },
+            ],
+            "typeName": "ZodUnion",
           },
         },
-        {
-          "_type": "ZodObject",
-          "shape": {
-            "two": {
-              "_type": "ZodNumber",
-            },
+        "right": {
+          "_def": {
+            "options": [
+              {
+                "_cached": null,
+                "_def": {
+                  "catchall": {
+                    "_def": {
+                      "typeName": "ZodNever",
+                    },
+                  },
+                  "typeName": "ZodObject",
+                  "unknownKeys": "strip",
+                },
+              },
+              {
+                "_cached": null,
+                "_def": {
+                  "catchall": {
+                    "_def": {
+                      "typeName": "ZodNever",
+                    },
+                  },
+                  "typeName": "ZodObject",
+                  "unknownKeys": "strip",
+                },
+              },
+            ],
+            "typeName": "ZodUnion",
           },
         },
-      ],
+        "typeName": "ZodIntersection",
+      },
     },
     "right": {
-      "_type": "ZodUnion",
-      "options": [
-        {
-          "_type": "ZodObject",
-          "shape": {
-            "three": {
-              "_type": "ZodNull",
+      "_def": {
+        "options": [
+          {
+            "_cached": null,
+            "_def": {
+              "catchall": {
+                "_def": {
+                  "typeName": "ZodNever",
+                },
+              },
+              "typeName": "ZodObject",
+              "unknownKeys": "strip",
             },
           },
-        },
-        {
-          "_type": "ZodObject",
-          "shape": {
-            "four": {
-              "_type": "ZodBoolean",
+          {
+            "_cached": null,
+            "_def": {
+              "catchall": {
+                "_def": {
+                  "typeName": "ZodNever",
+                },
+              },
+              "typeName": "ZodObject",
+              "unknownKeys": "strip",
             },
           },
-        },
-      ],
+        ],
+        "typeName": "ZodUnion",
+      },
     },
-  },
-  "right": {
-    "_type": "ZodUnion",
-    "options": [
-      {
-        "_type": "ZodObject",
-        "shape": {
-          "five": {
-            "_type": "ZodString",
-          },
-        },
-      },
-      {
-        "_type": "ZodObject",
-        "shape": {
-          "six": {
-            "_type": "ZodNumber",
-          },
-        },
-      },
-    ],
+    "typeName": "ZodIntersection",
   },
 }
 `;

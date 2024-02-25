@@ -2,168 +2,232 @@
 
 exports[`EndpointsFactory > .build() > Should create an endpoint with intersection middleware 1`] = `
 {
-  "_type": "ZodIntersection",
-  "left": {
-    "_type": "ZodIntersection",
+  "_def": {
     "left": {
-      "_type": "ZodObject",
-      "shape": {
-        "n1": {
-          "_type": "ZodNumber",
+      "_def": {
+        "left": {
+          "_cached": null,
+          "_def": {
+            "catchall": {
+              "_def": {
+                "typeName": "ZodNever",
+              },
+            },
+            "typeName": "ZodObject",
+            "unknownKeys": "strip",
+          },
         },
+        "right": {
+          "_cached": null,
+          "_def": {
+            "catchall": {
+              "_def": {
+                "typeName": "ZodNever",
+              },
+            },
+            "typeName": "ZodObject",
+            "unknownKeys": "strip",
+          },
+        },
+        "typeName": "ZodIntersection",
       },
     },
     "right": {
-      "_type": "ZodObject",
-      "shape": {
-        "n2": {
-          "_type": "ZodNumber",
+      "_cached": null,
+      "_def": {
+        "catchall": {
+          "_def": {
+            "typeName": "ZodNever",
+          },
         },
+        "typeName": "ZodObject",
+        "unknownKeys": "strip",
       },
     },
-  },
-  "right": {
-    "_type": "ZodObject",
-    "shape": {
-      "s": {
-        "_type": "ZodString",
-      },
-    },
+    "typeName": "ZodIntersection",
   },
 }
 `;
 
 exports[`EndpointsFactory > .build() > Should create an endpoint with intersection middleware 2`] = `
 {
-  "_type": "ZodObject",
-  "shape": {
-    "b": {
-      "_type": "ZodBoolean",
+  "_cached": null,
+  "_def": {
+    "catchall": {
+      "_def": {
+        "typeName": "ZodNever",
+      },
     },
+    "typeName": "ZodObject",
+    "unknownKeys": "strip",
   },
 }
 `;
 
 exports[`EndpointsFactory > .build() > Should create an endpoint with refined object middleware 1`] = `
 {
-  "_type": "ZodIntersection",
-  "left": {
-    "_type": "ZodEffects",
-    "value": {
-      "_type": "ZodObject",
-      "shape": {
-        "a": {
-          "_type": "ZodOptional",
-          "value": {
-            "_type": "ZodNumber",
+  "_def": {
+    "left": {
+      "_def": {
+        "effect": {
+          "type": "refinement",
+        },
+        "schema": {
+          "_cached": null,
+          "_def": {
+            "catchall": {
+              "_def": {
+                "typeName": "ZodNever",
+              },
+            },
+            "typeName": "ZodObject",
+            "unknownKeys": "strip",
           },
         },
-        "b": {
-          "_type": "ZodOptional",
-          "value": {
-            "_type": "ZodString",
+        "typeName": "ZodEffects",
+      },
+    },
+    "right": {
+      "_cached": null,
+      "_def": {
+        "catchall": {
+          "_def": {
+            "typeName": "ZodNever",
           },
         },
+        "typeName": "ZodObject",
+        "unknownKeys": "strip",
       },
     },
-  },
-  "right": {
-    "_type": "ZodObject",
-    "shape": {
-      "i": {
-        "_type": "ZodString",
-      },
-    },
+    "typeName": "ZodIntersection",
   },
 }
 `;
 
 exports[`EndpointsFactory > .build() > Should create an endpoint with refined object middleware 2`] = `
 {
-  "_type": "ZodObject",
-  "shape": {
-    "o": {
-      "_type": "ZodBoolean",
+  "_cached": null,
+  "_def": {
+    "catchall": {
+      "_def": {
+        "typeName": "ZodNever",
+      },
     },
+    "typeName": "ZodObject",
+    "unknownKeys": "strip",
   },
 }
 `;
 
 exports[`EndpointsFactory > .build() > Should create an endpoint with simple middleware 1`] = `
 {
-  "_type": "ZodIntersection",
-  "left": {
-    "_type": "ZodObject",
-    "shape": {
-      "n": {
-        "_type": "ZodNumber",
+  "_def": {
+    "left": {
+      "_cached": null,
+      "_def": {
+        "catchall": {
+          "_def": {
+            "typeName": "ZodNever",
+          },
+        },
+        "typeName": "ZodObject",
+        "unknownKeys": "strip",
       },
     },
-  },
-  "right": {
-    "_type": "ZodObject",
-    "shape": {
-      "s": {
-        "_type": "ZodString",
+    "right": {
+      "_cached": null,
+      "_def": {
+        "catchall": {
+          "_def": {
+            "typeName": "ZodNever",
+          },
+        },
+        "typeName": "ZodObject",
+        "unknownKeys": "strip",
       },
     },
+    "typeName": "ZodIntersection",
   },
 }
 `;
 
 exports[`EndpointsFactory > .build() > Should create an endpoint with simple middleware 2`] = `
 {
-  "_type": "ZodObject",
-  "shape": {
-    "b": {
-      "_type": "ZodBoolean",
+  "_cached": null,
+  "_def": {
+    "catchall": {
+      "_def": {
+        "typeName": "ZodNever",
+      },
     },
+    "typeName": "ZodObject",
+    "unknownKeys": "strip",
   },
 }
 `;
 
 exports[`EndpointsFactory > .build() > Should create an endpoint with union middleware 1`] = `
 {
-  "_type": "ZodIntersection",
-  "left": {
-    "_type": "ZodUnion",
-    "options": [
-      {
-        "_type": "ZodObject",
-        "shape": {
-          "n1": {
-            "_type": "ZodNumber",
+  "_def": {
+    "left": {
+      "_def": {
+        "options": [
+          {
+            "_cached": null,
+            "_def": {
+              "catchall": {
+                "_def": {
+                  "typeName": "ZodNever",
+                },
+              },
+              "typeName": "ZodObject",
+              "unknownKeys": "strip",
+            },
           },
-        },
-      },
-      {
-        "_type": "ZodObject",
-        "shape": {
-          "n2": {
-            "_type": "ZodNumber",
+          {
+            "_cached": null,
+            "_def": {
+              "catchall": {
+                "_def": {
+                  "typeName": "ZodNever",
+                },
+              },
+              "typeName": "ZodObject",
+              "unknownKeys": "strip",
+            },
           },
-        },
-      },
-    ],
-  },
-  "right": {
-    "_type": "ZodObject",
-    "shape": {
-      "s": {
-        "_type": "ZodString",
+        ],
+        "typeName": "ZodUnion",
       },
     },
+    "right": {
+      "_cached": null,
+      "_def": {
+        "catchall": {
+          "_def": {
+            "typeName": "ZodNever",
+          },
+        },
+        "typeName": "ZodObject",
+        "unknownKeys": "strip",
+      },
+    },
+    "typeName": "ZodIntersection",
   },
 }
 `;
 
 exports[`EndpointsFactory > .build() > Should create an endpoint with union middleware 2`] = `
 {
-  "_type": "ZodObject",
-  "shape": {
-    "b": {
-      "_type": "ZodBoolean",
+  "_cached": null,
+  "_def": {
+    "catchall": {
+      "_def": {
+        "typeName": "ZodNever",
+      },
     },
+    "typeName": "ZodObject",
+    "unknownKeys": "strip",
   },
 }
 `;

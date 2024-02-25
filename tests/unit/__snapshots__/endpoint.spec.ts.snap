@@ -2,40 +2,43 @@
 
 exports[`Endpoint > .getSchema() > should return the negative response schema 1`] = `
 {
-  "_type": "ZodObject",
-  "shape": {
-    "error": {
-      "_type": "ZodObject",
-      "shape": {
-        "message": {
-          "_type": "ZodString",
-        },
+  "_cached": null,
+  "_def": {
+    "catchall": {
+      "_def": {
+        "typeName": "ZodNever",
       },
     },
-    "status": {
-      "_type": "ZodLiteral",
-      "value": "error",
+    "expressZodApiMeta": {
+      "examples": [
+        {
+          "error": {
+            "message": "Sample error message",
+          },
+          "status": "error",
+        },
+      ],
     },
+    "typeName": "ZodObject",
+    "unknownKeys": "strip",
   },
 }
 `;
 
 exports[`Endpoint > .getSchema() > should return the positive response schema 1`] = `
 {
-  "_type": "ZodObject",
-  "shape": {
-    "data": {
-      "_type": "ZodObject",
-      "shape": {
-        "something": {
-          "_type": "ZodNumber",
-        },
+  "_cached": null,
+  "_def": {
+    "catchall": {
+      "_def": {
+        "typeName": "ZodNever",
       },
     },
-    "status": {
-      "_type": "ZodLiteral",
-      "value": "success",
+    "expressZodApiMeta": {
+      "examples": [],
     },
+    "typeName": "ZodObject",
+    "unknownKeys": "strip",
   },
 }
 `;
