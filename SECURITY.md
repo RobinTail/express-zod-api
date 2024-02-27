@@ -6,7 +6,6 @@
 | ------: | :------ | :----------------: |
 |  17.x.x | 02.2024 | :white_check_mark: |
 |  16.x.x | 12.2023 | :white_check_mark: |
-|  16.x.x | 12.2023 | :white_check_mark: |
 |  15.x.x | 12.2023 | :white_check_mark: |
 |  14.x.x | 10.2023 | :white_check_mark: |
 |  12.x.x | 09.2023 |        :x:         |

@@ -2,6 +2,10 @@
 
 ## Version 17
 
+### v17.0.1
+
+- Fixed logo for terminals supporting only 256 colors.
+
 ### v17.0.0
 
 - **Breaking changes**:
