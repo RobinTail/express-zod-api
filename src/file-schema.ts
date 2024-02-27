@@ -1,31 +1,24 @@
 import { z } from "zod";
 import { proprietary } from "./metadata";
-import { base64Regex, bufferSchema } from "./schema-helpers";
 
 export const ezFileKind = "File";
 
-// @todo remove this in v17
-const wrap = <T extends z.ZodTypeAny>(
-  schema: T,
-): ReturnType<typeof proprietary<T>> & Variants =>
-  // eslint-disable-next-line @typescript-eslint/no-use-before-define
-  Object.entries(variants).reduce(
-    (agg, [method, handler]) =>
-      Object.defineProperty(agg, method, { get: () => handler }),
-    proprietary(ezFileKind, schema),
-  ) as ReturnType<typeof proprietary<T>> & Variants;
+const bufferSchema = z.custom<Buffer>((subject) => Buffer.isBuffer(subject), {
+  message: "Expected Buffer",
+});
 
-// @todo remove arguments from the methods in v17
+const base64Regex =
+  /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/;
+
 const variants = {
-  /** @deprecated use ez.file("buffer") instead */
-  buffer: ({}: string | object = {}) => wrap(bufferSchema),
-  /** @deprecated use ez.file("string") instead */
-  string: ({}: string | object = {}) => wrap(z.string()),
-  /** @deprecated use ez.file("binary") instead */
-  binary: ({}: string | object = {}) => wrap(bufferSchema.or(z.string())),
-  /** @deprecated use ez.file("base64") instead */
-  base64: ({}: string | object = {}) =>
-    wrap(z.string().regex(base64Regex, "Does not match base64 encoding")),
+  buffer: () => proprietary(ezFileKind, bufferSchema),
+  string: () => proprietary(ezFileKind, z.string()),
+  binary: () => proprietary(ezFileKind, bufferSchema.or(z.string())),
+  base64: () =>
+    proprietary(
+      ezFileKind,
+      z.string().regex(base64Regex, "Does not match base64 encoding"),
+    ),
 };
 
 type Variants = typeof variants;
