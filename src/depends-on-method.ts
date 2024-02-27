@@ -7,13 +7,7 @@ export class DependsOnMethod {
   public readonly firstEndpoint: AbstractEndpoint | undefined;
   public readonly siblingMethods: Method[];
 
-  constructor(
-    /**
-     * @deprecated use pairs instead
-     * @todo remove from public in v17
-     * */
-    public readonly endpoints: Partial<Record<Method, AbstractEndpoint>>,
-  ) {
+  constructor(endpoints: Partial<Record<Method, AbstractEndpoint>>) {
     this.pairs = toPairs(endpoints).filter(
       (pair): pair is [Method, AbstractEndpoint] =>
         pair !== undefined && pair[1] !== undefined,

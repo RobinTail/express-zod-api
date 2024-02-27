@@ -1,5 +1,28 @@
 # Changelog
 
+## Version 17
+
+### v17.0.1
+
+- Fixed logo for terminals supporting only 256 colors.
+
+### v17.0.0
+
+- **Breaking changes**:
+  - `DependsOnMethod::endpoints` removed;
+  - Refinment methods of `ez.file()` removed;
+  - Minimum version of `vitest` supported is 1.0.4.
+- How to migrate confidently:
+  - If you're using refinment methods of `ez.file()`:
+    - Replace ~~`ez.file().string()`~~ to `ez.file("string")`;
+    - Replace ~~`ez.file().buffer()`~~ to `ez.file("buffer")`;
+    - Replace ~~`ez.file().base64()`~~ to `ez.file("base64")`;
+    - Replace ~~`ez.file().binary()`~~ to `ez.file("binary")`.
+  - If you're using `DependsOnMethod::endpoints`:
+    - Use the `pairs` property instead.
+  - If you're using version 0 of `vitest`:
+    - Upgrade it to the latest v1.
+
 ## Version 16
 
 ### v16.8.1
