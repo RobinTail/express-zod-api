@@ -2,6 +2,26 @@
 
 ## Version 17
 
+### v17.1.0
+
+- Ability to configure upload limits and an error in case the uploaded file exceeds them:
+  - Enabled `limits` option for `upload` feature in config;
+  - See the [Busboy documentation](https://www.npmjs.com/package/busboy#exports) for details on `limits`;
+  - Added `limitError` option to `upload` feature in config (optional);
+  - The error assigned to `limitError` is handled by ResultHandler (the negative response case);
+  - Thanks to [@rottmann](https://github.com/rottmann) for their contribution.
+
+```ts
+export const config = createConfig({
+  server: {
+    upload: {
+      limits: { fileSize: 51200 },
+      limitError: createHttpError(413, "The file is too large"),
+    },
+  },
+});
+```
+
 ### v17.0.1
 
 - Fixed logo for terminals supporting only 256 colors.
