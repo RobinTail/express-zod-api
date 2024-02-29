@@ -86,7 +86,6 @@ type UploadOptions = Pick<
   | "debug"
   | "uploadTimeout"
   | "limits"
-  | "limitHandler"
 >;
 
 type CompressionOptions = Pick<
