@@ -50,13 +50,15 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
   app.use(config.server.jsonParser || express.json());
   if (config.server.upload) {
     const uploader = await loadPeer<typeof fileUpload>("express-fileupload");
+    const { limitError, ...derivedConfig } = {
+      ...(typeof config.server.upload === "object" && config.server.upload),
+    };
     app.use(
       uploader({
-        ...(typeof config.server.upload === "object"
-          ? config.server.upload
-          : {}),
+        ...derivedConfig,
         abortOnLimit: false,
         parseNested: true,
+        limitHandler: limitError && (({ next }) => next && next(limitError)),
       }),
     );
   }

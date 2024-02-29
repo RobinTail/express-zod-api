@@ -202,7 +202,10 @@ describe("Server", () => {
       const configMock = {
         server: {
           listen: givePort(),
-          upload: true,
+          upload: {
+            limits: { fileSize: 1024 },
+            limitError: new Error("Too heavy"),
+          },
         },
         cors: true,
         startupLogo: false,
@@ -224,7 +227,13 @@ describe("Server", () => {
       expect(fileUploadMock).toHaveBeenCalledWith({
         abortOnLimit: false,
         parseNested: true,
+        limits: { fileSize: 1024 },
+        limitHandler: expect.any(Function),
       });
+      // limitHandler and limitError test
+      const nextMock = vi.fn();
+      fileUploadMock.mock.calls[0][0].limitHandler({ next: nextMock });
+      expect(nextMock).toHaveBeenCalledWith(new Error("Too heavy"));
     });
 
     test("should enable raw on request", async () => {

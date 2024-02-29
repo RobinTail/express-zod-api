@@ -85,7 +85,16 @@ type UploadOptions = Pick<
   | "tempFileDir"
   | "debug"
   | "uploadTimeout"
->;
+  | "limits"
+> & {
+  /**
+   * @desc The error to throw when file exceeds the configured limits (handled by ResultHandler).
+   * @see limits
+   * @override limitHandler
+   * @example createHttpError(413, "The file is too large")
+   * */
+  limitError?: Error;
+};
 
 type CompressionOptions = Pick<
   compression.CompressionOptions,

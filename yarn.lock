@@ -20,12 +20,12 @@
   resolved "https://registry.yarnpkg.com/@andrewbranch/untar.js/-/untar.js-1.0.3.tgz#ba9494f85eb83017c5c855763969caf1d0adea00"
   integrity sha512-Jh15/qVmrLGhkKJBdXlK1+9tY4lZruYjsgkDFj08ZmDiWVBLJcqkok7Z0/R0In+i1rScBpJlSvrTS2Lm41Pbnw==
 
-"@arethetypeswrong/cli@^0.14.0":
-  version "0.14.1"
-  resolved "https://registry.yarnpkg.com/@arethetypeswrong/cli/-/cli-0.14.1.tgz#e28a582f9fe8dedd8fc4fd15bea0f7fae4b7c407"
-  integrity sha512-JB9jHVrrlF45NPJjjVYvmxz8011Nvwl74tVKr3muD/vVIcb9cn2ibdSbYjThjG5h1BHTHMwzCBoxjIue+NDQ1g==
+"@arethetypeswrong/cli@^0.15.0":
+  version "0.15.0"
+  resolved "https://registry.yarnpkg.com/@arethetypeswrong/cli/-/cli-0.15.0.tgz#06f7e9eb0e8ab45b01363685653fd003e1f4f091"
+  integrity sha512-83v4IKvebLKTQqb+EoiHA2kngXHGUDgXSL1766MgwrzMSiuQty48rfxLdEgv3jmSHY/fIAGwBjAtBR93Ony8bA==
   dependencies:
-    "@arethetypeswrong/core" "0.14.1"
+    "@arethetypeswrong/core" "0.15.0"
     chalk "^4.1.2"
     cli-table3 "^0.6.3"
     commander "^10.0.1"
@@ -33,10 +33,10 @@
     marked-terminal "^6.0.0"
     semver "^7.5.4"
 
-"@arethetypeswrong/core@0.14.1":
-  version "0.14.1"
-  resolved "https://registry.yarnpkg.com/@arethetypeswrong/core/-/core-0.14.1.tgz#32e2a341b3ed2949e4e25cd20311a6b120c44305"
-  integrity sha512-B5cjaC9BQLhdSNQmG9dbcam8UFcXprgvY1YMxAfw/utCpUgPlKXK3wR3WphNr9CFlgcBaZL7NTuH/I7T17Kstw==
+"@arethetypeswrong/core@0.15.0":
+  version "0.15.0"
+  resolved "https://registry.yarnpkg.com/@arethetypeswrong/core/-/core-0.15.0.tgz#3367dae22c9ea1189aca1e697e21f96e2893b39b"
+  integrity sha512-YEsguGAnYVD3JT8HxOgmDQRO44SNCQu9vvsyKnJEeHUKHOP/DUyZUvTWCNYNm5oyn8kbOkDHFnuiLvzDenoAQQ==
   dependencies:
     "@andrewbranch/untar.js" "^1.0.3"
     fflate "^0.8.2"
@@ -689,9 +689,9 @@
   integrity sha512-hov8bUuiLiyFPGyFPE1lwWhmzYbirOXQNNo40+y3zow8aFVTeyn3VWL0VFFfdNddA8S4Vf0Tc062rzyNr7Paag==
 
 "@types/node@*", "@types/node@^20.8.4":
-  version "20.11.20"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-20.11.20.tgz#f0a2aee575215149a62784210ad88b3a34843659"
-  integrity sha512-7/rR21OS+fq8IyHTgtLkDK949uzsa6n8BkziAKtPVpugIkO6D+/ooXMvzXxDnZrmtXVfjb1bKQafYpb8s89LOg==
+  version "20.11.24"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-20.11.24.tgz#cc207511104694e84e9fb17f9a0c4c42d4517792"
+  integrity sha512-Kza43ewS3xoLgCEpQrsT+xRo/EJej1y0kVYGiLFE1NEODXGzTfwiC6tXTLMQskn1X4/Rjlh0MQUvx9W+L9long==
   dependencies:
     undici-types "~5.26.4"
 

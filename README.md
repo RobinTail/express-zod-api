@@ -785,6 +785,27 @@ const config = createConfig({
 ```
 
 Refer to [documentation](https://www.npmjs.com/package/express-fileupload#available-options) on available options.
+Some options are forced in order to ensure the correct workflow:
+
+```json5
+{ abortOnLimit: false, parseNested: true }
+```
+
+The `limitHandler` option is replaced by the `limitError` one, so you can set the limits this way:
+
+```typescript
+import createHttpError from "http-errors";
+
+const config = createConfig({
+  server: {
+    upload: {
+      limits: { fileSize: 51200 }, // 50 KB
+      limitError: createHttpError(413, "The file is too large"), // handled by ResultHandler
+    },
+  },
+});
+```
+
 Then you can change the `Endpoint` to handle requests having the `multipart/form-data` content type instead of JSON by
 using `ez.upload()` schema. Together with a corresponding configuration option, this makes it possible to handle file
 uploads. Here is a simplified example:
@@ -801,7 +822,7 @@ const fileUploadEndpoint = defaultEndpointsFactory.build({
   output: z.object({}),
   handler: async ({ input: { avatar } }) => {
     // avatar: {name, mv(), mimetype, data, size, etc}
-    // avatar.truncated is true on failure
+    // avatar.truncated is true on failure when limitError option is not set
   },
 });
 ```
