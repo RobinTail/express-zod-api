@@ -13,6 +13,9 @@
   - Thanks to [@rottmann](https://github.com/rottmann) for his contribution.
 
 ```ts
+import { createConfig } from "express-zod-api";
+import createHttpError from "http-errors";
+
 export const config = createConfig({
   server: {
     upload: {
