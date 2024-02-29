@@ -90,7 +90,6 @@ type UploadOptions = Pick<
   /**
    * @desc The error to throw when file exceeds the configured limits (handled by ResultHandler).
    * @see limits
-   * @override abortOnError
    * @override limitHandler
    * @example createHttpError(413, "The file is too large")
    * */
