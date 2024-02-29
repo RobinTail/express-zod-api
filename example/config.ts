@@ -14,7 +14,7 @@ export const config = createConfig({
     listen: 8090,
     upload: {
       limits: { fileSize: 51200 },
-      limitError: createHttpError(413, "The file is too large"),
+      limitError: createHttpError(413, "The file is too large"), // affects uploadAvatarEndpoint
     },
     compression: true, // affects sendAvatarEndpoint
     rawParser: express.raw(), // required for rawAcceptingEndpoint
