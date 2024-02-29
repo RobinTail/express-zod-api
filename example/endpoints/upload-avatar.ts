@@ -2,6 +2,7 @@ import { z } from "zod";
 import { ez } from "../../src";
 import { createHash } from "node:crypto";
 import { taggedEndpointsFactory } from "../factories";
+import createHttpError from "http-errors";
 
 export const uploadAvatarEndpoint = taggedEndpointsFactory.build({
   method: "post",
@@ -25,6 +26,9 @@ export const uploadAvatarEndpoint = taggedEndpointsFactory.build({
     otherInputs: z.record(z.any()),
   }),
   handler: async ({ input: { avatar, ...rest } }) => {
+    if (avatar.truncated) {
+      throw createHttpError(413, "The file is too large");
+    }
     return {
       name: avatar.name,
       size: avatar.size,
