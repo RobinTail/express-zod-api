@@ -9,6 +9,7 @@
   - See the [Busboy documentation](https://www.npmjs.com/package/busboy#exports) for details on `limits`;
   - Added `limitError` option to `upload` feature in config (optional);
   - The error assigned to `limitError` is handled by ResultHandler (the negative response case);
+  - When the `limitError` is not set, the `truncated` property of the uploaded file reflects the issue;
   - Thanks to [@rottmann](https://github.com/rottmann) for his contribution.
 
 ```ts
