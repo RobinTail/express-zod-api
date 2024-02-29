@@ -3,6 +3,7 @@ import { createConfig } from "../src";
 import ui from "swagger-ui-express";
 import yaml from "yaml";
 import { readFileSync } from "node:fs";
+import createHttpError from "http-errors";
 
 const documentation = yaml.parse(
   readFileSync("example/example.documentation.yaml", "utf-8"),
@@ -11,7 +12,10 @@ const documentation = yaml.parse(
 export const config = createConfig({
   server: {
     listen: 8090,
-    upload: true,
+    upload: {
+      limits: { fileSize: 51200 },
+      limitError: createHttpError(413, "The file is too large"),
+    },
     compression: true, // affects sendAvatarEndpoint
     rawParser: express.raw(), // required for rawAcceptingEndpoint
     beforeRouting: ({ app }) => {
