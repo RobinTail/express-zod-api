@@ -9,7 +9,7 @@
   - See the [Busboy documentation](https://www.npmjs.com/package/busboy#exports) for details on `limits`;
   - Added `limitError` option to `upload` feature in config (optional);
   - The error assigned to `limitError` is handled by ResultHandler (the negative response case);
-  - Thanks to [@rottmann](https://github.com/rottmann) for their contribution.
+  - Thanks to [@rottmann](https://github.com/rottmann) for his contribution.
 
 ```ts
 export const config = createConfig({
