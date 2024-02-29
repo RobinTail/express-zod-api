@@ -85,6 +85,7 @@ type UploadOptions = Pick<
   | "tempFileDir"
   | "debug"
   | "uploadTimeout"
+  | "limits"
 >;
 
 type CompressionOptions = Pick<
