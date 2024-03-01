@@ -800,7 +800,7 @@ const config = createConfig({
   server: {
     upload: {
       limits: { fileSize: 51200 }, // 50 KB
-      limitError: createHttpError(413, "The file is too large"), // handled by ResultHandler
+      limitError: createHttpError(413, "The file is too large"), // handled by errorHandler in config
     },
   },
 });
