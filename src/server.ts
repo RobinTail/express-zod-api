@@ -48,20 +48,20 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
     );
   }
   app.use(config.server.jsonParser || express.json());
-  if (config.server.upload) {
-    const uploader = await loadPeer<typeof fileUpload>("express-fileupload");
-    const { limitError, ...derivedConfig } = {
-      ...(typeof config.server.upload === "object" && config.server.upload),
-    };
-    app.use(
-      uploader({
-        ...derivedConfig,
-        abortOnLimit: false,
-        parseNested: true,
-        limitHandler: limitError && (({ next }) => next && next(limitError)),
-      }),
-    );
-  }
+  const makeUploader = config.server.upload
+    ? await loadPeer<typeof fileUpload>("express-fileupload")
+    : undefined;
+  const { limitError, ...uploadConfig } = {
+    ...(typeof config.server.upload === "object" && config.server.upload),
+  };
+  const uploader =
+    makeUploader &&
+    makeUploader({
+      ...uploadConfig,
+      abortOnLimit: false,
+      parseNested: true,
+      limitHandler: limitError && (({ next }) => next && next(limitError)),
+    });
   if (config.server.rawParser) {
     app.use(config.server.rawParser);
     app.use((req, {}, next) => {
@@ -78,7 +78,7 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
   if (config.server.beforeRouting) {
     await config.server.beforeRouting({ app, logger: rootLogger });
   }
-  initRouting({ app, routing, rootLogger, config });
+  initRouting({ app, routing, rootLogger, config, uploader });
   app.use(notFoundHandler);
 
   const starter = <T extends http.Server | https.Server>(
