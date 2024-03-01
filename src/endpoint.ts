@@ -271,7 +271,7 @@ export class Endpoint<
         break;
       }
     }
-    return { options };
+    return options;
   }
 
   async #parseAndRunHandler({
@@ -366,7 +366,7 @@ export class Endpoint<
     }
     const input = getInput(request, config.inputSources);
     try {
-      const { options } = await this.#runMiddlewares({
+      const options = await this.#runMiddlewares({
         method,
         input,
         request,
