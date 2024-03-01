@@ -232,7 +232,7 @@ describe("Server", () => {
       });
       // limitHandler and limitError test
       const nextMock = vi.fn();
-      fileUploadMock.mock.calls[0][0].limitHandler({ next: nextMock });
+      fileUploadMock.mock.calls[0][0].limitHandler({}, {}, nextMock);
       expect(nextMock).toHaveBeenCalledWith(new Error("Too heavy"));
     });
 
