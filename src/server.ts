@@ -58,7 +58,7 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
         ...derivedConfig,
         abortOnLimit: false,
         parseNested: true,
-        limitHandler: limitError && (({ next }) => next && next(limitError)),
+        limitHandler: limitError && (({}, {}, next) => next(limitError)),
       }),
     );
   }
