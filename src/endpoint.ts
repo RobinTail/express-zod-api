@@ -240,7 +240,6 @@ export class Endpoint<
     logger: AbstractLogger;
   }) {
     const options = {} as OPT;
-    let isStreamClosed = false;
     for (const def of this.#middlewares) {
       if (method === "options" && def.type === "proprietary") {
         continue;
@@ -264,8 +263,7 @@ export class Endpoint<
           logger,
         }),
       );
-      isStreamClosed = response.writableEnded;
-      if (isStreamClosed) {
+      if (response.writableEnded) {
         logger.warn(
           `The middleware ${def.middleware.name} has closed the stream. Accumulated options:`,
           options,
@@ -273,7 +271,7 @@ export class Endpoint<
         break;
       }
     }
-    return { options, isStreamClosed };
+    return { options, isStreamClosed: response.writableEnded };
   }
 
   async #parseAndRunHandler({
