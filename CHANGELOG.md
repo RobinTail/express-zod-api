@@ -2,13 +2,30 @@
 
 ## Version 17
 
+### v17.1.2
+
+- Fixed Uncaught Exception when using `limitError` feature.
+  - The exception was caused by excessive `next()` call from `express-fileupload` after handling the `limitError`.
+  - The issue did not affect the actual response since it had already been sent.
+  - In general, the problem arose due to asynchronous processing.
+  - The version introduces an upload failure handler instead of relying on the `limitHandler` of `express-fileupload`.
+  - Thus, handling the failed uploads is carried out after completing them.
+  - The specified `limitError` is only applicable to the `fileSize` limit, other limits do not trigger errors.
+  - The `limitError` feature introduced in v17.1.0.
+
+### v17.1.1
+
+- Fixed wrong status code sending in case of upload failures when `limitError` is `HttpError`.
+  - The feature introduced in v17.1.0.
+  - The status code used to be always `400`.
+
 ### v17.1.0
 
 - Ability to configure upload limits and an error in case the uploaded file exceeds them:
   - Enabled `limits` option for `upload` feature in config;
   - See the [Busboy documentation](https://www.npmjs.com/package/busboy#exports) for details on `limits`;
   - Added `limitError` option to `upload` feature in config (optional);
-  - The error assigned to `limitError` is handled by ResultHandler (the negative response case);
+  - The error assigned to `limitError` is handled by `errorHandler` in config (the negative response case);
   - When the `limitError` is not set, the `truncated` property of the uploaded file reflects the issue;
   - Thanks to [@rottmann](https://github.com/rottmann) for his contribution.
 
