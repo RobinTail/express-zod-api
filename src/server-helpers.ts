@@ -2,7 +2,7 @@ import { AnyResultHandlerDefinition } from "./result-handler";
 import { AbstractLogger } from "./logger";
 import { CommonConfig } from "./config-type";
 import { ErrorRequestHandler, RequestHandler } from "express";
-import createHttpError from "http-errors";
+import createHttpError, { isHttpError } from "http-errors";
 import { lastResortHandler } from "./last-resort";
 import { ResultHandlerError } from "./errors";
 import { makeErrorFromAnything } from "./common-helpers";
@@ -24,7 +24,9 @@ export const createParserFailureHandler =
       return next();
     }
     errorHandler.handler({
-      error: createHttpError(400, makeErrorFromAnything(error).message),
+      error: isHttpError(error)
+        ? error
+        : createHttpError(400, makeErrorFromAnything(error).message),
       request,
       response,
       input: null,
