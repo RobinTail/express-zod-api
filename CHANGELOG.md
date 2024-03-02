@@ -2,6 +2,12 @@
 
 ## Version 17
 
+### v17.1.1
+
+- Fixed wrong status code sending in case of upload failures when `limitError` is `HttpError`.
+  - The feature introduced in v17.1.0.
+  - The status code used to be always `400`.
+
 ### v17.1.0
 
 - Ability to configure upload limits and an error in case the uploaded file exceeds them:
