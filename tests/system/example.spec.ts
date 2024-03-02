@@ -376,6 +376,26 @@ describe("Example", async () => {
       );
       expect(await response.json()).toMatchSnapshot();
     });
+
+    test("Should fail to upload if the file is too large", async () => {
+      const filename = "dataflow.svg";
+      const logo = await readFile(filename, "utf-8");
+      const data = new FormData();
+      data.append("avatar", logo, { filename });
+      const response = await fetch(
+        `http://localhost:${port}/v1/avatar/upload`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": `${mimeMultipart}; boundary=${data.getBoundary()}`,
+          },
+          body: data.getBuffer().toString("utf8"),
+        },
+      );
+      expect(response.status).toBe(413);
+      const json = await response.json();
+      expect(json).toMatchSnapshot();
+    });
   });
 
   describe("Client", () => {

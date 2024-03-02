@@ -1,6 +1,7 @@
 import {
   createNotFoundHandler,
   createParserFailureHandler,
+  createUploadFailueHandler,
 } from "../../src/server-helpers";
 import { describe, expect, test, vi } from "vitest";
 import winston from "winston";
@@ -135,6 +136,36 @@ describe("Server helpers", () => {
         "An error occurred while serving the result: I am faulty.\n" +
           "Original error: Can not POST /v1/test.",
       );
+    });
+  });
+
+  describe("createUploadFailueHandler()", () => {
+    const error = new Error("Too heavy");
+
+    test.each([
+      {
+        files: { one: { truncated: true } },
+      },
+      {
+        files: { one: [{ truncated: false }, { truncated: true }] },
+      },
+    ])("should handle truncated files by calling next with error %#", (req) => {
+      const handler = createUploadFailueHandler(error);
+      const next = vi.fn();
+      handler(req as unknown as Request, {} as Response, next);
+      expect(next).toHaveBeenCalledWith(error);
+    });
+
+    test.each([
+      {},
+      { files: {} },
+      { files: { one: { truncated: false } } },
+      { file: { one: [{ truncated: false }] } },
+    ])("should call next when all uploads succeeded %#", (req) => {
+      const handler = createUploadFailueHandler(error);
+      const next = vi.fn();
+      handler(req as unknown as Request, {} as Response, next);
+      expect(next).toHaveBeenCalledWith();
     });
   });
 });
