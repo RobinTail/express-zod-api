@@ -15,6 +15,7 @@ import { Routing, initRouting } from "./routing";
 import {
   createNotFoundHandler,
   createParserFailureHandler,
+  createUploadFailueHandler,
 } from "./server-helpers";
 
 const makeCommonEntities = async (config: CommonConfig) => {
@@ -58,9 +59,11 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
         ...derivedConfig,
         abortOnLimit: false,
         parseNested: true,
-        limitHandler: limitError && (({}, {}, next) => next(limitError)),
       }),
     );
+    if (limitError) {
+      app.use(createUploadFailueHandler(limitError));
+    }
   }
   if (config.server.rawParser) {
     app.use(config.server.rawParser);

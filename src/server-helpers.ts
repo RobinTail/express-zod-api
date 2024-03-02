@@ -68,3 +68,15 @@ export const createNotFoundHandler =
       });
     }
   };
+
+export const createUploadFailueHandler =
+  (error: Error): RequestHandler =>
+  (req, {}, next) => {
+    const failedFile = Object.values(req?.files || [])
+      .flat()
+      .find(({ truncated }) => truncated);
+    if (failedFile) {
+      return next(error);
+    }
+    next();
+  };

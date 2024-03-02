@@ -2,6 +2,17 @@
 
 ## Version 17
 
+### v17.1.2
+
+- Fixed Uncaught Exception when using `limitError` feature.
+  - The exception was caused by excessive `next()` call from `express-fileupload` after handling the `limitError`.
+  - The issue did not affect the actual response since it had already been sent.
+  - In general, the problem arose due to asynchronous processing.
+  - The version introduces an upload failure handler instead of relying on the `limitHandler` of `express-fileupload`.
+  - Thus, handling the failed uploads is carried out after completing them.
+  - The specified `limitError` is only applicable to the `fileSize` limit, other limits do not trigger errors.
+  - The `limitError` feature introduced in v17.1.0.
+
 ### v17.1.1
 
 - Fixed wrong status code sending in case of upload failures when `limitError` is `HttpError`.
