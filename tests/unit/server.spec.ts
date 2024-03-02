@@ -202,7 +202,10 @@ describe("Server", () => {
       const configMock = {
         server: {
           listen: givePort(),
-          upload: true,
+          upload: {
+            limits: { fileSize: 1024 },
+            limitError: new Error("Too heavy"),
+          },
         },
         cors: true,
         startupLogo: false,
@@ -219,11 +222,12 @@ describe("Server", () => {
         },
       };
       await createServer(configMock, routingMock);
-      expect(appMock.use).toHaveBeenCalledTimes(4);
+      expect(appMock.use).toHaveBeenCalledTimes(5);
       expect(fileUploadMock).toHaveBeenCalledTimes(1);
       expect(fileUploadMock).toHaveBeenCalledWith({
         abortOnLimit: false,
         parseNested: true,
+        limits: { fileSize: 1024 },
       });
     });
 

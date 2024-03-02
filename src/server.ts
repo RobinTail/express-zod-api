@@ -15,6 +15,7 @@ import { Routing, initRouting } from "./routing";
 import {
   createNotFoundHandler,
   createParserFailureHandler,
+  createUploadFailueHandler,
 } from "./server-helpers";
 
 const makeCommonEntities = async (config: CommonConfig) => {
@@ -50,15 +51,19 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
   app.use(config.server.jsonParser || express.json());
   if (config.server.upload) {
     const uploader = await loadPeer<typeof fileUpload>("express-fileupload");
+    const { limitError, ...derivedConfig } = {
+      ...(typeof config.server.upload === "object" && config.server.upload),
+    };
     app.use(
       uploader({
-        ...(typeof config.server.upload === "object"
-          ? config.server.upload
-          : {}),
+        ...derivedConfig,
         abortOnLimit: false,
         parseNested: true,
       }),
     );
+    if (limitError) {
+      app.use(createUploadFailueHandler(limitError));
+    }
   }
   if (config.server.rawParser) {
     app.use(config.server.rawParser);
