@@ -75,8 +75,8 @@ export const createUploadFailueHandler =
     const failedFile = Object.values(req?.files || [])
       .flat()
       .find(({ truncated }) => truncated);
-    if (!failedFile) {
-      return next();
+    if (failedFile) {
+      return next(error);
     }
-    next(error);
+    next();
   };
