@@ -2,6 +2,10 @@
 
 ## Version 17
 
+### v17.1.2
+
+- Fixed Uncaught Exception when using `limitError` feature.
+
 ### v17.1.1
 
 - Fixed wrong status code sending in case of upload failures when `limitError` is `HttpError`.

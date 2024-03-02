@@ -58,9 +58,16 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
         ...derivedConfig,
         abortOnLimit: false,
         parseNested: true,
-        limitHandler: limitError && (({}, {}, next) => next(limitError)),
       }),
     );
+    if (limitError) {
+      app.use((req, {}, next) => {
+        const failedFile = Object.values(req?.files || [])
+          .flat()
+          .find(({ truncated }) => truncated);
+        next(failedFile ? limitError : undefined);
+      });
+    }
   }
   if (config.server.rawParser) {
     app.use(config.server.rawParser);

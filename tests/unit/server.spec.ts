@@ -222,18 +222,13 @@ describe("Server", () => {
         },
       };
       await createServer(configMock, routingMock);
-      expect(appMock.use).toHaveBeenCalledTimes(4);
+      expect(appMock.use).toHaveBeenCalledTimes(5);
       expect(fileUploadMock).toHaveBeenCalledTimes(1);
       expect(fileUploadMock).toHaveBeenCalledWith({
         abortOnLimit: false,
         parseNested: true,
         limits: { fileSize: 1024 },
-        limitHandler: expect.any(Function),
       });
-      // limitHandler and limitError test
-      const nextMock = vi.fn();
-      fileUploadMock.mock.calls[0][0].limitHandler({}, {}, nextMock);
-      expect(nextMock).toHaveBeenCalledWith(new Error("Too heavy"));
     });
 
     test("should enable raw on request", async () => {
