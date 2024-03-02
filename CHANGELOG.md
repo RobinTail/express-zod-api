@@ -10,7 +10,8 @@
   - In general, the problem arose due to asynchronous processing.
   - The version introduces an upload failure handler instead of relying on the `limitHandler` of `express-fileupload`.
   - Thus, handling of a failed uploads is carried out after completing the upload.
-  - The `limitError` features introduced in v17.1.0.
+  - The specified `limitError` is only applicable to the `fileSize` limit, other limits do not trigger errors.
+  - The `limitError` feature introduced in v17.1.0.
 
 ### v17.1.1
 
