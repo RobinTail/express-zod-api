@@ -94,6 +94,12 @@ type UploadOptions = Pick<
    * @example createHttpError(413, "The file is too large")
    * */
   limitError?: Error;
+  /**
+   * @desc A code to execute running upload middleware. It can be used to restrict the ability to upload.
+   * @default undefined
+   * @example ({ app }) => { app.use( ... ); }
+   * */
+  beforeUpload?: AppExtension;
 };
 
 type CompressionOptions = Pick<
@@ -138,12 +144,6 @@ export interface ServerConfig<TAG extends string = string>
      * @link https://expressjs.com/en/4x/api.html#express.raw
      * */
     rawParser?: RequestHandler;
-    /**
-     * @desc A code to execute before parsing the request. It can be used to restrict the ability to upload.
-     * @default undefined
-     * @example ({ app }) => { app.use( ... ); }
-     * */
-    beforeParsing?: AppExtension;
     /**
      * @desc A code to execute after parsing the request body but before processing the Routing of your API.
      * @desc This can be a good place for express middlewares establishing their own routes.
