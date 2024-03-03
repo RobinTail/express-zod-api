@@ -139,6 +139,12 @@ export interface ServerConfig<TAG extends string = string>
      * */
     rawParser?: RequestHandler;
     /**
+     * @desc A code to execute before parsing the request. It can be used to restrict the ability to upload.
+     * @default undefined
+     * @example ({ app }) => { app.use( ... ); }
+     * */
+    beforeParsing?: AppExtension;
+    /**
      * @desc A code to execute after parsing the request body but before processing the Routing of your API.
      * @desc This can be a good place for express middlewares establishing their own routes.
      * @desc It can help to avoid making a DIY solution based on the attachRouting() approach.
