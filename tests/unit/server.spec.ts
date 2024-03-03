@@ -205,6 +205,7 @@ describe("Server", () => {
           upload: {
             limits: { fileSize: 1024 },
             limitError: new Error("Too heavy"),
+            beforeUpload: vi.fn(),
           },
         },
         cors: true,
@@ -221,8 +222,12 @@ describe("Server", () => {
           }),
         },
       };
-      await createServer(configMock, routingMock);
+      const { logger } = await createServer(configMock, routingMock);
       expect(appMock.use).toHaveBeenCalledTimes(5);
+      expect(configMock.server.upload.beforeUpload).toHaveBeenCalledWith({
+        app: appMock,
+        logger,
+      });
       expect(fileUploadMock).toHaveBeenCalledTimes(1);
       expect(fileUploadMock).toHaveBeenCalledWith({
         abortOnLimit: false,
