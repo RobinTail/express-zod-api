@@ -95,7 +95,8 @@ type UploadOptions = Pick<
    * */
   limitError?: Error;
   /**
-   * @desc A code to execute before running the upload middleware. It can be used to restrict the ability to upload.
+   * @desc A code to execute before connecting the upload middleware.
+   * @desc It can be used to connect a middleware that restricts the ability to upload.
    * @default undefined
    * @example ({ app }) => { app.use( ... ); }
    * */

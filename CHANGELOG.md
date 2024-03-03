@@ -2,6 +2,33 @@
 
 ## Version 17
 
+### v17.2.0
+
+- Introducing `beforeUpload` option for the `upload` option in config:
+  - A code to execute before connecting the upload middleware;
+  - It can be used to connect a middleware that restricts the ability to upload;
+  - It accepts a function similar to `beforeRouting`, having `app` and `logger` in its argument.
+
+```typescript
+import createHttpError from "http-errors";
+import { createConfig } from "express-zod-api";
+
+const config = createConfig({
+  server: {
+    upload: {
+      beforeUpload: ({ app, logger }) => {
+        app.use((req, res, next) => {
+          if (req.is("multipart/form-data") && !canUpload(req)) {
+            return next(createHttpError(403, "Not authorized"));
+          }
+          next();
+        });
+      },
+    },
+  },
+});
+```
+
 ### v17.1.2
 
 - Fixed Uncaught Exception when using `limitError` feature.
