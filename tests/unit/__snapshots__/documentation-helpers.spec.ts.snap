@@ -1274,6 +1274,9 @@ exports[`Documentation helpers > excludeParamsFromDepiction() > should handle th
 
 exports[`Documentation helpers > excludeParamsFromDepiction() > should omit specified path params 0 1`] = `
 {
+  "allOf": undefined,
+  "examples": undefined,
+  "oneOf": undefined,
   "properties": {
     "b": {
       "type": "string",
@@ -1288,13 +1291,21 @@ exports[`Documentation helpers > excludeParamsFromDepiction() > should omit spec
 
 exports[`Documentation helpers > excludeParamsFromDepiction() > should omit specified path params 1 1`] = `
 {
+  "allOf": undefined,
+  "examples": undefined,
   "oneOf": [
     {
+      "allOf": undefined,
+      "examples": undefined,
+      "oneOf": undefined,
       "properties": {},
       "required": [],
       "type": "object",
     },
     {
+      "allOf": undefined,
+      "examples": undefined,
+      "oneOf": undefined,
       "properties": {
         "b": {
           "type": "string",
@@ -1306,11 +1317,16 @@ exports[`Documentation helpers > excludeParamsFromDepiction() > should omit spec
       "type": "object",
     },
   ],
+  "properties": undefined,
+  "required": undefined,
 }
 `;
 
 exports[`Documentation helpers > excludeParamsFromDepiction() > should omit specified path params 2 1`] = `
 {
+  "allOf": undefined,
+  "examples": undefined,
+  "oneOf": undefined,
   "properties": {
     "b": {
       "type": "string",
@@ -1327,6 +1343,9 @@ exports[`Documentation helpers > excludeParamsFromDepiction() > should omit spec
 {
   "allOf": [
     {
+      "allOf": undefined,
+      "examples": undefined,
+      "oneOf": undefined,
       "properties": {},
       "required": [],
       "type": "object",
@@ -1335,9 +1354,18 @@ exports[`Documentation helpers > excludeParamsFromDepiction() > should omit spec
       "additionalProperties": {
         "type": "string",
       },
+      "allOf": undefined,
+      "examples": undefined,
+      "oneOf": undefined,
+      "properties": undefined,
+      "required": undefined,
       "type": "object",
     },
   ],
+  "examples": undefined,
+  "oneOf": undefined,
+  "properties": undefined,
+  "required": undefined,
 }
 `;
 

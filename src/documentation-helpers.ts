@@ -826,19 +826,14 @@ export const excludeParamsFromDepiction = (
       )
     : undefined;
 
-  return omit(
-    Object.entries({ properties, required, examples, allOf, oneOf })
-      .filter(([{}, value]) => value === undefined)
-      .map(([key]) => key),
-    {
-      ...depicted,
-      properties,
-      required,
-      examples,
-      allOf,
-      oneOf,
-    },
-  );
+  return {
+    ...depicted,
+    properties,
+    required,
+    examples,
+    allOf,
+    oneOf,
+  };
 };
 
 export const excludeExamplesFromDepiction = (
