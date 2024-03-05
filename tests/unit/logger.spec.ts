@@ -142,7 +142,7 @@ describe("Logger", () => {
     });
   });
 
-  describe("isSimplifiedLoggerConfig()", () => {
+  describe("isSimplifiedWinstonConfig()", () => {
     test.each([
       { level: "silent" },
       { level: "debug", color: false },
