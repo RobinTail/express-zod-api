@@ -2,6 +2,14 @@
 
 ## Version 17
 
+### v17.2.1
+
+- Fixed a bug due to which a custom logger instance could be perceived as a simplified `winston` logger config.
+  - In particular, the issue arose for `pino` logger having the `level` option set to `debug`, `warn` or `silent`.
+  - This led to an attempt to load the `winston` logger, which may not have been installed.
+  - In this case, the following error occurred: `[MissingPeerError]: Missing peer dependency: winston`.
+  - The issue was found and reported by [@daniel-white](https://github.com/daniel-white).
+
 ### v17.2.0
 
 - Introducing `beforeUpload` option for the `upload` option in config:
