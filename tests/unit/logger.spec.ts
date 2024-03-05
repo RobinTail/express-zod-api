@@ -166,9 +166,12 @@ describe("Logger", () => {
       expect(isSimplifiedWinstonConfig(sample)).toBeFalsy();
     });
 
-    test("Issue #1605: pino instance should be distingushable from the SimplifiedWinstonConfig", async () => {
-      const subject = pino({ level: "debug" });
-      expect(isSimplifiedWinstonConfig(subject)).toBeFalsy();
-    });
+    test.each(["error", "warn", "info", "debug", "trace"])(
+      "Issue #1605: pino instance should be distingushable from the SimplifiedWinstonConfig",
+      (level) => {
+        const subject = pino({ level });
+        expect(isSimplifiedWinstonConfig(subject)).toBeFalsy();
+      },
+    );
   });
 });
