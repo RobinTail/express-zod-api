@@ -1,5 +1,6 @@
 import MockDate from "mockdate";
 import { EventEmitter } from "node:events";
+import pino from "pino";
 import {
   SimplifiedWinstonConfig,
   createLogger,
@@ -163,6 +164,11 @@ describe("Logger", () => {
       { level: "debug", depth: "wrong" },
     ])("should invalidate config %#", (sample) => {
       expect(isSimplifiedWinstonConfig(sample)).toBeFalsy();
+    });
+
+    test("Issue #1605: pino instance should be distingushable from the SimplifiedWinstonConfig", async () => {
+      const subject = pino({ level: "info" });
+      expect(isSimplifiedWinstonConfig(subject)).toBeFalsy();
     });
   });
 });
