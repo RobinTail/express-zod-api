@@ -167,7 +167,7 @@ describe("Logger", () => {
     });
 
     test("Issue #1605: pino instance should be distingushable from the SimplifiedWinstonConfig", async () => {
-      const subject = pino({ level: "info" });
+      const subject = pino({ level: "debug" });
       expect(isSimplifiedWinstonConfig(subject)).toBeFalsy();
     });
   });
