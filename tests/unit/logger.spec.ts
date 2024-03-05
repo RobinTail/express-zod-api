@@ -1,6 +1,5 @@
 import MockDate from "mockdate";
 import { EventEmitter } from "node:events";
-import pino from "pino";
 import {
   SimplifiedWinstonConfig,
   createLogger,
@@ -162,16 +161,11 @@ describe("Logger", () => {
       { level: "wrong" },
       { level: "debug", color: null },
       { level: "debug", depth: "wrong" },
+      // issue #1605: should not allow methods
+      { level: "debug", debug: () => {} },
+      { level: "warn", error: () => {} },
     ])("should invalidate config %#", (sample) => {
       expect(isSimplifiedWinstonConfig(sample)).toBeFalsy();
     });
-
-    test.each(["error", "warn", "info", "debug", "trace"])(
-      "Issue #1605: pino instance should be distingushable from the SimplifiedWinstonConfig",
-      (level) => {
-        const subject = pino({ level });
-        expect(isSimplifiedWinstonConfig(subject)).toBeFalsy();
-      },
-    );
   });
 });
