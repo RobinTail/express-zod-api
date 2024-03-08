@@ -49,11 +49,18 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
     );
   }
   app.use(config.server.jsonParser || express.json());
+
+  const { rootLogger, notFoundHandler, parserFailureHandler } =
+    await makeCommonEntities(config);
+
   if (config.server.upload) {
     const uploader = await loadPeer<typeof fileUpload>("express-fileupload");
-    const { limitError, ...derivedConfig } = {
+    const { limitError, beforeUpload, ...derivedConfig } = {
       ...(typeof config.server.upload === "object" && config.server.upload),
     };
+    if (beforeUpload) {
+      beforeUpload({ app, logger: rootLogger });
+    }
     app.use(
       uploader({
         ...derivedConfig,
@@ -74,9 +81,6 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
       next();
     });
   }
-
-  const { rootLogger, notFoundHandler, parserFailureHandler } =
-    await makeCommonEntities(config);
   app.use(parserFailureHandler);
   if (config.server.beforeRouting) {
     await config.server.beforeRouting({ app, logger: rootLogger });

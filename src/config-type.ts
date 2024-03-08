@@ -94,6 +94,13 @@ type UploadOptions = Pick<
    * @example createHttpError(413, "The file is too large")
    * */
   limitError?: Error;
+  /**
+   * @desc A code to execute before connecting the upload middleware.
+   * @desc It can be used to connect a middleware that restricts the ability to upload.
+   * @default undefined
+   * @example ({ app }) => { app.use( ... ); }
+   * */
+  beforeUpload?: AppExtension;
 };
 
 type CompressionOptions = Pick<

@@ -46,7 +46,9 @@ export const isSimplifiedWinstonConfig = (
     ? typeof subject.depth === "number" || subject.depth === null
     : true) &&
   typeof subject.level === "string" &&
-  ["silent", "warn", "debug"].includes(subject.level);
+  ["silent", "warn", "debug"].includes(subject.level) &&
+  Object.values(subject).find((prop) => typeof prop === "function") ===
+    undefined;
 
 /**
  * @desc a helper for creating a winston logger easier
