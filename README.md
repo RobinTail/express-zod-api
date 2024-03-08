@@ -791,7 +791,9 @@ Some options are forced in order to ensure the correct workflow:
 { abortOnLimit: false, parseNested: true }
 ```
 
-The `limitHandler` option is replaced by the `limitError` one, so you can set the limits this way:
+The `limitHandler` option is replaced by the `limitError` one. You can also connect an additional middleware for
+restricting the ability to upload using the `beforeUpload` option. So the configuration for the limited and restricted
+upload might look this way:
 
 ```typescript
 import createHttpError from "http-errors";
@@ -801,6 +803,14 @@ const config = createConfig({
     upload: {
       limits: { fileSize: 51200 }, // 50 KB
       limitError: createHttpError(413, "The file is too large"), // handled by errorHandler in config
+      beforeUpload: ({ app, logger }) => {
+        app.use((req, res, next) => {
+          if (req.is("multipart/form-data") && !canUpload(req)) {
+            return next(createHttpError(403, "Not authorized"));
+          }
+          next();
+        });
+      },
     },
   },
 });

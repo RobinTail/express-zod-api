@@ -141,7 +141,7 @@ describe("Logger", () => {
     });
   });
 
-  describe("isSimplifiedLoggerConfig()", () => {
+  describe("isSimplifiedWinstonConfig()", () => {
     test.each([
       { level: "silent" },
       { level: "debug", color: false },
@@ -161,6 +161,9 @@ describe("Logger", () => {
       { level: "wrong" },
       { level: "debug", color: null },
       { level: "debug", depth: "wrong" },
+      // issue #1605: should not allow methods
+      { level: "debug", debug: () => {} },
+      { level: "warn", error: () => {} },
     ])("should invalidate config %#", (sample) => {
       expect(isSimplifiedWinstonConfig(sample)).toBeFalsy();
     });
