@@ -806,39 +806,27 @@ export const excludeParamsFromDepiction = (
   if (isReferenceObject(depicted)) {
     return depicted;
   }
-  const properties = depicted.properties
-    ? omit(pathParams, depicted.properties)
-    : undefined;
-  const examples = depicted.examples
-    ? depicted.examples.map((entry) => omit(pathParams, entry))
-    : undefined;
-  const required = depicted.required
-    ? depicted.required.filter((name) => !pathParams.includes(name))
-    : undefined;
-  const allOf = depicted.allOf
-    ? depicted.allOf.map((entry) =>
-        excludeParamsFromDepiction(entry, pathParams),
-      )
-    : undefined;
-  const oneOf = depicted.oneOf
-    ? depicted.oneOf.map((entry) =>
-        excludeParamsFromDepiction(entry, pathParams),
-      )
-    : undefined;
-
-  return omit(
-    Object.entries({ properties, required, examples, allOf, oneOf })
-      .filter(([{}, value]) => value === undefined)
-      .map(([key]) => key),
-    {
-      ...depicted,
-      properties,
-      required,
-      examples,
-      allOf,
-      oneOf,
-    },
-  );
+  const copy = { ...depicted };
+  if (copy.properties) {
+    copy.properties = omit(pathParams, copy.properties);
+  }
+  if (copy.examples) {
+    copy.examples = copy.examples.map((entry) => omit(pathParams, entry));
+  }
+  if (copy.required) {
+    copy.required = copy.required.filter((name) => !pathParams.includes(name));
+  }
+  if (copy.allOf) {
+    copy.allOf = copy.allOf.map((entry) =>
+      excludeParamsFromDepiction(entry, pathParams),
+    );
+  }
+  if (copy.oneOf) {
+    copy.oneOf = copy.oneOf.map((entry) =>
+      excludeParamsFromDepiction(entry, pathParams),
+    );
+  }
+  return copy;
 };
 
 export const excludeExamplesFromDepiction = (
