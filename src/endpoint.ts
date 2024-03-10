@@ -232,14 +232,15 @@ export class Endpoint<
     request,
     response,
     logger,
+    options,
   }: {
     method: Method | AuxMethod;
     input: Readonly<FlatObject>; // Issue #673: input is immutable, since this.inputSchema is combined with ones of middlewares
     request: Request;
     response: Response;
     logger: AbstractLogger;
+    options: OPT;
   }) {
-    const options = {} as OPT;
     for (const def of this.#middlewares) {
       if (method === "options" && def.type === "proprietary") {
         continue;
@@ -271,7 +272,6 @@ export class Endpoint<
         break;
       }
     }
-    return options;
   }
 
   async #parseAndRunHandler({
@@ -308,6 +308,7 @@ export class Endpoint<
     logger,
     input,
     output,
+    options,
   }: {
     error: Error | null;
     request: Request;
@@ -315,6 +316,7 @@ export class Endpoint<
     logger: AbstractLogger;
     input: FlatObject;
     output: FlatObject | null;
+    options: OPT;
   }) {
     try {
       await this.#resultHandler.handler({
@@ -324,6 +326,7 @@ export class Endpoint<
         response,
         logger,
         input,
+        options,
       });
     } catch (e) {
       lastResortHandler({
@@ -348,6 +351,7 @@ export class Endpoint<
     siblingMethods?: Method[];
   }) {
     const method = getActualMethod(request);
+    const options = {} as OPT;
     let output: FlatObject | null = null;
     let error: Error | null = null;
     if (config.cors) {
@@ -366,12 +370,13 @@ export class Endpoint<
     }
     const input = getInput(request, config.inputSources);
     try {
-      const options = await this.#runMiddlewares({
+      await this.#runMiddlewares({
         method,
         input,
         request,
         response,
         logger,
+        options,
       });
       if (response.writableEnded) {
         return;
@@ -393,6 +398,7 @@ export class Endpoint<
       response,
       error,
       logger,
+      options,
     });
   }
 }
