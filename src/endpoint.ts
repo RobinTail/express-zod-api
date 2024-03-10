@@ -239,7 +239,7 @@ export class Endpoint<
     request: Request;
     response: Response;
     logger: AbstractLogger;
-    options: FlatObject;
+    options: Partial<OPT>;
   }) {
     for (const def of this.#middlewares) {
       if (method === "options" && def.type === "proprietary") {
@@ -316,7 +316,7 @@ export class Endpoint<
     logger: AbstractLogger;
     input: FlatObject;
     output: FlatObject | null;
-    options: FlatObject;
+    options: Partial<OPT>;
   }) {
     try {
       await this.#resultHandler.handler({
