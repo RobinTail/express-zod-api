@@ -239,7 +239,7 @@ export class Endpoint<
     request: Request;
     response: Response;
     logger: AbstractLogger;
-    options: OPT;
+    options: FlatObject;
   }) {
     for (const def of this.#middlewares) {
       if (method === "options" && def.type === "proprietary") {
@@ -316,7 +316,7 @@ export class Endpoint<
     logger: AbstractLogger;
     input: FlatObject;
     output: FlatObject | null;
-    options: OPT;
+    options: FlatObject;
   }) {
     try {
       await this.#resultHandler.handler({
@@ -351,7 +351,7 @@ export class Endpoint<
     siblingMethods?: Method[];
   }) {
     const method = getActualMethod(request);
-    const options = {} as OPT;
+    const options: Partial<OPT> = {};
     let output: FlatObject | null = null;
     let error: Error | null = null;
     if (config.cors) {
@@ -386,7 +386,11 @@ export class Endpoint<
         return;
       }
       output = await this.#parseOutput(
-        await this.#parseAndRunHandler({ input, options, logger }),
+        await this.#parseAndRunHandler({
+          input,
+          logger,
+          options: options as OPT, // ensured the complete OPT by writableEnded condition and try-catch
+        }),
       );
     } catch (e) {
       error = makeErrorFromAnything(e);
