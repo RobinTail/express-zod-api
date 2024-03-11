@@ -48,9 +48,10 @@ Start your API server with I/O schema validation and custom middlewares in minut
    8. [Connect to your own express app](#connect-to-your-own-express-app)
 6. [Special needs](#special-needs)
    1. [Different responses for different status codes](#different-responses-for-different-status-codes)
-   2. [Array response](#array-response) for migrating legacy APIs
-   3. [Headers as input source](#headers-as-input-source)
-   4. [Accepting raw data](#accepting-raw-data)
+   2. [Resources cleanup](#resources-cleanup)
+   3. [Array response](#array-response) for migrating legacy APIs
+   4. [Headers as input source](#headers-as-input-source)
+   5. [Accepting raw data](#accepting-raw-data)
 7. [Integration and Documentation](#integration-and-documentation)
    1. [Generating a Frontend Client](#generating-a-frontend-client)
    2. [Creating a documentation](#creating-a-documentation)
@@ -921,6 +922,42 @@ createResultHandler({
     // your implementation here
   },
 });
+```
+
+## Resources cleanup
+
+If some entities (database clients for example) do not care about automatically releasing their resources when their
+instances are destroyed (when the function that created them exits), you can do the following. Return these instances
+in a middleware so that they become `options` for Endpoint's handler. Those `options` are also available as an argument
+to a Result Handler. Create your own one and clean up resources in accordance with the documentation of that software.
+The `options` may however be empty or incomplete in case of errors or failures, so it is necessary to check for the
+presence of the particular one programmatically.
+
+```typescript
+import {
+  createResultHandler,
+  EndpointsFactory,
+  createMiddleware,
+} from "express-zod-api";
+
+const resultHandlerWithCleanup = createResultHandler({
+  handler: ({ options }) => {
+    if ("dbClient" in options && options.dbClient) {
+      (options.dbClient as DBClient).close(); // sample cleanup
+    }
+    // your implementation
+  },
+});
+
+const dbProvider = createMiddleware({
+  handler: async () => ({
+    dbClient: new DBClient(), // sample entity that requires cleanup
+  }),
+});
+
+const dbEquippedFactory = new EndpointsFactory(
+  resultHandlerWithCleanup,
+).addMiddleware(dbProvider);
 ```
 
 ## Array response
