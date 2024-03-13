@@ -34,7 +34,7 @@ jobs:
         path: ${{ steps.yarnCache.outputs.dir }}
         key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ matrix.node-version }}-${{ hashFiles('**/yarn.lock') }}
     - name: Install dependencies
-      run: yarn install
+      run: yarn install --ignore-engines # todo remove when 22.x released
     - name: Lint
       run: yarn lint
     - name: Test
