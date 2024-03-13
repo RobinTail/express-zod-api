@@ -30,7 +30,7 @@
     "test:cjs": "yarn --cwd tests/cjs --ignore-engines && vitest run -r tests/cjs",
     "test:esm": "yarn --cwd tests/esm --ignore-engines && vitest run -r tests/esm",
     "test:952": "yarn --cwd tests/issue952 && yarn --cwd tests/issue952 test",
-    "test:compat": "yarn --cwd tests/compat && yarn --cwd tests/compat test",
+    "test:compat": "yarn --cwd tests/compat --ignore-engines && yarn --cwd tests/compat test",
     "test:u": "yarn test:unit -u && yarn test:badge",
     "test:types": "tsc --noEmit",
     "test:unit": "vitest run --coverage tests/unit tests/system",
