@@ -21,7 +21,7 @@ declare module "express-zod-api" {
   interface LoggerOverrides extends Logger {}
 }
 
-export const config = createConfig({
+const config = createConfig({
   server: {
     listen: 8090,
     logger: { level: "debug" }, // simplified Winston config enabling debug level
