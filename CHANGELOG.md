@@ -23,10 +23,21 @@ declare module "express-zod-api" {
 
 export const config = createConfig({
   server: {
+    listen: 8090,
     logger: { level: "debug" }, // simplified Winston config enabling debug level
     upload: { debug: true }, // writes messages using Winston::debug()
   },
 });
+```
+
+```text
+info: Listening 8090
+debug: Express-file-upload: New upload started avatar->file.svg, bytes:0
+debug: Express-file-upload: Uploading avatar->file.svg, bytes:1138...
+debug: Express-file-upload: Upload finished avatar->file.svg, bytes:1138
+debug: Express-file-upload: Upload avatar->file.svg completed, bytes:1138.
+debug: Express-file-upload: Busboy finished parsing request.
+info: POST: /v1/avatar/upload
 ```
 
 ### v17.2.1
