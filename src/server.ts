@@ -66,6 +66,7 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
         ...derivedConfig,
         abortOnLimit: false,
         parseNested: true,
+        logger: { log: rootLogger.debug.bind(rootLogger) },
       }),
     );
     if (limitError) {

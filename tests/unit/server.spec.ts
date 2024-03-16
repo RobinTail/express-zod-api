@@ -233,6 +233,7 @@ describe("Server", () => {
         abortOnLimit: false,
         parseNested: true,
         limits: { fileSize: 1024 },
+        logger: { log: expect.any(Function) },
       });
     });
 
