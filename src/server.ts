@@ -66,6 +66,10 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
         ...derivedConfig,
         abortOnLimit: false,
         parseNested: true,
+        // @todo remove ignore when the types updated:
+        // @see https://github.com/DefinitelyTyped/DefinitelyTyped/pull/69016
+        // @ts-ignore
+        logger: { log: rootLogger.debug.bind(rootLogger) },
       }),
     );
     if (limitError) {
