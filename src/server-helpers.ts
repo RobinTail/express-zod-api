@@ -31,6 +31,7 @@ export const createParserFailureHandler =
       response,
       input: null,
       output: null,
+      options: {},
       logger: getChildLogger
         ? await getChildLogger({ request, parent: rootLogger })
         : rootLogger,
@@ -59,6 +60,7 @@ export const createNotFoundHandler =
         error,
         input: null,
         output: null,
+        options: {},
       });
     } catch (e) {
       lastResortHandler({
