@@ -22,6 +22,8 @@ interface ResultHandlerParams<RES> {
   input: FlatObject | null;
   /** null in case of errors or failures */
   output: FlatObject | null;
+  /** can be empty: check presence of the required property using "in" operator */
+  options: FlatObject;
   error: Error | null;
   request: Request;
   response: Response<RES>;

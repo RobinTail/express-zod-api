@@ -67,6 +67,7 @@ describe("Endpoint", () => {
         }),
         middleware: middlewareMock,
       });
+      const resultHandlerSpy = vi.spyOn(defaultResultHandler, "handler");
       const factory = new EndpointsFactory(defaultResultHandler).addMiddleware(
         middlewareDefinitionMock,
       );
@@ -113,6 +114,15 @@ describe("Endpoint", () => {
         logger: loggerMock,
       });
       expect(loggerMock.error).toHaveBeenCalledTimes(0);
+      expect(resultHandlerSpy).toHaveBeenCalledWith({
+        error: null,
+        input: { n: 453 },
+        logger: loggerMock,
+        options: { inc: 454 },
+        output: { inc2: 455, str: "453.00", transform: 4 },
+        request: requestMock,
+        response: responseMock,
+      });
       expect(responseMock.status).toHaveBeenCalledWith(200);
       expect(responseMock.json).toHaveBeenCalledWith({
         status: "success",
@@ -259,13 +269,12 @@ describe("Endpoint", () => {
 
   describe("#handleResult", () => {
     test("Should handle errors within ResultHandler", async () => {
-      const factory = new EndpointsFactory(
-        createResultHandler({
-          getPositiveResponse: () => z.object({}),
-          getNegativeResponse: () => z.object({}),
-          handler: () => assert.fail("Something unexpected happened"),
-        }),
-      );
+      const resultHandler = createResultHandler({
+        getPositiveResponse: () => z.object({}),
+        getNegativeResponse: () => z.object({}),
+        handler: vi.fn(() => assert.fail("Something unexpected happened")),
+      });
+      const factory = new EndpointsFactory(resultHandler);
       const endpoint = factory.build({
         method: "get",
         input: z.object({}),
@@ -274,11 +283,22 @@ describe("Endpoint", () => {
         }),
         handler: async () => ({ test: "OK" }),
       });
-      const { loggerMock, responseMock } = await testEndpoint({ endpoint });
+      const { loggerMock, responseMock, requestMock } = await testEndpoint({
+        endpoint,
+      });
       expect(loggerMock.error).toHaveBeenCalledTimes(1);
       expect(loggerMock.error.mock.calls[0][0]).toBe(
         "Result handler failure: Something unexpected happened.",
       );
+      expect(resultHandler.handler).toHaveBeenCalledWith({
+        error: null,
+        logger: loggerMock,
+        input: {},
+        options: {},
+        output: { test: "OK" },
+        request: requestMock,
+        response: responseMock,
+      });
       expect(responseMock.status).toHaveBeenCalledTimes(1);
       expect(responseMock.status.mock.calls[0][0]).toBe(500);
       expect(responseMock.json).toHaveBeenCalledTimes(0);

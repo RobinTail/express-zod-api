@@ -2,6 +2,41 @@
 
 ## Version 17
 
+### v17.4.0
+
+- Featuring `options` in Result Handler.
+  - The same ones that come from the middlewares to Endpoint's handler.
+  - You can use them for cleaning up resources (if required) allocated by the entities created by middlewares.
+  - Suggested use case: database clients that do not close their connections when their instances are destroyed.
+  - The `options` coming to Result Handler can be empty or incomplete in case of errors and failures.
+
+```typescript
+import {
+  createResultHandler,
+  EndpointsFactory,
+  createMiddleware,
+} from "express-zod-api";
+
+const resultHandlerWithCleanup = createResultHandler({
+  handler: ({ options }) => {
+    if ("dbClient" in options && options.dbClient) {
+      (options.dbClient as DBClient).close(); // sample cleanup
+    }
+    // your implementation
+  },
+});
+
+const dbProvider = createMiddleware({
+  handler: async () => ({
+    dbClient: new DBClient(), // sample entity that requires cleanup
+  }),
+});
+
+const dbEquippedFactory = new EndpointsFactory(
+  resultHandlerWithCleanup,
+).addMiddleware(dbProvider);
+```
+
 ### v17.3.0
 
 - Ability to use the configured logger for debugging uploads.
