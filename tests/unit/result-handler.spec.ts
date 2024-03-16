@@ -9,7 +9,7 @@ import {
   defaultResultHandler,
   withMeta,
 } from "../../src";
-import { ApiResponse } from "../../src/api-response";
+import { ApiResponse } from "../../src";
 import { metaProp } from "../../src/metadata";
 import { describe, expect, test, vi } from "vitest";
 import {
@@ -51,6 +51,7 @@ describe("ResultHandler", () => {
           request: requestMock as unknown as Request,
           response: responseMock as unknown as Response,
           logger: loggerMock,
+          options: {},
         });
         expect(loggerMock.error).toHaveBeenCalledTimes(1);
         expect(loggerMock.error.mock.calls[0][0]).toMatch(
@@ -86,6 +87,7 @@ describe("ResultHandler", () => {
           ),
           input: { something: 453 },
           output: { anything: 118 },
+          options: {},
           request: requestMock as unknown as Request,
           response: responseMock as unknown as Response,
           logger: loggerMock,
@@ -103,6 +105,7 @@ describe("ResultHandler", () => {
           error: createHttpError(404, "Something not found"),
           input: { something: 453 },
           output: { anything: 118 },
+          options: {},
           request: requestMock as unknown as Request,
           response: responseMock as unknown as Response,
           logger: loggerMock,
@@ -120,6 +123,7 @@ describe("ResultHandler", () => {
           error: null,
           input: { something: 453 },
           output: { anything: 118, items: ["One", "Two", "Three"] },
+          options: {},
           request: requestMock as unknown as Request,
           response: responseMock as unknown as Response,
           logger: loggerMock,
@@ -165,6 +169,7 @@ describe("ResultHandler", () => {
       error: null,
       input: { something: 453 },
       output: { anything: 118 },
+      options: {},
       request: requestMock as unknown as Request,
       response: responseMock as unknown as Response,
       logger: loggerMock,
