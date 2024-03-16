@@ -2,6 +2,44 @@
 
 ## Version 17
 
+### v17.3.0
+
+- Ability to use the configured logger for debugging uploads.
+  - In the `express-fileupload` package starting from version 1.5.0
+    [I made the logger customizable](https://github.com/richardgirges/express-fileupload/pull/371).
+  - Using at least the specified version of `express-fileupload` and having its `debug` option enabled, the upload
+    related logs are processed using the logger from the `express-zod-api` configuration.
+  - Please note: the `.debug()` method of the configured logger is used for upload related logging, therefore the
+    severity `level` of that logger must be configured accordingly in order to see those messages.
+
+```typescript
+import { createConfig } from "express-zod-api";
+import { Logger } from "winston";
+
+// using Winston logger
+declare module "express-zod-api" {
+  interface LoggerOverrides extends Logger {}
+}
+
+const config = createConfig({
+  server: {
+    listen: 8090,
+    logger: { level: "debug" }, // simplified Winston config enabling debug level
+    upload: { debug: true }, // writes messages using Winston::debug()
+  },
+});
+```
+
+```text
+info: Listening 8090
+debug: Express-file-upload: New upload started avatar->file.svg, bytes:0
+debug: Express-file-upload: Uploading avatar->file.svg, bytes:1138...
+debug: Express-file-upload: Upload finished avatar->file.svg, bytes:1138
+debug: Express-file-upload: Upload avatar->file.svg completed, bytes:1138.
+debug: Express-file-upload: Busboy finished parsing request.
+info: POST: /v1/avatar/upload
+```
+
 ### v17.2.1
 
 - Fixed a bug due to which a custom logger instance could be perceived as a simplified `winston` logger config.
