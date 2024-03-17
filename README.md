@@ -792,7 +792,7 @@ Some options are forced in order to ensure the correct workflow:
 {
   abortOnLimit: false,
   parseNested: true,
-  logger: {}, // the configured logger, default: winston
+  logger: {}, // the configured logger (default: winston), using its .debug() method
 }
 ```
 
@@ -806,7 +806,6 @@ import createHttpError from "http-errors";
 const config = createConfig({
   server: {
     upload: {
-      debug: true, // uses the debug() method of the configured logger
       limits: { fileSize: 51200 }, // 50 KB
       limitError: createHttpError(413, "The file is too large"), // handled by errorHandler in config
       beforeUpload: ({ app, logger }) => {
