@@ -37,7 +37,7 @@ Start your API server with I/O schema validation and custom middlewares in minut
    9. [Customizing logger](#customizing-logger)
    10. [Child logger](#child-logger)
    11. [Enabling compression](#enabling-compression)
-5. [Advances features](#advances-features)
+5. [Advanced features](#advanced-features)
    1. [Customizing input sources](#customizing-input-sources)
    2. [Route path params](#route-path-params)
    3. [Multiple schemas for one route](#multiple-schemas-for-one-route)
@@ -584,7 +584,7 @@ const config = createConfig({
 In order to receive a compressed response the client should include the following header in the request:
 `Accept-Encoding: gzip, deflate`. Only responses with compressible content types are subject to compression.
 
-# Advances features
+# Advanced features
 
 ## Customizing input sources
 
