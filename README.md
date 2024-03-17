@@ -789,7 +789,11 @@ Refer to [documentation](https://www.npmjs.com/package/express-fileupload#availa
 Some options are forced in order to ensure the correct workflow:
 
 ```json5
-{ abortOnLimit: false, parseNested: true }
+{
+  abortOnLimit: false,
+  parseNested: true,
+  logger: {}, // the configured logger, default: winston
+}
 ```
 
 The `limitHandler` option is replaced by the `limitError` one. You can also connect an additional middleware for
