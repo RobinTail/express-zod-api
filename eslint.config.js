@@ -16,7 +16,7 @@ export default [
   ...prettierBase,
   ...prettierRecommended,
   {
-    files: ["**/*.ts"],
+    files: ["**/*.ts", "eslint.config.js"],
     languageOptions: {
       ecmaVersion: "latest",
       sourceType: "module",
@@ -39,7 +39,13 @@ export default [
     },
   },
   {
-    files: ["tools/*.ts", "tests/**/*.ts", "tsup.config.ts", "example/*.ts"],
+    files: [
+      "tools/*.ts",
+      "tests/**/*.ts",
+      "tsup.config.ts",
+      "example/*.ts",
+      "eslint.config.js",
+    ],
     rules: {
       "import/no-extraneous-dependencies": "off",
     },
