@@ -37,7 +37,7 @@ Start your API server with I/O schema validation and custom middlewares in minut
    9. [Customizing logger](#customizing-logger)
    10. [Child logger](#child-logger)
    11. [Enabling compression](#enabling-compression)
-5. [Advances features](#advances-features)
+5. [Advanced features](#advanced-features)
    1. [Customizing input sources](#customizing-input-sources)
    2. [Route path params](#route-path-params)
    3. [Multiple schemas for one route](#multiple-schemas-for-one-route)
@@ -584,7 +584,7 @@ const config = createConfig({
 In order to receive a compressed response the client should include the following header in the request:
 `Accept-Encoding: gzip, deflate`. Only responses with compressible content types are subject to compression.
 
-# Advances features
+# Advanced features
 
 ## Customizing input sources
 
@@ -789,7 +789,11 @@ Refer to [documentation](https://www.npmjs.com/package/express-fileupload#availa
 Some options are forced in order to ensure the correct workflow:
 
 ```json5
-{ abortOnLimit: false, parseNested: true }
+{
+  abortOnLimit: false,
+  parseNested: true,
+  logger: {}, // the configured logger (default: winston), using its .debug() method
+}
 ```
 
 The `limitHandler` option is replaced by the `limitError` one. You can also connect an additional middleware for
@@ -802,7 +806,6 @@ import createHttpError from "http-errors";
 const config = createConfig({
   server: {
     upload: {
-      debug: true, // uses the debug() method of the configured logger
       limits: { fileSize: 51200 }, // 50 KB
       limitError: createHttpError(413, "The file is too large"), // handled by errorHandler in config
       beforeUpload: ({ app, logger }) => {

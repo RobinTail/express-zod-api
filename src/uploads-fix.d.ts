@@ -8,6 +8,6 @@ export module "express-fileupload" {
      * Customizable logger to write debug messages to.
      * @default console
      */
-    logger?: { log: (msg: string) => void } | undefined;
+    logger?: { log: Console["log"] } | undefined;
   }
 }
