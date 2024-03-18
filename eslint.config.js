@@ -7,14 +7,11 @@ import tsParser from "@typescript-eslint/parser";
 import { FlatCompat } from "@eslint/eslintrc";
 
 const compat = new FlatCompat();
-const airBnbBase = compat.extends("airbnb-typescript/base");
-const prettierBase = compat.extends("prettier");
-const prettierRecommended = compat.extends("plugin:prettier/recommended");
 
 export default [
-  ...airBnbBase,
-  ...prettierBase,
-  ...prettierRecommended,
+  ...compat.extends("airbnb-typescript/base"),
+  ...compat.extends("prettier"),
+  ...compat.extends("plugin:prettier/recommended"),
   {
     files: ["**/*.ts", "eslint.config.js"],
     languageOptions: {
