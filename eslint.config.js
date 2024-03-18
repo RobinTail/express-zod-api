@@ -34,12 +34,7 @@ export default [
     },
     rules: {
       "@typescript-eslint/lines-between-class-members": "off",
-      "sort-imports": [
-        "warn",
-        {
-          ignoreDeclarationSort: true,
-        },
-      ],
+      "sort-imports": ["warn", { ignoreDeclarationSort: true }],
       "unicorn/prefer-node-protocol": "error",
     },
   },
