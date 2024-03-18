@@ -34,7 +34,10 @@ jobs:
         path: ${{ steps.yarnCache.outputs.dir }}
         key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ matrix.node-version }}-${{ hashFiles('**/yarn.lock') }}
     - name: Install dependencies
-      run: yarn install
+      # @typescript-eslint/eslint-plugin changed its requirements to Node 18.18 in a minor release
+      # see: https://github.com/RobinTail/express-zod-api/pull/1625
+      # TODO: remove that when Node <18.18 dropped
+      run: yarn install --ignore-engines
     - name: Lint
       run: yarn lint
     - name: Test
