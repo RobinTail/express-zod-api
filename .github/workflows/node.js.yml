@@ -36,7 +36,7 @@ jobs:
         key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ matrix.node-version }}-${{ hashFiles('**/yarn.lock') }}
     - name: Install dependencies
       # todo use regular "yarn install" when min Node version increased to 18.18
-      # todo ignore from first install when 22.x released
+      # todo remove ignore from the first install when 22.x released
       # @typescript/eslint group compatibility issue fixed by ignoring engines for dev dependencies only:
       run: |
         npm pkg delete devDependencies
