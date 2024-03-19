@@ -35,7 +35,8 @@ jobs:
         path: ${{ steps.yarnCache.outputs.dir }}
         key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ matrix.node-version }}-${{ hashFiles('**/yarn.lock') }}
     - name: Install dependencies
-      # Experimental: Install prod dependencies and then the rest with ignoring engines
+      # todo use regular "yarn install" when min Node version increased to 18.18
+      # @typescript/eslint group compatibility issue fixed by ignoring engines for dev dependencies only:
       run: |
         npm pkg delete devDependencies
         yarn install
