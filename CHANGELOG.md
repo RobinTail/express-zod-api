@@ -2,6 +2,14 @@
 
 ## Version 17
 
+### v17.4.1
+
+- Technical update: no features, no fixes.
+- Minor adjustments to the documentation.
+- Removed some internal typings that are no longer required.
+- Upgrades to development environment.
+- Overall, a lot of work has been done to ensure that you won't feel any difference (kinda great in its own way).
+
 ### v17.4.0
 
 - Featuring `options` in Result Handler.
