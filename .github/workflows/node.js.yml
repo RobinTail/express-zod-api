@@ -34,7 +34,12 @@ jobs:
         path: ${{ steps.yarnCache.outputs.dir }}
         key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ matrix.node-version }}-${{ hashFiles('**/yarn.lock') }}
     - name: Install dependencies
-      run: yarn install
+      # Experimental: Install prod dependencies and then the rest with ignoring engines
+      run: |
+        npm pkg delete devDependencies
+        yarn install
+        git checkout -- .
+        yarn install --ignore-engines
     - name: Lint
       run: yarn lint
     - name: Test
