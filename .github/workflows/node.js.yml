@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [18.0.0, 18.6.0, 18.x, 20.0.0, 20.1.0, 20.x]
+        node-version: [18.0.0, 18.6.0, 18.12.0, 18.x, 20.0.0, 20.1.0, 20.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
     steps:
     - name: Get yarn cache dir
@@ -23,6 +23,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
     - name: Install Node.js ${{ matrix.node-version }}
+      id: setup-node
       uses: actions/setup-node@v4
       with:
         node-version: ${{ matrix.node-version }}
@@ -57,7 +58,15 @@ jobs:
       run: yarn test:cjs
     - name: ESM test
       run: yarn test:esm
+    - name: Check Jest 30 compatibility
+      uses: madhead/semver-utils@v4
+      id: jest30compat
+      with:
+        version: ${{ steps.setup-node.outputs.node-version }}
+        satisfies: '>=18.12.0'
+        lenient: false # require to parse or fail
     - name: Compatibility test
+      if: steps.jest30compat.outputs.satisfies == 'true'
       run: yarn test:compat
     - name: Issue 952 # see https://github.com/RobinTail/express-zod-api/issues/952
       run: yarn test:952
