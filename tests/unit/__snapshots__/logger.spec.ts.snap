@@ -3,20 +3,7 @@
 exports[`Logger > createWinstonLogger() > Should create debug logger 1`] = `
 [
   [
-    {
-      "level": "[34mdebug[39m",
-      "message": "testing debug message",
-      "timestamp": "2022-01-01T00:00:00.000Z",
-      "withColorful": "output",
-      Symbol(level): "debug",
-      Symbol(splat): [
-        {
-          "withColorful": "output",
-        },
-      ],
-      Symbol(message): "2022-01-01T00:00:00.000Z [34mdebug[39m: testing debug message { withColorful: [32m'output'[39m }",
-    },
-    [Function],
+    "2022-01-01T00:00:00.000Z [34mdebug[39m: testing debug message { withColorful: [32m'output'[39m }",
   ],
 ]
 `;
@@ -24,20 +11,7 @@ exports[`Logger > createWinstonLogger() > Should create debug logger 1`] = `
 exports[`Logger > createWinstonLogger() > Should create warn logger 1`] = `
 [
   [
-    {
-      "level": "warn",
-      "message": "testing warn message",
-      "timestamp": "2022-01-01T00:00:00.000Z",
-      "withMeta": true,
-      Symbol(level): "warn",
-      Symbol(splat): [
-        {
-          "withMeta": true,
-        },
-      ],
-      Symbol(message): "2022-01-01T00:00:00.000Z warn: testing warn message { withMeta: true }",
-    },
-    [Function],
+    "2022-01-01T00:00:00.000Z warn: testing warn message { withMeta: true }",
   ],
 ]
 `;
@@ -45,20 +19,7 @@ exports[`Logger > createWinstonLogger() > Should create warn logger 1`] = `
 exports[`Logger > createWinstonLogger() > Should handle array 0 1`] = `
 [
   [
-    {
-      "0": "test",
-      "level": "[31merror[39m",
-      "message": "Array",
-      "timestamp": "2022-01-01T00:00:00.000Z",
-      Symbol(level): "error",
-      Symbol(splat): [
-        [
-          "test",
-        ],
-      ],
-      Symbol(message): "2022-01-01T00:00:00.000Z [31merror[39m: Array [ [32m'test'[39m ]",
-    },
-    [Function],
+    "2022-01-01T00:00:00.000Z [31merror[39m: Array [ [32m'test'[39m ]",
   ],
 ]
 `;
@@ -66,20 +27,7 @@ exports[`Logger > createWinstonLogger() > Should handle array 0 1`] = `
 exports[`Logger > createWinstonLogger() > Should handle array 1 1`] = `
 [
   [
-    {
-      "0": "test",
-      "level": "[31merror[39m",
-      "message": "Array",
-      "timestamp": "2022-01-01T00:00:00.000Z",
-      Symbol(level): "error",
-      Symbol(splat): [
-        [
-          "test",
-        ],
-      ],
-      Symbol(message): "2022-01-01T00:00:00.000Z [31merror[39m: Array [ [32m'test'[39m ]",
-    },
-    [Function],
+    "2022-01-01T00:00:00.000Z [31merror[39m: Array [ [32m'test'[39m ]",
   ],
 ]
 `;
@@ -87,46 +35,10 @@ exports[`Logger > createWinstonLogger() > Should handle array 1 1`] = `
 exports[`Logger > createWinstonLogger() > Should handle circular references within subject 0 1`] = `
 [
   [
-    {
-      "a": [
-        {
-          "a": [Circular],
-          "b": {
-            "inner": [Circular],
-            "obj": [Circular],
-          },
-        },
-      ],
-      "b": {
-        "inner": [Circular],
-        "obj": {
-          "a": [
-            [Circular],
-          ],
-          "b": [Circular],
-        },
-      },
-      "level": "error",
-      "message": "Recursive",
-      "timestamp": "2022-01-01T00:00:00.000Z",
-      Symbol(level): "error",
-      Symbol(splat): [
-        {
-          "a": [
-            [Circular],
-          ],
-          "b": {
-            "inner": [Circular],
-            "obj": [Circular],
-          },
-        },
-      ],
-      Symbol(message): "2022-01-01T00:00:00.000Z error: Recursive <ref *1> {
+    "2022-01-01T00:00:00.000Z error: Recursive <ref *1> {
   a: [ [Circular *1] ],
   b: <ref *2> { inner: [Circular *2], obj: [Circular *1] }
 }",
-    },
-    [Function],
   ],
 ]
 `;
@@ -134,60 +46,7 @@ exports[`Logger > createWinstonLogger() > Should handle circular references with
 exports[`Logger > createWinstonLogger() > Should handle circular references within subject 1 1`] = `
 [
   [
-    {
-      "a": [
-        {
-          "a": [Circular],
-          "b": {
-            "inner": [Circular],
-            "obj": [Circular],
-          },
-        },
-      ],
-      "b": {
-        "inner": [Circular],
-        "obj": {
-          "a": [
-            [Circular],
-          ],
-          "b": [Circular],
-        },
-      },
-      "level": "error",
-      "message": "Recursive",
-      "timestamp": "2022-01-01T00:00:00.000Z",
-      Symbol(level): "error",
-      Symbol(splat): [
-        {
-          "a": [
-            [Circular],
-          ],
-          "b": {
-            "inner": [Circular],
-            "obj": [Circular],
-          },
-        },
-      ],
-      Symbol(message): "2022-01-01T00:00:00.000Z error: Recursive <ref *1> { a: [ [Circular *1] ], b: <ref *2> { inner: [Circular *2], obj: [Circular *1] } }",
-    },
-    [Function],
-  ],
-]
-`;
-
-exports[`Logger > createWinstonLogger() > Should handle empty message 1`] = `
-[
-  [
-    {
-      "level": "[31merror[39m",
-      "message": {
-        "someData": "test",
-      },
-      "timestamp": "2022-01-01T00:00:00.000Z",
-      Symbol(level): "error",
-      Symbol(message): "2022-01-01T00:00:00.000Z [31merror[39m: [No message] { someData: [32m'test'[39m }",
-    },
-    [Function],
+    "2022-01-01T00:00:00.000Z error: Recursive <ref *1> { a: [ [Circular *1] ], b: <ref *2> { inner: [Circular *2], obj: [Circular *1] } }",
   ],
 ]
 `;
@@ -195,17 +54,7 @@ exports[`Logger > createWinstonLogger() > Should handle empty message 1`] = `
 exports[`Logger > createWinstonLogger() > Should handle empty object meta 0 1`] = `
 [
   [
-    {
-      "level": "[31merror[39m",
-      "message": "Payload",
-      "timestamp": "2022-01-01T00:00:00.000Z",
-      Symbol(level): "error",
-      Symbol(splat): [
-        {},
-      ],
-      Symbol(message): "2022-01-01T00:00:00.000Z [31merror[39m: Payload {}",
-    },
-    [Function],
+    "2022-01-01T00:00:00.000Z [31merror[39m: Payload {}",
   ],
 ]
 `;
@@ -213,42 +62,7 @@ exports[`Logger > createWinstonLogger() > Should handle empty object meta 0 1`] 
 exports[`Logger > createWinstonLogger() > Should handle empty object meta 1 1`] = `
 [
   [
-    {
-      "level": "[31merror[39m",
-      "message": "Payload",
-      "timestamp": "2022-01-01T00:00:00.000Z",
-      Symbol(level): "error",
-      Symbol(splat): [
-        {},
-      ],
-      Symbol(message): "2022-01-01T00:00:00.000Z [31merror[39m: Payload {}",
-    },
-    [Function],
-  ],
-]
-`;
-
-exports[`Logger > createWinstonLogger() > Should handle excessive arguments 1`] = `
-[
-  [
-    {
-      "level": "debug",
-      "message": "Test",
-      "some": "value",
-      "timestamp": "2022-01-01T00:00:00.000Z",
-      Symbol(level): "debug",
-      Symbol(splat): [
-        {
-          "some": "value",
-        },
-        [
-          123,
-        ],
-        456,
-      ],
-      Symbol(message): "2022-01-01T00:00:00.000Z debug: Test { some: 'value' } [ 123 ] 456",
-    },
-    [Function],
+    "2022-01-01T00:00:00.000Z [31merror[39m: Payload {}",
   ],
 ]
 `;
@@ -256,17 +70,7 @@ exports[`Logger > createWinstonLogger() > Should handle excessive arguments 1`] 
 exports[`Logger > createWinstonLogger() > Should handle non-object meta 0 1`] = `
 [
   [
-    {
-      "level": "[31merror[39m",
-      "message": "Code",
-      "timestamp": "2022-01-01T00:00:00.000Z",
-      Symbol(level): "error",
-      Symbol(splat): [
-        8090,
-      ],
-      Symbol(message): "2022-01-01T00:00:00.000Z [31merror[39m: Code [33m8090[39m",
-    },
-    [Function],
+    "2022-01-01T00:00:00.000Z [31merror[39m: Code [33m8090[39m",
   ],
 ]
 `;
@@ -274,33 +78,7 @@ exports[`Logger > createWinstonLogger() > Should handle non-object meta 0 1`] = 
 exports[`Logger > createWinstonLogger() > Should handle non-object meta 1 1`] = `
 [
   [
-    {
-      "level": "[31merror[39m",
-      "message": "Code",
-      "timestamp": "2022-01-01T00:00:00.000Z",
-      Symbol(level): "error",
-      Symbol(splat): [
-        8090,
-      ],
-      Symbol(message): "2022-01-01T00:00:00.000Z [31merror[39m: Code [33m8090[39m",
-    },
-    [Function],
-  ],
-]
-`;
-
-exports[`Logger > createWinstonLogger() > Should manage profiling 1`] = `
-[
-  [
-    {
-      "durationMs": 554,
-      "level": "[32minfo[39m",
-      "message": "long-test",
-      "timestamp": "2022-01-01T00:00:00.554Z",
-      Symbol(level): "info",
-      Symbol(message): "2022-01-01T00:00:00.554Z [32minfo[39m: long-test duration: 554ms",
-    },
-    [Function],
+    "2022-01-01T00:00:00.000Z [31merror[39m: Code [33m8090[39m",
   ],
 ]
 `;

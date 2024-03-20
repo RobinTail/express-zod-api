@@ -4,11 +4,7 @@ import type fileUpload from "express-fileupload";
 import http from "node:http";
 import https from "node:https";
 import { AppConfig, CommonConfig, ServerConfig } from "./config-type";
-import {
-  AbstractLogger,
-  createLogger,
-  isSimplifiedWinstonConfig,
-} from "./logger";
+import { AbstractLogger, createLogger, isLoggerConfig } from "./logger";
 import { loadPeer } from "./peer-helpers";
 import { defaultResultHandler } from "./result-handler";
 import { Routing, initRouting } from "./routing";
@@ -19,8 +15,8 @@ import {
 } from "./server-helpers";
 
 const makeCommonEntities = async (config: CommonConfig) => {
-  const rootLogger: AbstractLogger = isSimplifiedWinstonConfig(config.logger)
-    ? createLogger({ ...config.logger, winston: await loadPeer("winston") })
+  const rootLogger: AbstractLogger = isLoggerConfig(config.logger)
+    ? createLogger({ ...config.logger })
     : config.logger;
   const errorHandler = config.errorHandler || defaultResultHandler;
   const { childLoggerProvider: getChildLogger } = config;
