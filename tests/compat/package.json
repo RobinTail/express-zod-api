@@ -2,7 +2,6 @@
   "name": "express-zod-api-vitest-test",
   "private": true,
   "version": "0.0.0",
-  "type": "commonjs",
   "scripts": {
     "test": "jest"
   },

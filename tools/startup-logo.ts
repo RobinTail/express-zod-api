@@ -1,4 +1,4 @@
-import ctx from "chalk";
+import { Chalk, ChalkInstance } from "chalk";
 import { writeFile } from "node:fs/promises";
 import {
   exportModifier,
@@ -9,7 +9,7 @@ import {
 import { printNode } from "../src/zts-helpers";
 import { format } from "prettier";
 
-const chalk = new ctx.Instance({ level: 2 }); // 256 colors
+const chalk = new Chalk({ level: 2 }); // 256 colors
 
 const proud = chalk.italic(
   "Proudly supports transgender community.".padStart(109),
@@ -28,7 +28,7 @@ const pink = chalk.hex("#F5A9B8");
 const blue = chalk.hex("#5BCEFA");
 const white = chalk.hex("#FFF");
 
-const colors = new Array<ctx.Chalk>(14)
+const colors = new Array<ChalkInstance>(14)
   .fill(blue, 1, 3)
   .fill(pink, 3, 5)
   .fill(white, 5, 7)

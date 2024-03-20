@@ -1,4 +1,3 @@
-import ctx, { ForegroundColor } from "chalk";
 import { inspect } from "node:util";
 import { isObject } from "./common-helpers";
 
@@ -43,11 +42,11 @@ const severity: Record<keyof AbstractLogger, number> = {
   error: 40,
 };
 
-const colors: Record<keyof AbstractLogger, typeof ForegroundColor> = {
-  debug: "blue",
-  info: "green",
-  warn: "yellow",
-  error: "red",
+const ansi: Record<keyof AbstractLogger, number> = {
+  debug: 34,
+  info: 32,
+  warn: 33,
+  error: 31,
 };
 
 export const isLoggerConfig = (subject: unknown): subject is LoggerConfig =>
@@ -73,7 +72,6 @@ export const createLogger = ({
 }: LoggerConfig): AbstractLogger => {
   const isDebug = level === "debug";
   const minSeverity = level === "silent" ? 100 : severity[level];
-  const chalk = new ctx.Instance({ level: color ? 1 : 0 });
 
   const print = (method: keyof AbstractLogger, message: string, meta?: any) => {
     if (severity[method] < minSeverity) {
@@ -82,7 +80,7 @@ export const createLogger = ({
     console.log(
       [
         new Date().toISOString(),
-        `${color ? chalk[colors[method]](method) : method}:`,
+        `${color ? `\x1b[${ansi[method]}m${method}\x1b[39m` : method}:`,
         message,
       ]
         .concat(
