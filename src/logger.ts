@@ -1,4 +1,4 @@
-import chalk, { ChalkInstance } from "chalk";
+import { Chalk, ForegroundColorName } from "chalk";
 import { inspect } from "node:util";
 import { isObject } from "./common-helpers";
 
@@ -43,11 +43,11 @@ const severity: Record<keyof AbstractLogger, number> = {
   error: 40,
 };
 
-const colors: Record<keyof AbstractLogger, ChalkInstance> = {
-  debug: chalk.blue,
-  info: chalk.green,
-  warn: chalk.yellow,
-  error: chalk.red,
+const colors: Record<keyof AbstractLogger, ForegroundColorName> = {
+  debug: "blue",
+  info: "green",
+  warn: "yellow",
+  error: "red",
 };
 
 export const isLoggerConfig = (subject: unknown): subject is LoggerConfig =>
@@ -73,6 +73,7 @@ export const createLogger = ({
 }: LoggerConfig): AbstractLogger => {
   const isDebug = level === "debug";
   const minSeverity = level === "silent" ? 100 : severity[level];
+  const chalk = new Chalk({ level: color ? 1 : 0 });
 
   const print = (method: keyof AbstractLogger, message: string, meta?: any) => {
     if (severity[method] < minSeverity) {
@@ -81,7 +82,7 @@ export const createLogger = ({
     console.log(
       [
         new Date().toISOString(),
-        `${color ? colors[method](method) : method}:`,
+        `${color ? chalk[colors[method]](method) : method}:`,
         message,
       ]
         .concat(
