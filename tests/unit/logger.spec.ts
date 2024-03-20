@@ -31,7 +31,7 @@ describe("Logger", () => {
     return { logger, logSpy };
   };
 
-  describe("createWinstonLogger()", () => {
+  describe("createLogger()", () => {
     test("Should create silent logger", () => {
       const { logger, logSpy } = makeLogger({ level: "silent" });
       logger.error("test");
