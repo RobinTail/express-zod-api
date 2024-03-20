@@ -1,4 +1,4 @@
-import { Chalk, ForegroundColorName } from "chalk";
+import ctx, { ForegroundColor } from "chalk";
 import { inspect } from "node:util";
 import { isObject } from "./common-helpers";
 
@@ -43,7 +43,7 @@ const severity: Record<keyof AbstractLogger, number> = {
   error: 40,
 };
 
-const colors: Record<keyof AbstractLogger, ForegroundColorName> = {
+const colors: Record<keyof AbstractLogger, typeof ForegroundColor> = {
   debug: "blue",
   info: "green",
   warn: "yellow",
@@ -73,7 +73,7 @@ export const createLogger = ({
 }: LoggerConfig): AbstractLogger => {
   const isDebug = level === "debug";
   const minSeverity = level === "silent" ? 100 : severity[level];
-  const chalk = new Chalk({ level: color ? 1 : 0 });
+  const chalk = new ctx.Instance({ level: color ? 1 : 0 });
 
   const print = (method: keyof AbstractLogger, message: string, meta?: any) => {
     if (severity[method] < minSeverity) {
