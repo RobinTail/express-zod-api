@@ -99,10 +99,12 @@ export const createLogger = ({
     console.log(output.join(" "));
   };
 
-  return {
-    info: (message: string, meta?: any) => print("info", message, meta),
-    debug: (message: string, meta?: any) => print("debug", message, meta),
-    warn: (message: string, meta?: any) => print("warn", message, meta),
-    error: (message: string, meta?: any) => print("error", message, meta),
-  };
+  return Object.keys(severity).reduce(
+    (agg, method) =>
+      Object.assign(agg, {
+        [method]: (message: string, meta?: any) =>
+          print(method as keyof AbstractLogger, message, meta),
+      }),
+    {} as AbstractLogger,
+  );
 };
