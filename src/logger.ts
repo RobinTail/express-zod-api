@@ -1,5 +1,6 @@
 import { inspect } from "node:util";
 import { isObject } from "./common-helpers";
+import { keys } from "ramda";
 
 /**
  * @desc Using module augmentation approach you can set the type of the actual logger used
@@ -99,11 +100,10 @@ export const createLogger = ({
     console.log(output.join(" "));
   };
 
-  return Object.keys(severity).reduce(
+  return keys(severity).reduce(
     (agg, method) =>
       Object.assign(agg, {
-        [method]: (message: string, meta?: any) =>
-          print(method as keyof AbstractLogger, message, meta),
+        [method]: (message: string, meta?: any) => print(method, message, meta),
       }),
     {} as AbstractLogger,
   );
