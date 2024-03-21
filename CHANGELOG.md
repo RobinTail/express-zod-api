@@ -1,5 +1,24 @@
 # Changelog
 
+## Version 18
+
+### v18.0.0
+
+- **Breaking changes**:
+  - `winston` is no longer a default logger.
+- Features:
+  - New lightweight built-in logger having pretty and colorized inspections and basic methods only.
+- How to migrate confidently:
+  - If you're using a custom logger in config:
+    - No action required.
+  - If you're using the default logger in config (which used to be `winston` as a peer dependency):
+    - If you're using its `info()`, `debug()`, `error()` and `warn()` methods only:
+      - You can now uninstall `winston`,
+      - No further action required.
+    - If you're using its other methods, like `.child()` or `profile()`:
+      - Configure `winston` as a custom logger [according to the documentation](README.md#customizing-logger),
+      - Or consider any other compatible logger, like `pino` for example, which is easier to configure.
+
 ## Version 17
 
 ### v17.4.1
