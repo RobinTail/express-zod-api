@@ -42,11 +42,13 @@ const severity: Record<keyof AbstractLogger, number> = {
   error: 40,
 };
 
-const ansi: Record<keyof AbstractLogger, number> = {
-  debug: 34,
-  info: 32,
-  warn: 33,
-  error: 31,
+const esc = "\x1b";
+const defaultColor = `${esc}[39m`;
+const ansi: Record<keyof AbstractLogger, string> = {
+  debug: `${esc}[34m`,
+  info: `${esc}[32m`,
+  warn: `${esc}[33m`,
+  error: `${esc}[31m`,
 };
 
 export const isLoggerConfig = (subject: unknown): subject is LoggerConfig =>
@@ -79,7 +81,7 @@ export const createLogger = ({
     }
     const output: string[] = [new Date().toISOString()];
     if (color) {
-      output.push(`\x1b[${ansi[method]}m${method}\x1b[39m:`);
+      output.push(`${ansi[method]}${method}${defaultColor}:`);
     } else {
       output.push(`${method}:`);
     }
