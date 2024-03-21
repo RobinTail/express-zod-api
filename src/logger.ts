@@ -61,8 +61,7 @@ export const isLoggerConfig = (subject: unknown): subject is LoggerConfig =>
     : true) &&
   typeof subject.level === "string" &&
   ["silent", "warn", "debug"].includes(subject.level) &&
-  Object.values(subject).find((prop) => typeof prop === "function") ===
-    undefined;
+  !Object.values(subject).some((prop) => typeof prop === "function");
 
 /**
  * @desc Creates a basic console logger with optional colorful inspections
