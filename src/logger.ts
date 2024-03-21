@@ -77,24 +77,24 @@ export const createLogger = ({
     if (severity[method] < minSeverity) {
       return;
     }
-    console.log(
-      [
-        new Date().toISOString(),
-        `${color ? `\x1b[${ansi[method]}m${method}\x1b[39m` : method}:`,
-        message,
-      ]
-        .concat(
-          meta === undefined
-            ? []
-            : inspect(meta, {
-                colors: color,
-                depth,
-                breakLength: isDebug ? 80 : Infinity,
-                compact: isDebug ? 3 : true,
-              }),
-        )
-        .join(" "),
-    );
+    const output: string[] = [new Date().toISOString()];
+    if (color) {
+      output.push(`\x1b[${ansi[method]}m${method}\x1b[39m:`);
+    } else {
+      output.push(`${method}:`);
+    }
+    output.push(message);
+    if (meta !== undefined) {
+      output.push(
+        inspect(meta, {
+          colors: color,
+          depth,
+          breakLength: isDebug ? 80 : Infinity,
+          compact: isDebug ? 3 : true,
+        }),
+      );
+    }
+    console.log(output.join(" "));
   };
 
   return {
