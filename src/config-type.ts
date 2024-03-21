@@ -47,7 +47,7 @@ export interface CommonConfig<TAG extends string = string> {
    */
   errorHandler?: AnyResultHandlerDefinition;
   /**
-   * @desc Logger configuration (winston) or instance of any other logger.
+   * @desc Logger configuration or an instance of any compatible logger.
    * @example { level: "debug", color: true }
    * */
   logger: LoggerConfig | AbstractLogger;
