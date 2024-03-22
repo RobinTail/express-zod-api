@@ -1,28 +1,33 @@
-import ansi, { StyleFunction } from "ansi-colors";
+import {
+  Color,
+  blueBright,
+  gray,
+  italic,
+  magentaBright,
+  whiteBright,
+} from "colorette";
 
-const proud = ansi.italic(
-  "Proudly supports transgender community.".padStart(109),
-);
-const slogan = ansi.italic(
+const proud = italic("Proudly supports transgender community.".padStart(109));
+const slogan = italic(
   "Start your API server with I/O schema validation and custom middlewares in minutes.".padStart(
     109,
   ),
 );
-const thanks = ansi.italic(
+const thanks = italic(
   "Thank you for choosing Express Zod API for your project.".padStart(132),
 );
-const dedicationMessage = ansi.italic("for Tonya".padEnd(20));
+const dedicationMessage = italic("for Tonya".padEnd(20));
 
-const pink = ansi.magentaBright; // hex("#F5A9B8")
-const blue = ansi.blueBright; // hex("#5BCEFA")
+const pink = magentaBright; // hex("#F5A9B8")
+const blue = blueBright; // hex("#5BCEFA")
 
-const colors = new Array<StyleFunction>(14)
+const colors = new Array<Color>(14)
   .fill(blue, 1, 3)
   .fill(pink, 3, 5)
-  .fill(ansi.whiteBright, 5, 7)
+  .fill(whiteBright, 5, 7)
   .fill(pink, 7, 9)
   .fill(blue, 9, 12)
-  .fill(ansi.grey, 12, 13);
+  .fill(gray, 12, 13);
 
 const logo = `
 8888888888                                                          8888888888P              888             d8888 8888888b. 8888888
