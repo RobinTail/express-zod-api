@@ -1,6 +1,10 @@
 import MockDate from "mockdate";
 import { EventEmitter } from "node:events";
-import { LoggerConfig, createLogger, isLoggerConfig } from "../../src/logger";
+import {
+  BuiltinLoggerConfig,
+  createLogger,
+  isBuiltinLoggerConfig,
+} from "../../src/logger";
 import {
   afterAll,
   beforeAll,
@@ -25,7 +29,7 @@ describe("Logger", () => {
     MockDate.reset();
   });
 
-  const makeLogger = (props: LoggerConfig) => {
+  const makeLogger = (props: BuiltinLoggerConfig) => {
     const logger = createLogger({ ...props });
     const logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
     return { logger, logSpy };
@@ -98,7 +102,7 @@ describe("Logger", () => {
       { level: "warn", depth: null },
       { level: "warn", depth: Infinity },
     ])("should validate config %#", (sample) => {
-      expect(isLoggerConfig(sample)).toBeTruthy();
+      expect(isBuiltinLoggerConfig(sample)).toBeTruthy();
     });
 
     test.each([
@@ -113,7 +117,7 @@ describe("Logger", () => {
       { level: "debug", debug: () => {} },
       { level: "warn", error: () => {} },
     ])("should invalidate config %#", (sample) => {
-      expect(isLoggerConfig(sample)).toBeFalsy();
+      expect(isBuiltinLoggerConfig(sample)).toBeFalsy();
     });
   });
 });

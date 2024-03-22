@@ -1,6 +1,6 @@
 import { inspect } from "node:util";
 import { isObject } from "./common-helpers";
-import { keys } from "ramda";
+import { mapObjIndexed } from "ramda";
 
 /**
  * @desc Using module augmentation approach you can set the type of the actual logger used
@@ -16,7 +16,7 @@ export type AbstractLogger = Record<
 > &
   LoggerOverrides;
 
-export interface LoggerConfig {
+export interface BuiltinLoggerConfig {
   /**
    * @desc The minimal severity to log or "silent" to disable logging
    * @example "debug" also enables pretty output for inspected entities
@@ -52,7 +52,9 @@ const ansi: Record<keyof AbstractLogger, string> = {
   error: `${esc}[31m`,
 };
 
-export const isLoggerConfig = (subject: unknown): subject is LoggerConfig =>
+export const isBuiltinLoggerConfig = (
+  subject: unknown,
+): subject is BuiltinLoggerConfig =>
   isObject(subject) &&
   "level" in subject &&
   ("color" in subject ? typeof subject.color === "boolean" : true) &&
@@ -71,7 +73,7 @@ export const createLogger = ({
   level,
   color = false,
   depth = 2,
-}: LoggerConfig): AbstractLogger => {
+}: BuiltinLoggerConfig): AbstractLogger => {
   const isDebug = level === "debug";
   const minSeverity = level === "silent" ? 100 : severity[level];
 
@@ -99,11 +101,10 @@ export const createLogger = ({
     console.log(output.join(" "));
   };
 
-  return keys(severity).reduce(
-    (agg, method) =>
-      Object.assign(agg, {
-        [method]: (message: string, meta?: any) => print(method, message, meta),
-      }),
-    {} as AbstractLogger,
+  return mapObjIndexed(
+    ({}, method) =>
+      (message: string, meta?: any) =>
+        print(method, message, meta),
+    severity,
   );
 };
