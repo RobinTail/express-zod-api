@@ -66,7 +66,7 @@ export const isBuiltinLoggerConfig = (
   !Object.values(subject).some((prop) => typeof prop === "function");
 
 /**
- * @desc Creates a basic console logger with optional colorful inspections
+ * @desc Creates the built-in console logger with optional colorful inspections
  * @example createLogger({ level: "debug", color: true, depth: 4 })
  * */
 export const createLogger = ({
