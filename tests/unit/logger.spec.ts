@@ -93,7 +93,7 @@ describe("Logger", () => {
     );
   });
 
-  describe("isLoggerConfig()", () => {
+  describe("isBuiltinLoggerConfig()", () => {
     test.each([
       { level: "silent" },
       { level: "debug", color: false },
