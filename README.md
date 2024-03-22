@@ -89,6 +89,7 @@ Therefore, many basic tasks can be accomplished faster and easier, in particular
 - Web server — [Express.js](https://expressjs.com/).
 - Schema validation — [Zod 3.x](https://github.com/colinhacks/zod).
 - Supports any logger having `info()`, `debug()`, `error()` and `warn()` methods;
+  - Built-in console logger with colorful and pretty inspections by default.
 - Generators:
   - Documentation — [OpenAPI 3.1](https://github.com/metadevpro/openapi3-ts) (former Swagger);
   - Client side types — inspired by [zod-to-ts](https://github.com/sachinraja/zod-to-ts).
