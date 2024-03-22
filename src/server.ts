@@ -16,7 +16,7 @@ import {
 
 const makeCommonEntities = async (config: CommonConfig) => {
   const rootLogger: AbstractLogger = isLoggerConfig(config.logger)
-    ? createLogger({ ...config.logger })
+    ? createLogger(config.logger)
     : config.logger;
   const errorHandler = config.errorHandler || defaultResultHandler;
   const { childLoggerProvider: getChildLogger } = config;
