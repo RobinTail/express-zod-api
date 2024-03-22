@@ -1,4 +1,4 @@
-import { Chalk, ChalkInstance } from "chalk";
+import ansi, { StyleFunction } from "ansi-colors";
 import { writeFile } from "node:fs/promises";
 import {
   exportModifier,
@@ -9,32 +9,29 @@ import {
 import { printNode } from "../src/zts-helpers";
 import { format } from "prettier";
 
-const chalk = new Chalk({ level: 2 }); // 256 colors
-
-const proud = chalk.italic(
+const proud = ansi.italic(
   "Proudly supports transgender community.".padStart(109),
 );
-const slogan = chalk.italic(
+const slogan = ansi.italic(
   "Start your API server with I/O schema validation and custom middlewares in minutes.".padStart(
     109,
   ),
 );
-const thanks = chalk.italic(
+const thanks = ansi.italic(
   "Thank you for choosing Express Zod API for your project.".padStart(132),
 );
-const dedicationMessage = chalk.italic("for Tonya".padEnd(20));
+const dedicationMessage = ansi.italic("for Tonya".padEnd(20));
 
-const pink = chalk.hex("#F5A9B8");
-const blue = chalk.hex("#5BCEFA");
-const white = chalk.hex("#FFF");
+const pink = ansi.magentaBright; // hex("#F5A9B8")
+const blue = ansi.blueBright; // hex("#5BCEFA")
 
-const colors = new Array<ChalkInstance>(14)
+const colors = new Array<StyleFunction>(14)
   .fill(blue, 1, 3)
   .fill(pink, 3, 5)
-  .fill(white, 5, 7)
+  .fill(ansi.whiteBright, 5, 7)
   .fill(pink, 7, 9)
   .fill(blue, 9, 12)
-  .fill(chalk.grey, 12, 13);
+  .fill(ansi.grey, 12, 13);
 
 const logo = `
 8888888888                                                          8888888888P              888             d8888 8888888b. 8888888

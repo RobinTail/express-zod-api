@@ -1,6 +1,7 @@
 import { inspect } from "node:util";
 import { isObject } from "./common-helpers";
 import { mapObjIndexed } from "ramda";
+import ansi, { StyleFunction } from "ansi-colors";
 
 /**
  * @desc Using module augmentation approach you can set the type of the actual logger used
@@ -43,13 +44,11 @@ const severity: Record<keyof AbstractLogger, number> = {
   error: 40,
 };
 
-const esc = "\x1b";
-const defaultColor = `${esc}[39m`;
-const ansi: Record<keyof AbstractLogger, string> = {
-  debug: `${esc}[34m`,
-  info: `${esc}[32m`,
-  warn: `${esc}[33m`,
-  error: `${esc}[31m`,
+const styles: Record<keyof AbstractLogger, StyleFunction> = {
+  debug: ansi.blue,
+  info: ansi.green,
+  warn: ansi.yellow,
+  error: ansi.red,
 };
 
 export const isBuiltinLoggerConfig = (
@@ -83,7 +82,7 @@ export const createLogger = ({
     }
     const output: string[] = [
       new Date().toISOString(),
-      color ? `${ansi[method]}${method}${defaultColor}:` : `${method}:`,
+      color ? `${styles[method](method)}:` : `${method}:`,
       message,
     ];
     if (meta !== undefined) {
