@@ -81,13 +81,11 @@ export const createLogger = ({
     if (severity[method] < minSeverity) {
       return;
     }
-    const output: string[] = [new Date().toISOString()];
-    if (color) {
-      output.push(`${ansi[method]}${method}${defaultColor}:`);
-    } else {
-      output.push(`${method}:`);
-    }
-    output.push(message);
+    const output: string[] = [
+      new Date().toISOString(),
+      color ? `${ansi[method]}${method}${defaultColor}:` : `${method}:`,
+      message,
+    ];
     if (meta !== undefined) {
       output.push(
         inspect(meta, {
