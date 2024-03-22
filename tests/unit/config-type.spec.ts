@@ -1,6 +1,5 @@
 import { Express, IRouter } from "express";
 import { createConfig } from "../../src";
-import winston from "winston";
 import { describe, expect, test, vi } from "vitest";
 
 describe("ConfigType", () => {
@@ -21,7 +20,7 @@ describe("ConfigType", () => {
       const argument = {
         app: vi.fn() as unknown as Express,
         cors: true,
-        logger: winston.createLogger({ silent: true }),
+        logger: console,
       };
       const config = createConfig(argument);
       expect(config).toEqual(argument);
