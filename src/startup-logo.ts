@@ -1,11 +1,4 @@
-import {
-  Color,
-  blueBright,
-  gray,
-  italic,
-  magentaBright,
-  whiteBright,
-} from "colorette";
+import { Ansis, gray, hex, italic, whiteBright } from "ansis";
 
 const proud = italic("Proudly supports transgender community.".padStart(109));
 const slogan = italic(
@@ -18,10 +11,10 @@ const thanks = italic(
 );
 const dedicationMessage = italic("for Tonya".padEnd(20));
 
-const pink = magentaBright; // hex("#F5A9B8")
-const blue = blueBright; // hex("#5BCEFA")
+const pink = hex("#F5A9B8");
+const blue = hex("#5BCEFA");
 
-const colors = new Array<Color>(14)
+const colors = new Array<Ansis>(14)
   .fill(blue, 1, 3)
   .fill(pink, 3, 5)
   .fill(whiteBright, 5, 7)
