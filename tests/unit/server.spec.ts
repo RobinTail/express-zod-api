@@ -12,13 +12,13 @@ import {
   httpListenSpy,
   httpsListenSpy,
 } from "../http-mock";
-import winston from "winston";
 import { z } from "zod";
 import {
   AppConfig,
   EndpointsFactory,
   ServerConfig,
   attachRouting,
+  createLogger,
   createServer,
   defaultResultHandler,
 } from "../../src";
@@ -75,7 +75,7 @@ describe("Server", () => {
     });
 
     test("Should create server with custom JSON parser, logger, error handler and beforeRouting", async () => {
-      const customLogger = winston.createLogger({ silent: true });
+      const customLogger = createLogger({ level: "silent" });
       const infoMethod = vi.spyOn(customLogger, "info");
       const port = givePort();
       const configMock = {
@@ -279,7 +279,7 @@ describe("Server", () => {
     test("should attach routing to the custom express app", async () => {
       const app = express();
       expect(appMock).toBeTruthy();
-      const customLogger = winston.createLogger({ silent: true });
+      const customLogger = createLogger({ level: "silent" });
       const infoMethod = vi.spyOn(customLogger, "info");
       const configMock = {
         app,
