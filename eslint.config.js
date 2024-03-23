@@ -15,7 +15,7 @@ export default [
   prettierConfig,
   prettierRecommended,
   {
-    files: ["**/*.ts", "eslint.config.js"],
+    files: ["**/*.ts", "*.config.js", "*.config.ts"],
     languageOptions: {
       ecmaVersion: "latest",
       sourceType: "module",
@@ -26,7 +26,7 @@ export default [
       },
     },
     plugins: {
-      typescript: tsPlugin,
+      "@typescript-eslint": tsPlugin,
       prettier: prettierPlugin,
       import: importPlugin,
       unicorn: unicornPlugin,
