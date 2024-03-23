@@ -1,6 +1,6 @@
-export const getStartupLogo = async () => {
-  const chalk = (await import("chalk")).default; // chalk v5 is ESM only
+import type { ChalkInstance } from "chalk";
 
+export const getStartupLogo = (chalk: ChalkInstance) => {
   const proud = chalk.italic(
     "Proudly supports transgender community.".padStart(109),
   );
@@ -17,7 +17,7 @@ export const getStartupLogo = async () => {
   const pink = chalk.hex("#F5A9B8");
   const blue = chalk.hex("#5BCEFA");
 
-  const colors = new Array<typeof chalk>(14)
+  const colors = new Array<ChalkInstance>(14)
     .fill(blue, 1, 3)
     .fill(pink, 3, 5)
     .fill(chalk.whiteBright, 5, 7)

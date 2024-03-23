@@ -1,3 +1,4 @@
+import type { ChalkInstance } from "chalk";
 import { inspect } from "node:util";
 import { isObject } from "./common-helpers";
 import { mapObjIndexed } from "ramda";
@@ -60,14 +61,13 @@ export const isBuiltinLoggerConfig = (
  * @desc Creates the built-in console logger with optional colorful inspections
  * @example createLogger({ level: "debug", color: true, depth: 4 })
  * */
-export const createLogger = async ({
+export const createLogger = ({
   level,
   color = false,
   depth = 2,
-}: BuiltinLoggerConfig): Promise<AbstractLogger> => {
-  const chalk = (await import("chalk")).default; // chalk v5 is ESM only
-
-  const styles: Record<keyof AbstractLogger, typeof chalk> = {
+  chalk,
+}: BuiltinLoggerConfig & { chalk: ChalkInstance }): AbstractLogger => {
+  const styles: Record<keyof AbstractLogger, ChalkInstance> = {
     debug: chalk.blue,
     info: chalk.green,
     warn: chalk.yellow,

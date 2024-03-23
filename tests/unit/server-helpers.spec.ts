@@ -9,11 +9,12 @@ import { Request, Response } from "express";
 import assert from "node:assert/strict";
 import { makeRequestMock, makeResponseMock } from "../../src/testing";
 import createHttpError from "http-errors";
+import chalk from "chalk";
 
 describe("Server helpers", () => {
   describe("createParserFailureHandler()", () => {
-    test("the handler should call next if there is no error", async () => {
-      const rootLogger = await createLogger({ level: "silent" });
+    test("the handler should call next if there is no error", () => {
+      const rootLogger = createLogger({ level: "silent", chalk });
       const handler = createParserFailureHandler({
         errorHandler: defaultResultHandler,
         rootLogger,
@@ -33,7 +34,7 @@ describe("Server helpers", () => {
       const errorHandler = { ...defaultResultHandler, handler: vi.fn() };
       const handler = createParserFailureHandler({
         errorHandler,
-        rootLogger: await createLogger({ level: "silent" }),
+        rootLogger: createLogger({ level: "silent", chalk }),
         getChildLogger: ({ parent }) => ({ ...parent, isChild: true }),
       });
       await handler(
@@ -61,7 +62,7 @@ describe("Server helpers", () => {
       };
       const handler = createNotFoundHandler({
         errorHandler,
-        rootLogger: await createLogger({ level: "silent" }),
+        rootLogger: createLogger({ level: "silent", chalk }),
         getChildLogger: async ({ parent }) => ({ ...parent, isChild: true }),
       });
       const next = vi.fn();
@@ -100,8 +101,8 @@ describe("Server helpers", () => {
       );
     });
 
-    test("should call Last Resort Handler in case of ResultHandler is faulty", async () => {
-      const rootLogger = await createLogger({ level: "silent" });
+    test("should call Last Resort Handler in case of ResultHandler is faulty", () => {
+      const rootLogger = createLogger({ level: "silent", chalk });
       const errorHandler = {
         ...defaultResultHandler,
         handler: vi.fn().mockImplementation(() => assert.fail("I am faulty")),

@@ -6,14 +6,14 @@
 
 - **Breaking changes**:
   - `winston` is no longer a default logger;
-  - `createLogger()` argument is changed, it becomes async and returns a built-in logger instead of `winston`.
+  - `createLogger()` argument is changed and it now returns a built-in logger instead of `winston`.
 - Features:
   - New built-in console logger with colorful pretty inspections and basic methods only.
 - How to migrate confidently:
   - If you're using a custom logger in config:
     - No action required.
   - If you're using `createLogger()` method in your code:
-    - Remove `winston` property from its argument, add `await` before it.
+    - Replace `winston` property to `chalk` one in its argument.
   - If you're using the default logger in config (which used to be `winston` as a peer dependency):
     - If you're using its `info()`, `debug()`, `error()` and `warn()` methods only:
       - You can now uninstall `winston` — no further action required.

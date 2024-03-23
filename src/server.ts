@@ -13,10 +13,15 @@ import {
   createParserFailureHandler,
   createUploadFailueHandler,
 } from "./server-helpers";
+import { getStartupLogo } from "./startup-logo";
 
 const makeCommonEntities = async (config: CommonConfig) => {
+  const chalk = (await import("chalk")).default; // chalk v5 is ESM only
+  if (config.startupLogo !== false) {
+    console.log(getStartupLogo(chalk));
+  }
   const rootLogger: AbstractLogger = isBuiltinLoggerConfig(config.logger)
-    ? await createLogger(config.logger)
+    ? createLogger({ chalk, ...config.logger })
     : config.logger;
   const errorHandler = config.errorHandler || defaultResultHandler;
   const { childLoggerProvider: getChildLogger } = config;
@@ -28,7 +33,7 @@ const makeCommonEntities = async (config: CommonConfig) => {
 
 export const attachRouting = async (config: AppConfig, routing: Routing) => {
   const { rootLogger, notFoundHandler } = await makeCommonEntities(config);
-  await initRouting({ app: config.app, routing, rootLogger, config });
+  initRouting({ app: config.app, routing, rootLogger, config });
   return { notFoundHandler, logger: rootLogger };
 };
 
@@ -82,7 +87,7 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
   if (config.server.beforeRouting) {
     await config.server.beforeRouting({ app, logger: rootLogger });
   }
-  await initRouting({ app, routing, rootLogger, config });
+  initRouting({ app, routing, rootLogger, config });
   app.use(notFoundHandler);
 
   const starter = <T extends http.Server | https.Server>(
