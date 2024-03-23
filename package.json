@@ -25,7 +25,6 @@
     "build:docs": "tsx example/generate-documentation.ts",
     "build:client": "tsx example/generate-client.ts",
     "build:license": "tsx tools/license.ts",
-    "build:logo": "tsx tools/startup-logo.ts",
     "test": "yarn test:types && yarn test:unit && yarn test:badge",
     "test:cjs": "yarn --cwd tests/cjs && vitest run -r tests/cjs",
     "test:esm": "yarn --cwd tests/esm && vitest run -r tests/esm",
@@ -68,6 +67,7 @@
     "node": "^18.0.0 || ^20.0.0"
   },
   "dependencies": {
+    "chalk": "^5.3.0",
     "openapi3-ts": "^4.2.1",
     "ramda": "^0.29.1"
   },
@@ -138,7 +138,6 @@
     "@typescript-eslint/eslint-plugin": "^7.1.0",
     "@typescript-eslint/parser": "^7.1.0",
     "@vitest/coverage-istanbul": "^1.0.4",
-    "chalk": "^5.3.0",
     "compression": "^1.7.4",
     "cors": "^2.8.5",
     "eslint": "^8.48.0",

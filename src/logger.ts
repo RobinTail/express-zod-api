@@ -1,3 +1,4 @@
+import type { ChalkInstance } from "chalk";
 import { inspect } from "node:util";
 import { isObject } from "./common-helpers";
 import { mapObjIndexed } from "ramda";
@@ -43,15 +44,6 @@ const severity: Record<keyof AbstractLogger, number> = {
   error: 40,
 };
 
-const esc = "\x1b";
-const defaultColor = `${esc}[39m`;
-const ansi: Record<keyof AbstractLogger, string> = {
-  debug: `${esc}[34m`,
-  info: `${esc}[32m`,
-  warn: `${esc}[33m`,
-  error: `${esc}[31m`,
-};
-
 export const isBuiltinLoggerConfig = (
   subject: unknown,
 ): subject is BuiltinLoggerConfig =>
@@ -65,6 +57,9 @@ export const isBuiltinLoggerConfig = (
   ["silent", "warn", "debug"].includes(subject.level) &&
   !Object.values(subject).some((prop) => typeof prop === "function");
 
+const esc = "\x1b";
+const reset = `${esc}[39m`;
+
 /**
  * @desc Creates the built-in console logger with optional colorful inspections
  * @example createLogger({ level: "debug", color: true, depth: 4 })
@@ -73,7 +68,15 @@ export const createLogger = ({
   level,
   color = false,
   depth = 2,
-}: BuiltinLoggerConfig): AbstractLogger => {
+  chalk,
+}: BuiltinLoggerConfig & { chalk?: ChalkInstance }): AbstractLogger => {
+  const styles: Record<keyof AbstractLogger, (text: string) => string> = {
+    debug: chalk?.blue || ((text) => `${esc}[34m${text}${reset}`),
+    info: chalk?.green || ((text) => `${esc}[32m${text}${reset}`),
+    warn: chalk?.hex("#FFA500") || ((text) => `${esc}[33m${text}${reset}`),
+    error: chalk?.red || ((text) => `${esc}[31m${text}${reset}`),
+  };
+
   const isDebug = level === "debug";
   const minSeverity = level === "silent" ? 100 : severity[level];
 
@@ -83,7 +86,7 @@ export const createLogger = ({
     }
     const output: string[] = [
       new Date().toISOString(),
-      color ? `${ansi[method]}${method}${defaultColor}:` : `${method}:`,
+      color ? `${styles[method](method)}:` : `${method}:`,
       message,
     ];
     if (meta !== undefined) {

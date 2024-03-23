@@ -13,10 +13,15 @@ import {
   createParserFailureHandler,
   createUploadFailueHandler,
 } from "./server-helpers";
+import { getStartupLogo } from "./startup-logo";
 
 const makeCommonEntities = async (config: CommonConfig) => {
+  const chalk = (await import("chalk")).default; // chalk v5 is ESM only
+  if (config.startupLogo !== false) {
+    console.log(getStartupLogo(chalk));
+  }
   const rootLogger: AbstractLogger = isBuiltinLoggerConfig(config.logger)
-    ? createLogger(config.logger)
+    ? createLogger({ chalk, ...config.logger })
     : config.logger;
   const errorHandler = config.errorHandler || defaultResultHandler;
   const { childLoggerProvider: getChildLogger } = config;

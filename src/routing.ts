@@ -5,7 +5,6 @@ import { AbstractEndpoint } from "./endpoint";
 import { AbstractLogger } from "./logger";
 import { walkRouting } from "./routing-walker";
 import { ServeStatic } from "./serve-static";
-import { getStartupLogo } from "./startup-logo";
 
 export interface Routing {
   [SEGMENT: string]: Routing | DependsOnMethod | AbstractEndpoint | ServeStatic;
@@ -22,9 +21,6 @@ export const initRouting = ({
   config: CommonConfig;
   routing: Routing;
 }) => {
-  if (config.startupLogo !== false) {
-    console.log(getStartupLogo());
-  }
   rootLogger.debug("Running", process.env.TSUP_BUILD || "from sources");
   walkRouting({
     routing,
