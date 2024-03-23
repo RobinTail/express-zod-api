@@ -2,9 +2,6 @@ import { defineConfig } from "vitest/config";
 
 export default defineConfig({
   test: {
-    env: {
-      FORCE_COLOR: "1", // for logger test in CI
-    },
     testTimeout: 10000,
     reporters: "basic",
     coverage: {
