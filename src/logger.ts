@@ -70,7 +70,7 @@ export const createLogger = ({
   const styles: Record<keyof AbstractLogger, (text: string) => string> = {
     debug: chalk?.blue || ((text) => `\x1b[34m${text}\x1b[39m`),
     info: chalk?.green || ((text) => `\x1b[32m${text}\x1b[39m`),
-    warn: chalk?.yellow || ((text) => `\x1b[33m${text}\x1b[39m`),
+    warn: chalk?.hex("#FFA500") || ((text) => `\x1b[33m${text}\x1b[39m`),
     error: chalk?.red || ((text) => `\x1b[31m${text}\x1b[39m`),
   };
 
