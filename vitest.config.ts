@@ -3,7 +3,7 @@ import { defineConfig } from "vitest/config";
 export default defineConfig({
   test: {
     env: {
-      FORCE_COLOR: "2",
+      FORCE_COLOR: "1",
     },
     testTimeout: 10000,
     reporters: "basic",
