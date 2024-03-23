@@ -13,7 +13,7 @@
   - If you're using a custom logger in config:
     - No action required.
   - If you're using `createLogger()` method in your code:
-    - Replace `winston` property to `chalk` one in its argument.
+    - Replace the `winston` property with the `chalk` one in its argument.
   - If you're using the default logger in config (which used to be `winston` as a peer dependency):
     - If you're using its `info()`, `debug()`, `error()` and `warn()` methods only:
       - You can now uninstall `winston` — no further action required.
