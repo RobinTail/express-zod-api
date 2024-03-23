@@ -48,11 +48,14 @@ describe("Logger", () => {
       expect(logSpy.mock.calls).toMatchSnapshot();
     });
 
-    test("Should create debug logger", () => {
-      const { logger, logSpy } = makeLogger({ level: "debug", color: true });
-      logger.debug("testing debug message", { withColorful: "output" });
-      expect(logSpy.mock.calls).toMatchSnapshot();
-    });
+    test.each(["debug", "info", "warn", "error"] as const)(
+      "Should create debug logger %#",
+      (method) => {
+        const { logger, logSpy } = makeLogger({ level: "debug", color: true });
+        logger[method]("testing debug message", { withColorful: "output" });
+        expect(logSpy.mock.calls).toMatchSnapshot();
+      },
+    );
 
     test.each(["debug", "warn"] as const)(
       "Should handle non-object meta %#",

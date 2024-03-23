@@ -1,9 +1,33 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`Logger > createLogger() > Should create debug logger 1`] = `
+exports[`Logger > createLogger() > Should create debug logger 0 1`] = `
 [
   [
     "2022-01-01T00:00:00.000Z [34mdebug[39m: testing debug message { withColorful: [32m'output'[39m }",
+  ],
+]
+`;
+
+exports[`Logger > createLogger() > Should create debug logger 1 1`] = `
+[
+  [
+    "2022-01-01T00:00:00.000Z [32minfo[39m: testing debug message { withColorful: [32m'output'[39m }",
+  ],
+]
+`;
+
+exports[`Logger > createLogger() > Should create debug logger 2 1`] = `
+[
+  [
+    "2022-01-01T00:00:00.000Z [33mwarn[39m: testing debug message { withColorful: [32m'output'[39m }",
+  ],
+]
+`;
+
+exports[`Logger > createLogger() > Should create debug logger 3 1`] = `
+[
+  [
+    "2022-01-01T00:00:00.000Z [31merror[39m: testing debug message { withColorful: [32m'output'[39m }",
   ],
 ]
 `;
