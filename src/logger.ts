@@ -66,12 +66,12 @@ export const createLogger = ({
   color = false,
   depth = 2,
   chalk,
-}: BuiltinLoggerConfig & { chalk: ChalkInstance }): AbstractLogger => {
-  const styles: Record<keyof AbstractLogger, ChalkInstance> = {
-    debug: chalk.blue,
-    info: chalk.green,
-    warn: chalk.yellow,
-    error: chalk.red,
+}: BuiltinLoggerConfig & { chalk?: ChalkInstance }): AbstractLogger => {
+  const styles: Record<keyof AbstractLogger, (text: string) => string> = {
+    debug: chalk?.blue || ((text) => `\x1b[34m${text}\x1b[39m`),
+    info: chalk?.green || ((text) => `\x1b[32m${text}\x1b[39m`),
+    warn: chalk?.yellow || ((text) => `\x1b[33m${text}\x1b[39m`),
+    error: chalk?.red || ((text) => `\x1b[31m${text}\x1b[39m`),
   };
 
   const isDebug = level === "debug";

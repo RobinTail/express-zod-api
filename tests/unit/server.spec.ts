@@ -24,7 +24,6 @@ import {
 } from "../../src";
 import express from "express";
 import { afterAll, describe, expect, test, vi } from "vitest";
-import chalk from "chalk";
 
 describe("Server", () => {
   afterAll(() => {
@@ -76,7 +75,7 @@ describe("Server", () => {
     });
 
     test("Should create server with custom JSON parser, logger, error handler and beforeRouting", async () => {
-      const customLogger = createLogger({ level: "silent", chalk });
+      const customLogger = createLogger({ level: "silent" });
       const infoMethod = vi.spyOn(customLogger, "info");
       const port = givePort();
       const configMock = {
@@ -280,7 +279,7 @@ describe("Server", () => {
     test("should attach routing to the custom express app", async () => {
       const app = express();
       expect(appMock).toBeTruthy();
-      const customLogger = createLogger({ level: "silent", chalk });
+      const customLogger = createLogger({ level: "silent" });
       const infoMethod = vi.spyOn(customLogger, "info");
       const configMock = {
         app,

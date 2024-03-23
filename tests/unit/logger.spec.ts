@@ -14,7 +14,6 @@ import {
   test,
   vi,
 } from "vitest";
-import chalk from "chalk";
 
 describe("Logger", () => {
   beforeAll(() => {
@@ -31,7 +30,7 @@ describe("Logger", () => {
   });
 
   const makeLogger = (props: BuiltinLoggerConfig) => {
-    const logger = createLogger({ ...props, chalk });
+    const logger = createLogger({ ...props });
     const logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
     return { logger, logSpy };
   };
