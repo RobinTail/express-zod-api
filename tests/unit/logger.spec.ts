@@ -50,10 +50,7 @@ describe("Logger", () => {
     });
 
     test("Should create debug logger", () => {
-      const { logger, logSpy } = makeLogger({
-        level: "debug",
-        color: true,
-      });
+      const { logger, logSpy } = makeLogger({ level: "debug", color: true });
       logger.debug("testing debug message", { withColorful: "output" });
       expect(logSpy.mock.calls).toMatchSnapshot();
     });
