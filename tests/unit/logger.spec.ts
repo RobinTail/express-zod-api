@@ -29,35 +29,38 @@ describe("Logger", () => {
     MockDate.reset();
   });
 
-  const makeLogger = (props: BuiltinLoggerConfig) => {
-    const logger = createLogger({ ...props });
+  const makeLogger = async (props: BuiltinLoggerConfig) => {
+    const logger = await createLogger({ ...props });
     const logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
     return { logger, logSpy };
   };
 
   describe("createLogger()", () => {
-    test("Should create silent logger", () => {
-      const { logger, logSpy } = makeLogger({ level: "silent" });
+    test("Should create silent logger", async () => {
+      const { logger, logSpy } = await makeLogger({ level: "silent" });
       logger.error("test");
       expect(logSpy).toHaveBeenCalledTimes(0);
     });
 
-    test("Should create warn logger", () => {
-      const { logger, logSpy } = makeLogger({ level: "warn" });
+    test("Should create warn logger", async () => {
+      const { logger, logSpy } = await makeLogger({ level: "warn" });
       logger.warn("testing warn message", { withMeta: true });
       expect(logSpy.mock.calls).toMatchSnapshot();
     });
 
-    test("Should create debug logger", () => {
-      const { logger, logSpy } = makeLogger({ level: "debug", color: true });
+    test("Should create debug logger", async () => {
+      const { logger, logSpy } = await makeLogger({
+        level: "debug",
+        color: true,
+      });
       logger.debug("testing debug message", { withColorful: "output" });
       expect(logSpy.mock.calls).toMatchSnapshot();
     });
 
     test.each(["debug", "warn"] as const)(
       "Should handle non-object meta %#",
-      (level) => {
-        const { logger, logSpy } = makeLogger({ level, color: true });
+      async (level) => {
+        const { logger, logSpy } = await makeLogger({ level, color: true });
         logger.error("Code", 8090);
         expect(logSpy.mock.calls).toMatchSnapshot();
       },
@@ -65,23 +68,26 @@ describe("Logger", () => {
 
     test.each(["debug", "warn"] as const)(
       "Should handle empty object meta %#",
-      (level) => {
-        const { logger, logSpy } = makeLogger({ level, color: true });
+      async (level) => {
+        const { logger, logSpy } = await makeLogger({ level, color: true });
         logger.error("Payload", {});
         expect(logSpy.mock.calls).toMatchSnapshot();
       },
     );
 
-    test.each(["debug", "warn"] as const)("Should handle array %#", (level) => {
-      const { logger, logSpy } = makeLogger({ level, color: true });
-      logger.error("Array", ["test"]);
-      expect(logSpy.mock.calls).toMatchSnapshot();
-    });
+    test.each(["debug", "warn"] as const)(
+      "Should handle array %#",
+      async (level) => {
+        const { logger, logSpy } = await makeLogger({ level, color: true });
+        logger.error("Array", ["test"]);
+        expect(logSpy.mock.calls).toMatchSnapshot();
+      },
+    );
 
     test.each(["debug", "warn"] as const)(
       "Should handle circular references within subject %#",
-      (level) => {
-        const { logger, logSpy } = makeLogger({ level, color: false });
+      async (level) => {
+        const { logger, logSpy } = await makeLogger({ level, color: false });
         const subject: any = {};
         subject.a = [subject];
         subject.b = {};

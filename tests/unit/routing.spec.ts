@@ -34,7 +34,7 @@ describe("Routing", () => {
       vi.clearAllMocks(); // resets call counters on mocked methods
     });
 
-    test("Should set right methods", () => {
+    test("Should set right methods", async () => {
       const handlerMock = vi.fn();
       const configMock = {
         cors: true,
@@ -68,9 +68,9 @@ describe("Routing", () => {
           },
         },
       };
-      initRouting({
+      await initRouting({
         app: appMock as unknown as IRouter,
-        rootLogger: createLogger({ level: "silent" }),
+        rootLogger: await createLogger({ level: "silent" }),
         config: configMock as CommonConfig,
         routing,
       });
@@ -89,7 +89,7 @@ describe("Routing", () => {
       expect(appMock.options.mock.calls[2][0]).toBe("/v1/user/universal");
     });
 
-    test("Should accept serveStatic", () => {
+    test("Should accept serveStatic", async () => {
       const routing: Routing = {
         public: new ServeStatic(__dirname, { dotfiles: "deny" }),
       };
@@ -97,9 +97,9 @@ describe("Routing", () => {
         cors: true,
         startupLogo: false,
       };
-      initRouting({
+      await initRouting({
         app: appMock as unknown as IRouter,
-        rootLogger: createLogger({ level: "silent" }),
+        rootLogger: await createLogger({ level: "silent" }),
         config: configMock as CommonConfig,
         routing,
       });
@@ -108,7 +108,7 @@ describe("Routing", () => {
       expect(appMock.use).toHaveBeenCalledWith("/public", staticHandler);
     });
 
-    test("Should accept DependsOnMethod", () => {
+    test("Should accept DependsOnMethod", async () => {
       const handlerMock = vi.fn();
       const configMock = {
         cors: true,
@@ -143,9 +143,9 @@ describe("Routing", () => {
           }),
         },
       };
-      initRouting({
+      await initRouting({
         app: appMock as unknown as IRouter,
-        rootLogger: createLogger({ level: "silent" }),
+        rootLogger: await createLogger({ level: "silent" }),
         config: configMock as CommonConfig,
         routing,
       });
@@ -162,7 +162,7 @@ describe("Routing", () => {
       expect(appMock.options.mock.calls[0][0]).toBe("/v1/user");
     });
 
-    test("Should check if endpoint supports the method it's assigned to within DependsOnMethod", () => {
+    test("Should check if endpoint supports the method it's assigned to within DependsOnMethod", async () => {
       const configMock = { cors: true, startupLogo: false };
       const factory = new EndpointsFactory(defaultResultHandler);
       const putAndPatchEndpoint = factory.build({
@@ -180,14 +180,14 @@ describe("Routing", () => {
           }),
         },
       };
-      expect(() =>
+      await expect(async () =>
         initRouting({
           app: appMock as unknown as IRouter,
-          rootLogger: createLogger({ level: "silent" }),
+          rootLogger: await createLogger({ level: "silent" }),
           config: configMock as CommonConfig,
           routing,
         }),
-      ).toThrowErrorMatchingSnapshot();
+      ).rejects.toThrowErrorMatchingSnapshot();
     });
 
     test("Issue 705: should set all DependsOnMethod' methods for CORS", async () => {
@@ -225,9 +225,9 @@ describe("Routing", () => {
           patch: putAndPatchEndpoint,
         }),
       };
-      initRouting({
+      await initRouting({
         app: appMock as unknown as IRouter,
-        rootLogger: createLogger({ level: "silent" }),
+        rootLogger: await createLogger({ level: "silent" }),
         config: configMock as CommonConfig,
         routing,
       });
@@ -249,7 +249,7 @@ describe("Routing", () => {
       );
     });
 
-    test("Should accept parameters", () => {
+    test("Should accept parameters", async () => {
       const handlerMock = vi.fn();
       const configMock = { startupLogo: false };
       const endpointMock = new EndpointsFactory(defaultResultHandler).build({
@@ -265,9 +265,9 @@ describe("Routing", () => {
           },
         },
       };
-      initRouting({
+      await initRouting({
         app: appMock as unknown as IRouter,
-        rootLogger: createLogger({ level: "silent" }),
+        rootLogger: await createLogger({ level: "silent" }),
         config: configMock as CommonConfig,
         routing,
       });
@@ -275,7 +275,7 @@ describe("Routing", () => {
       expect(appMock.get.mock.calls[0][0]).toBe("/v1/user/:id");
     });
 
-    test("Should handle empty paths and trim spaces", () => {
+    test("Should handle empty paths and trim spaces", async () => {
       const handlerMock = vi.fn();
       const configMock = { startupLogo: false };
       const endpointMock = new EndpointsFactory(defaultResultHandler).build({
@@ -294,9 +294,9 @@ describe("Routing", () => {
           },
         },
       };
-      initRouting({
+      await initRouting({
         app: appMock as unknown as IRouter,
-        rootLogger: createLogger({ level: "silent" }),
+        rootLogger: await createLogger({ level: "silent" }),
         config: configMock as CommonConfig,
         routing,
       });
@@ -305,7 +305,7 @@ describe("Routing", () => {
       expect(appMock.get.mock.calls[1][0]).toBe("/v1/user/:id/download");
     });
 
-    test("Should throw an error in case of slashes in route", () => {
+    test("Should throw an error in case of slashes in route", async () => {
       const handlerMock = vi.fn();
       const configMock = { startupLogo: false };
       const endpointMock = new EndpointsFactory(defaultResultHandler).build({
@@ -314,10 +314,10 @@ describe("Routing", () => {
         output: z.object({}),
         handler: handlerMock,
       });
-      expect(() =>
+      await expect(async () =>
         initRouting({
           app: appMock as unknown as IRouter,
-          rootLogger: createLogger({ level: "silent" }),
+          rootLogger: await createLogger({ level: "silent" }),
           config: configMock as CommonConfig,
           routing: {
             v1: {
@@ -325,17 +325,17 @@ describe("Routing", () => {
             },
           },
         }),
-      ).toThrowErrorMatchingSnapshot();
-      expect(() =>
+      ).rejects.toThrowErrorMatchingSnapshot();
+      await expect(async () =>
         initRouting({
           app: appMock as unknown as IRouter,
-          rootLogger: createLogger({ level: "silent" }),
+          rootLogger: await createLogger({ level: "silent" }),
           config: configMock as CommonConfig,
           routing: {
             "v1/user/retrieve": endpointMock,
           },
         }),
-      ).toThrowErrorMatchingSnapshot();
+      ).rejects.toThrowErrorMatchingSnapshot();
     });
 
     test("Should execute endpoints with right arguments", async () => {
