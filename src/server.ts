@@ -16,7 +16,7 @@ import {
 
 const makeCommonEntities = async (config: CommonConfig) => {
   const rootLogger: AbstractLogger = isBuiltinLoggerConfig(config.logger)
-    ? createLogger(config.logger)
+    ? await createLogger(config.logger)
     : config.logger;
   const errorHandler = config.errorHandler || defaultResultHandler;
   const { childLoggerProvider: getChildLogger } = config;
@@ -28,7 +28,7 @@ const makeCommonEntities = async (config: CommonConfig) => {
 
 export const attachRouting = async (config: AppConfig, routing: Routing) => {
   const { rootLogger, notFoundHandler } = await makeCommonEntities(config);
-  initRouting({ app: config.app, routing, rootLogger, config });
+  await initRouting({ app: config.app, routing, rootLogger, config });
   return { notFoundHandler, logger: rootLogger };
 };
 
@@ -82,7 +82,7 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
   if (config.server.beforeRouting) {
     await config.server.beforeRouting({ app, logger: rootLogger });
   }
-  initRouting({ app, routing, rootLogger, config });
+  await initRouting({ app, routing, rootLogger, config });
   app.use(notFoundHandler);
 
   const starter = <T extends http.Server | https.Server>(

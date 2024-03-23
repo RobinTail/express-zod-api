@@ -1,30 +1,31 @@
-import chalk from "chalk";
+export const getStartupLogo = async () => {
+  const chalk = (await import("chalk")).default; // chalk v5 is ESM only
 
-const proud = chalk.italic(
-  "Proudly supports transgender community.".padStart(109),
-);
-const slogan = chalk.italic(
-  "Start your API server with I/O schema validation and custom middlewares in minutes.".padStart(
-    109,
-  ),
-);
-const thanks = chalk.italic(
-  "Thank you for choosing Express Zod API for your project.".padStart(132),
-);
-const dedicationMessage = chalk.italic("for Tonya".padEnd(20));
+  const proud = chalk.italic(
+    "Proudly supports transgender community.".padStart(109),
+  );
+  const slogan = chalk.italic(
+    "Start your API server with I/O schema validation and custom middlewares in minutes.".padStart(
+      109,
+    ),
+  );
+  const thanks = chalk.italic(
+    "Thank you for choosing Express Zod API for your project.".padStart(132),
+  );
+  const dedicationMessage = chalk.italic("for Tonya".padEnd(20));
 
-const pink = chalk.hex("#F5A9B8");
-const blue = chalk.hex("#5BCEFA");
+  const pink = chalk.hex("#F5A9B8");
+  const blue = chalk.hex("#5BCEFA");
 
-const colors = new Array<chalk.Chalk>(14)
-  .fill(blue, 1, 3)
-  .fill(pink, 3, 5)
-  .fill(chalk.whiteBright, 5, 7)
-  .fill(pink, 7, 9)
-  .fill(blue, 9, 12)
-  .fill(chalk.gray, 12, 13);
+  const colors = new Array<typeof chalk>(14)
+    .fill(blue, 1, 3)
+    .fill(pink, 3, 5)
+    .fill(chalk.whiteBright, 5, 7)
+    .fill(pink, 7, 9)
+    .fill(blue, 9, 12)
+    .fill(chalk.gray, 12, 13);
 
-const logo = `
+  const logo = `
 8888888888                                                          8888888888P              888             d8888 8888888b. 8888888
 888                                                                       d88P               888            d88888 888   Y88b  888
 888                                                                      d88P                888           d88P888 888    888  888
@@ -39,8 +40,8 @@ ${dedicationMessage}888${slogan}
 ${thanks}
 `;
 
-export const getStartupLogo = () =>
-  logo
+  return logo
     .split("\n")
     .map((line, index) => (colors[index] ? colors[index](line) : line))
     .join("\n");
+};

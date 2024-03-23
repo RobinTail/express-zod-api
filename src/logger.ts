@@ -1,7 +1,6 @@
 import { inspect } from "node:util";
 import { isObject } from "./common-helpers";
 import { mapObjIndexed } from "ramda";
-import chalk from "chalk";
 
 /**
  * @desc Using module augmentation approach you can set the type of the actual logger used
@@ -44,13 +43,6 @@ const severity: Record<keyof AbstractLogger, number> = {
   error: 40,
 };
 
-const styles: Record<keyof AbstractLogger, chalk.Chalk> = {
-  debug: chalk.blue,
-  info: chalk.green,
-  warn: chalk.yellow,
-  error: chalk.red,
-};
-
 export const isBuiltinLoggerConfig = (
   subject: unknown,
 ): subject is BuiltinLoggerConfig =>
@@ -68,11 +60,20 @@ export const isBuiltinLoggerConfig = (
  * @desc Creates the built-in console logger with optional colorful inspections
  * @example createLogger({ level: "debug", color: true, depth: 4 })
  * */
-export const createLogger = ({
+export const createLogger = async ({
   level,
   color = false,
   depth = 2,
-}: BuiltinLoggerConfig): AbstractLogger => {
+}: BuiltinLoggerConfig): Promise<AbstractLogger> => {
+  const chalk = (await import("chalk")).default; // chalk v5 is ESM only
+
+  const styles: Record<keyof AbstractLogger, typeof chalk> = {
+    debug: chalk.blue,
+    info: chalk.green,
+    warn: chalk.yellow,
+    error: chalk.red,
+  };
+
   const isDebug = level === "debug";
   const minSeverity = level === "silent" ? 100 : severity[level];
 
