@@ -57,6 +57,9 @@ export const isBuiltinLoggerConfig = (
   ["silent", "warn", "debug"].includes(subject.level) &&
   !Object.values(subject).some((prop) => typeof prop === "function");
 
+const esc = "\x1b";
+const reset = `${esc}[39m`;
+
 /**
  * @desc Creates the built-in console logger with optional colorful inspections
  * @example createLogger({ level: "debug", color: true, depth: 4 })
@@ -68,10 +71,10 @@ export const createLogger = ({
   chalk,
 }: BuiltinLoggerConfig & { chalk?: ChalkInstance }): AbstractLogger => {
   const styles: Record<keyof AbstractLogger, (text: string) => string> = {
-    debug: chalk?.blue || ((text) => `\x1b[34m${text}\x1b[39m`),
-    info: chalk?.green || ((text) => `\x1b[32m${text}\x1b[39m`),
-    warn: chalk?.hex("#FFA500") || ((text) => `\x1b[33m${text}\x1b[39m`),
-    error: chalk?.red || ((text) => `\x1b[31m${text}\x1b[39m`),
+    debug: chalk?.blue || ((text) => `${esc}[34m${text}${reset}`),
+    info: chalk?.green || ((text) => `${esc}[32m${text}${reset}`),
+    warn: chalk?.hex("#FFA500") || ((text) => `${esc}[33m${text}${reset}`),
+    error: chalk?.red || ((text) => `${esc}[31m${text}${reset}`),
   };
 
   const isDebug = level === "debug";
