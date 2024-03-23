@@ -6,7 +6,7 @@
 
 - **Breaking changes**:
   - `winston` is no longer a default logger;
-  - `createLogger()` argument is changed and it now returns a built-in logger instead of `winston`.
+  - `createLogger()` argument is changed, and it now returns a built-in logger instead of `winston`.
 - Features:
   - New built-in console logger with colorful pretty inspections and basic methods only.
 - How to migrate confidently:
