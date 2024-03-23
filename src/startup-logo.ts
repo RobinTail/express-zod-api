@@ -1,26 +1,28 @@
-import { Ansis, gray, hex, italic, whiteBright } from "ansis";
+import chalk from "chalk";
 
-const proud = italic("Proudly supports transgender community.".padStart(109));
-const slogan = italic(
+const proud = chalk.italic(
+  "Proudly supports transgender community.".padStart(109),
+);
+const slogan = chalk.italic(
   "Start your API server with I/O schema validation and custom middlewares in minutes.".padStart(
     109,
   ),
 );
-const thanks = italic(
+const thanks = chalk.italic(
   "Thank you for choosing Express Zod API for your project.".padStart(132),
 );
-const dedicationMessage = italic("for Tonya".padEnd(20));
+const dedicationMessage = chalk.italic("for Tonya".padEnd(20));
 
-const pink = hex("#F5A9B8");
-const blue = hex("#5BCEFA");
+const pink = chalk.hex("#F5A9B8");
+const blue = chalk.hex("#5BCEFA");
 
-const colors = new Array<Ansis>(14)
+const colors = new Array<chalk.Chalk>(14)
   .fill(blue, 1, 3)
   .fill(pink, 3, 5)
-  .fill(whiteBright, 5, 7)
+  .fill(chalk.whiteBright, 5, 7)
   .fill(pink, 7, 9)
   .fill(blue, 9, 12)
-  .fill(gray, 12, 13);
+  .fill(chalk.gray, 12, 13);
 
 const logo = `
 8888888888                                                          8888888888P              888             d8888 8888888b. 8888888
