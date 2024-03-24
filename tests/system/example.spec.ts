@@ -192,7 +192,7 @@ describe("Example", async () => {
 
     test("Should upload the file", async () => {
       const filename = "logo.svg";
-      const logo = await readFile(filename);
+      const logo = await readFile(filename, "utf-8");
       const data = new FormData();
       data.append(
         "avatar",
