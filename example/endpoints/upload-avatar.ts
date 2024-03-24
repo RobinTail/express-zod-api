@@ -9,12 +9,7 @@ export const uploadAvatarEndpoint = taggedEndpointsFactory.build({
   description: "Handles a file upload.",
   input: z
     .object({
-      avatar: ez
-        .upload()
-        .refine(
-          (file) => file.mimetype.match(/image\/.+/),
-          "Should be an image",
-        ),
+      avatar: ez.upload(),
     })
     .passthrough(),
   output: z.object({
