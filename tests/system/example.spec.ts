@@ -6,10 +6,8 @@ import {
   Implementation,
   jsonEndpoints,
 } from "../../example/example.client";
-import { mimeMultipart } from "../../src/mime";
 import { givePort, waitFor } from "../helpers";
 import { createHash } from "node:crypto";
-import FormData from "form-data";
 import { readFile } from "node:fs/promises";
 import { afterAll, afterEach, describe, expect, test } from "vitest";
 
@@ -196,7 +194,11 @@ describe("Example", async () => {
       const filename = "logo.svg";
       const logo = await readFile(filename, "utf-8");
       const data = new FormData();
-      data.append("avatar", logo, { filename });
+      data.append(
+        "avatar",
+        new Blob([logo], { type: "image/svg+xml" }), // FormData mime is buggy in Node 18.0.0
+        filename,
+      );
       data.append("str", "test string value");
       data.append("num", 123);
       data.append("arr[0]", 456);
@@ -204,16 +206,29 @@ describe("Example", async () => {
       data.append("obj[some]", "thing");
       const response = await fetch(
         `http://localhost:${port}/v1/avatar/upload`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": `${mimeMultipart}; boundary=${data.getBoundary()}`,
-          },
-          body: data.getBuffer().toString("utf8"),
-        },
+        { method: "POST", body: data },
       );
       const json = await response.json();
-      expect(json).toMatchSnapshot();
+      expect(json).toEqual({
+        data: {
+          hash: "f39beeff92379dc935586d726211c2620be6f879",
+          mime:
+            process.versions.node === "18.0.0"
+              ? "application/octet-stream" // Node 18.0.0 FormData bug // @todo remove it when dropped
+              : "image/svg+xml",
+          name: "logo.svg",
+          otherInputs: {
+            arr: ["456", "789"],
+            num: "123",
+            obj: {
+              some: "thing",
+            },
+            str: "test string value",
+          },
+          size: 48687,
+        },
+        status: "success",
+      });
     });
 
     test.each([readFileSync("logo.svg"), createReadStream("logo.svg")])(
@@ -381,16 +396,14 @@ describe("Example", async () => {
       const filename = "dataflow.svg";
       const logo = await readFile(filename, "utf-8");
       const data = new FormData();
-      data.append("avatar", logo, { filename });
+      data.append(
+        "avatar",
+        new Blob([logo], { type: "image/svg+xml" }),
+        filename,
+      );
       const response = await fetch(
         `http://localhost:${port}/v1/avatar/upload`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": `${mimeMultipart}; boundary=${data.getBoundary()}`,
-          },
-          body: data.getBuffer().toString("utf8"),
-        },
+        { method: "POST", body: data },
       );
       expect(response.status).toBe(413);
       const json = await response.json();
