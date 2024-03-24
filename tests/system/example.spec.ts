@@ -196,7 +196,7 @@ describe("Example", async () => {
       const data = new FormData();
       data.append(
         "avatar",
-        new Blob([logo], { type: "image/svg+xml" }),
+        new Blob([logo], { type: "image/svg+xml" }), // FormData mime is buggy in Node 18.0.0
         filename,
       );
       data.append("str", "test string value");
@@ -209,7 +209,26 @@ describe("Example", async () => {
         { method: "POST", body: data },
       );
       const json = await response.json();
-      expect(json).toMatchSnapshot();
+      expect(json).toEqual({
+        data: {
+          hash: "f39beeff92379dc935586d726211c2620be6f879",
+          mime:
+            process.versions.node === "18.0.0"
+              ? "application/octet-stream" // Node 18.0.0 FormData bug // @todo remove it when dropped
+              : "image/svg+xml",
+          name: "logo.svg",
+          otherInputs: {
+            arr: ["456", "789"],
+            num: "123",
+            obj: {
+              some: "thing",
+            },
+            str: "test string value",
+          },
+          size: 48687,
+        },
+        status: "success",
+      });
     });
 
     test.each([readFileSync("logo.svg"), createReadStream("logo.svg")])(
