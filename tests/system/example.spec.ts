@@ -6,10 +6,8 @@ import {
   Implementation,
   jsonEndpoints,
 } from "../../example/example.client";
-import { mimeMultipart } from "../../src/mime";
 import { givePort, waitFor } from "../helpers";
 import { createHash } from "node:crypto";
-import FormData from "form-data";
 import { readFile } from "node:fs/promises";
 import { afterAll, afterEach, describe, expect, test } from "vitest";
 
@@ -194,9 +192,13 @@ describe("Example", async () => {
 
     test("Should upload the file", async () => {
       const filename = "logo.svg";
-      const logo = await readFile(filename, "utf-8");
+      const logo = await readFile(filename);
       const data = new FormData();
-      data.append("avatar", logo, { filename });
+      data.append(
+        "avatar",
+        new Blob([logo], { type: "image/svg+xml" }),
+        filename,
+      );
       data.append("str", "test string value");
       data.append("num", 123);
       data.append("arr[0]", 456);
@@ -204,13 +206,7 @@ describe("Example", async () => {
       data.append("obj[some]", "thing");
       const response = await fetch(
         `http://localhost:${port}/v1/avatar/upload`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": `${mimeMultipart}; boundary=${data.getBoundary()}`,
-          },
-          body: data.getBuffer().toString("utf8"),
-        },
+        { method: "POST", body: data },
       );
       const json = await response.json();
       expect(json).toMatchSnapshot();
@@ -381,16 +377,14 @@ describe("Example", async () => {
       const filename = "dataflow.svg";
       const logo = await readFile(filename, "utf-8");
       const data = new FormData();
-      data.append("avatar", logo, { filename });
+      data.append(
+        "avatar",
+        new Blob([logo], { type: "image/svg+xml" }),
+        filename,
+      );
       const response = await fetch(
         `http://localhost:${port}/v1/avatar/upload`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": `${mimeMultipart}; boundary=${data.getBoundary()}`,
-          },
-          body: data.getBuffer().toString("utf8"),
-        },
+        { method: "POST", body: data },
       );
       expect(response.status).toBe(413);
       const json = await response.json();
