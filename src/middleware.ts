@@ -29,7 +29,9 @@ interface MiddlewareCreationProps<
   SCO extends string,
 > {
   input: IN;
-  security?: LogicalContainer<Security<keyof z.input<IN> & string, SCO>>;
+  security?: LogicalContainer<
+    Security<Extract<keyof z.input<IN>, string>, SCO>
+  >;
   middleware: Middleware<z.output<IN>, OPT, OUT>;
 }
 
