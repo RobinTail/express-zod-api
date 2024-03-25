@@ -437,11 +437,11 @@ export const depictString: Depicter<z.ZodString> = ({
   },
 }) => {
   const regexCheck = checks.find(
-    (check): check is z.ZodStringCheck & { kind: "regex" } =>
+    (check): check is Extract<z.ZodStringCheck, { kind: "regex" }> =>
       check.kind === "regex",
   );
   const datetimeCheck = checks.find(
-    (check): check is z.ZodStringCheck & { kind: "datetime" } =>
+    (check): check is Extract<z.ZodStringCheck, { kind: "datetime" }> =>
       check.kind === "datetime",
   );
   const regex = regexCheck
@@ -879,7 +879,7 @@ export const depictResponse = ({
 };
 
 type SecurityHelper<K extends Security["type"]> = (
-  security: Security & { type: K },
+  security: Extract<Security, { type: K }>,
   inputSources?: InputSource[],
 ) => SecuritySchemeObject;
 
