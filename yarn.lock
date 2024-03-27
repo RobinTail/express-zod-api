@@ -572,9 +572,9 @@
   integrity sha512-t09vSN3MdfsyCHoFcTRCH/iUtG7OJ0CsjzB8cjAmKc/va/kIgeDI/TxsigdncE/4be734m0cvIYwNaV4i2XqAw==
 
 "@tsconfig/node18@^18.2.1":
-  version "18.2.3"
-  resolved "https://registry.yarnpkg.com/@tsconfig/node18/-/node18-18.2.3.tgz#8c1b254f58335fe4dfe83e86238360e55cc473e7"
-  integrity sha512-5GKTU9bfn4L37G9IdK8wcHfvyMijzw1uKNCd2Rs75V7fZK/l2OjGJ8Aa2myqNnESjekm/udpCnFH9qR9yPCtmw==
+  version "18.2.4"
+  resolved "https://registry.yarnpkg.com/@tsconfig/node18/-/node18-18.2.4.tgz#094efbdd70f697d37c09f34067bf41bc4a828ae3"
+  integrity sha512-5xxU8vVs9/FNcvm3gE07fPbn9tl6tqGGWA9tSlwsUEkBxtRnTsNmwrV8gasZ9F/EobaSv9+nu8AxUKccw77JpQ==
 
 "@tsd/typescript@~5.3.3":
   version "5.3.3"
