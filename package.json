@@ -27,10 +27,10 @@
     "build:license": "tsx tools/license.ts",
     "build:logo": "tsx tools/startup-logo.ts",
     "test": "yarn test:types && yarn test:unit && yarn test:badge",
-    "test:cjs": "yarn --cwd tests/cjs && vitest run -r tests/cjs",
-    "test:esm": "yarn --cwd tests/esm && vitest run -r tests/esm",
-    "test:952": "yarn --cwd tests/issue952 && yarn --cwd tests/issue952 test",
-    "test:compat": "yarn --cwd tests/compat && yarn --cwd tests/compat test",
+    "test:cjs": "yarn --cwd tests/cjs --ignore-engines && vitest run -r tests/cjs",
+    "test:esm": "yarn --cwd tests/esm --ignore-engines && vitest run -r tests/esm",
+    "test:952": "yarn --cwd tests/issue952 --ignore-engines && yarn --cwd tests/issue952 test",
+    "test:compat": "yarn --cwd tests/compat --ignore-engines && yarn --cwd tests/compat test",
     "test:u": "yarn test:unit -u && yarn test:badge",
     "test:types": "tsc --noEmit",
     "test:unit": "vitest run --coverage tests/unit tests/system",
@@ -65,7 +65,7 @@
     "*.md"
   ],
   "engines": {
-    "node": "^18.0.0 || ^20.0.0"
+    "node": "^18.0.0 || ^20.0.0 || ^22.0.0-nightly20240313"
   },
   "dependencies": {
     "openapi3-ts": "^4.2.1",

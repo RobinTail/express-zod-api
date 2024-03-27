@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [18.0.0, 18.6.0, 18.12.0, 18.x, 20.0.0, 20.1.0, 20.x]
+        node-version: [18.0.0, 18.6.0, 18.12.0, 18.x, 20.0.0, 20.1.0, 20.x, 22-nightly] # todo: use 22.x when released
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
     steps:
     - name: Get yarn cache dir
@@ -36,10 +36,11 @@ jobs:
         key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ matrix.node-version }}-${{ hashFiles('**/yarn.lock') }}
     - name: Install dependencies
       # todo use regular "yarn install" when min Node version increased to 18.18
+      # todo remove ignore from the first install when 22.x released
       # @typescript/eslint group compatibility issue fixed by ignoring engines for dev dependencies only:
       run: |
         npm pkg delete devDependencies
-        yarn install
+        yarn install --ignore-engines
         git checkout -- .
         yarn install --ignore-engines
     - name: Lint
