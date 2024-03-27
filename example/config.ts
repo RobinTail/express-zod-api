@@ -35,7 +35,7 @@ export const config = createConfig({
   },
 });
 
-// Uncomment these lines to set the type of logger used:
+// Uncomment these lines when using a custom logger, for example winston:
 /*
 declare module "express-zod-api" {
   interface LoggerOverrides extends winston.Logger {}

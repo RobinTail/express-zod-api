@@ -4,8 +4,7 @@ import {
   createUploadFailueHandler,
 } from "../../src/server-helpers";
 import { describe, expect, test, vi } from "vitest";
-import winston from "winston";
-import { defaultResultHandler } from "../../src";
+import { createLogger, defaultResultHandler } from "../../src";
 import { Request, Response } from "express";
 import assert from "node:assert/strict";
 import { makeRequestMock, makeResponseMock } from "../../src/testing";
@@ -14,7 +13,7 @@ import createHttpError from "http-errors";
 describe("Server helpers", () => {
   describe("createParserFailureHandler()", () => {
     test("the handler should call next if there is no error", () => {
-      const rootLogger = winston.createLogger({ silent: true });
+      const rootLogger = createLogger({ level: "silent" });
       const handler = createParserFailureHandler({
         errorHandler: defaultResultHandler,
         rootLogger,
@@ -34,7 +33,7 @@ describe("Server helpers", () => {
       const errorHandler = { ...defaultResultHandler, handler: vi.fn() };
       const handler = createParserFailureHandler({
         errorHandler,
-        rootLogger: winston.createLogger({ silent: true }),
+        rootLogger: createLogger({ level: "silent" }),
         getChildLogger: ({ parent }) => ({ ...parent, isChild: true }),
       });
       await handler(
@@ -62,7 +61,7 @@ describe("Server helpers", () => {
       };
       const handler = createNotFoundHandler({
         errorHandler,
-        rootLogger: winston.createLogger({ silent: true }),
+        rootLogger: createLogger({ level: "silent" }),
         getChildLogger: async ({ parent }) => ({ ...parent, isChild: true }),
       });
       const next = vi.fn();
@@ -102,7 +101,7 @@ describe("Server helpers", () => {
     });
 
     test("should call Last Resort Handler in case of ResultHandler is faulty", () => {
-      const rootLogger = winston.createLogger({ silent: true });
+      const rootLogger = createLogger({ level: "silent" });
       const errorHandler = {
         ...defaultResultHandler,
         handler: vi.fn().mockImplementation(() => assert.fail("I am faulty")),

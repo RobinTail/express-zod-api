@@ -3,7 +3,7 @@ import { IRouter, Request, RequestHandler } from "express";
 import type fileUpload from "express-fileupload";
 import { ServerOptions } from "node:https";
 import { AbstractEndpoint } from "./endpoint";
-import { AbstractLogger, SimplifiedWinstonConfig } from "./logger";
+import { AbstractLogger, BuiltinLoggerConfig } from "./logger";
 import { Method } from "./method";
 import { AnyResultHandlerDefinition } from "./result-handler";
 import { ListenOptions } from "node:net";
@@ -47,10 +47,10 @@ export interface CommonConfig<TAG extends string = string> {
    */
   errorHandler?: AnyResultHandlerDefinition;
   /**
-   * @desc Logger configuration (winston) or instance of any other logger.
+   * @desc Built-in logger configuration or an instance of any compatible logger.
    * @example { level: "debug", color: true }
    * */
-  logger: SimplifiedWinstonConfig | AbstractLogger;
+  logger: BuiltinLoggerConfig | AbstractLogger;
   /**
    * @desc A child logger returned by this function can override the logger in all handlers for each request
    * @example ({ parent }) => parent.child({ requestId: uuid() })
