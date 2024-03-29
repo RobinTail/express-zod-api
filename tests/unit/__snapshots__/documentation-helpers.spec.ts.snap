@@ -103,9 +103,7 @@ exports[`Documentation helpers > depictDiscriminatedUnion() > should wrap next d
           "format": "any",
         },
         "status": {
-          "enum": [
-            "success",
-          ],
+          "const": "success",
           "type": "string",
         },
       },
@@ -128,9 +126,7 @@ exports[`Documentation helpers > depictDiscriminatedUnion() > should wrap next d
           "type": "object",
         },
         "status": {
-          "enum": [
-            "error",
-          ],
+          "const": "error",
           "type": "string",
         },
       },
@@ -317,9 +313,7 @@ exports[`Documentation helpers > depictIntersection() > should fall back to allO
       "type": "number",
     },
     {
-      "enum": [
-        5,
-      ],
+      "const": 5,
       "type": "number",
     },
   ],
@@ -392,9 +386,7 @@ exports[`Documentation helpers > depictIntersection() > should maintain uniquene
 {
   "properties": {
     "test": {
-      "enum": [
-        5,
-      ],
+      "const": 5,
       "format": "double",
       "maximum": 1.7976931348623157e+308,
       "minimum": -1.7976931348623157e+308,
@@ -495,11 +487,9 @@ exports[`Documentation helpers > depictLazy > should handle circular references 
 }
 `;
 
-exports[`Documentation helpers > depictLiteral() > should set type and involve enum property 1`] = `
+exports[`Documentation helpers > depictLiteral() > should set type and involve const property 1`] = `
 {
-  "enum": [
-    "testing",
-  ],
+  "const": "testing",
   "type": "string",
 }
 `;
@@ -1221,9 +1211,7 @@ exports[`Documentation helpers > depictTuple() > should utilize prefixItems 1`] 
       "type": "string",
     },
     {
-      "enum": [
-        "test",
-      ],
+      "const": "test",
       "type": "string",
     },
   ],

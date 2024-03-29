@@ -268,7 +268,7 @@ export const depictLiteral: Depicter<z.ZodLiteral<unknown>> = ({
   schema: { value },
 }) => ({
   type: typeof value as "string" | "number" | "boolean",
-  enum: [value],
+  const: value,
 });
 
 export const depictObject: Depicter<z.ZodObject<z.ZodRawShape>> = ({

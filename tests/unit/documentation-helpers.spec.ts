@@ -455,7 +455,7 @@ describe("Documentation helpers", () => {
   });
 
   describe("depictLiteral()", () => {
-    test("should set type and involve enum property", () => {
+    test("should set type and involve const property", () => {
       expect(
         depictLiteral({
           schema: z.literal("testing"),
