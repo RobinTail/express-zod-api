@@ -1201,8 +1201,35 @@ exports[`Documentation helpers > depictTags() > should accept plain descriptions
 ]
 `;
 
-exports[`Documentation helpers > depictTuple() > should utilize prefixItems 1`] = `
+exports[`Documentation helpers > depictTuple() > should depict empty tuples as is 1`] = `
 {
+  "items": {
+    "not": {},
+  },
+  "prefixItems": [],
+  "type": "array",
+}
+`;
+
+exports[`Documentation helpers > depictTuple() > should depict rest as items when defined 1`] = `
+{
+  "items": {
+    "type": "string",
+  },
+  "prefixItems": [
+    {
+      "type": "boolean",
+    },
+  ],
+  "type": "array",
+}
+`;
+
+exports[`Documentation helpers > depictTuple() > should utilize prefixItems and set items:not:{} 1`] = `
+{
+  "items": {
+    "not": {},
+  },
   "prefixItems": [
     {
       "type": "boolean",
