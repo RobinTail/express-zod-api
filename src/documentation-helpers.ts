@@ -414,11 +414,22 @@ export const depictArray: Depicter<z.ZodArray<z.ZodTypeAny>> = ({
   return result;
 };
 
-/** @since OAS 3.1 using prefixItems for depicting tuples */
-export const depictTuple: Depicter<z.ZodTuple> = ({
-  schema: { items },
+/**
+ * @since OAS 3.1 using prefixItems for depicting tuples
+ * @since 17.5.0 added rest handling, fixed tuple type
+ * */
+export const depictTuple: Depicter<z.AnyZodTuple> = ({
+  schema: {
+    items,
+    _def: { rest },
+  },
   next,
-}) => ({ type: "array", prefixItems: items.map(next) });
+}) => ({
+  type: "array",
+  prefixItems: items.map(next),
+  // does not appear to support items:false, so not:{} is a recommended alias
+  items: rest === null ? { not: {} } : next(rest),
+});
 
 export const depictString: Depicter<z.ZodString> = ({
   schema: {
