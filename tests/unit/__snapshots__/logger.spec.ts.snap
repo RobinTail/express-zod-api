@@ -19,7 +19,7 @@ exports[`Logger > createLogger() > Should create debug logger 1 1`] = `
 exports[`Logger > createLogger() > Should create debug logger 2 1`] = `
 [
   [
-    "2022-01-01T00:00:00.000Z [33mwarn[39m: testing debug message { withColorful: [32m'output'[39m }",
+    "2022-01-01T00:00:00.000Z [38;2;255;165;0mwarn[39m: testing debug message { withColorful: [32m'output'[39m }",
   ],
 ]
 `;
