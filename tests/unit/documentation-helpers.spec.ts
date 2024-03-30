@@ -579,10 +579,28 @@ describe("Documentation helpers", () => {
   });
 
   describe("depictTuple()", () => {
-    test("should utilize prefixItems", () => {
+    test("should utilize prefixItems and set items:not:{}", () => {
       expect(
         depictTuple({
           schema: z.tuple([z.boolean(), z.string(), z.literal("test")]),
+          ...requestCtx,
+          next: makeNext(requestCtx),
+        }),
+      ).toMatchSnapshot();
+    });
+    test("should depict rest as items when defined", () => {
+      expect(
+        depictTuple({
+          schema: z.tuple([z.boolean()]).rest(z.string()),
+          ...requestCtx,
+          next: makeNext(requestCtx),
+        }),
+      ).toMatchSnapshot();
+    });
+    test("should depict empty tuples as is", () => {
+      expect(
+        depictTuple({
+          schema: z.tuple([]),
           ...requestCtx,
           next: makeNext(requestCtx),
         }),

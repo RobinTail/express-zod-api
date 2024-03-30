@@ -3317,6 +3317,8 @@ paths:
                   type: array
                   prefixItems:
                     - type: boolean
+                  items:
+                    not: {}
                 ofStrings:
                   type: array
                   prefixItems:
@@ -3324,6 +3326,8 @@ paths:
                     - type:
                         - string
                         - "null"
+                  items:
+                    not: {}
                 complex:
                   type: array
                   prefixItems:
@@ -3333,6 +3337,8 @@ paths:
                       format: int64
                       exclusiveMinimum: 0
                       maximum: 9007199254740991
+                  items:
+                    not: {}
               required:
                 - ofOne
                 - ofStrings
@@ -3355,6 +3361,8 @@ paths:
                       empty:
                         type: array
                         prefixItems: []
+                        items:
+                          not: {}
                     required:
                       - empty
                 required:
