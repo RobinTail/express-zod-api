@@ -16,12 +16,11 @@ import {
 import { getStartupLogo } from "./startup-logo";
 
 const makeCommonEntities = async (config: CommonConfig) => {
-  const chalk = (await import("chalk")).default; // chalk v5 is ESM only
   if (config.startupLogo !== false) {
-    console.log(getStartupLogo(chalk));
+    console.log(getStartupLogo());
   }
   const rootLogger: AbstractLogger = isBuiltinLoggerConfig(config.logger)
-    ? createLogger({ chalk, ...config.logger })
+    ? createLogger(config.logger)
     : config.logger;
   const errorHandler = config.errorHandler || defaultResultHandler;
   const { childLoggerProvider: getChildLogger } = config;
