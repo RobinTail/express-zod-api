@@ -23,6 +23,39 @@
 
 ## Version 17
 
+### v17.5.0
+
+- Depicting the `.rest()` part of `z.tuple()` in the generated `Documentation`:
+  - when `.rest()` is not used, additional `items` are not allowed;
+  - when `.rest()` is used, additional `items` assigned with the corresponding type.
+
+```yaml
+noRest: # z.tuple([z.boolean(), z.string()])
+  before:
+    type: array
+    prefixItems:
+      - type: boolean
+      - type: string
+  after:
+    type: array
+    prefixItems:
+      - type: boolean
+      - type: string
+    items: # added
+      not: {} # alias for false, which is not supported
+withRest: # z.tuple([z.boolean()]).rest(z.string())
+  before:
+    type: array
+    prefixItems:
+      - type: boolean
+  after:
+    type: array
+    prefixItems:
+      - type: boolean
+    items: # added
+      type: string
+```
+
 ### v17.4.1
 
 - Technical update: no features, no fixes.
