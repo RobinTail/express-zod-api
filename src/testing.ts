@@ -134,8 +134,8 @@ export const testEndpoint = async <
         { moduleName: "@jest/globals", moduleExport: "jest" },
       ])
     ).fn;
-  const requestMock = makeRequestMock({ fnMethod: fnMethod, requestProps });
-  const responseMock = makeResponseMock({ fnMethod: fnMethod, responseProps });
+  const requestMock = makeRequestMock({ fnMethod, requestProps });
+  const responseMock = makeResponseMock({ fnMethod, responseProps });
   const loggerMock = makeLoggerMock({ fnMethod, loggerProps });
   const configMock = {
     cors: false,
