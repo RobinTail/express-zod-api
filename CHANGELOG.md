@@ -11,7 +11,7 @@
 # z.literal("success")
 before:
   type: string
-  enum:
+  enum: # replaced
     - success
 after:
   type: string
@@ -21,7 +21,7 @@ after:
 ```yaml
 # z.literal(null)
 before:
-  type: object
+  type: object # fixed
   enum:
     - null
 after:
