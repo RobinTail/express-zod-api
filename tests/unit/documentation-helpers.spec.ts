@@ -455,7 +455,7 @@ describe("Documentation helpers", () => {
   });
 
   describe("depictLiteral()", () => {
-    test.each(["testng", null, BigInt(123)])(
+    test.each(["testng", null, BigInt(123), Symbol("test")])(
       "should set type and involve const property %#",
       (value) => {
         expect(
