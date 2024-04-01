@@ -25,7 +25,7 @@ before:
   enum:
     - null
 after:
-  type: null
+  type: "null"
   const: null
 ```
 
