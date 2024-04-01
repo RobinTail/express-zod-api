@@ -2,6 +2,10 @@
 
 ## Version 17
 
+### v17.6.1
+
+- Add missing `z.tuple().rest()` type to the generated client (Integration) when present.
+
 ### v17.6.0
 
 - Using `const` property for depicting `z.literal()` in the generated documentation;
