@@ -29,8 +29,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - success
+                    const: success
                   data:
                     type: object
                     properties:
@@ -69,8 +68,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - error
+                    const: error
                   error:
                     type: object
                     properties:
@@ -147,8 +145,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - success
+                    const: success
                   data:
                     type: object
                     properties:
@@ -185,8 +182,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - error
+                    const: error
                   error:
                     type: object
                     properties:
@@ -230,8 +226,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - created
+                    const: created
                   data:
                     type: object
                     properties:
@@ -254,8 +249,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - created
+                    const: created
                   data:
                     type: object
                     properties:
@@ -278,8 +272,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - error
+                    const: error
                   reason:
                     type: string
                 required:
@@ -294,8 +287,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - exists
+                    const: exists
                   id:
                     type: integer
                     format: int64
@@ -313,8 +305,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - error
+                    const: error
                   reason:
                     type: string
                 required:
@@ -440,8 +431,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - success
+                    const: success
                   data:
                     type: object
                     properties:
@@ -478,8 +468,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - error
+                    const: error
                   error:
                     type: object
                     properties:
@@ -518,8 +507,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - success
+                    const: success
                   data:
                     type: object
                     properties:
@@ -542,8 +530,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - error
+                    const: error
                   error:
                     type: object
                     properties:
