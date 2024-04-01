@@ -259,6 +259,10 @@ export const depictNullable: Depicter<z.ZodNullable<z.ZodTypeAny>> = ({
   return nested;
 };
 
+/**
+ * @todo use similar bigint handling when the following fix released:
+ * @link https://github.com/ramda/types/pull/116/files
+ * */
 const getSupportedType = (value: unknown): SchemaObjectType | undefined => {
   const detected = toLower(type(value)); // toLower is typed well unlike .toLowerCase()
   const isUnsupported =
@@ -269,7 +273,11 @@ const getSupportedType = (value: unknown): SchemaObjectType | undefined => {
     detected === "regexp" ||
     detected === "asyncfunction" ||
     detected === "error";
-  return isUnsupported ? undefined : detected;
+  return typeof value === "bigint"
+    ? "integer"
+    : isUnsupported
+      ? undefined
+      : detected;
 };
 
 export const depictEnum: Depicter<

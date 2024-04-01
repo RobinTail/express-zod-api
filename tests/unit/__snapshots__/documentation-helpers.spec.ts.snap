@@ -487,10 +487,24 @@ exports[`Documentation helpers > depictLazy > should handle circular references 
 }
 `;
 
-exports[`Documentation helpers > depictLiteral() > should set type and involve const property 1`] = `
+exports[`Documentation helpers > depictLiteral() > should set type and involve const property 0 1`] = `
 {
-  "const": "testing",
+  "const": "testng",
   "type": "string",
+}
+`;
+
+exports[`Documentation helpers > depictLiteral() > should set type and involve const property 1 1`] = `
+{
+  "const": null,
+  "type": "null",
+}
+`;
+
+exports[`Documentation helpers > depictLiteral() > should set type and involve const property 2 1`] = `
+{
+  "const": 123n,
+  "type": "integer",
 }
 `;
 

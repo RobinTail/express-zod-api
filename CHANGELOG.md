@@ -2,6 +2,33 @@
 
 ## Version 17
 
+### v17.6.0
+
+- Using `const` property for depicting `z.literal()` in the generated documentation;
+- Fixed possibly invalid values of `type` property when depicting `z.literal()`, `z.enum()` and `z.nativeEnum()`.
+
+```yaml
+# z.literal("success")
+before:
+  type: string
+  enum:
+    - success
+after:
+  type: string
+  const: success
+```
+
+```yaml
+# z.literal(null)
+before:
+  type: object
+  enum:
+    - null
+after:
+  type: null
+  const: null
+```
+
 ### v17.5.0
 
 - Depicting the `.rest()` part of `z.tuple()` in the generated `Documentation`:
