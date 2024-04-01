@@ -18,6 +18,7 @@ import {
   both,
   complement,
   concat,
+  type as detectType,
   filter,
   fromPairs,
   has,
@@ -33,7 +34,6 @@ import {
   range,
   reject,
   toLower,
-  type,
   union,
   when,
   xprod,
@@ -264,7 +264,7 @@ export const depictNullable: Depicter<z.ZodNullable<z.ZodTypeAny>> = ({
  * @link https://github.com/ramda/types/pull/116/files
  * */
 const getSupportedType = (value: unknown): SchemaObjectType | undefined => {
-  const detected = toLower(type(value)); // toLower is typed well unlike .toLowerCase()
+  const detected = toLower(detectType(value)); // toLower is typed well unlike .toLowerCase()
   const isUnsupported =
     detected === "symbol" ||
     detected === "undefined" ||
