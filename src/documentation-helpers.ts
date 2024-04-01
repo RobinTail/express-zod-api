@@ -32,6 +32,8 @@ import {
   pluck,
   range,
   reject,
+  toLower,
+  type,
   union,
   when,
   xprod,
@@ -257,17 +259,30 @@ export const depictNullable: Depicter<z.ZodNullable<z.ZodTypeAny>> = ({
   return nested;
 };
 
+const getSupportedType = (value: unknown): SchemaObjectType | undefined => {
+  const detected = toLower(type(value)); // toLower is typed well unlike .toLowerCase()
+  const isUnsupported =
+    detected === "symbol" ||
+    detected === "undefined" ||
+    detected === "function" ||
+    detected === "date" ||
+    detected === "regexp" ||
+    detected === "asyncfunction" ||
+    detected === "error";
+  return isUnsupported ? undefined : detected;
+};
+
 export const depictEnum: Depicter<
   z.ZodEnum<[string, ...string[]]> | z.ZodNativeEnum<any> // keeping "any" for ZodNativeEnum as compatibility fix
 > = ({ schema }) => ({
-  type: typeof Object.values(schema.enum)[0] as "string" | "number",
+  type: getSupportedType(Object.values(schema.enum)[0]),
   enum: Object.values(schema.enum),
 });
 
 export const depictLiteral: Depicter<z.ZodLiteral<unknown>> = ({
   schema: { value },
 }) => ({
-  type: typeof value as "string" | "number" | "boolean",
+  type: getSupportedType(value),
   const: value,
 });
 
@@ -539,10 +554,10 @@ export const depictObjectProperties = ({
 }: Parameters<Depicter<z.ZodObject<z.ZodRawShape>>>[0]) => map(next, shape);
 
 const makeSample = (depicted: SchemaObject) => {
-  const type = (
+  const firstType = (
     Array.isArray(depicted.type) ? depicted.type[0] : depicted.type
   ) as keyof typeof samples;
-  return samples?.[type];
+  return samples?.[firstType];
 };
 
 const makeNullableType = (prev: SchemaObject): SchemaObjectType[] => {
