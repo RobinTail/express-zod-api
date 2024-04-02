@@ -137,6 +137,7 @@ describe("zod-to-ts", () => {
         z.number(),
         z.object({ string: z.string() }),
       ]),
+      tupleRest: z.tuple([z.string(), z.number()]).rest(z.boolean()),
       record: z.record(
         z.object({
           object: z.object({

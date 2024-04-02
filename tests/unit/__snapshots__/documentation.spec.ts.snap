@@ -21,8 +21,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - success
+                    const: success
                   data:
                     type: object
                 required:
@@ -37,8 +36,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - error
+                    const: error
                   error:
                     type: object
                     properties:
@@ -92,8 +90,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - success
+                    const: success
                   data:
                     type: object
                 required:
@@ -108,8 +105,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - error
+                    const: error
                   error:
                     type: object
                     properties:
@@ -146,8 +142,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - success
+                    const: success
                   data:
                     type: object
                 required:
@@ -162,8 +157,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - error
+                    const: error
                   error:
                     type: object
                     properties:
@@ -217,8 +211,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - success
+                    const: success
                   data:
                     type: object
                 required:
@@ -233,8 +226,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - error
+                    const: error
                   error:
                     type: object
                     properties:
@@ -266,8 +258,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - success
+                    const: success
                   data:
                     type: object
                 required:
@@ -282,8 +273,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - error
+                    const: error
                   error:
                     type: object
                     properties:
@@ -351,8 +341,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - success
+                    const: success
                   data:
                     type: object
                     properties:
@@ -375,8 +364,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - error
+                    const: error
                   error:
                     type: object
                     properties:
@@ -416,8 +404,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - success
+                    const: success
                   data:
                     type: object
                 required:
@@ -432,8 +419,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - error
+                    const: error
                   error:
                     type: object
                     properties:
@@ -471,8 +457,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - success
+                    const: success
                   data:
                     type: object
                 required:
@@ -487,8 +472,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - error
+                    const: error
                   error:
                     type: object
                     properties:
@@ -559,8 +543,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - success
+                    const: success
                   data:
                     type: object
                     properties:
@@ -583,8 +566,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - error
+                    const: error
                   error:
                     type: object
                     properties:
@@ -664,15 +646,13 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - success
+                    const: success
                   data:
                     type: object
                     properties:
                       literal:
                         type: string
-                        enum:
-                          - something
+                        const: something
                       transformation:
                         type: number
                         format: double
@@ -693,8 +673,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - error
+                    const: error
                   error:
                     type: object
                     properties:
@@ -748,8 +727,7 @@ paths:
                   properties:
                     type:
                       type: string
-                      enum:
-                        - a
+                      const: a
                     a:
                       type: string
                   required:
@@ -759,8 +737,7 @@ paths:
                   properties:
                     type:
                       type: string
-                      enum:
-                        - b
+                      const: b
                     b:
                       type: string
                   required:
@@ -776,8 +753,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - success
+                    const: success
                   data:
                     discriminator:
                       propertyName: status
@@ -786,8 +762,7 @@ paths:
                         properties:
                           status:
                             type: string
-                            enum:
-                              - success
+                            const: success
                           data:
                             format: any
                         required:
@@ -796,8 +771,7 @@ paths:
                         properties:
                           status:
                             type: string
-                            enum:
-                              - error
+                            const: error
                           error:
                             type: object
                             properties:
@@ -820,8 +794,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - error
+                    const: error
                   error:
                     type: object
                     properties:
@@ -892,8 +865,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - success
+                    const: success
                   data:
                     type: object
                     properties:
@@ -924,8 +896,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - error
+                    const: error
                   error:
                     type: object
                     properties:
@@ -1011,8 +982,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - success
+                    const: success
                   data:
                     type: object
                     properties:
@@ -1034,8 +1004,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - error
+                    const: error
                   error:
                     type: object
                     properties:
@@ -1122,8 +1091,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - success
+                    const: success
                   data:
                     type: object
                     properties:
@@ -1148,8 +1116,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - error
+                    const: error
                   error:
                     type: object
                     properties:
@@ -1214,8 +1181,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - success
+                    const: success
                   data:
                     type: object
                     properties:
@@ -1254,8 +1220,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - error
+                    const: error
                   error:
                     type: object
                     properties:
@@ -1332,8 +1297,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - success
+                    const: success
                   data:
                     type: object
                     properties:
@@ -1370,8 +1334,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - error
+                    const: error
                   error:
                     type: object
                     properties:
@@ -1415,8 +1378,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - created
+                    const: created
                   data:
                     type: object
                     properties:
@@ -1439,8 +1401,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - created
+                    const: created
                   data:
                     type: object
                     properties:
@@ -1463,8 +1424,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - error
+                    const: error
                   reason:
                     type: string
                 required:
@@ -1479,8 +1439,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - exists
+                    const: exists
                   id:
                     type: integer
                     format: int64
@@ -1498,8 +1457,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - error
+                    const: error
                   reason:
                     type: string
                 required:
@@ -1625,8 +1583,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - success
+                    const: success
                   data:
                     type: object
                     properties:
@@ -1663,8 +1620,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - error
+                    const: error
                   error:
                     type: object
                     properties:
@@ -1703,8 +1659,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - success
+                    const: success
                   data:
                     type: object
                     properties:
@@ -1727,8 +1682,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - error
+                    const: error
                   error:
                     type: object
                     properties:
@@ -2092,8 +2046,7 @@ components:
       properties:
         status:
           type: string
-          enum:
-            - success
+          const: success
         data:
           type: object
           properties:
@@ -2128,8 +2081,7 @@ components:
       properties:
         status:
           type: string
-          enum:
-            - error
+          const: error
         error:
           type: object
           properties:
@@ -2147,8 +2099,7 @@ components:
       properties:
         status:
           type: string
-          enum:
-            - success
+          const: success
         data:
           type: object
           properties:
@@ -2174,8 +2125,7 @@ components:
       properties:
         status:
           type: string
-          enum:
-            - error
+          const: error
         error:
           type: object
           properties:
@@ -2211,8 +2161,7 @@ components:
       properties:
         status:
           type: string
-          enum:
-            - created
+          const: created
         data:
           type: object
           properties:
@@ -2231,8 +2180,7 @@ components:
       properties:
         status:
           type: string
-          enum:
-            - created
+          const: created
         data:
           type: object
           properties:
@@ -2251,8 +2199,7 @@ components:
       properties:
         status:
           type: string
-          enum:
-            - exists
+          const: exists
         id:
           type: integer
           format: int64
@@ -2266,8 +2213,7 @@ components:
       properties:
         status:
           type: string
-          enum:
-            - error
+          const: error
         reason:
           type: string
       required:
@@ -2278,8 +2224,7 @@ components:
       properties:
         status:
           type: string
-          enum:
-            - error
+          const: error
         reason:
           type: string
       required:
@@ -2324,8 +2269,7 @@ components:
       properties:
         status:
           type: string
-          enum:
-            - success
+          const: success
         data:
           type: object
           properties:
@@ -2358,8 +2302,7 @@ components:
       properties:
         status:
           type: string
-          enum:
-            - error
+          const: error
         error:
           type: object
           properties:
@@ -2383,8 +2326,7 @@ components:
       properties:
         status:
           type: string
-          enum:
-            - success
+          const: success
         data:
           type: object
           properties:
@@ -2403,8 +2345,7 @@ components:
       properties:
         status:
           type: string
-          enum:
-            - error
+          const: error
         error:
           type: object
           properties:
@@ -2488,8 +2429,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - success
+                    const: success
                   data:
                     type: object
                     properties:
@@ -2517,8 +2457,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - error
+                    const: error
                   error:
                     type: object
                     properties:
@@ -2581,8 +2520,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - success
+                    const: success
                   data:
                     type: object
                     properties:
@@ -2610,8 +2548,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - error
+                    const: error
                   error:
                     type: object
                     properties:
@@ -2675,8 +2612,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - OK
+                    const: OK
                   result:
                     type: object
                 required:
@@ -2692,8 +2628,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - NOT OK
+                    const: NOT OK
                 required:
                   - status
 components:
@@ -2792,8 +2727,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - success
+                    const: success
                   data:
                     type: object
                     properties:
@@ -2814,8 +2748,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - error
+                    const: error
                   error:
                     type: object
                     properties:
@@ -2934,8 +2867,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - success
+                    const: success
                   data:
                     type: object
                     properties:
@@ -2956,8 +2888,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - error
+                    const: error
                   error:
                     type: object
                     properties:
@@ -3023,8 +2954,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - success
+                    const: success
                   data:
                     type: object
                     properties:
@@ -3047,8 +2977,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - error
+                    const: error
                   error:
                     type: object
                     properties:
@@ -3106,8 +3035,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - success
+                    const: success
                   data:
                     type: object
                     properties:
@@ -3172,8 +3100,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - error
+                    const: error
                   error:
                     type: object
                     properties:
@@ -3242,8 +3169,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - success
+                    const: success
                   data:
                     type: object
                     properties:
@@ -3263,8 +3189,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - error
+                    const: error
                   error:
                     type: object
                     properties:
@@ -3353,8 +3278,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - success
+                    const: success
                   data:
                     type: object
                     properties:
@@ -3377,8 +3301,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - error
+                    const: error
                   error:
                     type: object
                     properties:
@@ -3437,8 +3360,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - success
+                    const: success
                   data:
                     type: object
                     properties:
@@ -3456,8 +3378,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - error
+                    const: error
                   error:
                     type: object
                     properties:
@@ -3524,8 +3445,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - success
+                    const: success
                   data:
                     type: object
                     properties:
@@ -3545,8 +3465,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - error
+                    const: error
                   error:
                     type: object
                     properties:
@@ -3612,8 +3531,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - ok
+                    const: ok
                   data:
                     type: object
                     properties:
@@ -3633,8 +3551,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - kinda
+                    const: kinda
                   data:
                     type: object
                     properties:
@@ -3651,16 +3568,14 @@ paths:
             application/json:
               schema:
                 type: string
-                enum:
-                  - error
+                const: error
         "500":
           description: POST /v1/mtpl Negative response 500
           content:
             application/json:
               schema:
                 type: string
-                enum:
-                  - failure
+                const: failure
 components:
   schemas: {}
   responses: {}
@@ -3709,8 +3624,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - success
+                    const: success
                   data:
                     type: object
                 required:
@@ -3725,8 +3639,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - error
+                    const: error
                   error:
                     type: object
                     properties:
@@ -3788,8 +3701,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - success
+                    const: success
                   data:
                     type: object
                     properties:
@@ -3812,8 +3724,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - error
+                    const: error
                   error:
                     type: object
                     properties:
@@ -3856,8 +3767,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - success
+                    const: success
                   data:
                     type: object
                     properties:
@@ -3880,8 +3790,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - error
+                    const: error
                   error:
                     type: object
                     properties:
@@ -3957,8 +3866,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - success
+                    const: success
                   data:
                     oneOf:
                       - type: object
@@ -3991,8 +3899,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - error
+                    const: error
                   error:
                     type: object
                     properties:
@@ -4059,8 +3966,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - success
+                    const: success
                   data:
                     type: object
                     properties:
@@ -4101,8 +4007,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - error
+                    const: error
                   error:
                     type: object
                     properties:
@@ -4182,8 +4087,7 @@ components:
       properties:
         status:
           type: string
-          enum:
-            - success
+          const: success
         data:
           type: object
       required:
@@ -4194,8 +4098,7 @@ components:
       properties:
         status:
           type: string
-          enum:
-            - error
+          const: error
         error:
           type: object
           properties:
@@ -4258,8 +4161,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - success
+                    const: success
                   data:
                     type: object
                     properties:
@@ -4290,8 +4192,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - error
+                    const: error
                   error:
                     type: object
                     properties:
@@ -4353,8 +4254,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - success
+                    const: success
                   data:
                     type: object
                     properties:
@@ -4382,8 +4282,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - error
+                    const: error
                   error:
                     type: object
                     properties:
@@ -4450,8 +4349,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - success
+                    const: success
                   data:
                     type: object
                     properties:
@@ -4479,8 +4377,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - error
+                    const: error
                   error:
                     type: object
                     properties:
@@ -4541,8 +4438,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - success
+                    const: success
                   data:
                     type: object
                     properties:
@@ -4564,8 +4460,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - error
+                    const: error
                   error:
                     type: object
                     properties:
@@ -4625,8 +4520,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - success
+                    const: success
                   data:
                     type: object
                     properties:
@@ -4650,8 +4544,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - error
+                    const: error
                   error:
                     type: object
                     properties:
@@ -4701,11 +4594,9 @@ paths:
           schema:
             oneOf:
               - type: string
-                enum:
-                  - John
+                const: John
               - type: string
-                enum:
-                  - Jane
+                const: Jane
       requestBody:
         description: the body of request
         content:
@@ -4727,8 +4618,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - success
+                    const: success
                   data:
                     type: object
                 required:
@@ -4743,8 +4633,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - error
+                    const: error
                   error:
                     type: object
                     properties:
@@ -4823,18 +4712,15 @@ components:
     ParameterOfPostV1NameName:
       oneOf:
         - type: string
-          enum:
-            - John
+          const: John
         - type: string
-          enum:
-            - Jane
+          const: Jane
     SuperPositiveResponseOfV1Name:
       type: object
       properties:
         status:
           type: string
-          enum:
-            - success
+          const: success
         data:
           type: object
       required:
@@ -4845,8 +4731,7 @@ components:
       properties:
         status:
           type: string
-          enum:
-            - error
+          const: error
         error:
           type: object
           properties:
@@ -4895,11 +4780,9 @@ paths:
           schema:
             oneOf:
               - type: string
-                enum:
-                  - John
+                const: John
               - type: string
-                enum:
-                  - Jane
+                const: Jane
         - name: other
           in: query
           required: true
@@ -4916,8 +4799,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - success
+                    const: success
                   data:
                     type: object
                 required:
@@ -4932,8 +4814,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - error
+                    const: error
                   error:
                     type: object
                     properties:
@@ -4983,11 +4864,9 @@ paths:
           schema:
             oneOf:
               - type: string
-                enum:
-                  - John
+                const: John
               - type: string
-                enum:
-                  - Jane
+                const: Jane
       requestBody:
         description: POST /v1/:name Request body
         content:
@@ -5009,8 +4888,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - success
+                    const: success
                   data:
                     type: object
                 required:
@@ -5025,8 +4903,7 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum:
-                      - error
+                    const: error
                   error:
                     type: object
                     properties:
