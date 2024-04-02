@@ -18,6 +18,7 @@ import {
   both,
   complement,
   concat,
+  type as detectType,
   filter,
   fromPairs,
   has,
@@ -32,6 +33,7 @@ import {
   pluck,
   range,
   reject,
+  toLower,
   union,
   when,
   xprod,
@@ -257,18 +259,34 @@ export const depictNullable: Depicter<z.ZodNullable<z.ZodTypeAny>> = ({
   return nested;
 };
 
+const getSupportedType = (value: unknown): SchemaObjectType | undefined => {
+  const detected = toLower(detectType(value)); // toLower is typed well unlike .toLowerCase()
+  const isSupported =
+    detected === "number" ||
+    detected === "string" ||
+    detected === "boolean" ||
+    detected === "object" ||
+    detected === "null" ||
+    detected === "array";
+  return typeof value === "bigint"
+    ? "integer"
+    : isSupported
+      ? detected
+      : undefined;
+};
+
 export const depictEnum: Depicter<
   z.ZodEnum<[string, ...string[]]> | z.ZodNativeEnum<any> // keeping "any" for ZodNativeEnum as compatibility fix
 > = ({ schema }) => ({
-  type: typeof Object.values(schema.enum)[0] as "string" | "number",
+  type: getSupportedType(Object.values(schema.enum)[0]),
   enum: Object.values(schema.enum),
 });
 
 export const depictLiteral: Depicter<z.ZodLiteral<unknown>> = ({
   schema: { value },
 }) => ({
-  type: typeof value as "string" | "number" | "boolean",
-  enum: [value],
+  type: getSupportedType(value), // constructor allows z.Primitive only, but ZodLiteral does not have that constrant
+  const: value,
 });
 
 export const depictObject: Depicter<z.ZodObject<z.ZodRawShape>> = ({
@@ -539,10 +557,10 @@ export const depictObjectProperties = ({
 }: Parameters<Depicter<z.ZodObject<z.ZodRawShape>>>[0]) => map(next, shape);
 
 const makeSample = (depicted: SchemaObject) => {
-  const type = (
+  const firstType = (
     Array.isArray(depicted.type) ? depicted.type[0] : depicted.type
   ) as keyof typeof samples;
-  return samples?.[type];
+  return samples?.[firstType];
 };
 
 const makeNullableType = (prev: SchemaObject): SchemaObjectType[] => {
