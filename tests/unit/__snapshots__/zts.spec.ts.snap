@@ -37,6 +37,11 @@ exports[`zod-to-ts > Example > should produce the expected results 1`] = `
             string: string;
         }
     ];
+    tupleRest: [
+        string,
+        number,
+        ...boolean
+    ];
     record: Record<string, {
         object: {
             arrayOfUnions: ([
