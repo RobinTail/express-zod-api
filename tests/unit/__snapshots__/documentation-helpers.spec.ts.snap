@@ -103,9 +103,7 @@ exports[`Documentation helpers > depictDiscriminatedUnion() > should wrap next d
           "format": "any",
         },
         "status": {
-          "enum": [
-            "success",
-          ],
+          "const": "success",
           "type": "string",
         },
       },
@@ -128,9 +126,7 @@ exports[`Documentation helpers > depictDiscriminatedUnion() > should wrap next d
           "type": "object",
         },
         "status": {
-          "enum": [
-            "error",
-          ],
+          "const": "error",
           "type": "string",
         },
       },
@@ -317,9 +313,7 @@ exports[`Documentation helpers > depictIntersection() > should fall back to allO
       "type": "number",
     },
     {
-      "enum": [
-        5,
-      ],
+      "const": 5,
       "type": "number",
     },
   ],
@@ -392,9 +386,7 @@ exports[`Documentation helpers > depictIntersection() > should maintain uniquene
 {
   "properties": {
     "test": {
-      "enum": [
-        5,
-      ],
+      "const": 5,
       "format": "double",
       "maximum": 1.7976931348623157e+308,
       "minimum": -1.7976931348623157e+308,
@@ -495,12 +487,31 @@ exports[`Documentation helpers > depictLazy > should handle circular references 
 }
 `;
 
-exports[`Documentation helpers > depictLiteral() > should set type and involve enum property 1`] = `
+exports[`Documentation helpers > depictLiteral() > should set type and involve const property 0 1`] = `
 {
-  "enum": [
-    "testing",
-  ],
+  "const": "testng",
   "type": "string",
+}
+`;
+
+exports[`Documentation helpers > depictLiteral() > should set type and involve const property 1 1`] = `
+{
+  "const": null,
+  "type": "null",
+}
+`;
+
+exports[`Documentation helpers > depictLiteral() > should set type and involve const property 2 1`] = `
+{
+  "const": 123n,
+  "type": "integer",
+}
+`;
+
+exports[`Documentation helpers > depictLiteral() > should set type and involve const property 3 1`] = `
+{
+  "const": Symbol(test),
+  "type": undefined,
 }
 `;
 
@@ -1248,9 +1259,7 @@ exports[`Documentation helpers > depictTuple() > should utilize prefixItems and 
       "type": "string",
     },
     {
-      "enum": [
-        "test",
-      ],
+      "const": "test",
       "type": "string",
     },
   ],
