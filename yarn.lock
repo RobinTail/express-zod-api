@@ -21,9 +21,9 @@
   integrity sha512-Jh15/qVmrLGhkKJBdXlK1+9tY4lZruYjsgkDFj08ZmDiWVBLJcqkok7Z0/R0In+i1rScBpJlSvrTS2Lm41Pbnw==
 
 "@arethetypeswrong/cli@^0.15.0":
-  version "0.15.2"
-  resolved "https://registry.yarnpkg.com/@arethetypeswrong/cli/-/cli-0.15.2.tgz#90bba612e257effa57101b917c58e4c114738c3b"
-  integrity sha512-YXKq7PyB+nv3KNCpmo384C+1f6DjCwJqSwxPpnFK/2shKy1Ug9RM8ma2eKlgfklyflNqtg1KJvTF2CxZmT0/ig==
+  version "0.15.3"
+  resolved "https://registry.yarnpkg.com/@arethetypeswrong/cli/-/cli-0.15.3.tgz#76e74f1942ef0cba0899d103589edf7800a0986d"
+  integrity sha512-sIMA9ZJBWDEg1+xt5RkAEflZuf8+PO8SdKj17x6PtETuUho+qlZJg4DgmKc3q+QwQ9zOB5VLK6jVRbFdNLdUIA==
   dependencies:
     "@arethetypeswrong/core" "0.15.1"
     chalk "^4.1.2"
@@ -4826,6 +4826,7 @@ winston@^3.10.0:
     winston-transport "^4.7.0"
 
 "wrap-ansi-cjs@npm:wrap-ansi@^7.0.0", wrap-ansi@^7.0.0:
+  name wrap-ansi-cjs
   version "7.0.0"
   resolved "https://registry.yarnpkg.com/wrap-ansi/-/wrap-ansi-7.0.0.tgz#67e145cff510a6a6984bdf1152911d69d2eb9e43"
   integrity sha512-YVGIj2kamLSTxw6NsZjoBxfSwsn0ycdesmc4p+Q21c5zPuZ1pl+NfxVdxPtdHvmNVOQ6XSYG4AUtyt/Fi7D16Q==
