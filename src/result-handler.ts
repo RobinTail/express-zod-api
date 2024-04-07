@@ -8,11 +8,10 @@ import {
 import {
   FlatObject,
   getExamples,
-  getMessageFromError,
-  getStatusCodeFromError,
   isObject,
   logInternalError,
 } from "./common-helpers";
+import { getMessageFromError, getStatusCodeFromError } from "./error-helpers";
 import { IOSchema } from "./io-schema";
 import { AbstractLogger } from "./logger";
 import { withMeta } from "./metadata";

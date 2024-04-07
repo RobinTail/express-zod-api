@@ -1,0 +1,9 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Error helpers > getMessageFromError() > should compile a string from ZodError 1`] = `"user/id: expected number, got string; user/name: expected string, got number"`;
+
+exports[`Error helpers > getMessageFromError() > should handle empty path in ZodIssue 1`] = `"Top level refinement issue"`;
+
+exports[`Error helpers > getMessageFromError() > should pass message from other error types 1`] = `"something went wrong"`;
+
+exports[`Error helpers > getMessageFromError() > should pass message from other error types 2`] = `"something went wrong"`;
