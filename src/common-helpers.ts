@@ -4,7 +4,6 @@ import { flip, pickBy, xprod } from "ramda";
 import { z } from "zod";
 import { CommonConfig, InputSource, InputSources } from "./config-type";
 import { AbstractLogger } from "./logger";
-import { getMeta } from "./metadata";
 import { AuxMethod, Method } from "./method";
 import { mimeMultipart } from "./mime";
 
@@ -79,42 +78,6 @@ export const logInternalError = ({
       payload: input,
     });
   }
-};
-
-export const getExamples = <
-  T extends z.ZodTypeAny,
-  V extends "original" | "parsed" | undefined,
->({
-  schema,
-  variant = "original",
-  validate = variant === "parsed",
-}: {
-  schema: T;
-  /**
-   * @desc examples variant: original or parsed
-   * @example "parsed" — for the case when possible schema transformations should be applied
-   * @default "original"
-   * @override validate: variant "parsed" activates validation as well
-   * */
-  variant?: V;
-  /**
-   * @desc filters out the examples that do not match the schema
-   * @default variant === "parsed"
-   * */
-  validate?: boolean;
-}): ReadonlyArray<V extends "parsed" ? z.output<T> : z.input<T>> => {
-  const examples = getMeta(schema, "examples") || [];
-  if (!validate && variant === "original") {
-    return examples;
-  }
-  const result: Array<z.input<T> | z.output<T>> = [];
-  for (const example of examples) {
-    const parsedExample = schema.safeParse(example);
-    if (parsedExample.success) {
-      result.push(variant === "parsed" ? parsedExample.data : example);
-    }
-  }
-  return result;
 };
 
 export const combinations = <T>(

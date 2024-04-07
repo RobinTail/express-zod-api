@@ -5,16 +5,11 @@ import {
   ApiResponse,
   defaultStatusCodes,
 } from "./api-response";
-import {
-  FlatObject,
-  getExamples,
-  isObject,
-  logInternalError,
-} from "./common-helpers";
+import { FlatObject, isObject, logInternalError } from "./common-helpers";
 import { getMessageFromError, getStatusCodeFromError } from "./error-helpers";
 import { IOSchema } from "./io-schema";
 import { AbstractLogger } from "./logger";
-import { withMeta } from "./metadata";
+import { getExamples, withMeta } from "./metadata";
 
 interface ResultHandlerParams<RES> {
   /** null in case of failure to parse or to find the matching endpoint (error: not found) */

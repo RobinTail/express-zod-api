@@ -5,7 +5,6 @@ export {
   defaultEndpointsFactory,
   arrayEndpointsFactory,
 } from "./endpoints-factory";
-export { getExamples } from "./common-helpers";
 export { createLogger } from "./logger";
 export { createMiddleware } from "./middleware";
 export {
@@ -53,3 +52,4 @@ export type {
 } from "./security";
 export { getStatusCodeFromError } from "./error-helpers";
 export { getMessageFromError } from "./error-helpers";
+export { getExamples } from "./metadata";

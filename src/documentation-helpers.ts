@@ -43,7 +43,6 @@ import { z } from "zod";
 import {
   FlatObject,
   combinations,
-  getExamples,
   hasCoercion,
   isCustomHeader,
   isObject,
@@ -62,6 +61,7 @@ import {
   andToOr,
   mapLogicalContainer,
 } from "./logical-container";
+import { getExamples } from "./metadata";
 import { Method } from "./method";
 import { RawSchema, ezRawKind } from "./raw-schema";
 import { isoDateRegex } from "./schema-helpers";

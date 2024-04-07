@@ -1,6 +1,6 @@
-import { combinations, isObject } from "./common-helpers";
-import { z } from "zod";
 import { clone, mergeDeepRight } from "ramda";
+import { z } from "zod";
+import { combinations, isObject } from "./common-helpers";
 import { ProprietaryKind } from "./proprietary-schemas";
 
 export interface Metadata<T extends z.ZodTypeAny> {
@@ -83,3 +83,39 @@ export const proprietary = <T extends z.ZodTypeAny>(
 
 export const isProprietary = (schema: z.ZodTypeAny, kind: ProprietaryKind) =>
   getMeta(schema, "kind") === kind;
+
+export const getExamples = <
+  T extends z.ZodTypeAny,
+  V extends "original" | "parsed" | undefined,
+>({
+  schema,
+  variant = "original",
+  validate = variant === "parsed",
+}: {
+  schema: T;
+  /**
+   * @desc examples variant: original or parsed
+   * @example "parsed" — for the case when possible schema transformations should be applied
+   * @default "original"
+   * @override validate: variant "parsed" activates validation as well
+   * */
+  variant?: V;
+  /**
+   * @desc filters out the examples that do not match the schema
+   * @default variant === "parsed"
+   * */
+  validate?: boolean;
+}): ReadonlyArray<V extends "parsed" ? z.output<T> : z.input<T>> => {
+  const examples = getMeta(schema, "examples") || [];
+  if (!validate && variant === "original") {
+    return examples;
+  }
+  const result: Array<z.input<T> | z.output<T>> = [];
+  for (const example of examples) {
+    const parsedExample = schema.safeParse(example);
+    if (parsedExample.success) {
+      result.push(variant === "parsed" ? parsedExample.data : example);
+    }
+  }
+  return result;
+};

@@ -4,14 +4,13 @@ import {
   combinations,
   defaultInputSources,
   getCustomHeaders,
-  getExamples,
   getInput,
   hasCoercion,
   isCustomHeader,
   makeCleanId,
   makeErrorFromAnything,
 } from "../../src/common-helpers";
-import { withMeta } from "../../src";
+import { getExamples, withMeta } from "../../src";
 import { Request } from "express";
 import { z } from "zod";
 import { describe, expect, test } from "vitest";
@@ -167,81 +166,6 @@ describe("Common Helpers", () => {
         ),
       ).toEqual({ a: "body", "x-request-id": "test" });
     });
-  });
-
-  describe("getExamples()", () => {
-    test("should return an empty array in case examples are not set", () => {
-      expect(getExamples({ schema: z.string(), variant: "parsed" })).toEqual(
-        [],
-      );
-      expect(getExamples({ schema: z.string() })).toEqual([]);
-      expect(
-        getExamples({ schema: withMeta(z.string()), variant: "parsed" }),
-      ).toEqual([]);
-      expect(getExamples({ schema: withMeta(z.string()) })).toEqual([]);
-    });
-    test("should return original examples by default", () => {
-      expect(
-        getExamples({
-          schema: withMeta(z.string()).example("some").example("another"),
-        }),
-      ).toEqual(["some", "another"]);
-    });
-    test("should return parsed examples on demand", () => {
-      expect(
-        getExamples({
-          schema: withMeta(z.string().transform((v) => parseInt(v, 10)))
-            .example("123")
-            .example("456"),
-          variant: "parsed",
-        }),
-      ).toEqual([123, 456]);
-    });
-    test("should not filter out invalid examples by default", () => {
-      expect(
-        getExamples({
-          schema: withMeta(z.string())
-            .example("some")
-            .example(123 as unknown as string)
-            .example("another"),
-        }),
-      ).toEqual(["some", 123, "another"]);
-    });
-    test("should filter out invalid examples on demand", () => {
-      expect(
-        getExamples({
-          schema: withMeta(z.string())
-            .example("some")
-            .example(123 as unknown as string)
-            .example("another"),
-          validate: true,
-        }),
-      ).toEqual(["some", "another"]);
-    });
-    test("should filter out invalid examples for the parsed variant", () => {
-      expect(
-        getExamples({
-          schema: withMeta(z.string().transform((v) => parseInt(v, 10)))
-            .example("123")
-            .example(null as unknown as string)
-            .example("456"),
-          variant: "parsed",
-        }),
-      ).toEqual([123, 456]);
-    });
-    test.each([z.array(z.number().int()), z.tuple([z.number(), z.number()])])(
-      "Issue #892: should handle examples of arrays and tuples %#",
-      (schema) => {
-        expect(
-          getExamples({
-            schema: withMeta(schema).example([1, 2]).example([3, 4]),
-          }),
-        ).toEqual([
-          [1, 2],
-          [3, 4],
-        ]);
-      },
-    );
   });
 
   describe("combinations()", () => {

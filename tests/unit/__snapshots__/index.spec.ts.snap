@@ -97,7 +97,6 @@ exports[`Index Entrypoint > exports > should have certain entities exposed 1`] =
   "EndpointsFactory",
   "defaultEndpointsFactory",
   "arrayEndpointsFactory",
-  "getExamples",
   "createLogger",
   "createMiddleware",
   "createResultHandler",
@@ -119,6 +118,7 @@ exports[`Index Entrypoint > exports > should have certain entities exposed 1`] =
   "ez",
   "getStatusCodeFromError",
   "getMessageFromError",
+  "getExamples",
 ]
 `;
 
