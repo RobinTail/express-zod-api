@@ -276,7 +276,7 @@ describe("Server", () => {
   });
 
   describe("attachRouting()", () => {
-    test("should attach routing to the custom express app", async () => {
+    test("should attach routing to the custom express app", () => {
       const app = express();
       expect(appMock).toBeTruthy();
       const customLogger = createLogger({ level: "silent" });
@@ -304,7 +304,7 @@ describe("Server", () => {
           }),
         },
       };
-      const { logger, notFoundHandler } = await attachRouting(
+      const { logger, notFoundHandler } = attachRouting(
         configMock as unknown as AppConfig,
         routingMock,
       );
