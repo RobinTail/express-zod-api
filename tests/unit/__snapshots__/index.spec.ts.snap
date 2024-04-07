@@ -112,13 +112,13 @@ exports[`Index Entrypoint > exports > should have certain entities exposed 1`] =
   "OutputValidationError",
   "InputValidationError",
   "MissingPeerError",
+  "getMessageFromError",
+  "getStatusCodeFromError",
+  "getExamples",
   "withMeta",
   "testEndpoint",
   "Integration",
   "ez",
-  "getStatusCodeFromError",
-  "getMessageFromError",
-  "getExamples",
 ]
 `;
 

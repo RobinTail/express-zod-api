@@ -23,7 +23,8 @@ export {
   InputValidationError,
   MissingPeerError,
 } from "./errors";
-export { withMeta } from "./metadata";
+export { getMessageFromError, getStatusCodeFromError } from "./error-helpers";
+export { getExamples, withMeta } from "./metadata";
 export { testEndpoint } from "./testing";
 export { Integration } from "./integration";
 
@@ -50,6 +51,3 @@ export type {
   OAuth2Security,
   OpenIdSecurity,
 } from "./security";
-export { getStatusCodeFromError } from "./error-helpers";
-export { getMessageFromError } from "./error-helpers";
-export { getExamples } from "./metadata";
