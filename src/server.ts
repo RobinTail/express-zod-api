@@ -30,8 +30,7 @@ const makeCommonEntities = (config: CommonConfig) => {
   return { rootLogger, errorHandler, notFoundHandler, parserFailureHandler };
 };
 
-/** @todo consider deasync */
-export const attachRouting = async (config: AppConfig, routing: Routing) => {
+export const attachRouting = (config: AppConfig, routing: Routing) => {
   const { rootLogger, notFoundHandler } = makeCommonEntities(config);
   initRouting({ app: config.app, routing, rootLogger, config });
   return { notFoundHandler, logger: rootLogger };

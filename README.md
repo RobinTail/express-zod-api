@@ -872,15 +872,11 @@ const app = express(); // or express.Router()
 const config = createConfig({ app /* cors, logger, ... */ });
 const routing: Routing = {}; // your endpoints go here
 
-// This async IIFE is only required for the top level CommonJS
-(async () => {
-  const { notFoundHandler, logger } = await attachRouting(config, routing);
+const { notFoundHandler, logger } = attachRouting(config, routing);
 
-  app.use(notFoundHandler); // optional
-  app.listen();
-
-  logger.info("Glory to science!");
-})();
+app.use(notFoundHandler); // optional
+app.listen();
+logger.info("Glory to science!");
 ```
 
 **Please note** that in this case you probably need to parse `request.body`, call `app.listen()` and handle `404`
