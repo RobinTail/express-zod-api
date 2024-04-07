@@ -15,7 +15,7 @@ import {
 } from "./server-helpers";
 import { getStartupLogo } from "./startup-logo";
 
-const makeCommonEntities = async (config: CommonConfig) => {
+const makeCommonEntities = (config: CommonConfig) => {
   if (config.startupLogo !== false) {
     console.log(getStartupLogo());
   }
@@ -30,8 +30,9 @@ const makeCommonEntities = async (config: CommonConfig) => {
   return { rootLogger, errorHandler, notFoundHandler, parserFailureHandler };
 };
 
+/** @todo consider deasync */
 export const attachRouting = async (config: AppConfig, routing: Routing) => {
-  const { rootLogger, notFoundHandler } = await makeCommonEntities(config);
+  const { rootLogger, notFoundHandler } = makeCommonEntities(config);
   initRouting({ app: config.app, routing, rootLogger, config });
   return { notFoundHandler, logger: rootLogger };
 };
@@ -51,7 +52,7 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
   app.use(config.server.jsonParser || express.json());
 
   const { rootLogger, notFoundHandler, parserFailureHandler } =
-    await makeCommonEntities(config);
+    makeCommonEntities(config);
 
   if (config.server.upload) {
     const uploader = await loadPeer<typeof fileUpload>("express-fileupload");
