@@ -10,7 +10,7 @@
 - Features:
   - New built-in console logger with colorful pretty inspections and basic methods only.
 - Non-breaking significant changes:
-  - Due to detaching from `winston`, the `attachRouting()` method is back to being syncronous.
+  - Due to detaching from `winston`, the `attachRouting()` method is back to being synchronous.
 - How to migrate confidently:
   - If you're using `attachRouting()` method:
     - Remove `await` before it (and possible async IIFE wrapper if present) — no longer required.
