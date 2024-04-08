@@ -22,6 +22,7 @@ const makeCommonEntities = (config: CommonConfig) => {
   const rootLogger: AbstractLogger = isBuiltinLoggerConfig(config.logger)
     ? createLogger(config.logger)
     : config.logger;
+  rootLogger.debug("Running", process.env.TSUP_BUILD || "from sources");
   const errorHandler = config.errorHandler || defaultResultHandler;
   const { childLoggerProvider: getChildLogger } = config;
   const creatorParams = { errorHandler, rootLogger, getChildLogger };

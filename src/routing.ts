@@ -20,8 +20,7 @@ export const initRouting = ({
   rootLogger: AbstractLogger;
   config: CommonConfig;
   routing: Routing;
-}) => {
-  rootLogger.debug("Running", process.env.TSUP_BUILD || "from sources");
+}) =>
   walkRouting({
     routing,
     hasCors: !!config.cors,
@@ -44,4 +43,3 @@ export const initRouting = ({
       app.use(path, handler);
     },
   });
-};
