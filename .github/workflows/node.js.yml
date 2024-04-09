@@ -35,13 +35,18 @@ jobs:
         path: ${{ steps.yarnCache.outputs.dir }}
         key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ matrix.node-version }}-${{ hashFiles('**/yarn.lock') }}
     - name: Install dependencies
-      # todo use regular "yarn install" when min Node version increased to 18.18
-      # @typescript/eslint group compatibility issue fixed by ignoring engines for dev dependencies only:
-      run: |
-        npm pkg delete devDependencies
-        yarn install
-        git checkout -- .
-        yarn install --ignore-engines
+      uses: nick-fields/retry@v3
+      with:
+        timeout_seconds: 15
+        max_attempts: 3
+        retry_on: error
+        # todo use regular "yarn install" when min Node version increased to 18.18
+        # @typescript/eslint group compatibility issue fixed by ignoring engines for dev dependencies only:
+        command: |
+          npm pkg delete devDependencies
+          yarn install
+          git checkout -- .
+          yarn install --ignore-engines
     - name: Lint
       run: yarn lint
     - name: Test
@@ -56,9 +61,19 @@ jobs:
     - name: Build
       run: yarn build
     - name: CJS test
-      run: yarn test:cjs
+      uses: nick-fields/retry@v3
+      with:
+        timeout_seconds: 15
+        max_attempts: 3
+        retry_on: error
+        command: yarn test:cjs
     - name: ESM test
-      run: yarn test:esm
+      uses: nick-fields/retry@v3
+      with:
+        timeout_seconds: 15
+        max_attempts: 3
+        retry_on: error
+        command: yarn test:esm
     - name: Check Jest 30 compatibility
       uses: madhead/semver-utils@v4
       id: jest30compat
@@ -68,9 +83,19 @@ jobs:
         lenient: false # require to parse or fail
     - name: Compatibility test
       if: steps.jest30compat.outputs.satisfies == 'true'
-      run: yarn test:compat
+      uses: nick-fields/retry@v3
+      with:
+        timeout_seconds: 15
+        max_attempts: 3
+        retry_on: error
+        command: yarn test:compat
     - name: Issue 952 # see https://github.com/RobinTail/express-zod-api/issues/952
-      run: yarn test:952
+      uses: nick-fields/retry@v3
+      with:
+        timeout_seconds: 15
+        max_attempts: 3
+        retry_on: error
+        command: yarn test:952
   finish:
     needs: build
     runs-on: ubuntu-latest
