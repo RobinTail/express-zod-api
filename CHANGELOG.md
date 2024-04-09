@@ -27,6 +27,10 @@
 
 ## Version 17
 
+### v17.7.0
+
+- Publishing with provenance statements to increase the supply-chain security.
+
 ### v17.6.1
 
 - Add missing `z.tuple().rest()` type to the generated client (Integration) when present.
