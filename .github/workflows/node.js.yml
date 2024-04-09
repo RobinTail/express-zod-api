@@ -38,6 +38,7 @@ jobs:
       uses: nick-fields/retry@v3
       with:
         timeout_seconds: 15
+        retry_wait_seconds: 1
         max_attempts: 3
         retry_on: error
         on_retry_command: yarn config set registry https://registry.npmjs.org
@@ -65,6 +66,7 @@ jobs:
       uses: nick-fields/retry@v3
       with:
         timeout_seconds: 15
+        retry_wait_seconds: 1
         max_attempts: 3
         retry_on: error
         on_retry_command: yarn config set registry https://registry.npmjs.org
@@ -73,6 +75,7 @@ jobs:
       uses: nick-fields/retry@v3
       with:
         timeout_seconds: 15
+        retry_wait_seconds: 1
         max_attempts: 3
         retry_on: error
         on_retry_command: yarn config set registry https://registry.npmjs.org
@@ -89,6 +92,7 @@ jobs:
       uses: nick-fields/retry@v3
       with:
         timeout_seconds: 15
+        retry_wait_seconds: 1
         max_attempts: 3
         retry_on: error
         on_retry_command: yarn config set registry https://registry.npmjs.org
@@ -97,6 +101,7 @@ jobs:
       uses: nick-fields/retry@v3
       with:
         timeout_seconds: 15
+        retry_wait_seconds: 1
         max_attempts: 3
         retry_on: error
         on_retry_command: yarn config set registry https://registry.npmjs.org
