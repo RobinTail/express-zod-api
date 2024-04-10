@@ -40,7 +40,6 @@ jobs:
       with:
         timeout_seconds: 15
         max_attempts: 3
-        retry_on: error
         on_retry_command: yarn config set registry https://registry.npmjs.org
         # todo use regular "yarn install" when min Node version increased to 18.18
         # @typescript/eslint group compatibility issue fixed by ignoring engines for dev dependencies only:
@@ -67,7 +66,6 @@ jobs:
       with:
         timeout_seconds: 15
         max_attempts: 3
-        retry_on: error
         on_retry_command: yarn config set registry https://registry.npmjs.org
         command: yarn test:cjs
     - name: ESM test
@@ -75,7 +73,6 @@ jobs:
       with:
         timeout_seconds: 15
         max_attempts: 3
-        retry_on: error
         on_retry_command: yarn config set registry https://registry.npmjs.org
         command: yarn test:esm
     - name: Check Jest 30 compatibility
@@ -91,7 +88,6 @@ jobs:
       with:
         timeout_seconds: 15
         max_attempts: 3
-        retry_on: error
         on_retry_command: yarn config set registry https://registry.npmjs.org
         command: yarn test:compat
     - name: Issue 952 # see https://github.com/RobinTail/express-zod-api/issues/952
@@ -99,7 +95,6 @@ jobs:
       with:
         timeout_seconds: 15
         max_attempts: 3
-        retry_on: error
         on_retry_command: yarn config set registry https://registry.npmjs.org
         command: yarn test:952
   finish:
