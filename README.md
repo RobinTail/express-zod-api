@@ -1093,7 +1093,7 @@ const config = createSimpleConfig({
 });
 
 const factory = ActionsFactory(config);
-attachSockets({
+await attachSockets({
   config,
   logger,
   io: new Server(), // https://socket.io/docs/v4/server-options/
