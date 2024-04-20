@@ -1069,8 +1069,8 @@ If you want the user of a client application to be able to subscribe to subseque
 capabilities of this library and the HTTP protocol itself would not be enough in this case. I have developed an
 additional pluggable library, [Zod Sockets](https://github.com/RobinTail/zod-sockets), which has similar principles and
 capabilities, but uses the websocket transport and Socket.IO protocol for that purpose.
-Here is a draft implementation of Zod Sockets attached to Express Zod API for handling incoming `subscribe` and
-`unsubscribe` events in order to broadcast the `time` event having the current time in payload every second.
+Here is an example of the synergy between of two libraries on handling the incoming `subscribe` and `unsubscribe`
+events in order to emit (broadcast) the `time` event every second with a current time in its payload.
 
 ```ts
 import { createServer } from "express-zod-api";
