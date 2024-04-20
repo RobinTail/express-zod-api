@@ -163,7 +163,10 @@ export const depictFile: Depicter<z.ZodType> = ({ schema }) => ({
   type: "string",
   format:
     schema instanceof z.ZodString
-      ? schema._def.checks.find((check) => check.kind === "regex")
+      ? schema._def.checks.find(
+          /** @todo remove regex check when min zod v3.23 (v19) */
+          (check) => check.kind === "regex" || check.kind === "base64",
+        )
         ? "byte"
         : "file"
       : "binary",

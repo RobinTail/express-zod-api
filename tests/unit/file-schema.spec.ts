@@ -79,9 +79,9 @@ describe("ez.file()", () => {
         expect(result.error.issues).toEqual([
           {
             code: "invalid_string",
-            message: "Does not match base64 encoding",
-            validation: "regex",
+            message: "Invalid base64",
             path: [],
+            validation: "base64",
           },
         ]);
       }
