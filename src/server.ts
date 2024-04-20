@@ -4,11 +4,7 @@ import type fileUpload from "express-fileupload";
 import http from "node:http";
 import https from "node:https";
 import { AppConfig, CommonConfig, ServerConfig } from "./config-type";
-import {
-  AbstractLogger,
-  createLogger,
-  isSimplifiedWinstonConfig,
-} from "./logger";
+import { AbstractLogger, createLogger, isBuiltinLoggerConfig } from "./logger";
 import { loadPeer } from "./peer-helpers";
 import { defaultResultHandler } from "./result-handler";
 import { Routing, initRouting } from "./routing";
@@ -17,11 +13,16 @@ import {
   createParserFailureHandler,
   createUploadFailueHandler,
 } from "./server-helpers";
+import { getStartupLogo } from "./startup-logo";
 
-const makeCommonEntities = async (config: CommonConfig) => {
-  const rootLogger: AbstractLogger = isSimplifiedWinstonConfig(config.logger)
-    ? createLogger({ ...config.logger, winston: await loadPeer("winston") })
+const makeCommonEntities = (config: CommonConfig) => {
+  if (config.startupLogo !== false) {
+    console.log(getStartupLogo());
+  }
+  const rootLogger: AbstractLogger = isBuiltinLoggerConfig(config.logger)
+    ? createLogger(config.logger)
     : config.logger;
+  rootLogger.debug("Running", process.env.TSUP_BUILD || "from sources");
   const errorHandler = config.errorHandler || defaultResultHandler;
   const { childLoggerProvider: getChildLogger } = config;
   const creatorParams = { errorHandler, rootLogger, getChildLogger };
@@ -30,8 +31,8 @@ const makeCommonEntities = async (config: CommonConfig) => {
   return { rootLogger, errorHandler, notFoundHandler, parserFailureHandler };
 };
 
-export const attachRouting = async (config: AppConfig, routing: Routing) => {
-  const { rootLogger, notFoundHandler } = await makeCommonEntities(config);
+export const attachRouting = (config: AppConfig, routing: Routing) => {
+  const { rootLogger, notFoundHandler } = makeCommonEntities(config);
   initRouting({ app: config.app, routing, rootLogger, config });
   return { notFoundHandler, logger: rootLogger };
 };
@@ -51,7 +52,7 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
   app.use(config.server.jsonParser || express.json());
 
   const { rootLogger, notFoundHandler, parserFailureHandler } =
-    await makeCommonEntities(config);
+    makeCommonEntities(config);
 
   if (config.server.upload) {
     const uploader = await loadPeer<typeof fileUpload>("express-fileupload");

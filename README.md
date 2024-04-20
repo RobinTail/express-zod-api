@@ -89,7 +89,7 @@ Therefore, many basic tasks can be accomplished faster and easier, in particular
 - Web server — [Express.js](https://expressjs.com/).
 - Schema validation — [Zod 3.x](https://github.com/colinhacks/zod).
 - Supports any logger having `info()`, `debug()`, `error()` and `warn()` methods;
-  - [Winston](https://github.com/winstonjs/winston) is default.
+  - Built-in console logger with colorful and pretty inspections by default.
 - Generators:
   - Documentation — [OpenAPI 3.1](https://github.com/metadevpro/openapi3-ts) (former Swagger);
   - Client side types — inspired by [zod-to-ts](https://github.com/sachinraja/zod-to-ts).
@@ -118,14 +118,14 @@ Much can be customized to fit your needs.
 Run one of the following commands to install the library, its peer dependencies and packages for types assistance.
 
 ```shell
-yarn add express-zod-api express zod winston typescript http-errors
+yarn add express-zod-api express zod typescript http-errors
 yarn add --dev @types/express @types/node @types/http-errors
 ```
 
 or
 
 ```shell
-npm install express-zod-api express zod winston typescript http-errors
+npm install express-zod-api express zod typescript http-errors
 npm install -D @types/express @types/node @types/http-errors
 ```
 
@@ -147,7 +147,6 @@ Create a minimal configuration. _See all available options
 
 ```typescript
 import { createConfig } from "express-zod-api";
-import type { Logger } from "winston";
 
 const config = createConfig({
   server: {
@@ -156,11 +155,6 @@ const config = createConfig({
   cors: true,
   logger: { level: "debug", color: true },
 });
-
-// Setting the type of the logger used
-declare module "express-zod-api" {
-  interface LoggerOverrides extends Logger {}
-}
 ```
 
 ## Create an endpoints factory
@@ -526,8 +520,9 @@ your API at [Let's Encrypt](https://letsencrypt.org/).
 
 ## Customizing logger
 
-You can uninstall `winston` (which is the default and recommended logger) and use another compatible one, having
-`info()`, `debug()`, `error()` and `warn()` methods. For example, `pino` logger with `pino-pretty` extension:
+If the simple console output of the built-in logger is not enough for you, you can connect any other compatible one.
+It must support at least the following methods: `info()`, `debug()`, `error()` and `warn()`.
+Winston and Pino support is well known. Here is an example configuring `pino` logger with `pino-pretty` extension:
 
 ```typescript
 import pino, { Logger } from "pino";
@@ -560,7 +555,7 @@ import { randomUUID } from "node:crypto";
 const config = createConfig({
   // logger: ...,
   childLoggerProvider: ({ parent, request }) =>
-    parent.child({ requestId: randomUUID() }),
+    parent.child({ requestId: randomUUID() }), // assuming a custom logger having .child() method
 });
 ```
 
@@ -793,7 +788,7 @@ Some options are forced in order to ensure the correct workflow:
 {
   abortOnLimit: false,
   parseNested: true,
-  logger: {}, // the configured logger (default: winston), using its .debug() method
+  logger: {}, // the configured logger, using its .debug() method
 }
 ```
 
@@ -878,15 +873,11 @@ const app = express(); // or express.Router()
 const config = createConfig({ app /* cors, logger, ... */ });
 const routing: Routing = {}; // your endpoints go here
 
-// This async IIFE is only required for the top level CommonJS
-(async () => {
-  const { notFoundHandler, logger } = await attachRouting(config, routing);
+const { notFoundHandler, logger } = attachRouting(config, routing);
 
-  app.use(notFoundHandler); // optional
-  app.listen();
-
-  logger.info("Glory to science!");
-})();
+app.use(notFoundHandler); // optional
+app.listen();
+logger.info("Glory to science!");
 ```
 
 **Please note** that in this case you probably need to parse `request.body`, call `app.listen()` and handle `404`
