@@ -1,6 +1,35 @@
 # Changelog
 
+## Version 18
+
+### v18.0.0
+
+- **Breaking changes**:
+  - `winston` is no longer a default logger;
+  - `createLogger()` argument is changed, and it now returns a built-in logger instead of `winston`.
+- Features:
+  - New built-in console logger with colorful pretty inspections and basic methods only.
+- Non-breaking significant changes:
+  - Due to detaching from `winston`, the `attachRouting()` method is back to being synchronous.
+- How to migrate confidently:
+  - If you're using `attachRouting()` method:
+    - Remove `await` before it (and possible async IIFE wrapper if present) — no longer required.
+  - If you're using a custom logger in config:
+    - No action required.
+  - If you're using `createLogger()` method in your code:
+    - Remove the `winston` property from its argument.
+  - If you're using the default logger in config (which used to be `winston` as a peer dependency):
+    - If you're only using its `info()`, `debug()`, `error()` and `warn()` methods:
+      - You can now uninstall `winston` — no further action required.
+    - If you're using its other methods, like `.child()` or `profile()`:
+      - Configure `winston` as a custom logger [according to the documentation](README.md#customizing-logger),
+      - Or consider any other compatible logger, like `pino` for example, which is easier to configure.
+
 ## Version 17
+
+### v17.7.1
+
+- Clarification of the documentation: the `skipLibCheck` option should be enabled in `tsconfig.json`.
 
 ### v17.7.0
 
