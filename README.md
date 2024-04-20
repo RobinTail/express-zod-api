@@ -129,12 +129,13 @@ npm install express-zod-api express zod winston typescript http-errors
 npm install -D @types/express @types/node @types/http-errors
 ```
 
-Add the following option to your `tsconfig.json` file in order to make it work as expected:
+Ensure having following options in your `tsconfig.json` file in order to make it work as expected:
 
 ```json
 {
   "compilerOptions": {
-    "strict": true
+    "strict": true,
+    "skipLibCheck": true,
   }
 }
 ```
