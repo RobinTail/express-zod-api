@@ -2,6 +2,10 @@
 
 ## Version 17
 
+### v17.7.1
+
+- Clarification of the documentation: the `skipLibCheck` option should be enabled in `tsconfig.json`.
+
 ### v17.7.0
 
 - Publishing with provenance statements to increase the supply-chain security.
