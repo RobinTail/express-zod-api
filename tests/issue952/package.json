@@ -7,13 +7,6 @@
     "posttest": "rm quick-start.d.ts"
   },
   "dependencies": {
-    "express-zod-api": "link:../..",
-    "express": "^4",
-    "http-errors": "^2",
-    "typescript": "^5",
-    "zod": "^3"
-  },
-  "devDependencies": {
-    "@types/express": "^4"
+    "express-zod-api": "link:../.."
   }
 }
