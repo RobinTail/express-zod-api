@@ -1093,7 +1093,7 @@ const config = createSimpleConfig({
   },
 });
 
-const factory = ActionsFactory(config);
+const factory = new ActionsFactory(config);
 await attachSockets({
   config,
   logger,
