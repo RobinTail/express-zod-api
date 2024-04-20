@@ -53,6 +53,7 @@ Start your API server with I/O schema validation and custom middlewares in minut
    3. [Headers as input source](#headers-as-input-source)
    4. [Accepting raw data](#accepting-raw-data)
    5. [Resources cleanup](#resources-cleanup)
+   6. [Subscriptions](#subscriptions)
 7. [Integration and Documentation](#integration-and-documentation)
    1. [Generating a Frontend Client](#generating-a-frontend-client)
    2. [Creating a documentation](#creating-a-documentation)
@@ -1060,6 +1061,56 @@ const dbProvider = createMiddleware({
 const dbEquippedFactory = new EndpointsFactory(
   resultHandlerWithCleanup,
 ).addMiddleware(dbProvider);
+```
+
+## Subscriptions
+
+If you want the user of a client application to be able to subscribe to subsequent updates initiated by the server, the
+capabilities of this library and the HTTP protocol itself would not be enough in this case. I have developed an
+additional pluggable library, [Zod Sockets](https://github.com/RobinTail/zod-sockets), which has similar principles and
+capabilities, but uses the websocket transport and Socket.IO protocol for that purpose.
+Here is a draft implementation of Zod Sockets attached to Express Zod API for handling incoming `subscribe` and
+`unsubscribe` events in order to broadcast the `time` event having the current time in payload every second.
+
+```ts
+import { createServer } from "express-zod-api";
+import { attachSockets, createSimpleConfig, ActionsFactory } from "zod-sockets";
+import { Server } from "socket.io";
+
+const { logger, httpsServer, httpServer } = await createServer();
+
+const config = createSimpleConfig({
+  emission: {
+    time: { schema: z.tuple([z.date()]) }, // constraints
+  },
+  hooks: {
+    onStartup: async ({ withRooms }) => {
+      setInterval(() => {
+        withRooms("subscribers").broadcast("time", new Date());
+      }, 1000);
+    },
+  },
+});
+
+const factory = ActionsFactory(config);
+attachSockets({
+  config,
+  logger,
+  io: new Server(), // https://socket.io/docs/v4/server-options/
+  target: httpsServer || httpServer,
+  actions: [
+    factory.build({
+      event: "subscribe",
+      input: z.tuple([]),
+      handler: async ({ client }) => client.join("subscribers"),
+    }),
+    factory.build({
+      event: "unsubscribe",
+      input: z.tuple([]),
+      handler: async ({ client }) => client.leave("subscribers"),
+    }),
+  ],
+});
 ```
 
 # Integration and Documentation
