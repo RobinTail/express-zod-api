@@ -135,7 +135,7 @@ Ensure having following options in your `tsconfig.json` file in order to make it
 {
   "compilerOptions": {
     "strict": true,
-    "skipLibCheck": true,
+    "skipLibCheck": true
   }
 }
 ```
