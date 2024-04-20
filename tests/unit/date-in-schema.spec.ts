@@ -18,15 +18,7 @@ describe("ez.dateIn()", () => {
       const result = schema.safeParse(123);
       expect(result.success).toBeFalsy();
       if (!result.success) {
-        expect(result.error.issues).toEqual([
-          {
-            code: "invalid_type",
-            expected: "string",
-            message: "Expected string, received number",
-            path: [],
-            received: "number",
-          },
-        ]);
+        expect(result.error.issues).toMatchSnapshot();
       }
     });
 
@@ -52,9 +44,10 @@ describe("ez.dateIn()", () => {
       if (!result.success) {
         expect(result.error.issues).toEqual([
           {
-            code: "invalid_date",
+            code: "invalid_string",
             message: "Invalid date",
             path: [],
+            validation: "date",
           },
         ]);
       }
@@ -68,8 +61,8 @@ describe("ez.dateIn()", () => {
         expect(result.error.issues).toEqual([
           {
             code: "invalid_string",
-            message: "Invalid",
-            validation: "regex",
+            message: "Invalid date",
+            validation: "date",
             path: [],
           },
         ]);
