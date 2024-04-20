@@ -1,6 +1,6 @@
 {
   "name": "express-zod-api",
-  "version": "17.7.0",
+  "version": "18.0.0-beta3",
   "description": "A Typescript library to help you get an API server up and running with I/O schema validation and custom middlewares in minutes.",
   "license": "MIT",
   "repository": {
@@ -25,7 +25,6 @@
     "build:docs": "tsx example/generate-documentation.ts",
     "build:client": "tsx example/generate-client.ts",
     "build:license": "tsx tools/license.ts",
-    "build:logo": "tsx tools/startup-logo.ts",
     "test": "yarn test:types && yarn test:unit && yarn test:badge",
     "test:cjs": "yarn --cwd tests/cjs && vitest run -r tests/cjs",
     "test:esm": "yarn --cwd tests/esm && vitest run -r tests/esm",
@@ -68,6 +67,7 @@
     "node": "^18.0.0 || ^20.0.0"
   },
   "dependencies": {
+    "ansis": "^3.1.0",
     "openapi3-ts": "^4.2.1",
     "ramda": "^0.29.1"
   },
@@ -86,7 +86,6 @@
     "prettier": "^3.1.0",
     "typescript": "^5.1.3",
     "vitest": "^1.0.4",
-    "winston": "^3.10.0",
     "zod": "^3.22.3"
   },
   "peerDependenciesMeta": {
@@ -122,9 +121,6 @@
     },
     "vitest": {
       "optional": true
-    },
-    "winston": {
-      "optional": true
     }
   },
   "devDependencies": {
@@ -142,7 +138,6 @@
     "@typescript-eslint/eslint-plugin": "^7.1.0",
     "@typescript-eslint/parser": "^7.1.0",
     "@vitest/coverage-istanbul": "^1.5.0",
-    "chalk": "^5.3.0",
     "compression": "^1.7.4",
     "cors": "^2.8.5",
     "eslint": "^8.48.0",
@@ -165,7 +160,6 @@
     "tsx": "^4.6.2",
     "typescript": "^5.2.2",
     "vitest": "^1.5.0",
-    "winston": "^3.10.0",
     "zod": "^3.22.3"
   },
   "keywords": [
