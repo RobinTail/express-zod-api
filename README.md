@@ -1076,6 +1076,7 @@ events in order to emit (broadcast) the `time` event every second with a current
 import { createServer } from "express-zod-api";
 import { attachSockets, createSimpleConfig, ActionsFactory } from "zod-sockets";
 import { Server } from "socket.io";
+import { z } from "zod";
 
 const { logger, httpsServer, httpServer } = await createServer();
 
