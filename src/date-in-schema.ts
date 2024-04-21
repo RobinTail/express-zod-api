@@ -6,7 +6,7 @@ export const ezDateInKind = "DateIn";
 
 export const dateIn = () => {
   const base = z.string();
-  const hasDateMethod = typeof base.date === "function";
+  const hasDateMethod = base.date?.() instanceof z.ZodString;
   const schema = hasDateMethod
     ? z.union([base.date(), base.datetime(), base.datetime({ local: true })])
     : base.regex(isoDateRegex); // @todo remove after min zod v3.23 (v19)

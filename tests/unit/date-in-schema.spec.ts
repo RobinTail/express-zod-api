@@ -1,9 +1,18 @@
 import { z } from "zod";
 import { getMeta } from "../../src/metadata";
 import { ez } from "../../src";
-import { describe, expect, test } from "vitest";
+import { beforeAll, describe, expect, test, vi } from "vitest";
 
-describe("ez.dateIn()", () => {
+describe.each(["current", "legacy"])("ez.dateIn() %s mode", (mode) => {
+  // @todo remove after min zod v3.23 (v19)
+  beforeAll(() => {
+    if (mode === "legacy") {
+      vi.spyOn(z.ZodString.prototype, "date").mockImplementation(
+        () => null as unknown as z.ZodString,
+      );
+    }
+  });
+
   describe("creation", () => {
     test("should create an instance", () => {
       const schema = ez.dateIn();
@@ -42,14 +51,7 @@ describe("ez.dateIn()", () => {
       const result = schema.safeParse("2022-01-32");
       expect(result.success).toBeFalsy();
       if (!result.success) {
-        expect(result.error.issues).toEqual([
-          {
-            code: "invalid_string",
-            message: "Invalid date",
-            path: [],
-            validation: "date",
-          },
-        ]);
+        expect(result.error.issues).toMatchSnapshot();
       }
     });
 
@@ -58,14 +60,7 @@ describe("ez.dateIn()", () => {
       const result = schema.safeParse("12.01.2021");
       expect(result.success).toBeFalsy();
       if (!result.success) {
-        expect(result.error.issues).toEqual([
-          {
-            code: "invalid_string",
-            message: "Invalid date",
-            validation: "date",
-            path: [],
-          },
-        ]);
+        expect(result.error.issues).toMatchSnapshot();
       }
     });
   });
