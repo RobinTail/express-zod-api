@@ -17,7 +17,7 @@ const variants = {
   binary: () => proprietary(ezFileKind, bufferSchema.or(z.string())),
   base64: () => {
     const base = z.string();
-    const hasBase64Method = typeof base.base64 === "function";
+    const hasBase64Method = base.base64?.() instanceof z.ZodString;
     return proprietary(
       ezFileKind,
       hasBase64Method
