@@ -1,6 +1,5 @@
 import { Request, RequestHandler, Response } from "express";
 import createHttpError, { HttpError } from "http-errors";
-import { Logger } from "winston";
 import {
   EndpointsFactory,
   createMiddleware,
@@ -9,6 +8,7 @@ import {
 } from "../../src";
 import { Endpoint } from "../../src/endpoint";
 import { expectType } from "tsd";
+import { AbstractLogger } from "../../src/logger";
 import { serializeSchemaForTest } from "../helpers";
 import { z } from "zod";
 import { describe, expect, test, vi } from "vitest";
@@ -115,7 +115,7 @@ describe("EndpointsFactory", () => {
           options: {},
           request: {} as Request,
           response: {} as Response,
-          logger: {} as Logger,
+          logger: {} as AbstractLogger,
         }),
       ).toEqual({
         option1: "some value",
@@ -156,7 +156,7 @@ describe("EndpointsFactory", () => {
           options: {},
           request: requestMock,
           response: responseMock,
-          logger: {} as Logger,
+          logger: {} as AbstractLogger,
         });
         expect(middleware).toHaveBeenCalledTimes(1);
         expect(middleware).toHaveBeenCalledWith(
@@ -189,7 +189,7 @@ describe("EndpointsFactory", () => {
           options: {},
           request: requestMock,
           response: responseMock,
-          logger: {} as Logger,
+          logger: {} as AbstractLogger,
         });
         expect(middleware).toHaveBeenCalledTimes(1);
         expect(middleware).toHaveBeenCalledWith(
@@ -220,7 +220,7 @@ describe("EndpointsFactory", () => {
             options: {},
             request: {} as Request,
             response: {} as Response,
-            logger: {} as Logger,
+            logger: {} as AbstractLogger,
           });
           expect.fail("Should not be here");
         } catch (e) {
@@ -251,7 +251,7 @@ describe("EndpointsFactory", () => {
             options: {},
             request: {} as Request,
             response: {} as Response,
-            logger: {} as Logger,
+            logger: {} as AbstractLogger,
           });
           expect.fail("Should not be here");
         } catch (e) {
