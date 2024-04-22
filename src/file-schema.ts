@@ -7,6 +7,7 @@ const bufferSchema = z.custom<Buffer>((subject) => Buffer.isBuffer(subject), {
   message: "Expected Buffer",
 });
 
+/** @todo remove after min zod v3.23 (v19) */
 const base64Regex =
   /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/;
 
@@ -14,11 +15,16 @@ const variants = {
   buffer: () => proprietary(ezFileKind, bufferSchema),
   string: () => proprietary(ezFileKind, z.string()),
   binary: () => proprietary(ezFileKind, bufferSchema.or(z.string())),
-  base64: () =>
-    proprietary(
+  base64: () => {
+    const base = z.string();
+    const hasBase64Method = base.base64?.() instanceof z.ZodString;
+    return proprietary(
       ezFileKind,
-      z.string().regex(base64Regex, "Does not match base64 encoding"),
-    ),
+      hasBase64Method
+        ? base.base64()
+        : base.regex(base64Regex, "Does not match base64 encoding"), // @todo remove after min zod v3.23 (v19)
+    );
+  },
 };
 
 type Variants = typeof variants;

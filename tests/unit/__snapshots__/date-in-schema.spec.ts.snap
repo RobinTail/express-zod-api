@@ -1,0 +1,95 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`ez.dateIn() current mode > parsing > should handle invalid date 1`] = `
+[
+  {
+    "code": "invalid_string",
+    "message": "Invalid date",
+    "path": [],
+    "validation": "date",
+  },
+]
+`;
+
+exports[`ez.dateIn() current mode > parsing > should handle invalid format 1`] = `
+[
+  {
+    "code": "invalid_string",
+    "message": "Invalid date",
+    "path": [],
+    "validation": "date",
+  },
+]
+`;
+
+exports[`ez.dateIn() current mode > parsing > should handle wrong parsed type 1`] = `
+[
+  {
+    "code": "invalid_union",
+    "message": "Invalid input",
+    "path": [],
+    "unionErrors": [
+      [ZodError: [
+  {
+    "code": "invalid_type",
+    "expected": "string",
+    "received": "number",
+    "path": [],
+    "message": "Expected string, received number"
+  }
+]],
+      [ZodError: [
+  {
+    "code": "invalid_type",
+    "expected": "string",
+    "received": "number",
+    "path": [],
+    "message": "Expected string, received number"
+  }
+]],
+      [ZodError: [
+  {
+    "code": "invalid_type",
+    "expected": "string",
+    "received": "number",
+    "path": [],
+    "message": "Expected string, received number"
+  }
+]],
+    ],
+  },
+]
+`;
+
+exports[`ez.dateIn() legacy mode > parsing > should handle invalid date 1`] = `
+[
+  {
+    "code": "invalid_date",
+    "message": "Invalid date",
+    "path": [],
+  },
+]
+`;
+
+exports[`ez.dateIn() legacy mode > parsing > should handle invalid format 1`] = `
+[
+  {
+    "code": "invalid_string",
+    "message": "Invalid",
+    "path": [],
+    "validation": "regex",
+  },
+]
+`;
+
+exports[`ez.dateIn() legacy mode > parsing > should handle wrong parsed type 1`] = `
+[
+  {
+    "code": "invalid_type",
+    "expected": "string",
+    "message": "Expected string, received number",
+    "path": [],
+    "received": "number",
+  },
+]
+`;
