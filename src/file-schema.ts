@@ -11,10 +11,7 @@ const variants = {
   buffer: () => proprietary(ezFileKind, bufferSchema),
   string: () => proprietary(ezFileKind, z.string()),
   binary: () => proprietary(ezFileKind, bufferSchema.or(z.string())),
-  base64: () => {
-    const base = z.string();
-    return proprietary(ezFileKind, base.base64());
-  },
+  base64: () => proprietary(ezFileKind, z.string().base64()),
 };
 
 type Variants = typeof variants;
