@@ -6,11 +6,7 @@
     "test": "jest"
   },
   "dependencies": {
-    "express-zod-api": "link:../..",
-    "express": "^4",
-    "http-errors": "^2",
-    "typescript": "^5",
-    "zod": "^3"
+    "express-zod-api": "link:../.."
   },
   "devDependencies": {
     "jest": "^30.0.0-alpha.3",
