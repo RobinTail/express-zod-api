@@ -2,6 +2,16 @@
 
 ## Version 18
 
+### v18.1.0
+
+- Optimization for `zod` 3.23:
+  - `zod` 3.23 offers
+    [several features on handling strings](https://github.com/colinhacks/zod/releases/tag/v3.23.0);
+  - It's also claimed to be "the final 3.x release before Zod 4.0".;
+  - Using the featured `zod` refinements in the following proprietary schemas: `ez.dateIn()` and `ez.file("base64")`;
+  - The changes are non-breaking and the compatibility to `zod` 3.22 remains;
+  - Validation error messages will depend on actual `zod` version installed.
+
 ### v18.0.0
 
 - **Breaking changes**:

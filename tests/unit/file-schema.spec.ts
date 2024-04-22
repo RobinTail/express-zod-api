@@ -3,9 +3,18 @@ import { z } from "zod";
 import { getMeta } from "../../src/metadata";
 import { ez } from "../../src";
 import { readFile } from "node:fs/promises";
-import { describe, expect, test } from "vitest";
+import { beforeAll, describe, expect, test, vi } from "vitest";
 
-describe("ez.file()", () => {
+describe.each(["current", "legacy"])("ez.file() %s mode", (mode) => {
+  // @todo remove after min zod v3.23 (v19)
+  beforeAll(() => {
+    if (mode === "legacy") {
+      vi.spyOn(z.ZodString.prototype, "base64").mockImplementation(
+        () => null as unknown as z.ZodString,
+      );
+    }
+  });
+
   describe("creation", () => {
     test("should create an instance being string by default", () => {
       const schema = ez.file();
@@ -76,14 +85,7 @@ describe("ez.file()", () => {
       const result = schema.safeParse("~~~~");
       expect(result.success).toBeFalsy();
       if (!result.success) {
-        expect(result.error.issues).toEqual([
-          {
-            code: "invalid_string",
-            message: "Does not match base64 encoding",
-            validation: "regex",
-            path: [],
-          },
-        ]);
+        expect(result.error.issues).toMatchSnapshot();
       }
     });
 
