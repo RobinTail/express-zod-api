@@ -1,18 +1,9 @@
 import { z } from "zod";
 import { getMeta } from "../../src/metadata";
 import { ez } from "../../src";
-import { beforeAll, describe, expect, test, vi } from "vitest";
+import { describe, expect, test } from "vitest";
 
-describe.each(["current", "legacy"])("ez.dateIn() %s mode", (mode) => {
-  // @todo remove after min zod v3.23 (v19)
-  beforeAll(() => {
-    if (mode === "legacy") {
-      vi.spyOn(z.ZodString.prototype, "date").mockImplementation(
-        () => null as unknown as z.ZodString,
-      );
-    }
-  });
-
+describe("ez.dateIn()", () => {
   describe("creation", () => {
     test("should create an instance", () => {
       const schema = ez.dateIn();

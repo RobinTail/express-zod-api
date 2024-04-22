@@ -1,23 +1,12 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`ez.file() current mode > parsing > should perform additional check for base64 file 1`] = `
+exports[`ez.file() > parsing > should perform additional check for base64 file 1`] = `
 [
   {
     "code": "invalid_string",
     "message": "Invalid base64",
     "path": [],
     "validation": "base64",
-  },
-]
-`;
-
-exports[`ez.file() legacy mode > parsing > should perform additional check for base64 file 1`] = `
-[
-  {
-    "code": "invalid_string",
-    "message": "Does not match base64 encoding",
-    "path": [],
-    "validation": "regex",
   },
 ]
 `;
