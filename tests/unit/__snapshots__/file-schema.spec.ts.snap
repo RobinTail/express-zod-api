@@ -1,5 +1,16 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`ez.file() > parsing > should perform additional check for base64 file 1`] = `
+[
+  {
+    "code": "invalid_string",
+    "message": "Invalid base64",
+    "path": [],
+    "validation": "base64",
+  },
+]
+`;
+
 exports[`ez.file() current mode > parsing > should perform additional check for base64 file 1`] = `
 [
   {

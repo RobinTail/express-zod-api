@@ -3,18 +3,9 @@ import { z } from "zod";
 import { getMeta } from "../../src/metadata";
 import { ez } from "../../src";
 import { readFile } from "node:fs/promises";
-import { beforeAll, describe, expect, test, vi } from "vitest";
+import { describe, expect, test } from "vitest";
 
-describe.each(["current", "legacy"])("ez.file() %s mode", (mode) => {
-  // @todo remove after min zod v3.23 (v19)
-  beforeAll(() => {
-    if (mode === "legacy") {
-      vi.spyOn(z.ZodString.prototype, "base64").mockImplementation(
-        () => null as unknown as z.ZodString,
-      );
-    }
-  });
-
+describe("ez.file()", () => {
   describe("creation", () => {
     test("should create an instance being string by default", () => {
       const schema = ez.file();
