@@ -1072,7 +1072,7 @@ capabilities, but uses the websocket transport and Socket.IO protocol for that p
 synergy between two libraries on handling the incoming `subscribe` and `unsubscribe` events in order to emit
 (broadcast) the `time` event every second with a current time in its payload:
 
-https://github.com/RobinTail/zod-sockets/blob/main/README.md#subscriptions
+https://github.com/RobinTail/zod-sockets#subscriptions
 
 # Integration and Documentation
 
