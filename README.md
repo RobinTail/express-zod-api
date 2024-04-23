@@ -140,6 +140,21 @@ Ensure having the following options in your `tsconfig.json` file in order to mak
 }
 ```
 
+### Optional Dependencies
+
+If you want or need to omit the `skipLibCheck` setting recommended above, you can install the following
+optional type dependencies to ensure that `express-zod-api` doesn't fail when compiling via `tsc`:
+
+```shell
+yarn add --dev @types/compression @types/express-fileupload
+```
+
+or
+
+```shell
+npm install -D @types/compression @types/express-fileupload
+```
+
 ## Set up config
 
 Create a minimal configuration. _See all available options
