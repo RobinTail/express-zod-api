@@ -1068,51 +1068,11 @@ const dbEquippedFactory = new EndpointsFactory(
 If you want the user of a client application to be able to subscribe to subsequent updates initiated by the server, the
 capabilities of this library and the HTTP protocol itself would not be enough in this case. I have developed an
 additional pluggable library, [Zod Sockets](https://github.com/RobinTail/zod-sockets), which has similar principles and
-capabilities, but uses the websocket transport and Socket.IO protocol for that purpose.
-Here is an example of the synergy between two libraries on handling the incoming `subscribe` and `unsubscribe` events
-in order to emit (broadcast) the `time` event every second with a current time in its payload.
+capabilities, but uses the websocket transport and Socket.IO protocol for that purpose. Check out an example of the
+synergy between two libraries on handling the incoming `subscribe` and `unsubscribe` events in order to emit
+(broadcast) the `time` event every second with a current time in its payload:
 
-```ts
-import { createServer } from "express-zod-api";
-import { attachSockets, createSimpleConfig, ActionsFactory } from "zod-sockets";
-import { Server } from "socket.io";
-import { z } from "zod";
-
-const { logger, httpsServer, httpServer } = await createServer();
-
-const config = createSimpleConfig({
-  emission: {
-    time: { schema: z.tuple([z.date()]) }, // constraints
-  },
-  hooks: {
-    onStartup: async ({ withRooms }) => {
-      setInterval(() => {
-        withRooms("subscribers").broadcast("time", new Date());
-      }, 1000);
-    },
-  },
-});
-
-const factory = new ActionsFactory(config);
-await attachSockets({
-  config,
-  logger,
-  io: new Server(), // https://socket.io/docs/v4/server-options/
-  target: httpsServer || httpServer,
-  actions: [
-    factory.build({
-      event: "subscribe",
-      input: z.tuple([]),
-      handler: async ({ client }) => client.join("subscribers"),
-    }),
-    factory.build({
-      event: "unsubscribe",
-      input: z.tuple([]),
-      handler: async ({ client }) => client.leave("subscribers"),
-    }),
-  ],
-});
-```
+https://github.com/RobinTail/zod-sockets/blob/main/README.md#subscriptions
 
 # Integration and Documentation
 
