@@ -15,7 +15,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node-version: [18.0.0, 18.x, 20.0.0, 20.x, 22-nightly] # todo: use 22.0 and 22.x when released
+        node-version: [18.0.0, 18.x, 20.0.0, 20.x, 22.0.0-rc.2] # todo: use 22.0 and 22.x when released
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
     steps:
     - name: Get yarn cache dir
