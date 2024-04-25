@@ -43,7 +43,7 @@ describe("Logger", () => {
     });
 
     test("Should create warn logger", () => {
-      const { logger, logSpy } = makeLogger({ level: "warn" });
+      const { logger, logSpy } = makeLogger({ level: "warn", color: false });
       logger.warn("testing warn message", { withMeta: true });
       expect(logSpy.mock.calls).toMatchSnapshot();
     });
