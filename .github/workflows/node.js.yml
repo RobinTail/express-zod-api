@@ -41,13 +41,7 @@ jobs:
         timeout_seconds: 15
         max_attempts: 3
         on_retry_command: yarn config set registry https://registry.npmjs.org
-        # todo use regular "yarn install" when min Node version increased to 18.18
-        # @typescript/eslint group compatibility issue fixed by ignoring engines for dev dependencies only:
-        command: |
-          npm pkg delete devDependencies
-          yarn install
-          git checkout -- .
-          yarn install --ignore-engines
+        command: yarn install
     - name: Lint
       run: yarn lint
     - name: Test
