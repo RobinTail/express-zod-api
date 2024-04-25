@@ -2,6 +2,11 @@
 
 ## Version 18
 
+### v18.3.0
+
+- Changed default behaviour when using built-in logger while omitting its `color` option in config:
+  - Automatically detecting the terminal color support by default.
+
 ### v18.2.0
 
 - Supporting Node 22;
