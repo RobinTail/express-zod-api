@@ -1,7 +1,7 @@
 import { inspect } from "node:util";
 import { isObject } from "./common-helpers";
 import { mapObjIndexed } from "ramda";
-import { Ansis, blue, green, hex, red } from "ansis";
+import ansis, { Ansis, blue, green, hex, red } from "ansis"; // @todo possible named export?
 
 /**
  * @desc Using module augmentation approach you can set the type of the actual logger used
@@ -25,7 +25,7 @@ export interface BuiltinLoggerConfig {
   level: "silent" | "warn" | "debug";
   /**
    * @desc Enables colors on printed severity and inspected entities
-   * @default false
+   * @default ansis.isSupported()
    * */
   color?: boolean;
   /**
@@ -63,7 +63,7 @@ export const isBuiltinLoggerConfig = (
  * */
 export const createLogger = ({
   level,
-  color = false,
+  color = ansis.isSupported(),
   depth = 2,
 }: BuiltinLoggerConfig): AbstractLogger => {
   const styles: Record<keyof AbstractLogger, Ansis> = {
