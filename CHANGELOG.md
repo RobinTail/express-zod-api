@@ -1,5 +1,13 @@
 # Changelog
 
+## Version 19
+
+### v19.0.0
+
+- Minimum supported versions:
+  - Node: 18.18.0,
+  - `zod`: 3.23.0.
+
 ## Version 18
 
 ### v18.3.0
