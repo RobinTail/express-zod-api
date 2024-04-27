@@ -84,6 +84,15 @@ exports[`Documentation helpers > depictDateOut > should throw when ZodDateOut in
 Caused by input schema of an Endpoint assigned to GET method of /v1/user/:id path.]
 `;
 
+exports[`Documentation helpers > depictDefault() > Feature 1706 1`] = `
+{
+  "default": "2024-04-27T21:57:39.444Z",
+  "format": "date-time",
+  "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?Z$",
+  "type": "string",
+}
+`;
+
 exports[`Documentation helpers > depictDefault() > should set default property 1`] = `
 {
   "default": true,

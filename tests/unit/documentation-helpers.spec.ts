@@ -222,6 +222,18 @@ describe("Documentation helpers", () => {
         }),
       ).toMatchSnapshot();
     });
+    test("Feature 1706", () => {
+      expect(
+        depictDefault({
+          schema: z
+            .string()
+            .datetime()
+            .default(() => new Date().toISOString()),
+          ...responseCtx,
+          next: makeNext(responseCtx),
+        }),
+      ).toMatchSnapshot();
+    });
   });
 
   describe("depictCatch()", () => {
