@@ -7,18 +7,11 @@ const bufferSchema = z.custom<Buffer>((subject) => Buffer.isBuffer(subject), {
   message: "Expected Buffer",
 });
 
-const base64Regex =
-  /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/;
-
 const variants = {
   buffer: () => proprietary(ezFileKind, bufferSchema),
   string: () => proprietary(ezFileKind, z.string()),
   binary: () => proprietary(ezFileKind, bufferSchema.or(z.string())),
-  base64: () =>
-    proprietary(
-      ezFileKind,
-      z.string().regex(base64Regex, "Does not match base64 encoding"),
-    ),
+  base64: () => proprietary(ezFileKind, z.string().base64()),
 };
 
 type Variants = typeof variants;

@@ -1,6 +1,6 @@
 {
   "name": "express-zod-api",
-  "version": "18.0.0",
+  "version": "18.3.0",
   "description": "A Typescript library to help you get an API server up and running with I/O schema validation and custom middlewares in minutes.",
   "license": "MIT",
   "repository": {
@@ -25,15 +25,13 @@
     "build:docs": "tsx example/generate-documentation.ts",
     "build:client": "tsx example/generate-client.ts",
     "build:license": "tsx tools/license.ts",
-    "test": "yarn test:types && yarn test:unit && yarn test:badge",
+    "pretest": "tsc --noEmit",
+    "test": "vitest run --coverage tests/unit tests/system",
+    "posttest": "make-coverage-badge --output-path coverage.svg",
     "test:cjs": "yarn --cwd tests/cjs && vitest run -r tests/cjs",
     "test:esm": "yarn --cwd tests/esm && vitest run -r tests/esm",
     "test:952": "yarn --cwd tests/issue952 && yarn --cwd tests/issue952 test",
     "test:compat": "yarn --cwd tests/compat && yarn --cwd tests/compat test",
-    "test:u": "yarn test:unit -u && yarn test:badge",
-    "test:types": "tsc --noEmit",
-    "test:unit": "vitest run --coverage tests/unit tests/system",
-    "test:badge": "make-coverage-badge --output-path coverage.svg",
     "bench": "vitest bench --run tests/bench",
     "lint": "eslint src example tests tools && yarn prettier *.md --check",
     "mdfix": "prettier *.md --write",
@@ -64,7 +62,7 @@
     "*.md"
   ],
   "engines": {
-    "node": "^18.0.0 || ^20.0.0"
+    "node": "^18.18.0 || ^20.9.0 || ^22.0.0"
   },
   "dependencies": {
     "ansis": "^3.1.0",
@@ -86,7 +84,7 @@
     "prettier": "^3.1.0",
     "typescript": "^5.1.3",
     "vitest": "^1.0.4",
-    "zod": "^3.22.3"
+    "zod": "^3.23.0"
   },
   "peerDependenciesMeta": {
     "@types/compression": {
@@ -160,7 +158,7 @@
     "tsx": "^4.6.2",
     "typescript": "^5.2.2",
     "vitest": "^1.5.0",
-    "zod": "^3.22.3"
+    "zod": "^3.23.0"
   },
   "keywords": [
     "nodejs",

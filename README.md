@@ -46,17 +46,18 @@ Start your API server with I/O schema validation and custom middlewares in minut
    6. [File uploads](#file-uploads)
    7. [Serving static files](#serving-static-files)
    8. [Connect to your own express app](#connect-to-your-own-express-app)
+   9. [Testing endpoints](#testing-endpoints)
 6. [Special needs](#special-needs)
    1. [Different responses for different status codes](#different-responses-for-different-status-codes)
    2. [Array response](#array-response) for migrating legacy APIs
    3. [Headers as input source](#headers-as-input-source)
    4. [Accepting raw data](#accepting-raw-data)
    5. [Resources cleanup](#resources-cleanup)
+   6. [Subscriptions](#subscriptions)
 7. [Integration and Documentation](#integration-and-documentation)
    1. [Generating a Frontend Client](#generating-a-frontend-client)
    2. [Creating a documentation](#creating-a-documentation)
    3. [Tagging the endpoints](#tagging-the-endpoints)
-   4. [How to test endpoints](#how-to-test-endpoints)
 8. [Caveats](#caveats)
    1. [Coercive schema of Zod](#coercive-schema-of-zod)
    2. [Excessive properties in endpoint output](#excessive-properties-in-endpoint-output)
@@ -887,6 +888,46 @@ to your custom express app.
 Besides that, if you're looking to include additional request parsers, or a middleware that establishes its own routes,
 then consider using the `beforeRouting` [option in config instead](#using-native-express-middlewares).
 
+## Testing endpoints
+
+The way to test endpoints is to mock the request, response, and logger objects, invoke the `execute()` method, and
+assert the expectations for calls of certain mocked methods. The library provides a special method `testEndpoint` that
+makes mocking easier. It requires you either to install `jest` (with `@types/jest`) or `vitest`
+(detects automatically), or to specify the `fnMethod` property assigned with a function mocking method of your testing
+framework, which can also be `node:test` module of most modern Node.js versions.
+However, in order to have proper mocking types in your own tests, you also need to specify `MockOverrides` once in your
+tests excplicitly, so the tests should look this way:
+
+```typescript
+import { testEndpoint } from "express-zod-api";
+
+// place it once anywhere in your tests
+declare module "express-zod-api" {
+  interface MockOverrides extends jest.Mock {} // or Mock from vitest
+}
+
+test("should respond successfully", async () => {
+  const { responseMock, loggerMock } = await testEndpoint({
+    endpoint: yourEndpoint,
+    requestProps: {
+      method: "POST", // default: GET
+      body: {}, // incoming data as if after parsing (JSON)
+    },
+    // fnMethod — for testing frameworks other than jest or vitest
+    // responseProps, configProps, loggerProps
+  });
+  expect(loggerMock.error).toHaveBeenCalledTimes(0);
+  expect(responseMock.status).toHaveBeenCalledWith(200);
+  expect(responseMock.json).toHaveBeenCalledWith({
+    status: "success",
+    data: {},
+  });
+});
+```
+
+_This method is optimized for the `defaultResultHandler`. With the flexibility to customize, you can add additional
+properties as needed._
+
 # Special needs
 
 ## Different responses for different status codes
@@ -1022,6 +1063,17 @@ const dbEquippedFactory = new EndpointsFactory(
 ).addMiddleware(dbProvider);
 ```
 
+## Subscriptions
+
+If you want the user of a client application to be able to subscribe to subsequent updates initiated by the server, the
+capabilities of this library and the HTTP protocol itself would not be enough in this case. I have developed an
+additional pluggable library, [Zod Sockets](https://github.com/RobinTail/zod-sockets), which has similar principles and
+capabilities, but uses the websocket transport and Socket.IO protocol for that purpose. Check out an example of the
+synergy between two libraries on handling the incoming `subscribe` and `unsubscribe` events in order to emit
+(broadcast) the `time` event every second with a current time in its payload:
+
+https://github.com/RobinTail/zod-sockets#subscriptions
+
 # Integration and Documentation
 
 ## Generating a Frontend Client
@@ -1144,46 +1196,6 @@ const exampleEndpoint = taggedEndpointsFactory.build({
   tag: "users", // or tags: ["users", "files"]
 });
 ```
-
-## How to test endpoints
-
-The way to test endpoints is to mock the request, response, and logger objects, invoke the `execute()` method, and
-assert the expectations for calls of certain mocked methods. The library provides a special method `testEndpoint` that
-makes mocking easier. It requires you either to install `jest` (with `@types/jest`) or `vitest`
-(detects automatically), or to specify the `fnMethod` property assigned with a function mocking method of your testing
-framework, which can also be `node:test` module of most modern Node.js versions.
-However, in order to have proper mocking types in your own tests, you also need to specify `MockOverrides` once in your
-tests excplicitly, so the tests should look this way:
-
-```typescript
-import { testEndpoint } from "express-zod-api";
-
-// place it once anywhere in your tests
-declare module "express-zod-api" {
-  interface MockOverrides extends jest.Mock {} // or Mock from vitest
-}
-
-test("should respond successfully", async () => {
-  const { responseMock, loggerMock } = await testEndpoint({
-    endpoint: yourEndpoint,
-    requestProps: {
-      method: "POST", // default: GET
-      body: {}, // incoming data as if after parsing (JSON)
-    },
-    // fnMethod — for testing frameworks other than jest or vitest
-    // responseProps, configProps, loggerProps
-  });
-  expect(loggerMock.error).toHaveBeenCalledTimes(0);
-  expect(responseMock.status).toHaveBeenCalledWith(200);
-  expect(responseMock.json).toHaveBeenCalledWith({
-    status: "success",
-    data: {},
-  });
-});
-```
-
-_This method is optimized for the `defaultResultHandler`. With the flexibility to customize, you can add additional
-properties as needed._
 
 # Caveats
 

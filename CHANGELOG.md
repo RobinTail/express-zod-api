@@ -1,6 +1,39 @@
 # Changelog
 
+## Version 19
+
+### v19.0.0
+
+- Minimum supported versions:
+  - Node: 18.18.0 or 20.9.0,
+  - `zod`: 3.23.0.
+
 ## Version 18
+
+### v18.3.0
+
+- Changed default behaviour when using built-in logger while omitting its `color` option in config:
+  - Automatically detecting the terminal color support by default.
+
+### v18.2.0
+
+- Supporting Node 22;
+- Featuring `zod-sockets` for implementing subscriptions on your API:
+  - I have developed an additional pluggable library, Zod Sockets, which has similar principles and capabilities, but
+    uses the websocket transport and Socket.IO protocol, so that the user of a client application could subscribe to
+    subsequent updates initiated by the server.
+  - Check out an [example of the synergy between two libraries](https://github.com/RobinTail/zod-sockets#subscriptions)
+    and the [Demo Chat application](https://github.com/RobinTail/chat).
+
+### v18.1.0
+
+- Optimization for `zod` 3.23:
+  - `zod` 3.23 offers
+    [several features on handling strings](https://github.com/colinhacks/zod/releases/tag/v3.23.0);
+  - It's also claimed to be "the final 3.x release before Zod 4.0".;
+  - Using the featured `zod` refinements in the following proprietary schemas: `ez.dateIn()` and `ez.file("base64")`;
+  - The changes are non-breaking and the compatibility to `zod` 3.22 remains;
+  - Validation error messages will depend on actual `zod` version installed.
 
 ### v18.0.0
 

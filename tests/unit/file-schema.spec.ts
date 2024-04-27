@@ -76,14 +76,7 @@ describe("ez.file()", () => {
       const result = schema.safeParse("~~~~");
       expect(result.success).toBeFalsy();
       if (!result.success) {
-        expect(result.error.issues).toEqual([
-          {
-            code: "invalid_string",
-            message: "Does not match base64 encoding",
-            validation: "regex",
-            path: [],
-          },
-        ]);
+        expect(result.error.issues).toMatchSnapshot();
       }
     });
 

@@ -18,15 +18,7 @@ describe("ez.dateIn()", () => {
       const result = schema.safeParse(123);
       expect(result.success).toBeFalsy();
       if (!result.success) {
-        expect(result.error.issues).toEqual([
-          {
-            code: "invalid_type",
-            expected: "string",
-            message: "Expected string, received number",
-            path: [],
-            received: "number",
-          },
-        ]);
+        expect(result.error.issues).toMatchSnapshot();
       }
     });
 
@@ -50,13 +42,7 @@ describe("ez.dateIn()", () => {
       const result = schema.safeParse("2022-01-32");
       expect(result.success).toBeFalsy();
       if (!result.success) {
-        expect(result.error.issues).toEqual([
-          {
-            code: "invalid_date",
-            message: "Invalid date",
-            path: [],
-          },
-        ]);
+        expect(result.error.issues).toMatchSnapshot();
       }
     });
 
@@ -65,14 +51,7 @@ describe("ez.dateIn()", () => {
       const result = schema.safeParse("12.01.2021");
       expect(result.success).toBeFalsy();
       if (!result.success) {
-        expect(result.error.issues).toEqual([
-          {
-            code: "invalid_string",
-            message: "Invalid",
-            validation: "regex",
-            path: [],
-          },
-        ]);
+        expect(result.error.issues).toMatchSnapshot();
       }
     });
   });

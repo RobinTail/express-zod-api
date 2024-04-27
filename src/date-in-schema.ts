@@ -1,15 +1,18 @@
 import { z } from "zod";
 import { proprietary } from "./metadata";
-import { isValidDate, isoDateRegex } from "./schema-helpers";
+import { isValidDate } from "./schema-helpers";
 
 export const ezDateInKind = "DateIn";
 
-export const dateIn = () =>
-  proprietary(
+export const dateIn = () => {
+  const schema = z.union([
+    z.string().date(),
+    z.string().datetime(),
+    z.string().datetime({ local: true }),
+  ]);
+
+  return proprietary(
     ezDateInKind,
-    z
-      .string()
-      .regex(isoDateRegex)
-      .transform((str) => new Date(str))
-      .pipe(z.date().refine(isValidDate)),
+    schema.transform((str) => new Date(str)).pipe(z.date().refine(isValidDate)),
   );
+};

@@ -64,7 +64,6 @@ import {
 } from "./logical-container";
 import { Method } from "./method";
 import { RawSchema, ezRawKind } from "./raw-schema";
-import { isoDateRegex } from "./schema-helpers";
 import {
   HandlingRules,
   HandlingVariant,
@@ -163,7 +162,7 @@ export const depictFile: Depicter<z.ZodType> = ({ schema }) => ({
   type: "string",
   format:
     schema instanceof z.ZodString
-      ? schema._def.checks.find((check) => check.kind === "regex")
+      ? schema._def.checks.find((check) => check.kind === "base64")
         ? "byte"
         : "file"
       : "binary",
@@ -328,7 +327,7 @@ export const depictDateIn: Depicter<z.ZodType> = (ctx) => {
     description: "YYYY-MM-DDTHH:mm:ss.sssZ",
     type: "string",
     format: "date-time",
-    pattern: isoDateRegex.source,
+    pattern: /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d+)?)?Z?$/.source,
     externalDocs: {
       url: isoDateDocumentationUrl,
     },

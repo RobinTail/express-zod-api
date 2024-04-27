@@ -25,7 +25,7 @@ export interface BuiltinLoggerConfig {
   level: "silent" | "warn" | "debug";
   /**
    * @desc Enables colors on printed severity and inspected entities
-   * @default false
+   * @default Ansis::isSupported()
    * */
   color?: boolean;
   /**
@@ -63,7 +63,7 @@ export const isBuiltinLoggerConfig = (
  * */
 export const createLogger = ({
   level,
-  color = false,
+  color = new Ansis().isSupported(),
   depth = 2,
 }: BuiltinLoggerConfig): AbstractLogger => {
   const styles: Record<keyof AbstractLogger, Ansis> = {
