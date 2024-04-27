@@ -5,7 +5,7 @@
 ### v19.0.0
 
 - Minimum supported versions:
-  - Node: 18.18.0,
+  - Node: 18.18.0 or 20.9.0,
   - `zod`: 3.23.0.
 
 ## Version 18
