@@ -69,15 +69,7 @@ jobs:
         max_attempts: 3
         on_retry_command: yarn config set registry https://registry.npmjs.org
         command: yarn test:esm
-    - name: Check Jest 30 compatibility
-      uses: madhead/semver-utils@v4
-      id: jest30compat
-      with:
-        version: ${{ steps.setup-node.outputs.node-version }}
-        satisfies: '>=18.12.0'
-        lenient: false # require to parse or fail
     - name: Compatibility test
-      if: steps.jest30compat.outputs.satisfies == 'true'
       uses: nick-fields/retry@v3
       with:
         timeout_seconds: 15
