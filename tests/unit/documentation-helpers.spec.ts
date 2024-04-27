@@ -225,10 +225,12 @@ describe("Documentation helpers", () => {
     test("Feature 1706", () => {
       expect(
         depictDefault({
-          schema: z
-            .string()
-            .datetime()
-            .default(() => new Date().toISOString()),
+          schema: withMeta(
+            z
+              .string()
+              .datetime()
+              .default(() => new Date().toISOString()),
+          ).placeholder("Today"),
           ...responseCtx,
           next: makeNext(responseCtx),
         }),

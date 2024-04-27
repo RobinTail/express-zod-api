@@ -10,6 +10,7 @@ export interface Metadata<T extends z.ZodTypeAny> {
    * */
   kind?: ProprietaryKind;
   examples: z.input<T>[];
+  placeholder?: string;
 }
 
 export const metaProp = "expressZodApiMeta";
@@ -18,9 +19,14 @@ type ExampleSetter<T extends z.ZodTypeAny> = (
   example: z.input<T>,
 ) => WithMeta<T>;
 
+type PlaceholderSetter<T extends z.ZodTypeAny> = (
+  placeholder: string,
+) => WithMeta<T>;
+
 type WithMeta<T extends z.ZodTypeAny> = T & {
   _def: T["_def"] & Record<typeof metaProp, Metadata<T>>;
   example: ExampleSetter<T>;
+  placeholder: PlaceholderSetter<T>;
 };
 
 /** @link https://github.com/colinhacks/zod/blob/3e4f71e857e75da722bd7e735b6d657a70682df2/src/types.ts#L485 */
@@ -36,6 +42,13 @@ export const withMeta = <T extends z.ZodTypeAny>(schema: T): WithMeta<T> => {
       get: (): ExampleSetter<T> => (value) => {
         const localCopy = withMeta<T>(copy);
         (localCopy._def[metaProp] as Metadata<T>).examples.push(value);
+        return localCopy;
+      },
+    },
+    placeholder: {
+      get: (): PlaceholderSetter<T> => (value) => {
+        const localCopy = withMeta<T>(copy);
+        (localCopy._def[metaProp] as Metadata<T>).placeholder = value;
         return localCopy;
       },
     },
