@@ -222,7 +222,7 @@ describe("Documentation helpers", () => {
         }),
       ).toMatchSnapshot();
     });
-    test("Feature 1706", () => {
+    test("Feature #1706: should override the default value by a label from metadata", () => {
       expect(
         depictDefault({
           schema: withMeta(

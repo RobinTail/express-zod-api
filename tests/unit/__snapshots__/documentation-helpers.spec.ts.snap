@@ -84,7 +84,7 @@ exports[`Documentation helpers > depictDateOut > should throw when ZodDateOut in
 Caused by input schema of an Endpoint assigned to GET method of /v1/user/:id path.]
 `;
 
-exports[`Documentation helpers > depictDefault() > Feature 1706 1`] = `
+exports[`Documentation helpers > depictDefault() > Feature #1706: should override the default value by a label from metadata 1`] = `
 {
   "default": "Today",
   "format": "date-time",
