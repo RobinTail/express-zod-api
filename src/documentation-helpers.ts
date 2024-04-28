@@ -62,7 +62,7 @@ import {
   andToOr,
   mapLogicalContainer,
 } from "./logical-container";
-import { getMeta, hasMeta } from "./metadata";
+import { getMeta } from "./metadata";
 import { Method } from "./method";
 import { RawSchema, ezRawKind } from "./raw-schema";
 import { isoDateRegex } from "./schema-helpers";
