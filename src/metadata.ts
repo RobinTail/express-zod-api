@@ -10,7 +10,8 @@ export interface Metadata<T extends z.ZodTypeAny> {
    * */
   kind?: ProprietaryKind;
   examples: z.input<T>[];
-  placeholder?: string;
+  /** @override ZodDefault::_def.defaultValue() */
+  defaultLabel?: string;
 }
 
 export const metaProp = "expressZodApiMeta";
@@ -19,14 +20,14 @@ type ExampleSetter<T extends z.ZodTypeAny> = (
   example: z.input<T>,
 ) => WithMeta<T>;
 
-type PlaceholderSetter<T extends z.ZodTypeAny> = (
-  placeholder: string,
-) => WithMeta<T>;
+type DefaultOverrider<T extends z.ZodTypeAny> = (label: string) => WithMeta<T>;
 
 type WithMeta<T extends z.ZodTypeAny> = T & {
   _def: T["_def"] & Record<typeof metaProp, Metadata<T>>;
+  /** @desc Add an example value (before any transformations, can be called multiple times) */
   example: ExampleSetter<T>;
-  placeholder: PlaceholderSetter<T>;
+  /** @desc Override the default value in the generated Documentation with a label */
+  overrideDefault: DefaultOverrider<T>;
 };
 
 /** @link https://github.com/colinhacks/zod/blob/3e4f71e857e75da722bd7e735b6d657a70682df2/src/types.ts#L485 */
@@ -45,10 +46,10 @@ export const withMeta = <T extends z.ZodTypeAny>(schema: T): WithMeta<T> => {
         return localCopy;
       },
     },
-    placeholder: {
-      get: (): PlaceholderSetter<T> => (value) => {
+    overrideDefault: {
+      get: (): DefaultOverrider<T> => (label) => {
         const localCopy = withMeta<T>(copy);
-        (localCopy._def[metaProp] as Metadata<T>).placeholder = value;
+        (localCopy._def[metaProp] as Metadata<T>).defaultLabel = label;
         return localCopy;
       },
     },

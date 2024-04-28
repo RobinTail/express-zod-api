@@ -230,7 +230,7 @@ describe("Documentation helpers", () => {
               .string()
               .datetime()
               .default(() => new Date().toISOString()),
-          ).placeholder("Today"),
+          ).overrideDefault("Today"),
           ...responseCtx,
           next: makeNext(responseCtx),
         }),

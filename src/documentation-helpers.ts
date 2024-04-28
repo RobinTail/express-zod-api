@@ -133,7 +133,7 @@ export const depictDefault: Depicter<z.ZodDefault<z.ZodTypeAny>> = ({
   next,
 }) => ({
   ...next(schema._def.innerType),
-  default: getMeta(schema, "placeholder") || schema._def.defaultValue(),
+  default: getMeta(schema, "defaultLabel") || schema._def.defaultValue(),
 });
 
 export const depictCatch: Depicter<z.ZodCatch<z.ZodTypeAny>> = ({
