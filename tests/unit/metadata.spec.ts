@@ -80,6 +80,20 @@ describe("Metadata", () => {
         expect(schemaWithMeta._def.expressZodApiMeta.examples).toEqual([]);
       });
     });
+
+    describe(".describeDefault()", () => {
+      test("should set the corresponding metadata in the schema definition", () => {
+        const schema = z
+          .string()
+          .datetime()
+          .default(() => new Date().toISOString());
+        const schemaWithMeta = withMeta(schema).describeDefault("Today");
+        expect(schemaWithMeta._def.expressZodApiMeta).toHaveProperty(
+          "defaultLabel",
+          "Today",
+        );
+      });
+    });
   });
 
   describe("hasMeta()", () => {
