@@ -37,13 +37,15 @@ type WithMeta<T extends z.ZodTypeAny> = T & {
 const cloneSchema = <T extends z.ZodTypeAny>(schema: T) =>
   schema.describe(schema.description as string);
 
-export const withMeta = <T extends z.ZodTypeAny>(schema: T): WithMeta<T> => {
+export const withMeta = <T extends z.ZodTypeAny>(
+  schema: T | WithMeta<T>,
+): WithMeta<T> => {
   const copy = cloneSchema(schema) as WithMeta<T>;
   copy._def[metaProp] = // clone for deep copy, issue #827
     clone(copy._def[metaProp]) || ({ examples: [] } satisfies Metadata<T>);
   Object.defineProperty(copy, "example" satisfies keyof ProprietaryMethods<T>, {
     get: (): ExampleSetter<T> => (value) => {
-      const localCopy = withMeta<T>(copy);
+      const localCopy = withMeta(copy);
       (localCopy._def[metaProp] as Metadata<T>).examples.push(value);
       return localCopy;
     },
@@ -53,7 +55,7 @@ export const withMeta = <T extends z.ZodTypeAny>(schema: T): WithMeta<T> => {
     "describeDefault" satisfies keyof ProprietaryMethods<T>,
     {
       get: (): DefaultDescriber<T> => (label) => {
-        const localCopy = withMeta<T>(copy);
+        const localCopy = withMeta(copy);
         (localCopy._def[metaProp] as Metadata<T>).defaultLabel = label;
         return localCopy;
       },
