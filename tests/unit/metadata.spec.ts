@@ -25,7 +25,7 @@ describe("Metadata", () => {
       expect(typeof schemaWithMeta.describeDefault).toBe("function");
     });
 
-    test("metadata should withstand refinements", () => {
+    test("should withstand refinements", () => {
       const schema = z.string();
       const schemaWithMeta = withMeta(schema).example("test");
       expect(schemaWithMeta._def.expressZodApiMeta.examples).toEqual(["test"]);
@@ -34,7 +34,7 @@ describe("Metadata", () => {
       });
     });
 
-    test("metadata should withstand double withMeta()", () => {
+    test("should withstand double wrapping", () => {
       const schema = z.string();
       const schemaWithMeta = withMeta(schema).example("test");
       expect(withMeta(schemaWithMeta)._def.expressZodApiMeta.examples).toEqual([
