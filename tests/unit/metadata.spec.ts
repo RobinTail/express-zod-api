@@ -16,40 +16,13 @@ describe("Metadata", () => {
       expect(expressZodApiMeta).toEqual({ examples: [] });
     });
 
-    test("should provide example() method", () => {
+    test("should provide proprietary methods", () => {
       const schema = z.string();
       const schemaWithMeta = withMeta(schema);
       expect(schemaWithMeta).toHaveProperty("example");
       expect(typeof schemaWithMeta.example).toBe("function");
-    });
-
-    test("example() should set the corresponding metadata in the schema definition", () => {
-      const schema = z.string();
-      const schemaWithMeta = withMeta(schema).example("test");
-      expect(schemaWithMeta._def.expressZodApiMeta).toHaveProperty("examples");
-      expect(schemaWithMeta._def.expressZodApiMeta.examples).toEqual(["test"]);
-    });
-
-    test("Issue 827: example() should be immutable", () => {
-      const schemaWithMeta = withMeta(z.string());
-      const schemaWithExample = schemaWithMeta.example("test");
-      expect(schemaWithExample._def.expressZodApiMeta.examples).toEqual([
-        "test",
-      ]);
-      expect(schemaWithMeta._def.expressZodApiMeta.examples).toEqual([]);
-    });
-
-    test("example() can set multiple examples", () => {
-      const schema = z.string();
-      const schemaWithMeta = withMeta(schema)
-        .example("test1")
-        .example("test2")
-        .example("test3");
-      expect(schemaWithMeta._def.expressZodApiMeta.examples).toEqual([
-        "test1",
-        "test2",
-        "test3",
-      ]);
+      expect(schemaWithMeta).toHaveProperty("describeDefault");
+      expect(typeof schemaWithMeta.describeDefault).toBe("function");
     });
 
     test("metadata should withstand refinements", () => {
@@ -71,6 +44,41 @@ describe("Metadata", () => {
         withMeta(schemaWithMeta).example("another")._def.expressZodApiMeta
           .examples,
       ).toEqual(["test", "another"]);
+    });
+
+    describe(".example()", () => {
+      test("should set the corresponding metadata in the schema definition", () => {
+        const schema = z.string();
+        const schemaWithMeta = withMeta(schema).example("test");
+        expect(schemaWithMeta._def.expressZodApiMeta).toHaveProperty(
+          "examples",
+        );
+        expect(schemaWithMeta._def.expressZodApiMeta.examples).toEqual([
+          "test",
+        ]);
+      });
+
+      test("can set multiple examples", () => {
+        const schema = z.string();
+        const schemaWithMeta = withMeta(schema)
+          .example("test1")
+          .example("test2")
+          .example("test3");
+        expect(schemaWithMeta._def.expressZodApiMeta.examples).toEqual([
+          "test1",
+          "test2",
+          "test3",
+        ]);
+      });
+
+      test("Issue 827: should be immutable", () => {
+        const schemaWithMeta = withMeta(z.string());
+        const schemaWithExample = schemaWithMeta.example("test");
+        expect(schemaWithExample._def.expressZodApiMeta.examples).toEqual([
+          "test",
+        ]);
+        expect(schemaWithMeta._def.expressZodApiMeta.examples).toEqual([]);
+      });
     });
   });
 
