@@ -17,12 +17,13 @@ describe("Metadata", () => {
     });
 
     test("should provide proprietary methods", () => {
-      const schema = z.string();
-      const schemaWithMeta = withMeta(schema);
-      expect(schemaWithMeta).toHaveProperty("example");
-      expect(typeof schemaWithMeta.example).toBe("function");
-      expect(schemaWithMeta).toHaveProperty("describeDefault");
-      expect(typeof schemaWithMeta.describeDefault).toBe("function");
+      const stringSchema = withMeta(z.string());
+      const defaultSchema = withMeta(z.string().default(""));
+      expect(stringSchema).toHaveProperty("example");
+      expect(typeof stringSchema.example).toBe("function");
+      expect(stringSchema).not.toHaveProperty("describeDefault");
+      expect(defaultSchema).toHaveProperty("describeDefault");
+      expect(typeof defaultSchema.describeDefault).toBe("function");
     });
 
     test("should withstand refinements", () => {

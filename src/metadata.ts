@@ -20,14 +20,19 @@ type ExampleSetter<T extends z.ZodTypeAny> = (
   example: z.input<T>,
 ) => WithMeta<T>;
 
-type DefaultDescriber<T extends z.ZodTypeAny> = (label: string) => WithMeta<T>;
+type DefaultDescriber<T extends z.ZodDefault<z.ZodTypeAny>> = (
+  label: string,
+) => WithMeta<T>;
 
-export interface ProprietaryMethods<T extends z.ZodTypeAny> {
+export type ProprietaryMethods<T extends z.ZodTypeAny> = {
   /** @desc Add an example value (before any transformations, can be called multiple times) */
   example: ExampleSetter<T>;
-  /** @desc Change the default value in the generated Documentation to a label */
-  describeDefault: DefaultDescriber<T>;
-}
+} & (T extends z.ZodDefault<z.ZodTypeAny>
+  ? {
+      /** @desc Change the default value in the generated Documentation to a label */
+      describeDefault: DefaultDescriber<T>;
+    }
+  : {});
 
 type WithMeta<T extends z.ZodTypeAny> = T & {
   _def: T["_def"] & Record<typeof metaProp, Metadata<T>>;
@@ -50,17 +55,19 @@ export const withMeta = <T extends z.ZodType>(
       return localCopy;
     },
   });
-  Object.defineProperty(
-    copy,
-    "describeDefault" satisfies keyof ProprietaryMethods<T>,
-    {
-      get: (): DefaultDescriber<T> => (label) => {
-        const localCopy = withMeta(copy);
-        localCopy._def[metaProp].defaultLabel = label;
-        return localCopy;
+  if (copy instanceof z.ZodDefault) {
+    Object.defineProperty(
+      copy,
+      "describeDefault" satisfies keyof ProprietaryMethods<typeof copy>,
+      {
+        get: (): DefaultDescriber<typeof copy> => (label) => {
+          const localCopy = withMeta<typeof copy>(copy);
+          localCopy._def[metaProp].defaultLabel = label;
+          return localCopy;
+        },
       },
-    },
-  );
+    );
+  }
   return copy;
 };
 
