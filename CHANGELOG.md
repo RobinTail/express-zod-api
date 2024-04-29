@@ -2,6 +2,21 @@
 
 ## Version 18
 
+### v18.3.0
+
+- Changed default behaviour when using built-in logger while omitting its `color` option in config:
+  - Automatically detecting the terminal color support by default.
+
+### v18.2.0
+
+- Supporting Node 22;
+- Featuring `zod-sockets` for implementing subscriptions on your API:
+  - I have developed an additional pluggable library, Zod Sockets, which has similar principles and capabilities, but
+    uses the websocket transport and Socket.IO protocol, so that the user of a client application could subscribe to
+    subsequent updates initiated by the server.
+  - Check out an [example of the synergy between two libraries](https://github.com/RobinTail/zod-sockets#subscriptions)
+    and the [Demo Chat application](https://github.com/RobinTail/chat).
+
 ### v18.1.0
 
 - Optimization for `zod` 3.23:
