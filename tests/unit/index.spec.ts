@@ -14,6 +14,7 @@ import {
   IOSchema,
   InputSecurity,
   LoggerOverrides,
+  MetaMethods,
   Metadata,
   Method,
   MiddlewareDefinition,
@@ -23,6 +24,7 @@ import {
   ResultHandlerDefinition,
   Routing,
   ServerConfig,
+  withMeta,
 } from "../../src";
 import { describe, expect, test, vi } from "vitest";
 
@@ -51,6 +53,10 @@ describe("Index Entrypoint", () => {
       expectType<LoggerOverrides>({});
       expectType<Routing>({});
       expectType<Metadata<z.ZodTypeAny>>({ examples: [] });
+      expectType<MetaMethods<z.ZodAny>>({
+        example: () => withMeta(z.any()),
+        describeDefault: () => withMeta(z.any()),
+      });
       expectType<CommonConfig>({ cors: true, logger: { level: "silent" } });
       expectType<AppConfig>({
         app: {} as IRouter,

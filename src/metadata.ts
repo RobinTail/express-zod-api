@@ -22,13 +22,16 @@ type ExampleSetter<T extends z.ZodTypeAny> = (
 
 type DefaultDescriber<T extends z.ZodTypeAny> = (label: string) => WithMeta<T>;
 
-type WithMeta<T extends z.ZodTypeAny> = T & {
-  _def: T["_def"] & Record<typeof metaProp, Metadata<T>>;
+export interface MetaMethods<T extends z.ZodTypeAny> {
   /** @desc Add an example value (before any transformations, can be called multiple times) */
   example: ExampleSetter<T>;
   /** @desc Change the default value in the generated Documentation to a label */
   describeDefault: DefaultDescriber<T>;
-};
+}
+
+type WithMeta<T extends z.ZodTypeAny> = T & {
+  _def: T["_def"] & Record<typeof metaProp, Metadata<T>>;
+} & MetaMethods<T>;
 
 /** @link https://github.com/colinhacks/zod/blob/3e4f71e857e75da722bd7e735b6d657a70682df2/src/types.ts#L485 */
 const cloneSchema = <T extends z.ZodTypeAny>(schema: T) =>
@@ -53,7 +56,7 @@ export const withMeta = <T extends z.ZodTypeAny>(schema: T): WithMeta<T> => {
         return localCopy;
       },
     },
-  });
+  } satisfies Record<keyof MetaMethods<T>, PropertyDescriptor>);
 };
 
 export const hasMeta = <T extends z.ZodTypeAny>(
