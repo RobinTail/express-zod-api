@@ -14,13 +14,13 @@ import {
   IOSchema,
   InputSecurity,
   LoggerOverrides,
-  MetaMethods,
   Metadata,
   Method,
   MiddlewareDefinition,
   MockOverrides,
   OAuth2Security,
   OpenIdSecurity,
+  ProprietaryMethods,
   ResultHandlerDefinition,
   Routing,
   ServerConfig,
@@ -53,7 +53,7 @@ describe("Index Entrypoint", () => {
       expectType<LoggerOverrides>({});
       expectType<Routing>({});
       expectType<Metadata<z.ZodTypeAny>>({ examples: [] });
-      expectType<MetaMethods<z.ZodAny>>({
+      expectType<ProprietaryMethods<z.ZodAny>>({
         example: () => withMeta(z.any()),
         describeDefault: () => withMeta(z.any()),
       });
