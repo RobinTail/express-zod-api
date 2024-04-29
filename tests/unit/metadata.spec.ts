@@ -53,10 +53,8 @@ describe("Metadata", () => {
         const schemaWithMeta = withMeta(schema).example("test");
         expect(schemaWithMeta._def.expressZodApiMeta).toHaveProperty(
           "examples",
+          ["test"],
         );
-        expect(schemaWithMeta._def.expressZodApiMeta.examples).toEqual([
-          "test",
-        ]);
       });
 
       test("can set multiple examples", () => {
