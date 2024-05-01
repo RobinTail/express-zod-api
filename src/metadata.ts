@@ -12,7 +12,7 @@ export interface Metadata {
    * @link https://github.com/colinhacks/zod/pull/2860
    * */
   kind?: ProprietaryKind;
-  examples: unknown[];
+  examples?: unknown[];
 }
 
 declare module "zod" {
@@ -28,7 +28,7 @@ declare module "zod" {
 const cloneSchema = (schema: z.ZodType) => {
   const copy = schema.describe(schema.description as string);
   copy._def[metaSymbol] = // clone for deep copy, issue #827
-    clone(copy._def[metaSymbol]) || ({ examples: [] } satisfies Metadata);
+    clone(copy._def[metaSymbol]) || ({} satisfies Metadata);
   return copy;
 };
 
@@ -39,6 +39,7 @@ if (!(metaSymbol in globalThis)) {
     value: (typeof this)["_input"],
   ) {
     const copy = cloneSchema(this);
+    copy._def[metaSymbol].examples = copy._def[metaSymbol].examples || [];
     copy._def[metaSymbol].examples.push(value);
     return copy;
   };
@@ -62,8 +63,8 @@ export const copyMeta = <A extends z.ZodTypeAny, B extends z.ZodTypeAny>(
   }
   const result = cloneSchema(dest);
   result._def[metaSymbol].examples = combinations(
-    result._def[metaSymbol].examples,
-    src._def[metaSymbol]?.examples || [], // @todo figure out its requirement
+    result._def[metaSymbol].examples || [],
+    src._def[metaSymbol]?.examples || [],
     ([destExample, srcExample]) =>
       typeof destExample === "object" && typeof srcExample === "object"
         ? mergeDeepRight({ ...destExample }, { ...srcExample })

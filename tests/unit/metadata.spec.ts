@@ -11,10 +11,10 @@ describe("Metadata", () => {
       const schemaWithMeta = withMeta(schema);
       expect(schemaWithMeta).toBeInstanceOf(z.ZodString);
       expect(metaSymbol).toBe(Symbol.for("express-zod-api"));
-      expect(schemaWithMeta._def[metaSymbol]).toEqual({ examples: [] });
+      expect(schemaWithMeta._def[metaSymbol]).toEqual({});
       const { [metaSymbol]: meta, ...rest } = schemaWithMeta._def;
       expect(rest).toEqual(schema._def);
-      expect(meta).toEqual({ examples: [] });
+      expect(meta).toEqual({});
     });
 
     test("should provide example() method", () => {
