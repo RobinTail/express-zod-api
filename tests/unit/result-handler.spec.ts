@@ -7,7 +7,6 @@ import {
   arrayResultHandler,
   createResultHandler,
   defaultResultHandler,
-  withMeta,
 } from "../../src";
 import { ApiResponse } from "../../src";
 import { metaSymbol } from "../../src/metadata";
@@ -136,15 +135,15 @@ describe("ResultHandler", () => {
 
       test("should forward output schema examples", () => {
         const apiResponse = getPositiveResponse(
-          withMeta(
-            z.object({
+          z
+            .object({
               str: z.string(),
               items: z.array(z.string()),
+            })
+            .example({
+              str: "test",
+              items: ["One", "Two", "Three"],
             }),
-          ).example({
-            str: "test",
-            items: ["One", "Two", "Three"],
-          }),
         );
         if (!(apiResponse instanceof z.ZodType)) {
           expect.fail("should not be here");

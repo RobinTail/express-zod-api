@@ -15,7 +15,6 @@ import {
 } from "./common-helpers";
 import { IOSchema } from "./io-schema";
 import { AbstractLogger } from "./logger";
-import { withMeta } from "./metadata";
 
 interface ResultHandlerParams<RES> {
   /** null in case of failure to parse or to find the matching endpoint (error: not found) */
@@ -71,12 +70,10 @@ export const defaultResultHandler = createResultHandler({
   getPositiveResponse: (output: IOSchema) => {
     // Examples are taken for proxying: no validation needed for this
     const examples = getExamples({ schema: output });
-    const responseSchema = withMeta(
-      z.object({
-        status: z.literal("success"),
-        data: output,
-      }),
-    );
+    const responseSchema = z.object({
+      status: z.literal("success"),
+      data: output,
+    });
     return examples.reduce<typeof responseSchema>(
       (acc, example) =>
         acc.example({
@@ -87,19 +84,19 @@ export const defaultResultHandler = createResultHandler({
     );
   },
   getNegativeResponse: () =>
-    withMeta(
-      z.object({
+    z
+      .object({
         status: z.literal("error"),
         error: z.object({
           message: z.string(),
         }),
+      })
+      .example({
+        status: "error",
+        error: {
+          message: getMessageFromError(new Error("Sample error message")),
+        },
       }),
-    ).example({
-      status: "error",
-      error: {
-        message: getMessageFromError(new Error("Sample error message")),
-      },
-    }),
   handler: ({ error, input, output, request, response, logger }) => {
     if (!error) {
       response.status(defaultStatusCodes.positive).json({
@@ -126,13 +123,12 @@ export const arrayResultHandler = createResultHandler({
   getPositiveResponse: (output) => {
     // Examples are taken for proxying: no validation needed for this
     const examples = getExamples({ schema: output });
-    const responseSchema = withMeta(
+    const responseSchema =
       "shape" in output &&
-        "items" in output.shape &&
-        output.shape.items instanceof z.ZodArray
+      "items" in output.shape &&
+      output.shape.items instanceof z.ZodArray
         ? (output.shape.items as z.ZodArray<z.ZodTypeAny>)
-        : z.array(z.any()),
-    );
+        : z.array(z.any());
     return examples.reduce<typeof responseSchema>(
       (acc, example) =>
         isObject(example) && "items" in example && Array.isArray(example.items)
@@ -142,9 +138,7 @@ export const arrayResultHandler = createResultHandler({
     );
   },
   getNegativeResponse: () =>
-    withMeta(z.string()).example(
-      getMessageFromError(new Error("Sample error message")),
-    ),
+    z.string().example(getMessageFromError(new Error("Sample error message"))),
   handler: ({ response, output, error, logger, request, input }) => {
     if (error) {
       const statusCode = getStatusCodeFromError(error);

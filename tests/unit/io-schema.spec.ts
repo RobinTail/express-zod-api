@@ -1,6 +1,6 @@
 import { expectNotType, expectType } from "tsd";
 import { z } from "zod";
-import { IOSchema, createMiddleware, withMeta } from "../../src";
+import { IOSchema, createMiddleware } from "../../src";
 import { getFinalEndpointInputSchema } from "../../src/io-schema";
 import { getMeta } from "../../src/metadata";
 import { AnyMiddlewareDef } from "../../src/middleware";
@@ -260,47 +260,45 @@ describe("I/O Schema and related helpers", () => {
     test("Should merge examples in case of using withMeta()", () => {
       const middlewares: AnyMiddlewareDef[] = [
         createMiddleware({
-          input: withMeta(
-            z
-              .object({
-                one: z.string(),
-              })
-              .and(
-                z.object({
-                  two: z.number(),
-                }),
-              ),
-          ).example({
-            one: "test",
-            two: 123,
-          }),
+          input: z
+            .object({
+              one: z.string(),
+            })
+            .and(
+              z.object({
+                two: z.number(),
+              }),
+            )
+            .example({
+              one: "test",
+              two: 123,
+            }),
           middleware: vi.fn(),
         }),
         createMiddleware({
-          input: withMeta(
-            z
-              .object({
-                three: z.null(),
-              })
-              .or(
-                z.object({
-                  four: z.boolean(),
-                }),
-              ),
-          ).example({
-            three: null,
-            four: true,
-          }),
+          input: z
+            .object({
+              three: z.null(),
+            })
+            .or(
+              z.object({
+                four: z.boolean(),
+              }),
+            )
+            .example({
+              three: null,
+              four: true,
+            }),
           middleware: vi.fn(),
         }),
       ];
-      const endpointInput = withMeta(
-        z.object({
+      const endpointInput = z
+        .object({
           five: z.string(),
-        }),
-      ).example({
-        five: "some",
-      });
+        })
+        .example({
+          five: "some",
+        });
       const result = getFinalEndpointInputSchema(middlewares, endpointInput);
       expect(getMeta(result, "examples")).toEqual([
         {

@@ -1,7 +1,7 @@
 import createHttpError from "http-errors";
 import assert from "node:assert/strict";
 import { z } from "zod";
-import { ez, withMeta } from "../../src";
+import { ez } from "../../src";
 import { keyAndTokenAuthenticatedEndpointsFactory } from "../factories";
 
 export const updateUserEndpoint =
@@ -9,8 +9,8 @@ export const updateUserEndpoint =
     method: "patch",
     tag: "users",
     description: "Changes the user record. Example user update endpoint.",
-    input: withMeta(
-      z.object({
+    input: z
+      .object({
         // id is the route path param of /v1/user/:id
         id: z
           .string()
@@ -21,21 +21,21 @@ export const updateUserEndpoint =
           ),
         name: z.string().min(1),
         birthday: ez.dateIn(),
+      })
+      .example({
+        id: "12",
+        name: "John Doe",
+        birthday: "1963-04-21",
       }),
-    ).example({
-      id: "12",
-      name: "John Doe",
-      birthday: "1963-04-21",
-    }),
-    output: withMeta(
-      z.object({
+    output: z
+      .object({
         name: z.string(),
         createdAt: ez.dateOut(),
+      })
+      .example({
+        name: "John Doe",
+        createdAt: new Date("2021-12-31"),
       }),
-    ).example({
-      name: "John Doe",
-      createdAt: new Date("2021-12-31"),
-    }),
     handler: async ({
       input: { id, name, key },
       options: { token },
