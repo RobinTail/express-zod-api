@@ -78,7 +78,7 @@ export const proprietary = <T extends z.ZodTypeAny>(
 ) => {
   const schema = cloneSchema(subject);
   schema._def[metaSymbol].kind = kind;
-  return schema;
+  return schema as T;
 };
 
 export const isProprietary = (schema: z.ZodTypeAny, kind: ProprietaryKind) =>

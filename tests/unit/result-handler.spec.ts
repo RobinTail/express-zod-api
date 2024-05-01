@@ -10,7 +10,7 @@ import {
   withMeta,
 } from "../../src";
 import { ApiResponse } from "../../src";
-import { metaProp } from "../../src/metadata";
+import { metaSymbol } from "../../src/metadata";
 import { describe, expect, test, vi } from "vitest";
 import {
   makeLoggerMock,
@@ -149,7 +149,7 @@ describe("ResultHandler", () => {
         if (!(apiResponse instanceof z.ZodType)) {
           expect.fail("should not be here");
         }
-        expect(apiResponse._def[metaProp]).toMatchSnapshot();
+        expect(apiResponse._def[metaSymbol]).toMatchSnapshot();
       });
 
       test("should generate negative response example", () => {
@@ -157,7 +157,7 @@ describe("ResultHandler", () => {
         if (!(apiResponse instanceof z.ZodType)) {
           expect.fail("should not be here");
         }
-        expect(apiResponse._def[metaProp]).toMatchSnapshot();
+        expect(apiResponse._def[metaSymbol]).toMatchSnapshot();
       });
     },
   );
