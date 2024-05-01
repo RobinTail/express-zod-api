@@ -20,7 +20,7 @@ declare module "zod" {
     [metaSymbol]: Metadata;
   }
   interface ZodType {
-    example: (example: this["_input"]) => this;
+    example(example: this["_input"]): this;
   }
 }
 
@@ -57,10 +57,13 @@ export const copyMeta = <A extends z.ZodTypeAny, B extends z.ZodTypeAny>(
   src: A,
   dest: B,
 ) => {
+  if (!hasMeta(src)) {
+    return dest;
+  }
   const result = cloneSchema(dest);
   result._def[metaSymbol].examples = combinations(
     result._def[metaSymbol].examples,
-    src._def[metaSymbol].examples,
+    src._def[metaSymbol]?.examples || [], // @todo figure out its requirement
     ([destExample, srcExample]) =>
       typeof destExample === "object" && typeof srcExample === "object"
         ? mergeDeepRight({ ...destExample }, { ...srcExample })
@@ -85,4 +88,5 @@ export const isProprietary = (schema: z.ZodTypeAny, kind: ProprietaryKind) =>
  * @deprecated no longer required
  * @todo remove in v19
  * */
-export const withMeta = <T extends z.ZodType>(schema: T) => cloneSchema(schema);
+export const withMeta = <T extends z.ZodTypeAny>(schema: T) =>
+  cloneSchema(schema) as T;

@@ -54,7 +54,7 @@ describe("Metadata", () => {
       const schema = z.string();
       const schemaWithMeta = withMeta(schema).example("test");
       expect(schemaWithMeta._def[metaSymbol].examples).toEqual(["test"]);
-      expect(schemaWithMeta.email()._def).toHaveProperty(metaSymbol, {
+      expect(schemaWithMeta.email()._def[metaSymbol]).toEqual({
         examples: ["test"],
       });
     });
