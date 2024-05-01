@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { withMeta } from "../../src";
-import { copyMeta, getMeta, hasMeta, metaProp } from "../../src/metadata";
+import { copyMeta, getMeta, hasMeta, metaSymbol } from "../../src/metadata";
 import { describe, expect, test } from "vitest";
 
 describe("Metadata", () => {
@@ -9,11 +9,11 @@ describe("Metadata", () => {
       const schema = z.string();
       const schemaWithMeta = withMeta(schema);
       expect(schemaWithMeta).toBeInstanceOf(z.ZodString);
-      expect(metaProp).toBe("expressZodApiMeta");
-      expect(schemaWithMeta._def).toHaveProperty(metaProp);
-      const { expressZodApiMeta, ...rest } = schemaWithMeta._def;
+      expect(metaSymbol).toBe(Symbol.for("express-zod-api"));
+      expect(schemaWithMeta._def[metaSymbol]).toEqual({ examples: [] });
+      const { [metaSymbol]: meta, ...rest } = schemaWithMeta._def;
       expect(rest).toEqual(schema._def);
-      expect(expressZodApiMeta).toEqual({ examples: [] });
+      expect(meta).toEqual({ examples: [] });
     });
 
     test("should provide example() method", () => {
@@ -26,17 +26,15 @@ describe("Metadata", () => {
     test("example() should set the corresponding metadata in the schema definition", () => {
       const schema = z.string();
       const schemaWithMeta = withMeta(schema).example("test");
-      expect(schemaWithMeta._def.expressZodApiMeta).toHaveProperty("examples");
-      expect(schemaWithMeta._def.expressZodApiMeta.examples).toEqual(["test"]);
+      expect(schemaWithMeta._def[metaSymbol]).toHaveProperty("examples");
+      expect(schemaWithMeta._def[metaSymbol].examples).toEqual(["test"]);
     });
 
     test("Issue 827: example() should be immutable", () => {
       const schemaWithMeta = withMeta(z.string());
       const schemaWithExample = schemaWithMeta.example("test");
-      expect(schemaWithExample._def.expressZodApiMeta.examples).toEqual([
-        "test",
-      ]);
-      expect(schemaWithMeta._def.expressZodApiMeta.examples).toEqual([]);
+      expect(schemaWithExample._def[metaSymbol].examples).toEqual(["test"]);
+      expect(schemaWithMeta._def[metaSymbol].examples).toEqual([]);
     });
 
     test("example() can set multiple examples", () => {
@@ -45,7 +43,7 @@ describe("Metadata", () => {
         .example("test1")
         .example("test2")
         .example("test3");
-      expect(schemaWithMeta._def.expressZodApiMeta.examples).toEqual([
+      expect(schemaWithMeta._def[metaSymbol].examples).toEqual([
         "test1",
         "test2",
         "test3",
@@ -55,8 +53,8 @@ describe("Metadata", () => {
     test("metadata should withstand refinements", () => {
       const schema = z.string();
       const schemaWithMeta = withMeta(schema).example("test");
-      expect(schemaWithMeta._def.expressZodApiMeta.examples).toEqual(["test"]);
-      expect(schemaWithMeta.email()._def).toHaveProperty(metaProp, {
+      expect(schemaWithMeta._def[metaSymbol].examples).toEqual(["test"]);
+      expect(schemaWithMeta.email()._def).toHaveProperty(metaSymbol, {
         examples: ["test"],
       });
     });
@@ -64,12 +62,11 @@ describe("Metadata", () => {
     test("metadata should withstand double withMeta()", () => {
       const schema = z.string();
       const schemaWithMeta = withMeta(schema).example("test");
-      expect(withMeta(schemaWithMeta)._def.expressZodApiMeta.examples).toEqual([
+      expect(withMeta(schemaWithMeta)._def[metaSymbol].examples).toEqual([
         "test",
       ]);
       expect(
-        withMeta(schemaWithMeta).example("another")._def.expressZodApiMeta
-          .examples,
+        withMeta(schemaWithMeta).example("another")._def[metaSymbol].examples,
       ).toEqual(["test", "another"]);
     });
   });
@@ -81,9 +78,9 @@ describe("Metadata", () => {
     test("should return false if the meta prop has invalid type", () => {
       const schema1 = z.string();
       const schema2 = z.string();
-      Object.defineProperty(schema1._def, metaProp, { value: null });
+      Object.defineProperty(schema1._def, metaSymbol, { value: null });
       expect(hasMeta(schema1)).toBeFalsy();
-      Object.defineProperty(schema2._def, metaProp, { value: 123 });
+      Object.defineProperty(schema2._def, metaSymbol, { value: 123 });
       expect(hasMeta(schema2)).toBeFalsy();
     });
     test("should return true if withMeta() has been used", () => {
@@ -98,9 +95,9 @@ describe("Metadata", () => {
     test("should return undefined on malformed schema", () => {
       const schema1 = z.string();
       const schema2 = z.string();
-      Object.defineProperty(schema1._def, metaProp, { value: null });
+      Object.defineProperty(schema1._def, metaSymbol, { value: null });
       expect(getMeta(schema1, "examples")).toBeUndefined();
-      Object.defineProperty(schema2._def, metaProp, { value: 123 });
+      Object.defineProperty(schema2._def, metaSymbol, { value: 123 });
       expect(getMeta(schema2, "examples")).toBeUndefined();
     });
     test("should return initial value if the value not set", () => {
