@@ -10,7 +10,7 @@ export interface Metadata<T extends z.ZodTypeAny> {
    * */
   kind?: ProprietaryKind;
   examples: z.input<T>[];
-  /** @override ZodDefault::_def.defaultValue() */
+  /** @override ZodDefault::_def.defaultValue() in depictDefault */
   defaultLabel?: string;
 }
 
