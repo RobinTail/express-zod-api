@@ -3,6 +3,9 @@ import { z } from "zod";
 import { clone, mergeDeepRight } from "ramda";
 import { ProprietaryKind } from "./proprietary-schemas";
 
+// @see https://github.com/colinhacks/zod/pull/3445/files#diff-d8a41ab20c64f92092513f153b78e7bbf5dc929c92909fad25e03d53c7f15bb7R21-R37
+const metaSymbol = Symbol.for("express-zod-api");
+
 export interface Metadata<T extends z.ZodTypeAny> {
   /**
    * @todo if the following PR merged, use native branding instead:
