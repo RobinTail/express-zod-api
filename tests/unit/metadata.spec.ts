@@ -4,40 +4,37 @@ import { copyMeta, getMeta, hasMeta, metaSymbol } from "../../src/metadata";
 import { describe, expect, test } from "vitest";
 
 describe("Metadata", () => {
-  // @todo consider removal or legacy test only
   describe("withMeta()", () => {
     test("should return the similar schema", () => {
       const schema = z.string();
       const schemaWithMeta = withMeta(schema);
-      expect(schemaWithMeta).toBeInstanceOf(z.ZodString);
-      expect(metaSymbol).toBe(Symbol.for("express-zod-api"));
-      expect(schemaWithMeta._def[metaSymbol]).toEqual({});
-      const { [metaSymbol]: meta, ...rest } = schemaWithMeta._def;
-      expect(rest).toEqual(schema._def);
-      expect(meta).toEqual({});
+      expect(schemaWithMeta).toEqual(schema);
     });
+  });
 
-    test("should provide example() method", () => {
+  describe(".example()", () => {
+    test("should be present", () => {
       const schema = z.string();
       expect(schema).toHaveProperty("example");
       expect(typeof schema.example).toBe("function");
     });
 
-    test("example() should set the corresponding metadata in the schema definition", () => {
+    test("should set the corresponding metadata in the schema definition", () => {
       const schema = z.string();
       const schemaWithMeta = schema.example("test");
-      expect(schemaWithMeta._def[metaSymbol]).toHaveProperty("examples");
-      expect(schemaWithMeta._def[metaSymbol].examples).toEqual(["test"]);
+      expect(schemaWithMeta._def[metaSymbol]).toHaveProperty("examples", [
+        "test",
+      ]);
     });
 
-    test("Issue 827: example() should be immutable", () => {
+    test("Issue 827: should be immutable", () => {
       const schema = z.string();
       const schemaWithExample = schema.example("test");
       expect(schemaWithExample._def[metaSymbol].examples).toEqual(["test"]);
-      expect(schema._def[metaSymbol]?.examples).toBeUndefined(); // @todo adjust types
+      expect(schema._def[metaSymbol]?.examples).toBeUndefined();
     });
 
-    test("example() can set multiple examples", () => {
+    test("can be used multiple times", () => {
       const schema = z.string();
       const schemaWithMeta = schema
         .example("test1")
@@ -50,22 +47,13 @@ describe("Metadata", () => {
       ]);
     });
 
-    test("metadata should withstand refinements", () => {
+    test("should withstand refinements", () => {
       const schema = z.string();
       const schemaWithMeta = schema.example("test");
       expect(schemaWithMeta._def[metaSymbol].examples).toEqual(["test"]);
       expect(schemaWithMeta.email()._def[metaSymbol]).toEqual({
         examples: ["test"],
       });
-    });
-
-    test("metadata should withstand double withMeta()", () => {
-      const schema = z.string();
-      const schemaWithMeta = schema.example("test");
-      expect(schemaWithMeta._def[metaSymbol].examples).toEqual(["test"]);
-      expect(
-        schemaWithMeta.example("another")._def[metaSymbol].examples,
-      ).toEqual(["test", "another"]);
     });
   });
 

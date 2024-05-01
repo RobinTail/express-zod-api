@@ -89,5 +89,4 @@ export const isProprietary = (schema: z.ZodTypeAny, kind: ProprietaryKind) =>
  * @deprecated no longer required
  * @todo remove in v19
  * */
-export const withMeta = <T extends z.ZodTypeAny>(schema: T) =>
-  cloneSchema(schema) as T;
+export const withMeta = <T extends z.ZodTypeAny>(schema: T) => schema;
