@@ -1,5 +1,5 @@
 import { combinations, isObject } from "./common-helpers";
-import { z } from "zod";
+import { ZodTypeDef, z } from "zod";
 import { clone, mergeDeepRight } from "ramda";
 import { ProprietaryKind } from "./proprietary-schemas";
 
@@ -17,7 +17,7 @@ export interface Metadata {
 
 declare module "zod" {
   interface ZodTypeDef {
-    [metaSymbol]: Metadata;
+    [metaSymbol]?: Metadata;
   }
   interface ZodType {
     example(example: this["_input"]): this;
@@ -29,7 +29,11 @@ const cloneSchema = (schema: z.ZodType) => {
   const copy = schema.describe(schema.description as string);
   copy._def[metaSymbol] = // clone for deep copy, issue #827
     clone(copy._def[metaSymbol]) || ({} satisfies Metadata);
-  return copy;
+  return copy as z.ZodType<
+    typeof copy._output,
+    Required<ZodTypeDef>,
+    typeof copy._input
+  >;
 };
 
 if (!(metaSymbol in globalThis)) {
@@ -63,7 +67,7 @@ export const copyMeta = <A extends z.ZodTypeAny, B extends z.ZodTypeAny>(
   }
   const result = cloneSchema(dest);
   result._def[metaSymbol].examples = combinations(
-    result._def[metaSymbol].examples || [],
+    result._def[metaSymbol]?.examples || [],
     src._def[metaSymbol]?.examples || [],
     ([destExample, srcExample]) =>
       typeof destExample === "object" && typeof srcExample === "object"

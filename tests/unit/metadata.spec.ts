@@ -30,7 +30,7 @@ describe("Metadata", () => {
     test("Issue 827: should be immutable", () => {
       const schema = z.string();
       const schemaWithExample = schema.example("test");
-      expect(schemaWithExample._def[metaSymbol].examples).toEqual(["test"]);
+      expect(schemaWithExample._def[metaSymbol]?.examples).toEqual(["test"]);
       expect(schema._def[metaSymbol]?.examples).toBeUndefined();
     });
 
@@ -40,7 +40,7 @@ describe("Metadata", () => {
         .example("test1")
         .example("test2")
         .example("test3");
-      expect(schemaWithMeta._def[metaSymbol].examples).toEqual([
+      expect(schemaWithMeta._def[metaSymbol]?.examples).toEqual([
         "test1",
         "test2",
         "test3",
@@ -50,7 +50,7 @@ describe("Metadata", () => {
     test("should withstand refinements", () => {
       const schema = z.string();
       const schemaWithMeta = schema.example("test");
-      expect(schemaWithMeta._def[metaSymbol].examples).toEqual(["test"]);
+      expect(schemaWithMeta._def[metaSymbol]?.examples).toEqual(["test"]);
       expect(schemaWithMeta.email()._def[metaSymbol]).toEqual({
         examples: ["test"],
       });
