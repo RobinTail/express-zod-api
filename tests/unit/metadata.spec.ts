@@ -1,3 +1,4 @@
+import { expectType } from "tsd";
 import { z } from "zod";
 import { withMeta } from "../../src";
 import { copyMeta, getMeta, hasMeta, metaSymbol } from "../../src/metadata";
@@ -5,10 +6,11 @@ import { describe, expect, test } from "vitest";
 
 describe("Metadata", () => {
   describe("withMeta()", () => {
-    test("should return the similar schema", () => {
+    test("should be present for backward compatibility", () => {
       const schema = z.string();
       const schemaWithMeta = withMeta(schema);
       expect(schemaWithMeta).toEqual(schema);
+      expectType<z.ZodString>(schemaWithMeta);
     });
   });
 
