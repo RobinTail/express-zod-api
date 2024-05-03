@@ -4,10 +4,6 @@ import { clone, mergeDeepRight } from "ramda";
 import { ProprietaryKind } from "./proprietary-schemas";
 
 export interface Metadata<T extends z.ZodTypeAny> {
-  /**
-   * @todo if the following PR merged, use native branding instead:
-   * @link https://github.com/colinhacks/zod/pull/2860
-   * */
   kind?: ProprietaryKind;
   examples: z.input<T>[];
   /** @override ZodDefault::_def.defaultValue() in depictDefault */
