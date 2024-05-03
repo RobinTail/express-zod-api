@@ -3,7 +3,6 @@ import { z } from "zod";
 import { clone, mergeDeepRight } from "ramda";
 import { ProprietaryKind } from "./proprietary-schemas";
 
-// @see https://github.com/colinhacks/zod/pull/3445/files#diff-d8a41ab20c64f92092513f153b78e7bbf5dc929c92909fad25e03d53c7f15bb7R21-R37
 export const metaSymbol = Symbol.for("express-zod-api");
 
 export interface Metadata {
@@ -27,7 +26,7 @@ const cloneSchema = (schema: z.ZodType) => {
     clone(copy._def[metaSymbol]) || ({} satisfies Metadata);
   return copy as z.ZodType<
     typeof copy._output,
-    Required<z.ZodTypeDef>,
+    Required<Pick<typeof copy._def, typeof metaSymbol>>,
     typeof copy._input
   >;
 };
@@ -42,6 +41,7 @@ const exampleSetter = function (
   return copy;
 };
 
+/** @see https://github.com/colinhacks/zod/blob/90efe7fa6135119224412c7081bd12ef0bccef26/plugin/effect/src/index.ts#L21-L31 */
 if (!(metaSymbol in globalThis)) {
   (globalThis as Record<symbol, unknown>)[metaSymbol] = true;
   Object.defineProperty(
