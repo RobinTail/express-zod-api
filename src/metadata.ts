@@ -7,10 +7,6 @@ import { ProprietaryKind } from "./proprietary-schemas";
 export const metaSymbol = Symbol.for("express-zod-api");
 
 export interface Metadata {
-  /**
-   * @todo if the following PR merged, use native branding instead:
-   * @link https://github.com/colinhacks/zod/pull/2860
-   * */
   kind?: ProprietaryKind;
   examples?: unknown[];
 }
