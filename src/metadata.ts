@@ -32,17 +32,27 @@ const cloneSchema = (schema: z.ZodType) => {
   >;
 };
 
+const exampleSetter = function (
+  this: z.ZodType,
+  value: (typeof this)["_input"],
+) {
+  const copy = cloneSchema(this);
+  copy._def[metaSymbol].examples = copy._def[metaSymbol].examples || [];
+  copy._def[metaSymbol].examples.push(value);
+  return copy;
+};
+
 if (!(metaSymbol in globalThis)) {
   (globalThis as Record<symbol, unknown>)[metaSymbol] = true;
-  z.ZodType.prototype.example = function (
-    this,
-    value: (typeof this)["_input"],
-  ) {
-    const copy = cloneSchema(this);
-    copy._def[metaSymbol].examples = copy._def[metaSymbol].examples || [];
-    copy._def[metaSymbol].examples.push(value);
-    return copy;
-  };
+  Object.defineProperty(
+    z.ZodType.prototype,
+    "example" satisfies keyof z.ZodType,
+    {
+      get(): z.ZodType["example"] {
+        return exampleSetter.bind(this);
+      },
+    },
+  );
 }
 
 export const hasMeta = <T extends z.ZodTypeAny>(schema: T) =>
