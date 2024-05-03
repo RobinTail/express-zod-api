@@ -58,7 +58,7 @@ describe("Index Entrypoint", () => {
       });
       expectType<ProprietaryMethods<z.ZodDefault<z.ZodString>>>({
         example: () => withMeta(z.string().default("")),
-        describeDefault: () => withMeta(z.string().default("")),
+        label: () => withMeta(z.string().default("")),
       });
       expectType<CommonConfig>({ cors: true, logger: { level: "silent" } });
       expectType<AppConfig>({

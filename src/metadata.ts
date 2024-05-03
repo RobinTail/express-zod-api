@@ -26,7 +26,7 @@ export type ProprietaryMethods<T extends z.ZodTypeAny> = {
 } & (T extends z.ZodDefault<z.ZodTypeAny>
   ? {
       /** @desc Change the default value in the generated Documentation to a label */
-      describeDefault: DefaultDescriber<T>;
+      label: DefaultDescriber<T>;
     }
   : {});
 
@@ -52,7 +52,7 @@ export const withMeta = <T extends z.ZodType>(schema: T): WithMeta<T> => {
   if (copy instanceof z.ZodDefault) {
     Object.defineProperty(
       copy,
-      "describeDefault" satisfies keyof ProprietaryMethods<typeof copy>,
+      "label" satisfies keyof ProprietaryMethods<typeof copy>,
       {
         get: (): DefaultDescriber<typeof copy> => (label) => {
           const localCopy = withMeta(copy);

@@ -21,9 +21,9 @@ describe("Metadata", () => {
       const defaultSchema = withMeta(z.string().default(""));
       expect(stringSchema).toHaveProperty("example");
       expect(typeof stringSchema.example).toBe("function");
-      expect(stringSchema).not.toHaveProperty("describeDefault");
-      expect(defaultSchema).toHaveProperty("describeDefault");
-      expect(typeof defaultSchema.describeDefault).toBe("function");
+      expect(stringSchema).not.toHaveProperty("label");
+      expect(defaultSchema).toHaveProperty("label");
+      expect(typeof defaultSchema.label).toBe("function");
     });
 
     test("should withstand refinements", () => {
@@ -80,13 +80,13 @@ describe("Metadata", () => {
       });
     });
 
-    describe(".describeDefault()", () => {
+    describe(".label()", () => {
       test("should set the corresponding metadata in the schema definition", () => {
         const schema = z
           .string()
           .datetime()
           .default(() => new Date().toISOString());
-        const schemaWithMeta = withMeta(schema).describeDefault("Today");
+        const schemaWithMeta = withMeta(schema).label("Today");
         expect(schemaWithMeta._def.expressZodApiMeta).toHaveProperty(
           "defaultLabel",
           "Today",

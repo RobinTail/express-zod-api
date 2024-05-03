@@ -5,7 +5,7 @@
 ### v18.4.0
 
 - Ability to replace the default value with a label in the generated Documentation:
-  - Introducing `.describeDefault()` method only available after wrapping `ZodDefault` into `withMeta()`;
+  - Introducing `.label()` method only available after wrapping `ZodDefault` into `withMeta()`;
   - The specified label replaces the actual value of the `default` property in documentation.
 
 ```ts
@@ -17,7 +17,7 @@ const labeledDefaultSchema = withMeta(
     .string()
     .datetime()
     .default(() => new Date().toISOString()),
-).describeDefault("Today");
+).label("Today");
 ```
 
 ### v18.3.0
