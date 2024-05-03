@@ -1,5 +1,5 @@
 import { combinations, isObject } from "./common-helpers";
-import { ZodTypeDef, z } from "zod";
+import { z } from "zod";
 import { clone, mergeDeepRight } from "ramda";
 import { ProprietaryKind } from "./proprietary-schemas";
 
@@ -27,7 +27,7 @@ const cloneSchema = (schema: z.ZodType) => {
     clone(copy._def[metaSymbol]) || ({} satisfies Metadata);
   return copy as z.ZodType<
     typeof copy._output,
-    Required<ZodTypeDef>,
+    Required<z.ZodTypeDef>,
     typeof copy._input
   >;
 };
