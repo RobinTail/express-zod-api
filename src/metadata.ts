@@ -89,7 +89,7 @@ export const getMeta = <T extends z.ZodTypeAny, K extends keyof Metadata<T>>(
 export const copyMeta = <A extends z.ZodTypeAny, B extends z.ZodTypeAny>(
   src: A,
   dest: B,
-) => {
+): B => {
   if (!hasMeta(src)) {
     return dest;
   }
