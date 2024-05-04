@@ -6,6 +6,8 @@ import { ProprietaryKind } from "./proprietary-schemas";
 export interface Metadata<T extends z.ZodTypeAny> {
   kind?: ProprietaryKind;
   examples: z.input<T>[];
+  /** @override ZodDefault::_def.defaultValue() in depictDefault */
+  defaultLabel?: string;
 }
 
 export const metaProp = "expressZodApiMeta";
@@ -14,28 +16,53 @@ type ExampleSetter<T extends z.ZodTypeAny> = (
   example: z.input<T>,
 ) => WithMeta<T>;
 
+type DefaultDescriber<T extends z.ZodDefault<z.ZodTypeAny>> = (
+  label: string,
+) => WithMeta<T>;
+
+export type ProprietaryMethods<T extends z.ZodTypeAny> = {
+  /** @desc Add an example value (before any transformations, can be called multiple times) */
+  example: ExampleSetter<T>;
+} & (T extends z.ZodDefault<z.ZodTypeAny>
+  ? {
+      /** @desc Change the default value in the generated Documentation to a label */
+      label: DefaultDescriber<T>;
+    }
+  : {});
+
 type WithMeta<T extends z.ZodTypeAny> = T & {
   _def: T["_def"] & Record<typeof metaProp, Metadata<T>>;
-  example: ExampleSetter<T>;
-};
+} & ProprietaryMethods<T>;
 
 /** @link https://github.com/colinhacks/zod/blob/3e4f71e857e75da722bd7e735b6d657a70682df2/src/types.ts#L485 */
 const cloneSchema = <T extends z.ZodTypeAny>(schema: T) =>
   schema.describe(schema.description as string);
 
-export const withMeta = <T extends z.ZodTypeAny>(schema: T): WithMeta<T> => {
+export const withMeta = <T extends z.ZodType>(schema: T): WithMeta<T> => {
   const copy = cloneSchema(schema) as WithMeta<T>;
   copy._def[metaProp] = // clone for deep copy, issue #827
     clone(copy._def[metaProp]) || ({ examples: [] } satisfies Metadata<T>);
-  return Object.defineProperties(copy, {
-    example: {
-      get: (): ExampleSetter<T> => (value) => {
-        const localCopy = withMeta<T>(copy);
-        (localCopy._def[metaProp] as Metadata<T>).examples.push(value);
-        return localCopy;
-      },
+  Object.defineProperty(copy, "example" satisfies keyof ProprietaryMethods<T>, {
+    get: (): ExampleSetter<T> => (value) => {
+      const localCopy = withMeta(copy);
+      localCopy._def[metaProp].examples.push(value);
+      return localCopy;
     },
   });
+  if (copy instanceof z.ZodDefault) {
+    Object.defineProperty(
+      copy,
+      "label" satisfies keyof ProprietaryMethods<typeof copy>,
+      {
+        get: (): DefaultDescriber<typeof copy> => (label) => {
+          const localCopy = withMeta(copy);
+          localCopy._def[metaProp].defaultLabel = label;
+          return localCopy;
+        },
+      },
+    );
+  }
+  return copy;
 };
 
 export const hasMeta = <T extends z.ZodTypeAny>(

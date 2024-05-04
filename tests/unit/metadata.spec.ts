@@ -16,43 +16,17 @@ describe("Metadata", () => {
       expect(expressZodApiMeta).toEqual({ examples: [] });
     });
 
-    test("should provide example() method", () => {
-      const schema = z.string();
-      const schemaWithMeta = withMeta(schema);
-      expect(schemaWithMeta).toHaveProperty("example");
-      expect(typeof schemaWithMeta.example).toBe("function");
+    test("should provide proprietary methods", () => {
+      const stringSchema = withMeta(z.string());
+      const defaultSchema = withMeta(z.string().default(""));
+      expect(stringSchema).toHaveProperty("example");
+      expect(typeof stringSchema.example).toBe("function");
+      expect(stringSchema).not.toHaveProperty("label");
+      expect(defaultSchema).toHaveProperty("label");
+      expect(typeof defaultSchema.label).toBe("function");
     });
 
-    test("example() should set the corresponding metadata in the schema definition", () => {
-      const schema = z.string();
-      const schemaWithMeta = withMeta(schema).example("test");
-      expect(schemaWithMeta._def.expressZodApiMeta).toHaveProperty("examples");
-      expect(schemaWithMeta._def.expressZodApiMeta.examples).toEqual(["test"]);
-    });
-
-    test("Issue 827: example() should be immutable", () => {
-      const schemaWithMeta = withMeta(z.string());
-      const schemaWithExample = schemaWithMeta.example("test");
-      expect(schemaWithExample._def.expressZodApiMeta.examples).toEqual([
-        "test",
-      ]);
-      expect(schemaWithMeta._def.expressZodApiMeta.examples).toEqual([]);
-    });
-
-    test("example() can set multiple examples", () => {
-      const schema = z.string();
-      const schemaWithMeta = withMeta(schema)
-        .example("test1")
-        .example("test2")
-        .example("test3");
-      expect(schemaWithMeta._def.expressZodApiMeta.examples).toEqual([
-        "test1",
-        "test2",
-        "test3",
-      ]);
-    });
-
-    test("metadata should withstand refinements", () => {
+    test("should withstand refinements", () => {
       const schema = z.string();
       const schemaWithMeta = withMeta(schema).example("test");
       expect(schemaWithMeta._def.expressZodApiMeta.examples).toEqual(["test"]);
@@ -61,7 +35,7 @@ describe("Metadata", () => {
       });
     });
 
-    test("metadata should withstand double withMeta()", () => {
+    test("should withstand double wrapping", () => {
       const schema = z.string();
       const schemaWithMeta = withMeta(schema).example("test");
       expect(withMeta(schemaWithMeta)._def.expressZodApiMeta.examples).toEqual([
@@ -71,6 +45,53 @@ describe("Metadata", () => {
         withMeta(schemaWithMeta).example("another")._def.expressZodApiMeta
           .examples,
       ).toEqual(["test", "another"]);
+    });
+
+    describe(".example()", () => {
+      test("should set the corresponding metadata in the schema definition", () => {
+        const schema = z.string();
+        const schemaWithMeta = withMeta(schema).example("test");
+        expect(schemaWithMeta._def.expressZodApiMeta).toHaveProperty(
+          "examples",
+          ["test"],
+        );
+      });
+
+      test("can set multiple examples", () => {
+        const schema = z.string();
+        const schemaWithMeta = withMeta(schema)
+          .example("test1")
+          .example("test2")
+          .example("test3");
+        expect(schemaWithMeta._def.expressZodApiMeta.examples).toEqual([
+          "test1",
+          "test2",
+          "test3",
+        ]);
+      });
+
+      test("Issue 827: should be immutable", () => {
+        const schemaWithMeta = withMeta(z.string());
+        const schemaWithExample = schemaWithMeta.example("test");
+        expect(schemaWithExample._def.expressZodApiMeta.examples).toEqual([
+          "test",
+        ]);
+        expect(schemaWithMeta._def.expressZodApiMeta.examples).toEqual([]);
+      });
+    });
+
+    describe(".label()", () => {
+      test("should set the corresponding metadata in the schema definition", () => {
+        const schema = z
+          .string()
+          .datetime()
+          .default(() => new Date().toISOString());
+        const schemaWithMeta = withMeta(schema).label("Today");
+        expect(schemaWithMeta._def.expressZodApiMeta).toHaveProperty(
+          "defaultLabel",
+          "Today",
+        );
+      });
     });
   });
 

@@ -62,6 +62,7 @@ import {
   andToOr,
   mapLogicalContainer,
 } from "./logical-container";
+import { getMeta } from "./metadata";
 import { Method } from "./method";
 import { RawSchema, ezRawKind } from "./raw-schema";
 import { isoDateRegex } from "./schema-helpers";
@@ -128,11 +129,12 @@ export const reformatParamsInPath = (path: string) =>
   path.replace(routePathParamsRegex, (param) => `{${param.slice(1)}}`);
 
 export const depictDefault: Depicter<z.ZodDefault<z.ZodTypeAny>> = ({
-  schema: {
-    _def: { innerType, defaultValue },
-  },
+  schema,
   next,
-}) => ({ ...next(innerType), default: defaultValue() });
+}) => ({
+  ...next(schema._def.innerType),
+  default: getMeta(schema, "defaultLabel") || schema._def.defaultValue(),
+});
 
 export const depictCatch: Depicter<z.ZodCatch<z.ZodTypeAny>> = ({
   schema: {

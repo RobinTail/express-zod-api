@@ -20,9 +20,11 @@ import {
   MockOverrides,
   OAuth2Security,
   OpenIdSecurity,
+  ProprietaryMethods,
   ResultHandlerDefinition,
   Routing,
   ServerConfig,
+  withMeta,
 } from "../../src";
 import { describe, expect, test, vi } from "vitest";
 
@@ -51,6 +53,13 @@ describe("Index Entrypoint", () => {
       expectType<LoggerOverrides>({});
       expectType<Routing>({});
       expectType<Metadata<z.ZodTypeAny>>({ examples: [] });
+      expectType<ProprietaryMethods<z.ZodAny>>({
+        example: () => withMeta(z.any()),
+      });
+      expectType<ProprietaryMethods<z.ZodDefault<z.ZodString>>>({
+        example: () => withMeta(z.string().default("")),
+        label: () => withMeta(z.string().default("")),
+      });
       expectType<CommonConfig>({ cors: true, logger: { level: "silent" } });
       expectType<AppConfig>({
         app: {} as IRouter,
