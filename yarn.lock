@@ -4396,9 +4396,9 @@ tsup@^8.0.0:
     tree-kill "^1.2.2"
 
 tsx@^4.6.2:
-  version "4.9.0"
-  resolved "https://registry.yarnpkg.com/tsx/-/tsx-4.9.0.tgz#08d7ea58df19d87416d26cce8caf93d0c3619852"
-  integrity sha512-UY0UUhDPL6MkqkZU4xTEjEBOLfV+RIt4xeeJ1qwK73xai4/zveG+X6+tieILa7rjtegUW2LE4p7fw7gAoLuytA==
+  version "4.9.1"
+  resolved "https://registry.yarnpkg.com/tsx/-/tsx-4.9.1.tgz#e8eb1ce2766ce9067d577fba237a3cf884b229fa"
+  integrity sha512-CqSJaYyZ6GEqnGtPuMPQHvUwRGU6VHSVF+RDxoOmRg/XD4aF0pD973tKhoUYGQtdcoCHcSOGk34ioFaP+vYcMQ==
   dependencies:
     esbuild "~0.20.2"
     get-tsconfig "^4.7.3"
