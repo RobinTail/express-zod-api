@@ -33,7 +33,7 @@ describe("Metadata", () => {
       const schema = z.string();
       const schemaWithExample = schema.example("test");
       expect(schemaWithExample._def[metaSymbol]?.examples).toEqual(["test"]);
-      expect(schema._def[metaSymbol]?.examples).toBeUndefined();
+      expect(schema._def[metaSymbol]).toBeUndefined();
     });
 
     test("can be used multiple times", () => {
