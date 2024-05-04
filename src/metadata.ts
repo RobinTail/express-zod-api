@@ -28,16 +28,12 @@ declare module "zod" {
 }
 
 /** @link https://github.com/colinhacks/zod/blob/3e4f71e857e75da722bd7e735b6d657a70682df2/src/types.ts#L485 */
-const cloneSchema = (schema: z.ZodType) => {
+const cloneSchema = <T extends z.ZodType>(schema: T) => {
   const copy = schema.describe(schema.description as string);
   copy._def[metaSymbol] = // clone for deep copy, issue #827
     clone(copy._def[metaSymbol]) ||
     ({ examples: [] } satisfies Metadata<typeof copy>);
-  return copy as z.ZodType<
-    typeof copy._output,
-    Required<Pick<typeof copy._def, typeof metaSymbol>>,
-    typeof copy._input
-  >;
+  return copy;
 };
 
 const exampleSetter = function (
@@ -45,7 +41,7 @@ const exampleSetter = function (
   value: (typeof this)["_input"],
 ) {
   const copy = cloneSchema(this);
-  copy._def[metaSymbol].examples.push(value);
+  copy._def[metaSymbol]!.examples.push(value);
   return copy;
 };
 
@@ -54,8 +50,8 @@ const defaultLabeler = function (
   label: string,
 ) {
   const copy = cloneSchema(this);
-  copy._def[metaSymbol].defaultLabel = label;
-  return copy as typeof this;
+  copy._def[metaSymbol]!.defaultLabel = label;
+  return copy;
 };
 
 /** @see https://github.com/colinhacks/zod/blob/90efe7fa6135119224412c7081bd12ef0bccef26/plugin/effect/src/index.ts#L21-L31 */
@@ -106,7 +102,7 @@ export const copyMeta = <A extends z.ZodTypeAny, B extends z.ZodTypeAny>(
         ? mergeDeepRight({ ...destExample }, { ...srcExample })
         : srcExample, // not supposed to be called on non-object schemas
   );
-  return result as B;
+  return result;
 };
 
 export const proprietary = <T extends z.ZodTypeAny>(
@@ -115,7 +111,7 @@ export const proprietary = <T extends z.ZodTypeAny>(
 ) => {
   const schema = cloneSchema(subject);
   schema._def[metaSymbol].kind = kind;
-  return schema as T;
+  return schema;
 };
 
 export const isProprietary = (schema: z.ZodTypeAny, kind: ProprietaryKind) =>
