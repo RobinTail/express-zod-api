@@ -2,6 +2,37 @@
 
 ## Version 18
 
+### v18.5.0
+
+- Major update on metadata: ~~`withMeta()`~~ is no longer required, deprecated and will be removed in v19:
+  - ~~`withMeta()`~~ was introduced in version 2.10.0, because I didn't want to alter Zod's prototypes;
+  - However, the [new information](https://github.com/colinhacks/zod/pull/3445#issuecomment-2091463120) arrived
+    recently from the author of Zod on that matter;
+  - It turned out that altering Zod's prototypes is exatly the recommended approach for extending its functionality;
+  - Therefore `express-zod-api` from now on acts as a plugin for Zod, adding the `.example()` and `.label()` methods to
+    its prototypes that were previously available only after wrapping the schema in ~~`withMeta()`~~.
+
+```ts
+import { z } from "zod";
+import { withMeta } from "express-zod-api";
+
+const before = withMeta(
+  z
+    .string()
+    .datetime()
+    .default(() => new Date().toISOString()),
+)
+  .example("2024-05-04T10:47:19.575Z")
+  .label("Today");
+
+const after = z
+  .string()
+  .datetime()
+  .default(() => new Date().toISOString())
+  .example("2024-05-04T10:47:19.575Z")
+  .label("Today");
+```
+
 ### v18.4.0
 
 - Ability to replace the default value with a label in the generated Documentation:
