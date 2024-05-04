@@ -1,5 +1,4 @@
 import z from "zod";
-import { withMeta } from "../../src";
 import { arrayRespondingFactory } from "../factories";
 
 /**
@@ -10,22 +9,22 @@ export const listUsersEndpoint = arrayRespondingFactory.build({
   method: "get",
   tag: "users",
   input: z.object({}),
-  output: withMeta(
-    z.object({
+  output: z
+    .object({
       // the arrayResultHandler will take the "items" prop as the response
       items: z.array(
         z.object({
           name: z.string(),
         }),
       ),
+    })
+    .example({
+      items: [
+        { name: "Hunter Schafer" },
+        { name: "Laverne Cox" },
+        { name: "Patti Harrison" },
+      ],
     }),
-  ).example({
-    items: [
-      { name: "Hunter Schafer" },
-      { name: "Laverne Cox" },
-      { name: "Patti Harrison" },
-    ],
-  }),
   handler: async () => ({
     items: [
       { name: "Maria Merian" },

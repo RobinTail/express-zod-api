@@ -9,7 +9,6 @@ import {
   createResultHandler,
   defaultEndpointsFactory,
   ez,
-  withMeta,
 } from "../../src";
 import { expectType } from "tsd";
 import { mimeJson } from "../../src/mime";
@@ -1116,14 +1115,16 @@ describe("Documentation", () => {
             getSomething: defaultEndpointsFactory.build({
               method: "get",
               input: z.object({
-                strNum: withMeta(
-                  z.string().transform((v) => parseInt(v, 10)),
-                ).example("123"), // example is for input side of the transformation
+                strNum: z
+                  .string()
+                  .transform((v) => parseInt(v, 10))
+                  .example("123"), // example is for input side of the transformation
               }),
               output: z.object({
-                numericStr: withMeta(
-                  z.number().transform((v) => `${v}`),
-                ).example(123), // example is for input side of the transformation
+                numericStr: z
+                  .number()
+                  .transform((v) => `${v}`)
+                  .example(123), // example is for input side of the transformation
               }),
               handler: async () => ({ numericStr: 123 }),
             }),
@@ -1143,20 +1144,20 @@ describe("Documentation", () => {
           v1: {
             getSomething: defaultEndpointsFactory.build({
               method: "get",
-              input: withMeta(
-                z.object({
+              input: z
+                .object({
                   strNum: z.string().transform((v) => parseInt(v, 10)),
+                })
+                .example({
+                  strNum: "123", // example is for input side of the transformation
                 }),
-              ).example({
-                strNum: "123", // example is for input side of the transformation
-              }),
-              output: withMeta(
-                z.object({
+              output: z
+                .object({
                   numericStr: z.number().transform((v) => `${v}`),
+                })
+                .example({
+                  numericStr: 123, // example is for input side of the transformation
                 }),
-              ).example({
-                numericStr: 123, // example is for input side of the transformation
-              }),
               handler: async () => ({ numericStr: 123 }),
             }),
           },
@@ -1175,20 +1176,20 @@ describe("Documentation", () => {
           v1: {
             getSomething: defaultEndpointsFactory.build({
               method: "post",
-              input: withMeta(
-                z.object({
+              input: z
+                .object({
                   strNum: z.string().transform((v) => parseInt(v, 10)),
+                })
+                .example({
+                  strNum: "123", // example is for input side of the transformation
                 }),
-              ).example({
-                strNum: "123", // example is for input side of the transformation
-              }),
-              output: withMeta(
-                z.object({
+              output: z
+                .object({
                   numericStr: z.number().transform((v) => `${v}`),
+                })
+                .example({
+                  numericStr: 123, // example is for input side of the transformation
                 }),
-              ).example({
-                numericStr: 123, // example is for input side of the transformation
-              }),
               handler: async () => ({ numericStr: 123 }),
             }),
           },
@@ -1208,32 +1209,32 @@ describe("Documentation", () => {
             getSomething: defaultEndpointsFactory
               .addMiddleware(
                 createMiddleware({
-                  input: withMeta(
-                    z.object({
+                  input: z
+                    .object({
                       key: z.string(),
+                    })
+                    .example({
+                      key: "1234-56789-01",
                     }),
-                  ).example({
-                    key: "1234-56789-01",
-                  }),
                   middleware: vi.fn(),
                 }),
               )
               .build({
                 method: "post",
-                input: withMeta(
-                  z.object({
+                input: z
+                  .object({
                     str: z.string(),
+                  })
+                  .example({
+                    str: "test",
                   }),
-                ).example({
-                  str: "test",
-                }),
-                output: withMeta(
-                  z.object({
+                output: z
+                  .object({
                     num: z.number(),
+                  })
+                  .example({
+                    num: 123,
                   }),
-                ).example({
-                  num: 123,
-                }),
                 handler: async () => ({ num: 123 }),
               }),
           },
@@ -1253,8 +1254,9 @@ describe("Documentation", () => {
           v1: {
             addSomething: defaultEndpointsFactory.build({
               method: "post",
-              input: withMeta(zodSchema).example({ a: "first" }),
-              output: withMeta(zodSchema.extend({ b: z.string() }))
+              input: zodSchema.example({ a: "first" }),
+              output: zodSchema
+                .extend({ b: z.string() })
                 .example({ a: "first", b: "prefix_first" })
                 .example({ a: "second", b: "prefix_second" }),
               handler: async ({ input: { a } }) => ({ a, b: `prefix_${a}` }),
