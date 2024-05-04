@@ -115,9 +115,3 @@ export const proprietary = <T extends z.ZodTypeAny>(
 
 export const isProprietary = (schema: z.ZodTypeAny, kind: ProprietaryKind) =>
   getMeta(schema, "kind") === kind;
-
-/**
- * @deprecated no longer required
- * @todo remove in v19
- * */
-export const withMeta = <T extends z.ZodTypeAny>(schema: T) => schema;

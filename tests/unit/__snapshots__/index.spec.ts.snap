@@ -115,7 +115,6 @@ exports[`Index Entrypoint > exports > should have certain entities exposed 1`] =
   "OutputValidationError",
   "InputValidationError",
   "MissingPeerError",
-  "withMeta",
   "testEndpoint",
   "Integration",
   "ez",
@@ -123,5 +122,3 @@ exports[`Index Entrypoint > exports > should have certain entities exposed 1`] =
 `;
 
 exports[`Index Entrypoint > exports > testEndpoint should have certain value 1`] = `[Function]`;
-
-exports[`Index Entrypoint > exports > withMeta should have certain value 1`] = `[Function]`;
