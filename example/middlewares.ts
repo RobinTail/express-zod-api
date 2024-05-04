@@ -1,7 +1,7 @@
 import createHttpError from "http-errors";
 import assert from "node:assert/strict";
 import { z } from "zod";
-import { Method, createMiddleware, withMeta } from "../src";
+import { Method, createMiddleware } from "../src";
 
 export const authMiddleware = createMiddleware({
   security: {
@@ -10,13 +10,13 @@ export const authMiddleware = createMiddleware({
       { type: "header", name: "token" },
     ],
   },
-  input: withMeta(
-    z.object({
+  input: z
+    .object({
       key: z.string().min(1),
+    })
+    .example({
+      key: "1234-5678-90",
     }),
-  ).example({
-    key: "1234-5678-90",
-  }),
   middleware: async ({ input: { key }, request, logger }) => {
     logger.debug("Checking the key and token...");
     assert.equal(key, "123", createHttpError(401, "Invalid key"));

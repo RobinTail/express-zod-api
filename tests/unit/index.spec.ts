@@ -101,5 +101,15 @@ describe("Index Entrypoint", () => {
       expectType<OpenIdSecurity>({ type: "openid", url: "" });
       expectType<ApiResponse<z.ZodTypeAny>>({ schema: z.string() });
     });
+
+    test("Extended Zod prototypes", () => {
+      expectType<Partial<z.ZodAny>>({
+        example: () => z.any(),
+      });
+      expectType<Partial<z.ZodDefault<z.ZodString>>>({
+        example: () => z.string().default(""),
+        label: () => z.string().default(""),
+      });
+    });
   });
 });
