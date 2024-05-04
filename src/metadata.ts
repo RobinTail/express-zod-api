@@ -31,8 +31,7 @@ declare module "zod" {
 const cloneSchema = <T extends z.ZodType>(schema: T) => {
   const copy = schema.describe(schema.description as string);
   copy._def[metaSymbol] = // clone for deep copy, issue #827
-    clone(copy._def[metaSymbol]) ||
-    ({ examples: [] } satisfies Metadata<typeof copy>);
+    clone(copy._def[metaSymbol]) || ({ examples: [] } satisfies Metadata<T>);
   return copy;
 };
 
