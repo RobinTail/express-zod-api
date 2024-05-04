@@ -812,12 +812,12 @@
   resolved "https://registry.yarnpkg.com/@types/qs/-/qs-6.9.15.tgz#adde8a060ec9c305a82de1babc1056e73bd64dce"
   integrity sha512-uXHQKES6DQKKCLh441Xv/dwxOq1TVS3JPUMlEqoEglvlhR6Mxnlew/Xq/LRVHpLyk7iK3zODe1qYHIMltO7XGg==
 
-"@types/ramda@^0.29.3":
-  version "0.29.12"
-  resolved "https://registry.yarnpkg.com/@types/ramda/-/ramda-0.29.12.tgz#fd8a23849176c6c1b3510243b64084c067e6a48f"
-  integrity sha512-sgIEjpJhdQPB52gDF4aphs9nl0xe54CR22DPdWqT8gQHjZYmVApgA0R3/CpMbl0Y8az2TEZrPNL2zy0EvjbkLA==
+"@types/ramda@^0.30.0":
+  version "0.30.0"
+  resolved "https://registry.yarnpkg.com/@types/ramda/-/ramda-0.30.0.tgz#59ae27c3bf00036e35b6944dd7f6d283f869f908"
+  integrity sha512-DQtfqUbSB18iM9NHbQ++kVUDuBWHMr6T2FpW1XTiksYRGjq4WnNPZLt712OEHEBJs7aMyJ68Mf2kGMOP1srVVw==
   dependencies:
-    types-ramda "^0.29.10"
+    types-ramda "^0.30.0"
 
 "@types/range-parser@*":
   version "1.2.7"
@@ -4494,10 +4494,10 @@ typed-array-length@^1.0.6:
     is-typed-array "^1.1.13"
     possible-typed-array-names "^1.0.0"
 
-types-ramda@^0.29.10:
-  version "0.29.10"
-  resolved "https://registry.yarnpkg.com/types-ramda/-/types-ramda-0.29.10.tgz#820432905b820301c74f6396f07aa2359b41cde4"
-  integrity sha512-5PJiW/eiTPyXXBYGZOYGezMl6qj7keBiZheRwfjJZY26QPHsNrjfJnz0mru6oeqqoTHOni893Jfd6zyUXfQRWg==
+types-ramda@^0.30.0:
+  version "0.30.0"
+  resolved "https://registry.yarnpkg.com/types-ramda/-/types-ramda-0.30.0.tgz#d4bae9c2ebaebb3fdbd538094f419ce13454cfde"
+  integrity sha512-oVPw/KHB5M0Du0txTEKKM8xZOG9cZBRdCVXvwHYuNJUVkAiJ9oWyqkA+9Bj2gjMsHgkkhsYevobQBWs8I2/Xvw==
   dependencies:
     ts-toolbelt "^9.6.0"
 
