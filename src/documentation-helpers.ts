@@ -37,7 +37,7 @@ import {
   union,
   when,
   xprod,
-  zipObj,
+  zip,
 } from "ramda";
 import { z } from "zod";
 import {
@@ -632,9 +632,11 @@ export const depictRaw: Depicter<RawSchema> = ({ next, schema }) =>
 
 const enumerateExamples = (examples: unknown[]): ExamplesObject | undefined =>
   examples.length
-    ? zipObj(
-        range(1, examples.length + 1).map((idx) => `example${idx}`),
-        map(objOf("value"), examples),
+    ? fromPairs(
+        zip(
+          range(1, examples.length + 1).map((idx) => `example${idx}`),
+          map(objOf("value"), examples),
+        ),
       )
     : undefined;
 
