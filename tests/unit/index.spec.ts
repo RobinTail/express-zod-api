@@ -50,7 +50,7 @@ describe("Index Entrypoint", () => {
       expectType<FlatObject>({});
       expectType<LoggerOverrides>({});
       expectType<Routing>({});
-      expectType<Metadata>({ examples: [] });
+      expectType<Metadata<z.ZodTypeAny>>({ examples: [] });
       expectType<CommonConfig>({ cors: true, logger: { level: "silent" } });
       expectType<AppConfig>({
         app: {} as IRouter,

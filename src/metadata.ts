@@ -5,14 +5,14 @@ import { ProprietaryKind } from "./proprietary-schemas";
 
 export const metaSymbol = Symbol.for("express-zod-api");
 
-export interface Metadata {
+export interface Metadata<T extends z.ZodTypeAny> {
   kind?: ProprietaryKind;
-  examples: unknown[];
+  examples: z.input<T>[];
 }
 
 declare module "zod" {
   interface ZodTypeDef {
-    [metaSymbol]?: Metadata;
+    [metaSymbol]?: Metadata<z.ZodTypeAny>;
   }
   interface ZodType {
     example(example: this["_input"]): this;
@@ -23,7 +23,8 @@ declare module "zod" {
 const cloneSchema = (schema: z.ZodType) => {
   const copy = schema.describe(schema.description as string);
   copy._def[metaSymbol] = // clone for deep copy, issue #827
-    clone(copy._def[metaSymbol]) || ({ examples: [] } satisfies Metadata);
+    clone(copy._def[metaSymbol]) ||
+    ({ examples: [] } satisfies Metadata<typeof copy>);
   return copy as z.ZodType<
     typeof copy._output,
     Required<Pick<typeof copy._def, typeof metaSymbol>>,
@@ -57,10 +58,10 @@ if (!(metaSymbol in globalThis)) {
 export const hasMeta = <T extends z.ZodTypeAny>(schema: T) =>
   metaSymbol in schema._def && isObject(schema._def[metaSymbol]);
 
-export const getMeta = <T extends z.ZodTypeAny, K extends keyof Metadata>(
+export const getMeta = <T extends z.ZodTypeAny, K extends keyof Metadata<T>>(
   schema: T,
   meta: K,
-): Readonly<Metadata[K]> | undefined =>
+): Readonly<Metadata<T>[K]> | undefined =>
   hasMeta(schema) ? schema._def[metaSymbol][meta] : undefined;
 
 export const copyMeta = <A extends z.ZodTypeAny, B extends z.ZodTypeAny>(
