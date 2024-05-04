@@ -28,7 +28,6 @@ export {
   InputValidationError,
   MissingPeerError,
 } from "./errors";
-export { withMeta } from "./metadata";
 export { testEndpoint } from "./testing";
 export { Integration } from "./integration";
 

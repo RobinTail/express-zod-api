@@ -7,6 +7,8 @@
 - Minimum supported versions:
   - Node: 18.18.0 or 20.9.0,
   - `zod`: 3.23.0.
+- The deprecated ~~`withMeta()`~~ is removed:
+  - See the changes to [v18.5.0](#v1850) on details.
 
 ## Version 18
 
