@@ -222,6 +222,19 @@ describe("Documentation helpers", () => {
         }),
       ).toMatchSnapshot();
     });
+    test("Feature #1706: should override the default value by a label from metadata", () => {
+      expect(
+        depictDefault({
+          schema: z
+            .string()
+            .datetime()
+            .default(() => new Date().toISOString())
+            .label("Today"),
+          ...responseCtx,
+          next: makeNext(responseCtx),
+        }),
+      ).toMatchSnapshot();
+    });
   });
 
   describe("depictCatch()", () => {

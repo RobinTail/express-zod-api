@@ -8,6 +8,8 @@ export const metaSymbol = Symbol.for("express-zod-api");
 export interface Metadata<T extends z.ZodTypeAny> {
   kind?: ProprietaryKind;
   examples: z.input<T>[];
+  /** @override ZodDefault::_def.defaultValue() in depictDefault */
+  defaultLabel?: string;
 }
 
 declare module "zod" {
@@ -15,7 +17,13 @@ declare module "zod" {
     [metaSymbol]?: Metadata<z.ZodTypeAny>;
   }
   interface ZodType {
+    /** @desc Add an example value (before any transformations, can be called multiple times) */
     example(example: this["_input"]): this;
+  }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  interface ZodDefault<T extends z.ZodTypeAny> {
+    /** @desc Change the default value in the generated Documentation to a label */
+    label(label: string): this;
   }
 }
 
@@ -41,6 +49,15 @@ const exampleSetter = function (
   return copy;
 };
 
+const defaultLabeler = function (
+  this: z.ZodDefault<z.ZodTypeAny>,
+  label: string,
+) {
+  const copy = cloneSchema(this);
+  copy._def[metaSymbol].defaultLabel = label;
+  return copy as typeof this;
+};
+
 /** @see https://github.com/colinhacks/zod/blob/90efe7fa6135119224412c7081bd12ef0bccef26/plugin/effect/src/index.ts#L21-L31 */
 if (!(metaSymbol in globalThis)) {
   (globalThis as Record<symbol, unknown>)[metaSymbol] = true;
@@ -50,6 +67,15 @@ if (!(metaSymbol in globalThis)) {
     {
       get(): z.ZodType["example"] {
         return exampleSetter.bind(this);
+      },
+    },
+  );
+  Object.defineProperty(
+    z.ZodDefault.prototype,
+    "label" satisfies keyof z.ZodDefault<z.ZodTypeAny>,
+    {
+      get(): z.ZodDefault<z.ZodTypeAny>["label"] {
+        return defaultLabeler.bind(this);
       },
     },
   );

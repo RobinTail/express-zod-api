@@ -59,6 +59,20 @@ describe("Metadata", () => {
     });
   });
 
+  describe(".label()", () => {
+    test("should set the corresponding metadata in the schema definition", () => {
+      const schema = z
+        .string()
+        .datetime()
+        .default(() => new Date().toISOString());
+      const schemaWithMeta = schema.label("Today");
+      expect(schemaWithMeta._def[metaSymbol]).toHaveProperty(
+        "defaultLabel",
+        "Today",
+      );
+    });
+  });
+
   describe("hasMeta()", () => {
     test("should return false if the schema definition has no meta prop", () => {
       expect(hasMeta(z.string())).toBeFalsy();

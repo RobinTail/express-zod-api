@@ -2,6 +2,24 @@
 
 ## Version 18
 
+### v18.4.0
+
+- Ability to replace the default value with a label in the generated Documentation:
+  - Introducing `.label()` method only available after wrapping `ZodDefault` into `withMeta()`;
+  - The specified label replaces the actual value of the `default` property in documentation.
+
+```ts
+import { z } from "zod";
+import { withMeta } from "express-zod-api";
+
+const labeledDefaultSchema = withMeta(
+  z
+    .string()
+    .datetime()
+    .default(() => new Date().toISOString()),
+).label("Today");
+```
+
 ### v18.3.0
 
 - Changed default behaviour when using built-in logger while omitting its `color` option in config:
