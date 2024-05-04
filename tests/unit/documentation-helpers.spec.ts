@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { ReferenceObject, SchemaObject } from "openapi3-ts/oas31";
 import { z } from "zod";
 import { defaultSerializer } from "../../src/common-helpers";
-import { DocumentationError, ez, withMeta } from "../../src";
+import { DocumentationError, ez } from "../../src";
 import {
   OpenAPIContext,
   depictAny,
@@ -225,12 +225,11 @@ describe("Documentation helpers", () => {
     test("Feature #1706: should override the default value by a label from metadata", () => {
       expect(
         depictDefault({
-          schema: withMeta(
-            z
-              .string()
-              .datetime()
-              .default(() => new Date().toISOString()),
-          ).label("Today"),
+          schema: z
+            .string()
+            .datetime()
+            .default(() => new Date().toISOString())
+            .label("Today"),
           ...responseCtx,
           next: makeNext(responseCtx),
         }),
@@ -351,12 +350,13 @@ describe("Documentation helpers", () => {
     test("should merge examples deeply", () => {
       expect(
         depictIntersection({
-          schema: withMeta(z.object({ test: z.object({ a: z.number() }) }))
+          schema: z
+            .object({ test: z.object({ a: z.number() }) })
             .example({ test: { a: 123 } })
             .and(
-              withMeta(z.object({ test: z.object({ b: z.number() }) })).example(
-                { test: { b: 456 } },
-              ),
+              z
+                .object({ test: z.object({ b: z.number() }) })
+                .example({ test: { b: 456 } }),
             ),
           ...requestCtx,
           next: makeNext(requestCtx),
@@ -367,12 +367,11 @@ describe("Documentation helpers", () => {
     test("should flatten three object schemas with examples", () => {
       expect(
         depictIntersection({
-          schema: withMeta(z.object({ one: z.number() }))
+          schema: z
+            .object({ one: z.number() })
             .example({ one: 123 })
-            .and(withMeta(z.object({ two: z.number() })).example({ two: 456 }))
-            .and(
-              withMeta(z.object({ three: z.number() })).example({ three: 789 }),
-            ),
+            .and(z.object({ two: z.number() }).example({ two: 456 }))
+            .and(z.object({ three: z.number() }).example({ three: 789 })),
           ...requestCtx,
           next: makeNext(requestCtx),
         }),
@@ -759,13 +758,12 @@ describe("Documentation helpers", () => {
     ])("should $action examples in case of $case", ({ isResponse }) => {
       expect(
         depictExamples(
-          withMeta(
-            z.object({
+          z
+            .object({
               one: z.string().transform((v) => v.length),
               two: z.number().transform((v) => `${v}`),
               three: z.boolean(),
-            }),
-          )
+            })
             .example({
               one: "test",
               two: 123,
@@ -787,13 +785,12 @@ describe("Documentation helpers", () => {
     test("should pass examples for the given parameter", () => {
       expect(
         depictParamExamples(
-          withMeta(
-            z.object({
+          z
+            .object({
               one: z.string().transform((v) => v.length),
               two: z.number().transform((v) => `${v}`),
               three: z.boolean(),
-            }),
-          )
+            })
             .example({
               one: "test",
               two: 123,

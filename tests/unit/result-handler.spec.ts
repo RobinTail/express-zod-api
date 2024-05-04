@@ -7,10 +7,9 @@ import {
   arrayResultHandler,
   createResultHandler,
   defaultResultHandler,
-  withMeta,
 } from "../../src";
 import { ApiResponse } from "../../src";
-import { metaProp } from "../../src/metadata";
+import { metaSymbol } from "../../src/metadata";
 import { describe, expect, test, vi } from "vitest";
 import {
   makeLoggerMock,
@@ -136,20 +135,20 @@ describe("ResultHandler", () => {
 
       test("should forward output schema examples", () => {
         const apiResponse = getPositiveResponse(
-          withMeta(
-            z.object({
+          z
+            .object({
               str: z.string(),
               items: z.array(z.string()),
+            })
+            .example({
+              str: "test",
+              items: ["One", "Two", "Three"],
             }),
-          ).example({
-            str: "test",
-            items: ["One", "Two", "Three"],
-          }),
         );
         if (!(apiResponse instanceof z.ZodType)) {
           expect.fail("should not be here");
         }
-        expect(apiResponse._def[metaProp]).toMatchSnapshot();
+        expect(apiResponse._def[metaSymbol]).toMatchSnapshot();
       });
 
       test("should generate negative response example", () => {
@@ -157,7 +156,7 @@ describe("ResultHandler", () => {
         if (!(apiResponse instanceof z.ZodType)) {
           expect.fail("should not be here");
         }
-        expect(apiResponse._def[metaProp]).toMatchSnapshot();
+        expect(apiResponse._def[metaSymbol]).toMatchSnapshot();
       });
     },
   );
