@@ -1141,18 +1141,18 @@ You can add descriptions and examples to your endpoints, their I/O schemas and t
 into the generated documentation of your API. Consider the following example:
 
 ```typescript
-import { defaultEndpointsFactory, withMeta } from "express-zod-api";
+import { defaultEndpointsFactory } from "express-zod-api";
 
 const exampleEndpoint = defaultEndpointsFactory.build({
   shortDescription: "Retrieves the user.", // <—— this becomes the summary line
   description: "The detailed explanaition on what this endpoint does.",
-  input: withMeta(
-    z.object({
+  input: z
+    .object({
       id: z.number().describe("the ID of the user"),
+    })
+    .example({
+      id: 123,
     }),
-  ).example({
-    id: 123,
-  }),
   // ..., similarly for output and middlewares
 });
 ```
