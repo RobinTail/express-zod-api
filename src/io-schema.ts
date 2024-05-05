@@ -14,7 +14,8 @@ export type IOSchema<U extends z.UnknownKeysParam = any> =
   | z.ZodUnion<[IOSchema<U>, ...IOSchema<U>[]]>
   | z.ZodIntersection<IOSchema<U>, IOSchema<U>>
   | z.ZodDiscriminatedUnion<string, z.ZodObject<any, U>[]>
-  | Refined<z.ZodObject<any, U>>;
+  | Refined<z.ZodObject<any, U>>
+  | z.ZodBranded<IOSchema<U>, any>;
 
 export type ProbableIntersection<
   A extends IOSchema<"strip"> | null,

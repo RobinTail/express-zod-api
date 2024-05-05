@@ -1,17 +1,16 @@
 import { z } from "zod";
-import { proprietary } from "./metadata";
 
-export const ezFileKind = "File";
+export const ezFileKind = Symbol.for("File");
 
 const bufferSchema = z.custom<Buffer>((subject) => Buffer.isBuffer(subject), {
   message: "Expected Buffer",
 });
 
 const variants = {
-  buffer: () => proprietary(ezFileKind, bufferSchema),
-  string: () => proprietary(ezFileKind, z.string()),
-  binary: () => proprietary(ezFileKind, bufferSchema.or(z.string())),
-  base64: () => proprietary(ezFileKind, z.string().base64()),
+  buffer: () => bufferSchema.brand(ezFileKind),
+  string: () => z.string().brand(ezFileKind),
+  binary: () => bufferSchema.or(z.string()).brand(ezFileKind),
+  base64: () => z.string().base64().brand(ezFileKind),
 };
 
 type Variants = typeof variants;

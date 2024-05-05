@@ -227,7 +227,8 @@ const onFile: Producer<z.ZodType> = ({ schema }) => {
       : bufferType;
 };
 
-const onRaw: Producer<RawSchema> = ({ next, schema }) => next(schema.shape.raw);
+const onRaw: Producer<RawSchema> = ({ next, schema }) =>
+  next(schema.unwrap().shape.raw);
 
 const producers: HandlingRules<ts.TypeNode, ZTSContext> = {
   ZodString: onPrimitive(ts.SyntaxKind.StringKeyword),

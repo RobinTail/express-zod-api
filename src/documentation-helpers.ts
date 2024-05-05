@@ -628,7 +628,7 @@ export const depictLazy: Depicter<z.ZodLazy<z.ZodTypeAny>> = ({
 };
 
 export const depictRaw: Depicter<RawSchema> = ({ next, schema }) =>
-  next(schema.shape.raw);
+  next(schema.unwrap().shape.raw);
 
 const enumerateExamples = (examples: unknown[]): ExamplesObject | undefined =>
   examples.length
@@ -668,6 +668,9 @@ export const extractObjectSchema = (
 ): z.ZodObject<z.ZodRawShape> => {
   if (subject instanceof z.ZodObject) {
     return subject;
+  }
+  if (subject instanceof z.ZodBranded) {
+    return extractObjectSchema(subject.unwrap(), tfError);
   }
   if (
     subject instanceof z.ZodUnion ||

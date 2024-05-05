@@ -6,10 +6,10 @@ import { ProprietaryKind } from "./proprietary-schemas";
 export const metaSymbol = Symbol.for("express-zod-api");
 
 export interface Metadata<T extends z.ZodTypeAny> {
-  kind?: ProprietaryKind;
   examples: z.input<T>[];
   /** @override ZodDefault::_def.defaultValue() in depictDefault */
   defaultLabel?: string;
+  brand?: string | number | symbol;
 }
 
 declare module "zod" {
@@ -53,6 +53,16 @@ const defaultLabeler = function (
   return copy;
 };
 
+const brander = function (this: z.ZodType, brand?: string | number | symbol) {
+  return new z.ZodBranded({
+    typeName: z.ZodFirstPartyTypeKind.ZodBranded,
+    type: this,
+    description: this._def.description,
+    errorMap: this._def.errorMap,
+    [metaSymbol]: { examples: [], ...clone(this._def[metaSymbol]), brand },
+  });
+};
+
 /** @see https://github.com/colinhacks/zod/blob/90efe7fa6135119224412c7081bd12ef0bccef26/plugin/effect/src/index.ts#L21-L31 */
 if (!(metaSymbol in globalThis)) {
   (globalThis as Record<symbol, unknown>)[metaSymbol] = true;
@@ -62,6 +72,16 @@ if (!(metaSymbol in globalThis)) {
     {
       get(): z.ZodType["example"] {
         return exampleSetter.bind(this);
+      },
+    },
+  );
+  Object.defineProperty(
+    z.ZodType.prototype,
+    "brand" satisfies keyof z.ZodType,
+    {
+      set() {},
+      get(): z.ZodType["brand"] {
+        return brander.bind(this);
       },
     },
   );
@@ -104,14 +124,5 @@ export const copyMeta = <A extends z.ZodTypeAny, B extends z.ZodTypeAny>(
   return result;
 };
 
-export const proprietary = <T extends z.ZodTypeAny>(
-  kind: ProprietaryKind,
-  subject: T,
-) => {
-  const schema = cloneSchema(subject);
-  schema._def[metaSymbol].kind = kind;
-  return schema;
-};
-
 export const isProprietary = (schema: z.ZodTypeAny, kind: ProprietaryKind) =>
-  getMeta(schema, "kind") === kind;
+  getMeta(schema, "brand") === kind;

@@ -2,13 +2,14 @@ import { getMeta } from "../../src/metadata";
 import { z } from "zod";
 import { ez } from "../../src";
 import { describe, expect, test, vi } from "vitest";
+import { ezUploadKind } from "../../src/upload-schema";
 
 describe("ez.upload()", () => {
   describe("creation", () => {
     test("should create an instance", () => {
       const schema = ez.upload();
-      expect(schema).toBeInstanceOf(z.ZodEffects);
-      expect(getMeta(schema, "kind")).toBe("Upload");
+      expect(schema).toBeInstanceOf(z.ZodBranded);
+      expect(getMeta(schema, "brand")).toBe(ezUploadKind);
     });
   });
 

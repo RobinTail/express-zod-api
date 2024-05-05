@@ -1,11 +1,13 @@
 import { z } from "zod";
 import { file } from "./file-schema";
-import { proprietary } from "./metadata";
 
-export const ezRawKind = "Raw";
+export const ezRawKind = Symbol.for("Raw");
 
 /** Shorthand for z.object({ raw: ez.file("buffer") }) */
-export const raw = () =>
-  proprietary(ezRawKind, z.object({ raw: file("buffer") }));
+export const raw = (extra?: z.ZodRawShape) =>
+  z
+    .object({ raw: file("buffer") })
+    .extend(extra || {})
+    .brand(ezRawKind);
 
 export type RawSchema = ReturnType<typeof raw>;

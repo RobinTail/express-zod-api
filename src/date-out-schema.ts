@@ -1,14 +1,11 @@
 import { z } from "zod";
-import { proprietary } from "./metadata";
 import { isValidDate } from "./schema-helpers";
 
-export const ezDateOutKind = "DateOut";
+export const ezDateOutKind = Symbol.for("DateOut");
 
 export const dateOut = () =>
-  proprietary(
-    ezDateOutKind,
-    z
-      .date()
-      .refine(isValidDate)
-      .transform((date) => date.toISOString()),
-  );
+  z
+    .date()
+    .refine(isValidDate)
+    .transform((date) => date.toISOString())
+    .brand(ezDateOutKind);
