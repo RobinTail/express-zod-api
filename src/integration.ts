@@ -222,7 +222,7 @@ export class Integration {
       },
     });
 
-    this.program.unshift(...Array.from(this.aliases.values()));
+    this.program.unshift(...this.aliases.values());
 
     // export type Path = "/v1/user/retrieve" | ___;
     this.program.push(makePublicLiteralType(this.ids.pathType, this.paths));
