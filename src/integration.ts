@@ -89,7 +89,7 @@ export class Integration {
   protected program: ts.Node[] = [];
   protected usage: Array<ts.Node | string> = [];
   protected registry = new Map<
-    `${Method} ${string}`, // method + path
+    { method: Method; path: string },
     Partial<Record<IOKind, string>> & {
       isJson: boolean;
       tags: string[];
@@ -207,14 +207,17 @@ export class Integration {
         this.program.push(createTypeAlias(genericResponse, genericResponseId));
         if (method !== "options") {
           this.paths.push(path);
-          this.registry.set(`${method} ${path}`, {
-            input: inputId,
-            positive: positiveResponseId,
-            negative: negativeResponseId,
-            response: genericResponseId,
-            isJson: endpoint.getMimeTypes("positive").includes(mimeJson),
-            tags: endpoint.getTags(),
-          });
+          this.registry.set(
+            { method, path },
+            {
+              input: inputId,
+              positive: positiveResponseId,
+              negative: negativeResponseId,
+              response: genericResponseId,
+              isJson: endpoint.getMimeTypes("positive").includes(mimeJson),
+              tags: endpoint.getTags(),
+            },
+          );
         }
       },
     });
@@ -263,10 +266,10 @@ export class Integration {
           id,
           extenderClause,
           registryEntries
-            .map(([methodPath, entry]) => {
+            .map(([{ method, path }, entry]) => {
               const reference = entry[kind];
               return reference
-                ? makeQuotedProp(methodPath, reference)
+                ? makeQuotedProp(`${method} ${path}`, reference)
                 : undefined;
             })
             .filter(
@@ -288,8 +291,8 @@ export class Integration {
         f.createObjectLiteralExpression(
           registryEntries
             .filter(([{}, { isJson }]) => isJson)
-            .map(([methodPath]) =>
-              f.createPropertyAssignment(`"${methodPath}"`, f.createTrue()),
+            .map(([{ method, path }]) =>
+              f.createPropertyAssignment(`"${method} ${path}"`, f.createTrue()),
             ),
         ),
       ),
@@ -301,9 +304,9 @@ export class Integration {
       makeConst(
         this.ids.endpointTagsConst,
         f.createObjectLiteralExpression(
-          registryEntries.map(([methodPath, { tags }]) =>
+          registryEntries.map(([{ method, path }, { tags }]) =>
             f.createPropertyAssignment(
-              `"${methodPath}"`,
+              `"${method} ${path}"`,
               f.createArrayLiteralExpression(
                 tags.map((tag) => f.createStringLiteral(tag)),
               ),
