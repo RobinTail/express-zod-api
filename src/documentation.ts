@@ -120,13 +120,9 @@ export class Documentation extends OpenApiBuilder {
         return name;
       }
     }
-    this.lastSecuritySchemaIds.set(
-      subject.type,
-      (this.lastSecuritySchemaIds.get(subject.type) || 0) + 1,
-    );
-    return `${subject.type.toUpperCase()}_${this.lastSecuritySchemaIds.get(
-      subject.type,
-    )}`;
+    const nextId = (this.lastSecuritySchemaIds.get(subject.type) || 0) + 1;
+    this.lastSecuritySchemaIds.set(subject.type, nextId);
+    return `${subject.type.toUpperCase()}_${nextId}`;
   }
 
   public constructor({
