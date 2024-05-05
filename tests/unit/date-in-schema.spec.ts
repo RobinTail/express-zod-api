@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { ezDateInKind } from "../../src/date-in-schema";
+import { ezDateInBrand } from "../../src/date-in-schema";
 import { getMeta } from "../../src/metadata";
 import { ez } from "../../src";
 import { describe, expect, test } from "vitest";
@@ -9,7 +9,7 @@ describe("ez.dateIn()", () => {
     test("should create an instance", () => {
       const schema = ez.dateIn();
       expect(schema).toBeInstanceOf(z.ZodBranded);
-      expect(getMeta(schema, "brand")).toEqual(ezDateInKind);
+      expect(getMeta(schema, "brand")).toEqual(ezDateInBrand);
     });
   });
 

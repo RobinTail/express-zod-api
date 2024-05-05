@@ -1,9 +1,9 @@
 import { z } from "zod";
 import { IOSchema } from "./io-schema";
 import { isProprietary } from "./metadata";
-import { ezRawKind } from "./raw-schema";
+import { ezRawBrand } from "./raw-schema";
 import { HandlingRules, SchemaHandler } from "./schema-walker";
-import { ezUploadKind } from "./upload-schema";
+import { ezUploadBrand } from "./upload-schema";
 
 /** @desc Check is a schema handling rule returning boolean */
 type Check<T extends z.ZodTypeAny> = SchemaHandler<T, boolean>;
@@ -95,12 +95,12 @@ export const hasTransformationOnTop = (subject: IOSchema): boolean =>
 export const hasUpload = (subject: IOSchema) =>
   hasNestedSchema({
     subject,
-    condition: (schema) => isProprietary(schema, ezUploadKind),
+    condition: (schema) => isProprietary(schema, ezUploadBrand),
   });
 
 export const hasRaw = (subject: IOSchema) =>
   hasNestedSchema({
     subject,
-    condition: (schema) => isProprietary(schema, ezRawKind),
+    condition: (schema) => isProprietary(schema, ezRawBrand),
     maxDepth: 3,
   });

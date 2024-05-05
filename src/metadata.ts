@@ -1,7 +1,7 @@
 import { combinations, isObject } from "./common-helpers";
 import { z } from "zod";
 import { clone, mergeDeepRight } from "ramda";
-import { ProprietaryKind } from "./proprietary-schemas";
+import { ProprietaryBrand } from "./proprietary-schemas";
 
 export const metaSymbol = Symbol.for("express-zod-api");
 
@@ -79,7 +79,7 @@ if (!(metaSymbol in globalThis)) {
     z.ZodType.prototype,
     "brand" satisfies keyof z.ZodType,
     {
-      set() {},
+      set() {}, // this is required to override the existing method
       get(): z.ZodType["brand"] {
         return brander.bind(this);
       },
@@ -124,5 +124,5 @@ export const copyMeta = <A extends z.ZodTypeAny, B extends z.ZodTypeAny>(
   return result;
 };
 
-export const isProprietary = (schema: z.ZodTypeAny, kind: ProprietaryKind) =>
-  getMeta(schema, "brand") === kind;
+export const isProprietary = (schema: z.ZodTypeAny, brand: ProprietaryBrand) =>
+  getMeta(schema, "brand") === brand;

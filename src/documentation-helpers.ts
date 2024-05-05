@@ -52,10 +52,10 @@ import {
   ucFirst,
 } from "./common-helpers";
 import { InputSource, TagsConfig } from "./config-type";
-import { ezDateInKind } from "./date-in-schema";
-import { ezDateOutKind } from "./date-out-schema";
+import { ezDateInBrand } from "./date-in-schema";
+import { ezDateOutBrand } from "./date-out-schema";
 import { DocumentationError } from "./errors";
-import { ezFileKind } from "./file-schema";
+import { ezFileBrand } from "./file-schema";
 import { IOSchema } from "./io-schema";
 import {
   LogicalContainer,
@@ -64,7 +64,7 @@ import {
 } from "./logical-container";
 import { getMeta } from "./metadata";
 import { Method } from "./method";
-import { RawSchema, ezRawKind } from "./raw-schema";
+import { RawSchema, ezRawBrand } from "./raw-schema";
 import {
   HandlingRules,
   HandlingVariant,
@@ -72,7 +72,7 @@ import {
   walkSchema,
 } from "./schema-walker";
 import { Security } from "./security";
-import { ezUploadKind } from "./upload-schema";
+import { ezUploadBrand } from "./upload-schema";
 
 /* eslint-disable @typescript-eslint/no-use-before-define */
 
@@ -782,11 +782,11 @@ export const depicters: HandlingRules<
   ZodPipeline: depictPipeline,
   ZodLazy: depictLazy,
   ZodReadonly: depictReadonly,
-  [ezFileKind]: depictFile,
-  [ezUploadKind]: depictUpload,
-  [ezDateOutKind]: depictDateOut,
-  [ezDateInKind]: depictDateIn,
-  [ezRawKind]: depictRaw,
+  [ezFileBrand]: depictFile,
+  [ezUploadBrand]: depictUpload,
+  [ezDateOutBrand]: depictDateOut,
+  [ezDateInBrand]: depictDateIn,
+  [ezRawBrand]: depictRaw,
 };
 
 export const onEach: Depicter<z.ZodTypeAny, "each"> = ({

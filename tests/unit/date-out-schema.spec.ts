@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { ezDateOutKind } from "../../src/date-out-schema";
+import { ezDateOutBrand } from "../../src/date-out-schema";
 import { getMeta } from "../../src/metadata";
 import { ez } from "../../src";
 import { describe, expect, test } from "vitest";
@@ -9,7 +9,7 @@ describe("ez.dateOut()", () => {
     test("should create an instance", () => {
       const schema = ez.dateOut();
       expect(schema).toBeInstanceOf(z.ZodBranded);
-      expect(getMeta(schema, "brand")).toEqual(ezDateOutKind);
+      expect(getMeta(schema, "brand")).toEqual(ezDateOutBrand);
     });
   });
 

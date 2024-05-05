@@ -1,7 +1,7 @@
 import { z } from "zod";
 import type { FlatObject } from "./common-helpers";
 import { getMeta } from "./metadata";
-import { ProprietaryKind } from "./proprietary-schemas";
+import { ProprietaryBrand } from "./proprietary-schemas";
 
 interface VariantDependingProps<U> {
   regular: { next: (schema: z.ZodTypeAny) => U };
@@ -30,7 +30,7 @@ export type SchemaHandler<
 
 export type HandlingRules<U, Context extends FlatObject = {}> = Partial<
   Record<
-    z.ZodFirstPartyTypeKind | ProprietaryKind,
+    z.ZodFirstPartyTypeKind | ProprietaryBrand,
     SchemaHandler<any, U, Context> // keeping "any" here in order to avoid excessive complexity
   >
 >;

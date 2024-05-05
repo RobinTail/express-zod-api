@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { isValidDate } from "./schema-helpers";
 
-export const ezDateInKind = Symbol.for("DateIn");
+export const ezDateInBrand = Symbol.for("DateIn");
 
 export const dateIn = () => {
   const schema = z.union([
@@ -13,5 +13,5 @@ export const dateIn = () => {
   return schema
     .transform((str) => new Date(str))
     .pipe(z.date().refine(isValidDate))
-    .brand(ezDateInKind);
+    .brand(ezDateInBrand);
 };

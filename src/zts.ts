@@ -1,10 +1,10 @@
 import ts from "typescript";
 import { z } from "zod";
 import { hasCoercion, tryToTransform } from "./common-helpers";
-import { ezDateInKind } from "./date-in-schema";
-import { ezDateOutKind } from "./date-out-schema";
-import { ezFileKind } from "./file-schema";
-import { RawSchema, ezRawKind } from "./raw-schema";
+import { ezDateInBrand } from "./date-in-schema";
+import { ezDateOutBrand } from "./date-out-schema";
+import { ezFileBrand } from "./file-schema";
+import { RawSchema, ezRawBrand } from "./raw-schema";
 import { HandlingRules, walkSchema } from "./schema-walker";
 import {
   LiteralType,
@@ -236,8 +236,8 @@ const producers: HandlingRules<ts.TypeNode, ZTSContext> = {
   ZodBigInt: onPrimitive(ts.SyntaxKind.BigIntKeyword),
   ZodBoolean: onPrimitive(ts.SyntaxKind.BooleanKeyword),
   ZodAny: onPrimitive(ts.SyntaxKind.AnyKeyword),
-  [ezDateInKind]: onPrimitive(ts.SyntaxKind.StringKeyword),
-  [ezDateOutKind]: onPrimitive(ts.SyntaxKind.StringKeyword),
+  [ezDateInBrand]: onPrimitive(ts.SyntaxKind.StringKeyword),
+  [ezDateOutBrand]: onPrimitive(ts.SyntaxKind.StringKeyword),
   ZodNull: onNull,
   ZodArray: onArray,
   ZodTuple: onTuple,
@@ -258,8 +258,8 @@ const producers: HandlingRules<ts.TypeNode, ZTSContext> = {
   ZodPipeline: onPipeline,
   ZodLazy: onLazy,
   ZodReadonly: onReadonly,
-  [ezFileKind]: onFile,
-  [ezRawKind]: onRaw,
+  [ezFileBrand]: onFile,
+  [ezRawBrand]: onRaw,
 };
 
 export const zodToTs = ({

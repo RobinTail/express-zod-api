@@ -4,12 +4,12 @@ import { z } from "zod";
 import { ez } from "../../src";
 import { hasNestedSchema, hasTransformationOnTop } from "../../src/deep-checks";
 import { isProprietary } from "../../src/metadata";
-import { ezUploadKind } from "../../src/upload-schema";
+import { ezUploadBrand } from "../../src/upload-schema";
 
 describe("Checks", () => {
   describe("hasNestedSchema()", () => {
     const condition = (subject: z.ZodTypeAny) =>
-      isProprietary(subject, ezUploadKind);
+      isProprietary(subject, ezUploadBrand);
 
     test("should return true for given argument satisfying condition", () => {
       expect(hasNestedSchema({ subject: ez.upload(), condition })).toBeTruthy();

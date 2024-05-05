@@ -1,7 +1,7 @@
 import type { UploadedFile } from "express-fileupload";
 import { z } from "zod";
 
-export const ezUploadKind = Symbol.for("Upload");
+export const ezUploadBrand = Symbol.for("Upload");
 
 export const upload = () =>
   z
@@ -31,4 +31,4 @@ export const upload = () =>
         message: `Expected file upload, received ${typeof input}`,
       }),
     )
-    .brand(ezUploadKind);
+    .brand(ezUploadBrand);
