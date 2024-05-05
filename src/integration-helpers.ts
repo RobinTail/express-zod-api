@@ -1,5 +1,6 @@
 import ts from "typescript";
 import { chain, toPairs } from "ramda";
+import { Method } from "./method";
 
 export const f = ts.factory;
 
@@ -74,10 +75,10 @@ export const makeEmptyInitializingConstructor = (
   params: ts.ParameterDeclaration[],
 ) => f.createConstructorDeclaration(undefined, params, f.createBlock([]));
 
-export const makeQuotedProp = (name: string, ref: string) =>
+export const makeInterfaceProp = (name: string, ref: string) =>
   f.createPropertySignature(
     undefined,
-    `"${name}"`,
+    name,
     undefined,
     f.createTypeReferenceNode(ref),
   );
@@ -205,3 +206,5 @@ export const makeObjectKeysReducer = (
       initial,
     ],
   );
+
+export const quoteProp = (...parts: [Method, string]) => `"${parts.join(" ")}"`;

@@ -67,9 +67,8 @@ interface DocumentationParams {
 }
 
 export class Documentation extends OpenApiBuilder {
-  protected lastSecuritySchemaIds: Partial<Record<SecuritySchemeType, number>> =
-    {};
-  protected lastOperationIdSuffixes: Record<string, number> = {};
+  protected lastSecuritySchemaIds = new Map<SecuritySchemeType, number>();
+  protected lastOperationIdSuffixes = new Map<string, number>();
 
   protected makeRef(
     name: string,
@@ -88,28 +87,27 @@ export class Documentation extends OpenApiBuilder {
   protected ensureUniqOperationId(
     path: string,
     method: Method,
-    userDefinedOperationId?: string,
+    userDefined?: string,
   ) {
-    if (userDefinedOperationId) {
-      assert(
-        !(userDefinedOperationId in this.lastOperationIdSuffixes),
+    const operationId = userDefined || makeCleanId(method, path);
+    let lastSuffix = this.lastOperationIdSuffixes.get(operationId);
+    if (lastSuffix === undefined) {
+      this.lastOperationIdSuffixes.set(operationId, 1);
+      return operationId;
+    }
+    if (userDefined) {
+      assert.fail(
         new DocumentationError({
-          message: `Duplicated operationId: "${userDefinedOperationId}"`,
+          message: `Duplicated operationId: "${userDefined}"`,
           method,
           isResponse: false,
           path,
         }),
       );
-      this.lastOperationIdSuffixes[userDefinedOperationId] = 1;
-      return userDefinedOperationId;
     }
-    const operationId = makeCleanId(method, path);
-    if (operationId in this.lastOperationIdSuffixes) {
-      this.lastOperationIdSuffixes[operationId]++;
-      return `${operationId}${this.lastOperationIdSuffixes[operationId]}`;
-    }
-    this.lastOperationIdSuffixes[operationId] = 1;
-    return operationId;
+    lastSuffix++;
+    this.lastOperationIdSuffixes.set(operationId, lastSuffix);
+    return `${operationId}${lastSuffix}`;
   }
 
   protected ensureUniqSecuritySchemaName(subject: SecuritySchemeObject) {
@@ -122,11 +120,9 @@ export class Documentation extends OpenApiBuilder {
         return name;
       }
     }
-    this.lastSecuritySchemaIds[subject.type] =
-      (this.lastSecuritySchemaIds?.[subject.type] || 0) + 1;
-    return `${subject.type.toUpperCase()}_${
-      this.lastSecuritySchemaIds[subject.type]
-    }`;
+    const nextId = (this.lastSecuritySchemaIds.get(subject.type) || 0) + 1;
+    this.lastSecuritySchemaIds.set(subject.type, nextId);
+    return `${subject.type.toUpperCase()}_${nextId}`;
   }
 
   public constructor({
