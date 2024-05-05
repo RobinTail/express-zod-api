@@ -38,13 +38,6 @@ import type Prettier from "prettier";
 
 type IOKind = "input" | "response" | "positive" | "negative";
 
-interface Registry {
-  [METHOD_PATH: string]: Partial<Record<IOKind, string>> & {
-    isJson: boolean;
-    tags: string[];
-  };
-}
-
 interface IntegrationParams {
   routing: Routing;
   /**
@@ -95,7 +88,13 @@ interface FormattedPrintingOptions {
 export class Integration {
   protected program: ts.Node[] = [];
   protected usage: Array<ts.Node | string> = [];
-  protected registry: Registry = {};
+  protected registry = new Map<
+    string, // method+path
+    Partial<Record<IOKind, string>> & {
+      isJson: boolean;
+      tags: string[];
+    }
+  >();
   protected paths: string[] = [];
   protected aliases = new Map<string, ts.TypeAliasDeclaration>();
   protected ids = {
@@ -208,14 +207,14 @@ export class Integration {
         this.program.push(createTypeAlias(genericResponse, genericResponseId));
         if (method !== "options") {
           this.paths.push(path);
-          this.registry[`${method} ${path}`] = {
+          this.registry.set(`${method} ${path}`, {
             input: inputId,
             positive: positiveResponseId,
             negative: negativeResponseId,
             response: genericResponseId,
             isJson: endpoint.getMimeTypes("positive").includes(mimeJson),
             tags: endpoint.getTags(),
-          };
+          });
         }
       },
     });
@@ -261,9 +260,9 @@ export class Integration {
         makePublicExtendedInterface(
           id,
           extenderClause,
-          Object.keys(this.registry)
-            .map((methodPath) => {
-              const reference = this.registry[methodPath][kind];
+          Array.from(this.registry.entries())
+            .map(([methodPath, entry]) => {
+              const reference = entry[kind];
               return reference
                 ? makeQuotedProp(methodPath, reference)
                 : undefined;
@@ -285,9 +284,9 @@ export class Integration {
       makeConst(
         this.ids.jsonEndpointsConst,
         f.createObjectLiteralExpression(
-          Object.keys(this.registry)
-            .filter((methodPath) => this.registry[methodPath].isJson)
-            .map((methodPath) =>
+          Array.from(this.registry.entries())
+            .filter(([{}, { isJson }]) => isJson)
+            .map(([methodPath]) =>
               f.createPropertyAssignment(`"${methodPath}"`, f.createTrue()),
             ),
         ),
@@ -300,13 +299,11 @@ export class Integration {
       makeConst(
         this.ids.endpointTagsConst,
         f.createObjectLiteralExpression(
-          Object.keys(this.registry).map((methodPath) =>
+          Array.from(this.registry.entries()).map(([methodPath, { tags }]) =>
             f.createPropertyAssignment(
               `"${methodPath}"`,
               f.createArrayLiteralExpression(
-                this.registry[methodPath].tags.map((tag) =>
-                  f.createStringLiteral(tag),
-                ),
+                tags.map((tag) => f.createStringLiteral(tag)),
               ),
             ),
           ),
