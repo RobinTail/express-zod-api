@@ -10,6 +10,7 @@ import {
   makeConst,
   makeEmptyInitializingConstructor,
   makeIndexedPromise,
+  makeInterfaceProp,
   makeObjectKeysReducer,
   makeParam,
   makeParams,
@@ -18,12 +19,12 @@ import {
   makePublicLiteralType,
   makePublicReadonlyProp,
   makePublicType,
-  makeQuotedProp,
   makeRecord,
   makeTemplateType,
   makeTypeParams,
   parametricIndexNode,
   protectedReadonlyModifier,
+  quoteProp,
   spacingMiddle,
 } from "./integration-helpers";
 import { defaultSerializer, makeCleanId } from "./common-helpers";
@@ -37,13 +38,6 @@ import { createTypeAlias, printNode } from "./zts-helpers";
 import type Prettier from "prettier";
 
 type IOKind = "input" | "response" | "positive" | "negative";
-
-interface Registry {
-  [METHOD_PATH: string]: Partial<Record<IOKind, string>> & {
-    isJson: boolean;
-    tags: string[];
-  };
-}
 
 interface IntegrationParams {
   routing: Routing;
@@ -95,9 +89,15 @@ interface FormattedPrintingOptions {
 export class Integration {
   protected program: ts.Node[] = [];
   protected usage: Array<ts.Node | string> = [];
-  protected registry: Registry = {};
+  protected registry = new Map<
+    { method: Method; path: string },
+    Partial<Record<IOKind, string>> & {
+      isJson: boolean;
+      tags: string[];
+    }
+  >();
   protected paths: string[] = [];
-  protected aliases: Record<string, ts.TypeAliasDeclaration> = {};
+  protected aliases = new Map<string, ts.TypeAliasDeclaration>();
   protected ids = {
     pathType: f.createIdentifier("Path"),
     methodType: f.createIdentifier("Method"),
@@ -130,11 +130,11 @@ export class Integration {
   protected interfaces: { id: ts.Identifier; kind: IOKind }[] = [];
 
   protected getAlias(name: string): ts.TypeReferenceNode | undefined {
-    return name in this.aliases ? f.createTypeReferenceNode(name) : undefined;
+    return this.aliases.has(name) ? f.createTypeReferenceNode(name) : undefined;
   }
 
   protected makeAlias(name: string, type: ts.TypeNode): ts.TypeReferenceNode {
-    this.aliases[name] = createTypeAlias(type, name);
+    this.aliases.set(name, createTypeAlias(type, name));
     return this.getAlias(name)!;
   }
 
@@ -208,19 +208,22 @@ export class Integration {
         this.program.push(createTypeAlias(genericResponse, genericResponseId));
         if (method !== "options") {
           this.paths.push(path);
-          this.registry[`${method} ${path}`] = {
-            input: inputId,
-            positive: positiveResponseId,
-            negative: negativeResponseId,
-            response: genericResponseId,
-            isJson: endpoint.getMimeTypes("positive").includes(mimeJson),
-            tags: endpoint.getTags(),
-          };
+          this.registry.set(
+            { method, path },
+            {
+              input: inputId,
+              positive: positiveResponseId,
+              negative: negativeResponseId,
+              response: genericResponseId,
+              isJson: endpoint.getMimeTypes("positive").includes(mimeJson),
+              tags: endpoint.getTags(),
+            },
+          );
         }
       },
     });
 
-    this.program.unshift(...Object.values<ts.Node>(this.aliases));
+    this.program.unshift(...this.aliases.values());
 
     // export type Path = "/v1/user/retrieve" | ___;
     this.program.push(makePublicLiteralType(this.ids.pathType, this.paths));
@@ -255,17 +258,19 @@ export class Integration {
     }
     this.interfaces.push({ id: this.ids.responseInterface, kind: "response" });
 
+    const registryEntries = Array.from(this.registry.entries());
+
     // export interface Input ___ { "get /v1/user/retrieve": GetV1UserRetrieveInput; }
     for (const { id, kind } of this.interfaces) {
       this.program.push(
         makePublicExtendedInterface(
           id,
           extenderClause,
-          Object.keys(this.registry)
-            .map((methodPath) => {
-              const reference = this.registry[methodPath][kind];
+          registryEntries
+            .map(([{ method, path }, entry]) => {
+              const reference = entry[kind];
               return reference
-                ? makeQuotedProp(methodPath, reference)
+                ? makeInterfaceProp(quoteProp(method, path), reference)
                 : undefined;
             })
             .filter(
@@ -285,10 +290,13 @@ export class Integration {
       makeConst(
         this.ids.jsonEndpointsConst,
         f.createObjectLiteralExpression(
-          Object.keys(this.registry)
-            .filter((methodPath) => this.registry[methodPath].isJson)
-            .map((methodPath) =>
-              f.createPropertyAssignment(`"${methodPath}"`, f.createTrue()),
+          registryEntries
+            .filter(([{}, { isJson }]) => isJson)
+            .map(([{ method, path }]) =>
+              f.createPropertyAssignment(
+                quoteProp(method, path),
+                f.createTrue(),
+              ),
             ),
         ),
       ),
@@ -300,13 +308,11 @@ export class Integration {
       makeConst(
         this.ids.endpointTagsConst,
         f.createObjectLiteralExpression(
-          Object.keys(this.registry).map((methodPath) =>
+          registryEntries.map(([{ method, path }, { tags }]) =>
             f.createPropertyAssignment(
-              `"${methodPath}"`,
+              quoteProp(method, path),
               f.createArrayLiteralExpression(
-                this.registry[methodPath].tags.map((tag) =>
-                  f.createStringLiteral(tag),
-                ),
+                tags.map((tag) => f.createStringLiteral(tag)),
               ),
             ),
           ),
