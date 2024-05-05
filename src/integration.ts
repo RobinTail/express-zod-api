@@ -89,7 +89,7 @@ export class Integration {
   protected program: ts.Node[] = [];
   protected usage: Array<ts.Node | string> = [];
   protected registry = new Map<
-    string, // method+path
+    `${Method} ${string}`, // method + path
     Partial<Record<IOKind, string>> & {
       isJson: boolean;
       tags: string[];
