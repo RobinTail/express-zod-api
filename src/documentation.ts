@@ -67,9 +67,8 @@ interface DocumentationParams {
 }
 
 export class Documentation extends OpenApiBuilder {
-  protected lastSecuritySchemaIds: Partial<Record<SecuritySchemeType, number>> =
-    {};
-  protected lastOperationIdSuffixes: Record<string, number> = {};
+  protected lastSecuritySchemaIds = new Map<SecuritySchemeType, number>();
+  protected lastOperationIdSuffixes = new Map<string, number>();
 
   protected makeRef(
     name: string,
@@ -88,27 +87,30 @@ export class Documentation extends OpenApiBuilder {
   protected ensureUniqOperationId(
     path: string,
     method: Method,
-    userDefinedOperationId?: string,
+    userDefined?: string,
   ) {
-    if (userDefinedOperationId) {
+    if (userDefined) {
       assert(
-        !(userDefinedOperationId in this.lastOperationIdSuffixes),
+        !this.lastOperationIdSuffixes.has(userDefined),
         new DocumentationError({
-          message: `Duplicated operationId: "${userDefinedOperationId}"`,
+          message: `Duplicated operationId: "${userDefined}"`,
           method,
           isResponse: false,
           path,
         }),
       );
-      this.lastOperationIdSuffixes[userDefinedOperationId] = 1;
-      return userDefinedOperationId;
+      this.lastOperationIdSuffixes.set(userDefined, 1);
+      return userDefined;
     }
     const operationId = makeCleanId(method, path);
-    if (operationId in this.lastOperationIdSuffixes) {
-      this.lastOperationIdSuffixes[operationId]++;
-      return `${operationId}${this.lastOperationIdSuffixes[operationId]}`;
+    if (this.lastOperationIdSuffixes.has(operationId)) {
+      this.lastOperationIdSuffixes.set(
+        operationId,
+        this.lastOperationIdSuffixes.get(operationId)! + 1,
+      );
+      return `${operationId}${this.lastOperationIdSuffixes.get(operationId)}`;
     }
-    this.lastOperationIdSuffixes[operationId] = 1;
+    this.lastOperationIdSuffixes.set(operationId, 1);
     return operationId;
   }
 
@@ -122,11 +124,13 @@ export class Documentation extends OpenApiBuilder {
         return name;
       }
     }
-    this.lastSecuritySchemaIds[subject.type] =
-      (this.lastSecuritySchemaIds?.[subject.type] || 0) + 1;
-    return `${subject.type.toUpperCase()}_${
-      this.lastSecuritySchemaIds[subject.type]
-    }`;
+    this.lastSecuritySchemaIds.set(
+      subject.type,
+      (this.lastSecuritySchemaIds.get(subject.type) || 0) + 1,
+    );
+    return `${subject.type.toUpperCase()}_${this.lastSecuritySchemaIds.get(
+      subject.type,
+    )}`;
   }
 
   public constructor({
