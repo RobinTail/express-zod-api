@@ -97,7 +97,7 @@ export class Integration {
   protected usage: Array<ts.Node | string> = [];
   protected registry: Registry = {};
   protected paths: string[] = [];
-  protected aliases: Record<string, ts.TypeAliasDeclaration> = {};
+  protected aliases = new Map<string, ts.TypeAliasDeclaration>();
   protected ids = {
     pathType: f.createIdentifier("Path"),
     methodType: f.createIdentifier("Method"),
@@ -130,11 +130,11 @@ export class Integration {
   protected interfaces: { id: ts.Identifier; kind: IOKind }[] = [];
 
   protected getAlias(name: string): ts.TypeReferenceNode | undefined {
-    return name in this.aliases ? f.createTypeReferenceNode(name) : undefined;
+    return this.aliases.has(name) ? f.createTypeReferenceNode(name) : undefined;
   }
 
   protected makeAlias(name: string, type: ts.TypeNode): ts.TypeReferenceNode {
-    this.aliases[name] = createTypeAlias(type, name);
+    this.aliases.set(name, createTypeAlias(type, name));
     return this.getAlias(name)!;
   }
 
@@ -220,7 +220,7 @@ export class Integration {
       },
     });
 
-    this.program.unshift(...Object.values<ts.Node>(this.aliases));
+    this.program.unshift(...Array.from(this.aliases.values()));
 
     // export type Path = "/v1/user/retrieve" | ___;
     this.program.push(makePublicLiteralType(this.ids.pathType, this.paths));
