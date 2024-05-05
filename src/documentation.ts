@@ -89,9 +89,14 @@ export class Documentation extends OpenApiBuilder {
     method: Method,
     userDefined?: string,
   ) {
+    const operationId = userDefined || makeCleanId(method, path);
+    let lastSuffix = this.lastOperationIdSuffixes.get(operationId);
+    if (lastSuffix === undefined) {
+      this.lastOperationIdSuffixes.set(operationId, 1);
+      return operationId;
+    }
     if (userDefined) {
-      assert(
-        !this.lastOperationIdSuffixes.has(userDefined),
+      assert.fail(
         new DocumentationError({
           message: `Duplicated operationId: "${userDefined}"`,
           method,
@@ -99,19 +104,10 @@ export class Documentation extends OpenApiBuilder {
           path,
         }),
       );
-      this.lastOperationIdSuffixes.set(userDefined, 1);
-      return userDefined;
     }
-    const operationId = makeCleanId(method, path);
-    if (this.lastOperationIdSuffixes.has(operationId)) {
-      this.lastOperationIdSuffixes.set(
-        operationId,
-        this.lastOperationIdSuffixes.get(operationId)! + 1,
-      );
-      return `${operationId}${this.lastOperationIdSuffixes.get(operationId)}`;
-    }
-    this.lastOperationIdSuffixes.set(operationId, 1);
-    return operationId;
+    lastSuffix++;
+    this.lastOperationIdSuffixes.set(operationId, lastSuffix);
+    return `${operationId}${lastSuffix}`;
   }
 
   protected ensureUniqSecuritySchemaName(subject: SecuritySchemeObject) {
