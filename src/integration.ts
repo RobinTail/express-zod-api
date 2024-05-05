@@ -10,6 +10,7 @@ import {
   makeConst,
   makeEmptyInitializingConstructor,
   makeIndexedPromise,
+  makeInterfaceProp,
   makeObjectKeysReducer,
   makeParam,
   makeParams,
@@ -18,7 +19,6 @@ import {
   makePublicLiteralType,
   makePublicReadonlyProp,
   makePublicType,
-  makeQuotedProp,
   makeRecord,
   makeTemplateType,
   makeTypeParams,
@@ -269,7 +269,7 @@ export class Integration {
             .map(([{ method, path }, entry]) => {
               const reference = entry[kind];
               return reference
-                ? makeQuotedProp(`${method} ${path}`, reference)
+                ? makeInterfaceProp(`"${method} ${path}"`, reference)
                 : undefined;
             })
             .filter(

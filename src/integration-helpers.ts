@@ -74,10 +74,10 @@ export const makeEmptyInitializingConstructor = (
   params: ts.ParameterDeclaration[],
 ) => f.createConstructorDeclaration(undefined, params, f.createBlock([]));
 
-export const makeQuotedProp = (name: string, ref: string) =>
+export const makeInterfaceProp = (name: string, ref: string) =>
   f.createPropertySignature(
     undefined,
-    `"${name}"`,
+    name,
     undefined,
     f.createTypeReferenceNode(ref),
   );
