@@ -24,6 +24,7 @@ import {
   makeTypeParams,
   parametricIndexNode,
   protectedReadonlyModifier,
+  quoteProp,
   spacingMiddle,
 } from "./integration-helpers";
 import { defaultSerializer, makeCleanId } from "./common-helpers";
@@ -269,7 +270,7 @@ export class Integration {
             .map(([{ method, path }, entry]) => {
               const reference = entry[kind];
               return reference
-                ? makeInterfaceProp(`"${method} ${path}"`, reference)
+                ? makeInterfaceProp(quoteProp(method, path), reference)
                 : undefined;
             })
             .filter(
@@ -292,7 +293,10 @@ export class Integration {
           registryEntries
             .filter(([{}, { isJson }]) => isJson)
             .map(([{ method, path }]) =>
-              f.createPropertyAssignment(`"${method} ${path}"`, f.createTrue()),
+              f.createPropertyAssignment(
+                quoteProp(method, path),
+                f.createTrue(),
+              ),
             ),
         ),
       ),
@@ -306,7 +310,7 @@ export class Integration {
         f.createObjectLiteralExpression(
           registryEntries.map(([{ method, path }, { tags }]) =>
             f.createPropertyAssignment(
-              `"${method} ${path}"`,
+              quoteProp(method, path),
               f.createArrayLiteralExpression(
                 tags.map((tag) => f.createStringLiteral(tag)),
               ),

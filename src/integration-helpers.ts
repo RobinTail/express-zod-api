@@ -1,5 +1,6 @@
 import ts from "typescript";
 import { chain, toPairs } from "ramda";
+import { Method } from "./method";
 
 export const f = ts.factory;
 
@@ -205,3 +206,5 @@ export const makeObjectKeysReducer = (
       initial,
     ],
   );
+
+export const quoteProp = (...parts: [Method, string]) => `"${parts.join(" ")}"`;
