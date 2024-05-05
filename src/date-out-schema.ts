@@ -9,3 +9,5 @@ export const dateOut = () =>
     .refine(isValidDate)
     .transform((date) => date.toISOString())
     .brand(ezDateOutBrand);
+
+export type DateOutSchema = ReturnType<typeof dateOut>;

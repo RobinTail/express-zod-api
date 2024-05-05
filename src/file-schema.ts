@@ -21,3 +21,5 @@ export function file<K extends Variant>(variant: K): ReturnType<Variants[K]>;
 export function file<K extends Variant>(variant?: K) {
   return variants[variant || "string"]();
 }
+
+export type FileSchema = ReturnType<typeof file>;

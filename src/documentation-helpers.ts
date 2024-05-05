@@ -52,10 +52,10 @@ import {
   ucFirst,
 } from "./common-helpers";
 import { InputSource, TagsConfig } from "./config-type";
-import { ezDateInBrand } from "./date-in-schema";
-import { ezDateOutBrand } from "./date-out-schema";
+import { DateInSchema, ezDateInBrand } from "./date-in-schema";
+import { DateOutSchema, ezDateOutBrand } from "./date-out-schema";
 import { DocumentationError } from "./errors";
-import { ezFileBrand } from "./file-schema";
+import { FileSchema, ezFileBrand } from "./file-schema";
 import { IOSchema } from "./io-schema";
 import {
   LogicalContainer,
@@ -72,7 +72,7 @@ import {
   walkSchema,
 } from "./schema-walker";
 import { Security } from "./security";
-import { ezUploadBrand } from "./upload-schema";
+import { UploadSchema, ezUploadBrand } from "./upload-schema";
 
 /* eslint-disable @typescript-eslint/no-use-before-define */
 
@@ -146,7 +146,7 @@ export const depictAny: Depicter<z.ZodAny> = () => ({
   format: "any",
 });
 
-export const depictUpload: Depicter<z.ZodType> = (ctx) => {
+export const depictUpload: Depicter<UploadSchema> = (ctx) => {
   assert(
     !ctx.isResponse,
     new DocumentationError({
@@ -160,15 +160,18 @@ export const depictUpload: Depicter<z.ZodType> = (ctx) => {
   };
 };
 
-export const depictFile: Depicter<z.ZodType> = ({ schema }) => ({
-  type: "string",
-  format:
-    schema instanceof z.ZodString
-      ? schema._def.checks.find((check) => check.kind === "base64")
-        ? "byte"
-        : "file"
-      : "binary",
-});
+export const depictFile: Depicter<FileSchema> = ({ schema }) => {
+  const subject = schema.unwrap();
+  return {
+    type: "string",
+    format:
+      subject instanceof z.ZodString
+        ? subject._def.checks.find((check) => check.kind === "base64")
+          ? "byte"
+          : "file"
+        : "binary",
+  };
+};
 
 export const depictUnion: Depicter<z.ZodUnion<z.ZodUnionOptions>> = ({
   schema: { options },
@@ -317,7 +320,7 @@ export const depictObject: Depicter<z.ZodObject<z.ZodRawShape>> = ({
  * */
 export const depictNull: Depicter<z.ZodNull> = () => ({ type: "null" });
 
-export const depictDateIn: Depicter<z.ZodType> = (ctx) => {
+export const depictDateIn: Depicter<DateInSchema> = (ctx) => {
   assert(
     !ctx.isResponse,
     new DocumentationError({
@@ -336,7 +339,7 @@ export const depictDateIn: Depicter<z.ZodType> = (ctx) => {
   };
 };
 
-export const depictDateOut: Depicter<z.ZodType> = (ctx) => {
+export const depictDateOut: Depicter<DateOutSchema> = (ctx) => {
   assert(
     ctx.isResponse,
     new DocumentationError({

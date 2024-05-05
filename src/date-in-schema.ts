@@ -15,3 +15,5 @@ export const dateIn = () => {
     .pipe(z.date().refine(isValidDate))
     .brand(ezDateInBrand);
 };
+
+export type DateInSchema = ReturnType<typeof dateIn>;

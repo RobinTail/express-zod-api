@@ -3,7 +3,7 @@ import { z } from "zod";
 import { hasCoercion, tryToTransform } from "./common-helpers";
 import { ezDateInBrand } from "./date-in-schema";
 import { ezDateOutBrand } from "./date-out-schema";
-import { ezFileBrand } from "./file-schema";
+import { FileSchema, ezFileBrand } from "./file-schema";
 import { RawSchema, ezRawBrand } from "./raw-schema";
 import { HandlingRules, walkSchema } from "./schema-walker";
 import {
@@ -216,13 +216,14 @@ const onLazy: Producer<z.ZodLazy<z.ZodTypeAny>> = ({
   );
 };
 
-const onFile: Producer<z.ZodType> = ({ schema }) => {
+const onFile: Producer<FileSchema> = ({ schema }) => {
+  const subject = schema.unwrap();
   const stringType = f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword);
   const bufferType = f.createTypeReferenceNode("Buffer");
   const unionType = f.createUnionTypeNode([stringType, bufferType]);
-  return schema instanceof z.ZodString
+  return subject instanceof z.ZodString
     ? stringType
-    : schema instanceof z.ZodUnion
+    : subject instanceof z.ZodUnion
       ? unionType
       : bufferType;
 };
