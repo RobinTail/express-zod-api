@@ -254,13 +254,15 @@ export class Integration {
     }
     this.interfaces.push({ id: this.ids.responseInterface, kind: "response" });
 
+    const registryEntries = Array.from(this.registry.entries());
+
     // export interface Input ___ { "get /v1/user/retrieve": GetV1UserRetrieveInput; }
     for (const { id, kind } of this.interfaces) {
       this.program.push(
         makePublicExtendedInterface(
           id,
           extenderClause,
-          Array.from(this.registry.entries())
+          registryEntries
             .map(([methodPath, entry]) => {
               const reference = entry[kind];
               return reference
@@ -284,7 +286,7 @@ export class Integration {
       makeConst(
         this.ids.jsonEndpointsConst,
         f.createObjectLiteralExpression(
-          Array.from(this.registry.entries())
+          registryEntries
             .filter(([{}, { isJson }]) => isJson)
             .map(([methodPath]) =>
               f.createPropertyAssignment(`"${methodPath}"`, f.createTrue()),
@@ -299,7 +301,7 @@ export class Integration {
       makeConst(
         this.ids.endpointTagsConst,
         f.createObjectLiteralExpression(
-          Array.from(this.registry.entries()).map(([methodPath, { tags }]) =>
+          registryEntries.map(([methodPath, { tags }]) =>
             f.createPropertyAssignment(
               `"${methodPath}"`,
               f.createArrayLiteralExpression(
