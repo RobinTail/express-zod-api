@@ -47,8 +47,9 @@ export const walkSchema = <U extends object, Context extends FlatObject = {}>({
   rules: HandlingRules<U, Context>;
   onMissing: SchemaHandler<z.ZodTypeAny, U, Context, "last">;
 }): U => {
-  const kind = getMeta(schema, "brand") || schema._def.typeName;
-  const handler = kind ? rules[kind as keyof typeof rules] : undefined;
+  const handler =
+    rules[getMeta(schema, "brand") as keyof typeof rules] ||
+    rules[schema._def.typeName as keyof typeof rules];
   const ctx = rest as unknown as Context;
   const next = (subject: z.ZodTypeAny) =>
     walkSchema({ schema: subject, ...ctx, onEach, rules, onMissing });
