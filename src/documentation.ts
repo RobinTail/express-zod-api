@@ -229,7 +229,7 @@ export class Documentation extends OpenApiBuilder {
             const scopes = ["oauth2", "openIdConnect"].includes(
               securitySchema.type,
             )
-              ? endpoint.getScopes()
+              ? endpoint.getScopes().slice()
               : [];
             this.addSecurityScheme(name, securitySchema);
             return { name, scopes };
