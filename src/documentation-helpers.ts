@@ -184,7 +184,7 @@ export const depictDiscriminatedUnion: Depicter<
 > = ({ schema: { options, discriminator }, next }) => {
   return {
     discriminator: { propertyName: discriminator },
-    oneOf: Array.from(options.values()).map(next),
+    oneOf: options.map(next),
   };
 };
 
