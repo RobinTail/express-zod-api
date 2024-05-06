@@ -216,7 +216,7 @@ export class Integration {
               negative: negativeResponseId,
               response: genericResponseId,
               isJson: endpoint.getMimeTypes("positive").includes(mimeJson),
-              tags: endpoint.getTags(),
+              tags: endpoint.getTags().slice(),
             },
           );
         }

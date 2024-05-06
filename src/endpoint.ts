@@ -61,7 +61,7 @@ export abstract class AbstractEndpoint {
   ): ReadonlyArray<NormalizedResponse>;
   public abstract getSecurity(): LogicalContainer<Security>;
   public abstract getScopes(): ReadonlyArray<string>;
-  public abstract getTags(): string[];
+  public abstract getTags(): ReadonlyArray<string>;
   public abstract getOperationId(method: Method): string | undefined;
 }
 
@@ -84,7 +84,7 @@ export class Endpoint<
   readonly #resultHandler: AnyResultHandlerDefinition;
   readonly #schemas: { input: IN; output: OUT };
   readonly #scopes: ReadonlyArray<SCO>;
-  readonly #tags: TAG[];
+  readonly #tags: ReadonlyArray<TAG>;
   readonly #getOperationId: (method: Method) => string | undefined;
 
   constructor({
@@ -119,7 +119,7 @@ export class Endpoint<
     this.#getOperationId = getOperationId;
     this.#methods = Object.freeze(methods);
     this.#scopes = Object.freeze(scopes);
-    this.#tags = tags;
+    this.#tags = Object.freeze(tags);
     this.#descriptions = { long, short };
     this.#schemas = { input: inputSchema, output: outputSchema };
     for (const [variant, schema] of Object.entries(this.#schemas)) {
@@ -209,7 +209,7 @@ export class Endpoint<
     return this.#scopes;
   }
 
-  public override getTags(): TAG[] {
+  public override getTags() {
     return this.#tags;
   }
 
