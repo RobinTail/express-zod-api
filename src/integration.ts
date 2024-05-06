@@ -258,30 +258,39 @@ export class Integration {
     }
     this.interfaces.push({ id: this.ids.responseInterface, kind: "response" });
 
-    const registryEntries = Array.from(this.registry.entries());
-
     // export interface Input ___ { "get /v1/user/retrieve": GetV1UserRetrieveInput; }
     for (const { id, kind } of this.interfaces) {
-      this.program.push(
-        makePublicExtendedInterface(
-          id,
-          extenderClause,
-          registryEntries
-            .map(([{ method, path }, entry]) => {
-              const reference = entry[kind];
-              return reference
-                ? makeInterfaceProp(quoteProp(method, path), reference)
-                : undefined;
-            })
-            .filter(
-              (entry): entry is ts.PropertySignature => entry !== undefined,
-            ),
-        ),
-      );
+      const props: ts.PropertySignature[] = [];
+      for (const [{ method, path }, entry] of this.registry) {
+        if (kind in entry) {
+          props.push(makeInterfaceProp(quoteProp(method, path), entry[kind]!));
+        }
+      }
+      this.program.push(makePublicExtendedInterface(id, extenderClause, props));
     }
 
     if (variant === "types") {
       return;
+    }
+
+    /** @see jsonEndpointsConst */
+    const jsonProps: ts.PropertyAssignment[] = [];
+    /** @see endpointTagsConst */
+    const tagProps: ts.PropertyAssignment[] = [];
+    for (const [{ method, path }, { isJson, tags }] of this.registry) {
+      if (isJson) {
+        jsonProps.push(
+          f.createPropertyAssignment(quoteProp(method, path), f.createTrue()),
+        );
+      }
+      tagProps.push(
+        f.createPropertyAssignment(
+          quoteProp(method, path),
+          f.createArrayLiteralExpression(
+            tags.map((tag) => f.createStringLiteral(tag)),
+          ),
+        ),
+      );
     }
 
     // export const jsonEndpoints = { "get /v1/user/retrieve": true }
@@ -289,16 +298,7 @@ export class Integration {
       exportModifier,
       makeConst(
         this.ids.jsonEndpointsConst,
-        f.createObjectLiteralExpression(
-          registryEntries
-            .filter(([{}, { isJson }]) => isJson)
-            .map(([{ method, path }]) =>
-              f.createPropertyAssignment(
-                quoteProp(method, path),
-                f.createTrue(),
-              ),
-            ),
-        ),
+        f.createObjectLiteralExpression(jsonProps),
       ),
     );
 
@@ -307,16 +307,7 @@ export class Integration {
       exportModifier,
       makeConst(
         this.ids.endpointTagsConst,
-        f.createObjectLiteralExpression(
-          registryEntries.map(([{ method, path }, { tags }]) =>
-            f.createPropertyAssignment(
-              quoteProp(method, path),
-              f.createArrayLiteralExpression(
-                tags.map((tag) => f.createStringLiteral(tag)),
-              ),
-            ),
-          ),
-        ),
+        f.createObjectLiteralExpression(tagProps),
       ),
     );
 
