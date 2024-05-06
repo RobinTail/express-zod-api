@@ -55,7 +55,7 @@ export abstract class AbstractEndpoint {
   public abstract getMethods(): ReadonlyArray<Method>;
   public abstract getSchema(variant: IOVariant): IOSchema;
   public abstract getSchema(variant: ResponseVariant): z.ZodTypeAny;
-  public abstract getMimeTypes(variant: MimeVariant): string[];
+  public abstract getMimeTypes(variant: MimeVariant): ReadonlyArray<string>;
   public abstract getResponses(variant: ResponseVariant): NormalizedResponse[];
   public abstract getSecurity(): LogicalContainer<Security>;
   public abstract getScopes(): string[];
@@ -73,7 +73,7 @@ export class Endpoint<
   readonly #descriptions: Record<DescriptionVariant, string | undefined>;
   readonly #methods: ReadonlyArray<Method>;
   readonly #middlewares: AnyMiddlewareDef[];
-  readonly #mimeTypes: Record<MimeVariant, string[]>;
+  readonly #mimeTypes: Record<MimeVariant, ReadonlyArray<string>>;
   readonly #responses: Record<ResponseVariant, NormalizedResponse[]>;
   readonly #handler: Handler<z.output<IN>, z.input<OUT>, OPT>;
   readonly #resultHandler: AnyResultHandlerDefinition;
@@ -144,13 +144,19 @@ export class Endpoint<
       );
     }
     this.#mimeTypes = {
-      input: hasUpload(inputSchema)
-        ? [mimeMultipart]
-        : hasRaw(inputSchema)
-          ? [mimeRaw]
-          : [mimeJson],
-      positive: this.#responses.positive.flatMap(({ mimeTypes }) => mimeTypes),
-      negative: this.#responses.negative.flatMap(({ mimeTypes }) => mimeTypes),
+      input: Object.freeze(
+        hasUpload(inputSchema)
+          ? [mimeMultipart]
+          : hasRaw(inputSchema)
+            ? [mimeRaw]
+            : [mimeJson],
+      ),
+      positive: Object.freeze(
+        this.#responses.positive.flatMap(({ mimeTypes }) => mimeTypes),
+      ),
+      negative: Object.freeze(
+        this.#responses.negative.flatMap(({ mimeTypes }) => mimeTypes),
+      ),
     };
   }
 
