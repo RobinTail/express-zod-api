@@ -268,8 +268,8 @@ export class Integration {
     });
 
     // Single walk through the registry for making properties for the next three objects
-    const jsonProps: ts.PropertyAssignment[] = [];
-    const tagProps: ts.PropertyAssignment[] = [];
+    const jsonEndpoints: ts.PropertyAssignment[] = [];
+    const endpointTags: ts.PropertyAssignment[] = [];
     for (const [{ method, path }, { isJson, tags, ...rest }] of this.registry) {
       // "get /v1/user/retrieve": GetV1UserRetrieveInput
       for (const face of this.interfaces) {
@@ -282,12 +282,12 @@ export class Integration {
       if (variant !== "types") {
         if (isJson) {
           // "get /v1/user/retrieve": true
-          jsonProps.push(
+          jsonEndpoints.push(
             f.createPropertyAssignment(quoteProp(method, path), f.createTrue()),
           );
         }
         // "get /v1/user/retrieve": ["users"]
-        tagProps.push(
+        endpointTags.push(
           f.createPropertyAssignment(
             quoteProp(method, path),
             f.createArrayLiteralExpression(
@@ -312,7 +312,7 @@ export class Integration {
       exportModifier,
       makeConst(
         this.ids.jsonEndpointsConst,
-        f.createObjectLiteralExpression(jsonProps),
+        f.createObjectLiteralExpression(jsonEndpoints),
       ),
     );
 
@@ -321,7 +321,7 @@ export class Integration {
       exportModifier,
       makeConst(
         this.ids.endpointTagsConst,
-        f.createObjectLiteralExpression(tagProps),
+        f.createObjectLiteralExpression(endpointTags),
       ),
     );
 
