@@ -52,7 +52,7 @@ export abstract class AbstractEndpoint {
   public abstract getDescription(
     variant: DescriptionVariant,
   ): string | undefined;
-  public abstract getMethods(): Method[];
+  public abstract getMethods(): ReadonlyArray<Method>;
   public abstract getSchema(variant: IOVariant): IOSchema;
   public abstract getSchema(variant: ResponseVariant): z.ZodTypeAny;
   public abstract getMimeTypes(variant: MimeVariant): string[];
@@ -71,7 +71,7 @@ export class Endpoint<
   TAG extends string,
 > extends AbstractEndpoint {
   readonly #descriptions: Record<DescriptionVariant, string | undefined>;
-  readonly #methods: Method[];
+  readonly #methods: ReadonlyArray<Method>;
   readonly #middlewares: AnyMiddlewareDef[];
   readonly #mimeTypes: Record<MimeVariant, string[]>;
   readonly #responses: Record<ResponseVariant, NormalizedResponse[]>;
@@ -112,7 +112,7 @@ export class Endpoint<
     this.#resultHandler = resultHandler;
     this.#middlewares = middlewares;
     this.#getOperationId = getOperationId;
-    this.#methods = methods;
+    this.#methods = Object.freeze(methods);
     this.#scopes = scopes;
     this.#tags = tags;
     this.#descriptions = { long, short };
@@ -158,7 +158,7 @@ export class Endpoint<
     return this.#descriptions[variant];
   }
 
-  public override getMethods(): Method[] {
+  public override getMethods() {
     return this.#methods;
   }
 
