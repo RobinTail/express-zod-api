@@ -822,7 +822,7 @@ export const onEach: Depicter<z.ZodTypeAny, "each"> = ({
     result.type = makeNullableType(prev);
   }
   if (examples.length) {
-    result.examples = Array.from(examples);
+    result.examples = examples.slice();
   }
   return result;
 };
