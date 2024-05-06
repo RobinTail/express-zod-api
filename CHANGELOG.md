@@ -2,6 +2,10 @@
 
 ## Version 18
 
+### v18.5.2
+
+- Muted uploader logs related to non-eligible requests.
+
 ### v18.5.1
 
 - A small performance improvement for `Integration` and `Documentation`.
