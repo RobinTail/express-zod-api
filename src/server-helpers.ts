@@ -82,3 +82,13 @@ export const createUploadFailueHandler =
     }
     next();
   };
+
+export const createUploadLogger = (
+  logger: AbstractLogger,
+): Pick<Console, "log"> => ({
+  log: (message, ...rest) => {
+    if (!/not eligible/.test(message)) {
+      logger.debug(message, ...rest);
+    }
+  },
+});

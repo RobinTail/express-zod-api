@@ -12,6 +12,7 @@ import {
   createNotFoundHandler,
   createParserFailureHandler,
   createUploadFailueHandler,
+  createUploadLogger,
 } from "./server-helpers";
 import { getStartupLogo } from "./startup-logo";
 
@@ -67,7 +68,7 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
         ...derivedConfig,
         abortOnLimit: false,
         parseNested: true,
-        logger: { log: rootLogger.debug.bind(rootLogger) },
+        logger: createUploadLogger(rootLogger),
       }),
     );
     if (limitError) {
