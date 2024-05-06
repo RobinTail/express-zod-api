@@ -127,7 +127,11 @@ export class Integration {
     exampleImplementationConst: f.createIdentifier("exampleImplementation"),
     clientConst: f.createIdentifier("client"),
   } satisfies Record<string, ts.Identifier>;
-  protected interfaces: { id: ts.Identifier; kind: IOKind }[] = [];
+  protected interfaces: Array<{
+    id: ts.Identifier;
+    kind: IOKind;
+    props: ts.PropertySignature[];
+  }> = [];
 
   protected getAlias(name: string): ts.TypeReferenceNode | undefined {
     return this.aliases.has(name) ? f.createTypeReferenceNode(name) : undefined;
@@ -249,48 +253,58 @@ export class Integration {
     this.interfaces.push({
       id: this.ids.inputInterface,
       kind: "input",
+      props: [],
     });
     if (splitResponse) {
       this.interfaces.push(
-        { id: this.ids.posResponseInterface, kind: "positive" },
-        { id: this.ids.negResponseInterface, kind: "negative" },
+        { id: this.ids.posResponseInterface, kind: "positive", props: [] },
+        { id: this.ids.negResponseInterface, kind: "negative", props: [] },
       );
     }
-    this.interfaces.push({ id: this.ids.responseInterface, kind: "response" });
+    this.interfaces.push({
+      id: this.ids.responseInterface,
+      kind: "response",
+      props: [],
+    });
 
-    // export interface Input ___ { "get /v1/user/retrieve": GetV1UserRetrieveInput; }
-    for (const { id, kind } of this.interfaces) {
-      const props: ts.PropertySignature[] = [];
-      for (const [{ method, path }, entry] of this.registry) {
-        if (kind in entry) {
-          props.push(makeInterfaceProp(quoteProp(method, path), entry[kind]!));
+    // Single walk through the registry for making properties for the next three objects
+    const jsonProps: ts.PropertyAssignment[] = [];
+    const tagProps: ts.PropertyAssignment[] = [];
+    for (const [{ method, path }, { isJson, tags, ...rest }] of this.registry) {
+      // "get /v1/user/retrieve": GetV1UserRetrieveInput
+      for (const face of this.interfaces) {
+        if (face.kind in rest) {
+          face.props.push(
+            makeInterfaceProp(quoteProp(method, path), rest[face.kind]!),
+          );
         }
       }
+      if (variant !== "types") {
+        if (isJson) {
+          // "get /v1/user/retrieve": true
+          jsonProps.push(
+            f.createPropertyAssignment(quoteProp(method, path), f.createTrue()),
+          );
+        }
+        // "get /v1/user/retrieve": ["users"]
+        tagProps.push(
+          f.createPropertyAssignment(
+            quoteProp(method, path),
+            f.createArrayLiteralExpression(
+              tags.map((tag) => f.createStringLiteral(tag)),
+            ),
+          ),
+        );
+      }
+    }
+
+    // export interface Input ___ { "get /v1/user/retrieve": GetV1UserRetrieveInput; }
+    for (const { id, props } of this.interfaces) {
       this.program.push(makePublicExtendedInterface(id, extenderClause, props));
     }
 
     if (variant === "types") {
       return;
-    }
-
-    /** @see jsonEndpointsConst */
-    const jsonProps: ts.PropertyAssignment[] = [];
-    /** @see endpointTagsConst */
-    const tagProps: ts.PropertyAssignment[] = [];
-    for (const [{ method, path }, { isJson, tags }] of this.registry) {
-      if (isJson) {
-        jsonProps.push(
-          f.createPropertyAssignment(quoteProp(method, path), f.createTrue()),
-        );
-      }
-      tagProps.push(
-        f.createPropertyAssignment(
-          quoteProp(method, path),
-          f.createArrayLiteralExpression(
-            tags.map((tag) => f.createStringLiteral(tag)),
-          ),
-        ),
-      );
     }
 
     // export const jsonEndpoints = { "get /v1/user/retrieve": true }
