@@ -56,7 +56,9 @@ export abstract class AbstractEndpoint {
   public abstract getSchema(variant: IOVariant): IOSchema;
   public abstract getSchema(variant: ResponseVariant): z.ZodTypeAny;
   public abstract getMimeTypes(variant: MimeVariant): ReadonlyArray<string>;
-  public abstract getResponses(variant: ResponseVariant): NormalizedResponse[];
+  public abstract getResponses(
+    variant: ResponseVariant,
+  ): ReadonlyArray<NormalizedResponse>;
   public abstract getSecurity(): LogicalContainer<Security>;
   public abstract getScopes(): string[];
   public abstract getTags(): string[];
@@ -74,7 +76,10 @@ export class Endpoint<
   readonly #methods: ReadonlyArray<Method>;
   readonly #middlewares: AnyMiddlewareDef[];
   readonly #mimeTypes: Record<MimeVariant, ReadonlyArray<string>>;
-  readonly #responses: Record<ResponseVariant, NormalizedResponse[]>;
+  readonly #responses: Record<
+    ResponseVariant,
+    ReadonlyArray<NormalizedResponse>
+  >;
   readonly #handler: Handler<z.output<IN>, z.input<OUT>, OPT>;
   readonly #resultHandler: AnyResultHandlerDefinition;
   readonly #schemas: { input: IN; output: OUT };
@@ -126,14 +131,18 @@ export class Endpoint<
       );
     }
     this.#responses = {
-      positive: normalizeApiResponse(
-        resultHandler.getPositiveResponse(outputSchema),
-        { mimeTypes: [mimeJson], statusCodes: [defaultStatusCodes.positive] },
+      positive: Object.freeze(
+        normalizeApiResponse(resultHandler.getPositiveResponse(outputSchema), {
+          mimeTypes: [mimeJson],
+          statusCodes: [defaultStatusCodes.positive],
+        }),
       ),
-      negative: normalizeApiResponse(resultHandler.getNegativeResponse(), {
-        mimeTypes: [mimeJson],
-        statusCodes: [defaultStatusCodes.negative],
-      }),
+      negative: Object.freeze(
+        normalizeApiResponse(resultHandler.getNegativeResponse(), {
+          mimeTypes: [mimeJson],
+          statusCodes: [defaultStatusCodes.negative],
+        }),
+      ),
     };
     for (const [variant, responses] of Object.entries(this.#responses)) {
       assert(
