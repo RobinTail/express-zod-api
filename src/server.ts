@@ -10,12 +10,11 @@ import { loadPeer } from "./peer-helpers";
 import { defaultResultHandler } from "./result-handler";
 import { Routing, initRouting } from "./routing";
 import {
-  LocalResponse,
   createLoggingMiddleware,
   createNotFoundHandler,
   createParserFailureHandler,
   createUploadFailueHandler,
-  createUploadLogger,
+  createUploadMiddleware,
   rawMover,
 } from "./server-helpers";
 import { getStartupLogo } from "./startup-logo";
@@ -67,19 +66,14 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
 
   if (config.server.upload) {
     const uploader = await loadPeer<typeof fileUpload>("express-fileupload");
-    const { limitError, beforeUpload, ...derivedConfig } = {
+    const { limitError, beforeUpload, ...options } = {
       ...(typeof config.server.upload === "object" && config.server.upload),
     };
     if (beforeUpload) {
       parsers.upload.push(beforeUpload);
     }
-    parsers.upload.push((req, res: LocalResponse, next) =>
-      uploader({
-        ...derivedConfig,
-        abortOnLimit: false,
-        parseNested: true,
-        logger: createUploadLogger(res.locals.logger || rootLogger),
-      })(req, res, next),
+    parsers.upload.push(
+      createUploadMiddleware({ uploader, options, rootLogger }),
     );
     if (limitError) {
       parsers.upload.push(createUploadFailueHandler(limitError));

@@ -1,3 +1,4 @@
+import type fileUpload from "express-fileupload";
 import { AnyResultHandlerDefinition } from "./result-handler";
 import { AbstractLogger } from "./logger";
 import { CommonConfig } from "./config-type";
@@ -77,6 +78,24 @@ export const createUploadLogger = (
 ): Pick<Console, "log"> => ({
   log: logger.debug.bind(logger),
 });
+
+export const createUploadMiddleware =
+  ({
+    options,
+    uploader,
+    rootLogger,
+  }: {
+    options: fileUpload.Options;
+    uploader: typeof fileUpload;
+    rootLogger: AbstractLogger;
+  }): RequestHandler =>
+  (req, res: LocalResponse, next) =>
+    uploader({
+      ...options,
+      abortOnLimit: false,
+      parseNested: true,
+      logger: createUploadLogger(res.locals.logger || rootLogger),
+    })(req, res, next);
 
 export const rawMover: RequestHandler = (req, {}, next) => {
   if (Buffer.isBuffer(req.body)) {
