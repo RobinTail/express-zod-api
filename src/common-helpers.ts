@@ -14,8 +14,8 @@ export type FlatObject = Record<string, unknown>;
 
 const areFilesAvailable = (request: Request): boolean => {
   const contentType = request.header("content-type") || "";
-  const isMultipart = contentType.toLowerCase().startsWith(contentTypes.upload);
-  return "files" in request && isMultipart;
+  const isUpload = contentType.toLowerCase().startsWith(contentTypes.upload);
+  return "files" in request && isUpload;
 };
 
 export const defaultInputSources: InputSources = {
