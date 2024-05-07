@@ -21,6 +21,7 @@ import {
   createLogger,
   createServer,
   defaultResultHandler,
+  ez,
 } from "../../src";
 import express from "express";
 import { afterAll, describe, expect, test, vi } from "vitest";
@@ -62,8 +63,11 @@ describe("Server", () => {
       await createServer(configMock, routingMock);
       expect(appMock).toBeTruthy();
       expect(appMock.disable).toHaveBeenCalledWith("x-powered-by");
-      expect(appMock.use).toHaveBeenCalledTimes(3);
-      expect(appMock.use.mock.calls[0][0]).toBe(expressJsonMock);
+      expect(appMock.use).toHaveBeenCalledTimes(5);
+      expect(appMock.use.mock.calls[0]).toEqual([
+        "/v1/test",
+        [expressJsonMock],
+      ]);
       expect(appMock.get).toHaveBeenCalledTimes(1);
       expect(appMock.get.mock.calls[0][0]).toBe("/v1/test");
       expect(appMock.post).toHaveBeenCalledTimes(1);
@@ -112,8 +116,11 @@ describe("Server", () => {
       expect(logger).toEqual(customLogger);
       expect(app).toEqual(appMock);
       expect(appMock).toBeTruthy();
-      expect(appMock.use).toHaveBeenCalledTimes(3);
-      expect(appMock.use.mock.calls[0][0]).toBe(configMock.server.jsonParser);
+      expect(appMock.use).toHaveBeenCalledTimes(5);
+      expect(appMock.use.mock.calls[0]).toEqual([
+        "/v1/test",
+        [configMock.server.jsonParser],
+      ]);
       expect(configMock.errorHandler.handler).toHaveBeenCalledTimes(0);
       expect(configMock.server.beforeRouting).toHaveBeenCalledWith({
         app: appMock,
@@ -193,19 +200,22 @@ describe("Server", () => {
         },
       };
       await createServer(configMock, routingMock);
-      expect(appMock.use).toHaveBeenCalledTimes(4);
+      expect(appMock.use).toHaveBeenCalledTimes(5);
       expect(compressionMock).toHaveBeenCalledTimes(1);
       expect(compressionMock).toHaveBeenCalledWith(undefined);
     });
 
     test("should enable uploads on request", async () => {
+      const beforeUpload = vi.fn();
+      const uploader = vi.fn();
+      fileUploadMock.mockImplementationOnce(() => uploader);
       const configMock = {
         server: {
           listen: givePort(),
           upload: {
             limits: { fileSize: 1024 },
             limitError: new Error("Too heavy"),
-            beforeUpload: vi.fn(),
+            beforeUpload,
           },
         },
         cors: true,
@@ -216,14 +226,20 @@ describe("Server", () => {
         v1: {
           test: new EndpointsFactory(defaultResultHandler).build({
             method: "get",
-            input: z.object({}),
+            input: z.object({
+              file: ez.upload(),
+            }),
             output: z.object({}),
             handler: vi.fn(),
           }),
         },
       };
       await createServer(configMock, routingMock);
-      expect(appMock.use).toHaveBeenCalledTimes(2);
+      expect(appMock.use).toHaveBeenCalledTimes(4);
+      expect(appMock.use.mock.calls[0]).toEqual([
+        "/v1/test",
+        [beforeUpload, uploader, expect.any(Function)], // 3rd: createUploadFailueHandler()
+      ]);
       expect(fileUploadMock).toHaveBeenCalledTimes(1);
       expect(fileUploadMock).toHaveBeenCalledWith({
         abortOnLimit: false,
@@ -248,16 +264,20 @@ describe("Server", () => {
         v1: {
           test: new EndpointsFactory(defaultResultHandler).build({
             method: "get",
-            input: z.object({}),
+            input: ez.raw(),
             output: z.object({}),
             handler: vi.fn(),
           }),
         },
       };
       await createServer(configMock, routingMock);
-      expect(appMock.use).toHaveBeenCalledTimes(2);
-      const rawPropMw = appMock.use.mock.calls[2][0]; // custom middleware for raw
-      expect(typeof rawPropMw).toBe("function");
+      expect(appMock.use).toHaveBeenCalledTimes(4);
+      expect(appMock.use.mock.calls[0]).toEqual([
+        "/v1/test",
+        [rawParserMock, expect.any(Function)], // 2nd: rawMover
+      ]);
+      const rawMover = appMock.use.mock.calls[0][1][1];
+      expect(typeof rawMover).toBe("function");
       const buffer = Buffer.from([]);
       const requestMock = makeRequestMock({
         fnMethod: vi.fn,
@@ -266,7 +286,7 @@ describe("Server", () => {
           body: buffer,
         },
       });
-      rawPropMw(requestMock, {}, vi.fn());
+      rawMover(requestMock, {}, vi.fn());
       expect(requestMock.body).toEqual({ raw: buffer });
     });
   });

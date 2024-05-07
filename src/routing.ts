@@ -28,7 +28,11 @@ export const initRouting = ({
     routing,
     hasCors: !!config.cors,
     onEndpoint: (endpoint, path, method, siblingMethods) => {
-      app.use(path, parsers?.[endpoint.getRequestType()] || []);
+      // @todo skip for "options" method?
+      const middlewares = parsers?.[endpoint.getRequestType()] || [];
+      if (middlewares.length) {
+        app.use(path, middlewares);
+      }
       app[method](path, async (request, response) => {
         const logger = config.childLoggerProvider
           ? await config.childLoggerProvider({ request, parent: rootLogger })
