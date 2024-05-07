@@ -11,7 +11,7 @@ import {
   ez,
 } from "../../src";
 import { expectType } from "tsd";
-import { mimeJson } from "../../src/mime";
+import { contentTypes } from "../../src/content-type";
 import { z } from "zod";
 import { givePort } from "../helpers";
 import { describe, expect, test, vi } from "vitest";
@@ -791,7 +791,7 @@ describe("Documentation", () => {
       const resultHandler = createResultHandler({
         getPositiveResponse: (output) => ({
           schema: z.object({ status: z.literal("OK"), result: output }),
-          mimeTypes: [mimeJson, "text/vnd.yaml"],
+          mimeTypes: [contentTypes.json, "text/vnd.yaml"],
           statusCode: 201,
         }),
         getNegativeResponse: () => ({

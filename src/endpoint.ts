@@ -26,7 +26,7 @@ import { AbstractLogger } from "./logger";
 import { LogicalContainer, combineContainers } from "./logical-container";
 import { AuxMethod, Method } from "./method";
 import { AnyMiddlewareDef } from "./middleware";
-import { mimeJson, mimeMultipart, mimeRaw } from "./mime";
+import { ContentType, contentTypes } from "./content-type";
 import { AnyResultHandlerDefinition } from "./result-handler";
 import { Security } from "./security";
 
@@ -61,6 +61,7 @@ export abstract class AbstractEndpoint {
   public abstract getScopes(): string[];
   public abstract getTags(): string[];
   public abstract getOperationId(method: Method): string | undefined;
+  public abstract getRequestType(): ContentType;
 }
 
 export class Endpoint<
@@ -81,6 +82,7 @@ export class Endpoint<
   readonly #scopes: SCO[];
   readonly #tags: TAG[];
   readonly #getOperationId: (method: Method) => string | undefined;
+  readonly #requestType: ContentType;
 
   constructor({
     methods,
@@ -128,10 +130,13 @@ export class Endpoint<
     this.#responses = {
       positive: normalizeApiResponse(
         resultHandler.getPositiveResponse(outputSchema),
-        { mimeTypes: [mimeJson], statusCodes: [defaultStatusCodes.positive] },
+        {
+          mimeTypes: [contentTypes.json],
+          statusCodes: [defaultStatusCodes.positive],
+        },
       ),
       negative: normalizeApiResponse(resultHandler.getNegativeResponse(), {
-        mimeTypes: [mimeJson],
+        mimeTypes: [contentTypes.json],
         statusCodes: [defaultStatusCodes.negative],
       }),
     };
@@ -143,12 +148,13 @@ export class Endpoint<
         ),
       );
     }
+    this.#requestType = hasUpload(inputSchema)
+      ? "upload"
+      : hasRaw(inputSchema)
+        ? "raw"
+        : "json";
     this.#mimeTypes = {
-      input: hasUpload(inputSchema)
-        ? [mimeMultipart]
-        : hasRaw(inputSchema)
-          ? [mimeRaw]
-          : [mimeJson],
+      input: [contentTypes[this.#requestType]],
       positive: this.#responses.positive.flatMap(({ mimeTypes }) => mimeTypes),
       negative: this.#responses.negative.flatMap(({ mimeTypes }) => mimeTypes),
     };
@@ -176,6 +182,10 @@ export class Endpoint<
 
   public override getMimeTypes(variant: MimeVariant) {
     return this.#mimeTypes[variant];
+  }
+
+  public override getRequestType() {
+    return this.#requestType;
   }
 
   public override getResponses(variant: ResponseVariant) {
