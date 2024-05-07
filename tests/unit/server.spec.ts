@@ -1,4 +1,4 @@
-import { makeRequestMock } from "../../src/testing";
+import { rawMover } from "../../src/server-helpers";
 import { givePort } from "../helpers";
 import {
   appMock,
@@ -274,20 +274,8 @@ describe("Server", () => {
       expect(appMock.use).toHaveBeenCalledTimes(4);
       expect(appMock.use.mock.calls[0]).toEqual([
         "/v1/test",
-        [rawParserMock, expect.any(Function)], // 2nd: rawMover
+        [rawParserMock, rawMover],
       ]);
-      const rawMover = appMock.use.mock.calls[0][1][1];
-      expect(typeof rawMover).toBe("function");
-      const buffer = Buffer.from([]);
-      const requestMock = makeRequestMock({
-        fnMethod: vi.fn,
-        requestProps: {
-          method: "POST",
-          body: buffer,
-        },
-      });
-      rawMover(requestMock, {}, vi.fn());
-      expect(requestMock.body).toEqual({ raw: buffer });
     });
   });
 

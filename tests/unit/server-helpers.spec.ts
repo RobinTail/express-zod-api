@@ -3,6 +3,7 @@ import {
   createParserFailureHandler,
   createUploadFailueHandler,
   createUploadLogger,
+  rawMover,
 } from "../../src/server-helpers";
 import { describe, expect, test, vi } from "vitest";
 import { defaultResultHandler } from "../../src";
@@ -185,6 +186,23 @@ describe("Server helpers", () => {
       expect(rootLogger.debug).toHaveBeenCalledWith(
         "Express-file-upload: Busboy finished parsing request.",
       );
+    });
+  });
+
+  describe("rawMover", () => {
+    test("should place the body into the raw prop of the body object", () => {
+      const buffer = Buffer.from([]);
+      const requestMock = makeRequestMock({
+        fnMethod: vi.fn,
+        requestProps: {
+          method: "POST",
+          body: buffer,
+        },
+      });
+      const nextMock = vi.fn();
+      rawMover(requestMock as unknown as Request, {} as Response, nextMock);
+      expect(requestMock.body).toEqual({ raw: buffer });
+      expect(nextMock).toHaveBeenCalled();
     });
   });
 });

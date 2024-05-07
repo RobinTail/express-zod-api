@@ -92,3 +92,10 @@ export const createUploadLogger = (
     }
   },
 });
+
+export const rawMover: RequestHandler = (req, {}, next) => {
+  if (Buffer.isBuffer(req.body)) {
+    req.body = { raw: req.body };
+  }
+  next();
+};

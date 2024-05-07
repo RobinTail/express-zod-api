@@ -14,6 +14,7 @@ import {
   createParserFailureHandler,
   createUploadFailueHandler,
   createUploadLogger,
+  rawMover,
 } from "./server-helpers";
 import { getStartupLogo } from "./startup-logo";
 
@@ -82,12 +83,7 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
     }
   }
   if (config.server.rawParser) {
-    parsers.raw.push(config.server.rawParser, (req, {}, next) => {
-      if (Buffer.isBuffer(req.body)) {
-        req.body = { raw: req.body };
-      }
-      next();
-    });
+    parsers.raw.push(config.server.rawParser, rawMover);
   }
   if (config.server.beforeRouting) {
     await config.server.beforeRouting({ app, logger: rootLogger });
