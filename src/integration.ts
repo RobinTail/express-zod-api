@@ -93,7 +93,7 @@ export class Integration {
     { method: Method; path: string },
     Partial<Record<IOKind, string>> & {
       isJson: boolean;
-      tags: string[];
+      tags: ReadonlyArray<string>;
     }
   >();
   protected paths: string[] = [];
@@ -127,7 +127,11 @@ export class Integration {
     exampleImplementationConst: f.createIdentifier("exampleImplementation"),
     clientConst: f.createIdentifier("client"),
   } satisfies Record<string, ts.Identifier>;
-  protected interfaces: { id: ts.Identifier; kind: IOKind }[] = [];
+  protected interfaces: Array<{
+    id: ts.Identifier;
+    kind: IOKind;
+    props: ts.PropertySignature[];
+  }> = [];
 
   protected getAlias(name: string): ts.TypeReferenceNode | undefined {
     return this.aliases.has(name) ? f.createTypeReferenceNode(name) : undefined;
@@ -249,35 +253,54 @@ export class Integration {
     this.interfaces.push({
       id: this.ids.inputInterface,
       kind: "input",
+      props: [],
     });
     if (splitResponse) {
       this.interfaces.push(
-        { id: this.ids.posResponseInterface, kind: "positive" },
-        { id: this.ids.negResponseInterface, kind: "negative" },
+        { id: this.ids.posResponseInterface, kind: "positive", props: [] },
+        { id: this.ids.negResponseInterface, kind: "negative", props: [] },
       );
     }
-    this.interfaces.push({ id: this.ids.responseInterface, kind: "response" });
+    this.interfaces.push({
+      id: this.ids.responseInterface,
+      kind: "response",
+      props: [],
+    });
 
-    const registryEntries = Array.from(this.registry.entries());
+    // Single walk through the registry for making properties for the next three objects
+    const jsonEndpoints: ts.PropertyAssignment[] = [];
+    const endpointTags: ts.PropertyAssignment[] = [];
+    for (const [{ method, path }, { isJson, tags, ...rest }] of this.registry) {
+      // "get /v1/user/retrieve": GetV1UserRetrieveInput
+      for (const face of this.interfaces) {
+        if (face.kind in rest) {
+          face.props.push(
+            makeInterfaceProp(quoteProp(method, path), rest[face.kind]!),
+          );
+        }
+      }
+      if (variant !== "types") {
+        if (isJson) {
+          // "get /v1/user/retrieve": true
+          jsonEndpoints.push(
+            f.createPropertyAssignment(quoteProp(method, path), f.createTrue()),
+          );
+        }
+        // "get /v1/user/retrieve": ["users"]
+        endpointTags.push(
+          f.createPropertyAssignment(
+            quoteProp(method, path),
+            f.createArrayLiteralExpression(
+              tags.map((tag) => f.createStringLiteral(tag)),
+            ),
+          ),
+        );
+      }
+    }
 
     // export interface Input ___ { "get /v1/user/retrieve": GetV1UserRetrieveInput; }
-    for (const { id, kind } of this.interfaces) {
-      this.program.push(
-        makePublicExtendedInterface(
-          id,
-          extenderClause,
-          registryEntries
-            .map(([{ method, path }, entry]) => {
-              const reference = entry[kind];
-              return reference
-                ? makeInterfaceProp(quoteProp(method, path), reference)
-                : undefined;
-            })
-            .filter(
-              (entry): entry is ts.PropertySignature => entry !== undefined,
-            ),
-        ),
-      );
+    for (const { id, props } of this.interfaces) {
+      this.program.push(makePublicExtendedInterface(id, extenderClause, props));
     }
 
     if (variant === "types") {
@@ -289,16 +312,7 @@ export class Integration {
       exportModifier,
       makeConst(
         this.ids.jsonEndpointsConst,
-        f.createObjectLiteralExpression(
-          registryEntries
-            .filter(([{}, { isJson }]) => isJson)
-            .map(([{ method, path }]) =>
-              f.createPropertyAssignment(
-                quoteProp(method, path),
-                f.createTrue(),
-              ),
-            ),
-        ),
+        f.createObjectLiteralExpression(jsonEndpoints),
       ),
     );
 
@@ -307,16 +321,7 @@ export class Integration {
       exportModifier,
       makeConst(
         this.ids.endpointTagsConst,
-        f.createObjectLiteralExpression(
-          registryEntries.map(([{ method, path }, { tags }]) =>
-            f.createPropertyAssignment(
-              quoteProp(method, path),
-              f.createArrayLiteralExpression(
-                tags.map((tag) => f.createStringLiteral(tag)),
-              ),
-            ),
-          ),
-        ),
+        f.createObjectLiteralExpression(endpointTags),
       ),
     );
 

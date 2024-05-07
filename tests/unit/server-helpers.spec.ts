@@ -2,18 +2,23 @@ import {
   createNotFoundHandler,
   createParserFailureHandler,
   createUploadFailueHandler,
+  createUploadLogger,
 } from "../../src/server-helpers";
 import { describe, expect, test, vi } from "vitest";
-import { createLogger, defaultResultHandler } from "../../src";
+import { defaultResultHandler } from "../../src";
 import { Request, Response } from "express";
 import assert from "node:assert/strict";
-import { makeRequestMock, makeResponseMock } from "../../src/testing";
+import {
+  makeLoggerMock,
+  makeRequestMock,
+  makeResponseMock,
+} from "../../src/testing";
 import createHttpError from "http-errors";
 
 describe("Server helpers", () => {
   describe("createParserFailureHandler()", () => {
     test("the handler should call next if there is no error", () => {
-      const rootLogger = createLogger({ level: "silent" });
+      const rootLogger = makeLoggerMock({ fnMethod: vi.fn });
       const handler = createParserFailureHandler({
         errorHandler: defaultResultHandler,
         rootLogger,
@@ -33,7 +38,7 @@ describe("Server helpers", () => {
       const errorHandler = { ...defaultResultHandler, handler: vi.fn() };
       const handler = createParserFailureHandler({
         errorHandler,
-        rootLogger: createLogger({ level: "silent" }),
+        rootLogger: makeLoggerMock({ fnMethod: vi.fn }),
         getChildLogger: ({ parent }) => ({ ...parent, isChild: true }),
       });
       await handler(
@@ -61,7 +66,7 @@ describe("Server helpers", () => {
       };
       const handler = createNotFoundHandler({
         errorHandler,
-        rootLogger: createLogger({ level: "silent" }),
+        rootLogger: makeLoggerMock({ fnMethod: vi.fn }),
         getChildLogger: async ({ parent }) => ({ ...parent, isChild: true }),
       });
       const next = vi.fn();
@@ -101,7 +106,7 @@ describe("Server helpers", () => {
     });
 
     test("should call Last Resort Handler in case of ResultHandler is faulty", () => {
-      const rootLogger = createLogger({ level: "silent" });
+      const rootLogger = makeLoggerMock({ fnMethod: vi.fn });
       const errorHandler = {
         ...defaultResultHandler,
         handler: vi.fn().mockImplementation(() => assert.fail("I am faulty")),
@@ -142,12 +147,8 @@ describe("Server helpers", () => {
     const error = new Error("Too heavy");
 
     test.each([
-      {
-        files: { one: { truncated: true } },
-      },
-      {
-        files: { one: [{ truncated: false }, { truncated: true }] },
-      },
+      { files: { one: { truncated: true } } },
+      { files: { one: [{ truncated: false }, { truncated: true }] } },
     ])("should handle truncated files by calling next with error %#", (req) => {
       const handler = createUploadFailueHandler(error);
       const next = vi.fn();
@@ -165,6 +166,25 @@ describe("Server helpers", () => {
       const next = vi.fn();
       handler(req as unknown as Request, {} as Response, next);
       expect(next).toHaveBeenCalledWith();
+    });
+  });
+
+  describe("createUploadLogger", () => {
+    const rootLogger = makeLoggerMock({ fnMethod: vi.fn });
+    const uploadLogger = createUploadLogger(rootLogger);
+
+    test("should mute 'not eligible' message", () => {
+      uploadLogger.log(
+        "Express-file-upload: Request is not eligible for file upload!",
+      );
+      expect(rootLogger.debug).not.toHaveBeenCalled();
+    });
+
+    test("should debug other messages", () => {
+      uploadLogger.log("Express-file-upload: Busboy finished parsing request.");
+      expect(rootLogger.debug).toHaveBeenCalledWith(
+        "Express-file-upload: Busboy finished parsing request.",
+      );
     });
   });
 });
