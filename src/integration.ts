@@ -93,7 +93,7 @@ export class Integration {
     { method: Method; path: string },
     Partial<Record<IOKind, string>> & {
       isJson: boolean;
-      tags: string[];
+      tags: ReadonlyArray<string>;
     }
   >();
   protected paths: string[] = [];
@@ -220,7 +220,7 @@ export class Integration {
               negative: negativeResponseId,
               response: genericResponseId,
               isJson: endpoint.getMimeTypes("positive").includes(mimeJson),
-              tags: endpoint.getTags().slice(),
+              tags: endpoint.getTags(),
             },
           );
         }
