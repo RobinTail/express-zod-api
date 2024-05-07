@@ -99,7 +99,7 @@ interface ReqResDepictHelperCommonProps
     "serializer" | "getRef" | "makeRef" | "path" | "method"
   > {
   schema: z.ZodTypeAny;
-  mimeTypes: string[];
+  mimeTypes: ReadonlyArray<string>;
   composition: "inline" | "components";
   description?: string;
 }
