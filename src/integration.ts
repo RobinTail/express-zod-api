@@ -29,7 +29,7 @@ import {
 } from "./integration-helpers";
 import { defaultSerializer, makeCleanId } from "./common-helpers";
 import { Method, methods } from "./method";
-import { mimeJson } from "./mime";
+import { contentTypes } from "./content-type";
 import { loadPeer } from "./peer-helpers";
 import { Routing } from "./routing";
 import { walkRouting } from "./routing-walker";
@@ -219,7 +219,9 @@ export class Integration {
               positive: positiveResponseId,
               negative: negativeResponseId,
               response: genericResponseId,
-              isJson: endpoint.getMimeTypes("positive").includes(mimeJson),
+              isJson: endpoint
+                .getMimeTypes("positive")
+                .includes(contentTypes.json),
               tags: endpoint.getTags(),
             },
           );
@@ -483,7 +485,7 @@ export class Integration {
         f.createObjectLiteralExpression([
           f.createPropertyAssignment(
             f.createStringLiteral("Content-Type"),
-            f.createStringLiteral(mimeJson),
+            f.createStringLiteral(contentTypes.json),
           ),
         ]),
         undefined,

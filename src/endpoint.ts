@@ -26,7 +26,7 @@ import { AbstractLogger } from "./logger";
 import { LogicalContainer, combineContainers } from "./logical-container";
 import { AuxMethod, Method } from "./method";
 import { AnyMiddlewareDef } from "./middleware";
-import { mimeJson, mimeMultipart, mimeRaw } from "./mime";
+import { contentTypes } from "./content-type";
 import { AnyResultHandlerDefinition } from "./result-handler";
 import { Security } from "./security";
 
@@ -128,10 +128,13 @@ export class Endpoint<
     this.#responses = {
       positive: normalizeApiResponse(
         resultHandler.getPositiveResponse(outputSchema),
-        { mimeTypes: [mimeJson], statusCodes: [defaultStatusCodes.positive] },
+        {
+          mimeTypes: [contentTypes.json],
+          statusCodes: [defaultStatusCodes.positive],
+        },
       ),
       negative: normalizeApiResponse(resultHandler.getNegativeResponse(), {
-        mimeTypes: [mimeJson],
+        mimeTypes: [contentTypes.json],
         statusCodes: [defaultStatusCodes.negative],
       }),
     };
@@ -145,10 +148,10 @@ export class Endpoint<
     }
     this.#mimeTypes = {
       input: hasUpload(inputSchema)
-        ? [mimeMultipart]
+        ? [contentTypes.upload]
         : hasRaw(inputSchema)
-          ? [mimeRaw]
-          : [mimeJson],
+          ? [contentTypes.raw]
+          : [contentTypes.json],
       positive: this.#responses.positive.flatMap(({ mimeTypes }) => mimeTypes),
       negative: this.#responses.negative.flatMap(({ mimeTypes }) => mimeTypes),
     };
