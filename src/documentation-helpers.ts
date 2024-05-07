@@ -180,7 +180,7 @@ export const depictDiscriminatedUnion: Depicter<
 > = ({ schema: { options, discriminator }, next }) => {
   return {
     discriminator: { propertyName: discriminator },
-    oneOf: Array.from(options.values()).map(next),
+    oneOf: options.map(next),
   };
 };
 
@@ -673,7 +673,7 @@ export const extractObjectSchema = (
     subject instanceof z.ZodUnion ||
     subject instanceof z.ZodDiscriminatedUnion
   ) {
-    return Array.from(subject.options.values())
+    return subject.options
       .map((option) => extractObjectSchema(option, tfError))
       .reduce((acc, option) => acc.merge(option.partial()), z.object({}));
   } else if (subject instanceof z.ZodEffects) {
@@ -818,7 +818,7 @@ export const onEach: Depicter<z.ZodTypeAny, "each"> = ({
     result.type = makeNullableType(prev);
   }
   if (examples.length) {
-    result.examples = Array.from(examples);
+    result.examples = examples.slice();
   }
   return result;
 };
