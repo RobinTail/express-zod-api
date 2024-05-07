@@ -28,7 +28,6 @@ export const initRouting = ({
     routing,
     hasCors: !!config.cors,
     onEndpoint: (endpoint, path, method, siblingMethods) => {
-      // @todo skip for "options" method?
       const middlewares = parsers?.[endpoint.getRequestType()] || [];
       if (middlewares.length) {
         app.use(path, middlewares);
