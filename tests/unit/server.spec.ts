@@ -222,12 +222,8 @@ describe("Server", () => {
           }),
         },
       };
-      const { logger } = await createServer(configMock, routingMock);
-      expect(appMock.use).toHaveBeenCalledTimes(5);
-      expect(configMock.server.upload.beforeUpload).toHaveBeenCalledWith({
-        app: appMock,
-        logger,
-      });
+      await createServer(configMock, routingMock);
+      expect(appMock.use).toHaveBeenCalledTimes(6);
       expect(fileUploadMock).toHaveBeenCalledTimes(1);
       expect(fileUploadMock).toHaveBeenCalledWith({
         abortOnLimit: false,

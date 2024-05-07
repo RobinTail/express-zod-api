@@ -95,12 +95,13 @@ type UploadOptions = Pick<
    * */
   limitError?: Error;
   /**
-   * @desc A code to execute before connecting the upload middleware.
-   * @desc It can be used to connect a middleware that restricts the ability to upload.
+   * @desc A middleware to execute before processing uploads.
+   * @desc It can be used to restrict the ability to upload.
+   * @since v19 must call next() or next(err) within
    * @default undefined
-   * @example ({ app }) => { app.use( ... ); }
+   * @example (req, res, next) => next(createHttpError(403, "Not authorized")
    * */
-  beforeUpload?: AppExtension;
+  beforeUpload?: RequestHandler;
 };
 
 type CompressionOptions = Pick<

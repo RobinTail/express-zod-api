@@ -61,7 +61,7 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
       ...(typeof config.server.upload === "object" && config.server.upload),
     };
     if (beforeUpload) {
-      beforeUpload({ app, logger: rootLogger });
+      app.use(beforeUpload);
     }
     app.use(
       uploader({
