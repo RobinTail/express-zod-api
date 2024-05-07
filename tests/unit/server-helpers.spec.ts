@@ -3,6 +3,7 @@ import {
   createParserFailureHandler,
   createUploadFailueHandler,
   createUploadLogger,
+  createUploadMiddleware,
   rawMover,
 } from "../../src/server-helpers";
 import { describe, expect, test, vi } from "vitest";
@@ -178,7 +179,7 @@ describe("Server helpers", () => {
     });
   });
 
-  describe("createUploadLogger", () => {
+  describe("createUploadLogger()", () => {
     const rootLogger = makeLoggerMock({ fnMethod: vi.fn });
     const uploadLogger = createUploadLogger(rootLogger);
 
@@ -186,6 +187,41 @@ describe("Server helpers", () => {
       uploadLogger.log("Express-file-upload: Busboy finished parsing request.");
       expect(rootLogger.debug).toHaveBeenCalledWith(
         "Express-file-upload: Busboy finished parsing request.",
+      );
+    });
+  });
+
+  describe("createUploadMiddleware()", () => {
+    test("should install the uploader with its special logger", () => {
+      const rootLogger = makeLoggerMock({ fnMethod: vi.fn });
+      const interalMw = vi.fn();
+      const uploaderMock = vi.fn(() => interalMw);
+      const mw = createUploadMiddleware({
+        uploader: uploaderMock,
+        options: {
+          limits: { fileSize: 1024 },
+        },
+        rootLogger,
+      });
+      const requestMock = makeRequestMock({ fnMethod: vi.fn });
+      const responseMock = makeResponseMock({ fnMethod: vi.fn });
+      const nextMock = vi.fn();
+      mw(
+        requestMock as unknown as Request,
+        responseMock as unknown as Response,
+        nextMock,
+      );
+      expect(uploaderMock).toHaveBeenCalledTimes(1);
+      expect(uploaderMock).toHaveBeenCalledWith({
+        abortOnLimit: false,
+        parseNested: true,
+        limits: { fileSize: 1024 },
+        logger: { log: expect.any(Function) }, // @see createUploadLogger test
+      });
+      expect(interalMw).toHaveBeenCalledWith(
+        requestMock,
+        responseMock,
+        nextMock,
       );
     });
   });

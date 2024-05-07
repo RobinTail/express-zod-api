@@ -237,17 +237,6 @@ describe("Server", () => {
         "/v1/test",
         [beforeUpload, expect.any(Function), expect.any(Function)], // uploader with logger, createUploadFailueHandler()
       ]);
-      // @todo sort this out
-      /*
-      const uploader = appMock.use.mock.calls[1][1][1];
-      uploader({}, { locals: { logger } }, vi.fn());
-      expect(fileUploadMock).toHaveBeenCalledTimes(1);
-      expect(fileUploadMock).toHaveBeenCalledWith({
-        abortOnLimit: false,
-        parseNested: true,
-        limits: { fileSize: 1024 },
-        logger: { log: expect.any(Function) },
-      });*/
     });
 
     test("should enable raw on request", async () => {
