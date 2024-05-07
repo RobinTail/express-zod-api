@@ -109,11 +109,6 @@ type CompressionOptions = Pick<
   "threshold" | "level" | "strategy" | "chunkSize" | "memLevel"
 >;
 
-type AppExtension = (params: {
-  app: IRouter;
-  logger: AbstractLogger;
-}) => void | Promise<void>;
-
 export interface ServerConfig<TAG extends string = string>
   extends CommonConfig<TAG> {
   /** @desc Server configuration. */
@@ -128,13 +123,13 @@ export interface ServerConfig<TAG extends string = string>
     jsonParser?: RequestHandler;
     /**
      * @desc Enable or configure uploads handling.
-     * @default false
+     * @default undefined
      * @requires express-fileupload
      * */
     upload?: boolean | UploadOptions;
     /**
      * @desc Enable or configure response compression.
-     * @default false
+     * @default undefined
      * @requires compression
      */
     compression?: boolean | CompressionOptions;
@@ -153,7 +148,10 @@ export interface ServerConfig<TAG extends string = string>
      * @default undefined
      * @example ({ app }) => { app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument)); }
      * */
-    beforeRouting?: AppExtension;
+    beforeRouting?: (params: {
+      app: IRouter;
+      logger: AbstractLogger;
+    }) => void | Promise<void>;
   };
   /** @desc Enables HTTPS server as well. */
   https?: {
