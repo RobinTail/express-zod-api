@@ -9,8 +9,9 @@
   - `zod`: 3.23.0.
 - The deprecated ~~`withMeta()`~~ is removed:
   - See the changes to [v18.5.0](#v1850) on details.
-- The following methods of `Endpoint` return readonly arrays:
-  - `.getMethods()`, `.getMimeTypes()`, `.getResponses()`, `.getScopes()`, `.getTags()`.
+- Several public methods and properties exposing arrays from class instances made readonly and frozen:
+  - On `Endpoint`: `.getMethods()`, `.getMimeTypes()`, `.getResponses()`, `.getScopes()`, `.getTags()`,
+  - On `DependsOnMethod`: `.pairs`, `.siblingMethods`.
 
 ## Version 18
 
