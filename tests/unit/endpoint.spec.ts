@@ -366,16 +366,23 @@ describe("Endpoint", () => {
   });
 
   describe("getRequestType()", () => {
-    test("should return the assigned one upon constructing", () => {
-      const factory = new EndpointsFactory(defaultResultHandler);
-      const endpoint = factory.build({
-        method: "get",
-        input: z.object({}),
-        output: z.object({ something: z.number() }),
-        handler: vi.fn(),
-      });
-      expect(endpoint.getRequestType()).toEqual("json");
-    });
+    test.each([
+      { input: z.object({}), expected: "json" },
+      { input: ez.raw(), expected: "raw" },
+      { input: z.object({ file: ez.upload() }), expected: "upload" },
+    ])(
+      "should return the assigned one upon constructing",
+      ({ input, expected }) => {
+        const factory = new EndpointsFactory(defaultResultHandler);
+        const endpoint = factory.build({
+          method: "get",
+          input,
+          output: z.object({}),
+          handler: vi.fn(),
+        });
+        expect(endpoint.getRequestType()).toEqual(expected);
+      },
+    );
   });
 
   describe(".getOperationId()", () => {
