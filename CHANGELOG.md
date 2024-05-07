@@ -17,7 +17,8 @@
 
 ### v18.5.2
 
-- Muted uploader logs related to non-eligible requests.
+- Muted uploader logs related to non-eligible requests;
+- Another performance improvement.
 
 ### v18.5.1
 
