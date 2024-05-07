@@ -365,6 +365,26 @@ describe("Endpoint", () => {
     );
   });
 
+  describe("getRequestType()", () => {
+    test.each([
+      { input: z.object({}), expected: "json" },
+      { input: ez.raw(), expected: "raw" },
+      { input: z.object({ file: ez.upload() }), expected: "upload" },
+    ])(
+      "should return the assigned one upon constructing",
+      ({ input, expected }) => {
+        const factory = new EndpointsFactory(defaultResultHandler);
+        const endpoint = factory.build({
+          method: "get",
+          input,
+          output: z.object({}),
+          handler: vi.fn(),
+        });
+        expect(endpoint.getRequestType()).toEqual(expected);
+      },
+    );
+  });
+
   describe(".getOperationId()", () => {
     test("should return undefined if its not defined upon creaton", () => {
       expect(
