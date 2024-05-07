@@ -1,4 +1,4 @@
-import { ErrorRequestHandler, IRouter, RequestHandler } from "express";
+import { IRouter, RequestHandler } from "express";
 import { CommonConfig } from "./config-type";
 import { ContentType } from "./content-type";
 import { DependsOnMethod } from "./depends-on-method";
@@ -28,23 +28,20 @@ export const initRouting = ({
     routing,
     hasCors: !!config.cors,
     onEndpoint: (endpoint, path, method, siblingMethods) => {
-      app[method](
-        path,
-        ...(parsers?.[endpoint.getRequestType()] || []),
-        async (request, response) => {
-          const logger = config.childLoggerProvider
-            ? await config.childLoggerProvider({ request, parent: rootLogger })
-            : rootLogger;
-          logger.info(`${request.method}: ${path}`);
-          await endpoint.execute({
-            request,
-            response,
-            logger,
-            config,
-            siblingMethods,
-          });
-        },
-      );
+      app.use(path, parsers?.[endpoint.getRequestType()] || []);
+      app[method](path, async (request, response) => {
+        const logger = config.childLoggerProvider
+          ? await config.childLoggerProvider({ request, parent: rootLogger })
+          : rootLogger;
+        logger.info(`${request.method}: ${path}`);
+        await endpoint.execute({
+          request,
+          response,
+          logger,
+          config,
+          siblingMethods,
+        });
+      });
     },
     onStatic: (path, handler) => {
       app.use(path, handler);
