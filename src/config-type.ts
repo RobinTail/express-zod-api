@@ -75,6 +75,16 @@ export interface CommonConfig<TAG extends string = string> {
   tags?: TagsConfig<TAG>;
 }
 
+export type BeforeUpload = (params: {
+  request: Request;
+  logger: AbstractLogger;
+}) => void | Promise<void>;
+
+type BeforeRouting = (params: {
+  app: IRouter;
+  logger: AbstractLogger;
+}) => void | Promise<void>;
+
 type UploadOptions = Pick<
   fileUpload.Options,
   | "createParentPath"
@@ -95,13 +105,11 @@ type UploadOptions = Pick<
    * */
   limitError?: Error;
   /**
-   * @desc A middleware to execute before processing uploads.
-   * @desc It can be used to restrict the ability to upload.
-   * @since v19 must call next() or next(err) within
+   * @desc A handler to execute before uploading — it can be used for restrictions by throwing an error.
    * @default undefined
-   * @example (req, res, next) => next(createHttpError(403, "Not authorized")
+   * @example ({request}) => { throw createHttpError(403, "Not authorized"); }
    * */
-  beforeUpload?: RequestHandler;
+  beforeUpload?: BeforeUpload;
 };
 
 type CompressionOptions = Pick<
@@ -148,10 +156,7 @@ export interface ServerConfig<TAG extends string = string>
      * @default undefined
      * @example ({ app }) => { app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument)); }
      * */
-    beforeRouting?: (params: {
-      app: IRouter;
-      logger: AbstractLogger;
-    }) => void | Promise<void>;
+    beforeRouting?: BeforeRouting;
   };
   /** @desc Enables HTTPS server as well. */
   https?: {

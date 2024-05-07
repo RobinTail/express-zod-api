@@ -1,7 +1,7 @@
 import type fileUpload from "express-fileupload";
 import { AnyResultHandlerDefinition } from "./result-handler";
 import { AbstractLogger } from "./logger";
-import { CommonConfig } from "./config-type";
+import { BeforeUpload, CommonConfig } from "./config-type";
 import { ErrorRequestHandler, RequestHandler, Response } from "express";
 import createHttpError, { isHttpError } from "http-errors";
 import { lastResortHandler } from "./last-resort";
@@ -84,18 +84,27 @@ export const createUploadMiddleware =
     options,
     uploader,
     rootLogger,
+    beforeUpload,
   }: {
     options: fileUpload.Options;
     uploader: typeof fileUpload;
     rootLogger: AbstractLogger;
+    beforeUpload?: BeforeUpload;
   }): RequestHandler =>
-  (req, res: LocalResponse, next) =>
+  async (request, response: LocalResponse, next) => {
+    const logger = response.locals.logger || rootLogger;
+    try {
+      await beforeUpload?.({ request, logger });
+    } catch (error) {
+      return next(error);
+    }
     uploader({
       ...options,
       abortOnLimit: false,
       parseNested: true,
-      logger: createUploadLogger(res.locals.logger || rootLogger),
-    })(req, res, next);
+      logger: createUploadLogger(logger),
+    })(request, response, next);
+  };
 
 export const rawMover: RequestHandler = (req, {}, next) => {
   if (Buffer.isBuffer(req.body)) {

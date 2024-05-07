@@ -205,14 +205,13 @@ describe("Server", () => {
     });
 
     test("should enable uploads on request", async () => {
-      const beforeUpload = vi.fn();
       const configMock = {
         server: {
           listen: givePort(),
           upload: {
             limits: { fileSize: 1024 },
             limitError: new Error("Too heavy"),
-            beforeUpload,
+            beforeUpload: vi.fn(),
           },
         },
         cors: true,
@@ -235,7 +234,7 @@ describe("Server", () => {
       expect(appMock.use).toHaveBeenCalledTimes(4);
       expect(appMock.use.mock.calls[1]).toEqual([
         "/v1/test",
-        [beforeUpload, expect.any(Function), expect.any(Function)], // uploader with logger, createUploadFailueHandler()
+        [expect.any(Function), expect.any(Function)], // uploader with logger, createUploadFailueHandler()
       ]);
     });
 

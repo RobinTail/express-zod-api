@@ -192,25 +192,32 @@ describe("Server helpers", () => {
   });
 
   describe("createUploadMiddleware()", () => {
-    test("should install the uploader with its special logger", () => {
-      const rootLogger = makeLoggerMock({ fnMethod: vi.fn });
-      const interalMw = vi.fn();
-      const uploaderMock = vi.fn(() => interalMw);
-      const mw = createUploadMiddleware({
-        uploader: uploaderMock,
-        options: {
-          limits: { fileSize: 1024 },
-        },
-        rootLogger,
-      });
-      const requestMock = makeRequestMock({ fnMethod: vi.fn });
-      const responseMock = makeResponseMock({ fnMethod: vi.fn });
-      const nextMock = vi.fn();
-      mw(
+    const rootLogger = makeLoggerMock({ fnMethod: vi.fn });
+    const interalMw = vi.fn();
+    const uploaderMock = vi.fn(() => interalMw);
+    const beforeUploadMock = vi.fn();
+    const middleware = createUploadMiddleware({
+      uploader: uploaderMock,
+      options: {
+        limits: { fileSize: 1024 },
+      },
+      rootLogger,
+      beforeUpload: beforeUploadMock,
+    });
+    const requestMock = makeRequestMock({ fnMethod: vi.fn });
+    const responseMock = makeResponseMock({ fnMethod: vi.fn });
+    const nextMock = vi.fn();
+
+    test("should install the uploader with its special logger", async () => {
+      await middleware(
         requestMock as unknown as Request,
         responseMock as unknown as Response,
         nextMock,
       );
+      expect(beforeUploadMock).toHaveBeenCalledWith({
+        request: requestMock,
+        logger: rootLogger,
+      });
       expect(uploaderMock).toHaveBeenCalledTimes(1);
       expect(uploaderMock).toHaveBeenCalledWith({
         abortOnLimit: false,
@@ -223,6 +230,19 @@ describe("Server helpers", () => {
         responseMock,
         nextMock,
       );
+    });
+
+    test("should handle errors thrown by beforeUpload", async () => {
+      const error = createHttpError(403, "Not authorized");
+      beforeUploadMock.mockImplementationOnce(() => {
+        throw error;
+      });
+      await middleware(
+        requestMock as unknown as Request,
+        responseMock as unknown as Response,
+        nextMock,
+      );
+      expect(nextMock).toHaveBeenCalledWith(error);
     });
   });
 

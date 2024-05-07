@@ -68,11 +68,8 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
     const { limitError, beforeUpload, ...options } = {
       ...(typeof config.server.upload === "object" && config.server.upload),
     };
-    if (beforeUpload) {
-      parsers.upload.push(beforeUpload);
-    }
     parsers.upload.push(
-      createUploadMiddleware({ uploader, options, rootLogger }),
+      createUploadMiddleware({ uploader, options, rootLogger, beforeUpload }),
     );
     if (limitError) {
       parsers.upload.push(createUploadFailueHandler(limitError));
