@@ -80,11 +80,6 @@ export type BeforeUpload = (params: {
   logger: AbstractLogger;
 }) => void | Promise<void>;
 
-type BeforeRouting = (params: {
-  app: IRouter;
-  logger: AbstractLogger;
-}) => void | Promise<void>;
-
 type UploadOptions = Pick<
   fileUpload.Options,
   | "createParentPath"
@@ -116,6 +111,11 @@ type CompressionOptions = Pick<
   compression.CompressionOptions,
   "threshold" | "level" | "strategy" | "chunkSize" | "memLevel"
 >;
+
+type BeforeRouting = (params: {
+  app: IRouter;
+  logger: AbstractLogger;
+}) => void | Promise<void>;
 
 export interface ServerConfig<TAG extends string = string>
   extends CommonConfig<TAG> {
