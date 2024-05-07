@@ -365,6 +365,19 @@ describe("Endpoint", () => {
     );
   });
 
+  describe("getRequestType()", () => {
+    test("should return the assigned one upon constructing", () => {
+      const factory = new EndpointsFactory(defaultResultHandler);
+      const endpoint = factory.build({
+        method: "get",
+        input: z.object({}),
+        output: z.object({ something: z.number() }),
+        handler: vi.fn(),
+      });
+      expect(endpoint.getRequestType()).toEqual("json");
+    });
+  });
+
   describe(".getOperationId()", () => {
     test("should return undefined if its not defined upon creaton", () => {
       expect(
