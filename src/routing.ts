@@ -28,10 +28,11 @@ export const initRouting = ({
     routing,
     hasCors: !!config.cors,
     onEndpoint: (endpoint, path, method, siblingMethods) => {
-      // @todo skip for "options" method?
-      const middlewares = parsers?.[endpoint.getRequestType()] || [];
-      if (middlewares.length) {
-        app.use(path, middlewares);
+      if (method !== "options") {
+        const middlewares = parsers?.[endpoint.getRequestType()] || [];
+        if (middlewares.length) {
+          app.use(path, middlewares);
+        }
       }
       app[method](path, async (request, response) => {
         const logger = config.childLoggerProvider
