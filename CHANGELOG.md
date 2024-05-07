@@ -9,6 +9,8 @@
   - `zod`: 3.23.0.
 - The deprecated ~~`withMeta()`~~ is removed:
   - See the changes to [v18.5.0](#v1850) on details.
+- The following methods of `Endpoint` return readonly arrays:
+  - `.getMethods()`, `.getMimeTypes()`, `.getResponses()`, `.getScopes()`, `.getTags()`.
 
 ## Version 18
 
