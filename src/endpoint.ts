@@ -47,7 +47,7 @@ export abstract class AbstractEndpoint {
     response: Response;
     logger: AbstractLogger;
     config: CommonConfig;
-    siblingMethods?: Method[];
+    siblingMethods?: ReadonlyArray<Method>;
   }): Promise<void>;
   public abstract getDescription(
     variant: DescriptionVariant,
