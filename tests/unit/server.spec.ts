@@ -223,7 +223,7 @@ describe("Server", () => {
         },
       };
       await createServer(configMock, routingMock);
-      expect(appMock.use).toHaveBeenCalledTimes(6);
+      expect(appMock.use).toHaveBeenCalledTimes(2);
       expect(fileUploadMock).toHaveBeenCalledTimes(1);
       expect(fileUploadMock).toHaveBeenCalledWith({
         abortOnLimit: false,
@@ -255,7 +255,7 @@ describe("Server", () => {
         },
       };
       await createServer(configMock, routingMock);
-      expect(appMock.use).toHaveBeenCalledTimes(5);
+      expect(appMock.use).toHaveBeenCalledTimes(2);
       const rawPropMw = appMock.use.mock.calls[2][0]; // custom middleware for raw
       expect(typeof rawPropMw).toBe("function");
       const buffer = Buffer.from([]);
