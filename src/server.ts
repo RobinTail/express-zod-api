@@ -29,9 +29,7 @@ const makeCommonEntities = (config: CommonConfig) => {
     : config.logger;
   rootLogger.debug("Running", process.env.TSUP_BUILD || "from sources");
   const errorHandler = config.errorHandler || defaultResultHandler;
-  const { childLoggerProvider: getChildLogger } = config;
-  // @todo should be the request level logger
-  const creatorParams = { errorHandler, rootLogger, getChildLogger };
+  const creatorParams = { errorHandler, rootLogger };
   const notFoundHandler = createNotFoundHandler(creatorParams);
   const parserFailureHandler = createParserFailureHandler(creatorParams);
   return { rootLogger, errorHandler, notFoundHandler, parserFailureHandler };

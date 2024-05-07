@@ -23,7 +23,6 @@ describe("Server helpers", () => {
       const handler = createParserFailureHandler({
         errorHandler: defaultResultHandler,
         rootLogger,
-        getChildLogger: undefined,
       });
       const next = vi.fn();
       handler(
@@ -37,15 +36,20 @@ describe("Server helpers", () => {
 
     test("the handler should call error handler with a child logger", async () => {
       const errorHandler = { ...defaultResultHandler, handler: vi.fn() };
+      const rootLogger = makeLoggerMock({ fnMethod: vi.fn });
       const handler = createParserFailureHandler({
         errorHandler,
-        rootLogger: makeLoggerMock({ fnMethod: vi.fn }),
-        getChildLogger: ({ parent }) => ({ ...parent, isChild: true }),
+        rootLogger,
       });
       await handler(
         new SyntaxError("Unexpected end of JSON input"),
         null as unknown as Request,
-        null as unknown as Response,
+        makeResponseMock({
+          fnMethod: vi.fn,
+          responseProps: {
+            locals: { logger: { ...rootLogger, isChild: true } },
+          },
+        }) as unknown as Response,
         vi.fn<any>(),
       );
       expect(errorHandler.handler).toHaveBeenCalledTimes(1);
@@ -65,10 +69,10 @@ describe("Server helpers", () => {
         ...defaultResultHandler,
         handler: vi.fn(),
       };
+      const rootLogger = makeLoggerMock({ fnMethod: vi.fn });
       const handler = createNotFoundHandler({
         errorHandler,
-        rootLogger: makeLoggerMock({ fnMethod: vi.fn }),
-        getChildLogger: async ({ parent }) => ({ ...parent, isChild: true }),
+        rootLogger,
       });
       const next = vi.fn();
       const requestMock = makeRequestMock({
@@ -79,7 +83,12 @@ describe("Server helpers", () => {
           body: { n: 453 },
         },
       });
-      const responseMock = makeResponseMock({ fnMethod: vi.fn });
+      const responseMock = makeResponseMock({
+        fnMethod: vi.fn,
+        responseProps: {
+          locals: { logger: { ...rootLogger, isChild: true } },
+        } as unknown as Response,
+      });
       await handler(
         requestMock as unknown as Request,
         responseMock as unknown as Response,
@@ -115,7 +124,6 @@ describe("Server helpers", () => {
       const handler = createNotFoundHandler({
         errorHandler,
         rootLogger,
-        getChildLogger: undefined,
       });
       const next = vi.fn();
       const requestMock = makeRequestMock({

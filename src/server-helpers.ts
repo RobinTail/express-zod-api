@@ -10,18 +10,13 @@ import { makeErrorFromAnything } from "./common-helpers";
 interface HandlerCreatorParams {
   errorHandler: AnyResultHandlerDefinition;
   rootLogger: AbstractLogger;
-  getChildLogger: CommonConfig["childLoggerProvider"];
 }
 
 export type LocalResponse = Response<unknown, { logger?: AbstractLogger }>;
 
 export const createParserFailureHandler =
-  ({
-    errorHandler,
-    rootLogger,
-    getChildLogger,
-  }: HandlerCreatorParams): ErrorRequestHandler =>
-  async (error, request, response, next) => {
+  ({ errorHandler, rootLogger }: HandlerCreatorParams): ErrorRequestHandler =>
+  async (error, request, response: LocalResponse, next) => {
     if (!error) {
       return next();
     }
@@ -34,26 +29,18 @@ export const createParserFailureHandler =
       input: null,
       output: null,
       options: {},
-      logger: getChildLogger
-        ? await getChildLogger({ request, parent: rootLogger })
-        : rootLogger,
+      logger: response.locals.logger || rootLogger,
     });
   };
 
 export const createNotFoundHandler =
-  ({
-    errorHandler,
-    getChildLogger,
-    rootLogger,
-  }: HandlerCreatorParams): RequestHandler =>
-  async (request, response) => {
+  ({ errorHandler, rootLogger }: HandlerCreatorParams): RequestHandler =>
+  async (request, response: LocalResponse) => {
     const error = createHttpError(
       404,
       `Can not ${request.method} ${request.path}`,
     );
-    const logger = getChildLogger
-      ? await getChildLogger({ request, parent: rootLogger })
-      : rootLogger;
+    const logger = response.locals.logger || rootLogger;
     try {
       errorHandler.handler({
         request,
