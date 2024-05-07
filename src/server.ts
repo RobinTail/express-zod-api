@@ -1,14 +1,13 @@
-import express, { RequestHandler } from "express";
+import express from "express";
 import type compression from "compression";
 import type fileUpload from "express-fileupload";
 import http from "node:http";
 import https from "node:https";
 import { AppConfig, CommonConfig, ServerConfig } from "./config-type";
-import { ContentType } from "./content-type";
 import { AbstractLogger, createLogger, isBuiltinLoggerConfig } from "./logger";
 import { loadPeer } from "./peer-helpers";
 import { defaultResultHandler } from "./result-handler";
-import { Routing, initRouting } from "./routing";
+import { Parsers, Routing, initRouting } from "./routing";
 import {
   createLoggingMiddleware,
   createNotFoundHandler,
@@ -57,7 +56,7 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
     );
   }
 
-  const parsers: Record<ContentType, RequestHandler[]> = {
+  const parsers: Parsers = {
     json: [config.server.jsonParser || express.json()],
     upload: [],
     raw: [],

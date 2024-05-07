@@ -13,6 +13,8 @@ export interface Routing {
   [SEGMENT: string]: Routing | DependsOnMethod | AbstractEndpoint | ServeStatic;
 }
 
+export type Parsers = Record<ContentType, RequestHandler[]>;
+
 export const initRouting = ({
   app,
   rootLogger,
@@ -24,7 +26,7 @@ export const initRouting = ({
   rootLogger: AbstractLogger;
   config: CommonConfig;
   routing: Routing;
-  parsers?: Record<ContentType, RequestHandler[]>;
+  parsers?: Parsers;
 }) =>
   walkRouting({
     routing,
