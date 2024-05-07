@@ -62,7 +62,7 @@ describe("Server", () => {
       await createServer(configMock, routingMock);
       expect(appMock).toBeTruthy();
       expect(appMock.disable).toHaveBeenCalledWith("x-powered-by");
-      expect(appMock.use).toHaveBeenCalledTimes(6);
+      expect(appMock.use).toHaveBeenCalledTimes(5);
       expect(appMock.use.mock.calls[1]).toEqual([
         "/v1/test",
         [expressJsonMock],
@@ -115,7 +115,7 @@ describe("Server", () => {
       expect(logger).toEqual(customLogger);
       expect(app).toEqual(appMock);
       expect(appMock).toBeTruthy();
-      expect(appMock.use).toHaveBeenCalledTimes(6);
+      expect(appMock.use).toHaveBeenCalledTimes(5);
       expect(appMock.use.mock.calls[1]).toEqual([
         "/v1/test",
         [configMock.server.jsonParser],
@@ -199,7 +199,7 @@ describe("Server", () => {
         },
       };
       await createServer(configMock, routingMock);
-      expect(appMock.use).toHaveBeenCalledTimes(6);
+      expect(appMock.use).toHaveBeenCalledTimes(5);
       expect(compressionMock).toHaveBeenCalledTimes(1);
       expect(compressionMock).toHaveBeenCalledWith(undefined);
     });
@@ -232,7 +232,7 @@ describe("Server", () => {
         },
       };
       await createServer(configMock, routingMock);
-      expect(appMock.use).toHaveBeenCalledTimes(5);
+      expect(appMock.use).toHaveBeenCalledTimes(4);
       expect(appMock.use.mock.calls[1]).toEqual([
         "/v1/test",
         [beforeUpload, expect.any(Function), expect.any(Function)], // uploader with logger, createUploadFailueHandler()
@@ -261,7 +261,7 @@ describe("Server", () => {
         },
       };
       await createServer(configMock, routingMock);
-      expect(appMock.use).toHaveBeenCalledTimes(5);
+      expect(appMock.use).toHaveBeenCalledTimes(4);
       expect(appMock.use.mock.calls[1]).toEqual([
         "/v1/test",
         [rawParserMock, rawMover],

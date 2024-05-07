@@ -42,6 +42,10 @@ export const attachRouting = (config: AppConfig, routing: Routing) => {
 
 export const createServer = async (config: ServerConfig, routing: Routing) => {
   const app = express().disable("x-powered-by");
+  const { rootLogger, notFoundHandler, parserFailureHandler } =
+    makeCommonEntities(config);
+  app.use(createLoggingMiddleware({ rootLogger, config }));
+
   if (config.server.compression) {
     const compressor = await loadPeer<typeof compression>("compression");
     app.use(
@@ -52,11 +56,6 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
       ),
     );
   }
-
-  const { rootLogger, notFoundHandler, parserFailureHandler } =
-    makeCommonEntities(config);
-
-  app.use(createLoggingMiddleware({ rootLogger, config }));
 
   const parsers: Record<ContentType, RequestHandler[]> = {
     json: [config.server.jsonParser || express.json()],
@@ -85,6 +84,7 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
   if (config.server.beforeRouting) {
     await config.server.beforeRouting({ app, logger: rootLogger });
   }
+
   initRouting({
     app,
     routing,
@@ -92,8 +92,7 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
     config,
     parsers,
   });
-  app.use(parserFailureHandler);
-  app.use(notFoundHandler);
+  app.use(parserFailureHandler, notFoundHandler);
 
   const starter = <T extends http.Server | https.Server>(
     server: T,
