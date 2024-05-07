@@ -107,7 +107,7 @@ type UploadOptions = Pick<
   /**
    * @desc A handler to execute before uploading — it can be used for restrictions by throwing an error.
    * @default undefined
-   * @example ({request}) => { throw createHttpError(403, "Not authorized"); }
+   * @example ({ request }) => { throw createHttpError(403, "Not authorized"); }
    * */
   beforeUpload?: BeforeUpload;
 };
