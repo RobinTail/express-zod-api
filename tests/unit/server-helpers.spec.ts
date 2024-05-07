@@ -1,3 +1,4 @@
+import { metaSymbol } from "../../src/metadata";
 import {
   createNotFoundHandler,
   createParserFailureHandler,
@@ -48,7 +49,9 @@ describe("Server helpers", () => {
         makeResponseMock({
           fnMethod: vi.fn,
           responseProps: {
-            locals: { logger: { ...rootLogger, isChild: true } },
+            locals: {
+              [metaSymbol]: { logger: { ...rootLogger, isChild: true } },
+            },
           },
         }) as unknown as Response,
         vi.fn<any>(),
@@ -87,7 +90,9 @@ describe("Server helpers", () => {
       const responseMock = makeResponseMock({
         fnMethod: vi.fn,
         responseProps: {
-          locals: { logger: { ...rootLogger, isChild: true } },
+          locals: {
+            [metaSymbol]: { logger: { ...rootLogger, isChild: true } },
+          },
         } as unknown as Response,
       });
       await handler(

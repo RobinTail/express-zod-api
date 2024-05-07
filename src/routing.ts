@@ -4,6 +4,7 @@ import { ContentType } from "./content-type";
 import { DependsOnMethod } from "./depends-on-method";
 import { AbstractEndpoint } from "./endpoint";
 import { AbstractLogger } from "./logger";
+import { metaSymbol } from "./metadata";
 import { walkRouting } from "./routing-walker";
 import { ServeStatic } from "./serve-static";
 import { LocalResponse } from "./server-helpers";
@@ -37,7 +38,7 @@ export const initRouting = ({
         await endpoint.execute({
           request,
           response,
-          logger: response.locals.logger || rootLogger,
+          logger: response.locals[metaSymbol]?.logger || rootLogger,
           config,
           siblingMethods,
         });

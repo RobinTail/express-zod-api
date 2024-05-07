@@ -1,4 +1,5 @@
 import type fileUpload from "express-fileupload";
+import { metaSymbol } from "./metadata";
 import { AnyResultHandlerDefinition } from "./result-handler";
 import { AbstractLogger } from "./logger";
 import { BeforeUpload, CommonConfig } from "./config-type";
@@ -13,7 +14,10 @@ interface HandlerCreatorParams {
   rootLogger: AbstractLogger;
 }
 
-export type LocalResponse = Response<unknown, { logger?: AbstractLogger }>;
+export type LocalResponse = Response<
+  unknown,
+  { [metaSymbol]?: { logger: AbstractLogger } }
+>;
 
 export const createParserFailureHandler =
   ({ errorHandler, rootLogger }: HandlerCreatorParams): ErrorRequestHandler =>
@@ -30,7 +34,7 @@ export const createParserFailureHandler =
       input: null,
       output: null,
       options: {},
-      logger: response.locals.logger || rootLogger,
+      logger: response.locals[metaSymbol]?.logger || rootLogger,
     });
   };
 
@@ -41,7 +45,7 @@ export const createNotFoundHandler =
       404,
       `Can not ${request.method} ${request.path}`,
     );
-    const logger = response.locals.logger || rootLogger;
+    const logger = response.locals[metaSymbol]?.logger || rootLogger;
     try {
       errorHandler.handler({
         request,
@@ -92,7 +96,7 @@ export const createUploadMiddleware =
     beforeUpload?: BeforeUpload;
   }): RequestHandler =>
   async (request, response: LocalResponse, next) => {
-    const logger = response.locals.logger || rootLogger;
+    const logger = response.locals[metaSymbol]?.logger || rootLogger;
     try {
       await beforeUpload?.({ request, logger });
     } catch (error) {
@@ -127,6 +131,6 @@ export const createLoggingMiddleware =
       ? await config.childLoggerProvider({ request, parent: rootLogger })
       : rootLogger;
     logger.info(`${request.method}: ${request.path}`);
-    response.locals.logger = logger;
+    response.locals[metaSymbol] = { logger };
     next();
   };

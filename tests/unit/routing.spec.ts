@@ -1,3 +1,4 @@
+import { metaSymbol } from "../../src/metadata";
 import {
   appMock,
   expressMock,
@@ -427,7 +428,9 @@ describe("Routing", () => {
       const responseMock = makeResponseMock({
         fnMethod: vi.fn,
         responseProps: {
-          locals: { logger: { ...loggerMock, isChild: true } },
+          locals: {
+            [metaSymbol]: { logger: { ...loggerMock, isChild: true } },
+          },
         },
       });
       await routeHandler(
