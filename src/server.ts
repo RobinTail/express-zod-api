@@ -10,6 +10,8 @@ import { loadPeer } from "./peer-helpers";
 import { defaultResultHandler } from "./result-handler";
 import { Routing, initRouting } from "./routing";
 import {
+  LocalResponse,
+  createLoggingMiddleware,
   createNotFoundHandler,
   createParserFailureHandler,
   createUploadFailueHandler,
@@ -28,6 +30,7 @@ const makeCommonEntities = (config: CommonConfig) => {
   rootLogger.debug("Running", process.env.TSUP_BUILD || "from sources");
   const errorHandler = config.errorHandler || defaultResultHandler;
   const { childLoggerProvider: getChildLogger } = config;
+  // @todo should be the request level logger
   const creatorParams = { errorHandler, rootLogger, getChildLogger };
   const notFoundHandler = createNotFoundHandler(creatorParams);
   const parserFailureHandler = createParserFailureHandler(creatorParams);
@@ -56,6 +59,8 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
   const { rootLogger, notFoundHandler, parserFailureHandler } =
     makeCommonEntities(config);
 
+  app.use(createLoggingMiddleware({ rootLogger, config }));
+
   const parsers: Record<ContentType, RequestHandler[]> = {
     json: [config.server.jsonParser || express.json()],
     upload: [],
@@ -70,13 +75,13 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
     if (beforeUpload) {
       parsers.upload.push(beforeUpload);
     }
-    parsers.upload.push(
+    parsers.upload.push((req, res: LocalResponse, next) =>
       uploader({
         ...derivedConfig,
         abortOnLimit: false,
         parseNested: true,
-        logger: createUploadLogger(rootLogger),
-      }),
+        logger: createUploadLogger(res.locals.logger || rootLogger),
+      })(req, res, next),
     );
     if (limitError) {
       parsers.upload.push(createUploadFailueHandler(limitError));

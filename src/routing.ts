@@ -6,6 +6,7 @@ import { AbstractEndpoint } from "./endpoint";
 import { AbstractLogger } from "./logger";
 import { walkRouting } from "./routing-walker";
 import { ServeStatic } from "./serve-static";
+import { LocalResponse } from "./server-helpers";
 
 export interface Routing {
   [SEGMENT: string]: Routing | DependsOnMethod | AbstractEndpoint | ServeStatic;
@@ -32,15 +33,11 @@ export const initRouting = ({
       if (middlewares.length) {
         app.use(path, middlewares);
       }
-      app[method](path, async (request, response) => {
-        const logger = config.childLoggerProvider
-          ? await config.childLoggerProvider({ request, parent: rootLogger })
-          : rootLogger;
-        logger.info(`${request.method}: ${path}`);
+      app[method](path, async (request, response: LocalResponse) => {
         await endpoint.execute({
           request,
           response,
-          logger,
+          logger: response.locals.logger || rootLogger,
           config,
           siblingMethods,
         });

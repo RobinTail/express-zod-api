@@ -1,7 +1,7 @@
 import { AnyResultHandlerDefinition } from "./result-handler";
 import { AbstractLogger } from "./logger";
 import { CommonConfig } from "./config-type";
-import { ErrorRequestHandler, RequestHandler } from "express";
+import { ErrorRequestHandler, RequestHandler, Response } from "express";
 import createHttpError, { isHttpError } from "http-errors";
 import { lastResortHandler } from "./last-resort";
 import { ResultHandlerError } from "./errors";
@@ -12,6 +12,8 @@ interface HandlerCreatorParams {
   rootLogger: AbstractLogger;
   getChildLogger: CommonConfig["childLoggerProvider"];
 }
+
+export type LocalResponse = Response<unknown, { logger?: AbstractLogger }>;
 
 export const createParserFailureHandler =
   ({
@@ -83,6 +85,7 @@ export const createUploadFailueHandler =
     next();
   };
 
+// @todo revert to using the logger.debug.bind
 export const createUploadLogger = (
   logger: AbstractLogger,
 ): Pick<Console, "log"> => ({
@@ -99,3 +102,21 @@ export const rawMover: RequestHandler = (req, {}, next) => {
   }
   next();
 };
+
+/** @since v19 prints the actual path of the request, not a configured route */
+export const createLoggingMiddleware =
+  ({
+    rootLogger,
+    config,
+  }: {
+    rootLogger: AbstractLogger;
+    config: CommonConfig;
+  }): RequestHandler =>
+  async (request, response: LocalResponse, next) => {
+    const logger = config.childLoggerProvider
+      ? await config.childLoggerProvider({ request, parent: rootLogger })
+      : rootLogger;
+    logger.info(`${request.method}: ${request.path}`);
+    response.locals.logger = logger;
+    next();
+  };

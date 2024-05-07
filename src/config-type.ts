@@ -28,7 +28,7 @@ export type TagsConfig<TAG extends string> = Record<
   string | { description: string; url?: string }
 >;
 
-type ChildLoggerProvider = (params: {
+export type ChildLoggerProvider = (params: {
   request: Request;
   parent: AbstractLogger;
 }) => AbstractLogger | Promise<AbstractLogger>;
