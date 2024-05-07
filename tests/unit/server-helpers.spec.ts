@@ -174,14 +174,7 @@ describe("Server helpers", () => {
     const rootLogger = makeLoggerMock({ fnMethod: vi.fn });
     const uploadLogger = createUploadLogger(rootLogger);
 
-    test("should mute 'not eligible' message", () => {
-      uploadLogger.log(
-        "Express-file-upload: Request is not eligible for file upload!",
-      );
-      expect(rootLogger.debug).not.toHaveBeenCalled();
-    });
-
-    test("should debug other messages", () => {
+    test("should debug the messages", () => {
       uploadLogger.log("Express-file-upload: Busboy finished parsing request.");
       expect(rootLogger.debug).toHaveBeenCalledWith(
         "Express-file-upload: Busboy finished parsing request.",

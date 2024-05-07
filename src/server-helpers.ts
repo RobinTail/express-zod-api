@@ -85,15 +85,10 @@ export const createUploadFailueHandler =
     next();
   };
 
-// @todo revert to using the logger.debug.bind
 export const createUploadLogger = (
   logger: AbstractLogger,
 ): Pick<Console, "log"> => ({
-  log: (message, ...rest) => {
-    if (!/not eligible/.test(message)) {
-      logger.debug(message, ...rest);
-    }
-  },
+  log: logger.debug.bind(logger),
 });
 
 export const rawMover: RequestHandler = (req, {}, next) => {
