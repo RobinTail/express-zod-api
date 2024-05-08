@@ -116,7 +116,7 @@ export const createUploadParsers = async ({
   return parsers;
 };
 
-export const rawMover: RequestHandler = (req, {}, next) => {
+export const moveRaw: RequestHandler = (req, {}, next) => {
   if (Buffer.isBuffer(req.body)) {
     req.body = { raw: req.body };
   }

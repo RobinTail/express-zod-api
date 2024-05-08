@@ -12,7 +12,7 @@ import {
   createNotFoundHandler,
   createParserFailureHandler,
   createUploadParsers,
-  rawMover,
+  moveRaw,
 } from "./server-helpers";
 import { getStartupLogo } from "./startup-logo";
 
@@ -57,7 +57,7 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
 
   const parsers: Parsers = {
     json: [config.server.jsonParser || express.json()],
-    raw: config.server.rawParser ? [config.server.rawParser, rawMover] : [],
+    raw: config.server.rawParser ? [config.server.rawParser, moveRaw] : [],
     upload: config.server.upload
       ? await createUploadParsers({ config, rootLogger })
       : [],

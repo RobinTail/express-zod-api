@@ -6,7 +6,7 @@ import {
   createUploadFailueHandler,
   createUploadLogger,
   createUploadParsers,
-  rawMover,
+  moveRaw,
 } from "../../src/server-helpers";
 import { describe, expect, test, vi } from "vitest";
 import { defaultResultHandler } from "../../src";
@@ -266,7 +266,7 @@ describe("Server helpers", () => {
     });
   });
 
-  describe("rawMover", () => {
+  describe("moveRaw()", () => {
     test("should place the body into the raw prop of the body object", () => {
       const buffer = Buffer.from([]);
       const requestMock = makeRequestMock({
@@ -277,7 +277,7 @@ describe("Server helpers", () => {
         },
       });
       const nextMock = vi.fn();
-      rawMover(requestMock as unknown as Request, {} as Response, nextMock);
+      moveRaw(requestMock as unknown as Request, {} as Response, nextMock);
       expect(requestMock.body).toEqual({ raw: buffer });
       expect(nextMock).toHaveBeenCalled();
     });

@@ -1,4 +1,4 @@
-import { rawMover } from "../../src/server-helpers";
+import { moveRaw } from "../../src/server-helpers";
 import { givePort } from "../helpers";
 import {
   appMock,
@@ -284,7 +284,7 @@ describe("Server", () => {
       expect(appMock.get).toHaveBeenCalledWith(
         "/v1/test",
         rawParserMock,
-        rawMover,
+        moveRaw,
         expect.any(Function), // endpoint
       );
     });
