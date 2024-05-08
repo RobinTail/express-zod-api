@@ -338,8 +338,8 @@ describe("App", async () => {
       expect(json).toMatchSnapshot({
         error: {
           message: expect.stringMatching(
-            // @todo check the current state on the supported Node versions
-            // the 2nd option is for Node 19
+            // @todo revisit when Node 18 dropped
+            // the 2nd option is for Node 20+
             /(Unexpected end of JSON input|Unterminated string in JSON at position 25)/,
           ),
         },
