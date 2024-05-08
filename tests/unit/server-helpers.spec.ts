@@ -1,3 +1,4 @@
+import { fileUploadMock } from "../express-mock";
 import { metaSymbol } from "../../src/metadata";
 import {
   createNotFoundHandler,
@@ -17,7 +18,6 @@ import {
   makeResponseMock,
 } from "../../src/testing";
 import createHttpError from "http-errors";
-import { fileUploadMock } from "../express-mock";
 
 describe("Server helpers", () => {
   describe("createParserFailureHandler()", () => {
