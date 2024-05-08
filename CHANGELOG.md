@@ -12,6 +12,13 @@
 - Several public methods and properties exposing arrays from class instances made readonly and frozen:
   - On `Endpoint`: `.getMethods()`, `.getMimeTypes()`, `.getResponses()`, `.getScopes()`, `.getTags()`,
   - On `DependsOnMethod`: `.pairs`, `.siblingMethods`.
+- The config option `server.upload.beforeUpload` changed:
+  - The assigned function now accepts `request` instead of `app`.
+- Request logging now reflects the actual path requested rather than the configured route:
+  - It is also placed in front of parsing.
+- Featuring selective parsers with child loggers:
+  - There are three types of endpoints depending on their input schema: those with upload, those with raw, and others.
+  - Depending on the type, only the parsers needed for certain endpoint are processed.
 
 ## Version 18
 
