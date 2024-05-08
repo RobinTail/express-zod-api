@@ -1,8 +1,9 @@
 import type fileUpload from "express-fileupload";
 import { metaSymbol } from "./metadata";
+import { loadPeer } from "./peer-helpers";
 import { AnyResultHandlerDefinition } from "./result-handler";
 import { AbstractLogger } from "./logger";
-import { BeforeUpload, CommonConfig } from "./config-type";
+import { CommonConfig, ServerConfig } from "./config-type";
 import { ErrorRequestHandler, RequestHandler, Response } from "express";
 import createHttpError, { isHttpError } from "http-errors";
 import { lastResortHandler } from "./last-resort";
@@ -83,19 +84,19 @@ export const createUploadLogger = (
   log: logger.debug.bind(logger),
 });
 
-export const createUploadMiddleware =
-  ({
-    options,
-    uploader,
-    rootLogger,
-    beforeUpload,
-  }: {
-    options: fileUpload.Options;
-    uploader: typeof fileUpload;
-    rootLogger: AbstractLogger;
-    beforeUpload?: BeforeUpload;
-  }): RequestHandler =>
-  async (request, response: LocalResponse, next) => {
+export const createUploadParsers = async ({
+  rootLogger,
+  config,
+}: {
+  rootLogger: AbstractLogger;
+  config: ServerConfig;
+}): Promise<RequestHandler[]> => {
+  const uploader = await loadPeer<typeof fileUpload>("express-fileupload");
+  const { limitError, beforeUpload, ...options } = {
+    ...(typeof config.server.upload === "object" && config.server.upload),
+  };
+  const parsers: RequestHandler[] = [];
+  parsers.push(async (request, response: LocalResponse, next) => {
     const logger = response.locals[metaSymbol]?.logger || rootLogger;
     try {
       await beforeUpload?.({ request, logger });
@@ -108,7 +109,12 @@ export const createUploadMiddleware =
       parseNested: true,
       logger: createUploadLogger(logger),
     })(request, response, next);
-  };
+  });
+  if (limitError) {
+    parsers.push(createUploadFailueHandler(limitError));
+  }
+  return parsers;
+};
 
 export const rawMover: RequestHandler = (req, {}, next) => {
   if (Buffer.isBuffer(req.body)) {

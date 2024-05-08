@@ -75,7 +75,7 @@ export interface CommonConfig<TAG extends string = string> {
   tags?: TagsConfig<TAG>;
 }
 
-export type BeforeUpload = (params: {
+type BeforeUpload = (params: {
   request: Request;
   logger: AbstractLogger;
 }) => void | Promise<void>;

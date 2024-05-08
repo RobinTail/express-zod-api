@@ -1,6 +1,5 @@
 import express from "express";
 import type compression from "compression";
-import type fileUpload from "express-fileupload";
 import http from "node:http";
 import https from "node:https";
 import { AppConfig, CommonConfig, ServerConfig } from "./config-type";
@@ -12,8 +11,7 @@ import {
   createLoggingMiddleware,
   createNotFoundHandler,
   createParserFailureHandler,
-  createUploadFailueHandler,
-  createUploadMiddleware,
+  createUploadParsers,
   rawMover,
 } from "./server-helpers";
 import { getStartupLogo } from "./startup-logo";
@@ -63,16 +61,7 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
   };
 
   if (config.server.upload) {
-    const uploader = await loadPeer<typeof fileUpload>("express-fileupload");
-    const { limitError, beforeUpload, ...options } = {
-      ...(typeof config.server.upload === "object" && config.server.upload),
-    };
-    parsers.upload.push(
-      createUploadMiddleware({ uploader, options, rootLogger, beforeUpload }),
-    );
-    if (limitError) {
-      parsers.upload.push(createUploadFailueHandler(limitError));
-    }
+    parsers.upload.push(...(await createUploadParsers({ config, rootLogger })));
   }
   if (config.server.rawParser) {
     parsers.raw.push(config.server.rawParser, rawMover);

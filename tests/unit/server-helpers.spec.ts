@@ -4,7 +4,7 @@ import {
   createParserFailureHandler,
   createUploadFailueHandler,
   createUploadLogger,
-  createUploadMiddleware,
+  createUploadParsers,
   rawMover,
 } from "../../src/server-helpers";
 import { describe, expect, test, vi } from "vitest";
@@ -17,6 +17,7 @@ import {
   makeResponseMock,
 } from "../../src/testing";
 import createHttpError from "http-errors";
+import { fileUploadMock } from "../express-mock";
 
 describe("Server helpers", () => {
   describe("createParserFailureHandler()", () => {
@@ -196,25 +197,52 @@ describe("Server helpers", () => {
     });
   });
 
-  describe("createUploadMiddleware()", () => {
+  describe("createUploadParsers()", async () => {
     const rootLogger = makeLoggerMock({ fnMethod: vi.fn });
-    const interalMw = vi.fn();
-    const uploaderMock = vi.fn(() => interalMw);
     const beforeUploadMock = vi.fn();
-    const middleware = createUploadMiddleware({
-      uploader: uploaderMock,
-      options: {
-        limits: { fileSize: 1024 },
+    const parsers = await createUploadParsers({
+      config: {
+        server: {
+          listen: 8090,
+          upload: {
+            limits: { fileSize: 1024 },
+            limitError: new Error("Too heavy"),
+            beforeUpload: beforeUploadMock,
+          },
+        },
+        cors: false,
+        logger: rootLogger,
       },
       rootLogger,
-      beforeUpload: beforeUploadMock,
     });
     const requestMock = makeRequestMock({ fnMethod: vi.fn });
     const responseMock = makeResponseMock({ fnMethod: vi.fn });
     const nextMock = vi.fn();
 
+    test("should return an array of RequestHandler", () => {
+      expect(parsers).toEqual([
+        expect.any(Function), // uploader with logger
+        expect.any(Function), // createUploadFailueHandler()
+      ]);
+    });
+
+    test("should handle errors thrown by beforeUpload", async () => {
+      const error = createHttpError(403, "Not authorized");
+      beforeUploadMock.mockImplementationOnce(() => {
+        throw error;
+      });
+      await parsers[0](
+        requestMock as unknown as Request,
+        responseMock as unknown as Response,
+        nextMock,
+      );
+      expect(nextMock).toHaveBeenCalledWith(error);
+    });
+
     test("should install the uploader with its special logger", async () => {
-      await middleware(
+      const interalMw = vi.fn();
+      fileUploadMock.mockImplementationOnce(() => interalMw);
+      await parsers[0](
         requestMock as unknown as Request,
         responseMock as unknown as Response,
         nextMock,
@@ -223,8 +251,8 @@ describe("Server helpers", () => {
         request: requestMock,
         logger: rootLogger,
       });
-      expect(uploaderMock).toHaveBeenCalledTimes(1);
-      expect(uploaderMock).toHaveBeenCalledWith({
+      expect(fileUploadMock).toHaveBeenCalledTimes(1);
+      expect(fileUploadMock).toHaveBeenCalledWith({
         abortOnLimit: false,
         parseNested: true,
         limits: { fileSize: 1024 },
@@ -235,19 +263,6 @@ describe("Server helpers", () => {
         responseMock,
         nextMock,
       );
-    });
-
-    test("should handle errors thrown by beforeUpload", async () => {
-      const error = createHttpError(403, "Not authorized");
-      beforeUploadMock.mockImplementationOnce(() => {
-        throw error;
-      });
-      await middleware(
-        requestMock as unknown as Request,
-        responseMock as unknown as Response,
-        nextMock,
-      );
-      expect(nextMock).toHaveBeenCalledWith(error);
     });
   });
 
