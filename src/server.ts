@@ -56,27 +56,16 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
 
   const parsers: Parsers = {
     json: [config.server.jsonParser || express.json()],
-    upload: [],
-    raw: [],
+    raw: config.server.rawParser ? [config.server.rawParser, rawMover] : [],
+    upload: config.server.upload
+      ? await createUploadParsers({ config, rootLogger })
+      : [],
   };
 
-  if (config.server.upload) {
-    parsers.upload.push(...(await createUploadParsers({ config, rootLogger })));
-  }
-  if (config.server.rawParser) {
-    parsers.raw.push(config.server.rawParser, rawMover);
-  }
   if (config.server.beforeRouting) {
     await config.server.beforeRouting({ app, logger: rootLogger });
   }
-
-  initRouting({
-    app,
-    routing,
-    rootLogger,
-    config,
-    parsers,
-  });
+  initRouting({ app, routing, rootLogger, config, parsers });
   app.use(parserFailureHandler, notFoundHandler);
 
   const starter = <T extends http.Server | https.Server>(
