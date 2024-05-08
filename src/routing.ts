@@ -32,19 +32,18 @@ export const initRouting = ({
     routing,
     hasCors: !!config.cors,
     onEndpoint: (endpoint, path, method, siblingMethods) => {
-      const middlewares = parsers?.[endpoint.getRequestType()] || [];
-      if (middlewares.length) {
-        app.use(path, middlewares);
-      }
-      app[method](path, async (request, response: LocalResponse) => {
-        await endpoint.execute({
-          request,
-          response,
-          logger: response.locals[metaSymbol]?.logger || rootLogger,
-          config,
-          siblingMethods,
-        });
-      });
+      app[method](
+        path,
+        ...(parsers?.[endpoint.getRequestType()] || []),
+        async (request, response: LocalResponse) =>
+          endpoint.execute({
+            request,
+            response,
+            logger: response.locals[metaSymbol]?.logger || rootLogger,
+            config,
+            siblingMethods,
+          }),
+      );
     },
     onStatic: (path, handler) => {
       app.use(path, handler);

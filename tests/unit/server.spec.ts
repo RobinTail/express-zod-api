@@ -62,17 +62,25 @@ describe("Server", () => {
       await createServer(configMock, routingMock);
       expect(appMock).toBeTruthy();
       expect(appMock.disable).toHaveBeenCalledWith("x-powered-by");
-      expect(appMock.use).toHaveBeenCalledTimes(5);
-      expect(appMock.use.mock.calls[1]).toEqual([
-        "/v1/test",
-        [expressJsonMock],
-      ]);
+      expect(appMock.use).toHaveBeenCalledTimes(2);
       expect(appMock.get).toHaveBeenCalledTimes(1);
-      expect(appMock.get.mock.calls[0][0]).toBe("/v1/test");
+      expect(appMock.get).toHaveBeenCalledWith(
+        "/v1/test",
+        expressJsonMock,
+        expect.any(Function), // endpoint
+      );
       expect(appMock.post).toHaveBeenCalledTimes(1);
-      expect(appMock.post.mock.calls[0][0]).toBe("/v1/test");
+      expect(appMock.post).toHaveBeenCalledWith(
+        "/v1/test",
+        expressJsonMock,
+        expect.any(Function), // endpoint
+      );
       expect(appMock.options).toHaveBeenCalledTimes(1);
-      expect(appMock.options.mock.calls[0][0]).toBe("/v1/test");
+      expect(appMock.options).toHaveBeenCalledWith(
+        "/v1/test",
+        expressJsonMock,
+        expect.any(Function), // endpoint
+      );
       expect(httpListenSpy).toHaveBeenCalledTimes(1);
       expect(httpListenSpy).toHaveBeenCalledWith(port, expect.any(Function));
     });
@@ -115,11 +123,7 @@ describe("Server", () => {
       expect(logger).toEqual(customLogger);
       expect(app).toEqual(appMock);
       expect(appMock).toBeTruthy();
-      expect(appMock.use).toHaveBeenCalledTimes(5);
-      expect(appMock.use.mock.calls[1]).toEqual([
-        "/v1/test",
-        [configMock.server.jsonParser],
-      ]);
+      expect(appMock.use).toHaveBeenCalledTimes(2);
       expect(configMock.errorHandler.handler).toHaveBeenCalledTimes(0);
       expect(configMock.server.beforeRouting).toHaveBeenCalledWith({
         app: appMock,
@@ -128,11 +132,23 @@ describe("Server", () => {
       expect(infoMethod).toHaveBeenCalledTimes(1);
       expect(infoMethod).toHaveBeenCalledWith(`Listening`, { port });
       expect(appMock.get).toHaveBeenCalledTimes(1);
-      expect(appMock.get.mock.calls[0][0]).toBe("/v1/test");
+      expect(appMock.get).toHaveBeenCalledWith(
+        "/v1/test",
+        configMock.server.jsonParser,
+        expect.any(Function), // endpoint
+      );
       expect(appMock.post).toHaveBeenCalledTimes(1);
-      expect(appMock.post.mock.calls[0][0]).toBe("/v1/test");
+      expect(appMock.post).toHaveBeenCalledWith(
+        "/v1/test",
+        configMock.server.jsonParser,
+        expect.any(Function), // endpoint
+      );
       expect(appMock.options).toHaveBeenCalledTimes(1);
-      expect(appMock.options.mock.calls[0][0]).toBe("/v1/test");
+      expect(appMock.options).toHaveBeenCalledWith(
+        "/v1/test",
+        configMock.server.jsonParser,
+        expect.any(Function), // endpoint
+      );
       expect(httpListenSpy).toHaveBeenCalledTimes(1);
       expect(httpListenSpy).toHaveBeenCalledWith(
         { port },
@@ -199,7 +215,7 @@ describe("Server", () => {
         },
       };
       await createServer(configMock, routingMock);
-      expect(appMock.use).toHaveBeenCalledTimes(5);
+      expect(appMock.use).toHaveBeenCalledTimes(3);
       expect(compressionMock).toHaveBeenCalledTimes(1);
       expect(compressionMock).toHaveBeenCalledWith(undefined);
     });
@@ -231,11 +247,14 @@ describe("Server", () => {
         },
       };
       await createServer(configMock, routingMock);
-      expect(appMock.use).toHaveBeenCalledTimes(4);
-      expect(appMock.use.mock.calls[1]).toEqual([
+      expect(appMock.use).toHaveBeenCalledTimes(2);
+      expect(appMock.get).toHaveBeenCalledTimes(1);
+      expect(appMock.get).toHaveBeenCalledWith(
         "/v1/test",
-        [expect.any(Function), expect.any(Function)], // uploader with logger, createUploadFailueHandler()
-      ]);
+        expect.any(Function), // uploader with logger
+        expect.any(Function), // createUploadFailueHandler()
+        expect.any(Function), // endpoint
+      );
     });
 
     test("should enable raw on request", async () => {
@@ -260,11 +279,14 @@ describe("Server", () => {
         },
       };
       await createServer(configMock, routingMock);
-      expect(appMock.use).toHaveBeenCalledTimes(4);
-      expect(appMock.use.mock.calls[1]).toEqual([
+      expect(appMock.use).toHaveBeenCalledTimes(2);
+      expect(appMock.get).toHaveBeenCalledTimes(1);
+      expect(appMock.get).toHaveBeenCalledWith(
         "/v1/test",
-        [rawParserMock, rawMover],
-      ]);
+        rawParserMock,
+        rawMover,
+        expect.any(Function), // endpoint
+      );
     });
   });
 
