@@ -75,6 +75,11 @@ export interface CommonConfig<TAG extends string = string> {
   tags?: TagsConfig<TAG>;
 }
 
+type BeforeUpload = (params: {
+  request: Request;
+  logger: AbstractLogger;
+}) => void | Promise<void>;
+
 type UploadOptions = Pick<
   fileUpload.Options,
   | "createParentPath"
@@ -95,12 +100,11 @@ type UploadOptions = Pick<
    * */
   limitError?: Error;
   /**
-   * @desc A code to execute before connecting the upload middleware.
-   * @desc It can be used to connect a middleware that restricts the ability to upload.
+   * @desc A handler to execute before uploading — it can be used for restrictions by throwing an error.
    * @default undefined
-   * @example ({ app }) => { app.use( ... ); }
+   * @example ({ request }) => { throw createHttpError(403, "Not authorized"); }
    * */
-  beforeUpload?: AppExtension;
+  beforeUpload?: BeforeUpload;
 };
 
 type CompressionOptions = Pick<
@@ -108,7 +112,7 @@ type CompressionOptions = Pick<
   "threshold" | "level" | "strategy" | "chunkSize" | "memLevel"
 >;
 
-type AppExtension = (params: {
+type BeforeRouting = (params: {
   app: IRouter;
   logger: AbstractLogger;
 }) => void | Promise<void>;
@@ -127,13 +131,13 @@ export interface ServerConfig<TAG extends string = string>
     jsonParser?: RequestHandler;
     /**
      * @desc Enable or configure uploads handling.
-     * @default false
+     * @default undefined
      * @requires express-fileupload
      * */
     upload?: boolean | UploadOptions;
     /**
      * @desc Enable or configure response compression.
-     * @default false
+     * @default undefined
      * @requires compression
      */
     compression?: boolean | CompressionOptions;
@@ -152,7 +156,7 @@ export interface ServerConfig<TAG extends string = string>
      * @default undefined
      * @example ({ app }) => { app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument)); }
      * */
-    beforeRouting?: AppExtension;
+    beforeRouting?: BeforeRouting;
   };
   /** @desc Enables HTTPS server as well. */
   https?: {

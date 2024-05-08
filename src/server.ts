@@ -1,18 +1,18 @@
 import express from "express";
 import type compression from "compression";
-import type fileUpload from "express-fileupload";
 import http from "node:http";
 import https from "node:https";
 import { AppConfig, CommonConfig, ServerConfig } from "./config-type";
-import { AbstractLogger, createLogger, isBuiltinLoggerConfig } from "./logger";
+import { createLogger, isBuiltinLoggerConfig } from "./logger";
 import { loadPeer } from "./peer-helpers";
 import { defaultResultHandler } from "./result-handler";
-import { Routing, initRouting } from "./routing";
+import { Parsers, Routing, initRouting } from "./routing";
 import {
+  createLoggingMiddleware,
   createNotFoundHandler,
   createParserFailureHandler,
-  createUploadFailueHandler,
-  createUploadLogger,
+  createUploadParsers,
+  moveRaw,
 } from "./server-helpers";
 import { getStartupLogo } from "./startup-logo";
 
@@ -20,16 +20,16 @@ const makeCommonEntities = (config: CommonConfig) => {
   if (config.startupLogo !== false) {
     console.log(getStartupLogo());
   }
-  const rootLogger: AbstractLogger = isBuiltinLoggerConfig(config.logger)
-    ? createLogger(config.logger)
-    : config.logger;
-  rootLogger.debug("Running", process.env.TSUP_BUILD || "from sources");
-  const errorHandler = config.errorHandler || defaultResultHandler;
-  const { childLoggerProvider: getChildLogger } = config;
-  const creatorParams = { errorHandler, rootLogger, getChildLogger };
-  const notFoundHandler = createNotFoundHandler(creatorParams);
-  const parserFailureHandler = createParserFailureHandler(creatorParams);
-  return { rootLogger, errorHandler, notFoundHandler, parserFailureHandler };
+  const commons = {
+    errorHandler: config.errorHandler || defaultResultHandler,
+    rootLogger: isBuiltinLoggerConfig(config.logger)
+      ? createLogger(config.logger)
+      : config.logger,
+  };
+  commons.rootLogger.debug("Running", process.env.TSUP_BUILD || "from sources");
+  const notFoundHandler = createNotFoundHandler(commons);
+  const parserFailureHandler = createParserFailureHandler(commons);
+  return { ...commons, notFoundHandler, parserFailureHandler };
 };
 
 export const attachRouting = (config: AppConfig, routing: Routing) => {
@@ -40,6 +40,10 @@ export const attachRouting = (config: AppConfig, routing: Routing) => {
 
 export const createServer = async (config: ServerConfig, routing: Routing) => {
   const app = express().disable("x-powered-by");
+  const { rootLogger, notFoundHandler, parserFailureHandler } =
+    makeCommonEntities(config);
+  app.use(createLoggingMiddleware({ rootLogger, config }));
+
   if (config.server.compression) {
     const compressor = await loadPeer<typeof compression>("compression");
     app.use(
@@ -50,46 +54,20 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
       ),
     );
   }
-  app.use(config.server.jsonParser || express.json());
 
-  const { rootLogger, notFoundHandler, parserFailureHandler } =
-    makeCommonEntities(config);
+  const parsers: Parsers = {
+    json: [config.server.jsonParser || express.json()],
+    raw: config.server.rawParser ? [config.server.rawParser, moveRaw] : [],
+    upload: config.server.upload
+      ? await createUploadParsers({ config, rootLogger })
+      : [],
+  };
 
-  if (config.server.upload) {
-    const uploader = await loadPeer<typeof fileUpload>("express-fileupload");
-    const { limitError, beforeUpload, ...derivedConfig } = {
-      ...(typeof config.server.upload === "object" && config.server.upload),
-    };
-    if (beforeUpload) {
-      beforeUpload({ app, logger: rootLogger });
-    }
-    app.use(
-      uploader({
-        ...derivedConfig,
-        abortOnLimit: false,
-        parseNested: true,
-        logger: createUploadLogger(rootLogger),
-      }),
-    );
-    if (limitError) {
-      app.use(createUploadFailueHandler(limitError));
-    }
-  }
-  if (config.server.rawParser) {
-    app.use(config.server.rawParser);
-    app.use((req, {}, next) => {
-      if (Buffer.isBuffer(req.body)) {
-        req.body = { raw: req.body };
-      }
-      next();
-    });
-  }
-  app.use(parserFailureHandler);
   if (config.server.beforeRouting) {
     await config.server.beforeRouting({ app, logger: rootLogger });
   }
-  initRouting({ app, routing, rootLogger, config });
-  app.use(notFoundHandler);
+  initRouting({ app, routing, rootLogger, config, parsers });
+  app.use(parserFailureHandler, notFoundHandler);
 
   const starter = <T extends http.Server | https.Server>(
     server: T,

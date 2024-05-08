@@ -88,7 +88,7 @@ describe("Example", async () => {
           createdAt: "2022-01-22T00:00:00.000Z",
         },
       });
-      await waitFor(() => /v1\/user\/:id/.test(out));
+      await waitFor(() => /v1\/user\/50/.test(out));
       await waitFor(() => /50, 123, 456/.test(out));
       expect(true).toBeTruthy();
     });

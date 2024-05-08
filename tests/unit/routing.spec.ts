@@ -1,3 +1,4 @@
+import { metaSymbol } from "../../src/metadata";
 import {
   appMock,
   expressMock,
@@ -382,7 +383,6 @@ describe("Routing", () => {
       );
       expect(nextMock).toHaveBeenCalledTimes(0);
       expect(handlerMock).toHaveBeenCalledTimes(1);
-      expect(loggerMock.info).toHaveBeenCalledWith("POST: /v1/user/set");
       expect(loggerMock.error).toHaveBeenCalledTimes(0);
       expect(handlerMock).toHaveBeenCalledWith({
         input: {
@@ -400,7 +400,7 @@ describe("Routing", () => {
       });
     });
 
-    test("should override the logger with a child logger if provider is specified in config", async () => {
+    test("should override the logger with a child logger if present in response.locals", async () => {
       const loggerMock = makeLoggerMock({ fnMethod: vi.fn });
       const config: CommonConfig = {
         cors: false,
@@ -425,7 +425,14 @@ describe("Routing", () => {
       expect(appMock.get).toHaveBeenCalledTimes(1);
       const routeHandler = appMock.get.mock.calls[0][1] as RequestHandler;
       const requestMock = makeRequestMock({ fnMethod: vi.fn });
-      const responseMock = makeResponseMock({ fnMethod: vi.fn });
+      const responseMock = makeResponseMock({
+        fnMethod: vi.fn,
+        responseProps: {
+          locals: {
+            [metaSymbol]: { logger: { ...loggerMock, isChild: true } },
+          },
+        },
+      });
       await routeHandler(
         requestMock as unknown as Request,
         responseMock as unknown as Response,
