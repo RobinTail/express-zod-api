@@ -17,8 +17,9 @@
 - Request logging now reflects the actual path requested rather than the configured route:
   - It is also placed in front of parsing.
 - Featuring selective parsers with child loggers:
-  - There are three types of endpoints depending on their input schema: those with upload, those with raw, and others.
-  - Depending on the type, only the parsers needed for certain endpoint are processed.
+  - There are three types of endpoints depending on their input schema: those with upload, those with raw, and others;
+  - Depending on the type, only the parsers needed for certain endpoint are processed;
+  - This reverts changes on muting uploader logs related to non-eligible requests made in v18.5.2 (all eligible now).
 
 ## Version 18
 
