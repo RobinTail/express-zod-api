@@ -13,13 +13,46 @@
   - On `Endpoint`: `.getMethods()`, `.getMimeTypes()`, `.getResponses()`, `.getScopes()`, `.getTags()`,
   - On `DependsOnMethod`: `.pairs`, `.siblingMethods`.
 - The config option `server.upload.beforeUpload` changed:
-  - The assigned function now accepts `request` instead of `app`.
+  - The assigned function now accepts `request` instead of `app` and being called only for eligible requests;
+  - Restricting upload can be achieved now by throwing an error from within.
 - Request logging now reflects the actual path requested rather than the configured route:
   - It is also placed in front of parsing.
 - Featuring selective parsers with child loggers:
   - There are three types of endpoints depending on their input schema: those with upload, those with raw, and others;
   - Depending on the type, only the parsers needed for certain endpoint are processed;
   - This reverts changes on muting uploader logs related to non-eligible requests made in v18.5.2 (all eligible now).
+
+```ts
+import createHttpError from "http-errors";
+import { createConfig } from "express-zod-api";
+
+const before = createConfig({
+  server: {
+    upload: {
+      beforeUpload: ({ app, logger }) => {
+        app.use((req, res, next) => {
+          if (req.is("multipart/form-data") && !canUpload(req)) {
+            return next(createHttpError(403, "Not authorized"));
+          }
+          next();
+        });
+      },
+    },
+  },
+});
+
+const after = createConfig({
+  server: {
+    upload: {
+      beforeUpload: ({ request, logger }) => {
+        if (!canUpload(request)) {
+          throw createHttpError(403, "Not authorized");
+        }
+      },
+    },
+  },
+});
+```
 
 ## Version 18
 
