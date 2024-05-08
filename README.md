@@ -805,13 +805,10 @@ const config = createConfig({
     upload: {
       limits: { fileSize: 51200 }, // 50 KB
       limitError: createHttpError(413, "The file is too large"), // handled by errorHandler in config
-      beforeUpload: ({ app, logger }) => {
-        app.use((req, res, next) => {
-          if (req.is("multipart/form-data") && !canUpload(req)) {
-            return next(createHttpError(403, "Not authorized"));
-          }
-          next();
-        });
+      beforeUpload: ({ request, logger }) => {
+        if (!canUpload(request)) {
+          throw createHttpError(403, "Not authorized");
+        }
       },
     },
   },
