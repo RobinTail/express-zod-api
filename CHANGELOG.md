@@ -17,7 +17,7 @@
     - Restricting the upload can be achieved now by throwing an error from within.
   - Changed interface for `ez.raw()`: additional properties should be supplied as its argument, not via `.extend()`.
 - Features:
-  - New minimal logging level `info` (higher than `debug`, but lower than `warn`);
+  - New configurable level `info` for built-in logger (higher than `debug`, but lower than `warn`);
   - Selective parsers equipped with a child logger:
     - There are 3 types of endpoints depending on their input schema: having `ez.upload()`, having `ez.raw()`, others;
     - Depending on that type, only the parsers needed for certain endpoint are processed;
