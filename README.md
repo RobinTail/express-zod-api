@@ -783,16 +783,8 @@ const config = createConfig({
 ```
 
 Refer to [documentation](https://www.npmjs.com/package/express-fileupload#available-options) on available options.
-Some options are forced in order to ensure the correct workflow:
-
-```json5
-{
-  abortOnLimit: false,
-  parseNested: true,
-  logger: {}, // the configured logger, using its .debug() method
-}
-```
-
+Some options are forced in order to ensure the correct workflow: `abortOnLimit: false`, `parseNested: true`, `logger`
+is assigned with `.debug()` method of the configured logger, and `debug` is enabled by default.
 The `limitHandler` option is replaced by the `limitError` one. You can also connect an additional middleware for
 restricting the ability to upload using the `beforeUpload` option. So the configuration for the limited and restricted
 upload might look this way:
