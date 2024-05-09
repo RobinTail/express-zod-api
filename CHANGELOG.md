@@ -22,7 +22,8 @@
     - Depending on that type, only the parsers needed for certain endpoint are processed;
     - This makes all requests eligible for the assigned parsers and reverts changes made in [v18.5.2](#v1852).
 - Non-breaking significant changes:
-  - Request logging reflects the actual path instead of the configured route, and it's placed in front of parsing.
+  - Request logging reflects the actual path instead of the configured route, and it's placed in front of parsing;
+  - Specifying `rawParser` in config is no longer needed to enable the feature.
 - How to migrate confidently:
   - Upgrade Node to latest version of 18.x, 20.x or 22.x;
   - Upgrade `zod` to its latest version of 3.x;
@@ -33,6 +34,8 @@
     - Supply them directly as an argument to `ez.raw()` — see the example below.
   - If you're using `beforeUpload` in your config:
     - Adjust the implementation according to the example below.
+  - If you're having `rawParser: express.raw()` in your config:
+    - You can now remove this line (it's the default value now), unless you're having any customizations.
 
 ```ts
 import createHttpError from "http-errors";
