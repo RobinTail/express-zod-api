@@ -95,16 +95,12 @@ export const hasTransformationOnTop = (subject: IOSchema): boolean =>
 export const hasUpload = (subject: IOSchema) =>
   hasNestedSchema({
     subject,
-    condition: (schema) =>
-      schema instanceof z.ZodBranded &&
-      schema._def[metaSymbol]?.brand === ezUploadBrand,
+    condition: (schema) => schema._def[metaSymbol]?.brand === ezUploadBrand,
   });
 
 export const hasRaw = (subject: IOSchema) =>
   hasNestedSchema({
     subject,
-    condition: (schema) =>
-      schema instanceof z.ZodBranded &&
-      schema._def[metaSymbol]?.brand === ezRawBrand,
+    condition: (schema) => schema._def[metaSymbol]?.brand === ezRawBrand,
     maxDepth: 3,
   });
