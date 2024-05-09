@@ -7,7 +7,7 @@ export const rawAcceptingEndpoint = taggedEndpointsFactory.build({
   tag: "files",
   // requires to enable rawParser option in server config:
   input: ez.raw({
-    /* additional inputs, route params for example, if needed */
+    /* the place for additional inputs, like route params, if needed */
   }),
   output: z.object({ length: z.number().int().nonnegative() }),
   handler: async ({ input: { raw } }) => ({
