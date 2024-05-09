@@ -146,6 +146,7 @@ export interface ServerConfig<TAG extends string = string>
      * @desc When enabled, use ez.raw() as input schema to get input.raw in Endpoint's handler
      * @default undefined
      * @example express.raw()
+     * @todo this can be now automatic
      * @link https://expressjs.com/en/4x/api.html#express.raw
      * */
     rawParser?: RequestHandler;

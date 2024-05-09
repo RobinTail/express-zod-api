@@ -1001,7 +1001,7 @@ Some APIs may require an endpoint to be able to accept and process raw data, suc
 file as an entire body of request. In order to enable this feature you need to set the `rawParser` config feature to
 `express.raw()`. See also its options [in Express.js documentation](https://expressjs.com/en/4x/api.html#express.raw).
 The raw data is placed into `request.body.raw` property, having type `Buffer`. Then use the proprietary `ez.raw()`
-schema (which is an alias for `z.object({ raw: ez.file("buffer") })`) as the input schema of your endpoint.
+schema as the input schema of your endpoint.
 
 ```typescript
 import express from "express";
@@ -1015,9 +1015,9 @@ const config = createConfig({
 
 const rawAcceptingEndpoint = defaultEndpointsFactory.build({
   method: "post",
-  input: ez
-    .raw() // accepts the featured { raw: Buffer }
-    .extend({}), // for additional inputs, like route params, if needed
+  input: ez.raw({
+    /* the place for additional inputs, like route params, if needed */
+  }),
   output: z.object({ length: z.number().int().nonnegative() }),
   handler: async ({ input: { raw } }) => ({
     length: raw.length, // raw is Buffer

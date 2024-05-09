@@ -1,8 +1,7 @@
 import { z } from "zod";
-import { proprietary } from "./metadata";
 import { isValidDate } from "./schema-helpers";
 
-export const ezDateInKind = "DateIn";
+export const ezDateInBrand = Symbol("DateIn");
 
 export const dateIn = () => {
   const schema = z.union([
@@ -11,8 +10,10 @@ export const dateIn = () => {
     z.string().datetime({ local: true }),
   ]);
 
-  return proprietary(
-    ezDateInKind,
-    schema.transform((str) => new Date(str)).pipe(z.date().refine(isValidDate)),
-  );
+  return schema
+    .transform((str) => new Date(str))
+    .pipe(z.date().refine(isValidDate))
+    .brand(ezDateInBrand);
 };
+
+export type DateInSchema = ReturnType<typeof dateIn>;

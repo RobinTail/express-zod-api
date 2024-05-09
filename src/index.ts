@@ -1,3 +1,5 @@
+import "./zod-plugin";
+
 export { createConfig } from "./config-type";
 export { AbstractEndpoint } from "./endpoint";
 export {

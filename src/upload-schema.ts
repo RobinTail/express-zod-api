@@ -1,13 +1,11 @@
 import type { UploadedFile } from "express-fileupload";
 import { z } from "zod";
-import { proprietary } from "./metadata";
 
-export const ezUploadKind = "Upload";
+export const ezUploadBrand = Symbol("Upload");
 
 export const upload = () =>
-  proprietary(
-    ezUploadKind,
-    z.custom<UploadedFile>(
+  z
+    .custom<UploadedFile>(
       (subject) =>
         typeof subject === "object" &&
         subject !== null &&
@@ -32,5 +30,7 @@ export const upload = () =>
       (input) => ({
         message: `Expected file upload, received ${typeof input}`,
       }),
-    ),
-  );
+    )
+    .brand(ezUploadBrand);
+
+export type UploadSchema = ReturnType<typeof upload>;

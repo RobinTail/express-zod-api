@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { copyMeta } from "./metadata";
 import { AnyMiddlewareDef } from "./middleware";
+import { RawSchema } from "./raw-schema";
 
 type Refined<T extends z.ZodTypeAny> =
   T extends z.ZodType<infer O> ? z.ZodEffects<T | Refined<T>, O, O> : never;
@@ -14,7 +15,8 @@ export type IOSchema<U extends z.UnknownKeysParam = any> =
   | z.ZodUnion<[IOSchema<U>, ...IOSchema<U>[]]>
   | z.ZodIntersection<IOSchema<U>, IOSchema<U>>
   | z.ZodDiscriminatedUnion<string, z.ZodObject<any, U>[]>
-  | Refined<z.ZodObject<any, U>>;
+  | Refined<z.ZodObject<any, U>>
+  | RawSchema;
 
 export type ProbableIntersection<
   A extends IOSchema<"strip"> | null,
