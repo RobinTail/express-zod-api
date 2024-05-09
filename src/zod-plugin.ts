@@ -2,9 +2,9 @@
  * @fileoverview Zod Runtime Plugin
  * @see https://github.com/colinhacks/zod/blob/90efe7fa6135119224412c7081bd12ef0bccef26/plugin/effect/src/index.ts#L21-L31
  * @desc This code modifies and extends zod's functionality immediately when importing express-zod-api
- * @desc Enables .examples() and .getExamples() on all schemas (ZodType)
- * @desc Enables .label() and .getLabel() on ZodDefault
- * @desc Enables .getBrand() on ZodBranded (runtime distinguishable branded types)
+ * @desc Enables .examples() on all schemas (ZodType)
+ * @desc Enables .label() on ZodDefault
+ * @desc Stores the argument supplied to .brand() on all schema (runtime distinguishable branded types)
  * */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
@@ -19,21 +19,10 @@ declare module "zod" {
   interface ZodType {
     /** @desc Add an example value (before any transformations, can be called multiple times) */
     example(example: this["_input"]): this;
-    /** @desc Returns the previously assigned examples */
-    getExamples(): z.input<this>[] | undefined;
   }
   interface ZodDefault<T extends z.ZodTypeAny> {
     /** @desc Change the default value in the generated Documentation to a label */
     label(label: string): this;
-    /** @desc Returns the previously assigned label */
-    getLabel(): string | undefined;
-  }
-  interface ZodBranded<
-    T extends z.ZodTypeAny,
-    B extends string | number | symbol,
-  > {
-    /** @desc Returns the brand */
-    getBrand(): B | undefined;
   }
 }
 
@@ -46,18 +35,10 @@ const exampleSetter = function (
   return copy;
 };
 
-const examplesGetter = function (this: z.ZodType) {
-  return hasMeta(this) ? this._def[metaSymbol]!.examples : undefined;
-};
-
 const labelSetter = function (this: z.ZodDefault<z.ZodTypeAny>, label: string) {
   const copy = cloneSchema(this);
   copy._def[metaSymbol]!.defaultLabel = label;
   return copy;
-};
-
-const labelGetter = function (this: z.ZodDefault<z.ZodTypeAny>) {
-  return hasMeta(this) ? this._def[metaSymbol]!.defaultLabel : undefined;
 };
 
 const brandSetter = function (
@@ -73,21 +54,12 @@ const brandSetter = function (
   });
 };
 
-const brandGetter = function (this: z.ZodBranded<z.ZodTypeAny, any>) {
-  return hasMeta(this) ? this._def[metaSymbol]!.brand : undefined;
-};
-
 if (!(metaSymbol in globalThis)) {
   (globalThis as Record<symbol, unknown>)[metaSymbol] = true;
   Object.defineProperties(z.ZodType.prototype, {
     ["example" satisfies keyof z.ZodType]: {
       get(): z.ZodType["example"] {
         return exampleSetter.bind(this);
-      },
-    },
-    ["getExamples" satisfies keyof z.ZodType]: {
-      get(): z.ZodType["getExamples"] {
-        return examplesGetter.bind(this);
       },
     },
     ["brand" satisfies keyof z.ZodType]: {
@@ -97,24 +69,12 @@ if (!(metaSymbol in globalThis)) {
       },
     },
   });
-  Object.defineProperties(z.ZodDefault.prototype, {
-    ["label" satisfies keyof z.ZodDefault<z.ZodTypeAny>]: {
+  Object.defineProperty(
+    z.ZodDefault.prototype,
+    "label" satisfies keyof z.ZodDefault<z.ZodTypeAny>,
+    {
       get(): z.ZodDefault<z.ZodTypeAny>["label"] {
         return labelSetter.bind(this);
-      },
-    },
-    ["getLabel" satisfies keyof z.ZodDefault<z.ZodTypeAny>]: {
-      get(): z.ZodDefault<z.ZodTypeAny>["getLabel"] {
-        return labelGetter.bind(this);
-      },
-    },
-  });
-  Object.defineProperty(
-    z.ZodBranded.prototype,
-    "getBrand" satisfies keyof z.ZodBranded<z.ZodTypeAny, any>,
-    {
-      get(): z.ZodBranded<z.ZodTypeAny, any>["getBrand"] {
-        return brandGetter.bind(this);
       },
     },
   );

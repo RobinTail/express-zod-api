@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { ez } from "../../src";
 import { describe, expect, test, vi } from "vitest";
+import { metaSymbol } from "../../src/metadata";
 import { ezUploadBrand } from "../../src/upload-schema";
 
 describe("ez.upload()", () => {
@@ -8,7 +9,7 @@ describe("ez.upload()", () => {
     test("should create an instance", () => {
       const schema = ez.upload();
       expect(schema).toBeInstanceOf(z.ZodBranded);
-      expect(schema.getBrand()).toBe(ezUploadBrand);
+      expect(schema._def[metaSymbol]?.brand).toBe(ezUploadBrand);
     });
   });
 

@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { IOSchema } from "./io-schema";
+import { metaSymbol } from "./metadata";
 import { ezRawBrand } from "./raw-schema";
 import { HandlingRules, SchemaHandler } from "./schema-walker";
 import { ezUploadBrand } from "./upload-schema";
@@ -95,13 +96,15 @@ export const hasUpload = (subject: IOSchema) =>
   hasNestedSchema({
     subject,
     condition: (schema) =>
-      schema instanceof z.ZodBranded && schema.getBrand() === ezUploadBrand,
+      schema instanceof z.ZodBranded &&
+      schema._def[metaSymbol]?.brand === ezUploadBrand,
   });
 
 export const hasRaw = (subject: IOSchema) =>
   hasNestedSchema({
     subject,
     condition: (schema) =>
-      schema instanceof z.ZodBranded && schema.getBrand() === ezRawBrand,
+      schema instanceof z.ZodBranded &&
+      schema._def[metaSymbol]?.brand === ezRawBrand,
     maxDepth: 3,
   });

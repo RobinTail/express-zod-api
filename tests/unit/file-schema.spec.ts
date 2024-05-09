@@ -4,13 +4,14 @@ import { ezFileBrand } from "../../src/file-schema";
 import { ez } from "../../src";
 import { readFile } from "node:fs/promises";
 import { describe, expect, test } from "vitest";
+import { metaSymbol } from "../../src/metadata";
 
 describe("ez.file()", () => {
   describe("creation", () => {
     test("should create an instance being string by default", () => {
       const schema = ez.file();
       expect(schema).toBeInstanceOf(z.ZodBranded);
-      expect(schema.getBrand()).toBe(ezFileBrand);
+      expect(schema._def[metaSymbol]?.brand).toBe(ezFileBrand);
     });
 
     test("should create a string file", () => {

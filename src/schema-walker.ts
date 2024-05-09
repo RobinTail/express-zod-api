@@ -1,5 +1,6 @@
 import { z } from "zod";
 import type { FlatObject } from "./common-helpers";
+import { metaSymbol } from "./metadata";
 import { ProprietaryBrand } from "./proprietary-schemas";
 
 interface VariantDependingProps<U> {
@@ -47,9 +48,8 @@ export const walkSchema = <U extends object, Context extends FlatObject = {}>({
   onMissing: SchemaHandler<z.ZodTypeAny, U, Context, "last">;
 }): U => {
   const handler =
-    (schema instanceof z.ZodBranded
-      ? rules[schema.getBrand() as keyof typeof rules]
-      : undefined) || rules[schema._def.typeName as keyof typeof rules];
+    rules[schema._def[metaSymbol]?.brand as keyof typeof rules] ||
+    rules[schema._def.typeName as keyof typeof rules];
   const ctx = rest as unknown as Context;
   const next = (subject: z.ZodTypeAny) =>
     walkSchema({ schema: subject, ...ctx, onEach, rules, onMissing });

@@ -48,20 +48,6 @@ describe("Metadata", () => {
     });
   });
 
-  describe(".getExamples()", () => {
-    test("should return undefined if examples are not set", () => {
-      expect(z.string().getExamples()).toBeUndefined();
-    });
-    test("should return the value that has been set", () => {
-      expect(z.string().example("test").getExamples()).toEqual(["test"]);
-    });
-    test("should return an array of examples", () => {
-      expect(
-        z.string().example("test1").example("test2").getExamples(),
-      ).toEqual(["test1", "test2"]);
-    });
-  });
-
   describe(".label()", () => {
     test("should set the corresponding metadata in the schema definition", () => {
       const schema = z
@@ -79,12 +65,6 @@ describe("Metadata", () => {
   describe(".brand()", () => {
     test("should set the brand", () => {
       expect(z.string().brand("test")._def[metaSymbol]?.brand).toEqual("test");
-    });
-  });
-
-  describe(".getBrand()", () => {
-    test("should return the assigned brand", () => {
-      expect(z.string().brand("test").getBrand()).toEqual("test");
     });
   });
 
@@ -119,7 +99,9 @@ describe("Metadata", () => {
       const dest = z.number();
       const result = copyMeta(src, dest);
       expect(hasMeta(result)).toBeTruthy();
-      expect(result.getExamples()).toEqual(src.getExamples());
+      expect(result._def[metaSymbol]?.examples).toEqual(
+        src._def[metaSymbol]?.examples,
+      );
     });
 
     test("should merge the meta from src to dest", () => {
@@ -134,7 +116,7 @@ describe("Metadata", () => {
         .example({ b: 789 });
       const result = copyMeta(src, dest);
       expect(hasMeta(result)).toBeTruthy();
-      expect(result.getExamples()).toEqual([
+      expect(result._def[metaSymbol]?.examples).toEqual([
         { a: "some", b: 123 },
         { a: "another", b: 123 },
         { a: "some", b: 456 },
@@ -156,7 +138,7 @@ describe("Metadata", () => {
         .example({ a: { c: 789 } });
       const result = copyMeta(src, dest);
       expect(hasMeta(result)).toBeTruthy();
-      expect(result.getExamples()).toEqual([
+      expect(result._def[metaSymbol]?.examples).toEqual([
         { a: { b: "some", c: 123 } },
         { a: { b: "another", c: 123 } },
         { a: { b: "some", c: 456 } },
