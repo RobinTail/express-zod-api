@@ -1,6 +1,5 @@
 import { z } from "zod";
 import { IOSchema } from "./io-schema";
-import { isProprietary } from "./metadata";
 import { ezRawBrand } from "./raw-schema";
 import { HandlingRules, SchemaHandler } from "./schema-walker";
 import { ezUploadBrand } from "./upload-schema";
@@ -95,12 +94,14 @@ export const hasTransformationOnTop = (subject: IOSchema): boolean =>
 export const hasUpload = (subject: IOSchema) =>
   hasNestedSchema({
     subject,
-    condition: (schema) => isProprietary(schema, ezUploadBrand),
+    condition: (schema) =>
+      schema instanceof z.ZodBranded && schema.getBrand() === ezUploadBrand,
   });
 
 export const hasRaw = (subject: IOSchema) =>
   hasNestedSchema({
     subject,
-    condition: (schema) => isProprietary(schema, ezRawBrand),
+    condition: (schema) =>
+      schema instanceof z.ZodBranded && schema.getBrand() === ezRawBrand,
     maxDepth: 3,
   });

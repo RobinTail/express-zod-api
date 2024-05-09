@@ -1,7 +1,6 @@
 import { expectType } from "tsd";
 import { z } from "zod";
 import { ezFileBrand } from "../../src/file-schema";
-import { getMeta } from "../../src/metadata";
 import { ez } from "../../src";
 import { readFile } from "node:fs/promises";
 import { describe, expect, test } from "vitest";
@@ -11,7 +10,7 @@ describe("ez.file()", () => {
     test("should create an instance being string by default", () => {
       const schema = ez.file();
       expect(schema).toBeInstanceOf(z.ZodBranded);
-      expect(getMeta(schema, "brand")).toBe(ezFileBrand);
+      expect(schema.getBrand()).toBe(ezFileBrand);
     });
 
     test("should create a string file", () => {

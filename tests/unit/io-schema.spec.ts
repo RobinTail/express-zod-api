@@ -2,7 +2,6 @@ import { expectNotType, expectType } from "tsd";
 import { z } from "zod";
 import { IOSchema, createMiddleware, ez } from "../../src";
 import { getFinalEndpointInputSchema } from "../../src/io-schema";
-import { getMeta } from "../../src/metadata";
 import { AnyMiddlewareDef } from "../../src/middleware";
 import { serializeSchemaForTest } from "../helpers";
 import { describe, expect, test, vi } from "vitest";
@@ -228,7 +227,7 @@ describe("I/O Schema and related helpers", () => {
         .object({ five: z.string() })
         .example({ five: "some" });
       const result = getFinalEndpointInputSchema(middlewares, endpointInput);
-      expect(getMeta(result, "examples")).toEqual([
+      expect(result.getExamples()).toEqual([
         {
           one: "test",
           two: 123,

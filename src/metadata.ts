@@ -1,7 +1,6 @@
 import { combinations, isObject } from "./common-helpers";
 import { z } from "zod";
 import { clone, mergeDeepRight } from "ramda";
-import { ProprietaryBrand } from "./proprietary-schemas";
 
 export const metaSymbol = Symbol.for("express-zod-api");
 
@@ -12,6 +11,9 @@ export interface Metadata<T extends z.ZodTypeAny> {
   brand?: string | number | symbol;
 }
 
+export const hasMeta = <T extends z.ZodTypeAny>(schema: T) =>
+  metaSymbol in schema._def && isObject(schema._def[metaSymbol]);
+
 declare module "zod" {
   interface ZodTypeDef {
     [metaSymbol]?: Metadata<z.ZodTypeAny>;
@@ -19,11 +21,23 @@ declare module "zod" {
   interface ZodType {
     /** @desc Add an example value (before any transformations, can be called multiple times) */
     example(example: this["_input"]): this;
+    /** @desc Returns the previously assigned examples */
+    getExamples(): z.input<this>[] | undefined;
   }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   interface ZodDefault<T extends z.ZodTypeAny> {
     /** @desc Change the default value in the generated Documentation to a label */
     label(label: string): this;
+    /** @desc Returns the previously assigned label */
+    getLabel(): string | undefined;
+  }
+  interface ZodBranded<
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    T extends z.ZodTypeAny,
+    B extends string | number | symbol,
+  > {
+    /** @desc Returns the brand */
+    getBrand(): B | undefined;
   }
 }
 
@@ -44,16 +58,24 @@ const exampleSetter = function (
   return copy;
 };
 
-const defaultLabeler = function (
-  this: z.ZodDefault<z.ZodTypeAny>,
-  label: string,
-) {
+const examplesGetter = function (this: z.ZodType) {
+  return hasMeta(this) ? this._def[metaSymbol]!.examples : undefined;
+};
+
+const labelSetter = function (this: z.ZodDefault<z.ZodTypeAny>, label: string) {
   const copy = cloneSchema(this);
   copy._def[metaSymbol]!.defaultLabel = label;
   return copy;
 };
 
-const brander = function (this: z.ZodType, brand?: string | number | symbol) {
+const labelGetter = function (this: z.ZodDefault<z.ZodTypeAny>) {
+  return hasMeta(this) ? this._def[metaSymbol]!.defaultLabel : undefined;
+};
+
+const brandSetter = function (
+  this: z.ZodType,
+  brand?: string | number | symbol,
+) {
   return new z.ZodBranded({
     typeName: z.ZodFirstPartyTypeKind.ZodBranded,
     type: this,
@@ -61,6 +83,10 @@ const brander = function (this: z.ZodType, brand?: string | number | symbol) {
     errorMap: this._def.errorMap,
     [metaSymbol]: { examples: [], ...clone(this._def[metaSymbol]), brand },
   });
+};
+
+const brandGetter = function (this: z.ZodBranded<z.ZodTypeAny, any>) {
+  return hasMeta(this) ? this._def[metaSymbol]!.brand : undefined;
 };
 
 /** @see https://github.com/colinhacks/zod/blob/90efe7fa6135119224412c7081bd12ef0bccef26/plugin/effect/src/index.ts#L21-L31 */
@@ -77,11 +103,20 @@ if (!(metaSymbol in globalThis)) {
   );
   Object.defineProperty(
     z.ZodType.prototype,
+    "getExamples" satisfies keyof z.ZodType,
+    {
+      get(): z.ZodType["getExamples"] {
+        return examplesGetter.bind(this);
+      },
+    },
+  );
+  Object.defineProperty(
+    z.ZodType.prototype,
     "brand" satisfies keyof z.ZodType,
     {
       set() {}, // this is required to override the existing method
-      get(): z.ZodType["brand"] {
-        return brander.bind(this);
+      get() {
+        return brandSetter.bind(this) as z.ZodType["brand"];
       },
     },
   );
@@ -90,20 +125,29 @@ if (!(metaSymbol in globalThis)) {
     "label" satisfies keyof z.ZodDefault<z.ZodTypeAny>,
     {
       get(): z.ZodDefault<z.ZodTypeAny>["label"] {
-        return defaultLabeler.bind(this);
+        return labelSetter.bind(this);
+      },
+    },
+  );
+  Object.defineProperty(
+    z.ZodDefault.prototype,
+    "getLabel" satisfies keyof z.ZodDefault<z.ZodTypeAny>,
+    {
+      get(): z.ZodDefault<z.ZodTypeAny>["getLabel"] {
+        return labelGetter.bind(this);
+      },
+    },
+  );
+  Object.defineProperty(
+    z.ZodBranded.prototype,
+    "getBrand" satisfies keyof z.ZodBranded<z.ZodTypeAny, any>,
+    {
+      get(): z.ZodBranded<z.ZodTypeAny, any>["getBrand"] {
+        return brandGetter.bind(this);
       },
     },
   );
 }
-
-export const hasMeta = <T extends z.ZodTypeAny>(schema: T) =>
-  metaSymbol in schema._def && isObject(schema._def[metaSymbol]);
-
-export const getMeta = <T extends z.ZodTypeAny, K extends keyof Metadata<T>>(
-  schema: T,
-  meta: K,
-): Readonly<Metadata<T>[K]> | undefined =>
-  hasMeta(schema) ? schema._def[metaSymbol][meta] : undefined;
 
 export const copyMeta = <A extends z.ZodTypeAny, B extends z.ZodTypeAny>(
   src: A,
@@ -123,6 +167,3 @@ export const copyMeta = <A extends z.ZodTypeAny, B extends z.ZodTypeAny>(
   );
   return result;
 };
-
-export const isProprietary = (schema: z.ZodTypeAny, brand: ProprietaryBrand) =>
-  getMeta(schema, "brand") === brand;

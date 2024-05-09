@@ -1,4 +1,3 @@
-import { getMeta } from "../../src/metadata";
 import { z } from "zod";
 import { ez } from "../../src";
 import { describe, expect, test, vi } from "vitest";
@@ -9,7 +8,7 @@ describe("ez.upload()", () => {
     test("should create an instance", () => {
       const schema = ez.upload();
       expect(schema).toBeInstanceOf(z.ZodBranded);
-      expect(getMeta(schema, "brand")).toBe(ezUploadBrand);
+      expect(schema.getBrand()).toBe(ezUploadBrand);
     });
   });
 

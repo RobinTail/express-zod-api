@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { copyMeta, getMeta, hasMeta, metaSymbol } from "../../src/metadata";
+import { copyMeta, hasMeta, metaSymbol } from "../../src/metadata";
 import { describe, expect, test } from "vitest";
 
 describe("Metadata", () => {
@@ -48,6 +48,20 @@ describe("Metadata", () => {
     });
   });
 
+  describe(".getExamples()", () => {
+    test("should return undefined if examples are not set", () => {
+      expect(z.string().getExamples()).toBeUndefined();
+    });
+    test("should return the value that has been set", () => {
+      expect(z.string().example("test").getExamples()).toEqual(["test"]);
+    });
+    test("should return an array of examples", () => {
+      expect(
+        z.string().example("test1").example("test2").getExamples(),
+      ).toEqual(["test1", "test2"]);
+    });
+  });
+
   describe(".label()", () => {
     test("should set the corresponding metadata in the schema definition", () => {
       const schema = z
@@ -59,6 +73,18 @@ describe("Metadata", () => {
         "defaultLabel",
         "Today",
       );
+    });
+  });
+
+  describe(".brand()", () => {
+    test("should set the brand", () => {
+      expect(z.string().brand("test")._def[metaSymbol]?.brand).toEqual("test");
+    });
+  });
+
+  describe(".getBrand()", () => {
+    test("should return the assigned brand", () => {
+      expect(z.string().brand("test").getBrand()).toEqual("test");
     });
   });
 
@@ -79,31 +105,6 @@ describe("Metadata", () => {
     });
   });
 
-  describe("getMeta()", () => {
-    test("should return undefined on a regular Zod schema or the malformed one", () => {
-      expect(getMeta(z.string(), "examples")).toBeUndefined();
-    });
-    test("should return undefined on malformed schema", () => {
-      const schema1 = z.string();
-      const schema2 = z.string();
-      Object.defineProperty(schema1._def, metaSymbol, { value: null });
-      expect(getMeta(schema1, "examples")).toBeUndefined();
-      Object.defineProperty(schema2._def, metaSymbol, { value: 123 });
-      expect(getMeta(schema2, "examples")).toBeUndefined();
-    });
-    test("should return undefined if the value not set", () => {
-      expect(getMeta(z.string(), "examples")).toBeUndefined();
-    });
-    test("should return the value that has been set", () => {
-      expect(getMeta(z.string().example("test"), "examples")).toEqual(["test"]);
-    });
-    test("should return an array of examples", () => {
-      expect(
-        getMeta(z.string().example("test1").example("test2"), "examples"),
-      ).toEqual(["test1", "test2"]);
-    });
-  });
-
   describe("copyMeta()", () => {
     test("should return the same dest schema in case src one has no meta", () => {
       const src = z.string();
@@ -118,7 +119,7 @@ describe("Metadata", () => {
       const dest = z.number();
       const result = copyMeta(src, dest);
       expect(hasMeta(result)).toBeTruthy();
-      expect(getMeta(result, "examples")).toEqual(getMeta(src, "examples"));
+      expect(result.getExamples()).toEqual(src.getExamples());
     });
 
     test("should merge the meta from src to dest", () => {
@@ -133,7 +134,7 @@ describe("Metadata", () => {
         .example({ b: 789 });
       const result = copyMeta(src, dest);
       expect(hasMeta(result)).toBeTruthy();
-      expect(getMeta(result, "examples")).toEqual([
+      expect(result.getExamples()).toEqual([
         { a: "some", b: 123 },
         { a: "another", b: 123 },
         { a: "some", b: 456 },
@@ -155,7 +156,7 @@ describe("Metadata", () => {
         .example({ a: { c: 789 } });
       const result = copyMeta(src, dest);
       expect(hasMeta(result)).toBeTruthy();
-      expect(getMeta(result, "examples")).toEqual([
+      expect(result.getExamples()).toEqual([
         { a: { b: "some", c: 123 } },
         { a: { b: "another", c: 123 } },
         { a: { b: "some", c: 456 } },

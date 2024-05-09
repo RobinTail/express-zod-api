@@ -1,5 +1,8 @@
 import { z } from "zod";
 
+// @todo should be a better place for this
+import "./metadata"; // required to apply the plugin
+
 export const ezFileBrand = Symbol("File");
 
 const bufferSchema = z.custom<Buffer>((subject) => Buffer.isBuffer(subject), {

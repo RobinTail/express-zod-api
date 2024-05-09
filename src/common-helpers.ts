@@ -6,7 +6,6 @@ import { z } from "zod";
 import { CommonConfig, InputSource, InputSources } from "./config-type";
 import { InputValidationError, OutputValidationError } from "./errors";
 import { AbstractLogger } from "./logger";
-import { getMeta } from "./metadata";
 import { AuxMethod, Method } from "./method";
 import { contentTypes } from "./content-type";
 
@@ -130,7 +129,7 @@ export const getExamples = <
    * */
   validate?: boolean;
 }): ReadonlyArray<V extends "parsed" ? z.output<T> : z.input<T>> => {
-  const examples = getMeta(schema, "examples") || [];
+  const examples = schema.getExamples() || [];
   if (!validate && variant === "original") {
     return examples;
   }

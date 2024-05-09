@@ -62,7 +62,6 @@ import {
   andToOr,
   mapLogicalContainer,
 } from "./logical-container";
-import { getMeta } from "./metadata";
 import { Method } from "./method";
 import { RawSchema, ezRawBrand } from "./raw-schema";
 import {
@@ -132,7 +131,7 @@ export const depictDefault: Depicter<z.ZodDefault<z.ZodTypeAny>> = ({
   next,
 }) => ({
   ...next(schema._def.innerType),
-  default: getMeta(schema, "defaultLabel") || schema._def.defaultValue(),
+  default: schema.getLabel() || schema._def.defaultValue(),
 });
 
 export const depictCatch: Depicter<z.ZodCatch<z.ZodTypeAny>> = ({
