@@ -17,12 +17,15 @@
     - Restricting the upload can be achieved now by throwing an error from within.
   - Changed interface for `ez.raw()`: additional properties should be supplied as its argument, not via `.extend()`.
 - Features:
+  - New minimal logging level `info` (higher than `debug`, but lower than `warn`);
   - Selective parsers equipped with a child logger:
     - There are 3 types of endpoints depending on their input schema: having `ez.upload()`, having `ez.raw()`, others;
     - Depending on that type, only the parsers needed for certain endpoint are processed;
     - This makes all requests eligible for the assigned parsers and reverts changes made in [v18.5.2](#v1852).
 - Non-breaking significant changes:
-  - Request logging reflects the actual path instead of the configured route, and it's placed in front of parsing;
+  - Request logging reflects the actual path instead of the configured route, and it's placed in front of parsing:
+    - The severity of those messaged reduced from `info` to `debug`;
+  - The debug messages from uploader are enabled by default when the logger level is set to `debug`;
   - Specifying `rawParser` in config is no longer needed to enable the feature.
 - How to migrate confidently:
   - Upgrade Node to latest version of 18.x, 20.x or 22.x;
