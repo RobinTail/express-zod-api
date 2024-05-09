@@ -31,6 +31,6 @@ export const upload = () =>
         message: `Expected file upload, received ${typeof input}`,
       }),
     )
-    .brand(ezUploadBrand);
+    .brand(ezUploadBrand as symbol);
 
 export type UploadSchema = ReturnType<typeof upload>;

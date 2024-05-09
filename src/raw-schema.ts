@@ -8,6 +8,6 @@ export const raw = <S extends z.ZodRawShape>(extra: S = {} as S) =>
   z
     .object({ raw: file("buffer") })
     .extend(extra)
-    .brand(ezRawBrand);
+    .brand(ezRawBrand as symbol);
 
 export type RawSchema = ReturnType<typeof raw>;

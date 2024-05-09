@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "scripts": {
     "test": "tsc -p tsconfig.json",
-    "posttest": "rm quick-start.d.ts"
+    "posttest": "rm *.d.ts"
   },
   "dependencies": {
     "express-zod-api": "link:../.."

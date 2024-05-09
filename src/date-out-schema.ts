@@ -8,6 +8,6 @@ export const dateOut = () =>
     .date()
     .refine(isValidDate)
     .transform((date) => date.toISOString())
-    .brand(ezDateOutBrand);
+    .brand(ezDateOutBrand as symbol);
 
 export type DateOutSchema = ReturnType<typeof dateOut>;
