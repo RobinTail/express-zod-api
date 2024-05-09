@@ -12,5 +12,6 @@ export default defineConfig({
       reporter: [["text", { maxCols: 120 }], "json-summary", "html", "lcov"],
       include: ["src/**"],
     },
+    setupFiles: ["./vitest.setup.ts"],
   },
 });
