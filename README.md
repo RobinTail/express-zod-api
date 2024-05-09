@@ -998,20 +998,13 @@ defaultEndpointsFactory.build({
 ## Accepting raw data
 
 Some APIs may require an endpoint to be able to accept and process raw data, such as streaming or uploading a binary
-file as an entire body of request. In order to enable this feature you need to set the `rawParser` config feature to
-`express.raw()`. See also its options [in Express.js documentation](https://expressjs.com/en/4x/api.html#express.raw).
-The raw data is placed into `request.body.raw` property, having type `Buffer`. Then use the proprietary `ez.raw()`
-schema as the input schema of your endpoint.
+file as an entire body of request. Use the proprietary `ez.raw()` schema as the input schema of your endpoint.
+The default parser in this case is `express.raw()`. You can customize it by assigning the `rawParser` option in config.
+The raw data is placed into `request.body.raw` property, having type `Buffer`.
 
 ```typescript
 import express from "express";
-import { createConfig, defaultEndpointsFactory, ez } from "express-zod-api";
-
-const config = createConfig({
-  server: {
-    rawParser: express.raw(), // enables the feature
-  },
-});
+import { defaultEndpointsFactory, ez } from "express-zod-api";
 
 const rawAcceptingEndpoint = defaultEndpointsFactory.build({
   method: "post",
