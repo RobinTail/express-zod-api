@@ -1003,7 +1003,6 @@ The default parser in this case is `express.raw()`. You can customize it by assi
 The raw data is placed into `request.body.raw` property, having type `Buffer`.
 
 ```typescript
-import express from "express";
 import { defaultEndpointsFactory, ez } from "express-zod-api";
 
 const rawAcceptingEndpoint = defaultEndpointsFactory.build({
