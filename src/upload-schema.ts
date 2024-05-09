@@ -1,7 +1,7 @@
 import type { UploadedFile } from "express-fileupload";
 import { z } from "zod";
 
-export const ezUploadBrand = Symbol.for("Upload");
+export const ezUploadBrand = Symbol("Upload");
 
 export const upload = () =>
   z

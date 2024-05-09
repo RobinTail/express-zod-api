@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { isValidDate } from "./schema-helpers";
 
-export const ezDateInBrand = Symbol.for("DateIn");
+export const ezDateInBrand = Symbol("DateIn");
 
 export const dateIn = () => {
   const schema = z.union([

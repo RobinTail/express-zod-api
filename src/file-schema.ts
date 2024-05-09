@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const ezFileBrand = Symbol.for("File");
+export const ezFileBrand = Symbol("File");
 
 const bufferSchema = z.custom<Buffer>((subject) => Buffer.isBuffer(subject), {
   message: "Expected Buffer",

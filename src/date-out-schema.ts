@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { isValidDate } from "./schema-helpers";
 
-export const ezDateOutBrand = Symbol.for("DateOut");
+export const ezDateOutBrand = Symbol("DateOut");
 
 export const dateOut = () =>
   z
