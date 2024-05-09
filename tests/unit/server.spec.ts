@@ -5,6 +5,7 @@ import {
   compressionMock,
   expressJsonMock,
   expressMock,
+  expressRawMock,
 } from "../express-mock";
 import {
   createHttpsServerSpy,
@@ -85,7 +86,7 @@ describe("Server", () => {
       expect(httpListenSpy).toHaveBeenCalledWith(port, expect.any(Function));
     });
 
-    test("Should create server with custom JSON parser, logger, error handler and beforeRouting", async () => {
+    test("Should create server with custom JSON parser, raw parser, logger, error handler and beforeRouting", async () => {
       const customLogger = createLogger({ level: "silent" });
       const infoMethod = vi.spyOn(customLogger, "info");
       const port = givePort();
@@ -93,6 +94,7 @@ describe("Server", () => {
         server: {
           listen: { port }, // testing Net::ListenOptions
           jsonParser: vi.fn(),
+          rawParser: vi.fn(),
           beforeRouting: vi.fn(),
         },
         cors: true,
@@ -102,9 +104,10 @@ describe("Server", () => {
         },
         logger: customLogger,
       };
+      const factory = new EndpointsFactory(defaultResultHandler);
       const routingMock = {
         v1: {
-          test: new EndpointsFactory(defaultResultHandler).build({
+          test: factory.build({
             methods: ["get", "post"],
             input: z.object({
               n: z.number(),
@@ -112,6 +115,12 @@ describe("Server", () => {
             output: z.object({
               b: z.boolean(),
             }),
+            handler: vi.fn(),
+          }),
+          raw: factory.build({
+            method: "patch",
+            input: ez.raw(),
+            output: z.object({}),
             handler: vi.fn(),
           }),
         },
@@ -143,10 +152,23 @@ describe("Server", () => {
         configMock.server.jsonParser,
         expect.any(Function), // endpoint
       );
-      expect(appMock.options).toHaveBeenCalledTimes(1);
+      expect(appMock.patch).toHaveBeenCalledTimes(1);
+      expect(appMock.patch).toHaveBeenCalledWith(
+        "/v1/raw",
+        configMock.server.rawParser,
+        moveRaw,
+        expect.any(Function), // endpoint
+      );
+      expect(appMock.options).toHaveBeenCalledTimes(2);
       expect(appMock.options).toHaveBeenCalledWith(
         "/v1/test",
         configMock.server.jsonParser,
+        expect.any(Function), // endpoint
+      );
+      expect(appMock.options).toHaveBeenCalledWith(
+        "/v1/raw",
+        configMock.server.rawParser,
+        moveRaw,
         expect.any(Function), // endpoint
       );
       expect(httpListenSpy).toHaveBeenCalledTimes(1);
@@ -258,11 +280,9 @@ describe("Server", () => {
     });
 
     test("should enable raw on request", async () => {
-      const rawParserMock = vi.fn();
       const configMock = {
         server: {
           listen: givePort(),
-          rawParser: rawParserMock,
         },
         cors: true,
         startupLogo: false,
@@ -283,7 +303,7 @@ describe("Server", () => {
       expect(appMock.get).toHaveBeenCalledTimes(1);
       expect(appMock.get).toHaveBeenCalledWith(
         "/v1/test",
-        rawParserMock,
+        expressRawMock,
         moveRaw,
         expect.any(Function), // endpoint
       );
