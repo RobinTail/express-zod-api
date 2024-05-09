@@ -42,7 +42,6 @@ export type { LoggerOverrides } from "./logger";
 export type { FlatObject } from "./common-helpers";
 export type { Method } from "./method";
 export type { IOSchema } from "./io-schema";
-export type { Metadata } from "./metadata";
 export type { CommonConfig, AppConfig, ServerConfig } from "./config-type";
 export type { MiddlewareDefinition } from "./middleware";
 export type { ResultHandlerDefinition } from "./result-handler";
