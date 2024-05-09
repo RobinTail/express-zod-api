@@ -4,8 +4,8 @@ import { clone, mergeDeepRight } from "ramda";
 
 export const metaSymbol = Symbol.for("express-zod-api");
 
-export interface Metadata<T extends z.ZodTypeAny> {
-  examples: z.input<T>[];
+export interface Metadata {
+  examples: unknown[];
   /** @override ZodDefault::_def.defaultValue() in depictDefault */
   defaultLabel?: string;
   brand?: string | number | symbol;
@@ -15,7 +15,7 @@ export interface Metadata<T extends z.ZodTypeAny> {
 export const cloneSchema = <T extends z.ZodType>(schema: T) => {
   const copy = schema.describe(schema.description as string);
   copy._def[metaSymbol] = // clone for deep copy, issue #827
-    clone(copy._def[metaSymbol]) || ({ examples: [] } satisfies Metadata<T>);
+    clone(copy._def[metaSymbol]) || ({ examples: [] } satisfies Metadata);
   return copy;
 };
 

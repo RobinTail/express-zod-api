@@ -14,7 +14,7 @@ import { Metadata, cloneSchema, metaSymbol } from "./metadata";
 
 declare module "zod" {
   interface ZodTypeDef {
-    [metaSymbol]?: Metadata<z.ZodTypeAny>;
+    [metaSymbol]?: Metadata;
   }
   interface ZodType {
     /** @desc Add an example value (before any transformations, can be called multiple times) */
