@@ -108,7 +108,7 @@ describe("Logger", () => {
     test.each([
       { level: "silent" },
       { level: "debug", color: false },
-      { level: "warn", color: true },
+      { level: "info", color: true },
       { level: "warn", depth: 5 },
       { level: "warn", depth: null },
       { level: "warn", depth: Infinity },
