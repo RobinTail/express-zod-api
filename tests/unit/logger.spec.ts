@@ -48,6 +48,14 @@ describe("Logger", () => {
       expect(logSpy.mock.calls).toMatchSnapshot();
     });
 
+    test("Should create info logger", () => {
+      const { logger, logSpy } = makeLogger({ level: "info", color: false });
+      logger.debug("testing debug message");
+      expect(logSpy).not.toHaveBeenCalled();
+      logger.warn("testing warn message");
+      expect(logSpy).toHaveBeenCalledTimes(1);
+    });
+
     test.each(["debug", "info", "warn", "error"] as const)(
       "Should create debug logger %#",
       (method) => {
