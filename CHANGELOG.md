@@ -15,6 +15,7 @@
   - Changed the `ServerConfig` option `server.upload.beforeUpload`:
     - The assigned function now accepts `request` instead of `app` and being called only for eligible requests;
     - Restricting the upload can be achieved now by throwing an error from within.
+  - Changed interface for `ez.raw()`: additional properties should be supplied as its argument, not via `.extend()`.
 - Features:
   - Selective parsers equipped with a child logger:
     - There are 3 types of endpoints depending on their input schema: having `ez.upload()`, having `ez.raw()`, others;
@@ -28,6 +29,8 @@
   - Avoid mutating the readonly arrays;
   - If you're using ~~`withMeta()`~~:
     - Remove it and unwrap your schemas — you can use `.example()` method directly.
+  - If you're using `ez.raw().extend()` for additional properties:
+    - Supply them directly as an argument to `ez.raw()` — see the example below.
   - If you're using `beforeUpload` in your config:
     - Adjust the implementation according to the example below.
 
@@ -60,6 +63,19 @@ const after = createConfig({
       },
     },
   },
+});
+```
+
+```ts
+import { z } from "zod";
+import { ez } from "express-zod-api";
+
+const before = ez.raw().extend({
+  pathParameter: z.string(),
+});
+
+const after = ez.raw({
+  pathParameter: z.string(),
 });
 ```
 
