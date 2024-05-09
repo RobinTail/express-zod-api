@@ -10,7 +10,7 @@
 
 import { clone } from "ramda";
 import { z } from "zod";
-import { Metadata, cloneSchema, hasMeta, metaSymbol } from "./metadata";
+import { Metadata, cloneSchema, metaSymbol } from "./metadata";
 
 declare module "zod" {
   interface ZodTypeDef {

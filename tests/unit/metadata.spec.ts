@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { copyMeta, hasMeta, metaSymbol } from "../../src/metadata";
+import { copyMeta, metaSymbol } from "../../src/metadata";
 import { describe, expect, test } from "vitest";
 
 describe("Metadata", () => {
@@ -68,37 +68,20 @@ describe("Metadata", () => {
     });
   });
 
-  describe("hasMeta()", () => {
-    test("should return false if the schema definition has no meta prop", () => {
-      expect(hasMeta(z.string())).toBeFalsy();
-    });
-    test("should return false if the meta prop has invalid type", () => {
-      const schema1 = z.string();
-      const schema2 = z.string();
-      Object.defineProperty(schema1._def, metaSymbol, { value: null });
-      expect(hasMeta(schema1)).toBeFalsy();
-      Object.defineProperty(schema2._def, metaSymbol, { value: 123 });
-      expect(hasMeta(schema2)).toBeFalsy();
-    });
-    test("should return true if proprietary method has been used", () => {
-      expect(hasMeta(z.string().example(""))).toBeTruthy();
-    });
-  });
-
   describe("copyMeta()", () => {
     test("should return the same dest schema in case src one has no meta", () => {
       const src = z.string();
       const dest = z.number();
       const result = copyMeta(src, dest);
       expect(result).toEqual(dest);
-      expect(hasMeta(result)).toBeFalsy();
-      expect(hasMeta(dest)).toBeFalsy();
+      expect(result._def[metaSymbol]).toBeFalsy();
+      expect(dest._def[metaSymbol]).toBeFalsy();
     });
     test("should copy meta from src to dest in case meta is defined", () => {
       const src = z.string().example("some");
       const dest = z.number();
       const result = copyMeta(src, dest);
-      expect(hasMeta(result)).toBeTruthy();
+      expect(result._def[metaSymbol]).toBeTruthy();
       expect(result._def[metaSymbol]?.examples).toEqual(
         src._def[metaSymbol]?.examples,
       );
@@ -115,7 +98,7 @@ describe("Metadata", () => {
         .example({ b: 456 })
         .example({ b: 789 });
       const result = copyMeta(src, dest);
-      expect(hasMeta(result)).toBeTruthy();
+      expect(result._def[metaSymbol]).toBeTruthy();
       expect(result._def[metaSymbol]?.examples).toEqual([
         { a: "some", b: 123 },
         { a: "another", b: 123 },
@@ -137,7 +120,7 @@ describe("Metadata", () => {
         .example({ a: { c: 456 } })
         .example({ a: { c: 789 } });
       const result = copyMeta(src, dest);
-      expect(hasMeta(result)).toBeTruthy();
+      expect(result._def[metaSymbol]).toBeTruthy();
       expect(result._def[metaSymbol]?.examples).toEqual([
         { a: { b: "some", c: 123 } },
         { a: { b: "another", c: 123 } },

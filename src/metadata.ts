@@ -1,4 +1,4 @@
-import { combinations, isObject } from "./common-helpers";
+import { combinations } from "./common-helpers";
 import { z } from "zod";
 import { clone, mergeDeepRight } from "ramda";
 
@@ -10,9 +10,6 @@ export interface Metadata<T extends z.ZodTypeAny> {
   defaultLabel?: string;
   brand?: string | number | symbol;
 }
-
-export const hasMeta = <T extends z.ZodTypeAny>(schema: T) =>
-  metaSymbol in schema._def && isObject(schema._def[metaSymbol]);
 
 /** @link https://github.com/colinhacks/zod/blob/3e4f71e857e75da722bd7e735b6d657a70682df2/src/types.ts#L485 */
 export const cloneSchema = <T extends z.ZodType>(schema: T) => {
