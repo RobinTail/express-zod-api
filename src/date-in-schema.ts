@@ -13,7 +13,7 @@ export const dateIn = () => {
   return schema
     .transform((str) => new Date(str))
     .pipe(z.date().refine(isValidDate))
-    .brand(ezDateInBrand);
+    .brand(ezDateInBrand as symbol);
 };
 
 export type DateInSchema = ReturnType<typeof dateIn>;
