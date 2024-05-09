@@ -253,6 +253,7 @@ describe("Server helpers", () => {
       });
       expect(fileUploadMock).toHaveBeenCalledTimes(1);
       expect(fileUploadMock).toHaveBeenCalledWith({
+        debug: true,
         abortOnLimit: false,
         parseNested: true,
         limits: { fileSize: 1024 },

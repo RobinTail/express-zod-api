@@ -13,7 +13,6 @@ export const config = createConfig({
   server: {
     listen: 8090,
     upload: {
-      debug: true,
       limits: { fileSize: 51200 },
       limitError: createHttpError(413, "The file is too large"), // affects uploadAvatarEndpoint
     },
