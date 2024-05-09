@@ -28,9 +28,11 @@ export type SchemaHandler<
   Variant extends HandlingVariant = "regular",
 > = (params: SchemaHandlingProps<T, U, Context, Variant>) => U;
 
+export type CustomBrand = string | symbol;
+
 export type HandlingRules<U, Context extends FlatObject = {}> = Partial<
   Record<
-    z.ZodFirstPartyTypeKind | ProprietaryBrand,
+    z.ZodFirstPartyTypeKind | ProprietaryBrand | CustomBrand,
     SchemaHandler<any, U, Context> // keeping "any" here in order to avoid excessive complexity
   >
 >;

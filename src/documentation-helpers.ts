@@ -102,6 +102,7 @@ interface ReqResDepictHelperCommonProps
   mimeTypes: ReadonlyArray<string>;
   composition: "inline" | "components";
   description?: string;
+  customBrands?: HandlingRules<SchemaObject | ReferenceObject, OpenAPIContext>;
 }
 
 const shortDescriptionLimit = 50;
@@ -700,6 +701,7 @@ export const depictRequestParams = ({
   getRef,
   makeRef,
   composition,
+  customBrands,
   description = `${method.toUpperCase()} ${path} Parameter`,
 }: Omit<ReqResDepictHelperCommonProps, "mimeTypes"> & {
   inputSources: InputSource[];
@@ -727,7 +729,7 @@ export const depictRequestParams = ({
       const depicted = walkSchema({
         schema: shape[name],
         isResponse: false,
-        rules: depicters,
+        rules: { ...depicters, ...customBrands },
         onEach,
         onMissing,
         serializer,
@@ -884,6 +886,7 @@ export const depictResponse = ({
   composition,
   hasMultipleStatusCodes,
   statusCode,
+  customBrands,
   description = `${method.toUpperCase()} ${path} ${ucFirst(variant)} response ${
     hasMultipleStatusCodes ? statusCode : ""
   }`.trim(),
@@ -896,7 +899,7 @@ export const depictResponse = ({
     walkSchema({
       schema,
       isResponse: true,
-      rules: depicters,
+      rules: { ...depicters, ...customBrands },
       onEach,
       onMissing,
       serializer,
@@ -1028,6 +1031,7 @@ export const depictRequest = ({
   getRef,
   makeRef,
   composition,
+  customBrands,
   description = `${method.toUpperCase()} ${path} Request body`,
 }: ReqResDepictHelperCommonProps): RequestBodyObject => {
   const pathParams = getRoutePathParams(path);
@@ -1036,7 +1040,7 @@ export const depictRequest = ({
       walkSchema({
         schema,
         isResponse: false,
-        rules: depicters,
+        rules: { ...depicters, ...customBrands },
         onEach,
         onMissing,
         serializer,

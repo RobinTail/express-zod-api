@@ -18,6 +18,7 @@ import { CommonConfig } from "./config-type";
 import { mapLogicalContainer } from "./logical-container";
 import { Method } from "./method";
 import {
+  OpenAPIContext,
   depictRequest,
   depictRequestParams,
   depictResponse,
@@ -29,6 +30,7 @@ import {
 } from "./documentation-helpers";
 import { Routing } from "./routing";
 import { RoutingWalkerParams, walkRouting } from "./routing-walker";
+import { HandlingRules } from "./schema-walker";
 
 type Component =
   | "positiveResponse"
@@ -64,6 +66,7 @@ interface DocumentationParams {
    * @default JSON.stringify() + SHA1 hash as a hex digest
    * */
   serializer?: (schema: z.ZodTypeAny) => string;
+  customBrands?: HandlingRules<SchemaObject | ReferenceObject, OpenAPIContext>;
 }
 
 export class Documentation extends OpenApiBuilder {
@@ -132,6 +135,7 @@ export class Documentation extends OpenApiBuilder {
     version,
     serverUrl,
     descriptions,
+    customBrands,
     hasSummaryFromDescription = true,
     composition = "inline",
     serializer = defaultSerializer,
@@ -153,6 +157,7 @@ export class Documentation extends OpenApiBuilder {
         endpoint,
         composition,
         serializer,
+        customBrands,
         getRef: this.getRef.bind(this),
         makeRef: this.makeRef.bind(this),
       };

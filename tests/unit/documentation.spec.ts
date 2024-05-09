@@ -1270,4 +1270,36 @@ describe("Documentation", () => {
       expect(spec).toMatchSnapshot();
     });
   });
+
+  describe("Feature #1470: Custom brands", () => {
+    test("should be handled accordingly in request, response and params", () => {
+      const spec = new Documentation({
+        config: sampleConfig,
+        routing: {
+          v1: {
+            ":name": defaultEndpointsFactory.build({
+              method: "get",
+              input: z.object({
+                name: z.string().brand("CUSTOM"),
+                other: z.boolean().brand("CUSTOM"),
+              }),
+              output: z.object({
+                test: z.number().brand("CUSTOM"),
+              }),
+              handler: vi.fn(),
+            }),
+          },
+        },
+        customBrands: {
+          CUSTOM: () => ({
+            summary: "My custom schema",
+          }),
+        },
+        version: "3.4.5",
+        title: "Testing custom brands handling",
+        serverUrl: "https://example.com",
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
+    });
+  });
 });
