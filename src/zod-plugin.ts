@@ -1,3 +1,13 @@
+/**
+ * @fileoverview Zod Runtime Plugin
+ * @see https://github.com/colinhacks/zod/blob/90efe7fa6135119224412c7081bd12ef0bccef26/plugin/effect/src/index.ts#L21-L31
+ * @desc This code modifies and extends zod's functionality immediately when importing express-zod-api
+ * @desc Enables .examples() and .getExamples() on all schemas (ZodType)
+ * @desc Enables .label() and .getLabel() on ZodDefault
+ * @desc Enables .getBrand() on ZodBranded (runtime distinguishable branded types)
+ * */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 import { clone } from "ramda";
 import { z } from "zod";
 import { Metadata, cloneSchema, hasMeta, metaSymbol } from "./metadata";
@@ -12,7 +22,6 @@ declare module "zod" {
     /** @desc Returns the previously assigned examples */
     getExamples(): z.input<this>[] | undefined;
   }
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   interface ZodDefault<T extends z.ZodTypeAny> {
     /** @desc Change the default value in the generated Documentation to a label */
     label(label: string): this;
@@ -20,7 +29,6 @@ declare module "zod" {
     getLabel(): string | undefined;
   }
   interface ZodBranded<
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     T extends z.ZodTypeAny,
     B extends string | number | symbol,
   > {
@@ -69,7 +77,6 @@ const brandGetter = function (this: z.ZodBranded<z.ZodTypeAny, any>) {
   return hasMeta(this) ? this._def[metaSymbol]!.brand : undefined;
 };
 
-/** @see https://github.com/colinhacks/zod/blob/90efe7fa6135119224412c7081bd12ef0bccef26/plugin/effect/src/index.ts#L21-L31 */
 if (!(metaSymbol in globalThis)) {
   (globalThis as Record<symbol, unknown>)[metaSymbol] = true;
   Object.defineProperties(z.ZodType.prototype, {
