@@ -1,6 +1,6 @@
 import { expectNotType, expectType } from "tsd";
 import { z } from "zod";
-import { IOSchema, createMiddleware } from "../../src";
+import { IOSchema, createMiddleware, ez } from "../../src";
 import { getFinalEndpointInputSchema } from "../../src/io-schema";
 import { getMeta } from "../../src/metadata";
 import { AnyMiddlewareDef } from "../../src/middleware";
@@ -15,6 +15,10 @@ describe("I/O Schema and related helpers", () => {
       expectType<IOSchema<"strict">>(z.object({}).strict());
       expectType<IOSchema<"passthrough">>(z.object({}).passthrough());
       expectType<IOSchema<"strip">>(z.object({}).strip());
+    });
+    test("accepts ez.raw()", () => {
+      expectType<IOSchema>(ez.raw());
+      expectType<IOSchema>(ez.raw({ something: z.any() }));
     });
     test("respects the UnknownKeys type argument", () => {
       expectNotType<IOSchema<"passthrough">>(z.object({}));
