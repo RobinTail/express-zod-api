@@ -152,6 +152,12 @@ describe("Documentation helpers", () => {
       expect(serializeSchemaForTest(subject)).toMatchSnapshot();
     });
 
+    test("should support ez.raw()", () => {
+      const subject = extractObjectSchema(ez.raw(), tfError);
+      expect(subject).toBeInstanceOf(z.ZodObject);
+      expect(serializeSchemaForTest(subject)).toMatchSnapshot();
+    });
+
     describe("Feature #600: Top level refinements", () => {
       test("should handle refined object schema", () => {
         const subject = extractObjectSchema(
