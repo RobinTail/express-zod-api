@@ -72,52 +72,36 @@ const brandGetter = function (this: z.ZodBranded<z.ZodTypeAny, any>) {
 /** @see https://github.com/colinhacks/zod/blob/90efe7fa6135119224412c7081bd12ef0bccef26/plugin/effect/src/index.ts#L21-L31 */
 if (!(metaSymbol in globalThis)) {
   (globalThis as Record<symbol, unknown>)[metaSymbol] = true;
-  Object.defineProperty(
-    z.ZodType.prototype,
-    "example" satisfies keyof z.ZodType,
-    {
+  Object.defineProperties(z.ZodType.prototype, {
+    ["example" satisfies keyof z.ZodType]: {
       get(): z.ZodType["example"] {
         return exampleSetter.bind(this);
       },
     },
-  );
-  Object.defineProperty(
-    z.ZodType.prototype,
-    "getExamples" satisfies keyof z.ZodType,
-    {
+    ["getExamples" satisfies keyof z.ZodType]: {
       get(): z.ZodType["getExamples"] {
         return examplesGetter.bind(this);
       },
     },
-  );
-  Object.defineProperty(
-    z.ZodType.prototype,
-    "brand" satisfies keyof z.ZodType,
-    {
+    ["brand" satisfies keyof z.ZodType]: {
       set() {}, // this is required to override the existing method
       get() {
         return brandSetter.bind(this) as z.ZodType["brand"];
       },
     },
-  );
-  Object.defineProperty(
-    z.ZodDefault.prototype,
-    "label" satisfies keyof z.ZodDefault<z.ZodTypeAny>,
-    {
+  });
+  Object.defineProperties(z.ZodDefault.prototype, {
+    ["label" satisfies keyof z.ZodDefault<z.ZodTypeAny>]: {
       get(): z.ZodDefault<z.ZodTypeAny>["label"] {
         return labelSetter.bind(this);
       },
     },
-  );
-  Object.defineProperty(
-    z.ZodDefault.prototype,
-    "getLabel" satisfies keyof z.ZodDefault<z.ZodTypeAny>,
-    {
+    ["getLabel" satisfies keyof z.ZodDefault<z.ZodTypeAny>]: {
       get(): z.ZodDefault<z.ZodTypeAny>["getLabel"] {
         return labelGetter.bind(this);
       },
     },
-  );
+  });
   Object.defineProperty(
     z.ZodBranded.prototype,
     "getBrand" satisfies keyof z.ZodBranded<z.ZodTypeAny, any>,
