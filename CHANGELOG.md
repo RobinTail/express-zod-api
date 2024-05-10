@@ -4,14 +4,86 @@
 
 ### v19.0.0
 
-- Minimum supported versions:
-  - Node: 18.18.0 or 20.9.0,
-  - `zod`: 3.23.0.
-- The deprecated ~~`withMeta()`~~ is removed:
-  - See the changes to [v18.5.0](#v1850) on details.
-- Several public methods and properties exposing arrays from class instances made readonly and frozen:
-  - On `Endpoint`: `.getMethods()`, `.getMimeTypes()`, `.getResponses()`, `.getScopes()`, `.getTags()`,
-  - On `DependsOnMethod`: `.pairs`, `.siblingMethods`.
+- **Breaking changes**:
+  - Increased minimum supported versions:
+    - Node: 18.18.0 or 20.9.0;
+    - `zod`: 3.23.0.
+  - Removed the deprecated ~~`withMeta()`~~ is removed (see [v18.5.0](#v1850) for details);
+  - Freezed the arrays returned by the following methods or exposed by properties that supposed to be readonly:
+    - For `Endpoint` class: `getMethods()`, `getMimeTypes()`, `getResponses()`, `getScopes()`, `getTags()`;
+    - For `DependsOnMethod` class: `pairs`, `siblingMethods`.
+  - Changed the `ServerConfig` option `server.upload.beforeUpload`:
+    - The assigned function now accepts `request` instead of `app` and being called only for eligible requests;
+    - Restricting the upload can be achieved now by throwing an error from within.
+  - Changed interface for `ez.raw()`: additional properties should be supplied as its argument, not via `.extend()`.
+- Features:
+  - New configurable level `info` for built-in logger (higher than `debug`, but lower than `warn`);
+  - Selective parsers equipped with a child logger:
+    - There are 3 types of endpoints depending on their input schema: having `ez.upload()`, having `ez.raw()`, others;
+    - Depending on that type, only the parsers needed for certain endpoint are processed;
+    - This makes all requests eligible for the assigned parsers and reverts changes made in [v18.5.2](#v1852).
+- Non-breaking significant changes:
+  - Request logging reflects the actual path instead of the configured route, and it's placed in front of parsing:
+    - The severity of those messaged reduced from `info` to `debug`;
+  - The debug messages from uploader are enabled by default when the logger level is set to `debug`;
+  - Specifying `rawParser` in config is no longer needed to enable the feature.
+- How to migrate confidently:
+  - Upgrade Node to latest version of 18.x, 20.x or 22.x;
+  - Upgrade `zod` to its latest version of 3.x;
+  - Avoid mutating the readonly arrays;
+  - If you're using ~~`withMeta()`~~:
+    - Remove it and unwrap your schemas — you can use `.example()` method directly.
+  - If you're using `ez.raw().extend()` for additional properties:
+    - Supply them directly as an argument to `ez.raw()` — see the example below.
+  - If you're using `beforeUpload` in your config:
+    - Adjust the implementation according to the example below.
+  - If you're having `rawParser: express.raw()` in your config:
+    - You can now remove this line (it's the default value now), unless you're having any customizations.
+
+```ts
+import createHttpError from "http-errors";
+import { createConfig } from "express-zod-api";
+
+const before = createConfig({
+  server: {
+    upload: {
+      beforeUpload: ({ app, logger }) => {
+        app.use((req, res, next) => {
+          if (req.is("multipart/form-data") && !canUpload(req)) {
+            return next(createHttpError(403, "Not authorized"));
+          }
+          next();
+        });
+      },
+    },
+  },
+});
+
+const after = createConfig({
+  server: {
+    upload: {
+      beforeUpload: ({ request, logger }) => {
+        if (!canUpload(request)) {
+          throw createHttpError(403, "Not authorized");
+        }
+      },
+    },
+  },
+});
+```
+
+```ts
+import { z } from "zod";
+import { ez } from "express-zod-api";
+
+const before = ez.raw().extend({
+  pathParameter: z.string(),
+});
+
+const after = ez.raw({
+  pathParameter: z.string(),
+});
+```
 
 ## Version 18
 

@@ -5,5 +5,16 @@
     "moduleResolution": "Bundler",
     "resolveJsonModule": true
   },
-  "include": ["src", "example", "tests/unit", "tests/system", "tests/bench", "tests/*.ts", "tools", "*.config.ts", "eslint.config.js"]
+  "include": [
+    "src",
+    "example",
+    "tests/unit",
+    "tests/system",
+    "tests/bench",
+    "tests/*.ts",
+    "tools",
+    "*.config.ts",
+    "*.setup.ts",
+    "eslint.config.js"
+  ],
 }

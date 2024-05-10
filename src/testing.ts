@@ -3,8 +3,9 @@ import http from "node:http";
 import { CommonConfig } from "./config-type";
 import { AbstractEndpoint } from "./endpoint";
 import { AbstractLogger } from "./logger";
-import { mimeJson } from "./mime";
+import { contentTypes } from "./content-type";
 import { loadAlternativePeer } from "./peer-helpers";
+import { LocalResponse } from "./server-helpers";
 
 /**
  * @desc Using module augmentation approach you can set the Mock type of your actual testing framework.
@@ -25,7 +26,7 @@ export const makeRequestMock = <REQ extends Record<string, any>>({
 }) =>
   ({
     method: "GET",
-    header: fnMethod(() => mimeJson),
+    header: fnMethod(() => contentTypes.json),
     ...requestProps,
   }) as { method: string } & Record<"header", MockOverrides> & REQ;
 
@@ -54,11 +55,13 @@ export const makeResponseMock = <RES extends Record<string, any>>({
       responseMock.writableEnded = true;
       return responseMock;
     }),
+    locals: {},
     ...responseProps,
   } as {
     writableEnded: boolean;
     statusCode: number;
     statusMessage: string;
+    locals: LocalResponse["locals"];
   } & Record<
     "set" | "setHeader" | "header" | "status" | "json" | "send" | "end",
     MockOverrides

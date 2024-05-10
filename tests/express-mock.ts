@@ -2,6 +2,7 @@
 import { Mock, vi } from "vitest";
 
 const expressJsonMock = vi.fn();
+const expressRawMock = vi.fn();
 const compressionMock = vi.fn();
 const fileUploadMock = vi.fn();
 
@@ -30,6 +31,7 @@ const expressMock = () => {
   return appMock;
 };
 expressMock.json = () => expressJsonMock;
+expressMock.raw = () => expressRawMock;
 expressMock.static = staticMock;
 
 vi.mock("express", () => ({ default: expressMock }));
@@ -40,6 +42,7 @@ export {
   expressMock,
   appMock,
   expressJsonMock,
+  expressRawMock,
   staticMock,
   staticHandler,
 };

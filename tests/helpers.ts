@@ -1,5 +1,6 @@
 import { map } from "ramda";
 import { z } from "zod";
+import { ezFileBrand } from "../src/file-schema";
 import { SchemaHandler, walkSchema } from "../src/schema-walker";
 
 let lastGivenPort = 8010;
@@ -82,6 +83,7 @@ export const serializeSchemaForTest = (
         from: next(schema._def.in),
         to: next(schema._def.out),
       }),
+      [ezFileBrand]: () => ({ brand: ezFileBrand }),
     },
     onEach: ({ schema }) => ({ _type: schema._def.typeName }),
     onMissing: ({ schema }) => {

@@ -1,14 +1,15 @@
 import { z } from "zod";
-import { getMeta } from "../../src/metadata";
+import { ezDateOutBrand } from "../../src/date-out-schema";
 import { ez } from "../../src";
 import { describe, expect, test } from "vitest";
+import { metaSymbol } from "../../src/metadata";
 
 describe("ez.dateOut()", () => {
   describe("creation", () => {
     test("should create an instance", () => {
       const schema = ez.dateOut();
-      expect(schema).toBeInstanceOf(z.ZodEffects);
-      expect(getMeta(schema, "kind")).toEqual("DateOut");
+      expect(schema).toBeInstanceOf(z.ZodBranded);
+      expect(schema._def[metaSymbol]?.brand).toEqual(ezDateOutBrand);
     });
   });
 

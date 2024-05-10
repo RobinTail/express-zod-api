@@ -6,16 +6,16 @@ import { z } from "zod";
 import { CommonConfig, InputSource, InputSources } from "./config-type";
 import { InputValidationError, OutputValidationError } from "./errors";
 import { AbstractLogger } from "./logger";
-import { getMeta } from "./metadata";
+import { metaSymbol } from "./metadata";
 import { AuxMethod, Method } from "./method";
-import { mimeMultipart } from "./mime";
+import { contentTypes } from "./content-type";
 
 export type FlatObject = Record<string, unknown>;
 
 const areFilesAvailable = (request: Request): boolean => {
   const contentType = request.header("content-type") || "";
-  const isMultipart = contentType.toLowerCase().startsWith(mimeMultipart);
-  return "files" in request && isMultipart;
+  const isUpload = contentType.toLowerCase().startsWith(contentTypes.upload);
+  return "files" in request && isUpload;
 };
 
 export const defaultInputSources: InputSources = {
@@ -130,7 +130,7 @@ export const getExamples = <
    * */
   validate?: boolean;
 }): ReadonlyArray<V extends "parsed" ? z.output<T> : z.input<T>> => {
-  const examples = getMeta(schema, "examples") || [];
+  const examples = schema._def[metaSymbol]?.examples || [];
   if (!validate && variant === "original") {
     return examples;
   }

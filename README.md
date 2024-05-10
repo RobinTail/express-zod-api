@@ -783,16 +783,8 @@ const config = createConfig({
 ```
 
 Refer to [documentation](https://www.npmjs.com/package/express-fileupload#available-options) on available options.
-Some options are forced in order to ensure the correct workflow:
-
-```json5
-{
-  abortOnLimit: false,
-  parseNested: true,
-  logger: {}, // the configured logger, using its .debug() method
-}
-```
-
+Some options are forced in order to ensure the correct workflow: `abortOnLimit: false`, `parseNested: true`, `logger`
+is assigned with `.debug()` method of the configured logger, and `debug` is enabled by default.
 The `limitHandler` option is replaced by the `limitError` one. You can also connect an additional middleware for
 restricting the ability to upload using the `beforeUpload` option. So the configuration for the limited and restricted
 upload might look this way:
@@ -805,13 +797,10 @@ const config = createConfig({
     upload: {
       limits: { fileSize: 51200 }, // 50 KB
       limitError: createHttpError(413, "The file is too large"), // handled by errorHandler in config
-      beforeUpload: ({ app, logger }) => {
-        app.use((req, res, next) => {
-          if (req.is("multipart/form-data") && !canUpload(req)) {
-            return next(createHttpError(403, "Not authorized"));
-          }
-          next();
-        });
+      beforeUpload: ({ request, logger }) => {
+        if (!canUpload(request)) {
+          throw createHttpError(403, "Not authorized");
+        }
       },
     },
   },
@@ -1001,26 +990,18 @@ defaultEndpointsFactory.build({
 ## Accepting raw data
 
 Some APIs may require an endpoint to be able to accept and process raw data, such as streaming or uploading a binary
-file as an entire body of request. In order to enable this feature you need to set the `rawParser` config feature to
-`express.raw()`. See also its options [in Express.js documentation](https://expressjs.com/en/4x/api.html#express.raw).
-The raw data is placed into `request.body.raw` property, having type `Buffer`. Then use the proprietary `ez.raw()`
-schema (which is an alias for `z.object({ raw: ez.file("buffer") })`) as the input schema of your endpoint.
+file as an entire body of request. Use the proprietary `ez.raw()` schema as the input schema of your endpoint.
+The default parser in this case is `express.raw()`. You can customize it by assigning the `rawParser` option in config.
+The raw data is placed into `request.body.raw` property, having type `Buffer`.
 
 ```typescript
-import express from "express";
-import { createConfig, defaultEndpointsFactory, ez } from "express-zod-api";
-
-const config = createConfig({
-  server: {
-    rawParser: express.raw(), // enables the feature
-  },
-});
+import { defaultEndpointsFactory, ez } from "express-zod-api";
 
 const rawAcceptingEndpoint = defaultEndpointsFactory.build({
   method: "post",
-  input: ez
-    .raw() // accepts the featured { raw: Buffer }
-    .extend({}), // for additional inputs, like route params, if needed
+  input: ez.raw({
+    /* the place for additional inputs, like route params, if needed */
+  }),
   output: z.object({ length: z.number().int().nonnegative() }),
   handler: async ({ input: { raw } }) => ({
     length: raw.length, // raw is Buffer

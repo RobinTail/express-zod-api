@@ -48,6 +48,14 @@ describe("Logger", () => {
       expect(logSpy.mock.calls).toMatchSnapshot();
     });
 
+    test("Should create info logger", () => {
+      const { logger, logSpy } = makeLogger({ level: "info", color: false });
+      logger.debug("testing debug message");
+      expect(logSpy).not.toHaveBeenCalled();
+      logger.warn("testing warn message");
+      expect(logSpy).toHaveBeenCalledTimes(1);
+    });
+
     test.each(["debug", "info", "warn", "error"] as const)(
       "Should create debug logger %#",
       (method) => {
@@ -100,7 +108,7 @@ describe("Logger", () => {
     test.each([
       { level: "silent" },
       { level: "debug", color: false },
-      { level: "warn", color: true },
+      { level: "info", color: true },
       { level: "warn", depth: 5 },
       { level: "warn", depth: null },
       { level: "warn", depth: Infinity },
