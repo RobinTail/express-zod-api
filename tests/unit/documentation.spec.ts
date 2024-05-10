@@ -1273,6 +1273,7 @@ describe("Documentation", () => {
 
   describe("Feature #1470: Custom brands", () => {
     test("should be handled accordingly in request, response and params", () => {
+      const deep = Symbol("DEEP");
       const spec = new Documentation({
         config: sampleConfig,
         routing: {
@@ -1282,7 +1283,7 @@ describe("Documentation", () => {
               input: z.object({
                 name: z.string().brand("CUSTOM"),
                 other: z.boolean().brand("CUSTOM"),
-                regular: z.boolean().brand("DEEP"),
+                regular: z.boolean().brand(deep),
               }),
               output: z.object({
                 number: z.number().brand("CUSTOM"),
@@ -1295,7 +1296,7 @@ describe("Documentation", () => {
           CUSTOM: () => ({
             summary: "My custom schema",
           }),
-          DEEP: (schema: z.ZodBranded<any, any>, { next }) =>
+          [deep]: (schema: z.ZodBranded<any, any>, { next }) =>
             next(schema.unwrap()),
         },
         version: "3.4.5",
