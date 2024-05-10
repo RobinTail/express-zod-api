@@ -2,6 +2,49 @@
 
 ## Version 19
 
+### v19.1.0
+
+- Feature: customizable handling rules for your branded schemas in Documentation and Integration:
+  - You can make your schemas special by branding them using `.brand()` method;
+  - The distinguishes the branded schemas in runtime;
+  - The constructors of `Documentation` and `Integration` now accept new property `brandHandling` (object);
+  - Its keys should be the brands you want to handle in a special way;
+  - Its values are functions having your schema as the first argument and a context in the second place.
+
+```ts
+import { z } from "zod";
+import { Documentation, Integration } from "express-zod-api";
+
+const myBrand = Symbol("MamaToldMeImSpecial"); // I highly recommend using symbols for this purpose
+const myBrandedSchema = z.string().brand(myBrand);
+
+new Documentation({
+  /* config, routing, title, version */
+  brandHandling: {
+    [myBrand]: (
+      schema: typeof myBrandedSchema, // you should assign type yourself
+      { next, path, method, isResponse }, // handle a nested schema using next()
+    ) => {
+      const defaultResult = next(schema.unwrap()); // { type: string }
+      return { summary: "Special type of data" };
+    },
+  },
+});
+
+import ts from "typescript";
+const { factory: f } = ts;
+
+new Integration({
+  /* routing */
+  brandHandling: {
+    [myBrand]: (
+      schema: typeof myBrandedSchema, // you should assign type yourself
+      { next, isResponse, serializer }, // handle a nested schema using next()
+    ) => f.createKeywordTypeNode(ts.SyntaxKind.BooleanKeyword),
+  },
+});
+```
+
 ### v19.0.0
 
 - **Breaking changes**:
