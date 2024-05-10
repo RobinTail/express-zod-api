@@ -1,3 +1,4 @@
+import ts from "typescript";
 import { z } from "zod";
 import { routing } from "../../example/routing";
 import {
@@ -7,6 +8,7 @@ import {
   defaultEndpointsFactory,
 } from "../../src";
 import { describe, expect, test, vi } from "vitest";
+import { f } from "../../src/integration-helpers";
 
 describe("Integration", () => {
   test.each(["client", "types"] as const)(
@@ -117,5 +119,32 @@ describe("Integration", () => {
       },
     });
     expect(await client.printFormatted()).toMatchSnapshot();
+  });
+
+  describe("Feature #1470: Custom brands", () => {
+    test("should by handled accordingly", async () => {
+      const client = new Integration({
+        splitResponse: true,
+        variant: "types",
+        brandHandling: {
+          CUSTOM: () => f.createKeywordTypeNode(ts.SyntaxKind.BooleanKeyword),
+        },
+        routing: {
+          v1: {
+            custom: defaultEndpointsFactory.build({
+              method: "post",
+              input: z.object({
+                string: z.string().brand("CUSTOM"),
+              }),
+              output: z.object({
+                number: z.number().brand("CUSTOM"),
+              }),
+              handler: vi.fn(),
+            }),
+          },
+        },
+      });
+      expect(await client.printFormatted()).toMatchSnapshot();
+    });
   });
 });
