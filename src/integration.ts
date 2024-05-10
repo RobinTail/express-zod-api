@@ -159,9 +159,8 @@ export class Integration {
           optionalPropStyle,
         };
         const inputId = makeCleanId(method, path, "input");
-        const input = zodToTs({
+        const input = zodToTs(endpoint.getSchema("input"), {
           ...commons,
-          schema: endpoint.getSchema("input"),
           isResponse: false,
         });
         const positiveResponseId = splitResponse
@@ -169,10 +168,9 @@ export class Integration {
           : undefined;
         const positiveSchema = endpoint.getSchema("positive");
         const positiveResponse = splitResponse
-          ? zodToTs({
+          ? zodToTs(positiveSchema, {
               ...commons,
               isResponse: true,
-              schema: positiveSchema,
             })
           : undefined;
         const negativeResponseId = splitResponse
@@ -180,10 +178,9 @@ export class Integration {
           : undefined;
         const negativeSchema = endpoint.getSchema("negative");
         const negativeResponse = splitResponse
-          ? zodToTs({
+          ? zodToTs(negativeSchema, {
               ...commons,
               isResponse: true,
-              schema: negativeSchema,
             })
           : undefined;
         const genericResponseId = makeCleanId(method, path, "response");
@@ -193,10 +190,9 @@ export class Integration {
                 f.createTypeReferenceNode(positiveResponseId),
                 f.createTypeReferenceNode(negativeResponseId),
               ])
-            : zodToTs({
+            : zodToTs(positiveSchema.or(negativeSchema), {
                 ...commons,
                 isResponse: true,
-                schema: positiveSchema.or(negativeSchema),
               });
         this.program.push(createTypeAlias(input, inputId));
         if (positiveResponse && positiveResponseId) {

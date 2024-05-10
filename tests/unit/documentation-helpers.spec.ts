@@ -79,8 +79,7 @@ describe("Documentation helpers", () => {
     serializer: defaultSerializer,
   };
   const makeNext = (ctx: OpenAPIContext) => (schema: z.ZodTypeAny) =>
-    walkSchema({
-      schema,
+    walkSchema(schema, {
       rules: depicters,
       ...ctx,
       onEach,
@@ -188,8 +187,7 @@ describe("Documentation helpers", () => {
         .record(z.literal("a"), z.string())
         .and(z.record(z.string(), z.string())),
     ])("should omit specified path params %#", (schema) => {
-      const depicted = walkSchema({
-        schema,
+      const depicted = walkSchema(schema, {
         ...requestCtx,
         onEach,
         rules: depicters,
@@ -221,8 +219,7 @@ describe("Documentation helpers", () => {
   describe("depictDefault()", () => {
     test("should set default property", () => {
       expect(
-        depictDefault({
-          schema: z.boolean().default(true),
+        depictDefault(z.boolean().default(true), {
           ...requestCtx,
           next: makeNext(requestCtx),
         }),
@@ -230,15 +227,17 @@ describe("Documentation helpers", () => {
     });
     test("Feature #1706: should override the default value by a label from metadata", () => {
       expect(
-        depictDefault({
-          schema: z
+        depictDefault(
+          z
             .string()
             .datetime()
             .default(() => new Date().toISOString())
             .label("Today"),
-          ...responseCtx,
-          next: makeNext(responseCtx),
-        }),
+          {
+            ...responseCtx,
+            next: makeNext(responseCtx),
+          },
+        ),
       ).toMatchSnapshot();
     });
   });
@@ -246,8 +245,7 @@ describe("Documentation helpers", () => {
   describe("depictCatch()", () => {
     test("should pass next depicter", () => {
       expect(
-        depictCatch({
-          schema: z.boolean().catch(true),
+        depictCatch(z.boolean().catch(true), {
           ...requestCtx,
           next: makeNext(requestCtx),
         }),
@@ -258,8 +256,7 @@ describe("Documentation helpers", () => {
   describe("depictAny()", () => {
     test("should set format:any", () => {
       expect(
-        depictAny({
-          schema: z.any(),
+        depictAny(z.any(), {
           ...requestCtx,
           next: makeNext(requestCtx),
         }),
@@ -270,8 +267,7 @@ describe("Documentation helpers", () => {
   describe("depictUpload()", () => {
     test("should set format:binary and type:string", () => {
       expect(
-        depictUpload({
-          schema: ez.upload(),
+        depictUpload(ez.upload(), {
           ...requestCtx,
           next: makeNext(requestCtx),
         }),
@@ -279,8 +275,7 @@ describe("Documentation helpers", () => {
     });
     test("should throw when using in response", () => {
       try {
-        depictUpload({
-          schema: ez.upload(),
+        depictUpload(ez.upload(), {
           ...responseCtx,
           next: makeNext(responseCtx),
         });
@@ -301,8 +296,7 @@ describe("Documentation helpers", () => {
       ez.file("buffer"),
     ])("should set type:string and format accordingly %#", (schema) => {
       expect(
-        depictFile({
-          schema,
+        depictFile(schema, {
           ...responseCtx,
           next: makeNext(responseCtx),
         }),
@@ -313,8 +307,7 @@ describe("Documentation helpers", () => {
   describe("depictUnion()", () => {
     test("should wrap next depicters into oneOf property", () => {
       expect(
-        depictUnion({
-          schema: z.string().or(z.number()),
+        depictUnion(z.string().or(z.number()), {
           ...requestCtx,
           next: makeNext(requestCtx),
         }),
@@ -325,17 +318,19 @@ describe("Documentation helpers", () => {
   describe("depictDiscriminatedUnion()", () => {
     test("should wrap next depicters in oneOf prop and set discriminator prop", () => {
       expect(
-        depictDiscriminatedUnion({
-          schema: z.discriminatedUnion("status", [
+        depictDiscriminatedUnion(
+          z.discriminatedUnion("status", [
             z.object({ status: z.literal("success"), data: z.any() }),
             z.object({
               status: z.literal("error"),
               error: z.object({ message: z.string() }),
             }),
           ]),
-          ...requestCtx,
-          next: makeNext(requestCtx),
-        }),
+          {
+            ...requestCtx,
+            next: makeNext(requestCtx),
+          },
+        ),
       ).toMatchSnapshot();
     });
   });
@@ -343,20 +338,20 @@ describe("Documentation helpers", () => {
   describe("depictIntersection()", () => {
     test("should flatten two object schemas", () => {
       expect(
-        depictIntersection({
-          schema: z
-            .object({ one: z.number() })
-            .and(z.object({ two: z.number() })),
-          ...requestCtx,
-          next: makeNext(requestCtx),
-        }),
+        depictIntersection(
+          z.object({ one: z.number() }).and(z.object({ two: z.number() })),
+          {
+            ...requestCtx,
+            next: makeNext(requestCtx),
+          },
+        ),
       ).toMatchSnapshot();
     });
 
     test("should merge examples deeply", () => {
       expect(
-        depictIntersection({
-          schema: z
+        depictIntersection(
+          z
             .object({ test: z.object({ a: z.number() }) })
             .example({ test: { a: 123 } })
             .and(
@@ -364,35 +359,41 @@ describe("Documentation helpers", () => {
                 .object({ test: z.object({ b: z.number() }) })
                 .example({ test: { b: 456 } }),
             ),
-          ...requestCtx,
-          next: makeNext(requestCtx),
-        }),
+          {
+            ...requestCtx,
+            next: makeNext(requestCtx),
+          },
+        ),
       ).toMatchSnapshot();
     });
 
     test("should flatten three object schemas with examples", () => {
       expect(
-        depictIntersection({
-          schema: z
+        depictIntersection(
+          z
             .object({ one: z.number() })
             .example({ one: 123 })
             .and(z.object({ two: z.number() }).example({ two: 456 }))
             .and(z.object({ three: z.number() }).example({ three: 789 })),
-          ...requestCtx,
-          next: makeNext(requestCtx),
-        }),
+          {
+            ...requestCtx,
+            next: makeNext(requestCtx),
+          },
+        ),
       ).toMatchSnapshot();
     });
 
     test("should maintain uniqueness in the array of required props", () => {
       expect(
-        depictIntersection({
-          schema: z
+        depictIntersection(
+          z
             .record(z.literal("test"), z.number())
             .and(z.object({ test: z.literal(5) })),
-          ...requestCtx,
-          next: makeNext(requestCtx),
-        }),
+          {
+            ...requestCtx,
+            next: makeNext(requestCtx),
+          },
+        ),
       ).toMatchSnapshot();
     });
 
@@ -401,8 +402,7 @@ describe("Documentation helpers", () => {
       z.number().and(z.literal(5)), // not objects
     ])("should fall back to allOf in other cases %#", (schema) => {
       expect(
-        depictIntersection({
-          schema,
+        depictIntersection(schema, {
           ...requestCtx,
           next: makeNext(requestCtx),
         }),
@@ -415,8 +415,7 @@ describe("Documentation helpers", () => {
       "should pass the next depicter %#",
       (ctx) => {
         expect(
-          depictOptional({
-            schema: z.string().optional(),
+          depictOptional(z.string().optional(), {
             ...ctx,
             next: makeNext(ctx),
           }),
@@ -430,8 +429,7 @@ describe("Documentation helpers", () => {
       "should add null to the type %#",
       (ctx) => {
         expect(
-          depictNullable({
-            schema: z.string().nullable(),
+          depictNullable(z.string().nullable(), {
             ...ctx,
             next: makeNext(ctx),
           }),
@@ -445,8 +443,7 @@ describe("Documentation helpers", () => {
       z.string().nullable().nullable(),
     ])("should only add null type once %#", (schema) => {
       expect(
-        depictNullable({
-          schema,
+        depictNullable(schema, {
           ...requestCtx,
           next: makeNext(requestCtx),
         }),
@@ -463,8 +460,7 @@ describe("Documentation helpers", () => {
       "should set type and enum properties",
       (schema) => {
         expect(
-          depictEnum({
-            schema,
+          depictEnum(schema, {
             ...requestCtx,
             next: makeNext(requestCtx),
           }),
@@ -478,8 +474,7 @@ describe("Documentation helpers", () => {
       "should set type and involve const property %#",
       (value) => {
         expect(
-          depictLiteral({
-            schema: z.literal(value),
+          depictLiteral(z.literal(value), {
             ...requestCtx,
             next: makeNext(requestCtx),
           }),
@@ -505,8 +500,7 @@ describe("Documentation helpers", () => {
       "should type:object, properties and required props %#",
       ({ shape, ctx }) => {
         expect(
-          depictObject({
-            schema: z.object(shape),
+          depictObject(z.object(shape), {
             ...ctx,
             next: makeNext(ctx),
           }),
@@ -521,8 +515,7 @@ describe("Documentation helpers", () => {
         c: z.coerce.string().optional(),
       });
       expect(
-        depictObject({
-          schema,
+        depictObject(schema, {
           ...responseCtx,
           next: makeNext(responseCtx),
         }),
@@ -533,8 +526,7 @@ describe("Documentation helpers", () => {
   describe("depictNull()", () => {
     test("should give type:null", () => {
       expect(
-        depictNull({
-          schema: z.null(),
+        depictNull(z.null(), {
           ...requestCtx,
           next: makeNext(requestCtx),
         }),
@@ -545,8 +537,7 @@ describe("Documentation helpers", () => {
   describe("depictBoolean()", () => {
     test("should set type:boolean", () => {
       expect(
-        depictBoolean({
-          schema: z.boolean(),
+        depictBoolean(z.boolean(), {
           ...requestCtx,
           next: makeNext(requestCtx),
         }),
@@ -557,8 +548,7 @@ describe("Documentation helpers", () => {
   describe("depictBigInt()", () => {
     test("should set type:integer and format:bigint", () => {
       expect(
-        depictBigInt({
-          schema: z.bigint(),
+        depictBigInt(z.bigint(), {
           ...requestCtx,
           next: makeNext(requestCtx),
         }),
@@ -578,8 +568,7 @@ describe("Documentation helpers", () => {
       "should set properties+required or additionalProperties props %#",
       (schema) => {
         expect(
-          depictRecord({
-            schema,
+          depictRecord(schema, {
             ...requestCtx,
             next: makeNext(requestCtx),
           }),
@@ -591,8 +580,7 @@ describe("Documentation helpers", () => {
   describe("depictArray()", () => {
     test("should set type:array and pass items depiction", () => {
       expect(
-        depictArray({
-          schema: z.array(z.boolean()),
+        depictArray(z.array(z.boolean()), {
           ...requestCtx,
           next: makeNext(requestCtx),
         }),
@@ -603,8 +591,7 @@ describe("Documentation helpers", () => {
   describe("depictTuple()", () => {
     test("should utilize prefixItems and set items:not:{}", () => {
       expect(
-        depictTuple({
-          schema: z.tuple([z.boolean(), z.string(), z.literal("test")]),
+        depictTuple(z.tuple([z.boolean(), z.string(), z.literal("test")]), {
           ...requestCtx,
           next: makeNext(requestCtx),
         }),
@@ -612,8 +599,7 @@ describe("Documentation helpers", () => {
     });
     test("should depict rest as items when defined", () => {
       expect(
-        depictTuple({
-          schema: z.tuple([z.boolean()]).rest(z.string()),
+        depictTuple(z.tuple([z.boolean()]).rest(z.string()), {
           ...requestCtx,
           next: makeNext(requestCtx),
         }),
@@ -621,8 +607,7 @@ describe("Documentation helpers", () => {
     });
     test("should depict empty tuples as is", () => {
       expect(
-        depictTuple({
-          schema: z.tuple([]),
+        depictTuple(z.tuple([]), {
           ...requestCtx,
           next: makeNext(requestCtx),
         }),
@@ -633,8 +618,7 @@ describe("Documentation helpers", () => {
   describe("depictString()", () => {
     test("should set type:string", () => {
       expect(
-        depictString({
-          schema: z.string(),
+        depictString(z.string(), {
           ...requestCtx,
           next: makeNext(requestCtx),
         }),
@@ -651,8 +635,7 @@ describe("Documentation helpers", () => {
       z.string().regex(/^\d+.\d+.\d+$/),
     ])("should set format, pattern and min/maxLength props %#", (schema) => {
       expect(
-        depictString({
-          schema,
+        depictString(schema, {
           ...requestCtx,
           next: makeNext(requestCtx),
         }),
@@ -665,8 +648,7 @@ describe("Documentation helpers", () => {
       "should type:number, min/max, format and exclusiveness props",
       (schema) => {
         expect(
-          depictNumber({
-            schema,
+          depictNumber(schema, {
             ...requestCtx,
             next: makeNext(requestCtx),
           }),
@@ -678,14 +660,13 @@ describe("Documentation helpers", () => {
   describe("depictObjectProperties()", () => {
     test("should wrap next depicters in a shape of object", () => {
       expect(
-        depictObjectProperties({
-          schema: z.object({
+        depictObjectProperties(
+          z.object({
             one: z.string(),
             two: z.boolean(),
           }),
-          ...requestCtx,
-          next: makeNext(requestCtx),
-        }),
+          makeNext(requestCtx),
+        ),
       ).toMatchSnapshot();
     });
   });
@@ -720,8 +701,7 @@ describe("Documentation helpers", () => {
       },
     ])("should depict as $expected", ({ schema, ctx }) => {
       expect(
-        depictEffect({
-          schema,
+        depictEffect(schema, {
           ...ctx,
           next: makeNext(ctx),
         }),
@@ -733,8 +713,7 @@ describe("Documentation helpers", () => {
       z.number().transform(() => assert.fail("this should be handled")),
     ])("should handle edge cases", (schema) => {
       expect(
-        depictEffect({
-          schema,
+        depictEffect(schema, {
           ...responseCtx,
           next: makeNext(responseCtx),
         }),
@@ -748,8 +727,7 @@ describe("Documentation helpers", () => {
       { ctx: requestCtx, expected: "string (in)" },
     ])("should depict as $expected", ({ ctx }) => {
       expect(
-        depictPipeline({
-          schema: z.string().pipe(z.coerce.boolean()),
+        depictPipeline(z.string().pipe(z.coerce.boolean()), {
           ...ctx,
           next: makeNext(ctx),
         }),
@@ -887,8 +865,7 @@ describe("Documentation helpers", () => {
   describe("depictDateIn", () => {
     test("should set type:string, pattern and format", () => {
       expect(
-        depictDateIn({
-          schema: ez.dateIn(),
+        depictDateIn(ez.dateIn(), {
           ...requestCtx,
           next: makeNext(requestCtx),
         }),
@@ -896,8 +873,7 @@ describe("Documentation helpers", () => {
     });
     test("should throw when ZodDateIn in response", () => {
       try {
-        depictDateIn({
-          schema: ez.dateIn(),
+        depictDateIn(ez.dateIn(), {
           ...responseCtx,
           next: makeNext(responseCtx),
         });
@@ -912,8 +888,7 @@ describe("Documentation helpers", () => {
   describe("depictDateOut", () => {
     test("should set type:string, description and format", () => {
       expect(
-        depictDateOut({
-          schema: ez.dateOut(),
+        depictDateOut(ez.dateOut(), {
           ...responseCtx,
           next: makeNext(responseCtx),
         }),
@@ -921,8 +896,7 @@ describe("Documentation helpers", () => {
     });
     test("should throw when ZodDateOut in request", () => {
       try {
-        depictDateOut({
-          schema: ez.dateOut(),
+        depictDateOut(ez.dateOut(), {
           ...requestCtx,
           next: makeNext(requestCtx),
         });
@@ -939,8 +913,7 @@ describe("Documentation helpers", () => {
       "should throw clear error %#",
       (ctx) => {
         try {
-          depictDate({
-            schema: z.date(),
+          depictDate(z.date(), {
             ...ctx,
             next: makeNext(ctx),
           });
@@ -956,8 +929,7 @@ describe("Documentation helpers", () => {
   describe("depictBranded", () => {
     test("should pass the next depicter", () => {
       expect(
-        depictBranded({
-          schema: z.string().min(2).brand<"Test">(),
+        depictBranded(z.string().min(2).brand<"Test">(), {
           ...responseCtx,
           next: makeNext(responseCtx),
         }),
@@ -968,8 +940,7 @@ describe("Documentation helpers", () => {
   describe("depictReadonly", () => {
     test("should pass the next depicter", () => {
       expect(
-        depictReadonly({
-          schema: z.string().readonly(),
+        depictReadonly(z.string().readonly(), {
           ...responseCtx,
           next: makeNext(responseCtx),
         }),
@@ -1009,8 +980,7 @@ describe("Documentation helpers", () => {
         );
       expect(getRefMock.mock.calls.length).toBe(0);
       expect(
-        depictLazy({
-          schema,
+        depictLazy(schema, {
           ...responseCtx,
           next: makeNext(responseCtx),
         }),

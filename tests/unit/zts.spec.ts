@@ -20,20 +20,20 @@ describe("zod-to-ts", () => {
 
   describe("z.array()", () => {
     test("outputs correct typescript", () => {
-      const node = zodToTs({
-        schema: z.object({ id: z.number(), value: z.string() }).array(),
-        ...defaultCtx,
-      });
+      const node = zodToTs(
+        z.object({ id: z.number(), value: z.string() }).array(),
+        defaultCtx,
+      );
       expect(printNodeTest(node)).toMatchSnapshot();
     });
   });
 
   describe("createTypeAlias()", () => {
     const identifier = "User";
-    const node = zodToTs({
-      schema: z.object({ username: z.string(), age: z.number() }),
-      ...defaultCtx,
-    });
+    const node = zodToTs(
+      z.object({ username: z.string(), age: z.number() }),
+      defaultCtx,
+    );
 
     test("outputs correct typescript", () => {
       const typeAlias = createTypeAlias(node, identifier);
@@ -73,9 +73,7 @@ describe("zod-to-ts", () => {
       { schema: z.nativeEnum(Fruit), feature: "string" },
       { schema: z.nativeEnum(StringLiteral), feature: "quoted string" },
     ])("handles $feature literals", ({ schema }) => {
-      expect(
-        printNodeTest(zodToTs({ schema, ...defaultCtx })),
-      ).toMatchSnapshot();
+      expect(printNodeTest(zodToTs(schema, defaultCtx))).toMatchSnapshot();
     });
   });
 
@@ -178,10 +176,7 @@ describe("zod-to-ts", () => {
     });
 
     test("should produce the expected results", () => {
-      const node = zodToTs({
-        schema: example,
-        ...defaultCtx,
-      });
+      const node = zodToTs(example, defaultCtx);
       expect(printNode(node)).toMatchSnapshot();
     });
   });
@@ -209,12 +204,12 @@ describe("zod-to-ts", () => {
     });
 
     test("outputs correct typescript", () => {
-      const node = zodToTs({ schema: optionalStringSchema, ...defaultCtx });
+      const node = zodToTs(optionalStringSchema, defaultCtx);
       expect(printNodeTest(node)).toMatchSnapshot();
     });
 
     test("should output `?:` and undefined union for optional properties", () => {
-      const node = zodToTs({ schema: objectWithOptionals, ...defaultCtx });
+      const node = zodToTs(objectWithOptionals, defaultCtx);
       expect(printNodeTest(node)).toMatchSnapshot();
     });
   });
@@ -223,7 +218,7 @@ describe("zod-to-ts", () => {
     const nullableUsernameSchema = z.object({
       username: z.string().nullable(),
     });
-    const node = zodToTs({ schema: nullableUsernameSchema, ...defaultCtx });
+    const node = zodToTs(nullableUsernameSchema, defaultCtx);
 
     test("outputs correct typescript", () => {
       expect(printNodeTest(node)).toMatchSnapshot();
@@ -236,7 +231,7 @@ describe("zod-to-ts", () => {
         "string-literal": z.string(),
         5: z.number(),
       });
-      const node = zodToTs({ schema, ...defaultCtx });
+      const node = zodToTs(schema, defaultCtx);
       expect(printNodeTest(node)).toMatchSnapshot();
     });
 
@@ -246,7 +241,7 @@ describe("zod-to-ts", () => {
         name: z.string(),
         countryOfOrigin: z.string(),
       });
-      const node = zodToTs({ schema, ...defaultCtx });
+      const node = zodToTs(schema, defaultCtx);
       expect(printNodeTest(node)).toMatchSnapshot();
     });
 
@@ -262,7 +257,7 @@ describe("zod-to-ts", () => {
         _r: z.any(),
         "-r": z.undefined(),
       });
-      const node = zodToTs({ schema, ...defaultCtx });
+      const node = zodToTs(schema, defaultCtx);
       expect(printNodeTest(node)).toMatchSnapshot();
     });
 
@@ -271,7 +266,7 @@ describe("zod-to-ts", () => {
         name: z.string().describe("The name of the item"),
         price: z.number().describe("The price of the item"),
       });
-      const node = zodToTs({ schema, ...defaultCtx });
+      const node = zodToTs(schema, defaultCtx);
       expect(printNodeTest(node)).toMatchSnapshot();
     });
   });
@@ -289,7 +284,7 @@ describe("zod-to-ts", () => {
       unknown: z.unknown(),
       never: z.never(),
     });
-    const node = zodToTs({ schema: primitiveSchema, ...defaultCtx });
+    const node = zodToTs(primitiveSchema, defaultCtx);
 
     test("outputs correct typescript", () => {
       expect(printNodeTest(node)).toMatchSnapshot();
@@ -302,7 +297,7 @@ describe("zod-to-ts", () => {
       z.object({ kind: z.literal("square"), x: z.number() }),
       z.object({ kind: z.literal("triangle"), x: z.number(), y: z.number() }),
     ]);
-    const node = zodToTs({ schema: shapeSchema, ...defaultCtx });
+    const node = zodToTs(shapeSchema, defaultCtx);
 
     test("outputs correct typescript", () => {
       expect(printNodeTest(node)).toMatchSnapshot();
@@ -316,9 +311,7 @@ describe("zod-to-ts", () => {
       z.literal(false),
       z.literal(123),
     ])("Should produce the correct typescript %#", (schema) => {
-      expect(
-        printNodeTest(zodToTs({ schema, ...defaultCtx })),
-      ).toMatchSnapshot();
+      expect(printNodeTest(zodToTs(schema, defaultCtx))).toMatchSnapshot();
     });
   });
 
@@ -330,14 +323,14 @@ describe("zod-to-ts", () => {
       ])("should produce the schema type $expected", ({ isResponse }) => {
         const schema = z.number().transform((num) => `${num}`);
         expect(
-          printNodeTest(zodToTs({ schema, ...defaultCtx, isResponse })),
+          printNodeTest(zodToTs(schema, { ...defaultCtx, isResponse })),
         ).toMatchSnapshot();
       });
 
       test("should handle unsupported transformation in response", () => {
         const schema = z.number().transform((num) => () => num);
         expect(
-          printNodeTest(zodToTs({ schema, ...defaultCtx, isResponse: true })),
+          printNodeTest(zodToTs(schema, { ...defaultCtx, isResponse: true })),
         ).toMatchSnapshot();
       });
 
@@ -346,7 +339,7 @@ describe("zod-to-ts", () => {
           .number()
           .transform(() => assert.fail("this should be handled"));
         expect(
-          printNodeTest(zodToTs({ schema, ...defaultCtx, isResponse: true })),
+          printNodeTest(zodToTs(schema, { ...defaultCtx, isResponse: true })),
         ).toMatchSnapshot();
       });
     });

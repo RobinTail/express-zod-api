@@ -6,59 +6,56 @@ import { HandlingRules, SchemaHandler } from "./schema-walker";
 import { ezUploadBrand } from "./upload-schema";
 
 /** @desc Check is a schema handling rule returning boolean */
-type Check<T extends z.ZodTypeAny> = SchemaHandler<T, boolean>;
+type Check = SchemaHandler<boolean>;
 
-const onSomeUnion: Check<
-  | z.ZodUnion<z.ZodUnionOptions>
-  | z.ZodDiscriminatedUnion<string, z.ZodDiscriminatedUnionOption<string>[]>
-> = ({ schema: { options }, next }) => options.some(next);
+const onSomeUnion: Check = (
+  schema:
+    | z.ZodUnion<z.ZodUnionOptions>
+    | z.ZodDiscriminatedUnion<string, z.ZodDiscriminatedUnionOption<string>[]>,
+  { next },
+) => schema.options.some(next);
 
-const onIntersection: Check<z.ZodIntersection<z.ZodTypeAny, z.ZodTypeAny>> = ({
-  schema: { _def },
-  next,
-}) => [_def.left, _def.right].some(next);
+const onIntersection: Check = (
+  { _def }: z.ZodIntersection<z.ZodTypeAny, z.ZodTypeAny>,
+  { next },
+) => [_def.left, _def.right].some(next);
 
-const onObject: Check<z.ZodObject<z.ZodRawShape>> = ({ schema, next }) =>
-  Object.values(schema.shape).some(next);
-const onElective: Check<
-  z.ZodOptional<z.ZodTypeAny> | z.ZodNullable<z.ZodTypeAny>
-> = ({ schema, next }) => next(schema.unwrap());
-const onEffects: Check<z.ZodEffects<z.ZodTypeAny>> = ({ schema, next }) =>
-  next(schema.innerType());
-const onRecord: Check<z.ZodRecord> = ({ schema, next }) =>
-  next(schema.valueSchema);
-const onArray: Check<z.ZodArray<z.ZodTypeAny>> = ({ schema, next }) =>
-  next(schema.element);
-const onDefault: Check<z.ZodDefault<z.ZodTypeAny>> = ({ schema, next }) =>
-  next(schema._def.innerType);
+const onElective: Check = (
+  schema: z.ZodOptional<z.ZodTypeAny> | z.ZodNullable<z.ZodTypeAny>,
+  { next },
+) => next(schema.unwrap());
 
 const checks: HandlingRules<boolean> = {
-  ZodObject: onObject,
+  ZodObject: ({ shape }: z.ZodObject<z.ZodRawShape>, { next }) =>
+    Object.values(shape).some(next),
   ZodUnion: onSomeUnion,
   ZodDiscriminatedUnion: onSomeUnion,
   ZodIntersection: onIntersection,
-  ZodEffects: onEffects,
+  ZodEffects: (schema: z.ZodEffects<z.ZodTypeAny>, { next }) =>
+    next(schema.innerType()),
   ZodOptional: onElective,
   ZodNullable: onElective,
-  ZodRecord: onRecord,
-  ZodArray: onArray,
-  ZodDefault: onDefault,
+  ZodRecord: ({ valueSchema }: z.ZodRecord, { next }) => next(valueSchema),
+  ZodArray: ({ element }: z.ZodArray<z.ZodTypeAny>, { next }) => next(element),
+  ZodDefault: ({ _def }: z.ZodDefault<z.ZodTypeAny>, { next }) =>
+    next(_def.innerType),
 };
 
 /** @desc The optimized version of the schema walker for boolean checks */
-export const hasNestedSchema = ({
-  subject,
-  condition,
-  rules = checks,
-  depth = 1,
-  maxDepth = Number.POSITIVE_INFINITY,
-}: {
-  subject: z.ZodTypeAny;
-  condition: (schema: z.ZodTypeAny) => boolean;
-  rules?: HandlingRules<boolean>;
-  maxDepth?: number;
-  depth?: number;
-}): boolean => {
+export const hasNestedSchema = (
+  subject: z.ZodTypeAny,
+  {
+    condition,
+    rules = checks,
+    depth = 1,
+    maxDepth = Number.POSITIVE_INFINITY,
+  }: {
+    condition: (schema: z.ZodTypeAny) => boolean;
+    rules?: HandlingRules<boolean>;
+    maxDepth?: number;
+    depth?: number;
+  },
+): boolean => {
   if (condition(subject)) {
     return true;
   }
@@ -67,11 +64,9 @@ export const hasNestedSchema = ({
       ? rules[subject._def.typeName as keyof typeof rules]
       : undefined;
   if (handler) {
-    return handler({
-      schema: subject,
+    return handler(subject, {
       next: (schema) =>
-        hasNestedSchema({
-          subject: schema,
+        hasNestedSchema(schema, {
           condition,
           rules,
           maxDepth,
@@ -83,8 +78,7 @@ export const hasNestedSchema = ({
 };
 
 export const hasTransformationOnTop = (subject: IOSchema): boolean =>
-  hasNestedSchema({
-    subject,
+  hasNestedSchema(subject, {
     maxDepth: 3,
     rules: { ZodUnion: onSomeUnion, ZodIntersection: onIntersection },
     condition: (schema) =>
@@ -93,14 +87,12 @@ export const hasTransformationOnTop = (subject: IOSchema): boolean =>
   });
 
 export const hasUpload = (subject: IOSchema) =>
-  hasNestedSchema({
-    subject,
+  hasNestedSchema(subject, {
     condition: (schema) => schema._def[metaSymbol]?.brand === ezUploadBrand,
   });
 
 export const hasRaw = (subject: IOSchema) =>
-  hasNestedSchema({
-    subject,
+  hasNestedSchema(subject, {
     condition: (schema) => schema._def[metaSymbol]?.brand === ezRawBrand,
     maxDepth: 3,
   });
