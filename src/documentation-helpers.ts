@@ -104,7 +104,7 @@ interface ReqResDepictHelperCommonProps
   mimeTypes: ReadonlyArray<string>;
   composition: "inline" | "components";
   description?: string;
-  customBrands?: HandlingRules<SchemaObject | ReferenceObject, OpenAPIContext>;
+  brandHandling?: HandlingRules<SchemaObject | ReferenceObject, OpenAPIContext>;
 }
 
 const shortDescriptionLimit = 50;
@@ -688,7 +688,7 @@ export const depictRequestParams = ({
   getRef,
   makeRef,
   composition,
-  customBrands,
+  brandHandling,
   description = `${method.toUpperCase()} ${path} Parameter`,
 }: Omit<ReqResDepictHelperCommonProps, "mimeTypes"> & {
   inputSources: InputSource[];
@@ -714,7 +714,7 @@ export const depictRequestParams = ({
     .filter((name) => isQueryEnabled || isPathParam(name))
     .map((name) => {
       const depicted = walkSchema(shape[name], {
-        rules: { ...depicters, ...customBrands },
+        rules: { ...brandHandling, ...depicters },
         onEach,
         onMissing,
         ctx: {
@@ -871,7 +871,7 @@ export const depictResponse = ({
   composition,
   hasMultipleStatusCodes,
   statusCode,
-  customBrands,
+  brandHandling,
   description = `${method.toUpperCase()} ${path} ${ucFirst(variant)} response ${
     hasMultipleStatusCodes ? statusCode : ""
   }`.trim(),
@@ -882,7 +882,7 @@ export const depictResponse = ({
 }): ResponseObject => {
   const depictedSchema = excludeExamplesFromDepiction(
     walkSchema(schema, {
-      rules: { ...depicters, ...customBrands },
+      rules: { ...brandHandling, ...depicters },
       onEach,
       onMissing,
       ctx: {
@@ -1017,14 +1017,14 @@ export const depictRequest = ({
   getRef,
   makeRef,
   composition,
-  customBrands,
+  brandHandling,
   description = `${method.toUpperCase()} ${path} Request body`,
 }: ReqResDepictHelperCommonProps): RequestBodyObject => {
   const pathParams = getRoutePathParams(path);
   const bodyDepiction = excludeExamplesFromDepiction(
     excludeParamsFromDepiction(
       walkSchema(schema, {
-        rules: { ...depicters, ...customBrands },
+        rules: { ...brandHandling, ...depicters },
         onEach,
         onMissing,
         ctx: {

@@ -66,7 +66,7 @@ interface DocumentationParams {
    * @default JSON.stringify() + SHA1 hash as a hex digest
    * */
   serializer?: (schema: z.ZodTypeAny) => string;
-  customBrands?: HandlingRules<SchemaObject | ReferenceObject, OpenAPIContext>;
+  brandHandling?: HandlingRules<SchemaObject | ReferenceObject, OpenAPIContext>;
 }
 
 export class Documentation extends OpenApiBuilder {
@@ -135,7 +135,7 @@ export class Documentation extends OpenApiBuilder {
     version,
     serverUrl,
     descriptions,
-    customBrands,
+    brandHandling,
     hasSummaryFromDescription = true,
     composition = "inline",
     serializer = defaultSerializer,
@@ -157,7 +157,7 @@ export class Documentation extends OpenApiBuilder {
         endpoint,
         composition,
         serializer,
-        customBrands,
+        brandHandling,
         getRef: this.getRef.bind(this),
         makeRef: this.makeRef.bind(this),
       };

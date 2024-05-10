@@ -1290,7 +1290,7 @@ describe("Documentation", () => {
             }),
           },
         },
-        customBrands: {
+        brandHandling: {
           CUSTOM: () => ({
             summary: "My custom schema",
           }),
