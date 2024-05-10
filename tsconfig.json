@@ -5,5 +5,14 @@
     "moduleResolution": "Bundler",
     "resolveJsonModule": true
   },
-  "include": ["src", "example", "tests/unit", "tests/system", "tests/bench", "tests/*.ts", "tools", "*.config.ts"]
+  "include": [
+    "src",
+    "example",
+    "tests/unit",
+    "tests/system",
+    "tests/bench",
+    "tests/*.ts",
+    "tools",
+    "*.config.ts"
+  ]
 }
