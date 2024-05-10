@@ -64,6 +64,7 @@ import {
 } from "./logical-container";
 import { metaSymbol } from "./metadata";
 import { Method } from "./method";
+import { ProprietaryBrand } from "./proprietary-schemas";
 import { RawSchema, ezRawBrand } from "./raw-schema";
 import {
   HandlingRules,
@@ -746,7 +747,8 @@ export const depictRequestParams = ({
 
 export const depicters: HandlingRules<
   SchemaObject | ReferenceObject,
-  OpenAPIContext
+  OpenAPIContext,
+  z.ZodFirstPartyTypeKind | ProprietaryBrand
 > = {
   ZodString: depictString,
   ZodNumber: depictNumber,

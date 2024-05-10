@@ -4,6 +4,7 @@ import { hasCoercion, tryToTransform } from "./common-helpers";
 import { ezDateInBrand } from "./date-in-schema";
 import { ezDateOutBrand } from "./date-out-schema";
 import { FileSchema, ezFileBrand } from "./file-schema";
+import { ProprietaryBrand } from "./proprietary-schemas";
 import { RawSchema, ezRawBrand } from "./raw-schema";
 import { HandlingRules, walkSchema } from "./schema-walker";
 import {
@@ -219,7 +220,11 @@ const onFile: Producer = (schema: FileSchema) => {
 const onRaw: Producer = (schema: RawSchema, { next }) =>
   next(schema.unwrap().shape.raw);
 
-const producers: HandlingRules<ts.TypeNode, ZTSContext> = {
+const producers: HandlingRules<
+  ts.TypeNode,
+  ZTSContext,
+  z.ZodFirstPartyTypeKind | ProprietaryBrand
+> = {
   ZodString: onPrimitive(ts.SyntaxKind.StringKeyword),
   ZodNumber: onPrimitive(ts.SyntaxKind.NumberKeyword),
   ZodBigInt: onPrimitive(ts.SyntaxKind.BigIntKeyword),

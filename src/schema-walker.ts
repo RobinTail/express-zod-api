@@ -1,7 +1,6 @@
 import { z } from "zod";
 import type { FlatObject } from "./common-helpers";
 import { metaSymbol } from "./metadata";
-import { ProprietaryBrand } from "./proprietary-schemas";
 
 interface VariantDependingProps<U> {
   regular: { next: (schema: z.ZodTypeAny) => U };
@@ -17,14 +16,11 @@ export type SchemaHandler<
   Variant extends HandlingVariant = "regular",
 > = (schema: any, ctx: Context & VariantDependingProps<U>[Variant]) => U;
 
-export type CustomBrand = string | symbol;
-
-export type HandlingRules<U, Context extends FlatObject = {}> = Partial<
-  Record<
-    z.ZodFirstPartyTypeKind | ProprietaryBrand | CustomBrand,
-    SchemaHandler<U, Context>
-  >
->;
+export type HandlingRules<
+  U,
+  Context extends FlatObject = {},
+  K extends string | symbol = string | symbol,
+> = Partial<Record<K, SchemaHandler<U, Context>>>;
 
 /** @since 10.1.1 calling onEach _after_ handler and giving it the previously achieved result */
 export const walkSchema = <U extends object, Context extends FlatObject = {}>(

@@ -25,7 +25,7 @@ const onElective: Check = (
   { next },
 ) => next(schema.unwrap());
 
-const checks: HandlingRules<boolean> = {
+const checks: HandlingRules<boolean, {}, z.ZodFirstPartyTypeKind> = {
   ZodObject: ({ shape }: z.ZodObject<z.ZodRawShape>, { next }) =>
     Object.values(shape).some(next),
   ZodUnion: onSomeUnion,
