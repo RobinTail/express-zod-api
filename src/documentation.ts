@@ -66,6 +66,12 @@ interface DocumentationParams {
    * @default JSON.stringify() + SHA1 hash as a hex digest
    * */
   serializer?: (schema: z.ZodTypeAny) => string;
+  /**
+   * @desc Handling rules for your own branded types.
+   * @desc Keys: brands (recommended to use unique symbols).
+   * @desc Values: functions having schema as first argument that you should assign type to, second one is a context.
+   * @example { MyBrand: ( schema: typeof myBrandSchema, { next } ) => ({ type: "object" })
+   */
   brandHandling?: HandlingRules<SchemaObject | ReferenceObject, OpenAPIContext>;
 }
 
