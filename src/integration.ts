@@ -33,8 +33,9 @@ import { contentTypes } from "./content-type";
 import { loadPeer } from "./peer-helpers";
 import { Routing } from "./routing";
 import { walkRouting } from "./routing-walker";
+import { HandlingRules } from "./schema-walker";
 import { zodToTs } from "./zts";
-import { createTypeAlias, printNode } from "./zts-helpers";
+import { ZTSContext, createTypeAlias, printNode } from "./zts-helpers";
 import type Prettier from "prettier";
 
 type IOKind = "input" | "response" | "positive" | "negative";
@@ -74,6 +75,13 @@ interface IntegrationParams {
      */
     withUndefined?: boolean;
   };
+  /**
+   * @desc Handling rules for your own branded types.
+   * @desc Keys: brands (recommended to use unique symbols).
+   * @desc Values: functions having schema as first argument that you should assign type to, second one is a context.
+   * @example { MyBrand: ( schema: typeof myBrandSchema, { next } ) => createKeywordTypeNode(SyntaxKind.AnyKeyword)
+   */
+  brandHandling?: HandlingRules<ts.TypeNode, ZTSContext>;
 }
 
 interface FormattedPrintingOptions {
@@ -144,6 +152,7 @@ export class Integration {
 
   public constructor({
     routing,
+    brandHandling,
     variant = "client",
     serializer = defaultSerializer,
     splitResponse = false,
@@ -160,8 +169,8 @@ export class Integration {
         };
         const inputId = makeCleanId(method, path, "input");
         const input = zodToTs(endpoint.getSchema("input"), {
-          ...commons,
-          isResponse: false,
+          brandHandling,
+          ctx: { ...commons, isResponse: false },
         });
         const positiveResponseId = splitResponse
           ? makeCleanId(method, path, "positive.response")
@@ -169,8 +178,8 @@ export class Integration {
         const positiveSchema = endpoint.getSchema("positive");
         const positiveResponse = splitResponse
           ? zodToTs(positiveSchema, {
-              ...commons,
-              isResponse: true,
+              brandHandling,
+              ctx: { ...commons, isResponse: true },
             })
           : undefined;
         const negativeResponseId = splitResponse
@@ -179,8 +188,8 @@ export class Integration {
         const negativeSchema = endpoint.getSchema("negative");
         const negativeResponse = splitResponse
           ? zodToTs(negativeSchema, {
-              ...commons,
-              isResponse: true,
+              brandHandling,
+              ctx: { ...commons, isResponse: true },
             })
           : undefined;
         const genericResponseId = makeCleanId(method, path, "response");
@@ -191,8 +200,8 @@ export class Integration {
                 f.createTypeReferenceNode(negativeResponseId),
               ])
             : zodToTs(positiveSchema.or(negativeSchema), {
-                ...commons,
-                isResponse: true,
+                brandHandling,
+                ctx: { ...commons, isResponse: true },
               });
         this.program.push(createTypeAlias(input, inputId));
         if (positiveResponse && positiveResponseId) {

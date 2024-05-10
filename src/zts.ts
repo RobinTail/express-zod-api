@@ -256,9 +256,18 @@ const producers: HandlingRules<
   [ezRawBrand]: onRaw,
 };
 
-export const zodToTs = (schema: z.ZodTypeAny, ctx: ZTSContext) =>
+export const zodToTs = (
+  schema: z.ZodTypeAny,
+  {
+    brandHandling,
+    ctx,
+  }: {
+    brandHandling?: HandlingRules<ts.TypeNode, ZTSContext>;
+    ctx: ZTSContext;
+  },
+) =>
   walkSchema(schema, {
-    rules: producers,
+    rules: { ...brandHandling, ...producers },
     onMissing: () => f.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword),
     ctx,
   });
