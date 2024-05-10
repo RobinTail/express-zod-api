@@ -39,8 +39,9 @@ export const walkSchema = <U extends object, Context extends FlatObject = {}>(
     onEach,
     rules,
     onMissing,
-    ...rest
-  }: SchemaHandlingProps<U, Context, "last"> & {
+    ctx = {} as Context,
+  }: SchemaHandlingProps<U, {}, "last"> & {
+    ctx?: Context;
     onEach?: SchemaHandler<U, Context, "each">;
     rules: HandlingRules<U, Context>;
     onMissing: SchemaHandler<U, Context, "last">;
@@ -49,9 +50,8 @@ export const walkSchema = <U extends object, Context extends FlatObject = {}>(
   const handler =
     rules[schema._def[metaSymbol]?.brand as keyof typeof rules] ||
     rules[schema._def.typeName as keyof typeof rules];
-  const ctx = rest as unknown as Context;
   const next = (subject: z.ZodTypeAny) =>
-    walkSchema(subject, { ...ctx, onEach, rules, onMissing });
+    walkSchema(subject, { ctx, onEach, rules, onMissing });
   const result = handler
     ? handler(schema, { ...ctx, next })
     : onMissing(schema, ctx);

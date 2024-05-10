@@ -81,9 +81,9 @@ describe("Documentation helpers", () => {
   const makeNext = (ctx: OpenAPIContext) => (schema: z.ZodTypeAny) =>
     walkSchema(schema, {
       rules: depicters,
-      ...ctx,
       onEach,
       onMissing,
+      ctx,
     });
 
   beforeEach(() => {
@@ -188,9 +188,9 @@ describe("Documentation helpers", () => {
         .and(z.record(z.string(), z.string())),
     ])("should omit specified path params %#", (schema) => {
       const depicted = walkSchema(schema, {
-        ...requestCtx,
-        onEach,
+        ctx: requestCtx,
         rules: depicters,
+        onEach,
         onMissing,
       });
       expect(excludeParamsFromDepiction(depicted, ["a"])).toMatchSnapshot();

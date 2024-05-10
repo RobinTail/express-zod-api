@@ -713,15 +713,17 @@ export const depictRequestParams = ({
     .filter((name) => isQueryEnabled || isPathParam(name))
     .map((name) => {
       const depicted = walkSchema(shape[name], {
-        isResponse: false,
         rules: { ...depicters, ...customBrands },
         onEach,
         onMissing,
-        serializer,
-        getRef,
-        makeRef,
-        path,
-        method,
+        ctx: {
+          isResponse: false,
+          serializer,
+          getRef,
+          makeRef,
+          path,
+          method,
+        },
       });
       const result =
         composition === "components"
@@ -878,15 +880,17 @@ export const depictResponse = ({
 }): ResponseObject => {
   const depictedSchema = excludeExamplesFromDepiction(
     walkSchema(schema, {
-      isResponse: true,
       rules: { ...depicters, ...customBrands },
       onEach,
       onMissing,
-      serializer,
-      getRef,
-      makeRef,
-      path,
-      method,
+      ctx: {
+        isResponse: true,
+        serializer,
+        getRef,
+        makeRef,
+        path,
+        method,
+      },
     }),
   );
   const media: MediaTypeObject = {
@@ -1018,15 +1022,17 @@ export const depictRequest = ({
   const bodyDepiction = excludeExamplesFromDepiction(
     excludeParamsFromDepiction(
       walkSchema(schema, {
-        isResponse: false,
         rules: { ...depicters, ...customBrands },
         onEach,
         onMissing,
-        serializer,
-        getRef,
-        makeRef,
-        path,
-        method,
+        ctx: {
+          isResponse: false,
+          serializer,
+          getRef,
+          makeRef,
+          path,
+          method,
+        },
       }),
       pathParams,
     ),
