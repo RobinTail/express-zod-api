@@ -1282,9 +1282,10 @@ describe("Documentation", () => {
               input: z.object({
                 name: z.string().brand("CUSTOM"),
                 other: z.boolean().brand("CUSTOM"),
+                regular: z.boolean().brand("DEEP"),
               }),
               output: z.object({
-                test: z.number().brand("CUSTOM"),
+                number: z.number().brand("CUSTOM"),
               }),
               handler: vi.fn(),
             }),
@@ -1294,6 +1295,8 @@ describe("Documentation", () => {
           CUSTOM: () => ({
             summary: "My custom schema",
           }),
+          DEEP: (schema: z.ZodBranded<any, any>, { next }) =>
+            next(schema.unwrap()),
         },
         version: "3.4.5",
         title: "Testing custom brands handling",

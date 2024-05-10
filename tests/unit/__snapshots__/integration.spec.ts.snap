@@ -379,6 +379,7 @@ client.provide("get", "/v1/user/retrieve", { id: "10" });
 exports[`Integration > Feature #1470: Custom brands > should by handled accordingly 1`] = `
 "type PostV1CustomInput = {
   string: boolean;
+  regular: string;
 };
 
 type PostV1CustomPositiveResponse = {

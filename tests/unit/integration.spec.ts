@@ -128,6 +128,8 @@ describe("Integration", () => {
         variant: "types",
         brandHandling: {
           CUSTOM: () => f.createKeywordTypeNode(ts.SyntaxKind.BooleanKeyword),
+          DEEP: (schema: z.ZodBranded<any, any>, { next }) =>
+            next(schema.unwrap()),
         },
         routing: {
           v1: {
@@ -135,6 +137,7 @@ describe("Integration", () => {
               method: "post",
               input: z.object({
                 string: z.string().brand("CUSTOM"),
+                regular: z.string().brand("DEEP"),
               }),
               output: z.object({
                 number: z.number().brand("CUSTOM"),
