@@ -11,17 +11,11 @@ interface VariantDependingProps<U> {
 
 export type HandlingVariant = keyof VariantDependingProps<unknown>;
 
-type SchemaHandlingProps<
-  U,
-  Context extends FlatObject,
-  Variant extends HandlingVariant,
-> = Context & VariantDependingProps<U>[Variant];
-
 export type SchemaHandler<
   U,
   Context extends FlatObject = {},
   Variant extends HandlingVariant = "regular",
-> = (schema: any, params: SchemaHandlingProps<U, Context, Variant>) => U;
+> = (schema: any, ctx: Context & VariantDependingProps<U>[Variant]) => U;
 
 export type CustomBrand = string | symbol;
 
@@ -40,7 +34,7 @@ export const walkSchema = <U extends object, Context extends FlatObject = {}>(
     rules,
     onMissing,
     ctx = {} as Context,
-  }: SchemaHandlingProps<U, {}, "last"> & {
+  }: {
     ctx?: Context;
     onEach?: SchemaHandler<U, Context, "each">;
     rules: HandlingRules<U, Context>;
