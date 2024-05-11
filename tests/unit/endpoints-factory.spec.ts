@@ -9,6 +9,7 @@ import {
 import { Endpoint } from "../../src/endpoint";
 import { expectType } from "tsd";
 import { AbstractLogger } from "../../src/logger";
+import { makeLoggerMock } from "../../src/testing";
 import { serializeSchemaForTest } from "../helpers";
 import { z } from "zod";
 import { describe, expect, test, vi } from "vitest";
@@ -123,7 +124,7 @@ describe("EndpointsFactory", () => {
             options: {},
             request: {} as Request,
             response: {} as Response,
-            logger: {} as AbstractLogger,
+            logger: makeLoggerMock({ fnMethod: vi.fn }),
           }),
         ).toEqual({
           option1: "some value",

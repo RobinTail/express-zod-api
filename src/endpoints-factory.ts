@@ -126,7 +126,7 @@ export class EndpointsFactory<
     );
   }
 
-  /** @todo consider removal of static options since it makes no sense */
+  /** @todo remove the static options in v19 - it makes no sense */
   public addOptions<AOUT extends FlatObject>(
     options: AOUT | (() => Promise<AOUT>),
   ) {
@@ -135,7 +135,15 @@ export class EndpointsFactory<
         createMiddleware({
           input: z.object({}),
           middleware:
-            typeof options === "function" ? options : async () => options,
+            typeof options === "function"
+              ? options
+              : async ({ logger }) => {
+                  logger.warn(
+                    "addOptions: Static options are deprecated. " +
+                      "Replace with async function or just import the const.",
+                  );
+                  return options;
+                },
         }),
       ),
       this.resultHandler,
