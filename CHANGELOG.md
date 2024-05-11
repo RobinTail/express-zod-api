@@ -2,6 +2,26 @@
 
 ## Version 18
 
+### v18.6.1
+
+- Notice on creating connections within a function supplied to `EndpointsFactory::addOptions()`:
+  - Use it with caution: a new connection will be created for every request handled by endpoint made on that factory;
+  - Consider reusing `const` across your files for persistent connections;
+  - In case of intentional non-persistent connection, consider resources cleanup if necessary:
+
+```typescript
+import { createResultHandler } from "express-zod-api";
+
+const resultHandlerWithCleanup = createResultHandler({
+  handler: ({ options }) => {
+    // necessary to check for certain option presence:
+    if ("db" in options && options.db) {
+      options.db.connection.close(); // sample cleanup
+    }
+  },
+});
+```
+
 ### v18.6.0
 
 - Feat: Supporting async functon as an argument for `EndpointsFactory::addOptions()`:
@@ -14,6 +34,7 @@ import { readFile } from "node:fs/promises";
 import { defaultEndpointsFactory } from "express-zod-api";
 
 const endpointsFactory = defaultEndpointsFactory.addOptions(async () => {
+  // caution: new connection on every request:
   const db = mongoose.connect("mongodb://connection.string");
   const privateKey = await readFile("private-key.pem", "utf-8");
   return { db, privateKey };
