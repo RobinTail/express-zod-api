@@ -297,11 +297,13 @@ In case you'd like to provide your endpoints with options that do not depend on 
 instance, consider shorthand method `addOptions`.
 
 ```typescript
+import { readFile } from "node:fs/promises";
 import { defaultEndpointsFactory } from "express-zod-api";
 
-const endpointsFactory = defaultEndpointsFactory.addOptions({
-  db: mongoose.connect("mongodb://connection.string"),
-  privateKey: fs.readFileSync("private-key.pem", "utf-8"),
+const endpointsFactory = defaultEndpointsFactory.addOptions(async () => {
+  const db = mongoose.connect("mongodb://connection.string");
+  const privateKey = await readFile("private-key.pem", "utf-8");
+  return { db, privateKey };
 });
 ```
 
