@@ -292,14 +292,15 @@ You can connect as many middlewares as you want, they will be executed in order.
 
 ## Options
 
-In case you'd like to provide your endpoints with options that do not depend on Request, like database connection
-instance, consider shorthand method `addOptions`.
+In case you'd like to provide your endpoints with options that do not depend on Request, like non-persistent connection
+to a database, consider shorthand method `addOptions`. For static options consider resuing `const` across your files.
 
 ```typescript
 import { readFile } from "node:fs/promises";
 import { defaultEndpointsFactory } from "express-zod-api";
 
 const endpointsFactory = defaultEndpointsFactory.addOptions(async () => {
+  // caution: new connection on every request:
   const db = mongoose.connect("mongodb://connection.string");
   const privateKey = await readFile("private-key.pem", "utf-8");
   return { db, privateKey };
