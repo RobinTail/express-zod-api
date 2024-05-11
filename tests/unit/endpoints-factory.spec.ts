@@ -91,38 +91,47 @@ describe("EndpointsFactory", () => {
   });
 
   describe(".addOptions()", () => {
-    test("Should create a new factory with an empty-input middleware and the same result handler", async () => {
-      const resultHandlerMock = createResultHandler({
-        getPositiveResponse: () => z.string(),
-        getNegativeResponse: () => z.string(),
-        handler: vi.fn(),
-      });
-      const factory = new EndpointsFactory(resultHandlerMock);
-      const newFactory = factory.addOptions({
+    test.each([
+      {
         option1: "some value",
         option2: "other value",
-      });
-      expect(factory["middlewares"]).toStrictEqual([]);
-      expect(factory["resultHandler"]).toStrictEqual(resultHandlerMock);
-      expect(newFactory["middlewares"].length).toBe(1);
-      expect(newFactory["middlewares"][0].input).toBeInstanceOf(z.ZodObject);
-      expect(
-        (newFactory["middlewares"][0].input as z.AnyZodObject).shape,
-      ).toEqual({});
-      expect(
-        await newFactory["middlewares"][0].middleware({
-          input: {},
-          options: {},
-          request: {} as Request,
-          response: {} as Response,
-          logger: {} as AbstractLogger,
-        }),
-      ).toEqual({
+      },
+      async () => ({
         option1: "some value",
         option2: "other value",
-      });
-      expect(newFactory["resultHandler"]).toStrictEqual(resultHandlerMock);
-    });
+      }),
+    ])(
+      "Should create a new factory with an empty-input middleware and the same result handler",
+      async (options) => {
+        const resultHandlerMock = createResultHandler({
+          getPositiveResponse: () => z.string(),
+          getNegativeResponse: () => z.string(),
+          handler: vi.fn(),
+        });
+        const factory = new EndpointsFactory(resultHandlerMock);
+        const newFactory = factory.addOptions(options);
+        expect(factory["middlewares"]).toStrictEqual([]);
+        expect(factory["resultHandler"]).toStrictEqual(resultHandlerMock);
+        expect(newFactory["middlewares"].length).toBe(1);
+        expect(newFactory["middlewares"][0].input).toBeInstanceOf(z.ZodObject);
+        expect(
+          (newFactory["middlewares"][0].input as z.AnyZodObject).shape,
+        ).toEqual({});
+        expect(
+          await newFactory["middlewares"][0].middleware({
+            input: {},
+            options: {},
+            request: {} as Request,
+            response: {} as Response,
+            logger: {} as AbstractLogger,
+          }),
+        ).toEqual({
+          option1: "some value",
+          option2: "other value",
+        });
+        expect(newFactory["resultHandler"]).toStrictEqual(resultHandlerMock);
+      },
+    );
   });
 
   describe.each(["addExpressMiddleware" as const, "use" as const])(

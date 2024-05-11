@@ -126,12 +126,16 @@ export class EndpointsFactory<
     );
   }
 
-  public addOptions<AOUT extends FlatObject>(options: AOUT) {
+  /** @todo consider removal of static options since it makes no sense */
+  public addOptions<AOUT extends FlatObject>(
+    options: AOUT | (() => Promise<AOUT>),
+  ) {
     return EndpointsFactory.#create<IN, OUT & AOUT, SCO, TAG>(
       this.middlewares.concat(
         createMiddleware({
           input: z.object({}),
-          middleware: async () => options,
+          middleware:
+            typeof options === "function" ? options : async () => options,
         }),
       ),
       this.resultHandler,

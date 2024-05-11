@@ -298,9 +298,10 @@ instance, consider shorthand method `addOptions`.
 ```typescript
 import { defaultEndpointsFactory } from "express-zod-api";
 
-const endpointsFactory = defaultEndpointsFactory.addOptions({
-  db: mongoose.connect("mongodb://connection.string"),
-  privateKey: fs.readFileSync("private-key.pem", "utf-8"),
+const endpointsFactory = defaultEndpointsFactory.addOptions(async () => {
+  const db = mongoose.connect("mongodb://connection.string");
+  const privateKey = fs.readFileSync("private-key.pem", "utf-8");
+  return { db, privateKey };
 });
 ```
 
