@@ -1149,6 +1149,44 @@ const exampleEndpoint = defaultEndpointsFactory.build({
 _See the example of the generated documentation
 [here](https://github.com/RobinTail/express-zod-api/blob/master/example/example.documentation.yaml)_
 
+## Customizable brands handling
+
+You can customize handling rules for your schemas in Documentation and Integration. Use the `.brand()` method on your
+schema to make it special and distinguishable for the library in runtime. Using symbols is recommended for branding.
+After that utilize the `brandHandling` feature of both constructors to declare your custom implementation.
+
+```ts
+import { z } from "zod";
+import { Documentation, Integration } from "express-zod-api";
+
+const myBrand = Symbol("MamaToldMeImSpecial");
+const myBrandedSchema = z.string().brand(myBrand);
+
+new Documentation({
+  brandHandling: {
+    [myBrand]: (
+      schema: typeof myBrandedSchema, // you should assign type yourself
+      { next, path, method, isResponse }, // handle a nested schema using next()
+    ) => {
+      const defaultResult = next(schema.unwrap()); // { type: string }
+      return { summary: "Special type of data" };
+    },
+  },
+});
+
+import ts from "typescript";
+const { factory: f } = ts;
+
+new Integration({
+  brandHandling: {
+    [myBrand]: (
+      schema: typeof myBrandedSchema, // you should assign type yourself
+      { next, isResponse, serializer }, // handle a nested schema using next()
+    ) => f.createKeywordTypeNode(ts.SyntaxKind.BooleanKeyword),
+  },
+});
+```
+
 ## Tagging the endpoints
 
 When generating documentation, you may find it necessary to classify endpoints into groups. For this, the
