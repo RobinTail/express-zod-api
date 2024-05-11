@@ -59,6 +59,7 @@ Start your API server with I/O schema validation and custom middlewares in minut
    2. [Generating a Frontend Client](#generating-a-frontend-client)
    3. [Creating a documentation](#creating-a-documentation)
    4. [Tagging the endpoints](#tagging-the-endpoints)
+   5. [Customizable brands handling](#customizable-brands-handling)
 8. [Caveats](#caveats)
    1. [Coercive schema of Zod](#coercive-schema-of-zod)
    2. [Excessive properties in endpoint output](#excessive-properties-in-endpoint-output)
@@ -1150,6 +1151,43 @@ const exampleEndpoint = defaultEndpointsFactory.build({
 _See the example of the generated documentation
 [here](https://github.com/RobinTail/express-zod-api/blob/master/example/example.documentation.yaml)_
 
+## Tagging the endpoints
+
+When generating documentation, you may find it necessary to classify endpoints into groups. For this, the
+possibility of tagging endpoints is provided. In order to achieve the consistency of tags across all endpoints, the
+possible tags should be declared in the configuration first and another instantiation approach of the
+`EndpointsFactory` is required. Consider the following example:
+
+```typescript
+import {
+  createConfig,
+  EndpointsFactory,
+  defaultResultHandler,
+} from "express-zod-api";
+
+const config = createConfig({
+  // ..., use the simple or the advanced syntax:
+  tags: {
+    users: "Everything about the users",
+    files: {
+      description: "Everything about the files processing",
+      url: "https://example.com",
+    },
+  },
+});
+
+// instead of defaultEndpointsFactory use the following approach:
+const taggedEndpointsFactory = new EndpointsFactory({
+  resultHandler: defaultResultHandler, // or use your custom one
+  config, // <—— supply your config here
+});
+
+const exampleEndpoint = taggedEndpointsFactory.build({
+  // ...
+  tag: "users", // or tags: ["users", "files"]
+});
+```
+
 ## Customizable brands handling
 
 You can customize handling rules for your schemas in Documentation and Integration. Use the `.brand()` method on your
@@ -1185,43 +1223,6 @@ new Integration({
       { next, isResponse, serializer }, // handle a nested schema using next()
     ) => f.createKeywordTypeNode(ts.SyntaxKind.BooleanKeyword),
   },
-});
-```
-
-## Tagging the endpoints
-
-When generating documentation, you may find it necessary to classify endpoints into groups. For this, the
-possibility of tagging endpoints is provided. In order to achieve the consistency of tags across all endpoints, the
-possible tags should be declared in the configuration first and another instantiation approach of the
-`EndpointsFactory` is required. Consider the following example:
-
-```typescript
-import {
-  createConfig,
-  EndpointsFactory,
-  defaultResultHandler,
-} from "express-zod-api";
-
-const config = createConfig({
-  // ..., use the simple or the advanced syntax:
-  tags: {
-    users: "Everything about the users",
-    files: {
-      description: "Everything about the files processing",
-      url: "https://example.com",
-    },
-  },
-});
-
-// instead of defaultEndpointsFactory use the following approach:
-const taggedEndpointsFactory = new EndpointsFactory({
-  resultHandler: defaultResultHandler, // or use your custom one
-  config, // <—— supply your config here
-});
-
-const exampleEndpoint = taggedEndpointsFactory.build({
-  // ...
-  tag: "users", // or tags: ["users", "files"]
 });
 ```
 
