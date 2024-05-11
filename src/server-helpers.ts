@@ -3,7 +3,7 @@ import { metaSymbol } from "./metadata";
 import { loadPeer } from "./peer-helpers";
 import { AnyResultHandlerDefinition } from "./result-handler";
 import { AbstractLogger } from "./logger";
-import { ServerConfig } from "./config-type";
+import { CommonConfig, ServerConfig } from "./config-type";
 import { ErrorRequestHandler, RequestHandler, Response } from "express";
 import createHttpError, { isHttpError } from "http-errors";
 import { lastResortHandler } from "./last-resort";
@@ -131,7 +131,7 @@ export const createLoggingMiddleware =
     config,
   }: {
     rootLogger: AbstractLogger;
-    config: ServerConfig;
+    config: CommonConfig;
   }): RequestHandler =>
   async (request, response: LocalResponse, next) => {
     const logger = config.childLoggerProvider

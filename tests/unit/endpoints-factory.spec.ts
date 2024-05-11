@@ -9,6 +9,7 @@ import {
 import { Endpoint } from "../../src/endpoint";
 import { expectType } from "tsd";
 import { AbstractLogger } from "../../src/logger";
+import { makeLoggerMock } from "../../src/testing";
 import { serializeSchemaForTest } from "../helpers";
 import { z } from "zod";
 import { describe, expect, test, vi } from "vitest";
@@ -98,10 +99,10 @@ describe("EndpointsFactory", () => {
         handler: vi.fn(),
       });
       const factory = new EndpointsFactory(resultHandlerMock);
-      const newFactory = factory.addOptions({
+      const newFactory = factory.addOptions(async () => ({
         option1: "some value",
         option2: "other value",
-      });
+      }));
       expect(factory["middlewares"]).toStrictEqual([]);
       expect(factory["resultHandler"]).toStrictEqual(resultHandlerMock);
       expect(newFactory["middlewares"].length).toBe(1);
@@ -115,7 +116,7 @@ describe("EndpointsFactory", () => {
           options: {},
           request: {} as Request,
           response: {} as Response,
-          logger: {} as AbstractLogger,
+          logger: makeLoggerMock({ fnMethod: vi.fn }),
         }),
       ).toEqual({
         option1: "some value",

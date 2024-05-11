@@ -5,16 +5,11 @@
 ### v19.0.0
 
 - **Breaking changes**:
-  - Increased minimum supported versions:
-    - Node: 18.18.0 or 20.9.0;
-    - `zod`: 3.23.0.
-  - Removed the deprecated ~~`withMeta()`~~ is removed (see [v18.5.0](#v1850) for details);
-  - Freezed the arrays returned by the following methods or exposed by properties that supposed to be readonly:
-    - For `Endpoint` class: `getMethods()`, `getMimeTypes()`, `getResponses()`, `getScopes()`, `getTags()`;
-    - For `DependsOnMethod` class: `pairs`, `siblingMethods`.
-  - Changed the `ServerConfig` option `server.upload.beforeUpload`:
-    - The assigned function now accepts `request` instead of `app` and being called only for eligible requests;
-    - Restricting the upload can be achieved now by throwing an error from within.
+  - Minimum supported versions: Node 18.18.0, 20.9.0 or 22.0.0; `zod` 3.23.0.
+  - Removed the deprecated ~~`withMeta()`~~ (see [v18.5.0](#v1850) for details);
+  - Removed support for static options by `EndpointsFactory::addOptions()` (see [v18.6.0](#v1860) for details);
+  - Freezed the arrays returned by the methods or exposed by properties of `Endpoint` and `DependsOnMethod`;
+  - Changed the `ServerConfig` option `server.upload.beforeUpload`: accepts `request` instead of `app`;
   - Changed interface for `ez.raw()`: additional properties should be supplied as its argument, not via `.extend()`.
 - Features:
   - New configurable level `info` for built-in logger (higher than `debug`, but lower than `warn`);
@@ -28,11 +23,13 @@
   - The debug messages from uploader are enabled by default when the logger level is set to `debug`;
   - Specifying `rawParser` in config is no longer needed to enable the feature.
 - How to migrate confidently:
-  - Upgrade Node to latest version of 18.x, 20.x or 22.x;
-  - Upgrade `zod` to its latest version of 3.x;
+  - Upgrade Node to latest version of 18.x, 20.x or 22.x and `zod` to its latest 3.x;
   - Avoid mutating the readonly arrays;
   - If you're using ~~`withMeta()`~~:
     - Remove it and unwrap your schemas — you can use `.example()` method directly.
+  - If you're using `.addOptions()` on `EndpointsFactory` instance:
+    - Replace the argument with an async function returning those options;
+    - Or assign those options to `const` and import them where needed.
   - If you're using `ez.raw().extend()` for additional properties:
     - Supply them directly as an argument to `ez.raw()` — see the example below.
   - If you're using `beforeUpload` in your config:
@@ -86,6 +83,45 @@ const after = ez.raw({
 ```
 
 ## Version 18
+
+### v18.6.1
+
+- Notice on creating connections within a function supplied to `EndpointsFactory::addOptions()`:
+  - Use it with caution: a new connection will be created for every request handled by endpoint made on that factory;
+  - Consider reusing `const` across your files for persistent connections;
+  - In case of intentional non-persistent connection, consider resources cleanup if necessary:
+
+```typescript
+import { createResultHandler } from "express-zod-api";
+
+const resultHandlerWithCleanup = createResultHandler({
+  handler: ({ options }) => {
+    // necessary to check for certain option presence:
+    if ("db" in options && options.db) {
+      options.db.connection.close(); // sample cleanup
+    }
+  },
+});
+```
+
+### v18.6.0
+
+- Feat: Supporting async functon as an argument for `EndpointsFactory::addOptions()`:
+  - I realized that it does not make sense for `.addOptions` just to proxy the static data;
+  - In case your options are static you can just `import` the corresponding `const` instead;
+  - Static options are deprecated and its support will be removed in v19.
+
+```ts
+import { readFile } from "node:fs/promises";
+import { defaultEndpointsFactory } from "express-zod-api";
+
+const endpointsFactory = defaultEndpointsFactory.addOptions(async () => {
+  // caution: new connection on every request:
+  const db = mongoose.connect("mongodb://connection.string");
+  const privateKey = await readFile("private-key.pem", "utf-8");
+  return { db, privateKey };
+});
+```
 
 ### v18.5.2
 

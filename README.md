@@ -52,12 +52,12 @@ Start your API server with I/O schema validation and custom middlewares in minut
    2. [Array response](#array-response) for migrating legacy APIs
    3. [Headers as input source](#headers-as-input-source)
    4. [Accepting raw data](#accepting-raw-data)
-   5. [Resources cleanup](#resources-cleanup)
-   6. [Subscriptions](#subscriptions)
+   5. [Subscriptions](#subscriptions)
 7. [Integration and Documentation](#integration-and-documentation)
-   1. [Generating a Frontend Client](#generating-a-frontend-client)
-   2. [Creating a documentation](#creating-a-documentation)
-   3. [Tagging the endpoints](#tagging-the-endpoints)
+   1. [Zod Plugin](#zod-plugin)
+   2. [Generating a Frontend Client](#generating-a-frontend-client)
+   3. [Creating a documentation](#creating-a-documentation)
+   4. [Tagging the endpoints](#tagging-the-endpoints)
 8. [Caveats](#caveats)
    1. [Coercive schema of Zod](#coercive-schema-of-zod)
    2. [Excessive properties in endpoint output](#excessive-properties-in-endpoint-output)
@@ -88,7 +88,7 @@ Therefore, many basic tasks can be accomplished faster and easier, in particular
 
 - [Typescript](https://www.typescriptlang.org/) first.
 - Web server — [Express.js](https://expressjs.com/).
-- Schema validation — [Zod 3.x](https://github.com/colinhacks/zod).
+- Schema validation — [Zod 3.x](https://github.com/colinhacks/zod) including [Zod Plugin](#zod-plugin).
 - Supports any logger having `info()`, `debug()`, `error()` and `warn()` methods;
   - Built-in console logger with colorful and pretty inspections by default.
 - Generators:
@@ -292,15 +292,34 @@ You can connect as many middlewares as you want, they will be executed in order.
 
 ## Options
 
-In case you'd like to provide your endpoints with options that do not depend on Request, like database connection
-instance, consider shorthand method `addOptions`.
+In case you'd like to provide your endpoints with options that do not depend on Request, like non-persistent connection
+to a database, consider shorthand method `addOptions`. For static options consider reusing `const` across your files.
 
 ```typescript
+import { readFile } from "node:fs/promises";
 import { defaultEndpointsFactory } from "express-zod-api";
 
-const endpointsFactory = defaultEndpointsFactory.addOptions({
-  db: mongoose.connect("mongodb://connection.string"),
-  privateKey: fs.readFileSync("private-key.pem", "utf-8"),
+const endpointsFactory = defaultEndpointsFactory.addOptions(async () => {
+  // caution: new connection on every request:
+  const db = mongoose.connect("mongodb://connection.string");
+  const privateKey = await readFile("private-key.pem", "utf-8");
+  return { db, privateKey };
+});
+```
+
+**Notice on resources cleanup**: If necessary, you can release resources at the end of the request processing in a
+custom [Result Handler](#response-customization):
+
+```typescript
+import { createResultHandler } from "express-zod-api";
+
+const resultHandlerWithCleanup = createResultHandler({
+  handler: ({ options }) => {
+    // necessary to check for certain option presence:
+    if ("db" in options && options.db) {
+      options.db.connection.close(); // sample cleanup
+    }
+  },
 });
 ```
 
@@ -1009,41 +1028,6 @@ const rawAcceptingEndpoint = defaultEndpointsFactory.build({
 });
 ```
 
-## Resources cleanup
-
-If some entities (database clients for example) do not care about automatically releasing their resources when their
-instances are destroyed, you can do the following. Return these instances in a middleware so that they become `options`
-for Endpoint's handler. Those `options` are also available as an argument to a Result Handler. Create your own one and
-clean up resources in accordance with the documentation of that software. The `options` may however be empty or
-incomplete in case of errors or failures, so it is necessary to check for their presence programmatically.
-
-```typescript
-import {
-  createResultHandler,
-  EndpointsFactory,
-  createMiddleware,
-} from "express-zod-api";
-
-const resultHandlerWithCleanup = createResultHandler({
-  handler: ({ options }) => {
-    if ("dbClient" in options && options.dbClient) {
-      (options.dbClient as DBClient).close(); // sample cleanup
-    }
-    // your implementation
-  },
-});
-
-const dbProvider = createMiddleware({
-  handler: async () => ({
-    dbClient: new DBClient(), // sample entity that requires cleanup
-  }),
-});
-
-const dbEquippedFactory = new EndpointsFactory(
-  resultHandlerWithCleanup,
-).addMiddleware(dbProvider);
-```
-
 ## Subscriptions
 
 If you want the user of a client application to be able to subscribe to subsequent updates initiated by the server, the
@@ -1056,6 +1040,14 @@ synergy between two libraries on handling the incoming `subscribe` and `unsubscr
 https://github.com/RobinTail/zod-sockets#subscriptions
 
 # Integration and Documentation
+
+## Zod Plugin
+
+Express Zod API acts as a plugin for Zod, extending its functionality once you import anything from `express-zod-api`:
+
+- Adds `.example()` method to all Zod schemas for storing examples and reflecting them in the generated documentation;
+- Adds `.label()` method to `ZodDefault` for replacing the default value in documentation with a label;
+- Alters the `.brand()` method on all Zod schemas by making the assigned brand available in runtime.
 
 ## Generating a Frontend Client
 
