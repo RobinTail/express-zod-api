@@ -2,6 +2,24 @@
 
 ## Version 18
 
+### v18.6.0
+
+- Feat: Supporting async functon as an argument for `EndpointsFactory::addOptions()`:
+  - I realized that it does not make sense for `.addOptions` just to proxy the static data;
+  - In case your options are static you can just `import` the corresponding `const` instead;
+  - Static options are deprecated and its support will be removed in v19.
+
+```ts
+import { readFile } from "node:fs/promises";
+import { defaultEndpointsFactory } from "express-zod-api";
+
+const endpointsFactory = defaultEndpointsFactory.addOptions(async () => {
+  const db = mongoose.connect("mongodb://connection.string");
+  const privateKey = await readFile("private-key.pem", "utf-8");
+  return { db, privateKey };
+});
+```
+
 ### v18.5.2
 
 - Muted uploader logs related to non-eligible requests;
