@@ -53,14 +53,13 @@ export const attachRouting = (config: AppConfig, routing: Routing) => {
 };
 
 export const createServer = async (config: ServerConfig, routing: Routing) => {
-  const app = express().disable("x-powered-by");
   const {
     rootLogger,
     notFoundHandler,
     parserFailureHandler,
     loggingMiddleware,
   } = makeCommonEntities(config);
-  app.use(loggingMiddleware);
+  const app = express().disable("x-powered-by").use(loggingMiddleware);
 
   if (config.server.compression) {
     const compressor = await loadPeer<typeof compression>("compression");
