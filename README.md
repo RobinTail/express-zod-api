@@ -88,7 +88,7 @@ Therefore, many basic tasks can be accomplished faster and easier, in particular
 
 - [Typescript](https://www.typescriptlang.org/) first.
 - Web server — [Express.js](https://expressjs.com/).
-- Schema validation — [Zod 3.x](https://github.com/colinhacks/zod).
+- Schema validation — [Zod 3.x](https://github.com/colinhacks/zod) including [Zod Plugin](#zod-plugin).
 - Supports any logger having `info()`, `debug()`, `error()` and `warn()` methods;
   - Built-in console logger with colorful and pretty inspections by default.
 - Generators:
@@ -1056,6 +1056,14 @@ synergy between two libraries on handling the incoming `subscribe` and `unsubscr
 https://github.com/RobinTail/zod-sockets#subscriptions
 
 # Integration and Documentation
+
+## Zod Plugin
+
+Express Zod API acts as a plugin for Zod, extending its functionality once you import anything from `express-zod-api`:
+
+- Adds `.example()` method to all Zod schemas for storing examples and reflecting them in the generated documentation;
+- Adds `.label()` method to `ZodDefault` for replacing the default value in documentation with a label;
+- Alters the `.brand()` method on all Zod schemas by making the assigned brand available in runtime.
 
 ## Generating a Frontend Client
 
