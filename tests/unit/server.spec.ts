@@ -345,7 +345,7 @@ describe("Server", () => {
       );
       expect(logger).toEqual(customLogger);
       expect(typeof notFoundHandler).toBe("function");
-      expect(appMock.use).toHaveBeenCalledTimes(0);
+      expect(appMock.use).toHaveBeenCalledTimes(1); // createLoggingMiddleware
       expect(configMock.errorHandler.handler).toHaveBeenCalledTimes(0);
       expect(infoMethod).toHaveBeenCalledTimes(0);
       expect(appMock.get).toHaveBeenCalledTimes(1);

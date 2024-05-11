@@ -20,29 +20,46 @@ const makeCommonEntities = (config: CommonConfig) => {
   if (config.startupLogo !== false) {
     console.log(getStartupLogo());
   }
-  const commons = {
-    errorHandler: config.errorHandler || defaultResultHandler,
-    rootLogger: isBuiltinLoggerConfig(config.logger)
-      ? createLogger(config.logger)
-      : config.logger,
+  const errorHandler = config.errorHandler || defaultResultHandler;
+  const rootLogger = isBuiltinLoggerConfig(config.logger)
+    ? createLogger(config.logger)
+    : config.logger;
+  rootLogger.debug("Running", process.env.TSUP_BUILD || "from sources");
+  const loggingMiddleware = createLoggingMiddleware({ rootLogger, config });
+  const notFoundHandler = createNotFoundHandler({ rootLogger, errorHandler });
+  const parserFailureHandler = createParserFailureHandler({
+    rootLogger,
+    errorHandler,
+  });
+  return {
+    rootLogger,
+    errorHandler,
+    notFoundHandler,
+    parserFailureHandler,
+    loggingMiddleware,
   };
-  commons.rootLogger.debug("Running", process.env.TSUP_BUILD || "from sources");
-  const notFoundHandler = createNotFoundHandler(commons);
-  const parserFailureHandler = createParserFailureHandler(commons);
-  return { ...commons, notFoundHandler, parserFailureHandler };
 };
 
 export const attachRouting = (config: AppConfig, routing: Routing) => {
-  const { rootLogger, notFoundHandler } = makeCommonEntities(config);
-  initRouting({ app: config.app, routing, rootLogger, config });
+  const { rootLogger, notFoundHandler, loggingMiddleware } =
+    makeCommonEntities(config);
+  initRouting({
+    app: config.app.use(loggingMiddleware),
+    routing,
+    rootLogger,
+    config,
+  });
   return { notFoundHandler, logger: rootLogger };
 };
 
 export const createServer = async (config: ServerConfig, routing: Routing) => {
-  const app = express().disable("x-powered-by");
-  const { rootLogger, notFoundHandler, parserFailureHandler } =
-    makeCommonEntities(config);
-  app.use(createLoggingMiddleware({ rootLogger, config }));
+  const {
+    rootLogger,
+    notFoundHandler,
+    parserFailureHandler,
+    loggingMiddleware,
+  } = makeCommonEntities(config);
+  const app = express().disable("x-powered-by").use(loggingMiddleware);
 
   if (config.server.compression) {
     const compressor = await loadPeer<typeof compression>("compression");
