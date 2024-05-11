@@ -34,7 +34,12 @@ const makeCommonEntities = (config: CommonConfig) => {
 
 export const attachRouting = (config: AppConfig, routing: Routing) => {
   const { rootLogger, notFoundHandler } = makeCommonEntities(config);
-  initRouting({ app: config.app, routing, rootLogger, config });
+  initRouting({
+    app: config.app.use(createLoggingMiddleware({ rootLogger, config })),
+    routing,
+    rootLogger,
+    config,
+  });
   return { notFoundHandler, logger: rootLogger };
 };
 
