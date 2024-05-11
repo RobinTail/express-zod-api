@@ -5,9 +5,7 @@
 ### v19.0.0
 
 - **Breaking changes**:
-  - Increased minimum supported versions:
-    - Node: 18.18.0 or 20.9.0;
-    - `zod`: 3.23.0.
+  - Minimum supported versions: Node 18.18.0, 20.9.0 or 22.0.0; `zod` 3.23.0.
   - Removed the deprecated ~~`withMeta()`~~ (see [v18.5.0](#v1850) for details);
   - Removed support for static options by `EndpointsFactory::addOptions()` (see [v18.6.0](#v1860) for details);
   - Freezed the arrays returned by the methods or exposed by properties of `Endpoint` and `DependsOnMethod`;
