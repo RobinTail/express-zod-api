@@ -52,8 +52,7 @@ Start your API server with I/O schema validation and custom middlewares in minut
    2. [Array response](#array-response) for migrating legacy APIs
    3. [Headers as input source](#headers-as-input-source)
    4. [Accepting raw data](#accepting-raw-data)
-   5. [Resources cleanup](#resources-cleanup)
-   6. [Subscriptions](#subscriptions)
+   5. [Subscriptions](#subscriptions)
 7. [Integration and Documentation](#integration-and-documentation)
    1. [Generating a Frontend Client](#generating-a-frontend-client)
    2. [Creating a documentation](#creating-a-documentation)
@@ -292,15 +291,34 @@ You can connect as many middlewares as you want, they will be executed in order.
 
 ## Options
 
-In case you'd like to provide your endpoints with options that do not depend on Request, like database connection
-instance, consider shorthand method `addOptions`.
+In case you'd like to provide your endpoints with options that do not depend on Request, like non-persistent connection
+to a database, consider shorthand method `addOptions`. For static options consider reusing `const` across your files.
 
 ```typescript
+import { readFile } from "node:fs/promises";
 import { defaultEndpointsFactory } from "express-zod-api";
 
-const endpointsFactory = defaultEndpointsFactory.addOptions({
-  db: mongoose.connect("mongodb://connection.string"),
-  privateKey: fs.readFileSync("private-key.pem", "utf-8"),
+const endpointsFactory = defaultEndpointsFactory.addOptions(async () => {
+  // caution: new connection on every request:
+  const db = mongoose.connect("mongodb://connection.string");
+  const privateKey = await readFile("private-key.pem", "utf-8");
+  return { db, privateKey };
+});
+```
+
+**Notice on resources cleanup**: If necessary, you can release resources at the end of the request processing in a
+custom [Result Handler](#response-customization):
+
+```typescript
+import { createResultHandler } from "express-zod-api";
+
+const resultHandlerWithCleanup = createResultHandler({
+  handler: ({ options }) => {
+    // necessary to check for certain option presence:
+    if ("db" in options && options.db) {
+      options.db.connection.close(); // sample cleanup
+    }
+  },
 });
 ```
 
@@ -1026,41 +1044,6 @@ const rawAcceptingEndpoint = defaultEndpointsFactory.build({
     length: raw.length, // raw is Buffer
   }),
 });
-```
-
-## Resources cleanup
-
-If some entities (database clients for example) do not care about automatically releasing their resources when their
-instances are destroyed, you can do the following. Return these instances in a middleware so that they become `options`
-for Endpoint's handler. Those `options` are also available as an argument to a Result Handler. Create your own one and
-clean up resources in accordance with the documentation of that software. The `options` may however be empty or
-incomplete in case of errors or failures, so it is necessary to check for their presence programmatically.
-
-```typescript
-import {
-  createResultHandler,
-  EndpointsFactory,
-  createMiddleware,
-} from "express-zod-api";
-
-const resultHandlerWithCleanup = createResultHandler({
-  handler: ({ options }) => {
-    if ("dbClient" in options && options.dbClient) {
-      (options.dbClient as DBClient).close(); // sample cleanup
-    }
-    // your implementation
-  },
-});
-
-const dbProvider = createMiddleware({
-  handler: async () => ({
-    dbClient: new DBClient(), // sample entity that requires cleanup
-  }),
-});
-
-const dbEquippedFactory = new EndpointsFactory(
-  resultHandlerWithCleanup,
-).addMiddleware(dbProvider);
 ```
 
 ## Subscriptions
