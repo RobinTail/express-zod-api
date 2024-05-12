@@ -2,6 +2,10 @@
 
 ## Version 18
 
+### v18.6.2
+
+- Compatibility improvement for Jest: all dynamic `import()` in CJS build are replaced with `require()`.
+
 ### v18.6.1
 
 - Notice on creating connections within a function supplied to `EndpointsFactory::addOptions()`:
