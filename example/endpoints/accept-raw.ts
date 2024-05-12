@@ -10,6 +10,6 @@ export const rawAcceptingEndpoint = taggedEndpointsFactory.build({
   }),
   output: z.object({ length: z.number().int().nonnegative() }),
   handler: async ({ input: { raw } }) => ({
-    length: raw.length, // input.raw is populated automatically when rawParser is set in config
+    length: raw.length, // input.raw is populated automatically by the corresponding parser
   }),
 });
