@@ -2,12 +2,8 @@ import express from "express";
 import { createConfig } from "../src";
 import ui from "swagger-ui-express";
 import yaml from "yaml";
-import { readFileSync } from "node:fs";
+import { readFile } from "node:fs/promises";
 import createHttpError from "http-errors";
-
-const documentation = yaml.parse(
-  readFileSync("example/example.documentation.yaml", "utf-8"),
-);
 
 export const config = createConfig({
   server: {
@@ -18,8 +14,11 @@ export const config = createConfig({
     },
     compression: true, // affects sendAvatarEndpoint
     rawParser: express.raw(), // required for rawAcceptingEndpoint
-    beforeRouting: ({ app }) => {
+    beforeRouting: async ({ app }) => {
       // third-party middlewares serving their own routes or establishing their own routing besides the API
+      const documentation = yaml.parse(
+        await readFile("example/example.documentation.yaml", "utf-8"),
+      );
       app.use("/docs", ui.serve, ui.setup(documentation));
     },
   },
