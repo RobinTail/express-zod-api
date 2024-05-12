@@ -29,7 +29,7 @@ import {
 } from "./integration-helpers";
 import { defaultSerializer, makeCleanId } from "./common-helpers";
 import { Method, methods } from "./method";
-import { mimeJson } from "./mime";
+import { contentTypes } from "./content-type";
 import { loadPeer } from "./peer-helpers";
 import { Routing } from "./routing";
 import { walkRouting } from "./routing-walker";
@@ -219,7 +219,9 @@ export class Integration {
               positive: positiveResponseId,
               negative: negativeResponseId,
               response: genericResponseId,
-              isJson: endpoint.getMimeTypes("positive").includes(mimeJson),
+              isJson: endpoint
+                .getMimeTypes("positive")
+                .includes(contentTypes.json),
               tags: endpoint.getTags(),
             },
           );
@@ -271,25 +273,24 @@ export class Integration {
     const jsonEndpoints: ts.PropertyAssignment[] = [];
     const endpointTags: ts.PropertyAssignment[] = [];
     for (const [{ method, path }, { isJson, tags, ...rest }] of this.registry) {
+      const propName = quoteProp(method, path);
       // "get /v1/user/retrieve": GetV1UserRetrieveInput
       for (const face of this.interfaces) {
         if (face.kind in rest) {
-          face.props.push(
-            makeInterfaceProp(quoteProp(method, path), rest[face.kind]!),
-          );
+          face.props.push(makeInterfaceProp(propName, rest[face.kind]!));
         }
       }
       if (variant !== "types") {
         if (isJson) {
           // "get /v1/user/retrieve": true
           jsonEndpoints.push(
-            f.createPropertyAssignment(quoteProp(method, path), f.createTrue()),
+            f.createPropertyAssignment(propName, f.createTrue()),
           );
         }
         // "get /v1/user/retrieve": ["users"]
         endpointTags.push(
           f.createPropertyAssignment(
-            quoteProp(method, path),
+            propName,
             f.createArrayLiteralExpression(
               tags.map((tag) => f.createStringLiteral(tag)),
             ),
@@ -483,7 +484,7 @@ export class Integration {
         f.createObjectLiteralExpression([
           f.createPropertyAssignment(
             f.createStringLiteral("Content-Type"),
-            f.createStringLiteral(mimeJson),
+            f.createStringLiteral(contentTypes.json),
           ),
         ]),
         undefined,

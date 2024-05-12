@@ -3,7 +3,7 @@ import http from "node:http";
 import { CommonConfig } from "./config-type";
 import { AbstractEndpoint } from "./endpoint";
 import { AbstractLogger } from "./logger";
-import { mimeJson } from "./mime";
+import { contentTypes } from "./content-type";
 import { loadAlternativePeer } from "./peer-helpers";
 
 /**
@@ -25,7 +25,7 @@ export const makeRequestMock = <REQ extends Record<string, any>>({
 }) =>
   ({
     method: "GET",
-    header: fnMethod(() => mimeJson),
+    header: fnMethod(() => contentTypes.json),
     ...requestProps,
   }) as { method: string } & Record<"header", MockOverrides> & REQ;
 
