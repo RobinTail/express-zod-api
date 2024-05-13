@@ -13,8 +13,10 @@
   - Removed the deprecated method ~~`withMeta()`~~ (see [v18.5.0](#v1850) for details);
   - Removed support for static options by `EndpointsFactory::addOptions()` (see [v18.6.0](#v1860) for details);
   - Freezed the arrays returned by the methods or exposed by properties of `Endpoint` and `DependsOnMethod`;
-  - Changed the `ServerConfig` option `server.upload.beforeUpload`: accepts `request` instead of `app`;
-  - Changed interface for `ez.raw()`: additional properties should be supplied as its argument, not via `.extend()`.
+  - Changed interface for `ez.raw()`: additional properties should be supplied as its argument, not via `.extend()`;
+  - Changed the following config options:
+    - The function assigned to `server.upload.beforeUpload` now accepts `request` instead of `app`;
+    - The function assigned to `server.beforeRouting` is now called before parsing too.
 - Features:
   - New configurable level `info` for built-in logger (higher than `debug`, but lower than `warn`);
   - Selective parsers equipped with a child logger:
@@ -38,6 +40,8 @@
     - Supply them directly as an argument to `ez.raw()` — see the example below.
   - If you're using `beforeUpload` in your config:
     - Adjust the implementation according to the example below.
+  - If you're using `beforeRouting` in your config for anything that requires a parsed request body:
+    - Add the required parsers using `app.use()` statements to the assigned function.
   - If you're having `rawParser: express.raw()` in your config:
     - You can now remove this line (it's the default value now), unless you're having any customizations.
 
