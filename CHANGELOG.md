@@ -5,7 +5,11 @@
 ### v19.0.0
 
 - **Breaking changes**:
-  - Minimum supported versions: Node 18.18.0, 20.9.0 or 22.0.0; `zod` 3.23.0.
+  - Minimum supported versions:
+    - For Node.js: 18.18.0, 20.9.0 or 22.0.0;
+    - For `zod`: 3.23.0;
+    - For `express`: [4.19.2](https://github.com/expressjs/express/security/advisories/GHSA-rv95-896h-c2vc);
+    - For `express-fileupload` and `@types/express-fileupload`: 1.5.0.
   - Removed the deprecated ~~`withMeta()`~~ (see [v18.5.0](#v1850) for details);
   - Removed support for static options by `EndpointsFactory::addOptions()` (see [v18.6.0](#v1860) for details);
   - Freezed the arrays returned by the methods or exposed by properties of `Endpoint` and `DependsOnMethod`;
@@ -23,7 +27,7 @@
   - The debug messages from uploader are enabled by default when the logger level is set to `debug`;
   - Specifying `rawParser` in config is no longer needed to enable the feature.
 - How to migrate confidently:
-  - Upgrade Node to latest version of 18.x, 20.x or 22.x and `zod` to its latest 3.x;
+  - Upgrade Node.js, `zod`, `express`, `express-fileupload` and `@types/express-fileupload` accordingly;
   - Avoid mutating the readonly arrays;
   - If you're using ~~`withMeta()`~~:
     - Remove it and unwrap your schemas — you can use `.example()` method directly.
