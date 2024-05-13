@@ -148,7 +148,7 @@ export interface ServerConfig<TAG extends string = string>
      * */
     rawParser?: RequestHandler;
     /**
-     * @desc A code to execute after parsing the request body but before processing the Routing of your API.
+     * @desc A code to execute before processing the Routing of your API (and before parsing).
      * @desc This can be a good place for express middlewares establishing their own routes.
      * @desc It can help to avoid making a DIY solution based on the attachRouting() approach.
      * @default undefined
