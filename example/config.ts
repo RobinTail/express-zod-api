@@ -1,4 +1,3 @@
-import express from "express";
 import { createConfig } from "../src";
 import ui from "swagger-ui-express";
 import yaml from "yaml";
@@ -9,12 +8,10 @@ export const config = createConfig({
   server: {
     listen: 8090,
     upload: {
-      debug: true,
       limits: { fileSize: 51200 },
       limitError: createHttpError(413, "The file is too large"), // affects uploadAvatarEndpoint
     },
     compression: true, // affects sendAvatarEndpoint
-    rawParser: express.raw(), // required for rawAcceptingEndpoint
     beforeRouting: async ({ app }) => {
       // third-party middlewares serving their own routes or establishing their own routing besides the API
       const documentation = yaml.parse(

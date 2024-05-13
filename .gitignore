@@ -6,3 +6,4 @@ yarn-error.log
 coverage
 tests/**/yarn.lock
 tests/**/quick-start.ts
+tests/issue952/*.d.ts

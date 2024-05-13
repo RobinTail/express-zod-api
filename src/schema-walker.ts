@@ -1,7 +1,7 @@
 import { z } from "zod";
 import type { FlatObject } from "./common-helpers";
-import { getMeta } from "./metadata";
-import { ProprietaryKind } from "./proprietary-schemas";
+import { metaSymbol } from "./metadata";
+import { ProprietaryBrand } from "./proprietary-schemas";
 
 interface VariantDependingProps<U> {
   regular: { next: (schema: z.ZodTypeAny) => U };
@@ -30,7 +30,7 @@ export type SchemaHandler<
 
 export type HandlingRules<U, Context extends FlatObject = {}> = Partial<
   Record<
-    z.ZodFirstPartyTypeKind | ProprietaryKind,
+    z.ZodFirstPartyTypeKind | ProprietaryBrand,
     SchemaHandler<any, U, Context> // keeping "any" here in order to avoid excessive complexity
   >
 >;
@@ -47,8 +47,9 @@ export const walkSchema = <U extends object, Context extends FlatObject = {}>({
   rules: HandlingRules<U, Context>;
   onMissing: SchemaHandler<z.ZodTypeAny, U, Context, "last">;
 }): U => {
-  const kind = getMeta(schema, "kind") || schema._def.typeName;
-  const handler = kind ? rules[kind as keyof typeof rules] : undefined;
+  const handler =
+    rules[schema._def[metaSymbol]?.brand as keyof typeof rules] ||
+    rules[schema._def.typeName as keyof typeof rules];
   const ctx = rest as unknown as Context;
   const next = (subject: z.ZodTypeAny) =>
     walkSchema({ schema: subject, ...ctx, onEach, rules, onMissing });

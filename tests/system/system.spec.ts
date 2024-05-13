@@ -289,7 +289,7 @@ describe("App", async () => {
       );
     });
 
-    test("Should treat custom errors in middleware input validations as they are", async () => {
+    test("Should treat custom errors in endpoint input validations as they are", async () => {
       const response = await fetch(
         `http://127.0.0.1:${port}/v1/faulty?epError=1`,
         {
@@ -327,18 +327,19 @@ describe("App", async () => {
 
     test("Should fail on malformed body", async () => {
       const response = await fetch(`http://127.0.0.1:${port}/v1/test`, {
-        method: "PUT",
+        method: "POST", // valid method this time
         headers: {
           "Content-Type": "application/json",
         },
-        body: '{"key": "123", "something',
+        body: '{"key": "123", "something', // no closing bracket
       });
       expect(response.status).toBe(400); // Issue #907
       const json = await response.json();
       expect(json).toMatchSnapshot({
         error: {
           message: expect.stringMatching(
-            // the 2nd option is for Node 19
+            // @todo revisit when Node 18 dropped
+            // the 2nd option is for Node 20+
             /(Unexpected end of JSON input|Unterminated string in JSON at position 25)/,
           ),
         },

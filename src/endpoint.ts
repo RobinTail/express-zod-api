@@ -47,19 +47,21 @@ export abstract class AbstractEndpoint {
     response: Response;
     logger: AbstractLogger;
     config: CommonConfig;
-    siblingMethods?: Method[];
+    siblingMethods?: ReadonlyArray<Method>;
   }): Promise<void>;
   public abstract getDescription(
     variant: DescriptionVariant,
   ): string | undefined;
-  public abstract getMethods(): Method[];
+  public abstract getMethods(): ReadonlyArray<Method>;
   public abstract getSchema(variant: IOVariant): IOSchema;
   public abstract getSchema(variant: ResponseVariant): z.ZodTypeAny;
-  public abstract getMimeTypes(variant: MimeVariant): string[];
-  public abstract getResponses(variant: ResponseVariant): NormalizedResponse[];
+  public abstract getMimeTypes(variant: MimeVariant): ReadonlyArray<string>;
+  public abstract getResponses(
+    variant: ResponseVariant,
+  ): ReadonlyArray<NormalizedResponse>;
   public abstract getSecurity(): LogicalContainer<Security>;
-  public abstract getScopes(): string[];
-  public abstract getTags(): string[];
+  public abstract getScopes(): ReadonlyArray<string>;
+  public abstract getTags(): ReadonlyArray<string>;
   public abstract getOperationId(method: Method): string | undefined;
   public abstract getRequestType(): ContentType;
 }
@@ -72,15 +74,18 @@ export class Endpoint<
   TAG extends string,
 > extends AbstractEndpoint {
   readonly #descriptions: Record<DescriptionVariant, string | undefined>;
-  readonly #methods: Method[];
+  readonly #methods: ReadonlyArray<Method>;
   readonly #middlewares: AnyMiddlewareDef[];
-  readonly #mimeTypes: Record<MimeVariant, string[]>;
-  readonly #responses: Record<ResponseVariant, NormalizedResponse[]>;
+  readonly #mimeTypes: Record<MimeVariant, ReadonlyArray<string>>;
+  readonly #responses: Record<
+    ResponseVariant,
+    ReadonlyArray<NormalizedResponse>
+  >;
   readonly #handler: Handler<z.output<IN>, z.input<OUT>, OPT>;
   readonly #resultHandler: AnyResultHandlerDefinition;
   readonly #schemas: { input: IN; output: OUT };
-  readonly #scopes: SCO[];
-  readonly #tags: TAG[];
+  readonly #scopes: ReadonlyArray<SCO>;
+  readonly #tags: ReadonlyArray<TAG>;
   readonly #getOperationId: (method: Method) => string | undefined;
   readonly #requestType: ContentType;
 
@@ -114,9 +119,9 @@ export class Endpoint<
     this.#resultHandler = resultHandler;
     this.#middlewares = middlewares;
     this.#getOperationId = getOperationId;
-    this.#methods = methods;
-    this.#scopes = scopes;
-    this.#tags = tags;
+    this.#methods = Object.freeze(methods);
+    this.#scopes = Object.freeze(scopes);
+    this.#tags = Object.freeze(tags);
     this.#descriptions = { long, short };
     this.#schemas = { input: inputSchema, output: outputSchema };
     for (const [variant, schema] of Object.entries(this.#schemas)) {
@@ -128,17 +133,18 @@ export class Endpoint<
       );
     }
     this.#responses = {
-      positive: normalizeApiResponse(
-        resultHandler.getPositiveResponse(outputSchema),
-        {
+      positive: Object.freeze(
+        normalizeApiResponse(resultHandler.getPositiveResponse(outputSchema), {
           mimeTypes: [contentTypes.json],
           statusCodes: [defaultStatusCodes.positive],
-        },
+        }),
       ),
-      negative: normalizeApiResponse(resultHandler.getNegativeResponse(), {
-        mimeTypes: [contentTypes.json],
-        statusCodes: [defaultStatusCodes.negative],
-      }),
+      negative: Object.freeze(
+        normalizeApiResponse(resultHandler.getNegativeResponse(), {
+          mimeTypes: [contentTypes.json],
+          statusCodes: [defaultStatusCodes.negative],
+        }),
+      ),
     };
     for (const [variant, responses] of Object.entries(this.#responses)) {
       assert(
@@ -154,9 +160,13 @@ export class Endpoint<
         ? "raw"
         : "json";
     this.#mimeTypes = {
-      input: [contentTypes[this.#requestType]],
-      positive: this.#responses.positive.flatMap(({ mimeTypes }) => mimeTypes),
-      negative: this.#responses.negative.flatMap(({ mimeTypes }) => mimeTypes),
+      input: Object.freeze([contentTypes[this.#requestType]]),
+      positive: Object.freeze(
+        this.#responses.positive.flatMap(({ mimeTypes }) => mimeTypes),
+      ),
+      negative: Object.freeze(
+        this.#responses.negative.flatMap(({ mimeTypes }) => mimeTypes),
+      ),
     };
   }
 
@@ -164,7 +174,7 @@ export class Endpoint<
     return this.#descriptions[variant];
   }
 
-  public override getMethods(): Method[] {
+  public override getMethods() {
     return this.#methods;
   }
 
@@ -200,11 +210,11 @@ export class Endpoint<
     );
   }
 
-  public override getScopes(): SCO[] {
+  public override getScopes() {
     return this.#scopes;
   }
 
-  public override getTags(): TAG[] {
+  public override getTags() {
     return this.#tags;
   }
 
