@@ -1,6 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`ez.dateIn() current mode > parsing > should handle invalid date 1`] = `
+exports[`ez.dateIn() > parsing > should handle invalid date 1`] = `
 [
   {
     "code": "invalid_string",
@@ -11,7 +11,7 @@ exports[`ez.dateIn() current mode > parsing > should handle invalid date 1`] = `
 ]
 `;
 
-exports[`ez.dateIn() current mode > parsing > should handle invalid format 1`] = `
+exports[`ez.dateIn() > parsing > should handle invalid format 1`] = `
 [
   {
     "code": "invalid_string",
@@ -22,7 +22,7 @@ exports[`ez.dateIn() current mode > parsing > should handle invalid format 1`] =
 ]
 `;
 
-exports[`ez.dateIn() current mode > parsing > should handle wrong parsed type 1`] = `
+exports[`ez.dateIn() > parsing > should handle wrong parsed type 1`] = `
 [
   {
     "code": "invalid_union",
@@ -57,39 +57,6 @@ exports[`ez.dateIn() current mode > parsing > should handle wrong parsed type 1`
   }
 ]],
     ],
-  },
-]
-`;
-
-exports[`ez.dateIn() legacy mode > parsing > should handle invalid date 1`] = `
-[
-  {
-    "code": "invalid_date",
-    "message": "Invalid date",
-    "path": [],
-  },
-]
-`;
-
-exports[`ez.dateIn() legacy mode > parsing > should handle invalid format 1`] = `
-[
-  {
-    "code": "invalid_string",
-    "message": "Invalid",
-    "path": [],
-    "validation": "regex",
-  },
-]
-`;
-
-exports[`ez.dateIn() legacy mode > parsing > should handle wrong parsed type 1`] = `
-[
-  {
-    "code": "invalid_type",
-    "expected": "string",
-    "message": "Expected string, received number",
-    "path": [],
-    "received": "number",
   },
 ]
 `;

@@ -54,9 +54,10 @@ Start your API server with I/O schema validation and custom middlewares in minut
    4. [Accepting raw data](#accepting-raw-data)
    5. [Subscriptions](#subscriptions)
 7. [Integration and Documentation](#integration-and-documentation)
-   1. [Generating a Frontend Client](#generating-a-frontend-client)
-   2. [Creating a documentation](#creating-a-documentation)
-   3. [Tagging the endpoints](#tagging-the-endpoints)
+   1. [Zod Plugin](#zod-plugin)
+   2. [Generating a Frontend Client](#generating-a-frontend-client)
+   3. [Creating a documentation](#creating-a-documentation)
+   4. [Tagging the endpoints](#tagging-the-endpoints)
 8. [Caveats](#caveats)
    1. [Coercive schema of Zod](#coercive-schema-of-zod)
    2. [Excessive properties in endpoint output](#excessive-properties-in-endpoint-output)
@@ -87,7 +88,7 @@ Therefore, many basic tasks can be accomplished faster and easier, in particular
 
 - [Typescript](https://www.typescriptlang.org/) first.
 - Web server — [Express.js](https://expressjs.com/).
-- Schema validation — [Zod 3.x](https://github.com/colinhacks/zod).
+- Schema validation — [Zod 3.x](https://github.com/colinhacks/zod) including [Zod Plugin](#zod-plugin).
 - Supports any logger having `info()`, `debug()`, `error()` and `warn()` methods;
   - Built-in console logger with colorful and pretty inspections by default.
 - Generators:
@@ -801,16 +802,8 @@ const config = createConfig({
 ```
 
 Refer to [documentation](https://www.npmjs.com/package/express-fileupload#available-options) on available options.
-Some options are forced in order to ensure the correct workflow:
-
-```json5
-{
-  abortOnLimit: false,
-  parseNested: true,
-  logger: {}, // the configured logger, using its .debug() method
-}
-```
-
+Some options are forced in order to ensure the correct workflow: `abortOnLimit: false`, `parseNested: true`, `logger`
+is assigned with `.debug()` method of the configured logger, and `debug` is enabled by default.
 The `limitHandler` option is replaced by the `limitError` one. You can also connect an additional middleware for
 restricting the ability to upload using the `beforeUpload` option. So the configuration for the limited and restricted
 upload might look this way:
@@ -823,13 +816,10 @@ const config = createConfig({
     upload: {
       limits: { fileSize: 51200 }, // 50 KB
       limitError: createHttpError(413, "The file is too large"), // handled by errorHandler in config
-      beforeUpload: ({ app, logger }) => {
-        app.use((req, res, next) => {
-          if (req.is("multipart/form-data") && !canUpload(req)) {
-            return next(createHttpError(403, "Not authorized"));
-          }
-          next();
-        });
+      beforeUpload: ({ request, logger }) => {
+        if (!canUpload(request)) {
+          throw createHttpError(403, "Not authorized");
+        }
       },
     },
   },
@@ -1019,26 +1009,18 @@ defaultEndpointsFactory.build({
 ## Accepting raw data
 
 Some APIs may require an endpoint to be able to accept and process raw data, such as streaming or uploading a binary
-file as an entire body of request. In order to enable this feature you need to set the `rawParser` config feature to
-`express.raw()`. See also its options [in Express.js documentation](https://expressjs.com/en/4x/api.html#express.raw).
-The raw data is placed into `request.body.raw` property, having type `Buffer`. Then use the proprietary `ez.raw()`
-schema (which is an alias for `z.object({ raw: ez.file("buffer") })`) as the input schema of your endpoint.
+file as an entire body of request. Use the proprietary `ez.raw()` schema as the input schema of your endpoint.
+The default parser in this case is `express.raw()`. You can customize it by assigning the `rawParser` option in config.
+The raw data is placed into `request.body.raw` property, having type `Buffer`.
 
 ```typescript
-import express from "express";
-import { createConfig, defaultEndpointsFactory, ez } from "express-zod-api";
-
-const config = createConfig({
-  server: {
-    rawParser: express.raw(), // enables the feature
-  },
-});
+import { defaultEndpointsFactory, ez } from "express-zod-api";
 
 const rawAcceptingEndpoint = defaultEndpointsFactory.build({
   method: "post",
-  input: ez
-    .raw() // accepts the featured { raw: Buffer }
-    .extend({}), // for additional inputs, like route params, if needed
+  input: ez.raw({
+    /* the place for additional inputs, like route params, if needed */
+  }),
   output: z.object({ length: z.number().int().nonnegative() }),
   handler: async ({ input: { raw } }) => ({
     length: raw.length, // raw is Buffer
@@ -1058,6 +1040,14 @@ synergy between two libraries on handling the incoming `subscribe` and `unsubscr
 https://github.com/RobinTail/zod-sockets#subscriptions
 
 # Integration and Documentation
+
+## Zod Plugin
+
+Express Zod API acts as a plugin for Zod, extending its functionality once you import anything from `express-zod-api`:
+
+- Adds `.example()` method to all Zod schemas for storing examples and reflecting them in the generated documentation;
+- Adds `.label()` method to `ZodDefault` for replacing the default value in documentation with a label;
+- Alters the `.brand()` method on all Zod schemas by making the assigned brand available in runtime.
 
 ## Generating a Frontend Client
 

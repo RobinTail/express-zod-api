@@ -93,7 +93,7 @@ export class Integration {
     { method: Method; path: string },
     Partial<Record<IOKind, string>> & {
       isJson: boolean;
-      tags: string[];
+      tags: ReadonlyArray<string>;
     }
   >();
   protected paths: string[] = [];

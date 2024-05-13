@@ -52,20 +52,19 @@ import {
   ucFirst,
 } from "./common-helpers";
 import { InputSource, TagsConfig } from "./config-type";
-import { ezDateInKind } from "./date-in-schema";
-import { ezDateOutKind } from "./date-out-schema";
+import { DateInSchema, ezDateInBrand } from "./date-in-schema";
+import { DateOutSchema, ezDateOutBrand } from "./date-out-schema";
 import { DocumentationError } from "./errors";
-import { ezFileKind } from "./file-schema";
+import { FileSchema, ezFileBrand } from "./file-schema";
 import { IOSchema } from "./io-schema";
 import {
   LogicalContainer,
   andToOr,
   mapLogicalContainer,
 } from "./logical-container";
-import { getMeta } from "./metadata";
+import { metaSymbol } from "./metadata";
 import { Method } from "./method";
-import { RawSchema, ezRawKind } from "./raw-schema";
-import { isoDateRegex } from "./schema-helpers";
+import { RawSchema, ezRawBrand } from "./raw-schema";
 import {
   HandlingRules,
   HandlingVariant,
@@ -73,7 +72,7 @@ import {
   walkSchema,
 } from "./schema-walker";
 import { Security } from "./security";
-import { ezUploadKind } from "./upload-schema";
+import { UploadSchema, ezUploadBrand } from "./upload-schema";
 
 /* eslint-disable @typescript-eslint/no-use-before-define */
 
@@ -100,7 +99,7 @@ interface ReqResDepictHelperCommonProps
     "serializer" | "getRef" | "makeRef" | "path" | "method"
   > {
   schema: z.ZodTypeAny;
-  mimeTypes: string[];
+  mimeTypes: ReadonlyArray<string>;
   composition: "inline" | "components";
   description?: string;
 }
@@ -133,7 +132,7 @@ export const depictDefault: Depicter<z.ZodDefault<z.ZodTypeAny>> = ({
   next,
 }) => ({
   ...next(schema._def.innerType),
-  default: getMeta(schema, "defaultLabel") || schema._def.defaultValue(),
+  default: schema._def[metaSymbol]?.defaultLabel || schema._def.defaultValue(),
 });
 
 export const depictCatch: Depicter<z.ZodCatch<z.ZodTypeAny>> = ({
@@ -147,7 +146,7 @@ export const depictAny: Depicter<z.ZodAny> = () => ({
   format: "any",
 });
 
-export const depictUpload: Depicter<z.ZodType> = (ctx) => {
+export const depictUpload: Depicter<UploadSchema> = (ctx) => {
   assert(
     !ctx.isResponse,
     new DocumentationError({
@@ -161,18 +160,18 @@ export const depictUpload: Depicter<z.ZodType> = (ctx) => {
   };
 };
 
-export const depictFile: Depicter<z.ZodType> = ({ schema }) => ({
-  type: "string",
-  format:
-    schema instanceof z.ZodString
-      ? schema._def.checks.find(
-          /** @todo remove regex check when min zod v3.23 (v19) */
-          (check) => check.kind === "regex" || check.kind === "base64",
-        )
-        ? "byte"
-        : "file"
-      : "binary",
-});
+export const depictFile: Depicter<FileSchema> = ({ schema }) => {
+  const subject = schema.unwrap();
+  return {
+    type: "string",
+    format:
+      subject instanceof z.ZodString
+        ? subject._def.checks.find((check) => check.kind === "base64")
+          ? "byte"
+          : "file"
+        : "binary",
+  };
+};
 
 export const depictUnion: Depicter<z.ZodUnion<z.ZodUnionOptions>> = ({
   schema: { options },
@@ -321,7 +320,7 @@ export const depictObject: Depicter<z.ZodObject<z.ZodRawShape>> = ({
  * */
 export const depictNull: Depicter<z.ZodNull> = () => ({ type: "null" });
 
-export const depictDateIn: Depicter<z.ZodType> = (ctx) => {
+export const depictDateIn: Depicter<DateInSchema> = (ctx) => {
   assert(
     !ctx.isResponse,
     new DocumentationError({
@@ -333,14 +332,14 @@ export const depictDateIn: Depicter<z.ZodType> = (ctx) => {
     description: "YYYY-MM-DDTHH:mm:ss.sssZ",
     type: "string",
     format: "date-time",
-    pattern: isoDateRegex.source,
+    pattern: /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d+)?)?Z?$/.source,
     externalDocs: {
       url: isoDateDocumentationUrl,
     },
   };
 };
 
-export const depictDateOut: Depicter<z.ZodType> = (ctx) => {
+export const depictDateOut: Depicter<DateOutSchema> = (ctx) => {
   assert(
     ctx.isResponse,
     new DocumentationError({
@@ -632,7 +631,7 @@ export const depictLazy: Depicter<z.ZodLazy<z.ZodTypeAny>> = ({
 };
 
 export const depictRaw: Depicter<RawSchema> = ({ next, schema }) =>
-  next(schema.shape.raw);
+  next(schema.unwrap().shape.raw);
 
 const enumerateExamples = (examples: unknown[]): ExamplesObject | undefined =>
   examples.length
@@ -672,6 +671,9 @@ export const extractObjectSchema = (
 ): z.ZodObject<z.ZodRawShape> => {
   if (subject instanceof z.ZodObject) {
     return subject;
+  }
+  if (subject instanceof z.ZodBranded) {
+    return extractObjectSchema(subject.unwrap(), tfError);
   }
   if (
     subject instanceof z.ZodUnion ||
@@ -783,11 +785,11 @@ export const depicters: HandlingRules<
   ZodPipeline: depictPipeline,
   ZodLazy: depictLazy,
   ZodReadonly: depictReadonly,
-  [ezFileKind]: depictFile,
-  [ezUploadKind]: depictUpload,
-  [ezDateOutKind]: depictDateOut,
-  [ezDateInKind]: depictDateIn,
-  [ezRawKind]: depictRaw,
+  [ezFileBrand]: depictFile,
+  [ezUploadBrand]: depictUpload,
+  [ezDateOutBrand]: depictDateOut,
+  [ezDateInBrand]: depictDateIn,
+  [ezRawBrand]: depictRaw,
 };
 
 export const onEach: Depicter<z.ZodTypeAny, "each"> = ({
