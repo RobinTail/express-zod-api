@@ -1441,3 +1441,15 @@ exports[`Documentation helpers > extractObjectSchema() > should return object sc
   },
 }
 `;
+
+exports[`Documentation helpers > extractObjectSchema() > should support ez.raw() 1`] = `
+{
+  "_type": "ZodObject",
+  "shape": {
+    "raw": {
+      "_type": "ZodBranded",
+      "brand": Symbol(File),
+    },
+  },
+}
+`;

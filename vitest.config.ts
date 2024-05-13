@@ -1,5 +1,7 @@
 import { defineConfig } from "vitest/config";
 
+const isIntegrationTest = process.argv.includes("-r");
+
 export default defineConfig({
   test: {
     env: {
@@ -12,5 +14,6 @@ export default defineConfig({
       reporter: [["text", { maxCols: 120 }], "json-summary", "html", "lcov"],
       include: ["src/**"],
     },
+    setupFiles: isIntegrationTest ? [] : ["./vitest.setup.ts"],
   },
 });

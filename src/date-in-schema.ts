@@ -1,18 +1,19 @@
 import { z } from "zod";
-import { proprietary } from "./metadata";
-import { isValidDate, isoDateRegex } from "./schema-helpers";
+import { isValidDate } from "./schema-helpers";
 
-export const ezDateInKind = "DateIn";
+export const ezDateInBrand = Symbol("DateIn");
 
 export const dateIn = () => {
-  const base = z.string();
-  const hasDateMethod = base.date?.() instanceof z.ZodString;
-  const schema = hasDateMethod
-    ? z.union([base.date(), base.datetime(), base.datetime({ local: true })])
-    : base.regex(isoDateRegex); // @todo remove after min zod v3.23 (v19)
+  const schema = z.union([
+    z.string().date(),
+    z.string().datetime(),
+    z.string().datetime({ local: true }),
+  ]);
 
-  return proprietary(
-    ezDateInKind,
-    schema.transform((str) => new Date(str)).pipe(z.date().refine(isValidDate)),
-  );
+  return schema
+    .transform((str) => new Date(str))
+    .pipe(z.date().refine(isValidDate))
+    .brand(ezDateInBrand as symbol);
 };
+
+export type DateInSchema = ReturnType<typeof dateIn>;

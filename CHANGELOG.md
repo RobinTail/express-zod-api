@@ -1,5 +1,95 @@
 # Changelog
 
+## Version 19
+
+### v19.0.0
+
+- **Breaking changes**:
+  - Increased the minimum supported versions:
+    - For Node.js: 18.18.0, 20.9.0 or 22.0.0;
+    - For `zod`: 3.23.0;
+    - For `express`: [4.19.2](https://github.com/expressjs/express/security/advisories/GHSA-rv95-896h-c2vc);
+    - For `express-fileupload` and `@types/express-fileupload`: 1.5.0.
+  - Removed the deprecated method ~~`withMeta()`~~ (see [v18.5.0](#v1850) for details);
+  - Removed support for static options by `EndpointsFactory::addOptions()` (see [v18.6.0](#v1860) for details);
+  - Freezed the arrays returned by the methods or exposed by properties of `Endpoint` and `DependsOnMethod`;
+  - Changed interface for `ez.raw()`: additional properties should be supplied as its argument, not via `.extend()`;
+  - Changed the following config options:
+    - The function assigned to `server.upload.beforeUpload` now accepts `request` instead of `app`;
+    - The function assigned to `server.beforeRouting` is now called before parsing too.
+- Features:
+  - New configurable level `info` for built-in logger (higher than `debug`, but lower than `warn`);
+  - Selective parsers equipped with a child logger:
+    - There are 3 types of endpoints depending on their input schema: having `ez.upload()`, having `ez.raw()`, others;
+    - Depending on that type, only the parsers needed for certain endpoint are processed;
+    - This makes all requests eligible for the assigned parsers and reverts changes made in [v18.5.2](#v1852);
+    - Specifying `rawParser` in config is no longer needed to enable the feature.
+- Non-breaking significant changes:
+  - Request logging reflects the actual path instead of the configured route, and it's placed in front of parsing:
+    - The severity of those messaged reduced from `info` to `debug`;
+  - The debug messages from uploader are enabled by default when the logger level is set to `debug`;
+- How to migrate confidently:
+  - Upgrade Node.js, `zod`, `express`, `express-fileupload` and `@types/express-fileupload` accordingly;
+  - Avoid mutating the readonly arrays;
+  - If you're using ~~`withMeta()`~~:
+    - Remove it and unwrap your schemas — you can use `.example()` method directly.
+  - If you're using `.addOptions()` on `EndpointsFactory` instance:
+    - Replace the argument with an async function returning those options;
+    - Or assign those options to `const` and import them where needed.
+  - If you're using `ez.raw().extend()` for additional properties:
+    - Supply them directly as an argument to `ez.raw()` — see the example below.
+  - If you're using `beforeUpload` in your config:
+    - Adjust the implementation according to the example below.
+  - If you're using `beforeRouting` in your config for anything that requires a parsed request body:
+    - Add the required parsers using `app.use()` statements to the assigned function.
+  - If you're having `rawParser: express.raw()` in your config:
+    - You can now remove this line (it's the default value now), unless you're having any customizations.
+
+```ts
+import createHttpError from "http-errors";
+import { createConfig } from "express-zod-api";
+
+const before = createConfig({
+  server: {
+    upload: {
+      beforeUpload: ({ app, logger }) => {
+        app.use((req, res, next) => {
+          if (req.is("multipart/form-data") && !canUpload(req)) {
+            return next(createHttpError(403, "Not authorized"));
+          }
+          next();
+        });
+      },
+    },
+  },
+});
+
+const after = createConfig({
+  server: {
+    upload: {
+      beforeUpload: ({ request, logger }) => {
+        if (!canUpload(request)) {
+          throw createHttpError(403, "Not authorized");
+        }
+      },
+    },
+  },
+});
+```
+
+```ts
+import { z } from "zod";
+import { ez } from "express-zod-api";
+
+const before = ez.raw().extend({
+  pathParameter: z.string(),
+});
+
+const after = ez.raw({
+  pathParameter: z.string(),
+});
+```
+
 ## Version 18
 
 ### v18.6.2

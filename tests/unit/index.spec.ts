@@ -14,7 +14,6 @@ import {
   IOSchema,
   InputSecurity,
   LoggerOverrides,
-  Metadata,
   Method,
   MiddlewareDefinition,
   MockOverrides,
@@ -50,7 +49,6 @@ describe("Index Entrypoint", () => {
       expectType<FlatObject>({});
       expectType<LoggerOverrides>({});
       expectType<Routing>({});
-      expectType<Metadata<z.ZodTypeAny>>({ examples: [] });
       expectType<CommonConfig>({ cors: true, logger: { level: "silent" } });
       expectType<AppConfig>({
         app: {} as IRouter,

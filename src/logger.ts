@@ -22,7 +22,7 @@ export interface BuiltinLoggerConfig {
    * @desc The minimal severity to log or "silent" to disable logging
    * @example "debug" also enables pretty output for inspected entities
    * */
-  level: "silent" | "warn" | "debug";
+  level: "silent" | "warn" | "info" | "debug";
   /**
    * @desc Enables colors on printed severity and inspected entities
    * @default Ansis::isSupported()
@@ -54,7 +54,7 @@ export const isBuiltinLoggerConfig = (
     ? typeof subject.depth === "number" || subject.depth === null
     : true) &&
   typeof subject.level === "string" &&
-  ["silent", "warn", "debug"].includes(subject.level) &&
+  ["silent", "warn", "info", "debug"].includes(subject.level) &&
   !Object.values(subject).some((prop) => typeof prop === "function");
 
 /**

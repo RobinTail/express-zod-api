@@ -1,8 +1,12 @@
+import { fileUploadMock } from "../express-mock";
+import { metaSymbol } from "../../src/metadata";
 import {
   createNotFoundHandler,
   createParserFailureHandler,
   createUploadFailueHandler,
   createUploadLogger,
+  createUploadParsers,
+  moveRaw,
 } from "../../src/server-helpers";
 import { describe, expect, test, vi } from "vitest";
 import { defaultResultHandler } from "../../src";
@@ -22,7 +26,6 @@ describe("Server helpers", () => {
       const handler = createParserFailureHandler({
         errorHandler: defaultResultHandler,
         rootLogger,
-        getChildLogger: undefined,
       });
       const next = vi.fn();
       handler(
@@ -36,15 +39,22 @@ describe("Server helpers", () => {
 
     test("the handler should call error handler with a child logger", async () => {
       const errorHandler = { ...defaultResultHandler, handler: vi.fn() };
+      const rootLogger = makeLoggerMock({ fnMethod: vi.fn });
       const handler = createParserFailureHandler({
         errorHandler,
-        rootLogger: makeLoggerMock({ fnMethod: vi.fn }),
-        getChildLogger: ({ parent }) => ({ ...parent, isChild: true }),
+        rootLogger,
       });
       await handler(
         new SyntaxError("Unexpected end of JSON input"),
         null as unknown as Request,
-        null as unknown as Response,
+        makeResponseMock({
+          fnMethod: vi.fn,
+          responseProps: {
+            locals: {
+              [metaSymbol]: { logger: { ...rootLogger, isChild: true } },
+            },
+          },
+        }) as unknown as Response,
         vi.fn<any>(),
       );
       expect(errorHandler.handler).toHaveBeenCalledTimes(1);
@@ -64,10 +74,10 @@ describe("Server helpers", () => {
         ...defaultResultHandler,
         handler: vi.fn(),
       };
+      const rootLogger = makeLoggerMock({ fnMethod: vi.fn });
       const handler = createNotFoundHandler({
         errorHandler,
-        rootLogger: makeLoggerMock({ fnMethod: vi.fn }),
-        getChildLogger: async ({ parent }) => ({ ...parent, isChild: true }),
+        rootLogger,
       });
       const next = vi.fn();
       const requestMock = makeRequestMock({
@@ -78,7 +88,14 @@ describe("Server helpers", () => {
           body: { n: 453 },
         },
       });
-      const responseMock = makeResponseMock({ fnMethod: vi.fn });
+      const responseMock = makeResponseMock({
+        fnMethod: vi.fn,
+        responseProps: {
+          locals: {
+            [metaSymbol]: { logger: { ...rootLogger, isChild: true } },
+          },
+        } as unknown as Response,
+      });
       await handler(
         requestMock as unknown as Request,
         responseMock as unknown as Response,
@@ -114,7 +131,6 @@ describe("Server helpers", () => {
       const handler = createNotFoundHandler({
         errorHandler,
         rootLogger,
-        getChildLogger: undefined,
       });
       const next = vi.fn();
       const requestMock = makeRequestMock({
@@ -169,22 +185,102 @@ describe("Server helpers", () => {
     });
   });
 
-  describe("createUploadLogger", () => {
+  describe("createUploadLogger()", () => {
     const rootLogger = makeLoggerMock({ fnMethod: vi.fn });
     const uploadLogger = createUploadLogger(rootLogger);
 
-    test("should mute 'not eligible' message", () => {
-      uploadLogger.log(
-        "Express-file-upload: Request is not eligible for file upload!",
-      );
-      expect(rootLogger.debug).not.toHaveBeenCalled();
-    });
-
-    test("should debug other messages", () => {
+    test("should debug the messages", () => {
       uploadLogger.log("Express-file-upload: Busboy finished parsing request.");
       expect(rootLogger.debug).toHaveBeenCalledWith(
         "Express-file-upload: Busboy finished parsing request.",
       );
+    });
+  });
+
+  describe("createUploadParsers()", async () => {
+    const rootLogger = makeLoggerMock({ fnMethod: vi.fn });
+    const beforeUploadMock = vi.fn();
+    const parsers = await createUploadParsers({
+      config: {
+        server: {
+          listen: 8090,
+          upload: {
+            limits: { fileSize: 1024 },
+            limitError: new Error("Too heavy"),
+            beforeUpload: beforeUploadMock,
+          },
+        },
+        cors: false,
+        logger: rootLogger,
+      },
+      rootLogger,
+    });
+    const requestMock = makeRequestMock({ fnMethod: vi.fn });
+    const responseMock = makeResponseMock({ fnMethod: vi.fn });
+    const nextMock = vi.fn();
+
+    test("should return an array of RequestHandler", () => {
+      expect(parsers).toEqual([
+        expect.any(Function), // uploader with logger
+        expect.any(Function), // createUploadFailueHandler()
+      ]);
+    });
+
+    test("should handle errors thrown by beforeUpload", async () => {
+      const error = createHttpError(403, "Not authorized");
+      beforeUploadMock.mockImplementationOnce(() => {
+        throw error;
+      });
+      await parsers[0](
+        requestMock as unknown as Request,
+        responseMock as unknown as Response,
+        nextMock,
+      );
+      expect(nextMock).toHaveBeenCalledWith(error);
+    });
+
+    test("should install the uploader with its special logger", async () => {
+      const interalMw = vi.fn();
+      fileUploadMock.mockImplementationOnce(() => interalMw);
+      await parsers[0](
+        requestMock as unknown as Request,
+        responseMock as unknown as Response,
+        nextMock,
+      );
+      expect(beforeUploadMock).toHaveBeenCalledWith({
+        request: requestMock,
+        logger: rootLogger,
+      });
+      expect(fileUploadMock).toHaveBeenCalledTimes(1);
+      expect(fileUploadMock).toHaveBeenCalledWith({
+        debug: true,
+        abortOnLimit: false,
+        parseNested: true,
+        limits: { fileSize: 1024 },
+        logger: { log: expect.any(Function) }, // @see createUploadLogger test
+      });
+      expect(interalMw).toHaveBeenCalledWith(
+        requestMock,
+        responseMock,
+        nextMock,
+      );
+    });
+  });
+
+  describe("moveRaw()", () => {
+    test("should place the body into the raw prop of the body object", () => {
+      const buffer = Buffer.from([]);
+      const requestMock = makeRequestMock({
+        fnMethod: vi.fn,
+        requestProps: {
+          method: "POST",
+          body: buffer,
+        },
+      });
+      const nextMock = vi.fn();
+      moveRaw(requestMock as unknown as Request, {} as Response, nextMock);
+      expect(requestMock.body).toEqual({ raw: buffer });
+      expect(nextMock).toHaveBeenCalled();
     });
   });
 });

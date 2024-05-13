@@ -12,7 +12,7 @@ export interface RoutingWalkerParams {
     endpoint: AbstractEndpoint,
     path: string,
     method: Method | AuxMethod,
-    siblingMethods?: Method[],
+    siblingMethods?: ReadonlyArray<Method>,
   ) => void;
   onStatic?: (path: string, handler: StaticHandler) => void;
   parentPath?: string;

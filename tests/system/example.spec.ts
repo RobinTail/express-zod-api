@@ -88,7 +88,7 @@ describe("Example", async () => {
           createdAt: "2022-01-22T00:00:00.000Z",
         },
       });
-      await waitFor(() => /v1\/user\/:id/.test(out));
+      await waitFor(() => /v1\/user\/50/.test(out));
       await waitFor(() => /50, 123, 456/.test(out));
       expect(true).toBeTruthy();
     });
@@ -196,7 +196,7 @@ describe("Example", async () => {
       const data = new FormData();
       data.append(
         "avatar",
-        new Blob([logo], { type: "image/svg+xml" }), // FormData mime is buggy in Node 18.0.0
+        new Blob([logo], { type: "image/svg+xml" }),
         filename,
       );
       data.append("str", "test string value");
@@ -212,10 +212,7 @@ describe("Example", async () => {
       expect(json).toEqual({
         data: {
           hash: "f39beeff92379dc935586d726211c2620be6f879",
-          mime:
-            process.versions.node === "18.0.0"
-              ? "application/octet-stream" // Node 18.0.0 FormData bug // @todo remove it when dropped
-              : "image/svg+xml",
+          mime: "image/svg+xml",
           name: "logo.svg",
           otherInputs: {
             arr: ["456", "789"],
