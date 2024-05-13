@@ -289,7 +289,7 @@ describe("App", async () => {
       );
     });
 
-    test("Should treat custom errors in middleware input validations as they are", async () => {
+    test("Should treat custom errors in endpoint input validations as they are", async () => {
       const response = await fetch(
         `http://127.0.0.1:${port}/v1/faulty?epError=1`,
         {
