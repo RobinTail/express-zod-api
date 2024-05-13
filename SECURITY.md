@@ -4,7 +4,7 @@
 
 | Version | Release |     Supported      |
 | ------: | :------ | :----------------: |
-|  19.x.x | 06.2024 | :white_check_mark: |
+|  19.x.x | 05.2024 | :white_check_mark: |
 |  18.x.x | 04.2024 | :white_check_mark: |
 |  17.x.x | 02.2024 | :white_check_mark: |
 |  16.x.x | 12.2023 | :white_check_mark: |
