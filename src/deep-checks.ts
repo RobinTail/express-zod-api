@@ -41,6 +41,13 @@ const checks: HandlingRules<boolean, {}, z.ZodFirstPartyTypeKind> = {
     next(_def.innerType),
 };
 
+interface NestedSchemaLookupProps {
+  condition: (schema: z.ZodTypeAny) => boolean;
+  rules?: HandlingRules<boolean>;
+  maxDepth?: number;
+  depth?: number;
+}
+
 /** @desc The optimized version of the schema walker for boolean checks */
 export const hasNestedSchema = (
   subject: z.ZodTypeAny,
@@ -49,12 +56,7 @@ export const hasNestedSchema = (
     rules = checks,
     depth = 1,
     maxDepth = Number.POSITIVE_INFINITY,
-  }: {
-    condition: (schema: z.ZodTypeAny) => boolean;
-    rules?: HandlingRules<boolean>;
-    maxDepth?: number;
-    depth?: number;
-  },
+  }: NestedSchemaLookupProps,
 ): boolean => {
   if (condition(subject)) {
     return true;
