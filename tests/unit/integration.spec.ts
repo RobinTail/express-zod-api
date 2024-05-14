@@ -9,7 +9,6 @@ import {
   defaultEndpointsFactory,
 } from "../../src";
 import { describe, expect, test, vi } from "vitest";
-import { f } from "../../src/integration-helpers";
 
 describe("Integration", () => {
   test.each(["client", "types"] as const)(
@@ -130,7 +129,8 @@ describe("Integration", () => {
         splitResponse: true,
         variant: "types",
         brandHandling: {
-          CUSTOM: () => f.createKeywordTypeNode(ts.SyntaxKind.BooleanKeyword),
+          CUSTOM: () =>
+            ts.factory.createKeywordTypeNode(ts.SyntaxKind.BooleanKeyword),
           DEEP: rule,
         },
         routing: {
