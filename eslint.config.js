@@ -16,4 +16,10 @@ export default [
       "@typescript-eslint/no-explicit-any": "off",
     }
   },
+  {
+    files: ["src/zod-plugin.ts"],
+    rules: {
+      "@typescript-eslint/no-unused-vars": "off"
+    }
+  }
 ];
