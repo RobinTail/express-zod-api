@@ -7,4 +7,12 @@ export default [
   {languageOptions: { globals: globals.node }},
   pluginJs.configs.recommended,
   ...tseslint.configs.recommended,
+  {
+    files: ["**/*.ts"],
+    rules: {
+      "no-empty-pattern": "off",
+      "@typescript-eslint/no-empty-object-type": "off",
+      "@typescript-eslint/no-explicit-any": "off",
+    }
+  },
 ];
