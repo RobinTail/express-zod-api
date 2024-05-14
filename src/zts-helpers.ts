@@ -15,11 +15,7 @@ export interface ZTSContext extends FlatObject {
   optionalPropStyle: { withQuestionMark?: boolean; withUndefined?: boolean };
 }
 
-export type Producer<T extends z.ZodTypeAny> = SchemaHandler<
-  T,
-  ts.TypeNode,
-  ZTSContext
->;
+export type Producer = SchemaHandler<ts.TypeNode, ZTSContext>;
 
 export const addJsDocComment = (node: ts.Node, text: string) => {
   ts.addSyntheticLeadingComment(

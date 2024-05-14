@@ -1,5 +1,6 @@
 import { IRouter } from "express";
 import { expectType } from "tsd";
+import ts from "typescript";
 import { z } from "zod";
 import * as entrypoint from "../../src";
 import {
@@ -10,6 +11,7 @@ import {
   CommonConfig,
   CookieSecurity,
   CustomHeaderSecurity,
+  Depicter,
   FlatObject,
   IOSchema,
   InputSecurity,
@@ -19,6 +21,7 @@ import {
   MockOverrides,
   OAuth2Security,
   OpenIdSecurity,
+  Producer,
   ResultHandlerDefinition,
   Routing,
   ServerConfig,
@@ -40,6 +43,13 @@ describe("Index Entrypoint", () => {
       } else {
         expect(entity).toMatchSnapshot();
       }
+    });
+
+    test("Convenience types should be exposed", () => {
+      expectType<Depicter>(() => ({ type: "number" }));
+      expectType<Producer>(() =>
+        ts.factory.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword),
+      );
     });
 
     test("Issue 952, 1182, 1269: should expose certain types and interfaces", () => {
