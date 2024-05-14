@@ -1175,37 +1175,43 @@ const exampleEndpoint = taggedEndpointsFactory.build({
 
 You can customize handling rules for your schemas in Documentation and Integration. Use the `.brand()` method on your
 schema to make it special and distinguishable for the library in runtime. Using symbols is recommended for branding.
-After that utilize the `brandHandling` feature of both constructors to declare your custom implementation.
+After that utilize the `brandHandling` feature of both constructors to declare your custom implementation. In case you
+need to reuse a handling rule for multiple brands, use the exposed types `Depicter` and `Producer`.
 
 ```ts
+import ts from "typescript";
 import { z } from "zod";
-import { Documentation, Integration } from "express-zod-api";
+import {
+  Documentation,
+  Integration,
+  Depicter,
+  Producer,
+} from "express-zod-api";
 
-const myBrand = Symbol("MamaToldMeImSpecial");
+const myBrand = Symbol("MamaToldMeImSpecial"); // I recommend to use symbols for this purpose
 const myBrandedSchema = z.string().brand(myBrand);
 
+const ruleForDocs: Depicter = (
+  schema: typeof myBrandedSchema, // you should assign type yourself
+  { next, path, method, isResponse }, // handle a nested schema using next()
+) => {
+  const defaultDepiction = next(schema.unwrap()); // { type: string }
+  return { summary: "Special type of data" };
+};
+
+const ruleForClient: Producer = (
+  schema: typeof myBrandedSchema, // you should assign type yourself
+  { next, isResponse, serializer }, // handle a nested schema using next()
+) => ts.factory.createKeywordTypeNode(ts.SyntaxKind.BooleanKeyword);
+
 new Documentation({
-  brandHandling: {
-    [myBrand]: (
-      schema: typeof myBrandedSchema, // you should assign type yourself
-      { next, path, method, isResponse }, // handle a nested schema using next()
-    ) => {
-      const defaultResult = next(schema.unwrap()); // { type: string }
-      return { summary: "Special type of data" };
-    },
-  },
+  /* config, routing, title, version */
+  brandHandling: { [myBrand]: ruleForDocs },
 });
 
-import ts from "typescript";
-const { factory: f } = ts;
-
 new Integration({
-  brandHandling: {
-    [myBrand]: (
-      schema: typeof myBrandedSchema, // you should assign type yourself
-      { next, isResponse, serializer }, // handle a nested schema using next()
-    ) => f.createKeywordTypeNode(ts.SyntaxKind.BooleanKeyword),
-  },
+  /* routing */
+  brandHandling: { [myBrand]: ruleForClient },
 });
 ```
 
