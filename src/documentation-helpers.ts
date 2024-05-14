@@ -66,12 +66,7 @@ import { metaSymbol } from "./metadata";
 import { Method } from "./method";
 import { ProprietaryBrand } from "./proprietary-schemas";
 import { RawSchema, ezRawBrand } from "./raw-schema";
-import {
-  HandlingRules,
-  HandlingVariant,
-  SchemaHandler,
-  walkSchema,
-} from "./schema-walker";
+import { HandlingRules, SchemaHandler, walkSchema } from "./schema-walker";
 import { Security } from "./security";
 import { UploadSchema, ezUploadBrand } from "./upload-schema";
 
@@ -89,11 +84,7 @@ export interface OpenAPIContext extends FlatObject {
   method: Method;
 }
 
-type Depicter<Variant extends HandlingVariant = "regular"> = SchemaHandler<
-  SchemaObject | ReferenceObject,
-  OpenAPIContext,
-  Variant
->;
+type Depicter = SchemaHandler<SchemaObject | ReferenceObject, OpenAPIContext>;
 
 interface ReqResDepictHelperCommonProps
   extends Pick<
@@ -783,7 +774,11 @@ export const depicters: HandlingRules<
   [ezRawBrand]: depictRaw,
 };
 
-export const onEach: Depicter<"each"> = (schema, { isResponse, prev }) => {
+export const onEach: SchemaHandler<
+  SchemaObject | ReferenceObject,
+  OpenAPIContext,
+  "each"
+> = (schema, { isResponse, prev }) => {
   if (isReferenceObject(prev)) {
     return {};
   }
@@ -816,7 +811,11 @@ export const onEach: Depicter<"each"> = (schema, { isResponse, prev }) => {
   return result;
 };
 
-export const onMissing: Depicter<"last"> = (schema, ctx) =>
+export const onMissing: SchemaHandler<
+  SchemaObject | ReferenceObject,
+  OpenAPIContext,
+  "last"
+> = (schema, ctx) =>
   assert.fail(
     new DocumentationError({
       message: `Zod type ${schema.constructor.name} is unsupported.`,

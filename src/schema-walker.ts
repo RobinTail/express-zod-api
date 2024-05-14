@@ -7,8 +7,7 @@ interface VariantDependingProps<U> {
   each: { prev: U };
   last: {};
 }
-
-export type HandlingVariant = keyof VariantDependingProps<unknown>;
+type HandlingVariant = keyof VariantDependingProps<unknown>;
 
 export type SchemaHandler<
   U,
