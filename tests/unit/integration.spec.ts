@@ -4,6 +4,7 @@ import { routing } from "../../example/routing";
 import {
   EndpointsFactory,
   Integration,
+  Producer,
   createResultHandler,
   defaultEndpointsFactory,
 } from "../../src";
@@ -123,13 +124,14 @@ describe("Integration", () => {
 
   describe("Feature #1470: Custom brands", () => {
     test("should by handled accordingly", async () => {
+      const rule: Producer = (schema: z.ZodBranded<any, any>, { next }) =>
+        next(schema.unwrap());
       const client = new Integration({
         splitResponse: true,
         variant: "types",
         brandHandling: {
           CUSTOM: () => f.createKeywordTypeNode(ts.SyntaxKind.BooleanKeyword),
-          DEEP: (schema: z.ZodBranded<any, any>, { next }) =>
-            next(schema.unwrap()),
+          DEEP: rule,
         },
         routing: {
           v1: {

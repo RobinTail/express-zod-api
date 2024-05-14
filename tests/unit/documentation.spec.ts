@@ -1,6 +1,7 @@
 import { config as exampleConfig } from "../../example/config";
 import { routing } from "../../example/routing";
 import {
+  Depicter,
   Documentation,
   DocumentationError,
   EndpointsFactory,
@@ -1274,6 +1275,8 @@ describe("Documentation", () => {
   describe("Feature #1470: Custom brands", () => {
     test("should be handled accordingly in request, response and params", () => {
       const deep = Symbol("DEEP");
+      const rule: Depicter = (schema: z.ZodBranded<any, any>, { next }) =>
+        next(schema.unwrap());
       const spec = new Documentation({
         config: sampleConfig,
         routing: {
@@ -1296,8 +1299,7 @@ describe("Documentation", () => {
           CUSTOM: () => ({
             summary: "My custom schema",
           }),
-          [deep]: (schema: z.ZodBranded<any, any>, { next }) =>
-            next(schema.unwrap()),
+          [deep]: rule,
         },
         version: "3.4.5",
         title: "Testing custom brands handling",
