@@ -76,7 +76,7 @@ interface IntegrationParams {
     withUndefined?: boolean;
   };
   /**
-   * @desc Handling rules for your own branded types.
+   * @desc Handling rules for your own branded schemas.
    * @desc Keys: brands (recommended to use unique symbols).
    * @desc Values: functions having schema as first argument that you should assign type to, second one is a context.
    * @example { MyBrand: ( schema: typeof myBrandSchema, { next } ) => createKeywordTypeNode(SyntaxKind.AnyKeyword)
