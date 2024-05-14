@@ -11,6 +11,7 @@ export default [
     files: ["**/*.ts"],
     rules: {
       "no-empty-pattern": "off",
+      "no-empty": "off",
       "@typescript-eslint/no-empty-object-type": "off",
       "@typescript-eslint/no-explicit-any": "off",
     }
