@@ -12,7 +12,7 @@ describe("Checks", () => {
       subject._def[metaSymbol]?.brand === ezUploadBrand;
 
     test("should return true for given argument satisfying condition", () => {
-      expect(hasNestedSchema({ subject: ez.upload(), condition })).toBeTruthy();
+      expect(hasNestedSchema(ez.upload(), { condition })).toBeTruthy();
     });
 
     test.each([
@@ -26,7 +26,7 @@ describe("Checks", () => {
       ez.upload().refine(() => true),
       z.array(ez.upload()),
     ])("should return true for wrapped needle %#", (subject) => {
-      expect(hasNestedSchema({ subject, condition })).toBeTruthy();
+      expect(hasNestedSchema(subject, { condition })).toBeTruthy();
     });
 
     test.each([
@@ -36,7 +36,7 @@ describe("Checks", () => {
       z.boolean().and(z.literal(true)),
       z.number().or(z.string()),
     ])("should return false in other cases %#", (subject) => {
-      expect(hasNestedSchema({ subject, condition })).toBeFalsy();
+      expect(hasNestedSchema(subject, { condition })).toBeFalsy();
     });
 
     test("should finish early", () => {
@@ -48,8 +48,7 @@ describe("Checks", () => {
         }),
       });
       const check = vi.fn((schema) => schema instanceof z.ZodObject);
-      hasNestedSchema({
-        subject,
+      hasNestedSchema(subject, {
         condition: check,
       });
       expect(check.mock.calls.length).toBe(1);

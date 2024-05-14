@@ -58,6 +58,7 @@ Start your API server with I/O schema validation and custom middlewares in minut
    2. [Generating a Frontend Client](#generating-a-frontend-client)
    3. [Creating a documentation](#creating-a-documentation)
    4. [Tagging the endpoints](#tagging-the-endpoints)
+   5. [Customizable brands handling](#customizable-brands-handling)
 8. [Caveats](#caveats)
    1. [Coercive schema of Zod](#coercive-schema-of-zod)
    2. [Excessive properties in endpoint output](#excessive-properties-in-endpoint-output)
@@ -1167,6 +1168,50 @@ const taggedEndpointsFactory = new EndpointsFactory({
 const exampleEndpoint = taggedEndpointsFactory.build({
   // ...
   tag: "users", // or tags: ["users", "files"]
+});
+```
+
+## Customizable brands handling
+
+You can customize handling rules for your schemas in Documentation and Integration. Use the `.brand()` method on your
+schema to make it special and distinguishable for the library in runtime. Using symbols is recommended for branding.
+After that utilize the `brandHandling` feature of both constructors to declare your custom implementation. In case you
+need to reuse a handling rule for multiple brands, use the exposed types `Depicter` and `Producer`.
+
+```ts
+import ts from "typescript";
+import { z } from "zod";
+import {
+  Documentation,
+  Integration,
+  Depicter,
+  Producer,
+} from "express-zod-api";
+
+const myBrand = Symbol("MamaToldMeImSpecial"); // I recommend to use symbols for this purpose
+const myBrandedSchema = z.string().brand(myBrand);
+
+const ruleForDocs: Depicter = (
+  schema: typeof myBrandedSchema, // you should assign type yourself
+  { next, path, method, isResponse }, // handle a nested schema using next()
+) => {
+  const defaultDepiction = next(schema.unwrap()); // { type: string }
+  return { summary: "Special type of data" };
+};
+
+const ruleForClient: Producer = (
+  schema: typeof myBrandedSchema, // you should assign type yourself
+  { next, isResponse, serializer }, // handle a nested schema using next()
+) => ts.factory.createKeywordTypeNode(ts.SyntaxKind.BooleanKeyword);
+
+new Documentation({
+  /* config, routing, title, version */
+  brandHandling: { [myBrand]: ruleForDocs },
+});
+
+new Integration({
+  /* routing */
+  brandHandling: { [myBrand]: ruleForClient },
 });
 ```
 
