@@ -35,6 +35,9 @@ export { Integration } from "./integration";
 
 export { ez } from "./proprietary-schemas";
 
+// Convenience types
+export type { Producer } from "./zts-helpers";
+
 // Issues 952, 1182, 1269: Insufficient exports for consumer's declaration
 export type { MockOverrides } from "./testing";
 export type { Routing } from "./routing";
