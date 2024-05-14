@@ -70,8 +70,6 @@ import { HandlingRules, SchemaHandler, walkSchema } from "./schema-walker";
 import { Security } from "./security";
 import { UploadSchema, ezUploadBrand } from "./upload-schema";
 
- 
-
 export interface OpenAPIContext extends FlatObject {
   isResponse: boolean;
   serializer: (schema: z.ZodTypeAny) => string;

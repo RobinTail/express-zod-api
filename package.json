@@ -140,6 +140,7 @@
     "cors": "^2.8.5",
     "eslint": "^9.2.0",
     "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.1.3",
     "express": "^4.19.2",
     "express-fileupload": "^1.5.0",
     "globals": "^15.2.0",
