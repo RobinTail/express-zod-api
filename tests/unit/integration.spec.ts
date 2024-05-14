@@ -1,8 +1,10 @@
+import ts from "typescript";
 import { z } from "zod";
 import { routing } from "../../example/routing";
 import {
   EndpointsFactory,
   Integration,
+  Producer,
   createResultHandler,
   defaultEndpointsFactory,
 } from "../../src";
@@ -117,5 +119,37 @@ describe("Integration", () => {
       },
     });
     expect(await client.printFormatted()).toMatchSnapshot();
+  });
+
+  describe("Feature #1470: Custom brands", () => {
+    test("should by handled accordingly", async () => {
+      const rule: Producer = (schema: z.ZodBranded<any, any>, { next }) =>
+        next(schema.unwrap());
+      const client = new Integration({
+        splitResponse: true,
+        variant: "types",
+        brandHandling: {
+          CUSTOM: () =>
+            ts.factory.createKeywordTypeNode(ts.SyntaxKind.BooleanKeyword),
+          DEEP: rule,
+        },
+        routing: {
+          v1: {
+            custom: defaultEndpointsFactory.build({
+              method: "post",
+              input: z.object({
+                string: z.string().brand("CUSTOM"),
+                regular: z.string().brand("DEEP"),
+              }),
+              output: z.object({
+                number: z.number().brand("CUSTOM"),
+              }),
+              handler: vi.fn(),
+            }),
+          },
+        },
+      });
+      expect(await client.printFormatted()).toMatchSnapshot();
+    });
   });
 });

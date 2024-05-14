@@ -35,20 +35,27 @@ export const waitFor = async (cb: () => boolean) =>
 export const serializeSchemaForTest = (
   subject: z.ZodTypeAny,
 ): Record<string, any> => {
-  const onSomeUnion: SchemaHandler<
-    | z.ZodUnion<z.ZodUnionOptions>
-    | z.ZodDiscriminatedUnion<string, z.ZodDiscriminatedUnionOption<string>[]>,
-    object
-  > = ({ schema, next }) => ({
-    options: Array.from(schema.options.values()).map(next),
+  const onSomeUnion: SchemaHandler<object> = (
+    {
+      options,
+    }:
+      | z.ZodUnion<z.ZodUnionOptions>
+      | z.ZodDiscriminatedUnion<
+          string,
+          z.ZodDiscriminatedUnionOption<string>[]
+        >,
+    { next },
+  ) => ({
+    options: Array.from(options.values()).map(next),
   });
-  const onOptionalOrNullable: SchemaHandler<
-    z.ZodOptional<z.ZodTypeAny> | z.ZodNullable<z.ZodTypeAny>,
-    object
-  > = ({ schema, next }) => ({ value: next(schema.unwrap()) });
+  const onOptionalOrNullable: SchemaHandler<object> = (
+    schema: z.ZodOptional<z.ZodTypeAny> | z.ZodNullable<z.ZodTypeAny>,
+    { next },
+  ) => ({
+    value: next(schema.unwrap()),
+  });
   const onPrimitive = () => ({});
-  return walkSchema({
-    schema: subject,
+  return walkSchema(subject, {
     rules: {
       ZodNull: onPrimitive,
       ZodNumber: onPrimitive,
@@ -58,36 +65,42 @@ export const serializeSchemaForTest = (
       ZodDiscriminatedUnion: onSomeUnion,
       ZodOptional: onOptionalOrNullable,
       ZodNullable: onOptionalOrNullable,
-      ZodIntersection: ({ schema, next }) => ({
-        left: next(schema._def.left),
-        right: next(schema._def.right),
+      ZodIntersection: ({ _def }: z.ZodIntersection<any, any>, { next }) => ({
+        left: next(_def.left),
+        right: next(_def.right),
       }),
-      ZodObject: ({ schema, next }) => ({ shape: map(next, schema.shape) }),
-      ZodEffects: ({ schema, next }) => ({ value: next(schema._def.schema) }),
-      ZodRecord: ({ schema, next }) => ({
-        keys: next(schema.keySchema),
-        values: next(schema.valueSchema),
+      ZodObject: ({ shape }: z.ZodObject<any>, { next }) => ({
+        shape: map(next, shape),
       }),
-      ZodArray: ({ schema, next }) => ({ items: next(schema.element) }),
-      ZodLiteral: ({ schema }) => ({ value: schema.value }),
-      ZodDefault: ({ schema, next }) => ({
-        value: next(schema._def.innerType),
-        default: schema._def.defaultValue(),
+      ZodEffects: ({ _def }: z.ZodEffects<any>, { next }) => ({
+        value: next(_def.schema),
       }),
-      ZodReadonly: ({ schema, next }) => next(schema._def.innerType),
-      ZodCatch: ({ schema, next }) => ({
-        value: next(schema._def.innerType),
-        fallback: schema._def.defaultValue(),
+      ZodRecord: ({ keySchema, valueSchema }: z.ZodRecord, { next }) => ({
+        keys: next(keySchema),
+        values: next(valueSchema),
       }),
-      ZodPipeline: ({ schema, next }) => ({
-        from: next(schema._def.in),
-        to: next(schema._def.out),
+      ZodArray: ({ element }: z.ZodArray<any>, { next }) => ({
+        items: next(element),
+      }),
+      ZodLiteral: ({ value }: z.ZodLiteral<any>) => ({ value }),
+      ZodDefault: ({ _def }: z.ZodDefault<any>, { next }) => ({
+        value: next(_def.innerType),
+        default: _def.defaultValue(),
+      }),
+      ZodReadonly: (schema: z.ZodReadonly<any>, { next }) =>
+        next(schema.unwrap()),
+      ZodCatch: ({ _def }: z.ZodCatch<any>, { next }) => ({
+        value: next(_def.innerType),
+      }),
+      ZodPipeline: ({ _def }: z.ZodPipeline<any, any>, { next }) => ({
+        from: next(_def.in),
+        to: next(_def.out),
       }),
       [ezFileBrand]: () => ({ brand: ezFileBrand }),
     },
-    onEach: ({ schema }) => ({ _type: schema._def.typeName }),
-    onMissing: ({ schema }) => {
-      console.warn(`There is no serializer for ${schema._def.typeName}`);
+    onEach: ({ _def }: z.ZodTypeAny) => ({ _type: _def.typeName }),
+    onMissing: ({ _def }: z.ZodTypeAny) => {
+      console.warn(`There is no serializer for ${_def.typeName}`);
       return {};
     },
   });
