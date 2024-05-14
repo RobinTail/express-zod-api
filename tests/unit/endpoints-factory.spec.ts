@@ -15,7 +15,7 @@ import { z } from "zod";
 import { describe, expect, test, vi } from "vitest";
 
 describe("EndpointsFactory", () => {
-  /* eslint-disable @typescript-eslint/dot-notation */
+   
 
   describe(".constructor()", () => {
     test("Should create the empty factory with result handler", () => {

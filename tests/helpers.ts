@@ -20,7 +20,7 @@ export const givePort = (test?: keyof typeof reservedPorts) => {
 export const waitFor = async (cb: () => boolean) =>
   new Promise((resolve, reject) => {
     const timeout = setTimeout(() => {
-      clearInterval(timer); // eslint-disable-line @typescript-eslint/no-use-before-define
+      clearInterval(timer);  
       reject();
     }, 10000);
     const timer = setInterval(() => {
