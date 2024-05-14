@@ -30,4 +30,10 @@ export default [
       "@typescript-eslint/no-unused-vars": "off",
     },
   },
+  {
+    files: ["tests/*/quick-start.ts"],
+    rules: {
+      "prettier/prettier": "off",
+    },
+  },
 ];
