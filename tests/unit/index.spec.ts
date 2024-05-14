@@ -11,6 +11,7 @@ import {
   CommonConfig,
   CookieSecurity,
   CustomHeaderSecurity,
+  Depicter,
   FlatObject,
   IOSchema,
   InputSecurity,
@@ -45,6 +46,7 @@ describe("Index Entrypoint", () => {
     });
 
     test("Convenience types should be exposed", () => {
+      expectType<Depicter>(() => ({ type: "number" }));
       expectType<Producer>(() =>
         ts.factory.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword),
       );

@@ -84,7 +84,10 @@ export interface OpenAPIContext extends FlatObject {
   method: Method;
 }
 
-type Depicter = SchemaHandler<SchemaObject | ReferenceObject, OpenAPIContext>;
+export type Depicter = SchemaHandler<
+  SchemaObject | ReferenceObject,
+  OpenAPIContext
+>;
 
 interface ReqResDepictHelperCommonProps
   extends Pick<

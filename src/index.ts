@@ -36,6 +36,7 @@ export { Integration } from "./integration";
 export { ez } from "./proprietary-schemas";
 
 // Convenience types
+export type { Depicter } from "./documentation-helpers";
 export type { Producer } from "./zts-helpers";
 
 // Issues 952, 1182, 1269: Insufficient exports for consumer's declaration
