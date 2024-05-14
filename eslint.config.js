@@ -14,22 +14,29 @@ export default [
   ...tseslint.configs.recommended,
   eslintConfigPrettier,
   eslintPluginPrettierRecommended,
+  // Things to turn off
   {
-    files: ["**/*.ts"],
     rules: {
       "no-empty-pattern": "off",
       "no-empty": "off",
       "@typescript-eslint/no-empty-object-type": "off",
       "@typescript-eslint/no-explicit-any": "off",
+    },
+  },
+  // Things to turn on
+  {
+    rules: {
       "unicorn/prefer-node-protocol": "error",
     },
   },
+  // Special needs of plugin
   {
     files: ["src/zod-plugin.ts"],
     rules: {
       "@typescript-eslint/no-unused-vars": "off",
     },
   },
+  // Special needs of the generated code
   {
     files: ["tests/*/quick-start.ts"],
     rules: {
