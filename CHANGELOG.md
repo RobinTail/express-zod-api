@@ -6,7 +6,7 @@
 
 - Feature: customizable handling rules for your branded schemas in Documentation and Integration:
   - You can make your schemas special by branding them using `.brand()` method;
-  - The library distinguishes the branded schemas in runtime;
+  - The library (being a Zod Plugin as well) distinguishes the branded schemas in runtime;
   - The constructors of `Documentation` and `Integration` now accept new property `brandHandling` (object);
   - Its keys should be the brands you want to handle in a special way;
   - Its values are functions having your schema as the first argument and a context in the second place;
@@ -22,7 +22,7 @@ import {
   Producer,
 } from "express-zod-api";
 
-const myBrand = Symbol("MamaToldMeImSpecial"); // I highly recommend using symbols for this purpose
+const myBrand = Symbol("MamaToldMeImSpecial"); // I recommend to use symbols for this purpose
 const myBrandedSchema = z.string().brand(myBrand);
 
 const ruleForDocs: Depicter = (
