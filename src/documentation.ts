@@ -7,6 +7,7 @@ import {
   SecuritySchemeObject,
   SecuritySchemeType,
 } from "openapi3-ts/oas31";
+import { pluck } from "ramda";
 import { z } from "zod";
 import { DocumentationError } from "./errors";
 import {
@@ -184,8 +185,7 @@ export class Documentation extends OpenApiBuilder {
         endpoint.getOperationId(method),
       );
 
-      // @todo perhaps excessive
-      const { paramNames, depictedParams } = depictRequestParams({
+      const depictedParams = depictRequestParams({
         ...commons,
         inputSources,
         schema: endpoint.getSchema("input"),
@@ -223,7 +223,7 @@ export class Documentation extends OpenApiBuilder {
       const requestBody = inputSources.includes("body")
         ? depictRequest({
             ...commons,
-            paramNames,
+            paramNames: pluck("name", depictedParams),
             schema: endpoint.getSchema("input"),
             mimeTypes: endpoint.getMimeTypes("input"),
             description: descriptions?.requestBody?.call(null, {

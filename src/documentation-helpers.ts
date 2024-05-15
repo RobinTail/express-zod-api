@@ -722,37 +722,33 @@ export const depictRequestParams = ({
         parameter.location !== undefined,
     );
 
-  const depictedParams = parameters.map<ParameterObject>(
-    ({ name, location }) => {
-      const depicted = walkSchema(shape[name], {
-        rules: { ...brandHandling, ...depicters },
-        onEach,
-        onMissing,
-        ctx: {
-          isResponse: false,
-          serializer,
-          getRef,
-          makeRef,
-          path,
-          method,
-        },
-      });
-      const result =
-        composition === "components"
-          ? makeRef(makeCleanId(description, name), depicted)
-          : depicted;
-      return {
-        name,
-        in: location,
-        required: !shape[name].isOptional(),
-        description: depicted.description || description,
-        schema: result,
-        examples: depictParamExamples(schema, name),
-      };
-    },
-  );
-
-  return { paramNames: pluck("name", parameters), depictedParams };
+  return parameters.map<ParameterObject>(({ name, location }) => {
+    const depicted = walkSchema(shape[name], {
+      rules: { ...brandHandling, ...depicters },
+      onEach,
+      onMissing,
+      ctx: {
+        isResponse: false,
+        serializer,
+        getRef,
+        makeRef,
+        path,
+        method,
+      },
+    });
+    const result =
+      composition === "components"
+        ? makeRef(makeCleanId(description, name), depicted)
+        : depicted;
+    return {
+      name,
+      in: location,
+      required: !shape[name].isOptional(),
+      description: depicted.description || description,
+      schema: result,
+      examples: depictParamExamples(schema, name),
+    };
+  });
 };
 
 export const depicters: HandlingRules<
