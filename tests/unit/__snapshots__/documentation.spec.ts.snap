@@ -3791,14 +3791,8 @@ paths:
           application/json:
             schema:
               type: object
-              properties:
-                id:
-                  type: string
-                x-request-id:
-                  type: string
-              required:
-                - id
-                - x-request-id
+              properties: {}
+              required: []
       responses:
         "200":
           description: POST /v1/test Positive response
@@ -3882,11 +3876,8 @@ paths:
               properties:
                 id:
                   type: string
-                x-request-id:
-                  type: string
               required:
                 - id
-                - x-request-id
       responses:
         "200":
           description: PUT /v1/test Positive response

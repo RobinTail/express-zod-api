@@ -157,7 +157,7 @@ export class Documentation extends OpenApiBuilder {
       _method,
     ) => {
       const method = _method as Method;
-      const commonParams = {
+      const commons = {
         path,
         method,
         endpoint,
@@ -184,8 +184,9 @@ export class Documentation extends OpenApiBuilder {
         endpoint.getOperationId(method),
       );
 
-      const depictedParams = depictRequestParams({
-        ...commonParams,
+      // @todo perhaps excessive
+      const { paramNames, depictedParams } = depictRequestParams({
+        ...commons,
         inputSources,
         schema: endpoint.getSchema("input"),
         description: descriptions?.requestParameter?.call(null, {
@@ -201,7 +202,7 @@ export class Documentation extends OpenApiBuilder {
         for (const { mimeTypes, schema, statusCodes } of apiResponses) {
           for (const statusCode of statusCodes) {
             responses[statusCode] = depictResponse({
-              ...commonParams,
+              ...commons,
               variant,
               schema,
               mimeTypes,
@@ -221,7 +222,8 @@ export class Documentation extends OpenApiBuilder {
 
       const requestBody = inputSources.includes("body")
         ? depictRequest({
-            ...commonParams,
+            ...commons,
+            paramNames,
             schema: endpoint.getSchema("input"),
             mimeTypes: endpoint.getMimeTypes("input"),
             description: descriptions?.requestBody?.call(null, {

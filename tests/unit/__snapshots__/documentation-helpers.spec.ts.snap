@@ -849,80 +849,103 @@ exports[`Documentation helpers > depictRecord() > should set properties+required
 `;
 
 exports[`Documentation helpers > depictRequestParams() > Feature 1180: should depict header params when enabled 1`] = `
-[
-  {
-    "description": "GET /v1/user/:id Parameter",
-    "examples": undefined,
-    "in": "header",
-    "name": "x-request-id",
-    "required": true,
-    "schema": {
-      "type": "string",
+{
+  "depictedParams": [
+    {
+      "description": "GET /v1/user/:id Parameter",
+      "examples": undefined,
+      "in": "header",
+      "name": "x-request-id",
+      "required": true,
+      "schema": {
+        "type": "string",
+      },
     },
-  },
-  {
-    "description": "GET /v1/user/:id Parameter",
-    "examples": undefined,
-    "in": "path",
-    "name": "id",
-    "required": true,
-    "schema": {
-      "type": "string",
+    {
+      "description": "GET /v1/user/:id Parameter",
+      "examples": undefined,
+      "in": "path",
+      "name": "id",
+      "required": true,
+      "schema": {
+        "type": "string",
+      },
     },
-  },
-  {
-    "description": "GET /v1/user/:id Parameter",
-    "examples": undefined,
-    "in": "query",
-    "name": "test",
-    "required": true,
-    "schema": {
-      "type": "boolean",
+    {
+      "description": "GET /v1/user/:id Parameter",
+      "examples": undefined,
+      "in": "query",
+      "name": "test",
+      "required": true,
+      "schema": {
+        "type": "boolean",
+      },
     },
-  },
-]
+  ],
+  "paramNames": [
+    "x-request-id",
+    "id",
+    "test",
+  ],
+}
 `;
 
-exports[`Documentation helpers > depictRequestParams() > should depict none if both query and params are disabled 1`] = `[]`;
+exports[`Documentation helpers > depictRequestParams() > should depict none if both query and params are disabled 1`] = `
+{
+  "depictedParams": [],
+  "paramNames": [],
+}
+`;
 
 exports[`Documentation helpers > depictRequestParams() > should depict only path params if query is disabled 1`] = `
-[
-  {
-    "description": "GET /v1/user/:id Parameter",
-    "examples": undefined,
-    "in": "path",
-    "name": "id",
-    "required": true,
-    "schema": {
-      "type": "string",
+{
+  "depictedParams": [
+    {
+      "description": "GET /v1/user/:id Parameter",
+      "examples": undefined,
+      "in": "path",
+      "name": "id",
+      "required": true,
+      "schema": {
+        "type": "string",
+      },
     },
-  },
-]
+  ],
+  "paramNames": [
+    "id",
+  ],
+}
 `;
 
 exports[`Documentation helpers > depictRequestParams() > should depict query and path params 1`] = `
-[
-  {
-    "description": "GET /v1/user/:id Parameter",
-    "examples": undefined,
-    "in": "path",
-    "name": "id",
-    "required": true,
-    "schema": {
-      "type": "string",
+{
+  "depictedParams": [
+    {
+      "description": "GET /v1/user/:id Parameter",
+      "examples": undefined,
+      "in": "path",
+      "name": "id",
+      "required": true,
+      "schema": {
+        "type": "string",
+      },
     },
-  },
-  {
-    "description": "GET /v1/user/:id Parameter",
-    "examples": undefined,
-    "in": "query",
-    "name": "test",
-    "required": true,
-    "schema": {
-      "type": "boolean",
+    {
+      "description": "GET /v1/user/:id Parameter",
+      "examples": undefined,
+      "in": "query",
+      "name": "test",
+      "required": true,
+      "schema": {
+        "type": "boolean",
+      },
     },
-  },
-]
+  ],
+  "paramNames": [
+    "id",
+    "test",
+  ],
+}
 `;
 
 exports[`Documentation helpers > depictSecurity() > should add scopes when missing 1`] = `
