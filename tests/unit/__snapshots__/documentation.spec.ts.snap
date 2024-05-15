@@ -3857,6 +3857,87 @@ servers:
 "
 `;
 
+exports[`Documentation > Feature 1180: Headers opt-in params > should describe x- inputs as header params in put request 1`] = `
+"openapi: 3.1.0
+info:
+  title: Testing headers params
+  version: 3.4.5
+paths:
+  /v1/test:
+    put:
+      operationId: PutV1Test
+      requestBody:
+        description: PUT /v1/test Request body
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                x-request-id:
+                  type: string
+              required:
+                - id
+                - x-request-id
+      responses:
+        "200":
+          description: PUT /v1/test Positive response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    const: success
+                  data:
+                    type: object
+                required:
+                  - status
+                  - data
+        "400":
+          description: PUT /v1/test Negative response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    const: error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                required:
+                  - status
+                  - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
+components:
+  schemas: {}
+  responses: {}
+  parameters: {}
+  examples: {}
+  requestBodies: {}
+  headers: {}
+  securitySchemes: {}
+  links: {}
+  callbacks: {}
+tags: []
+servers:
+  - url: https://example.com
+"
+`;
+
 exports[`Documentation > Issue #98 > Should describe non-empty array 1`] = `
 "openapi: 3.1.0
 info:

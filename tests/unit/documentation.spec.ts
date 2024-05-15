@@ -984,10 +984,11 @@ describe("Documentation", () => {
       inputSources: {
         get: ["query", "params", "headers"],
         post: ["body", "query", "params", "headers"],
+        put: ["body", "headers"], // query is not enabled
       },
     });
 
-    test.each(["get", "post"] as const)(
+    test.each(["get", "post", "put"] as const)(
       "should describe x- inputs as header params in %s request",
       (method) => {
         const spec = new Documentation({
