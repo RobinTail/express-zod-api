@@ -1317,7 +1317,7 @@ exports[`Documentation helpers > excludeParamsFromDepiction() > should handle th
 }
 `;
 
-exports[`Documentation helpers > excludeParamsFromDepiction() > should omit specified path params 0 1`] = `
+exports[`Documentation helpers > excludeParamsFromDepiction() > should omit specified params 0 1`] = `
 {
   "properties": {
     "b": {
@@ -1331,7 +1331,7 @@ exports[`Documentation helpers > excludeParamsFromDepiction() > should omit spec
 }
 `;
 
-exports[`Documentation helpers > excludeParamsFromDepiction() > should omit specified path params 1 1`] = `
+exports[`Documentation helpers > excludeParamsFromDepiction() > should omit specified params 1 1`] = `
 {
   "oneOf": [
     {
@@ -1354,7 +1354,7 @@ exports[`Documentation helpers > excludeParamsFromDepiction() > should omit spec
 }
 `;
 
-exports[`Documentation helpers > excludeParamsFromDepiction() > should omit specified path params 2 1`] = `
+exports[`Documentation helpers > excludeParamsFromDepiction() > should omit specified params 2 1`] = `
 {
   "properties": {
     "b": {
@@ -1368,7 +1368,7 @@ exports[`Documentation helpers > excludeParamsFromDepiction() > should omit spec
 }
 `;
 
-exports[`Documentation helpers > excludeParamsFromDepiction() > should omit specified path params 3 1`] = `
+exports[`Documentation helpers > excludeParamsFromDepiction() > should omit specified params 3 1`] = `
 {
   "allOf": [
     {
