@@ -3866,6 +3866,13 @@ paths:
   /v1/test:
     put:
       operationId: PutV1Test
+      parameters:
+        - name: x-request-id
+          in: header
+          required: true
+          description: PUT /v1/test Parameter
+          schema:
+            type: string
       requestBody:
         description: PUT /v1/test Request body
         content:

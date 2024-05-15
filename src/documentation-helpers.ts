@@ -705,7 +705,9 @@ export const depictRequestParams = ({
   const isHeaderParam = (name: string) =>
     areHeadersEnabled && isCustomHeader(name);
   return Object.keys(shape)
-    .filter((name) => isQueryEnabled || isPathParam(name))
+    .filter(
+      (name) => isQueryEnabled || isPathParam(name) || isHeaderParam(name),
+    )
     .map((name) => {
       const depicted = walkSchema(shape[name], {
         rules: { ...brandHandling, ...depicters },
@@ -726,6 +728,7 @@ export const depictRequestParams = ({
           : depicted;
       return {
         name,
+        // @todo DNRY
         in: isPathParam(name)
           ? "path"
           : isHeaderParam(name)
