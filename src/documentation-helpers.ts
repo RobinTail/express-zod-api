@@ -3,6 +3,7 @@ import {
   ExamplesObject,
   MediaTypeObject,
   OAuthFlowObject,
+  ParameterLocation,
   ParameterObject,
   ReferenceObject,
   RequestBodyObject,
@@ -704,42 +705,50 @@ export const depictRequestParams = ({
     areParamsEnabled && pathParams.includes(name);
   const isHeaderParam = (name: string) =>
     areHeadersEnabled && isCustomHeader(name);
-  return Object.keys(shape)
+
+  const parameters = Object.keys(shape)
+    .map<{ name: string; location?: ParameterLocation }>((name) => ({
+      name,
+      location: isPathParam(name)
+        ? "path"
+        : isHeaderParam(name)
+          ? "header"
+          : isQueryEnabled
+            ? "query"
+            : undefined,
+    }))
     .filter(
-      (name) => isQueryEnabled || isPathParam(name) || isHeaderParam(name),
-    )
-    .map((name) => {
-      const depicted = walkSchema(shape[name], {
-        rules: { ...brandHandling, ...depicters },
-        onEach,
-        onMissing,
-        ctx: {
-          isResponse: false,
-          serializer,
-          getRef,
-          makeRef,
-          path,
-          method,
-        },
-      });
-      const result =
-        composition === "components"
-          ? makeRef(makeCleanId(description, name), depicted)
-          : depicted;
-      return {
-        name,
-        // @todo DNRY
-        in: isPathParam(name)
-          ? "path"
-          : isHeaderParam(name)
-            ? "header"
-            : "query",
-        required: !shape[name].isOptional(),
-        description: depicted.description || description,
-        schema: result,
-        examples: depictParamExamples(schema, name),
-      };
+      (parameter): parameter is Required<typeof parameter> =>
+        parameter.location !== undefined,
+    );
+
+  return parameters.map(({ name, location }) => {
+    const depicted = walkSchema(shape[name], {
+      rules: { ...brandHandling, ...depicters },
+      onEach,
+      onMissing,
+      ctx: {
+        isResponse: false,
+        serializer,
+        getRef,
+        makeRef,
+        path,
+        method,
+      },
     });
+    const result =
+      composition === "components"
+        ? makeRef(makeCleanId(description, name), depicted)
+        : depicted;
+    return {
+      name,
+      in: location,
+      required: !shape[name].isOptional(),
+      description: depicted.description || description,
+      schema: result,
+      examples: depictParamExamples(schema, name),
+    };
+  });
 };
 
 export const depicters: HandlingRules<
