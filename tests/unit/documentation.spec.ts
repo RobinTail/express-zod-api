@@ -981,31 +981,37 @@ describe("Documentation", () => {
   describe("Feature 1180: Headers opt-in params", () => {
     const specificConfig = createConfig({
       ...sampleConfig,
-      inputSources: { get: ["query", "params", "headers"] },
+      inputSources: {
+        get: ["query", "params", "headers"],
+        post: ["body", "query", "params", "headers"],
+      },
     });
 
-    test("should describe x- inputs as header params", () => {
-      const spec = new Documentation({
-        config: specificConfig,
-        routing: {
-          v1: {
-            test: defaultEndpointsFactory.build({
-              method: "get",
-              input: z.object({
-                id: z.string(),
-                "x-request-id": z.string(),
+    test.each(["get", "post"] as const)(
+      "should describe x- inputs as header params in %s request",
+      (method) => {
+        const spec = new Documentation({
+          config: specificConfig,
+          routing: {
+            v1: {
+              test: defaultEndpointsFactory.build({
+                method,
+                input: z.object({
+                  id: z.string(),
+                  "x-request-id": z.string(),
+                }),
+                output: z.object({}),
+                handler: vi.fn(),
               }),
-              output: z.object({}),
-              handler: vi.fn(),
-            }),
+            },
           },
-        },
-        version: "3.4.5",
-        title: "Testing headers params",
-        serverUrl: "https://example.com",
-      }).getSpecAsYaml();
-      expect(spec).toMatchSnapshot();
-    });
+          version: "3.4.5",
+          title: "Testing headers params",
+          serverUrl: "https://example.com",
+        }).getSpecAsYaml();
+        expect(spec).toMatchSnapshot();
+      },
+    );
   });
 
   describe("Feature #1431: Multiple schemas for different status codes", () => {
