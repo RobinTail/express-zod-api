@@ -3,6 +3,7 @@ import {
   ExamplesObject,
   MediaTypeObject,
   OAuthFlowObject,
+  ParameterLocation,
   ParameterObject,
   ReferenceObject,
   RequestBodyObject,
@@ -686,7 +687,7 @@ export const depictRequestParams = ({
   description = `${method.toUpperCase()} ${path} Parameter`,
 }: Omit<ReqResDepictHelperCommonProps, "mimeTypes"> & {
   inputSources: InputSource[];
-}): ParameterObject[] => {
+}) => {
   const { shape } = extractObjectSchema(
     schema,
     new DocumentationError({
@@ -704,39 +705,50 @@ export const depictRequestParams = ({
     areParamsEnabled && pathParams.includes(name);
   const isHeaderParam = (name: string) =>
     areHeadersEnabled && isCustomHeader(name);
-  return Object.keys(shape)
-    .filter((name) => isQueryEnabled || isPathParam(name))
-    .map((name) => {
-      const depicted = walkSchema(shape[name], {
-        rules: { ...brandHandling, ...depicters },
-        onEach,
-        onMissing,
-        ctx: {
-          isResponse: false,
-          serializer,
-          getRef,
-          makeRef,
-          path,
-          method,
-        },
-      });
-      const result =
-        composition === "components"
-          ? makeRef(makeCleanId(description, name), depicted)
-          : depicted;
-      return {
-        name,
-        in: isPathParam(name)
-          ? "path"
-          : isHeaderParam(name)
-            ? "header"
-            : "query",
-        required: !shape[name].isOptional(),
-        description: depicted.description || description,
-        schema: result,
-        examples: depictParamExamples(schema, name),
-      };
+
+  const parameters = Object.keys(shape)
+    .map<{ name: string; location?: ParameterLocation }>((name) => ({
+      name,
+      location: isPathParam(name)
+        ? "path"
+        : isHeaderParam(name)
+          ? "header"
+          : isQueryEnabled
+            ? "query"
+            : undefined,
+    }))
+    .filter(
+      (parameter): parameter is Required<typeof parameter> =>
+        parameter.location !== undefined,
+    );
+
+  return parameters.map<ParameterObject>(({ name, location }) => {
+    const depicted = walkSchema(shape[name], {
+      rules: { ...brandHandling, ...depicters },
+      onEach,
+      onMissing,
+      ctx: {
+        isResponse: false,
+        serializer,
+        getRef,
+        makeRef,
+        path,
+        method,
+      },
     });
+    const result =
+      composition === "components"
+        ? makeRef(makeCleanId(description, name), depicted)
+        : depicted;
+    return {
+      name,
+      in: location,
+      required: !shape[name].isOptional(),
+      description: depicted.description || description,
+      schema: result,
+      examples: depictParamExamples(schema, name),
+    };
+  });
 };
 
 export const depicters: HandlingRules<
@@ -828,29 +840,29 @@ export const onMissing: SchemaHandler<
 
 export const excludeParamsFromDepiction = (
   depicted: SchemaObject | ReferenceObject,
-  pathParams: string[],
+  names: string[],
 ): SchemaObject | ReferenceObject => {
   if (isReferenceObject(depicted)) {
     return depicted;
   }
   const copy = { ...depicted };
   if (copy.properties) {
-    copy.properties = omit(pathParams, copy.properties);
+    copy.properties = omit(names, copy.properties);
   }
   if (copy.examples) {
-    copy.examples = copy.examples.map((entry) => omit(pathParams, entry));
+    copy.examples = copy.examples.map((entry) => omit(names, entry));
   }
   if (copy.required) {
-    copy.required = copy.required.filter((name) => !pathParams.includes(name));
+    copy.required = copy.required.filter((name) => !names.includes(name));
   }
   if (copy.allOf) {
     copy.allOf = copy.allOf.map((entry) =>
-      excludeParamsFromDepiction(entry, pathParams),
+      excludeParamsFromDepiction(entry, names),
     );
   }
   if (copy.oneOf) {
     copy.oneOf = copy.oneOf.map((entry) =>
-      excludeParamsFromDepiction(entry, pathParams),
+      excludeParamsFromDepiction(entry, names),
     );
   }
   return copy;
@@ -1010,6 +1022,7 @@ export const depictSecurityRefs = (
   return depictSecurityRefs({ or: [container] });
 };
 
+// @todo depictBody
 export const depictRequest = ({
   method,
   path,
@@ -1020,9 +1033,11 @@ export const depictRequest = ({
   makeRef,
   composition,
   brandHandling,
+  paramNames,
   description = `${method.toUpperCase()} ${path} Request body`,
-}: ReqResDepictHelperCommonProps): RequestBodyObject => {
-  const pathParams = getRoutePathParams(path);
+}: ReqResDepictHelperCommonProps & {
+  paramNames: string[];
+}): RequestBodyObject => {
   const bodyDepiction = excludeExamplesFromDepiction(
     excludeParamsFromDepiction(
       walkSchema(schema, {
@@ -1038,7 +1053,7 @@ export const depictRequest = ({
           method,
         },
       }),
-      pathParams,
+      paramNames,
     ),
   );
   const media: MediaTypeObject = {
@@ -1046,7 +1061,7 @@ export const depictRequest = ({
       composition === "components"
         ? makeRef(makeCleanId(description), bodyDepiction)
         : bodyDepiction,
-    examples: depictExamples(schema, false, pathParams),
+    examples: depictExamples(schema, false, paramNames),
   };
   return { description, content: fromPairs(xprod(mimeTypes, [media])) };
 };
