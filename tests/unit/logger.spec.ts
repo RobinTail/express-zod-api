@@ -134,7 +134,7 @@ describe("Logger", () => {
         debug() {}
       })(),
       Object.setPrototypeOf({ level: "debug" }, { debug: () => {} }),
-      new winston.Logger(),
+      winston.createLogger(),
     ])("should invalidate config %#", (sample) => {
       expect(isBuiltinLoggerConfig(sample)).toBeFalsy();
     });
