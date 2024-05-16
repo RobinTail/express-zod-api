@@ -44,18 +44,9 @@ const severity: Record<keyof AbstractLogger, number> = {
   error: 40,
 };
 
-export const isBuiltinLoggerConfig = (
-  subject: unknown,
-): subject is BuiltinLoggerConfig =>
+export const isActualLogger = (subject: unknown): subject is AbstractLogger =>
   isObject(subject) &&
-  "level" in subject &&
-  ("color" in subject ? typeof subject.color === "boolean" : true) &&
-  ("depth" in subject
-    ? typeof subject.depth === "number" || subject.depth === null
-    : true) &&
-  typeof subject.level === "string" &&
-  ["silent", "warn", "info", "debug"].includes(subject.level) &&
-  !Object.values(subject).some((prop) => typeof prop === "function");
+  Object.keys(severity).some((method) => method in subject);
 
 /**
  * @desc Creates the built-in console logger with optional colorful inspections

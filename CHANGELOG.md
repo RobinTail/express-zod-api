@@ -2,6 +2,14 @@
 
 ## Version 19
 
+### v19.1.2
+
+- Fixed a bug on logger instance recognition failure:
+  - When an instance of `winston` logger was assigned in config, it was not recognized as an actual logger;
+  - That led to using the built-in logger having reduced capabilities;
+  - Other loggers could be also affected by this issue;
+  - The issue was found and reported by [@boarush](https://github.com/boarush).
+
 ### v19.1.1
 
 - Fixed a bug on duplicated or missing request header parameters in the generated Documentation:
