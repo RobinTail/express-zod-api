@@ -1,6 +1,7 @@
 import { config as exampleConfig } from "../../example/config";
 import { routing } from "../../example/routing";
 import {
+  Depicter,
   Documentation,
   DocumentationError,
   EndpointsFactory,
@@ -980,31 +981,38 @@ describe("Documentation", () => {
   describe("Feature 1180: Headers opt-in params", () => {
     const specificConfig = createConfig({
       ...sampleConfig,
-      inputSources: { get: ["query", "params", "headers"] },
+      inputSources: {
+        get: ["query", "params", "headers"],
+        post: ["body", "query", "params", "headers"],
+        put: ["body", "headers"], // query is not enabled
+      },
     });
 
-    test("should describe x- inputs as header params", () => {
-      const spec = new Documentation({
-        config: specificConfig,
-        routing: {
-          v1: {
-            test: defaultEndpointsFactory.build({
-              method: "get",
-              input: z.object({
-                id: z.string(),
-                "x-request-id": z.string(),
+    test.each(["get", "post", "put"] as const)(
+      "should describe x- inputs as header params in %s request",
+      (method) => {
+        const spec = new Documentation({
+          config: specificConfig,
+          routing: {
+            v1: {
+              test: defaultEndpointsFactory.build({
+                method,
+                input: z.object({
+                  id: z.string(),
+                  "x-request-id": z.string(),
+                }),
+                output: z.object({}),
+                handler: vi.fn(),
               }),
-              output: z.object({}),
-              handler: vi.fn(),
-            }),
+            },
           },
-        },
-        version: "3.4.5",
-        title: "Testing headers params",
-        serverUrl: "https://example.com",
-      }).getSpecAsYaml();
-      expect(spec).toMatchSnapshot();
-    });
+          version: "3.4.5",
+          title: "Testing headers params",
+          serverUrl: "https://example.com",
+        }).getSpecAsYaml();
+        expect(spec).toMatchSnapshot();
+      },
+    );
   });
 
   describe("Feature #1431: Multiple schemas for different status codes", () => {
@@ -1265,6 +1273,43 @@ describe("Documentation", () => {
         },
         version: "3.4.5",
         title: "Testing Metadata:example on IO parameter",
+        serverUrl: "https://example.com",
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
+    });
+  });
+
+  describe("Feature #1470: Custom brands", () => {
+    test("should be handled accordingly in request, response and params", () => {
+      const deep = Symbol("DEEP");
+      const rule: Depicter = (schema: z.ZodBranded<any, any>, { next }) =>
+        next(schema.unwrap());
+      const spec = new Documentation({
+        config: sampleConfig,
+        routing: {
+          v1: {
+            ":name": defaultEndpointsFactory.build({
+              method: "get",
+              input: z.object({
+                name: z.string().brand("CUSTOM"),
+                other: z.boolean().brand("CUSTOM"),
+                regular: z.boolean().brand(deep),
+              }),
+              output: z.object({
+                number: z.number().brand("CUSTOM"),
+              }),
+              handler: vi.fn(),
+            }),
+          },
+        },
+        brandHandling: {
+          CUSTOM: () => ({
+            summary: "My custom schema",
+          }),
+          [deep]: rule,
+        },
+        version: "3.4.5",
+        title: "Testing custom brands handling",
         serverUrl: "https://example.com",
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();

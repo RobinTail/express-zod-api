@@ -7,6 +7,7 @@ import {
   SecuritySchemeObject,
   SecuritySchemeType,
 } from "openapi3-ts/oas31";
+import { pluck } from "ramda";
 import { z } from "zod";
 import { DocumentationError } from "./errors";
 import {
@@ -18,6 +19,7 @@ import { CommonConfig } from "./config-type";
 import { mapLogicalContainer } from "./logical-container";
 import { Method } from "./method";
 import {
+  OpenAPIContext,
   depictRequest,
   depictRequestParams,
   depictResponse,
@@ -29,6 +31,7 @@ import {
 } from "./documentation-helpers";
 import { Routing } from "./routing";
 import { RoutingWalkerParams, walkRouting } from "./routing-walker";
+import { HandlingRules } from "./schema-walker";
 
 type Component =
   | "positiveResponse"
@@ -64,6 +67,13 @@ interface DocumentationParams {
    * @default JSON.stringify() + SHA1 hash as a hex digest
    * */
   serializer?: (schema: z.ZodTypeAny) => string;
+  /**
+   * @desc Handling rules for your own branded schemas.
+   * @desc Keys: brands (recommended to use unique symbols).
+   * @desc Values: functions having schema as first argument that you should assign type to, second one is a context.
+   * @example { MyBrand: ( schema: typeof myBrandSchema, { next } ) => ({ type: "object" })
+   */
+  brandHandling?: HandlingRules<SchemaObject | ReferenceObject, OpenAPIContext>;
 }
 
 export class Documentation extends OpenApiBuilder {
@@ -132,6 +142,7 @@ export class Documentation extends OpenApiBuilder {
     version,
     serverUrl,
     descriptions,
+    brandHandling,
     hasSummaryFromDescription = true,
     composition = "inline",
     serializer = defaultSerializer,
@@ -147,12 +158,13 @@ export class Documentation extends OpenApiBuilder {
       _method,
     ) => {
       const method = _method as Method;
-      const commonParams = {
+      const commons = {
         path,
         method,
         endpoint,
         composition,
         serializer,
+        brandHandling,
         getRef: this.getRef.bind(this),
         makeRef: this.makeRef.bind(this),
       };
@@ -174,7 +186,7 @@ export class Documentation extends OpenApiBuilder {
       );
 
       const depictedParams = depictRequestParams({
-        ...commonParams,
+        ...commons,
         inputSources,
         schema: endpoint.getSchema("input"),
         description: descriptions?.requestParameter?.call(null, {
@@ -190,7 +202,7 @@ export class Documentation extends OpenApiBuilder {
         for (const { mimeTypes, schema, statusCodes } of apiResponses) {
           for (const statusCode of statusCodes) {
             responses[statusCode] = depictResponse({
-              ...commonParams,
+              ...commons,
               variant,
               schema,
               mimeTypes,
@@ -210,7 +222,8 @@ export class Documentation extends OpenApiBuilder {
 
       const requestBody = inputSources.includes("body")
         ? depictRequest({
-            ...commonParams,
+            ...commons,
+            paramNames: pluck("name", depictedParams),
             schema: endpoint.getSchema("input"),
             mimeTypes: endpoint.getMimeTypes("input"),
             description: descriptions?.requestBody?.call(null, {

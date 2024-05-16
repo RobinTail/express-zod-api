@@ -3592,7 +3592,98 @@ servers:
 "
 `;
 
-exports[`Documentation > Feature 1180: Headers opt-in params > should describe x- inputs as header params 1`] = `
+exports[`Documentation > Feature #1470: Custom brands > should be handled accordingly in request, response and params 1`] = `
+"openapi: 3.1.0
+info:
+  title: Testing custom brands handling
+  version: 3.4.5
+paths:
+  /v1/{name}:
+    get:
+      operationId: GetV1Name
+      parameters:
+        - name: name
+          in: path
+          required: true
+          description: GET /v1/:name Parameter
+          schema:
+            summary: My custom schema
+        - name: other
+          in: query
+          required: true
+          description: GET /v1/:name Parameter
+          schema:
+            summary: My custom schema
+        - name: regular
+          in: query
+          required: true
+          description: GET /v1/:name Parameter
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: GET /v1/:name Positive response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    const: success
+                  data:
+                    type: object
+                    properties:
+                      number:
+                        summary: My custom schema
+                    required:
+                      - number
+                required:
+                  - status
+                  - data
+        "400":
+          description: GET /v1/:name Negative response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    const: error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                required:
+                  - status
+                  - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
+components:
+  schemas: {}
+  responses: {}
+  parameters: {}
+  examples: {}
+  requestBodies: {}
+  headers: {}
+  securitySchemes: {}
+  links: {}
+  callbacks: {}
+tags: []
+servers:
+  - url: https://example.com
+"
+`;
+
+exports[`Documentation > Feature 1180: Headers opt-in params > should describe x- inputs as header params in get request 1`] = `
 "openapi: 3.1.0
 info:
   title: Testing headers params
@@ -3632,6 +3723,179 @@ paths:
                   - data
         "400":
           description: GET /v1/test Negative response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    const: error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                required:
+                  - status
+                  - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
+components:
+  schemas: {}
+  responses: {}
+  parameters: {}
+  examples: {}
+  requestBodies: {}
+  headers: {}
+  securitySchemes: {}
+  links: {}
+  callbacks: {}
+tags: []
+servers:
+  - url: https://example.com
+"
+`;
+
+exports[`Documentation > Feature 1180: Headers opt-in params > should describe x- inputs as header params in post request 1`] = `
+"openapi: 3.1.0
+info:
+  title: Testing headers params
+  version: 3.4.5
+paths:
+  /v1/test:
+    post:
+      operationId: PostV1Test
+      parameters:
+        - name: id
+          in: query
+          required: true
+          description: POST /v1/test Parameter
+          schema:
+            type: string
+        - name: x-request-id
+          in: header
+          required: true
+          description: POST /v1/test Parameter
+          schema:
+            type: string
+      requestBody:
+        description: POST /v1/test Request body
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: {}
+              required: []
+      responses:
+        "200":
+          description: POST /v1/test Positive response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    const: success
+                  data:
+                    type: object
+                required:
+                  - status
+                  - data
+        "400":
+          description: POST /v1/test Negative response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    const: error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                required:
+                  - status
+                  - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
+components:
+  schemas: {}
+  responses: {}
+  parameters: {}
+  examples: {}
+  requestBodies: {}
+  headers: {}
+  securitySchemes: {}
+  links: {}
+  callbacks: {}
+tags: []
+servers:
+  - url: https://example.com
+"
+`;
+
+exports[`Documentation > Feature 1180: Headers opt-in params > should describe x- inputs as header params in put request 1`] = `
+"openapi: 3.1.0
+info:
+  title: Testing headers params
+  version: 3.4.5
+paths:
+  /v1/test:
+    put:
+      operationId: PutV1Test
+      parameters:
+        - name: x-request-id
+          in: header
+          required: true
+          description: PUT /v1/test Parameter
+          schema:
+            type: string
+      requestBody:
+        description: PUT /v1/test Request body
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+              required:
+                - id
+      responses:
+        "200":
+          description: PUT /v1/test Positive response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    const: success
+                  data:
+                    type: object
+                required:
+                  - status
+                  - data
+        "400":
+          description: PUT /v1/test Negative response
           content:
             application/json:
               schema:
