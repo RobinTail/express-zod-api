@@ -1,5 +1,6 @@
 import MockDate from "mockdate";
 import { EventEmitter } from "node:events";
+import winston from "winston";
 import {
   BuiltinLoggerConfig,
   createLogger,
@@ -127,6 +128,13 @@ describe("Logger", () => {
       // issue #1605: should not allow methods
       { level: "debug", debug: () => {} },
       { level: "warn", error: () => {} },
+      // issue #1772: similar to #1605, but the methods are in prototype
+      new (class {
+        level = "debug";
+        debug() {}
+      })(),
+      Object.setPrototypeOf({ level: "debug" }, { debug: () => {} }),
+      new winston.Logger(),
     ])("should invalidate config %#", (sample) => {
       expect(isBuiltinLoggerConfig(sample)).toBeFalsy();
     });
