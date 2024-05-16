@@ -1,6 +1,5 @@
 import MockDate from "mockdate";
 import { EventEmitter } from "node:events";
-import winston from "winston";
 import {
   AbstractLogger,
   BuiltinLoggerConfig,
@@ -128,7 +127,6 @@ describe("Logger", () => {
         debug() {}
       })(),
       Object.setPrototypeOf({ level: "debug" }, { debug: () => {} }),
-      winston.createLogger(),
     ])("should validate logger instances %#", (sample) => {
       expect(isActualLogger(sample)).toBeTruthy();
     });
