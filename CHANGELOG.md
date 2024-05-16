@@ -2,6 +2,16 @@
 
 ## Version 19
 
+### v19.1.1
+
+- Fixed a bug on duplicated or missing request header parameters in the generated Documentation:
+  - The issue corresponds to the "Headers as input source" opt-in feature;
+  - When `query` was not listed in the input sources:
+    - Headers used to be missing in the documented request parameters.
+  - When `body` was listed along with `query` in the input sources:
+    - Headers used to be duplicated into the documented request body.
+  - The issue was found and reported by [@boarush](https://github.com/boarush).
+
 ### v19.1.0
 
 - Feature: customizable handling rules for your branded schemas in Documentation and Integration:
