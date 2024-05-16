@@ -193,7 +193,7 @@ describe("Documentation helpers", () => {
       z
         .record(z.literal("a"), z.string())
         .and(z.record(z.string(), z.string())),
-    ])("should omit specified path params %#", (schema) => {
+    ])("should omit specified params %#", (schema) => {
       const depicted = walkSchema(schema, {
         ctx: requestCtx,
         rules: depicters,
