@@ -4,6 +4,8 @@
     "node": true
   },
   "extends": [
+    "eslint:recommended",
+    // "plugin:@typescript-eslint/recommended",
     "airbnb-typescript/base",
     "prettier",
     "plugin:prettier/recommended"
@@ -21,6 +23,8 @@
     "unicorn"
   ],
   "rules": {
+    "no-empty": ["error", { "allowEmptyCatch": true }],
+    "no-empty-pattern": ["error", { "allowObjectPatternsAsParameters": true }],
     "@typescript-eslint/lines-between-class-members": "off",
     "sort-imports": ["warn", {
       "ignoreDeclarationSort": true
