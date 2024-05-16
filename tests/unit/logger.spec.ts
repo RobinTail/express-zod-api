@@ -113,7 +113,7 @@ describe("Logger", () => {
       { level: "warn", depth: 5 },
       { level: "warn", depth: null },
       { level: "warn", depth: Infinity },
-    ])("should invalidate config %#", (sample) => {
+    ])("should invalidate built-in logger config %#", (sample) => {
       expect(isActualLogger(sample)).toBeFalsy();
     });
 
