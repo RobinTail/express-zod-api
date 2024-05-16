@@ -2,9 +2,10 @@ import MockDate from "mockdate";
 import { EventEmitter } from "node:events";
 import winston from "winston";
 import {
+  AbstractLogger,
   BuiltinLoggerConfig,
   createLogger,
-  isBuiltinLoggerConfig,
+  isActualLogger,
 } from "../../src/logger";
 import {
   afterAll,
@@ -105,26 +106,19 @@ describe("Logger", () => {
     );
   });
 
-  describe("isBuiltinLoggerConfig()", () => {
-    test.each([
+  describe("isActualLogger()", () => {
+    test.each<BuiltinLoggerConfig>([
       { level: "silent" },
       { level: "debug", color: false },
       { level: "info", color: true },
       { level: "warn", depth: 5 },
       { level: "warn", depth: null },
       { level: "warn", depth: Infinity },
-    ])("should validate config %#", (sample) => {
-      expect(isBuiltinLoggerConfig(sample)).toBeTruthy();
+    ])("should invalidate config %#", (sample) => {
+      expect(isActualLogger(sample)).toBeFalsy();
     });
 
-    test.each([
-      null,
-      undefined,
-      {},
-      { level: null },
-      { level: "wrong" },
-      { level: "debug", color: null },
-      { level: "debug", depth: "wrong" },
+    test.each<AbstractLogger>([
       // issue #1605: should not allow methods
       { level: "debug", debug: () => {} },
       { level: "warn", error: () => {} },
@@ -135,8 +129,8 @@ describe("Logger", () => {
       })(),
       Object.setPrototypeOf({ level: "debug" }, { debug: () => {} }),
       winston.createLogger(),
-    ])("should invalidate config %#", (sample) => {
-      expect(isBuiltinLoggerConfig(sample)).toBeFalsy();
+    ])("should validate logger instances %#", (sample) => {
+      expect(isActualLogger(sample)).toBeTruthy();
     });
   });
 });
