@@ -1,12 +1,8 @@
 import MockDate from "mockdate";
 import { EventEmitter } from "node:events";
-import {
-  AbstractLogger,
-  BuiltinLogger,
-  BuiltinLoggerConfig,
-  createLogger,
-  isLoggerInstance,
-} from "../../src/logger";
+import { BuiltinLogger, createLogger } from "../../src";
+import { BuiltinLoggerConfig } from "../../src/builtin-logger";
+import { AbstractLogger, isLoggerInstance } from "../../src/logger";
 import {
   afterAll,
   beforeAll,
