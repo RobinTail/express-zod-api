@@ -1,9 +1,10 @@
 import MockDate from "mockdate";
 import { EventEmitter } from "node:events";
 import {
+  AbstractLogger,
   BuiltinLoggerConfig,
   createLogger,
-  isBuiltinLoggerConfig,
+  isActualLogger,
 } from "../../src/logger";
 import {
   afterAll,
@@ -96,31 +97,30 @@ describe("Logger", () => {
     );
   });
 
-  describe("isBuiltinLoggerConfig()", () => {
-    test.each([
+  describe("isActualLogger()", () => {
+    test.each<BuiltinLoggerConfig>([
       { level: "silent" },
       { level: "debug", color: false },
       { level: "warn", color: true },
       { level: "warn", depth: 5 },
       { level: "warn", depth: null },
       { level: "warn", depth: Infinity },
-    ])("should validate config %#", (sample) => {
-      expect(isBuiltinLoggerConfig(sample)).toBeTruthy();
+    ])("should invalidate built-in logger config %#", (sample) => {
+      expect(isActualLogger(sample)).toBeFalsy();
     });
 
-    test.each([
-      null,
-      undefined,
-      {},
-      { level: null },
-      { level: "wrong" },
-      { level: "debug", color: null },
-      { level: "debug", depth: "wrong" },
+    test.each<AbstractLogger>([
       // issue #1605: should not allow methods
       { level: "debug", debug: () => {} },
       { level: "warn", error: () => {} },
-    ])("should invalidate config %#", (sample) => {
-      expect(isBuiltinLoggerConfig(sample)).toBeFalsy();
+      // issue #1772: similar to #1605, but the methods are in prototype
+      new (class {
+        level = "debug";
+        debug() {}
+      })(),
+      Object.setPrototypeOf({ level: "debug" }, { debug: () => {} }),
+    ])("should validate logger instances %#", (sample) => {
+      expect(isActualLogger(sample)).toBeTruthy();
     });
   });
 });

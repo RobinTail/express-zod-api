@@ -4,7 +4,7 @@ import type fileUpload from "express-fileupload";
 import http from "node:http";
 import https from "node:https";
 import { AppConfig, CommonConfig, ServerConfig } from "./config-type";
-import { AbstractLogger, createLogger, isBuiltinLoggerConfig } from "./logger";
+import { createLogger, isActualLogger } from "./logger";
 import { loadPeer } from "./peer-helpers";
 import { defaultResultHandler } from "./result-handler";
 import { Routing, initRouting } from "./routing";
@@ -20,9 +20,9 @@ const makeCommonEntities = (config: CommonConfig) => {
   if (config.startupLogo !== false) {
     console.log(getStartupLogo());
   }
-  const rootLogger: AbstractLogger = isBuiltinLoggerConfig(config.logger)
-    ? createLogger(config.logger)
-    : config.logger;
+  const rootLogger = isActualLogger(config.logger)
+    ? config.logger
+    : createLogger(config.logger);
   rootLogger.debug("Running", process.env.TSUP_BUILD || "from sources");
   const errorHandler = config.errorHandler || defaultResultHandler;
   const { childLoggerProvider: getChildLogger } = config;

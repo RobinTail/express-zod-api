@@ -2,6 +2,11 @@
 
 ## Version 18
 
+### v18.6.3
+
+- Better approach on logger instance recognition:
+  - Backported from [v19.1.2](https://github.com/RobinTail/express-zod-api/blob/master/CHANGELOG.md#v1912).
+
 ### v18.6.2
 
 - Compatibility improvement for Jest: all dynamic `import()` in CJS build are replaced with `require()`.
