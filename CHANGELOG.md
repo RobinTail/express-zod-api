@@ -5,7 +5,7 @@
 ### v18.6.3
 
 - Better approach on logger instance recognition:
-  - Backported fix of [v19.1.2](https://github.com/RobinTail/express-zod-api/blob/master/CHANGELOG.md#v1912).
+  - Backported from [v19.1.2](https://github.com/RobinTail/express-zod-api/blob/master/CHANGELOG.md#v1912).
 
 ### v18.6.2
 
