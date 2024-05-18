@@ -1,4 +1,4 @@
-import { BuiltinLogger, createLogger } from "../../src";
+import { BuiltinLogger } from "../../src";
 import { BuiltinLoggerConfig } from "../../src/builtin-logger";
 import { AbstractLogger, isLoggerInstance } from "../../src/logger";
 import { describe, expect, test } from "vitest";
@@ -27,7 +27,6 @@ describe("Logger helpers", () => {
       })(),
       Object.setPrototypeOf({ level: "debug" }, { debug: () => {} }),
       new BuiltinLogger({ level: "debug" }),
-      createLogger({ level: "warn" }), // @todo remove in v20
     ])("should validate logger instances %#", (sample) => {
       expect(isLoggerInstance(sample)).toBeTruthy();
     });
