@@ -1,6 +1,6 @@
 import { inspect } from "node:util";
 import { isObject } from "./common-helpers";
-import { Ansis, blue, green, hex, red } from "ansis";
+import { Ansis, blue, cyanBright, green, hex, red } from "ansis";
 
 /**
  * @desc Using module augmentation approach you can set the type of the actual logger used
@@ -34,6 +34,8 @@ export interface BuiltinLoggerConfig {
    * @example Infinity
    * */
   depth?: number | null;
+  /** @internal For the needs of the .child() method */
+  requestId?: string;
 }
 
 const severity: Record<keyof AbstractLogger, number> = {
@@ -66,11 +68,14 @@ export class BuiltinLogger implements AbstractLogger {
     ) {
       return;
     }
-    const output: string[] = [
-      new Date().toISOString(),
+    const output: string[] = [new Date().toISOString()];
+    if (this.config.requestId) {
+      output.push(cyanBright(this.config.requestId));
+    }
+    output.push(
       this.config.color ? `${this.styles[method](method)}:` : `${method}:`,
       message,
-    ];
+    );
     if (meta !== undefined) {
       output.push(
         inspect(meta, {
@@ -84,20 +89,24 @@ export class BuiltinLogger implements AbstractLogger {
     console.log(output.join(" "));
   }
 
-  debug(message: string, meta?: unknown) {
+  public debug(message: string, meta?: unknown) {
     this.print("debug", message, meta);
   }
 
-  info(message: string, meta?: unknown) {
+  public info(message: string, meta?: unknown) {
     this.print("info", message, meta);
   }
 
-  warn(message: string, meta?: unknown) {
+  public warn(message: string, meta?: unknown) {
     this.print("warn", message, meta);
   }
 
-  error(message: string, meta?: unknown) {
+  public error(message: string, meta?: unknown) {
     this.print("error", message, meta);
+  }
+
+  public child(requestId: string) {
+    return new BuiltinLogger({ ...this.config, requestId });
   }
 }
 

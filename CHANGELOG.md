@@ -2,6 +2,26 @@
 
 ## Version 19
 
+### v19.2.0
+
+- Feat: Child method in Built-in Logger:
+  - Can do this without additional libraries now:
+
+```ts
+import { randomUUID } from "node:crypto";
+import { BuiltinLogger, createConfig } from "express-zod-api";
+
+declare module "express-zod-api" {
+  interface LoggerOverrides extends BuiltinLogger {}
+}
+
+const config = createConfig({
+  logger: { level: "debug", color: true },
+  // provides a child logger equipped with a Request ID
+  childLoggerProvider: ({ parent }) => parent.child(randomUUID()),
+});
+```
+
 ### v19.1.2
 
 - Fixed a bug on logger instance recognition failure:
