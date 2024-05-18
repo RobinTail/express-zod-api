@@ -49,10 +49,6 @@ export const isActualLogger = (subject: unknown): subject is AbstractLogger =>
 
 /** @desc Built-in console logger with optional colorful inspections */
 export class BuiltinLogger implements AbstractLogger {
-  protected isDebug: boolean;
-  protected minSeverity: number;
-  protected hasColor: boolean;
-  protected depth: number | null;
   protected readonly styles: Record<keyof AbstractLogger, Ansis> = {
     debug: blue,
     info: green,
@@ -61,33 +57,27 @@ export class BuiltinLogger implements AbstractLogger {
   };
 
   /** @example new BuiltinLogger({ level: "debug", color: true, depth: 4 }) */
-  constructor({
-    level,
-    color = new Ansis().isSupported(),
-    depth = 2,
-  }: BuiltinLoggerConfig) {
-    this.hasColor = color;
-    this.depth = depth;
-    this.isDebug = level === "debug";
-    this.minSeverity = level === "silent" ? Infinity : severity[level];
-  }
+  public constructor(protected config: BuiltinLoggerConfig) {}
 
   protected print(method: keyof AbstractLogger, message: string, meta?: any) {
-    if (severity[method] < this.minSeverity) {
+    if (
+      this.config.level === "silent" ||
+      severity[method] < severity[this.config.level]
+    ) {
       return;
     }
     const output: string[] = [
       new Date().toISOString(),
-      this.hasColor ? `${this.styles[method](method)}:` : `${method}:`,
+      this.config.color ? `${this.styles[method](method)}:` : `${method}:`,
       message,
     ];
     if (meta !== undefined) {
       output.push(
         inspect(meta, {
-          colors: this.hasColor,
-          depth: this.depth,
-          breakLength: this.isDebug ? 80 : Infinity,
-          compact: this.isDebug ? 3 : true,
+          colors: this.config.color,
+          depth: this.config.depth,
+          breakLength: this.config.level === "debug" ? 80 : Infinity,
+          compact: this.config.level === "debug" ? 3 : true,
         }),
       );
     }
