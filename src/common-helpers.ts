@@ -5,7 +5,7 @@ import { flip, pickBy, xprod } from "ramda";
 import { z } from "zod";
 import { CommonConfig, InputSource, InputSources } from "./config-type";
 import { InputValidationError, OutputValidationError } from "./errors";
-import { AbstractLogger } from "./logger";
+import { ActualLogger } from "./logger";
 import { metaSymbol } from "./metadata";
 import { AuxMethod, Method } from "./method";
 import { contentTypes } from "./content-type";
@@ -94,7 +94,7 @@ export const logInternalError = ({
   error,
   statusCode,
 }: {
-  logger: AbstractLogger;
+  logger: ActualLogger;
   request: Request;
   input: FlatObject | null;
   error: Error;

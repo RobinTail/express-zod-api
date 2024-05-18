@@ -2,6 +2,12 @@ import { inspect } from "node:util";
 import { isObject } from "./common-helpers";
 import { Ansis, blue, cyanBright, green, hex, red } from "ansis";
 
+/** @desc You can use any logger compatible with this type. */
+export type AbstractLogger = Record<
+  "info" | "debug" | "warn" | "error",
+  (message: string, meta?: any) => any
+>;
+
 /**
  * @desc Using module augmentation approach you can set the type of the actual logger used
  * @example declare module "express-zod-api" { interface LoggerOverrides extends winston.Logger {} }
@@ -9,12 +15,7 @@ import { Ansis, blue, cyanBright, green, hex, red } from "ansis";
  * */
 export interface LoggerOverrides {}
 
-/** @desc You can use any logger compatible with this type. */
-export type AbstractLogger = Record<
-  "info" | "debug" | "warn" | "error",
-  (message: string, meta?: any) => any
-> &
-  LoggerOverrides;
+export type ActualLogger = AbstractLogger & LoggerOverrides;
 
 export interface BuiltinLoggerConfig {
   /**
@@ -45,6 +46,7 @@ const severity: Record<keyof AbstractLogger, number> = {
   error: 40,
 };
 
+/** @todo isLoggerInstance */
 export const isActualLogger = (subject: unknown): subject is AbstractLogger =>
   isObject(subject) &&
   Object.keys(severity).some((method) => method in subject);

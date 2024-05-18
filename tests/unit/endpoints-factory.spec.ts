@@ -8,7 +8,7 @@ import {
 } from "../../src";
 import { Endpoint } from "../../src/endpoint";
 import { expectType } from "tsd";
-import { AbstractLogger } from "../../src/logger";
+import { ActualLogger } from "../../src/logger";
 import { makeLoggerMock } from "../../src/testing";
 import { serializeSchemaForTest } from "../helpers";
 import { z } from "zod";
@@ -157,7 +157,7 @@ describe("EndpointsFactory", () => {
           options: {},
           request: requestMock,
           response: responseMock,
-          logger: {} as AbstractLogger,
+          logger: {} as ActualLogger,
         });
         expect(middleware).toHaveBeenCalledTimes(1);
         expect(middleware).toHaveBeenCalledWith(
@@ -190,7 +190,7 @@ describe("EndpointsFactory", () => {
           options: {},
           request: requestMock,
           response: responseMock,
-          logger: {} as AbstractLogger,
+          logger: {} as ActualLogger,
         });
         expect(middleware).toHaveBeenCalledTimes(1);
         expect(middleware).toHaveBeenCalledWith(
@@ -221,7 +221,7 @@ describe("EndpointsFactory", () => {
             options: {},
             request: {} as Request,
             response: {} as Response,
-            logger: {} as AbstractLogger,
+            logger: {} as ActualLogger,
           });
           expect.fail("Should not be here");
         } catch (e) {
@@ -252,7 +252,7 @@ describe("EndpointsFactory", () => {
             options: {},
             request: {} as Request,
             response: {} as Response,
-            logger: {} as AbstractLogger,
+            logger: {} as ActualLogger,
           });
           expect.fail("Should not be here");
         } catch (e) {
