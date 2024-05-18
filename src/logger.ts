@@ -79,7 +79,11 @@ export class BuiltinLogger implements AbstractLogger {
     });
   }
 
-  protected print(method: keyof AbstractLogger, message: string, meta?: any) {
+  protected print(
+    method: keyof AbstractLogger,
+    message: string,
+    meta?: unknown,
+  ) {
     if (
       this.config.level === "silent" ||
       severity[method] < severity[this.config.level]
