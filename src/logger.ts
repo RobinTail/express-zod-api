@@ -53,8 +53,7 @@ const severity: Record<keyof AbstractLogger, number> = {
   error: 40,
 };
 
-/** @todo isLoggerInstance */
-export const isActualLogger = (subject: unknown): subject is AbstractLogger =>
+export const isLoggerInstance = (subject: unknown): subject is AbstractLogger =>
   isObject(subject) &&
   Object.keys(severity).some((method) => method in subject);
 

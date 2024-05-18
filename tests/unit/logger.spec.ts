@@ -5,7 +5,7 @@ import {
   BuiltinLogger,
   BuiltinLoggerConfig,
   createLogger,
-  isActualLogger,
+  isLoggerInstance,
 } from "../../src/logger";
 import {
   afterAll,
@@ -106,7 +106,7 @@ describe("Logger", () => {
     );
   });
 
-  describe("isActualLogger()", () => {
+  describe("isLoggerInstance()", () => {
     test.each<BuiltinLoggerConfig>([
       { level: "silent" },
       { level: "debug", color: false },
@@ -115,7 +115,7 @@ describe("Logger", () => {
       { level: "warn", depth: null },
       { level: "warn", depth: Infinity },
     ])("should invalidate built-in logger config %#", (sample) => {
-      expect(isActualLogger(sample)).toBeFalsy();
+      expect(isLoggerInstance(sample)).toBeFalsy();
     });
 
     test.each<AbstractLogger>([
@@ -131,7 +131,7 @@ describe("Logger", () => {
       new BuiltinLogger({ level: "debug" }),
       createLogger({ level: "warn" }), // @todo remove in v20
     ])("should validate logger instances %#", (sample) => {
-      expect(isActualLogger(sample)).toBeTruthy();
+      expect(isLoggerInstance(sample)).toBeTruthy();
     });
   });
 });

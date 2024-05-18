@@ -3,7 +3,7 @@ import type compression from "compression";
 import http from "node:http";
 import https from "node:https";
 import { AppConfig, CommonConfig, ServerConfig } from "./config-type";
-import { BuiltinLogger, isActualLogger } from "./logger";
+import { BuiltinLogger, isLoggerInstance } from "./logger";
 import { loadPeer } from "./peer-helpers";
 import { defaultResultHandler } from "./result-handler";
 import { Parsers, Routing, initRouting } from "./routing";
@@ -21,7 +21,7 @@ const makeCommonEntities = (config: CommonConfig) => {
     console.log(getStartupLogo());
   }
   const errorHandler = config.errorHandler || defaultResultHandler;
-  const rootLogger = isActualLogger(config.logger)
+  const rootLogger = isLoggerInstance(config.logger)
     ? config.logger
     : new BuiltinLogger(config.logger);
   rootLogger.debug("Running", process.env.TSUP_BUILD || "from sources");
