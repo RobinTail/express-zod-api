@@ -47,6 +47,7 @@ export const isActualLogger = (subject: unknown): subject is AbstractLogger =>
   isObject(subject) &&
   Object.keys(severity).some((method) => method in subject);
 
+/** @desc Built-in console logger with optional colorful inspections */
 export class BuiltinLogger implements AbstractLogger {
   protected isDebug: boolean;
   protected minSeverity: number;
@@ -59,6 +60,7 @@ export class BuiltinLogger implements AbstractLogger {
     error: red,
   };
 
+  /** @example new BuiltinLogger({ level: "debug", color: true, depth: 4 }) */
   constructor({
     level,
     color = new Ansis().isSupported(),
@@ -110,8 +112,9 @@ export class BuiltinLogger implements AbstractLogger {
 }
 
 /**
- * @desc Creates the built-in console logger with optional colorful inspections
- * @example createLogger({ level: "debug", color: true, depth: 4 })
+ * @desc Alias for "new BuiltinLogger()"
+ * @deprecated use new BuiltinLogger()
+ * @todo remove in v20
  * */
 export const createLogger = (config: BuiltinLoggerConfig) =>
   new BuiltinLogger(config);
