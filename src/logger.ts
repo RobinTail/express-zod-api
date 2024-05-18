@@ -1,6 +1,5 @@
 import { inspect } from "node:util";
 import { isObject } from "./common-helpers";
-import { mapObjIndexed } from "ramda";
 import { Ansis, blue, green, hex, red } from "ansis";
 
 /**
@@ -48,51 +47,71 @@ export const isActualLogger = (subject: unknown): subject is AbstractLogger =>
   isObject(subject) &&
   Object.keys(severity).some((method) => method in subject);
 
-/**
- * @desc Creates the built-in console logger with optional colorful inspections
- * @example createLogger({ level: "debug", color: true, depth: 4 })
- * */
-export const createLogger = ({
-  level,
-  color = new Ansis().isSupported(),
-  depth = 2,
-}: BuiltinLoggerConfig): AbstractLogger => {
-  const styles: Record<keyof AbstractLogger, Ansis> = {
+export class BuiltinLogger implements AbstractLogger {
+  protected isDebug: boolean;
+  protected minSeverity: number;
+  protected hasColor: boolean;
+  protected depth: number | null;
+  protected readonly styles: Record<keyof AbstractLogger, Ansis> = {
     debug: blue,
     info: green,
     warn: hex("#FFA500"),
     error: red,
   };
 
-  const isDebug = level === "debug";
-  const minSeverity = level === "silent" ? 100 : severity[level];
+  constructor({
+    level,
+    color = new Ansis().isSupported(),
+    depth = 2,
+  }: BuiltinLoggerConfig) {
+    this.hasColor = color;
+    this.depth = depth;
+    this.isDebug = level === "debug";
+    this.minSeverity = level === "silent" ? Infinity : severity[level];
+  }
 
-  const print = (method: keyof AbstractLogger, message: string, meta?: any) => {
-    if (severity[method] < minSeverity) {
+  protected print(method: keyof AbstractLogger, message: string, meta?: any) {
+    if (severity[method] < this.minSeverity) {
       return;
     }
     const output: string[] = [
       new Date().toISOString(),
-      color ? `${styles[method](method)}:` : `${method}:`,
+      this.hasColor ? `${this.styles[method](method)}:` : `${method}:`,
       message,
     ];
     if (meta !== undefined) {
       output.push(
         inspect(meta, {
-          colors: color,
-          depth,
-          breakLength: isDebug ? 80 : Infinity,
-          compact: isDebug ? 3 : true,
+          colors: this.hasColor,
+          depth: this.depth,
+          breakLength: this.isDebug ? 80 : Infinity,
+          compact: this.isDebug ? 3 : true,
         }),
       );
     }
     console.log(output.join(" "));
-  };
+  }
 
-  return mapObjIndexed(
-    ({}, method) =>
-      (message: string, meta?: any) =>
-        print(method, message, meta),
-    severity,
-  );
-};
+  debug(message: string, meta?: unknown) {
+    this.print("debug", message, meta);
+  }
+
+  info(message: string, meta?: unknown) {
+    this.print("info", message, meta);
+  }
+
+  warn(message: string, meta?: unknown) {
+    this.print("warn", message, meta);
+  }
+
+  error(message: string, meta?: unknown) {
+    this.print("error", message, meta);
+  }
+}
+
+/**
+ * @desc Creates the built-in console logger with optional colorful inspections
+ * @example createLogger({ level: "debug", color: true, depth: 4 })
+ * */
+export const createLogger = (config: BuiltinLoggerConfig) =>
+  new BuiltinLogger(config);

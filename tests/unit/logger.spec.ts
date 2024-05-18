@@ -127,6 +127,7 @@ describe("Logger", () => {
         debug() {}
       })(),
       Object.setPrototypeOf({ level: "debug" }, { debug: () => {} }),
+      createLogger({ level: "debug" }),
     ])("should validate logger instances %#", (sample) => {
       expect(isActualLogger(sample)).toBeTruthy();
     });
