@@ -17,6 +17,11 @@ export interface LoggerOverrides {}
 
 export type ActualLogger = AbstractLogger & LoggerOverrides;
 
+interface Context {
+  requestId?: string;
+  [K: PropertyKey]: unknown;
+}
+
 export interface BuiltinLoggerConfig {
   /**
    * @desc The minimal severity to log or "silent" to disable logging
@@ -35,8 +40,11 @@ export interface BuiltinLoggerConfig {
    * @example Infinity
    * */
   depth?: number | null;
-  /** @internal For the needs of the .child() method */
-  requestId?: string;
+  /**
+   * @desc Context: the metadata applicable for each logged entry, used by .child() method
+   * @see childLoggerProvider
+   * */
+  ctx?: Context;
 }
 
 const severity: Record<keyof AbstractLogger, number> = {
@@ -71,8 +79,12 @@ export class BuiltinLogger implements AbstractLogger {
       return;
     }
     const output: string[] = [new Date().toISOString()];
-    if (this.config.requestId) {
-      output.push(cyanBright(this.config.requestId));
+    if (this.config.ctx) {
+      const { requestId, ...rest } = this.config.ctx;
+      if (requestId) {
+        output.push(cyanBright(requestId));
+      }
+      meta = { ...meta, ctx: rest };
     }
     output.push(
       this.config.color ? `${this.styles[method](method)}:` : `${method}:`,
@@ -107,8 +119,8 @@ export class BuiltinLogger implements AbstractLogger {
     this.print("error", message, meta);
   }
 
-  public child(requestId: string) {
-    return new BuiltinLogger({ ...this.config, requestId });
+  public child(ctx: Context) {
+    return new BuiltinLogger({ ...this.config, ctx });
   }
 }
 
