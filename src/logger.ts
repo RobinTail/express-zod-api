@@ -1,5 +1,5 @@
 import { inspect } from "node:util";
-import { isObject } from "./common-helpers";
+import { FlatObject, isObject } from "./common-helpers";
 import { Ansis, blue, cyanBright, green, hex, red } from "ansis";
 
 /** @desc You can use any logger compatible with this type. */
@@ -17,9 +17,8 @@ export interface LoggerOverrides {}
 
 export type ActualLogger = AbstractLogger & LoggerOverrides;
 
-interface Context {
+interface Context extends FlatObject {
   requestId?: string;
-  [K: PropertyKey]: unknown;
 }
 
 export interface BuiltinLoggerConfig {
@@ -71,6 +70,15 @@ export class BuiltinLogger implements AbstractLogger {
   /** @example new BuiltinLogger({ level: "debug", color: true, depth: 4 }) */
   public constructor(protected config: BuiltinLoggerConfig) {}
 
+  protected prettyPrint(subject: unknown) {
+    return inspect(subject, {
+      colors: this.config.color,
+      depth: this.config.depth,
+      breakLength: this.config.level === "debug" ? 80 : Infinity,
+      compact: this.config.level === "debug" ? 3 : true,
+    });
+  }
+
   protected print(method: keyof AbstractLogger, message: string, meta?: any) {
     if (
       this.config.level === "silent" ||
@@ -78,27 +86,22 @@ export class BuiltinLogger implements AbstractLogger {
     ) {
       return;
     }
-    const output: string[] = [new Date().toISOString()];
+    const output: string[] = [
+      new Date().toISOString(),
+      this.config.color ? `${this.styles[method](method)}:` : `${method}:`,
+      message,
+    ];
+    if (meta !== undefined) {
+      output.push(this.prettyPrint(meta));
+    }
     if (this.config.ctx) {
       const { requestId, ...rest } = this.config.ctx;
       if (requestId) {
         output.push(cyanBright(requestId));
       }
-      meta = { ...meta, ctx: rest };
-    }
-    output.push(
-      this.config.color ? `${this.styles[method](method)}:` : `${method}:`,
-      message,
-    );
-    if (meta !== undefined) {
-      output.push(
-        inspect(meta, {
-          colors: this.config.color,
-          depth: this.config.depth,
-          breakLength: this.config.level === "debug" ? 80 : Infinity,
-          compact: this.config.level === "debug" ? 3 : true,
-        }),
-      );
+      if (Object.keys(rest).length > 0) {
+        output.splice(1, 0, this.prettyPrint(rest));
+      }
     }
     console.log(output.join(" "));
   }
