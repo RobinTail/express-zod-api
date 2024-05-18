@@ -86,22 +86,20 @@ export class BuiltinLogger implements AbstractLogger {
     ) {
       return;
     }
-    const output: string[] = [
-      new Date().toISOString(),
+    const { requestId, ...ctx } = this.config.ctx || {};
+    const output: string[] = [new Date().toISOString()];
+    if (requestId) {
+      output.push(cyanBright(requestId));
+    }
+    output.push(
       this.config.color ? `${this.styles[method](method)}:` : `${method}:`,
       message,
-    ];
+    );
     if (meta !== undefined) {
       output.push(this.prettyPrint(meta));
     }
-    if (this.config.ctx) {
-      const { requestId, ...rest } = this.config.ctx;
-      if (requestId) {
-        output.splice(1, 0, cyanBright(requestId));
-      }
-      if (Object.keys(rest).length > 0) {
-        output.push(this.prettyPrint(rest));
-      }
+    if (Object.keys(ctx).length > 0) {
+      output.push(this.prettyPrint(ctx));
     }
     console.log(output.join(" "));
   }
