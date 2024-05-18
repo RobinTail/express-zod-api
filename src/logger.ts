@@ -97,10 +97,10 @@ export class BuiltinLogger implements AbstractLogger {
     if (this.config.ctx) {
       const { requestId, ...rest } = this.config.ctx;
       if (requestId) {
-        output.push(cyanBright(requestId));
+        output.splice(1, 0, cyanBright(requestId));
       }
       if (Object.keys(rest).length > 0) {
-        output.splice(1, 0, this.prettyPrint(rest));
+        output.push(this.prettyPrint(rest));
       }
     }
     console.log(output.join(" "));
