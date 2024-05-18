@@ -3,7 +3,7 @@ import type compression from "compression";
 import http from "node:http";
 import https from "node:https";
 import { AppConfig, CommonConfig, ServerConfig } from "./config-type";
-import { createLogger, isActualLogger } from "./logger";
+import { BuiltinLogger, isActualLogger } from "./logger";
 import { loadPeer } from "./peer-helpers";
 import { defaultResultHandler } from "./result-handler";
 import { Parsers, Routing, initRouting } from "./routing";
@@ -23,7 +23,7 @@ const makeCommonEntities = (config: CommonConfig) => {
   const errorHandler = config.errorHandler || defaultResultHandler;
   const rootLogger = isActualLogger(config.logger)
     ? config.logger
-    : createLogger(config.logger);
+    : new BuiltinLogger(config.logger);
   rootLogger.debug("Running", process.env.TSUP_BUILD || "from sources");
   const loggingMiddleware = createLoggingMiddleware({ rootLogger, config });
   const notFoundHandler = createNotFoundHandler({ rootLogger, errorHandler });

@@ -2,6 +2,7 @@ import MockDate from "mockdate";
 import { EventEmitter } from "node:events";
 import {
   AbstractLogger,
+  BuiltinLogger,
   BuiltinLoggerConfig,
   createLogger,
   isActualLogger,
@@ -31,7 +32,7 @@ describe("Logger", () => {
   });
 
   const makeLogger = (props: BuiltinLoggerConfig) => {
-    const logger = createLogger({ ...props });
+    const logger = new BuiltinLogger({ ...props });
     const logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
     return { logger, logSpy };
   };
@@ -127,7 +128,8 @@ describe("Logger", () => {
         debug() {}
       })(),
       Object.setPrototypeOf({ level: "debug" }, { debug: () => {} }),
-      createLogger({ level: "debug" }),
+      new BuiltinLogger({ level: "debug" }),
+      createLogger({ level: "warn" }), // @todo remove in v20
     ])("should validate logger instances %#", (sample) => {
       expect(isActualLogger(sample)).toBeTruthy();
     });
