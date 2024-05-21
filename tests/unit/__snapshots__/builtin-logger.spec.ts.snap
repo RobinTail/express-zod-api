@@ -1,5 +1,21 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`BuiltinLogger > .child() > should create a child logger 0 1`] = `
+[
+  [
+    "2022-01-01T00:00:00.000Z [96msome id[39m info: Here is some message { more: 'information' } { extra: 'data' }",
+  ],
+]
+`;
+
+exports[`BuiltinLogger > .child() > should create a child logger 1 1`] = `
+[
+  [
+    "2022-01-01T00:00:00.000Z [96msimple[39m info: Here is some message { more: 'information' }",
+  ],
+]
+`;
+
 exports[`BuiltinLogger > constructor() > Should create debug logger 0 1`] = `
 [
   [

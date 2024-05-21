@@ -104,6 +104,18 @@ describe("BuiltinLogger", () => {
     );
   });
 
+  describe(".child()", () => {
+    test.each([
+      { requestId: "some id", extra: "data" },
+      { requestId: "simple" },
+    ])("should create a child logger %#", (ctx) => {
+      const { logger: parent, logSpy } = makeLogger({ level: "info" });
+      const child = parent.child(ctx);
+      child.info("Here is some message", { more: "information" });
+      expect(logSpy.mock.calls).toMatchSnapshot();
+    });
+  });
+
   /** @todo remove in v20 */
   describe("createLogger() alias", () => {
     test("should return instance of BuiltinLogger", () => {
