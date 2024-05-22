@@ -27,10 +27,10 @@ export default [
   { ignores: ["dist/", "coverage/"] },
   {
     rules: {
-      "no-empty-pattern": "off",
-      "no-empty": "off",
-      "@typescript-eslint/no-empty-object-type": "off",
-      "@typescript-eslint/no-explicit-any": "off",
+      "no-empty-pattern": "off", // @todo remove
+      "no-empty": "off", // @todo remove
+      "@typescript-eslint/no-empty-object-type": "off", // @todo remove
+      "@typescript-eslint/no-explicit-any": "off", // @todo remove
     },
   },
   // Things to turn on globally
