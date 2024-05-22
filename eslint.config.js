@@ -24,6 +24,7 @@ export default [
   eslintConfigPrettier,
   eslintPluginPrettierRecommended,
   // Things to turn off
+  { ignores: ["dist/", "coverage/"] },
   {
     rules: {
       "no-empty-pattern": "off",
