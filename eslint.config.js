@@ -4,11 +4,20 @@ import tseslint from "typescript-eslint";
 import eslintConfigPrettier from "eslint-config-prettier";
 import eslintPluginPrettierRecommended from "eslint-plugin-prettier/recommended";
 import eslintPluginUnicorn from "eslint-plugin-unicorn";
+import eslintImportX from "eslint-plugin-import-x";
 
 export default [
   {
     languageOptions: { globals: globals.node },
-    plugins: { unicorn: eslintPluginUnicorn },
+    plugins: {
+      unicorn: eslintPluginUnicorn,
+      "import-x": eslintImportX,
+    },
+    settings: {
+      "import-x/parsers": {
+        "@typescript-eslint/parser": [".ts"],
+      },
+    },
   },
   pluginJs.configs.recommended,
   ...tseslint.configs.recommended,
@@ -23,10 +32,19 @@ export default [
       "@typescript-eslint/no-explicit-any": "off",
     },
   },
-  // Things to turn on
+  // Things to turn on globally
   {
     rules: {
       "unicorn/prefer-node-protocol": "error",
+      "import-x/named": "error",
+      "import-x/export": "error",
+    },
+  },
+  // For the sources
+  {
+    files: ["src/*.ts"],
+    rules: {
+      "import-x/no-extraneous-dependencies": "error",
     },
   },
   // Special needs of plugin
@@ -41,6 +59,14 @@ export default [
     files: ["tests/*/quick-start.ts"],
     rules: {
       "prettier/prettier": "off",
+    },
+  },
+  // For non-generated code
+  {
+    files: ["**/*.ts"],
+    ignores: ["tests/*/quick-start.ts"],
+    rules: {
+      "import-x/no-duplicates": "warn",
     },
   },
 ];
