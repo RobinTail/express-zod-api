@@ -27,8 +27,8 @@ export default [
   { ignores: ["dist/", "coverage/"] },
   {
     rules: {
-      "no-empty-pattern": "off", // @todo remove
-      "no-empty": "off", // @todo remove
+      "no-empty": ["error", { allowEmptyCatch: true }],
+      "no-empty-pattern": ["error", { allowObjectPatternsAsParameters: true }],
       "@typescript-eslint/no-empty-object-type": "off", // @todo remove
       "@typescript-eslint/no-explicit-any": "off", // @todo remove
     },
