@@ -124,7 +124,7 @@
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.15.0",
-    "@eslint/js": "^9.2.0",
+    "@eslint/js": "^9.3.0",
     "@tsconfig/node18": "^18.2.1",
     "@types/compression": "^1.7.5",
     "@types/cors": "^2.8.14",
@@ -145,7 +145,7 @@
     "eslint-plugin-unicorn": "^53.0.0",
     "express": "^4.19.2",
     "express-fileupload": "^1.5.0",
-    "globals": "^15.2.0",
+    "globals": "^15.3.0",
     "http-errors": "^2.0.0",
     "husky": "^9.0.5",
     "make-coverage-badge": "^1.2.0",
