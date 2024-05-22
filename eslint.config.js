@@ -38,6 +38,7 @@ export default [
       "unicorn/prefer-node-protocol": "error",
       "import-x/named": "error",
       "import-x/export": "error",
+      "import-x/no-duplicates": "warn",
     },
   },
   // For the sources
@@ -59,14 +60,7 @@ export default [
     files: ["tests/*/quick-start.ts"],
     rules: {
       "prettier/prettier": "off",
-    },
-  },
-  // For non-generated code
-  {
-    files: ["**/*.ts"],
-    ignores: ["tests/*/quick-start.ts"],
-    rules: {
-      "import-x/no-duplicates": "warn",
+      "import-x/no-duplicates": "off",
     },
   },
 ];
