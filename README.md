@@ -573,10 +573,15 @@ it can also be asynchronous. The child logger returned by that function will rep
 import { createConfig } from "express-zod-api";
 import { randomUUID } from "node:crypto";
 
+// This enables the .child() method:
+declare module "express-zod-api" {
+  interface LoggerOverrides extends BuiltinLogger {}
+}
+
 const config = createConfig({
   // logger: ...,
   childLoggerProvider: ({ parent, request }) =>
-    parent.child({ requestId: randomUUID() }), // assuming a custom logger having .child() method
+    parent.child({ requestId: randomUUID() }),
 });
 ```
 
