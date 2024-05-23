@@ -13,11 +13,6 @@ export default [
       unicorn: unicornPlugin,
       "import-x": importPlugin,
     },
-    settings: {
-      "import-x/parsers": {
-        "@typescript-eslint/parser": [".ts"],
-      },
-    },
   },
   jsPlugin.configs.recommended,
   ...tsPlugin.configs.recommended,
