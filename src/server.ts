@@ -4,7 +4,7 @@ import http from "node:http";
 import https from "node:https";
 import { BuiltinLogger } from "./builtin-logger";
 import { AppConfig, CommonConfig, ServerConfig } from "./config-type";
-import { isLoggerInstance } from "./logger";
+import { isLoggerInstance } from "./logger-helpers";
 import { loadPeer } from "./peer-helpers";
 import { defaultResultHandler } from "./result-handler";
 import { Parsers, Routing, initRouting } from "./routing";

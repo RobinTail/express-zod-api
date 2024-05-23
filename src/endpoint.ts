@@ -22,7 +22,7 @@ import {
 } from "./errors";
 import { IOSchema } from "./io-schema";
 import { lastResortHandler } from "./last-resort";
-import { ActualLogger } from "./logger";
+import { ActualLogger } from "./logger-helpers";
 import { LogicalContainer, combineContainers } from "./logical-container";
 import { AuxMethod, Method } from "./method";
 import { AnyMiddlewareDef } from "./middleware";

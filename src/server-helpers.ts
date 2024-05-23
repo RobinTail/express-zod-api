@@ -2,7 +2,7 @@ import type fileUpload from "express-fileupload";
 import { metaSymbol } from "./metadata";
 import { loadPeer } from "./peer-helpers";
 import { AnyResultHandlerDefinition } from "./result-handler";
-import { ActualLogger } from "./logger";
+import { ActualLogger } from "./logger-helpers";
 import { CommonConfig, ServerConfig } from "./config-type";
 import { ErrorRequestHandler, RequestHandler, Response } from "express";
 import createHttpError, { isHttpError } from "http-errors";

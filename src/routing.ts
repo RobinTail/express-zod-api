@@ -3,7 +3,7 @@ import { CommonConfig } from "./config-type";
 import { ContentType } from "./content-type";
 import { DependsOnMethod } from "./depends-on-method";
 import { AbstractEndpoint } from "./endpoint";
-import { ActualLogger } from "./logger";
+import { ActualLogger } from "./logger-helpers";
 import { metaSymbol } from "./metadata";
 import { walkRouting } from "./routing-walker";
 import { ServeStatic } from "./serve-static";

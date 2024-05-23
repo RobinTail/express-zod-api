@@ -1,7 +1,7 @@
 import { Ansis, blue, cyanBright, green, hex, red } from "ansis";
 import { inspect } from "node:util";
 import type { FlatObject } from "./common-helpers";
-import { AbstractLogger, severity } from "./logger";
+import { AbstractLogger, severity } from "./logger-helpers";
 
 interface Context extends FlatObject {
   requestId?: string;

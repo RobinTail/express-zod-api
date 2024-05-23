@@ -4,7 +4,7 @@ import type fileUpload from "express-fileupload";
 import { ServerOptions } from "node:https";
 import { BuiltinLoggerConfig } from "./builtin-logger";
 import { AbstractEndpoint } from "./endpoint";
-import { AbstractLogger, ActualLogger } from "./logger";
+import { AbstractLogger, ActualLogger } from "./logger-helpers";
 import { Method } from "./method";
 import { AnyResultHandlerDefinition } from "./result-handler";
 import { ListenOptions } from "node:net";

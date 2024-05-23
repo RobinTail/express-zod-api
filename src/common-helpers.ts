@@ -5,7 +5,7 @@ import { flip, pickBy, xprod } from "ramda";
 import { z } from "zod";
 import { CommonConfig, InputSource, InputSources } from "./config-type";
 import { InputValidationError, OutputValidationError } from "./errors";
-import { ActualLogger } from "./logger";
+import { ActualLogger } from "./logger-helpers";
 import { metaSymbol } from "./metadata";
 import { AuxMethod, Method } from "./method";
 import { contentTypes } from "./content-type";

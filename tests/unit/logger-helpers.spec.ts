@@ -1,6 +1,6 @@
 import { BuiltinLogger } from "../../src";
 import { BuiltinLoggerConfig } from "../../src/builtin-logger";
-import { AbstractLogger, isLoggerInstance } from "../../src/logger";
+import { AbstractLogger, isLoggerInstance } from "../../src/logger-helpers";
 import { describe, expect, test } from "vitest";
 
 describe("Logger helpers", () => {

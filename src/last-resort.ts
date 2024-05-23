@@ -1,6 +1,6 @@
 import { Response } from "express";
 import { ResultHandlerError } from "./errors";
-import { ActualLogger } from "./logger";
+import { ActualLogger } from "./logger-helpers";
 
 interface LastResortHandlerParams {
   error: ResultHandlerError;

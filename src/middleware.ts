@@ -7,7 +7,7 @@ import { IOSchemaError } from "./errors";
 import { IOSchema } from "./io-schema";
 import { LogicalContainer } from "./logical-container";
 import { Security } from "./security";
-import { ActualLogger } from "./logger";
+import { ActualLogger } from "./logger-helpers";
 import assert from "node:assert/strict";
 
 interface MiddlewareParams<IN, OPT> {

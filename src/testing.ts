@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import http from "node:http";
 import { CommonConfig } from "./config-type";
 import { AbstractEndpoint } from "./endpoint";
-import { AbstractLogger, ActualLogger } from "./logger";
+import { AbstractLogger, ActualLogger } from "./logger-helpers";
 import { contentTypes } from "./content-type";
 import { loadAlternativePeer } from "./peer-helpers";
 import { LocalResponse } from "./server-helpers";

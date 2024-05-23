@@ -8,7 +8,7 @@ import {
 } from "../../src";
 import { Endpoint } from "../../src/endpoint";
 import { expectType } from "tsd";
-import { ActualLogger } from "../../src/logger";
+import { ActualLogger } from "../../src/logger-helpers";
 import { makeLoggerMock } from "../../src/testing";
 import { serializeSchemaForTest } from "../helpers";
 import { z } from "zod";
