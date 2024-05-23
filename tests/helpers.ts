@@ -1,5 +1,6 @@
 import { map } from "ramda";
 import { z } from "zod";
+import { FlatObject } from "../src";
 import { ezFileBrand } from "../src/file-schema";
 import { SchemaHandler, walkSchema } from "../src/schema-walker";
 
@@ -32,9 +33,7 @@ export const waitFor = async (cb: () => boolean) =>
     }, 100);
   });
 
-export const serializeSchemaForTest = (
-  subject: z.ZodTypeAny,
-): Record<string, any> => {
+export const serializeSchemaForTest = (subject: z.ZodTypeAny): FlatObject => {
   const onSomeUnion: SchemaHandler<object> = (
     {
       options,
@@ -65,34 +64,40 @@ export const serializeSchemaForTest = (
       ZodDiscriminatedUnion: onSomeUnion,
       ZodOptional: onOptionalOrNullable,
       ZodNullable: onOptionalOrNullable,
-      ZodIntersection: ({ _def }: z.ZodIntersection<any, any>, { next }) => ({
+      ZodIntersection: (
+        { _def }: z.ZodIntersection<z.ZodTypeAny, z.ZodTypeAny>,
+        { next },
+      ) => ({
         left: next(_def.left),
         right: next(_def.right),
       }),
-      ZodObject: ({ shape }: z.ZodObject<any>, { next }) => ({
+      ZodObject: ({ shape }: z.ZodObject<z.ZodRawShape>, { next }) => ({
         shape: map(next, shape),
       }),
-      ZodEffects: ({ _def }: z.ZodEffects<any>, { next }) => ({
+      ZodEffects: ({ _def }: z.ZodEffects<z.ZodTypeAny>, { next }) => ({
         value: next(_def.schema),
       }),
       ZodRecord: ({ keySchema, valueSchema }: z.ZodRecord, { next }) => ({
         keys: next(keySchema),
         values: next(valueSchema),
       }),
-      ZodArray: ({ element }: z.ZodArray<any>, { next }) => ({
+      ZodArray: ({ element }: z.ZodArray<z.ZodTypeAny>, { next }) => ({
         items: next(element),
       }),
-      ZodLiteral: ({ value }: z.ZodLiteral<any>) => ({ value }),
-      ZodDefault: ({ _def }: z.ZodDefault<any>, { next }) => ({
+      ZodLiteral: ({ value }: z.ZodLiteral<unknown>) => ({ value }),
+      ZodDefault: ({ _def }: z.ZodDefault<z.ZodTypeAny>, { next }) => ({
         value: next(_def.innerType),
         default: _def.defaultValue(),
       }),
-      ZodReadonly: (schema: z.ZodReadonly<any>, { next }) =>
+      ZodReadonly: (schema: z.ZodReadonly<z.ZodTypeAny>, { next }) =>
         next(schema.unwrap()),
-      ZodCatch: ({ _def }: z.ZodCatch<any>, { next }) => ({
+      ZodCatch: ({ _def }: z.ZodCatch<z.ZodTypeAny>, { next }) => ({
         value: next(_def.innerType),
       }),
-      ZodPipeline: ({ _def }: z.ZodPipeline<any, any>, { next }) => ({
+      ZodPipeline: (
+        { _def }: z.ZodPipeline<z.ZodTypeAny, z.ZodTypeAny>,
+        { next },
+      ) => ({
         from: next(_def.in),
         to: next(_def.out),
       }),

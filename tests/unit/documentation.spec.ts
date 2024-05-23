@@ -1282,8 +1282,10 @@ describe("Documentation", () => {
   describe("Feature #1470: Custom brands", () => {
     test("should be handled accordingly in request, response and params", () => {
       const deep = Symbol("DEEP");
-      const rule: Depicter = (schema: z.ZodBranded<any, any>, { next }) =>
-        next(schema.unwrap());
+      const rule: Depicter = (
+        schema: z.ZodBranded<z.ZodTypeAny, PropertyKey>,
+        { next },
+      ) => next(schema.unwrap());
       const spec = new Documentation({
         config: sampleConfig,
         routing: {
