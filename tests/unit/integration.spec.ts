@@ -123,8 +123,10 @@ describe("Integration", () => {
 
   describe("Feature #1470: Custom brands", () => {
     test("should by handled accordingly", async () => {
-      const rule: Producer = (schema: z.ZodBranded<any, any>, { next }) =>
-        next(schema.unwrap());
+      const rule: Producer = (
+        schema: z.ZodBranded<z.ZodTypeAny, PropertyKey>,
+        { next },
+      ) => next(schema.unwrap());
       const client = new Integration({
         splitResponse: true,
         variant: "types",

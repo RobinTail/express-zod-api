@@ -177,7 +177,7 @@ describe("Routing", () => {
           user: new DependsOnMethod({
             put: putAndPatchEndpoint,
             patch: putAndPatchEndpoint,
-            post: putAndPatchEndpoint as any, // intentional
+            post: putAndPatchEndpoint, // intentional
           }),
         },
       };
@@ -436,7 +436,7 @@ describe("Routing", () => {
       await routeHandler(
         requestMock as unknown as Request,
         responseMock as unknown as Response,
-        vi.fn<any>(),
+        vi.fn<[], void>(),
       );
       expect(handlerMock).toHaveBeenCalledWith({
         input: {},

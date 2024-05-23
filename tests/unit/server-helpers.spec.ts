@@ -55,7 +55,7 @@ describe("Server helpers", () => {
             },
           },
         }) as unknown as Response,
-        vi.fn<any>(),
+        vi.fn<[], void>(),
       );
       expect(errorHandler.handler).toHaveBeenCalledTimes(1);
       expect(errorHandler.handler.mock.calls[0][0].error).toEqual(

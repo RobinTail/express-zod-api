@@ -1,5 +1,6 @@
 import MockDate from "mockdate";
 import { EventEmitter } from "node:events";
+import { FlatObject } from "../../src";
 import {
   AbstractLogger,
   BuiltinLoggerConfig,
@@ -94,7 +95,7 @@ describe("Logger", () => {
       "Should handle circular references within subject %#",
       (level) => {
         const { logger, logSpy } = makeLogger({ level, color: false });
-        const subject: any = {};
+        const subject: Record<string, FlatObject | Array<FlatObject>> = {};
         subject.a = [subject];
         subject.b = {};
         subject.b.inner = subject.b;

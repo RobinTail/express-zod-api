@@ -22,7 +22,7 @@ describe("Endpoint", () => {
         methods: ["get", "post", "put", "delete", "patch"],
         inputSchema: z.object({}),
         outputSchema: z.object({}),
-        handler: vi.fn<any>(),
+        handler: vi.fn<[], Promise<{}>>(),
         resultHandler: createResultHandler({
           getPositiveResponse: () => z.string(),
           getNegativeResponse: () => z.string(),
@@ -43,7 +43,7 @@ describe("Endpoint", () => {
         methods: ["patch"],
         inputSchema: z.object({}),
         outputSchema: z.object({}),
-        handler: vi.fn<any>(),
+        handler: vi.fn<[], Promise<{}>>(),
         resultHandler: createResultHandler({
           getPositiveResponse: () => z.string(),
           getNegativeResponse: () => z.string(),
@@ -712,7 +712,7 @@ describe("Endpoint", () => {
             methods: ["get"],
             inputSchema: z.object({}).transform(() => []),
             outputSchema: z.object({}),
-            handler: vi.fn<any>(),
+            handler: vi.fn<[], Promise<{}>>(),
             resultHandler: {
               getPositiveResponse: vi.fn(),
               getNegativeResponse: vi.fn(),
@@ -730,7 +730,7 @@ describe("Endpoint", () => {
             methods: ["get"],
             inputSchema: z.object({}),
             outputSchema: z.object({}).transform(() => []),
-            handler: vi.fn<any>(),
+            handler: vi.fn<[], Promise<{}>>(),
             resultHandler: {
               getPositiveResponse: vi.fn(),
               getNegativeResponse: vi.fn(),
@@ -753,7 +753,7 @@ describe("Endpoint", () => {
             methods: ["get"],
             inputSchema: z.object({}),
             outputSchema: z.object({}),
-            handler: vi.fn<any>(),
+            handler: vi.fn<[], Promise<{}>>(),
             resultHandler: {
               getPositiveResponse: () => [],
               getNegativeResponse: () => z.any(),
@@ -771,7 +771,7 @@ describe("Endpoint", () => {
             methods: ["get"],
             inputSchema: z.object({}),
             outputSchema: z.object({}),
-            handler: vi.fn<any>(),
+            handler: vi.fn<[], Promise<{}>>(),
             resultHandler: {
               getPositiveResponse: () => z.any(),
               getNegativeResponse: () => [],
