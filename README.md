@@ -568,18 +568,19 @@ declare module "express-zod-api" {
 In case you need a dedicated logger for each request (for example, equipped with a request ID), you can specify the
 `childLoggerProvider` option in your configuration. The function accepts the initially defined logger and the request,
 it can also be asynchronous. The child logger returned by that function will replace the `logger` in all handlers.
+You can use the `.child()` method of the built-in logger or [install a custom logger](#customizing-logger) instead.
 
 ```typescript
 import { createConfig } from "express-zod-api";
 import { randomUUID } from "node:crypto";
 
-// This enables the .child() method:
+// This enables the .child() method on the built-in logger:
 declare module "express-zod-api" {
   interface LoggerOverrides extends BuiltinLogger {}
 }
 
 const config = createConfig({
-  // logger: ...,
+  logger: { level: "debug", color: true },
   childLoggerProvider: ({ parent, request }) =>
     parent.child({ requestId: randomUUID() }),
 });

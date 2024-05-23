@@ -4,8 +4,8 @@
 
 ### v19.2.0
 
-- Feat: Child method in Built-in Logger:
-  - Can do this without additional libraries now:
+- Feat: `.child()` method for the built-in logger:
+  - You can assign request ID to the log entries without additional libraries now:
 
 ```ts
 import { randomUUID } from "node:crypto";
