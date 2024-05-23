@@ -15,10 +15,10 @@ import {
 import { z } from "zod";
 import {
   AppConfig,
+  BuiltinLogger,
   EndpointsFactory,
   ServerConfig,
   attachRouting,
-  createLogger,
   createServer,
   defaultResultHandler,
   ez,
@@ -87,7 +87,7 @@ describe("Server", () => {
     });
 
     test("Should create server with custom JSON parser, raw parser, logger, error handler and beforeRouting", async () => {
-      const customLogger = createLogger({ level: "silent" });
+      const customLogger = new BuiltinLogger({ level: "silent" });
       const infoMethod = vi.spyOn(customLogger, "info");
       const port = givePort();
       const configMock = {
@@ -314,7 +314,7 @@ describe("Server", () => {
     test("should attach routing to the custom express app", () => {
       const app = express();
       expect(appMock).toBeTruthy();
-      const customLogger = createLogger({ level: "silent" });
+      const customLogger = new BuiltinLogger({ level: "silent" });
       const infoMethod = vi.spyOn(customLogger, "info");
       const configMock = {
         app,

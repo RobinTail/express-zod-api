@@ -1,6 +1,22 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`Logger > createLogger() > Should create debug logger 0 1`] = `
+exports[`BuiltinLogger > .child() > should create a child logger 0 1`] = `
+[
+  [
+    "2022-01-01T00:00:00.000Z [96msome id[39m info: Here is some message { more: 'information' } { extra: 'data' }",
+  ],
+]
+`;
+
+exports[`BuiltinLogger > .child() > should create a child logger 1 1`] = `
+[
+  [
+    "2022-01-01T00:00:00.000Z [96msimple[39m info: Here is some message { more: 'information' }",
+  ],
+]
+`;
+
+exports[`BuiltinLogger > constructor() > Should create debug logger 0 1`] = `
 [
   [
     "2022-01-01T00:00:00.000Z [34mdebug[39m: testing debug message { withColorful: [32m'output'[39m }",
@@ -8,7 +24,7 @@ exports[`Logger > createLogger() > Should create debug logger 0 1`] = `
 ]
 `;
 
-exports[`Logger > createLogger() > Should create debug logger 1 1`] = `
+exports[`BuiltinLogger > constructor() > Should create debug logger 1 1`] = `
 [
   [
     "2022-01-01T00:00:00.000Z [32minfo[39m: testing debug message { withColorful: [32m'output'[39m }",
@@ -16,7 +32,7 @@ exports[`Logger > createLogger() > Should create debug logger 1 1`] = `
 ]
 `;
 
-exports[`Logger > createLogger() > Should create debug logger 2 1`] = `
+exports[`BuiltinLogger > constructor() > Should create debug logger 2 1`] = `
 [
   [
     "2022-01-01T00:00:00.000Z [38;2;255;165;0mwarn[39m: testing debug message { withColorful: [32m'output'[39m }",
@@ -24,7 +40,7 @@ exports[`Logger > createLogger() > Should create debug logger 2 1`] = `
 ]
 `;
 
-exports[`Logger > createLogger() > Should create debug logger 3 1`] = `
+exports[`BuiltinLogger > constructor() > Should create debug logger 3 1`] = `
 [
   [
     "2022-01-01T00:00:00.000Z [31merror[39m: testing debug message { withColorful: [32m'output'[39m }",
@@ -32,7 +48,7 @@ exports[`Logger > createLogger() > Should create debug logger 3 1`] = `
 ]
 `;
 
-exports[`Logger > createLogger() > Should create warn logger 1`] = `
+exports[`BuiltinLogger > constructor() > Should create warn logger 1`] = `
 [
   [
     "2022-01-01T00:00:00.000Z warn: testing warn message { withMeta: true }",
@@ -40,7 +56,7 @@ exports[`Logger > createLogger() > Should create warn logger 1`] = `
 ]
 `;
 
-exports[`Logger > createLogger() > Should handle array 0 1`] = `
+exports[`BuiltinLogger > constructor() > Should handle array 0 1`] = `
 [
   [
     "2022-01-01T00:00:00.000Z [31merror[39m: Array [ [32m'test'[39m ]",
@@ -48,7 +64,7 @@ exports[`Logger > createLogger() > Should handle array 0 1`] = `
 ]
 `;
 
-exports[`Logger > createLogger() > Should handle array 1 1`] = `
+exports[`BuiltinLogger > constructor() > Should handle array 1 1`] = `
 [
   [
     "2022-01-01T00:00:00.000Z [31merror[39m: Array [ [32m'test'[39m ]",
@@ -56,7 +72,7 @@ exports[`Logger > createLogger() > Should handle array 1 1`] = `
 ]
 `;
 
-exports[`Logger > createLogger() > Should handle circular references within subject 0 1`] = `
+exports[`BuiltinLogger > constructor() > Should handle circular references within subject 0 1`] = `
 [
   [
     "2022-01-01T00:00:00.000Z error: Recursive <ref *1> {
@@ -67,7 +83,7 @@ exports[`Logger > createLogger() > Should handle circular references within subj
 ]
 `;
 
-exports[`Logger > createLogger() > Should handle circular references within subject 1 1`] = `
+exports[`BuiltinLogger > constructor() > Should handle circular references within subject 1 1`] = `
 [
   [
     "2022-01-01T00:00:00.000Z error: Recursive <ref *1> { a: [ [Circular *1] ], b: <ref *2> { inner: [Circular *2], obj: [Circular *1] } }",
@@ -75,7 +91,7 @@ exports[`Logger > createLogger() > Should handle circular references within subj
 ]
 `;
 
-exports[`Logger > createLogger() > Should handle empty object meta 0 1`] = `
+exports[`BuiltinLogger > constructor() > Should handle empty object meta 0 1`] = `
 [
   [
     "2022-01-01T00:00:00.000Z [31merror[39m: Payload {}",
@@ -83,7 +99,7 @@ exports[`Logger > createLogger() > Should handle empty object meta 0 1`] = `
 ]
 `;
 
-exports[`Logger > createLogger() > Should handle empty object meta 1 1`] = `
+exports[`BuiltinLogger > constructor() > Should handle empty object meta 1 1`] = `
 [
   [
     "2022-01-01T00:00:00.000Z [31merror[39m: Payload {}",
@@ -91,7 +107,7 @@ exports[`Logger > createLogger() > Should handle empty object meta 1 1`] = `
 ]
 `;
 
-exports[`Logger > createLogger() > Should handle non-object meta 0 1`] = `
+exports[`BuiltinLogger > constructor() > Should handle non-object meta 0 1`] = `
 [
   [
     "2022-01-01T00:00:00.000Z [31merror[39m: Code [33m8090[39m",
@@ -99,7 +115,7 @@ exports[`Logger > createLogger() > Should handle non-object meta 0 1`] = `
 ]
 `;
 
-exports[`Logger > createLogger() > Should handle non-object meta 1 1`] = `
+exports[`BuiltinLogger > constructor() > Should handle non-object meta 1 1`] = `
 [
   [
     "2022-01-01T00:00:00.000Z [31merror[39m: Code [33m8090[39m",
