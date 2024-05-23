@@ -177,7 +177,7 @@ describe("Routing", () => {
           user: new DependsOnMethod({
             put: putAndPatchEndpoint,
             patch: putAndPatchEndpoint,
-            post: putAndPatchEndpoint as any, // intentional
+            post: putAndPatchEndpoint, // intentional
           }),
         },
       };

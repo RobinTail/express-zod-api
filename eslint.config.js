@@ -18,7 +18,7 @@ export default [
   ...tsPlugin.configs.recommended,
   prettierOverrides,
   prettierRules,
-  // Things to turn off
+  // Things to turn off globally
   { ignores: ["dist/", "coverage/"] },
   {
     rules: {
@@ -42,6 +42,13 @@ export default [
     files: ["src/*.ts"],
     rules: {
       "import-x/no-extraneous-dependencies": "error",
+    },
+  },
+  // For tests
+  {
+    files: ["tests/**/*.ts"],
+    rules: {
+      "@typescript-eslint/no-explicit-any": "off",
     },
   },
   // Special needs of plugin

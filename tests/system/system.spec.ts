@@ -126,7 +126,7 @@ describe("App", async () => {
         }),
     },
   };
-  vi.spyOn(global.console, "log").mockImplementation(vi.fn<any>());
+  vi.spyOn(global.console, "log").mockImplementation(vi.fn());
   const server = (
     await createServer(
       {

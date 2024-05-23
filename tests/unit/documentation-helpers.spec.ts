@@ -781,11 +781,13 @@ describe("Documentation helpers", () => {
   });
 
   describe("depictLazy", () => {
-    const recursiveArray: z.ZodLazy<z.ZodArray<any>> = z.lazy(() =>
+    const recursiveArray: z.ZodLazy<z.ZodArray<z.ZodTypeAny>> = z.lazy(() =>
       recursiveArray.array(),
     );
-    const directlyRecursive: z.ZodLazy<any> = z.lazy(() => directlyRecursive);
-    const recursiveObject: z.ZodLazy<z.ZodObject<any>> = z.lazy(() =>
+    const directlyRecursive: z.ZodLazy<z.ZodTypeAny> = z.lazy(
+      () => directlyRecursive,
+    );
+    const recursiveObject: z.ZodLazy<z.ZodObject<z.ZodRawShape>> = z.lazy(() =>
       z.object({ prop: recursiveObject }),
     );
 
