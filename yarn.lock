@@ -2957,11 +2957,11 @@ onetime@^6.0.0:
     mimic-fn "^4.0.0"
 
 openapi3-ts@^4.2.1:
-  version "4.3.1"
-  resolved "https://registry.yarnpkg.com/openapi3-ts/-/openapi3-ts-4.3.1.tgz#8f4b68e97e7885d531694938f59983e866c47dc1"
-  integrity sha512-ha/kTOLhMQL7MvS9Abu/cpCXx5qwHQ++88YkUzn1CGfmM8JvCOG/4ZE6tRsexgXRFaoJrcwLyf81H2Y/CXALtA==
+  version "4.3.2"
+  resolved "https://registry.yarnpkg.com/openapi3-ts/-/openapi3-ts-4.3.2.tgz#a1a11eb5e0bc557210a4ec9b627711af8fb19b41"
+  integrity sha512-IvKNb3hPHwfuyVJnseTsFvZ0DO2EODpitYMsLcmfVwJ2p41zAHh2VDConzLLEB5h5YFbne9vv1zZxCeUICYZ8A==
   dependencies:
-    yaml "^2.4.1"
+    yaml "^2.4.2"
 
 optionator@^0.9.3:
   version "0.9.4"
@@ -4079,7 +4079,7 @@ yallist@^4.0.0:
   resolved "https://registry.yarnpkg.com/yallist/-/yallist-4.0.0.tgz#9bb92790d9c0effec63be73519e11a35019a3a72"
   integrity sha512-3wdGidZyq5PB084XLES5TpOSRA3wjXAlIWMhum2kRcv/41Sn2emQ0dycQW4uZXLejwKvg6EsvbdlVL+FYEct7A==
 
-yaml@^2.3.4, yaml@^2.4.1:
+yaml@^2.3.4, yaml@^2.4.2:
   version "2.4.2"
   resolved "https://registry.yarnpkg.com/yaml/-/yaml-2.4.2.tgz#7a2b30f2243a5fc299e1f14ca58d475ed4bc5362"
   integrity sha512-B3VqDZ+JAg1nZpaEmWtTXUlBneoGx6CPM9b0TENK6aoSu5t73dItudwdgmi6tHlIZZId4dZ9skcAQ2UbcyAeVA==
