@@ -3,7 +3,15 @@
 exports[`BuiltinLogger > .child() > should create a child logger 0 1`] = `
 [
   [
-    "2022-01-01T00:00:00.000Z [96msome id[39m info: Here is some message { more: 'information' } { extra: 'data' }",
+    "2022-01-01T00:00:00.000Z [96msome id[39m [32minfo[39m: Here is some message { more: [32m'information'[39m } { extra: [32m'data'[39m }",
+  ],
+]
+`;
+
+exports[`BuiltinLogger > .child() > should create a child logger 0 2`] = `
+[
+  [
+    "2022-01-01T00:00:00.000Z some id info: Here is some message { more: 'information' } { extra: 'data' }",
   ],
 ]
 `;
@@ -11,7 +19,15 @@ exports[`BuiltinLogger > .child() > should create a child logger 0 1`] = `
 exports[`BuiltinLogger > .child() > should create a child logger 1 1`] = `
 [
   [
-    "2022-01-01T00:00:00.000Z [96msimple[39m info: Here is some message { more: 'information' }",
+    "2022-01-01T00:00:00.000Z [96msimple[39m [32minfo[39m: Here is some message { more: [32m'information'[39m }",
+  ],
+]
+`;
+
+exports[`BuiltinLogger > .child() > should create a child logger 1 2`] = `
+[
+  [
+    "2022-01-01T00:00:00.000Z simple info: Here is some message { more: 'information' }",
   ],
 ]
 `;

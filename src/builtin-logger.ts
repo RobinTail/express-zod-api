@@ -67,7 +67,7 @@ export class BuiltinLogger implements AbstractLogger {
     const { requestId, ...ctx } = this.config.ctx || {};
     const output: string[] = [new Date().toISOString()];
     if (requestId) {
-      output.push(cyanBright(requestId));
+      output.push(this.config.color ? cyanBright(requestId) : requestId);
     }
     output.push(
       this.config.color ? `${this.styles[method](method)}:` : `${method}:`,

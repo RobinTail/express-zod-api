@@ -104,12 +104,15 @@ describe("BuiltinLogger", () => {
     );
   });
 
-  describe(".child()", () => {
+  describe.each([true, false])(".child()", (color) => {
     test.each([
       { requestId: "some id", extra: "data" },
       { requestId: "simple" },
     ])("should create a child logger %#", (ctx) => {
-      const { logger: parent, logSpy } = makeLogger({ level: "info" });
+      const { logger: parent, logSpy } = makeLogger({
+        level: "info",
+        color,
+      });
       const child = parent.child(ctx);
       child.info("Here is some message", { more: "information" });
       expect(logSpy.mock.calls).toMatchSnapshot();
