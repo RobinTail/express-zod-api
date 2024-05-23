@@ -3,12 +3,12 @@ import createHttpError from "http-errors";
 import { expectType } from "tsd";
 import { z } from "zod";
 import {
+  ApiResponse,
   InputValidationError,
   arrayResultHandler,
   createResultHandler,
   defaultResultHandler,
 } from "../../src";
-import { ApiResponse } from "../../src";
 import { metaSymbol } from "../../src/metadata";
 import { describe, expect, test, vi } from "vitest";
 import {
