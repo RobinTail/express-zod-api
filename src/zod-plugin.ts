@@ -6,8 +6,6 @@
  * @desc Enables .label() on ZodDefault
  * @desc Stores the argument supplied to .brand() on all schema (runtime distinguishable branded types)
  * */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 import { clone } from "ramda";
 import { z } from "zod";
 import { Metadata, cloneSchema, metaSymbol } from "./metadata";
