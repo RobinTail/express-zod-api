@@ -2,6 +2,10 @@
 
 ## Version 19
 
+### v19.2.1
+
+- `openapi3-ts` version is 4.3.2 (fixed distribution).
+
 ### v19.2.0
 
 - Feat: `.child()` method for the built-in logger:
