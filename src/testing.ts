@@ -15,6 +15,7 @@ import { LocalResponse } from "./server-helpers";
 export interface MockOverrides {}
 
 /** @desc Compatibility constraints for a function mocking method of a testing framework. */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type MockFunction = (implementation?: (...args: any[]) => any) => MockOverrides;
 
 export const makeRequestMock = <REQ extends Record<string, any>>({

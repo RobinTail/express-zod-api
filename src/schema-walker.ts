@@ -13,7 +13,10 @@ export type SchemaHandler<
   U,
   Context extends FlatObject = {},
   Variant extends HandlingVariant = "regular",
-> = (schema: any, ctx: Context & VariantDependingProps<U>[Variant]) => U;
+> = (
+  schema: any, // eslint-disable-line @typescript-eslint/no-explicit-any
+  ctx: Context & VariantDependingProps<U>[Variant],
+) => U;
 
 export type HandlingRules<
   U,

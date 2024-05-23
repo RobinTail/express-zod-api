@@ -3,7 +3,7 @@ import { isObject } from "./common-helpers";
 /** @desc You can use any logger compatible with this type. */
 export type AbstractLogger = Record<
   "info" | "debug" | "warn" | "error",
-  (message: string, meta?: any) => any
+  (message: string, meta?: any) => any // eslint-disable-line @typescript-eslint/no-explicit-any
 >;
 
 /**

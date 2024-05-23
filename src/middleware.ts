@@ -44,6 +44,7 @@ export interface MiddlewareDefinition<
   type: "proprietary" | "express";
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type AnyMiddlewareDef = MiddlewareDefinition<any, any, any, any>;
 
 export const createMiddleware = <
