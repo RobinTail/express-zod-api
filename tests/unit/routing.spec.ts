@@ -9,13 +9,13 @@ import { z } from "zod";
 import {
   BuiltinLogger,
   DependsOnMethod,
+  CommonConfig,
   EndpointsFactory,
   Routing,
   ServeStatic,
   defaultEndpointsFactory,
   defaultResultHandler,
 } from "../../src";
-import { CommonConfig } from "../../src";
 import {
   makeLoggerMock,
   makeRequestMock,

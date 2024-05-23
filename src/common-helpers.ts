@@ -181,7 +181,7 @@ export const tryToTransform = <T>(
 ) => {
   try {
     return typeof schema.parse(sample);
-  } catch (e) {
+  } catch {
     return undefined;
   }
 };
