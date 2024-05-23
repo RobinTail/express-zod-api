@@ -98,7 +98,7 @@ export class BuiltinLogger implements AbstractLogger {
     this.print("error", message, meta);
   }
 
-  public child(ctx?: Context) {
+  public child(ctx: Context) {
     return new BuiltinLogger({ ...this.config, ctx });
   }
 }
