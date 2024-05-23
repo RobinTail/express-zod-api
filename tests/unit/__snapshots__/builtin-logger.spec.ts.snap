@@ -16,6 +16,22 @@ exports[`BuiltinLogger > .child() > should create a child logger 1 1`] = `
 ]
 `;
 
+exports[`BuiltinLogger > .child() > should create a child logger 2 1`] = `
+[
+  [
+    "2022-01-01T00:00:00.000Z info: Here is some message { more: 'information' }",
+  ],
+]
+`;
+
+exports[`BuiltinLogger > .child() > should create a child logger 3 1`] = `
+[
+  [
+    "2022-01-01T00:00:00.000Z info: Here is some message { more: 'information' }",
+  ],
+]
+`;
+
 exports[`BuiltinLogger > constructor() > Should create debug logger 0 1`] = `
 [
   [

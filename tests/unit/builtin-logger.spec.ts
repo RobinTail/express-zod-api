@@ -108,6 +108,8 @@ describe("BuiltinLogger", () => {
     test.each([
       { requestId: "some id", extra: "data" },
       { requestId: "simple" },
+      {},
+      undefined,
     ])("should create a child logger %#", (ctx) => {
       const { logger: parent, logSpy } = makeLogger({ level: "info" });
       const child = parent.child(ctx);
