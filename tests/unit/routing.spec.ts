@@ -8,6 +8,7 @@ import {
 import { z } from "zod";
 import {
   DependsOnMethod,
+  CommonConfig,
   EndpointsFactory,
   Routing,
   ServeStatic,
@@ -15,7 +16,6 @@ import {
   defaultEndpointsFactory,
   defaultResultHandler,
 } from "../../src";
-import { CommonConfig } from "../../src";
 import {
   makeLoggerMock,
   makeRequestMock,
