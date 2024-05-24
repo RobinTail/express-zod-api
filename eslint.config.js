@@ -53,7 +53,7 @@ export default [
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-empty-object-type": [
         "warn",
-        { allowInterfaces: "with-single-extends" }, // for augmentation
+        { allowWithName: "MockOverrides" },
       ],
     },
   },
