@@ -10,8 +10,9 @@ import { metaSymbol } from "./metadata";
 import { AuxMethod, Method } from "./method";
 import { contentTypes } from "./content-type";
 
-export type FlatObject = Record<string, unknown>;
+/** @desc this type does not allow props assignment, but it works for reading them when merged with another interface */
 export type EmptyObject = Record<string, never>;
+export type FlatObject = Record<string, unknown>;
 
 const areFilesAvailable = (request: Request): boolean => {
   const contentType = request.header("content-type") || "";
