@@ -46,7 +46,7 @@ export const makeResponseMock = <RES extends FlatObject>({
     set: fnMethod(() => responseMock),
     setHeader: fnMethod(() => responseMock),
     header: fnMethod(() => responseMock),
-    status: fnMethod((code) => {
+    status: fnMethod((code: number) => {
       responseMock.statusCode = code;
       responseMock.statusMessage = http.STATUS_CODES[code]!;
       return responseMock;
