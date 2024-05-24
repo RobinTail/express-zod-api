@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { EmptyObject } from "./common-helpers";
 import { IOSchema } from "./io-schema";
 import { metaSymbol } from "./metadata";
 import { ezRawBrand } from "./raw-schema";
@@ -25,7 +26,7 @@ const onElective: Check = (
   { next },
 ) => next(schema.unwrap());
 
-const checks: HandlingRules<boolean, {}, z.ZodFirstPartyTypeKind> = {
+const checks: HandlingRules<boolean, EmptyObject, z.ZodFirstPartyTypeKind> = {
   ZodObject: ({ shape }: z.ZodObject<z.ZodRawShape>, { next }) =>
     Object.values(shape).some(next),
   ZodUnion: onSomeUnion,

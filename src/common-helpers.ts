@@ -12,6 +12,10 @@ import { contentTypes } from "./content-type";
 
 export type FlatObject = Record<string, unknown>;
 export type EmptyObject = Record<string, never>;
+export type Merged<
+  A extends FlatObject,
+  B extends FlatObject,
+> = (A extends EmptyObject ? B : A) & (B extends EmptyObject ? A : B);
 
 const areFilesAvailable = (request: Request): boolean => {
   const contentType = request.header("content-type") || "";
