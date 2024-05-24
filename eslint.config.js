@@ -66,8 +66,11 @@ export default [
     rules: {
       "prettier/prettier": "off",
       "import-x/no-duplicates": "off",
-      "@typescript-eslint/no-explicit-any": "off", // @todo remove
-      "@typescript-eslint/no-empty-object-type": "off", // @todo remove
+      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/no-empty-object-type": [
+        "error",
+        { allowObjectTypes: "always" },
+      ],
     },
   },
 ];
