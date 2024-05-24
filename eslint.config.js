@@ -25,7 +25,6 @@ export default [
       "no-empty": ["error", { allowEmptyCatch: true }],
       "no-empty-pattern": ["error", { allowObjectPatternsAsParameters: true }],
       "@typescript-eslint/no-empty-object-type": "off", // @todo remove
-      "@typescript-eslint/no-explicit-any": "off", // @todo remove
     },
   },
   // Things to turn on globally
@@ -60,10 +59,11 @@ export default [
   },
   // Special needs of the generated code
   {
-    files: ["tests/*/quick-start.ts"],
+    files: ["tests/*/quick-start.ts", "example/example.client.ts"],
     rules: {
       "prettier/prettier": "off",
       "import-x/no-duplicates": "off",
+      "@typescript-eslint/no-explicit-any": "off", // @todo remove
     },
   },
 ];

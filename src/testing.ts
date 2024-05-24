@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import http from "node:http";
+import { FlatObject } from "./common-helpers";
 import { CommonConfig } from "./config-type";
 import { AbstractEndpoint } from "./endpoint";
 import { AbstractLogger, ActualLogger } from "./logger-helpers";
@@ -15,9 +16,10 @@ import { LocalResponse } from "./server-helpers";
 export interface MockOverrides {}
 
 /** @desc Compatibility constraints for a function mocking method of a testing framework. */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type MockFunction = (implementation?: (...args: any[]) => any) => MockOverrides;
 
-export const makeRequestMock = <REQ extends Record<string, any>>({
+export const makeRequestMock = <REQ extends FlatObject>({
   fnMethod,
   requestProps,
 }: {
@@ -30,7 +32,7 @@ export const makeRequestMock = <REQ extends Record<string, any>>({
     ...requestProps,
   }) as { method: string } & Record<"header", MockOverrides> & REQ;
 
-export const makeResponseMock = <RES extends Record<string, any>>({
+export const makeResponseMock = <RES extends FlatObject>({
   fnMethod,
   responseProps,
 }: {
@@ -44,7 +46,7 @@ export const makeResponseMock = <RES extends Record<string, any>>({
     set: fnMethod(() => responseMock),
     setHeader: fnMethod(() => responseMock),
     header: fnMethod(() => responseMock),
-    status: fnMethod((code) => {
+    status: fnMethod((code: number) => {
       responseMock.statusCode = code;
       responseMock.statusMessage = http.STATUS_CODES[code]!;
       return responseMock;
@@ -70,7 +72,7 @@ export const makeResponseMock = <RES extends Record<string, any>>({
   return responseMock;
 };
 
-export const makeLoggerMock = <LOG extends Record<string, any>>({
+export const makeLoggerMock = <LOG extends FlatObject>({
   fnMethod,
   loggerProps,
 }: {
@@ -118,9 +120,9 @@ interface TestEndpointProps<REQ, RES, LOG> {
 
 /** @desc Requires either jest (with @types/jest) or vitest or to specify the fnMethod option */
 export const testEndpoint = async <
-  LOG extends Record<string, any>,
-  REQ extends Record<string, any>,
-  RES extends Record<string, any>,
+  LOG extends FlatObject,
+  REQ extends FlatObject,
+  RES extends FlatObject,
 >({
   endpoint,
   requestProps,

@@ -27,12 +27,12 @@ describe("ResultHandler", () => {
     {
       resultHandler: defaultResultHandler,
       name: "defaultResultHandler",
-      errorMethod: "json",
+      errorMethod: "json" as const,
     },
     {
       resultHandler: arrayResultHandler,
       name: "arrayResultHandler",
-      errorMethod: "send",
+      errorMethod: "send" as const,
     },
   ])(
     "$name",
