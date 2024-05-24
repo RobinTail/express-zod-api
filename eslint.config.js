@@ -24,7 +24,6 @@ export default [
     rules: {
       "no-empty": ["error", { allowEmptyCatch: true }],
       "no-empty-pattern": ["error", { allowObjectPatternsAsParameters: true }],
-      "@typescript-eslint/no-empty-object-type": "warn", // @todo remove
     },
   },
   // Things to turn on globally
