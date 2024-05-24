@@ -10,7 +10,7 @@ type Refined<T extends z.ZodTypeAny> =
  * @desc The type allowed on the top level of Middlewares and Endpoints
  * @param U — only "strip" is allowed for Middlewares due to intersection issue (Zod) #600
  * */
-export type IOSchema<U extends z.UnknownKeysParam = any> =
+export type IOSchema<U extends z.UnknownKeysParam = z.UnknownKeysParam> =
   | z.ZodObject<any, U>
   | z.ZodUnion<[IOSchema<U>, ...IOSchema<U>[]]>
   | z.ZodIntersection<IOSchema<U>, IOSchema<U>>
