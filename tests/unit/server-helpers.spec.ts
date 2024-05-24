@@ -94,7 +94,7 @@ describe("Server helpers", () => {
           locals: {
             [metaSymbol]: { logger: { ...rootLogger, isChild: true } },
           },
-        } as unknown as Response,
+        },
       });
       await handler(
         requestMock as unknown as Request,
