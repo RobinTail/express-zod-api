@@ -11,7 +11,6 @@ export type AbstractLogger = Record<
  * @example declare module "express-zod-api" { interface LoggerOverrides extends winston.Logger {} }
  * @link https://www.typescriptlang.org/docs/handbook/declaration-merging.html#module-augmentation
  * */
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type -- for module augmentation
 export interface LoggerOverrides {}
 
 export type ActualLogger = AbstractLogger & LoggerOverrides;
