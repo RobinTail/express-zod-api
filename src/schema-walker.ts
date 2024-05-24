@@ -1,31 +1,40 @@
 import { z } from "zod";
-import type { FlatObject } from "./common-helpers";
+import type { EmptyObject, FlatObject } from "./common-helpers";
 import { metaSymbol } from "./metadata";
 
-interface VariantDependingProps<U> {
-  regular: { next: (schema: z.ZodTypeAny) => U };
-  each: { prev: U };
-  last: {};
+export interface NextHandlerInc<U> {
+  next: (schema: z.ZodTypeAny) => U;
 }
-type HandlingVariant = keyof VariantDependingProps<unknown>;
+
+interface PrevInc<U> {
+  prev: U;
+}
 
 export type SchemaHandler<
   U,
-  Context extends FlatObject = {},
-  Variant extends HandlingVariant = "regular",
+  Context extends FlatObject = EmptyObject,
+  Variant extends "regular" | "each" | "last" = "regular",
 > = (
   schema: any, // eslint-disable-line @typescript-eslint/no-explicit-any
-  ctx: Context & VariantDependingProps<U>[Variant],
+  ctx: Context &
+    (Variant extends "regular"
+      ? NextHandlerInc<U>
+      : Variant extends "each"
+        ? PrevInc<U>
+        : Context),
 ) => U;
 
 export type HandlingRules<
   U,
-  Context extends FlatObject = {},
+  Context extends FlatObject = EmptyObject,
   K extends string | symbol = string | symbol,
 > = Partial<Record<K, SchemaHandler<U, Context>>>;
 
 /** @since 10.1.1 calling onEach _after_ handler and giving it the previously achieved result */
-export const walkSchema = <U extends object, Context extends FlatObject = {}>(
+export const walkSchema = <
+  U extends object,
+  Context extends FlatObject = EmptyObject,
+>(
   schema: z.ZodTypeAny,
   {
     onEach,

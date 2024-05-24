@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { z } from "zod";
-import { FlatObject } from "./common-helpers";
+import { EmptyObject, FlatObject } from "./common-helpers";
 import { CommonConfig } from "./config-type";
 import { Endpoint, Handler } from "./endpoint";
 import {
@@ -42,7 +42,7 @@ type BuildProps<
 
 export class EndpointsFactory<
   IN extends IOSchema<"strip"> | null = null,
-  OUT extends FlatObject = {},
+  OUT extends FlatObject = EmptyObject,
   SCO extends string = string,
   TAG extends string = string,
 > {
@@ -99,7 +99,7 @@ export class EndpointsFactory<
   public addExpressMiddleware<
     R extends Request,
     S extends Response,
-    AOUT extends FlatObject = {},
+    AOUT extends FlatObject = EmptyObject,
   >(
     middleware: ExpressMiddleware<R, S>,
     features?: ExpressMiddlewareFeatures<R, S, AOUT>,

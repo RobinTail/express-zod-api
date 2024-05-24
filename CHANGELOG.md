@@ -4,11 +4,13 @@
 
 ### v20.0.0
 
-- Publically exposed types are corrected for better constraints:
+- Publicly exposed types are corrected for better constraints:
   - `IOSchema` type: type arguments generalized to the most wide type possible;
   - The `requestProps`, `responseProps` and `loggerProps` properties of the `testEndpoint()` method's argument:
     - changed from `Record<string, any>` to `Record<string, unknown>`;
     - when assigning objects to those arguments, avoid `as` operator — use `satisfies` if extra constraints needed.
+  - The `options` property of a Middleware' and Endpoint's handler extends from `Record<string, never>` by default:
+    - You can not assign additional properties to the `options` directly — use middlewares to combine options.
 
 ## Version 19
 
