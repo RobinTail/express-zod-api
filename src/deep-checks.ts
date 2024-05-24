@@ -3,7 +3,7 @@ import { EmptyObject } from "./common-helpers";
 import { IOSchema } from "./io-schema";
 import { metaSymbol } from "./metadata";
 import { ezRawBrand } from "./raw-schema";
-import { HandlingRules, SchemaHandler } from "./schema-walker";
+import { HandlingRules, NextHandlerInc, SchemaHandler } from "./schema-walker";
 import { ezUploadBrand } from "./upload-schema";
 
 /** @desc Check is a schema handling rule returning boolean */
@@ -75,7 +75,7 @@ export const hasNestedSchema = (
           maxDepth,
           depth: depth + 1,
         }),
-    });
+    } as EmptyObject & NextHandlerInc<boolean>);
   }
   return false;
 };

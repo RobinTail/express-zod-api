@@ -1,21 +1,27 @@
 import { z } from "zod";
-import type { EmptyObject, FlatObject, Merged } from "./common-helpers";
+import type { EmptyObject, FlatObject } from "./common-helpers";
 import { metaSymbol } from "./metadata";
 
-interface VariantDependingProps<U> {
-  regular: { next: (schema: z.ZodTypeAny) => U };
-  each: { prev: U };
-  last: EmptyObject;
+export interface NextHandlerInc<U> {
+  next: (schema: z.ZodTypeAny) => U;
 }
-type HandlingVariant = keyof VariantDependingProps<unknown>;
+
+interface PrevInc<U> {
+  prev: U;
+}
 
 export type SchemaHandler<
   U,
   Context extends FlatObject = EmptyObject,
-  Variant extends HandlingVariant = "regular",
+  Variant extends "regular" | "each" | "last" = "regular",
 > = (
   schema: any, // eslint-disable-line @typescript-eslint/no-explicit-any
-  ctx: Merged<Context, VariantDependingProps<U>[Variant]>,
+  ctx: Context &
+    (Variant extends "regular"
+      ? NextHandlerInc<U>
+      : Variant extends "each"
+        ? PrevInc<U>
+        : Context),
 ) => U;
 
 export type HandlingRules<
@@ -48,19 +54,8 @@ export const walkSchema = <
   const next = (subject: z.ZodTypeAny) =>
     walkSchema(subject, { ctx, onEach, rules, onMissing });
   const result = handler
-    ? handler(schema, { ...ctx, next } as Merged<
-        Context,
-        VariantDependingProps<U>["regular"]
-      >)
-    : onMissing(
-        schema,
-        ctx as Merged<Context, VariantDependingProps<U>["last"]>,
-      );
-  const overrides =
-    onEach &&
-    onEach(schema, { prev: result, ...ctx } as Merged<
-      Context,
-      VariantDependingProps<U>["each"]
-    >);
+    ? handler(schema, { ...ctx, next })
+    : onMissing(schema, ctx);
+  const overrides = onEach && onEach(schema, { prev: result, ...ctx });
   return overrides ? { ...result, ...overrides } : result;
 };
