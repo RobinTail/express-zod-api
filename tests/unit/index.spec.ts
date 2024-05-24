@@ -27,6 +27,7 @@ import {
   ServerConfig,
 } from "../../src";
 import { describe, expect, test, vi } from "vitest";
+import { EmptyObject } from "../../src/common-helpers";
 
 describe("Index Entrypoint", () => {
   describe("exports", () => {
@@ -70,7 +71,14 @@ describe("Index Entrypoint", () => {
         logger: { level: "silent" },
         cors: false,
       });
-      expectType<MiddlewareDefinition<IOSchema<"strip">, {}, {}, string>>({
+      expectType<
+        MiddlewareDefinition<
+          IOSchema<"strip">,
+          EmptyObject,
+          EmptyObject,
+          string
+        >
+      >({
         type: "proprietary",
         input: z.object({}),
         middleware: vi.fn(),

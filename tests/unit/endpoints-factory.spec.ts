@@ -6,6 +6,7 @@ import {
   createResultHandler,
   defaultEndpointsFactory,
 } from "../../src";
+import { EmptyObject } from "../../src/common-helpers";
 import { Endpoint } from "../../src/endpoint";
 import { expectType } from "tsd";
 import { ActualLogger } from "../../src/logger-helpers";
@@ -199,7 +200,7 @@ describe("EndpointsFactory", () => {
         expect(requestMock.body).toHaveProperty("test");
         expect(requestMock.body.test).toBe("Here is the test");
         expect(options).toEqual({});
-        expectType<{}>(options);
+        expectType<EmptyObject>(options);
       });
 
       test("Should handle errors", async () => {

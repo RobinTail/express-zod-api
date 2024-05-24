@@ -11,6 +11,7 @@ import { AuxMethod, Method } from "./method";
 import { contentTypes } from "./content-type";
 
 export type FlatObject = Record<string, unknown>;
+export type EmptyObject = Record<string, never>;
 
 const areFilesAvailable = (request: Request): boolean => {
   const contentType = request.header("content-type") || "";

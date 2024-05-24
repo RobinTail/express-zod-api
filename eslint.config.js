@@ -24,7 +24,7 @@ export default [
     rules: {
       "no-empty": ["error", { allowEmptyCatch: true }],
       "no-empty-pattern": ["error", { allowObjectPatternsAsParameters: true }],
-      "@typescript-eslint/no-empty-object-type": "off", // @todo remove
+      "@typescript-eslint/no-empty-object-type": "warn", // @todo remove
     },
   },
   // Things to turn on globally
@@ -48,6 +48,10 @@ export default [
     files: ["tests/**/*.ts"],
     rules: {
       "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/no-empty-object-type": [
+        "warn",
+        { allowInterfaces: "with-single-extends" }, // for augmentation
+      ],
     },
   },
   // Special needs of plugin
@@ -64,6 +68,7 @@ export default [
       "prettier/prettier": "off",
       "import-x/no-duplicates": "off",
       "@typescript-eslint/no-explicit-any": "off", // @todo remove
+      "@typescript-eslint/no-empty-object-type": "off", // @todo remove
     },
   },
 ];
