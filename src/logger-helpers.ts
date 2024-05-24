@@ -3,7 +3,7 @@ import { isObject } from "./common-helpers";
 /** @desc You can use any logger compatible with this type. */
 export type AbstractLogger = Record<
   "info" | "debug" | "warn" | "error",
-  (message: string, meta?: any) => any // eslint-disable-line @typescript-eslint/no-explicit-any
+  (message: string, meta?: any) => any // eslint-disable-line @typescript-eslint/no-explicit-any -- for compatibility
 >;
 
 /**
@@ -11,7 +11,7 @@ export type AbstractLogger = Record<
  * @example declare module "express-zod-api" { interface LoggerOverrides extends winston.Logger {} }
  * @link https://www.typescriptlang.org/docs/handbook/declaration-merging.html#module-augmentation
  * */
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type -- for module augmentation
 export interface LoggerOverrides {}
 
 export type ActualLogger = AbstractLogger & LoggerOverrides;

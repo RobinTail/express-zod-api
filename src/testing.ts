@@ -13,11 +13,11 @@ import { LocalResponse } from "./server-helpers";
  * @example declare module "express-zod-api" { interface MockOverrides extends Mock {} }
  * @link https://www.typescriptlang.org/docs/handbook/declaration-merging.html#module-augmentation
  * */
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type -- for module augmentation
 export interface MockOverrides {}
 
 /** @desc Compatibility constraints for a function mocking method of a testing framework. */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- for assignment compatibility
 type MockFunction = (implementation?: (...args: any[]) => any) => MockOverrides;
 
 export const makeRequestMock = <REQ extends FlatObject>({

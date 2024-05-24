@@ -15,7 +15,7 @@ export type SchemaHandler<
   Context extends FlatObject = EmptyObject,
   Variant extends "regular" | "each" | "last" = "regular",
 > = (
-  schema: any, // eslint-disable-line @typescript-eslint/no-explicit-any
+  schema: any, // eslint-disable-line @typescript-eslint/no-explicit-any -- for assignmet compatibility
   ctx: Context &
     (Variant extends "regular"
       ? NextHandlerInc<U>
