@@ -1,5 +1,4 @@
 import { NextFunction, Request, Response } from "express";
-import { HttpError } from "http-errors";
 import { z } from "zod";
 import { hasTransformationOnTop } from "./deep-checks";
 import { EmptyObject, FlatObject } from "./common-helpers";
@@ -88,9 +87,10 @@ export class ExpressMiddleware<
   R extends Request,
   S extends Response,
   OUT extends FlatObject,
+  // @todo maybe from abstract
 > extends Middleware<
   z.ZodObject<EmptyObject, "strip">,
-  EmptyObject,
+  FlatObject,
   OUT,
   string
 > {
@@ -105,7 +105,7 @@ export class ExpressMiddleware<
       transformer = (err: Error) => err,
     }: {
       provider?: (request: R, response: S) => OUT | Promise<OUT>;
-      transformer?: (err: Error) => HttpError | Error;
+      transformer?: (err: Error) => Error;
     } = {},
   ) {
     super({

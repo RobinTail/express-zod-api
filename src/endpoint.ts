@@ -278,7 +278,8 @@ export class Endpoint<
       }
       Object.assign(
         options,
-        await mw.handle({
+        // @todo make ExpressMiddleware to extend from Abstract
+        await (mw as AbstractMiddleware).handle({
           input: finalInput,
           options,
           request,
