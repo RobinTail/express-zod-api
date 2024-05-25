@@ -126,7 +126,7 @@ describe("EndpointsFactory", () => {
         (newFactory["middlewares"][0].getSchema() as z.AnyZodObject).shape,
       ).toEqual({});
       expect(
-        await newFactory["middlewares"][0].handle({
+        await newFactory["middlewares"][0].execute({
           input: {},
           options: {},
           request: {} as Request,
@@ -169,7 +169,7 @@ describe("EndpointsFactory", () => {
         ).toEqual({});
         const requestMock = { body: { something: "awesome" } } as Request;
         const responseMock = {} as Response;
-        const options = await newFactory["middlewares"][0].handle({
+        const options = await newFactory["middlewares"][0].execute({
           input: {},
           options: {},
           request: requestMock,
@@ -202,7 +202,7 @@ describe("EndpointsFactory", () => {
         expect(newFactory["middlewares"].length).toBe(1);
         const requestMock = { body: { something: "awesome" } } as Request;
         const responseMock = {} as Response;
-        const options = await newFactory["middlewares"][0].handle({
+        const options = await newFactory["middlewares"][0].execute({
           input: {},
           options: {},
           request: requestMock,
@@ -232,7 +232,7 @@ describe("EndpointsFactory", () => {
         });
         const newFactory = factory[method](middleware);
         try {
-          await newFactory["middlewares"][0].handle({
+          await newFactory["middlewares"][0].execute({
             input: {},
             options: {},
             request: {} as Request,
@@ -263,7 +263,7 @@ describe("EndpointsFactory", () => {
           transformer: (err) => createHttpError(401, err.message),
         });
         try {
-          await newFactory["middlewares"][0].handle({
+          await newFactory["middlewares"][0].execute({
             input: {},
             options: {},
             request: {} as Request,

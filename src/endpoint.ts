@@ -269,7 +269,7 @@ export class Endpoint<
       }
       Object.assign(
         options,
-        await mw.handle({ input, options, request, response, logger }),
+        await mw.execute({ input, options, request, response, logger }),
       );
       if (response.writableEnded) {
         logger.warn(

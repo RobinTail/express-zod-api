@@ -20,7 +20,7 @@ type Handler<IN, OPT, OUT> = (params: {
 export abstract class AbstractMiddleware {
   public abstract getSecurity(): LogicalContainer<Security> | undefined;
   public abstract getSchema(): IOSchema<"strip">;
-  public abstract handle(params: {
+  public abstract execute(params: {
     input: unknown;
     options: FlatObject;
     request: Request;
@@ -80,7 +80,7 @@ export class Middleware<
   }
 
   /** @throws InputValidationError */
-  public override async handle({
+  public override async execute({
     input,
     ...rest
   }: {
