@@ -1020,8 +1020,7 @@ export const depictSecurityRefs = (
   return depictSecurityRefs({ or: [container] });
 };
 
-// @todo depictBody
-export const depictRequest = ({
+export const depictBody = ({
   method,
   path,
   schema,

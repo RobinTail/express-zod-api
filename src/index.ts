@@ -12,7 +12,7 @@ export {
   getMessageFromError,
   getStatusCodeFromError,
 } from "./common-helpers";
-export { createLogger, BuiltinLogger } from "./builtin-logger";
+export { BuiltinLogger } from "./builtin-logger";
 export { Middleware } from "./middleware";
 export {
   createResultHandler,
