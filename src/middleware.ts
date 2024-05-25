@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { z } from "zod";
 import { hasTransformationOnTop } from "./deep-checks";
 import { EmptyObject, FlatObject } from "./common-helpers";
-import { IOSchemaError } from "./errors";
+import { InputValidationError, IOSchemaError } from "./errors";
 import { IOSchema } from "./io-schema";
 import { LogicalContainer } from "./logical-container";
 import { Security } from "./security";
@@ -72,14 +72,27 @@ export class Middleware<
     return this.input;
   }
 
-  public override async handle(params: {
-    input: z.output<IN>;
+  public override async handle({
+    input,
+    ...rest
+  }: {
+    input: unknown;
     options: OPT;
     request: Request;
     response: Response;
     logger: ActualLogger;
   }) {
-    return this.handler(params);
+    try {
+      return this.handler({
+        input: (await this.input.parseAsync(input)) as z.output<IN>, // @todo what's happening here?
+        ...rest,
+      });
+    } catch (e) {
+      if (e instanceof z.ZodError) {
+        throw new InputValidationError(e);
+      }
+      throw e;
+    }
   }
 }
 
@@ -87,7 +100,6 @@ export class ExpressMiddleware<
   R extends Request,
   S extends Response,
   OUT extends FlatObject,
-  // @todo maybe from abstract
 > extends Middleware<
   z.ZodObject<EmptyObject, "strip">,
   FlatObject,

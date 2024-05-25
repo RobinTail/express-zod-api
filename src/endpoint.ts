@@ -267,25 +267,9 @@ export class Endpoint<
       if (method === "options" && !(mw instanceof ExpressMiddleware)) {
         continue;
       }
-      let finalInput: unknown;
-      try {
-        finalInput = await mw.getSchema().parseAsync(input);
-      } catch (e) {
-        if (e instanceof z.ZodError) {
-          throw new InputValidationError(e);
-        }
-        throw e;
-      }
       Object.assign(
         options,
-        // @todo make ExpressMiddleware to extend from Abstract
-        await (mw as AbstractMiddleware).handle({
-          input: finalInput,
-          options,
-          request,
-          response,
-          logger,
-        }),
+        await mw.handle({ input, options, request, response, logger }),
       );
       if (response.writableEnded) {
         logger.warn(
