@@ -44,9 +44,10 @@ export const getFinalEndpointInputSchema = <
     .map((mw) => mw.getSchema() as IOSchema)
     .concat(input);
 
-  const finalSchema = allSchemas.reduce((acc, schema) =>
-    acc.and(schema),
-  ) as ProbableIntersection<MIN, IN>;
+  const finalSchema = allSchemas.reduce((acc, schema) => acc.and(schema));
 
-  return allSchemas.reduce((acc, schema) => copyMeta(schema, acc), finalSchema);
+  return allSchemas.reduce(
+    (acc, schema) => copyMeta(schema, acc),
+    finalSchema,
+  ) as ProbableIntersection<MIN, IN>;
 };
