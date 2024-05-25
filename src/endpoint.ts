@@ -264,7 +264,7 @@ export class Endpoint<
     options: Partial<OPT>;
   }) {
     for (const mw of this.#middlewares) {
-      if (method === "options" && mw instanceof ExpressMiddleware) {
+      if (method === "options" && !(mw instanceof ExpressMiddleware)) {
         continue;
       }
       let finalInput: unknown;
