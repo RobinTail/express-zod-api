@@ -72,6 +72,7 @@ export class Middleware<
     return this.#input;
   }
 
+  /** @throws InputValidationError */
   public override async handle({
     input,
     ...rest
@@ -83,10 +84,8 @@ export class Middleware<
     logger: ActualLogger;
   }) {
     try {
-      return this.#handler({
-        input: (await this.#input.parseAsync(input)) as z.output<IN>, // @todo what's happening here?
-        ...rest,
-      });
+      const validInput: z.output<IN> = await this.#input.parseAsync(input);
+      return this.#handler({ ...rest, input: validInput });
     } catch (e) {
       if (e instanceof z.ZodError) {
         throw new InputValidationError(e);
