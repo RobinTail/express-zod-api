@@ -3,7 +3,7 @@ import { z } from "zod";
 import {
   AbstractEndpoint,
   EndpointsFactory,
-  createMiddleware,
+  Middleware,
   createResultHandler,
   defaultEndpointsFactory,
   defaultResultHandler,
@@ -61,11 +61,11 @@ describe("Endpoint", () => {
         .mockImplementationOnce(async ({ input }) => ({
           inc: input.n + 1,
         }));
-      const middlewareDefinitionMock = createMiddleware({
+      const middlewareDefinitionMock = new Middleware({
         input: z.object({
           n: z.number(),
         }),
-        middleware: middlewareMock,
+        handler: middlewareMock,
       });
       const resultHandlerSpy = vi.spyOn(defaultResultHandler, "handler");
       const factory = new EndpointsFactory(defaultResultHandler).addMiddleware(
@@ -229,11 +229,11 @@ describe("Endpoint", () => {
           response.end("to hell with all that!");
           return { inc: input.n + 1 };
         });
-      const middlewareDefinitionMock = createMiddleware({
+      const middlewareDefinitionMock = new Middleware({
         input: z.object({
           n: z.number(),
         }),
-        middleware: middlewareMock,
+        handler: middlewareMock,
       });
       const factory = defaultEndpointsFactory.addMiddleware(
         middlewareDefinitionMock,
@@ -403,11 +403,11 @@ describe("Endpoint", () => {
     test("should handle async refinements in input, output and middleware", async () => {
       const endpoint = new EndpointsFactory(defaultResultHandler)
         .addMiddleware(
-          createMiddleware({
+          new Middleware({
             input: z.object({
               m: z.number().refine(async (m) => m < 10),
             }),
-            middleware: async () => ({}),
+            handler: async () => ({}),
           }),
         )
         .build({
@@ -442,11 +442,11 @@ describe("Endpoint", () => {
     test("should skip proprietary ones", async () => {
       const endpoint = new EndpointsFactory(defaultResultHandler)
         .addMiddleware(
-          createMiddleware({
+          new Middleware({
             input: z.object({
               shouldNotBeHere: z.boolean(),
             }),
-            middleware: async () => assert.fail("Should not be here"),
+            handler: async () => assert.fail("Should not be here"),
           }),
         )
         .addExpressMiddleware((req, res, next) => {
@@ -531,9 +531,9 @@ describe("Endpoint", () => {
 
     test("thrown in middleware and caught in execute()", async () => {
       const factory = new EndpointsFactory(defaultResultHandler).addMiddleware(
-        createMiddleware({
+        new Middleware({
           input: z.object({}),
-          middleware: async () => assert.fail("Something went wrong"),
+          handler: async () => assert.fail("Something went wrong"),
         }),
       );
       const endpoint = factory.build({
@@ -788,11 +788,11 @@ describe("Endpoint", () => {
 
   describe("Issue #673: transformations in middlewares", () => {
     test("should avoid double parsing, should not mutate input", async () => {
-      const dateInputMiddleware = createMiddleware({
+      const dateInputMiddleware = new Middleware({
         input: z.object({
           middleware_date_input: ez.dateIn().optional(),
         }),
-        middleware: async ({ input: { middleware_date_input }, logger }) => {
+        handler: async ({ input: { middleware_date_input }, logger }) => {
           logger.debug("date in mw handler", typeof middleware_date_input);
           return {};
         },

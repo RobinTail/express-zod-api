@@ -16,6 +16,8 @@ exports[`Index Entrypoint > exports > InputValidationError should have certain v
 
 exports[`Index Entrypoint > exports > Integration should have certain value 1`] = `[Function]`;
 
+exports[`Index Entrypoint > exports > Middleware should have certain value 1`] = `[Function]`;
+
 exports[`Index Entrypoint > exports > MissingPeerError should have certain value 1`] = `[Function]`;
 
 exports[`Index Entrypoint > exports > OutputValidationError should have certain value 1`] = `[Function]`;
@@ -49,8 +51,6 @@ exports[`Index Entrypoint > exports > attachRouting should have certain value 1`
 exports[`Index Entrypoint > exports > createConfig should have certain value 1`] = `[Function]`;
 
 exports[`Index Entrypoint > exports > createLogger should have certain value 1`] = `[Function]`;
-
-exports[`Index Entrypoint > exports > createMiddleware should have certain value 1`] = `[Function]`;
 
 exports[`Index Entrypoint > exports > createResultHandler should have certain value 1`] = `[Function]`;
 
@@ -104,7 +104,7 @@ exports[`Index Entrypoint > exports > should have certain entities exposed 1`] =
   "getStatusCodeFromError",
   "createLogger",
   "BuiltinLogger",
-  "createMiddleware",
+  "Middleware",
   "createResultHandler",
   "defaultResultHandler",
   "arrayResultHandler",

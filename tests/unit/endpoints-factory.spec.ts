@@ -2,11 +2,10 @@ import { Request, RequestHandler, Response } from "express";
 import createHttpError, { HttpError } from "http-errors";
 import {
   EndpointsFactory,
-  createMiddleware,
+  Middleware,
   createResultHandler,
   defaultEndpointsFactory,
 } from "../../src";
-import { EmptyObject } from "../../src/common-helpers";
 import { Endpoint } from "../../src/endpoint";
 import { expectType } from "tsd";
 import { ActualLogger } from "../../src/logger-helpers";
@@ -30,11 +29,11 @@ describe("EndpointsFactory", () => {
     });
 
     test("Should create the factory with middleware and result handler", () => {
-      const middleware = createMiddleware({
+      const middleware = new Middleware({
         input: z.object({
           n: z.number(),
         }),
-        middleware: vi.fn(),
+        handler: vi.fn<any>(),
       });
       const resultHandlerMock = createResultHandler({
         getPositiveResponse: () => z.string(),
@@ -57,11 +56,11 @@ describe("EndpointsFactory", () => {
         handler: vi.fn(),
       });
       const factory = new EndpointsFactory(resultHandlerMock);
-      const middleware = createMiddleware({
+      const middleware = new Middleware({
         input: z.object({
           n: z.number(),
         }),
-        middleware: vi.fn(),
+        handler: vi.fn<any>(),
       });
       const newFactory = factory.addMiddleware(middleware);
       expect(factory["middlewares"]).toStrictEqual([]);
@@ -73,15 +72,15 @@ describe("EndpointsFactory", () => {
     test("Should maintain the chain of options", () => {
       defaultEndpointsFactory
         .addMiddleware(
-          createMiddleware({
+          new Middleware({
             input: z.object({}),
-            middleware: async () => ({ test: "fist option" }),
+            handler: async () => ({ test: "fist option" }),
           }),
         )
         .addMiddleware(
-          createMiddleware({
+          new Middleware({
             input: z.object({}),
-            middleware: async ({ options }) => ({
+            handler: async ({ options }) => ({
               second: `another option, ${options.test}`,
             }),
           }),
@@ -105,12 +104,14 @@ describe("EndpointsFactory", () => {
       expect(factory["middlewares"]).toStrictEqual([]);
       expect(factory["resultHandler"]).toStrictEqual(resultHandlerMock);
       expect(newFactory["middlewares"].length).toBe(1);
-      expect(newFactory["middlewares"][0].input).toBeInstanceOf(z.ZodObject);
+      expect(newFactory["middlewares"][0].getSchema()).toBeInstanceOf(
+        z.ZodObject,
+      );
       expect(
-        (newFactory["middlewares"][0].input as z.AnyZodObject).shape,
+        (newFactory["middlewares"][0].getSchema() as z.AnyZodObject).shape,
       ).toEqual({});
       expect(
-        await newFactory["middlewares"][0].middleware({
+        await newFactory["middlewares"][0].handle({
           input: {},
           options: {},
           request: {} as Request,
@@ -145,13 +146,15 @@ describe("EndpointsFactory", () => {
           }),
         });
         expect(newFactory["middlewares"].length).toBe(1);
-        expect(newFactory["middlewares"][0].input).toBeInstanceOf(z.ZodObject);
+        expect(newFactory["middlewares"][0].getSchema()).toBeInstanceOf(
+          z.ZodObject,
+        );
         expect(
-          (newFactory["middlewares"][0].input as z.AnyZodObject).shape,
+          (newFactory["middlewares"][0].getSchema() as z.AnyZodObject).shape,
         ).toEqual({});
         const requestMock = { body: { something: "awesome" } } as Request;
         const responseMock = {} as Response;
-        const options = await newFactory["middlewares"][0].middleware({
+        const options = await newFactory["middlewares"][0].handle({
           input: {},
           options: {},
           request: requestMock,
@@ -184,7 +187,7 @@ describe("EndpointsFactory", () => {
         expect(newFactory["middlewares"].length).toBe(1);
         const requestMock = { body: { something: "awesome" } } as Request;
         const responseMock = {} as Response;
-        const options = await newFactory["middlewares"][0].middleware({
+        const options = await newFactory["middlewares"][0].handle({
           input: {},
           options: {},
           request: requestMock,
@@ -200,7 +203,6 @@ describe("EndpointsFactory", () => {
         expect(requestMock.body).toHaveProperty("test");
         expect(requestMock.body.test).toBe("Here is the test");
         expect(options).toEqual({});
-        expectType<EmptyObject>(options);
       });
 
       test("Should handle errors", async () => {
@@ -215,7 +217,7 @@ describe("EndpointsFactory", () => {
         });
         const newFactory = factory[method](middleware);
         try {
-          await newFactory["middlewares"][0].middleware({
+          await newFactory["middlewares"][0].handle({
             input: {},
             options: {},
             request: {} as Request,
@@ -246,7 +248,7 @@ describe("EndpointsFactory", () => {
           transformer: (err) => createHttpError(401, err.message),
         });
         try {
-          await newFactory["middlewares"][0].middleware({
+          await newFactory["middlewares"][0].handle({
             input: {},
             options: {},
             request: {} as Request,
@@ -268,11 +270,11 @@ describe("EndpointsFactory", () => {
 
   describe(".build()", () => {
     test("Should create an endpoint with simple middleware", () => {
-      const middleware = createMiddleware({
+      const middleware = new Middleware({
         input: z.object({
           n: z.number(),
         }),
-        middleware: vi.fn(),
+        handler: vi.fn<any>(),
       });
       const resultHandlerMock = createResultHandler({
         getPositiveResponse: () => z.string(),
@@ -310,7 +312,7 @@ describe("EndpointsFactory", () => {
     });
 
     test("Should create an endpoint with refined object middleware", () => {
-      const middleware = createMiddleware({
+      const middleware = new Middleware({
         input: z
           .object({
             a: z.number().optional(),
@@ -319,7 +321,7 @@ describe("EndpointsFactory", () => {
           .refine((props) => Object.keys(props).length, {
             message: "Should be at least one option specified",
           }),
-        middleware: vi.fn(),
+        handler: vi.fn<any>(),
       });
       const resultHandlerMock = createResultHandler({
         getPositiveResponse: () => z.string(),
@@ -359,7 +361,7 @@ describe("EndpointsFactory", () => {
     });
 
     test("Should create an endpoint with intersection middleware", () => {
-      const middleware = createMiddleware({
+      const middleware = new Middleware({
         input: z
           .object({
             n1: z.number(),
@@ -369,7 +371,7 @@ describe("EndpointsFactory", () => {
               n2: z.number(),
             }),
           ),
-        middleware: vi.fn(),
+        handler: vi.fn<any>(),
       });
       const resultHandlerMock = createResultHandler({
         getPositiveResponse: () => z.string(),
@@ -410,7 +412,7 @@ describe("EndpointsFactory", () => {
     });
 
     test("Should create an endpoint with union middleware", () => {
-      const middleware = createMiddleware({
+      const middleware = new Middleware({
         input: z
           .object({
             n1: z.number(),
@@ -420,7 +422,7 @@ describe("EndpointsFactory", () => {
               n2: z.number(),
             }),
           ),
-        middleware: vi.fn(),
+        handler: vi.fn<any>(),
       });
       const resultHandlerMock = createResultHandler({
         getPositiveResponse: () => z.string(),

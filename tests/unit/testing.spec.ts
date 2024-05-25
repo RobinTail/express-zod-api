@@ -1,10 +1,6 @@
 import { expectType } from "tsd";
 import { z } from "zod";
-import {
-  createMiddleware,
-  defaultEndpointsFactory,
-  testEndpoint,
-} from "../../src";
+import { Middleware, defaultEndpointsFactory, testEndpoint } from "../../src";
 import { Mock, describe, expect, test, vi } from "vitest";
 
 declare module "../../src" {
@@ -18,9 +14,9 @@ describe("Testing", () => {
       async (fnMethod) => {
         const endpoint = defaultEndpointsFactory
           .addMiddleware(
-            createMiddleware({
+            new Middleware({
               input: z.object({}),
-              middleware: async ({ response }) => {
+              handler: async ({ response }) => {
                 response
                   .setHeader("X-Some", "header")
                   .header("X-Another", "header as well")

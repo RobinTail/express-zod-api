@@ -4,7 +4,7 @@ import { z } from "zod";
 import {
   EndpointsFactory,
   Method,
-  createMiddleware,
+  Middleware,
   createResultHandler,
   createServer,
   defaultResultHandler,
@@ -43,7 +43,7 @@ describe("App", async () => {
         }),
       )
         .addMiddleware(
-          createMiddleware({
+          new Middleware({
             input: z.object({
               mwError: z
                 .any()
@@ -55,7 +55,7 @@ describe("App", async () => {
                   ),
                 ),
             }),
-            middleware: async () => ({}),
+            handler: async () => ({}),
           }),
         )
         .build({
@@ -77,11 +77,11 @@ describe("App", async () => {
         }),
       test: new EndpointsFactory(defaultResultHandler)
         .addMiddleware(
-          createMiddleware({
+          new Middleware({
             input: z.object({
               key: z.string().refine((v) => v === "123", "Invalid key"),
             }),
-            middleware: async () => ({
+            handler: async () => ({
               user: {
                 id: 354,
               },
@@ -89,9 +89,9 @@ describe("App", async () => {
           }),
         )
         .addMiddleware(
-          createMiddleware({
+          new Middleware({
             input: z.object({}),
-            middleware: async ({ request, options: { user } }) => ({
+            handler: async ({ request, options: { user } }) => ({
               method: request.method.toLowerCase() as Method,
               permissions: user.id === 354 ? ["any"] : [],
             }),

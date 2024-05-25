@@ -88,7 +88,6 @@ export class ExpressMiddleware<
   R extends Request,
   S extends Response,
   OUT extends FlatObject,
-  // @todo maybe abstract:
 > extends Middleware<
   z.ZodObject<EmptyObject, "strip">,
   EmptyObject,
@@ -107,7 +106,7 @@ export class ExpressMiddleware<
     }: {
       provider?: (request: R, response: S) => OUT | Promise<OUT>;
       transformer?: (err: Error) => HttpError | Error;
-    },
+    } = {},
   ) {
     super({
       input: z.object({}),
