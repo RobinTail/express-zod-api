@@ -20,7 +20,7 @@ import { mapLogicalContainer } from "./logical-container";
 import { Method } from "./method";
 import {
   OpenAPIContext,
-  depictRequest,
+  depictBody,
   depictRequestParams,
   depictResponse,
   depictSecurity,
@@ -221,7 +221,7 @@ export class Documentation extends OpenApiBuilder {
       }
 
       const requestBody = inputSources.includes("body")
-        ? depictRequest({
+        ? depictBody({
             ...commons,
             paramNames: pluck("name", depictedParams),
             schema: endpoint.getSchema("input"),
