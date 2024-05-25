@@ -35,11 +35,11 @@ export class Middleware<
   OUT extends FlatObject,
   SCO extends string,
 > extends AbstractMiddleware {
-  protected input: IN;
-  protected security?: LogicalContainer<
+  readonly #input: IN;
+  readonly #security?: LogicalContainer<
     Security<Extract<keyof z.input<IN>, string>, SCO>
   >;
-  protected handler: Handler<z.output<IN>, OPT, OUT>;
+  readonly #handler: Handler<z.output<IN>, OPT, OUT>;
 
   constructor({
     input,
@@ -59,17 +59,17 @@ export class Middleware<
         "Using transformations on the top level of middleware input schema is not allowed.",
       ),
     );
-    this.input = input;
-    this.security = security;
-    this.handler = handler;
+    this.#input = input;
+    this.#security = security;
+    this.#handler = handler;
   }
 
   public override getSecurity() {
-    return this.security;
+    return this.#security;
   }
 
   public override getSchema() {
-    return this.input;
+    return this.#input;
   }
 
   public override async handle({
@@ -83,8 +83,8 @@ export class Middleware<
     logger: ActualLogger;
   }) {
     try {
-      return this.handler({
-        input: (await this.input.parseAsync(input)) as z.output<IN>, // @todo what's happening here?
+      return this.#handler({
+        input: (await this.#input.parseAsync(input)) as z.output<IN>, // @todo what's happening here?
         ...rest,
       });
     } catch (e) {
