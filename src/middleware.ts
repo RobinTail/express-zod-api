@@ -29,6 +29,19 @@ export abstract class AbstractMiddleware {
   }): Promise<FlatObject>;
 }
 
+export interface MiddlewareCreationProps<
+  IN extends IOSchema<"strip">,
+  OPT extends FlatObject,
+  OUT extends FlatObject,
+  SCO extends string,
+> {
+  input: IN;
+  security?: LogicalContainer<
+    Security<Extract<keyof z.input<IN>, string>, SCO>
+  >;
+  handler: Handler<z.output<IN>, OPT, OUT>;
+}
+
 export class Middleware<
   IN extends IOSchema<"strip">,
   OPT extends FlatObject,
@@ -45,13 +58,7 @@ export class Middleware<
     input,
     security,
     handler,
-  }: {
-    input: IN;
-    security?: LogicalContainer<
-      Security<Extract<keyof z.input<IN>, string>, SCO>
-    >;
-    handler: Handler<z.output<IN>, OPT, OUT>;
-  }) {
+  }: MiddlewareCreationProps<IN, OPT, OUT, SCO>) {
     super();
     assert(
       !hasTransformationOnTop(input),
@@ -84,7 +91,7 @@ export class Middleware<
     logger: ActualLogger;
   }) {
     try {
-      const validInput: z.output<IN> = await this.#input.parseAsync(input);
+      const validInput = (await this.#input.parseAsync(input)) as z.output<IN>;
       return this.#handler({ ...rest, input: validInput });
     } catch (e) {
       if (e instanceof z.ZodError) {

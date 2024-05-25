@@ -87,6 +87,21 @@ describe("EndpointsFactory", () => {
         );
       expect(true).toBeTruthy();
     });
+
+    test("Should accept creation props", () => {
+      defaultEndpointsFactory
+        .addMiddleware({
+          input: z.object({}),
+          handler: async () => ({ test: "fist option" }),
+        })
+        .addMiddleware({
+          input: z.object({}),
+          handler: async ({ options }) => ({
+            second: `another option, ${options.test}`,
+          }),
+        });
+      expect(true).toBeTruthy();
+    });
   });
 
   describe(".addOptions()", () => {

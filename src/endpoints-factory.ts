@@ -13,6 +13,7 @@ import {
   AbstractMiddleware,
   ExpressMiddleware,
   Middleware,
+  MiddlewareCreationProps,
 } from "./middleware";
 import {
   AnyResultHandlerDefinition,
@@ -79,18 +80,26 @@ export class EndpointsFactory<
     return factory;
   }
 
-  // @todo can have creation props here?
   public addMiddleware<
     AIN extends IOSchema<"strip">,
     AOUT extends FlatObject,
     ASCO extends string,
-  >(subject: Middleware<AIN, OUT, AOUT, ASCO>) {
+  >(
+    subject:
+      | Middleware<AIN, OUT, AOUT, ASCO>
+      | MiddlewareCreationProps<AIN, OUT, AOUT, ASCO>,
+  ) {
     return EndpointsFactory.#create<
       ProbableIntersection<IN, AIN>,
       OUT & AOUT,
       SCO & ASCO,
       TAG
-    >(this.middlewares.concat(subject), this.resultHandler);
+    >(
+      this.middlewares.concat(
+        subject instanceof Middleware ? subject : new Middleware(subject),
+      ),
+      this.resultHandler,
+    );
   }
 
   public use = this.addExpressMiddleware;
