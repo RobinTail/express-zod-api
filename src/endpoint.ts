@@ -25,7 +25,7 @@ import { lastResortHandler } from "./last-resort";
 import { ActualLogger } from "./logger-helpers";
 import { LogicalContainer, combineContainers } from "./logical-container";
 import { AuxMethod, Method } from "./method";
-import { AnyMiddlewareDef } from "./middleware";
+import { AbstractMiddleware, ExpressMiddleware } from "./middleware";
 import { ContentType, contentTypes } from "./content-type";
 import { AnyResultHandlerDefinition } from "./result-handler";
 import { Security } from "./security";
@@ -75,7 +75,7 @@ export class Endpoint<
 > extends AbstractEndpoint {
   readonly #descriptions: Record<DescriptionVariant, string | undefined>;
   readonly #methods: ReadonlyArray<Method>;
-  readonly #middlewares: AnyMiddlewareDef[];
+  readonly #middlewares: AbstractMiddleware[];
   readonly #mimeTypes: Record<MimeVariant, ReadonlyArray<string>>;
   readonly #responses: Record<
     ResponseVariant,
@@ -102,7 +102,7 @@ export class Endpoint<
     description: long,
     shortDescription: short,
   }: {
-    middlewares?: AnyMiddlewareDef[];
+    middlewares?: AbstractMiddleware[];
     inputSchema: IN;
     outputSchema: OUT;
     handler: Handler<z.output<IN>, z.input<OUT>, OPT>;
@@ -204,8 +204,10 @@ export class Endpoint<
 
   public override getSecurity() {
     return this.#middlewares.reduce<LogicalContainer<Security>>(
-      (acc, middleware) =>
-        middleware.security ? combineContainers(acc, middleware.security) : acc,
+      (acc, middleware) => {
+        const security = middleware.getSecurity();
+        return security ? combineContainers(acc, security) : acc;
+      },
       { and: [] },
     );
   }
@@ -261,13 +263,13 @@ export class Endpoint<
     logger: ActualLogger;
     options: Partial<OPT>;
   }) {
-    for (const def of this.#middlewares) {
-      if (method === "options" && def.type === "proprietary") {
+    for (const mw of this.#middlewares) {
+      if (method === "options" && mw instanceof ExpressMiddleware) {
         continue;
       }
       let finalInput: unknown;
       try {
-        finalInput = await def.input.parseAsync(input);
+        finalInput = await mw.getSchema().parseAsync(input);
       } catch (e) {
         if (e instanceof z.ZodError) {
           throw new InputValidationError(e);
@@ -276,7 +278,7 @@ export class Endpoint<
       }
       Object.assign(
         options,
-        await def.middleware({
+        await mw.handle({
           input: finalInput,
           options,
           request,
@@ -286,7 +288,7 @@ export class Endpoint<
       );
       if (response.writableEnded) {
         logger.warn(
-          `The middleware ${def.middleware.name} has closed the stream. Accumulated options:`,
+          `The middleware ${mw.constructor.name} has closed the stream. Accumulated options:`,
           options,
         );
         break;

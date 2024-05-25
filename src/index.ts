@@ -13,7 +13,7 @@ export {
   getStatusCodeFromError,
 } from "./common-helpers";
 export { createLogger, BuiltinLogger } from "./builtin-logger";
-export { createMiddleware } from "./middleware";
+export { Middleware } from "./middleware";
 export {
   createResultHandler,
   defaultResultHandler,
@@ -47,7 +47,6 @@ export type { FlatObject } from "./common-helpers";
 export type { Method } from "./method";
 export type { IOSchema } from "./io-schema";
 export type { CommonConfig, AppConfig, ServerConfig } from "./config-type";
-export type { MiddlewareDefinition } from "./middleware";
 export type { ResultHandlerDefinition } from "./result-handler";
 export type { ApiResponse } from "./api-response";
 export type {

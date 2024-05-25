@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { HttpError } from "http-errors";
 import { z } from "zod";
 import { hasTransformationOnTop } from "./deep-checks";
-import { FlatObject } from "./common-helpers";
+import { EmptyObject, FlatObject } from "./common-helpers";
 import { IOSchemaError } from "./errors";
 import { IOSchema } from "./io-schema";
 import { LogicalContainer } from "./logical-container";
@@ -10,74 +10,117 @@ import { Security } from "./security";
 import { ActualLogger } from "./logger-helpers";
 import assert from "node:assert/strict";
 
-interface MiddlewareParams<IN, OPT> {
+type Handler<IN, OPT, OUT> = (params: {
   input: IN;
   options: OPT;
   request: Request;
   response: Response;
   logger: ActualLogger;
+}) => Promise<OUT>;
+
+export abstract class AbstractMiddleware {
+  public abstract getSecurity(): LogicalContainer<Security> | undefined;
+  public abstract getSchema(): IOSchema<"strip">;
+  public abstract handle(params: {
+    input: unknown;
+    options: FlatObject;
+    request: Request;
+    response: Response;
+    logger: ActualLogger;
+  }): Promise<FlatObject>;
 }
 
-type Middleware<IN, OPT, OUT> = (
-  params: MiddlewareParams<IN, OPT>,
-) => Promise<OUT>;
-
-interface MiddlewareCreationProps<
+export class Middleware<
   IN extends IOSchema<"strip">,
-  OPT,
+  OPT extends FlatObject,
   OUT extends FlatObject,
   SCO extends string,
-> {
-  input: IN;
-  security?: LogicalContainer<
+> extends AbstractMiddleware {
+  protected input: IN;
+  protected security?: LogicalContainer<
     Security<Extract<keyof z.input<IN>, string>, SCO>
   >;
-  middleware: Middleware<z.output<IN>, OPT, OUT>;
+  protected handler: Handler<z.output<IN>, OPT, OUT>;
+
+  constructor({
+    input,
+    security,
+    handler,
+  }: {
+    input: IN;
+    security?: LogicalContainer<
+      Security<Extract<keyof z.input<IN>, string>, SCO>
+    >;
+    handler: Handler<z.output<IN>, OPT, OUT>;
+  }) {
+    super();
+    assert(
+      !hasTransformationOnTop(input),
+      new IOSchemaError(
+        "Using transformations on the top level of middleware input schema is not allowed.",
+      ),
+    );
+    this.input = input;
+    this.security = security;
+    this.handler = handler;
+  }
+
+  public override getSecurity() {
+    return this.security;
+  }
+
+  public override getSchema() {
+    return this.input;
+  }
+
+  public override async handle(params: {
+    input: z.output<IN>;
+    options: OPT;
+    request: Request;
+    response: Response;
+    logger: ActualLogger;
+  }) {
+    return this.handler(params);
+  }
 }
 
-export interface MiddlewareDefinition<
-  IN extends IOSchema<"strip">,
-  OPT,
-  OUT extends FlatObject,
-  SCO extends string,
-> extends MiddlewareCreationProps<IN, OPT, OUT, SCO> {
-  type: "proprietary" | "express";
-}
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- no better way found yet
-export type AnyMiddlewareDef = MiddlewareDefinition<any, any, any, any>;
-
-export const createMiddleware = <
-  IN extends IOSchema<"strip">,
-  OPT,
-  OUT extends FlatObject,
-  SCO extends string,
->(
-  props: MiddlewareCreationProps<IN, OPT, OUT, SCO>,
-): MiddlewareDefinition<IN, OPT, OUT, SCO> => {
-  assert(
-    !hasTransformationOnTop(props.input),
-    new IOSchemaError(
-      "Using transformations on the top level of middleware input schema is not allowed.",
-    ),
-  );
-  return {
-    ...props,
-    type: "proprietary",
-  };
-};
-
-export type ExpressMiddleware<R extends Request, S extends Response> = (
-  request: R,
-  response: S,
-  next: NextFunction,
-) => void | Promise<void>;
-
-export interface ExpressMiddlewareFeatures<
+export class ExpressMiddleware<
   R extends Request,
   S extends Response,
   OUT extends FlatObject,
+  // @todo maybe abstract:
+> extends Middleware<
+  z.ZodObject<EmptyObject, "strip">,
+  EmptyObject,
+  OUT,
+  string
 > {
-  provider?: (request: R, response: S) => OUT | Promise<OUT>;
-  transformer?: (err: Error) => HttpError | Error;
+  constructor(
+    originalMw: (
+      request: R,
+      response: S,
+      next: NextFunction,
+    ) => void | Promise<void>,
+    {
+      provider = () => ({}) as OUT,
+      transformer = (err: Error) => err,
+    }: {
+      provider?: (request: R, response: S) => OUT | Promise<OUT>;
+      transformer?: (err: Error) => HttpError | Error;
+    },
+  ) {
+    super({
+      input: z.object({}),
+      handler: async ({ request, response }) =>
+        new Promise<OUT>((resolve, reject) => {
+          const next = (err?: unknown) => {
+            if (err && err instanceof Error) {
+              return reject(transformer(err));
+            }
+            resolve(provider(request as R, response as S));
+          };
+          originalMw(request as R, response as S, next);
+        }),
+    });
+  }
 }
