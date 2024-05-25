@@ -257,7 +257,7 @@ describe("Endpoint", () => {
       expect(loggerMock.error).toHaveBeenCalledTimes(0);
       expect(loggerMock.warn).toHaveBeenCalledTimes(1);
       expect(loggerMock.warn.mock.calls[0][0]).toBe(
-        "The middleware spy has closed the stream. Accumulated options:",
+        "A middleware has closed the stream. Accumulated options:",
       );
       expect(loggerMock.warn.mock.calls[0][1]).toEqual({ inc: 454 });
       expect(responseMock.status).toHaveBeenCalledTimes(0);

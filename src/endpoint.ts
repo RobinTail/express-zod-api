@@ -288,7 +288,7 @@ export class Endpoint<
       );
       if (response.writableEnded) {
         logger.warn(
-          `The middleware ${mw.constructor.name} has closed the stream. Accumulated options:`,
+          "A middleware has closed the stream. Accumulated options:",
           options,
         );
         break;
