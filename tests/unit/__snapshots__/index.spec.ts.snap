@@ -48,8 +48,6 @@ exports[`Index Entrypoint > exports > attachRouting should have certain value 1`
 
 exports[`Index Entrypoint > exports > createConfig should have certain value 1`] = `[Function]`;
 
-exports[`Index Entrypoint > exports > createLogger should have certain value 1`] = `[Function]`;
-
 exports[`Index Entrypoint > exports > createMiddleware should have certain value 1`] = `[Function]`;
 
 exports[`Index Entrypoint > exports > createResultHandler should have certain value 1`] = `[Function]`;
@@ -102,7 +100,6 @@ exports[`Index Entrypoint > exports > should have certain entities exposed 1`] =
   "getExamples",
   "getMessageFromError",
   "getStatusCodeFromError",
-  "createLogger",
   "BuiltinLogger",
   "createMiddleware",
   "createResultHandler",
