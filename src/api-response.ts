@@ -34,27 +34,7 @@ export interface ApiResponse<S extends z.ZodTypeAny> extends Opt<S> {
   mimeType?: string;
 }
 
-// @todo get rid
 export type AnyResponseDefinition =
   | z.ZodTypeAny // plain schema, default status codes applied
   | ApiResponse<z.ZodTypeAny> // single response definition, status code(s) customizable
   | ApiResponse<z.ZodTypeAny>[]; // Feature #1431: different responses for different status codes
-
-// @todo get rid
-export const normalizeApiResponse = (
-  subject: AnyResponseDefinition,
-  fallback: Omit<NormalizedResponse<z.ZodTypeAny>, "schema">,
-): NormalizedResponse<z.ZodTypeAny>[] => {
-  if (subject instanceof z.ZodType) {
-    return [{ ...fallback, schema: subject }];
-  }
-  return (Array.isArray(subject) ? subject : [subject]).map(
-    ({ schema, statusCodes, statusCode, mimeTypes, mimeType }) => ({
-      schema,
-      statusCodes: statusCode
-        ? [statusCode]
-        : statusCodes || fallback.statusCodes,
-      mimeTypes: mimeType ? [mimeType] : mimeTypes || fallback.mimeTypes,
-    }),
-  );
-};
