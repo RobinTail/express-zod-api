@@ -61,16 +61,13 @@ describe("Endpoint", () => {
         .mockImplementationOnce(async ({ input }) => ({
           inc: input.n + 1,
         }));
-      const middlewareDefinitionMock = new Middleware({
+      const resultHandlerSpy = vi.spyOn(defaultResultHandler, "handler");
+      const factory = new EndpointsFactory(defaultResultHandler).addMiddleware({
         input: z.object({
           n: z.number(),
         }),
         handler: middlewareMock,
       });
-      const resultHandlerSpy = vi.spyOn(defaultResultHandler, "handler");
-      const factory = new EndpointsFactory(defaultResultHandler).addMiddleware(
-        middlewareDefinitionMock,
-      );
       const handlerMock = vi
         .fn()
         .mockImplementationOnce(async ({ input, options }) => ({
@@ -229,15 +226,12 @@ describe("Endpoint", () => {
           response.end("to hell with all that!");
           return { inc: input.n + 1 };
         });
-      const middlewareDefinitionMock = new Middleware({
+      const factory = defaultEndpointsFactory.addMiddleware({
         input: z.object({
           n: z.number(),
         }),
         handler: middlewareMock,
       });
-      const factory = defaultEndpointsFactory.addMiddleware(
-        middlewareDefinitionMock,
-      );
       const handlerMock = vi.fn();
       const endpoint = factory.build({
         method: "post",
@@ -402,14 +396,12 @@ describe("Endpoint", () => {
   describe("Issue #269: Async refinements", () => {
     test("should handle async refinements in input, output and middleware", async () => {
       const endpoint = new EndpointsFactory(defaultResultHandler)
-        .addMiddleware(
-          new Middleware({
-            input: z.object({
-              m: z.number().refine(async (m) => m < 10),
-            }),
-            handler: async () => ({}),
+        .addMiddleware({
+          input: z.object({
+            m: z.number().refine(async (m) => m < 10),
           }),
-        )
+          handler: async () => ({}),
+        })
         .build({
           methods: ["post"],
           input: z.object({
@@ -441,14 +433,12 @@ describe("Endpoint", () => {
   describe("Issue #514: Express native middlewares for OPTIONS request", () => {
     test("should skip proprietary ones", async () => {
       const endpoint = new EndpointsFactory(defaultResultHandler)
-        .addMiddleware(
-          new Middleware({
-            input: z.object({
-              shouldNotBeHere: z.boolean(),
-            }),
-            handler: async () => assert.fail("Should not be here"),
+        .addMiddleware({
+          input: z.object({
+            shouldNotBeHere: z.boolean(),
           }),
-        )
+          handler: async () => assert.fail("Should not be here"),
+        })
         .addExpressMiddleware((req, res, next) => {
           res.set("X-Custom-Header", "test");
           next();
@@ -530,12 +520,10 @@ describe("Endpoint", () => {
     });
 
     test("thrown in middleware and caught in execute()", async () => {
-      const factory = new EndpointsFactory(defaultResultHandler).addMiddleware(
-        new Middleware({
-          input: z.object({}),
-          handler: async () => assert.fail("Something went wrong"),
-        }),
-      );
+      const factory = new EndpointsFactory(defaultResultHandler).addMiddleware({
+        input: z.object({}),
+        handler: async () => assert.fail("Something went wrong"),
+      });
       const endpoint = factory.build({
         methods: ["post"],
         input: z.object({}),

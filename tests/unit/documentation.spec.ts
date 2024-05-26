@@ -1215,18 +1215,16 @@ describe("Documentation", () => {
         routing: {
           v1: {
             getSomething: defaultEndpointsFactory
-              .addMiddleware(
-                new Middleware({
-                  input: z
-                    .object({
-                      key: z.string(),
-                    })
-                    .example({
-                      key: "1234-56789-01",
-                    }),
-                  handler: vi.fn(),
-                }),
-              )
+              .addMiddleware({
+                input: z
+                  .object({
+                    key: z.string(),
+                  })
+                  .example({
+                    key: "1234-56789-01",
+                  }),
+                handler: vi.fn(),
+              })
               .build({
                 method: "post",
                 input: z

@@ -80,12 +80,12 @@ describe("EndpointsFactory", () => {
         .addMiddleware(
           new Middleware({
             input: z.object({}),
-            handler: async ({ options }) => ({
-              second: `another option, ${options.test}`,
-            }),
+            handler: async ({ options }) => {
+              expectType<string>(options.test);
+              return { second: `another option, ${options.test}` };
+            },
           }),
         );
-      expect(true).toBeTruthy();
     });
 
     test("Should accept creation props", () => {
@@ -96,11 +96,13 @@ describe("EndpointsFactory", () => {
         })
         .addMiddleware({
           input: z.object({}),
-          handler: async ({ options }) => ({
-            second: `another option, ${options.test}`,
-          }),
+          handler: async ({ options }) => {
+            expectType<string>(options.test);
+            return {
+              second: `another option, ${options.test}`,
+            };
+          },
         });
-      expect(true).toBeTruthy();
     });
   });
 
