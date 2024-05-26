@@ -1,8 +1,14 @@
 import { z } from "zod";
-import { Middleware } from "../../src";
+import { Request, Response } from "express";
+import { InputValidationError, Middleware } from "../../src";
 import { IOSchemaError } from "../../src/errors";
 import { describe, expect, test, vi } from "vitest";
 import { AbstractMiddleware } from "../../src/middleware";
+import {
+  makeLoggerMock,
+  makeRequestMock,
+  makeResponseMock,
+} from "../../src/testing";
 
 describe("Middleware", () => {
   describe("constructor()", () => {
@@ -46,6 +52,28 @@ describe("Middleware", () => {
           ),
         );
       });
+    });
+  });
+
+  describe(".execute()", () => {
+    test("should validate the supplied input or throw an InputValidationError", async () => {
+      const mw = new Middleware({
+        input: z.object({
+          test: z.string(),
+        }),
+        handler: vi.fn<any>(),
+      });
+      await expect(() =>
+        mw.execute({
+          input: { test: 123 },
+          options: {},
+          logger: makeLoggerMock({ fnMethod: vi.fn }),
+          request: makeRequestMock({ fnMethod: vi.fn }) as unknown as Request,
+          response: makeResponseMock({
+            fnMethod: vi.fn,
+          }) as unknown as Response,
+        }),
+      ).rejects.toThrow(InputValidationError);
     });
   });
 });
