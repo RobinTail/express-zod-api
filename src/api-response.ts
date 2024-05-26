@@ -34,7 +34,7 @@ export interface ApiResponse<S extends z.ZodTypeAny> extends Opt<S> {
   mimeType?: string;
 }
 
-export type AnyResponseDefinition =
-  | z.ZodTypeAny // plain schema, default status codes applied
-  | ApiResponse<z.ZodTypeAny> // single response definition, status code(s) customizable
-  | ApiResponse<z.ZodTypeAny>[]; // Feature #1431: different responses for different status codes
+export type AnyResponseDefinition<S extends z.ZodTypeAny = z.ZodTypeAny> =
+  | S // plain schema, default status codes applied
+  | ApiResponse<S> // single response definition, status code(s) customizable
+  | ApiResponse<S>[]; // Feature #1431: different responses for different status codes

@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 import { z } from "zod";
 import {
   AnyResponseDefinition,
-  ApiResponse,
   defaultStatusCodes,
   NormalizedResponse,
 } from "./api-response";
@@ -107,15 +106,8 @@ export class ResultHandler<
   }
 }
 
-type ExtractSchema<T extends AnyResponseDefinition> = T extends ApiResponse<
-  infer S
->[]
-  ? S
-  : T extends ApiResponse<infer S>
-    ? S
-    : T extends z.ZodTypeAny
-      ? T
-      : never;
+type ExtractSchema<T extends AnyResponseDefinition> =
+  T extends AnyResponseDefinition<infer S> ? S : never;
 
 export const defaultResultHandler = new ResultHandler({
   positive: (output: IOSchema) => {
