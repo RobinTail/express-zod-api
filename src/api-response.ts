@@ -16,11 +16,11 @@ export interface NormalizedResponse<S extends z.ZodTypeAny> {
   statusCodes: [number, ...number[]];
 }
 
+// @todo naming
 type Opt<S extends z.ZodTypeAny> = Pick<NormalizedResponse<S>, "schema"> &
   Partial<Omit<NormalizedResponse<S>, "schema">>;
 
 export interface ApiResponse<S extends z.ZodTypeAny> extends Opt<S> {
-  schema: S;
   /**
    * @default 200 for a positive response
    * @default 400 for a negative response
