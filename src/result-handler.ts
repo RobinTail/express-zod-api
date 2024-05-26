@@ -32,13 +32,21 @@ type Handler<RES> = (params: {
 }) => void | Promise<void>;
 
 export abstract class AbstractResultHandler {
+  readonly #handler: Handler<unknown>;
+
+  protected constructor(handler: Handler<unknown>) {
+    this.#handler = handler;
+  }
+
+  public execute(...params: Parameters<Handler<unknown>>) {
+    return this.#handler(...params);
+  }
+
   public abstract getPositiveResponse(
     output: IOSchema,
   ): NormalizedResponse<z.ZodTypeAny>[];
   public abstract getNegativeResponse(): NormalizedResponse<z.ZodTypeAny>[];
-  public abstract execute(
-    ...params: Parameters<Handler<unknown>>
-  ): ReturnType<Handler<unknown>>;
+
   protected normalize(
     subject: AnyResponseDefinition,
     fallback: {
@@ -67,7 +75,6 @@ export class ResultHandler<
 > extends AbstractResultHandler {
   readonly #positive: (output: IOSchema) => POS;
   readonly #negative: NEG;
-  readonly #handler: Handler<z.output<ExtractSchema<POS> | ExtractSchema<NEG>>>;
 
   constructor({
     positive,
@@ -79,10 +86,9 @@ export class ResultHandler<
     negative: NEG;
     handler: Handler<z.output<ExtractSchema<POS> | ExtractSchema<NEG>>>;
   }) {
-    super();
+    super(handler);
     this.#positive = positive;
     this.#negative = negative;
-    this.#handler = handler;
   }
 
   public override getPositiveResponse(output: IOSchema) {
@@ -98,10 +104,6 @@ export class ResultHandler<
       statusCodes: [defaultStatusCodes.negative],
       mimeTypes: [contentTypes.json],
     });
-  }
-
-  public override execute(...params: Parameters<Handler<unknown>>) {
-    return this.#handler(...params);
   }
 }
 
