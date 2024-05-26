@@ -39,7 +39,7 @@ export const getFinalEndpointInputSchema = <
 >(
   middlewares: AbstractMiddleware[],
   input: IN,
-): ProbableIntersection<MIN, IN> => {
+) => {
   const allSchemas = middlewares
     .map((mw) => mw.getSchema() as IOSchema)
     .concat(input);
