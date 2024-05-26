@@ -34,6 +34,9 @@ type Handler<RES> = (params: {
 export abstract class AbstractResultHandler {
   public abstract getPositiveResponse(output: IOSchema): NormalizedResponse[];
   public abstract getNegativeResponse(): NormalizedResponse[];
+  public abstract execute(
+    ...params: Parameters<Handler<unknown>>
+  ): ReturnType<Handler<unknown>>;
   protected normalize(
     subject:
       | z.ZodTypeAny
@@ -67,13 +70,16 @@ export class ResultHandler<
     output: IOSchema,
   ) => POS | ApiResponse<POS> | ApiResponse<POS>[];
   readonly #negative: NormalizedResponse[];
+  readonly #handler: Handler<z.output<POS> | z.output<NEG>>;
 
   constructor({
     positive,
     negative,
+    handler,
   }: {
     positive: (output: IOSchema) => POS | ApiResponse<POS> | ApiResponse<POS>[];
     negative: NEG | ApiResponse<NEG> | ApiResponse<NEG>[];
+    handler: Handler<z.output<POS> | z.output<NEG>>;
   }) {
     super();
     this.#positive = positive;
@@ -81,6 +87,7 @@ export class ResultHandler<
       statusCodes: [defaultStatusCodes.negative],
       mimeTypes: [contentTypes.json],
     });
+    this.#handler = handler;
   }
 
   public override getPositiveResponse(output: IOSchema) {
@@ -93,6 +100,12 @@ export class ResultHandler<
 
   public override getNegativeResponse() {
     return this.#negative;
+  }
+
+  public override execute(
+    ...params: Parameters<Handler<z.output<POS> | z.output<NEG>>>
+  ) {
+    return this.#handler(...params);
   }
 }
 
