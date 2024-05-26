@@ -29,9 +29,7 @@ interface ResultHandlerParams<RES> {
   logger: ActualLogger;
 }
 
-type ResultHandler<RES> = (
-  params: ResultHandlerParams<RES>,
-) => void | Promise<void>;
+type Handler<RES> = (params: ResultHandlerParams<RES>) => void | Promise<void>;
 
 type ExtractSchema<T extends AnyResponseDefinition> = T extends ApiResponse<
   infer S
@@ -49,9 +47,7 @@ export interface ResultHandlerDefinition<
 > {
   getPositiveResponse: (output: IOSchema) => POS;
   getNegativeResponse: () => NEG;
-  handler: ResultHandler<
-    z.output<ExtractSchema<POS>> | z.output<ExtractSchema<NEG>>
-  >;
+  handler: Handler<z.output<ExtractSchema<POS>> | z.output<ExtractSchema<NEG>>>;
 }
 
 export type AnyResultHandlerDefinition = ResultHandlerDefinition<
