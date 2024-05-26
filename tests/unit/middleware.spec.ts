@@ -58,9 +58,7 @@ describe("Middleware", () => {
   describe(".execute()", () => {
     test("should validate the supplied input or throw an InputValidationError", async () => {
       const mw = new Middleware({
-        input: z.object({
-          test: z.string(),
-        }),
+        input: z.object({ test: z.string() }),
         handler: vi.fn<any>(),
       });
       await expect(() =>
@@ -74,6 +72,33 @@ describe("Middleware", () => {
           }) as unknown as Response,
         }),
       ).rejects.toThrow(InputValidationError);
+    });
+
+    test("should call the handler and return its output", async () => {
+      const handlerMock = vi.fn<any>(() => ({ result: "test" }));
+      const mw = new Middleware({
+        input: z.object({ test: z.string() }),
+        handler: handlerMock,
+      });
+      const loggerMock = makeLoggerMock({ fnMethod: vi.fn });
+      const requestMock = makeRequestMock({ fnMethod: vi.fn });
+      const responseMock = makeResponseMock({ fnMethod: vi.fn });
+      expect(
+        await mw.execute({
+          input: { test: "something" },
+          options: { opt: "anything " },
+          logger: loggerMock,
+          request: requestMock as unknown as Request,
+          response: responseMock as unknown as Response,
+        }),
+      ).toEqual({ result: "test" });
+      expect(handlerMock).toHaveBeenCalledWith({
+        input: { test: "something" },
+        options: { opt: "anything " },
+        logger: loggerMock,
+        request: requestMock,
+        response: responseMock,
+      });
     });
   });
 });
