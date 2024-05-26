@@ -15,6 +15,27 @@
   - The `options` property of a Middleware' and Endpoint's handler extends from `Record<string, never>` by default:
     - You can not assign additional properties to the `options` directly — use middlewares to combine options.
 
+```ts
+// before
+factory.addMiddleware(
+  createMiddleware({
+    input: z.object({}),
+    middleware: async () => ({}),
+  }),
+);
+
+// after, variant 1:
+factory.addMiddleware(
+  new Middleware({
+    input: z.object({}),
+    handler: async () => ({}),
+  }),
+);
+
+// variant 2: short syntax now available:
+factory.addMiddleware({ input: z.object({}), handler: async () => ({}) });
+```
+
 ## Version 19
 
 ### v19.2.1

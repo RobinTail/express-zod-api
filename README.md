@@ -241,9 +241,9 @@ Here is an example of the authentication middleware, that checks a `key` from in
 ```typescript
 import { z } from "zod";
 import createHttpError from "http-errors";
-import { createMiddleware } from "express-zod-api";
+import { Middleware } from "express-zod-api";
 
-const authMiddleware = createMiddleware({
+const authMiddleware = new Middleware({
   security: {
     // this information is optional and used for generating documentation
     and: [
@@ -254,7 +254,7 @@ const authMiddleware = createMiddleware({
   input: z.object({
     key: z.string().min(1),
   }),
-  middleware: async ({ input: { key }, request, logger }) => {
+  handler: async ({ input: { key }, request, logger }) => {
     logger.debug("Checking the key and token");
     const user = await db.Users.findOne({ key });
     if (!user) {
@@ -287,6 +287,15 @@ You can connect the middleware to endpoints factory right away, making it kind o
 import { defaultEndpointsFactory } from "express-zod-api";
 
 const endpointsFactory = defaultEndpointsFactory.addMiddleware(authMiddleware);
+```
+
+The `.addMiddleware()` method can also accept the `Middleware` constructor argument directly, for shorter inline syntax:
+
+```ts
+endpointsFactory.addMiddleware({
+  input: z.object({}),
+  handler: async () => ({}),
+});
 ```
 
 You can connect as many middlewares as you want, they will be executed in order.
@@ -369,9 +378,9 @@ Validation errors are reported in a response with a status code `400`.
 
 ```typescript
 import { z } from "zod";
-import { createMiddleware } from "express-zod-api";
+import { Middleware } from "express-zod-api";
 
-const nicknameConstraintMiddleware = createMiddleware({
+const nicknameConstraintMiddleware = new Middleware({
   input: z.object({
     nickname: z
       .string()
