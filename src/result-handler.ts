@@ -16,7 +16,7 @@ import {
 import { IOSchema } from "./io-schema";
 import { ActualLogger } from "./logger-helpers";
 
-interface ResultHandlerParams<RES> {
+type Handler<RES> = (params: {
   /** null in case of failure to parse or to find the matching endpoint (error: not found) */
   input: FlatObject | null;
   /** null in case of errors or failures */
@@ -27,9 +27,7 @@ interface ResultHandlerParams<RES> {
   request: Request;
   response: Response<RES>;
   logger: ActualLogger;
-}
-
-type Handler<RES> = (params: ResultHandlerParams<RES>) => void | Promise<void>;
+}) => void | Promise<void>;
 
 type ExtractSchema<T extends AnyResponseDefinition> = T extends ApiResponse<
   infer S
