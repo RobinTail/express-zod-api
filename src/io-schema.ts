@@ -18,28 +18,20 @@ export type IOSchema<U extends z.UnknownKeysParam = z.UnknownKeysParam> =
   | Refined<z.ZodObject<z.ZodRawShape, U>>
   | RawSchema;
 
-export type ProbableIntersection<
-  A extends IOSchema<"strip"> | null,
-  B extends IOSchema,
-> = A extends null
-  ? B
-  : A extends IOSchema<"strip">
-    ? z.ZodIntersection<A, B>
-    : never;
-
 /**
  * @description intersects input schemas of middlewares and the endpoint
  * @since 07.03.2022 former combineEndpointAndMiddlewareInputSchemas()
  * @since 05.03.2023 is immutable to metadata
+ * @since 26.05.2024 uses the regular ZodIntersection
  * @see copyMeta
  */
 export const getFinalEndpointInputSchema = <
-  MIN extends IOSchema<"strip"> | null,
+  MIN extends IOSchema<"strip">,
   IN extends IOSchema,
 >(
   middlewares: AbstractMiddleware[],
   input: IN,
-): ProbableIntersection<MIN, IN> => {
+): z.ZodIntersection<MIN, IN> => {
   const allSchemas = middlewares
     .map((mw) => mw.getSchema() as IOSchema)
     .concat(input);
@@ -49,5 +41,5 @@ export const getFinalEndpointInputSchema = <
   return allSchemas.reduce(
     (acc, schema) => copyMeta(schema, acc),
     finalSchema,
-  ) as ProbableIntersection<MIN, IN>;
+  ) as z.ZodIntersection<MIN, IN>;
 };

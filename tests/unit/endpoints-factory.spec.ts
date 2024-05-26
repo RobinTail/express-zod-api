@@ -320,12 +320,7 @@ describe("EndpointsFactory", () => {
       expect(
         serializeSchemaForTest(endpoint.getSchema("output")),
       ).toMatchSnapshot();
-      expectType<
-        z.ZodIntersection<
-          z.ZodObject<{ n: z.ZodNumber }>,
-          z.ZodObject<{ s: z.ZodString }>
-        >
-      >(endpoint.getSchema("input"));
+      expectType<{ n: number; s: string }>(endpoint.getSchema("input")._output);
     });
 
     test("Should create an endpoint with refined object middleware", () => {
@@ -364,17 +359,9 @@ describe("EndpointsFactory", () => {
       expect(
         serializeSchemaForTest(endpoint.getSchema("output")),
       ).toMatchSnapshot();
-      expectType<
-        z.ZodIntersection<
-          z.ZodEffects<
-            z.ZodObject<{
-              a: z.ZodOptional<z.ZodNumber>;
-              b: z.ZodOptional<z.ZodString>;
-            }>
-          >,
-          z.ZodObject<{ i: z.ZodString }>
-        >
-      >(endpoint.getSchema("input"));
+      expectType<{ a?: number; b?: string; i: string }>(
+        endpoint.getSchema("input")._output,
+      );
     });
 
     test("Should create an endpoint with intersection middleware", () => {
@@ -417,15 +404,9 @@ describe("EndpointsFactory", () => {
       expect(
         serializeSchemaForTest(endpoint.getSchema("output")),
       ).toMatchSnapshot();
-      expectType<
-        z.ZodIntersection<
-          z.ZodIntersection<
-            z.ZodObject<{ n1: z.ZodNumber }>,
-            z.ZodObject<{ n2: z.ZodNumber }>
-          >,
-          z.ZodObject<{ s: z.ZodString }>
-        >
-      >(endpoint.getSchema("input"));
+      expectType<{ n1: number; n2: number; s: string }>(
+        endpoint.getSchema("input")._output,
+      );
     });
 
     test("Should create an endpoint with union middleware", () => {
@@ -471,14 +452,9 @@ describe("EndpointsFactory", () => {
       expect(
         serializeSchemaForTest(endpoint.getSchema("output")),
       ).toMatchSnapshot();
-      expectType<
-        z.ZodIntersection<
-          z.ZodUnion<
-            [z.ZodObject<{ n1: z.ZodNumber }>, z.ZodObject<{ n2: z.ZodNumber }>]
-          >,
-          z.ZodObject<{ s: z.ZodString }>
-        >
-      >(endpoint.getSchema("input"));
+      expectType<{ s: string } & ({ n1: number } | { n2: number })>(
+        endpoint.getSchema("input")._output,
+      );
     });
   });
 });

@@ -3,11 +3,7 @@ import { z } from "zod";
 import { EmptyObject, FlatObject } from "./common-helpers";
 import { CommonConfig } from "./config-type";
 import { Endpoint, Handler } from "./endpoint";
-import {
-  IOSchema,
-  ProbableIntersection,
-  getFinalEndpointInputSchema,
-} from "./io-schema";
+import { IOSchema, getFinalEndpointInputSchema } from "./io-schema";
 import { Method } from "./method";
 import {
   AbstractMiddleware,
@@ -23,14 +19,14 @@ import {
 type BuildProps<
   IN extends IOSchema,
   OUT extends IOSchema,
-  MIN extends IOSchema<"strip"> | null,
+  MIN extends IOSchema<"strip">,
   OPT extends FlatObject,
   SCO extends string,
   TAG extends string,
 > = {
   input: IN;
   output: OUT;
-  handler: Handler<z.output<ProbableIntersection<MIN, IN>>, z.input<OUT>, OPT>;
+  handler: Handler<z.output<z.ZodIntersection<MIN, IN>>, z.input<OUT>, OPT>;
   description?: string;
   shortDescription?: string;
   operationId?: string | ((method: Method) => string);
@@ -39,7 +35,7 @@ type BuildProps<
   ({ tags?: TAG[] } | { tag?: TAG });
 
 export class EndpointsFactory<
-  IN extends IOSchema<"strip"> | null = null,
+  IN extends IOSchema<"strip"> = z.ZodObject<EmptyObject, "strip">,
   OUT extends FlatObject = EmptyObject,
   SCO extends string = string,
   TAG extends string = string,
@@ -66,7 +62,7 @@ export class EndpointsFactory<
   }
 
   static #create<
-    CIN extends IOSchema<"strip"> | null,
+    CIN extends IOSchema<"strip">,
     COUT extends FlatObject,
     CSCO extends string,
     CTAG extends string,
@@ -89,7 +85,7 @@ export class EndpointsFactory<
       | ConstructorParameters<typeof Middleware<AIN, OUT, AOUT, ASCO>>[0],
   ) {
     return EndpointsFactory.#create<
-      ProbableIntersection<IN, AIN>,
+      z.ZodIntersection<IN, AIN>,
       OUT & AOUT,
       SCO & ASCO,
       TAG
@@ -135,7 +131,7 @@ export class EndpointsFactory<
     operationId,
     ...rest
   }: BuildProps<BIN, BOUT, IN, OUT, SCO, TAG>): Endpoint<
-    ProbableIntersection<IN, BIN>,
+    z.ZodIntersection<IN, BIN>,
     BOUT,
     OUT,
     SCO,
