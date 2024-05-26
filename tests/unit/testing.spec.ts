@@ -1,10 +1,6 @@
 import { expectType } from "tsd";
 import { z } from "zod";
-import {
-  createMiddleware,
-  defaultEndpointsFactory,
-  testEndpoint,
-} from "../../src";
+import { defaultEndpointsFactory, testEndpoint } from "../../src";
 import { Mock, describe, expect, test, vi } from "vitest";
 
 declare module "../../src" {
@@ -17,18 +13,16 @@ describe("Testing", () => {
       "Should test the endpoint %#",
       async (fnMethod) => {
         const endpoint = defaultEndpointsFactory
-          .addMiddleware(
-            createMiddleware({
-              input: z.object({}),
-              middleware: async ({ response }) => {
-                response
-                  .setHeader("X-Some", "header")
-                  .header("X-Another", "header as well")
-                  .send("this is just for testing mocked methods");
-                return {};
-              },
-            }),
-          )
+          .addMiddleware({
+            input: z.object({}),
+            handler: async ({ response }) => {
+              response
+                .setHeader("X-Some", "header")
+                .header("X-Another", "header as well")
+                .send("this is just for testing mocked methods");
+              return {};
+            },
+          })
           .build({
             method: "get",
             input: z.object({}),

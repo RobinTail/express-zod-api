@@ -3,7 +3,7 @@ import { z } from "zod";
 import {
   AbstractEndpoint,
   EndpointsFactory,
-  createMiddleware,
+  Middleware,
   createResultHandler,
   defaultEndpointsFactory,
   defaultResultHandler,
@@ -61,16 +61,13 @@ describe("Endpoint", () => {
         .mockImplementationOnce(async ({ input }) => ({
           inc: input.n + 1,
         }));
-      const middlewareDefinitionMock = createMiddleware({
+      const resultHandlerSpy = vi.spyOn(defaultResultHandler, "handler");
+      const factory = new EndpointsFactory(defaultResultHandler).addMiddleware({
         input: z.object({
           n: z.number(),
         }),
-        middleware: middlewareMock,
+        handler: middlewareMock,
       });
-      const resultHandlerSpy = vi.spyOn(defaultResultHandler, "handler");
-      const factory = new EndpointsFactory(defaultResultHandler).addMiddleware(
-        middlewareDefinitionMock,
-      );
       const handlerMock = vi
         .fn()
         .mockImplementationOnce(async ({ input, options }) => ({
@@ -229,15 +226,12 @@ describe("Endpoint", () => {
           response.end("to hell with all that!");
           return { inc: input.n + 1 };
         });
-      const middlewareDefinitionMock = createMiddleware({
+      const factory = defaultEndpointsFactory.addMiddleware({
         input: z.object({
           n: z.number(),
         }),
-        middleware: middlewareMock,
+        handler: middlewareMock,
       });
-      const factory = defaultEndpointsFactory.addMiddleware(
-        middlewareDefinitionMock,
-      );
       const handlerMock = vi.fn();
       const endpoint = factory.build({
         method: "post",
@@ -257,7 +251,7 @@ describe("Endpoint", () => {
       expect(loggerMock.error).toHaveBeenCalledTimes(0);
       expect(loggerMock.warn).toHaveBeenCalledTimes(1);
       expect(loggerMock.warn.mock.calls[0][0]).toBe(
-        "The middleware spy has closed the stream. Accumulated options:",
+        "A middleware has closed the stream. Accumulated options:",
       );
       expect(loggerMock.warn.mock.calls[0][1]).toEqual({ inc: 454 });
       expect(responseMock.status).toHaveBeenCalledTimes(0);
@@ -402,14 +396,12 @@ describe("Endpoint", () => {
   describe("Issue #269: Async refinements", () => {
     test("should handle async refinements in input, output and middleware", async () => {
       const endpoint = new EndpointsFactory(defaultResultHandler)
-        .addMiddleware(
-          createMiddleware({
-            input: z.object({
-              m: z.number().refine(async (m) => m < 10),
-            }),
-            middleware: async () => ({}),
+        .addMiddleware({
+          input: z.object({
+            m: z.number().refine(async (m) => m < 10),
           }),
-        )
+          handler: async () => ({}),
+        })
         .build({
           methods: ["post"],
           input: z.object({
@@ -441,14 +433,12 @@ describe("Endpoint", () => {
   describe("Issue #514: Express native middlewares for OPTIONS request", () => {
     test("should skip proprietary ones", async () => {
       const endpoint = new EndpointsFactory(defaultResultHandler)
-        .addMiddleware(
-          createMiddleware({
-            input: z.object({
-              shouldNotBeHere: z.boolean(),
-            }),
-            middleware: async () => assert.fail("Should not be here"),
+        .addMiddleware({
+          input: z.object({
+            shouldNotBeHere: z.boolean(),
           }),
-        )
+          handler: async () => assert.fail("Should not be here"),
+        })
         .addExpressMiddleware((req, res, next) => {
           res.set("X-Custom-Header", "test");
           next();
@@ -530,12 +520,10 @@ describe("Endpoint", () => {
     });
 
     test("thrown in middleware and caught in execute()", async () => {
-      const factory = new EndpointsFactory(defaultResultHandler).addMiddleware(
-        createMiddleware({
-          input: z.object({}),
-          middleware: async () => assert.fail("Something went wrong"),
-        }),
-      );
+      const factory = new EndpointsFactory(defaultResultHandler).addMiddleware({
+        input: z.object({}),
+        handler: async () => assert.fail("Something went wrong"),
+      });
       const endpoint = factory.build({
         methods: ["post"],
         input: z.object({}),
@@ -788,11 +776,11 @@ describe("Endpoint", () => {
 
   describe("Issue #673: transformations in middlewares", () => {
     test("should avoid double parsing, should not mutate input", async () => {
-      const dateInputMiddleware = createMiddleware({
+      const dateInputMiddleware = new Middleware({
         input: z.object({
           middleware_date_input: ez.dateIn().optional(),
         }),
-        middleware: async ({ input: { middleware_date_input }, logger }) => {
+        handler: async ({ input: { middleware_date_input }, logger }) => {
           logger.debug("date in mw handler", typeof middleware_date_input);
           return {};
         },

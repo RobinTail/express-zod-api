@@ -6,7 +6,7 @@ import {
   DocumentationError,
   EndpointsFactory,
   createConfig,
-  createMiddleware,
+  Middleware,
   createResultHandler,
   defaultEndpointsFactory,
   ez,
@@ -593,16 +593,16 @@ describe("Documentation", () => {
     });
 
     test("should ensure uniq security schema names", () => {
-      const mw1 = createMiddleware({
+      const mw1 = new Middleware({
         security: {
           or: [{ type: "input", name: "key" }, { type: "bearer" }],
         },
         input: z.object({
           key: z.string(),
         }),
-        middleware: vi.fn(),
+        handler: vi.fn<any>(),
       });
-      const mw2 = createMiddleware({
+      const mw2 = new Middleware({
         security: {
           and: [
             { type: "bearer" },
@@ -618,12 +618,12 @@ describe("Documentation", () => {
           ],
         },
         input: z.object({}),
-        middleware: vi.fn(),
+        handler: vi.fn<any>(),
       });
-      const mw3 = createMiddleware({
+      const mw3 = new Middleware({
         security: { type: "bearer", format: "JWT" },
         input: z.object({}),
-        middleware: vi.fn(),
+        handler: vi.fn<any>(),
       });
       const spec = new Documentation({
         config: sampleConfig,
@@ -1215,18 +1215,16 @@ describe("Documentation", () => {
         routing: {
           v1: {
             getSomething: defaultEndpointsFactory
-              .addMiddleware(
-                createMiddleware({
-                  input: z
-                    .object({
-                      key: z.string(),
-                    })
-                    .example({
-                      key: "1234-56789-01",
-                    }),
-                  middleware: vi.fn(),
-                }),
-              )
+              .addMiddleware({
+                input: z
+                  .object({
+                    key: z.string(),
+                  })
+                  .example({
+                    key: "1234-56789-01",
+                  }),
+                handler: vi.fn(),
+              })
               .build({
                 method: "post",
                 input: z

@@ -5,6 +5,8 @@
 ### v20.0.0
 
 - Method `createLogger()` removed — use `new BuiltinLogger()` instead if needed;
+- Method `createMiddleware()` removed — use either `new Middleware()` or `EndpointsFactory::addMiddleware()` instead:
+  - The argument's property `middleware` renamed to `handler`.
 - Publicly exposed types are corrected for better constraints:
   - `IOSchema` type: type arguments generalized to the most wide type possible;
   - The `requestProps`, `responseProps` and `loggerProps` properties of the `testEndpoint()` method's argument:
@@ -12,6 +14,26 @@
     - when assigning objects to those arguments, avoid `as` operator — use `satisfies` if extra constraints needed.
   - The `options` property of a Middleware' and Endpoint's handler extends from `Record<string, never>` by default:
     - You can not assign additional properties to the `options` directly — use middlewares to combine options.
+
+```ts
+// before
+factory.addMiddleware(
+  createMiddleware({
+    input: z.object({}),
+    middleware: async () => ({}),
+  }),
+);
+
+// after:
+factory // variant 1:
+  .addMiddleware(
+    new Middleware({
+      input: z.object({}),
+      handler: async () => ({}),
+    }),
+  ) // variant 2: short syntax now available:
+  .addMiddleware({ input: z.object({}), handler: async () => ({}) });
+```
 
 ## Version 19
 

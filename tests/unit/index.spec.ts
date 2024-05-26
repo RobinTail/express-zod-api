@@ -17,7 +17,6 @@ import {
   InputSecurity,
   LoggerOverrides,
   Method,
-  MiddlewareDefinition,
   MockOverrides,
   OAuth2Security,
   OpenIdSecurity,
@@ -27,7 +26,6 @@ import {
   ServerConfig,
 } from "../../src";
 import { describe, expect, test, vi } from "vitest";
-import { EmptyObject } from "../../src/common-helpers";
 
 describe("Index Entrypoint", () => {
   describe("exports", () => {
@@ -70,18 +68,6 @@ describe("Index Entrypoint", () => {
         server: { listen: 8090 },
         logger: { level: "silent" },
         cors: false,
-      });
-      expectType<
-        MiddlewareDefinition<
-          IOSchema<"strip">,
-          EmptyObject,
-          EmptyObject,
-          string
-        >
-      >({
-        type: "proprietary",
-        input: z.object({}),
-        middleware: vi.fn(),
       });
       expectType<ResultHandlerDefinition<z.ZodTypeAny, z.ZodTypeAny>>({
         getPositiveResponse: vi.fn(),

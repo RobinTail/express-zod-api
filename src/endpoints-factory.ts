@@ -10,11 +10,9 @@ import {
 } from "./io-schema";
 import { Method } from "./method";
 import {
-  AnyMiddlewareDef,
+  AbstractMiddleware,
   ExpressMiddleware,
-  ExpressMiddlewareFeatures,
-  MiddlewareDefinition,
-  createMiddleware,
+  Middleware,
 } from "./middleware";
 import {
   AnyResultHandlerDefinition,
@@ -47,7 +45,7 @@ export class EndpointsFactory<
   TAG extends string = string,
 > {
   protected resultHandler: AnyResultHandlerDefinition;
-  protected middlewares: AnyMiddlewareDef[] = [];
+  protected middlewares: AbstractMiddleware[] = [];
 
   /** @desc Consider using the "config" prop with the "tags" option to enforce constraints on tagging the endpoints */
   constructor(resultHandler: AnyResultHandlerDefinition);
@@ -73,7 +71,7 @@ export class EndpointsFactory<
     CSCO extends string,
     CTAG extends string,
   >(
-    middlewares: AnyMiddlewareDef[],
+    middlewares: AbstractMiddleware[],
     resultHandler: AnyResultHandlerDefinition,
   ) {
     const factory = new EndpointsFactory<CIN, COUT, CSCO, CTAG>(resultHandler);
@@ -85,13 +83,22 @@ export class EndpointsFactory<
     AIN extends IOSchema<"strip">,
     AOUT extends FlatObject,
     ASCO extends string,
-  >(subject: MiddlewareDefinition<AIN, OUT, AOUT, ASCO>) {
+  >(
+    subject:
+      | Middleware<AIN, OUT, AOUT, ASCO>
+      | ConstructorParameters<typeof Middleware<AIN, OUT, AOUT, ASCO>>[0],
+  ) {
     return EndpointsFactory.#create<
       ProbableIntersection<IN, AIN>,
       OUT & AOUT,
       SCO & ASCO,
       TAG
-    >(this.middlewares.concat(subject), this.resultHandler);
+    >(
+      this.middlewares.concat(
+        subject instanceof Middleware ? subject : new Middleware(subject),
+      ),
+      this.resultHandler,
+    );
   }
 
   public use = this.addExpressMiddleware;
@@ -100,28 +107,9 @@ export class EndpointsFactory<
     R extends Request,
     S extends Response,
     AOUT extends FlatObject = EmptyObject,
-  >(
-    middleware: ExpressMiddleware<R, S>,
-    features?: ExpressMiddlewareFeatures<R, S, AOUT>,
-  ) {
-    const transformer = features?.transformer || ((err: Error) => err);
-    const provider = features?.provider || (() => ({}) as AOUT);
-    const definition: AnyMiddlewareDef = {
-      type: "express",
-      input: z.object({}),
-      middleware: async ({ request, response }) =>
-        new Promise<AOUT>((resolve, reject) => {
-          const next = (err?: unknown) => {
-            if (err && err instanceof Error) {
-              return reject(transformer(err));
-            }
-            resolve(provider(request as R, response as S));
-          };
-          middleware(request as R, response as S, next);
-        }),
-    };
+  >(...params: ConstructorParameters<typeof ExpressMiddleware<R, S, AOUT>>) {
     return EndpointsFactory.#create<IN, OUT & AOUT, SCO, TAG>(
-      this.middlewares.concat(definition),
+      this.middlewares.concat(new ExpressMiddleware(...params)),
       this.resultHandler,
     );
   }
@@ -129,9 +117,9 @@ export class EndpointsFactory<
   public addOptions<AOUT extends FlatObject>(getOptions: () => Promise<AOUT>) {
     return EndpointsFactory.#create<IN, OUT & AOUT, SCO, TAG>(
       this.middlewares.concat(
-        createMiddleware({
+        new Middleware({
           input: z.object({}),
-          middleware: getOptions,
+          handler: getOptions,
         }),
       ),
       this.resultHandler,

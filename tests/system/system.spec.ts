@@ -4,7 +4,6 @@ import { z } from "zod";
 import {
   EndpointsFactory,
   Method,
-  createMiddleware,
   createResultHandler,
   createServer,
   defaultResultHandler,
@@ -42,22 +41,20 @@ describe("App", async () => {
           handler: () => assert.fail("I am faulty"),
         }),
       )
-        .addMiddleware(
-          createMiddleware({
-            input: z.object({
-              mwError: z
-                .any()
-                .optional()
-                .transform((value) =>
-                  assert(
-                    !value,
-                    "Custom error in the Middleware input validation",
-                  ),
+        .addMiddleware({
+          input: z.object({
+            mwError: z
+              .any()
+              .optional()
+              .transform((value) =>
+                assert(
+                  !value,
+                  "Custom error in the Middleware input validation",
                 ),
-            }),
-            middleware: async () => ({}),
+              ),
           }),
-        )
+          handler: async () => ({}),
+        })
         .build({
           method: "get",
           input: z.object({
@@ -76,27 +73,23 @@ describe("App", async () => {
           }),
         }),
       test: new EndpointsFactory(defaultResultHandler)
-        .addMiddleware(
-          createMiddleware({
-            input: z.object({
-              key: z.string().refine((v) => v === "123", "Invalid key"),
-            }),
-            middleware: async () => ({
-              user: {
-                id: 354,
-              },
-            }),
+        .addMiddleware({
+          input: z.object({
+            key: z.string().refine((v) => v === "123", "Invalid key"),
           }),
-        )
-        .addMiddleware(
-          createMiddleware({
-            input: z.object({}),
-            middleware: async ({ request, options: { user } }) => ({
-              method: request.method.toLowerCase() as Method,
-              permissions: user.id === 354 ? ["any"] : [],
-            }),
+          handler: async () => ({
+            user: {
+              id: 354,
+            },
           }),
-        )
+        })
+        .addMiddleware({
+          input: z.object({}),
+          handler: async ({ request, options: { user } }) => ({
+            method: request.method.toLowerCase() as Method,
+            permissions: user.id === 354 ? ["any"] : [],
+          }),
+        })
         .build({
           methods: ["get", "post"],
           input: z.object({

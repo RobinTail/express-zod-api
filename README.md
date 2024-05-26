@@ -241,9 +241,9 @@ Here is an example of the authentication middleware, that checks a `key` from in
 ```typescript
 import { z } from "zod";
 import createHttpError from "http-errors";
-import { createMiddleware } from "express-zod-api";
+import { Middleware } from "express-zod-api";
 
-const authMiddleware = createMiddleware({
+const authMiddleware = new Middleware({
   security: {
     // this information is optional and used for generating documentation
     and: [
@@ -254,7 +254,7 @@ const authMiddleware = createMiddleware({
   input: z.object({
     key: z.string().min(1),
   }),
-  middleware: async ({ input: { key }, request, logger }) => {
+  handler: async ({ input: { key }, request, logger }) => {
     logger.debug("Checking the key and token");
     const user = await db.Users.findOne({ key });
     if (!user) {
@@ -281,15 +281,20 @@ const yourEndpoint = defaultEndpointsFactory
   });
 ```
 
-You can connect the middleware to endpoints factory right away, making it kind of global:
+You can create a new factory by connecting as many middlewares as you want — they will be executed in the specified
+order for all the endpoints produced on that factory. You may also use a shorter inline syntax within the
+`.addMiddleware()` method, and have access to the output of the previously executed middlewares in chain as `options`:
 
 ```typescript
 import { defaultEndpointsFactory } from "express-zod-api";
 
-const endpointsFactory = defaultEndpointsFactory.addMiddleware(authMiddleware);
+const factory = defaultEndpointsFactory
+  .addMiddleware(authMiddleware) // add Middleware instance or use shorter syntax:
+  .addMiddleware({
+    input: z.object({}),
+    handler: async ({ options: { user } }) => ({}), // options.user from authMiddleware
+  });
 ```
-
-You can connect as many middlewares as you want, they will be executed in order.
 
 ## Options
 
@@ -369,9 +374,9 @@ Validation errors are reported in a response with a status code `400`.
 
 ```typescript
 import { z } from "zod";
-import { createMiddleware } from "express-zod-api";
+import { Middleware } from "express-zod-api";
 
-const nicknameConstraintMiddleware = createMiddleware({
+const nicknameConstraintMiddleware = new Middleware({
   input: z.object({
     nickname: z
       .string()

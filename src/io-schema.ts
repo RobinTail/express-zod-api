@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { copyMeta } from "./metadata";
-import { AnyMiddlewareDef } from "./middleware";
+import { AbstractMiddleware } from "./middleware";
 import { RawSchema } from "./raw-schema";
 
 type Refined<T extends z.ZodTypeAny> =
@@ -37,16 +37,17 @@ export const getFinalEndpointInputSchema = <
   MIN extends IOSchema<"strip"> | null,
   IN extends IOSchema,
 >(
-  middlewares: AnyMiddlewareDef[],
+  middlewares: AbstractMiddleware[],
   input: IN,
 ): ProbableIntersection<MIN, IN> => {
   const allSchemas = middlewares
-    .map(({ input: schema }) => schema)
+    .map((mw) => mw.getSchema() as IOSchema)
     .concat(input);
 
-  const finalSchema = allSchemas.reduce((acc, schema) =>
-    acc.and(schema),
-  ) as ProbableIntersection<MIN, IN>;
+  const finalSchema = allSchemas.reduce((acc, schema) => acc.and(schema));
 
-  return allSchemas.reduce((acc, schema) => copyMeta(schema, acc), finalSchema);
+  return allSchemas.reduce(
+    (acc, schema) => copyMeta(schema, acc),
+    finalSchema,
+  ) as ProbableIntersection<MIN, IN>;
 };
