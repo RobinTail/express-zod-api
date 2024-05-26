@@ -13,7 +13,6 @@ import {
   AbstractMiddleware,
   ExpressMiddleware,
   Middleware,
-  MiddlewareCreationProps,
 } from "./middleware";
 import {
   AnyResultHandlerDefinition,
@@ -87,7 +86,7 @@ export class EndpointsFactory<
   >(
     subject:
       | Middleware<AIN, OUT, AOUT, ASCO>
-      | MiddlewareCreationProps<AIN, OUT, AOUT, ASCO>,
+      | ConstructorParameters<typeof Middleware<AIN, OUT, AOUT, ASCO>>[0],
   ) {
     return EndpointsFactory.#create<
       ProbableIntersection<IN, AIN>,

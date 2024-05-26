@@ -29,19 +29,6 @@ export abstract class AbstractMiddleware {
   }): Promise<FlatObject>;
 }
 
-export interface MiddlewareCreationProps<
-  IN extends IOSchema<"strip">,
-  OPT extends FlatObject,
-  OUT extends FlatObject,
-  SCO extends string,
-> {
-  input: IN;
-  security?: LogicalContainer<
-    Security<Extract<keyof z.input<IN>, string>, SCO>
-  >;
-  handler: Handler<z.output<IN>, OPT, OUT>;
-}
-
 export class Middleware<
   IN extends IOSchema<"strip">,
   OPT extends FlatObject,
@@ -58,7 +45,13 @@ export class Middleware<
     input,
     security,
     handler,
-  }: MiddlewareCreationProps<IN, OPT, OUT, SCO>) {
+  }: {
+    input: IN;
+    security?: LogicalContainer<
+      Security<Extract<keyof z.input<IN>, string>, SCO>
+    >;
+    handler: Handler<z.output<IN>, OPT, OUT>;
+  }) {
     super();
     assert(
       !hasTransformationOnTop(input),
@@ -113,7 +106,7 @@ export class ExpressMiddleware<
   string
 > {
   constructor(
-    originalMw: (
+    nativeMw: (
       request: R,
       response: S,
       next: NextFunction,
@@ -136,7 +129,7 @@ export class ExpressMiddleware<
             }
             resolve(provider(request as R, response as S));
           };
-          originalMw(request as R, response as S, next);
+          nativeMw(request as R, response as S, next);
         }),
     });
   }
