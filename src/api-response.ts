@@ -27,15 +27,18 @@ export interface ApiResponse<S extends z.ZodTypeAny> {
   mimeTypes?: [string, ...string[]];
 }
 
+// @todo invert with ApiResponse
 export type NormalizedResponse = Required<
   Pick<ApiResponse<z.ZodTypeAny>, "schema" | "statusCodes" | "mimeTypes">
 >;
 
+// @todo get rid
 export type AnyResponseDefinition =
   | z.ZodTypeAny // plain schema, default status codes applied
   | ApiResponse<z.ZodTypeAny> // single response definition, status code(s) customizable
   | ApiResponse<z.ZodTypeAny>[]; // Feature #1431: different responses for different status codes
 
+// @todo get rid
 export const normalizeApiResponse = (
   subject: AnyResponseDefinition,
   fallback: Omit<NormalizedResponse, "schema">,

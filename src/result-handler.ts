@@ -4,6 +4,7 @@ import {
   AnyResponseDefinition,
   ApiResponse,
   defaultStatusCodes,
+  NormalizedResponse,
 } from "./api-response";
 import {
   FlatObject,
@@ -13,6 +14,7 @@ import {
   isObject,
   logInternalError,
 } from "./common-helpers";
+import { contentTypes } from "./content-type";
 import { IOSchema } from "./io-schema";
 import { ActualLogger } from "./logger-helpers";
 
@@ -29,6 +31,72 @@ type Handler<RES> = (params: {
   logger: ActualLogger;
 }) => void | Promise<void>;
 
+export abstract class AbstractResultHandler {
+  public abstract getPositiveResponse(output: IOSchema): NormalizedResponse[];
+  public abstract getNegativeResponse(): NormalizedResponse[];
+  protected normalize(
+    subject:
+      | z.ZodTypeAny
+      | ApiResponse<z.ZodTypeAny>
+      | ApiResponse<z.ZodTypeAny>[],
+    fallback: {
+      statusCodes: [number, ...number[]];
+      mimeTypes: [string, ...string[]];
+    },
+  ): NormalizedResponse[] {
+    if (subject instanceof z.ZodType) {
+      return [{ ...fallback, schema: subject }];
+    }
+    return (Array.isArray(subject) ? subject : [subject]).map(
+      ({ schema, statusCodes, statusCode, mimeTypes, mimeType }) => ({
+        schema,
+        statusCodes: statusCode
+          ? [statusCode]
+          : statusCodes || fallback.statusCodes,
+        mimeTypes: mimeType ? [mimeType] : mimeTypes || fallback.mimeTypes,
+      }),
+    );
+  }
+}
+
+export class ResultHandler<
+  POS extends z.ZodTypeAny,
+  NEG extends z.ZodTypeAny,
+> extends AbstractResultHandler {
+  readonly #positive: (
+    output: IOSchema,
+  ) => POS | ApiResponse<POS> | ApiResponse<POS>[];
+  readonly #negative: NormalizedResponse[];
+
+  constructor({
+    positive,
+    negative,
+  }: {
+    positive: (output: IOSchema) => POS | ApiResponse<POS> | ApiResponse<POS>[];
+    negative: NEG | ApiResponse<NEG> | ApiResponse<NEG>[];
+  }) {
+    super();
+    this.#positive = positive;
+    this.#negative = this.normalize(negative, {
+      statusCodes: [defaultStatusCodes.negative],
+      mimeTypes: [contentTypes.json],
+    });
+  }
+
+  public override getPositiveResponse(output: IOSchema) {
+    const userDefined = this.#positive(output);
+    return this.normalize(userDefined, {
+      statusCodes: [defaultStatusCodes.positive],
+      mimeTypes: [contentTypes.json],
+    });
+  }
+
+  public override getNegativeResponse() {
+    return this.#negative;
+  }
+}
+
+// @todo get rid
 type ExtractSchema<T extends AnyResponseDefinition> = T extends ApiResponse<
   infer S
 >[]
@@ -39,6 +107,7 @@ type ExtractSchema<T extends AnyResponseDefinition> = T extends ApiResponse<
       ? T
       : never;
 
+// @todo get rid
 export interface ResultHandlerDefinition<
   POS extends AnyResponseDefinition,
   NEG extends AnyResponseDefinition,
@@ -48,6 +117,7 @@ export interface ResultHandlerDefinition<
   handler: Handler<z.output<ExtractSchema<POS>> | z.output<ExtractSchema<NEG>>>;
 }
 
+// @todo get rid
 export type AnyResultHandlerDefinition = ResultHandlerDefinition<
   AnyResponseDefinition,
   AnyResponseDefinition
