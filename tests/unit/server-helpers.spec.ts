@@ -9,7 +9,7 @@ import {
   moveRaw,
 } from "../../src/server-helpers";
 import { describe, expect, test, vi } from "vitest";
-import { defaultResultHandler } from "../../src";
+import { defaultResultHandler, ResultHandler } from "../../src";
 import { Request, Response } from "express";
 import assert from "node:assert/strict";
 import {
@@ -38,7 +38,12 @@ describe("Server helpers", () => {
     });
 
     test("the handler should call error handler with a child logger", async () => {
-      const errorHandler = { ...defaultResultHandler, handler: vi.fn() };
+      const errorHandler = new ResultHandler({
+        positive: () => [],
+        negative: [],
+        handler: vi.fn(),
+      });
+      const spy = vi.spyOn(errorHandler, "execute");
       const rootLogger = makeLoggerMock({ fnMethod: vi.fn });
       const handler = createParserFailureHandler({
         errorHandler,
@@ -57,23 +62,22 @@ describe("Server helpers", () => {
         }) as unknown as Response,
         vi.fn<any>(),
       );
-      expect(errorHandler.handler).toHaveBeenCalledTimes(1);
-      expect(errorHandler.handler.mock.calls[0][0].error).toEqual(
+      expect(spy).toHaveBeenCalledTimes(1);
+      expect(spy.mock.calls[0][0].error).toEqual(
         createHttpError(400, "Unexpected end of JSON input"),
       );
-      expect(errorHandler.handler.mock.calls[0][0].logger).toHaveProperty(
-        "isChild",
-        true,
-      );
+      expect(spy.mock.calls[0][0].logger).toHaveProperty("isChild", true);
     });
   });
 
   describe("createNotFoundHandler()", () => {
     test("the handler should call ResultHandler with 404 error", async () => {
-      const errorHandler = {
-        ...defaultResultHandler,
+      const errorHandler = new ResultHandler({
+        positive: () => [],
+        negative: [],
         handler: vi.fn(),
-      };
+      });
+      const spy = vi.spyOn(errorHandler, "execute");
       const rootLogger = makeLoggerMock({ fnMethod: vi.fn });
       const handler = createNotFoundHandler({
         errorHandler,
@@ -102,32 +106,27 @@ describe("Server helpers", () => {
         next,
       );
       expect(next).toHaveBeenCalledTimes(0);
-      expect(errorHandler.handler).toHaveBeenCalledTimes(1);
-      expect(errorHandler.handler.mock.calls[0]).toHaveLength(1);
-      expect(errorHandler.handler.mock.calls[0][0]).toHaveProperty("logger");
-      expect(errorHandler.handler.mock.calls[0][0].logger).toHaveProperty(
-        "isChild",
-        true,
-      );
-      expect(errorHandler.handler.mock.calls[0][0].error).toEqual(
+      expect(spy).toHaveBeenCalledTimes(1);
+      expect(spy.mock.calls[0]).toHaveLength(1);
+      expect(spy.mock.calls[0][0]).toHaveProperty("logger");
+      expect(spy.mock.calls[0][0].logger).toHaveProperty("isChild", true);
+      expect(spy.mock.calls[0][0].error).toEqual(
         createHttpError(404, "Can not POST /v1/test"),
       );
-      expect(errorHandler.handler.mock.calls[0][0].input).toBeNull();
-      expect(errorHandler.handler.mock.calls[0][0].output).toBeNull();
-      expect(errorHandler.handler.mock.calls[0][0].request).toEqual(
-        requestMock,
-      );
-      expect(errorHandler.handler.mock.calls[0][0].response).toEqual(
-        responseMock,
-      );
+      expect(spy.mock.calls[0][0].input).toBeNull();
+      expect(spy.mock.calls[0][0].output).toBeNull();
+      expect(spy.mock.calls[0][0].request).toEqual(requestMock);
+      expect(spy.mock.calls[0][0].response).toEqual(responseMock);
     });
 
     test("should call Last Resort Handler in case of ResultHandler is faulty", () => {
       const rootLogger = makeLoggerMock({ fnMethod: vi.fn });
-      const errorHandler = {
-        ...defaultResultHandler,
+      const errorHandler = new ResultHandler({
+        positive: () => [],
+        negative: [],
         handler: vi.fn().mockImplementation(() => assert.fail("I am faulty")),
-      };
+      });
+      const spy = vi.spyOn(errorHandler, "execute");
       const handler = createNotFoundHandler({
         errorHandler,
         rootLogger,
@@ -148,7 +147,7 @@ describe("Server helpers", () => {
         next,
       );
       expect(next).toHaveBeenCalledTimes(0);
-      expect(errorHandler.handler).toHaveBeenCalledTimes(1);
+      expect(spy).toHaveBeenCalledTimes(1);
       expect(responseMock.status).toHaveBeenCalledTimes(1);
       expect(responseMock.status.mock.calls[0][0]).toBe(500);
       expect(responseMock.end).toHaveBeenCalledTimes(1);

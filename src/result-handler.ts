@@ -39,13 +39,13 @@ export abstract class AbstractResultHandler {
   public abstract execute(
     ...params: Parameters<Handler<unknown>>
   ): ReturnType<Handler<unknown>>;
-  protected normalize<S extends z.ZodTypeAny>(
-    subject: S | ApiResponse<S> | ApiResponse<S>[],
+  protected normalize(
+    subject: AnyResponseDefinition,
     fallback: {
       statusCodes: [number, ...number[]];
       mimeTypes: [string, ...string[]];
     },
-  ): NormalizedResponse<S>[] {
+  ): NormalizedResponse<z.ZodTypeAny>[] {
     if (subject instanceof z.ZodType) {
       return [{ ...fallback, schema: subject }];
     }
@@ -62,30 +62,26 @@ export abstract class AbstractResultHandler {
 }
 
 export class ResultHandler<
-  POS extends z.ZodTypeAny,
-  NEG extends z.ZodTypeAny,
+  POS extends AnyResponseDefinition,
+  NEG extends AnyResponseDefinition,
 > extends AbstractResultHandler {
-  readonly #positive: (
-    output: IOSchema,
-  ) => POS | ApiResponse<POS> | ApiResponse<POS>[];
-  readonly #negative: NormalizedResponse<NEG>[];
-  readonly #handler: Handler<z.output<POS> | z.output<NEG>>;
+  readonly #positive: (output: IOSchema) => POS;
+  readonly #negative: NEG;
+  readonly #handler: Handler<z.output<ExtractSchema<POS> | ExtractSchema<NEG>>>;
 
   constructor({
     positive,
     negative,
     handler,
   }: {
-    positive: (output: IOSchema) => POS | ApiResponse<POS> | ApiResponse<POS>[];
-    negative: NEG | ApiResponse<NEG> | ApiResponse<NEG>[];
-    handler: Handler<z.output<POS> | z.output<NEG>>;
+    // @todo support both optionally functional
+    positive: (output: IOSchema) => POS;
+    negative: NEG;
+    handler: Handler<z.output<ExtractSchema<POS> | ExtractSchema<NEG>>>;
   }) {
     super();
     this.#positive = positive;
-    this.#negative = this.normalize(negative, {
-      statusCodes: [defaultStatusCodes.negative],
-      mimeTypes: [contentTypes.json],
-    });
+    this.#negative = negative;
     this.#handler = handler;
   }
 
@@ -98,17 +94,17 @@ export class ResultHandler<
   }
 
   public override getNegativeResponse() {
-    return this.#negative;
+    return this.normalize(this.#negative, {
+      statusCodes: [defaultStatusCodes.negative],
+      mimeTypes: [contentTypes.json],
+    });
   }
 
-  public override execute(
-    ...params: Parameters<Handler<z.output<POS> | z.output<NEG>>>
-  ) {
+  public override execute(...params: Parameters<Handler<unknown>>) {
     return this.#handler(...params);
   }
 }
 
-// @todo get rid
 type ExtractSchema<T extends AnyResponseDefinition> = T extends ApiResponse<
   infer S
 >[]
@@ -119,32 +115,8 @@ type ExtractSchema<T extends AnyResponseDefinition> = T extends ApiResponse<
       ? T
       : never;
 
-// @todo get rid
-export interface ResultHandlerDefinition<
-  POS extends AnyResponseDefinition,
-  NEG extends AnyResponseDefinition,
-> {
-  getPositiveResponse: (output: IOSchema) => POS;
-  getNegativeResponse: () => NEG;
-  handler: Handler<z.output<ExtractSchema<POS>> | z.output<ExtractSchema<NEG>>>;
-}
-
-// @todo get rid
-export type AnyResultHandlerDefinition = ResultHandlerDefinition<
-  AnyResponseDefinition,
-  AnyResponseDefinition
->;
-
-// @todo get rid
-export const createResultHandler = <
-  POS extends AnyResponseDefinition,
-  NEG extends AnyResponseDefinition,
->(
-  definition: ResultHandlerDefinition<POS, NEG>,
-) => definition;
-
-export const defaultResultHandler = createResultHandler({
-  getPositiveResponse: (output: IOSchema) => {
+export const defaultResultHandler = new ResultHandler({
+  positive: (output: IOSchema) => {
     // Examples are taken for proxying: no validation needed for this
     const examples = getExamples({ schema: output });
     const responseSchema = z.object({
@@ -160,20 +132,19 @@ export const defaultResultHandler = createResultHandler({
       responseSchema,
     );
   },
-  getNegativeResponse: () =>
-    z
-      .object({
-        status: z.literal("error"),
-        error: z.object({
-          message: z.string(),
-        }),
-      })
-      .example({
-        status: "error",
-        error: {
-          message: getMessageFromError(new Error("Sample error message")),
-        },
+  negative: z
+    .object({
+      status: z.literal("error"),
+      error: z.object({
+        message: z.string(),
       }),
+    })
+    .example({
+      status: "error",
+      error: {
+        message: getMessageFromError(new Error("Sample error message")),
+      },
+    }),
   handler: ({ error, input, output, request, response, logger }) => {
     if (!error) {
       response.status(defaultStatusCodes.positive).json({
@@ -196,8 +167,8 @@ export const defaultResultHandler = createResultHandler({
  * @desc Responding with array is a bad practice keeping your endpoints from evolving without breaking changes.
  * @desc This handler expects your endpoint to have the property 'items' in the output object schema
  * */
-export const arrayResultHandler = createResultHandler({
-  getPositiveResponse: (output) => {
+export const arrayResultHandler = new ResultHandler({
+  positive: (output) => {
     // Examples are taken for proxying: no validation needed for this
     const examples = getExamples({ schema: output });
     const responseSchema =
@@ -214,8 +185,9 @@ export const arrayResultHandler = createResultHandler({
       responseSchema,
     );
   },
-  getNegativeResponse: () =>
-    z.string().example(getMessageFromError(new Error("Sample error message"))),
+  negative: z
+    .string()
+    .example(getMessageFromError(new Error("Sample error message"))),
   handler: ({ response, output, error, logger, request, input }) => {
     if (error) {
       const statusCode = getStatusCodeFromError(error);

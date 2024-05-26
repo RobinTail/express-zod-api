@@ -3,8 +3,8 @@ import createHttpError, { HttpError } from "http-errors";
 import {
   EndpointsFactory,
   Middleware,
-  createResultHandler,
   defaultEndpointsFactory,
+  ResultHandler,
 } from "../../src";
 import { Endpoint } from "../../src/endpoint";
 import { expectType } from "tsd";
@@ -17,9 +17,9 @@ import { describe, expect, test, vi } from "vitest";
 describe("EndpointsFactory", () => {
   describe(".constructor()", () => {
     test("Should create the empty factory with result handler", () => {
-      const resultHandlerMock = createResultHandler({
-        getPositiveResponse: () => z.string(),
-        getNegativeResponse: () => z.string(),
+      const resultHandlerMock = new ResultHandler({
+        positive: () => z.string(),
+        negative: z.string(),
         handler: vi.fn(),
       });
       const factory = new EndpointsFactory(resultHandlerMock);
@@ -35,9 +35,9 @@ describe("EndpointsFactory", () => {
         }),
         handler: vi.fn<any>(),
       });
-      const resultHandlerMock = createResultHandler({
-        getPositiveResponse: () => z.string(),
-        getNegativeResponse: () => z.string(),
+      const resultHandlerMock = new ResultHandler({
+        positive: () => z.string(),
+        negative: z.string(),
         handler: vi.fn(),
       });
       const factory = new EndpointsFactory(resultHandlerMock).addMiddleware(
@@ -50,9 +50,9 @@ describe("EndpointsFactory", () => {
 
   describe(".addMiddleware()", () => {
     test("Should create a new factory with a middleware and the same result handler", () => {
-      const resultHandlerMock = createResultHandler({
-        getPositiveResponse: () => z.string(),
-        getNegativeResponse: () => z.string(),
+      const resultHandlerMock = new ResultHandler({
+        positive: () => z.string(),
+        negative: z.string(),
         handler: vi.fn(),
       });
       const factory = new EndpointsFactory(resultHandlerMock);
@@ -108,9 +108,9 @@ describe("EndpointsFactory", () => {
 
   describe(".addOptions()", () => {
     test("Should create a new factory with an empty-input middleware and the same result handler", async () => {
-      const resultHandlerMock = createResultHandler({
-        getPositiveResponse: () => z.string(),
-        getNegativeResponse: () => z.string(),
+      const resultHandlerMock = new ResultHandler({
+        positive: () => z.string(),
+        negative: z.string(),
         handler: vi.fn(),
       });
       const factory = new EndpointsFactory(resultHandlerMock);
@@ -147,9 +147,9 @@ describe("EndpointsFactory", () => {
     ".%s()",
     (method) => {
       test("Should create a new factory with a native express middleware wrapper", async () => {
-        const resultHandlerMock = createResultHandler({
-          getPositiveResponse: () => z.string(),
-          getNegativeResponse: () => z.string(),
+        const resultHandlerMock = new ResultHandler({
+          positive: () => z.string(),
+          negative: z.string(),
           handler: vi.fn(),
         });
         const factory = new EndpointsFactory(resultHandlerMock);
@@ -190,9 +190,9 @@ describe("EndpointsFactory", () => {
       });
 
       test("Should operate without options provider", async () => {
-        const resultHandlerMock = createResultHandler({
-          getPositiveResponse: () => z.string(),
-          getNegativeResponse: () => z.string(),
+        const resultHandlerMock = new ResultHandler({
+          positive: () => z.string(),
+          negative: z.string(),
           handler: vi.fn(),
         });
         const factory = new EndpointsFactory(resultHandlerMock);
@@ -223,9 +223,9 @@ describe("EndpointsFactory", () => {
       });
 
       test("Should handle errors", async () => {
-        const resultHandlerMock = createResultHandler({
-          getPositiveResponse: () => z.string(),
-          getNegativeResponse: () => z.string(),
+        const resultHandlerMock = new ResultHandler({
+          positive: () => z.string(),
+          negative: z.string(),
           handler: vi.fn(),
         });
         const factory = new EndpointsFactory(resultHandlerMock);
@@ -252,9 +252,9 @@ describe("EndpointsFactory", () => {
       });
 
       test("Should transform errors", async () => {
-        const resultHandlerMock = createResultHandler({
-          getPositiveResponse: () => z.string(),
-          getNegativeResponse: () => z.string(),
+        const resultHandlerMock = new ResultHandler({
+          positive: () => z.string(),
+          negative: z.string(),
           handler: vi.fn(),
         });
         const factory = new EndpointsFactory(resultHandlerMock);
@@ -293,9 +293,9 @@ describe("EndpointsFactory", () => {
         }),
         handler: vi.fn<any>(),
       });
-      const resultHandlerMock = createResultHandler({
-        getPositiveResponse: () => z.string(),
-        getNegativeResponse: () => z.string(),
+      const resultHandlerMock = new ResultHandler({
+        positive: () => z.string(),
+        negative: z.string(),
         handler: vi.fn(),
       });
       const factory = new EndpointsFactory(resultHandlerMock).addMiddleware(
@@ -335,9 +335,9 @@ describe("EndpointsFactory", () => {
           }),
         handler: vi.fn<any>(),
       });
-      const resultHandlerMock = createResultHandler({
-        getPositiveResponse: () => z.string(),
-        getNegativeResponse: () => z.string(),
+      const resultHandlerMock = new ResultHandler({
+        positive: () => z.string(),
+        negative: z.string(),
         handler: vi.fn(),
       });
       const factory = new EndpointsFactory(resultHandlerMock).addMiddleware(
@@ -377,9 +377,9 @@ describe("EndpointsFactory", () => {
           ),
         handler: vi.fn<any>(),
       });
-      const resultHandlerMock = createResultHandler({
-        getPositiveResponse: () => z.string(),
-        getNegativeResponse: () => z.string(),
+      const resultHandlerMock = new ResultHandler({
+        positive: () => z.string(),
+        negative: z.string(),
         handler: vi.fn(),
       });
       const factory = new EndpointsFactory(resultHandlerMock).addMiddleware(
@@ -422,9 +422,9 @@ describe("EndpointsFactory", () => {
           ),
         handler: vi.fn<any>(),
       });
-      const resultHandlerMock = createResultHandler({
-        getPositiveResponse: () => z.string(),
-        getNegativeResponse: () => z.string(),
+      const resultHandlerMock = new ResultHandler({
+        positive: () => z.string(),
+        negative: z.string(),
         handler: vi.fn(),
       });
       const factory = new EndpointsFactory(resultHandlerMock).addMiddleware(

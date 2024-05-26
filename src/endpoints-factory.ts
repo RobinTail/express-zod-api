@@ -11,7 +11,7 @@ import {
   Middleware,
 } from "./middleware";
 import {
-  AnyResultHandlerDefinition,
+  AbstractResultHandler,
   arrayResultHandler,
   defaultResultHandler,
 } from "./result-handler";
@@ -40,20 +40,20 @@ export class EndpointsFactory<
   SCO extends string = string,
   TAG extends string = string,
 > {
-  protected resultHandler: AnyResultHandlerDefinition;
+  protected resultHandler: AbstractResultHandler;
   protected middlewares: AbstractMiddleware[] = [];
 
   /** @desc Consider using the "config" prop with the "tags" option to enforce constraints on tagging the endpoints */
-  constructor(resultHandler: AnyResultHandlerDefinition);
+  constructor(resultHandler: AbstractResultHandler);
   constructor(params: {
-    resultHandler: AnyResultHandlerDefinition;
+    resultHandler: AbstractResultHandler;
     config?: CommonConfig<TAG>;
   });
   constructor(
     subject:
-      | AnyResultHandlerDefinition
+      | AbstractResultHandler
       | {
-          resultHandler: AnyResultHandlerDefinition;
+          resultHandler: AbstractResultHandler;
           config?: CommonConfig<TAG>;
         },
   ) {
@@ -66,10 +66,7 @@ export class EndpointsFactory<
     COUT extends FlatObject,
     CSCO extends string,
     CTAG extends string,
-  >(
-    middlewares: AbstractMiddleware[],
-    resultHandler: AnyResultHandlerDefinition,
-  ) {
+  >(middlewares: AbstractMiddleware[], resultHandler: AbstractResultHandler) {
     const factory = new EndpointsFactory<CIN, COUT, CSCO, CTAG>(resultHandler);
     factory.middlewares = middlewares;
     return factory;
