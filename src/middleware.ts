@@ -35,7 +35,7 @@ export class Middleware<
   OUT extends FlatObject,
   SCO extends string,
 > extends AbstractMiddleware {
-  readonly #input: IN;
+  readonly #schema: IN;
   readonly #security?: LogicalContainer<
     Security<Extract<keyof z.input<IN>, string>, SCO>
   >;
@@ -59,7 +59,7 @@ export class Middleware<
         "Using transformations on the top level of middleware input schema is not allowed.",
       ),
     );
-    this.#input = input;
+    this.#schema = input;
     this.#security = security;
     this.#handler = handler;
   }
@@ -69,7 +69,7 @@ export class Middleware<
   }
 
   public override getSchema() {
-    return this.#input;
+    return this.#schema;
   }
 
   /** @throws InputValidationError */
@@ -84,7 +84,7 @@ export class Middleware<
     logger: ActualLogger;
   }) {
     try {
-      const validInput = (await this.#input.parseAsync(input)) as z.output<IN>;
+      const validInput = (await this.#schema.parseAsync(input)) as z.output<IN>;
       return this.#handler({ ...rest, input: validInput });
     } catch (e) {
       if (e instanceof z.ZodError) {
