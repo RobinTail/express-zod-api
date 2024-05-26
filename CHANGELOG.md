@@ -5,6 +5,8 @@
 ### v20.0.0
 
 - Method `createLogger()` removed — use `new BuiltinLogger()` instead if needed;
+- Method `createMiddleware()` removed — use either `new Middleware()` or `EndpointsFactory::addMiddleware()` instead:
+  - The argument's property `middleware` renamed to `handler`.
 - Publicly exposed types are corrected for better constraints:
   - `IOSchema` type: type arguments generalized to the most wide type possible;
   - The `requestProps`, `responseProps` and `loggerProps` properties of the `testEndpoint()` method's argument:
