@@ -58,7 +58,7 @@ export abstract class AbstractEndpoint {
   public abstract getMimeTypes(variant: MimeVariant): ReadonlyArray<string>;
   public abstract getResponses(
     variant: ResponseVariant,
-  ): ReadonlyArray<NormalizedResponse>;
+  ): ReadonlyArray<NormalizedResponse<z.ZodTypeAny>>;
   public abstract getSecurity(): LogicalContainer<Security>;
   public abstract getScopes(): ReadonlyArray<string>;
   public abstract getTags(): ReadonlyArray<string>;
@@ -79,7 +79,7 @@ export class Endpoint<
   readonly #mimeTypes: Record<MimeVariant, ReadonlyArray<string>>;
   readonly #responses: Record<
     ResponseVariant,
-    ReadonlyArray<NormalizedResponse>
+    ReadonlyArray<NormalizedResponse<z.ZodTypeAny>>
   >;
   readonly #handler: Handler<z.output<IN>, z.input<OUT>, OPT>;
   readonly #resultHandler: AnyResultHandlerDefinition;

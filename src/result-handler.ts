@@ -32,21 +32,20 @@ type Handler<RES> = (params: {
 }) => void | Promise<void>;
 
 export abstract class AbstractResultHandler {
-  public abstract getPositiveResponse(output: IOSchema): NormalizedResponse[];
-  public abstract getNegativeResponse(): NormalizedResponse[];
+  public abstract getPositiveResponse(
+    output: IOSchema,
+  ): NormalizedResponse<z.ZodTypeAny>[];
+  public abstract getNegativeResponse(): NormalizedResponse<z.ZodTypeAny>[];
   public abstract execute(
     ...params: Parameters<Handler<unknown>>
   ): ReturnType<Handler<unknown>>;
-  protected normalize(
-    subject:
-      | z.ZodTypeAny
-      | ApiResponse<z.ZodTypeAny>
-      | ApiResponse<z.ZodTypeAny>[],
+  protected normalize<S extends z.ZodTypeAny>(
+    subject: S | ApiResponse<S> | ApiResponse<S>[],
     fallback: {
       statusCodes: [number, ...number[]];
       mimeTypes: [string, ...string[]];
     },
-  ): NormalizedResponse[] {
+  ): NormalizedResponse<S>[] {
     if (subject instanceof z.ZodType) {
       return [{ ...fallback, schema: subject }];
     }
@@ -69,7 +68,7 @@ export class ResultHandler<
   readonly #positive: (
     output: IOSchema,
   ) => POS | ApiResponse<POS> | ApiResponse<POS>[];
-  readonly #negative: NormalizedResponse[];
+  readonly #negative: NormalizedResponse<NEG>[];
   readonly #handler: Handler<z.output<POS> | z.output<NEG>>;
 
   constructor({
@@ -136,6 +135,7 @@ export type AnyResultHandlerDefinition = ResultHandlerDefinition<
   AnyResponseDefinition
 >;
 
+// @todo get rid
 export const createResultHandler = <
   POS extends AnyResponseDefinition,
   NEG extends AnyResponseDefinition,

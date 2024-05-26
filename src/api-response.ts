@@ -5,7 +5,21 @@ export const defaultStatusCodes = {
   negative: 400,
 };
 
-export interface ApiResponse<S extends z.ZodTypeAny> {
+export interface NormalizedResponse<S extends z.ZodTypeAny> {
+  schema: S;
+  /** @default [ "application/json" ] */
+  mimeTypes: [string, ...string[]];
+  /**
+   * @default [200] for positive response
+   * @default [400] for negative response
+   * */
+  statusCodes: [number, ...number[]];
+}
+
+type Opt<S extends z.ZodTypeAny> = Pick<NormalizedResponse<S>, "schema"> &
+  Partial<Omit<NormalizedResponse<S>, "schema">>;
+
+export interface ApiResponse<S extends z.ZodTypeAny> extends Opt<S> {
   schema: S;
   /**
    * @default 200 for a positive response
@@ -14,23 +28,11 @@ export interface ApiResponse<S extends z.ZodTypeAny> {
    * */
   statusCode?: number;
   /**
-   * @default [200] for positive response
-   * @default [400] for negative response
-   * */
-  statusCodes?: [number, ...number[]];
-  /**
    * @default "application/json"
    * @override mimeTypes
    * */
   mimeType?: string;
-  /** @default [ "application/json" ] */
-  mimeTypes?: [string, ...string[]];
 }
-
-// @todo invert with ApiResponse
-export type NormalizedResponse = Required<
-  Pick<ApiResponse<z.ZodTypeAny>, "schema" | "statusCodes" | "mimeTypes">
->;
 
 // @todo get rid
 export type AnyResponseDefinition =
@@ -41,8 +43,8 @@ export type AnyResponseDefinition =
 // @todo get rid
 export const normalizeApiResponse = (
   subject: AnyResponseDefinition,
-  fallback: Omit<NormalizedResponse, "schema">,
-): NormalizedResponse[] => {
+  fallback: Omit<NormalizedResponse<z.ZodTypeAny>, "schema">,
+): NormalizedResponse<z.ZodTypeAny>[] => {
   if (subject instanceof z.ZodType) {
     return [{ ...fallback, schema: subject }];
   }
