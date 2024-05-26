@@ -24,16 +24,15 @@ factory.addMiddleware(
   }),
 );
 
-// after, variant 1:
-factory.addMiddleware(
-  new Middleware({
-    input: z.object({}),
-    handler: async () => ({}),
-  }),
-);
-
-// variant 2: short syntax now available:
-factory.addMiddleware({ input: z.object({}), handler: async () => ({}) });
+// after:
+factory // variant 1:
+  .addMiddleware(
+    new Middleware({
+      input: z.object({}),
+      handler: async () => ({}),
+    }),
+  ) // variant 2: short syntax now available:
+  .addMiddleware({ input: z.object({}), handler: async () => ({}) });
 ```
 
 ## Version 19

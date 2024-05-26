@@ -281,24 +281,20 @@ const yourEndpoint = defaultEndpointsFactory
   });
 ```
 
-You can connect the middleware to endpoints factory right away, making it kind of global:
+You can create a new factory by connecting as many middlewares as you want — they will be executed in the specified
+order for all the endpoints produced on that factory. You may also use a shorter inline syntax within the
+`.addMiddleware()` method, and have access to the output of the previously executed middlewares in chain as `options`:
 
 ```typescript
 import { defaultEndpointsFactory } from "express-zod-api";
 
-const endpointsFactory = defaultEndpointsFactory.addMiddleware(authMiddleware);
+const factory = defaultEndpointsFactory
+  .addMiddleware(authMiddleware) // add Middleware instance or use shorter syntax:
+  .addMiddleware({
+    input: z.object({}),
+    handler: async ({ options: { user } }) => ({}), // options.user from authMiddleware
+  });
 ```
-
-The `.addMiddleware()` method can also accept the `Middleware` constructor argument directly, for shorter inline syntax:
-
-```ts
-endpointsFactory.addMiddleware({
-  input: z.object({}),
-  handler: async () => ({}),
-});
-```
-
-You can connect as many middlewares as you want, they will be executed in order.
 
 ## Options
 
