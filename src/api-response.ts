@@ -30,3 +30,8 @@ export type AnyResponseDefinition<S extends z.ZodTypeAny = z.ZodTypeAny> =
   | S // plain schema, default status codes applied
   | ApiResponse<S> // single response definition, status code(s) customizable
   | ApiResponse<S>[]; // Feature #1431: different responses for different status codes
+
+export type LazyResponseDefinition<
+  D extends AnyResponseDefinition,
+  A extends unknown[] = [],
+> = (...args: A) => D;

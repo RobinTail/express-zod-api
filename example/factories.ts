@@ -25,14 +25,8 @@ export const keyAndTokenAuthenticatedEndpointsFactory =
 export const fileSendingEndpointsFactory = new EndpointsFactory({
   config,
   resultHandler: new ResultHandler({
-    positive: () => ({
-      schema: z.string(),
-      mimeType: "image/svg+xml",
-    }),
-    negative: {
-      schema: z.string(),
-      mimeType: "text/plain",
-    },
+    positive: { schema: z.string(), mimeType: "image/svg+xml" },
+    negative: { schema: z.string(), mimeType: "text/plain" },
     handler: ({ response, error, output }) => {
       if (error) {
         response.status(400).send(error.message);
@@ -51,14 +45,8 @@ export const fileSendingEndpointsFactory = new EndpointsFactory({
 export const fileStreamingEndpointsFactory = new EndpointsFactory({
   config,
   resultHandler: new ResultHandler({
-    positive: () => ({
-      schema: ez.file("buffer"),
-      mimeType: "image/*",
-    }),
-    negative: {
-      schema: z.string(),
-      mimeType: "text/plain",
-    },
+    positive: { schema: ez.file("buffer"), mimeType: "image/*" },
+    negative: { schema: z.string(), mimeType: "text/plain" },
     handler: ({ response, error, output }) => {
       if (error) {
         response.status(400).send(error.message);

@@ -1,6 +1,10 @@
 import { Request, Response } from "express";
 import { z } from "zod";
-import { AnyResponseDefinition, NormalizedResponse } from "./api-response";
+import {
+  AnyResponseDefinition,
+  LazyResponseDefinition,
+  NormalizedResponse,
+} from "./api-response";
 import {
   FlatObject,
   getExamples,
@@ -45,23 +49,29 @@ export abstract class AbstractResultHandler {
   public abstract getPositiveResponse(output: IOSchema): NormalizedResponse[];
   public abstract getNegativeResponse(): NormalizedResponse[];
 
-  protected normalize(
-    subject: AnyResponseDefinition,
-    fallback: {
+  protected normalize<A extends unknown[]>(
+    subject:
+      | AnyResponseDefinition
+      | LazyResponseDefinition<AnyResponseDefinition, A>,
+    features: {
+      arguments: A;
       statusCodes: [number, ...number[]];
       mimeTypes: [string, ...string[]];
     },
   ): NormalizedResponse[] {
+    if (typeof subject === "function") {
+      return this.normalize(subject(...features.arguments), features);
+    }
     if (subject instanceof z.ZodType) {
-      return [{ ...fallback, schema: subject }];
+      return [{ ...features, schema: subject }];
     }
     return (Array.isArray(subject) ? subject : [subject]).map(
       ({ schema, statusCodes, statusCode, mimeTypes, mimeType }) => ({
         schema,
         statusCodes: statusCode
           ? [statusCode]
-          : statusCodes || fallback.statusCodes,
-        mimeTypes: mimeType ? [mimeType] : mimeTypes || fallback.mimeTypes,
+          : statusCodes || features.statusCodes,
+        mimeTypes: mimeType ? [mimeType] : mimeTypes || features.mimeTypes,
       }),
     );
   }
@@ -71,17 +81,16 @@ export class ResultHandler<
   POS extends AnyResponseDefinition,
   NEG extends AnyResponseDefinition,
 > extends AbstractResultHandler {
-  readonly #positive: (output: IOSchema) => POS;
-  readonly #negative: NEG;
+  readonly #positive: POS | LazyResponseDefinition<POS, [IOSchema]>;
+  readonly #negative: NEG | LazyResponseDefinition<NEG>;
 
   constructor({
     positive,
     negative,
     handler,
   }: {
-    // @todo support both optionally functional
-    positive: (output: IOSchema) => POS;
-    negative: NEG;
+    positive: POS | LazyResponseDefinition<POS, [IOSchema]>;
+    negative: NEG | LazyResponseDefinition<NEG>;
     handler: Handler<z.output<ExtractSchema<POS> | ExtractSchema<NEG>>>;
   }) {
     super(handler);
@@ -90,8 +99,8 @@ export class ResultHandler<
   }
 
   public override getPositiveResponse(output: IOSchema) {
-    const userDefined = this.#positive(output);
-    return this.normalize(userDefined, {
+    return this.normalize(this.#positive, {
+      arguments: [output],
       statusCodes: [defaultStatusCodes.positive],
       mimeTypes: [contentTypes.json],
     });
@@ -99,6 +108,7 @@ export class ResultHandler<
 
   public override getNegativeResponse() {
     return this.normalize(this.#negative, {
+      arguments: [],
       statusCodes: [defaultStatusCodes.negative],
       mimeTypes: [contentTypes.json],
     });
@@ -109,7 +119,7 @@ type ExtractSchema<T extends AnyResponseDefinition> =
   T extends AnyResponseDefinition<infer S> ? S : never;
 
 export const defaultResultHandler = new ResultHandler({
-  positive: (output: IOSchema) => {
+  positive: (output) => {
     // Examples are taken for proxying: no validation needed for this
     const examples = getExamples({ schema: output });
     const responseSchema = z.object({
