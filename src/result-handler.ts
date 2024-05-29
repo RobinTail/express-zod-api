@@ -1,8 +1,9 @@
 import { Request, Response } from "express";
 import { z } from "zod";
 import {
-  AnyResponseDefinition,
-  LazyResponseDefinition,
+  AnyApiResponse,
+  LazyResponse,
+  normalize,
   NormalizedResponse,
 } from "./api-response";
 import {
@@ -35,35 +36,13 @@ type Handler<RES> = (params: {
   logger: ActualLogger;
 }) => void | Promise<void>;
 
-const normalize = <A extends unknown[]>(
-  subject:
-    | AnyResponseDefinition
-    | LazyResponseDefinition<AnyResponseDefinition, A>,
-  features: {
-    arguments: A;
-    statusCodes: [number, ...number[]];
-    mimeTypes: [string, ...string[]];
-  },
-): NormalizedResponse[] => {
-  if (typeof subject === "function") {
-    return normalize(subject(...features.arguments), features);
-  }
-  if (subject instanceof z.ZodType) {
-    return [{ ...features, schema: subject }];
-  }
-  return (Array.isArray(subject) ? subject : [subject]).map(
-    ({ schema, statusCodes, statusCode, mimeTypes, mimeType }) => ({
-      schema,
-      statusCodes: statusCode
-        ? [statusCode]
-        : statusCodes || features.statusCodes,
-      mimeTypes: mimeType ? [mimeType] : mimeTypes || features.mimeTypes,
-    }),
-  );
-};
+type ResponseSchema<T extends AnyApiResponse> =
+  T extends AnyApiResponse<infer S> ? S : never;
 
 export abstract class AbstractResultHandler {
   readonly #handler: Handler<unknown>;
+  public abstract getPositiveResponse(output: IOSchema): NormalizedResponse[];
+  public abstract getNegativeResponse(): NormalizedResponse[];
 
   protected constructor(handler: Handler<unknown>) {
     this.#handler = handler;
@@ -72,26 +51,23 @@ export abstract class AbstractResultHandler {
   public execute(...params: Parameters<Handler<unknown>>) {
     return this.#handler(...params);
   }
-
-  public abstract getPositiveResponse(output: IOSchema): NormalizedResponse[];
-  public abstract getNegativeResponse(): NormalizedResponse[];
 }
 
 export class ResultHandler<
-  POS extends AnyResponseDefinition,
-  NEG extends AnyResponseDefinition,
+  POS extends AnyApiResponse,
+  NEG extends AnyApiResponse,
 > extends AbstractResultHandler {
-  readonly #positive: POS | LazyResponseDefinition<POS, [IOSchema]>;
-  readonly #negative: NEG | LazyResponseDefinition<NEG>;
+  readonly #positive: POS | LazyResponse<POS, [IOSchema]>;
+  readonly #negative: NEG | LazyResponse<NEG>;
 
   constructor({
     positive,
     negative,
     handler,
   }: {
-    positive: POS | LazyResponseDefinition<POS, [IOSchema]>;
-    negative: NEG | LazyResponseDefinition<NEG>;
-    handler: Handler<z.output<ExtractSchema<POS> | ExtractSchema<NEG>>>;
+    positive: POS | LazyResponse<POS, [IOSchema]>;
+    negative: NEG | LazyResponse<NEG>;
+    handler: Handler<z.output<ResponseSchema<POS> | ResponseSchema<NEG>>>;
   }) {
     super(handler);
     this.#positive = positive;
@@ -114,9 +90,6 @@ export class ResultHandler<
     });
   }
 }
-
-type ExtractSchema<T extends AnyResponseDefinition> =
-  T extends AnyResponseDefinition<infer S> ? S : never;
 
 export const defaultResultHandler = new ResultHandler({
   positive: (output) => {
