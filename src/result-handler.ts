@@ -35,6 +35,33 @@ type Handler<RES> = (params: {
   logger: ActualLogger;
 }) => void | Promise<void>;
 
+const normalize = <A extends unknown[]>(
+  subject:
+    | AnyResponseDefinition
+    | LazyResponseDefinition<AnyResponseDefinition, A>,
+  features: {
+    arguments: A;
+    statusCodes: [number, ...number[]];
+    mimeTypes: [string, ...string[]];
+  },
+): NormalizedResponse[] => {
+  if (typeof subject === "function") {
+    return normalize(subject(...features.arguments), features);
+  }
+  if (subject instanceof z.ZodType) {
+    return [{ ...features, schema: subject }];
+  }
+  return (Array.isArray(subject) ? subject : [subject]).map(
+    ({ schema, statusCodes, statusCode, mimeTypes, mimeType }) => ({
+      schema,
+      statusCodes: statusCode
+        ? [statusCode]
+        : statusCodes || features.statusCodes,
+      mimeTypes: mimeType ? [mimeType] : mimeTypes || features.mimeTypes,
+    }),
+  );
+};
+
 export abstract class AbstractResultHandler {
   readonly #handler: Handler<unknown>;
 
@@ -48,33 +75,6 @@ export abstract class AbstractResultHandler {
 
   public abstract getPositiveResponse(output: IOSchema): NormalizedResponse[];
   public abstract getNegativeResponse(): NormalizedResponse[];
-
-  protected normalize<A extends unknown[]>(
-    subject:
-      | AnyResponseDefinition
-      | LazyResponseDefinition<AnyResponseDefinition, A>,
-    features: {
-      arguments: A;
-      statusCodes: [number, ...number[]];
-      mimeTypes: [string, ...string[]];
-    },
-  ): NormalizedResponse[] {
-    if (typeof subject === "function") {
-      return this.normalize(subject(...features.arguments), features);
-    }
-    if (subject instanceof z.ZodType) {
-      return [{ ...features, schema: subject }];
-    }
-    return (Array.isArray(subject) ? subject : [subject]).map(
-      ({ schema, statusCodes, statusCode, mimeTypes, mimeType }) => ({
-        schema,
-        statusCodes: statusCode
-          ? [statusCode]
-          : statusCodes || features.statusCodes,
-        mimeTypes: mimeType ? [mimeType] : mimeTypes || features.mimeTypes,
-      }),
-    );
-  }
 }
 
 export class ResultHandler<
@@ -99,7 +99,7 @@ export class ResultHandler<
   }
 
   public override getPositiveResponse(output: IOSchema) {
-    return this.normalize(this.#positive, {
+    return normalize(this.#positive, {
       arguments: [output],
       statusCodes: [defaultStatusCodes.positive],
       mimeTypes: [contentTypes.json],
@@ -107,7 +107,7 @@ export class ResultHandler<
   }
 
   public override getNegativeResponse() {
-    return this.normalize(this.#negative, {
+    return normalize(this.#negative, {
       arguments: [],
       statusCodes: [defaultStatusCodes.negative],
       mimeTypes: [contentTypes.json],
