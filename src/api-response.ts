@@ -5,22 +5,8 @@ export const defaultStatusCodes = {
   negative: 400,
 };
 
-export interface NormalizedResponse<S extends z.ZodTypeAny> {
+export interface ApiResponse<S extends z.ZodTypeAny> {
   schema: S;
-  /** @default [ "application/json" ] */
-  mimeTypes: [string, ...string[]];
-  /**
-   * @default [200] for positive response
-   * @default [400] for negative response
-   * */
-  statusCodes: [number, ...number[]];
-}
-
-// @todo naming
-type Opt<S extends z.ZodTypeAny> = Pick<NormalizedResponse<S>, "schema"> &
-  Partial<Omit<NormalizedResponse<S>, "schema">>;
-
-export interface ApiResponse<S extends z.ZodTypeAny> extends Opt<S> {
   /**
    * @default 200 for a positive response
    * @default 400 for a negative response
@@ -28,11 +14,22 @@ export interface ApiResponse<S extends z.ZodTypeAny> extends Opt<S> {
    * */
   statusCode?: number;
   /**
+   * @default [200] for positive response
+   * @default [400] for negative response
+   * */
+  statusCodes?: [number, ...number[]];
+  /**
    * @default "application/json"
    * @override mimeTypes
    * */
   mimeType?: string;
+  /** @default [ "application/json" ] */
+  mimeTypes?: [string, ...string[]];
 }
+
+export type NormalizedResponse = Required<
+  Pick<ApiResponse<z.ZodTypeAny>, "schema" | "statusCodes" | "mimeTypes">
+>;
 
 export type AnyResponseDefinition<S extends z.ZodTypeAny = z.ZodTypeAny> =
   | S // plain schema, default status codes applied

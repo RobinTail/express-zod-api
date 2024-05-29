@@ -41,10 +41,8 @@ export abstract class AbstractResultHandler {
     return this.#handler(...params);
   }
 
-  public abstract getPositiveResponse(
-    output: IOSchema,
-  ): NormalizedResponse<z.ZodTypeAny>[];
-  public abstract getNegativeResponse(): NormalizedResponse<z.ZodTypeAny>[];
+  public abstract getPositiveResponse(output: IOSchema): NormalizedResponse[];
+  public abstract getNegativeResponse(): NormalizedResponse[];
 
   protected normalize(
     subject: AnyResponseDefinition,
@@ -52,7 +50,7 @@ export abstract class AbstractResultHandler {
       statusCodes: [number, ...number[]];
       mimeTypes: [string, ...string[]];
     },
-  ): NormalizedResponse<z.ZodTypeAny>[] {
+  ): NormalizedResponse[] {
     if (subject instanceof z.ZodType) {
       return [{ ...fallback, schema: subject }];
     }
