@@ -35,11 +35,11 @@ export type Result<S extends z.ZodTypeAny = z.ZodTypeAny> =
   | ApiResponse<S> // single response definition, status code(s) customizable
   | ApiResponse<S>[]; // Feature #1431: different responses for different status codes
 
-export type LazyResult<D extends Result, A extends unknown[] = []> = (
+export type LazyResult<R extends Result, A extends unknown[] = []> = (
   ...args: A
-) => D;
+) => R;
 
-type ResultSchema<T extends Result> = T extends Result<infer S> ? S : never;
+type ResultSchema<R extends Result> = R extends Result<infer S> ? S : never;
 
 export abstract class AbstractResultHandler {
   readonly #handler: Handler;
