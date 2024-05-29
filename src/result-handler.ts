@@ -1,9 +1,8 @@
 import { Request, Response } from "express";
 import { z } from "zod";
 import {
-  AnyApiResponse,
-  LazyResponse,
-  normalize,
+  ApiResponse,
+  defaultStatusCodes,
   NormalizedResponse,
 } from "./api-response";
 import {
@@ -18,12 +17,7 @@ import { contentTypes } from "./content-type";
 import { IOSchema } from "./io-schema";
 import { ActualLogger } from "./logger-helpers";
 
-export const defaultStatusCodes = {
-  positive: 200,
-  negative: 400,
-};
-
-type Handler<RES> = (params: {
+type Handler<RES = unknown> = (params: {
   /** null in case of failure to parse or to find the matching endpoint (error: not found) */
   input: FlatObject | null;
   /** null in case of errors or failures */
@@ -36,38 +30,69 @@ type Handler<RES> = (params: {
   logger: ActualLogger;
 }) => void | Promise<void>;
 
-type ResponseSchema<T extends AnyApiResponse> =
-  T extends AnyApiResponse<infer S> ? S : never;
+export type Result<S extends z.ZodTypeAny = z.ZodTypeAny> =
+  | S // plain schema, default status codes applied
+  | ApiResponse<S> // single response definition, status code(s) customizable
+  | ApiResponse<S>[]; // Feature #1431: different responses for different status codes
+
+export type LazyResult<D extends Result, A extends unknown[] = []> = (
+  ...args: A
+) => D;
+
+type ResultSchema<T extends Result> = T extends Result<infer S> ? S : never;
 
 export abstract class AbstractResultHandler {
-  readonly #handler: Handler<unknown>;
+  readonly #handler: Handler;
   public abstract getPositiveResponse(output: IOSchema): NormalizedResponse[];
   public abstract getNegativeResponse(): NormalizedResponse[];
-
-  protected constructor(handler: Handler<unknown>) {
+  protected constructor(handler: Handler) {
     this.#handler = handler;
   }
-
-  public execute(...params: Parameters<Handler<unknown>>) {
+  public execute(...params: Parameters<Handler>) {
     return this.#handler(...params);
   }
 }
 
+export const normalize = <A extends unknown[]>(
+  subject: Result | LazyResult<Result, A>,
+  features: {
+    arguments: A;
+    statusCodes: [number, ...number[]];
+    mimeTypes: [string, ...string[]];
+  },
+): NormalizedResponse[] => {
+  if (typeof subject === "function") {
+    return normalize(subject(...features.arguments), features);
+  }
+  if (subject instanceof z.ZodType) {
+    return [{ ...features, schema: subject }];
+  }
+  return (Array.isArray(subject) ? subject : [subject]).map(
+    ({ schema, statusCodes, statusCode, mimeTypes, mimeType }) => ({
+      schema,
+      statusCodes: statusCode
+        ? [statusCode]
+        : statusCodes || features.statusCodes,
+      mimeTypes: mimeType ? [mimeType] : mimeTypes || features.mimeTypes,
+    }),
+  );
+};
+
 export class ResultHandler<
-  POS extends AnyApiResponse,
-  NEG extends AnyApiResponse,
+  POS extends Result,
+  NEG extends Result,
 > extends AbstractResultHandler {
-  readonly #positive: POS | LazyResponse<POS, [IOSchema]>;
-  readonly #negative: NEG | LazyResponse<NEG>;
+  readonly #positive: POS | LazyResult<POS, [IOSchema]>;
+  readonly #negative: NEG | LazyResult<NEG>;
 
   constructor({
     positive,
     negative,
     handler,
   }: {
-    positive: POS | LazyResponse<POS, [IOSchema]>;
-    negative: NEG | LazyResponse<NEG>;
-    handler: Handler<z.output<ResponseSchema<POS> | ResponseSchema<NEG>>>;
+    positive: POS | LazyResult<POS, [IOSchema]>;
+    negative: NEG | LazyResult<NEG>;
+    handler: Handler<z.output<ResultSchema<POS> | ResultSchema<NEG>>>;
   }) {
     super(handler);
     this.#positive = positive;
