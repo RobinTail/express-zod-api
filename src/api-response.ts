@@ -1,10 +1,5 @@
 import { z } from "zod";
 
-export const defaultStatusCodes = {
-  positive: 200,
-  negative: 400,
-};
-
 export interface ApiResponse<S extends z.ZodTypeAny> {
   schema: S;
   /**

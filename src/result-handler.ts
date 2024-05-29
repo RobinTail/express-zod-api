@@ -1,10 +1,6 @@
 import { Request, Response } from "express";
 import { z } from "zod";
-import {
-  AnyResponseDefinition,
-  defaultStatusCodes,
-  NormalizedResponse,
-} from "./api-response";
+import { AnyResponseDefinition, NormalizedResponse } from "./api-response";
 import {
   FlatObject,
   getExamples,
@@ -16,6 +12,11 @@ import {
 import { contentTypes } from "./content-type";
 import { IOSchema } from "./io-schema";
 import { ActualLogger } from "./logger-helpers";
+
+export const defaultStatusCodes = {
+  positive: 200,
+  negative: 400,
+};
 
 type Handler<RES> = (params: {
   /** null in case of failure to parse or to find the matching endpoint (error: not found) */
