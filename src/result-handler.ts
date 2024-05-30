@@ -121,20 +121,14 @@ export const defaultResultHandler = new ResultHandler({
       data: output,
     });
     return examples.reduce<typeof responseSchema>(
-      (acc, example) =>
-        acc.example({
-          status: "success",
-          data: example,
-        }),
+      (acc, example) => acc.example({ status: "success", data: example }),
       responseSchema,
     );
   },
   negative: z
     .object({
       status: z.literal("error"),
-      error: z.object({
-        message: z.string(),
-      }),
+      error: z.object({ message: z.string() }),
     })
     .example({
       status: "error",
@@ -144,10 +138,9 @@ export const defaultResultHandler = new ResultHandler({
     }),
   handler: ({ error, input, output, request, response, logger }) => {
     if (!error) {
-      response.status(defaultStatusCodes.positive).json({
-        status: "success",
-        data: output,
-      });
+      response
+        .status(defaultStatusCodes.positive)
+        .json({ status: "success", data: output });
       return;
     }
     const statusCode = getStatusCodeFromError(error);
