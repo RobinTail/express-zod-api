@@ -35,7 +35,7 @@ type Handler<RES = unknown> = (params: {
 type Result<S extends z.ZodTypeAny = z.ZodTypeAny> =
   | S // plain schema, default status codes applied
   | ApiResponse<S> // single response definition, status code(s) customizable
-  | [ApiResponse<S>, ...ApiResponse<S>[]]; // Feature #1431: different responses for different status codes
+  | ApiResponse<S>[]; // Feature #1431: different responses for different status codes (non-empty, prog. check!)
 
 type LazyResult<R extends Result, A extends unknown[] = []> = (...args: A) => R;
 
