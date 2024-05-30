@@ -132,14 +132,6 @@ export class Endpoint<
       positive: Object.freeze(resultHandler.getPositiveResponse(outputSchema)),
       negative: Object.freeze(resultHandler.getNegativeResponse()),
     };
-    for (const [variant, responses] of Object.entries(this.#responses)) {
-      assert(
-        responses.length,
-        new ResultHandlerError(
-          `ResultHandler must have at least one ${variant} response schema specified.`,
-        ),
-      );
-    }
     this.#requestType = hasUpload(inputSchema)
       ? "upload"
       : hasRaw(inputSchema)

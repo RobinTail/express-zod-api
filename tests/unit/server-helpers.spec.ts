@@ -39,8 +39,8 @@ describe("Server helpers", () => {
 
     test("the handler should call error handler with a child logger", async () => {
       const errorHandler = new ResultHandler({
-        positive: () => [],
-        negative: [],
+        positive: vi.fn(),
+        negative: vi.fn(),
         handler: vi.fn(),
       });
       const spy = vi.spyOn(errorHandler, "execute");
@@ -73,8 +73,8 @@ describe("Server helpers", () => {
   describe("createNotFoundHandler()", () => {
     test("the handler should call ResultHandler with 404 error", async () => {
       const errorHandler = new ResultHandler({
-        positive: () => [],
-        negative: [],
+        positive: vi.fn(),
+        negative: vi.fn(),
         handler: vi.fn(),
       });
       const spy = vi.spyOn(errorHandler, "execute");
@@ -122,8 +122,8 @@ describe("Server helpers", () => {
     test("should call Last Resort Handler in case of ResultHandler is faulty", () => {
       const rootLogger = makeLoggerMock({ fnMethod: vi.fn });
       const errorHandler = new ResultHandler({
-        positive: () => [],
-        negative: [],
+        positive: vi.fn(),
+        negative: vi.fn(),
         handler: vi.fn().mockImplementation(() => assert.fail("I am faulty")),
       });
       const spy = vi.spyOn(errorHandler, "execute");

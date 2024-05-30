@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import assert from "node:assert/strict";
 import { z } from "zod";
 import {
   ApiResponse,
@@ -14,6 +15,7 @@ import {
   logInternalError,
 } from "./common-helpers";
 import { contentTypes } from "./content-type";
+import { ResultHandlerError } from "./errors";
 import { IOSchema } from "./io-schema";
 import { ActualLogger } from "./logger-helpers";
 
@@ -30,14 +32,12 @@ type Handler<RES = unknown> = (params: {
   logger: ActualLogger;
 }) => void | Promise<void>;
 
-export type Result<S extends z.ZodTypeAny = z.ZodTypeAny> =
+type Result<S extends z.ZodTypeAny = z.ZodTypeAny> =
   | S // plain schema, default status codes applied
   | ApiResponse<S> // single response definition, status code(s) customizable
-  | ApiResponse<S>[]; // Feature #1431: different responses for different status codes
+  | [ApiResponse<S>, ...ApiResponse<S>[]]; // Feature #1431: different responses for different status codes
 
-export type LazyResult<R extends Result, A extends unknown[] = []> = (
-  ...args: A
-) => R;
+type LazyResult<R extends Result, A extends unknown[] = []> = (...args: A) => R;
 
 type ResultSchema<R extends Result> = R extends Result<infer S> ? S : never;
 
@@ -53,9 +53,11 @@ export abstract class AbstractResultHandler {
   }
 }
 
+/** @throws ResultHandlerError when Result is an empty array */
 export const normalize = <A extends unknown[]>(
   subject: Result | LazyResult<Result, A>,
   features: {
+    variant: "positive" | "negative";
     arguments: A;
     statusCodes: [number, ...number[]];
     mimeTypes: [string, ...string[]];
@@ -66,6 +68,14 @@ export const normalize = <A extends unknown[]>(
   }
   if (subject instanceof z.ZodType) {
     return [{ ...features, schema: subject }];
+  }
+  if (Array.isArray(subject)) {
+    assert(
+      subject.length,
+      new ResultHandlerError(
+        `At least one ${features.variant} response schema required.`,
+      ),
+    );
   }
   return (Array.isArray(subject) ? subject : [subject]).map(
     ({ schema, statusCodes, statusCode, mimeTypes, mimeType }) => ({
@@ -97,6 +107,7 @@ export class ResultHandler<
 
   public override getPositiveResponse(output: IOSchema) {
     return normalize(this.#positive, {
+      variant: "positive",
       arguments: [output],
       statusCodes: [defaultStatusCodes.positive],
       mimeTypes: [contentTypes.json],
@@ -105,6 +116,7 @@ export class ResultHandler<
 
   public override getNegativeResponse() {
     return normalize(this.#negative, {
+      variant: "negative",
       arguments: [],
       statusCodes: [defaultStatusCodes.negative],
       mimeTypes: [contentTypes.json],

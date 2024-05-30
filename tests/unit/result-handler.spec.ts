@@ -8,7 +8,9 @@ import {
   defaultResultHandler,
   ResultHandler,
   AbstractResultHandler,
+  ApiResponse,
 } from "../../src";
+import { ResultHandlerError } from "../../src/errors";
 import { metaSymbol } from "../../src/metadata";
 import { describe, expect, test, vi } from "vitest";
 import {
@@ -18,6 +20,60 @@ import {
 } from "../../src/testing";
 
 describe("ResultHandler", () => {
+  describe("conctructor()", () => {
+    test("should support multiple response schemas depending on status codes", () => {
+      const subject = new ResultHandler({
+        positive: () => [
+          { statusCode: 200, schema: z.literal("ok") },
+          { statusCode: 201, schema: z.literal("kinda") },
+        ],
+        negative: [
+          { statusCode: 400, schema: z.literal("error") },
+          { statusCode: 500, schema: z.literal("failure") },
+        ],
+        handler: ({ response }) => {
+          expectType<Response<"ok" | "kinda" | "error" | "failure">>(response);
+          response.status(200).send("error");
+        },
+      });
+      expect(subject).toBeInstanceOf(AbstractResultHandler);
+    });
+  });
+
+  describe("getters", () => {
+    test("should throw when result is defined as an empty array", () => {
+      expect(() =>
+        new ResultHandler({
+          positive: () =>
+            [] as unknown as [
+              ApiResponse<z.ZodTypeAny>,
+              ...ApiResponse<z.ZodTypeAny>[],
+            ],
+          negative: vi.fn(),
+          handler: vi.fn(),
+        }).getPositiveResponse(z.object({})),
+      ).toThrow(
+        new ResultHandlerError(
+          "At least one positive response schema required.",
+        ),
+      );
+      expect(() =>
+        new ResultHandler({
+          positive: vi.fn(),
+          negative: [] as unknown as [
+            ApiResponse<z.ZodTypeAny>,
+            ...ApiResponse<z.ZodTypeAny>[],
+          ],
+          handler: vi.fn(),
+        }).getNegativeResponse(),
+      ).toThrow(
+        new ResultHandlerError(
+          "At least one negative response schema required.",
+        ),
+      );
+    });
+  });
+
   const requestMock = makeRequestMock({
     fnMethod: vi.fn,
     requestProps: { method: "POST", url: "http://something/v1/anything" },
@@ -167,23 +223,5 @@ describe("ResultHandler", () => {
     expect(responseMock.status).toHaveBeenCalledWith(500);
     expect(responseMock.send).toHaveBeenCalledTimes(1);
     expect(responseMock.send.mock.calls[0]).toMatchSnapshot();
-  });
-
-  test("createResultHandler() should support multiple response schemas depending on status codes", () => {
-    const subject = new ResultHandler({
-      positive: () => [
-        { statusCode: 200, schema: z.literal("ok") },
-        { statusCode: 201, schema: z.literal("kinda") },
-      ],
-      negative: [
-        { statusCode: 400, schema: z.literal("error") },
-        { statusCode: 500, schema: z.literal("failure") },
-      ],
-      handler: ({ response }) => {
-        expectType<Response<"ok" | "kinda" | "error" | "failure">>(response);
-        response.status(200).send("error");
-      },
-    });
-    expect(subject).toBeInstanceOf(AbstractResultHandler);
   });
 });
