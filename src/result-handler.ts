@@ -1,5 +1,4 @@
 import { Request, Response } from "express";
-import assert from "node:assert/strict";
 import { z } from "zod";
 import {
   ApiResponse,
@@ -15,9 +14,9 @@ import {
   logInternalError,
 } from "./common-helpers";
 import { contentTypes } from "./content-type";
-import { ResultHandlerError } from "./errors";
 import { IOSchema } from "./io-schema";
 import { ActualLogger } from "./logger-helpers";
+import { normalize, ResultSchema } from "./result-helpers";
 
 type Handler<RES = unknown> = (params: {
   /** null in case of failure to parse or to find the matching endpoint (error: not found) */
@@ -32,14 +31,14 @@ type Handler<RES = unknown> = (params: {
   logger: ActualLogger;
 }) => void | Promise<void>;
 
-type Result<S extends z.ZodTypeAny = z.ZodTypeAny> =
+export type Result<S extends z.ZodTypeAny = z.ZodTypeAny> =
   | S // plain schema, default status codes applied
   | ApiResponse<S> // single response definition, status code(s) customizable
   | ApiResponse<S>[]; // Feature #1431: different responses for different status codes (non-empty, prog. check!)
 
-type LazyResult<R extends Result, A extends unknown[] = []> = (...args: A) => R;
-
-type ResultSchema<R extends Result> = R extends Result<infer S> ? S : never;
+export type LazyResult<R extends Result, A extends unknown[] = []> = (
+  ...args: A
+) => R;
 
 export abstract class AbstractResultHandler {
   readonly #handler: Handler;
@@ -52,41 +51,6 @@ export abstract class AbstractResultHandler {
     return this.#handler(...params);
   }
 }
-
-/** @throws ResultHandlerError when Result is an empty array */
-export const normalize = <A extends unknown[]>(
-  subject: Result | LazyResult<Result, A>,
-  features: {
-    variant: "positive" | "negative";
-    arguments: A;
-    statusCodes: [number, ...number[]];
-    mimeTypes: [string, ...string[]];
-  },
-): NormalizedResponse[] => {
-  if (typeof subject === "function") {
-    return normalize(subject(...features.arguments), features);
-  }
-  if (subject instanceof z.ZodType) {
-    return [{ ...features, schema: subject }];
-  }
-  if (Array.isArray(subject)) {
-    assert(
-      subject.length,
-      new ResultHandlerError(
-        `At least one ${features.variant} response schema required.`,
-      ),
-    );
-  }
-  return (Array.isArray(subject) ? subject : [subject]).map(
-    ({ schema, statusCodes, statusCode, mimeTypes, mimeType }) => ({
-      schema,
-      statusCodes: statusCode
-        ? [statusCode]
-        : statusCodes || features.statusCodes,
-      mimeTypes: mimeType ? [mimeType] : mimeTypes || features.mimeTypes,
-    }),
-  );
-};
 
 export class ResultHandler<
   POS extends Result,

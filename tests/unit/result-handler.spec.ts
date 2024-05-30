@@ -8,11 +8,11 @@ import {
   defaultResultHandler,
   ResultHandler,
   AbstractResultHandler,
-  ApiResponse,
 } from "../../src";
 import { ResultHandlerError } from "../../src/errors";
 import { metaSymbol } from "../../src/metadata";
 import { describe, expect, test, vi } from "vitest";
+import { Result } from "../../src/result-handler";
 import {
   makeLoggerMock,
   makeRequestMock,
@@ -44,11 +44,7 @@ describe("ResultHandler", () => {
     test("should throw when result is defined as an empty array", () => {
       expect(() =>
         new ResultHandler({
-          positive: () =>
-            [] as unknown as [
-              ApiResponse<z.ZodTypeAny>,
-              ...ApiResponse<z.ZodTypeAny>[],
-            ],
+          positive: () => [] as Result,
           negative: vi.fn(),
           handler: vi.fn(),
         }).getPositiveResponse(z.object({})),
@@ -60,10 +56,7 @@ describe("ResultHandler", () => {
       expect(() =>
         new ResultHandler({
           positive: vi.fn(),
-          negative: [] as unknown as [
-            ApiResponse<z.ZodTypeAny>,
-            ...ApiResponse<z.ZodTypeAny>[],
-          ],
+          negative: [] as Result,
           handler: vi.fn(),
         }).getNegativeResponse(),
       ).toThrow(
