@@ -87,14 +87,14 @@ describe("Integration", () => {
   test("Should support multiple response schemas depending on status code", async () => {
     const factory = new EndpointsFactory(
       new ResultHandler({
-        positive: (output) => [
+        positive: (data) => [
           {
             statusCode: 200,
-            schema: z.object({ status: z.literal("ok"), data: output }),
+            schema: z.object({ status: z.literal("ok"), data }),
           },
           {
             statusCode: 201,
-            schema: z.object({ status: z.literal("kinda"), data: output }),
+            schema: z.object({ status: z.literal("kinda"), data }),
           },
         ],
         negative: [

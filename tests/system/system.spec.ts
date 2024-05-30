@@ -36,7 +36,7 @@ describe("App", async () => {
         }),
       faulty: new EndpointsFactory(
         new ResultHandler({
-          positive: () => z.object({}),
+          positive: z.object({}),
           negative: z.object({}),
           handler: () => assert.fail("I am faulty"),
         }),

@@ -790,8 +790,8 @@ describe("Documentation", () => {
 
     test("should handle custom mime types and status codes", () => {
       const resultHandler = new ResultHandler({
-        positive: (output) => ({
-          schema: z.object({ status: z.literal("OK"), result: output }),
+        positive: (result) => ({
+          schema: z.object({ status: z.literal("OK"), result }),
           mimeTypes: [contentTypes.json, "text/vnd.yaml"],
           statusCode: 201,
         }),
@@ -1019,14 +1019,14 @@ describe("Documentation", () => {
     test("should depict accordingly", () => {
       const factory = new EndpointsFactory(
         new ResultHandler({
-          positive: (output) => [
+          positive: (data) => [
             {
               statusCode: 200,
-              schema: z.object({ status: z.literal("ok"), data: output }),
+              schema: z.object({ status: z.literal("ok"), data }),
             },
             {
               statusCode: 201,
-              schema: z.object({ status: z.literal("kinda"), data: output }),
+              schema: z.object({ status: z.literal("kinda"), data }),
             },
           ],
           negative: [

@@ -24,7 +24,7 @@ describe("Endpoint", () => {
         outputSchema: z.object({}),
         handler: vi.fn<any>(),
         resultHandler: new ResultHandler({
-          positive: () => z.string(),
+          positive: z.string(),
           negative: z.string(),
           handler: vi.fn(),
         }),
@@ -45,7 +45,7 @@ describe("Endpoint", () => {
         outputSchema: z.object({}),
         handler: vi.fn<any>(),
         resultHandler: new ResultHandler({
-          positive: () => z.string(),
+          positive: z.string(),
           negative: z.string(),
           handler: vi.fn(),
         }),
@@ -264,7 +264,7 @@ describe("Endpoint", () => {
   describe("#handleResult", () => {
     test("Should handle errors within ResultHandler", async () => {
       const resultHandler = new ResultHandler({
-        positive: () => z.object({}),
+        positive: z.object({}),
         negative: z.object({}),
         handler: vi.fn(() => assert.fail("Something unexpected happened")),
       });
@@ -493,7 +493,7 @@ describe("Endpoint", () => {
     test("thrown in #handleResult()", async () => {
       const factory = new EndpointsFactory(
         new ResultHandler({
-          positive: () => z.object({}),
+          positive: z.object({}),
           negative: z.object({}),
           handler: () => assert.fail("Something unexpected happened"),
         }),
