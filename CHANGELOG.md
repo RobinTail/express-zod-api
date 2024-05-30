@@ -5,6 +5,9 @@
 ### v20.0.0
 
 - Method `createLogger()` removed — use `new BuiltinLogger()` instead if needed;
+- Method `createResultHandler` removed — use `new ResultHandler()` instead:
+  - The argument's properties renamed: `getPositiveResponse` to `positive` and `getNegativeResponse` to `negative`;
+  - Both properties can now accept static values and the previously assigned functions.
 - Method `createMiddleware()` removed — use either `new Middleware()` or `EndpointsFactory::addMiddleware()` instead:
   - The argument's property `middleware` renamed to `handler`.
 - Publicly exposed types are corrected for better constraints:
@@ -14,6 +17,23 @@
     - when assigning objects to those arguments, avoid `as` operator — use `satisfies` if extra constraints needed.
   - The `options` property of a Middleware' and Endpoint's handler extends from `Record<string, never>` by default:
     - You can not assign additional properties to the `options` directly — use middlewares to combine options.
+
+```ts
+// before
+createResultHandler({
+  getPositiveResponse: (data) => z.object({ data }),
+  getNegativeResponse: () => ({
+    schema: z.string(),
+    mimeType: "text/plain",
+  }),
+});
+
+// after
+new ResultHandler({
+  positive: (data) => z.object({ data }),
+  negative: { schema: z.string(), mimeType: "text/plain" }, // can be static now
+});
+```
 
 ```ts
 // before

@@ -317,9 +317,9 @@ const endpointsFactory = defaultEndpointsFactory.addOptions(async () => {
 custom [Result Handler](#response-customization):
 
 ```typescript
-import { createResultHandler } from "express-zod-api";
+import { ResultHandler } from "express-zod-api";
 
-const resultHandlerWithCleanup = createResultHandler({
+const resultHandlerWithCleanup = new ResultHandler({
   handler: ({ options }) => {
     // necessary to check for certain option presence:
     if ("db" in options && options.db) {
@@ -724,18 +724,17 @@ You can create your own result handler by using this example as a template:
 ```typescript
 import { z } from "zod";
 import {
-  createResultHandler,
-  IOSchema,
+  ResultHandler,
   getStatusCodeFromError,
   getMessageFromError,
 } from "express-zod-api";
 
-const yourResultHandler = createResultHandler({
-  getPositiveResponse: (output: IOSchema) => ({
-    schema: z.object({ data: output }),
+const yourResultHandler = new ResultHandler({
+  positive: (data) => ({
+    schema: z.object({ data }),
     mimeType: "application/json", // optinal, or mimeTypes for array
   }),
-  getNegativeResponse: () => z.object({ error: z.string() }),
+  negative: z.object({ error: z.string() }),
   handler: ({ error, input, output, request, response, logger }) => {
     if (!error) {
       // your implementation
@@ -775,12 +774,9 @@ The response schema generally may be just `z.string()`, but I made more specific
 
 ```typescript
 const fileStreamingEndpointsFactory = new EndpointsFactory(
-  createResultHandler({
-    getPositiveResponse: () => ({
-      schema: ez.file("buffer"),
-      mimeType: "image/*",
-    }),
-    getNegativeResponse: () => ({ schema: z.string(), mimeType: "text/plain" }),
+  new ResultHandler({
+    positive: { schema: ez.file("buffer"), mimeType: "image/*" },
+    negative: { schema: z.string(), mimeType: "text/plain" },
     handler: ({ response, error, output }) => {
       if (error) {
         response.status(400).send(error.message);
@@ -954,18 +950,18 @@ properties as needed._
 
 In some special cases you may want the ResultHandler to respond slightly differently depending on the status code,
 for example if your API strictly follows REST standards. It may also be necessary to reflect this difference in the
-generated Documentation. To implement this functionality, the `createResultHandler` method supports a flexible
-declaration of possible response schemas and their corresponding status codes.
+generated Documentation. For that purpose, the constructor of `ResultHandler` accepts flexible declaration of possible
+response schemas and their corresponding status codes.
 
 ```typescript
-import { createResultHandler } from "express-zod-api";
+import { ResultHandler } from "express-zod-api";
 
-createResultHandler({
-  getPositiveResponse: (output) => ({
+new ResultHandler({
+  positive: (data) => ({
     statusCodes: [201, 202], // created or will be created
-    schema: z.object({ status: z.literal("created"), data: output }),
+    schema: z.object({ status: z.literal("created"), data }),
   }),
-  getNegativeResponse: () => [
+  negative: [
     {
       statusCode: 409, // conflict: entity already exists
       schema: z.object({ status: z.literal("exists"), id: z.number().int() }),

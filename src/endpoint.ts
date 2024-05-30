@@ -1,11 +1,7 @@
 import { Request, Response } from "express";
 import assert from "node:assert/strict";
 import { z } from "zod";
-import {
-  NormalizedResponse,
-  defaultStatusCodes,
-  normalizeApiResponse,
-} from "./api-response";
+import { NormalizedResponse } from "./api-response";
 import { hasRaw, hasTransformationOnTop, hasUpload } from "./deep-checks";
 import {
   FlatObject,
@@ -27,7 +23,7 @@ import { LogicalContainer, combineContainers } from "./logical-container";
 import { AuxMethod, Method } from "./method";
 import { AbstractMiddleware, ExpressMiddleware } from "./middleware";
 import { ContentType, contentTypes } from "./content-type";
-import { AnyResultHandlerDefinition } from "./result-handler";
+import { AbstractResultHandler } from "./result-handler";
 import { Security } from "./security";
 
 export type Handler<IN, OUT, OPT> = (params: {
@@ -82,7 +78,7 @@ export class Endpoint<
     ReadonlyArray<NormalizedResponse>
   >;
   readonly #handler: Handler<z.output<IN>, z.input<OUT>, OPT>;
-  readonly #resultHandler: AnyResultHandlerDefinition;
+  readonly #resultHandler: AbstractResultHandler;
   readonly #schemas: { input: IN; output: OUT };
   readonly #scopes: ReadonlyArray<SCO>;
   readonly #tags: ReadonlyArray<TAG>;
@@ -106,7 +102,7 @@ export class Endpoint<
     inputSchema: IN;
     outputSchema: OUT;
     handler: Handler<z.output<IN>, z.input<OUT>, OPT>;
-    resultHandler: AnyResultHandlerDefinition;
+    resultHandler: AbstractResultHandler;
     description?: string;
     shortDescription?: string;
     getOperationId?: (method: Method) => string | undefined;
@@ -133,27 +129,9 @@ export class Endpoint<
       );
     }
     this.#responses = {
-      positive: Object.freeze(
-        normalizeApiResponse(resultHandler.getPositiveResponse(outputSchema), {
-          mimeTypes: [contentTypes.json],
-          statusCodes: [defaultStatusCodes.positive],
-        }),
-      ),
-      negative: Object.freeze(
-        normalizeApiResponse(resultHandler.getNegativeResponse(), {
-          mimeTypes: [contentTypes.json],
-          statusCodes: [defaultStatusCodes.negative],
-        }),
-      ),
+      positive: Object.freeze(resultHandler.getPositiveResponse(outputSchema)),
+      negative: Object.freeze(resultHandler.getNegativeResponse()),
     };
-    for (const [variant, responses] of Object.entries(this.#responses)) {
-      assert(
-        responses.length,
-        new ResultHandlerError(
-          `ResultHandler must have at least one ${variant} response schema specified.`,
-        ),
-      );
-    }
     this.#requestType = hasUpload(inputSchema)
       ? "upload"
       : hasRaw(inputSchema)
@@ -326,7 +304,7 @@ export class Endpoint<
     options: Partial<OPT>;
   }) {
     try {
-      await this.#resultHandler.handler({
+      await this.#resultHandler.execute({
         error,
         output,
         request,

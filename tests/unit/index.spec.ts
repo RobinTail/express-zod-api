@@ -21,7 +21,6 @@ import {
   OAuth2Security,
   OpenIdSecurity,
   Producer,
-  ResultHandlerDefinition,
   Routing,
   ServerConfig,
 } from "../../src";
@@ -68,31 +67,6 @@ describe("Index Entrypoint", () => {
         server: { listen: 8090 },
         logger: { level: "silent" },
         cors: false,
-      });
-      expectType<ResultHandlerDefinition<z.ZodTypeAny, z.ZodTypeAny>>({
-        getPositiveResponse: vi.fn(),
-        getNegativeResponse: vi.fn(),
-        handler: vi.fn(),
-      });
-      expectType<
-        ResultHandlerDefinition<
-          ApiResponse<z.ZodTypeAny>[],
-          ApiResponse<z.ZodTypeAny>[]
-        >
-      >({
-        getPositiveResponse: vi.fn(),
-        getNegativeResponse: vi.fn(),
-        handler: vi.fn(),
-      });
-      expectType<
-        ResultHandlerDefinition<
-          ApiResponse<z.ZodTypeAny>,
-          ApiResponse<z.ZodTypeAny>
-        >
-      >({
-        getPositiveResponse: vi.fn(),
-        getNegativeResponse: vi.fn(),
-        handler: vi.fn(),
       });
       expectType<BasicSecurity>({ type: "basic" });
       expectType<BearerSecurity>({ type: "bearer" });

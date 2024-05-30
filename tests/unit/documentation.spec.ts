@@ -7,9 +7,9 @@ import {
   EndpointsFactory,
   createConfig,
   Middleware,
-  createResultHandler,
   defaultEndpointsFactory,
   ez,
+  ResultHandler,
 } from "../../src";
 import { expectType } from "tsd";
 import { contentTypes } from "../../src/content-type";
@@ -789,17 +789,17 @@ describe("Documentation", () => {
     });
 
     test("should handle custom mime types and status codes", () => {
-      const resultHandler = createResultHandler({
-        getPositiveResponse: (output) => ({
-          schema: z.object({ status: z.literal("OK"), result: output }),
+      const resultHandler = new ResultHandler({
+        positive: (result) => ({
+          schema: z.object({ status: z.literal("OK"), result }),
           mimeTypes: [contentTypes.json, "text/vnd.yaml"],
           statusCode: 201,
         }),
-        getNegativeResponse: () => ({
+        negative: {
           schema: z.object({ status: z.literal("NOT OK") }),
           mimeType: "text/vnd.yaml",
           statusCode: 403,
-        }),
+        },
         handler: () => {},
       });
       const factory = new EndpointsFactory(resultHandler);
@@ -1018,18 +1018,18 @@ describe("Documentation", () => {
   describe("Feature #1431: Multiple schemas for different status codes", () => {
     test("should depict accordingly", () => {
       const factory = new EndpointsFactory(
-        createResultHandler({
-          getPositiveResponse: (output) => [
+        new ResultHandler({
+          positive: (data) => [
             {
               statusCode: 200,
-              schema: z.object({ status: z.literal("ok"), data: output }),
+              schema: z.object({ status: z.literal("ok"), data }),
             },
             {
               statusCode: 201,
-              schema: z.object({ status: z.literal("kinda"), data: output }),
+              schema: z.object({ status: z.literal("kinda"), data }),
             },
           ],
-          getNegativeResponse: () => [
+          negative: [
             { statusCode: 400, schema: z.literal("error") },
             { statusCode: 500, schema: z.literal("failure") },
           ],

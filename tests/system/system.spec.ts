@@ -4,9 +4,9 @@ import { z } from "zod";
 import {
   EndpointsFactory,
   Method,
-  createResultHandler,
   createServer,
   defaultResultHandler,
+  ResultHandler,
 } from "../../src";
 import { givePort, waitFor } from "../helpers";
 import { afterAll, describe, expect, test, vi } from "vitest";
@@ -35,9 +35,9 @@ describe("App", async () => {
           }),
         }),
       faulty: new EndpointsFactory(
-        createResultHandler({
-          getPositiveResponse: () => z.object({}),
-          getNegativeResponse: () => z.object({}),
+        new ResultHandler({
+          positive: z.object({}),
+          negative: z.object({}),
           handler: () => assert.fail("I am faulty"),
         }),
       )

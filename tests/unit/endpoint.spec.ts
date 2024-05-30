@@ -4,14 +4,14 @@ import {
   AbstractEndpoint,
   EndpointsFactory,
   Middleware,
-  createResultHandler,
   defaultEndpointsFactory,
   defaultResultHandler,
   ez,
   testEndpoint,
+  ResultHandler,
 } from "../../src";
 import { Endpoint } from "../../src/endpoint";
-import { IOSchemaError, ResultHandlerError } from "../../src/errors";
+import { IOSchemaError } from "../../src/errors";
 import { serializeSchemaForTest } from "../helpers";
 import { describe, expect, test, vi } from "vitest";
 
@@ -23,9 +23,9 @@ describe("Endpoint", () => {
         inputSchema: z.object({}),
         outputSchema: z.object({}),
         handler: vi.fn<any>(),
-        resultHandler: createResultHandler({
-          getPositiveResponse: () => z.string(),
-          getNegativeResponse: () => z.string(),
+        resultHandler: new ResultHandler({
+          positive: z.string(),
+          negative: z.string(),
           handler: vi.fn(),
         }),
       });
@@ -44,9 +44,9 @@ describe("Endpoint", () => {
         inputSchema: z.object({}),
         outputSchema: z.object({}),
         handler: vi.fn<any>(),
-        resultHandler: createResultHandler({
-          getPositiveResponse: () => z.string(),
-          getNegativeResponse: () => z.string(),
+        resultHandler: new ResultHandler({
+          positive: z.string(),
+          negative: z.string(),
           handler: vi.fn(),
         }),
       });
@@ -61,7 +61,7 @@ describe("Endpoint", () => {
         .mockImplementationOnce(async ({ input }) => ({
           inc: input.n + 1,
         }));
-      const resultHandlerSpy = vi.spyOn(defaultResultHandler, "handler");
+      const resultHandlerSpy = vi.spyOn(defaultResultHandler, "execute");
       const factory = new EndpointsFactory(defaultResultHandler).addMiddleware({
         input: z.object({
           n: z.number(),
@@ -263,11 +263,12 @@ describe("Endpoint", () => {
 
   describe("#handleResult", () => {
     test("Should handle errors within ResultHandler", async () => {
-      const resultHandler = createResultHandler({
-        getPositiveResponse: () => z.object({}),
-        getNegativeResponse: () => z.object({}),
+      const resultHandler = new ResultHandler({
+        positive: z.object({}),
+        negative: z.object({}),
         handler: vi.fn(() => assert.fail("Something unexpected happened")),
       });
+      const spy = vi.spyOn(resultHandler, "execute");
       const factory = new EndpointsFactory(resultHandler);
       const endpoint = factory.build({
         method: "get",
@@ -284,7 +285,7 @@ describe("Endpoint", () => {
       expect(loggerMock.error.mock.calls[0][0]).toBe(
         "Result handler failure: Something unexpected happened.",
       );
-      expect(resultHandler.handler).toHaveBeenCalledWith({
+      expect(spy).toHaveBeenCalledWith({
         error: null,
         logger: loggerMock,
         input: {},
@@ -491,9 +492,9 @@ describe("Endpoint", () => {
 
     test("thrown in #handleResult()", async () => {
       const factory = new EndpointsFactory(
-        createResultHandler({
-          getPositiveResponse: () => z.object({}),
-          getNegativeResponse: () => z.object({}),
+        new ResultHandler({
+          positive: z.object({}),
+          negative: z.object({}),
           handler: () => assert.fail("Something unexpected happened"),
         }),
       );
@@ -701,11 +702,11 @@ describe("Endpoint", () => {
             inputSchema: z.object({}).transform(() => []),
             outputSchema: z.object({}),
             handler: vi.fn<any>(),
-            resultHandler: {
-              getPositiveResponse: vi.fn(),
-              getNegativeResponse: vi.fn(),
+            resultHandler: new ResultHandler({
+              positive: vi.fn(),
+              negative: vi.fn(),
               handler: vi.fn(),
-            },
+            }),
           }),
       ).toThrow(
         new IOSchemaError(
@@ -719,56 +720,15 @@ describe("Endpoint", () => {
             inputSchema: z.object({}),
             outputSchema: z.object({}).transform(() => []),
             handler: vi.fn<any>(),
-            resultHandler: {
-              getPositiveResponse: vi.fn(),
-              getNegativeResponse: vi.fn(),
+            resultHandler: new ResultHandler({
+              positive: vi.fn(),
+              negative: vi.fn(),
               handler: vi.fn(),
-            },
+            }),
           }),
       ).toThrow(
         new IOSchemaError(
           "Using transformations on the top level of endpoint output schema is not allowed.",
-        ),
-      );
-    });
-  });
-
-  describe("Feature #1431: Multiple responses and status codes", () => {
-    test("Should throw in constructor when ResultHandler has no response schema specified", () => {
-      expect(
-        () =>
-          new Endpoint({
-            methods: ["get"],
-            inputSchema: z.object({}),
-            outputSchema: z.object({}),
-            handler: vi.fn<any>(),
-            resultHandler: {
-              getPositiveResponse: () => [],
-              getNegativeResponse: () => z.any(),
-              handler: vi.fn(),
-            },
-          }),
-      ).toThrow(
-        new ResultHandlerError(
-          "ResultHandler must have at least one positive response schema specified.",
-        ),
-      );
-      expect(
-        () =>
-          new Endpoint({
-            methods: ["get"],
-            inputSchema: z.object({}),
-            outputSchema: z.object({}),
-            handler: vi.fn<any>(),
-            resultHandler: {
-              getPositiveResponse: () => z.any(),
-              getNegativeResponse: () => [],
-              handler: vi.fn(),
-            },
-          }),
-      ).toThrow(
-        new ResultHandlerError(
-          "ResultHandler must have at least one negative response schema specified.",
         ),
       );
     });
