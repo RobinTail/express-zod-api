@@ -224,7 +224,7 @@ describe("EndpointsFactory", () => {
 
       test("Should handle errors", async () => {
         const resultHandlerMock = new ResultHandler({
-          positive: () => z.string(),
+          positive: z.string(),
           negative: z.string(),
           handler: vi.fn(),
         });
@@ -423,7 +423,7 @@ describe("EndpointsFactory", () => {
         handler: vi.fn<any>(),
       });
       const resultHandlerMock = new ResultHandler({
-        positive: () => z.string(),
+        positive: z.string(),
         negative: z.string(),
         handler: vi.fn(),
       });
