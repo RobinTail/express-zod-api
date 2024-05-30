@@ -85,18 +85,14 @@ export class ResultHandler<
   readonly #positive: POS | LazyResult<POS, [IOSchema]>;
   readonly #negative: NEG | LazyResult<NEG>;
 
-  constructor({
-    positive,
-    negative,
-    handler,
-  }: {
+  constructor(params: {
     positive: POS | LazyResult<POS, [IOSchema]>;
     negative: NEG | LazyResult<NEG>;
     handler: Handler<z.output<ResultSchema<POS> | ResultSchema<NEG>>>;
   }) {
-    super(handler);
-    this.#positive = positive;
-    this.#negative = negative;
+    super(params.handler);
+    this.#positive = params.positive;
+    this.#negative = params.negative;
   }
 
   public override getPositiveResponse(output: IOSchema) {
