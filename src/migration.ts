@@ -1,6 +1,21 @@
 import type { TSESLint } from "@typescript-eslint/utils";
+import { mapObjIndexed } from "ramda";
 
 const pluginName = "ez-migration";
+
+const changes = {
+  createLogger: "BuiltinLogger",
+  createResultHandler: "ResultHandler",
+  createMiddleware: "Middleware",
+};
+
+const messages = mapObjIndexed(
+  (value, key) => `Change ${key} to ${value}.`,
+  changes,
+);
+
+const shouldReplace = (subject: string): subject is keyof typeof changes =>
+  subject in changes;
 
 const rules = {
   "changed-imports": {
@@ -8,28 +23,23 @@ const rules = {
     meta: {
       type: "suggestion",
       fixable: "code",
-      messages: { entity: "Entity replaced, autofix available" },
+      messages,
       schema: [],
     },
     create(context) {
       return {
         ImportDeclaration(node) {
-          const changes = {
-            createLogger: "BuiltinLogger",
-            createResultHandler: "ResultHandler",
-          };
           if (node.source.value === "express-zod-api") {
             for (const spec of node.specifiers) {
               if (
                 spec.type === "ImportSpecifier" &&
-                spec.imported.name in changes
+                shouldReplace(spec.imported.name)
               ) {
-                const change =
-                  changes[spec.imported.name as keyof typeof changes];
+                const replacement = changes[spec.imported.name];
                 context.report({
                   node,
-                  messageId: "entity",
-                  fix: (fixer) => fixer.replaceText(spec, change),
+                  messageId: spec.imported.name,
+                  fix: (fixer) => fixer.replaceText(spec, replacement),
                 });
               }
             }
@@ -37,7 +47,7 @@ const rules = {
         },
       };
     },
-  } satisfies TSESLint.RuleModule<"entity">,
+  } satisfies TSESLint.RuleModule<keyof typeof changes>,
 };
 
 export const migration = {
