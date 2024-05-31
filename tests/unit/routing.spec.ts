@@ -375,7 +375,7 @@ describe("Routing", () => {
       await routeHandler(requestMock, responseMock, nextMock);
       expect(nextMock).toHaveBeenCalledTimes(0);
       expect(handlerMock).toHaveBeenCalledTimes(1);
-      expect(loggerMock._getLogs().error).toEqual([]);
+      expect(loggerMock._getLogs().error).toHaveLength(0);
       expect(handlerMock).toHaveBeenCalledWith({
         input: {
           test: 123,
