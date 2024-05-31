@@ -53,7 +53,7 @@ interface TestEndpointProps<REQ, LOG> {
   endpoint: AbstractEndpoint;
   /**
    * @desc Additional properties to set on Request mock
-   * @default { method: "GET", headers: {"content-type": "application/json" } }
+   * @default { method: "GET", headers: { "content-type": "application/json" } }
    * */
   requestProps?: REQ;
   /** @link https://www.npmjs.com/package/node-mocks-http */
