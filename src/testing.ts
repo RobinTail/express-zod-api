@@ -20,11 +20,13 @@ export interface MockOverrides {}
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- for assignment compatibility
 type MockFunction = (implementation?: (...args: any[]) => any) => MockOverrides;
 
-export const makeRequestMock = <REQ extends RequestOptions>(props?: REQ) =>
-  createRequest({
+export const makeRequestMock = <REQ extends RequestOptions>(props?: REQ) => {
+  const mock = createRequest<Request>({
     ...props,
     headers: { "content-type": contentTypes.json, ...props?.headers },
-  }) as ReturnType<typeof createRequest> & REQ;
+  });
+  return mock as typeof mock & REQ;
+};
 
 export const makeResponseMock = <RES extends FlatObject>({
   fnMethod,
