@@ -3,19 +3,27 @@ import { mapObjIndexed } from "ramda";
 
 const pluginName = "ez-migration";
 
-const changes = {
+const changedMethods = {
   createLogger: "BuiltinLogger",
   createResultHandler: "ResultHandler",
   createMiddleware: "Middleware",
 };
 
-const messages = mapObjIndexed(
-  (value, key) => `Change ${key} to ${value}.`,
-  changes,
-);
+const changedProps = {
+  getPositiveResponse: "positive",
+  getNegativeResponse: "negative",
+  responseProps: "responseOptions",
+};
 
-const shouldReplace = (subject: string): subject is keyof typeof changes =>
-  subject in changes;
+const messages = mapObjIndexed((value, key) => `Change ${key} to ${value}.`, {
+  ...changedMethods,
+  ...changedProps,
+});
+
+const shouldReplace = <T extends Record<string, string>>(
+  subject: unknown,
+  scope: T,
+): subject is keyof T => typeof subject === "string" && subject in scope;
 
 const rules = {
   "changed-imports": {
@@ -33,9 +41,9 @@ const rules = {
             for (const spec of node.specifiers) {
               if (
                 spec.type === "ImportSpecifier" &&
-                shouldReplace(spec.imported.name)
+                shouldReplace(spec.imported.name, changedMethods)
               ) {
-                const replacement = changes[spec.imported.name];
+                const replacement = changedMethods[spec.imported.name];
                 context.report({
                   node,
                   messageId: spec.imported.name,
@@ -48,9 +56,9 @@ const rules = {
         CallExpression(node) {
           if (
             node.callee.type === "Identifier" &&
-            shouldReplace(node.callee.name)
+            shouldReplace(node.callee.name, changedMethods)
           ) {
-            const replacement = `new ${changes[node.callee.name]}`;
+            const replacement = `new ${changedMethods[node.callee.name]}`;
             context.report({
               node,
               messageId: node.callee.name,
@@ -58,9 +66,32 @@ const rules = {
             });
           }
         },
+        NewExpression(node) {
+          if (
+            node.callee.type === "Identifier" &&
+            node.callee.name === changedMethods.createResultHandler &&
+            node.arguments.length === 1 &&
+            node.arguments[0].type === "ObjectExpression"
+          ) {
+            for (const prop of node.arguments[0].properties) {
+              if (
+                prop.type === "Property" &&
+                prop.key.type === "Identifier" &&
+                shouldReplace(prop.key.name, changedProps)
+              ) {
+                const replacement = changedProps[prop.key.name];
+                context.report({
+                  node: prop,
+                  messageId: prop.key.name,
+                  fix: (fixer) => fixer.replaceText(prop.key, replacement),
+                });
+              }
+            }
+          }
+        },
       };
     },
-  } satisfies TSESLint.RuleModule<keyof typeof changes>,
+  } satisfies TSESLint.RuleModule<keyof typeof messages>,
 };
 
 export const migration = {
