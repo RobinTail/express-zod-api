@@ -34,16 +34,15 @@ export const makeLoggerMock = <LOG extends FlatObject>(loggerProps?: LOG) => {
     (loggerProps || {}) as AbstractLogger &
       LOG & { _getLogs: () => typeof logs },
     {
-      get(target, prop) {
+      get(target, prop, recv) {
         if (prop === "_getLogs") {
           return () => logs;
         }
         if (prop in severity) {
           return (...args: unknown[]) =>
             logs[prop as keyof AbstractLogger].push(args);
-          // @todo maybe should also check props
         }
-        return target[prop as keyof typeof target];
+        return Reflect.get(target, prop, recv);
       },
     },
   );
