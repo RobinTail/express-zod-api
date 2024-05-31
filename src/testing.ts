@@ -88,7 +88,7 @@ interface TestEndpointProps<REQ, RES, LOG> {
   endpoint: AbstractEndpoint;
   /**
    * @desc Additional properties to set on Request mock
-   * @default { method: "GET", header: () => "application/json" }
+   * @default { method: "GET", headers: {"content-type": "application/json" } }
    * */
   requestProps?: REQ;
   /**
