@@ -98,9 +98,7 @@ describe("ResultHandler", () => {
         [
           expect.stringMatching(/^Internal server error\nError: Some error/),
           {
-            payload: {
-              something: 453,
-            },
+            payload: { something: 453 },
             url: "http://something/v1/anything",
           },
         ],
