@@ -42,7 +42,7 @@ export default [
       "import-x/no-extraneous-dependencies": "error",
       "@typescript-eslint/no-empty-object-type": [
         "error",
-        { allowWithName: "LoggerOverrides|MockOverrides" },
+        { allowWithName: "LoggerOverrides" },
       ],
     },
   },
@@ -51,10 +51,7 @@ export default [
     files: ["tests/**/*.ts"],
     rules: {
       "@typescript-eslint/no-explicit-any": "off",
-      "@typescript-eslint/no-empty-object-type": [
-        "warn",
-        { allowWithName: "MockOverrides" },
-      ],
+      "@typescript-eslint/no-empty-object-type": ["warn"],
     },
   },
   // Special needs of plugin

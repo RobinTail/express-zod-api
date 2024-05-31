@@ -12,14 +12,6 @@ import {
   ResponseOptions,
 } from "node-mocks-http";
 
-/**
- * @desc Using module augmentation approach you can set the Mock type of your actual testing framework.
- * @example declare module "express-zod-api" { interface MockOverrides extends Mock {} }
- * @link https://www.typescriptlang.org/docs/handbook/declaration-merging.html#module-augmentation
- * @todo remove
- * */
-export interface MockOverrides {}
-
 export const makeRequestMock = <REQ extends RequestOptions>(props?: REQ) => {
   const mock = createRequest<Request>({
     ...props,

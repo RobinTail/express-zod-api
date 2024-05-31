@@ -3,10 +3,6 @@ import { z } from "zod";
 import { defaultEndpointsFactory, testEndpoint } from "../../src";
 import { Mock, describe, expect, test, vi } from "vitest";
 
-declare module "../../src" {
-  interface MockOverrides extends Mock {}
-}
-
 describe("Testing", () => {
   describe("testEndpoint()", () => {
     test("Should test the endpoint", async () => {
