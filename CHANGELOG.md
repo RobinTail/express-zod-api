@@ -56,6 +56,24 @@ factory // variant 1:
   .addMiddleware({ input: z.object({}), handler: async () => ({}) });
 ```
 
+```ts
+// before
+const { responseMock: responseMockBefore, loggerMock: loggerMockBefore } =
+  testEndpoint({
+    fnMethod: vi.fn,
+    endpoint,
+  });
+expect(responseMockBefore.status).toHaveBeenCalledWith(200);
+expect(loggerMockBefore.error).not.toHaveBeenCalled();
+
+// after
+const { responseMock, loggerMock } = testEndpoint({ endpoint });
+expect(responseMock._getStatusCode()).toBe(200);
+expect(responseMock._getHeaders()).toEqual({ "x-custom": "one" });
+expect(responseMock._getData()).toBe(JSON.stringify({ status: "success" }));
+expect(loggerMock._getLogs().error).toEqual([]);
+```
+
 ## Version 19
 
 ### v19.2.1
