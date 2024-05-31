@@ -72,7 +72,7 @@ interface TestEndpointProps<REQ, LOG> {
 
 export const testEndpoint = async <
   LOG extends FlatObject,
-  REQ extends FlatObject,
+  REQ extends RequestOptions,
 >({
   endpoint,
   requestProps,
