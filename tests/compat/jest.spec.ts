@@ -21,11 +21,13 @@ describe("Jest compatibility test", () => {
           requestProps: { method: "POST", body: { n: 123 } },
           fnMethod,
         });
-        expect(responseMock.status).toHaveBeenCalledWith(200);
-        expect(responseMock.json).toHaveBeenCalledWith({
-          status: "success",
-          data: { inc: 124 },
-        });
+        expect(responseMock._getStatusCode()).toBe(200);
+        expect(responseMock._getData()).toBe(
+          JSON.stringify({
+            status: "success",
+            data: { inc: 124 },
+          }),
+        );
       },
     );
   });
