@@ -236,10 +236,7 @@ describe("Routing", () => {
       expect(appMock.options.mock.calls[0][0]).toBe("/hello");
       const fn = appMock.options.mock.calls[0][1];
       expect(typeof fn).toBe("function"); // async (req, res) => void
-      const requestMock = makeRequestMock({
-        fnMethod: vi.fn,
-        requestProps: { method: "PUT" },
-      });
+      const requestMock = makeRequestMock({ method: "PUT" });
       const responseMock = makeResponseMock({ fnMethod: vi.fn });
       await fn(requestMock, responseMock);
       expect(responseMock.status).toHaveBeenCalledWith(200);
@@ -371,8 +368,8 @@ describe("Routing", () => {
       expect(appMock.post).toHaveBeenCalledTimes(1);
       const routeHandler = appMock.post.mock.calls[0][1] as RequestHandler;
       const requestMock = makeRequestMock({
-        fnMethod: vi.fn,
-        requestProps: { method: "POST", body: { test: 123 } },
+        method: "POST",
+        body: { test: 123 },
       });
       const responseMock = makeResponseMock({ fnMethod: vi.fn });
       const nextMock = vi.fn();
@@ -424,7 +421,7 @@ describe("Routing", () => {
       });
       expect(appMock.get).toHaveBeenCalledTimes(1);
       const routeHandler = appMock.get.mock.calls[0][1] as RequestHandler;
-      const requestMock = makeRequestMock({ fnMethod: vi.fn });
+      const requestMock = makeRequestMock();
       const responseMock = makeResponseMock({
         fnMethod: vi.fn,
         responseProps: {

@@ -85,12 +85,9 @@ describe("Server helpers", () => {
       });
       const next = vi.fn();
       const requestMock = makeRequestMock({
-        fnMethod: vi.fn,
-        requestProps: {
-          method: "POST",
-          path: "/v1/test",
-          body: { n: 453 },
-        },
+        method: "POST",
+        path: "/v1/test",
+        body: { n: 453 },
       });
       const responseMock = makeResponseMock({
         fnMethod: vi.fn,
@@ -133,12 +130,9 @@ describe("Server helpers", () => {
       });
       const next = vi.fn();
       const requestMock = makeRequestMock({
-        fnMethod: vi.fn,
-        requestProps: {
-          method: "POST",
-          path: "/v1/test",
-          body: { n: 453 },
-        },
+        method: "POST",
+        path: "/v1/test",
+        body: { n: 453 },
       });
       const responseMock = makeResponseMock({ fnMethod: vi.fn });
       handler(
@@ -214,7 +208,7 @@ describe("Server helpers", () => {
       },
       rootLogger,
     });
-    const requestMock = makeRequestMock({ fnMethod: vi.fn });
+    const requestMock = makeRequestMock();
     const responseMock = makeResponseMock({ fnMethod: vi.fn });
     const nextMock = vi.fn();
 
@@ -270,11 +264,8 @@ describe("Server helpers", () => {
     test("should place the body into the raw prop of the body object", () => {
       const buffer = Buffer.from([]);
       const requestMock = makeRequestMock({
-        fnMethod: vi.fn,
-        requestProps: {
-          method: "POST",
-          body: buffer,
-        },
+        method: "POST",
+        body: buffer,
       });
       const nextMock = vi.fn();
       moveRaw(requestMock as unknown as Request, {} as Response, nextMock);

@@ -7,6 +7,7 @@ import { AbstractLogger, ActualLogger } from "./logger-helpers";
 import { contentTypes } from "./content-type";
 import { loadAlternativePeer } from "./peer-helpers";
 import { LocalResponse } from "./server-helpers";
+import { createRequest, RequestOptions } from "node-mocks-http";
 
 /**
  * @desc Using module augmentation approach you can set the Mock type of your actual testing framework.
@@ -19,18 +20,11 @@ export interface MockOverrides {}
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- for assignment compatibility
 type MockFunction = (implementation?: (...args: any[]) => any) => MockOverrides;
 
-export const makeRequestMock = <REQ extends FlatObject>({
-  fnMethod,
-  requestProps,
-}: {
-  fnMethod: MockFunction;
-  requestProps?: REQ;
-}) =>
-  ({
-    method: "GET",
-    header: fnMethod(() => contentTypes.json),
-    ...requestProps,
-  }) as { method: string } & Record<"header", MockOverrides> & REQ;
+export const makeRequestMock = <REQ extends RequestOptions>(props?: REQ) =>
+  createRequest({
+    ...props,
+    headers: { "content-type": contentTypes.json, ...props?.headers },
+  }) as ReturnType<typeof createRequest> & REQ;
 
 export const makeResponseMock = <RES extends FlatObject>({
   fnMethod,
@@ -139,7 +133,7 @@ export const testEndpoint = async <
         { moduleName: "@jest/globals", moduleExport: "jest" },
       ])
     ).fn;
-  const requestMock = makeRequestMock({ fnMethod, requestProps });
+  const requestMock = makeRequestMock(requestProps);
   const responseMock = makeResponseMock({ fnMethod, responseProps });
   const loggerMock = makeLoggerMock({ fnMethod, loggerProps });
   const configMock = {

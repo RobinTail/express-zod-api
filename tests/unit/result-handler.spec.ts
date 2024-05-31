@@ -68,8 +68,8 @@ describe("ResultHandler", () => {
   });
 
   const requestMock = makeRequestMock({
-    fnMethod: vi.fn,
-    requestProps: { method: "POST", url: "http://something/v1/anything" },
+    method: "POST",
+    url: "http://something/v1/anything",
   });
 
   describe.each([
