@@ -45,6 +45,19 @@ const rules = {
             }
           }
         },
+        CallExpression(node) {
+          if (
+            node.callee.type === "Identifier" &&
+            shouldReplace(node.callee.name)
+          ) {
+            const replacement = `new ${changes[node.callee.name]}`;
+            context.report({
+              node,
+              messageId: node.callee.name,
+              fix: (fixer) => fixer.replaceText(node.callee, replacement),
+            });
+          }
+        },
       };
     },
   } satisfies TSESLint.RuleModule<keyof typeof changes>,
