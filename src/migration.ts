@@ -8,30 +8,36 @@ const rules = {
     meta: {
       type: "suggestion",
       fixable: "code",
-      messages: { builtinLogger: "createLogger —> BuiltinLogger" },
+      messages: { entity: "Entity replaced, autofix available" },
       schema: [],
     },
     create(context) {
       return {
         ImportDeclaration(node) {
+          const changes = {
+            createLogger: "BuiltinLogger",
+            createResultHandler: "ResultHandler",
+          };
           if (node.source.value === "express-zod-api") {
-            const spec = node.specifiers.find(
-              (spec) =>
+            for (const spec of node.specifiers) {
+              if (
                 spec.type === "ImportSpecifier" &&
-                spec.imported.name === "createLogger",
-            );
-            if (spec) {
-              context.report({
-                node,
-                messageId: "builtinLogger",
-                fix: (fixer) => fixer.replaceText(spec, "BuiltinLogger"),
-              });
+                spec.imported.name in changes
+              ) {
+                const change =
+                  changes[spec.imported.name as keyof typeof changes];
+                context.report({
+                  node,
+                  messageId: "entity",
+                  fix: (fixer) => fixer.replaceText(spec, change),
+                });
+              }
             }
           }
         },
       };
     },
-  } satisfies TSESLint.RuleModule<"builtinLogger">,
+  } satisfies TSESLint.RuleModule<"entity">,
 };
 
 export const migration = {
