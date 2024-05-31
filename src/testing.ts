@@ -56,7 +56,10 @@ interface TestEndpointProps<REQ, LOG> {
    * @default { method: "GET", headers: { "content-type": "application/json" } }
    * */
   requestProps?: REQ;
-  /** @link https://www.npmjs.com/package/node-mocks-http */
+  /**
+   * @link https://www.npmjs.com/package/node-mocks-http
+   * @default { req: requestMock }
+   * */
   responseOptions?: ResponseOptions;
   /**
    * @desc Additional properties to set on config mock
@@ -81,7 +84,10 @@ export const testEndpoint = async <
   loggerProps,
 }: TestEndpointProps<REQ, LOG>) => {
   const requestMock = makeRequestMock(requestProps);
-  const responseMock = makeResponseMock(responseOptions);
+  const responseMock = makeResponseMock({
+    req: requestMock,
+    ...responseOptions,
+  });
   const loggerMock = makeLoggerMock(loggerProps);
   const configMock = {
     cors: false,
