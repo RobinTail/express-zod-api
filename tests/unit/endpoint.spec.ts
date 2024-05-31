@@ -575,7 +575,9 @@ describe("Endpoint", () => {
           },
         },
       });
-      expect(responseMock._getData()).toMatchSnapshot();
+      expect(responseMock._getData()).toBe(
+        JSON.stringify({ status: "success", data: {} }),
+      );
       expect(responseMock._getStatusCode()).toBe(200);
     });
 
@@ -590,7 +592,15 @@ describe("Endpoint", () => {
           },
         },
       });
-      expect(responseMock._getData()).toMatchSnapshot();
+      expect(responseMock._getData()).toBe(
+        JSON.stringify({
+          status: "error",
+          error: {
+            message:
+              "dynamicValue: type1Attribute is required if type is type1",
+          },
+        }),
+      );
       expect(responseMock._getStatusCode()).toBe(400);
     });
 
@@ -643,7 +653,9 @@ describe("Endpoint", () => {
           },
         },
       });
-      expect(responseMock._getData()).toMatchSnapshot();
+      expect(responseMock._getData()).toBe(
+        JSON.stringify({ status: "success", data: {} }),
+      );
       expect(responseMock._getStatusCode()).toBe(200);
     });
 
@@ -655,7 +667,12 @@ describe("Endpoint", () => {
           body: {},
         },
       });
-      expect(responseMock._getData()).toMatchSnapshot();
+      expect(responseMock._getData()).toBe(
+        JSON.stringify({
+          status: "error",
+          error: { message: "Please provide at least one property" },
+        }),
+      );
       expect(responseMock._getStatusCode()).toBe(400);
     });
 

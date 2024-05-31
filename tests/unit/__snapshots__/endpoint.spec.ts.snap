@@ -39,11 +39,3 @@ exports[`Endpoint > .getSchema() > should return the positive response schema 1`
   },
 }
 `;
-
-exports[`Endpoint > Feature #600: Top level refinements > should accept valid inputs 1`] = `"{"status":"success","data":{}}"`;
-
-exports[`Endpoint > Feature #600: Top level refinements > should fail during the refinement of invalid inputs 1`] = `"{"status":"error","error":{"message":"Please provide at least one property"}}"`;
-
-exports[`Endpoint > Issue #654: Top level refinements > should accept valid inputs 1`] = `"{"status":"success","data":{}}"`;
-
-exports[`Endpoint > Issue #654: Top level refinements > should fail during the refinement of invalid inputs 1`] = `"{"status":"error","error":{"message":"dynamicValue: type1Attribute is required if type is type1"}}"`;
