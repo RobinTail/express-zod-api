@@ -10,13 +10,14 @@
   - Both properties can now accept static values and the previously assigned functions.
 - Method `createMiddleware()` removed — use either `new Middleware()` or `EndpointsFactory::addMiddleware()` instead:
   - The argument's property `middleware` renamed to `handler`.
-- Publicly exposed types are corrected for better constraints:
-  - `IOSchema` type: type arguments generalized to the most wide type possible;
-  - The `requestProps`, `responseProps` and `loggerProps` properties of the `testEndpoint()` method's argument:
-    - changed from `Record<string, any>` to `Record<string, unknown>`;
-    - when assigning objects to those arguments, avoid `as` operator — use `satisfies` if extra constraints needed.
-  - The `options` property of a Middleware' and Endpoint's handler extends from `Record<string, never>` by default:
-    - You can not assign additional properties to the `options` directly — use middlewares to combine options.
+- Method `testEndpoint()` was changed:
+  - It was detached from any testing frameworks, `fnMethod` property removed from the argument;
+  - Mocked request and response are now fully operational and do not require to mock anything to do the job;
+  - The `responseProps` property changed to `responseOptions`, it's no longer meant to be used for custom props;
+  - The returned entities `requestMock`, `responseMock` and `loggerMock` no longer rely on testing framework for props.  
+    Instead, they provide methods to assert expectations in tests:
+    - `responseMock._getStatusCode()`, `responseMock._getHeaders()`, `responseMock._getData()`, `loggerMock._getLogs()`;
+    - See [the documentation of node-mocks-http library](https://www.npmjs.com/package/node-mocks-http) for details.
 
 ```ts
 // before
