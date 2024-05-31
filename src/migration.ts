@@ -15,12 +15,20 @@ const changedProps = {
   responseProps: "responseOptions",
 };
 
-const messages = mapObjIndexed((value, key) => `Change ${key} to ${value}.`, {
-  ...changedMethods,
-  ...changedProps,
-});
+const removedProps = {
+  fnMethod: null,
+};
 
-const shouldReplace = <T extends Record<string, string>>(
+const messages = mapObjIndexed(
+  (value, key) => (value ? `Change ${key} to ${value}.` : `Remove ${key}`),
+  {
+    ...changedMethods,
+    ...changedProps,
+    ...removedProps,
+  },
+);
+
+const shouldReplace = <T extends Record<string, unknown>>(
   subject: unknown,
   scope: T,
 ): subject is keyof T => typeof subject === "string" && subject in scope;
@@ -72,17 +80,27 @@ const rules = {
             node.arguments[0].type === "ObjectExpression"
           ) {
             for (const prop of node.arguments[0].properties) {
-              if (
-                prop.type === "Property" &&
-                prop.key.type === "Identifier" &&
-                shouldReplace(prop.key.name, changedProps)
-              ) {
-                const replacement = changedProps[prop.key.name];
-                context.report({
-                  node: prop,
-                  messageId: prop.key.name,
-                  fix: (fixer) => fixer.replaceText(prop.key, replacement),
-                });
+              if (prop.type === "Property" && prop.key.type === "Identifier") {
+                if (shouldReplace(prop.key.name, changedProps)) {
+                  const replacement = changedProps[prop.key.name];
+                  context.report({
+                    node: prop,
+                    messageId: prop.key.name,
+                    fix: (fixer) => fixer.replaceText(prop.key, replacement),
+                  });
+                }
+                if (shouldReplace(prop.key.name, removedProps)) {
+                  context.report({
+                    node: prop,
+                    messageId: prop.key.name,
+                    fix: (fixer) => {
+                      const next = context.sourceCode.getTokenAfter(prop);
+                      return next?.value === ","
+                        ? fixer.removeRange([prop.range[0], next.range[1] + 1])
+                        : fixer.remove(prop);
+                    },
+                  });
+                }
               }
             }
           }
