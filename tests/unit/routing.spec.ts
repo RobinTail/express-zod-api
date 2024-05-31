@@ -22,7 +22,7 @@ import {
   makeResponseMock,
 } from "../../src/testing";
 import { initRouting } from "../../src/routing";
-import type { IRouter, Request, RequestHandler, Response } from "express";
+import type { IRouter, RequestHandler } from "express";
 import { beforeAll, beforeEach, describe, expect, test, vi } from "vitest";
 
 describe("Routing", () => {
@@ -237,12 +237,11 @@ describe("Routing", () => {
       const fn = appMock.options.mock.calls[0][1];
       expect(typeof fn).toBe("function"); // async (req, res) => void
       const requestMock = makeRequestMock({ method: "PUT" });
-      const responseMock = makeResponseMock({ fnMethod: vi.fn });
+      const responseMock = makeResponseMock();
       await fn(requestMock, responseMock);
-      expect(responseMock.status).toHaveBeenCalledWith(200);
-      expect(responseMock.set).toHaveBeenCalledTimes(3);
-      expect(responseMock.set).toHaveBeenCalledWith(
-        "Access-Control-Allow-Methods",
+      expect(responseMock._getStatusCode()).toBe(200);
+      expect(responseMock._getHeaders()).toHaveProperty(
+        "access-control-allow-methods",
         "GET, POST, PUT, PATCH, OPTIONS",
       );
     });
@@ -371,13 +370,9 @@ describe("Routing", () => {
         method: "POST",
         body: { test: 123 },
       });
-      const responseMock = makeResponseMock({ fnMethod: vi.fn });
+      const responseMock = makeResponseMock();
       const nextMock = vi.fn();
-      await routeHandler(
-        requestMock as unknown as Request,
-        responseMock as unknown as Response,
-        nextMock,
-      );
+      await routeHandler(requestMock, responseMock, nextMock);
       expect(nextMock).toHaveBeenCalledTimes(0);
       expect(handlerMock).toHaveBeenCalledTimes(1);
       expect(loggerMock.error).toHaveBeenCalledTimes(0);
@@ -388,13 +383,13 @@ describe("Routing", () => {
         options: {},
         logger: loggerMock,
       });
-      expect(responseMock.status).toHaveBeenCalledWith(200);
-      expect(responseMock.json).toHaveBeenCalledWith({
-        status: "success",
-        data: {
-          result: true,
-        },
-      });
+      expect(responseMock._getStatusCode()).toBe(200);
+      expect(responseMock._getData()).toBe(
+        JSON.stringify({
+          status: "success",
+          data: { result: true },
+        }),
+      );
     });
 
     test("should override the logger with a child logger if present in response.locals", async () => {
@@ -423,18 +418,11 @@ describe("Routing", () => {
       const routeHandler = appMock.get.mock.calls[0][1] as RequestHandler;
       const requestMock = makeRequestMock();
       const responseMock = makeResponseMock({
-        fnMethod: vi.fn,
-        responseProps: {
-          locals: {
-            [metaSymbol]: { logger: { ...loggerMock, isChild: true } },
-          },
+        locals: {
+          [metaSymbol]: { logger: { ...loggerMock, isChild: true } },
         },
       });
-      await routeHandler(
-        requestMock as unknown as Request,
-        responseMock as unknown as Response,
-        vi.fn<any>(),
-      );
+      await routeHandler(requestMock, responseMock, vi.fn<any>());
       expect(handlerMock).toHaveBeenCalledWith({
         input: {},
         options: {},

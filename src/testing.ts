@@ -1,5 +1,4 @@
-import { Request, Response } from "express";
-import http from "node:http";
+import { Request } from "express";
 import { FlatObject } from "./common-helpers";
 import { CommonConfig } from "./config-type";
 import { AbstractEndpoint } from "./endpoint";
@@ -7,7 +6,12 @@ import { AbstractLogger, ActualLogger } from "./logger-helpers";
 import { contentTypes } from "./content-type";
 import { loadAlternativePeer } from "./peer-helpers";
 import { LocalResponse } from "./server-helpers";
-import { createRequest, RequestOptions } from "node-mocks-http";
+import {
+  createRequest,
+  RequestOptions,
+  createResponse,
+  ResponseOptions,
+} from "node-mocks-http";
 
 /**
  * @desc Using module augmentation approach you can set the Mock type of your actual testing framework.
@@ -28,45 +32,8 @@ export const makeRequestMock = <REQ extends RequestOptions>(props?: REQ) => {
   return mock as typeof mock & REQ;
 };
 
-export const makeResponseMock = <RES extends FlatObject>({
-  fnMethod,
-  responseProps,
-}: {
-  fnMethod: MockFunction;
-  responseProps?: RES;
-}) => {
-  const responseMock = {
-    writableEnded: false,
-    statusCode: 200,
-    statusMessage: http.STATUS_CODES[200],
-    set: fnMethod(() => responseMock),
-    setHeader: fnMethod(() => responseMock),
-    header: fnMethod(() => responseMock),
-    status: fnMethod((code: number) => {
-      responseMock.statusCode = code;
-      responseMock.statusMessage = http.STATUS_CODES[code]!;
-      return responseMock;
-    }),
-    json: fnMethod(() => responseMock),
-    send: fnMethod(() => responseMock),
-    end: fnMethod(() => {
-      responseMock.writableEnded = true;
-      return responseMock;
-    }),
-    locals: {},
-    ...responseProps,
-  } as {
-    writableEnded: boolean;
-    statusCode: number;
-    statusMessage: string;
-    locals: LocalResponse["locals"];
-  } & Record<
-    "set" | "setHeader" | "header" | "status" | "json" | "send" | "end",
-    MockOverrides
-  > &
-    RES;
-  return responseMock;
-};
+export const makeResponseMock = (responseOptions?: ResponseOptions) =>
+  createResponse<LocalResponse>(responseOptions);
 
 export const makeLoggerMock = <LOG extends FlatObject>({
   fnMethod,
@@ -83,7 +50,7 @@ export const makeLoggerMock = <LOG extends FlatObject>({
     ...loggerProps,
   }) as Record<keyof AbstractLogger, MockOverrides> & LOG;
 
-interface TestEndpointProps<REQ, RES, LOG> {
+interface TestEndpointProps<REQ, LOG> {
   /** @desc The endpoint to test */
   endpoint: AbstractEndpoint;
   /**
@@ -91,11 +58,8 @@ interface TestEndpointProps<REQ, RES, LOG> {
    * @default { method: "GET", headers: {"content-type": "application/json" } }
    * */
   requestProps?: REQ;
-  /**
-   * @desc Additional properties to set on Response mock
-   * @default { writableEnded, statusCode, statusMessage, set, setHeader, header, status, json, send, end }
-   * */
-  responseProps?: RES;
+  /** @link https://www.npmjs.com/package/node-mocks-http */
+  responseOptions?: ResponseOptions;
   /**
    * @desc Additional properties to set on config mock
    * @default { cors: false, logger }
@@ -118,15 +82,14 @@ interface TestEndpointProps<REQ, RES, LOG> {
 export const testEndpoint = async <
   LOG extends FlatObject,
   REQ extends FlatObject,
-  RES extends FlatObject,
 >({
   endpoint,
   requestProps,
-  responseProps,
+  responseOptions,
   configProps,
   loggerProps,
   fnMethod: userDefined,
-}: TestEndpointProps<REQ, RES, LOG>) => {
+}: TestEndpointProps<REQ, LOG>) => {
   const fnMethod =
     userDefined ||
     (
@@ -136,7 +99,7 @@ export const testEndpoint = async <
       ])
     ).fn;
   const requestMock = makeRequestMock(requestProps);
-  const responseMock = makeResponseMock({ fnMethod, responseProps });
+  const responseMock = makeResponseMock(responseOptions);
   const loggerMock = makeLoggerMock({ fnMethod, loggerProps });
   const configMock = {
     cors: false,
@@ -144,8 +107,8 @@ export const testEndpoint = async <
     ...configProps,
   };
   await endpoint.execute({
-    request: requestMock as unknown as Request,
-    response: responseMock as unknown as Response,
+    request: requestMock,
+    response: responseMock,
     config: configMock as CommonConfig,
     logger: loggerMock as unknown as ActualLogger,
   });

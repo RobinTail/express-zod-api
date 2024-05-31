@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { Request, Response } from "express";
 import { InputValidationError, Middleware } from "../../src";
 import { IOSchemaError } from "../../src/errors";
 import { describe, expect, test, vi } from "vitest";
@@ -66,10 +65,8 @@ describe("Middleware", () => {
           input: { test: 123 },
           options: {},
           logger: makeLoggerMock({ fnMethod: vi.fn }),
-          request: makeRequestMock({ fnMethod: vi.fn }) as unknown as Request,
-          response: makeResponseMock({
-            fnMethod: vi.fn,
-          }) as unknown as Response,
+          request: makeRequestMock(),
+          response: makeResponseMock(),
         }),
       ).rejects.toThrow(InputValidationError);
     });
@@ -81,15 +78,15 @@ describe("Middleware", () => {
         handler: handlerMock,
       });
       const loggerMock = makeLoggerMock({ fnMethod: vi.fn });
-      const requestMock = makeRequestMock({ fnMethod: vi.fn });
-      const responseMock = makeResponseMock({ fnMethod: vi.fn });
+      const requestMock = makeRequestMock();
+      const responseMock = makeResponseMock();
       expect(
         await mw.execute({
           input: { test: "something" },
           options: { opt: "anything " },
           logger: loggerMock,
-          request: requestMock as unknown as Request,
-          response: responseMock as unknown as Response,
+          request: requestMock,
+          response: responseMock,
         }),
       ).toEqual({ result: "test" });
       expect(handlerMock).toHaveBeenCalledWith({

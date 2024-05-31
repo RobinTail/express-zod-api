@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { Response } from "express";
 import createHttpError from "http-errors";
 import { expectType } from "tsd";
 import { z } from "zod";
@@ -76,23 +76,21 @@ describe("ResultHandler", () => {
     {
       subject: defaultResultHandler,
       name: "defaultResultHandler",
-      errorMethod: "json" as const,
     },
     {
       subject: arrayResultHandler,
       name: "arrayResultHandler",
-      errorMethod: "send" as const,
     },
-  ])("$name", ({ subject, errorMethod }) => {
+  ])("$name", ({ subject }) => {
     test("Should handle generic error", () => {
-      const responseMock = makeResponseMock({ fnMethod: vi.fn });
+      const responseMock = makeResponseMock();
       const loggerMock = makeLoggerMock({ fnMethod: vi.fn });
       subject.execute({
         error: new Error("Some error"),
         input: { something: 453 },
         output: { anything: 118 },
-        request: requestMock as unknown as Request,
-        response: responseMock as unknown as Response,
+        request: requestMock,
+        response: responseMock,
         logger: loggerMock,
         options: {},
       });
@@ -108,13 +106,12 @@ describe("ResultHandler", () => {
       expect(loggerMock.error.mock.calls[0][1].payload).toEqual({
         something: 453,
       });
-      expect(responseMock.status).toHaveBeenCalledWith(500);
-      expect(responseMock[errorMethod]).toHaveBeenCalledTimes(1);
-      expect(responseMock[errorMethod].mock.calls[0]).toMatchSnapshot();
+      expect(responseMock._getStatusCode()).toBe(500);
+      expect(responseMock._getData()).toMatchSnapshot();
     });
 
     test("Should handle schema error", () => {
-      const responseMock = makeResponseMock({ fnMethod: vi.fn });
+      const responseMock = makeResponseMock();
       const loggerMock = makeLoggerMock({ fnMethod: vi.fn });
       subject.execute({
         error: new InputValidationError(
@@ -131,50 +128,47 @@ describe("ResultHandler", () => {
         input: { something: 453 },
         output: { anything: 118 },
         options: {},
-        request: requestMock as unknown as Request,
-        response: responseMock as unknown as Response,
+        request: requestMock,
+        response: responseMock,
         logger: loggerMock,
       });
       expect(loggerMock.error).toHaveBeenCalledTimes(0);
-      expect(responseMock.status).toHaveBeenCalledWith(400);
-      expect(responseMock[errorMethod]).toHaveBeenCalledTimes(1);
-      expect(responseMock[errorMethod].mock.calls[0]).toMatchSnapshot();
+      expect(responseMock._getStatusCode()).toBe(400);
+      expect(responseMock._getData()).toMatchSnapshot();
     });
 
     test("Should handle HTTP error", () => {
-      const responseMock = makeResponseMock({ fnMethod: vi.fn });
+      const responseMock = makeResponseMock();
       const loggerMock = makeLoggerMock({ fnMethod: vi.fn });
       subject.execute({
         error: createHttpError(404, "Something not found"),
         input: { something: 453 },
         output: { anything: 118 },
         options: {},
-        request: requestMock as unknown as Request,
-        response: responseMock as unknown as Response,
+        request: requestMock,
+        response: responseMock,
         logger: loggerMock,
       });
       expect(loggerMock.error).toHaveBeenCalledTimes(0);
-      expect(responseMock.status).toHaveBeenCalledWith(404);
-      expect(responseMock[errorMethod]).toHaveBeenCalledTimes(1);
-      expect(responseMock[errorMethod].mock.calls[0]).toMatchSnapshot();
+      expect(responseMock._getStatusCode()).toBe(404);
+      expect(responseMock._getData()).toMatchSnapshot();
     });
 
     test("Should handle regular response", () => {
-      const responseMock = makeResponseMock({ fnMethod: vi.fn });
+      const responseMock = makeResponseMock();
       const loggerMock = makeLoggerMock({ fnMethod: vi.fn });
       subject.execute({
         error: null,
         input: { something: 453 },
         output: { anything: 118, items: ["One", "Two", "Three"] },
         options: {},
-        request: requestMock as unknown as Request,
-        response: responseMock as unknown as Response,
+        request: requestMock,
+        response: responseMock,
         logger: loggerMock,
       });
       expect(loggerMock.error).toHaveBeenCalledTimes(0);
-      expect(responseMock.status).toHaveBeenCalledWith(200);
-      expect(responseMock.json).toHaveBeenCalledTimes(1);
-      expect(responseMock.json.mock.calls[0]).toMatchSnapshot();
+      expect(responseMock._getStatusCode()).toBe(200);
+      expect(responseMock._getData()).toMatchSnapshot();
     });
 
     test("should forward output schema examples", () => {
@@ -201,20 +195,19 @@ describe("ResultHandler", () => {
   });
 
   test("arrayResultHandler should fail when there is no items prop in the output", () => {
-    const responseMock = makeResponseMock({ fnMethod: vi.fn });
+    const responseMock = makeResponseMock();
     const loggerMock = makeLoggerMock({ fnMethod: vi.fn });
     arrayResultHandler.execute({
       error: null,
       input: { something: 453 },
       output: { anything: 118 },
       options: {},
-      request: requestMock as unknown as Request,
-      response: responseMock as unknown as Response,
+      request: requestMock,
+      response: responseMock,
       logger: loggerMock,
     });
     expect(loggerMock.error).toHaveBeenCalledTimes(0);
-    expect(responseMock.status).toHaveBeenCalledWith(500);
-    expect(responseMock.send).toHaveBeenCalledTimes(1);
-    expect(responseMock.send.mock.calls[0]).toMatchSnapshot();
+    expect(responseMock._getStatusCode()).toBe(500);
+    expect(responseMock._getData()).toMatchSnapshot();
   });
 });

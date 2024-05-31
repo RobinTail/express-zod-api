@@ -53,13 +53,10 @@ describe("Server helpers", () => {
         new SyntaxError("Unexpected end of JSON input"),
         null as unknown as Request,
         makeResponseMock({
-          fnMethod: vi.fn,
-          responseProps: {
-            locals: {
-              [metaSymbol]: { logger: { ...rootLogger, isChild: true } },
-            },
+          locals: {
+            [metaSymbol]: { logger: { ...rootLogger, isChild: true } },
           },
-        }) as unknown as Response,
+        }),
         vi.fn<any>(),
       );
       expect(spy).toHaveBeenCalledTimes(1);
@@ -90,18 +87,11 @@ describe("Server helpers", () => {
         body: { n: 453 },
       });
       const responseMock = makeResponseMock({
-        fnMethod: vi.fn,
-        responseProps: {
-          locals: {
-            [metaSymbol]: { logger: { ...rootLogger, isChild: true } },
-          },
+        locals: {
+          [metaSymbol]: { logger: { ...rootLogger, isChild: true } },
         },
       });
-      await handler(
-        requestMock as unknown as Request,
-        responseMock as unknown as Response,
-        next,
-      );
+      await handler(requestMock, responseMock, next);
       expect(next).toHaveBeenCalledTimes(0);
       expect(spy).toHaveBeenCalledTimes(1);
       expect(spy.mock.calls[0]).toHaveLength(1);
@@ -134,18 +124,12 @@ describe("Server helpers", () => {
         path: "/v1/test",
         body: { n: 453 },
       });
-      const responseMock = makeResponseMock({ fnMethod: vi.fn });
-      handler(
-        requestMock as unknown as Request,
-        responseMock as unknown as Response,
-        next,
-      );
+      const responseMock = makeResponseMock();
+      handler(requestMock, responseMock, next);
       expect(next).toHaveBeenCalledTimes(0);
       expect(spy).toHaveBeenCalledTimes(1);
-      expect(responseMock.status).toHaveBeenCalledTimes(1);
-      expect(responseMock.status.mock.calls[0][0]).toBe(500);
-      expect(responseMock.end).toHaveBeenCalledTimes(1);
-      expect(responseMock.end.mock.calls[0][0]).toBe(
+      expect(responseMock._getStatusCode()).toBe(500);
+      expect(responseMock._getData()).toBe(
         "An error occurred while serving the result: I am faulty.\n" +
           "Original error: Can not POST /v1/test.",
       );
@@ -209,7 +193,7 @@ describe("Server helpers", () => {
       rootLogger,
     });
     const requestMock = makeRequestMock();
-    const responseMock = makeResponseMock({ fnMethod: vi.fn });
+    const responseMock = makeResponseMock();
     const nextMock = vi.fn();
 
     test("should return an array of RequestHandler", () => {
@@ -224,22 +208,14 @@ describe("Server helpers", () => {
       beforeUploadMock.mockImplementationOnce(() => {
         throw error;
       });
-      await parsers[0](
-        requestMock as unknown as Request,
-        responseMock as unknown as Response,
-        nextMock,
-      );
+      await parsers[0](requestMock, responseMock, nextMock);
       expect(nextMock).toHaveBeenCalledWith(error);
     });
 
     test("should install the uploader with its special logger", async () => {
       const interalMw = vi.fn();
       fileUploadMock.mockImplementationOnce(() => interalMw);
-      await parsers[0](
-        requestMock as unknown as Request,
-        responseMock as unknown as Response,
-        nextMock,
-      );
+      await parsers[0](requestMock, responseMock, nextMock);
       expect(beforeUploadMock).toHaveBeenCalledWith({
         request: requestMock,
         logger: rootLogger,
@@ -268,7 +244,7 @@ describe("Server helpers", () => {
         body: buffer,
       });
       const nextMock = vi.fn();
-      moveRaw(requestMock as unknown as Request, {} as Response, nextMock);
+      moveRaw(requestMock, makeResponseMock(), nextMock);
       expect(requestMock.body).toEqual({ raw: buffer });
       expect(nextMock).toHaveBeenCalled();
     });

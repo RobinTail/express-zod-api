@@ -31,26 +31,27 @@ describe("Testing", () => {
           });
         const { responseMock, requestMock, loggerMock } = await testEndpoint({
           endpoint,
-          responseProps: { prop1: vi.fn(), prop2: 123 },
+          responseOptions: { locals: { prop1: vi.fn(), prop2: 123 } },
           requestProps: { test1: vi.fn(), test2: 456 },
           loggerProps: { feat1: vi.fn(), feat2: 789 },
           fnMethod,
         });
-        expect(responseMock.setHeader).toHaveBeenCalledWith("X-Some", "header");
-        expect(responseMock.header).toHaveBeenCalledWith(
-          "X-Another",
-          "header as well",
-        );
-        expect(responseMock.send).toHaveBeenCalledWith(
+        expect(responseMock._getHeaders()).toEqual({
+          "x-some": "header",
+          "x-another": "header as well",
+        });
+        expect(responseMock._getData()).toBe(
           "this is just for testing mocked methods",
         );
-        expect(responseMock.prop1).toEqual(expect.any(Function));
-        expect(responseMock.prop2).toBe(123);
+        expect(responseMock.locals).toHaveProperty(
+          "prop1",
+          expect.any(Function),
+        );
+        expect(responseMock.locals).toHaveProperty("prop2", 123);
         expect(requestMock.test1).toEqual(expect.any(Function));
         expect(requestMock.test2).toBe(456);
         expect(loggerMock.feat1).toEqual(expect.any(Function));
         expect(loggerMock.feat2).toBe(789);
-        expectType<Mock>(responseMock.prop1);
         expectType<Mock>(requestMock.test1);
         expectType<Mock>(loggerMock.feat1);
       },
