@@ -129,7 +129,7 @@ describe("ResultHandler", () => {
         response: responseMock,
         logger: loggerMock,
       });
-      expect(loggerMock._getLogs().error).toEqual([]);
+      expect(loggerMock._getLogs().error).toHaveLength(0);
       expect(responseMock._getStatusCode()).toBe(400);
       expect(responseMock._getData()).toMatchSnapshot();
     });
@@ -146,7 +146,7 @@ describe("ResultHandler", () => {
         response: responseMock,
         logger: loggerMock,
       });
-      expect(loggerMock._getLogs().error).toEqual([]);
+      expect(loggerMock._getLogs().error).toHaveLength(0);
       expect(responseMock._getStatusCode()).toBe(404);
       expect(responseMock._getData()).toMatchSnapshot();
     });
@@ -163,7 +163,7 @@ describe("ResultHandler", () => {
         response: responseMock,
         logger: loggerMock,
       });
-      expect(loggerMock._getLogs().error).toEqual([]);
+      expect(loggerMock._getLogs().error).toHaveLength(0);
       expect(responseMock._getStatusCode()).toBe(200);
       expect(responseMock._getData()).toMatchSnapshot();
     });
@@ -203,7 +203,7 @@ describe("ResultHandler", () => {
       response: responseMock,
       logger: loggerMock,
     });
-    expect(loggerMock._getLogs().error).toEqual([]);
+    expect(loggerMock._getLogs().error).toHaveLength(0);
     expect(responseMock._getStatusCode()).toBe(500);
     expect(responseMock._getData()).toMatchSnapshot();
   });
