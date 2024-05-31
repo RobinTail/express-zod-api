@@ -907,20 +907,13 @@ then consider using the `beforeRouting` [option in config instead](#using-native
 ## Testing endpoints
 
 The way to test endpoints is to mock the request, response, and logger objects, invoke the `execute()` method, and
-assert the expectations for calls of certain mocked methods. The library provides a special method `testEndpoint` that
-makes mocking easier. It requires you either to install `jest` (with `@types/jest`) or `vitest`
-(detects automatically), or to specify the `fnMethod` property assigned with a function mocking method of your testing
-framework, which can also be `node:test` module of most modern Node.js versions.
-However, in order to have proper mocking types in your own tests, you also need to specify `MockOverrides` once in your
-tests excplicitly, so the tests should look this way:
+assert the expectations on status, headers and payload. The library provides a special method `testEndpoint` that
+makes mocking easier. Under the hood, request and response object are mocked using the
+[node-mocks-http](https://www.npmjs.com/package/node-mocks-http) library, therefore you can utilize its API for
+settings additional properties and asserting expectation using the provided getters, such as `._getStatusCode()`.
 
 ```typescript
 import { testEndpoint } from "express-zod-api";
-
-// place it once anywhere in your tests
-declare module "express-zod-api" {
-  interface MockOverrides extends jest.Mock {} // or Mock from vitest
-}
 
 test("should respond successfully", async () => {
   const { responseMock, loggerMock } = await testEndpoint({
@@ -929,20 +922,18 @@ test("should respond successfully", async () => {
       method: "POST", // default: GET
       body: {}, // incoming data as if after parsing (JSON)
     },
-    // fnMethod — for testing frameworks other than jest or vitest
-    // responseProps, configProps, loggerProps
+    // responseOptions, configProps, loggerProps
   });
-  expect(loggerMock.error).toHaveBeenCalledTimes(0);
-  expect(responseMock.status).toHaveBeenCalledWith(200);
-  expect(responseMock.json).toHaveBeenCalledWith({
-    status: "success",
-    data: {},
-  });
+  expect(loggerMock._getLogs().error).toHaveLength(0);
+  expect(responseMock._getStatusCode()).toBe(200);
+  expect(responseMock._getData()).toBe(
+    JSON.stringify({
+      status: "success",
+      data: {},
+    }),
+  );
 });
 ```
-
-_This method is optimized for the `defaultResultHandler`. With the flexibility to customize, you can add additional
-properties as needed._
 
 # Special needs
 

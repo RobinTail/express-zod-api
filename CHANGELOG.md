@@ -58,11 +58,11 @@ factory // variant 1:
 
 ```ts
 // before
+declare module "express-zod-api" {
+  interface MockOverrides extends Mock {} // remove it
+}
 const { responseMock: responseMockBefore, loggerMock: loggerMockBefore } =
-  testEndpoint({
-    fnMethod: vi.fn,
-    endpoint,
-  });
+  testEndpoint({ endpoint });
 expect(responseMockBefore.status).toHaveBeenCalledWith(200);
 expect(loggerMockBefore.error).not.toHaveBeenCalled();
 
