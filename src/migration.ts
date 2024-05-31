@@ -65,6 +65,27 @@ const rules = {
               fix: (fixer) => fixer.replaceText(node.callee, replacement),
             });
           }
+          if (
+            node.callee.type === "Identifier" &&
+            node.callee.name === "testEndpoint" &&
+            node.arguments.length === 1 &&
+            node.arguments[0].type === "ObjectExpression"
+          ) {
+            for (const prop of node.arguments[0].properties) {
+              if (
+                prop.type === "Property" &&
+                prop.key.type === "Identifier" &&
+                shouldReplace(prop.key.name, changedProps)
+              ) {
+                const replacement = changedProps[prop.key.name];
+                context.report({
+                  node: prop,
+                  messageId: prop.key.name,
+                  fix: (fixer) => fixer.replaceText(prop.key, replacement),
+                });
+              }
+            }
+          }
         },
         NewExpression(node) {
           if (
