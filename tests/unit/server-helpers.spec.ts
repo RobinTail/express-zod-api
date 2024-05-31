@@ -22,7 +22,7 @@ import createHttpError from "http-errors";
 describe("Server helpers", () => {
   describe("createParserFailureHandler()", () => {
     test("the handler should call next if there is no error", () => {
-      const rootLogger = makeLoggerMock({ fnMethod: vi.fn });
+      const rootLogger = makeLoggerMock();
       const handler = createParserFailureHandler({
         errorHandler: defaultResultHandler,
         rootLogger,
@@ -44,7 +44,7 @@ describe("Server helpers", () => {
         handler: vi.fn(),
       });
       const spy = vi.spyOn(errorHandler, "execute");
-      const rootLogger = makeLoggerMock({ fnMethod: vi.fn });
+      const rootLogger = makeLoggerMock({ isRoot: true });
       const handler = createParserFailureHandler({
         errorHandler,
         rootLogger,
@@ -54,7 +54,7 @@ describe("Server helpers", () => {
         null as unknown as Request,
         makeResponseMock({
           locals: {
-            [metaSymbol]: { logger: { ...rootLogger, isChild: true } },
+            [metaSymbol]: { logger: makeLoggerMock({ isChild: true }) },
           },
         }),
         vi.fn<any>(),
@@ -75,7 +75,7 @@ describe("Server helpers", () => {
         handler: vi.fn(),
       });
       const spy = vi.spyOn(errorHandler, "execute");
-      const rootLogger = makeLoggerMock({ fnMethod: vi.fn });
+      const rootLogger = makeLoggerMock({ isRoot: true });
       const handler = createNotFoundHandler({
         errorHandler,
         rootLogger,
@@ -88,7 +88,7 @@ describe("Server helpers", () => {
       });
       const responseMock = makeResponseMock({
         locals: {
-          [metaSymbol]: { logger: { ...rootLogger, isChild: true } },
+          [metaSymbol]: { logger: makeLoggerMock({ isChild: true }) },
         },
       });
       await handler(requestMock, responseMock, next);
@@ -107,7 +107,7 @@ describe("Server helpers", () => {
     });
 
     test("should call Last Resort Handler in case of ResultHandler is faulty", () => {
-      const rootLogger = makeLoggerMock({ fnMethod: vi.fn });
+      const rootLogger = makeLoggerMock();
       const errorHandler = new ResultHandler({
         positive: vi.fn(),
         negative: vi.fn(),
@@ -163,19 +163,19 @@ describe("Server helpers", () => {
   });
 
   describe("createUploadLogger()", () => {
-    const rootLogger = makeLoggerMock({ fnMethod: vi.fn });
+    const rootLogger = makeLoggerMock();
     const uploadLogger = createUploadLogger(rootLogger);
 
     test("should debug the messages", () => {
       uploadLogger.log("Express-file-upload: Busboy finished parsing request.");
-      expect(rootLogger.debug).toHaveBeenCalledWith(
-        "Express-file-upload: Busboy finished parsing request.",
-      );
+      expect(rootLogger._getLogs().debug).toEqual([
+        ["Express-file-upload: Busboy finished parsing request."],
+      ]);
     });
   });
 
   describe("createUploadParsers()", async () => {
-    const rootLogger = makeLoggerMock({ fnMethod: vi.fn });
+    const rootLogger = makeLoggerMock();
     const beforeUploadMock = vi.fn();
     const parsers = await createUploadParsers({
       config: {

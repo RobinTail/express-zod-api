@@ -357,7 +357,7 @@ describe("Routing", () => {
           },
         },
       };
-      const loggerMock = makeLoggerMock({ fnMethod: vi.fn });
+      const loggerMock = makeLoggerMock();
       initRouting({
         app: appMock as unknown as IRouter,
         rootLogger: loggerMock,
@@ -375,7 +375,7 @@ describe("Routing", () => {
       await routeHandler(requestMock, responseMock, nextMock);
       expect(nextMock).toHaveBeenCalledTimes(0);
       expect(handlerMock).toHaveBeenCalledTimes(1);
-      expect(loggerMock.error).toHaveBeenCalledTimes(0);
+      expect(loggerMock._getLogs().error).toEqual([]);
       expect(handlerMock).toHaveBeenCalledWith({
         input: {
           test: 123,
@@ -393,12 +393,12 @@ describe("Routing", () => {
     });
 
     test("should override the logger with a child logger if present in response.locals", async () => {
-      const loggerMock = makeLoggerMock({ fnMethod: vi.fn });
+      const loggerMock = makeLoggerMock({ original: true });
       const config: CommonConfig = {
         cors: false,
         startupLogo: false,
         logger: loggerMock,
-        childLoggerProvider: ({ parent }) => ({ ...parent, isChild: true }),
+        childLoggerProvider: () => makeLoggerMock({ isChild: true }),
       };
       const handlerMock = vi.fn();
       const endpoint = defaultEndpointsFactory.build({
@@ -419,14 +419,19 @@ describe("Routing", () => {
       const requestMock = makeRequestMock();
       const responseMock = makeResponseMock({
         locals: {
-          [metaSymbol]: { logger: { ...loggerMock, isChild: true } },
+          [metaSymbol]: {
+            logger: config.childLoggerProvider!({
+              parent: loggerMock,
+              request: requestMock,
+            }),
+          },
         },
       });
       await routeHandler(requestMock, responseMock, vi.fn<any>());
       expect(handlerMock).toHaveBeenCalledWith({
         input: {},
         options: {},
-        logger: { ...loggerMock, isChild: true },
+        logger: expect.objectContaining({ isChild: true }),
       });
     });
   });

@@ -64,7 +64,7 @@ describe("Middleware", () => {
         mw.execute({
           input: { test: 123 },
           options: {},
-          logger: makeLoggerMock({ fnMethod: vi.fn }),
+          logger: makeLoggerMock(),
           request: makeRequestMock(),
           response: makeResponseMock(),
         }),
@@ -77,7 +77,7 @@ describe("Middleware", () => {
         input: z.object({ test: z.string() }),
         handler: handlerMock,
       });
-      const loggerMock = makeLoggerMock({ fnMethod: vi.fn });
+      const loggerMock = makeLoggerMock();
       const requestMock = makeRequestMock();
       const responseMock = makeResponseMock();
       expect(

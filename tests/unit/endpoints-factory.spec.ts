@@ -113,7 +113,7 @@ describe("EndpointsFactory", () => {
           options: {},
           request: {} as Request,
           response: {} as Response,
-          logger: makeLoggerMock({ fnMethod: vi.fn }),
+          logger: makeLoggerMock(),
         }),
       ).toEqual({
         option1: "some value",

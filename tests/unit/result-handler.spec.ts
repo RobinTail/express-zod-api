@@ -84,7 +84,7 @@ describe("ResultHandler", () => {
   ])("$name", ({ subject }) => {
     test("Should handle generic error", () => {
       const responseMock = makeResponseMock();
-      const loggerMock = makeLoggerMock({ fnMethod: vi.fn });
+      const loggerMock = makeLoggerMock();
       subject.execute({
         error: new Error("Some error"),
         input: { something: 453 },
@@ -94,25 +94,24 @@ describe("ResultHandler", () => {
         logger: loggerMock,
         options: {},
       });
-      expect(loggerMock.error).toHaveBeenCalledTimes(1);
-      expect(loggerMock.error.mock.calls[0][0]).toMatch(
-        /^Internal server error\nError: Some error/,
-      );
-      expect(loggerMock.error.mock.calls[0][1]).toHaveProperty("url");
-      expect(loggerMock.error.mock.calls[0][1].url).toBe(
-        "http://something/v1/anything",
-      );
-      expect(loggerMock.error.mock.calls[0][1]).toHaveProperty("payload");
-      expect(loggerMock.error.mock.calls[0][1].payload).toEqual({
-        something: 453,
-      });
+      expect(loggerMock._getLogs().error).toEqual([
+        [
+          expect.stringMatching(/^Internal server error\nError: Some error/),
+          {
+            payload: {
+              something: 453,
+            },
+            url: "http://something/v1/anything",
+          },
+        ],
+      ]);
       expect(responseMock._getStatusCode()).toBe(500);
       expect(responseMock._getData()).toMatchSnapshot();
     });
 
     test("Should handle schema error", () => {
       const responseMock = makeResponseMock();
-      const loggerMock = makeLoggerMock({ fnMethod: vi.fn });
+      const loggerMock = makeLoggerMock();
       subject.execute({
         error: new InputValidationError(
           new z.ZodError([
@@ -132,14 +131,14 @@ describe("ResultHandler", () => {
         response: responseMock,
         logger: loggerMock,
       });
-      expect(loggerMock.error).toHaveBeenCalledTimes(0);
+      expect(loggerMock._getLogs().error).toEqual([]);
       expect(responseMock._getStatusCode()).toBe(400);
       expect(responseMock._getData()).toMatchSnapshot();
     });
 
     test("Should handle HTTP error", () => {
       const responseMock = makeResponseMock();
-      const loggerMock = makeLoggerMock({ fnMethod: vi.fn });
+      const loggerMock = makeLoggerMock();
       subject.execute({
         error: createHttpError(404, "Something not found"),
         input: { something: 453 },
@@ -149,14 +148,14 @@ describe("ResultHandler", () => {
         response: responseMock,
         logger: loggerMock,
       });
-      expect(loggerMock.error).toHaveBeenCalledTimes(0);
+      expect(loggerMock._getLogs().error).toEqual([]);
       expect(responseMock._getStatusCode()).toBe(404);
       expect(responseMock._getData()).toMatchSnapshot();
     });
 
     test("Should handle regular response", () => {
       const responseMock = makeResponseMock();
-      const loggerMock = makeLoggerMock({ fnMethod: vi.fn });
+      const loggerMock = makeLoggerMock();
       subject.execute({
         error: null,
         input: { something: 453 },
@@ -166,7 +165,7 @@ describe("ResultHandler", () => {
         response: responseMock,
         logger: loggerMock,
       });
-      expect(loggerMock.error).toHaveBeenCalledTimes(0);
+      expect(loggerMock._getLogs().error).toEqual([]);
       expect(responseMock._getStatusCode()).toBe(200);
       expect(responseMock._getData()).toMatchSnapshot();
     });
@@ -196,7 +195,7 @@ describe("ResultHandler", () => {
 
   test("arrayResultHandler should fail when there is no items prop in the output", () => {
     const responseMock = makeResponseMock();
-    const loggerMock = makeLoggerMock({ fnMethod: vi.fn });
+    const loggerMock = makeLoggerMock();
     arrayResultHandler.execute({
       error: null,
       input: { something: 453 },
@@ -206,7 +205,7 @@ describe("ResultHandler", () => {
       response: responseMock,
       logger: loggerMock,
     });
-    expect(loggerMock.error).toHaveBeenCalledTimes(0);
+    expect(loggerMock._getLogs().error).toEqual([]);
     expect(responseMock._getStatusCode()).toBe(500);
     expect(responseMock._getData()).toMatchSnapshot();
   });

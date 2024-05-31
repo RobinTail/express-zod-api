@@ -2,9 +2,8 @@ import { Request } from "express";
 import { FlatObject } from "./common-helpers";
 import { CommonConfig } from "./config-type";
 import { AbstractEndpoint } from "./endpoint";
-import { AbstractLogger, ActualLogger } from "./logger-helpers";
+import { AbstractLogger, ActualLogger, severity } from "./logger-helpers";
 import { contentTypes } from "./content-type";
-import { loadAlternativePeer } from "./peer-helpers";
 import { LocalResponse } from "./server-helpers";
 import {
   createRequest,
@@ -17,12 +16,9 @@ import {
  * @desc Using module augmentation approach you can set the Mock type of your actual testing framework.
  * @example declare module "express-zod-api" { interface MockOverrides extends Mock {} }
  * @link https://www.typescriptlang.org/docs/handbook/declaration-merging.html#module-augmentation
+ * @todo remove
  * */
 export interface MockOverrides {}
-
-/** @desc Compatibility constraints for a function mocking method of a testing framework. */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- for assignment compatibility
-type MockFunction = (implementation?: (...args: any[]) => any) => MockOverrides;
 
 export const makeRequestMock = <REQ extends RequestOptions>(props?: REQ) => {
   const mock = createRequest<Request>({
@@ -35,20 +31,31 @@ export const makeRequestMock = <REQ extends RequestOptions>(props?: REQ) => {
 export const makeResponseMock = (responseOptions?: ResponseOptions) =>
   createResponse<LocalResponse>(responseOptions);
 
-export const makeLoggerMock = <LOG extends FlatObject>({
-  fnMethod,
-  loggerProps,
-}: {
-  fnMethod: MockFunction;
-  loggerProps?: LOG;
-}) =>
-  ({
-    info: fnMethod(),
-    warn: fnMethod(),
-    error: fnMethod(),
-    debug: fnMethod(),
-    ...loggerProps,
-  }) as Record<keyof AbstractLogger, MockOverrides> & LOG;
+export const makeLoggerMock = <LOG extends FlatObject>(loggerProps?: LOG) => {
+  const logs: Record<keyof AbstractLogger, unknown[]> = {
+    warn: [],
+    error: [],
+    info: [],
+    debug: [],
+  };
+  return new Proxy(
+    (loggerProps || {}) as AbstractLogger &
+      LOG & { _getLogs: () => typeof logs },
+    {
+      get(target, prop) {
+        if (prop === "_getLogs") {
+          return () => logs;
+        }
+        if (prop in severity) {
+          return (...args: unknown[]) =>
+            logs[prop as keyof AbstractLogger].push(args);
+          // @todo maybe should also check props
+        }
+        return target[prop as keyof typeof target];
+      },
+    },
+  );
+};
 
 interface TestEndpointProps<REQ, LOG> {
   /** @desc The endpoint to test */
@@ -70,15 +77,8 @@ interface TestEndpointProps<REQ, LOG> {
    * @default { info, warn, error, debug }
    * */
   loggerProps?: LOG;
-  /**
-   * @desc Optionally specify the function mocking method of your testing framework
-   * @default jest.fn || vi.fn // from vitest
-   * @example mock.fn.bind(mock) // from node:test, binding might be necessary
-   * */
-  fnMethod?: MockFunction;
 }
 
-/** @desc Requires either jest (with @types/jest) or vitest or to specify the fnMethod option */
 export const testEndpoint = async <
   LOG extends FlatObject,
   REQ extends FlatObject,
@@ -88,19 +88,10 @@ export const testEndpoint = async <
   responseOptions,
   configProps,
   loggerProps,
-  fnMethod: userDefined,
 }: TestEndpointProps<REQ, LOG>) => {
-  const fnMethod =
-    userDefined ||
-    (
-      await loadAlternativePeer<{ fn: MockFunction }>([
-        { moduleName: "vitest", moduleExport: "vi" },
-        { moduleName: "@jest/globals", moduleExport: "jest" },
-      ])
-    ).fn;
   const requestMock = makeRequestMock(requestProps);
   const responseMock = makeResponseMock(responseOptions);
-  const loggerMock = makeLoggerMock({ fnMethod, loggerProps });
+  const loggerMock = makeLoggerMock(loggerProps);
   const configMock = {
     cors: false,
     logger: loggerMock,
@@ -110,7 +101,7 @@ export const testEndpoint = async <
     request: requestMock,
     response: responseMock,
     config: configMock as CommonConfig,
-    logger: loggerMock as unknown as ActualLogger,
+    logger: loggerMock as ActualLogger,
   });
   return { requestMock, responseMock, loggerMock };
 };

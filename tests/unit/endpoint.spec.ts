@@ -110,7 +110,7 @@ describe("Endpoint", () => {
         options: { inc: 454 },
         logger: loggerMock,
       });
-      expect(loggerMock.error).toHaveBeenCalledTimes(0);
+      expect(loggerMock._getLogs().error).toHaveLength(0);
       expect(resultHandlerSpy).toHaveBeenCalledWith({
         error: null,
         input: { n: 453 },
@@ -149,7 +149,7 @@ describe("Endpoint", () => {
           }),
         },
       });
-      expect(loggerMock.error).toHaveBeenCalledTimes(0);
+      expect(loggerMock._getLogs().error).toHaveLength(0);
       expect(responseMock._getStatusCode()).toBe(200);
       expect(handlerMock).toHaveBeenCalledTimes(0);
       expect(responseMock._getHeaders()).toEqual({
@@ -192,7 +192,7 @@ describe("Endpoint", () => {
         }),
       });
       const { responseMock, loggerMock } = await testEndpoint({ endpoint });
-      expect(loggerMock.error).toHaveBeenCalledTimes(1);
+      expect(loggerMock._getLogs().error).toHaveLength(1);
       expect(responseMock._getStatusCode()).toBe(500);
       expect(responseMock._getData()).toBe(
         JSON.stringify({
@@ -233,12 +233,13 @@ describe("Endpoint", () => {
       });
       expect(handlerMock).toHaveBeenCalledTimes(0);
       expect(middlewareMock).toHaveBeenCalledTimes(1);
-      expect(loggerMock.error).toHaveBeenCalledTimes(0);
-      expect(loggerMock.warn).toHaveBeenCalledTimes(1);
-      expect(loggerMock.warn.mock.calls[0][0]).toBe(
-        "A middleware has closed the stream. Accumulated options:",
-      );
-      expect(loggerMock.warn.mock.calls[0][1]).toEqual({ inc: 454 });
+      expect(loggerMock._getLogs().error).toHaveLength(0);
+      expect(loggerMock._getLogs().warn).toEqual([
+        [
+          "A middleware has closed the stream. Accumulated options:",
+          { inc: 454 },
+        ],
+      ]);
       expect(responseMock._getStatusCode()).toBe(200);
       expect(responseMock._getStatusMessage()).toBe("OK");
     });
@@ -264,10 +265,9 @@ describe("Endpoint", () => {
       const { loggerMock, responseMock, requestMock } = await testEndpoint({
         endpoint,
       });
-      expect(loggerMock.error).toHaveBeenCalledTimes(1);
-      expect(loggerMock.error.mock.calls[0][0]).toBe(
-        "Result handler failure: Something unexpected happened.",
-      );
+      expect(loggerMock._getLogs().error).toEqual([
+        ["Result handler failure: Something unexpected happened."],
+      ]);
       expect(spy).toHaveBeenCalledWith({
         error: null,
         logger: loggerMock,
@@ -463,7 +463,7 @@ describe("Endpoint", () => {
         }),
       });
       const { responseMock, loggerMock } = await testEndpoint({ endpoint });
-      expect(loggerMock.error).toHaveBeenCalledTimes(1);
+      expect(loggerMock._getLogs().error).toHaveLength(1);
       expect(responseMock._getStatusCode()).toBe(500);
       expect(responseMock._getData()).toBe(
         JSON.stringify({
@@ -490,10 +490,9 @@ describe("Endpoint", () => {
         handler: async () => ({ test: "OK" }),
       });
       const { loggerMock, responseMock } = await testEndpoint({ endpoint });
-      expect(loggerMock.error).toHaveBeenCalledTimes(1);
-      expect(loggerMock.error.mock.calls[0][0]).toBe(
-        "Result handler failure: Something unexpected happened.",
-      );
+      expect(loggerMock._getLogs().error).toEqual([
+        ["Result handler failure: Something unexpected happened."],
+      ]);
       expect(responseMock._getStatusCode()).toBe(500);
       expect(responseMock._getData()).toBe(
         "An error occurred while serving the result: Something unexpected happened.",
@@ -518,7 +517,7 @@ describe("Endpoint", () => {
           body: {},
         },
       });
-      expect(loggerMock.error).toHaveBeenCalledTimes(1);
+      expect(loggerMock._getLogs().error).toHaveLength(1);
       expect(responseMock._getStatusCode()).toBe(500);
       expect(responseMock._getData()).toBe(
         JSON.stringify({
@@ -736,7 +735,7 @@ describe("Endpoint", () => {
         },
       });
 
-      expect(loggerMock.debug.mock.calls).toEqual([
+      expect(loggerMock._getLogs().debug).toEqual([
         ["date in mw handler", "object"],
         ["date in endpoint handler", "object"],
       ]);
