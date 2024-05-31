@@ -3,57 +3,47 @@ import { z } from "zod";
 import { defaultEndpointsFactory, testEndpoint } from "../../src";
 import { Mock, describe, expect, test, vi } from "vitest";
 
-declare module "../../src" {
-  interface MockOverrides extends Mock {}
-}
-
 describe("Testing", () => {
   describe("testEndpoint()", () => {
-    test.each([undefined, vi.fn])(
-      "Should test the endpoint %#",
-      async (fnMethod) => {
-        const endpoint = defaultEndpointsFactory
-          .addMiddleware({
-            input: z.object({}),
-            handler: async ({ response }) => {
-              response
-                .setHeader("X-Some", "header")
-                .header("X-Another", "header as well")
-                .send("this is just for testing mocked methods");
-              return {};
-            },
-          })
-          .build({
-            method: "get",
-            input: z.object({}),
-            output: z.object({}),
-            handler: async () => ({}),
-          });
-        const { responseMock, requestMock, loggerMock } = await testEndpoint({
-          endpoint,
-          responseProps: { prop1: vi.fn(), prop2: 123 },
-          requestProps: { test1: vi.fn(), test2: 456 },
-          loggerProps: { feat1: vi.fn(), feat2: 789 },
-          fnMethod,
+    test("Should test the endpoint", async () => {
+      const endpoint = defaultEndpointsFactory
+        .addMiddleware({
+          input: z.object({}),
+          handler: async ({ response }) => {
+            response
+              .setHeader("X-Some", "header")
+              .header("X-Another", "header as well")
+              .send("this is just for testing mocked methods");
+            return {};
+          },
+        })
+        .build({
+          method: "get",
+          input: z.object({}),
+          output: z.object({}),
+          handler: async () => ({}),
         });
-        expect(responseMock.setHeader).toHaveBeenCalledWith("X-Some", "header");
-        expect(responseMock.header).toHaveBeenCalledWith(
-          "X-Another",
-          "header as well",
-        );
-        expect(responseMock.send).toHaveBeenCalledWith(
-          "this is just for testing mocked methods",
-        );
-        expect(responseMock.prop1).toEqual(expect.any(Function));
-        expect(responseMock.prop2).toBe(123);
-        expect(requestMock.test1).toEqual(expect.any(Function));
-        expect(requestMock.test2).toBe(456);
-        expect(loggerMock.feat1).toEqual(expect.any(Function));
-        expect(loggerMock.feat2).toBe(789);
-        expectType<Mock>(responseMock.prop1);
-        expectType<Mock>(requestMock.test1);
-        expectType<Mock>(loggerMock.feat1);
-      },
-    );
+      const { responseMock, requestMock, loggerMock } = await testEndpoint({
+        endpoint,
+        responseOptions: { locals: { prop1: vi.fn(), prop2: 123 } },
+        requestProps: { test1: vi.fn(), test2: 456 },
+        loggerProps: { feat1: vi.fn(), feat2: 789 },
+      });
+      expect(responseMock._getHeaders()).toEqual({
+        "x-some": "header",
+        "x-another": "header as well",
+      });
+      expect(responseMock._getData()).toBe(
+        "this is just for testing mocked methods",
+      );
+      expect(responseMock.locals).toHaveProperty("prop1", expect.any(Function));
+      expect(responseMock.locals).toHaveProperty("prop2", 123);
+      expect(requestMock.test1).toEqual(expect.any(Function));
+      expect(requestMock.test2).toBe(456);
+      expect(loggerMock.feat1).toEqual(expect.any(Function));
+      expect(loggerMock.feat2).toBe(789);
+      expectType<Mock>(requestMock.test1);
+      expectType<Mock>(loggerMock.feat1);
+    });
   });
 });

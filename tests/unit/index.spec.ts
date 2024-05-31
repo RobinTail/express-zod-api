@@ -17,14 +17,13 @@ import {
   InputSecurity,
   LoggerOverrides,
   Method,
-  MockOverrides,
   OAuth2Security,
   OpenIdSecurity,
   Producer,
   Routing,
   ServerConfig,
 } from "../../src";
-import { describe, expect, test, vi } from "vitest";
+import { describe, expect, test } from "vitest";
 
 describe("Index Entrypoint", () => {
   describe("exports", () => {
@@ -51,7 +50,6 @@ describe("Index Entrypoint", () => {
     });
 
     test("Issue 952, 1182, 1269: should expose certain types and interfaces", () => {
-      expectType<MockOverrides>(vi.fn());
       expectType<Method>("get");
       expectType<IOSchema>(z.object({}));
       expectType<FlatObject>({});
