@@ -1,5 +1,5 @@
 import type { TSESLint } from "@typescript-eslint/utils";
-import { mapObjIndexed } from "ramda";
+import { fromPairs, keys, mapObjIndexed, xprod } from "ramda";
 
 const pluginName = "ez-migration";
 
@@ -135,8 +135,11 @@ const rules = {
 
 /** @desc ESLint plugin for migrating to this version */
 export const migration = {
-  rules: {
-    [`${pluginName}/v20`]: "error",
-  } satisfies Record<`${typeof pluginName}/${keyof typeof rules}`, "error">,
+  rules: fromPairs(
+    xprod(
+      keys(rules).map((rule) => `${pluginName}/${rule}`),
+      ["error"],
+    ),
+  ),
   plugins: { [pluginName]: { rules } },
 } as object; // reducing DTS
