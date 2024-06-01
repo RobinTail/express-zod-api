@@ -2,6 +2,8 @@ import type { TSESLint } from "@typescript-eslint/utils";
 import { fromPairs, keys, mapObjIndexed, xprod } from "ramda";
 
 const pluginName = "ez-migration";
+const importName = "express-zod-api";
+const testerName = "testEndpoint";
 
 const changedMethods = {
   createLogger: "BuiltinLogger",
@@ -45,7 +47,7 @@ const rules = {
     create(context) {
       return {
         ImportDeclaration(node) {
-          if (node.source.value === "express-zod-api") {
+          if (node.source.value === importName) {
             for (const spec of node.specifiers) {
               if (
                 spec.type === "ImportSpecifier" &&
@@ -75,7 +77,7 @@ const rules = {
           }
           if (
             node.callee.type === "Identifier" &&
-            node.callee.name === "testEndpoint" &&
+            node.callee.name === testerName &&
             node.arguments.length === 1 &&
             node.arguments[0].type === "ObjectExpression"
           ) {
