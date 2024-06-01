@@ -110,6 +110,18 @@ const v20: Rule.RuleModule = {
         }
       }
     },
+    Identifier: (node) => {
+      if (
+        node.name === "MockOverrides" &&
+        (node.parent.type as string) === "TSInterfaceDeclaration"
+      ) {
+        context.report({
+          node,
+          message: `Remove augmentation of the "${node.name}" interface — no longer needed.`,
+          fix: (fixer) => fixer.remove(node.parent),
+        });
+      }
+    },
   }),
 };
 

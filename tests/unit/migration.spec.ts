@@ -1,8 +1,11 @@
 import { RuleTester } from "eslint";
 import { migration } from "../../src";
 import { describe, test } from "vitest";
+import parser from "@typescript-eslint/parser";
 
-const tester = new RuleTester();
+const tester = new RuleTester({
+  languageOptions: { parser },
+});
 
 describe("Migration", () => {
   test("should pass ESLint rule tester", () => {
@@ -71,6 +74,15 @@ describe("Migration", () => {
             },
           ],
           output: `testEndpoint({  responseOptions: {} })`,
+        },
+        {
+          code: `interface MockOverrides extends Mock {}`,
+          errors: [
+            {
+              message: `Remove augmentation of the "MockOverrides" interface — no longer needed.`,
+            },
+          ],
+          output: ``,
         },
       ],
     });
