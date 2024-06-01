@@ -34,7 +34,7 @@ const shouldReplace = <T extends Record<string, unknown>>(
 ): subject is keyof T => typeof subject === "string" && subject in scope;
 
 const rules = {
-  "changed-imports": {
+  v20: {
     defaultOptions: [],
     meta: {
       type: "suggestion",
@@ -133,9 +133,10 @@ const rules = {
   } satisfies TSESLint.RuleModule<keyof typeof messages>,
 };
 
+/** @desc ESLint plugin for migrating to this version */
 export const migration = {
   rules: {
-    [`${pluginName}/changed-imports`]: "error",
+    [`${pluginName}/v20`]: "error",
   } satisfies Record<`${typeof pluginName}/${keyof typeof rules}`, "error">,
   plugins: { [pluginName]: { rules } },
-};
+} as object; // reducing DTS
