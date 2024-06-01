@@ -15,6 +15,7 @@ const changedProps = {
   getPositiveResponse: "positive",
   getNegativeResponse: "negative",
   responseProps: "responseOptions",
+  middleware: "handler",
 };
 
 const removedProps = { fnMethod: null };
@@ -90,7 +91,10 @@ const v20: Rule.RuleModule = {
     NewExpression: (node) => {
       if (
         node.callee.type === "Identifier" &&
-        node.callee.name === changedMethods.createResultHandler &&
+        [
+          changedMethods.createResultHandler,
+          changedMethods.createMiddleware,
+        ].includes(node.callee.name) &&
         node.arguments.length === 1 &&
         node.arguments[0].type === "ObjectExpression"
       ) {

@@ -16,7 +16,7 @@ describe("Migration", () => {
         { code: `import { Middleware } from "express-zod-api"` },
         { code: `new BuiltinLogger({})` },
         { code: `new ResultHandler({ positive: {}, negative: {} })` },
-        { code: `new Middleware({})` },
+        { code: `new Middleware({ handler: {} })` },
         { code: `testEndpoint({})` },
       ],
       invalid: [
@@ -64,6 +64,11 @@ describe("Migration", () => {
             { message: `Change property "getNegativeResponse" to "negative".` },
           ],
           output: `new ResultHandler({ positive: {}, negative: {} })`,
+        },
+        {
+          code: `new Middleware({ middleware: {} })`,
+          errors: [{ message: `Change property "middleware" to "handler".` }],
+          output: `new Middleware({ handler: {} })`,
         },
         {
           code: `testEndpoint({ fnMethod: {}, responseProps: {} })`,
