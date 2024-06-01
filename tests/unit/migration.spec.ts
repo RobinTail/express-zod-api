@@ -22,72 +22,72 @@ describe("Migration", () => {
       invalid: [
         {
           code: `import { createLogger } from "express-zod-api"`,
+          output: `import { BuiltinLogger } from "express-zod-api"`,
           errors: [
             { message: `Change import "createLogger" to "BuiltinLogger".` },
           ],
-          output: `import { BuiltinLogger } from "express-zod-api"`,
         },
         {
           code: `import { createResultHandler } from "express-zod-api"`,
+          output: `import { ResultHandler } from "express-zod-api"`,
           errors: [
             {
               message: `Change import "createResultHandler" to "ResultHandler".`,
             },
           ],
-          output: `import { ResultHandler } from "express-zod-api"`,
         },
         {
           code: `import { createMiddleware } from "express-zod-api"`,
+          output: `import { Middleware } from "express-zod-api"`,
           errors: [
             { message: `Change import "createMiddleware" to "Middleware".` },
           ],
-          output: `import { Middleware } from "express-zod-api"`,
         },
         {
           code: `createLogger({})`,
+          output: `new BuiltinLogger({})`,
           errors: [
             { message: `Change "createLogger" to "new BuiltinLogger".` },
           ],
-          output: `new BuiltinLogger({})`,
         },
         {
           code: `createResultHandler({})`,
+          output: `new ResultHandler({})`,
           errors: [
             { message: `Change "createResultHandler" to "new ResultHandler".` },
           ],
-          output: `new ResultHandler({})`,
         },
         {
           code: `new ResultHandler({ getPositiveResponse: {}, getNegativeResponse: {} })`,
+          output: `new ResultHandler({ positive: {}, negative: {} })`,
           errors: [
             { message: `Change property "getPositiveResponse" to "positive".` },
             { message: `Change property "getNegativeResponse" to "negative".` },
           ],
-          output: `new ResultHandler({ positive: {}, negative: {} })`,
         },
         {
           code: `new Middleware({ middleware: {} })`,
-          errors: [{ message: `Change property "middleware" to "handler".` }],
           output: `new Middleware({ handler: {} })`,
+          errors: [{ message: `Change property "middleware" to "handler".` }],
         },
         {
           code: `testEndpoint({ fnMethod: {}, responseProps: {} })`,
+          output: `testEndpoint({  responseOptions: {} })`,
           errors: [
             { message: `Remove property "fnMethod".` },
             {
               message: `Change property "responseProps" to "responseOptions".`,
             },
           ],
-          output: `testEndpoint({  responseOptions: {} })`,
         },
         {
           code: `interface MockOverrides extends Mock {}`,
+          output: ``,
           errors: [
             {
               message: `Remove augmentation of the "MockOverrides" interface — no longer needed.`,
             },
           ],
-          output: ``,
         },
       ],
     });
