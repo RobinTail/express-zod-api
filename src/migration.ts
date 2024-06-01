@@ -123,5 +123,5 @@ export const migration = {
       ["error" as const],
     ),
   ),
-  plugins: { [pluginName]: { rules } as object },
+  plugins: { [pluginName]: { rules } },
 };
