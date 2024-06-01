@@ -39,7 +39,7 @@ const rules = {
   v20: {
     defaultOptions: [],
     meta: {
-      type: "suggestion",
+      type: "problem",
       fixable: "code",
       messages,
       schema: [],
@@ -139,9 +139,9 @@ const rules = {
 export const migration = {
   rules: fromPairs(
     xprod(
-      keys(rules).map((rule) => `${pluginName}/${rule}`),
-      ["error"],
+      keys(rules).map((rule) => `${pluginName}/${rule}` as const),
+      ["error" as const],
     ),
   ),
-  plugins: { [pluginName]: { rules } },
-} as object; // reducing DTS
+  plugins: { [pluginName]: { rules } as object },
+};

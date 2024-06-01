@@ -92,7 +92,7 @@ exports[`Index Entrypoint > exports > migration should have certain value 1`] = 
               "responseProps": "Change responseProps to responseOptions.",
             },
             "schema": [],
-            "type": "suggestion",
+            "type": "problem",
           },
         },
       },
