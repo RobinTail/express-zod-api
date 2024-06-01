@@ -79,19 +79,8 @@ exports[`Index Entrypoint > exports > migration should have certain value 1`] = 
       "rules": {
         "v20": {
           "create": [Function],
-          "defaultOptions": [],
           "meta": {
             "fixable": "code",
-            "messages": {
-              "createLogger": "Change createLogger to BuiltinLogger.",
-              "createMiddleware": "Change createMiddleware to Middleware.",
-              "createResultHandler": "Change createResultHandler to ResultHandler.",
-              "fnMethod": "Remove fnMethod",
-              "getNegativeResponse": "Change getNegativeResponse to negative.",
-              "getPositiveResponse": "Change getPositiveResponse to positive.",
-              "responseProps": "Change responseProps to responseOptions.",
-            },
-            "schema": [],
             "type": "problem",
           },
         },
