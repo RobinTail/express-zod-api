@@ -1,7 +1,6 @@
 import assert from "node:assert/strict";
 import { z } from "zod";
 import {
-  AbstractEndpoint,
   EndpointsFactory,
   Middleware,
   defaultEndpointsFactory,
@@ -10,7 +9,7 @@ import {
   testEndpoint,
   ResultHandler,
 } from "../../src";
-import { Endpoint } from "../../src/endpoint";
+import { AbstractEndpoint, Endpoint } from "../../src/endpoint";
 import { IOSchemaError } from "../../src/errors";
 import { serializeSchemaForTest } from "../helpers";
 import { describe, expect, test, vi } from "vitest";

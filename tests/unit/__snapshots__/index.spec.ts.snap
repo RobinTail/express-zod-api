@@ -1,9 +1,5 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`Index Entrypoint > exports > AbstractEndpoint should have certain value 1`] = `[Function]`;
-
-exports[`Index Entrypoint > exports > AbstractResultHandler should have certain value 1`] = `[Function]`;
-
 exports[`Index Entrypoint > exports > BuiltinLogger should have certain value 1`] = `[Function]`;
 
 exports[`Index Entrypoint > exports > DependsOnMethod should have certain value 1`] = `[Function]`;
@@ -96,7 +92,6 @@ exports[`Index Entrypoint > exports > migration should have certain value 1`] = 
 exports[`Index Entrypoint > exports > should have certain entities exposed 1`] = `
 [
   "createConfig",
-  "AbstractEndpoint",
   "EndpointsFactory",
   "defaultEndpointsFactory",
   "arrayEndpointsFactory",
@@ -105,7 +100,6 @@ exports[`Index Entrypoint > exports > should have certain entities exposed 1`] =
   "getStatusCodeFromError",
   "BuiltinLogger",
   "Middleware",
-  "AbstractResultHandler",
   "ResultHandler",
   "defaultResultHandler",
   "arrayResultHandler",

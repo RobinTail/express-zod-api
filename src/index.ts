@@ -1,7 +1,6 @@
 import "./zod-plugin";
 
 export { createConfig } from "./config-type";
-export { AbstractEndpoint } from "./endpoint";
 export {
   EndpointsFactory,
   defaultEndpointsFactory,
@@ -15,7 +14,6 @@ export {
 export { BuiltinLogger } from "./builtin-logger";
 export { Middleware } from "./middleware";
 export {
-  AbstractResultHandler,
   ResultHandler,
   defaultResultHandler,
   arrayResultHandler,
