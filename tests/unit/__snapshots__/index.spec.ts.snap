@@ -72,6 +72,27 @@ exports[`Index Entrypoint > exports > getMessageFromError should have certain va
 
 exports[`Index Entrypoint > exports > getStatusCodeFromError should have certain value 1`] = `[Function]`;
 
+exports[`Index Entrypoint > exports > migration should have certain value 1`] = `
+{
+  "plugins": {
+    "ez-migration": {
+      "rules": {
+        "v20": {
+          "create": [Function],
+          "meta": {
+            "fixable": "code",
+            "type": "problem",
+          },
+        },
+      },
+    },
+  },
+  "rules": {
+    "ez-migration/v20": "error",
+  },
+}
+`;
+
 exports[`Index Entrypoint > exports > should have certain entities exposed 1`] = `
 [
   "createConfig",
@@ -101,6 +122,7 @@ exports[`Index Entrypoint > exports > should have certain entities exposed 1`] =
   "testEndpoint",
   "Integration",
   "ez",
+  "migration",
 ]
 `;
 

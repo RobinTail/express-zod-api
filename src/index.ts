@@ -35,6 +35,7 @@ export { testEndpoint } from "./testing";
 export { Integration } from "./integration";
 
 export { ez } from "./proprietary-schemas";
+export { migration } from "./migration";
 
 // Convenience types
 export type { Depicter } from "./documentation-helpers";
