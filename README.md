@@ -97,9 +97,6 @@ Therefore, many basic tasks can be accomplished faster and easier, in particular
   - Client side types — inspired by [zod-to-ts](https://github.com/sachinraja/zod-to-ts).
 - File uploads — [Express-FileUpload](https://github.com/richardgirges/express-fileupload)
   (based on [Busboy](https://github.com/mscdex/busboy)).
-- Supports any testing framework having a function mocking method;
-  - [Jest](https://github.com/jestjs/jest) and [Vitest](https://github.com/vitest-dev/vitest)
-    are both supported automatically.
 
 ## Concept
 
