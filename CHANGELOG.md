@@ -7,7 +7,7 @@
 - Method `createLogger()` removed — use `new BuiltinLogger()` instead if needed;
 - Method `createResultHandler` removed — use `new ResultHandler()` instead:
   - The argument's properties renamed: `getPositiveResponse` to `positive` and `getNegativeResponse` to `negative`;
-  - Both properties can now accept static values and the previously assigned functions.
+  - Both properties can now accept static values (not only functions).
 - Method `createMiddleware()` removed — use either `new Middleware()` or `EndpointsFactory::addMiddleware()` instead:
   - The argument's property `middleware` renamed to `handler`.
 - Method `testEndpoint()` was changed:
