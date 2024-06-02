@@ -60,8 +60,11 @@ export class ResultHandler<
   readonly #negative: NEG | LazyResult<NEG>;
 
   constructor(params: {
+    /** @desc A description of the API response in case of success (schema, status code, MIME type) */
     positive: POS | LazyResult<POS, [IOSchema]>;
+    /** @desc A description of the API response in case of error (schema, status code, MIME type) */
     negative: NEG | LazyResult<NEG>;
+    /** @desc The actual implementation to transmit the response in any case */
     handler: Handler<z.output<ResultSchema<POS> | ResultSchema<NEG>>>;
   }) {
     super(params.handler);
