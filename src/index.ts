@@ -12,7 +12,7 @@ export {
   getMessageFromError,
   getStatusCodeFromError,
 } from "./common-helpers";
-export { createLogger } from "./logger";
+export { createLogger, BuiltinLogger } from "./builtin-logger";
 export { createMiddleware } from "./middleware";
 export {
   createResultHandler,
@@ -42,7 +42,7 @@ export type { Producer } from "./zts-helpers";
 // Issues 952, 1182, 1269: Insufficient exports for consumer's declaration
 export type { MockOverrides } from "./testing";
 export type { Routing } from "./routing";
-export type { LoggerOverrides } from "./logger";
+export type { LoggerOverrides } from "./logger-helpers";
 export type { FlatObject } from "./common-helpers";
 export type { Method } from "./method";
 export type { IOSchema } from "./io-schema";

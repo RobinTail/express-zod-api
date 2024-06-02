@@ -37,3 +37,10 @@ declare module "express-zod-api" {
   interface LoggerOverrides extends winston.Logger {}
 }
 */
+
+// Uncomment these lines for using .child() method of built-in logger:
+/*
+declare module "express-zod-api" {
+  interface LoggerOverrides extends BuiltinLogger {}
+}
+*/

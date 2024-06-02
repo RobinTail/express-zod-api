@@ -2,6 +2,30 @@
 
 ## Version 19
 
+### v19.2.1
+
+- `openapi3-ts` version is 4.3.2 (fixed distribution).
+
+### v19.2.0
+
+- Feat: `.child()` method for the built-in logger:
+  - You can assign request ID to the log entries without additional libraries now:
+
+```ts
+import { randomUUID } from "node:crypto";
+import { BuiltinLogger, createConfig } from "express-zod-api";
+
+declare module "express-zod-api" {
+  interface LoggerOverrides extends BuiltinLogger {}
+}
+
+const config = createConfig({
+  logger: { level: "debug", color: true },
+  childLoggerProvider: ({ parent }) =>
+    parent.child({ requestId: randomUUID() }),
+});
+```
+
 ### v19.1.2
 
 - Fixed a bug on logger instance recognition failure:

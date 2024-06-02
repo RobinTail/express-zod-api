@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import http from "node:http";
 import { CommonConfig } from "./config-type";
 import { AbstractEndpoint } from "./endpoint";
-import { AbstractLogger } from "./logger";
+import { AbstractLogger, ActualLogger } from "./logger-helpers";
 import { contentTypes } from "./content-type";
 import { loadAlternativePeer } from "./peer-helpers";
 import { LocalResponse } from "./server-helpers";
@@ -149,7 +149,7 @@ export const testEndpoint = async <
     request: requestMock as unknown as Request,
     response: responseMock as unknown as Response,
     config: configMock as CommonConfig,
-    logger: loggerMock as unknown as AbstractLogger,
+    logger: loggerMock as unknown as ActualLogger,
   });
   return { requestMock, responseMock, loggerMock };
 };
