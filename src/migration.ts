@@ -1,5 +1,4 @@
-import type { Rule } from "eslint";
-import { fromPairs, keys, xprod } from "ramda";
+import type { Rule, Linter } from "eslint";
 
 const pluginName = "ez-migration";
 const importName = "express-zod-api";
@@ -133,11 +132,8 @@ const rules = { v20 };
 
 /** @desc ESLint plugin for migrating to this version (from previous) */
 export const migration = {
-  rules: fromPairs(
-    xprod(
-      keys(rules).map((rule) => `${pluginName}/${rule}` as const),
-      ["error" as const],
-    ),
-  ),
+  rules: { "ez-migration/v20": "error" },
   plugins: { [pluginName]: { rules } },
-};
+} satisfies Linter.FlatConfig<
+  Record<`${typeof pluginName}/${keyof typeof rules}`, "error">
+>;
