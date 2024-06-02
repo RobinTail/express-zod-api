@@ -31,7 +31,6 @@
     "test:cjs": "yarn --cwd tests/cjs && vitest run -r tests/cjs",
     "test:esm": "yarn --cwd tests/esm && vitest run -r tests/esm",
     "test:952": "yarn --cwd tests/issue952 && yarn --cwd tests/issue952 test",
-    "test:compat": "yarn --cwd tests/compat && yarn --cwd tests/compat test",
     "bench": "vitest bench --run tests/bench",
     "lint": "eslint && yarn prettier *.md --check",
     "mdfix": "prettier *.md --write",
