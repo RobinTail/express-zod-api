@@ -7,12 +7,11 @@ import {
   arrayResultHandler,
   defaultResultHandler,
   ResultHandler,
-  AbstractResultHandler,
 } from "../../src";
 import { ResultHandlerError } from "../../src/errors";
 import { metaSymbol } from "../../src/metadata";
 import { describe, expect, test, vi } from "vitest";
-import { Result } from "../../src/result-handler";
+import { AbstractResultHandler, Result } from "../../src/result-handler";
 import {
   makeLoggerMock,
   makeRequestMock,
