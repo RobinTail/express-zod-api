@@ -130,7 +130,7 @@ const v20: Rule.RuleModule = {
 
 const rules = { v20 };
 
-/** @desc ESLint plugin for migrating to this version (from previous) */
+/** @desc ESLint flat config entry for migrating to this version (from previous), requires at least ESLint 8 */
 export const migration = {
   rules: { "ez-migration/v20": "error" },
   plugins: { [pluginName]: { rules } },
