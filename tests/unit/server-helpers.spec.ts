@@ -10,7 +10,7 @@ import {
 } from "../../src/server-helpers";
 import { describe, expect, test, vi } from "vitest";
 import { defaultResultHandler, ResultHandler } from "../../src";
-import { Request, Response } from "express";
+import { Request } from "express";
 import assert from "node:assert/strict";
 import {
   makeLoggerMock,
@@ -28,12 +28,7 @@ describe("Server helpers", () => {
         rootLogger,
       });
       const next = vi.fn();
-      handler(
-        undefined,
-        null as unknown as Request,
-        null as unknown as Response,
-        next,
-      );
+      handler(undefined, makeRequestMock(), makeResponseMock(), next);
       expect(next).toHaveBeenCalledTimes(1);
     });
 
@@ -51,7 +46,7 @@ describe("Server helpers", () => {
       });
       await handler(
         new SyntaxError("Unexpected end of JSON input"),
-        null as unknown as Request,
+        makeRequestMock(),
         makeResponseMock({
           locals: {
             [metaSymbol]: { logger: makeLoggerMock({ isChild: true }) },
@@ -145,7 +140,7 @@ describe("Server helpers", () => {
     ])("should handle truncated files by calling next with error %#", (req) => {
       const handler = createUploadFailueHandler(error);
       const next = vi.fn();
-      handler(req as unknown as Request, {} as Response, next);
+      handler(req as unknown as Request, makeResponseMock(), next);
       expect(next).toHaveBeenCalledWith(error);
     });
 
@@ -157,7 +152,7 @@ describe("Server helpers", () => {
     ])("should call next when all uploads succeeded %#", (req) => {
       const handler = createUploadFailueHandler(error);
       const next = vi.fn();
-      handler(req as unknown as Request, {} as Response, next);
+      handler(req as unknown as Request, makeResponseMock(), next);
       expect(next).toHaveBeenCalledWith();
     });
   });
