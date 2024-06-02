@@ -56,7 +56,7 @@ factory.addMiddleware(
   }),
 );
 
-// after:
+// after
 factory // variant 1:
   .addMiddleware(
     new Middleware({
@@ -74,15 +74,17 @@ declare module "express-zod-api" {
 }
 const { responseMock: responseMockBefore, loggerMock: loggerMockBefore } =
   testEndpoint({ endpoint });
+expect(responseMockBefore.set).toHaveBeenCalledWith("X-Custom", "one");
 expect(responseMockBefore.status).toHaveBeenCalledWith(200);
 expect(loggerMockBefore.error).not.toHaveBeenCalled();
 
 // after
 const { responseMock, loggerMock } = testEndpoint({ endpoint });
 expect(responseMock._getStatusCode()).toBe(200);
-expect(responseMock._getHeaders()).toEqual({ "x-custom": "one" });
-expect(responseMock._getData()).toBe(JSON.stringify({ status: "success" }));
-expect(loggerMock._getLogs().error).toEqual([]);
+expect(responseMock._getHeaders()).toEqual({ "x-custom": "one" }); // lower case!
+expect(responseMock._getData()).toBe(JSON.stringify({ status: "success" })); // or:
+expect(JSON.parse(responseMock._getData())).toEqual({ status: "success" });
+expect(loggerMock._getLogs().error).toHaveLength(0);
 ```
 
 ## Version 19
