@@ -20,8 +20,8 @@ export const makeRequestMock = <REQ extends RequestOptions>(props?: REQ) => {
   return mock as typeof mock & REQ;
 };
 
-export const makeResponseMock = (responseOptions?: ResponseOptions) =>
-  createResponse<LocalResponse>(responseOptions);
+export const makeResponseMock = (opt?: ResponseOptions) =>
+  createResponse<LocalResponse>(opt);
 
 export const makeLoggerMock = <LOG extends FlatObject>(loggerProps?: LOG) => {
   const logs: Record<keyof AbstractLogger, unknown[]> = {
