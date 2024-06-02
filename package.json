@@ -150,7 +150,7 @@
     "husky": "^9.0.5",
     "make-coverage-badge": "^1.2.0",
     "mockdate": "^3.0.5",
-    "prettier": "3.2.5",
+    "prettier": "3.3.0",
     "swagger-ui-express": "^5.0.0",
     "tsd": "^0.31.0",
     "tsup": "^8.0.0",
