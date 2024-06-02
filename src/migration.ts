@@ -131,7 +131,7 @@ const v20: Rule.RuleModule = {
 
 const rules = { v20 };
 
-/** @desc ESLint plugin for migrating to this version */
+/** @desc ESLint plugin for migrating to this version (from previous) */
 export const migration = {
   rules: fromPairs(
     xprod(
