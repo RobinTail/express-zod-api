@@ -18,14 +18,12 @@ export default [
   ...tsPlugin.configs.recommended,
   prettierOverrides,
   prettierRules,
-  // Things to turn off
+  // Things to turn off globally
   { ignores: ["dist/", "coverage/"] },
   {
     rules: {
       "no-empty": ["error", { allowEmptyCatch: true }],
       "no-empty-pattern": ["error", { allowObjectPatternsAsParameters: true }],
-      "@typescript-eslint/no-empty-object-type": "off", // @todo remove
-      "@typescript-eslint/no-explicit-any": "off", // @todo remove
     },
   },
   // Things to turn on globally
@@ -42,6 +40,16 @@ export default [
     files: ["src/*.ts"],
     rules: {
       "import-x/no-extraneous-dependencies": "error",
+      "@typescript-eslint/no-explicit-any": "off", // @todo remove
+      "@typescript-eslint/no-empty-object-type": "off", // @todo narrow
+    },
+  },
+  // For tests
+  {
+    files: ["tests/**/*.ts"],
+    rules: {
+      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/no-empty-object-type": "off", // @todo narrow
     },
   },
   // Special needs of plugin
@@ -53,10 +61,15 @@ export default [
   },
   // Special needs of the generated code
   {
-    files: ["tests/*/quick-start.ts"],
+    files: ["tests/*/quick-start.ts", "example/example.client.ts"],
     rules: {
       "prettier/prettier": "off",
       "import-x/no-duplicates": "off",
+      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/no-empty-object-type": [
+        "error",
+        { allowObjectTypes: "always" },
+      ],
     },
   },
 ];

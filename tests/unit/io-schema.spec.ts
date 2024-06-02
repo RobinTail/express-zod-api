@@ -181,7 +181,7 @@ describe("I/O Schema and related helpers", () => {
         id: "123",
       });
       expect(result.success).toBeFalsy();
-      expect((result as z.SafeParseError<any>).error).toMatchSnapshot();
+      expect(result.error).toMatchSnapshot();
     });
 
     test("Should merge mixed object schemas", () => {

@@ -1,12 +1,6 @@
 import MockDate from "mockdate";
 import { EventEmitter } from "node:events";
 import {
-  AbstractLogger,
-  BuiltinLoggerConfig,
-  createLogger,
-  isActualLogger,
-} from "../../src/logger";
-import {
   afterAll,
   beforeAll,
   beforeEach,
@@ -15,8 +9,13 @@ import {
   test,
   vi,
 } from "vitest";
+import {
+  BuiltinLogger,
+  BuiltinLoggerConfig,
+  createLogger,
+} from "../../src/builtin-logger";
 
-describe("Logger", () => {
+describe("BuiltinLogger", () => {
   beforeAll(() => {
     // fix (node:58829) MaxListenersExceededWarning: Possible EventEmitter memory leak
     EventEmitter.setMaxListeners(15);
@@ -31,12 +30,12 @@ describe("Logger", () => {
   });
 
   const makeLogger = (props: BuiltinLoggerConfig) => {
-    const logger = createLogger({ ...props });
+    const logger = new BuiltinLogger({ ...props });
     const logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
     return { logger, logSpy };
   };
 
-  describe("createLogger()", () => {
+  describe("constructor()", () => {
     test("Should create silent logger", () => {
       const { logger, logSpy } = makeLogger({ level: "silent" });
       logger.error("test");
@@ -105,30 +104,25 @@ describe("Logger", () => {
     );
   });
 
-  describe("isActualLogger()", () => {
-    test.each<BuiltinLoggerConfig>([
-      { level: "silent" },
-      { level: "debug", color: false },
-      { level: "info", color: true },
-      { level: "warn", depth: 5 },
-      { level: "warn", depth: null },
-      { level: "warn", depth: Infinity },
-    ])("should invalidate built-in logger config %#", (sample) => {
-      expect(isActualLogger(sample)).toBeFalsy();
+  describe.each([true, false])(".child()", (color) => {
+    test.each([
+      { requestId: "some id", extra: "data" },
+      { requestId: "simple" },
+    ])("should create a child logger %#", (ctx) => {
+      const { logger: parent, logSpy } = makeLogger({
+        level: "info",
+        color,
+      });
+      const child = parent.child(ctx);
+      child.info("Here is some message", { more: "information" });
+      expect(logSpy.mock.calls).toMatchSnapshot();
     });
+  });
 
-    test.each<AbstractLogger>([
-      // issue #1605: should not allow methods
-      { level: "debug", debug: () => {} },
-      { level: "warn", error: () => {} },
-      // issue #1772: similar to #1605, but the methods are in prototype
-      new (class {
-        level = "debug";
-        debug() {}
-      })(),
-      Object.setPrototypeOf({ level: "debug" }, { debug: () => {} }),
-    ])("should validate logger instances %#", (sample) => {
-      expect(isActualLogger(sample)).toBeTruthy();
+  /** @todo remove in v20 */
+  describe("createLogger() alias", () => {
+    test("should return instance of BuiltinLogger", () => {
+      expect(createLogger({ level: "debug" })).toBeInstanceOf(BuiltinLogger);
     });
   });
 });

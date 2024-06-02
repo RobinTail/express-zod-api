@@ -2,6 +2,8 @@
 
 exports[`Index Entrypoint > exports > AbstractEndpoint should have certain value 1`] = `[Function]`;
 
+exports[`Index Entrypoint > exports > BuiltinLogger should have certain value 1`] = `[Function]`;
+
 exports[`Index Entrypoint > exports > DependsOnMethod should have certain value 1`] = `[Function]`;
 
 exports[`Index Entrypoint > exports > Documentation should have certain value 1`] = `[Function]`;
@@ -101,6 +103,7 @@ exports[`Index Entrypoint > exports > should have certain entities exposed 1`] =
   "getMessageFromError",
   "getStatusCodeFromError",
   "createLogger",
+  "BuiltinLogger",
   "createMiddleware",
   "createResultHandler",
   "defaultResultHandler",

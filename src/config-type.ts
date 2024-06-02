@@ -2,8 +2,9 @@ import type compression from "compression";
 import { IRouter, Request, RequestHandler } from "express";
 import type fileUpload from "express-fileupload";
 import { ServerOptions } from "node:https";
+import { BuiltinLoggerConfig } from "./builtin-logger";
 import { AbstractEndpoint } from "./endpoint";
-import { AbstractLogger, BuiltinLoggerConfig } from "./logger";
+import { AbstractLogger, ActualLogger } from "./logger-helpers";
 import { Method } from "./method";
 import { AnyResultHandlerDefinition } from "./result-handler";
 import { ListenOptions } from "node:net";
@@ -20,7 +21,7 @@ type HeadersProvider = (params: {
   defaultHeaders: Headers;
   request: Request;
   endpoint: AbstractEndpoint;
-  logger: AbstractLogger;
+  logger: ActualLogger;
 }) => Headers | Promise<Headers>;
 
 export type TagsConfig<TAG extends string> = Record<
@@ -30,8 +31,8 @@ export type TagsConfig<TAG extends string> = Record<
 
 type ChildLoggerProvider = (params: {
   request: Request;
-  parent: AbstractLogger;
-}) => AbstractLogger | Promise<AbstractLogger>;
+  parent: ActualLogger;
+}) => ActualLogger | Promise<ActualLogger>;
 
 export interface CommonConfig<TAG extends string = string> {
   /**
@@ -77,7 +78,7 @@ export interface CommonConfig<TAG extends string = string> {
 
 type BeforeUpload = (params: {
   request: Request;
-  logger: AbstractLogger;
+  logger: ActualLogger;
 }) => void | Promise<void>;
 
 type UploadOptions = Pick<
@@ -114,7 +115,7 @@ type CompressionOptions = Pick<
 
 type BeforeRouting = (params: {
   app: IRouter;
-  logger: AbstractLogger;
+  logger: ActualLogger;
 }) => void | Promise<void>;
 
 export interface ServerConfig<TAG extends string = string>

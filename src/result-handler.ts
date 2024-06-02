@@ -14,7 +14,7 @@ import {
   logInternalError,
 } from "./common-helpers";
 import { IOSchema } from "./io-schema";
-import { AbstractLogger } from "./logger";
+import { ActualLogger } from "./logger-helpers";
 
 interface ResultHandlerParams<RES> {
   /** null in case of failure to parse or to find the matching endpoint (error: not found) */
@@ -26,7 +26,7 @@ interface ResultHandlerParams<RES> {
   error: Error | null;
   request: Request;
   response: Response<RES>;
-  logger: AbstractLogger;
+  logger: ActualLogger;
 }
 
 type ResultHandler<RES> = (

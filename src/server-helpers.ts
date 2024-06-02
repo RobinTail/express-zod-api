@@ -2,7 +2,7 @@ import type fileUpload from "express-fileupload";
 import { metaSymbol } from "./metadata";
 import { loadPeer } from "./peer-helpers";
 import { AnyResultHandlerDefinition } from "./result-handler";
-import { AbstractLogger } from "./logger";
+import { ActualLogger } from "./logger-helpers";
 import { CommonConfig, ServerConfig } from "./config-type";
 import { ErrorRequestHandler, RequestHandler, Response } from "express";
 import createHttpError, { isHttpError } from "http-errors";
@@ -12,12 +12,12 @@ import { makeErrorFromAnything } from "./common-helpers";
 
 interface HandlerCreatorParams {
   errorHandler: AnyResultHandlerDefinition;
-  rootLogger: AbstractLogger;
+  rootLogger: ActualLogger;
 }
 
 export type LocalResponse = Response<
   unknown,
-  { [metaSymbol]?: { logger: AbstractLogger } }
+  { [metaSymbol]?: { logger: ActualLogger } }
 >;
 
 export const createParserFailureHandler =
@@ -79,7 +79,7 @@ export const createUploadFailueHandler =
   };
 
 export const createUploadLogger = (
-  logger: AbstractLogger,
+  logger: ActualLogger,
 ): Pick<Console, "log"> => ({
   log: logger.debug.bind(logger),
 });
@@ -88,7 +88,7 @@ export const createUploadParsers = async ({
   rootLogger,
   config,
 }: {
-  rootLogger: AbstractLogger;
+  rootLogger: ActualLogger;
   config: ServerConfig;
 }): Promise<RequestHandler[]> => {
   const uploader = await loadPeer<typeof fileUpload>("express-fileupload");
@@ -130,7 +130,7 @@ export const createLoggingMiddleware =
     rootLogger,
     config,
   }: {
-    rootLogger: AbstractLogger;
+    rootLogger: ActualLogger;
     config: CommonConfig;
   }): RequestHandler =>
   async (request, response: LocalResponse, next) => {

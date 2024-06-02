@@ -22,7 +22,7 @@ import {
 } from "./errors";
 import { IOSchema } from "./io-schema";
 import { lastResortHandler } from "./last-resort";
-import { AbstractLogger } from "./logger";
+import { ActualLogger } from "./logger-helpers";
 import { LogicalContainer, combineContainers } from "./logical-container";
 import { AuxMethod, Method } from "./method";
 import { AnyMiddlewareDef } from "./middleware";
@@ -33,7 +33,7 @@ import { Security } from "./security";
 export type Handler<IN, OUT, OPT> = (params: {
   input: IN;
   options: OPT;
-  logger: AbstractLogger;
+  logger: ActualLogger;
 }) => Promise<OUT>;
 
 type DescriptionVariant = "short" | "long";
@@ -45,7 +45,7 @@ export abstract class AbstractEndpoint {
   public abstract execute(params: {
     request: Request;
     response: Response;
-    logger: AbstractLogger;
+    logger: ActualLogger;
     config: CommonConfig;
     siblingMethods?: ReadonlyArray<Method>;
   }): Promise<void>;
@@ -258,7 +258,7 @@ export class Endpoint<
     input: Readonly<FlatObject>; // Issue #673: input is immutable, since this.inputSchema is combined with ones of middlewares
     request: Request;
     response: Response;
-    logger: AbstractLogger;
+    logger: ActualLogger;
     options: Partial<OPT>;
   }) {
     for (const def of this.#middlewares) {
@@ -301,7 +301,7 @@ export class Endpoint<
   }: {
     input: Readonly<FlatObject>;
     options: OPT;
-    logger: AbstractLogger;
+    logger: ActualLogger;
   }) {
     let finalInput: z.output<IN>; // final input types transformations for handler
     try {
@@ -333,7 +333,7 @@ export class Endpoint<
     error: Error | null;
     request: Request;
     response: Response;
-    logger: AbstractLogger;
+    logger: ActualLogger;
     input: FlatObject;
     output: FlatObject | null;
     options: Partial<OPT>;
@@ -366,7 +366,7 @@ export class Endpoint<
   }: {
     request: Request;
     response: Response;
-    logger: AbstractLogger;
+    logger: ActualLogger;
     config: CommonConfig;
     siblingMethods?: Method[];
   }) {
