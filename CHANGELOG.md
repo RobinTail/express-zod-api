@@ -19,8 +19,8 @@
     - `responseMock._getStatusCode()`, `responseMock._getHeaders()`, `responseMock._getData()`, `loggerMock._getLogs()`;
     - See [the documentation of node-mocks-http library](https://www.npmjs.com/package/node-mocks-http) for details.
 - How to migrate:
-  - Consider using the provided ESLint plugin `migration` in order to apply changes automatically (example below);
-  - Or follow the examples below in order to rename/remove entities manually as described above.
+  - Consider using the provided ESLint plugin `migration` in order to apply changes automatically (except assertions);
+  - Or follow the code samples below in order to rename/remove entities manually as described above.
 
 ```js
 // eslint.config.mjs — minimal config to apply migrations automatically using "eslint --fix":
