@@ -161,7 +161,7 @@
     "zod": "^3.23.0"
   },
   "resolutions": {
-    "**/@typescript-eslint/utils": "^8.0.0-alpha.24"
+    "**/@typescript-eslint/utils": "^8.0.0-alpha.25"
   },
   "keywords": [
     "nodejs",
