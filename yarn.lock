@@ -935,10 +935,10 @@
     "@typescript-eslint/types" "8.0.0-alpha.24"
     eslint-visitor-keys "^3.4.3"
 
-"@vitest/coverage-istanbul@^2.0.0-beta.5":
-  version "2.0.0-beta.5"
-  resolved "https://registry.yarnpkg.com/@vitest/coverage-istanbul/-/coverage-istanbul-2.0.0-beta.5.tgz#f6ef9ac0fb2f04250cf5a1078b4cd5d8d6b0f5c9"
-  integrity sha512-xHGvgwB0KjHICFKeRYrT3096qKaAsLcoIsZj/jVf0a7LFCtZyrUyQCZnwsvJAP0zRa47eVte36G1sTEoJr/3nw==
+"@vitest/coverage-istanbul@^2.0.0-beta.8":
+  version "2.0.0-beta.8"
+  resolved "https://registry.yarnpkg.com/@vitest/coverage-istanbul/-/coverage-istanbul-2.0.0-beta.8.tgz#d58f64d47381f1c601933a6499777c106944b125"
+  integrity sha512-DIUmbCNZdcC9D3OWxj7gKubNPdqA6LqSTiEUTAO6tqm6CyZGZXxhA2U9Y2Suhh+T1Md1R9rDAB5oILijIgJj0w==
   dependencies:
     debug "^4.3.4"
     istanbul-lib-coverage "^3.2.2"
@@ -950,44 +950,44 @@
     picocolors "^1.0.0"
     test-exclude "^6.0.0"
 
-"@vitest/expect@2.0.0-beta.5":
-  version "2.0.0-beta.5"
-  resolved "https://registry.yarnpkg.com/@vitest/expect/-/expect-2.0.0-beta.5.tgz#19724b63df1e2015e81d839b4ac2dd51b4ba3a3c"
-  integrity sha512-Nndd4vXfCMBqkWgVjDguvisTA+tsXHp1eRx5lpLCPM1goc49TKh2wqzYtaIbA4pWTW54JhYXbP0EdhmHk/zoXA==
+"@vitest/expect@2.0.0-beta.8":
+  version "2.0.0-beta.8"
+  resolved "https://registry.yarnpkg.com/@vitest/expect/-/expect-2.0.0-beta.8.tgz#4e1b3608dcb92d07949c872fc8502811601e1f64"
+  integrity sha512-Gk6tRRJfkgX0G9bdyvrv70htJXJH3lVgqrJyvxDoFI3kO3ggpkeALpPcxd0zWfRRPi3N9i1+PaLf+/ATVNYRig==
   dependencies:
-    "@vitest/spy" "2.0.0-beta.5"
-    "@vitest/utils" "2.0.0-beta.5"
+    "@vitest/spy" "2.0.0-beta.8"
+    "@vitest/utils" "2.0.0-beta.8"
     chai "^5.1.1"
 
-"@vitest/runner@2.0.0-beta.5":
-  version "2.0.0-beta.5"
-  resolved "https://registry.yarnpkg.com/@vitest/runner/-/runner-2.0.0-beta.5.tgz#1a8f06ed81f0b3f808fc63f9f7d9e00f047c26bd"
-  integrity sha512-1MEC6x7kK8PMaLjaspcBfaJftmIOdLlp+HrYc6KiW3EDM6TIvgLrqTcUFD0zj/Kq4AVNGgvJJN8vCDIV7nO0Gw==
+"@vitest/runner@2.0.0-beta.8":
+  version "2.0.0-beta.8"
+  resolved "https://registry.yarnpkg.com/@vitest/runner/-/runner-2.0.0-beta.8.tgz#b246c4d84e571ede3d375c00f18d319f8c93a0af"
+  integrity sha512-L+U0vw0TyM7UA2EfxcR/3TTdlkqzDP5Uxj3SpsAsw9b9rFDtw5ZhrRnRRb4LZDildt3q/P/kjuJG6LSigVoITQ==
   dependencies:
-    "@vitest/utils" "2.0.0-beta.5"
+    "@vitest/utils" "2.0.0-beta.8"
     p-limit "^5.0.0"
     pathe "^1.1.2"
 
-"@vitest/snapshot@2.0.0-beta.5":
-  version "2.0.0-beta.5"
-  resolved "https://registry.yarnpkg.com/@vitest/snapshot/-/snapshot-2.0.0-beta.5.tgz#ed2c1ba86a68744726e13a91b0d7e5684fc669e5"
-  integrity sha512-+KkkOX/WoUxUP1UNwhPLvIjNJ5YFGODS8giJWQQ9BnAp2kotuEsmehhUia59rzLlq42Ql+6YTohACj+0fVCxbw==
+"@vitest/snapshot@2.0.0-beta.8":
+  version "2.0.0-beta.8"
+  resolved "https://registry.yarnpkg.com/@vitest/snapshot/-/snapshot-2.0.0-beta.8.tgz#c2cfb8cb4b0b245bc34d08823fc9dd2b0b0e490f"
+  integrity sha512-dUv6FE1qlGvLhLiLqTr2YcxohX/eevobaRsGJRll/NqUot4ugB46N1pTxx+VCiyVETuTkr+hjOWJvyxfWpXtdg==
   dependencies:
     magic-string "^0.30.10"
     pathe "^1.1.2"
     pretty-format "^29.7.0"
 
-"@vitest/spy@2.0.0-beta.5":
-  version "2.0.0-beta.5"
-  resolved "https://registry.yarnpkg.com/@vitest/spy/-/spy-2.0.0-beta.5.tgz#d74b3036b975f14bae66a46f0459a5616b0cd3ee"
-  integrity sha512-O0S70iwmNOjkqGHGk+EO3jRL4sr8xa+6NKCJtK2adkEK9ozEmzZgde0l4n9eLydCIWLw+fXREfIFtqafac6NJw==
+"@vitest/spy@2.0.0-beta.8":
+  version "2.0.0-beta.8"
+  resolved "https://registry.yarnpkg.com/@vitest/spy/-/spy-2.0.0-beta.8.tgz#67979a613a49fc1d47503124f0f66d17c7f19a97"
+  integrity sha512-eYnayQ48XxSrUkoeaprUqXEqJJvBIwAGKXAXeTZpQ7vFDLjG0hTLgTt1slw92kwR1qYvS4seKjpSwa5AsTUFdA==
   dependencies:
     tinyspy "^3.0.0"
 
-"@vitest/utils@2.0.0-beta.5":
-  version "2.0.0-beta.5"
-  resolved "https://registry.yarnpkg.com/@vitest/utils/-/utils-2.0.0-beta.5.tgz#55dc259c32ed8f76411c623849d1fe667391ac40"
-  integrity sha512-VYvlmu6LeQSe3OsnbMTu8zf9lrbxsmN/V4l4Sod6rgun2g2NkUvh6KwDPqmryDM2MOsYFQqPdO8avASHKBlCvA==
+"@vitest/utils@2.0.0-beta.8":
+  version "2.0.0-beta.8"
+  resolved "https://registry.yarnpkg.com/@vitest/utils/-/utils-2.0.0-beta.8.tgz#95d23ab488f55dbde0ac577bcefcc6e0a1548b84"
+  integrity sha512-iv1LQCAqt7T3DMJC51H8acJ4+DPMvgWwpSTcyy1pdHqm7eZ3uMTnFAPIy6Df63sHQsiuha79PESYXVwfPRT9tg==
   dependencies:
     diff-sequences "^29.6.3"
     estree-walker "^3.0.3"
@@ -3667,10 +3667,10 @@ tinybench@^2.8.0:
   resolved "https://registry.yarnpkg.com/tinybench/-/tinybench-2.8.0.tgz#30e19ae3a27508ee18273ffed9ac7018949acd7b"
   integrity sha512-1/eK7zUnIklz4JUUlL+658n58XO2hHLQfSk1Zf2LKieUjxidN16eKFEoDEfjHc3ohofSSqK3X5yO6VGb6iW8Lw==
 
-tinypool@^0.9.0:
-  version "0.9.0"
-  resolved "https://registry.yarnpkg.com/tinypool/-/tinypool-0.9.0.tgz#229528824f8cf067fba97b912b8d490df754b36e"
-  integrity sha512-/aMLccuigz3ZZV8pv/LvOVkOzOfcKkz0V2d5JfHhXUSlp0JJ8h2lAjveUZFTKqII9L4iJh4jod5bfZxx3mditw==
+tinypool@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/tinypool/-/tinypool-1.0.0.tgz#a68965218e04f4ad9de037d2a1cd63cda9afb238"
+  integrity sha512-KIKExllK7jp3uvrNtvRBYBWBOAXSX8ZvoaD8T+7KB/QHIuoJW3Pmr60zucywjAlMb5TeXUkcs/MWeWLu0qvuAQ==
 
 tinyspy@^3.0.0:
   version "3.0.0"
@@ -3893,10 +3893,10 @@ vary@^1, vary@~1.1.2:
   resolved "https://registry.yarnpkg.com/vary/-/vary-1.1.2.tgz#2299f02c6ded30d4a5961b0b9f74524a18f634fc"
   integrity sha512-BNGbWLfd0eUPabhkXUVm0j8uuvREyTh5ovRa/dyow/BqAbZJyC+5fU+IzQOzmAKzYqYRAISoRhdQr3eIZ/PXqg==
 
-vite-node@2.0.0-beta.5:
-  version "2.0.0-beta.5"
-  resolved "https://registry.yarnpkg.com/vite-node/-/vite-node-2.0.0-beta.5.tgz#58bdd9e480b06ccd9954fc04d7067cab13f59d75"
-  integrity sha512-TySmJu8O0+29u970hcmGd50krZl6eK8+EuuA/b1Z4JROmKW0jB9wB++mq1KCKEfnNIUBmF14FKq8BCiJLgGRyg==
+vite-node@2.0.0-beta.8:
+  version "2.0.0-beta.8"
+  resolved "https://registry.yarnpkg.com/vite-node/-/vite-node-2.0.0-beta.8.tgz#a4883a0caf56dd018d6f6a0f09cdc3263975204d"
+  integrity sha512-BbxDb2p9yAOD1Fn+BzDIuI1S7phoLleZXyThe7UcQ6XJDj3nOmHTp25RuJOScOe4e05qj09qGrUmuBcslCyPGg==
   dependencies:
     cac "^6.7.14"
     debug "^4.3.4"
@@ -3915,16 +3915,16 @@ vite@^5.0.0:
   optionalDependencies:
     fsevents "~2.3.3"
 
-vitest@^2.0.0-beta.5:
-  version "2.0.0-beta.5"
-  resolved "https://registry.yarnpkg.com/vitest/-/vitest-2.0.0-beta.5.tgz#834aae26553e0f79f7ce34bc8beeb6c54020e907"
-  integrity sha512-hVUz9cXYqf9e2ZLgP1aqFd6rgqQhZkW7FHdXWEzsQo8ZF0PBitWseeusc9G3Ist9C+nT5uRMTQLdCt8iFvalxw==
+vitest@^2.0.0-beta.8:
+  version "2.0.0-beta.8"
+  resolved "https://registry.yarnpkg.com/vitest/-/vitest-2.0.0-beta.8.tgz#e3aa59bb241bef38456ce605aea84ca944430645"
+  integrity sha512-sYWGt+lljLbW2rjjAFbuTwBSGoWT1GFJfjig6ld/oKUzRLRvgnvoFv6IACbcVKFXJpElxdwxNBXDdwuaxNhAEQ==
   dependencies:
-    "@vitest/expect" "2.0.0-beta.5"
-    "@vitest/runner" "2.0.0-beta.5"
-    "@vitest/snapshot" "2.0.0-beta.5"
-    "@vitest/spy" "2.0.0-beta.5"
-    "@vitest/utils" "2.0.0-beta.5"
+    "@vitest/expect" "2.0.0-beta.8"
+    "@vitest/runner" "2.0.0-beta.8"
+    "@vitest/snapshot" "2.0.0-beta.8"
+    "@vitest/spy" "2.0.0-beta.8"
+    "@vitest/utils" "2.0.0-beta.8"
     chai "^5.1.1"
     debug "^4.3.4"
     execa "^8.0.1"
@@ -3933,9 +3933,9 @@ vitest@^2.0.0-beta.5:
     picocolors "^1.0.0"
     std-env "^3.7.0"
     tinybench "^2.8.0"
-    tinypool "^0.9.0"
+    tinypool "^1.0.0"
     vite "^5.0.0"
-    vite-node "2.0.0-beta.5"
+    vite-node "2.0.0-beta.8"
     why-is-node-running "^2.2.2"
 
 webidl-conversions@^4.0.2:
