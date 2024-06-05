@@ -791,7 +791,7 @@ export const onEach: SchemaHandler<
   SchemaObject | ReferenceObject,
   OpenAPIContext,
   "each"
-> = (schema, { isResponse, prev }) => {
+> = (schema: z.ZodTypeAny, { isResponse, prev }) => {
   if (isReferenceObject(prev)) {
     return {};
   }
@@ -828,7 +828,7 @@ export const onMissing: SchemaHandler<
   SchemaObject | ReferenceObject,
   OpenAPIContext,
   "last"
-> = (schema, ctx) =>
+> = (schema: z.ZodTypeAny, ctx) =>
   assert.fail(
     new DocumentationError({
       message: `Zod type ${schema.constructor.name} is unsupported.`,

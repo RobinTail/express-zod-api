@@ -144,7 +144,10 @@ const onNullable: Producer = (schema: z.ZodNullable<z.ZodTypeAny>, { next }) =>
     f.createLiteralTypeNode(f.createNull()),
   ]);
 
-const onTuple: Producer = ({ items, _def: { rest } }: z.ZodTuple, { next }) =>
+const onTuple: Producer = (
+  { items, _def: { rest } }: z.AnyZodTuple,
+  { next },
+) =>
   f.createTupleTypeNode(
     items
       .map(next)
@@ -152,7 +155,7 @@ const onTuple: Producer = ({ items, _def: { rest } }: z.ZodTuple, { next }) =>
   );
 
 const onRecord: Producer = (
-  { keySchema, valueSchema }: z.ZodRecord,
+  { keySchema, valueSchema }: z.ZodRecord<z.ZodTypeAny>,
   { next },
 ) =>
   f.createExpressionWithTypeArguments(
