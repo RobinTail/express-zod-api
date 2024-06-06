@@ -44,10 +44,16 @@ export class BuiltinLogger implements AbstractLogger {
   /** @example new BuiltinLogger({ level: "debug", color: true, depth: 4 }) */
   public constructor(protected config: BuiltinLoggerConfig) {}
 
+  protected hasColor() {
+    const { color = new Ansis().isSupported() } = this.config;
+    return color;
+  }
+
   protected prettyPrint(subject: unknown) {
+    const { depth = 2 } = this.config;
     return inspect(subject, {
-      colors: this.config.color,
-      depth: this.config.depth,
+      depth,
+      colors: this.hasColor(),
       breakLength: this.config.level === "debug" ? 80 : Infinity,
       compact: this.config.level === "debug" ? 3 : true,
     });
@@ -67,10 +73,10 @@ export class BuiltinLogger implements AbstractLogger {
     const { requestId, ...ctx } = this.config.ctx || {};
     const output: string[] = [new Date().toISOString()];
     if (requestId) {
-      output.push(this.config.color ? cyanBright(requestId) : requestId);
+      output.push(this.hasColor() ? cyanBright(requestId) : requestId);
     }
     output.push(
-      this.config.color ? `${this.styles[method](method)}:` : `${method}:`,
+      this.hasColor() ? `${this.styles[method](method)}:` : `${method}:`,
       message,
     );
     if (meta !== undefined) {
