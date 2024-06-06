@@ -89,6 +89,11 @@ expect(loggerMock._getLogs().error).toHaveLength(0);
 
 ## Version 19
 
+### v19.2.2
+
+- Fixed missing defaults for Built-in Logger: color support autodetection and `depth=2`:
+  - Those features were lost in version 19.2.0.
+
 ### v19.2.1
 
 - `openapi3-ts` version is 4.3.2 (fixed distribution).

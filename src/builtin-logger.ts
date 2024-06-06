@@ -34,6 +34,7 @@ export interface BuiltinLoggerConfig {
 
 /** @desc Built-in console logger with optional colorful inspections */
 export class BuiltinLogger implements AbstractLogger {
+  protected hasColor: boolean;
   protected readonly styles: Record<keyof AbstractLogger, Ansis> = {
     debug: blue,
     info: green,
@@ -42,12 +43,16 @@ export class BuiltinLogger implements AbstractLogger {
   };
 
   /** @example new BuiltinLogger({ level: "debug", color: true, depth: 4 }) */
-  public constructor(protected config: BuiltinLoggerConfig) {}
+  public constructor(protected config: BuiltinLoggerConfig) {
+    const { color: hasColor = new Ansis().isSupported() } = config;
+    this.hasColor = hasColor;
+  }
 
   protected prettyPrint(subject: unknown) {
+    const { depth = 2 } = this.config;
     return inspect(subject, {
-      colors: this.config.color,
-      depth: this.config.depth,
+      depth,
+      colors: this.hasColor,
       breakLength: this.config.level === "debug" ? 80 : Infinity,
       compact: this.config.level === "debug" ? 3 : true,
     });
@@ -67,10 +72,10 @@ export class BuiltinLogger implements AbstractLogger {
     const { requestId, ...ctx } = this.config.ctx || {};
     const output: string[] = [new Date().toISOString()];
     if (requestId) {
-      output.push(this.config.color ? cyanBright(requestId) : requestId);
+      output.push(this.hasColor ? cyanBright(requestId) : requestId);
     }
     output.push(
-      this.config.color ? `${this.styles[method](method)}:` : `${method}:`,
+      this.hasColor ? `${this.styles[method](method)}:` : `${method}:`,
       message,
     );
     if (meta !== undefined) {
