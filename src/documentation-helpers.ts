@@ -448,14 +448,8 @@ export const depictString: Depicter = ({
   isDatetime,
   _def: { checks },
 }: z.ZodString) => {
-  const regexCheck = checks.find(
-    (check): check is Extract<z.ZodStringCheck, { kind: "regex" }> =>
-      check.kind === "regex",
-  );
-  const datetimeCheck = checks.find(
-    (check): check is Extract<z.ZodStringCheck, { kind: "datetime" }> =>
-      check.kind === "datetime",
-  );
+  const regexCheck = checks.find((check) => check.kind === "regex");
+  const datetimeCheck = checks.find((check) => check.kind === "datetime");
   const regex = regexCheck
     ? regexCheck.regex
     : datetimeCheck
