@@ -14,6 +14,7 @@ import {
   SecuritySchemeObject,
   TagObject,
   isReferenceObject,
+  isSchemaObject,
 } from "openapi3-ts/oas31";
 import {
   both,
@@ -184,14 +185,15 @@ export const depictDiscriminatedUnion: Depicter = (
 const tryFlattenIntersection = (
   children: Array<SchemaObject | ReferenceObject>,
 ) => {
-  const [left, right] = children.filter(
-    (entry): entry is SchemaObject =>
-      !isReferenceObject(entry) &&
-      entry.type === "object" &&
-      Object.keys(entry).every((key) =>
-        ["type", "properties", "required", "examples"].includes(key),
-      ),
-  );
+  const [left, right] = children
+    .filter((entry) => isSchemaObject(entry))
+    .filter(
+      (entry) =>
+        entry.type === "object" &&
+        Object.keys(entry).every((key) =>
+          ["type", "properties", "required", "examples"].includes(key),
+        ),
+    );
   assert(left && right, "Can not flatten objects");
   const flat: SchemaObject = { type: "object" };
   if (left.properties || right.properties) {
@@ -246,7 +248,7 @@ export const depictNullable: Depicter = (
   { next },
 ) => {
   const nested = next(schema.unwrap());
-  if (!isReferenceObject(nested)) {
+  if (isSchemaObject(nested)) {
     nested.type = makeNullableType(nested);
   }
   return nested;
@@ -559,7 +561,7 @@ export const depictEffect: Depicter = (
 ) => {
   const input = next(schema.innerType());
   const { effect } = schema._def;
-  if (isResponse && effect.type === "transform" && !isReferenceObject(input)) {
+  if (isResponse && effect.type === "transform" && isSchemaObject(input)) {
     const outputType = tryToTransform(schema, makeSample(input));
     if (outputType && ["number", "string", "boolean"].includes(outputType)) {
       return { type: outputType as "number" | "string" | "boolean" };
@@ -567,11 +569,7 @@ export const depictEffect: Depicter = (
       return next(z.any());
     }
   }
-  if (
-    !isResponse &&
-    effect.type === "preprocess" &&
-    !isReferenceObject(input)
-  ) {
+  if (!isResponse && effect.type === "preprocess" && isSchemaObject(input)) {
     const { type: inputType, ...rest } = input;
     return {
       ...rest,
