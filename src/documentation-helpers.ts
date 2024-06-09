@@ -186,7 +186,7 @@ const tryFlattenIntersection = (
   children: Array<SchemaObject | ReferenceObject>,
 ) => {
   const [left, right] = children
-    .filter((entry) => isSchemaObject(entry))
+    .filter(isSchemaObject)
     .filter(
       (entry) =>
         entry.type === "object" &&
