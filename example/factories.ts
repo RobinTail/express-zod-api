@@ -79,9 +79,9 @@ export const arrayRespondingFactory = new EndpointsFactory({
 export const statusDependingFactory = new EndpointsFactory({
   config,
   resultHandler: new ResultHandler({
-    positive: (output) => ({
+    positive: (data) => ({
       statusCodes: [201, 202],
-      schema: z.object({ status: z.literal("created"), data: output }),
+      schema: z.object({ status: z.literal("created"), data }),
     }),
     negative: [
       {
