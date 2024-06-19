@@ -1,6 +1,6 @@
 import { RuleTester } from "eslint";
-import { migration } from "../../src";
-import { describe, test } from "vitest";
+import { migration } from "../../src/migration";
+import { describe, test, expect } from "vitest";
 import parser from "@typescript-eslint/parser";
 
 const tester = new RuleTester({
@@ -8,6 +8,10 @@ const tester = new RuleTester({
 });
 
 describe("Migration", () => {
+  test("should consist of one rule", () => {
+    expect(migration).toMatchSnapshot();
+  });
+
   test("should pass ESLint rule tester", () => {
     tester.run("v20", migration.plugins["ez-migration"].rules.v20, {
       valid: [
