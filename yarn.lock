@@ -3639,9 +3639,9 @@ ts-toolbelt@^9.6.0:
   integrity sha512-nsZd8ZeNUzukXPlJmTBwUAuABDe/9qtVDelJeT/qW0ow3ZS3BsQJtNkan1802aM9Uf68/Y8ljw86Hu0h5IUW3w==
 
 tsd@^0.31.0:
-  version "0.31.0"
-  resolved "https://registry.yarnpkg.com/tsd/-/tsd-0.31.0.tgz#8fe1e19f2116c5208732ab10e1b435b4b0e06559"
-  integrity sha512-yjBiQ5n8OMv/IZOuhDjBy0ZLCoJ7rky/RxRh5W4sJ0oNNCU/kf6s3puPAkGNi59PptDdkcpUm+RsKSdjR2YbNg==
+  version "0.31.1"
+  resolved "https://registry.yarnpkg.com/tsd/-/tsd-0.31.1.tgz#350f8332169b30faf50ad0b3e66fe87f51b1d4c7"
+  integrity sha512-sSL84A0SFwx2xGMWrxlGaarKFSQszWjJS2vgNDDLwatytzg2aq6ShlwHsBYxRNmjzXISODwMva5ZOdAg/4AoOA==
   dependencies:
     "@tsd/typescript" "~5.4.3"
     eslint-formatter-pretty "^4.1.0"
