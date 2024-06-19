@@ -1,7 +1,5 @@
-import { renameSync, statSync } from "node:fs";
 import { defineConfig, Options } from "tsup";
 import { version } from "./package.json";
-import { waitFor } from "./tests/helpers";
 
 const commons: Options = {
   format: ["cjs", "esm"],
@@ -33,17 +31,7 @@ export default defineConfig([
   },
   {
     ...commons,
-    entry: ["src/migration.ts"],
+    entry: { index: "src/migration.ts" },
     outDir: "migration",
-    onSuccess: async () => {
-      for (const ext of ["js", "d.ts", "cjs", "d.cts"]) {
-        const subject = `migration/migration.${ext}`;
-        await waitFor(
-          () => statSync(subject, { throwIfNoEntry: false })?.isFile() || false,
-        );
-        renameSync(subject, `migration/index.${ext}`);
-        console.log(subject);
-      }
-    },
   },
 ]);
