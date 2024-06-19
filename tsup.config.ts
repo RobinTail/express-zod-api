@@ -33,5 +33,7 @@ export default defineConfig([
     ...commons,
     entry: { index: "src/migration.ts" },
     outDir: "migration",
+    // @see https://github.com/arethetypeswrong/arethetypeswrong.github.io/blob/main/docs/problems/MissingExportEquals.md
+    dts: { footer: `export = _default;` },
   },
 ]);

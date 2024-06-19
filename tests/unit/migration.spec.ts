@@ -1,5 +1,5 @@
 import { RuleTester } from "eslint";
-import { migration } from "../../src/migration";
+import migration from "../../src/migration";
 import { describe, test, expect } from "vitest";
 import parser from "@typescript-eslint/parser";
 
