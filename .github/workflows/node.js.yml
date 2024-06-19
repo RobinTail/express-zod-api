@@ -76,6 +76,13 @@ jobs:
         max_attempts: 3
         on_retry_command: yarn config set registry https://registry.npmjs.org
         command: yarn test:952
+    - name: Compatibility test
+      uses: nick-fields/retry@v3
+      with:
+        timeout_seconds: 15
+        max_attempts: 3
+        on_retry_command: yarn config set registry https://registry.npmjs.org
+        command: yarn test:compat
   finish:
     needs: build
     runs-on: ubuntu-latest
