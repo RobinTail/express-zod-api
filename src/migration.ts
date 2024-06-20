@@ -130,7 +130,13 @@ const v20: Rule.RuleModule = {
 
 const rules = { v20 };
 
-/** @desc ESLint flat config entry for migrating to this version (from previous), requires at least ESLint 8 */
+/**
+ * @desc ESLint flat config entry for migrating to this version (from previous), requires at least ESLint 8 or higher
+ * @example // eslint.config.mjs:
+ * @example import parser from "@typescript-eslint/parser";
+ * @example import migration from "express-zod-api/migration";
+ * @example export default [{ languageOptions: { parser } }, migration];
+ * */
 export default {
   rules: { "ez-migration/v20": "error" },
   plugins: { [pluginName]: { rules } },
