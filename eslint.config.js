@@ -19,7 +19,7 @@ export default [
   prettierOverrides,
   prettierRules,
   // Things to turn off globally
-  { ignores: ["dist/", "coverage/"] },
+  { ignores: ["dist/", "coverage/", "migration/"] },
   {
     rules: {
       "no-empty": ["error", { allowEmptyCatch: true }],
