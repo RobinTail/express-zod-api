@@ -498,9 +498,7 @@ export const depictNumber: Depicter = ({
   minValue,
   _def: { checks },
 }: z.ZodNumber) => {
-  const minCheck = checks.find(({ kind }) => kind === "min") as
-    | Extract<z.ZodNumberCheck, { kind: "min" }>
-    | undefined;
+  const minCheck = checks.find((check) => check.kind === "min");
   const minimum =
     minValue === null
       ? isInt
@@ -508,9 +506,7 @@ export const depictNumber: Depicter = ({
         : -Number.MAX_VALUE
       : minValue;
   const isMinInclusive = minCheck ? minCheck.inclusive : true;
-  const maxCheck = checks.find(({ kind }) => kind === "max") as
-    | Extract<z.ZodNumberCheck, { kind: "max" }>
-    | undefined;
+  const maxCheck = checks.find((check) => check.kind === "max");
   const maximum =
     maxValue === null
       ? isInt
