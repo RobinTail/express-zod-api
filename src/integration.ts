@@ -30,13 +30,12 @@ import {
 import { defaultSerializer, makeCleanId } from "./common-helpers";
 import { Method, methods } from "./method";
 import { contentTypes } from "./content-type";
-import { loadPeer } from "./peer-helpers";
 import { Routing } from "./routing";
 import { walkRouting } from "./routing-walker";
 import { HandlingRules } from "./schema-walker";
 import { zodToTs } from "./zts";
 import { ZTSContext, createTypeAlias, printNode } from "./zts-helpers";
-import type Prettier from "prettier";
+import { format as prettierFormat } from "prettier";
 
 type IOKind = "input" | "response" | "positive" | "negative";
 
@@ -713,21 +712,11 @@ export class Integration {
 
   public async printFormatted({
     printerOptions,
-    format: userDefined,
+    format = (text) => prettierFormat(text, { filepath: "client.ts" }),
   }: FormattedPrintingOptions = {}) {
-    let format = userDefined;
-    if (!format) {
-      try {
-        const prettierFormat = (await loadPeer<typeof Prettier>("prettier"))
-          .format;
-        format = (text) => prettierFormat(text, { filepath: "client.ts" });
-      } catch {}
-    }
-
     const usageExample = this.printUsage(printerOptions);
     this.usage =
       usageExample && format ? [await format(usageExample)] : this.usage;
-
     const output = this.print(printerOptions);
     return format ? format(output) : output;
   }
