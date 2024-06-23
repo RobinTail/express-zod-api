@@ -1,6 +1,5 @@
-import type fileUpload from "express-fileupload";
+import fileUpload from "express-fileupload";
 import { metaSymbol } from "./metadata";
-import { loadPeer } from "./peer-helpers";
 import { AbstractResultHandler } from "./result-handler";
 import { ActualLogger } from "./logger-helpers";
 import { CommonConfig, ServerConfig } from "./config-type";
@@ -84,14 +83,13 @@ export const createUploadLogger = (
   log: logger.debug.bind(logger),
 });
 
-export const createUploadParsers = async ({
+export const createUploadParsers = ({
   rootLogger,
   config,
 }: {
   rootLogger: ActualLogger;
   config: ServerConfig;
-}): Promise<RequestHandler[]> => {
-  const uploader = await loadPeer<typeof fileUpload>("express-fileupload");
+}): RequestHandler[] => {
   const { limitError, beforeUpload, ...options } = {
     ...(typeof config.server.upload === "object" && config.server.upload),
   };
@@ -103,7 +101,7 @@ export const createUploadParsers = async ({
     } catch (error) {
       return next(error);
     }
-    uploader({
+    fileUpload({
       debug: true,
       ...options,
       abortOnLimit: false,

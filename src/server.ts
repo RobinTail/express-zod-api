@@ -75,7 +75,7 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
     json: [config.server.jsonParser || express.json()],
     raw: [config.server.rawParser || express.raw(), moveRaw],
     upload: config.server.upload
-      ? await createUploadParsers({ config, rootLogger })
+      ? createUploadParsers({ config, rootLogger })
       : [],
   };
 

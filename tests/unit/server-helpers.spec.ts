@@ -169,10 +169,10 @@ describe("Server helpers", () => {
     });
   });
 
-  describe("createUploadParsers()", async () => {
+  describe("createUploadParsers()", () => {
     const rootLogger = makeLoggerMock();
     const beforeUploadMock = vi.fn();
-    const parsers = await createUploadParsers({
+    const parsers = createUploadParsers({
       config: {
         server: {
           listen: 8090,

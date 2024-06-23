@@ -1,6 +1,6 @@
 import { CompressionOptions } from "compression";
 import { IRouter, Request, RequestHandler } from "express";
-import type fileUpload from "express-fileupload";
+import { Options as FileUploadOptions } from "express-fileupload";
 import { ServerOptions } from "node:https";
 import { BuiltinLoggerConfig } from "./builtin-logger";
 import { AbstractEndpoint } from "./endpoint";
@@ -82,7 +82,7 @@ type BeforeUpload = (params: {
 }) => void | Promise<void>;
 
 type UploadOptions = Pick<
-  fileUpload.Options,
+  FileUploadOptions,
   | "createParentPath"
   | "uriDecodeFileNames"
   | "safeFileNames"
@@ -133,7 +133,6 @@ export interface ServerConfig<TAG extends string = string>
     /**
      * @desc Enable or configure uploads handling.
      * @default undefined
-     * @requires express-fileupload
      * */
     upload?: boolean | UploadOptions;
     /**
