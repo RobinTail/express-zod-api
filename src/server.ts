@@ -1,11 +1,10 @@
 import express from "express";
-import type compression from "compression";
+import compression from "compression";
 import http from "node:http";
 import https from "node:https";
 import { BuiltinLogger } from "./builtin-logger";
 import { AppConfig, CommonConfig, ServerConfig } from "./config-type";
 import { isLoggerInstance } from "./logger-helpers";
-import { loadPeer } from "./peer-helpers";
 import { defaultResultHandler } from "./result-handler";
 import { Parsers, Routing, initRouting } from "./routing";
 import {
@@ -63,9 +62,8 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
   const app = express().disable("x-powered-by").use(loggingMiddleware);
 
   if (config.server.compression) {
-    const compressor = await loadPeer<typeof compression>("compression");
     app.use(
-      compressor(
+      compression(
         typeof config.server.compression === "object"
           ? config.server.compression
           : undefined,

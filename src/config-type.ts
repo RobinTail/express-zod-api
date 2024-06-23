@@ -1,4 +1,4 @@
-import type compression from "compression";
+import { CompressionOptions } from "compression";
 import { IRouter, Request, RequestHandler } from "express";
 import type fileUpload from "express-fileupload";
 import { ServerOptions } from "node:https";
@@ -108,8 +108,8 @@ type UploadOptions = Pick<
   beforeUpload?: BeforeUpload;
 };
 
-type CompressionOptions = Pick<
-  compression.CompressionOptions,
+type CompresorOptions = Pick<
+  CompressionOptions,
   "threshold" | "level" | "strategy" | "chunkSize" | "memLevel"
 >;
 
@@ -139,9 +139,8 @@ export interface ServerConfig<TAG extends string = string>
     /**
      * @desc Enable or configure response compression.
      * @default undefined
-     * @requires compression
      */
-    compression?: boolean | CompressionOptions;
+    compression?: boolean | CompresorOptions;
     /**
      * @desc Custom raw parser (assigns Buffer to request body)
      * @default express.raw()
