@@ -15,15 +15,6 @@ export default defineConfig([
     ...commons,
     entry: ["src/index.ts"],
     esbuildOptions: (options, { format }) => {
-      options.supported = {};
-      if (format === "cjs") {
-        /**
-         * Downgrade dynamic imports for CJS even they are actually supported, but still are problematic for Jest
-         * @example jest with ts-jest
-         * @link https://github.com/evanw/esbuild/issues/2651
-         */
-        options.supported["dynamic-import"] = false;
-      }
       options.define = {
         "process.env.TSUP_BUILD": `"v${version} (${format.toUpperCase()})"`,
       };
