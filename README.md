@@ -593,8 +593,6 @@ const config = createConfig({
 According to [Express.js best practices guide](http://expressjs.com/en/advanced/best-practice-performance.html)
 it might be a good idea to enable GZIP compression of your API responses.
 
-Install the following additional packages: `compression` and `@types/compression`, and enable or configure compression:
-
 ```typescript
 import { createConfig } from "express-zod-api";
 
@@ -793,8 +791,7 @@ const fileStreamingEndpointsFactory = new EndpointsFactory(
 
 ## File uploads
 
-Install the following additional packages: `express-fileupload` and `@types/express-fileupload`, and enable or
-configure file uploads:
+You can enable and configure the file uploads in a following way:
 
 ```typescript
 import { createConfig } from "express-zod-api";
@@ -1045,7 +1042,7 @@ Express Zod API acts as a plugin for Zod, extending its functionality once you i
 ## Generating a Frontend Client
 
 You can generate a Typescript file containing the IO types of your API and a client for it.
-Consider installing `prettier` and using the async `printFormatted()` method.
+Consider using the async `printFormatted()` method or just `print()` for unformatted code.
 
 ```typescript
 import { Integration } from "express-zod-api";
@@ -1057,7 +1054,7 @@ const client = new Integration({
   splitResponse: false, // optional, prints the positive and negative response types separately
 });
 
-const prettierFormattedTypescriptCode = await client.printFormatted(); // or just .print() for unformatted
+const prettierFormattedTypescriptCode = await client.printFormatted(); // or just .print()
 ```
 
 Alternatively, you can supply your own `format` function into that method or use a regular `print()` method instead.
