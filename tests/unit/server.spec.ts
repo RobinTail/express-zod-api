@@ -36,7 +36,7 @@ describe("Server", () => {
   });
 
   describe("createServer()", () => {
-    test("Should create server with minimal config", () => {
+    test("Should create server with minimal config", async () => {
       const port = givePort();
       const configMock: ServerConfig = {
         server: {
@@ -60,7 +60,7 @@ describe("Server", () => {
           }),
         },
       };
-      createServer(configMock, routingMock);
+      await createServer(configMock, routingMock);
       expect(appMock).toBeTruthy();
       expect(appMock.disable).toHaveBeenCalledWith("x-powered-by");
       expect(appMock.use).toHaveBeenCalledTimes(2);
@@ -86,7 +86,7 @@ describe("Server", () => {
       expect(httpListenSpy).toHaveBeenCalledWith(port, expect.any(Function));
     });
 
-    test("Should create server with custom JSON parser, raw parser, logger, error handler and beforeRouting", () => {
+    test("Should create server with custom JSON parser, raw parser, logger, error handler and beforeRouting", async () => {
       const customLogger = new BuiltinLogger({ level: "silent" });
       const infoMethod = vi.spyOn(customLogger, "info");
       const port = givePort();
@@ -125,7 +125,7 @@ describe("Server", () => {
           }),
         },
       };
-      const { logger, app } = createServer(
+      const { logger, app } = await createServer(
         configMock as unknown as ServerConfig,
         routingMock,
       );
@@ -178,7 +178,7 @@ describe("Server", () => {
       );
     });
 
-    test("should create a HTTPS server on request", () => {
+    test("should create a HTTPS server on request", async () => {
       const configMock = {
         server: { listen: givePort() },
         https: {
@@ -203,7 +203,7 @@ describe("Server", () => {
         },
       };
 
-      const { httpsServer } = createServer(configMock, routingMock);
+      const { httpsServer } = await createServer(configMock, routingMock);
       expect(httpsServer).toBeTruthy();
       expect(createHttpsServerSpy).toHaveBeenCalledWith(
         configMock.https.options,
@@ -216,7 +216,7 @@ describe("Server", () => {
       );
     });
 
-    test("should enable compression on request", () => {
+    test("should enable compression on request", async () => {
       const configMock = {
         server: {
           listen: givePort(),
@@ -236,13 +236,13 @@ describe("Server", () => {
           }),
         },
       };
-      createServer(configMock, routingMock);
+      await createServer(configMock, routingMock);
       expect(appMock.use).toHaveBeenCalledTimes(3);
       expect(compressionMock).toHaveBeenCalledTimes(1);
       expect(compressionMock).toHaveBeenCalledWith(undefined);
     });
 
-    test("should enable uploads on request", () => {
+    test("should enable uploads on request", async () => {
       const configMock = {
         server: {
           listen: givePort(),
@@ -268,7 +268,7 @@ describe("Server", () => {
           }),
         },
       };
-      createServer(configMock, routingMock);
+      await createServer(configMock, routingMock);
       expect(appMock.use).toHaveBeenCalledTimes(2);
       expect(appMock.get).toHaveBeenCalledTimes(1);
       expect(appMock.get).toHaveBeenCalledWith(
@@ -279,7 +279,7 @@ describe("Server", () => {
       );
     });
 
-    test("should enable raw on request", () => {
+    test("should enable raw on request", async () => {
       const configMock = {
         server: {
           listen: givePort(),
@@ -298,7 +298,7 @@ describe("Server", () => {
           }),
         },
       };
-      createServer(configMock, routingMock);
+      await createServer(configMock, routingMock);
       expect(appMock.use).toHaveBeenCalledTimes(2);
       expect(appMock.get).toHaveBeenCalledTimes(1);
       expect(appMock.get).toHaveBeenCalledWith(

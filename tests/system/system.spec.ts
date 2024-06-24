@@ -11,7 +11,7 @@ import {
 import { givePort, waitFor } from "../helpers";
 import { afterAll, describe, expect, test, vi } from "vitest";
 
-describe("App", () => {
+describe("App", async () => {
   const port = givePort();
 
   const routing = {
@@ -120,21 +120,24 @@ describe("App", () => {
     },
   };
   vi.spyOn(global.console, "log").mockImplementation(vi.fn());
-  const server = createServer(
-    {
-      server: {
-        listen: port,
-        compression: { threshold: 1 },
+  const server = (
+    await createServer(
+      {
+        server: {
+          listen: port,
+          compression: { threshold: 1 },
+        },
+        cors: false,
+        startupLogo: true,
+        logger: { level: "silent" },
+        inputSources: {
+          post: ["query", "body", "files"],
+        },
       },
-      cors: false,
-      startupLogo: true,
-      logger: { level: "silent" },
-      inputSources: {
-        post: ["query", "body", "files"],
-      },
-    },
-    routing,
+      routing,
+    )
   ).httpServer;
+  await waitFor(() => server.listening);
 
   afterAll(async () => {
     server.close();

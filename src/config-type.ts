@@ -113,7 +113,10 @@ type CompresorOptions = Pick<
   "threshold" | "level" | "strategy" | "chunkSize" | "memLevel"
 >;
 
-type BeforeRouting = (params: { app: IRouter; logger: ActualLogger }) => void;
+type BeforeRouting = (params: {
+  app: IRouter;
+  logger: ActualLogger;
+}) => void | Promise<void>;
 
 export interface ServerConfig<TAG extends string = string>
   extends CommonConfig<TAG> {

@@ -52,7 +52,7 @@ export const attachRouting = (config: AppConfig, routing: Routing) => {
   return { notFoundHandler, logger: rootLogger };
 };
 
-export const createServer = (config: ServerConfig, routing: Routing) => {
+export const createServer = async (config: ServerConfig, routing: Routing) => {
   const {
     rootLogger,
     notFoundHandler,
@@ -80,7 +80,7 @@ export const createServer = (config: ServerConfig, routing: Routing) => {
   };
 
   if (config.server.beforeRouting) {
-    config.server.beforeRouting({ app, logger: rootLogger });
+    await config.server.beforeRouting({ app, logger: rootLogger });
   }
   initRouting({ app, routing, rootLogger, config, parsers });
   app.use(parserFailureHandler, notFoundHandler);
