@@ -16,8 +16,6 @@ exports[`Index Entrypoint > exports > Integration should have certain value 1`] 
 
 exports[`Index Entrypoint > exports > Middleware should have certain value 1`] = `[Function]`;
 
-exports[`Index Entrypoint > exports > MissingPeerError should have certain value 1`] = `[Function]`;
-
 exports[`Index Entrypoint > exports > OutputValidationError should have certain value 1`] = `[Function]`;
 
 exports[`Index Entrypoint > exports > ResultHandler should have certain value 1`] = `[Function]`;
@@ -91,7 +89,6 @@ exports[`Index Entrypoint > exports > should have certain entities exposed 1`] =
   "RoutingError",
   "OutputValidationError",
   "InputValidationError",
-  "MissingPeerError",
   "testEndpoint",
   "Integration",
   "ez",

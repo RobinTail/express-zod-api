@@ -27,7 +27,6 @@ export {
   RoutingError,
   OutputValidationError,
   InputValidationError,
-  MissingPeerError,
 } from "./errors";
 export { testEndpoint } from "./testing";
 export { Integration } from "./integration";
