@@ -1,7 +1,7 @@
 import { writeFile } from "node:fs/promises";
 import manifest from "../package.json";
 
-const ownLicense = `
+const text = `
 MIT License
 
 Copyright (c) ${new Date().getFullYear()} ${manifest.author.name}
@@ -25,4 +25,4 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 `;
 
-await writeFile("LICENSE", ownLicense.trimStart(), "utf-8");
+await writeFile("LICENSE", text.trimStart(), "utf-8");
