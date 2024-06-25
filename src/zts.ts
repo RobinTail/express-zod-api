@@ -94,8 +94,7 @@ const onEffects: Producer = (
   { next, isResponse },
 ) => {
   const input = next(schema.innerType());
-  const effect = schema._def.effect;
-  if (isResponse && effect.type === "transform") {
+  if (isResponse && schema._def.effect.type === "transform") {
     const outputType = tryToTransform(schema, makeSample(input));
     const resolutions: Partial<
       Record<NonNullable<typeof outputType>, ts.KeywordTypeSyntaxKind>
