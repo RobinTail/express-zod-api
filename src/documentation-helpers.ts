@@ -14,6 +14,7 @@ import {
   SecuritySchemeObject,
   TagObject,
   isReferenceObject,
+  isSchemaObject,
 } from "openapi3-ts/oas31";
 import {
   both,
@@ -184,14 +185,15 @@ export const depictDiscriminatedUnion: Depicter = (
 const tryFlattenIntersection = (
   children: Array<SchemaObject | ReferenceObject>,
 ) => {
-  const [left, right] = children.filter(
-    (entry): entry is SchemaObject =>
-      !isReferenceObject(entry) &&
-      entry.type === "object" &&
-      Object.keys(entry).every((key) =>
-        ["type", "properties", "required", "examples"].includes(key),
-      ),
-  );
+  const [left, right] = children
+    .filter(isSchemaObject)
+    .filter(
+      (entry) =>
+        entry.type === "object" &&
+        Object.keys(entry).every((key) =>
+          ["type", "properties", "required", "examples"].includes(key),
+        ),
+    );
   assert(left && right, "Can not flatten objects");
   const flat: SchemaObject = { type: "object" };
   if (left.properties || right.properties) {
@@ -246,7 +248,7 @@ export const depictNullable: Depicter = (
   { next },
 ) => {
   const nested = next(schema.unwrap());
-  if (!isReferenceObject(nested)) {
+  if (isSchemaObject(nested)) {
     nested.type = makeNullableType(nested);
   }
   return nested;
@@ -448,14 +450,8 @@ export const depictString: Depicter = ({
   isDatetime,
   _def: { checks },
 }: z.ZodString) => {
-  const regexCheck = checks.find(
-    (check): check is Extract<z.ZodStringCheck, { kind: "regex" }> =>
-      check.kind === "regex",
-  );
-  const datetimeCheck = checks.find(
-    (check): check is Extract<z.ZodStringCheck, { kind: "datetime" }> =>
-      check.kind === "datetime",
-  );
+  const regexCheck = checks.find((check) => check.kind === "regex");
+  const datetimeCheck = checks.find((check) => check.kind === "datetime");
   const regex = regexCheck
     ? regexCheck.regex
     : datetimeCheck
@@ -502,9 +498,7 @@ export const depictNumber: Depicter = ({
   minValue,
   _def: { checks },
 }: z.ZodNumber) => {
-  const minCheck = checks.find(({ kind }) => kind === "min") as
-    | Extract<z.ZodNumberCheck, { kind: "min" }>
-    | undefined;
+  const minCheck = checks.find((check) => check.kind === "min");
   const minimum =
     minValue === null
       ? isInt
@@ -512,9 +506,7 @@ export const depictNumber: Depicter = ({
         : -Number.MAX_VALUE
       : minValue;
   const isMinInclusive = minCheck ? minCheck.inclusive : true;
-  const maxCheck = checks.find(({ kind }) => kind === "max") as
-    | Extract<z.ZodNumberCheck, { kind: "max" }>
-    | undefined;
+  const maxCheck = checks.find((check) => check.kind === "max");
   const maximum =
     maxValue === null
       ? isInt
@@ -565,7 +557,7 @@ export const depictEffect: Depicter = (
 ) => {
   const input = next(schema.innerType());
   const { effect } = schema._def;
-  if (isResponse && effect.type === "transform" && !isReferenceObject(input)) {
+  if (isResponse && effect.type === "transform" && isSchemaObject(input)) {
     const outputType = tryToTransform(schema, makeSample(input));
     if (outputType && ["number", "string", "boolean"].includes(outputType)) {
       return { type: outputType as "number" | "string" | "boolean" };
@@ -573,11 +565,7 @@ export const depictEffect: Depicter = (
       return next(z.any());
     }
   }
-  if (
-    !isResponse &&
-    effect.type === "preprocess" &&
-    !isReferenceObject(input)
-  ) {
+  if (!isResponse && effect.type === "preprocess" && isSchemaObject(input)) {
     const { type: inputType, ...rest } = input;
     return {
       ...rest,

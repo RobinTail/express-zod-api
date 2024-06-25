@@ -1,6 +1,6 @@
 {
   "name": "express-zod-api",
-  "version": "19.2.2",
+  "version": "19.2.3",
   "description": "A Typescript library to help you get an API server up and running with I/O schema validation and custom middlewares in minutes.",
   "license": "MIT",
   "repository": {
@@ -66,9 +66,9 @@
     "node": "^18.18.0 || ^20.9.0 || ^22.0.0"
   },
   "dependencies": {
-    "ansis": "^3.1.0",
-    "openapi3-ts": "^4.3.2",
-    "ramda": "^0.30.0"
+    "ansis": "^3.2.0",
+    "openapi3-ts": "^4.3.3",
+    "ramda": "^0.30.1"
   },
   "peerDependencies": {
     "@types/compression": "^1.7.5",
@@ -140,7 +140,8 @@
     "cors": "^2.8.5",
     "eslint": "^9.3.0",
     "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-import-x": "^0.5.0",
+    "eslint-import-resolver-typescript": "^3.6.1",
+    "eslint-plugin-import": "https://registry.npmjs.org/eslint-plugin-import-x/-/eslint-plugin-import-x-0.5.2.tgz",
     "eslint-plugin-prettier": "^5.1.3",
     "eslint-plugin-unicorn": "^54.0.0",
     "express": "^4.19.2",
@@ -155,13 +156,13 @@
     "tsd": "^0.31.0",
     "tsup": "^8.0.0",
     "tsx": "^4.6.2",
-    "typescript": "^5.2.2",
-    "typescript-eslint": "^8.0.0-alpha.30",
+    "typescript": "^5.5.2",
+    "typescript-eslint": "^8.0.0-alpha.33",
     "vitest": "^2.0.0-beta.11",
     "zod": "^3.23.0"
   },
   "resolutions": {
-    "**/@typescript-eslint/utils": "^8.0.0-alpha.30"
+    "**/@typescript-eslint/utils": "^8.0.0-alpha.33"
   },
   "keywords": [
     "nodejs",
