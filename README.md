@@ -9,7 +9,7 @@
 ![downloads](https://img.shields.io/npm/dw/express-zod-api.svg)
 ![npm release](https://img.shields.io/npm/v/express-zod-api.svg?color=green25&label=latest)
 ![GitHub Repo stars](https://img.shields.io/github/stars/RobinTail/express-zod-api.svg?style=flat)
-![License](https://img.shields.io/npm/l/express-zod-api.svg?color=green25)
+![License](https://img.shields.io/github/license/robintail/express-zod-api?color=green25)
 
 Start your API server with I/O schema validation and custom middlewares in minutes.
 
