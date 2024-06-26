@@ -2,6 +2,13 @@
 
 ## Version 19
 
+### v19.2.3
+
+- `ansis` version `^3.2.0`;
+- `openapi3-ts` version `^4.3.3`;
+- `ramda` version `^0.30.1`;
+- Several optimizations to the implementation enabled by Typescript 5.5;
+
 ### v19.2.2
 
 - Fixed missing defaults for Built-in Logger: color support autodetection and `depth=2`:
