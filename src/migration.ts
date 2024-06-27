@@ -132,6 +132,7 @@ const rules = { v20 };
 
 /**
  * @desc ESLint flat config entry for migrating to this version (from previous), requires at least ESLint 8 or higher
+ * @deprecated Single-use tool that can be removed and changed regardless SemVer. Remember to delete it after use.
  * @example
  *          // eslint.config.mjs:
  *          import parser from "@typescript-eslint/parser";
