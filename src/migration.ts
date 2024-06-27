@@ -116,7 +116,7 @@ const v20: Rule.RuleModule = {
     Identifier: (node) => {
       if (
         node.name === "MockOverrides" &&
-        (node.parent.type as string) === "TSInterfaceDeclaration"
+        `${node.parent.type}` === "TSInterfaceDeclaration"
       ) {
         context.report({
           node,
