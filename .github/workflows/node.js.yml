@@ -69,13 +69,6 @@ jobs:
         max_attempts: 3
         on_retry_command: yarn config set registry https://registry.npmjs.org
         command: yarn test:esm
-    - name: Issue 952 # see https://github.com/RobinTail/express-zod-api/issues/952
-      uses: nick-fields/retry@v3
-      with:
-        timeout_seconds: 15
-        max_attempts: 3
-        on_retry_command: yarn config set registry https://registry.npmjs.org
-        command: yarn test:952
     - name: Compatibility test
       uses: nick-fields/retry@v3
       with:
@@ -83,6 +76,13 @@ jobs:
         max_attempts: 3
         on_retry_command: yarn config set registry https://registry.npmjs.org
         command: yarn test:compat
+    - name: Issue 952 # see https://github.com/RobinTail/express-zod-api/issues/952
+      uses: nick-fields/retry@v3
+      with:
+        timeout_seconds: 15
+        max_attempts: 3
+        on_retry_command: yarn config set registry https://registry.npmjs.org
+        command: yarn test:952
   finish:
     needs: build
     runs-on: ubuntu-latest
