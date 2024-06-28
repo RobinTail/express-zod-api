@@ -23,11 +23,11 @@
   - Or follow the code samples below in order to rename/remove entities manually as described above.
 
 ```js
-// eslint.config.mjs — minimal config to apply migrations automatically using "eslint --fix" (at least ESLint 8)
+// eslint.config.mjs — minimal config to apply migrations automatically using "eslint . --fix" (at least ESLint 8)
 import parser from "@typescript-eslint/parser";
 import migration from "express-zod-api/migration";
 
-export default [{ languageOptions: { parser } }, migration];
+export default [{ languageOptions: { parser }, files: ["**/*.ts"] }, migration];
 ```
 
 ```ts
