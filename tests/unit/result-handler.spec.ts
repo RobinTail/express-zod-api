@@ -103,7 +103,11 @@ describe("ResultHandler", () => {
         ],
       ]);
       expect(responseMock._getStatusCode()).toBe(500);
-      expect(responseMock._getData()).toMatchSnapshot();
+      expect(
+        responseMock._isJSON()
+          ? responseMock._getJSONData()
+          : responseMock._getData(),
+      ).toMatchSnapshot();
     });
 
     test("Should handle schema error", () => {
@@ -130,7 +134,11 @@ describe("ResultHandler", () => {
       });
       expect(loggerMock._getLogs().error).toHaveLength(0);
       expect(responseMock._getStatusCode()).toBe(400);
-      expect(responseMock._getData()).toMatchSnapshot();
+      expect(
+        responseMock._isJSON()
+          ? responseMock._getJSONData()
+          : responseMock._getData(),
+      ).toMatchSnapshot();
     });
 
     test("Should handle HTTP error", () => {
@@ -147,7 +155,11 @@ describe("ResultHandler", () => {
       });
       expect(loggerMock._getLogs().error).toHaveLength(0);
       expect(responseMock._getStatusCode()).toBe(404);
-      expect(responseMock._getData()).toMatchSnapshot();
+      expect(
+        responseMock._isJSON()
+          ? responseMock._getJSONData()
+          : responseMock._getData(),
+      ).toMatchSnapshot();
     });
 
     test("Should handle regular response", () => {
@@ -164,7 +176,7 @@ describe("ResultHandler", () => {
       });
       expect(loggerMock._getLogs().error).toHaveLength(0);
       expect(responseMock._getStatusCode()).toBe(200);
-      expect(responseMock._getData()).toMatchSnapshot();
+      expect(responseMock._getJSONData()).toMatchSnapshot();
     });
 
     test("should forward output schema examples", () => {
@@ -204,6 +216,10 @@ describe("ResultHandler", () => {
     });
     expect(loggerMock._getLogs().error).toHaveLength(0);
     expect(responseMock._getStatusCode()).toBe(500);
-    expect(responseMock._getData()).toMatchSnapshot();
+    expect(
+      responseMock._isJSON()
+        ? responseMock._getJSONData()
+        : responseMock._getData(),
+    ).toMatchSnapshot();
   });
 });
