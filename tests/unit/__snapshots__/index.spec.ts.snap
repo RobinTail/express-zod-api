@@ -1,7 +1,5 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`Index Entrypoint > exports > AbstractEndpoint should have certain value 1`] = `[Function]`;
-
 exports[`Index Entrypoint > exports > BuiltinLogger should have certain value 1`] = `[Function]`;
 
 exports[`Index Entrypoint > exports > DependsOnMethod should have certain value 1`] = `[Function]`;
@@ -16,9 +14,13 @@ exports[`Index Entrypoint > exports > InputValidationError should have certain v
 
 exports[`Index Entrypoint > exports > Integration should have certain value 1`] = `[Function]`;
 
+exports[`Index Entrypoint > exports > Middleware should have certain value 1`] = `[Function]`;
+
 exports[`Index Entrypoint > exports > MissingPeerError should have certain value 1`] = `[Function]`;
 
 exports[`Index Entrypoint > exports > OutputValidationError should have certain value 1`] = `[Function]`;
+
+exports[`Index Entrypoint > exports > ResultHandler should have certain value 1`] = `[Function]`;
 
 exports[`Index Entrypoint > exports > RoutingError should have certain value 1`] = `[Function]`;
 
@@ -27,54 +29,28 @@ exports[`Index Entrypoint > exports > ServeStatic should have certain value 1`] 
 exports[`Index Entrypoint > exports > arrayEndpointsFactory should have certain value 1`] = `
 EndpointsFactory {
   "middlewares": [],
-  "resultHandler": {
-    "getNegativeResponse": [Function],
-    "getPositiveResponse": [Function],
-    "handler": [Function],
-  },
+  "resultHandler": ResultHandler {},
   "use": [Function],
 }
 `;
 
-exports[`Index Entrypoint > exports > arrayResultHandler should have certain value 1`] = `
-{
-  "getNegativeResponse": [Function],
-  "getPositiveResponse": [Function],
-  "handler": [Function],
-}
-`;
+exports[`Index Entrypoint > exports > arrayResultHandler should have certain value 1`] = `ResultHandler {}`;
 
 exports[`Index Entrypoint > exports > attachRouting should have certain value 1`] = `[Function]`;
 
 exports[`Index Entrypoint > exports > createConfig should have certain value 1`] = `[Function]`;
-
-exports[`Index Entrypoint > exports > createLogger should have certain value 1`] = `[Function]`;
-
-exports[`Index Entrypoint > exports > createMiddleware should have certain value 1`] = `[Function]`;
-
-exports[`Index Entrypoint > exports > createResultHandler should have certain value 1`] = `[Function]`;
 
 exports[`Index Entrypoint > exports > createServer should have certain value 1`] = `[Function]`;
 
 exports[`Index Entrypoint > exports > defaultEndpointsFactory should have certain value 1`] = `
 EndpointsFactory {
   "middlewares": [],
-  "resultHandler": {
-    "getNegativeResponse": [Function],
-    "getPositiveResponse": [Function],
-    "handler": [Function],
-  },
+  "resultHandler": ResultHandler {},
   "use": [Function],
 }
 `;
 
-exports[`Index Entrypoint > exports > defaultResultHandler should have certain value 1`] = `
-{
-  "getNegativeResponse": [Function],
-  "getPositiveResponse": [Function],
-  "handler": [Function],
-}
-`;
+exports[`Index Entrypoint > exports > defaultResultHandler should have certain value 1`] = `ResultHandler {}`;
 
 exports[`Index Entrypoint > exports > ez should have certain value 1`] = `
 {
@@ -95,17 +71,15 @@ exports[`Index Entrypoint > exports > getStatusCodeFromError should have certain
 exports[`Index Entrypoint > exports > should have certain entities exposed 1`] = `
 [
   "createConfig",
-  "AbstractEndpoint",
   "EndpointsFactory",
   "defaultEndpointsFactory",
   "arrayEndpointsFactory",
   "getExamples",
   "getMessageFromError",
   "getStatusCodeFromError",
-  "createLogger",
   "BuiltinLogger",
-  "createMiddleware",
-  "createResultHandler",
+  "Middleware",
+  "ResultHandler",
   "defaultResultHandler",
   "arrayResultHandler",
   "DependsOnMethod",

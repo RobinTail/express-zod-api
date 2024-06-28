@@ -24,7 +24,7 @@ export default [
   prettierOverrides,
   prettierRules,
   // Things to turn off globally
-  { ignores: ["dist/", "coverage/"] },
+  { ignores: ["dist/", "coverage/", "migration/"] },
   {
     rules: {
       "no-empty": ["error", { allowEmptyCatch: true }],
@@ -45,8 +45,10 @@ export default [
     files: ["src/*.ts"],
     rules: {
       "import/no-extraneous-dependencies": "error",
-      "@typescript-eslint/no-explicit-any": "off", // @todo remove
-      "@typescript-eslint/no-empty-object-type": "off", // @todo narrow
+      "@typescript-eslint/no-empty-object-type": [
+        "error",
+        { allowWithName: "LoggerOverrides" },
+      ],
     },
   },
   // For tests
@@ -54,7 +56,7 @@ export default [
     files: ["tests/**/*.ts"],
     rules: {
       "@typescript-eslint/no-explicit-any": "off",
-      "@typescript-eslint/no-empty-object-type": "off", // @todo narrow
+      "@typescript-eslint/no-empty-object-type": ["warn"],
     },
   },
   // Special needs of plugin

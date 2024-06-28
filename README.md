@@ -97,9 +97,6 @@ Therefore, many basic tasks can be accomplished faster and easier, in particular
   - Client side types — inspired by [zod-to-ts](https://github.com/sachinraja/zod-to-ts).
 - File uploads — [Express-FileUpload](https://github.com/richardgirges/express-fileupload)
   (based on [Busboy](https://github.com/mscdex/busboy)).
-- Supports any testing framework having a function mocking method;
-  - [Jest](https://github.com/jestjs/jest) and [Vitest](https://github.com/vitest-dev/vitest)
-    are both supported automatically.
 
 ## Concept
 
@@ -241,9 +238,9 @@ Here is an example of the authentication middleware, that checks a `key` from in
 ```typescript
 import { z } from "zod";
 import createHttpError from "http-errors";
-import { createMiddleware } from "express-zod-api";
+import { Middleware } from "express-zod-api";
 
-const authMiddleware = createMiddleware({
+const authMiddleware = new Middleware({
   security: {
     // this information is optional and used for generating documentation
     and: [
@@ -254,7 +251,7 @@ const authMiddleware = createMiddleware({
   input: z.object({
     key: z.string().min(1),
   }),
-  middleware: async ({ input: { key }, request, logger }) => {
+  handler: async ({ input: { key }, request, logger }) => {
     logger.debug("Checking the key and token");
     const user = await db.Users.findOne({ key });
     if (!user) {
@@ -281,15 +278,20 @@ const yourEndpoint = defaultEndpointsFactory
   });
 ```
 
-You can connect the middleware to endpoints factory right away, making it kind of global:
+You can create a new factory by connecting as many middlewares as you want — they will be executed in the specified
+order for all the endpoints produced on that factory. You may also use a shorter inline syntax within the
+`.addMiddleware()` method, and have access to the output of the previously executed middlewares in chain as `options`:
 
 ```typescript
 import { defaultEndpointsFactory } from "express-zod-api";
 
-const endpointsFactory = defaultEndpointsFactory.addMiddleware(authMiddleware);
+const factory = defaultEndpointsFactory
+  .addMiddleware(authMiddleware) // add Middleware instance or use shorter syntax:
+  .addMiddleware({
+    input: z.object({}),
+    handler: async ({ options: { user } }) => ({}), // options.user from authMiddleware
+  });
 ```
-
-You can connect as many middlewares as you want, they will be executed in order.
 
 ## Options
 
@@ -312,9 +314,9 @@ const endpointsFactory = defaultEndpointsFactory.addOptions(async () => {
 custom [Result Handler](#response-customization):
 
 ```typescript
-import { createResultHandler } from "express-zod-api";
+import { ResultHandler } from "express-zod-api";
 
-const resultHandlerWithCleanup = createResultHandler({
+const resultHandlerWithCleanup = new ResultHandler({
   handler: ({ options }) => {
     // necessary to check for certain option presence:
     if ("db" in options && options.db) {
@@ -369,9 +371,9 @@ Validation errors are reported in a response with a status code `400`.
 
 ```typescript
 import { z } from "zod";
-import { createMiddleware } from "express-zod-api";
+import { Middleware } from "express-zod-api";
 
-const nicknameConstraintMiddleware = createMiddleware({
+const nicknameConstraintMiddleware = new Middleware({
   input: z.object({
     nickname: z
       .string()
@@ -719,18 +721,17 @@ You can create your own result handler by using this example as a template:
 ```typescript
 import { z } from "zod";
 import {
-  createResultHandler,
-  IOSchema,
+  ResultHandler,
   getStatusCodeFromError,
   getMessageFromError,
 } from "express-zod-api";
 
-const yourResultHandler = createResultHandler({
-  getPositiveResponse: (output: IOSchema) => ({
-    schema: z.object({ data: output }),
+const yourResultHandler = new ResultHandler({
+  positive: (data) => ({
+    schema: z.object({ data }),
     mimeType: "application/json", // optinal, or mimeTypes for array
   }),
-  getNegativeResponse: () => z.object({ error: z.string() }),
+  negative: z.object({ error: z.string() }),
   handler: ({ error, input, output, request, response, logger }) => {
     if (!error) {
       // your implementation
@@ -770,12 +771,9 @@ The response schema generally may be just `z.string()`, but I made more specific
 
 ```typescript
 const fileStreamingEndpointsFactory = new EndpointsFactory(
-  createResultHandler({
-    getPositiveResponse: () => ({
-      schema: ez.file("buffer"),
-      mimeType: "image/*",
-    }),
-    getNegativeResponse: () => ({ schema: z.string(), mimeType: "text/plain" }),
+  new ResultHandler({
+    positive: { schema: ez.file("buffer"), mimeType: "image/*" },
+    negative: { schema: z.string(), mimeType: "text/plain" },
     handler: ({ response, error, output }) => {
       if (error) {
         response.status(400).send(error.message);
@@ -906,20 +904,13 @@ then consider using the `beforeRouting` [option in config instead](#using-native
 ## Testing endpoints
 
 The way to test endpoints is to mock the request, response, and logger objects, invoke the `execute()` method, and
-assert the expectations for calls of certain mocked methods. The library provides a special method `testEndpoint` that
-makes mocking easier. It requires you either to install `jest` (with `@types/jest`) or `vitest`
-(detects automatically), or to specify the `fnMethod` property assigned with a function mocking method of your testing
-framework, which can also be `node:test` module of most modern Node.js versions.
-However, in order to have proper mocking types in your own tests, you also need to specify `MockOverrides` once in your
-tests excplicitly, so the tests should look this way:
+assert the expectations on status, headers and payload. The library provides a special method `testEndpoint` that
+makes mocking easier. Under the hood, request and response object are mocked using the
+[node-mocks-http](https://www.npmjs.com/package/node-mocks-http) library, therefore you can utilize its API for
+settings additional properties and asserting expectation using the provided getters, such as `._getStatusCode()`.
 
 ```typescript
 import { testEndpoint } from "express-zod-api";
-
-// place it once anywhere in your tests
-declare module "express-zod-api" {
-  interface MockOverrides extends jest.Mock {} // or Mock from vitest
-}
 
 test("should respond successfully", async () => {
   const { responseMock, loggerMock } = await testEndpoint({
@@ -928,20 +919,15 @@ test("should respond successfully", async () => {
       method: "POST", // default: GET
       body: {}, // incoming data as if after parsing (JSON)
     },
-    // fnMethod — for testing frameworks other than jest or vitest
-    // responseProps, configProps, loggerProps
+    // responseOptions, configProps, loggerProps
   });
-  expect(loggerMock.error).toHaveBeenCalledTimes(0);
-  expect(responseMock.status).toHaveBeenCalledWith(200);
-  expect(responseMock.json).toHaveBeenCalledWith({
-    status: "success",
-    data: {},
-  });
+  expect(loggerMock._getLogs().error).toHaveLength(0);
+  expect(responseMock._getStatusCode()).toBe(200);
+  expect(responseMock._getHeaders()).toHaveProperty("x-custom", "one"); // lower case!
+  expect(responseMock._getData()).toBe(JSON.stringify({ status: "success" })); // or:
+  expect(JSON.parse(responseMock._getData())).toEqual({ status: "success" });
 });
 ```
-
-_This method is optimized for the `defaultResultHandler`. With the flexibility to customize, you can add additional
-properties as needed._
 
 # Special needs
 
@@ -949,18 +935,18 @@ properties as needed._
 
 In some special cases you may want the ResultHandler to respond slightly differently depending on the status code,
 for example if your API strictly follows REST standards. It may also be necessary to reflect this difference in the
-generated Documentation. To implement this functionality, the `createResultHandler` method supports a flexible
-declaration of possible response schemas and their corresponding status codes.
+generated Documentation. For that purpose, the constructor of `ResultHandler` accepts flexible declaration of possible
+response schemas and their corresponding status codes.
 
 ```typescript
-import { createResultHandler } from "express-zod-api";
+import { ResultHandler } from "express-zod-api";
 
-createResultHandler({
-  getPositiveResponse: (output) => ({
+new ResultHandler({
+  positive: (data) => ({
     statusCodes: [201, 202], // created or will be created
-    schema: z.object({ status: z.literal("created"), data: output }),
+    schema: z.object({ status: z.literal("created"), data }),
   }),
-  getNegativeResponse: () => [
+  negative: [
     {
       statusCode: 409, // conflict: entity already exists
       schema: z.object({ status: z.literal("exists"), id: z.number().int() }),

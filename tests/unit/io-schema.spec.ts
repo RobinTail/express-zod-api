@@ -1,9 +1,9 @@
 import { expectNotType, expectType } from "tsd";
 import { z } from "zod";
-import { IOSchema, createMiddleware, ez } from "../../src";
+import { IOSchema, Middleware, ez } from "../../src";
 import { getFinalEndpointInputSchema } from "../../src/io-schema";
 import { metaSymbol } from "../../src/metadata";
-import { AnyMiddlewareDef } from "../../src/middleware";
+import { AbstractMiddleware } from "../../src/middleware";
 import { serializeSchemaForTest } from "../helpers";
 import { describe, expect, test, vi } from "vitest";
 
@@ -91,7 +91,7 @@ describe("I/O Schema and related helpers", () => {
 
   describe("getFinalEndpointInputSchema()", () => {
     test("Should handle no middlewares", () => {
-      const middlewares: AnyMiddlewareDef[] = [];
+      const middlewares: AbstractMiddleware[] = [];
       const endpointInput = z.object({
         four: z.boolean(),
       });
@@ -101,18 +101,18 @@ describe("I/O Schema and related helpers", () => {
     });
 
     test("Should merge input object schemas", () => {
-      const middlewares: AnyMiddlewareDef[] = [
-        createMiddleware({
+      const middlewares: AbstractMiddleware[] = [
+        new Middleware({
           input: z.object({ one: z.string() }),
-          middleware: vi.fn(),
+          handler: vi.fn(),
         }),
-        createMiddleware({
+        new Middleware({
           input: z.object({ two: z.number() }),
-          middleware: vi.fn(),
+          handler: vi.fn(),
         }),
-        createMiddleware({
+        new Middleware({
           input: z.object({ three: z.null() }),
-          middleware: vi.fn(),
+          handler: vi.fn(),
         }),
       ];
       const endpointInput = z.object({
@@ -124,18 +124,18 @@ describe("I/O Schema and related helpers", () => {
     });
 
     test("Should merge union object schemas", () => {
-      const middlewares: AnyMiddlewareDef[] = [
-        createMiddleware({
+      const middlewares: AbstractMiddleware[] = [
+        new Middleware({
           input: z
             .object({ one: z.string() })
             .or(z.object({ two: z.number() })),
-          middleware: vi.fn(),
+          handler: vi.fn(),
         }),
-        createMiddleware({
+        new Middleware({
           input: z
             .object({ three: z.null() })
             .or(z.object({ four: z.boolean() })),
-          middleware: vi.fn(),
+          handler: vi.fn(),
         }),
       ];
       const endpointInput = z
@@ -147,18 +147,18 @@ describe("I/O Schema and related helpers", () => {
     });
 
     test("Should merge intersection object schemas", () => {
-      const middlewares: AnyMiddlewareDef[] = [
-        createMiddleware({
+      const middlewares: AbstractMiddleware[] = [
+        new Middleware({
           input: z
             .object({ one: z.string() })
             .and(z.object({ two: z.number() })),
-          middleware: vi.fn(),
+          handler: vi.fn(),
         }),
-        createMiddleware({
+        new Middleware({
           input: z
             .object({ three: z.null() })
             .and(z.object({ four: z.boolean() })),
-          middleware: vi.fn(),
+          handler: vi.fn(),
         }),
       ];
       const endpointInput = z
@@ -185,18 +185,18 @@ describe("I/O Schema and related helpers", () => {
     });
 
     test("Should merge mixed object schemas", () => {
-      const middlewares: AnyMiddlewareDef[] = [
-        createMiddleware({
+      const middlewares: AbstractMiddleware[] = [
+        new Middleware({
           input: z
             .object({ one: z.string() })
             .and(z.object({ two: z.number() })),
-          middleware: vi.fn(),
+          handler: vi.fn(),
         }),
-        createMiddleware({
+        new Middleware({
           input: z
             .object({ three: z.null() })
             .or(z.object({ four: z.boolean() })),
-          middleware: vi.fn(),
+          handler: vi.fn(),
         }),
       ];
       const endpointInput = z.object({
@@ -208,20 +208,20 @@ describe("I/O Schema and related helpers", () => {
     });
 
     test("Should merge examples in case of using withMeta()", () => {
-      const middlewares: AnyMiddlewareDef[] = [
-        createMiddleware({
+      const middlewares: AbstractMiddleware[] = [
+        new Middleware({
           input: z
             .object({ one: z.string() })
             .and(z.object({ two: z.number() }))
             .example({ one: "test", two: 123 }),
-          middleware: vi.fn(),
+          handler: vi.fn(),
         }),
-        createMiddleware({
+        new Middleware({
           input: z
             .object({ three: z.null() })
             .or(z.object({ four: z.boolean() }))
             .example({ three: null, four: true }),
-          middleware: vi.fn(),
+          handler: vi.fn(),
         }),
       ];
       const endpointInput = z

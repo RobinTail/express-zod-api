@@ -17,16 +17,13 @@ import {
   InputSecurity,
   LoggerOverrides,
   Method,
-  MiddlewareDefinition,
-  MockOverrides,
   OAuth2Security,
   OpenIdSecurity,
   Producer,
-  ResultHandlerDefinition,
   Routing,
   ServerConfig,
 } from "../../src";
-import { describe, expect, test, vi } from "vitest";
+import { describe, expect, test } from "vitest";
 
 describe("Index Entrypoint", () => {
   describe("exports", () => {
@@ -53,7 +50,6 @@ describe("Index Entrypoint", () => {
     });
 
     test("Issue 952, 1182, 1269: should expose certain types and interfaces", () => {
-      expectType<MockOverrides>(vi.fn());
       expectType<Method>("get");
       expectType<IOSchema>(z.object({}));
       expectType<FlatObject>({});
@@ -69,36 +65,6 @@ describe("Index Entrypoint", () => {
         server: { listen: 8090 },
         logger: { level: "silent" },
         cors: false,
-      });
-      expectType<MiddlewareDefinition<IOSchema<"strip">, {}, {}, string>>({
-        type: "proprietary",
-        input: z.object({}),
-        middleware: vi.fn(),
-      });
-      expectType<ResultHandlerDefinition<z.ZodTypeAny, z.ZodTypeAny>>({
-        getPositiveResponse: vi.fn(),
-        getNegativeResponse: vi.fn(),
-        handler: vi.fn(),
-      });
-      expectType<
-        ResultHandlerDefinition<
-          ApiResponse<z.ZodTypeAny>[],
-          ApiResponse<z.ZodTypeAny>[]
-        >
-      >({
-        getPositiveResponse: vi.fn(),
-        getNegativeResponse: vi.fn(),
-        handler: vi.fn(),
-      });
-      expectType<
-        ResultHandlerDefinition<
-          ApiResponse<z.ZodTypeAny>,
-          ApiResponse<z.ZodTypeAny>
-        >
-      >({
-        getPositiveResponse: vi.fn(),
-        getNegativeResponse: vi.fn(),
-        handler: vi.fn(),
       });
       expectType<BasicSecurity>({ type: "basic" });
       expectType<BearerSecurity>({ type: "bearer" });

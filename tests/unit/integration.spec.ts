@@ -5,8 +5,8 @@ import {
   EndpointsFactory,
   Integration,
   Producer,
-  createResultHandler,
   defaultEndpointsFactory,
+  ResultHandler,
 } from "../../src";
 import { describe, expect, test, vi } from "vitest";
 
@@ -86,18 +86,18 @@ describe("Integration", () => {
 
   test("Should support multiple response schemas depending on status code", async () => {
     const factory = new EndpointsFactory(
-      createResultHandler({
-        getPositiveResponse: (output) => [
+      new ResultHandler({
+        positive: (data) => [
           {
             statusCode: 200,
-            schema: z.object({ status: z.literal("ok"), data: output }),
+            schema: z.object({ status: z.literal("ok"), data }),
           },
           {
             statusCode: 201,
-            schema: z.object({ status: z.literal("kinda"), data: output }),
+            schema: z.object({ status: z.literal("kinda"), data }),
           },
         ],
-        getNegativeResponse: () => [
+        negative: [
           { statusCode: 400, schema: z.literal("error") },
           { statusCode: 500, schema: z.literal("failure") },
         ],

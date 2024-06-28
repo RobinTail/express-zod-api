@@ -6,7 +6,7 @@ import { BuiltinLoggerConfig } from "./builtin-logger";
 import { AbstractEndpoint } from "./endpoint";
 import { AbstractLogger, ActualLogger } from "./logger-helpers";
 import { Method } from "./method";
-import { AnyResultHandlerDefinition } from "./result-handler";
+import { AbstractResultHandler } from "./result-handler";
 import { ListenOptions } from "node:net";
 
 export type InputSource = keyof Pick<
@@ -46,7 +46,7 @@ export interface CommonConfig<TAG extends string = string> {
    * @default defaultResultHandler
    * @see defaultResultHandler
    */
-  errorHandler?: AnyResultHandlerDefinition;
+  errorHandler?: AbstractResultHandler;
   /**
    * @desc Built-in logger configuration or an instance of any compatible logger.
    * @example { level: "debug", color: true }

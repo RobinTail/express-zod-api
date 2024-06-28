@@ -1,7 +1,7 @@
 import {
   EndpointsFactory,
   arrayResultHandler,
-  createResultHandler,
+  ResultHandler,
   defaultResultHandler,
   ez,
   getStatusCodeFromError,
@@ -24,15 +24,9 @@ export const keyAndTokenAuthenticatedEndpointsFactory =
 /** @desc This factory sends the file as string located in the "data" property of the endpoint's output */
 export const fileSendingEndpointsFactory = new EndpointsFactory({
   config,
-  resultHandler: createResultHandler({
-    getPositiveResponse: () => ({
-      schema: z.string(),
-      mimeType: "image/svg+xml",
-    }),
-    getNegativeResponse: () => ({
-      schema: z.string(),
-      mimeType: "text/plain",
-    }),
+  resultHandler: new ResultHandler({
+    positive: { schema: z.string(), mimeType: "image/svg+xml" },
+    negative: { schema: z.string(), mimeType: "text/plain" },
     handler: ({ response, error, output }) => {
       if (error) {
         response.status(400).send(error.message);
@@ -50,15 +44,9 @@ export const fileSendingEndpointsFactory = new EndpointsFactory({
 /** @desc This one streams the file using the "filename" property of the endpoint's output */
 export const fileStreamingEndpointsFactory = new EndpointsFactory({
   config,
-  resultHandler: createResultHandler({
-    getPositiveResponse: () => ({
-      schema: ez.file("buffer"),
-      mimeType: "image/*",
-    }),
-    getNegativeResponse: () => ({
-      schema: z.string(),
-      mimeType: "text/plain",
-    }),
+  resultHandler: new ResultHandler({
+    positive: { schema: ez.file("buffer"), mimeType: "image/*" },
+    negative: { schema: z.string(), mimeType: "text/plain" },
     handler: ({ response, error, output }) => {
       if (error) {
         response.status(400).send(error.message);
@@ -90,12 +78,12 @@ export const arrayRespondingFactory = new EndpointsFactory({
 /** @desc The factory demonstrates slightly different response schemas depending on the negative status code */
 export const statusDependingFactory = new EndpointsFactory({
   config,
-  resultHandler: createResultHandler({
-    getPositiveResponse: (output) => ({
+  resultHandler: new ResultHandler({
+    positive: (data) => ({
       statusCodes: [201, 202],
-      schema: z.object({ status: z.literal("created"), data: output }),
+      schema: z.object({ status: z.literal("created"), data }),
     }),
-    getNegativeResponse: () => [
+    negative: [
       {
         statusCode: 409,
         schema: z.object({ status: z.literal("exists"), id: z.number().int() }),

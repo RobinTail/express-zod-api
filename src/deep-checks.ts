@@ -1,8 +1,9 @@
 import { z } from "zod";
+import { EmptyObject } from "./common-helpers";
 import { IOSchema } from "./io-schema";
 import { metaSymbol } from "./metadata";
 import { ezRawBrand } from "./raw-schema";
-import { HandlingRules, SchemaHandler } from "./schema-walker";
+import { HandlingRules, NextHandlerInc, SchemaHandler } from "./schema-walker";
 import { ezUploadBrand } from "./upload-schema";
 
 /** @desc Check is a schema handling rule returning boolean */
@@ -25,7 +26,7 @@ const onElective: Check = (
   { next },
 ) => next(schema.unwrap());
 
-const checks: HandlingRules<boolean, {}, z.ZodFirstPartyTypeKind> = {
+const checks: HandlingRules<boolean, EmptyObject, z.ZodFirstPartyTypeKind> = {
   ZodObject: ({ shape }: z.ZodObject<z.ZodRawShape>, { next }) =>
     Object.values(shape).some(next),
   ZodUnion: onSomeUnion,
@@ -74,7 +75,7 @@ export const hasNestedSchema = (
           maxDepth,
           depth: depth + 1,
         }),
-    });
+    } as EmptyObject & NextHandlerInc<boolean>);
   }
   return false;
 };

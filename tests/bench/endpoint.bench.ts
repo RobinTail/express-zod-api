@@ -10,7 +10,7 @@ describe("Endpoint", () => {
         endpoint: retrieveUserEndpoint,
         requestProps: { query: { id: "10" } },
       });
-      expect(responseMock.status).toHaveBeenCalledWith(200);
+      expect(responseMock._getStatusCode()).toBe(200);
     },
     { time: 15000 },
   );

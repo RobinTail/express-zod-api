@@ -14,9 +14,9 @@ import {
   makeErrorFromAnything,
 } from "../../src/common-helpers";
 import { InputValidationError } from "../../src";
-import { Request } from "express";
 import { z } from "zod";
 import { describe, expect, test } from "vitest";
+import { makeRequestMock } from "../../src/testing";
 
 describe("Common Helpers", () => {
   describe("defaultInputSources", () => {
@@ -50,52 +50,33 @@ describe("Common Helpers", () => {
     test("should return body for POST, PUT and PATCH requests by default", () => {
       expect(
         getInput(
-          {
-            body: { param: 123 },
-            method: "POST",
-            header: () => "application/json",
-          } as unknown as Request,
+          makeRequestMock({ body: { param: 123 }, method: "POST" }),
           undefined,
         ),
       ).toEqual({ param: 123 });
       expect(
-        getInput(
-          {
-            body: { param: 123 },
-            method: "PUT",
-          } as Request,
-          {},
-        ),
+        getInput(makeRequestMock({ body: { param: 123 }, method: "PUT" }), {}),
       ).toEqual({ param: 123 });
       expect(
         getInput(
-          {
-            body: { param: 123 },
-            method: "PATCH",
-          } as Request,
+          makeRequestMock({ body: { param: 123 }, method: "PATCH" }),
           undefined,
         ),
       ).toEqual({ param: 123 });
     });
     test("should return query for GET requests by default", () => {
-      expect(
-        getInput(
-          {
-            query: { param: 123 },
-            method: "GET",
-          } as unknown as Request,
-          {},
-        ),
-      ).toEqual({ param: 123 });
+      expect(getInput(makeRequestMock({ query: { param: 123 } }), {})).toEqual({
+        param: 123,
+      });
     });
     test("should return only query for DELETE requests by default", () => {
       expect(
         getInput(
-          {
+          makeRequestMock({
             query: { a: "query" },
             body: { b: "body" },
             method: "DELETE",
-          } as unknown as Request,
+          }),
           undefined,
         ),
       ).toEqual({ a: "query" });
@@ -103,11 +84,11 @@ describe("Common Helpers", () => {
     test("should return body and query for unknown requests by default", () => {
       expect(
         getInput(
-          {
+          makeRequestMock({
             query: { a: "query" },
             body: { b: "body" },
-            method: "UNSUPPORTED",
-          } as unknown as Request,
+            method: "UNSUPPORTED" as "GET", // intentional fake
+          }),
           undefined,
         ),
       ).toEqual({ a: "query", b: "body" });
@@ -115,12 +96,12 @@ describe("Common Helpers", () => {
     test("should return body and files on demand for POST by default", () => {
       expect(
         getInput(
-          {
+          makeRequestMock({
             body: { param: 123 },
             files: { file: "456" },
             method: "POST",
-            header: () => "multipart/form-data; charset=utf-8",
-          } as unknown as Request,
+            headers: { "content-type": "multipart/form-data; charset=utf-8" },
+          }),
           {},
         ),
       ).toEqual({ param: 123, file: "456" });
@@ -128,12 +109,11 @@ describe("Common Helpers", () => {
     test("Issue 158: should return query and body for POST on demand", () => {
       expect(
         getInput(
-          {
+          makeRequestMock({
             body: { a: "body" },
             query: { b: "query" },
             method: "POST",
-            header: () => "application/json",
-          } as unknown as Request,
+          }),
           { post: ["query", "body"] },
         ),
       ).toEqual({ a: "body", b: "query" });
@@ -141,30 +121,29 @@ describe("Common Helpers", () => {
     test("URL params: should also be taken, with a higher priority by default", () => {
       expect(
         getInput(
-          {
+          makeRequestMock({
             body: { a: "body" },
             query: { b: "query" },
             params: { a: "url param", b: "url param" },
             method: "POST",
-            header: () => "application/json",
-          } as unknown as Request,
+          }),
           undefined,
         ),
       ).toEqual({ a: "url param", b: "url param" });
     });
     test("Issue 514: should return empty object for OPTIONS", () => {
       expect(
-        getInput({ method: "OPTIONS" } as unknown as Request, undefined),
+        getInput(makeRequestMock({ method: "OPTIONS" }), undefined),
       ).toEqual({});
     });
     test("Feature 1180: should include custom headers when enabled", () => {
       expect(
         getInput(
-          {
+          makeRequestMock({
             method: "POST",
             body: { a: "body" },
             headers: { authorization: "Bearer ***", "x-request-id": "test" },
-          } as unknown as Request,
+          }),
           { post: ["body", "headers"] },
         ),
       ).toEqual({ a: "body", "x-request-id": "test" });

@@ -1,103 +1,66 @@
-import { Request, Response } from "express";
-import http from "node:http";
+import { Request } from "express";
+import { FlatObject } from "./common-helpers";
 import { CommonConfig } from "./config-type";
 import { AbstractEndpoint } from "./endpoint";
-import { AbstractLogger, ActualLogger } from "./logger-helpers";
+import { AbstractLogger, ActualLogger, severity } from "./logger-helpers";
 import { contentTypes } from "./content-type";
-import { loadAlternativePeer } from "./peer-helpers";
 import { LocalResponse } from "./server-helpers";
+import {
+  createRequest,
+  RequestOptions,
+  createResponse,
+  ResponseOptions,
+} from "node-mocks-http";
 
-/**
- * @desc Using module augmentation approach you can set the Mock type of your actual testing framework.
- * @example declare module "express-zod-api" { interface MockOverrides extends Mock {} }
- * @link https://www.typescriptlang.org/docs/handbook/declaration-merging.html#module-augmentation
- * */
-export interface MockOverrides {}
-
-/** @desc Compatibility constraints for a function mocking method of a testing framework. */
-type MockFunction = (implementation?: (...args: any[]) => any) => MockOverrides;
-
-export const makeRequestMock = <REQ extends Record<string, any>>({
-  fnMethod,
-  requestProps,
-}: {
-  fnMethod: MockFunction;
-  requestProps?: REQ;
-}) =>
-  ({
-    method: "GET",
-    header: fnMethod(() => contentTypes.json),
-    ...requestProps,
-  }) as { method: string } & Record<"header", MockOverrides> & REQ;
-
-export const makeResponseMock = <RES extends Record<string, any>>({
-  fnMethod,
-  responseProps,
-}: {
-  fnMethod: MockFunction;
-  responseProps?: RES;
-}) => {
-  const responseMock = {
-    writableEnded: false,
-    statusCode: 200,
-    statusMessage: http.STATUS_CODES[200],
-    set: fnMethod(() => responseMock),
-    setHeader: fnMethod(() => responseMock),
-    header: fnMethod(() => responseMock),
-    status: fnMethod((code) => {
-      responseMock.statusCode = code;
-      responseMock.statusMessage = http.STATUS_CODES[code]!;
-      return responseMock;
-    }),
-    json: fnMethod(() => responseMock),
-    send: fnMethod(() => responseMock),
-    end: fnMethod(() => {
-      responseMock.writableEnded = true;
-      return responseMock;
-    }),
-    locals: {},
-    ...responseProps,
-  } as {
-    writableEnded: boolean;
-    statusCode: number;
-    statusMessage: string;
-    locals: LocalResponse["locals"];
-  } & Record<
-    "set" | "setHeader" | "header" | "status" | "json" | "send" | "end",
-    MockOverrides
-  > &
-    RES;
-  return responseMock;
+export const makeRequestMock = <REQ extends RequestOptions>(props?: REQ) => {
+  const mock = createRequest<Request>({
+    ...props,
+    headers: { "content-type": contentTypes.json, ...props?.headers },
+  });
+  return mock as typeof mock & REQ;
 };
 
-export const makeLoggerMock = <LOG extends Record<string, any>>({
-  fnMethod,
-  loggerProps,
-}: {
-  fnMethod: MockFunction;
-  loggerProps?: LOG;
-}) =>
-  ({
-    info: fnMethod(),
-    warn: fnMethod(),
-    error: fnMethod(),
-    debug: fnMethod(),
-    ...loggerProps,
-  }) as Record<keyof AbstractLogger, MockOverrides> & LOG;
+export const makeResponseMock = (opt?: ResponseOptions) =>
+  createResponse<LocalResponse>(opt);
 
-interface TestEndpointProps<REQ, RES, LOG> {
+export const makeLoggerMock = <LOG extends FlatObject>(loggerProps?: LOG) => {
+  const logs: Record<keyof AbstractLogger, unknown[]> = {
+    warn: [],
+    error: [],
+    info: [],
+    debug: [],
+  };
+  return new Proxy(
+    (loggerProps || {}) as AbstractLogger &
+      LOG & { _getLogs: () => typeof logs },
+    {
+      get(target, prop, recv) {
+        if (prop === "_getLogs") {
+          return () => logs;
+        }
+        if (prop in severity) {
+          return (...args: unknown[]) =>
+            logs[prop as keyof AbstractLogger].push(args);
+        }
+        return Reflect.get(target, prop, recv);
+      },
+    },
+  );
+};
+
+interface TestEndpointProps<REQ, LOG> {
   /** @desc The endpoint to test */
   endpoint: AbstractEndpoint;
   /**
    * @desc Additional properties to set on Request mock
-   * @default { method: "GET", header: () => "application/json" }
+   * @default { method: "GET", headers: { "content-type": "application/json" } }
    * */
   requestProps?: REQ;
   /**
-   * @desc Additional properties to set on Response mock
-   * @default { writableEnded, statusCode, statusMessage, set, setHeader, header, status, json, send, end }
+   * @link https://www.npmjs.com/package/node-mocks-http
+   * @default { req: requestMock }
    * */
-  responseProps?: RES;
+  responseOptions?: ResponseOptions;
   /**
    * @desc Additional properties to set on config mock
    * @default { cors: false, logger }
@@ -108,48 +71,34 @@ interface TestEndpointProps<REQ, RES, LOG> {
    * @default { info, warn, error, debug }
    * */
   loggerProps?: LOG;
-  /**
-   * @desc Optionally specify the function mocking method of your testing framework
-   * @default jest.fn || vi.fn // from vitest
-   * @example mock.fn.bind(mock) // from node:test, binding might be necessary
-   * */
-  fnMethod?: MockFunction;
 }
 
-/** @desc Requires either jest (with @types/jest) or vitest or to specify the fnMethod option */
 export const testEndpoint = async <
-  LOG extends Record<string, any>,
-  REQ extends Record<string, any>,
-  RES extends Record<string, any>,
+  LOG extends FlatObject,
+  REQ extends RequestOptions,
 >({
   endpoint,
   requestProps,
-  responseProps,
+  responseOptions,
   configProps,
   loggerProps,
-  fnMethod: userDefined,
-}: TestEndpointProps<REQ, RES, LOG>) => {
-  const fnMethod =
-    userDefined ||
-    (
-      await loadAlternativePeer<{ fn: MockFunction }>([
-        { moduleName: "vitest", moduleExport: "vi" },
-        { moduleName: "@jest/globals", moduleExport: "jest" },
-      ])
-    ).fn;
-  const requestMock = makeRequestMock({ fnMethod, requestProps });
-  const responseMock = makeResponseMock({ fnMethod, responseProps });
-  const loggerMock = makeLoggerMock({ fnMethod, loggerProps });
+}: TestEndpointProps<REQ, LOG>) => {
+  const requestMock = makeRequestMock(requestProps);
+  const responseMock = makeResponseMock({
+    req: requestMock,
+    ...responseOptions,
+  });
+  const loggerMock = makeLoggerMock(loggerProps);
   const configMock = {
     cors: false,
     logger: loggerMock,
     ...configProps,
   };
   await endpoint.execute({
-    request: requestMock as unknown as Request,
-    response: responseMock as unknown as Response,
+    request: requestMock,
+    response: responseMock,
     config: configMock as CommonConfig,
-    logger: loggerMock as unknown as ActualLogger,
+    logger: loggerMock as ActualLogger,
   });
   return { requestMock, responseMock, loggerMock };
 };

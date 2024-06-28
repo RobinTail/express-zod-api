@@ -9,11 +9,7 @@ import {
   test,
   vi,
 } from "vitest";
-import {
-  BuiltinLogger,
-  BuiltinLoggerConfig,
-  createLogger,
-} from "../../src/builtin-logger";
+import { BuiltinLogger, BuiltinLoggerConfig } from "../../src/builtin-logger";
 
 describe("BuiltinLogger", () => {
   beforeAll(() => {
@@ -116,13 +112,6 @@ describe("BuiltinLogger", () => {
       const child = parent.child(ctx);
       child.info("Here is some message", { more: "information" });
       expect(logSpy.mock.calls).toMatchSnapshot();
-    });
-  });
-
-  /** @todo remove in v20 */
-  describe("createLogger() alias", () => {
-    test("should return instance of BuiltinLogger", () => {
-      expect(createLogger({ level: "debug" })).toBeInstanceOf(BuiltinLogger);
     });
   });
 });
