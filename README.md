@@ -924,8 +924,7 @@ test("should respond successfully", async () => {
   expect(loggerMock._getLogs().error).toHaveLength(0);
   expect(responseMock._getStatusCode()).toBe(200);
   expect(responseMock._getHeaders()).toHaveProperty("x-custom", "one"); // lower case!
-  expect(responseMock._getData()).toBe(JSON.stringify({ status: "success" })); // or:
-  expect(JSON.parse(responseMock._getData())).toEqual({ status: "success" });
+  expect(responseMock._getJSONData()).toEqual({ status: "success" });
 });
 ```
 
