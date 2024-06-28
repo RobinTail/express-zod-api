@@ -4,7 +4,13 @@ exports[`ResultHandler > 'arrayResultHandler' > Should handle HTTP error 1`] = `
 
 exports[`ResultHandler > 'arrayResultHandler' > Should handle generic error 1`] = `"Some error"`;
 
-exports[`ResultHandler > 'arrayResultHandler' > Should handle regular response 1`] = `"["One","Two","Three"]"`;
+exports[`ResultHandler > 'arrayResultHandler' > Should handle regular response 1`] = `
+[
+  "One",
+  "Two",
+  "Three",
+]
+`;
 
 exports[`ResultHandler > 'arrayResultHandler' > Should handle schema error 1`] = `"something: Expected string, got number"`;
 
@@ -28,13 +34,46 @@ exports[`ResultHandler > 'arrayResultHandler' > should generate negative respons
 }
 `;
 
-exports[`ResultHandler > 'defaultResultHandler' > Should handle HTTP error 1`] = `"{"status":"error","error":{"message":"Something not found"}}"`;
+exports[`ResultHandler > 'defaultResultHandler' > Should handle HTTP error 1`] = `
+{
+  "error": {
+    "message": "Something not found",
+  },
+  "status": "error",
+}
+`;
 
-exports[`ResultHandler > 'defaultResultHandler' > Should handle generic error 1`] = `"{"status":"error","error":{"message":"Some error"}}"`;
+exports[`ResultHandler > 'defaultResultHandler' > Should handle generic error 1`] = `
+{
+  "error": {
+    "message": "Some error",
+  },
+  "status": "error",
+}
+`;
 
-exports[`ResultHandler > 'defaultResultHandler' > Should handle regular response 1`] = `"{"status":"success","data":{"anything":118,"items":["One","Two","Three"]}}"`;
+exports[`ResultHandler > 'defaultResultHandler' > Should handle regular response 1`] = `
+{
+  "data": {
+    "anything": 118,
+    "items": [
+      "One",
+      "Two",
+      "Three",
+    ],
+  },
+  "status": "success",
+}
+`;
 
-exports[`ResultHandler > 'defaultResultHandler' > Should handle schema error 1`] = `"{"status":"error","error":{"message":"something: Expected string, got number"}}"`;
+exports[`ResultHandler > 'defaultResultHandler' > Should handle schema error 1`] = `
+{
+  "error": {
+    "message": "something: Expected string, got number",
+  },
+  "status": "error",
+}
+`;
 
 exports[`ResultHandler > 'defaultResultHandler' > should forward output schema examples 1`] = `
 {

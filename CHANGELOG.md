@@ -2,6 +2,10 @@
 
 ## Version 20
 
+### v20.0.1
+
+- Found a better method for asserting the expected response: `responseMock._getJSONData()`.
+
 ### v20.0.0
 
 - Method `createLogger()` removed — use `new BuiltinLogger()` instead if needed;
@@ -82,8 +86,7 @@ expect(loggerMockBefore.error).not.toHaveBeenCalled();
 const { responseMock, loggerMock } = testEndpoint({ endpoint });
 expect(responseMock._getStatusCode()).toBe(200);
 expect(responseMock._getHeaders()).toHaveProperty("x-custom", "one"); // lower case!
-expect(responseMock._getData()).toBe(JSON.stringify({ status: "success" })); // or:
-expect(JSON.parse(responseMock._getData())).toEqual({ status: "success" });
+expect(responseMock._getJSONData()).toEqual({ status: "success" });
 expect(loggerMock._getLogs().error).toHaveLength(0);
 ```
 
