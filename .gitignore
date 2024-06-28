@@ -1,5 +1,6 @@
 node_modules
 dist
+migration
 yarn-error.log
 .idea
 .npmrc

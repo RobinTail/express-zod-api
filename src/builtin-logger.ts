@@ -107,11 +107,3 @@ export class BuiltinLogger implements AbstractLogger {
     return new BuiltinLogger({ ...this.config, ctx });
   }
 }
-
-/**
- * @desc Alias for "new BuiltinLogger()"
- * @deprecated use new BuiltinLogger()
- * @todo remove in v20
- * */
-export const createLogger = (config: BuiltinLoggerConfig) =>
-  new BuiltinLogger(config);

@@ -1,7 +1,7 @@
 import type fileUpload from "express-fileupload";
 import { metaSymbol } from "./metadata";
 import { loadPeer } from "./peer-helpers";
-import { AnyResultHandlerDefinition } from "./result-handler";
+import { AbstractResultHandler } from "./result-handler";
 import { ActualLogger } from "./logger-helpers";
 import { CommonConfig, ServerConfig } from "./config-type";
 import { ErrorRequestHandler, RequestHandler, Response } from "express";
@@ -11,7 +11,7 @@ import { ResultHandlerError } from "./errors";
 import { makeErrorFromAnything } from "./common-helpers";
 
 interface HandlerCreatorParams {
-  errorHandler: AnyResultHandlerDefinition;
+  errorHandler: AbstractResultHandler;
   rootLogger: ActualLogger;
 }
 
@@ -26,7 +26,7 @@ export const createParserFailureHandler =
     if (!error) {
       return next();
     }
-    errorHandler.handler({
+    errorHandler.execute({
       error: isHttpError(error)
         ? error
         : createHttpError(400, makeErrorFromAnything(error).message),
@@ -48,7 +48,7 @@ export const createNotFoundHandler =
     );
     const logger = response.locals[metaSymbol]?.logger || rootLogger;
     try {
-      errorHandler.handler({
+      errorHandler.execute({
         request,
         response,
         logger,

@@ -1,7 +1,6 @@
 import "./zod-plugin";
 
 export { createConfig } from "./config-type";
-export { AbstractEndpoint } from "./endpoint";
 export {
   EndpointsFactory,
   defaultEndpointsFactory,
@@ -12,10 +11,10 @@ export {
   getMessageFromError,
   getStatusCodeFromError,
 } from "./common-helpers";
-export { createLogger, BuiltinLogger } from "./builtin-logger";
-export { createMiddleware } from "./middleware";
+export { BuiltinLogger } from "./builtin-logger";
+export { Middleware } from "./middleware";
 export {
-  createResultHandler,
+  ResultHandler,
   defaultResultHandler,
   arrayResultHandler,
 } from "./result-handler";
@@ -40,15 +39,12 @@ export type { Depicter } from "./documentation-helpers";
 export type { Producer } from "./zts-helpers";
 
 // Issues 952, 1182, 1269: Insufficient exports for consumer's declaration
-export type { MockOverrides } from "./testing";
 export type { Routing } from "./routing";
 export type { LoggerOverrides } from "./logger-helpers";
 export type { FlatObject } from "./common-helpers";
 export type { Method } from "./method";
 export type { IOSchema } from "./io-schema";
 export type { CommonConfig, AppConfig, ServerConfig } from "./config-type";
-export type { MiddlewareDefinition } from "./middleware";
-export type { ResultHandlerDefinition } from "./result-handler";
 export type { ApiResponse } from "./api-response";
 export type {
   BasicSecurity,

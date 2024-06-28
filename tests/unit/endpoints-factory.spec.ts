@@ -1,27 +1,31 @@
-import { Request, RequestHandler, Response } from "express";
+import { RequestHandler } from "express";
 import createHttpError, { HttpError } from "http-errors";
 import {
   EndpointsFactory,
-  createMiddleware,
-  createResultHandler,
+  Middleware,
   defaultEndpointsFactory,
+  ResultHandler,
 } from "../../src";
 import { Endpoint } from "../../src/endpoint";
 import { expectType } from "tsd";
-import { ActualLogger } from "../../src/logger-helpers";
-import { makeLoggerMock } from "../../src/testing";
+import {
+  makeLoggerMock,
+  makeRequestMock,
+  makeResponseMock,
+} from "../../src/testing";
 import { serializeSchemaForTest } from "../helpers";
 import { z } from "zod";
 import { describe, expect, test, vi } from "vitest";
 
 describe("EndpointsFactory", () => {
+  const resultHandlerMock = new ResultHandler({
+    positive: z.string(),
+    negative: z.string(),
+    handler: vi.fn(),
+  });
+
   describe(".constructor()", () => {
     test("Should create the empty factory with result handler", () => {
-      const resultHandlerMock = createResultHandler({
-        getPositiveResponse: () => z.string(),
-        getNegativeResponse: () => z.string(),
-        handler: vi.fn(),
-      });
       const factory = new EndpointsFactory(resultHandlerMock);
       expect(factory).toBeInstanceOf(EndpointsFactory);
       expect(factory["middlewares"]).toStrictEqual([]);
@@ -29,16 +33,9 @@ describe("EndpointsFactory", () => {
     });
 
     test("Should create the factory with middleware and result handler", () => {
-      const middleware = createMiddleware({
-        input: z.object({
-          n: z.number(),
-        }),
-        middleware: vi.fn(),
-      });
-      const resultHandlerMock = createResultHandler({
-        getPositiveResponse: () => z.string(),
-        getNegativeResponse: () => z.string(),
-        handler: vi.fn(),
+      const middleware = new Middleware({
+        input: z.object({ n: z.number() }),
+        handler: vi.fn<any>(),
       });
       const factory = new EndpointsFactory(resultHandlerMock).addMiddleware(
         middleware,
@@ -50,17 +47,10 @@ describe("EndpointsFactory", () => {
 
   describe(".addMiddleware()", () => {
     test("Should create a new factory with a middleware and the same result handler", () => {
-      const resultHandlerMock = createResultHandler({
-        getPositiveResponse: () => z.string(),
-        getNegativeResponse: () => z.string(),
-        handler: vi.fn(),
-      });
       const factory = new EndpointsFactory(resultHandlerMock);
-      const middleware = createMiddleware({
-        input: z.object({
-          n: z.number(),
-        }),
-        middleware: vi.fn(),
+      const middleware = new Middleware({
+        input: z.object({ n: z.number() }),
+        handler: vi.fn<any>(),
       });
       const newFactory = factory.addMiddleware(middleware);
       expect(factory["middlewares"]).toStrictEqual([]);
@@ -72,30 +62,40 @@ describe("EndpointsFactory", () => {
     test("Should maintain the chain of options", () => {
       defaultEndpointsFactory
         .addMiddleware(
-          createMiddleware({
+          new Middleware({
             input: z.object({}),
-            middleware: async () => ({ test: "fist option" }),
+            handler: async () => ({ test: "fist option" }),
           }),
         )
         .addMiddleware(
-          createMiddleware({
+          new Middleware({
             input: z.object({}),
-            middleware: async ({ options }) => ({
-              second: `another option, ${options.test}`,
-            }),
+            handler: async ({ options }) => {
+              expectType<string>(options.test);
+              return { second: `another option, ${options.test}` };
+            },
           }),
         );
-      expect(true).toBeTruthy();
+    });
+
+    test("Should accept creation props", () => {
+      defaultEndpointsFactory
+        .addMiddleware({
+          input: z.object({}),
+          handler: async () => ({ test: "fist option" }),
+        })
+        .addMiddleware({
+          input: z.object({}),
+          handler: async ({ options }) => {
+            expectType<string>(options.test);
+            return { second: `another option, ${options.test}` };
+          },
+        });
     });
   });
 
   describe(".addOptions()", () => {
     test("Should create a new factory with an empty-input middleware and the same result handler", async () => {
-      const resultHandlerMock = createResultHandler({
-        getPositiveResponse: () => z.string(),
-        getNegativeResponse: () => z.string(),
-        handler: vi.fn(),
-      });
       const factory = new EndpointsFactory(resultHandlerMock);
       const newFactory = factory.addOptions(async () => ({
         option1: "some value",
@@ -104,17 +104,19 @@ describe("EndpointsFactory", () => {
       expect(factory["middlewares"]).toStrictEqual([]);
       expect(factory["resultHandler"]).toStrictEqual(resultHandlerMock);
       expect(newFactory["middlewares"].length).toBe(1);
-      expect(newFactory["middlewares"][0].input).toBeInstanceOf(z.ZodObject);
+      expect(newFactory["middlewares"][0].getSchema()).toBeInstanceOf(
+        z.ZodObject,
+      );
       expect(
-        (newFactory["middlewares"][0].input as z.AnyZodObject).shape,
+        (newFactory["middlewares"][0].getSchema() as z.AnyZodObject).shape,
       ).toEqual({});
       expect(
-        await newFactory["middlewares"][0].middleware({
+        await newFactory["middlewares"][0].execute({
           input: {},
           options: {},
-          request: {} as Request,
-          response: {} as Response,
-          logger: makeLoggerMock({ fnMethod: vi.fn }),
+          request: makeRequestMock(),
+          response: makeResponseMock(),
+          logger: makeLoggerMock(),
         }),
       ).toEqual({
         option1: "some value",
@@ -128,34 +130,29 @@ describe("EndpointsFactory", () => {
     ".%s()",
     (method) => {
       test("Should create a new factory with a native express middleware wrapper", async () => {
-        const resultHandlerMock = createResultHandler({
-          getPositiveResponse: () => z.string(),
-          getNegativeResponse: () => z.string(),
-          handler: vi.fn(),
-        });
         const factory = new EndpointsFactory(resultHandlerMock);
         const middleware: RequestHandler = vi.fn((req, {}, next) => {
           req.body.test = "Here is the test";
           next();
         });
         const newFactory = factory[method](middleware, {
-          provider: (req) => ({
-            result: req.body.test,
-          }),
+          provider: (req) => ({ result: req.body.test }),
         });
         expect(newFactory["middlewares"].length).toBe(1);
-        expect(newFactory["middlewares"][0].input).toBeInstanceOf(z.ZodObject);
+        expect(newFactory["middlewares"][0].getSchema()).toBeInstanceOf(
+          z.ZodObject,
+        );
         expect(
-          (newFactory["middlewares"][0].input as z.AnyZodObject).shape,
+          (newFactory["middlewares"][0].getSchema() as z.AnyZodObject).shape,
         ).toEqual({});
-        const requestMock = { body: { something: "awesome" } } as Request;
-        const responseMock = {} as Response;
-        const options = await newFactory["middlewares"][0].middleware({
+        const requestMock = makeRequestMock({ body: { something: "awesome" } });
+        const responseMock = makeResponseMock();
+        const options = await newFactory["middlewares"][0].execute({
           input: {},
           options: {},
           request: requestMock,
           response: responseMock,
-          logger: {} as ActualLogger,
+          logger: makeLoggerMock(),
         });
         expect(middleware).toHaveBeenCalledTimes(1);
         expect(middleware).toHaveBeenCalledWith(
@@ -169,11 +166,6 @@ describe("EndpointsFactory", () => {
       });
 
       test("Should operate without options provider", async () => {
-        const resultHandlerMock = createResultHandler({
-          getPositiveResponse: () => z.string(),
-          getNegativeResponse: () => z.string(),
-          handler: vi.fn(),
-        });
         const factory = new EndpointsFactory(resultHandlerMock);
         const middleware: RequestHandler = vi.fn((req, {}, next) => {
           req.body.test = "Here is the test";
@@ -181,14 +173,14 @@ describe("EndpointsFactory", () => {
         });
         const newFactory = factory[method](middleware);
         expect(newFactory["middlewares"].length).toBe(1);
-        const requestMock = { body: { something: "awesome" } } as Request;
-        const responseMock = {} as Response;
-        const options = await newFactory["middlewares"][0].middleware({
+        const requestMock = makeRequestMock({ body: { something: "awesome" } });
+        const responseMock = makeResponseMock({});
+        const options = await newFactory["middlewares"][0].execute({
           input: {},
           options: {},
           request: requestMock,
           response: responseMock,
-          logger: {} as ActualLogger,
+          logger: makeLoggerMock(),
         });
         expect(middleware).toHaveBeenCalledTimes(1);
         expect(middleware).toHaveBeenCalledWith(
@@ -199,27 +191,21 @@ describe("EndpointsFactory", () => {
         expect(requestMock.body).toHaveProperty("test");
         expect(requestMock.body.test).toBe("Here is the test");
         expect(options).toEqual({});
-        expectType<{}>(options);
       });
 
       test("Should handle errors", async () => {
-        const resultHandlerMock = createResultHandler({
-          getPositiveResponse: () => z.string(),
-          getNegativeResponse: () => z.string(),
-          handler: vi.fn(),
-        });
         const factory = new EndpointsFactory(resultHandlerMock);
         const middleware: RequestHandler = vi.fn(({}, {}, next) => {
           next(new Error("This one has failed"));
         });
         const newFactory = factory[method](middleware);
         try {
-          await newFactory["middlewares"][0].middleware({
+          await newFactory["middlewares"][0].execute({
             input: {},
             options: {},
-            request: {} as Request,
-            response: {} as Response,
-            logger: {} as ActualLogger,
+            request: makeRequestMock(),
+            response: makeResponseMock(),
+            logger: makeLoggerMock(),
           });
           expect.fail("Should not be here");
         } catch (e) {
@@ -232,11 +218,6 @@ describe("EndpointsFactory", () => {
       });
 
       test("Should transform errors", async () => {
-        const resultHandlerMock = createResultHandler({
-          getPositiveResponse: () => z.string(),
-          getNegativeResponse: () => z.string(),
-          handler: vi.fn(),
-        });
         const factory = new EndpointsFactory(resultHandlerMock);
         const middleware: RequestHandler = vi.fn(({}, {}, next) => {
           next(new Error("This one has failed"));
@@ -245,12 +226,12 @@ describe("EndpointsFactory", () => {
           transformer: (err) => createHttpError(401, err.message),
         });
         try {
-          await newFactory["middlewares"][0].middleware({
+          await newFactory["middlewares"][0].execute({
             input: {},
             options: {},
-            request: {} as Request,
-            response: {} as Response,
-            logger: {} as ActualLogger,
+            request: makeRequestMock(),
+            response: makeResponseMock(),
+            logger: makeLoggerMock(),
           });
           expect.fail("Should not be here");
         } catch (e) {
@@ -267,16 +248,9 @@ describe("EndpointsFactory", () => {
 
   describe(".build()", () => {
     test("Should create an endpoint with simple middleware", () => {
-      const middleware = createMiddleware({
-        input: z.object({
-          n: z.number(),
-        }),
-        middleware: vi.fn(),
-      });
-      const resultHandlerMock = createResultHandler({
-        getPositiveResponse: () => z.string(),
-        getNegativeResponse: () => z.string(),
-        handler: vi.fn(),
+      const middleware = new Middleware({
+        input: z.object({ n: z.number() }),
+        handler: vi.fn<any>(),
       });
       const factory = new EndpointsFactory(resultHandlerMock).addMiddleware(
         middleware,
@@ -284,12 +258,8 @@ describe("EndpointsFactory", () => {
       const handlerMock = vi.fn();
       const endpoint = factory.build({
         method: "get",
-        input: z.object({
-          s: z.string(),
-        }),
-        output: z.object({
-          b: z.boolean(),
-        }),
+        input: z.object({ s: z.string() }),
+        output: z.object({ b: z.boolean() }),
         handler: handlerMock,
       });
       expect(endpoint).toBeInstanceOf(Endpoint);
@@ -300,16 +270,11 @@ describe("EndpointsFactory", () => {
       expect(
         serializeSchemaForTest(endpoint.getSchema("output")),
       ).toMatchSnapshot();
-      expectType<
-        z.ZodIntersection<
-          z.ZodObject<{ n: z.ZodNumber }>,
-          z.ZodObject<{ s: z.ZodString }>
-        >
-      >(endpoint.getSchema("input"));
+      expectType<{ n: number; s: string }>(endpoint.getSchema("input")._output);
     });
 
     test("Should create an endpoint with refined object middleware", () => {
-      const middleware = createMiddleware({
+      const middleware = new Middleware({
         input: z
           .object({
             a: z.number().optional(),
@@ -318,24 +283,15 @@ describe("EndpointsFactory", () => {
           .refine((props) => Object.keys(props).length, {
             message: "Should be at least one option specified",
           }),
-        middleware: vi.fn(),
-      });
-      const resultHandlerMock = createResultHandler({
-        getPositiveResponse: () => z.string(),
-        getNegativeResponse: () => z.string(),
-        handler: vi.fn(),
+        handler: vi.fn<any>(),
       });
       const factory = new EndpointsFactory(resultHandlerMock).addMiddleware(
         middleware,
       );
       const endpoint = factory.build({
         method: "get",
-        input: z.object({
-          i: z.string(),
-        }),
-        output: z.object({
-          o: z.boolean(),
-        }),
+        input: z.object({ i: z.string() }),
+        output: z.object({ o: z.boolean() }),
         handler: vi.fn(),
       });
       expect(
@@ -344,36 +300,15 @@ describe("EndpointsFactory", () => {
       expect(
         serializeSchemaForTest(endpoint.getSchema("output")),
       ).toMatchSnapshot();
-      expectType<
-        z.ZodIntersection<
-          z.ZodEffects<
-            z.ZodObject<{
-              a: z.ZodOptional<z.ZodNumber>;
-              b: z.ZodOptional<z.ZodString>;
-            }>
-          >,
-          z.ZodObject<{ i: z.ZodString }>
-        >
-      >(endpoint.getSchema("input"));
+      expectType<{ a?: number; b?: string; i: string }>(
+        endpoint.getSchema("input")._output,
+      );
     });
 
     test("Should create an endpoint with intersection middleware", () => {
-      const middleware = createMiddleware({
-        input: z
-          .object({
-            n1: z.number(),
-          })
-          .and(
-            z.object({
-              n2: z.number(),
-            }),
-          ),
-        middleware: vi.fn(),
-      });
-      const resultHandlerMock = createResultHandler({
-        getPositiveResponse: () => z.string(),
-        getNegativeResponse: () => z.string(),
-        handler: vi.fn(),
+      const middleware = new Middleware({
+        input: z.object({ n1: z.number() }).and(z.object({ n2: z.number() })),
+        handler: vi.fn<any>(),
       });
       const factory = new EndpointsFactory(resultHandlerMock).addMiddleware(
         middleware,
@@ -381,12 +316,8 @@ describe("EndpointsFactory", () => {
       const handlerMock = vi.fn();
       const endpoint = factory.build({
         methods: ["get"],
-        input: z.object({
-          s: z.string(),
-        }),
-        output: z.object({
-          b: z.boolean(),
-        }),
+        input: z.object({ s: z.string() }),
+        output: z.object({ b: z.boolean() }),
         handler: handlerMock,
       });
       expect(endpoint).toBeInstanceOf(Endpoint);
@@ -397,34 +328,15 @@ describe("EndpointsFactory", () => {
       expect(
         serializeSchemaForTest(endpoint.getSchema("output")),
       ).toMatchSnapshot();
-      expectType<
-        z.ZodIntersection<
-          z.ZodIntersection<
-            z.ZodObject<{ n1: z.ZodNumber }>,
-            z.ZodObject<{ n2: z.ZodNumber }>
-          >,
-          z.ZodObject<{ s: z.ZodString }>
-        >
-      >(endpoint.getSchema("input"));
+      expectType<{ n1: number; n2: number; s: string }>(
+        endpoint.getSchema("input")._output,
+      );
     });
 
     test("Should create an endpoint with union middleware", () => {
-      const middleware = createMiddleware({
-        input: z
-          .object({
-            n1: z.number(),
-          })
-          .or(
-            z.object({
-              n2: z.number(),
-            }),
-          ),
-        middleware: vi.fn(),
-      });
-      const resultHandlerMock = createResultHandler({
-        getPositiveResponse: () => z.string(),
-        getNegativeResponse: () => z.string(),
-        handler: vi.fn(),
+      const middleware = new Middleware({
+        input: z.object({ n1: z.number() }).or(z.object({ n2: z.number() })),
+        handler: vi.fn<any>(),
       });
       const factory = new EndpointsFactory(resultHandlerMock).addMiddleware(
         middleware,
@@ -435,12 +347,8 @@ describe("EndpointsFactory", () => {
       }));
       const endpoint = factory.build({
         methods: ["get"],
-        input: z.object({
-          s: z.string(),
-        }),
-        output: z.object({
-          b: z.boolean(),
-        }),
+        input: z.object({ s: z.string() }),
+        output: z.object({ b: z.boolean() }),
         handler: handlerMock,
       });
       expect(endpoint).toBeInstanceOf(Endpoint);
@@ -451,14 +359,9 @@ describe("EndpointsFactory", () => {
       expect(
         serializeSchemaForTest(endpoint.getSchema("output")),
       ).toMatchSnapshot();
-      expectType<
-        z.ZodIntersection<
-          z.ZodUnion<
-            [z.ZodObject<{ n1: z.ZodNumber }>, z.ZodObject<{ n2: z.ZodNumber }>]
-          >,
-          z.ZodObject<{ s: z.ZodString }>
-        >
-      >(endpoint.getSchema("input"));
+      expectType<{ s: string } & ({ n1: number } | { n2: number })>(
+        endpoint.getSchema("input")._output,
+      );
     });
   });
 });

@@ -1,5 +1,92 @@
 # Changelog
 
+## Version 20
+
+### v20.0.0
+
+- Method `createLogger()` removed — use `new BuiltinLogger()` instead if needed;
+- Method `createResultHandler` removed — use `new ResultHandler()` instead:
+  - The argument's properties renamed: `getPositiveResponse` to `positive` and `getNegativeResponse` to `negative`;
+  - Both properties can now accept static values (not only functions).
+- Method `createMiddleware()` removed — use either `new Middleware()` or `EndpointsFactory::addMiddleware()` instead:
+  - The argument's property `middleware` renamed to `handler`.
+- Method `testEndpoint()` was changed:
+  - It was detached from any testing frameworks, `fnMethod` property removed from the argument;
+  - Mocked request and response are now fully operational and do not require to mock anything to do the job;
+  - The `responseProps` property changed to `responseOptions`, it's no longer meant to be used for custom props;
+  - The returned entities `requestMock`, `responseMock` and `loggerMock` no longer rely on testing framework for props.  
+    Instead, they provide methods to assert expectations in tests:
+    - `responseMock._getStatusCode()`, `responseMock._getHeaders()`, `responseMock._getData()`, `loggerMock._getLogs()`;
+    - See [the documentation of node-mocks-http library](https://www.npmjs.com/package/node-mocks-http) for details.
+- How to migrate:
+  - Consider using the provided ESLint plugin `migration` in order to apply changes automatically (except assertions);
+  - Or follow the code samples below in order to rename/remove entities manually as described above.
+
+```js
+// eslint.config.mjs — minimal config to apply migrations automatically using "eslint . --fix" (at least ESLint 8)
+import parser from "@typescript-eslint/parser";
+import migration from "express-zod-api/migration";
+
+export default [{ languageOptions: { parser }, files: ["**/*.ts"] }, migration];
+```
+
+```ts
+// before
+createResultHandler({
+  getPositiveResponse: (data) => z.object({ data }),
+  getNegativeResponse: () => ({
+    schema: z.string(),
+    mimeType: "text/plain",
+  }),
+});
+
+// after
+new ResultHandler({
+  positive: (data) => z.object({ data }),
+  negative: { schema: z.string(), mimeType: "text/plain" }, // can be static now
+});
+```
+
+```ts
+// before
+factory.addMiddleware(
+  createMiddleware({
+    input: z.object({}),
+    middleware: async () => ({}),
+  }),
+);
+
+// after
+factory // variant 1:
+  .addMiddleware(
+    new Middleware({
+      input: z.object({}),
+      handler: async () => ({}),
+    }),
+  ) // variant 2: short syntax now available:
+  .addMiddleware({ input: z.object({}), handler: async () => ({}) });
+```
+
+```ts
+// before
+declare module "express-zod-api" {
+  interface MockOverrides extends Mock {} // remove it
+}
+const { responseMock: responseMockBefore, loggerMock: loggerMockBefore } =
+  testEndpoint({ endpoint });
+expect(responseMockBefore.set).toHaveBeenCalledWith("X-Custom", "one");
+expect(responseMockBefore.status).toHaveBeenCalledWith(200);
+expect(loggerMockBefore.error).not.toHaveBeenCalled();
+
+// after
+const { responseMock, loggerMock } = testEndpoint({ endpoint });
+expect(responseMock._getStatusCode()).toBe(200);
+expect(responseMock._getHeaders()).toHaveProperty("x-custom", "one"); // lower case!
+expect(responseMock._getData()).toBe(JSON.stringify({ status: "success" })); // or:
+expect(JSON.parse(responseMock._getData())).toEqual({ status: "success" });
+expect(loggerMock._getLogs().error).toHaveLength(0);
+```
+
 ## Version 19
 
 ### v19.2.3

@@ -1,17 +1,13 @@
 {
-  "name": "express-zod-api-vitest-test",
+  "name": "express-zod-api-compat-test",
   "private": true,
+  "type": "module",
   "version": "0.0.0",
-  "scripts": {
-    "test": "jest"
-  },
   "dependencies": {
-    "express-zod-api": "link:../.."
+    "express-zod-api": "link:../..",
+    "eslint": "^8.57.0"
   },
-  "devDependencies": {
-    "jest": "^30.0.0-alpha.4",
-    "@types/jest": "^29.5.12",
-    "@swc/core": "^1.5.0",
-    "@swc/jest": "^0.2.29"
+  "scripts": {
+    "test": "eslint --debug"
   }
 }

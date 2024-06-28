@@ -9,17 +9,3 @@ export const loadPeer = async <T>(
   } catch {}
   throw new MissingPeerError(moduleName);
 };
-
-export const loadAlternativePeer = async <T>(
-  options: {
-    moduleName: string;
-    moduleExport?: string;
-  }[],
-) => {
-  for (const { moduleName, moduleExport } of options) {
-    try {
-      return await loadPeer<T>(moduleName, moduleExport);
-    } catch {}
-  }
-  throw new MissingPeerError(options.map(({ moduleName }) => moduleName));
-};

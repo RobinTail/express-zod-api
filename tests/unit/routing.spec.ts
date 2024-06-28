@@ -22,7 +22,7 @@ import {
   makeResponseMock,
 } from "../../src/testing";
 import { initRouting } from "../../src/routing";
-import type { IRouter, Request, RequestHandler, Response } from "express";
+import type { IRouter, RequestHandler } from "express";
 import { beforeAll, beforeEach, describe, expect, test, vi } from "vitest";
 
 describe("Routing", () => {
@@ -236,16 +236,12 @@ describe("Routing", () => {
       expect(appMock.options.mock.calls[0][0]).toBe("/hello");
       const fn = appMock.options.mock.calls[0][1];
       expect(typeof fn).toBe("function"); // async (req, res) => void
-      const requestMock = makeRequestMock({
-        fnMethod: vi.fn,
-        requestProps: { method: "PUT" },
-      });
-      const responseMock = makeResponseMock({ fnMethod: vi.fn });
+      const requestMock = makeRequestMock({ method: "PUT" });
+      const responseMock = makeResponseMock();
       await fn(requestMock, responseMock);
-      expect(responseMock.status).toHaveBeenCalledWith(200);
-      expect(responseMock.set).toHaveBeenCalledTimes(3);
-      expect(responseMock.set).toHaveBeenCalledWith(
-        "Access-Control-Allow-Methods",
+      expect(responseMock._getStatusCode()).toBe(200);
+      expect(responseMock._getHeaders()).toHaveProperty(
+        "access-control-allow-methods",
         "GET, POST, PUT, PATCH, OPTIONS",
       );
     });
@@ -361,7 +357,7 @@ describe("Routing", () => {
           },
         },
       };
-      const loggerMock = makeLoggerMock({ fnMethod: vi.fn });
+      const loggerMock = makeLoggerMock();
       initRouting({
         app: appMock as unknown as IRouter,
         rootLogger: loggerMock,
@@ -371,19 +367,15 @@ describe("Routing", () => {
       expect(appMock.post).toHaveBeenCalledTimes(1);
       const routeHandler = appMock.post.mock.calls[0][1] as RequestHandler;
       const requestMock = makeRequestMock({
-        fnMethod: vi.fn,
-        requestProps: { method: "POST", body: { test: 123 } },
+        method: "POST",
+        body: { test: 123 },
       });
-      const responseMock = makeResponseMock({ fnMethod: vi.fn });
+      const responseMock = makeResponseMock();
       const nextMock = vi.fn();
-      await routeHandler(
-        requestMock as unknown as Request,
-        responseMock as unknown as Response,
-        nextMock,
-      );
+      await routeHandler(requestMock, responseMock, nextMock);
       expect(nextMock).toHaveBeenCalledTimes(0);
       expect(handlerMock).toHaveBeenCalledTimes(1);
-      expect(loggerMock.error).toHaveBeenCalledTimes(0);
+      expect(loggerMock._getLogs().error).toHaveLength(0);
       expect(handlerMock).toHaveBeenCalledWith({
         input: {
           test: 123,
@@ -391,22 +383,22 @@ describe("Routing", () => {
         options: {},
         logger: loggerMock,
       });
-      expect(responseMock.status).toHaveBeenCalledWith(200);
-      expect(responseMock.json).toHaveBeenCalledWith({
-        status: "success",
-        data: {
-          result: true,
-        },
-      });
+      expect(responseMock._getStatusCode()).toBe(200);
+      expect(responseMock._getData()).toBe(
+        JSON.stringify({
+          status: "success",
+          data: { result: true },
+        }),
+      );
     });
 
     test("should override the logger with a child logger if present in response.locals", async () => {
-      const loggerMock = makeLoggerMock({ fnMethod: vi.fn });
+      const loggerMock = makeLoggerMock({ original: true });
       const config: CommonConfig = {
         cors: false,
         startupLogo: false,
         logger: loggerMock,
-        childLoggerProvider: ({ parent }) => ({ ...parent, isChild: true }),
+        childLoggerProvider: () => makeLoggerMock({ isChild: true }),
       };
       const handlerMock = vi.fn();
       const endpoint = defaultEndpointsFactory.build({
@@ -424,24 +416,22 @@ describe("Routing", () => {
       });
       expect(appMock.get).toHaveBeenCalledTimes(1);
       const routeHandler = appMock.get.mock.calls[0][1] as RequestHandler;
-      const requestMock = makeRequestMock({ fnMethod: vi.fn });
+      const requestMock = makeRequestMock();
       const responseMock = makeResponseMock({
-        fnMethod: vi.fn,
-        responseProps: {
-          locals: {
-            [metaSymbol]: { logger: { ...loggerMock, isChild: true } },
+        locals: {
+          [metaSymbol]: {
+            logger: config.childLoggerProvider!({
+              parent: loggerMock,
+              request: requestMock,
+            }),
           },
         },
       });
-      await routeHandler(
-        requestMock as unknown as Request,
-        responseMock as unknown as Response,
-        vi.fn<any>(),
-      );
+      await routeHandler(requestMock, responseMock, vi.fn<any>());
       expect(handlerMock).toHaveBeenCalledWith({
         input: {},
         options: {},
-        logger: { ...loggerMock, isChild: true },
+        logger: expect.objectContaining({ isChild: true }),
       });
     });
   });

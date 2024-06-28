@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { copyMeta } from "./metadata";
-import { AnyMiddlewareDef } from "./middleware";
+import { AbstractMiddleware } from "./middleware";
 import { RawSchema } from "./raw-schema";
 
 type Refined<T extends z.ZodTypeAny> =
@@ -10,43 +10,36 @@ type Refined<T extends z.ZodTypeAny> =
  * @desc The type allowed on the top level of Middlewares and Endpoints
  * @param U — only "strip" is allowed for Middlewares due to intersection issue (Zod) #600
  * */
-export type IOSchema<U extends z.UnknownKeysParam = any> =
-  | z.ZodObject<any, U>
+export type IOSchema<U extends z.UnknownKeysParam = z.UnknownKeysParam> =
+  | z.ZodObject<z.ZodRawShape, U>
   | z.ZodUnion<[IOSchema<U>, ...IOSchema<U>[]]>
   | z.ZodIntersection<IOSchema<U>, IOSchema<U>>
-  | z.ZodDiscriminatedUnion<string, z.ZodObject<any, U>[]>
-  | Refined<z.ZodObject<any, U>>
+  | z.ZodDiscriminatedUnion<string, z.ZodObject<z.ZodRawShape, U>[]>
+  | Refined<z.ZodObject<z.ZodRawShape, U>>
   | RawSchema;
-
-export type ProbableIntersection<
-  A extends IOSchema<"strip"> | null,
-  B extends IOSchema,
-> = A extends null
-  ? B
-  : A extends IOSchema<"strip">
-    ? z.ZodIntersection<A, B>
-    : never;
 
 /**
  * @description intersects input schemas of middlewares and the endpoint
  * @since 07.03.2022 former combineEndpointAndMiddlewareInputSchemas()
  * @since 05.03.2023 is immutable to metadata
+ * @since 26.05.2024 uses the regular ZodIntersection
  * @see copyMeta
  */
 export const getFinalEndpointInputSchema = <
-  MIN extends IOSchema<"strip"> | null,
+  MIN extends IOSchema<"strip">,
   IN extends IOSchema,
 >(
-  middlewares: AnyMiddlewareDef[],
+  middlewares: AbstractMiddleware[],
   input: IN,
-): ProbableIntersection<MIN, IN> => {
+): z.ZodIntersection<MIN, IN> => {
   const allSchemas = middlewares
-    .map(({ input: schema }) => schema)
+    .map((mw) => mw.getSchema() as IOSchema)
     .concat(input);
 
-  const finalSchema = allSchemas.reduce((acc, schema) =>
-    acc.and(schema),
-  ) as ProbableIntersection<MIN, IN>;
+  const finalSchema = allSchemas.reduce((acc, schema) => acc.and(schema));
 
-  return allSchemas.reduce((acc, schema) => copyMeta(schema, acc), finalSchema);
+  return allSchemas.reduce(
+    (acc, schema) => copyMeta(schema, acc),
+    finalSchema,
+  ) as z.ZodIntersection<MIN, IN>;
 };

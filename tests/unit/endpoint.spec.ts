@@ -1,17 +1,16 @@
 import assert from "node:assert/strict";
 import { z } from "zod";
 import {
-  AbstractEndpoint,
   EndpointsFactory,
-  createMiddleware,
-  createResultHandler,
+  Middleware,
   defaultEndpointsFactory,
   defaultResultHandler,
   ez,
   testEndpoint,
+  ResultHandler,
 } from "../../src";
-import { Endpoint } from "../../src/endpoint";
-import { IOSchemaError, ResultHandlerError } from "../../src/errors";
+import { AbstractEndpoint, Endpoint } from "../../src/endpoint";
+import { IOSchemaError } from "../../src/errors";
 import { serializeSchemaForTest } from "../helpers";
 import { describe, expect, test, vi } from "vitest";
 
@@ -23,9 +22,9 @@ describe("Endpoint", () => {
         inputSchema: z.object({}),
         outputSchema: z.object({}),
         handler: vi.fn<any>(),
-        resultHandler: createResultHandler({
-          getPositiveResponse: () => z.string(),
-          getNegativeResponse: () => z.string(),
+        resultHandler: new ResultHandler({
+          positive: z.string(),
+          negative: z.string(),
           handler: vi.fn(),
         }),
       });
@@ -44,9 +43,9 @@ describe("Endpoint", () => {
         inputSchema: z.object({}),
         outputSchema: z.object({}),
         handler: vi.fn<any>(),
-        resultHandler: createResultHandler({
-          getPositiveResponse: () => z.string(),
-          getNegativeResponse: () => z.string(),
+        resultHandler: new ResultHandler({
+          positive: z.string(),
+          negative: z.string(),
           handler: vi.fn(),
         }),
       });
@@ -61,16 +60,13 @@ describe("Endpoint", () => {
         .mockImplementationOnce(async ({ input }) => ({
           inc: input.n + 1,
         }));
-      const middlewareDefinitionMock = createMiddleware({
+      const resultHandlerSpy = vi.spyOn(defaultResultHandler, "execute");
+      const factory = new EndpointsFactory(defaultResultHandler).addMiddleware({
         input: z.object({
           n: z.number(),
         }),
-        middleware: middlewareMock,
+        handler: middlewareMock,
       });
-      const resultHandlerSpy = vi.spyOn(defaultResultHandler, "handler");
-      const factory = new EndpointsFactory(defaultResultHandler).addMiddleware(
-        middlewareDefinitionMock,
-      );
       const handlerMock = vi
         .fn()
         .mockImplementationOnce(async ({ input, options }) => ({
@@ -113,7 +109,7 @@ describe("Endpoint", () => {
         options: { inc: 454 },
         logger: loggerMock,
       });
-      expect(loggerMock.error).toHaveBeenCalledTimes(0);
+      expect(loggerMock._getLogs().error).toHaveLength(0);
       expect(resultHandlerSpy).toHaveBeenCalledWith({
         error: null,
         input: { n: 453 },
@@ -123,15 +119,13 @@ describe("Endpoint", () => {
         request: requestMock,
         response: responseMock,
       });
-      expect(responseMock.status).toHaveBeenCalledWith(200);
-      expect(responseMock.json).toHaveBeenCalledWith({
-        status: "success",
-        data: {
-          inc2: 455,
-          str: "453.00",
-          transform: 4,
-        },
-      });
+      expect(responseMock._getStatusCode()).toBe(200);
+      expect(responseMock._getData()).toBe(
+        JSON.stringify({
+          status: "success",
+          data: { inc2: 455, str: "453.00", transform: 4 },
+        }),
+      );
     });
 
     test("should close the stream on OPTIONS request", async () => {
@@ -154,28 +148,15 @@ describe("Endpoint", () => {
           }),
         },
       });
-      expect(loggerMock.error).toHaveBeenCalledTimes(0);
-      expect(responseMock.status).toHaveBeenCalledWith(200);
-      expect(responseMock.json).toHaveBeenCalledTimes(0);
+      expect(loggerMock._getLogs().error).toHaveLength(0);
+      expect(responseMock._getStatusCode()).toBe(200);
       expect(handlerMock).toHaveBeenCalledTimes(0);
-      expect(responseMock.set).toHaveBeenCalledTimes(4);
-      expect(responseMock.end).toHaveBeenCalledTimes(1);
-      expect(responseMock.set.mock.calls[0]).toEqual([
-        "Access-Control-Allow-Origin",
-        "*",
-      ]);
-      expect(responseMock.set.mock.calls[1]).toEqual([
-        "Access-Control-Allow-Methods",
-        "GET, OPTIONS",
-      ]);
-      expect(responseMock.set.mock.calls[2]).toEqual([
-        "Access-Control-Allow-Headers",
-        "content-type",
-      ]);
-      expect(responseMock.set.mock.calls[3]).toEqual([
-        "X-Custom-Header",
-        "Testing",
-      ]);
+      expect(responseMock._getHeaders()).toEqual({
+        "access-control-allow-origin": "*",
+        "access-control-allow-methods": "GET, OPTIONS",
+        "access-control-allow-headers": "content-type",
+        "x-custom-header": "Testing",
+      });
     });
   });
 
@@ -188,13 +169,13 @@ describe("Endpoint", () => {
         handler: async () => ({ email: "not email" }),
       });
       const { responseMock } = await testEndpoint({ endpoint });
-      expect(responseMock.status).toHaveBeenCalledWith(500);
-      expect(responseMock.json).toHaveBeenCalledWith({
-        status: "error",
-        error: {
-          message: "output/email: Invalid email",
-        },
-      });
+      expect(responseMock._getStatusCode()).toBe(500);
+      expect(responseMock._getData()).toBe(
+        JSON.stringify({
+          status: "error",
+          error: { message: "output/email: Invalid email" },
+        }),
+      );
     });
 
     test("Should throw on output parsing non-Zod error", async () => {
@@ -210,14 +191,14 @@ describe("Endpoint", () => {
         }),
       });
       const { responseMock, loggerMock } = await testEndpoint({ endpoint });
-      expect(loggerMock.error).toHaveBeenCalledTimes(1);
-      expect(responseMock.status).toHaveBeenCalledWith(500);
-      expect(responseMock.json).toHaveBeenCalledWith({
-        status: "error",
-        error: {
-          message: "Something unexpected",
-        },
-      });
+      expect(loggerMock._getLogs().error).toHaveLength(1);
+      expect(responseMock._getStatusCode()).toBe(500);
+      expect(responseMock._getData()).toBe(
+        JSON.stringify({
+          status: "error",
+          error: { message: "Something unexpected" },
+        }),
+      );
     });
   });
 
@@ -229,15 +210,12 @@ describe("Endpoint", () => {
           response.end("to hell with all that!");
           return { inc: input.n + 1 };
         });
-      const middlewareDefinitionMock = createMiddleware({
+      const factory = defaultEndpointsFactory.addMiddleware({
         input: z.object({
           n: z.number(),
         }),
-        middleware: middlewareMock,
+        handler: middlewareMock,
       });
-      const factory = defaultEndpointsFactory.addMiddleware(
-        middlewareDefinitionMock,
-      );
       const handlerMock = vi.fn();
       const endpoint = factory.build({
         method: "post",
@@ -254,26 +232,26 @@ describe("Endpoint", () => {
       });
       expect(handlerMock).toHaveBeenCalledTimes(0);
       expect(middlewareMock).toHaveBeenCalledTimes(1);
-      expect(loggerMock.error).toHaveBeenCalledTimes(0);
-      expect(loggerMock.warn).toHaveBeenCalledTimes(1);
-      expect(loggerMock.warn.mock.calls[0][0]).toBe(
-        "The middleware spy has closed the stream. Accumulated options:",
-      );
-      expect(loggerMock.warn.mock.calls[0][1]).toEqual({ inc: 454 });
-      expect(responseMock.status).toHaveBeenCalledTimes(0);
-      expect(responseMock.json).toHaveBeenCalledTimes(0);
-      expect(responseMock.statusCode).toBe(200);
-      expect(responseMock.statusMessage).toBe("OK");
+      expect(loggerMock._getLogs().error).toHaveLength(0);
+      expect(loggerMock._getLogs().warn).toEqual([
+        [
+          "A middleware has closed the stream. Accumulated options:",
+          { inc: 454 },
+        ],
+      ]);
+      expect(responseMock._getStatusCode()).toBe(200);
+      expect(responseMock._getStatusMessage()).toBe("OK");
     });
   });
 
   describe("#handleResult", () => {
     test("Should handle errors within ResultHandler", async () => {
-      const resultHandler = createResultHandler({
-        getPositiveResponse: () => z.object({}),
-        getNegativeResponse: () => z.object({}),
+      const resultHandler = new ResultHandler({
+        positive: z.object({}),
+        negative: z.object({}),
         handler: vi.fn(() => assert.fail("Something unexpected happened")),
       });
+      const spy = vi.spyOn(resultHandler, "execute");
       const factory = new EndpointsFactory(resultHandler);
       const endpoint = factory.build({
         method: "get",
@@ -286,11 +264,10 @@ describe("Endpoint", () => {
       const { loggerMock, responseMock, requestMock } = await testEndpoint({
         endpoint,
       });
-      expect(loggerMock.error).toHaveBeenCalledTimes(1);
-      expect(loggerMock.error.mock.calls[0][0]).toBe(
-        "Result handler failure: Something unexpected happened.",
-      );
-      expect(resultHandler.handler).toHaveBeenCalledWith({
+      expect(loggerMock._getLogs().error).toEqual([
+        ["Result handler failure: Something unexpected happened."],
+      ]);
+      expect(spy).toHaveBeenCalledWith({
         error: null,
         logger: loggerMock,
         input: {},
@@ -299,11 +276,8 @@ describe("Endpoint", () => {
         request: requestMock,
         response: responseMock,
       });
-      expect(responseMock.status).toHaveBeenCalledTimes(1);
-      expect(responseMock.status.mock.calls[0][0]).toBe(500);
-      expect(responseMock.json).toHaveBeenCalledTimes(0);
-      expect(responseMock.end).toHaveBeenCalledTimes(1);
-      expect(responseMock.end.mock.calls[0][0]).toBe(
+      expect(responseMock._getStatusCode()).toBe(500);
+      expect(responseMock._getData()).toBe(
         "An error occurred while serving the result: Something unexpected happened.",
       );
     });
@@ -402,14 +376,12 @@ describe("Endpoint", () => {
   describe("Issue #269: Async refinements", () => {
     test("should handle async refinements in input, output and middleware", async () => {
       const endpoint = new EndpointsFactory(defaultResultHandler)
-        .addMiddleware(
-          createMiddleware({
-            input: z.object({
-              m: z.number().refine(async (m) => m < 10),
-            }),
-            middleware: async () => ({}),
+        .addMiddleware({
+          input: z.object({
+            m: z.number().refine(async (m) => m < 10),
           }),
-        )
+          handler: async () => ({}),
+        })
         .build({
           methods: ["post"],
           input: z.object({
@@ -429,26 +401,24 @@ describe("Endpoint", () => {
           body: { n: 123, m: 5 },
         },
       });
-      expect(responseMock.json).toHaveBeenCalledWith({
-        status: "success",
-        data: {
-          str: "This is fine",
-        },
-      });
+      expect(responseMock._getData()).toBe(
+        JSON.stringify({
+          status: "success",
+          data: { str: "This is fine" },
+        }),
+      );
     });
   });
 
   describe("Issue #514: Express native middlewares for OPTIONS request", () => {
     test("should skip proprietary ones", async () => {
       const endpoint = new EndpointsFactory(defaultResultHandler)
-        .addMiddleware(
-          createMiddleware({
-            input: z.object({
-              shouldNotBeHere: z.boolean(),
-            }),
-            middleware: async () => assert.fail("Should not be here"),
+        .addMiddleware({
+          input: z.object({
+            shouldNotBeHere: z.boolean(),
           }),
-        )
+          handler: async () => assert.fail("Should not be here"),
+        })
         .addExpressMiddleware((req, res, next) => {
           res.set("X-Custom-Header", "test");
           next();
@@ -469,9 +439,12 @@ describe("Endpoint", () => {
           method: "OPTIONS",
         },
       });
-      expect(responseMock.status).toHaveBeenCalledWith(200);
-      expect(responseMock.json).toHaveBeenCalledTimes(0);
-      expect(responseMock.set).toHaveBeenCalledWith("X-Custom-Header", "test");
+      expect(responseMock._getStatusCode()).toBe(200);
+      expect(responseMock._getData()).toBe("");
+      expect(responseMock._getHeaders()).toHaveProperty(
+        "x-custom-header",
+        "test",
+      );
     });
   });
 
@@ -489,21 +462,21 @@ describe("Endpoint", () => {
         }),
       });
       const { responseMock, loggerMock } = await testEndpoint({ endpoint });
-      expect(loggerMock.error).toHaveBeenCalledTimes(1);
-      expect(responseMock.status).toHaveBeenCalledWith(500);
-      expect(responseMock.json).toHaveBeenCalledWith({
-        status: "error",
-        error: {
-          message: "Something unexpected",
-        },
-      });
+      expect(loggerMock._getLogs().error).toHaveLength(1);
+      expect(responseMock._getStatusCode()).toBe(500);
+      expect(responseMock._getData()).toBe(
+        JSON.stringify({
+          status: "error",
+          error: { message: "Something unexpected" },
+        }),
+      );
     });
 
     test("thrown in #handleResult()", async () => {
       const factory = new EndpointsFactory(
-        createResultHandler({
-          getPositiveResponse: () => z.object({}),
-          getNegativeResponse: () => z.object({}),
+        new ResultHandler({
+          positive: z.object({}),
+          negative: z.object({}),
           handler: () => assert.fail("Something unexpected happened"),
         }),
       );
@@ -516,26 +489,20 @@ describe("Endpoint", () => {
         handler: async () => ({ test: "OK" }),
       });
       const { loggerMock, responseMock } = await testEndpoint({ endpoint });
-      expect(loggerMock.error).toHaveBeenCalledTimes(1);
-      expect(loggerMock.error.mock.calls[0][0]).toBe(
-        "Result handler failure: Something unexpected happened.",
-      );
-      expect(responseMock.status).toHaveBeenCalledTimes(1);
-      expect(responseMock.status.mock.calls[0][0]).toBe(500);
-      expect(responseMock.json).toHaveBeenCalledTimes(0);
-      expect(responseMock.end).toHaveBeenCalledTimes(1);
-      expect(responseMock.end.mock.calls[0][0]).toBe(
+      expect(loggerMock._getLogs().error).toEqual([
+        ["Result handler failure: Something unexpected happened."],
+      ]);
+      expect(responseMock._getStatusCode()).toBe(500);
+      expect(responseMock._getData()).toBe(
         "An error occurred while serving the result: Something unexpected happened.",
       );
     });
 
     test("thrown in middleware and caught in execute()", async () => {
-      const factory = new EndpointsFactory(defaultResultHandler).addMiddleware(
-        createMiddleware({
-          input: z.object({}),
-          middleware: async () => assert.fail("Something went wrong"),
-        }),
-      );
+      const factory = new EndpointsFactory(defaultResultHandler).addMiddleware({
+        input: z.object({}),
+        handler: async () => assert.fail("Something went wrong"),
+      });
       const endpoint = factory.build({
         methods: ["post"],
         input: z.object({}),
@@ -549,12 +516,14 @@ describe("Endpoint", () => {
           body: {},
         },
       });
-      expect(loggerMock.error).toHaveBeenCalledTimes(1);
-      expect(responseMock.status).toHaveBeenCalledWith(500);
-      expect(responseMock.json).toHaveBeenCalledWith({
-        status: "error",
-        error: { message: "Something went wrong" },
-      });
+      expect(loggerMock._getLogs().error).toHaveLength(1);
+      expect(responseMock._getStatusCode()).toBe(500);
+      expect(responseMock._getData()).toBe(
+        JSON.stringify({
+          status: "error",
+          error: { message: "Something went wrong" },
+        }),
+      );
     });
   });
 
@@ -605,11 +574,10 @@ describe("Endpoint", () => {
           },
         },
       });
-      expect(responseMock.json).toHaveBeenCalledWith({
-        data: {},
-        status: "success",
-      });
-      expect(responseMock.status).toHaveBeenCalledWith(200);
+      expect(responseMock._getData()).toBe(
+        JSON.stringify({ status: "success", data: {} }),
+      );
+      expect(responseMock._getStatusCode()).toBe(200);
     });
 
     test("should fail during the refinement of invalid inputs", async () => {
@@ -623,13 +591,16 @@ describe("Endpoint", () => {
           },
         },
       });
-      expect(responseMock.json).toHaveBeenCalledWith({
-        error: {
-          message: "dynamicValue: type1Attribute is required if type is type1",
-        },
-        status: "error",
-      });
-      expect(responseMock.status).toHaveBeenCalledWith(400);
+      expect(responseMock._getData()).toBe(
+        JSON.stringify({
+          status: "error",
+          error: {
+            message:
+              "dynamicValue: type1Attribute is required if type is type1",
+          },
+        }),
+      );
+      expect(responseMock._getStatusCode()).toBe(400);
     });
 
     test("should refine the output schema as well", async () => {
@@ -644,13 +615,13 @@ describe("Endpoint", () => {
           },
         },
       });
-      expect(responseMock.json).toHaveBeenCalledWith({
-        status: "error",
-        error: {
-          message: "output: failure on demand",
-        },
-      });
-      expect(responseMock.status).toHaveBeenCalledWith(500);
+      expect(responseMock._getData()).toBe(
+        JSON.stringify({
+          status: "error",
+          error: { message: "output: failure on demand" },
+        }),
+      );
+      expect(responseMock._getStatusCode()).toBe(500);
     });
   });
 
@@ -681,11 +652,10 @@ describe("Endpoint", () => {
           },
         },
       });
-      expect(responseMock.json).toHaveBeenCalledWith({
-        data: {},
-        status: "success",
-      });
-      expect(responseMock.status).toHaveBeenCalledWith(200);
+      expect(responseMock._getData()).toBe(
+        JSON.stringify({ status: "success", data: {} }),
+      );
+      expect(responseMock._getStatusCode()).toBe(200);
     });
 
     test("should fail during the refinement of invalid inputs", async () => {
@@ -696,13 +666,13 @@ describe("Endpoint", () => {
           body: {},
         },
       });
-      expect(responseMock.json).toHaveBeenCalledWith({
-        error: {
-          message: "Please provide at least one property",
-        },
-        status: "error",
-      });
-      expect(responseMock.status).toHaveBeenCalledWith(400);
+      expect(responseMock._getData()).toBe(
+        JSON.stringify({
+          status: "error",
+          error: { message: "Please provide at least one property" },
+        }),
+      );
+      expect(responseMock._getStatusCode()).toBe(400);
     });
 
     test("should throw when using transformation (constructor)", () => {
@@ -713,11 +683,11 @@ describe("Endpoint", () => {
             inputSchema: z.object({}).transform(() => []),
             outputSchema: z.object({}),
             handler: vi.fn<any>(),
-            resultHandler: {
-              getPositiveResponse: vi.fn(),
-              getNegativeResponse: vi.fn(),
+            resultHandler: new ResultHandler({
+              positive: vi.fn(),
+              negative: vi.fn(),
               handler: vi.fn(),
-            },
+            }),
           }),
       ).toThrow(
         new IOSchemaError(
@@ -731,11 +701,11 @@ describe("Endpoint", () => {
             inputSchema: z.object({}),
             outputSchema: z.object({}).transform(() => []),
             handler: vi.fn<any>(),
-            resultHandler: {
-              getPositiveResponse: vi.fn(),
-              getNegativeResponse: vi.fn(),
+            resultHandler: new ResultHandler({
+              positive: vi.fn(),
+              negative: vi.fn(),
               handler: vi.fn(),
-            },
+            }),
           }),
       ).toThrow(
         new IOSchemaError(
@@ -745,54 +715,13 @@ describe("Endpoint", () => {
     });
   });
 
-  describe("Feature #1431: Multiple responses and status codes", () => {
-    test("Should throw in constructor when ResultHandler has no response schema specified", () => {
-      expect(
-        () =>
-          new Endpoint({
-            methods: ["get"],
-            inputSchema: z.object({}),
-            outputSchema: z.object({}),
-            handler: vi.fn<any>(),
-            resultHandler: {
-              getPositiveResponse: () => [],
-              getNegativeResponse: () => z.any(),
-              handler: vi.fn(),
-            },
-          }),
-      ).toThrow(
-        new ResultHandlerError(
-          "ResultHandler must have at least one positive response schema specified.",
-        ),
-      );
-      expect(
-        () =>
-          new Endpoint({
-            methods: ["get"],
-            inputSchema: z.object({}),
-            outputSchema: z.object({}),
-            handler: vi.fn<any>(),
-            resultHandler: {
-              getPositiveResponse: () => z.any(),
-              getNegativeResponse: () => [],
-              handler: vi.fn(),
-            },
-          }),
-      ).toThrow(
-        new ResultHandlerError(
-          "ResultHandler must have at least one negative response schema specified.",
-        ),
-      );
-    });
-  });
-
   describe("Issue #673: transformations in middlewares", () => {
     test("should avoid double parsing, should not mutate input", async () => {
-      const dateInputMiddleware = createMiddleware({
+      const dateInputMiddleware = new Middleware({
         input: z.object({
           middleware_date_input: ez.dateIn().optional(),
         }),
-        middleware: async ({ input: { middleware_date_input }, logger }) => {
+        handler: async ({ input: { middleware_date_input }, logger }) => {
           logger.debug("date in mw handler", typeof middleware_date_input);
           return {};
         },
@@ -822,11 +751,11 @@ describe("Endpoint", () => {
         },
       });
 
-      expect(loggerMock.debug.mock.calls).toEqual([
+      expect(loggerMock._getLogs().debug).toEqual([
         ["date in mw handler", "object"],
         ["date in endpoint handler", "object"],
       ]);
-      expect(responseMock.status).toHaveBeenCalledWith(200);
+      expect(responseMock._getStatusCode()).toBe(200);
     });
   });
 });

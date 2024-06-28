@@ -1,0 +1,22 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Migration > should consist of one rule 1`] = `
+{
+  "plugins": {
+    "ez-migration": {
+      "rules": {
+        "v20": {
+          "create": [Function],
+          "meta": {
+            "fixable": "code",
+            "type": "problem",
+          },
+        },
+      },
+    },
+  },
+  "rules": {
+    "ez-migration/v20": "error",
+  },
+}
+`;
