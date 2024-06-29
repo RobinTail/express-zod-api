@@ -95,7 +95,6 @@ interface ReqResHandlingProps<S extends z.ZodTypeAny>
     "serializer" | "getRef" | "makeRef" | "path" | "method"
   > {
   schema: S;
-  mimeTypes: ReadonlyArray<string>;
   composition: "inline" | "components";
   description?: string;
   brandHandling?: HandlingRules<SchemaObject | ReferenceObject, OpenAPIContext>;
@@ -671,7 +670,7 @@ export const depictRequestParams = ({
   composition,
   brandHandling,
   description = `${method.toUpperCase()} ${path} Parameter`,
-}: Omit<ReqResHandlingProps<IOSchema>, "mimeTypes"> & {
+}: ReqResHandlingProps<IOSchema> & {
   inputSources: InputSource[];
 }) => {
   const { shape } = extractObjectSchema(
@@ -876,6 +875,7 @@ export const depictResponse = ({
     hasMultipleStatusCodes ? statusCode : ""
   }`.trim(),
 }: ReqResHandlingProps<z.ZodTypeAny> & {
+  mimeTypes: ReadonlyArray<string>;
   variant: "positive" | "negative";
   statusCode: number;
   hasMultipleStatusCodes: boolean;
@@ -1021,6 +1021,7 @@ export const depictBody = ({
   paramNames,
   description = `${method.toUpperCase()} ${path} Request body`,
 }: ReqResHandlingProps<IOSchema> & {
+  mimeTypes: ReadonlyArray<string>;
   paramNames: string[];
 }): RequestBodyObject => {
   const bodyDepiction = excludeExamplesFromDepiction(
