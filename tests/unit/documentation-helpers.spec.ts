@@ -127,15 +127,8 @@ describe("Documentation helpers", () => {
   });
 
   describe("extractObjectSchema()", () => {
-    const tfError = new Error(
-      "Using transformations on the top level schema is not allowed.",
-    );
-
     test("should pass the object schema through", () => {
-      const subject = extractObjectSchema(
-        z.object({ one: z.string() }),
-        tfError,
-      );
+      const subject = extractObjectSchema(z.object({ one: z.string() }));
       expect(subject).toBeInstanceOf(z.ZodObject);
       expect(serializeSchemaForTest(subject)).toMatchSnapshot();
     });
@@ -143,7 +136,6 @@ describe("Documentation helpers", () => {
     test("should return object schema for the union of object schemas", () => {
       const subject = extractObjectSchema(
         z.object({ one: z.string() }).or(z.object({ two: z.number() })),
-        tfError,
       );
       expect(subject).toBeInstanceOf(z.ZodObject);
       expect(serializeSchemaForTest(subject)).toMatchSnapshot();
@@ -152,14 +144,13 @@ describe("Documentation helpers", () => {
     test("should return object schema for the intersection of object schemas", () => {
       const subject = extractObjectSchema(
         z.object({ one: z.string() }).and(z.object({ two: z.number() })),
-        tfError,
       );
       expect(subject).toBeInstanceOf(z.ZodObject);
       expect(serializeSchemaForTest(subject)).toMatchSnapshot();
     });
 
     test("should support ez.raw()", () => {
-      const subject = extractObjectSchema(ez.raw(), tfError);
+      const subject = extractObjectSchema(ez.raw());
       expect(subject).toBeInstanceOf(z.ZodObject);
       expect(serializeSchemaForTest(subject)).toMatchSnapshot();
     });
@@ -168,19 +159,19 @@ describe("Documentation helpers", () => {
       test("should handle refined object schema", () => {
         const subject = extractObjectSchema(
           z.object({ one: z.string() }).refine(() => true),
-          tfError,
         );
         expect(subject).toBeInstanceOf(z.ZodObject);
         expect(serializeSchemaForTest(subject)).toMatchSnapshot();
       });
+    });
 
-      test("should throw when using transformation", () => {
-        expect(() =>
-          extractObjectSchema(
-            z.object({ one: z.string() }).transform(() => ({})),
-            tfError,
-          ),
-        ).toThrow(tfError);
+    describe("Feature #1869: Top level transformations", () => {
+      test("should handle transformations to another object", () => {
+        const subject = extractObjectSchema(
+          z.object({ one: z.string() }).transform(({ one }) => ({ two: one })),
+        );
+        expect(subject).toBeInstanceOf(z.ZodObject);
+        expect(serializeSchemaForTest(subject)).toMatchSnapshot();
       });
     });
   });
