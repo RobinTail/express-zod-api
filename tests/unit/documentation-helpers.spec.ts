@@ -177,7 +177,7 @@ describe("Documentation helpers", () => {
       test("should throw when using transformation", () => {
         expect(() =>
           extractObjectSchema(
-            z.object({ one: z.string() }).transform(() => []),
+            z.object({ one: z.string() }).transform(() => ({})),
             tfError,
           ),
         ).toThrow(tfError);

@@ -42,7 +42,7 @@ describe("Middleware", () => {
                 .object({
                   something: z.number(),
                 })
-                .transform(() => []),
+                .transform(() => ({})),
               handler: vi.fn<any>(),
             }),
         ).toThrow(

@@ -58,14 +58,14 @@ describe("Checks", () => {
   describe("hasTranformationOnTop()", () => {
     test("should return true for transformation", () => {
       expect(
-        hasTransformationOnTop(z.object({}).transform(() => [])),
+        hasTransformationOnTop(z.object({}).transform(() => ({}))),
       ).toBeTruthy();
     });
 
     test("should detect transformation in intersection", () => {
       expect(
         hasTransformationOnTop(
-          z.object({}).and(z.object({}).transform(() => [])),
+          z.object({}).and(z.object({}).transform(() => ({}))),
         ),
       ).toBeTruthy();
     });
@@ -73,7 +73,7 @@ describe("Checks", () => {
     test("should detect transformation in union", () => {
       expect(
         hasTransformationOnTop(
-          z.object({}).or(z.object({}).transform(() => [])),
+          z.object({}).or(z.object({}).transform(() => ({}))),
         ),
       ).toBeTruthy();
     });

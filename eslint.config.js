@@ -47,7 +47,7 @@ export default [
       "import/no-extraneous-dependencies": "error",
       "@typescript-eslint/no-empty-object-type": [
         "error",
-        { allowWithName: "LoggerOverrides" },
+        { allowWithName: "LoggerOverrides|Effected" },
       ],
     },
   },

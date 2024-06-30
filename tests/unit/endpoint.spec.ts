@@ -663,7 +663,7 @@ describe("Endpoint", () => {
         () =>
           new Endpoint({
             methods: ["get"],
-            inputSchema: z.object({}).transform(() => []),
+            inputSchema: z.object({}).transform(() => ({})),
             outputSchema: z.object({}),
             handler: vi.fn<any>(),
             resultHandler: new ResultHandler({
@@ -682,7 +682,7 @@ describe("Endpoint", () => {
           new Endpoint({
             methods: ["get"],
             inputSchema: z.object({}),
-            outputSchema: z.object({}).transform(() => []),
+            outputSchema: z.object({}).transform(() => ({})),
             handler: vi.fn<any>(),
             resultHandler: new ResultHandler({
               positive: vi.fn(),

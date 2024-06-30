@@ -80,6 +80,7 @@ export const hasNestedSchema = (
   return false;
 };
 
+/** @todo remove */
 export const hasTransformationOnTop = (subject: IOSchema): boolean =>
   hasNestedSchema(subject, {
     maxDepth: 3,
