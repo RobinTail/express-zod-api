@@ -4,9 +4,10 @@ import { copyMeta } from "./metadata";
 import { AbstractMiddleware } from "./middleware";
 import { RawSchema } from "./raw-schema";
 
-type IOBase<U extends z.UnknownKeysParam> = z.ZodObject<z.ZodRawShape, U>;
+type BaseObject<U extends z.UnknownKeysParam> = z.ZodObject<z.ZodRawShape, U>;
 
-interface Effected<T extends z.ZodTypeAny>
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type -- workaround for TS2456, circular reference
+interface ObjectBasedEffect<T extends z.ZodTypeAny>
   extends z.ZodEffects<T, FlatObject> {}
 
 /**
@@ -14,11 +15,11 @@ interface Effected<T extends z.ZodTypeAny>
  * @param U — only "strip" is allowed for Middlewares due to intersection issue (Zod) #600
  * */
 export type IOSchema<U extends z.UnknownKeysParam = z.UnknownKeysParam> =
-  | IOBase<U>
+  | BaseObject<U>
   | z.ZodUnion<[IOSchema<U>, ...IOSchema<U>[]]>
   | z.ZodIntersection<IOSchema<U>, IOSchema<U>>
-  | z.ZodDiscriminatedUnion<string, IOBase<U>[]>
-  | Effected<IOSchema<U>>
+  | z.ZodDiscriminatedUnion<string, BaseObject<U>[]>
+  | ObjectBasedEffect<IOSchema<U>>
   | RawSchema;
 
 /**

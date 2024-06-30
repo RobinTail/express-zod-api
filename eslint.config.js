@@ -45,10 +45,6 @@ export default [
     files: ["src/*.ts"],
     rules: {
       "import/no-extraneous-dependencies": "error",
-      "@typescript-eslint/no-empty-object-type": [
-        "error",
-        { allowWithName: "LoggerOverrides|Effected" },
-      ],
     },
   },
   // For tests
