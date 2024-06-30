@@ -10,7 +10,6 @@ import {
   ResultHandler,
 } from "../../src";
 import { AbstractEndpoint, Endpoint } from "../../src/endpoint";
-import { IOSchemaError } from "../../src/errors";
 import { serializeSchemaForTest } from "../helpers";
 import { describe, expect, test, vi } from "vitest";
 
@@ -656,45 +655,6 @@ describe("Endpoint", () => {
         error: { message: "Please provide at least one property" },
       });
       expect(responseMock._getStatusCode()).toBe(400);
-    });
-
-    test("should throw when using transformation (constructor)", () => {
-      expect(
-        () =>
-          new Endpoint({
-            methods: ["get"],
-            inputSchema: z.object({}).transform(() => ({})),
-            outputSchema: z.object({}),
-            handler: vi.fn<any>(),
-            resultHandler: new ResultHandler({
-              positive: vi.fn(),
-              negative: vi.fn(),
-              handler: vi.fn(),
-            }),
-          }),
-      ).toThrow(
-        new IOSchemaError(
-          "Using transformations on the top level of endpoint input schema is not allowed.",
-        ),
-      );
-      expect(
-        () =>
-          new Endpoint({
-            methods: ["get"],
-            inputSchema: z.object({}),
-            outputSchema: z.object({}).transform(() => ({})),
-            handler: vi.fn<any>(),
-            resultHandler: new ResultHandler({
-              positive: vi.fn(),
-              negative: vi.fn(),
-              handler: vi.fn(),
-            }),
-          }),
-      ).toThrow(
-        new IOSchemaError(
-          "Using transformations on the top level of endpoint output schema is not allowed.",
-        ),
-      );
     });
   });
 

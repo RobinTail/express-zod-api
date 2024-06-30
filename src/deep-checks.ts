@@ -80,16 +80,6 @@ export const hasNestedSchema = (
   return false;
 };
 
-/** @todo remove */
-export const hasTransformationOnTop = (subject: IOSchema): boolean =>
-  hasNestedSchema(subject, {
-    maxDepth: 3,
-    rules: { ZodUnion: onSomeUnion, ZodIntersection: onIntersection },
-    condition: (schema) =>
-      schema instanceof z.ZodEffects &&
-      schema._def.effect.type !== "refinement",
-  });
-
 export const hasUpload = (subject: IOSchema) =>
   hasNestedSchema(subject, {
     condition: (schema) => schema._def[metaSymbol]?.brand === ezUploadBrand,

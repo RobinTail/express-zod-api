@@ -635,7 +635,7 @@ export const depictParamExamples = (
 
 export const extractObjectSchema = (
   subject: IOSchema,
-  tfError: DocumentationError,
+  tfError: DocumentationError, // @todo sort this out
 ): z.ZodObject<z.ZodRawShape> => {
   if (subject instanceof z.ZodObject) {
     return subject;
