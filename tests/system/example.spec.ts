@@ -145,7 +145,7 @@ describe("Example", async () => {
 
     test("Should send an image with a correct header", async () => {
       const response = await fetch(
-        `http://localhost:${port}/v1/avatar/send?userId=123`,
+        `http://localhost:${port}/v1/avatar/send?user_id=123`,
       );
       expect(response.status).toBe(200);
       expect(response.headers.has("Content-type")).toBeTruthy();
