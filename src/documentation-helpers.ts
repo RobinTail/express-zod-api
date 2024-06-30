@@ -89,13 +89,12 @@ export type Depicter = SchemaHandler<
   OpenAPIContext
 >;
 
-interface ReqResDepictHelperCommonProps
+interface ReqResHandlingProps<S extends z.ZodTypeAny>
   extends Pick<
     OpenAPIContext,
     "serializer" | "getRef" | "makeRef" | "path" | "method"
   > {
-  schema: z.ZodTypeAny;
-  mimeTypes: ReadonlyArray<string>;
+  schema: S;
   composition: "inline" | "components";
   description?: string;
   brandHandling?: HandlingRules<SchemaObject | ReferenceObject, OpenAPIContext>;
@@ -671,7 +670,7 @@ export const depictRequestParams = ({
   composition,
   brandHandling,
   description = `${method.toUpperCase()} ${path} Parameter`,
-}: Omit<ReqResDepictHelperCommonProps, "mimeTypes"> & {
+}: ReqResHandlingProps<IOSchema> & {
   inputSources: InputSource[];
 }) => {
   const { shape } = extractObjectSchema(
@@ -875,7 +874,8 @@ export const depictResponse = ({
   description = `${method.toUpperCase()} ${path} ${ucFirst(variant)} response ${
     hasMultipleStatusCodes ? statusCode : ""
   }`.trim(),
-}: ReqResDepictHelperCommonProps & {
+}: ReqResHandlingProps<z.ZodTypeAny> & {
+  mimeTypes: ReadonlyArray<string>;
   variant: "positive" | "negative";
   statusCode: number;
   hasMultipleStatusCodes: boolean;
@@ -1020,7 +1020,8 @@ export const depictBody = ({
   brandHandling,
   paramNames,
   description = `${method.toUpperCase()} ${path} Request body`,
-}: ReqResDepictHelperCommonProps & {
+}: ReqResHandlingProps<IOSchema> & {
+  mimeTypes: ReadonlyArray<string>;
   paramNames: string[];
 }): RequestBodyObject => {
   const bodyDepiction = excludeExamplesFromDepiction(
