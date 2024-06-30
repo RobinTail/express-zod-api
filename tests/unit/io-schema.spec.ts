@@ -52,12 +52,6 @@ describe("I/O Schema and related helpers", () => {
       expectType<IOSchema>(z.object({}).and(z.object({}).or(z.object({}))));
     });
     describe("Feature #600: Top level refinements", () => {
-      test("accepts transformations to another object", () => {
-        expectNotType<IOSchema>(z.object({}).transform(() => []));
-        expectType<IOSchema>(
-          z.object({ s: z.string() }).transform(() => ({ n: 123 })),
-        );
-      });
       test("accepts a refinement of object", () => {
         expectType<IOSchema>(z.object({}).refine(() => true));
         expectType<IOSchema>(z.object({}).superRefine(() => true));
@@ -73,17 +67,27 @@ describe("I/O Schema and related helpers", () => {
           z
             .object({})
             .refine(() => true)
+            .refine(() => true)
             .refine(() => true),
         );
         expectType<IOSchema>(
           z
             .object({})
             .superRefine(() => true)
+            .superRefine(() => true)
             .superRefine(() => true),
         );
       });
-      test("does not accept transformation of object", () => {
+    });
+    describe("Feature #1869: Top level transformations", () => {
+      test("accepts transformations to another object", () => {
+        expectType<IOSchema>(
+          z.object({ s: z.string() }).transform(() => ({ n: 123 })),
+        );
+      });
+      test("does not accept transformation to other types", () => {
         expectNotType<IOSchema>(z.object({}).transform(() => true));
+        expectNotType<IOSchema>(z.object({}).transform(() => []));
       });
     });
   });
