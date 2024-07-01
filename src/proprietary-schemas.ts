@@ -1,8 +1,8 @@
-import { dateIn, ezDateInBrand } from "./date-in-schema";
-import { dateOut, ezDateOutBrand } from "./date-out-schema";
-import { ezFileBrand, file } from "./file-schema";
-import { ezRawBrand, raw } from "./raw-schema";
-import { ezUploadBrand, upload } from "./upload-schema";
+import { dateIn, type ezDateInBrand } from "./date-in-schema";
+import { dateOut, type ezDateOutBrand } from "./date-out-schema";
+import { file, type ezFileBrand } from "./file-schema";
+import { raw, type ezRawBrand } from "./raw-schema";
+import { upload, type ezUploadBrand } from "./upload-schema";
 
 export const ez = { dateIn, dateOut, file, upload, raw };
 
