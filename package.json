@@ -128,7 +128,6 @@
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.15.0",
-    "@eslint/js": "^9.3.0",
     "@tsconfig/node18": "^18.2.1",
     "@types/compression": "^1.7.5",
     "@types/cors": "^2.8.14",
@@ -163,12 +162,12 @@
     "tsup": "^8.0.0",
     "tsx": "^4.6.2",
     "typescript": "^5.5.2",
-    "typescript-eslint": "^8.0.0-alpha.36",
+    "typescript-eslint": "^8.0.0-alpha.38",
     "vitest": "^1.5.0",
     "zod": "^3.23.0"
   },
   "resolutions": {
-    "**/@typescript-eslint/utils": "^8.0.0-alpha.36"
+    "**/@typescript-eslint/utils": "^8.0.0-alpha.38"
   },
   "keywords": [
     "nodejs",
