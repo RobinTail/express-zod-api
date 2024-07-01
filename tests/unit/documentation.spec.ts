@@ -1,3 +1,5 @@
+import camelize from "camelize-ts";
+import snakify from "snakify-ts";
 import { config as exampleConfig } from "../../example/config";
 import { routing } from "../../example/routing";
 import {
@@ -1310,6 +1312,38 @@ describe("Documentation", () => {
         },
         version: "3.4.5",
         title: "Testing custom brands handling",
+        serverUrl: "https://example.com",
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
+    });
+  });
+
+  describe("Feature #1869: Top level transformations", () => {
+    test("should handle in request and response", () => {
+      const spec = new Documentation({
+        config: sampleConfig,
+        routing: {
+          v1: {
+            test: defaultEndpointsFactory.build({
+              method: "get",
+              input: z
+                .object({
+                  user_id: z.string(),
+                })
+                .transform((input) => camelize(input)),
+              output: z
+                .object({
+                  userName: z.string(),
+                })
+                .transform((input) => snakify(input)),
+              handler: async ({ input: { userId } }) => ({
+                userName: `User ${userId}`,
+              }),
+            }),
+          },
+        },
+        version: "3.4.5",
+        title: "Testing top level transformations",
         serverUrl: "https://example.com",
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
