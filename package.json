@@ -128,7 +128,6 @@
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.15.0",
-    "@eslint/js": "^9.3.0",
     "@tsconfig/node18": "^18.2.1",
     "@types/compression": "^1.7.5",
     "@types/cors": "^2.8.14",
