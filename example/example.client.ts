@@ -81,7 +81,7 @@ type GetV1UserListResponse =
   | string;
 
 type GetV1AvatarSendInput = {
-  user_id: string;
+  userId: string;
 };
 
 type GetV1AvatarSendResponse = string | string;

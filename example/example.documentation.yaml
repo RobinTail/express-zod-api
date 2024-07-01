@@ -353,7 +353,7 @@ paths:
         - files
         - users
       parameters:
-        - name: user_id
+        - name: userId
           in: query
           required: true
           description: GET /v1/avatar/send Parameter
