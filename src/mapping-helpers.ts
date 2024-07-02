@@ -16,5 +16,3 @@ type GetKeyByValue<T, V> =
 export type Remap<T, U extends { [P in keyof T]: V }, V extends string> = {
   [P in U[keyof U]]: T[GetKeyByValue<U, P>];
 };
-
-export const asTuple = <A, B>(a: A, b: B): [A, B] => [a, b];
