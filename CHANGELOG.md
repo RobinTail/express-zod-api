@@ -11,7 +11,7 @@
   - The library offers a new `.remap()` method on the `z.object()` schema that applies a `.pipe()` to transformation;
     - Currently `.remap()` requires an assignment of all the object props explicitly, but it may be improved later;
   - Find more details [in the documentation](README.md#top-level-transformations-and-mapping);
-  - The feature suggested by [Peter Rottmann](@rottmann).
+  - The feature suggested by [Peter Rottmann](https://github.com/rottmann).
 
 ```ts
 import camelize from "camelize-ts";
