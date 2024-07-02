@@ -108,8 +108,8 @@ const objectMapper = function (
     z.object(
       pipe(
         toPairs,
-        map<[string, z.ZodTypeAny], [string, z.ZodTypeAny]>(([key, schema]) => [
-          mapping[key],
+        map(([key, schema]): [(typeof mapping)[string], typeof schema] => [
+          mapping[String(key)],
           schema,
         ]),
         fromPairs,
