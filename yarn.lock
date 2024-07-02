@@ -1610,9 +1610,9 @@ eslint-module-utils@^2.7.4:
   dependencies:
     debug "^3.2.7"
 
-"eslint-plugin-import@https://registry.npmjs.org/eslint-plugin-import-x/-/eslint-plugin-import-x-0.5.2.tgz":
-  version "0.5.2"
-  resolved "https://registry.npmjs.org/eslint-plugin-import-x/-/eslint-plugin-import-x-0.5.2.tgz#a2d23b8c3ec2a049772902ba4addc9f3ee549e50"
+"eslint-plugin-import@https://registry.npmjs.org/eslint-plugin-import-x/-/eslint-plugin-import-x-0.5.3.tgz":
+  version "0.5.3"
+  resolved "https://registry.npmjs.org/eslint-plugin-import-x/-/eslint-plugin-import-x-0.5.3.tgz#5965a567885521734c05c6832de93ece18da12ad"
   dependencies:
     "@typescript-eslint/utils" "^7.4.0"
     debug "^4.3.4"
@@ -1622,6 +1622,7 @@ eslint-module-utils@^2.7.4:
     is-glob "^4.0.3"
     minimatch "^9.0.3"
     semver "^7.6.0"
+    stable-hash "^0.0.4"
     tslib "^2.6.2"
 
 eslint-plugin-prettier@^5.1.3:
@@ -3451,6 +3452,11 @@ spdx-license-ids@^3.0.0:
   version "3.0.18"
   resolved "https://registry.yarnpkg.com/spdx-license-ids/-/spdx-license-ids-3.0.18.tgz#22aa922dcf2f2885a6494a261f2d8b75345d0326"
   integrity sha512-xxRs31BqRYHwiMzudOrpSiHtZ8i/GeionCBDSilhYRj+9gIcI8wCZTlXZKu9vZIVqViP3dcp9qE5G6AlIaD+TQ==
+
+stable-hash@^0.0.4:
+  version "0.0.4"
+  resolved "https://registry.yarnpkg.com/stable-hash/-/stable-hash-0.0.4.tgz#55ae7dadc13e4b3faed13601587cec41859b42f7"
+  integrity sha512-LjdcbuBeLcdETCrPn9i8AYAZ1eCtu4ECAWtP7UleOiZ9LzVxRzzUZEoZ8zB24nhkQnDWyET0I+3sWokSDS3E7g==
 
 stackback@0.0.2:
   version "0.0.2"
