@@ -1,5 +1,5 @@
 /**
- * @fileoverview Service types for Zod Runtime Plugin, mapping utils in particular.
+ * @fileoverview Mapping utils for Zod Runtime Plugin (remap)
  * @link https://stackoverflow.com/questions/55454125/typescript-remapping-object-properties-in-typesafe
  */
 type TuplesFromObject<T> = {
