@@ -1327,15 +1327,11 @@ describe("Documentation", () => {
             test: defaultEndpointsFactory.build({
               method: "get",
               input: z
-                .object({
-                  user_id: z.string(),
-                })
-                .transform((input) => camelize(input)),
+                .object({ user_id: z.string() })
+                .remap({ user_id: "userId" }),
               output: z
-                .object({
-                  userName: z.string(),
-                })
-                .transform((input) => snakify(input)),
+                .object({ userName: z.string() })
+                .remap({ userName: "user_name" }),
               handler: async ({ input: { userId } }) => ({
                 userName: `User ${userId}`,
               }),

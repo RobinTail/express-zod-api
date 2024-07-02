@@ -651,7 +651,9 @@ export const extractObjectSchema = (
       .reduce((acc, option) => acc.merge(option.partial()), z.object({}));
   } else if (subject instanceof z.ZodEffects) {
     return extractObjectSchema(subject._def.schema);
-  } // intersection left
+  } else if (subject instanceof z.ZodPipeline) {
+    return extractObjectSchema(subject._def.in);
+  } // intersection left:
   return extractObjectSchema(subject._def.left).merge(
     extractObjectSchema(subject._def.right),
   );

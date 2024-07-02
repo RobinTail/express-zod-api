@@ -20,7 +20,8 @@ export type IOSchema<U extends z.UnknownKeysParam = z.UnknownKeysParam> =
   | z.ZodIntersection<IOSchema<U>, IOSchema<U>>
   | z.ZodDiscriminatedUnion<string, BaseObject<U>[]>
   | ObjectBasedEffect<IOSchema<U>>
-  | RawSchema;
+  | RawSchema
+  | z.ZodPipeline<IOSchema<U>, IOSchema<U>>;
 
 /**
  * @description intersects input schemas of middlewares and the endpoint

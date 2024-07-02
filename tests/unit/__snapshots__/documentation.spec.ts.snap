@@ -3711,7 +3711,12 @@ paths:
                     type: string
                     const: success
                   data:
-                    format: any
+                    type: object
+                    properties:
+                      user_name:
+                        type: string
+                    required:
+                      - user_name
                 required:
                   - status
                   - data
