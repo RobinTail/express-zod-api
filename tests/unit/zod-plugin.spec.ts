@@ -81,5 +81,18 @@ describe("Zod Runtime Plugin", () => {
         userId: "test",
       });
     });
+
+    test("should support partial mapping", () => {
+      const schema = z.object({ user_id: z.string(), name: z.string() });
+      const mappedSchema = schema.remap({ user_id: "userId" });
+      expect(mappedSchema._def.out.shape).toEqual({
+        userId: schema.shape.user_id,
+        name: schema.shape.name,
+      });
+      expect(mappedSchema.parse({ user_id: "test", name: "some" })).toEqual({
+        userId: "test",
+        name: "some",
+      });
+    });
   });
 });

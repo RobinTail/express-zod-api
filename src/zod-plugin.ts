@@ -8,8 +8,9 @@
  * */
 import { clone, fromPairs, map, pipe, toPairs, pair } from "ramda";
 import { z } from "zod";
+import { FlatObject } from "./common-helpers";
 import { cloneSchema, Metadata, metaSymbol } from "./metadata";
-import { Remap } from "./mapping-helpers";
+import { Intact, Remap } from "./mapping-helpers";
 
 declare module "zod" {
   interface ZodTypeDef {
@@ -30,14 +31,11 @@ declare module "zod" {
     Output = z.objectOutputType<T, Catchall, UnknownKeys>,
     Input = z.objectInputType<T, Catchall, UnknownKeys>,
   > {
-    remap<V extends string, U extends { [P in keyof T]: V }>(
+    remap<V extends string, U extends { [P in keyof T]?: V }>(
       mapping: U,
     ): z.ZodPipeline<
-      z.ZodEffects<
-        this,
-        Remap<z.output<z.ZodObject<T, UnknownKeys, Catchall>>, U, V>
-      >,
-      z.ZodObject<Remap<T, U, V>>
+      z.ZodEffects<this, FlatObject>, // internal type simplified
+      z.ZodObject<Remap<T, U, V> & Intact<T, U>>
     >;
   }
 }
@@ -77,14 +75,16 @@ const objectMapper = function (
   return this.transform(
     pipe(
       toPairs,
-      map(([key, value]) => pair(mapping[key], value)),
+      map(([key, value]) => pair(key in mapping ? mapping[key] : key, value)),
       fromPairs,
     ),
   ).pipe(
     z.object(
       pipe(
         toPairs,
-        map(([key, schema]) => pair(mapping[String(key)], schema)),
+        map(([key, schema]) =>
+          pair(key in mapping ? mapping[String(key)] : key, schema),
+        ),
         fromPairs,
       )(clone(this.shape)), // immutable, no references to the original schemas
     ),

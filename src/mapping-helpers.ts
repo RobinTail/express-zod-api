@@ -13,6 +13,8 @@ type GetKeyByValue<T, V> =
       : never
     : never;
 
-export type Remap<T, U extends { [P in keyof T]: V }, V extends string> = {
-  [P in U[keyof U]]: T[GetKeyByValue<U, P>];
+export type Remap<T, U extends { [P in keyof T]?: V }, V extends string> = {
+  [P in NonNullable<U[keyof U]>]: T[GetKeyByValue<U, P>];
 };
+
+export type Intact<T, U> = { [K in Exclude<keyof T, keyof U>]: T[K] };

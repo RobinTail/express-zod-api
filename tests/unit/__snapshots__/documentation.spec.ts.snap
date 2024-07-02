@@ -3699,6 +3699,17 @@ paths:
           description: GET /v1/test Parameter
           schema:
             type: string
+        - name: at
+          in: query
+          required: true
+          description: YYYY-MM-DDTHH:mm:ss.sssZ
+          schema:
+            description: YYYY-MM-DDTHH:mm:ss.sssZ
+            type: string
+            format: date-time
+            pattern: ^\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?)?Z?$
+            externalDocs:
+              url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
       responses:
         "200":
           description: GET /v1/test Positive response

@@ -2,6 +2,17 @@
 
 ## Version 20
 
+### v20.2.0
+
+- Feature: Partial mapping support for `z.object().remap()`:
+  - Properties can be omitted in `remap()` in order to preserve them unchanged.
+
+```ts
+z.object({ user_name: z.string(), id: z.number() }).remap({
+  user_name: "userName", // —> { userName, id }
+});
+```
+
 ### v20.1.0
 
 - Feature: Top level transformations support and object schema remapping:
