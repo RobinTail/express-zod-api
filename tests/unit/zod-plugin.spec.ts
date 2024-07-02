@@ -1,0 +1,84 @@
+import { describe, expect, test } from "vitest";
+import { z } from "zod";
+import { metaSymbol } from "../../src/metadata";
+
+describe("Zod Runtime Plugin", () => {
+  describe(".example()", () => {
+    test("should be present", () => {
+      const schema = z.string();
+      expect(schema).toHaveProperty("example");
+      expect(typeof schema.example).toBe("function");
+    });
+
+    test("should set the corresponding metadata in the schema definition", () => {
+      const schema = z.string();
+      const schemaWithMeta = schema.example("test");
+      expect(schemaWithMeta._def[metaSymbol]).toHaveProperty("examples", [
+        "test",
+      ]);
+    });
+
+    test("Issue 827: should be immutable", () => {
+      const schema = z.string();
+      const schemaWithExample = schema.example("test");
+      expect(schemaWithExample._def[metaSymbol]?.examples).toEqual(["test"]);
+      expect(schema._def[metaSymbol]).toBeUndefined();
+    });
+
+    test("can be used multiple times", () => {
+      const schema = z.string();
+      const schemaWithMeta = schema
+        .example("test1")
+        .example("test2")
+        .example("test3");
+      expect(schemaWithMeta._def[metaSymbol]?.examples).toEqual([
+        "test1",
+        "test2",
+        "test3",
+      ]);
+    });
+
+    test("should withstand refinements", () => {
+      const schema = z.string();
+      const schemaWithMeta = schema.example("test");
+      expect(schemaWithMeta._def[metaSymbol]?.examples).toEqual(["test"]);
+      expect(schemaWithMeta.email()._def[metaSymbol]).toEqual({
+        examples: ["test"],
+      });
+    });
+  });
+
+  describe(".label()", () => {
+    test("should set the corresponding metadata in the schema definition", () => {
+      const schema = z
+        .string()
+        .datetime()
+        .default(() => new Date().toISOString());
+      const schemaWithMeta = schema.label("Today");
+      expect(schemaWithMeta._def[metaSymbol]).toHaveProperty(
+        "defaultLabel",
+        "Today",
+      );
+    });
+  });
+
+  describe(".brand()", () => {
+    test("should set the brand", () => {
+      expect(z.string().brand("test")._def[metaSymbol]?.brand).toEqual("test");
+    });
+  });
+
+  describe(".remap()", () => {
+    test("should transform and pipe the object schema keys", () => {
+      const schema = z.object({ user_id: z.string() });
+      const mappedSchema = schema.remap({ user_id: "userId" });
+      expect(mappedSchema._def.in._def.schema).toEqual(schema);
+      expect(mappedSchema._def.out.shape).toEqual({
+        userId: schema.shape.user_id,
+      });
+      expect(mappedSchema.parse({ user_id: "test" })).toEqual({
+        userId: "test",
+      });
+    });
+  });
+});

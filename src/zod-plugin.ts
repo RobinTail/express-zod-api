@@ -70,6 +70,7 @@ const brandSetter = function (
   });
 };
 
+/** @todo should clone schema? */
 const objectMapper = function (
   this: z.ZodObject<z.ZodRawShape>,
   mapping: Record<string, string>,
