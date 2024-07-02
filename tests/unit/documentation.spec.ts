@@ -1,3 +1,4 @@
+import camelize from "camelize-ts";
 import { config as exampleConfig } from "../../example/config";
 import { routing } from "../../example/routing";
 import {
@@ -1317,7 +1318,32 @@ describe("Documentation", () => {
   });
 
   describe("Feature #1869: Top level transformations", () => {
-    test("should handle in request and response", () => {
+    test("should handle object-to-object transformation in request", () => {
+      const spec = new Documentation({
+        config: sampleConfig,
+        routing: {
+          v1: {
+            test: defaultEndpointsFactory.build({
+              method: "get",
+              input: z
+                .object({ user_id: z.string() })
+                .transform((inputs) => camelize(inputs)),
+              output: z.object({}),
+              handler: async ({ input: { userId }, logger }) => {
+                logger.debug("userId", userId);
+                return {};
+              },
+            }),
+          },
+        },
+        version: "3.4.5",
+        title: "Testing top level transformations",
+        serverUrl: "https://example.com",
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
+    });
+
+    test("should handle in request and response using .remap()", () => {
       const spec = new Documentation({
         config: sampleConfig,
         routing: {

@@ -3683,7 +3683,7 @@ servers:
 "
 `;
 
-exports[`Documentation > Feature #1869: Top level transformations > should handle in request and response 1`] = `
+exports[`Documentation > Feature #1869: Top level transformations > should handle in request and response using .remap() 1`] = `
 "openapi: 3.1.0
 info:
   title: Testing top level transformations
@@ -3717,6 +3717,80 @@ paths:
                         type: string
                     required:
                       - user_name
+                required:
+                  - status
+                  - data
+        "400":
+          description: GET /v1/test Negative response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    const: error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                required:
+                  - status
+                  - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
+components:
+  schemas: {}
+  responses: {}
+  parameters: {}
+  examples: {}
+  requestBodies: {}
+  headers: {}
+  securitySchemes: {}
+  links: {}
+  callbacks: {}
+tags: []
+servers:
+  - url: https://example.com
+"
+`;
+
+exports[`Documentation > Feature #1869: Top level transformations > should handle object-to-object transformation in request 1`] = `
+"openapi: 3.1.0
+info:
+  title: Testing top level transformations
+  version: 3.4.5
+paths:
+  /v1/test:
+    get:
+      operationId: GetV1Test
+      parameters:
+        - name: user_id
+          in: query
+          required: true
+          description: GET /v1/test Parameter
+          schema:
+            type: string
+      responses:
+        "200":
+          description: GET /v1/test Positive response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    const: success
+                  data:
+                    type: object
                 required:
                   - status
                   - data
