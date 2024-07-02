@@ -1,13 +1,11 @@
 import { NextFunction, Request, Response } from "express";
 import { z } from "zod";
-import { hasTransformationOnTop } from "./deep-checks";
 import { EmptyObject, FlatObject } from "./common-helpers";
-import { InputValidationError, IOSchemaError } from "./errors";
+import { InputValidationError } from "./errors";
 import { IOSchema } from "./io-schema";
 import { LogicalContainer } from "./logical-container";
 import { Security } from "./security";
 import { ActualLogger } from "./logger-helpers";
-import assert from "node:assert/strict";
 
 type Handler<IN, OPT, OUT> = (params: {
   input: IN;
@@ -53,12 +51,6 @@ export class Middleware<
     handler: Handler<z.output<IN>, OPT, OUT>;
   }) {
     super();
-    assert(
-      !hasTransformationOnTop(input),
-      new IOSchemaError(
-        "Using transformations on the top level of middleware input schema is not allowed.",
-      ),
-    );
     this.#schema = input;
     this.#security = security;
     this.#handler = handler;

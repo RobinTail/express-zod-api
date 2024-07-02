@@ -1,8 +1,7 @@
 import { Request, Response } from "express";
-import assert from "node:assert/strict";
 import { z } from "zod";
 import { NormalizedResponse } from "./api-response";
-import { hasRaw, hasTransformationOnTop, hasUpload } from "./deep-checks";
+import { hasRaw, hasUpload } from "./deep-checks";
 import {
   FlatObject,
   getActualMethod,
@@ -11,7 +10,6 @@ import {
 } from "./common-helpers";
 import { CommonConfig } from "./config-type";
 import {
-  IOSchemaError,
   InputValidationError,
   OutputValidationError,
   ResultHandlerError,
@@ -120,14 +118,6 @@ export class Endpoint<
     this.#tags = Object.freeze(tags);
     this.#descriptions = { long, short };
     this.#schemas = { input: inputSchema, output: outputSchema };
-    for (const [variant, schema] of Object.entries(this.#schemas)) {
-      assert(
-        !hasTransformationOnTop(schema),
-        new IOSchemaError(
-          `Using transformations on the top level of endpoint ${variant} schema is not allowed.`,
-        ),
-      );
-    }
     this.#responses = {
       positive: Object.freeze(resultHandler.getPositiveResponse(outputSchema)),
       negative: Object.freeze(resultHandler.getNegativeResponse()),

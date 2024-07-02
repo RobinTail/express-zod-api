@@ -1397,6 +1397,17 @@ exports[`Documentation helpers > extractObjectSchema() > Feature #600: Top level
 }
 `;
 
+exports[`Documentation helpers > extractObjectSchema() > Feature #1869: Top level transformations > should handle transformations to another object 1`] = `
+{
+  "_type": "ZodObject",
+  "shape": {
+    "one": {
+      "_type": "ZodString",
+    },
+  },
+}
+`;
+
 exports[`Documentation helpers > extractObjectSchema() > should pass the object schema through 1`] = `
 {
   "_type": "ZodObject",

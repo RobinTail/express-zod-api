@@ -1,22 +1,27 @@
 import { z } from "zod";
+import { FlatObject } from "./common-helpers";
 import { copyMeta } from "./metadata";
 import { AbstractMiddleware } from "./middleware";
 import { RawSchema } from "./raw-schema";
 
-type Refined<T extends z.ZodTypeAny> =
-  T extends z.ZodType<infer O> ? z.ZodEffects<T | Refined<T>, O, O> : never;
+type BaseObject<U extends z.UnknownKeysParam> = z.ZodObject<z.ZodRawShape, U>;
+
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type -- workaround for TS2456, circular reference
+interface ObjectBasedEffect<T extends z.ZodTypeAny>
+  extends z.ZodEffects<T, FlatObject> {}
 
 /**
  * @desc The type allowed on the top level of Middlewares and Endpoints
  * @param U — only "strip" is allowed for Middlewares due to intersection issue (Zod) #600
  * */
 export type IOSchema<U extends z.UnknownKeysParam = z.UnknownKeysParam> =
-  | z.ZodObject<z.ZodRawShape, U>
+  | BaseObject<U>
   | z.ZodUnion<[IOSchema<U>, ...IOSchema<U>[]]>
   | z.ZodIntersection<IOSchema<U>, IOSchema<U>>
-  | z.ZodDiscriminatedUnion<string, z.ZodObject<z.ZodRawShape, U>[]>
-  | Refined<z.ZodObject<z.ZodRawShape, U>>
-  | RawSchema;
+  | z.ZodDiscriminatedUnion<string, BaseObject<U>[]>
+  | ObjectBasedEffect<IOSchema<U>>
+  | RawSchema
+  | z.ZodPipeline<IOSchema<U>, IOSchema<U>>;
 
 /**
  * @description intersects input schemas of middlewares and the endpoint

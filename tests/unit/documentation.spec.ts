@@ -1315,4 +1315,32 @@ describe("Documentation", () => {
       expect(spec).toMatchSnapshot();
     });
   });
+
+  describe("Feature #1869: Top level transformations", () => {
+    test("should handle in request and response", () => {
+      const spec = new Documentation({
+        config: sampleConfig,
+        routing: {
+          v1: {
+            test: defaultEndpointsFactory.build({
+              method: "get",
+              input: z
+                .object({ user_id: z.string() })
+                .remap({ user_id: "userId" }),
+              output: z
+                .object({ userName: z.string() })
+                .remap({ userName: "user_name" }),
+              handler: async ({ input: { userId } }) => ({
+                userName: `User ${userId}`,
+              }),
+            }),
+          },
+        },
+        version: "3.4.5",
+        title: "Testing top level transformations",
+        serverUrl: "https://example.com",
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
+    });
+  });
 });
