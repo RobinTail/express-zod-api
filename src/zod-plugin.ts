@@ -6,15 +6,7 @@
  * @desc Enables .label() on ZodDefault
  * @desc Stores the argument supplied to .brand() on all schema (runtime distinguishable branded types)
  * */
-import {
-  clone,
-  fromPairs,
-  KeyValuePair,
-  map,
-  pipe,
-  toPairs,
-  Tuple,
-} from "ramda";
+import { clone, fromPairs, map, pipe, toPairs } from "ramda";
 import { z } from "zod";
 import { Metadata, cloneSchema, metaSymbol } from "./metadata";
 
