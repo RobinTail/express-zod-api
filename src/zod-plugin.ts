@@ -8,6 +8,7 @@
  * */
 import { clone, fromPairs, map, pipe, toPairs, pair } from "ramda";
 import { z } from "zod";
+import { FlatObject } from "./common-helpers";
 import { cloneSchema, Metadata, metaSymbol } from "./metadata";
 import { Remap } from "./mapping-helpers";
 
@@ -33,10 +34,7 @@ declare module "zod" {
     remap<V extends string, U extends { [P in keyof T]: V }>(
       mapping: U,
     ): z.ZodPipeline<
-      z.ZodEffects<
-        this,
-        Remap<z.output<z.ZodObject<T, UnknownKeys, Catchall>>, U, V>
-      >,
+      z.ZodEffects<this, FlatObject>, // internal type simplified
       z.ZodObject<Remap<T, U, V>>
     >;
   }
