@@ -1,5 +1,3 @@
-import camelize from "camelize-ts";
-import snakify from "snakify-ts";
 import { config as exampleConfig } from "../../example/config";
 import { routing } from "../../example/routing";
 import {
