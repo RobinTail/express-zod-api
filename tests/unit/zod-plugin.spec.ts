@@ -76,6 +76,7 @@ describe("Zod Runtime Plugin", () => {
       expect(mappedSchema._def.out.shape).toEqual({
         userId: schema.shape.user_id,
       });
+      expect(mappedSchema._def.out.shape.userId).not.toBe(schema.shape.user_id);
       expect(mappedSchema.parse({ user_id: "test" })).toEqual({
         userId: "test",
       });
