@@ -20,6 +20,9 @@ type GetKeyByValue<T, V> =
       ? P
       : never
     : never;
+type Remap<T, U extends { [P in keyof T]: V }, V extends string> = {
+  [P in U[keyof U]]: T[GetKeyByValue<U, P>];
+};
 
 declare module "zod" {
   interface ZodTypeDef {
@@ -45,9 +48,9 @@ declare module "zod" {
     ): z.ZodPipeline<
       z.ZodEffects<
         this,
-        { [P in U[keyof U]]: T[GetKeyByValue<U, P>]["_output"] }
+        Remap<z.output<z.ZodObject<T, UnknownKeys, Catchall>>, U, V>
       >,
-      z.ZodObject<{ [P in U[keyof U]]: T[GetKeyByValue<U, P>] }>
+      z.ZodObject<Remap<T, U, V>>
     >;
   }
 }
