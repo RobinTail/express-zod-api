@@ -6,7 +6,15 @@
  * @desc Enables .label() on ZodDefault
  * @desc Stores the argument supplied to .brand() on all schema (runtime distinguishable branded types)
  * */
-import { clone, fromPairs, map, pipe, toPairs } from "ramda";
+import {
+  clone,
+  fromPairs,
+  KeyValuePair,
+  map,
+  pipe,
+  toPairs,
+  Tuple,
+} from "ramda";
 import { z } from "zod";
 import { Metadata, cloneSchema, metaSymbol } from "./metadata";
 
@@ -90,7 +98,7 @@ const objectMapper = function (
   return this.transform(
     pipe(
       toPairs,
-      map<[string, unknown], [string, unknown]>(([key, value]) => [
+      map(([key, value]): [(typeof mapping)[typeof key], typeof value] => [
         mapping[key],
         value,
       ]),
