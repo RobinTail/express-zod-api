@@ -434,7 +434,7 @@ const getUserEndpoint = endpointsFactory.build({
 For some APIs it may be important that public interfaces such as query parameters use snake case, while the
 implementation itself requires camel case for constants and their properties. Since version 20.1.0 the library offers
 several ways to facilitate interoperability between the different naming standards. The first thing to note is that you
-can transform the entire `input` schema using a well-typed mapping library.
+can transform the entire `input` schema into another object using a well-typed mapping library.
 
 ```ts
 import camelize from "camelize-ts";
