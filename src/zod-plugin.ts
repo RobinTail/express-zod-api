@@ -8,21 +8,8 @@
  * */
 import { clone, fromPairs, map, pipe, toPairs } from "ramda";
 import { z } from "zod";
-import { Metadata, cloneSchema, metaSymbol } from "./metadata";
-
-// @link https://stackoverflow.com/questions/55454125/typescript-remapping-object-properties-in-typesafe
-type TuplesFromObject<T> = {
-  [P in keyof T]: [P, T[P]];
-}[keyof T];
-type GetKeyByValue<T, V> =
-  TuplesFromObject<T> extends infer TT
-    ? TT extends [infer P, V]
-      ? P
-      : never
-    : never;
-type Remap<T, U extends { [P in keyof T]: V }, V extends string> = {
-  [P in U[keyof U]]: T[GetKeyByValue<U, P>];
-};
+import { cloneSchema, Metadata, metaSymbol } from "./metadata";
+import { asTuple, Remap } from "./mapping-helpers";
 
 declare module "zod" {
   interface ZodTypeDef {
@@ -90,20 +77,14 @@ const objectMapper = function (
   return this.transform(
     pipe(
       toPairs,
-      map(([key, value]): [(typeof mapping)[typeof key], typeof value] => [
-        mapping[key],
-        value,
-      ]),
+      map(([key, value]) => asTuple(mapping[key], value)),
       fromPairs,
     ),
   ).pipe(
     z.object(
       pipe(
         toPairs,
-        map(([key, schema]): [(typeof mapping)[string], typeof schema] => [
-          mapping[String(key)],
-          schema,
-        ]),
+        map(([key, schema]) => asTuple(mapping[String(key)], schema)),
         fromPairs,
       )(this.shape),
     ),
