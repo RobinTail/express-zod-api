@@ -2,6 +2,38 @@
 
 ## Version 20
 
+### v20.1.0
+
+- Feature: Top level transformations support and object schema remapping:
+  - This can enable having `snake_case` API parameters while keeping `camelCase` naming in your implementation;
+  - You can `.transform()` the entire `input` schema into another object, using a well-typed mapping library;
+  - You can do the same with the `output` schema, but that would not be enough for generating a valid documentation;
+  - The library offers a new `.remap()` method on the `z.object()` schema that applies a `.pipe()` to transformation;
+    - Currently `.remap()` requires an assignment of all the object props explicitly, but it may be improved later;
+  - Find more details [in the documentation](README.md#top-level-transformations-and-mapping);
+  - The feature suggested by [Peter Rottmann](https://github.com/rottmann).
+
+```ts
+import camelize from "camelize-ts";
+import { z } from "zod";
+
+const endpoint = endpointsFactory.build({
+  method: "get",
+  input: z
+    .object({ user_id: z.string() })
+    .transform((inputs) => camelize(inputs)),
+  output: z.object({ userName: z.string() }).remap({ userName: "user_name" }),
+  handler: async ({ input: { userId }, logger }) => {
+    logger.debug("user_id became userId", userId);
+    return { userName: "Agneta" }; // becomes "user_name" in response
+  },
+});
+```
+
+### v20.0.1
+
+- Found a better method for asserting the expected response: `responseMock._getJSONData()`.
+
 ### v20.0.0
 
 - Method `createLogger()` removed — use `new BuiltinLogger()` instead if needed;
@@ -82,8 +114,7 @@ expect(loggerMockBefore.error).not.toHaveBeenCalled();
 const { responseMock, loggerMock } = testEndpoint({ endpoint });
 expect(responseMock._getStatusCode()).toBe(200);
 expect(responseMock._getHeaders()).toHaveProperty("x-custom", "one"); // lower case!
-expect(responseMock._getData()).toBe(JSON.stringify({ status: "success" })); // or:
-expect(JSON.parse(responseMock._getData())).toEqual({ status: "success" });
+expect(responseMock._getJSONData()).toEqual({ status: "success" });
 expect(loggerMock._getLogs().error).toHaveLength(0);
 ```
 

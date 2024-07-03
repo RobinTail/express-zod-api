@@ -10,7 +10,6 @@ import {
   ResultHandler,
 } from "../../src";
 import { AbstractEndpoint, Endpoint } from "../../src/endpoint";
-import { IOSchemaError } from "../../src/errors";
 import { serializeSchemaForTest } from "../helpers";
 import { describe, expect, test, vi } from "vitest";
 
@@ -120,12 +119,10 @@ describe("Endpoint", () => {
         response: responseMock,
       });
       expect(responseMock._getStatusCode()).toBe(200);
-      expect(responseMock._getData()).toBe(
-        JSON.stringify({
-          status: "success",
-          data: { inc2: 455, str: "453.00", transform: 4 },
-        }),
-      );
+      expect(responseMock._getJSONData()).toEqual({
+        status: "success",
+        data: { inc2: 455, str: "453.00", transform: 4 },
+      });
     });
 
     test("should close the stream on OPTIONS request", async () => {
@@ -170,12 +167,10 @@ describe("Endpoint", () => {
       });
       const { responseMock } = await testEndpoint({ endpoint });
       expect(responseMock._getStatusCode()).toBe(500);
-      expect(responseMock._getData()).toBe(
-        JSON.stringify({
-          status: "error",
-          error: { message: "output/email: Invalid email" },
-        }),
-      );
+      expect(responseMock._getJSONData()).toEqual({
+        status: "error",
+        error: { message: "output/email: Invalid email" },
+      });
     });
 
     test("Should throw on output parsing non-Zod error", async () => {
@@ -193,12 +188,10 @@ describe("Endpoint", () => {
       const { responseMock, loggerMock } = await testEndpoint({ endpoint });
       expect(loggerMock._getLogs().error).toHaveLength(1);
       expect(responseMock._getStatusCode()).toBe(500);
-      expect(responseMock._getData()).toBe(
-        JSON.stringify({
-          status: "error",
-          error: { message: "Something unexpected" },
-        }),
-      );
+      expect(responseMock._getJSONData()).toEqual({
+        status: "error",
+        error: { message: "Something unexpected" },
+      });
     });
   });
 
@@ -401,12 +394,10 @@ describe("Endpoint", () => {
           body: { n: 123, m: 5 },
         },
       });
-      expect(responseMock._getData()).toBe(
-        JSON.stringify({
-          status: "success",
-          data: { str: "This is fine" },
-        }),
-      );
+      expect(responseMock._getJSONData()).toEqual({
+        status: "success",
+        data: { str: "This is fine" },
+      });
     });
   });
 
@@ -464,12 +455,10 @@ describe("Endpoint", () => {
       const { responseMock, loggerMock } = await testEndpoint({ endpoint });
       expect(loggerMock._getLogs().error).toHaveLength(1);
       expect(responseMock._getStatusCode()).toBe(500);
-      expect(responseMock._getData()).toBe(
-        JSON.stringify({
-          status: "error",
-          error: { message: "Something unexpected" },
-        }),
-      );
+      expect(responseMock._getJSONData()).toEqual({
+        status: "error",
+        error: { message: "Something unexpected" },
+      });
     });
 
     test("thrown in #handleResult()", async () => {
@@ -518,12 +507,10 @@ describe("Endpoint", () => {
       });
       expect(loggerMock._getLogs().error).toHaveLength(1);
       expect(responseMock._getStatusCode()).toBe(500);
-      expect(responseMock._getData()).toBe(
-        JSON.stringify({
-          status: "error",
-          error: { message: "Something went wrong" },
-        }),
-      );
+      expect(responseMock._getJSONData()).toEqual({
+        status: "error",
+        error: { message: "Something went wrong" },
+      });
     });
   });
 
@@ -574,9 +561,10 @@ describe("Endpoint", () => {
           },
         },
       });
-      expect(responseMock._getData()).toBe(
-        JSON.stringify({ status: "success", data: {} }),
-      );
+      expect(responseMock._getJSONData()).toEqual({
+        status: "success",
+        data: {},
+      });
       expect(responseMock._getStatusCode()).toBe(200);
     });
 
@@ -591,15 +579,12 @@ describe("Endpoint", () => {
           },
         },
       });
-      expect(responseMock._getData()).toBe(
-        JSON.stringify({
-          status: "error",
-          error: {
-            message:
-              "dynamicValue: type1Attribute is required if type is type1",
-          },
-        }),
-      );
+      expect(responseMock._getJSONData()).toEqual({
+        status: "error",
+        error: {
+          message: "dynamicValue: type1Attribute is required if type is type1",
+        },
+      });
       expect(responseMock._getStatusCode()).toBe(400);
     });
 
@@ -615,12 +600,10 @@ describe("Endpoint", () => {
           },
         },
       });
-      expect(responseMock._getData()).toBe(
-        JSON.stringify({
-          status: "error",
-          error: { message: "output: failure on demand" },
-        }),
-      );
+      expect(responseMock._getJSONData()).toEqual({
+        status: "error",
+        error: { message: "output: failure on demand" },
+      });
       expect(responseMock._getStatusCode()).toBe(500);
     });
   });
@@ -652,9 +635,10 @@ describe("Endpoint", () => {
           },
         },
       });
-      expect(responseMock._getData()).toBe(
-        JSON.stringify({ status: "success", data: {} }),
-      );
+      expect(responseMock._getJSONData()).toEqual({
+        status: "success",
+        data: {},
+      });
       expect(responseMock._getStatusCode()).toBe(200);
     });
 
@@ -666,52 +650,11 @@ describe("Endpoint", () => {
           body: {},
         },
       });
-      expect(responseMock._getData()).toBe(
-        JSON.stringify({
-          status: "error",
-          error: { message: "Please provide at least one property" },
-        }),
-      );
+      expect(responseMock._getJSONData()).toEqual({
+        status: "error",
+        error: { message: "Please provide at least one property" },
+      });
       expect(responseMock._getStatusCode()).toBe(400);
-    });
-
-    test("should throw when using transformation (constructor)", () => {
-      expect(
-        () =>
-          new Endpoint({
-            methods: ["get"],
-            inputSchema: z.object({}).transform(() => []),
-            outputSchema: z.object({}),
-            handler: vi.fn<any>(),
-            resultHandler: new ResultHandler({
-              positive: vi.fn(),
-              negative: vi.fn(),
-              handler: vi.fn(),
-            }),
-          }),
-      ).toThrow(
-        new IOSchemaError(
-          "Using transformations on the top level of endpoint input schema is not allowed.",
-        ),
-      );
-      expect(
-        () =>
-          new Endpoint({
-            methods: ["get"],
-            inputSchema: z.object({}),
-            outputSchema: z.object({}).transform(() => []),
-            handler: vi.fn<any>(),
-            resultHandler: new ResultHandler({
-              positive: vi.fn(),
-              negative: vi.fn(),
-              handler: vi.fn(),
-            }),
-          }),
-      ).toThrow(
-        new IOSchemaError(
-          "Using transformations on the top level of endpoint output schema is not allowed.",
-        ),
-      );
     });
   });
 

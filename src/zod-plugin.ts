@@ -6,9 +6,11 @@
  * @desc Enables .label() on ZodDefault
  * @desc Stores the argument supplied to .brand() on all schema (runtime distinguishable branded types)
  * */
-import { clone } from "ramda";
+import { clone, fromPairs, map, pipe, toPairs, pair } from "ramda";
 import { z } from "zod";
-import { Metadata, cloneSchema, metaSymbol } from "./metadata";
+import { FlatObject } from "./common-helpers";
+import { cloneSchema, Metadata, metaSymbol } from "./metadata";
+import { Remap } from "./mapping-helpers";
 
 declare module "zod" {
   interface ZodTypeDef {
@@ -21,6 +23,20 @@ declare module "zod" {
   interface ZodDefault<T extends z.ZodTypeAny> {
     /** @desc Change the default value in the generated Documentation to a label */
     label(label: string): this;
+  }
+  interface ZodObject<
+    T extends z.ZodRawShape,
+    UnknownKeys extends z.UnknownKeysParam = z.UnknownKeysParam,
+    Catchall extends z.ZodTypeAny = z.ZodTypeAny,
+    Output = z.objectOutputType<T, Catchall, UnknownKeys>,
+    Input = z.objectInputType<T, Catchall, UnknownKeys>,
+  > {
+    remap<V extends string, U extends { [P in keyof T]: V }>(
+      mapping: U,
+    ): z.ZodPipeline<
+      z.ZodEffects<this, FlatObject>, // internal type simplified
+      z.ZodObject<Remap<T, U, V>>
+    >;
   }
 }
 
@@ -52,6 +68,27 @@ const brandSetter = function (
   });
 };
 
+const objectMapper = function (
+  this: z.ZodObject<z.ZodRawShape>,
+  mapping: Record<string, string>,
+) {
+  return this.transform(
+    pipe(
+      toPairs,
+      map(([key, value]) => pair(mapping[key], value)),
+      fromPairs,
+    ),
+  ).pipe(
+    z.object(
+      pipe(
+        toPairs,
+        map(([key, schema]) => pair(mapping[String(key)], schema)),
+        fromPairs,
+      )(clone(this.shape)), // immutable, no references to the original schemas
+    ),
+  );
+};
+
 if (!(metaSymbol in globalThis)) {
   (globalThis as Record<symbol, unknown>)[metaSymbol] = true;
   Object.defineProperties(z.ZodType.prototype, {
@@ -73,6 +110,15 @@ if (!(metaSymbol in globalThis)) {
     {
       get(): z.ZodDefault<z.ZodTypeAny>["label"] {
         return labelSetter.bind(this);
+      },
+    },
+  );
+  Object.defineProperty(
+    z.ZodObject.prototype,
+    "remap" satisfies keyof z.ZodObject<z.ZodRawShape>,
+    {
+      get() {
+        return objectMapper.bind(this) as z.ZodObject<z.ZodRawShape>["remap"];
       },
     },
   );

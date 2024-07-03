@@ -31,12 +31,13 @@ Start your API server with I/O schema validation and custom middlewares in minut
    3. [Using native express middlewares](#using-native-express-middlewares)
    4. [Refinements](#refinements)
    5. [Transformations](#transformations)
-   6. [Dealing with dates](#dealing-with-dates)
-   7. [Cross-Origin Resource Sharing](#cross-origin-resource-sharing) (CORS)
-   8. [Enabling HTTPS](#enabling-https)
-   9. [Customizing logger](#customizing-logger)
-   10. [Child logger](#child-logger)
-   11. [Enabling compression](#enabling-compression)
+   6. [Top level transformations and mapping](#top-level-transformations-and-mapping)
+   7. [Dealing with dates](#dealing-with-dates)
+   8. [Cross-Origin Resource Sharing](#cross-origin-resource-sharing) (CORS)
+   9. [Enabling HTTPS](#enabling-https)
+   10. [Customizing logger](#customizing-logger)
+   11. [Child logger](#child-logger)
+   12. [Enabling compression](#enabling-compression)
 5. [Advanced features](#advanced-features)
    1. [Customizing input sources](#customizing-input-sources)
    2. [Route path params](#route-path-params)
@@ -421,13 +422,48 @@ const getUserEndpoint = endpointsFactory.build({
       .string()
       .transform((ids) => ids.split(",").map((id) => parseInt(id, 10))),
   }),
-  output: z.object({
-    /* ... */
-  }),
   handler: async ({ input: { id, ids }, logger }) => {
     logger.debug("id", id); // type: number
     logger.debug("ids", ids); // type: number[]
   },
+});
+```
+
+## Top level transformations and mapping
+
+For some APIs it may be important that public interfaces such as query parameters use snake case, while the
+implementation itself requires camel case for constants and their properties. Since version 20.1.0 the library offers
+several ways to facilitate interoperability between the different naming standards. The first thing to note is that you
+can transform the entire `input` schema into another object using a well-typed mapping library.
+
+```ts
+import camelize from "camelize-ts";
+import { z } from "zod";
+
+const endpoint = endpointsFactory.build({
+  method: "get",
+  input: z
+    .object({ user_id: z.string() })
+    .transform((inputs) => camelize(inputs)),
+  handler: async ({ input: { userId }, logger }) => {
+    logger.debug("user_id became userId", userId);
+  },
+});
+```
+
+Of course, you can do the same with the `output` schema, but that would not be enough to
+[generate a valid documentation](#creating-a-documentation), because the transformations themselves do not contain the
+schemas on which the documentation is based. In this case, the library offers the `remap()` method of the object schema,
+a part of the [Zod plugin](#zod-plugin), which under the hood, in addition to the transformation, also pipes the result
+into a new transformed object schema.
+
+```ts
+import { z } from "zod";
+
+const endpoint = endpointsFactory.build({
+  method: "get",
+  output: z.object({ userName: z.string() }).remap({ userName: "user_name" }),
+  handler: async () => ({ userName: "Agneta" }), // becomes "user_name" in response
 });
 ```
 
@@ -924,8 +960,7 @@ test("should respond successfully", async () => {
   expect(loggerMock._getLogs().error).toHaveLength(0);
   expect(responseMock._getStatusCode()).toBe(200);
   expect(responseMock._getHeaders()).toHaveProperty("x-custom", "one"); // lower case!
-  expect(responseMock._getData()).toBe(JSON.stringify({ status: "success" })); // or:
-  expect(JSON.parse(responseMock._getData())).toEqual({ status: "success" });
+  expect(responseMock._getJSONData()).toEqual({ status: "success" });
 });
 ```
 

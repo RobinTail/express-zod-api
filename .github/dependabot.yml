@@ -11,10 +11,6 @@ updates:
     schedule:
       interval: "weekly"
     groups:
-      eslint:
-        patterns:
-          - "eslint"
-          - "@eslint/js"
       typescript-eslint:
         patterns:
           - "typescript-eslint"

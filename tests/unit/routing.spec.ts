@@ -384,12 +384,10 @@ describe("Routing", () => {
         logger: loggerMock,
       });
       expect(responseMock._getStatusCode()).toBe(200);
-      expect(responseMock._getData()).toBe(
-        JSON.stringify({
-          status: "success",
-          data: { result: true },
-        }),
-      );
+      expect(responseMock._getJSONData()).toEqual({
+        status: "success",
+        data: { result: true },
+      });
     });
 
     test("should override the logger with a child logger if present in response.locals", async () => {
