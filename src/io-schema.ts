@@ -10,17 +10,21 @@ type BaseObject<U extends z.UnknownKeysParam> = z.ZodObject<z.ZodRawShape, U>;
 interface ObjectBasedEffect<T extends z.ZodTypeAny>
   extends z.ZodEffects<T, FlatObject> {}
 
+type EffectsChain<U extends z.UnknownKeysParam> = ObjectBasedEffect<
+  BaseObject<U> | EffectsChain<U>
+>;
+
 /**
  * @desc The type allowed on the top level of Middlewares and Endpoints
  * @param U — only "strip" is allowed for Middlewares due to intersection issue (Zod) #600
  * */
 export type IOSchema<U extends z.UnknownKeysParam = z.UnknownKeysParam> =
   | BaseObject<U> // z.object()
+  | EffectsChain<U> // z.object().refine(), z.object().transform(), z.object().preprocess()
+  | RawSchema // ez.raw()
   | z.ZodUnion<[IOSchema<U>, ...IOSchema<U>[]]> // z.object().or()
   | z.ZodIntersection<IOSchema<U>, IOSchema<U>> // z.object().and()
   | z.ZodDiscriminatedUnion<string, BaseObject<U>[]> // z.discriminatedUnion()
-  | ObjectBasedEffect<IOSchema<U>> // z.object().refine(), z.object().transform(), z.object().preprocess()
-  | RawSchema // ez.raw()
   | z.ZodPipeline<ObjectBasedEffect<BaseObject<U>>, BaseObject<U>>; // z.object().remap()
 
 /**
