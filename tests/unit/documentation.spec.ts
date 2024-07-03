@@ -1327,7 +1327,7 @@ describe("Documentation", () => {
               method: "get",
               input: z
                 .object({ user_id: z.string() })
-                .transform((inputs) => camelize(inputs)),
+                .transform((inputs) => camelize(inputs, true)),
               output: z.object({}),
               handler: async ({ input: { userId }, logger }) => {
                 logger.debug("userId", userId);

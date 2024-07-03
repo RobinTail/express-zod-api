@@ -444,7 +444,7 @@ const endpoint = endpointsFactory.build({
   method: "get",
   input: z
     .object({ user_id: z.string() })
-    .transform((inputs) => camelize(inputs)),
+    .transform((inputs) => camelize(inputs, true)), // shallow
   handler: async ({ input: { userId }, logger }) => {
     logger.debug("user_id became userId", userId);
   },
