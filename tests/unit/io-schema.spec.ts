@@ -85,9 +85,25 @@ describe("I/O Schema and related helpers", () => {
           z.object({ s: z.string() }).transform(() => ({ n: 123 })),
         );
       });
-      test("does not accept transformation to other types", () => {
+      test("accepts piping into another object schema", () => {
+        expectType<IOSchema>(
+          z
+            .object({ s: z.string() })
+            .transform(() => ({ n: 123 }))
+            .pipe(z.object({ n: z.number() })),
+        );
+        expectType<IOSchema>(
+          z.object({ user_id: z.string() }).remap({ user_id: "userId" }),
+        );
+      });
+      test("does not accept transformation to another type", () => {
         expectNotType<IOSchema>(z.object({}).transform(() => true));
         expectNotType<IOSchema>(z.object({}).transform(() => []));
+      });
+      test("does not accept piping into another kind of schema", () => {
+        expectNotType<IOSchema>(
+          z.object({ s: z.string() }).pipe(z.array(z.string())),
+        );
       });
     });
   });
