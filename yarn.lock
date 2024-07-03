@@ -15,10 +15,10 @@
   resolved "https://registry.yarnpkg.com/@andrewbranch/untar.js/-/untar.js-1.0.3.tgz#ba9494f85eb83017c5c855763969caf1d0adea00"
   integrity sha512-Jh15/qVmrLGhkKJBdXlK1+9tY4lZruYjsgkDFj08ZmDiWVBLJcqkok7Z0/R0In+i1rScBpJlSvrTS2Lm41Pbnw==
 
-"@arethetypeswrong/cli@^0.15.0":
-  version "0.15.3"
-  resolved "https://registry.yarnpkg.com/@arethetypeswrong/cli/-/cli-0.15.3.tgz#76e74f1942ef0cba0899d103589edf7800a0986d"
-  integrity sha512-sIMA9ZJBWDEg1+xt5RkAEflZuf8+PO8SdKj17x6PtETuUho+qlZJg4DgmKc3q+QwQ9zOB5VLK6jVRbFdNLdUIA==
+"@arethetypeswrong/cli@^0.16.0":
+  version "0.16.0"
+  resolved "https://registry.yarnpkg.com/@arethetypeswrong/cli/-/cli-0.16.0.tgz#28ac0aaaea55dcbe7d9c7b9a5462454b9b39f36f"
+  integrity sha512-Vn3ihwlhueIvyJ6V3PKS8zwll9TId5Radvl3GS58ITimafJNoYRribKCoymYFiFS3jH6TspM30KhhiMvnMGvNQ==
   dependencies:
     "@arethetypeswrong/core" "0.15.1"
     chalk "^4.1.2"
@@ -27,6 +27,7 @@
     marked "^9.1.2"
     marked-terminal "^6.0.0"
     semver "^7.5.4"
+    which-pm-runs "^1.1.0"
 
 "@arethetypeswrong/core@0.15.1":
   version "0.15.1"
@@ -3963,6 +3964,11 @@ whatwg-url@^7.0.0:
     lodash.sortby "^4.7.0"
     tr46 "^1.0.1"
     webidl-conversions "^4.0.2"
+
+which-pm-runs@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/which-pm-runs/-/which-pm-runs-1.1.0.tgz#35ccf7b1a0fce87bd8b92a478c9d045785d3bf35"
+  integrity sha512-n1brCuqClxfFfq/Rb0ICg9giSZqCS+pLtccdag6C2HyufBrh3fBOiy9nb6ggRMvWOVH5GrdJskj5iGTZNxd7SA==
 
 which@^2.0.1:
   version "2.0.2"
