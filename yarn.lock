@@ -3818,6 +3818,11 @@ type-is@^1.6.18, type-is@~1.6.18:
     media-typer "0.3.0"
     mime-types "~2.1.24"
 
+typed-case@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/typed-case/-/typed-case-1.0.3.tgz#67c97009d707d629b841264d165feb2f6ef21dba"
+  integrity sha512-yZ0UgzdG1cypdxlnpTE79WT85MOX+XxkWZoFyFshyYwgT1yj3MtU1lYwb1eVxaL5S5mcD1w3wT5tG3rzE5Vh6w==
+
 types-ramda@^0.30.0:
   version "0.30.0"
   resolved "https://registry.yarnpkg.com/types-ramda/-/types-ramda-0.30.0.tgz#d4bae9c2ebaebb3fdbd538094f419ce13454cfde"

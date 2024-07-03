@@ -2,6 +2,7 @@ import { Request } from "express";
 import { isHttpError } from "http-errors";
 import { createHash } from "node:crypto";
 import { flip, pickBy, xprod } from "ramda";
+import { toPascalCase } from "typed-case";
 import { z } from "zod";
 import { CommonConfig, InputSource, InputSources } from "./config-type";
 import { InputValidationError, OutputValidationError } from "./errors";
@@ -161,17 +162,12 @@ export const hasCoercion = (schema: z.ZodTypeAny): boolean =>
     ? schema._def.coerce
     : false;
 
-export const ucFirst = (subject: string) =>
-  subject.charAt(0).toUpperCase() + subject.slice(1).toLowerCase();
-
 export const makeCleanId = (...args: string[]) =>
   args
     .flatMap((entry) => entry.split(/[^A-Z0-9]/gi)) // split by non-alphanumeric characters
-    .flatMap((entry) =>
-      // split by sequences of capitalized letters
-      entry.replaceAll(/[A-Z]+/g, (beginning) => `/${beginning}`).split("/"),
+    .map((entry) =>
+      toPascalCase(entry, { preserveConsecutiveUppercase: false }),
     )
-    .map(ucFirst)
     .join("");
 
 export const defaultSerializer = (schema: z.ZodTypeAny): string =>

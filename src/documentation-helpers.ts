@@ -41,6 +41,7 @@ import {
   xprod,
   zip,
 } from "ramda";
+import { capitalize } from "typed-case";
 import { z } from "zod";
 import {
   FlatObject,
@@ -51,7 +52,6 @@ import {
   isObject,
   makeCleanId,
   tryToTransform,
-  ucFirst,
 } from "./common-helpers";
 import { InputSource, TagsConfig } from "./config-type";
 import { DateInSchema, ezDateInBrand } from "./date-in-schema";
@@ -863,7 +863,7 @@ export const depictResponse = ({
   hasMultipleStatusCodes,
   statusCode,
   brandHandling,
-  description = `${method.toUpperCase()} ${path} ${ucFirst(variant)} response ${
+  description = `${method.toUpperCase()} ${path} ${capitalize(variant)} response ${
     hasMultipleStatusCodes ? statusCode : ""
   }`.trim(),
 }: ReqResHandlingProps<z.ZodTypeAny> & {
