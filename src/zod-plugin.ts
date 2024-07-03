@@ -35,7 +35,7 @@ declare module "zod" {
       mapping: U,
     ): z.ZodPipeline<
       z.ZodEffects<this, FlatObject>, // internal type simplified
-      z.ZodObject<Remap<T, U, V> & Intact<T, U>>
+      z.ZodObject<Remap<T, U, V> & Intact<T, U>, UnknownKeys>
     >;
   }
 }
