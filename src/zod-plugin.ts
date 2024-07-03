@@ -75,7 +75,7 @@ const objectMapper = function (
   return this.transform(
     pipe(
       toPairs,
-      map(([key, value]) => pair(key in mapping ? mapping[key] : key, value)),
+      map(([key, value]) => pair(mapping[key] || key, value)),
       fromPairs,
     ),
   ).pipe(
@@ -83,9 +83,7 @@ const objectMapper = function (
       .object(
         pipe(
           toPairs,
-          map(([key, schema]) =>
-            pair(key in mapping ? mapping[String(key)] : key, schema),
-          ),
+          map(([key, schema]) => pair(mapping[String(key)] || key, schema)),
           fromPairs,
         )(clone(this.shape)), // immutable, no references to the original schemas
       )
