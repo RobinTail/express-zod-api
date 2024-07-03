@@ -467,6 +467,9 @@ const endpoint = endpointsFactory.build({
 });
 ```
 
+The original properties omitted within `remap()` will remain unchanged (partial mapping). Applying `remap()` to
+`z.object().passthrough()` schema enables excessive properties with original naming.
+
 ## Dealing with dates
 
 Dates in Javascript are one of the most troublesome entities. In addition, `Date` cannot be passed directly in JSON
