@@ -79,15 +79,17 @@ const objectMapper = function (
       fromPairs,
     ),
   ).pipe(
-    z.object(
-      pipe(
-        toPairs,
-        map(([key, schema]) =>
-          pair(key in mapping ? mapping[String(key)] : key, schema),
-        ),
-        fromPairs,
-      )(clone(this.shape)), // immutable, no references to the original schemas
-    ),
+    z
+      .object(
+        pipe(
+          toPairs,
+          map(([key, schema]) =>
+            pair(key in mapping ? mapping[String(key)] : key, schema),
+          ),
+          fromPairs,
+        )(clone(this.shape)), // immutable, no references to the original schemas
+      )
+      [this._def.unknownKeys](), // proxies unknown keys when set to "passthrough"
   );
 };
 

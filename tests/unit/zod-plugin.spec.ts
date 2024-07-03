@@ -94,5 +94,16 @@ describe("Zod Runtime Plugin", () => {
         name: "some",
       });
     });
+
+    test("should support passthrough object schemas", () => {
+      const schema = z.object({ user_id: z.string() }).passthrough();
+      const mappedSchema = schema.remap({ user_id: "userId" });
+      expect(
+        mappedSchema.parse({ user_id: "test", extra: "excessive" }),
+      ).toEqual({
+        userId: "test",
+        extra: "excessive",
+      });
+    });
   });
 });
