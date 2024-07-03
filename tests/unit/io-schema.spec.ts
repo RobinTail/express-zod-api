@@ -85,6 +85,15 @@ describe("I/O Schema and related helpers", () => {
           z.object({ s: z.string() }).transform(() => ({ n: 123 })),
         );
       });
+      test("accepts nested transformations", () => {
+        expectType<IOSchema>(
+          z
+            .object({ s: z.string() })
+            .transform(() => ({ a: 123 }))
+            .transform(() => ({ b: 456 }))
+            .transform(() => ({ c: 789 })),
+        );
+      });
       test("accepts piping into another object schema", () => {
         expectType<IOSchema>(
           z
@@ -103,6 +112,14 @@ describe("I/O Schema and related helpers", () => {
       test("does not accept piping into another kind of schema", () => {
         expectNotType<IOSchema>(
           z.object({ s: z.string() }).pipe(z.array(z.string())),
+        );
+      });
+      test("does not accept nested piping", () => {
+        expectNotType<IOSchema>(
+          z
+            .object({ a: z.string() })
+            .remap({ a: "b" })
+            .pipe(z.object({ b: z.string() })),
         );
       });
     });
