@@ -52,13 +52,6 @@ describe("I/O Schema and related helpers", () => {
       expectType<IOSchema>(z.object({}).and(z.object({}).or(z.object({}))));
     });
     describe("Feature #600: Top level refinements", () => {
-      test("Problem: refinement is indistinguishable from transformation", () => {
-        // the issue has to be prevented programmatically using hasTopLevelTransformingEffect() helper
-        expectType<IOSchema>(z.object({}).transform(() => []));
-        expectType<IOSchema>(
-          z.object({ s: z.string() }).transform(() => ({ n: 123 })),
-        );
-      });
       test("accepts a refinement of object", () => {
         expectType<IOSchema>(z.object({}).refine(() => true));
         expectType<IOSchema>(z.object({}).superRefine(() => true));
@@ -74,17 +67,60 @@ describe("I/O Schema and related helpers", () => {
           z
             .object({})
             .refine(() => true)
+            .refine(() => true)
             .refine(() => true),
         );
         expectType<IOSchema>(
           z
             .object({})
             .superRefine(() => true)
+            .superRefine(() => true)
             .superRefine(() => true),
         );
       });
-      test("does not accept transformation of object", () => {
+    });
+    describe("Feature #1869: Top level transformations", () => {
+      test("accepts transformations to another object", () => {
+        expectType<IOSchema>(
+          z.object({ s: z.string() }).transform(() => ({ n: 123 })),
+        );
+      });
+      test("accepts nested transformations", () => {
+        expectType<IOSchema>(
+          z
+            .object({ s: z.string() })
+            .transform(() => ({ a: 123 }))
+            .transform(() => ({ b: 456 }))
+            .transform(() => ({ c: 789 })),
+        );
+      });
+      test("accepts piping into another object schema", () => {
+        expectType<IOSchema>(
+          z
+            .object({ s: z.string() })
+            .transform(() => ({ n: 123 }))
+            .pipe(z.object({ n: z.number() })),
+        );
+        expectType<IOSchema>(
+          z.object({ user_id: z.string() }).remap({ user_id: "userId" }),
+        );
+      });
+      test("does not accept transformation to another type", () => {
         expectNotType<IOSchema>(z.object({}).transform(() => true));
+        expectNotType<IOSchema>(z.object({}).transform(() => []));
+      });
+      test("does not accept piping into another kind of schema", () => {
+        expectNotType<IOSchema>(
+          z.object({ s: z.string() }).pipe(z.array(z.string())),
+        );
+      });
+      test("does not accept nested piping", () => {
+        expectNotType<IOSchema>(
+          z
+            .object({ a: z.string() })
+            .remap({ a: "b" })
+            .pipe(z.object({ b: z.string() })),
+        );
       });
     });
   });

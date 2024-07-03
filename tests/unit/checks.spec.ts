@@ -2,7 +2,7 @@ import { UploadedFile } from "express-fileupload";
 import { describe, expect, test, vi } from "vitest";
 import { z } from "zod";
 import { ez } from "../../src";
-import { hasNestedSchema, hasTransformationOnTop } from "../../src/deep-checks";
+import { hasNestedSchema } from "../../src/deep-checks";
 import { metaSymbol } from "../../src/metadata";
 import { ezUploadBrand } from "../../src/upload-schema";
 
@@ -52,44 +52,6 @@ describe("Checks", () => {
         condition: check,
       });
       expect(check.mock.calls.length).toBe(1);
-    });
-  });
-
-  describe("hasTranformationOnTop()", () => {
-    test("should return true for transformation", () => {
-      expect(
-        hasTransformationOnTop(z.object({}).transform(() => [])),
-      ).toBeTruthy();
-    });
-
-    test("should detect transformation in intersection", () => {
-      expect(
-        hasTransformationOnTop(
-          z.object({}).and(z.object({}).transform(() => [])),
-        ),
-      ).toBeTruthy();
-    });
-
-    test("should detect transformation in union", () => {
-      expect(
-        hasTransformationOnTop(
-          z.object({}).or(z.object({}).transform(() => [])),
-        ),
-      ).toBeTruthy();
-    });
-
-    test("should return false for object fields using transformations", () => {
-      expect(
-        hasTransformationOnTop(
-          z.object({ s: z.string().transform(() => 123) }),
-        ),
-      ).toBeFalsy();
-    });
-
-    test("should return false for refinement", () => {
-      expect(
-        hasTransformationOnTop(z.object({}).refine(() => true)),
-      ).toBeFalsy();
     });
   });
 });

@@ -635,27 +635,27 @@ export const depictParamExamples = (
 
 export const extractObjectSchema = (
   subject: IOSchema,
-  tfError: DocumentationError,
 ): z.ZodObject<z.ZodRawShape> => {
   if (subject instanceof z.ZodObject) {
     return subject;
   }
   if (subject instanceof z.ZodBranded) {
-    return extractObjectSchema(subject.unwrap(), tfError);
+    return extractObjectSchema(subject.unwrap());
   }
   if (
     subject instanceof z.ZodUnion ||
     subject instanceof z.ZodDiscriminatedUnion
   ) {
     return subject.options
-      .map((option) => extractObjectSchema(option, tfError))
+      .map((option) => extractObjectSchema(option))
       .reduce((acc, option) => acc.merge(option.partial()), z.object({}));
   } else if (subject instanceof z.ZodEffects) {
-    assert(subject._def.effect.type === "refinement", tfError);
-    return extractObjectSchema(subject._def.schema, tfError); // object refinement
-  } // intersection left
-  return extractObjectSchema(subject._def.left, tfError).merge(
-    extractObjectSchema(subject._def.right, tfError),
+    return extractObjectSchema(subject._def.schema);
+  } else if (subject instanceof z.ZodPipeline) {
+    return extractObjectSchema(subject._def.in);
+  } // intersection left:
+  return extractObjectSchema(subject._def.left).merge(
+    extractObjectSchema(subject._def.right),
   );
 };
 
@@ -673,15 +673,7 @@ export const depictRequestParams = ({
 }: ReqResHandlingProps<IOSchema> & {
   inputSources: InputSource[];
 }) => {
-  const { shape } = extractObjectSchema(
-    schema,
-    new DocumentationError({
-      message: `Using transformations on the top level schema is not allowed.`,
-      path,
-      method,
-      isResponse: false,
-    }),
-  );
+  const { shape } = extractObjectSchema(schema);
   const pathParams = getRoutePathParams(path);
   const isQueryEnabled = inputSources.includes("query");
   const areParamsEnabled = inputSources.includes("params");
