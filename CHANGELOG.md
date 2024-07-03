@@ -2,6 +2,24 @@
 
 ## Version 20
 
+### v20.2.0
+
+- Feature: Partial mapping and passthrough support for `z.object().remap()`:
+  - Properties can be omitted in `remap()` in order to preserve them unchanged;
+  - Undeclared keys will remain unchanged for `z.object().passthrough().remap()` schema;
+    - Passthrough object schemas are not allowed in Middlewares, but they are allowed in Endpoints.
+
+```ts
+z.object({ user_name: z.string(), id: z.number() }).remap({
+  user_name: "userName", // —> { userName, id }
+});
+
+z.object({ user_id: z.string() })
+  .passthrough()
+  .remap({ user_id: "userId" })
+  .parse({ user_id: "test", extra: "excessive" }); // —> { userId, extra }
+```
+
 ### v20.1.0
 
 - Feature: Top level transformations support and object schema remapping:

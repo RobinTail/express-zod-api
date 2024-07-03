@@ -1351,13 +1351,13 @@ describe("Documentation", () => {
             test: defaultEndpointsFactory.build({
               method: "get",
               input: z
-                .object({ user_id: z.string() })
-                .remap({ user_id: "userId" }),
+                .object({ user_id: z.string(), at: ez.dateIn() })
+                .remap({ user_id: "userId" }), // partial mapping
               output: z
                 .object({ userName: z.string() })
                 .remap({ userName: "user_name" }),
-              handler: async ({ input: { userId } }) => ({
-                userName: `User ${userId}`,
+              handler: async ({ input: { userId, at } }) => ({
+                userName: `User ${userId} ${at}`,
               }),
             }),
           },
