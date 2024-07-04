@@ -76,7 +76,16 @@ const objectMapper = function (
   this: z.ZodObject<z.ZodRawShape>,
   tool: Record<string, string> | (<T>(subject: T) => T),
 ) {
-  const shape = clone(this.shape); // immutable, no references to the original schemas
+  const shapeClone = clone(this.shape); // immutable, no references to the original schemas
+  const nextShape =
+    typeof tool === "function"
+      ? tool(shapeClone)
+      : pipe(
+          toPairs,
+          map(([key, schema]) => pair(tool[String(key)] || key, schema)),
+          fromPairs,
+        )(shapeClone);
+  const output = z.object(nextShape)[this._def.unknownKeys](); // proxies unknown keys when set to "passthrough"
   return this.transform(
     typeof tool === "function"
       ? tool
@@ -85,19 +94,7 @@ const objectMapper = function (
           map(([key, value]) => pair(tool[key] || key, value)),
           fromPairs,
         ),
-  ).pipe(
-    z
-      .object(
-        typeof tool === "function"
-          ? tool(shape)
-          : pipe(
-              toPairs,
-              map(([key, schema]) => pair(tool[String(key)] || key, schema)),
-              fromPairs,
-            )(shape),
-      )
-      [this._def.unknownKeys](), // proxies unknown keys when set to "passthrough"
-  );
+  ).pipe(output);
 };
 
 if (!(metaSymbol in globalThis)) {
