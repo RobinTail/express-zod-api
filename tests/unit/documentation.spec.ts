@@ -1,4 +1,5 @@
 import camelize from "camelize-ts";
+import snakify from "snakify-ts";
 import { config as exampleConfig } from "../../example/config";
 import { routing } from "../../example/routing";
 import {
@@ -1318,7 +1319,7 @@ describe("Documentation", () => {
   });
 
   describe("Feature #1869: Top level transformations", () => {
-    test("should handle object-to-object transformation in request", () => {
+    test("should handle object-to-object functional transformations and mapping", () => {
       const spec = new Documentation({
         config: sampleConfig,
         routing: {
@@ -1328,11 +1329,12 @@ describe("Documentation", () => {
               input: z
                 .object({ user_id: z.string() })
                 .transform((inputs) => camelize(inputs, true)),
-              output: z.object({}),
-              handler: async ({ input: { userId }, logger }) => {
-                logger.debug("userId", userId);
-                return {};
-              },
+              output: z
+                .object({ userName: z.string() })
+                .remap((outputs) => snakify(outputs, true)),
+              handler: async ({ input: { userId } }) => ({
+                userName: `User ${userId}`,
+              }),
             }),
           },
         },
@@ -1343,7 +1345,7 @@ describe("Documentation", () => {
       expect(spec).toMatchSnapshot();
     });
 
-    test("should handle in request and response using .remap()", () => {
+    test("should handle explicit renaming", () => {
       const spec = new Documentation({
         config: sampleConfig,
         routing: {
