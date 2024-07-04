@@ -433,13 +433,13 @@ const getUserEndpoint = endpointsFactory.build({
 
 For some APIs it may be important that public interfaces such as query parameters use snake case, while the
 implementation itself requires camel case for internal naming. In order to facilitate interoperability between the
-different naming standards. The first thing to note is that you can `.transform()` the entire `input` schema into
-another object using a well-typed mapping library, such as [camelize-ts](https://www.npmjs.com/package/camelize-ts).
-However, that would not be enough for the `output` schema if you're also aiming to
-[generate a valid documentation](#creating-a-documentation), because the transformations themselves do not contain
-schemas. Addressing this case, the library offers the `.remap()` method of the object schema, a part of the
-[Zod plugin](#zod-plugin), which under the hood, in addition to the transformation, also `.pipe()` the transformed
-object into a new object schema. Here is the recommended solution: it is importnant to use shallow transformations only.
+different naming standards you can `.transform()` the entire `input` schema into another object using a well-typed
+mapping library, such as [camelize-ts](https://www.npmjs.com/package/camelize-ts). However, that approach would not be
+enough for the `output` schema if you're also aiming to [generate a valid documentation](#creating-a-documentation),
+because the transformations themselves do not contain schemas. Addressing this case, the library offers the `.remap()`
+method of the object schema, a part of the [Zod plugin](#zod-plugin), which under the hood, in addition to the
+transformation, also `.pipe()` the transformed object into a new object schema.
+Here is a recommended solution: it is importnant to use shallow transformations only.
 
 ```ts
 import camelize from "camelize-ts";
