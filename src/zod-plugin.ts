@@ -4,6 +4,7 @@
  * @desc This code modifies and extends zod's functionality immediately when importing express-zod-api
  * @desc Enables .examples() on all schemas (ZodType)
  * @desc Enables .label() on ZodDefault
+ * @desc Enables .remap() on ZodObject
  * @desc Stores the argument supplied to .brand() on all schema (runtime distinguishable branded types)
  * */
 import { clone, fromPairs, map, pipe, toPairs, pair } from "ramda";
