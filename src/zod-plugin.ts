@@ -40,7 +40,7 @@ declare module "zod" {
     >;
     remap<U extends z.ZodRawShape>(
       mapper: (subject: T) => U,
-    ): z.ZodPipeline<z.ZodEffects<this, FlatObject>, z.ZodObject<U>>;
+    ): z.ZodPipeline<z.ZodEffects<this, FlatObject>, z.ZodObject<U>>; // internal type simplified
   }
 }
 
@@ -74,24 +74,19 @@ const brandSetter = function (
 
 const objectMapper = function (
   this: z.ZodObject<z.ZodRawShape>,
-  tool: Record<string, string> | (<T>(subject: T) => T),
+  tool:
+    | Record<string, string>
+    | (<T>(subject: T) => { [P in string | keyof T]: T[keyof T] }),
 ) {
-  const [transformer, reshaper] =
+  const transformer =
     typeof tool === "function"
-      ? [tool, tool]
-      : [
-          pipe(
-            toPairs<FlatObject>,
-            map(([key, value]) => pair(tool[key] || key, value)),
-            fromPairs,
-          ),
-          pipe(
-            toPairs<z.ZodRawShape>,
-            map(([key, schema]) => pair(tool[String(key)] || key, schema)),
-            fromPairs,
-          ),
-        ];
-  const nextShape = reshaper(clone(this.shape)); // immutable
+      ? tool
+      : pipe(
+          toPairs,
+          map(([key, schema]) => pair(tool[String(key)] || key, schema)),
+          fromPairs,
+        );
+  const nextShape = transformer(clone(this.shape)); // immutable
   const output = z.object(nextShape)[this._def.unknownKeys](); // proxies unknown keys when set to "passthrough"
   return this.transform(transformer).pipe(output);
 };
