@@ -76,22 +76,21 @@ const objectMapper = function (
   this: z.ZodObject<z.ZodRawShape>,
   tool: Record<string, string> | (<T>(subject: T) => T),
 ) {
-  const transformer =
+  const [transformer, reshaper] =
     typeof tool === "function"
-      ? tool
-      : pipe(
-          toPairs<FlatObject>,
-          map(([key, value]) => pair(tool[key] || key, value)),
-          fromPairs,
-        );
-  const reshaper =
-    typeof tool === "function"
-      ? tool
-      : pipe(
-          toPairs<z.ZodRawShape>,
-          map(([key, schema]) => pair(tool[String(key)] || key, schema)),
-          fromPairs,
-        );
+      ? [tool, tool]
+      : [
+          pipe(
+            toPairs<FlatObject>,
+            map(([key, value]) => pair(tool[key] || key, value)),
+            fromPairs,
+          ),
+          pipe(
+            toPairs<z.ZodRawShape>,
+            map(([key, schema]) => pair(tool[String(key)] || key, schema)),
+            fromPairs,
+          ),
+        ];
   const nextShape = reshaper(clone(this.shape)); // immutable
   const output = z.object(nextShape)[this._def.unknownKeys](); // proxies unknown keys when set to "passthrough"
   return this.transform(transformer).pipe(output);
