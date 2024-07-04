@@ -464,6 +464,12 @@ const endpoint = endpointsFactory.build({
 The `.remap()` method can also accept an object with an explictly defined naming of your choice. The original keys
 missing in that object remain unchanged (partial mapping).
 
+```ts
+z.object({ user_name: z.string(), id: z.number() }).remap({
+  user_name: "weHAVEreallyWEIRDnamingSTANDARDS", // "id" remains intact
+});
+```
+
 ## Dealing with dates
 
 Dates in Javascript are one of the most troublesome entities. In addition, `Date` cannot be passed directly in JSON
