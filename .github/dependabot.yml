@@ -11,6 +11,10 @@ updates:
     schedule:
       interval: "weekly"
     groups:
+      vitest:
+        patterns:
+          - "vitest"
+          - "@vitest/coverage-istanbul"
       typescript-eslint:
         patterns:
           - "typescript-eslint"
