@@ -74,25 +74,25 @@ const brandSetter = function (
 
 const objectMapper = function (
   this: z.ZodObject<z.ZodRawShape>,
-  mapping: Record<string, string> | (<T>(subject: T) => T),
+  tool: Record<string, string> | (<T>(subject: T) => T),
 ) {
   const shape = clone(this.shape); // immutable, no references to the original schemas
   return this.transform(
-    typeof mapping === "function"
-      ? mapping
+    typeof tool === "function"
+      ? tool
       : pipe(
           toPairs,
-          map(([key, value]) => pair(mapping[key] || key, value)),
+          map(([key, value]) => pair(tool[key] || key, value)),
           fromPairs,
         ),
   ).pipe(
     z
       .object(
-        typeof mapping === "function"
-          ? mapping(shape)
+        typeof tool === "function"
+          ? tool(shape)
           : pipe(
               toPairs,
-              map(([key, schema]) => pair(mapping[String(key)] || key, schema)),
+              map(([key, schema]) => pair(tool[String(key)] || key, schema)),
               fromPairs,
             )(shape),
       )
