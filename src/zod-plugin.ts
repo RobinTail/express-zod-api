@@ -83,7 +83,7 @@ const objectMapper = function (
       ? tool
       : pipe(
           toPairs,
-          map(([key, schema]) => pair(tool[String(key)] || key, schema)),
+          map(([key, value]) => pair(tool[String(key)] || key, value)),
           fromPairs,
         );
   const nextShape = transformer(clone(this.shape)); // immutable
