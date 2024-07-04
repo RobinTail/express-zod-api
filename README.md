@@ -432,43 +432,43 @@ const getUserEndpoint = endpointsFactory.build({
 ## Top level transformations and mapping
 
 For some APIs it may be important that public interfaces such as query parameters use snake case, while the
-implementation itself requires camel case for constants and their properties. Since version 20.1.0 the library offers
-several ways to facilitate interoperability between the different naming standards. The first thing to note is that you
-can transform the entire `input` schema into another object using a well-typed mapping library.
+implementation itself requires camel case for internal naming. In order to facilitate interoperability between the
+different naming standards you can `.transform()` the entire `input` schema into another object using a well-typed
+mapping library, such as [camelize-ts](https://www.npmjs.com/package/camelize-ts). However, that approach would not be
+enough for the `output` schema if you're also aiming to [generate a valid documentation](#creating-a-documentation),
+because the transformations themselves do not contain schemas. Addressing this case, the library offers the `.remap()`
+method of the object schema, a part of the [Zod plugin](#zod-plugin), which under the hood, in addition to the
+transformation, also `.pipe()` the transformed object into a new object schema.
+Here is a recommended solution: it is importnant to use shallow transformations only.
 
 ```ts
 import camelize from "camelize-ts";
+import snakify from "snakify-ts";
 import { z } from "zod";
 
 const endpoint = endpointsFactory.build({
   method: "get",
   input: z
     .object({ user_id: z.string() })
-    .transform((inputs) => camelize(inputs, true)), // shallow
+    .transform((inputs) => camelize(inputs, /* shallow: */ true)),
+  output: z
+    .object({ userName: z.string() })
+    .remap((outputs) => snakify(outputs, /* shallow: */ true)),
   handler: async ({ input: { userId }, logger }) => {
     logger.debug("user_id became userId", userId);
+    return { userName: "Agneta" }; // becomes "user_name" in response
   },
 });
 ```
 
-Of course, you can do the same with the `output` schema, but that would not be enough to
-[generate a valid documentation](#creating-a-documentation), because the transformations themselves do not contain the
-schemas on which the documentation is based. In this case, the library offers the `remap()` method of the object schema,
-a part of the [Zod plugin](#zod-plugin), which under the hood, in addition to the transformation, also pipes the result
-into a new transformed object schema.
+The `.remap()` method can also accept an object with an explictly defined naming of your choice. The original keys
+missing in that object remain unchanged (partial mapping).
 
 ```ts
-import { z } from "zod";
-
-const endpoint = endpointsFactory.build({
-  method: "get",
-  output: z.object({ userName: z.string() }).remap({ userName: "user_name" }),
-  handler: async () => ({ userName: "Agneta" }), // becomes "user_name" in response
+z.object({ user_name: z.string(), id: z.number() }).remap({
+  user_name: "weHAVEreallyWEIRDnamingSTANDARDS", // "id" remains intact
 });
 ```
-
-The original properties omitted within `remap()` will remain unchanged (partial mapping). Applying `remap()` to
-`z.object().passthrough()` schema enables excessive properties with original naming.
 
 ## Dealing with dates
 
