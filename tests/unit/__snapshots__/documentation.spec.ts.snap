@@ -3683,7 +3683,7 @@ servers:
 "
 `;
 
-exports[`Documentation > Feature #1869: Top level transformations > should handle in request and response using .remap() 1`] = `
+exports[`Documentation > Feature #1869: Top level transformations > should handle explicit renaming 1`] = `
 "openapi: 3.1.0
 info:
   title: Testing top level transformations
@@ -3699,6 +3699,17 @@ paths:
           description: GET /v1/test Parameter
           schema:
             type: string
+        - name: at
+          in: query
+          required: true
+          description: YYYY-MM-DDTHH:mm:ss.sssZ
+          schema:
+            description: YYYY-MM-DDTHH:mm:ss.sssZ
+            type: string
+            format: date-time
+            pattern: ^\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?)?Z?$
+            externalDocs:
+              url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
       responses:
         "200":
           description: GET /v1/test Positive response
@@ -3762,7 +3773,7 @@ servers:
 "
 `;
 
-exports[`Documentation > Feature #1869: Top level transformations > should handle object-to-object transformation in request 1`] = `
+exports[`Documentation > Feature #1869: Top level transformations > should handle object-to-object functional transformations and mapping 1`] = `
 "openapi: 3.1.0
 info:
   title: Testing top level transformations
@@ -3791,6 +3802,11 @@ paths:
                     const: success
                   data:
                     type: object
+                    properties:
+                      user_name:
+                        type: string
+                    required:
+                      - user_name
                 required:
                   - status
                   - data

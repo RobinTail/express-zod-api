@@ -2,6 +2,51 @@
 
 ## Version 20
 
+### v20.3.0
+
+- Feature: `z.object().remap()` accepts a mapping function:
+  - Similar to `.transform()` you can now supply an object shape mapping function;
+  - It is important to use shallow transformations only;
+  - Using `.remap()` is recommended for `output` schemas if you're also aiming to generate a valid documentation.
+
+```ts
+import camelize from "camelize-ts";
+import snakify from "snakify-ts";
+import { z } from "zod";
+
+const endpoint = endpointsFactory.build({
+  method: "get",
+  input: z
+    .object({ user_id: z.string() })
+    .transform((inputs) => camelize(inputs, /* shallow: */ true)),
+  output: z
+    .object({ userName: z.string() })
+    .remap((outputs) => snakify(outputs, /* shallow: */ true)),
+  handler: async ({ input: { userId }, logger }) => {
+    logger.debug("user_id became userId", userId);
+    return { userName: "Agneta" }; // becomes "user_name" in response
+  },
+});
+```
+
+### v20.2.0
+
+- Feature: Partial mapping and passthrough support for `z.object().remap()`:
+  - Properties can be omitted in `remap()` in order to preserve them unchanged;
+  - Undeclared keys will remain unchanged for `z.object().passthrough().remap()` schema;
+    - Passthrough object schemas are not allowed in Middlewares, but they are allowed in Endpoints.
+
+```ts
+z.object({ user_name: z.string(), id: z.number() }).remap({
+  user_name: "userName", // —> { userName, id }
+});
+
+z.object({ user_id: z.string() })
+  .passthrough()
+  .remap({ user_id: "userId" })
+  .parse({ user_id: "test", extra: "excessive" }); // —> { userId, extra }
+```
+
 ### v20.1.0
 
 - Feature: Top level transformations support and object schema remapping:
@@ -21,7 +66,7 @@ const endpoint = endpointsFactory.build({
   method: "get",
   input: z
     .object({ user_id: z.string() })
-    .transform((inputs) => camelize(inputs)),
+    .transform((inputs) => camelize(inputs, true)), // shallow
   output: z.object({ userName: z.string() }).remap({ userName: "user_name" }),
   handler: async ({ input: { userId }, logger }) => {
     logger.debug("user_id became userId", userId);

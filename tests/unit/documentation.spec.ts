@@ -1,4 +1,5 @@
 import camelize from "camelize-ts";
+import snakify from "snakify-ts";
 import { config as exampleConfig } from "../../example/config";
 import { routing } from "../../example/routing";
 import {
@@ -1318,7 +1319,7 @@ describe("Documentation", () => {
   });
 
   describe("Feature #1869: Top level transformations", () => {
-    test("should handle object-to-object transformation in request", () => {
+    test("should handle object-to-object functional transformations and mapping", () => {
       const spec = new Documentation({
         config: sampleConfig,
         routing: {
@@ -1327,12 +1328,13 @@ describe("Documentation", () => {
               method: "get",
               input: z
                 .object({ user_id: z.string() })
-                .transform((inputs) => camelize(inputs)),
-              output: z.object({}),
-              handler: async ({ input: { userId }, logger }) => {
-                logger.debug("userId", userId);
-                return {};
-              },
+                .transform((inputs) => camelize(inputs, true)),
+              output: z
+                .object({ userName: z.string() })
+                .remap((outputs) => snakify(outputs, true)),
+              handler: async ({ input: { userId } }) => ({
+                userName: `User ${userId}`,
+              }),
             }),
           },
         },
@@ -1343,7 +1345,7 @@ describe("Documentation", () => {
       expect(spec).toMatchSnapshot();
     });
 
-    test("should handle in request and response using .remap()", () => {
+    test("should handle explicit renaming", () => {
       const spec = new Documentation({
         config: sampleConfig,
         routing: {
@@ -1351,13 +1353,13 @@ describe("Documentation", () => {
             test: defaultEndpointsFactory.build({
               method: "get",
               input: z
-                .object({ user_id: z.string() })
-                .remap({ user_id: "userId" }),
+                .object({ user_id: z.string(), at: ez.dateIn() })
+                .remap({ user_id: "userId" }), // partial mapping
               output: z
                 .object({ userName: z.string() })
                 .remap({ userName: "user_name" }),
-              handler: async ({ input: { userId } }) => ({
-                userName: `User ${userId}`,
+              handler: async ({ input: { userId, at } }) => ({
+                userName: `User ${userId} ${at}`,
               }),
             }),
           },

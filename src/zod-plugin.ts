@@ -4,13 +4,14 @@
  * @desc This code modifies and extends zod's functionality immediately when importing express-zod-api
  * @desc Enables .examples() on all schemas (ZodType)
  * @desc Enables .label() on ZodDefault
+ * @desc Enables .remap() on ZodObject
  * @desc Stores the argument supplied to .brand() on all schema (runtime distinguishable branded types)
  * */
 import { clone, fromPairs, map, pipe, toPairs, pair } from "ramda";
 import { z } from "zod";
 import { FlatObject } from "./common-helpers";
 import { cloneSchema, Metadata, metaSymbol } from "./metadata";
-import { Remap } from "./mapping-helpers";
+import { Intact, Remap } from "./mapping-helpers";
 
 declare module "zod" {
   interface ZodTypeDef {
@@ -31,12 +32,15 @@ declare module "zod" {
     Output = z.objectOutputType<T, Catchall, UnknownKeys>,
     Input = z.objectInputType<T, Catchall, UnknownKeys>,
   > {
-    remap<V extends string, U extends { [P in keyof T]: V }>(
+    remap<V extends string, U extends { [P in keyof T]?: V }>(
       mapping: U,
     ): z.ZodPipeline<
       z.ZodEffects<this, FlatObject>, // internal type simplified
-      z.ZodObject<Remap<T, U, V>>
+      z.ZodObject<Remap<T, U, V> & Intact<T, U>, UnknownKeys>
     >;
+    remap<U extends z.ZodRawShape>(
+      mapper: (subject: T) => U,
+    ): z.ZodPipeline<z.ZodEffects<this, FlatObject>, z.ZodObject<U>>; // internal type simplified
   }
 }
 
@@ -70,23 +74,21 @@ const brandSetter = function (
 
 const objectMapper = function (
   this: z.ZodObject<z.ZodRawShape>,
-  mapping: Record<string, string>,
+  tool:
+    | Record<string, string>
+    | (<T>(subject: T) => { [P in string | keyof T]: T[keyof T] }),
 ) {
-  return this.transform(
-    pipe(
-      toPairs,
-      map(([key, value]) => pair(mapping[key], value)),
-      fromPairs,
-    ),
-  ).pipe(
-    z.object(
-      pipe(
-        toPairs,
-        map(([key, schema]) => pair(mapping[String(key)], schema)),
-        fromPairs,
-      )(clone(this.shape)), // immutable, no references to the original schemas
-    ),
-  );
+  const transformer =
+    typeof tool === "function"
+      ? tool
+      : pipe(
+          toPairs,
+          map(([key, value]) => pair(tool[String(key)] || key, value)),
+          fromPairs,
+        );
+  const nextShape = transformer(clone(this.shape)); // immutable
+  const output = z.object(nextShape)[this._def.unknownKeys](); // proxies unknown keys when set to "passthrough"
+  return this.transform(transformer).pipe(output);
 };
 
 if (!(metaSymbol in globalThis)) {
