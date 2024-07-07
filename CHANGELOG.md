@@ -2,6 +2,14 @@
 
 ## Version 20
 
+### v20.3.1
+
+- Removed `eslint` and `prettier` from the list of the optional peer dependencies:
+  - `eslint` with a flat config support (v8 or v9) is only required to use [the migration codemod](#v2000);
+  - `prettier` is only a fallback for `Integration::printFormatted()`, which can work without it as well;
+  - These changes aim to reduce the confusion and ease the installation;
+  - The issue was found and reported by **Bogdan** who does not have a GitHub account.
+
 ### v20.3.0
 
 - Feature: `z.object().remap()` accepts a mapping function:
