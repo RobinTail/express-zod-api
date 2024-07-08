@@ -1,7 +1,6 @@
-import { expectType } from "tsd";
 import { z } from "zod";
 import { defaultEndpointsFactory, testEndpoint } from "../../src";
-import { Mock, describe, expect, test, vi } from "vitest";
+import { Mock, describe, expect, expectTypeOf, test, vi } from "vitest";
 
 describe("Testing", () => {
   describe("testEndpoint()", () => {
@@ -42,8 +41,8 @@ describe("Testing", () => {
       expect(requestMock.test2).toBe(456);
       expect(loggerMock.feat1).toEqual(expect.any(Function));
       expect(loggerMock.feat2).toBe(789);
-      expectType<Mock>(requestMock.test1);
-      expectType<Mock>(loggerMock.feat1);
+      expectTypeOf(requestMock.test1).toEqualTypeOf<Mock>();
+      expectTypeOf(loggerMock.feat1).toEqualTypeOf<Mock>();
     });
   });
 });

@@ -2,6 +2,10 @@
 
 ## Version 20
 
+### v20.3.2
+
+- Minor corrections to the documentation.
+
 ### v20.3.1
 
 - Removed `eslint` and `prettier` from the list of the optional peer dependencies:

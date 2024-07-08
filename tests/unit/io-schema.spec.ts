@@ -1,126 +1,149 @@
-import { expectNotType, expectType } from "tsd";
 import { z } from "zod";
 import { IOSchema, Middleware, ez } from "../../src";
 import { getFinalEndpointInputSchema } from "../../src/io-schema";
 import { metaSymbol } from "../../src/metadata";
 import { AbstractMiddleware } from "../../src/middleware";
 import { serializeSchemaForTest } from "../helpers";
-import { describe, expect, test, vi } from "vitest";
+import { describe, expect, expectTypeOf, test, vi } from "vitest";
 
 describe("I/O Schema and related helpers", () => {
   describe("IOSchema", () => {
     test("accepts object", () => {
-      expectType<IOSchema>(z.object({}));
-      expectType<IOSchema<"strip">>(z.object({}));
-      expectType<IOSchema<"strict">>(z.object({}).strict());
-      expectType<IOSchema<"passthrough">>(z.object({}).passthrough());
-      expectType<IOSchema<"strip">>(z.object({}).strip());
+      expectTypeOf(z.object({})).toMatchTypeOf<IOSchema>();
+      expectTypeOf(z.object({})).toMatchTypeOf<IOSchema<"strip">>();
+      expectTypeOf(z.object({}).strict()).toMatchTypeOf<IOSchema<"strict">>();
+      expectTypeOf(z.object({}).passthrough()).toMatchTypeOf<
+        IOSchema<"passthrough">
+      >();
+      expectTypeOf(z.object({}).strip()).toMatchTypeOf<IOSchema<"strip">>();
     });
     test("accepts ez.raw()", () => {
-      expectType<IOSchema>(ez.raw());
-      expectType<IOSchema>(ez.raw({ something: z.any() }));
+      expectTypeOf(ez.raw()).toMatchTypeOf<IOSchema>();
+      expectTypeOf(ez.raw({ something: z.any() })).toMatchTypeOf<IOSchema>();
     });
     test("respects the UnknownKeys type argument", () => {
-      expectNotType<IOSchema<"passthrough">>(z.object({}));
+      expectTypeOf(z.object({})).not.toMatchTypeOf<IOSchema<"passthrough">>();
     });
     test("accepts union of objects", () => {
-      expectType<IOSchema>(z.union([z.object({}), z.object({})]));
-      expectType<IOSchema>(z.object({}).or(z.object({})));
-      expectType<IOSchema>(z.object({}).or(z.object({}).or(z.object({}))));
+      expectTypeOf(
+        z.union([z.object({}), z.object({})]),
+      ).toMatchTypeOf<IOSchema>();
+      expectTypeOf(z.object({}).or(z.object({}))).toMatchTypeOf<IOSchema>();
+      expectTypeOf(
+        z.object({}).or(z.object({}).or(z.object({}))),
+      ).toMatchTypeOf<IOSchema>();
     });
     test("does not accept union of object and array of objects", () => {
-      expectNotType<IOSchema>(z.object({}).or(z.array(z.object({}))));
+      expectTypeOf(
+        z.object({}).or(z.array(z.object({}))),
+      ).not.toMatchTypeOf<IOSchema>();
     });
     test("accepts intersection of objects", () => {
-      expectType<IOSchema>(z.intersection(z.object({}), z.object({})));
-      expectType<IOSchema>(z.object({}).and(z.object({})));
-      expectType<IOSchema>(z.object({}).and(z.object({}).and(z.object({}))));
+      expectTypeOf(
+        z.intersection(z.object({}), z.object({})),
+      ).toMatchTypeOf<IOSchema>();
+      expectTypeOf(z.object({}).and(z.object({}))).toMatchTypeOf<IOSchema>();
+      expectTypeOf(
+        z.object({}).and(z.object({}).and(z.object({}))),
+      ).toMatchTypeOf<IOSchema>();
     });
     test("does not accepts intersection of object with array of objects", () => {
-      expectNotType<IOSchema>(z.object({}).and(z.array(z.object({}))));
+      expectTypeOf(
+        z.object({}).and(z.array(z.object({}))),
+      ).not.toMatchTypeOf<IOSchema>();
     });
     test("accepts discriminated union of objects", () => {
-      expectType<IOSchema>(
+      expectTypeOf(
         z.discriminatedUnion("type", [
           z.object({ type: z.literal("one") }),
           z.object({ type: z.literal("two") }),
         ]),
-      );
+      ).toMatchTypeOf<IOSchema>();
     });
     test("accepts a mix of types based on object", () => {
-      expectType<IOSchema>(z.object({}).or(z.object({}).and(z.object({}))));
-      expectType<IOSchema>(z.object({}).and(z.object({}).or(z.object({}))));
+      expectTypeOf(
+        z.object({}).or(z.object({}).and(z.object({}))),
+      ).toMatchTypeOf<IOSchema>();
+      expectTypeOf(
+        z.object({}).and(z.object({}).or(z.object({}))),
+      ).toMatchTypeOf<IOSchema>();
     });
     describe("Feature #600: Top level refinements", () => {
       test("accepts a refinement of object", () => {
-        expectType<IOSchema>(z.object({}).refine(() => true));
-        expectType<IOSchema>(z.object({}).superRefine(() => true));
-        expectType<IOSchema>(
+        expectTypeOf(z.object({}).refine(() => true)).toMatchTypeOf<IOSchema>();
+        expectTypeOf(
+          z.object({}).superRefine(() => true),
+        ).toMatchTypeOf<IOSchema>();
+        expectTypeOf(
           z.object({}).refinement(() => true, {
             code: "custom",
             message: "test",
           }),
-        );
+        ).toMatchTypeOf<IOSchema>();
       });
       test("Issue 662: accepts nested refinements", () => {
-        expectType<IOSchema>(
+        expectTypeOf(
           z
             .object({})
             .refine(() => true)
             .refine(() => true)
             .refine(() => true),
-        );
-        expectType<IOSchema>(
+        ).toMatchTypeOf<IOSchema>();
+        expectTypeOf(
           z
             .object({})
             .superRefine(() => true)
             .superRefine(() => true)
             .superRefine(() => true),
-        );
+        ).toMatchTypeOf<IOSchema>();
       });
     });
     describe("Feature #1869: Top level transformations", () => {
       test("accepts transformations to another object", () => {
-        expectType<IOSchema>(
+        expectTypeOf(
           z.object({ s: z.string() }).transform(() => ({ n: 123 })),
-        );
+        ).toMatchTypeOf<IOSchema>();
       });
       test("accepts nested transformations", () => {
-        expectType<IOSchema>(
+        expectTypeOf(
           z
             .object({ s: z.string() })
             .transform(() => ({ a: 123 }))
             .transform(() => ({ b: 456 }))
             .transform(() => ({ c: 789 })),
-        );
+        ).toMatchTypeOf<IOSchema>();
       });
       test("accepts piping into another object schema", () => {
-        expectType<IOSchema>(
+        expectTypeOf(
           z
             .object({ s: z.string() })
             .transform(() => ({ n: 123 }))
             .pipe(z.object({ n: z.number() })),
-        );
-        expectType<IOSchema>(
+        ).toMatchTypeOf<IOSchema>();
+        expectTypeOf(
           z.object({ user_id: z.string() }).remap({ user_id: "userId" }),
-        );
+        ).toMatchTypeOf<IOSchema>();
       });
       test("does not accept transformation to another type", () => {
-        expectNotType<IOSchema>(z.object({}).transform(() => true));
-        expectNotType<IOSchema>(z.object({}).transform(() => []));
+        expectTypeOf(
+          z.object({}).transform(() => true),
+        ).not.toMatchTypeOf<IOSchema>();
+        expectTypeOf(
+          z.object({}).transform(() => []),
+        ).not.toMatchTypeOf<IOSchema>();
       });
       test("does not accept piping into another kind of schema", () => {
-        expectNotType<IOSchema>(
+        expectTypeOf(
           z.object({ s: z.string() }).pipe(z.array(z.string())),
-        );
+        ).not.toMatchTypeOf<IOSchema>();
       });
       test("does not accept nested piping", () => {
-        expectNotType<IOSchema>(
+        expectTypeOf(
           z
             .object({ a: z.string() })
             .remap({ a: "b" })
             .pipe(z.object({ b: z.string() })),
-        );
+        ).not.toMatchTypeOf<IOSchema>();
       });
     });
   });

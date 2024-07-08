@@ -1,6 +1,5 @@
 import { spawn } from "node:child_process";
 import { createReadStream, readFileSync } from "node:fs";
-import { expectType } from "tsd";
 import {
   ExpressZodAPIClient,
   Implementation,
@@ -9,7 +8,14 @@ import {
 import { givePort, waitFor } from "../helpers";
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
-import { afterAll, afterEach, describe, expect, test } from "vitest";
+import {
+  afterAll,
+  afterEach,
+  describe,
+  expect,
+  expectTypeOf,
+  test,
+} from "vitest";
 
 describe("Example", async () => {
   let out = "";
@@ -437,10 +443,10 @@ describe("Example", async () => {
         id: "10",
       });
       expect(response).toMatchSnapshot();
-      expectType<
+      expectTypeOf(response).toMatchTypeOf<
         | { status: "success"; data: { id: number; name: string } }
         | { status: "error"; error: { message: string } }
-      >(response);
+      >();
     });
   });
 });

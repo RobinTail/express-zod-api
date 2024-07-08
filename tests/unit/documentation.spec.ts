@@ -13,11 +13,10 @@ import {
   ez,
   ResultHandler,
 } from "../../src";
-import { expectType } from "tsd";
 import { contentTypes } from "../../src/content-type";
 import { z } from "zod";
 import { givePort } from "../helpers";
-import { describe, expect, test, vi } from "vitest";
+import { describe, expect, expectTypeOf, test, vi } from "vitest";
 
 describe("Documentation", () => {
   const sampleConfig = createConfig({
@@ -862,8 +861,14 @@ describe("Documentation", () => {
       const unionSchema = z.union([subType1, subType2]);
       type TestingType = z.infer<typeof unionSchema>;
 
-      expectType<TestingType>({ id: "string", field1: "string" });
-      expectType<TestingType>({ id: "string", field2: "string" });
+      expectTypeOf({
+        id: "string",
+        field1: "string",
+      }).toMatchTypeOf<TestingType>();
+      expectTypeOf({
+        id: "string",
+        field2: "string",
+      }).toMatchTypeOf<TestingType>();
 
       const spec = new Documentation({
         config: sampleConfig,
