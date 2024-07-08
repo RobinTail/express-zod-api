@@ -7,6 +7,7 @@ export default defineConfig({
     env: {
       FORCE_COLOR: "1",
     },
+    pool: "threads",
     testTimeout: 10000,
     reporters: "basic",
     coverage: {
