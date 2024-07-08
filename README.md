@@ -1078,6 +1078,7 @@ Express Zod API acts as a plugin for Zod, extending its functionality once you i
 
 - Adds `.example()` method to all Zod schemas for storing examples and reflecting them in the generated documentation;
 - Adds `.label()` method to `ZodDefault` for replacing the default value in documentation with a label;
+- Adds `.remap()` method to `ZodObject` for renaming object properties in a suitable way for making documentation;
 - Alters the `.brand()` method on all Zod schemas by making the assigned brand available in runtime.
 
 ## Generating a Frontend Client
