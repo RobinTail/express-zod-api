@@ -2,6 +2,10 @@
 
 ## Version 20
 
+### v20.3.2
+
+- Minor corrections to the documentation.
+
 ### v20.3.1
 
 - Removed `eslint` and `prettier` from the list of the optional peer dependencies:
@@ -172,6 +176,11 @@ expect(loggerMock._getLogs().error).toHaveLength(0);
 ```
 
 ## Version 19
+
+### v19.3.0
+
+- Feat: Supporting `vitest` version 2:
+  - Released today. Find the migration guide here: https://vitest.dev/guide/migration.html#migrating-to-vitest-2-0
 
 ### v19.2.3
 

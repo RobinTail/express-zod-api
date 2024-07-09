@@ -7,7 +7,6 @@ import {
   ResultHandler,
 } from "../../src";
 import { Endpoint } from "../../src/endpoint";
-import { expectType } from "tsd";
 import {
   makeLoggerMock,
   makeRequestMock,
@@ -15,7 +14,7 @@ import {
 } from "../../src/testing";
 import { serializeSchemaForTest } from "../helpers";
 import { z } from "zod";
-import { describe, expect, test, vi } from "vitest";
+import { describe, expect, expectTypeOf, test, vi } from "vitest";
 
 describe("EndpointsFactory", () => {
   const resultHandlerMock = new ResultHandler({
@@ -71,7 +70,7 @@ describe("EndpointsFactory", () => {
           new Middleware({
             input: z.object({}),
             handler: async ({ options }) => {
-              expectType<string>(options.test);
+              expectTypeOf(options.test).toEqualTypeOf<string>();
               return { second: `another option, ${options.test}` };
             },
           }),
@@ -87,7 +86,7 @@ describe("EndpointsFactory", () => {
         .addMiddleware({
           input: z.object({}),
           handler: async ({ options }) => {
-            expectType<string>(options.test);
+            expectTypeOf(options.test).toEqualTypeOf<string>();
             return { second: `another option, ${options.test}` };
           },
         });
@@ -270,7 +269,10 @@ describe("EndpointsFactory", () => {
       expect(
         serializeSchemaForTest(endpoint.getSchema("output")),
       ).toMatchSnapshot();
-      expectType<{ n: number; s: string }>(endpoint.getSchema("input")._output);
+      expectTypeOf(endpoint.getSchema("input")._output).toMatchTypeOf<{
+        n: number;
+        s: string;
+      }>();
     });
 
     test("Should create an endpoint with refined object middleware", () => {
@@ -300,9 +302,11 @@ describe("EndpointsFactory", () => {
       expect(
         serializeSchemaForTest(endpoint.getSchema("output")),
       ).toMatchSnapshot();
-      expectType<{ a?: number; b?: string; i: string }>(
-        endpoint.getSchema("input")._output,
-      );
+      expectTypeOf(endpoint.getSchema("input")._output).toMatchTypeOf<{
+        a?: number;
+        b?: string;
+        i: string;
+      }>();
     });
 
     test("Should create an endpoint with intersection middleware", () => {
@@ -328,9 +332,11 @@ describe("EndpointsFactory", () => {
       expect(
         serializeSchemaForTest(endpoint.getSchema("output")),
       ).toMatchSnapshot();
-      expectType<{ n1: number; n2: number; s: string }>(
-        endpoint.getSchema("input")._output,
-      );
+      expectTypeOf(endpoint.getSchema("input")._output).toMatchTypeOf<{
+        n1: number;
+        n2: number;
+        s: string;
+      }>();
     });
 
     test("Should create an endpoint with union middleware", () => {
@@ -359,9 +365,9 @@ describe("EndpointsFactory", () => {
       expect(
         serializeSchemaForTest(endpoint.getSchema("output")),
       ).toMatchSnapshot();
-      expectType<{ s: string } & ({ n1: number } | { n2: number })>(
-        endpoint.getSchema("input")._output,
-      );
+      expectTypeOf(endpoint.getSchema("input")._output).toMatchTypeOf<
+        { s: string } & ({ n1: number } | { n2: number })
+      >();
     });
   });
 });

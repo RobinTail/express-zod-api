@@ -1,5 +1,4 @@
 import createHttpError from "http-errors";
-import { expectType } from "tsd";
 import {
   combinations,
   defaultInputSources,
@@ -15,7 +14,7 @@ import {
 } from "../../src/common-helpers";
 import { InputValidationError } from "../../src";
 import { z } from "zod";
-import { describe, expect, test } from "vitest";
+import { describe, expect, expectTypeOf, test } from "vitest";
 import { makeRequestMock } from "../../src/testing";
 
 describe("Common Helpers", () => {
@@ -359,7 +358,7 @@ describe("Common Helpers", () => {
       [[1, 2, 3], "1,2,3"],
     ])("should accept %#", (argument, expected) => {
       const result = makeErrorFromAnything(argument);
-      expectType<Error>(result);
+      expectTypeOf(result).toEqualTypeOf<Error>();
       expect(result).toBeInstanceOf(Error);
       expect(result).toHaveProperty("message");
       expect(typeof result.message).toBe("string");

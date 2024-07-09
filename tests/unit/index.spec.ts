@@ -1,5 +1,4 @@
 import { IRouter } from "express";
-import { expectType } from "tsd";
 import ts from "typescript";
 import { z } from "zod";
 import * as entrypoint from "../../src";
@@ -23,7 +22,7 @@ import {
   Routing,
   ServerConfig,
 } from "../../src";
-import { describe, expect, test } from "vitest";
+import { describe, expect, test, expectTypeOf } from "vitest";
 
 describe("Index Entrypoint", () => {
   describe("exports", () => {
@@ -43,47 +42,74 @@ describe("Index Entrypoint", () => {
     });
 
     test("Convenience types should be exposed", () => {
-      expectType<Depicter>(() => ({ type: "number" }));
-      expectType<Producer>(() =>
+      expectTypeOf(() => ({
+        type: "number" as const,
+      })).toMatchTypeOf<Depicter>();
+      expectTypeOf(() =>
         ts.factory.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword),
-      );
+      ).toMatchTypeOf<Producer>();
     });
 
     test("Issue 952, 1182, 1269: should expose certain types and interfaces", () => {
-      expectType<Method>("get");
-      expectType<IOSchema>(z.object({}));
-      expectType<FlatObject>({});
-      expectType<LoggerOverrides>({});
-      expectType<Routing>({});
-      expectType<CommonConfig>({ cors: true, logger: { level: "silent" } });
-      expectType<AppConfig>({
-        app: {} as IRouter,
-        cors: true,
-        logger: { level: "silent" },
-      });
-      expectType<ServerConfig>({
-        server: { listen: 8090 },
-        logger: { level: "silent" },
-        cors: false,
-      });
-      expectType<BasicSecurity>({ type: "basic" });
-      expectType<BearerSecurity>({ type: "bearer" });
-      expectType<CookieSecurity>({ type: "cookie", name: "" });
-      expectType<CustomHeaderSecurity>({ type: "header", name: "" });
-      expectType<InputSecurity<string>>({ type: "input", name: "" });
-      expectType<OAuth2Security<string>>({ type: "oauth2" });
-      expectType<OpenIdSecurity>({ type: "openid", url: "" });
-      expectType<ApiResponse<z.ZodTypeAny>>({ schema: z.string() });
+      expectTypeOf<"get">().toMatchTypeOf<Method>();
+      expectTypeOf(z.object({})).toMatchTypeOf<IOSchema>();
+      expectTypeOf({}).toMatchTypeOf<FlatObject>();
+      expectTypeOf({}).toEqualTypeOf<LoggerOverrides>();
+      expectTypeOf({}).toMatchTypeOf<Routing>();
+      expectTypeOf<{
+        cors: true;
+        logger: { level: "silent" };
+      }>().toMatchTypeOf<CommonConfig>();
+      expectTypeOf<{
+        app: IRouter;
+        cors: true;
+        logger: { level: "silent" };
+      }>().toMatchTypeOf<AppConfig>();
+      expectTypeOf<{
+        server: { listen: 8090 };
+        logger: { level: "silent" };
+        cors: false;
+      }>().toMatchTypeOf<ServerConfig>();
+      expectTypeOf<{ type: "basic" }>().toMatchTypeOf<BasicSecurity>();
+      expectTypeOf<{ type: "bearer" }>().toMatchTypeOf<BearerSecurity>();
+      expectTypeOf<{
+        type: "cookie";
+        name: "some";
+      }>().toMatchTypeOf<CookieSecurity>();
+      expectTypeOf<{
+        type: "header";
+        name: "some";
+      }>().toMatchTypeOf<CustomHeaderSecurity>();
+      expectTypeOf<{ type: "input"; name: "some" }>().toMatchTypeOf<
+        InputSecurity<string>
+      >();
+      expectTypeOf<{ type: "oauth2" }>().toMatchTypeOf<
+        OAuth2Security<string>
+      >();
+      expectTypeOf<{
+        type: "openid";
+        url: "https://";
+      }>().toMatchTypeOf<OpenIdSecurity>();
+      expectTypeOf({ schema: z.string() }).toMatchTypeOf<
+        ApiResponse<z.ZodTypeAny>
+      >();
     });
 
     test("Extended Zod prototypes", () => {
-      expectType<Partial<z.ZodAny>>({
+      expectTypeOf({
         example: () => z.any(),
-      });
-      expectType<Partial<z.ZodDefault<z.ZodString>>>({
+      }).toMatchTypeOf<Partial<z.ZodAny>>();
+      expectTypeOf({
         example: () => z.string().default(""),
         label: () => z.string().default(""),
-      });
+      }).toMatchTypeOf<Partial<z.ZodDefault<z.ZodString>>>();
+      expectTypeOf({
+        remap: () =>
+          z.pipeline(
+            z.object({}).transform(() => ({})),
+            z.object({}),
+          ),
+      }).toMatchTypeOf<Partial<z.ZodObject<z.ZodRawShape, "strip">>>();
     });
   });
 });

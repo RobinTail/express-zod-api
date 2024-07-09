@@ -1,9 +1,8 @@
-import { expectType } from "tsd";
 import { z } from "zod";
 import { ezFileBrand } from "../../src/file-schema";
 import { ez } from "../../src";
 import { readFile } from "node:fs/promises";
-import { describe, expect, test } from "vitest";
+import { describe, expect, expectTypeOf, test } from "vitest";
 import { metaSymbol } from "../../src/metadata";
 
 describe("ez.file()", () => {
@@ -17,25 +16,25 @@ describe("ez.file()", () => {
     test("should create a string file", () => {
       const schema = ez.file("string");
       expect(schema).toBeInstanceOf(z.ZodBranded);
-      expectType<string>(schema._output);
+      expectTypeOf(schema._output).toMatchTypeOf<string>();
     });
 
     test("should create a buffer file", () => {
       const schema = ez.file("buffer");
       expect(schema).toBeInstanceOf(z.ZodBranded);
-      expectType<Buffer>(schema._output);
+      expectTypeOf(schema._output).toMatchTypeOf<Buffer>();
     });
 
     test("should create a binary file", () => {
       const schema = ez.file("binary");
       expect(schema).toBeInstanceOf(z.ZodBranded);
-      expectType<Buffer | string>(schema._output);
+      expectTypeOf(schema._output).toMatchTypeOf<Buffer | string>();
     });
 
     test("should create a base64 file", () => {
       const schema = ez.file("base64");
       expect(schema).toBeInstanceOf(z.ZodBranded);
-      expectType<string>(schema._output);
+      expectTypeOf(schema._output).toMatchTypeOf<string>();
     });
   });
 
