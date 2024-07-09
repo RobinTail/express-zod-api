@@ -2,8 +2,9 @@
  * @fileoverview Zod Runtime Plugin
  * @see https://github.com/colinhacks/zod/blob/90efe7fa6135119224412c7081bd12ef0bccef26/plugin/effect/src/index.ts#L21-L31
  * @desc This code modifies and extends zod's functionality immediately when importing express-zod-api
- * @desc Enables .examples() on all schemas (ZodType)
+ * @desc Enables .example() on all schemas (ZodType)
  * @desc Enables .label() on ZodDefault
+ * @desc Enables .remap() on ZodObject
  * @desc Stores the argument supplied to .brand() on all schema (runtime distinguishable branded types)
  * */
 import { clone, fromPairs, map, pipe, toPairs, pair } from "ramda";
@@ -35,8 +36,11 @@ declare module "zod" {
       mapping: U,
     ): z.ZodPipeline<
       z.ZodEffects<this, FlatObject>, // internal type simplified
-      z.ZodObject<Remap<T, U, V> & Intact<T, U>>
+      z.ZodObject<Remap<T, U, V> & Intact<T, U>, UnknownKeys>
     >;
+    remap<U extends z.ZodRawShape>(
+      mapper: (subject: T) => U,
+    ): z.ZodPipeline<z.ZodEffects<this, FlatObject>, z.ZodObject<U>>; // internal type simplified
   }
 }
 
@@ -70,25 +74,21 @@ const brandSetter = function (
 
 const objectMapper = function (
   this: z.ZodObject<z.ZodRawShape>,
-  mapping: Record<string, string>,
+  tool:
+    | Record<string, string>
+    | (<T>(subject: T) => { [P in string | keyof T]: T[keyof T] }),
 ) {
-  return this.transform(
-    pipe(
-      toPairs,
-      map(([key, value]) => pair(mapping[key] || key, value)),
-      fromPairs,
-    ),
-  ).pipe(
-    z
-      .object(
-        pipe(
+  const transformer =
+    typeof tool === "function"
+      ? tool
+      : pipe(
           toPairs,
-          map(([key, schema]) => pair(mapping[String(key)] || key, schema)),
+          map(([key, value]) => pair(tool[String(key)] || key, value)),
           fromPairs,
-        )(clone(this.shape)), // immutable, no references to the original schemas
-      )
-      [this._def.unknownKeys](), // proxies unknown keys when set to "passthrough"
-  );
+        );
+  const nextShape = transformer(clone(this.shape)); // immutable
+  const output = z.object(nextShape)[this._def.unknownKeys](); // proxies unknown keys when set to "passthrough"
+  return this.transform(transformer).pipe(output);
 };
 
 if (!(metaSymbol in globalThis)) {

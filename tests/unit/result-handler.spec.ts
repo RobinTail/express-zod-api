@@ -1,6 +1,5 @@
 import { Response } from "express";
 import createHttpError from "http-errors";
-import { expectType } from "tsd";
 import { z } from "zod";
 import {
   InputValidationError,
@@ -10,7 +9,7 @@ import {
 } from "../../src";
 import { ResultHandlerError } from "../../src/errors";
 import { metaSymbol } from "../../src/metadata";
-import { describe, expect, test, vi } from "vitest";
+import { describe, expect, expectTypeOf, test, vi } from "vitest";
 import { AbstractResultHandler, Result } from "../../src/result-handler";
 import {
   makeLoggerMock,
@@ -31,7 +30,9 @@ describe("ResultHandler", () => {
           { statusCode: 500, schema: z.literal("failure") },
         ],
         handler: ({ response }) => {
-          expectType<Response<"ok" | "kinda" | "error" | "failure">>(response);
+          expectTypeOf(response).toMatchTypeOf<
+            Response<"ok" | "kinda" | "error" | "failure">
+          >();
           response.status(200).send("error");
         },
       });

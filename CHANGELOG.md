@@ -2,6 +2,45 @@
 
 ## Version 20
 
+### v20.3.2
+
+- Minor corrections to the documentation.
+
+### v20.3.1
+
+- Removed `eslint` and `prettier` from the list of the optional peer dependencies:
+  - `eslint` with a flat config support (v8 or v9) is only required to use [the migration codemod](#v2000);
+  - `prettier` is only a fallback for `Integration::printFormatted()`, which can work without it as well;
+  - These changes aim to reduce the confusion and ease the installation;
+  - The issue was found and reported by **Bogdan** who does not have a GitHub account.
+
+### v20.3.0
+
+- Feature: `z.object().remap()` accepts a mapping function:
+  - Similar to `.transform()` you can now supply an object shape mapping function;
+  - It is important to use shallow transformations only;
+  - Using `.remap()` is recommended for `output` schemas if you're also aiming to generate a valid documentation.
+
+```ts
+import camelize from "camelize-ts";
+import snakify from "snakify-ts";
+import { z } from "zod";
+
+const endpoint = endpointsFactory.build({
+  method: "get",
+  input: z
+    .object({ user_id: z.string() })
+    .transform((inputs) => camelize(inputs, /* shallow: */ true)),
+  output: z
+    .object({ userName: z.string() })
+    .remap((outputs) => snakify(outputs, /* shallow: */ true)),
+  handler: async ({ input: { userId }, logger }) => {
+    logger.debug("user_id became userId", userId);
+    return { userName: "Agneta" }; // becomes "user_name" in response
+  },
+});
+```
+
 ### v20.2.0
 
 - Feature: Partial mapping and passthrough support for `z.object().remap()`:
@@ -137,6 +176,11 @@ expect(loggerMock._getLogs().error).toHaveLength(0);
 ```
 
 ## Version 19
+
+### v19.3.0
+
+- Feat: Supporting `vitest` version 2:
+  - Released today. Find the migration guide here: https://vitest.dev/guide/migration.html#migrating-to-vitest-2-0
 
 ### v19.2.3
 

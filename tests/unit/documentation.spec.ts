@@ -1,4 +1,5 @@
 import camelize from "camelize-ts";
+import snakify from "snakify-ts";
 import { config as exampleConfig } from "../../example/config";
 import { routing } from "../../example/routing";
 import {
@@ -12,11 +13,10 @@ import {
   ez,
   ResultHandler,
 } from "../../src";
-import { expectType } from "tsd";
 import { contentTypes } from "../../src/content-type";
 import { z } from "zod";
 import { givePort } from "../helpers";
-import { describe, expect, test, vi } from "vitest";
+import { describe, expect, expectTypeOf, test, vi } from "vitest";
 
 describe("Documentation", () => {
   const sampleConfig = createConfig({
@@ -861,8 +861,14 @@ describe("Documentation", () => {
       const unionSchema = z.union([subType1, subType2]);
       type TestingType = z.infer<typeof unionSchema>;
 
-      expectType<TestingType>({ id: "string", field1: "string" });
-      expectType<TestingType>({ id: "string", field2: "string" });
+      expectTypeOf({
+        id: "string",
+        field1: "string",
+      }).toMatchTypeOf<TestingType>();
+      expectTypeOf({
+        id: "string",
+        field2: "string",
+      }).toMatchTypeOf<TestingType>();
 
       const spec = new Documentation({
         config: sampleConfig,
@@ -1318,7 +1324,7 @@ describe("Documentation", () => {
   });
 
   describe("Feature #1869: Top level transformations", () => {
-    test("should handle object-to-object transformation in request", () => {
+    test("should handle object-to-object functional transformations and mapping", () => {
       const spec = new Documentation({
         config: sampleConfig,
         routing: {
@@ -1328,11 +1334,12 @@ describe("Documentation", () => {
               input: z
                 .object({ user_id: z.string() })
                 .transform((inputs) => camelize(inputs, true)),
-              output: z.object({}),
-              handler: async ({ input: { userId }, logger }) => {
-                logger.debug("userId", userId);
-                return {};
-              },
+              output: z
+                .object({ userName: z.string() })
+                .remap((outputs) => snakify(outputs, true)),
+              handler: async ({ input: { userId } }) => ({
+                userName: `User ${userId}`,
+              }),
             }),
           },
         },
@@ -1343,7 +1350,7 @@ describe("Documentation", () => {
       expect(spec).toMatchSnapshot();
     });
 
-    test("should handle in request and response using .remap()", () => {
+    test("should handle explicit renaming", () => {
       const spec = new Documentation({
         config: sampleConfig,
         routing: {

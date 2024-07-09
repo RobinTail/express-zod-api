@@ -3683,7 +3683,7 @@ servers:
 "
 `;
 
-exports[`Documentation > Feature #1869: Top level transformations > should handle in request and response using .remap() 1`] = `
+exports[`Documentation > Feature #1869: Top level transformations > should handle explicit renaming 1`] = `
 "openapi: 3.1.0
 info:
   title: Testing top level transformations
@@ -3773,7 +3773,7 @@ servers:
 "
 `;
 
-exports[`Documentation > Feature #1869: Top level transformations > should handle object-to-object transformation in request 1`] = `
+exports[`Documentation > Feature #1869: Top level transformations > should handle object-to-object functional transformations and mapping 1`] = `
 "openapi: 3.1.0
 info:
   title: Testing top level transformations
@@ -3802,6 +3802,11 @@ paths:
                     const: success
                   data:
                     type: object
+                    properties:
+                      user_name:
+                        type: string
+                    required:
+                      - user_name
                 required:
                   - status
                   - data
