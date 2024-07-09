@@ -2,6 +2,11 @@
 
 ## Version 19
 
+### v19.3.0
+
+- Feat: Supporting `vitest` version 2:
+  - Released today. Find the migration guide here: https://vitest.dev/guide/migration.html#migrating-to-vitest-2-0
+
 ### v19.2.3
 
 - `ansis` version `^3.2.0`;
