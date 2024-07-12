@@ -1,3 +1,4 @@
+import "../../src/zod-plugin"; // required for this test
 import camelize from "camelize-ts";
 import { describe, expect, test } from "vitest";
 import { z } from "zod";
