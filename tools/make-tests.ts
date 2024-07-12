@@ -14,11 +14,16 @@ const extractQuickStartFromReadme = async () => {
 };
 
 const quickStart = await extractQuickStartFromReadme();
-await writeFile("./tests/cjs/quick-start.ts", quickStart);
-await writeFile("./tests/esm/quick-start.ts", quickStart);
 
-/** @link https://github.com/RobinTail/express-zod-api/issues/952 */
-await writeFile(
-  "./tests/issue952/quick-start.ts",
-  quickStart.replace(/const/g, "export const"),
-);
+const testContent = {
+  cjs: quickStart,
+  esm: quickStart,
+  issue952: quickStart.replace(/const/g, "export const"),
+};
+
+for (const testName in testContent) {
+  await writeFile(
+    `./tests/${testName}/quick-start.ts`,
+    testContent[testName as keyof typeof testContent],
+  );
+}
