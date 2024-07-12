@@ -13,7 +13,6 @@
     "tests/bench",
     "tests/*.ts",
     "tools",
-    "*.config.ts",
-    "*.setup.ts"
+    "*.config.ts"
   ],
 }
