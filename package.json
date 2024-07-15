@@ -150,12 +150,12 @@
     "tsup": "^8.0.0",
     "tsx": "^4.6.2",
     "typescript": "^5.5.2",
-    "typescript-eslint": "^8.0.0-alpha.42",
+    "typescript-eslint": "^8.0.0-alpha.44",
     "vitest": "^2.0.0",
     "zod": "^3.23.0"
   },
   "resolutions": {
-    "**/@typescript-eslint/utils": "^8.0.0-alpha.42"
+    "**/@typescript-eslint/utils": "^8.0.0-alpha.44"
   },
   "keywords": [
     "nodejs",
