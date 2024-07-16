@@ -72,11 +72,6 @@ interface TestingProps<REQ, LOG> {
   loggerProps?: LOG;
 }
 
-interface TestEndpointProps<REQ, LOG> extends TestingProps<REQ, LOG> {
-  /** @desc The endpoint to test */
-  endpoint: AbstractEndpoint;
-}
-
 export const testEndpoint = async <
   LOG extends FlatObject,
   REQ extends RequestOptions,
@@ -86,7 +81,10 @@ export const testEndpoint = async <
   responseOptions,
   configProps,
   loggerProps,
-}: TestEndpointProps<REQ, LOG>) => {
+}: TestingProps<REQ, LOG> & {
+  /** @desc The endpoint to test */
+  endpoint: AbstractEndpoint;
+}) => {
   const requestMock = makeRequestMock(requestProps);
   const responseMock = makeResponseMock({
     req: requestMock,
@@ -107,11 +105,6 @@ export const testEndpoint = async <
   return { requestMock, responseMock, loggerMock };
 };
 
-interface TestMiddlewareProps<REQ, LOG> extends TestingProps<REQ, LOG> {
-  middleware: AbstractMiddleware;
-  options: FlatObject;
-}
-
 export const testMiddleware = async <
   LOG extends FlatObject,
   REQ extends RequestOptions,
@@ -120,9 +113,14 @@ export const testMiddleware = async <
   responseOptions,
   middleware,
   loggerProps,
-  options,
+  options = {},
   configProps,
-}: TestMiddlewareProps<REQ, LOG>) => {
+}: TestingProps<REQ, LOG> & {
+  /** @desc The middleware to test */
+  middleware: AbstractMiddleware;
+  /** @desc The output aggregated from previous middlewares */
+  options?: FlatObject;
+}) => {
   // @todo DNRY
   const requestMock = makeRequestMock(requestProps);
   const responseMock = makeResponseMock({
