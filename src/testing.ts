@@ -97,21 +97,13 @@ export const testEndpoint = async <
   REQ extends RequestOptions,
 >({
   endpoint,
-  requestProps,
-  responseOptions,
-  configProps,
-  loggerProps,
+  ...rest
 }: TestingProps<REQ, LOG> & {
   /** @desc The endpoint to test */
   endpoint: AbstractEndpoint;
 }) => {
   const { requestMock, responseMock, loggerMock, configMock } =
-    makeTestingMocks({
-      requestProps,
-      responseOptions,
-      configProps,
-      loggerProps,
-    });
+    makeTestingMocks(rest);
   await endpoint.execute({
     request: requestMock,
     response: responseMock,
@@ -125,12 +117,9 @@ export const testMiddleware = async <
   LOG extends FlatObject,
   REQ extends RequestOptions,
 >({
-  requestProps,
-  responseOptions,
   middleware,
-  loggerProps,
   options = {},
-  configProps,
+  ...rest
 }: TestingProps<REQ, LOG> & {
   /** @desc The middleware to test */
   middleware: AbstractMiddleware;
@@ -138,12 +127,7 @@ export const testMiddleware = async <
   options?: FlatObject;
 }) => {
   const { requestMock, responseMock, loggerMock, configMock } =
-    makeTestingMocks({
-      requestProps,
-      responseOptions,
-      configProps,
-      loggerProps,
-    });
+    makeTestingMocks(rest);
   const input = getInput(requestMock, configMock.inputSources);
   const output = await middleware.execute({
     request: requestMock,
