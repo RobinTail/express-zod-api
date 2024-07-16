@@ -1,5 +1,5 @@
 import { Request } from "express";
-import { FlatObject } from "./common-helpers";
+import { FlatObject, getInput } from "./common-helpers";
 import { CommonConfig } from "./config-type";
 import { AbstractEndpoint } from "./endpoint";
 import { AbstractLogger, ActualLogger, severity } from "./logger-helpers";
@@ -11,6 +11,7 @@ import {
   createResponse,
   ResponseOptions,
 } from "node-mocks-http";
+import { AbstractMiddleware } from "./middleware";
 
 export const makeRequestMock = <REQ extends RequestOptions>(props?: REQ) => {
   const mock = createRequest<Request>({
@@ -48,9 +49,7 @@ export const makeLoggerMock = <LOG extends FlatObject>(loggerProps?: LOG) => {
   );
 };
 
-interface TestEndpointProps<REQ, LOG> {
-  /** @desc The endpoint to test */
-  endpoint: AbstractEndpoint;
+interface TestingProps<REQ, LOG> {
   /**
    * @desc Additional properties to set on Request mock
    * @default { method: "GET", headers: { "content-type": "application/json" } }
@@ -71,6 +70,11 @@ interface TestEndpointProps<REQ, LOG> {
    * @default { info, warn, error, debug }
    * */
   loggerProps?: LOG;
+}
+
+interface TestEndpointProps<REQ, LOG> extends TestingProps<REQ, LOG> {
+  /** @desc The endpoint to test */
+  endpoint: AbstractEndpoint;
 }
 
 export const testEndpoint = async <
@@ -101,4 +105,43 @@ export const testEndpoint = async <
     logger: loggerMock as ActualLogger,
   });
   return { requestMock, responseMock, loggerMock };
+};
+
+interface TestMiddlewareProps<REQ, LOG> extends TestingProps<REQ, LOG> {
+  middleware: AbstractMiddleware;
+  options: FlatObject;
+}
+
+export const testMiddleware = async <
+  LOG extends FlatObject,
+  REQ extends RequestOptions,
+>({
+  requestProps,
+  responseOptions,
+  middleware,
+  loggerProps,
+  options,
+  configProps,
+}: TestMiddlewareProps<REQ, LOG>) => {
+  // @todo DNRY
+  const requestMock = makeRequestMock(requestProps);
+  const responseMock = makeResponseMock({
+    req: requestMock,
+    ...responseOptions,
+  });
+  const loggerMock = makeLoggerMock(loggerProps);
+  const configMock = {
+    cors: false,
+    logger: loggerMock,
+    ...configProps,
+  };
+  const input = getInput(requestMock, configMock.inputSources);
+  const output = await middleware.execute({
+    request: requestMock,
+    response: responseMock,
+    logger: loggerMock,
+    input,
+    options,
+  });
+  return { requestMock, responseMock, loggerMock, output };
 };
