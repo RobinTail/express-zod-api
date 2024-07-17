@@ -1,6 +1,7 @@
 import http from "node:http";
 import https from "node:https";
 import { MockInstance, vi } from "vitest";
+import type { Application } from "express";
 
 const realHttpCreator = http.createServer;
 const realHttpsCreator = https.createServer;
@@ -9,9 +10,11 @@ let httpListenSpy: MockInstance;
 let httpsListenSpy: MockInstance;
 
 vi.spyOn(http, "createServer").mockImplementation((app) => {
-  const server = realHttpCreator(app);
+  const server = realHttpCreator(app as Application);
   httpListenSpy = vi.spyOn(server, "listen").mockImplementation(({}, cb) => {
-    cb?.call(null);
+    if (typeof cb === "function") {
+      cb();
+    }
     return server;
   });
   return server;
@@ -19,10 +22,12 @@ vi.spyOn(http, "createServer").mockImplementation((app) => {
 
 const createHttpsServerSpy = vi
   .spyOn(https, "createServer")
-  .mockImplementation(({}, app) => {
-    const server = realHttpsCreator(app);
+  .mockImplementation((...args) => {
+    const server = realHttpsCreator(args[1] as Application);
     httpsListenSpy = vi.spyOn(server, "listen").mockImplementation(({}, cb) => {
-      cb?.call(null);
+      if (typeof cb === "function") {
+        cb();
+      }
       return server;
     });
     return server;
