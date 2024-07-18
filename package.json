@@ -33,7 +33,7 @@
     "test:952": "yarn --cwd tests/issue952 && yarn --cwd tests/issue952 test",
     "test:compat": "yarn --cwd tests/compat && yarn --cwd tests/compat test",
     "bench": "vitest bench --run tests/bench",
-    "lint": "eslint && yarn prettier *.md --check",
+    "lint": "yarn eslint && yarn prettier *.md --check",
     "mdfix": "prettier *.md --write",
     "cleanup": "rm -rf tests/**/node_modules coverage",
     "precommit": "yarn lint && yarn test && yarn build && git add example/example.* LICENSE coverage.svg",
