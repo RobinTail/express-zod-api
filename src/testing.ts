@@ -123,7 +123,7 @@ export const testMiddleware = async <
 }: TestingProps<REQ, LOG> & {
   /** @desc The middleware to test */
   middleware: AbstractMiddleware;
-  /** @desc The output aggregated from previous middlewares */
+  /** @desc The aggregated output from previously executed middlewares */
   options?: FlatObject;
 }) => {
   const { requestMock, responseMock, loggerMock, configMock } =
