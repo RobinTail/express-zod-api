@@ -7,11 +7,7 @@ import {
   ResultHandler,
 } from "../../src";
 import { Endpoint } from "../../src/endpoint";
-import {
-  makeLoggerMock,
-  makeRequestMock,
-  makeResponseMock,
-} from "../../src/testing";
+import { testMiddleware } from "../../src/testing";
 import { serializeSchemaForTest } from "../helpers";
 import { z } from "zod";
 import { describe, expect, expectTypeOf, test, vi } from "vitest";
@@ -109,15 +105,10 @@ describe("EndpointsFactory", () => {
       expect(
         (newFactory["middlewares"][0].getSchema() as z.AnyZodObject).shape,
       ).toEqual({});
-      expect(
-        await newFactory["middlewares"][0].execute({
-          input: {},
-          options: {},
-          request: makeRequestMock(),
-          response: makeResponseMock(),
-          logger: makeLoggerMock(),
-        }),
-      ).toEqual({
+      const { output: options } = await testMiddleware({
+        middleware: newFactory["middlewares"][0],
+      });
+      expect(options).toEqual({
         option1: "some value",
         option2: "other value",
       });
@@ -144,14 +135,13 @@ describe("EndpointsFactory", () => {
         expect(
           (newFactory["middlewares"][0].getSchema() as z.AnyZodObject).shape,
         ).toEqual({});
-        const requestMock = makeRequestMock({ body: { something: "awesome" } });
-        const responseMock = makeResponseMock();
-        const options = await newFactory["middlewares"][0].execute({
-          input: {},
-          options: {},
-          request: requestMock,
-          response: responseMock,
-          logger: makeLoggerMock(),
+        const {
+          output: options,
+          responseMock,
+          requestMock,
+        } = await testMiddleware({
+          middleware: newFactory["middlewares"][0],
+          requestProps: { body: { something: "awesome" } },
         });
         expect(middleware).toHaveBeenCalledTimes(1);
         expect(middleware).toHaveBeenCalledWith(
@@ -172,14 +162,13 @@ describe("EndpointsFactory", () => {
         });
         const newFactory = factory[method](middleware);
         expect(newFactory["middlewares"].length).toBe(1);
-        const requestMock = makeRequestMock({ body: { something: "awesome" } });
-        const responseMock = makeResponseMock({});
-        const options = await newFactory["middlewares"][0].execute({
-          input: {},
-          options: {},
-          request: requestMock,
-          response: responseMock,
-          logger: makeLoggerMock(),
+        const {
+          output: options,
+          responseMock,
+          requestMock,
+        } = await testMiddleware({
+          middleware: newFactory["middlewares"][0],
+          requestProps: { body: { something: "awesome" } },
         });
         expect(middleware).toHaveBeenCalledTimes(1);
         expect(middleware).toHaveBeenCalledWith(
@@ -199,12 +188,8 @@ describe("EndpointsFactory", () => {
         });
         const newFactory = factory[method](middleware);
         try {
-          await newFactory["middlewares"][0].execute({
-            input: {},
-            options: {},
-            request: makeRequestMock(),
-            response: makeResponseMock(),
-            logger: makeLoggerMock(),
+          await testMiddleware({
+            middleware: newFactory["middlewares"][0],
           });
           expect.fail("Should not be here");
         } catch (e) {
@@ -225,12 +210,8 @@ describe("EndpointsFactory", () => {
           transformer: (err) => createHttpError(401, err.message),
         });
         try {
-          await newFactory["middlewares"][0].execute({
-            input: {},
-            options: {},
-            request: makeRequestMock(),
-            response: makeResponseMock(),
-            logger: makeLoggerMock(),
+          await testMiddleware({
+            middleware: newFactory["middlewares"][0],
           });
           expect.fail("Should not be here");
         } catch (e) {
