@@ -1,6 +1,6 @@
 {
   "name": "express-zod-api",
-  "version": "20.3.2",
+  "version": "20.4.0",
   "description": "A Typescript library to help you get an API server up and running with I/O schema validation and custom middlewares in minutes.",
   "license": "MIT",
   "repository": {
@@ -150,12 +150,12 @@
     "tsup": "^8.0.0",
     "tsx": "^4.6.2",
     "typescript": "^5.5.2",
-    "typescript-eslint": "^8.0.0-alpha.44",
+    "typescript-eslint": "^8.0.0-alpha.45",
     "vitest": "^2.0.3",
     "zod": "^3.23.0"
   },
   "resolutions": {
-    "**/@typescript-eslint/utils": "^8.0.0-alpha.44"
+    "**/@typescript-eslint/utils": "^8.0.0-alpha.45"
   },
   "keywords": [
     "nodejs",

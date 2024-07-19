@@ -1,5 +1,5 @@
 import { Request } from "express";
-import { FlatObject } from "./common-helpers";
+import { FlatObject, getInput } from "./common-helpers";
 import { CommonConfig } from "./config-type";
 import { AbstractEndpoint } from "./endpoint";
 import { AbstractLogger, ActualLogger, severity } from "./logger-helpers";
@@ -11,6 +11,7 @@ import {
   createResponse,
   ResponseOptions,
 } from "node-mocks-http";
+import { AbstractMiddleware } from "./middleware";
 
 export const makeRequestMock = <REQ extends RequestOptions>(props?: REQ) => {
   const mock = createRequest<Request>({
@@ -48,9 +49,27 @@ export const makeLoggerMock = <LOG extends FlatObject>(loggerProps?: LOG) => {
   );
 };
 
-interface TestEndpointProps<REQ, LOG> {
-  /** @desc The endpoint to test */
-  endpoint: AbstractEndpoint;
+const makeTestingMocks = <LOG extends FlatObject, REQ extends RequestOptions>({
+  requestProps,
+  responseOptions,
+  configProps,
+  loggerProps,
+}: TestingProps<REQ, LOG>) => {
+  const requestMock = makeRequestMock(requestProps);
+  const responseMock = makeResponseMock({
+    req: requestMock,
+    ...responseOptions,
+  });
+  const loggerMock = makeLoggerMock(loggerProps);
+  const configMock = {
+    cors: false,
+    logger: loggerMock,
+    ...configProps,
+  };
+  return { requestMock, responseMock, loggerMock, configMock };
+};
+
+interface TestingProps<REQ, LOG> {
   /**
    * @desc Additional properties to set on Request mock
    * @default { method: "GET", headers: { "content-type": "application/json" } }
@@ -78,22 +97,13 @@ export const testEndpoint = async <
   REQ extends RequestOptions,
 >({
   endpoint,
-  requestProps,
-  responseOptions,
-  configProps,
-  loggerProps,
-}: TestEndpointProps<REQ, LOG>) => {
-  const requestMock = makeRequestMock(requestProps);
-  const responseMock = makeResponseMock({
-    req: requestMock,
-    ...responseOptions,
-  });
-  const loggerMock = makeLoggerMock(loggerProps);
-  const configMock = {
-    cors: false,
-    logger: loggerMock,
-    ...configProps,
-  };
+  ...rest
+}: TestingProps<REQ, LOG> & {
+  /** @desc The endpoint to test */
+  endpoint: AbstractEndpoint;
+}) => {
+  const { requestMock, responseMock, loggerMock, configMock } =
+    makeTestingMocks(rest);
   await endpoint.execute({
     request: requestMock,
     response: responseMock,
@@ -101,4 +111,30 @@ export const testEndpoint = async <
     logger: loggerMock as ActualLogger,
   });
   return { requestMock, responseMock, loggerMock };
+};
+
+export const testMiddleware = async <
+  LOG extends FlatObject,
+  REQ extends RequestOptions,
+>({
+  middleware,
+  options = {},
+  ...rest
+}: TestingProps<REQ, LOG> & {
+  /** @desc The middleware to test */
+  middleware: AbstractMiddleware;
+  /** @desc The aggregated output from previously executed middlewares */
+  options?: FlatObject;
+}) => {
+  const { requestMock, responseMock, loggerMock, configMock } =
+    makeTestingMocks(rest);
+  const input = getInput(requestMock, configMock.inputSources);
+  const output = await middleware.execute({
+    request: requestMock,
+    response: responseMock,
+    logger: loggerMock,
+    input,
+    options,
+  });
+  return { requestMock, responseMock, loggerMock, output };
 };
