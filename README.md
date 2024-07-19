@@ -48,6 +48,7 @@ Start your API server with I/O schema validation and custom middlewares in minut
    7. [Serving static files](#serving-static-files)
    8. [Connect to your own express app](#connect-to-your-own-express-app)
    9. [Testing endpoints](#testing-endpoints)
+   10. [Testing middlewares](#testing-middlewares)
 6. [Special needs](#special-needs)
    1. [Different responses for different status codes](#different-responses-for-different-status-codes)
    2. [Array response](#array-response) for migrating legacy APIs
@@ -964,6 +965,31 @@ test("should respond successfully", async () => {
   expect(responseMock._getStatusCode()).toBe(200);
   expect(responseMock._getHeaders()).toHaveProperty("x-custom", "one"); // lower case!
   expect(responseMock._getJSONData()).toEqual({ status: "success" });
+});
+```
+
+## Testing middlewares
+
+Middlewares can also be tested individually, [similar to endpoints](#testing-endpoints), but using the
+`testMiddleware()` method. There is also an ability to pass `options` collected from outputs of previous middlewares,
+if the one being tested somehow depends on them.
+
+```typescript
+const { output, responseMock, loggerMock } = await testMiddleware({
+  requestProps: { method: "POST", body: { test: "something" } },
+  options: { prev: "accumulated" },
+  middleware: new Middleware({
+    input: z.object({ test: z.string() }),
+    handler: async ({ options, input: { test } }) => ({
+      collectedOptions: Object.keys(options),
+      testLength: test.length,
+    }),
+  }),
+});
+expect(loggerMock._getLogs().error).toHaveLength(0);
+expect(output).toEqual({
+  collectedOptions: ["prev"],
+  testLength: 9,
 });
 ```
 
