@@ -1,10 +1,11 @@
 import { z } from "zod";
-import { defaultEndpointsFactory, testEndpoint } from "../../src";
+import { defaultEndpointsFactory, Middleware, testEndpoint } from "../../src";
 import { Mock, describe, expect, expectTypeOf, test, vi } from "vitest";
+import { testMiddleware } from "../../src/testing";
 
 describe("Testing", () => {
   describe("testEndpoint()", () => {
-    test("Should test the endpoint", async () => {
+    test("Should test an endpoint", async () => {
       const endpoint = defaultEndpointsFactory
         .addMiddleware({
           input: z.object({}),
@@ -43,6 +44,26 @@ describe("Testing", () => {
       expect(loggerMock.feat2).toBe(789);
       expectTypeOf(requestMock.test1).toEqualTypeOf<Mock>();
       expectTypeOf(loggerMock.feat1).toEqualTypeOf<Mock>();
+    });
+  });
+
+  describe("testMiddleware()", () => {
+    test("Should test a middleware", async () => {
+      const { output } = await testMiddleware({
+        requestProps: { method: "POST", body: { test: "something" } },
+        options: { prev: "accumulated" },
+        middleware: new Middleware({
+          input: z.object({ test: z.string() }),
+          handler: async ({ options, input: { test } }) => ({
+            optKeys: Object.keys(options),
+            inpLen: test.length,
+          }),
+        }),
+      });
+      expect(output).toEqual({
+        optKeys: ["prev"],
+        inpLen: 9,
+      });
     });
   });
 });

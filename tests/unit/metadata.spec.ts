@@ -1,3 +1,4 @@
+import "../../src/zod-plugin"; // required for this test
 import { z } from "zod";
 import { copyMeta, metaSymbol } from "../../src/metadata";
 import { describe, expect, test } from "vitest";
