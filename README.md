@@ -975,22 +975,24 @@ Middlewares can also be tested individually, [similar to endpoints](#testing-end
 if the one being tested somehow depends on them.
 
 ```typescript
-const { output, responseMock, loggerMock } = await testMiddleware({
-  requestProps: { method: "POST", body: { test: "something" } },
-  options: { prev: "accumulated" },
-  middleware: new Middleware({
-    input: z.object({ test: z.string() }),
-    handler: async ({ options, input: { test } }) => ({
-      collectedOptions: Object.keys(options),
-      testLength: test.length,
-    }),
+import { z } from "zod";
+import { Middleware, testMiddleware } from "express-zod-api";
+
+const middleware = new Middleware({
+  input: z.object({ test: z.string() }),
+  handler: async ({ options, input: { test } }) => ({
+    collectedOptions: Object.keys(options),
+    testLength: test.length,
   }),
 });
-expect(loggerMock._getLogs().error).toHaveLength(0);
-expect(output).toEqual({
-  collectedOptions: ["prev"],
-  testLength: 9,
+
+const { output, responseMock, loggerMock } = await testMiddleware({
+  middleware,
+  requestProps: { method: "POST", body: { test: "something" } },
+  options: { prev: "accumulated" },
 });
+expect(loggerMock._getLogs().error).toHaveLength(0);
+expect(output).toEqual({ collectedOptions: ["prev"], testLength: 9 });
 ```
 
 # Special needs
