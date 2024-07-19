@@ -2,6 +2,32 @@
 
 ## Version 20
 
+### v20.4.0
+
+- Feat: middleware testing helper: `testMiddleware()`, similar to `testEndpoint()`:
+  - There is also an ability to pass `options` collected from outputs of previous middlewares, if the one being tested
+    somehow depends on them.
+  - The method returns: `output, requestMock, responseMock, loggerMock`.
+
+```typescript
+const { output, responseMock, loggerMock } = await testMiddleware({
+  requestProps: { method: "POST", body: { test: "something" } },
+  options: { prev: "accumulated" },
+  middleware: new Middleware({
+    input: z.object({ test: z.string() }),
+    handler: async ({ options, input: { test } }) => ({
+      collectedOptions: Object.keys(options),
+      testLength: test.length,
+    }),
+  }),
+});
+expect(loggerMock._getLogs().error).toHaveLength(0);
+expect(output).toEqual({
+  collectedOptions: ["prev"],
+  testLength: 9,
+});
+```
+
 ### v20.3.2
 
 - Minor corrections to the documentation.
