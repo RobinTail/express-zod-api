@@ -958,8 +958,7 @@ test("should respond successfully", async () => {
     requestProps: {
       method: "POST", // default: GET
       body: {}, // incoming data as if after parsing (JSON)
-    },
-    // responseOptions, configProps, loggerProps
+    }, // responseOptions, configProps, loggerProps
   });
   expect(loggerMock._getLogs().error).toHaveLength(0);
   expect(responseMock._getStatusCode()).toBe(200);
@@ -989,7 +988,7 @@ const middleware = new Middleware({
 const { output, responseMock, loggerMock } = await testMiddleware({
   middleware,
   requestProps: { method: "POST", body: { test: "something" } },
-  options: { prev: "accumulated" },
+  options: { prev: "accumulated" }, // responseOptions, configProps, loggerProps
 });
 expect(loggerMock._getLogs().error).toHaveLength(0);
 expect(output).toEqual({ collectedOptions: ["prev"], testLength: 9 });
