@@ -141,7 +141,6 @@ describe("EndpointsFactory", () => {
           requestMock,
         } = await testMiddleware({
           middleware: newFactory["middlewares"][0],
-          requestProps: { body: { something: "awesome" } },
         });
         expect(middleware).toHaveBeenCalledTimes(1);
         expect(middleware).toHaveBeenCalledWith(
@@ -168,7 +167,6 @@ describe("EndpointsFactory", () => {
           requestMock,
         } = await testMiddleware({
           middleware: newFactory["middlewares"][0],
-          requestProps: { body: { something: "awesome" } },
         });
         expect(middleware).toHaveBeenCalledTimes(1);
         expect(middleware).toHaveBeenCalledWith(
