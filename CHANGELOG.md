@@ -7,7 +7,7 @@
 - Feat: middleware testing helper: `testMiddleware()`, similar to `testEndpoint()`:
   - There is also an ability to pass `options` collected from outputs of previous middlewares, if the one being tested
     somehow depends on them.
-  - The method returns: `output, requestMock, responseMock, loggerMock`.
+  - The method returns: `Promise<{ output, requestMock, responseMock, loggerMock }>`.
 
 ```typescript
 import { z } from "zod";
