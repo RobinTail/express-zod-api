@@ -1517,9 +1517,10 @@ eslint-module-utils@^2.7.4:
   dependencies:
     debug "^3.2.7"
 
-"eslint-plugin-import@https://registry.npmjs.org/eslint-plugin-import-x/-/eslint-plugin-import-x-3.0.1.tgz":
+"eslint-plugin-import@npm:eslint-plugin-import-x@^3.0.1":
   version "3.0.1"
-  resolved "https://registry.npmjs.org/eslint-plugin-import-x/-/eslint-plugin-import-x-3.0.1.tgz#e65b383a6e6708d3d7961bd36f157d7f5b5bb51d"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-import-x/-/eslint-plugin-import-x-3.0.1.tgz#e65b383a6e6708d3d7961bd36f157d7f5b5bb51d"
+  integrity sha512-jzQgJuE4ssxwNi0aMBkOL8whd4eHb0Z/uFWsk8uEoYB7xwTkAptSKojLzRswxgf/1bhH6QgcLjgabUBQqluBIg==
   dependencies:
     "@rtsao/scc" "^1.1.0"
     "@typescript-eslint/utils" "^7.4.0"
