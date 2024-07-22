@@ -15,7 +15,7 @@ export default defineConfig([
     ...commons,
     entry: ["src/index.ts"],
     esbuildOptions: (options, { format }) => {
-      options.supported = {};
+      options.supported = options.supported || {};
       if (format === "cjs") {
         /**
          * Downgrade dynamic imports for CJS even they are actually supported, but still are problematic for Jest
