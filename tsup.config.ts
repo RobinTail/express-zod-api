@@ -8,6 +8,9 @@ const commons: Options = {
   clean: true,
   dts: true,
   minify: true,
+  target: "node18",
+  platform: "node",
+  removeNodeProtocol: false, // @todo will be default in v9
 };
 
 export default defineConfig([
