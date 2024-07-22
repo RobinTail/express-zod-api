@@ -142,6 +142,6 @@ const rules = { v20 };
 export default {
   rules: { "ez-migration/v20": "error" },
   plugins: { [pluginName]: { rules } },
-} satisfies Linter.FlatConfig<
+} satisfies Linter.Config<
   Record<`${typeof pluginName}/${keyof typeof rules}`, "error">
 >;
