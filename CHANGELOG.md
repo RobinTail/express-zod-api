@@ -2,6 +2,12 @@
 
 ## Version 20
 
+### v20.4.1
+
+- Technical update due to improved builder configuration:
+  - Removed crutches for the `migration/index.d.cts` file;
+  - Fixed missing `node:` protocol in the imports of core modules in the distributed javascript files.
+
 ### v20.4.0
 
 - Feat: middleware testing helper: `testMiddleware()`, similar to `testEndpoint()`:

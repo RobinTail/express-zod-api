@@ -1,27 +1,26 @@
 import { defineConfig, Options } from "tsup";
-import { version } from "./package.json";
+import { version, engines } from "./package.json";
+import semver from "semver";
+
+const minNode = semver.minVersion(engines.node)!;
 
 const commons: Options = {
+  format: ["cjs", "esm"],
   splitting: false,
   sourcemap: false,
   clean: true,
   dts: true,
   minify: true,
-};
-
-const migration: Options = {
-  ...commons,
-  entry: { index: "src/migration.ts" },
-  outDir: "migration",
+  target: `node${minNode.major}.${minNode.minor}.${minNode.patch}`,
+  removeNodeProtocol: false, // @todo will be default in v9
 };
 
 export default defineConfig([
   {
     ...commons,
-    format: ["cjs", "esm"],
     entry: ["src/index.ts"],
     esbuildOptions: (options, { format }) => {
-      options.supported = {};
+      options.supported = options.supported || {};
       if (format === "cjs") {
         /**
          * Downgrade dynamic imports for CJS even they are actually supported, but still are problematic for Jest
@@ -36,13 +35,13 @@ export default defineConfig([
     },
   },
   {
-    ...migration,
-    format: "esm",
-  },
-  {
-    ...migration,
-    format: "cjs",
-    // @see https://github.com/arethetypeswrong/arethetypeswrong.github.io/blob/main/docs/problems/MissingExportEquals.md
-    dts: { footer: `export = _default;` },
+    ...commons,
+    entry: { index: "src/migration.ts" },
+    outDir: "migration",
+    /**
+     * This replaces "export { _default as default }" with "export = _default" in the CJS DTS build
+     * @link https://github.com/arethetypeswrong/arethetypeswrong.github.io/blob/main/docs/problems/MissingExportEquals.md
+     * */
+    cjsInterop: true,
   },
 ]);
