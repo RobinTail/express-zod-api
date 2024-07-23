@@ -1,5 +1,8 @@
 import { defineConfig, Options } from "tsup";
-import { version } from "./package.json";
+import { version, engines } from "./package.json";
+import semver from "semver";
+
+const minNode = semver.minVersion(engines.node)!;
 
 const commons: Options = {
   format: ["cjs", "esm"],
@@ -8,6 +11,8 @@ const commons: Options = {
   clean: true,
   dts: true,
   minify: true,
+  target: `node${minNode.major}.${minNode.minor}.${minNode.patch}`,
+  removeNodeProtocol: false, // @todo will be default in v9
 };
 
 export default defineConfig([
