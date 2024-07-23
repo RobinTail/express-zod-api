@@ -12,7 +12,6 @@ const commons: Options = {
   dts: true,
   minify: true,
   target: `node${minNode.major}.${minNode.minor}.${minNode.patch}`,
-  platform: "node",
   removeNodeProtocol: false, // @todo will be default in v9
 };
 
