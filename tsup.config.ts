@@ -1,5 +1,5 @@
 import { defineConfig, Options } from "tsup";
-import { version, engines } from "./package.json";
+import { version, engines, name } from "./package.json";
 import semver from "semver";
 
 const minNode = semver.minVersion(engines.node)!;
@@ -18,6 +18,7 @@ const commons: Options = {
 export default defineConfig([
   {
     ...commons,
+    name,
     entry: ["src/index.ts"],
     esbuildOptions: (options, { format }) => {
       options.supported = options.supported || {};
@@ -36,6 +37,7 @@ export default defineConfig([
   },
   {
     ...commons,
+    name: "./migration".padStart(name.length),
     entry: { index: "src/migration.ts" },
     outDir: "migration",
     /**
