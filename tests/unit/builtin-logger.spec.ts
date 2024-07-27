@@ -9,6 +9,7 @@ import {
   test,
   vi,
 } from "vitest";
+import { performance } from "node:perf_hooks";
 import { BuiltinLogger, BuiltinLoggerConfig } from "../../src/builtin-logger";
 
 describe("BuiltinLogger", () => {
@@ -116,18 +117,27 @@ describe("BuiltinLogger", () => {
   });
 
   describe("profile()", () => {
-    test.each([10, 100, 1000])(
+    test.each([0.01, 0.1, 1, 10, 100, 1000])(
       "should measure the time during the calls with the same label",
       async (delay) => {
         const { logger, logSpy } = makeLogger({ level: "debug", color: false });
         logger.profile("test");
-        await new Promise((resolve) => setTimeout(resolve, delay));
+        const start = performance.now();
+        while (performance.now() - start < delay) {
+          // just wait
+        }
         logger.profile("test");
         expect(logSpy).toHaveBeenCalledWith(
           expect.stringMatching(
             /2022-01-01T00:00:00.000Z debug: test '[\d.,]+ ms'/,
           ),
         );
+        const thatNumber = Number(
+          (logSpy.mock.calls[0][0] as string)
+            .match(/'([\d.,]+)/)![1]
+            .replaceAll(",", ""),
+        );
+        expect(thatNumber >= delay);
       },
     );
   });
