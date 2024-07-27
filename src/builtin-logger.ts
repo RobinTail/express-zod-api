@@ -1,9 +1,8 @@
 import { Ansis, blue, cyanBright, green, hex, red } from "ansis";
 import { inspect } from "node:util";
 import { performance } from "node:perf_hooks";
-import { last } from "ramda";
 import type { FlatObject } from "./common-helpers";
-import { AbstractLogger, severity } from "./logger-helpers";
+import { AbstractLogger, formatDuration, severity } from "./logger-helpers";
 
 interface Context extends FlatObject {
   requestId?: string;
@@ -33,16 +32,6 @@ export interface BuiltinLoggerConfig {
    * */
   ctx?: Context;
 }
-
-/** @link https://tc39.es/ecma402/#table-sanctioned-single-unit-identifiers */
-const timeUnits = [
-  { name: "picosecond", ms: 1e-9 },
-  { name: "nanosecond", ms: 1e-6 },
-  { name: "microsecond", ms: 1e-3 },
-  { name: "millisecond", ms: 1 },
-  { name: "second", ms: 1e3 },
-  { name: "minute", ms: 6e4 },
-];
 
 /** @desc Built-in console logger with optional colorful inspections */
 export class BuiltinLogger implements AbstractLogger {
@@ -120,7 +109,6 @@ export class BuiltinLogger implements AbstractLogger {
     return new BuiltinLogger({ ...this.config, ctx });
   }
 
-  /** @todo consider Intl.NumberFormat() when Node 18 dropped (microsecond unit is missing) */
   public profile(label: string) {
     const now = performance.now();
     const start = this.profiles[label];
@@ -129,11 +117,6 @@ export class BuiltinLogger implements AbstractLogger {
       return;
     }
     delete this.profiles[label];
-    const duration = now - start; // ms
-    const unit =
-      timeUnits.find(({ ms }) => duration / ms < 1e3) || last(timeUnits)!;
-    const converted = Math.round(duration / unit.ms);
-    const truncated = Math.round(converted);
-    this.debug(label, `${truncated} ${unit.name}${truncated > 1 ? "s" : ""}`);
+    this.debug(label, formatDuration(now - start));
   }
 }
