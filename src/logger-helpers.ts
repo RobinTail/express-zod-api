@@ -29,19 +29,19 @@ export const isLoggerInstance = (subject: unknown): subject is AbstractLogger =>
 
 /** @link https://tc39.es/ecma402/#table-sanctioned-single-unit-identifiers */
 const timeUnits = [
-  { name: "picosecond", maxMs: 1e-6 }, // missing in ECMA
-  { name: "nanosecond", maxMs: 1e-3 },
-  { name: "microsecond", maxMs: 1 }, // missing in Node 18
-  { name: "millisecond", maxMs: 1e3 },
-  { name: "second", maxMs: 1e6 },
-  { name: "minute", maxMs: 6e7 },
+  { name: "picosecond", maxMs: 1e-6, div: 1e-9 }, // missing in ECMA
+  { name: "nanosecond", maxMs: 1e-3, div: 1e-6 },
+  { name: "microsecond", maxMs: 1, div: 1e-3 }, // missing in Node 18
+  { name: "millisecond", maxMs: 1e3, div: 1 },
+  { name: "second", maxMs: 6e4, div: 1e3 },
+  { name: "minute", maxMs: Infinity, div: 6e4 },
 ];
 
 /** @todo consider Intl.NumberFormat() when Node 18 dropped (microsecond unit is missing) */
 export const formatDuration = (durationMs: number) => {
   const unit =
     timeUnits.find(({ maxMs }) => durationMs < maxMs) || last(timeUnits)!;
-  const converted = Math.round((1e3 * durationMs) / unit.maxMs);
+  const converted = Math.round(durationMs / unit.div);
   const truncated = Math.round(converted);
   return `${truncated} ${unit.name}${truncated > 1 ? "s" : ""}`;
 };
