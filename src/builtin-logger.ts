@@ -1,5 +1,6 @@
 import { Ansis, blue, cyanBright, green, hex, red } from "ansis";
 import { inspect } from "node:util";
+import { performance } from "node:perf_hooks";
 import type { FlatObject } from "./common-helpers";
 import { AbstractLogger, severity } from "./logger-helpers";
 
@@ -34,6 +35,7 @@ export interface BuiltinLoggerConfig {
 
 /** @desc Built-in console logger with optional colorful inspections */
 export class BuiltinLogger implements AbstractLogger {
+  protected profiles: Partial<Record<string, number>> = {};
   protected hasColor: boolean;
   protected readonly styles: Record<keyof AbstractLogger, Ansis> = {
     debug: blue,
@@ -105,5 +107,24 @@ export class BuiltinLogger implements AbstractLogger {
 
   public child(ctx: Context) {
     return new BuiltinLogger({ ...this.config, ctx });
+  }
+
+  public profile(label: string) {
+    const now = performance.now();
+    const start = this.profiles[label];
+    if (start === undefined) {
+      this.profiles[label] = now;
+      return;
+    }
+    delete this.profiles[label];
+    this.debug(
+      label,
+      Intl.NumberFormat(undefined, {
+        style: "unit",
+        unit: "millisecond",
+        unitDisplay: "short",
+        notation: "compact",
+      }).format(now - start),
+    );
   }
 }
