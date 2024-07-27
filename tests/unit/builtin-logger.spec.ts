@@ -117,8 +117,8 @@ describe("BuiltinLogger", () => {
   });
 
   describe("profile()", () => {
-    test.each([0.01, 0.1, 1, 10, 100, 1000])(
-      "should measure the time during the calls with the same label",
+    test.each([1e-2, 1e-1, 1, 1e1, 1e2, 1e3])(
+      "should measure %s ms",
       async (delay) => {
         const { logger, logSpy } = makeLogger({ level: "debug", color: false });
         logger.profile("test");
