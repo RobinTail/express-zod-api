@@ -1,6 +1,10 @@
 import { BuiltinLogger } from "../../src";
 import { BuiltinLoggerConfig } from "../../src/builtin-logger";
-import { AbstractLogger, isLoggerInstance } from "../../src/logger-helpers";
+import {
+  AbstractLogger,
+  formatDuration,
+  isLoggerInstance,
+} from "../../src/logger-helpers";
 import { describe, expect, test } from "vitest";
 
 describe("Logger helpers", () => {
@@ -30,5 +34,12 @@ describe("Logger helpers", () => {
     ])("should validate logger instances %#", (sample) => {
       expect(isLoggerInstance(sample)).toBeTruthy();
     });
+  });
+
+  describe("formatDuration()", () => {
+    test.each([1e-9, 1e-6, 1e-3, 1, 1e3, 1e6, 1e9])(
+      "%# should format %s ms",
+      (duration) => expect(formatDuration(duration)).toMatchSnapshot(),
+    );
   });
 });

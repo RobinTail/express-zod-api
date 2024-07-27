@@ -1,0 +1,15 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Logger helpers > formatDuration() > 0 should format 1e-9 ms 1`] = `"1 picosecond"`;
+
+exports[`Logger helpers > formatDuration() > 1 should format 0.000001 ms 1`] = `"1000 picoseconds"`;
+
+exports[`Logger helpers > formatDuration() > 2 should format 0.001 ms 1`] = `"1 microsecond"`;
+
+exports[`Logger helpers > formatDuration() > 3 should format 1 ms 1`] = `"1 millisecond"`;
+
+exports[`Logger helpers > formatDuration() > 4 should format 1000 ms 1`] = `"1 second"`;
+
+exports[`Logger helpers > formatDuration() > 5 should format 1000000 ms 1`] = `"17 minutes"`;
+
+exports[`Logger helpers > formatDuration() > 6 should format 1000000000 ms 1`] = `"16667 minutes"`;
