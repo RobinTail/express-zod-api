@@ -114,4 +114,21 @@ describe("BuiltinLogger", () => {
       expect(logSpy.mock.calls).toMatchSnapshot();
     });
   });
+
+  describe("profile()", () => {
+    test.each([10, 100, 1000])(
+      "should measure the time during the calls with the same label",
+      async (delay) => {
+        const { logger, logSpy } = makeLogger({ level: "debug", color: false });
+        logger.profile("test");
+        await new Promise((resolve) => setTimeout(resolve, delay));
+        logger.profile("test");
+        expect(logSpy).toHaveBeenCalledWith(
+          expect.stringMatching(
+            /2022-01-01T00:00:00.000Z debug: test '[\d.,]+ ms'/,
+          ),
+        );
+      },
+    );
+  });
 });
