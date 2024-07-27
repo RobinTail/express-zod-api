@@ -117,27 +117,19 @@ describe("BuiltinLogger", () => {
   });
 
   describe("profile()", () => {
-    test.each([1e-2, 1e-1, 1, 1e1, 1e2, 1e3])(
+    test.each([1e-3, 1e-2, 1e-1, 1, 1e1, 1e2, 1e3])(
       "should measure %s ms",
       async (delay) => {
         const { logger, logSpy } = makeLogger({ level: "debug", color: false });
         logger.profile("test");
         const start = performance.now();
-        while (performance.now() - start < delay) {
-          // just wait
-        }
+        while (performance.now() - start < delay) {} // eslint-disable-line no-empty -- waits
         logger.profile("test");
         expect(logSpy).toHaveBeenCalledWith(
           expect.stringMatching(
-            /2022-01-01T00:00:00.000Z debug: test '[\d.,]+ ms'/,
+            /2022-01-01T00:00:00.000Z debug: test '[\d.]+ (micro|milli)?second(s)?'/,
           ),
         );
-        const thatNumber = Number(
-          (logSpy.mock.calls[0][0] as string)
-            .match(/'([\d.,]+)/)![1]
-            .replaceAll(",", ""),
-        );
-        expect(thatNumber >= delay);
       },
     );
   });
