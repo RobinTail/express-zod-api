@@ -127,7 +127,7 @@ describe("BuiltinLogger", () => {
         logger.profile("test");
         expect(logSpy).toHaveBeenCalledWith(
           expect.stringMatching(
-            /2022-01-01T00:00:00.000Z debug: test '[\d.]+ (micro|milli)?second(s)?'/,
+            /2022-01-01T00:00:00.000Z debug: test '[\d.]+ (pico|micro|milli)?second(s)?'/,
           ),
         );
       },

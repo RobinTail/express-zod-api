@@ -36,6 +36,7 @@ export interface BuiltinLoggerConfig {
 
 /** @link https://tc39.es/ecma402/#table-sanctioned-single-unit-identifiers */
 const timeUnits = [
+  { name: "picosecond", ms: 1e-9 },
   { name: "nanosecond", ms: 1e-6 },
   { name: "microsecond", ms: 1e-3 },
   { name: "millisecond", ms: 1 },
