@@ -123,7 +123,6 @@ export class BuiltinLogger implements AbstractLogger {
         style: "unit",
         unit: "millisecond",
         unitDisplay: "short",
-        notation: "compact",
       }).format(now - start),
     );
   }
