@@ -37,11 +37,16 @@ const timeUnits = [
   { name: "minute", maxMs: Infinity, div: 6e4 },
 ];
 
-/** @todo consider Intl.NumberFormat() when Node 18 dropped (microsecond unit is missing) */
+/** @todo consider Intl units when Node 18 dropped (microsecond unit is missing, picosecond is not in list) */
 export const formatDuration = (durationMs: number) => {
   const unit =
     timeUnits.find(({ maxMs }) => durationMs < maxMs) || last(timeUnits)!;
-  const converted = Math.round(durationMs / unit.div);
-  const truncated = Math.round(converted);
-  return `${truncated} ${unit.name}${truncated > 1 ? "s" : ""}`;
+  const converted = durationMs / unit.div;
+  const formatted = Intl.NumberFormat(undefined, {
+    useGrouping: false,
+    style: "decimal",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: durationMs >= 1e3 ? 2 : 0,
+  }).format(converted);
+  return `${formatted} ${unit.name}${converted > 1 ? "s" : ""}`;
 };

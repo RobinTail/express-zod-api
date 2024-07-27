@@ -26,14 +26,16 @@ exports[`Logger helpers > formatDuration() > 11 should format 100 ms 1`] = `"100
 
 exports[`Logger helpers > formatDuration() > 12 should format 1000 ms 1`] = `"1 second"`;
 
-exports[`Logger helpers > formatDuration() > 13 should format 10000 ms 1`] = `"10 seconds"`;
+exports[`Logger helpers > formatDuration() > 13 should format 1500 ms 1`] = `"1.5 seconds"`;
 
-exports[`Logger helpers > formatDuration() > 14 should format 100000 ms 1`] = `"2 minutes"`;
+exports[`Logger helpers > formatDuration() > 14 should format 10000 ms 1`] = `"10 seconds"`;
 
-exports[`Logger helpers > formatDuration() > 15 should format 1000000 ms 1`] = `"17 minutes"`;
+exports[`Logger helpers > formatDuration() > 15 should format 100000 ms 1`] = `"1.67 minutes"`;
 
-exports[`Logger helpers > formatDuration() > 16 should format 10000000 ms 1`] = `"167 minutes"`;
+exports[`Logger helpers > formatDuration() > 16 should format 1000000 ms 1`] = `"16.67 minutes"`;
 
-exports[`Logger helpers > formatDuration() > 17 should format 100000000 ms 1`] = `"1667 minutes"`;
+exports[`Logger helpers > formatDuration() > 17 should format 10000000 ms 1`] = `"166.67 minutes"`;
 
-exports[`Logger helpers > formatDuration() > 18 should format 1000000000 ms 1`] = `"16667 minutes"`;
+exports[`Logger helpers > formatDuration() > 18 should format 100000000 ms 1`] = `"1666.67 minutes"`;
+
+exports[`Logger helpers > formatDuration() > 19 should format 1000000000 ms 1`] = `"16666.67 minutes"`;
