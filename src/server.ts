@@ -104,5 +104,6 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
         )
       : undefined,
   } satisfies Record<string, http.Server | https.Server | undefined>;
+
   return { app, ...servers, logger: rootLogger };
 };
