@@ -35,11 +35,11 @@ export interface BuiltinLoggerConfig {
 
 /** @link https://tc39.es/ecma402/#table-sanctioned-single-unit-identifiers */
 const timeUnits = [
-  { name: "nanosecond", mult: 1e-6 },
-  { name: "microsecond", mult: 1e-3 },
-  { name: "millisecond", mult: 1 },
-  { name: "second", mult: 1e3 },
-  { name: "minute", mult: 6e4 },
+  { name: "nanosecond", ms: 1e-6 },
+  { name: "microsecond", ms: 1e-3 },
+  { name: "millisecond", ms: 1 },
+  { name: "second", ms: 1e3 },
+  { name: "minute", ms: 6e4 },
 ];
 
 /** @desc Built-in console logger with optional colorful inspections */
@@ -127,7 +127,7 @@ export class BuiltinLogger implements AbstractLogger {
     }
     delete this.profiles[label];
     const duration = now - start; // ms
-    const unit = timeUnits.find(({ mult }) => duration / mult < 1e3);
+    const unit = timeUnits.find(({ ms }) => duration / ms < 1e3);
     this.debug(
       label,
       Intl.NumberFormat(undefined, {
@@ -136,7 +136,7 @@ export class BuiltinLogger implements AbstractLogger {
         unit: unit?.name || "millisecond",
         minimumFractionDigits: 0,
         maximumFractionDigits: 0,
-      }).format(duration / (unit?.mult || 1)),
+      }).format(duration / (unit?.ms || 1)),
     );
   }
 }
