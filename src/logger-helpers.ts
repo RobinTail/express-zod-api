@@ -46,7 +46,7 @@ export const formatDuration = (durationMs: number) => {
     useGrouping: false,
     style: "decimal",
     minimumFractionDigits: 0,
-    maximumFractionDigits: durationMs >= 1e3 ? 2 : 0,
+    maximumFractionDigits: durationMs > 1e3 ? 2 : 0,
   }).format(converted);
   return `${formatted} ${unit.name}${converted > 1 ? "s" : ""}`;
 };
