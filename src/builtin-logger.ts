@@ -128,15 +128,21 @@ export class BuiltinLogger implements AbstractLogger {
     delete this.profiles[label];
     const duration = now - start; // ms
     const unit = timeUnits.find(({ ms }) => duration / ms < 1e3);
+    const converted = Math.round(duration / (unit?.ms || 1));
+    const truncated = Math.round(converted);
     this.debug(
       label,
+      `${truncated} ${unit?.name || "millisecond"}${truncated > 1 ? "s" : ""}`,
+      // @todo use this when Node 18 dropped (microsecond unit is missing):
+      /*
       Intl.NumberFormat(undefined, {
         style: "unit",
         unitDisplay: "long",
         unit: unit?.name || "millisecond",
         minimumFractionDigits: 0,
         maximumFractionDigits: 0,
-      }).format(duration / (unit?.ms || 1)),
+      }).format(converted),
+      */
     );
   }
 }
