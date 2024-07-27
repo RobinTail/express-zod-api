@@ -60,9 +60,6 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
     parserFailureHandler,
     loggingMiddleware,
   } = makeCommonEntities(config);
-  if (rootLogger instanceof BuiltinLogger) {
-    rootLogger.profile("warmup");
-  }
   const app = express().disable("x-powered-by").use(loggingMiddleware);
 
   if (config.server.compression) {
@@ -107,8 +104,5 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
         )
       : undefined,
   } satisfies Record<string, http.Server | https.Server | undefined>;
-  if (rootLogger instanceof BuiltinLogger) {
-    rootLogger.profile("warmup");
-  }
   return { app, ...servers, logger: rootLogger };
 };
