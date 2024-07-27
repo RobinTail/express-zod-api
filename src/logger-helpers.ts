@@ -34,7 +34,7 @@ const timeUnits = [
   { name: "microsecond", maxMs: 1, div: 1e-3 }, // missing in Node 18
   { name: "millisecond", maxMs: 1e3, div: 1 },
   { name: "second", maxMs: 6e4, div: 1e3 },
-  { name: "minute", maxMs: Infinity, div: 6e4 },
+  { name: "minute", maxMs: 36e5, div: 6e4 },
 ];
 
 /** @todo consider Intl units when Node 18 dropped (microsecond unit is missing, picosecond is not in list) */
