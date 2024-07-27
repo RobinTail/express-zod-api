@@ -1,6 +1,7 @@
 import { Ansis, blue, cyanBright, green, hex, red } from "ansis";
 import { inspect } from "node:util";
 import { performance } from "node:perf_hooks";
+import { last } from "ramda";
 import type { FlatObject } from "./common-helpers";
 import { AbstractLogger, severity } from "./logger-helpers";
 
@@ -118,6 +119,7 @@ export class BuiltinLogger implements AbstractLogger {
     return new BuiltinLogger({ ...this.config, ctx });
   }
 
+  /** @todo consider Intl.NumberFormat() when Node 18 dropped (microsecond unit is missing) */
   public profile(label: string) {
     const now = performance.now();
     const start = this.profiles[label];
@@ -127,22 +129,10 @@ export class BuiltinLogger implements AbstractLogger {
     }
     delete this.profiles[label];
     const duration = now - start; // ms
-    const unit = timeUnits.find(({ ms }) => duration / ms < 1e3);
-    const converted = Math.round(duration / (unit?.ms || 1));
+    const unit =
+      timeUnits.find(({ ms }) => duration / ms < 1e3) || last(timeUnits)!;
+    const converted = Math.round(duration / unit.ms);
     const truncated = Math.round(converted);
-    this.debug(
-      label,
-      `${truncated} ${unit?.name || "millisecond"}${truncated > 1 ? "s" : ""}`,
-      // @todo use this when Node 18 dropped (microsecond unit is missing):
-      /*
-      Intl.NumberFormat(undefined, {
-        style: "unit",
-        unitDisplay: "long",
-        unit: unit?.name || "millisecond",
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-      }).format(converted),
-      */
-    );
+    this.debug(label, `${truncated} ${unit.name}${truncated > 1 ? "s" : ""}`);
   }
 }
