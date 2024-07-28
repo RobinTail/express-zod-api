@@ -27,6 +27,16 @@ export const isLoggerInstance = (subject: unknown): subject is AbstractLogger =>
   isObject(subject) &&
   Object.keys(severity).some((method) => method in subject);
 
+const makeNumberFormat = (fraction = 0) =>
+  Intl.NumberFormat(undefined, {
+    useGrouping: false,
+    minimumFractionDigits: 0,
+    maximumFractionDigits: fraction,
+  });
+
+const intFormat = makeNumberFormat();
+const formatFloat = makeNumberFormat(2);
+
 const pickTimeUnit = cond<[number], [string, number]>([
   [gt(1e-6), (ms) => ["picosecond", ms / 1e-9]],
   [gt(1e-3), (ms) => ["nanosecond", ms / 1e-6]],
@@ -42,10 +52,8 @@ const pickTimeUnit = cond<[number], [string, number]>([
  * */
 export const formatDuration = (durationMs: number) => {
   const [unit, converted] = pickTimeUnit(durationMs);
-  const formatted = Intl.NumberFormat(undefined, {
-    useGrouping: false,
-    minimumFractionDigits: 0,
-    maximumFractionDigits: durationMs > 1e3 ? 2 : 0,
-  }).format(converted);
+  const formatted = (durationMs > 1e3 ? formatFloat : intFormat).format(
+    converted,
+  );
   return `${formatted} ${unit}${converted > 1 ? "s" : ""}`;
 };
