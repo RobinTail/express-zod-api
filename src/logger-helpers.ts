@@ -1,4 +1,4 @@
-import { cond, gt, T, pair } from "ramda";
+import { cond, gt, T } from "ramda";
 import { isObject } from "./common-helpers";
 
 /** @desc You can use any logger compatible with this type. */
@@ -40,21 +40,18 @@ const makeNumberFormat = (fraction = 0) =>
 
 // creating them once increases the performance significantly
 const intFormat = makeNumberFormat();
-const formatFloat = makeNumberFormat(2);
+const floatFormat = makeNumberFormat(2);
 
-const pickTimeUnit = cond<[number], [string, number]>([
-  [gt(1e-6), (ms) => ["picosecond", ms / 1e-9]],
-  [gt(1e-3), (ms) => ["nanosecond", ms / 1e-6]],
-  [gt(1), (ms) => ["microsecond", ms / 1e-3]],
-  [gt(1e3), pair("millisecond")],
-  [gt(6e4), (ms) => ["second", ms / 1e3]],
-  [T, (ms) => ["minute", ms / 6e4]],
+const pickTimeUnit = cond<[number], [string, number, Intl.NumberFormat]>([
+  [gt(1e-6), (ms) => ["picosecond", ms / 1e-9, intFormat]],
+  [gt(1e-3), (ms) => ["nanosecond", ms / 1e-6, intFormat]],
+  [gt(1), (ms) => ["microsecond", ms / 1e-3, intFormat]],
+  [gt(1e3), (ms) => ["millisecond", ms, intFormat]],
+  [gt(6e4), (ms) => ["second", ms / 1e3, floatFormat]],
+  [T, (ms) => ["minute", ms / 6e4, floatFormat]],
 ]);
 
 export const formatDuration = (durationMs: number) => {
-  const [unit, converted] = pickTimeUnit(durationMs);
-  const formatted = (durationMs > 1e3 ? formatFloat : intFormat).format(
-    converted,
-  );
-  return `${formatted} ${unit}${converted > 1 ? "s" : ""}`;
+  const [unit, converted, formatter] = pickTimeUnit(durationMs);
+  return `${formatter.format(converted)} ${unit}${converted > 1 ? "s" : ""}`;
 };

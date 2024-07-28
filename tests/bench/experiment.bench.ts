@@ -6,5 +6,7 @@ describe.each([0.555, 555, 55555555])("Experiment", (ms) => {
     formatDuration(ms);
   });
 
-  bench("featured", () => {});
+  bench("featured", () => {
+    formatDuration(ms);
+  });
 });
