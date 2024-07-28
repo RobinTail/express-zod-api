@@ -38,7 +38,7 @@ declare module "express-zod-api" {
 }
 */
 
-// Uncomment these lines for using .child() or .profile() methods of built-in logger:
+// Uncomment these lines for using .child() and .profile() methods of built-in logger:
 /*
 declare module "express-zod-api" {
   interface LoggerOverrides extends BuiltinLogger {}

@@ -108,7 +108,7 @@ export class BuiltinLogger implements AbstractLogger {
     return new BuiltinLogger({ ...this.config, ctx });
   }
 
-  /** @desc Measures the duration until calling the returned callback */
+  /** @desc Measures the duration until you invoke the returned callback */
   public profile(message: string) {
     const start = performance.now();
     return () => this.debug(message, formatDuration(performance.now() - start));
