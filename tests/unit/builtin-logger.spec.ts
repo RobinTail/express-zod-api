@@ -144,7 +144,7 @@ describe("BuiltinLogger", () => {
       },
     );
 
-    test.each([undefined, "formatted", "ms"] as const)(
+    test.each([undefined, "adaptive", "ms"] as const)(
       "should accept variant option %s",
       (variant) => {
         const { logger, logSpy } = makeLogger({ level: "debug", color: false });

@@ -37,8 +37,8 @@ interface ProfilerParams {
   message: string;
   /** @default "debug" */
   severity?: keyof AbstractLogger;
-  /** @default "formatted" */
-  variant?: "formatted" | "ms";
+  /** @default "adaptive" */
+  variant?: "adaptive" | "ms";
 }
 
 /** @desc Built-in console logger with optional colorful inspections */
@@ -126,7 +126,7 @@ export class BuiltinLogger implements AbstractLogger {
       const {
         message,
         severity = "debug",
-        variant = "formatted",
+        variant = "adaptive",
       } = typeof subject === "object" ? subject : { message: subject };
       this.print(
         severity,
