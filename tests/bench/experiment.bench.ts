@@ -3,7 +3,7 @@ import { z } from "zod";
 import { depictExamples } from "../../src/documentation-helpers";
 import "../../src/zod-plugin";
 
-describe.each([true, false])("Experiment %s", (isResponse) => {
+describe.skip.each([true, false])("Experiment %s", (isResponse) => {
   bench("original", () => {
     depictExamples(
       z

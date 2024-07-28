@@ -157,13 +157,11 @@ export const makePublicExtendedInterface = (
     props,
   );
 
+const aggregateDeclarations = chain(([name, id]: [string, ts.Identifier]) => [
+  f.createTypeParameterDeclaration([], name, f.createTypeReferenceNode(id)),
+]);
 export const makeTypeParams = (params: Record<string, ts.Identifier>) =>
-  chain(
-    ([name, id]) => [
-      f.createTypeParameterDeclaration([], name, f.createTypeReferenceNode(id)),
-    ],
-    toPairs(params),
-  );
+  aggregateDeclarations(toPairs(params));
 
 export const makeArrowFn = (
   params: ts.Identifier[],
