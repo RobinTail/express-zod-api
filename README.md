@@ -647,7 +647,7 @@ const config = createConfig({ logger: { level: "debug", color: true } });
 // Inside a handler of Endpoint, Middleware or ResultHandler:
 const done = logger.profile("expensive operation");
 doExpensiveOperation();
-done(); // 2024-07-28T00:00:00.000Z debug: expensive operation '555 milliseconds'
+done(); // debug: expensive operation '555 milliseconds'
 ```
 
 ## Enabling compression
