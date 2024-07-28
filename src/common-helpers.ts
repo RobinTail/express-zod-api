@@ -188,6 +188,6 @@ export const tryToTransform = <T>(
   }
 };
 
-/** @desc does not actually check the keys */
-export const isFlat = (subject: unknown): subject is FlatObject =>
-  typeof subject === "object" && subject !== null && !Array.isArray(subject);
+/** @desc can still be an array, use Array.isArray() or rather R.type() to exclude that case */
+export const isObject = (subject: unknown) =>
+  typeof subject === "object" && subject !== null;

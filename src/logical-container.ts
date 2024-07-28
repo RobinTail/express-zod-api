@@ -1,5 +1,5 @@
 import { chain } from "ramda";
-import { combinations, isFlat } from "./common-helpers";
+import { combinations, isObject } from "./common-helpers";
 
 type LogicalOr<T> = { or: T[] };
 type LogicalAnd<T> = { and: T[] };
@@ -10,10 +10,10 @@ export type LogicalContainer<T> =
   | T;
 
 const isLogicalOr = (subject: unknown): subject is LogicalOr<unknown> =>
-  isFlat(subject) && "or" in subject;
+  isObject(subject) && "or" in subject;
 
 const isLogicalAnd = (subject: unknown): subject is LogicalAnd<unknown> =>
-  isFlat(subject) && "and" in subject;
+  isObject(subject) && "and" in subject;
 
 /** @desc combines several LogicalAnds into a one */
 const flattenAnds = <T>(subject: (T | LogicalAnd<T>)[]): LogicalAnd<T> => ({

@@ -46,7 +46,6 @@ import {
   getExamples,
   hasCoercion,
   isCustomHeader,
-  isFlat,
   makeCleanId,
   tryToTransform,
   ucFirst,
@@ -616,7 +615,7 @@ export const depictExamples = (
 ): ExamplesObject | undefined =>
   pipe(
     getExamples,
-    map(when(isFlat, omit(omitProps))),
+    map(when((subj) => detectType(subj) === "Object", omit(omitProps))),
     enumerateExamples,
   )({ schema, variant: isResponse ? "parsed" : "original", validate: true });
 
