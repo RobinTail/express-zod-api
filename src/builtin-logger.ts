@@ -35,7 +35,7 @@ export interface BuiltinLoggerConfig {
 
 /** @desc Built-in console logger with optional colorful inspections */
 export class BuiltinLogger implements AbstractLogger {
-  protected profiles: Partial<Record<string, number>> = {};
+  protected timeOrigins: Partial<Record<string, number>> = {};
   protected hasColor: boolean;
   protected readonly styles: Record<keyof AbstractLogger, Ansis> = {
     debug: blue,
@@ -112,12 +112,12 @@ export class BuiltinLogger implements AbstractLogger {
   /** @desc Measures the time between two calls of this method with same argument */
   public profile(label: string) {
     const now = performance.now();
-    const start = this.profiles[label];
+    const start = this.timeOrigins[label];
     if (start === undefined) {
-      this.profiles[label] = now;
+      this.timeOrigins[label] = now;
       return;
     }
-    delete this.profiles[label];
+    delete this.timeOrigins[label];
     this.debug(label, formatDuration(now - start));
   }
 }
