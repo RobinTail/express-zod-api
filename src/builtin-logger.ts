@@ -38,7 +38,7 @@ interface ProfilerParams {
   /** @default "debug" */
   severity?: keyof AbstractLogger;
   /** @default "adaptive" */
-  variant?: "adaptive" | "ms";
+  unit?: "adaptive" | "ms";
 }
 
 /** @desc Built-in console logger with optional colorful inspections */
@@ -126,12 +126,12 @@ export class BuiltinLogger implements AbstractLogger {
       const {
         message,
         severity = "debug",
-        variant = "adaptive",
+        unit = "adaptive",
       } = typeof subject === "object" ? subject : { message: subject };
       this.print(
         severity,
         message,
-        variant === "ms" ? duration : formatDuration(duration),
+        unit === "ms" ? duration : formatDuration(duration),
       );
     };
   }

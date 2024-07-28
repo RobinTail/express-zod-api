@@ -145,13 +145,13 @@ describe("BuiltinLogger", () => {
     );
 
     test.each([undefined, "adaptive", "ms"] as const)(
-      "should accept variant option %s",
-      (variant) => {
+      "should accept unit option %s",
+      (unit) => {
         const { logger, logSpy } = makeLogger({ level: "debug", color: false });
-        logger.profile({ message: "test", variant })();
+        logger.profile({ message: "test", unit })();
         expect(logSpy).toHaveBeenCalledWith(
           expect.stringMatching(
-            variant === "ms" ? /debug: test [\d.]+$/ : /debug: test '\d+ \w+'$/,
+            unit === "ms" ? /debug: test [\d.]+$/ : /debug: test '\d+ \w+'$/,
           ),
         );
       },
