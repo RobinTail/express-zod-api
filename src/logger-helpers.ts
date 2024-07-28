@@ -1,4 +1,4 @@
-import { cond, gt, T } from "ramda";
+import { cond, gt, T, pair } from "ramda";
 import { isObject } from "./common-helpers";
 
 /** @desc You can use any logger compatible with this type. */
@@ -27,13 +27,13 @@ export const isLoggerInstance = (subject: unknown): subject is AbstractLogger =>
   isObject(subject) &&
   Object.keys(severity).some((method) => method in subject);
 
-const convert = cond<[number], [string, number]>([
-  [gt(1e-6), (v) => ["picosecond", v / 1e-9]],
-  [gt(1e-3), (v) => ["nanosecond", v / 1e-6]],
-  [gt(1), (v) => ["microsecond", v / 1e-3]],
-  [gt(1e3), (v) => ["millisecond", v]],
-  [gt(6e4), (v) => ["second", v / 1e3]],
-  [T, (v) => ["minute", v / 6e4]],
+const pickTimeUnit = cond<[number], [string, number]>([
+  [gt(1e-6), (ms) => ["picosecond", ms / 1e-9]],
+  [gt(1e-3), (ms) => ["nanosecond", ms / 1e-6]],
+  [gt(1), (ms) => ["microsecond", ms / 1e-3]],
+  [gt(1e3), pair("millisecond")],
+  [gt(6e4), (ms) => ["second", ms / 1e3]],
+  [T, (ms) => ["minute", ms / 6e4]],
 ]);
 
 /**
@@ -41,7 +41,7 @@ const convert = cond<[number], [string, number]>([
  * @link https://tc39.es/ecma402/#table-sanctioned-single-unit-identifiers
  * */
 export const formatDuration = (durationMs: number) => {
-  const [unit, converted] = convert(durationMs);
+  const [unit, converted] = pickTimeUnit(durationMs);
   const formatted = Intl.NumberFormat(undefined, {
     useGrouping: false,
     style: "decimal",
