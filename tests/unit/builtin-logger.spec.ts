@@ -132,5 +132,18 @@ describe("BuiltinLogger", () => {
         );
       },
     );
+
+    test.each([undefined, "debug", "info", "warn", "error"] as const)(
+      "should accept severity option",
+      (severity) => {
+        const { logger, logSpy } = makeLogger({ level: "debug", color: false });
+        logger.profile({ message: "test", severity })();
+        expect(logSpy).toHaveBeenCalledWith(
+          expect.stringContaining(
+            `2022-01-01T00:00:00.000Z ${severity || "debug"}: test`,
+          ),
+        );
+      },
+    );
   });
 });
