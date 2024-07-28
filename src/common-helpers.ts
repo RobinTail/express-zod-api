@@ -188,6 +188,5 @@ export const tryToTransform = <T>(
   }
 };
 
-/** @desc can still be an array, use R.complement(Array.isArray) to exclude that case */
-export const isObject = (subject: unknown) =>
-  typeof subject === "object" && subject !== null;
+export const isFlat = (subject: unknown): subject is FlatObject =>
+  typeof subject === "object" && subject !== null && !Array.isArray(subject);

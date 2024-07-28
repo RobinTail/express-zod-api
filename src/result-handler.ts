@@ -10,7 +10,7 @@ import {
   getExamples,
   getMessageFromError,
   getStatusCodeFromError,
-  isObject,
+  isFlat,
   logInternalError,
 } from "./common-helpers";
 import { contentTypes } from "./content-type";
@@ -148,7 +148,7 @@ export const arrayResultHandler = new ResultHandler({
         : z.array(z.any());
     return examples.reduce<typeof responseSchema>(
       (acc, example) =>
-        isObject(example) && "items" in example && Array.isArray(example.items)
+        isFlat(example) && "items" in example && Array.isArray(example.items)
           ? acc.example(example.items)
           : acc,
       responseSchema,

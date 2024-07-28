@@ -17,8 +17,6 @@ import {
   isSchemaObject,
 } from "openapi3-ts/oas31";
 import {
-  both,
-  complement,
   concat,
   type as detectType,
   filter,
@@ -48,7 +46,7 @@ import {
   getExamples,
   hasCoercion,
   isCustomHeader,
-  isObject,
+  isFlat,
   makeCleanId,
   tryToTransform,
   ucFirst,
@@ -618,7 +616,7 @@ export const depictExamples = (
 ): ExamplesObject | undefined =>
   pipe(
     getExamples,
-    map(when(both(isObject, complement(Array.isArray)), omit(omitProps))),
+    map(when(isFlat, omit(omitProps))),
     enumerateExamples,
   )({ schema, variant: isResponse ? "parsed" : "original", validate: true });
 

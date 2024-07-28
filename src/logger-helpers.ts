@@ -1,4 +1,4 @@
-import { isObject } from "./common-helpers";
+import { isFlat } from "./common-helpers";
 
 /** @desc You can use any logger compatible with this type. */
 export type AbstractLogger = Record<
@@ -23,8 +23,7 @@ export const severity: Record<keyof AbstractLogger, number> = {
 };
 
 export const isLoggerInstance = (subject: unknown): subject is AbstractLogger =>
-  isObject(subject) &&
-  Object.keys(severity).some((method) => method in subject);
+  isFlat(subject) && Object.keys(severity).some((method) => method in subject);
 
 /**
  * @todo consider Intl units when Node 18 dropped (microsecond unit is missing, picosecond is not in list)
