@@ -121,11 +121,9 @@ export class BuiltinLogger implements AbstractLogger {
     const start = performance.now();
     return () => {
       const duration = performance.now() - start;
-      this.print(
-        (typeof subject === "object" && subject.severity) || "debug",
-        typeof subject === "object" ? subject.message : subject,
-        formatDuration(duration),
-      );
+      const { message, severity = "debug" } =
+        typeof subject === "object" ? subject : { message: subject };
+      this.print(severity, message, formatDuration(duration));
     };
   }
 }
