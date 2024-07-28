@@ -1,12 +1,20 @@
 import { bench, describe } from "vitest";
-import { formatDuration } from "../../src/logger-helpers";
+import { getCustomHeaders } from "../../src/common-helpers";
 
-describe.each([0.555, 555, 55555555])("Experiment", (ms) => {
+describe("Experiment", () => {
   bench("original", () => {
-    formatDuration(ms);
+    getCustomHeaders({
+      authorization: "Bearer ***",
+      "x-request-id": "test",
+      "x-another": "header",
+    });
   });
 
   bench("featured", () => {
-    formatDuration(ms);
+    getCustomHeaders({
+      authorization: "Bearer ***",
+      "x-request-id": "test",
+      "x-another": "header",
+    });
   });
 });
