@@ -1,4 +1,4 @@
-import { last } from "ramda";
+import { cond, gt, T } from "ramda";
 import { isObject } from "./common-helpers";
 
 /** @desc You can use any logger compatible with this type. */
@@ -27,26 +27,26 @@ export const isLoggerInstance = (subject: unknown): subject is AbstractLogger =>
   isObject(subject) &&
   Object.keys(severity).some((method) => method in subject);
 
-/** @link https://tc39.es/ecma402/#table-sanctioned-single-unit-identifiers */
-const timeUnits = [
-  { name: "picosecond", maxMs: 1e-6, div: 1e-9 }, // missing in ECMA
-  { name: "nanosecond", maxMs: 1e-3, div: 1e-6 },
-  { name: "microsecond", maxMs: 1, div: 1e-3 }, // missing in Node 18
-  { name: "millisecond", maxMs: 1e3, div: 1 },
-  { name: "second", maxMs: 6e4, div: 1e3 },
-  { name: "minute", maxMs: 36e5, div: 6e4 },
-];
+const convert = cond<[number], [string, number]>([
+  [gt(1e-6), (v) => ["picosecond", v / 1e-9]],
+  [gt(1e-3), (v) => ["nanosecond", v / 1e-6]],
+  [gt(1), (v) => ["microsecond", v / 1e-3]],
+  [gt(1e3), (v) => ["millisecond", v]],
+  [gt(6e4), (v) => ["second", v / 1e3]],
+  [T, (v) => ["minute", v / 6e4]],
+]);
 
-/** @todo consider Intl units when Node 18 dropped (microsecond unit is missing, picosecond is not in list) */
+/**
+ * @todo consider Intl units when Node 18 dropped (microsecond unit is missing, picosecond is not in list)
+ * @link https://tc39.es/ecma402/#table-sanctioned-single-unit-identifiers
+ * */
 export const formatDuration = (durationMs: number) => {
-  const unit =
-    timeUnits.find(({ maxMs }) => durationMs < maxMs) || last(timeUnits)!;
-  const converted = durationMs / unit.div;
+  const [unit, converted] = convert(durationMs);
   const formatted = Intl.NumberFormat(undefined, {
     useGrouping: false,
     style: "decimal",
     minimumFractionDigits: 0,
     maximumFractionDigits: durationMs > 1e3 ? 2 : 0,
   }).format(converted);
-  return `${formatted} ${unit.name}${converted > 1 ? "s" : ""}`;
+  return `${formatted} ${unit}${converted > 1 ? "s" : ""}`;
 };
