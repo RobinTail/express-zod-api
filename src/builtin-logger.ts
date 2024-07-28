@@ -109,6 +109,7 @@ export class BuiltinLogger implements AbstractLogger {
     return new BuiltinLogger({ ...this.config, ctx });
   }
 
+  /** @desc Measures the time between two calls of this method with same argument */
   public profile(label: string) {
     const now = performance.now();
     const start = this.profiles[label];
