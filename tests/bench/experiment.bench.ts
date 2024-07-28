@@ -1,15 +1,12 @@
 import { bench, describe } from "vitest";
+import { formatDuration } from "../../src/logger-helpers";
 
-describe.skip("Experiment", () => {
-  const originalFn = () => {};
+describe.each([0.555, 555, 55555555])("Experiment", (ms) => {
+  bench("original", () => {
+    formatDuration(ms);
+  });
 
-  bench(
-    "original",
-    () => {
-      originalFn();
-    },
-    { time: 5000 },
-  );
-
-  bench("featured", () => {}, { time: 5000 });
+  bench("featured", () => {
+    formatDuration(ms);
+  });
 });

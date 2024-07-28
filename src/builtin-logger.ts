@@ -1,7 +1,8 @@
 import { Ansis, blue, cyanBright, green, hex, red } from "ansis";
 import { inspect } from "node:util";
+import { performance } from "node:perf_hooks";
 import type { FlatObject } from "./common-helpers";
-import { AbstractLogger, severity } from "./logger-helpers";
+import { AbstractLogger, formatDuration, severity } from "./logger-helpers";
 
 interface Context extends FlatObject {
   requestId?: string;
@@ -105,5 +106,11 @@ export class BuiltinLogger implements AbstractLogger {
 
   public child(ctx: Context) {
     return new BuiltinLogger({ ...this.config, ctx });
+  }
+
+  /** @desc Measures the duration until you invoke the returned callback */
+  public profile(message: string) {
+    const start = performance.now();
+    return () => this.debug(message, formatDuration(performance.now() - start));
   }
 }

@@ -37,7 +37,8 @@ Start your API server with I/O schema validation and custom middlewares in minut
    9. [Enabling HTTPS](#enabling-https)
    10. [Customizing logger](#customizing-logger)
    11. [Child logger](#child-logger)
-   12. [Enabling compression](#enabling-compression)
+   12. [Profiling](#profiling)
+   13. [Enabling compression](#enabling-compression)
 5. [Advanced features](#advanced-features)
    1. [Customizing input sources](#customizing-input-sources)
    2. [Route path params](#route-path-params)
@@ -613,10 +614,10 @@ it can also be asynchronous. The child logger returned by that function will rep
 You can use the `.child()` method of the built-in logger or [install a custom logger](#customizing-logger) instead.
 
 ```typescript
-import { createConfig } from "express-zod-api";
+import { createConfig, BuiltinLogger } from "express-zod-api";
 import { randomUUID } from "node:crypto";
 
-// This enables the .child() method on the built-in logger:
+// This enables the .child() method on "logger":
 declare module "express-zod-api" {
   interface LoggerOverrides extends BuiltinLogger {}
 }
@@ -626,6 +627,27 @@ const config = createConfig({
   childLoggerProvider: ({ parent, request }) =>
     parent.child({ requestId: randomUUID() }),
 });
+```
+
+## Profiling
+
+For debugging and performance testing purposes the library offers a simple `.profile()` method on the built-in logger.
+It starts a timer when you call it and measures the duration in adaptive units (from picoseconds to minutes) until you
+invoke the returned callback. The `level` of the logger must be set to `debug` to make those measurements visible.
+
+```typescript
+import { createConfig, BuiltinLogger } from "express-zod-api";
+
+// This enables the .profile() method on "logger":
+declare module "express-zod-api" {
+  interface LoggerOverrides extends BuiltinLogger {}
+}
+const config = createConfig({ logger: { level: "debug", color: true } });
+
+// Inside a handler of Endpoint, Middleware or ResultHandler:
+const done = logger.profile("expensive operation");
+doExpensiveOperation();
+done(); // debug: expensive operation '555 milliseconds'
 ```
 
 ## Enabling compression

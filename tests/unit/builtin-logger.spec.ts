@@ -9,6 +9,7 @@ import {
   test,
   vi,
 } from "vitest";
+import { performance } from "node:perf_hooks";
 import { BuiltinLogger, BuiltinLoggerConfig } from "../../src/builtin-logger";
 
 describe("BuiltinLogger", () => {
@@ -113,5 +114,23 @@ describe("BuiltinLogger", () => {
       child.info("Here is some message", { more: "information" });
       expect(logSpy.mock.calls).toMatchSnapshot();
     });
+  });
+
+  describe("profile()", () => {
+    test.each([1e-3, 1e-2, 1e-1, 1, 1e1, 1e2, 1e3])(
+      "should measure %s ms",
+      async (delay) => {
+        const { logger, logSpy } = makeLogger({ level: "debug", color: false });
+        const stop = logger.profile("test");
+        const start = performance.now();
+        while (performance.now() - start < delay) {} // eslint-disable-line no-empty -- waits
+        stop();
+        expect(logSpy).toHaveBeenCalledWith(
+          expect.stringMatching(
+            /2022-01-01T00:00:00.000Z debug: test '[\d.]+ (pico|micro|milli)?second(s)?'/,
+          ),
+        );
+      },
+    );
   });
 });

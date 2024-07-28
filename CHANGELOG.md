@@ -2,6 +2,32 @@
 
 ## Version 20
 
+### v20.5.0
+
+- Featuring a simple profiler for the built-in logger:
+  - Introducing `BuiltinLogger::profile(msg: string)` — measures the duration until you invoke the returned callback;
+  - Using Node Performance Hooks for measuring microtimes (less than 1ms);
+  - The output severity is `debug` (will be customizable later), so logger must have the corresponding `level`;
+  - It prints the duration in log using adaptive units: from picoseconds to minutes.
+
+```typescript
+// usage assuming that logger is an instance of BuiltinLogger
+const done = logger.profile("expensive operation");
+doExpensiveOperation();
+done(); // debug: expensive operation '555 milliseconds'
+```
+
+```typescript
+// to set up config using the built-in logger do this:
+import { createConfig, BuiltinLogger } from "express-zod-api";
+
+const config = createConfig({ logger: { level: "debug", color: true } });
+
+declare module "express-zod-api" {
+  interface LoggerOverrides extends BuiltinLogger {}
+}
+```
+
 ### v20.4.1
 
 - Technical update due to improved builder configuration:
