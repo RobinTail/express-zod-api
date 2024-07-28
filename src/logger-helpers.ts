@@ -27,6 +27,10 @@ export const isLoggerInstance = (subject: unknown): subject is AbstractLogger =>
   isObject(subject) &&
   Object.keys(severity).some((method) => method in subject);
 
+/**
+ * @todo consider Intl units when Node 18 dropped (microsecond unit is missing, picosecond is not in list)
+ * @link https://tc39.es/ecma402/#table-sanctioned-single-unit-identifiers
+ * */
 const makeNumberFormat = (fraction = 0) =>
   Intl.NumberFormat(undefined, {
     useGrouping: false,
@@ -34,6 +38,7 @@ const makeNumberFormat = (fraction = 0) =>
     maximumFractionDigits: fraction,
   });
 
+// creating them once increases the performance significantly
 const intFormat = makeNumberFormat();
 const formatFloat = makeNumberFormat(2);
 
@@ -46,10 +51,6 @@ const pickTimeUnit = cond<[number], [string, number]>([
   [T, (ms) => ["minute", ms / 6e4]],
 ]);
 
-/**
- * @todo consider Intl units when Node 18 dropped (microsecond unit is missing, picosecond is not in list)
- * @link https://tc39.es/ecma402/#table-sanctioned-single-unit-identifiers
- * */
 export const formatDuration = (durationMs: number) => {
   const [unit, converted] = pickTimeUnit(durationMs);
   const formatted = (durationMs > 1e3 ? formatFloat : intFormat).format(
