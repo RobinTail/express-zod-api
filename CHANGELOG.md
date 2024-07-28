@@ -5,16 +5,16 @@
 ### v20.5.0
 
 - Featuring a simple profiler for the built-in logger:
-  - Introducing `BuiltinLogger::profile(label: string)` — it measures the duration between two calls with same argument;
+  - Introducing `BuiltinLogger::profile(msg: string)` — measures the duration until calling the returned callback;
   - Using Node Performance Hooks for measuring microtimes (less than 1ms);
   - The output severity is `debug` (will be customizable later), so logger must have the corresponding `level`;
   - It prints the duration in log using adaptive units: from picoseconds to minutes.
 
 ```typescript
 // usage assuming that logger is an instance of BuiltinLogger
-logger.profile("expensive operation");
+const done = logger.profile("expensive operation");
 doExpensiveOperation();
-logger.profile("expensive operation"); // 2024-07-28T00:00:00.000Z debug: expensive operation '555 milliseconds'
+done(); // 2024-07-28T00:00:00.000Z debug: expensive operation '555 milliseconds'
 ```
 
 ```typescript

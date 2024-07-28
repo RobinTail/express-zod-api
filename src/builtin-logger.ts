@@ -35,7 +35,6 @@ export interface BuiltinLoggerConfig {
 
 /** @desc Built-in console logger with optional colorful inspections */
 export class BuiltinLogger implements AbstractLogger {
-  protected timeOrigins: Partial<Record<string, number>> = {};
   protected hasColor: boolean;
   protected readonly styles: Record<keyof AbstractLogger, Ansis> = {
     debug: blue,
@@ -109,15 +108,9 @@ export class BuiltinLogger implements AbstractLogger {
     return new BuiltinLogger({ ...this.config, ctx });
   }
 
-  /** @desc Measures the duration between two calls of this method with same argument */
-  public profile(label: string) {
-    const now = performance.now();
-    const start = this.timeOrigins[label];
-    if (start === undefined) {
-      this.timeOrigins[label] = now;
-      return;
-    }
-    delete this.timeOrigins[label];
-    this.debug(label, formatDuration(now - start));
+  /** @desc Measures the duration until calling the returned callback */
+  public profile(message: string) {
+    const start = performance.now();
+    return () => this.debug(message, formatDuration(performance.now() - start));
   }
 }

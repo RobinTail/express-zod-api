@@ -121,10 +121,10 @@ describe("BuiltinLogger", () => {
       "should measure %s ms",
       async (delay) => {
         const { logger, logSpy } = makeLogger({ level: "debug", color: false });
-        logger.profile("test");
+        const stop = logger.profile("test");
         const start = performance.now();
         while (performance.now() - start < delay) {} // eslint-disable-line no-empty -- waits
-        logger.profile("test");
+        stop();
         expect(logSpy).toHaveBeenCalledWith(
           expect.stringMatching(
             /2022-01-01T00:00:00.000Z debug: test '[\d.]+ (pico|micro|milli)?second(s)?'/,
