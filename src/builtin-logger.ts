@@ -35,8 +35,10 @@ export interface BuiltinLoggerConfig {
 
 interface ProfilerParams {
   message: string;
-  /** @default debug */
+  /** @default "debug" */
   severity?: keyof AbstractLogger;
+  /** @default "formatted" */
+  variant?: "formatted" | "ms";
 }
 
 /** @desc Built-in console logger with optional colorful inspections */
@@ -121,9 +123,16 @@ export class BuiltinLogger implements AbstractLogger {
     const start = performance.now();
     return () => {
       const duration = performance.now() - start;
-      const { message, severity = "debug" } =
-        typeof subject === "object" ? subject : { message: subject };
-      this.print(severity, message, formatDuration(duration));
+      const {
+        message,
+        severity = "debug",
+        variant = "formatted",
+      } = typeof subject === "object" ? subject : { message: subject };
+      this.print(
+        severity,
+        message,
+        variant === "ms" ? duration : formatDuration(duration),
+      );
     };
   }
 }

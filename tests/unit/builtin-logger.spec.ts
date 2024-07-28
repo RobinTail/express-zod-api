@@ -134,13 +134,24 @@ describe("BuiltinLogger", () => {
     );
 
     test.each([undefined, "debug", "info", "warn", "error"] as const)(
-      "should accept severity option",
+      "should accept severity option %s",
       (severity) => {
         const { logger, logSpy } = makeLogger({ level: "debug", color: false });
         logger.profile({ message: "test", severity })();
         expect(logSpy).toHaveBeenCalledWith(
-          expect.stringContaining(
-            `2022-01-01T00:00:00.000Z ${severity || "debug"}: test`,
+          expect.stringContaining(`${severity || "debug"}: test`),
+        );
+      },
+    );
+
+    test.each([undefined, "formatted", "ms"] as const)(
+      "should accept variant option %s",
+      (variant) => {
+        const { logger, logSpy } = makeLogger({ level: "debug", color: false });
+        logger.profile({ message: "test", variant })();
+        expect(logSpy).toHaveBeenCalledWith(
+          expect.stringMatching(
+            variant === "ms" ? /debug: test [\d.]+$/ : /debug: test '\d+ \w+'$/,
           ),
         );
       },
