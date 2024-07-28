@@ -632,8 +632,8 @@ const config = createConfig({
 ## Profiling
 
 For debugging and performance testing purposes the library offers a simple `.profile()` method on the built-in logger.
-It starts a timer when you call it and measures the duration until you invoke the returned callback. The `level` of the
-logger must be set to `debug` in order to make the measurements visible.
+It starts a timer when you call it and measures the duration in adaptive units (from picoseconds to minutes) until you
+invoke the returned callback. The `level` of the logger must be set to `debug` to make those measurements visible.
 
 ```typescript
 import { createConfig, BuiltinLogger } from "express-zod-api";
