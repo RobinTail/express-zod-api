@@ -617,7 +617,7 @@ You can use the `.child()` method of the built-in logger or [install a custom lo
 import { createConfig, BuiltinLogger } from "express-zod-api";
 import { randomUUID } from "node:crypto";
 
-// This enables the .child() method on the built-in logger:
+// This enables the .child() method on "logger":
 declare module "express-zod-api" {
   interface LoggerOverrides extends BuiltinLogger {}
 }
@@ -638,7 +638,7 @@ invoke the returned callback. The `level` of the logger must be set to `debug` t
 ```typescript
 import { createConfig, BuiltinLogger } from "express-zod-api";
 
-// This enables the .profile() method on the built-in logger:
+// This enables the .profile() method on "logger":
 declare module "express-zod-api" {
   interface LoggerOverrides extends BuiltinLogger {}
 }
