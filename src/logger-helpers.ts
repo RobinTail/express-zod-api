@@ -44,7 +44,6 @@ export const formatDuration = (durationMs: number) => {
   const [unit, converted] = pickTimeUnit(durationMs);
   const formatted = Intl.NumberFormat(undefined, {
     useGrouping: false,
-    style: "decimal",
     minimumFractionDigits: 0,
     maximumFractionDigits: durationMs > 1e3 ? 2 : 0,
   }).format(converted);
