@@ -33,6 +33,14 @@ export interface BuiltinLoggerConfig {
   ctx?: Context;
 }
 
+interface ProfilerOptions {
+  message: string;
+  /** @default "debug" */
+  severity?: keyof AbstractLogger | ((ms: number) => keyof AbstractLogger);
+  /** @default formatDuration - adaptive units and limited fraction */
+  formatter?: (ms: number) => string | number;
+}
+
 /** @desc Built-in console logger with optional colorful inspections */
 export class BuiltinLogger implements AbstractLogger {
   protected hasColor: boolean;
@@ -109,8 +117,22 @@ export class BuiltinLogger implements AbstractLogger {
   }
 
   /** @desc Measures the duration until you invoke the returned callback */
-  public profile(message: string) {
+  public profile(message: string): () => void;
+  public profile(options: ProfilerOptions): () => void;
+  public profile(subject: string | ProfilerOptions) {
     const start = performance.now();
-    return () => this.debug(message, formatDuration(performance.now() - start));
+    return () => {
+      const duration = performance.now() - start;
+      const {
+        message,
+        severity = "debug",
+        formatter = formatDuration,
+      } = typeof subject === "object" ? subject : { message: subject };
+      this.print(
+        typeof severity === "function" ? severity(duration) : severity,
+        message,
+        formatter(duration),
+      );
+    };
   }
 }

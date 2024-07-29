@@ -132,5 +132,34 @@ describe("BuiltinLogger", () => {
         );
       },
     );
+
+    test.each([
+      undefined,
+      "debug",
+      "info",
+      "warn",
+      "error",
+      () => "error",
+    ] as const)("should accept severity option %s", (severity) => {
+      const { logger, logSpy } = makeLogger({ level: "debug", color: false });
+      logger.profile({ message: "test", severity })();
+      expect(logSpy).toHaveBeenCalledWith(
+        expect.stringContaining(
+          `${typeof severity === "function" ? severity() : severity || "debug"}: test`,
+        ),
+      );
+    });
+
+    test.each([
+      undefined,
+      (ms: number) => Math.round(ms),
+      (ms: number) => `${ms.toFixed(0)}ms`,
+    ] as const)("should accept formatter option %#", (formatter) => {
+      const { logger, logSpy } = makeLogger({ level: "debug", color: false });
+      logger.profile({ message: "test", formatter })();
+      expect(logSpy).toHaveBeenCalledWith(
+        expect.stringMatching(/debug: test '?\d+\s?\w*'?$/),
+      );
+    });
   });
 });
