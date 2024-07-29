@@ -633,7 +633,7 @@ const config = createConfig({
 
 For debugging and performance testing purposes the library offers a simple `.profile()` method on the built-in logger.
 It starts a timer when you call it and measures the duration in adaptive units (from picoseconds to minutes) until you
-invoke the returned callback. The `level` of the logger must be set to `debug` to make those measurements visible.
+invoke the returned callback. The default severity of those measurements is `debug`.
 
 ```typescript
 import { createConfig, BuiltinLogger } from "express-zod-api";
@@ -648,6 +648,16 @@ const config = createConfig({ logger: { level: "debug", color: true } });
 const done = logger.profile("expensive operation");
 doExpensiveOperation();
 done(); // debug: expensive operation '555 milliseconds'
+```
+
+You can also customize the profiler with your own formatter, chosen severity or even performance assessment function:
+
+```typescript
+logger.profile({
+  message: "expensive operation",
+  severity: (ms) => (ms > 500 ? "error" : "info"), // assess immediately
+  formatter: (ms) => `${ms.toFixed(2)}ms`, // custom format
+});
 ```
 
 ## Enabling compression
