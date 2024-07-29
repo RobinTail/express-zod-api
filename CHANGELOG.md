@@ -7,17 +7,19 @@
 - Featuring customizations for profiler of the built-in logger:
   - The `.profile()` method can now accept an object having the following properties:
     - `message` — the one to be displayed;
-    - `severity` — optional, default `debug`, `info`, `warn`, `error`;
     - `formatter` — optional, a function to transform milliseconds into a string or number;
+    - `severity` — optional, `debug` (default), `info`, `warn`, `error`
+      - it can also be a function returning one of those values depending on duration in milliseconds;
+      - thus, you can immediately assess the measured performance;
 
 ```typescript
 const done = logger.profile({
   message: "expensive operation",
-  severity: "info",
+  severity: (ms) => (ms > 500 ? "error" : "info"),
   formatter: (ms) => `${ms.toFixed(2)}ms`,
 });
 doExpensiveOperation();
-done(); // info: expensive operation '555.55ms'
+done(); // error: expensive operation '555.55ms'
 ```
 
 ### v20.5.0

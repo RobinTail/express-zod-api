@@ -36,7 +36,7 @@ export interface BuiltinLoggerConfig {
 interface ProfilerOptions {
   message: string;
   /** @default "debug" */
-  severity?: keyof AbstractLogger;
+  severity?: keyof AbstractLogger | ((ms: number) => keyof AbstractLogger);
   /** @default formatDuration - adaptive units and limited fraction */
   formatter?: (ms: number) => string | number;
 }
@@ -128,7 +128,11 @@ export class BuiltinLogger implements AbstractLogger {
         severity = "debug",
         formatter = formatDuration,
       } = typeof subject === "object" ? subject : { message: subject };
-      this.print(severity, message, formatter(duration));
+      this.print(
+        typeof severity === "function" ? severity(duration) : severity,
+        message,
+        formatter(duration),
+      );
     };
   }
 }
