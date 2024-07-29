@@ -2,7 +2,7 @@ import { bench, describe, expect } from "vitest";
 import { routing } from "../../example/routing";
 import { Integration } from "../../src";
 
-describe.skip("Integration", () => {
+describe("Integration", () => {
   bench(
     "example",
     () => {
