@@ -658,6 +658,8 @@ logger.profile({
   severity: (ms) => (ms > 500 ? "error" : "info"), // assess immediately
   formatter: (ms) => `${ms.toFixed(2)}ms`, // custom format
 });
+doExpensiveOperation();
+done(); // error: expensive operation '555.55ms'
 ```
 
 ## Enabling compression
