@@ -33,7 +33,7 @@ export interface BuiltinLoggerConfig {
   ctx?: Context;
 }
 
-interface ProfilerParams {
+interface ProfilerOptions {
   message: string;
   /** @default "debug" */
   severity?: keyof AbstractLogger;
@@ -118,8 +118,8 @@ export class BuiltinLogger implements AbstractLogger {
 
   /** @desc Measures the duration until you invoke the returned callback */
   public profile(message: string): () => void;
-  public profile(params: ProfilerParams): () => void;
-  public profile(subject: string | ProfilerParams) {
+  public profile(options: ProfilerOptions): () => void;
+  public profile(subject: string | ProfilerOptions) {
     const start = performance.now();
     return () => {
       const duration = performance.now() - start;
