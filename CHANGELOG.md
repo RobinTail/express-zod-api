@@ -8,9 +8,9 @@
   - The `.profile()` method can now accept an object having the following properties:
     - `message` — the one to be displayed;
     - `formatter` — optional, a function to transform milliseconds into a string or number;
-    - `severity` — optional, `debug` (default), `info`, `warn`, `error`
+    - `severity` — optional, `debug` (default), `info`, `warn`, `error`:
       - it can also be a function returning one of those values depending on duration in milliseconds;
-      - thus, you can immediately assess the measured performance;
+      - thus, you can immediately assess the measured performance.
 
 ```typescript
 const done = logger.profile({
