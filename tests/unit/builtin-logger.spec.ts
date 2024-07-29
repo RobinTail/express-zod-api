@@ -144,17 +144,16 @@ describe("BuiltinLogger", () => {
       },
     );
 
-    test.each([undefined, "adaptive", "ms"] as const)(
-      "should accept unit option %s",
-      (unit) => {
-        const { logger, logSpy } = makeLogger({ level: "debug", color: false });
-        logger.profile({ message: "test", unit })();
-        expect(logSpy).toHaveBeenCalledWith(
-          expect.stringMatching(
-            unit === "ms" ? /debug: test [\d.]+$/ : /debug: test '\d+ \w+'$/,
-          ),
-        );
-      },
-    );
+    test.each([
+      undefined,
+      (ms: number) => Math.round(ms),
+      (ms: number) => `${ms.toFixed(0)}ms`,
+    ] as const)("should accept formatter option %#", (formatter) => {
+      const { logger, logSpy } = makeLogger({ level: "debug", color: false });
+      logger.profile({ message: "test", formatter })();
+      expect(logSpy).toHaveBeenCalledWith(
+        expect.stringMatching(/debug: test '?\d+\s?\w*'?$/),
+      );
+    });
   });
 });
