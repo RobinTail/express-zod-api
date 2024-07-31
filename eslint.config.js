@@ -35,7 +35,6 @@ export default [
   {
     rules: {
       "unicorn/prefer-node-protocol": "error",
-      "import/named": "error",
       "import/export": "error",
       "import/no-duplicates": "warn",
     },
