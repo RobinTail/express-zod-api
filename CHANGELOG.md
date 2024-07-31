@@ -2,8 +2,13 @@
 
 ## Version 20
 
+### v20.6.1
+
+- `node-mocks-http` version `^1.15.1`.
+
 ### v20.6.0
 
+- Small performance tuning;
 - Featuring customizations for profiler of the built-in logger:
   - The `.profile()` method can now accept an object having the following properties:
     - `message` — the one to be displayed;
