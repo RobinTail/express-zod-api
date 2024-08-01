@@ -37,33 +37,30 @@ export class IOSchemaError extends Error {
 /** @desc An error of validating the Endpoint handler's returns against the Endpoint output schema */
 export class OutputValidationError extends IOSchemaError {
   public override name = "OutputValidationError";
-  public readonly originalError: ZodError;
 
-  constructor(originalError: ZodError) {
+  constructor(public readonly originalError: ZodError) {
     super(getMessageFromError(originalError));
-    this.originalError = originalError;
   }
 }
 
 /** @desc An error of validating the input sources against the Middleware or Endpoint input schema */
 export class InputValidationError extends IOSchemaError {
   public override name = "InputValidationError";
-  public readonly originalError: ZodError;
 
-  constructor(originalError: ZodError) {
+  constructor(public readonly originalError: ZodError) {
     super(getMessageFromError(originalError));
-    this.originalError = originalError;
   }
 }
 
-/** @desc An error related to the execution or the response schema definition of ResultHandler */
+/** @desc An error related to the execution or incorrect configuration of ResultHandler */
 export class ResultHandlerError extends Error {
   public override name = "ResultHandlerError";
-  public readonly originalError: Error | undefined;
 
-  constructor(message: string, originalError?: Error | null) {
+  constructor(
+    message: string,
+    public readonly originalError?: Error,
+  ) {
     super(message);
-    this.originalError = originalError || undefined;
   }
 }
 
