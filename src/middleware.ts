@@ -79,10 +79,7 @@ export class Middleware<
       const validInput = (await this.#schema.parseAsync(input)) as z.output<IN>;
       return this.#handler({ ...rest, input: validInput });
     } catch (e) {
-      if (e instanceof z.ZodError) {
-        throw new InputValidationError(e);
-      }
-      throw e;
+      throw e instanceof z.ZodError ? new InputValidationError(e) : e;
     }
   }
 }
