@@ -209,10 +209,7 @@ export class Endpoint<
     try {
       return (await this.#schemas.output.parseAsync(output)) as FlatObject;
     } catch (e) {
-      if (e instanceof z.ZodError) {
-        throw new OutputValidationError(e);
-      }
-      throw e;
+      throw e instanceof z.ZodError ? new OutputValidationError(e) : e;
     }
   }
 
@@ -264,10 +261,7 @@ export class Endpoint<
         input,
       )) as z.output<IN>;
     } catch (e) {
-      if (e instanceof z.ZodError) {
-        throw new InputValidationError(e);
-      }
-      throw e;
+      throw e instanceof z.ZodError ? new InputValidationError(e) : e;
     }
     return this.#handler({
       input: finalInput,
