@@ -307,7 +307,10 @@ export class Endpoint<
       lastResortHandler({
         logger,
         response,
-        error: new ResultHandlerError(makeErrorFromAnything(e).message, error),
+        error: new ResultHandlerError(
+          makeErrorFromAnything(e).message,
+          error || undefined,
+        ),
       });
     }
   }
