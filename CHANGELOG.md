@@ -2,6 +2,10 @@
 
 ## Version 20
 
+### v20.6.2
+
+- Small refactoring of several methods and expressions.
+
 ### v20.6.1
 
 - `node-mocks-http` version `^1.15.1`.
