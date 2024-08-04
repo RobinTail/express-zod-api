@@ -2,6 +2,61 @@
 
 ## Version 20
 
+### v20.6.2
+
+- Small refactoring of several methods and expressions.
+
+### v20.6.1
+
+- `node-mocks-http` version `^1.15.1`.
+
+### v20.6.0
+
+- Small performance tuning;
+- Featuring customizations for profiler of the built-in logger:
+  - The `.profile()` method can now accept an object having the following properties:
+    - `message` — the one to be displayed;
+    - `formatter` — optional, a function to transform milliseconds into a string or number;
+    - `severity` — optional, `debug` (default), `info`, `warn`, `error`:
+      - it can also be a function returning one of those values depending on duration in milliseconds;
+      - thus, you can immediately assess the measured performance.
+
+```typescript
+const done = logger.profile({
+  message: "expensive operation",
+  severity: (ms) => (ms > 500 ? "error" : "info"),
+  formatter: (ms) => `${ms.toFixed(2)}ms`,
+});
+doExpensiveOperation();
+done(); // error: expensive operation '555.55ms'
+```
+
+### v20.5.0
+
+- Featuring a simple profiler for the built-in logger:
+  - Introducing `BuiltinLogger::profile(msg: string)` — measures the duration until you invoke the returned callback;
+  - Using Node Performance Hooks for measuring microtimes (less than 1ms);
+  - The output severity is `debug` (will be customizable later), so logger must have the corresponding `level`;
+  - It prints the duration in log using adaptive units: from picoseconds to minutes.
+
+```typescript
+// usage assuming that logger is an instance of BuiltinLogger
+const done = logger.profile("expensive operation");
+doExpensiveOperation();
+done(); // debug: expensive operation '555 milliseconds'
+```
+
+```typescript
+// to set up config using the built-in logger do this:
+import { createConfig, BuiltinLogger } from "express-zod-api";
+
+const config = createConfig({ logger: { level: "debug", color: true } });
+
+declare module "express-zod-api" {
+  interface LoggerOverrides extends BuiltinLogger {}
+}
+```
+
 ### v20.4.1
 
 - Technical update due to improved builder configuration:

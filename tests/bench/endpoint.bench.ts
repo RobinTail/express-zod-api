@@ -2,7 +2,7 @@ import { bench, describe, expect } from "vitest";
 import { retrieveUserEndpoint } from "../../example/endpoints/retrieve-user";
 import { testEndpoint } from "../../src";
 
-describe("Endpoint", () => {
+describe.skip("Endpoint", () => {
   bench(
     "retrieveUserEndpoint",
     async () => {

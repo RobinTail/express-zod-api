@@ -3,7 +3,7 @@ import { config } from "../../example/config";
 import { routing } from "../../example/routing";
 import { Documentation } from "../../src";
 
-describe("Documentation", () => {
+describe.skip("Documentation", () => {
   bench(
     "example",
     () => {

@@ -9,6 +9,7 @@ import {
   test,
   vi,
 } from "vitest";
+import { performance } from "node:perf_hooks";
 import { BuiltinLogger, BuiltinLoggerConfig } from "../../src/builtin-logger";
 
 describe("BuiltinLogger", () => {
@@ -112,6 +113,53 @@ describe("BuiltinLogger", () => {
       const child = parent.child(ctx);
       child.info("Here is some message", { more: "information" });
       expect(logSpy.mock.calls).toMatchSnapshot();
+    });
+  });
+
+  describe("profile()", () => {
+    test.each([1e-3, 1e-2, 1e-1, 1, 1e1, 1e2, 1e3])(
+      "should measure %s ms",
+      async (delay) => {
+        const { logger, logSpy } = makeLogger({ level: "debug", color: false });
+        const stop = logger.profile("test");
+        const start = performance.now();
+        while (performance.now() - start < delay) {} // eslint-disable-line no-empty -- waits
+        stop();
+        expect(logSpy).toHaveBeenCalledWith(
+          expect.stringMatching(
+            /2022-01-01T00:00:00.000Z debug: test '[\d.]+ (pico|micro|milli)?second(s)?'/,
+          ),
+        );
+      },
+    );
+
+    test.each([
+      undefined,
+      "debug",
+      "info",
+      "warn",
+      "error",
+      () => "error",
+    ] as const)("should accept severity option %s", (severity) => {
+      const { logger, logSpy } = makeLogger({ level: "debug", color: false });
+      logger.profile({ message: "test", severity })();
+      expect(logSpy).toHaveBeenCalledWith(
+        expect.stringContaining(
+          `${typeof severity === "function" ? severity() : severity || "debug"}: test`,
+        ),
+      );
+    });
+
+    test.each([
+      undefined,
+      (ms: number) => Math.round(ms),
+      (ms: number) => `${ms.toFixed(0)}ms`,
+    ] as const)("should accept formatter option %#", (formatter) => {
+      const { logger, logSpy } = makeLogger({ level: "debug", color: false });
+      logger.profile({ message: "test", formatter })();
+      expect(logSpy).toHaveBeenCalledWith(
+        expect.stringMatching(/debug: test '?\d+\s?\w*'?$/),
+      );
     });
   });
 });
