@@ -4,7 +4,12 @@ import tsPlugin from "typescript-eslint";
 import prettierOverrides from "eslint-config-prettier";
 import prettierRules from "eslint-plugin-prettier/recommended";
 import unicornPlugin from "eslint-plugin-unicorn";
-import { allowed, typeOnly } from "./tools/allowed-deps.js";
+import { getDependencies } from "./tools/allowed-deps.js";
+
+const { allowed, typeOnly } = await getDependencies("./package.json", [
+  "eslint",
+  "prettier",
+]);
 
 export default [
   {
