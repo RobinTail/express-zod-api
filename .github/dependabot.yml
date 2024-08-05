@@ -15,7 +15,3 @@ updates:
         patterns:
           - "vitest"
           - "@vitest/coverage-istanbul"
-      typescript-eslint:
-        patterns:
-          - "typescript-eslint"
-          - "@typescript-eslint/utils"
