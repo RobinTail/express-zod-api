@@ -7,13 +7,14 @@ import unicornPlugin from "eslint-plugin-unicorn";
 import manifest from "./package.json" assert { type: "json" }; // @todo use "with" after Node 18.20 and 20.10
 import { reject, startsWith, partition } from "ramda";
 
+const unlistedPeers = ["eslint", "prettier"];
 const excludeTypes = reject(startsWith("@types/"));
 const allPeers = excludeTypes(Object.keys(manifest.peerDependencies));
 const isOptional = (name) => manifest.peerDependenciesMeta[name]?.optional;
 const [optPeers, reqPeers] = partition(isOptional, allPeers);
 const production = Object.keys(manifest.dependencies);
 const allowed = production.concat(reqPeers);
-const typeOnly = optPeers.concat(["eslint", "prettier"]);
+const typeOnly = optPeers.concat(unlistedPeers);
 
 console.debug("Allowed imports", allowed);
 console.debug("Type only imports", typeOnly);
