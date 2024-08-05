@@ -9,14 +9,13 @@ export const getDependencies = async (packageJson, unlistedPeers) => {
   const lookup = flip(path)(manifest);
   const isOptional = (name) =>
     lookup(["peerDependenciesMeta", name, "optional"]);
+
   const allPeers = excludeTypes(Object.keys(manifest.peerDependencies));
   const [optPeers, reqPeers] = partition(isOptional, allPeers);
   const production = Object.keys(manifest.dependencies);
-  const allowed = production.concat(reqPeers);
-  const typeOnly = optPeers.concat(unlistedPeers);
 
-  console.debug("Allowed imports", allowed);
-  console.debug("Type only imports", typeOnly);
-
-  return { allowed, typeOnly };
+  return {
+    allowed: production.concat(reqPeers),
+    typeOnly: optPeers.concat(unlistedPeers),
+  };
 };

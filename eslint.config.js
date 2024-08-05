@@ -6,10 +6,10 @@ import prettierRules from "eslint-plugin-prettier/recommended";
 import unicornPlugin from "eslint-plugin-unicorn";
 import { getDependencies } from "./tools/allowed-deps.js";
 
-const { allowed, typeOnly } = await getDependencies("./package.json", [
-  "eslint",
-  "prettier",
-]);
+const unlisted = ["eslint", "prettier"];
+const { allowed, typeOnly } = await getDependencies("./package.json", unlisted);
+
+console.debug(allowed, typeOnly);
 
 export default [
   {
