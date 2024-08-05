@@ -4,6 +4,15 @@ import tsPlugin from "typescript-eslint";
 import prettierOverrides from "eslint-config-prettier";
 import prettierRules from "eslint-plugin-prettier/recommended";
 import unicornPlugin from "eslint-plugin-unicorn";
+import manifest from "./package.json" with { type: "json" };
+
+const dependencies = Object.keys(manifest.dependencies);
+const peers = Object.keys(manifest.peerDependencies).filter(
+  (peer) => !peer.startsWith("@types/"),
+);
+const allowed = dependencies.concat(peers);
+const typeOnly = ["eslint", "prettier"];
+console.debug("Allowed imports", allowed);
 
 export default [
   {
@@ -34,7 +43,13 @@ export default [
   {
     files: ["src/*.ts"],
     rules: {
-      "@typescript-eslint/no-restricted-imports": ["error", { paths: [] }], // @todo
+      "@typescript-eslint/no-restricted-imports": [
+        "error",
+        {
+          patterns: [{ regex: `^(?!\\.|node:)(?!${allowed.join("|")}).+$` }],
+          paths: typeOnly.map((name) => ({ name, allowTypeImports: true })),
+        },
+      ],
     },
   },
   // For tests
