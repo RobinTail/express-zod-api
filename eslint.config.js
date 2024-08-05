@@ -4,8 +4,12 @@ import tsPlugin from "typescript-eslint";
 import prettierOverrides from "eslint-config-prettier";
 import prettierRules from "eslint-plugin-prettier/recommended";
 import unicornPlugin from "eslint-plugin-unicorn";
-import manifest from "./package.json" assert { type: "json" }; // @todo use "with" after Node 18.20 and 20.10
+
+import { readFile } from "node:fs/promises";
 import { reject, startsWith, partition } from "ramda";
+
+// @todo consider "import with" starting Node 18.20 and 20.10
+const manifest = JSON.parse(await readFile("./package.json", "utf-8"));
 
 const unlistedPeers = ["eslint", "prettier"];
 const excludeTypes = reject(startsWith("@types/"));
