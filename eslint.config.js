@@ -5,14 +5,18 @@ import prettierOverrides from "eslint-config-prettier";
 import prettierRules from "eslint-plugin-prettier/recommended";
 import unicornPlugin from "eslint-plugin-unicorn";
 import manifest from "./package.json" with { type: "json" };
+import { reject, startsWith, partition } from "ramda";
 
-const dependencies = Object.keys(manifest.dependencies);
-const peers = Object.keys(manifest.peerDependencies).filter(
-  (peer) => !peer.startsWith("@types/"),
-);
-const allowed = dependencies.concat(peers);
-const typeOnly = ["eslint", "prettier"];
+const excludeTypes = reject(startsWith("@types/"));
+const allPeers = excludeTypes(Object.keys(manifest.peerDependencies));
+const isOptional = (name) => manifest.peerDependenciesMeta[name]?.optional;
+const [optPeers, reqPeers] = partition(isOptional, allPeers);
+const production = Object.keys(manifest.dependencies);
+const allowed = production.concat(reqPeers);
+const typeOnly = optPeers.concat(["eslint", "prettier"]);
+
 console.debug("Allowed imports", allowed);
+console.debug("Type only imports", typeOnly);
 
 export default [
   {
