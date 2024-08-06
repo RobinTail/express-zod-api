@@ -5,14 +5,14 @@ import tsPlugin from "typescript-eslint";
 import prettierOverrides from "eslint-config-prettier";
 import prettierRules from "eslint-plugin-prettier/recommended";
 import unicornPlugin from "eslint-plugin-unicorn";
-import importPlugin from "./tools/import-plugin.cjs";
+import allowedDepsPlugin from "eslint-plugin-allowed-dependencies";
 
 export default [
   {
     languageOptions: { globals: globals.node },
     plugins: {
       unicorn: unicornPlugin,
-      import: importPlugin.default, // @todo
+      allowed: allowedDepsPlugin,
     },
   },
   jsPlugin.configs.recommended,
@@ -37,7 +37,7 @@ export default [
   {
     files: ["src/*.ts"],
     rules: {
-      "import/allowed-dependencies": [
+      "allowed/allowed-dependencies": [
         "error",
         {
           manifest: JSON.parse(await readFile("./package.json", "utf8")),
