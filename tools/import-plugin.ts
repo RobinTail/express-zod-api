@@ -70,6 +70,6 @@ const allowedDeps = createRule<
   },
 });
 
-export const plugin = {
+export default {
   rules: { "allowed-dependencies": allowedDeps },
 } satisfies TSESLint.Linter.Plugin;

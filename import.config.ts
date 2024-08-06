@@ -17,5 +17,5 @@ export default defineConfig({
   ...commons,
   entry: ["./tools/import-plugin.ts"],
   outDir: "tools",
-  external: ["*"],
+  skipNodeModulesBundle: true,
 });

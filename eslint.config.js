@@ -5,14 +5,14 @@ import tsPlugin from "typescript-eslint";
 import prettierOverrides from "eslint-config-prettier";
 import prettierRules from "eslint-plugin-prettier/recommended";
 import unicornPlugin from "eslint-plugin-unicorn";
-import { plugin as importPlugin } from "./tools/import-plugin.cjs";
+import importPlugin from "./tools/import-plugin.cjs";
 
 export default [
   {
     languageOptions: { globals: globals.node },
     plugins: {
       unicorn: unicornPlugin,
-      import: importPlugin,
+      import: importPlugin.default, // @todo
     },
   },
   jsPlugin.configs.recommended,
