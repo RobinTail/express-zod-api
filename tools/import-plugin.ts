@@ -14,7 +14,7 @@ const allowedDeps = createRule<
       manifest: { dependencies?: object; peerDependencies?: object };
       typeOnly?: string[];
     },
-  ],
+  ], // @todo use https://www.npmjs.com/package/type-fest
   keyof typeof messages
 >({
   meta: {
@@ -25,7 +25,7 @@ const allowedDeps = createRule<
       {
         type: "object",
         properties: {
-          manifest: { type: "object" },
+          manifest: { type: "object" }, // @todo use settings
           typeOnly: { type: "array", items: { type: "string" } },
         },
       },
