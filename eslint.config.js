@@ -37,7 +37,7 @@ export default [
   {
     files: ["src/*.ts"],
     rules: {
-      "allowed/allowed-dependencies": [
+      "allowed/dependencies": [
         "error",
         {
           manifest: JSON.parse(await readFile("./package.json", "utf8")),
