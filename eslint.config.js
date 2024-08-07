@@ -1,21 +1,18 @@
 import globals from "globals";
 import jsPlugin from "@eslint/js";
+import { readFile } from "node:fs/promises";
 import tsPlugin from "typescript-eslint";
 import prettierOverrides from "eslint-config-prettier";
 import prettierRules from "eslint-plugin-prettier/recommended";
 import unicornPlugin from "eslint-plugin-unicorn";
-import { getDependencies } from "./tools/allowed-deps.js";
-
-const unlisted = ["eslint", "prettier"];
-const { allowed, typeOnly } = await getDependencies("./package.json", unlisted);
-
-console.debug(allowed, typeOnly);
+import allowedDepsPlugin from "eslint-plugin-allowed-dependencies";
 
 export default [
   {
     languageOptions: { globals: globals.node },
     plugins: {
       unicorn: unicornPlugin,
+      allowed: allowedDepsPlugin,
     },
   },
   jsPlugin.configs.recommended,
@@ -40,11 +37,11 @@ export default [
   {
     files: ["src/*.ts"],
     rules: {
-      "@typescript-eslint/no-restricted-imports": [
+      "allowed/dependencies": [
         "error",
         {
-          patterns: [{ regex: `^(?!\\.|node:)(?!${allowed.join("|")}).+$` }],
-          paths: typeOnly.map((name) => ({ name, allowTypeImports: true })),
+          manifest: JSON.parse(await readFile("./package.json", "utf8")),
+          typeOnly: ["eslint", "prettier"],
         },
       ],
     },
