@@ -1598,9 +1598,9 @@ eslint-config-prettier@^9.1.0:
   integrity sha512-NSWl5BFQWEPi1j4TjVNItzYV7dZXZ+wP6I6ZhrBGpChQhZRUaElihE9uRRkcbRnNb76UMKDF3r+WTmNcGPKsqw==
 
 eslint-plugin-allowed-dependencies@^0.4.0:
-  version "0.4.0"
-  resolved "https://registry.npmjs.org/eslint-plugin-allowed-dependencies/-/eslint-plugin-allowed-dependencies-0.4.0.tgz#508a1fe6023188a2209b8764fb34c10c52ff95ec"
-  integrity sha512-KWEzKg5JkAdstr2XANmTpl8nMa4/H3w+wRetRXgZQzGUet4heTot32MAurfCo81aMQyU6ed/WpDuzrw8jIbUVA==
+  version "0.4.1"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-allowed-dependencies/-/eslint-plugin-allowed-dependencies-0.4.1.tgz#8c849c48398d53ea8fc29a8b3c83fa70c1a109aa"
+  integrity sha512-AB/bldXgVY/TK9Bp2mBgsXcnkONlbTppR9f0tL4poWLoephfSxgM47jw6x0/BI6TthwnnBrNPuhytJvIHtrvnQ==
   dependencies:
     ramda "^0.30.1"
 
