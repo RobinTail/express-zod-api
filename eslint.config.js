@@ -39,6 +39,16 @@ export default [
       "allowed/dependencies": ["error", { typeOnly: ["eslint", "prettier"] }],
     },
   },
+  // For migration particularly
+  {
+    files: ["src/migration.ts"],
+    rules: {
+      "allowed/dependencies": [
+        "error",
+        { ignore: ["^@typescript-eslint", "^\\."] },
+      ],
+    },
+  },
   // For tests
   {
     files: ["tests/**/*.ts"],
