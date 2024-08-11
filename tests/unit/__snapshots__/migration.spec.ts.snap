@@ -7,8 +7,14 @@ exports[`Migration > should consist of one rule 1`] = `
       "rules": {
         "v20": {
           "create": [Function],
+          "defaultOptions": [],
           "meta": {
             "fixable": "code",
+            "messages": {
+              "change": "Change {{subject}} {{from}} to {{to}}.",
+              "remove": "Remove {{subject}} {{name}}.",
+            },
+            "schema": [],
             "type": "problem",
           },
         },
