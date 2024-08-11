@@ -155,7 +155,7 @@ const v20 = ESLintUtils.RuleCreator.withoutDocs({
 });
 
 /**
- * @desc ESLint plugin for migrating to this version (from previous), requires ESLint 9
+ * @desc ESLint plugin for migrating to this version (from previous), requires eslint v9 and typescript-eslint v8
  * @deprecated Single-use tool that can be removed and changed regardless SemVer. Remember to delete it after use.
  * @example
  *          // eslint.config.mjs:

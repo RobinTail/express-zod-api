@@ -2,6 +2,27 @@
 
 ## Version 20
 
+### v20.7.0
+
+- Changes to migration plugin:
+  - Requirements: `eslint@^9` and `typescript-eslint@^8`;
+  - The `express-zod-api/migration` is a pure ESLint plugin: no rule applied by default, it must be enabled explicitly;
+  - The ESLint plugin was introduced in v20.0.0 for automated migration from v19 (except assertions in tests);
+  - For migrating from v19 to v20.7.0 use the following minimal config and run `eslint --fix`:
+
+```javascript
+import parser from "@typescript-eslint/parser";
+import migration from "express-zod-api/migration";
+
+export default [
+  { languageOptions: { parser }, plugins: { migration } },
+  {
+    files: ["**/*.ts"], // define the files need to be migrated (source code)
+    rules: { "migration/v20": "error" }, // enable the rule explicitly
+  },
+];
+```
+
 ### v20.6.2
 
 - Small refactoring of several methods and expressions.
