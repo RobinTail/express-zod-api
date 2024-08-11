@@ -5,10 +5,10 @@
   "version": "0.0.0",
   "dependencies": {
     "express-zod-api": "link:../..",
-    "eslint": "^8.57.0"
+    "eslint": "~9.0.0"
   },
   "scripts": {
     "pretest": "echo 'import { createLogger } from \"express-zod-api\";' > sample.ts",
-    "test": "eslint sample.ts --fix && vitest --run ./migration.spec.ts && rm sample.ts"
+    "test": "eslint --fix && vitest --run && rm sample.ts"
   }
 }
