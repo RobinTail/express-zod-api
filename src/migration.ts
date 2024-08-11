@@ -1,6 +1,5 @@
 import { ESLintUtils, type TSESLint } from "@typescript-eslint/utils";
 
-const pluginName = "ez-migration";
 const importName = "express-zod-api";
 const testerName = "testEndpoint";
 
@@ -155,18 +154,18 @@ const v20 = ESLintUtils.RuleCreator.withoutDocs({
   }),
 });
 
-const rules = { v20 };
-
 /**
- * @desc ESLint flat config entry for migrating to this version (from previous), requires at least ESLint 8 or higher
+ * @desc ESLint plugin for migrating to this version (from previous), requires ESLint 9
  * @deprecated Single-use tool that can be removed and changed regardless SemVer. Remember to delete it after use.
  * @example
  *          // eslint.config.mjs:
  *          import parser from "@typescript-eslint/parser";
  *          import migration from "express-zod-api/migration";
- *          export default [{ languageOptions: { parser }, files: ["**\/*.ts"] }, migration];
+ *          export default [
+ *            { languageOptions: {parser}, plugins: {migration} },
+ *            { files: ["**\/*.ts"], rules: { "migration/v20": "error" } }
+ *          ];
  * */
 export default {
-  rules: { "ez-migration/v20": "error" },
-  plugins: { [pluginName]: { rules } },
-} satisfies TSESLint.FlatConfig.Config;
+  rules: { v20 },
+} satisfies TSESLint.Linter.Plugin;

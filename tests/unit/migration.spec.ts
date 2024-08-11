@@ -17,7 +17,7 @@ describe("Migration", () => {
   });
 });
 
-tester.run("v20", migration.plugins["ez-migration"].rules.v20, {
+tester.run("v20", migration.rules.v20, {
   valid: [
     { code: `import { BuiltinLogger } from "express-zod-api"` },
     { code: `import { ResultHandler } from "express-zod-api"` },

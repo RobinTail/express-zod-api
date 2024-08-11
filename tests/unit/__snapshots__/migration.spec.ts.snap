@@ -2,27 +2,20 @@
 
 exports[`Migration > should consist of one rule 1`] = `
 {
-  "plugins": {
-    "ez-migration": {
-      "rules": {
-        "v20": {
-          "create": [Function],
-          "defaultOptions": [],
-          "meta": {
-            "fixable": "code",
-            "messages": {
-              "change": "Change {{subject}} {{from}} to {{to}}.",
-              "remove": "Remove {{subject}} {{name}}.",
-            },
-            "schema": [],
-            "type": "problem",
-          },
+  "rules": {
+    "v20": {
+      "create": [Function],
+      "defaultOptions": [],
+      "meta": {
+        "fixable": "code",
+        "messages": {
+          "change": "Change {{subject}} {{from}} to {{to}}.",
+          "remove": "Remove {{subject}} {{name}}.",
         },
+        "schema": [],
+        "type": "problem",
       },
     },
-  },
-  "rules": {
-    "ez-migration/v20": "error",
   },
 }
 `;
