@@ -4,11 +4,12 @@
 
 ### v20.7.0
 
-- Changes to migration plugin:
+- Changes to migration plugin (single-use tool, regardless SemVer):
   - Requirements: `eslint@^9` and `typescript-eslint@^8` (may work with previous versions, but it's no longer tested);
   - The `express-zod-api/migration` is a pure ESLint plugin: no rule applied by default, it must be enabled explicitly;
+  - The files requiring migration have to be defined explicitly — this should improve clarity on its operation;
   - The ESLint plugin was introduced in v20.0.0 for automated migration from v19 (except assertions in tests);
-  - For migrating from v19 to v20.7.0 use the following minimal config and run `eslint --fix`:
+  - For migrating from v19 use the following minimal config and run `eslint --fix`:
 
 ```javascript
 // eslint.config.js (or .mjs if you're developing in a CommonJS environment)
