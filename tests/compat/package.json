@@ -8,6 +8,7 @@
     "eslint": "^8.57.0"
   },
   "scripts": {
-    "test": "eslint --debug"
+    "pretest": "echo 'import { createLogger } from \"express-zod-api\";' > sample.ts",
+    "test": "eslint sample.ts --fix && vitest --run ./migration.spec.ts && rm sample.ts"
   }
 }
