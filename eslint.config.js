@@ -43,7 +43,10 @@ export default [
   {
     files: ["src/migration.ts"],
     rules: {
-      "allowed/dependencies": ["error", { ignore: ["^@typescript-eslint"] }],
+      "allowed/dependencies": [
+        "error",
+        { ignore: ["^@typescript-eslint", "^\\."] },
+      ],
     },
   },
   // For tests

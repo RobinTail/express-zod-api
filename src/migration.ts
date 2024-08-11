@@ -1,6 +1,6 @@
 import { ESLintUtils, type TSESLint } from "@typescript-eslint/utils";
+import { name as importName } from "../package.json";
 
-const importName = "express-zod-api";
 const testerName = "testEndpoint";
 
 const changedMethods = {
