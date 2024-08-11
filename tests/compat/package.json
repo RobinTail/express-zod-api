@@ -5,7 +5,7 @@
   "version": "0.0.0",
   "dependencies": {
     "express-zod-api": "link:../..",
-    "eslint": "~9.0.0"
+    "eslint": "9.0.0"
   },
   "scripts": {
     "pretest": "echo 'import { createLogger } from \"express-zod-api\";' > sample.ts",
