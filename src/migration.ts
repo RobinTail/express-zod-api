@@ -141,7 +141,7 @@ const v20 = ESLintUtils.RuleCreator.withoutDocs({
     Identifier: (node) => {
       if (
         node.name === "MockOverrides" &&
-        `${node.parent.type}` === "TSInterfaceDeclaration"
+        node.parent.type === "TSInterfaceDeclaration"
       ) {
         ctx.report({
           node,
