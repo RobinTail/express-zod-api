@@ -1,7 +1,6 @@
-import type { Rule, Linter } from "eslint";
+import { ESLintUtils, type TSESLint } from "@typescript-eslint/utils";
+import { name as importName } from "../package.json";
 
-const pluginName = "ez-migration";
-const importName = "express-zod-api";
 const testerName = "testEndpoint";
 
 const changedMethods = {
@@ -24,9 +23,18 @@ const shouldAct = <T extends Record<string, unknown>>(
   scope: T,
 ): subject is keyof T => typeof subject === "string" && subject in scope;
 
-const v20: Rule.RuleModule = {
-  meta: { type: "problem", fixable: "code" },
-  create: (context) => ({
+const v20 = ESLintUtils.RuleCreator.withoutDocs({
+  meta: {
+    type: "problem",
+    fixable: "code",
+    schema: [],
+    messages: {
+      change: "Change {{subject}} {{from}} to {{to}}.",
+      remove: "Remove {{subject}} {{name}}.",
+    },
+  },
+  defaultOptions: [],
+  create: (ctx) => ({
     ImportDeclaration: (node) => {
       if (node.source.value === importName) {
         for (const spec of node.specifiers) {
@@ -35,9 +43,14 @@ const v20: Rule.RuleModule = {
             shouldAct(spec.imported.name, changedMethods)
           ) {
             const replacement = changedMethods[spec.imported.name];
-            context.report({
+            ctx.report({
               node: spec.imported,
-              message: `Change import "${spec.imported.name}" to "${replacement}".`,
+              messageId: "change",
+              data: {
+                subject: "import",
+                from: spec.imported.name,
+                to: replacement,
+              },
               fix: (fixer) => fixer.replaceText(spec, replacement),
             });
           }
@@ -50,9 +63,10 @@ const v20: Rule.RuleModule = {
         shouldAct(node.callee.name, changedMethods)
       ) {
         const replacement = `new ${changedMethods[node.callee.name]}`;
-        context.report({
+        ctx.report({
           node: node.callee,
-          message: `Change "${node.callee.name}" to "${replacement}".`,
+          messageId: "change",
+          data: { subject: "call", from: node.callee.name, to: replacement },
           fix: (fixer) => fixer.replaceText(node.callee, replacement),
         });
       }
@@ -66,18 +80,24 @@ const v20: Rule.RuleModule = {
           if (prop.type === "Property" && prop.key.type === "Identifier") {
             if (shouldAct(prop.key.name, changedProps)) {
               const replacement = changedProps[prop.key.name];
-              context.report({
+              ctx.report({
                 node: prop,
-                message: `Change property "${prop.key.name}" to "${replacement}".`,
+                messageId: "change",
+                data: {
+                  subject: "property",
+                  from: prop.key.name,
+                  to: replacement,
+                },
                 fix: (fixer) => fixer.replaceText(prop.key, replacement),
               });
             }
             if (shouldAct(prop.key.name, removedProps)) {
-              context.report({
+              ctx.report({
                 node: prop,
-                message: `Remove property "${prop.key.name}".`,
+                messageId: "remove",
+                data: { subject: "property", name: prop.key.name },
                 fix: (fixer) =>
-                  context.sourceCode.getTokenAfter(prop)?.value === "," &&
+                  ctx.sourceCode.getTokenAfter(prop)?.value === "," &&
                   prop.range
                     ? fixer.removeRange([prop.range[0], prop.range[1] + 1])
                     : fixer.remove(prop),
@@ -104,9 +124,14 @@ const v20: Rule.RuleModule = {
             shouldAct(prop.key.name, changedProps)
           ) {
             const replacement = changedProps[prop.key.name];
-            context.report({
+            ctx.report({
               node: prop,
-              message: `Change property "${prop.key.name}" to "${replacement}".`,
+              messageId: "change",
+              data: {
+                subject: "property",
+                from: prop.key.name,
+                to: replacement,
+              },
               fix: (fixer) => fixer.replaceText(prop.key, replacement),
             });
           }
@@ -116,32 +141,31 @@ const v20: Rule.RuleModule = {
     Identifier: (node) => {
       if (
         node.name === "MockOverrides" &&
-        `${node.parent.type}` === "TSInterfaceDeclaration"
+        node.parent.type === "TSInterfaceDeclaration"
       ) {
-        context.report({
+        ctx.report({
           node,
-          message: `Remove augmentation of the "${node.name}" interface — no longer needed.`,
+          messageId: "remove",
+          data: { subject: "augmentation", name: node.name },
           fix: (fixer) => fixer.remove(node.parent),
         });
       }
     },
   }),
-};
-
-const rules = { v20 };
+});
 
 /**
- * @desc ESLint flat config entry for migrating to this version (from previous), requires at least ESLint 8 or higher
+ * @desc ESLint plugin for migrating to this version (from previous), requires eslint v9 and typescript-eslint v8
  * @deprecated Single-use tool that can be removed and changed regardless SemVer. Remember to delete it after use.
  * @example
  *          // eslint.config.mjs:
  *          import parser from "@typescript-eslint/parser";
  *          import migration from "express-zod-api/migration";
- *          export default [{ languageOptions: { parser }, files: ["**\/*.ts"] }, migration];
+ *          export default [
+ *            { languageOptions: {parser}, plugins: {migration} },
+ *            { files: ["**\/*.ts"], rules: { "migration/v20": "error" } }
+ *          ];
  * */
 export default {
-  rules: { "ez-migration/v20": "error" },
-  plugins: { [pluginName]: { rules } },
-} satisfies Linter.Config<
-  Record<`${typeof pluginName}/${keyof typeof rules}`, "error">
->;
+  rules: { v20 },
+} satisfies TSESLint.Linter.Plugin;

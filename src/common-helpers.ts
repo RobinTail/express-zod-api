@@ -58,11 +58,7 @@ export const getInput = (
 };
 
 export const makeErrorFromAnything = (subject: unknown): Error =>
-  subject instanceof Error
-    ? subject
-    : new Error(
-        typeof subject === "symbol" ? subject.toString() : `${subject}`,
-      );
+  subject instanceof Error ? subject : new Error(String(subject));
 
 export const getMessageFromError = (error: Error): string => {
   if (error instanceof z.ZodError) {
