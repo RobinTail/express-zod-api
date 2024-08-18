@@ -258,6 +258,9 @@ describe("App", async () => {
         },
       });
       expect(response.status).toBe(500);
+      expect(response.headers.get("content-type")).toBe(
+        "text/plain; charset=utf-8",
+      );
       const text = await response.text();
       expect(text).toBe(
         "An error occurred while serving the result: I am faulty.",
