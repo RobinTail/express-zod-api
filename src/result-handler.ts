@@ -161,7 +161,7 @@ export const arrayResultHandler = new ResultHandler({
     if (error) {
       const statusCode = getStatusCodeFromError(error);
       logInternalError({ logger, statusCode, request, error, input });
-      response.status(statusCode).send(error.message);
+      response.status(statusCode).type("text/plain").send(error.message);
       return;
     }
     if (output && "items" in output && Array.isArray(output.items)) {
@@ -169,6 +169,7 @@ export const arrayResultHandler = new ResultHandler({
     } else {
       response
         .status(500)
+        .type("text/plain")
         .send("Property 'items' is missing in the endpoint output");
     }
   },
