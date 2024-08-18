@@ -44,12 +44,13 @@ Start your API server with I/O schema validation and custom middlewares in minut
    2. [Route path params](#route-path-params)
    3. [Multiple schemas for one route](#multiple-schemas-for-one-route)
    4. [Response customization](#response-customization)
-   5. [Non-object response](#non-object-response) including file downloads
-   6. [File uploads](#file-uploads)
-   7. [Serving static files](#serving-static-files)
-   8. [Connect to your own express app](#connect-to-your-own-express-app)
-   9. [Testing endpoints](#testing-endpoints)
-   10. [Testing middlewares](#testing-middlewares)
+   5. [Error handling](#error-handling)
+   6. [Non-object response](#non-object-response) including file downloads
+   7. [File uploads](#file-uploads)
+   8. [Serving static files](#serving-static-files)
+   9. [Connect to your own express app](#connect-to-your-own-express-app)
+   10. [Testing endpoints](#testing-endpoints)
+   11. [Testing middlewares](#testing-middlewares)
 6. [Special needs](#special-needs)
    1. [Different responses for different status codes](#different-responses-for-different-status-codes)
    2. [Array response](#array-response) for migrating legacy APIs
@@ -818,7 +819,6 @@ const yourResultHandler = new ResultHandler({
 });
 ```
 
-Note: `OutputValidationError` and `InputValidationError` are also available for your custom error handling.
 _See also [Different responses for different status codes](#different-responses-for-different-status-codes)_.
 
 After creating your custom `ResultHandler` you can use it as an argument for `EndpointsFactory` instance creation:
@@ -829,8 +829,26 @@ import { EndpointsFactory } from "express-zod-api";
 const endpointsFactory = new EndpointsFactory(yourResultHandler);
 ```
 
-Please note: `ResultHandler` must handle any errors and not throw its own. Otherwise, the case will be passed to the
-`LastResortHandler`, which will set the status code to `500` and send the error message as plain text.
+## Error handling
+
+`ResultHandler` is designed to be the entity responsible for centralized error handling. By default, that center is
+the `defaultResultHandler`, however, since much can be customized, you should be aware that there are three possible
+origins of errors that could happen in runtime and be handled the following way:
+
+- Ones related to `Endpoint` execution — handled by a `ResultHandler` assigned to the `EndpointsFactory` produced it:
+  - Proprietary classes (available to you for your custom handling):
+    - `InputValidationError` — when request payload does not match the `input` schema of the endpoint.
+      The default response status code is `400`;
+    - `OutputValidationError` — when returns of the endpoint's `handler` does not match its `output` schema (`500`);
+  - Errors thrown within endpoint's `handler`:
+    - `HttpError`, made by `createHttpError()` method of `http-errors` (required peer dependency). The default response
+      status code is taken from `error.statusCode`;
+    - Others, inheriting from `Error` class (`500`);
+- Ones related to routing, parsing and upload issues — handled by `ResultHandler` assigned to `errorHandler` in config:
+  - Default is `defaultResultHandler` (sets `500`);
+  - `ResultHandler` must handle possible `error` and avoid throwing its own errors, otherwise:
+- Ones related to `ResultHandler` execution — handled by `LastResortHandler`:
+  - Response status code is always `500` and the response itself is a plain text containing original `error.message`.
 
 ## Non-object response
 
