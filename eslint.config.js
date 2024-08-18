@@ -1,6 +1,5 @@
 import globals from "globals";
 import jsPlugin from "@eslint/js";
-import { readFile } from "node:fs/promises";
 import tsPlugin from "typescript-eslint";
 import prettierOverrides from "eslint-config-prettier";
 import prettierRules from "eslint-plugin-prettier/recommended";
@@ -37,12 +36,16 @@ export default [
   {
     files: ["src/*.ts"],
     rules: {
+      "allowed/dependencies": ["error", { typeOnly: ["eslint", "prettier"] }],
+    },
+  },
+  // For migration particularly
+  {
+    files: ["src/migration.ts"],
+    rules: {
       "allowed/dependencies": [
         "error",
-        {
-          manifest: JSON.parse(await readFile("./package.json", "utf8")),
-          typeOnly: ["eslint", "prettier"],
-        },
+        { ignore: ["^@typescript-eslint", "^\\."] },
       ],
     },
   },

@@ -45,5 +45,6 @@ export default defineConfig([
      * @link https://github.com/arethetypeswrong/arethetypeswrong.github.io/blob/main/docs/problems/MissingExportEquals.md
      * */
     cjsInterop: true,
+    skipNodeModulesBundle: true,
   },
 ]);

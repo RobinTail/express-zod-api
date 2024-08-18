@@ -5,9 +5,12 @@
   "version": "0.0.0",
   "dependencies": {
     "express-zod-api": "link:../..",
-    "eslint": "^8.57.0"
+    "eslint": "9.0.0",
+    "typescript-eslint": "8.0.0",
+    "typescript": "~5.1.0"
   },
   "scripts": {
-    "test": "eslint --debug"
+    "pretest": "echo 'import { createLogger } from \"express-zod-api\";' > sample.ts",
+    "test": "eslint --fix && vitest --run && rm sample.ts"
   }
 }
