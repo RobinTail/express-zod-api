@@ -42,7 +42,7 @@ export interface CommonConfig<TAG extends string = string> {
    */
   cors: boolean | HeadersProvider;
   /**
-   * @desc Custom ResultHandlerDefinition for common errors.
+   * @desc The ResultHandler to use for handling routing, parsing and upload errors
    * @default defaultResultHandler
    * @see defaultResultHandler
    */

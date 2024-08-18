@@ -2,6 +2,14 @@
 
 ## Version 20
 
+### v20.7.1
+
+- Improved documentation on error handling:
+  - More clarity on the origins of possible runtime errors and how they are handled by default;
+  - Revealing details on how routing, parsing and upload errors are handled by default;
+  - Correction to the JSDoc of the corresponding `errorHandler` property in config.
+- Removing redundant type coercion in the migration tool.
+
 ### v20.7.0
 
 - Changes to migration plugin (single-use tool, regardless SemVer):
