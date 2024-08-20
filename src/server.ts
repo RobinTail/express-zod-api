@@ -13,9 +13,11 @@ import {
   createNotFoundHandler,
   createParserFailureHandler,
   createUploadParsers,
+  LocalResponse,
   moveRaw,
 } from "./server-helpers";
 import { getStartupLogo } from "./startup-logo";
+import { metaSymbol } from "./metadata";
 
 const makeCommonEntities = (config: CommonConfig) => {
   if (config.startupLogo !== false) {
@@ -82,7 +84,12 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
   };
 
   if (config.server.beforeRouting) {
-    await config.server.beforeRouting({ app, logger: rootLogger });
+    await config.server.beforeRouting({
+      app,
+      logger: rootLogger,
+      getLogger: (response: LocalResponse) =>
+        response.locals[metaSymbol]?.logger || rootLogger,
+    });
   }
   initRouting({ app, routing, rootLogger, config, parsers });
   app.use(parserFailureHandler, notFoundHandler);
