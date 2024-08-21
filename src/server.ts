@@ -13,11 +13,10 @@ import {
   createNotFoundHandler,
   createParserFailureHandler,
   createUploadParsers,
-  LocalResponse,
+  makeLoggerExtrator,
   moveRaw,
 } from "./server-helpers";
 import { getStartupLogo } from "./startup-logo";
-import { metaSymbol } from "./metadata";
 
 const makeCommonEntities = (config: CommonConfig) => {
   if (config.startupLogo !== false) {
@@ -29,13 +28,15 @@ const makeCommonEntities = (config: CommonConfig) => {
     : new BuiltinLogger(config.logger);
   rootLogger.debug("Running", process.env.TSUP_BUILD || "from sources");
   const loggingMiddleware = createLoggingMiddleware({ rootLogger, config });
-  const notFoundHandler = createNotFoundHandler({ rootLogger, errorHandler });
+  const getLogger = makeLoggerExtrator(rootLogger);
+  const notFoundHandler = createNotFoundHandler({ getLogger, errorHandler });
   const parserFailureHandler = createParserFailureHandler({
-    rootLogger,
+    getLogger,
     errorHandler,
   });
   return {
     rootLogger,
+    getLogger,
     errorHandler,
     notFoundHandler,
     parserFailureHandler,
@@ -44,12 +45,12 @@ const makeCommonEntities = (config: CommonConfig) => {
 };
 
 export const attachRouting = (config: AppConfig, routing: Routing) => {
-  const { rootLogger, notFoundHandler, loggingMiddleware } =
+  const { rootLogger, getLogger, notFoundHandler, loggingMiddleware } =
     makeCommonEntities(config);
   initRouting({
     app: config.app.use(loggingMiddleware),
     routing,
-    rootLogger,
+    getLogger,
     config,
   });
   return { notFoundHandler, logger: rootLogger };
@@ -58,6 +59,7 @@ export const attachRouting = (config: AppConfig, routing: Routing) => {
 export const createServer = async (config: ServerConfig, routing: Routing) => {
   const {
     rootLogger,
+    getLogger,
     notFoundHandler,
     parserFailureHandler,
     loggingMiddleware,
@@ -79,7 +81,7 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
     json: [config.server.jsonParser || express.json()],
     raw: [config.server.rawParser || express.raw(), moveRaw],
     upload: config.server.upload
-      ? await createUploadParsers({ config, rootLogger })
+      ? await createUploadParsers({ config, getLogger })
       : [],
   };
 
@@ -87,11 +89,10 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
     await config.server.beforeRouting({
       app,
       logger: rootLogger,
-      getLogger: (response: LocalResponse) =>
-        response.locals[metaSymbol]?.logger || rootLogger,
+      getLogger,
     });
   }
-  initRouting({ app, routing, rootLogger, config, parsers });
+  initRouting({ app, routing, getLogger, config, parsers });
   app.use(parserFailureHandler, notFoundHandler);
 
   const starter = <T extends http.Server | https.Server>(

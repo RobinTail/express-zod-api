@@ -12,7 +12,7 @@ import { makeErrorFromAnything } from "./common-helpers";
 
 interface HandlerCreatorParams {
   errorHandler: AbstractResultHandler;
-  rootLogger: ActualLogger;
+  getLogger: LoggerExtrator;
 }
 
 export type LocalResponse = Response<
@@ -21,7 +21,7 @@ export type LocalResponse = Response<
 >;
 
 export const createParserFailureHandler =
-  ({ errorHandler, rootLogger }: HandlerCreatorParams): ErrorRequestHandler =>
+  ({ errorHandler, getLogger }: HandlerCreatorParams): ErrorRequestHandler =>
   async (error, request, response: LocalResponse, next) => {
     if (!error) {
       return next();
@@ -35,18 +35,18 @@ export const createParserFailureHandler =
       input: null,
       output: null,
       options: {},
-      logger: response.locals[metaSymbol]?.logger || rootLogger,
+      logger: getLogger(response),
     });
   };
 
 export const createNotFoundHandler =
-  ({ errorHandler, rootLogger }: HandlerCreatorParams): RequestHandler =>
+  ({ errorHandler, getLogger }: HandlerCreatorParams): RequestHandler =>
   async (request, response: LocalResponse) => {
     const error = createHttpError(
       404,
       `Can not ${request.method} ${request.path}`,
     );
-    const logger = response.locals[metaSymbol]?.logger || rootLogger;
+    const logger = getLogger(response);
     try {
       errorHandler.execute({
         request,
@@ -85,10 +85,10 @@ export const createUploadLogger = (
 });
 
 export const createUploadParsers = async ({
-  rootLogger,
+  getLogger,
   config,
 }: {
-  rootLogger: ActualLogger;
+  getLogger: LoggerExtrator;
   config: ServerConfig;
 }): Promise<RequestHandler[]> => {
   const uploader = await loadPeer<typeof fileUpload>("express-fileupload");
@@ -97,7 +97,7 @@ export const createUploadParsers = async ({
   };
   const parsers: RequestHandler[] = [];
   parsers.push(async (request, response: LocalResponse, next) => {
-    const logger = response.locals[metaSymbol]?.logger || rootLogger;
+    const logger = getLogger(response);
     try {
       await beforeUpload?.({ request, logger });
     } catch (error) {
@@ -141,3 +141,9 @@ export const createLoggingMiddleware =
     response.locals[metaSymbol] = { logger };
     next();
   };
+
+export type LoggerExtrator = (response: LocalResponse) => ActualLogger;
+export const makeLoggerExtrator =
+  (fallback: ActualLogger): LoggerExtrator =>
+  (response) =>
+    response.locals[metaSymbol]?.logger || fallback;

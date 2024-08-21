@@ -6,6 +6,7 @@ import {
   createUploadFailueHandler,
   createUploadLogger,
   createUploadParsers,
+  makeLoggerExtrator,
   moveRaw,
 } from "../../src/server-helpers";
 import { describe, expect, test, vi } from "vitest";
@@ -22,43 +23,38 @@ import createHttpError from "http-errors";
 describe("Server helpers", () => {
   describe("createParserFailureHandler()", () => {
     test("the handler should call next if there is no error", () => {
-      const rootLogger = makeLoggerMock();
       const handler = createParserFailureHandler({
         errorHandler: defaultResultHandler,
-        rootLogger,
+        getLogger: () => makeLoggerMock(),
       });
       const next = vi.fn();
       handler(undefined, makeRequestMock(), makeResponseMock(), next);
       expect(next).toHaveBeenCalledTimes(1);
     });
 
-    test("the handler should call error handler with a child logger", async () => {
+    test("the handler should call error handler", async () => {
       const errorHandler = new ResultHandler({
         positive: vi.fn(),
         negative: vi.fn(),
         handler: vi.fn(),
       });
       const spy = vi.spyOn(errorHandler, "execute");
-      const rootLogger = makeLoggerMock({ isRoot: true });
+      const loggerMock = makeLoggerMock({ isRoot: true });
       const handler = createParserFailureHandler({
         errorHandler,
-        rootLogger,
+        getLogger: () => loggerMock,
       });
       await handler(
         new SyntaxError("Unexpected end of JSON input"),
         makeRequestMock(),
-        makeResponseMock({
-          locals: {
-            [metaSymbol]: { logger: makeLoggerMock({ isChild: true }) },
-          },
-        }),
+        makeResponseMock(),
         vi.fn<any>(),
       );
       expect(spy).toHaveBeenCalledTimes(1);
       expect(spy.mock.calls[0][0].error).toEqual(
         createHttpError(400, "Unexpected end of JSON input"),
       );
-      expect(spy.mock.calls[0][0].logger).toHaveProperty("isChild", true);
+      expect(spy.mock.calls[0][0].logger).toEqual(loggerMock);
     });
   });
 
@@ -70,10 +66,10 @@ describe("Server helpers", () => {
         handler: vi.fn(),
       });
       const spy = vi.spyOn(errorHandler, "execute");
-      const rootLogger = makeLoggerMock({ isRoot: true });
+      const loggerMock = makeLoggerMock({ isRoot: true });
       const handler = createNotFoundHandler({
         errorHandler,
-        rootLogger,
+        getLogger: () => loggerMock,
       });
       const next = vi.fn();
       const requestMock = makeRequestMock({
@@ -81,17 +77,13 @@ describe("Server helpers", () => {
         path: "/v1/test",
         body: { n: 453 },
       });
-      const responseMock = makeResponseMock({
-        locals: {
-          [metaSymbol]: { logger: makeLoggerMock({ isChild: true }) },
-        },
-      });
+      const responseMock = makeResponseMock();
       await handler(requestMock, responseMock, next);
       expect(next).toHaveBeenCalledTimes(0);
       expect(spy).toHaveBeenCalledTimes(1);
       expect(spy.mock.calls[0]).toHaveLength(1);
       expect(spy.mock.calls[0][0]).toHaveProperty("logger");
-      expect(spy.mock.calls[0][0].logger).toHaveProperty("isChild", true);
+      expect(spy.mock.calls[0][0].logger).toEqual(loggerMock);
       expect(spy.mock.calls[0][0].error).toEqual(
         createHttpError(404, "Can not POST /v1/test"),
       );
@@ -102,7 +94,7 @@ describe("Server helpers", () => {
     });
 
     test("should call Last Resort Handler in case of ResultHandler is faulty", () => {
-      const rootLogger = makeLoggerMock();
+      const loggerMock = makeLoggerMock();
       const errorHandler = new ResultHandler({
         positive: vi.fn(),
         negative: vi.fn(),
@@ -111,7 +103,7 @@ describe("Server helpers", () => {
       const spy = vi.spyOn(errorHandler, "execute");
       const handler = createNotFoundHandler({
         errorHandler,
-        rootLogger,
+        getLogger: () => loggerMock,
       });
       const next = vi.fn();
       const requestMock = makeRequestMock({
@@ -170,7 +162,7 @@ describe("Server helpers", () => {
   });
 
   describe("createUploadParsers()", async () => {
-    const rootLogger = makeLoggerMock();
+    const loggerMock = makeLoggerMock();
     const beforeUploadMock = vi.fn();
     const parsers = await createUploadParsers({
       config: {
@@ -183,9 +175,9 @@ describe("Server helpers", () => {
           },
         },
         cors: false,
-        logger: rootLogger,
+        logger: loggerMock,
       },
-      rootLogger,
+      getLogger: () => loggerMock,
     });
     const requestMock = makeRequestMock();
     const responseMock = makeResponseMock();
@@ -213,7 +205,7 @@ describe("Server helpers", () => {
       await parsers[0](requestMock, responseMock, nextMock);
       expect(beforeUploadMock).toHaveBeenCalledWith({
         request: requestMock,
-        logger: rootLogger,
+        logger: loggerMock,
       });
       expect(fileUploadMock).toHaveBeenCalledTimes(1);
       expect(fileUploadMock).toHaveBeenCalledWith({
@@ -242,6 +234,25 @@ describe("Server helpers", () => {
       moveRaw(requestMock, makeResponseMock(), nextMock);
       expect(requestMock.body).toEqual({ raw: buffer });
       expect(nextMock).toHaveBeenCalled();
+    });
+  });
+
+  describe("makeLoggerExtrator()", () => {
+    const rootLogger = makeLoggerMock({ isRoot: true });
+    const getLogger = makeLoggerExtrator(rootLogger);
+
+    test("should extract child logger from response", () => {
+      const response = makeResponseMock({
+        locals: {
+          [metaSymbol]: { logger: makeLoggerMock({ isChild: true }) },
+        },
+      });
+      expect(getLogger(response)).toHaveProperty("isChild", true);
+    });
+
+    test("should fall back to root", () => {
+      const response = makeResponseMock();
+      expect(getLogger(response)).toEqual(rootLogger);
     });
   });
 });
