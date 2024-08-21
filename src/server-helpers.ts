@@ -10,6 +10,8 @@ import { lastResortHandler } from "./last-resort";
 import { ResultHandlerError } from "./errors";
 import { makeErrorFromAnything } from "./common-helpers";
 
+export type LoggerExtrator = (response: LocalResponse) => ActualLogger;
+
 interface HandlerCreatorParams {
   errorHandler: AbstractResultHandler;
   getLogger: LoggerExtrator;
@@ -142,7 +144,6 @@ export const createLoggingMiddleware =
     next();
   };
 
-export type LoggerExtrator = (response: LocalResponse) => ActualLogger;
 export const makeLoggerExtrator =
   (fallback: ActualLogger): LoggerExtrator =>
   (response) =>
