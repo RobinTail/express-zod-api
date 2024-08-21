@@ -10,17 +10,17 @@ import { lastResortHandler } from "./last-resort";
 import { ResultHandlerError } from "./errors";
 import { makeErrorFromAnything } from "./common-helpers";
 
+export type LocalResponse = Response<
+  unknown,
+  { [metaSymbol]?: { logger: ActualLogger } }
+>;
+
 export type LoggerExtrator = (response: LocalResponse) => ActualLogger;
 
 interface HandlerCreatorParams {
   errorHandler: AbstractResultHandler;
   getLogger: LoggerExtrator;
 }
-
-export type LocalResponse = Response<
-  unknown,
-  { [metaSymbol]?: { logger: ActualLogger } }
->;
 
 export const createParserFailureHandler =
   ({ errorHandler, getLogger }: HandlerCreatorParams): ErrorRequestHandler =>
