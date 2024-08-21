@@ -5,7 +5,7 @@ import { DependsOnMethod } from "./depends-on-method";
 import { AbstractEndpoint } from "./endpoint";
 import { walkRouting } from "./routing-walker";
 import { ServeStatic } from "./serve-static";
-import { LocalResponse, LoggerExtrator } from "./server-helpers";
+import { LoggerExtractor } from "./server-helpers";
 
 export interface Routing {
   [SEGMENT: string]: Routing | DependsOnMethod | AbstractEndpoint | ServeStatic;
@@ -21,7 +21,7 @@ export const initRouting = ({
   parsers,
 }: {
   app: IRouter;
-  getLogger: LoggerExtrator;
+  getLogger: LoggerExtractor;
   config: CommonConfig;
   routing: Routing;
   parsers?: Parsers;
@@ -33,7 +33,7 @@ export const initRouting = ({
       app[method](
         path,
         ...(parsers?.[endpoint.getRequestType()] || []),
-        async (request, response: LocalResponse) =>
+        async (request, response) =>
           endpoint.execute({
             request,
             response,

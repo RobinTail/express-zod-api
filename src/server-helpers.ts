@@ -15,16 +15,16 @@ export type LocalResponse = Response<
   { [metaSymbol]?: { logger: ActualLogger } }
 >;
 
-export type LoggerExtrator = (response: LocalResponse) => ActualLogger;
+export type LoggerExtractor = (response: LocalResponse) => ActualLogger;
 
 interface HandlerCreatorParams {
   errorHandler: AbstractResultHandler;
-  getLogger: LoggerExtrator;
+  getLogger: LoggerExtractor;
 }
 
 export const createParserFailureHandler =
   ({ errorHandler, getLogger }: HandlerCreatorParams): ErrorRequestHandler =>
-  async (error, request, response: LocalResponse, next) => {
+  async (error, request, response, next) => {
     if (!error) {
       return next();
     }
@@ -43,7 +43,7 @@ export const createParserFailureHandler =
 
 export const createNotFoundHandler =
   ({ errorHandler, getLogger }: HandlerCreatorParams): RequestHandler =>
-  async (request, response: LocalResponse) => {
+  async (request, response) => {
     const error = createHttpError(
       404,
       `Can not ${request.method} ${request.path}`,
@@ -90,7 +90,7 @@ export const createUploadParsers = async ({
   getLogger,
   config,
 }: {
-  getLogger: LoggerExtrator;
+  getLogger: LoggerExtractor;
   config: ServerConfig;
 }): Promise<RequestHandler[]> => {
   const uploader = await loadPeer<typeof fileUpload>("express-fileupload");
@@ -98,7 +98,7 @@ export const createUploadParsers = async ({
     ...(typeof config.server.upload === "object" && config.server.upload),
   };
   const parsers: RequestHandler[] = [];
-  parsers.push(async (request, response: LocalResponse, next) => {
+  parsers.push(async (request, response, next) => {
     const logger = getLogger(response);
     try {
       await beforeUpload?.({ request, logger });
@@ -145,6 +145,6 @@ export const createLoggingMiddleware =
   };
 
 export const makeLoggerExtrator =
-  (fallback: ActualLogger): LoggerExtrator =>
+  (fallback: ActualLogger): LoggerExtractor =>
   (response) =>
     response.locals[metaSymbol]?.logger || fallback;
