@@ -144,7 +144,7 @@ export const createLoggingMiddleware =
     next();
   };
 
-export const makeLoggerExtrator =
+export const makeLoggerExtractor =
   (fallback: ActualLogger): LoggerExtractor =>
   (response) =>
     response.locals[metaSymbol]?.logger || fallback;

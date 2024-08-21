@@ -6,7 +6,7 @@ import {
   createUploadFailueHandler,
   createUploadLogger,
   createUploadParsers,
-  makeLoggerExtrator,
+  makeLoggerExtractor,
   moveRaw,
 } from "../../src/server-helpers";
 import { describe, expect, test, vi } from "vitest";
@@ -237,9 +237,9 @@ describe("Server helpers", () => {
     });
   });
 
-  describe("makeLoggerExtrator()", () => {
+  describe("makeLoggerExtractor()", () => {
     const rootLogger = makeLoggerMock({ isRoot: true });
-    const getLogger = makeLoggerExtrator(rootLogger);
+    const getLogger = makeLoggerExtractor(rootLogger);
 
     test("should extract child logger from response", () => {
       const response = makeResponseMock({

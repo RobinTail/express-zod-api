@@ -13,7 +13,7 @@ import {
   createNotFoundHandler,
   createParserFailureHandler,
   createUploadParsers,
-  makeLoggerExtrator,
+  makeLoggerExtractor,
   moveRaw,
 } from "./server-helpers";
 import { getStartupLogo } from "./startup-logo";
@@ -28,7 +28,7 @@ const makeCommonEntities = (config: CommonConfig) => {
     : new BuiltinLogger(config.logger);
   rootLogger.debug("Running", process.env.TSUP_BUILD || "from sources");
   const loggingMiddleware = createLoggingMiddleware({ rootLogger, config });
-  const getLogger = makeLoggerExtrator(rootLogger);
+  const getLogger = makeLoggerExtractor(rootLogger);
   const notFoundHandler = createNotFoundHandler({ getLogger, errorHandler });
   const parserFailureHandler = createParserFailureHandler({
     getLogger,
