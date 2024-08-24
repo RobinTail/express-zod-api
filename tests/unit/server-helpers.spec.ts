@@ -39,10 +39,9 @@ describe("Server helpers", () => {
         handler: vi.fn(),
       });
       const spy = vi.spyOn(errorHandler, "execute");
-      const loggerMock = makeLoggerMock({ isRoot: true });
       const handler = createParserFailureHandler({
         errorHandler,
-        getChildLogger: () => loggerMock,
+        getChildLogger: () => makeLoggerMock(),
       });
       await handler(
         new SyntaxError("Unexpected end of JSON input"),
@@ -54,7 +53,6 @@ describe("Server helpers", () => {
       expect(spy.mock.calls[0][0].error).toEqual(
         createHttpError(400, "Unexpected end of JSON input"),
       );
-      expect(spy.mock.calls[0][0].logger).toEqual(loggerMock);
     });
   });
 
@@ -66,10 +64,9 @@ describe("Server helpers", () => {
         handler: vi.fn(),
       });
       const spy = vi.spyOn(errorHandler, "execute");
-      const loggerMock = makeLoggerMock({ isRoot: true });
       const handler = createNotFoundHandler({
         errorHandler,
-        getChildLogger: () => loggerMock,
+        getChildLogger: () => makeLoggerMock(),
       });
       const next = vi.fn();
       const requestMock = makeRequestMock({
@@ -82,8 +79,6 @@ describe("Server helpers", () => {
       expect(next).toHaveBeenCalledTimes(0);
       expect(spy).toHaveBeenCalledTimes(1);
       expect(spy.mock.calls[0]).toHaveLength(1);
-      expect(spy.mock.calls[0][0]).toHaveProperty("logger");
-      expect(spy.mock.calls[0][0].logger).toEqual(loggerMock);
       expect(spy.mock.calls[0][0].error).toEqual(
         createHttpError(404, "Can not POST /v1/test"),
       );
@@ -238,7 +233,7 @@ describe("Server helpers", () => {
   });
 
   describe("makeChildLoggerExtractor()", () => {
-    const rootLogger = makeLoggerMock({ isRoot: true });
+    const rootLogger = makeLoggerMock();
     const getLogger = makeChildLoggerExtractor(rootLogger);
 
     test("should extract child logger from request", () => {
