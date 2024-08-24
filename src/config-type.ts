@@ -1,5 +1,5 @@
 import type compression from "compression";
-import { IRouter, Request, RequestHandler, Response } from "express";
+import { IRouter, Request, RequestHandler } from "express";
 import type fileUpload from "express-fileupload";
 import { ServerOptions } from "node:https";
 import { BuiltinLoggerConfig } from "./builtin-logger";
@@ -8,6 +8,7 @@ import { AbstractLogger, ActualLogger } from "./logger-helpers";
 import { Method } from "./method";
 import { AbstractResultHandler } from "./result-handler";
 import { ListenOptions } from "node:net";
+import { LoggerExtractor } from "./server-helpers";
 
 export type InputSource = keyof Pick<
   Request,
@@ -116,7 +117,7 @@ type CompressionOptions = Pick<
 type BeforeRouting = (params: {
   app: IRouter;
   logger: ActualLogger;
-  getLogger: (response: Response) => ActualLogger;
+  getLogger: LoggerExtractor;
 }) => void | Promise<void>;
 
 export interface ServerConfig<TAG extends string = string>

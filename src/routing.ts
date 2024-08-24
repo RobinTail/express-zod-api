@@ -37,7 +37,7 @@ export const initRouting = ({
           endpoint.execute({
             request,
             response,
-            logger: getLogger(response),
+            logger: getLogger(request),
             config,
             siblingMethods,
           }),

@@ -241,18 +241,20 @@ describe("Server helpers", () => {
     const rootLogger = makeLoggerMock({ isRoot: true });
     const getLogger = makeLoggerExtractor(rootLogger);
 
-    test("should extract child logger from response", () => {
-      const response = makeResponseMock({
-        locals: {
-          [metaSymbol]: { logger: makeLoggerMock({ isChild: true }) },
+    test("should extract child logger from request", () => {
+      const request = makeRequestMock({
+        res: {
+          locals: {
+            [metaSymbol]: { logger: makeLoggerMock({ isChild: true }) },
+          },
         },
       });
-      expect(getLogger(response)).toHaveProperty("isChild", true);
+      expect(getLogger(request)).toHaveProperty("isChild", true);
     });
 
     test("should fall back to root", () => {
-      const response = makeResponseMock();
-      expect(getLogger(response)).toEqual(rootLogger);
+      const request = makeRequestMock();
+      expect(getLogger(request)).toEqual(rootLogger);
     });
   });
 });

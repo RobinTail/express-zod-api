@@ -4,18 +4,21 @@ import { loadPeer } from "./peer-helpers";
 import { AbstractResultHandler } from "./result-handler";
 import { ActualLogger } from "./logger-helpers";
 import { CommonConfig, ServerConfig } from "./config-type";
-import { ErrorRequestHandler, RequestHandler, Response } from "express";
+import { ErrorRequestHandler, RequestHandler, Request } from "express";
 import createHttpError, { isHttpError } from "http-errors";
 import { lastResortHandler } from "./last-resort";
 import { ResultHandlerError } from "./errors";
 import { makeErrorFromAnything } from "./common-helpers";
 
-export type LocalResponse = Response<
+type LocalRequest = Request<
+  unknown,
+  unknown,
+  unknown,
   unknown,
   { [metaSymbol]?: { logger: ActualLogger } }
 >;
 
-export type LoggerExtractor = (response: LocalResponse) => ActualLogger;
+export type LoggerExtractor = (request: Request) => ActualLogger;
 
 interface HandlerCreatorParams {
   errorHandler: AbstractResultHandler;
@@ -37,7 +40,7 @@ export const createParserFailureHandler =
       input: null,
       output: null,
       options: {},
-      logger: getLogger(response),
+      logger: getLogger(request),
     });
   };
 
@@ -48,7 +51,7 @@ export const createNotFoundHandler =
       404,
       `Can not ${request.method} ${request.path}`,
     );
-    const logger = getLogger(response);
+    const logger = getLogger(request);
     try {
       errorHandler.execute({
         request,
@@ -99,7 +102,7 @@ export const createUploadParsers = async ({
   };
   const parsers: RequestHandler[] = [];
   parsers.push(async (request, response, next) => {
-    const logger = getLogger(response);
+    const logger = getLogger(request);
     try {
       await beforeUpload?.({ request, logger });
     } catch (error) {
@@ -135,16 +138,18 @@ export const createLoggingMiddleware =
     rootLogger: ActualLogger;
     config: CommonConfig;
   }): RequestHandler =>
-  async (request, response: LocalResponse, next) => {
+  async (request, response, next) => {
     const logger = config.childLoggerProvider
       ? await config.childLoggerProvider({ request, parent: rootLogger })
       : rootLogger;
     logger.debug(`${request.method}: ${request.path}`);
-    response.locals[metaSymbol] = { logger };
+    if (request.res) {
+      (request as LocalRequest).res!.locals[metaSymbol] = { logger };
+    }
     next();
   };
 
 export const makeLoggerExtractor =
   (fallback: ActualLogger): LoggerExtractor =>
-  (response) =>
-    response.locals[metaSymbol]?.logger || fallback;
+  (request) =>
+    (request as LocalRequest).res?.locals[metaSymbol]?.logger || fallback;

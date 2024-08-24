@@ -4,7 +4,6 @@ import { CommonConfig } from "./config-type";
 import { AbstractEndpoint } from "./endpoint";
 import { AbstractLogger, ActualLogger, severity } from "./logger-helpers";
 import { contentTypes } from "./content-type";
-import { LocalResponse } from "./server-helpers";
 import {
   createRequest,
   RequestOptions,
@@ -21,8 +20,7 @@ export const makeRequestMock = <REQ extends RequestOptions>(props?: REQ) => {
   return mock as typeof mock & REQ;
 };
 
-export const makeResponseMock = (opt?: ResponseOptions) =>
-  createResponse<LocalResponse>(opt);
+export const makeResponseMock = (opt?: ResponseOptions) => createResponse(opt);
 
 export const makeLoggerMock = <LOG extends FlatObject>(loggerProps?: LOG) => {
   const logs: Record<keyof AbstractLogger, unknown[]> = {
@@ -60,6 +58,7 @@ const makeTestingMocks = <LOG extends FlatObject, REQ extends RequestOptions>({
     req: requestMock,
     ...responseOptions,
   });
+  requestMock.res = responseMock;
   const loggerMock = makeLoggerMock(loggerProps);
   const configMock = {
     cors: false,
