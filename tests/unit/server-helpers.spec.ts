@@ -89,7 +89,6 @@ describe("Server helpers", () => {
     });
 
     test("should call Last Resort Handler in case of ResultHandler is faulty", () => {
-      const loggerMock = makeLoggerMock();
       const errorHandler = new ResultHandler({
         positive: vi.fn(),
         negative: vi.fn(),
@@ -98,7 +97,7 @@ describe("Server helpers", () => {
       const spy = vi.spyOn(errorHandler, "execute");
       const handler = createNotFoundHandler({
         errorHandler,
-        getChildLogger: () => loggerMock,
+        getChildLogger: () => makeLoggerMock(),
       });
       const next = vi.fn();
       const requestMock = makeRequestMock({
@@ -170,7 +169,7 @@ describe("Server helpers", () => {
           },
         },
         cors: false,
-        logger: loggerMock,
+        logger: { level: "silent" },
       },
       getChildLogger: () => loggerMock,
     });
@@ -181,7 +180,7 @@ describe("Server helpers", () => {
     test("should return an array of RequestHandler", () => {
       expect(parsers).toEqual([
         expect.any(Function), // uploader with logger
-        expect.any(Function), // createUploadFailueHandler()
+        expect.any(Function), // createUploadFailureHandler()
       ]);
     });
 
@@ -195,8 +194,8 @@ describe("Server helpers", () => {
     });
 
     test("should install the uploader with its special logger", async () => {
-      const interalMw = vi.fn();
-      fileUploadMock.mockImplementationOnce(() => interalMw);
+      const internalMw = vi.fn();
+      fileUploadMock.mockImplementationOnce(() => internalMw);
       await parsers[0](requestMock, responseMock, nextMock);
       expect(beforeUploadMock).toHaveBeenCalledWith({
         request: requestMock,
@@ -210,7 +209,7 @@ describe("Server helpers", () => {
         limits: { fileSize: 1024 },
         logger: { log: expect.any(Function) }, // @see createUploadLogger test
       });
-      expect(interalMw).toHaveBeenCalledWith(
+      expect(internalMw).toHaveBeenCalledWith(
         requestMock,
         responseMock,
         nextMock,
