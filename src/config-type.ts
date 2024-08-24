@@ -118,7 +118,7 @@ type BeforeRouting = (params: {
   app: IRouter;
   /**
    * @desc Root logger, same for all requests
-   * @todo rename in v21
+   * @todo reconsider the naming in v21
    * */
   logger: ActualLogger;
   /** @desc Returns a child logger if childLoggerProvider is configured (otherwise root logger) */
