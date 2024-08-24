@@ -66,7 +66,7 @@ export const createNotFoundHandler =
     }
   };
 
-export const createUploadFailueHandler =
+export const createUploadFailureHandler =
   (error: Error): RequestHandler =>
   (req, {}, next) => {
     const failedFile = Object.values(req?.files || [])
@@ -112,7 +112,7 @@ export const createUploadParsers = async ({
     })(request, response, next);
   });
   if (limitError) {
-    parsers.push(createUploadFailueHandler(limitError));
+    parsers.push(createUploadFailureHandler(limitError));
   }
   return parsers;
 };

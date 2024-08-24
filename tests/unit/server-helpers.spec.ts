@@ -3,7 +3,7 @@ import { metaSymbol } from "../../src/metadata";
 import {
   createNotFoundHandler,
   createParserFailureHandler,
-  createUploadFailueHandler,
+  createUploadFailureHandler,
   createUploadLogger,
   createUploadParsers,
   moveRaw,
@@ -131,14 +131,14 @@ describe("Server helpers", () => {
     });
   });
 
-  describe("createUploadFailueHandler()", () => {
+  describe("createUploadFailureHandler()", () => {
     const error = new Error("Too heavy");
 
     test.each([
       { files: { one: { truncated: true } } },
       { files: { one: [{ truncated: false }, { truncated: true }] } },
     ])("should handle truncated files by calling next with error %#", (req) => {
-      const handler = createUploadFailueHandler(error);
+      const handler = createUploadFailureHandler(error);
       const next = vi.fn();
       handler(req as unknown as Request, makeResponseMock(), next);
       expect(next).toHaveBeenCalledWith(error);
@@ -150,7 +150,7 @@ describe("Server helpers", () => {
       { files: { one: { truncated: false } } },
       { file: { one: [{ truncated: false }] } },
     ])("should call next when all uploads succeeded %#", (req) => {
-      const handler = createUploadFailueHandler(error);
+      const handler = createUploadFailureHandler(error);
       const next = vi.fn();
       handler(req as unknown as Request, makeResponseMock(), next);
       expect(next).toHaveBeenCalledWith();
