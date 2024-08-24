@@ -233,7 +233,7 @@ describe("Server helpers", () => {
 
   describe("makeChildLoggerExtractor()", () => {
     const rootLogger = makeLoggerMock();
-    const getLogger = makeChildLoggerExtractor(rootLogger);
+    const getChildLogger = makeChildLoggerExtractor(rootLogger);
 
     test("should extract child logger from request", () => {
       const request = makeRequestMock({
@@ -243,12 +243,12 @@ describe("Server helpers", () => {
           },
         },
       });
-      expect(getLogger(request)).toHaveProperty("isChild", true);
+      expect(getChildLogger(request)).toHaveProperty("isChild", true);
     });
 
     test("should fall back to root", () => {
       const request = makeRequestMock();
-      expect(getLogger(request)).toEqual(rootLogger);
+      expect(getChildLogger(request)).toEqual(rootLogger);
     });
   });
 });
