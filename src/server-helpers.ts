@@ -10,7 +10,7 @@ import { lastResortHandler } from "./last-resort";
 import { ResultHandlerError } from "./errors";
 import { makeErrorFromAnything } from "./common-helpers";
 
-type LocalRequest = Request<
+type EquippedRequest = Request<
   unknown,
   unknown,
   unknown,
@@ -147,7 +147,7 @@ export const createLoggingMiddleware =
       : rootLogger;
     logger.debug(`${request.method}: ${request.path}`);
     if (request.res) {
-      (request as LocalRequest).res!.locals[metaSymbol] = { logger };
+      (request as EquippedRequest).res!.locals[metaSymbol] = { logger };
     }
     next();
   };
@@ -155,4 +155,4 @@ export const createLoggingMiddleware =
 export const makeChildLoggerExtractor =
   (fallback: ActualLogger): ChildLoggerExtractor =>
   (request) =>
-    (request as LocalRequest).res?.locals[metaSymbol]?.logger || fallback;
+    (request as EquippedRequest).res?.locals[metaSymbol]?.logger || fallback;

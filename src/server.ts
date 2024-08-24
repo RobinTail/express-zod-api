@@ -29,18 +29,12 @@ const makeCommonEntities = (config: CommonConfig) => {
   rootLogger.debug("Running", process.env.TSUP_BUILD || "from sources");
   const loggingMiddleware = createLoggingMiddleware({ rootLogger, config });
   const getChildLogger = makeChildLoggerExtractor(rootLogger);
-  const notFoundHandler = createNotFoundHandler({
-    getChildLogger,
-    errorHandler,
-  });
-  const parserFailureHandler = createParserFailureHandler({
-    getChildLogger,
-    errorHandler,
-  });
+  const commons = { getChildLogger, errorHandler };
+  const notFoundHandler = createNotFoundHandler(commons);
+  const parserFailureHandler = createParserFailureHandler(commons);
   return {
+    ...commons,
     rootLogger,
-    getChildLogger,
-    errorHandler,
     notFoundHandler,
     parserFailureHandler,
     loggingMiddleware,
