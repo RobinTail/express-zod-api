@@ -5,7 +5,7 @@ import { DependsOnMethod } from "./depends-on-method";
 import { AbstractEndpoint } from "./endpoint";
 import { walkRouting } from "./routing-walker";
 import { ServeStatic } from "./serve-static";
-import { LoggerExtractor } from "./server-helpers";
+import { ChildLoggerExtractor } from "./server-helpers";
 
 export interface Routing {
   [SEGMENT: string]: Routing | DependsOnMethod | AbstractEndpoint | ServeStatic;
@@ -15,13 +15,13 @@ export type Parsers = Record<ContentType, RequestHandler[]>;
 
 export const initRouting = ({
   app,
-  getLogger,
+  getChildLogger,
   config,
   routing,
   parsers,
 }: {
   app: IRouter;
-  getLogger: LoggerExtractor;
+  getChildLogger: ChildLoggerExtractor;
   config: CommonConfig;
   routing: Routing;
   parsers?: Parsers;
@@ -37,7 +37,7 @@ export const initRouting = ({
           endpoint.execute({
             request,
             response,
-            logger: getLogger(request),
+            logger: getChildLogger(request),
             config,
             siblingMethods,
           }),

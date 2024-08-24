@@ -18,15 +18,18 @@ type LocalRequest = Request<
   { [metaSymbol]?: { logger: ActualLogger } }
 >;
 
-export type LoggerExtractor = (request: Request) => ActualLogger;
+export type ChildLoggerExtractor = (request: Request) => ActualLogger;
 
 interface HandlerCreatorParams {
   errorHandler: AbstractResultHandler;
-  getLogger: LoggerExtractor;
+  getChildLogger: ChildLoggerExtractor;
 }
 
 export const createParserFailureHandler =
-  ({ errorHandler, getLogger }: HandlerCreatorParams): ErrorRequestHandler =>
+  ({
+    errorHandler,
+    getChildLogger,
+  }: HandlerCreatorParams): ErrorRequestHandler =>
   async (error, request, response, next) => {
     if (!error) {
       return next();
@@ -40,18 +43,18 @@ export const createParserFailureHandler =
       input: null,
       output: null,
       options: {},
-      logger: getLogger(request),
+      logger: getChildLogger(request),
     });
   };
 
 export const createNotFoundHandler =
-  ({ errorHandler, getLogger }: HandlerCreatorParams): RequestHandler =>
+  ({ errorHandler, getChildLogger }: HandlerCreatorParams): RequestHandler =>
   async (request, response) => {
     const error = createHttpError(
       404,
       `Can not ${request.method} ${request.path}`,
     );
-    const logger = getLogger(request);
+    const logger = getChildLogger(request);
     try {
       errorHandler.execute({
         request,
@@ -71,6 +74,7 @@ export const createNotFoundHandler =
     }
   };
 
+/** @todo fix typo in naming */
 export const createUploadFailueHandler =
   (error: Error): RequestHandler =>
   (req, {}, next) => {
@@ -90,10 +94,10 @@ export const createUploadLogger = (
 });
 
 export const createUploadParsers = async ({
-  getLogger,
+  getChildLogger,
   config,
 }: {
-  getLogger: LoggerExtractor;
+  getChildLogger: ChildLoggerExtractor;
   config: ServerConfig;
 }): Promise<RequestHandler[]> => {
   const uploader = await loadPeer<typeof fileUpload>("express-fileupload");
@@ -102,7 +106,7 @@ export const createUploadParsers = async ({
   };
   const parsers: RequestHandler[] = [];
   parsers.push(async (request, response, next) => {
-    const logger = getLogger(request);
+    const logger = getChildLogger(request);
     try {
       await beforeUpload?.({ request, logger });
     } catch (error) {
@@ -149,7 +153,7 @@ export const createLoggingMiddleware =
     next();
   };
 
-export const makeLoggerExtractor =
-  (fallback: ActualLogger): LoggerExtractor =>
+export const makeChildLoggerExtractor =
+  (fallback: ActualLogger): ChildLoggerExtractor =>
   (request) =>
     (request as LocalRequest).res?.locals[metaSymbol]?.logger || fallback;

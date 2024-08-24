@@ -69,7 +69,7 @@ describe("Routing", () => {
       };
       initRouting({
         app: appMock as unknown as IRouter,
-        getLogger: () => new BuiltinLogger({ level: "silent" }),
+        getChildLogger: () => new BuiltinLogger({ level: "silent" }),
         config: configMock as CommonConfig,
         routing,
       });
@@ -98,7 +98,7 @@ describe("Routing", () => {
       };
       initRouting({
         app: appMock as unknown as IRouter,
-        getLogger: () => new BuiltinLogger({ level: "silent" }),
+        getChildLogger: () => new BuiltinLogger({ level: "silent" }),
         config: configMock as CommonConfig,
         routing,
       });
@@ -144,7 +144,7 @@ describe("Routing", () => {
       };
       initRouting({
         app: appMock as unknown as IRouter,
-        getLogger: () => new BuiltinLogger({ level: "silent" }),
+        getChildLogger: () => new BuiltinLogger({ level: "silent" }),
         config: configMock as CommonConfig,
         routing,
       });
@@ -182,7 +182,7 @@ describe("Routing", () => {
       expect(() =>
         initRouting({
           app: appMock as unknown as IRouter,
-          getLogger: () => new BuiltinLogger({ level: "silent" }),
+          getChildLogger: () => new BuiltinLogger({ level: "silent" }),
           config: configMock as CommonConfig,
           routing,
         }),
@@ -226,7 +226,7 @@ describe("Routing", () => {
       };
       initRouting({
         app: appMock as unknown as IRouter,
-        getLogger: () => new BuiltinLogger({ level: "silent" }),
+        getChildLogger: () => new BuiltinLogger({ level: "silent" }),
         config: configMock as CommonConfig,
         routing,
       });
@@ -262,7 +262,7 @@ describe("Routing", () => {
       };
       initRouting({
         app: appMock as unknown as IRouter,
-        getLogger: () => new BuiltinLogger({ level: "silent" }),
+        getChildLogger: () => new BuiltinLogger({ level: "silent" }),
         config: configMock as CommonConfig,
         routing,
       });
@@ -291,7 +291,7 @@ describe("Routing", () => {
       };
       initRouting({
         app: appMock as unknown as IRouter,
-        getLogger: () => new BuiltinLogger({ level: "silent" }),
+        getChildLogger: () => new BuiltinLogger({ level: "silent" }),
         config: configMock as CommonConfig,
         routing,
       });
@@ -312,7 +312,7 @@ describe("Routing", () => {
       expect(() =>
         initRouting({
           app: appMock as unknown as IRouter,
-          getLogger: () => new BuiltinLogger({ level: "silent" }),
+          getChildLogger: () => new BuiltinLogger({ level: "silent" }),
           config: configMock as CommonConfig,
           routing: {
             v1: {
@@ -324,7 +324,7 @@ describe("Routing", () => {
       expect(() =>
         initRouting({
           app: appMock as unknown as IRouter,
-          getLogger: () => new BuiltinLogger({ level: "silent" }),
+          getChildLogger: () => new BuiltinLogger({ level: "silent" }),
           config: configMock as CommonConfig,
           routing: {
             "v1/user/retrieve": endpointMock,
@@ -358,7 +358,7 @@ describe("Routing", () => {
       const loggerMock = makeLoggerMock();
       initRouting({
         app: appMock as unknown as IRouter,
-        getLogger: () => loggerMock,
+        getChildLogger: () => loggerMock,
         config: configMock as CommonConfig,
         routing,
       });
