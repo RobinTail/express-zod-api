@@ -345,7 +345,7 @@ import ui from "swagger-ui-express";
 const config = createConfig({
   server: {
     listen: 80,
-    beforeRouting: ({ app, logger }) => {
+    beforeRouting: ({ app, logger, getChildLogger }) => {
       logger.info("Serving the API documentation at https://example.com/docs");
       app.use("/docs", ui.serve, ui.setup(documentation));
     },
