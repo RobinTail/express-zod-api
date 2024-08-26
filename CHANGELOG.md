@@ -2,6 +2,34 @@
 
 ## Version 20
 
+### v20.8.0
+
+- Feat: providing child logger to `beforeRouting()` hook:
+  - The function assigned to config property `server.beforeRouting` now accepts additional argument `getChildLogger()`;
+  - The featured method accepts `request` and returns a child logger if `childLoggerProvider()` is configured;
+  - Otherwise, it returns the root logger (same for all requests, same as the `logger` argument).
+
+```ts
+import { createConfig } from "express-zod-api";
+import { randomUUID } from "node:crypto";
+
+const config = createConfig({
+  logger: { level: "debug" },
+  childLoggerProvider: ({ parent }) =>
+    parent.child({ requestId: randomUUID() }),
+  server: {
+    listen: 80,
+    beforeRouting: ({ app, logger, getChildLogger }) => {
+      logger.info("This is root logger");
+      app.use((req, res, next) => {
+        getChildLogger(req).info("This is a child logger");
+        next();
+      });
+    },
+  },
+});
+```
+
 ### v20.7.1
 
 - Improved documentation on error handling:

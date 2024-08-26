@@ -4,25 +4,33 @@ import { loadPeer } from "./peer-helpers";
 import { AbstractResultHandler } from "./result-handler";
 import { ActualLogger } from "./logger-helpers";
 import { CommonConfig, ServerConfig } from "./config-type";
-import { ErrorRequestHandler, RequestHandler, Response } from "express";
+import { ErrorRequestHandler, RequestHandler, Request } from "express";
 import createHttpError, { isHttpError } from "http-errors";
 import { lastResortHandler } from "./last-resort";
 import { ResultHandlerError } from "./errors";
 import { makeErrorFromAnything } from "./common-helpers";
 
-interface HandlerCreatorParams {
-  errorHandler: AbstractResultHandler;
-  rootLogger: ActualLogger;
-}
-
-export type LocalResponse = Response<
+type EquippedRequest = Request<
+  unknown,
+  unknown,
+  unknown,
   unknown,
   { [metaSymbol]?: { logger: ActualLogger } }
 >;
 
+export type ChildLoggerExtractor = (request: Request) => ActualLogger;
+
+interface HandlerCreatorParams {
+  errorHandler: AbstractResultHandler;
+  getChildLogger: ChildLoggerExtractor;
+}
+
 export const createParserFailureHandler =
-  ({ errorHandler, rootLogger }: HandlerCreatorParams): ErrorRequestHandler =>
-  async (error, request, response: LocalResponse, next) => {
+  ({
+    errorHandler,
+    getChildLogger,
+  }: HandlerCreatorParams): ErrorRequestHandler =>
+  async (error, request, response, next) => {
     if (!error) {
       return next();
     }
@@ -35,18 +43,18 @@ export const createParserFailureHandler =
       input: null,
       output: null,
       options: {},
-      logger: response.locals[metaSymbol]?.logger || rootLogger,
+      logger: getChildLogger(request),
     });
   };
 
 export const createNotFoundHandler =
-  ({ errorHandler, rootLogger }: HandlerCreatorParams): RequestHandler =>
-  async (request, response: LocalResponse) => {
+  ({ errorHandler, getChildLogger }: HandlerCreatorParams): RequestHandler =>
+  async (request, response) => {
     const error = createHttpError(
       404,
       `Can not ${request.method} ${request.path}`,
     );
-    const logger = response.locals[metaSymbol]?.logger || rootLogger;
+    const logger = getChildLogger(request);
     try {
       errorHandler.execute({
         request,
@@ -85,10 +93,10 @@ export const createUploadLogger = (
 });
 
 export const createUploadParsers = async ({
-  rootLogger,
+  getChildLogger,
   config,
 }: {
-  rootLogger: ActualLogger;
+  getChildLogger: ChildLoggerExtractor;
   config: ServerConfig;
 }): Promise<RequestHandler[]> => {
   const uploader = await loadPeer<typeof fileUpload>("express-fileupload");
@@ -96,8 +104,8 @@ export const createUploadParsers = async ({
     ...(typeof config.server.upload === "object" && config.server.upload),
   };
   const parsers: RequestHandler[] = [];
-  parsers.push(async (request, response: LocalResponse, next) => {
-    const logger = response.locals[metaSymbol]?.logger || rootLogger;
+  parsers.push(async (request, response, next) => {
+    const logger = getChildLogger(request);
     try {
       await beforeUpload?.({ request, logger });
     } catch (error) {
@@ -133,11 +141,18 @@ export const createLoggingMiddleware =
     rootLogger: ActualLogger;
     config: CommonConfig;
   }): RequestHandler =>
-  async (request, response: LocalResponse, next) => {
+  async (request, response, next) => {
     const logger = config.childLoggerProvider
       ? await config.childLoggerProvider({ request, parent: rootLogger })
       : rootLogger;
     logger.debug(`${request.method}: ${request.path}`);
-    response.locals[metaSymbol] = { logger };
+    if (request.res) {
+      (request as EquippedRequest).res!.locals[metaSymbol] = { logger };
+    }
     next();
   };
+
+export const makeChildLoggerExtractor =
+  (fallback: ActualLogger): ChildLoggerExtractor =>
+  (request) =>
+    (request as EquippedRequest).res?.locals[metaSymbol]?.logger || fallback;
