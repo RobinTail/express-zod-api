@@ -8,6 +8,7 @@ import { AbstractLogger, ActualLogger } from "./logger-helpers";
 import { Method } from "./method";
 import { AbstractResultHandler } from "./result-handler";
 import { ListenOptions } from "node:net";
+import { ChildLoggerExtractor } from "./server-helpers";
 
 export type InputSource = keyof Pick<
   Request,
@@ -42,7 +43,7 @@ export interface CommonConfig<TAG extends string = string> {
    */
   cors: boolean | HeadersProvider;
   /**
-   * @desc Custom ResultHandlerDefinition for common errors.
+   * @desc The ResultHandler to use for handling routing, parsing and upload errors
    * @default defaultResultHandler
    * @see defaultResultHandler
    */
@@ -115,7 +116,13 @@ type CompressionOptions = Pick<
 
 type BeforeRouting = (params: {
   app: IRouter;
+  /**
+   * @desc Root logger, same for all requests
+   * @todo reconsider the naming in v21
+   * */
   logger: ActualLogger;
+  /** @desc Returns a child logger if childLoggerProvider is configured (otherwise root logger) */
+  getChildLogger: ChildLoggerExtractor;
 }) => void | Promise<void>;
 
 export interface ServerConfig<TAG extends string = string>

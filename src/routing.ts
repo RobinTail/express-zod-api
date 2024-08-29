@@ -3,11 +3,9 @@ import { CommonConfig } from "./config-type";
 import { ContentType } from "./content-type";
 import { DependsOnMethod } from "./depends-on-method";
 import { AbstractEndpoint } from "./endpoint";
-import { ActualLogger } from "./logger-helpers";
-import { metaSymbol } from "./metadata";
 import { walkRouting } from "./routing-walker";
 import { ServeStatic } from "./serve-static";
-import { LocalResponse } from "./server-helpers";
+import { ChildLoggerExtractor } from "./server-helpers";
 
 export interface Routing {
   [SEGMENT: string]: Routing | DependsOnMethod | AbstractEndpoint | ServeStatic;
@@ -17,13 +15,13 @@ export type Parsers = Record<ContentType, RequestHandler[]>;
 
 export const initRouting = ({
   app,
-  rootLogger,
+  getChildLogger,
   config,
   routing,
   parsers,
 }: {
   app: IRouter;
-  rootLogger: ActualLogger;
+  getChildLogger: ChildLoggerExtractor;
   config: CommonConfig;
   routing: Routing;
   parsers?: Parsers;
@@ -35,11 +33,11 @@ export const initRouting = ({
       app[method](
         path,
         ...(parsers?.[endpoint.getRequestType()] || []),
-        async (request, response: LocalResponse) =>
+        async (request, response) =>
           endpoint.execute({
             request,
             response,
-            logger: response.locals[metaSymbol]?.logger || rootLogger,
+            logger: getChildLogger(request),
             config,
             siblingMethods,
           }),

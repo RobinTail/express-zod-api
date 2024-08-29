@@ -4,7 +4,6 @@ import { CommonConfig } from "./config-type";
 import { AbstractEndpoint } from "./endpoint";
 import { AbstractLogger, ActualLogger, severity } from "./logger-helpers";
 import { contentTypes } from "./content-type";
-import { LocalResponse } from "./server-helpers";
 import {
   createRequest,
   RequestOptions,
@@ -21,8 +20,7 @@ export const makeRequestMock = <REQ extends RequestOptions>(props?: REQ) => {
   return mock as typeof mock & REQ;
 };
 
-export const makeResponseMock = (opt?: ResponseOptions) =>
-  createResponse<LocalResponse>(opt);
+export const makeResponseMock = (opt?: ResponseOptions) => createResponse(opt);
 
 export const makeLoggerMock = <LOG extends FlatObject>(loggerProps?: LOG) => {
   const logs: Record<keyof AbstractLogger, unknown[]> = {
@@ -57,9 +55,12 @@ const makeTestingMocks = <LOG extends FlatObject, REQ extends RequestOptions>({
 }: TestingProps<REQ, LOG>) => {
   const requestMock = makeRequestMock(requestProps);
   const responseMock = makeResponseMock({
-    req: requestMock,
+    req: requestMock, // this works only for res.format()
     ...responseOptions,
   });
+  /** @link https://github.com/expressjs/express/blob/2a980ad16052e53b398c9953fea50e3daa0b495c/lib/middleware/init.js#L31-L32 */
+  responseMock.req = responseOptions?.req || requestMock;
+  requestMock.res = responseMock;
   const loggerMock = makeLoggerMock(loggerProps);
   const configMock = {
     cors: false,

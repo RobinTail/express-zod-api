@@ -126,10 +126,19 @@ describe("App", async () => {
         server: {
           listen: port,
           compression: { threshold: 1 },
+          beforeRouting: ({ app, getChildLogger }) => {
+            app.use((req, {}, next) => {
+              const childLogger = getChildLogger(req);
+              assert("isChild" in childLogger && childLogger.isChild);
+              next();
+            });
+          },
         },
         cors: false,
         startupLogo: true,
         logger: { level: "silent" },
+        childLoggerProvider: ({ parent }) =>
+          Object.defineProperty(parent, "isChild", { value: true }),
         inputSources: {
           post: ["query", "body", "files"],
         },
