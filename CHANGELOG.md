@@ -2,6 +2,11 @@
 
 ## Version 20
 
+### v20.9.0
+
+- `openapi3-ts` vesion is 4.4.0:
+  - Feat: `Documentation::getSpecAsYaml()` accepts the same options as `yaml.stringify`.
+
 ### v20.8.0
 
 - Feat: providing child logger to `beforeRouting()` hook:
