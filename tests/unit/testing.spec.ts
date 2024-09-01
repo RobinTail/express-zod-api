@@ -38,8 +38,15 @@ describe("Testing", () => {
       );
       expect(responseMock.locals).toHaveProperty("prop1", expect.any(Function));
       expect(responseMock.locals).toHaveProperty("prop2", 123);
+      expect(requestMock.res?.locals).toHaveProperty(
+        "prop1",
+        expect.any(Function),
+      );
+      expect(requestMock.res?.locals).toHaveProperty("prop2", 123);
       expect(requestMock.test1).toEqual(expect.any(Function));
       expect(requestMock.test2).toBe(456);
+      expect(responseMock.req).toHaveProperty("test1", expect.any(Function));
+      expect(responseMock.req).toHaveProperty("test2", 456);
       expect(loggerMock.feat1).toEqual(expect.any(Function));
       expect(loggerMock.feat2).toBe(789);
       expectTypeOf(requestMock.test1).toEqualTypeOf<Mock>();
