@@ -1,4 +1,4 @@
-import { ZodError } from "zod";
+import { z } from "zod";
 import { getMessageFromError } from "./common-helpers";
 import { OpenAPIContext } from "./documentation-helpers";
 
@@ -38,7 +38,7 @@ export class IOSchemaError extends Error {
 export class OutputValidationError extends IOSchemaError {
   public override name = "OutputValidationError";
 
-  constructor(public readonly originalError: ZodError) {
+  constructor(public readonly originalError: z.ZodError) {
     super(getMessageFromError(originalError));
   }
 }
@@ -47,7 +47,7 @@ export class OutputValidationError extends IOSchemaError {
 export class InputValidationError extends IOSchemaError {
   public override name = "InputValidationError";
 
-  constructor(public readonly originalError: ZodError) {
+  constructor(public readonly originalError: z.ZodError) {
     super(getMessageFromError(originalError));
   }
 }
