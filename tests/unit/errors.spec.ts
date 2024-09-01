@@ -1,4 +1,4 @@
-import { ZodError } from "zod";
+import { z } from "zod";
 import { DocumentationError, RoutingError } from "../../src";
 import {
   IOSchemaError,
@@ -52,7 +52,7 @@ describe("Errors", () => {
   });
 
   describe("OutputValidationError", () => {
-    const zodError = new ZodError([]);
+    const zodError = new z.ZodError([]);
 
     test("should be an instance of IOSchemaError and Error", () => {
       expect(new OutputValidationError(zodError)).toBeInstanceOf(IOSchemaError);
@@ -73,7 +73,7 @@ describe("Errors", () => {
   });
 
   describe("InputValidationError", () => {
-    const zodError = new ZodError([]);
+    const zodError = new z.ZodError([]);
 
     test("should be an instance of IOSchemaError and Error", () => {
       expect(new InputValidationError(zodError)).toBeInstanceOf(IOSchemaError);
