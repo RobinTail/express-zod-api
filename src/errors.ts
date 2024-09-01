@@ -66,14 +66,9 @@ export class ResultHandlerError extends Error {
 
 export class MissingPeerError extends Error {
   public override name = "MissingPeerError";
-  constructor(module: string | string[]) {
-    const isArray = Array.isArray(module);
+  constructor(module: string) {
     super(
-      `Missing ${
-        isArray ? "one of the following peer dependencies" : "peer dependency"
-      }: ${
-        isArray ? module.join(" | ") : module
-      }. Please install it to use the feature.`,
+      `Missing peer dependency: ${module}. Please install it to use the feature.`,
     );
   }
 }
