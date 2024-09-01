@@ -270,6 +270,10 @@ describe("Endpoint", () => {
         response: responseMock,
       });
       expect(responseMock._getStatusCode()).toBe(500);
+      expect(responseMock._getHeaders()).toHaveProperty(
+        "content-type",
+        "text/plain",
+      );
       expect(responseMock._getData()).toBe(
         "An error occurred while serving the result: Something unexpected happened.",
       );

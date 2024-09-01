@@ -2,6 +2,12 @@
 
 ## Version 20
 
+### v20.9.1
+
+- Plain text MIME type is set for the corresponding responses:
+  - Last Resort Handler (in case your ResultHandler throws);
+  - ~~`arrayResultHandler`~~ (deprecated) — in case of errors and failures.
+
 ### v20.9.0
 
 - `openapi3-ts` vesion is 4.4.0:
