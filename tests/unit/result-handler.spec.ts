@@ -104,6 +104,10 @@ describe("ResultHandler", () => {
         ],
       ]);
       expect(responseMock._getStatusCode()).toBe(500);
+      expect(responseMock._getHeaders()).toHaveProperty(
+        "content-type",
+        responseMock._isJSON() ? "application/json" : "text/plain",
+      );
       expect(
         responseMock._isJSON()
           ? responseMock._getJSONData()
@@ -135,6 +139,10 @@ describe("ResultHandler", () => {
       });
       expect(loggerMock._getLogs().error).toHaveLength(0);
       expect(responseMock._getStatusCode()).toBe(400);
+      expect(responseMock._getHeaders()).toHaveProperty(
+        "content-type",
+        responseMock._isJSON() ? "application/json" : "text/plain",
+      );
       expect(
         responseMock._isJSON()
           ? responseMock._getJSONData()
@@ -156,6 +164,10 @@ describe("ResultHandler", () => {
       });
       expect(loggerMock._getLogs().error).toHaveLength(0);
       expect(responseMock._getStatusCode()).toBe(404);
+      expect(responseMock._getHeaders()).toHaveProperty(
+        "content-type",
+        responseMock._isJSON() ? "application/json" : "text/plain",
+      );
       expect(
         responseMock._isJSON()
           ? responseMock._getJSONData()
@@ -217,6 +229,10 @@ describe("ResultHandler", () => {
     });
     expect(loggerMock._getLogs().error).toHaveLength(0);
     expect(responseMock._getStatusCode()).toBe(500);
+    expect(responseMock._getHeaders()).toHaveProperty(
+      "content-type",
+      "text/plain",
+    );
     expect(
       responseMock._isJSON()
         ? responseMock._getJSONData()
