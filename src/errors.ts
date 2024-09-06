@@ -1,4 +1,4 @@
-import { ZodError } from "zod";
+import { z } from "zod";
 import { getMessageFromError } from "./common-helpers";
 import { OpenAPIContext } from "./documentation-helpers";
 
@@ -38,7 +38,7 @@ export class IOSchemaError extends Error {
 export class OutputValidationError extends IOSchemaError {
   public override name = "OutputValidationError";
 
-  constructor(public readonly originalError: ZodError) {
+  constructor(public readonly originalError: z.ZodError) {
     super(getMessageFromError(originalError));
   }
 }
@@ -47,7 +47,7 @@ export class OutputValidationError extends IOSchemaError {
 export class InputValidationError extends IOSchemaError {
   public override name = "InputValidationError";
 
-  constructor(public readonly originalError: ZodError) {
+  constructor(public readonly originalError: z.ZodError) {
     super(getMessageFromError(originalError));
   }
 }
@@ -66,14 +66,9 @@ export class ResultHandlerError extends Error {
 
 export class MissingPeerError extends Error {
   public override name = "MissingPeerError";
-  constructor(module: string | string[]) {
-    const isArray = Array.isArray(module);
+  constructor(module: string) {
     super(
-      `Missing ${
-        isArray ? "one of the following peer dependencies" : "peer dependency"
-      }: ${
-        isArray ? module.join(" | ") : module
-      }. Please install it to use the feature.`,
+      `Missing peer dependency: ${module}. Please install it to use the feature.`,
     );
   }
 }

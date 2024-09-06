@@ -1,4 +1,4 @@
-import { ZodError } from "zod";
+import { z } from "zod";
 import { DocumentationError, RoutingError } from "../../src";
 import {
   IOSchemaError,
@@ -11,120 +11,119 @@ import { describe, expect, test } from "vitest";
 
 describe("Errors", () => {
   describe("RoutingError", () => {
+    const error = new RoutingError("test");
+
     test("should be an instance of Error", () => {
-      expect(new RoutingError("test")).toBeInstanceOf(Error);
+      expect(error).toBeInstanceOf(Error);
     });
 
     test("should have the name matching its class", () => {
-      expect(new RoutingError("test").name).toBe("RoutingError");
+      expect(error.name).toBe("RoutingError");
     });
   });
 
   describe("DocumentationError", () => {
-    const params = {
+    const error = new DocumentationError({
       message: "test",
       path: "/v1/testPath",
       method: "get" as const,
       isResponse: true,
-    };
+    });
 
     test("should be an instance of Error", () => {
-      expect(new DocumentationError(params)).toBeInstanceOf(Error);
+      expect(error).toBeInstanceOf(Error);
     });
 
     test("should include more details into the message", () => {
-      expect(new DocumentationError(params).message).toMatchSnapshot();
+      expect(error.message).toMatchSnapshot();
     });
 
     test("should have the name matching its class", () => {
-      expect(new DocumentationError(params).name).toBe("DocumentationError");
+      expect(error.name).toBe("DocumentationError");
     });
   });
 
   describe("IOSchemaError", () => {
+    const error = new IOSchemaError("test");
+
     test("should be an instance of Error", () => {
-      expect(new IOSchemaError("test")).toBeInstanceOf(Error);
+      expect(error).toBeInstanceOf(Error);
     });
 
     test("should have the name matching its class", () => {
-      expect(new IOSchemaError("test").name).toBe("IOSchemaError");
+      expect(error.name).toBe("IOSchemaError");
     });
   });
 
   describe("OutputValidationError", () => {
-    const zodError = new ZodError([]);
+    const zodError = new z.ZodError([]);
+    const error = new OutputValidationError(zodError);
 
     test("should be an instance of IOSchemaError and Error", () => {
-      expect(new OutputValidationError(zodError)).toBeInstanceOf(IOSchemaError);
-      expect(new OutputValidationError(zodError)).toBeInstanceOf(Error);
+      expect(error).toBeInstanceOf(IOSchemaError);
+      expect(error).toBeInstanceOf(Error);
     });
 
     test("should have the name matching its class", () => {
-      expect(new OutputValidationError(zodError).name).toBe(
-        "OutputValidationError",
-      );
+      expect(error.name).toBe("OutputValidationError");
     });
 
     test("should have .originalError property matching the one used for constructing", () => {
-      expect(new OutputValidationError(zodError).originalError).toEqual(
-        zodError,
-      );
+      expect(error.originalError).toEqual(zodError);
     });
   });
 
   describe("InputValidationError", () => {
-    const zodError = new ZodError([]);
+    const zodError = new z.ZodError([]);
+    const error = new InputValidationError(zodError);
 
     test("should be an instance of IOSchemaError and Error", () => {
-      expect(new InputValidationError(zodError)).toBeInstanceOf(IOSchemaError);
-      expect(new InputValidationError(zodError)).toBeInstanceOf(Error);
+      expect(error).toBeInstanceOf(IOSchemaError);
+      expect(error).toBeInstanceOf(Error);
     });
 
     test("should have the name matching its class", () => {
-      expect(new InputValidationError(zodError).name).toBe(
-        "InputValidationError",
-      );
+      expect(error.name).toBe("InputValidationError");
     });
 
     test("should have .originalError property matching the one used for constructing", () => {
-      expect(new InputValidationError(zodError).originalError).toEqual(
-        zodError,
-      );
+      expect(error.originalError).toEqual(zodError);
     });
   });
 
-  describe("ResultHandlerError", () => {
-    test("should be an instance of Error", () => {
-      expect(new ResultHandlerError("test")).toBeInstanceOf(Error);
-    });
+  describe.each([new Error("test2"), undefined])(
+    "ResultHandlerError",
+    (originalError) => {
+      const error = new ResultHandlerError("test", originalError);
 
-    test("should have the name matching its class", () => {
-      expect(new ResultHandlerError("test").name).toBe("ResultHandlerError");
-    });
+      test("should be an instance of Error", () => {
+        expect(error).toBeInstanceOf(Error);
+      });
 
-    test(".originalError should be the original error", () => {
-      const error = new ResultHandlerError("test", new Error("test2"));
-      expect(error.originalError).toEqual(new Error("test2"));
-      const error2 = new ResultHandlerError("test");
-      expect(error2.originalError).toBeUndefined();
-    });
-  });
+      test("should have the name matching its class", () => {
+        expect(error.name).toBe("ResultHandlerError");
+      });
+
+      test(".originalError should be the original error", () => {
+        expect(error.originalError).toEqual(originalError);
+      });
+    },
+  );
 
   describe("MissingPeerError", () => {
+    const error = new MissingPeerError("compression");
+
     test("should be an instance of Error", () => {
-      expect(new MissingPeerError("compression")).toBeInstanceOf(Error);
+      expect(error).toBeInstanceOf(Error);
     });
 
     test("should have the name matching its class", () => {
-      expect(new MissingPeerError("compression").name).toBe("MissingPeerError");
+      expect(error.name).toBe("MissingPeerError");
     });
 
     test("should have a human readable message", () => {
-      expect(new MissingPeerError("compression").message).toBe(
+      expect(error.message).toBe(
         "Missing peer dependency: compression. Please install it to use the feature.",
-      );
-      expect(new MissingPeerError(["jest", "vitest"]).message).toBe(
-        "Missing one of the following peer dependencies: jest | vitest. Please install it to use the feature.",
       );
     });
   });
