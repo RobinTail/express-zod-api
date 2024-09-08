@@ -58,8 +58,17 @@ jobs:
       run: yarn test:compat
     - name: Issue 952 # see https://github.com/RobinTail/express-zod-api/issues/952
       run: yarn test:952
+
     - name: Dicussion 2024
       run: yarn test:discussion2024
+    - name: Install bun
+      uses: oven-sh/setup-bun@v2
+      with:
+        bun-version: 1.1.21
+    - name: Discussion 2024 using bun
+      working-directory: tests/discussion-2024
+      run: bun run docs.ts
+
   finish:
     needs: build
     runs-on: ubuntu-latest
