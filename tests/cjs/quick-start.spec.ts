@@ -1,5 +1,4 @@
 import { spawn } from "node:child_process";
-import assert from "node:assert/strict";
 
 describe("CJS Test", async () => {
   const { givePort } = await import("../helpers.js");
