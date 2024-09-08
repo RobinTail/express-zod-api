@@ -157,6 +157,9 @@
     "vitest": "^2.0.3",
     "zod": "^3.23.0"
   },
+  "resolutions": {
+    "@arethetypeswrong/**/lru-cache": "^10"
+  },
   "keywords": [
     "nodejs",
     "api",
