@@ -15,6 +15,7 @@ describe("Example", async () => {
   const listener = (chunk: Buffer) => {
     out += chunk.toString();
   };
+  const matchOut = (regExp: RegExp) => regExp.test(out);
   const example = spawn("tsx", ["example/index.ts"]);
   example.stdout.on("data", listener);
   const port = givePort("example");
@@ -88,7 +89,7 @@ describe("Example", async () => {
         },
       });
       await vi.waitFor(() =>
-        assert(/v1\/user\/50/.test(out) && /50, 123, 456/.test(out)),
+        assert([/v1\/user\/50/, /50, 123, 456/].every(matchOut)),
       );
       expect(true).toBeTruthy();
     });
@@ -123,7 +124,7 @@ describe("Example", async () => {
         },
       });
       await vi.waitFor(() =>
-        assert(/v1\/user\/retrieve/.test(out) && /50, method get/.test(out)),
+        assert([/v1\/user\/retrieve/, /50, method get/].every(matchOut)),
       );
       expect(true).toBeTruthy();
     });
