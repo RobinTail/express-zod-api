@@ -1,4 +1,3 @@
-import assert from "node:assert/strict";
 import { ReferenceObject, SchemaObject } from "openapi3-ts/oas31";
 import { z } from "zod";
 import { defaultSerializer } from "../../src/common-helpers";

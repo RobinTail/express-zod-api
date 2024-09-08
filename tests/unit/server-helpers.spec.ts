@@ -11,7 +11,6 @@ import {
 } from "../../src/server-helpers";
 import { defaultResultHandler, ResultHandler } from "../../src";
 import { Request } from "express";
-import assert from "node:assert/strict";
 import {
   makeLoggerMock,
   makeRequestMock,

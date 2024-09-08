@@ -1,4 +1,3 @@
-import assert from "node:assert/strict";
 import ts from "typescript";
 import { z } from "zod";
 import { f } from "../../src/integration-helpers";

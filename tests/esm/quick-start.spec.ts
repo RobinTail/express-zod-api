@@ -1,6 +1,5 @@
 import { spawn } from "node:child_process";
 import { givePort } from "../helpers";
-import assert from "node:assert/strict";
 
 describe("ESM Test", async () => {
   let out = "";
