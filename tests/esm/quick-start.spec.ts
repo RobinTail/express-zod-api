@@ -1,5 +1,6 @@
 import { spawn } from "node:child_process";
-import { givePort, waitFor } from "../helpers";
+import { givePort } from "../helpers";
+import assert from "node:assert/strict";
 
 describe("ESM Test", async () => {
   let out = "";
@@ -10,13 +11,13 @@ describe("ESM Test", async () => {
   quickStart.stdout.on("data", listener);
   quickStart.stderr.on("data", listener);
   const port = givePort("example");
-  await waitFor(() => out.indexOf(`Listening`) > -1);
+  await vi.waitFor(() => assert(out.includes(`Listening`)), { timeout: 1e4 });
 
   afterAll(async () => {
     quickStart.stdout.removeListener("data", listener);
     quickStart.stderr.removeListener("data", listener);
     quickStart.kill();
-    await waitFor(() => quickStart.killed);
+    await vi.waitFor(() => assert(quickStart.killed), { timeout: 1e4 });
   });
 
   afterEach(() => {
