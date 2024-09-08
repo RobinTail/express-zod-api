@@ -1,4 +1,3 @@
-import MockDate from "mockdate";
 import { EventEmitter } from "node:events";
 import { performance } from "node:perf_hooks";
 import { BuiltinLogger, BuiltinLoggerConfig } from "../../src/builtin-logger";
@@ -10,11 +9,11 @@ describe("BuiltinLogger", () => {
   });
 
   beforeEach(() => {
-    MockDate.set("2022-01-01T00:00:00Z");
+    vi.useFakeTimers({ now: new Date("2022-01-01T00:00:00Z") });
   });
 
   afterAll(() => {
-    MockDate.reset();
+    vi.useRealTimers();
   });
 
   const makeLogger = (props: BuiltinLoggerConfig) => {
