@@ -19,7 +19,7 @@ jobs:
       - name: Install bun
         uses: oven-sh/setup-bun@v2
         with:
-          bun-version: latest
+          bun-version: ${{ matrix.bun-version }}
       - name: Get bun cache dir and hash
         id: bunCache
         run: |
@@ -29,7 +29,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ${{ steps.bunCache.outputs.dir }}
-          key: ${{ runner.os }}-build-cache-bun-${{ steps.bunCache.outputs.hash }}
+          key: ${{ runner.os }}-build-cache-bun-${{ matrix.bun-version }}-${{ steps.bunCache.outputs.hash }}
       - name: Install dependencies
         run: bun install
       - name: Lint
