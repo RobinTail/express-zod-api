@@ -1,0 +1,40 @@
+name: Bun CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        bun-version: [1.1.21, latest]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - name: Get bun cache dir and hash
+        id: bunCache
+        run: |
+          echo "dir=$(bun pm cache)" >> $GITHUB_OUTPUT
+          echo "hash=$(bun pm hash)" >> $GITHUB_OUTPUT
+      - name: Cache node modules
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.bunCache.outputs.dir }}
+          key: ${{ runner.os }}-build-cache-bun-${{ steps.bunCache.outputs.hash }}
+      - name: Install dependencies
+        run: bun install
+      - name: Lint
+        run: bun run lint
+      - name: Test
+        run: bun run test
+      - name: Build
+        run: bun run build
