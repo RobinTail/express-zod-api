@@ -267,7 +267,7 @@ describe("Example", async () => {
           message: "User not found",
         },
       });
-      await vi.waitFor(() => assert(/101, method get/.test(out)));
+      await vi.waitFor(() => assert(matchOut(/101, method get/)));
       expect(true).toBeTruthy();
     });
 
