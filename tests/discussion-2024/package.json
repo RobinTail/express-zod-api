@@ -1,0 +1,12 @@
+{
+  "name": "express-zod-api-esm-for-discussion-2024",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "test": "tsx docs.ts"
+  },
+  "dependencies": {
+    "express-zod-api": "link:../.."
+  }
+}
