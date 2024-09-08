@@ -8,7 +8,7 @@ import {
   defaultResultHandler,
   ResultHandler,
 } from "../../src";
-import { givePort, waitFor } from "../helpers";
+import { givePort } from "../helpers";
 
 describe("App", async () => {
   const port = givePort();
@@ -145,12 +145,12 @@ describe("App", async () => {
       routing,
     )
   ).httpServer;
-  await waitFor(() => server.listening);
+  await vi.waitFor(() => assert(server.listening), { timeout: 1e4 });
 
   afterAll(async () => {
     server.close();
     // this approach works better than .close() callback
-    await waitFor(() => !server.listening);
+    await vi.waitFor(() => assert(!server.listening), { timeout: 1e4 });
     vi.restoreAllMocks();
   });
 
