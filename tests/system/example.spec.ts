@@ -8,14 +8,6 @@ import {
 import { givePort, waitFor } from "../helpers";
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
-import {
-  afterAll,
-  afterEach,
-  describe,
-  expect,
-  expectTypeOf,
-  test,
-} from "vitest";
 
 describe("Example", async () => {
   let out = "";

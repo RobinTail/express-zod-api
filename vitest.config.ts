@@ -5,6 +5,7 @@ export default defineConfig({
     env: {
       FORCE_COLOR: "1",
     },
+    globals: true,
     pool: "threads",
     testTimeout: 10000,
     reporters: "basic",

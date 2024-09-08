@@ -22,7 +22,6 @@ import {
   Routing,
   ServerConfig,
 } from "../../src";
-import { describe, expect, test, expectTypeOf } from "vitest";
 
 describe("Index Entrypoint", () => {
   describe("exports", () => {

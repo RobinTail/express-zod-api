@@ -1,4 +1,4 @@
-import { bench, describe } from "vitest";
+import { bench } from "vitest";
 import { z } from "zod";
 import { depictExamples } from "../../src/documentation-helpers";
 import "../../src/zod-plugin";

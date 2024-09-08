@@ -1,5 +1,4 @@
 import { spawn } from "node:child_process";
-import { afterAll, afterEach, describe, expect, test } from "vitest";
 
 describe("CJS Test", async () => {
   const { givePort, waitFor } = await import("../helpers.js");

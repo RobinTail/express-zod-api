@@ -1,5 +1,4 @@
 import { contentTypes } from "../../src/content-type";
-import { describe, expect, test } from "vitest";
 
 describe("contentTypes", () => {
   test("should has predefined properties", () => {
