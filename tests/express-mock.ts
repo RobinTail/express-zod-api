@@ -1,5 +1,4 @@
-// @see https://github.com/swc-project/vi/issues/14#issuecomment-970189585
-import { Mock, vi } from "vitest";
+import type { Mock } from "vitest";
 
 const expressJsonMock = vi.fn();
 const expressRawMock = vi.fn();

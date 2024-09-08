@@ -1,7 +1,6 @@
 import { z } from "zod";
 import { ezDateOutBrand } from "../../src/date-out-schema";
 import { ez } from "../../src";
-import { describe, expect, test } from "vitest";
 import { metaSymbol } from "../../src/metadata";
 
 describe("ez.dateOut()", () => {

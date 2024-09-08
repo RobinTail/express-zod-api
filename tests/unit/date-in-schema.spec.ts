@@ -1,7 +1,6 @@
 import { z } from "zod";
 import { ezDateInBrand } from "../../src/date-in-schema";
 import { ez } from "../../src";
-import { describe, expect, test } from "vitest";
 import { metaSymbol } from "../../src/metadata";
 
 describe("ez.dateIn()", () => {

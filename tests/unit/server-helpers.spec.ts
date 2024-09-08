@@ -9,7 +9,6 @@ import {
   makeChildLoggerExtractor,
   moveRaw,
 } from "../../src/server-helpers";
-import { describe, expect, test, vi } from "vitest";
 import { defaultResultHandler, ResultHandler } from "../../src";
 import { Request } from "express";
 import assert from "node:assert/strict";

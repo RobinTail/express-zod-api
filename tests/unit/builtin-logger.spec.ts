@@ -1,14 +1,5 @@
 import MockDate from "mockdate";
 import { EventEmitter } from "node:events";
-import {
-  afterAll,
-  beforeAll,
-  beforeEach,
-  describe,
-  expect,
-  test,
-  vi,
-} from "vitest";
 import { performance } from "node:perf_hooks";
 import { BuiltinLogger, BuiltinLoggerConfig } from "../../src/builtin-logger";
 

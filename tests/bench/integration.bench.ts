@@ -1,4 +1,4 @@
-import { bench, describe, expect } from "vitest";
+import { bench } from "vitest";
 import { routing } from "../../example/routing";
 import { Integration } from "../../src";
 

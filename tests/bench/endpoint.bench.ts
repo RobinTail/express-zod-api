@@ -1,4 +1,4 @@
-import { bench, describe, expect } from "vitest";
+import { bench } from "vitest";
 import { retrieveUserEndpoint } from "../../example/endpoints/retrieve-user";
 import { testEndpoint } from "../../src";
 

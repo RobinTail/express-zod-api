@@ -21,7 +21,6 @@ import {
 } from "../../src/testing";
 import { initRouting } from "../../src/routing";
 import type { IRouter, RequestHandler } from "express";
-import { beforeAll, beforeEach, describe, expect, test, vi } from "vitest";
 
 describe("Routing", () => {
   describe("initRouting()", () => {

@@ -1,6 +1,5 @@
 import { spawn } from "node:child_process";
 import { givePort, waitFor } from "../helpers";
-import { afterAll, afterEach, describe, expect, test } from "vitest";
 
 describe("ESM Test", async () => {
   let out = "";

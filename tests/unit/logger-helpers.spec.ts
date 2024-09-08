@@ -5,7 +5,6 @@ import {
   formatDuration,
   isLoggerInstance,
 } from "../../src/logger-helpers";
-import { describe, expect, test } from "vitest";
 
 describe("Logger helpers", () => {
   describe("isLoggerInstance()", () => {

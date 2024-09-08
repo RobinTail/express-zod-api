@@ -4,7 +4,6 @@ import { getFinalEndpointInputSchema } from "../../src/io-schema";
 import { metaSymbol } from "../../src/metadata";
 import { AbstractMiddleware } from "../../src/middleware";
 import { serializeSchemaForTest } from "../helpers";
-import { describe, expect, expectTypeOf, test, vi } from "vitest";
 
 describe("I/O Schema and related helpers", () => {
   describe("IOSchema", () => {

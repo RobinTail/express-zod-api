@@ -24,7 +24,6 @@ import {
   ez,
 } from "../../src";
 import express from "express";
-import { afterAll, describe, expect, test, vi } from "vitest";
 
 describe("Server", () => {
   afterAll(() => {

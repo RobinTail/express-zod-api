@@ -1,4 +1,3 @@
-import { describe, expect, test } from "vitest";
 import { lastResortHandler } from "../../src/last-resort";
 import { makeLoggerMock, makeResponseMock } from "../../src/testing";
 

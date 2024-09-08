@@ -53,7 +53,6 @@ import {
 } from "../../src/documentation-helpers";
 import { walkSchema } from "../../src/schema-walker";
 import { serializeSchemaForTest } from "../helpers";
-import { beforeEach, describe, expect, test, vi } from "vitest";
 
 describe("Documentation helpers", () => {
   const getRefMock = vi.fn();

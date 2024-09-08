@@ -1,6 +1,5 @@
 import { Express, IRouter } from "express";
 import { createConfig } from "../../src";
-import { describe, expect, test, vi } from "vitest";
 
 describe("ConfigType", () => {
   describe("createConfig()", () => {

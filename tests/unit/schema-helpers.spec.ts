@@ -1,4 +1,3 @@
-import { describe, expect, test } from "vitest";
 import { isValidDate } from "../../src/schema-helpers";
 
 describe("Schema helpers", () => {

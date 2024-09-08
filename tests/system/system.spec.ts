@@ -9,7 +9,6 @@ import {
   ResultHandler,
 } from "../../src";
 import { givePort, waitFor } from "../helpers";
-import { afterAll, describe, expect, test, vi } from "vitest";
 
 describe("App", async () => {
   const port = givePort();
