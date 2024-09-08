@@ -1,0 +1,22 @@
+name: Bun
+
+on:
+  - push
+  - pull_request
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.1.21
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Discussion 2024 using bun
+        working-directory: tests/discussion-2024
+        run: |
+          bun install
+          bun run docs.ts
+
