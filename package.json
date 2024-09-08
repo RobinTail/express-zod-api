@@ -158,7 +158,7 @@
     "zod": "^3.23.0"
   },
   "resolutions": {
-    "@arethetypeswrong/**/lru-cache": "^10"
+    "@arethetypeswrong/**/lru-cache": "^10.4.3"
   },
   "keywords": [
     "nodejs",
