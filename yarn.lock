@@ -2629,7 +2629,7 @@ node-emoji@^2.1.3:
     emojilib "^2.4.0"
     skin-tone "^2.0.0"
 
-node-mocks-http@^1.15.1:
+node-mocks-http@^1.16.0:
   version "1.16.0"
   resolved "https://registry.yarnpkg.com/node-mocks-http/-/node-mocks-http-1.16.0.tgz#c54c75fce7b7bec9afed9a00606d3c69e9ae8dc4"
   integrity sha512-jmDjsr87ugnZ4nqBeX8ccMB1Fn04qc5Fz45XgrneJerWGV0VqS+wpu/zVkwv8LDAYHljDy5FzNvRJaOzEW9Dyw==
