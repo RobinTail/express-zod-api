@@ -2,6 +2,11 @@
 
 ## Version 20
 
+### v20.9.2
+
+- Minor syntax adjustments and cleanup;
+- `node-mocks-http` version is 1.16.0.
+
 ### v20.9.1
 
 - Plain text MIME type is set for the corresponding responses:
