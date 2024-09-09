@@ -115,7 +115,7 @@
     }
   },
   "devDependencies": {
-    "@arethetypeswrong/cli": "^0.16.1",
+    "@arethetypeswrong/cli": "^0.16.2",
     "@eslint/eslintrc": "^3",
     "@tsconfig/node18": "^18.2.1",
     "@types/compression": "^1.7.5",
@@ -156,9 +156,6 @@
     "typescript-eslint": "^8.0.0",
     "vitest": "^2.0.3",
     "zod": "^3.23.0"
-  },
-  "resolutions": {
-    "@arethetypeswrong/**/lru-cache": "^10.4.3"
   },
   "keywords": [
     "nodejs",
