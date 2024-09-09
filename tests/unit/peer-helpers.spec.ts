@@ -1,6 +1,5 @@
 import { MissingPeerError } from "../../src";
 import { loadPeer } from "../../src/peer-helpers";
-import { describe, expect, test } from "vitest";
 
 describe("Peer loading helpers", () => {
   describe("loadPeer()", () => {

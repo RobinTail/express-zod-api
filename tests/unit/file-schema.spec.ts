@@ -2,7 +2,6 @@ import { z } from "zod";
 import { ezFileBrand } from "../../src/file-schema";
 import { ez } from "../../src";
 import { readFile } from "node:fs/promises";
-import { describe, expect, expectTypeOf, test } from "vitest";
 import { metaSymbol } from "../../src/metadata";
 
 describe("ez.file()", () => {

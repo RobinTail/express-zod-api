@@ -1,4 +1,4 @@
-import { bench, describe, expect } from "vitest";
+import { bench } from "vitest";
 import { config } from "../../example/config";
 import { routing } from "../../example/routing";
 import { Documentation } from "../../src";

@@ -1,6 +1,5 @@
 import { z } from "zod";
 import { ez } from "../../src";
-import { describe, expect, test, vi } from "vitest";
 import { metaSymbol } from "../../src/metadata";
 import { ezUploadBrand } from "../../src/upload-schema";
 

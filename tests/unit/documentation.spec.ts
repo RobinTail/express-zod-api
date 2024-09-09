@@ -16,7 +16,6 @@ import {
 import { contentTypes } from "../../src/content-type";
 import { z } from "zod";
 import { givePort } from "../helpers";
-import { describe, expect, expectTypeOf, test, vi } from "vitest";
 
 describe("Documentation", () => {
   const sampleConfig = createConfig({

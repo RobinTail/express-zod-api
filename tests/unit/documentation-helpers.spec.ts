@@ -1,4 +1,3 @@
-import assert from "node:assert/strict";
 import { ReferenceObject, SchemaObject } from "openapi3-ts/oas31";
 import { z } from "zod";
 import { defaultSerializer } from "../../src/common-helpers";
@@ -53,7 +52,6 @@ import {
 } from "../../src/documentation-helpers";
 import { walkSchema } from "../../src/schema-walker";
 import { serializeSchemaForTest } from "../helpers";
-import { beforeEach, describe, expect, test, vi } from "vitest";
 
 describe("Documentation helpers", () => {
   const getRefMock = vi.fn();

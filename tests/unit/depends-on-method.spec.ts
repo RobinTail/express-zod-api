@@ -4,7 +4,6 @@ import {
   EndpointsFactory,
   defaultResultHandler,
 } from "../../src";
-import { describe, expect, test } from "vitest";
 import { AbstractEndpoint } from "../../src/endpoint";
 
 describe("DependsOnMethod", () => {

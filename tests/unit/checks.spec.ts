@@ -1,5 +1,4 @@
 import { UploadedFile } from "express-fileupload";
-import { describe, expect, test, vi } from "vitest";
 import { z } from "zod";
 import { ez } from "../../src";
 import { hasNestedSchema } from "../../src/deep-checks";

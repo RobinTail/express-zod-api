@@ -1,6 +1,6 @@
 import http from "node:http";
 import https from "node:https";
-import { MockInstance, vi } from "vitest";
+import type { MockInstance } from "vitest";
 import type { Application } from "express";
 
 const realHttpCreator = http.createServer;

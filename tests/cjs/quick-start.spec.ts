@@ -1,8 +1,7 @@
 import { spawn } from "node:child_process";
-import { afterAll, afterEach, describe, expect, test } from "vitest";
 
 describe("CJS Test", async () => {
-  const { givePort, waitFor } = await import("../helpers.js");
+  const { givePort } = await import("../helpers.js");
   let out = "";
   const listener = (chunk: Buffer) => {
     out += chunk.toString();
@@ -11,13 +10,13 @@ describe("CJS Test", async () => {
   quickStart.stdout.on("data", listener);
   quickStart.stderr.on("data", listener);
   const port = givePort("example");
-  await waitFor(() => out.indexOf(`Listening`) > -1);
+  await vi.waitFor(() => assert(out.includes(`Listening`)), { timeout: 1e4 });
 
   afterAll(async () => {
     quickStart.stdout.removeListener("data", listener);
     quickStart.stderr.removeListener("data", listener);
     quickStart.kill();
-    await waitFor(() => quickStart.killed);
+    await vi.waitFor(() => assert(quickStart.killed), { timeout: 1e4 });
   });
 
   afterEach(() => {

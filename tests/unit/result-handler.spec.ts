@@ -9,7 +9,6 @@ import {
 } from "../../src";
 import { ResultHandlerError } from "../../src/errors";
 import { metaSymbol } from "../../src/metadata";
-import { describe, expect, expectTypeOf, test, vi } from "vitest";
 import { AbstractResultHandler, Result } from "../../src/result-handler";
 import {
   makeLoggerMock,

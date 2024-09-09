@@ -1,11 +1,9 @@
-import assert from "node:assert/strict";
 import ts from "typescript";
 import { z } from "zod";
 import { f } from "../../src/integration-helpers";
 import { defaultSerializer } from "../../src/common-helpers";
 import { zodToTs } from "../../src/zts";
 import { ZTSContext, createTypeAlias, printNode } from "../../src/zts-helpers";
-import { describe, expect, test, vi } from "vitest";
 
 describe("zod-to-ts", () => {
   const printNodeTest = (node: ts.Node) =>

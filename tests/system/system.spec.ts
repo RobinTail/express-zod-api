@@ -1,5 +1,4 @@
 import cors from "cors";
-import assert from "node:assert/strict";
 import { z } from "zod";
 import {
   EndpointsFactory,
@@ -8,8 +7,7 @@ import {
   defaultResultHandler,
   ResultHandler,
 } from "../../src";
-import { givePort, waitFor } from "../helpers";
-import { afterAll, describe, expect, test, vi } from "vitest";
+import { givePort } from "../helpers";
 
 describe("App", async () => {
   const port = givePort();
@@ -146,12 +144,12 @@ describe("App", async () => {
       routing,
     )
   ).httpServer;
-  await waitFor(() => server.listening);
+  await vi.waitFor(() => assert(server.listening), { timeout: 1e4 });
 
   afterAll(async () => {
     server.close();
     // this approach works better than .close() callback
-    await waitFor(() => !server.listening);
+    await vi.waitFor(() => assert(!server.listening), { timeout: 1e4 });
     vi.restoreAllMocks();
   });
 

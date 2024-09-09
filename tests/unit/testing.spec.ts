@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { defaultEndpointsFactory, Middleware, testEndpoint } from "../../src";
-import { Mock, describe, expect, expectTypeOf, test, vi } from "vitest";
+import type { Mock } from "vitest";
 import { testMiddleware } from "../../src/testing";
 
 describe("Testing", () => {

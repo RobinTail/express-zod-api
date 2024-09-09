@@ -10,7 +10,6 @@ import { Endpoint } from "../../src/endpoint";
 import { testMiddleware } from "../../src/testing";
 import { serializeSchemaForTest } from "../helpers";
 import { z } from "zod";
-import { describe, expect, expectTypeOf, test, vi } from "vitest";
 
 describe("EndpointsFactory", () => {
   const resultHandlerMock = new ResultHandler({

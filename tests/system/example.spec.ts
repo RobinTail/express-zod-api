@@ -5,32 +5,25 @@ import {
   Implementation,
   jsonEndpoints,
 } from "../../example/example.client";
-import { givePort, waitFor } from "../helpers";
+import { givePort } from "../helpers";
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
-import {
-  afterAll,
-  afterEach,
-  describe,
-  expect,
-  expectTypeOf,
-  test,
-} from "vitest";
 
 describe("Example", async () => {
   let out = "";
   const listener = (chunk: Buffer) => {
     out += chunk.toString();
   };
+  const matchOut = (regExp: RegExp) => regExp.test(out);
   const example = spawn("tsx", ["example/index.ts"]);
   example.stdout.on("data", listener);
   const port = givePort("example");
-  await waitFor(() => out.indexOf(`Listening`) > -1);
+  await vi.waitFor(() => assert(out.includes(`Listening`)), { timeout: 1e4 });
 
   afterAll(async () => {
     example.stdout.removeListener("data", listener);
     example.kill();
-    await waitFor(() => example.killed);
+    await vi.waitFor(() => assert(example.killed), { timeout: 1e4 });
   });
 
   afterEach(() => {
@@ -94,8 +87,9 @@ describe("Example", async () => {
           createdAt: "2022-01-22T00:00:00.000Z",
         },
       });
-      await waitFor(() => /v1\/user\/50/.test(out));
-      await waitFor(() => /50, 123, 456/.test(out));
+      await vi.waitFor(() =>
+        assert([/v1\/user\/50/, /50, 123, 456/].every(matchOut)),
+      );
       expect(true).toBeTruthy();
     });
 
@@ -128,8 +122,9 @@ describe("Example", async () => {
           ],
         },
       });
-      await waitFor(() => /v1\/user\/retrieve/.test(out));
-      await waitFor(() => /50, method get/.test(out));
+      await vi.waitFor(() =>
+        assert([/v1\/user\/retrieve/, /50, method get/].every(matchOut)),
+      );
       expect(true).toBeTruthy();
     });
 
@@ -271,7 +266,7 @@ describe("Example", async () => {
           message: "User not found",
         },
       });
-      await waitFor(() => /101, method get/.test(out));
+      await vi.waitFor(() => assert(matchOut(/101, method get/)));
       expect(true).toBeTruthy();
     });
 

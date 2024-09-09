@@ -1,6 +1,5 @@
 import { RuleTester } from "@typescript-eslint/rule-tester";
 import migration from "../../src/migration";
-import { describe, test, expect, afterAll, it } from "vitest";
 import parser from "@typescript-eslint/parser";
 
 RuleTester.afterAll = afterAll;

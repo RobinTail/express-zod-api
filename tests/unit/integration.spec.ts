@@ -8,7 +8,6 @@ import {
   defaultEndpointsFactory,
   ResultHandler,
 } from "../../src";
-import { describe, expect, test, vi } from "vitest";
 
 describe("Integration", () => {
   test.each(["client", "types"] as const)(

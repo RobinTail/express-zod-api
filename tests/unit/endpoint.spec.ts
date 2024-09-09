@@ -1,4 +1,3 @@
-import assert from "node:assert/strict";
 import { z } from "zod";
 import {
   EndpointsFactory,
@@ -11,7 +10,6 @@ import {
 } from "../../src";
 import { AbstractEndpoint, Endpoint } from "../../src/endpoint";
 import { serializeSchemaForTest } from "../helpers";
-import { describe, expect, test, vi } from "vitest";
 
 describe("Endpoint", () => {
   describe(".getMethods()", () => {

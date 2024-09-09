@@ -36,12 +36,7 @@ jobs:
         path: ${{ steps.yarnCache.outputs.dir }}
         key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ matrix.node-version }}-${{ hashFiles('**/yarn.lock') }}
     - name: Install dependencies
-      uses: nick-fields/retry@v3
-      with:
-        timeout_seconds: 15
-        max_attempts: 3
-        on_retry_command: yarn config set registry https://registry.npmjs.org
-        command: yarn install
+      run: yarn install
     - name: Lint
       run: yarn lint
     - name: Test
@@ -56,33 +51,13 @@ jobs:
     - name: Build
       run: yarn build
     - name: CJS test
-      uses: nick-fields/retry@v3
-      with:
-        timeout_seconds: 15
-        max_attempts: 3
-        on_retry_command: yarn config set registry https://registry.npmjs.org
-        command: yarn test:cjs
+      run: yarn test:cjs
     - name: ESM test
-      uses: nick-fields/retry@v3
-      with:
-        timeout_seconds: 15
-        max_attempts: 3
-        on_retry_command: yarn config set registry https://registry.npmjs.org
-        command: yarn test:esm
+      run: yarn test:esm
     - name: Compatibility test
-      uses: nick-fields/retry@v3
-      with:
-        timeout_seconds: 15
-        max_attempts: 3
-        on_retry_command: yarn config set registry https://registry.npmjs.org
-        command: yarn test:compat
+      run: yarn test:compat
     - name: Issue 952 # see https://github.com/RobinTail/express-zod-api/issues/952
-      uses: nick-fields/retry@v3
-      with:
-        timeout_seconds: 15
-        max_attempts: 3
-        on_retry_command: yarn config set registry https://registry.npmjs.org
-        command: yarn test:952
+      run: yarn test:952
   finish:
     needs: build
     runs-on: ubuntu-latest
