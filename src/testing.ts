@@ -1,4 +1,4 @@
-import { Request } from "express";
+import { Request, Response } from "express";
 import { FlatObject, getInput } from "./common-helpers";
 import { CommonConfig } from "./config-type";
 import { AbstractEndpoint } from "./endpoint";
@@ -20,7 +20,8 @@ export const makeRequestMock = <REQ extends RequestOptions>(props?: REQ) => {
   return mock as typeof mock & REQ;
 };
 
-export const makeResponseMock = (opt?: ResponseOptions) => createResponse(opt);
+export const makeResponseMock = (opt?: ResponseOptions) =>
+  createResponse<Response>(opt);
 
 export const makeLoggerMock = <LOG extends FlatObject>(loggerProps?: LOG) => {
   const logs: Record<keyof AbstractLogger, unknown[]> = {
