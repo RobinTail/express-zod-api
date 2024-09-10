@@ -10,7 +10,6 @@ import { Endpoint } from "../../src/endpoint";
 import { testMiddleware } from "../../src/testing";
 import { serializeSchemaForTest } from "../helpers";
 import { z } from "zod";
-import assert from "node:assert/strict";
 
 describe("EndpointsFactory", () => {
   const resultHandlerMock = new ResultHandler({
