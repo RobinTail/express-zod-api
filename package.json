@@ -17,6 +17,7 @@
     "url": "https://github.com/RobinTail/express-zod-api/issues"
   },
   "scripts": {
+    "postinstall": "npx patch-package",
     "start": "tsx example/index.ts",
     "build": "yarn build:compile && yarn build:tests && yarn build:assets",
     "build:compile": "tsup && attw --pack",
