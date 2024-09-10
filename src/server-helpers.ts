@@ -34,7 +34,7 @@ export const createParserFailureHandler =
     if (!error) {
       return next();
     }
-    errorHandler.execute({
+    return errorHandler.execute({
       error: isHttpError(error)
         ? error
         : createHttpError(400, makeErrorFromAnything(error).message),
