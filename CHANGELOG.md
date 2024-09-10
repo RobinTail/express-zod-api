@@ -2,6 +2,16 @@
 
 ## Version 20
 
+### v20.10.0
+
+- Feat: Supporting Express 5
+  - Epic news: after 10 years of struggles and anticipations
+    [Express 5.0.0 is finally released](https://github.com/expressjs/express/releases/tag/v5.0.0);
+  - The primary a mostly awaited feature is the proper support of asynchronous handlers;
+  - This version introduces the initial support of Express 5 without breaking changes;
+  - Notice: the corresponding `@types/express` for the version 5 is not yet released;
+  - [Instructions on migrating to Express 5](https://expressjs.com/en/guide/migrating-5.html).
+
 ### v20.9.2
 
 - Minor syntax adjustments and cleanup;
