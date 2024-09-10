@@ -111,7 +111,7 @@ export const createUploadParsers = async ({
     } catch (error) {
       return next(error);
     }
-    uploader({
+    return uploader({
       debug: true,
       ...options,
       abortOnLimit: false,
