@@ -118,7 +118,7 @@ export class ExpressMiddleware<
             }
             resolve(provider(request as R, response as S));
           };
-          nativeMw(request as R, response as S, next);
+          nativeMw(request as R, response as S, next)?.catch(next);
         }),
     });
   }

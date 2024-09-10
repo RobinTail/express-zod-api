@@ -152,6 +152,20 @@ describe("EndpointsFactory", () => {
         expect(options).toEqual({ result: "Here is the test" });
       });
 
+      test("Should handle rejects from async middlewares", async () => {
+        const factory = new EndpointsFactory(resultHandlerMock);
+        const middleware: RequestHandler = vi.fn(async () =>
+          assert.fail("Rejected"),
+        );
+        const newFactory = factory[method](middleware);
+        await expect(() =>
+          testMiddleware({
+            middleware: newFactory["middlewares"][0],
+          }),
+        ).rejects.toThrow(new Error("Rejected"));
+        expect(middleware).toHaveBeenCalledTimes(1);
+      });
+
       test("Should operate without options provider", async () => {
         const factory = new EndpointsFactory(resultHandlerMock);
         const middleware: RequestHandler = vi.fn((req, {}, next) => {

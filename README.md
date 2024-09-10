@@ -92,7 +92,7 @@ Therefore, many basic tasks can be accomplished faster and easier, in particular
 ## Technologies
 
 - [Typescript](https://www.typescriptlang.org/) first.
-- Web server — [Express.js](https://expressjs.com/).
+- Web server — [Express.js](https://expressjs.com/) v4 or v5.
 - Schema validation — [Zod 3.x](https://github.com/colinhacks/zod) including [Zod Plugin](#zod-plugin).
 - Supports any logger having `info()`, `debug()`, `error()` and `warn()` methods;
   - Built-in console logger with colorful and pretty inspections by default.
