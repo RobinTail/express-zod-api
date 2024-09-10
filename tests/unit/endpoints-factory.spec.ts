@@ -10,6 +10,7 @@ import { Endpoint } from "../../src/endpoint";
 import { testMiddleware } from "../../src/testing";
 import { serializeSchemaForTest } from "../helpers";
 import { z } from "zod";
+import assert from "node:assert/strict";
 
 describe("EndpointsFactory", () => {
   const resultHandlerMock = new ResultHandler({
@@ -150,6 +151,20 @@ describe("EndpointsFactory", () => {
         expect(requestMock.body).toHaveProperty("test");
         expect(requestMock.body.test).toBe("Here is the test");
         expect(options).toEqual({ result: "Here is the test" });
+      });
+
+      test("Should handle rejects from async middlewares", async () => {
+        const factory = new EndpointsFactory(resultHandlerMock);
+        const middleware: RequestHandler = vi.fn(async () =>
+          assert.fail("Rejected"),
+        );
+        const newFactory = factory[method](middleware);
+        await expect(() =>
+          testMiddleware({
+            middleware: newFactory["middlewares"][0],
+          }),
+        ).rejects.toThrow(new Error("Rejected"));
+        expect(middleware).toHaveBeenCalledTimes(1);
       });
 
       test("Should operate without options provider", async () => {
