@@ -1,4 +1,5 @@
 import cors from "cors";
+import depd from "depd";
 import { z } from "zod";
 import {
   EndpointsFactory,
@@ -6,12 +7,15 @@ import {
   createServer,
   defaultResultHandler,
   ResultHandler,
+  BuiltinLogger,
 } from "../../src";
 import { givePort } from "../helpers";
 
 describe("App", async () => {
   const port = givePort();
 
+  const logger = new BuiltinLogger({ level: "silent" });
+  const warnMethod = vi.spyOn(logger, "warn");
   const routing = {
     v1: {
       corsed: new EndpointsFactory(defaultResultHandler)
@@ -117,7 +121,7 @@ describe("App", async () => {
         }),
     },
   };
-  vi.spyOn(global.console, "log").mockImplementation(vi.fn());
+  vi.spyOn(console, "log").mockImplementation(vi.fn()); // mutes logo output
   const server = (
     await createServer(
       {
@@ -125,6 +129,7 @@ describe("App", async () => {
           listen: port,
           compression: { threshold: 1 },
           beforeRouting: ({ app, getChildLogger }) => {
+            depd("express")("Sample deprecation message");
             app.use((req, {}, next) => {
               const childLogger = getChildLogger(req);
               assert("isChild" in childLogger && childLogger.isChild);
@@ -134,7 +139,7 @@ describe("App", async () => {
         },
         cors: false,
         startupLogo: true,
-        logger: { level: "silent" },
+        logger,
         childLoggerProvider: ({ parent }) =>
           Object.defineProperty(parent, "isChild", { value: true }),
         inputSources: {
@@ -145,6 +150,10 @@ describe("App", async () => {
     )
   ).httpServer;
   await vi.waitFor(() => assert(server.listening), { timeout: 1e4 });
+  expect(warnMethod).toHaveBeenCalledWith(
+    "Sample deprecation message",
+    new Error("Sample deprecation message"),
+  );
 
   afterAll(async () => {
     server.close();
@@ -231,7 +240,6 @@ describe("App", async () => {
         },
       );
       expect(response.status).toBe(200);
-      console.log(response.headers);
       expect(response.headers.get("Content-Encoding")).toBe("gzip");
       const json = await response.json();
       expect(json).toMatchSnapshot();
