@@ -27,9 +27,8 @@ const makeCommonEntities = (config: CommonConfig) => {
     ? config.logger
     : new BuiltinLogger(config.logger);
   rootLogger.debug("Running", process.env.TSUP_BUILD || "from sources");
-  process.on("deprecation", (error: Error) =>
-    rootLogger.warn(error.message, error),
-  );
+  const onDeprecation = (err: Error) => rootLogger.warn(err.message, err);
+  process.on("deprecation", onDeprecation);
   const loggingMiddleware = createLoggingMiddleware({ rootLogger, config });
   const getChildLogger = makeChildLoggerExtractor(rootLogger);
   const commons = { getChildLogger, errorHandler };
