@@ -702,6 +702,13 @@
   dependencies:
     "@types/node" "*"
 
+"@types/depd@^1.1.36":
+  version "1.1.36"
+  resolved "https://registry.npmjs.org/@types/depd/-/depd-1.1.36.tgz#7633366ce394e6aa046cedb55e70143e9bca67cd"
+  integrity sha512-+apvfj5Bn6ORfud9XrgoIu6H6s2pTN+X8rQ2LgkA3YUXY+PiXkCJjizh8qxv8CrLtXlxw3NCmYrNbbeckVOQrA==
+  dependencies:
+    "@types/node" "*"
+
 "@types/eslint@^9.6.0":
   version "9.6.1"
   resolved "https://registry.yarnpkg.com/@types/eslint/-/eslint-9.6.1.tgz#d5795ad732ce81715f27f75da913004a56751584"

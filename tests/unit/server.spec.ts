@@ -24,6 +24,7 @@ import {
   ez,
 } from "../../src";
 import express from "express";
+import depd from "depd";
 
 describe("Server", () => {
   afterAll(() => {
@@ -88,13 +89,16 @@ describe("Server", () => {
     test("Should create server with custom JSON parser, raw parser, logger, error handler and beforeRouting", async () => {
       const customLogger = new BuiltinLogger({ level: "silent" });
       const infoMethod = vi.spyOn(customLogger, "info");
+      const warnMethod = vi.spyOn(customLogger, "warn");
       const port = givePort();
       const configMock = {
         server: {
           listen: { port }, // testing Net::ListenOptions
           jsonParser: vi.fn(),
           rawParser: vi.fn(),
-          beforeRouting: vi.fn(),
+          beforeRouting: vi.fn(() => {
+            depd("express")("Sample deprecation message");
+          }),
         },
         cors: true,
         startupLogo: false,
@@ -140,6 +144,11 @@ describe("Server", () => {
       });
       expect(infoMethod).toHaveBeenCalledTimes(1);
       expect(infoMethod).toHaveBeenCalledWith(`Listening`, { port });
+      expect(warnMethod).toHaveBeenCalledTimes(1);
+      expect(warnMethod).toHaveBeenCalledWith(
+        "Sample deprecation message",
+        new Error("Sample deprecation message"),
+      );
       expect(appMock.get).toHaveBeenCalledTimes(1);
       expect(appMock.get).toHaveBeenCalledWith(
         "/v1/test",
