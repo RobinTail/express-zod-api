@@ -27,8 +27,6 @@ const makeCommonEntities = (config: CommonConfig) => {
     ? config.logger
     : new BuiltinLogger(config.logger);
   rootLogger.debug("Running", process.env.TSUP_BUILD || "from sources");
-  const onDeprecation = (err: Error) => rootLogger.warn(err.message, err);
-  process.on("deprecation", onDeprecation);
   const loggingMiddleware = createLoggingMiddleware({ rootLogger, config });
   const getChildLogger = makeChildLoggerExtractor(rootLogger);
   const commons = { getChildLogger, errorHandler };
@@ -64,6 +62,8 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
     loggingMiddleware,
   } = makeCommonEntities(config);
   const app = express().disable("x-powered-by").use(loggingMiddleware);
+  const onDeprecation = (err: Error) => rootLogger.warn(err.message, err);
+  process.on("deprecation", onDeprecation);
 
   if (config.server.compression) {
     const compressor = await loadPeer<typeof compression>("compression");
