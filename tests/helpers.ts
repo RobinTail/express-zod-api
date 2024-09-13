@@ -11,7 +11,7 @@ const disposer = (function* () {
 export const givePort = (
   test?: "example",
   reserved = 8090,
-  notExample = when(equals(reserved), (): number => givePort(test)),
+  notExample = when(equals(reserved), (): number => givePort()),
 ) => (test ? reserved : notExample(disposer.next().value));
 
 export const serializeSchemaForTest = (
