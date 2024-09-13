@@ -1,4 +1,3 @@
-import type { DeprecationError } from "depd";
 import express from "express";
 import type compression from "compression";
 import http from "node:http";
@@ -15,19 +14,19 @@ import {
   createParserFailureHandler,
   createUploadParsers,
   makeChildLoggerExtractor,
+  installDeprecationListener,
   moveRaw,
 } from "./server-helpers";
 import { getStartupLogo } from "./startup-logo";
 
 const makeCommonEntities = (config: CommonConfig) => {
-  if (config.startupLogo !== false) {
-    console.log(getStartupLogo());
-  }
+  if (config.startupLogo !== false) console.log(getStartupLogo());
   const errorHandler = config.errorHandler || defaultResultHandler;
   const rootLogger = isLoggerInstance(config.logger)
     ? config.logger
     : new BuiltinLogger(config.logger);
   rootLogger.debug("Running", process.env.TSUP_BUILD || "from sources");
+  installDeprecationListener(rootLogger);
   const loggingMiddleware = createLoggingMiddleware({ rootLogger, config });
   const getChildLogger = makeChildLoggerExtractor(rootLogger);
   const commons = { getChildLogger, errorHandler };
@@ -39,11 +38,6 @@ const makeCommonEntities = (config: CommonConfig) => {
     notFoundHandler,
     parserFailureHandler,
     loggingMiddleware,
-    onDeprecation: ({ message, namespace, name, stack }: DeprecationError) =>
-      rootLogger.warn(
-        `${name} (${namespace}): ${message}`,
-        stack.split("\n").slice(1),
-      ),
   };
 };
 
@@ -66,10 +60,8 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
     notFoundHandler,
     parserFailureHandler,
     loggingMiddleware,
-    onDeprecation,
   } = makeCommonEntities(config);
   const app = express().disable("x-powered-by").use(loggingMiddleware);
-  process.on("deprecation", onDeprecation);
 
   if (config.server.compression) {
     const compressor = await loadPeer<typeof compression>("compression");

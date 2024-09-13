@@ -156,3 +156,11 @@ export const makeChildLoggerExtractor =
   (fallback: ActualLogger): ChildLoggerExtractor =>
   (request) =>
     (request as EquippedRequest).res?.locals[metaSymbol]?.logger || fallback;
+
+export const installDeprecationListener = (logger: ActualLogger) =>
+  process.on("deprecation", ({ message, namespace, name, stack }) =>
+    logger.warn(
+      `${name} (${namespace}): ${message}`,
+      stack.split("\n").slice(1),
+    ),
+  );
