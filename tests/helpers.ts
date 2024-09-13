@@ -1,4 +1,4 @@
-import { map, when, equals } from "ramda";
+import { map, when, equals, nAry } from "ramda";
 import { z } from "zod";
 import { ezFileBrand } from "../src/file-schema";
 import { SchemaHandler, walkSchema } from "../src/schema-walker";
@@ -8,11 +8,8 @@ const disposer = (function* () {
   while (true) yield port++;
 })();
 
-export const givePort = (
-  test?: "example",
-  reserved = 8090,
-  ensure = when(equals(reserved), (): number => givePort()),
-) => (test ? reserved : ensure(disposer.next().value));
+export const givePort = (test?: "example", rsvd = 8090): number =>
+  test ? rsvd : when(equals(rsvd), nAry(0, givePort))(disposer.next().value);
 
 export const serializeSchemaForTest = (
   subject: z.ZodTypeAny,
