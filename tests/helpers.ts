@@ -11,8 +11,8 @@ const disposer = (function* () {
 export const givePort = (
   test?: "example",
   reserved = 8090,
-  notExample = when(equals(reserved), (): number => givePort()),
-) => (test ? reserved : notExample(disposer.next().value));
+  ensure = when(equals(reserved), (): number => givePort()),
+) => (test ? reserved : ensure(disposer.next().value));
 
 export const serializeSchemaForTest = (
   subject: z.ZodTypeAny,
