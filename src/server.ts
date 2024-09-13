@@ -1,3 +1,4 @@
+import type { DeprecationError } from "depd";
 import express from "express";
 import type compression from "compression";
 import http from "node:http";
@@ -38,6 +39,11 @@ const makeCommonEntities = (config: CommonConfig) => {
     notFoundHandler,
     parserFailureHandler,
     loggingMiddleware,
+    onDeprecation: ({ message, namespace, name, stack }: DeprecationError) =>
+      rootLogger.warn(
+        `${name} (${namespace}): ${message}`,
+        stack.split("\n").slice(1),
+      ),
   };
 };
 
@@ -60,14 +66,10 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
     notFoundHandler,
     parserFailureHandler,
     loggingMiddleware,
+    onDeprecation,
   } = makeCommonEntities(config);
   const app = express().disable("x-powered-by").use(loggingMiddleware);
-  process.on("deprecation", ({ message, namespace, name, stack }) =>
-    rootLogger.warn(
-      `${name} (${namespace}): ${message}`,
-      stack.split("\n").slice(1),
-    ),
-  );
+  process.on("deprecation", onDeprecation);
 
   if (config.server.compression) {
     const compressor = await loadPeer<typeof compression>("compression");
