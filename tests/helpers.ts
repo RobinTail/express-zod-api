@@ -10,8 +10,9 @@ const disposer = (function* () {
 
 export const givePort = (
   test?: "example",
-  notExample = when(equals(8090), (): number => givePort(test)),
-) => (test ? 8090 : notExample(disposer.next().value));
+  reserved = 8090,
+  notExample = when(equals(reserved), (): number => givePort(test)),
+) => (test ? reserved : notExample(disposer.next().value));
 
 export const serializeSchemaForTest = (
   subject: z.ZodTypeAny,
