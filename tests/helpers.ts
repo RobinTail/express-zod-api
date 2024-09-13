@@ -3,19 +3,16 @@ import { z } from "zod";
 import { ezFileBrand } from "../src/file-schema";
 import { SchemaHandler, walkSchema } from "../src/schema-walker";
 
-let lastGivenPort = 8010;
-const reservedPorts = {
-  example: 8090,
-};
-export const givePort = (test?: keyof typeof reservedPorts) => {
-  if (test && reservedPorts[test]) {
-    return reservedPorts[test];
+const portsDisposer = (function* () {
+  let port = 8010;
+  while (true) {
+    yield port;
+    port = port + (port === 8089 ? 2 : 1);
   }
-  do {
-    lastGivenPort++;
-  } while (Object.values(reservedPorts).includes(lastGivenPort));
-  return lastGivenPort;
-};
+})();
+
+export const givePort = (test?: "example") =>
+  test ? 8090 : portsDisposer.next().value;
 
 export const serializeSchemaForTest = (
   subject: z.ZodTypeAny,
