@@ -62,7 +62,12 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
     loggingMiddleware,
   } = makeCommonEntities(config);
   const app = express().disable("x-powered-by").use(loggingMiddleware);
-  process.on("deprecation", (err) => rootLogger.warn(err.message, err));
+  process.on("deprecation", ({ message, namespace, name, stack }) =>
+    rootLogger.warn(
+      `${name} (${namespace}): ${message}`,
+      stack.split("\n").slice(1),
+    ),
+  );
 
   if (config.server.compression) {
     const compressor = await loadPeer<typeof compression>("compression");

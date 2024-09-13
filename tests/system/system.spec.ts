@@ -151,8 +151,8 @@ describe("App", async () => {
   ).httpServer;
   await vi.waitFor(() => assert(server.listening), { timeout: 1e4 });
   expect(warnMethod).toHaveBeenCalledWith(
-    "Sample deprecation message",
-    new Error("Sample deprecation message"),
+    "DeprecationError (express): Sample deprecation message",
+    expect.any(Array), // stack
   );
 
   afterAll(async () => {
