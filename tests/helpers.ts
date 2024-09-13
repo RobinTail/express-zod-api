@@ -5,9 +5,7 @@ import { SchemaHandler, walkSchema } from "../src/schema-walker";
 
 const disposer = (function* () {
   let port = 8010;
-  while (true) {
-    yield port++;
-  }
+  while (true) yield port++;
 })();
 
 export const givePort = (
