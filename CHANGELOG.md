@@ -2,6 +2,12 @@
 
 ## Version 20
 
+### v20.11.0
+
+- Feat: Handling deprecation events by actual logger
+  - `express` uses `depd` for emitting `deprecation` events when a certain deprecated approach used;
+  - This version installs a listener of that event and delegates it to the `warn` method of your actual logger.
+
 ### v20.10.0
 
 - Feat: Supporting Express 5
