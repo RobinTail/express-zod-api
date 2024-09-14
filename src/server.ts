@@ -14,19 +14,19 @@ import {
   createParserFailureHandler,
   createUploadParsers,
   makeChildLoggerExtractor,
+  installDeprecationListener,
   moveRaw,
 } from "./server-helpers";
 import { getStartupLogo } from "./startup-logo";
 
 const makeCommonEntities = (config: CommonConfig) => {
-  if (config.startupLogo !== false) {
-    console.log(getStartupLogo());
-  }
+  if (config.startupLogo !== false) console.log(getStartupLogo());
   const errorHandler = config.errorHandler || defaultResultHandler;
   const rootLogger = isLoggerInstance(config.logger)
     ? config.logger
     : new BuiltinLogger(config.logger);
   rootLogger.debug("Running", process.env.TSUP_BUILD || "from sources");
+  installDeprecationListener(rootLogger);
   const loggingMiddleware = createLoggingMiddleware({ rootLogger, config });
   const getChildLogger = makeChildLoggerExtractor(rootLogger);
   const commons = { getChildLogger, errorHandler };
@@ -95,10 +95,7 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
   const starter = <T extends http.Server | https.Server>(
     server: T,
     subject: typeof config.server.listen,
-  ) =>
-    server.listen(subject, () => {
-      rootLogger.info("Listening", subject);
-    }) as T;
+  ) => server.listen(subject, () => rootLogger.info("Listening", subject)) as T;
 
   const servers = {
     httpServer: starter(http.createServer(app), config.server.listen),
