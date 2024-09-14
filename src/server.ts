@@ -95,10 +95,7 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
   const starter = <T extends http.Server | https.Server>(
     server: T,
     subject: typeof config.server.listen,
-  ) =>
-    server.listen(subject, () => {
-      rootLogger.info("Listening", subject);
-    }) as T;
+  ) => server.listen(subject, () => rootLogger.info("Listening", subject)) as T;
 
   const servers = {
     httpServer: starter(http.createServer(app), config.server.listen),
