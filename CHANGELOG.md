@@ -2647,7 +2647,7 @@ const exampleEndpoint = taggedEndpointsFactory.build({
 
 ### v8.0.0
 
-- **Breaking changes**: 
+- **Breaking changes**:
   - Removed the signature deprecated in v7.6.1:
     - The argument of `EndpointsFactory::addMiddleware()` has to be the result of `createMiddleware()`;
   - Only the following Node versions are supported: ^14.17.0, ^16.10.0, ^18.0.0.
