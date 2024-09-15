@@ -3063,8 +3063,9 @@ interface After {
   - The generated client is flexibly configurable on the frontend side using an implementation function that
     directly makes requests to an endpoint using the libraries and methods of your choice.
   - The client asserts the type of request parameters and response.
-- Changes since `beta4`:
-  - Add missing headers to example implementation.
+  - Path params are excluded from `params` after being substituted.
+  - The client now accepts a function parameter of `Implementation` type.
+  - Its parameter `path` now contains substituted path params.
 
 ```typescript
 // example client-generator.ts
@@ -3092,25 +3093,6 @@ const client = new ExpressZodAPIClient(async (method, path, params) => {
 
 client.provide("get", "/v1/user/retrieve", { id: "10" });
 ```
-
-### v6.1.0-beta4
-
-- Path params are excluded from `params` after being substituted.
-
-### v6.1.0-beta3
-
-- The client now accepts a function parameter of `Implementation` type.
-  - Its parameter `path` now contains substituted path params.
-
-### v6.1.0-beta2
-
-- Fixing bugs and taking into account path params.
-
-### v6.1.0-beta1
-
-- This is a beta release of a new feature for public testing.
-- Feature #403: API Client Generator.
-  - More details coming soon.
 
 ### v6.0.3
 
