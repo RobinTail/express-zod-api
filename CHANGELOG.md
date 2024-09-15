@@ -2197,12 +2197,6 @@ after:
 
 ### v9.0.0
 
-- No additional changes since v9.0.0-beta4.
-  - Read the release notes on beta versions for migration strategy from v8.
-
-### v9.0.0-beta4
-
-- This release contains the feature from version [8.11.0](#v8110).
 - **BREAKING** changes:
   - `createApiResponse()` method is removed. Read the release notes to v8.11.0 for migration strategy.
 - Potentially **BREAKING** changes:
@@ -2219,14 +2213,6 @@ after:
     - `getInputMimeTypes()` —> `getMimeTypes("input")`
     - `getPositiveMimeTypes()` —> `getMimeTypes("positive")`
     - `getNegativeMimeTypes()` —> `getMimeTypes("negative")`
-
-### v9.0.0-beta3
-
-- This release contains the feature from version [8.10.0](#v8100).
-
-### v9.0.0-beta2
-
-- Potentially **BREAKING** changes:
   - Fixed problem #787, reported and resolved by [@TheWisestOne](https://github.com/TheWisestOne).
     - Validation errors thrown from within the Middlewares and Endpoint handlers unrelated to the IO do now lead to the
       status code `500` instead of `400`, when you're using the `defaultResultHandler` or `defaultEndpointsFactory`.
@@ -2242,6 +2228,15 @@ after:
       - `getMessageFromError()`,
       - `getStatusCodeFromError()`.
     - Consider using `getStatusCodeFromError()` inside your custom `ResultHandler`, or make the following changes:
+  - Fixed issue #820, reported and resolved by [@McMerph](https://github.com/McMerph).
+    - Request `body` is no longer considered as an input source for `DELETE` request.
+    - Despite the fact that this method MAY contain `body` (it's not explicitly prohibited), it's currently considered
+      a bad practice to rely on it. Also, it led to a syntax error in the generated documentation according to OpenAPI
+      3.0 specification.
+    - In case you have such Endpoints that rely on inputs collected from `DELETE` request body and want to continue,
+      add the following property to your configuration in order to keep the previous behavior without changes to your
+      implementation.
+    - Read the [customization instructions](README.md#customizing-input-sources).
 
 ```typescript
 // Your custom ResultHandler
@@ -2258,20 +2253,6 @@ const statusCode = getStatusCodeFromError(error);
 const message = getMessageFromError(error);
 response.status(statusCode);
 ```
-
-### v9.0.0-beta1
-
-- This release is based on version 8.9.4.
-- Potentially **BREAKING** changes:
-  - Fixed issue #820, reported and resolved by [@McMerph](https://github.com/McMerph).
-    - Request `body` is no longer considered as an input source for `DELETE` request.
-    - Despite the fact that this method MAY contain `body` (it's not explicitly prohibited), it's currently considered
-      a bad practice to rely on it. Also, it led to a syntax error in the generated documentation according to OpenAPI
-      3.0 specification.
-    - In case you have such Endpoints that rely on inputs collected from `DELETE` request body and want to continue,
-      add the following property to your configuration in order to keep the previous behavior without changes to your
-      implementation.
-    - Read the [customization instructions](https://github.com/RobinTail/express-zod-api#customizing-input-sources).
 
 ```yaml
 inputSources: { delete: ["body", "query", "params"] }
