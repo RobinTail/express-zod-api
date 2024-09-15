@@ -2017,37 +2017,8 @@ after:
 
 ### v10.0.0
 
-- This release contains the fix from version 9.4.2.
-- Read the release notes on beta versions for migration strategy from v9.
-
-### v10.0.0-beta6
-
-- This release contains the fix from version 9.4.1.
-
-### v10.0.0-beta5
-
-- Fixed DTS path for ESM in package.json.
-
-### v10.0.0-beta4
-
-- No changes.
-
-### v10.0.0-beta3
-
-- This release contains features from versions 9.3.0 (incl. hotfix 9.3.1) and 9.4.0.
 - **BREAKING** changes:
   - `Client::constructor()` now requires an object argument having `routing` property.
-
-```ts
-// before
-new Client(routing).print();
-// after
-new Client({ routing }).print();
-```
-
-### v10.0.0-beta2
-
-- **BREAKING** changes to the behavior of a public method.
   - The feature method `withMeta` _(introduced in v2.1.0)_ used to mutate its argument (`zod` schema) in order to
     extend it with additional methods.
   - If you're using this feature _within_ the call of `EndpointsFactory::build()`, there is no issue.
@@ -2057,6 +2028,29 @@ new Client({ routing }).print();
     - Reusing a schema assigned to a const for its several wrappings by `withMeta` and setting different examples.
     - In this case all examples were set to the original const.
   - This release fixes that behavior by making `withMeta` immutable: it returns a new copy of its argument.
+  - `zod` becomes a peer dependency, fixes issue #822.
+    - You need to install it manually and adjust your imports accordingly.
+  - `express` becomes a peer dependency as well.
+    - You need to install it manually.
+  - `typescript` becomes an optional peer dependency.
+    - When using a client generator, you need to install it manually.
+    - The minimal supported version is 4.9.3.
+  - Proprietary schemas are now exported under the namespace `ez`.
+    - Imports and utilization should be adjusted accordingly.
+    - Affected schemas: `file`, `dateIn`, `dateOut`, `upload`.
+  - If facing Typescript errors `TS4023` or `TS4094`, ensure disabling `declaration` option in your `tsconfig.json`.
+  - The minimal Node version is now 14.18.0.
+  - Due to switching to `tsup` builder, the file structure has changed:
+    - `/dist/index.js` — CommonJS bundle;
+    - `/dist/esm/index.js` — ESM bundle;
+    - `/dist/index.d.ts` — types declaration bundle.
+
+```ts
+// before
+new Client(routing).print();
+// after
+new Client({ routing }).print();
+```
 
 ```ts
 // the example case
@@ -2069,28 +2063,6 @@ const schemaB = withMeta(originalSchema).example("B");
 // - schemaA has example "A"
 // - schemaB has example "B"
 ```
-
-### v10.0.0-beta1
-
-- This release is based on the features of version 9.2.1.
-- **BREAKING** changes to the concept of dependencies.
-  - `zod` becomes a peer dependency, fixes issue #822.
-    - You need to install it manually and adjust your imports accordingly.
-  - `express` becomes a peer dependency as well.
-    - You need to install it manually.
-  - `typescript` becomes an optional peer dependency.
-    - When using a client generator, you need to install it manually.
-    - The minimal supported version is 4.9.3.
-  - Proprietary schemas are now exported under the namespace `ez`.
-    - Imports and utilization should be adjusted accordingly.
-    - Affected schemas: `file`, `dateIn`, `dateOut`, `upload`.
-  - If facing Typescript errors `TS4023` or `TS4094`, ensure disabling `declaration` option in your `tsconfig.json`.
-- **BREAKING** changes to the engines.
-  - The minimal Node version is now 14.18.0.
-- Due to switching to `tsup` builder, the file structure has changed:
-  - `/dist/index.js` — CommonJS bundle;
-  - `/dist/esm/index.js` — ESM bundle;
-  - `/dist/index.d.ts` — types declaration bundle.
 
 ```ts
 // before
@@ -2197,12 +2169,6 @@ after:
 
 ### v9.0.0
 
-- No additional changes since v9.0.0-beta4.
-  - Read the release notes on beta versions for migration strategy from v8.
-
-### v9.0.0-beta4
-
-- This release contains the feature from version [8.11.0](#v8110).
 - **BREAKING** changes:
   - `createApiResponse()` method is removed. Read the release notes to v8.11.0 for migration strategy.
 - Potentially **BREAKING** changes:
@@ -2219,14 +2185,6 @@ after:
     - `getInputMimeTypes()` —> `getMimeTypes("input")`
     - `getPositiveMimeTypes()` —> `getMimeTypes("positive")`
     - `getNegativeMimeTypes()` —> `getMimeTypes("negative")`
-
-### v9.0.0-beta3
-
-- This release contains the feature from version [8.10.0](#v8100).
-
-### v9.0.0-beta2
-
-- Potentially **BREAKING** changes:
   - Fixed problem #787, reported and resolved by [@TheWisestOne](https://github.com/TheWisestOne).
     - Validation errors thrown from within the Middlewares and Endpoint handlers unrelated to the IO do now lead to the
       status code `500` instead of `400`, when you're using the `defaultResultHandler` or `defaultEndpointsFactory`.
@@ -2242,6 +2200,15 @@ after:
       - `getMessageFromError()`,
       - `getStatusCodeFromError()`.
     - Consider using `getStatusCodeFromError()` inside your custom `ResultHandler`, or make the following changes:
+  - Fixed issue #820, reported and resolved by [@McMerph](https://github.com/McMerph).
+    - Request `body` is no longer considered as an input source for `DELETE` request.
+    - Despite the fact that this method MAY contain `body` (it's not explicitly prohibited), it's currently considered
+      a bad practice to rely on it. Also, it led to a syntax error in the generated documentation according to OpenAPI
+      3.0 specification.
+    - In case you have such Endpoints that rely on inputs collected from `DELETE` request body and want to continue,
+      add the following property to your configuration in order to keep the previous behavior without changes to your
+      implementation.
+    - Read the [customization instructions](README.md#customizing-input-sources).
 
 ```typescript
 // Your custom ResultHandler
@@ -2258,20 +2225,6 @@ const statusCode = getStatusCodeFromError(error);
 const message = getMessageFromError(error);
 response.status(statusCode);
 ```
-
-### v9.0.0-beta1
-
-- This release is based on version 8.9.4.
-- Potentially **BREAKING** changes:
-  - Fixed issue #820, reported and resolved by [@McMerph](https://github.com/McMerph).
-    - Request `body` is no longer considered as an input source for `DELETE` request.
-    - Despite the fact that this method MAY contain `body` (it's not explicitly prohibited), it's currently considered
-      a bad practice to rely on it. Also, it led to a syntax error in the generated documentation according to OpenAPI
-      3.0 specification.
-    - In case you have such Endpoints that rely on inputs collected from `DELETE` request body and want to continue,
-      add the following property to your configuration in order to keep the previous behavior without changes to your
-      implementation.
-    - Read the [customization instructions](https://github.com/RobinTail/express-zod-api#customizing-input-sources).
 
 ```yaml
 inputSources: { delete: ["body", "query", "params"] }
@@ -2694,27 +2647,12 @@ const exampleEndpoint = taggedEndpointsFactory.build({
 
 ### v8.0.0
 
+- **Breaking changes**:
+  - Removed the signature deprecated in v7.6.1:
+    - The argument of `EndpointsFactory::addMiddleware()` has to be the result of `createMiddleware()`;
+  - Only the following Node versions are supported: ^14.17.0, ^16.10.0, ^18.0.0.
 - `winston` version is 3.8.2.
-- This version is based on v8.0.0-beta3 and contains breaking changes from v8.0.0-beta1 and v8.0.0-beta2.
-  Check out the explanation of these breaking changes below in order to migrate to v8.0.0.
-
-### v8.0.0-beta3
-
-- This version includes the fix from version 7.9.2.
 - `zod` version is 3.19.0.
-
-### v8.0.0-beta2
-
-- **Breaking**: removing the signature deprecated in v7.6.1.
-  - The argument of `EndpointsFactory::addMiddleware()` has to be the result of `createMiddleware()`.
-
-### v8.0.0-beta1
-
-- This version is based on v7.9.1.
-- **Breaking**: Only the following Node versions are supported:
-  - 14.17.0 and higher,
-  - 16.10.0 and higher
-  - 18.0.0 and higher.
 - `openapi3-ts` version is 3.0.2.
 - Supporting `jest` (optional peer dependency) version 29.x.
 
@@ -3063,8 +3001,9 @@ interface After {
   - The generated client is flexibly configurable on the frontend side using an implementation function that
     directly makes requests to an endpoint using the libraries and methods of your choice.
   - The client asserts the type of request parameters and response.
-- Changes since `beta4`:
-  - Add missing headers to example implementation.
+  - Path params are excluded from `params` after being substituted.
+  - The client now accepts a function parameter of `Implementation` type.
+  - Its parameter `path` now contains substituted path params.
 
 ```typescript
 // example client-generator.ts
@@ -3093,25 +3032,6 @@ const client = new ExpressZodAPIClient(async (method, path, params) => {
 client.provide("get", "/v1/user/retrieve", { id: "10" });
 ```
 
-### v6.1.0-beta4
-
-- Path params are excluded from `params` after being substituted.
-
-### v6.1.0-beta3
-
-- The client now accepts a function parameter of `Implementation` type.
-  - Its parameter `path` now contains substituted path params.
-
-### v6.1.0-beta2
-
-- Fixing bugs and taking into account path params.
-
-### v6.1.0-beta1
-
-- This is a beta release of a new feature for public testing.
-- Feature #403: API Client Generator.
-  - More details coming soon.
-
 ### v6.0.3
 
 - `zod` version is 3.14.4.
@@ -3135,6 +3055,13 @@ client.provide("get", "/v1/user/retrieve", { id: "10" });
   - You cannot use the `.strict()`, `.passthrough()` and its deprecated alias `.nonstrict()` methods in middlewares.
   - Only `.strip()` is allowed in middlewares, which is actually default, so you should not use any of them at all.
   - Replace the `z.date()` with `z.dateIn()` in input schema and with `z.dateOut()` in output schema.
+- Also, improvements have been made to the `EndpointsFactory`, in terms of combining the input schemas of
+  middlewares and the endpoint itself. A custom type has been replaced with usage of `ZodIntersection` schema with
+  respect to the originals.
+- The generated documentation has improved in this regard:
+  - Previously, fields from an object union were documented in a simplified way as optional.
+  - Instead, it is now documented using `oneOf` OpenAPI notation.
+- In addition, you can now also use the new `z.discriminatedUnion()` as the input schema on the top level.
 
 ```typescript
 // how to migrate
@@ -3148,18 +3075,6 @@ export const myMiddleware = createMiddleware({
   middleware: async () => ({...}),
 });
 ```
-
-## Version 5
-
-### v5.9.0-beta1
-
-- In this build, improvements have been made to the `EndpointsFactory`, in terms of combining the input schemas of
-  middlewares and the endpoint itself. A custom type has been replaced with usage of `ZodIntersection` schema with
-  respect to the originals.
-- The generated documentation has improved in this regard:
-  - Previously, fields from an object union were documented in a simplified way as optional.
-  - Instead, it is now documented using `oneOf` OpenAPI notation.
-- In addition, you can now also use the new `z.discriminatedUnion()` as the input schema on the top level.
 
 ```typescript
 // example
@@ -3183,6 +3098,8 @@ const endpoint = defaultEndpointsFactory.build({
   }
 });
 ```
+
+## Version 5
 
 ### v5.8.0
 
@@ -3254,10 +3171,6 @@ const advancedUsage = defaultEndpointsFactory.use(auth(), {
 
 ### v5.5.0
 
-- No changes.
-
-### v5.5.0-beta1
-
 - `z.date()` is deprecated for using within IO schemas of your API.
 - Feature #297: `z.dateIn()` and `z.dateOut()` schemas.
   - Since `Date` cannot be passed directly in JSON format, attempting to return `Date` from the endpoint handler
@@ -3299,10 +3212,6 @@ const updateUserEndpoint = defaultEndpointsFactory.build({
   [recommendations](https://expressjs.com/en/advanced/best-practice-security.html).
 
 ### v5.4.1
-
-- No changes.
-
-### v5.4.1-beta1
 
 - Listing the following types as the regular dependencies since certain exported methods refer to them:
   `@types/compression, @types/express, @types/express-fileupload, @types/http-errors, @types/node`.
@@ -3381,14 +3290,6 @@ const routing: Routing = {
 
 ### v5.1.0
 
-- No changes.
-
-### v5.1.0-beta2
-
-- Fixing a warning message when using `testEndpoint()` method.
-
-### v5.1.0-beta1
-
 - Feature #252: a helper method for testing your endpoints: `testEndpoint()`.
   - Requires `jest` (and optionally `@types/jest`) to be installed.
   - The method helps to mock the request, response, config and logger required to execute the endpoint.
@@ -3417,14 +3318,10 @@ test("should respond successfully", async () => {
 
 ### v5.0.0
 
-- No changes.
-
-### v5.0.0-beta1
-
-- The ability to configure and run an additional HTTPS server to process requests over a secure protocol.
-- This option is only available when using `createServer()` method.
 - **Breaking changes**: Instead of HTTP Server the method `createServer()` now returns an object with the following
   entities: `app, httpServer, httpsServer, logger`.
+- Feat: the ability to configure and run an additional HTTPS server to process requests over a secure protocol:
+  - This option is only available when using `createServer()` method.
 - New configuration option `https`:
 
 ```typescript
@@ -3561,14 +3458,6 @@ const newInputSourcesByDefault: InputSources = {
 ```
 
 ### v3.0.0
-
-- No changes. [November 20](https://en.wikipedia.org/wiki/Transgender_Day_of_Remembrance) release.
-
-### v3.0.0-beta2
-
-- No changes. Compiled using the recently released Typescript 4.5.2.
-
-### v3.0.0-beta1
 
 - **Warning**: There are breaking changes described below:
   - Minimum compatible Node version changed from ~~10~~ to 12.
@@ -3986,34 +3875,6 @@ const fileStreamingEndpointsFactoryAfter = new EndpointsFactory(
 
 ### v2.0.0
 
-- First stable release of the v2.
-- All dependencies are up-to-date.
-- Minor changes of response descriptions in OpenAPI / Swagger documentation generator.
-
-### v2.0.0-beta4
-
-- The code has not been changed from the previous version.
-- I've added the [Security policy](https://github.com/RobinTail/express-zod-api/blob/master/SECURITY.md).
-- The last thing that still confuses me is the naming of the `getPositiveResponse` and `getNegativeResponse` properties
-  of `ResultHandlerDefinition`. The first of which has to be a method, since it depends on the output of the `Endpoint`,
-  and the second, although it shouldn't, I made it this way for consistency.
-- In any case, my idea for a stable release of the second version in a week has now been formed, but if you have any
-  feedback, suggestions, recommendations, complaints, please let me know. I've added a
-  [section](https://github.com/RobinTail/express-zod-api#your-input-to-my-output) to the Readme file on how to do this.
-
-### v2.0.0-beta3
-
-- Some private methods have been made "really private" using the new typescript hashtag syntax.
-- Fixed `EndpointOutput<>` type helper for the non-object response type in the `ResultHandlerDefinition`.
-
-### v2.0.0-beta2
-
-- Zod version is 3.5.1.
-- Better examples including a custom `ResultHandler` and a file download.
-- Fixed a bug of incorrect `getPositiveMimeTypes()` and `getNegativeMimeTypes()` usage in Swagger docs generator.
-
-### v2.0.0-beta1
-
 - **Warning**: There are breaking changes described below.
   In general, if you used the `defaultResultHandler` before, then you won't have to change much of code.
 - **Motivation**. I really like the first version of the library for its simplicity and elegance,
@@ -4023,9 +3884,31 @@ const fileStreamingEndpointsFactoryAfter = new EndpointsFactory(
   complicated, but I found it important. However, it brought a number of benefits, which are also described below.
 - Node version required: at least `10.0.0` and the library target now is `ES6`.
 - Type `ResultHandler` is no longer exported, please use `createResultHandler()` or `defaultResultHandler`.
+- The optional property `resultHandler` of `ConfigType` has been replaced with `errorHandler`.
 - The `setResultHandler()` method of `EndpointsFactory` class has been removed. The `ResultHandlerDefinition` has
   to be specified as an argument of `EndpointsFactory` constructor. You can use `defaultResultHandler` or
   `createResultHandler()` for this, or you can use `defaultEndpointsFactory`.
+- Added the [Security policy](SECURITY.md).
+- Some private methods have been made "entirely private" using the new typescript hashtag syntax.
+- New methods of `Endpoint` class `getPositiveResponseSchema()` and `getNegativeResponseSchema()` return the
+  complete response of the endpoint taking into account the `ResultHandlerDefinition` schemas.
+  New methods: `getPositiveMimeTypes()` and `getNegativeMimeTypes()` return the array of mime types.
+- New type helping utility: `EndpointResponse<E extends AbstractEndpoint>` to be used instead of `EndpointOutput`
+  returns the complete type of the endpoint response including both positive and negative cases.
+- Fixed `EndpointOutput<>` type helper for the non-object response type in the `ResultHandlerDefinition`.
+- Zod version is 3.5.1.
+- Better examples including a custom `ResultHandler` and a file download.
+- Obtaining the OpenAPI / Swagger specification has been simplified: now you can call `getSpecAsYaml()` method
+  directly on `OpenAPI` class instance. There is also a new option `errorResponseDescription`.
+- Fixed a bug of incorrect `getPositiveMimeTypes()` and `getNegativeMimeTypes()` usage in Swagger docs generator.
+- OpenAPI / Swagger specification no longer uses references for schemas and parameters, so they are inline now.
+  Instead of `default` entry in `responses` there are HTTP status codes `200` and `400` that represent positive
+  and negative responses accordingly. Response schemas are now complete as well.
+- For creating your own `ResultHandlerDefinition` please use `createResultHandler()`. It also requires
+  `createApiResponse()` to be used that takes a response schema and optional mime types as arguments.
+  The endpoint output should be wrapped in `markOutput()`. So far this is the only way I have come up with to
+  facilitate type inference with essentially double nesting of generic types. Typescript does not yet support such
+  features as `MyGenericType<A<B>>`.
 
 ```typescript
 // before
@@ -4036,20 +3919,12 @@ export const endpointsFactoryAfter = new EndpointsFactory(defaultResultHandler);
 import { defaultEndpointsFactory } from "express-zod-api";
 ```
 
-- The optional property `resultHandler` of `ConfigType` has been replaced with `errorHandler`.
-
 ```typescript
 // before
 resultHandler: ResultHandler; // optional
 // after
 errorHandler: ResultHandlerDefinition<any, any>; // optional, default: defaultResultHandler
 ```
-
-- New methods of `Endpoint` class `getPositiveResponseSchema()` and `getNegativeResponseSchema()` return the
-  complete response of the endpoint taking into account the `ResultHandlerDefinition` schemas.
-  New methods: `getPositiveMimeTypes()` and `getNegativeMimeTypes()` return the array of mime types.
-- New type helping utility: `EndpointResponse<E extends AbstractEndpoint>` to be used instead of `EndpointOutput`
-  returns the complete type of the endpoint response including both positive and negative cases.
 
 ```typescript
 // Example. Before (v1):
@@ -4094,9 +3969,6 @@ type MyEndpointResponse = EndpointResponse<typeof myEndpointV2>; // => the follo
 //  }
 ```
 
-- Obtaining the OpenAPI / Swagger specification has been simplified: now you can call `getSpecAsYaml()` method
-  directly on `OpenAPI` class instance. There is also a new option `errorResponseDescription`.
-
 ```typescript
 // before
 new OpenAPI({
@@ -4107,15 +3979,6 @@ new OpenAPI({
   /* ... */
 }).getSpecAsYaml();
 ```
-
-- OpenAPI / Swagger specification no longer uses references for schemas and parameters, so they are inline now.
-  Instead of `default` entry in `responses` there are HTTP status codes `200` and `400` that represent positive
-  and negative responses accordingly. Response schemas are now complete as well.
-- For creating your own `ResultHandlerDefinition` please use `createResultHandler()`. It also requires
-  `createApiResponse()` to be used that takes a response schema and optional mime types as arguments.
-  The endpoint output should be wrapped in `markOutput()`. So far this is the only way I have come up with to
-  facilitate type inference with essentially double nesting of generic types. Typescript does not yet support such
-  features as `MyGenericType<A<B>>`.
 
 ```typescript
 // before
@@ -4369,7 +4232,7 @@ new OpenAPI().builder.getSpecAsYaml();
 
 - Refactoring of Endpoint::execute() method.
 
-### v0.2.3 & v0.2.2
+### v0.2.2
 
 - First published release.
 - Zod version is v3.0.0-alpha4.
