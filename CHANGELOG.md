@@ -2017,7 +2017,6 @@ after:
 
 ### v10.0.0
 
-- Fixed DTS path for ESM in package.json.
 - **BREAKING** changes:
   - `Client::constructor()` now requires an object argument having `routing` property.
   - The feature method `withMeta` _(introduced in v2.1.0)_ used to mutate its argument (`zod` schema) in order to
@@ -2648,8 +2647,9 @@ const exampleEndpoint = taggedEndpointsFactory.build({
 
 ### v8.0.0
 
-- **Breaking**: removing the signature deprecated in v7.6.1.
-  - The argument of `EndpointsFactory::addMiddleware()` has to be the result of `createMiddleware()`;
+- **Breaking changes**: 
+  - Removed the signature deprecated in v7.6.1:
+    - The argument of `EndpointsFactory::addMiddleware()` has to be the result of `createMiddleware()`;
   - Only the following Node versions are supported: ^14.17.0, ^16.10.0, ^18.0.0.
 - `winston` version is 3.8.2.
 - `zod` version is 3.19.0.
@@ -3295,7 +3295,6 @@ const routing: Routing = {
   - The method helps to mock the request, response, config and logger required to execute the endpoint.
   - The method executes the endpoint and returns the created mocks.
   - After that you only need to assert your expectations in the test.
-- Fixed a warning message when using `testEndpoint()` method.
 
 ```typescript
 import { testEndpoint } from "express-zod-api";
@@ -3321,8 +3320,8 @@ test("should respond successfully", async () => {
 
 - **Breaking changes**: Instead of HTTP Server the method `createServer()` now returns an object with the following
   entities: `app, httpServer, httpsServer, logger`.
-- The ability to configure and run an additional HTTPS server to process requests over a secure protocol.
-- This option is only available when using `createServer()` method.
+- Feat: the ability to configure and run an additional HTTPS server to process requests over a secure protocol:
+  - This option is only available when using `createServer()` method.
 - New configuration option `https`:
 
 ```typescript
@@ -3889,8 +3888,6 @@ const fileStreamingEndpointsFactoryAfter = new EndpointsFactory(
 - The `setResultHandler()` method of `EndpointsFactory` class has been removed. The `ResultHandlerDefinition` has
   to be specified as an argument of `EndpointsFactory` constructor. You can use `defaultResultHandler` or
   `createResultHandler()` for this, or you can use `defaultEndpointsFactory`.
-- Minor changes of response descriptions in OpenAPI / Swagger documentation generator.
-- The code has not been changed from the previous version.
 - Added the [Security policy](SECURITY.md).
 - Some private methods have been made "entirely private" using the new typescript hashtag syntax.
 - New methods of `Endpoint` class `getPositiveResponseSchema()` and `getNegativeResponseSchema()` return the
