@@ -3986,34 +3986,6 @@ const fileStreamingEndpointsFactoryAfter = new EndpointsFactory(
 
 ### v2.0.0
 
-- First stable release of the v2.
-- All dependencies are up-to-date.
-- Minor changes of response descriptions in OpenAPI / Swagger documentation generator.
-
-### v2.0.0-beta4
-
-- The code has not been changed from the previous version.
-- I've added the [Security policy](https://github.com/RobinTail/express-zod-api/blob/master/SECURITY.md).
-- The last thing that still confuses me is the naming of the `getPositiveResponse` and `getNegativeResponse` properties
-  of `ResultHandlerDefinition`. The first of which has to be a method, since it depends on the output of the `Endpoint`,
-  and the second, although it shouldn't, I made it this way for consistency.
-- In any case, my idea for a stable release of the second version in a week has now been formed, but if you have any
-  feedback, suggestions, recommendations, complaints, please let me know. I've added a
-  [section](https://github.com/RobinTail/express-zod-api#your-input-to-my-output) to the Readme file on how to do this.
-
-### v2.0.0-beta3
-
-- Some private methods have been made "really private" using the new typescript hashtag syntax.
-- Fixed `EndpointOutput<>` type helper for the non-object response type in the `ResultHandlerDefinition`.
-
-### v2.0.0-beta2
-
-- Zod version is 3.5.1.
-- Better examples including a custom `ResultHandler` and a file download.
-- Fixed a bug of incorrect `getPositiveMimeTypes()` and `getNegativeMimeTypes()` usage in Swagger docs generator.
-
-### v2.0.0-beta1
-
 - **Warning**: There are breaking changes described below.
   In general, if you used the `defaultResultHandler` before, then you won't have to change much of code.
 - **Motivation**. I really like the first version of the library for its simplicity and elegance,
@@ -4023,9 +3995,33 @@ const fileStreamingEndpointsFactoryAfter = new EndpointsFactory(
   complicated, but I found it important. However, it brought a number of benefits, which are also described below.
 - Node version required: at least `10.0.0` and the library target now is `ES6`.
 - Type `ResultHandler` is no longer exported, please use `createResultHandler()` or `defaultResultHandler`.
+- The optional property `resultHandler` of `ConfigType` has been replaced with `errorHandler`.
 - The `setResultHandler()` method of `EndpointsFactory` class has been removed. The `ResultHandlerDefinition` has
   to be specified as an argument of `EndpointsFactory` constructor. You can use `defaultResultHandler` or
   `createResultHandler()` for this, or you can use `defaultEndpointsFactory`.
+- Minor changes of response descriptions in OpenAPI / Swagger documentation generator.
+- The code has not been changed from the previous version.
+- Added the [Security policy](SECURITY.md).
+- Some private methods have been made "entirely private" using the new typescript hashtag syntax.
+- New methods of `Endpoint` class `getPositiveResponseSchema()` and `getNegativeResponseSchema()` return the
+  complete response of the endpoint taking into account the `ResultHandlerDefinition` schemas.
+  New methods: `getPositiveMimeTypes()` and `getNegativeMimeTypes()` return the array of mime types.
+- New type helping utility: `EndpointResponse<E extends AbstractEndpoint>` to be used instead of `EndpointOutput`
+  returns the complete type of the endpoint response including both positive and negative cases.
+- Fixed `EndpointOutput<>` type helper for the non-object response type in the `ResultHandlerDefinition`.
+- Zod version is 3.5.1.
+- Better examples including a custom `ResultHandler` and a file download.
+- Obtaining the OpenAPI / Swagger specification has been simplified: now you can call `getSpecAsYaml()` method
+  directly on `OpenAPI` class instance. There is also a new option `errorResponseDescription`.
+- Fixed a bug of incorrect `getPositiveMimeTypes()` and `getNegativeMimeTypes()` usage in Swagger docs generator.
+- OpenAPI / Swagger specification no longer uses references for schemas and parameters, so they are inline now.
+  Instead of `default` entry in `responses` there are HTTP status codes `200` and `400` that represent positive
+  and negative responses accordingly. Response schemas are now complete as well.
+- For creating your own `ResultHandlerDefinition` please use `createResultHandler()`. It also requires
+  `createApiResponse()` to be used that takes a response schema and optional mime types as arguments.
+  The endpoint output should be wrapped in `markOutput()`. So far this is the only way I have come up with to
+  facilitate type inference with essentially double nesting of generic types. Typescript does not yet support such
+  features as `MyGenericType<A<B>>`.
 
 ```typescript
 // before
@@ -4036,20 +4032,12 @@ export const endpointsFactoryAfter = new EndpointsFactory(defaultResultHandler);
 import { defaultEndpointsFactory } from "express-zod-api";
 ```
 
-- The optional property `resultHandler` of `ConfigType` has been replaced with `errorHandler`.
-
 ```typescript
 // before
 resultHandler: ResultHandler; // optional
 // after
 errorHandler: ResultHandlerDefinition<any, any>; // optional, default: defaultResultHandler
 ```
-
-- New methods of `Endpoint` class `getPositiveResponseSchema()` and `getNegativeResponseSchema()` return the
-  complete response of the endpoint taking into account the `ResultHandlerDefinition` schemas.
-  New methods: `getPositiveMimeTypes()` and `getNegativeMimeTypes()` return the array of mime types.
-- New type helping utility: `EndpointResponse<E extends AbstractEndpoint>` to be used instead of `EndpointOutput`
-  returns the complete type of the endpoint response including both positive and negative cases.
 
 ```typescript
 // Example. Before (v1):
@@ -4094,9 +4082,6 @@ type MyEndpointResponse = EndpointResponse<typeof myEndpointV2>; // => the follo
 //  }
 ```
 
-- Obtaining the OpenAPI / Swagger specification has been simplified: now you can call `getSpecAsYaml()` method
-  directly on `OpenAPI` class instance. There is also a new option `errorResponseDescription`.
-
 ```typescript
 // before
 new OpenAPI({
@@ -4107,15 +4092,6 @@ new OpenAPI({
   /* ... */
 }).getSpecAsYaml();
 ```
-
-- OpenAPI / Swagger specification no longer uses references for schemas and parameters, so they are inline now.
-  Instead of `default` entry in `responses` there are HTTP status codes `200` and `400` that represent positive
-  and negative responses accordingly. Response schemas are now complete as well.
-- For creating your own `ResultHandlerDefinition` please use `createResultHandler()`. It also requires
-  `createApiResponse()` to be used that takes a response schema and optional mime types as arguments.
-  The endpoint output should be wrapped in `markOutput()`. So far this is the only way I have come up with to
-  facilitate type inference with essentially double nesting of generic types. Typescript does not yet support such
-  features as `MyGenericType<A<B>>`.
 
 ```typescript
 // before
@@ -4369,7 +4345,7 @@ new OpenAPI().builder.getSpecAsYaml();
 
 - Refactoring of Endpoint::execute() method.
 
-### v0.2.3 & v0.2.2
+### v0.2.2
 
 - First published release.
 - Zod version is v3.0.0-alpha4.
