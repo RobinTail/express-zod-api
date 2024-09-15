@@ -3135,6 +3135,13 @@ client.provide("get", "/v1/user/retrieve", { id: "10" });
   - You cannot use the `.strict()`, `.passthrough()` and its deprecated alias `.nonstrict()` methods in middlewares.
   - Only `.strip()` is allowed in middlewares, which is actually default, so you should not use any of them at all.
   - Replace the `z.date()` with `z.dateIn()` in input schema and with `z.dateOut()` in output schema.
+- Also, improvements have been made to the `EndpointsFactory`, in terms of combining the input schemas of
+  middlewares and the endpoint itself. A custom type has been replaced with usage of `ZodIntersection` schema with
+  respect to the originals.
+- The generated documentation has improved in this regard:
+  - Previously, fields from an object union were documented in a simplified way as optional.
+  - Instead, it is now documented using `oneOf` OpenAPI notation.
+- In addition, you can now also use the new `z.discriminatedUnion()` as the input schema on the top level.
 
 ```typescript
 // how to migrate
@@ -3148,18 +3155,6 @@ export const myMiddleware = createMiddleware({
   middleware: async () => ({...}),
 });
 ```
-
-## Version 5
-
-### v5.9.0-beta1
-
-- In this build, improvements have been made to the `EndpointsFactory`, in terms of combining the input schemas of
-  middlewares and the endpoint itself. A custom type has been replaced with usage of `ZodIntersection` schema with
-  respect to the originals.
-- The generated documentation has improved in this regard:
-  - Previously, fields from an object union were documented in a simplified way as optional.
-  - Instead, it is now documented using `oneOf` OpenAPI notation.
-- In addition, you can now also use the new `z.discriminatedUnion()` as the input schema on the top level.
 
 ```typescript
 // example
@@ -3183,6 +3178,8 @@ const endpoint = defaultEndpointsFactory.build({
   }
 });
 ```
+
+## Version 5
 
 ### v5.8.0
 
@@ -3254,10 +3251,6 @@ const advancedUsage = defaultEndpointsFactory.use(auth(), {
 
 ### v5.5.0
 
-- No changes.
-
-### v5.5.0-beta1
-
 - `z.date()` is deprecated for using within IO schemas of your API.
 - Feature #297: `z.dateIn()` and `z.dateOut()` schemas.
   - Since `Date` cannot be passed directly in JSON format, attempting to return `Date` from the endpoint handler
@@ -3299,10 +3292,6 @@ const updateUserEndpoint = defaultEndpointsFactory.build({
   [recommendations](https://expressjs.com/en/advanced/best-practice-security.html).
 
 ### v5.4.1
-
-- No changes.
-
-### v5.4.1-beta1
 
 - Listing the following types as the regular dependencies since certain exported methods refer to them:
   `@types/compression, @types/express, @types/express-fileupload, @types/http-errors, @types/node`.
@@ -3381,19 +3370,12 @@ const routing: Routing = {
 
 ### v5.1.0
 
-- No changes.
-
-### v5.1.0-beta2
-
-- Fixing a warning message when using `testEndpoint()` method.
-
-### v5.1.0-beta1
-
 - Feature #252: a helper method for testing your endpoints: `testEndpoint()`.
   - Requires `jest` (and optionally `@types/jest`) to be installed.
   - The method helps to mock the request, response, config and logger required to execute the endpoint.
   - The method executes the endpoint and returns the created mocks.
   - After that you only need to assert your expectations in the test.
+- Fixed a warning message when using `testEndpoint()` method.
 
 ```typescript
 import { testEndpoint } from "express-zod-api";
@@ -3417,14 +3399,10 @@ test("should respond successfully", async () => {
 
 ### v5.0.0
 
-- No changes.
-
-### v5.0.0-beta1
-
-- The ability to configure and run an additional HTTPS server to process requests over a secure protocol.
-- This option is only available when using `createServer()` method.
 - **Breaking changes**: Instead of HTTP Server the method `createServer()` now returns an object with the following
   entities: `app, httpServer, httpsServer, logger`.
+- The ability to configure and run an additional HTTPS server to process requests over a secure protocol.
+- This option is only available when using `createServer()` method.
 - New configuration option `https`:
 
 ```typescript
