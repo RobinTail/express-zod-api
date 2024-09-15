@@ -3562,14 +3562,6 @@ const newInputSourcesByDefault: InputSources = {
 
 ### v3.0.0
 
-- No changes. [November 20](https://en.wikipedia.org/wiki/Transgender_Day_of_Remembrance) release.
-
-### v3.0.0-beta2
-
-- No changes. Compiled using the recently released Typescript 4.5.2.
-
-### v3.0.0-beta1
-
 - **Warning**: There are breaking changes described below:
   - Minimum compatible Node version changed from ~~10~~ to 12.
   - The exports map restricts the possibility to import/require the package files to the entry points only.
