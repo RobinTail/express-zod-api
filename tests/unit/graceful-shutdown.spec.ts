@@ -122,34 +122,22 @@ describe("graceful()", () => {
           await setTimeout(50);
           res.end("baz");
         });
-
       const [httpServer, port] = await makeServer(handler);
-
       const terminator = graceful({
         gracefulTerminationTimeout: 150,
         server: httpServer,
       });
-
       const dispatcher = new Agent({ pipelining: 5, keepAliveTimeout: 5e3 });
       const request0 = fetch(`http://localhost:${port}`, { dispatcher });
-
       await setTimeout(50);
-
       void terminator.terminate();
-
       const request1 = fetch(`http://localhost:${port}`, { dispatcher });
-
       await setTimeout(50);
-
       expect(handler).toHaveBeenCalledTimes(2);
-
       const response0 = await request0;
-
       expect(response0.headers.get("connection")).toBe("keep-alive");
       await expect(response0.text()).resolves.toBe("foobar");
-
       const response1 = await request1;
-
       expect(response1.headers.get("connection")).toBe("close");
       await expect(response1.text()).resolves.toBe("baz");
     },
@@ -159,21 +147,16 @@ describe("graceful()", () => {
     const [httpServer, port] = await makeServer(({}, res) => {
       res.end("foo");
     });
-
     const terminator = graceful({
       gracefulTerminationTimeout: 150,
       server: httpServer,
     });
-
     await fetch(`http://localhost:${port}`, {
       headers: { connection: "close" },
     });
-
     await setTimeout(50);
-
     expect(terminator.sockets.size).toBe(0);
     expect(terminator.secureSockets.size).toBe(0);
-
     await terminator.terminate();
   });
 });
