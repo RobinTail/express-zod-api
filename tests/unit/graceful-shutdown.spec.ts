@@ -48,41 +48,33 @@ describe("graceful()", () => {
       await expect(getConnections(httpServer)).resolves.toBe(0);
     },
   );
+
+  test(
+    "server stops accepting new connections after terminator.terminate() is called",
+    { timeout: 500 },
+    async () => {
+      const httpServer = await makeServer(async ({}, res) => {
+        await setTimeout(100);
+        res.end("foo");
+      });
+      const terminator = graceful({
+        gracefulTerminationTimeout: 150,
+        server: httpServer,
+      });
+      const request0 = fetch("http://localhost:3000");
+      await setTimeout(50);
+      void terminator.terminate();
+      await setTimeout(50);
+      const request1 = fetch("http://localhost:3000");
+      await expect(request1).rejects.toThrowError();
+      const response0 = await request0;
+      expect(response0.headers.get("connection")).toBe("close");
+      await expect(response0.text()).resolves.toBe("foo");
+    },
+  );
 });
 
 /*
-test("server stops accepting new connections after terminator.terminate() is called", async (t) => {
-  t.timeout(500);
-
-  const httpServer = await createHttpServer((serverResponse) => {
-    setTimeout(() => {
-      serverResponse.end("foo");
-    }, 100);
-  });
-
-  const terminator = createInternalHttpTerminator({
-    gracefulTerminationTimeout: 150,
-    server: httpServer.server,
-  });
-
-  const request0 = fetch(httpServer.url);
-
-  await setTimeout(50);
-
-  void terminator.terminate();
-
-  await setTimeout(50);
-
-  const request1 = fetch(httpServer.url);
-
-  await t.throwsAsync(request1);
-
-  const response0 = await request0;
-
-  t.is(response0.headers.connection, "close");
-  t.is(response0.body, "foo");
-});
-
 test("ongoing requests receive {connection: close} header", async (t) => {
   t.timeout(500);
 
