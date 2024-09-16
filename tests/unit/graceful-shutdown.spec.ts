@@ -115,7 +115,7 @@ describe("graceful()", () => {
           res.end("bar");
         })
         .mockImplementationOnce(async ({}, res) => {
-          // @todo Unable to intercept the response without the delay.
+          // Unable to intercept the response without the delay.
           // When `end()` is called immediately, the `request` event
           // already has `headersSent=true`. It is unclear how to intercept
           // the response beforehand.
@@ -159,40 +159,32 @@ describe("graceful()", () => {
     expect(terminator.secureSockets.size).toBe(0);
     await terminator.terminate();
   });
+
+  test(
+    "closes immediately after in-flight connections are closed (#16)",
+    { timeout: 1e3 },
+    async () => {
+      const spy = vi.fn<RequestListener>(async ({}, res) => {
+        await setTimeout(100);
+        res.end("foo");
+      });
+      const [httpServer, port] = await makeServer(spy);
+      expect(httpServer.listening).toBeTruthy();
+      const terminator = graceful({
+        gracefulTerminationTimeout: 500,
+        server: httpServer,
+      });
+      void fetch(`http://localhost:${port}`, {
+        headers: { connection: "close" },
+      });
+      await setTimeout(50);
+      await expect(getConnections(httpServer)).resolves.toBe(1);
+      void terminator.terminate();
+      // Wait for serverResponse.end to be called, plus a few extra ms for the
+      // terminator to finish polling in-flight connections. (Do not, however, wait
+      // long enough to trigger graceful termination.)
+      await setTimeout(75);
+      await expect(getConnections(httpServer)).resolves.toBe(0);
+    },
+  );
 });
-
-/*
-test("closes immediately after in-flight connections are closed (#16)", async (t) => {
-  t.timeout(1_000);
-
-  const spy = sinon.spy((serverResponse) => {
-    setTimeout(() => {
-      serverResponse.end("foo");
-    }, 100);
-  });
-
-  const httpServer = await createHttpServer(spy);
-
-  t.true(httpServer.server.listening);
-
-  const terminator = createInternalHttpTerminator({
-    gracefulTerminationTimeout: 500,
-    server: httpServer.server,
-  });
-
-  fetch(httpServer.url);
-
-  await setTimeout(50);
-
-  t.is(await httpServer.getConnections(), 1);
-
-  void terminator.terminate();
-
-  // Wait for serverResponse.end to be called, plus a few extra ms for the
-  // terminator to finish polling in-flight connections. (Do not, however, wait
-  // long enough to trigger graceful termination.)
-  await setTimeout(75);
-
-  t.is(await httpServer.getConnections(), 0);
-});
-*/
