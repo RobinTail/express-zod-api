@@ -67,7 +67,7 @@ export const graceful = ({
     }
   };
 
-  const terminate = async () => {
+  const shutdown = async () => {
     if (terminating) {
       logger?.warn("Already terminating HTTP server");
       return terminating;
@@ -152,6 +152,6 @@ export const graceful = ({
   return {
     secureSockets,
     sockets,
-    terminate,
+    shutdown,
   };
 };

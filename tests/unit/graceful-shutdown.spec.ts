@@ -42,7 +42,7 @@ describe("graceful()", () => {
       const [httpServer] = await makeHttpServer(vi.fn());
       expect(httpServer.listening).toBeTruthy();
       const terminator = graceful({ server: httpServer });
-      await terminator.terminate();
+      await terminator.shutdown();
       expect(httpServer.listening).toBeFalsy();
     },
   );
@@ -62,7 +62,7 @@ describe("graceful()", () => {
       }).catch(vi.fn());
       await setTimeout(50);
       expect(handler).toHaveBeenCalled();
-      void terminator.terminate();
+      void terminator.shutdown();
       await setTimeout(100);
       await expect(getConnections(httpServer)).resolves.toBe(1);
       await setTimeout(100);
@@ -86,7 +86,7 @@ describe("graceful()", () => {
         headers: { connection: "close" },
       });
       await setTimeout(50);
-      void terminator.terminate();
+      void terminator.shutdown();
       await setTimeout(50);
       const request1 = fetch(`http://localhost:${port}`, {
         headers: { connection: "close" },
@@ -112,7 +112,7 @@ describe("graceful()", () => {
       });
       const request = fetch(`http://localhost:${port}`, { keepalive: true });
       await setTimeout(50);
-      void terminator.terminate();
+      void terminator.shutdown();
       const response = await request;
       expect(response.headers.get("connection")).toBe("close");
       await expect(response.text()).resolves.toBe("foo");
@@ -146,7 +146,7 @@ describe("graceful()", () => {
       const dispatcher = new Agent({ pipelining: 5, keepAliveTimeout: 5e3 });
       const request0 = fetch(`http://localhost:${port}`, { dispatcher });
       await setTimeout(50);
-      void terminator.terminate();
+      void terminator.shutdown();
       const request1 = fetch(`http://localhost:${port}`, { dispatcher });
       await setTimeout(50);
       expect(handler).toHaveBeenCalledTimes(2);
@@ -173,7 +173,7 @@ describe("graceful()", () => {
     await setTimeout(50);
     expect(terminator.sockets.size).toBe(0);
     expect(terminator.secureSockets.size).toBe(0);
-    await terminator.terminate();
+    await terminator.shutdown();
   });
 
   test(
@@ -198,7 +198,7 @@ describe("graceful()", () => {
 
       expect(terminator.secureSockets.size).toBe(0);
 
-      await terminator.terminate();
+      await terminator.shutdown();
     },
   );
 
@@ -221,7 +221,7 @@ describe("graceful()", () => {
       });
       await setTimeout(50);
       await expect(getConnections(httpServer)).resolves.toBe(1);
-      void terminator.terminate();
+      void terminator.shutdown();
       // Wait for serverResponse.end to be called, plus a few extra ms for the
       // terminator to finish polling in-flight connections. (Do not, however, wait
       // long enough to trigger graceful termination.)
