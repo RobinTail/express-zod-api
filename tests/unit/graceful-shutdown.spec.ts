@@ -1,12 +1,15 @@
 import { setTimeout } from "node:timers/promises";
 import http, { RequestListener } from "node:http";
+import { Agent } from "undici";
 import { graceful } from "../../src/graceful-shutdown";
+import { givePort } from "../helpers";
 
 describe("graceful()", () => {
   const makeServer = (handler: RequestListener) =>
-    new Promise<http.Server>((resolve) => {
+    new Promise<[http.Server, number]>((resolve) => {
       const subject = http.createServer(handler);
-      subject.listen(3000, () => resolve(subject));
+      const port = givePort();
+      subject.listen(port, () => resolve([subject, port]));
     });
 
   const getConnections = (server: http.Server) =>
@@ -20,7 +23,7 @@ describe("graceful()", () => {
     "terminates HTTP server with no connections",
     { timeout: 100 },
     async () => {
-      const httpServer = await makeServer(vi.fn());
+      const [httpServer] = await makeServer(vi.fn());
       expect(httpServer.listening).toBeTruthy();
       const terminator = graceful({ server: httpServer });
       await terminator.terminate();
@@ -33,12 +36,12 @@ describe("graceful()", () => {
     { timeout: 500 },
     async () => {
       const handler = vi.fn();
-      const httpServer = await makeServer(handler);
+      const [httpServer, port] = await makeServer(handler);
       const terminator = graceful({
         gracefulTerminationTimeout: 150,
         server: httpServer,
       });
-      void fetch("http://localhost:3000").catch(vi.fn());
+      void fetch(`http://localhost:${port}`).catch(vi.fn());
       await setTimeout(50);
       expect(handler).toHaveBeenCalled();
       void terminator.terminate();
@@ -53,7 +56,7 @@ describe("graceful()", () => {
     "server stops accepting new connections after terminator.terminate() is called",
     { timeout: 500 },
     async () => {
-      const httpServer = await makeServer(async ({}, res) => {
+      const [httpServer, port] = await makeServer(async ({}, res) => {
         await setTimeout(100);
         res.end("foo");
       });
@@ -61,11 +64,11 @@ describe("graceful()", () => {
         gracefulTerminationTimeout: 150,
         server: httpServer,
       });
-      const request0 = fetch("http://localhost:3000");
+      const request0 = fetch(`http://localhost:${port}`);
       await setTimeout(50);
       void terminator.terminate();
       await setTimeout(50);
-      const request1 = fetch("http://localhost:3000");
+      const request1 = fetch(`http://localhost:${port}`);
       await expect(request1).rejects.toThrowError();
       const response0 = await request0;
       expect(response0.headers.get("connection")).toBe("close");
@@ -77,7 +80,7 @@ describe("graceful()", () => {
     "ongoing requests receive {connection: close} header",
     { timeout: 500 },
     async () => {
-      const httpServer = await makeServer(async ({}, res) => {
+      const [httpServer, port] = await makeServer(async ({}, res) => {
         await setTimeout(100);
         res.end("foo");
       });
@@ -85,7 +88,7 @@ describe("graceful()", () => {
         gracefulTerminationTimeout: 150,
         server: httpServer,
       });
-      const request = fetch("http://localhost:3000", { keepalive: true });
+      const request = fetch(`http://localhost:${port}`, { keepalive: true });
       await setTimeout(50);
       void terminator.terminate();
       const response = await request;
@@ -93,62 +96,61 @@ describe("graceful()", () => {
       await expect(response.text()).resolves.toBe("foo");
     },
   );
+
+  test(
+    "ongoing requests receive {connection: close} header (new request reusing an existing socket)",
+    { timeout: 1e3 },
+    async () => {
+      const handler = vi
+        .fn<RequestListener>()
+        .mockImplementationOnce(async ({}, res) => {
+          res.write("foo");
+          await setTimeout(50);
+          res.end("bar");
+        })
+        .mockImplementationOnce(async ({}, res) => {
+          // @todo Unable to intercept the response without the delay.
+          // When `end()` is called immediately, the `request` event
+          // already has `headersSent=true`. It is unclear how to intercept
+          // the response beforehand.
+          await setTimeout(50);
+          res.end("baz");
+        });
+
+      const [httpServer, port] = await makeServer(handler);
+
+      const terminator = graceful({
+        gracefulTerminationTimeout: 150,
+        server: httpServer,
+      });
+
+      const dispatcher = new Agent({ pipelining: 5, keepAliveTimeout: 5e3 });
+      const request0 = fetch(`http://localhost:${port}`, { dispatcher });
+
+      await setTimeout(50);
+
+      void terminator.terminate();
+
+      const request1 = fetch(`http://localhost:${port}`, { dispatcher });
+
+      await setTimeout(50);
+
+      expect(handler).toHaveBeenCalledTimes(2);
+
+      const response0 = await request0;
+
+      expect(response0.headers.get("connection")).toBe("keep-alive");
+      await expect(response0.text()).resolves.toBe("foobar");
+
+      const response1 = await request1;
+
+      expect(response1.headers.get("connection")).toBe("close");
+      await expect(response1.text()).resolves.toBe("baz");
+    },
+  );
 });
 
 /*
-test("ongoing requests receive {connection: close} header (new request reusing an existing socket)", async (t) => {
-  t.timeout(1_000);
-
-  const stub = sinon.stub();
-
-  stub.onCall(0).callsFake((serverResponse) => {
-    serverResponse.write("foo");
-
-    setTimeout(() => {
-      serverResponse.end("bar");
-    }, 50);
-  });
-
-  stub.onCall(1).callsFake((serverResponse) => {
-    // @todo Unable to intercept the response without the delay.
-    // When `end()` is called immediately, the `request` event
-    // already has `headersSent=true`. It is unclear how to intercept
-    // the response beforehand.
-    setTimeout(() => {
-      serverResponse.end("baz");
-    }, 50);
-  });
-
-  const httpServer = await createHttpServer(stub);
-
-  const terminator = createInternalHttpTerminator({
-    gracefulTerminationTimeout: 150,
-    server: httpServer.server,
-  });
-
-  const request0 = fetch(new Request(httpServer.url, { keepalive: true }));
-
-  await setTimeout(50);
-
-  void terminator.terminate();
-
-  const request1 = fetch(new Request(httpServer.url, { keepalive: true }));
-
-  await setTimeout(50);
-
-  t.is(stub.callCount, 2);
-
-  const response0 = await request0;
-
-  t.is(response0.headers.connection, "keep-alive");
-  t.is(response0.body, "foobar");
-
-  const response1 = await request1;
-
-  t.is(response1.headers.connection, "close");
-  t.is(response1.body, "baz");
-});
-
 test("empties internal socket collection", async (t) => {
   t.timeout(500);
 
