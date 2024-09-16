@@ -41,7 +41,9 @@ describe("graceful()", () => {
         gracefulTerminationTimeout: 150,
         server: httpServer,
       });
-      void fetch(`http://localhost:${port}`).catch(vi.fn());
+      void fetch(`http://localhost:${port}`, {
+        headers: { connection: "close" },
+      }).catch(vi.fn());
       await setTimeout(50);
       expect(handler).toHaveBeenCalled();
       void terminator.terminate();
@@ -64,11 +66,15 @@ describe("graceful()", () => {
         gracefulTerminationTimeout: 150,
         server: httpServer,
       });
-      const request0 = fetch(`http://localhost:${port}`);
+      const request0 = fetch(`http://localhost:${port}`, {
+        headers: { connection: "close" },
+      });
       await setTimeout(50);
       void terminator.terminate();
       await setTimeout(50);
-      const request1 = fetch(`http://localhost:${port}`);
+      const request1 = fetch(`http://localhost:${port}`, {
+        headers: { connection: "close" },
+      });
       await expect(request1).rejects.toThrowError();
       const response0 = await request0;
       expect(response0.headers.get("connection")).toBe("close");
@@ -148,31 +154,31 @@ describe("graceful()", () => {
       await expect(response1.text()).resolves.toBe("baz");
     },
   );
+
+  test("empties internal socket collection", { timeout: 500 }, async () => {
+    const [httpServer, port] = await makeServer(({}, res) => {
+      res.end("foo");
+    });
+
+    const terminator = graceful({
+      gracefulTerminationTimeout: 150,
+      server: httpServer,
+    });
+
+    await fetch(`http://localhost:${port}`, {
+      headers: { connection: "close" },
+    });
+
+    await setTimeout(50);
+
+    expect(terminator.sockets.size).toBe(0);
+    expect(terminator.secureSockets.size).toBe(0);
+
+    await terminator.terminate();
+  });
 });
 
 /*
-test("empties internal socket collection", async (t) => {
-  t.timeout(500);
-
-  const httpServer = await createHttpServer((serverResponse) => {
-    serverResponse.end("foo");
-  });
-
-  const terminator = createInternalHttpTerminator({
-    gracefulTerminationTimeout: 150,
-    server: httpServer.server,
-  });
-
-  await fetch(httpServer.url);
-
-  await setTimeout(50);
-
-  t.is(terminator.sockets.size, 0);
-  t.is(terminator.secureSockets.size, 0);
-
-  await terminator.terminate();
-});
-
 test("empties internal socket collection for https server", async (t) => {
   t.timeout(500);
 
