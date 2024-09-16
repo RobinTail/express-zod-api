@@ -20,7 +20,7 @@ export const graceful = ({
 }: {
   server: Server;
   gracefulTerminationTimeout?: number;
-  logger: ActualLogger;
+  logger?: ActualLogger;
 }) => {
   // @todo might be enough with one
   const sockets = new Set<Duplex>();
@@ -69,7 +69,7 @@ export const graceful = ({
 
   const terminate = async () => {
     if (terminating) {
-      logger.warn("Already terminating HTTP server");
+      logger?.warn("Already terminating HTTP server");
       return terminating;
     }
 
