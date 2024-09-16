@@ -162,27 +162,6 @@ describe("graceful()", () => {
 });
 
 /*
-test("empties internal socket collection for https server", async (t) => {
-  t.timeout(500);
-
-  const httpsServer = await createHttpsServer((serverResponse) => {
-    serverResponse.end("foo");
-  });
-
-  const terminator = createInternalHttpTerminator({
-    gracefulTerminationTimeout: 150,
-    server: httpsServer.server,
-  });
-
-  await fetch(httpsServer.url);
-
-  await setTimeout(50);
-
-  t.is(terminator.secureSockets.size, 0);
-
-  await terminator.terminate();
-});
-
 test("closes immediately after in-flight connections are closed (#16)", async (t) => {
   t.timeout(1_000);
 
