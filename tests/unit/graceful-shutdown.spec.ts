@@ -72,35 +72,30 @@ describe("graceful()", () => {
       await expect(response0.text()).resolves.toBe("foo");
     },
   );
+
+  test(
+    "ongoing requests receive {connection: close} header",
+    { timeout: 500 },
+    async () => {
+      const httpServer = await makeServer(async ({}, res) => {
+        await setTimeout(100);
+        res.end("foo");
+      });
+      const terminator = graceful({
+        gracefulTerminationTimeout: 150,
+        server: httpServer,
+      });
+      const request = fetch("http://localhost:3000", { keepalive: true });
+      await setTimeout(50);
+      void terminator.terminate();
+      const response = await request;
+      expect(response.headers.get("connection")).toBe("close");
+      await expect(response.text()).resolves.toBe("foo");
+    },
+  );
 });
 
 /*
-test("ongoing requests receive {connection: close} header", async (t) => {
-  t.timeout(500);
-
-  const httpServer = await createHttpServer((serverResponse) => {
-    setTimeout(() => {
-      serverResponse.end("foo");
-    }, 100);
-  });
-
-  const terminator = createInternalHttpTerminator({
-    gracefulTerminationTimeout: 150,
-    server: httpServer.server,
-  });
-
-  const request = fetch(new Request(httpServer.url, { keepalive: true }));
-
-  await setTimeout(50);
-
-  void terminator.terminate();
-
-  const response = await request;
-
-  t.is(response.headers.connection, "close");
-  t.is(response.body, "foo");
-});
-
 test("ongoing requests receive {connection: close} header (new request reusing an existing socket)", async (t) => {
   t.timeout(1_000);
 
