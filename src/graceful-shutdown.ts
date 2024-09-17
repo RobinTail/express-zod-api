@@ -62,13 +62,14 @@ export const graceful = ({
             outgoingMessage.setHeader("connection", "close");
         });
         for (const socket of sockets) {
-          if (!hasHttpServer(socket)) continue; // This is the HTTP CONNECT request socket.
-          if (hasResponse(socket)) {
-            if (!socket._httpMessage.headersSent)
-              socket._httpMessage.setHeader("connection", "close");
-            continue;
+          if (hasHttpServer(socket)) {
+            if (hasResponse(socket)) {
+              if (!socket._httpMessage.headersSent)
+                socket._httpMessage.setHeader("connection", "close");
+              continue;
+            }
+            destroySocket(socket);
           }
-          destroySocket(socket);
         }
         // Wait for all in-flight connections to drain, forcefully terminating any
         // open connections after the given timeout
