@@ -116,10 +116,7 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
           ? config.gracefulShutdown.timeout
           : undefined,
     });
-    const onTerm = async () => {
-      await graceful.shutdown();
-      process.exit(0);
-    };
+    const onTerm = () => graceful.shutdown().then(void process.exit);
     process.on("SIGINT", onTerm);
     process.on("SIGTERM", onTerm);
   }
