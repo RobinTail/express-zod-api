@@ -82,7 +82,7 @@ describe("graceful()", () => {
   );
 
   test(
-    "terminates hanging sockets after httpResponseTimeout",
+    "terminates hanging sockets after defined timeout",
     { timeout: 500 },
     async () => {
       const handler = vi.fn();
@@ -107,7 +107,7 @@ describe("graceful()", () => {
   );
 
   test(
-    "server stops accepting new connections after terminator.terminate() is called",
+    "server stops accepting new connections after .terminate() is called",
     { timeout: 500 },
     async () => {
       const [httpServer, port] = await makeHttpServer(async ({}, res) => {
@@ -167,10 +167,6 @@ describe("graceful()", () => {
           res.end("bar");
         })
         .mockImplementationOnce(async ({}, res) => {
-          // Unable to intercept the response without the delay.
-          // When `end()` is called immediately, the `request` event
-          // already has `headersSent=true`. It is unclear how to intercept
-          // the response beforehand.
           await setTimeout(50);
           res.end("baz");
         });
@@ -252,9 +248,6 @@ describe("graceful()", () => {
       await setTimeout(50);
       await expect(getConnections(httpServer)).resolves.toBe(1);
       void terminator.shutdown();
-      // Wait for serverResponse.end to be called, plus a few extra ms for the
-      // terminator to finish polling in-flight connections. (Do not, however, wait
-      // long enough to trigger graceful termination.)
       await setTimeout(75);
       await expect(getConnections(httpServer)).resolves.toBe(0);
     },
