@@ -51,7 +51,7 @@ export const graceful = ({
 
   const shutdown = () => {
     if (terminating) {
-      logger?.warn("Already terminating HTTP server");
+      logger?.warn("Already terminating...");
       return terminating;
     }
 
@@ -62,8 +62,7 @@ export const graceful = ({
             outgoingMessage.setHeader("connection", "close");
         });
         for (const socket of sockets) {
-          // This is the HTTP CONNECT request socket.
-          if (!hasHttpServer(socket)) continue;
+          if (!hasHttpServer(socket)) continue; // This is the HTTP CONNECT request socket.
           if (hasResponse(socket)) {
             if (!socket._httpMessage.headersSent)
               socket._httpMessage.setHeader("connection", "close");
