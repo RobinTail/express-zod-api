@@ -54,7 +54,7 @@ describe("graceful()", () => {
       const handler = vi.fn();
       const [httpServer, port] = await makeHttpServer(handler);
       const terminator = graceful({
-        gracefulTerminationTimeout: 150,
+        timeout: 150,
         server: httpServer,
       });
       void fetch(`http://localhost:${port}`, {
@@ -79,7 +79,7 @@ describe("graceful()", () => {
         res.end("foo");
       });
       const terminator = graceful({
-        gracefulTerminationTimeout: 150,
+        timeout: 150,
         server: httpServer,
       });
       const request0 = fetch(`http://localhost:${port}`, {
@@ -107,7 +107,7 @@ describe("graceful()", () => {
         res.end("foo");
       });
       const terminator = graceful({
-        gracefulTerminationTimeout: 150,
+        timeout: 150,
         server: httpServer,
       });
       const request = fetch(`http://localhost:${port}`, { keepalive: true });
@@ -140,7 +140,7 @@ describe("graceful()", () => {
         });
       const [httpServer, port] = await makeHttpServer(handler);
       const terminator = graceful({
-        gracefulTerminationTimeout: 150,
+        timeout: 150,
         server: httpServer,
       });
       const dispatcher = new Agent({ pipelining: 5, keepAliveTimeout: 5e3 });
@@ -164,7 +164,7 @@ describe("graceful()", () => {
       res.end("foo");
     });
     const terminator = graceful({
-      gracefulTerminationTimeout: 150,
+      timeout: 150,
       server: httpServer,
     });
     await fetch(`http://localhost:${port}`, {
@@ -183,7 +183,7 @@ describe("graceful()", () => {
         res.end("foo");
       });
       const terminator = graceful({
-        gracefulTerminationTimeout: 150,
+        timeout: 150,
         server: httpsServer,
       });
       await fetch(`https://localhost:${port}`, {
@@ -207,7 +207,7 @@ describe("graceful()", () => {
       const [httpServer, port] = await makeHttpServer(spy);
       expect(httpServer.listening).toBeTruthy();
       const terminator = graceful({
-        gracefulTerminationTimeout: 500,
+        timeout: 500,
         server: httpServer,
       });
       void fetch(`http://localhost:${port}`, {

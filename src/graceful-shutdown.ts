@@ -17,11 +17,11 @@ const hasHttpServer = (
 
 export const graceful = ({
   server,
-  gracefulTerminationTimeout = 1e3,
+  timeout = 1e3,
   logger,
 }: {
   server: http.Server | https.Server;
-  gracefulTerminationTimeout?: number;
+  timeout?: number;
   logger?: ActualLogger;
 }) => {
   const sockets = new Set<Duplex>();
@@ -89,10 +89,7 @@ export const graceful = ({
     // Wait for all in-flight connections to drain, forcefully terminating any
     // open connections after the given timeout
     for await (const started of setInterval(10, Date.now())) {
-      if (
-        sockets.size === 0 ||
-        Date.now() - started >= gracefulTerminationTimeout
-      ) {
+      if (sockets.size === 0 || Date.now() - started >= timeout) {
         break;
       }
     }
