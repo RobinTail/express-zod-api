@@ -46,10 +46,8 @@ export const graceful = ({
    * Evaluate whether additional steps are required to destroy the socket.
    * @see https://github.com/nodejs/node/blob/57bd715d527aba8dae56b975056961b0e429e91e/lib/_http_client.js#L363-L413
    */
-  const destroySocket = (socket: Duplex) => {
-    socket.destroy();
-    sockets.delete(socket);
-  };
+  const destroySocket = (socket: Duplex) =>
+    void sockets.delete(socket.destroy());
 
   const shutdown = () => {
     if (terminating) {
