@@ -68,7 +68,5 @@ export const graceful = ({
     return closeAsync();
   };
 
-  const shutdown = () => (terminating ??= workflow());
-
-  return { sockets, shutdown };
+  return { sockets, shutdown: () => (terminating ??= workflow()) };
 };
