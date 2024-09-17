@@ -51,17 +51,16 @@ export const graceful = ({
   const destroySocket = (socket: Socket) =>
     void sockets.delete(socket.destroy());
 
+  const disconnect = (socket: Socket) =>
+    void (hasResponse(socket)
+      ? !socket._httpMessage.headersSent &&
+        socket._httpMessage.setHeader("connection", "close")
+      : destroySocket(socket));
+
   const workflow = async () => {
     server.on("request", onRequest);
     for (const socket of sockets) {
-      if (isEncrypted(socket) || hasHttpServer(socket)) {
-        if (hasResponse(socket)) {
-          if (!socket._httpMessage.headersSent)
-            socket._httpMessage.setHeader("connection", "close");
-          continue;
-        }
-        destroySocket(socket);
-      }
+      if (isEncrypted(socket) || hasHttpServer(socket)) disconnect(socket);
     }
     for await (const started of setInterval(10, Date.now())) {
       if (sockets.size === 0 || Date.now() - started >= timeout) break;
