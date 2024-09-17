@@ -96,7 +96,9 @@ describe("graceful()", () => {
       }).catch(vi.fn());
       await setTimeout(50);
       expect(handler).toHaveBeenCalled();
-      void terminator.shutdown();
+      const pending0 = terminator.shutdown();
+      const pending1 = terminator.shutdown();
+      expect(pending1).toBe(pending0);
       await setTimeout(100);
       await expect(getConnections(httpServer)).resolves.toBe(1);
       await setTimeout(100);
