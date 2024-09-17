@@ -2,9 +2,9 @@ import https from "node:https";
 import { setTimeout } from "node:timers/promises";
 import http, { RequestListener } from "node:http";
 import { Agent } from "undici";
-import pem from "pem";
 import { graceful } from "../../src/graceful-shutdown";
 import { givePort } from "../helpers";
+import forge from "node-forge";
 
 describe("graceful()", () => {
   const makeHttpServer = (handler: RequestListener) =>
@@ -15,18 +15,52 @@ describe("graceful()", () => {
     });
 
   const makeHttpsServer = (handler: RequestListener) =>
-    new Promise<pem.CertificateCreationResult>((resolve, reject) => {
-      pem.createCertificate({ days: 5, selfSigned: true }, (error, result) =>
-        error ? reject(error) : resolve(result),
+    new Promise<[https.Server, number]>((resolve) => {
+      (forge as any).options.usePureJavaScript = true;
+      const keys = forge.pki.rsa.generateKeyPair(2048);
+      const cert = forge.pki.createCertificate();
+      cert.publicKey = keys.publicKey;
+      cert.serialNumber = "01";
+      cert.validity.notBefore = new Date();
+      cert.validity.notAfter = new Date();
+      cert.validity.notAfter.setFullYear(
+        cert.validity.notBefore.getFullYear() + 1,
       );
-    }).then(
-      ({ csr: ca, certificate: cert, serviceKey: key }) =>
-        new Promise<[https.Server, number]>((resolve) => {
-          const subject = https.createServer({ ca, cert, key }, handler);
-          const port = givePort();
-          subject.listen(port, () => resolve([subject, port]));
-        }),
-    );
+      const attrs = [
+        { name: "commonName", value: "localhost" },
+        { name: "countryName", value: "DE" },
+        { name: "organizationName", value: "ExpressZodAPI" },
+        { shortName: "OU", value: "DEV" },
+      ];
+      cert.setSubject(attrs);
+      cert.setIssuer(attrs);
+      cert.setExtensions([
+        { name: "basicConstraints", cA: true },
+        {
+          name: "keyUsage",
+          keyCertSign: true,
+          digitalSignature: true,
+          nonRepudiation: true,
+          keyEncipherment: true,
+          dataEncipherment: true,
+        },
+        { name: "extKeyUsage", serverAuth: true, clientAuth: true },
+        {
+          name: "subjectAltName",
+          altNames: [{ type: 2, value: "localhost" }],
+        },
+      ]);
+      cert.sign(keys.privateKey, forge.md.sha256.create());
+      const subject = https.createServer(
+        {
+          cert: forge.pki.certificateToPem(cert),
+          key: forge.pki.privateKeyToPem(keys.privateKey),
+        },
+        handler,
+      );
+      const port = givePort();
+      subject.listen(port, () => resolve([subject, port]));
+    });
 
   const getConnections = (server: http.Server) =>
     new Promise<number>((resolve, reject) => {
