@@ -172,7 +172,6 @@ describe("graceful()", () => {
     });
     await setTimeout(50);
     expect(terminator.sockets.size).toBe(0);
-    expect(terminator.secureSockets.size).toBe(0);
     await terminator.shutdown();
   });
 
@@ -183,21 +182,16 @@ describe("graceful()", () => {
       const [httpsServer, port] = await makeHttpsServer(({}, res) => {
         res.end("foo");
       });
-
       const terminator = graceful({
         gracefulTerminationTimeout: 150,
         server: httpsServer,
       });
-
       await fetch(`https://localhost:${port}`, {
         dispatcher: new Agent({ connect: { rejectUnauthorized: false } }),
         headers: { connection: "close" },
       });
-
       await setTimeout(50);
-
-      expect(terminator.secureSockets.size).toBe(0);
-
+      expect(terminator.sockets.size).toBe(0);
       await terminator.shutdown();
     },
   );
