@@ -28,16 +28,10 @@ export const graceful = ({
 
   let terminating: Promise<void> | undefined;
 
-  const onConnection = (socket: Duplex) => {
-    if (terminating) {
-      socket.destroy();
-    } else {
-      sockets.add(socket);
-      socket.once("close", () => {
-        sockets.delete(socket);
-      });
-    }
-  };
+  const onConnection = (socket: Duplex) =>
+    void (terminating
+      ? socket.destroy()
+      : sockets.add(socket.once("close", () => void sockets.delete(socket))));
 
   server.on("connection", onConnection);
   server.on("secureConnection", onConnection);
