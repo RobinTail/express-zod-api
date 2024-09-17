@@ -32,10 +32,10 @@ export const graceful = ({
 }) => {
   const sockets = new Set<Socket>();
 
-  let terminating: Promise<void> | undefined;
+  let pending: Promise<void> | undefined;
 
   const onConnection = (socket: Socket) =>
-    void (terminating
+    void (pending
       ? socket.destroy()
       : sockets.add(socket.once("close", () => void sockets.delete(socket))));
 
@@ -68,5 +68,5 @@ export const graceful = ({
     return closeAsync();
   };
 
-  return { sockets, shutdown: () => (terminating ??= workflow()) };
+  return { sockets, shutdown: () => (pending ??= workflow()) };
 };
