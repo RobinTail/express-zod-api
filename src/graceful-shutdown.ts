@@ -48,14 +48,13 @@ export const graceful = ({
         void server.close((error) => (error ? reject(error) : resolve())),
     );
 
-  const destroySocket = (socket: Socket) =>
-    void sockets.delete(socket.destroy());
+  const destroy = (socket: Socket) => void sockets.delete(socket.destroy());
 
   const disconnect = (socket: Socket) =>
     void (hasResponse(socket)
       ? !socket._httpMessage.headersSent &&
         socket._httpMessage.setHeader("connection", "close")
-      : destroySocket(socket));
+      : destroy(socket));
 
   const workflow = async () => {
     server.on("request", onRequest);
@@ -65,7 +64,7 @@ export const graceful = ({
     for await (const started of setInterval(10, Date.now())) {
       if (sockets.size === 0 || Date.now() - started >= timeout) break;
     }
-    for (const socket of sockets) destroySocket(socket);
+    for (const socket of sockets) destroy(socket);
     return closeAsync();
   };
 
