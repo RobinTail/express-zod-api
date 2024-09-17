@@ -4,6 +4,7 @@ import http from "node:http";
 import https from "node:https";
 import { BuiltinLogger } from "./builtin-logger";
 import { AppConfig, CommonConfig, ServerConfig } from "./config-type";
+import { monitor } from "./graceful-shutdown";
 import { isLoggerInstance } from "./logger-helpers";
 import { loadPeer } from "./peer-helpers";
 import { defaultResultHandler } from "./result-handler";
@@ -106,6 +107,22 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
         )
       : undefined,
   } satisfies Record<string, http.Server | https.Server | undefined>;
+
+  if (config.gracefulShutdown) {
+    const graceful = monitor({
+      server: servers.httpServer,
+      timeout:
+        typeof config.gracefulShutdown === "object"
+          ? config.gracefulShutdown.timeout
+          : undefined,
+    });
+    const onTerm = async () => {
+      await graceful.shutdown();
+      process.exit(0);
+    };
+    process.on("SIGINT", onTerm);
+    process.on("SIGTERM", onTerm);
+  }
 
   return { app, ...servers, logger: rootLogger };
 };

@@ -171,6 +171,7 @@ export interface ServerConfig<TAG extends string = string>
     /** @desc Port, UNIX socket or custom options. */
     listen: number | string | ListenOptions;
   };
+  gracefulShutdown?: boolean | { timeout: number };
 }
 
 export interface AppConfig<TAG extends string = string>
