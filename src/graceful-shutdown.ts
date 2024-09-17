@@ -46,7 +46,7 @@ export const graceful = ({
     void sockets.delete(socket.destroy());
 
   const shutdown = () =>
-    (terminating ??= Promise.resolve().then(async () => {
+    (terminating ??= (async () => {
       server.on("request", onRequest);
       for (const socket of sockets) {
         if (hasHttpServer(socket)) {
@@ -63,7 +63,7 @@ export const graceful = ({
       }
       for (const socket of sockets) destroySocket(socket);
       return closeAsync();
-    }));
+    })());
 
   return { sockets, shutdown };
 };
