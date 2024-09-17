@@ -36,10 +36,6 @@ export const graceful = ({
   server.on("connection", onConnection);
   server.on("secureConnection", onConnection);
 
-  /**
-   * Evaluate whether additional steps are required to destroy the socket.
-   * @see https://github.com/nodejs/node/blob/57bd715d527aba8dae56b975056961b0e429e91e/lib/_http_client.js#L363-L413
-   */
   const destroySocket = (socket: Duplex) =>
     void sockets.delete(socket.destroy());
 
@@ -57,12 +53,8 @@ export const graceful = ({
             destroySocket(socket);
           }
         }
-        // Wait for all in-flight connections to drain, forcefully terminating any
-        // open connections after the given timeout
         for await (const started of setInterval(10, Date.now())) {
-          if (sockets.size === 0 || Date.now() - started >= timeout) {
-            break;
-          }
+          if (sockets.size === 0 || Date.now() - started >= timeout) break;
         }
         for (const socket of sockets) destroySocket(socket);
       })
