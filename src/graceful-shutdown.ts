@@ -45,25 +45,26 @@ export const graceful = ({
   const destroySocket = (socket: Duplex) =>
     void sockets.delete(socket.destroy());
 
-  const shutdown = () =>
-    (terminating ??= (async () => {
-      server.on("request", onRequest);
-      for (const socket of sockets) {
-        if (hasHttpServer(socket)) {
-          if (hasResponse(socket)) {
-            if (!socket._httpMessage.headersSent)
-              socket._httpMessage.setHeader("connection", "close");
-            continue;
-          }
-          destroySocket(socket);
+  const workflow = async () => {
+    server.on("request", onRequest);
+    for (const socket of sockets) {
+      if (hasHttpServer(socket)) {
+        if (hasResponse(socket)) {
+          if (!socket._httpMessage.headersSent)
+            socket._httpMessage.setHeader("connection", "close");
+          continue;
         }
+        destroySocket(socket);
       }
-      for await (const started of setInterval(10, Date.now())) {
-        if (sockets.size === 0 || Date.now() - started >= timeout) break;
-      }
-      for (const socket of sockets) destroySocket(socket);
-      return closeAsync();
-    })());
+    }
+    for await (const started of setInterval(10, Date.now())) {
+      if (sockets.size === 0 || Date.now() - started >= timeout) break;
+    }
+    for (const socket of sockets) destroySocket(socket);
+    return closeAsync();
+  };
+
+  const shutdown = () => (terminating ??= workflow());
 
   return { sockets, shutdown };
 };
