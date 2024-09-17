@@ -36,35 +36,34 @@ export const graceful = ({
   server.on("connection", onConnection);
   server.on("secureConnection", onConnection);
 
+  const closeAsync = () =>
+    new Promise<void>(
+      (resolve, reject) =>
+        void server.close((error) => (error ? reject(error) : resolve())),
+    );
+
   const destroySocket = (socket: Duplex) =>
     void sockets.delete(socket.destroy());
 
   const shutdown = () =>
-    (terminating ??= Promise.resolve()
-      .then(async () => {
-        server.on("request", onRequest);
-        for (const socket of sockets) {
-          if (hasHttpServer(socket)) {
-            if (hasResponse(socket)) {
-              if (!socket._httpMessage.headersSent)
-                socket._httpMessage.setHeader("connection", "close");
-              continue;
-            }
-            destroySocket(socket);
+    (terminating ??= Promise.resolve().then(async () => {
+      server.on("request", onRequest);
+      for (const socket of sockets) {
+        if (hasHttpServer(socket)) {
+          if (hasResponse(socket)) {
+            if (!socket._httpMessage.headersSent)
+              socket._httpMessage.setHeader("connection", "close");
+            continue;
           }
+          destroySocket(socket);
         }
-        for await (const started of setInterval(10, Date.now())) {
-          if (sockets.size === 0 || Date.now() - started >= timeout) break;
-        }
-        for (const socket of sockets) destroySocket(socket);
-      })
-      .then(
-        () =>
-          new Promise(
-            (resolve, reject) =>
-              void server.close((error) => (error ? reject(error) : resolve())),
-          ),
-      ));
+      }
+      for await (const started of setInterval(10, Date.now())) {
+        if (sockets.size === 0 || Date.now() - started >= timeout) break;
+      }
+      for (const socket of sockets) destroySocket(socket);
+      return closeAsync();
+    }));
 
   return { sockets, shutdown };
 };
