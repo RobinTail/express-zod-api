@@ -14,50 +14,51 @@ describe("graceful()", () => {
       subject.listen(port, () => resolve([subject, port]));
     });
 
+  const signCert = () => {
+    (forge as any).options.usePureJavaScript = true;
+    const keys = forge.pki.rsa.generateKeyPair(2048);
+    const cert = forge.pki.createCertificate();
+    cert.publicKey = keys.publicKey;
+    cert.serialNumber = "01";
+    cert.validity.notBefore = new Date();
+    cert.validity.notAfter = new Date();
+    cert.validity.notAfter.setFullYear(
+      cert.validity.notBefore.getFullYear() + 1,
+    );
+    const attrs = [
+      { name: "commonName", value: "localhost" },
+      { name: "countryName", value: "DE" },
+      { name: "organizationName", value: "ExpressZodAPI" },
+      { shortName: "OU", value: "DEV" },
+    ];
+    cert.setSubject(attrs);
+    cert.setIssuer(attrs);
+    cert.setExtensions([
+      { name: "basicConstraints", cA: true },
+      {
+        name: "keyUsage",
+        keyCertSign: true,
+        digitalSignature: true,
+        nonRepudiation: true,
+        keyEncipherment: true,
+        dataEncipherment: true,
+      },
+      { name: "extKeyUsage", serverAuth: true, clientAuth: true },
+      {
+        name: "subjectAltName",
+        altNames: [{ type: 2, value: "localhost" }],
+      },
+    ]);
+    cert.sign(keys.privateKey, forge.md.sha256.create());
+    return {
+      cert: forge.pki.certificateToPem(cert),
+      key: forge.pki.privateKeyToPem(keys.privateKey),
+    };
+  };
+
   const makeHttpsServer = (handler: RequestListener) =>
     new Promise<[https.Server, number]>((resolve) => {
-      (forge as any).options.usePureJavaScript = true;
-      const keys = forge.pki.rsa.generateKeyPair(2048);
-      const cert = forge.pki.createCertificate();
-      cert.publicKey = keys.publicKey;
-      cert.serialNumber = "01";
-      cert.validity.notBefore = new Date();
-      cert.validity.notAfter = new Date();
-      cert.validity.notAfter.setFullYear(
-        cert.validity.notBefore.getFullYear() + 1,
-      );
-      const attrs = [
-        { name: "commonName", value: "localhost" },
-        { name: "countryName", value: "DE" },
-        { name: "organizationName", value: "ExpressZodAPI" },
-        { shortName: "OU", value: "DEV" },
-      ];
-      cert.setSubject(attrs);
-      cert.setIssuer(attrs);
-      cert.setExtensions([
-        { name: "basicConstraints", cA: true },
-        {
-          name: "keyUsage",
-          keyCertSign: true,
-          digitalSignature: true,
-          nonRepudiation: true,
-          keyEncipherment: true,
-          dataEncipherment: true,
-        },
-        { name: "extKeyUsage", serverAuth: true, clientAuth: true },
-        {
-          name: "subjectAltName",
-          altNames: [{ type: 2, value: "localhost" }],
-        },
-      ]);
-      cert.sign(keys.privateKey, forge.md.sha256.create());
-      const subject = https.createServer(
-        {
-          cert: forge.pki.certificateToPem(cert),
-          key: forge.pki.privateKeyToPem(keys.privateKey),
-        },
-        handler,
-      );
+      const subject = https.createServer(signCert(), handler);
       const port = givePort();
       subject.listen(port, () => resolve([subject, port]));
     });
