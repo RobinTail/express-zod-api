@@ -1,13 +1,14 @@
-import http, { ServerResponse } from "node:http";
-import type { Server } from "node:net";
+import http from "node:http";
+import https from "node:https";
 import type { Duplex } from "node:stream";
 import type { ActualLogger } from "./logger-helpers";
 import { setInterval } from "node:timers/promises";
 
 const hasResponse = (
   socket: Duplex,
-): socket is typeof socket & { _httpMessage: ServerResponse } =>
-  "_httpMessage" in socket && socket._httpMessage instanceof ServerResponse;
+): socket is typeof socket & { _httpMessage: http.ServerResponse } =>
+  "_httpMessage" in socket &&
+  socket._httpMessage instanceof http.ServerResponse;
 
 const hasHttpServer = (
   socket: Duplex,
@@ -19,7 +20,7 @@ export const graceful = ({
   gracefulTerminationTimeout = 1e3,
   logger,
 }: {
-  server: Server;
+  server: http.Server | https.Server;
   gracefulTerminationTimeout?: number;
   logger?: ActualLogger;
 }) => {
