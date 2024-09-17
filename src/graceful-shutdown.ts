@@ -14,6 +14,9 @@ const hasHttpServer = (
 ): socket is typeof socket & { server: http.Server } =>
   "server" in socket && socket.server instanceof http.Server;
 
+const onRequest: http.RequestListener = ({}, res) =>
+  void (!res.headersSent && res.setHeader("connection", "close"));
+
 export const graceful = ({
   server,
   timeout = 1e3,
@@ -49,10 +52,7 @@ export const graceful = ({
   const shutdown = () =>
     (terminating ??= Promise.resolve()
       .then(async () => {
-        server.on("request", ({}, outgoingMessage) => {
-          if (!outgoingMessage.headersSent)
-            outgoingMessage.setHeader("connection", "close");
-        });
+        server.on("request", onRequest);
         for (const socket of sockets) {
           if (hasHttpServer(socket)) {
             if (hasResponse(socket)) {
