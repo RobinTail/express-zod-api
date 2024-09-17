@@ -2,6 +2,7 @@ import http, { ServerResponse } from "node:http";
 import type { Server } from "node:net";
 import type { Duplex } from "node:stream";
 import type { ActualLogger } from "./logger-helpers";
+import { setInterval } from "node:timers/promises";
 
 const hasResponse = (
   socket: Duplex,
@@ -120,22 +121,20 @@ export const graceful = ({
 
     // Wait for all in-flight connections to drain, forcefully terminating any
     // open connections after the given timeout
-    try {
-      // @todo do not use
-      await vi.waitFor(
-        () => assert(sockets.size === 0 && secureSockets.size === 0), // @todo do not use
-        { interval: 10, timeout: gracefulTerminationTimeout },
-      );
-    } catch {
-      // Ignore timeout errors
-    } finally {
-      for (const socket of sockets) {
-        destroySocket(socket);
+    for await (const started of setInterval(10, Date.now())) {
+      if (
+        (sockets.size === 0 && secureSockets.size === 0) ||
+        Date.now() - started >= gracefulTerminationTimeout
+      ) {
+        break;
       }
+    }
+    for (const socket of sockets) {
+      destroySocket(socket);
+    }
 
-      for (const socket of secureSockets) {
-        destroySocket(socket);
-      }
+    for (const socket of secureSockets) {
+      destroySocket(socket);
     }
 
     server.close((error) => {
