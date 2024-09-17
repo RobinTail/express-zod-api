@@ -97,13 +97,9 @@ export const graceful = ({
       destroySocket(socket);
     }
 
-    server.close((error) => {
-      if (error) {
-        rejectTerminating(error);
-      } else {
-        resolveTerminating();
-      }
-    });
+    server.close((error) =>
+      error ? rejectTerminating(error) : resolveTerminating(),
+    );
 
     return terminating;
   };
