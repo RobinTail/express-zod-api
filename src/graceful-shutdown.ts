@@ -59,20 +59,16 @@ export const graceful = ({
 
     return (terminating = Promise.resolve()
       .then(async () => {
-        server.on("request", (incomingMessage, outgoingMessage) => {
-          if (!outgoingMessage.headersSent) {
+        server.on("request", ({}, outgoingMessage) => {
+          if (!outgoingMessage.headersSent)
             outgoingMessage.setHeader("connection", "close");
-          }
         });
         for (const socket of sockets) {
           // This is the HTTP CONNECT request socket.
-          if (!hasHttpServer(socket)) {
-            continue;
-          }
+          if (!hasHttpServer(socket)) continue;
           if (hasResponse(socket)) {
-            if (!socket._httpMessage.headersSent) {
+            if (!socket._httpMessage.headersSent)
               socket._httpMessage.setHeader("connection", "close");
-            }
             continue;
           }
           destroySocket(socket);
@@ -84,15 +80,14 @@ export const graceful = ({
             break;
           }
         }
-        for (const socket of sockets) {
-          destroySocket(socket);
-        }
+        for (const socket of sockets) destroySocket(socket);
       })
       .then(
         () =>
-          new Promise((resolve, reject) => {
-            server.close((error) => (error ? reject(error) : resolve()));
-          }),
+          new Promise(
+            (resolve, reject) =>
+              void server.close((error) => (error ? reject(error) : resolve())),
+          ),
       ));
   };
 
