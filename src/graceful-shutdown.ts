@@ -23,7 +23,7 @@ const isEncrypted = (socket: Socket): socket is TLSSocket =>
 const onRequest: http.RequestListener = ({}, res) =>
   void (!res.headersSent && res.setHeader("connection", "close"));
 
-export const graceful = ({
+export const monitor = ({
   server,
   timeout = 1e3,
 }: {

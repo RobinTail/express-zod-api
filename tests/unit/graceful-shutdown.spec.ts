@@ -2,11 +2,11 @@ import https from "node:https";
 import { setTimeout } from "node:timers/promises";
 import http, { RequestListener } from "node:http";
 import { Agent } from "undici";
-import { graceful } from "../../src/graceful-shutdown";
+import { monitor } from "../../src/graceful-shutdown";
 import { givePort } from "../helpers";
 import forge from "node-forge";
 
-describe("graceful()", () => {
+describe("monitor()", () => {
   const makeHttpServer = (handler: RequestListener) =>
     new Promise<[http.Server, number]>((resolve) => {
       const subject = http.createServer(handler);
@@ -71,24 +71,24 @@ describe("graceful()", () => {
     });
 
   test(
-    "terminates HTTP server with no connections",
+    "shuts down HTTP server with no connections",
     { timeout: 100 },
     async () => {
       const [httpServer] = await makeHttpServer(vi.fn());
       expect(httpServer.listening).toBeTruthy();
-      const terminator = graceful({ server: httpServer });
-      await terminator.shutdown();
+      const graceful = monitor({ server: httpServer });
+      await graceful.shutdown();
       expect(httpServer.listening).toBeFalsy();
     },
   );
 
   test(
-    "terminates hanging sockets after defined timeout",
+    "shuts down hanging sockets after defined timeout",
     { timeout: 500 },
     async () => {
       const handler = vi.fn();
       const [httpServer, port] = await makeHttpServer(handler);
-      const terminator = graceful({
+      const graceful = monitor({
         timeout: 150,
         server: httpServer,
       });
@@ -97,8 +97,8 @@ describe("graceful()", () => {
       }).catch(vi.fn());
       await setTimeout(50);
       expect(handler).toHaveBeenCalled();
-      const pending0 = terminator.shutdown();
-      const pending1 = terminator.shutdown();
+      const pending0 = graceful.shutdown();
+      const pending1 = graceful.shutdown();
       expect(pending1).toBe(pending0);
       await setTimeout(100);
       await expect(getConnections(httpServer)).resolves.toBe(1);
@@ -108,14 +108,14 @@ describe("graceful()", () => {
   );
 
   test(
-    "server stops accepting new connections after .terminate() is called",
+    "server stops accepting new connections after .shutdown() called",
     { timeout: 500 },
     async () => {
       const [httpServer, port] = await makeHttpServer(async ({}, res) => {
         await setTimeout(100);
         res.end("foo");
       });
-      const terminator = graceful({
+      const graceful = monitor({
         timeout: 150,
         server: httpServer,
       });
@@ -123,7 +123,7 @@ describe("graceful()", () => {
         headers: { connection: "close" },
       });
       await setTimeout(50);
-      void terminator.shutdown();
+      void graceful.shutdown();
       await setTimeout(50);
       const request1 = fetch(`http://localhost:${port}`, {
         headers: { connection: "close" },
@@ -143,13 +143,13 @@ describe("graceful()", () => {
         await setTimeout(100);
         res.end("foo");
       });
-      const terminator = graceful({
+      const graceful = monitor({
         timeout: 150,
         server: httpServer,
       });
       const request = fetch(`http://localhost:${port}`, { keepalive: true });
       await setTimeout(50);
-      void terminator.shutdown();
+      void graceful.shutdown();
       const response = await request;
       expect(response.headers.get("connection")).toBe("close");
       await expect(response.text()).resolves.toBe("foo");
@@ -172,14 +172,14 @@ describe("graceful()", () => {
           res.end("baz");
         });
       const [httpServer, port] = await makeHttpServer(handler);
-      const terminator = graceful({
+      const graceful = monitor({
         timeout: 150,
         server: httpServer,
       });
       const dispatcher = new Agent({ pipelining: 5, keepAliveTimeout: 5e3 });
       const request0 = fetch(`http://localhost:${port}`, { dispatcher });
       await setTimeout(50);
-      void terminator.shutdown();
+      void graceful.shutdown();
       const request1 = fetch(`http://localhost:${port}`, { dispatcher });
       await setTimeout(50);
       expect(handler).toHaveBeenCalledTimes(2);
@@ -196,7 +196,7 @@ describe("graceful()", () => {
     const [httpServer, port] = await makeHttpServer(({}, res) => {
       res.end("foo");
     });
-    const terminator = graceful({
+    const graceful = monitor({
       timeout: 150,
       server: httpServer,
     });
@@ -204,8 +204,8 @@ describe("graceful()", () => {
       headers: { connection: "close" },
     });
     await setTimeout(50);
-    expect(terminator.sockets.size).toBe(0);
-    await terminator.shutdown();
+    expect(graceful.sockets.size).toBe(0);
+    await graceful.shutdown();
   });
 
   test(
@@ -215,7 +215,7 @@ describe("graceful()", () => {
       const [httpsServer, port] = await makeHttpsServer(({}, res) => {
         res.end("foo");
       });
-      const terminator = graceful({
+      const graceful = monitor({
         timeout: 150,
         server: httpsServer,
       });
@@ -224,8 +224,8 @@ describe("graceful()", () => {
         headers: { connection: "close" },
       });
       await setTimeout(50);
-      expect(terminator.sockets.size).toBe(0);
-      await terminator.shutdown();
+      expect(graceful.sockets.size).toBe(0);
+      await graceful.shutdown();
     },
   );
 
@@ -239,7 +239,7 @@ describe("graceful()", () => {
       });
       const [httpServer, port] = await makeHttpServer(spy);
       expect(httpServer.listening).toBeTruthy();
-      const terminator = graceful({
+      const graceful = monitor({
         timeout: 500,
         server: httpServer,
       });
@@ -248,7 +248,7 @@ describe("graceful()", () => {
       });
       await setTimeout(50);
       await expect(getConnections(httpServer)).resolves.toBe(1);
-      void terminator.shutdown();
+      void graceful.shutdown();
       await setTimeout(75);
       await expect(getConnections(httpServer)).resolves.toBe(0);
     },
