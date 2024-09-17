@@ -51,57 +51,49 @@ export const graceful = ({
     sockets.delete(socket);
   };
 
-  const shutdown = async () => {
+  const shutdown = () => {
     if (terminating) {
       logger?.warn("Already terminating HTTP server");
       return terminating;
     }
 
-    let resolveTerminating: () => void;
-    let rejectTerminating: (error: Error) => void;
-
-    // @todo all code below must be inside
-    terminating = new Promise((resolve, reject) => {
-      resolveTerminating = resolve;
-      rejectTerminating = reject;
-    });
-
-    server.on("request", (incomingMessage, outgoingMessage) => {
-      if (!outgoingMessage.headersSent) {
-        outgoingMessage.setHeader("connection", "close");
-      }
-    });
-
-    for (const socket of sockets) {
-      // This is the HTTP CONNECT request socket.
-      if (!hasHttpServer(socket)) {
-        continue;
-      }
-      if (hasResponse(socket)) {
-        if (!socket._httpMessage.headersSent) {
-          socket._httpMessage.setHeader("connection", "close");
+    return (terminating = Promise.resolve()
+      .then(async () => {
+        server.on("request", (incomingMessage, outgoingMessage) => {
+          if (!outgoingMessage.headersSent) {
+            outgoingMessage.setHeader("connection", "close");
+          }
+        });
+        for (const socket of sockets) {
+          // This is the HTTP CONNECT request socket.
+          if (!hasHttpServer(socket)) {
+            continue;
+          }
+          if (hasResponse(socket)) {
+            if (!socket._httpMessage.headersSent) {
+              socket._httpMessage.setHeader("connection", "close");
+            }
+            continue;
+          }
+          destroySocket(socket);
         }
-        continue;
-      }
-      destroySocket(socket);
-    }
-
-    // Wait for all in-flight connections to drain, forcefully terminating any
-    // open connections after the given timeout
-    for await (const started of setInterval(10, Date.now())) {
-      if (sockets.size === 0 || Date.now() - started >= timeout) {
-        break;
-      }
-    }
-    for (const socket of sockets) {
-      destroySocket(socket);
-    }
-
-    server.close((error) =>
-      error ? rejectTerminating(error) : resolveTerminating(),
-    );
-
-    return terminating;
+        // Wait for all in-flight connections to drain, forcefully terminating any
+        // open connections after the given timeout
+        for await (const started of setInterval(10, Date.now())) {
+          if (sockets.size === 0 || Date.now() - started >= timeout) {
+            break;
+          }
+        }
+        for (const socket of sockets) {
+          destroySocket(socket);
+        }
+      })
+      .then(
+        () =>
+          new Promise((resolve, reject) => {
+            server.close((error) => (error ? reject(error) : resolve()));
+          }),
+      ));
   };
 
   return { sockets, shutdown };
