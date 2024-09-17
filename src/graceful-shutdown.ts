@@ -1,7 +1,6 @@
 import http from "node:http";
 import https from "node:https";
 import type { Duplex } from "node:stream";
-import type { ActualLogger } from "./logger-helpers";
 import { setInterval } from "node:timers/promises";
 
 const hasResponse = (
@@ -18,11 +17,9 @@ const hasHttpServer = (
 export const graceful = ({
   server,
   timeout = 1e3,
-  logger,
 }: {
   server: http.Server | https.Server;
   timeout?: number;
-  logger?: ActualLogger;
 }) => {
   const sockets = new Set<Duplex>();
 
@@ -49,13 +46,8 @@ export const graceful = ({
   const destroySocket = (socket: Duplex) =>
     void sockets.delete(socket.destroy());
 
-  const shutdown = () => {
-    if (terminating) {
-      logger?.warn("Already terminating...");
-      return terminating;
-    }
-
-    return (terminating = Promise.resolve()
+  const shutdown = () =>
+    (terminating ??= Promise.resolve()
       .then(async () => {
         server.on("request", ({}, outgoingMessage) => {
           if (!outgoingMessage.headersSent)
@@ -87,7 +79,6 @@ export const graceful = ({
               void server.close((error) => (error ? reject(error) : resolve())),
           ),
       ));
-  };
 
   return { sockets, shutdown };
 };
