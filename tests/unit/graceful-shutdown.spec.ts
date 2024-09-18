@@ -14,6 +14,25 @@ describe("monitor()", () => {
       subject.listen(port, () => resolve([subject, port]));
     });
 
+  const certAttr = [
+    { name: "commonName", value: "localhost" },
+    { name: "countryName", value: "DE" },
+    { name: "organizationName", value: "ExpressZodAPI" },
+    { shortName: "OU", value: "DEV" },
+  ];
+  const certExt = [
+    { name: "basicConstraints", cA: true },
+    { name: "extKeyUsage", serverAuth: true, clientAuth: true },
+    { name: "subjectAltName", altNames: [{ type: 2, value: "localhost" }] },
+    {
+      name: "keyUsage",
+      keyCertSign: true,
+      digitalSignature: true,
+      nonRepudiation: true,
+      keyEncipherment: true,
+      dataEncipherment: true,
+    },
+  ];
   const signCert = () => {
     (forge as any).options.usePureJavaScript = true;
     const keys = forge.pki.rsa.generateKeyPair(2048);
@@ -25,30 +44,9 @@ describe("monitor()", () => {
     cert.validity.notAfter.setFullYear(
       cert.validity.notBefore.getFullYear() + 1,
     );
-    const attrs = [
-      { name: "commonName", value: "localhost" },
-      { name: "countryName", value: "DE" },
-      { name: "organizationName", value: "ExpressZodAPI" },
-      { shortName: "OU", value: "DEV" },
-    ];
-    cert.setSubject(attrs);
-    cert.setIssuer(attrs);
-    cert.setExtensions([
-      { name: "basicConstraints", cA: true },
-      {
-        name: "keyUsage",
-        keyCertSign: true,
-        digitalSignature: true,
-        nonRepudiation: true,
-        keyEncipherment: true,
-        dataEncipherment: true,
-      },
-      { name: "extKeyUsage", serverAuth: true, clientAuth: true },
-      {
-        name: "subjectAltName",
-        altNames: [{ type: 2, value: "localhost" }],
-      },
-    ]);
+    cert.setSubject(certAttr);
+    cert.setIssuer(certAttr);
+    cert.setExtensions(certExt);
     cert.sign(keys.privateKey, forge.md.sha256.create());
     return {
       cert: forge.pki.certificateToPem(cert),
