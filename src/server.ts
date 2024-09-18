@@ -95,15 +95,15 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
 
   const starter = <T extends http.Server | https.Server>(
     server: T,
-    subject: typeof config.server.listen,
+    subject?: typeof config.server.listen,
   ) => server.listen(subject, () => rootLogger.info("Listening", subject)) as T;
 
-  const servers = [http.createServer(app)].concat(
-    config.https ? https.createServer(config.https.options, app) : [],
-  ) as [http.Server] | [http.Server, https.Server];
+  const httpServer = http.createServer(app);
+  const httpsServer =
+    config.https && https.createServer(config.https.options, app);
 
   if (config.gracefulShutdown) {
-    const graceful = monitor(servers, {
+    const graceful = monitor([httpServer].concat(httpsServer || []), {
       logger: rootLogger,
       timeout:
         typeof config.gracefulShutdown === "object"
@@ -118,12 +118,10 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
     for (const trigger of events) process.on(trigger, onTerm);
   }
 
-  const [httpServer, httpsServer] = servers;
-
   return {
     app,
     logger: rootLogger,
     httpServer: starter(httpServer, config.server.listen),
-    httpsServer: httpsServer && starter(httpsServer, config.https!.listen), // ensured by presence
+    httpsServer: httpsServer && starter(httpsServer, config.https?.listen),
   };
 };
