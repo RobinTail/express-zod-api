@@ -3,6 +3,7 @@ import https from "node:https";
 import type { Socket } from "node:net";
 import type { TLSSocket } from "node:tls";
 import { setInterval } from "node:timers/promises";
+import { ActualLogger } from "./logger-helpers";
 
 const hasResponse = (
   socket: Socket,
@@ -20,15 +21,17 @@ const isEncrypted = (socket: Socket): socket is TLSSocket =>
   typeof socket.encrypted === "boolean" &&
   socket.encrypted;
 
-const onRequest: http.RequestListener = ({}, res) =>
+const weAreClosed: http.RequestListener = ({}, res) =>
   void (!res.headersSent && res.setHeader("connection", "close"));
 
 export const monitor = ({
   server,
   timeout = 1e3,
+  logger,
 }: {
   server: http.Server | https.Server;
   timeout?: number;
+  logger?: ActualLogger;
 }) => {
   const sockets = new Set<Socket>();
 
@@ -57,7 +60,8 @@ export const monitor = ({
       : destroy(socket));
 
   const workflow = async () => {
-    server.on("request", onRequest);
+    server.on("request", weAreClosed);
+    logger?.info("Graceful shutdown", { sockets: sockets.size, timeout });
     for (const socket of sockets) {
       if (isEncrypted(socket) || hasHttpServer(socket)) disconnect(socket);
     }

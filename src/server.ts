@@ -110,6 +110,7 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
 
   if (config.gracefulShutdown) {
     const graceful = monitor({
+      logger: rootLogger,
       server: servers.httpServer,
       timeout:
         typeof config.gracefulShutdown === "object"

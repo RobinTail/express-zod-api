@@ -20,6 +20,7 @@ export const config = createConfig({
       app.use("/docs", ui.serve, ui.setup(documentation));
     },
   },
+  gracefulShutdown: true,
   cors: true,
   logger: {
     level: "debug",
