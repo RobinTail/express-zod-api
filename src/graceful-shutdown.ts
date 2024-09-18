@@ -30,25 +30,17 @@ export const monitor = (
       ? socket.destroy()
       : sockets.add(socket.once("close", () => void sockets.delete(socket))));
 
-  for (const server of servers) {
-    for (const event of ["connection", "secureConnection"]) {
+  for (const server of servers)
+    for (const event of ["connection", "secureConnection"])
       server.on(event, watch);
-    }
-  }
 
   const workflow = async () => {
     for (const server of servers) server.on("request", weAreClosed);
-    logger?.info("Graceful shutdown", {
-      servers: servers.length,
-      sockets: sockets.size,
-      timeout,
-    });
-    for (const socket of sockets) {
+    logger?.info("Graceful shutdown", { sockets: sockets.size, timeout });
+    for (const socket of sockets)
       if (isEncrypted(socket) || hasHttpServer(socket)) disconnect(socket);
-    }
-    for await (const started of setInterval(10, Date.now())) {
+    for await (const started of setInterval(10, Date.now()))
       if (sockets.size === 0 || Date.now() - started >= timeout) break;
-    }
     for (const socket of sockets) destroy(socket);
     return Promise.allSettled(servers.map(closeAsync));
   };
