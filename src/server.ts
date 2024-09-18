@@ -19,7 +19,6 @@ import {
   moveRaw,
 } from "./server-helpers";
 import { getStartupLogo } from "./startup-logo";
-import { values, reject, isNil } from "ramda";
 
 const makeCommonEntities = (config: CommonConfig) => {
   if (config.startupLogo !== false) console.log(getStartupLogo());
@@ -99,18 +98,12 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
     subject: typeof config.server.listen,
   ) => server.listen(subject, () => rootLogger.info("Listening", subject)) as T;
 
-  const servers = {
-    httpServer: starter(http.createServer(app), config.server.listen),
-    httpsServer: config.https
-      ? starter(
-          https.createServer(config.https.options, app),
-          config.https.listen,
-        )
-      : undefined,
-  } satisfies Record<string, http.Server | https.Server | undefined>;
+  const servers = [http.createServer(app)].concat(
+    config.https ? https.createServer(config.https.options, app) : [],
+  ) as [http.Server] | [http.Server, https.Server];
 
   if (config.gracefulShutdown) {
-    const graceful = monitor(reject(isNil, values(servers)), {
+    const graceful = monitor(servers, {
       logger: rootLogger,
       timeout:
         typeof config.gracefulShutdown === "object"
@@ -122,5 +115,12 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
     process.on("SIGTERM", onTerm);
   }
 
-  return { app, ...servers, logger: rootLogger };
+  const [httpServer, httpsServer] = servers;
+
+  return {
+    app,
+    logger: rootLogger,
+    httpServer: starter(httpServer, config.server.listen),
+    httpsServer: httpsServer && starter(httpsServer, config.https!.listen), // ensured by presence
+  };
 };
