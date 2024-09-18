@@ -111,10 +111,11 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
           : undefined,
     });
     const onTerm = () => graceful.shutdown().then(void process.exit);
-    for (const trigger of (typeof config.gracefulShutdown === "object"
-      ? config.gracefulShutdown.events
-      : undefined) || ["SIGINT", "SIGTERM"])
-      process.on(trigger, onTerm);
+    const { events = ["SIGINT", "SIGTERM"] } =
+      typeof config.gracefulShutdown === "object"
+        ? config.gracefulShutdown
+        : {};
+    for (const trigger of events) process.on(trigger, onTerm);
   }
 
   const [httpServer, httpsServer] = servers;
