@@ -1,13 +1,13 @@
+import forge from "node-forge";
+import http from "node:http";
 import https from "node:https";
-import { setTimeout } from "node:timers/promises";
-import http, { RequestListener } from "node:http";
 import { Agent } from "undici";
+import { setTimeout } from "node:timers/promises";
 import { monitor } from "../../src/graceful-shutdown";
 import { givePort } from "../helpers";
-import forge from "node-forge";
 
 describe("monitor()", () => {
-  const makeHttpServer = (handler: RequestListener) =>
+  const makeHttpServer = (handler: http.RequestListener) =>
     new Promise<[http.Server, number]>((resolve) => {
       const subject = http.createServer(handler);
       const port = givePort();
@@ -56,7 +56,7 @@ describe("monitor()", () => {
     };
   };
 
-  const makeHttpsServer = (handler: RequestListener) =>
+  const makeHttpsServer = (handler: http.RequestListener) =>
     new Promise<[https.Server, number]>((resolve) => {
       const subject = https.createServer(signCert(), handler);
       const port = givePort();
@@ -161,7 +161,7 @@ describe("monitor()", () => {
     { timeout: 1e3 },
     async () => {
       const handler = vi
-        .fn<RequestListener>()
+        .fn<http.RequestListener>()
         .mockImplementationOnce(async ({}, res) => {
           res.write("foo");
           await setTimeout(50);
@@ -233,7 +233,7 @@ describe("monitor()", () => {
     "closes immediately after in-flight connections are closed (#16)",
     { timeout: 1e3 },
     async () => {
-      const spy = vi.fn<RequestListener>(async ({}, res) => {
+      const spy = vi.fn<http.RequestListener>(async ({}, res) => {
         await setTimeout(100);
         res.end("foo");
       });

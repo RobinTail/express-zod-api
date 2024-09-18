@@ -1,9 +1,9 @@
 import http from "node:http";
 import https from "node:https";
+import { setInterval } from "node:timers/promises";
 import type { Socket } from "node:net";
 import type { TLSSocket } from "node:tls";
-import { setInterval } from "node:timers/promises";
-import { ActualLogger } from "./logger-helpers";
+import type { ActualLogger } from "./logger-helpers";
 
 const hasResponse = (
   socket: Socket,
@@ -37,13 +37,13 @@ export const monitor = ({
 
   let pending: Promise<void> | undefined;
 
-  const onConnection = (socket: Socket) =>
+  const watch = (socket: Socket) =>
     void (pending
       ? socket.destroy()
       : sockets.add(socket.once("close", () => void sockets.delete(socket))));
 
-  server.on("connection", onConnection);
-  server.on("secureConnection", onConnection);
+  server.on("connection", watch);
+  server.on("secureConnection", watch);
 
   const closeAsync = () =>
     new Promise<void>(
