@@ -1,52 +1,22 @@
+import { Socket } from "node:net";
+import { TLSSocket } from "node:tls";
 import { bench } from "vitest";
-import { z } from "zod";
-import { depictExamples } from "../../src/documentation-helpers";
-import "../../src/zod-plugin";
+import { isEncrypted } from "../../src/graceful-helpers";
 
-describe.skip.each([true, false])("Experiment %s", (isResponse) => {
+const comparable = (socket: Socket): socket is TLSSocket =>
+  socket instanceof TLSSocket;
+
+describe("Experiment %s", () => {
+  const a = new Socket();
+  const b = new TLSSocket(a);
+
   bench("original", () => {
-    depictExamples(
-      z
-        .object({
-          one: z.string().transform((v) => v.length),
-          two: z.number().transform((v) => `${v}`),
-          three: z.boolean(),
-        })
-        .example({
-          one: "test",
-          two: 123,
-          three: true,
-        })
-        .example({
-          one: "test2",
-          two: 456,
-          three: false,
-        }),
-      isResponse,
-      ["three"],
-    );
+    isEncrypted(a);
+    isEncrypted(b);
   });
 
   bench("featured", () => {
-    depictExamples(
-      z
-        .object({
-          one: z.string().transform((v) => v.length),
-          two: z.number().transform((v) => `${v}`),
-          three: z.boolean(),
-        })
-        .example({
-          one: "test",
-          two: 123,
-          three: true,
-        })
-        .example({
-          one: "test2",
-          two: 456,
-          three: false,
-        }),
-      isResponse,
-      ["three"],
-    );
+    comparable(a);
+    comparable(b);
   });
 });
