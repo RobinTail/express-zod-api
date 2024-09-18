@@ -56,7 +56,8 @@ Start your API server with I/O schema validation and custom middlewares in minut
    2. [Array response](#array-response) for migrating legacy APIs
    3. [Headers as input source](#headers-as-input-source)
    4. [Accepting raw data](#accepting-raw-data)
-   5. [Subscriptions](#subscriptions)
+   5. [Graceful shutdown](#graceful-shutdown)
+   6. [Subscriptions](#subscriptions)
 7. [Integration and Documentation](#integration-and-documentation)
    1. [Zod Plugin](#zod-plugin)
    2. [Generating a Frontend Client](#generating-a-frontend-client)
