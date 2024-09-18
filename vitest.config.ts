@@ -7,6 +7,7 @@ export default defineConfig({
     },
     globals: true,
     pool: "threads",
+    poolOptions: { threads: { minThreads: 1, maxThreads: 1 } },
     testTimeout: 10000,
     reporters: "basic",
     coverage: {

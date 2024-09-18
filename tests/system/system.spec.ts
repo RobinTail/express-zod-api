@@ -10,11 +10,12 @@ import {
   BuiltinLogger,
 } from "../../src";
 import { givePort } from "../helpers";
+import { setTimeout } from "node:timers/promises";
 
 describe("App", async () => {
   const port = givePort();
-
   const logger = new BuiltinLogger({ level: "silent" });
+  const infoMethod = vi.spyOn(logger, "info");
   const warnMethod = vi.spyOn(logger, "warn");
   const routing = {
     v1: {
@@ -119,6 +120,12 @@ describe("App", async () => {
             };
           },
         }),
+      long: new EndpointsFactory(defaultResultHandler).build({
+        method: "get",
+        input: z.object({}),
+        output: z.object({}),
+        handler: async () => setTimeout(5000, {}),
+      }),
     },
   };
   vi.spyOn(console, "log").mockImplementation(vi.fn()); // mutes logo output
@@ -139,6 +146,7 @@ describe("App", async () => {
         },
         cors: false,
         startupLogo: true,
+        gracefulShutdown: { events: ["FAKE"] },
         logger,
         childLoggerProvider: ({ parent }) =>
           Object.defineProperty(parent, "isChild", { value: true }),
@@ -450,6 +458,26 @@ describe("App", async () => {
       expect(response.status).toBe(500);
       const json = await response.json();
       expect(json).toMatchSnapshot();
+    });
+  });
+
+  describe("Shutdown", () => {
+    test("should terminate suspended request gracefully on signal", async () => {
+      const spy = vi
+        .spyOn(process, "exit")
+        .mockImplementation(vi.fn<typeof process.exit>());
+      fetch(`http://127.0.0.1:${port}/v1/long`).catch((err) =>
+        expect(err).toHaveProperty("message", "fetch failed"),
+      );
+      await setTimeout(500);
+      process.emit("FAKE" as "SIGTERM");
+      expect(infoMethod).toHaveBeenCalledWith("Graceful shutdown", {
+        sockets: 1,
+        timeout: 1000,
+      });
+      await setTimeout(1500);
+      expect(server.listening).toBeFalsy();
+      expect(spy).toHaveBeenCalled();
     });
   });
 });
