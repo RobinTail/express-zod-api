@@ -10,7 +10,7 @@
     - first put the server into a mode that rejects new requests,
     - attempt to complete started requests within the specified time,
     - and then forcefully stop the server and terminate the process;
-  - This feature is a modernized fork of [http-terminator](https://github.com/gajus/http-terminator).
+  - This feature utilizes a modernized fork of [http-terminator](https://github.com/gajus/http-terminator).
 
 ```ts
 import { createConfig } from "express-zod-api";
