@@ -4,7 +4,7 @@ import { ezFileBrand } from "../src/file-schema";
 import { SchemaHandler, walkSchema } from "../src/schema-walker";
 
 const disposer = (function* () {
-  let port = 8010;
+  let port = 8e3 + 1e2 * Number(process.env.VITEST_POOL_ID);
   while (true) yield port++;
 })();
 

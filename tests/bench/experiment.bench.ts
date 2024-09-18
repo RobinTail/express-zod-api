@@ -1,52 +1,28 @@
+import http from "node:http";
+import { Socket } from "node:net";
 import { bench } from "vitest";
-import { z } from "zod";
-import { depictExamples } from "../../src/documentation-helpers";
-import "../../src/zod-plugin";
+import { hasHttpServer } from "../../src/graceful-helpers";
 
-describe.skip.each([true, false])("Experiment %s", (isResponse) => {
+const comparable = (
+  socket: Socket,
+): socket is typeof socket & { server: http.Server } =>
+  "server" in socket &&
+  typeof socket.server === "object" &&
+  socket.server !== null &&
+  "close" in socket.server &&
+  typeof socket.server.close === "function";
+
+describe("Experiment %s", () => {
+  const a = new Socket();
+  const b = { server: http.createServer() };
+
   bench("original", () => {
-    depictExamples(
-      z
-        .object({
-          one: z.string().transform((v) => v.length),
-          two: z.number().transform((v) => `${v}`),
-          three: z.boolean(),
-        })
-        .example({
-          one: "test",
-          two: 123,
-          three: true,
-        })
-        .example({
-          one: "test2",
-          two: 456,
-          three: false,
-        }),
-      isResponse,
-      ["three"],
-    );
+    hasHttpServer(a);
+    hasHttpServer(b as unknown as Socket);
   });
 
   bench("featured", () => {
-    depictExamples(
-      z
-        .object({
-          one: z.string().transform((v) => v.length),
-          two: z.number().transform((v) => `${v}`),
-          three: z.boolean(),
-        })
-        .example({
-          one: "test",
-          two: 123,
-          three: true,
-        })
-        .example({
-          one: "test2",
-          two: 456,
-          three: false,
-        }),
-      isResponse,
-      ["three"],
-    );
+    comparable(a);
+    comparable(b as unknown as Socket);
   });
 });

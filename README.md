@@ -56,7 +56,8 @@ Start your API server with I/O schema validation and custom middlewares in minut
    2. [Array response](#array-response) for migrating legacy APIs
    3. [Headers as input source](#headers-as-input-source)
    4. [Accepting raw data](#accepting-raw-data)
-   5. [Subscriptions](#subscriptions)
+   5. [Graceful shutdown](#graceful-shutdown)
+   6. [Subscriptions](#subscriptions)
 7. [Integration and Documentation](#integration-and-documentation)
    1. [Zod Plugin](#zod-plugin)
    2. [Generating a Frontend Client](#generating-a-frontend-client)
@@ -1136,6 +1137,23 @@ const rawAcceptingEndpoint = defaultEndpointsFactory.build({
   handler: async ({ input: { raw } }) => ({
     length: raw.length, // raw is Buffer
   }),
+});
+```
+
+## Graceful shutdown
+
+You can enable and configure a special request monitoring that, if it receives a signal to terminate a process, will
+first put the server into a mode that rejects new requests, attempt to complete started requests within the specified
+time, and then forcefully stop the server and terminate the process.
+
+```ts
+import { createConfig } from "express-zod-api";
+
+createConfig({
+  gracefulShutdown: {
+    timeout: 1000,
+    events: ["SIGINT", "SIGTERM"],
+  },
 });
 ```
 

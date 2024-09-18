@@ -2,6 +2,27 @@
 
 ## Version 20
 
+### v20.12.0
+
+- Feat: Graceful Shutdown
+  - You can enable and configure a special request monitoring that,
+    if it receives a signal to terminate a process, will:
+    - first put the server into a mode that rejects new requests,
+    - attempt to complete started requests within the specified time,
+    - and then forcefully stop the server and terminate the process;
+  - This feature utilizes a modernized fork of [http-terminator](https://github.com/gajus/http-terminator).
+
+```ts
+import { createConfig } from "express-zod-api";
+
+createConfig({
+  gracefulShutdown: {
+    timeout: 1000,
+    events: ["SIGINT", "SIGTERM"],
+  },
+});
+```
+
 ### v20.11.0
 
 - Feat: Handling deprecation events by actual logger

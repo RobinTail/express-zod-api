@@ -4,6 +4,7 @@ import http from "node:http";
 import https from "node:https";
 import { BuiltinLogger } from "./builtin-logger";
 import { AppConfig, CommonConfig, ServerConfig } from "./config-type";
+import { monitor } from "./graceful-shutdown";
 import { isLoggerInstance } from "./logger-helpers";
 import { loadPeer } from "./peer-helpers";
 import { defaultResultHandler } from "./result-handler";
@@ -94,18 +95,30 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
 
   const starter = <T extends http.Server | https.Server>(
     server: T,
-    subject: typeof config.server.listen,
+    subject?: typeof config.server.listen,
   ) => server.listen(subject, () => rootLogger.info("Listening", subject)) as T;
 
-  const servers = {
-    httpServer: starter(http.createServer(app), config.server.listen),
-    httpsServer: config.https
-      ? starter(
-          https.createServer(config.https.options, app),
-          config.https.listen,
-        )
-      : undefined,
-  } satisfies Record<string, http.Server | https.Server | undefined>;
+  const httpServer = http.createServer(app);
+  const httpsServer =
+    config.https && https.createServer(config.https.options, app);
 
-  return { app, ...servers, logger: rootLogger };
+  if (config.gracefulShutdown) {
+    const { events = ["SIGINT", "SIGTERM"], timeout } =
+      typeof config.gracefulShutdown === "object"
+        ? config.gracefulShutdown
+        : {};
+    const graceful = monitor([httpServer].concat(httpsServer || []), {
+      logger: rootLogger,
+      timeout,
+    });
+    const onTerm = () => graceful.shutdown().then(() => process.exit());
+    for (const trigger of events) process.on(trigger, onTerm);
+  }
+
+  return {
+    app,
+    logger: rootLogger,
+    httpServer: starter(httpServer, config.server.listen),
+    httpsServer: httpsServer && starter(httpsServer, config.https?.listen),
+  };
 };
