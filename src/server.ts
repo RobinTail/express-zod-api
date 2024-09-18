@@ -103,18 +103,15 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
     config.https && https.createServer(config.https.options, app);
 
   if (config.gracefulShutdown) {
-    const graceful = monitor([httpServer].concat(httpsServer || []), {
-      logger: rootLogger,
-      timeout:
-        typeof config.gracefulShutdown === "object"
-          ? config.gracefulShutdown.timeout
-          : undefined,
-    });
-    const onTerm = () => graceful.shutdown().then(() => process.exit());
-    const { events = ["SIGINT", "SIGTERM"] } =
+    const { events = ["SIGINT", "SIGTERM"], timeout } =
       typeof config.gracefulShutdown === "object"
         ? config.gracefulShutdown
         : {};
+    const graceful = monitor([httpServer].concat(httpsServer || []), {
+      logger: rootLogger,
+      timeout,
+    });
+    const onTerm = () => graceful.shutdown().then(() => process.exit());
     for (const trigger of events) process.on(trigger, onTerm);
   }
 
