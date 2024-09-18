@@ -19,6 +19,7 @@ import {
   moveRaw,
 } from "./server-helpers";
 import { getStartupLogo } from "./startup-logo";
+import { values, reject, isNil } from "ramda";
 
 const makeCommonEntities = (config: CommonConfig) => {
   if (config.startupLogo !== false) console.log(getStartupLogo());
@@ -109,9 +110,8 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
   } satisfies Record<string, http.Server | https.Server | undefined>;
 
   if (config.gracefulShutdown) {
-    const graceful = monitor({
+    const graceful = monitor(reject(isNil, values(servers)), {
       logger: rootLogger,
-      server: servers.httpServer,
       timeout:
         typeof config.gracefulShutdown === "object"
           ? config.gracefulShutdown.timeout

@@ -4,22 +4,18 @@ import { setInterval } from "node:timers/promises";
 import type { Socket } from "node:net";
 import type { ActualLogger } from "./logger-helpers";
 import {
+  closeAsync,
   hasHttpServer,
   hasResponse,
   isEncrypted,
   weAreClosed,
 } from "./graceful-helpers";
 
-export const monitor = ({
-  server,
-  timeout = 1e3,
-  logger,
-}: {
-  server: http.Server | https.Server;
-  timeout?: number;
-  logger?: ActualLogger;
-}) => {
-  let pending: Promise<void> | undefined;
+export const monitor = (
+  servers: Array<http.Server | https.Server>,
+  { timeout = 1e3, logger }: { timeout?: number; logger?: ActualLogger } = {},
+) => {
+  let pending: Promise<PromiseSettledResult<void>[]> | undefined;
   const sockets = new Set<Socket>();
   const destroy = (socket: Socket) => void sockets.delete(socket.destroy());
 
@@ -34,18 +30,19 @@ export const monitor = ({
       ? socket.destroy()
       : sockets.add(socket.once("close", () => void sockets.delete(socket))));
 
-  server.on("connection", watch);
-  server.on("secureConnection", watch);
-
-  const closeAsync = () =>
-    new Promise<void>(
-      (resolve, reject) =>
-        void server.close((error) => (error ? reject(error) : resolve())),
-    );
+  for (const server of servers) {
+    for (const event of ["connection", "secureConnection"]) {
+      server.on(event, watch);
+    }
+  }
 
   const workflow = async () => {
-    server.on("request", weAreClosed);
-    logger?.info("Graceful shutdown", { sockets: sockets.size, timeout });
+    for (const server of servers) server.on("request", weAreClosed);
+    logger?.info("Graceful shutdown", {
+      servers: servers.length,
+      sockets: sockets.size,
+      timeout,
+    });
     for (const socket of sockets) {
       if (isEncrypted(socket) || hasHttpServer(socket)) disconnect(socket);
     }
@@ -53,7 +50,7 @@ export const monitor = ({
       if (sockets.size === 0 || Date.now() - started >= timeout) break;
     }
     for (const socket of sockets) destroy(socket);
-    return closeAsync();
+    return Promise.allSettled(servers.map(closeAsync));
   };
 
   return { sockets, shutdown: () => (pending ??= workflow()) };
