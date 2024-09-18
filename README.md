@@ -1139,6 +1139,23 @@ const rawAcceptingEndpoint = defaultEndpointsFactory.build({
 });
 ```
 
+## Graceful shutdown
+
+You can enable and configure a special request monitoring that, if it receives a signal to terminate a process, will
+first put the server into a mode that rejects new requests, attempt to complete started requests within the specified
+time, and then forcefully stop the server and terminate the process.
+
+```ts
+import { createConfig } from "express-zod-api";
+
+createConfig({
+  gracefulShutdown: {
+    timeout: 1000,
+    events: ["SIGINT", "SIGTERM"],
+  },
+});
+```
+
 ## Subscriptions
 
 If you want the user of a client application to be able to subscribe to subsequent updates initiated by the server, the
