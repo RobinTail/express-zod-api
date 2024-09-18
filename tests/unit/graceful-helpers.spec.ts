@@ -27,9 +27,7 @@ describe("Graceful helpers", () => {
 
   describe("hasHttpServer()", () => {
     test("should ensure server prop to be instance of http.Server", () => {
-      const subject = {
-        server: http.createServer(),
-      };
+      const subject = { server: http.createServer() };
       expect(hasHttpServer(subject as unknown as Socket)).toBeTruthy();
     });
     test.each([{}, { server: undefined }, { server: {} }])(
