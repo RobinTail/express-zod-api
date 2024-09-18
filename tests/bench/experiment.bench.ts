@@ -1,6 +1,5 @@
 import http from "node:http";
 import { Socket } from "node:net";
-import { TLSSocket } from "node:tls";
 import { bench } from "vitest";
 import { hasHttpServer } from "../../src/graceful-helpers";
 
