@@ -114,6 +114,20 @@ type CompressionOptions = Pick<
   "threshold" | "level" | "strategy" | "chunkSize" | "memLevel"
 >;
 
+interface GracefulOptions {
+  /**
+   * @desc Time given to drain ongoing requests before exit.
+   * @default 1000
+   * */
+  timeout?: number;
+  /**
+   * @desc Process event (Signal) that triggers the graceful shutdown.
+   * @see Signals
+   * @default [SIGINT, SIGTERM]
+   * */
+  events?: string[];
+}
+
 type BeforeRouting = (params: {
   app: IRouter;
   /**
@@ -171,14 +185,11 @@ export interface ServerConfig<TAG extends string = string>
     /** @desc Port, UNIX socket or custom options. */
     listen: number | string | ListenOptions;
   };
-  gracefulShutdown?:
-    | boolean
-    | {
-        /** @default 1000 */
-        timeout?: number;
-        /** @default [SIGINT, SIGTERM] */
-        events?: string[];
-      };
+  /**
+   * @desc Rejects new connections and attempts to finish ongoing ones in the specified time before exit.
+   * @default undefined
+   * */
+  gracefulShutdown?: boolean | GracefulOptions;
 }
 
 export interface AppConfig<TAG extends string = string>
