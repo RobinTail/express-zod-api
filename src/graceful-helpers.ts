@@ -1,25 +1,30 @@
 import http from "node:http";
 import type { Socket, Server } from "node:net";
-import type { TLSSocket } from "node:tls";
 
+/** faster implementation than instanceof for using only the checked methods */
 export const hasResponse = (
   socket: Socket,
-): socket is typeof socket & { _httpMessage: http.ServerResponse } =>
+): socket is typeof socket & {
+  _httpMessage: Pick<http.ServerResponse, "headersSent" | "setHeader">;
+} =>
   "_httpMessage" in socket &&
-  socket._httpMessage instanceof http.ServerResponse;
+  typeof socket._httpMessage === "object" &&
+  socket._httpMessage !== null &&
+  "headersSent" in socket._httpMessage &&
+  typeof socket._httpMessage.headersSent === "boolean" &&
+  "setHeader" in socket._httpMessage &&
+  typeof socket._httpMessage.setHeader === "function";
 
 /** 6.88x faster than instanceof */
-export const hasHttpServer = (
-  socket: Socket,
-): socket is typeof socket & { server: http.Server } =>
+export const hasHttpServer = (socket: Socket): boolean =>
   "server" in socket &&
   typeof socket.server === "object" &&
   socket.server !== null &&
   "close" in socket.server &&
   typeof socket.server.close === "function";
 
-/** 6.30x faster than instanceof */
-export const isEncrypted = (socket: Socket): socket is TLSSocket =>
+/** 6.30x faster than instanceof TLSSocket */
+export const isEncrypted = (socket: Socket): boolean =>
   "encrypted" in socket &&
   typeof socket.encrypted === "boolean" &&
   socket.encrypted;
