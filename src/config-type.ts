@@ -175,9 +175,9 @@ export interface ServerConfig<TAG extends string = string>
     | boolean
     | {
         /** @default 1000 */
-        timeout: number;
+        timeout?: number;
         /** @default [SIGINT, SIGTERM] */
-        events: string[];
+        events?: string[];
       };
 }
 
