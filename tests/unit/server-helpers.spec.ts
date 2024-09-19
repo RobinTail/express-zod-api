@@ -159,7 +159,7 @@ describe("Server helpers", () => {
     const loggerMock = makeLoggerMock();
     const beforeUploadMock = vi.fn();
     const parsers = await createUploadParsers({
-      config: {
+      uploadConfig: {
         limits: { fileSize: 1024 },
         limitError: new Error("Too heavy"),
         beforeUpload: beforeUploadMock,

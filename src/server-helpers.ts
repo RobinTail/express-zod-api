@@ -93,18 +93,18 @@ export const createUploadLogger = (
   log: logger.debug.bind(logger),
 });
 
-export const truthyFallback = <T>(config: true | T, fallback: T): T =>
+export const truthyFb = <T>(config: true | T, fallback: T): T =>
   config === true ? fallback : config;
 
 export const createUploadParsers = async ({
   getChildLogger,
-  config,
+  uploadConfig,
 }: {
   getChildLogger: ChildLoggerExtractor;
-  config: Exclude<ServerConfig["server"]["upload"], false | undefined>;
+  uploadConfig: Exclude<ServerConfig["server"]["upload"], false | undefined>;
 }): Promise<RequestHandler[]> => {
   const uploader = await loadPeer<typeof fileUpload>("express-fileupload");
-  const { limitError, beforeUpload, ...options } = truthyFallback(config, {});
+  const { limitError, beforeUpload, ...options } = truthyFb(uploadConfig, {});
   const parsers: RequestHandler[] = [];
   parsers.push(async (request, response, next) => {
     const logger = getChildLogger(request);

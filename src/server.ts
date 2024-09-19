@@ -17,7 +17,7 @@ import {
   installDeprecationListener,
   moveRaw,
   installTerminationListener,
-  truthyFallback,
+  truthyFb,
 } from "./server-helpers";
 import { getStartupLogo } from "./startup-logo";
 
@@ -72,7 +72,7 @@ export const createServer = async (
       compression: compressionConfig,
       jsonParser,
       rawParser,
-      upload,
+      upload: uploadConfig,
       beforeRouting,
       listen: httpListen,
     },
@@ -93,14 +93,14 @@ export const createServer = async (
 
   if (compressionConfig) {
     const compressor = await loadPeer<typeof compression>("compression");
-    app.use(compressor(truthyFallback(compressionConfig, undefined)));
+    app.use(compressor(truthyFb(compressionConfig, undefined)));
   }
 
   const parsers: Parsers = {
     json: [jsonParser || express.json()],
     raw: [rawParser || express.raw(), moveRaw],
-    upload: upload
-      ? await createUploadParsers({ config: upload, getChildLogger })
+    upload: uploadConfig
+      ? await createUploadParsers({ uploadConfig, getChildLogger })
       : [],
   };
 
@@ -123,7 +123,7 @@ export const createServer = async (
     installTerminationListener({
       servers: [httpServer].concat(httpsServer || []),
       logger: rootLogger,
-      options: truthyFallback(gracefulShutdown, {}),
+      options: truthyFb(gracefulShutdown, {}),
     });
   }
 
