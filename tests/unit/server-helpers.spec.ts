@@ -8,6 +8,8 @@ import {
   createUploadParsers,
   makeChildLoggerExtractor,
   moveRaw,
+  installDeprecationListener,
+  installTerminationListener,
 } from "../../src/server-helpers";
 import { defaultResultHandler, ResultHandler } from "../../src";
 import { Request } from "express";
@@ -247,6 +249,28 @@ describe("Server helpers", () => {
     test("should fall back to root", () => {
       const request = makeRequestMock();
       expect(getChildLogger(request)).toEqual(rootLogger);
+    });
+  });
+
+  describe("installDeprecationListener()", () => {
+    test("should assign deprecation event listener on process", () => {
+      const spy = vi.spyOn(process, "on").mockImplementation(vi.fn());
+      const logger = makeLoggerMock();
+      installDeprecationListener(logger);
+      expect(spy).toHaveBeenCalledWith("deprecation", expect.any(Function));
+    });
+  });
+
+  describe("installTerminationListener", () => {
+    test("should install termination signal listener on process", () => {
+      const spy = vi.spyOn(process, "on").mockImplementation(vi.fn());
+      const logger = makeLoggerMock();
+      installTerminationListener({
+        servers: [],
+        logger,
+        options: { events: ["NOT_HAPPEN"] },
+      });
+      expect(spy).toHaveBeenCalledWith("NOT_HAPPEN", expect.any(Function));
     });
   });
 });

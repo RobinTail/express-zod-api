@@ -9,6 +9,7 @@ import createHttpError, { isHttpError } from "http-errors";
 import { lastResortHandler } from "./last-resort";
 import { ResultHandlerError } from "./errors";
 import { makeErrorFromAnything } from "./common-helpers";
+import { monitor } from "./graceful-shutdown";
 
 type EquippedRequest = Request<
   unknown,
@@ -164,3 +165,17 @@ export const installDeprecationListener = (logger: ActualLogger) =>
       stack.split("\n").slice(1),
     ),
   );
+
+export const installTerminationListener = ({
+  servers,
+  logger,
+  options: { timeout, events = ["SIGINT", "SIGTERM"] },
+}: {
+  servers: Parameters<typeof monitor>[0];
+  options: Extract<ServerConfig["gracefulShutdown"], object>;
+  logger: ActualLogger;
+}) => {
+  const graceful = monitor(servers, { logger, timeout });
+  const onTerm = () => graceful.shutdown().then(() => process.exit());
+  for (const trigger of events) process.on(trigger, onTerm);
+};

@@ -4,7 +4,6 @@ import http from "node:http";
 import https from "node:https";
 import { BuiltinLogger } from "./builtin-logger";
 import { AppConfig, CommonConfig, ServerConfig } from "./config-type";
-import { monitor } from "./graceful-shutdown";
 import { isLoggerInstance } from "./logger-helpers";
 import { loadPeer } from "./peer-helpers";
 import { defaultResultHandler } from "./result-handler";
@@ -17,6 +16,7 @@ import {
   makeChildLoggerExtractor,
   installDeprecationListener,
   moveRaw,
+  installTerminationListener,
 } from "./server-helpers";
 import { getStartupLogo } from "./startup-logo";
 
@@ -103,16 +103,11 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
     config.https && https.createServer(config.https.options, app);
 
   if (config.gracefulShutdown) {
-    const { events = ["SIGINT", "SIGTERM"], timeout } =
-      typeof config.gracefulShutdown === "object"
-        ? config.gracefulShutdown
-        : {};
-    const graceful = monitor([httpServer].concat(httpsServer || []), {
+    installTerminationListener({
+      servers: [httpServer].concat(httpsServer || []),
       logger: rootLogger,
-      timeout,
+      options: config.gracefulShutdown === true ? {} : config.gracefulShutdown,
     });
-    const onTerm = () => graceful.shutdown().then(() => process.exit());
-    for (const trigger of events) process.on(trigger, onTerm);
   }
 
   return {
