@@ -4,7 +4,7 @@ import { loadPeer } from "./peer-helpers";
 import { AbstractResultHandler } from "./result-handler";
 import { ActualLogger } from "./logger-helpers";
 import { CommonConfig, ServerConfig } from "./config-type";
-import { ErrorRequestHandler, RequestHandler, Request } from "express";
+import { ErrorRequestHandler, Request, RequestHandler } from "express";
 import createHttpError, { isHttpError } from "http-errors";
 import { lastResortHandler } from "./last-resort";
 import { ResultHandlerError } from "./errors";
@@ -93,17 +93,18 @@ export const createUploadLogger = (
   log: logger.debug.bind(logger),
 });
 
+export const truthyFallback = <T>(config: true | T, fallback: T): T =>
+  config === true ? fallback : config;
+
 export const createUploadParsers = async ({
   getChildLogger,
   config,
 }: {
   getChildLogger: ChildLoggerExtractor;
-  config: ServerConfig["server"]["upload"];
+  config: Exclude<ServerConfig["server"]["upload"], false | undefined>;
 }): Promise<RequestHandler[]> => {
   const uploader = await loadPeer<typeof fileUpload>("express-fileupload");
-  const { limitError, beforeUpload, ...options } = {
-    ...(typeof config === "object" && config),
-  };
+  const { limitError, beforeUpload, ...options } = truthyFallback(config, {});
   const parsers: RequestHandler[] = [];
   parsers.push(async (request, response, next) => {
     const logger = getChildLogger(request);

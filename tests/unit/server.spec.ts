@@ -239,7 +239,7 @@ describe("Server", () => {
       await createServer(configMock, routingMock);
       expect(appMock.use).toHaveBeenCalledTimes(3);
       expect(compressionMock).toHaveBeenCalledTimes(1);
-      expect(compressionMock).toHaveBeenCalledWith({});
+      expect(compressionMock).toHaveBeenCalledWith(undefined);
     });
 
     test("should enable uploads on request", async () => {

@@ -17,6 +17,7 @@ import {
   installDeprecationListener,
   moveRaw,
   installTerminationListener,
+  truthyFallback,
 } from "./server-helpers";
 import { getStartupLogo } from "./startup-logo";
 
@@ -92,11 +93,7 @@ export const createServer = async (
 
   if (compressionConfig) {
     const compressor = await loadPeer<typeof compression>("compression");
-    app.use(
-      compressor({
-        ...(typeof compressionConfig === "object" && compressionConfig),
-      }),
-    );
+    app.use(compressor(truthyFallback(compressionConfig, undefined)));
   }
 
   const parsers: Parsers = {
@@ -126,9 +123,7 @@ export const createServer = async (
     installTerminationListener({
       servers: [httpServer].concat(httpsServer || []),
       logger: rootLogger,
-      options: {
-        ...(typeof gracefulShutdown === "object" && gracefulShutdown),
-      },
+      options: truthyFallback(gracefulShutdown, {}),
     });
   }
 
