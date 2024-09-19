@@ -98,11 +98,11 @@ export const createUploadParsers = async ({
   config,
 }: {
   getChildLogger: ChildLoggerExtractor;
-  config: ServerConfig;
+  config: ServerConfig["server"]["upload"];
 }): Promise<RequestHandler[]> => {
   const uploader = await loadPeer<typeof fileUpload>("express-fileupload");
   const { limitError, beforeUpload, ...options } = {
-    ...(typeof config.server.upload === "object" && config.server.upload),
+    ...(typeof config === "object" && config),
   };
   const parsers: RequestHandler[] = [];
   parsers.push(async (request, response, next) => {

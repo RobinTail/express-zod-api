@@ -16,19 +16,19 @@ export type Parsers = Record<ContentType, RequestHandler[]>;
 export const initRouting = ({
   app,
   getChildLogger,
-  config,
+  config: { cors, ...rest },
   routing,
   parsers,
 }: {
   app: IRouter;
   getChildLogger: ChildLoggerExtractor;
-  config: CommonConfig;
+  config: Pick<CommonConfig, "cors" | "inputSources">;
   routing: Routing;
   parsers?: Parsers;
 }) =>
   walkRouting({
     routing,
-    hasCors: !!config.cors,
+    hasCors: !!cors,
     onEndpoint: (endpoint, path, method, siblingMethods) => {
       app[method](
         path,
@@ -38,7 +38,7 @@ export const initRouting = ({
             request,
             response,
             logger: getChildLogger(request),
-            config,
+            config: { cors, ...rest },
             siblingMethods,
           }),
       );

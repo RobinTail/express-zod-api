@@ -40,7 +40,7 @@ export abstract class AbstractEndpoint {
     request: Request;
     response: Response;
     logger: ActualLogger;
-    config: CommonConfig;
+    config: Pick<CommonConfig, "cors" | "inputSources">;
     siblingMethods?: ReadonlyArray<Method>;
   }): Promise<void>;
   public abstract getDescription(
@@ -313,23 +313,23 @@ export class Endpoint<
     request,
     response,
     logger,
-    config,
+    config: { cors, inputSources },
     siblingMethods = [],
   }: {
     request: Request;
     response: Response;
     logger: ActualLogger;
-    config: CommonConfig;
+    config: Pick<CommonConfig, "cors" | "inputSources">;
     siblingMethods?: Method[];
   }) {
     const method = getActualMethod(request);
     const options: Partial<OPT> = {};
     let output: FlatObject | null = null;
     let error: Error | null = null;
-    if (config.cors) {
+    if (cors) {
       let headers = this.#getDefaultCorsHeaders(siblingMethods);
-      if (typeof config.cors === "function") {
-        headers = await config.cors({
+      if (typeof cors === "function") {
+        headers = await cors({
           request,
           logger,
           endpoint: this,
@@ -340,7 +340,7 @@ export class Endpoint<
         response.set(key, headers[key]);
       }
     }
-    const input = getInput(request, config.inputSources);
+    const input = getInput(request, inputSources);
     try {
       await this.#runMiddlewares({
         method,

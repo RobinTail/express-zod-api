@@ -25,7 +25,10 @@ const makeCommonEntities = ({
   errorHandler: chosenErrorHandler,
   logger: loggerConfig,
   childLoggerProvider: provider,
-}: CommonConfig) => {
+}: Pick<
+  CommonConfig,
+  "startupLogo" | "errorHandler" | "logger" | "childLoggerProvider"
+>) => {
   if (startupLogo) console.log(getStartupLogo());
   const errorHandler = chosenErrorHandler || defaultResultHandler;
   const rootLogger = isLoggerInstance(loggerConfig)
@@ -47,78 +50,92 @@ const makeCommonEntities = ({
   };
 };
 
-export const attachRouting = (config: AppConfig, routing: Routing) => {
+export const attachRouting = (
+  { app, ...rest }: AppConfig,
+  routing: Routing,
+) => {
   const { rootLogger, getChildLogger, notFoundHandler, loggingMiddleware } =
-    makeCommonEntities(config);
+    makeCommonEntities(rest);
   initRouting({
-    app: config.app.use(loggingMiddleware),
+    app: app.use(loggingMiddleware),
     routing,
     getChildLogger,
-    config,
+    config: rest,
   });
   return { notFoundHandler, logger: rootLogger };
 };
 
-export const createServer = async (config: ServerConfig, routing: Routing) => {
+export const createServer = async (
+  {
+    server: {
+      compression: compressionConfig,
+      jsonParser,
+      rawParser,
+      upload,
+      beforeRouting,
+      listen: httpListen,
+    },
+    https: httpsConfig,
+    gracefulShutdown,
+    ...rest
+  }: ServerConfig,
+  routing: Routing,
+) => {
   const {
     rootLogger,
     getChildLogger,
     notFoundHandler,
     parserFailureHandler,
     loggingMiddleware,
-  } = makeCommonEntities(config);
+  } = makeCommonEntities(rest);
   const app = express().disable("x-powered-by").use(loggingMiddleware);
 
-  if (config.server.compression) {
+  if (compressionConfig) {
     const compressor = await loadPeer<typeof compression>("compression");
     app.use(
-      compressor(
-        typeof config.server.compression === "object"
-          ? config.server.compression
-          : undefined,
-      ),
+      compressor({
+        ...(typeof compressionConfig === "object" && compressionConfig),
+      }),
     );
   }
 
   const parsers: Parsers = {
-    json: [config.server.jsonParser || express.json()],
-    raw: [config.server.rawParser || express.raw(), moveRaw],
-    upload: config.server.upload
-      ? await createUploadParsers({ config, getChildLogger })
+    json: [jsonParser || express.json()],
+    raw: [rawParser || express.raw(), moveRaw],
+    upload: upload
+      ? await createUploadParsers({ config: upload, getChildLogger })
       : [],
   };
 
-  if (config.server.beforeRouting) {
-    await config.server.beforeRouting({
-      app,
-      logger: rootLogger,
-      getChildLogger,
-    });
+  if (beforeRouting) {
+    await beforeRouting({ app, logger: rootLogger, getChildLogger });
   }
-  initRouting({ app, routing, getChildLogger, config, parsers });
+  initRouting({ app, routing, getChildLogger, config: rest, parsers });
   app.use(parserFailureHandler, notFoundHandler);
 
   const starter = <T extends http.Server | https.Server>(
     server: T,
-    subject?: typeof config.server.listen,
+    subject?: typeof httpListen,
   ) => server.listen(subject, () => rootLogger.info("Listening", subject)) as T;
 
   const httpServer = http.createServer(app);
   const httpsServer =
-    config.https && https.createServer(config.https.options, app);
+    httpsConfig && https.createServer(httpsConfig.options, app);
 
-  if (config.gracefulShutdown) {
+  if (gracefulShutdown) {
     installTerminationListener({
       servers: [httpServer].concat(httpsServer || []),
       logger: rootLogger,
-      options: config.gracefulShutdown === true ? {} : config.gracefulShutdown,
+      options: {
+        ...(typeof gracefulShutdown === "object" && gracefulShutdown),
+      },
     });
   }
 
   return {
     app,
     logger: rootLogger,
-    httpServer: starter(httpServer, config.server.listen),
-    httpsServer: httpsServer && starter(httpsServer, config.https?.listen),
+    httpServer: starter(httpServer, httpListen),
+    httpsServer: httpsServer && starter(httpsServer, httpsConfig?.listen),
   };
 };
