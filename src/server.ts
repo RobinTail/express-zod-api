@@ -20,15 +20,20 @@ import {
 } from "./server-helpers";
 import { getStartupLogo } from "./startup-logo";
 
-const makeCommonEntities = (config: CommonConfig) => {
-  if (config.startupLogo !== false) console.log(getStartupLogo());
-  const errorHandler = config.errorHandler || defaultResultHandler;
-  const rootLogger = isLoggerInstance(config.logger)
-    ? config.logger
-    : new BuiltinLogger(config.logger);
+const makeCommonEntities = ({
+  startupLogo = true,
+  errorHandler: chosenErrorHandler,
+  logger: loggerConfig,
+  childLoggerProvider: provider,
+}: CommonConfig) => {
+  if (startupLogo) console.log(getStartupLogo());
+  const errorHandler = chosenErrorHandler || defaultResultHandler;
+  const rootLogger = isLoggerInstance(loggerConfig)
+    ? loggerConfig
+    : new BuiltinLogger(loggerConfig);
   rootLogger.debug("Running", process.env.TSUP_BUILD || "from sources");
   installDeprecationListener(rootLogger);
-  const loggingMiddleware = createLoggingMiddleware({ rootLogger, config });
+  const loggingMiddleware = createLoggingMiddleware({ rootLogger, provider });
   const getChildLogger = makeChildLoggerExtractor(rootLogger);
   const commons = { getChildLogger, errorHandler };
   const notFoundHandler = createNotFoundHandler(commons);

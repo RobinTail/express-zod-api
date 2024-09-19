@@ -137,14 +137,14 @@ export const moveRaw: RequestHandler = (req, {}, next) => {
 export const createLoggingMiddleware =
   ({
     rootLogger,
-    config,
+    provider,
   }: {
     rootLogger: ActualLogger;
-    config: CommonConfig;
+    provider: CommonConfig["childLoggerProvider"];
   }): RequestHandler =>
   async (request, response, next) => {
-    const logger = config.childLoggerProvider
-      ? await config.childLoggerProvider({ request, parent: rootLogger })
+    const logger = provider
+      ? await provider({ request, parent: rootLogger })
       : rootLogger;
     logger.debug(`${request.method}: ${request.path}`);
     if (request.res) {
