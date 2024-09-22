@@ -9,6 +9,7 @@ export default defineConfig({
     pool: "threads",
     testTimeout: 10000,
     reporters: "basic",
+    setupFiles: "vitest.setup.ts",
     coverage: {
       provider: "istanbul",
       reporter: [["text", { maxCols: 120 }], "json-summary", "html", "lcov"],
