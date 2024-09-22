@@ -2,7 +2,7 @@ import type fileUpload from "express-fileupload";
 import { metaSymbol } from "./metadata";
 import { loadPeer } from "./peer-helpers";
 import { AbstractResultHandler } from "./result-handler";
-import { ActualLogger } from "./logger-helpers";
+import { ActualLogger, isLoggerInstance } from "./logger-helpers";
 import { CommonConfig, ServerConfig } from "./config-type";
 import { ErrorRequestHandler, Request, RequestHandler } from "express";
 import createHttpError, { isHttpError } from "http-errors";
@@ -10,6 +10,8 @@ import { lastResortHandler } from "./last-resort";
 import { ResultHandlerError } from "./errors";
 import { makeErrorFromAnything } from "./common-helpers";
 import { monitor } from "./graceful-shutdown";
+import { BuiltinLogger, defaultResultHandler } from ".";
+import { getStartupLogo } from "./startup-logo";
 
 type EquippedRequest = Request<
   unknown,
@@ -179,4 +181,35 @@ export const installTerminationListener = ({
   const graceful = monitor(servers, { logger, timeout });
   const onTerm = () => graceful.shutdown().then(() => process.exit());
   for (const trigger of events) process.on(trigger, onTerm);
+};
+
+/** @desc The workflow needed both for createServer() and attachRouting() */
+export const makeCommonEntities = ({
+  startupLogo = true,
+  errorHandler: chosenErrorHandler,
+  logger: loggerConfig,
+  childLoggerProvider: provider,
+}: Pick<
+  CommonConfig,
+  "startupLogo" | "errorHandler" | "logger" | "childLoggerProvider"
+>) => {
+  if (startupLogo) console.log(getStartupLogo());
+  const errorHandler = chosenErrorHandler || defaultResultHandler;
+  const rootLogger = isLoggerInstance(loggerConfig)
+    ? loggerConfig
+    : new BuiltinLogger(loggerConfig);
+  rootLogger.debug("Running", process.env.TSUP_BUILD || "from sources");
+  installDeprecationListener(rootLogger);
+  const loggingMiddleware = createLoggingMiddleware({ rootLogger, provider });
+  const getChildLogger = makeChildLoggerExtractor(rootLogger);
+  const commons = { getChildLogger, errorHandler };
+  const notFoundHandler = createNotFoundHandler(commons);
+  const parserFailureHandler = createParserFailureHandler(commons);
+  return {
+    ...commons,
+    rootLogger,
+    notFoundHandler,
+    parserFailureHandler,
+    loggingMiddleware,
+  };
 };

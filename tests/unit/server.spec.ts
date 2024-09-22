@@ -1,4 +1,3 @@
-import { moveRaw } from "../../src/server-helpers";
 import { givePort } from "../helpers";
 import {
   appMock,
@@ -23,6 +22,7 @@ import {
   defaultResultHandler,
   ez,
 } from "../../src";
+import { moveRaw } from "../../src/server-helpers";
 import express from "express";
 
 describe("Server", () => {
