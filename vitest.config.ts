@@ -1,4 +1,6 @@
 import { defineConfig } from "vitest/config";
+import { fileURLToPath } from "node:url";
+import { dirname, join } from "node:path";
 
 export default defineConfig({
   test: {
@@ -9,7 +11,10 @@ export default defineConfig({
     pool: "threads",
     testTimeout: 10000,
     reporters: "basic",
-    setupFiles: "vitest.setup.ts",
+    setupFiles: join(
+      dirname(fileURLToPath(import.meta.url)),
+      "vitest.setup.ts",
+    ),
     coverage: {
       provider: "istanbul",
       reporter: [["text", { maxCols: 120 }], "json-summary", "html", "lcov"],
