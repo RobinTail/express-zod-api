@@ -1,25 +1,5 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`Migration > should consist of one rule 1`] = `
-{
-  "rules": {
-    "v20": {
-      "create": [Function],
-      "defaultOptions": [],
-      "meta": {
-        "fixable": "code",
-        "messages": {
-          "change": "Change {{subject}} {{from}} to {{to}}.",
-          "remove": "Remove {{subject}} {{name}}.",
-        },
-        "schema": [],
-        "type": "problem",
-      },
-    },
-  },
-}
-`;
-
 exports[`Migration > should consist of one rule being the major version of the package 1`] = `
 {
   "rules": {
