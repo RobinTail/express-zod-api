@@ -1,6 +1,7 @@
 import { RuleTester } from "@typescript-eslint/rule-tester";
 import migration from "../../src/migration";
 import parser from "@typescript-eslint/parser";
+import { version } from "../../package.json";
 
 RuleTester.afterAll = afterAll;
 RuleTester.describe = describe;
@@ -11,7 +12,8 @@ const tester = new RuleTester({
 });
 
 describe("Migration", () => {
-  test("should consist of one rule", () => {
+  test("should consist of one rule being the major version of the package", () => {
+    expect(migration.rules).toHaveProperty(`v${version.split(".")[0]}`);
     expect(migration).toMatchSnapshot();
   });
 });
