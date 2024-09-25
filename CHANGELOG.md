@@ -2,6 +2,11 @@
 
 ## Version 20
 
+### v20.14.0
+
+- Enabling usage of recently released `@types/express@^5.0.0`:
+  - This is an addition to the support of Express 5 introduced in v20.10.0.
+
 ### v20.12.0
 
 - Feat: Graceful Shutdown
