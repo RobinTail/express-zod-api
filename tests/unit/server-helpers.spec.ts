@@ -32,28 +32,34 @@ describe("Server helpers", () => {
       expect(next).toHaveBeenCalledTimes(1);
     });
 
-    test("the handler should call error handler", async () => {
-      const errorHandler = new ResultHandler({
-        positive: vi.fn(),
-        negative: vi.fn(),
-        handler: vi.fn(),
-      });
-      const spy = vi.spyOn(errorHandler, "execute");
-      const handler = createParserFailureHandler({
-        errorHandler,
-        getChildLogger: () => makeLoggerMock(),
-      });
-      await handler(
-        new SyntaxError("Unexpected end of JSON input"),
-        makeRequestMock(),
-        makeResponseMock(),
-        vi.fn<any>(),
-      );
-      expect(spy).toHaveBeenCalledTimes(1);
-      expect(spy.mock.calls[0][0].error).toEqual(
-        createHttpError(400, "Unexpected end of JSON input"),
-      );
-    });
+    test.each([
+      new SyntaxError("Unexpected end of JSON input"),
+      createHttpError(400, "Unexpected end of JSON input"),
+    ])(
+      "the handler should call error handler with correct error code %#",
+      async (error) => {
+        const errorHandler = new ResultHandler({
+          positive: vi.fn(),
+          negative: vi.fn(),
+          handler: vi.fn(),
+        });
+        const spy = vi.spyOn(errorHandler, "execute");
+        const handler = createParserFailureHandler({
+          errorHandler,
+          getChildLogger: () => makeLoggerMock(),
+        });
+        await handler(
+          error,
+          makeRequestMock(),
+          makeResponseMock(),
+          vi.fn<any>(),
+        );
+        expect(spy).toHaveBeenCalledTimes(1);
+        expect(spy.mock.calls[0][0].error).toEqual(
+          createHttpError(400, "Unexpected end of JSON input"),
+        );
+      },
+    );
   });
 
   describe("createNotFoundHandler()", () => {
