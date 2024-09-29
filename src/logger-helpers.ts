@@ -27,7 +27,14 @@ export const isLoggerInstance = (subject: unknown): subject is AbstractLogger =>
   Object.keys(severity).some((method) => method in subject);
 
 /** @link https://tc39.es/ecma402/#table-sanctioned-single-unit-identifiers */
-const makeNumberFormat = (unit: string, fraction = 0) =>
+type TimeUnit =
+  | "nanosecond"
+  | "microsecond"
+  | "millisecond"
+  | "second"
+  | "minute";
+
+const makeNumberFormat = (unit: TimeUnit, fraction = 0) =>
   Intl.NumberFormat(undefined, {
     useGrouping: false,
     minimumFractionDigits: 0,
