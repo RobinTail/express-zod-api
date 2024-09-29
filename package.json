@@ -117,7 +117,7 @@
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.16.2",
     "@eslint/eslintrc": "^3",
-    "@tsconfig/node18": "^18.2.1",
+    "@tsconfig/node20": "^20.1.4",
     "@types/compression": "^1.7.5",
     "@types/cors": "^2.8.14",
     "@types/depd": "^1.1.36",
