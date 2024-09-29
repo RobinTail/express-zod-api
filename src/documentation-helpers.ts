@@ -274,7 +274,7 @@ export const depictEnum: Depicter = (
 });
 
 export const depictLiteral: Depicter = ({ value }: z.ZodLiteral<unknown>) => ({
-  type: getSupportedType(value), // constructor allows z.Primitive only, but ZodLiteral does not have that constrant
+  type: getSupportedType(value), // constructor allows z.Primitive only, but ZodLiteral does not have that constraint
   const: value,
 });
 

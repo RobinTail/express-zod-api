@@ -50,7 +50,7 @@ interface IntegrationParams {
    * */
   variant?: "types" | "client";
   /**
-   * @desc Declares positive and negative response types separately and provides them within additional dictoinaries
+   * @desc Declares positive and negative response types separately and provides them within additional dictionaries
    * @default false
    * */
   splitResponse?: boolean;

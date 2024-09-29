@@ -17,7 +17,7 @@ import {
 } from "../../src/testing";
 
 describe("ResultHandler", () => {
-  describe("conctructor()", () => {
+  describe("constructor()", () => {
     test("should support multiple response schemas depending on status codes", () => {
       const subject = new ResultHandler({
         positive: () => [
