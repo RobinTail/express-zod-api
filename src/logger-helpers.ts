@@ -46,16 +46,11 @@ const sFormat = makeNumberFormat("second", 2);
 const mFormat = makeNumberFormat("minute", 2);
 
 // not using R.cond for performance optimization
-const pickTimeUnit = (ms: number): [number, Intl.NumberFormat] => {
-  if (ms < 1e-6) return [ms / 1e-6, pcFormat];
-  if (ms < 1e-3) return [ms / 1e-6, nsFormat];
-  if (ms < 1) return [ms / 1e-3, mcFormat];
-  if (ms < 1e3) return [ms, msFormat];
-  if (ms < 6e4) return [ms / 1e3, sFormat];
-  return [ms / 6e4, mFormat];
-};
-
-export const formatDuration = (durationMs: number) => {
-  const [converted, formatter] = pickTimeUnit(durationMs);
-  return formatter.format(converted);
+export const formatDuration = (ms: number) => {
+  if (ms < 1e-6) return pcFormat.format(ms / 1e-6);
+  if (ms < 1e-3) return nsFormat.format(ms / 1e-6);
+  if (ms < 1) return mcFormat.format(ms / 1e-3);
+  if (ms < 1e3) return msFormat.format(ms);
+  if (ms < 6e4) return sFormat.format(ms / 1e3);
+  return mFormat.format(ms / 6e4);
 };
