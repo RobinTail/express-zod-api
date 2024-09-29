@@ -27,7 +27,7 @@ exports[`App > Protocol > Should fail on invalid method 1`] = `
 exports[`App > Protocol > Should fail on malformed body 1`] = `
 {
   "error": {
-    "message": StringMatching /Unterminated string in JSON at position 25/,
+    "message": "Unterminated string in JSON at position 25",
   },
   "status": "error",
 }

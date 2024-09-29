@@ -354,13 +354,7 @@ describe("App", async () => {
       });
       expect(response.status).toBe(400); // Issue #907
       const json = await response.json();
-      expect(json).toMatchSnapshot({
-        error: {
-          message: expect.stringMatching(
-            /Unterminated string in JSON at position 25/,
-          ),
-        },
-      });
+      expect(json).toMatchSnapshot();
     });
 
     test("Should fail when missing content type header", async () => {
