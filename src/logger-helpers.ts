@@ -38,19 +38,19 @@ const makeNumberFormat = (unit: string, fraction = 0) =>
   });
 
 // creating them once increases the performance significantly
-const pcFormat = makeNumberFormat("nanosecond", 3);
-const nsFormat = makeNumberFormat("nanosecond");
-const mcFormat = makeNumberFormat("microsecond");
-const msFormat = makeNumberFormat("millisecond");
-const sFormat = makeNumberFormat("second", 2);
-const mFormat = makeNumberFormat("minute", 2);
+const picoFormat = makeNumberFormat("nanosecond", 3);
+const nanoFormat = makeNumberFormat("nanosecond");
+const microFormat = makeNumberFormat("microsecond");
+const milliFormat = makeNumberFormat("millisecond");
+const secondsFormat = makeNumberFormat("second", 2);
+const minutesFormat = makeNumberFormat("minute", 2);
 
 // not using R.cond for performance optimization
 export const formatDuration = (ms: number) => {
-  if (ms < 1e-6) return pcFormat.format(ms / 1e-6);
-  if (ms < 1e-3) return nsFormat.format(ms / 1e-6);
-  if (ms < 1) return mcFormat.format(ms / 1e-3);
-  if (ms < 1e3) return msFormat.format(ms);
-  if (ms < 6e4) return sFormat.format(ms / 1e3);
-  return mFormat.format(ms / 6e4);
+  if (ms < 1e-6) return picoFormat.format(ms / 1e-6);
+  if (ms < 1e-3) return nanoFormat.format(ms / 1e-6);
+  if (ms < 1) return microFormat.format(ms / 1e-3);
+  if (ms < 1e3) return milliFormat.format(ms);
+  if (ms < 6e4) return secondsFormat.format(ms / 1e3);
+  return minutesFormat.format(ms / 6e4);
 };
