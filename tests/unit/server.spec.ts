@@ -274,7 +274,7 @@ describe("Server", () => {
       expect(appMock.get).toHaveBeenCalledWith(
         "/v1/test",
         expect.any(Function), // uploader with logger
-        expect.any(Function), // createUploadFailueHandler()
+        expect.any(Function), // createUploadFailureHandler()
         expect.any(Function), // endpoint
       );
     });

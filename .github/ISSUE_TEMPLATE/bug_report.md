@@ -10,7 +10,7 @@ assignees: ''
 # Description
 
 A clear and concise description of what the bug is.
-Accompany with screenshots or generated code samples if needed.
+Accompany by screenshots or generated code samples if needed.
 
 ## Expected
 

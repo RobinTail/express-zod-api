@@ -57,7 +57,7 @@ createConfig({
 
 ### v20.9.0
 
-- `openapi3-ts` vesion is 4.4.0:
+- `openapi3-ts` version is 4.4.0:
   - Feat: `Documentation::getSpecAsYaml()` accepts the same options as `yaml.stringify`.
 
 ### v20.8.0
@@ -605,7 +605,7 @@ const resultHandlerWithCleanup = createResultHandler({
 
 ### v18.6.0
 
-- Feat: Supporting async functon as an argument for `EndpointsFactory::addOptions()`:
+- Feat: Supporting async function as an argument for `EndpointsFactory::addOptions()`:
   - I realized that it does not make sense for `.addOptions` just to proxy the static data;
   - In case your options are static you can just `import` the corresponding `const` instead;
   - Static options are deprecated and its support will be removed in v19.
@@ -637,7 +637,7 @@ const endpointsFactory = defaultEndpointsFactory.addOptions(async () => {
   - ~~`withMeta()`~~ was introduced in version 2.10.0, because I didn't want to alter Zod's prototypes;
   - However, the [new information](https://github.com/colinhacks/zod/pull/3445#issuecomment-2091463120) arrived
     recently from the author of Zod on that matter;
-  - It turned out that altering Zod's prototypes is exatly the recommended approach for extending its functionality;
+  - It turned out that altering Zod's prototypes is exactly the recommended approach for extending its functionality;
   - Therefore `express-zod-api` from now on acts as a plugin for Zod, adding the `.example()` and `.label()` methods to
     its prototypes that were previously available only after wrapping the schema in ~~`withMeta()`~~.
 
@@ -970,7 +970,7 @@ export const config = createConfig({
   - Refinment methods of `ez.file()` removed;
   - Minimum version of `vitest` supported is 1.0.4.
 - How to migrate confidently:
-  - If you're using refinment methods of `ez.file()`:
+  - If you're using refinement methods of `ez.file()`:
     - Replace ~~`ez.file().string()`~~ to `ez.file("string")`;
     - Replace ~~`ez.file().buffer()`~~ to `ez.file("buffer")`;
     - Replace ~~`ez.file().base64()`~~ to `ez.file("base64")`;
@@ -1018,7 +1018,7 @@ after:
   - This version relies on `inspect()` method of `node:util` instead, for serializing objects in all cases.
   - When the `level` is set to `debug` the inspected objects will be pretty printed.
   - When the `level` is set to `warn` the inspected objects will be serialized in one line.
-- Additionaly, new option `depth` added to `SimplifiedWinstonConfig` that can be `number | null` being `2` by default.
+- Additionally, new option `depth` added to `SimplifiedWinstonConfig` that can be `number | null` being `2` by default.
   - The option controls how deeply the objects should be inspected, serialized and printed.
   - It can be set to `null` or `Infinity` for unlimited depth.
 
@@ -1347,7 +1347,7 @@ securitySchemes:
   - Switching to [OpenAPI 3.1](https://swagger.io/specification/) for generating better Documentation for your API.
     - Consider [the new UI](https://editor-next.swagger.io/) for exploring the produced documentation.
   - Improved way of configuring descriptions and naming of the generated documentation components:
-    - Intoroducing the new option `descriptions` holding several formatting functions.
+    - Introducing the new option `descriptions` holding several formatting functions.
   - Ability to generate formatted typescript client using the new async method `printFormatted` of the `Integration`
     class when the `prettier` package is installed (detects automatically).
     - Ability to supply your own typescript formatting function into that new method.
@@ -1432,7 +1432,7 @@ operationId:
   - Transitioned from an exclusive approach to the inclusive one:
     - Introducing the list of `files` included into the distribution (instead of ignoring redundant ones).
   - Stable testing environment:
-    - Inclusive, stable and extendible `tsconfig.json` files;
+    - Inclusive, stable and extensible `tsconfig.json` files;
     - Stable `package.json` for integration, ESM and compatibility tests;
     - Dedicated environment for Issue #952 test.
   - Simplified development commands.
@@ -1526,7 +1526,7 @@ logger.info("Payload", {});
 
 ### v14.2.4
 
-- Fixed internal logging format when primivite are supplied as a second argument to the logger methods.
+- Fixed internal logging format when primitive are supplied as a second argument to the logger methods.
 
 ```typescript
 logger.info("Listening", 8090);
@@ -1690,7 +1690,7 @@ defaultEndpointsFactory.build({
 - Featuring the ability to customize the `operationId` in the generated documentation.
   - Using the new property of `EndpointsFactory::build()` method you can now override the value of the
     corresponding `operationId` of the endpoint in generated documentation.
-  - When using this feature, you must ensure the uniqness of the IDs you specified across your API endpoints.
+  - When using this feature, you must ensure the uniqueness of the IDs you specified across your API endpoints.
   - The feature is implemented by [@john-schmitz](https://github.com/john-schmitz).
 
 ```typescript
@@ -1741,7 +1741,7 @@ defaultEndpointsFactory.build({
     - Instead of `MiddlewareDefinition` type use `createMiddleware()` method.
     - Instead of `ResultHandlerDefinition` type use `createResultHandler()` method.
     - Instead of the mentioned security types use the `security` property of the `createMiddleware()` argument.
-  - The issue 1182 is the continuation of the issue 952 "Infussicient exports" (for consumer's declaration).
+  - The issue 1182 is the continuation of the issue 952 "Insufficient exports" (for consumer's declaration).
     - Found and reported by [@bobgubko](https://github.com/bobgubko)
 
 ### v12.0.2

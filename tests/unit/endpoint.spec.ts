@@ -355,7 +355,7 @@ describe("Endpoint", () => {
   });
 
   describe(".getOperationId()", () => {
-    test("should return undefined if its not defined upon creaton", () => {
+    test("should return undefined if its not defined upon creation", () => {
       expect(
         new Endpoint({
           methods: ["get"],

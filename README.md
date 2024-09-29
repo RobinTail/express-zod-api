@@ -443,7 +443,7 @@ enough for the `output` schema if you're also aiming to [generate a valid docume
 because the transformations themselves do not contain schemas. Addressing this case, the library offers the `.remap()`
 method of the object schema, a part of the [Zod plugin](#zod-plugin), which under the hood, in addition to the
 transformation, also `.pipe()` the transformed object into a new object schema.
-Here is a recommended solution: it is importnant to use shallow transformations only.
+Here is a recommended solution: it is important to use shallow transformations only.
 
 ```ts
 import camelize from "camelize-ts";
@@ -465,7 +465,7 @@ const endpoint = endpointsFactory.build({
 });
 ```
 
-The `.remap()` method can also accept an object with an explictly defined naming of your choice. The original keys
+The `.remap()` method can also accept an object with an explicitly defined naming of your choice. The original keys
 missing in that object remain unchanged (partial mapping).
 
 ```ts

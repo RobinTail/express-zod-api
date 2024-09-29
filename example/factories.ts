@@ -17,7 +17,7 @@ export const taggedEndpointsFactory = new EndpointsFactory({
   config,
 });
 
-/** @desc This one extends the previois one by enforcing the authentication using the specified middleware */
+/** @desc This one extends the previous one by enforcing the authentication using the specified middleware */
 export const keyAndTokenAuthenticatedEndpointsFactory =
   taggedEndpointsFactory.addMiddleware(authMiddleware);
 
