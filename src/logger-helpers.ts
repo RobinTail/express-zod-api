@@ -1,8 +1,17 @@
 import { isObject } from "./common-helpers";
 
+export const severity = {
+  debug: 10,
+  info: 20,
+  warn: 30,
+  error: 40,
+} satisfies Record<string, number>;
+
+export type Severity = keyof typeof severity;
+
 /** @desc You can use any logger compatible with this type. */
 export type AbstractLogger = Record<
-  "info" | "debug" | "warn" | "error",
+  Severity,
   (message: string, meta?: any) => any // eslint-disable-line @typescript-eslint/no-explicit-any -- for compatibility
 >;
 
@@ -14,13 +23,6 @@ export type AbstractLogger = Record<
 export interface LoggerOverrides {} // eslint-disable-line @typescript-eslint/no-empty-object-type -- for augmentation
 
 export type ActualLogger = AbstractLogger & LoggerOverrides;
-
-export const severity: Record<keyof AbstractLogger, number> = {
-  debug: 10,
-  info: 20,
-  warn: 30,
-  error: 40,
-};
 
 export const isLoggerInstance = (subject: unknown): subject is AbstractLogger =>
   isObject(subject) &&
