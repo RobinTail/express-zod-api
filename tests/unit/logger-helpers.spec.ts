@@ -4,9 +4,16 @@ import {
   AbstractLogger,
   formatDuration,
   isLoggerInstance,
+  severity,
 } from "../../src/logger-helpers";
 
 describe("Logger helpers", () => {
+  describe("severity", () => {
+    test("should have the specific arrangement", () => {
+      expect(severity).toMatchSnapshot();
+    });
+  });
+
   describe("isLoggerInstance()", () => {
     test.each<BuiltinLoggerConfig>([
       { level: "silent" },

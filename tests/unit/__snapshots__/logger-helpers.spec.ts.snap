@@ -39,3 +39,12 @@ exports[`Logger helpers > formatDuration() > 17 should format 10000000 ms 1`] = 
 exports[`Logger helpers > formatDuration() > 18 should format 100000000 ms 1`] = `"1666.67 minutes"`;
 
 exports[`Logger helpers > formatDuration() > 19 should format 1000000000 ms 1`] = `"16666.67 minutes"`;
+
+exports[`Logger helpers > severity > should have the specific arrangement 1`] = `
+{
+  "debug": 10,
+  "error": 40,
+  "info": 20,
+  "warn": 30,
+}
+`;
