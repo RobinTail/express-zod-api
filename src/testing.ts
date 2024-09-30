@@ -5,8 +5,8 @@ import { AbstractEndpoint } from "./endpoint";
 import {
   AbstractLogger,
   ActualLogger,
+  isSeverity,
   Severity,
-  severity,
 } from "./logger-helpers";
 import { contentTypes } from "./content-type";
 import {
@@ -40,12 +40,9 @@ export const makeLoggerMock = <LOG extends FlatObject>(loggerProps?: LOG) => {
       LOG & { _getLogs: () => typeof logs },
     {
       get(target, prop, recv) {
-        if (prop === "_getLogs") {
-          return () => logs;
-        }
-        if (prop in severity) {
-          return (...args: unknown[]) => logs[prop as Severity].push(args);
-        }
+        if (prop === "_getLogs") return () => logs;
+        if (isSeverity(prop))
+          return (...args: unknown[]) => logs[prop].push(args);
         return Reflect.get(target, prop, recv);
       },
     },

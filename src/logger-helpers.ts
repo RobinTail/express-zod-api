@@ -28,6 +28,9 @@ export const isLoggerInstance = (subject: unknown): subject is AbstractLogger =>
   isObject(subject) &&
   Object.keys(severity).some((method) => method in subject);
 
+export const isSeverity = (subject: PropertyKey): subject is Severity =>
+  subject in severity;
+
 /**
  * @todo consider Intl units when Node 18 dropped (microsecond unit is missing, picosecond is not in list)
  * @link https://tc39.es/ecma402/#table-sanctioned-single-unit-identifiers

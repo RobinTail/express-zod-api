@@ -5,6 +5,7 @@ import {
   formatDuration,
   isLoggerInstance,
   severity,
+  isSeverity,
 } from "../../src/logger-helpers";
 
 describe("Logger helpers", () => {
@@ -12,6 +13,21 @@ describe("Logger helpers", () => {
     test("should have the specific arrangement", () => {
       expect(severity).toMatchSnapshot();
     });
+  });
+
+  describe("isSeverity()", () => {
+    test.each(["debug", "info", "warn", "error"])(
+      "should recognize %s",
+      (subject) => {
+        expect(isSeverity(subject)).toBeTruthy();
+      },
+    );
+    test.each(["something", "", 123, Symbol.dispose])(
+      "should reject others %#",
+      (subject) => {
+        expect(isSeverity(subject)).toBeFalsy();
+      },
+    );
   });
 
   describe("isLoggerInstance()", () => {
