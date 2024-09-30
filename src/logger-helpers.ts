@@ -1,6 +1,6 @@
 import { isObject } from "./common-helpers";
 
-export const severity = {
+const severity = {
   debug: 10,
   info: 20,
   warn: 30,
@@ -30,6 +30,10 @@ export const isLoggerInstance = (subject: unknown): subject is AbstractLogger =>
 
 export const isSeverity = (subject: PropertyKey): subject is Severity =>
   subject in severity;
+
+/** @desc returns positive number when subject has a higher severity than the reference */
+export const sevCompare = (subject: Severity, reference: Severity) =>
+  severity[subject] - severity[reference];
 
 /**
  * @todo consider Intl units when Node 18 dropped (microsecond unit is missing, picosecond is not in list)

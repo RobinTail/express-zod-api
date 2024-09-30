@@ -5,8 +5,8 @@ import type { FlatObject } from "./common-helpers";
 import {
   AbstractLogger,
   formatDuration,
+  sevCompare,
   Severity,
-  severity,
 } from "./logger-helpers";
 
 interface Context extends FlatObject {
@@ -75,7 +75,7 @@ export class BuiltinLogger implements AbstractLogger {
   protected print(method: Severity, message: string, meta?: unknown) {
     if (
       this.config.level === "silent" ||
-      severity[method] < severity[this.config.level]
+      sevCompare(method, this.config.level) < 0
     ) {
       return;
     }

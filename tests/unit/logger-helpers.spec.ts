@@ -4,17 +4,11 @@ import {
   AbstractLogger,
   formatDuration,
   isLoggerInstance,
-  severity,
   isSeverity,
+  sevCompare,
 } from "../../src/logger-helpers";
 
 describe("Logger helpers", () => {
-  describe("severity", () => {
-    test("should have the specific arrangement", () => {
-      expect(severity).toMatchSnapshot();
-    });
-  });
-
   describe("isSeverity()", () => {
     test.each(["debug", "info", "warn", "error"])(
       "should recognize %s",
@@ -26,6 +20,32 @@ describe("Logger helpers", () => {
       "should reject others %#",
       (subject) => {
         expect(isSeverity(subject)).toBeFalsy();
+      },
+    );
+  });
+
+  describe("sevCompare", () => {
+    test.each([
+      ["debug", "debug", 0],
+      ["debug", "info", -10],
+      ["debug", "warn", -20],
+      ["debug", "error", -30],
+      ["info", "debug", 10],
+      ["info", "info", 0],
+      ["info", "warn", -10],
+      ["info", "error", -20],
+      ["warn", "debug", 20],
+      ["warn", "info", 10],
+      ["warn", "warn", 0],
+      ["warn", "error", -10],
+      ["error", "debug", 30],
+      ["error", "info", 20],
+      ["error", "warn", 10],
+      ["error", "error", 0],
+    ] as const)(
+      "should compare %s to %s with %i result",
+      (subject, reference, result) => {
+        expect(sevCompare(subject, reference)).toBe(result);
       },
     );
   });
