@@ -37,7 +37,6 @@ export const getStartupLogo = () => {
 ${dedicationMessage}888${slogan}
 ${thanks}
 ${process.env.DOCS_QR}
-${process.env.GITHUB_QR}
 `;
 
   return logo

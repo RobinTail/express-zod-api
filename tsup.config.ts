@@ -10,10 +10,6 @@ const qrDocs = renderUnicodeCompact(
   `https://ez.robintail.cz/v${version}`,
   qrOptions,
 );
-const qrGithub = renderUnicodeCompact(
-  `https://github.com/RobinTail/express-zod-api/tree/v${version}`,
-  qrOptions,
-);
 
 const commons: Options = {
   format: ["cjs", "esm"],
@@ -45,7 +41,6 @@ export default defineConfig([
       options.define = {
         "process.env.TSUP_BUILD": `"v${version} (${format.toUpperCase()})"`,
         "process.env.DOCS_QR": `"${qrDocs.replace(/\n/g, "\\n")}"`,
-        "process.env.GITHUB_QR": `"${qrGithub.replace(/\n/g, "\\n")}"`,
       };
     },
   },
