@@ -18,9 +18,9 @@ jobs:
         node-version: [18.18.0, 18.x, 20.9.0, 20.x, 22.0.0, 22.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
     steps:
-    - name: Get yarn cache dir
-      id: yarnCache
-      run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
+    - name: Get pnpm cache dir
+      id: pnpmCache
+      run: echo "dir=$(pnpm store path)" >> $GITHUB_OUTPUT
     - name: Checkout
       uses: actions/checkout@v4
     - name: Install Node.js ${{ matrix.node-version }}
@@ -31,16 +31,16 @@ jobs:
     - name: Cache node modules
       uses: actions/cache@v4
       env:
-        cache-name: cache-yarn
+        cache-name: cache-pnpm
       with:
-        path: ${{ steps.yarnCache.outputs.dir }}
-        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ matrix.node-version }}-${{ hashFiles('**/yarn.lock') }}
+        path: ${{ steps.pnpmCache.outputs.dir }}
+        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ matrix.node-version }}-${{ hashFiles('**/pnpm-lock.yaml') }}
     - name: Install dependencies
-      run: yarn install
+      run: pnpm install
     - name: Lint
-      run: yarn lint
+      run: pnpm lint
     - name: Test
-      run: yarn test
+      run: pnpm test
     - name: Coveralls
       uses: coverallsapp/github-action@v2
       continue-on-error: true
@@ -49,15 +49,15 @@ jobs:
         flag-name: run-${{ matrix.node-version }}
         parallel: true
     - name: Build
-      run: yarn build
+      run: pnpm build
     - name: CJS test
-      run: yarn test:cjs
+      run: pnpm test:cjs
     - name: ESM test
-      run: yarn test:esm
+      run: pnpm test:esm
     - name: Compatibility test
-      run: yarn test:compat
+      run: pnpm test:compat
     - name: Issue 952 # see https://github.com/RobinTail/express-zod-api/issues/952
-      run: yarn test:952
+      run: pnpm test:952
   finish:
     needs: build
     runs-on: ubuntu-latest
