@@ -1,17 +1,20 @@
+import { invoker, map } from "ramda";
 import { defineConfig, Options } from "tsup";
 import { version, engines, name } from "./package.json";
 import semver from "semver";
-import { encode, QrCodeGenerateResult } from "uqr";
+import { renderUnicodeCompact } from "uqr";
 
 const minNode = semver.minVersion(engines.node)!;
 
-const toBin = ({ data }: QrCodeGenerateResult) =>
-  data.map((row) => parseInt(row.map((bit) => (bit ? "1" : "0")).join(""), 2));
+const toNumerics = (data: string) =>
+  map(invoker(0, "charCodeAt"), data.split(""));
 
 const qrOptions = { minVersion: 4, maxVersion: 4, boostEcc: true };
-const qrDocs = toBin(encode(`https://ez.robintail.cz/v${version}`, qrOptions));
-const qrGithub = toBin(
-  encode(
+const qrDocs = toNumerics(
+  renderUnicodeCompact(`https://ez.robintail.cz/v${version}`, qrOptions),
+);
+const qrGithub = toNumerics(
+  renderUnicodeCompact(
     `https://github.com/RobinTail/express-zod-api/tree/v${version}`,
     qrOptions,
   ),
