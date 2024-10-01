@@ -5,11 +5,7 @@ import { renderUnicodeCompact } from "uqr";
 
 const minNode = semver.minVersion(engines.node)!;
 
-const qrDocs = renderUnicodeCompact(`https://ez.robintail.cz/v${version}`, {
-  minVersion: 4,
-  maxVersion: 4,
-  boostEcc: true,
-});
+const qrDocs = renderUnicodeCompact(`https://ez.robintail.cz/v${version}`);
 
 const commons: Options = {
   format: ["cjs", "esm"],
