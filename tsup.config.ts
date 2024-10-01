@@ -1,8 +1,21 @@
 import { defineConfig, Options } from "tsup";
 import { version, engines, name } from "./package.json";
 import semver from "semver";
+import { encode, QrCodeGenerateResult } from "uqr";
 
 const minNode = semver.minVersion(engines.node)!;
+
+const toBin = ({ data }: QrCodeGenerateResult) =>
+  data.map((row) => parseInt(row.map((bit) => (bit ? "1" : "0")).join(""), 2));
+
+const qrOptions = { minVersion: 4, maxVersion: 4, boostEcc: true };
+const qrDocs = toBin(encode(`https://ez.robintail.cz/v${version}`, qrOptions));
+const qrGithub = toBin(
+  encode(
+    `https://github.com/RobinTail/express-zod-api/tree/v${version}`,
+    qrOptions,
+  ),
+);
 
 const commons: Options = {
   format: ["cjs", "esm"],
@@ -31,7 +44,11 @@ export default defineConfig([
         options.supported["dynamic-import"] = false;
       }
       options.define = {
-        "process.env.TSUP_BUILD": `"v${version} (${format.toUpperCase()})"`,
+        "process.env.TSUP_BUILD": JSON.stringify(
+          `v${version} (${format.toUpperCase()})`,
+        ),
+        "process.env.DOCS_QR": JSON.stringify(qrDocs),
+        "process.env.GITHUB_QR": JSON.stringify(qrGithub),
       };
     },
   },

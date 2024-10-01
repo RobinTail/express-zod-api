@@ -1,5 +1,41 @@
 import { Ansis, gray, hex, italic, whiteBright } from "ansis";
 
+const unbin = (subject: unknown) => {
+  if (!Array.isArray(subject)) return [];
+  const bools = subject.map((encoded) =>
+    typeof encoded === "number"
+      ? encoded
+          .toString(2)
+          .split("")
+          .map((bit) => bit === "1")
+      : [],
+  );
+  const size = Math.max(...bools.map((row) => row.length));
+  return bools.map((row) =>
+    Array<boolean>(size - row.length + 1)
+      .fill(false) // restores margin of leading zeros
+      .concat(row),
+  );
+};
+
+const render = (data: unknown) => {
+  const result = unbin(data);
+  const at = (x: number, y: number) =>
+    y < result.length && x < result[y].length ? result[y][x] : true;
+  const lines: string[] = [];
+  for (let row = 0; row < result.length; row += 2) {
+    let line = "";
+    for (let col = 0; col < result[row].length; col++) {
+      if (!at(col, row) && !at(col, row + 1)) line += "\u2588";
+      else if (!at(col, row) && at(col, row + 1)) line += "\u2580";
+      else if (at(col, row) && !at(col, row + 1)) line += "\u2584";
+      else line += " ";
+    }
+    lines.push(line);
+  }
+  return lines.join("\n");
+};
+
 export const getStartupLogo = () => {
   const proud = italic("Proudly supports transgender community.".padStart(109));
   const slogan = italic(
@@ -36,6 +72,8 @@ export const getStartupLogo = () => {
                     888${proud}
 ${dedicationMessage}888${slogan}
 ${thanks}
+${render(process.env.DOCS_QR)}
+${render(process.env.GITHUB_QR)}
 `;
 
   return logo
