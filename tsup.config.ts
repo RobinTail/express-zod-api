@@ -1,4 +1,3 @@
-import { invoker, map } from "ramda";
 import { defineConfig, Options } from "tsup";
 import { version, engines, name } from "./package.json";
 import semver from "semver";
@@ -6,18 +5,14 @@ import { renderUnicodeCompact } from "uqr";
 
 const minNode = semver.minVersion(engines.node)!;
 
-const toNumerics = (data: string) =>
-  map(invoker(0, "charCodeAt"), data.split(""));
-
 const qrOptions = { minVersion: 4, maxVersion: 4, boostEcc: true };
-const qrDocs = toNumerics(
-  renderUnicodeCompact(`https://ez.robintail.cz/v${version}`, qrOptions),
+const qrDocs = renderUnicodeCompact(
+  `https://ez.robintail.cz/v${version}`,
+  qrOptions,
 );
-const qrGithub = toNumerics(
-  renderUnicodeCompact(
-    `https://github.com/RobinTail/express-zod-api/tree/v${version}`,
-    qrOptions,
-  ),
+const qrGithub = renderUnicodeCompact(
+  `https://github.com/RobinTail/express-zod-api/tree/v${version}`,
+  qrOptions,
 );
 
 const commons: Options = {
@@ -46,12 +41,11 @@ export default defineConfig([
          */
         options.supported["dynamic-import"] = false;
       }
+      options.charset = "utf8";
       options.define = {
-        "process.env.TSUP_BUILD": JSON.stringify(
-          `v${version} (${format.toUpperCase()})`,
-        ),
-        "process.env.DOCS_QR": JSON.stringify(qrDocs),
-        "process.env.GITHUB_QR": JSON.stringify(qrGithub),
+        "process.env.TSUP_BUILD": `"v${version} (${format.toUpperCase()})"`,
+        "process.env.DOCS_QR": `"${qrDocs.replace(/\n/g, "\\n")}"`,
+        "process.env.GITHUB_QR": `"${qrGithub.replace(/\n/g, "\\n")}"`,
       };
     },
   },

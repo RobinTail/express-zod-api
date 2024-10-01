@@ -1,8 +1,5 @@
 import { Ansis, gray, hex, italic, whiteBright } from "ansis";
 
-const restore = (numerics: unknown) =>
-  Array.isArray(numerics) ? String.fromCharCode(...numerics) : "";
-
 export const getStartupLogo = () => {
   const proud = italic("Proudly supports transgender community.".padStart(109));
   const slogan = italic(
@@ -39,8 +36,8 @@ export const getStartupLogo = () => {
                     888${proud}
 ${dedicationMessage}888${slogan}
 ${thanks}
-${restore(process.env.DOCS_QR)}
-${restore(process.env.GITHUB_QR)}
+${process.env.DOCS_QR}
+${process.env.GITHUB_QR}
 `;
 
   return logo
