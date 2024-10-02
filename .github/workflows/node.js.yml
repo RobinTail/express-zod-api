@@ -42,7 +42,7 @@ jobs:
     - name: Test
       run: yarn test
     - name: Coveralls
-      uses: coverallsapp/github-action@v2
+      uses: coverallsapp/github-action@v2.3.0
       continue-on-error: true
       with:
         github-token: ${{ secrets.github_token }}
@@ -64,7 +64,7 @@ jobs:
     steps:
       - name: Coveralls Finished
         continue-on-error: true
-        uses: coverallsapp/github-action@v2
+        uses: coverallsapp/github-action@v2.3.0
         with:
           github-token: ${{ secrets.github_token }}
           parallel-finished: true
