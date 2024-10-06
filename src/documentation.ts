@@ -7,8 +7,9 @@ import {
   SecuritySchemeObject,
   SecuritySchemeType,
 } from "openapi3-ts/oas31";
-import { pluck } from "ramda";
+import { keys, pluck } from "ramda";
 import { z } from "zod";
+import { defaultStatusCodes } from "./api-response";
 import { DocumentationError } from "./errors";
 import {
   defaultInputSources,
@@ -197,7 +198,7 @@ export class Documentation extends OpenApiBuilder {
       });
 
       const responses: ResponsesObject = {};
-      for (const variant of ["positive", "negative"] as const) {
+      for (const variant of keys(defaultStatusCodes)) {
         const apiResponses = endpoint.getResponses(variant);
         for (const { mimeTypes, schema, statusCodes } of apiResponses) {
           for (const statusCode of statusCodes) {
