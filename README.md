@@ -123,13 +123,19 @@ Install the library, its peer dependencies and type assistance packages using yo
 [package manager](https://nodesource.com/blog/nodejs-package-manager-comparative-guide-2024/):
 
 ```yaml
-express: # depending on the preferred version of Express
-  v5: # packages to install for using with Express 5
-    prod: express-zod-api express@^5 zod typescript http-errors
-    dev:  @types/express@^5 @types/node @types/http-errors
-  v4: # packages to install for using with Express 4
-    prod: express-zod-api express zod typescript http-errors
-    dev:  @types/express @types/node @types/http-errors
+with-express-v5: # packages to install for using with Express 5
+  prod: express-zod-api express@^5 zod typescript http-errors
+  dev:  @types/express@^5 @types/node @types/http-errors
+with-express-v4: # packages to install for using with Express 4
+  prod: express-zod-api express zod typescript http-errors
+  dev:  @types/express @types/node @types/http-errors
+```
+
+Example command for `yarn` and Express 5:
+
+```shell
+yarn add express-zod-api express@^5 zod typescript http-errors
+yarn add -D @types/express@^5 @types/node @types/http-errors
 ```
 
 Ensure having the following options in your `tsconfig.json` file in order to make it work as expected:
