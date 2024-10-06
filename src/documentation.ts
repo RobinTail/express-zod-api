@@ -80,6 +80,7 @@ interface DocumentationParams {
 export class Documentation extends OpenApiBuilder {
   protected lastSecuritySchemaIds = new Map<SecuritySchemeType, number>();
   protected lastOperationIdSuffixes = new Map<string, number>();
+  protected responseVariants = keys(defaultStatusCodes);
 
   protected makeRef(
     name: string,
@@ -198,7 +199,7 @@ export class Documentation extends OpenApiBuilder {
       });
 
       const responses: ResponsesObject = {};
-      for (const variant of keys(defaultStatusCodes)) {
+      for (const variant of this.responseVariants) {
         const apiResponses = endpoint.getResponses(variant);
         for (const { mimeTypes, schema, statusCodes } of apiResponses) {
           for (const statusCode of statusCodes) {
