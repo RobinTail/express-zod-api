@@ -122,10 +122,15 @@ Much can be customized to fit your needs.
 Install the library, its peer dependencies and type assistance packages using your favorite
 [package manager](https://nodesource.com/blog/nodejs-package-manager-comparative-guide-2024/):
 
-| Dependencies | with Express 5                                          | with Express 4                                       |
-| ------------ | ------------------------------------------------------- | ---------------------------------------------------- |
-| Production   | `express-zod-api express@^5 zod typescript http-errors` | `express-zod-api express zod typescript http-errors` |
-| Development  | `@types/express@^5 @types/node @types/http-errors`      | `@types/express @types/node @types/http-errors`      |
+```yaml
+express: # depending on the preferred version of Express
+  v5: # packages to install for using with Express 5
+    prod: express-zod-api express@^5 zod typescript http-errors
+    dev:  @types/express@^5 @types/node @types/http-errors
+  v4: # packages to install for using with Express 4
+    prod: express-zod-api express zod typescript http-errors
+    dev:  @types/express @types/node @types/http-errors
+```
 
 Ensure having the following options in your `tsconfig.json` file in order to make it work as expected:
 
