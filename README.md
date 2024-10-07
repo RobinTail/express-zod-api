@@ -88,6 +88,35 @@ Therefore, many basic tasks can be accomplished faster and easier, in particular
   field names when you implement the client for your API.
 - You can generate your API documentation in OpenAPI 3.1 and JSON Schema compatible format.
 
+## Contributors
+
+These people contributed to the improvement of the library by reporting bugs, making changes and suggesting ideas:
+
+[<img src="https://github.com/rottmann.png" alt="@rottmann" width="50px" />](https://github.com/rottmann)
+[<img src="https://github.com/boarush.png" alt="@boarush" width="50px" />](https://github.com/boarush)
+[<img src="https://github.com/daniel-white.png" alt="@daniel-white" width="50px" />](https://github.com/daniel-white)
+[<img src="https://github.com/kotsmile.png" alt="@kotsmile" width="50px" />](https://github.com/kotsmile)
+[<img src="https://github.com/arlyon.png" alt="@arlyon" width="50px" />](https://github.com/arlyon)
+[<img src="https://github.com/elee1766.png" alt="@elee1766" width="50px" />](https://github.com/elee1766)
+[<img src="https://github.com/danclaytondev.png" alt="@danclaytondev" width="50px" />](https://github.com/danclaytondev)
+[<img src="https://github.com/huyhoang160593.png" alt="@huyhoang160593" width="50px" />](https://github.com/huyhoang160593)
+[<img src="https://github.com/sarahssharkey.png" alt="@sarahssharkey" width="50px" />](https://github.com/sarahssharkey)
+[<img src="https://github.com/shawncarr.png" alt="@shawncarr" width="50px" />](https://github.com/shawncarr)
+[<img src="https://github.com/alindsay55661.png" alt="@alindsay55661" width="50px" />](https://github.com/alindsay55661)
+[<img src="https://github.com/john-schmitz.png" alt="@john-schmitz" width="50px" />](https://github.com/john-schmitz)
+[<img src="https://github.com/bobgubko.png" alt="@bobgubko" width="50px" />](https://github.com/bobgubko)
+[<img src="https://github.com/miki725.png" alt="@miki725" width="50px" />](https://github.com/miki725)
+[<img src="https://github.com/dev-m1-macbook.png" alt="@dev-m1-macbook" width="50px" />](https://github.com/dev-m1-macbook)
+[<img src="https://github.com/McMerph.png" alt="@McMerph" width="50px" />](https://github.com/McMerph)
+[<img src="https://github.com/shroudedcode.png" alt="@shroudedcode" width="50px" />](https://github.com/shroudedcode)
+[<img src="https://github.com/maxcohn.png" alt="@maxcohn" width="50px" />](https://github.com/maxcohn)
+[<img src="https://github.com/VideoSystemsTech.png" alt="@VideoSystemsTech" width="50px" />](https://github.com/VideoSystemsTech)
+[<img src="https://github.com/TheWisestOne.png" alt="@TheWisestOne" width="50px" />](https://github.com/TheWisestOne)
+[<img src="https://github.com/lazylace37.png" alt="@lazylace37" width="50px" />](https://github.com/lazylace37)
+[<img src="https://github.com/leosuncin.png" alt="@leosuncin" width="50px" />](https://github.com/leosuncin)
+[<img src="https://github.com/kirdk.png" alt="@kirdk" width="50px" />](https://github.com/kirdk)
+[<img src="https://github.com/rayzr522.png" alt="@rayzr522" width="50px" />](https://github.com/rayzr522)
+
 # How it works
 
 ## Technologies
