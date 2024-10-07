@@ -2,6 +2,12 @@
 
 ## Version 20
 
+### v20.14.1
+
+- `node-mocks-http` version is `^1.16.1`:
+  - This deduplicates the `@types/express` dependency to the version installed in your project;
+  - This fix is an addition to the support of Express 5 (v20.10.0) and its types (v20.14.0).
+
 ### v20.14.0
 
 - Enabling usage of recently released `@types/express@^5.0.0`:

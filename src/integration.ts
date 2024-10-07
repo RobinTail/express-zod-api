@@ -1,5 +1,6 @@
 import ts from "typescript";
 import { z } from "zod";
+import { ResponseVariant } from "./api-response";
 import {
   emptyHeading,
   emptyTail,
@@ -38,7 +39,7 @@ import { zodToTs } from "./zts";
 import { ZTSContext, createTypeAlias, printNode } from "./zts-helpers";
 import type Prettier from "prettier";
 
-type IOKind = "input" | "response" | "positive" | "negative";
+type IOKind = "input" | "response" | ResponseVariant;
 
 interface IntegrationParams {
   routing: Routing;

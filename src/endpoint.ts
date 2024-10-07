@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { z } from "zod";
-import { NormalizedResponse } from "./api-response";
+import { NormalizedResponse, ResponseVariant } from "./api-response";
 import { hasRaw, hasUpload } from "./deep-checks";
 import {
   FlatObject,
@@ -32,7 +32,6 @@ export type Handler<IN, OUT, OPT> = (params: {
 
 type DescriptionVariant = "short" | "long";
 type IOVariant = "input" | "output";
-type ResponseVariant = "positive" | "negative";
 type MimeVariant = Extract<IOVariant, "input"> | ResponseVariant;
 
 export abstract class AbstractEndpoint {
