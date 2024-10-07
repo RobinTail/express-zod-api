@@ -1,7 +1,8 @@
-import { readFile } from "node:fs/promises";
+import { readFile, writeFile } from "node:fs/promises";
 
 const users = new Set();
 const changelog = await readFile("CHANGELOG.md", "utf8");
+const readme = await readFile("README.md", "utf8");
 
 const links = changelog.matchAll(/\(https:\/\/github\.com\/([-\w]+)\)/g);
 for (const link of links) {
@@ -15,4 +16,9 @@ const markdown = Array.from(users)
   )
   .join("\n");
 
-console.log(markdown);
+const update = readme.replace(
+  /## Contributors[^#]+#/,
+  `## Contributors\n\n${markdown}\n\n#`,
+);
+
+await writeFile("README.md", update, "utf8");
