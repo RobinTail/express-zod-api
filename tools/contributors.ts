@@ -1,29 +1,12 @@
-const users = new Set([
-  "rottmann",
-  "boarush",
-  "daniel-white",
-  "kotsmile",
-  "arlyon",
-  "elee1766",
-  "danclaytondev",
-  "huyhoang160593",
-  "sarahssharkey",
-  "shawncarr",
-  "alindsay55661",
-  "john-schmitz",
-  "bobgubko",
-  "miki725",
-  "dev-m1-macbook",
-  "McMerph",
-  "shroudedcode",
-  "maxcohn",
-  "VideoSystemsTech",
-  "TheWisestOne",
-  "lazylace37",
-  "leosuncin",
-  "kirdk",
-  "rayzr522",
-]);
+import { readFile } from "node:fs/promises";
+
+const users = new Set();
+const changelog = await readFile("CHANGELOG.md", "utf8");
+
+const links = changelog.matchAll(/\(https:\/\/github\.com\/([-\w]+)\)/g);
+for (const link of links) {
+  users.add(link[1]);
+}
 
 const markdown = Array.from(users)
   .map(
