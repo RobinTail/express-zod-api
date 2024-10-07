@@ -18,7 +18,9 @@ const markdown = Array.from(users)
 
 const update = readme.replace(
   /## Contributors[^#]+#/,
-  `## Contributors\n\n${markdown}\n\n#`,
+  `## Contributors\n\n` +
+    `These people contributed to the improvement of the library by reporting bugs, making changes and suggesting ideas:\n\n` +
+    `${markdown}\n\n#`,
 );
 
 await writeFile("README.md", update, "utf8");
