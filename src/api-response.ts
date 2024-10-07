@@ -3,7 +3,9 @@ import { z } from "zod";
 export const defaultStatusCodes = {
   positive: 200,
   negative: 400,
-};
+} satisfies Record<string, number>;
+
+export type ResponseVariant = keyof typeof defaultStatusCodes;
 
 export interface ApiResponse<S extends z.ZodTypeAny> {
   schema: S;

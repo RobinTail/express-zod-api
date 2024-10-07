@@ -1,28 +1,17 @@
-import http from "node:http";
-import { Socket } from "node:net";
 import { bench } from "vitest";
-import { hasHttpServer } from "../../src/graceful-helpers";
-
-const comparable = (
-  socket: Socket,
-): socket is typeof socket & { server: http.Server } =>
-  "server" in socket &&
-  typeof socket.server === "object" &&
-  socket.server !== null &&
-  "close" in socket.server &&
-  typeof socket.server.close === "function";
+import { keys, keysIn } from "ramda";
+import { defaultStatusCodes } from "../../src/api-response";
 
 describe("Experiment %s", () => {
-  const a = new Socket();
-  const b = { server: http.createServer() };
-
-  bench("original", () => {
-    hasHttpServer(a);
-    hasHttpServer(b as unknown as Socket);
+  bench("Object.keys()", () => {
+    Object.keys(defaultStatusCodes);
   });
 
-  bench("featured", () => {
-    comparable(a);
-    comparable(b as unknown as Socket);
+  bench("R.keys()", () => {
+    keys(defaultStatusCodes);
+  });
+
+  bench("R.keysIn()", () => {
+    keysIn(defaultStatusCodes);
   });
 });

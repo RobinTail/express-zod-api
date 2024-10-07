@@ -4,9 +4,52 @@ import {
   AbstractLogger,
   formatDuration,
   isLoggerInstance,
+  isSeverity,
+  isHidden,
 } from "../../src/logger-helpers";
 
 describe("Logger helpers", () => {
+  describe("isSeverity()", () => {
+    test.each(["debug", "info", "warn", "error"])(
+      "should recognize %s",
+      (subject) => {
+        expect(isSeverity(subject)).toBeTruthy();
+      },
+    );
+    test.each(["something", "", 123, Symbol.dispose])(
+      "should reject others %#",
+      (subject) => {
+        expect(isSeverity(subject)).toBeFalsy();
+      },
+    );
+  });
+
+  describe("isHidden", () => {
+    test.each([
+      ["debug", "debug", false],
+      ["debug", "info", true],
+      ["debug", "warn", true],
+      ["debug", "error", true],
+      ["info", "debug", false],
+      ["info", "info", false],
+      ["info", "warn", true],
+      ["info", "error", true],
+      ["warn", "debug", false],
+      ["warn", "info", false],
+      ["warn", "warn", false],
+      ["warn", "error", true],
+      ["error", "debug", false],
+      ["error", "info", false],
+      ["error", "warn", false],
+      ["error", "error", false],
+    ] as const)(
+      "should compare %s to %s with %s result",
+      (subject, gate, result) => {
+        expect(isHidden(subject, gate)).toBe(result);
+      },
+    );
+  });
+
   describe("isLoggerInstance()", () => {
     test.each<BuiltinLoggerConfig>([
       { level: "silent" },
