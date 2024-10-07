@@ -40,6 +40,7 @@ import {
   zip,
 } from "ramda";
 import { z } from "zod";
+import { ResponseVariant } from "./api-response";
 import {
   FlatObject,
   combinations,
@@ -865,7 +866,7 @@ export const depictResponse = ({
   }`.trim(),
 }: ReqResHandlingProps<z.ZodTypeAny> & {
   mimeTypes: ReadonlyArray<string>;
-  variant: "positive" | "negative";
+  variant: ResponseVariant;
   statusCode: number;
   hasMultipleStatusCodes: boolean;
 }): ResponseObject => {

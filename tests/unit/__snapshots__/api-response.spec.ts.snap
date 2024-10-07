@@ -1,0 +1,8 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`ApiResponse > defaultStatusCodes > should be 200 and 400 1`] = `
+{
+  "negative": 400,
+  "positive": 200,
+}
+`;
