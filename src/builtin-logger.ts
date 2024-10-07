@@ -5,7 +5,7 @@ import type { FlatObject } from "./common-helpers";
 import {
   AbstractLogger,
   formatDuration,
-  sevCompare,
+  isHidden,
   Severity,
 } from "./logger-helpers";
 
@@ -73,10 +73,7 @@ export class BuiltinLogger implements AbstractLogger {
   }
 
   protected print(method: Severity, message: string, meta?: unknown) {
-    if (
-      this.config.level === "silent" ||
-      sevCompare(method, this.config.level) < 0
-    ) {
+    if (this.config.level === "silent" || isHidden(method, this.config.level)) {
       return;
     }
     const { requestId, ...ctx } = this.config.ctx || {};

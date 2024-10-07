@@ -31,9 +31,8 @@ export const isLoggerInstance = (subject: unknown): subject is AbstractLogger =>
 export const isSeverity = (subject: PropertyKey): subject is Severity =>
   subject in severity;
 
-/** @desc returns positive number when subject has a higher severity than the reference */
-export const sevCompare = (subject: Severity, reference: Severity) =>
-  severity[subject] - severity[reference];
+export const isHidden = (subject: Severity, gate: Severity) =>
+  severity[subject] < severity[gate];
 
 /**
  * @todo consider Intl units when Node 18 dropped (microsecond unit is missing, picosecond is not in list)

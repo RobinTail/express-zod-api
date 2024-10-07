@@ -5,7 +5,7 @@ import {
   formatDuration,
   isLoggerInstance,
   isSeverity,
-  sevCompare,
+  isHidden,
 } from "../../src/logger-helpers";
 
 describe("Logger helpers", () => {
@@ -24,28 +24,28 @@ describe("Logger helpers", () => {
     );
   });
 
-  describe("sevCompare", () => {
+  describe("isHidden", () => {
     test.each([
-      ["debug", "debug", 0],
-      ["debug", "info", -10],
-      ["debug", "warn", -20],
-      ["debug", "error", -30],
-      ["info", "debug", 10],
-      ["info", "info", 0],
-      ["info", "warn", -10],
-      ["info", "error", -20],
-      ["warn", "debug", 20],
-      ["warn", "info", 10],
-      ["warn", "warn", 0],
-      ["warn", "error", -10],
-      ["error", "debug", 30],
-      ["error", "info", 20],
-      ["error", "warn", 10],
-      ["error", "error", 0],
+      ["debug", "debug", false],
+      ["debug", "info", true],
+      ["debug", "warn", true],
+      ["debug", "error", true],
+      ["info", "debug", false],
+      ["info", "info", false],
+      ["info", "warn", true],
+      ["info", "error", true],
+      ["warn", "debug", false],
+      ["warn", "info", false],
+      ["warn", "warn", false],
+      ["warn", "error", true],
+      ["error", "debug", false],
+      ["error", "info", false],
+      ["error", "warn", false],
+      ["error", "error", false],
     ] as const)(
-      "should compare %s to %s with %i result",
-      (subject, reference, result) => {
-        expect(sevCompare(subject, reference)).toBe(result);
+      "should compare %s to %s with %s result",
+      (subject, gate, result) => {
+        expect(isHidden(subject, gate)).toBe(result);
       },
     );
   });
