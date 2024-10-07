@@ -24,12 +24,11 @@ const users = new Set([
   "kirdk",
   "rayzr522",
 ]);
-const size = "50px";
 
 const markdown = Array.from(users)
   .map(
     (user) =>
-      `[<img src="https://github.com/${user}.png" alt="@${user}" style="width:${size};border-radius:50%" />](https://github.com/${user})`,
+      `[<img src="https://github.com/${user}.png" alt="@${user}" width="50px" />](https://github.com/${user})`,
   )
   .join("\n");
 
