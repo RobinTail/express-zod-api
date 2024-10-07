@@ -117,7 +117,30 @@ Much can be customized to fit your needs.
 
 ## Contributors
 
-![contributors](contributors.svg)
+[<img src="https://github.com/rottmann.png" alt="@rottmann" style="width:50px;border-radius:50%" />](https://github.com/rottmann)
+[<img src="https://github.com/boarush.png" alt="@boarush" style="width:50px;border-radius:50%" />](https://github.com/boarush)
+[<img src="https://github.com/daniel-white.png" alt="@daniel-white" style="width:50px;border-radius:50%" />](https://github.com/daniel-white)
+[<img src="https://github.com/kotsmile.png" alt="@kotsmile" style="width:50px;border-radius:50%" />](https://github.com/kotsmile)
+[<img src="https://github.com/arlyon.png" alt="@arlyon" style="width:50px;border-radius:50%" />](https://github.com/arlyon)
+[<img src="https://github.com/elee1766.png" alt="@elee1766" style="width:50px;border-radius:50%" />](https://github.com/elee1766)
+[<img src="https://github.com/danclaytondev.png" alt="@danclaytondev" style="width:50px;border-radius:50%" />](https://github.com/danclaytondev)
+[<img src="https://github.com/huyhoang160593.png" alt="@huyhoang160593" style="width:50px;border-radius:50%" />](https://github.com/huyhoang160593)
+[<img src="https://github.com/sarahssharkey.png" alt="@sarahssharkey" style="width:50px;border-radius:50%" />](https://github.com/sarahssharkey)
+[<img src="https://github.com/shawncarr.png" alt="@shawncarr" style="width:50px;border-radius:50%" />](https://github.com/shawncarr)
+[<img src="https://github.com/alindsay55661.png" alt="@alindsay55661" style="width:50px;border-radius:50%" />](https://github.com/alindsay55661)
+[<img src="https://github.com/john-schmitz.png" alt="@john-schmitz" style="width:50px;border-radius:50%" />](https://github.com/john-schmitz)
+[<img src="https://github.com/bobgubko.png" alt="@bobgubko" style="width:50px;border-radius:50%" />](https://github.com/bobgubko)
+[<img src="https://github.com/miki725.png" alt="@miki725" style="width:50px;border-radius:50%" />](https://github.com/miki725)
+[<img src="https://github.com/dev-m1-macbook.png" alt="@dev-m1-macbook" style="width:50px;border-radius:50%" />](https://github.com/dev-m1-macbook)
+[<img src="https://github.com/McMerph.png" alt="@McMerph" style="width:50px;border-radius:50%" />](https://github.com/McMerph)
+[<img src="https://github.com/shroudedcode.png" alt="@shroudedcode" style="width:50px;border-radius:50%" />](https://github.com/shroudedcode)
+[<img src="https://github.com/maxcohn.png" alt="@maxcohn" style="width:50px;border-radius:50%" />](https://github.com/maxcohn)
+[<img src="https://github.com/VideoSystemsTech.png" alt="@VideoSystemsTech" style="width:50px;border-radius:50%" />](https://github.com/VideoSystemsTech)
+[<img src="https://github.com/TheWisestOne.png" alt="@TheWisestOne" style="width:50px;border-radius:50%" />](https://github.com/TheWisestOne)
+[<img src="https://github.com/lazylace37.png" alt="@lazylace37" style="width:50px;border-radius:50%" />](https://github.com/lazylace37)
+[<img src="https://github.com/leosuncin.png" alt="@leosuncin" style="width:50px;border-radius:50%" />](https://github.com/leosuncin)
+[<img src="https://github.com/kirdk.png" alt="@kirdk" style="width:50px;border-radius:50%" />](https://github.com/kirdk)
+[<img src="https://github.com/rayzr522.png" alt="@rayzr522" style="width:50px;border-radius:50%" />](https://github.com/rayzr522)
 
 # Quick start
 
