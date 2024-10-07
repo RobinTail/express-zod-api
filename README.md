@@ -88,33 +88,6 @@ Therefore, many basic tasks can be accomplished faster and easier, in particular
   field names when you implement the client for your API.
 - You can generate your API documentation in OpenAPI 3.1 and JSON Schema compatible format.
 
-# How it works
-
-## Technologies
-
-- [Typescript](https://www.typescriptlang.org/) first.
-- Web server — [Express.js](https://expressjs.com/) v4 or v5.
-- Schema validation — [Zod 3.x](https://github.com/colinhacks/zod) including [Zod Plugin](#zod-plugin).
-- Supports any logger having `info()`, `debug()`, `error()` and `warn()` methods;
-  - Built-in console logger with colorful and pretty inspections by default.
-- Generators:
-  - Documentation — [OpenAPI 3.1](https://github.com/metadevpro/openapi3-ts) (former Swagger);
-  - Client side types — inspired by [zod-to-ts](https://github.com/sachinraja/zod-to-ts).
-- File uploads — [Express-FileUpload](https://github.com/richardgirges/express-fileupload)
-  (based on [Busboy](https://github.com/mscdex/busboy)).
-
-## Concept
-
-The API operates object schemas for input and output validation.
-The object being validated is the combination of certain `request` properties.
-It is available to the endpoint handler as the `input` parameter.
-Middlewares have access to all `request` properties, they can provide endpoints with `options`.
-The object returned by the endpoint handler is called `output`. It goes to the `ResultHandler` which is
-responsible for transmitting consistent responses containing the `output` or possible error.
-Much can be customized to fit your needs.
-
-![Dataflow](https://raw.githubusercontent.com/RobinTail/express-zod-api/master/dataflow.svg)
-
 ## Contributors
 
 [<img src="https://github.com/rottmann.png" alt="@rottmann" width="50px" />](https://github.com/rottmann)
@@ -141,6 +114,33 @@ Much can be customized to fit your needs.
 [<img src="https://github.com/leosuncin.png" alt="@leosuncin" width="50px" />](https://github.com/leosuncin)
 [<img src="https://github.com/kirdk.png" alt="@kirdk" width="50px" />](https://github.com/kirdk)
 [<img src="https://github.com/rayzr522.png" alt="@rayzr522" width="50px" />](https://github.com/rayzr522)
+
+# How it works
+
+## Technologies
+
+- [Typescript](https://www.typescriptlang.org/) first.
+- Web server — [Express.js](https://expressjs.com/) v4 or v5.
+- Schema validation — [Zod 3.x](https://github.com/colinhacks/zod) including [Zod Plugin](#zod-plugin).
+- Supports any logger having `info()`, `debug()`, `error()` and `warn()` methods;
+  - Built-in console logger with colorful and pretty inspections by default.
+- Generators:
+  - Documentation — [OpenAPI 3.1](https://github.com/metadevpro/openapi3-ts) (former Swagger);
+  - Client side types — inspired by [zod-to-ts](https://github.com/sachinraja/zod-to-ts).
+- File uploads — [Express-FileUpload](https://github.com/richardgirges/express-fileupload)
+  (based on [Busboy](https://github.com/mscdex/busboy)).
+
+## Concept
+
+The API operates object schemas for input and output validation.
+The object being validated is the combination of certain `request` properties.
+It is available to the endpoint handler as the `input` parameter.
+Middlewares have access to all `request` properties, they can provide endpoints with `options`.
+The object returned by the endpoint handler is called `output`. It goes to the `ResultHandler` which is
+responsible for transmitting consistent responses containing the `output` or possible error.
+Much can be customized to fit your needs.
+
+![Dataflow](https://raw.githubusercontent.com/RobinTail/express-zod-api/master/dataflow.svg)
 
 # Quick start
 
