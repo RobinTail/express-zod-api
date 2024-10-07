@@ -2,7 +2,12 @@ import { Request, Response } from "express";
 import { FlatObject, getInput } from "./common-helpers";
 import { CommonConfig } from "./config-type";
 import { AbstractEndpoint } from "./endpoint";
-import { AbstractLogger, ActualLogger, severity } from "./logger-helpers";
+import {
+  AbstractLogger,
+  ActualLogger,
+  isSeverity,
+  Severity,
+} from "./logger-helpers";
 import { contentTypes } from "./content-type";
 import {
   createRequest,
@@ -24,7 +29,7 @@ export const makeResponseMock = (opt?: ResponseOptions) =>
   createResponse<Response>(opt);
 
 export const makeLoggerMock = <LOG extends FlatObject>(loggerProps?: LOG) => {
-  const logs: Record<keyof AbstractLogger, unknown[]> = {
+  const logs: Record<Severity, unknown[]> = {
     warn: [],
     error: [],
     info: [],
@@ -35,13 +40,9 @@ export const makeLoggerMock = <LOG extends FlatObject>(loggerProps?: LOG) => {
       LOG & { _getLogs: () => typeof logs },
     {
       get(target, prop, recv) {
-        if (prop === "_getLogs") {
-          return () => logs;
-        }
-        if (prop in severity) {
-          return (...args: unknown[]) =>
-            logs[prop as keyof AbstractLogger].push(args);
-        }
+        if (prop === "_getLogs") return () => logs;
+        if (isSeverity(prop))
+          return (...args: unknown[]) => logs[prop].push(args);
         return Reflect.get(target, prop, recv);
       },
     },
