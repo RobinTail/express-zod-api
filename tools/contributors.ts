@@ -29,7 +29,7 @@ const size = "50px";
 const markdown = Array.from(users)
   .map(
     (user) =>
-      `[<img src="https://github.com/${user}.png" alt="@${user}" style="width:${size};border-radius:50%" />](https://github.com/${user})`,
+      `<a href="https://github.com/${user}"><img src="https://github.com/${user}.png" alt="@${user}" style="width:${size};border-radius:50%" /></a>`,
   )
   .join("\n");
 
