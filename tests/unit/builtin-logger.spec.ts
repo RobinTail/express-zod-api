@@ -106,6 +106,16 @@ describe("BuiltinLogger", () => {
     });
   });
 
+  describe("formatDuration()", () => {
+    test.each([
+      1e-9, 1e-8, 1e-7, 1e-6, 1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1, 1e1, 1e2, 1e3,
+      15e2, 1e4, 1e5, 1e6, 1e7, 1e8, 1e9,
+    ])("%# should format %s ms", (duration) => {
+      const { logger } = makeLogger({ level: "debug", color: false });
+      expect(logger["formatDuration"](duration)).toMatchSnapshot();
+    });
+  });
+
   describe("profile()", () => {
     test.each([1e-3, 1e-2, 1e-1, 1, 1e1, 1e2, 1e3])(
       "should measure %s ms",
@@ -117,7 +127,7 @@ describe("BuiltinLogger", () => {
         stop();
         expect(logSpy).toHaveBeenCalledWith(
           expect.stringMatching(
-            /2022-01-01T00:00:00.000Z debug: test '[\d.]+ (pico|micro|milli)?second(s)?'/,
+            /2022-01-01T00:00:00.000Z debug: test '[\d.]+ (micro|milli)?second(s)?'/,
           ),
         );
       },

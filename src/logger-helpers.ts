@@ -42,7 +42,7 @@ type TimeUnit =
   | "second"
   | "minute";
 
-const makeNumberFormat = (unit: TimeUnit, fraction = 0) =>
+export const makeNumberFormat = (unit: TimeUnit, fraction = 0) =>
   Intl.NumberFormat(undefined, {
     useGrouping: false,
     minimumFractionDigits: 0,
@@ -51,21 +51,3 @@ const makeNumberFormat = (unit: TimeUnit, fraction = 0) =>
     unitDisplay: "long",
     unit,
   });
-
-// creating them once increases the performance significantly
-const picoFormat = makeNumberFormat("nanosecond", 3);
-const nanoFormat = makeNumberFormat("nanosecond");
-const microFormat = makeNumberFormat("microsecond");
-const milliFormat = makeNumberFormat("millisecond");
-const secondsFormat = makeNumberFormat("second", 2);
-const minutesFormat = makeNumberFormat("minute", 2);
-
-// not using R.cond for performance optimization
-export const formatDuration = (ms: number) => {
-  if (ms < 1e-6) return picoFormat.format(ms / 1e-6);
-  if (ms < 1e-3) return nanoFormat.format(ms / 1e-6);
-  if (ms < 1) return microFormat.format(ms / 1e-3);
-  if (ms < 1e3) return milliFormat.format(ms);
-  if (ms < 6e4) return secondsFormat.format(ms / 1e3);
-  return minutesFormat.format(ms / 6e4);
-};
