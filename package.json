@@ -13,9 +13,8 @@
     "url": "https://robintail.cz",
     "email": "me@robintail.cz"
   },
-  "bugs": {
-    "url": "https://github.com/RobinTail/express-zod-api/issues"
-  },
+  "bugs": "https://github.com/RobinTail/express-zod-api/issues",
+  "funding": "https://github.com/sponsors/RobinTail",
   "scripts": {
     "start": "tsx example/index.ts",
     "build": "yarn build:compile && yarn build:tests && yarn build:assets",
