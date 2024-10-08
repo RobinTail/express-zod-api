@@ -5,6 +5,7 @@ import {
   isLoggerInstance,
   isSeverity,
   isHidden,
+  makeNumberFormat,
 } from "../../src/logger-helpers";
 
 describe("Logger helpers", () => {
@@ -76,4 +77,38 @@ describe("Logger helpers", () => {
       expect(isLoggerInstance(sample)).toBeTruthy();
     });
   });
+
+  describe.each([undefined, 0, 2])(
+    "makeNumberFormat() with %s fraction",
+    (fraction) => {
+      const defaultLocale = new Intl.NumberFormat().resolvedOptions().locale;
+      test.each([
+        "nanosecond",
+        "microsecond",
+        "millisecond",
+        "second",
+        "minute",
+      ] as const)("should return Intl instance for %s unit", (unit) => {
+        const instance = makeNumberFormat(unit, fraction);
+        expect(instance).toBeInstanceOf(Intl.NumberFormat);
+        expect(instance.resolvedOptions()).toEqual({
+          unit,
+          maximumFractionDigits: fraction || 0,
+          locale: defaultLocale,
+          minimumFractionDigits: 0,
+          minimumIntegerDigits: 1,
+          notation: "standard",
+          numberingSystem: "latn",
+          roundingIncrement: 1,
+          roundingMode: "halfExpand",
+          roundingPriority: "auto",
+          signDisplay: "auto",
+          style: "unit",
+          trailingZeroDisplay: "auto",
+          unitDisplay: "long",
+          useGrouping: false,
+        });
+      });
+    },
+  );
 });
