@@ -2,7 +2,12 @@ import { Ansis, blue, cyanBright, green, hex, red } from "ansis";
 import { inspect } from "node:util";
 import { performance } from "node:perf_hooks";
 import type { FlatObject } from "./common-helpers";
-import { AbstractLogger, formatDuration, severity } from "./logger-helpers";
+import {
+  AbstractLogger,
+  formatDuration,
+  isHidden,
+  Severity,
+} from "./logger-helpers";
 
 interface Context extends FlatObject {
   requestId?: string;
@@ -36,7 +41,7 @@ export interface BuiltinLoggerConfig {
 interface ProfilerOptions {
   message: string;
   /** @default "debug" */
-  severity?: keyof AbstractLogger | ((ms: number) => keyof AbstractLogger);
+  severity?: Severity | ((ms: number) => Severity);
   /** @default formatDuration - adaptive units and limited fraction */
   formatter?: (ms: number) => string | number;
 }
@@ -44,7 +49,7 @@ interface ProfilerOptions {
 /** @desc Built-in console logger with optional colorful inspections */
 export class BuiltinLogger implements AbstractLogger {
   protected hasColor: boolean;
-  protected readonly styles: Record<keyof AbstractLogger, Ansis> = {
+  protected readonly styles: Record<Severity, Ansis> = {
     debug: blue,
     info: green,
     warn: hex("#FFA500"),
@@ -67,15 +72,8 @@ export class BuiltinLogger implements AbstractLogger {
     });
   }
 
-  protected print(
-    method: keyof AbstractLogger,
-    message: string,
-    meta?: unknown,
-  ) {
-    if (
-      this.config.level === "silent" ||
-      severity[method] < severity[this.config.level]
-    ) {
+  protected print(method: Severity, message: string, meta?: unknown) {
+    if (this.config.level === "silent" || isHidden(method, this.config.level)) {
       return;
     }
     const { requestId, ...ctx } = this.config.ctx || {};

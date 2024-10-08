@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { z } from "zod";
-import { NormalizedResponse } from "./api-response";
+import { NormalizedResponse, ResponseVariant } from "./api-response";
 import { ResultHandlerError } from "./errors";
 import type { LazyResult, Result } from "./result-handler";
 
@@ -11,7 +11,7 @@ export type ResultSchema<R extends Result> =
 export const normalize = <A extends unknown[]>(
   subject: Result | LazyResult<Result, A>,
   features: {
-    variant: "positive" | "negative";
+    variant: ResponseVariant;
     arguments: A;
     statusCodes: [number, ...number[]];
     mimeTypes: [string, ...string[]];
