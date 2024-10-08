@@ -140,10 +140,10 @@ Much can be customized to fit your needs.
 ## Installation
 
 Install the library, its peer dependencies and type assistance packages using your favorite
-[package manager](https://nodesource.com/blog/nodejs-package-manager-comparative-guide-2024/).
+[package manager](https://nodesource.com/blog/nodejs-package-manager-comparative-guide-2024/)
+— example for `yarn` and `express` v5 (recommended):
 
 ```shell
-# example for yarn and express 5 (recommended):
 yarn add express-zod-api express@^5 zod typescript http-errors
 yarn add -D @types/express@^5 @types/node @types/http-errors
 ```
