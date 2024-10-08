@@ -2,6 +2,11 @@
 
 ## Version 20
 
+### v20.14.2
+
+- Documentation: promoting Express 5 as the recommended version for new projects;
+- Minor refactoring: response variant constraints, inverted definition of `AbstractLogger` type.
+
 ### v20.14.1
 
 - `node-mocks-http` version is `^1.16.1`:

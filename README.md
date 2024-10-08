@@ -13,7 +13,7 @@
 
 Start your API server with I/O schema validation and custom middlewares in minutes.
 
-1. [Why and what is it for](#why-and-what-is-it-for)
+1. [Overview](#overview)
 2. [How it works](#how-it-works)
 3. [Quick start](#quick-start) — **Fast Track**
 4. [Basic features](#basic-features)
@@ -62,7 +62,7 @@ Start your API server with I/O schema validation and custom middlewares in minut
 
 You can find the release notes and migration guides in [Changelog](CHANGELOG.md).
 
-# Why and what is it for
+# Overview
 
 I made this library because of the often repetitive tasks of starting a web server APIs with the need to validate input
 data. It integrates and provides the capabilities of popular web server, logging, validation and documenting solutions.
