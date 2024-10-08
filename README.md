@@ -13,18 +13,9 @@
 
 Start your API server with I/O schema validation and custom middlewares in minutes.
 
-1. [Why and what is it for](#why-and-what-is-it-for)
+1. [Overview](#overview)
 2. [How it works](#how-it-works)
-   1. [Technologies](#technologies)
-   2. [Concept](#concept)
-3. [Quick start](#quick-start) — Fast Track
-   1. [Installation](#installation)
-   2. [Set up config](#set-up-config)
-   3. [Create an endpoints factory](#create-an-endpoints-factory)
-   4. [Create your first endpoint](#create-your-first-endpoint)
-   5. [Set up routing](#set-up-routing)
-   6. [Create your server](#create-your-server)
-   7. [Try it](#try-it)
+3. [Quick start](#quick-start) — **Fast Track**
 4. [Basic features](#basic-features)
    1. [Middlewares](#middlewares)
    2. [Options](#options)
@@ -71,7 +62,7 @@ Start your API server with I/O schema validation and custom middlewares in minut
 
 You can find the release notes and migration guides in [Changelog](CHANGELOG.md).
 
-# Why and what is it for
+# Overview
 
 I made this library because of the often repetitive tasks of starting a web server APIs with the need to validate input
 data. It integrates and provides the capabilities of popular web server, logging, validation and documenting solutions.
@@ -119,6 +110,18 @@ These people contributed to the improvement of the library by reporting bugs, ma
 
 # How it works
 
+## Concept
+
+The API operates object schemas for input and output validation.
+The object being validated is the combination of certain `request` properties.
+It is available to the endpoint handler as the `input` parameter.
+Middlewares have access to all `request` properties, they can provide endpoints with `options`.
+The object returned by the endpoint handler is called `output`. It goes to the `ResultHandler` which is
+responsible for transmitting consistent responses containing the `output` or possible error.
+Much can be customized to fit your needs.
+
+![Dataflow](https://raw.githubusercontent.com/RobinTail/express-zod-api/master/dataflow.svg)
+
 ## Technologies
 
 - [Typescript](https://www.typescriptlang.org/) first.
@@ -131,18 +134,6 @@ These people contributed to the improvement of the library by reporting bugs, ma
   - Client side types — inspired by [zod-to-ts](https://github.com/sachinraja/zod-to-ts).
 - File uploads — [Express-FileUpload](https://github.com/richardgirges/express-fileupload)
   (based on [Busboy](https://github.com/mscdex/busboy)).
-
-## Concept
-
-The API operates object schemas for input and output validation.
-The object being validated is the combination of certain `request` properties.
-It is available to the endpoint handler as the `input` parameter.
-Middlewares have access to all `request` properties, they can provide endpoints with `options`.
-The object returned by the endpoint handler is called `output`. It goes to the `ResultHandler` which is
-responsible for transmitting consistent responses containing the `output` or possible error.
-Much can be customized to fit your needs.
-
-![Dataflow](https://raw.githubusercontent.com/RobinTail/express-zod-api/master/dataflow.svg)
 
 # Quick start
 
