@@ -13,18 +13,9 @@
 
 Start your API server with I/O schema validation and custom middlewares in minutes.
 
-1. [Why and what is it for](#why-and-what-is-it-for)
+1. [Overview](#overview)
 2. [How it works](#how-it-works)
-   1. [Technologies](#technologies)
-   2. [Concept](#concept)
-3. [Quick start](#quick-start) — Fast Track
-   1. [Installation](#installation)
-   2. [Set up config](#set-up-config)
-   3. [Create an endpoints factory](#create-an-endpoints-factory)
-   4. [Create your first endpoint](#create-your-first-endpoint)
-   5. [Set up routing](#set-up-routing)
-   6. [Create your server](#create-your-server)
-   7. [Try it](#try-it)
+3. [Quick start](#quick-start) — **Fast Track**
 4. [Basic features](#basic-features)
    1. [Middlewares](#middlewares)
    2. [Options](#options)
@@ -71,7 +62,7 @@ Start your API server with I/O schema validation and custom middlewares in minut
 
 You can find the release notes and migration guides in [Changelog](CHANGELOG.md).
 
-# Why and what is it for
+# Overview
 
 I made this library because of the often repetitive tasks of starting a web server APIs with the need to validate input
 data. It integrates and provides the capabilities of popular web server, logging, validation and documenting solutions.
@@ -88,7 +79,48 @@ Therefore, many basic tasks can be accomplished faster and easier, in particular
   field names when you implement the client for your API.
 - You can generate your API documentation in OpenAPI 3.1 and JSON Schema compatible format.
 
+## Contributors
+
+These people contributed to the improvement of the library by reporting bugs, making changes and suggesting ideas:
+
+[<img src="https://github.com/rottmann.png" alt="@rottmann" width="50px" />](https://github.com/rottmann)
+[<img src="https://github.com/boarush.png" alt="@boarush" width="50px" />](https://github.com/boarush)
+[<img src="https://github.com/daniel-white.png" alt="@daniel-white" width="50px" />](https://github.com/daniel-white)
+[<img src="https://github.com/kotsmile.png" alt="@kotsmile" width="50px" />](https://github.com/kotsmile)
+[<img src="https://github.com/arlyon.png" alt="@arlyon" width="50px" />](https://github.com/arlyon)
+[<img src="https://github.com/elee1766.png" alt="@elee1766" width="50px" />](https://github.com/elee1766)
+[<img src="https://github.com/danclaytondev.png" alt="@danclaytondev" width="50px" />](https://github.com/danclaytondev)
+[<img src="https://github.com/huyhoang160593.png" alt="@huyhoang160593" width="50px" />](https://github.com/huyhoang160593)
+[<img src="https://github.com/sarahssharkey.png" alt="@sarahssharkey" width="50px" />](https://github.com/sarahssharkey)
+[<img src="https://github.com/shawncarr.png" alt="@shawncarr" width="50px" />](https://github.com/shawncarr)
+[<img src="https://github.com/alindsay55661.png" alt="@alindsay55661" width="50px" />](https://github.com/alindsay55661)
+[<img src="https://github.com/john-schmitz.png" alt="@john-schmitz" width="50px" />](https://github.com/john-schmitz)
+[<img src="https://github.com/bobgubko.png" alt="@bobgubko" width="50px" />](https://github.com/bobgubko)
+[<img src="https://github.com/miki725.png" alt="@miki725" width="50px" />](https://github.com/miki725)
+[<img src="https://github.com/dev-m1-macbook.png" alt="@dev-m1-macbook" width="50px" />](https://github.com/dev-m1-macbook)
+[<img src="https://github.com/McMerph.png" alt="@McMerph" width="50px" />](https://github.com/McMerph)
+[<img src="https://github.com/shroudedcode.png" alt="@shroudedcode" width="50px" />](https://github.com/shroudedcode)
+[<img src="https://github.com/maxcohn.png" alt="@maxcohn" width="50px" />](https://github.com/maxcohn)
+[<img src="https://github.com/VideoSystemsTech.png" alt="@VideoSystemsTech" width="50px" />](https://github.com/VideoSystemsTech)
+[<img src="https://github.com/TheWisestOne.png" alt="@TheWisestOne" width="50px" />](https://github.com/TheWisestOne)
+[<img src="https://github.com/lazylace37.png" alt="@lazylace37" width="50px" />](https://github.com/lazylace37)
+[<img src="https://github.com/leosuncin.png" alt="@leosuncin" width="50px" />](https://github.com/leosuncin)
+[<img src="https://github.com/kirdk.png" alt="@kirdk" width="50px" />](https://github.com/kirdk)
+[<img src="https://github.com/rayzr522.png" alt="@rayzr522" width="50px" />](https://github.com/rayzr522)
+
 # How it works
+
+## Concept
+
+The API operates object schemas for input and output validation.
+The object being validated is the combination of certain `request` properties.
+It is available to the endpoint handler as the `input` parameter.
+Middlewares have access to all `request` properties, they can provide endpoints with `options`.
+The object returned by the endpoint handler is called `output`. It goes to the `ResultHandler` which is
+responsible for transmitting consistent responses containing the `output` or possible error.
+Much can be customized to fit your needs.
+
+![Dataflow](https://raw.githubusercontent.com/RobinTail/express-zod-api/master/dataflow.svg)
 
 ## Technologies
 
@@ -102,18 +134,6 @@ Therefore, many basic tasks can be accomplished faster and easier, in particular
   - Client side types — inspired by [zod-to-ts](https://github.com/sachinraja/zod-to-ts).
 - File uploads — [Express-FileUpload](https://github.com/richardgirges/express-fileupload)
   (based on [Busboy](https://github.com/mscdex/busboy)).
-
-## Concept
-
-The API operates object schemas for input and output validation.
-The object being validated is the combination of certain `request` properties.
-It is available to the endpoint handler as the `input` parameter.
-Middlewares have access to all `request` properties, they can provide endpoints with `options`.
-The object returned by the endpoint handler is called `output`. It goes to the `ResultHandler` which is
-responsible for transmitting consistent responses containing the `output` or possible error.
-Much can be customized to fit your needs.
-
-![Dataflow](https://raw.githubusercontent.com/RobinTail/express-zod-api/master/dataflow.svg)
 
 # Quick start
 

@@ -10,6 +10,12 @@
 
 ## Version 20
 
+### v20.14.2
+
+- Documentation: promoting Express 5 as the recommended version for new projects;
+- Minor refactoring: response variant constraints, inverted definition of `AbstractLogger` type;
+- There is now an opportunity to support the project with sponsorship: https://github.com/sponsors/RobinTail
+
 ### v20.14.1
 
 - `node-mocks-http` version is `^1.16.1`:
