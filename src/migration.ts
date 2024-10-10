@@ -4,8 +4,11 @@ import {
   type TSESTree,
 } from "@typescript-eslint/utils";
 
+const createConfigName = "createConfig";
+const serverPropName = "server";
+
 const changedProps = {
-  server: "http",
+  [serverPropName]: "http",
 };
 
 const movedProps = [
@@ -50,12 +53,14 @@ const v21 = ESLintUtils.RuleCreator.withoutDocs({
     CallExpression: (node) => {
       if (
         node.callee.type === "Identifier" &&
-        node.callee.name === "createConfig" &&
+        node.callee.name === createConfigName &&
         node.arguments.length === 1
       ) {
         const argument = node.arguments[0];
         if (argument.type === "ObjectExpression") {
-          const serverProp = argument.properties.find(propByName("server"));
+          const serverProp = argument.properties.find(
+            propByName(serverPropName),
+          );
           if (serverProp) {
             const replacement = changedProps[serverProp.key.name];
             ctx.report({
