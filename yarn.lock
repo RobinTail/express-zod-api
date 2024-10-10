@@ -1679,9 +1679,9 @@ eslint-config-prettier@^9.1.0:
   integrity sha512-NSWl5BFQWEPi1j4TjVNItzYV7dZXZ+wP6I6ZhrBGpChQhZRUaElihE9uRRkcbRnNb76UMKDF3r+WTmNcGPKsqw==
 
 eslint-plugin-allowed-dependencies@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-allowed-dependencies/-/eslint-plugin-allowed-dependencies-1.0.0.tgz#8ae9b41d5566d5f2506b8ce67db7c499671bb7ef"
-  integrity sha512-G5XtSbjsvTvD+xTr4sExjB9UpaOVgD9KMDhb4pM8XKTM3IXgDMistsTDHTwgVctm19kK9dE/h5xZZaIk5sUJvQ==
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-allowed-dependencies/-/eslint-plugin-allowed-dependencies-1.0.1.tgz#1fdd87620a18e2ac923ffafe46b1312c6f4e9832"
+  integrity sha512-owrocf0t5RGOv1rIZ2oanvlYR0kx/hYVAF+eNZRn6RCZBno9/q6iEp3UJzZPKYzb0fV0fEwIFAbWWVcpemsv8Q==
   dependencies:
     ramda "^0.30.1"
 
@@ -2091,9 +2091,9 @@ globals@^14.0.0:
   integrity sha512-oahGvuMGQlPw/ivIYBjVSrWAfWLBeku5tpPE2fOPLi+WHffIWbuh2tCjhyQhTBPMf5E9jDEH4FOmTYgYwbKwtQ==
 
 globals@^15.3.0, globals@^15.9.0:
-  version "15.10.0"
-  resolved "https://registry.yarnpkg.com/globals/-/globals-15.10.0.tgz#a7eab3886802da248ad8b6a9ccca6573ff899c9b"
-  integrity sha512-tqFIbz83w4Y5TCbtgjZjApohbuh7K9BxGYFm7ifwDR240tvdb7P9x+/9VvUKlmkPoiknoJtanI8UOrqxS3a7lQ==
+  version "15.11.0"
+  resolved "https://registry.yarnpkg.com/globals/-/globals-15.11.0.tgz#b96ed4c6998540c6fb824b24b5499216d2438d6e"
+  integrity sha512-yeyNSjdbyVaWurlwCpcA6XNBrHTMIeDdj0/hnvX/OLJ9ekOXYbLsLinH/MucQyGvNnXhidTdNhTtJaffL2sMfw==
 
 gopd@^1.0.1:
   version "1.0.1"
@@ -3620,9 +3620,9 @@ typescript@5.6.1-rc:
   integrity sha512-E3b2+1zEFu84jB0YQi9BORDjz9+jGbwwy1Zi3G0LUNw7a7cePUrHMRNy8aPh53nXpkFGVHSxIZo5vKTfYaFiBQ==
 
 typescript@^5.5.2:
-  version "5.6.2"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.6.2.tgz#d1de67b6bef77c41823f822df8f0b3bcff60a5a0"
-  integrity sha512-NW8ByodCSNCwZeghjN3o+JX5OFH0Ojg6sadjEKY4huZ52TqbJTJnDo5+Tw98lSy63NZvi4n+ez5m2u5d4PkZyw==
+  version "5.6.3"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.6.3.tgz#5f3449e31c9d94febb17de03cc081dd56d81db5b"
+  integrity sha512-hjcS1mhfuyi4WW8IWtjP7brDrG2cuDZukyrYrSauoXGNgx0S7zceP07adYkJycEr56BOUTNPzbInooiN3fn1qw==
 
 undici-types@~6.19.2:
   version "6.19.8"
@@ -3630,9 +3630,9 @@ undici-types@~6.19.2:
   integrity sha512-ve2KP6f/JnbPBFyobGHuerC9g1FYGn/F8n1LWTwNxCEzd6IfqTwUQcNXgEtmmQ6DlRrC1hrSrBnCZPokRrDHjw==
 
 undici@^6.19.8:
-  version "6.19.8"
-  resolved "https://registry.yarnpkg.com/undici/-/undici-6.19.8.tgz#002d7c8a28f8cc3a44ff33c3d4be4d85e15d40e1"
-  integrity sha512-U8uCCl2x9TK3WANvmBavymRzxbfFYG+tAu+fgx3zxQy3qdagQqBLwJVrdyO1TBfUXvfKveMKJZhpvUYoOjM+4g==
+  version "6.20.0"
+  resolved "https://registry.yarnpkg.com/undici/-/undici-6.20.0.tgz#3b94d967693759ea625a3b78b2097213f30405a1"
+  integrity sha512-AITZfPuxubm31Sx0vr8bteSalEbs9wQb/BOBi9FPlD9Qpd6HxZ4Q0+hI742jBhkPb4RT2v5MQzaW5VhRVyj+9A==
 
 unicode-emoji-modifier-base@^1.0.0:
   version "1.0.0"
