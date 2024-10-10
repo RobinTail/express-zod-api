@@ -16,15 +16,21 @@ const movedProps = [
   "beforeRouting",
 ] as const;
 
+type PropWithId = TSESTree.Property & {
+  key: TSESTree.Identifier;
+};
+
+const isPropWithId = (
+  subject: TSESTree.ObjectLiteralElement,
+): subject is PropWithId =>
+  subject.type === "Property" && subject.key.type === "Identifier";
+
 const propByName =
   <T extends string>(subject: T | ReadonlyArray<T>) =>
   (
     entry: TSESTree.ObjectLiteralElement,
-  ): entry is TSESTree.Property & {
-    key: TSESTree.Identifier & { name: T };
-  } =>
-    entry.type === "Property" &&
-    entry.key.type === "Identifier" &&
+  ): entry is PropWithId & { key: { name: T } } =>
+    isPropWithId(entry) &&
     (Array.isArray(subject)
       ? subject.includes(entry.key.name)
       : entry.key.name === subject);
@@ -79,10 +85,7 @@ const v21 = ESLintUtils.RuleCreator.withoutDocs({
                 node: httpProp,
                 messageId: "move",
                 data: {
-                  subject:
-                    prop.type === "Property" && prop.key.type === "Identifier"
-                      ? prop.key.name
-                      : "the property",
+                  subject: isPropWithId(prop) ? prop.key.name : "the property",
                   from: httpProp.key.name,
                   to: `the top level of ${node.callee.name} argument`,
                 },
