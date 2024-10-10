@@ -3,14 +3,21 @@ import {
   type TSESLint,
   type TSESTree,
 } from "@typescript-eslint/utils";
-import { complement } from "ramda";
 
 const changedProps = {
   server: "http",
 };
 
+const movedProps = [
+  "jsonParser",
+  "upload",
+  "compression",
+  "rawParser",
+  "beforeRouting",
+] as const;
+
 const propByName =
-  <T extends string>(name: T) =>
+  <T extends string>(subject: T | ReadonlyArray<T>) =>
   (
     entry: TSESTree.ObjectLiteralElement,
   ): entry is TSESTree.Property & {
@@ -18,7 +25,9 @@ const propByName =
   } =>
     entry.type === "Property" &&
     entry.key.type === "Identifier" &&
-    entry.key.name === name;
+    (Array.isArray(subject)
+      ? subject.includes(entry.key.name)
+      : entry.key.name === subject);
 
 const v21 = ESLintUtils.RuleCreator.withoutDocs({
   meta: {
@@ -59,7 +68,7 @@ const v21 = ESLintUtils.RuleCreator.withoutDocs({
           );
           if (httpProp && httpProp.value.type === "ObjectExpression") {
             const nested = httpProp.value.properties;
-            const movable = nested.filter(complement(propByName("listen")));
+            const movable = nested.filter(propByName(movedProps));
             for (const prop of movable) {
               const propText = ctx.sourceCode.text.slice(
                 prop.range[0],
